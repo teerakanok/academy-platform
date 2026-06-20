@@ -2,7 +2,7 @@
 
 > Open work only. Move closed items to `completed_log.md` with evidence.
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
-> **Last updated:** 2026-05-26
+> **Last updated:** 2026-06-10
 
 ---
 
@@ -43,6 +43,57 @@ Use only assets that already exist + free/owned infra. No paid platform, no larg
 - [ ] Import the CAS-005 bank (portable content → chosen platform; no re-authoring).
 - [ ] Freemium gate ladder: free sample → paid full bank + study guides → live cohort → corporate in-house quote → waitlists.
 - [ ] First trend course pilot (pick one with demand signal: Agentic AI security / Risk / ISO / basic pentest / cryptography).
+
+## Parallel strategic track — Train-the-Trainer / Instructor Business-in-a-Box
+
+This is **not a replacement for the learner-facing Academy**. Keep the original B2C / B2B learner path alive. This track is a parallel B2B/B2B2C wedge: sell commercial teaching capability to instructors, training centers, universities, bootcamps, and consultants who want to launch cert-prep classes quickly.
+
+Deep market research, competitor analysis, pricing model, and validation gates: `reports/train-the-trainer-market-research-2026-06-10.md`.
+
+### Concept
+
+Package CYBERSKILLS Academy content as a **commercially licensed trainer starter kit**:
+- Instructor kit: teaching notes, lesson plan, timing plan, slide deck, instructor script, lab setup guide, facilitation tips, common student questions.
+- Student kit: workbook, handouts, lab guide, practice questions, mock exam, explained answers.
+- Online subscription labs: cohort-ready lab seats, updated as tools/exam objectives change.
+- Trainer prep: on-demand videos that teach the instructor how to teach the course quickly.
+- Update subscription: continuously refreshed slide, lab, mock exam, and transition guide when exam versions/objectives change.
+- Launch assets: course outline, landing-page copy, sales brochure, pricing guidance, certificate template.
+- Commercial license: explicit right to use the content in paid classes, subject to license limits.
+
+### Value proposition
+
+- Help instructors start a new training business faster.
+- Let instructors bring themselves + capital; CYBERSKILLS supplies the courseware, labs, mocks, and teaching system.
+- Shorten time-to-revenue: buy the kit, get teaching-ready assets immediately.
+- Give small training providers a credible course catalog without building content from zero.
+
+### Business model
+
+- Subscription for updated courseware, labs, mock exams, and trainer-prep videos.
+- Commercial teaching license by instructor, cohort, institution, or student-seat tier.
+- Optional lab-seat usage pricing for cohorts.
+- Possible higher-touch tier: CYBERSKILLS reviews/approves instructors and provides delivery QA.
+
+### Phase 0 validation path
+
+- [ ] Identify 10-20 real prospects: independent instructors, corporate trainers, universities, bootcamps, and small training centers.
+- [ ] Create a 1-module sample kit + product one-pager + draft commercial license; do **not** build a full platform first.
+- [ ] Test willingness to pay with paid pilot, LOI, or deposit. Interest without money is not a go signal.
+- [ ] Validate legal/IP/trademark constraints for each target certification before public positioning; do not imply official authorization unless formally authorized.
+- [ ] Compare this track against learner-facing Academy signals after the first validation cycle; both can proceed if the channel and maintenance load are justified.
+
+### 5-Direction Design Check
+
+**Forward:** Add a parallel instructor-enablement offering that packages Academy assets into a commercial courseware + labs + trainer-prep subscription. Success is not a built platform; success is validated instructor/training-center willingness to pay.
+
+**Reverse:** Runtime buyer flow: instructor sees offer → reviews sample module/license → pays pilot/deposit → receives courseware/lab access → teaches cohort → reports usage/feedback. Outputs needed: license terms, content package, lab-seat rules, update cadence, QA expectations.
+
+**Top:** This complements learner-facing Academy and STAR. Academy content remains the source package; STAR-style labs can become optional cohort lab seats. It must not blur into official certification-provider training unless CYBERSKILLS has authorization.
+
+**Bottom:** Maintenance cost is real because exam objectives, slides, labs, and mock explanations must stay current. Start with one cert/module sample before any recurring platform or full catalog commitment.
+
+**Left-Right:** Alternative considered: keep only direct-to-learner Academy. Not chosen as the only path because instructor licensing can create higher willingness-to-pay and distribution leverage. Tradeoff: higher legal/QA burden, but potentially stronger B2B revenue and faster channel access.
 
 ---
 
