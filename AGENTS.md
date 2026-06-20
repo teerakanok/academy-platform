@@ -8,6 +8,31 @@
 
 ---
 
+## Required read order
+
+For every Academy session:
+
+1. Read director context: `../../../AGENTS.md`.
+2. Read this file.
+3. Read `plans/active_plan.md` and `plans/completed_log.md`.
+4. Read local `principles/` and `skills/` only when the task matches a project-specific addition.
+5. For cross-product work, read `../../../ecosystem/ECOSYSTEM.md`.
+
+Provider-specific folders or files may point here, but this file and local project governance are the canonical source.
+
+## Local governance layout
+
+- `principles/` - Academy-specific principles only; global rules stay in the director repo.
+- `skills/` - Academy-specific skills only; do not duplicate global director skills.
+- `plans/active_plan.md` - open goals, gates, acceptance criteria, risks, and strategic backlog.
+- `plans/completed_log.md` - closed decisions/work with outcome, evidence, and residual risk.
+- `reports/` - Academy reports, sessions, handoffs, reviews, and project evidence summaries.
+- `artifacts/` - generated evidence for Academy work, such as exports, screenshots, traces, and raw validation outputs.
+- `context/` - durable source-of-truth context that is not a plan, report, or artifact.
+- `docs/` - product, engineering, and user-facing documentation.
+
+Local governance must complement director standards, stay provider-neutral, and remain additive unless the task explicitly approves broader cleanup.
+
 ## What this is
 
 **CyberSkills Academy** — the **knowledge / courses pillar** of the CYBERSKILLS ecosystem: an online learning destination that sells

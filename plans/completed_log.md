@@ -5,6 +5,32 @@
 
 ---
 
+## 2026-06-20 — Governance structure standardized
+
+**Outcome:** Academy governance now follows the director-managed project
+structure with project-local ownership for principles, skills, plans, reports,
+artifacts, context, and docs.
+
+**What changed / decided:**
+- Added project-local governance directories with short ownership READMEs:
+  `principles/`, `skills/`, `reports/`, `reports/handoffs/`,
+  `reports/sessions/`, `reports/reviews/`, `artifacts/`, `context/`, and
+  `docs/`.
+- Updated `AGENTS.md` with the required read order, director/ecosystem links,
+  and the local governance directory map.
+- Kept existing Academy reports in the product repo and did not migrate old
+  artifacts or reports in bulk.
+
+**Evidence:**
+- Governance structure verified with targeted file/directory checks.
+- Director governance validator run from the director repo:
+  `rtk bash scripts/validate-governance.sh`.
+- Diff hygiene checked with `rtk git diff --check`.
+
+**Residual risk:**
+- This is governance scaffold only; it does not resolve Phase 0 validation work
+  or the open CAS-005 answer-key disputes.
+
 ## 2026-05-26 — Project naming + GTM strategy + repo bootstrap
 
 **Outcome:** CyberSkills Academy defined as a product (planning stage) with a locked name, agreed scope, an honest go-to-market strategy, and a validate-before-invest operating principle. Repository created and registered.
