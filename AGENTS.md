@@ -1,9 +1,9 @@
 # AGENTS.md — CyberSkills Academy (academy-platform)
 **Single Source of Truth — Provider-Agnostic AI Agent Context**
-**Compatible with: Claude Code | Gemini CLI | OpenAI Codex | any future AI agent**
+**Compatible with provider-neutral AI agents**
 
 > Canonical context for this product. All AI providers read this file.
-> Provider-specific extensions (if ever needed) go in a separate `CLAUDE.md` / `.gemini/` / `.codex/` and must reference this file. Keep this file provider-neutral.
+> Provider-specific extensions, if ever needed, are pointer files only and must reference this file. Keep this file provider-neutral.
 > Director-level context lives in the repo-root `../../../AGENTS.md` (CYBERSKILLS ecosystem). Read it before cross-product work.
 
 ---
@@ -149,5 +149,6 @@ When delegating work on this product, describe roles by **neutral capability tie
 
 - `plans/active_plan.md` — open goals, gates, acceptance criteria, risks, strategic backlog.
 - `plans/completed_log.md` — closed items with outcome + evidence + residual risk.
-- Strategy memory (Director): `~/.claude/projects/.../memory/project_academy.md`.
+- Strategy context: `plans/active_plan.md`, `plans/completed_log.md`,
+  `context/`, and relevant ecosystem docs.
 - Read repo-root `AGENTS.md` + `ecosystem/ECOSYSTEM.md` before cross-product work.
