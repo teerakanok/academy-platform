@@ -20,6 +20,15 @@ For every Academy session:
 
 Provider-specific folders or files may point here, but this file and local project governance are the canonical source.
 
+## Founder Updates
+
+For a verified, material Academy prototype, decision, milestone, shipped outcome,
+risk, or blocker with new evidence and direct founder value, run the director
+`publish-owner-update` skill's `assess-trigger` gate. If eligible, publish only
+through route `academy` to `#product-academy`. Never trigger from a commit,
+routine progress, status question, duplicate evidence, chore, or session close
+alone. A route failure is a stop; never fall back to `director`.
+
 ## Local governance layout
 
 - `principles/` - Academy-specific principles only; global rules stay in the director repo.
