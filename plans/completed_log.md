@@ -5,6 +5,55 @@
 
 ---
 
+## 2026-07-31 — One-shot build EXECUTED: M1 + M2 + M3-prep ผ่าน acceptance ครบ
+
+**Outcome:** `academy-web/` เกิดจริงและเขียวทั้ง chain จาก clean install:
+`npm ci && build && lint && test (vitest 55/55) && test:e2e (playwright 18/18)`
+บน local Supabase จริง — M1 Foundation (landing + PDPA + lead capture + schema
+`academy` RLS default deny), M2 Course player (loader + practice + timed exam +
+PBQ checks/select/order + scoring spec + module nav + resume + axe + visual
+matrix), M3-prep (ADR draft single-account)
+
+**What changed (commit หลักของ run):**
+- M1: scaffold ตรึงรุ่นตาม cyberskills-web (next 15.5.x/react 18.3.x/tailwind
+  3.4.19 + lockfile + .nvmrc 24 + SBOM) · landing content-agnostic + `/privacy`
+  PDPA + consent v1 versioned + CHECK constraint · `/api/leads` idempotent +
+  content-type/body-size/rate-limit + DB-fail ตอบ fail จริง · migration 0001
+  (RLS เปิด 0 policy, grant เฉพาะ service_role) · tests: RLS hardening จาก
+  pg_catalog + anon REST read/write ถูกปฏิเสธแยก test + service-role positive
+- M2: fixture CAS-005 internal (md5 ตรง source Crucible `640c8613`) + integrity
+  test · loader → `CourseContent` (validation บอกไฟล์/field) · scoring ตามแผน
+  §4-M2-3 ครบ edge · timer deadline-based + fake clock · progress localStorage
+  versioned + corrupt reset · full-acceptance e2e: FL-02 ทั้งชุดผ่าน UI 90 ข้อ
+  → 105/106 = 99.1% ตรงเป๊ะ (ตั้งใจผิด 1 MCQ), PBQ 21/21, exhibit PBQ-009,
+  weakest domain ถูก module · visual matrix 7 states × {1440, 390} ไม่มี defect
+- M3-prep: `docs/adr/ADR-draft-single-account.md` (DRAFT — decision matrix 5
+  แกน + code evidence 4 product + migration/rollback sketch + คำแนะนำ Option A)
+- `PENDING_USER_ACTION.md` ครบตามแผน §5 (Vercel/Cloudflare/DB prod/ADR/push)
+
+**Deviation จากแผนที่ต้องรู้:**
+- **Fixture module-1 = 150 MCQ ไม่ใช่ 165** — เลข 165 ในแผน/RIL รอบก่อนเป็นความ
+  คลาดเคลื่อนของสคริปต์นับรอบวางแผน (source + manifest ของ source เอง = 150;
+  reviewer codex ที่ประเมิน 150 ถูกแล้ว) → integrity test ยึด 150 + บันทึกใน
+  `academy-web/fixtures/cas005/README.md`
+- MCQ 35 ข้อมี `visual` ref ไป assets/ ที่อยู่นอกสโคป fixture — loader เก็บ
+  metadata, player ไม่ render (known limitation)
+- Infra เครื่อง dev: disk เต็ม (เหลือ 120MB) ทำ Docker snapshot พังกลาง run —
+  กู้ด้วยการลบ lease ค้าง + re-pull + เคลียร์ image เก่า (~9GB คืน); บันทึกใน
+  PENDING ข้อ 8
+
+**Evidence:** commits ใน repo นี้ (scaffold → M1 → fixture → M2 core → M2 UI →
+M2 e2e → ADR) · artifacts/oneshot-2026-07-31/{m1,m2}/ (screenshots ทุก state) ·
+review lane อิสระหลัง build (ผลอยู่ใน handoff ปิด session)
+
+**Residual risk:**
+- ยังไม่ deploy จริง — external checkpoints ทั้งหมดรอ founder (PENDING §1–3)
+- In-memory rate-limit พอเฉพาะหลัง Zero Trust; public ต้องมี edge rate-limit
+- `/player` + fixture = INTERNAL ONLY ห้ามหลุดไป public deploy
+- M3 auth จริงยังล็อกด้วย ADR gate (draft พร้อมแล้ว)
+
+---
+
 ## 2026-07-31 — One-shot build plan เสร็จ + ผ่าน RIL 2 lane (codex + claude) converge
 
 **Outcome:** แผน execute แบบ one-shot สำหรับ M1+M2+M3-prep พร้อมใช้ที่

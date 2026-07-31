@@ -35,21 +35,25 @@ validation ต่อ course เป็นรอบ pitch + poll ของ founder
 
 ### Build roadmap (content-agnostic, ยึด infra + implementation ที่ล็อก 2026-07-31)
 
-- [ ] **M1 — Foundation:** app `academy-web/` (Next.js App Router + cs- design
-  tokens) ใน repo นี้ + Supabase self-host wiring + โครง PDPA consent +
-  พร้อม deploy Vercel `sin1` / CNAME `academy.cyberskills.co.th` / Zero Trust
-  ครอบทุกหน้า (pre-public) — Done = build ผ่าน, shell แบรนด์ถูกต้อง render,
-  DB round-trip; ส่วน deploy/DNS/Access เป็น external-service step แยก
-  (ต้องทำกับ founder — ห้ามทำใน AFK)
-- [ ] **M2 — Course player (commodity core):** player เสพ Crucible portable
-  JSON — video slot, practice/quiz พร้อม hard requirements เดิม (multi-answer
-  grading, per-question explanation, question pools/timed/retake, PBQ UX),
-  module nav + progress; interactive video บน custom HLS player มาตอน commit
-  CF Stream (M5) — M2 ใช้ CAS-005 bank เป็น dev fixture ภายใน
+- [x] **M1 — Foundation:** ✅ **เสร็จ 2026-07-31 (local acceptance ครบ)** —
+  `academy-web/` build+lint+test+e2e เขียวจาก `npm ci` บน local Supabase จริง;
+  landing + PDPA + lead capture + schema `academy` RLS default deny
+  (ดู `completed_log.md` entry 2026-07-31 one-shot executed); ส่วน deploy
+  Vercel `sin1` / CNAME / Zero Trust = external checkpoints รอ founder ตาม
+  `PENDING_USER_ACTION.md` §1–3 (ห้ามทำใน AFK)
+- [x] **M2 — Course player (commodity core):** ✅ **เสร็จ 2026-07-31** — loader
+  เสพ Crucible portable JSON + practice (explanation/pool/shuffle/retake) +
+  timed exam (deadline timer/resume) + PBQ checks/select/order + exhibit +
+  scoring spec + module nav + progress + axe + visual matrix; fixture =
+  CAS-005 internal (นับจริง 150 MCQ — เลข 165 ในแผนเดิมคลาดเคลื่อน); video
+  slot เป็น placeholder จนกว่า commit CF Stream (M5)
 - [ ] **M3 — Identity + personalized path v0:** email-identity account
   (ออกแบบ consume external issuer ได้), progress persistence, assessment →
   skip/branch + cheatsheet slot — **ก่อนลงมือ M3 ต้องมี ADR ecosystem
   single-account (Crux/STAR/Academy/Forge) อย่างน้อยฉบับ draft ให้ founder เคาะ**
+  → ✅ **draft พร้อมแล้ว 2026-07-31**: `docs/adr/ADR-draft-single-account.md`
+  (แนะนำ Option A — formalize Pool A GoTrue + identity contract + JWKS
+  asymmetric) — รอ founder เคาะ + ยกเป็น ecosystem ADR
 - [ ] **M4 — Lab gate:** เสียบ Crux lab plane (แยก GCP project + budget alarm),
   checkpoint-lab flow + credit meter v0 (ภายใน)
 - [ ] **M5 — Commerce + video:** credit ledger จริง + edition/pricing logic +
