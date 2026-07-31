@@ -15,7 +15,7 @@ export function WaitlistForm({ consentSummary }: { consentSummary: string }) {
     event.preventDefault()
     if (!consent) {
       setStatus('error')
-      setErrorMessage('โปรดยอมรับนโยบายความเป็นส่วนตัวก่อนลงทะเบียน')
+      setErrorMessage('Please accept the privacy notice before signing up.')
       return
     }
     setStatus('submitting')
@@ -39,11 +39,11 @@ export function WaitlistForm({ consentSummary }: { consentSummary: string }) {
         setStatus('success')
       } else {
         setStatus('error')
-        setErrorMessage(data?.error ?? 'บันทึกไม่สำเร็จ โปรดลองใหม่ภายหลัง')
+        setErrorMessage(data?.error ?? 'Could not save that. Please try again.')
       }
     } catch {
       setStatus('error')
-      setErrorMessage('เชื่อมต่อไม่สำเร็จ โปรดลองใหม่ภายหลัง')
+      setErrorMessage('Could not reach the server. Please try again.')
     }
   }
 
@@ -52,10 +52,10 @@ export function WaitlistForm({ consentSummary }: { consentSummary: string }) {
       <div
         role="status"
         data-testid="waitlist-success"
-        className="rounded-lg border border-cs-accent-border bg-cs-accent-dim px-5 py-4 text-cs-text"
+        className="rounded-xl border border-cs-accent-border bg-cs-accent-dim px-5 py-4 text-cs-text"
       >
-        <p className="font-semibold">ลงทะเบียนเรียบร้อย</p>
-        <p className="text-sm text-cs-body mt-1">เราจะส่งข่าวการเปิดตัวไปที่อีเมลของคุณ</p>
+        <p className="font-semibold">You are on the list.</p>
+        <p className="text-sm text-cs-body mt-1">We will email you when the next course opens.</p>
       </div>
     )
   }
@@ -64,7 +64,7 @@ export function WaitlistForm({ consentSummary }: { consentSummary: string }) {
     <form onSubmit={handleSubmit} className="space-y-4" noValidate>
       <div className="flex flex-col sm:flex-row gap-3">
         <label htmlFor="waitlist-email" className="sr-only">
-          อีเมล
+          Email
         </label>
         <input
           id="waitlist-email"
@@ -74,14 +74,14 @@ export function WaitlistForm({ consentSummary }: { consentSummary: string }) {
           placeholder="you@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="flex-1 rounded-lg border border-cs-border bg-cs-surface px-4 py-3 text-cs-text placeholder:text-cs-faint focus:border-cs-accent focus:outline-none focus:ring-1 focus:ring-cs-accent"
+          className="flex-1 rounded-xl border border-cs-border bg-cs-surface px-4 py-3 text-cs-text placeholder:text-cs-faint focus:border-cs-accent focus:outline-none focus:ring-1 focus:ring-cs-accent"
         />
         <button
           type="submit"
           disabled={status === 'submitting'}
-          className="rounded-lg bg-cs-accent px-6 py-3 font-semibold text-cs-bg transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="rounded-xl bg-cs-accent px-6 py-3 font-semibold text-cs-on-accent transition-opacity hover:opacity-90 disabled:opacity-50"
         >
-          {status === 'submitting' ? 'กำลังบันทึก…' : 'ลงทะเบียนรอเปิดตัว'}
+          {status === 'submitting' ? 'Saving…' : 'Notify me'}
         </button>
       </div>
 
@@ -96,7 +96,7 @@ export function WaitlistForm({ consentSummary }: { consentSummary: string }) {
         <span>
           {consentSummary}{' '}
           <Link href="/privacy" className="text-cs-accent underline underline-offset-4">
-            อ่านนโยบายความเป็นส่วนตัว
+            Read the privacy notice
           </Link>
         </span>
       </label>

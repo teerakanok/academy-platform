@@ -5,12 +5,86 @@
 @tailwind utilities;
 
 /*
- * CyberSkills Academy — dark terminal theme (cs- tokens จาก @cyberskills/tokens)
- * ค่าสีมาจาก tailwind preset โดยตรง (hex) — ยังไม่มี theme toggle ใน scope นี้
+ * CyberSkills Academy — visual identity
  *
- * ข้อห้าม brand: ห้ามใส่ letter-spacing กับข้อความภาษาไทย (อ่านยาก/สระลอย)
- * — utility ที่มี tracking ใช้ได้เฉพาะข้อความละติน/ตัวเลขเท่านั้น
+ * อยู่ใน family เดียวกับ cyberskills.co.th โดยใช้ "ชื่อ token ชุดเดียวกัน" (cs-*)
+ * แต่ให้ "ค่าของตัวเอง" — ทำให้ component ที่มีอยู่เปลี่ยนอารมณ์ตามได้ทันทีโดยไม่ต้องแก้ไฟล์
+ *
+ * ทำไมค่าถึงต่างจากเว็บหลัก: เว็บหลักคือบริษัท security (เข้ม/คม/terminal)
+ * ส่วน Academy คือห้องเรียน — งานของมันคือลดกำแพงความกลัว ไม่ใช่สร้างความน่าเกรงขาม
+ *   · พื้นหลังขาวอมมิ้นต์ (ไม่ใช่ขาวอมฟ้าแบบเว็บหลัก, ไม่ใช่ครีม) = สดและสงบ
+ *   · light เป็นค่าตั้งต้น, dark สลับได้
+ *   · teal ยังเป็นสายเลือดเดิม + เพิ่ม indigo เป็นสีที่สองสำหรับ "ความก้าวหน้า/ทักษะ"
+ *
+ * สีของ data viz ผ่านการ validate ด้วยสคริปต์จริง (ไม่ได้กะเอา):
+ *   light  teal #00785C + indigo #5B63D3 → ผ่านครบทุกข้อ
+ *   dark   teal #16A98A + indigo #7F88EC → ผ่านครบทุกข้อ
+ *   (lightness band, chroma floor, CVD separation, normal-vision floor, contrast)
  */
+
+:root {
+  /* ---- LIGHT = ค่าตั้งต้นของ Academy ---- */
+  --cs-bg: 244 247 246; /* #F4F7F6 ขาวอมมิ้นต์ */
+  --cs-surface: 255 255 255;
+  --cs-surface-2: 236 242 240;
+  --cs-border: 214 224 221;
+  --cs-border-2: 178 196 191;
+  --cs-text: 18 33 30; /* เขียวเกือบดำ นุ่มกว่าดำสนิท */
+  --cs-primary: 18 33 30;
+  --cs-body: 45 63 58;
+  --cs-muted: 92 112 106;
+  --cs-faint: 107 122 118;
+
+  /* #00785C — ต้องผ่านสองเกณฑ์พร้อมกัน: WCAG (เป็นสีตัวหนังสือ) และ dataviz
+     (เป็นสีของเส้น/จุดในกราฟ) ค่าแรกที่เลือก #00806A ตกเกณฑ์ WCAG บนพื้น
+     surface-2 (4.31) ส่วน #00755F ที่เข้มพอกลับตกเกณฑ์ chroma ของ dataviz —
+     ค่านี้ผ่านทั้งคู่: contrast surface-2 4.82 / white 5.47, dataviz ผ่านครบ */
+  --cs-accent: 0 120 92;
+  --cs-on-accent: 255 255 255;
+  --cs-accent-dim: rgba(0, 120, 92, 0.1);
+  --cs-accent-border: rgba(0, 120, 92, 0.28);
+
+  --cs-accent-2: 91 99 211; /* #5B63D3 — ความก้าวหน้า/ทักษะ/พิสูจน์แล้ว */
+  --cs-accent-2-dim: rgba(91, 99, 211, 0.1);
+  --cs-accent-2-border: rgba(91, 99, 211, 0.28);
+
+  /* #A6480A — เหตุผลเดียวกับ teal (เดิม 4.43 บน surface-2) ค่านี้ได้ 5.21 */
+  --cs-amber: 166 72 10;
+  --cs-amber-dim: rgba(166, 72, 10, 0.1);
+  --cs-amber-border: rgba(166, 72, 10, 0.3);
+
+  --cs-shadow-card: 0 1px 3px rgba(16, 40, 34, 0.06), 0 8px 24px -12px rgba(16, 40, 34, 0.12);
+  --cs-shadow-lift: 0 2px 6px rgba(16, 40, 34, 0.08), 0 16px 36px -16px rgba(16, 40, 34, 0.18);
+}
+
+:root[data-theme='dark'] {
+  --cs-bg: 10 18 17;
+  --cs-surface: 17 28 26;
+  --cs-surface-2: 26 41 38;
+  --cs-border: 36 56 52;
+  --cs-border-2: 56 82 76;
+  --cs-text: 236 245 242;
+  --cs-primary: 236 245 242;
+  --cs-body: 200 216 211;
+  --cs-muted: 141 162 156;
+  --cs-faint: 122 142 137;
+
+  --cs-accent: 22 169 138; /* #16A98A */
+  --cs-on-accent: 6 16 14;
+  --cs-accent-dim: rgba(22, 169, 138, 0.14);
+  --cs-accent-border: rgba(22, 169, 138, 0.34);
+
+  --cs-accent-2: 127 136 236; /* #7F88EC */
+  --cs-accent-2-dim: rgba(127, 136, 236, 0.14);
+  --cs-accent-2-border: rgba(127, 136, 236, 0.34);
+
+  --cs-amber: 245 165 74;
+  --cs-amber-dim: rgba(245, 165, 74, 0.14);
+  --cs-amber-border: rgba(245, 165, 74, 0.32);
+
+  --cs-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+  --cs-shadow-lift: 0 2px 6px rgba(0, 0, 0, 0.45), 0 16px 36px -16px rgba(0, 0, 0, 0.7);
+}
 
 html {
   scroll-behavior: smooth;
@@ -21,5 +95,64 @@ body {
 }
 
 ::selection {
-  @apply bg-cs-accent/30 text-cs-text;
+  background: var(--cs-accent-dim);
+  color: rgb(var(--cs-text));
+}
+
+/* การ์ดสีขาวบนพื้นขาวอมมิ้นต์ต้องมีเงาบางๆ ถึงจะลอยขึ้นมา */
+.card {
+  @apply rounded-2xl border border-cs-border bg-cs-surface;
+  box-shadow: var(--cs-shadow-card);
+}
+
+.card-interactive {
+  @apply card transition-all duration-200;
+}
+
+.card-interactive:hover {
+  box-shadow: var(--cs-shadow-lift);
+  transform: translateY(-2px);
+}
+
+/* ความยาวบรรทัดสำหรับอ่านเนื้อหาเรียน — งานหลักของหน้าบทเรียนคือ "อ่านสบาย" */
+.prose-lesson {
+  max-width: 68ch;
+}
+
+.prose-lesson p {
+  @apply text-[1.0625rem] leading-[1.75];
+}
+
+/* โฟกัสต้องเห็นชัดทุกที่ (ผู้เรียนใช้คีย์บอร์ดเยอะ) */
+:focus-visible {
+  outline: 2px solid rgb(var(--cs-accent));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* บทเรียน/โหนดบนแผนที่ทยอยปรากฏตามลำดับขั้น — สื่อว่า "เส้นทางค่อยๆ คลี่ออก" */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rise-in {
+  animation: rise-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
 }

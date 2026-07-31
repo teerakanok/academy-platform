@@ -1,10 +1,21 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Inter, JetBrains_Mono } from 'next/font/google'
+import { Fraunces, Inter, JetBrains_Mono } from 'next/font/google'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import './globals.css'
 
-// ตาม pattern cyberskills-web: next/font โหลดฟอนต์ตอน build — ไม่มี external
-// request ตอน runtime, CLS จากฟอนต์เป็น 0; ภาษาไทยใช้ system fallback
+// Fraunces (soft serif) พูดแทน "คน/ความรู้" · Inter อ่านยาวสบาย · JetBrains Mono
+// พูดแทน "เครื่อง" — คอร์สนี้คือการสอนคนคุยกับเครื่อง ตัวอักษรเลยแบ่งหน้าที่แบบนั้น
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  // variable weight ปลดล็อกแกน SOFT/WONK ซึ่งเป็นตัวที่ทำให้หัวเรื่องดูอบอุ่น
+  // แทนที่จะเป็น serif วิชาการแข็งๆ
+  weight: 'variable',
+  axes: ['SOFT', 'WONK'],
+  variable: '--font-fraunces',
+  display: 'swap',
+})
+
 const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
@@ -14,7 +25,7 @@ const inter = Inter({
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
-  weight: ['400', '500', '600'],
+  weight: ['400', '500'],
   variable: '--font-jetbrains-mono',
   display: 'swap',
 })
@@ -22,35 +33,72 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: {
     default: 'CyberSkills Academy',
-    template: '%s | CyberSkills Academy',
+    template: '%s · CyberSkills Academy',
   },
   description:
-    'แพลตฟอร์มเรียนรู้ cybersecurity แบบ personalized — เรียนเฉพาะสิ่งที่ยังไม่รู้ พิสูจน์ทักษะด้วย lab จริง',
-  robots: {
-    // ยังไม่ public — อยู่หลัง Zero Trust; กัน index ไว้ก่อนจนกว่า founder สั่งเปิด
-    index: false,
-    follow: false,
-  },
+    'Learn cybersecurity without relearning what you already know. Map your path, prove your skills, and keep moving.',
+  robots: { index: false, follow: false },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="th" data-theme="dark" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+    <html
+      lang="en"
+      data-theme="light"
+      className={`${inter.variable} ${fraunces.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
+    >
+      <head>
+        {/* ใช้ธีมที่ผู้ใช้เลือกไว้ก่อนวาดเฟรมแรก — กันจอกระพริบ; ค่าตั้งต้นคือ light
+            ความปลอดภัย: สตริงนี้เป็น literal คงที่ ไม่มีการ interpolate ค่าใดจากผู้ใช้
+            จึงไม่มีช่องทาง XSS (pattern เดียวกับ cyberskills-web) */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(localStorage.getItem('academy.theme')==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}",
+          }}
+        />
+      </head>
       <body className="min-h-screen flex flex-col">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:bg-cs-accent focus:text-cs-bg focus:px-4 focus:py-2 focus:rounded focus:text-sm focus:font-medium"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:rounded-lg focus:bg-cs-accent focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-cs-on-accent"
         >
-          ข้ามไปเนื้อหาหลัก
+          Skip to content
         </a>
+
+        <header className="sticky top-0 z-40 border-b border-cs-border bg-cs-bg/85 backdrop-blur">
+          <div className="mx-auto flex max-w-6xl items-center gap-6 px-6 py-3.5">
+            <Link href="/" className="font-display text-lg font-semibold tracking-tight text-cs-text">
+              CyberSkills <span className="text-cs-accent">Academy</span>
+            </Link>
+            <nav aria-label="Main" className="ml-auto flex items-center gap-1 text-sm">
+              <Link
+                href="/dashboard"
+                className="rounded-lg px-3 py-1.5 text-cs-muted transition-colors hover:bg-cs-surface-2 hover:text-cs-text"
+              >
+                My learning
+              </Link>
+              <Link
+                href="/player"
+                className="rounded-lg px-3 py-1.5 text-cs-muted transition-colors hover:bg-cs-surface-2 hover:text-cs-text"
+              >
+                Practice
+              </Link>
+            </nav>
+            <ThemeToggle />
+          </div>
+        </header>
+
         <main id="main" className="flex-1">
           {children}
         </main>
-        <footer className="border-t border-cs-border px-6 py-6 text-sm text-cs-muted">
-          <div className="mx-auto max-w-5xl flex flex-wrap items-center justify-between gap-3">
+
+        <footer className="mt-16 border-t border-cs-border px-6 py-8 text-sm text-cs-muted">
+          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3">
             <span>© {new Date().getFullYear()} CYBERSKILLS</span>
-            <Link href="/privacy" className="hover:text-cs-accent underline underline-offset-4">
-              นโยบายความเป็นส่วนตัว
+            <Link href="/privacy" className="underline underline-offset-4 hover:text-cs-accent">
+              นโยบายความเป็นส่วนตัว (Privacy)
             </Link>
           </div>
         </footer>
