@@ -5,6 +5,36 @@
 
 ---
 
+## 2026-07-31 — Implementation direction ล็อก: DIY "build the core, buy the plumbing" + ทิศทาง single-account auth
+
+**Outcome:** ปิดคำถาม Phase 1 "hosted LMS vs DIY" — **ไม่ซื้อ platform, build เอง
+แบบซื้อเฉพาะ plumbing** และเพิ่มทิศทาง auth: **single account เข้าได้ทุก product**
+(Crux, STAR, Academy, Forge) ซึ่งต้องยกเป็น ADR ระดับ ecosystem ก่อน build จริง
+
+**What changed / decided:**
+- เหตุผลหลัก: product ที่ล็อกไว้ (path engine, prove-it lab, ระบบแต้ม, edition
+  pricing) ไม่มีขายใน LMS ไหน — ซื้อ platform = จ่ายรายเดือนให้ส่วน commodity
+  แล้วยัง build ส่วนที่เป็น product อยู่ดี + vendor lock
+- Build: path engine, credit ledger, pricing logic, course player, admin /
+  Reuse: Crux lab plane, self-hosted Supabase, cs- design system, Crucible /
+  Buy เป็น service จ่ายตามใช้: video streaming + payment (candidates ยังไม่เลือก
+  — ต้อง due-diligence ตอนใช้จริง)
+- ไม่ขัด validate-before-invest: DIY บน infra ตัวเอง = recurring ~ศูนย์;
+  slice แรกของ stack จริง = ตัว Phase 0 เอง (build once, ไม่มีของ throwaway)
+- Auth: ยกหลัก "single email identity" เดิมเป็น cross-product single account;
+  ระหว่างรอ ADR → Phase 0 ใช้ email เป็น identity key + ออกแบบ auth ให้ consume
+  external issuer ได้
+
+**Evidence:** วิเคราะห์เทียบ LearnWorlds (verified $99–299/mo, ไม่มี credit
+metering / lab plane / edition pro-rata) ใน director session 2026-07-31;
+Crux lab plane + money-safety มีอยู่จริงใน `crux-lms/product/services/lab-plane/`
+
+**Residual risk:**
+- Build scope จริงยังไม่ถูก estimate — ห้ามเริ่ม build ก่อน Phase 0 signal ตาม gate เดิม
+- Single-account ADR ยังไม่เกิด — ถ้า Academy build auth ไปก่อนโดยไม่ design ให้
+  consume external issuer จะสร้าง migration debt
+- ตัวเลือก vendor (streaming/payment) ยังไม่ verify ราคา/เงื่อนไขปัจจุบัน
+
 ## 2026-07-31 — Product concept + pricing/access model (founder discussion → draft ลงแผน)
 
 **Outcome:** นิยาม product ของ Academy ชัดขึ้นจาก "on-demand courses" เป็น

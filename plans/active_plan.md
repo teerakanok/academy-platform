@@ -122,6 +122,44 @@ Use only assets that already exist + free/owned infra. No paid platform, no larg
   = เรื่องเดียวกัน: *platform ที่ไม่หลังหักผู้เรียน*)
 - ตัวเลขทั้งหมด (floor %, window, สูตร linear) = **placeholder ตัวอย่าง** รอ calibrate
 
+### Implementation direction — ล็อก 2026-07-31: DIY "build the core, buy the plumbing"
+
+- **ไม่ซื้อ hosted LMS** — product ที่ล็อกไว้ (path engine, prove-it lab gate, ระบบแต้ม,
+  edition/pro-rata pricing) **ไม่มีขายใน platform ไหน**; hosted LMS ครอบแค่ส่วน
+  commodity (วิดีโอ+quiz) แล้วยังต้อง build ส่วนที่เป็น product ล้อมมันอยู่ดี =
+  จ่ายสองต่อ + vendor lock
+- **Build:** path engine, credit ledger, edition/pricing logic, course player UX, admin
+- **Reuse (มีแล้ว):** lab plane จาก Crux (shared capability), self-hosted Supabase
+  (auth+DB), cs- design system, Crucible content pipeline
+- **Buy เป็น service (จ่ายตามใช้):** video streaming (signed URL พอ ไม่ต้อง DRM หนัก —
+  ยุทธศาสตร์ย้าย value ออกจากวิดีโอแล้ว; candidates เช่น Bunny/Cloudflare Stream —
+  **ยังไม่เลือก** ต้อง due-diligence ตอนใช้จริง), payment gateway ไทย (candidates เช่น
+  Stripe/Opn/2C2P — **ยังไม่เลือก**)
+- **ทำไมไม่ขัด validate-before-invest:** DIY บน infra ที่เป็นเจ้าของ = recurring cost
+  เพิ่ม ~ศูนย์ (สิ่งที่ gate ห้ามคือ recurring cost + build ใหญ่ก่อน signal);
+  ลำดับ build ผูกกับ gate:
+  1. Slice แรกของ stack จริง = ตัว Phase 0 เอง (placement test + free sample +
+     lead capture บน foundation จริง ไม่ใช่ของ throwaway)
+  2. ผ่าน gate → build ต่อบน foundation เดิม: course player → lab gate (เสียบ Crux
+     capability) → credit + payment — ไม่มีจังหวะย้ายบ้าน
+
+### Auth — ทิศทาง: single account ทุก product (founder 2026-07-31)
+
+- **Requirement:** user มี 1 account เข้าได้ทั้ง Crux, STAR, Academy, **Forge**
+  (และ product อนาคต) — ยกระดับจากหลัก "single email-based identity" เดิมใน
+  `AGENTS.md` เป็น cross-product identity จริง
+- **นี่คือ decision ระดับ ecosystem ไม่ใช่ของ Academy คนเดียว** — แตะ STAR (มี login
+  เดิม) และ Crux (มี auth-transport threat model + zero-friction ILT flow ที่ห้ามพัง)
+  → ต้องยกเป็น **ADR ระดับ director/ecosystem ก่อนเริ่ม build auth จริง** (open item)
+- แนวทางที่ ADR ต้องประเมิน (ทั้งหมดเป็น candidates — **ยังไม่เลือก**): shared issuer
+  บน self-hosted Supabase Auth ที่มีอยู่ / dedicated self-hosted OIDC IdP /
+  ทางเลือกอื่นตาม due diligence ณ วันทำจริง
+- **สิ่งที่ทำได้เลยราคาถูก (ไม่ต้องรอ ADR):** Phase 0 lead capture ใช้ **email เป็น
+  identity key** ตั้งแต่วันแรก; ออกแบบ Academy auth ให้ **consume external issuer ได้**
+  (ไม่ hardcode auth ผูกกับตัวเอง)
+- **ข้อควรระวังใน ADR:** PDPA — identity ข้าม product = PII ใช้ร่วม, consent ต้องครอบ;
+  migration path ของ account เดิมใน STAR; ห้ามเพิ่ม friction ให้ Crux ILT onsite flow
+
 ### ขอบเขต ecosystem (ห้ามเบลอ)
 
 - **Crux = ILT-only ใช้ภายใน ไม่ขาย** (ล็อกใน crux `context/product-direction.md`) —
@@ -165,14 +203,21 @@ Use only assets that already exist + free/owned infra. No paid platform, no larg
 - [ ] นิยามเส้นแบ่ง Academy checkpoint lab vs STAR scenario lab เป็นลายลักษณ์อักษร
 - [ ] ตรวจข้อกฎหมาย/consumer protection ไทยเรื่อง prepaid credit + วันหมดอายุ
   ก่อนประกาศนโยบายจริง
+- [ ] ยก **ADR ระดับ director/ecosystem: single account ทุก product** (Crux + STAR +
+  Academy + Forge) ก่อนเริ่ม build auth จริงของ Academy — ประเมิน shared issuer vs
+  dedicated IdP, PDPA consent scope, migration ของ account เดิมในแต่ละ product,
+  ห้ามพัง Crux zero-friction ILT
 
 ---
 
 ## Phase 1 — Platform decision (gated by Phase 0 "go")
-- [ ] Decide delivery platform: hosted LMS vs DIY (record decision + rationale in `completed_log.md`).
-  - อัปเดต 2026-07-31: requirement lab-gated learning ทำให้ hosted-LMS ล้วนไม่น่าเพียงพอ —
-    lab plane ควรเป็น embeddable service แยกชั้น (ดู "นิยาม Product + โมเดลราคา" ด้านบน)
-- [ ] If hosted LMS: free-trial test against hard requirements — multi-answer grading, **per-question explanation rendering** (the differentiator), question pools / timed / retake mock exams, free-tier for the freemium teaser, data export/ownership. **PBQ interactive UX is the known risk** — confirm an acceptable approximation or supplement.
+- [x] ~~Decide delivery platform: hosted LMS vs DIY~~ — **ล็อก 2026-07-31: DIY
+  "build the core, buy the plumbing"** (ดู Implementation direction ด้านบน +
+  `completed_log.md` entry 2026-07-31); การลงมือ build ยังเรียงหลัง Phase 0 ตามเดิม
+- ~~If hosted LMS: free-trial test against hard requirements~~ — superseded
+  (ไม่ใช้ hosted LMS แล้ว); hard requirements เดิม (multi-answer grading,
+  per-question explanation rendering, question pools/timed/retake, PBQ UX)
+  ย้ายไปเป็น requirement ของ course player ที่ build เอง
 - [ ] Stand up `academy.cyberskills.co.th` (CNAME) only when a platform is chosen.
 
 ## Phase 2 — Catalog build (gated by Phase 1)
