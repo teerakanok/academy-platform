@@ -85,9 +85,9 @@ validation ต่อ course เป็นรอบ pitch + poll ของ founder
   - Fix ใน Crucible commit `640c8613`: propagate ครบทุก artifact (bank → v2-build
     → SV2/SV1 → suite → generator), verify 29/29 PASS + adversarial review
     CORRECT-AND-COMPLETE
-  - **เงื่อนไขก่อน public distribution (ยังไม่ block งานอื่น):** codex confirm
-    pass ที่ 3 ข้อนี้หนึ่งรอบ (codex usage limit ถึง 5 ส.ค. 2026) + Crucible
-    ยัง push ไม่ได้ในรอบนี้ (ต้องรอ authorization push ตามปกติ)
+  - ~~เงื่อนไขก่อน public distribution: codex confirm pass~~ — **superseded
+    2026-07-31: founder ตัด gate นี้ออกจากแผนแล้ว** (ตัดสินใหม่เฉพาะถ้าจะเอา
+    bank ออก public); Crucible push ยังรอ authorization ตามปกติ
 - [ ] **Pick a distribution channel** (the real constraint) — **inventory เสร็จ
   2026-07-31 รอ founder เคาะ**: brief 8 ช่องที่
   `reports/reviews/channel-inventory-2026-07-31.md` (corporate probe 4+1 org /
@@ -257,9 +257,9 @@ validation ต่อ course เป็นรอบ pitch + poll ของ founder
   - R2 (assets/backup): ~$0.015/GB/เดือน, egress ฟรี; Zero Trust Access ใช้
     free tier ได้ถึง ~50 seats (ตรวจ plan จริงตอน setup); Phase 0 ไม่มี video
     → ค่า Cloudflare ส่วนเพิ่ม ≈ $0
-- **ทำไมไม่ขัด validate-before-invest:** DIY บน infra ที่เป็นเจ้าของ = recurring cost
-  เพิ่ม ~ศูนย์ (สิ่งที่ gate ห้ามคือ recurring cost + build ใหญ่ก่อน signal);
-  ลำดับ build ผูกกับ gate:
+- **หมายเหตุประวัติ (เขียนก่อน build-first):** เดิมเฟรมว่า "ไม่ขัด
+  validate-before-invest" เพราะ recurring ~ศูนย์ — ตอนนี้ founder เคาะ
+  build-first แล้ว (2026-07-31) ประเด็นนี้จบ; ลำดับ build เดิมที่บันทึกไว้:
   1. Slice แรกของ stack จริง = ตัว Phase 0 เอง (placement test + free sample +
      lead capture บน foundation จริง ไม่ใช่ของ throwaway)
   2. ผ่าน gate → build ต่อบน foundation เดิม: course player → lab gate (เสียบ Crux
@@ -311,7 +311,9 @@ validation ต่อ course เป็นรอบ pitch + poll ของ founder
 - **บทเรียน Knewton:** ห้ามขาย "AI-personalized" เป็น headline — ขาย outcome
   ("ถึงเป้าเร็วขึ้น ไม่เรียนซ้ำของที่รู้"); user override เสมอ
 - **ภาระ content factory:** granular content + tag + branch + cheatsheet ต่อหน่วย
-  ทำให้โจทย์ฝั่ง Crucible โตขึ้นหลายเท่า — ยังไม่ได้ประเมิน ต้องประเมินก่อน commit build
+  ทำให้โจทย์ฝั่ง Crucible โตขึ้นหลายเท่า — ยังไม่ได้ประเมิน; **ต้องประเมินก่อน
+  commit "course catalog/เนื้อหา"** (ไม่ block การ build platform ซึ่ง
+  content-agnostic — founder เคาะ build-first 2026-07-31)
 - CAS-005: disputes ปิดครบแล้ว (Crucible `640c8613`); gate ก่อน public ถูกตัด
   จากแผนโดย founder 2026-07-31 — ตัดสินใจใหม่เฉพาะเมื่อจะเอา bank ออก public จริง
 
@@ -337,14 +339,17 @@ validation ต่อ course เป็นรอบ pitch + poll ของ founder
 ## Phase 1 — Platform decision (**superseded 2026-07-31** — ตัดสินครบแล้ว: DIY + build-first; เก็บไว้เป็นประวัติ)
 - [x] ~~Decide delivery platform: hosted LMS vs DIY~~ — **ล็อก 2026-07-31: DIY
   "build the core, buy the plumbing"** (ดู Implementation direction ด้านบน +
-  `completed_log.md` entry 2026-07-31); การลงมือ build ยังเรียงหลัง Phase 0 ตามเดิม
+  `completed_log.md` entry 2026-07-31); ~~build เรียงหลัง Phase 0~~ →
+  **build-first ตาม founder decision 2026-07-31** (ดู Build roadmap ด้านบน)
 - ~~If hosted LMS: free-trial test against hard requirements~~ — superseded
   (ไม่ใช้ hosted LMS แล้ว); hard requirements เดิม (multi-answer grading,
   per-question explanation rendering, question pools/timed/retake, PBQ UX)
   ย้ายไปเป็น requirement ของ course player ที่ build เอง
-- [ ] Stand up `academy.cyberskills.co.th` (CNAME) only when a platform is chosen.
+- [ ] Stand up `academy.cyberskills.co.th` (CNAME) — ปลดล็อกแล้ว (platform =
+  DIY ล็อก 2026-07-31); เป็น external checkpoint ใน
+  `plans/platform-build-oneshot-2026-07-31.md` §5
 
-## Phase 2 — Catalog build (gated by Phase 1)
+## Phase 2 — Catalog build (gated by **course-catalog decision** — founder pitch + poll; platform decision ปิดแล้ว)
 - [ ] Import the CAS-005 bank (portable content → chosen platform; no re-authoring).
 - [ ] Freemium gate ladder: free sample → paid full bank + study guides → live cohort → corporate in-house quote → waitlists.
 - [ ] First trend course pilot (pick one with demand signal: Agentic AI security / Risk / ISO / basic pentest / cryptography).
