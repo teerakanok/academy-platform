@@ -251,7 +251,10 @@ screenshot landing เก็บใน `artifacts/oneshot-<date>/m1/`
 8. e2e: เปิด full-length-02 จาก fixture → ทำครบ (รวม PBQ ทั้ง 3 kind) →
    ได้ผล + breakdown + review ได้ · **PBQ-009 exhibit ถูก render จริง
    (assertion เฉพาะ)** · module nav ใช้ได้จริง · resume หลัง reload · a11y:
-   axe ไม่มี violation ระดับ critical/serious บนหน้า player + results
+   axe ไม่มี violation ระดับ critical/serious บนหน้า player + results —
+   แยก suite: `fast` (unit + focused e2e ใช้ระหว่าง iterate) กับ
+   `full-acceptance` (FL-02 ทั้งชุด ~90 interactions — รันตอนปิด milestone)
+   เพื่อไม่ให้ iteration ถูก block ด้วย test ช้า
 9. Visual review (ระดับย่อของ `deep-visual-review`): state matrix = {landing,
    module list, quiz กลางชุด, PBQ ทั้ง 3 kind, results, review} × {desktop
    1440, mobile 390} → แก้จนไม่มี defect ที่มองเห็น → screenshot เก็บ
