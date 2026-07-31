@@ -26,9 +26,15 @@ verified + GCP lab estimate) — ถูกกว่า CPC โฆษณาไท
 market anchors verified 2026-07-31 (CertMaster $489, Dion Udemy $15–30,
 Dion direct $39–69/เดือน) — ดูรายละเอียดใน active_plan ส่วนโมเดลราคา
 
+- **Refresh วน = ค่าโฆษณา (founder ยืนยัน):** ออกครบ 5 ตัวแล้วต้องวนกลับมา
+  อัปเดต N+/Sec+ ตาม cert cycle — founder ยอมรับ loop นี้เป็น recurring
+  marketing cost โดยเจตนา ("คิดเสียว่าค่าโฆษณา"); โบนัส: ทุก refresh คือ
+  re-marketing event + วันที่ "อัปเดตล่าสุด" เป็น trust signal
+
 **Residual risk:**
-- งาน Crucible 5 คอร์สเต็มรูปก่อนมีรายได้ = ก้อนลงทุนจริงของ strategy นี้ —
-  ยังไม่ได้ประเมิน capacity; ห้ามใช้ vision นี้ข้าม Phase 0 gate
+- งาน Crucible 5 คอร์สเต็มรูป + refresh loop ถาวร = ก้อนลงทุนจริงของ strategy
+  นี้ — capacity assessment ยังต้องทำเพื่อ size ภาระ (founder ยอมรับหลักการแล้ว);
+  ห้ามใช้ vision นี้ข้าม Phase 0 gate
 - ตัวเลขบันไดราคา paid ทั้งหมดเป็น placeholder รอ WTP probe
 - ISC2 CC ชนกับของฟรีของ ISC2 เอง — ต้องชนะด้วย lab + path ไม่ใช่แค่ฟรี
 
