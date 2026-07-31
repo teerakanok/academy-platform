@@ -1,0 +1,589 @@
+{
+  "id": "module-1-governance-risk-compliance-part-06",
+  "sourceModuleId": "m1",
+  "sourceSlug": "module-1-governance-risk-compliance",
+  "title": "Module 1 - Governance, Risk, and Compliance - Part 6",
+  "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+  "part": 6,
+  "questionRange": [
+    51,
+    60
+  ],
+  "questions": [
+    {
+      "id": "M1-100",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "attack surface determination",
+      "stem": "A compliance lead challenges whether the proposed control can be tested in operation. A new partner integration adds APIs, service accounts, event queues, and data exports. What should the security practitioner do FIRST?",
+      "choices": {
+        "A": "Enumerate the attack surface: external, internal, identity, data, and supply-chain exposure",
+        "B": "Map the attack chain to preventive, detective, and responsive controls across phases",
+        "C": "Model AI risks: prompt injection, retrieval leakage, tool misuse, data poisoning, and approval limits",
+        "D": "Profile threats against the organization's real assets, exposure, controls, and processes",
+        "E": "Model assets, actors, data flows, trust boundaries, dependencies, and assumptions before choosing controls"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Attack surface is everything an attacker can reach, not just open ports. A partner integration adds APIs, service identities, queues, and export paths, so the first step is to enumerate all exposure: external, internal, identity, data, and supply-chain (A). Identity paths and third-party dependencies are easy to miss, so naming them explicitly is what makes the answer defensible.",
+      "whyWrong": {
+        "B": "Mapping controls along the kill chain assumes you already know the surface; it does not enumerate the new identity, data, and supply-chain exposure first.",
+        "C": "AI model threat modeling targets prompt injection and tool misuse, which this non-AI integration does not raise.",
+        "D": "Threat profiling judges which threats apply, but it does not inventory the new reachable surface.",
+        "E": "Building a system model is foundational, yet it stops short of enumerating external, identity, and supply-chain attack surfaces."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "A": "Directly enumerates the new exposure, including identity and data-export paths and third-party dependencies, which is exactly the gap the integration creates."
+      },
+      "keywords": [
+        {
+          "text": "attack surface determination",
+          "tier": "critical"
+        },
+        {
+          "text": "include third-party dependencies",
+          "tier": "high"
+        },
+        {
+          "text": "include data export paths",
+          "tier": "high"
+        },
+        {
+          "text": "include identity paths",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-054",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "AI usage risk management",
+      "stem": "A transformation program is standardizing inconsistent security practices after rapid growth. In this scenario, a team wants a generative AI assistant to summarize sensitive incidents and recommend response actions. Which target-state design is the most complete and defensible?",
+      "choices": {
+        "A": "Run a business impact analysis and turn impact tolerance into recovery and continuity requirements",
+        "B": "Blend quantitative estimates with qualitative business, safety, legal, and reputation factors",
+        "C": "Assess data, model, output, automation, privacy, and accountability risks before enabling operational use",
+        "D": "Review contractual duties, access scope, logging, subprocessors, breach notice, and offboarding",
+        "E": "Apply compensating controls, document residual risk, and get accountable risk acceptance"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "AI risk is broader than a single control: it spans data exposure, unreliable output, and the impact of automated actions. Before letting the assistant operate on sensitive incidents, assess all of those risk dimensions (C). A defensible design also logs prompts and retrieved evidence and gates high-impact actions so the system stays reviewable.",
+      "whyWrong": {
+        "A": "Business impact analysis sets recovery objectives, not the data and output safeguards an AI assistant needs.",
+        "B": "Combining quantitative and qualitative analysis scores risk but does not define the AI usage controls.",
+        "D": "Third-party contract review fits a vendor, not an internally enabled AI capability.",
+        "E": "Compensating controls and risk acceptance come after the AI-specific risk assessment, not instead of it."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "C": "Covers the full AI risk picture (data, model, output, automation, privacy, accountability) and leaves auditable controls before operational use."
+      },
+      "keywords": [
+        {
+          "text": "AI usage risk management",
+          "tier": "critical"
+        },
+        {
+          "text": "log prompts and retrieved evidence",
+          "tier": "high"
+        },
+        {
+          "text": "gate high-impact actions",
+          "tier": "high"
+        },
+        {
+          "text": "business impact analysis",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-105",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Analyze",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "attack surface determination",
+      "stem": "A new partner integration adds APIs, service accounts, event queues, and data exports. Which items best distinguish a defensible answer from a superficial one? (Select all that apply.)",
+      "choices": {
+        "A": "Include data export paths",
+        "B": "Include identity paths",
+        "C": "Log retrieved context",
+        "D": "Detect staging and exfiltration",
+        "E": "Include third-party dependencies"
+      },
+      "correct": [
+        "A",
+        "B",
+        "E"
+      ],
+      "explanation": "Determining attack surface means inventorying every way an attacker can reach the system. For a partner integration, that must include data-export paths (A), identity paths from service accounts (B), and the third-party dependencies the integration introduces (E). Items that belong to other topics, such as logging AI context or detecting kill-chain activity, do not enumerate the new surface.",
+      "whyWrong": {
+        "C": "Logging retrieved context is an AI threat-modeling control, not part of enumerating this integration's surface.",
+        "D": "Detecting staging and exfiltration is a kill-chain detection task, not surface enumeration."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "A": "Data exports are a real exposure path that a thorough attack-surface inventory must capture.",
+        "B": "Service accounts create identity paths that attackers can abuse, so they belong in the surface enumeration.",
+        "E": "The partner relationship adds supply-chain dependencies that expand the surface beyond your own systems."
+      },
+      "keywords": [
+        {
+          "text": "attack surface determination",
+          "tier": "critical"
+        },
+        {
+          "text": "include third-party dependencies",
+          "tier": "high"
+        },
+        {
+          "text": "include data export paths",
+          "tier": "high"
+        },
+        {
+          "text": "include identity paths",
+          "tier": "high"
+        },
+        {
+          "text": "threat model",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-122",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.5",
+      "learningObjective": "Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+      "lesson": "2A and 5A",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "AI data leakage and retention",
+      "stem": "Employees paste regulated case notes into an AI assistant to speed up summaries. Weighing security value, operational burden, and evidence quality, which option is most defensible?",
+      "choices": {
+        "A": "Require model/version governance, evaluation evidence, change notice, and rollback criteria",
+        "B": "Treat model output as advisory and validate it against telemetry, policy, and human approval thresholds",
+        "C": "Limit tool permissions, isolate untrusted content, and require approval for high-impact actions",
+        "D": "Update detection, awareness, and response for AI-enabled social engineering and automation scale",
+        "E": "Define approved data classes, retention rules, logging, and redaction controls for AI use"
+      },
+      "correct": [
+        "E"
+      ],
+      "explanation": "AI tools open new data exposure and retention paths: anything pasted in may be stored or logged. The core problem here is regulated data leaving controlled boundaries, so the fix is to define what data classes are allowed, plus retention, logging, and redaction rules (E). That keeps prompt and output handling auditable.",
+      "whyWrong": {
+        "A": "Model and version governance manages the AI supply chain, not the data employees are pasting in.",
+        "B": "Validating output reliability addresses trust in answers, not leakage of regulated inputs.",
+        "C": "Tool-permission and injection controls address agent actions, not data-handling and retention.",
+        "D": "Detecting AI-enabled attacks is about adversary activity, not your own data-leakage exposure."
+      },
+      "sources": [
+        "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption."
+      ],
+      "whyCorrect": {
+        "E": "Directly governs which regulated inputs are allowed and how they are retained, logged, and redacted, which is the exposure the scenario creates."
+      },
+      "keywords": [
+        {
+          "text": "AI data leakage and retention",
+          "tier": "critical"
+        },
+        {
+          "text": "audit prompt and output handling",
+          "tier": "high"
+        },
+        {
+          "text": "classify allowed inputs",
+          "tier": "high"
+        },
+        {
+          "text": "redact sensitive fields",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-018",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.1",
+      "learningObjective": "Given a set of organizational security requirements, implement the appropriate governance components.",
+      "lesson": "2A",
+      "bloom": "Analyze",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "GRC evidence systems",
+      "stem": "Cloud guardrails, exceptions, and owner attestations are mapped to regulatory obligations. Which items best distinguish a defensible answer from a superficial one? (Select all that apply.)",
+      "choices": {
+        "A": "Track exception aging",
+        "B": "Define consulted legal and security roles",
+        "C": "Link tests to owners and evidence",
+        "D": "Map controls to obligations",
+        "E": "Classify emergency changes"
+      },
+      "correct": [
+        "A",
+        "C",
+        "D"
+      ],
+      "explanation": "A GRC evidence system has to connect controls to owners, exceptions, tests, and the obligations they satisfy. For this scenario that means mapping controls to obligations (D), linking each test to an owner and its evidence (C), and tracking how long exceptions stay open (A). RACI roles and change classification belong to other governance topics.",
+      "whyWrong": {
+        "B": "Defining consulted roles is a RACI/decision-ownership concern, not the evidence register itself.",
+        "E": "Classifying emergency changes belongs to change governance, not GRC evidence mapping."
+      },
+      "sources": [
+        "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components."
+      ],
+      "whyCorrect": {
+        "A": "Exception aging shows whether open risks are being closed, which is core evidence in a GRC register.",
+        "C": "Tying tests to owners and evidence is what makes a control's status auditable.",
+        "D": "Mapping controls to obligations proves the program actually satisfies the regulatory requirements."
+      },
+      "keywords": [
+        {
+          "text": "GRC evidence systems",
+          "tier": "critical"
+        },
+        {
+          "text": "link tests to owners and evidence",
+          "tier": "high"
+        },
+        {
+          "text": "map controls to obligations",
+          "tier": "high"
+        },
+        {
+          "text": "track exception aging",
+          "tier": "high"
+        },
+        {
+          "text": "RACI",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-035",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "business impact and recovery requirements",
+      "stem": "A payment workflow is called mission critical, yet its MTD, RTO, RPO, and manual workarounds are undefined. Weighing security value, operational burden, and evidence quality, which option is most defensible?",
+      "choices": {
+        "A": "Blend quantitative estimates with qualitative business, safety, legal, and reputation factors",
+        "B": "Assess data, model, output, automation, privacy, and accountability risks before operational use",
+        "C": "Review contractual duties, access scope, logging, subprocessors, breach notice, and offboarding",
+        "D": "Apply compensating controls, document residual risk, and get accountable risk acceptance",
+        "E": "Run a business impact analysis and turn impact tolerance into recovery and continuity requirements"
+      },
+      "correct": [
+        "E"
+      ],
+      "explanation": "Resilience targets must be driven by business impact, not guesswork. Because MTD, RTO, and RPO are undefined, the first move is a business impact analysis that converts impact tolerance into concrete recovery and continuity requirements (E). That also surfaces critical dependencies and forces validation of the manual workarounds.",
+      "whyWrong": {
+        "A": "Quantitative/qualitative risk analysis scores risks but does not set RTO, RPO, or MTD.",
+        "B": "AI risk assessment is unrelated to defining recovery objectives for a payment workflow.",
+        "C": "Third-party contract review does not establish the workflow's recovery targets.",
+        "D": "Compensating controls and risk acceptance address residual risk, not the undefined resilience objectives."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "E": "A BIA produces the missing recovery objectives and continuity requirements directly from business impact."
+      },
+      "keywords": [
+        {
+          "text": "business impact and recovery requirements",
+          "tier": "critical"
+        },
+        {
+          "text": "identify critical dependencies",
+          "tier": "high"
+        },
+        {
+          "text": "validate manual workarounds",
+          "tier": "high"
+        },
+        {
+          "text": "set RTO/RPO/MTD",
+          "tier": "high"
+        },
+        {
+          "text": "business impact analysis",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-131",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.5",
+      "learningObjective": "Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+      "lesson": "2A and 5A",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "AI-enabled adversary activity",
+      "stem": "Phishing volume is rising and the messages are closely tailored to internal projects. Which target-state design is the most complete and defensible?",
+      "choices": {
+        "A": "Require model/version governance, evaluation evidence, change notice, and rollback criteria",
+        "B": "Define approved data classes, retention rules, logging, and redaction controls for AI use",
+        "C": "Treat model output as advisory and validate it against telemetry, policy, and human approval thresholds",
+        "D": "Update detection, awareness, and response for AI-enabled social engineering at scale",
+        "E": "Limit tool permissions, isolate untrusted content, and require approval for high-impact actions"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "AI lets attackers generate faster, more personalized, and more varied phishing. Highly tailored lures point to AI-enabled social engineering, so the defense is to update detection, awareness, and response for that scale (D). Hardening reporting workflows and watching for impersonation patterns keep the control measurable.",
+      "whyWrong": {
+        "A": "Model and version governance secures your own AI supply chain, not inbound phishing.",
+        "B": "Data-class and retention controls address AI data leakage, not adversary phishing.",
+        "C": "Output-reliability validation governs AI you operate, not attacker-generated email.",
+        "E": "Tool-permission and injection controls protect AI agents, not the phishing-targeted workforce."
+      },
+      "sources": [
+        "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption."
+      ],
+      "whyCorrect": {
+        "D": "Targets the actual threat, AI-amplified social engineering, by adapting detection, training, and response."
+      },
+      "keywords": [
+        {
+          "text": "AI-enabled adversary activity",
+          "tier": "critical"
+        },
+        {
+          "text": "monitor impersonation patterns",
+          "tier": "high"
+        },
+        {
+          "text": "harden reporting workflows",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ],
+      "visual": {
+        "id": "cas005-lo-1-5",
+        "fileName": "cas005-lo-1-5.svg",
+        "src": "../assets/figures/cas005-lo-1-5.svg",
+        "title": "CAS005 LO 1.5: AI Governance and AI-Enabled Threats",
+        "alt": "Instructional diagram for CAS005 objective 1.5, showing scenario cue, control decision, and evidence review.",
+        "caption": "Generated instructional diagram for CAS005 LO 1.5; verify against AI Governance and AI-Enabled Threats source anchors.",
+        "sourceLabel": "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+        "generated": true
+      }
+    },
+    {
+      "id": "M1-113",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "assets, data flows, trust boundaries, and assumptions",
+      "stem": "A payments API accepts customer records, calls a fraud service, and writes decisions back to core systems. Weighing security value, operational burden, and evidence quality, which option is most defensible?",
+      "choices": {
+        "A": "Profile threats against the organization's real assets, exposure, controls, and processes",
+        "B": "Model assets, actors, data flows, trust boundaries, dependencies, and assumptions before choosing controls",
+        "C": "Map the attack chain to preventive, detective, and responsive controls across phases",
+        "D": "Model AI risks: prompt injection, retrieval leakage, tool misuse, data poisoning, output trust, and approval limits",
+        "E": "Enumerate the attack surface: external, internal, identity, data, and supply-chain exposure"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Threat modeling starts by defining what you are modeling. With a payments API spanning customer data, a fraud service, and core systems, the first step is to model the assets, actors, data flows, trust boundaries, and assumptions (B). Without that baseline, control choices have no grounding.",
+      "whyWrong": {
+        "A": "Threat profiling filters which threats apply, but only after the system model exists.",
+        "C": "Mapping controls to the kill chain comes later, once boundaries and flows are known.",
+        "D": "AI-specific threats do not match this conventional payments API.",
+        "E": "Attack-surface enumeration is a related step, but it does not draw the trust boundaries and data flows first."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "B": "Defines the system, its actors, and trust boundaries first, which every later control decision depends on."
+      },
+      "keywords": [
+        {
+          "text": "identify actors and data stores",
+          "tier": "high"
+        },
+        {
+          "text": "draw trust boundaries",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-020",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.1",
+      "learningObjective": "Given a set of organizational security requirements, implement the appropriate governance components.",
+      "lesson": "2A",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "staging data governance",
+      "stem": "Developers copied production customer records into a shared test environment to troubleshoot faster. Which evidence points would let a reviewer defend the decision against plausible alternatives? (Select all that apply.)",
+      "choices": {
+        "A": "Classify emergency changes",
+        "B": "Minimize data before use",
+        "C": "Mask or tokenize sensitive fields",
+        "D": "Expire test copies",
+        "E": "Tie approval to residual-risk evidence"
+      },
+      "correct": [
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "Nonproduction environments still carry the same data-protection duties as production. Defensible staging governance minimizes the data brought in (B), masks or tokenizes sensitive fields (C), and expires test copies on a schedule (D). Emergency-change classification and approval ownership belong to other governance topics.",
+      "whyWrong": {
+        "A": "Classifying emergency changes is change governance, not staging data protection.",
+        "E": "Tying approval to residual-risk evidence is a RACI/decision-ownership control, not data handling."
+      },
+      "sources": [
+        "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components."
+      ],
+      "whyCorrect": {
+        "B": "Bringing in only the data actually needed shrinks exposure at the source.",
+        "C": "Masking or tokenizing protects sensitive fields even if the test environment is breached.",
+        "D": "Expiring test copies stops regulated data from lingering indefinitely in staging."
+      },
+      "keywords": [
+        {
+          "text": "staging data governance",
+          "tier": "critical"
+        },
+        {
+          "text": "mask or tokenize sensitive fields",
+          "tier": "high"
+        },
+        {
+          "text": "minimize data before use",
+          "tier": "high"
+        },
+        {
+          "text": "expire test copies",
+          "tier": "high"
+        },
+        {
+          "text": "data governance",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-108",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Remember",
+      "difficulty": "Advanced recall",
+      "type": "single",
+      "topic": "assets, data flows, trust boundaries, and assumptions",
+      "stem": "A payments API accepts customer records, calls a fraud service, and writes decisions back to core systems. Which option best names the control objective the reviewer should apply?",
+      "choices": {
+        "A": "Model AI risks: prompt injection, retrieval leakage, tool misuse, data poisoning, output trust, and approval limits",
+        "B": "Profile threats against the organization's real assets, exposure, controls, and processes",
+        "C": "Model assets, actors, data flows, trust boundaries, dependencies, and assumptions before choosing controls",
+        "D": "Map the attack chain to preventive, detective, and responsive controls across phases",
+        "E": "Enumerate the attack surface: external, internal, identity, data, and supply-chain exposure"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The control objective for threat modeling is to define what is being modeled first. For a payments API touching customer data, a fraud service, and core systems, that means modeling assets, actors, data flows, trust boundaries, and assumptions (C). Drawing those boundaries and recording assumptions is the foundation every other control rests on.",
+      "whyWrong": {
+        "A": "AI threat modeling does not fit this conventional API workflow.",
+        "B": "Threat profiling judges relevance of threats, which follows the system model.",
+        "D": "Kill-chain control placement comes after boundaries and flows are defined.",
+        "E": "Attack-surface enumeration is related but does not draw trust boundaries first."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "C": "Names the foundational objective: model the system, its boundaries, and assumptions before selecting controls."
+      },
+      "keywords": [
+        {
+          "text": "draw trust boundaries",
+          "tier": "high"
+        },
+        {
+          "text": "record assumptions",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    }
+  ],
+  "instructor": "Songpon TEERAKANOK",
+  "website": "cyberskills.co.th",
+  "copyright": "Copyright (c) 2026 CYBERSKILLS Professional Training Center. All rights reserved. For enrolled learners only. Non-distribution."
+}

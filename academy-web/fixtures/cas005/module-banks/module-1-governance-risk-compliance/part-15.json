@@ -1,0 +1,615 @@
+{
+  "id": "module-1-governance-risk-compliance-part-15",
+  "sourceModuleId": "m1",
+  "sourceSlug": "module-1-governance-risk-compliance",
+  "title": "Module 1 - Governance, Risk, and Compliance - Part 15",
+  "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+  "part": 15,
+  "questionRange": [
+    141,
+    150
+  ],
+  "questions": [
+    {
+      "id": "M1-135",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.5",
+      "learningObjective": "Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+      "lesson": "2A and 5A",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "AI supply chain and model governance",
+      "stem": "A vendor model is updated silently and changes its detection recommendations. Which elements belong in the design package? (Select all that apply.)",
+      "choices": {
+        "A": "Record model versions",
+        "B": "Define rollback triggers",
+        "C": "Test behavior changes",
+        "D": "Classify allowed inputs",
+        "E": "Audit prompt and output handling"
+      },
+      "correct": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "An AI model is a critical dependency needing lifecycle governance. To control silent vendor updates, the package must record model versions (A), define rollback triggers (B), and test behavior changes (C). Classifying inputs (D) and auditing prompt/output handling (E) are data-leakage controls, not supply-chain governance.",
+      "whyWrong": {
+        "D": "Classifying allowed inputs controls data leakage, not version change.",
+        "E": "Auditing prompt and output handling addresses leakage, not supply-chain governance."
+      },
+      "sources": [
+        "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption."
+      ],
+      "whyCorrect": {
+        "A": "Recording model versions makes silent updates visible and traceable.",
+        "B": "Rollback triggers let you revert to a known-good model when behavior degrades.",
+        "C": "Testing behavior changes detects when an update shifts detection results before harm occurs."
+      },
+      "keywords": [
+        {
+          "text": "AI supply chain and model governance",
+          "tier": "critical"
+        },
+        {
+          "text": "define rollback triggers",
+          "tier": "high"
+        },
+        {
+          "text": "record model versions",
+          "tier": "high"
+        },
+        {
+          "text": "test behavior changes",
+          "tier": "high"
+        }
+      ]
+    },
+    {
+      "id": "M1-029",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.1",
+      "learningObjective": "Given a set of organizational security requirements, implement the appropriate governance components.",
+      "lesson": "2A",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "change and configuration governance",
+      "stem": "An emergency firewall change skipped review and later broke a regulated data feed. Which elements belong in the design package? (Select all that apply.)",
+      "choices": {
+        "A": "Perform post-change review",
+        "B": "Minimize data before use",
+        "C": "Require rollback plans",
+        "D": "Classify emergency changes",
+        "E": "Record exceptions and recertification dates"
+      },
+      "correct": [
+        "A",
+        "C",
+        "D"
+      ],
+      "explanation": "Change and configuration governance keeps emergency speed while staying accountable. The pieces that close this gap are classifying emergency changes (D), requiring rollback plans (C), and performing a post-change review (A). Minimizing data (B) is staging-data governance, and recording exceptions/recertification dates (E) is a procedure concern—both off-topic here.",
+      "whyWrong": {
+        "B": "Minimizing data before use is staging-data governance, not change control.",
+        "E": "Recording exceptions and recertification dates is a procedure/policy concern, not emergency-change control."
+      },
+      "sources": [
+        "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components."
+      ],
+      "whyCorrect": {
+        "A": "A post-change review captures impact and lessons, turning the bypass into accountable evidence.",
+        "C": "A rollback plan lets a failed emergency change be reversed before it breaks production.",
+        "D": "Classifying emergency changes sets the risk-based approval path so review is not simply skipped."
+      },
+      "keywords": [
+        {
+          "text": "change and configuration governance",
+          "tier": "critical"
+        },
+        {
+          "text": "classify emergency changes",
+          "tier": "high"
+        },
+        {
+          "text": "perform post-change review",
+          "tier": "high"
+        },
+        {
+          "text": "require rollback plans",
+          "tier": "high"
+        },
+        {
+          "text": "change governance",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-146",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.5",
+      "learningObjective": "Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+      "lesson": "2A and 5A",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "AI-enabled adversary activity",
+      "stem": "Phishing volume rises and messages are highly tailored to internal projects. Which evidence points would let a reviewer defend the decision against plausible alternatives? (Select all that apply.)",
+      "choices": {
+        "A": "Harden reporting workflows",
+        "B": "Audit prompt and output handling",
+        "C": "Define rollback triggers",
+        "D": "Monitor impersonation patterns",
+        "E": "Train against targeted lures"
+      },
+      "correct": [
+        "A",
+        "D",
+        "E"
+      ],
+      "explanation": "AI-amplified phishing calls for updates to detection, awareness, and response. The defensible evidence is hardening reporting workflows (A), monitoring impersonation patterns (D), and training against targeted lures (E). Auditing prompt/output handling (B) is a data-leakage control and defining rollback triggers (C) is supply-chain governance—both off-topic.",
+      "whyWrong": {
+        "B": "Auditing prompt and output handling addresses AI data leakage, not phishing.",
+        "C": "Defining rollback triggers governs the AI supply chain, not adversary activity."
+      },
+      "sources": [
+        "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption."
+      ],
+      "whyCorrect": {
+        "A": "Hardened reporting workflows speed user-driven detection of tailored phishing.",
+        "D": "Monitoring impersonation patterns catches AI-crafted lures mimicking internal projects.",
+        "E": "Training against targeted lures raises resistance to the personalized attacks described."
+      },
+      "keywords": [
+        {
+          "text": "AI-enabled adversary activity",
+          "tier": "critical"
+        },
+        {
+          "text": "monitor impersonation patterns",
+          "tier": "high"
+        },
+        {
+          "text": "train against targeted lures",
+          "tier": "high"
+        },
+        {
+          "text": "harden reporting workflows",
+          "tier": "high"
+        }
+      ],
+      "visual": {
+        "id": "cas005-lo-1-5",
+        "fileName": "cas005-lo-1-5.svg",
+        "src": "../assets/figures/cas005-lo-1-5.svg",
+        "title": "CAS005 LO 1.5: AI Governance and AI-Enabled Threats",
+        "alt": "Instructional diagram for CAS005 objective 1.5, showing scenario cue, control decision, and evidence review.",
+        "caption": "Generated instructional diagram for CAS005 LO 1.5; verify against AI Governance and AI-Enabled Threats source anchors.",
+        "sourceLabel": "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+        "generated": true
+      }
+    },
+    {
+      "id": "M1-043",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Analyze",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "third-party risk management",
+      "stem": "A vendor will administer a security platform and can view incident evidence. Which root cause is most important to address?",
+      "choices": {
+        "A": "Review contractual duties, access scope, logging, subprocessors, breach notification, and offboarding controls",
+        "B": "Combine quantitative estimates with qualitative business, safety, legal, and reputation factors",
+        "C": "Assess data, model, output, automation, privacy, and accountability risks before operational use",
+        "D": "Apply compensating controls, document residual risk, and obtain accountable risk acceptance",
+        "E": "Run a business impact analysis and turn impact tolerance into recovery and continuity requirements"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "A vendor administering your platform becomes part of your own security and audit surface. Third-party risk management is the right lens: define contractual duties, access scope, logging, subprocessors, breach notification, and offboarding—choice A. The other options handle internal risk analysis, AI risk, treatment, or recovery, not the vendor relationship itself.",
+      "whyWrong": {
+        "B": "Quantitative/qualitative analysis compares risks; it does not set vendor obligations.",
+        "C": "AI usage risk assessment is the wrong domain for vendor administration.",
+        "D": "Compensating controls and acceptance treat residual risk, not the vendor contract.",
+        "E": "A business impact analysis sizes recovery needs, not third-party controls."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "A": "It governs the vendor as part of your audit surface—access, logging, breach, and termination obligations."
+      },
+      "keywords": [
+        {
+          "text": "third-party risk management",
+          "tier": "critical"
+        },
+        {
+          "text": "define termination and breach obligations",
+          "tier": "high"
+        },
+        {
+          "text": "require activity logs",
+          "tier": "high"
+        },
+        {
+          "text": "business impact analysis",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-123",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.5",
+      "learningObjective": "Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+      "lesson": "2A and 5A",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "multi",
+      "topic": "prompt injection and tool misuse",
+      "stem": "An AI assistant retrieves external web content and can open tickets or trigger workflows. Which controls or evidence should be included? (Select all that apply.)",
+      "choices": {
+        "A": "Require approval for actions",
+        "B": "Scope tool identity",
+        "C": "Redact sensitive fields",
+        "D": "Separate untrusted instructions",
+        "E": "Require corroborating signals"
+      },
+      "correct": [
+        "A",
+        "B",
+        "D"
+      ],
+      "explanation": "When untrusted content can drive actions, prompt injection and tool misuse are the core risks. The controls that close them are requiring approval for actions (A), scoping tool identity (B), and separating untrusted instructions (D). Redacting fields (C) is a data-leakage control that can limit injection-driven exfiltration, and requiring corroborating signals (E) is an output-reliability control that helps with untrusted output—useful, but neither is the strongest control for the tool-misuse path this scenario keys.",
+      "whyWrong": {
+        "C": "Redacting sensitive fields is a data-leakage control that can reduce injection-driven exfiltration, but it does not constrain the injected actions themselves.",
+        "E": "Requiring corroborating signals supports output reliability and untrusted-output handling, but it is not the strongest control for tool misuse here."
+      },
+      "sources": [
+        "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption."
+      ],
+      "whyCorrect": {
+        "A": "Requiring approval for actions adds a human gate before high-impact operations.",
+        "B": "Scoping tool identity limits what the assistant can do if manipulated.",
+        "D": "Separating untrusted instructions stops injected text from being treated as commands."
+      },
+      "keywords": [
+        {
+          "text": "prompt injection and tool misuse",
+          "tier": "critical"
+        },
+        {
+          "text": "separate untrusted instructions",
+          "tier": "high"
+        },
+        {
+          "text": "require approval for actions",
+          "tier": "high"
+        },
+        {
+          "text": "scope tool identity",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-077",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "privacy regulations as lifecycle rules",
+      "stem": "A product roadmap plans to collect device identifiers, support notes, and behavior telemetry for a new personalization feature. Which elements belong in the design package? (Select all that apply.)",
+      "choices": {
+        "A": "Validate purpose",
+        "B": "Define retention and access",
+        "C": "Minimize collection",
+        "D": "Verify period of coverage",
+        "E": "Retain audit evidence"
+      },
+      "correct": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Privacy is a lifecycle design rule applied before collection. The package should validate purpose (A), define retention and access (B), and minimize collection (C). Verifying period of coverage (D) is an audit concern and retaining audit evidence (E) is a sector-compliance task—both adjacent but not the lifecycle controls here.",
+      "whyWrong": {
+        "D": "Verifying period of coverage relates to audit scoping, not privacy lifecycle design.",
+        "E": "Retaining audit evidence supports sector compliance, not lifecycle limitation."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "A": "Validating purpose ensures the collection is justified rather than speculative.",
+        "B": "Defining retention and access limits how long and to whom the data is exposed.",
+        "C": "Minimizing collection reduces the data footprint and downstream privacy risk."
+      },
+      "keywords": [
+        {
+          "text": "privacy regulations as lifecycle rules",
+          "tier": "critical"
+        },
+        {
+          "text": "define retention and access",
+          "tier": "high"
+        },
+        {
+          "text": "minimize collection",
+          "tier": "high"
+        },
+        {
+          "text": "validate purpose",
+          "tier": "high"
+        },
+        {
+          "text": "audit evidence",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-096",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "AI model threat modeling",
+      "stem": "A retrieval-augmented assistant can read internal documents and create support tickets. Which elements belong in the design package? (Select all that apply.)",
+      "choices": {
+        "A": "Log retrieved context",
+        "B": "Separate read and act privileges",
+        "C": "Map threats to assets",
+        "D": "Validate exposure paths",
+        "E": "Gate external instructions"
+      },
+      "correct": [
+        "A",
+        "B",
+        "E"
+      ],
+      "explanation": "An AI workflow that reads internal data and takes actions adds model, data, and action surfaces, so AI-specific threat modeling applies. The package should log retrieved context (A), separate read and act privileges (B), and gate external instructions (E). Mapping threats to assets (C) and validating exposure paths (D) are threat-profiling steps, not the AI-model controls.",
+      "whyWrong": {
+        "C": "Mapping threats to assets is threat profiling, not AI-model control design.",
+        "D": "Validating exposure paths is a threat-profiling step, not an AI-model control."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "A": "Logging retrieved context makes the data feeding the model auditable.",
+        "B": "Separating read and act privileges prevents a read path from triggering unsafe actions.",
+        "E": "Gating external instructions blocks injected content from driving the assistant's actions."
+      },
+      "keywords": [
+        {
+          "text": "AI model threat modeling",
+          "tier": "critical"
+        },
+        {
+          "text": "separate read and act privileges",
+          "tier": "high"
+        },
+        {
+          "text": "gate external instructions",
+          "tier": "high"
+        },
+        {
+          "text": "log retrieved context",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ],
+      "visual": {
+        "id": "cas005-lo-1-4",
+        "fileName": "cas005-lo-1-4.svg",
+        "src": "../assets/figures/cas005-lo-1-4.svg",
+        "title": "CAS005 LO 1.4: Perform Threat Modeling",
+        "alt": "Instructional diagram for CAS005 objective 1.4, showing scenario cue, control decision, and evidence review.",
+        "caption": "Generated instructional diagram for CAS005 LO 1.4; verify against Perform Threat Modeling source anchors.",
+        "sourceLabel": "CAS005 LO 1.4: Given a scenario, perform threat modeling activities.",
+        "generated": true
+      }
+    },
+    {
+      "id": "M1-051",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Understand",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "quantitative and qualitative risk analysis",
+      "stem": "Leadership wants to compare ransomware-outage risk against payment-fraud risk using both expected loss and strategic impact. Which approach best addresses the issue?",
+      "choices": {
+        "A": "Run a business impact analysis and turn impact tolerance into recovery and continuity requirements",
+        "B": "Apply compensating controls, document residual risk, and obtain accountable risk acceptance",
+        "C": "Assess data, model, output, automation, privacy, and accountability risks before operational use",
+        "D": "Review contractual duties, access scope, logging, subprocessors, breach notification, and offboarding controls",
+        "E": "Combine quantitative estimates with qualitative business, safety, legal, and reputation factors"
+      },
+      "correct": [
+        "E"
+      ],
+      "explanation": "Comparing these risks on both expected loss and strategic impact needs both numeric and contextual evidence. The answer is E: pair expected-loss estimates with business, safety, legal, and reputation factors and state the assumptions. The other options treat risk, assess AI risk, set recovery targets, or review vendors—none blends both lenses for this comparison.",
+      "whyWrong": {
+        "A": "A business impact analysis sizes recovery needs, not a quantitative-plus-qualitative comparison.",
+        "B": "Compensating controls and acceptance treat a risk; they do not analyze and compare two.",
+        "C": "AI usage risk assessment is the wrong domain for ransomware-versus-fraud comparison.",
+        "D": "Third-party risk review covers vendors, not this internal risk comparison."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "E": "It blends quantitative loss estimates with qualitative impact factors, the only fair way to compare these two risks."
+      },
+      "keywords": [
+        {
+          "text": "quantitative and qualitative risk analysis",
+          "tier": "critical"
+        },
+        {
+          "text": "state uncertainty and assumptions",
+          "tier": "high"
+        },
+        {
+          "text": "document nonfinancial impacts",
+          "tier": "high"
+        },
+        {
+          "text": "business impact analysis",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-010",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.1",
+      "learningObjective": "Given a set of organizational security requirements, implement the appropriate governance components.",
+      "lesson": "2A",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "staging data governance",
+      "stem": "Developers copied production customer records into a shared test environment to troubleshoot faster. Which evidence points would let a reviewer defend the decision against plausible alternatives? (Select all that apply.)",
+      "choices": {
+        "A": "Mask or tokenize sensitive fields",
+        "B": "Minimize data before use",
+        "C": "Expire test copies",
+        "D": "Document workflow steps and required evidence",
+        "E": "Define consulted legal and security roles"
+      },
+      "correct": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Nonproduction environments still carry data-protection duties. The defensible controls are masking or tokenizing sensitive fields (A), minimizing data before use (B), and expiring test copies (C). Documenting workflow steps (D) is a procedure concern and naming consulted roles (E) is a RACI concern—neither protects the staging data.",
+      "whyWrong": {
+        "D": "Documenting workflow steps is a procedure artifact, not a staging-data control.",
+        "E": "Defining consulted roles is decision ownership, not data protection."
+      },
+      "sources": [
+        "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components."
+      ],
+      "whyCorrect": {
+        "A": "Tokenizing replaces sensitive values with tokens (mapping kept in a vault) and masking obscures them, so test data does not expose real customer values.",
+        "B": "Minimizing data before use limits how much sensitive data ever reaches the test environment.",
+        "C": "Expiring test copies stops production data from lingering in staging indefinitely."
+      },
+      "keywords": [
+        {
+          "text": "staging data governance",
+          "tier": "critical"
+        },
+        {
+          "text": "mask or tokenize sensitive fields",
+          "tier": "high"
+        },
+        {
+          "text": "minimize data before use",
+          "tier": "high"
+        },
+        {
+          "text": "expire test copies",
+          "tier": "high"
+        },
+        {
+          "text": "data governance",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-041",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Understand",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "quantitative and qualitative risk analysis",
+      "stem": "Leadership wants to compare ransomware-outage risk against payment-fraud risk using both expected loss and strategic impact. Which approach best addresses the issue?",
+      "choices": {
+        "A": "Run a business impact analysis and turn impact tolerance into recovery and continuity requirements",
+        "B": "Assess data, model, output, automation, privacy, and accountability risks before operational use",
+        "C": "Apply compensating controls, document residual risk, and obtain accountable risk acceptance",
+        "D": "Review contractual duties, access scope, logging, subprocessors, breach notification, and offboarding controls",
+        "E": "Combine quantitative estimates with qualitative business, safety, legal, and reputation factors"
+      },
+      "correct": [
+        "E"
+      ],
+      "explanation": "Comparing these risks on both expected loss and strategic impact needs both numeric and contextual evidence. The answer is E: estimate exposure and frequency quantitatively, then weigh business, safety, legal, and reputation factors and state the assumptions. The other options assess AI risk, set recovery targets, treat risk, or review vendors—none combines both lenses.",
+      "whyWrong": {
+        "A": "A business impact analysis sets recovery objectives, not a blended risk comparison.",
+        "B": "AI usage risk assessment is the wrong domain for ransomware-versus-fraud comparison.",
+        "C": "Compensating controls and acceptance treat a risk; they do not compare two.",
+        "D": "Third-party risk review covers vendors, not this internal comparison."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "E": "It pairs quantitative exposure estimates with qualitative impact factors so both risks can be compared fairly."
+      },
+      "keywords": [
+        {
+          "text": "quantitative and qualitative risk analysis",
+          "tier": "critical"
+        },
+        {
+          "text": "state uncertainty and assumptions",
+          "tier": "high"
+        },
+        {
+          "text": "estimate exposure and frequency",
+          "tier": "high"
+        },
+        {
+          "text": "document nonfinancial impacts",
+          "tier": "high"
+        },
+        {
+          "text": "business impact analysis",
+          "tier": "medium"
+        }
+      ]
+    }
+  ],
+  "instructor": "Songpon TEERAKANOK",
+  "website": "cyberskills.co.th",
+  "copyright": "Copyright (c) 2026 CYBERSKILLS Professional Training Center. All rights reserved. For enrolled learners only. Non-distribution."
+}

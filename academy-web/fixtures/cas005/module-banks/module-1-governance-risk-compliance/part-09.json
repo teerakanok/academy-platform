@@ -1,0 +1,595 @@
+{
+  "id": "module-1-governance-risk-compliance-part-09",
+  "sourceModuleId": "m1",
+  "sourceSlug": "module-1-governance-risk-compliance",
+  "title": "Module 1 - Governance, Risk, and Compliance - Part 9",
+  "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+  "part": 9,
+  "questionRange": [
+    81,
+    90
+  ],
+  "questions": [
+    {
+      "id": "M1-012",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.1",
+      "learningObjective": "Given a set of organizational security requirements, implement the appropriate governance components.",
+      "lesson": "2A",
+      "bloom": "Understand",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "RACI and decision ownership",
+      "stem": "Exception requests stall because operations validates the compensating controls while business leaders own the residual-risk decision. Which approach best addresses the issue?",
+      "choices": {
+        "A": "Require change governance: risk classification, emergency approval, rollback evidence, and post-change review",
+        "B": "Use GRC tooling or an evidence register mapping controls, owners, exceptions, tests, and obligations",
+        "C": "Apply data governance to staging: minimization, masking/tokenization, access limits, and retention",
+        "D": "Build a RACI separating recommendation, consultation, approval, execution, and evidence ownership",
+        "E": "Use a procedure that turns the policy into required steps, evidence, approvals, and tests"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The stall comes from unclear decision authority, not a missing technical control. A RACI fixes it by separating who recommends, who is consulted, who approves, who executes, and who owns evidence (D). Tying approval to residual-risk evidence and naming the accountable business owner unblocks the queue.",
+      "whyWrong": {
+        "A": "Change governance manages changes, not the ownership confusion blocking exceptions.",
+        "B": "A GRC register tracks evidence but does not assign who decides on residual risk.",
+        "C": "Staging data governance is unrelated to exception decision authority.",
+        "E": "A procedure documents steps but does not resolve who is accountable for the decision."
+      },
+      "sources": [
+        "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components."
+      ],
+      "whyCorrect": {
+        "D": "Clarifies decision authority, which is the real cause of the stalled exceptions."
+      },
+      "keywords": [
+        {
+          "text": "RACI and decision ownership",
+          "tier": "critical"
+        },
+        {
+          "text": "tie approval to residual-risk evidence",
+          "tier": "high"
+        },
+        {
+          "text": "name the accountable business owner",
+          "tier": "high"
+        },
+        {
+          "text": "compensating controls",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-063",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "reporting frameworks and executive evidence",
+      "stem": "The board wants a cybersecurity scorecard that supports regulatory reporting and investment decisions. Which target-state design is the most complete and defensible?",
+      "choices": {
+        "A": "Distinguish audits, assessments, and certifications by scope, period, criteria, and current evidence",
+        "B": "Adjust architecture and governance to meet residency, processing, and contractual limits",
+        "C": "Design controls around applicable healthcare, privacy, retention, access, and reporting duties",
+        "D": "Map metrics to a recognized framework and show risk, control performance, exceptions, and trends",
+        "E": "Apply purpose limitation, minimization, consent/notice, retention, and subject-rights handling"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Executive reporting needs decision-useful evidence tied to recognized control objectives. The complete design maps metrics to a framework and shows risk, control performance, exceptions, and trends (D). Residual risk trends and control exceptions are what make the scorecard credible.",
+      "whyWrong": {
+        "A": "Assurance-artifact distinctions support audits, not board reporting.",
+        "B": "Data-residency adjustments address location, not the scorecard.",
+        "C": "Sector control design is a compliance task, not the executive scorecard.",
+        "E": "Privacy lifecycle controls do not produce executive reporting."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "D": "Ties metrics to a framework and surfaces performance, exceptions, and trends for the board."
+      },
+      "keywords": [
+        {
+          "text": "reporting frameworks and executive evidence",
+          "tier": "critical"
+        },
+        {
+          "text": "include control exceptions",
+          "tier": "high"
+        },
+        {
+          "text": "show residual risk trends",
+          "tier": "high"
+        },
+        {
+          "text": "residual risk",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-092",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "kill chain and control placement",
+      "stem": "A likely adversary uses phishing, token theft, cloud API discovery, and staged exfiltration. Which target-state design is the most complete and defensible?",
+      "choices": {
+        "A": "Map the attack chain to preventive, detective, and responsive controls across phases",
+        "B": "Enumerate the attack surface: external, internal, identity, data, and supply-chain exposure",
+        "C": "Model assets, actors, data flows, trust boundaries, dependencies, and assumptions before choosing controls",
+        "D": "Profile threats against the organization's real assets, exposure, controls, and processes",
+        "E": "Model AI risks: prompt injection, retrieval leakage, tool misuse, data poisoning, output trust, and approval limits"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "When an adversary moves through multiple stages, controls should sit across the whole attack path rather than at one point. Mapping the chain to preventive, detective, and responsive controls at each phase (A) lets you add identity detection early and catch staging and exfiltration late.",
+      "whyWrong": {
+        "B": "Attack-surface enumeration lists exposure but does not place controls along the kill chain.",
+        "C": "Building a system model is foundational but does not assign phase-by-phase controls.",
+        "D": "Threat profiling judges relevance; it does not map controls to attack stages.",
+        "E": "AI threat modeling does not match this conventional intrusion path."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "A": "Places layered controls across every phase of the multi-stage attack the scenario describes."
+      },
+      "keywords": [
+        {
+          "text": "kill chain and control placement",
+          "tier": "critical"
+        },
+        {
+          "text": "detect staging and exfiltration",
+          "tier": "high"
+        },
+        {
+          "text": "add identity detection",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-088",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "reporting frameworks and executive evidence",
+      "stem": "The board wants a cybersecurity scorecard that supports regulatory reporting and investment decisions. Which evidence points would let a reviewer defend the design against plausible alternatives? (Select all that apply.)",
+      "choices": {
+        "A": "Show residual risk trends",
+        "B": "Map metrics to a framework",
+        "C": "Include control exceptions",
+        "D": "Retain audit evidence",
+        "E": "Minimize collection"
+      },
+      "correct": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "A defensible scorecard maps metrics to a recognized framework (B), shows residual risk trends over time (A), and discloses control exceptions (C). Retaining audit evidence and minimizing collection are valid practices but belong to industry-compliance and privacy topics, not the executive scorecard.",
+      "whyWrong": {
+        "D": "Retaining audit evidence supports industry compliance, not the reporting scorecard.",
+        "E": "Minimizing collection is a privacy lifecycle control, unrelated to executive reporting."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "A": "Residual risk trends show whether risk is improving, which investment decisions need.",
+        "B": "Framework mapping gives the metrics shared meaning for regulators and the board.",
+        "C": "Disclosing exceptions keeps the scorecard from overstating coverage."
+      },
+      "keywords": [
+        {
+          "text": "reporting frameworks and executive evidence",
+          "tier": "critical"
+        },
+        {
+          "text": "map metrics to a framework",
+          "tier": "high"
+        },
+        {
+          "text": "include control exceptions",
+          "tier": "high"
+        },
+        {
+          "text": "show residual risk trends",
+          "tier": "high"
+        },
+        {
+          "text": "audit evidence",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-032",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "risk treatment and compensating controls",
+      "stem": "A certified production system cannot be patched until recertification, but active exploit activity exists. What should the security practitioner recommend FIRST?",
+      "choices": {
+        "A": "Apply compensating controls, document residual risk, and get accountable risk acceptance",
+        "B": "Review contractual duties, access scope, logging, subprocessors, breach notice, and offboarding",
+        "C": "Assess data, model, output, automation, privacy, and accountability risks before operational use",
+        "D": "Run a business impact analysis and turn impact tolerance into recovery and continuity requirements",
+        "E": "Blend quantitative estimates with qualitative business, safety, legal, and reputation factors"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "When patching is blocked, due care still requires reducing the risk and formally accepting what remains. Apply compensating controls such as segmentation, monitoring, and access restriction, document the residual risk, and get accountable sign-off (A). That balances the exploit threat against the recertification constraint.",
+      "whyWrong": {
+        "B": "Third-party contract review does not address an unpatchable internal system.",
+        "C": "AI risk assessment is unrelated to this patching constraint.",
+        "D": "A BIA sets recovery objectives, not the immediate mitigation for active exploitation.",
+        "E": "Quantitative/qualitative analysis scores the risk but does not act to reduce it now."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "A": "Reduces exposure with compensating controls and records accountable acceptance of the residual risk."
+      },
+      "keywords": [
+        {
+          "text": "risk treatment and compensating controls",
+          "tier": "critical"
+        },
+        {
+          "text": "monitor and restrict access",
+          "tier": "high"
+        },
+        {
+          "text": "document residual risk",
+          "tier": "high"
+        },
+        {
+          "text": "segment the asset",
+          "tier": "high"
+        },
+        {
+          "text": "business impact analysis",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-037",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Analyze",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "risk treatment and compensating controls",
+      "stem": "A certified production system cannot be patched until recertification, but active exploit activity exists. Which items make a risk-treatment answer defensible rather than superficial? (Select all that apply.)",
+      "choices": {
+        "A": "Monitor and restrict access",
+        "B": "Document residual risk",
+        "C": "Segment the asset",
+        "D": "Define termination and breach obligations",
+        "E": "Log prompts and retrieved evidence"
+      },
+      "correct": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "When you cannot patch, you reduce the risk another way and record what remains. Defensible treatment monitors and restricts access (A), documents the residual risk for accountable acceptance (B), and segments the asset to limit blast radius (C). Vendor contract terms and AI logging belong to other topics.",
+      "whyWrong": {
+        "D": "Termination and breach obligations are third-party risk terms, not compensating controls here.",
+        "E": "Logging prompts and retrieved evidence is an AI usage control, unrelated to this patch constraint."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "A": "Monitoring and tighter access cut the chance and reach of exploitation while patching is blocked.",
+        "B": "Documenting residual risk is what enables accountable, auditable risk acceptance.",
+        "C": "Segmenting the asset contains an attacker if the unpatched flaw is exploited."
+      },
+      "keywords": [
+        {
+          "text": "risk treatment and compensating controls",
+          "tier": "critical"
+        },
+        {
+          "text": "monitor and restrict access",
+          "tier": "high"
+        },
+        {
+          "text": "document residual risk",
+          "tier": "high"
+        },
+        {
+          "text": "segment the asset",
+          "tier": "high"
+        },
+        {
+          "text": "compensating controls",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-116",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "AI model threat modeling",
+      "stem": "A retrieval-augmented assistant can read internal documents and create support tickets. Which elements belong in the design package? (Select all that apply.)",
+      "choices": {
+        "A": "Gate external instructions",
+        "B": "Include data export paths",
+        "C": "Include third-party dependencies",
+        "D": "Log retrieved context",
+        "E": "Separate read and act privileges"
+      },
+      "correct": [
+        "A",
+        "D",
+        "E"
+      ],
+      "explanation": "Threat modeling an AI system must cover prompt injection, retrieval leakage, tool misuse, and approval boundaries. Because this assistant both reads documents and takes actions, the design should gate instructions coming from external content (A), log retrieved context (D), and separate read privileges from act privileges (E). Generic attack-surface items fit a different topic.",
+      "whyWrong": {
+        "B": "Data export paths are legitimate design concerns, but they map to attack-surface enumeration; the keyed set here targets the AI-specific threat-model controls.",
+        "C": "Third-party dependencies matter to the broader design, but they fall under attack-surface analysis rather than the AI model threat-modeling controls keyed here."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "A": "Gating external instructions defends against prompt injection hidden in retrieved content.",
+        "D": "Logging retrieved context makes retrieval leakage and tool misuse traceable.",
+        "E": "Separating read from act privileges stops a poisoned read from triggering an unsafe action."
+      },
+      "keywords": [
+        {
+          "text": "AI model threat modeling",
+          "tier": "critical"
+        },
+        {
+          "text": "separate read and act privileges",
+          "tier": "high"
+        },
+        {
+          "text": "gate external instructions",
+          "tier": "high"
+        },
+        {
+          "text": "log retrieved context",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ],
+      "visual": {
+        "id": "cas005-lo-1-4",
+        "fileName": "cas005-lo-1-4.svg",
+        "src": "../assets/figures/cas005-lo-1-4.svg",
+        "title": "CAS005 LO 1.4: Perform Threat Modeling",
+        "alt": "Instructional diagram for CAS005 objective 1.4, showing scenario cue, control decision, and evidence review.",
+        "caption": "Generated instructional diagram for CAS005 LO 1.4; verify against Perform Threat Modeling source anchors.",
+        "sourceLabel": "CAS005 LO 1.4: Given a scenario, perform threat modeling activities.",
+        "generated": true
+      }
+    },
+    {
+      "id": "M1-120",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "attack surface determination",
+      "stem": "A new partner integration adds APIs, service accounts, event queues, and data exports. What should the security practitioner do FIRST?",
+      "choices": {
+        "A": "Model assets, actors, data flows, trust boundaries, dependencies, and assumptions before choosing controls",
+        "B": "Map the attack chain to preventive, detective, and responsive controls across phases",
+        "C": "Profile threats against the organization's real assets, exposure, controls, and processes",
+        "D": "Model AI risks: prompt injection, retrieval leakage, tool misuse, data poisoning, output trust, and approval limits",
+        "E": "Enumerate the attack surface: external, internal, identity, data, and supply-chain exposure"
+      },
+      "correct": [
+        "E"
+      ],
+      "explanation": "Attack surface is more than open ports. A partner integration adds APIs, service identities, queues, and export paths, so the first step is to enumerate all exposure: external, internal, identity, data, and supply-chain (E). Naming third-party dependencies and data-export paths is what makes the inventory complete.",
+      "whyWrong": {
+        "A": "Building a system model is foundational but does not enumerate external and supply-chain surface.",
+        "B": "Kill-chain control placement assumes the surface is already known.",
+        "C": "Threat profiling judges relevance, not the new reachable surface.",
+        "D": "AI threat modeling does not fit this non-AI integration."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "E": "Inventories the full new exposure, including identity, data-export, and supply-chain paths the integration adds."
+      },
+      "keywords": [
+        {
+          "text": "attack surface determination",
+          "tier": "critical"
+        },
+        {
+          "text": "include third-party dependencies",
+          "tier": "high"
+        },
+        {
+          "text": "include data export paths",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-025",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.1",
+      "learningObjective": "Given a set of organizational security requirements, implement the appropriate governance components.",
+      "lesson": "2A",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "staging data governance",
+      "stem": "Developers copied production customer records into a shared test environment to troubleshoot faster. Which target-state design is the most complete and defensible?",
+      "choices": {
+        "A": "Build a RACI separating recommendation, consultation, approval, execution, and evidence ownership",
+        "B": "Use a procedure that turns the policy into required steps, evidence, approvals, and tests",
+        "C": "Use GRC tooling or an evidence register mapping controls, owners, exceptions, tests, and obligations",
+        "D": "Apply data governance to staging: minimization, masking/tokenization, access limits, and retention",
+        "E": "Require change governance: risk classification, emergency approval, rollback evidence, and post-change review"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Nonproduction environments still inherit data-protection obligations. The complete design applies data governance to staging, minimizing data, masking or tokenizing sensitive fields, limiting access, and expiring test copies (D). Those measures directly protect the copied customer records.",
+      "whyWrong": {
+        "A": "A RACI clarifies ownership but does not protect the data in staging.",
+        "B": "A procedure documents steps without implementing the data safeguards.",
+        "C": "A GRC register tracks evidence; it does not minimize or mask the records.",
+        "E": "Change governance handles changes, not this data-protection gap."
+      },
+      "sources": [
+        "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components."
+      ],
+      "whyCorrect": {
+        "D": "Protects the regulated data in staging via minimization, masking, access limits, and retention."
+      },
+      "keywords": [
+        {
+          "text": "staging data governance",
+          "tier": "critical"
+        },
+        {
+          "text": "minimize data before use",
+          "tier": "high"
+        },
+        {
+          "text": "expire test copies",
+          "tier": "high"
+        },
+        {
+          "text": "change governance",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-075",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "multi",
+      "topic": "audit, assessment, and certification evidence",
+      "stem": "Executives are treating a past assessment letter as proof of current certification for a regulated service. Which controls or evidence should be included? (Select all that apply.)",
+      "choices": {
+        "A": "Verify period of coverage",
+        "B": "Validate purpose",
+        "C": "Confirm attestation scope",
+        "D": "Map metrics to a framework",
+        "E": "Collect current operating evidence"
+      },
+      "correct": [
+        "A",
+        "C",
+        "E"
+      ],
+      "explanation": "Assurance artifacts differ by scope and time window, so an old letter does not prove current status. The defensible response verifies the period it covers (A), confirms what the attestation actually scoped (C), and collects current operating evidence (E). Privacy purpose validation and reporting metrics belong to other topics.",
+      "whyWrong": {
+        "B": "Validating purpose is a privacy lifecycle control, not assurance-artifact verification.",
+        "D": "Mapping metrics to a framework is executive reporting, not certification validity."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "A": "Checking the period of coverage shows whether the assurance is still valid.",
+        "C": "Confirming attestation scope ensures the letter covers the regulated service in question.",
+        "E": "Current operating evidence proves the controls still work today."
+      },
+      "keywords": [
+        {
+          "text": "audit, assessment, and certification evidence",
+          "tier": "critical"
+        },
+        {
+          "text": "collect current operating evidence",
+          "tier": "high"
+        },
+        {
+          "text": "confirm attestation scope",
+          "tier": "high"
+        },
+        {
+          "text": "verify period of coverage",
+          "tier": "high"
+        },
+        {
+          "text": "RPO",
+          "tier": "medium"
+        }
+      ]
+    }
+  ],
+  "instructor": "Songpon TEERAKANOK",
+  "website": "cyberskills.co.th",
+  "copyright": "Copyright (c) 2026 CYBERSKILLS Professional Training Center. All rights reserved. For enrolled learners only. Non-distribution."
+}

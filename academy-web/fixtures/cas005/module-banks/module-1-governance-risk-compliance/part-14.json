@@ -1,0 +1,579 @@
+{
+  "id": "module-1-governance-risk-compliance-part-14",
+  "sourceModuleId": "m1",
+  "sourceSlug": "module-1-governance-risk-compliance",
+  "title": "Module 1 - Governance, Risk, and Compliance - Part 14",
+  "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+  "part": 14,
+  "questionRange": [
+    131,
+    140
+  ],
+  "questions": [
+    {
+      "id": "M1-093",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "assets, data flows, trust boundaries, and assumptions",
+      "stem": "A payments API accepts customer records, calls a fraud service, and writes decisions back to core systems. Weighing security value, operational burden, and evidence quality, which option is most defensible?",
+      "choices": {
+        "A": "Map the attack chain to preventive, detective, and responsive controls across multiple phases",
+        "B": "Model prompt injection, retrieval leakage, tool misuse, data poisoning, output trust, and approval boundaries",
+        "C": "Enumerate external, internal, identity, data, and supply-chain attack surfaces",
+        "D": "Model assets, actors, data flows, trust boundaries, dependencies, and assumptions before selecting controls",
+        "E": "Profile threats against the organization's real assets, exposure, controls, and business processes"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Threat modeling begins by defining what you are modeling. For a multi-system payments flow, you first map assets, actors, data flows, trust boundaries, dependencies, and assumptions—choice D—so later control choices rest on a clear model. The other options (control placement, AI modeling, surface enumeration, threat profiling) are later steps that assume this scoping is already done.",
+      "whyWrong": {
+        "A": "Placing controls across the chain comes after the system is modeled.",
+        "B": "AI-specific modeling does not fit this conventional payments flow.",
+        "C": "Surface enumeration lists exposure but skips the foundational data-flow model.",
+        "E": "Threat profiling judges applicability after the model exists, not before."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "D": "It establishes the system model—actors, data stores, boundaries, and assumptions—that every later control decision depends on."
+      },
+      "keywords": [
+        {
+          "text": "identify actors and data stores",
+          "tier": "high"
+        },
+        {
+          "text": "record assumptions",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-079",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Remember",
+      "difficulty": "Advanced recall",
+      "type": "single",
+      "topic": "data residency and processing location",
+      "stem": "Encrypted backups are replicated to a region excluded by customer contracts. Which control objective should the reviewer apply?",
+      "choices": {
+        "A": "Apply purpose limitation, minimization, consent/notice where needed, retention, and subject-rights handling",
+        "B": "Design controls around applicable healthcare, privacy, retention, access, and reporting obligations",
+        "C": "Distinguish audits, assessments, and certifications by scope, period, criteria, and current control evidence",
+        "D": "Map metrics to a recognized framework and show risk, control performance, exceptions, and trend evidence",
+        "E": "Adjust architecture and governance to meet residency, processing, and contractual restrictions"
+      },
+      "correct": [
+        "E"
+      ],
+      "explanation": "Encryption protects the data's confidentiality but does not satisfy a contract about where it may reside. Compliance can constrain location no matter how strong the crypto, so the objective is to enforce allowed regions and record transfer/retention evidence—choice E. The other options cover privacy lifecycle, sector strategy, audit types, or reporting, not data location.",
+      "whyWrong": {
+        "A": "Privacy lifecycle rules govern collection and use, not where backups may live.",
+        "B": "Sector compliance strategy is broader and does not target the location restriction.",
+        "C": "Audit and certification distinctions do not control replication location.",
+        "D": "Reporting metrics do not enforce allowed regions."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "E": "It enforces contractual residency and processing-location limits that encryption alone cannot meet."
+      },
+      "keywords": [
+        {
+          "text": "data residency and processing location",
+          "tier": "critical"
+        },
+        {
+          "text": "record transfer and retention evidence",
+          "tier": "high"
+        },
+        {
+          "text": "map data locations to obligations",
+          "tier": "high"
+        },
+        {
+          "text": "enforce allowed regions",
+          "tier": "high"
+        },
+        {
+          "text": "RPO",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-005",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.1",
+      "learningObjective": "Given a set of organizational security requirements, implement the appropriate governance components.",
+      "lesson": "2A",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "staging data governance",
+      "stem": "Developers copied production customer records into a shared test environment to troubleshoot faster. Which target-state design is most complete and defensible?",
+      "choices": {
+        "A": "Require change governance: risk classification, emergency approval, rollback evidence, and post-implementation review",
+        "B": "Operationalize the policy into a procedure with required steps, evidence, approvals, and tests",
+        "C": "Build a RACI that separates recommendation, consultation, approval, execution, and evidence ownership",
+        "D": "Govern staging data with minimization, masking/tokenization, access limits, and retention rules",
+        "E": "Use a GRC tool or evidence register that maps controls, owners, exceptions, tests, and obligations"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Production data copied into nonproduction remains subject to the applicable data-protection obligations. Copying real customer data into a shared test environment must be governed with minimization, masking/tokenization, access limits, and expiry—choice D. The other options govern change, procedures, decision ownership, or GRC evidence, not the staging-data exposure.",
+      "whyWrong": {
+        "A": "Change governance controls modifications, not copies of production data.",
+        "B": "A procedure documents steps but does not impose staging-data protections.",
+        "C": "A RACI assigns ownership, not the data controls needed in staging.",
+        "E": "A GRC register tracks evidence; it does not mask or expire the copied data."
+      },
+      "sources": [
+        "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components."
+      ],
+      "whyCorrect": {
+        "D": "It governs the test environment so production data is minimized, masked, access-limited, and expired."
+      },
+      "keywords": [
+        {
+          "text": "staging data governance",
+          "tier": "critical"
+        },
+        {
+          "text": "minimize data before use",
+          "tier": "high"
+        },
+        {
+          "text": "expire test copies",
+          "tier": "high"
+        },
+        {
+          "text": "change governance",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-142",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.5",
+      "learningObjective": "Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+      "lesson": "2A and 5A",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "AI data leakage and retention",
+      "stem": "Employees paste regulated case notes into an AI assistant to speed up summaries. Weighing security value, operational burden, and evidence quality, which option is most defensible?",
+      "choices": {
+        "A": "Update detection, awareness, and response for AI-enabled social engineering at scale",
+        "B": "Limit tool permissions, isolate untrusted content, and require approval for high-impact actions",
+        "C": "Treat model output as advisory and validate it against telemetry, policy, and human approval thresholds",
+        "D": "Define approved data classes, retention rules, logging, and redaction controls for AI use",
+        "E": "Require model/version governance, evaluation evidence, change notification, and rollback criteria"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Feeding regulated content into an AI assistant creates new data-exposure and retention paths. The control is to define approved data classes, redact sensitive fields, and audit prompt/output handling—choice D. The other options target adversary use, injection, output trust, or supply chain, not this leakage path.",
+      "whyWrong": {
+        "A": "Detection and awareness target attackers, not internal data leakage.",
+        "B": "Tool permissioning addresses action abuse, not what regulated data is pasted in.",
+        "C": "Output validation checks reliability, not data exposure or retention.",
+        "E": "Model/version governance covers supply-chain change, not regulated inputs."
+      },
+      "sources": [
+        "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption."
+      ],
+      "whyCorrect": {
+        "D": "It governs AI data leakage and retention by classifying inputs, redacting fields, and auditing handling."
+      },
+      "keywords": [
+        {
+          "text": "AI data leakage and retention",
+          "tier": "critical"
+        },
+        {
+          "text": "audit prompt and output handling",
+          "tier": "high"
+        },
+        {
+          "text": "redact sensitive fields",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-130",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.5",
+      "learningObjective": "Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+      "lesson": "2A and 5A",
+      "bloom": "Analyze",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "AI supply chain and model governance",
+      "stem": "A vendor model is updated silently and changes its detection recommendations. Which root cause is most important to address?",
+      "choices": {
+        "A": "Define approved data classes, retention rules, logging, and redaction controls for AI use",
+        "B": "Treat model output as advisory and validate it against telemetry, policy, and human approval thresholds",
+        "C": "Limit tool permissions, isolate untrusted content, and require approval for high-impact actions",
+        "D": "Update detection, awareness, and response for AI-enabled social engineering at scale",
+        "E": "Require model/version governance, evaluation evidence, change notification, and rollback criteria"
+      },
+      "correct": [
+        "E"
+      ],
+      "explanation": "A silent model update that shifts behavior is a supply-chain governance gap. AI dependencies need lifecycle governance—versioning, change notification, evaluation, and rollback—choice E: test behavior changes and record model versions. The other options handle leakage, output trust, injection, or adversary use, not uncontrolled model change.",
+      "whyWrong": {
+        "A": "Data-class controls address leakage, not version change.",
+        "B": "Output validation checks reliability but does not govern versions or rollback.",
+        "C": "Tool permissioning limits actions, not silent model updates.",
+        "D": "Adversary-focused updates do not detect or control model drift."
+      },
+      "sources": [
+        "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption."
+      ],
+      "whyCorrect": {
+        "E": "It governs the AI supply chain so model versions are tracked, evaluated, and reversible."
+      },
+      "keywords": [
+        {
+          "text": "AI supply chain and model governance",
+          "tier": "critical"
+        },
+        {
+          "text": "define rollback triggers",
+          "tier": "high"
+        },
+        {
+          "text": "record model versions",
+          "tier": "high"
+        },
+        {
+          "text": "test behavior changes",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-148",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.5",
+      "learningObjective": "Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+      "lesson": "2A and 5A",
+      "bloom": "Understand",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "prompt injection and tool misuse",
+      "stem": "An AI assistant retrieves external web content and can open tickets or trigger workflows. Which approach best addresses the issue?",
+      "choices": {
+        "A": "Treat model output as advisory and validate it against telemetry, policy, and human approval thresholds",
+        "B": "Define approved data classes, retention rules, logging, and redaction controls for AI use",
+        "C": "Require model/version governance, evaluation evidence, change notification, and rollback criteria",
+        "D": "Limit tool permissions, isolate untrusted content, and require approval for high-impact actions",
+        "E": "Update detection, awareness, and response for AI-enabled social engineering at scale"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "When an assistant reads untrusted content and can also act, prompt injection can cross from content into action. The control is to separate untrusted instructions, scope tool identity, and require approval for high-impact actions—choice D. The other options address output trust, data leakage, supply chain, or adversary use, not the content-to-action path.",
+      "whyWrong": {
+        "A": "Output validation checks reliability; it does not stop injected actions.",
+        "B": "Data-class controls limit leakage, not injected instructions driving actions.",
+        "C": "Model/version governance controls supply-chain change, not tool misuse.",
+        "E": "Adversary-focused updates target external attackers, not the assistant's tool path."
+      },
+      "sources": [
+        "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption."
+      ],
+      "whyCorrect": {
+        "D": "It breaks the injection-to-action chain by isolating untrusted content and gating high-impact actions."
+      },
+      "keywords": [
+        {
+          "text": "prompt injection and tool misuse",
+          "tier": "critical"
+        },
+        {
+          "text": "separate untrusted instructions",
+          "tier": "high"
+        },
+        {
+          "text": "require approval for actions",
+          "tier": "high"
+        },
+        {
+          "text": "scope tool identity",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-023",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.1",
+      "learningObjective": "Given a set of organizational security requirements, implement the appropriate governance components.",
+      "lesson": "2A",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "GRC evidence systems",
+      "stem": "Cloud guardrails, exceptions, and owner attestations need to be mapped to regulatory obligations. What should the security practitioner recommend FIRST?",
+      "choices": {
+        "A": "Require change governance: risk classification, emergency approval, rollback evidence, and post-implementation review",
+        "B": "Operationalize the policy into a procedure with required steps, evidence, approvals, and tests",
+        "C": "Govern staging data with minimization, masking/tokenization, access limits, and retention rules",
+        "D": "Use a GRC tool or evidence register that maps controls, owners, exceptions, tests, and obligations",
+        "E": "Build a RACI that separates recommendation, consultation, approval, execution, and evidence ownership"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Mapping guardrails, exceptions, and attestations to obligations is a GRC evidence-system task. It gives traceable evidence linking each obligation to a control, owner, and test, and lets you track exception aging—choice D. The other options govern change, procedures, staging data, or decision ownership, not obligation-to-evidence traceability.",
+      "whyWrong": {
+        "A": "Change governance controls modifications, not obligation mapping.",
+        "B": "A procedure documents steps; it does not map evidence to obligations.",
+        "C": "Staging data governance is unrelated to obligation traceability.",
+        "E": "A RACI assigns ownership, not the evidence traceability needed."
+      },
+      "sources": [
+        "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components."
+      ],
+      "whyCorrect": {
+        "D": "A GRC register ties controls to owners, tests, and obligations, producing the traceable evidence requested."
+      },
+      "keywords": [
+        {
+          "text": "GRC evidence systems",
+          "tier": "critical"
+        },
+        {
+          "text": "map controls to obligations",
+          "tier": "high"
+        },
+        {
+          "text": "track exception aging",
+          "tier": "high"
+        },
+        {
+          "text": "change governance",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-045",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "business impact and recovery requirements",
+      "stem": "A payment workflow is called mission critical, yet its MTD, RTO, RPO, and manual workarounds are undefined. Weighing security value, operational burden, and evidence quality, which option is most defensible?",
+      "choices": {
+        "A": "Assess data, model, output, automation, privacy, and accountability risks before operational use",
+        "B": "Combine quantitative estimates with qualitative business, safety, legal, and reputation factors",
+        "C": "Apply compensating controls, document residual risk, and obtain accountable risk acceptance",
+        "D": "Run a business impact analysis and turn impact tolerance into recovery and continuity requirements",
+        "E": "Review contractual duties, access scope, logging, subprocessors, breach notification, and offboarding controls"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Resilience targets must be derived from business impact, not from a label. A business impact analysis identifies critical dependencies, informs MTD/RTO/RPO and continuity requirements, and defines the manual workarounds that exercises and tests later validate—choice D. The other options are valid risk activities but do not produce recovery requirements from impact tolerance.",
+      "whyWrong": {
+        "A": "AI usage risk assessment is the wrong domain for a payment-workflow BIA.",
+        "B": "Quantitative/qualitative analysis compares risks; it does not set recovery objectives.",
+        "C": "Compensating controls and acceptance treat risk; they do not define RTO/RPO/MTD.",
+        "E": "Third-party risk review covers vendors, not this internal recovery gap."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "D": "A BIA converts impact tolerance into concrete recovery objectives and defines the workarounds and continuity needs that exercises later validate."
+      },
+      "keywords": [
+        {
+          "text": "business impact and recovery requirements",
+          "tier": "critical"
+        },
+        {
+          "text": "identify critical dependencies",
+          "tier": "high"
+        },
+        {
+          "text": "validate manual workarounds",
+          "tier": "high"
+        },
+        {
+          "text": "set RTO/RPO/MTD",
+          "tier": "high"
+        },
+        {
+          "text": "business impact analysis",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-133",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.5",
+      "learningObjective": "Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+      "lesson": "2A and 5A",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "multi",
+      "topic": "prompt injection and tool misuse",
+      "stem": "An AI assistant retrieves external web content and can open tickets or trigger workflows. Which controls or evidence should be included? (Select all that apply.)",
+      "choices": {
+        "A": "Separate untrusted instructions",
+        "B": "Scope tool identity",
+        "C": "Monitor impersonation patterns",
+        "D": "Harden reporting workflows",
+        "E": "Require approval for actions"
+      },
+      "correct": [
+        "A",
+        "B",
+        "E"
+      ],
+      "explanation": "When untrusted content can drive actions, prompt injection becomes the core risk. The controls that close it are separating untrusted instructions (A), scoping tool identity (B), and requiring approval for actions (E). Monitoring impersonation (C) and hardening reporting workflows (D) are adversary-activity controls, not injection defenses.",
+      "whyWrong": {
+        "C": "Monitoring impersonation patterns is an adversary-activity control, not an injection defense.",
+        "D": "Hardening reporting workflows addresses phishing response, not tool misuse."
+      },
+      "sources": [
+        "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption."
+      ],
+      "whyCorrect": {
+        "A": "Separating untrusted instructions stops injected text from being treated as commands.",
+        "B": "Scoping tool identity limits what the assistant can do if it is manipulated.",
+        "E": "Requiring approval for actions adds a human gate before high-impact operations."
+      },
+      "keywords": [
+        {
+          "text": "prompt injection and tool misuse",
+          "tier": "critical"
+        },
+        {
+          "text": "separate untrusted instructions",
+          "tier": "high"
+        },
+        {
+          "text": "require approval for actions",
+          "tier": "high"
+        },
+        {
+          "text": "scope tool identity",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-003",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.1",
+      "learningObjective": "Given a set of organizational security requirements, implement the appropriate governance components.",
+      "lesson": "2A",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "GRC evidence systems",
+      "stem": "Cloud guardrails, exceptions, and owner attestations need to be mapped to regulatory obligations. What should the security practitioner recommend FIRST?",
+      "choices": {
+        "A": "Build a RACI that separates recommendation, consultation, approval, execution, and evidence ownership",
+        "B": "Govern staging data with minimization, masking/tokenization, access limits, and retention rules",
+        "C": "Operationalize the policy into a procedure with required steps, evidence, approvals, and tests",
+        "D": "Use a GRC tool or evidence register that maps controls, owners, exceptions, tests, and obligations",
+        "E": "Require change governance: risk classification, emergency approval, rollback evidence, and post-implementation review"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Mapping guardrails, exceptions, and attestations to obligations is a GRC evidence-system task. It links each obligation to a control, an owner, a test, and supporting evidence—choice D. The other options assign decision ownership, govern staging data, write procedures, or control change, none of which provides the obligation-to-evidence traceability requested.",
+      "whyWrong": {
+        "A": "A RACI assigns who decides, not the evidence traceability across obligations.",
+        "B": "Staging data governance is unrelated to mapping controls to obligations.",
+        "C": "A procedure documents steps; it does not map the program's evidence to obligations.",
+        "E": "Change governance controls modifications, not obligation-to-evidence mapping."
+      },
+      "sources": [
+        "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components."
+      ],
+      "whyCorrect": {
+        "D": "A GRC register ties controls to owners, tests, and obligations, linking tests to owners and evidence."
+      },
+      "keywords": [
+        {
+          "text": "GRC evidence systems",
+          "tier": "critical"
+        },
+        {
+          "text": "link tests to owners and evidence",
+          "tier": "high"
+        },
+        {
+          "text": "map controls to obligations",
+          "tier": "high"
+        },
+        {
+          "text": "track exception aging",
+          "tier": "high"
+        },
+        {
+          "text": "change governance",
+          "tier": "medium"
+        }
+      ]
+    }
+  ],
+  "instructor": "Songpon TEERAKANOK",
+  "website": "cyberskills.co.th",
+  "copyright": "Copyright (c) 2026 CYBERSKILLS Professional Training Center. All rights reserved. For enrolled learners only. Non-distribution."
+}

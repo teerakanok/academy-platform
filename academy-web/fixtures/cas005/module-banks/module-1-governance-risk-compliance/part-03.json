@@ -1,0 +1,579 @@
+{
+  "id": "module-1-governance-risk-compliance-part-03",
+  "sourceModuleId": "m1",
+  "sourceSlug": "module-1-governance-risk-compliance",
+  "title": "Module 1 - Governance, Risk, and Compliance - Part 3",
+  "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+  "part": 3,
+  "questionRange": [
+    21,
+    30
+  ],
+  "questions": [
+    {
+      "id": "M1-004",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.1",
+      "learningObjective": "Given a set of organizational security requirements, implement the appropriate governance components.",
+      "lesson": "2A",
+      "bloom": "Analyze",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "change and configuration governance",
+      "stem": "An emergency firewall change bypassed review and later broke a regulated data feed. Which finding is the most important root cause to address?",
+      "choices": {
+        "A": "Apply data governance to staging: minimization, masking or tokenization, access limits, and retention rules",
+        "B": "Build a RACI that separates who recommends, who is consulted, who approves, who executes, and who owns the evidence",
+        "C": "Require change governance with risk classification, emergency approval, rollback evidence, and post-implementation review",
+        "D": "Use a GRC tool or evidence register that maps controls, owners, exceptions, tests, and obligations",
+        "E": "Write a procedure that turns the policy into required steps, evidence, approvals, and tests"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The root cause is that an urgent change skipped controlled review and had no rollback or follow-up check. Change and configuration governance fixes this by classifying emergency changes, preserving an expedited approval path, requiring rollback evidence, and adding a post-implementation review (C). A RACI, GRC register, staging data rules, or a procedure address adjacent concerns but none restores accountable change with emergency agility.",
+      "whyWrong": {
+        "A": "Staging data governance covers test-environment data, not production change control.",
+        "B": "A RACI clarifies decision roles but does not impose the emergency-change discipline that was missing.",
+        "D": "A GRC register stores evidence; it does not govern how changes are approved and reviewed.",
+        "E": "A procedure operationalizes a policy generally, but the specific gap is the change-management process itself."
+      },
+      "sources": [
+        "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components."
+      ],
+      "whyCorrect": {
+        "C": "Change governance keeps emergencies fast while still requiring classification, approval, rollback, and post-change review."
+      },
+      "keywords": [
+        {
+          "text": "change and configuration governance",
+          "tier": "critical"
+        },
+        {
+          "text": "classify emergency changes",
+          "tier": "high"
+        },
+        {
+          "text": "perform post-change review",
+          "tier": "high"
+        },
+        {
+          "text": "change governance",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-038",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "third-party risk management",
+      "stem": "A vendor will administer one of your security platforms and can view incident evidence. Which elements belong in the design package? (Select all that apply.)",
+      "choices": {
+        "A": "Require activity logs",
+        "B": "Estimate exposure and frequency",
+        "C": "Define termination and breach obligations",
+        "D": "Scope privileged access",
+        "E": "Gate high-impact actions"
+      },
+      "correct": [
+        "A",
+        "C",
+        "D"
+      ],
+      "explanation": "When a vendor administers your platform, their access becomes part of your security and audit surface. The third-party controls that matter here are scoping their privileged access (D), requiring activity logs of what they do (A), and defining termination and breach obligations in the contract (C). Estimating exposure and frequency (B) is risk-analysis work, and gating high-impact actions (E) is an AI-usage control; neither is the third-party-risk design this scenario needs.",
+      "whyWrong": {
+        "B": "Estimating exposure and frequency is quantitative risk analysis, not a third-party access control.",
+        "E": "Gating high-impact actions is an AI-usage safeguard unrelated to vendor administration."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "A": "Activity logs make the vendor's privileged actions auditable.",
+        "C": "Termination and breach obligations define what the vendor must do when the relationship ends or data is exposed.",
+        "D": "Scoping privileged access limits the vendor to only what administration requires."
+      },
+      "keywords": [
+        {
+          "text": "third-party risk management",
+          "tier": "critical"
+        },
+        {
+          "text": "define termination and breach obligations",
+          "tier": "high"
+        },
+        {
+          "text": "scope privileged access",
+          "tier": "high"
+        },
+        {
+          "text": "require activity logs",
+          "tier": "high"
+        },
+        {
+          "text": "incident evidence",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-058",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "third-party risk management",
+      "stem": "A vendor will administer one of your security platforms and can view incident evidence. Which elements belong in the design package? (Select all that apply.)",
+      "choices": {
+        "A": "Require activity logs",
+        "B": "Define termination and breach obligations",
+        "C": "Validate manual workarounds",
+        "D": "Estimate exposure and frequency",
+        "E": "Scope privileged access"
+      },
+      "correct": [
+        "A",
+        "B",
+        "E"
+      ],
+      "explanation": "Vendor administration extends your security and audit surface, so the design package must control that access. The right elements are scoping the vendor's privileged access (E), requiring activity logs (A), and defining termination and breach obligations (B). Validating manual workarounds (C) is a business-continuity step, and estimating exposure and frequency (D) is risk analysis; neither belongs to this third-party access design.",
+      "whyWrong": {
+        "C": "Validating manual workarounds is a recovery-planning task, not a vendor access control.",
+        "D": "Estimating exposure and frequency is quantitative risk analysis, separate from third-party design."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "A": "Activity logs keep the vendor's privileged actions auditable.",
+        "B": "Termination and breach obligations set the vendor's duties at offboarding and during incidents.",
+        "E": "Scoping privileged access restricts the vendor to the minimum administration needs."
+      },
+      "keywords": [
+        {
+          "text": "third-party risk management",
+          "tier": "critical"
+        },
+        {
+          "text": "define termination and breach obligations",
+          "tier": "high"
+        },
+        {
+          "text": "scope privileged access",
+          "tier": "high"
+        },
+        {
+          "text": "require activity logs",
+          "tier": "high"
+        },
+        {
+          "text": "incident evidence",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-040",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Remember",
+      "difficulty": "Advanced recall",
+      "type": "single",
+      "topic": "business impact and recovery requirements",
+      "stem": "A payment workflow is called mission critical, yet its MTD, RTO, RPO, and manual workarounds are undefined. Which control objective should the reviewer apply?",
+      "choices": {
+        "A": "Combine quantitative estimates with qualitative business, safety, legal, and reputation factors",
+        "B": "Assess data, model, output, automation, privacy, and accountability risks before operational use",
+        "C": "Apply compensating controls, document residual risk, and obtain accountable risk acceptance",
+        "D": "Review contractual duties, access scope, logging, subprocessors, breach notification, and offboarding controls",
+        "E": "Run a business impact analysis and convert impact tolerance into recovery and continuity requirements"
+      },
+      "correct": [
+        "E"
+      ],
+      "explanation": "Resilience decisions must be driven by business impact, not by a label like mission critical. A business impact analysis sets RTO, RPO, and MTD, identifies critical dependencies, and validates that the manual workarounds actually work (E). Quantitative risk analysis, AI usage risk, compensating controls, and third-party review are valid elsewhere but do not produce the recovery objectives this workflow is missing.",
+      "whyWrong": {
+        "A": "Blending quantitative and qualitative risk prioritizes risks but does not set recovery objectives.",
+        "B": "AI usage risk assessment is irrelevant to a payment workflow's recovery planning.",
+        "C": "Compensating controls treat a residual risk, not the missing continuity requirements.",
+        "D": "Third-party review covers vendor risk, not this workflow's recovery objectives."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "E": "A BIA converts impact tolerance into concrete recovery and continuity requirements, which is exactly what is undefined here."
+      },
+      "keywords": [
+        {
+          "text": "business impact and recovery requirements",
+          "tier": "critical"
+        },
+        {
+          "text": "identify critical dependencies",
+          "tier": "high"
+        },
+        {
+          "text": "validate manual workarounds",
+          "tier": "high"
+        },
+        {
+          "text": "set RTO/RPO/MTD",
+          "tier": "high"
+        },
+        {
+          "text": "business impact analysis",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-104",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "multi",
+      "topic": "threat profiling and applicability",
+      "stem": "You are turning lessons learned into durable control requirements. Threat intelligence describes attacks against your sector, but your environment has different assets and exposure paths. Which controls or evidence should be included? (Select all that apply.)",
+      "choices": {
+        "A": "Validate exposure paths",
+        "B": "Identify actors and data stores",
+        "C": "Gate external instructions",
+        "D": "Map threats to assets",
+        "E": "Document excluded assumptions"
+      },
+      "correct": [
+        "A",
+        "D",
+        "E"
+      ],
+      "explanation": "Sector intel becomes useful only when filtered through your own environment. Threat profiling does that by mapping reported threats onto your real assets (D), validating which exposure paths actually exist (A), and recording what you deliberately left out so the analysis stays auditable (E). Identifying actors and data stores (B) is general data-flow modeling, and gating external instructions (C) is an AI control; neither performs the applicability filter the stem requires.",
+      "whyWrong": {
+        "B": "Identifying actors and data stores is data-flow modeling, not the applicability judgment being tested.",
+        "C": "Gating external instructions is an AI model-threat control, unrelated to sector-intel profiling."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "A": "Validating exposure paths confirms which attack routes truly exist in your environment.",
+        "D": "Mapping threats to assets is what makes generic sector intel applicable here.",
+        "E": "Documenting excluded assumptions keeps the profile defensible by showing what was out of scope."
+      },
+      "keywords": [
+        {
+          "text": "threat profiling and applicability",
+          "tier": "critical"
+        },
+        {
+          "text": "document excluded assumptions",
+          "tier": "high"
+        },
+        {
+          "text": "validate exposure paths",
+          "tier": "high"
+        },
+        {
+          "text": "map threats to assets",
+          "tier": "high"
+        },
+        {
+          "text": "threat intelligence",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-034",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "AI usage risk management",
+      "stem": "A team wants a generative AI assistant to summarize sensitive incidents and recommend response actions. Which target-state design is most complete and defensible?",
+      "choices": {
+        "A": "Run a business impact analysis and convert impact tolerance into recovery and continuity requirements",
+        "B": "Apply compensating controls, document residual risk, and obtain accountable risk acceptance",
+        "C": "Combine quantitative estimates with qualitative business, safety, legal, and reputation factors",
+        "D": "Assess data, model, output, automation, privacy, and accountability risks before operational use",
+        "E": "Review contractual duties, access scope, logging, subprocessors, breach notification, and offboarding controls"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "AI risk spans three surfaces at once: the sensitive data it reads, the reliability of its output, and the impact of any actions it takes. A complete design assesses data, model, output, automation, privacy, and accountability risks before operational use, classifying allowed data and gating high-impact actions (D). A BIA, compensating controls, blended risk analysis, and third-party review each cover only one slice of this AI use case.",
+      "whyWrong": {
+        "A": "A BIA sets recovery objectives, not AI data, output, and automation safeguards.",
+        "B": "Compensating controls treat a residual risk; they do not design the AI use case end to end.",
+        "C": "Blended risk analysis prioritizes risks but does not produce the AI control set.",
+        "E": "Third-party review applies if a vendor is involved, but it omits model and output risks."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "D": "Only a full AI usage risk assessment covers data exposure, unreliable output, and automated-action impact together."
+      },
+      "keywords": [
+        {
+          "text": "AI usage risk management",
+          "tier": "critical"
+        },
+        {
+          "text": "gate high-impact actions",
+          "tier": "high"
+        },
+        {
+          "text": "classify allowed data",
+          "tier": "high"
+        },
+        {
+          "text": "business impact analysis",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-110",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "attack surface determination",
+      "stem": "A new partner integration adds APIs, service accounts, event queues, and data exports. What should the security practitioner recommend FIRST?",
+      "choices": {
+        "A": "Model assets, actors, data flows, trust boundaries, dependencies, and assumptions before choosing controls",
+        "B": "Map the attack chain to preventive, detective, and responsive controls at multiple phases",
+        "C": "Profile threats against your organization's real assets, exposure, controls, and business processes",
+        "D": "Enumerate externally reachable, internally reachable, identity, data, and supply-chain attack surfaces",
+        "E": "Model prompt injection, retrieval leakage, tool misuse, data poisoning, output trust, and approval boundaries"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Attack surface is more than open ports. A new integration brings APIs, service accounts, event queues, and exports, so the first step is to enumerate every surface it adds: externally reachable, internally reachable, identity, data, and supply-chain, including identity paths and third-party dependencies (D). Data-flow modeling, kill-chain mapping, threat profiling, and AI threat modeling come after you know the full surface.",
+      "whyWrong": {
+        "A": "Data-flow modeling supports threat modeling but does not first inventory the new attack surface.",
+        "B": "Kill-chain control placement assumes you already know what is exposed.",
+        "C": "Threat profiling judges intel applicability, not the surface a new integration creates.",
+        "E": "AI-specific threat modeling does not fit a conventional API and service-account integration."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "D": "Enumerating all reachable, identity, data, and supply-chain surfaces captures the new exposure before controls are chosen."
+      },
+      "keywords": [
+        {
+          "text": "attack surface determination",
+          "tier": "critical"
+        },
+        {
+          "text": "include third-party dependencies",
+          "tier": "high"
+        },
+        {
+          "text": "include identity paths",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-069",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Remember",
+      "difficulty": "Advanced recall",
+      "type": "single",
+      "topic": "data residency and processing location",
+      "stem": "Encrypted backups are being replicated to a region that customer contracts exclude. Which control objective should the reviewer apply?",
+      "choices": {
+        "A": "Adjust architecture and governance to satisfy residency, processing-location, and contractual restrictions",
+        "B": "Map metrics to a recognized framework and show risk, control performance, exceptions, and trends",
+        "C": "Distinguish audits, assessments, and certifications by scope, period, criteria, and current control evidence",
+        "D": "Apply purpose limitation, minimization, consent or notice where needed, retention, and subject-rights handling",
+        "E": "Design controls around the applicable healthcare, privacy, retention, access, and reporting obligations"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Compliance can dictate where data lives even when it is encrypted. Replicating backups into an excluded region breaks a contractual residency restriction, so the control objective is to adjust architecture and governance to keep data in permitted regions and record transfer and retention evidence (A). Framework metrics, audit-artifact distinctions, privacy lifecycle rules, and sector controls do not relocate the data.",
+      "whyWrong": {
+        "B": "Framework metrics report posture, not the data's physical location.",
+        "C": "Classifying assurance artifacts proves control state, not lawful storage location.",
+        "D": "Privacy lifecycle handling concerns personal data use, not the contractual region rule.",
+        "E": "Sector-specific control design is broader than this residency violation."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "A": "Residency and contractual limits govern data location even under encryption, so enforcing allowed regions is the objective."
+      },
+      "keywords": [
+        {
+          "text": "data residency and processing location",
+          "tier": "critical"
+        },
+        {
+          "text": "record transfer and retention evidence",
+          "tier": "high"
+        },
+        {
+          "text": "enforce allowed regions",
+          "tier": "high"
+        },
+        {
+          "text": "RPO",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-050",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Remember",
+      "difficulty": "Advanced recall",
+      "type": "single",
+      "topic": "business impact and recovery requirements",
+      "stem": "A service team proposes buying a tool, but the reviewer wants a control objective first. A payment workflow is called mission critical, yet its MTD, RTO, RPO, and manual workarounds are undefined. Which control objective should the reviewer apply?",
+      "choices": {
+        "A": "Run a business impact analysis and convert impact tolerance into recovery and continuity requirements",
+        "B": "Apply compensating controls, document residual risk, and obtain accountable risk acceptance",
+        "C": "Assess data, model, output, automation, privacy, and accountability risks before operational use",
+        "D": "Combine quantitative estimates with qualitative business, safety, legal, and reputation factors",
+        "E": "Review contractual duties, access scope, logging, subprocessors, breach notification, and offboarding controls"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Resilience must be driven by business impact, not by a tool purchase or a mission-critical label. A business impact analysis sets RTO, RPO, and MTD, identifies critical dependencies, and validates the manual workarounds (A). Compensating controls, AI usage risk, blended risk analysis, and third-party review do not produce the recovery objectives this workflow lacks.",
+      "whyWrong": {
+        "B": "Compensating controls treat residual risk, not missing recovery objectives.",
+        "C": "AI usage risk assessment does not apply to a payment workflow's continuity planning.",
+        "D": "Blended risk analysis prioritizes risk but does not set RTO, RPO, or MTD.",
+        "E": "Third-party review covers vendor risk, not this workflow's recovery design."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "A": "A BIA turns impact tolerance into the recovery and continuity requirements that are currently undefined."
+      },
+      "keywords": [
+        {
+          "text": "business impact and recovery requirements",
+          "tier": "critical"
+        },
+        {
+          "text": "identify critical dependencies",
+          "tier": "high"
+        },
+        {
+          "text": "validate manual workarounds",
+          "tier": "high"
+        },
+        {
+          "text": "business impact analysis",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-033",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Analyze",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "third-party risk management",
+      "stem": "A vendor will administer one of your security platforms and can view incident evidence. Which finding is the most important root cause to address?",
+      "choices": {
+        "A": "Run a business impact analysis and convert impact tolerance into recovery and continuity requirements",
+        "B": "Combine quantitative estimates with qualitative business, safety, legal, and reputation factors",
+        "C": "Apply compensating controls, document residual risk, and obtain accountable risk acceptance",
+        "D": "Review contractual duties, access scope, logging, subprocessors, breach notification, and offboarding controls",
+        "E": "Assess data, model, output, automation, privacy, and accountability risks before operational use"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Once a vendor administers your platform and can see incident evidence, their access is part of your security and audit surface. The root cause to address is third-party risk: review contractual duties, access scope, logging, subprocessors, breach notification, and offboarding, then require activity logs and define termination and breach obligations (D). A BIA, blended risk analysis, compensating controls, and AI usage risk do not govern the vendor relationship.",
+      "whyWrong": {
+        "A": "A BIA sets recovery objectives, not vendor access controls.",
+        "B": "Blended risk analysis prioritizes risk but does not manage the vendor relationship.",
+        "C": "Compensating controls treat a residual technical risk, not third-party governance.",
+        "E": "AI usage risk does not apply to administering a conventional security platform."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "D": "Treating vendor administration as part of your audit surface, with logging and contractual duties, is the real fix."
+      },
+      "keywords": [
+        {
+          "text": "third-party risk management",
+          "tier": "critical"
+        },
+        {
+          "text": "define termination and breach obligations",
+          "tier": "high"
+        },
+        {
+          "text": "require activity logs",
+          "tier": "high"
+        },
+        {
+          "text": "business impact analysis",
+          "tier": "medium"
+        }
+      ]
+    }
+  ],
+  "instructor": "Songpon TEERAKANOK",
+  "website": "cyberskills.co.th",
+  "copyright": "Copyright (c) 2026 CYBERSKILLS Professional Training Center. All rights reserved. For enrolled learners only. Non-distribution."
+}

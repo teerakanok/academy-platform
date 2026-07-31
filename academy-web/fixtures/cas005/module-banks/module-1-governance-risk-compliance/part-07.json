@@ -1,0 +1,581 @@
+{
+  "id": "module-1-governance-risk-compliance-part-07",
+  "sourceModuleId": "m1",
+  "sourceSlug": "module-1-governance-risk-compliance",
+  "title": "Module 1 - Governance, Risk, and Compliance - Part 7",
+  "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+  "part": 7,
+  "questionRange": [
+    61,
+    70
+  ],
+  "questions": [
+    {
+      "id": "M1-014",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.1",
+      "learningObjective": "Given a set of organizational security requirements, implement the appropriate governance components.",
+      "lesson": "2A",
+      "bloom": "Analyze",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "change and configuration governance",
+      "stem": "An emergency firewall change bypassed review and later broke a regulated data feed. Which finding is the most important root cause to address?",
+      "choices": {
+        "A": "Use a procedure that turns the policy into required steps, evidence, approvals, and tests",
+        "B": "Build a RACI separating recommendation, consultation, approval, execution, and evidence ownership",
+        "C": "Use GRC tooling or an evidence register mapping controls, owners, exceptions, tests, and obligations",
+        "D": "Apply data governance to staging: minimization, masking/tokenization, access limits, and retention",
+        "E": "Require change governance: risk classification, emergency approval, rollback evidence, and post-change review"
+      },
+      "correct": [
+        "E"
+      ],
+      "explanation": "The root cause is an unmanaged change, not a missing technical control. The fix is change governance that still allows emergency speed but adds risk classification, an emergency-approval path, rollback evidence, and a post-implementation review (E). That keeps urgent changes accountable and reviewable.",
+      "whyWrong": {
+        "A": "A procedure documents steps but does not add the emergency-approval and rollback controls a bypassed change needs.",
+        "B": "A RACI clarifies who decides, but the failure was an uncontrolled change process, not unclear ownership.",
+        "C": "A GRC register tracks evidence; it does not govern how emergency changes are approved and reversed.",
+        "D": "Staging data governance is unrelated to an emergency production firewall change."
+      },
+      "sources": [
+        "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components."
+      ],
+      "whyCorrect": {
+        "E": "Restores accountable change without losing emergency agility, and leaves rollback and post-change evidence to audit."
+      },
+      "keywords": [
+        {
+          "text": "change and configuration governance",
+          "tier": "critical"
+        },
+        {
+          "text": "perform post-change review",
+          "tier": "high"
+        },
+        {
+          "text": "require rollback plans",
+          "tier": "high"
+        },
+        {
+          "text": "change governance",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-137",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.5",
+      "learningObjective": "Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+      "lesson": "2A and 5A",
+      "bloom": "Remember",
+      "difficulty": "Advanced recall",
+      "type": "single",
+      "topic": "AI data leakage and retention",
+      "stem": "Employees paste regulated case notes into an AI assistant to speed up summaries. Which option best names the control objective the reviewer should apply?",
+      "choices": {
+        "A": "Treat model output as advisory and validate it against telemetry, policy, and human approval thresholds",
+        "B": "Define approved data classes, retention rules, logging, and redaction controls for AI use",
+        "C": "Require model/version governance, evaluation evidence, change notice, and rollback criteria",
+        "D": "Update detection, awareness, and response for AI-enabled social engineering at scale",
+        "E": "Limit tool permissions, isolate untrusted content, and require approval for high-impact actions"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "AI tools create new data exposure and retention paths, so the control objective is to govern the data itself: which classes are allowed, how long it is kept, what is logged, and what must be redacted (B). Classifying allowed inputs and auditing prompt and output handling make the control checkable.",
+      "whyWrong": {
+        "A": "Output-reliability validation addresses trust in answers, not leakage of regulated inputs.",
+        "C": "Model and version governance manages the AI supply chain, not the data being pasted in.",
+        "D": "Detecting AI-enabled attacks is about adversaries, not your own data handling.",
+        "E": "Tool-permission and injection controls protect agent actions, not data classification and retention."
+      },
+      "sources": [
+        "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption."
+      ],
+      "whyCorrect": {
+        "B": "Names the data-protection objective that fits regulated data entering an AI assistant."
+      },
+      "keywords": [
+        {
+          "text": "AI data leakage and retention",
+          "tier": "critical"
+        },
+        {
+          "text": "audit prompt and output handling",
+          "tier": "high"
+        },
+        {
+          "text": "classify allowed inputs",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-080",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Understand",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "audit, assessment, and certification evidence",
+      "stem": "Executives are treating a past assessment letter as proof of current certification for a regulated service. Which approach best addresses the issue?",
+      "choices": {
+        "A": "Apply purpose limitation, minimization, consent/notice, retention, and subject-rights handling",
+        "B": "Adjust architecture and governance to meet residency, processing, and contractual limits",
+        "C": "Design controls around applicable healthcare, privacy, retention, access, and reporting duties",
+        "D": "Map metrics to a recognized framework and show risk, control performance, exceptions, and trends",
+        "E": "Distinguish audits, assessments, and certifications by scope, period, criteria, and current evidence"
+      },
+      "correct": [
+        "E"
+      ],
+      "explanation": "Assurance artifacts differ in authority, time window, and scope; a past assessment letter is not a current certification. The fix is to distinguish these artifact types and verify the period of coverage and attestation scope, backed by current operating evidence (E).",
+      "whyWrong": {
+        "A": "Privacy lifecycle controls do not address misreading an assessment letter.",
+        "B": "Data residency rules are unrelated to the validity window of an assurance artifact.",
+        "C": "Industry-specific control design does not resolve the audit-vs-certification confusion.",
+        "D": "Reporting frameworks present metrics; they do not establish the scope and period of an attestation."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "E": "Separates audits, assessments, and certifications by scope and period so stale evidence is not mistaken for current assurance."
+      },
+      "keywords": [
+        {
+          "text": "audit, assessment, and certification evidence",
+          "tier": "critical"
+        },
+        {
+          "text": "confirm attestation scope",
+          "tier": "high"
+        },
+        {
+          "text": "verify period of coverage",
+          "tier": "high"
+        },
+        {
+          "text": "RPO",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-109",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Understand",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "threat profiling and applicability",
+      "stem": "Threat intelligence describes attacks against your sector, but your environment has different assets and exposure paths. Which approach best addresses the issue?",
+      "choices": {
+        "A": "Profile threats against the organization's real assets, exposure, controls, and processes",
+        "B": "Map the attack chain to preventive, detective, and responsive controls across phases",
+        "C": "Model assets, actors, data flows, trust boundaries, dependencies, and assumptions before choosing controls",
+        "D": "Enumerate the attack surface: external, internal, identity, data, and supply-chain exposure",
+        "E": "Model AI risks: prompt injection, retrieval leakage, tool misuse, data poisoning, output trust, and approval limits"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Generic sector intelligence is only useful once filtered through your own environment. Threat profiling maps reported threats to your actual assets, exposure, and controls and validates which exposure paths genuinely apply (A). That turns broad intel into relevant, defensible findings.",
+      "whyWrong": {
+        "B": "Kill-chain control placement assumes the relevant threats are already known to apply.",
+        "C": "Building a system model is foundational but does not judge which external threats are applicable.",
+        "D": "Attack-surface enumeration lists exposure but does not weigh threat relevance.",
+        "E": "AI threat modeling does not fit a generic sector-threat applicability question."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "A": "Tests applicability by mapping generic threats to your real assets and exposure paths."
+      },
+      "keywords": [
+        {
+          "text": "threat profiling and applicability",
+          "tier": "critical"
+        },
+        {
+          "text": "validate exposure paths",
+          "tier": "high"
+        },
+        {
+          "text": "map threats to assets",
+          "tier": "high"
+        },
+        {
+          "text": "threat intelligence",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-078",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "reporting frameworks and executive evidence",
+      "stem": "The board wants a cybersecurity scorecard that supports regulatory reporting and investment decisions. Which evidence points would let a reviewer defend the design against plausible alternatives? (Select all that apply.)",
+      "choices": {
+        "A": "Show residual risk trends",
+        "B": "Restrict minimum necessary access",
+        "C": "Minimize collection",
+        "D": "Include control exceptions",
+        "E": "Map metrics to a framework"
+      },
+      "correct": [
+        "A",
+        "D",
+        "E"
+      ],
+      "explanation": "Executive reporting needs decision-useful evidence tied to recognized control objectives. A defensible scorecard maps metrics to a framework (E), shows residual risk trends over time (A), and includes control exceptions (D) so leaders see the real risk picture. Access and collection controls belong to other compliance topics.",
+      "whyWrong": {
+        "B": "Minimum-necessary access is an industry-compliance control, not scorecard evidence.",
+        "C": "Minimizing collection is a privacy lifecycle control, unrelated to executive reporting."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "A": "Residual risk trends show whether the program is improving, which investment decisions depend on.",
+        "D": "Surfacing control exceptions keeps the scorecard honest about where controls are not fully in place.",
+        "E": "Mapping to a recognized framework gives the metrics shared meaning for regulators and the board."
+      },
+      "keywords": [
+        {
+          "text": "reporting frameworks and executive evidence",
+          "tier": "critical"
+        },
+        {
+          "text": "map metrics to a framework",
+          "tier": "high"
+        },
+        {
+          "text": "include control exceptions",
+          "tier": "high"
+        },
+        {
+          "text": "show residual risk trends",
+          "tier": "high"
+        },
+        {
+          "text": "residual risk",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-068",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "reporting frameworks and executive evidence",
+      "stem": "The board wants a cybersecurity scorecard that supports regulatory reporting and investment decisions. Which evidence points would let a reviewer defend the design against plausible alternatives? (Select all that apply.)",
+      "choices": {
+        "A": "Retain audit evidence",
+        "B": "Map metrics to a framework",
+        "C": "Include control exceptions",
+        "D": "Map data locations to obligations",
+        "E": "Show residual risk trends"
+      },
+      "correct": [
+        "B",
+        "C",
+        "E"
+      ],
+      "explanation": "An executive scorecard is defensible when its metrics map to a recognized framework (B), it shows residual risk trends (E), and it discloses control exceptions (C). Retaining audit evidence and mapping data locations are valid practices but belong to other compliance topics, not the scorecard itself.",
+      "whyWrong": {
+        "A": "Retaining audit evidence supports industry-specific compliance, not the reporting scorecard.",
+        "D": "Mapping data locations to obligations is a data-residency concern, not executive reporting."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "B": "Framework mapping gives metrics shared meaning for regulators and the board.",
+        "C": "Disclosing exceptions keeps the scorecard from overstating control coverage.",
+        "E": "Residual risk trends show whether risk is rising or falling over time."
+      },
+      "keywords": [
+        {
+          "text": "reporting frameworks and executive evidence",
+          "tier": "critical"
+        },
+        {
+          "text": "map metrics to a framework",
+          "tier": "high"
+        },
+        {
+          "text": "include control exceptions",
+          "tier": "high"
+        },
+        {
+          "text": "show residual risk trends",
+          "tier": "high"
+        },
+        {
+          "text": "audit evidence",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-030",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.1",
+      "learningObjective": "Given a set of organizational security requirements, implement the appropriate governance components.",
+      "lesson": "2A",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "staging data governance",
+      "stem": "Developers copied production customer records into a shared test environment to troubleshoot faster. Which evidence points would let a reviewer defend the decision against plausible alternatives? (Select all that apply.)",
+      "choices": {
+        "A": "Minimize data before use",
+        "B": "Record exceptions and recertification dates",
+        "C": "Mask or tokenize sensitive fields",
+        "D": "Document workflow steps and required evidence",
+        "E": "Expire test copies"
+      },
+      "correct": [
+        "A",
+        "C",
+        "E"
+      ],
+      "explanation": "Test environments inherit the same data-protection duties as production. Defensible staging governance minimizes the data brought in (A), masks or tokenizes sensitive fields (C), and expires test copies (E). Exception logging and procedure documentation are governance practices from other topics.",
+      "whyWrong": {
+        "B": "Recording exceptions and recertification dates is a policy/standard practice, not staging data protection.",
+        "D": "Documenting workflow steps belongs to procedure governance, not data handling in staging."
+      },
+      "sources": [
+        "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components."
+      ],
+      "whyCorrect": {
+        "A": "Using only the data actually needed cuts exposure at the source.",
+        "C": "Masking or tokenizing protects sensitive fields if the shared environment is compromised.",
+        "E": "Expiring test copies prevents regulated data from persisting in staging."
+      },
+      "keywords": [
+        {
+          "text": "staging data governance",
+          "tier": "critical"
+        },
+        {
+          "text": "mask or tokenize sensitive fields",
+          "tier": "high"
+        },
+        {
+          "text": "minimize data before use",
+          "tier": "high"
+        },
+        {
+          "text": "expire test copies",
+          "tier": "high"
+        },
+        {
+          "text": "data governance",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-015",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.1",
+      "learningObjective": "Given a set of organizational security requirements, implement the appropriate governance components.",
+      "lesson": "2A",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "staging data governance",
+      "stem": "Developers copied production customer records into a shared test environment to troubleshoot faster. Which target-state design is the most complete and defensible?",
+      "choices": {
+        "A": "Use a procedure that turns the policy into required steps, evidence, approvals, and tests",
+        "B": "Use GRC tooling or an evidence register mapping controls, owners, exceptions, tests, and obligations",
+        "C": "Require change governance: risk classification, emergency approval, rollback evidence, and post-change review",
+        "D": "Build a RACI separating recommendation, consultation, approval, execution, and evidence ownership",
+        "E": "Apply data governance to staging: minimization, masking/tokenization, access limits, and retention"
+      },
+      "correct": [
+        "E"
+      ],
+      "explanation": "Nonproduction environments still inherit data-protection obligations. The complete design applies data governance to staging, minimizing data, masking or tokenizing sensitive fields, limiting access, and setting retention (E). Those measures are exactly what protects the copied customer records.",
+      "whyWrong": {
+        "A": "A procedure documents how to act but does not itself protect the data in the test environment.",
+        "B": "A GRC register tracks evidence; it does not minimize or mask the copied records.",
+        "C": "Change governance handles changes, not the data-protection gap in staging.",
+        "D": "A RACI clarifies ownership but does not implement the data safeguards needed here."
+      },
+      "sources": [
+        "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components."
+      ],
+      "whyCorrect": {
+        "E": "Directly protects the regulated data in staging through minimization, masking, access limits, and retention."
+      },
+      "keywords": [
+        {
+          "text": "staging data governance",
+          "tier": "critical"
+        },
+        {
+          "text": "mask or tokenize sensitive fields",
+          "tier": "high"
+        },
+        {
+          "text": "minimize data before use",
+          "tier": "high"
+        },
+        {
+          "text": "change governance",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-072",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Analyze",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "privacy regulations as lifecycle rules",
+      "stem": "A product roadmap will collect device identifiers, support notes, and behavior telemetry for a new personalization feature. Which finding is the most important root cause to address?",
+      "choices": {
+        "A": "Apply purpose limitation, minimization, consent/notice where needed, retention, and subject-rights handling",
+        "B": "Design controls around applicable healthcare, privacy, retention, access, and reporting duties",
+        "C": "Adjust architecture and governance to meet residency, processing, and contractual limits",
+        "D": "Map metrics to a recognized framework and show risk, control performance, exceptions, and trends",
+        "E": "Distinguish audits, assessments, and certifications by scope, period, criteria, and current evidence"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Privacy is a design constraint across the data lifecycle, not a notice added after launch. New collection of identifiers and telemetry must satisfy purpose limitation, minimization, consent or notice where required, retention limits, and subject rights (A). Validating purpose and defining retention and access keep it defensible.",
+      "whyWrong": {
+        "B": "Industry-specific control design applies sector duties, not the general privacy lifecycle this feature needs.",
+        "C": "Data-residency adjustments address where data lives, not whether collection is justified and minimized.",
+        "D": "Reporting frameworks present metrics; they do not govern lawful collection.",
+        "E": "Assurance-artifact distinctions are about audit evidence, not privacy-by-design."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "A": "Builds privacy into the lifecycle, validating purpose and setting retention and rights handling before collection."
+      },
+      "keywords": [
+        {
+          "text": "privacy regulations as lifecycle rules",
+          "tier": "critical"
+        },
+        {
+          "text": "define retention and access",
+          "tier": "high"
+        },
+        {
+          "text": "validate purpose",
+          "tier": "high"
+        },
+        {
+          "text": "RPO",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-017",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.1",
+      "learningObjective": "Given a set of organizational security requirements, implement the appropriate governance components.",
+      "lesson": "2A",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "multi",
+      "topic": "RACI and decision ownership",
+      "stem": "Exception requests stall because operations validates the compensating controls while business leaders own the residual-risk decision. Which controls or evidence should be included? (Select all that apply.)",
+      "choices": {
+        "A": "Tie approval to residual-risk evidence",
+        "B": "Name the accountable business owner",
+        "C": "Link tests to owners and evidence",
+        "D": "Define consulted legal and security roles",
+        "E": "Define accountable approvers and reviewers"
+      },
+      "correct": [
+        "A",
+        "B",
+        "D"
+      ],
+      "explanation": "The bottleneck is unclear decision authority, so a RACI is the right fix. It ties approval to residual-risk evidence (A), names the accountable business owner (B), and defines who must be consulted, such as legal and security (D). GRC test linkage and policy-level approver definitions belong to other topics.",
+      "whyWrong": {
+        "C": "Linking tests to owners and evidence is a GRC-register control, not RACI decision ownership.",
+        "E": "Defining approvers and reviewers in policy form is a policy/procedure concern, not the RACI fix for this stall."
+      },
+      "sources": [
+        "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components."
+      ],
+      "whyCorrect": {
+        "A": "Linking approval to residual-risk evidence makes the business owner's decision concrete and reviewable.",
+        "B": "Naming the accountable business owner removes the ambiguity that is stalling the exceptions.",
+        "D": "Defining consulted roles ensures legal and security input without confusing who decides."
+      },
+      "keywords": [
+        {
+          "text": "RACI and decision ownership",
+          "tier": "critical"
+        },
+        {
+          "text": "define consulted legal and security roles",
+          "tier": "high"
+        },
+        {
+          "text": "tie approval to residual-risk evidence",
+          "tier": "high"
+        },
+        {
+          "text": "name the accountable business owner",
+          "tier": "high"
+        },
+        {
+          "text": "compensating controls",
+          "tier": "medium"
+        }
+      ]
+    }
+  ],
+  "instructor": "Songpon TEERAKANOK",
+  "website": "cyberskills.co.th",
+  "copyright": "Copyright (c) 2026 CYBERSKILLS Professional Training Center. All rights reserved. For enrolled learners only. Non-distribution."
+}

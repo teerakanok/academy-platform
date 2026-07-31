@@ -1,0 +1,593 @@
+{
+  "id": "module-1-governance-risk-compliance-part-10",
+  "sourceModuleId": "m1",
+  "sourceSlug": "module-1-governance-risk-compliance",
+  "title": "Module 1 - Governance, Risk, and Compliance - Part 10",
+  "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+  "part": 10,
+  "questionRange": [
+    91,
+    100
+  ],
+  "questions": [
+    {
+      "id": "M1-097",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "kill chain and control placement",
+      "stem": "A likely adversary uses phishing, token theft, cloud API discovery, and staged exfiltration. Which evidence points would let a reviewer defend the control design against plausible alternatives? (Select all that apply.)",
+      "choices": {
+        "A": "Monitor cloud API discovery",
+        "B": "Document excluded assumptions",
+        "C": "Detect staging and exfiltration",
+        "D": "Add identity detection",
+        "E": "Map threats to assets"
+      },
+      "correct": [
+        "A",
+        "C",
+        "D"
+      ],
+      "explanation": "Defending a multi-stage attack means placing controls at each phase of the kill chain. For this adversary that means adding identity detection for token theft (D), monitoring cloud API discovery (A), and detecting staging and exfiltration (C). Documenting assumptions and mapping threats to assets are threat-profiling steps from a different topic.",
+      "whyWrong": {
+        "B": "Documenting excluded assumptions is a threat-profiling activity, not kill-chain control placement.",
+        "E": "Mapping threats to assets is threat profiling, not placing controls across attack phases."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "A": "Monitoring cloud API discovery catches the reconnaissance phase of this attack.",
+        "C": "Detecting staging and exfiltration covers the final phase before data leaves.",
+        "D": "Identity detection counters the token theft step early in the chain."
+      },
+      "keywords": [
+        {
+          "text": "kill chain and control placement",
+          "tier": "critical"
+        },
+        {
+          "text": "detect staging and exfiltration",
+          "tier": "high"
+        },
+        {
+          "text": "monitor cloud API discovery",
+          "tier": "high"
+        },
+        {
+          "text": "add identity detection",
+          "tier": "high"
+        }
+      ]
+    },
+    {
+      "id": "M1-147",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.5",
+      "learningObjective": "Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+      "lesson": "2A and 5A",
+      "bloom": "Remember",
+      "difficulty": "Advanced recall",
+      "type": "single",
+      "topic": "AI data leakage and retention",
+      "stem": "Employees paste regulated case notes into an AI assistant to speed up summaries. Which option best names the control objective the reviewer should apply?",
+      "choices": {
+        "A": "Limit tool permissions, isolate untrusted content, and require approval for high-impact actions",
+        "B": "Update detection, awareness, and response for AI-enabled social engineering at scale",
+        "C": "Define approved data classes, retention rules, logging, and redaction controls for AI use",
+        "D": "Treat model output as advisory and validate it against telemetry, policy, and human approval thresholds",
+        "E": "Require model/version governance, evaluation evidence, change notice, and rollback criteria"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "AI tools open new data exposure and retention paths. The control objective is to govern the data itself: define which classes are allowed, how long it is retained, what is logged, and what must be redacted (C). Classifying allowed inputs and redacting sensitive fields make the control auditable.",
+      "whyWrong": {
+        "A": "Tool-permission and injection controls govern agent actions, not data handling.",
+        "B": "Detecting AI-enabled attacks is about adversaries, not your own data leakage.",
+        "D": "Output-reliability validation addresses trust in answers, not regulated-input leakage.",
+        "E": "Model and version governance secures the AI supply chain, not the data being pasted in."
+      },
+      "sources": [
+        "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption."
+      ],
+      "whyCorrect": {
+        "C": "Names the data-protection objective that fits regulated data entering an AI assistant."
+      },
+      "keywords": [
+        {
+          "text": "AI data leakage and retention",
+          "tier": "critical"
+        },
+        {
+          "text": "audit prompt and output handling",
+          "tier": "high"
+        },
+        {
+          "text": "classify allowed inputs",
+          "tier": "high"
+        },
+        {
+          "text": "redact sensitive fields",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-064",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "data residency and processing location",
+      "stem": "Encrypted backups are being replicated to a region that customer contracts exclude. Weighing security value, operational burden, and evidence quality, which option is most defensible?",
+      "choices": {
+        "A": "Design controls around applicable healthcare, privacy, retention, access, and reporting duties",
+        "B": "Apply purpose limitation, minimization, consent/notice, retention, and subject-rights handling",
+        "C": "Distinguish audits, assessments, and certifications by scope, period, criteria, and current evidence",
+        "D": "Map metrics to a recognized framework and show risk, control performance, exceptions, and trends",
+        "E": "Adjust architecture and governance to meet residency, processing, and contractual limits"
+      },
+      "correct": [
+        "E"
+      ],
+      "explanation": "Encryption protects confidentiality, but it does not satisfy a contractual rule about where data may live. Because the backups violate a residency restriction, the fix is to adjust architecture and governance to meet residency, processing, and contractual limits (E), and to record transfer and retention evidence.",
+      "whyWrong": {
+        "A": "Sector control design does not resolve a data-location restriction.",
+        "B": "Privacy lifecycle controls can include retention and location constraints, but they do not directly resolve this contractual residency restriction the way realigning architecture does.",
+        "C": "Assurance-artifact distinctions are about audit evidence, not residency.",
+        "D": "Reporting frameworks present metrics; they do not fix the location violation."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "E": "Directly addresses the residency violation by aligning where data is stored with the contract."
+      },
+      "keywords": [
+        {
+          "text": "data residency and processing location",
+          "tier": "critical"
+        },
+        {
+          "text": "record transfer and retention evidence",
+          "tier": "high"
+        },
+        {
+          "text": "map data locations to obligations",
+          "tier": "high"
+        },
+        {
+          "text": "RPO",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-095",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Analyze",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "attack surface determination",
+      "stem": "A new partner integration adds APIs, service accounts, event queues, and data exports. Which items make an attack-surface answer defensible rather than superficial? (Select all that apply.)",
+      "choices": {
+        "A": "Include data export paths",
+        "B": "Monitor cloud API discovery",
+        "C": "Include third-party dependencies",
+        "D": "Identify actors and data stores",
+        "E": "Include identity paths"
+      },
+      "correct": [
+        "A",
+        "C",
+        "E"
+      ],
+      "explanation": "Determining attack surface means inventorying every reachable exposure. For this integration that includes data-export paths (A), the third-party dependencies it introduces (C), and identity paths from service accounts (E). Monitoring API discovery is a kill-chain task, and identifying actors and data stores belongs to system modeling.",
+      "whyWrong": {
+        "B": "Monitoring cloud API discovery is a kill-chain detection control, not surface enumeration.",
+        "D": "Identifying actors and data stores can inform attack-surface analysis, but it belongs primarily to system modeling; the keyed set emphasizes data exports, third parties, and identity paths."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "A": "Data exports are a real exposure path the surface inventory must capture.",
+        "C": "The partner relationship adds supply-chain dependencies that widen the surface.",
+        "E": "Service accounts create identity paths attackers can abuse, so they belong in the inventory."
+      },
+      "keywords": [
+        {
+          "text": "attack surface determination",
+          "tier": "critical"
+        },
+        {
+          "text": "include third-party dependencies",
+          "tier": "high"
+        },
+        {
+          "text": "include data export paths",
+          "tier": "high"
+        },
+        {
+          "text": "include identity paths",
+          "tier": "high"
+        },
+        {
+          "text": "trust boundaries",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-009",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.1",
+      "learningObjective": "Given a set of organizational security requirements, implement the appropriate governance components.",
+      "lesson": "2A",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "change and configuration governance",
+      "stem": "An emergency firewall change bypassed review and later broke a regulated data feed. Which elements belong in the design package? (Select all that apply.)",
+      "choices": {
+        "A": "Require rollback plans",
+        "B": "Define consulted legal and security roles",
+        "C": "Name the accountable business owner",
+        "D": "Perform post-change review",
+        "E": "Classify emergency changes"
+      },
+      "correct": [
+        "A",
+        "D",
+        "E"
+      ],
+      "explanation": "Change governance lets urgent changes happen while staying accountable. The design package classifies emergency changes by risk (E), requires a rollback plan before acting (A), and runs a post-implementation review afterward (D). Naming owners and consulted roles is RACI work from another topic.",
+      "whyWrong": {
+        "B": "Defining consulted roles is RACI decision ownership, not change governance.",
+        "C": "Accountable ownership can be part of change governance, but it maps to RACI/decision ownership; the more change-specific answers are rollback, post-change review, and emergency classification."
+      },
+      "sources": [
+        "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components."
+      ],
+      "whyCorrect": {
+        "A": "A rollback plan would have let the team reverse the change that broke the regulated feed.",
+        "D": "Post-change review catches the impact an emergency change caused and feeds lessons back.",
+        "E": "Classifying emergency changes sets the right approval and scrutiny for risky changes."
+      },
+      "keywords": [
+        {
+          "text": "change and configuration governance",
+          "tier": "critical"
+        },
+        {
+          "text": "classify emergency changes",
+          "tier": "high"
+        },
+        {
+          "text": "perform post-change review",
+          "tier": "high"
+        },
+        {
+          "text": "require rollback plans",
+          "tier": "high"
+        },
+        {
+          "text": "change governance",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-112",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "kill chain and control placement",
+      "stem": "A likely adversary uses phishing, token theft, cloud API discovery, and staged exfiltration. Which target-state design is the most complete and defensible?",
+      "choices": {
+        "A": "Map the attack chain to preventive, detective, and responsive controls across phases",
+        "B": "Profile threats against the organization's real assets, exposure, controls, and processes",
+        "C": "Model AI risks: prompt injection, retrieval leakage, tool misuse, data poisoning, output trust, and approval limits",
+        "D": "Model assets, actors, data flows, trust boundaries, dependencies, and assumptions before choosing controls",
+        "E": "Enumerate the attack surface: external, internal, identity, data, and supply-chain exposure"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "A multi-stage adversary should be met with controls across the whole attack path, not at one point. Mapping the chain to preventive, detective, and responsive controls at each phase (A) lets you catch API discovery and detect staging and exfiltration.",
+      "whyWrong": {
+        "B": "Threat profiling judges relevance; it does not map controls to attack stages.",
+        "C": "AI threat modeling does not fit this conventional intrusion path.",
+        "D": "Building a system model is foundational but does not assign phase-by-phase controls.",
+        "E": "Attack-surface enumeration lists exposure without placing controls along the kill chain."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "A": "Places layered controls across every phase of this multi-stage intrusion."
+      },
+      "keywords": [
+        {
+          "text": "kill chain and control placement",
+          "tier": "critical"
+        },
+        {
+          "text": "detect staging and exfiltration",
+          "tier": "high"
+        },
+        {
+          "text": "monitor cloud API discovery",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-086",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Analyze",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "industry-specific compliance strategy",
+      "stem": "A healthcare analytics workflow touches patient data, billing metadata, and operational dashboards. Which items make an industry-compliance answer defensible rather than superficial? (Select all that apply.)",
+      "choices": {
+        "A": "Retain audit evidence",
+        "B": "Confirm attestation scope",
+        "C": "Restrict minimum necessary access",
+        "D": "Map data locations to obligations",
+        "E": "Validate permitted use"
+      },
+      "correct": [
+        "A",
+        "C",
+        "E"
+      ],
+      "explanation": "Healthcare data carries sector-specific duties. A defensible strategy retains audit evidence (A), restricts access to the minimum necessary (C), and validates that each use is permitted (E). Attestation scope and data-location mapping are concerns of the audit-evidence and residency topics.",
+      "whyWrong": {
+        "B": "Confirming attestation scope relates to assurance artifacts, not healthcare data handling.",
+        "D": "Mapping data locations to obligations can support healthcare/privacy compliance, but it maps to the data-residency topic and is not the strongest sector-control choice here."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "A": "Retained audit evidence demonstrates the sector obligations were met.",
+        "C": "Minimum-necessary access is a core healthcare data-handling requirement.",
+        "E": "Validating permitted use ensures patient data is processed only for allowed purposes."
+      },
+      "keywords": [
+        {
+          "text": "industry-specific compliance strategy",
+          "tier": "critical"
+        },
+        {
+          "text": "restrict minimum necessary access",
+          "tier": "high"
+        },
+        {
+          "text": "validate permitted use",
+          "tier": "high"
+        },
+        {
+          "text": "retain audit evidence",
+          "tier": "high"
+        },
+        {
+          "text": "audit evidence",
+          "tier": "medium"
+        }
+      ],
+      "visual": {
+        "id": "cas005-lo-1-3",
+        "fileName": "cas005-lo-1-3.svg",
+        "src": "../assets/figures/cas005-lo-1-3.svg",
+        "title": "CAS005 LO 1.3: Explain Legal Compliance",
+        "alt": "Instructional diagram for CAS005 objective 1.3, showing scenario cue, control decision, and evidence review.",
+        "caption": "Generated instructional diagram for CAS005 LO 1.3; verify against Explain Legal Compliance source anchors.",
+        "sourceLabel": "CAS005 LO 1.3: Explain how compliance affects information security strategies.",
+        "generated": true
+      }
+    },
+    {
+      "id": "M1-067",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "privacy regulations as lifecycle rules",
+      "stem": "A product roadmap will collect device identifiers, support notes, and behavior telemetry for a new personalization feature. Which elements belong in the design package? (Select all that apply.)",
+      "choices": {
+        "A": "Define retention and access",
+        "B": "Show residual risk trends",
+        "C": "Minimize collection",
+        "D": "Validate purpose",
+        "E": "Retain audit evidence"
+      },
+      "correct": [
+        "A",
+        "C",
+        "D"
+      ],
+      "explanation": "Privacy is a lifecycle design constraint, applied before data is collected. For this new feature the package validates the purpose for each data type (D), minimizes what is collected (C), and defines retention and access limits (A). Residual-risk reporting and audit-evidence retention belong to other topics.",
+      "whyWrong": {
+        "B": "Residual risk trends are executive-reporting evidence, not privacy-by-design elements.",
+        "E": "Retaining audit evidence supports industry compliance, not the privacy lifecycle design."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "A": "Defining retention and access limits how long data is kept and who can reach it.",
+        "C": "Minimizing collection avoids gathering identifiers and telemetry beyond what is needed.",
+        "D": "Validating purpose confirms each data type has a lawful, specific reason to be collected."
+      },
+      "keywords": [
+        {
+          "text": "privacy regulations as lifecycle rules",
+          "tier": "critical"
+        },
+        {
+          "text": "define retention and access",
+          "tier": "high"
+        },
+        {
+          "text": "minimize collection",
+          "tier": "high"
+        },
+        {
+          "text": "validate purpose",
+          "tier": "high"
+        },
+        {
+          "text": "audit evidence",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-103",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "assets, data flows, trust boundaries, and assumptions",
+      "stem": "A payments API accepts customer records, calls a fraud service, and writes decisions back to core systems. Weighing security value, operational burden, and evidence quality, which option is most defensible?",
+      "choices": {
+        "A": "Model AI risks: prompt injection, retrieval leakage, tool misuse, data poisoning, output trust, and approval limits",
+        "B": "Map the attack chain to preventive, detective, and responsive controls across phases",
+        "C": "Profile threats against the organization's real assets, exposure, controls, and processes",
+        "D": "Enumerate the attack surface: external, internal, identity, data, and supply-chain exposure",
+        "E": "Model assets, actors, data flows, trust boundaries, dependencies, and assumptions before choosing controls"
+      },
+      "correct": [
+        "E"
+      ],
+      "explanation": "Threat modeling starts by defining what is being modeled. For a payments API spanning customer data, a fraud service, and core systems, the most defensible first step is to model the assets, actors, data flows, trust boundaries, and assumptions (E). Identifying actors and data stores and recording assumptions grounds every later control.",
+      "whyWrong": {
+        "A": "AI threat modeling does not fit this conventional API.",
+        "B": "Kill-chain control placement comes after boundaries and flows are known.",
+        "C": "Threat profiling judges relevance, after the system model exists.",
+        "D": "Attack-surface enumeration is related but does not record assumptions and boundaries first."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "E": "Defines the system, its boundaries, and assumptions, the basis for all later control choices."
+      },
+      "keywords": [
+        {
+          "text": "identify actors and data stores",
+          "tier": "high"
+        },
+        {
+          "text": "record assumptions",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-071",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "industry-specific compliance strategy",
+      "stem": "A healthcare analytics workflow touches patient data, billing metadata, and operational dashboards. What should the security practitioner do FIRST?",
+      "choices": {
+        "A": "Design controls around applicable healthcare, privacy, retention, access, and reporting duties",
+        "B": "Adjust architecture and governance to meet residency, processing, and contractual limits",
+        "C": "Map metrics to a recognized framework and show risk, control performance, exceptions, and trends",
+        "D": "Distinguish audits, assessments, and certifications by scope, period, criteria, and current evidence",
+        "E": "Apply purpose limitation, minimization, consent/notice, retention, and subject-rights handling"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Security strategy must reflect the sector's legal and data-handling duties. For healthcare data, the first step is to design controls around the applicable obligations across privacy, retention, access, and reporting (A). That establishes minimum-necessary access and retained audit evidence as a foundation.",
+      "whyWrong": {
+        "B": "Data-residency adjustments address location, not the full healthcare control set.",
+        "C": "Reporting frameworks present results; they do not define sector controls first.",
+        "D": "Distinguishing assurance artifacts is about audit evidence, not designing sector controls.",
+        "E": "The general privacy lifecycle is necessary but narrower than the full healthcare duties."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "A": "Anchors the design in the specific healthcare obligations the workflow must satisfy."
+      },
+      "keywords": [
+        {
+          "text": "industry-specific compliance strategy",
+          "tier": "critical"
+        },
+        {
+          "text": "restrict minimum necessary access",
+          "tier": "high"
+        },
+        {
+          "text": "retain audit evidence",
+          "tier": "high"
+        },
+        {
+          "text": "audit evidence",
+          "tier": "medium"
+        }
+      ]
+    }
+  ],
+  "instructor": "Songpon TEERAKANOK",
+  "website": "cyberskills.co.th",
+  "copyright": "Copyright (c) 2026 CYBERSKILLS Professional Training Center. All rights reserved. For enrolled learners only. Non-distribution."
+}

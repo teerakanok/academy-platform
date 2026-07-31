@@ -1,0 +1,595 @@
+{
+  "id": "module-1-governance-risk-compliance-part-12",
+  "sourceModuleId": "m1",
+  "sourceSlug": "module-1-governance-risk-compliance",
+  "title": "Module 1 - Governance, Risk, and Compliance - Part 12",
+  "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+  "part": 12,
+  "questionRange": [
+    111,
+    120
+  ],
+  "questions": [
+    {
+      "id": "M1-082",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Analyze",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "privacy regulations as lifecycle rules",
+      "stem": "A product roadmap plans to collect device identifiers, support notes, and behavior telemetry for a new personalization feature. Which root cause is most important to address?",
+      "choices": {
+        "A": "Distinguish audits, assessments, and certifications by scope, period, criteria, and current control evidence",
+        "B": "Map metrics to a recognized framework and show risk, control performance, exceptions, and trend evidence",
+        "C": "Adjust architecture and governance to meet residency, processing, and contractual restrictions",
+        "D": "Apply purpose limitation, minimization, consent/notice where needed, retention, and subject-rights handling",
+        "E": "Design controls around applicable healthcare, privacy, retention, access, and reporting obligations"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Privacy is a data-lifecycle design constraint, not a post-launch notice. When a feature plans to collect personal data, the root issue is justifying and limiting that collection up front. That is D: validate purpose, minimize collection, and define retention, access, and subject rights. The other options address adjacent compliance topics but skip the lifecycle controls this feature needs.",
+      "whyWrong": {
+        "A": "Audit and certification distinctions prove controls operate; they do not constrain data collection.",
+        "B": "Reporting metrics communicate posture, not purpose limitation or minimization.",
+        "C": "Residency and processing rules govern where data lives, not whether collection is justified.",
+        "E": "Sector-specific obligations are broader than the lifecycle controls this collection requires."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "D": "It applies privacy as a lifecycle rule—purpose, minimization, retention, and subject rights—before collection begins."
+      },
+      "keywords": [
+        {
+          "text": "privacy regulations as lifecycle rules",
+          "tier": "critical"
+        },
+        {
+          "text": "define retention and access",
+          "tier": "high"
+        },
+        {
+          "text": "minimize collection",
+          "tier": "high"
+        },
+        {
+          "text": "RPO",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-027",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.1",
+      "learningObjective": "Given a set of organizational security requirements, implement the appropriate governance components.",
+      "lesson": "2A",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "multi",
+      "topic": "RACI and decision ownership",
+      "stem": "Exception requests stall: operations validates compensating controls while business leaders own the residual-risk decision. Which controls or evidence should be included? (Select all that apply.)",
+      "choices": {
+        "A": "Tie approval to residual-risk evidence",
+        "B": "Define consulted legal and security roles",
+        "C": "Mask or tokenize sensitive fields",
+        "D": "Name the accountable business owner",
+        "E": "Track exception aging"
+      },
+      "correct": [
+        "A",
+        "B",
+        "D"
+      ],
+      "explanation": "Exceptions stall when no one clearly owns the decision. A RACI fixes that by separating who recommends, who is consulted, and who is accountable. The pieces that close this gap are naming the accountable business owner (D), defining the consulted legal and security roles (B), and tying approval to residual-risk evidence (A). Masking data (C) and exception aging (E) belong to other topics.",
+      "whyWrong": {
+        "C": "Masking or tokenizing fields is staging-data governance, not decision ownership.",
+        "E": "Tracking exception aging is a GRC evidence concern, not the RACI fix for who decides."
+      },
+      "sources": [
+        "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components."
+      ],
+      "whyCorrect": {
+        "A": "Tying approval to residual-risk evidence forces the accountable owner to decide on facts, not just sign off.",
+        "B": "Defining consulted legal and security roles routes the right input before approval.",
+        "D": "Naming the accountable business owner ends the stall by fixing who actually owns the residual risk."
+      },
+      "keywords": [
+        {
+          "text": "RACI and decision ownership",
+          "tier": "critical"
+        },
+        {
+          "text": "define consulted legal and security roles",
+          "tier": "high"
+        },
+        {
+          "text": "tie approval to residual-risk evidence",
+          "tier": "high"
+        },
+        {
+          "text": "name the accountable business owner",
+          "tier": "high"
+        },
+        {
+          "text": "compensating controls",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-102",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "kill chain and control placement",
+      "stem": "A likely adversary chains phishing, token theft, cloud API discovery, and staged exfiltration. Which target-state design is most complete and defensible?",
+      "choices": {
+        "A": "Model assets, actors, data flows, trust boundaries, dependencies, and assumptions before selecting controls",
+        "B": "Profile threats against the organization's real assets, exposure, controls, and business processes",
+        "C": "Enumerate external, internal, identity, data, and supply-chain attack surfaces",
+        "D": "Model prompt injection, retrieval leakage, tool misuse, data poisoning, output trust, and approval boundaries",
+        "E": "Map the attack chain to preventive, detective, and responsive controls across multiple phases"
+      },
+      "correct": [
+        "E"
+      ],
+      "explanation": "A multi-stage attack should not be stopped at a single point. Threat modeling places preventive, detective, and responsive controls along the whole chain so a missed stage is still caught later. That is E. The other options are useful modeling steps—scoping the system, profiling threats, enumerating surfaces, or AI-specific modeling—but none distributes controls across the kill chain.",
+      "whyWrong": {
+        "A": "Scoping the model defines what to analyze; it does not place controls along the chain.",
+        "B": "Threat profiling judges applicability; it does not distribute multi-phase controls.",
+        "C": "Attack-surface enumeration lists exposure, not where controls sit across the chain.",
+        "D": "AI-specific threat modeling targets model risks, not this human-driven kill chain."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "E": "It positions controls at multiple phases of the attack path, giving defense in depth instead of one chokepoint."
+      },
+      "keywords": [
+        {
+          "text": "kill chain and control placement",
+          "tier": "critical"
+        },
+        {
+          "text": "monitor cloud API discovery",
+          "tier": "high"
+        },
+        {
+          "text": "add identity detection",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-139",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.5",
+      "learningObjective": "Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+      "lesson": "2A and 5A",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "model output reliability",
+      "stem": "Analysts want AI recommendations to auto-close incidents when confidence is high. What should the security practitioner recommend FIRST?",
+      "choices": {
+        "A": "Require model/version governance, evaluation evidence, change notification, and rollback criteria",
+        "B": "Limit tool permissions, isolate untrusted content, and require approval for high-impact actions",
+        "C": "Define approved data classes, retention rules, logging, and redaction controls for AI use",
+        "D": "Treat model output as advisory and validate it against telemetry, policy, and human approval thresholds",
+        "E": "Update detection, awareness, and response for AI-enabled social engineering and automation scale"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Model output is probabilistic, so it is not authoritative evidence on its own. Before any auto-close, treat recommendations as advisory and validate them against telemetry, policy, and a human approval threshold—choice D. The other options address supply chain, injection, data leakage, or adversary use, none of which fixes the over-trust in raw model output.",
+      "whyWrong": {
+        "A": "Model/version governance controls supply-chain change, not trust in a single recommendation.",
+        "B": "Tool permissioning limits actions; it does not validate output reliability.",
+        "C": "Data-class controls address leakage, not over-trust in output.",
+        "E": "Adversary-focused updates do not validate the model's own recommendations."
+      },
+      "sources": [
+        "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption."
+      ],
+      "whyCorrect": {
+        "D": "It treats output as advisory and requires corroboration and approval before acting on a probabilistic recommendation."
+      },
+      "keywords": [
+        {
+          "text": "model output reliability",
+          "tier": "critical"
+        },
+        {
+          "text": "require corroborating signals",
+          "tier": "high"
+        },
+        {
+          "text": "track false positives",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-121",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.5",
+      "learningObjective": "Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+      "lesson": "2A and 5A",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "AI-enabled adversary activity",
+      "stem": "Phishing volume rises and messages are highly tailored to internal projects. Which target-state design is most complete and defensible?",
+      "choices": {
+        "A": "Define approved data classes, retention rules, logging, and redaction controls for AI use",
+        "B": "Treat model output as advisory and validate it against telemetry, policy, and human approval thresholds",
+        "C": "Update detection, awareness, and response for AI-enabled social engineering and automation scale",
+        "D": "Limit tool permissions, isolate untrusted content, and require approval for high-impact actions",
+        "E": "Require model/version governance, evaluation evidence, change notification, and rollback criteria"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "AI lets attackers produce faster, more personalized, more varied lures. The defense is to update detection, awareness, and response for that scale—choice C: monitor impersonation patterns, harden reporting workflows, and train against targeted lures. The other options govern your own AI use (data, output, injection, supply chain), not the attacker's AI-amplified phishing.",
+      "whyWrong": {
+        "A": "Data-class controls protect internal AI inputs, not against external phishing.",
+        "B": "Output validation governs your model's reliability, not the attacker's lures.",
+        "D": "Tool permissioning addresses injection and action abuse, not phishing volume.",
+        "E": "Model/version governance covers supply chain, not adversary activity."
+      },
+      "sources": [
+        "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption."
+      ],
+      "whyCorrect": {
+        "C": "It updates detection, awareness, and response to match AI-amplified attacker speed and personalization."
+      },
+      "keywords": [
+        {
+          "text": "AI-enabled adversary activity",
+          "tier": "critical"
+        },
+        {
+          "text": "monitor impersonation patterns",
+          "tier": "high"
+        },
+        {
+          "text": "harden reporting workflows",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ],
+      "visual": {
+        "id": "cas005-lo-1-5",
+        "fileName": "cas005-lo-1-5.svg",
+        "src": "../assets/figures/cas005-lo-1-5.svg",
+        "title": "CAS005 LO 1.5: AI Governance and AI-Enabled Threats",
+        "alt": "Instructional diagram for CAS005 objective 1.5, showing scenario cue, control decision, and evidence review.",
+        "caption": "Generated instructional diagram for CAS005 LO 1.5; verify against AI Governance and AI-Enabled Threats source anchors.",
+        "sourceLabel": "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+        "generated": true
+      }
+    },
+    {
+      "id": "M1-125",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.5",
+      "learningObjective": "Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+      "lesson": "2A and 5A",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "AI supply chain and model governance",
+      "stem": "A vendor model is updated silently and changes its detection recommendations. Which elements belong in the design package? (Select all that apply.)",
+      "choices": {
+        "A": "Test behavior changes",
+        "B": "Redact sensitive fields",
+        "C": "Classify allowed inputs",
+        "D": "Record model versions",
+        "E": "Define rollback triggers"
+      },
+      "correct": [
+        "A",
+        "D",
+        "E"
+      ],
+      "explanation": "An AI model is a critical dependency that needs lifecycle governance. To control silent vendor updates, the package must record model versions (D), test behavior changes (A), and define rollback triggers (E). Redacting fields (B) and classifying inputs (C) address data leakage, a different AI topic.",
+      "whyWrong": {
+        "B": "Redacting sensitive fields controls data leakage, not version change.",
+        "C": "Classifying allowed inputs is a data-leakage control, not supply-chain governance."
+      },
+      "sources": [
+        "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption."
+      ],
+      "whyCorrect": {
+        "A": "Testing behavior changes detects when an update shifts detection results before it causes harm.",
+        "D": "Recording model versions makes silent updates visible and traceable.",
+        "E": "Defining rollback triggers lets you revert to a known-good model when behavior degrades."
+      },
+      "keywords": [
+        {
+          "text": "AI supply chain and model governance",
+          "tier": "critical"
+        },
+        {
+          "text": "define rollback triggers",
+          "tier": "high"
+        },
+        {
+          "text": "record model versions",
+          "tier": "high"
+        },
+        {
+          "text": "test behavior changes",
+          "tier": "high"
+        }
+      ]
+    },
+    {
+      "id": "M1-150",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.5",
+      "learningObjective": "Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+      "lesson": "2A and 5A",
+      "bloom": "Analyze",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "AI supply chain and model governance",
+      "stem": "A vendor model is updated silently and changes its detection recommendations. Which root cause is most important to address?",
+      "choices": {
+        "A": "Limit tool permissions, isolate untrusted content, and require approval for high-impact actions",
+        "B": "Define approved data classes, retention rules, logging, and redaction controls for AI use",
+        "C": "Require model/version governance, evaluation evidence, change notification, and rollback criteria",
+        "D": "Update detection, awareness, and response for AI-enabled social engineering and automation scale",
+        "E": "Treat model output as advisory and validate it against telemetry, policy, and human approval thresholds"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "A silent model update that changes behavior is a supply-chain governance gap. AI dependencies need the same lifecycle controls as any critical dependency: versioning, change notice, evaluation, and rollback—choice C. The other options handle injection, data leakage, adversary use, or output trust, not uncontrolled model change.",
+      "whyWrong": {
+        "A": "Tool permissioning limits actions, not vendor model updates.",
+        "B": "Data-class controls address leakage, not version change.",
+        "D": "Adversary-focused updates do not detect or control model drift.",
+        "E": "Output validation checks reliability but does not govern model versions or rollback."
+      },
+      "sources": [
+        "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption."
+      ],
+      "whyCorrect": {
+        "C": "It governs the AI supply chain so model changes are tracked, evaluated, and reversible."
+      },
+      "keywords": [
+        {
+          "text": "AI supply chain and model governance",
+          "tier": "critical"
+        },
+        {
+          "text": "define rollback triggers",
+          "tier": "high"
+        },
+        {
+          "text": "test behavior changes",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-126",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.5",
+      "learningObjective": "Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+      "lesson": "2A and 5A",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "AI-enabled adversary activity",
+      "stem": "Phishing volume rises and messages are highly tailored to internal projects. Which evidence points would let a reviewer defend the decision against plausible alternatives? (Select all that apply.)",
+      "choices": {
+        "A": "Test behavior changes",
+        "B": "Require approval for actions",
+        "C": "Harden reporting workflows",
+        "D": "Monitor impersonation patterns",
+        "E": "Train against targeted lures"
+      },
+      "correct": [
+        "C",
+        "D",
+        "E"
+      ],
+      "explanation": "AI-amplified phishing demands updates to detection, awareness, and response. The evidence that defends that choice is hardening reporting workflows (C), monitoring impersonation patterns (D), and training against targeted lures (E). Testing model behavior (A) is supply-chain governance, and approval-for-actions (B) is an injection control—both off-topic here.",
+      "whyWrong": {
+        "A": "Testing behavior changes governs the AI supply chain, not adversary phishing.",
+        "B": "Requiring approval for actions is a prompt-injection control, not a phishing defense."
+      },
+      "sources": [
+        "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption."
+      ],
+      "whyCorrect": {
+        "C": "Hardened reporting workflows speed user-driven detection of tailored phishing.",
+        "D": "Monitoring impersonation patterns catches AI-crafted lures that mimic internal projects.",
+        "E": "Training against targeted lures raises resistance to the personalized attacks described."
+      },
+      "keywords": [
+        {
+          "text": "AI-enabled adversary activity",
+          "tier": "critical"
+        },
+        {
+          "text": "monitor impersonation patterns",
+          "tier": "high"
+        },
+        {
+          "text": "train against targeted lures",
+          "tier": "high"
+        },
+        {
+          "text": "harden reporting workflows",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ],
+      "visual": {
+        "id": "cas005-lo-1-5",
+        "fileName": "cas005-lo-1-5.svg",
+        "src": "../assets/figures/cas005-lo-1-5.svg",
+        "title": "CAS005 LO 1.5: AI Governance and AI-Enabled Threats",
+        "alt": "Instructional diagram for CAS005 objective 1.5, showing scenario cue, control decision, and evidence review.",
+        "caption": "Generated instructional diagram for CAS005 LO 1.5; verify against AI Governance and AI-Enabled Threats source anchors.",
+        "sourceLabel": "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+        "generated": true
+      }
+    },
+    {
+      "id": "M1-055",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "business impact and recovery requirements",
+      "stem": "A payment workflow is called mission critical, yet its MTD, RTO, RPO, and manual workarounds are undefined. Weighing security value, operational burden, and evidence quality, which option is most defensible?",
+      "choices": {
+        "A": "Run a business impact analysis and turn impact tolerance into recovery and continuity requirements",
+        "B": "Combine quantitative estimates with qualitative business, safety, legal, and reputation factors",
+        "C": "Review contractual duties, access scope, logging, subprocessors, breach notification, and offboarding controls",
+        "D": "Apply compensating controls, document residual risk, and obtain accountable risk acceptance",
+        "E": "Assess data, model, output, automation, privacy, and accountability risks before operational use"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Resilience targets must come from business impact, not labels. A business impact analysis identifies critical dependencies, sets RTO/RPO/MTD, and validates the manual workarounds—choice A. The other options are valid risk activities but do not derive recovery requirements from impact tolerance.",
+      "whyWrong": {
+        "B": "Quantitative/qualitative analysis compares risks; it does not set recovery objectives.",
+        "C": "Third-party risk review covers vendors, not this internal recovery gap.",
+        "D": "Compensating controls and acceptance treat risk; they do not define RTO/RPO/MTD.",
+        "E": "AI usage risk assessment is the wrong domain for a payment-workflow BIA."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "A": "A BIA converts impact tolerance into concrete recovery objectives and tests the workarounds claimed to cover them."
+      },
+      "keywords": [
+        {
+          "text": "business impact and recovery requirements",
+          "tier": "critical"
+        },
+        {
+          "text": "identify critical dependencies",
+          "tier": "high"
+        },
+        {
+          "text": "validate manual workarounds",
+          "tier": "high"
+        },
+        {
+          "text": "set RTO/RPO/MTD",
+          "tier": "high"
+        },
+        {
+          "text": "business impact analysis",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-011",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.1",
+      "learningObjective": "Given a set of organizational security requirements, implement the appropriate governance components.",
+      "lesson": "2A",
+      "bloom": "Remember",
+      "difficulty": "Advanced recall",
+      "type": "single",
+      "topic": "policy, standard, procedure, and guideline separation",
+      "stem": "A board-approved privileged access policy must be turned into repeatable engineering work instructions. Which control objective should the reviewer apply?",
+      "choices": {
+        "A": "Require change governance: risk classification, emergency approval, rollback evidence, and post-implementation review",
+        "B": "Operationalize the policy into a procedure with required steps, evidence, approvals, and tests",
+        "C": "Build a RACI that separates recommendation, consultation, approval, execution, and evidence ownership",
+        "D": "Govern staging data with minimization, masking/tokenization, access limits, and retention rules",
+        "E": "Use a GRC tool or evidence register that maps controls, owners, exceptions, tests, and obligations"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Policy states intent; a procedure turns it into repeatable, testable execution. Converting an access policy into work instructions is the defining job of a procedure—choice B—which names the steps, approvers, evidence, and tests. The other choices govern change, decision ownership, staging data, or GRC evidence, not the policy-to-procedure conversion.",
+      "whyWrong": {
+        "A": "Change governance controls modifications, not the conversion of policy into procedure.",
+        "C": "A RACI assigns who decides; it does not author the work instructions.",
+        "D": "Staging data governance is unrelated to operationalizing an access policy.",
+        "E": "A GRC register tracks evidence across obligations, not the procedure itself."
+      },
+      "sources": [
+        "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components."
+      ],
+      "whyCorrect": {
+        "B": "A procedure translates policy intent into repeatable steps with defined approvers and evidence."
+      },
+      "keywords": [
+        {
+          "text": "policy, standard, procedure, and guideline separation",
+          "tier": "critical"
+        },
+        {
+          "text": "record exceptions and recertification dates",
+          "tier": "high"
+        },
+        {
+          "text": "define accountable approvers and reviewers",
+          "tier": "high"
+        },
+        {
+          "text": "change governance",
+          "tier": "medium"
+        }
+      ]
+    }
+  ],
+  "instructor": "Songpon TEERAKANOK",
+  "website": "cyberskills.co.th",
+  "copyright": "Copyright (c) 2026 CYBERSKILLS Professional Training Center. All rights reserved. For enrolled learners only. Non-distribution."
+}

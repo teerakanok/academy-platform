@@ -1,0 +1,158 @@
+{
+  "generatedAt": "2026-07-31T07:26:45.560Z",
+  "source": "output/cas005/v4.1/practice-tests",
+  "provenance": {
+    "copiedFrom": "products/personal/crucible-studio/courses/comptia-securityx/exam-versions/cas-005/archive/legacy-output/v4.1/practice-tests/student-version-2",
+    "crucibleCommit": "640c8613",
+    "copiedAt": "2026-07-31",
+    "note": "trimmed manifest — เหลือเฉพาะส่วนที่ fixture นี้ใช้ (module-1 + full-practice-02)"
+  },
+  "instructor": "Songpon TEERAKANOK",
+  "website": "cyberskills.co.th",
+  "copyright": "Copyright (c) 2026 CYBERSKILLS Professional Training Center. All rights reserved. For enrolled learners only. Non-distribution.",
+  "brandStatement": "CYBERSKILLS designs practical cybersecurity learning programs for organizations that need measurable behavior change, executive-ready cyber exercises, and hands-on security capability development.",
+  "services": [
+    "Security awareness training",
+    "Tabletop exercises (TTX)",
+    "Phishing simulation",
+    "Cybersecurity certification bootcamps",
+    "Executive cyber risk workshops"
+  ],
+  "modules": [
+    {
+      "slug": "module-1-governance-risk-compliance",
+      "title": "Module 1 - Governance, Risk, and Compliance",
+      "questionCount": 150,
+      "parts": [
+        {
+          "slug": "part-01",
+          "count": 10,
+          "range": [
+            1,
+            10
+          ]
+        },
+        {
+          "slug": "part-02",
+          "count": 10,
+          "range": [
+            11,
+            20
+          ]
+        },
+        {
+          "slug": "part-03",
+          "count": 10,
+          "range": [
+            21,
+            30
+          ]
+        },
+        {
+          "slug": "part-04",
+          "count": 10,
+          "range": [
+            31,
+            40
+          ]
+        },
+        {
+          "slug": "part-05",
+          "count": 10,
+          "range": [
+            41,
+            50
+          ]
+        },
+        {
+          "slug": "part-06",
+          "count": 10,
+          "range": [
+            51,
+            60
+          ]
+        },
+        {
+          "slug": "part-07",
+          "count": 10,
+          "range": [
+            61,
+            70
+          ]
+        },
+        {
+          "slug": "part-08",
+          "count": 10,
+          "range": [
+            71,
+            80
+          ]
+        },
+        {
+          "slug": "part-09",
+          "count": 10,
+          "range": [
+            81,
+            90
+          ]
+        },
+        {
+          "slug": "part-10",
+          "count": 10,
+          "range": [
+            91,
+            100
+          ]
+        },
+        {
+          "slug": "part-11",
+          "count": 10,
+          "range": [
+            101,
+            110
+          ]
+        },
+        {
+          "slug": "part-12",
+          "count": 10,
+          "range": [
+            111,
+            120
+          ]
+        },
+        {
+          "slug": "part-13",
+          "count": 10,
+          "range": [
+            121,
+            130
+          ]
+        },
+        {
+          "slug": "part-14",
+          "count": 10,
+          "range": [
+            131,
+            140
+          ]
+        },
+        {
+          "slug": "part-15",
+          "count": 10,
+          "range": [
+            141,
+            150
+          ]
+        }
+      ]
+    }
+  ],
+  "fullLength": [
+    {
+      "id": "cas005-full-practice-02",
+      "title": "CAS005 Full-Length Practice Test 02",
+      "normalQuestions": 85,
+      "pbqs": 5
+    }
+  ]
+}

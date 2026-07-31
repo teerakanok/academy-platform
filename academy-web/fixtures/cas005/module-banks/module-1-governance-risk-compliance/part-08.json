@@ -1,0 +1,597 @@
+{
+  "id": "module-1-governance-risk-compliance-part-08",
+  "sourceModuleId": "m1",
+  "sourceSlug": "module-1-governance-risk-compliance",
+  "title": "Module 1 - Governance, Risk, and Compliance - Part 8",
+  "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+  "part": 8,
+  "questionRange": [
+    71,
+    80
+  ],
+  "questions": [
+    {
+      "id": "M1-124",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.5",
+      "learningObjective": "Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+      "lesson": "2A and 5A",
+      "bloom": "Analyze",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "model output reliability",
+      "stem": "Analysts want AI recommendations to close incidents automatically when confidence is high. Which items make a model-reliability answer defensible rather than superficial? (Select all that apply.)",
+      "choices": {
+        "A": "Audit prompt and output handling",
+        "B": "Require corroborating signals",
+        "C": "Track false positives",
+        "D": "Classify allowed inputs",
+        "E": "Show evidence used"
+      },
+      "correct": [
+        "B",
+        "C",
+        "E"
+      ],
+      "explanation": "Model output is advisory, not authoritative, so high-confidence does not justify auto-closing incidents on its own. A defensible design requires corroborating signals before acting (B), tracks false positives (C), and shows the evidence behind each recommendation (E). Prompt auditing and input classification are AI data-handling controls from another topic.",
+      "whyWrong": {
+        "A": "Auditing prompt and output handling addresses data leakage, not output reliability.",
+        "D": "Classifying allowed inputs is a data-leakage control, not a check on output trustworthiness."
+      },
+      "sources": [
+        "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption."
+      ],
+      "whyCorrect": {
+        "B": "Requiring independent signals stops a single model judgment from closing real incidents.",
+        "C": "Tracking false positives measures whether the model is reliable enough to trust.",
+        "E": "Showing the evidence used lets a human verify and overturn a wrong recommendation."
+      },
+      "keywords": [
+        {
+          "text": "model output reliability",
+          "tier": "critical"
+        },
+        {
+          "text": "require corroborating signals",
+          "tier": "high"
+        },
+        {
+          "text": "track false positives",
+          "tier": "high"
+        },
+        {
+          "text": "show evidence used",
+          "tier": "high"
+        }
+      ]
+    },
+    {
+      "id": "M1-076",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Analyze",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "industry-specific compliance strategy",
+      "stem": "A healthcare analytics workflow touches patient data, billing metadata, and operational dashboards. Which items make an industry-compliance answer defensible rather than superficial? (Select all that apply.)",
+      "choices": {
+        "A": "Restrict minimum necessary access",
+        "B": "Validate permitted use",
+        "C": "Show residual risk trends",
+        "D": "Verify period of coverage",
+        "E": "Retain audit evidence"
+      },
+      "correct": [
+        "A",
+        "B",
+        "E"
+      ],
+      "explanation": "Healthcare data brings sector-specific duties. A defensible strategy restricts access to the minimum necessary (A), validates that each use is permitted (B), and retains audit evidence to prove compliance (E). Residual-risk trends and attestation coverage belong to reporting and audit-evidence topics instead.",
+      "whyWrong": {
+        "C": "Residual risk trends are executive-reporting evidence, not sector compliance controls.",
+        "D": "Verifying period of coverage relates to assurance artifacts, not healthcare data handling."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "A": "Minimum-necessary access is a core healthcare data-handling requirement.",
+        "B": "Validating permitted use ensures patient data is processed only for allowed purposes.",
+        "E": "Retained audit evidence demonstrates the sector obligations were met."
+      },
+      "keywords": [
+        {
+          "text": "industry-specific compliance strategy",
+          "tier": "critical"
+        },
+        {
+          "text": "restrict minimum necessary access",
+          "tier": "high"
+        },
+        {
+          "text": "validate permitted use",
+          "tier": "high"
+        },
+        {
+          "text": "retain audit evidence",
+          "tier": "high"
+        },
+        {
+          "text": "audit evidence",
+          "tier": "medium"
+        }
+      ],
+      "visual": {
+        "id": "cas005-lo-1-3",
+        "fileName": "cas005-lo-1-3.svg",
+        "src": "../assets/figures/cas005-lo-1-3.svg",
+        "title": "CAS005 LO 1.3: Explain Legal Compliance",
+        "alt": "Instructional diagram for CAS005 objective 1.3, showing scenario cue, control decision, and evidence review.",
+        "caption": "Generated instructional diagram for CAS005 LO 1.3; verify against Explain Legal Compliance source anchors.",
+        "sourceLabel": "CAS005 LO 1.3: Explain how compliance affects information security strategies.",
+        "generated": true
+      }
+    },
+    {
+      "id": "M1-081",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "industry-specific compliance strategy",
+      "stem": "A healthcare analytics workflow touches patient data, billing metadata, and operational dashboards. What should the security practitioner do FIRST?",
+      "choices": {
+        "A": "Distinguish audits, assessments, and certifications by scope, period, criteria, and current evidence",
+        "B": "Apply purpose limitation, minimization, consent/notice, retention, and subject-rights handling",
+        "C": "Design controls around applicable healthcare, privacy, retention, access, and reporting duties",
+        "D": "Map metrics to a recognized framework and show risk, control performance, exceptions, and trends",
+        "E": "Adjust architecture and governance to meet residency, processing, and contractual limits"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Security strategy must reflect the sector's legal and data-handling duties. For healthcare data, the first step is to design controls around the applicable obligations, covering privacy, retention, access, and reporting (C). That establishes audit evidence and validates permitted use before anything else.",
+      "whyWrong": {
+        "A": "Distinguishing assurance artifacts is about audit evidence, not designing sector controls.",
+        "B": "The general privacy lifecycle is necessary but narrower than the full set of healthcare duties.",
+        "D": "Reporting frameworks present results; they do not define the sector controls first.",
+        "E": "Data-residency adjustments address location, not the broader healthcare control set."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "C": "Anchors the design in the specific healthcare obligations the workflow must satisfy."
+      },
+      "keywords": [
+        {
+          "text": "industry-specific compliance strategy",
+          "tier": "critical"
+        },
+        {
+          "text": "restrict minimum necessary access",
+          "tier": "high"
+        },
+        {
+          "text": "validate permitted use",
+          "tier": "high"
+        },
+        {
+          "text": "retain audit evidence",
+          "tier": "high"
+        },
+        {
+          "text": "audit evidence",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-073",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "reporting frameworks and executive evidence",
+      "stem": "The board wants a cybersecurity scorecard that supports regulatory reporting and investment decisions. Which target-state design is the most complete and defensible?",
+      "choices": {
+        "A": "Map metrics to a recognized framework and show risk, control performance, exceptions, and trends",
+        "B": "Design controls around applicable healthcare, privacy, retention, access, and reporting duties",
+        "C": "Apply purpose limitation, minimization, consent/notice, retention, and subject-rights handling",
+        "D": "Distinguish audits, assessments, and certifications by scope, period, criteria, and current evidence",
+        "E": "Adjust architecture and governance to meet residency, processing, and contractual limits"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Reporting needs decision-useful evidence tied to recognized control objectives. The complete design maps metrics to a framework and presents risk, control performance, exceptions, and trends (A). Including exceptions and residual risk trends is what makes the scorecard credible to regulators and the board.",
+      "whyWrong": {
+        "B": "Sector control design is a compliance task, not the executive scorecard itself.",
+        "C": "Privacy lifecycle controls do not produce board-level reporting.",
+        "D": "Assurance-artifact distinctions support audits, not the reporting framework.",
+        "E": "Data-residency adjustments address location, not scorecard reporting."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "A": "Ties metrics to a recognized framework and surfaces the performance, exceptions, and trends decision-makers need."
+      },
+      "keywords": [
+        {
+          "text": "reporting frameworks and executive evidence",
+          "tier": "critical"
+        },
+        {
+          "text": "map metrics to a framework",
+          "tier": "high"
+        },
+        {
+          "text": "include control exceptions",
+          "tier": "high"
+        },
+        {
+          "text": "show residual risk trends",
+          "tier": "high"
+        },
+        {
+          "text": "residual risk",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-141",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.5",
+      "learningObjective": "Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+      "lesson": "2A and 5A",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "AI-enabled adversary activity",
+      "stem": "Phishing volume is rising and the messages are closely tailored to internal projects. Which target-state design is the most complete and defensible?",
+      "choices": {
+        "A": "Update detection, awareness, and response for AI-enabled social engineering at scale",
+        "B": "Require model/version governance, evaluation evidence, change notice, and rollback criteria",
+        "C": "Treat model output as advisory and validate it against telemetry, policy, and human approval thresholds",
+        "D": "Limit tool permissions, isolate untrusted content, and require approval for high-impact actions",
+        "E": "Define approved data classes, retention rules, logging, and redaction controls for AI use"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Highly tailored, high-volume phishing is a sign of AI-amplified social engineering. The defense is to update detection, awareness training, and response for that speed and personalization (A), and to monitor impersonation patterns and train against targeted lures. The other options govern AI you operate, not the inbound attack.",
+      "whyWrong": {
+        "B": "Model and version governance secures your AI supply chain, not inbound phishing.",
+        "C": "Output-reliability validation governs AI you run, not attacker email.",
+        "D": "Tool-permission and injection controls protect AI agents, not the targeted workforce.",
+        "E": "Data-class and retention controls address AI data leakage, not adversary phishing."
+      },
+      "sources": [
+        "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption."
+      ],
+      "whyCorrect": {
+        "A": "Adapts detection, training, and response to the AI-amplified phishing the scenario describes."
+      },
+      "keywords": [
+        {
+          "text": "AI-enabled adversary activity",
+          "tier": "critical"
+        },
+        {
+          "text": "monitor impersonation patterns",
+          "tier": "high"
+        },
+        {
+          "text": "train against targeted lures",
+          "tier": "high"
+        },
+        {
+          "text": "harden reporting workflows",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ],
+      "visual": {
+        "id": "cas005-lo-1-5",
+        "fileName": "cas005-lo-1-5.svg",
+        "src": "../assets/figures/cas005-lo-1-5.svg",
+        "title": "CAS005 LO 1.5: AI Governance and AI-Enabled Threats",
+        "alt": "Instructional diagram for CAS005 objective 1.5, showing scenario cue, control decision, and evidence review.",
+        "caption": "Generated instructional diagram for CAS005 LO 1.5; verify against AI Governance and AI-Enabled Threats source anchors.",
+        "sourceLabel": "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+        "generated": true
+      }
+    },
+    {
+      "id": "M1-098",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Remember",
+      "difficulty": "Advanced recall",
+      "type": "single",
+      "topic": "assets, data flows, trust boundaries, and assumptions",
+      "stem": "A post-incident review asks security to separate the true cause from convenient symptoms. In this scenario, a payments API accepts customer records, calls a fraud service, and writes decisions back to core systems. Which option best names the control objective the reviewer should apply?",
+      "choices": {
+        "A": "Profile threats against the organization's real assets, exposure, controls, and processes",
+        "B": "Map the attack chain to preventive, detective, and responsive controls across phases",
+        "C": "Model AI risks: prompt injection, retrieval leakage, tool misuse, data poisoning, output trust, and approval limits",
+        "D": "Enumerate the attack surface: external, internal, identity, data, and supply-chain exposure",
+        "E": "Model assets, actors, data flows, trust boundaries, dependencies, and assumptions before choosing controls"
+      },
+      "correct": [
+        "E"
+      ],
+      "explanation": "Threat modeling begins by defining what is being modeled. For a payments API spanning customer data, a fraud service, and core systems, the control objective is to model the assets, actors, data flows, trust boundaries, and assumptions first (E). Identifying actors and data stores and recording assumptions makes the model auditable.",
+      "whyWrong": {
+        "A": "Threat profiling weighs which threats apply, after the system model.",
+        "B": "Kill-chain control placement comes once boundaries and flows are known.",
+        "C": "AI threat modeling does not fit this conventional API.",
+        "D": "Attack-surface enumeration lists exposure but does not draw trust boundaries first."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "E": "Names the foundational objective: define the system, its boundaries, and assumptions before any control choice."
+      },
+      "keywords": [
+        {
+          "text": "identify actors and data stores",
+          "tier": "high"
+        },
+        {
+          "text": "draw trust boundaries",
+          "tier": "high"
+        },
+        {
+          "text": "record assumptions",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-044",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "AI usage risk management",
+      "stem": "A team wants a generative AI assistant to summarize sensitive incidents and recommend response actions. Which target-state design is the most complete and defensible?",
+      "choices": {
+        "A": "Assess data, model, output, automation, privacy, and accountability risks before operational use",
+        "B": "Blend quantitative estimates with qualitative business, safety, legal, and reputation factors",
+        "C": "Run a business impact analysis and turn impact tolerance into recovery and continuity requirements",
+        "D": "Review contractual duties, access scope, logging, subprocessors, breach notice, and offboarding",
+        "E": "Apply compensating controls, document residual risk, and get accountable risk acceptance"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "AI risk spans data exposure, unreliable output, and the impact of automated actions. Before the assistant operates on sensitive incidents, assess all of those dimensions, plus privacy and accountability (A). Classifying allowed data, logging prompts and retrieved evidence, and gating high-impact actions keep it reviewable.",
+      "whyWrong": {
+        "B": "Quantitative/qualitative analysis scores risk but does not define AI usage controls.",
+        "C": "A BIA sets recovery objectives, not the AI-specific safeguards.",
+        "D": "Third-party contract review fits a vendor, not an internally enabled AI capability.",
+        "E": "Compensating controls and risk acceptance follow the AI risk assessment, not replace it."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "A": "Covers the full AI risk picture and leaves auditable controls before operational use."
+      },
+      "keywords": [
+        {
+          "text": "AI usage risk management",
+          "tier": "critical"
+        },
+        {
+          "text": "log prompts and retrieved evidence",
+          "tier": "high"
+        },
+        {
+          "text": "classify allowed data",
+          "tier": "high"
+        },
+        {
+          "text": "business impact analysis",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-065",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "multi",
+      "topic": "audit, assessment, and certification evidence",
+      "stem": "Executives are treating a past assessment letter as proof of current certification for a regulated service. Which controls or evidence should be included? (Select all that apply.)",
+      "choices": {
+        "A": "Verify period of coverage",
+        "B": "Collect current operating evidence",
+        "C": "Restrict minimum necessary access",
+        "D": "Map data locations to obligations",
+        "E": "Confirm attestation scope"
+      },
+      "correct": [
+        "A",
+        "B",
+        "E"
+      ],
+      "explanation": "Assurance artifacts differ by scope and time window, so a letter from the past does not prove current status. The defensible response verifies the period the letter covers (A), collects current operating evidence (B), and confirms what the attestation actually scoped (E). Access controls and data-location mapping belong to other topics.",
+      "whyWrong": {
+        "C": "Minimum-necessary access is a healthcare/industry control, not assurance-artifact verification.",
+        "D": "Mapping data locations to obligations is a data-residency concern, not certification validity."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "A": "Checking the period of coverage exposes whether the assurance is still valid today.",
+        "B": "Current operating evidence proves controls work now, not just when the letter was issued.",
+        "E": "Confirming attestation scope ensures the letter actually covers the regulated service in question."
+      },
+      "keywords": [
+        {
+          "text": "audit, assessment, and certification evidence",
+          "tier": "critical"
+        },
+        {
+          "text": "collect current operating evidence",
+          "tier": "high"
+        },
+        {
+          "text": "confirm attestation scope",
+          "tier": "high"
+        },
+        {
+          "text": "verify period of coverage",
+          "tier": "high"
+        }
+      ]
+    },
+    {
+      "id": "M1-118",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Remember",
+      "difficulty": "Advanced recall",
+      "type": "single",
+      "topic": "assets, data flows, trust boundaries, and assumptions",
+      "stem": "A payments API accepts customer records, calls a fraud service, and writes decisions back to core systems. Which option best names the control objective the reviewer should apply?",
+      "choices": {
+        "A": "Model assets, actors, data flows, trust boundaries, dependencies, and assumptions before choosing controls",
+        "B": "Model AI risks: prompt injection, retrieval leakage, tool misuse, data poisoning, output trust, and approval limits",
+        "C": "Profile threats against the organization's real assets, exposure, controls, and processes",
+        "D": "Map the attack chain to preventive, detective, and responsive controls across phases",
+        "E": "Enumerate the attack surface: external, internal, identity, data, and supply-chain exposure"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Threat modeling starts by defining what is being modeled. For a payments API across customer data, a fraud service, and core systems, the control objective is to model assets, actors, data flows, trust boundaries, and assumptions first (A). Identifying actors and data stores and recording assumptions is the basis for every later control.",
+      "whyWrong": {
+        "B": "AI threat modeling does not fit this conventional API workflow.",
+        "C": "Threat profiling judges relevance of threats, after the system model exists.",
+        "D": "Kill-chain control placement follows boundary and flow definition.",
+        "E": "Attack-surface enumeration is related but does not record assumptions and boundaries first."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "A": "Names the foundational objective: model the system and its boundaries before selecting controls."
+      },
+      "keywords": [
+        {
+          "text": "identify actors and data stores",
+          "tier": "high"
+        },
+        {
+          "text": "record assumptions",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-059",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "AI usage risk management",
+      "stem": "A team wants a generative AI assistant to summarize sensitive incidents and recommend response actions. Which evidence points would let a reviewer defend the decision against plausible alternatives? (Select all that apply.)",
+      "choices": {
+        "A": "Gate high-impact actions",
+        "B": "Identify critical dependencies",
+        "C": "Log prompts and retrieved evidence",
+        "D": "Document nonfinancial impacts",
+        "E": "Classify allowed data"
+      },
+      "correct": [
+        "A",
+        "C",
+        "E"
+      ],
+      "explanation": "Managing AI usage risk means controlling data, output, and automated impact. Defensible evidence gates high-impact actions (A), logs prompts and retrieved evidence for audit (C), and classifies which data the assistant may use (E). Dependency mapping and nonfinancial impact analysis belong to other risk topics.",
+      "whyWrong": {
+        "B": "Identifying critical dependencies is a business-impact/recovery activity, not AI usage control.",
+        "D": "Documenting nonfinancial impacts belongs to qualitative risk analysis, not AI usage governance."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "A": "Gating high-impact actions stops the assistant from acting autonomously on critical incidents.",
+        "C": "Logging prompts and retrieved evidence creates the audit trail the decision relies on.",
+        "E": "Classifying allowed data limits what sensitive content the assistant can process."
+      },
+      "keywords": [
+        {
+          "text": "AI usage risk management",
+          "tier": "critical"
+        },
+        {
+          "text": "log prompts and retrieved evidence",
+          "tier": "high"
+        },
+        {
+          "text": "gate high-impact actions",
+          "tier": "high"
+        },
+        {
+          "text": "classify allowed data",
+          "tier": "high"
+        }
+      ]
+    }
+  ],
+  "instructor": "Songpon TEERAKANOK",
+  "website": "cyberskills.co.th",
+  "copyright": "Copyright (c) 2026 CYBERSKILLS Professional Training Center. All rights reserved. For enrolled learners only. Non-distribution."
+}

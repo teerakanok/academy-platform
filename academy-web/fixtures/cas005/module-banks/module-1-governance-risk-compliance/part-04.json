@@ -1,0 +1,607 @@
+{
+  "id": "module-1-governance-risk-compliance-part-04",
+  "sourceModuleId": "m1",
+  "sourceSlug": "module-1-governance-risk-compliance",
+  "title": "Module 1 - Governance, Risk, and Compliance - Part 4",
+  "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+  "part": 4,
+  "questionRange": [
+    31,
+    40
+  ],
+  "questions": [
+    {
+      "id": "M1-101",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Analyze",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "AI model threat modeling",
+      "stem": "A retrieval-augmented assistant can read internal documents and create support tickets. Which finding is the most important root cause to address?",
+      "choices": {
+        "A": "Model prompt injection, retrieval leakage, tool misuse, data poisoning, output trust, and approval boundaries",
+        "B": "Map the attack chain to preventive, detective, and responsive controls at multiple phases",
+        "C": "Profile threats against your organization's real assets, exposure, controls, and business processes",
+        "D": "Model assets, actors, data flows, trust boundaries, dependencies, and assumptions before choosing controls",
+        "E": "Enumerate externally reachable, internally reachable, identity, data, and supply-chain attack surfaces"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "An assistant that reads internal content and also takes actions adds model, data, and action surfaces. The root cause is AI-specific threat modeling: prompt injection, retrieval leakage, tool misuse, data poisoning, output trust, and approval boundaries, with controls like separating read from act privileges and logging retrieved context (A). Kill-chain mapping, threat profiling, data-flow modeling, and attack-surface enumeration do not capture these AI-specific risks.",
+      "whyWrong": {
+        "B": "Kill-chain control placement assumes a conventional attack path, not AI manipulation.",
+        "C": "Threat profiling judges intel applicability, not the assistant's internal surfaces.",
+        "D": "Generic data-flow modeling scopes a system but omits prompt-injection and tool-misuse risks.",
+        "E": "Attack-surface enumeration inventories exposure without modeling how the model is subverted."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "A": "Only AI-specific threat modeling addresses how the assistant's reading and acting can be manipulated."
+      },
+      "keywords": [
+        {
+          "text": "AI model threat modeling",
+          "tier": "critical"
+        },
+        {
+          "text": "separate read and act privileges",
+          "tier": "high"
+        },
+        {
+          "text": "gate external instructions",
+          "tier": "high"
+        },
+        {
+          "text": "log retrieved context",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ],
+      "visual": {
+        "id": "cas005-lo-1-4",
+        "fileName": "cas005-lo-1-4.svg",
+        "src": "../assets/figures/cas005-lo-1-4.svg",
+        "title": "CAS005 LO 1.4: Perform Threat Modeling",
+        "alt": "Instructional diagram for CAS005 objective 1.4, showing scenario cue, control decision, and evidence review.",
+        "caption": "Generated instructional diagram for CAS005 LO 1.4; verify against Perform Threat Modeling source anchors.",
+        "sourceLabel": "CAS005 LO 1.4: Given a scenario, perform threat modeling activities.",
+        "generated": true
+      }
+    },
+    {
+      "id": "M1-048",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "third-party risk management",
+      "stem": "A vendor will administer one of your security platforms and can view incident evidence. Which elements belong in the design package? (Select all that apply.)",
+      "choices": {
+        "A": "Require activity logs",
+        "B": "Scope privileged access",
+        "C": "Define termination and breach obligations",
+        "D": "Document residual risk",
+        "E": "Document nonfinancial impacts"
+      },
+      "correct": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "Vendor administration extends your security and audit surface, so the design must govern that access. The third-party controls are scoping the vendor's privileged access (B), requiring activity logs (A), and defining termination and breach obligations (C). Documenting residual risk (D) is part of risk acceptance, and documenting nonfinancial impacts (E) is risk analysis; neither is the access design this scenario needs.",
+      "whyWrong": {
+        "D": "Documenting residual risk belongs to risk treatment and acceptance, not vendor access design.",
+        "E": "Documenting nonfinancial impacts is part of risk analysis, not third-party controls."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "A": "Activity logs make the vendor's privileged actions auditable.",
+        "B": "Scoping privileged access limits the vendor to only what administration requires.",
+        "C": "Termination and breach obligations define vendor duties at offboarding and during incidents."
+      },
+      "keywords": [
+        {
+          "text": "third-party risk management",
+          "tier": "critical"
+        },
+        {
+          "text": "define termination and breach obligations",
+          "tier": "high"
+        },
+        {
+          "text": "scope privileged access",
+          "tier": "high"
+        },
+        {
+          "text": "require activity logs",
+          "tier": "high"
+        },
+        {
+          "text": "compensating controls",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-134",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.5",
+      "learningObjective": "Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+      "lesson": "2A and 5A",
+      "bloom": "Analyze",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "model output reliability",
+      "stem": "Analysts want AI recommendations to close incidents automatically whenever the model's confidence is high. Which items separate a defensible answer from a superficial one? (Select all that apply.)",
+      "choices": {
+        "A": "Harden reporting workflows",
+        "B": "Require corroborating signals",
+        "C": "Redact sensitive fields",
+        "D": "Show evidence used",
+        "E": "Track false positives"
+      },
+      "correct": [
+        "B",
+        "D",
+        "E"
+      ],
+      "explanation": "A confidence score is probabilistic, not authoritative, so AI output must be validated before it drives an auto-close. The defensible controls require corroborating signals before acting (B), show the evidence the recommendation used (D), and track false positives to monitor reliability over time (E). Hardening reporting workflows (A) defends against AI-enabled adversaries, and redacting sensitive fields (C) controls data leakage; neither establishes output reliability.",
+      "whyWrong": {
+        "A": "Hardening reporting workflows addresses adversary abuse, not the reliability of your model's output.",
+        "C": "Redacting sensitive fields controls data exposure, not whether the close decision is trustworthy."
+      },
+      "sources": [
+        "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption."
+      ],
+      "whyCorrect": {
+        "B": "Requiring corroborating signals stops a single probabilistic score from closing an incident on its own.",
+        "D": "Showing the evidence used makes each recommendation reviewable and accountable.",
+        "E": "Tracking false positives measures whether the model is reliable enough to keep trusting."
+      },
+      "keywords": [
+        {
+          "text": "model output reliability",
+          "tier": "critical"
+        },
+        {
+          "text": "require corroborating signals",
+          "tier": "high"
+        },
+        {
+          "text": "track false positives",
+          "tier": "high"
+        },
+        {
+          "text": "show evidence used",
+          "tier": "high"
+        }
+      ]
+    },
+    {
+      "id": "M1-060",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Remember",
+      "difficulty": "Advanced recall",
+      "type": "single",
+      "topic": "business impact and recovery requirements",
+      "stem": "A payment workflow is called mission critical, yet its MTD, RTO, RPO, and manual workarounds are undefined. Which control objective should the reviewer apply?",
+      "choices": {
+        "A": "Assess data, model, output, automation, privacy, and accountability risks before operational use",
+        "B": "Combine quantitative estimates with qualitative business, safety, legal, and reputation factors",
+        "C": "Review contractual duties, access scope, logging, subprocessors, breach notification, and offboarding controls",
+        "D": "Run a business impact analysis and convert impact tolerance into recovery and continuity requirements",
+        "E": "Apply compensating controls, document residual risk, and obtain accountable risk acceptance"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Resilience decisions must come from business impact, not a mission-critical label. A business impact analysis sets RTO, RPO, and MTD, identifies critical dependencies, and validates the manual workarounds (D). AI usage risk, blended risk analysis, third-party review, and compensating controls do not produce the recovery objectives this workflow is missing.",
+      "whyWrong": {
+        "A": "AI usage risk assessment does not apply to a payment workflow's recovery planning.",
+        "B": "Blended risk analysis prioritizes risk but does not set recovery objectives.",
+        "C": "Third-party review covers vendor risk, not this workflow's continuity design.",
+        "E": "Compensating controls treat residual risk, not the missing recovery requirements."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "D": "A BIA converts impact tolerance into the recovery and continuity requirements that are undefined here."
+      },
+      "keywords": [
+        {
+          "text": "business impact and recovery requirements",
+          "tier": "critical"
+        },
+        {
+          "text": "identify critical dependencies",
+          "tier": "high"
+        },
+        {
+          "text": "validate manual workarounds",
+          "tier": "high"
+        },
+        {
+          "text": "business impact analysis",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-042",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "risk treatment and compensating controls",
+      "stem": "A certified production system cannot be patched until recertification, but exploit activity for the flaw already exists. What should the security practitioner recommend FIRST?",
+      "choices": {
+        "A": "Review contractual duties, access scope, logging, subprocessors, breach notification, and offboarding controls",
+        "B": "Apply compensating controls, document residual risk, and obtain accountable risk acceptance",
+        "C": "Run a business impact analysis and convert impact tolerance into recovery and continuity requirements",
+        "D": "Assess data, model, output, automation, privacy, and accountability risks before operational use",
+        "E": "Combine quantitative estimates with qualitative business, safety, legal, and reputation factors"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Patching is blocked by recertification, yet the threat is live, so due care requires reducing the risk and formally accepting what remains. Apply compensating controls such as monitoring and restricting access, document the residual risk, and obtain accountable risk acceptance (B). Third-party review, a BIA, AI usage risk, and blended risk analysis do not provide this interim treatment-plus-acceptance path.",
+      "whyWrong": {
+        "A": "Third-party review governs vendors, not an unpatchable internal system.",
+        "C": "A BIA sets recovery objectives, not interim mitigation for a live vulnerability.",
+        "D": "AI usage risk does not apply to this patching constraint.",
+        "E": "Blended risk analysis prioritizes risk but does not deliver the compensating controls needed now."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "B": "When patching is constrained, compensating controls plus documented, accepted residual risk is the due-care response."
+      },
+      "keywords": [
+        {
+          "text": "risk treatment and compensating controls",
+          "tier": "critical"
+        },
+        {
+          "text": "monitor and restrict access",
+          "tier": "high"
+        },
+        {
+          "text": "document residual risk",
+          "tier": "high"
+        },
+        {
+          "text": "segment the asset",
+          "tier": "high"
+        },
+        {
+          "text": "business impact analysis",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-007",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.1",
+      "learningObjective": "Given a set of organizational security requirements, implement the appropriate governance components.",
+      "lesson": "2A",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "multi",
+      "topic": "RACI and decision ownership",
+      "stem": "Exception requests keep stalling: operations validates the compensating controls, but business leaders are the ones who own the residual-risk decision. Which controls or evidence should be included? (Select all that apply.)",
+      "choices": {
+        "A": "Minimize data before use",
+        "B": "Record exceptions and recertification dates",
+        "C": "Define consulted legal and security roles",
+        "D": "Name the accountable business owner",
+        "E": "Tie approval to residual-risk evidence"
+      },
+      "correct": [
+        "C",
+        "D",
+        "E"
+      ],
+      "explanation": "The requests stall because decision authority is unclear, so the fix is RACI-style ownership. The defensible elements name the accountable business owner who can accept residual risk (D), define which legal and security roles are consulted (C), and tie approval to residual-risk evidence (E). Minimizing data before use (A) is staging data governance, and recording exceptions and recertification dates (B) belongs to procedures; neither resolves who owns the decision.",
+      "whyWrong": {
+        "A": "Minimizing data before use is a staging-data control, unrelated to exception ownership.",
+        "B": "Recording exceptions and recertification dates is a procedure detail, not the ownership gap."
+      },
+      "sources": [
+        "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components."
+      ],
+      "whyCorrect": {
+        "C": "Defining consulted legal and security roles ensures the right inputs reach the decision without owning it.",
+        "D": "Naming the accountable business owner is what unblocks an exception that needs a residual-risk decision.",
+        "E": "Tying approval to residual-risk evidence makes the acceptance defensible and reviewable."
+      },
+      "keywords": [
+        {
+          "text": "RACI and decision ownership",
+          "tier": "critical"
+        },
+        {
+          "text": "define consulted legal and security roles",
+          "tier": "high"
+        },
+        {
+          "text": "tie approval to residual-risk evidence",
+          "tier": "high"
+        },
+        {
+          "text": "name the accountable business owner",
+          "tier": "high"
+        },
+        {
+          "text": "compensating controls",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-053",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Analyze",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "third-party risk management",
+      "stem": "A vendor will administer one of your security platforms and can view incident evidence. Which finding is the most important root cause to address?",
+      "choices": {
+        "A": "Combine quantitative estimates with qualitative business, safety, legal, and reputation factors",
+        "B": "Review contractual duties, access scope, logging, subprocessors, breach notification, and offboarding controls",
+        "C": "Apply compensating controls, document residual risk, and obtain accountable risk acceptance",
+        "D": "Assess data, model, output, automation, privacy, and accountability risks before operational use",
+        "E": "Run a business impact analysis and convert impact tolerance into recovery and continuity requirements"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Vendor administration with access to incident evidence makes the vendor part of your security and audit surface. The root cause is third-party risk: review contractual duties, access scope, logging, subprocessors, breach notification, and offboarding, then require activity logs and define termination and breach obligations (B). Blended risk analysis, compensating controls, AI usage risk, and a BIA do not govern the vendor relationship.",
+      "whyWrong": {
+        "A": "Blended risk analysis prioritizes risk but does not manage the vendor relationship.",
+        "C": "Compensating controls treat a residual technical risk, not third-party governance.",
+        "D": "AI usage risk does not apply to administering a conventional platform.",
+        "E": "A BIA sets recovery objectives, not vendor access controls."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "B": "Governing the vendor's access, logging, and contractual duties addresses the surface their administration creates."
+      },
+      "keywords": [
+        {
+          "text": "third-party risk management",
+          "tier": "critical"
+        },
+        {
+          "text": "define termination and breach obligations",
+          "tier": "high"
+        },
+        {
+          "text": "require activity logs",
+          "tier": "high"
+        },
+        {
+          "text": "business impact analysis",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-114",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "multi",
+      "topic": "threat profiling and applicability",
+      "stem": "Before production credentials are issued, you review a third-party integration. Threat intelligence describes attacks against your sector, but your environment has different assets and exposure paths. Which controls or evidence should be included? (Select all that apply.)",
+      "choices": {
+        "A": "Validate exposure paths",
+        "B": "Document excluded assumptions",
+        "C": "Gate external instructions",
+        "D": "Map threats to assets",
+        "E": "Draw trust boundaries"
+      },
+      "correct": [
+        "A",
+        "B",
+        "D"
+      ],
+      "explanation": "Sector intel only counts once filtered through your own environment. Threat profiling maps reported threats onto your real assets (D), validates which exposure paths actually exist (A), and records what you deliberately excluded so the analysis stays defensible (B). Gating external instructions (C) is an AI control, and drawing trust boundaries (E) is general data-flow modeling; neither performs this applicability filter.",
+      "whyWrong": {
+        "C": "Gating external instructions is an AI model-threat control, not sector-intel profiling.",
+        "E": "Drawing trust boundaries is a data-flow modeling step, not the applicability judgment being tested."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "A": "Validating exposure paths confirms which attack routes truly exist here.",
+        "B": "Documenting excluded assumptions keeps the profile auditable.",
+        "D": "Mapping threats to assets is what makes generic sector intel applicable."
+      },
+      "keywords": [
+        {
+          "text": "threat profiling and applicability",
+          "tier": "critical"
+        },
+        {
+          "text": "document excluded assumptions",
+          "tier": "high"
+        },
+        {
+          "text": "validate exposure paths",
+          "tier": "high"
+        },
+        {
+          "text": "map threats to assets",
+          "tier": "high"
+        },
+        {
+          "text": "threat intelligence",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-145",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.5",
+      "learningObjective": "Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+      "lesson": "2A and 5A",
+      "bloom": "Create",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "AI supply chain and model governance",
+      "stem": "A vendor model is updated silently and changes its detection recommendations. Which elements belong in the design package? (Select all that apply.)",
+      "choices": {
+        "A": "Require approval for actions",
+        "B": "Redact sensitive fields",
+        "C": "Test behavior changes",
+        "D": "Record model versions",
+        "E": "Define rollback triggers"
+      },
+      "correct": [
+        "C",
+        "D",
+        "E"
+      ],
+      "explanation": "A silently updated vendor model is a supply-chain and version-governance problem. The design must record model versions so changes are visible (D), test behavior changes before they affect detection (C), and define rollback triggers when a new version regresses (E). Requiring approval for actions (A) is a prompt-injection control, and redacting sensitive fields (B) is data-leakage handling; neither governs the model supply chain.",
+      "whyWrong": {
+        "A": "Requiring approval for actions controls tool misuse, not model version governance.",
+        "B": "Redacting sensitive fields addresses data leakage, not silent model updates."
+      },
+      "sources": [
+        "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption."
+      ],
+      "whyCorrect": {
+        "C": "Testing behavior changes catches detection regressions before a new model version takes effect.",
+        "D": "Recording model versions makes silent updates visible and auditable.",
+        "E": "Defining rollback triggers lets you revert a bad model update quickly."
+      },
+      "keywords": [
+        {
+          "text": "AI supply chain and model governance",
+          "tier": "critical"
+        },
+        {
+          "text": "define rollback triggers",
+          "tier": "high"
+        },
+        {
+          "text": "record model versions",
+          "tier": "high"
+        },
+        {
+          "text": "test behavior changes",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-143",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.5",
+      "learningObjective": "Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+      "lesson": "2A and 5A",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "multi",
+      "topic": "prompt injection and tool misuse",
+      "stem": "During a third-party integration review, before production credentials are issued, an AI assistant retrieves external web content and can open tickets or trigger workflows. Which controls or evidence should be included? (Select all that apply.)",
+      "choices": {
+        "A": "Require corroborating signals",
+        "B": "Scope tool identity",
+        "C": "Require approval for actions",
+        "D": "Separate untrusted instructions",
+        "E": "Train against targeted lures"
+      },
+      "correct": [
+        "B",
+        "C",
+        "D"
+      ],
+      "explanation": "When an assistant ingests external content and can take actions, attacker-controlled text can become injected instructions. The controls that fit are scoping the tool's identity and permissions (B), requiring approval for high-impact actions (C), and separating untrusted external content from trusted instructions (D). Requiring corroborating signals (A) is an output-reliability control, and training against targeted lures (E) addresses AI-enabled adversaries; neither stops prompt injection through tools.",
+      "whyWrong": {
+        "A": "Requiring corroborating signals improves output reliability, not protection against prompt injection.",
+        "E": "Training against targeted lures addresses adversary social engineering, not tool-misuse controls."
+      },
+      "sources": [
+        "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption."
+      ],
+      "whyCorrect": {
+        "B": "Scoping tool identity limits what the assistant can do if it is manipulated.",
+        "C": "Requiring approval for actions stops injected instructions from triggering high-impact workflows automatically.",
+        "D": "Separating untrusted instructions keeps external web content from being executed as commands."
+      },
+      "keywords": [
+        {
+          "text": "prompt injection and tool misuse",
+          "tier": "critical"
+        },
+        {
+          "text": "separate untrusted instructions",
+          "tier": "high"
+        },
+        {
+          "text": "require approval for actions",
+          "tier": "high"
+        },
+        {
+          "text": "scope tool identity",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    }
+  ],
+  "instructor": "Songpon TEERAKANOK",
+  "website": "cyberskills.co.th",
+  "copyright": "Copyright (c) 2026 CYBERSKILLS Professional Training Center. All rights reserved. For enrolled learners only. Non-distribution."
+}

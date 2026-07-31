@@ -1,0 +1,613 @@
+{
+  "id": "module-1-governance-risk-compliance-part-02",
+  "sourceModuleId": "m1",
+  "sourceSlug": "module-1-governance-risk-compliance",
+  "title": "Module 1 - Governance, Risk, and Compliance - Part 2",
+  "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+  "part": 2,
+  "questionRange": [
+    11,
+    20
+  ],
+  "questions": [
+    {
+      "id": "M1-022",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.1",
+      "learningObjective": "Given a set of organizational security requirements, implement the appropriate governance components.",
+      "lesson": "2A",
+      "bloom": "Understand",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "RACI and decision ownership",
+      "stem": "A security lead is evaluating whether the proposed fix addresses the root cause or only the symptom. Exception requests keep stalling: operations validates the compensating controls, but business leaders are the ones who own the residual-risk decision. Which approach best fixes this?",
+      "choices": {
+        "A": "Build a RACI that separates who recommends, who is consulted, who approves, who executes, and who owns the evidence",
+        "B": "Use a GRC tool or evidence register that maps controls, owners, exceptions, tests, and obligations",
+        "C": "Require change governance with risk classification, emergency approval, rollback evidence, and post-implementation review",
+        "D": "Apply data governance to staging: minimization, masking or tokenization, access limits, and retention rules",
+        "E": "Write a procedure that turns the policy into required steps, evidence, approvals, and tests"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The requests stall because decision authority is unclear, not because another technical control is missing. A RACI fixes exactly that: it names who recommends, who is consulted, who approves, and who owns the evidence, so an exception can move once the accountable business owner signs off against residual-risk evidence (A). The other options are sound controls, but a GRC register, change governance, staging data rules, or a procedure all assume ownership is already defined.",
+      "whyWrong": {
+        "B": "A GRC register stores control and exception evidence but does not assign who has authority to approve the exception.",
+        "C": "Change governance controls how changes are made, not who owns the residual-risk acceptance.",
+        "D": "Staging data governance addresses test-environment data, which is unrelated to stalled exception ownership.",
+        "E": "A procedure operationalizes a policy into steps, but it still needs a defined approver to unblock the exception."
+      },
+      "sources": [
+        "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components."
+      ],
+      "whyCorrect": {
+        "A": "A RACI assigns the decision to a named accountable owner and ties approval to residual-risk evidence, which is the real gap here."
+      },
+      "keywords": [
+        {
+          "text": "RACI and decision ownership",
+          "tier": "critical"
+        },
+        {
+          "text": "define consulted legal and security roles",
+          "tier": "high"
+        },
+        {
+          "text": "tie approval to residual-risk evidence",
+          "tier": "high"
+        },
+        {
+          "text": "name the accountable business owner",
+          "tier": "high"
+        },
+        {
+          "text": "compensating controls",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-119",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Understand",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "threat profiling and applicability",
+      "stem": "You are preparing a board-ready recommendation. Threat intelligence describes attacks against your sector, but your environment has different assets and exposure paths. Which approach best addresses this?",
+      "choices": {
+        "A": "Map the attack chain to preventive, detective, and responsive controls at multiple phases",
+        "B": "Enumerate externally reachable, internally reachable, identity, data, and supply-chain attack surfaces",
+        "C": "Model assets, actors, data flows, trust boundaries, dependencies, and assumptions before choosing controls",
+        "D": "Profile threats against your organization's real assets, exposure, controls, and business processes",
+        "E": "Model prompt injection, retrieval leakage, tool misuse, data poisoning, output trust, and approval boundaries"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Generic sector intelligence is only useful once you filter it through your own environment. Threat profiling does this: it tests each reported threat against your real assets, exposure paths, and controls, then documents what you excluded so the analysis stays defensible (D). Kill-chain mapping, attack-surface enumeration, data-flow modeling, and AI threat modeling are all valid activities, but none of them answer whether the sector intel actually applies here.",
+      "whyWrong": {
+        "A": "Mapping the chain to controls comes after you decide which threats apply; it does not establish applicability.",
+        "B": "Enumerating attack surfaces inventories exposure but does not match sector threats to your specific assets.",
+        "C": "Building a data-flow model supports threat modeling generally but skips the applicability filter the stem needs.",
+        "E": "AI-specific threat modeling targets model and tool surfaces, not the question of whether sector intel fits your environment."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "D": "Profiling threats against your actual assets and exposure is what turns generic sector intel into an applicability judgment for your environment."
+      },
+      "keywords": [
+        {
+          "text": "threat profiling and applicability",
+          "tier": "critical"
+        },
+        {
+          "text": "document excluded assumptions",
+          "tier": "high"
+        },
+        {
+          "text": "map threats to assets",
+          "tier": "high"
+        },
+        {
+          "text": "threat intelligence",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-074",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "data residency and processing location",
+      "stem": "A platform team is designing the minimum evidence package for a high-risk workflow. Encrypted backups are being replicated to a region that customer contracts exclude. Weighing security value, operational burden, and evidence quality, which response is most defensible?",
+      "choices": {
+        "A": "Distinguish audits, assessments, and certifications by scope, period, criteria, and current control evidence",
+        "B": "Design controls around the applicable healthcare, privacy, retention, access, and reporting obligations",
+        "C": "Apply purpose limitation, minimization, consent or notice where needed, retention, and subject-rights handling",
+        "D": "Map metrics to a recognized framework and show risk, control performance, exceptions, and trends",
+        "E": "Adjust architecture and governance to satisfy residency, processing-location, and contractual restrictions"
+      },
+      "correct": [
+        "E"
+      ],
+      "explanation": "Encryption protects confidentiality, but compliance can still dictate where data is allowed to live. Replicating to an excluded region violates a contractual residency restriction regardless of how strong the encryption is, so the fix is to change the architecture and governance to keep data in permitted regions and record the transfer and retention evidence (E). Audit-evidence distinctions, sector controls, privacy lifecycle rules, and reporting metrics do not resolve a location violation.",
+      "whyWrong": {
+        "A": "Sorting assurance artifacts by scope and period is about proving control state, not about correcting a contractual data-residency violation.",
+        "B": "Sector-specific control design is broader than the precise residency breach the stem describes.",
+        "C": "Privacy lifecycle rules govern how personal data is handled, not the contractual region restriction at issue.",
+        "D": "Framework metrics report posture; they do not move data out of a prohibited region."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "E": "Residency and contractual limits constrain where data may be stored even when it is encrypted, so enforcing allowed regions is the direct fix."
+      },
+      "keywords": [
+        {
+          "text": "data residency and processing location",
+          "tier": "critical"
+        },
+        {
+          "text": "record transfer and retention evidence",
+          "tier": "high"
+        },
+        {
+          "text": "map data locations to obligations",
+          "tier": "high"
+        },
+        {
+          "text": "RPO",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-016",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.1",
+      "learningObjective": "Given a set of organizational security requirements, implement the appropriate governance components.",
+      "lesson": "2A",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "policy, standard, procedure, and guideline separation",
+      "stem": "A platform team is designing the minimum evidence package for a high-risk workflow. A board-approved privileged access policy now has to become repeatable engineering work instructions. Weighing security value, operational burden, and evidence quality, which response is most defensible?",
+      "choices": {
+        "A": "Build a RACI that separates who recommends, who is consulted, who approves, who executes, and who owns the evidence",
+        "B": "Apply data governance to staging: minimization, masking or tokenization, access limits, and retention rules",
+        "C": "Write a procedure that turns the policy into required steps, evidence, approvals, and tests",
+        "D": "Use a GRC tool or evidence register that maps controls, owners, exceptions, tests, and obligations",
+        "E": "Require change governance with risk classification, emergency approval, rollback evidence, and post-implementation review"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Policy states what must be true; a procedure is the artifact that turns that intent into repeatable execution. To convert the policy into work instructions you write a procedure defining the required steps, the evidence to capture, the approvals, and the tests (C). A RACI assigns roles, a GRC register stores evidence, and change governance controls modifications, but none of them is the step-by-step execution document the policy needs.",
+      "whyWrong": {
+        "A": "A RACI clarifies who does what but does not document how the task is performed step by step.",
+        "B": "Staging data governance addresses test-environment data, not privileged-access execution instructions.",
+        "D": "A GRC register tracks control and exception evidence; it is not the work-instruction document.",
+        "E": "Change governance manages how changes are approved, not how the standing privileged-access process runs."
+      },
+      "sources": [
+        "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components."
+      ],
+      "whyCorrect": {
+        "C": "A procedure is exactly the governance artifact that translates policy intent into repeatable, evidence-producing steps."
+      },
+      "keywords": [
+        {
+          "text": "policy, standard, procedure, and guideline separation",
+          "tier": "critical"
+        },
+        {
+          "text": "document workflow steps and required evidence",
+          "tier": "high"
+        },
+        {
+          "text": "record exceptions and recertification dates",
+          "tier": "high"
+        },
+        {
+          "text": "change governance",
+          "tier": "medium"
+        }
+      ],
+      "visual": {
+        "id": "cas005-lo-1-1",
+        "fileName": "cas005-lo-1-1.svg",
+        "src": "../assets/figures/cas005-lo-1-1.svg",
+        "title": "CAS005 LO 1.1: Implement Appropriate Governance Components",
+        "alt": "Instructional diagram for CAS005 objective 1.1, showing scenario cue, control decision, and evidence review.",
+        "caption": "Generated instructional diagram for CAS005 LO 1.1; verify against Implement Appropriate Governance Components source anchors.",
+        "sourceLabel": "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components.",
+        "generated": true
+      }
+    },
+    {
+      "id": "M1-026",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.1",
+      "learningObjective": "Given a set of organizational security requirements, implement the appropriate governance components.",
+      "lesson": "2A",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "policy, standard, procedure, and guideline separation",
+      "stem": "A tabletop exercise shows a gap between policy language and how the control actually behaves. The board-approved privileged access policy still has to become repeatable engineering work instructions. Weighing security value, operational burden, and evidence quality, which response is most defensible?",
+      "choices": {
+        "A": "Build a RACI that separates who recommends, who is consulted, who approves, who executes, and who owns the evidence",
+        "B": "Use a GRC tool or evidence register that maps controls, owners, exceptions, tests, and obligations",
+        "C": "Require change governance with risk classification, emergency approval, rollback evidence, and post-implementation review",
+        "D": "Apply data governance to staging: minimization, masking or tokenization, access limits, and retention rules",
+        "E": "Write a procedure that turns the policy into required steps, evidence, approvals, and tests"
+      },
+      "correct": [
+        "E"
+      ],
+      "explanation": "The gap is that policy intent has not been translated into executable steps. A procedure closes it by defining the required steps, the evidence to capture, the approvals, and the tests, including the accountable approvers and recertification dates (E). A RACI, a GRC register, change governance, or staging data rules each address a different concern and leave the policy without work instructions.",
+      "whyWrong": {
+        "A": "A RACI names decision roles but does not specify how the work is carried out.",
+        "B": "A GRC register holds evidence; it is not the executable instruction set.",
+        "C": "Change governance controls how changes are approved, not the standing privileged-access workflow.",
+        "D": "Staging data governance concerns test-environment data, which is unrelated to this policy translation."
+      },
+      "sources": [
+        "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components."
+      ],
+      "whyCorrect": {
+        "E": "A procedure is the governance artifact that converts policy intent into repeatable execution with reviewable evidence."
+      },
+      "keywords": [
+        {
+          "text": "policy, standard, procedure, and guideline separation",
+          "tier": "critical"
+        },
+        {
+          "text": "document workflow steps and required evidence",
+          "tier": "high"
+        },
+        {
+          "text": "record exceptions and recertification dates",
+          "tier": "high"
+        },
+        {
+          "text": "define accountable approvers and reviewers",
+          "tier": "high"
+        },
+        {
+          "text": "change governance",
+          "tier": "medium"
+        }
+      ],
+      "visual": {
+        "id": "cas005-lo-1-1",
+        "fileName": "cas005-lo-1-1.svg",
+        "src": "../assets/figures/cas005-lo-1-1.svg",
+        "title": "CAS005 LO 1.1: Implement Appropriate Governance Components",
+        "alt": "Instructional diagram for CAS005 objective 1.1, showing scenario cue, control decision, and evidence review.",
+        "caption": "Generated instructional diagram for CAS005 LO 1.1; verify against Implement Appropriate Governance Components source anchors.",
+        "sourceLabel": "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components.",
+        "generated": true
+      }
+    },
+    {
+      "id": "M1-084",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "single",
+      "topic": "data residency and processing location",
+      "stem": "A tabletop exercise shows a gap between policy language and how the control actually behaves. Encrypted backups are being replicated to a region that customer contracts exclude. Weighing security value, operational burden, and evidence quality, which response is most defensible?",
+      "choices": {
+        "A": "Distinguish audits, assessments, and certifications by scope, period, criteria, and current control evidence",
+        "B": "Design controls around the applicable healthcare, privacy, retention, access, and reporting obligations",
+        "C": "Map metrics to a recognized framework and show risk, control performance, exceptions, and trends",
+        "D": "Adjust architecture and governance to satisfy residency, processing-location, and contractual restrictions",
+        "E": "Apply purpose limitation, minimization, consent or notice where needed, retention, and subject-rights handling"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Confidentiality controls do not override a contractual residency limit. Because the backups land in an excluded region, the defensible fix is to adjust the architecture and governance so replication stays in permitted regions and to record the transfer and retention evidence (D). Audit-artifact distinctions, sector controls, framework metrics, and privacy lifecycle rules do not move the data back into compliant locations.",
+      "whyWrong": {
+        "A": "Classifying assurance artifacts proves control state; it does not correct a prohibited data location.",
+        "B": "Sector-specific control design is broader than this specific residency violation.",
+        "C": "Framework metrics report posture rather than relocating the backups.",
+        "E": "Privacy lifecycle handling governs personal data use, not the contractual region restriction here."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "D": "Residency and contractual restrictions limit where data may live even when encrypted, so enforcing allowed regions directly resolves the breach."
+      },
+      "keywords": [
+        {
+          "text": "data residency and processing location",
+          "tier": "critical"
+        },
+        {
+          "text": "record transfer and retention evidence",
+          "tier": "high"
+        },
+        {
+          "text": "enforce allowed regions",
+          "tier": "high"
+        },
+        {
+          "text": "RPO",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-066",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Analyze",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "industry-specific compliance strategy",
+      "stem": "A security council is deciding what evidence to require before approval. A healthcare analytics workflow touches patient data, billing metadata, and operational dashboards. Which items separate a defensible answer from a superficial one? (Select all that apply.)",
+      "choices": {
+        "A": "Retain audit evidence",
+        "B": "Restrict to minimum necessary access",
+        "C": "Define retention and access",
+        "D": "Validate permitted use",
+        "E": "Minimize collection"
+      },
+      "correct": [
+        "A",
+        "B",
+        "D"
+      ],
+      "explanation": "Sector compliance follows the regulated data and the regulated process. For a healthcare analytics workflow the defensible controls are the ones healthcare obligations specifically require: validating that the use is permitted (D), restricting access to the minimum necessary (B), and retaining audit evidence to prove compliance (A). Defining retention and access (C) and minimizing collection (E) are general privacy-lifecycle good practice; they can support healthcare compliance too, but they are less specific than the sector-focused controls this scenario tests.",
+      "whyWrong": {
+        "C": "Defining retention and access is a general privacy-lifecycle control; it can apply to healthcare too but is less specific than the sector-focused controls keyed here.",
+        "E": "Minimizing collection is good privacy practice broadly but is not the sector-specific control set being tested."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "A": "Retaining audit evidence is how a healthcare workflow proves its controls operated, which sector compliance demands.",
+        "B": "Minimum-necessary access is a core healthcare safeguard limiting who can see patient data.",
+        "D": "Validating permitted use confirms the analytics are an allowed purpose for regulated patient data."
+      },
+      "keywords": [
+        {
+          "text": "industry-specific compliance strategy",
+          "tier": "critical"
+        },
+        {
+          "text": "restrict minimum necessary access",
+          "tier": "high"
+        },
+        {
+          "text": "validate permitted use",
+          "tier": "high"
+        },
+        {
+          "text": "retain audit evidence",
+          "tier": "high"
+        },
+        {
+          "text": "audit evidence",
+          "tier": "medium"
+        }
+      ],
+      "visual": {
+        "id": "cas005-lo-1-3",
+        "fileName": "cas005-lo-1-3.svg",
+        "src": "../assets/figures/cas005-lo-1-3.svg",
+        "title": "CAS005 LO 1.3: Explain Legal Compliance",
+        "alt": "Instructional diagram for CAS005 objective 1.3, showing scenario cue, control decision, and evidence review.",
+        "caption": "Generated instructional diagram for CAS005 LO 1.3; verify against Explain Legal Compliance source anchors.",
+        "sourceLabel": "CAS005 LO 1.3: Explain how compliance affects information security strategies.",
+        "generated": true
+      }
+    },
+    {
+      "id": "M1-111",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Analyze",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "AI model threat modeling",
+      "stem": "A retrieval-augmented assistant can read internal documents and create support tickets. Which finding is the most important root cause to address?",
+      "choices": {
+        "A": "Profile threats against your organization's real assets, exposure, controls, and business processes",
+        "B": "Map the attack chain to preventive, detective, and responsive controls at multiple phases",
+        "C": "Model assets, actors, data flows, trust boundaries, dependencies, and assumptions before choosing controls",
+        "D": "Model prompt injection, retrieval leakage, tool misuse, data poisoning, output trust, and approval boundaries",
+        "E": "Enumerate externally reachable, internally reachable, identity, data, and supply-chain attack surfaces"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "An assistant that both reads internal content and takes actions adds model, data, and action surfaces a normal app does not have. The right root-cause analysis is AI-specific threat modeling: prompt injection, retrieval leakage, tool misuse, data poisoning, output trust, and approval boundaries, with controls like logging retrieved context and gating external instructions (D). Generic threat profiling, kill-chain mapping, data-flow modeling, and attack-surface enumeration miss these AI-specific risks.",
+      "whyWrong": {
+        "A": "Threat profiling judges applicability of external intel, not the assistant's internal model and action surfaces.",
+        "B": "Kill-chain control placement assumes a conventional attack path, not AI-specific manipulation.",
+        "C": "Generic data-flow modeling helps scope a system but omits prompt-injection and tool-misuse risks.",
+        "E": "Attack-surface enumeration inventories exposure but does not model how the model itself can be subverted."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "D": "Only AI-specific threat modeling covers the prompt-injection, retrieval, and tool-action risks this assistant introduces."
+      },
+      "keywords": [
+        {
+          "text": "AI model threat modeling",
+          "tier": "critical"
+        },
+        {
+          "text": "gate external instructions",
+          "tier": "high"
+        },
+        {
+          "text": "log retrieved context",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ],
+      "visual": {
+        "id": "cas005-lo-1-4",
+        "fileName": "cas005-lo-1-4.svg",
+        "src": "../assets/figures/cas005-lo-1-4.svg",
+        "title": "CAS005 LO 1.4: Perform Threat Modeling",
+        "alt": "Instructional diagram for CAS005 objective 1.4, showing scenario cue, control decision, and evidence review.",
+        "caption": "Generated instructional diagram for CAS005 LO 1.4; verify against Perform Threat Modeling source anchors.",
+        "sourceLabel": "CAS005 LO 1.4: Given a scenario, perform threat modeling activities.",
+        "generated": true
+      }
+    },
+    {
+      "id": "M1-149",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.5",
+      "learningObjective": "Summarize the information security challenges associated with artificial intelligence (AI) adoption.",
+      "lesson": "2A and 5A",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "model output reliability",
+      "stem": "A regulated organization is trying to modernize without losing auditability. Analysts want AI recommendations to close incidents automatically whenever the model's confidence is high. What should the security practitioner recommend FIRST?",
+      "choices": {
+        "A": "Treat model output as advisory evidence and validate it against telemetry, policy, and human approval thresholds",
+        "B": "Define approved data classes, retention rules, logging, and redaction controls for AI use",
+        "C": "Require model and version governance, evaluation evidence, change notification, and rollback criteria",
+        "D": "Constrain tool permissions, isolate untrusted content, and require approval for high-impact actions",
+        "E": "Update detection, awareness, and response for AI-enabled social engineering and automation at scale"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "A model's confidence score is probabilistic; it is not authoritative evidence on its own. Before letting AI auto-close incidents, treat its output as advisory and validate it against telemetry, policy, and human approval thresholds, requiring corroborating signals and showing the evidence used (A). Data-class rules, model governance, tool-permission limits, and adversary-awareness updates are useful AI controls, but they do not address whether the output itself is reliable enough to act on automatically.",
+      "whyWrong": {
+        "B": "Approved data classes and redaction limit data exposure, not the reliability of the close decision.",
+        "C": "Model and version governance manages the supply chain, not whether a single recommendation is trustworthy.",
+        "D": "Constraining tool permissions limits actions but does not establish output reliability.",
+        "E": "Adversary-awareness updates address attacker use of AI, not the trustworthiness of your own model's output."
+      },
+      "sources": [
+        "CAS005 LO 1.5: Summarize the information security challenges associated with artificial intelligence (AI) adoption."
+      ],
+      "whyCorrect": {
+        "A": "Probabilistic output must be corroborated before action, so validating it against independent signals and approval thresholds comes first."
+      },
+      "keywords": [
+        {
+          "text": "model output reliability",
+          "tier": "critical"
+        },
+        {
+          "text": "require corroborating signals",
+          "tier": "high"
+        },
+        {
+          "text": "show evidence used",
+          "tier": "high"
+        },
+        {
+          "text": "prompt injection",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-085",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "multi",
+      "topic": "audit, assessment, and certification evidence",
+      "stem": "Before production credentials are issued for a regulated service, executives are treating a past assessment letter as proof of current certification. Which controls or evidence should be included? (Select all that apply.)",
+      "choices": {
+        "A": "Confirm the attestation scope",
+        "B": "Collect current operating evidence",
+        "C": "Map metrics to a framework",
+        "D": "Record transfer and retention evidence",
+        "E": "Verify the period of coverage"
+      },
+      "correct": [
+        "A",
+        "B",
+        "E"
+      ],
+      "explanation": "Assurance artifacts differ in authority, time window, and scope, so a past assessment letter is not the same as current certification. To rely on it defensibly you must confirm what the attestation actually covered (A), verify the period of coverage so it is still current (E), and collect evidence the controls operate today (B). Mapping metrics to a framework (C) and recording transfer and retention evidence (D) belong to other topics and do not validate the certification claim.",
+      "whyWrong": {
+        "C": "Mapping metrics to a framework is executive reporting, not validation of a certification claim.",
+        "D": "Transfer and retention evidence relates to data residency, not to confirming current certification."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "A": "Confirming attestation scope shows whether the letter even covers this regulated service.",
+        "B": "Current operating evidence proves the controls still work, which a dated letter cannot.",
+        "E": "Verifying the coverage period checks that the assessment is not stale."
+      },
+      "keywords": [
+        {
+          "text": "audit, assessment, and certification evidence",
+          "tier": "critical"
+        },
+        {
+          "text": "collect current operating evidence",
+          "tier": "high"
+        },
+        {
+          "text": "confirm attestation scope",
+          "tier": "high"
+        },
+        {
+          "text": "verify period of coverage",
+          "tier": "high"
+        }
+      ]
+    }
+  ],
+  "instructor": "Songpon TEERAKANOK",
+  "website": "cyberskills.co.th",
+  "copyright": "Copyright (c) 2026 CYBERSKILLS Professional Training Center. All rights reserved. For enrolled learners only. Non-distribution."
+}

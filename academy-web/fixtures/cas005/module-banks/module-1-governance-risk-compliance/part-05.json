@@ -1,0 +1,619 @@
+{
+  "id": "module-1-governance-risk-compliance-part-05",
+  "sourceModuleId": "m1",
+  "sourceSlug": "module-1-governance-risk-compliance",
+  "title": "Module 1 - Governance, Risk, and Compliance - Part 5",
+  "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+  "part": 5,
+  "questionRange": [
+    41,
+    50
+  ],
+  "questions": [
+    {
+      "id": "M1-056",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "multi",
+      "topic": "quantitative and qualitative risk analysis",
+      "stem": "During a third-party integration review, before production credentials are issued, leadership wants to compare ransomware outage risk with payment fraud risk using both expected loss and strategic impact. Which controls or evidence should be included? (Select all that apply.)",
+      "choices": {
+        "A": "State uncertainty and assumptions",
+        "B": "Scope privileged access",
+        "C": "Document nonfinancial impacts",
+        "D": "Estimate exposure and frequency",
+        "E": "Segment the asset"
+      },
+      "correct": [
+        "A",
+        "C",
+        "D"
+      ],
+      "explanation": "Comparing risks on both expected loss and strategic impact means blending quantitative and qualitative analysis. You estimate exposure and frequency for the dollar figure (D), document nonfinancial impacts like reputation and safety for the strategic view (C), and state the uncertainty and assumptions so the comparison is honest (A). Scoping privileged access (B) is a third-party control and segmenting the asset (E) is a compensating control; neither is part of the risk analysis.",
+      "whyWrong": {
+        "B": "Scoping privileged access is a third-party access control, not risk-comparison evidence.",
+        "E": "Segmenting the asset is a compensating control, not part of the analysis."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "A": "Stating uncertainty and assumptions keeps a quantitative-plus-qualitative comparison defensible.",
+        "C": "Documenting nonfinancial impacts captures the strategic side that expected loss alone misses.",
+        "D": "Estimating exposure and frequency produces the expected-loss figure leadership asked for."
+      },
+      "keywords": [
+        {
+          "text": "quantitative and qualitative risk analysis",
+          "tier": "critical"
+        },
+        {
+          "text": "state uncertainty and assumptions",
+          "tier": "high"
+        },
+        {
+          "text": "estimate exposure and frequency",
+          "tier": "high"
+        },
+        {
+          "text": "document nonfinancial impacts",
+          "tier": "high"
+        },
+        {
+          "text": "compensating controls",
+          "tier": "medium"
+        }
+      ],
+      "visual": {
+        "id": "cas005-lo-1-2",
+        "fileName": "cas005-lo-1-2.svg",
+        "src": "../assets/figures/cas005-lo-1-2.svg",
+        "title": "CAS005 LO 1.2: Apply Risk Management Strategies",
+        "alt": "Instructional diagram for CAS005 objective 1.2, showing scenario cue, control decision, and evidence review.",
+        "caption": "Generated instructional diagram for CAS005 LO 1.2; verify against Apply Risk Management Strategies source anchors.",
+        "sourceLabel": "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities.",
+        "generated": true
+      }
+    },
+    {
+      "id": "M1-090",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.3",
+      "learningObjective": "Explain how compliance affects information security strategies.",
+      "lesson": "2B",
+      "bloom": "Understand",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "audit, assessment, and certification evidence",
+      "stem": "You are preparing a board-ready recommendation. Executives are treating a past assessment letter as proof of current certification for a regulated service. Which approach best addresses this?",
+      "choices": {
+        "A": "Adjust architecture and governance to satisfy residency, processing-location, and contractual restrictions",
+        "B": "Apply purpose limitation, minimization, consent or notice where needed, retention, and subject-rights handling",
+        "C": "Design controls around the applicable healthcare, privacy, retention, access, and reporting obligations",
+        "D": "Map metrics to a recognized framework and show risk, control performance, exceptions, and trends",
+        "E": "Distinguish audits, assessments, and certifications by scope, period, criteria, and current control evidence"
+      },
+      "correct": [
+        "E"
+      ],
+      "explanation": "Assurance artifacts differ in authority, time window, and scope, so a past assessment letter is not equivalent to current certification. The right move is to distinguish audits, assessments, and certifications by their scope, period, and criteria, then confirm the attestation scope and collect current operating evidence (E). Residency fixes, privacy lifecycle rules, sector control design, and framework metrics do not correct this misuse of an assurance artifact.",
+      "whyWrong": {
+        "A": "Residency and contractual fixes address data location, not the certification claim.",
+        "B": "Privacy lifecycle handling governs personal data, not assurance-artifact validity.",
+        "C": "Sector-specific control design is broader than this evidence misuse.",
+        "D": "Framework metrics report posture; they do not validate a certification claim."
+      },
+      "sources": [
+        "CAS005 LO 1.3: Explain how compliance affects information security strategies."
+      ],
+      "whyCorrect": {
+        "E": "Separating assessment from certification, and checking scope and period, exposes why the letter cannot prove current certification."
+      },
+      "keywords": [
+        {
+          "text": "audit, assessment, and certification evidence",
+          "tier": "critical"
+        },
+        {
+          "text": "collect current operating evidence",
+          "tier": "high"
+        },
+        {
+          "text": "confirm attestation scope",
+          "tier": "high"
+        },
+        {
+          "text": "RPO",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-021",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.1",
+      "learningObjective": "Given a set of organizational security requirements, implement the appropriate governance components.",
+      "lesson": "2A",
+      "bloom": "Remember",
+      "difficulty": "Advanced recall",
+      "type": "single",
+      "topic": "policy, standard, procedure, and guideline separation",
+      "stem": "A service team proposes buying a tool, but the reviewer wants a control objective first. A board-approved privileged access policy still has to become repeatable engineering work instructions. Which control objective should the reviewer apply?",
+      "choices": {
+        "A": "Require change governance with risk classification, emergency approval, rollback evidence, and post-implementation review",
+        "B": "Apply data governance to staging: minimization, masking or tokenization, access limits, and retention rules",
+        "C": "Build a RACI that separates who recommends, who is consulted, who approves, who executes, and who owns the evidence",
+        "D": "Use a GRC tool or evidence register that maps controls, owners, exceptions, tests, and obligations",
+        "E": "Write a procedure that turns the policy into required steps, evidence, approvals, and tests"
+      },
+      "correct": [
+        "E"
+      ],
+      "explanation": "Policy states intent; a procedure is the artifact that turns it into repeatable execution. Converting the privileged-access policy into work instructions means writing a procedure with the required steps, evidence, approvals, tests, and accountable approvers (E). Change governance, staging data rules, a RACI, and a GRC register each address a different concern and do not produce the work instructions.",
+      "whyWrong": {
+        "A": "Change governance controls how changes are approved, not the standing privileged-access workflow.",
+        "B": "Staging data governance covers test-environment data, not policy translation.",
+        "C": "A RACI assigns decision roles but does not document how the task is performed.",
+        "D": "A GRC register stores evidence; it is not the work-instruction document."
+      },
+      "sources": [
+        "CAS005 LO 1.1: Given a set of organizational security requirements, implement the appropriate governance components."
+      ],
+      "whyCorrect": {
+        "E": "A procedure is the governance artifact that translates policy intent into repeatable, reviewable execution."
+      },
+      "keywords": [
+        {
+          "text": "policy, standard, procedure, and guideline separation",
+          "tier": "critical"
+        },
+        {
+          "text": "document workflow steps and required evidence",
+          "tier": "high"
+        },
+        {
+          "text": "define accountable approvers and reviewers",
+          "tier": "high"
+        },
+        {
+          "text": "change governance",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-107",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "kill chain and control placement",
+      "stem": "A risk owner asks which control proves the organization understood the scenario constraints: a likely adversary uses phishing, token theft, cloud API discovery, and staged exfiltration. Which evidence points would let a reviewer defend the design against plausible alternatives? (Select all that apply.)",
+      "choices": {
+        "A": "Detect staging and exfiltration",
+        "B": "Identify actors and data stores",
+        "C": "Monitor cloud API discovery",
+        "D": "Gate external instructions",
+        "E": "Add identity detection"
+      },
+      "correct": [
+        "A",
+        "C",
+        "E"
+      ],
+      "explanation": "Defensible kill-chain design places controls at each phase the adversary actually uses. Here that means identity detection for phishing and token theft (E), monitoring for cloud API discovery (C), and detection of staging and exfiltration (A), placing detection and response-enabling coverage across every phase of the described chain. Identifying actors and data stores (B) is data-flow modeling, and gating external instructions (D) is an AI control; neither places controls along this chain.",
+      "whyWrong": {
+        "B": "Identifying actors and data stores is data-flow modeling, not control placement along the chain.",
+        "D": "Gating external instructions is an AI model-threat control, not relevant to this attack chain."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "A": "Detecting staging and exfiltration covers the final phases where data leaves the environment.",
+        "C": "Monitoring cloud API discovery catches the reconnaissance phase in the described chain.",
+        "E": "Adding identity detection counters the phishing and token-theft entry point."
+      },
+      "keywords": [
+        {
+          "text": "kill chain and control placement",
+          "tier": "critical"
+        },
+        {
+          "text": "detect staging and exfiltration",
+          "tier": "high"
+        },
+        {
+          "text": "monitor cloud API discovery",
+          "tier": "high"
+        },
+        {
+          "text": "add identity detection",
+          "tier": "high"
+        },
+        {
+          "text": "trust boundaries",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-039",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "AI usage risk management",
+      "stem": "During a cloud migration review, a team wants a generative AI assistant to summarize sensitive incidents and recommend response actions. Which evidence points would let a reviewer defend the design against plausible alternatives? (Select all that apply.)",
+      "choices": {
+        "A": "Log prompts and retrieved evidence",
+        "B": "State uncertainty and assumptions",
+        "C": "Classify allowed data",
+        "D": "Require activity logs",
+        "E": "Gate high-impact actions"
+      },
+      "correct": [
+        "A",
+        "C",
+        "E"
+      ],
+      "explanation": "AI usage risk spans the data it reads, the reliability of its output, and the impact of its actions. A defensible design classifies which data the assistant may use (C), logs prompts and retrieved evidence for accountability (A), and gates high-impact actions so recommendations are not executed blindly (E). Stating uncertainty and assumptions (B) is risk-analysis work, and requiring activity logs (D) maps to third-party/vendor controls; logging is a valid accountability safeguard generally, but (A) is the more specific AI-usage evidence this scenario tests.",
+      "whyWrong": {
+        "B": "Stating uncertainty and assumptions belongs to quantitative and qualitative risk analysis.",
+        "D": "Activity logging is a valid accountability safeguard, but here it maps to third-party/vendor controls; logging prompts and retrieved evidence (A) is the more specific AI-usage evidence."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "A": "Logging prompts and retrieved evidence makes the assistant's reasoning auditable.",
+        "C": "Classifying allowed data controls what sensitive incident content the assistant may process.",
+        "E": "Gating high-impact actions keeps automated recommendations from acting without oversight."
+      },
+      "keywords": [
+        {
+          "text": "AI usage risk management",
+          "tier": "critical"
+        },
+        {
+          "text": "log prompts and retrieved evidence",
+          "tier": "high"
+        },
+        {
+          "text": "gate high-impact actions",
+          "tier": "high"
+        },
+        {
+          "text": "classify allowed data",
+          "tier": "high"
+        }
+      ]
+    },
+    {
+      "id": "M1-052",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "single",
+      "topic": "risk treatment and compensating controls",
+      "stem": "A regional operations team needs a control design that can scale to the enterprise. A certified production system cannot be patched until recertification, but exploit activity for the flaw already exists. What should the security practitioner recommend FIRST?",
+      "choices": {
+        "A": "Apply compensating controls, document residual risk, and obtain accountable risk acceptance",
+        "B": "Run a business impact analysis and convert impact tolerance into recovery and continuity requirements",
+        "C": "Combine quantitative estimates with qualitative business, safety, legal, and reputation factors",
+        "D": "Review contractual duties, access scope, logging, subprocessors, breach notification, and offboarding controls",
+        "E": "Assess data, model, output, automation, privacy, and accountability risks before operational use"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Patching is blocked but the threat is live, so due care means reducing the risk now and formally accepting the rest. Apply compensating controls such as segmenting the asset and monitoring and restricting access, then document the residual risk and obtain accountable acceptance (A). A BIA, blended risk analysis, third-party review, and AI usage risk do not provide this interim treatment-plus-acceptance path.",
+      "whyWrong": {
+        "B": "A BIA sets recovery objectives, not interim mitigation for a live vulnerability.",
+        "C": "Blended risk analysis prioritizes risk but does not deliver the controls needed now.",
+        "D": "Third-party review governs vendors, not an unpatchable internal system.",
+        "E": "AI usage risk does not apply to this patching constraint."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "A": "When patching is constrained, compensating controls plus documented, accepted residual risk is the due-care response."
+      },
+      "keywords": [
+        {
+          "text": "risk treatment and compensating controls",
+          "tier": "critical"
+        },
+        {
+          "text": "monitor and restrict access",
+          "tier": "high"
+        },
+        {
+          "text": "document residual risk",
+          "tier": "high"
+        },
+        {
+          "text": "segment the asset",
+          "tier": "high"
+        },
+        {
+          "text": "business impact analysis",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-036",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Apply",
+      "difficulty": "Hard",
+      "type": "multi",
+      "topic": "quantitative and qualitative risk analysis",
+      "stem": "A newly merged business unit exposes an inconsistent control pattern. Leadership wants to compare ransomware outage risk with payment fraud risk using both expected loss and strategic impact. Which controls or evidence should be included? (Select all that apply.)",
+      "choices": {
+        "A": "Document nonfinancial impacts",
+        "B": "Segment the asset",
+        "C": "State uncertainty and assumptions",
+        "D": "Estimate exposure and frequency",
+        "E": "Set RTO/RPO/MTD"
+      },
+      "correct": [
+        "A",
+        "C",
+        "D"
+      ],
+      "explanation": "Comparing risks on both expected loss and strategic impact blends quantitative and qualitative analysis. You estimate exposure and frequency for the dollar figure (D), document nonfinancial impacts such as reputation and safety (A), and state the uncertainty and assumptions so the comparison is honest (C). Segmenting the asset (B) is a compensating control, and setting RTO/RPO/MTD (E) is recovery planning; neither belongs to this comparison.",
+      "whyWrong": {
+        "B": "Segmenting the asset is a compensating control, not risk-comparison evidence.",
+        "E": "Setting RTO/RPO/MTD is recovery planning, not part of comparing these two risks."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "A": "Documenting nonfinancial impacts captures the strategic dimension expected loss alone misses.",
+        "C": "Stating uncertainty and assumptions keeps the blended comparison defensible.",
+        "D": "Estimating exposure and frequency produces the expected-loss figure being compared."
+      },
+      "keywords": [
+        {
+          "text": "quantitative and qualitative risk analysis",
+          "tier": "critical"
+        },
+        {
+          "text": "state uncertainty and assumptions",
+          "tier": "high"
+        },
+        {
+          "text": "estimate exposure and frequency",
+          "tier": "high"
+        },
+        {
+          "text": "document nonfinancial impacts",
+          "tier": "high"
+        },
+        {
+          "text": "compensating controls",
+          "tier": "medium"
+        }
+      ],
+      "visual": {
+        "id": "cas005-lo-1-2",
+        "fileName": "cas005-lo-1-2.svg",
+        "src": "../assets/figures/cas005-lo-1-2.svg",
+        "title": "CAS005 LO 1.2: Apply Risk Management Strategies",
+        "alt": "Instructional diagram for CAS005 objective 1.2, showing scenario cue, control decision, and evidence review.",
+        "caption": "Generated instructional diagram for CAS005 LO 1.2; verify against Apply Risk Management Strategies source anchors.",
+        "sourceLabel": "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities.",
+        "generated": true
+      }
+    },
+    {
+      "id": "M1-057",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.2",
+      "learningObjective": "Given a set of organizational security requirements, perform risk management activities.",
+      "lesson": "2C",
+      "bloom": "Analyze",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "risk treatment and compensating controls",
+      "stem": "A risk committee weighs technical feasibility against residual-risk accountability. A certified production system cannot be patched until recertification, but exploit activity exists. Which items separate a defensible answer from a superficial one? (Select all that apply.)",
+      "choices": {
+        "A": "Monitor and restrict access",
+        "B": "Document residual risk",
+        "C": "Identify critical dependencies",
+        "D": "Scope privileged access",
+        "E": "Segment the asset"
+      },
+      "correct": [
+        "A",
+        "B",
+        "E"
+      ],
+      "explanation": "With patching blocked and the threat live, the defensible answer pairs risk reduction with formal acceptance. That means segmenting the asset (E) and monitoring and restricting access (A) to lower exposure, plus documenting the residual risk (B) for accountable acceptance. Identifying critical dependencies (C) is a BIA step; scoping privileged access (D) is a general least-privilege control that can reduce exposure but is not the compensating-control-plus-acceptance pattern this scenario specifically tests.",
+      "whyWrong": {
+        "C": "Identifying critical dependencies is a business-impact-analysis step, not a compensating control.",
+        "D": "Scoping privileged access is a general least-privilege control that can reduce exposure, but it is not the compensating-control-plus-acceptance treatment this unpatchable asset needs."
+      },
+      "sources": [
+        "CAS005 LO 1.2: Given a set of organizational security requirements, perform risk management activities."
+      ],
+      "whyCorrect": {
+        "A": "Monitoring and restricting access reduces exposure while patching is impossible.",
+        "B": "Documenting residual risk supports the accountable acceptance the committee must make.",
+        "E": "Segmenting the asset limits blast radius as a compensating control."
+      },
+      "keywords": [
+        {
+          "text": "risk treatment and compensating controls",
+          "tier": "critical"
+        },
+        {
+          "text": "monitor and restrict access",
+          "tier": "high"
+        },
+        {
+          "text": "document residual risk",
+          "tier": "high"
+        },
+        {
+          "text": "segment the asset",
+          "tier": "high"
+        },
+        {
+          "text": "compensating controls",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-117",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Evaluate",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "kill chain and control placement",
+      "stem": "A likely adversary uses phishing, token theft, cloud API discovery, and staged exfiltration. Which evidence points would let a reviewer defend the design against plausible alternatives? (Select all that apply.)",
+      "choices": {
+        "A": "Draw trust boundaries",
+        "B": "Add identity detection",
+        "C": "Map threats to assets",
+        "D": "Detect staging and exfiltration",
+        "E": "Monitor cloud API discovery"
+      },
+      "correct": [
+        "B",
+        "D",
+        "E"
+      ],
+      "explanation": "Defensible kill-chain design places controls at every phase the adversary actually uses. Identity detection counters phishing and token theft (B), monitoring catches cloud API discovery (E), and detection of staging and exfiltration covers the final phases (D), spanning preventive, detective, and responsive controls. Drawing trust boundaries (A) is data-flow modeling, and mapping threats to assets (C) is threat profiling; neither places controls along this chain.",
+      "whyWrong": {
+        "A": "Drawing trust boundaries is a data-flow modeling step, not control placement along the chain.",
+        "C": "Mapping threats to assets is threat profiling, a different activity from placing kill-chain controls."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "B": "Adding identity detection counters the phishing and token-theft entry point.",
+        "D": "Detecting staging and exfiltration covers the phases where data leaves the environment.",
+        "E": "Monitoring cloud API discovery catches the reconnaissance phase in the chain."
+      },
+      "keywords": [
+        {
+          "text": "kill chain and control placement",
+          "tier": "critical"
+        },
+        {
+          "text": "detect staging and exfiltration",
+          "tier": "high"
+        },
+        {
+          "text": "monitor cloud API discovery",
+          "tier": "high"
+        },
+        {
+          "text": "add identity detection",
+          "tier": "high"
+        },
+        {
+          "text": "trust boundaries",
+          "tier": "medium"
+        }
+      ]
+    },
+    {
+      "id": "M1-115",
+      "moduleId": "m1",
+      "moduleTitle": "Module 1 - Governance, Risk, and Compliance",
+      "objective": "1.4",
+      "learningObjective": "Given a scenario, perform threat modeling activities.",
+      "lesson": "5A",
+      "bloom": "Analyze",
+      "difficulty": "Instructor-grade",
+      "type": "multi",
+      "topic": "attack surface determination",
+      "stem": "A new partner integration adds APIs, service accounts, event queues, and data exports. Which items separate a defensible answer from a superficial one? (Select all that apply.)",
+      "choices": {
+        "A": "Include data export paths",
+        "B": "Include identity paths",
+        "C": "Map threats to assets",
+        "D": "Include third-party dependencies",
+        "E": "Record assumptions"
+      },
+      "correct": [
+        "A",
+        "B",
+        "D"
+      ],
+      "explanation": "Attack surface is more than open ports, so a defensible enumeration of this integration includes its data export paths (A), the identity paths created by new service accounts (B), and the third-party dependencies it introduces (D). Mapping threats to assets (C) is threat profiling, and recording assumptions (E) belongs to data-flow modeling; neither completes the attack-surface enumeration this scenario asks for.",
+      "whyWrong": {
+        "C": "Mapping threats to assets is threat profiling, a different activity from enumerating the surface.",
+        "E": "Recording assumptions is a data-flow modeling step, not part of surface enumeration."
+      },
+      "sources": [
+        "CAS005 LO 1.4: Given a scenario, perform threat modeling activities."
+      ],
+      "whyCorrect": {
+        "A": "Including data export paths captures a data-exfiltration surface the integration adds.",
+        "B": "Including identity paths accounts for the new service accounts as an attack surface.",
+        "D": "Including third-party dependencies covers the supply-chain surface of the partner integration."
+      },
+      "keywords": [
+        {
+          "text": "attack surface determination",
+          "tier": "critical"
+        },
+        {
+          "text": "include third-party dependencies",
+          "tier": "high"
+        },
+        {
+          "text": "include data export paths",
+          "tier": "high"
+        },
+        {
+          "text": "include identity paths",
+          "tier": "high"
+        },
+        {
+          "text": "trust boundaries",
+          "tier": "medium"
+        }
+      ]
+    }
+  ],
+  "instructor": "Songpon TEERAKANOK",
+  "website": "cyberskills.co.th",
+  "copyright": "Copyright (c) 2026 CYBERSKILLS Professional Training Center. All rights reserved. For enrolled learners only. Non-distribution."
+}
