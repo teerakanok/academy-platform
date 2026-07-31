@@ -5,6 +5,40 @@
 
 ---
 
+## 2026-07-31 — Lane A: CAS-005 answer-key dispute audit เสร็จ (founder decision brief พร้อมเคาะ)
+
+**Outcome:** ปิดคำถาม "11 founder-level disputes เหลือกี่ข้อจริง" ด้วยการ audit
+จากไฟล์จริงทั้ง pipeline — **เหลือเปิดจริง 3 ข้อ** (PBQ-010, M4-082, M4-067) พร้อม
+founder decision brief ทีละข้อที่
+`reports/reviews/cas005-dispute-audit-2026-07-31.md`
+
+**What changed / decided:**
+- นิยาม "11 disputes" ถูก verify: คือ 11 ธงระดับ `:answer` ใน
+  `v2-build/review/findings-academic-iter1.json` (610 ข้อ / 75 ธงรวม)
+- ตรวจ key ครบ 600 MCQ + 10 PBQ: **ไม่มี answer key ใดถูกแก้ตลอด pipeline**
+  (merge copy byte-for-byte; finalfix แตะเฉพาะ prose) — กฎ "ห้ามแก้ key โดยไม่มี
+  founder decision" ไม่เคยถูกละเมิด
+- 8 ข้อ reviewer ถอนธงหลัง rewrite prose (iter2 ไม่ recur), M1-136 ลดเหลือ prose
+  แล้วปิดใน final loop; 3 ข้อไม่เคยถูกปิด: M4-082 (ธง recur 2 รอบ), M4-067
+  (ธงใหม่ iter2), PBQ-010 (ไม่เคยถูก re-review หลัง iter1)
+- Universe ครบจริง: full-length + pre/post reuse ข้อจาก module banks ตาม id
+  → ไม่มีข้อหลุด review
+- Source of truth confirm: bank จริง = `archive/legacy-output/v4.1/practice-tests/`
+  (`module-banks/` ต้นฉบับ + `student-version-2/` deliverable); `assessments/` ใหม่ยังว่าง
+
+**Evidence:** report ถูก fact-check โดย independent review lane (read-only
+verifier, 6/6 จุด CONFIRMED, 0 factual error); NIST SP 800-61r3 (current, เม.ย.
+2025) ยืนยันลำดับ eradication-ก่อน-recovery ผ่าน csrc.nist.gov 2026-07-31;
+codex review lane ใช้ไม่ได้ (usage limit ถึง 5 ส.ค.) จึงใช้ managed Claude
+verifier ตาม `feedback_managed_subagents_ok_supersedes_blanket_ban`
+
+**Residual risk:**
+- 3 disputes ยังเปิดจน founder เคาะ — publish gate ยังปิดเหมือนเดิม
+- รายชื่อข้อที่ iter2 ครอบจริง enumerate ไม่ได้แล้ว (out ถูก overwrite) — ข้อสรุป
+  "8 ข้อถอนธง" อิงจากธงไม่ recur; ถ้าต้องการชัวร์ 100% สั่ง spot-check batch เดียว
+  ได้ตอน Crucible fix session
+- การแก้ key + regenerate + re-review เป็นงาน Crucible session แยก ยังไม่เริ่ม
+
 ## 2026-07-31 — Implementation direction ล็อก: DIY "build the core, buy the plumbing" + ทิศทาง single-account auth
 
 **Outcome:** ปิดคำถาม Phase 1 "hosted LMS vs DIY" — **ไม่ซื้อ platform, build เอง

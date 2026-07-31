@@ -15,8 +15,10 @@ Stand up **CyberSkills Academy** (cert exam-prep courses + sold mock tests + tre
 ## Current phase: **Phase 0 — Validate demand (cheap, reversible, ~$0 recurring)**
 
 > **สถานะ: KICKED OFF 2026-07-31 (founder สั่งลุย)** — ลำดับงาน 3 lane:
-> - **Lane A (critical path):** audit สถานะ CAS-005 bank + disputes → founder
->   decision brief → ปิด answer keys (ดูสถานะ verified ใน item 1)
+> - **Lane A (critical path):** ✅ **audit เสร็จ 2026-07-31** →
+>   `reports/reviews/cas005-dispute-audit-2026-07-31.md` — เหลือ 3 disputes
+>   ที่เปิดจริง (PBQ-010, M4-082, M4-067) **รอ founder เคาะทีละข้อ** แล้วแก้ key
+>   ใน Crucible session (ดูสถานะ verified ใน item 1)
 > - **Lane B (รอ founder input):** channel inventory — director เตรียมรายการ
 >   channel ที่มีจริงให้ founder เลือก/เติม
 > - **Lane C (build):** Phase 0 slice บน stack จริง (placement-test framing +
@@ -32,10 +34,17 @@ Use only assets that already exist + free/owned infra. No paid platform, no larg
   - **อัปเดต 2026-07-31 (verified on disk):** path เดิม (`output/cas005/...`) rot แล้ว —
     ของจริงอยู่ที่ `products/personal/crucible-studio/courses/comptia-securityx/exam-versions/cas-005/archive/legacy-output/v4.1/practice-tests/`
     (review: `v2-build/review/findings-academic-iter*.json` + `qa/practice-review-*.md`);
-    โครงใหม่ `.../cas-005/assessments/` **ยังว่าง**. หลักฐาน review ที่เห็น:
-    iter1 = 610 items / 75 flagged → มี rewrite pipeline (`rewritten/`, `finalfix.mjs`)
-    → batch ท้าย flagged = 0 — **แต่ไม่พบบันทึกว่า 11 founder-level disputes ถูกปิด**
-    → งานแรกของ Lane A: verify ว่าเหลือ dispute ไหนจริง แล้วทำ founder decision brief
+    โครงใหม่ `.../cas-005/assessments/` **ยังว่าง**
+  - **✅ Lane A audit เสร็จ 2026-07-31** —
+    `reports/reviews/cas005-dispute-audit-2026-07-31.md` (fact-checked โดย
+    independent review lane, 6/6 CONFIRMED): 11 founder-level disputes = ธง
+    `:answer` ใน iter1; **ไม่มี answer key ใดถูกแก้เลยตลอด pipeline** (ตรวจ 600/600
+    + 10 PBQ); 8+1 ข้อ reviewer ถอนธงหลัง rewrite prose; **ยังเปิดจริง 3 ข้อ:
+    PBQ-010** (restore-ก่อน-root-cause ขัด NIST 800-61 + ขัด field ตัวเอง),
+    **M4-082** (key ไม่รวม "Map fields" ทั้งที่ stem ยกปัญหา inconsistent fields —
+    reviewer ยืนยัน 2 รอบ), **M4-067** (key ไม่รวม "Sandbox process")
+  - **➡️ Next: founder เคาะ 3 ข้อจาก decision cards ใน report** → แก้ key +
+    regenerate + re-review ใน **Crucible session แยก** → ปลด publish gate
 - [ ] **Pick a distribution channel** (the real constraint). Inventory what exists: founder/academic network, existing client/list, relevant communities, website traffic. Without a channel, expect ~0 signal.
 - [ ] **Publish a free sample** (e.g. ~50 questions, spread across domains) on existing infra at ~$0 — static hosting or a page on the current website. Reskin to the cs- dark theme.
 - [ ] **Lead capture at ~$0** — capture email (+ one qualifying field: target exam date) at the results screen, value-first (let them finish + see explanations first), instant unlock (no "check your email" delay), PDPA consent checkbox. Store on owned/free infra (self-hosted Supabase or a free form).
@@ -299,7 +308,9 @@ Package CYBERSKILLS Academy content as a **commercially licensed trainer starter
 ## Known risks / weaknesses (evidence-backed)
 - **Distribution is the binding constraint**, not product quality — unvalidated.
 - Open-market standalone sale probability is **low** (commodity market, strong incumbents, cold-start trust).
-- CAS-005 bank still has **11 unresolved answer-key disputes** — blocks public release.
+- CAS-005 bank has **3 unresolved answer-key disputes** (PBQ-010, M4-082, M4-067 —
+  audit 2026-07-31, จากเดิมที่เข้าใจว่า 11; อีก 8+1 ปิดโดย review loop แล้ว) —
+  still blocks public release until founder เคาะ + fix.
 - Recurring-cost trap: committing to a paid platform before demand = capital burn + sunk-cost pressure.
 - Content source (Crucible) and delivery (Academy) must stay decoupled or migration cost balloons.
 
