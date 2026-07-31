@@ -21,10 +21,10 @@ function serviceDb() {
 test.describe('landing', () => {
   test('render brand + waitlist form + ลิงก์ privacy โดยไม่ประกาศ course ใดๆ', async ({ page }) => {
     await page.goto('/')
-    await expect(page.getByRole('heading', { level: 1, name: 'CyberSkills Academy' })).toBeVisible()
-    await expect(page.getByRole('textbox', { name: 'อีเมล' })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Stop relearning')
+    await expect(page.getByRole('textbox', { name: 'Email' })).toBeVisible()
     await expect(page.getByTestId('consent-checkbox')).not.toBeChecked()
-    await expect(page.getByRole('link', { name: 'อ่านนโยบายความเป็นส่วนตัว' })).toHaveAttribute('href', '/privacy')
+    await expect(page.getByRole('link', { name: 'Read the privacy notice' })).toHaveAttribute('href', '/privacy')
 
     // ข้อความ consent ที่ผู้ใช้เห็นต้องเป็นฉบับเดียวกับไฟล์ versioned ที่ API บันทึก
     // (กัน copy แยกร่างจาก v1.md — หลักฐาน consent ผิดฉบับ)
@@ -56,9 +56,9 @@ test.describe('lead capture ผ่าน UI', () => {
   test('ติ๊ก consent + submit → success และ row เกิดจริงใน DB พร้อม consent version', async ({ page }) => {
     const email = `e2e-ui-${Date.now()}@example.com`
     await page.goto('/')
-    await page.getByRole('textbox', { name: 'อีเมล' }).fill(email)
+    await page.getByRole('textbox', { name: 'Email' }).fill(email)
     await page.getByTestId('consent-checkbox').check()
-    await page.getByRole('button', { name: 'ลงทะเบียนรอเปิดตัว' }).click()
+    await page.getByRole('button', { name: 'Notify me' }).click()
     await expect(page.getByTestId('waitlist-success')).toBeVisible()
 
     const db = serviceDb()
@@ -74,8 +74,8 @@ test.describe('lead capture ผ่าน UI', () => {
   test('ไม่ติ๊ก consent → ถูกปฏิเสธ ไม่มี row เกิด', async ({ page }) => {
     const email = `e2e-noconsent-${Date.now()}@example.com`
     await page.goto('/')
-    await page.getByRole('textbox', { name: 'อีเมล' }).fill(email)
-    await page.getByRole('button', { name: 'ลงทะเบียนรอเปิดตัว' }).click()
+    await page.getByRole('textbox', { name: 'Email' }).fill(email)
+    await page.getByRole('button', { name: 'Notify me' }).click()
     await expect(page.getByTestId('waitlist-error')).toBeVisible()
 
     const db = serviceDb()

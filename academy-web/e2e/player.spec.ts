@@ -131,6 +131,10 @@ test.describe('exam resume + timer', () => {
   })
 
   test('exam running + results: axe ผ่าน และ PBQ-009 exhibit render', async ({ page }) => {
+    // เทสนี้รัน axe 3 รอบบนหน้าที่มีปุ่มนำทาง 90 ปุ่ม ใช้เวลาราว 25 วินาทีเมื่อ
+    // เครื่องว่าง และเกิน 30 วินาทีเมื่อรันต่อท้ายเทสอื่น — ตั้งเพดานตามความจริง
+    // ดีกว่าปล่อยให้เป็นเทสที่แดงสลับเขียวโดยไม่มีอะไรพังจริง
+    test.setTimeout(90_000)
     await page.goto('/player/exam/cas005-full-practice-02')
     await page.getByTestId('start-exam-button').click()
     await expectNoSeriousViolations(page)
