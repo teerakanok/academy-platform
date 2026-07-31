@@ -85,6 +85,11 @@ Use only assets that already exist + free/owned infra. No paid platform, no larg
 
 ### เศรษฐศาสตร์ lab: ระบบแต้ม (academy currency)
 
+- **ชื่อ currency: working name = "credit/เครดิต" (ชั่วคราว — ล็อก 2026-07-31):**
+  founder ยังไม่ถูกใจชื่อนี้ ตั้งใจเปลี่ยนทีหลัง → **ต้อง rename ก่อน public launch
+  เท่านั้น** (เปลี่ยนชื่อ currency หลังมี user จริง = แพงทั้ง UX/docs/ความเชื่อมั่น);
+  ชื่อที่เสนอแล้วไม่ผ่าน: UP/Delta/Fuel/Creds/Zenith/ก้าว/Spark/Scala —
+  บทเรียน filter: ทุกชื่อต้องรอดประโยคไทย "เติมเงิน 100 ___" โดยไม่ขำ/ไม่กำกวม
 - ซื้อ course ได้แต้มติดมา (~100 เป็นเลขแนวคิด) — **calibrate ให้พอ "ทำ lab จบคอร์ส +
   ทำซ้ำทั้งคอร์สได้ 1–2 รอบ"** จากต้นทุนวัดจริงตอน pilot ไม่ใช่จากความรู้สึก
 - แต้มหมดซื้อเพิ่มได้ที่ **ราคา ~ต้นทุน infra** — ไม่ใช่ profit line ("คนต้องการเวลาเพิ่ม
@@ -153,7 +158,8 @@ Use only assets that already exist + free/owned infra. No paid platform, no larg
 - [x] ~~ล็อกเลข access term สุดท้าย~~ — **ล็อก final 2026-07-31: 3 ปีเต็ม
   เลขเดียวทั้ง catalog** (เหตุผล: ความง่าย — คำสัญญาเดียวไม่มีกติกาซ่อน;
   ดูรายละเอียดในส่วนโมเดลราคา)
-- [ ] ตั้งชื่อ academy currency
+- [ ] Rename academy currency ก่อน public launch (working name ชั่วคราว = "credit"
+  — founder ไม่ชอบ; ดูรายชื่อที่ตกรอบ + filter ในส่วนระบบแต้ม)
 - [ ] Calibrate ตัวเลขจริงจาก pilot ที่มีต้นทุนวัดจริง: แต้มต่อ lab, แต้มแถมต่อ course,
   ราคา top-up, floor %, free-upgrade window
 - [ ] นิยามเส้นแบ่ง Academy checkpoint lab vs STAR scenario lab เป็นลายลักษณ์อักษร
