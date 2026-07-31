@@ -15,8 +15,10 @@ feature** — video, practice, lab, cheatsheet — เจตนา = โฆษ�
 **What changed / decided (founder):**
 - Free tier = 5 คอร์ส entry เต็มรูป (ไม่ใช่แค่ fundamentals) — ทิ้งตลาด
   commodity ให้เป็นสนามโฆษณา; paid เหลือขั้นสูง/trend/B2B ที่ trust ถูกแก้แล้ว
+- **Release ทีละตัว ไม่พร้อมกัน — founder ยืนยันเอง ("ค่อยๆเรียกแขก")**:
+  แต่ละคอร์สฟรีคือ campaign เรียกแขกหนึ่งรอบ ไม่ใช่ catalog dump; ลำดับเสนอ
+  Basic Linux → N+ (รอ founder เคาะลำดับจริง)
 - CPO guardrails ที่บันทึกคู่กัน: lab ใช้แต้มฟรีรายเดือน (กัน abuse + เพดานต้นทุน);
-  rollout ทีละคอร์ส ห้ามสร้างครบ 5 ก่อน validate (เสนอ Basic Linux → N+ ก่อน);
   ภาระ content freshness ×5 ต้องผ่าน Crucible capacity assessment
 
 **Evidence:** ต้นทุน free tier ~$0.3–0.5/active/เดือน (จาก CF Stream pricing
