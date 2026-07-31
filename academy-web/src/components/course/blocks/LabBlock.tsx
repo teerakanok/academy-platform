@@ -69,7 +69,7 @@ export function LabBlock({
           type="button"
           onClick={() => setFullscreen(true)}
           data-testid="lab-expand"
-          className="shrink-0 rounded-xl border border-cs-accent-2-border bg-cs-accent-2-dim px-4 py-2 text-sm font-medium text-cs-accent-2 transition-opacity hover:opacity-90"
+          className="shrink-0 rounded-xl border-2 border-cs-accent bg-cs-surface px-4 py-2 text-sm font-medium text-cs-accent transition-colors hover:bg-cs-accent-dim"
         >
           Expand to full screen
         </button>

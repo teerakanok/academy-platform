@@ -79,7 +79,7 @@ export function WaitlistForm({ consentSummary }: { consentSummary: string }) {
         <button
           type="submit"
           disabled={status === 'submitting'}
-          className="rounded-xl bg-cs-accent px-6 py-3 font-semibold text-cs-on-accent transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="rounded-xl bg-cs-accent-fill px-6 py-3 font-semibold text-cs-on-accent transition-opacity hover:opacity-90 disabled:opacity-50"
         >
           {status === 'submitting' ? 'Saving…' : 'Notify me'}
         </button>

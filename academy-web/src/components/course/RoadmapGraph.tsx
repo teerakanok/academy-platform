@@ -20,57 +20,39 @@ import {
 // วาดเส้นด้วย SVG ชั้นล่าง แล้ววาง node เป็น HTML ทับ — ได้ข้อความตัดบรรทัด,
 // โฟกัสคีย์บอร์ด และลิงก์จริงฟรี โดยไม่ต้องดิ้นรนกับ text ใน SVG
 
-const STATUS_META: Record<
-  NodeStatus,
-  { label: string; icon: string; ring: string; fill: string; text: string; border: string }
-> = {
+// Done กับ Proven ใช้ "สีเดียวกันคนละน้ำหนัก" โดยตั้งใจ — ทั้งคู่แปลว่าปลอดภัยแล้ว
+// ต่างกันแค่เส้นทางที่มา (เรียนจบ vs พิสูจน์ผ่าน) การใช้คนละสีจะสื่อผิดว่าเป็นคนละพวก
+// และไม่มีสีไหนแยกจากฟ้าได้จริงในสายตา deuteran อยู่ดี — ตัวแยกจริงคือไอคอน + ป้าย
+const STATUS_META: Record<NodeStatus, { label: string; icon: string; marker: string }> = {
   completed: {
     label: 'Done',
     icon: '✓',
-    ring: 'ring-cs-accent',
-    fill: 'bg-cs-accent',
-    text: 'text-cs-on-accent',
-    border: 'border-cs-accent',
+    marker: 'bg-cs-accent-fill text-cs-on-accent border-cs-accent-fill',
   },
   'tested-out': {
     label: 'Proven',
     icon: '★',
-    ring: 'ring-cs-accent-2',
-    fill: 'bg-cs-accent-2',
-    text: 'text-white',
-    border: 'border-cs-accent-2',
+    marker: 'bg-cs-surface text-cs-accent border-cs-accent ring-4 ring-cs-accent-dim',
   },
   skipped: {
     label: 'Skipped',
     icon: '↷',
-    ring: 'ring-cs-border-2',
-    fill: 'bg-cs-surface-2',
-    text: 'text-cs-muted',
-    border: 'border-cs-border-2 border-dashed',
+    marker: 'bg-cs-surface-2 text-cs-muted border-cs-border-2 border-dashed',
   },
   'in-progress': {
     label: 'In progress',
     icon: '◐',
-    ring: 'ring-cs-accent',
-    fill: 'bg-cs-accent-dim',
-    text: 'text-cs-accent',
-    border: 'border-cs-accent',
+    marker: 'bg-cs-accent-dim text-cs-accent border-cs-accent',
   },
   available: {
     label: 'Ready',
     icon: '›',
-    ring: 'ring-transparent',
-    fill: 'bg-cs-surface',
-    text: 'text-cs-text',
-    border: 'border-cs-border-2',
+    marker: 'bg-cs-surface text-cs-text border-cs-border-2',
   },
   locked: {
     label: 'Locked',
     icon: '🔒',
-    ring: 'ring-transparent',
-    fill: 'bg-cs-surface-2',
-    text: 'text-cs-faint',
-    border: 'border-cs-border',
+    marker: 'bg-cs-surface-2 text-cs-faint border-cs-border',
   },
 }
 
@@ -136,7 +118,7 @@ export function RoadmapGraph({
             const marker = (
               <>
                 <span
-                  className={`flex h-[52px] w-[52px] items-center justify-center border-2 text-lg font-semibold shadow-card transition-transform duration-200 group-hover:scale-105 ${meta.fill} ${meta.text} ${meta.border} ${isCapstone ? '' : 'rounded-full'}`}
+                  className={`flex h-[52px] w-[52px] items-center justify-center border-2 text-lg font-semibold shadow-card transition-transform duration-200 group-hover:scale-105 ${meta.marker} ${isCapstone ? '' : 'rounded-full'}`}
                   style={isCapstone ? { clipPath: HEX_CLIP, borderRadius: 6 } : undefined}
                   aria-hidden="true"
                 >
@@ -194,8 +176,12 @@ export function RoadmapGraph({
 
       <figcaption className="mt-6">
         <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-cs-muted">
-          <LegendItem swatch="bg-cs-accent" label="Done — you worked through it" icon="✓" />
-          <LegendItem swatch="bg-cs-accent-2" label="Proven — you tested out of it" icon="★" />
+          <LegendItem swatch="bg-cs-accent-fill text-cs-on-accent" label="Done — you worked through it" icon="✓" />
+          <LegendItem
+            swatch="bg-cs-surface border-2 border-cs-accent text-cs-accent"
+            label="Proven — you tested out of it"
+            icon="★"
+          />
           <LegendItem swatch="bg-cs-surface-2 border border-dashed border-cs-border-2" label="Skipped — not proven yet" icon="↷" />
           <LegendItem swatch="bg-cs-surface border border-cs-border-2" label="Ready to start" icon="›" />
           <li className="flex items-center gap-1.5">

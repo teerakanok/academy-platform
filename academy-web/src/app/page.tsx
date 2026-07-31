@@ -23,7 +23,7 @@ export default function HomePage() {
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
             href="/dashboard"
-            className="rounded-xl bg-cs-accent px-6 py-3 text-sm font-semibold text-cs-on-accent transition-opacity hover:opacity-90"
+            className="rounded-xl bg-cs-accent-fill px-6 py-3 text-sm font-semibold text-cs-on-accent transition-opacity hover:opacity-90"
           >
             Browse courses
           </Link>

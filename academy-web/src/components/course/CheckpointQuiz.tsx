@@ -148,7 +148,7 @@ export function CheckpointQuiz({
             onClick={grade}
             disabled={!allAnswered}
             data-testid="checkpoint-submit"
-            className="rounded-xl bg-cs-accent px-5 py-2.5 text-sm font-semibold text-cs-on-accent transition-opacity hover:opacity-90 disabled:opacity-40"
+            className="rounded-xl bg-cs-accent-fill px-5 py-2.5 text-sm font-semibold text-cs-on-accent transition-opacity hover:opacity-90 disabled:opacity-40"
           >
             Check my answers
           </button>
@@ -162,7 +162,7 @@ export function CheckpointQuiz({
                 type="button"
                 onClick={() => onPassed(results)}
                 data-testid="checkpoint-continue"
-                className="rounded-xl bg-cs-accent px-5 py-2.5 text-sm font-semibold text-cs-on-accent transition-opacity hover:opacity-90"
+                className="rounded-xl bg-cs-accent-fill px-5 py-2.5 text-sm font-semibold text-cs-on-accent transition-opacity hover:opacity-90"
               >
                 {requireAllCorrect ? 'Mark as proven' : 'Mark lesson done'}
               </button>

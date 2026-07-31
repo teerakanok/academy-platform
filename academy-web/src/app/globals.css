@@ -12,71 +12,78 @@
  *
  * ทำไมค่าถึงต่างจากเว็บหลัก: เว็บหลักคือบริษัท security (เข้ม/คม/terminal)
  * ส่วน Academy คือห้องเรียน — งานของมันคือลดกำแพงความกลัว ไม่ใช่สร้างความน่าเกรงขาม
- *   · พื้นหลังขาวอมมิ้นต์ (ไม่ใช่ขาวอมฟ้าแบบเว็บหลัก, ไม่ใช่ครีม) = สดและสงบ
+ *   · พื้นหลังขาวอมฟ้าอ่อน เข้าชุดกับสีประจำตัวของ Academy
  *   · light เป็นค่าตั้งต้น, dark สลับได้
- *   · teal ยังเป็นสายเลือดเดิม + เพิ่ม indigo เป็นสีที่สองสำหรับ "ความก้าวหน้า/ทักษะ"
  *
- * สีของ data viz ผ่านการ validate ด้วยสคริปต์จริง (ไม่ได้กะเอา):
- *   light  teal #00785C + indigo #5B63D3 → ผ่านครบทุกข้อ
- *   dark   teal #16A98A + indigo #7F88EC → ผ่านครบทุกข้อ
- *   (lightness band, chroma floor, CVD separation, normal-vision floor, contrast)
+ * สีประจำ Academy คือ #38BDF8 — เป็นค่าที่มีอยู่แล้วใน productBrand ของเว็บหลัก
+ * (cyberskills-web/src/lib/content-v2.js) และในโลโก้ logo-academy.svg ไม่ใช่สีที่
+ * คิดขึ้นใหม่ ใช้โมเดลเดียวกับเว็บหลัก: สีสดสำหรับพื้น (ตัวอักษรเป็น ink เข้ม)
+ * และเฉดเข้มกว่าสำหรับตัวอักษร/เส้น เพื่อให้ผ่าน WCAG
+ *
+ * ทำไมไม่มี "สีที่สอง": สถานะ Done กับ Proven คือผลลัพธ์เดียวกัน (ปลอดภัยแล้ว)
+ * ที่มาคนละทาง จึงควรเป็นสีเดียวกันคนละน้ำหนัก — และการทดสอบยืนยันว่าไม่มีสีไหน
+ * แยกจากฟ้าได้จริงในสายตา deuteran (ม่วง/ชมพูตก ΔE 0.3–5.2, เขียวอมฟ้าตกเกณฑ์
+ * ตาปกติ) ตัวแยกจริงคือรูปทรง + ไอคอน + ป้ายข้อความ ซึ่งมีครบอยู่แล้ว
  */
 
 :root {
   /* ---- LIGHT = ค่าตั้งต้นของ Academy ---- */
-  --cs-bg: 244 247 246; /* #F4F7F6 ขาวอมมิ้นต์ */
+  --cs-bg: 243 247 250; /* #F3F7FA ขาวอมฟ้า เข้าชุดกับสีประจำ Academy */
   --cs-surface: 255 255 255;
-  --cs-surface-2: 236 242 240;
-  --cs-border: 214 224 221;
-  --cs-border-2: 178 196 191;
-  --cs-text: 18 33 30; /* เขียวเกือบดำ นุ่มกว่าดำสนิท */
-  --cs-primary: 18 33 30;
-  --cs-body: 45 63 58;
-  --cs-muted: 92 112 106;
-  --cs-faint: 107 122 118;
+  --cs-surface-2: 235 241 246;
+  --cs-border: 212 222 232;
+  --cs-border-2: 176 192 208;
+  --cs-text: 14 28 40; /* น้ำเงินเกือบดำ นุ่มกว่าดำสนิท */
+  --cs-primary: 14 28 40;
+  --cs-body: 42 60 76;
+  --cs-muted: 88 106 124;
+  --cs-faint: 104 120 136;
 
-  /* #00785C — ต้องผ่านสองเกณฑ์พร้อมกัน: WCAG (เป็นสีตัวหนังสือ) และ dataviz
-     (เป็นสีของเส้น/จุดในกราฟ) ค่าแรกที่เลือก #00806A ตกเกณฑ์ WCAG บนพื้น
-     surface-2 (4.31) ส่วน #00755F ที่เข้มพอกลับตกเกณฑ์ chroma ของ dataviz —
-     ค่านี้ผ่านทั้งคู่: contrast surface-2 4.82 / white 5.47, dataviz ผ่านครบ */
-  --cs-accent: 0 120 92;
-  --cs-on-accent: 255 255 255;
-  --cs-accent-dim: rgba(0, 120, 92, 0.1);
-  --cs-accent-border: rgba(0, 120, 92, 0.28);
+  /* #0A6C9E = textLight ของ Academy ตาม productBrand — ใช้กับตัวอักษร ขอบ และ
+     เส้น/จุดในกราฟ (white 5.75 · surface-2 5.07 · bg 5.34 ผ่าน AA ทุกพื้น) */
+  --cs-accent: 10 108 158;
+  /* #38BDF8 = สีสดประจำ Academy — ใช้เป็นพื้นเท่านั้น คู่กับ ink เข้ม (8.82) */
+  --cs-accent-fill: 56 189 248;
+  --cs-on-accent: 6 18 28;
+  --cs-accent-dim: rgba(56, 189, 248, 0.12);
+  --cs-accent-border: rgba(10, 108, 158, 0.28);
 
-  --cs-accent-2: 91 99 211; /* #5B63D3 — ความก้าวหน้า/ทักษะ/พิสูจน์แล้ว */
-  --cs-accent-2-dim: rgba(91, 99, 211, 0.1);
-  --cs-accent-2-border: rgba(91, 99, 211, 0.28);
+  /* น้ำหนักที่สองของสีเดียวกัน ใช้กับสถานะ "พิสูจน์แล้ว" และของที่ต้องลงมือ */
+  --cs-accent-2: 10 108 158;
+  --cs-accent-2-dim: rgba(10, 108, 158, 0.08);
+  --cs-accent-2-border: rgba(10, 108, 158, 0.4);
 
-  /* #A6480A — เหตุผลเดียวกับ teal (เดิม 4.43 บน surface-2) ค่านี้ได้ 5.21 */
+  /* #A6480A — สีเตือน ต้องผ่าน AA บน surface-2 เช่นกัน (5.21) */
   --cs-amber: 166 72 10;
   --cs-amber-dim: rgba(166, 72, 10, 0.1);
   --cs-amber-border: rgba(166, 72, 10, 0.3);
 
-  --cs-shadow-card: 0 1px 3px rgba(16, 40, 34, 0.06), 0 8px 24px -12px rgba(16, 40, 34, 0.12);
-  --cs-shadow-lift: 0 2px 6px rgba(16, 40, 34, 0.08), 0 16px 36px -16px rgba(16, 40, 34, 0.18);
+  --cs-shadow-card: 0 1px 3px rgba(12, 32, 48, 0.06), 0 8px 24px -12px rgba(12, 32, 48, 0.12);
+  --cs-shadow-lift: 0 2px 6px rgba(12, 32, 48, 0.08), 0 16px 36px -16px rgba(12, 32, 48, 0.18);
 }
 
 :root[data-theme='dark'] {
-  --cs-bg: 10 18 17;
-  --cs-surface: 17 28 26;
-  --cs-surface-2: 26 41 38;
-  --cs-border: 36 56 52;
-  --cs-border-2: 56 82 76;
-  --cs-text: 236 245 242;
-  --cs-primary: 236 245 242;
-  --cs-body: 200 216 211;
-  --cs-muted: 141 162 156;
-  --cs-faint: 122 142 137;
+  --cs-bg: 9 16 22;
+  --cs-surface: 16 26 35;
+  --cs-surface-2: 25 38 50;
+  --cs-border: 35 52 67;
+  --cs-border-2: 54 78 98;
+  --cs-text: 235 243 250;
+  --cs-primary: 235 243 250;
+  --cs-body: 199 213 226;
+  --cs-muted: 140 158 176;
+  --cs-faint: 121 139 157;
 
-  --cs-accent: 22 169 138; /* #16A98A */
-  --cs-on-accent: 6 16 14;
-  --cs-accent-dim: rgba(22, 169, 138, 0.14);
-  --cs-accent-border: rgba(22, 169, 138, 0.34);
+  /* dark: ฟ้าสดอ่านเป็นตัวอักษรได้สบาย (bg 8.85 · surface-2 7.06) */
+  --cs-accent: 56 189 248;
+  --cs-accent-fill: 56 189 248;
+  --cs-on-accent: 6 18 28;
+  --cs-accent-dim: rgba(56, 189, 248, 0.16);
+  --cs-accent-border: rgba(56, 189, 248, 0.34);
 
-  --cs-accent-2: 127 136 236; /* #7F88EC */
-  --cs-accent-2-dim: rgba(127, 136, 236, 0.14);
-  --cs-accent-2-border: rgba(127, 136, 236, 0.34);
+  --cs-accent-2: 125 211 252; /* #7DD3FC = hover ของ Academy */
+  --cs-accent-2-dim: rgba(125, 211, 252, 0.12);
+  --cs-accent-2-border: rgba(125, 211, 252, 0.42);
 
   --cs-amber: 245 165 74;
   --cs-amber-dim: rgba(245, 165, 74, 0.14);
@@ -99,7 +106,7 @@ body {
   color: rgb(var(--cs-text));
 }
 
-/* การ์ดสีขาวบนพื้นขาวอมมิ้นต์ต้องมีเงาบางๆ ถึงจะลอยขึ้นมา */
+/* การ์ดสีขาวบนพื้นขาวอมฟ้าต้องมีเงาบางๆ ถึงจะลอยขึ้นมา */
 .card {
   @apply rounded-2xl border border-cs-border bg-cs-surface;
   box-shadow: var(--cs-shadow-card);

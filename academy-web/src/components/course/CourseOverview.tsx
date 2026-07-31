@@ -64,7 +64,7 @@ export function CourseOverview({
                 data-testid={`lang-${code}`}
                 className={`rounded-lg px-2.5 py-1 font-mono uppercase transition-colors ${
                   code === locale
-                    ? 'bg-cs-accent text-cs-on-accent'
+                    ? 'bg-cs-accent-fill text-cs-on-accent'
                     : 'border border-cs-border text-cs-muted hover:border-cs-accent hover:text-cs-accent'
                 }`}
               >
@@ -93,7 +93,7 @@ export function CourseOverview({
             <Link
               href={`/courses/${structure.slug}/lessons/${next.id}`}
               data-testid="start-or-continue"
-              className="rounded-xl bg-cs-accent px-6 py-3 text-sm font-semibold text-cs-on-accent transition-opacity hover:opacity-90"
+              className="rounded-xl bg-cs-accent-fill px-6 py-3 text-sm font-semibold text-cs-on-accent transition-opacity hover:opacity-90"
             >
               {summary.completed + summary.testedOut + summary.skipped > 0 ? 'Continue' : 'Start the first lesson'}
             </Link>

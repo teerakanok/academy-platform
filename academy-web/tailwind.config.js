@@ -18,6 +18,7 @@ const themeAware = {
   'cs-muted': 'rgb(var(--cs-muted) / <alpha-value>)',
   'cs-faint': 'rgb(var(--cs-faint) / <alpha-value>)',
   'cs-accent': 'rgb(var(--cs-accent) / <alpha-value>)',
+  'cs-accent-fill': 'rgb(var(--cs-accent-fill) / <alpha-value>)',
   'cs-on-accent': 'rgb(var(--cs-on-accent) / <alpha-value>)',
   'cs-accent-2': 'rgb(var(--cs-accent-2) / <alpha-value>)',
   'cs-amber': 'rgb(var(--cs-amber) / <alpha-value>)',

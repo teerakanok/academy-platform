@@ -140,7 +140,7 @@ export function LessonView({
             type="button"
             onClick={() => setMode('test-out')}
             data-testid="test-out"
-            className="rounded-xl border border-cs-accent-2-border bg-cs-accent-2-dim px-4 py-2 text-sm font-medium text-cs-accent-2 transition-colors hover:opacity-90"
+            className="rounded-xl border-2 border-cs-accent bg-cs-surface px-4 py-2 text-sm font-medium text-cs-accent transition-colors hover:bg-cs-accent-dim"
           >
             Prove it and move on
           </button>
@@ -238,7 +238,7 @@ export function LessonView({
                 type="button"
                 onClick={goNext}
                 data-testid="next-lesson"
-                className="rounded-xl bg-cs-accent px-5 py-2 text-sm font-semibold text-cs-on-accent transition-opacity hover:opacity-90"
+                className="rounded-xl bg-cs-accent-fill px-5 py-2 text-sm font-semibold text-cs-on-accent transition-opacity hover:opacity-90"
               >
                 Next: {nodeTitles[upcoming.id] ?? upcoming.id}
               </button>

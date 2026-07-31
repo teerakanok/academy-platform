@@ -88,7 +88,7 @@ export function PracticePlayer({ bank }: { bank: ModuleBank }) {
             type="button"
             data-testid="start-practice-button"
             onClick={start}
-            className="rounded-lg bg-cs-accent px-6 py-2.5 text-sm font-semibold text-cs-bg hover:opacity-90"
+            className="rounded-lg bg-cs-accent-fill px-6 py-2.5 text-sm font-semibold text-cs-on-accent hover:opacity-90"
           >
             เริ่มฝึก
           </button>
@@ -158,7 +158,7 @@ export function PracticePlayer({ bank }: { bank: ModuleBank }) {
             data-testid="check-answer-button"
             disabled={!answeredCurrent}
             onClick={() => setRevealed(true)}
-            className="rounded-lg bg-cs-accent px-5 py-2 text-sm font-semibold text-cs-bg hover:opacity-90 disabled:opacity-30"
+            className="rounded-lg bg-cs-accent-fill px-5 py-2 text-sm font-semibold text-cs-on-accent hover:opacity-90 disabled:opacity-30"
           >
             ตรวจคำตอบ
           </button>
@@ -171,7 +171,7 @@ export function PracticePlayer({ bank }: { bank: ModuleBank }) {
               setRevealed(false)
               setCursor((c) => c + 1)
             }}
-            className="rounded-lg bg-cs-accent px-5 py-2 text-sm font-semibold text-cs-bg hover:opacity-90 disabled:opacity-30"
+            className="rounded-lg bg-cs-accent-fill px-5 py-2 text-sm font-semibold text-cs-on-accent hover:opacity-90 disabled:opacity-30"
           >
             ข้อถัดไป →
           </button>

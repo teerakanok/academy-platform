@@ -86,7 +86,7 @@ export function CourseDashboard({ courses }: { courses: DashboardCourse[] }) {
           </p>
           <Link
             href={`/courses/${resume.course.structure.slug}/lessons/${resumeNode.id}`}
-            className="mt-4 inline-flex rounded-xl bg-cs-accent px-5 py-2.5 text-sm font-semibold text-cs-on-accent transition-opacity hover:opacity-90"
+            className="mt-4 inline-flex rounded-xl bg-cs-accent-fill px-5 py-2.5 text-sm font-semibold text-cs-on-accent transition-opacity hover:opacity-90"
           >
             Continue lesson
           </Link>
@@ -135,7 +135,7 @@ export function CourseDashboard({ courses }: { courses: DashboardCourse[] }) {
                       aria-label={`${course.title} progress`}
                     >
                       <div
-                        className="h-full rounded-full bg-cs-accent transition-[width] duration-500"
+                        className="h-full rounded-full bg-cs-accent-fill transition-[width] duration-500"
                         style={{ width: `${summary.provenPercent}%` }}
                       />
                     </div>

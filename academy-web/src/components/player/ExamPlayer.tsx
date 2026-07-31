@@ -96,7 +96,7 @@ export function ExamPlayer({ test }: { test: FullLengthTest }) {
             type="button"
             data-testid="start-exam-button"
             onClick={start}
-            className="rounded-lg bg-cs-accent px-6 py-2.5 text-sm font-semibold text-cs-bg hover:opacity-90"
+            className="rounded-lg bg-cs-accent-fill px-6 py-2.5 text-sm font-semibold text-cs-on-accent hover:opacity-90"
           >
             เริ่มทำแบบทดสอบ
           </button>
@@ -148,7 +148,7 @@ export function ExamPlayer({ test }: { test: FullLengthTest }) {
             type="button"
             data-testid="submit-exam-button"
             onClick={submit}
-            className="rounded-lg bg-cs-accent px-4 py-2 text-sm font-semibold text-cs-bg hover:opacity-90"
+            className="rounded-lg bg-cs-accent-fill px-4 py-2 text-sm font-semibold text-cs-on-accent hover:opacity-90"
           >
             ส่งคำตอบ
           </button>
@@ -171,7 +171,7 @@ export function ExamPlayer({ test }: { test: FullLengthTest }) {
               aria-current={i === index ? 'step' : undefined}
               className={`h-8 w-8 rounded font-mono text-xs transition-colors ${
                 i === index
-                  ? 'bg-cs-accent text-cs-bg font-bold'
+                  ? 'bg-cs-accent-fill text-cs-on-accent font-bold'
                   : answered
                     ? 'bg-cs-accent-dim text-cs-accent border border-cs-accent-border'
                     : 'border border-cs-border text-cs-muted hover:border-cs-border-2'

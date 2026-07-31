@@ -204,7 +204,7 @@ export function InteractiveVideo({
                     onClick={submitAnswer}
                     disabled={!selected}
                     data-testid="video-quiz-submit"
-                    className="rounded-xl bg-cs-accent px-5 py-2 text-sm font-semibold text-cs-on-accent transition-opacity hover:opacity-90 disabled:opacity-40"
+                    className="rounded-xl bg-cs-accent-fill px-5 py-2 text-sm font-semibold text-cs-on-accent transition-opacity hover:opacity-90 disabled:opacity-40"
                   >
                     Check answer
                   </button>
@@ -213,7 +213,7 @@ export function InteractiveVideo({
                     type="button"
                     onClick={continueAfterCue}
                     data-testid="video-quiz-continue"
-                    className="rounded-xl bg-cs-accent px-5 py-2 text-sm font-semibold text-cs-on-accent transition-opacity hover:opacity-90"
+                    className="rounded-xl bg-cs-accent-fill px-5 py-2 text-sm font-semibold text-cs-on-accent transition-opacity hover:opacity-90"
                   >
                     Keep watching
                   </button>

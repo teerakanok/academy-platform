@@ -135,7 +135,7 @@ export function ResultsScreen({
           type="button"
           data-testid="review-wrong-button"
           onClick={() => setReviewing(true)}
-          className="rounded-lg bg-cs-accent px-5 py-2.5 text-sm font-semibold text-cs-bg hover:opacity-90"
+          className="rounded-lg bg-cs-accent-fill px-5 py-2.5 text-sm font-semibold text-cs-on-accent hover:opacity-90"
         >
           ทบทวนข้อที่ผิด ({wrongMcqs.length + pbqsWithWrongFields.length})
         </button>
