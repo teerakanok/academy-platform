@@ -1,0 +1,25 @@
+/* Security: ไม่มี external resource — fonts ผ่าน next/font เท่านั้น */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * CyberSkills Academy — dark terminal theme (cs- tokens จาก @cyberskills/tokens)
+ * ค่าสีมาจาก tailwind preset โดยตรง (hex) — ยังไม่มี theme toggle ใน scope นี้
+ *
+ * ข้อห้าม brand: ห้ามใส่ letter-spacing กับข้อความภาษาไทย (อ่านยาก/สระลอย)
+ * — utility ที่มี tracking ใช้ได้เฉพาะข้อความละติน/ตัวเลขเท่านั้น
+ */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-cs-bg text-cs-body font-body antialiased;
+}
+
+::selection {
+  @apply bg-cs-accent/30 text-cs-text;
+}
