@@ -6,6 +6,8 @@
 # golden rule — secrets และ generated
 .env
 .env.*
+# .env.example เป็น template ไม่มี secret — ต้อง track (แผน one-shot §4-M1 step 7)
+!.env.example
 *.key
 *.pem
 node_modules/

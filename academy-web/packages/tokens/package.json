@@ -1,0 +1,7 @@
+{
+  "name": "@cyberskills/tokens",
+  "version": "1.0.0",
+  "description": "CYBERSKILLS Design System tokens — foundation colors + per-product accents",
+  "main": "index.js",
+  "private": true
+}
