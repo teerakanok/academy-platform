@@ -5,6 +5,35 @@
 
 ---
 
+## 2026-07-31 — Lane A ปิดสมบูรณ์: founder เคาะ 3 disputes + แก้ key ใน Crucible ครบ
+
+**Outcome:** Lane A (critical path ของ Phase 0) จบทั้งเส้นในวันเดียว: audit →
+founder decision brief → founder เคาะ ("แก้ตามแนะนำทั้งหมด") → แก้ answer key
+3 ข้อใน Crucible พร้อม propagate ทุก artifact → **hard prerequisite ของ publish
+gate ปลดแล้ว** (เหลือ optional codex confirm + push Crucible)
+
+**What changed / decided (founder, ลายลักษณ์อักษร ใน session 2026-07-31):**
+- PBQ-010 `recoveryOrder`: Preserve → Contain → **Fix root cause → Validate
+  clean restore** (eradication ก่อน recovery ตาม NIST SP 800-61)
+- M4-082: correct → **A,C,D,E** (เพิ่ม "Map fields")
+- M4-067: correct → **A,B,C,E** (เพิ่ม "Sandbox process")
+
+**Evidence:**
+- Crucible commit `640c8613` (26 ไฟล์): bank JSON/MD, v2-build rewritten +
+  v2-source (re-merge), SV2 regenerate (validator pass 199 files), SV1
+  regenerate, full-length-02, practice-suite, v1 generator (กัน regression),
+  Crucible completed_log บันทึก decision
+- Verification script 29/29 PASS; adversarial review lane อิสระ:
+  CORRECT-AND-COMPLETE (scope ตรง, ไม่มีข้ออื่นถูกแตะ, ไม่เหลือ stale key ใน
+  deliverable); `git diff --check` ผ่าน
+
+**Residual risk:**
+- Cross-model (codex) confirm ยังไม่ได้รัน — usage limit ถึง 5 ส.ค. 2026;
+  นัดรัน 1 pass ที่ 3 ข้อนี้ก่อน public distribution
+- Crucible commit ยังไม่ push (รอ authorization ตามปกติ)
+- `v2-build/work/` คง snapshot ก่อนแก้ไว้โดยตั้งใจ (ประวัติ pipeline) — ไม่ใช่
+  deliverable
+
 ## 2026-07-31 — Lane A: CAS-005 answer-key dispute audit เสร็จ (founder decision brief พร้อมเคาะ)
 
 **Outcome:** ปิดคำถาม "11 founder-level disputes เหลือกี่ข้อจริง" ด้วยการ audit
