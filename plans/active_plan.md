@@ -20,8 +20,10 @@ Stand up **CyberSkills Academy** (cert exam-prep courses + sold mock tests + tre
 >   (commit `640c8613`; verify 29/29 + adversarial review CORRECT-AND-COMPLETE)
 >   — เหลือ optional: codex confirm pass หลัง 5 ส.ค. ก่อน public distribution
 >   (ดูรายละเอียดใน item 1)
-> - **Lane B (รอ founder input):** channel inventory — director เตรียมรายการ
->   channel ที่มีจริงให้ founder เลือก/เติม
+> - **Lane B: inventory เสร็จ 2026-07-31 — รอ founder เคาะ channel** —
+>   decision brief 8 ช่อง (reach/effort/fit/ข้อจำกัด + guardrails) ที่
+>   `reports/reviews/channel-inventory-2026-07-31.md`; ผ่าน independent review
+>   (PASS-WITH-FIXES, แก้ครบ); แนะนำเริ่ม corporate probe (ทำได้ก่อน Lane C)
 > - **Lane C (build):** Phase 0 slice บน stack จริง (placement-test framing +
 >   free sample + lead capture ใช้ email เป็น identity key + PDPA consent) —
 >   scaffold เริ่มได้เลย แต่ **publish ถูก gate ด้วย Lane A**
@@ -43,7 +45,12 @@ Use only assets that already exist + free/owned infra. No paid platform, no larg
   - **เงื่อนไขก่อน public distribution (ยังไม่ block งานอื่น):** codex confirm
     pass ที่ 3 ข้อนี้หนึ่งรอบ (codex usage limit ถึง 5 ส.ค. 2026) + Crucible
     ยัง push ไม่ได้ในรอบนี้ (ต้องรอ authorization push ตามปกติ)
-- [ ] **Pick a distribution channel** (the real constraint). Inventory what exists: founder/academic network, existing client/list, relevant communities, website traffic. Without a channel, expect ~0 signal.
+- [ ] **Pick a distribution channel** (the real constraint) — **inventory เสร็จ
+  2026-07-31 รอ founder เคาะ**: brief 8 ช่องที่
+  `reports/reviews/channel-inventory-2026-07-31.md` (corporate probe 4+1 org /
+  FB communities ~25–30k / company social page ต้องตั้งใหม่ / instructor pool /
+  สกมช / dev communities / events); ข้อค้นพบสำคัญ: เว็บไม่มี analytics —
+  traffic วัดไม่ได้จนกว่าจะติดตัว cookieless. Without a channel, expect ~0 signal.
 - [ ] **Publish a free sample** (e.g. ~50 questions, spread across domains) on existing infra at ~$0 — static hosting or a page on the current website. Reskin to the cs- dark theme.
 - [ ] **Lead capture at ~$0** — capture email (+ one qualifying field: target exam date) at the results screen, value-first (let them finish + see explanations first), instant unlock (no "check your email" delay), PDPA consent checkbox. Store on owned/free infra (self-hosted Supabase or a free form).
 - [ ] **Auto-capture behavioral signals** (no extra friction): completion, score, weakest domain, referrer/UTM — these are the honest signals.

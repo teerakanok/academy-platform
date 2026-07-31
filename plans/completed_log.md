@@ -5,6 +5,38 @@
 
 ---
 
+## 2026-07-31 — Lane B: channel inventory brief เสร็จ (รอ founder เคาะ channel)
+
+**Outcome:** inventory ช่องทาง distribution จาก assets ที่มีจริงครบ 8 ช่อง พร้อม
+decision brief ให้ founder เคาะได้ทีละช่องโดยไม่ต้องหาข้อมูลเอง —
+`reports/reviews/channel-inventory-2026-07-31.md` (read-only ทั้ง lane:
+ไม่มีการส่ง email/โพสต์/ติดต่อภายนอกจริง)
+
+**What changed / found:**
+- ช่องที่แนะนำเริ่มก่อน: **corporate probe** กับ client เดิม role=owner (KTB,
+  Chowbright, ARV, Humanica) + Angler pilot client (รวม 5 org) — ทำได้ทันที
+  ไม่ต้องรอ Lane C; IIDA/Trainocate = instructor-only ผ่าน MUIC ไม่ใช่ช่องของเรา
+- B2C: FB communities cybersec ไทยรวม ~25–30k follower (Thai Cy Sec ~15.5k,
+  CompTIA TH ~8k, Cyber Community TH ~3.9k, 2600 TH) — รอ Lane C + CAS-005 gate
+- **ข้อค้นพบ:** เว็บไม่มี analytics ติดตั้ง (traffic = วัดไม่ได้; หน้า privacy
+  ห้าม third-party tracking → ต้องเลือกตัว cookieless) และไม่พบ company social
+  page — ต้องตั้งใหม่ก่อน campaign คอร์สฟรีตัวแรก
+- Guardrails ที่คุมทุกช่องถูกบันทึกใน brief: university-IP (company voice
+  เท่านั้น), MUIC ≠ CYBERSKILLS, CAS-005 publish gate, PDPA (Angler target
+  lists ใช้ไม่ได้เด็ดขาด)
+
+**Evidence:** brief ผ่าน independent review lane (managed reviewer read-only —
+codex ติด usage limit ถึง 5 ส.ค.): **PASS-WITH-FIXES, accuracy 15/15 ข้อ
+ตรวจถูกทั้งหมด**, SHOULD-FIX 2 จุด (source-URL mapping, scope ICCS4xx) แก้ครบ
+ในรอบเดียว; sources ต่อ claim ระบุไว้ท้าย brief
+
+**Residual risk:**
+- ตัวเลข reach ของ dev communities (BorntoDev/สมาคมโปรแกรมเมอร์ไทย) ยังไม่
+  verified — ต้องนับจริงถ้า founder เลือกช่องนั้น
+- Instructor consent ที่มี = ลง profile เท่านั้น; การขอช่วยแชร์ต้องขอรายคน
+- การยิง B2C ทุกช่องยังถูก gate ด้วย Lane C (มีหน้าเว็บให้ชี้) + CAS-005
+  codex confirm + push authorization
+
 ## 2026-07-31 — Free-tier strategy ขยาย: entry certs ฟรีเต็มรูปเป็นเครื่องจักรโฆษณา
 
 **Outcome:** founder กำหนดทิศทาง free tier ใหม่ (กว้างกว่า "fundamentals ฟรี"
