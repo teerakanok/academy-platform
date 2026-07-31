@@ -66,23 +66,22 @@ Use only assets that already exist + free/owned infra. No paid platform, no larg
 | ชั้น | นโยบาย |
 |---|---|
 | Fundamentals (เช่น basic Linux & bash) | **ฟรี — absorb cost เอง** (แบบมีเพดาน): funnel + prerequisite layer ใน path + เวทีโชว์ placement/skip; **ไม่ขายเป็น SKU เดี่ยว** (สู้ของฟรี THM/OverTheWire/freeCodeCamp ไม่ได้); lab ใช้แต้มฟรีรายเดือน (precedent: Skills Boost แจก 35 credits/เดือน); lab พื้นฐาน = container เบา ต้นทุนต่ำ |
-| Path / Premium / Cert course (เช่น AI Secure Coding, CISSP) | ซื้อขาดต่อ **edition**, access **การันตีขั้นต่ำ 2 ปี + auto-extend ฟรีตราบใดที่ edition ยังเป็นเวอร์ชันปัจจุบัน** (ล็อก 2026-07-31 — ดูเหตุผลด้านล่าง), update ย่อยฟรีภายใน term, โชว์วันที่ "อัปเดตล่าสุด" ชัดเจน |
+| Path / Premium / Cert course (เช่น AI Secure Coding, CISSP) | ซื้อขาดต่อ **edition**, access **3 ปีเต็ม — เลขเดียวทั้ง catalog** (ล็อก final 2026-07-31), update ย่อยฟรีภายใน term, โชว์วันที่ "อัปเดตล่าสุด" ชัดเจน |
 | หน่วยขายหลัก | **Path/Track** — fundamentals ที่เกี่ยวข้องรวมอยู่ข้างใน (access clock inherit จาก path ที่ซื้อ) |
 
 - **Edition clock:** course ผูก cert ใช้รอบของ cert vendor (~3 ปี); fundamentals/trend
   course ใช้ major-version ของเราเอง (ยกเครื่องใหญ่ = edition ใหม่; patch เล็ก = free update)
-- **ตัวเลข access — ล็อก 2026-07-31: "การันตีขั้นต่ำ 2 ปี" + auto-extend จนจบ edition**
-  - เหตุผลเลือก 2 ไม่ใช่ 3 (founder): **คำสัญญาที่ประกาศแล้วเป็นประตูทางเดียว** —
-    "2 ค่อยเพิ่ม 3 ได้ แต่ 3 ลดลง 2 รู้สึกแย่"; ช่วง demand ยัง unvalidated
-    ต้องเลือกคำสัญญาที่ถูกที่สุดที่เพียงพอ (validate-before-invest ใช้กับคำสัญญาด้วย)
-  - **Rider ปิด edge case:** ไม่ตัด access ตราบใดที่ edition นั้นยังเป็นเวอร์ชันปัจจุบัน
-    (auto-extend ฟรี) → คนซื้อต้น edition ได้ ~3 ปีโดยพฤตินัย, เคส "ซื้อซ้ำของเดิม
-    ทั้งที่เนื้อหายัง current" หายทั้งเคส; ทุกการต่ออายุ = email goodwill
-    ("เราขยาย access ให้คุณฟรี") ต้นทุนศูนย์
-  - **"เพิ่มเป็นการันตี 3 ปี" เก็บไว้เป็น goodwill lever ในอนาคต** (ratchet ขึ้นได้เสมอ
-    ห้าม ratchet ลง)
+- **ตัวเลข access — ล็อก final 2026-07-31: 3 ปีเต็ม เลขเดียวทั้ง catalog**
+  - เหตุผล (founder): **เอาให้ง่าย** — คำสัญญาเดียว ประโยคเดียว ไม่มีกติกาซ่อน;
+    3 ปีครอบหนึ่ง cert cycle เต็ม (~3 ปีทั้ง CompTIA/ISC2) → ไม่มีเคส "ซื้อซ้ำ
+    ของเดิมทั้งที่เนื้อหายัง current" โดยธรรมชาติ
   - เทียบ official (verified 2026-07-31): CompTIA CertMaster = 12 เดือนหลัง activate;
-    ISC2 self-paced = 90–180 วัน → การันตี 2 ปีของเรา = 2 เท่า CompTIA, 4–8 เท่า ISC2
+    ISC2 self-paced = 90–180 วัน → 3 ปีของเรา = 3 เท่า CompTIA, 6–12 เท่า ISC2
+  - ทางเลือกที่พิจารณาแล้วไม่เอา (บันทึกไว้ใน `completed_log.md`): "การันตี 2 ปี +
+    auto-extend จนจบ edition" — ปลอดภัยเชิง ratchet กว่า แต่ซับซ้อนกว่า; founder
+    เลือกความง่ายและยอมรับว่าเลข 3 ที่ประกาศแล้วจะลดทีหลังไม่ได้
+  - เคส edition อายุยาวกว่า 3 ปี (ถ้าเกิด): ต่ออายุให้ฟรีเป็น goodwill รายกรณี —
+    ไม่ต้องเป็นนโยบายประกาศ
 
 ### เศรษฐศาสตร์ lab: ระบบแต้ม (academy currency)
 
@@ -151,9 +150,9 @@ Use only assets that already exist + free/owned infra. No paid platform, no larg
 
 ### Open items ของโมเดลนี้ (รอ founder / รอ pilot)
 
-- [x] ~~ล็อกเลข access term สุดท้าย~~ — **ล็อกแล้ว 2026-07-31: การันตีขั้นต่ำ 2 ปี
-  เลขเดียวทั้ง catalog + auto-extend ฟรีจนจบ edition** (เหตุผล: ประตูทางเดียว —
-  เพิ่มทีหลังได้ ลดไม่ได้; ดูรายละเอียดในส่วนโมเดลราคา)
+- [x] ~~ล็อกเลข access term สุดท้าย~~ — **ล็อก final 2026-07-31: 3 ปีเต็ม
+  เลขเดียวทั้ง catalog** (เหตุผล: ความง่าย — คำสัญญาเดียวไม่มีกติกาซ่อน;
+  ดูรายละเอียดในส่วนโมเดลราคา)
 - [ ] ตั้งชื่อ academy currency
 - [ ] Calibrate ตัวเลขจริงจาก pilot ที่มีต้นทุนวัดจริง: แต้มต่อ lab, แต้มแถมต่อ course,
   ราคา top-up, floor %, free-upgrade window
