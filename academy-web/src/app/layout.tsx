@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Fraunces, Inter, JetBrains_Mono } from 'next/font/google'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -69,8 +70,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <header className="sticky top-0 z-40 border-b border-cs-border bg-cs-bg/85 backdrop-blur">
           <div className="mx-auto flex max-w-6xl items-center gap-6 px-6 py-3.5">
-            <Link href="/" className="font-display text-lg font-semibold tracking-tight text-cs-text">
-              CyberSkills <span className="text-cs-accent">Academy</span>
+            <Link href="/" className="flex items-center gap-2.5">
+              {/* โลโก้ canonical จาก cyberskills-web/public/redesign/logos — ห้ามวาดใหม่ */}
+              <Image
+                src="/brand/logo-academy.svg"
+                alt=""
+                width={30}
+                height={30}
+                priority
+                className="shrink-0"
+              />
+              <span className="font-display text-lg font-semibold tracking-tight text-cs-text">
+                CyberSkills <span className="text-cs-accent">Academy</span>
+              </span>
             </Link>
             <nav aria-label="Main" className="ml-auto flex items-center gap-1 text-sm">
               <Link

@@ -422,6 +422,17 @@ Package CYBERSKILLS Academy content as a **commercially licensed trainer starter
 
 ---
 
+## Backlog ที่ founder สั่งจดไว้ (ยังไม่ทำ — 2026-08-01)
+
+- [ ] **Progressive mode ของ realistic practice test (แบบ CISSP CAT):** เดินหน้า
+  อย่างเดียว ย้อนกลับไปแก้ข้อที่ตอบไปแล้วไม่ได้ — เป็นโหมดเพิ่มเติมจากโหมดปกติ
+  ที่มีอยู่ (ปัจจุบัน nav ข้ามไปมาได้อิสระ) ต้องคิดเรื่อง: กติกาการ flag/review
+  ที่ยังเหลือ, การบันทึก attempt ที่ย้อนไม่ได้, และการสื่อสารให้ผู้เรียนรู้ตัว
+  ก่อนกดยืนยันแต่ละข้อ
+- [ ] **UI ของหน้า practice test ต้องรื้อ** — founder ระบุ 2026-08-01 ว่า
+  "ค่อนไปทางไม่ชอบ" แต่ให้ทำตัวหลัก (course experience) ก่อน; ตอนรื้อให้ยึด
+  visual language ชุดใหม่ของ Academy ที่ทำไว้แล้ว
+
 ## Strategic backlog (speculative — NOT execution lane)
 - On-demand video course library (Coursera-style) — the larger build; validate via waitlist first.
 - Additional cert tracks beyond CAS-005.

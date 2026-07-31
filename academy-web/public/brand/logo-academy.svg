@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- CYBERSKILLS Academy — "Unbox the spark": open box, potential emerges -->
+  <g fill="none" stroke="#38BDF8" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M100 102 L144 122 L100 142 L56 122 Z" fill="rgba(56,189,248,0.06)"/>
+    <path d="M56 122 L56 158 L100 178 L100 142 Z" fill="rgba(56,189,248,0.10)"/>
+    <path d="M144 122 L144 158 L100 178 L100 142 Z" fill="rgba(56,189,248,0.18)"/>
+    <path d="M56 122 L100 102 L86 80 L42 100 Z" fill="rgba(56,189,248,0.05)"/>
+    <path d="M144 122 L100 102 L114 80 L158 100 Z" fill="rgba(56,189,248,0.05)"/>
+  </g>
+  <path d="M100 22 C102.5 44 105 49 124 52 C105 55 102.5 60 100 82 C97.5 60 95 55 76 52 C95 49 97.5 44 100 22 Z" fill="#38BDF8"/>
+  <circle cx="72" cy="38" r="3.2" fill="#38BDF8" opacity="0.7"/>
+  <circle cx="130" cy="40" r="2.6" fill="#38BDF8" opacity="0.55"/>
+</svg>
