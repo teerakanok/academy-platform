@@ -12,25 +12,65 @@ Stand up **CyberSkills Academy** (cert exam-prep courses + sold mock tests + tre
 
 ---
 
-## Current phase: **Phase 0 — Validate demand (cheap, reversible, ~$0 recurring)**
+## Current phase: **PLATFORM BUILD — founder เคาะ 2026-07-31 (Phase 0 = DEFERRED)**
 
-> **สถานะ: KICKED OFF 2026-07-31 (founder สั่งลุย)** — ลำดับงาน 3 lane:
-> - **Lane A (critical path): ✅ เสร็จสมบูรณ์ 2026-07-31** — audit →
->   founder เคาะ ("แก้ตามแนะนำทั้งหมด") → **แก้ key 3 ข้อใน Crucible แล้ว**
->   (commit `640c8613`; verify 29/29 + adversarial review CORRECT-AND-COMPLETE)
->   — เหลือ optional: codex confirm pass หลัง 5 ส.ค. ก่อน public distribution
->   (ดูรายละเอียดใน item 1)
-> - **Lane B: inventory เสร็จ 2026-07-31 — รอ founder เคาะ channel** —
->   decision brief 8 ช่อง (reach/effort/fit/ข้อจำกัด + guardrails) ที่
->   `reports/reviews/channel-inventory-2026-07-31.md`; ผ่าน independent review
->   (PASS-WITH-FIXES, แก้ครบ); แนะนำเริ่ม corporate probe (ทำได้ก่อน Lane C)
-> - **Lane C (build):** Phase 0 slice บน stack จริง (placement-test framing +
->   free sample + lead capture ใช้ email เป็น identity key + PDPA consent) —
->   scaffold เริ่มได้เลย แต่ **publish ถูก gate ด้วย Lane A**
+> **Founder decision (in-session, 2026-07-31):** ถือว่ามี demand — เริ่ม build
+> platform ทันที; **Phase 0 (validate demand) ไม่ทิ้ง แต่ defer**: จะกลับมาทำตอน
+> เคาะว่าจะทำ course อะไรบ้าง โดย **founder จะไป pitch + poll ผ่าน channels
+> ต่างๆ เอง** (ใช้ channel inventory จาก Lane B —
+> `reports/reviews/channel-inventory-2026-07-31.md` — เป็น input ของรอบนั้น);
+> ระหว่างนี้ build ทุกส่วนแบบ **content-agnostic** (player/engine เสพ Crucible
+> portable JSON — ไม่ผูก course ใด course หนึ่ง)
+>
+> **CAS-005 gate: ตัดออกจากแผน (founder 2026-07-31)** — ไม่ได้ focus course ใด
+> ตอนนี้; ตัว key fix เสร็จสมบูรณ์แล้ว (Crucible `640c8613`, verify 29/29) —
+> ถ้าวันหน้าจะเอา bank ออก public ค่อยตัดสินใจเรื่อง confirm pass ตอนนั้น
+>
+> **CPO note:** demand validation ต่อ course จะเกิดตอนรอบ pitch + poll ของ
+> founder → การ build ตอนนี้เสี่ยงต่ำลงเพราะเป็น foundation ที่ vision ที่ล็อก
+> ต้องใช้อยู่ดี + recurring cost ~0 บน owned infra
 
-Use only assets that already exist + free/owned infra. No paid platform, no large build.
+### Build roadmap (content-agnostic, ยึด infra + implementation ที่ล็อก 2026-07-31)
 
-### Phase 0 — open items
+- [ ] **M1 — Foundation:** app `academy-web/` (Next.js App Router + cs- design
+  tokens) ใน repo นี้ + Supabase self-host wiring + โครง PDPA consent +
+  พร้อม deploy Vercel `sin1` / CNAME `academy.cyberskills.co.th` / Zero Trust
+  ครอบทุกหน้า (pre-public) — Done = build ผ่าน, shell แบรนด์ถูกต้อง render,
+  DB round-trip; ส่วน deploy/DNS/Access เป็น external-service step แยก
+  (ต้องทำกับ founder — ห้ามทำใน AFK)
+- [ ] **M2 — Course player (commodity core):** player เสพ Crucible portable
+  JSON — video slot, practice/quiz พร้อม hard requirements เดิม (multi-answer
+  grading, per-question explanation, question pools/timed/retake, PBQ UX),
+  module nav + progress; interactive video บน custom HLS player มาตอน commit
+  CF Stream (M5) — M2 ใช้ CAS-005 bank เป็น dev fixture ภายใน
+- [ ] **M3 — Identity + personalized path v0:** email-identity account
+  (ออกแบบ consume external issuer ได้), progress persistence, assessment →
+  skip/branch + cheatsheet slot — **ก่อนลงมือ M3 ต้องมี ADR ecosystem
+  single-account (Crux/STAR/Academy/Forge) อย่างน้อยฉบับ draft ให้ founder เคาะ**
+- [ ] **M4 — Lab gate:** เสียบ Crux lab plane (แยก GCP project + budget alarm),
+  checkpoint-lab flow + credit meter v0 (ภายใน)
+- [ ] **M5 — Commerce + video:** credit ledger จริง + edition/pricing logic +
+  payment gateway ไทย (DD เลือก vendor ตอนนั้น) + commit Cloudflare Stream +
+  custom player (ห้าม iframe embed ตามเงื่อนไขที่ล็อก)
+
+### Launch gates (ยังมีผลระหว่าง build)
+
+- Rename currency ก่อน public launch · Crucible capacity assessment ก่อน commit
+  free-course catalog
+- ห้ามเพิ่ม vendor/จ่ายเงิน service ใหม่โดยไม่มี founder decision (streaming/
+  payment DD ตอน M5)
+- Auth จริง (M3) ต้องมี ADR ecosystem single-account ให้ founder เคาะก่อน
+
+---
+
+## Phase 0 — DEFERRED (founder decision 2026-07-31; กลับมาตอนเคาะ course catalog)
+
+> Lane A ✅ เสร็จ (CAS-005 disputes ปิด, commit `640c8613`) · Lane B ✅ inventory
+> เสร็จ (`reports/reviews/channel-inventory-2026-07-31.md`) · เมื่อถึงรอบเคาะ
+> course catalog: **founder pitch + poll ผ่าน channels เอง** โดยใช้ brief Lane B
+> เป็น input; validation experiments ด้านล่างเก็บไว้เป็นบริบทของรอบนั้น
+
+### Phase 0 — open items (deferred — ไม่ใช่ execution lane ตอนนี้)
 - [x] ~~**Resolve the CAS-005 answer-key disputes**~~ — **✅ RESOLVED 2026-07-31**
   (audit → founder เคาะ → แก้ครบ; รายละเอียดใน `completed_log.md` 2026-07-31)
   - Audit: `reports/reviews/cas005-dispute-audit-2026-07-31.md` — 11 disputes

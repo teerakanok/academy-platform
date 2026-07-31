@@ -5,6 +5,35 @@
 
 ---
 
+## 2026-07-31 — Founder เคาะ: เริ่ม PLATFORM BUILD ทันที; Phase 0 = defer; ตัด CAS-005 gate จากแผน
+
+**Outcome:** ทิศ execution เปลี่ยนจาก validate-first → **build-first** — เริ่มทำ
+platform เลยโดยถือว่ามี demand; แผน build M1–M5 (content-agnostic) อยู่ใน
+`active_plan.md` และ one-shot execution plan ละเอียดแยกไฟล์ใน `plans/`
+
+**What changed / decided (founder, in-session 2026-07-31):**
+- **เริ่ม build platform ทันที** — "ผมอยากเริ่มทำ platform"; ทุก milestone
+  build แบบ content-agnostic (player/engine เสพ Crucible portable JSON)
+- **Phase 0 ไม่ทิ้ง แต่ defer** — กลับมาตอนเคาะว่าจะทำ course อะไรบ้าง โดย
+  founder จะไป **pitch + poll ผ่าน channels ต่างๆ เอง** (channel inventory
+  Lane B = input ของรอบนั้น)
+- **ตัด CAS-005 gate ออกจากแผน** — ไม่ได้ focus course ใด course หนึ่งตอนนี้;
+  key fix เสร็จสมบูรณ์แล้ว (Crucible `640c8613`, verify 29/29) — เรื่อง codex
+  confirm pass ค่อยตัดสินใจใหม่ถ้าจะเอา bank ออก public (หมายเหตุ: codex
+  ไม่ติด usage limit แล้ว — founder แจ้ง 2026-07-31)
+- Handoff ถัดไป = **one-shot build order**: founder จะสั่ง execute แผนแบบ
+  one shot; แผนต้องผ่าน RIL (codex + claude อิสระ) ก่อน close session
+
+**Evidence:** in-session directives 2026-07-31 (บันทึกคำต่อคำในส่วน What
+changed); active_plan restructure ใน commit เดียวกับ entry นี้
+
+**Residual risk:**
+- Demand ต่อ course ยัง unvalidated จนกว่ารอบ pitch + poll — founder รับ
+  ความเสี่ยงโดยเจตนา; mitigation: recurring cost ~0 บน owned infra + ทุก
+  milestone เป็น foundation ที่ locked vision ต้องใช้อยู่ดี
+- External steps (Vercel/DNS/Zero Trust/GCP) ทำใน one-shot ไม่ได้ — ต้องเป็น
+  checkpoint กับ founder ตามแผน
+
 ## 2026-07-31 — Lane B: channel inventory brief เสร็จ (รอ founder เคาะ channel)
 
 **Outcome:** inventory ช่องทาง distribution จาก assets ที่มีจริงครบ 8 ช่อง พร้อม
