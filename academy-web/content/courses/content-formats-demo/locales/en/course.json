@@ -1,0 +1,21 @@
+{
+  "locale": "en",
+  "title": "Content formats (UI demo)",
+  "subtitle": "A placeholder course that shows every content format the player supports, so the shape of each one can be reviewed before real material goes in.",
+  "audience": "Internal demo. The words are filler; the layouts are real.",
+  "outcomes": [
+    "See how written material reads inside a lesson",
+    "See how diagrams, handouts and outside sources are treated differently",
+    "See where a hands-on lab sits and how it expands"
+  ],
+  "skillLabels": {
+    "reading": "Reading layout",
+    "references": "References & handouts",
+    "hands-on": "Hands-on slot"
+  },
+  "nodeTitles": {
+    "formats-reading": "Written material and diagrams",
+    "formats-references": "Handouts and outside sources",
+    "formats-hands-on": "The hands-on slot"
+  }
+}

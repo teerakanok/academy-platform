@@ -180,7 +180,16 @@ export function LessonView({
         />
       )}
 
-      {mode === 'learn' && <LessonBody blocks={lesson.blocks} />}
+      {mode === 'learn' && (
+        <>
+          <LessonBody blocks={lesson.blocks} />
+          {lesson.attribution && (
+            <p className="prose-lesson border-t border-cs-border pt-4 text-xs text-cs-muted">
+              {lesson.attribution}
+            </p>
+          )}
+        </>
+      )}
 
       {(mode === 'skipped' || done) && (
         <section className="card p-6" data-testid="cheatsheet">

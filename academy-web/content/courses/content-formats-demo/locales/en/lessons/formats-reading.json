@@ -1,0 +1,61 @@
+{
+  "nodeId": "formats-reading",
+  "locale": "en",
+  "title": "Written material and diagrams",
+  "objective": "See how an article and a diagram sit inside a lesson — rendered as part of the page, never in a frame.",
+  "attribution": "Adapted from a note written in Crux · rendered natively here, not embedded · placeholder text",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "This is placeholder copy standing in for an article. The important thing to look at is not the words — it is that written material becomes part of this page. It uses the same typeface, the same measure, the same spacing as everything else, so nothing announces that it was authored somewhere else."
+    },
+    {
+      "kind": "paragraph",
+      "text": "That matters because an article inside a frame brings its own fonts, its own scrollbar and its own width. The reader feels the seam immediately, and on a phone it becomes a small window inside a window."
+    },
+    {
+      "kind": "heading",
+      "text": "A diagram sits inline and expands when you need it"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Images are shown at the width of the reading column, which is comfortable for context but too small to study detail. Clicking opens it full screen, and Escape returns you to exactly where you were."
+    },
+    {
+      "kind": "image",
+      "src": "/media/sample-diagram.svg",
+      "alt": "Placeholder diagram showing user space asking the kernel, which then reaches the hardware",
+      "caption": "Placeholder diagram. Click it to see the full-screen behaviour."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "The rule this page is demonstrating",
+      "text": "Anything a learner has to read becomes our own content. Anything they have to look at closely or work in can be embedded, and gets a way to fill the screen."
+    },
+    {
+      "kind": "code",
+      "caption": "Code keeps the mono voice",
+      "lines": ["$ ls -lah /etc", "# placeholder — real lessons put real commands here"]
+    }
+  ],
+  "cheatsheet": [
+    "Articles are rendered as native page content, never framed",
+    "Diagrams sit at reading width and expand full screen on click",
+    "Escape closes the expanded view and keeps your place"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why is an article rendered as part of the page instead of embedded in a frame?",
+      "choices": {
+        "A": "Frames load faster",
+        "B": "So it shares the same typography and width as the rest of the lesson, with no visible seam and no window-inside-a-window on mobile",
+        "C": "Because frames cannot show text",
+        "D": "To avoid paying for hosting"
+      },
+      "correct": ["B"],
+      "explanation": "A framed document brings its own fonts, width and scrollbar. Rendering it natively removes the seam and keeps it readable on small screens."
+    }
+  ]
+}

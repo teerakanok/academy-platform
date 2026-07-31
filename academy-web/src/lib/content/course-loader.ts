@@ -182,6 +182,37 @@ const blockSchema = z.discriminatedUnion('kind', [
     headers: z.array(z.string()).min(1),
     rows: z.array(z.array(z.string())).min(1),
   }),
+  z.object({
+    kind: z.literal('image'),
+    src: z.string().min(1),
+    // alt บังคับ ไม่ใช่ทางเลือก — ภาพที่อธิบายตัวเองไม่ได้คือเนื้อหาที่หายไป
+    // สำหรับคนที่ใช้ screen reader
+    alt: z.string().min(1),
+    caption: z.string().optional(),
+  }),
+  z.object({
+    kind: z.literal('attachment'),
+    title: z.string().min(1),
+    description: z.string().optional(),
+    href: z.string().min(1),
+    fileType: z.enum(['pdf', 'zip', 'other']),
+    sizeLabel: z.string().optional(),
+  }),
+  z.object({
+    kind: z.literal('externalLink'),
+    title: z.string().min(1),
+    description: z.string().optional(),
+    href: z.string().url(),
+    // ต้องบอกว่าเป็นของใคร ไม่งั้นผู้เรียนไม่รู้ว่ากำลังจะออกไปไหน
+    sourceLabel: z.string().min(1),
+  }),
+  z.object({
+    kind: z.literal('lab'),
+    title: z.string().min(1),
+    description: z.string().min(1),
+    estimatedMinutes: z.number().positive(),
+    status: z.enum(['coming-soon', 'ready']),
+  }),
 ])
 
 const questionSchema = z.object({
@@ -198,6 +229,7 @@ const lessonSchema = z.object({
   title: z.string().min(1),
   objective: z.string().min(1),
   blocks: z.array(blockSchema).min(1),
+  attribution: z.string().optional(),
   cheatsheet: z.array(z.string().min(1)).min(1),
   checkpoint: z.array(questionSchema).min(1),
   videoCueQuestions: z.array(questionSchema.extend({ cueId: z.string().min(1) })).optional(),

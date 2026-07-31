@@ -1,4 +1,12 @@
 import type { LessonBlock } from '@/lib/content/course-types'
+import { ImageBlock } from './blocks/ImageBlock'
+import { LabBlock } from './blocks/LabBlock'
+
+const FILE_LABEL: Record<'pdf' | 'zip' | 'other', string> = {
+  pdf: 'PDF',
+  zip: 'ZIP',
+  other: 'File',
+}
 
 // เรนเดอร์เนื้อหาบทเรียนจากบล็อกที่มีชนิดชัดเจน — ไม่รับ HTML ดิบจากเนื้อหา
 // จึงไม่มีช่องทาง XSS จากฝั่ง content และคุมหน้าตาได้สม่ำเสมอทุกบท
@@ -84,6 +92,78 @@ export function LessonBody({ blocks }: { blocks: LessonBlock[] }) {
                   </p>
                 )}
               </section>
+            )
+
+          case 'image':
+            return <ImageBlock key={index} src={block.src} alt={block.alt} caption={block.caption} />
+
+          case 'lab':
+            return (
+              <LabBlock
+                key={index}
+                title={block.title}
+                description={block.description}
+                estimatedMinutes={block.estimatedMinutes}
+                status={block.status}
+              />
+            )
+
+          case 'attachment':
+            // เอกสารแนบเป็น "ของแถมให้เก็บไป" ไม่ใช่ตัวเนื้อหาหลัก — เปิดแท็บใหม่
+            // เพื่อให้ผู้อ่านได้ตัวอ่าน PDF เต็มรูปของเบราว์เซอร์ (ซูม/ค้น/พิมพ์ได้)
+            // แทนที่จะยัดลงกล่องที่มี scroll ซ้อน scroll
+            return (
+              <a
+                key={index}
+                href={block.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="attachment-block"
+                className="not-prose flex items-start gap-4 rounded-2xl border border-cs-border bg-cs-surface p-5 shadow-card transition-colors hover:border-cs-accent"
+              >
+                <span
+                  aria-hidden="true"
+                  className="mt-0.5 shrink-0 rounded-lg border border-cs-border bg-cs-surface-2 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase text-cs-muted"
+                >
+                  {FILE_LABEL[block.fileType]}
+                </span>
+                <span className="min-w-0">
+                  <span className="block font-display text-base font-semibold text-cs-text">{block.title}</span>
+                  {block.description && (
+                    <span className="mt-1 block text-sm leading-relaxed text-cs-body">{block.description}</span>
+                  )}
+                  <span className="mt-1.5 block font-mono text-[11px] text-cs-muted">
+                    Opens in a new tab{block.sizeLabel ? ` · ${block.sizeLabel}` : ''}
+                  </span>
+                </span>
+              </a>
+            )
+
+          case 'externalLink':
+            // ของคนอื่น = ลิงก์ที่พาออกไป และต้องบอกให้ชัดว่ากำลังออกจาก Academy
+            // (ไม่ iframe: เว็บส่วนใหญ่บล็อกอยู่แล้ว และการฝังทำให้ของคนอื่นดูเหมือนของเรา)
+            return (
+              <a
+                key={index}
+                href={block.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="external-link-block"
+                className="not-prose flex items-start gap-4 rounded-2xl border border-cs-border bg-cs-surface-2 p-5 transition-colors hover:border-cs-accent"
+              >
+                <span aria-hidden="true" className="mt-0.5 shrink-0 text-cs-muted">
+                  ↗
+                </span>
+                <span className="min-w-0">
+                  <span className="block font-display text-base font-semibold text-cs-text">{block.title}</span>
+                  {block.description && (
+                    <span className="mt-1 block text-sm leading-relaxed text-cs-body">{block.description}</span>
+                  )}
+                  <span className="mt-1.5 block font-mono text-[11px] text-cs-muted">
+                    Leaves Academy · {block.sourceLabel}
+                  </span>
+                </span>
+              </a>
             )
 
           case 'table':

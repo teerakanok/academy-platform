@@ -74,6 +74,33 @@ export type LessonBlock =
   /** ช่วงลงมือทำ — ตัวตั้งต้นของ prove-it lab จริงในภายหลัง */
   | { kind: 'try'; title: string; steps: string[]; expected?: string }
   | { kind: 'table'; headers: string[]; rows: string[][] }
+  // ---- ชนิดเนื้อหาตามหลักที่ล็อกไว้ (founder 2026-07-31) ----
+  // "สิ่งที่ต้องอ่าน = ทำเป็นของเราเอง · สิ่งที่ต้องดู/ลงมือ = ฝังได้ + ขยายเต็มจอ
+  //  · ของคนอื่น = ลิงก์ที่พาออกไป"
+  /** ภาพ/ไดอะแกรม — อยู่ในหน้า คลิกขยายได้ (ของที่ต้อง "เพ่ง") */
+  | { kind: 'image'; src: string; alt: string; caption?: string }
+  /** เอกสารแนบ เช่น PDF ใบงาน/ชีตสรุป — เป็นการ์ดให้เปิด/ดาวน์โหลด ไม่ฝังเป็นตัวอ่านหลัก
+   *  เหตุผล: PDF เป็น layout ตายตัว ไม่ reflow บนจอเล็กจึงอ่านไม่ได้จริง */
+  | {
+      kind: 'attachment'
+      title: string
+      description?: string
+      href: string
+      fileType: 'pdf' | 'zip' | 'other'
+      sizeLabel?: string
+    }
+  /** ลิงก์ออกนอก Academy — ต้องบอกผู้เรียนตรงๆ ว่ากำลังออกไปที่ไหน
+   *  ห้าม iframe: เว็บส่วนใหญ่บล็อกการฝังอยู่แล้ว และการฝังทำให้เนื้อหาคนอื่น
+   *  ดูเหมือนของเรา ซึ่งเป็นปัญหาความน่าเชื่อถือ */
+  | { kind: 'externalLink'; title: string; description?: string; href: string; sourceLabel: string }
+  /** ช่อง lab ที่ฝังได้จริง (M4) — เป็นของที่ต้อง "ลงมือ" จึงต้องขยายเต็มจอได้ */
+  | {
+      kind: 'lab'
+      title: string
+      description: string
+      estimatedMinutes: number
+      status: 'coming-soon' | 'ready'
+    }
 
 export interface CheckpointQuestion {
   id: string
@@ -97,6 +124,9 @@ export interface LessonContent {
   /** "จบบทนี้แล้วคุณจะ…" — สัญญาที่ให้ผู้เรียน */
   objective: string
   blocks: LessonBlock[]
+  /** ที่มาของเนื้อหา เช่น บทความที่เขียนไว้ใน Crux แล้วนำมา render เป็นบล็อกของ
+   *  Academy เอง (ไม่ใช่ฝัง) — แสดงเป็นบรรทัดเล็กๆ เพื่อความโปร่งใส */
+  attribution?: string
   /** ใช้ทั้งตอนจบบท และตอนผู้เรียนเลือกข้าม (แก้ skip anxiety) */
   cheatsheet: string[]
   checkpoint: CheckpointQuestion[]

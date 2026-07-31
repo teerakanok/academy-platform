@@ -1,0 +1,92 @@
+{
+  "nodeId": "formats-references",
+  "locale": "en",
+  "title": "Handouts and outside sources",
+  "objective": "See how a downloadable handout and a link to someone else's site are treated — both leave the page, on purpose.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Two things do not belong inside the lesson body: files that were designed for paper, and pages that belong to other people. Both get a card that says plainly what will happen when you act on it."
+    },
+    {
+      "kind": "heading",
+      "text": "A handout is something you take away"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A PDF has a fixed layout. It does not reflow, so on a phone it is either unreadably small or requires constant zooming. Putting one inside a scrolling box gives you two scrollbars and a worse version of a document the browser already knows how to display well."
+    },
+    {
+      "kind": "attachment",
+      "title": "Linux permissions cheat sheet",
+      "description": "One page you can keep next to the terminal. Placeholder file for this demo.",
+      "href": "/media/sample-handout.pdf",
+      "fileType": "pdf",
+      "sizeLabel": "1 page"
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "When a PDF is the actual lesson",
+      "text": "Then it should not be a PDF here. It should be authored as lesson content so it reflows, can be searched, translated and read aloud. The PDF stays as the printable export."
+    },
+    {
+      "kind": "heading",
+      "text": "Somebody else's page is a link, not a frame"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Most sites refuse to be embedded, so a frame often shows nothing at all. And when it does work, their content ends up wearing our chrome, which is misleading. A labelled link is the honest version."
+    },
+    {
+      "kind": "externalLink",
+      "title": "The ls manual page",
+      "description": "The reference for every flag, maintained by the people who maintain the tool.",
+      "href": "https://man7.org/linux/man-pages/man1/ls.1.html",
+      "sourceLabel": "man7.org"
+    },
+    {
+      "kind": "table",
+      "headers": ["Content", "Where it lives", "What happens on click"],
+      "rows": [
+        ["Article", "In the page", "Nothing — you are already reading it"],
+        ["Diagram", "In the page", "Expands full screen"],
+        ["Handout", "A file", "Opens in a new tab"],
+        ["Someone else's page", "Their site", "Opens in a new tab, labelled"],
+        ["Lab", "Embedded panel", "Expands full screen"]
+      ]
+    }
+  ],
+  "cheatsheet": [
+    "PDFs are handouts, not lesson bodies — fixed layout does not reflow",
+    "If a PDF is the real lesson, author it as lesson content instead",
+    "External pages open in a new tab and say whose site they are",
+    "Frames are avoided: most sites block them, and they blur whose content it is"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why is a PDF not embedded as the lesson body?",
+      "choices": {
+        "A": "PDFs cannot be displayed in browsers",
+        "B": "Its layout is fixed, so it will not reflow on a small screen, and reading it in a scrolling box puts a scrollbar inside a scrollbar",
+        "C": "PDFs are always too large to load",
+        "D": "Browsers block PDF files by default"
+      },
+      "correct": ["B"],
+      "explanation": "The problem is fixed layout. The browser's own viewer, in its own tab, handles zoom and search far better than a box inside our page."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "What is the main reason external pages are linked rather than framed?",
+      "choices": {
+        "A": "Most sites block being framed, and framing makes their content look like ours",
+        "B": "Links are faster to write",
+        "C": "Frames cost more to host",
+        "D": "External pages are always untrustworthy"
+      },
+      "correct": ["A"],
+      "explanation": "Both halves matter: it frequently does not work at all, and when it does it misrepresents whose material the reader is looking at."
+    }
+  ]
+}

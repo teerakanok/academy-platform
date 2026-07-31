@@ -1,0 +1,83 @@
+{
+  "nodeId": "formats-hands-on",
+  "locale": "en",
+  "title": "The hands-on slot",
+  "objective": "See where a browser lab sits in a lesson, and how it takes over the screen when you actually start working in it.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A lab is the one thing that genuinely belongs embedded. It is not something to read — it is somewhere to work, and it has to be inside the lesson so that finishing it can count towards your progress."
+    },
+    {
+      "kind": "paragraph",
+      "text": "In the flow of the lesson it sits at a comfortable size, so you can see it alongside the instructions. The moment you start typing in it, that size stops being enough — which is what the expand control is for."
+    },
+    {
+      "kind": "lab",
+      "title": "Read and fix a permission problem",
+      "description": "A throwaway machine with a file that the wrong people can write to. Find it and fix it. Placeholder for this demo.",
+      "estimatedMinutes": 10,
+      "status": "coming-soon"
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Why this is the trust mechanism",
+      "text": "A quiz shows you can recognise the right answer. A lab shows you can produce it. That is what makes a required checkpoint worth requiring, and what lets someone skip other lessons with confidence."
+    },
+    {
+      "kind": "try",
+      "title": "What to check in this demo",
+      "steps": [
+        "Press Expand to full screen and confirm the panel fills the window",
+        "Press Escape and confirm you land back where you were",
+        "Resize the browser narrow and check the panel still behaves"
+      ],
+      "expected": "The panel grows to the full window with a clear way out, and shrinking the window does not break the layout."
+    }
+  ],
+  "cheatsheet": [
+    "A lab is embedded because it is somewhere to work, not something to read",
+    "Inline at a readable size, full screen when you are actually working",
+    "Escape always returns you to the lesson at the same place",
+    "Doing beats recognising — the lab is what makes a required checkpoint meaningful"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why is a lab embedded when an article is not?",
+      "choices": {
+        "A": "Labs are smaller files",
+        "B": "A lab is somewhere the learner works, and completing it has to count towards progress — an article is something they read, which is better as native page content",
+        "C": "Labs cannot be linked to",
+        "D": "Articles are not part of courses"
+      },
+      "correct": ["B"],
+      "explanation": "The split is doing versus reading. Anything interactive that feeds progress stays inside; anything to read becomes part of the page itself."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "What should happen when the learner leaves full screen?",
+      "choices": {
+        "A": "They return to the course map",
+        "B": "The lesson restarts",
+        "C": "They land back in the lesson at the same place",
+        "D": "The lab resets"
+      },
+      "correct": ["C"],
+      "explanation": "Losing your place is the thing that actually breaks flow. Expanding and collapsing must never cost the learner their position."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Which content types get a full-screen control?",
+      "choices": {
+        "A": "Everything, for consistency",
+        "B": "Only things you look at closely or work inside — diagrams, video and labs",
+        "C": "Only PDFs",
+        "D": "Nothing, full screen is never useful"
+      },
+      "correct": ["B"],
+      "explanation": "Full screen is an escape hatch for detail and for work. Needing it to make a document readable is a sign that document should not have been embedded."
+    }
+  ]
+}

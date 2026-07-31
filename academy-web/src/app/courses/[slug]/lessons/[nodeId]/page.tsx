@@ -27,7 +27,9 @@ export default async function LessonPage({
   if (!node) notFound()
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12">
+    // ~70ch ที่ขนาดตัวอักษรของเนื้อหา — กว้างพอสำหรับตาราง/โค้ด แต่ยังอ่านยาวสบาย
+    // และทุกบล็อกใช้ขอบเดียวกันหมด
+    <div className="mx-auto max-w-[46rem] px-6 py-12">
       <LessonView
         structure={course.structure}
         node={node}
