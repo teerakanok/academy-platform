@@ -11,7 +11,7 @@
   "repo": {
     "remote": "github.com/teerakanok/academy-platform",
     "branch": "main",
-    "base_head": "8b6b721562d1953551d289fca589b6128be532b2"
+    "base_head": "58dde53c246e5490901d70ef695fbd693dcc55a3"
   },
   "delivery": "local",
   "worktree": {
@@ -29,7 +29,7 @@
       "ห้ามแจกจ่าย/publish CAS-005 bank ก่อน codex confirm pass ผ่าน และ Crucible commit 640c8613 ถูก push ตาม authorization",
       "ห้ามแก้ answer key เพิ่มโดยไม่มี founder decision ใหม่",
       "ห้ามแก้ไฟล์ใน Crucible repo จาก session นี้ (key fix เสร็จแล้ว; งานใหม่ใน Crucible ต้องเปิด scope ใหม่)",
-      "ห้ามเริ่ม build Lane C ก่อน founder เคาะ infra direction (hosting/web/db/cdn/lab — discussion กำลังจะเกิดใน director session 2026-07-31)",
+      "Lane C build ต้องยึด infra ที่ล็อก (Vercel sin1 + CNAME academy.cyberskills.co.th + Supabase self-host + Zero Trust ครอบ admin) — ห้าม deviate หรือเพิ่ม vendor ใหม่โดยไม่มี founder decision ใหม่",
       "ห้าม subscribe paid platform / จ่ายเงิน service ใหม่",
       "ห้ามแตะ dirty files ใน director repo (เป็นของ workstream อื่น) และห้าม push ทุก repo โดยไม่มี authorization ชัดเจน",
       "ห้ามลบ video/academy-promo-video-short.mp4 โดยไม่มี vault migration + receipt"
@@ -45,7 +45,7 @@
   "owner_decisions": [
     "Founder เคาะ 2026-07-31 (ลายลักษณ์อักษร): แก้ CAS-005 disputes ตามแนะนำทั้งหมด — PBQ-010 eradication-ก่อน-recovery, M4-082 +D (Map fields), M4-067 +A (Sandbox process)",
     "Product/pricing/implementation ล็อกตาม packet เดิม (academy-kickoff-phase0): personalized+lab-gated, access 3 ปี, DIY build-core-buy-plumbing, single-account ADR ก่อน build auth",
-    "Founder จะเคาะ infra direction (hosting/web/db/cdn/lab) ใน director discussion ถัดไป — Lane C build ต้องรอผลนี้"
+    "Founder เคาะ infra 2026-07-31 (หลัง close Lane A): Phase 0 web = Vercel — ล็อก; video post-gate = Cloudflare Stream แบบมีเงื่อนไข interactive (custom player บน HLS/DASH + signed token, ห้าม build บน iframe embed); Lab = GCP ต่อ — ล็อก (ไม่ rebuild); cost model + รายละเอียดใน plans/active_plan.md ส่วน Infra direction (commit 58dde53c)"
   ],
   "completed": [
     "Lane A จบทั้งเส้น: audit disputes (report + decision brief, fact-checked 6/6 CONFIRMED) → founder เคาะ → แก้ key 3 ข้อใน Crucible commit 640c8613 (26 ไฟล์, propagate ครบ: bank JSON/MD → rewritten → v2-source → SV2 (validator pass 199 files) → SV1 → full-length-02 → practice-suite → v1 generator กัน regression)",
@@ -74,7 +74,7 @@
   ],
   "remaining_work": [
     "Lane B (next action): channel inventory จาก assets จริง → decision brief ให้ founder เลือก distribution channel",
-    "Lane C: Phase 0 slice (placement-test framing + free sample + lead capture email-identity + PDPA consent) — รอ infra direction จาก founder ก่อนเริ่ม build",
+    "Lane C: Phase 0 slice (placement-test framing + free sample + lead capture email-identity + PDPA consent) — infra ล็อกแล้ว (Vercel sin1 + Supabase self-host) เริ่ม build ได้ใน session ถัดไป",
     "หลัง 5 ส.ค.: codex confirm pass 1 รอบที่ M4-082/M4-067/PBQ-010 แล้วบันทึกผลใน artifacts/",
     "Push academy (ahead 3) + Crucible 640c8613 เมื่อได้ authorization",
     "ยก ADR ระดับ ecosystem: single account 4 products",
@@ -89,7 +89,7 @@
   ],
   "next": {
     "cwd": ".",
-    "summary": "Lane B: channel inventory ให้ founder เลือก + รอ infra direction จาก founder สำหรับ Lane C",
+    "summary": "Lane B: channel inventory ให้ founder เลือก (Lane C ปลดล็อกแล้ว — infra เคาะครบ เริ่ม build ได้ถัดจากนี้)",
     "first_step": "รวบรวม channel ที่มีอยู่จริง (read-only): founder/academic network (MUIC, มช., วงการ instructor), client/list เดิมจาก Gage/Angler contacts ที่มี consent, communities ไทย (คอมมู cybersec/cert-prep), traffic ปัจจุบันของ cyberskills.co.th — แล้วเขียน decision brief เปรียบเทียบ reach/effort/fit ต่อ channel ลง reports/reviews/channel-inventory-2026-XX-XX.md",
     "commands": [
       "cat plans/active_plan.md",
@@ -139,7 +139,7 @@ Lane A ปิดสมบูรณ์: CAS-005 disputes เคาะ+แก้�
 ## Owner Intent And Decisions
 - Decision: Founder เคาะ 2026-07-31 (ลายลักษณ์อักษร): แก้ CAS-005 disputes ตามแนะนำทั้งหมด — PBQ-010 eradication-ก่อน-recovery, M4-082 +D (Map fields), M4-067 +A (Sandbox process)
 - Decision: Product/pricing/implementation ล็อกตาม packet เดิม (academy-kickoff-phase0): personalized+lab-gated, access 3 ปี, DIY build-core-buy-plumbing, single-account ADR ก่อน build auth
-- Decision: Founder จะเคาะ infra direction (hosting/web/db/cdn/lab) ใน director discussion ถัดไป — Lane C build ต้องรอผลนี้
+- Decision: Founder เคาะ infra 2026-07-31 (หลัง close Lane A): Phase 0 web = Vercel — ล็อก; video post-gate = Cloudflare Stream แบบมีเงื่อนไข interactive (custom player บน HLS/DASH + signed token, ห้าม build บน iframe embed); Lab = GCP ต่อ — ล็อก (ไม่ rebuild); cost model + รายละเอียดใน plans/active_plan.md ส่วน Infra direction (commit 58dde53c)
 - Allowed scope: Lane B: รวบรวม channel inventory จาก assets ที่มีจริง (read-only research) แล้วเขียน decision brief ลง reports/reviews/ ของ repo นี้
 - Allowed scope: อัปเดต plans/active_plan.md และ plans/completed_log.md ของ repo นี้
 - Allowed scope: commit ใน repo นี้เมื่องานมี verification ครบ
@@ -148,7 +148,7 @@ Lane A ปิดสมบูรณ์: CAS-005 disputes เคาะ+แก้�
 ## Repository State
 - State: ready
 - Branch: main
-- Baseline: 8b6b721562d1953551d289fca589b6128be532b2
+- Baseline: 58dde53c246e5490901d70ef695fbd693dcc55a3
 - Delivery: local (academy ahead 3, crucible ahead 1 — ยังไม่ push ตาม authorization)
 
 ## Completed This Session
@@ -182,7 +182,7 @@ Expected worktree: clean.
 
 ## Remaining Work And Risks
 - Remaining: Lane B (next action): channel inventory จาก assets จริง → decision brief ให้ founder เลือก distribution channel
-- Remaining: Lane C: Phase 0 slice (placement-test framing + free sample + lead capture email-identity + PDPA consent) — รอ infra direction จาก founder ก่อนเริ่ม build
+- Remaining: Lane C: Phase 0 slice (placement-test framing + free sample + lead capture email-identity + PDPA consent) — infra ล็อกแล้ว (Vercel sin1 + Supabase self-host) เริ่ม build ได้ใน session ถัดไป
 - Remaining: หลัง 5 ส.ค.: codex confirm pass 1 รอบที่ M4-082/M4-067/PBQ-010 แล้วบันทึกผลใน artifacts/
 - Remaining: Push academy (ahead 3) + Crucible 640c8613 เมื่อได้ authorization
 - Remaining: ยก ADR ระดับ ecosystem: single account 4 products
@@ -198,7 +198,7 @@ No blocker.
 ## Exact Next Action
 Working directory: .
 
-Lane B: channel inventory ให้ founder เลือก + รอ infra direction จาก founder สำหรับ Lane C
+Lane B: channel inventory ให้ founder เลือก (Lane C ปลดล็อกแล้ว — infra เคาะครบ เริ่ม build ได้ถัดจากนี้)
 
 First step: รวบรวม channel ที่มีอยู่จริง (read-only): founder/academic network (MUIC, มช., วงการ instructor), client/list เดิมจาก Gage/Angler contacts ที่มี consent, communities ไทย (คอมมู cybersec/cert-prep), traffic ปัจจุบันของ cyberskills.co.th — แล้วเขียน decision brief เปรียบเทียบ reach/effort/fit ต่อ channel ลง reports/reviews/channel-inventory-2026-XX-XX.md
 
@@ -222,7 +222,7 @@ Lane B ถือว่าเสร็จเมื่อครบทุกข้�
 - ห้ามแจกจ่าย/publish CAS-005 bank ก่อน codex confirm pass ผ่าน และ Crucible commit 640c8613 ถูก push ตาม authorization
 - ห้ามแก้ answer key เพิ่มโดยไม่มี founder decision ใหม่
 - ห้ามแก้ไฟล์ใน Crucible repo จาก session นี้ (key fix เสร็จแล้ว; งานใหม่ใน Crucible ต้องเปิด scope ใหม่)
-- ห้ามเริ่ม build Lane C ก่อน founder เคาะ infra direction (hosting/web/db/cdn/lab — discussion กำลังจะเกิดใน director session 2026-07-31)
+- Lane C build ต้องยึด infra ที่ล็อก (Vercel sin1 + CNAME academy.cyberskills.co.th + Supabase self-host + Zero Trust ครอบ admin) — ห้าม deviate หรือเพิ่ม vendor ใหม่โดยไม่มี founder decision ใหม่
 - ห้าม subscribe paid platform / จ่ายเงิน service ใหม่
 - ห้ามแตะ dirty files ใน director repo (เป็นของ workstream อื่น) และห้าม push ทุก repo โดยไม่มี authorization ชัดเจน
 - ห้ามลบ video/academy-promo-video-short.mp4 โดยไม่มี vault migration + receipt
