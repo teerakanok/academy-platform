@@ -90,10 +90,17 @@ Use only assets that already exist + free/owned infra. No paid platform, no larg
 
 | ชั้น | นโยบาย |
 |---|---|
-| Fundamentals (เช่น basic Linux & bash) | **ฟรี — absorb cost เอง** (แบบมีเพดาน): funnel + prerequisite layer ใน path + เวทีโชว์ placement/skip; **ไม่ขายเป็น SKU เดี่ยว** (สู้ของฟรี THM/OverTheWire/freeCodeCamp ไม่ได้); lab ใช้แต้มฟรีรายเดือน (precedent: Skills Boost แจก 35 credits/เดือน); lab พื้นฐาน = container เบา ต้นทุนต่ำ |
+| **Free tier — ขยาย (founder 2026-07-31):** N+, Sec+, ISC2 CC, Basic Linux, Basic Programming | **ฟรีเต็มรูป — ให้หมดทุก feature** (video, practice, lab, cheatsheet, personalized path): เป็น **เครื่องจักรโฆษณา** — "ถ้าของฟรีดีครบเครื่องขนาดนี้ ของจ่ายตังจะขนาดไหน"; ทิ้งตลาด entry-cert commodity (Udemy/Messer) ให้เป็นสนามโฆษณา แล้วให้ paid เหลือแต่ขั้นสูงที่ trust ถูกแก้แล้ว; guardrail เดียว: **lab ผ่านแต้มฟรีรายเดือน** (precedent: Skills Boost 35 credits/เดือน — กัน abuse + เพดานต้นทุน + สอนผู้เรียนรู้จักแต้ม); ต้นทุน ~$0.3–0.5/free active/เดือน (~10–17฿) ถูกกว่า CPC โฆษณา แต่ได้คนเรียนจริง + email + skill data; **rollout ทีละคอร์ส ห้ามสร้างครบ 5 ก่อน validate** (เสนอเริ่ม Basic Linux → N+); ภาระ content freshness ×5 ต้องผ่าน Crucible capacity assessment ก่อน commit รายการสุดท้าย; หมายเหตุ ISC2 CC: ISC2 แจก training ฟรีเองอยู่ (1M Certified) — ของเราชนะด้วย lab + path |
 | Path / Premium / Cert course (เช่น AI Secure Coding, CISSP) | ซื้อขาดต่อ **edition**, access **3 ปีเต็ม — เลขเดียวทั้ง catalog** (ล็อก final 2026-07-31), update ย่อยฟรีภายใน term, โชว์วันที่ "อัปเดตล่าสุด" ชัดเจน |
 | หน่วยขายหลัก | **Path/Track** — fundamentals ที่เกี่ยวข้องรวมอยู่ข้างใน (access clock inherit จาก path ที่ซื้อ) |
 
+- **บันไดราคา paid (placeholder รอ WTP probe — discussion 2026-07-31):** เมื่อ
+  entry certs ย้ายไปฟรีหมด paid เหลือขั้นสูง: CySA+/Pentest+ ~3,990–4,990฿ ·
+  SecurityX/CASP+ ~5,990–6,990฿ · CISSP ~6,990–7,990฿ · trend courses
+  ~2,990–4,990฿ · B2B seat 2–3× + lab-verified skill report; anchor ตลาด
+  verified 2026-07-31: CertMaster Learn+Labs ≈ $489/12 เดือน, Dion Udemy
+  ~$15–30 sale, Dion direct $39–69/เดือน; unit cost ต่อผู้เรียน/คอร์ส ≈ 170–280฿
+  → margin ~90% (ก้อนจริงคือ content freshness)
 - **Edition clock:** course ผูก cert ใช้รอบของ cert vendor (~3 ปี); fundamentals/trend
   course ใช้ major-version ของเราเอง (ยกเครื่องใหญ่ = edition ใหม่; patch เล็ก = free update)
 - **ตัวเลข access — ล็อก final 2026-07-31: 3 ปีเต็ม เลขเดียวทั้ง catalog**

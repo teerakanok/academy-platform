@@ -5,6 +5,31 @@
 
 ---
 
+## 2026-07-31 — Free-tier strategy ขยาย: entry certs ฟรีเต็มรูปเป็นเครื่องจักรโฆษณา
+
+**Outcome:** founder กำหนดทิศทาง free tier ใหม่ (กว้างกว่า "fundamentals ฟรี"
+เดิมมาก): **N+, Sec+, ISC2 CC, Basic Linux, Basic Programming แจกฟรีครบทุก
+feature** — video, practice, lab, cheatsheet — เจตนา = โฆษณา:
+"ถ้าของฟรีดีครบเครื่องขนาดนี้ ของจ่ายตังจะขนาดไหน"
+
+**What changed / decided (founder):**
+- Free tier = 5 คอร์ส entry เต็มรูป (ไม่ใช่แค่ fundamentals) — ทิ้งตลาด
+  commodity ให้เป็นสนามโฆษณา; paid เหลือขั้นสูง/trend/B2B ที่ trust ถูกแก้แล้ว
+- CPO guardrails ที่บันทึกคู่กัน: lab ใช้แต้มฟรีรายเดือน (กัน abuse + เพดานต้นทุน);
+  rollout ทีละคอร์ส ห้ามสร้างครบ 5 ก่อน validate (เสนอ Basic Linux → N+ ก่อน);
+  ภาระ content freshness ×5 ต้องผ่าน Crucible capacity assessment
+
+**Evidence:** ต้นทุน free tier ~$0.3–0.5/active/เดือน (จาก CF Stream pricing
+verified + GCP lab estimate) — ถูกกว่า CPC โฆษณาไทยแต่ได้คนเรียนจริง;
+market anchors verified 2026-07-31 (CertMaster $489, Dion Udemy $15–30,
+Dion direct $39–69/เดือน) — ดูรายละเอียดใน active_plan ส่วนโมเดลราคา
+
+**Residual risk:**
+- งาน Crucible 5 คอร์สเต็มรูปก่อนมีรายได้ = ก้อนลงทุนจริงของ strategy นี้ —
+  ยังไม่ได้ประเมิน capacity; ห้ามใช้ vision นี้ข้าม Phase 0 gate
+- ตัวเลขบันไดราคา paid ทั้งหมดเป็น placeholder รอ WTP probe
+- ISC2 CC ชนกับของฟรีของ ISC2 เอง — ต้องชนะด้วย lab + path ไม่ใช่แค่ฟรี
+
 ## 2026-07-31 — Infra direction เคาะ: Vercel (Phase 0 web) + Cloudflare Stream (มีเงื่อนไข) + Lab GCP ต่อ
 
 **Outcome:** founder เคาะ infra ของ Academy ใน director discussion หลัง close
