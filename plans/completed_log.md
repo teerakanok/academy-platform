@@ -19,8 +19,11 @@
 - Lab browser-based เป็น gate ต่อ topic — ใช้หลักการเดียวกับ Crux lab plane
   (ตัว Crux product ยัง ILT-only ใช้ภายใน ไม่เปลี่ยน)
 - Fundamentals แจกฟรี absorb cost เอง (ไม่ขายเป็น SKU เดี่ยว — เป็น funnel +
-  prerequisite ใน path); premium/cert course ซื้อขาดต่อ edition, fixed-term access
-  (เลขสุดท้าย 2 หรือ 3 ปี รอล็อก — director แนะนำ 3)
+  prerequisite ใน path); premium/cert course ซื้อขาดต่อ edition
+- **Access term ล็อกแล้ว: การันตีขั้นต่ำ 2 ปี + auto-extend ฟรีตราบใดที่ edition
+  ยังเป็นเวอร์ชันปัจจุบัน** — founder เลือก 2 ด้วยหลัก "ประตูทางเดียว" (เพิ่มเป็น 3
+  ทีหลังได้เป็นของขวัญ แต่ลดจาก 3 เหลือ 2 = ผิดสัญญา); rider auto-extend ปิดเคส
+  "ซื้อซ้ำของเดิมทั้งที่เนื้อหายัง current" และให้คนซื้อต้น edition ได้ ~3 ปีโดยพฤตินัย
 - ระบบแต้ม lab (academy currency): แถมพอ "จบคอร์ส + ซ้ำ 1–2 รอบ",
   top-up ~ราคาต้นทุน infra (ไม่ใช่ profit line), คืนแต้มบางส่วนเมื่อทำจบ,
   นาฬิกาแต้ม = นาฬิกา access
