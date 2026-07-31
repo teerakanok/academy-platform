@@ -306,7 +306,8 @@ Stand up **CyberSkills Academy** (cert exam-prep courses + sold mock tests + tre
   ("ถึงเป้าเร็วขึ้น ไม่เรียนซ้ำของที่รู้"); user override เสมอ
 - **ภาระ content factory:** granular content + tag + branch + cheatsheet ต่อหน่วย
   ทำให้โจทย์ฝั่ง Crucible โตขึ้นหลายเท่า — ยังไม่ได้ประเมิน ต้องประเมินก่อน commit build
-- CAS-005 answer-key disputes ยังเป็น hard prerequisite ก่อน public distribution (ไม่เปลี่ยน)
+- CAS-005: disputes ปิดครบแล้ว (Crucible `640c8613`); gate ก่อน public ถูกตัด
+  จากแผนโดย founder 2026-07-31 — ตัดสินใจใหม่เฉพาะเมื่อจะเอา bank ออก public จริง
 
 ### Open items ของโมเดลนี้ (รอ founder / รอ pilot)
 
@@ -399,8 +400,8 @@ Package CYBERSKILLS Academy content as a **commercially licensed trainer starter
 - **Distribution is the binding constraint**, not product quality — unvalidated.
 - Open-market standalone sale probability is **low** (commodity market, strong incumbents, cold-start trust).
 - ~~CAS-005 answer-key disputes~~ — **ปิดครบ 2026-07-31** (founder เคาะ + fix
-  ใน Crucible `640c8613`); ก่อน public release เหลือแค่ optional codex confirm
-  pass (หลัง 5 ส.ค.) และ push Crucible ตาม authorization ปกติ.
+  ใน Crucible `640c8613`); confirm-pass gate ถูกตัดจากแผน (founder 2026-07-31)
+  — พิจารณาใหม่เฉพาะถ้าจะเอา bank ออก public; push Crucible ตาม authorization ปกติ.
 - Recurring-cost trap: committing to a paid platform before demand = capital burn + sunk-cost pressure.
 - Content source (Crucible) and delivery (Academy) must stay decoupled or migration cost balloons.
 

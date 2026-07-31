@@ -56,11 +56,18 @@ It is the structured-knowledge sibling of **STAR** (cinematic hands-on labs). ST
 
 ---
 
-## Status — PLANNING / VALIDATION stage (no build yet)
+## Status — PLATFORM BUILD (founder decision 2026-07-31)
 
-This product has **not been built**. The current phase is **demand validation before investment** (see `plans/active_plan.md`).
+**Founder เคาะ 2026-07-31: build-first.** เริ่ม build platform ทันทีแบบ
+content-agnostic; **Phase 0 (validate demand) ถูก defer** — จะกลับมาตอนเคาะ
+course catalog โดย founder pitch + poll ผ่าน channels เอง (input:
+`reports/reviews/channel-inventory-2026-07-31.md`). Execution plan:
+`plans/platform-build-oneshot-2026-07-31.md` + roadmap ใน `plans/active_plan.md`.
 
-**Standing operating principle for this product:** *validate-before-invest.* Do not take on recurring fixed cost (hosted-LMS subscriptions, paid platforms) or large build effort **until demand is validated** with cheap, reversible experiments. Recurring cost must be a *result* of traction, not a bet on it.
+**Standing operating principle (ปรับ 2026-07-31):** ห้ามเพิ่ม recurring cost /
+subscribe paid service ใหม่โดยไม่มี founder decision เสมอ (ข้อนี้ยังอยู่);
+ส่วน "ห้าม build ใหญ่ก่อน validate" ถูก supersede โดย founder decision
+2026-07-31 — build บน owned infra ที่ recurring ~0 ได้เลย
 
 ---
 
@@ -85,23 +92,25 @@ This product has **not been built**. The current phase is **demand validation be
 | **Delivery** | how learners consume it | validate with the simplest free path (static pages on existing infra) | adopt a delivery platform **only after demand is validated** |
 
 - **Content source of truth = Crucible** (`products/personal/crucible-studio/`). Academy is the *delivery + commerce + funnel* layer; it consumes content Crucible produces. Keep content portable so it is not locked to any platform.
-- **Delivery platform: UNDECIDED.** A hosted LMS (e.g. LearnWorlds) was considered and **deferred** (recurring cost before validated demand). Decision is downstream of validation. If validated:
-  - **Hosted LMS** — chosen for no-maintenance, built-in commerce/accounts/certificates/funnels, once paying volume justifies the recurring cost.
-  - **DIY custom** — only if a hosted platform cannot meet a hard requirement; would follow CYBERSKILLS stack defaults (see Tech Stack).
+- **Delivery platform: DECIDED 2026-07-31 — DIY "build the core, buy the
+  plumbing"** (hosted LMS ถูกตัด — product ที่ล็อกไม่มีขายใน platform ไหน);
+  รายละเอียด + เหตุผลใน `plans/active_plan.md` ส่วน Implementation direction
+  และ `plans/completed_log.md` entry 2026-07-31.
 - **URLs must be platform-agnostic.** Use `academy.cyberskills.co.th` (CNAME) so the delivery platform can be swapped without breaking links or brand — never expose a vendor's raw URL.
 - **SEO / funnel:** keep free lead-magnet + marketing content on the **main domain** (`cyberskills.co.th` / a resources path) to build authority and capture search, then funnel into the Academy subdomain (subdomain SEO authority is weaker).
 - **Learner identity:** plan for a single email-based identity so free bank, paid courses, and waitlists can converge into one account later. Do not build an account system during validation — just capture email consistently.
 
 ---
 
-## Tech stack — TBD (decision pending validation)
+## Tech stack — ล็อกตามแผน build (2026-07-31)
 
-Do **not** assume or hardcode a stack yet. The delivery platform decision (hosted LMS vs DIY) is open.
-
-- If **hosted LMS**: configuration/branding work, content import, minimal custom code.
-- If **DIY custom** (only if justified): follow CYBERSKILLS defaults — Next.js or React+Vite · Tailwind (cs- design tokens) · FastAPI (Python) or NestJS (Node) · Supabase (PostgreSQL) · LLM provider abstracted, not hardcoded.
-
-Whatever is chosen, record the decision + rationale in `plans/completed_log.md`.
+DIY บน CYBERSKILLS defaults: Next.js App Router (TypeScript) · Tailwind +
+`@cyberskills/tokens` (cs-) · Supabase self-host **Pool A** schema `academy` ·
+deploy Vercel `sin1` + CNAME `academy.cyberskills.co.th` + Zero Trust ก่อน
+public · Lab = Crux lab plane บน GCP (M4) · video = managed stream ผ่าน custom
+HLS player (M5, vendor ยังไม่ commit) — เวอร์ชัน/รายละเอียดตรึงใน
+`plans/platform-build-oneshot-2026-07-31.md`; การเปลี่ยน stack ต้องมี founder
+decision ใหม่ + บันทึกใน `plans/completed_log.md`.
 
 ---
 
@@ -124,8 +133,13 @@ Whatever is chosen, record the decision + rationale in `plans/completed_log.md`.
 
 ## Constraints — what NOT to do
 
-- ❌ Do **not** subscribe to a recurring paid platform or start a large build before demand is validated (see validate-before-invest).
-- ❌ Do **not** publicly distribute the CAS-005 bank until the **open answer-key disputes are resolved** (a wrong key destroys credibility with the senior security audience). Source + review evidence (path updated 2026-07-31): `products/personal/crucible-studio/courses/comptia-securityx/exam-versions/cas-005/archive/legacy-output/v4.1/practice-tests/` (`student-version-2/` + `v2-build/review/findings-academic-iter*.json` + `qa/practice-review-*.md`).
+- ❌ Do **not** subscribe to a recurring paid platform / จ่ายเงิน service ใหม่
+  โดยไม่มี founder decision (ยังมีผลเสมอ; ส่วน "ห้าม build ก่อน validate" ถูก
+  supersede แล้ว — ดู Status)
+- ℹ️ CAS-005 bank: answer-key disputes **ปิดครบ 2026-07-31** (Crucible
+  `640c8613`); ปัจจุบันใช้เป็น **internal dev fixture เท่านั้น** — การเอาออก
+  public เป็น decision แยกในอนาคต (founder ตัด gate นี้ออกจากแผน 2026-07-31
+  เพราะยังไม่ focus course ใด)
 - ❌ Do **not** hardcode a vendor's raw URL anywhere — use the `academy.` subdomain.
 - ❌ Do **not** re-author content per platform — keep one portable source of truth in Crucible.
 - ❌ Do **not** reference provider-specific model names (e.g. specific Claude/Gemini/OpenAI model strings) or provider-only tooling in any skill, template, script, or doc for this product — this product is **provider-neutral**.
