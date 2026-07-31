@@ -14,10 +14,28 @@ Stand up **CyberSkills Academy** (cert exam-prep courses + sold mock tests + tre
 
 ## Current phase: **Phase 0 — Validate demand (cheap, reversible, ~$0 recurring)**
 
+> **สถานะ: KICKED OFF 2026-07-31 (founder สั่งลุย)** — ลำดับงาน 3 lane:
+> - **Lane A (critical path):** audit สถานะ CAS-005 bank + disputes → founder
+>   decision brief → ปิด answer keys (ดูสถานะ verified ใน item 1)
+> - **Lane B (รอ founder input):** channel inventory — director เตรียมรายการ
+>   channel ที่มีจริงให้ founder เลือก/เติม
+> - **Lane C (build):** Phase 0 slice บน stack จริง (placement-test framing +
+>   free sample + lead capture ใช้ email เป็น identity key + PDPA consent) —
+>   scaffold เริ่มได้เลย แต่ **publish ถูก gate ด้วย Lane A**
+
 Use only assets that already exist + free/owned infra. No paid platform, no large build.
 
 ### Phase 0 — open items
-- [ ] **Resolve the 11 CAS-005 answer-key disputes** (hard prerequisite before any public distribution). Source: `products/personal/crucible-studio/output/cas005/v4.1/practice-tests/v2-build/review/findings-*.json`. Founder decision required (changes original keys — affects v1 + v2). Incl. PBQ-010 (NIST 800-61: eradication before recovery).
+- [ ] **Resolve the CAS-005 answer-key disputes** (hard prerequisite before any public
+  distribution). Founder decision required (changes original keys — affects v1 + v2).
+  Incl. PBQ-010 (NIST 800-61: eradication before recovery).
+  - **อัปเดต 2026-07-31 (verified on disk):** path เดิม (`output/cas005/...`) rot แล้ว —
+    ของจริงอยู่ที่ `products/personal/crucible-studio/courses/comptia-securityx/exam-versions/cas-005/archive/legacy-output/v4.1/practice-tests/`
+    (review: `v2-build/review/findings-academic-iter*.json` + `qa/practice-review-*.md`);
+    โครงใหม่ `.../cas-005/assessments/` **ยังว่าง**. หลักฐาน review ที่เห็น:
+    iter1 = 610 items / 75 flagged → มี rewrite pipeline (`rewritten/`, `finalfix.mjs`)
+    → batch ท้าย flagged = 0 — **แต่ไม่พบบันทึกว่า 11 founder-level disputes ถูกปิด**
+    → งานแรกของ Lane A: verify ว่าเหลือ dispute ไหนจริง แล้วทำ founder decision brief
 - [ ] **Pick a distribution channel** (the real constraint). Inventory what exists: founder/academic network, existing client/list, relevant communities, website traffic. Without a channel, expect ~0 signal.
 - [ ] **Publish a free sample** (e.g. ~50 questions, spread across domains) on existing infra at ~$0 — static hosting or a page on the current website. Reskin to the cs- dark theme.
 - [ ] **Lead capture at ~$0** — capture email (+ one qualifying field: target exam date) at the results screen, value-first (let them finish + see explanations first), instant unlock (no "check your email" delay), PDPA consent checkbox. Store on owned/free infra (self-hosted Supabase or a free form).

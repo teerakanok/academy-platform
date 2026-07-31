@@ -125,7 +125,7 @@ Whatever is chosen, record the decision + rationale in `plans/completed_log.md`.
 ## Constraints — what NOT to do
 
 - ❌ Do **not** subscribe to a recurring paid platform or start a large build before demand is validated (see validate-before-invest).
-- ❌ Do **not** publicly distribute the CAS-005 bank until the **open answer-key disputes are resolved** (a wrong key destroys credibility with the senior security audience). Source + review evidence: `products/personal/crucible-studio/output/cas005/v4.1/practice-tests/` (`student-version-2/` + `v2-build/review/findings-*.json`).
+- ❌ Do **not** publicly distribute the CAS-005 bank until the **open answer-key disputes are resolved** (a wrong key destroys credibility with the senior security audience). Source + review evidence (path updated 2026-07-31): `products/personal/crucible-studio/courses/comptia-securityx/exam-versions/cas-005/archive/legacy-output/v4.1/practice-tests/` (`student-version-2/` + `v2-build/review/findings-academic-iter*.json` + `qa/practice-review-*.md`).
 - ❌ Do **not** hardcode a vendor's raw URL anywhere — use the `academy.` subdomain.
 - ❌ Do **not** re-author content per platform — keep one portable source of truth in Crucible.
 - ❌ Do **not** reference provider-specific model names (e.g. specific Claude/Gemini/OpenAI model strings) or provider-only tooling in any skill, template, script, or doc for this product — this product is **provider-neutral**.
