@@ -5,6 +5,38 @@
 
 ---
 
+## 2026-07-31 — Infra direction เคาะ: Vercel (Phase 0 web) + Cloudflare Stream (มีเงื่อนไข) + Lab GCP ต่อ
+
+**Outcome:** founder เคาะ infra ของ Academy ใน director discussion หลัง close
+Lane A — บันทึกลง `active_plan.md` ส่วน "Infra direction":
+
+**What changed / decided (founder):**
+- **Phase 0 web = Vercel — ล็อก** (`academy.cyberskills.co.th` CNAME → Vercel
+  sin1; admin ครอบ Zero Trust Access)
+- **Video post-gate = managed stream ผ่าน Cloudflare Stream ได้ แบบมีเงื่อนไข:**
+  ต้องไม่ขัด interactive video (pop-up คำถามระหว่างดู) — เงื่อนไขผ่านโดย design
+  guard: ใช้ custom player เสพ HLS/DASH manifest + signed token, **ห้าม build
+  บน iframe embed** ของ Stream; ชั้น interactive เป็น player logic ฝั่งเรา
+  ไม่ผูก vendor (Bunny เป็น fallback ได้เพราะ HLS มาตรฐานเหมือนกัน)
+- **Lab = GCP ต่อ — ล็อก** ("ไม่อยาก rebuild ทุกอย่างใหม่หมด") — reuse Crux
+  lab plane; แยก project + budget alarm
+- DB = Supabase self-host เดิม (video ไม่เข้า DB); assets/backup = R2; RDC
+  บทบาทเดิม
+
+**Evidence:** Cloudflare Stream custom-player + signed-token support ยืนยันจาก
+developers.cloudflare.com (using-own-player, securing-your-stream) 2026-07-31;
+pricing semantics จาก official docs: storage = prepaid block $5/1,000 นาที,
+delivery = $1/1,000 นาทีที่ดู, encode ฟรี, ไม่มี free allowance; cost model +
+ตัวอย่าง 3 scenario อยู่ใน active_plan (pilot ≈ $15/เดือน, growth ≈ $70,
+scale ≈ $220)
+
+**Residual risk:**
+- Pricing ต้อง re-verify ตอน commit จริง (ตัวเลข ณ 2026-07-31)
+- "prepaid capacity" ของ Stream storage: ยืนยัน billing behavior จริงตอนเปิดใช้
+  (block ขยายเมื่อ catalog โต)
+- Zero Trust free tier ~50 seats ต้องตรวจกับ plan จริงตอน setup
+- Payment gateway ไทยยังไม่เลือก (DD ตอนใช้จริงตามเดิม)
+
 ## 2026-07-31 — Lane A ปิดสมบูรณ์: founder เคาะ 3 disputes + แก้ key ใน Crucible ครบ
 
 **Outcome:** Lane A (critical path ของ Phase 0) จบทั้งเส้นในวันเดียว: audit →

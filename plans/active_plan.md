@@ -160,6 +160,44 @@ Use only assets that already exist + free/owned infra. No paid platform, no larg
   ยุทธศาสตร์ย้าย value ออกจากวิดีโอแล้ว; candidates เช่น Bunny/Cloudflare Stream —
   **ยังไม่เลือก** ต้อง due-diligence ตอนใช้จริง), payment gateway ไทย (candidates เช่น
   Stripe/Opn/2C2P — **ยังไม่เลือก**)
+
+### Infra direction — founder เคาะ 2026-07-31
+
+- **Phase 0 web = Vercel (ล็อก):** `academy.cyberskills.co.th` CNAME (Cloudflare) →
+  Vercel region `sin1` (ใกล้ Supabase self-host; pattern เดียวกับ product อื่น);
+  admin/preview ครอบ Cloudflare Zero Trust Access จนกว่าจะพร้อม public
+- **DB = Supabase self-host เดิม** (leads + consent PDPA + signals; ต่อไปคือ auth/
+  credit ledger/progress ตาม ADR) — video/ไฟล์หนักไม่เข้า DB เด็ดขาด (object
+  storage + CDN เท่านั้น; DB เก็บ metadata + token)
+- **Video (post-gate) = managed stream, Cloudflare Stream เป็น front-runner**
+  (founder อนุมัติแบบมีเงื่อนไข): **เงื่อนไข interactive video ต้องไม่เสีย** —
+  verified 2026-07-31: Stream เสิร์ฟ HLS/DASH manifest มาตรฐาน + signed token
+  ให้ custom player ได้ (hls.js/Video.js/Shaka/AVPlayer/ExoPlayer) → ชั้น
+  interactive (pop-up คำถาม, pause ที่ cue point, กัน seek ข้ามคำถาม) เป็น player
+  logic ฝั่งเรา ไม่ผูก vendor; **design guard: ห้าม build lesson player บน iframe
+  embed ของ Stream** — ต้องเป็น custom player เสพ manifest; ตัวเลข pricing
+  (verified 2026-07-31: $5/1,000 นาทีเก็บ + $1/1,000 นาทีส่ง, encode ฟรี)
+  re-verify อีกครั้งตอน commit จริง; Bunny ยังเป็น fallback ได้เพราะ HLS มาตรฐาน
+  เหมือนกัน
+- **Lab = GCP — ล็อก (founder 2026-07-31):** ใช้ shared lab plane จาก Crux ต่อ
+  ("ไม่อยาก rebuild ทุกอย่างใหม่หมด") — แยก GCP project + budget alarm ของ
+  Academy; credit ledger เป็นตัว meter ต้นทุน
+- **Course assets ที่ไม่ใช่ video** (lab images, ไฟล์แจก) = R2 (egress ฟรี);
+  DB backup → R2 ตาม pattern ปัจจุบัน; RDC คงบทบาทเดิม (host self-host stack)
+- **Cloudflare cost model (verified จาก official docs 2026-07-31):** Stream
+  storage = **prepaid capacity** ซื้อเป็นบล็อก $5/1,000 นาที content (นับความยาว
+  video ไม่เกี่ยว resolution; encode+ingress ฟรี), delivery = $1/1,000 นาทีที่ถูกดู
+  (นับ HLS/DASH/player ทุกแบบ); **ไม่มี free allowance** (ข้อมูล blog ภายนอกที่ว่า
+  Pro/Business แถมนาที — ไม่อยู่ใน official docs, อย่าใช้วางแผน)
+  - สูตร: ค่า Stream/เดือน ≈ ⌈นาที catalog/1,000⌉×$5 (ช่วงที่ catalog โต) +
+    (ผู้เรียน active × นาทีดูเฉลี่ย)/1,000 × $1
+  - ตัวอย่าง: pilot (catalog 10 ชม., 50 คน×200 นาที) ≈ **$15/เดือน**; growth
+    (30 ชม., 200 คน×300 นาที) ≈ **$70/เดือน**; scale (60 ชม., 500 คน×400 นาที)
+    ≈ **$220/เดือน** — ต้นทุน video ต่อผู้เรียน ~$0.2–0.4/คน/เดือน จิ๋วเทียบราคา
+    คอร์สซื้อขาด; personalized path ยิ่ง skip มาก delivered minutes ยิ่งลด = ถูกลง
+  - R2 (assets/backup): ~$0.015/GB/เดือน, egress ฟรี; Zero Trust Access ใช้
+    free tier ได้ถึง ~50 seats (ตรวจ plan จริงตอน setup); Phase 0 ไม่มี video
+    → ค่า Cloudflare ส่วนเพิ่ม ≈ $0
 - **ทำไมไม่ขัด validate-before-invest:** DIY บน infra ที่เป็นเจ้าของ = recurring cost
   เพิ่ม ~ศูนย์ (สิ่งที่ gate ห้ามคือ recurring cost + build ใหญ่ก่อน signal);
   ลำดับ build ผูกกับ gate:
