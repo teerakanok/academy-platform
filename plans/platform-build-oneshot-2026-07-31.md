@@ -87,7 +87,8 @@ academy-platform/
 - TypeScript + `@types/*` + `eslint-config-next` ตามที่ scaffold ของรุ่นนั้นให้มา
 - `@supabase/supabase-js` (รุ่น stable ล่าสุด ณ วัน scaffold), `zod`
   (ระวัง `z.coerce.boolean` กับ FormData — ใช้ explicit checkbox parsing),
-  `@playwright/test`, `vitest` (unit)
+  `@playwright/test`, `@axe-core/playwright` (a11y ใน M2), `vitest` (unit),
+  `supabase` CLI (devDependency — ดู M1 step 8)
 - Vendored `packages/tokens`: คัดลอกจาก `cyberskills-web/packages/tokens`
   เวอร์ชันปัจจุบัน; ใช้ preset key `website` ไปก่อน (key `academy` ใน canonical
   tokens = งาน director repo — บันทึกใน PENDING แทน ห้ามแก้ director repo)
@@ -98,11 +99,18 @@ academy-platform/
 
 ## 3) Content contract (verify จากไฟล์จริง 2026-07-31)
 
-**Fixture ที่ล็อกสำหรับ one-shot:** คัดลอกจาก SV2
-(`.../v4.1/practice-tests/student-version-2/`) เข้า `fixtures/cas005/`:
-1. `module-banks/module-1-governance-risk-compliance/` ทั้ง module (MCQ
-   single+multi)
-2. `full-length/cas005-full-practice-02.json` (85 ข้อ + PBQ 5 ตัว)
+**Fixture ที่ล็อกสำหรับ one-shot:** คัดลอกจาก SV2 — path เต็มจาก **director
+repo root**:
+`products/personal/crucible-studio/courses/comptia-securityx/exam-versions/`
+`cas-005/archive/legacy-output/v4.1/practice-tests/student-version-2/`
+(จาก cwd ของ academy repo = `../../../products/personal/crucible-studio/...`)
+เข้า `fixtures/cas005/`:
+1. `module-banks/module-1-governance-risk-compliance/` **ทั้ง module = 15 part
+   files รวม 165 ข้อ MCQ** (นับจริง 2026-07-31) — เอาครบทุก part ไม่คัดย่อย
+2. `full-length/cas005-full-practice-02.json` (**85 MCQ + 5 PBQ / 21 fields**)
+พร้อม **fixture integrity test** (unit): assert 15 parts · 165 MCQ · 85
+normal · 5 PBQ · 21 fields · เซ็ต kind = {checks, select, order} — กัน fixture
+ถูกคัดลอกผิด/ตกหล่นแล้ว acceptance เขียวปลอม
 3. `manifest.json` (ตัดเหลือส่วนที่ fixture ใช้ + ระบุที่มา)
 พร้อม `fixtures/cas005/README.md`: ที่มา, วันที่คัดลอก, **INTERNAL ONLY —
 ห้าม deploy public / ห้ามแจก** (CAS-005 public distribution เป็น decision แยก)
@@ -116,9 +124,15 @@ academy-platform/
   bloom, difficulty, type ("single"|"multi"), topic, stem, choices,
   correct (array อักษร), explanation, whyWrong, sources, whyCorrect, keywords`
 - Full-length: `id, title, timeLimitMinutes, normalQuestions, pbqs`
-- PBQ: `id, title, objective, scenario, fields, sources, keywords` — แต่ละ
-  field ใช้ discriminator **`kind`**; ค่าที่พบจริง: `checks`, `select`, `text`,
-  `order`; `correct` เป็น **string หรือ array** แล้วแต่ kind
+- PBQ: `id, title, objective, scenario, fields, sources, keywords` +
+  **`exhibit` (optional — พบจริงใน PBQ-009)**: loader ต้อง preserve + player
+  ต้อง render exhibit เมื่อมี (มี e2e assertion); `objective` ของ PBQ เป็น
+  string หลายค่า (เช่น `"1.5, 3.6"`) — ดูกติกา attribution ในข้อ scoring;
+  แต่ละ field ใช้ discriminator **`kind`**; ค่าที่พบจริง: `checks`, `select`,
+  `text`, `order`; **field sub-structure จริง:** `{id, label, kind, options?
+  (array), correct (string|array แล้วแต่ kind), explanation, aliases? (array —
+  เฉพาะ kind=text ใช้ตอน match คำตอบ)}` — loader ต้องอ่าน `field.kind`
+  (ไม่ใช่ `field.type`)
 - **Kind ที่ต้องรองรับ + grade ได้จริงใน one-shot = ทุก kind ที่อยู่ใน fixture
   ที่ล็อก**: `checks`, `select`, `order` (FL-02) — ส่วน `text` (มีใน FL-01
   ซึ่งไม่อยู่ใน fixture) → แสดง banner "ยังไม่รองรับใน player รุ่นนี้" ได้
@@ -145,7 +159,9 @@ field ที่พัง (ห้ามล้มเงียบ)
 4. **PDPA ครบชุด:** หน้า `/privacy` (วัตถุประสงค์เก็บ email, ระยะเก็บ, ช่องทาง
    ถอน consent/ติดต่อ) · consent checkbox ไม่ pre-tick + ลิงก์ privacy ·
    ข้อความ consent เก็บเป็นไฟล์ versioned ใน repo (`src/content/consent/v1.md`)
-   → DB เก็บ `consent_text_version` ตรงกับไฟล์
+   → DB เก็บ `consent_text_version` ตรงกับไฟล์ และ **มี CHECK constraint จำกัด
+   ค่า version ที่ยอมรับ (เริ่ม `'v1'`)** + negative test: insert version
+   นอกลิสต์ต้อง fail
 5. Lead intake (`/api/leads`, server-only):
    - validation (zod), email normalize (trim + lowercase), **idempotent**:
      email ซ้ำ = ตอบสำเร็จ ไม่สร้าง row ซ้ำ (unique constraint บน
@@ -163,21 +179,34 @@ field ที่พัง (ห้ามล้มเงียบ)
    **RLS เปิดและไม่มี policy ให้ anon/authenticated เลย (default deny —
    service role เท่านั้นที่เขียน/อ่าน)** + grants ชัดเจน + คอมเมนต์ระบุขั้นตอน
    prod (ดู §5 ข้อ 3)
-7. Local dev DB — runbook self-contained (ห้ามอ้างไฟล์นอก repo):
-   ใช้ supabase CLI ใน `academy-web/supabase/` → `npx supabase init` แล้วตั้ง
-   `config.toml` ให้ `[api] schemas` รวม `"academy"` → `npx supabase start`
-   (Docker) → `npx supabase db reset` เพื่อ apply migration จากศูนย์;
-   client ใช้ `.schema('academy')`; **ห้ามชี้ prod เด็ดขาด**
-8. Playwright e2e: landing render · submit lead สำเร็จ (ยืนยัน row เกิดจริง
-   ด้วย query ฝั่ง test ไม่ใช่เชื่อ response) · consent ไม่ติ๊ก = ถูกปฏิเสธ ·
-   email ซ้ำ = idempotent · **negative RLS test: anon REST (`/rest/v1` local +
-   anon key) select/insert `academy.leads` ต้องถูกปฏิเสธ**
-9. ทุก check เขียว → commit (atomic ต่อหน่วยงาน)
+7. `.env.example`: repo-root `.gitignore` มี `.env.*` ซึ่งกินไฟล์นี้ —
+   **เพิ่มบรรทัด `!.env.example` ใน `.gitignore`** แล้วยืนยันว่าไฟล์เข้า git จริง
+   (`git status` ต้องเห็น) — ห้ามใช้ `git add -f` กลบปัญหา
+8. Local dev DB — runbook self-contained (ห้ามอ้างไฟล์นอก repo):
+   ติดตั้ง `supabase` CLI เป็น **devDependency (ตรึงใน lockfile — ห้ามใช้
+   npx transient latest)**; รันจาก **`academy-web/` (repo ของ app)**:
+   `supabase init` (สร้างโฟลเดอร์ `supabase/` เอง — อย่ารันซ้อนข้างใน) →
+   ตั้ง `config.toml` ให้ `[api] schemas` รวม `"academy"` →
+   `supabase start` (Docker) → `supabase db reset` เพื่อ apply migration
+   จากศูนย์; client ใช้ `.schema('academy')`; **ห้ามชี้ prod เด็ดขาด**
+9. Playwright e2e + integration tests (ทุกข้อที่ประกาศใน step 5 ต้องมี test
+   คุม — ห้ามประกาศแล้วไม่ทดสอบ): landing render · submit lead สำเร็จ (ยืนยัน
+   row เกิดจริงด้วย query ฝั่ง test ไม่ใช่เชื่อ response) · consent ไม่ติ๊ก =
+   ถูกปฏิเสธ · email ซ้ำ = idempotent · **content-type ผิด/body เกิน limit →
+   4xx ตามชนิด** · **rate-limit เกิน → 429** · **DB ล่ม (หยุด local stack
+   ชั่วคราวหรือ inject connection fail) → response ต้อง fail จริง ไม่ใช่
+   success** · **RLS hardening test: SQL assert `relrowsecurity = true` บน
+   `academy.leads` + จำนวน policy = ตามที่ migration ประกาศ (default deny)**
+   · anon REST (`/rest/v1` local + anon key) **อ่านถูกปฏิเสธ** และ **เขียนถูก
+   ปฏิเสธ** (แยกสอง test) · service-role insert สำเร็จ (positive path แยก)
+10. ทุก check เขียว → commit (atomic ต่อหน่วยงาน)
 
-**Acceptance M1 (วัดได้ + no false-green):** `npm run build && npm run lint &&
-npm run test && npm run test:e2e` เขียวทั้งหมดบน local Supabase จริง (ผ่าน
-`db reset` แล้วอย่างน้อย 1 รอบ); negative RLS test มีอยู่และผ่าน; ไม่มี secret
-ใน git; screenshot landing เก็บใน `artifacts/oneshot-<date>/m1/`
+**Acceptance M1 (วัดได้ + no false-green):** เริ่มจาก **`npm ci` (clean install
+จาก lockfile ล้วน)** แล้ว `npm run build && npm run lint && npm run test &&
+npm run test:e2e` เขียวทั้งหมดบน local Supabase จริง (ผ่าน `db reset` แล้ว
+อย่างน้อย 1 รอบ); test ตาม step 9 ครบทุกข้อ (รวม RLS hardening + DB-fail
+honesty + rate-limit); SBOM.md สอดคล้อง lockfile; ไม่มี secret ใน git;
+screenshot landing เก็บใน `artifacts/oneshot-<date>/m1/`
 **Fallback:** ถ้า local Supabase ตั้งไม่ขึ้น → dev ต่อบน Postgres docker เปล่า
 ได้เพื่อไม่ block งานอื่น แต่ **M1 = INCOMPLETE** (พิสูจน์ RLS/PostgREST ไม่ได้)
 — รายงานตรงๆ ห้ามนับผ่าน
@@ -194,14 +223,21 @@ npm run test && npm run test:e2e` เขียวทั้งหมดบน loc
      `timeLimitMinutes`, retake ได้
    - **Timer แบบ deadline-based** (เก็บ `endsAt` timestamp — reload/สลับ tab
      แล้วเวลาไม่เพี้ยน) + fake-clock tests
-   - PBQ: render + **grade ทุก kind ใน fixture (`checks`, `select`, `order`)**;
-     `order` ต้องมีทางเลือก keyboard (ปุ่มเลื่อนขึ้น/ลง) ไม่ใช่ drag อย่างเดียว;
-     kind นอก fixture → banner "ยังไม่รองรับ" (ตามกติกา §3)
+   - PBQ: render + **grade ทุก kind ใน fixture**: `checks` (multi-checkbox),
+     `select` (dropdown), `order` (จัดลำดับ — ต้องมีทางเลือก keyboard
+     ปุ่มเลื่อนขึ้น/ลง ไม่ใช่ drag อย่างเดียว); kind นอก fixture (เช่น `text`
+     free-text + alias matching ที่อยู่ใน FL-01) → banner "ยังไม่รองรับ"
+     (ตามกติกา §3)
 3. **Scoring spec (ตายตัว ห้ามตีความเอง):** MCQ 1 ข้อ = 1 หน่วย; PBQ ให้คะแนน
    ต่อ field (1 field = 1 หน่วย, grade ตาม kind); ข้อที่ไม่ตอบ = ผิด;
-   denominator = หน่วยทั้งหมดในชุด; breakdown ต่อ module/objective ใช้หน่วย
-   เดียวกัน; weakest domain = domain คะแนน% ต่ำสุดที่มี ≥3 หน่วย (ต่ำกว่านั้น
-   แสดง "ข้อมูลไม่พอ"); เสมอกัน → แสดงทุก domain ที่เสมอ — ทั้งหมดมี unit test
+   denominator = หน่วยทั้งหมดในชุด **นับหน่วยละครั้งเดียว**;
+   **attribution ต่อ breakdown:** MCQ เข้า module ตาม `moduleId` และ objective
+   ตาม `objective` ของข้อ; **PBQ ไม่มี moduleId → ไม่เข้า module breakdown
+   (แสดงเป็นกลุ่ม "PBQ" แยก)**; objective ของ PBQ มีหลายค่า → หน่วยทุก field
+   ของ PBQ เข้า **objective ตัวแรกในลิสต์เท่านั้น** (กัน double-count);
+   weakest domain = domain คะแนน% ต่ำสุดที่มี ≥3 หน่วย (ต่ำกว่านั้นแสดง
+   "ข้อมูลไม่พอ"); เสมอกัน → แสดงทุก domain ที่เสมอ — ทั้งหมดมี unit test
+   รวม case กัน double-count denominator
 4. Results screen ตาม spec ข้อ 3 + ปุ่ม review ข้อผิด — โครง data ออกแบบให้
    เป็น primitive ของ assessment/personalized path (M3+)
 5. **Module navigation (requirement ที่ล็อก):** เลือก module → practice จาก
@@ -213,9 +249,9 @@ npm run test && npm run test:e2e` เขียวทั้งหมดบน loc
 7. Video slot: component รับ **normalized media ref จาก `CourseContent`**
    (optional) — ตอนนี้ render placeholder; ห้ามอ่าน `manifest.services`
 8. e2e: เปิด full-length-02 จาก fixture → ทำครบ (รวม PBQ ทั้ง 3 kind) →
-   ได้ผล + breakdown + review ได้ · module nav ใช้ได้จริง · resume หลัง
-   reload · a11y: axe ไม่มี violation ระดับ critical/serious บนหน้า player +
-   results
+   ได้ผล + breakdown + review ได้ · **PBQ-009 exhibit ถูก render จริง
+   (assertion เฉพาะ)** · module nav ใช้ได้จริง · resume หลัง reload · a11y:
+   axe ไม่มี violation ระดับ critical/serious บนหน้า player + results
 9. Visual review (ระดับย่อของ `deep-visual-review`): state matrix = {landing,
    module list, quiz กลางชุด, PBQ ทั้ง 3 kind, results, review} × {desktop
    1440, mobile 390} → แก้จนไม่มี defect ที่มองเห็น → screenshot เก็บ
@@ -243,8 +279,10 @@ module nav acceptance ผ่าน; e2e + axe เขียว
 
 1. **Review lane อิสระ** ทั้ง codebase ใหม่ — cross-model 1 lane ถ้า runtime
    มีเครื่องมือ, ไม่งั้น managed reviewer แยก context (นโยบายเครื่องมืออยู่
-   ระดับ director ไม่ผูกในแผนนี้); แก้ critical ให้หมดหรือบันทึกเป็น known
-   issue พร้อมเหตุผล
+   ระดับ director ไม่ผูกในแผนนี้); **critical ต้องแก้ให้หมด — critical ที่
+   แก้ไม่ได้ = ผล run โดยรวม INCOMPLETE** (known-issue ได้เฉพาะ non-critical
+   พร้อมเหตุผล); **หลังแก้ finding ใดๆ ต้อง rerun tests ที่เกี่ยว + full
+   suite รอบสุดท้ายก่อนประกาศสถานะ**
 2. อัปเดต `plans/active_plan.md` + `completed_log.md` **เฉพาะ milestone ที่
    acceptance ผ่านจริง** + `PENDING_USER_ACTION.md` ครบตาม §5
 3. Cleanup: ปิด dev server/supabase local (`npx supabase stop`), fixture อยู่ใน

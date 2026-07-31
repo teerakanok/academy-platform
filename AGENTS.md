@@ -89,7 +89,7 @@ subscribe paid service ใหม่โดยไม่มี founder decision เ
 | Layer | What | Now | Later |
 |---|---|---|---|
 | **Content** | courses, mock banks, explanations, study guides | authored in **Crucible** as portable structured data (e.g. JSON) | ingested into whatever delivery platform is chosen — no re-authoring |
-| **Delivery** | how learners consume it | validate with the simplest free path (static pages on existing infra) | adopt a delivery platform **only after demand is validated** |
+| **Delivery** | how learners consume it | DIY build `academy-web/` ตามแผน one-shot (อยู่หลัง Zero Trust จนกว่า founder สั่ง public) | public launch หลัง founder เคาะ course catalog (pitch + poll) |
 
 - **Content source of truth = Crucible** (`products/personal/crucible-studio/`). Academy is the *delivery + commerce + funnel* layer; it consumes content Crucible produces. Keep content portable so it is not locked to any platform.
 - **Delivery platform: DECIDED 2026-07-31 — DIY "build the core, buy the
@@ -98,7 +98,7 @@ subscribe paid service ใหม่โดยไม่มี founder decision เ
   และ `plans/completed_log.md` entry 2026-07-31.
 - **URLs must be platform-agnostic.** Use `academy.cyberskills.co.th` (CNAME) so the delivery platform can be swapped without breaking links or brand — never expose a vendor's raw URL.
 - **SEO / funnel:** keep free lead-magnet + marketing content on the **main domain** (`cyberskills.co.th` / a resources path) to build authority and capture search, then funnel into the Academy subdomain (subdomain SEO authority is weaker).
-- **Learner identity:** plan for a single email-based identity so free bank, paid courses, and waitlists can converge into one account later. Do not build an account system during validation — just capture email consistently.
+- **Learner identity:** single email-based identity ตั้งแต่วันแรก (lead capture ใช้ email เป็น identity key); ระบบ account/auth จริงเริ่มได้เมื่อ **ADR ecosystem single-account** ผ่าน founder เท่านั้น (ดู plans) — ออกแบบให้ consume external issuer ได้เสมอ.
 
 ---
 

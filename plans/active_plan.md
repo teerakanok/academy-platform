@@ -8,7 +8,10 @@
 
 ## Objective
 
-Stand up **CyberSkills Academy** (cert exam-prep courses + sold mock tests + trend-driven pro courses) **without over-investing ahead of demand**. Near-term goal is not revenue — it is a **validated decision** on whether (and how) to build the delivery platform.
+Stand up **CyberSkills Academy** (cert exam-prep courses + sold mock tests +
+trend-driven pro courses). **Founder เคาะ 2026-07-31: build-first** — สร้าง
+platform (DIY) ทันทีแบบ content-agnostic; การเลือก course catalog + demand
+validation ต่อ course เป็นรอบ pitch + poll ของ founder ภายหลัง (Phase 0 deferred).
 
 ---
 
@@ -108,8 +111,10 @@ Stand up **CyberSkills Academy** (cert exam-prep courses + sold mock tests + tre
 
 ## นิยาม Product + โมเดลราคา/สิทธิ์เข้าถึง (draft จาก founder discussion 2026-07-31)
 
-> ส่วนนี้คือ "สิ่งที่จะ build เมื่อผ่าน Phase 0 gate" — **ไม่ใช่ execution lane ปัจจุบัน**
-> Phase 0 (validate demand) มาก่อนเสมอ; vision นี้ไม่ใช่เหตุผลข้าม gate
+> ส่วนนี้คือ **spec ของสิ่งที่กำลัง build** (execution ตาม
+> `plans/platform-build-oneshot-2026-07-31.md`) — อัปเดต 2026-07-31:
+> Phase-0-first ถูก supersede โดย founder decision build-first;
+> course catalog ยังรอ founder pitch + poll
 > ที่มา + market evidence: `completed_log.md` entry 2026-07-31
 
 ### แก่นของ product: personalized, interactive, lab-gated
@@ -296,8 +301,9 @@ Stand up **CyberSkills Academy** (cert exam-prep courses + sold mock tests + tre
 
 ### Guards เชิงกลยุทธ์ (อย่าหล่น)
 
-- **Distribution + trust ยังเป็น binding constraint** — vision นี้ทำให้ product แหลมขึ้น
-  แต่ product ไม่เคยเป็นคอขวด; ห้ามใช้ vision เป็นเหตุผลเลื่อน/ข้าม Phase 0
+- **Distribution + trust ยังเป็น binding constraint** — build-first (founder
+  2026-07-31) แก้ฝั่ง product ไม่ใช่ฝั่ง distribution; การลงทุน content ต่อ
+  course ยังต้องรอผล pitch + poll ของ founder — ห้าม commit catalog เอง
 - **Phase 0 synergy (ทดสอบ concept ได้เกือบฟรี):** reframe free CAS-005 sample เป็น
   **"placement test — รู้จุดอ่อนใน 30 นาที ไม่เสียเวลาเรียนของที่รู้แล้ว"** แล้ววัดว่า
   messaging ไหนดึง lead กว่า = validation ของ desirability จากพฤติกรรมจริง;
@@ -328,7 +334,7 @@ Stand up **CyberSkills Academy** (cert exam-prep courses + sold mock tests + tre
 
 ---
 
-## Phase 1 — Platform decision (gated by Phase 0 "go")
+## Phase 1 — Platform decision (**superseded 2026-07-31** — ตัดสินครบแล้ว: DIY + build-first; เก็บไว้เป็นประวัติ)
 - [x] ~~Decide delivery platform: hosted LMS vs DIY~~ — **ล็อก 2026-07-31: DIY
   "build the core, buy the plumbing"** (ดู Implementation direction ด้านบน +
   `completed_log.md` entry 2026-07-31); การลงมือ build ยังเรียงหลัง Phase 0 ตามเดิม
