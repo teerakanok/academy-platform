@@ -1,1 +1,14 @@
 .DS_Store
+
+# runtime state ของ publish-owner-update — ห้าม track (receipts/evidence/media)
+.owner-update/
+
+# golden rule — secrets และ generated
+.env
+.env.*
+*.key
+*.pem
+node_modules/
+test-results/
+dist/
+build/
