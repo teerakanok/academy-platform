@@ -5,6 +5,33 @@
 
 ---
 
+## 2026-07-31 — One-shot build plan เสร็จ + ผ่าน RIL 2 lane (codex + claude) converge
+
+**Outcome:** แผน execute แบบ one-shot สำหรับ M1+M2+M3-prep พร้อมใช้ที่
+`plans/platform-build-oneshot-2026-07-31.md` — ผ่าน review อิสระ 2 lane จน
+converge (claude r2 = PASS; codex r3 = technical clear + governance sweep แก้ครบ)
+
+**What changed:**
+- แผน 4 revision (rev 1 → rev 4): commits `3ae8109`, `21932b3`, `a2a8e6f`,
+  `40d54b4`; governance reconcile ทั้ง `AGENTS.md` + `active_plan.md` เป็น
+  build-first ครบทุกจุด
+- ทุก fact ในแผน verify จากไฟล์จริง: fixture module-1 = 15 parts / **165 MCQ**,
+  FL-02 = 85 MCQ + 5 PBQ / 21 fields / kinds {checks,select,order}, PBQ-009 มี
+  `exhibit`, stack ตรึงตาม cyberskills-web, tokens vendored pattern
+- จุดเสี่ยงที่แผนดัก: `PGRST_DB_SCHEMAS` prod ยังไม่มี `academy` (external
+  checkpoint พร้อม rollback), RLS false-green (assert relrowsecurity + negative
+  แยก read/write), timebox → INCOMPLETE ห้าม tick, critical ค้าง = INCOMPLETE
+
+**Evidence:** `reports/reviews/oneshot-plan-ril-2026-07-31.md` (บันทึกทุกรอบ +
+verdicts + commits)
+
+**Residual risk:**
+- แผนยังไม่ถูก execute — สถานะจริงของ scaffold/local Supabase จะรู้ตอน run
+- Demand ต่อ course ยัง unvalidated (founder รับความเสี่ยง build-first;
+  รอบ pitch + poll ของ founder เป็นตัวปิด)
+- Director submodule pointer ยังไม่ bump (director branch ปัจจุบันเป็นของ
+  workstream อื่น — ทำตอนอยู่บน branch ที่ถูกต้อง)
+
 ## 2026-07-31 — Founder เคาะ: เริ่ม PLATFORM BUILD ทันที; Phase 0 = defer; ตัด CAS-005 gate จากแผน
 
 **Outcome:** ทิศ execution เปลี่ยนจาก validate-first → **build-first** — เริ่มทำ
