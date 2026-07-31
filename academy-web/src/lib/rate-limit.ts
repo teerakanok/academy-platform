@@ -4,11 +4,21 @@
 
 const WINDOW_MS = 60_000
 const MAX_REQUESTS_PER_WINDOW = 10
+// กัน state โตไม่จำกัดจาก key ปลอม (XFF หมุนค่า) — เกินเพดานแล้วกวาด key ที่
+// หมด window ทิ้งก่อน (finding review lane); เพดานนี้พอสำหรับ pre-public
+const MAX_TRACKED_KEYS = 10_000
 
 const hits = new Map<string, number[]>()
 
+function sweepExpired(now: number): void {
+  for (const [key, times] of hits) {
+    if (times.every((t) => now - t >= WINDOW_MS)) hits.delete(key)
+  }
+}
+
 /** คืน true = อนุญาต, false = เกิน limit (ควรตอบ 429) — `now` inject ได้เพื่อ test */
 export function allowRequest(key: string, now: number = Date.now()): boolean {
+  if (hits.size >= MAX_TRACKED_KEYS && !hits.has(key)) sweepExpired(now)
   const recent = (hits.get(key) ?? []).filter((t) => now - t < WINDOW_MS)
   if (recent.length >= MAX_REQUESTS_PER_WINDOW) {
     hits.set(key, recent)

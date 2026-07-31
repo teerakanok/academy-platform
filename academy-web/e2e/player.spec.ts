@@ -108,6 +108,28 @@ test.describe('exam resume + timer', () => {
     expect(answered).toBe(2)
   })
 
+  test('attempt หมดเวลาระหว่างปิดหน้า → reload แล้ว finalize เป็น submitted + แสดงผลทันที', async ({ page }) => {
+    await page.goto('/player/exam/cas005-full-practice-02')
+    await page.getByTestId('start-exam-button').click()
+    await page.locator('[data-testid^="mcq-"] input').first().check()
+
+    // จำลองเวลาหมดระหว่างปิดหน้า: เขียน endsAt ให้เป็นอดีตตรงๆ ใน storage
+    await page.evaluate(() => {
+      const key = Object.keys(window.localStorage).find((k) => k.includes('cas005-full-practice-02'))!
+      const rec = JSON.parse(window.localStorage.getItem(key)!) as { endsAt: number }
+      rec.endsAt = Date.now() - 60_000
+      window.localStorage.setItem(key, JSON.stringify(rec))
+    })
+    await page.reload()
+
+    await expect(page.getByTestId('results-screen')).toBeVisible()
+    const status = await page.evaluate(() => {
+      const key = Object.keys(window.localStorage).find((k) => k.includes('cas005-full-practice-02'))!
+      return (JSON.parse(window.localStorage.getItem(key)!) as { status: string }).status
+    })
+    expect(status).toBe('submitted')
+  })
+
   test('exam running + results: axe ผ่าน และ PBQ-009 exhibit render', async ({ page }) => {
     await page.goto('/player/exam/cas005-full-practice-02')
     await page.getByTestId('start-exam-button').click()

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { CURRENT_CONSENT_VERSION } from '@/lib/consent'
 
 export const metadata: Metadata = {
   title: 'นโยบายความเป็นส่วนตัว',
@@ -16,8 +17,8 @@ export default function PrivacyPage() {
         นโยบายความเป็นส่วนตัว — CyberSkills Academy
       </h1>
       <p className="text-cs-muted text-sm mb-10">
-        ฉบับ v1 · ปรับปรุงล่าสุด 31 กรกฎาคม 2026 · เป็นไปตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล
-        พ.ศ. 2562 (PDPA)
+        ฉบับ {CURRENT_CONSENT_VERSION} · ปรับปรุงล่าสุด 31 กรกฎาคม 2026 ·
+        เป็นไปตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 (PDPA)
       </p>
 
       <div className="space-y-8 leading-relaxed">

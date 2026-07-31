@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { createClient } from '@supabase/supabase-js'
-import { mkdirSync } from 'node:fs'
+import { mkdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 // M1 e2e — landing + lead capture บน local Supabase จริง
@@ -25,6 +25,16 @@ test.describe('landing', () => {
     await expect(page.getByRole('textbox', { name: 'อีเมล' })).toBeVisible()
     await expect(page.getByTestId('consent-checkbox')).not.toBeChecked()
     await expect(page.getByRole('link', { name: 'อ่านนโยบายความเป็นส่วนตัว' })).toHaveAttribute('href', '/privacy')
+
+    // ข้อความ consent ที่ผู้ใช้เห็นต้องเป็นฉบับเดียวกับไฟล์ versioned ที่ API บันทึก
+    // (กัน copy แยกร่างจาก v1.md — หลักฐาน consent ผิดฉบับ)
+    const consentFileText = readFileSync(
+      join(__dirname, '..', 'src', 'content', 'consent', 'v1.md'),
+      'utf8',
+    ).trim()
+    await expect(page.locator('label').filter({ has: page.getByTestId('consent-checkbox') })).toContainText(
+      consentFileText.slice(0, 60),
+    )
 
     mkdirSync(ARTIFACT_DIR, { recursive: true })
     await page.screenshot({ path: join(ARTIFACT_DIR, 'landing-desktop-1440.png'), fullPage: true })
@@ -94,13 +104,15 @@ test.describe('lead API — security + honesty', () => {
       headers: { 'content-type': 'application/json', 'x-forwarded-for': '10.50.2.1' },
       data: { email, consent: true },
     })
-    expect(first.status()).toBe(201)
+    expect(first.status()).toBe(200)
     const second = await request.post('/api/leads', {
       headers: { 'content-type': 'application/json', 'x-forwarded-for': '10.50.2.2' },
       data: { email: `  ${email.toUpperCase()}  `, consent: true },
     })
     expect(second.status()).toBe(200)
-    expect((await second.json()).ok).toBe(true)
+    // กัน enumeration: response ของ email ใหม่และ email ซ้ำต้องแยกไม่ออก
+    expect(await second.json()).toEqual(await first.json())
+    expect(second.status()).toBe(first.status())
 
     const db = serviceDb()
     const { data } = await db.from('leads').select('email').eq('email', email)

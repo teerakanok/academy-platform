@@ -29,6 +29,10 @@ create table academy.leads (
 );
 
 -- idempotency: email ซ้ำ = unique violation (23505) → API ตอบสำเร็จโดยไม่สร้าง row ซ้ำ
+-- KNOWN LIMITATION (review lane 2026-07-31): unique ต่อ email ทำให้บันทึก
+-- re-consent เวอร์ชันใหม่ของ lead เดิมไม่ได้ — ยอมรับได้ตอนนี้เพราะมี consent
+-- เวอร์ชันเดียว (v1) และยังไม่ public; ตอนเพิ่ม v2 (ซึ่งต้องมี migration แก้
+-- CHECK อยู่แล้ว) ให้เพิ่มตาราง append-only `consent_events` ในครั้งเดียวกัน
 create unique index leads_email_unique on academy.leads (email);
 
 -- RLS: เปิด และ *ไม่มี policy ใดๆ* = default deny สำหรับทุก role ที่ไม่ bypass

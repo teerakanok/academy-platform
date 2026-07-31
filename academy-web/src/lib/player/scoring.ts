@@ -44,9 +44,11 @@ export interface ExamScore {
 }
 
 function sameSet(a: string[], b: string[]): boolean {
-  if (a.length !== b.length) return false
+  // เทียบเชิงเซ็ตแท้ — dedupe ทั้งสองฝั่งก่อน กันคำตอบซ้ำสมาชิก (เช่น ['A','A'])
+  // ถูกนับเทียบ length แล้วผ่านทั้งที่เซ็ตจริงไม่ครบ (finding review lane)
+  const sa = new Set(a)
   const sb = new Set(b)
-  return a.every((x) => sb.has(x))
+  return sa.size === sb.size && [...sa].every((x) => sb.has(x))
 }
 
 function sameOrder(a: string[], b: string[]): boolean {

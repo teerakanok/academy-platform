@@ -26,9 +26,11 @@ export default defineConfig({
   ],
   webServer: {
     // production serve (next start) — ต้อง `npm run build` ก่อน (อยู่ใน acceptance chain แล้ว)
+    // reuse=false: fail-closed ถ้ามี server ค้างบน port — กัน acceptance เขียว
+    // กับ build เก่า (finding review lane)
     command: 'npm run start',
     url: 'http://127.0.0.1:3000',
-    reuseExistingServer: true,
+    reuseExistingServer: false,
     timeout: 60_000,
   },
 })

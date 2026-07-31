@@ -47,6 +47,20 @@ const mcqSchema = z.object({
   sources: z.array(z.string()).optional(),
   keywords: z.array(keywordSchema).optional(),
   visual: visualSchema.optional(),
+}).superRefine((q, ctx) => {
+  // semantic invariants ที่ scoring/UI พึ่ง (finding review lane) — type ผ่าน
+  // อย่างเดียวไม่พอ: ข้อที่ correct ชี้ตัวเลือกที่ไม่มีอยู่ = ข้อที่ตอบถูกไม่ได้เลย
+  const letters = new Set(Object.keys(q.choices))
+  const unknown = q.correct.filter((c) => !letters.has(c))
+  if (unknown.length > 0) {
+    ctx.addIssue({ code: 'custom', message: `${q.id}: correct มีตัวเลือกที่ไม่มีใน choices: ${unknown.join(',')}` })
+  }
+  if (new Set(q.correct).size !== q.correct.length) {
+    ctx.addIssue({ code: 'custom', message: `${q.id}: correct มีตัวซ้ำ` })
+  }
+  if (q.type === 'single' && q.correct.length !== 1) {
+    ctx.addIssue({ code: 'custom', message: `${q.id}: type=single ต้องมี correct 1 ตัว (พบ ${q.correct.length})` })
+  }
 })
 
 // field.kind เป็น discriminator (ไม่ใช่ field.type — บทเรียน RIL r1)
@@ -70,6 +84,17 @@ const pbqFieldSchema = z
     if ((f.kind === 'checks' || f.kind === 'select' || f.kind === 'order') && !f.options?.length) {
       ctx.addIssue({ code: 'custom', message: `field ${f.id}: kind=${f.kind} ต้องมี options` })
     }
+    if (f.options) {
+      if (new Set(f.options).size !== f.options.length) {
+        ctx.addIssue({ code: 'custom', message: `field ${f.id}: options มีค่าซ้ำ` })
+      }
+      const opts = new Set(f.options)
+      const correctValues = Array.isArray(f.correct) ? f.correct : [f.correct]
+      const missing = correctValues.filter((c) => !opts.has(c))
+      if ((f.kind === 'checks' || f.kind === 'select' || f.kind === 'order') && missing.length > 0) {
+        ctx.addIssue({ code: 'custom', message: `field ${f.id}: correct มีค่าที่ไม่อยู่ใน options` })
+      }
+    }
   })
 
 const pbqSchema = z.object({
@@ -81,6 +106,11 @@ const pbqSchema = z.object({
   fields: z.array(pbqFieldSchema).min(1),
   sources: z.array(z.string()).optional(),
   keywords: z.array(keywordSchema).optional(),
+}).superRefine((p, ctx) => {
+  const ids = p.fields.map((f) => f.id)
+  if (new Set(ids).size !== ids.length) {
+    ctx.addIssue({ code: 'custom', message: `${p.id}: field id ซ้ำภายใน PBQ` })
+  }
 })
 
 const modulePartFileSchema = z.object({
@@ -168,4 +198,65 @@ export function buildCourseContent(
 ): CourseContent {
   // media slot ตั้งใจว่างไว้ — ห้าม map จาก manifest.services (marketing metadata)
   return { modules, fullLength }
+}
+
+const manifestContractSchema = z.object({
+  modules: z
+    .array(
+      z.object({
+        slug: z.string(),
+        questionCount: z.number().int().nonnegative(),
+        parts: z.array(z.object({ slug: z.string(), count: z.number().int().nonnegative() })),
+      }),
+    )
+    .optional(),
+  fullLength: z
+    .array(
+      z.object({
+        id: z.string(),
+        normalQuestions: z.number().int().nonnegative(),
+        pbqs: z.number().int().nonnegative(),
+      }),
+    )
+    .optional(),
+})
+
+/**
+ * ตรวจ content ที่โหลดได้กับ manifest ของชุดเนื้อหา — กันเคส "ไฟล์หายบางส่วน
+ * แล้วระบบเสิร์ฟ bank สั้นลงแบบเงียบ" (finding review lane): manifest คือ
+ * contract ว่าชุดนี้ควรมีอะไรครบเท่าไร
+ */
+export function assertManifestContract(
+  content: CourseContent,
+  manifestData: unknown,
+  file: string,
+): void {
+  const parsed = manifestContractSchema.safeParse(manifestData)
+  if (!parsed.success) fail(file, parsed.error)
+  const manifest = parsed.data
+
+  for (const expected of manifest.modules ?? []) {
+    const loaded = content.modules.find((m) => m.slug === expected.slug)
+    if (!loaded) {
+      throw new ContentValidationError(file, `module ${expected.slug} อยู่ใน manifest แต่โหลดไม่พบ`)
+    }
+    if (loaded.questions.length !== expected.questionCount) {
+      throw new ContentValidationError(
+        file,
+        `module ${expected.slug}: โหลดได้ ${loaded.questions.length} ข้อ แต่ manifest ระบุ ${expected.questionCount} (ไฟล์ part หาย/เกิน?)`,
+      )
+    }
+  }
+  for (const expected of manifest.fullLength ?? []) {
+    const loaded = content.fullLength.find((t) => t.id === expected.id)
+    if (!loaded) {
+      throw new ContentValidationError(file, `full-length ${expected.id} อยู่ใน manifest แต่โหลดไม่พบ`)
+    }
+    if (loaded.questions.length !== expected.normalQuestions || loaded.pbqs.length !== expected.pbqs) {
+      throw new ContentValidationError(
+        file,
+        `full-length ${expected.id}: โหลดได้ ${loaded.questions.length}+${loaded.pbqs.length} แต่ manifest ระบุ ${expected.normalQuestions}+${expected.pbqs}`,
+      )
+    }
+  }
 }

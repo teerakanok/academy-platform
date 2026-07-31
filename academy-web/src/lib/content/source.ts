@@ -1,6 +1,6 @@
-import { readdirSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { buildCourseContent, loadFullLength, loadModuleBank } from './loader'
+import { assertManifestContract, buildCourseContent, loadFullLength, loadModuleBank } from './loader'
 import type { CourseContent } from './types'
 
 // Server-side content source — อ่านจาก fixture dir (content-agnostic: เปลี่ยน dir
@@ -39,6 +39,15 @@ export function getCourseContent(): CourseContent {
     .sort()
     .map((f) => loadFullLength(f, readJson(join(fullLengthDir, f))))
 
-  cached = buildCourseContent(modules, fullLength)
+  const content = buildCourseContent(modules, fullLength)
+
+  // manifest = contract ของชุดเนื้อหา — ถ้ามี ต้องตรงกับที่โหลดได้จริง
+  // (กันไฟล์หายบางส่วนแบบเงียบ); ไม่มี manifest = ข้ามได้ (content-agnostic)
+  const manifestPath = join(CONTENT_DIR, 'manifest.json')
+  if (existsSync(manifestPath)) {
+    assertManifestContract(content, readJson(manifestPath), 'manifest.json')
+  }
+
+  cached = content
   return cached
 }

@@ -5,6 +5,10 @@ import { join } from 'node:path'
 // Visual state matrix (แผน §4-M2-9):
 // {landing, module list, quiz กลางชุด, PBQ ทั้ง 3 kind, results, review} × {1440, 390}
 // PBQ-010 มีครบทั้ง checks/select/order ในตัวเดียว + PBQ-009 สำหรับ exhibit
+//
+// ⚠️ ขอบเขตของ suite นี้ = "เก็บหลักฐานภาพให้ครบทุก state" เท่านั้น —
+// ผลเขียวไม่ใช่คำรับรองว่าไม่มี visual defect; การตัดสิน defect เป็นขั้น
+// review ภาพโดยคน/agent แยกต่างหาก (บันทึกผลใน completed_log/handoff)
 
 const ARTIFACT_DIR = join(__dirname, '..', '..', 'artifacts', 'oneshot-2026-07-31', 'm2')
 const VIEWPORTS = [

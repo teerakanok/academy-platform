@@ -97,8 +97,8 @@ export async function POST(request: NextRequest) {
   })
 
   if (error) {
-    // unique violation = email ซ้ำ → idempotent success (ไม่สร้าง row ซ้ำ ไม่เผย
-    // ว่า email นี้เคยลงทะเบียน — กัน enumeration)
+    // unique violation = email ซ้ำ → idempotent success — status/body ต้อง
+    // เหมือน path สร้างใหม่ทุกประการ กัน enumeration จาก response ที่ต่างกัน
     if (error.code === '23505') {
       return NextResponse.json({ ok: true }, { status: 200 })
     }
@@ -111,5 +111,5 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  return NextResponse.json({ ok: true }, { status: 201 })
+  return NextResponse.json({ ok: true }, { status: 200 })
 }

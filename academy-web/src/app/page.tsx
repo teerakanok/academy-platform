@@ -1,7 +1,11 @@
 import { WaitlistForm } from '@/components/WaitlistForm'
+import { consentText, CURRENT_CONSENT_VERSION } from '@/lib/consent'
 
 // Landing shell — content-agnostic: ห้ามประกาศ course ใดๆ จนกว่า founder เคาะ catalog
 export default function HomePage() {
+  // ข้อความ consent ต้องมาจากไฟล์ versioned ฉบับเดียวกับที่ API บันทึกเสมอ
+  // (finding review lane: ห้าม hardcode copy แยกจาก v1.md — หลักฐาน consent จะผิดฉบับ)
+  const consentLabel = consentText(CURRENT_CONSENT_VERSION).trim()
   return (
     <div className="mx-auto max-w-5xl px-6">
       <section className="pt-24 pb-16 sm:pt-32">
@@ -45,7 +49,7 @@ export default function HomePage() {
           เปิดตัวเร็วๆ นี้
         </h2>
         <p className="text-cs-body mb-6">ลงทะเบียนรับข่าวการเปิดตัวก่อนใคร</p>
-        <WaitlistForm consentSummary="ข้าพเจ้ายินยอมให้ CYBERSKILLS เก็บและใช้อีเมลนี้เพื่อแจ้งข่าวการเปิดตัวและความคืบหน้าของ CyberSkills Academy" />
+        <WaitlistForm consentSummary={consentLabel} />
       </section>
     </div>
   )

@@ -50,23 +50,44 @@ export interface LoadResult {
   corruptReset: boolean
 }
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((x) => typeof x === 'string')
+}
+
+// validation ต้องลึกถึงคำตอบทุก entry — shallow typeof เคยปล่อย answers.mcq=null
+// ผ่าน (typeof null === 'object') แล้วไป crash ใน player แทนที่จะ reset+แจ้ง
+// (finding review lane)
 function isValidRecord(value: unknown): value is AttemptRecord {
-  if (typeof value !== 'object' || value === null) return false
-  const r = value as Record<string, unknown>
-  return (
-    r.version === PROGRESS_STORE_VERSION &&
-    typeof r.contentId === 'string' &&
-    typeof r.attemptId === 'string' &&
-    (r.mode === 'exam' || r.mode === 'practice') &&
-    (r.endsAt === null || typeof r.endsAt === 'number') &&
-    typeof r.seed === 'number' &&
-    typeof r.answers === 'object' &&
-    r.answers !== null &&
-    typeof (r.answers as Record<string, unknown>).mcq === 'object' &&
-    typeof (r.answers as Record<string, unknown>).pbq === 'object' &&
-    (r.status === 'in-progress' || r.status === 'submitted') &&
-    typeof r.startedAt === 'number'
-  )
+  if (!isPlainObject(value)) return false
+  const r = value
+  if (r.version !== PROGRESS_STORE_VERSION) return false
+  if (typeof r.contentId !== 'string' || typeof r.attemptId !== 'string') return false
+  if (r.mode !== 'exam' && r.mode !== 'practice') return false
+  if (r.endsAt !== null && !(typeof r.endsAt === 'number' && Number.isFinite(r.endsAt))) return false
+  if (typeof r.seed !== 'number' || !Number.isFinite(r.seed)) return false
+  if (r.status !== 'in-progress' && r.status !== 'submitted') return false
+  if (typeof r.startedAt !== 'number' || !Number.isFinite(r.startedAt)) return false
+  if (r.submittedAt !== null && !(typeof r.submittedAt === 'number' && Number.isFinite(r.submittedAt))) return false
+
+  if (!isPlainObject(r.answers)) return false
+  const { mcq, pbq } = r.answers as Record<string, unknown>
+  if (!isPlainObject(mcq) || !isPlainObject(pbq)) return false
+  for (const answer of Object.values(mcq)) {
+    if (answer !== undefined && !isStringArray(answer)) return false
+  }
+  for (const fields of Object.values(pbq)) {
+    if (!isPlainObject(fields)) return false
+    for (const fieldAnswer of Object.values(fields)) {
+      if (fieldAnswer !== undefined && typeof fieldAnswer !== 'string' && !isStringArray(fieldAnswer)) {
+        return false
+      }
+    }
+  }
+  return true
 }
 
 export function loadAttempt(store: ProgressStore, contentId: string, attemptId: string): LoadResult {

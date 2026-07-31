@@ -28,14 +28,22 @@ export function ExamPlayer({ test }: { test: FullLengthTest }) {
   const [index, setIndex] = useState(0)
   const [corruptNotice, setCorruptNotice] = useState(false)
 
-  // resume: attempt in-progress ที่ยังไม่หมดเวลา → ทำต่อได้ทันที
+  // resume: attempt in-progress ที่ยังไม่หมดเวลา → ทำต่อได้ทันที;
+  // หมดเวลาไประหว่างปิดหน้า → finalize เป็น submitted ทันที (idempotent) —
+  // ห้ามเด้งกลับ intro ทั้งที่ storage ยังค้าง in-progress (finding review lane)
   useEffect(() => {
     const { record, corruptReset } = latestAttempt(browserStore(), test.id)
     if (corruptReset) setCorruptNotice(true)
-    if (record && record.status === 'in-progress' && !isExpired(record)) {
+    if (!record) return
+    if (record.status === 'in-progress' && isExpired(record)) {
+      const finalized: AttemptRecord = { ...record, status: 'submitted', submittedAt: record.endsAt }
+      saveAttempt(browserStore(), finalized)
+      setAttempt(finalized)
+      setPhase('submitted')
+    } else if (record.status === 'in-progress') {
       setAttempt(record)
       setPhase('running')
-    } else if (record && record.status === 'submitted') {
+    } else {
       setAttempt(record)
       setPhase('submitted')
     }
