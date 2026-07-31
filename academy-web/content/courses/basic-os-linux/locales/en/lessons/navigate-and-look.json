@@ -1,0 +1,140 @@
+{
+  "nodeId": "navigate-and-look",
+  "locale": "en",
+  "title": "Move around and look at things",
+  "objective": "By the end of this lesson you can move anywhere in the filesystem and read every column of a detailed listing, including the parts most people skip.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Three commands do almost all of the moving and looking: pwd tells you where you are, ls shows what is here, and cd takes you somewhere else. The skill worth building is not memorising them — it is reading what ls tells you, because that output answers security questions later."
+    },
+    {
+      "kind": "code",
+      "caption": "Moving around",
+      "lines": [
+        "pwd              # where am I",
+        "cd /var/log      # go to an absolute path",
+        "cd ..            # go up one level",
+        "cd               # go home (same as cd ~)",
+        "cd -             # go back to where I just was"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The flags on ls that matter"
+    },
+    {
+      "kind": "table",
+      "headers": ["Command", "What it adds"],
+      "rows": [
+        ["ls", "Names only"],
+        ["ls -l", "Long form: permissions, owner, size, modified time"],
+        ["ls -a", "Includes hidden entries — anything starting with a dot"],
+        ["ls -lh", "Long form with human-readable sizes (4.0K instead of 4096)"],
+        ["ls -lt", "Sorted by modification time, newest first"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "The combination to keep in your fingers",
+      "text": "ls -lah — long form, hidden files included, readable sizes. Hidden files are where configuration lives, and they are exactly what an attacker would prefer you not to list."
+    },
+    {
+      "kind": "heading",
+      "text": "Reading a long listing, column by column"
+    },
+    {
+      "kind": "code",
+      "caption": "One line of ls -lh output",
+      "lines": ["-rw-r--r--  1  songpon  staff   2.4K  Jul 31 14:02  notes.txt"]
+    },
+    {
+      "kind": "list",
+      "ordered": true,
+      "items": [
+        "-rw-r--r--  — the type and the permissions. The first character is the type: - is a regular file, d is a directory, l is a link",
+        "1 — how many names point at this same data",
+        "songpon — the user who owns it",
+        "staff — the group that owns it",
+        "2.4K — the size",
+        "Jul 31 14:02 — when it was last modified",
+        "notes.txt — the name"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "You do not need to decode the permission characters yet — that is its own lesson. What matters now is knowing that the owner, the group, and those ten characters are all sitting there in every listing, waiting to be read."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Why the modified time is a security field",
+      "text": "In an investigation, \"which files changed around the time of the alert?\" is one of the first questions. ls -lt sorts by exactly that. A configuration file in /etc with a modification time nobody can account for is worth explaining."
+    },
+    {
+      "kind": "try",
+      "title": "Read a real directory properly",
+      "steps": [
+        "Run: cd ~ && ls -lah",
+        "Find one entry whose name starts with a dot and note what it is",
+        "Run: ls -lt /etc | head",
+        "Look at the newest-modified configuration files on your machine"
+      ],
+      "expected": "Your home directory including hidden config files, then the most recently changed files in /etc. On a fresh machine the newest ones are usually from installation time."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "When a command confuses you",
+      "text": "Run man followed by the command name — for example man ls — to read its manual. Press q to quit. Reading man pages is a habit that separates people who can work on an unfamiliar system from people who can only repeat what they memorised."
+    }
+  ],
+  "cheatsheet": [
+    "pwd where am I · ls what is here · cd move",
+    "cd .. up one · cd home · cd - back to previous location",
+    "ls -lah is the workhorse: long form, hidden files, readable sizes",
+    "ls -l columns: type+permissions, links, owner, group, size, modified, name",
+    "First character: - file · d directory · l link",
+    "ls -lt sorts newest first — the investigation view",
+    "man <command> opens the manual; q quits"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Which command shows hidden files with readable sizes and full detail?",
+      "choices": {
+        "A": "ls",
+        "B": "ls -lah",
+        "C": "ls -R",
+        "D": "pwd -a"
+      },
+      "correct": ["B"],
+      "explanation": "-l gives the long form, -a includes dot-files, -h makes sizes readable. Together they are the listing you will use most."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "In the listing line `drwxr-xr-x 2 songpon staff 4.0K Jul 31 14:02 reports`, what does the leading `d` tell you?",
+      "choices": {
+        "A": "The entry is deleted",
+        "B": "The entry is a directory",
+        "C": "The file is a duplicate",
+        "D": "The owner has disabled the file"
+      },
+      "correct": ["B"],
+      "explanation": "The first character is the entry type: d for directory, - for a regular file, l for a symbolic link."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "You are asked which configuration files changed most recently on a server. What do you run?",
+      "choices": {
+        "A": "ls -lt /etc",
+        "B": "ls -a /etc",
+        "C": "pwd /etc",
+        "D": "cd /etc"
+      },
+      "correct": ["A"],
+      "explanation": "-t sorts by modification time, newest first. That question comes up constantly during incident work."
+    }
+  ]
+}

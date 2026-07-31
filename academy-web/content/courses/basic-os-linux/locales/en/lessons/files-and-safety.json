@@ -1,0 +1,136 @@
+{
+  "nodeId": "files-and-safety",
+  "locale": "en",
+  "title": "Create, copy, move, delete — safely",
+  "objective": "By the end of this lesson you can manage files from the command line, and you have working habits that stop the one mistake that ends careers.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "The commands here are short and there are not many of them. The important content of this lesson is not the commands — it is that the command line does what you said, immediately, with no confirmation and no recycle bin."
+    },
+    {
+      "kind": "code",
+      "caption": "The core set",
+      "lines": [
+        "mkdir reports              # make a directory",
+        "mkdir -p reports/2026/q3   # make the whole chain at once",
+        "touch notes.txt            # create an empty file",
+        "cp notes.txt backup.txt    # copy",
+        "cp -r reports archive      # copy a directory and its contents",
+        "mv notes.txt final.txt     # rename (move within the same place)",
+        "mv final.txt ~/documents/  # move somewhere else",
+        "rm backup.txt              # delete a file",
+        "rmdir empty-folder         # delete an empty directory"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Looking inside a file without opening an editor"
+    },
+    {
+      "kind": "table",
+      "headers": ["Command", "Use it when"],
+      "rows": [
+        ["cat file", "The file is short and you want all of it"],
+        ["less file", "The file is long — scroll with arrows, q to quit"],
+        ["head file", "You only need the first 10 lines"],
+        ["tail file", "You only need the last 10 lines"],
+        ["tail -f file", "The file is being written to right now and you want to watch it live"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "tail -f is how you watch a system think",
+      "text": "Run tail -f on a log file, then trigger the thing you are testing in another window. Watching entries appear in real time turns debugging from guesswork into observation."
+    },
+    {
+      "kind": "heading",
+      "text": "The command that deserves its reputation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "rm -rf means \"delete this, everything inside it, recursively, and do not ask me about anything\". It is genuinely useful and it is genuinely how people destroy production systems. There is no undo. The files are not in a bin somewhere."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The three habits that prevent the disaster",
+      "text": "First: run ls with the same path before you run rm with it — look at exactly what is about to go. Second: never put a wildcard next to a slash you have not read twice; the space in `rm -rf / tmp/old` instead of `rm -rf /tmp/old` is a real and famous way to erase a machine. Third: on anything that matters, check pwd before deleting relative paths."
+    },
+    {
+      "kind": "code",
+      "caption": "The habit, written out",
+      "lines": [
+        "ls -la /tmp/build-cache      # look first — is this really what I mean?",
+        "rm -rf /tmp/build-cache      # then act"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Why this is a security lesson, not just a safety one",
+      "text": "Destroying data is an availability failure, and availability is one third of the security triad alongside confidentiality and integrity. An engineer who deletes the wrong directory has caused a security incident, whatever the intent was."
+    },
+    {
+      "kind": "try",
+      "title": "Practise in a throwaway directory",
+      "steps": [
+        "Run: mkdir -p ~/sandbox/a/b && cd ~/sandbox",
+        "Run: touch a/one.txt a/b/two.txt",
+        "Run: ls -R a          (see the structure you made)",
+        "Run: cp -r a a-copy   (copy the whole tree)",
+        "Run: ls -la a-copy    (look before you delete — always this order)",
+        "Run: rm -rf a-copy    (now remove it)"
+      ],
+      "expected": "You built a small tree, copied it, inspected the copy, and removed it. Practising the look-then-act order in a sandbox is how it becomes automatic when it matters."
+    }
+  ],
+  "cheatsheet": [
+    "mkdir -p makes the whole path chain · touch creates an empty file",
+    "cp -r and mv work on directories; mv is also how you rename",
+    "cat short files · less long files · head/tail for the ends",
+    "tail -f watches a file live — the debugging workhorse",
+    "rm has no undo and no recycle bin",
+    "Always ls the exact path first, then rm it",
+    "Deleting the wrong data is an availability incident, not just a mistake"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "You want to watch new lines appear in a log file as they are written. What do you use?",
+      "choices": {
+        "A": "cat logfile",
+        "B": "tail -f logfile",
+        "C": "head logfile",
+        "D": "less logfile"
+      },
+      "correct": ["B"],
+      "explanation": "tail -f follows the file, printing new lines as they arrive. The others show a snapshot and return."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "What is the habit that most reliably prevents deleting the wrong thing?",
+      "choices": {
+        "A": "Running rm twice to be sure",
+        "B": "Running ls on the exact same path first and reading the output",
+        "C": "Deleting only on weekdays",
+        "D": "Using rm without -r"
+      },
+      "correct": ["B"],
+      "explanation": "Look-then-act. Running ls with the identical path shows you precisely what the command will affect, before it is irreversible."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why is accidental deletion described as a security incident?",
+      "choices": {
+        "A": "Because it is always caused by an attacker",
+        "B": "Because availability is part of the security triad alongside confidentiality and integrity",
+        "C": "Because deleted files can be recovered by attackers",
+        "D": "It is not — it is only an operations problem"
+      },
+      "correct": ["B"],
+      "explanation": "Security covers confidentiality, integrity and availability. Data that is gone is an availability failure regardless of whether anyone acted maliciously."
+    }
+  ]
+}

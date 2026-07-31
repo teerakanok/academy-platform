@@ -1,0 +1,33 @@
+{
+  "locale": "en",
+  "title": "Basic OS & Linux",
+  "subtitle": "Understand what an operating system is actually doing, then drive Linux from the command line with confidence.",
+  "audience": "For anyone moving into IT or security who has used a computer for years but never looked underneath. No prior command-line experience needed.",
+  "outcomes": [
+    "Explain what an operating system does, in plain language, without hand-waving",
+    "Move around a Linux filesystem and read what a listing is telling you",
+    "Read and change permissions, and recognise the permission mistakes attackers look for",
+    "Inspect running processes and keep a system patched",
+    "Chain commands together to answer a question from a log file"
+  ],
+  "skillLabels": {
+    "os-concepts": "How systems work",
+    "cli": "Command line",
+    "filesystem": "Files & paths",
+    "permissions": "Users & permissions",
+    "processes": "Processes & packages",
+    "security-lens": "Security thinking"
+  },
+  "nodeTitles": {
+    "os-what-it-does": "What an operating system actually does",
+    "linux-and-distros": "Linux, kernels, and distributions",
+    "get-a-linux": "Get a Linux you can break",
+    "filesystem-tree": "The filesystem is one tree",
+    "navigate-and-look": "Move around and look at things",
+    "files-and-safety": "Create, copy, move, delete — safely",
+    "users-and-root": "Users, groups, and root",
+    "permissions": "Read and change permissions",
+    "processes-and-packages": "Processes and keeping software current",
+    "pipes-and-logs": "Pipes, grep, and reading logs"
+  }
+}

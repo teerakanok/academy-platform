@@ -1,0 +1,121 @@
+{
+  "nodeId": "get-a-linux",
+  "locale": "en",
+  "title": "Get a Linux you can break",
+  "objective": "By the end of this lesson you have a working Linux terminal in front of you, on a machine where breaking things costs you nothing.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "You cannot learn this by reading. You need a machine you are willing to destroy, because the fastest way to understand what a command does is to run it somewhere the consequences are free."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Pick whichever of these matches the computer in front of you. All three give you a real Linux command line."
+    },
+    {
+      "kind": "heading",
+      "text": "On Windows: WSL"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Windows Subsystem for Linux runs a real Linux kernel alongside Windows. It is the least friction of any option and it is what most people should use."
+    },
+    {
+      "kind": "code",
+      "caption": "In PowerShell, as administrator",
+      "lines": ["wsl --install", "# then restart, and open \"Ubuntu\" from the Start menu"]
+    },
+    {
+      "kind": "heading",
+      "text": "On macOS: a virtual machine, not the built-in terminal"
+    },
+    {
+      "kind": "paragraph",
+      "text": "macOS gives you a Unix terminal, which feels similar and will get you through the early lessons. But it is not Linux — some commands differ, and the permission and package sections later will not match. Install a free virtualisation tool and run Ubuntu inside it."
+    },
+    {
+      "kind": "heading",
+      "text": "On anything, including a tablet: a cloud shell"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Every major cloud provider offers a free browser-based Linux shell attached to your account. Nothing to install. The trade-off is that these sessions reset, so treat anything you save there as temporary."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Do not practise on something that matters",
+      "text": "Never learn these commands on a machine that holds work data, or on a server anyone depends on. Part of the point is to make mistakes. Make them where the worst outcome is rebuilding a throwaway machine."
+    },
+    {
+      "kind": "heading",
+      "text": "Prove it works"
+    },
+    {
+      "kind": "paragraph",
+      "text": "You now have a black window with a prompt in it. The prompt usually ends in $ and is the system waiting for you to type. Three commands will confirm everything is wired up."
+    },
+    {
+      "kind": "try",
+      "title": "Your first three commands",
+      "steps": [
+        "Type: whoami        (which user am I?)",
+        "Type: pwd           (where am I?)",
+        "Type: uname -a      (what is this system?)"
+      ],
+      "expected": "A username, then a path that probably starts with /home, then a long line naming the kernel. If all three answered, your environment is ready for the rest of the course."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Two habits worth forming now",
+      "text": "Press Tab to complete a half-typed name instead of typing it out — it prevents typos in exactly the places typos are expensive. Press the up arrow to bring back the previous command instead of retyping it."
+    }
+  ],
+  "cheatsheet": [
+    "Windows: wsl --install, then open Ubuntu",
+    "macOS: run Ubuntu in a VM — the built-in terminal is Unix but not Linux",
+    "Anywhere: a provider's browser cloud shell, but treat storage as temporary",
+    "Never practise on a machine holding real data",
+    "whoami = which user · pwd = where am I · uname -a = what system is this",
+    "Tab completes names · up arrow recalls the last command"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "You are on Windows and want the lowest-friction real Linux environment. What do you use?",
+      "choices": {
+        "A": "The Windows command prompt, which is the same thing",
+        "B": "WSL — Windows Subsystem for Linux",
+        "C": "A remote desktop into a colleague's machine",
+        "D": "The built-in macOS terminal"
+      },
+      "correct": ["B"],
+      "explanation": "WSL runs a real Linux kernel next to Windows. The Windows command prompt is a different system with different commands entirely."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why is the macOS terminal not a perfect substitute for Linux in this course?",
+      "choices": {
+        "A": "It has no command line at all",
+        "B": "It is Unix-like and feels similar, but some commands and the package and permission behaviour differ from Linux",
+        "C": "It cannot run any of the commands in this course",
+        "D": "It requires a paid licence"
+      },
+      "correct": ["B"],
+      "explanation": "It will carry you through the early navigation lessons, then diverge exactly where the course gets specific — package management and some permission details."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Which command answers \"where am I in the filesystem right now?\"",
+      "choices": {
+        "A": "whoami",
+        "B": "uname -a",
+        "C": "pwd",
+        "D": "ls"
+      },
+      "correct": ["C"],
+      "explanation": "pwd prints the working directory. whoami answers who, uname answers what system, and ls lists what is here — a different question."
+    }
+  ]
+}

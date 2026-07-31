@@ -1,0 +1,198 @@
+{
+  "nodeId": "pipes-and-logs",
+  "locale": "en",
+  "title": "Pipes, grep, and reading logs",
+  "objective": "By the end of this lesson you can chain small commands together to answer a real question from a log file — the core working skill of anyone who investigates systems.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "This is the capstone, and it is where the Unix idea finally pays off. Each command you have learned does one narrow thing. The power comes from connecting them: the output of one becomes the input of the next, and a question nobody wrote a tool for gets answered in a single line."
+    },
+    {
+      "kind": "heading",
+      "text": "Three streams and two operators"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Every command has an input, an output, and a separate channel for errors. You redirect them with a small set of symbols."
+    },
+    {
+      "kind": "table",
+      "headers": ["Symbol", "Meaning"],
+      "rows": [
+        ["|", "Send the output of the left command into the right command"],
+        [">", "Write output to a file, replacing what was there"],
+        [">>", "Append output to the end of a file"],
+        ["2>", "Redirect error messages specifically"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "> overwrites without asking",
+      "text": "command > results.txt destroys whatever results.txt held. >> adds to it. This is the same lesson as rm, in a different costume: the shell does exactly what you said, immediately."
+    },
+    {
+      "kind": "heading",
+      "text": "The four commands that do most of the work"
+    },
+    {
+      "kind": "code",
+      "caption": "Your investigation toolkit",
+      "lines": [
+        "grep 'pattern' file       # print only lines that match",
+        "grep -i 'error' file      # case-insensitive",
+        "grep -c 'error' file      # count matches instead of printing them",
+        "grep -v 'healthcheck' f   # invert: everything EXCEPT matches",
+        "",
+        "wc -l file                # count lines",
+        "sort                      # sort lines",
+        "uniq -c                   # collapse duplicates and count them"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Chaining them into an answer"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Here is a question a real person gets asked: which IP addresses failed to log in, and which one tried hardest? There is no single command for that. There is a pipeline."
+    },
+    {
+      "kind": "code",
+      "caption": "Read it left to right, as a sentence",
+      "lines": [
+        "grep 'Failed password' /var/log/auth.log | awk '{print $(NF-3)}' | sort | uniq -c | sort -rn | head",
+        "",
+        "# find the failed-login lines",
+        "#   -> pull out the IP address field",
+        "#      -> sort them so identical ones sit together",
+        "#         -> collapse duplicates and count each",
+        "#            -> sort by that count, highest first",
+        "#               -> show the top few"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Each stage is simple and replaceable. If the log format differs on your system, you change one stage rather than looking for a different tool. That composability is the whole design philosophy, and it is why these commands have outlived every product built to replace them."
+    },
+    {
+      "kind": "heading",
+      "text": "Where the logs are"
+    },
+    {
+      "kind": "table",
+      "headers": ["Location", "What is in it"],
+      "rows": [
+        ["/var/log/auth.log", "Authentication: logins, sudo use, failures (Debian/Ubuntu)"],
+        ["/var/log/syslog", "General system messages"],
+        ["/var/log/", "Everything else, often one directory per service"],
+        ["journalctl -u ssh", "On systemd machines, logs for one specific service"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Reading auth.log is a real security skill",
+      "text": "Failed passwords, sudo commands, new sessions from unfamiliar addresses — the evidence for most host-level questions is sitting in that one file. Being able to interrogate it with a pipeline, on a machine with no security tooling installed, is the difference between waiting for a dashboard and finding the answer."
+    },
+    {
+      "kind": "try",
+      "title": "Answer a question with a pipeline",
+      "steps": [
+        "Run: sudo grep -c 'sudo' /var/log/auth.log          (how many sudo events)",
+        "Run: sudo grep 'sudo' /var/log/auth.log | tail -5   (the most recent ones)",
+        "Run: ls /var/log | wc -l                            (how many log files exist)",
+        "Run: sudo journalctl -n 20                          (last 20 system journal entries, if systemd)",
+        "Build your own: pick any log and count how many lines mention a word you choose"
+      ],
+      "expected": "Counts and recent entries from your own machine's authentication log, then a pipeline you assembled yourself. If your distribution stores authentication elsewhere, finding that out is part of the exercise."
+    },
+    {
+      "kind": "heading",
+      "text": "Where to go from here"
+    },
+    {
+      "kind": "paragraph",
+      "text": "You now have the foundation the rest of security work is built on: you know what the operating system is doing, you can move around it, you can read and set permissions, you can see what is running, and you can interrogate a log. Every next topic — networking, hardening, incident response, cloud — assumes exactly this and adds to it."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "The habit that matters most",
+      "text": "When something on a Linux machine confuses you, the answer is almost always available from the machine itself: a man page, a config file in /etc, a log in /var/log, or a process list. Reach for those before reaching for a search engine. That habit is what makes someone able to work on a system they have never seen."
+    }
+  ],
+  "cheatsheet": [
+    "| pipes output into the next command · > overwrites a file · >> appends · 2> redirects errors",
+    "grep finds lines · -i ignores case · -c counts · -v inverts",
+    "wc -l counts lines · sort orders · uniq -c collapses and counts",
+    "sort | uniq -c | sort -rn = the standard 'what is most frequent' pattern",
+    "/var/log/auth.log holds logins, sudo use and failures",
+    "journalctl -u <service> reads one service's logs on systemd",
+    "Change one stage of a pipeline rather than looking for a different tool",
+    "The machine can usually answer your question about itself: man, /etc, /var/log, ps"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What does the | symbol do?",
+      "choices": {
+        "A": "Runs two commands at the same time independently",
+        "B": "Sends the output of the command on the left as the input of the command on the right",
+        "C": "Writes output to a file",
+        "D": "Comments out the rest of the line"
+      },
+      "correct": ["B"],
+      "explanation": "That connection is the whole idea: small single-purpose commands become an answer when chained."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "You want to append results to an existing file without destroying it. Which do you use?",
+      "choices": {
+        "A": "> results.txt",
+        "B": ">> results.txt",
+        "C": "| results.txt",
+        "D": "2> results.txt"
+      },
+      "correct": ["B"],
+      "explanation": "> replaces the file's contents outright. >> adds to the end. 2> redirects errors, and | pipes to a command, not a file."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Which pipeline answers \"which values appear most often, highest first\"?",
+      "choices": {
+        "A": "sort | uniq -c | sort -rn",
+        "B": "uniq | wc -l",
+        "C": "grep -v | head",
+        "D": "sort -rn | grep -c"
+      },
+      "correct": ["A"],
+      "explanation": "uniq only collapses adjacent duplicates, so you sort first, count with uniq -c, then sort numerically in reverse to rank them."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "On a Debian or Ubuntu machine, where do you look for failed login attempts?",
+      "choices": {
+        "A": "/etc/passwd",
+        "B": "/tmp/logins",
+        "C": "/var/log/auth.log",
+        "D": "/usr/bin/auth"
+      },
+      "correct": ["C"],
+      "explanation": "Authentication events — logins, failures, and sudo use — go to /var/log/auth.log. /etc/passwd lists accounts, which is a different question."
+    },
+    {
+      "id": "cp-5",
+      "prompt": "Why is a pipeline often preferable to finding a purpose-built tool for the same question?",
+      "choices": {
+        "A": "Pipelines always run faster",
+        "B": "Each stage is simple and replaceable, so a change in the data means editing one stage rather than needing a different tool — and it works on any machine without installing anything",
+        "C": "Purpose-built tools cannot read log files",
+        "D": "Pipelines do not require permissions"
+      },
+      "correct": ["B"],
+      "explanation": "Composability and availability. The commands are already on the machine, and adapting the pipeline is a smaller change than adopting new software."
+    }
+  ]
+}

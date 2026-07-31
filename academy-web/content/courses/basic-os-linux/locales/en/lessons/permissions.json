@@ -1,0 +1,201 @@
+{
+  "nodeId": "permissions",
+  "locale": "en",
+  "title": "Read and change permissions",
+  "objective": "By the end of this lesson you can decode any permission string on sight, set permissions deliberately with chmod, and explain why 777 is a finding rather than a fix.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "This is the lesson everything so far was building towards. Permissions are where the operating system's fourth job — deciding who may do what — becomes something you can read and change. It is also the single most common source of real-world misconfiguration findings."
+    },
+    {
+      "kind": "heading",
+      "text": "Ten characters, three groups of three"
+    },
+    {
+      "kind": "code",
+      "caption": "The permission string, split up",
+      "lines": [
+        "-  rw-  r--  r--",
+        "|   |    |    |",
+        "|   |    |    +--  others: everyone else",
+        "|   |    +-------  group: members of the owning group",
+        "|   +------------  user: the owner",
+        "+----------------  type: - file, d directory, l link"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Each group of three is always in the same order: r for read, w for write, x for execute. A dash means the permission is absent. So rw-r--r-- reads as: the owner may read and write; the group may read; everyone else may read."
+    },
+    {
+      "kind": "table",
+      "headers": ["Letter", "On a file", "On a directory"],
+      "rows": [
+        ["r", "Read the contents", "List what is inside"],
+        ["w", "Change the contents", "Create, rename, or delete entries inside"],
+        ["x", "Run it as a program", "Enter it and reach things inside"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The directory column surprises people",
+      "text": "w on a directory means someone can delete files inside it — even files they do not own and cannot read. And without x on a directory you cannot reach anything inside, no matter what the permissions on those files say. Directory permissions gate the path, not just the folder."
+    },
+    {
+      "kind": "heading",
+      "text": "The numbers are just the letters in binary"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Each group of three is one digit. Read is 4, write is 2, execute is 1, and you add up whichever are present. There is no more to it than that."
+    },
+    {
+      "kind": "table",
+      "headers": ["Digit", "Letters", "Means"],
+      "rows": [
+        ["7", "rwx", "read + write + execute"],
+        ["6", "rw-", "read + write"],
+        ["5", "r-x", "read + execute"],
+        ["4", "r--", "read only"],
+        ["0", "---", "nothing"]
+      ]
+    },
+    {
+      "kind": "list",
+      "items": [
+        "644 = rw-r--r--  — the normal setting for a document",
+        "755 = rwxr-xr-x  — the normal setting for a program or a directory",
+        "600 = rw-------  — owner only; correct for a private key or a secrets file",
+        "777 = rwxrwxrwx  — everyone can do everything"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Changing them: chmod and chown"
+    },
+    {
+      "kind": "code",
+      "caption": "Two ways to say the same thing",
+      "lines": [
+        "chmod 644 notes.txt        # numeric: set exactly this",
+        "chmod u+x deploy.sh        # symbolic: add execute for the owner",
+        "chmod go-w shared/         # remove write from group and others",
+        "chmod -R 755 website/      # apply down a whole tree",
+        "",
+        "chown songpon notes.txt          # change the owning user (needs sudo)",
+        "chown songpon:staff notes.txt    # change user and group"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Numeric sets the whole state at once and is unambiguous. Symbolic adjusts one thing and leaves the rest alone. Use numeric when you know exactly what the end state should be; use symbolic when you are making one targeted change."
+    },
+    {
+      "kind": "heading",
+      "text": "Why 777 is a finding"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When something does not work, 777 makes the permission error go away. That is why it appears in so many forum answers and so many production systems. What it actually says is: any user and any process on this machine may read this, change it, and run it."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The realistic attack, in three steps",
+      "text": "An attacker gets a foothold as a low-privileged account — say the web server user. They find a script that is 777 and that runs regularly as root. They edit the script, because 777 said they could. The next time it runs, their code runs as root. Nothing was exploited; the permissions were simply an open door."
+    },
+    {
+      "kind": "paragraph",
+      "text": "The fix is almost never 777. It is to work out which user needs which access and grant that: usually correcting ownership with chown, or adding the right group, then setting 644 or 755."
+    },
+    {
+      "kind": "try",
+      "title": "Prove each rule to yourself",
+      "steps": [
+        "Run: cd ~ && mkdir -p perm-lab && cd perm-lab",
+        "Run: echo 'hello' > secret.txt && ls -l secret.txt        (note the default permissions)",
+        "Run: chmod 600 secret.txt && ls -l secret.txt             (now owner-only)",
+        "Run: printf '#!/bin/sh\\necho it ran\\n' > run.sh && ./run.sh    (fails — no execute bit)",
+        "Run: chmod u+x run.sh && ./run.sh                          (now it runs)",
+        "Run: ls -ld .                                              (read the directory's own permissions)"
+      ],
+      "expected": "You see default permissions, tighten a file to owner-only, watch a script refuse to run and then run once it has x, and finally read the permissions on the directory itself rather than its contents."
+    }
+  ],
+  "cheatsheet": [
+    "Ten characters: type, then user / group / others, each rwx",
+    "r read · w write · x execute (on a directory: list · modify contents · enter)",
+    "w on a directory lets someone delete files they do not own",
+    "Without x on a directory you cannot reach anything inside it",
+    "Numbers: r=4 w=2 x=1, added per group",
+    "644 documents · 755 programs and directories · 600 secrets · 777 never",
+    "chmod 644 file sets exactly; chmod u+x file adjusts one bit",
+    "chown user:group file changes ownership (usually needs sudo)",
+    "777 lets any process on the box rewrite the file — the classic escalation path",
+    "Fix permission errors with correct ownership and 644/755, not with 777"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Decode `-rwxr-x---`. Who can do what?",
+      "choices": {
+        "A": "Owner: read/write/execute · group: read/execute · others: nothing",
+        "B": "Owner: read/write · group: read · others: read",
+        "C": "Everyone can read, write and execute",
+        "D": "Owner: read only · group: write · others: execute"
+      },
+      "correct": ["A"],
+      "explanation": "Split it into three groups of three after the type character: rwx for the owner, r-x for the group, --- for everyone else."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "What is 640 in letters?",
+      "choices": {
+        "A": "rwxr-x---",
+        "B": "rw-r-----",
+        "C": "r--rw----",
+        "D": "rw-rw-r--"
+      },
+      "correct": ["B"],
+      "explanation": "6 = 4+2 = rw-, 4 = r--, 0 = ---. A common setting for a config file readable by a service group but by nobody else."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A colleague fixes a permission error by running chmod -R 777 on an application directory. What have they actually done?",
+      "choices": {
+        "A": "Restricted the directory to the owner",
+        "B": "Made every file readable, writable and executable by every user and process on the machine",
+        "C": "Given the files to root",
+        "D": "Nothing — 777 is the default"
+      },
+      "correct": ["B"],
+      "explanation": "777 grants everything to everyone. Any compromised low-privilege process on that host can now rewrite those files, and whatever runs them afterwards runs the attacker's code."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "You need a private key file to be readable only by its owner. Which command is correct?",
+      "choices": {
+        "A": "chmod 644 id_rsa",
+        "B": "chmod 600 id_rsa",
+        "C": "chmod 755 id_rsa",
+        "D": "chmod 777 id_rsa"
+      },
+      "correct": ["B"],
+      "explanation": "600 is rw------- — the owner may read and write, nobody else has any access. SSH will refuse to use a key that is more permissive than this."
+    },
+    {
+      "id": "cp-5",
+      "prompt": "Why can a user delete a file inside a directory even when they have no write permission on the file itself?",
+      "choices": {
+        "A": "Because deletion ignores permissions entirely",
+        "B": "Because deleting an entry is controlled by write permission on the containing directory, not on the file",
+        "C": "Because the file was owned by root",
+        "D": "This cannot happen"
+      },
+      "correct": ["B"],
+      "explanation": "Removing a name from a directory is a change to the directory. Write permission there is enough — which is why directory permissions deserve as much attention as file permissions."
+    }
+  ]
+}

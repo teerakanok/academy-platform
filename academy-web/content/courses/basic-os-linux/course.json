@@ -1,0 +1,102 @@
+{
+  "id": "basic-os-linux",
+  "slug": "basic-os-linux",
+  "version": "1.0.0",
+  "defaultLocale": "en",
+  "availableLocales": ["en", "th"],
+  "level": "beginner",
+  "estimatedMinutes": 165,
+  "skills": [
+    { "id": "os-concepts", "maxScore": 100 },
+    { "id": "cli", "maxScore": 100 },
+    { "id": "filesystem", "maxScore": 100 },
+    { "id": "permissions", "maxScore": 100 },
+    { "id": "processes", "maxScore": 100 },
+    { "id": "security-lens", "maxScore": 100 }
+  ],
+  "globalSkillWeights": {
+    "foundations": 0.75,
+    "security-ops": 0.25
+  },
+  "nodes": [
+    {
+      "id": "os-what-it-does",
+      "kind": "lesson",
+      "prerequisites": [],
+      "estimatedMinutes": 12,
+      "skillWeights": { "os-concepts": 4, "security-lens": 1 },
+      "video": {
+        "src": "/media/lesson-demo.mp4",
+        "durationSeconds": 150,
+        "cues": [
+          { "id": "cue-kernel", "atSeconds": 15 },
+          { "id": "cue-process", "atSeconds": 55 },
+          { "id": "cue-permission", "atSeconds": 100 }
+        ]
+      }
+    },
+    {
+      "id": "linux-and-distros",
+      "kind": "lesson",
+      "prerequisites": ["os-what-it-does"],
+      "estimatedMinutes": 14,
+      "skillWeights": { "os-concepts": 3 }
+    },
+    {
+      "id": "get-a-linux",
+      "kind": "lesson",
+      "prerequisites": ["os-what-it-does"],
+      "estimatedMinutes": 15,
+      "skillWeights": { "cli": 2, "os-concepts": 1 }
+    },
+    {
+      "id": "filesystem-tree",
+      "kind": "lesson",
+      "prerequisites": ["linux-and-distros", "get-a-linux"],
+      "estimatedMinutes": 15,
+      "skillWeights": { "filesystem": 4 }
+    },
+    {
+      "id": "navigate-and-look",
+      "kind": "lesson",
+      "prerequisites": ["filesystem-tree"],
+      "estimatedMinutes": 16,
+      "skillWeights": { "cli": 4, "filesystem": 2 }
+    },
+    {
+      "id": "files-and-safety",
+      "kind": "lesson",
+      "prerequisites": ["navigate-and-look"],
+      "estimatedMinutes": 18,
+      "skillWeights": { "cli": 3, "filesystem": 3, "security-lens": 1 }
+    },
+    {
+      "id": "users-and-root",
+      "kind": "lesson",
+      "prerequisites": ["filesystem-tree"],
+      "estimatedMinutes": 15,
+      "skillWeights": { "permissions": 3, "security-lens": 2 }
+    },
+    {
+      "id": "permissions",
+      "kind": "capstone",
+      "prerequisites": ["files-and-safety", "users-and-root"],
+      "estimatedMinutes": 22,
+      "skillWeights": { "permissions": 6, "security-lens": 3, "cli": 1 }
+    },
+    {
+      "id": "processes-and-packages",
+      "kind": "lesson",
+      "prerequisites": ["permissions"],
+      "estimatedMinutes": 18,
+      "skillWeights": { "processes": 5, "security-lens": 2 }
+    },
+    {
+      "id": "pipes-and-logs",
+      "kind": "capstone",
+      "prerequisites": ["processes-and-packages"],
+      "estimatedMinutes": 20,
+      "skillWeights": { "cli": 4, "processes": 3, "security-lens": 4 }
+    }
+  ]
+}

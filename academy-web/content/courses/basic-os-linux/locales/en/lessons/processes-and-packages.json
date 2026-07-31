@@ -1,0 +1,139 @@
+{
+  "nodeId": "processes-and-packages",
+  "locale": "en",
+  "title": "Processes and keeping software current",
+  "objective": "By the end of this lesson you can see what is running on a machine, stop something that should not be, and keep the system patched — which is the highest-value security work most people never do.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A program sitting on disk is a file. A program that is running is a process — it has an id, an owner, memory of its own, and a parent that started it. Knowing what is running, and as whom, is the first question in almost every investigation."
+    },
+    {
+      "kind": "code",
+      "caption": "Seeing what is running",
+      "lines": [
+        "ps aux            # every process: user, PID, CPU, memory, command",
+        "ps aux | head     # just the first few lines while you learn the columns",
+        "top               # live view, updates continuously (q to quit)",
+        "kill 4821         # ask process 4821 to shut down cleanly",
+        "kill -9 4821      # force it — last resort, no chance to clean up"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The two columns to read first"
+    },
+    {
+      "kind": "paragraph",
+      "text": "In ps aux output, the first column is the user the process is running as, and the second is the PID — the process id you would use to stop it. Everything else is detail. The user column is the security-relevant one: a process running as root can do anything root can do."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The question an investigator asks",
+      "text": "Not \"what is running?\" but \"what is running as a user that surprises me?\". A backup job running as root is expected. A web server process running as root is a finding, because a flaw in that web server now gives an attacker the whole machine rather than one confined account."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Add & to the end of a command to run it in the background, then use jobs to list what you started and fg to bring one back. Useful when you want to start something long-running and keep working in the same terminal."
+    },
+    {
+      "kind": "heading",
+      "text": "Installing and updating software"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Linux does not install software by downloading an installer from a website. It uses a package manager that pulls signed packages from repositories the distribution trusts, resolves dependencies, and keeps a record of what is installed."
+    },
+    {
+      "kind": "code",
+      "caption": "On Debian and Ubuntu",
+      "lines": [
+        "sudo apt update              # refresh the list of what is available",
+        "sudo apt upgrade             # install available updates",
+        "sudo apt install nmap        # install a package",
+        "apt list --installed         # what is on this machine",
+        "sudo apt remove nmap         # remove it"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "On Red Hat family systems the same steps are dnf check-update, dnf upgrade, and dnf install. The concepts are identical; only the command name changes."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "apt update does not update anything",
+      "text": "It refreshes the catalogue of what versions exist. apt upgrade is what actually installs them. Running only the first and believing you have patched the machine is a genuinely common mistake."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Why patching outranks almost everything else",
+      "text": "Most successful intrusions use a vulnerability that had a patch available. Not a novel technique — a known problem on an unpatched machine. Package updates are unglamorous, and they remove more real risk than most security tooling purchases."
+    },
+    {
+      "kind": "try",
+      "title": "Inspect and patch",
+      "steps": [
+        "Run: ps aux | head -15                  (read the USER and PID columns)",
+        "Run: ps aux | grep -c ''                (roughly how many processes are running)",
+        "Run: sleep 300 &                        (start something in the background)",
+        "Run: jobs                               (see it listed)",
+        "Run: kill %1                            (stop it)",
+        "Run: sudo apt update                    (refresh the catalogue)",
+        "Run: apt list --upgradable              (see what is out of date)"
+      ],
+      "expected": "A list of processes with their owners, a background job you start and stop yourself, and a list of packages with updates waiting — often longer than people expect on a machine that has been running a while."
+    }
+  ],
+  "cheatsheet": [
+    "A process is a running program: it has a PID, an owner, and its own memory",
+    "ps aux lists everything · top is the live view · q quits top",
+    "Read the USER and PID columns first",
+    "A service running as root turns one flaw into total compromise",
+    "kill PID asks nicely · kill -9 PID forces (no cleanup)",
+    "command & runs in the background · jobs lists · fg brings back",
+    "apt update refreshes the catalogue · apt upgrade actually installs",
+    "Red Hat family: dnf check-update / dnf upgrade / dnf install",
+    "Most breaches use a known vulnerability that already had a patch"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "In `ps aux` output, which column matters most for a security question?",
+      "choices": {
+        "A": "The memory percentage",
+        "B": "The USER column — which account the process is running as",
+        "C": "The start time",
+        "D": "The terminal it was launched from"
+      },
+      "correct": ["B"],
+      "explanation": "What a process may do is determined by who it runs as. A process running as root can do anything root can do, so an unexpected root process is the thing to explain."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "You ran `sudo apt update` and no packages were installed. Why?",
+      "choices": {
+        "A": "The machine is fully patched already",
+        "B": "apt update only refreshes the catalogue of available versions; apt upgrade installs them",
+        "C": "You needed to reboot first",
+        "D": "The repository was unreachable"
+      },
+      "correct": ["B"],
+      "explanation": "The two-step model catches people out constantly. update fetches the list, upgrade applies it. Believing the first one patched the machine leaves it unpatched."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why is keeping packages current considered high-value security work?",
+      "choices": {
+        "A": "Because new versions are always faster",
+        "B": "Because most successful intrusions exploit known vulnerabilities that already had patches available",
+        "C": "Because it satisfies auditors and nothing more",
+        "D": "Because it replaces the need for permissions"
+      },
+      "correct": ["B"],
+      "explanation": "The common case is not a novel exploit against a current system — it is a known issue on a system nobody updated."
+    }
+  ]
+}

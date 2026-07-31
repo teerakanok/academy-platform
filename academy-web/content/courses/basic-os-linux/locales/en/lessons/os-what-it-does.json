@@ -1,0 +1,162 @@
+{
+  "nodeId": "os-what-it-does",
+  "locale": "en",
+  "title": "What an operating system actually does",
+  "objective": "By the end of this lesson you can explain, without jargon, the four jobs every operating system does — and why each one matters to security.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "You have used an operating system every day for years. You have probably never had to say what one is. That is fine for using a computer and useless for defending one, because almost every security control you will ever configure is really an operating system feature with a product name on top."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Here is the whole idea in one sentence: an operating system is the program that decides which other programs get to use the hardware, and on what terms."
+    },
+    {
+      "kind": "heading",
+      "text": "The four jobs"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Everything an OS does falls into four buckets. Learn these four and most of Linux stops being trivia and starts being a system you can reason about."
+    },
+    {
+      "kind": "table",
+      "headers": ["Job", "What it means", "Where you meet it later"],
+      "rows": [
+        ["Run programs", "Decide which program uses the CPU, and when", "Processes, `ps`, `top`, killing a runaway service"],
+        ["Manage memory", "Give each program its own memory and keep them apart", "Why one crashed program does not take the machine down"],
+        ["Store things", "Turn a disk into files and folders with names", "The filesystem tree, paths, mounts"],
+        ["Decide who may do what", "Enforce users, groups, and permissions", "Permissions, `sudo`, privilege escalation"]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The kernel is the part that enforces"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The core of the operating system is called the kernel. It is the only code that talks to the hardware directly. Your programs do not get to touch the disk or the network card themselves — they ask the kernel, and the kernel decides whether to do it."
+    },
+    {
+      "kind": "paragraph",
+      "text": "That asking has a name: a system call. When a text editor saves a file, it makes a system call that means roughly \"please write these bytes to this file\". The kernel checks whether this user is allowed to write that file, and either does it or refuses."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Why this is the whole security story in miniature",
+      "text": "Every permission check, every audit log, every \"access denied\" starts here. If an attacker can get their code to run inside the kernel, there is nothing left above it to say no. That is why kernel patches are urgent in a way that most updates are not."
+    },
+    {
+      "kind": "heading",
+      "text": "Two worlds: kernel space and user space"
+    },
+    {
+      "kind": "paragraph",
+      "text": "You will see the terms kernel space and user space constantly. Kernel space is where the kernel runs, with full access to the hardware. User space is where everything else runs — your browser, your editor, the web server — each one boxed in, able to ask for things but not to take them."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "A program crashing in user space kills that program",
+        "A failure in kernel space can take down the whole machine",
+        "Moving from user space to kernel space without permission is what \"privilege escalation\" means"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "A mental model that will keep paying off",
+      "text": "Think of the kernel as the only person with keys to the building, and every program as a visitor at the front desk. Visitors can request anything. The desk decides. Security work is mostly about what the desk is willing to say yes to, and who is standing at it."
+    }
+  ],
+  "cheatsheet": [
+    "An OS decides which programs use the hardware, and on what terms",
+    "Four jobs: run programs, manage memory, store files, decide who may do what",
+    "The kernel is the only code that touches hardware directly",
+    "Programs ask the kernel for things using system calls",
+    "User space = boxed-in programs · kernel space = full access",
+    "Privilege escalation = getting from user space power to kernel-level power"
+  ],
+  "videoCueQuestions": [
+    {
+      "cueId": "cue-kernel",
+      "id": "vq-kernel",
+      "prompt": "A program wants to write a file to disk. What actually happens?",
+      "choices": {
+        "A": "The program writes to the disk hardware directly",
+        "B": "The program asks the kernel, which checks permission and then writes",
+        "C": "The program asks the antivirus for permission first",
+        "D": "The disk decides whether to accept the write"
+      },
+      "correct": ["B"],
+      "explanation": "Programs in user space never touch hardware directly. They make a system call, and the kernel decides whether to carry it out. That decision point is where permissions are enforced."
+    },
+    {
+      "cueId": "cue-process",
+      "id": "vq-process",
+      "prompt": "Why does one program crashing usually not take down the whole machine?",
+      "choices": {
+        "A": "Because modern CPUs never fail",
+        "B": "Because the OS restarts crashed programs automatically",
+        "C": "Because each program runs in user space with its own memory, isolated from the others",
+        "D": "Because crashes only affect the window that is on screen"
+      },
+      "correct": ["C"],
+      "explanation": "Memory management keeps programs apart. A crash in user space is contained to that program. A failure inside the kernel is a different matter — that can take the machine with it."
+    },
+    {
+      "cueId": "cue-permission",
+      "id": "vq-permission",
+      "prompt": "Which of these is the operating system's job, not an add-on security product's job?",
+      "choices": {
+        "A": "Deciding whether this user may open this file",
+        "B": "Showing a dashboard of last month's alerts",
+        "C": "Emailing a report to the security team",
+        "D": "Scoring a vendor's risk questionnaire"
+      },
+      "correct": ["A"],
+      "explanation": "Access decisions are a core OS function. Security products mostly observe, report on, and add policy around decisions the operating system is already making."
+    }
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "In one line: what is an operating system?",
+      "choices": {
+        "A": "The window manager and desktop you see on screen",
+        "B": "The program that decides which other programs use the hardware, and on what terms",
+        "C": "The set of applications installed on a machine",
+        "D": "The firmware built into the motherboard"
+      },
+      "correct": ["B"],
+      "explanation": "The desktop is one visible part, and firmware sits below the OS. The defining job is arbitrating access to hardware on behalf of programs."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Which of these are jobs of the operating system? (Select all that apply.)",
+      "choices": {
+        "A": "Scheduling which program gets the CPU",
+        "B": "Keeping each program's memory separate from the others",
+        "C": "Turning a disk into named files and folders",
+        "D": "Enforcing which user may read which file",
+        "E": "Writing the application's business logic"
+      },
+      "correct": ["A", "B", "C", "D"],
+      "explanation": "The first four are the OS's four jobs. Business logic belongs to the application — the OS only decides whether that application is allowed to do what it asks."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why do kernel vulnerabilities get treated more urgently than most application bugs?",
+      "choices": {
+        "A": "Kernel bugs are always easier to exploit",
+        "B": "The kernel is the layer that enforces every access decision, so code running there has nothing above it saying no",
+        "C": "Kernels are written in older languages",
+        "D": "Application bugs cannot lead to data loss"
+      },
+      "correct": ["B"],
+      "explanation": "It is about position, not difficulty. Controls above the kernel depend on the kernel being trustworthy; once that assumption breaks, the controls built on it stop meaning anything."
+    }
+  ]
+}

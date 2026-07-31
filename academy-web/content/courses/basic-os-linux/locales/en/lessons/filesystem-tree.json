@@ -1,0 +1,121 @@
+{
+  "nodeId": "filesystem-tree",
+  "locale": "en",
+  "title": "The filesystem is one tree",
+  "objective": "By the end of this lesson you can read any Linux path and say where it points, and you know what lives in the directories you will meet most often.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Windows gives you several trees: C:, D:, a network drive. Linux gives you exactly one. It starts at / — called root — and everything on the machine hangs somewhere beneath it, including extra disks and USB sticks, which get attached at a folder rather than getting a letter of their own."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "One tree, one consequence",
+      "text": "Because there is only one tree, every file on the machine has exactly one full address. That is what makes Linux scriptable: a path in a script means the same thing on every machine of that type."
+    },
+    {
+      "kind": "heading",
+      "text": "The directories worth knowing on day one"
+    },
+    {
+      "kind": "table",
+      "headers": ["Path", "What lives there", "Why you will care"],
+      "rows": [
+        ["/home/yourname", "Your personal files", "Where you work. Usually written as ~"],
+        ["/etc", "System configuration, as text files", "Almost every server setting you change is here"],
+        ["/var/log", "Log files", "Where you go when something went wrong"],
+        ["/usr/bin", "Installed programs", "Where the commands you type actually live"],
+        ["/tmp", "Temporary scratch space", "Writable by everyone — which makes it interesting to attackers"],
+        ["/root", "The root user's home", "Not the same thing as /"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "\"Everything is a file\"",
+      "text": "You will hear this constantly. It means Linux exposes hardware, running processes, and system state as things you can read with ordinary file commands. A disk, a network connection, even a running process shows up somewhere in the tree. It sounds like trivia; it is why one small set of commands can inspect the entire system."
+    },
+    {
+      "kind": "heading",
+      "text": "Absolute and relative paths"
+    },
+    {
+      "kind": "paragraph",
+      "text": "An absolute path starts at / and is unambiguous from anywhere: /var/log/syslog means one specific file, no matter where you are standing. A relative path starts from wherever you currently are: log/syslog means \"the log folder here\", which depends entirely on your current location."
+    },
+    {
+      "kind": "list",
+      "ordered": false,
+      "items": [
+        "/ at the start means absolute — measured from the root of the tree",
+        "no leading / means relative — measured from where you are now",
+        ". means here",
+        ".. means one level up",
+        "~ means your own home directory"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Where this bites people",
+      "text": "A script that uses relative paths does the right thing when you run it from your own folder and something else entirely when a scheduled job runs it from elsewhere. When a task works by hand and fails on a schedule, relative paths are the first suspect."
+    },
+    {
+      "kind": "try",
+      "title": "Read the tree yourself",
+      "steps": [
+        "Run: ls /            (see the top-level directories)",
+        "Run: ls /etc | head  (see the first few config files)",
+        "Run: echo ~          (see what ~ expands to for you)"
+      ],
+      "expected": "A list of the standard top-level folders, a sample of configuration files, and your own home path — probably /home/ plus your username."
+    }
+  ],
+  "cheatsheet": [
+    "Linux has one tree starting at / — no drive letters",
+    "/home/you = your files (~) · /etc = configuration · /var/log = logs",
+    "/usr/bin = installed programs · /tmp = world-writable scratch · /root = root's home",
+    "Absolute path starts with / and means the same from anywhere",
+    "Relative path depends on where you are: . here, .. up one, ~ home",
+    "Task works by hand but fails on a schedule? Suspect relative paths"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What is the difference between /log and log ?",
+      "choices": {
+        "A": "No difference, the slash is optional",
+        "B": "/log is absolute — a folder directly under the root of the tree. log is relative — a folder inside wherever you currently are",
+        "C": "/log is a file and log is a folder",
+        "D": "/log is on another disk"
+      },
+      "correct": ["B"],
+      "explanation": "The leading slash anchors the path to the root of the single tree. Without it, the path is measured from your current directory."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Where would you look first for configuration of a service on a Linux server?",
+      "choices": {
+        "A": "/tmp",
+        "B": "/var/log",
+        "C": "/etc",
+        "D": "/usr/bin"
+      },
+      "correct": ["C"],
+      "explanation": "/etc holds system configuration as plain text. /var/log holds output about what happened, /usr/bin holds the programs, and /tmp is scratch space."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A scheduled job runs a script that works perfectly when you run it by hand. What is worth checking first?",
+      "choices": {
+        "A": "Whether the script uses relative paths that resolve differently depending on the working directory",
+        "B": "Whether the disk is full",
+        "C": "Whether the file has a .sh extension",
+        "D": "Whether the machine has been restarted"
+      },
+      "correct": ["A"],
+      "explanation": "A relative path silently means something different when the working directory changes. It is the classic cause of \"works for me, fails on schedule\"."
+    }
+  ]
+}

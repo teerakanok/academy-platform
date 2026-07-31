@@ -1,0 +1,135 @@
+{
+  "nodeId": "users-and-root",
+  "locale": "en",
+  "title": "Users, groups, and root",
+  "objective": "By the end of this lesson you can explain who a Linux system thinks you are, what root can do, and why almost nobody should be logged in as root.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Every action on a Linux machine is taken by some user. Not \"a person\" — a user account, which may belong to a human, or to a service like a web server. When the kernel decides whether to allow something, the user is the thing it checks."
+    },
+    {
+      "kind": "code",
+      "caption": "Who does the system think you are?",
+      "lines": [
+        "whoami        # your username",
+        "id            # your user id, group id, and every group you are in",
+        "groups        # just the group names"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Users, groups, and why groups exist"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A user has a numeric id (UID) and belongs to one or more groups, each with its own id (GID). Groups exist so that permissions can be granted to a role instead of to a list of individuals — put five engineers in a group, grant the group access, and you manage one thing instead of five."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The names are for you, the numbers are for the kernel",
+      "text": "The kernel works in UIDs and GIDs. The names you see come from /etc/passwd and /etc/group, which map numbers to readable names. This is why a file copied to another machine can appear to belong to a stranger — the number came along, and that number means someone else there."
+    },
+    {
+      "kind": "heading",
+      "text": "root is UID 0, and UID 0 is not checked"
+    },
+    {
+      "kind": "paragraph",
+      "text": "There is one special user: root, with UID 0. The permission checks we will study in the next lesson do not constrain root. Root can read any file, kill any process, change any setting, and delete anything — including the parts of the system that are keeping it running."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "This is why you do not stay logged in as root",
+      "text": "As root, every typo becomes maximally destructive and every program you launch inherits unlimited power — including one you did not mean to run. The risk is not that you are careless. It is that nothing is standing between a mistake and the whole machine."
+    },
+    {
+      "kind": "heading",
+      "text": "sudo: borrow the power for one command"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Instead of becoming root, you run a single command as root using sudo. You stay yourself; the one command is elevated; and the system records that you did it."
+    },
+    {
+      "kind": "code",
+      "caption": "Borrowing, not becoming",
+      "lines": [
+        "cat /etc/shadow          # permission denied — as it should be",
+        "sudo cat /etc/shadow     # allowed, logged, and only for this command",
+        "sudo -l                  # what am I permitted to run this way?"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "That last point matters more than it looks. sudo leaves an audit trail tying a privileged action to a named human. A shared root password does not — everything traces back to \"root\", and you cannot answer the question every incident asks: who did this?"
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Least privilege, stated plainly",
+      "text": "Give every user and every service exactly the access it needs to do its job, and no more. When you later read that a breach \"escalated privileges\", it means an attacker found a way to stop being a limited user and start being root. Every unnecessary permission you leave lying around is a step on that path."
+    },
+    {
+      "kind": "try",
+      "title": "Look at the account model on your machine",
+      "steps": [
+        "Run: id                                  (your ids and groups)",
+        "Run: cat /etc/passwd | head -20          (accounts — note the service accounts, not just humans)",
+        "Run: sudo -l                             (what you are allowed to do as root)",
+        "Run: ls -l /etc/shadow                   (note the owner and that you cannot read it)"
+      ],
+      "expected": "Your own ids, a list of accounts where most are services rather than people, the sudo rights you hold, and a file that only root can read — the password hashes."
+    }
+  ],
+  "cheatsheet": [
+    "Every action belongs to a user account — human or service",
+    "whoami = name · id = numeric ids and groups · groups = group names",
+    "Groups grant permissions to a role instead of to a list of people",
+    "The kernel works in UID/GID numbers; names come from /etc/passwd and /etc/group",
+    "root is UID 0 and is not subject to permission checks",
+    "Use sudo to elevate one command instead of becoming root",
+    "sudo gives an audit trail; a shared root password destroys accountability",
+    "Least privilege: exactly the access needed, nothing spare"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What makes the root account different from other accounts?",
+      "choices": {
+        "A": "It has a longer password",
+        "B": "It is UID 0, and the normal permission checks do not restrict it",
+        "C": "It can only log in from the console",
+        "D": "It owns every file on the system"
+      },
+      "correct": ["B"],
+      "explanation": "root is defined by UID 0. Permission checks that constrain everyone else do not constrain it, which is why it can do anything — including damage."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why is sudo preferred over logging in as root and staying there? (Select all that apply.)",
+      "choices": {
+        "A": "Only one command runs elevated, so mistakes have a smaller blast radius",
+        "B": "It produces an audit trail tied to a named person",
+        "C": "It makes the command run faster",
+        "D": "Programs you launch do not silently inherit unlimited privilege"
+      },
+      "correct": ["A", "B", "D"],
+      "explanation": "Scope, accountability, and inheritance are the three reasons. Performance has nothing to do with it."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A file copied between two machines suddenly appears to be owned by an unfamiliar user. What is the most likely explanation?",
+      "choices": {
+        "A": "The file was tampered with in transit",
+        "B": "Ownership is stored as a numeric UID, and that number maps to a different account name on the second machine",
+        "C": "The file lost its permissions entirely",
+        "D": "Copying always resets ownership to root"
+      },
+      "correct": ["B"],
+      "explanation": "The kernel stores the number, not the name. The same UID can map to different names on different machines, so the same file appears to belong to someone else."
+    }
+  ]
+}
