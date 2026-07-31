@@ -11,7 +11,7 @@
   "repo": {
     "remote": "github.com/teerakanok/academy-platform",
     "branch": "main",
-    "base_head": "58dde53c246e5490901d70ef695fbd693dcc55a3"
+    "base_head": "0dd7f2cf58f4238100757489e872b9885243ea81"
   },
   "delivery": "local",
   "worktree": {
@@ -45,7 +45,8 @@
   "owner_decisions": [
     "Founder เคาะ 2026-07-31 (ลายลักษณ์อักษร): แก้ CAS-005 disputes ตามแนะนำทั้งหมด — PBQ-010 eradication-ก่อน-recovery, M4-082 +D (Map fields), M4-067 +A (Sandbox process)",
     "Product/pricing/implementation ล็อกตาม packet เดิม (academy-kickoff-phase0): personalized+lab-gated, access 3 ปี, DIY build-core-buy-plumbing, single-account ADR ก่อน build auth",
-    "Founder เคาะ infra 2026-07-31 (หลัง close Lane A): Phase 0 web = Vercel — ล็อก; video post-gate = Cloudflare Stream แบบมีเงื่อนไข interactive (custom player บน HLS/DASH + signed token, ห้าม build บน iframe embed); Lab = GCP ต่อ — ล็อก (ไม่ rebuild); cost model + รายละเอียดใน plans/active_plan.md ส่วน Infra direction (commit 58dde53c)"
+    "Founder เคาะ infra 2026-07-31 (หลัง close Lane A): Phase 0 web = Vercel — ล็อก; video post-gate = Cloudflare Stream แบบมีเงื่อนไข interactive (custom player บน HLS/DASH + signed token, ห้าม build บน iframe embed); Lab = GCP ต่อ — ล็อก (ไม่ rebuild); cost model + รายละเอียดใน plans/active_plan.md ส่วน Infra direction (commit 58dde53c)",
+    "Founder กำหนด free-tier strategy 2026-07-31: N+, Sec+, ISC2 CC, Basic Linux, Basic Programming แจกฟรีเต็มรูปทุก feature (video/practice/lab/cheatsheet) เป็นเครื่องจักรโฆษณา — **release ทีละตัว ไม่พร้อมกัน (founder: ค่อยๆเรียกแขก)**; refresh loop ตาม cert cycle = ค่าโฆษณา recurring (founder ยืนยัน); guardrails: lab ผ่านแต้มฟรีรายเดือน + Crucible capacity assessment; paid ladder placeholder ใน active_plan (commits c885b14..0dd7f2cf)"
   ],
   "completed": [
     "Lane A จบทั้งเส้น: audit disputes (report + decision brief, fact-checked 6/6 CONFIRMED) → founder เคาะ → แก้ key 3 ข้อใน Crucible commit 640c8613 (26 ไฟล์, propagate ครบ: bank JSON/MD → rewritten → v2-source → SV2 (validator pass 199 files) → SV1 → full-length-02 → practice-suite → v1 generator กัน regression)",
@@ -140,6 +141,7 @@ Lane A ปิดสมบูรณ์: CAS-005 disputes เคาะ+แก้�
 - Decision: Founder เคาะ 2026-07-31 (ลายลักษณ์อักษร): แก้ CAS-005 disputes ตามแนะนำทั้งหมด — PBQ-010 eradication-ก่อน-recovery, M4-082 +D (Map fields), M4-067 +A (Sandbox process)
 - Decision: Product/pricing/implementation ล็อกตาม packet เดิม (academy-kickoff-phase0): personalized+lab-gated, access 3 ปี, DIY build-core-buy-plumbing, single-account ADR ก่อน build auth
 - Decision: Founder เคาะ infra 2026-07-31 (หลัง close Lane A): Phase 0 web = Vercel — ล็อก; video post-gate = Cloudflare Stream แบบมีเงื่อนไข interactive (custom player บน HLS/DASH + signed token, ห้าม build บน iframe embed); Lab = GCP ต่อ — ล็อก (ไม่ rebuild); cost model + รายละเอียดใน plans/active_plan.md ส่วน Infra direction (commit 58dde53c)
+- Decision: Founder กำหนด free-tier strategy 2026-07-31: N+, Sec+, ISC2 CC, Basic Linux, Basic Programming แจกฟรีเต็มรูปทุก feature (video/practice/lab/cheatsheet) เป็นเครื่องจักรโฆษณา — **release ทีละตัว ไม่พร้อมกัน (founder: ค่อยๆเรียกแขก)**; refresh loop ตาม cert cycle = ค่าโฆษณา recurring (founder ยืนยัน); guardrails: lab ผ่านแต้มฟรีรายเดือน + Crucible capacity assessment; paid ladder placeholder ใน active_plan (commits c885b14..0dd7f2cf)
 - Allowed scope: Lane B: รวบรวม channel inventory จาก assets ที่มีจริง (read-only research) แล้วเขียน decision brief ลง reports/reviews/ ของ repo นี้
 - Allowed scope: อัปเดต plans/active_plan.md และ plans/completed_log.md ของ repo นี้
 - Allowed scope: commit ใน repo นี้เมื่องานมี verification ครบ
@@ -148,7 +150,7 @@ Lane A ปิดสมบูรณ์: CAS-005 disputes เคาะ+แก้�
 ## Repository State
 - State: ready
 - Branch: main
-- Baseline: 58dde53c246e5490901d70ef695fbd693dcc55a3
+- Baseline: 0dd7f2cf58f4238100757489e872b9885243ea81
 - Delivery: local (academy ahead 3, crucible ahead 1 — ยังไม่ push ตาม authorization)
 
 ## Completed This Session
