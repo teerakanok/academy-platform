@@ -396,3 +396,35 @@ artifacts, context, and docs.
 - Distribution capacity unproven — the binding constraint for everything downstream.
 - 11 CAS-005 answer-key disputes unresolved — blocks public distribution.
 - Delivery platform undecided — Phase 0 must produce a demand signal before committing.
+
+## 2026-08-01 — M3 auth + simulation + i18n + Cloudflare deploy + CRITICAL fix
+
+**Auth ครบวงจร (M3 แกนหลัก)** — รหัส 6 หลักทางอีเมล · middleware allowlist ·
+progress ผูกบัญชี (migration 0002/0003) · พิสูจน์ทั้งชุดบน workerd จริง
+· e2e ต้องมี session แล้ว (auth.setup.ts ล็อกอินผ่าน API + อ่านอีเมลจริง ไม่ใช่ mock)
+
+**Simulation challenge** — โจทย์จำลองหน้าจอตั้งค่า IPv4 ตัดสินจากสถานะสุดท้าย
+ไม่ใช่ลำดับคลิก · สองโจทย์บนหน้าจอเดียวกันที่คำตอบตรงข้ามกัน · โหมด assessed มีแล้ว
+แต่ยังไม่ผูกเข้า checkpoint
+
+**Deploy จริงขึ้น Cloudflare** — https://cyberskills-academy.songpon-te.workers.dev
+(หน้าร้านอย่างเดียว บัญชีปิด รอ session identity) · เจอ 3 กับดักที่ local ไม่เจอ
+บันทึกใน memory `cloudflare-nextjs-deploy-traps`
+
+**i18n EN/TH** — dictionary + สลับได้ + นโยบายความเป็นส่วนตัวสองภาษา + เทสกัน
+อักษรไทยหลุดบนหน้าอังกฤษ
+
+**วิดีโอหลายภาษา** — สลับ source ตามภาษาเสียง คืนตำแหน่งที่ดูอยู่ · caption ผ่าน
+`<track>` มาตรฐาน · ย้าย quiz ออกจาก overlay มาไว้ใต้วิดีโอ (เดิมล้นจนต้องเลื่อนในกรอบ)
+
+**CRITICAL ที่แก้แล้ว** — client ประกาศเองว่าเรียนจบได้ → ปลอมใบรับรองได้
+พบจาก cross-model review พิสูจน์ด้วยสคริปต์โจมตี แก้ที่ราก และมีเทสกันย้อนกลับ
+
+**Copy** — ตัดสำนวนที่อ่านออกว่าเครื่องเขียน 17 จุดในบทเรียน + 13 จุดใน UI
+(review ข้ามโมเดลชี้ 20 จุด ตรงกับที่สงสัยตัวเอง: สูตร "X ไม่ใช่ Y" · ประโยคปิด
+แบบคติพจน์ · วลีสามจังหวะ)
+
+**ADR single-account** — founder เคาะครบ 5 ข้อ · เปิด asymmetric JWT/JWKS บน Pool A
+(ปลด blocker STAR ที่ค้างตั้งแต่ 2026-06-13)
+
+verification: build + lint + vitest 139/139 + playwright 50/50

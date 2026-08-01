@@ -145,6 +145,27 @@ founder ถามเรื่องย้าย frontend ไป Cloudflare — *
 - [ ] คอร์สเครือข่ายจริงที่บทนี้ควรอยู่ (ตอนนี้ฝากไว้ในคอร์ส demo)
 - [ ] ให้ Crucible ผลิต simulation ได้ (ตอนนี้เขียนมือใน JSON ของบทเรียน)
 
+### ความปลอดภัย — ที่แก้แล้ว และที่ยังเปิดอยู่ (review 2026-08-01)
+
+รีวิวข้ามโมเดลรอบภาพรวม (codex, persona: hostile appsec) แล้วพิสูจน์ทุกข้อด้วยการ
+โจมตีจริง ไม่เชื่อรายงานทันที
+
+**แก้แล้ว — CRITICAL:** client ประกาศเองได้ว่า 'เรียนจบ' → ยิง 10 request ได้ครบ
+คอร์สโดยไม่ตอบคำถามเลย และมีสิทธิ์ใบรับรอง (พิสูจน์ 10/10 ก่อนแก้ · 0/10 หลังแก้)
+ตอนนี้ client ส่งได้แค่ action/answers เซิร์ฟเวอร์ตรวจกับเฉลยเอง + เทสกันย้อนกลับ
+
+**ยังเปิดอยู่ — ต้องปิดก่อนเปิดสมัครจริง:**
+- [ ] **HIGH · เดารหัส OTP ได้** — rate limit อยู่ใน memory ของ process และ key มาจาก
+      header ที่ปลอมได้; บน Workers แต่ละ isolate มี memory แยก รหัส 6 หลัก = ล้านค่า
+      → ต้องใช้ limiter แบบ distributed (KV/DO/Redis) จำกัดทั้ง IP และ email
+      และล็อก challenge หลังผิดกี่ครั้ง
+- [ ] **HIGH · ไม่มี entitlement ต่อคอร์ส** — middleware เช็คแค่ "มี user ไหม"
+      วันที่มีคอร์สเสียเงิน บัญชีฟรีใบเดียวเปิดได้ทุกคอร์ส
+- [ ] **MEDIUM · ไฟล์บทเรียนอยู่ใน public/** — วิดีโอ/PDF โหลดได้โดยไม่ล็อกอิน
+      ขัดกับมติ "ต้องสมัครถ้าจะใช้"
+- [ ] **MEDIUM · shouldCreateUser:true บน endpoint สาธารณะ** — ยิงอีเมลจำนวนมากได้
+- [ ] **MEDIUM · MAX_TRACKED_KEYS ไม่ใช่เพดานจริง** — memory โตไม่หยุดจาก IP ปลอม
+
 ### Launch gates (ยังมีผลระหว่าง build)
 
 - Rename currency ก่อน public launch · Crucible capacity assessment ก่อน commit
