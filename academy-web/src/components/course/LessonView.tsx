@@ -140,7 +140,7 @@ export function LessonView({
         </p>
 
         {/* แถบตำแหน่ง: ผู้เรียนต้องรู้เสมอว่าอยู่จุดไหนของเส้นทาง ไม่ใช่อยู่ในอุโมงค์ */}
-        <ol className="mt-6 flex flex-wrap items-center gap-1.5" aria-label="Course progress">
+        <ol className="mt-4 flex flex-wrap items-center gap-x-1.5" aria-label="Course progress">
           {structure.nodes.map((n) => {
             const status = nodeStatus(n, learnerState)
             const isCurrent = n.id === node.id
@@ -151,16 +151,22 @@ export function LessonView({
                   href={`/courses/${structure.slug}/lessons/${n.id}`}
                   aria-label={`${nodeTitles[n.id] ?? n.id}${isCurrent ? ' (current)' : ''}`}
                   aria-current={isCurrent ? 'step' : undefined}
-                  className={`block h-1.5 rounded-full transition-all ${
-                    isCurrent
-                      ? 'w-10 bg-cs-accent-fill'
-                      : isProven
-                        ? 'w-5 bg-cs-accent-fill/70 hover:w-7'
-                        : status === 'skipped'
-                          ? 'w-5 bg-cs-border-2/60 hover:w-7'
-                          : 'w-5 bg-cs-border-2/40 hover:w-7'
-                  }`}
-                />
+                  // แถบสูง 6px กดด้วยเมาส์ได้ แต่นิ้วกดไม่โดน — ขยายพื้นที่กดด้วย
+                  // padding แนวตั้ง โดยที่เส้นยังบางเท่าเดิม (ไม่ทำให้ดีไซน์หนาขึ้น)
+                  className="group flex items-center py-2.5"
+                >
+                  <span
+                    className={`block h-1.5 rounded-full transition-all ${
+                      isCurrent
+                        ? 'w-10 bg-cs-accent-fill'
+                        : isProven
+                          ? 'w-5 bg-cs-accent-fill/70 group-hover:w-7'
+                          : status === 'skipped'
+                            ? 'w-5 bg-cs-border-2/60 group-hover:w-7'
+                            : 'w-5 bg-cs-border-2/40 group-hover:w-7'
+                    }`}
+                  />
+                </Link>
               </li>
             )
           })}

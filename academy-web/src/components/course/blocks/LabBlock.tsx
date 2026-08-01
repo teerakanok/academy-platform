@@ -28,6 +28,12 @@ function Placeholder({ status, compact }: { status: 'coming-soon' | 'ready'; com
           ? 'The hands-on environment loads here. Nothing to install — it runs in this tab.'
           : 'Starting your environment…'}
       </p>
+      {/* พูดตรงๆ บนจอเล็กแทนที่จะยัด terminal ให้พิมพ์ด้วยคีย์บอร์ดมือถือ — และ
+          ไม่ปิดกั้น เพราะการอ่านทั้งบทยังทำบนมือถือได้ครบ ปัญหาอยู่ที่ "พิมพ์"
+          ไม่ใช่ที่ "หน้าจอ" (M4: เมื่อมี lab ที่ไม่ต้องพิมพ์ ให้ทำบรรทัดนี้เป็นเงื่อนไข) */}
+      <p className="mt-2 text-xs text-cs-muted sm:hidden">
+        Best on a computer — labs mean typing. The rest of the lesson works here.
+      </p>
     </div>
   )
 }
@@ -93,7 +99,11 @@ export function LabBlock({
             autoFocus
             className="shrink-0 rounded-control border border-cs-border px-4 py-2 text-sm text-cs-body transition-colors hover:border-cs-accent hover:text-cs-accent"
           >
-            {isInline ? 'Done (Esc)' : 'Exit full screen (Esc)'}
+            {/* บนมือถือไม่มีปุ่ม Escape จะบอกให้กดก็ไร้ความหมาย — และคำเต็มยาวเกิน
+                จนล้นขอบจอ ปุ่มปิดที่มองเห็นได้จึงเป็นทางออกหลัก ส่วน Esc เป็นทางลัด
+                ของคนใช้คีย์บอร์ด */}
+            <span className="sm:hidden">Done</span>
+            <span className="hidden sm:inline">{isInline ? 'Done (Esc)' : 'Exit full screen (Esc)'}</span>
           </button>
         </div>
         <div className="flex min-h-[300px] flex-1 items-center justify-center rounded-xl border border-dashed border-cs-accent-border bg-cs-surface-sunken">
@@ -118,7 +128,9 @@ export function LabBlock({
           <h3 className="font-display text-base font-semibold text-cs-text">{title}</h3>
         </div>
         <p className="px-5 pb-3 pt-1 text-sm leading-relaxed text-cs-body">{description}</p>
-        <div className="relative mx-5 mb-4 flex h-36 items-center justify-center rounded-xl bg-cs-surface-sunken">
+        {/* min-h ไม่ใช่ h ตายตัว — ความสูงคงที่เคยทำให้ข้อความล้นออกไปทับย่อหน้า
+              ข้างบนบนจอแคบ กล่องต้องยืดตามเนื้อหา ไม่ใช่ให้เนื้อหาไหลออกนอกกล่อง */}
+          <div className="relative mx-5 mb-4 flex min-h-[9rem] items-center justify-center rounded-xl bg-cs-surface-sunken py-4 pt-10 sm:pt-4">
           <Placeholder status={status} compact />
           {/* ปุ่มขยายเบาๆ ไม่แย่งความสนใจจากการอ่าน แต่เข้าถึงด้วยคีย์บอร์ดได้เสมอ
               (ไม่ซ่อนไว้ให้โผล่ตอน hover เพราะทัชสกรีนกับคีย์บอร์ดจะหาไม่เจอ) */}
@@ -126,7 +138,7 @@ export function LabBlock({
             type="button"
             onClick={() => setExpanded(true)}
             data-testid="lab-expand"
-            className="absolute right-2 top-2 flex items-center gap-1.5 rounded-lg border border-cs-border bg-cs-surface px-2.5 py-1 font-mono text-[11px] text-cs-muted transition-colors hover:border-cs-accent hover:text-cs-accent"
+            className="absolute right-2 top-2 flex items-center gap-1.5 rounded-lg border border-cs-border bg-cs-surface px-3 py-2 font-mono text-[11px] text-cs-muted transition-colors hover:border-cs-accent hover:text-cs-accent sm:px-2.5 sm:py-1"
           >
             <span aria-hidden="true">⤢</span> Bigger
           </button>

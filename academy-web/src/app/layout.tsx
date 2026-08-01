@@ -69,8 +69,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
 
         <header className="sticky top-0 z-40 border-b border-cs-border bg-cs-bg/85 backdrop-blur">
-          <div className="mx-auto flex max-w-6xl items-center gap-3 px-5 py-3.5 sm:gap-6 sm:px-6">
-            <Link href="/" className="flex items-center gap-2.5">
+          <div className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-3 sm:gap-6 sm:px-6 sm:py-3.5">
+            <Link href="/" className="flex items-center gap-2 sm:gap-2.5">
               {/* โลโก้ canonical จาก cyberskills-web/public/redesign/logos — ห้ามวาดใหม่ */}
               <Image
                 src="/brand/logo-academy.svg"
@@ -80,21 +80,32 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 priority
                 className="shrink-0"
               />
-              {/* ห้ามตัดบรรทัด — ที่ 390px เคยแตกเป็นสองแถวจนดูเหมือนหน้าพัง */}
+              {/* ที่ 390px มี logo + ชื่อ + สองลิงก์ + ปุ่มธีม ใส่ครบไม่พอที่จริงๆ
+                  (เคยล้นจนทั้งเว็บเลื่อนซ้ายขวาได้) จึงตัดคำว่า CyberSkills ออกบน
+                  จอเล็ก เพราะโลโก้แบกตระกูลอยู่แล้ว — เลือกตัดตรงนี้เพราะไม่ทำให้
+                  ปลายทางไหนหายไป ต่างจากการยุบเมนูเป็นแฮมเบอร์เกอร์
+                  ชื่อเต็มยังอยู่ครบสำหรับ screen reader */}
               <span className="whitespace-nowrap font-display text-base font-semibold tracking-tight text-cs-text sm:text-lg">
-                CyberSkills <span className="text-cs-accent">Academy</span>
+                <span className="sr-only">CyberSkills Academy</span>
+                <span aria-hidden="true" className="hidden sm:inline">
+                  CyberSkills{' '}
+                </span>
+                <span aria-hidden="true" className="text-cs-accent">
+                  Academy
+                </span>
               </span>
             </Link>
             <nav aria-label="Main" className="ml-auto flex items-center gap-0.5 text-[13px] sm:gap-1 sm:text-sm">
+              {/* py-2 บนจอเล็กเพื่อให้นิ้วกดโดนจริง ไม่ใช่แค่พอกดด้วยเมาส์ */}
               <Link
                 href="/dashboard"
-                className="whitespace-nowrap rounded-lg px-2.5 py-1.5 text-cs-muted transition-colors hover:bg-cs-surface-2 hover:text-cs-text sm:px-3"
+                className="whitespace-nowrap rounded-lg px-2 py-2 text-cs-muted transition-colors hover:bg-cs-surface-2 hover:text-cs-text sm:px-3 sm:py-1.5"
               >
                 My learning
               </Link>
               <Link
                 href="/player"
-                className="whitespace-nowrap rounded-lg px-2.5 py-1.5 text-cs-muted transition-colors hover:bg-cs-surface-2 hover:text-cs-text sm:px-3"
+                className="whitespace-nowrap rounded-lg px-2 py-2 text-cs-muted transition-colors hover:bg-cs-surface-2 hover:text-cs-text sm:px-3 sm:py-1.5"
               >
                 Practice
               </Link>
