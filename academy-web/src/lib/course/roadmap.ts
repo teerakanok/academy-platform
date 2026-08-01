@@ -201,3 +201,44 @@ export function summarise(structure: CourseStructure, state: LearnerCourseState)
     coveragePercent: total === 0 ? 0 : Math.round(((proven + skipped) / total) * 100),
   }
 }
+
+// ── ใบรับรองการเรียนจบ ────────────────────────────────────────────────────────
+//
+// คำถามที่ต้องตอบก่อนออกใบได้: "เรียนจบ" แปลว่าอะไร ในระบบที่ยอมให้ข้ามบทได้
+//
+// ถ้าข้ามครึ่งคอร์สแล้วยังได้ใบ ใบนั้นก็ไม่ได้บอกอะไรกับใครเลย และเราจะเป็นคนแรก
+// ที่รู้ว่ามันไม่มีความหมาย — ซึ่งขัดกับเหตุผลทั้งหมดที่เราแยก "ข้าม" ออกจาก
+// "พิสูจน์แล้ว" ตั้งแต่ต้น
+//
+// กติกา: ทุก node ต้องอยู่ในสถานะที่พิสูจน์แล้ว (เรียนจบ หรือ test out) ไม่มี
+// ข้อยกเว้น การข้ามไม่ได้ปิดประตู — กลับมาพิสูจน์เมื่อไหร่ก็ได้ ใบจะออกทันที
+// พูดอีกอย่าง: ข้ามคือเครื่องมือจัดจังหวะการเรียน ไม่ใช่ทางลัดไปเอากระดาษ
+
+export type CertificateBlocker = 'skipped' | 'unstarted'
+
+export interface CertificateEligibility {
+  eligible: boolean
+  provenCount: number
+  total: number
+  /** node ที่ยังกั้นใบอยู่ พร้อมเหตุผล — ต้องบอกให้ผู้เรียนรู้ว่าต้องทำอะไรต่อ */
+  blocking: { id: string; reason: CertificateBlocker }[]
+}
+
+export function certificateEligibility(
+  structure: CourseStructure,
+  state: LearnerCourseState,
+): CertificateEligibility {
+  const blocking: { id: string; reason: CertificateBlocker }[] = []
+  let provenCount = 0
+  for (const node of structure.nodes) {
+    const status = nodeStatus(node, state)
+    if (status === 'completed' || status === 'tested-out') provenCount += 1
+    else blocking.push({ id: node.id, reason: status === 'skipped' ? 'skipped' : 'unstarted' })
+  }
+  return {
+    eligible: blocking.length === 0 && structure.nodes.length > 0,
+    provenCount,
+    total: structure.nodes.length,
+    blocking,
+  }
+}

@@ -11,6 +11,7 @@ import {
   toLearnerState,
   type CourseProgressRecord,
 } from '@/lib/course/progress'
+import { certificateEligibility } from '@/lib/course/roadmap'
 import { EMPTY_STATE, nextNode, summarise } from '@/lib/course/roadmap'
 import { courseSkillData } from '@/lib/course/skills'
 import { RadarChart } from './RadarChart'
@@ -40,6 +41,8 @@ export function CourseOverview({
 
   const state = loaded ? toLearnerState(record) : EMPTY_STATE
   const summary = summarise(structure, state)
+  const cert = certificateEligibility(structure, state)
+  const skippedBlockers = cert.blocking.filter((b) => b.reason === 'skipped').length
   const next = nextNode(structure, state)
   const skills = courseSkillData(structure, copy.skillLabels, state)
   const untranslated = structure.nodes.length - translatedNodeIds.length
@@ -158,6 +161,38 @@ export function CourseOverview({
             courseSlug={structure.slug}
           />
         </div>
+      </section>
+
+      {/* ใบรับรองการเรียนจบ — แสดงตั้งแต่ยังไม่ได้ เพราะสิ่งที่ผู้เรียนต้องรู้คือ
+          "ต้องทำอะไรอีกถึงจะได้" ไม่ใช่รู้ตอนได้แล้ว
+          กติกา: ทุกบทต้องพิสูจน์แล้ว การข้ามกั้นใบไว้ แต่ไม่ได้ปิดประตู —
+          กลับมาพิสูจน์เมื่อไหร่ก็ได้ ถ้าข้ามครึ่งคอร์สแล้วยังได้ใบ ใบนั้นก็ไม่ได้
+          บอกอะไรกับใคร และเราจะเป็นคนแรกที่รู้ */}
+      <section
+        className={`card-feature p-6 sm:p-7 ${cert.eligible ? 'card-takeaway' : ''}`}
+        data-testid="certificate-status"
+        data-eligible={cert.eligible}
+      >
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-cs-accent">
+              Certificate of completion
+            </p>
+            <h2 className="mt-1.5 font-display text-xl font-semibold text-cs-text">
+              {cert.eligible ? 'Earned — every lesson proven' : 'Prove every lesson to earn it'}
+            </h2>
+          </div>
+          <span className="shrink-0 rounded-full bg-cs-accent-fill px-3 py-1 font-mono text-xs font-semibold text-cs-on-accent">
+            {cert.provenCount} / {cert.total}
+          </span>
+        </div>
+        <p className="mt-3 max-w-2xl text-sm text-cs-body">
+          {cert.eligible
+            ? 'Nothing was skipped and every required checkpoint was earned, so the certificate says something true about you.'
+            : skippedBlockers > 0
+              ? `A certificate that counted skipped lessons would not mean anything. ${skippedBlockers} skipped ${skippedBlockers === 1 ? 'lesson is' : 'lessons are'} holding it — come back and prove ${skippedBlockers === 1 ? 'it' : 'them'} any time, by reading or by testing out.`
+              : 'It is issued once every lesson on your route is proven — either by finishing it or by testing out of it.'}
+        </p>
       </section>
 
       <section className="card-feature p-6">
