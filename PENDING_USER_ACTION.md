@@ -43,13 +43,18 @@ login สองทาง) — รายละเอียดและเหต�
 
 **เหลือเป็น external checkpoint ที่ founder เท่านั้นทำได้:**
 
-### 4.1 Pool A — เปิด asymmetric JWT + JWKS (blocking M3 บางส่วน)
+### 4.1 ✅ Pool A — เปิด asymmetric JWT + JWKS แล้ว 2026-08-01 (ไม่ blocking แล้ว)
 - แตะ Supabase production ที่ Crux/STAR/Forge/Academy ใช้ร่วมกัน → due-care เต็ม
 - ต้อง **verify สดก่อนลงมือ** ว่า GoTrue เวอร์ชันที่รันอยู่รองรับจริง (third-party
   facts rot — ADR จงใจไม่ pin ความสามารถ vendor)
 - ปลด blocker ของ STAR ที่ค้างตั้งแต่ 2026-06-13 ไปด้วย และเลิกแจก HS256 secret
   ให้ Forge ถือ
-- Rollback: GoTrue สลับกลับ HS256 ได้ · consumer ที่ยัง server-verify ไม่กระทบ
+- Rollback: คืน `.env.pre-asymjwt-20260801-154836` + `docker-compose.override.yml.pre-asymjwt-20260801-154836`
+  แล้ว `docker compose up -d --no-deps auth rest storage realtime`
+- ผลตรวจหลังทำ: JWKS มี ES256 1 คีย์ (public เท่านั้น) · 4 container healthy restarts=0 ·
+  rest+anon 200 · rest+service 200 · storage+service 200 · auth health 200 ·
+  refresh token 10 ใบยังไม่ถูก revoke (ไม่มีใครหลุด) · log ไม่มี error/fatal
+- รายละเอียด: `reports/state/supabase.md` ของ director repo
 
 ### 4.2 ยก ADR ขึ้นเป็น ecosystem ADR ระดับ director
 - decision แตะ 4 product จึงไม่ควรอยู่ใต้ repo เดียว
