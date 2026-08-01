@@ -9,9 +9,95 @@ import {
   toLearnerState,
   type CourseProgressRecord,
 } from '@/lib/course/progress'
-import { EMPTY_STATE, nextNode, summarise, type LearnerCourseState } from '@/lib/course/roadmap'
+import {
+  EMPTY_STATE,
+  nextNode,
+  nodeStatus,
+  summarise,
+  type LearnerCourseState,
+} from '@/lib/course/roadmap'
 import { globalSkillData } from '@/lib/course/skills'
+import { CourseCover } from './CourseCover'
 import { RadarChart } from './RadarChart'
+
+// ความคืบหน้าเป็น "จุดต่อบทเรียน" ไม่ใช่แถบ — แถบที่ 0% คือเส้นจางที่มองไม่เห็น
+// และไม่บอกอะไรเลย ส่วนจุดบอกได้ทันทีว่าคอร์สยาวแค่ไหนและเดินไปถึงไหน
+// คอร์สที่ยาวมากกลับไปใช้แถบ เพราะจุด 50 จุดอ่านไม่ออก
+const MAX_DOTS = 16
+
+function LessonProgress({
+  structure,
+  state,
+  loaded,
+  label,
+  testId,
+  provenPercent,
+  skipped,
+}: {
+  structure: DashboardCourse['structure']
+  state: LearnerCourseState
+  loaded: boolean
+  label: string
+  testId: string
+  provenPercent: number
+  skipped: number
+}) {
+  const useDots = structure.nodes.length <= MAX_DOTS
+
+  return (
+    <div>
+      <div className="mb-2 flex items-center justify-between text-xs">
+        <span className="font-medium text-cs-text" data-testid={testId}>
+          {!loaded ? '—' : provenPercent > 0 ? `${provenPercent}% proven` : 'Not started yet'}
+        </span>
+        {skipped > 0 && <span className="text-cs-muted">{skipped} skipped</span>}
+      </div>
+
+      {useDots ? (
+        <ul
+          className="flex flex-wrap gap-1.5"
+          role="progressbar"
+          aria-valuenow={provenPercent}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`${label} progress`}
+        >
+          {structure.nodes.map((node) => {
+            const status = nodeStatus(node, state)
+            const isProven = status === 'completed' || status === 'tested-out'
+            const isSkipped = status === 'skipped'
+            return (
+              <li
+                key={node.id}
+                className={`h-2.5 w-2.5 rounded-full ${
+                  isProven
+                    ? 'bg-cs-accent-fill'
+                    : isSkipped
+                      ? 'border border-dashed border-cs-border-2 bg-transparent'
+                      : 'border border-cs-border-2 bg-cs-surface-sunken'
+                }`}
+              />
+            )
+          })}
+        </ul>
+      ) : (
+        <div
+          className="h-1.5 overflow-hidden rounded-full bg-cs-surface-sunken"
+          role="progressbar"
+          aria-valuenow={provenPercent}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`${label} progress`}
+        >
+          <div
+            className="h-full rounded-full bg-cs-accent-fill transition-[width] duration-500"
+            style={{ width: `${provenPercent}%` }}
+          />
+        </div>
+      )}
+    </div>
+  )
+}
 
 export interface DashboardCourse {
   structure: CourseStructure
@@ -61,10 +147,10 @@ export function CourseDashboard({ courses }: { courses: DashboardCourse[] }) {
     <div className="space-y-12">
       <header>
         <p className="font-mono text-xs uppercase tracking-[0.14em] text-cs-accent">My learning</p>
-        <h1 className="mt-2 font-display text-4xl font-semibold tracking-tight text-cs-text">
+        <h1 className="mt-3 font-display text-[2.5rem] font-semibold leading-[1.08] tracking-tight text-cs-text sm:text-5xl">
           {resume ? 'Pick up where you left off' : 'Start something today'}
         </h1>
-        <p className="mt-2 max-w-2xl text-cs-body">
+        <p className="mt-3 max-w-2xl text-[1.0625rem] leading-relaxed text-cs-body">
           Your progress is saved in this browser. Sign-in and cross-device sync arrive with learner accounts.
         </p>
       </header>
@@ -76,20 +162,27 @@ export function CourseDashboard({ courses }: { courses: DashboardCourse[] }) {
       )}
 
       {resume && resumeNode && (
-        <section className="card p-6" data-testid="resume-card">
-          <p className="font-mono text-[11px] uppercase tracking-wide text-cs-accent">Continue</p>
-          <h2 className="mt-1.5 font-display text-xl font-semibold text-cs-text">
-            {resume.course.nodeTitles[resumeNode.id] ?? resumeNode.id}
-          </h2>
-          <p className="mt-1 text-sm text-cs-muted">
-            {resume.course.title} · about {resumeNode.estimatedMinutes} minutes
-          </p>
-          <Link
-            href={`/courses/${resume.course.structure.slug}/lessons/${resumeNode.id}`}
-            className="mt-4 inline-flex rounded-xl bg-cs-accent-fill px-5 py-2.5 text-sm font-semibold text-cs-on-accent transition-opacity hover:opacity-90"
-          >
-            Continue lesson
-          </Link>
+        <section
+          className="card-feature hero-wash relative overflow-hidden p-7 sm:p-8"
+          data-testid="resume-card"
+        >
+          <div className="relative flex flex-wrap items-end justify-between gap-6">
+            <div className="min-w-0">
+              <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-cs-accent">Continue</p>
+              <h2 className="mt-2 font-display text-2xl font-semibold leading-snug text-cs-text sm:text-3xl">
+                {resume.course.nodeTitles[resumeNode.id] ?? resumeNode.id}
+              </h2>
+              <p className="mt-2 text-sm text-cs-muted">
+                {resume.course.title} · about {resumeNode.estimatedMinutes} minutes
+              </p>
+            </div>
+            <Link
+              href={`/courses/${resume.course.structure.slug}/lessons/${resumeNode.id}`}
+              className="shrink-0 rounded-control bg-cs-accent-fill px-6 py-3 text-sm font-semibold text-cs-on-accent shadow-card transition-transform duration-200 hover:-translate-y-0.5"
+            >
+              Continue lesson
+            </Link>
+          </div>
         </section>
       )}
 
@@ -105,38 +198,39 @@ export function CourseDashboard({ courses }: { courses: DashboardCourse[] }) {
               <li key={course.structure.slug}>
                 <Link
                   href={`/courses/${course.structure.slug}`}
-                  className="card-interactive block h-full p-6"
+                  className="card-feature card-interactive group block h-full overflow-hidden"
                   data-testid={`course-card-${course.structure.slug}`}
                 >
-                  <div className="flex items-center gap-2">
-                    <span className="rounded-full border border-cs-accent-border bg-cs-accent-dim px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wide text-cs-accent">
-                      {course.level}
-                    </span>
-                    <span className="font-mono text-[11px] text-cs-muted">
-                      {Math.round(course.structure.estimatedMinutes / 60)}h · {course.structure.nodes.length} lessons
-                    </span>
-                  </div>
-                  <h3 className="mt-3 font-display text-lg font-semibold text-cs-text">{course.title}</h3>
-                  <p className="mt-1.5 line-clamp-3 text-sm leading-relaxed text-cs-body">{course.subtitle}</p>
+                  {/* ปก = แผนที่จริงของคอร์สนี้ ต่างกันทุกคอร์สโดยไม่ต้องมีคนวาด */}
+                  <CourseCover
+                    structure={course.structure}
+                    state={state}
+                    className="h-[132px] border-b border-cs-border transition-transform duration-300 group-hover:scale-[1.03]"
+                  />
 
-                  <div className="mt-5">
-                    <div className="flex items-center justify-between text-xs text-cs-muted">
-                      <span data-testid={`course-progress-${course.structure.slug}`}>
-                        {loaded ? `${summary.provenPercent}% proven` : '—'}
+                  <div className="p-6">
+                    <div className="flex items-center gap-2">
+                      <span className="rounded-full bg-cs-accent-fill px-2.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-cs-on-accent">
+                        {course.level}
                       </span>
-                      {summary.skipped > 0 && <span>{summary.skipped} skipped</span>}
+                      <span className="font-mono text-[11px] text-cs-muted">
+                        {Math.round(course.structure.estimatedMinutes / 60)}h · {course.structure.nodes.length} lessons
+                      </span>
                     </div>
-                    <div
-                      className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-cs-surface-2"
-                      role="progressbar"
-                      aria-valuenow={summary.provenPercent}
-                      aria-valuemin={0}
-                      aria-valuemax={100}
-                      aria-label={`${course.title} progress`}
-                    >
-                      <div
-                        className="h-full rounded-full bg-cs-accent-fill transition-[width] duration-500"
-                        style={{ width: `${summary.provenPercent}%` }}
+                    <h3 className="mt-3 font-display text-xl font-semibold leading-snug text-cs-text">
+                      {course.title}
+                    </h3>
+                    <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-cs-body">{course.subtitle}</p>
+
+                    <div className="mt-5 border-t border-cs-border pt-4">
+                      <LessonProgress
+                        structure={course.structure}
+                        state={state}
+                        loaded={loaded}
+                        label={course.title}
+                        testId={`course-progress-${course.structure.slug}`}
+                        provenPercent={summary.provenPercent}
+                        skipped={summary.skipped}
                       />
                     </div>
                   </div>
@@ -147,7 +241,7 @@ export function CourseDashboard({ courses }: { courses: DashboardCourse[] }) {
         </ul>
       </section>
 
-      <section className="card p-6" aria-labelledby="skills-heading">
+      <section className="card-feature p-6 sm:p-7" aria-labelledby="skills-heading">
         <h2 id="skills-heading" className="sr-only">
           Skill map
         </h2>
@@ -159,14 +253,14 @@ export function CourseDashboard({ courses }: { courses: DashboardCourse[] }) {
         />
       </section>
 
-      <section className="card p-6">
+      <section className="surface-sunken rounded-feature border border-cs-border p-6">
         <h2 className="font-display text-lg font-semibold text-cs-text">Practice banks</h2>
         <p className="mt-1.5 text-sm text-cs-body">
           Timed practice tests and question banks, separate from the courses.
         </p>
         <Link
           href="/player"
-          className="mt-4 inline-flex rounded-xl border border-cs-border px-5 py-2.5 text-sm transition-colors hover:border-cs-accent hover:text-cs-accent"
+          className="mt-4 inline-flex rounded-control border border-cs-border bg-cs-surface px-5 py-2.5 text-sm transition-colors hover:border-cs-accent hover:text-cs-accent"
         >
           Open practice
         </Link>

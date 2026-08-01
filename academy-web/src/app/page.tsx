@@ -11,9 +11,9 @@ export default function HomePage() {
 
   return (
     <div className="mx-auto max-w-5xl px-6">
-      <section className="pt-20 pb-14 sm:pt-28">
+      <section className="hero-wash -mx-6 rounded-feature px-6 pt-20 pb-14 sm:pt-28">
         <p className="font-mono text-xs uppercase tracking-[0.16em] text-cs-accent">Learn security properly</p>
-        <h1 className="mt-4 max-w-3xl font-display text-[2.75rem] font-semibold leading-[1.1] tracking-tight text-cs-text sm:text-6xl">
+        <h1 className="mt-4 max-w-3xl font-display text-[3rem] font-semibold leading-[1.05] tracking-tight text-cs-text sm:text-[4.25rem]">
           Stop relearning what you already know.
         </h1>
         <p className="mt-5 max-w-2xl text-lg leading-relaxed text-cs-body">
@@ -23,14 +23,14 @@ export default function HomePage() {
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
             href="/dashboard"
-            className="rounded-xl bg-cs-accent-fill px-6 py-3 text-sm font-semibold text-cs-on-accent transition-opacity hover:opacity-90"
+            className="rounded-control bg-cs-accent-fill px-7 py-3.5 text-sm font-semibold text-cs-on-accent shadow-card transition-transform duration-200 hover:-translate-y-0.5"
           >
             Browse courses
           </Link>
           {courses[0] && (
             <Link
               href={`/courses/${courses[0].structure.slug}`}
-              className="rounded-xl border border-cs-border px-6 py-3 text-sm font-medium text-cs-body transition-colors hover:border-cs-accent hover:text-cs-accent"
+              className="rounded-control border border-cs-border bg-cs-surface px-7 py-3.5 text-sm font-medium text-cs-body transition-colors hover:border-cs-accent hover:text-cs-accent"
             >
               Start {courses[0].copy.title}
             </Link>
@@ -53,7 +53,7 @@ export default function HomePage() {
             body: 'A few checkpoints have to be earned. Those are the ones that make the rest of your map mean something.',
           },
         ].map((item) => (
-          <div key={item.title} className="card p-6">
+          <div key={item.title} className="card p-6 transition-transform duration-200 hover:-translate-y-1">
             <h2 className="font-display text-base font-semibold text-cs-text">{item.title}</h2>
             <p className="mt-2 text-sm leading-relaxed text-cs-body">{item.body}</p>
           </div>

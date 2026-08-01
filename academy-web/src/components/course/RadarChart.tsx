@@ -47,7 +47,9 @@ export function RadarChart({
       <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
         <svg
           viewBox={`0 0 ${SIZE} ${SIZE}`}
-          className="h-[260px] w-[260px] shrink-0"
+          // ยังไม่มีข้อมูล = ใส่ wash อ่อนๆ ไว้ ไม่ปล่อยให้เป็นโครงลวดขาวโล่ง
+          // ซึ่งอ่านเหมือน "พัง" มากกว่า "ยังไม่เริ่ม"
+          className={`h-[268px] w-[268px] shrink-0 rounded-feature ${nothingYet ? 'cover-wash' : ''}`}
           role="img"
           aria-label={`${title}: ${data.map((d) => `${d.label} ${d.notStarted ? 'not started' : `${d.value} percent`}`).join(', ')}`}
         >
@@ -56,8 +58,9 @@ export function RadarChart({
               key={ring}
               points={data.map((_, i) => pointOn(i, count, ring)).map((p) => `${p.x},${p.y}`).join(' ')}
               fill="none"
-              stroke="rgb(var(--cs-border))"
+              stroke="rgb(var(--cs-accent))"
               strokeWidth={1}
+              strokeOpacity={0.22}
             />
           ))}
           {data.map((_, i) => {
@@ -69,8 +72,9 @@ export function RadarChart({
                 y1={CENTER}
                 x2={end.x}
                 y2={end.y}
-                stroke="rgb(var(--cs-border))"
+                stroke="rgb(var(--cs-accent))"
                 strokeWidth={1}
+                strokeOpacity={0.18}
               />
             )
           })}
@@ -96,15 +100,18 @@ export function RadarChart({
           )}
 
           {nothingYet && (
-            <text
-              x={CENTER}
-              y={CENTER + 4}
-              textAnchor="middle"
-              className="fill-cs-faint"
-              style={{ fontSize: 11 }}
-            >
-              nothing recorded yet
-            </text>
+            <>
+              <circle cx={CENTER} cy={CENTER} r={7} fill="rgb(var(--cs-accent-fill))" fillOpacity={0.9} />
+              <text
+                x={CENTER}
+                y={CENTER + 30}
+                textAnchor="middle"
+                className="fill-cs-accent"
+                style={{ fontSize: 11, fontWeight: 600 }}
+              >
+                you start here
+              </text>
+            </>
           )}
         </svg>
 

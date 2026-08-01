@@ -58,8 +58,19 @@
   --cs-amber-dim: rgba(166, 72, 10, 0.1);
   --cs-amber-border: rgba(166, 72, 10, 0.3);
 
+  /* ระดับพื้นผิว: เดิมมีแค่ surface กับ surface-2 ทำให้ทุกกล่องน้ำหนักเท่ากันหมด
+     raised = ของที่ต้องเด่นกว่าเพื่อน · sunken = ร่องที่ของอื่นวางอยู่ข้างบน */
+  --cs-surface-raised: 255 255 255;
+  --cs-surface-sunken: 228 236 243;
+
   --cs-shadow-card: 0 1px 3px rgba(12, 32, 48, 0.06), 0 8px 24px -12px rgba(12, 32, 48, 0.12);
   --cs-shadow-lift: 0 2px 6px rgba(12, 32, 48, 0.08), 0 16px 36px -16px rgba(12, 32, 48, 0.18);
+  /* ชั้นที่สาม สำหรับของชิ้นเอกของหน้า (การ์ดคอร์ส, กล่องเรียนต่อ) */
+  --cs-shadow-feature: 0 4px 12px rgba(12, 32, 48, 0.1), 0 28px 56px -24px rgba(12, 32, 48, 0.26);
+
+  /* พื้นหลังของหน้าปกคอร์ส — ตัวที่ทำให้สีประจำตัวได้โผล่จริงบนหน้า */
+  --cs-cover-wash: linear-gradient(135deg, rgba(56, 189, 248, 0.16) 0%, rgba(56, 189, 248, 0.05) 46%, rgba(10, 108, 158, 0.1) 100%);
+  --cs-hero-wash: radial-gradient(120% 90% at 12% 0%, rgba(56, 189, 248, 0.18) 0%, rgba(56, 189, 248, 0) 62%);
 }
 
 :root[data-theme='dark'] {
@@ -89,8 +100,15 @@
   --cs-amber-dim: rgba(245, 165, 74, 0.14);
   --cs-amber-border: rgba(245, 165, 74, 0.32);
 
+  --cs-surface-raised: 21 34 45;
+  --cs-surface-sunken: 6 12 17;
+
   --cs-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
   --cs-shadow-lift: 0 2px 6px rgba(0, 0, 0, 0.45), 0 16px 36px -16px rgba(0, 0, 0, 0.7);
+  --cs-shadow-feature: 0 4px 14px rgba(0, 0, 0, 0.5), 0 28px 60px -24px rgba(0, 0, 0, 0.8);
+
+  --cs-cover-wash: linear-gradient(135deg, rgba(56, 189, 248, 0.2) 0%, rgba(56, 189, 248, 0.06) 46%, rgba(125, 211, 252, 0.08) 100%);
+  --cs-hero-wash: radial-gradient(120% 90% at 12% 0%, rgba(56, 189, 248, 0.14) 0%, rgba(56, 189, 248, 0) 62%);
 }
 
 html {
@@ -112,13 +130,38 @@ body {
   box-shadow: var(--cs-shadow-card);
 }
 
+/* ชิ้นเอกของหน้า — ต้องอ่านออกทันทีว่า "อันนี้สำคัญกว่าอันอื่น" */
+.card-feature {
+  @apply rounded-[24px] border border-cs-border bg-cs-surface;
+  box-shadow: var(--cs-shadow-feature);
+}
+
+/* ร่องที่ของอื่นวางอยู่ข้างบน — ใช้กับพื้นที่รองที่ไม่ควรแย่งความสนใจ */
+.surface-sunken {
+  background: rgb(var(--cs-surface-sunken));
+}
+
 .card-interactive {
-  @apply card transition-all duration-200;
+  @apply card transition-all duration-200 ease-out;
 }
 
 .card-interactive:hover {
   box-shadow: var(--cs-shadow-lift);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  border-color: var(--cs-accent-border);
+}
+
+.card-feature.card-interactive:hover {
+  box-shadow: var(--cs-shadow-feature), 0 0 0 1px var(--cs-accent-border);
+}
+
+/* หน้าปกคอร์ส — สีประจำตัวได้ที่ยืนจริงบนหน้า */
+.cover-wash {
+  background-image: var(--cs-cover-wash);
+}
+
+.hero-wash {
+  background-image: var(--cs-hero-wash);
 }
 
 /* ความยาวบรรทัดคุมที่ container ของหน้าบทเรียนแทน (ดู lessons/[nodeId]/page.tsx)

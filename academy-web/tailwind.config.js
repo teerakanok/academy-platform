@@ -10,6 +10,8 @@ const themeAware = {
   'cs-bg': 'rgb(var(--cs-bg) / <alpha-value>)',
   'cs-surface': 'rgb(var(--cs-surface) / <alpha-value>)',
   'cs-surface-2': 'rgb(var(--cs-surface-2) / <alpha-value>)',
+  'cs-surface-raised': 'rgb(var(--cs-surface-raised) / <alpha-value>)',
+  'cs-surface-sunken': 'rgb(var(--cs-surface-sunken) / <alpha-value>)',
   'cs-border': 'rgb(var(--cs-border) / <alpha-value>)',
   'cs-border-2': 'rgb(var(--cs-border-2) / <alpha-value>)',
   'cs-text': 'rgb(var(--cs-text) / <alpha-value>)',
@@ -47,6 +49,11 @@ module.exports = {
       boxShadow: {
         card: 'var(--cs-shadow-card)',
         lift: 'var(--cs-shadow-lift)',
+        feature: 'var(--cs-shadow-feature)',
+      },
+      borderRadius: {
+        control: '12px',
+        feature: '24px',
       },
     },
   },
