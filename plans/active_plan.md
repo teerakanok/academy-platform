@@ -145,6 +145,61 @@ founder ถามเรื่องย้าย frontend ไป Cloudflare — *
 - [ ] คอร์สเครือข่ายจริงที่บทนี้ควรอยู่ (ตอนนี้ฝากไว้ในคอร์ส demo)
 - [ ] ให้ Crucible ผลิต simulation ได้ (ตอนนี้เขียนมือใน JSON ของบทเรียน)
 
+### Identity Control — ทิศทางที่ล็อกแล้ว และสิ่งที่ Academy ทำไปแล้ว (2026-08-01)
+
+**ทางเข้ากลางคือ `accounts.cyberskills.co.th`** ทั้งสมัครและเข้าสู่ระบบ · Academy
+redirect ไปที่นั่นพร้อม client_id / redirect_uri / state / PKCE / nonce / service_id
+แล้วรับ **one-time code + state กลับมาทาง browser เท่านั้น** · backend แลก code ด้วย
+PKCE verifier แล้วได้ (issuer, subject, verified email, service_id, nonce,
+activation status/revision) · **ไม่มี cookie ระดับโดเมนแม่**
+
+**สี่ชั้นสถานะ และชั้นก่อนหน้าไม่เคยแปลว่าได้ชั้นถัดไป:**
+`account exists → service activation → product entitlement → resource authorization`
+
+**Academy เป็นเจ้าของเอง:** academy.users/profile, purchase, invitation, course access,
+progress, quiz, certificate, resource authorization
+**Identity Control ไม่แตะของพวกนี้** และ **Academy ห้ามค้นหา/รวม/สร้าง identity ด้วย
+email เอง**
+
+#### ทำแล้ว
+- [x] adapter boundary หลัง interface + fake (`src/lib/identity/`) — fake บังคับกฎเดียว
+      กับของจริง (code ใช้ครั้งเดียว · PKCE · redirect_uri ตรงเป๊ะ · หมดอายุ) ไม่ใช่
+      stub ที่ตอบ ok เสมอ
+- [x] registry ที่**ปฏิเสธ adapter ปลอมบน production ตั้งแต่ตอนเรียก**
+- [x] callback route เตรียมไว้ (`/auth/callback`) — ยังไม่ต่อจริง และ**ปฏิเสธ callback
+      ที่มี subject/email/token/otp/invite ติดมาใน URL** เพราะนั่นแปลว่าอีกฝั่งผิดสัญญา
+- [x] migration 0004: `service_activation` (สำเนาจาก Identity Control พร้อม revision)
+      แยกจาก `course_entitlement` (Academy เป็นเจ้าของ) + ฟังก์ชัน
+      `has_course_entitlement` เพื่อให้มีคำตอบเดียวที่ทุกเส้นทางใช้ร่วมกัน
+- [x] เทส 11 ข้อยืนยันว่า **เปิดใช้บริการสำเร็จไม่ได้ให้สิทธิ์คอร์สใดเลย** ·
+      suspended ใช้บริการไม่ได้แต่สิทธิ์คอร์สยังอยู่ (คนละชั้น) · เพิกถอน/หมดอายุ
+      ใช้ไม่ได้แต่ยังตอบได้ว่าเคยมี
+- [x] session เป็น host-scoped อยู่แล้ว (ไม่มีการตั้ง domain ที่ไหนในโค้ด)
+- [x] map ด้วย (issuer, subject) และ email เป็น attribute ที่เปลี่ยนได้ — ทำไว้ตั้งแต่ M3
+
+#### ยังไม่ทำ
+- [ ] เสียบ `has_course_entitlement` เข้าเส้นทางที่ปล่อยเนื้อหาจริง (ตอนนี้ middleware
+      ยังเช็คแค่ "มี user ไหม") — ต้องทำก่อนมีคอร์สเสียเงิน
+- [ ] transaction store ฝั่ง backend (เก็บ state/PKCE verifier/nonce) แล้วต่อ callback
+- [ ] `/sign-in` เปลี่ยนเป็น redirect ไป Account Center — **ทำเมื่อ Identity Control
+      พร้อมต่อจริงเท่านั้น**
+- [ ] adapter ตัวจริงที่คุยกับ Identity Control (รอ P3 provider/persistence + release gates)
+
+#### ⚠️ ข้อขัดที่ต้องตัดสิน
+- **Academy ถือ `SUPABASE_SERVICE_ROLE_KEY` ของ Pool A** ซึ่งเป็น shared service-role
+  ที่ทิศทางระบุว่า "ห้ามถือ" — ใช้เขียนสคีมา `academy` ของตัวเอง
+  ทางแก้: สร้าง Postgres role เฉพาะที่ grant แค่สคีมา `academy` แล้วให้ Academy ถือ
+  ตัวนั้นแทน (ต้องทำฝั่ง Pool A จึงเป็นงานของ founder/session identity ไม่ใช่ของ session นี้)
+- **Pool A ตั้ง `GOTRUE_COOKIE_DOMAIN=.cyberskills.co.th` ไว้แล้ว** ซึ่งขัดกับข้อ
+  "ไม่มี shared parent-domain cookie" — cookie ของ Academy เองเป็น host-scoped
+  แต่ค่าที่ตั้งไว้ที่ GoTrue ควรถูกทบทวนโดย session identity
+
+#### สิ่งที่ Academy จะต้องรื้อถ้าทิศทางเปลี่ยน
+`/sign-in` ของ Academy (รหัส 6 หลักผ่าน GoTrue โดยตรง) เป็นของชั่วคราวและ **ไม่ควร
+เปิดใช้บน production** — ดังนั้นการลงแรงทำ rate limiter แบบ distributed ให้ OTP ของ
+Academy เองเป็นงานที่จะถูกทิ้ง ความรับผิดชอบนั้นย้ายไปอยู่ที่ Identity Control
+(ปรับลำดับงานตามนี้แล้ว)
+
 ### ความปลอดภัย — ที่แก้แล้ว และที่ยังเปิดอยู่ (review 2026-08-01)
 
 รีวิวข้ามโมเดลรอบภาพรวม (codex, persona: hostile appsec) แล้วพิสูจน์ทุกข้อด้วยการ
