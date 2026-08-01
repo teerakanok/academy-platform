@@ -185,13 +185,13 @@ export function RoadmapGraph({
 
       <figcaption className="mt-6">
         <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-cs-muted">
-          <LegendItem swatch="bg-cs-accent-fill text-cs-on-accent" label="Done — you worked through it" icon="✓" />
+          <LegendItem swatch="bg-cs-accent-fill text-cs-on-accent" label="Done, you worked through it" icon="✓" />
           <LegendItem
             swatch="bg-cs-surface border-2 border-cs-accent text-cs-accent"
-            label="Proven — you tested out of it"
+            label="Proven, you tested out of it"
             icon="★"
           />
-          <LegendItem swatch="bg-cs-surface-2 border border-dashed border-cs-border-2" label="Skipped — not proven yet" icon="↷" />
+          <LegendItem swatch="bg-cs-surface-2 border border-dashed border-cs-border-2" label="Skipped, still unproven" icon="↷" />
           <LegendItem swatch="bg-cs-surface border border-cs-border-2" label="Ready to start" icon="›" />
           <li className="flex items-center gap-1.5">
             <span

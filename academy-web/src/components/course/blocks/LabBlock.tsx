@@ -32,7 +32,7 @@ function Placeholder({ status, compact }: { status: 'coming-soon' | 'ready'; com
           ไม่ปิดกั้น เพราะการอ่านทั้งบทยังทำบนมือถือได้ครบ ปัญหาอยู่ที่ "พิมพ์"
           ไม่ใช่ที่ "หน้าจอ" (M4: เมื่อมี lab ที่ไม่ต้องพิมพ์ ให้ทำบรรทัดนี้เป็นเงื่อนไข) */}
       <p className="mt-2 text-xs text-cs-muted sm:hidden">
-        Best on a computer — labs mean typing. The rest of the lesson works here.
+        Labs need typing, so they go better on a computer. The rest of the lesson reads fine here.
       </p>
     </div>
   )

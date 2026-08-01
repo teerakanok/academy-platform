@@ -1,8 +1,15 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "main": ".open-next/worker.js",
-  "name": "academy-web",
+  "name": "cyberskills-academy",
   "compatibility_date": "2025-03-25",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
-  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" }
+  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  "observability": { "enabled": true },
+  "vars": {
+    // preview: ยังไม่เปิดให้ค้นเจอ และยังไม่เปิดระบบบัญชี
+    // (ไม่มี NEXT_PUBLIC_SUPABASE_* = หน้า sign-in จะบอกตรงๆ ว่ายังไม่เปิด
+    //  แทนที่จะโชว์ฟอร์มที่กดแล้ว error)
+    "NEXT_PUBLIC_SEARCH_INDEXING": "off"
+  }
 }

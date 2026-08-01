@@ -34,8 +34,8 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'CyberSkills Academy',
-    template: '%s · CyberSkills Academy',
+    default: 'CYBERSKILLS Academy',
+    template: '%s · CYBERSKILLS Academy',
   },
   description:
     'Learn cybersecurity without relearning what you already know. Map your path, prove your skills, and keep moving.',
@@ -87,9 +87,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   ปลายทางไหนหายไป ต่างจากการยุบเมนูเป็นแฮมเบอร์เกอร์
                   ชื่อเต็มยังอยู่ครบสำหรับ screen reader */}
               <span className="whitespace-nowrap font-display text-base font-semibold tracking-tight text-cs-text sm:text-lg">
-                <span className="sr-only">CyberSkills Academy</span>
+                <span className="sr-only">CYBERSKILLS Academy</span>
                 <span aria-hidden="true" className="hidden sm:inline">
-                  CyberSkills{' '}
+                  CYBERSKILLS{' '}
                 </span>
                 <span aria-hidden="true" className="text-cs-accent">
                   Academy
@@ -123,7 +123,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <footer className="mt-16 border-t border-cs-border px-6 py-8 text-sm text-cs-muted">
           <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3">
             <span>© {new Date().getFullYear()} CYBERSKILLS</span>
-            <Link href="/privacy" className="underline underline-offset-4 hover:text-cs-accent">
+            <Link
+              href="/privacy"
+              className="whitespace-nowrap underline underline-offset-4 hover:text-cs-accent"
+            >
               นโยบายความเป็นส่วนตัว (Privacy)
             </Link>
           </div>

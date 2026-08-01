@@ -68,7 +68,7 @@ export function publicPage({
     robots: indexable ? { index: true, follow: true } : { index: false, follow: false },
     openGraph: {
       type: 'website',
-      siteName: 'CyberSkills Academy',
+      siteName: 'CYBERSKILLS Academy',
       url,
       title,
       description,

@@ -43,7 +43,7 @@
       "kind": "callout",
       "tone": "warning",
       "title": "This is why you do not stay logged in as root",
-      "text": "As root, every typo becomes maximally destructive and every program you launch inherits unlimited power — including one you did not mean to run. The risk is not that you are careless. It is that nothing is standing between a mistake and the whole machine."
+      "text": "As root, every typo becomes maximally destructive and every program you launch inherits unlimited power — including one you did not mean to run. The problem is that root leaves nothing standing between a typo and the whole machine."
     },
     {
       "kind": "heading",

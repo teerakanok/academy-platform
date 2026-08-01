@@ -66,7 +66,7 @@ export function SignInForm({ next }: { next: string }) {
               Email address
             </label>
             <p className="mt-1 text-sm text-cs-muted">
-              We send a six-digit code. No password to choose, remember, or lose.
+              We send a six-digit code. There is no password to set.
             </p>
             <input
               id="email"
@@ -96,7 +96,7 @@ export function SignInForm({ next }: { next: string }) {
               Enter the code
             </label>
             <p className="mt-1 text-sm text-cs-muted">
-              Sent to <span className="font-medium text-cs-text">{email}</span>. It expires shortly.
+              Sent to <span className="font-medium text-cs-text">{email}</span>. It expires in an hour.
             </p>
             <input
               id="code"

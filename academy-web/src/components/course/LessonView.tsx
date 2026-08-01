@@ -326,8 +326,8 @@ export function LessonView({
           {peeking && (
             <div className="mt-3 border-t border-cs-border pt-3">
               <p className="mb-2.5 text-xs text-cs-muted">
-                Tick anything you could already explain. It is only here to help you decide — the checkpoint is what
-                counts as proven.
+                Tick anything you could already explain. This is just to help you decide. Only the checkpoint counts
+                as proven.
               </p>
               <SelfCheckList
                 items={lesson.cheatsheet}
@@ -397,7 +397,7 @@ export function LessonView({
           className="flex flex-wrap items-center justify-between gap-3 rounded-control border border-dashed border-cs-border-2 bg-cs-surface-2 px-4 py-3"
           data-testid="focus-bar"
         >
-          <p className="text-sm text-cs-muted">The lesson is hidden so the questions are a real test.</p>
+          <p className="text-sm text-cs-muted">The lesson is hidden while you answer.</p>
           <button
             type="button"
             onClick={() => setFocused(false)}
@@ -442,8 +442,8 @@ export function LessonView({
                 </span>
               </div>
               <p className="mt-3 text-sm text-cs-muted">
-                Tick each one you could explain right now without scrolling back. What you leave unticked is where a
-                re-read pays off.
+                Tick each one you could explain right now without scrolling back. Whatever you leave unticked is worth
+                a re-read.
               </p>
               <div className="mt-5 border-t border-cs-border pt-5">
                 <SelfCheckList
@@ -456,7 +456,7 @@ export function LessonView({
               </div>
               <p className="mt-5 border-t border-cs-border pt-4 text-sm text-cs-body">
                 {recalled.size === lesson.cheatsheet.length
-                  ? 'All of them. The checkpoint below should feel like a formality — that is the point.'
+                  ? 'All of them. The checkpoint below should be quick.'
                   : 'When you are ready, a few questions below confirm it stuck.'}
               </p>
             </section>
@@ -490,8 +490,8 @@ export function LessonView({
         <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
           <p className="text-sm text-cs-muted">
             {mode === 'test-out' || isCapstone
-              ? 'Answer from memory — looking something up tells you the answer, not whether you knew it.'
-              : 'Answer from memory if you can. Getting one wrong here is useful information, not a penalty.'}
+              ? 'Answer from memory. Looking something up gives you the answer without telling you whether you knew it.'
+              : 'Answer from memory if you can. Getting one wrong here is useful to you and costs you nothing.'}
           </p>
           {mode === 'learn' && !focused && (
             <button

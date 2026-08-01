@@ -6,7 +6,7 @@
   "blocks": [
     {
       "kind": "paragraph",
-      "text": "The commands here are short and there are not many of them. The important content of this lesson is not the commands — it is that the command line does what you said, immediately, with no confirmation and no recycle bin."
+      "text": "The commands here are short and there are not many of them. The command line does what you typed, immediately. No confirmation, no recycle bin. That is the part to internalise before the commands themselves."
     },
     {
       "kind": "code",
@@ -42,7 +42,7 @@
       "kind": "callout",
       "tone": "tip",
       "title": "tail -f is how you watch a system think",
-      "text": "Run tail -f on a log file, then trigger the thing you are testing in another window. Watching entries appear in real time turns debugging from guesswork into observation."
+      "text": "Run tail -f on a log file, then trigger the thing you are testing in another window. Watching entries appear while you reproduce a problem lets you tie an action to its effect."
     },
     {
       "kind": "heading",
@@ -50,7 +50,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "rm -rf means \"delete this, everything inside it, recursively, and do not ask me about anything\". It is genuinely useful and it is genuinely how people destroy production systems. There is no undo. The files are not in a bin somewhere."
+      "text": "rm -rf means \"delete this, everything inside it, recursively, and do not ask me about anything\". It is useful, and it has destroyed production systems. There is no undo. The files are not in a bin somewhere."
     },
     {
       "kind": "callout",

@@ -18,7 +18,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "Everything an OS does falls into four buckets. Learn these four and most of Linux stops being trivia and starts being a system you can reason about."
+      "text": "Everything an OS does falls into four buckets. Once these four are clear, most of Linux follows from them."
     },
     {
       "kind": "image",
@@ -94,7 +94,7 @@
       "kind": "callout",
       "tone": "tip",
       "title": "A mental model that will keep paying off",
-      "text": "Think of the kernel as the only person with keys to the building, and every program as a visitor at the front desk. Visitors can request anything. The desk decides. Security work is mostly about what the desk is willing to say yes to, and who is standing at it."
+      "text": "Think of the kernel as the only person with keys to the building, and every program as a visitor at the front desk. Visitors can request anything. The desk decides. Most security work comes down to what the kernel agrees to do, and which user is asking."
     }
   ],
   "cheatsheet": [

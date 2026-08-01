@@ -14,7 +14,7 @@ export const metadata = publicPage({
   path: '/courses',
   title: 'Courses',
   description:
-    'Cybersecurity courses you can move through at your own pace — skip what you already know by proving it, and keep a map of what you have actually earned.',
+    'Cybersecurity courses you take at your own pace. Prove what you already know and skip it, and keep a map of what you have earned.',
 })
 
 export default function CoursesPage() {
@@ -23,13 +23,13 @@ export default function CoursesPage() {
   return (
     <div className="mx-auto max-w-5xl px-6 py-12">
       <header className="hero-bleed pb-4">
-        <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-cs-accent">Courses</p>
-        <h1 className="mt-2 font-display text-4xl font-semibold leading-[1.1] tracking-tight text-cs-text">
-          Learn what you do not know yet
+        <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-cs-accent">CYBERSKILLS Academy</p>
+        <h1 className="mt-2 font-display text-4xl font-semibold leading-[1.1] tracking-tight text-cs-text text-balance">
+          Courses
         </h1>
         <p className="mt-4 max-w-2xl text-lg leading-relaxed text-cs-body">
-          Every course is a map, not a queue. Prove a lesson and move on; skip one and it stays on your map as
-          unproven until you come back for it.
+          Each course is a map you can take your own route through. Prove a lesson and move on. Skip one and it
+          stays marked as unproven until you come back for it.
         </p>
       </header>
 
@@ -55,8 +55,8 @@ export default function CoursesPage() {
       </ul>
 
       <p className="mt-10 text-sm text-cs-muted">
-        Reading a course page is open to everyone. Taking a course needs a free CyberSkills account — one account
-        across everything we run.
+        Course pages are open to everyone. Taking a course needs a free CYBERSKILLS account, which works across
+        everything we run.
       </p>
     </div>
   )

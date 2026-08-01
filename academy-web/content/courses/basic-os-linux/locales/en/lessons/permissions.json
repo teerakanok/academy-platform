@@ -6,7 +6,7 @@
   "blocks": [
     {
       "kind": "paragraph",
-      "text": "This is the lesson everything so far was building towards. Permissions are where the operating system's fourth job — deciding who may do what — becomes something you can read and change. It is also the single most common source of real-world misconfiguration findings."
+      "text": "This is where the filesystem and the user accounts from earlier lessons meet. Permissions are where the operating system's fourth job — deciding who may do what — becomes something you can read and change. It is also the single most common source of real-world misconfiguration findings."
     },
     {
       "kind": "heading",
@@ -65,7 +65,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "Each group of three is one digit. Read is 4, write is 2, execute is 1, and you add up whichever are present. There is no more to it than that."
+      "text": "Each group of three is one digit. Read is 4, write is 2, execute is 1, and you add up whichever are present. That arithmetic is all there is to numeric modes."
     },
     {
       "kind": "table",
@@ -144,7 +144,7 @@
       "kind": "callout",
       "tone": "warning",
       "title": "The realistic attack, in three steps",
-      "text": "An attacker gets a foothold as a low-privileged account — say the web server user. They find a script that is 777 and that runs regularly as root. They edit the script, because 777 said they could. The next time it runs, their code runs as root. Nothing was exploited; the permissions were simply an open door."
+      "text": "An attacker gets a foothold as a low-privileged account — say the web server user. They find a script that is 777 and that runs regularly as root. They edit the script, because 777 said they could. The next time it runs, their code runs as root. No exploit was involved. The permissions already allowed the edit."
     },
     {
       "kind": "paragraph",

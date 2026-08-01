@@ -6,7 +6,7 @@
   "blocks": [
     {
       "kind": "paragraph",
-      "text": "Three commands do almost all of the moving and looking: pwd tells you where you are, ls shows what is here, and cd takes you somewhere else. The skill worth building is not memorising them — it is reading what ls tells you, because that output answers security questions later."
+      "text": "Three commands do almost all of the moving and looking: pwd tells you where you are, ls shows what is here, and cd takes you somewhere else. The skill worth building is reading what ls tells you. Those columns answer security questions later."
     },
     {
       "kind": "code",
@@ -87,7 +87,7 @@
       "kind": "callout",
       "tone": "tip",
       "title": "When a command confuses you",
-      "text": "Run man followed by the command name — for example man ls — to read its manual. Press q to quit. Reading man pages is a habit that separates people who can work on an unfamiliar system from people who can only repeat what they memorised."
+      "text": "Run man followed by the command name — for example man ls — to read its manual. Press q to quit. Man pages are what you fall back on when you are on a system you have never seen."
     }
   ],
   "cheatsheet": [

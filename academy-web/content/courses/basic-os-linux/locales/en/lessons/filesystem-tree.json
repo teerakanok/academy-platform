@@ -68,7 +68,7 @@
       "kind": "callout",
       "tone": "tip",
       "title": "\"Everything is a file\"",
-      "text": "You will hear this constantly. It means Linux exposes hardware, running processes, and system state as things you can read with ordinary file commands. A disk, a network connection, even a running process shows up somewhere in the tree. It sounds like trivia; it is why one small set of commands can inspect the entire system."
+      "text": "You will hear this constantly. It means Linux exposes hardware, running processes, and system state as things you can read with ordinary file commands. A disk, a network connection, even a running process shows up somewhere in the tree. That design is why cat, ls and ps can inspect so many different parts of the system."
     },
     {
       "kind": "heading",

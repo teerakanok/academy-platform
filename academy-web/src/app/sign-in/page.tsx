@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { SignInForm } from '@/components/auth/SignInForm'
+import { accountsEnabled } from '@/lib/auth/enabled'
 import { safeNextPath } from '@/lib/auth/route-client'
 import { privatePage } from '@/lib/seo'
 
@@ -34,25 +35,38 @@ export default async function SignInPage({
           className="mx-auto"
         />
         <h1 className="mt-4 font-display text-3xl font-semibold leading-tight tracking-tight text-cs-text">
-          One CyberSkills account
+          One CYBERSKILLS account
         </h1>
         <p className="mx-auto mt-3 max-w-md text-cs-body">
-          The same account works across everything we run — Academy today, and the certifications we issue later.
+          The same account works across everything we run. Academy now, and the certifications we issue later.
         </p>
       </div>
 
-      <SignInForm next={target} />
+      {accountsEnabled() ? (
+        <SignInForm next={target} />
+      ) : (
+        <div className="card-feature p-6 sm:p-8" data-testid="accounts-not-open">
+          <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-cs-accent">Preview</p>
+          <h2 className="mt-2 font-display text-xl font-semibold text-cs-text">Accounts are not open yet</h2>
+          <p className="mt-3 text-sm leading-relaxed text-cs-body">
+            You can read the course pages in this build. Sign-in opens when the platform launches.
+          </p>
+        </div>
+      )}
 
       <p className="mt-6 text-center text-sm text-cs-muted">
-        Browsing is open to everyone —{' '}
+        You can{' '}
         <Link href="/courses" className="underline underline-offset-4 hover:text-cs-accent">
-          look through the courses first
+          look through the courses
         </Link>{' '}
-        if you would rather.
+        without an account.
       </p>
-      <p className="mt-3 text-center text-xs text-cs-muted">
-        By continuing you agree to how we handle your data —{' '}
-        <Link href="/privacy" className="underline underline-offset-4 hover:text-cs-accent">
+      <p className="mx-auto mt-3 max-w-sm text-center text-xs text-cs-muted">
+        By continuing you agree to how we handle your data.{' '}
+        <Link
+          href="/privacy"
+          className="whitespace-nowrap underline underline-offset-4 hover:text-cs-accent"
+        >
           นโยบายความเป็นส่วนตัว (Privacy)
         </Link>
       </p>

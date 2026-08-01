@@ -23,7 +23,7 @@ const BG = '#0B1620'
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const course = getCourse(slug)
-  const title = course?.copy.title ?? 'CyberSkills Academy'
+  const title = course?.copy.title ?? 'CYBERSKILLS Academy'
   const subtitle = course?.copy.subtitle ?? ''
   const lessons = course?.structure.nodes.length ?? 0
   const level = course?.structure.level ?? ''

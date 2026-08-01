@@ -6,7 +6,7 @@
   "blocks": [
     {
       "kind": "paragraph",
-      "text": "This is the capstone, and it is where the Unix idea finally pays off. Each command you have learned does one narrow thing. The power comes from connecting them: the output of one becomes the input of the next, and a question nobody wrote a tool for gets answered in a single line."
+      "text": "This is the capstone, and it shows why Unix commands were built to be chained. Each command you have learned does one narrow thing. The power comes from connecting them: the output of one becomes the input of the next, and a question nobody wrote a tool for gets answered in a single line."
     },
     {
       "kind": "heading",
@@ -95,7 +95,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "Each stage is simple and replaceable. If the log format differs on your system, you change one stage rather than looking for a different tool. That composability is the whole design philosophy, and it is why these commands have outlived every product built to replace them."
+      "text": "Each stage is simple and replaceable. If the log format differs on your system, you change one stage rather than looking for a different tool. Because each stage is replaceable, the same handful of commands keeps working across log formats and machines you have never seen."
     },
     {
       "kind": "heading",

@@ -191,14 +191,14 @@ export function CourseOverview({
         </div>
         <p className="mt-3 max-w-2xl text-sm text-cs-body">
           {cert.eligible
-            ? 'It says you can do this, and every lesson behind it has the evidence to back that up.'
-            : 'The certificate says you can do this — not that you read every page. Reading a lesson and testing out of it count exactly the same.'}
+            ? 'Every lesson behind it has the evidence to back it up.'
+            : 'The certificate is about what you can do, so reading a lesson and testing out of it count the same.'}
         </p>
         {!cert.eligible && skippedBlockers > 0 && (
           <p className="mt-3 max-w-2xl text-sm text-cs-body" data-testid="certificate-skipped-note">
             {skippedBlockers === 1 ? 'One lesson you skipped has' : `${skippedBlockers} lessons you skipped have`} no
-            evidence yet. If you already know {skippedBlockers === 1 ? 'it' : 'them'}, test out — it takes a few
-            questions and counts in full.
+            evidence yet. If you already know {skippedBlockers === 1 ? 'it' : 'them'}, testing out takes a few questions
+            and counts in full.
           </p>
         )}
         {!cert.eligible && cert.blocking.length > 0 && (

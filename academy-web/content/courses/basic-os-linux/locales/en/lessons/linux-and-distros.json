@@ -30,7 +30,7 @@
       "kind": "callout",
       "tone": "tip",
       "title": "Which one should you learn?",
-      "text": "Learn Ubuntu first. Not because it is best, but because when you search an error message at 1am, Ubuntu answers exist. Once the concepts are yours, moving to another distro is mostly learning a different package command."
+      "text": "Learn Ubuntu first. Not for technical reasons. When you paste an error message into a search box at 1am, Ubuntu answers exist. Once the concepts are yours, moving to another distro is mostly learning a different package command."
     },
     {
       "kind": "heading",
@@ -38,7 +38,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "The reason is not that it is friendlier. It is that it can be operated without a human looking at a screen. A Linux server can be installed, configured, updated, and inspected entirely through text — which means it can be automated, version-controlled, and reproduced exactly."
+      "text": "Linux did not win servers by being friendlier. It won because the whole machine can be driven as text, which means it can be scripted, versioned and repeated. A Linux server can be installed, configured, updated, and inspected entirely through text — which means it can be automated, version-controlled, and reproduced exactly."
     },
     {
       "kind": "list",
@@ -61,7 +61,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "Distros ship on a schedule and support each release for a fixed period. Ubuntu labels some releases LTS — long-term support — meaning security updates keep coming for years. Running a release past its support date means the security fixes stop arriving, silently. Nothing breaks on the day it happens, which is exactly what makes it dangerous."
+      "text": "Distros ship on a schedule and support each release for a fixed period. Ubuntu labels some releases LTS — long-term support — meaning security updates keep coming for years. Running a release past its support date means the security fixes stop arriving, silently. Nothing breaks on the day it happens. The machine keeps running; the security fixes just stop arriving."
     },
     {
       "kind": "try",

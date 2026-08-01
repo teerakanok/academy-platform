@@ -4,7 +4,7 @@ import { CURRENT_CONSENT_VERSION } from '@/lib/consent'
 
 export const metadata: Metadata = {
   title: 'นโยบายความเป็นส่วนตัว',
-  description: 'นโยบายความเป็นส่วนตัวของ CyberSkills Academy (PDPA)',
+  description: 'นโยบายความเป็นส่วนตัวของ CYBERSKILLS Academy (PDPA)',
 }
 
 // PDPA notice สำหรับ waitlist lead capture — ช่องทางติดต่อใช้ค่าเดียวกับ
@@ -14,7 +14,7 @@ export default function PrivacyPage() {
     <article className="mx-auto max-w-3xl px-6 py-16">
       <p className="font-mono text-sm text-cs-accent mb-3">PRIVACY POLICY</p>
       <h1 className="font-display text-3xl font-bold text-cs-text mb-2">
-        นโยบายความเป็นส่วนตัว — CyberSkills Academy
+        นโยบายความเป็นส่วนตัว CYBERSKILLS Academy
       </h1>
       <p className="text-cs-muted text-sm mb-10">
         ฉบับ {CURRENT_CONSENT_VERSION} · ปรับปรุงล่าสุด 31 กรกฎาคม 2026 ·
@@ -27,7 +27,7 @@ export default function PrivacyPage() {
             1. ผู้ควบคุมข้อมูลส่วนบุคคล
           </h2>
           <p>
-            CYBERSKILLS (ผู้ให้บริการ CyberSkills Academy) เป็นผู้ควบคุมข้อมูลส่วนบุคคลตามนโยบายนี้
+            CYBERSKILLS (ผู้ให้บริการ CYBERSKILLS Academy) เป็นผู้ควบคุมข้อมูลส่วนบุคคลตามนโยบายนี้
             ติดต่อได้ที่อีเมล{' '}
             <a href="mailto:contact@cyberskills.co.th" className="text-cs-accent underline underline-offset-4">
               contact@cyberskills.co.th
@@ -43,7 +43,7 @@ export default function PrivacyPage() {
           <ul className="list-disc pl-6 space-y-2">
             <li>
               <span className="text-cs-text">อีเมล</span> — เพื่อแจ้งข่าวการเปิดตัว ความคืบหน้า
-              และข้อมูลคอร์สของ CyberSkills Academy ตามความยินยอมที่คุณให้ไว้
+              และข้อมูลคอร์สของ CYBERSKILLS Academy ตามความยินยอมที่คุณให้ไว้
             </li>
             <li>
               <span className="text-cs-text">ข้อมูลที่มาของการเข้าชม</span> (เช่น UTM parameters,
