@@ -106,6 +106,11 @@ export type LessonBlock =
       description: string
       estimatedMinutes: number
       status: 'coming-soon' | 'ready'
+      /** inline = แบบฝึกสั้นๆ ทำคาที่อ่านอยู่ ไม่ต้องเปิดเต็มจอ (ค่าตั้งต้น)
+       *  full = สถานการณ์จริงที่ต้องใช้พื้นที่ทำงาน เปิดเต็มจอได้
+       *  เหตุผล: บังคับให้เปิด cockpit เต็มจอเพื่อทำอะไร 2 นาที คือความรำคาญ
+       *  ที่ทำให้คนไม่ทำ lab เลย */
+      scale?: 'inline' | 'full'
     }
 
 export interface CheckpointQuestion {

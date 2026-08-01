@@ -13,11 +13,24 @@
       "text": "In the flow of the lesson it sits at a comfortable size, so you can see it alongside the instructions. The moment you start typing in it, that size stops being enough — which is what the expand control is for."
     },
     {
+      "kind": "paragraph",
+      "text": "Not every hands-on moment deserves a full workspace. A two-minute check belongs right here in the reading, because making someone open a separate environment for it is the reason they skip it."
+    },
+    {
+      "kind": "lab",
+      "title": "Check who owns this file",
+      "description": "One command, one answer. Small enough to do without leaving the sentence you were reading.",
+      "estimatedMinutes": 2,
+      "status": "coming-soon",
+      "scale": "inline"
+    },
+    {
       "kind": "lab",
       "title": "Read and fix a permission problem",
-      "description": "A throwaway machine with a file that the wrong people can write to. Find it and fix it. Placeholder for this demo.",
+      "description": "A throwaway machine with a file the wrong people can write to. Find it and fix it. This one needs room to work, so it can fill the screen.",
       "estimatedMinutes": 10,
-      "status": "coming-soon"
+      "status": "coming-soon",
+      "scale": "full"
     },
     {
       "kind": "callout",
@@ -52,7 +65,9 @@
         "C": "Labs cannot be linked to",
         "D": "Articles are not part of courses"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "The split is doing versus reading. Anything interactive that feeds progress stays inside; anything to read becomes part of the page itself."
     },
     {
@@ -64,7 +79,9 @@
         "C": "They land back in the lesson at the same place",
         "D": "The lab resets"
       },
-      "correct": ["C"],
+      "correct": [
+        "C"
+      ],
       "explanation": "Losing your place is the thing that actually breaks flow. Expanding and collapsing must never cost the learner their position."
     },
     {
@@ -76,7 +93,9 @@
         "C": "Only PDFs",
         "D": "Nothing, full screen is never useful"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Full screen is an escape hatch for detail and for work. Needing it to make a document readable is a sign that document should not have been embedded."
     }
   ]

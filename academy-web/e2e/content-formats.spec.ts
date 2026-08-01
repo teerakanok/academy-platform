@@ -66,9 +66,17 @@ test.describe('content formats', () => {
     expect(body.subarray(0, 5).toString()).toBe('%PDF-')
   })
 
-  test('Lab: ขยายเต็มจอได้ และ Escape กลับมาที่เดิม', async ({ page }) => {
+  test('Lab มีสองขนาด: inline ทำคาที่อ่าน (ไม่มีปุ่มขยาย) · full ขยายเต็มจอได้', async ({ page }) => {
     await page.goto(`${COURSE}/lessons/formats-hands-on`)
-    await expect(page.getByTestId('lab-block')).toBeVisible()
+
+    // แบบฝึกสั้นต้องอยู่ในสายการอ่าน และต้องไม่มีปุ่มเปิดเต็มจอ —
+    // การบังคับเปิด cockpit เพื่อทำอะไร 2 นาทีคือเหตุผลที่คนข้าม lab
+    const inline = page.locator('[data-testid="lab-block"][data-scale="inline"]')
+    await expect(inline).toBeVisible()
+    await expect(inline.getByTestId('lab-expand')).toHaveCount(0)
+
+    const full = page.locator('[data-testid="lab-block"][data-scale="full"]')
+    await expect(full).toBeVisible()
     await expect(page.getByTestId('lab-fullscreen')).toHaveCount(0)
 
     await page.getByTestId('lab-expand').click()
@@ -85,7 +93,20 @@ test.describe('content formats', () => {
 
     await page.keyboard.press('Escape')
     await expect(page.getByTestId('lab-fullscreen')).toHaveCount(0)
-    await expect(page.getByTestId('lab-block')).toBeVisible()
+    await expect(full).toBeVisible()
+  })
+
+  test('ก่อนตัดสินว่า "รู้แล้ว" ต้องเปิดดูสาระของบทได้', async ({ page }) => {
+    // ชื่อบทกับหนึ่งประโยคไม่พอให้ใครตัดสินว่าตัวเองรู้แล้วจริงไหม
+    await page.goto('/courses/basic-os-linux/lessons/linux-and-distros')
+    await expect(page.getByTestId('key-ideas-peek')).toHaveCount(0)
+    await page.getByTestId('peek-key-ideas').click()
+    const peek = page.getByTestId('key-ideas-peek')
+    await expect(peek).toBeVisible()
+    await expect(peek.locator('li')).not.toHaveCount(0)
+    // capstone ข้ามไม่ได้ จึงไม่มีแถบนี้เลย
+    await page.goto(`${COURSE}/lessons/formats-hands-on`)
+    await expect(page.getByTestId('peek-key-ideas')).toHaveCount(0)
   })
 
   test('คอร์ส demo ปรากฏบน dashboard ร่วมกับคอร์สจริง', async ({ page }) => {

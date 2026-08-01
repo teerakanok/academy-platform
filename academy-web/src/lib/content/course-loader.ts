@@ -211,6 +211,7 @@ const blockSchema = z.discriminatedUnion('kind', [
     kind: z.literal('lab'),
     title: z.string().min(1),
     description: z.string().min(1),
+    scale: z.enum(['inline', 'full']).optional(),
     estimatedMinutes: z.number().positive(),
     status: z.enum(['coming-soon', 'ready']),
   }),

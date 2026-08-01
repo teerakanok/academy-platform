@@ -105,6 +105,7 @@ export function LessonBody({ blocks }: { blocks: LessonBlock[] }) {
                 description={block.description}
                 estimatedMinutes={block.estimatedMinutes}
                 status={block.status}
+                scale={block.scale}
               />
             )
 

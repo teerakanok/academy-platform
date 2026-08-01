@@ -30,11 +30,27 @@
     },
     {
       "kind": "table",
-      "headers": ["Letter", "On a file", "On a directory"],
+      "headers": [
+        "Letter",
+        "On a file",
+        "On a directory"
+      ],
       "rows": [
-        ["r", "Read the contents", "List what is inside"],
-        ["w", "Change the contents", "Create, rename, or delete entries inside"],
-        ["x", "Run it as a program", "Enter it and reach things inside"]
+        [
+          "r",
+          "Read the contents",
+          "List what is inside"
+        ],
+        [
+          "w",
+          "Change the contents",
+          "Create, rename, or delete entries inside"
+        ],
+        [
+          "x",
+          "Run it as a program",
+          "Enter it and reach things inside"
+        ]
       ]
     },
     {
@@ -53,13 +69,37 @@
     },
     {
       "kind": "table",
-      "headers": ["Digit", "Letters", "Means"],
+      "headers": [
+        "Digit",
+        "Letters",
+        "Means"
+      ],
       "rows": [
-        ["7", "rwx", "read + write + execute"],
-        ["6", "rw-", "read + write"],
-        ["5", "r-x", "read + execute"],
-        ["4", "r--", "read only"],
-        ["0", "---", "nothing"]
+        [
+          "7",
+          "rwx",
+          "read + write + execute"
+        ],
+        [
+          "6",
+          "rw-",
+          "read + write"
+        ],
+        [
+          "5",
+          "r-x",
+          "read + execute"
+        ],
+        [
+          "4",
+          "r--",
+          "read only"
+        ],
+        [
+          "0",
+          "---",
+          "nothing"
+        ]
       ]
     },
     {
@@ -111,6 +151,14 @@
       "text": "The fix is almost never 777. It is to work out which user needs which access and grant that: usually correcting ownership with chown, or adding the right group, then setting 644 or 755."
     },
     {
+      "kind": "lab",
+      "title": "Read one permission string",
+      "description": "A single file is waiting. Say who can do what to it — then check your answer against the machine.",
+      "estimatedMinutes": 3,
+      "status": "coming-soon",
+      "scale": "inline"
+    },
+    {
       "kind": "try",
       "title": "Prove each rule to yourself",
       "steps": [
@@ -146,7 +194,9 @@
         "C": "Everyone can read, write and execute",
         "D": "Owner: read only · group: write · others: execute"
       },
-      "correct": ["A"],
+      "correct": [
+        "A"
+      ],
       "explanation": "Split it into three groups of three after the type character: rwx for the owner, r-x for the group, --- for everyone else."
     },
     {
@@ -158,7 +208,9 @@
         "C": "r--rw----",
         "D": "rw-rw-r--"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "6 = 4+2 = rw-, 4 = r--, 0 = ---. A common setting for a config file readable by a service group but by nobody else."
     },
     {
@@ -170,7 +222,9 @@
         "C": "Given the files to root",
         "D": "Nothing — 777 is the default"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "777 grants everything to everyone. Any compromised low-privilege process on that host can now rewrite those files, and whatever runs them afterwards runs the attacker's code."
     },
     {
@@ -182,7 +236,9 @@
         "C": "chmod 755 id_rsa",
         "D": "chmod 777 id_rsa"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "600 is rw------- — the owner may read and write, nobody else has any access. SSH will refuse to use a key that is more permissive than this."
     },
     {
@@ -194,7 +250,9 @@
         "C": "Because the file was owned by root",
         "D": "This cannot happen"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Removing a name from a directory is a change to the directory. Write permission there is enough — which is why directory permissions deserve as much attention as file permissions."
     }
   ]

@@ -46,6 +46,7 @@ export function LessonView({
   const [loaded, setLoaded] = useState(false)
   const [mode, setMode] = useState<Mode>('learn')
   const [done, setDone] = useState<null | 'completed' | 'tested-out' | 'skipped'>(null)
+  const [peeking, setPeeking] = useState(false)
 
   useEffect(() => {
     const store = browserCourseStore()
@@ -174,24 +175,52 @@ export function LessonView({
       </header>
 
       {mode === 'learn' && !done && canSkip(node) && (
-        <div className="flex flex-wrap items-center gap-3 rounded-control border border-cs-border bg-cs-surface px-4 py-3">
-          <p className="text-sm text-cs-muted">Already know this?</p>
-          <button
-            type="button"
-            onClick={() => setMode('test-out')}
-            data-testid="test-out"
-            className="rounded-control border-2 border-cs-accent bg-cs-surface px-4 py-2 text-sm font-medium text-cs-accent transition-colors hover:bg-cs-accent-dim"
-          >
-            Prove it and move on
-          </button>
-          <button
-            type="button"
-            onClick={skipLesson}
-            data-testid="skip-lesson"
-            className="rounded-control border border-cs-border px-4 py-2 text-sm text-cs-muted transition-colors hover:border-cs-border-2 hover:text-cs-body"
-          >
-            Skip with the summary
-          </button>
+        <div className="rounded-control border border-cs-border bg-cs-surface px-4 py-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <p className="text-sm text-cs-muted">Already know this?</p>
+            {/* ต้องเห็นสาระของบทก่อนถึงจะตัดสินได้จริง — ชื่อบทกับหนึ่งประโยค
+                ไม่พอให้ใครบอกได้ว่าตัวเองรู้แล้วหรือยัง */}
+            <button
+              type="button"
+              onClick={() => setPeeking((v) => !v)}
+              data-testid="peek-key-ideas"
+              aria-expanded={peeking}
+              className="rounded-control px-2 py-1 text-sm font-medium text-cs-accent underline underline-offset-4 transition-colors hover:text-cs-text"
+            >
+              {peeking ? 'Hide what it covers' : 'See what it covers'}
+            </button>
+            <span className="ml-auto flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setMode('test-out')}
+                data-testid="test-out"
+                className="rounded-control border-2 border-cs-accent bg-cs-surface px-4 py-2 text-sm font-medium text-cs-accent transition-colors hover:bg-cs-accent-dim"
+              >
+                Prove it and move on
+              </button>
+              <button
+                type="button"
+                onClick={skipLesson}
+                data-testid="skip-lesson"
+                className="rounded-control border border-cs-border px-4 py-2 text-sm text-cs-muted transition-colors hover:border-cs-border-2 hover:text-cs-body"
+              >
+                Skip with the summary
+              </button>
+            </span>
+          </div>
+
+          {peeking && (
+            <ul className="mt-3 space-y-1.5 border-t border-cs-border pt-3" data-testid="key-ideas-peek">
+              {lesson.cheatsheet.map((item, i) => (
+                <li key={i} className="flex gap-2.5 text-sm leading-relaxed text-cs-body">
+                  <span aria-hidden="true" className="mt-0.5 font-mono text-cs-accent">
+                    ·
+                  </span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
 
@@ -228,6 +257,30 @@ export function LessonView({
               {lesson.attribution}
             </p>
           )}
+
+          {/* จังหวะปิดการอ่าน: สรุปสิ่งที่เพิ่งอ่านก่อนจะเจอคำถาม
+              เดิมอ่านจบแล้วเจอ quiz ทันทีซึ่งกระโดดเกินไป และไม่มีโอกาสทบทวน */}
+          {!done && (
+            <section className="mt-14 rounded-feature border border-cs-accent-border bg-cs-accent-dim p-6 sm:p-7">
+              <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-cs-accent">
+                That is the lesson
+              </p>
+              <h2 className="mt-2 font-display text-xl font-semibold text-cs-text">Key ideas to keep</h2>
+              <ul className="mt-4 space-y-2">
+                {lesson.cheatsheet.map((item, i) => (
+                  <li key={i} className="flex gap-3 text-sm leading-relaxed text-cs-body">
+                    <span aria-hidden="true" className="mt-0.5 font-mono text-cs-accent">
+                      ·
+                    </span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-5 border-t border-cs-accent-border pt-4 text-sm text-cs-muted">
+                When you are ready, a few questions below confirm it stuck.
+              </p>
+            </section>
+          )}
         </>
       )}
 
@@ -250,11 +303,13 @@ export function LessonView({
       )}
 
       {!done && (mode === 'learn' || mode === 'test-out') && (
+        <div className="pt-2">
         <CheckpointQuiz
           questions={lesson.checkpoint}
           requireAllCorrect={mode === 'test-out' || isCapstone}
           onPassed={mode === 'test-out' ? finishTestOut : finishLesson}
         />
+        </div>
       )}
 
       {done && (
