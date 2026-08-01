@@ -19,15 +19,49 @@
       "text": "The directories worth knowing on day one"
     },
     {
+      "kind": "image",
+      "src": "/media/diagrams/filesystem-tree.svg",
+      "alt": "A tree hanging off a single root directory. /etc holds configuration, /var/log holds things that grow and is where you look when something broke, /home/you holds your own files, /usr/bin holds the programs, and /tmp is scratch space wiped on reboot.",
+      "caption": "One tree, one root. Other disks hang off it as branches rather than getting a letter."
+    },
+    {
       "kind": "table",
-      "headers": ["Path", "What lives there", "Why you will care"],
+      "headers": [
+        "Path",
+        "What lives there",
+        "Why you will care"
+      ],
       "rows": [
-        ["/home/yourname", "Your personal files", "Where you work. Usually written as ~"],
-        ["/etc", "System configuration, as text files", "Almost every server setting you change is here"],
-        ["/var/log", "Log files", "Where you go when something went wrong"],
-        ["/usr/bin", "Installed programs", "Where the commands you type actually live"],
-        ["/tmp", "Temporary scratch space", "Writable by everyone — which makes it interesting to attackers"],
-        ["/root", "The root user's home", "Not the same thing as /"]
+        [
+          "/home/yourname",
+          "Your personal files",
+          "Where you work. Usually written as ~"
+        ],
+        [
+          "/etc",
+          "System configuration, as text files",
+          "Almost every server setting you change is here"
+        ],
+        [
+          "/var/log",
+          "Log files",
+          "Where you go when something went wrong"
+        ],
+        [
+          "/usr/bin",
+          "Installed programs",
+          "Where the commands you type actually live"
+        ],
+        [
+          "/tmp",
+          "Temporary scratch space",
+          "Writable by everyone — which makes it interesting to attackers"
+        ],
+        [
+          "/root",
+          "The root user's home",
+          "Not the same thing as /"
+        ]
       ]
     },
     {
@@ -90,7 +124,9 @@
         "C": "/log is a file and log is a folder",
         "D": "/log is on another disk"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "The leading slash anchors the path to the root of the single tree. Without it, the path is measured from your current directory."
     },
     {
@@ -102,7 +138,9 @@
         "C": "/etc",
         "D": "/usr/bin"
       },
-      "correct": ["C"],
+      "correct": [
+        "C"
+      ],
       "explanation": "/etc holds system configuration as plain text. /var/log holds output about what happened, /usr/bin holds the programs, and /tmp is scratch space."
     },
     {
@@ -114,7 +152,9 @@
         "C": "Whether the file has a .sh extension",
         "D": "Whether the machine has been restarted"
       },
-      "correct": ["A"],
+      "correct": [
+        "A"
+      ],
       "explanation": "A relative path silently means something different when the working directory changes. It is the classic cause of \"works for me, fails on schedule\"."
     }
   ]

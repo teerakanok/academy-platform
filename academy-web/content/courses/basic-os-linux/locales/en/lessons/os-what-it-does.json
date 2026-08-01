@@ -21,13 +21,39 @@
       "text": "Everything an OS does falls into four buckets. Learn these four and most of Linux stops being trivia and starts being a system you can reason about."
     },
     {
+      "kind": "image",
+      "src": "/media/diagrams/os-layers.svg",
+      "alt": "Programs such as a browser, an editor, a shell command and a background service all sit above the operating system. The operating system does four jobs — runs things by sharing the CPU, hands out memory, stores files, and decides who may do what. Below it sit the CPU, memory, disk and network card, none of which programs touch directly.",
+      "caption": "Nothing you run reaches the hardware on its own. That is the whole idea."
+    },
+    {
       "kind": "table",
-      "headers": ["Job", "What it means", "Where you meet it later"],
+      "headers": [
+        "Job",
+        "What it means",
+        "Where you meet it later"
+      ],
       "rows": [
-        ["Run programs", "Decide which program uses the CPU, and when", "Processes, `ps`, `top`, killing a runaway service"],
-        ["Manage memory", "Give each program its own memory and keep them apart", "Why one crashed program does not take the machine down"],
-        ["Store things", "Turn a disk into files and folders with names", "The filesystem tree, paths, mounts"],
-        ["Decide who may do what", "Enforce users, groups, and permissions", "Permissions, `sudo`, privilege escalation"]
+        [
+          "Run programs",
+          "Decide which program uses the CPU, and when",
+          "Processes, `ps`, `top`, killing a runaway service"
+        ],
+        [
+          "Manage memory",
+          "Give each program its own memory and keep them apart",
+          "Why one crashed program does not take the machine down"
+        ],
+        [
+          "Store things",
+          "Turn a disk into files and folders with names",
+          "The filesystem tree, paths, mounts"
+        ],
+        [
+          "Decide who may do what",
+          "Enforce users, groups, and permissions",
+          "Permissions, `sudo`, privilege escalation"
+        ]
       ]
     },
     {
@@ -90,7 +116,9 @@
         "C": "The program asks the antivirus for permission first",
         "D": "The disk decides whether to accept the write"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Programs in user space never touch hardware directly. They make a system call, and the kernel decides whether to carry it out. That decision point is where permissions are enforced."
     },
     {
@@ -103,7 +131,9 @@
         "C": "Because each program runs in user space with its own memory, isolated from the others",
         "D": "Because crashes only affect the window that is on screen"
       },
-      "correct": ["C"],
+      "correct": [
+        "C"
+      ],
       "explanation": "Memory management keeps programs apart. A crash in user space is contained to that program. A failure inside the kernel is a different matter — that can take the machine with it."
     },
     {
@@ -116,7 +146,9 @@
         "C": "Emailing a report to the security team",
         "D": "Scoring a vendor's risk questionnaire"
       },
-      "correct": ["A"],
+      "correct": [
+        "A"
+      ],
       "explanation": "Access decisions are a core OS function. Security products mostly observe, report on, and add policy around decisions the operating system is already making."
     }
   ],
@@ -130,7 +162,9 @@
         "C": "The set of applications installed on a machine",
         "D": "The firmware built into the motherboard"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "The desktop is one visible part, and firmware sits below the OS. The defining job is arbitrating access to hardware on behalf of programs."
     },
     {
@@ -143,7 +177,12 @@
         "D": "Enforcing which user may read which file",
         "E": "Writing the application's business logic"
       },
-      "correct": ["A", "B", "C", "D"],
+      "correct": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
       "explanation": "The first four are the OS's four jobs. Business logic belongs to the application — the OS only decides whether that application is allowed to do what it asks."
     },
     {
@@ -155,7 +194,9 @@
         "C": "Kernels are written in older languages",
         "D": "Application bugs cannot lead to data loss"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "It is about position, not difficulty. Controls above the kernel depend on the kernel being trustworthy; once that assumption breaks, the controls built on it stop meaning anything."
     }
   ]

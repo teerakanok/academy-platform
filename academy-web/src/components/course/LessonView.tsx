@@ -108,6 +108,13 @@ export function LessonView({
   // จึงไม่ต้อง persist และไม่ควรไปปนกับ record ที่บอกว่าอะไรผ่านแล้ว
   const [known, setKnown] = useState<Set<number>>(() => new Set())
   const [recalled, setRecalled] = useState<Set<number>>(() => new Set())
+  // โหมดตั้งใจตอบ — ผู้เรียนเลือกเอง ไม่ใช่ระบบบังคับ
+  //
+  // ตอนแรกผมจะบันทึกว่า "เปิดดูระหว่างตอบ" แล้วไม่นับเป็น proven — คิดใหม่แล้วไม่ทำ
+  // เพราะกฎแบบนั้นลงโทษเฉพาะคนที่ซื่อสัตย์พอจะใช้ปุ่มของเรา ส่วนคนที่เปิดอีกแท็บ
+  // ไม่โดนอะไรเลย = สอนให้คนเลี่ยงทางตรง
+  // สิ่งที่ช่วยจริงคือให้ "ตอบจากความจำ" เป็นตัวเลือกที่กดได้ง่าย ไม่ใช่ข้อบังคับ
+  const [focused, setFocused] = useState(false)
 
   function toggle(set: (fn: (prev: Set<number>) => Set<number>) => void, index: number) {
     set((prev) => {
@@ -349,7 +356,24 @@ export function LessonView({
         />
       )}
 
-      {mode === 'learn' && (
+      {mode === 'learn' && focused && (
+        <div
+          className="flex flex-wrap items-center justify-between gap-3 rounded-control border border-dashed border-cs-border-2 bg-cs-surface-2 px-4 py-3"
+          data-testid="focus-bar"
+        >
+          <p className="text-sm text-cs-muted">The lesson is hidden so the questions are a real test.</p>
+          <button
+            type="button"
+            onClick={() => setFocused(false)}
+            data-testid="focus-off"
+            className="rounded-control border border-cs-border bg-cs-surface px-4 py-2 text-sm text-cs-body transition-colors hover:border-cs-accent hover:text-cs-accent"
+          >
+            Show the lesson again
+          </button>
+        </div>
+      )}
+
+      {mode === 'learn' && !focused && (
         <>
           <LessonBody blocks={lesson.blocks} />
           {lesson.attribution && (
@@ -427,11 +451,23 @@ export function LessonView({
         {/* เรื่องเลื่อนกลับไปอ่าน: ไม่ล็อก เพราะล็อกไม่ได้จริง (เปิดอีกแท็บก็จบ) และ
             การล็อกทำให้ระบบดูไม่ไว้ใจผู้เรียน สิ่งที่ช่วยจริงคือบอกตรงๆ ว่าการเปิดดู
             ให้ผลอะไร — ตอบจากความจำคือสิ่งเดียวที่บอกได้ว่า "รู้" ไม่ใช่ "หาเจอ" */}
-        <p className="mb-3 text-sm text-cs-muted">
-          {mode === 'test-out' || isCapstone
-            ? 'Answer from memory — the lesson is still above you, but looking something up tells you the answer, not whether you knew it.'
-            : 'Answer from memory if you can. Getting one wrong here is useful information, not a penalty.'}
-        </p>
+        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+          <p className="text-sm text-cs-muted">
+            {mode === 'test-out' || isCapstone
+              ? 'Answer from memory — looking something up tells you the answer, not whether you knew it.'
+              : 'Answer from memory if you can. Getting one wrong here is useful information, not a penalty.'}
+          </p>
+          {mode === 'learn' && !focused && (
+            <button
+              type="button"
+              onClick={() => setFocused(true)}
+              data-testid="focus-on"
+              className="text-sm font-medium text-cs-accent underline underline-offset-4 transition-colors hover:text-cs-text"
+            >
+              Hide the lesson while I answer
+            </button>
+          )}
+        </div>
         <CheckpointQuiz
           questions={lesson.checkpoint}
           requireAllCorrect={mode === 'test-out' || isCapstone}

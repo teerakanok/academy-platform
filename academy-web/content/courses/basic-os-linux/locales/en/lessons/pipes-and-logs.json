@@ -18,13 +18,34 @@
     },
     {
       "kind": "table",
-      "headers": ["Symbol", "Meaning"],
+      "headers": [
+        "Symbol",
+        "Meaning"
+      ],
       "rows": [
-        ["|", "Send the output of the left command into the right command"],
-        [">", "Write output to a file, replacing what was there"],
-        [">>", "Append output to the end of a file"],
-        ["2>", "Redirect error messages specifically"]
+        [
+          "|",
+          "Send the output of the left command into the right command"
+        ],
+        [
+          ">",
+          "Write output to a file, replacing what was there"
+        ],
+        [
+          ">>",
+          "Append output to the end of a file"
+        ],
+        [
+          "2>",
+          "Redirect error messages specifically"
+        ]
       ]
+    },
+    {
+      "kind": "image",
+      "src": "/media/diagrams/shell-pipeline.svg",
+      "alt": "A pipeline of four commands. cat access.log emits every line, grep filters to only the failures, cut keeps just the path field, and sort with uniq counts them. The result is a short list such as 12 slash admin slash login.",
+      "caption": "Each step reads the previous step's output. Stop anywhere and look — that is how you debug one."
     },
     {
       "kind": "callout",
@@ -82,12 +103,27 @@
     },
     {
       "kind": "table",
-      "headers": ["Location", "What is in it"],
+      "headers": [
+        "Location",
+        "What is in it"
+      ],
       "rows": [
-        ["/var/log/auth.log", "Authentication: logins, sudo use, failures (Debian/Ubuntu)"],
-        ["/var/log/syslog", "General system messages"],
-        ["/var/log/", "Everything else, often one directory per service"],
-        ["journalctl -u ssh", "On systemd machines, logs for one specific service"]
+        [
+          "/var/log/auth.log",
+          "Authentication: logins, sudo use, failures (Debian/Ubuntu)"
+        ],
+        [
+          "/var/log/syslog",
+          "General system messages"
+        ],
+        [
+          "/var/log/",
+          "Everything else, often one directory per service"
+        ],
+        [
+          "journalctl -u ssh",
+          "On systemd machines, logs for one specific service"
+        ]
       ]
     },
     {
@@ -143,7 +179,9 @@
         "C": "Writes output to a file",
         "D": "Comments out the rest of the line"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "That connection is the whole idea: small single-purpose commands become an answer when chained."
     },
     {
@@ -155,7 +193,9 @@
         "C": "| results.txt",
         "D": "2> results.txt"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "> replaces the file's contents outright. >> adds to the end. 2> redirects errors, and | pipes to a command, not a file."
     },
     {
@@ -167,7 +207,9 @@
         "C": "grep -v | head",
         "D": "sort -rn | grep -c"
       },
-      "correct": ["A"],
+      "correct": [
+        "A"
+      ],
       "explanation": "uniq only collapses adjacent duplicates, so you sort first, count with uniq -c, then sort numerically in reverse to rank them."
     },
     {
@@ -179,7 +221,9 @@
         "C": "/var/log/auth.log",
         "D": "/usr/bin/auth"
       },
-      "correct": ["C"],
+      "correct": [
+        "C"
+      ],
       "explanation": "Authentication events — logins, failures, and sudo use — go to /var/log/auth.log. /etc/passwd lists accounts, which is a different question."
     },
     {
@@ -191,7 +235,9 @@
         "C": "Purpose-built tools cannot read log files",
         "D": "Pipelines do not require permissions"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Composability and availability. The commands are already on the machine, and adapting the pipeline is a smaller change than adopting new software."
     }
   ]

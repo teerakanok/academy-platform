@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 352" width="700" height="352" role="img" aria-label="The Linux filesystem is one tree hanging off a single root">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 1 L9 5 L0 9 z" fill="#7FCDF3"/>
+    </marker>
+  </defs>
+  <rect x="40" y="24" width="64" height="34" rx="10" fill="#38BDF8"/>
+  <text x="72.0" y="46.0" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" font-weight="600" fill="#06121C">/</text>
+  <text x="120" y="46" text-anchor="start" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11.5" fill="#5E7A8A">one tree, one root — there is no C: drive</text>
+  <path d="M58 58 V99 H84" stroke="#7FCDF3" stroke-width="1.5" fill="none"/>
+  <path d="M58 58 V99 H84" stroke="#7FCDF3" stroke-width="1.5" fill="none"/>
+  <rect x="84" y="82" width="120" height="34" rx="8" fill="#38BDF8"/>
+  <text x="144.0" y="104.0" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" font-weight="600" fill="#06121C">/etc</text>
+  <text x="218" y="103" text-anchor="start" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11.5" fill="#5E7A8A">configuration — text files that decide how things behave</text>
+  <path d="M58 58 V147 H84" stroke="#7FCDF3" stroke-width="1.5" fill="none"/>
+  <path d="M58 58 V147 H84" stroke="#7FCDF3" stroke-width="1.5" fill="none"/>
+  <rect x="84" y="130" width="120" height="34" rx="8" fill="#38BDF8"/>
+  <text x="144.0" y="152.0" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" font-weight="600" fill="#06121C">/var/log</text>
+  <text x="218" y="151" text-anchor="start" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11.5" fill="#5E7A8A">things that grow — this is where you look when something broke</text>
+  <path d="M58 58 V195 H84" stroke="#7FCDF3" stroke-width="1.5" fill="none"/>
+  <path d="M58 58 V195 H84" stroke="#7FCDF3" stroke-width="1.5" fill="none"/>
+  <rect x="84" y="178" width="120" height="34" rx="8" fill="#38BDF8"/>
+  <text x="144.0" y="200.0" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" font-weight="600" fill="#06121C">/home/you</text>
+  <text x="218" y="199" text-anchor="start" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11.5" fill="#5E7A8A">your own files; nobody else needs write access here</text>
+  <path d="M58 58 V243 H84" stroke="#7FCDF3" stroke-width="1.5" fill="none"/>
+  <path d="M58 58 V243 H84" stroke="#7FCDF3" stroke-width="1.5" fill="none"/>
+  <rect x="84" y="226" width="120" height="34" rx="8" fill="#38BDF8"/>
+  <text x="144.0" y="248.0" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" font-weight="600" fill="#06121C">/usr/bin</text>
+  <text x="218" y="247" text-anchor="start" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11.5" fill="#5E7A8A">the programs themselves</text>
+  <path d="M58 58 V291 H84" stroke="#7FCDF3" stroke-width="1.5" fill="none"/>
+  <path d="M58 58 V291 H84" stroke="#7FCDF3" stroke-width="1.5" fill="none"/>
+  <rect x="84" y="274" width="120" height="34" rx="8" fill="#38BDF8"/>
+  <text x="144.0" y="296.0" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" font-weight="600" fill="#06121C">/tmp</text>
+  <text x="218" y="295" text-anchor="start" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11.5" fill="#5E7A8A">scratch space, wiped on reboot</text>
+  <text x="40" y="336" text-anchor="start" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11.5" fill="#5E7A8A">Everything else hangs off the same root — including other disks.</text>
+</svg>
