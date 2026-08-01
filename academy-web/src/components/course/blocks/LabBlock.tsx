@@ -5,11 +5,16 @@ import { useEffect, useState } from 'react'
 // ช่อง lab — เป็นของที่ผู้เรียนต้อง "ลงมือ" จึงเป็นกรณีเดียวที่เราฝังของที่รันอยู่
 // ข้างในหน้าเรา
 //
-// มีสองขนาดโดยเจตนา:
-//   inline — แบบฝึกสั้นๆ ทำคาที่กำลังอ่าน ไม่ต้องเปิดเต็มจอ ไม่ต้องเปลี่ยนบริบท
-//   full   — สถานการณ์จริงที่ต้องใช้พื้นที่ทำงาน มีปุ่มขยายเต็มจอ
-// เหตุผล: การบังคับให้เปิด cockpit เต็มจอเพื่อทำอะไรสองนาที คือความรำคาญที่ทำให้
-// คนข้าม lab ไปเลย ซึ่งแพงกว่าการที่ lab เล็กไปหน่อยมาก
+// scale กำหนด "ท่าตั้งต้น" ไม่ใช่ "ท่าเดียวที่ทำได้":
+//   inline — แบบฝึกสั้น เริ่มต้นอยู่ในสายการอ่าน ไม่ตัดจังหวะ
+//   full   — สถานการณ์จริง เริ่มต้นเป็นพื้นที่ทำงานเต็มการ์ด
+// ทั้งสองแบบขยายได้เสมอ เพราะความถนัดของแต่ละคนและขนาดจอไม่เท่ากัน การล็อกให้
+// เล็กอย่างเดียวขัดกับหลักของ product เองที่ผู้เรียน override ได้ทุกจุด
+//
+// แต่ขยายคนละท่าโดยตั้งใจ:
+//   inline → กล่องใหญ่กลางจอ ยังเห็นหน้าบทเรียนจางๆ ข้างหลัง = "ยังอยู่ในบทเรียน
+//            แค่ใหญ่ขึ้น" เหมาะกับงานสองนาที
+//   full   → เต็มจอจริง = เข้าโหมดทำงาน เหมาะกับงานสิบนาทีขึ้นไป
 //
 // ตอนนี้ยังเป็นโครงว่าง: lab plane จริงมาใน M4 (reuse ของ Crux) — สิ่งที่ทำไว้แล้ว
 // คือรูปทรงและพฤติกรรมของช่องนี้ เพื่อให้เสียบของจริงทีหลังโดยไม่ต้องรื้อ UX
@@ -40,13 +45,13 @@ export function LabBlock({
   status: 'coming-soon' | 'ready'
   scale?: 'inline' | 'full'
 }) {
-  const [fullscreen, setFullscreen] = useState(false)
+  const [expanded, setExpanded] = useState(false)
   const isInline = scale === 'inline'
 
   useEffect(() => {
-    if (!fullscreen) return
+    if (!expanded) return
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setFullscreen(false)
+      if (e.key === 'Escape') setExpanded(false)
     }
     document.addEventListener('keydown', onKey)
     const previousOverflow = document.body.style.overflow
@@ -55,9 +60,50 @@ export function LabBlock({
       document.removeEventListener('keydown', onKey)
       document.body.style.overflow = previousOverflow
     }
-  }, [fullscreen])
+  }, [expanded])
 
-  // ---------- แบบฝึกสั้น: อยู่ในสายการอ่าน ไม่ตัดจังหวะ ----------
+  const overlay = expanded && (
+    <div
+      className={
+        isInline
+          ? 'fixed inset-0 z-50 flex items-center justify-center bg-cs-text/40 p-4 backdrop-blur-sm sm:p-8'
+          : 'fixed inset-0 z-50 flex flex-col bg-cs-bg p-4 sm:p-6'
+      }
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
+      data-testid="lab-fullscreen"
+      data-mode={isInline ? 'dialog' : 'fullscreen'}
+      onClick={isInline ? () => setExpanded(false) : undefined}
+    >
+      <div
+        className={
+          isInline
+            ? 'flex max-h-[85vh] w-full max-w-5xl flex-col rounded-feature border border-cs-border bg-cs-surface p-5 shadow-feature'
+            : 'flex min-h-0 flex-1 flex-col'
+        }
+        onClick={isInline ? (e) => e.stopPropagation() : undefined}
+      >
+        <div className="mb-3 flex items-center justify-between gap-4">
+          <p className="min-w-0 truncate font-display text-base font-semibold text-cs-text">{title}</p>
+          <button
+            type="button"
+            onClick={() => setExpanded(false)}
+            data-testid="lab-fullscreen-close"
+            autoFocus
+            className="shrink-0 rounded-control border border-cs-border px-4 py-2 text-sm text-cs-body transition-colors hover:border-cs-accent hover:text-cs-accent"
+          >
+            {isInline ? 'Done (Esc)' : 'Exit full screen (Esc)'}
+          </button>
+        </div>
+        <div className="flex min-h-[300px] flex-1 items-center justify-center rounded-xl border border-dashed border-cs-accent-border bg-cs-surface-sunken">
+          <Placeholder status={status} compact={false} />
+        </div>
+      </div>
+    </div>
+  )
+
+  // ---------- แบบฝึกสั้น: อยู่ในสายการอ่าน ----------
   if (isInline) {
     return (
       <section
@@ -72,24 +118,25 @@ export function LabBlock({
           <h3 className="font-display text-base font-semibold text-cs-text">{title}</h3>
         </div>
         <p className="px-5 pb-3 pt-1 text-sm leading-relaxed text-cs-body">{description}</p>
-        <div className="mx-5 mb-4 flex h-36 items-center justify-center rounded-xl bg-cs-surface-sunken">
+        <div className="relative mx-5 mb-4 flex h-36 items-center justify-center rounded-xl bg-cs-surface-sunken">
           <Placeholder status={status} compact />
+          {/* ปุ่มขยายเบาๆ ไม่แย่งความสนใจจากการอ่าน แต่เข้าถึงด้วยคีย์บอร์ดได้เสมอ
+              (ไม่ซ่อนไว้ให้โผล่ตอน hover เพราะทัชสกรีนกับคีย์บอร์ดจะหาไม่เจอ) */}
+          <button
+            type="button"
+            onClick={() => setExpanded(true)}
+            data-testid="lab-expand"
+            className="absolute right-2 top-2 flex items-center gap-1.5 rounded-lg border border-cs-border bg-cs-surface px-2.5 py-1 font-mono text-[11px] text-cs-muted transition-colors hover:border-cs-accent hover:text-cs-accent"
+          >
+            <span aria-hidden="true">⤢</span> Bigger
+          </button>
         </div>
+        {overlay}
       </section>
     )
   }
 
   // ---------- สถานการณ์เต็ม: ต้องมีพื้นที่ทำงานจริง ----------
-  const panel = (
-    <div
-      className={`flex items-center justify-center border border-dashed border-cs-accent-border bg-cs-surface-sunken ${
-        fullscreen ? 'min-h-0 flex-1 rounded-feature' : 'aspect-[16/9] rounded-xl'
-      }`}
-    >
-      <Placeholder status={status} compact={false} />
-    </div>
-  )
-
   return (
     <section
       className="not-prose rounded-feature border border-cs-border bg-cs-surface p-5 shadow-feature"
@@ -106,7 +153,7 @@ export function LabBlock({
         </div>
         <button
           type="button"
-          onClick={() => setFullscreen(true)}
+          onClick={() => setExpanded(true)}
           data-testid="lab-expand"
           className="shrink-0 rounded-control border-2 border-cs-accent bg-cs-surface px-4 py-2 text-sm font-medium text-cs-accent transition-colors hover:bg-cs-accent-dim"
         >
@@ -114,31 +161,11 @@ export function LabBlock({
         </button>
       </div>
 
-      {panel}
+      <div className="flex aspect-[16/9] items-center justify-center rounded-xl border border-dashed border-cs-accent-border bg-cs-surface-sunken">
+        <Placeholder status={status} compact={false} />
+      </div>
 
-      {fullscreen && (
-        <div
-          className="fixed inset-0 z-50 flex flex-col bg-cs-bg p-4 sm:p-6"
-          role="dialog"
-          aria-modal="true"
-          aria-label={title}
-          data-testid="lab-fullscreen"
-        >
-          <div className="mb-3 flex items-center justify-between gap-4">
-            <p className="min-w-0 truncate font-display text-base font-semibold text-cs-text">{title}</p>
-            <button
-              type="button"
-              onClick={() => setFullscreen(false)}
-              data-testid="lab-fullscreen-close"
-              autoFocus
-              className="shrink-0 rounded-control border border-cs-border px-4 py-2 text-sm text-cs-body transition-colors hover:border-cs-accent hover:text-cs-accent"
-            >
-              Exit full screen (Esc)
-            </button>
-          </div>
-          {panel}
-        </div>
-      )}
+      {overlay}
     </section>
   )
 }

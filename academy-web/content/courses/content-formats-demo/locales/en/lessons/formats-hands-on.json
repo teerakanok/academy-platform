@@ -14,12 +14,12 @@
     },
     {
       "kind": "paragraph",
-      "text": "Not every hands-on moment deserves a full workspace. A two-minute check belongs right here in the reading, because making someone open a separate environment for it is the reason they skip it."
+      "text": "Not every hands-on moment deserves a full workspace. A two-minute check belongs right here in the reading, because making someone open a separate environment for it is the reason they skip it. It still expands if you want more room — the size is a starting posture, not a restriction."
     },
     {
       "kind": "lab",
       "title": "Check who owns this file",
-      "description": "One command, one answer. Small enough to do without leaving the sentence you were reading.",
+      "description": "One command, one answer. Small enough to do without leaving the sentence you were reading — and it opens bigger if you would rather work that way.",
       "estimatedMinutes": 2,
       "status": "coming-soon",
       "scale": "inline"
@@ -42,16 +42,18 @@
       "kind": "try",
       "title": "What to check in this demo",
       "steps": [
-        "Press Expand to full screen and confirm the panel fills the window",
-        "Press Escape and confirm you land back where you were",
-        "Resize the browser narrow and check the panel still behaves"
+        "Press Bigger on the short exercise — it opens over the lesson, which stays visible behind it",
+        "Press Expand to full screen on the longer lab — that one takes the whole window",
+        "Press Escape from either and confirm you land back at the same place",
+        "Resize the browser narrow and check both still behave"
       ],
-      "expected": "The panel grows to the full window with a clear way out, and shrinking the window does not break the layout."
+      "expected": "Both panels grow when you ask them to, in proportion to the work they hold, and Escape always returns you to your place in the lesson."
     }
   ],
   "cheatsheet": [
     "A lab is embedded because it is somewhere to work, not something to read",
-    "Inline at a readable size, full screen when you are actually working",
+    "Size is a starting posture, not a limit: short exercises start inline, real scenarios start large, and both expand",
+    "A short exercise opens into a dialog over the lesson; a full scenario takes the whole screen",
     "Escape always returns you to the lesson at the same place",
     "Doing beats recognising — the lab is what makes a required checkpoint meaningful"
   ],
@@ -86,17 +88,17 @@
     },
     {
       "id": "cp-3",
-      "prompt": "Which content types get a full-screen control?",
+      "prompt": "A lab takes two minutes. Which starting size is right?",
       "choices": {
-        "A": "Everything, for consistency",
-        "B": "Only things you look at closely or work inside — diagrams, video and labs",
-        "C": "Only PDFs",
-        "D": "Nothing, full screen is never useful"
+        "A": "Full screen, so it is consistent with every other lab",
+        "B": "Inline in the reading, with the option to open it bigger if the learner wants",
+        "C": "Inline only, with no way to make it bigger",
+        "D": "It should not be a lab at all"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Full screen is an escape hatch for detail and for work. Needing it to make a document readable is a sign that document should not have been embedded."
+      "explanation": "Making someone enter a separate environment for two minutes of work is why short exercises get skipped. Starting inline removes that cost; keeping the expand control means a small screen or an awkward task is never a dead end."
     }
   ]
 }

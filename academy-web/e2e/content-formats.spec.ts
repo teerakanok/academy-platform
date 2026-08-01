@@ -66,29 +66,39 @@ test.describe('content formats', () => {
     expect(body.subarray(0, 5).toString()).toBe('%PDF-')
   })
 
-  test('Lab มีสองขนาด: inline ทำคาที่อ่าน (ไม่มีปุ่มขยาย) · full ขยายเต็มจอได้', async ({ page }) => {
+  test('Lab ขยายได้ทั้งสองขนาด แต่คนละท่า: inline = กล่องใหญ่ · full = เต็มจอ', async ({ page }) => {
     await page.goto(`${COURSE}/lessons/formats-hands-on`)
+    const viewport = page.viewportSize()!
 
-    // แบบฝึกสั้นต้องอยู่ในสายการอ่าน และต้องไม่มีปุ่มเปิดเต็มจอ —
-    // การบังคับเปิด cockpit เพื่อทำอะไร 2 นาทีคือเหตุผลที่คนข้าม lab
     const inline = page.locator('[data-testid="lab-block"][data-scale="inline"]')
-    await expect(inline).toBeVisible()
-    await expect(inline.getByTestId('lab-expand')).toHaveCount(0)
-
     const full = page.locator('[data-testid="lab-block"][data-scale="full"]')
+    await expect(inline).toBeVisible()
     await expect(full).toBeVisible()
     await expect(page.getByTestId('lab-fullscreen')).toHaveCount(0)
 
-    await page.getByTestId('lab-expand').click()
+    // แบบฝึกสั้น: ตั้งต้นอยู่ในสายการอ่าน แต่ต้องขยายได้ถ้าจอเล็กหรือทำไม่ถนัด
+    await inline.getByTestId('lab-expand').click()
+    const dialog = page.getByTestId('lab-fullscreen')
+    await expect(dialog).toHaveAttribute('data-mode', 'dialog')
+    // ตั้งใจให้ไม่เต็มจอ — ยังเห็นหน้าบทเรียนอยู่ข้างหลัง = ยังไม่ได้ออกจากบทเรียน
+    const panel = dialog.locator('> div')
+    const dialogBox = (await panel.boundingBox())!
+    expect(dialogBox.width).toBeLessThan(viewport.width)
+    expect(dialogBox.height).toBeLessThan(viewport.height)
+    expect(dialogBox.width).toBeGreaterThan(600)
+    await page.screenshot({ path: join(ARTIFACT_DIR, 'lab-inline-dialog-desktop-1440.png'), animations: 'disabled' })
+    await page.keyboard.press('Escape')
+    await expect(page.getByTestId('lab-fullscreen')).toHaveCount(0)
+
+    // สถานการณ์เต็ม: เข้าโหมดทำงาน กินทั้งหน้าจอจริง
+    await full.getByTestId('lab-expand').click()
     const overlay = page.getByTestId('lab-fullscreen')
-    await expect(overlay).toBeVisible()
+    await expect(overlay).toHaveAttribute('data-mode', 'fullscreen')
+    const box = (await overlay.boundingBox())!
+    expect(box.width).toBeGreaterThanOrEqual(viewport.width - 1)
+    expect(box.height).toBeGreaterThanOrEqual(viewport.height - 1)
 
-    // ต้องกินเต็มหน้าจอจริง ไม่ใช่แค่กล่องที่ใหญ่ขึ้น
-    const box = await overlay.boundingBox()
-    const viewport = page.viewportSize()!
-    expect(box!.width).toBeGreaterThanOrEqual(viewport.width - 1)
-    expect(box!.height).toBeGreaterThanOrEqual(viewport.height - 1)
-
+    mkdirSync(ARTIFACT_DIR, { recursive: true })
     await page.screenshot({ path: join(ARTIFACT_DIR, 'lab-fullscreen-desktop-1440.png'), animations: 'disabled' })
 
     await page.keyboard.press('Escape')
