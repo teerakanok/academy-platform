@@ -36,12 +36,28 @@
 5. Verify: REST query schema `academy` ผ่าน + anon อ่าน/เขียน `academy.leads`
    ถูกปฏิเสธ + สุ่มเช็ค product schema อื่นยังตอบปกติ
 
-## 4) เคาะ ADR single-account → ปลดล็อก M3
+## 4) ✅ เคาะ ADR single-account แล้ว (2026-08-01) → M3 ปลดล็อก
 
-- Draft พร้อมแล้ว: `docs/adr/ADR-draft-single-account.md`
-  (คำแนะนำ: Option A — formalize Pool A GoTrue + identity contract + JWKS
-  asymmetric ซึ่งปลดบล็อก STAR getClaims ไปพร้อมกัน)
-- เมื่อเคาะแล้ว: ยกขึ้นเป็น ecosystem ADR ระดับ director ก่อนเริ่ม build auth จริง
+founder เคาะครบ 5 ข้อ (Option A · เปิด JWKS · consent ecosystem · **บังคับสมัคร** ·
+login สองทาง) — รายละเอียดและเหตุผลอยู่ใน `docs/adr/ADR-draft-single-account.md` §0
+
+**เหลือเป็น external checkpoint ที่ founder เท่านั้นทำได้:**
+
+### 4.1 Pool A — เปิด asymmetric JWT + JWKS (blocking M3 บางส่วน)
+- แตะ Supabase production ที่ Crux/STAR/Forge/Academy ใช้ร่วมกัน → due-care เต็ม
+- ต้อง **verify สดก่อนลงมือ** ว่า GoTrue เวอร์ชันที่รันอยู่รองรับจริง (third-party
+  facts rot — ADR จงใจไม่ pin ความสามารถ vendor)
+- ปลด blocker ของ STAR ที่ค้างตั้งแต่ 2026-06-13 ไปด้วย และเลิกแจก HS256 secret
+  ให้ Forge ถือ
+- Rollback: GoTrue สลับกลับ HS256 ได้ · consumer ที่ยัง server-verify ไม่กระทบ
+
+### 4.2 ยก ADR ขึ้นเป็น ecosystem ADR ระดับ director
+- decision แตะ 4 product จึงไม่ควรอยู่ใต้ repo เดียว
+- ทำใน director repo ตอน worktree ว่าง (ตอนนี้มี workstream อื่นค้างอยู่)
+
+### 4.3 consent text ฉบับ ecosystem
+- แตะ privacy notice ของทุก product = เรื่อง legal ไม่ใช่ technical
+- reuse pattern versioning ที่ Academy M1 ทำไว้แล้ว
 
 ## 5) M4+ / M5 (ยังไม่ถึงเวลา — บันทึกไว้ตามแผน)
 

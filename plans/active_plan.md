@@ -47,13 +47,29 @@ validation ต่อ course เป็นรอบ pitch + poll ของ founder
   scoring spec + module nav + progress + axe + visual matrix; fixture =
   CAS-005 internal (นับจริง 150 MCQ — เลข 165 ในแผนเดิมคลาดเคลื่อน); video
   slot เป็น placeholder จนกว่า commit CF Stream (M5)
-- [ ] **M3 — Identity + personalized path v0:** email-identity account
-  (ออกแบบ consume external issuer ได้), progress persistence, assessment →
-  skip/branch + cheatsheet slot — **ก่อนลงมือ M3 ต้องมี ADR ecosystem
-  single-account (Crux/STAR/Academy/Forge) อย่างน้อยฉบับ draft ให้ founder เคาะ**
-  → ✅ **draft พร้อมแล้ว 2026-07-31**: `docs/adr/ADR-draft-single-account.md`
-  (แนะนำ Option A — formalize Pool A GoTrue + identity contract + JWKS
-  asymmetric) — รอ founder เคาะ + ยกเป็น ecosystem ADR
+- [ ] **M3 — Identity + personalized path v0** — 🔓 **ปลดล็อก 2026-08-01**
+  (founder เคาะ ADR ครบ 5 ข้อ; ดู `docs/adr/ADR-draft-single-account.md` §0)
+  - **เคาะแล้ว:** Option A (shared issuer Pool A GoTrue + identity contract) ·
+    เปิด asymmetric JWT/JWKS · consent ecosystem · **บังคับสมัครถ้าจะใช้**
+    (founder overrule คำแนะนำเดิม — เหตุผล: ค่า infra ต่อหัวไม่ใช่ศูนย์ โดยเฉพาะ
+    lab compute ใน M4 + การสมัครเป็น filter ของความตั้งใจ) · login = email OTP
+    **และ** Google
+  - **Account = universal CYBERSKILLS account** ไม่ใช่ account ของ Academy —
+    หน้าสมัครพูดในนาม CYBERSKILLS, ครอบทุกบริการ, **รวมถึง certification ที่เรา
+    อาจออกเองในอนาคต** → identity ต้อง verified email ตั้งแต่วันแรก และห้ามถอย
+    ไปใช้ email เป็น join key (ใช้ `(issuer, subject)`)
+  - **ขอบเขต gate:** ทุกอย่างที่ "ใช้" ต้องมี account (บทเรียน/quiz/lab/progress)
+    ส่วนหน้าร้าน (landing, รายการคอร์ส, หน้าแนะนำคอร์ส) เปิดสาธารณะ — เพราะเป็น
+    สิ่งที่ทำให้คนอยากสมัคร และเป็นหน้าเดียวที่ search + การแชร์ลิงก์เข้าถึงได้
+    ซึ่งสำคัญเพราะ "หา distribution channel ไม่ได้" ยังเป็นข้อเปิดในแผน
+  - **ทำได้เลยบน local Supabase:** ตาราง `academy.users` `(issuer, subject)` ·
+    หน้าสมัคร/เข้าสู่ระบบ · route gating · ย้าย progress จาก browser → DB ·
+    ผูก waitlist lead ↔ account ด้วย verified email ณ เวลา sign-up
+  - **ติด external checkpoint:** asymmetric JWT/JWKS บน Pool A (founder เท่านั้น —
+    `PENDING_USER_ACTION.md` §4.1) · ระหว่างรอ ให้ verify ฝั่ง server ไปก่อน
+    (แบบ Crux) ซึ่งไม่ต้องใช้ JWKS
+  - **ต้อง DD สดตอนลงมือ:** ความสามารถ asymmetric JWT ของ GoTrue เวอร์ชันที่รันจริง
+
 - [ ] **M4 — Lab gate:** เสียบ Crux lab plane (แยก GCP project + budget alarm),
   checkpoint-lab flow + credit meter v0 (ภายใน)
 - [ ] **M5 — Commerce + video:** credit ledger จริง + edition/pricing logic +

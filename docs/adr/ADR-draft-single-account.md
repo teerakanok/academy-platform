@@ -1,9 +1,57 @@
-# ADR (DRAFT) — Single Account ทุก Product ของ CYBERSKILLS
+# ADR — Single Account ทุก Product ของ CYBERSKILLS
 
-> **สถานะ: DRAFT — ยังไม่ใช่ decision** · เขียน 2026-07-31 (M3-prep ของ academy
-> one-shot) · รอ founder เคาะ แล้วต้อง**ยกขึ้นเป็น ecosystem ADR ระดับ director**
-> (decision นี้แตะ Crux/STAR/Forge/Academy — ไม่ใช่ของ Academy คนเดียว)
-> ห้ามเริ่ม build auth จริงของ Academy (M3) จนกว่า ADR ผ่าน
+> **สถานะ: ACCEPTED — founder เคาะ 2026-08-01** · draft เขียน 2026-07-31
+> (M3-prep ของ academy one-shot)
+> **ยังต้องยกขึ้นเป็น ecosystem ADR ระดับ director** (decision นี้แตะ
+> Crux/STAR/Forge/Academy) — งานนั้นทำใน director repo ตอนที่ worktree ว่าง
+> M3 auth ของ Academy **ปลดล็อกแล้ว** ยกเว้นส่วนที่ต้องแตะ Pool A (ดู §0.2)
+
+---
+
+## 0) Decision ของ founder (2026-08-01)
+
+**เคาะตามคำแนะนำทุกข้อ ยกเว้นข้อ 4 ซึ่ง founder ตัดสินตรงข้ามกับที่เสนอ**
+
+### 0.1 สิ่งที่เคาะ
+
+| # | เรื่อง | ผล |
+|---|---|---|
+| 1 | สถาปัตยกรรม identity | **Option A** — formalize shared issuer บน Pool A GoTrue + identity contract |
+| 2 | Pool A asymmetric JWT + JWKS | **ทำ** (ปลด blocker ของ STAR ไปด้วย + เลิกแจก HS256 secret ให้ Forge) |
+| 3 | PDPA consent ครอบ identity ข้าม product | **ทำ** — consent text ฉบับ ecosystem เดียว มี version |
+| 4 | Academy บังคับสมัครไหม | **บังคับสมัคร** — ตรงข้ามกับที่ draft แนะนำ (ดูเหตุผลด้านล่าง) |
+| 5 | วิธี login | **ทั้ง email OTP และ Google** |
+
+### 0.2 ข้อ 4 — บังคับสมัคร (founder overrule คำแนะนำ)
+
+draft แนะนำให้เรียนได้โดยไม่ต้องมี account แล้วค่อยสมัครตอนที่ account ซื้ออะไรให้
+founder ตัดสินตรงข้าม ด้วยเหตุผลสองข้อที่หนักกว่าที่ draft ชั่งไว้:
+
+1. **ค่า infra ไม่ใช่ศูนย์** — ผู้ใช้ที่ไม่มีตัวตนเผาค่า infra ของเราทิ้งได้ โดยเฉพาะ
+   lab plane ที่เป็น compute จริงต่อ session (M4) ไม่ใช่หน้าเว็บที่ต้นทุนส่วนเพิ่ม
+   เกือบศูนย์ — draft ชั่งน้ำหนักด้าน conversion แต่ไม่ได้ชั่งด้านต้นทุนต่อหัว
+2. **การสมัครคือ filter ของความตั้งใจ** — "ถ้าของฟรีมันดีจริง สมัครอะไม่ยากเย็นหรอก"
+   คนที่ยอมลงทุนเวลาสมัครคือคนที่ตั้งใจเรียนจริง ซึ่งเป็นกลุ่มที่ signal มีความหมาย
+
+**ผลต่อการออกแบบ:** ทุกอย่างที่ "ใช้" ต้องมี account — บทเรียน, quiz, lab, progress
+หน้าที่เป็นหน้าร้าน (รายการคอร์ส, หน้าแนะนำคอร์ส, landing) ยังเปิดสาธารณะ เพราะนั่น
+คือสิ่งที่ทำให้คนอยากสมัคร ไม่ใช่สิ่งที่คนมาใช้ — และเป็นหน้าเดียวที่ search engine
+กับการแชร์ลิงก์เข้าถึงได้ ซึ่งสำคัญเพราะ "หา distribution channel ไม่ได้" เป็นข้อ
+ที่ยังเปิดอยู่ในแผน
+
+### 0.3 Account = universal CYBERSKILLS account (founder framing)
+
+**ไม่ใช่ "สมัคร Academy" แต่คือ "สมัคร CYBERSKILLS"** — หนึ่ง account ใช้ได้กับทุก
+บริการของเรา และ founder ระบุชัดว่า **รวมถึงการสอบ certification ที่เราอาจออกเอง
+ในอนาคต** ด้วย
+
+ผลที่ตามมาและต้องออกแบบเผื่อตั้งแต่ M3:
+- หน้าสมัครต้องพูดในนาม CYBERSKILLS (มี Academy เป็นบริบท) ไม่ใช่แบรนด์ Academy เดี่ยว
+- consent ข้อ 3 ต้องครอบทั้ง ecosystem อยู่แล้ว — สอดคล้องกันพอดี
+- **certification เป็นข้อผูกมัดเรื่องความน่าเชื่อของตัวตน**: ใบรับรองคือคำกล่าวอ้าง
+  เกี่ยวกับตัวบุคคล ดังนั้น identity ต้องยืนยัน email จริงตั้งแต่วันแรก และโครงต้อง
+  รองรับการยกระดับการพิสูจน์ตัวตนตอนสอบภายหลัง โดยไม่ต้องรื้อ data model
+  (`(issuer, subject)` รองรับอยู่แล้ว — ห้ามถอยไปใช้ email เป็น join key เด็ดขาด)
 
 ---
 
