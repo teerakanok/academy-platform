@@ -63,9 +63,9 @@ export function CheckpointQuiz({
   }
 
   return (
-    <section className="card p-6" aria-labelledby="checkpoint-heading" data-testid="checkpoint">
+    <section className="card-feature p-6 sm:p-8" aria-labelledby="checkpoint-heading" data-testid="checkpoint">
       <div className="mb-1 flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id="checkpoint-heading" className="font-display text-xl font-semibold text-cs-text">
+        <h2 id="checkpoint-heading" className="font-display text-2xl font-semibold text-cs-text">
           {requireAllCorrect ? 'Required checkpoint' : 'Check yourself'}
         </h2>
         <span className="font-mono text-xs text-cs-muted">
@@ -148,7 +148,7 @@ export function CheckpointQuiz({
             onClick={grade}
             disabled={!allAnswered}
             data-testid="checkpoint-submit"
-            className="rounded-xl bg-cs-accent-fill px-5 py-2.5 text-sm font-semibold text-cs-on-accent transition-opacity hover:opacity-90 disabled:opacity-40"
+            className="rounded-control bg-cs-accent-fill px-6 py-3 text-sm font-semibold text-cs-on-accent shadow-card transition-transform duration-200 hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-40 disabled:shadow-none"
           >
             Check my answers
           </button>
@@ -162,7 +162,7 @@ export function CheckpointQuiz({
                 type="button"
                 onClick={() => onPassed(results)}
                 data-testid="checkpoint-continue"
-                className="rounded-xl bg-cs-accent-fill px-5 py-2.5 text-sm font-semibold text-cs-on-accent transition-opacity hover:opacity-90"
+                className="rounded-control bg-cs-accent-fill px-6 py-3 text-sm font-semibold text-cs-on-accent shadow-card transition-transform duration-200 hover:-translate-y-0.5"
               >
                 {requireAllCorrect ? 'Mark as proven' : 'Mark lesson done'}
               </button>
@@ -175,7 +175,7 @@ export function CheckpointQuiz({
                   type="button"
                   onClick={retry}
                   data-testid="checkpoint-retry"
-                  className="rounded-xl border border-cs-border px-5 py-2.5 text-sm transition-colors hover:border-cs-accent hover:text-cs-accent"
+                  className="rounded-control border border-cs-border bg-cs-surface px-6 py-3 text-sm transition-colors duration-200 hover:border-cs-accent hover:text-cs-accent"
                 >
                   Try again
                 </button>

@@ -65,8 +65,13 @@ export function LessonView({
     setRecord(next)
   }
 
-  const upcoming = loaded ? nextNode(structure, toLearnerState(record)) : null
+  const learnerState = toLearnerState(record)
+  const upcoming = loaded ? nextNode(structure, learnerState) : null
   const isCapstone = node.kind === 'capstone'
+  const nodeIndex = structure.nodes.findIndex((n) => n.id === node.id)
+  const position = nodeIndex + 1
+  const prevNode = nodeIndex > 0 ? structure.nodes[nodeIndex - 1] : null
+  const followingNode = nodeIndex < structure.nodes.length - 1 ? structure.nodes[nodeIndex + 1] : null
 
   function finishLesson(results: Record<string, boolean>) {
     persist(markCompleted(record, node.id, results))
@@ -103,27 +108,62 @@ export function LessonView({
         </Link>
       </nav>
 
-      <header>
+      <header className="hero-bleed pb-2">
         <div className="flex flex-wrap items-center gap-2">
+          <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-cs-accent">
+            Lesson {position} of {structure.nodes.length}
+          </span>
+          <span className="font-mono text-[11px] text-cs-muted">· about {node.estimatedMinutes} minutes</span>
           {isCapstone && (
-            <span className="rounded-full border border-cs-accent-2-border bg-cs-accent-2-dim px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wide text-cs-accent-2">
+            <span className="rounded-full border-2 border-cs-accent px-2.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-cs-accent">
               Required checkpoint
             </span>
           )}
-          <span className="font-mono text-[11px] text-cs-muted">about {node.estimatedMinutes} minutes</span>
           {done && (
             <span
               data-testid="lesson-status"
-              className="rounded-full border border-cs-accent-border bg-cs-accent-dim px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wide text-cs-accent"
+              className="rounded-full bg-cs-accent-fill px-2.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-cs-on-accent"
             >
               {done === 'completed' ? 'Done' : done === 'tested-out' ? 'Proven' : 'Skipped'}
             </span>
           )}
         </div>
-        <h1 className="mt-3 font-display text-3xl font-semibold leading-tight tracking-tight text-cs-text">
+
+        <h1 className="mt-3 font-display text-4xl font-semibold leading-[1.1] tracking-tight text-cs-text">
           {lesson.title}
         </h1>
-        <p className="mt-3 max-w-2xl leading-relaxed text-cs-body">{lesson.objective}</p>
+
+        {/* objective คือคำสัญญาของบท ไม่ใช่คำอธิบายประกอบ — ให้มันมีน้ำหนักจริง */}
+        <p className="mt-4 border-l-2 border-cs-accent pl-4 text-lg leading-relaxed text-cs-body">
+          {lesson.objective}
+        </p>
+
+        {/* แถบตำแหน่ง: ผู้เรียนต้องรู้เสมอว่าอยู่จุดไหนของเส้นทาง ไม่ใช่อยู่ในอุโมงค์ */}
+        <ol className="mt-6 flex flex-wrap items-center gap-1.5" aria-label="Course progress">
+          {structure.nodes.map((n) => {
+            const status = nodeStatus(n, learnerState)
+            const isCurrent = n.id === node.id
+            const isProven = status === 'completed' || status === 'tested-out'
+            return (
+              <li key={n.id}>
+                <Link
+                  href={`/courses/${structure.slug}/lessons/${n.id}`}
+                  aria-label={`${nodeTitles[n.id] ?? n.id}${isCurrent ? ' (current)' : ''}`}
+                  aria-current={isCurrent ? 'step' : undefined}
+                  className={`block h-1.5 rounded-full transition-all ${
+                    isCurrent
+                      ? 'w-10 bg-cs-accent-fill'
+                      : isProven
+                        ? 'w-5 bg-cs-accent-fill/70 hover:w-7'
+                        : status === 'skipped'
+                          ? 'w-5 bg-cs-border-2/60 hover:w-7'
+                          : 'w-5 bg-cs-border-2/40 hover:w-7'
+                  }`}
+                />
+              </li>
+            )
+          })}
+        </ol>
 
         {servedLocale !== requestedLocale && (
           <p className="mt-4 rounded-xl border border-cs-border bg-cs-surface-2 px-4 py-2.5 text-xs text-cs-muted">
@@ -134,13 +174,13 @@ export function LessonView({
       </header>
 
       {mode === 'learn' && !done && canSkip(node) && (
-        <div className="card flex flex-wrap items-center gap-3 p-4">
-          <p className="text-sm text-cs-body">Already know this?</p>
+        <div className="flex flex-wrap items-center gap-3 rounded-control border border-cs-border bg-cs-surface px-4 py-3">
+          <p className="text-sm text-cs-muted">Already know this?</p>
           <button
             type="button"
             onClick={() => setMode('test-out')}
             data-testid="test-out"
-            className="rounded-xl border-2 border-cs-accent bg-cs-surface px-4 py-2 text-sm font-medium text-cs-accent transition-colors hover:bg-cs-accent-dim"
+            className="rounded-control border-2 border-cs-accent bg-cs-surface px-4 py-2 text-sm font-medium text-cs-accent transition-colors hover:bg-cs-accent-dim"
           >
             Prove it and move on
           </button>
@@ -148,7 +188,7 @@ export function LessonView({
             type="button"
             onClick={skipLesson}
             data-testid="skip-lesson"
-            className="rounded-xl border border-cs-border px-4 py-2 text-sm text-cs-muted transition-colors hover:border-cs-border-2 hover:text-cs-body"
+            className="rounded-control border border-cs-border px-4 py-2 text-sm text-cs-muted transition-colors hover:border-cs-border-2 hover:text-cs-body"
           >
             Skip with the summary
           </button>
@@ -192,7 +232,7 @@ export function LessonView({
       )}
 
       {(mode === 'skipped' || done) && (
-        <section className="card p-6" data-testid="cheatsheet">
+        <section className="card-feature p-6 sm:p-8" data-testid="cheatsheet">
           <h2 className="font-display text-lg font-semibold text-cs-text">
             {done === 'skipped' ? 'The summary you skipped to' : 'Keep this'}
           </h2>
@@ -218,7 +258,7 @@ export function LessonView({
       )}
 
       {done && (
-        <div className="card flex flex-wrap items-center gap-3 p-6" data-testid="lesson-complete">
+        <div className="card-feature hero-wash flex flex-wrap items-center gap-3 p-6 sm:p-7" data-testid="lesson-complete">
           <p className="text-sm text-cs-body">
             {done === 'skipped'
               ? 'Marked as skipped. It stays on your map as unproven, and you can come back any time.'
@@ -229,7 +269,7 @@ export function LessonView({
           <div className="ml-auto flex gap-2">
             <Link
               href={`/courses/${structure.slug}`}
-              className="rounded-xl border border-cs-border px-4 py-2 text-sm transition-colors hover:border-cs-accent hover:text-cs-accent"
+              className="rounded-control border border-cs-border bg-cs-surface px-5 py-3 text-sm transition-colors duration-200 hover:border-cs-accent hover:text-cs-accent"
             >
               Back to the map
             </Link>
@@ -238,7 +278,7 @@ export function LessonView({
                 type="button"
                 onClick={goNext}
                 data-testid="next-lesson"
-                className="rounded-xl bg-cs-accent-fill px-5 py-2 text-sm font-semibold text-cs-on-accent transition-opacity hover:opacity-90"
+                className="rounded-control bg-cs-accent-fill px-6 py-3 text-sm font-semibold text-cs-on-accent shadow-card transition-transform duration-200 hover:-translate-y-0.5"
               >
                 Next: {nodeTitles[upcoming.id] ?? upcoming.id}
               </button>
@@ -246,6 +286,35 @@ export function LessonView({
           </div>
         </div>
       )}
+      <nav
+        aria-label="Lesson navigation"
+        className="flex items-center justify-between gap-3 border-t border-cs-border pt-6"
+      >
+        {prevNode ? (
+          <Link
+            href={`/courses/${structure.slug}/lessons/${prevNode.id}`}
+            className="group min-w-0 rounded-control border border-cs-border bg-cs-surface px-4 py-3 text-left transition-colors hover:border-cs-accent"
+          >
+            <span className="block font-mono text-[10px] uppercase tracking-wide text-cs-muted">Previous</span>
+            <span className="mt-0.5 block truncate text-sm text-cs-text group-hover:text-cs-accent">
+              {nodeTitles[prevNode.id] ?? prevNode.id}
+            </span>
+          </Link>
+        ) : (
+          <span />
+        )}
+        {followingNode && (
+          <Link
+            href={`/courses/${structure.slug}/lessons/${followingNode.id}`}
+            className="group min-w-0 rounded-control border border-cs-border bg-cs-surface px-4 py-3 text-right transition-colors hover:border-cs-accent"
+          >
+            <span className="block font-mono text-[10px] uppercase tracking-wide text-cs-muted">Next in course</span>
+            <span className="mt-0.5 block truncate text-sm text-cs-text group-hover:text-cs-accent">
+              {nodeTitles[followingNode.id] ?? followingNode.id}
+            </span>
+          </Link>
+        )}
+      </nav>
     </article>
   )
 }

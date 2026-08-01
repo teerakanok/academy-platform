@@ -113,7 +113,7 @@ export function InteractiveVideo({
 
   return (
     <div className="not-prose" data-testid="interactive-video">
-      <div className="relative overflow-hidden rounded-2xl border border-cs-border bg-black shadow-card">
+      <div className="relative overflow-hidden rounded-feature border border-cs-border bg-black shadow-feature">
         <video
           ref={videoRef}
           src={video.src}

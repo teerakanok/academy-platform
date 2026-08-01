@@ -24,7 +24,7 @@ export function LessonBody({ blocks }: { blocks: LessonBlock[] }) {
         switch (block.kind) {
           case 'heading':
             return (
-              <h2 key={index} className="pt-3 font-display text-xl font-semibold text-cs-text">
+              <h2 key={index} className="pt-6 font-display text-2xl font-semibold leading-snug text-cs-text">
                 {block.text}
               </h2>
             )
