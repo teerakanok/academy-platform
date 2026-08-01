@@ -1,0 +1,176 @@
+{
+  "nodeId": "formats-simulation",
+  "locale": "en",
+  "title": "Set it up yourself",
+  "objective": "Work the same settings screen an administrator uses, and decide which addressing mode each machine needs before you touch a single field.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "You can read about DHCP twice and still freeze the first time someone hands you a machine that cannot reach the network. The gap is not knowledge of the acronym. It is that you have never seen the screen, never watched the fields grey out, and never had to decide which mode this particular machine needs."
+    },
+    {
+      "kind": "paragraph",
+      "text": "So here is the screen. It behaves the way the real one does: pick automatic and the manual fields close; press OK and an address appears from somewhere else. Two machines follow, and they need opposite answers."
+    },
+    {
+      "kind": "heading",
+      "text": "A machine that must always be findable"
+    },
+    {
+      "kind": "simulation",
+      "challenge": {
+        "id": "static-print-server",
+        "title": "The print server",
+        "brief": "Everyone in the office prints to this machine, and the queue is configured on forty desktops using the address 192.168.10.50. It sits on the 192.168.10.0/24 network, where the router is .1 and also answers DNS. Configure it so that address never changes.",
+        "surface": "network-interface",
+        "initial": { "addressMode": "dhcp", "ipv4": "", "subnet": "", "gateway": "", "dns1": "", "applied": false },
+        "requirements": [
+          {
+            "id": "mode",
+            "label": "The address has to survive a reboot, so it cannot be handed out by a server",
+            "field": "addressMode",
+            "operator": "equals",
+            "value": "static"
+          },
+          {
+            "id": "ip",
+            "label": "The address the forty desktops already print to",
+            "field": "ipv4",
+            "operator": "equals",
+            "value": "192.168.10.50"
+          },
+          {
+            "id": "mask",
+            "label": "A mask that matches a /24 network",
+            "field": "subnet",
+            "operator": "equals",
+            "value": "255.255.255.0"
+          },
+          {
+            "id": "gw",
+            "label": "The router on this network",
+            "field": "gateway",
+            "operator": "equals",
+            "value": "192.168.10.1"
+          },
+          {
+            "id": "dns",
+            "label": "Something that can resolve names, or the machine reaches nothing by hostname",
+            "field": "dns1",
+            "operator": "equals",
+            "value": "192.168.10.1"
+          },
+          {
+            "id": "applied",
+            "label": "Settings confirmed with OK",
+            "field": "applied",
+            "operator": "isTrue"
+          }
+        ],
+        "hints": [
+          "A /24 network means the first three numbers identify the network and the last one identifies the machine.",
+          "The brief tells you the router's last number and says it also answers DNS."
+        ],
+        "debrief": "A server that other machines are configured to find by address has to keep that address. Static addressing is the cost of being findable, and the price is that somebody now has to remember this machine exists when the network changes."
+      }
+    },
+    {
+      "kind": "heading",
+      "text": "A machine that moves"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Same screen. Read what this one needs before you decide anything."
+    },
+    {
+      "kind": "simulation",
+      "challenge": {
+        "id": "dhcp-roaming-laptop",
+        "title": "The consultant's laptop",
+        "brief": "This laptop is used at three client sites and a coworking space, on networks you do not control and cannot ask about. It has to work when it is opened, without anyone editing settings first. Configure it, then confirm it actually picked up an address.",
+        "surface": "network-interface",
+        "initial": {
+          "addressMode": "static",
+          "ipv4": "192.168.10.50",
+          "subnet": "255.255.255.0",
+          "gateway": "192.168.10.1",
+          "dns1": "192.168.10.1",
+          "applied": true
+        },
+        "requirements": [
+          {
+            "id": "mode",
+            "label": "Settings have to come from whichever network it lands on",
+            "field": "addressMode",
+            "operator": "equals",
+            "value": "dhcp"
+          },
+          {
+            "id": "leased",
+            "label": "Confirmed, and an address was actually obtained",
+            "field": "applied",
+            "operator": "isTrue"
+          }
+        ],
+        "hints": [
+          "The settings already in the fields belong to a different office. Ask yourself what happens to them tomorrow.",
+          "You cannot type an address for a network you have never seen."
+        ],
+        "debrief": "Notice what happened to the fields you did not have to fill in. That is the whole trade: you give up control of the address and get a machine that works anywhere. The print server made the opposite trade, and both were right."
+      }
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Why this is not a quiz",
+      "text": "A multiple-choice question about DHCP asks whether you can recognise the right answer. This asks you to produce a working configuration, and it tells you which requirements you have not met yet without telling you what to type. The same screen can be used to prove the skill later, with the feedback switched off."
+    }
+  ],
+  "cheatsheet": [
+    "Static: the machine keeps one address that you chose and must maintain",
+    "DHCP: the network hands out an address, mask, gateway and DNS on connection",
+    "Anything other machines are configured to reach by address needs to be static",
+    "Anything that moves between networks needs DHCP",
+    "A /24 network uses the mask 255.255.255.0",
+    "Without a DNS server the machine reaches nothing by name, only by address",
+    "The gateway is how the machine reaches anything outside its own network"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A monitoring server polls twelve switches by IP address. What addressing does the monitoring server itself need?",
+      "choices": {
+        "A": "DHCP, so it always gets a valid address",
+        "B": "Static, because the switches are configured to send traps back to a fixed address",
+        "C": "It does not matter",
+        "D": "DHCP with a long lease"
+      },
+      "correct": ["B"],
+      "explanation": "Anything that other devices are configured to reach at a specific address has to keep that address. A changed address silently breaks every device pointing at the old one."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "You set a laptop to a static address that works at the office. The user takes it home and has no network. Why?",
+      "choices": {
+        "A": "The laptop is broken",
+        "B": "Home networks block static addresses",
+        "C": "The address, gateway and DNS all belong to the office network and mean nothing on the home one",
+        "D": "The DNS cache needs clearing"
+      },
+      "correct": ["C"],
+      "explanation": "A static configuration describes one specific network. Move the machine and every value in it is wrong at once, which is exactly the problem DHCP exists to solve."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A machine has a correct IP address and mask but a blank DNS server. What breaks?",
+      "choices": {
+        "A": "Nothing",
+        "B": "Names do not resolve, so anything referenced by hostname fails while direct IP addresses still work",
+        "C": "The machine cannot get an address",
+        "D": "Only printing"
+      },
+      "correct": ["B"],
+      "explanation": "This is a useful failure to recognise: pings to an address succeed, everything by name fails. It points straight at DNS rather than at the network itself."
+    }
+  ]
+}

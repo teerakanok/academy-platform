@@ -208,6 +208,29 @@ const blockSchema = z.discriminatedUnion('kind', [
     sourceLabel: z.string().min(1),
   }),
   z.object({
+    kind: z.literal('simulation'),
+    challenge: z.object({
+      id: z.string().min(1),
+      title: z.string().min(1),
+      brief: z.string().min(1),
+      surface: z.enum(['network-interface']),
+      initial: z.record(z.string(), z.union([z.string(), z.boolean()])),
+      requirements: z
+        .array(
+          z.object({
+            id: z.string().min(1),
+            label: z.string().min(1),
+            field: z.string().min(1),
+            operator: z.enum(['equals', 'notEquals', 'oneOf', 'isTrue', 'isFalse']),
+            value: z.union([z.string(), z.array(z.string())]).optional(),
+          }),
+        )
+        .min(1),
+      hints: z.array(z.string().min(1)).optional(),
+      debrief: z.string().min(1).optional(),
+    }),
+  }),
+  z.object({
     kind: z.literal('lab'),
     title: z.string().min(1),
     description: z.string().min(1),

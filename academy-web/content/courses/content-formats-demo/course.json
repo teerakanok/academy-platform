@@ -21,6 +21,10 @@
     {
       "id": "hands-on",
       "maxScore": 100
+    },
+    {
+      "id": "simulation",
+      "maxScore": 100
     }
   ],
   "globalSkillWeights": {
@@ -49,10 +53,21 @@
       }
     },
     {
+      "id": "formats-simulation",
+      "kind": "lesson",
+      "prerequisites": [
+        "formats-references"
+      ],
+      "estimatedMinutes": 8,
+      "skillWeights": {
+        "simulation": 5
+      }
+    },
+    {
       "id": "formats-hands-on",
       "kind": "capstone",
       "prerequisites": [
-        "formats-references"
+        "formats-simulation"
       ],
       "estimatedMinutes": 10,
       "skillWeights": {

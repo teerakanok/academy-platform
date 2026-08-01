@@ -101,6 +101,11 @@ export type LessonBlock =
   | { kind: 'externalLink'; title: string; description?: string; href: string; sourceLabel: string }
   /** ช่อง lab ที่ฝังได้จริง (M4) — เป็นของที่ต้อง "ลงมือ" จึงต้องขยายเต็มจอได้ */
   | {
+      kind: 'simulation'
+      /** อ้างถึงโจทย์จำลองที่ประกาศไว้ในไฟล์เดียวกัน (ดู SimulationChallenge) */
+      challenge: import('@/lib/simulation/types').SimulationChallenge
+    }
+  | {
       kind: 'lab'
       title: string
       description: string

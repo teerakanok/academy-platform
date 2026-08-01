@@ -20,8 +20,9 @@ import c13 from '../../../content/courses/basic-os-linux/course.json'
 import c14 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-hands-on.json'
 import c15 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-reading.json'
 import c16 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-references.json'
-import c17 from '../../../content/courses/content-formats-demo/locales/en/course.json'
-import c18 from '../../../content/courses/content-formats-demo/course.json'
+import c17 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-simulation.json'
+import c18 from '../../../content/courses/content-formats-demo/locales/en/course.json'
+import c19 from '../../../content/courses/content-formats-demo/course.json'
 
 /** โครง + ข้อความของทุกคอร์ส ผูกเข้ามาตอน build ไม่ใช่ตอน request */
 export const COURSE_REGISTRY: Record<
@@ -49,12 +50,13 @@ export const COURSE_REGISTRY: Record<
     },
   },
   "content-formats-demo": {
-    __structure: c18,
+    __structure: c19,
     "en": {
-      __copy: c17,
+      __copy: c18,
       "formats-hands-on": c14,
       "formats-reading": c15,
       "formats-references": c16,
+      "formats-simulation": c17,
     },
   },
 } as never

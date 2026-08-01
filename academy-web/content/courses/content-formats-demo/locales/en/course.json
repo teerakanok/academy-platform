@@ -11,11 +11,13 @@
   "skillLabels": {
     "reading": "Reading layout",
     "references": "References & handouts",
-    "hands-on": "Hands-on slot"
+    "hands-on": "Hands-on slot",
+    "simulation": "Hands-on setup"
   },
   "nodeTitles": {
     "formats-reading": "Written material and diagrams",
     "formats-references": "Handouts and outside sources",
-    "formats-hands-on": "The hands-on slot"
+    "formats-hands-on": "The hands-on slot",
+    "formats-simulation": "Set it up yourself"
   }
 }

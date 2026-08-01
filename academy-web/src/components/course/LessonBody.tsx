@@ -1,6 +1,7 @@
 import type { LessonBlock } from '@/lib/content/course-types'
 import { ImageBlock } from './blocks/ImageBlock'
 import { LabBlock } from './blocks/LabBlock'
+import { SimulationBlock } from './blocks/SimulationBlock'
 
 const FILE_LABEL: Record<'pdf' | 'zip' | 'other', string> = {
   pdf: 'PDF',
@@ -96,6 +97,9 @@ export function LessonBody({ blocks }: { blocks: LessonBlock[] }) {
 
           case 'image':
             return <ImageBlock key={index} src={block.src} alt={block.alt} caption={block.caption} />
+
+          case 'simulation':
+            return <SimulationBlock key={index} challenge={block.challenge} />
 
           case 'lab':
             return (
