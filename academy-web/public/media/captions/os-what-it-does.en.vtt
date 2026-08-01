@@ -1,0 +1,13 @@
+WEBVTT
+
+00:00:02.000 --> 00:00:12.000
+An operating system decides which programs may use the hardware, and on what terms.
+
+00:00:14.000 --> 00:00:24.000
+The kernel is the only code that touches the hardware directly.
+
+00:00:54.000 --> 00:01:04.000
+Every running program is a process, with an owner and memory of its own.
+
+00:01:34.000 --> 00:01:44.000
+Permission checks are the fourth job: deciding who may do what.

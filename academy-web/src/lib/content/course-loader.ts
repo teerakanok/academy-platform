@@ -11,13 +11,41 @@ const cueSchema = z.object({
   atSeconds: z.number().nonnegative(),
 })
 
+const localeEnum = z.enum(['en', 'th'])
+
+const audioTrackSchema = z.object({
+  locale: localeEnum,
+  src: z.string().min(1),
+  label: z.string().min(1),
+})
+
+const captionTrackSchema = z.object({
+  locale: localeEnum,
+  src: z.string().min(1),
+  label: z.string().min(1),
+})
+
 const videoSchema = z
   .object({
-    src: z.string().min(1),
+    src: z.string().min(1).optional(),
+    audio: z.array(audioTrackSchema).min(1).optional(),
+    captions: z.array(captionTrackSchema).optional(),
     durationSeconds: z.number().positive(),
     cues: z.array(cueSchema),
   })
   .superRefine((v, ctx) => {
+    // ต้องมีเสียงอย่างน้อยทางใดทางหนึ่ง ไม่งั้นเป็นวิดีโอที่เล่นอะไรไม่ได้
+    if (!v.src && !v.audio?.length) {
+      ctx.addIssue({ code: 'custom', message: 'video ต้องมี src หรือ audio อย่างน้อยหนึ่งแทร็ก' })
+    }
+    const audioLocales = (v.audio ?? []).map((a) => a.locale)
+    if (new Set(audioLocales).size !== audioLocales.length) {
+      ctx.addIssue({ code: 'custom', message: 'แทร็กเสียงมีภาษาซ้ำ' })
+    }
+    const capLocales = (v.captions ?? []).map((c) => c.locale)
+    if (new Set(capLocales).size !== capLocales.length) {
+      ctx.addIssue({ code: 'custom', message: 'คำบรรยายมีภาษาซ้ำ' })
+    }
     const ids = v.cues.map((c) => c.id)
     if (new Set(ids).size !== ids.length) {
       ctx.addIssue({ code: 'custom', message: 'cue id ซ้ำ' })

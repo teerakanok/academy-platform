@@ -1,7 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { LessonVideo, VideoCueQuestion } from '@/lib/content/course-types'
+import type { LessonVideo, Locale, VideoCueQuestion } from '@/lib/content/course-types'
+import { useUi } from '@/components/i18n/LocaleProvider'
 
 // Custom video player พร้อมคำถามแทรกกลางเรื่อง
 //
@@ -29,6 +30,7 @@ export function InteractiveVideo({
   answeredCueIds: string[]
   onCueAnswered: (cueId: string, correct: boolean) => void
 }) {
+  const { t: ui } = useUi()
   const videoRef = useRef<HTMLVideoElement>(null)
   const clampingRef = useRef(false)
   const [answered, setAnswered] = useState<string[]>(answeredCueIds)
@@ -38,6 +40,18 @@ export function InteractiveVideo({
   const [currentTime, setCurrentTime] = useState(0)
   const [playing, setPlaying] = useState(false)
   const [unavailable, setUnavailable] = useState(false)
+
+  // ── ภาษาเสียง ─────────────────────────────────────────────────────────────
+  // เนื้อหาเดิมที่มีแค่ src เดียว = ถือว่ามีหนึ่งแทร็ก ไม่ต้องแก้ไฟล์คอร์สเก่า
+  const audioTracks =
+    video.audio && video.audio.length > 0
+      ? video.audio
+      : video.src
+        ? [{ locale: 'en' as Locale, src: video.src, label: 'English' }]
+        : []
+  const [audioLocale, setAudioLocale] = useState<Locale>(() => audioTracks[0]?.locale ?? 'en')
+  const activeAudio = audioTracks.find((a) => a.locale === audioLocale) ?? audioTracks[0]
+  const captions = video.captions ?? []
 
   const cues = [...video.cues].sort((a, b) => a.atSeconds - b.atSeconds)
   const questionByCue = new Map(questions.map((q) => [q.cueId, q]))
@@ -109,14 +123,60 @@ export function InteractiveVideo({
     }
   }, [])
 
+  // สลับภาษาเสียง = เปลี่ยนไฟล์ จึงต้องคืนตำแหน่งและสถานะเล่นเอง
+  // ไม่งั้นผู้เรียนที่ดูมา 4 นาทีแล้วเปลี่ยนภาษาจะถูกโยนกลับไปเริ่มใหม่
+  function switchAudio(locale: Locale) {
+    const el = videoRef.current
+    const at = el?.currentTime ?? 0
+    const wasPlaying = el ? !el.paused : false
+    setAudioLocale(locale)
+    requestAnimationFrame(() => {
+      const next = videoRef.current
+      if (!next) return
+      const resume = () => {
+        next.currentTime = at
+        if (wasPlaying) void next.play()
+        next.removeEventListener('loadedmetadata', resume)
+      }
+      next.addEventListener('loadedmetadata', resume)
+    })
+  }
+
   const upcoming = nextPendingCue(currentTime)
 
   return (
     <div className="not-prose" data-testid="interactive-video">
+      {audioTracks.length > 1 && (
+        <div className="mb-2 flex flex-wrap items-center gap-2" data-testid="audio-language-picker">
+          <span className="font-mono text-[11px] uppercase tracking-wide text-cs-muted">{ui.video.audio}</span>
+          {audioTracks.map((track) => (
+            <button
+              key={track.locale}
+              type="button"
+              onClick={() => switchAudio(track.locale)}
+              data-testid={`audio-${track.locale}`}
+              aria-pressed={track.locale === audioLocale}
+              className={`rounded-control border px-3 py-1 text-[13px] transition-colors ${
+                track.locale === audioLocale
+                  ? 'border-cs-accent bg-cs-accent-dim text-cs-accent'
+                  : 'border-cs-border text-cs-muted hover:border-cs-accent hover:text-cs-accent'
+              }`}
+            >
+              {track.label}
+            </button>
+          ))}
+          {captions.length > 0 && (
+            <span className="ml-1 text-[11px] text-cs-muted">
+              {ui.video.captionsHint(captions.map((c) => c.label).join(' / '))}
+            </span>
+          )}
+        </div>
+      )}
+
       <div className="relative overflow-hidden rounded-feature border border-cs-border bg-black shadow-feature">
         <video
           ref={videoRef}
-          src={video.src}
+          src={activeAudio?.src}
           className="block aspect-video w-full"
           controls
           preload="metadata"
@@ -125,7 +185,23 @@ export function InteractiveVideo({
           onTimeUpdate={handleTimeUpdate}
           onSeeking={handleSeeking}
           onError={() => setUnavailable(true)}
-        />
+          crossOrigin="anonymous"
+        >
+          {/* คำบรรยายเป็น <track> มาตรฐาน — เบราว์เซอร์มีตัวเลือกเปิด/ปิดและเลือก
+              ภาษาให้อยู่แล้ว ไม่ต้องเขียน UI ซ้ำ และผู้เรียนที่คุ้นกับ player อื่น
+              จะหาเจอทันที ค่าตั้งต้นเลือกภาษาที่ "ไม่ใช่ภาษาเสียง" เพราะคนที่เปิด
+              คำบรรยายมักฟังภาษาหนึ่งแล้วอ่านอีกภาษาหนึ่ง */}
+          {captions.map((c) => (
+            <track
+              key={c.locale}
+              kind="subtitles"
+              src={c.src}
+              srcLang={c.locale}
+              label={c.label}
+              default={captions.length === 1 ? c.locale !== audioLocale : false}
+            />
+          ))}
+        </video>
 
         {unavailable && (
           <div className="absolute inset-0 flex items-center justify-center bg-cs-surface p-6 text-center text-sm text-cs-muted">
@@ -137,15 +213,32 @@ export function InteractiveVideo({
 
         {activeQuestion && (
           <div
-            // ทึบเกือบเต็มโดยตั้งใจ: คำถามต้องอ่านออกไม่ว่าเฟรมวิดีโอข้างหลังจะสว่าง
-            // หรือมีสีจัดแค่ไหน (ภาพ test pattern ทำให้เห็นปัญหานี้ชัด)
-            className="absolute inset-0 flex items-center justify-center bg-cs-bg/[0.985] p-5 backdrop-blur-md"
+            className="absolute inset-x-0 bottom-0 flex items-center gap-2 bg-cs-bg/95 px-4 py-2.5 backdrop-blur"
+            data-testid="video-paused-marker"
+          >
+            <span aria-hidden="true" className="font-mono text-[11px] uppercase tracking-wide text-cs-accent">
+              Paused
+            </span>
+            <span className="text-[13px] text-cs-body">There is a question below.</span>
+          </div>
+        )}
+      </div>
+
+      {activeQuestion && (
+          <div
+            // คำถามอยู่ "ใต้วิดีโอ" ไม่ใช่ทับบนวิดีโอ
+            //
+            // เดิมเป็น overlay ทับในกล่อง 16:9 ซึ่งเตี้ยเกินกว่าจะใส่คำถามพร้อมตัวเลือก
+            // ได้ครบ ผู้เรียนจึงต้องเลื่อนอ่านในกรอบวิดีโอ ซึ่งอ่านยากและดูเหมือนหน้าพัง
+            // วางไว้ข้างล่างแทน: ไม่มีการเลื่อนซ้อน อ่านได้เต็มความกว้าง และยังเห็น
+            // เฟรมที่เป็นต้นเหตุของคำถามค้างอยู่ข้างบน
+            className="card-feature card-takeaway mt-3 p-5 sm:p-6"
             role="dialog"
             aria-modal="true"
             aria-label="Question"
             data-testid="video-quiz"
           >
-            <div className="max-h-full w-full max-w-xl overflow-y-auto">
+            <div className="w-full">
               <p className="mb-1 font-mono text-[11px] uppercase tracking-wide text-cs-accent">
                 Quick check · paused at {formatTime(cues.find((c) => c.id === activeCueId)?.atSeconds ?? 0)}
               </p>
@@ -221,8 +314,7 @@ export function InteractiveVideo({
               </div>
             </div>
           </div>
-        )}
-      </div>
+      )}
 
       <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-cs-muted">
         <span data-testid="video-cue-progress">

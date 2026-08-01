@@ -51,7 +51,30 @@
         "security-lens": 1
       },
       "video": {
-        "src": "/media/lesson-demo.mp4",
+        "audio": [
+          {
+            "locale": "en",
+            "src": "/media/lesson-demo.mp4",
+            "label": "English"
+          },
+          {
+            "locale": "th",
+            "src": "/media/lesson-demo-th.mp4",
+            "label": "ไทย"
+          }
+        ],
+        "captions": [
+          {
+            "locale": "en",
+            "src": "/media/captions/os-what-it-does.en.vtt",
+            "label": "English"
+          },
+          {
+            "locale": "th",
+            "src": "/media/captions/os-what-it-does.th.vtt",
+            "label": "ไทย"
+          }
+        ],
         "durationSeconds": 150,
         "cues": [
           {

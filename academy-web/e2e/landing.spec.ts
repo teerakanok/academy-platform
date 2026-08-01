@@ -40,15 +40,41 @@ test.describe('landing', () => {
     await page.screenshot({ path: join(ARTIFACT_DIR, 'landing-desktop-1440.png'), fullPage: true })
   })
 
-  test('หน้า /privacy render สาระ PDPA ครบ (วัตถุประสงค์ / ระยะเก็บ / ช่องทางถอน consent)', async ({ page }) => {
+  test('หน้า /privacy render สาระ PDPA ครบทั้งสองภาษา และไม่ปนกัน', async ({ page }) => {
+    // คนต่างชาติที่เปิดเว็บภาษาอังกฤษต้องอ่านนโยบายออกทั้งหน้า ไม่ใช่เจอไทยล้วน
     await page.goto('/privacy')
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('นโยบายความเป็นส่วนตัว')
-    await expect(page.getByText('ระยะเวลาเก็บรักษา')).toBeVisible()
-    await expect(page.getByText('การถอนความยินยอม', { exact: false })).toBeVisible()
+    const article = page.getByTestId('privacy-content')
+    await expect(article).toHaveAttribute('data-locale', 'en')
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('privacy notice')
+    await expect(page.getByText('How long we keep it')).toBeVisible()
+    await expect(page.getByText('Your rights, and how to withdraw')).toBeVisible()
     await expect(page.getByRole('link', { name: 'contact@cyberskills.co.th' }).first()).toBeVisible()
+    // ห้ามมีอักษรไทยหลุดบนหน้าอังกฤษเลยแม้แต่ตัวเดียว
+    const enText = (await article.innerText()).replace(/contact@cyberskills\.co\.th/g, '')
+    expect(enText).not.toMatch(/[\u0E00-\u0E7F]/)
 
     mkdirSync(ARTIFACT_DIR, { recursive: true })
     await page.screenshot({ path: join(ARTIFACT_DIR, 'privacy-desktop-1440.png'), fullPage: true })
+
+    // สลับเป็นไทยแล้วต้องได้ฉบับไทยจริง พร้อมสาระเดิมครบ
+    await page.getByRole('banner').getByTestId('lang-th').click()
+    await expect(article).toHaveAttribute('data-locale', 'th')
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('นโยบายความเป็นส่วนตัว')
+    await expect(page.getByText('ระยะเวลาเก็บรักษา')).toBeVisible()
+    await expect(page.getByText('การถอนความยินยอม', { exact: false })).toBeVisible()
+    await page.screenshot({ path: join(ARTIFACT_DIR, 'privacy-th-desktop-1440.png'), fullPage: true })
+  })
+
+  test('สลับภาษาแล้วเมนูเปลี่ยนตาม และจำค่าไว้ข้ามหน้า', async ({ page }) => {
+    await page.goto('/courses')
+    await expect(page.getByRole('link', { name: 'My learning' })).toBeVisible()
+
+    await page.getByRole('banner').getByTestId('lang-th').click()
+    await expect(page.getByRole('link', { name: 'คอร์สของฉัน' })).toBeVisible()
+
+    // ข้ามหน้าแล้วยังเป็นไทยอยู่ (เก็บใน cookie)
+    await page.goto('/privacy')
+    await expect(page.getByTestId('privacy-content')).toHaveAttribute('data-locale', 'th')
   })
 })
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { getAllCourses, getCourse, getLesson, listCourseSlugs } from '@/lib/content/course-source'
 import { courseSkillData, globalSkillData } from '@/lib/course/skills'
@@ -60,8 +60,20 @@ describe('Basic OS & Linux — ครบถ้วนพร้อมสอน', (
       for (const cue of node.video!.cues) {
         expect(cue.atSeconds).toBeLessThan(node.video!.durationSeconds)
       }
-      const file = join(process.cwd(), 'public', node.video!.src.replace(/^\//, ''))
-      expect(existsSync(file), `ไม่พบไฟล์วิดีโอ ${node.video!.src} — รัน scripts/make-dummy-lesson-video.sh`).toBe(true)
+      // ทุกแทร็กเสียงต้องมีไฟล์จริง ไม่ใช่แค่แทร็กแรก — ผู้เรียนที่สลับไปภาษาที่สอง
+      // แล้วเจอวิดีโอเล่นไม่ได้คือความผิดพลาดที่เห็นเฉพาะคนที่กดสลับ
+      const tracks = node.video!.audio ?? (node.video!.src ? [{ locale: 'en' as const, src: node.video!.src, label: 'default' }] : [])
+      expect(tracks.length, 'วิดีโอต้องมีเสียงอย่างน้อยหนึ่งแทร็ก').toBeGreaterThan(0)
+      for (const track of tracks) {
+        const file = join(process.cwd(), 'public', track.src.replace(/^\//, ''))
+        expect(existsSync(file), `ไม่พบไฟล์วิดีโอ ${track.src} (เสียง ${track.locale}) — รัน scripts/make-dummy-video-tracks.sh`).toBe(true)
+      }
+      for (const cap of node.video!.captions ?? []) {
+        const file = join(process.cwd(), 'public', cap.src.replace(/^\//, ''))
+        expect(existsSync(file), `ไม่พบไฟล์คำบรรยาย ${cap.src} (${cap.locale})`).toBe(true)
+        // WebVTT ที่ไม่ขึ้นต้นด้วย WEBVTT เบราว์เซอร์จะเมินเงียบๆ ไม่มี error ให้เห็น
+        expect(readFileSync(file, 'utf8').startsWith('WEBVTT'), `${cap.src} ไม่ใช่ WebVTT ที่ถูกต้อง`).toBe(true)
+      }
     }
   })
 })

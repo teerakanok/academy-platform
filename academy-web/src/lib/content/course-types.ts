@@ -27,9 +27,32 @@ export interface VideoCuePoint {
   atSeconds: number
 }
 
-export interface LessonVideo {
+/** แทร็กเสียงหนึ่งภาษา — คนละไฟล์วิดีโอ ไม่ใช่คนละแทร็กในไฟล์เดียว
+ *
+ *  เหตุผล: HTML5 สลับ audio track ในไฟล์เดียวได้ไม่ทั่วถึงพอจะพึ่งได้จริง
+ *  การมีไฟล์ต่อภาษาทำงานได้ทุกเบราว์เซอร์ และยังให้เราเลือกโหลดเฉพาะภาษาที่ดูอยู่
+ */
+export interface VideoAudioTrack {
+  locale: Locale
   /** เสิร์ฟผ่าน custom player เท่านั้น — ห้าม iframe embed ของ vendor (design guard ที่ล็อกไว้) */
   src: string
+  /** ชื่อที่ผู้เรียนเห็นบนปุ่มเลือก เช่น "ไทย" / "English" */
+  label: string
+}
+
+/** คำบรรยาย (WebVTT) — มีได้หลายภาษาต่อหนึ่งแทร็กเสียง */
+export interface VideoCaptionTrack {
+  locale: Locale
+  src: string
+  label: string
+}
+
+export interface LessonVideo {
+  /** ยังรับ src เดี่ยวได้เพื่อความเข้ากันได้กับเนื้อหาเดิม (= เสียงภาษาเดียว) */
+  src?: string
+  /** ถ้ามีหลายภาษาเสียง ใช้อันนี้แทน src — ตัวแรกคือค่าตั้งต้น */
+  audio?: VideoAudioTrack[]
+  captions?: VideoCaptionTrack[]
   durationSeconds: number
   cues: VideoCuePoint[]
 }
