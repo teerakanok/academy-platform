@@ -65,6 +65,8 @@ validation ต่อ course เป็นรอบ pitch + poll ของ founder
   - **ทำได้เลยบน local Supabase:** ตาราง `academy.users` `(issuer, subject)` ·
     หน้าสมัคร/เข้าสู่ระบบ · route gating · ย้าย progress จาก browser → DB ·
     ผูก waitlist lead ↔ account ด้วย verified email ณ เวลา sign-up
+  - ⚠️ ก่อนแตะ Pool A ทุกครั้ง อ่าน `ecosystem/SHARED_INFRA_ACCESS.md` และ `reports/state/supabase.md`
+    ของ director repo ก่อน — เป็น shared infra ที่ Crux/STAR/Forge ใช้ร่วมกัน
   - **ติด external checkpoint:** asymmetric JWT/JWKS บน Pool A (founder เท่านั้น —
     `PENDING_USER_ACTION.md` §4.1) · ระหว่างรอ ให้ verify ฝั่ง server ไปก่อน
     (แบบ Crux) ซึ่งไม่ต้องใช้ JWKS

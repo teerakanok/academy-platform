@@ -106,6 +106,10 @@ subscribe paid service ใหม่โดยไม่มี founder decision เ
 
 DIY บน CYBERSKILLS defaults: Next.js App Router (TypeScript) · Tailwind +
 `@cyberskills/tokens` (cs-) · Supabase self-host **Pool A** schema `academy` ·
+
+> ⚠️ Pool A เป็น shared infra (Crux/STAR/Forge/Academy) — ก่อนแตะ auth, migration,
+> หรือ SQL ตรง ให้อ่าน `ecosystem/SHARED_INFRA_ACCESS.md` และ `reports/state/supabase.md`
+> ของ director repo ก่อนเสมอ
 deploy Vercel `sin1` + CNAME `academy.cyberskills.co.th` + Zero Trust ก่อน
 public · Lab = Crux lab plane บน GCP (M4) · video = managed stream ผ่าน custom
 HLS player (M5, vendor ยังไม่ commit) — เวอร์ชัน/รายละเอียดตรึงใน
