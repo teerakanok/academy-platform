@@ -5,18 +5,16 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import type { CourseNode, CourseStructure, LessonContent, Locale } from '@/lib/content/course-types'
 import {
-  browserCourseStore,
   emptyProgress,
-  loadCourseProgress,
   markCompleted,
   markSkipped,
   markStarted,
   markTestedOut,
   recordVideoCue,
-  saveCourseProgress,
   toLearnerState,
   type CourseProgressRecord,
 } from '@/lib/course/progress'
+import { fetchProgress, pushNodeEvent, type ProgressSyncFailure } from '@/lib/course/progress-client'
 import { canSkip, nextNode, nodeStatus } from '@/lib/course/roadmap'
 import { CheckpointQuiz } from './CheckpointQuiz'
 import { InteractiveVideo } from './InteractiveVideo'
@@ -124,22 +122,33 @@ export function LessonView({
     })
   }
 
+  const [syncError, setSyncError] = useState<ProgressSyncFailure | null>(null)
+
   useEffect(() => {
-    const store = browserCourseStore()
-    const { record: loadedRecord } = loadCourseProgress(store, structure.slug)
-    const started = markStarted(loadedRecord, node.id)
-    saveCourseProgress(store, started)
-    setRecord(started)
-    setLoaded(true)
-    const status = nodeStatus(node, toLearnerState(started))
-    if (status === 'completed') setDone('completed')
-    else if (status === 'tested-out') setDone('tested-out')
-    else if (status === 'skipped') setDone('skipped')
+    let alive = true
+    fetchProgress(structure.slug).then((loadedRecord) => {
+      if (!alive) return
+      const started = markStarted(loadedRecord, node.id)
+      setRecord(started)
+      setLoaded(true)
+      const status = nodeStatus(node, toLearnerState(started))
+      if (status === 'completed') setDone('completed')
+      else if (status === 'tested-out') setDone('tested-out')
+      else if (status === 'skipped') setDone('skipped')
+      // แค่ "เปิดอ่าน" ก็บันทึก เพื่อให้กลับมาต่อจากที่ค้างได้จากเครื่องไหนก็ได้
+      void pushNodeEvent({ slug: structure.slug, nodeId: node.id, status: 'in-progress' })
+    })
+    return () => {
+      alive = false
+    }
   }, [structure.slug, node])
 
-  function persist(next: CourseProgressRecord) {
-    saveCourseProgress(browserCourseStore(), next)
+  // อัปเดตหน้าจอทันที แล้วค่อยบันทึก — ผู้เรียนไม่ควรต้องรอ network ระหว่างตอบคำถาม
+  // แต่ถ้าบันทึกไม่สำเร็จต้องบอกให้รู้ ไม่ใช่เงียบแล้วปล่อยให้เขาเสียงานไปเฉยๆ
+  function persist(next: CourseProgressRecord, event?: Parameters<typeof pushNodeEvent>[0]) {
     setRecord(next)
+    if (!event) return
+    void pushNodeEvent(event).then((failure) => setSyncError(failure))
   }
 
   const learnerState = toLearnerState(record)
@@ -151,30 +160,49 @@ export function LessonView({
   const followingNode = nodeIndex < structure.nodes.length - 1 ? structure.nodes[nodeIndex + 1] : null
 
   function finishLesson(results: Record<string, boolean>) {
-    persist(markCompleted(record, node.id, results))
+    persist(markCompleted(record, node.id, results), {
+      slug: structure.slug,
+      nodeId: node.id,
+      status: 'completed',
+      checkpointResults: results,
+    })
     setDone('completed')
   }
 
   function finishTestOut(results: Record<string, boolean>) {
-    persist(markTestedOut(record, node.id, results))
+    persist(markTestedOut(record, node.id, results), {
+      slug: structure.slug,
+      nodeId: node.id,
+      status: 'tested-out',
+      checkpointResults: results,
+    })
     setDone('tested-out')
   }
 
   function skipLesson() {
-    persist(markSkipped(record, node.id))
+    persist(markSkipped(record, node.id), { slug: structure.slug, nodeId: node.id, status: 'skipped' })
     setDone('skipped')
     setMode('skipped')
   }
 
-  function goNext() {
-    const store = browserCourseStore()
-    const { record: fresh } = loadCourseProgress(store, structure.slug)
+  async function goNext() {
+    // อ่านสดจากบัญชีก่อนเลือกบทถัดไป — อาจมีเครื่องอื่นเรียนคืบไปแล้ว
+    const fresh = await fetchProgress(structure.slug)
     const target = nextNode(structure, toLearnerState(fresh))
     router.push(target ? `/courses/${structure.slug}/lessons/${target.id}` : `/courses/${structure.slug}`)
   }
 
   return (
     <article className="space-y-8">
+      {syncError && (
+        <p
+          role="alert"
+          data-testid="progress-sync-error"
+          className="rounded-control border border-cs-amber-border bg-cs-amber-dim px-4 py-3 text-sm text-cs-body"
+        >
+          {syncError.message} — ความคืบหน้าล่าสุดของบทนี้อาจยังไม่ถูกบันทึกไว้ในบัญชี
+        </p>
+      )}
       <nav aria-label="Breadcrumb" className="font-mono text-xs text-cs-muted">
         <Link href="/dashboard" className="hover:text-cs-accent">
           My learning
@@ -352,7 +380,15 @@ export function LessonView({
           video={node.video}
           questions={lesson.videoCueQuestions}
           answeredCueIds={Object.keys(record.videoCueResults[node.id] ?? {})}
-          onCueAnswered={(cueId, correct) => persist(recordVideoCue(record, node.id, cueId, correct))}
+          onCueAnswered={(cueId, correct) => {
+            const next = recordVideoCue(record, node.id, cueId, correct)
+            persist(next, {
+              slug: structure.slug,
+              nodeId: node.id,
+              status: 'in-progress',
+              videoCueResults: next.videoCueResults[node.id] ?? {},
+            })
+          }}
         />
       )}
 

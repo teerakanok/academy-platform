@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Fraunces, Inter, JetBrains_Mono } from 'next/font/google'
+import { AccountMenu } from '@/components/auth/AccountMenu'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import './globals.css'
 
@@ -110,6 +111,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 Practice
               </Link>
             </nav>
+            <AccountMenu />
             <ThemeToggle />
           </div>
         </header>

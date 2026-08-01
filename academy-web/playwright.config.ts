@@ -19,9 +19,17 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   projects: [
+    // ตั้งแต่ M3 บทเรียน/quiz/lab/dashboard ต้องมีบัญชี — spec ทั้งหมดจึงต้องมี
+    // session ก่อน ไม่งั้นจะถูกเด้งไปหน้า sign-in แล้ว assertion พังแบบงงๆ
+    { name: 'setup', testMatch: /auth\.setup\.ts/ },
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1440, height: 900 },
+        storageState: 'test-results/.auth/learner.json',
+      },
     },
   ],
   webServer: {

@@ -1,0 +1,30 @@
+<!--
+  อีเมลเข้าสู่ระบบ — ให้ทั้ง "รหัส" และ "ลิงก์"
+
+  ทำไมต้องมีทั้งสองอย่าง:
+    · รหัส = พิมพ์กลับมาที่แท็บเดิมได้ ไม่ต้องออกจากหน้าที่กำลังอ่านอยู่ (ทางหลัก)
+    · ลิงก์ = เผื่อกรณีเปิดอีเมลบนอีกเครื่อง หรือ template ฝั่ง prod ยังไม่ได้ตั้งค่า
+      ให้มีรหัส — ระบบต้องล็อกอินได้อยู่ดี ไม่ใช่พังเพราะ config อีเมล
+
+  ตัวแปรของ GoTrue: {{ .Token }} = รหัส 6 หลัก · {{ .ConfirmationURL }} = ลิงก์
+-->
+<h2>Your CyberSkills sign-in code</h2>
+
+<p style="font-size:15px;color:#334">Enter this code in the tab you started from:</p>
+
+<p style="font-family:ui-monospace,Menlo,monospace;font-size:34px;font-weight:700;letter-spacing:8px;color:#0A6C9E;margin:18px 0">
+  {{ .Token }}
+</p>
+
+<p style="font-size:13px;color:#667">It expires shortly and can only be used once.</p>
+
+<hr style="border:none;border-top:1px solid #dde;margin:22px 0" />
+
+<p style="font-size:13px;color:#667">
+  Opening your email on another device?
+  <a href="{{ .ConfirmationURL }}">Sign in with this link instead</a>.
+</p>
+
+<p style="font-size:12px;color:#889">
+  If you did not ask to sign in, you can ignore this email — nothing happens until the code is used.
+</p>

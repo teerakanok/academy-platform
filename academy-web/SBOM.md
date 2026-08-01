@@ -11,6 +11,7 @@
 |---|---|---|---|
 | @cyberskills/tokens | `file:packages/tokens` | local | design tokens (vendored local package) |
 | @opennextjs/cloudflare | `^1.20.2` | 1.20.2 | adapter รัน Next.js บน Cloudflare Workers (ยังเป็นตัวเลือก — ดู reports/reviews) |
+| @supabase/ssr | `^0.12.4` | 0.12.4 | session ผ่าน cookie ฝั่ง server (M3 auth) |
 | @supabase/supabase-js | `^2.111.0` | 2.111.0 | DB client (server-only, service role) |
 | next | `^15.5.22` | 15.5.22 | framework (App Router) |
 | react | `^18.3.1` | 18.3.1 | UI runtime |

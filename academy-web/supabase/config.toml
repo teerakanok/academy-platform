@@ -246,6 +246,13 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
+# อีเมลเข้าสู่ระบบ — template ของเราเองที่ใส่ทั้งรหัส 6 หลักและลิงก์
+# ค่าเริ่มต้นของ GoTrue ส่งเฉพาะลิงก์ ซึ่งบังคับให้ผู้เรียนออกจากแท็บที่กำลังอ่านอยู่
+# ⚠️ prod (Pool A) ต้องตั้ง template เดียวกันนี้ด้วย ไม่งั้นจะได้แต่ลิงก์
+[auth.email.template.magic_link]
+subject = "Your CyberSkills sign-in code"
+content_path = "./supabase/templates/magic-link.html"
+
 # Uncomment to customize email template
 # [auth.email.template.invite]
 # subject = "You have been invited"

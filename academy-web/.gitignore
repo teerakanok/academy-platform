@@ -25,3 +25,6 @@ supabase/.temp/
 # ผลลัพธ์ build ของ Cloudflare adapter — สร้างใหม่ได้จาก source เสมอ
 .open-next/
 .wrangler/
+
+# secret ฝั่ง workerd ตอน dev — ห้ามเข้า git
+.dev.vars

@@ -4,8 +4,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import type { CourseStructure } from '@/lib/content/course-types'
 import {
-  browserCourseStore,
-  loadCourseProgress,
+  emptyProgress,
   toLearnerState,
   type CourseProgressRecord,
 } from '@/lib/course/progress'
@@ -113,17 +112,26 @@ export function CourseDashboard({ courses }: { courses: DashboardCourse[] }) {
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
-    const store = browserCourseStore()
-    const next: Record<string, CourseProgressRecord> = {}
-    let sawCorrupt = false
-    for (const course of courses) {
-      const { record, corruptReset } = loadCourseProgress(store, course.structure.slug)
-      next[course.structure.slug] = record
-      sawCorrupt = sawCorrupt || corruptReset
+    let alive = true
+    // ดึงทุกคอร์สในครั้งเดียว — ยิงทีละคอร์สทำให้ dashboard ช้าขึ้นตามจำนวนคอร์ส
+    fetch('/api/progress', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((body: { ok: boolean; records?: Record<string, CourseProgressRecord> }) => {
+        if (!alive) return
+        const next: Record<string, CourseProgressRecord> = {}
+        for (const course of courses) {
+          next[course.structure.slug] = body.records?.[course.structure.slug] ?? emptyProgress(course.structure.slug)
+        }
+        setProgress(next)
+        setCorrupt(false)
+        setLoaded(true)
+      })
+      .catch(() => {
+        if (alive) setLoaded(true)
+      })
+    return () => {
+      alive = false
     }
-    setProgress(next)
-    setCorrupt(sawCorrupt)
-    setLoaded(true)
   }, [courses])
 
   function stateFor(slug: string): LearnerCourseState {

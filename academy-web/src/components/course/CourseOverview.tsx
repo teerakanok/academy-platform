@@ -4,13 +4,11 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import type { CourseCopy, CourseStructure, Locale } from '@/lib/content/course-types'
 import {
-  browserCourseStore,
   emptyProgress,
-  loadCourseProgress,
-  resetCourse,
   toLearnerState,
   type CourseProgressRecord,
 } from '@/lib/course/progress'
+import { fetchProgress } from '@/lib/course/progress-client'
 import { certificateEligibility } from '@/lib/course/roadmap'
 import { EMPTY_STATE, nextNode, summarise } from '@/lib/course/roadmap'
 import { courseSkillData } from '@/lib/course/skills'
@@ -33,10 +31,16 @@ export function CourseOverview({
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
-    const { record: loadedRecord, corruptReset } = loadCourseProgress(browserCourseStore(), structure.slug)
-    setRecord(loadedRecord)
-    setCorrupt(corruptReset)
-    setLoaded(true)
+    let alive = true
+    fetchProgress(structure.slug).then((loadedRecord) => {
+      if (!alive) return
+      setRecord(loadedRecord)
+      setCorrupt(false)
+      setLoaded(true)
+    })
+    return () => {
+      alive = false
+    }
   }, [structure.slug])
 
   const state = loaded ? toLearnerState(record) : EMPTY_STATE
@@ -104,8 +108,8 @@ export function CourseOverview({
           {loaded && summary.coveragePercent > 0 && (
             <button
               type="button"
-              onClick={() => {
-                resetCourse(browserCourseStore(), structure.slug)
+              onClick={async () => {
+                await fetch(`/api/progress/reset?slug=${encodeURIComponent(structure.slug)}`, { method: 'POST' })
                 setRecord(emptyProgress(structure.slug))
               }}
               data-testid="reset-course"
