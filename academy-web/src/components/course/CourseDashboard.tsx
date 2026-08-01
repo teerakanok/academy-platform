@@ -203,7 +203,10 @@ export function CourseDashboard({ courses }: { courses: DashboardCourse[] }) {
             const state = stateFor(course.structure.slug)
             const summary = summarise(course.structure, state)
             return (
-              <li key={course.structure.slug}>
+              // min-w-0: grid item มี min-width:auto เป็นค่าตั้งต้น จึงหดต่ำกว่าขนาด
+              // เนื้อหาของตัวเองไม่ได้ — SVG ในปกมีขนาดในตัว การ์ดเลยกว้างเกินจอมือถือ
+              // แล้วดันทั้งหน้าให้เลื่อนซ้ายขวาได้ (gate มือถือจับได้)
+              <li key={course.structure.slug} className="min-w-0">
                 <Link
                   href={`/courses/${course.structure.slug}`}
                   className="card-feature card-interactive group block h-full overflow-hidden"

@@ -81,17 +81,49 @@ function Layers() {
   )
 }
 
-const MOTIFS: Record<MotifName, () => React.JSX.Element> = {
-  terminal: Terminal,
-  logs: Logs,
-  shield: Shield,
-  cloud: Cloud,
-  probe: Probe,
-  layers: Layers,
+// กรอบจริงที่แต่ละลายวาดกินในผืน 192×176 — วัดจากพิกัดในฟังก์ชันข้างบน
+//
+// ทำไมต้องมี: ลายทุกอันอยู่ในผืนเท่ากันก็จริง แต่วาดกินพื้นที่ไม่เท่ากัน
+// (terminal สูง 124 · layers 138 · shield 148) วางข้างกันแล้วเห็นชัดว่าอันหนึ่ง
+// ใหญ่กว่าอีกอัน ทั้งที่กล่องเท่ากันเป๊ะ — ต้องปรับที่ "ขนาดของสิ่งที่วาด" ไม่ใช่
+// ขนาดของกล่อง
+//
+// ⚠️ แก้พิกัดในลายไหน ต้องอัปเดตกรอบของลายนั้นด้วย มีเทสคุมว่าค่าที่ประกาศตรงกับ
+// พิกัดจริง
+type Box = readonly [minX: number, minY: number, maxX: number, maxY: number]
+
+const MOTIFS: Record<MotifName, { Shape: () => React.JSX.Element; box: Box }> = {
+  terminal: { Shape: Terminal, box: [12, 14, 180, 138] },
+  logs: { Shape: Logs, box: [16, 26, 184, 126] },
+  shield: { Shape: Shield, box: [26, 14, 166, 162] },
+  cloud: { Shape: Cloud, box: [30, 28, 170, 138] },
+  probe: { Shape: Probe, box: [24, 40, 182, 158] },
+  layers: { Shape: Layers, box: [24, 22, 168, 160] },
+}
+
+// กล่องเป้าหมายที่ทุกลายต้องพอดี — เลือกให้เล็กกว่าผืนเล็กน้อยเพื่อให้มีระยะหายใจ
+const TARGET_W = 150
+const TARGET_H = 116
+const CENTER_X = 96
+const CENTER_Y = 88
+
+/** ย่อ/ขยายลายให้พอดีกล่องเป้าหมายโดยไม่บิดสัดส่วน แล้วจัดกึ่งกลาง */
+function fitTransform(box: Box): string {
+  const [minX, minY, maxX, maxY] = box
+  const w = maxX - minX
+  const h = maxY - minY
+  const scale = Math.min(TARGET_W / w, TARGET_H / h)
+  const cx = (minX + maxX) / 2
+  const cy = (minY + maxY) / 2
+  // เลื่อนจุดกึ่งกลางของลายไปทับจุดกึ่งกลางของผืน แล้วค่อยย่อขยายรอบจุดนั้น
+  const tx = CENTER_X - cx * scale
+  const ty = CENTER_Y - cy * scale
+  return `translate(${tx.toFixed(2)} ${ty.toFixed(2)}) scale(${scale.toFixed(4)})`
 }
 
 export function CoverMotif({ motif }: { motif: MotifName }) {
-  const Shape = MOTIFS[motif] ?? Layers
+  const entry = MOTIFS[motif] ?? MOTIFS.layers
+  const { Shape, box } = entry
   return (
     <svg
       viewBox="0 0 192 176"
@@ -99,7 +131,9 @@ export function CoverMotif({ motif }: { motif: MotifName }) {
       className="pointer-events-none h-[76%] w-[76%] opacity-[0.3]"
       preserveAspectRatio="xMidYMid meet"
     >
-      <Shape />
+      <g transform={fitTransform(box)}>
+        <Shape />
+      </g>
     </svg>
   )
 }

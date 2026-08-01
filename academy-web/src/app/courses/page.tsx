@@ -35,7 +35,9 @@ export default function CoursesPage() {
 
       <ul className="mt-10 grid gap-6 sm:grid-cols-2">
         {courses.map((course) => (
-          <li key={course.structure.slug}>
+          // min-w-0: grid item มี min-width:auto เป็นค่าตั้งต้น จึงหดต่ำกว่าขนาด
+          // เนื้อหาของตัวเองไม่ได้ — SVG ในปกมีขนาดในตัว การ์ดเลยกว้างเกินจอมือถือ
+          <li key={course.structure.slug} className="min-w-0">
             <Link
               href={`/courses/${course.structure.slug}`}
               data-testid={`catalogue-card-${course.structure.slug}`}

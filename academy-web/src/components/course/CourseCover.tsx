@@ -14,12 +14,25 @@ import { EMPTY_STATE, layoutRoadmap, type LearnerCourseState } from '@/lib/cours
 // เพื่อให้ได้สัดส่วนแบบแถบกว้าง ปกจึงเป็นภาพย่อของแผนที่จริง ไม่ใช่ของตกแต่งที่
 // วาดขึ้นต่างหากแล้วหลุดจากกันเมื่อเนื้อหาเปลี่ยน
 
-// สัดส่วนทั้งหมดคิดเทียบกับ "ขนาดจริงของแผนที่" ไม่ใช่ค่าคงที่ — เพราะ SVG ถูกย่อ
-// ขยายให้พอดีแถบ คอร์สที่มีไม่กี่บทจะถูกขยายมากกว่า ถ้าใช้รัศมีคงที่ node ของคอร์ส
-// สั้นจะใหญ่กว่าคอร์สยาวอย่างเห็นได้ชัด (เจอจริงตอนเทียบสองการ์ดข้างกัน)
-const PAD_RATIO = 0.075
-const NODE_RATIO = 0.019
-const EDGE_RATIO = 0.005
+// ปกต้องเป็นกล่องขนาดคงที่ทุกคอร์ส
+//
+// เดิม viewBox ถูกคำนวณจากกรอบของกราฟตรงๆ ความสูงของปกจึงมาจาก "รูปร่างของกราฟ":
+// คอร์สที่แตกกิ่ง (กระจายสองมิติ) ได้ปกสูง ส่วนคอร์สที่เป็นเส้นตรงสามบทได้ปกแบนเตี้ย
+// วางข้างกันแล้วการ์ดสูงไม่เท่ากันทันที
+//
+// วิธีแก้: ล็อกสัดส่วนของปก แล้ว "ขยาย viewBox ออกรอบจุดกึ่งกลางของแผนที่" ให้ได้
+// สัดส่วนนั้น — ไม่ใช่ยืดภาพ แผนที่จึงยังไม่บิดและอยู่กลางกล่องเสมอ
+const COVER_ASPECT = 16 / 5
+// พื้นที่ของ SVG คือ 70% ของความกว้างปก (อีก 30% เป็นลายบอกหัวข้อ)
+const SVG_WIDTH_FRACTION = 0.7
+const SVG_ASPECT = COVER_ASPECT * SVG_WIDTH_FRACTION
+
+// ขนาด node/เส้นคิดเทียบกับ "ความกว้างของ viewBox สุดท้าย" ไม่ใช่ขนาดของกราฟ
+// เพราะ viewBox สุดท้ายคือสิ่งที่ถูกย่อขยายไปเป็นพิกเซลจริง — คิดจากตรงนี้แล้ว node
+// ของทุกคอร์สจะออกมาเท่ากันบนหน้าจอ ไม่ว่ากราฟจะยาวหรือสั้น
+const PAD_RATIO = 0.05
+const NODE_RATIO = 0.014
+const EDGE_RATIO = 0.0038
 
 export function CourseCover({
   structure,
@@ -41,13 +54,29 @@ export function CourseCover({
   const minY = Math.min(...points.map((p) => p.cy))
   const maxY = Math.max(...points.map((p) => p.cy))
 
-  const unit = Math.max(maxX - minX, maxY - minY, 1)
-  const PAD = unit * PAD_RATIO
-  const nodeR = unit * NODE_RATIO
-  const edgeW = unit * EDGE_RATIO
+  // กรอบของแผนที่ + ระยะขอบ แล้วขยายด้านที่สั้นไปจนได้สัดส่วนของปก
+  const extent = Math.max(maxX - minX, maxY - minY, 1)
+  const PAD = extent * PAD_RATIO
+  const boxW = maxX - minX + PAD * 2
+  const boxH = maxY - minY + PAD * 2
+  const centerX = (minX + maxX) / 2
+  const centerY = (minY + maxY) / 2
+
+  const viewW = boxW / boxH < SVG_ASPECT ? boxH * SVG_ASPECT : boxW
+  const viewH = viewW / SVG_ASPECT
+  const viewX = centerX - viewW / 2
+  const viewY = centerY - viewH / 2
+
+  const nodeR = viewW * NODE_RATIO
+  const edgeW = viewW * EDGE_RATIO
 
   return (
-    <div className={`cover-wash relative overflow-hidden ${className}`} aria-hidden="true">
+    <div
+      // ไม่ใส่ flex ตรงนี้: flex item มี min-width:auto เป็นค่าตั้งต้น SVG จึงไม่ยอมหด
+      // ต่ำกว่าขนาดเนื้อหาตัวเอง แล้วดันการ์ดกว้างเกินจอมือถือ (gate จับได้)
+      className={`cover-wash relative aspect-[16/5] overflow-hidden ${className}`}
+      aria-hidden="true"
+    >
       {/* สองโซนที่ไม่ทับกัน: ขวา = ลายบอกหัวข้อ (คอร์สนี้เรื่องอะไร) ·
           ซ้าย/กลาง = แผนที่จริง (เส้นทางหน้าตาแบบไหน)
           เคยวางลายทับกลางแผนที่แล้วอ่านไม่ออกทั้งคู่ */}
@@ -55,9 +84,9 @@ export function CourseCover({
         <CoverMotif motif={structure.coverMotif ?? 'layers'} />
       </div>
       <svg
-        viewBox={`${minX - PAD} ${minY - PAD} ${maxX - minX + PAD * 2} ${maxY - minY + PAD * 2}`}
+        viewBox={`${viewX} ${viewY} ${viewW} ${viewH}`}
         preserveAspectRatio="xMidYMid meet"
-        className="relative block h-full w-[70%]"
+        className="relative block h-full w-[70%] min-w-0"
       >
         {layout.edges.map((edge) => {
           const from = toCover(edge.fromX, edge.fromY)

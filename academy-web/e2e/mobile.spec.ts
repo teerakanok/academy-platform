@@ -14,7 +14,8 @@ import { test, expect } from '@playwright/test'
 test.use({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true })
 
 const PAGES = [
-  ['/dashboard', 'หน้ารวมคอร์ส'],
+  ['/dashboard', 'หน้า My learning'],
+  ['/courses', 'หน้ารายการคอร์สสาธารณะ'],
   ['/courses/basic-os-linux', 'หน้าคอร์ส + roadmap'],
   ['/courses/basic-os-linux/lessons/permissions', 'บทเรียนที่มี lab แทรก'],
   ['/courses/content-formats-demo/lessons/formats-hands-on', 'บทเรียนที่มี lab สองขนาด'],

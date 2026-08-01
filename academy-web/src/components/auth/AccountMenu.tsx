@@ -50,6 +50,9 @@ export function AccountMenu() {
       >
         {state.email}
       </span>
+      {/* จอเล็กเหลือแค่ไอคอน — ที่ 390px มี logo + ชื่อ + สองลิงก์ + ปุ่มออก + ปุ่มธีม
+          ใส่คำว่า "Sign out" เต็มแล้วล้นขอบจอ ซึ่งไปดันการ์ดคอร์สให้กว้างตามทั้งหน้า
+          (gate มือถือจับได้ตอนเทสรันแบบล็อกอินแล้ว ส่วนตอนไม่ล็อกอินไม่เจอ) */}
       <button
         type="button"
         data-testid="header-sign-out"
@@ -58,9 +61,22 @@ export function AccountMenu() {
           // reload เต็ม — หน้าที่ render ไว้ยังคิดว่าล็อกอินอยู่
           window.location.assign('/')
         }}
-        className="whitespace-nowrap rounded-control border border-cs-border px-3 py-1.5 text-[13px] text-cs-muted transition-colors hover:border-cs-accent hover:text-cs-accent sm:text-sm"
+        className="flex items-center gap-1.5 whitespace-nowrap rounded-control border border-cs-border px-2.5 py-2 text-[13px] text-cs-muted transition-colors hover:border-cs-accent hover:text-cs-accent sm:px-3 sm:py-1.5 sm:text-sm"
       >
-        Sign out
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 20 20"
+          className="h-4 w-4 sm:hidden"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M12.5 6.5V4.5a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2" />
+          <path d="M16.5 10H8m8.5 0-2.5-2.5M16.5 10 14 12.5" />
+        </svg>
+        <span className="sr-only sm:not-sr-only">Sign out</span>
       </button>
     </div>
   )
