@@ -47,7 +47,9 @@ validation ต่อ course เป็นรอบ pitch + poll ของ founder
   scoring spec + module nav + progress + axe + visual matrix; fixture =
   CAS-005 internal (นับจริง 150 MCQ — เลข 165 ในแผนเดิมคลาดเคลื่อน); video
   slot เป็น placeholder จนกว่า commit CF Stream (M5)
-- [ ] **M3 — Identity + personalized path v0** — 🔓 **ปลดล็อก 2026-08-01**
+- [~] **M3 — Identity + personalized path v0** — 🟡 **แกนหลักเสร็จ 2026-08-01**
+  (auth ครบวงจร + gating + progress ผูกบัญชี พิสูจน์บน Cloudflare runtime แล้ว;
+  เหลือ Google sign-in ที่ต้องใช้ OAuth credential จริง และหน้าโปรไฟล์/ชื่อจริง)
   (founder เคาะ ADR ครบ 5 ข้อ; ดู `docs/adr/ADR-draft-single-account.md` §0)
   - **เคาะแล้ว:** Option A (shared issuer Pool A GoTrue + identity contract) ·
     เปิด asymmetric JWT/JWKS · consent ecosystem · **บังคับสมัครถ้าจะใช้**
