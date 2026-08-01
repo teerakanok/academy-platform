@@ -2,7 +2,36 @@
 
 > Open work only. Move closed items to `completed_log.md` with evidence.
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
-> **Last updated:** 2026-07-31
+> **Last updated:** 2026-08-02
+
+---
+
+## ⚠️ อ่านก่อนลงมือ — แผน implement ที่ผ่าน RIL แล้ว (2026-08-02)
+
+**`plans/implementation-plan-2026-08-02.md` คือแผนที่ session ถัดไปต้องเดินตาม**
+ผ่าน RIL 7 รอบ สองเลนอิสระ (codex `model_reasoning_effort=high` + Claude critic)
+→ **PASS ทั้งสองเลนในรอบที่ 7**
+
+**สิ่งที่ RIL เปลี่ยนไปจากความเข้าใจเดิม — สำคัญมาก:**
+ร่างแรกเขียนว่า "แกนหลักฐานต่อครบแล้ว เหลือแค่ต่อ simulation" ซึ่ง **ไม่จริง**
+พิสูจน์ด้วยการรันจริงแล้วพบ 5 ข้อบกพร่อง (F1–F5) ที่ยังอยู่บน HEAD วันนี้:
+
+| # | ข้อบกพร่อง | ที่ |
+|---|---|---|
+| F1 | เฉลยและคำอธิบายถูกส่งไป browser ทั้งชุด (MCQ · video cue · simulation · `/player`) | `lessons/[nodeId]/page.tsx:35` |
+| F2 | บทปกติ "ผ่าน" ด้วยการตอบครบ ไม่ต้องตอบถูก | `api/progress/route.ts:125–127` |
+| F3 | ใบรับรองนับ `completed` เป็น "พิสูจน์แล้ว" → ตอบผิดทุกข้อก็ได้ใบ | `roadmap.ts:239` |
+| F4 | UI ประกาศว่าผ่านก่อนเซิร์ฟเวอร์ตอบ (ทิ้ง `outcome`) | `LessonView.tsx:151,172` |
+| F5 | คำถามกลางวิดีโอตรวจและบันทึกจริง แต่ไม่ถูกใช้ตัดสินอะไร | — |
+
+→ **W0 (ซ่อมแกนหลักฐาน) ต้องทำก่อนทุกอย่าง** และงานแรกจริงๆ คือ **W0-0**
+(โครง attempt + คลังข้อ) เพราะกติกาอื่นทั้งหมดพึ่งมัน
+
+**ลำดับที่บังคับ:** W0-0 → W0-1..4 → W1 → W2 → W3 → W4 · W-content ทำขนานกับ W0 ได้
+
+**Founder blocker ที่ต้องขอตั้งแต่เปิด session** (§4.2b ของแผน):
+R2 bucket สำหรับย้าย media · และอนุญาต deploy หนึ่งครั้งเพื่อ verify `/media/*`
+(ลอง `wrangler dev --remote` ก่อน)
 
 ---
 
