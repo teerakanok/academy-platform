@@ -28,7 +28,7 @@ export function InteractiveVideo({
   video: LessonVideo
   questions: VideoCueQuestion[]
   answeredCueIds: string[]
-  onCueAnswered: (cueId: string, correct: boolean) => void
+  onCueAnswered: (cueId: string, correct: boolean, answer: string[]) => void
 }) {
   const { t: ui } = useUi()
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -98,7 +98,7 @@ export function InteractiveVideo({
     if (!activeQuestion || !selected) return
     setSubmitted(true)
     const correct = activeQuestion.correct.length === 1 && activeQuestion.correct[0] === selected
-    onCueAnswered(activeQuestion.cueId, correct)
+    onCueAnswered(activeQuestion.cueId, correct, selected ? [selected] : [])
   }
 
   function continueAfterCue() {

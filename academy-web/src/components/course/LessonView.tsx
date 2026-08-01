@@ -14,7 +14,7 @@ import {
   toLearnerState,
   type CourseProgressRecord,
 } from '@/lib/course/progress'
-import { fetchProgress, pushNodeEvent, type ProgressSyncFailure } from '@/lib/course/progress-client'
+import { fetchProgress, pushProgress, type ProgressAction, type ProgressSyncFailure } from '@/lib/course/progress-client'
 import { canSkip, nextNode, nodeStatus } from '@/lib/course/roadmap'
 import { CheckpointQuiz } from './CheckpointQuiz'
 import { InteractiveVideo } from './InteractiveVideo'
@@ -136,7 +136,7 @@ export function LessonView({
       else if (status === 'tested-out') setDone('tested-out')
       else if (status === 'skipped') setDone('skipped')
       // แค่ "เปิดอ่าน" ก็บันทึก เพื่อให้กลับมาต่อจากที่ค้างได้จากเครื่องไหนก็ได้
-      void pushNodeEvent({ slug: structure.slug, nodeId: node.id, status: 'in-progress' })
+      void pushProgress({ action: 'open', slug: structure.slug, nodeId: node.id })
     })
     return () => {
       alive = false
@@ -145,10 +145,10 @@ export function LessonView({
 
   // อัปเดตหน้าจอทันที แล้วค่อยบันทึก — ผู้เรียนไม่ควรต้องรอ network ระหว่างตอบคำถาม
   // แต่ถ้าบันทึกไม่สำเร็จต้องบอกให้รู้ ไม่ใช่เงียบแล้วปล่อยให้เขาเสียงานไปเฉยๆ
-  function persist(next: CourseProgressRecord, event?: Parameters<typeof pushNodeEvent>[0]) {
+  function persist(next: CourseProgressRecord, event?: ProgressAction) {
     setRecord(next)
     if (!event) return
-    void pushNodeEvent(event).then((failure) => setSyncError(failure))
+    void pushProgress(event).then(({ failure }) => setSyncError(failure))
   }
 
   const learnerState = toLearnerState(record)
@@ -159,28 +159,32 @@ export function LessonView({
   const prevNode = nodeIndex > 0 ? structure.nodes[nodeIndex - 1] : null
   const followingNode = nodeIndex < structure.nodes.length - 1 ? structure.nodes[nodeIndex + 1] : null
 
-  function finishLesson(results: Record<string, boolean>) {
+  // หมายเหตุ: การตัดสินว่า "ผ่าน" เกิดที่เซิร์ฟเวอร์แล้ว ตรงนี้แค่สะท้อนผลที่ได้กลับมา
+  // ให้หน้าจอทันที (optimistic) — ถ้าเซิร์ฟเวอร์ไม่เห็นด้วย syncError จะขึ้นเตือน
+  function finishLesson(results: Record<string, boolean>, answers: Record<string, string[]>) {
     persist(markCompleted(record, node.id, results), {
+      action: 'checkpoint',
       slug: structure.slug,
       nodeId: node.id,
-      status: 'completed',
-      checkpointResults: results,
+      mode: 'learn',
+      answers,
     })
     setDone('completed')
   }
 
-  function finishTestOut(results: Record<string, boolean>) {
+  function finishTestOut(results: Record<string, boolean>, answers: Record<string, string[]>) {
     persist(markTestedOut(record, node.id, results), {
+      action: 'checkpoint',
       slug: structure.slug,
       nodeId: node.id,
-      status: 'tested-out',
-      checkpointResults: results,
+      mode: 'test-out',
+      answers,
     })
     setDone('tested-out')
   }
 
   function skipLesson() {
-    persist(markSkipped(record, node.id), { slug: structure.slug, nodeId: node.id, status: 'skipped' })
+    persist(markSkipped(record, node.id), { action: 'skip', slug: structure.slug, nodeId: node.id })
     setDone('skipped')
     setMode('skipped')
   }
@@ -380,14 +384,9 @@ export function LessonView({
           video={node.video}
           questions={lesson.videoCueQuestions}
           answeredCueIds={Object.keys(record.videoCueResults[node.id] ?? {})}
-          onCueAnswered={(cueId, correct) => {
+          onCueAnswered={(cueId, correct, answer) => {
             const next = recordVideoCue(record, node.id, cueId, correct)
-            persist(next, {
-              slug: structure.slug,
-              nodeId: node.id,
-              status: 'in-progress',
-              videoCueResults: next.videoCueResults[node.id] ?? {},
-            })
+            persist(next, { action: 'video-cue', slug: structure.slug, nodeId: node.id, cueId, answer })
           }}
         />
       )}

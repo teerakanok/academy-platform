@@ -25,13 +25,29 @@ export async function fetchProgress(slug: string): Promise<CourseProgressRecord>
   }
 }
 
-export async function pushNodeEvent(event: {
-  slug: string
-  nodeId: string
-  status: 'in-progress' | 'completed' | 'tested-out' | 'skipped'
-  checkpointResults?: Record<string, boolean>
-  videoCueResults?: Record<string, boolean>
-}): Promise<ProgressSyncFailure | null> {
+/**
+ * แจ้งสิ่งที่ผู้เรียนทำ — ไม่ใช่ผลลัพธ์
+ *
+ * เดิมฟังก์ชันนี้ส่ง status: 'completed' ไปตรงๆ ซึ่งแปลว่า client เป็นคนตัดสินว่า
+ * ตัวเองผ่าน พิสูจน์แล้วว่ายิง 10 request ก็ได้ครบทั้งคอร์สโดยไม่ตอบอะไรเลย
+ * ตอนนี้เซิร์ฟเวอร์ตรวจคำตอบเองจากเฉลยที่ไม่เคยออกไปฝั่ง client
+ */
+export type ProgressAction =
+  | { action: 'open'; slug: string; nodeId: string }
+  | { action: 'skip'; slug: string; nodeId: string }
+  | { action: 'checkpoint'; slug: string; nodeId: string; mode: 'learn' | 'test-out'; answers: Record<string, string[]> }
+  | { action: 'video-cue'; slug: string; nodeId: string; cueId: string; answer: string[] }
+
+export interface CheckpointOutcome {
+  passed: boolean
+  results: Record<string, boolean>
+  correctCount: number
+  total: number
+}
+
+export async function pushProgress(
+  event: ProgressAction,
+): Promise<{ failure: ProgressSyncFailure | null; outcome?: CheckpointOutcome; correct?: boolean }> {
   try {
     const res = await fetch('/api/progress', {
       method: 'POST',
@@ -42,10 +58,27 @@ export async function pushNodeEvent(event: {
       // เพิ่งเรียนจบจะไม่ถูกบันทึก — ผู้เรียนเสียงานโดยไม่มีอะไรแจ้งเลย
       keepalive: true,
     })
-    if (res.ok) return null
-    const body = (await res.json().catch(() => ({}))) as { error?: string }
-    return { nodeId: event.nodeId, message: body.error ?? 'บันทึกความคืบหน้าไม่สำเร็จ' }
+    const body = (await res.json().catch(() => ({}))) as {
+      ok?: boolean
+      error?: string
+      passed?: boolean
+      results?: Record<string, boolean>
+      correctCount?: number
+      total?: number
+      correct?: boolean
+    }
+    if (!res.ok || !body.ok) {
+      return { failure: { nodeId: event.nodeId, message: body.error ?? 'บันทึกความคืบหน้าไม่สำเร็จ' } }
+    }
+    return {
+      failure: null,
+      outcome:
+        body.passed !== undefined
+          ? { passed: body.passed, results: body.results ?? {}, correctCount: body.correctCount ?? 0, total: body.total ?? 0 }
+          : undefined,
+      correct: body.correct,
+    }
   } catch {
-    return { nodeId: event.nodeId, message: 'บันทึกความคืบหน้าไม่สำเร็จ — เครือข่ายมีปัญหา' }
+    return { failure: { nodeId: event.nodeId, message: 'บันทึกความคืบหน้าไม่สำเร็จ — เครือข่ายมีปัญหา' } }
   }
 }

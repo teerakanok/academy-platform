@@ -23,8 +23,8 @@ export function CheckpointQuiz({
   questions: CheckpointQuestion[]
   /** true เมื่อเป็น capstone — ต้องถูกทุกข้อ */
   requireAllCorrect: boolean
-  onPassed: (results: Record<string, boolean>) => void
-  onAnswered?: (results: Record<string, boolean>) => void
+  onPassed: (results: Record<string, boolean>, answers: Record<string, string[]>) => void
+  onAnswered?: (results: Record<string, boolean>, answers: Record<string, string[]>) => void
 }) {
   const [answers, setAnswers] = useState<Record<string, string[]>>({})
   const [graded, setGraded] = useState(false)
@@ -54,7 +54,7 @@ export function CheckpointQuiz({
 
   function grade() {
     setGraded(true)
-    onAnswered?.(results)
+    onAnswered?.(results, answers)
   }
 
   function retry() {
@@ -160,7 +160,7 @@ export function CheckpointQuiz({
             {passed ? (
               <button
                 type="button"
-                onClick={() => onPassed(results)}
+                onClick={() => onPassed(results, answers)}
                 data-testid="checkpoint-continue"
                 className="rounded-control bg-cs-accent-fill px-6 py-3 text-sm font-semibold text-cs-on-accent shadow-card transition-transform duration-200 hover:-translate-y-0.5"
               >
