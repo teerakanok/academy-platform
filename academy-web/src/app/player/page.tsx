@@ -1,12 +1,10 @@
 import type { Metadata } from 'next'
+import { privatePage } from '@/lib/seo'
 import Link from 'next/link'
 import { getCourseContent } from '@/lib/content/source'
 import { PlayerHub } from '@/components/player/PlayerHub'
 
-export const metadata: Metadata = {
-  title: 'Course Player (dev)',
-  robots: { index: false, follow: false },
-}
+export const metadata: Metadata = privatePage('Course Player (dev)')
 
 // Internal dev player — เสพ fixture ผ่าน loader เท่านั้น (content-agnostic engine)
 export default function PlayerPage() {

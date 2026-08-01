@@ -1,13 +1,11 @@
 import type { Metadata } from 'next'
+import { privatePage } from '@/lib/seo'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getCourseContent } from '@/lib/content/source'
 import { ExamPlayer } from '@/components/player/ExamPlayer'
 
-export const metadata: Metadata = {
-  title: 'Full-Length Practice (dev)',
-  robots: { index: false, follow: false },
-}
+export const metadata: Metadata = privatePage('Full-Length Practice (dev)')
 
 export default async function ExamPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params

@@ -163,11 +163,10 @@ export function CourseOverview({
         </div>
       </section>
 
-      {/* ใบรับรองการเรียนจบ — แสดงตั้งแต่ยังไม่ได้ เพราะสิ่งที่ผู้เรียนต้องรู้คือ
-          "ต้องทำอะไรอีกถึงจะได้" ไม่ใช่รู้ตอนได้แล้ว
-          กติกา: ทุกบทต้องพิสูจน์แล้ว การข้ามกั้นใบไว้ แต่ไม่ได้ปิดประตู —
-          กลับมาพิสูจน์เมื่อไหร่ก็ได้ ถ้าข้ามครึ่งคอร์สแล้วยังได้ใบ ใบนั้นก็ไม่ได้
-          บอกอะไรกับใคร และเราจะเป็นคนแรกที่รู้ */}
+      {/* ใบรับรอง — บอกว่า "ทำได้ในระดับที่ผ่าน" ไม่ใช่ "นั่งอ่านครบ"
+          จึงต้องเขียนโดยนำด้วยสิ่งที่ทำให้ได้ใบ ไม่ใช่สิ่งที่กั้นใบไว้ และต้อง
+          ชัดว่า test out นับเท่ากับอ่านจบทุกประการ — คนที่รู้อยู่แล้วไม่ควรถูก
+          ทำให้รู้สึกว่ากำลังโดนลงโทษที่รู้มาก่อน */}
       <section
         className={`card-feature p-6 sm:p-7 ${cert.eligible ? 'card-takeaway' : ''}`}
         data-testid="certificate-status"
@@ -179,7 +178,7 @@ export function CourseOverview({
               Certificate of completion
             </p>
             <h2 className="mt-1.5 font-display text-xl font-semibold text-cs-text">
-              {cert.eligible ? 'Earned — every lesson proven' : 'Prove every lesson to earn it'}
+              {cert.eligible ? 'Earned — you proved all of it' : 'Prove it and it is yours'}
             </h2>
           </div>
           <span className="shrink-0 rounded-full bg-cs-accent-fill px-3 py-1 font-mono text-xs font-semibold text-cs-on-accent">
@@ -188,11 +187,36 @@ export function CourseOverview({
         </div>
         <p className="mt-3 max-w-2xl text-sm text-cs-body">
           {cert.eligible
-            ? 'Nothing was skipped and every required checkpoint was earned, so the certificate says something true about you.'
-            : skippedBlockers > 0
-              ? `A certificate that counted skipped lessons would not mean anything. ${skippedBlockers} skipped ${skippedBlockers === 1 ? 'lesson is' : 'lessons are'} holding it — come back and prove ${skippedBlockers === 1 ? 'it' : 'them'} any time, by reading or by testing out.`
-              : 'It is issued once every lesson on your route is proven — either by finishing it or by testing out of it.'}
+            ? 'It says you can do this, and every lesson behind it has the evidence to back that up.'
+            : 'The certificate says you can do this — not that you read every page. Reading a lesson and testing out of it count exactly the same.'}
         </p>
+        {!cert.eligible && skippedBlockers > 0 && (
+          <p className="mt-3 max-w-2xl text-sm text-cs-body" data-testid="certificate-skipped-note">
+            {skippedBlockers === 1 ? 'One lesson you skipped has' : `${skippedBlockers} lessons you skipped have`} no
+            evidence yet. If you already know {skippedBlockers === 1 ? 'it' : 'them'}, test out — it takes a few
+            questions and counts in full.
+          </p>
+        )}
+        {!cert.eligible && cert.blocking.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {cert.blocking.slice(0, 4).map((b) => (
+              <Link
+                key={b.id}
+                href={`/courses/${structure.slug}/lessons/${b.id}`}
+                data-testid={`certificate-blocker-${b.id}`}
+                className="rounded-control border border-cs-border bg-cs-surface px-3 py-1.5 text-sm text-cs-body transition-colors hover:border-cs-accent hover:text-cs-accent"
+              >
+                {b.reason === 'skipped' ? 'Test out: ' : 'Open: '}
+                {copy.nodeTitles[b.id] ?? b.id}
+              </Link>
+            ))}
+            {cert.blocking.length > 4 && (
+              <span className="self-center font-mono text-xs text-cs-muted">
+                +{cert.blocking.length - 4} more
+              </span>
+            )}
+          </div>
+        )}
       </section>
 
       <section className="card-feature p-6">

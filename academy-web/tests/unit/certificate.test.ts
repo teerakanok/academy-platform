@@ -27,20 +27,20 @@ describe('ใบรับรองการเรียนจบ', () => {
     expect(r.blocking.map((b) => b.reason)).toEqual(['unstarted', 'unstarted', 'unstarted'])
   })
 
-  it('การข้ามกั้นใบไว้ — ไม่งั้นใบก็ไม่ได้บอกอะไรกับใคร', () => {
+  it('ข้ามโดยไม่พิสูจน์ = ยังไม่มีหลักฐาน จึงยังไม่ออกใบ', () => {
     const r = certificateEligibility(structure, state({ completed: ['a', 'c'], skipped: ['b'] }))
     expect(r.eligible).toBe(false)
     expect(r.blocking).toEqual([{ id: 'b', reason: 'skipped' }])
   })
 
-  it('กลับมาพิสูจน์บทที่ข้ามแล้วได้ใบทันที — ข้ามไม่ได้ปิดประตู', () => {
+  it('กลับมา test out บทที่ข้ามแล้วได้ใบทันที', () => {
     const r = certificateEligibility(structure, state({ completed: ['a', 'c'], testedOut: ['b'] }))
     expect(r.eligible).toBe(true)
     expect(r.blocking).toEqual([])
     expect(r.provenCount).toBe(3)
   })
 
-  it('test out ทั้งคอร์สก็นับ — พิสูจน์แล้วคือพิสูจน์แล้ว ไม่ว่ามาทางไหน', () => {
+  it('รู้อยู่แล้วและ test out ทั้งคอร์ส = ได้ใบเต็ม ไม่มีการลงโทษคนที่รู้มาก่อน', () => {
     expect(certificateEligibility(structure, state({ testedOut: ['a', 'b', 'c'] })).eligible).toBe(true)
   })
 

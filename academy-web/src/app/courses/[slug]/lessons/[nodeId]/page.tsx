@@ -1,12 +1,11 @@
 import type { Metadata } from 'next'
+import { privatePage } from '@/lib/seo'
 import { notFound } from 'next/navigation'
 import { getCourse, getLesson } from '@/lib/content/course-source'
 import type { Locale } from '@/lib/content/course-types'
 import { LessonView } from '@/components/course/LessonView'
 
-export const metadata: Metadata = {
-  robots: { index: false, follow: false },
-}
+export const metadata: Metadata = privatePage()
 
 export default async function LessonPage({
   params,

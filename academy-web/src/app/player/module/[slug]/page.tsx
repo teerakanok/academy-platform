@@ -1,13 +1,11 @@
 import type { Metadata } from 'next'
+import { privatePage } from '@/lib/seo'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getCourseContent } from '@/lib/content/source'
 import { PracticePlayer } from '@/components/player/PracticePlayer'
 
-export const metadata: Metadata = {
-  title: 'Module Practice (dev)',
-  robots: { index: false, follow: false },
-}
+export const metadata: Metadata = privatePage('Module Practice (dev)')
 
 export default async function ModulePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params

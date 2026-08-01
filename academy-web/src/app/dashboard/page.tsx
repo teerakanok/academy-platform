@@ -1,11 +1,9 @@
 import type { Metadata } from 'next'
+import { privatePage } from '@/lib/seo'
 import { getAllCourses } from '@/lib/content/course-source'
 import { CourseDashboard } from '@/components/course/CourseDashboard'
 
-export const metadata: Metadata = {
-  title: 'My learning',
-  robots: { index: false, follow: false },
-}
+export const metadata: Metadata = privatePage('My learning')
 
 export default function DashboardPage() {
   const courses = getAllCourses()
