@@ -114,6 +114,21 @@ test.describe('content formats', () => {
     const peek = page.getByTestId('key-ideas-peek')
     await expect(peek).toBeVisible()
     await expect(peek.locator('li')).not.toHaveCount(0)
+
+    // ติ๊กเองต้องไม่ใช่ประตู — ติ๊กครบแล้วต้องยังไม่มีอะไรถูกปลดล็อกหรือถูกกั้น
+    // (self-report ไม่ใช่หลักฐาน มีแต่ checkpoint ที่นับว่าพิสูจน์แล้ว)
+    const items = peek.getByTestId('self-check-item')
+    const total = await items.count()
+    for (let i = 0; i < total; i++) await items.nth(i).click()
+    await expect(page.getByTestId('peek-verdict')).toContainText('prove it and move on')
+    await expect(page.getByTestId('test-out')).toBeEnabled()
+    await expect(page.getByTestId('skip-lesson')).toBeEnabled()
+
+    // กล่องสรุปท้ายบทต้องนับให้เห็น และ quiz ต้องเข้าถึงได้โดยไม่ต้องติ๊กครบก่อน
+    await expect(page.getByTestId('takeaway-count')).toContainText(`0 / ${total}`)
+    await expect(page.getByTestId('checkpoint')).toBeVisible()
+    await page.getByTestId('key-takeaway-list').getByTestId('self-check-item').first().click()
+    await expect(page.getByTestId('takeaway-count')).toContainText(`1 / ${total}`)
     // capstone ข้ามไม่ได้ จึงไม่มีแถบนี้เลย
     await page.goto(`${COURSE}/lessons/formats-hands-on`)
     await expect(page.getByTestId('peek-key-ideas')).toHaveCount(0)

@@ -70,7 +70,7 @@
 
   /* พื้นหลังของหน้าปกคอร์ส — ตัวที่ทำให้สีประจำตัวได้โผล่จริงบนหน้า */
   --cs-cover-wash: linear-gradient(135deg, rgba(56, 189, 248, 0.24) 0%, rgba(56, 189, 248, 0.08) 48%, rgba(10, 108, 158, 0.14) 100%);
-  --cs-hero-wash: radial-gradient(1100px 460px at 50% -14%, rgba(56, 189, 248, 0.14) 0%, rgba(56, 189, 248, 0.045) 46%, rgba(56, 189, 248, 0) 72%);
+  --cs-hero-wash: radial-gradient(1100px 400px at 50% 42%, rgba(56, 189, 248, 0.13) 0%, rgba(56, 189, 248, 0.04) 46%, rgba(56, 189, 248, 0) 70%);
 }
 
 :root[data-theme='dark'] {
@@ -108,7 +108,7 @@
   --cs-shadow-feature: 0 4px 14px rgba(0, 0, 0, 0.5), 0 28px 60px -24px rgba(0, 0, 0, 0.8);
 
   --cs-cover-wash: linear-gradient(135deg, rgba(56, 189, 248, 0.2) 0%, rgba(56, 189, 248, 0.06) 46%, rgba(125, 211, 252, 0.08) 100%);
-  --cs-hero-wash: radial-gradient(1100px 460px at 50% -14%, rgba(56, 189, 248, 0.09) 0%, rgba(56, 189, 248, 0.03) 46%, rgba(56, 189, 248, 0) 72%);
+  --cs-hero-wash: radial-gradient(1100px 400px at 50% 42%, rgba(56, 189, 248, 0.085) 0%, rgba(56, 189, 248, 0.028) 46%, rgba(56, 189, 248, 0) 70%);
 }
 
 html {
@@ -162,6 +162,14 @@ body {
   box-shadow: var(--cs-shadow-feature), 0 0 0 1px var(--cs-accent-border);
 }
 
+/* กล่องสรุปท้ายบท — ต้องอ่านออกทันทีว่า "ไม่ใช่หมายเหตุข้างทาง"
+   callout ใช้พื้นสีอ่อน มน 16px ตัวเล็ก · กล่องนี้ใช้พื้นขาว เงาลึก มน 24px
+   บวกแถบสีประจำตัวด้านซ้ายที่ callout ไม่มี
+   ต้องประกาศหลัง .card-feature เพราะ @apply border ในนั้นจะทับ utility border-l-* */
+.card-takeaway {
+  border-left: 5px solid rgb(var(--cs-accent-fill));
+}
+
 /* หน้าปกคอร์ส — สีประจำตัวได้ที่ยืนจริงบนหน้า */
 .cover-wash {
   background-image: var(--cs-cover-wash);
@@ -185,12 +193,16 @@ body {
 .hero-bleed::before {
   content: '';
   position: absolute;
+  /* กล่องของแสงต้อง "ใหญ่กว่า" เนื้อหาเสมอ ไม่ใช่ height: 100% —
+     ถ้ากล่องสูงเท่าเนื้อหา ตัวไล่สีจะถูกตัดที่ขอบกล่องทั้งที่ยังไม่จางหมด
+     กลายเป็นเส้นตัดแนวนอนชัดๆ ที่อ่านออกว่า "หน้าถูกแบ่งครึ่ง"
+     ความสูงคงที่ + จัดกลาง = การจางจบภายในกล่อง จึงไม่มีขอบด้านไหนเลย */
   left: 50%;
-  top: 0;
+  top: 50%;
   z-index: 0;
   width: 100vw;
-  height: 100%;
-  transform: translateX(-50%);
+  height: 880px;
+  transform: translate(-50%, -50%);
   background-image: var(--cs-hero-wash);
   pointer-events: none;
 }

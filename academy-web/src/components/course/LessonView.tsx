@@ -24,6 +24,63 @@ import { LessonBody } from './LessonBody'
 
 type Mode = 'learn' | 'test-out' | 'skipped'
 
+// รายการติ๊กเองสำหรับผู้เรียน — ตั้งใจให้ "ไม่ใช่ประตู"
+//
+// ติ๊กครบแล้วปลดล็อกให้ข้าม/ให้เริ่ม quiz คือการเอา self-report มาทำหน้าที่หลักฐาน
+// ซึ่งขัดกับหลักของ product เองที่ว่า "ข้ามไม่เคยนับว่าพิสูจน์แล้ว มีแต่ checkpoint
+// ที่นับ" และคนที่ติ๊กครบเร็วที่สุดมักเป็นคนที่รู้น้อยที่สุด
+// ประโยชน์จริงของมันคือทำให้ผู้เรียน "หยุดคิดทีละข้อ" ก่อนตัดสินใจ — active recall
+// ซึ่งได้ผลกว่าการกวาดตาอ่านซ้ำ จึงให้มันบอกผลลัพธ์ ไม่ให้มันกั้นทาง
+function SelfCheckList({
+  items,
+  checked,
+  onToggle,
+  testId,
+  size,
+}: {
+  items: string[]
+  checked: Set<number>
+  onToggle: (index: number) => void
+  testId: string
+  size: 'sm' | 'md'
+}) {
+  return (
+    <ul className={size === 'md' ? 'space-y-1' : 'space-y-0.5'} data-testid={testId}>
+      {items.map((item, i) => {
+        const on = checked.has(i)
+        return (
+          <li key={i}>
+            <button
+              type="button"
+              role="checkbox"
+              aria-checked={on}
+              onClick={() => onToggle(i)}
+              data-testid="self-check-item"
+              className={`flex w-full items-start gap-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-cs-surface-2 ${
+                size === 'md' ? 'text-[0.95rem] leading-relaxed' : 'text-sm leading-relaxed'
+              } ${on ? 'text-cs-text' : 'text-cs-body'}`}
+            >
+              <span
+                aria-hidden="true"
+                className={`mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] border-2 transition-colors ${
+                  on ? 'border-cs-accent bg-cs-accent text-cs-on-accent' : 'border-cs-border-2 bg-transparent'
+                }`}
+              >
+                {on && (
+                  <svg viewBox="0 0 12 12" className="h-2.5 w-2.5" fill="none" stroke="currentColor" strokeWidth="2.4">
+                    <path d="M2 6.2 4.7 9 10 3.2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </span>
+              <span>{item}</span>
+            </button>
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
+
 export function LessonView({
   structure,
   node,
@@ -47,6 +104,18 @@ export function LessonView({
   const [mode, setMode] = useState<Mode>('learn')
   const [done, setDone] = useState<null | 'completed' | 'tested-out' | 'skipped'>(null)
   const [peeking, setPeeking] = useState(false)
+  // เก็บไว้ในหน่วยความจำของหน้าเท่านั้น — เป็นเครื่องช่วยคิดของผู้เรียน ไม่ใช่หลักฐาน
+  // จึงไม่ต้อง persist และไม่ควรไปปนกับ record ที่บอกว่าอะไรผ่านแล้ว
+  const [known, setKnown] = useState<Set<number>>(() => new Set())
+  const [recalled, setRecalled] = useState<Set<number>>(() => new Set())
+
+  function toggle(set: (fn: (prev: Set<number>) => Set<number>) => void, index: number) {
+    set((prev) => {
+      const next = new Set(prev)
+      if (!next.delete(index)) next.add(index)
+      return next
+    })
+  }
 
   useEffect(() => {
     const store = browserCourseStore()
@@ -182,20 +251,24 @@ export function LessonView({
 
       {mode === 'learn' && !done && canSkip(node) && (
         <div className="rounded-control border border-cs-border bg-cs-surface px-4 py-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <p className="text-sm text-cs-muted">Already know this?</p>
-            {/* ต้องเห็นสาระของบทก่อนถึงจะตัดสินได้จริง — ชื่อบทกับหนึ่งประโยค
-                ไม่พอให้ใครบอกได้ว่าตัวเองรู้แล้วหรือยัง */}
-            <button
-              type="button"
-              onClick={() => setPeeking((v) => !v)}
-              data-testid="peek-key-ideas"
-              aria-expanded={peeking}
-              className="rounded-control px-2 py-1 text-sm font-medium text-cs-accent underline underline-offset-4 transition-colors hover:text-cs-text"
-            >
-              {peeking ? 'Hide what it covers' : 'See what it covers'}
-            </button>
-            <span className="ml-auto flex flex-wrap gap-2">
+          {/* จัดเป็นสองฝั่งชัดเจน (คำถาม | ทางเลือก) แทนการดัน ml-auto —
+              พอจอแคบแล้ว ml-auto จะทิ้งช่องว่างไว้ฝั่งซ้ายของแถวที่สอง ทำให้ดูเหลื่อม */}
+          <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-3">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <p className="text-sm text-cs-muted">Already know this?</p>
+              {/* ต้องเห็นสาระของบทก่อนถึงจะตัดสินได้จริง — ชื่อบทกับหนึ่งประโยค
+                  ไม่พอให้ใครบอกได้ว่าตัวเองรู้แล้วหรือยัง */}
+              <button
+                type="button"
+                onClick={() => setPeeking((v) => !v)}
+                data-testid="peek-key-ideas"
+                aria-expanded={peeking}
+                className="rounded-control px-1 py-1 text-sm font-medium text-cs-accent underline underline-offset-4 transition-colors hover:text-cs-text"
+              >
+                {peeking ? 'Hide what it covers' : 'See what it covers'}
+              </button>
+            </div>
+            <span className="flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={() => setMode('test-out')}
@@ -216,16 +289,37 @@ export function LessonView({
           </div>
 
           {peeking && (
-            <ul className="mt-3 space-y-1.5 border-t border-cs-border pt-3" data-testid="key-ideas-peek">
-              {lesson.cheatsheet.map((item, i) => (
-                <li key={i} className="flex gap-2.5 text-sm leading-relaxed text-cs-body">
-                  <span aria-hidden="true" className="mt-0.5 font-mono text-cs-accent">
-                    ·
-                  </span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
+            <div className="mt-3 border-t border-cs-border pt-3">
+              <p className="mb-2.5 text-xs text-cs-muted">
+                Tick anything you could already explain. It is only here to help you decide — the checkpoint is what
+                counts as proven.
+              </p>
+              <SelfCheckList
+                items={lesson.cheatsheet}
+                checked={known}
+                onToggle={(i) => toggle(setKnown, i)}
+                testId="key-ideas-peek"
+                size="sm"
+              />
+              {known.size > 0 && (
+                <p className="mt-3 text-sm text-cs-body" data-testid="peek-verdict">
+                  {known.size === lesson.cheatsheet.length ? (
+                    <>
+                      You marked all {lesson.cheatsheet.length}. Then the checkpoint should be quick —{' '}
+                      <span className="font-medium text-cs-text">prove it and move on</span> keeps it on your map as
+                      proven, which skipping does not.
+                    </>
+                  ) : (
+                    <>
+                      <span className="font-medium text-cs-text">
+                        {lesson.cheatsheet.length - known.size} of {lesson.cheatsheet.length}
+                      </span>{' '}
+                      are still new to you. That is the part this lesson adds.
+                    </>
+                  )}
+                </p>
+              )}
+            </div>
           )}
         </div>
       )}
@@ -266,24 +360,44 @@ export function LessonView({
 
           {/* จังหวะปิดการอ่าน: สรุปสิ่งที่เพิ่งอ่านก่อนจะเจอคำถาม
               เดิมอ่านจบแล้วเจอ quiz ทันทีซึ่งกระโดดเกินไป และไม่มีโอกาสทบทวน */}
+          {/* ต้องดูไม่เหมือน callout — callout คือหมายเหตุข้างทาง (กล่องสีอ่อน มน 16px
+              ตัวเล็ก) ส่วนกล่องนี้คือชิ้นเอกของหน้า จึงใช้ card-feature (พื้นขาว เงาลึก
+              มน 24px) + แถบสีประจำตัวด้านซ้าย + ตัวหนังสือใหญ่ขึ้น เดิมทั้งสองใช้
+              accent-dim + accent-border เหมือนกันเป๊ะ จึงกลืนกันจริงตามที่ทัก */}
           {!done && (
-            <section className="mt-14 rounded-feature border border-cs-accent-border bg-cs-accent-dim p-6 sm:p-7">
-              <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-cs-accent">
-                That is the lesson
+            <section
+              className="card-feature card-takeaway mt-14 overflow-hidden p-6 sm:p-8"
+              data-testid="key-takeaways"
+            >
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-cs-accent">That is the lesson</p>
+                  <h2 className="mt-1.5 font-display text-2xl font-semibold text-cs-text">Key ideas to keep</h2>
+                </div>
+                <span
+                  className="shrink-0 rounded-full bg-cs-accent-fill px-3 py-1 font-mono text-xs font-semibold text-cs-on-accent"
+                  data-testid="takeaway-count"
+                >
+                  {recalled.size} / {lesson.cheatsheet.length}
+                </span>
+              </div>
+              <p className="mt-3 text-sm text-cs-muted">
+                Tick each one you could explain right now without scrolling back. What you leave unticked is where a
+                re-read pays off.
               </p>
-              <h2 className="mt-2 font-display text-xl font-semibold text-cs-text">Key ideas to keep</h2>
-              <ul className="mt-4 space-y-2">
-                {lesson.cheatsheet.map((item, i) => (
-                  <li key={i} className="flex gap-3 text-sm leading-relaxed text-cs-body">
-                    <span aria-hidden="true" className="mt-0.5 font-mono text-cs-accent">
-                      ·
-                    </span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-5 border-t border-cs-accent-border pt-4 text-sm text-cs-muted">
-                When you are ready, a few questions below confirm it stuck.
+              <div className="mt-5 border-t border-cs-border pt-5">
+                <SelfCheckList
+                  items={lesson.cheatsheet}
+                  checked={recalled}
+                  onToggle={(i) => toggle(setRecalled, i)}
+                  testId="key-takeaway-list"
+                  size="md"
+                />
+              </div>
+              <p className="mt-5 border-t border-cs-border pt-4 text-sm text-cs-body">
+                {recalled.size === lesson.cheatsheet.length
+                  ? 'All of them. The checkpoint below should feel like a formality — that is the point.'
+                  : 'When you are ready, a few questions below confirm it stuck.'}
               </p>
             </section>
           )}
@@ -310,6 +424,14 @@ export function LessonView({
 
       {!done && (mode === 'learn' || mode === 'test-out') && (
         <div className="pt-2">
+        {/* เรื่องเลื่อนกลับไปอ่าน: ไม่ล็อก เพราะล็อกไม่ได้จริง (เปิดอีกแท็บก็จบ) และ
+            การล็อกทำให้ระบบดูไม่ไว้ใจผู้เรียน สิ่งที่ช่วยจริงคือบอกตรงๆ ว่าการเปิดดู
+            ให้ผลอะไร — ตอบจากความจำคือสิ่งเดียวที่บอกได้ว่า "รู้" ไม่ใช่ "หาเจอ" */}
+        <p className="mb-3 text-sm text-cs-muted">
+          {mode === 'test-out' || isCapstone
+            ? 'Answer from memory — the lesson is still above you, but looking something up tells you the answer, not whether you knew it.'
+            : 'Answer from memory if you can. Getting one wrong here is useful information, not a penalty.'}
+        </p>
         <CheckpointQuiz
           questions={lesson.checkpoint}
           requireAllCorrect={mode === 'test-out' || isCapstone}
