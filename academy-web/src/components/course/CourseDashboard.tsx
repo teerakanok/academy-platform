@@ -23,7 +23,7 @@ import { RadarChart } from './RadarChart'
 // ความคืบหน้าเป็น "จุดต่อบทเรียน" ไม่ใช่แถบ — แถบที่ 0% คือเส้นจางที่มองไม่เห็น
 // และไม่บอกอะไรเลย ส่วนจุดบอกได้ทันทีว่าคอร์สยาวแค่ไหนและเดินไปถึงไหน
 // คอร์สที่ยาวมากกลับไปใช้แถบ เพราะจุด 50 จุดอ่านไม่ออก
-const MAX_DOTS = 16
+const MAX_DOTS = 12
 
 function LessonProgress({
   structure,
@@ -55,7 +55,7 @@ function LessonProgress({
 
       {useDots ? (
         <ul
-          className="flex flex-wrap gap-1.5"
+          className="flex flex-wrap gap-1 sm:gap-1.5"
           role="progressbar"
           aria-valuenow={provenPercent}
           aria-valuemin={0}
@@ -69,12 +69,12 @@ function LessonProgress({
             return (
               <li
                 key={node.id}
-                className={`h-2.5 w-2.5 rounded-full ${
+                className={`h-2.5 w-2.5 rounded-full transition-colors ${
                   isProven
                     ? 'bg-cs-accent-fill'
                     : isSkipped
                       ? 'border border-dashed border-cs-border-2 bg-transparent'
-                      : 'border border-cs-border-2 bg-cs-surface-sunken'
+                      : 'bg-cs-border-2/70'
                 }`}
               />
             )
@@ -145,12 +145,12 @@ export function CourseDashboard({ courses }: { courses: DashboardCourse[] }) {
 
   return (
     <div className="space-y-12">
-      <header>
+      <header className="hero-bleed pb-2">
         <p className="font-mono text-xs uppercase tracking-[0.14em] text-cs-accent">My learning</p>
-        <h1 className="mt-3 font-display text-[2.5rem] font-semibold leading-[1.08] tracking-tight text-cs-text sm:text-5xl">
+        <h1 className="mt-3 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-cs-text sm:text-5xl">
           {resume ? 'Pick up where you left off' : 'Start something today'}
         </h1>
-        <p className="mt-3 max-w-2xl text-[1.0625rem] leading-relaxed text-cs-body">
+        <p className="mt-3 max-w-2xl text-lg leading-relaxed text-cs-body">
           Your progress is saved in this browser. Sign-in and cross-device sync arrive with learner accounts.
         </p>
       </header>
@@ -163,10 +163,10 @@ export function CourseDashboard({ courses }: { courses: DashboardCourse[] }) {
 
       {resume && resumeNode && (
         <section
-          className="card-feature hero-wash relative overflow-hidden p-7 sm:p-8"
+          className="card-feature hero-wash relative overflow-hidden p-6 sm:p-8"
           data-testid="resume-card"
         >
-          <div className="relative flex flex-wrap items-end justify-between gap-6">
+          <div className="relative flex flex-col items-stretch gap-5 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
             <div className="min-w-0">
               <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-cs-accent">Continue</p>
               <h2 className="mt-2 font-display text-2xl font-semibold leading-snug text-cs-text sm:text-3xl">
@@ -178,7 +178,7 @@ export function CourseDashboard({ courses }: { courses: DashboardCourse[] }) {
             </div>
             <Link
               href={`/courses/${resume.course.structure.slug}/lessons/${resumeNode.id}`}
-              className="shrink-0 rounded-control bg-cs-accent-fill px-6 py-3 text-sm font-semibold text-cs-on-accent shadow-card transition-transform duration-200 hover:-translate-y-0.5"
+              className="shrink-0 rounded-control bg-cs-accent-fill px-6 py-3 text-center text-sm font-semibold text-cs-on-accent shadow-card transition-transform duration-200 hover:-translate-y-0.5 sm:text-left"
             >
               Continue lesson
             </Link>
@@ -190,7 +190,7 @@ export function CourseDashboard({ courses }: { courses: DashboardCourse[] }) {
         <h2 id="courses-heading" className="mb-4 font-display text-2xl font-semibold text-cs-text">
           Courses
         </h2>
-        <ul className="grid gap-4 sm:grid-cols-2">
+        <ul className="grid gap-4 md:grid-cols-2">
           {courses.map((course) => {
             const state = stateFor(course.structure.slug)
             const summary = summarise(course.structure, state)
@@ -205,7 +205,7 @@ export function CourseDashboard({ courses }: { courses: DashboardCourse[] }) {
                   <CourseCover
                     structure={course.structure}
                     state={state}
-                    className="h-[132px] border-b border-cs-border transition-transform duration-300 group-hover:scale-[1.03]"
+                    className="h-32 border-b border-cs-border transition-transform duration-300 group-hover:scale-[1.03] md:h-[152px]"
                   />
 
                   <div className="p-6">
@@ -241,7 +241,7 @@ export function CourseDashboard({ courses }: { courses: DashboardCourse[] }) {
         </ul>
       </section>
 
-      <section className="card-feature p-6 sm:p-7" aria-labelledby="skills-heading">
+      <section className="card-feature p-6 sm:p-8" aria-labelledby="skills-heading">
         <h2 id="skills-heading" className="sr-only">
           Skill map
         </h2>

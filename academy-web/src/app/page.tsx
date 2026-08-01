@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { WaitlistForm } from '@/components/WaitlistForm'
 import { getAllCourses } from '@/lib/content/course-source'
+import { CourseCover } from '@/components/course/CourseCover'
 import { consentText, CURRENT_CONSENT_VERSION } from '@/lib/consent'
 
 // Landing — Academy ยืนได้ด้วยตัวเอง คนมาถึงหน้านี้โดยไม่เคยรู้จัก CYBERSKILLS ก็ได้
@@ -11,9 +12,9 @@ export default function HomePage() {
 
   return (
     <div className="mx-auto max-w-5xl px-6">
-      <section className="hero-wash -mx-6 rounded-feature px-6 pt-20 pb-14 sm:pt-28">
-        <p className="font-mono text-xs uppercase tracking-[0.16em] text-cs-accent">Learn security properly</p>
-        <h1 className="mt-4 max-w-3xl font-display text-[3rem] font-semibold leading-[1.05] tracking-tight text-cs-text sm:text-[4.25rem]">
+      <section className="hero-bleed pt-20 pb-16 sm:pt-28">
+        <p className="font-mono text-xs uppercase tracking-[0.14em] text-cs-accent">Learn security properly</p>
+        <h1 className="mt-4 max-w-3xl font-display text-5xl font-semibold leading-[1.05] tracking-tight text-cs-text sm:text-7xl">
           Stop relearning what you already know.
         </h1>
         <p className="mt-5 max-w-2xl text-lg leading-relaxed text-cs-body">
@@ -23,14 +24,14 @@ export default function HomePage() {
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
             href="/dashboard"
-            className="rounded-control bg-cs-accent-fill px-7 py-3.5 text-sm font-semibold text-cs-on-accent shadow-card transition-transform duration-200 hover:-translate-y-0.5"
+            className="rounded-control bg-cs-accent-fill px-6 py-3 text-sm font-semibold text-cs-on-accent shadow-card transition-transform duration-200 hover:-translate-y-0.5"
           >
             Browse courses
           </Link>
           {courses[0] && (
             <Link
               href={`/courses/${courses[0].structure.slug}`}
-              className="rounded-control border border-cs-border bg-cs-surface px-7 py-3.5 text-sm font-medium text-cs-body transition-colors hover:border-cs-accent hover:text-cs-accent"
+              className="rounded-control border border-cs-border bg-cs-surface px-6 py-3 text-sm font-medium text-cs-body transition-colors duration-200 hover:border-cs-accent hover:text-cs-accent"
             >
               Start {courses[0].copy.title}
             </Link>
@@ -65,15 +66,25 @@ export default function HomePage() {
           <h2 id="catalog-heading" className="mb-5 font-display text-2xl font-semibold text-cs-text">
             Available now
           </h2>
-          <ul className="grid gap-4 sm:grid-cols-2">
+          <ul className="grid gap-4 md:grid-cols-2">
             {courses.map((course) => (
               <li key={course.structure.slug}>
-                <Link href={`/courses/${course.structure.slug}`} className="card-interactive block h-full p-6">
-                  <span className="font-mono text-[11px] uppercase tracking-wide text-cs-accent">
-                    {course.structure.level} · {Math.round(course.structure.estimatedMinutes / 60)}h
-                  </span>
-                  <h3 className="mt-2 font-display text-lg font-semibold text-cs-text">{course.copy.title}</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-cs-body">{course.copy.subtitle}</p>
+                <Link
+                  href={`/courses/${course.structure.slug}`}
+                  className="card-feature card-interactive group block h-full overflow-hidden"
+                >
+                  {/* คอร์สเดียวกันต้องหน้าตาเหมือนกันทุกที่ที่ปรากฏ */}
+                  <CourseCover
+                    structure={course.structure}
+                    className="h-32 border-b border-cs-border transition-transform duration-300 group-hover:scale-[1.03] md:h-[152px]"
+                  />
+                  <div className="p-6">
+                    <span className="font-mono text-[11px] uppercase tracking-wide text-cs-accent">
+                      {course.structure.level} · {Math.round(course.structure.estimatedMinutes / 60)}h
+                    </span>
+                    <h3 className="mt-2 font-display text-xl font-semibold text-cs-text">{course.copy.title}</h3>
+                    <p className="mt-1.5 text-sm leading-relaxed text-cs-body">{course.copy.subtitle}</p>
+                  </div>
                 </Link>
               </li>
             ))}

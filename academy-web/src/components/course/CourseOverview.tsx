@@ -46,7 +46,7 @@ export function CourseOverview({
 
   return (
     <div className="space-y-12">
-      <header className="hero-wash -mx-6 rounded-feature px-6 pt-8 pb-10">
+      <header className="hero-bleed pt-6 pb-10">
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-full bg-cs-accent-fill px-2.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-cs-on-accent">
             {structure.level}
@@ -93,7 +93,7 @@ export function CourseOverview({
             <Link
               href={`/courses/${structure.slug}/lessons/${next.id}`}
               data-testid="start-or-continue"
-              className="rounded-control bg-cs-accent-fill px-7 py-3.5 text-sm font-semibold text-cs-on-accent shadow-card transition-transform duration-200 hover:-translate-y-0.5"
+              className="rounded-control bg-cs-accent-fill px-6 py-3 text-sm font-semibold text-cs-on-accent shadow-card transition-transform duration-200 hover:-translate-y-0.5"
             >
               {summary.completed + summary.testedOut + summary.skipped > 0 ? 'Continue' : 'Start the first lesson'}
             </Link>
@@ -106,7 +106,7 @@ export function CourseOverview({
                 setRecord(emptyProgress(structure.slug))
               }}
               data-testid="reset-course"
-              className="rounded-control border border-cs-border bg-cs-surface px-5 py-3.5 text-sm text-cs-muted transition-colors hover:border-cs-amber hover:text-cs-amber"
+              className="rounded-control border border-cs-border bg-cs-surface px-6 py-3 text-sm text-cs-muted transition-colors duration-200 hover:border-cs-amber hover:text-cs-amber"
             >
               Reset my progress
             </button>

@@ -3,13 +3,25 @@
   "slug": "content-formats-demo",
   "version": "1.0.0",
   "defaultLocale": "en",
-  "availableLocales": ["en"],
+  "availableLocales": [
+    "en"
+  ],
   "level": "beginner",
   "estimatedMinutes": 24,
+  "coverMotif": "layers",
   "skills": [
-    { "id": "reading", "maxScore": 100 },
-    { "id": "references", "maxScore": 100 },
-    { "id": "hands-on", "maxScore": 100 }
+    {
+      "id": "reading",
+      "maxScore": 100
+    },
+    {
+      "id": "references",
+      "maxScore": 100
+    },
+    {
+      "id": "hands-on",
+      "maxScore": 100
+    }
   ],
   "globalSkillWeights": {
     "foundations": 0.5,
@@ -21,21 +33,32 @@
       "kind": "lesson",
       "prerequisites": [],
       "estimatedMinutes": 8,
-      "skillWeights": { "reading": 4 }
+      "skillWeights": {
+        "reading": 4
+      }
     },
     {
       "id": "formats-references",
       "kind": "lesson",
-      "prerequisites": ["formats-reading"],
+      "prerequisites": [
+        "formats-reading"
+      ],
       "estimatedMinutes": 6,
-      "skillWeights": { "references": 4 }
+      "skillWeights": {
+        "references": 4
+      }
     },
     {
       "id": "formats-hands-on",
       "kind": "capstone",
-      "prerequisites": ["formats-references"],
+      "prerequisites": [
+        "formats-references"
+      ],
       "estimatedMinutes": 10,
-      "skillWeights": { "hands-on": 5, "reading": 1 }
+      "skillWeights": {
+        "hands-on": 5,
+        "reading": 1
+      }
     }
   ]
 }

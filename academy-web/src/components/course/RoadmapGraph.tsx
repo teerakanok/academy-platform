@@ -23,7 +23,16 @@ import {
 // Done กับ Proven ใช้ "สีเดียวกันคนละน้ำหนัก" โดยตั้งใจ — ทั้งคู่แปลว่าปลอดภัยแล้ว
 // ต่างกันแค่เส้นทางที่มา (เรียนจบ vs พิสูจน์ผ่าน) การใช้คนละสีจะสื่อผิดว่าเป็นคนละพวก
 // และไม่มีสีไหนแยกจากฟ้าได้จริงในสายตา deuteran อยู่ดี — ตัวแยกจริงคือไอคอน + ป้าย
-const STATUS_META: Record<NodeStatus, { label: string; icon: string; marker: string }> = {
+// แม่กุญแจวาดเป็น SVG ไม่ใช้ emoji — emoji มีสีของตัวเอง (ทอง) ซึ่งเป็นสีเดียว
+// บนหน้าที่ไม่อยู่ในระบบสี และเด่นผิดที่โดยเฉพาะบนธีมมืด
+const LockGlyph = () => (
+  <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth={2}>
+    <rect x={5} y={11} width={14} height={9} rx={2} />
+    <path d="M8 11V8a4 4 0 0 1 8 0v3" strokeLinecap="round" />
+  </svg>
+)
+
+const STATUS_META: Record<NodeStatus, { label: string; icon: React.ReactNode; marker: string }> = {
   completed: {
     label: 'Done',
     icon: '✓',
@@ -51,7 +60,7 @@ const STATUS_META: Record<NodeStatus, { label: string; icon: string; marker: str
   },
   locked: {
     label: 'Locked',
-    icon: '🔒',
+    icon: <LockGlyph />,
     marker: 'bg-cs-surface-2 text-cs-faint border-cs-border',
   },
 }

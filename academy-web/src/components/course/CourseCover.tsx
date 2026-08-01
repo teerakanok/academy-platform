@@ -1,4 +1,5 @@
 import type { CourseStructure } from '@/lib/content/course-types'
+import { CoverMotif } from './CoverMotif'
 import { EMPTY_STATE, layoutRoadmap, type LearnerCourseState } from '@/lib/course/roadmap'
 
 // หน้าปกคอร์ส = แผนที่เส้นทางของคอร์สนั้นเอง
@@ -47,10 +48,16 @@ export function CourseCover({
 
   return (
     <div className={`cover-wash relative overflow-hidden ${className}`} aria-hidden="true">
+      {/* สองโซนที่ไม่ทับกัน: ขวา = ลายบอกหัวข้อ (คอร์สนี้เรื่องอะไร) ·
+          ซ้าย/กลาง = แผนที่จริง (เส้นทางหน้าตาแบบไหน)
+          เคยวางลายทับกลางแผนที่แล้วอ่านไม่ออกทั้งคู่ */}
+      <div className="pointer-events-none absolute inset-y-0 -right-3 flex w-[30%] items-center justify-center">
+        <CoverMotif motif={structure.coverMotif ?? 'layers'} />
+      </div>
       <svg
         viewBox={`${minX - PAD} ${minY - PAD} ${maxX - minX + PAD * 2} ${maxY - minY + PAD * 2}`}
         preserveAspectRatio="xMidYMid meet"
-        className="block h-full w-full"
+        className="relative block h-full w-[70%]"
       >
         {layout.edges.map((edge) => {
           const from = toCover(edge.fromX, edge.fromY)

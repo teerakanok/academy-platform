@@ -11,6 +11,10 @@
 
 export type Locale = 'en' | 'th'
 
+/** ลายพื้นหลังของหน้าปก — บอก "คอร์สนี้เรื่องอะไร" แยกจากรูปร่างเส้นทาง
+ *  (กราฟโหนดอย่างเดียวทำให้คอร์สคนละเรื่องที่ยาวพอกันดูเหมือนกัน) */
+export type CoverMotif = 'terminal' | 'logs' | 'shield' | 'cloud' | 'probe' | 'layers'
+
 export type LessonNodeKind =
   /** บทเรียนปกติ — ข้ามได้ (พร้อมรับ cheatsheet) */
   | 'lesson'
@@ -58,6 +62,8 @@ export interface CourseStructure {
   level: 'beginner' | 'intermediate' | 'advanced'
   estimatedMinutes: number
   skills: CourseSkill[]
+  /** ลายพื้นหลังหน้าปก — ไม่ระบุ = layers */
+  coverMotif?: CoverMotif
   /** คอร์สนี้ป้อนทักษะระดับ ecosystem ตัวไหนบ้าง (ใช้กับ radar ภาพรวม) */
   globalSkillWeights: Record<string, number>
   nodes: CourseNode[]

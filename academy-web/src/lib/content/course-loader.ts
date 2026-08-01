@@ -50,6 +50,7 @@ const structureSchema = z.object({
   level: z.enum(['beginner', 'intermediate', 'advanced']),
   estimatedMinutes: z.number().positive(),
   skills: z.array(z.object({ id: z.string().min(1), maxScore: z.number().positive() })).min(1),
+  coverMotif: z.enum(['terminal', 'logs', 'shield', 'cloud', 'probe', 'layers']).optional(),
   globalSkillWeights: z.record(z.string(), z.number().positive()),
   nodes: z.array(nodeSchema).min(1),
 })

@@ -69,7 +69,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
 
         <header className="sticky top-0 z-40 border-b border-cs-border bg-cs-bg/85 backdrop-blur">
-          <div className="mx-auto flex max-w-6xl items-center gap-6 px-6 py-3.5">
+          <div className="mx-auto flex max-w-6xl items-center gap-3 px-5 py-3.5 sm:gap-6 sm:px-6">
             <Link href="/" className="flex items-center gap-2.5">
               {/* โลโก้ canonical จาก cyberskills-web/public/redesign/logos — ห้ามวาดใหม่ */}
               <Image
@@ -80,20 +80,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 priority
                 className="shrink-0"
               />
-              <span className="font-display text-lg font-semibold tracking-tight text-cs-text">
+              {/* ห้ามตัดบรรทัด — ที่ 390px เคยแตกเป็นสองแถวจนดูเหมือนหน้าพัง */}
+              <span className="whitespace-nowrap font-display text-base font-semibold tracking-tight text-cs-text sm:text-lg">
                 CyberSkills <span className="text-cs-accent">Academy</span>
               </span>
             </Link>
-            <nav aria-label="Main" className="ml-auto flex items-center gap-1 text-sm">
+            <nav aria-label="Main" className="ml-auto flex items-center gap-0.5 text-[13px] sm:gap-1 sm:text-sm">
               <Link
                 href="/dashboard"
-                className="rounded-lg px-3 py-1.5 text-cs-muted transition-colors hover:bg-cs-surface-2 hover:text-cs-text"
+                className="whitespace-nowrap rounded-lg px-2.5 py-1.5 text-cs-muted transition-colors hover:bg-cs-surface-2 hover:text-cs-text sm:px-3"
               >
                 My learning
               </Link>
               <Link
                 href="/player"
-                className="rounded-lg px-3 py-1.5 text-cs-muted transition-colors hover:bg-cs-surface-2 hover:text-cs-text"
+                className="whitespace-nowrap rounded-lg px-2.5 py-1.5 text-cs-muted transition-colors hover:bg-cs-surface-2 hover:text-cs-text sm:px-3"
               >
                 Practice
               </Link>
