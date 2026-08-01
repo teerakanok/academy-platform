@@ -4,6 +4,9 @@
 > นี่คือการรันบน **workerd** ซึ่งเป็น runtime ตัวเดียวกับที่ Cloudflare ใช้จริง
 > ไม่ใช่ Node ปกติ สิ่งที่เห็นตรงนี้จึงเป็นตัวแทนของ production ได้
 
+> **ตอนนี้เปิดรออยู่แล้วที่ http://127.0.0.1:8788** — ถ้าเปิดแล้วไม่ขึ้น
+> แปลว่า wrangler ถูกปิดไป ให้รันข้อ 3 ใหม่
+
 ## เปิดยังไง
 
 ต้องมีสามอย่างรันอยู่ ตามลำดับนี้
@@ -20,6 +23,9 @@ cd products/cyberskills/academy-platform/academy-web
 # 3) รันบน runtime ของ Cloudflare
 ./node_modules/.bin/wrangler dev --port 8788 --local
 ```
+
+**บทที่อยากให้ลองที่สุดตอนนี้:** คอร์ส *Content formats* → บท **Set it up yourself**
+โจทย์จำลองหน้าจอตั้งค่า IP จริง สองโจทย์บนหน้าจอเดียวกันที่คำตอบตรงข้ามกัน
 
 เปิด **http://127.0.0.1:8788**
 
@@ -59,8 +65,12 @@ cd products/cyberskills/academy-platform/academy-web
 - **lab ของจริง** — ตอนนี้เป็นโครงว่าง ตัว lab plane มาใน M4
 - **ใบรับรองที่ออกได้จริง** — กติกาว่าใครมีสิทธิ์ทำแล้ว แต่ยังไม่ได้ออกเป็นเอกสาร
   (ต้องมีชื่อจริง + หน้า verify ก่อน)
-- **ยังไม่ deploy ขึ้น Cloudflare จริง** — ต้องใช้ account ของคุณ + ต้องเอา schema
-  `academy` ขึ้น Pool A ก่อน (ดู `PENDING_USER_ACTION.md`)
+- **deploy ขึ้น Cloudflare แล้ว** แต่เป็นหน้าร้านอย่างเดียว:
+  https://cyberskills-academy.songpon-te.workers.dev
+  ระบบบัญชีปิดอยู่ (prod ยังไม่มี schema `academy` และรอ session identity เคาะ)
+  หน้า sign-in จึงขึ้นว่า "ยังไม่เปิด" แทนที่จะโชว์ฟอร์มที่กดแล้วพัง
+  ⚠️ deploy ต้องใช้ `npm run deploy:cf` เท่านั้น — build ตรงๆ จะพา env ของเครื่อง
+  dev ติดไปด้วย (เคยพลาดมาแล้ว บันทึกไว้ใน src/lib/auth/enabled.ts)
 
 ## ถ้าอะไรพัง
 
