@@ -185,7 +185,10 @@ email เอง**
       พร้อมต่อจริงเท่านั้น**
 - [ ] adapter ตัวจริงที่คุยกับ Identity Control (รอ P3 provider/persistence + release gates)
 
-#### ⚠️ ข้อขัดที่ต้องตัดสิน
+#### ⚠️ ข้อขัดสองข้อ — **session identity เป็นคนตัดสิน Academy ปรับตาม** (founder 2026-08-01)
+
+Academy จะไม่แก้สองข้อนี้เอง และไม่แตะ Pool A เพื่อแก้มัน แค่ส่งข้อมูลให้ session
+identity ตัดสิน แล้วรอรับผลกลับมาปรับ
 - **Academy ถือ `SUPABASE_SERVICE_ROLE_KEY` ของ Pool A** ซึ่งเป็น shared service-role
   ที่ทิศทางระบุว่า "ห้ามถือ" — ใช้เขียนสคีมา `academy` ของตัวเอง
   ทางแก้: สร้าง Postgres role เฉพาะที่ grant แค่สคีมา `academy` แล้วให้ Academy ถือ
