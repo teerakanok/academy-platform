@@ -15,6 +15,9 @@ const eslintConfig = [
       'playwright-report/**',
       // runtime scratch ของ supabase CLI + config CommonJS — ไม่ใช่ code ของ app
       'supabase/.temp/**',
+      // ผลลัพธ์ของ adapter Cloudflare (bundle ของ Next + vendor) — ไม่ใช่ code ที่เราเขียน
+      '.open-next/**',
+      '.wrangler/**',
       'tailwind.config.js',
     ],
   },

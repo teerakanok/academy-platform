@@ -1,48 +1,54 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs'
-import { join } from 'node:path'
 import { loadCourseCopy, loadCourseStructure, loadLesson } from './course-loader'
+import { COURSE_REGISTRY } from './registry.generated'
 import type { Course, CourseStructure, LessonContent, Locale } from './course-types'
 
-// อ่านคอร์สจากดิสก์ฝั่ง server — โครงเป็นกลางทางภาษา ส่วนข้อความอ่านตาม locale
-// ที่ขอ และถ้าภาษานั้นยังไม่มีบทนั้น จะ fallback ไป defaultLocale แบบ "บอกให้รู้"
-// ไม่ใช่แอบสลับเงียบๆ (ผู้เรียนต้องรู้ว่ากำลังอ่านภาษาอะไรอยู่)
+// อ่านคอร์สจาก registry ที่ผูกเข้ามาตอน build — ไม่ใช่จากดิสก์ตอน request
+//
+// เดิมใช้ readFileSync/readdirSync ซึ่ง (ก) รันบน runtime ที่ไม่มี filesystem ไม่ได้
+// (พิสูจน์กับ Cloudflare Workers แล้ว: `fs.readFileSync is not implemented`)
+// (ข) ทำให้เนื้อหาผิดรูปไปโผล่ตอนผู้ใช้เปิดหน้า แทนที่จะทำ build แดงตั้งแต่แรก
+// เนื้อหาเป็นไฟล์นิ่งใน git อยู่แล้ว การอ่านจากดิสก์จึงไม่เคยจำเป็น
+//
+// โครงเป็นกลางทางภาษา ส่วนข้อความอ่านตาม locale ที่ขอ และถ้าภาษานั้นยังไม่มีบทนั้น
+// จะ fallback ไป defaultLocale แบบ "บอกให้รู้" ไม่ใช่แอบสลับเงียบๆ
 //
 // หมายเหตุที่มา: คอร์สนี้เขียนขึ้นใน repo นี้เพื่อพิสูจน์ประสบการณ์การเรียน —
 // ที่ authoring จริงของเนื้อหาคือ Crucible ซึ่งต้องผลิต shape เดียวกันนี้ส่งมา
 
-const CONTENT_ROOT = process.env.ACADEMY_COURSE_DIR ?? join(process.cwd(), 'content', 'courses')
+type LocaleBucket = { __copy: unknown } & Record<string, unknown>
+type CourseBucket = { __structure: unknown } & Record<string, LocaleBucket>
 
-function readJson(path: string): unknown {
-  return JSON.parse(readFileSync(path, 'utf8'))
-}
-
+const registry = COURSE_REGISTRY as unknown as Record<string, CourseBucket>
 const structureCache = new Map<string, CourseStructure>()
 
+function localeBucket(slug: string, locale: string): LocaleBucket | null {
+  const course = registry[slug]
+  if (!course) return null
+  const bucket = course[locale]
+  return bucket && typeof bucket === 'object' ? bucket : null
+}
+
 export function listCourseSlugs(): string[] {
-  if (!existsSync(CONTENT_ROOT)) return []
-  return readdirSync(CONTENT_ROOT, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name)
-    .sort()
+  return Object.keys(registry).sort()
 }
 
 export function getCourseStructure(slug: string): CourseStructure | null {
   const cached = structureCache.get(slug)
   if (cached) return cached
-  const file = join(CONTENT_ROOT, slug, 'course.json')
-  if (!existsSync(file)) return null
-  const structure = loadCourseStructure(`${slug}/course.json`, readJson(file))
+  const raw = registry[slug]?.__structure
+  if (!raw) return null
+  const structure = loadCourseStructure(`${slug}/course.json`, raw)
   structureCache.set(slug, structure)
   return structure
 }
 
-function lessonPath(slug: string, locale: Locale, nodeId: string): string {
-  return join(CONTENT_ROOT, slug, 'locales', locale, 'lessons', `${nodeId}.json`)
+function rawLesson(slug: string, locale: Locale, nodeId: string): unknown {
+  return localeBucket(slug, locale)?.[nodeId] ?? null
 }
 
 /** node ที่มีเนื้อหาแปลครบในภาษานี้จริง */
 export function translatedNodeIds(structure: CourseStructure, locale: Locale): string[] {
-  return structure.nodes.filter((node) => existsSync(lessonPath(structure.slug, locale, node.id))).map((n) => n.id)
+  return structure.nodes.filter((node) => rawLesson(structure.slug, locale, node.id)).map((n) => n.id)
 }
 
 export function getCourse(slug: string, requested?: Locale): Course | null {
@@ -51,9 +57,9 @@ export function getCourse(slug: string, requested?: Locale): Course | null {
   const locale: Locale =
     requested && structure.availableLocales.includes(requested) ? requested : structure.defaultLocale
 
-  const copyFile = join(CONTENT_ROOT, slug, 'locales', locale, 'course.json')
-  if (!existsSync(copyFile)) return null
-  const copy = loadCourseCopy(`${slug}/locales/${locale}/course.json`, readJson(copyFile), structure)
+  const rawCopy = localeBucket(slug, locale)?.__copy
+  if (!rawCopy) return null
+  const copy = loadCourseCopy(`${slug}/locales/${locale}/course.json`, rawCopy, structure)
 
   return { structure, copy, locale, translatedNodeIds: translatedNodeIds(structure, locale) }
 }
@@ -72,9 +78,9 @@ export function getLesson(slug: string, nodeId: string, requested?: Locale): Res
     requested && structure.availableLocales.includes(requested) ? requested : structure.defaultLocale
 
   for (const locale of [requestedLocale, structure.defaultLocale]) {
-    const file = lessonPath(slug, locale, nodeId)
-    if (!existsSync(file)) continue
-    const lesson = loadLesson(`${slug}/locales/${locale}/lessons/${nodeId}.json`, readJson(file), structure)
+    const raw = rawLesson(slug, locale, nodeId)
+    if (!raw) continue
+    const lesson = loadLesson(`${slug}/locales/${locale}/lessons/${nodeId}.json`, raw, structure)
     return { lesson, servedLocale: locale, requestedLocale }
   }
   return null

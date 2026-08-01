@@ -96,6 +96,27 @@ validation ต่อ course เป็นรอบ pitch + poll ของ founder
   payment gateway ไทย (DD เลือก vendor ตอนนั้น) + commit Cloudflare Stream +
   custom player (ห้าม iframe embed ตามเงื่อนไขที่ล็อก)
 
+### Hosting — ยังไม่ตัดสิน (พิสูจน์แล้วว่าไปได้ทั้งสองทาง 2026-08-01)
+
+founder ถามเรื่องย้าย frontend ไป Cloudflare — **ข้อเท็จจริงสำคัญ: ยังไม่เคย deploy
+ขึ้น Vercel เลย** จึงไม่ใช่การย้าย แต่คือการเลือกก่อนลงครั้งแรก ต้นทุนตอนนี้ ≈ ศูนย์
+
+พิสูจน์ด้วยการ build + รันบน workerd จริงในเครื่อง (`wrangler dev`):
+- ตอนแรกพัง 3 หน้า ด้วยสาเหตุเดียว: `fs.readFileSync is not implemented`
+- **แก้ที่ต้นเหตุแล้ว** — เนื้อหาผูกเข้ามาตอน build ผ่าน `registry.generated.ts`
+  (`scripts/generate-content-registry.mjs` + เทสกันล้าสมัย) ไม่มีการอ่านดิสก์ตอน
+  request อีก **ได้ประโยชน์ไม่ว่าจะเลือกทางไหน**
+- ผลล่าสุด: ทุกหน้า 200 บน workerd พร้อมเนื้อหาจริง · `next/og` ใช้ได้ ·
+  worker 2.2 KB + assets 1.8 MB (เพดานฟรี 3 MiB)
+- `src/lib/content/source.ts` (engine ของ /player ที่เป็น internal-only) ยังอ่าน
+  ดิสก์อยู่ — ไม่แก้เพราะ /player ห้าม deploy public อยู่แล้ว **ถ้าจะขึ้น Cloudflare
+  จริงต้องกันเส้นทางนี้ออกจาก bundle หรือแปลงให้เหมือนกัน**
+
+ยังไม่ตัดสิน เพราะข้อที่เหลือไม่ใช่เรื่องเทคนิค: **DB อยู่กรุงเทพที่เดียว** หน้าร้าน
+เป็น static/SSG หมด (edge ชนะขาด) แต่หน้าที่ล็อกอินแล้วต้องคุย DB ข้ามทวีป
+→ ต้องวัดจริงหลัง M3 มี progress ลง DB แล้ว ไม่ใช่เดา (Smart Placement อาจช่วย
+แต่ยังไม่ยืนยัน)
+
 ### Launch gates (ยังมีผลระหว่าง build)
 
 - Rename currency ก่อน public launch · Crucible capacity assessment ก่อน commit

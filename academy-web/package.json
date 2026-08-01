@@ -6,6 +6,7 @@
     "node": "24.x"
   },
   "scripts": {
+    "prebuild": "node scripts/generate-content-registry.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -27,6 +28,7 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.12.1",
     "@eslint/eslintrc": "^3.3.6",
+    "@opennextjs/cloudflare": "^1.20.2",
     "@playwright/test": "^1.62.1",
     "@types/node": "^24.13.3",
     "@types/pg": "^8.20.0",
@@ -40,6 +42,7 @@
     "supabase": "^2.111.0",
     "tailwindcss": "^3.4.19",
     "typescript": "^5.9.3",
-    "vitest": "^3.2.7"
+    "vitest": "^3.2.7",
+    "wrangler": "^4.118.0"
   }
 }

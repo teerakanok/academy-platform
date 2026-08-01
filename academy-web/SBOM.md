@@ -10,10 +10,12 @@
 | package | range | resolved | หน้าที่ |
 |---|---|---|---|
 | @cyberskills/tokens | `file:packages/tokens` | local | design tokens (vendored local package) |
+| @opennextjs/cloudflare | `^1.20.2` | 1.20.2 | adapter รัน Next.js บน Cloudflare Workers (ยังเป็นตัวเลือก — ดู reports/reviews) |
 | @supabase/supabase-js | `^2.111.0` | 2.111.0 | DB client (server-only, service role) |
 | next | `^15.5.22` | 15.5.22 | framework (App Router) |
 | react | `^18.3.1` | 18.3.1 | UI runtime |
 | react-dom | `^18.3.1` | 18.3.1 | UI runtime (DOM) |
+| wrangler | `^4.118.0` | 4.118.0 | CLI ของ Cloudflare Workers — ใช้ build/รันทดสอบบน workerd จริงในเครื่อง |
 | zod | `^4.4.3` | 4.4.3 | input validation ที่ API boundary |
 
 ## Dev dependencies
