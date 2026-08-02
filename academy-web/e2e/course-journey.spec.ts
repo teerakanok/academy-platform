@@ -3,7 +3,10 @@ import { mkdirSync } from 'node:fs'
 import { join } from 'node:path'
 
 // เดินเส้นทางผู้เรียนจริงตั้งแต่ต้น: เรียน → ตอบคำถามกลางวิดีโอ → ผ่าน checkpoint
-// → พิสูจน์ข้ามบท (test out) → ข้ามบทพร้อมสรุป → กลับมาดูแผนที่ที่สถานะเปลี่ยนจริง
+// → ข้ามบทพร้อมสรุป → กลับมาดูแผนที่ที่สถานะเปลี่ยนจริง
+//
+// หมายเหตุ: เส้นทาง "พิสูจน์ข้ามบท" (test-out) เคยอยู่ในเทสนี้ แต่ถูกปิดทั้งคอร์ส
+// ตั้งแต่ W0-3 (assessment-policy) จนกว่าจะมีคลังข้อแยกสำหรับโหมดวัดผล
 //
 // ทดสอบพฤติกรรมที่ founder ขอโดยตรง: pop quiz บนวิดีโอ, กันกรอข้าม, node สถานะ
 // ต่างๆ บนแผนที่, capstone ที่ข้ามไม่ได้ และ spider chart ที่ขยับตามของจริง
@@ -39,7 +42,7 @@ test.describe('learner journey through a course', () => {
     await expect(page.getByTestId('video-cue-progress')).toContainText('1/3')
   })
 
-  test('full route: learn → test out → skip, and the map + radar reflect all three', async ({ page }) => {
+  test('full route: learn → skip, and the map + radar reflect both', async ({ page }) => {
     test.setTimeout(180_000)
 
     // 1) บทแรก: เรียนจบผ่าน checkpoint
@@ -88,7 +91,7 @@ test.describe('learner journey through a course', () => {
     // บทที่ยังไม่ถึงต้องยังล็อกอยู่
     await expect(page.getByTestId('node-permissions')).toHaveAttribute('data-status', 'locked')
 
-    // การข้ามไม่นับเป็น "พิสูจน์แล้ว" — 2 จาก 10
+    // การข้ามไม่นับเป็นบทที่ทำจบ — 2 จาก 10
     await expect(page.getByTestId('course-summary')).toContainText('2/10 lessons done')
     await expect(page.getByTestId('course-summary')).toContainText('1 skipped')
 

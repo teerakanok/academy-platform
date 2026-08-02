@@ -98,7 +98,7 @@ describe('บทถัดไปและสรุปความคืบหน�
     expect(nextNode(structure, done)).toBeNull()
   })
 
-  it('การข้ามนับเป็นความคืบหน้าแต่ไม่นับว่าพิสูจน์แล้ว', () => {
+  it('การข้ามนับเป็นความคืบหน้าในเส้นทาง แต่ไม่นับเป็นบทที่ทำจบ', () => {
     const s = summarise(structure, { ...EMPTY_STATE, completed: ['a'], skipped: ['b'], testedOut: ['c'] })
     expect(s.finishedPercent).toBe(50) // a + c จาก 4
     expect(s.coveragePercent).toBe(75) // รวม b ที่ข้าม

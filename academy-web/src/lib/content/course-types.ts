@@ -64,14 +64,21 @@ export interface CourseNode {
   /** node ที่ต้องผ่านก่อน — ทำให้ทั้งคอร์สเป็น DAG ไม่ใช่เส้นตรง */
   prerequisites: string[]
   estimatedMinutes: number
-  /** node นี้เพิ่มทักษะอะไรบ้าง (คีย์ต้องมีใน course.skills) */
+  /** node นี้ครอบคลุมทักษะอะไรบ้าง (คีย์ต้องมีใน course.skills) */
   skillWeights: Record<string, number>
   video?: LessonVideo
 }
 
 export interface CourseSkill {
   id: string
-  /** ระดับเต็มของทักษะนี้ในคอร์ส — ใช้เป็นตัวหารของ radar */
+  /**
+   * น้ำหนักรวมของทักษะนี้ในคอร์ส — ใช้เป็นตัวหารของ radar
+   *
+   * ⚠️ radar บอก **ความครอบคลุม** (เดินผ่านบทที่แตะทักษะนี้ไปเท่าไร) ไม่ใช่ระดับ
+   * ความสามารถที่พิสูจน์แล้ว — หลักฐานอยู่ที่ด่านบังคับเท่านั้น (W0-3) ·
+   * ชื่อ field ยังเป็น `maxScore` เพราะเป็นสัญญาของไฟล์เนื้อหาทุกคอร์ส การ rename
+   * ต้องแก้ JSON ทุกไฟล์พร้อมกัน จึงแยกเป็นงานของตัวเองเมื่อมีเหตุให้แตะ schema
+   */
   maxScore: number
 }
 

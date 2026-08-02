@@ -110,7 +110,7 @@ describe('การคำนวณทักษะ', () => {
     expect(data.every((d) => d.notStarted)).toBe(true)
   })
 
-  it('การข้ามไม่เพิ่มทักษะ — แผนภูมิต้องไม่โกหกเจ้าของ', () => {
+  it('การข้ามไม่นับเป็นความครอบคลุม — แผนภูมิต้องไม่โกหกเจ้าของ', () => {
     const skipped = courseSkillData(course.structure, course.copy.skillLabels, {
       ...EMPTY_STATE,
       skipped: course.structure.nodes.map((n) => n.id),

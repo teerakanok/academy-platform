@@ -116,7 +116,8 @@ test.describe('content formats', () => {
     await expect(peek.locator('li')).not.toHaveCount(0)
 
     // ติ๊กเองต้องไม่ใช่ประตู — ติ๊กครบแล้วต้องยังไม่มีอะไรถูกปลดล็อกหรือถูกกั้น
-    // (self-report ไม่ใช่หลักฐาน มีแต่ checkpoint ที่นับว่าพิสูจน์แล้ว)
+    // (การบอกเองไม่เคยขยับสถานะ มีแต่ checkpoint ที่ขยับ · ส่วนหลักฐานที่
+    //  ใบรับรองอ้างถึงคือด่านบังคับเท่านั้น — W0-3)
     const items = peek.getByTestId('self-check-item')
     const total = await items.count()
     for (let i = 0; i < total; i++) await items.nth(i).click()
