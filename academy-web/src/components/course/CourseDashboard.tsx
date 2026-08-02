@@ -47,7 +47,9 @@ function LessonProgress({
     <div>
       <div className="mb-2 flex items-center justify-between text-xs">
         <span className="font-medium text-cs-text" data-testid={testId}>
-          {!loaded ? '—' : provenPercent > 0 ? `${provenPercent}% proven` : 'Not started yet'}
+          {/* "proven" สงวนไว้ให้ด่านวัดผลเท่านั้นตั้งแต่ W0-3 — ตัวเลขนี้คือ
+              ความคืบหน้าของบทเรียน */}
+          {!loaded ? '—' : provenPercent > 0 ? `${provenPercent}% done` : 'Not started yet'}
         </span>
         {skipped > 0 && <span className="text-cs-muted">{skipped} skipped</span>}
       </div>

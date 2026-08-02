@@ -148,8 +148,11 @@ export function CourseOverview({
           <h2 id="roadmap-heading" className="font-display text-2xl font-semibold text-cs-text">
             Your route through this course
           </h2>
+          {/* ⚠️ เดิมเขียนว่า "proven" ซึ่งไม่จริงตั้งแต่ W0-3 — ตัวเลขนี้นับบทที่เดิน
+              ผ่านแล้ว (รวมบทปกติที่ไล่ลองจนผ่านได้) · คำว่าพิสูจน์แล้วสงวนไว้ให้
+              ด่านวัดผลบนการ์ดใบรับรองเท่านั้น */}
           <p className="font-mono text-xs text-cs-muted" data-testid="course-summary">
-            {summary.completed + summary.testedOut}/{summary.total} proven
+            {summary.completed + summary.testedOut}/{summary.total} lessons done
             {summary.skipped > 0 ? ` · ${summary.skipped} skipped` : ''}
           </p>
         </div>
@@ -234,7 +237,7 @@ export function CourseOverview({
       </section>
 
       <section className="card-feature p-6">
-        <RadarChart data={skills} title="What you have proven in this course" testId="course-radar" />
+        <RadarChart data={skills} title="What you have covered in this course" testId="course-radar" />
       </section>
     </div>
   )

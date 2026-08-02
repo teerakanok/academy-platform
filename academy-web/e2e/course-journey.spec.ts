@@ -89,7 +89,7 @@ test.describe('learner journey through a course', () => {
     await expect(page.getByTestId('node-permissions')).toHaveAttribute('data-status', 'locked')
 
     // การข้ามไม่นับเป็น "พิสูจน์แล้ว" — 2 จาก 10
-    await expect(page.getByTestId('course-summary')).toContainText('2/10 proven')
+    await expect(page.getByTestId('course-summary')).toContainText('2/10 lessons done')
     await expect(page.getByTestId('course-summary')).toContainText('1 skipped')
 
     // radar ต้องมีข้อมูลแล้ว (ไม่ใช่สถานะว่างเปล่า)
@@ -105,7 +105,7 @@ test.describe('learner journey through a course', () => {
     // 5) dashboard ต้องเห็นความคืบหน้าและปุ่มเรียนต่อ
     await page.goto('/dashboard')
     await expect(page.getByTestId('resume-card')).toBeVisible()
-    await expect(page.getByTestId('course-progress-basic-os-linux')).toContainText('20% proven')
+    await expect(page.getByTestId('course-progress-basic-os-linux')).toContainText('20% done')
     await page.screenshot({
       path: join(ARTIFACT_DIR, 'dashboard-in-progress-desktop-1440.png'),
       fullPage: true,
