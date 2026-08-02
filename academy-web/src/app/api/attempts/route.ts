@@ -2,11 +2,11 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { currentUser } from '@/lib/auth/session'
 import { getCourseStructure } from '@/lib/content/course-source'
-import { CHECKPOINT_CHALLENGE_ID, buildAttemptParams, cryptoPick, toPublicQuestions } from '@/lib/course/attempt'
+import { CHECKPOINT_CHALLENGE_ID, buildAttemptParams, cryptoPick } from '@/lib/course/attempt'
 import { getLessonAnswerKey, mcqItems, simulationItems } from '@/lib/content/answer-key'
 import { requiresAttempt } from '@/lib/course/assessment-policy'
 import { issueAttempt, nextAttemptAt } from '@/lib/course/attempt-db'
-import { toPublicSimulation, type AttemptSimulation } from '@/lib/content/public-lesson'
+import { toPublicSimulation } from '@/lib/content/public-lesson'
 import { resolveChallenge, rollVariables } from '@/lib/simulation/variables'
 import type { SimulationChallenge } from '@/lib/simulation/types'
 import { readBoundedBody } from '@/lib/http/bounded-body'
@@ -122,19 +122,22 @@ export async function POST(request: Request) {
     // โจทย์จำลองที่แทนค่าตัวแปรของ attempt นี้แล้ว — ยังผ่าน toPublicSimulation
     // เหมือนเดิม จึงไม่มี operator/value/hints ติดไปกับ response · ประกาศชนิดไว้
     // เพื่อให้ลืมฟิลด์ใดฟิลด์หนึ่ง (เช่น `kind`) เป็น error ตอนคอมไพล์ ไม่ใช่ด่านหายเงียบๆ
-    // รูป public ของโจทย์ชุดเดียวกับที่เก็บใน params — ไม่มี operator/value/hints
-    const simulations: AttemptSimulation[] = resolvedSims.map((sim) => ({
-      kind: 'simulation',
-      id: sim.id,
-      challenge: toPublicSimulation(sim.challenge),
-    }))
-
+    // ⚠️ ตอบจาก `issued.params` ไม่ใช่ `params` ที่เพิ่งสร้าง
+    //
+    // ถ้าผู้เรียนมีใบที่ยังไม่ถูกใช้อยู่แล้ว (เปิดหน้าซ้ำ / response ครั้งก่อนหายกลางทาง)
+    // DB จะคืนใบเดิมมา — ตอบด้วยชุดที่เพิ่งสุ่มจะกลายเป็นโจทย์ใหม่คู่กับเฉลยเก่า
+    // ทันที (0010) · attempt หนึ่งใบถือทุกอย่างที่ใช้แสดงและตรวจงานของตัวเอง
+    const stored = issued.params
     return NextResponse.json({
       ok: true,
       attemptId: issued.attemptId,
       expiresAt: issued.expiresAt,
-      questions: toPublicQuestions(bank, params),
-      simulations,
+      questions: stored.questions,
+      simulations: (stored.simulations ?? []).map((sim) => ({
+        kind: 'simulation' as const,
+        id: sim.id,
+        challenge: toPublicSimulation(sim.challenge),
+      })),
     })
   } catch (err) {
     console.error('[api/attempts] ออก attempt ไม่สำเร็จ:', err)

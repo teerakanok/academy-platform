@@ -75,6 +75,7 @@ async function issueWithVars(userId = learner.id) {
   expect(challenge, 'แทนค่าตัวแปรไม่ครบ').not.toBeNull()
   const params: AttemptParams = {
     questionIds: [],
+    questions: [],
     keyMaps: {},
     answerKeys: {},
     simulations: [{ id: 'sim-1', challenge: challenge! }],

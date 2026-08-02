@@ -29,6 +29,14 @@ export function attemptQuota(): number {
 export interface IssuedAttempt {
   attemptId: string
   expiresAt: string
+  /**
+   * params ที่ **เก็บอยู่จริง** ของใบนี้ — อาจไม่ใช่ชุดที่เพิ่งส่งเข้าไป
+   *
+   * ถ้าผู้เรียนมีใบที่ยังไม่ถูกใช้อยู่แล้ว (เปิดหน้าซ้ำ / response หายกลางทาง)
+   * ฟังก์ชันใน DB จะคืนใบเดิม — ผู้เรียกต้องเรนเดอร์จากชุดนี้เท่านั้น ไม่งั้นหน้าจะ
+   * แสดงโจทย์ใหม่คู่กับเฉลยเก่า (ดู 0010)
+   */
+  params: AttemptParams
 }
 
 export interface ConsumedAttempt {
@@ -69,9 +77,9 @@ export async function issueAttempt(
     p_window_minutes: ATTEMPT_WINDOW_MINUTES,
   })
   if (error) throw new Error(`ออก attempt ไม่สำเร็จ: ${error.message}`)
-  const row = (data as { attempt_id: string; expires_at: string }[] | null)?.[0]
+  const row = (data as { attempt_id: string; expires_at: string; params: AttemptParams }[] | null)?.[0]
   if (!row) return null
-  return { attemptId: row.attempt_id, expiresAt: row.expires_at }
+  return { attemptId: row.attempt_id, expiresAt: row.expires_at, params: row.params }
 }
 
 /**

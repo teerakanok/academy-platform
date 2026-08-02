@@ -149,3 +149,36 @@ test.describe('การรอโจทย์ของ attempt', () => {
     await expect(failed).toHaveCount(0)
   })
 })
+
+test.describe('เปิดหน้าซ้ำ', () => {
+  // RIL cross-model รอบ 2 ข้อ 4: ทุก reload เคยออก attempt ใหม่ · ผู้เรียนที่ตอบไป
+  // ครึ่งทางแล้วเผลอ refresh สามครั้งใน 30 นาที เจอ 429 ทั้งที่ยังไม่เคยกดส่งเลย
+  test('🔴 refresh หลายครั้งต้องได้โจทย์ใบเดิม ไม่กินโควตา', async ({ page }) => {
+    const seen: string[] = []
+    page.on('response', async (r) => {
+      if (r.url().includes('/api/attempts') && r.request().method() === 'POST' && r.ok()) {
+        seen.push(((await r.json()) as { attemptId: string }).attemptId)
+      }
+    })
+
+    // เก็บ "โจทย์ที่เห็นจริงบนหน้าจอ" ทุกครั้ง ไม่ใช่แค่ id ของใบ
+    const targets: string[] = []
+    const prompts: string[] = []
+    for (let i = 0; i < 4; i++) {
+      await page.goto(LESSON_URL)
+      const sim = page.getByTestId('checkpoint-sim-sim-1')
+      await expect(sim).toBeVisible()
+      const target = /192\.168\.10\.\d+/.exec((await sim.textContent()) ?? '')?.[0]
+      expect(target, 'โจทย์บนหน้าจอไม่มีค่าเป้าหมาย').toBeTruthy()
+      targets.push(target!)
+      prompts.push((await page.getByTestId('checkpoint-q-cp-1').textContent()) ?? '')
+    }
+
+    expect(seen.length, 'ต้องขอ attempt ครบทุกครั้งที่โหลด').toBe(4)
+    expect(new Set(seen).size, 'ทุกครั้งต้องได้ใบเดิม').toBe(1)
+    // ⚠️ ข้อที่สำคัญกว่า id: **เนื้อโจทย์ต้องเป็นชุดเดิม** — ถ้าตอบด้วยชุดที่เพิ่งสุ่มใหม่
+    // ผู้เรียนจะเห็นโจทย์ใหม่คู่กับเฉลยเก่าที่เก็บไว้ใน attempt (mutation จับได้ตรงนี้)
+    expect(new Set(targets).size, 'ค่าเป้าหมายต้องไม่เปลี่ยนระหว่าง refresh').toBe(1)
+    expect(new Set(prompts).size, 'ตัวเลือกของ MCQ ต้องไม่สลับระหว่าง refresh').toBe(1)
+  })
+})

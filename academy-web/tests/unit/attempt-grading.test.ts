@@ -24,7 +24,7 @@ function challenge(value: string): SimulationChallenge {
 const fromContent: SimulationSet = [{ id: 'sim-1', challenge: challenge('192.168.10.99') }]
 
 function params(simulations?: SimulationSet): AttemptParams {
-  return { questionIds: [], keyMaps: {}, answerKeys: {}, simulations }
+  return { questionIds: [], questions: [], keyMaps: {}, answerKeys: {}, simulations }
 }
 
 describe('simulationsToGrade', () => {

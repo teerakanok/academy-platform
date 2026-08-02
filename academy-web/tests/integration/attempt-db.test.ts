@@ -26,6 +26,7 @@ const ISS = 'https://attempt-test.local'
 const COURSE = 'attempt-test-course'
 const SAMPLE_PARAMS: AttemptParams = {
   questionIds: ['q1'],
+  questions: [],
   keyMaps: { q1: { A: 'B', B: 'A' } },
   answerKeys: { q1: ['B'] },
 }
@@ -72,6 +73,8 @@ describe('issue_attempt', () => {
 
   it('ออก attempt ผูกกับผู้ใช้ เป็น uuid ที่ไม่ซ้ำ และหมดอายุใน ~60 นาที', async () => {
     const a = await issueAttempt(ctx('n-issue'), SAMPLE_PARAMS, '1.0.0')
+    // ใบใหม่จะออกก็ต่อเมื่อใบเดิมถูกใช้ไปแล้ว (0010 — เปิดหน้าซ้ำไม่กินโควตา)
+    await consumeAttempt(ctx('n-issue'), a!.attemptId)
     const b = await issueAttempt(ctx('n-issue'), SAMPLE_PARAMS, '1.0.0')
     expect(a).not.toBeNull()
     expect(b).not.toBeNull()
@@ -82,9 +85,10 @@ describe('issue_attempt', () => {
     expect(ttlMs).toBeGreaterThan(55 * 60_000)
     expect(ttlMs).toBeLessThan(65 * 60_000)
 
+    // ตรวจแถวของใบที่ **ยังไม่ถูกใช้** (b) — ใบ a ถูก consume ไปแล้วในเทสนี้เอง
     const row = await withDb((db) =>
       db.query(`select user_id, challenge_version, consumed_at from academy.attempt where attempt_id = $1`, [
-        a!.attemptId,
+        b!.attemptId,
       ]),
     )
     expect(row.rows[0].user_id).toBe(owner.id)
@@ -93,8 +97,12 @@ describe('issue_attempt', () => {
   })
 
   it(`โควตา: ครั้งที่ ${QUOTA + 1} ในหน้าต่างเวลาถูกปฏิเสธ — และตัวนับอยู่ใน DB ไม่ใช่ memory`, async () => {
+    // ⚠️ ต้อง consume ระหว่างทาง เพราะตั้งแต่ 0010 ใบที่ยังไม่ถูกใช้จะถูกคืนซ้ำ
+    // (เปิดหน้าซ้ำไม่กินโควตา) · หนึ่งช่องโควตา = หนึ่งชุดโจทย์ที่ **ถูกใช้จริง**
     for (let i = 0; i < QUOTA; i++) {
-      expect(await issueAttempt(ctx('n-quota'), SAMPLE_PARAMS, '1.0.0')).not.toBeNull()
+      const issued = await issueAttempt(ctx('n-quota'), SAMPLE_PARAMS, '1.0.0')
+      expect(issued).not.toBeNull()
+      await consumeAttempt(ctx('n-quota'), issued!.attemptId)
     }
     // แต่ละ call ของ issueAttempt สร้าง client ใหม่ (academyDb() ต่อใหม่ทุกครั้ง) —
     // การที่ครั้งที่ 4 ยังถูกปฏิเสธพิสูจน์ว่าตัวนับอยู่ในแถวของ DB ไม่ใช่ state ของ process
@@ -103,18 +111,35 @@ describe('issue_attempt', () => {
     expect(await issueAttempt(ctx('n-quota-other'), SAMPLE_PARAMS, '1.0.0')).not.toBeNull()
   })
 
-  it('โควตากันยิงพร้อมกัน: ยิงเกินโควตาพร้อมกันแล้วออกได้ไม่เกินเพดาน', async () => {
+  it('ยิงขอพร้อมกันหลายเส้น → ได้ใบเดียวกันทุกเส้น ไม่ใช่คนละใบ', async () => {
+    // สองแท็บเปิดพร้อมกันคือเคสจริง · ก่อน 0010 แต่ละเส้นได้ใบของตัวเองและกินคนละช่อง
+    // (สาม refresh = โควตาหมด ทั้งที่ยังไม่เคยกดส่ง) · ตอนนี้ทุกเส้นต้องได้ใบเดียวกัน
     const results = await Promise.all(
       Array.from({ length: QUOTA + 3 }, () =>
         issueAttempt(ctx('n-quota-race'), SAMPLE_PARAMS, '1.0.0'),
       ),
     )
-    expect(results.filter((r) => r !== null)).toHaveLength(QUOTA)
+    const ids = new Set(results.filter((r) => r !== null).map((r) => r!.attemptId))
+    expect(results.every((r) => r !== null)).toBe(true)
+    expect(ids.size, 'ขอพร้อมกันแล้วต้องได้ใบเดียว').toBe(1)
+  })
+
+  it('โควตากันยิงพร้อมกัน: ใช้ครบเพดานแล้วขอใหม่พร้อมกันต้องไม่ทะลุ', async () => {
+    for (let i = 0; i < QUOTA; i++) {
+      const issued = await issueAttempt(ctx('n-quota-burn'), SAMPLE_PARAMS, '1.0.0')
+      await consumeAttempt(ctx('n-quota-burn'), issued!.attemptId)
+    }
+    const after = await Promise.all(
+      Array.from({ length: 3 }, () => issueAttempt(ctx('n-quota-burn'), SAMPLE_PARAMS, '1.0.0')),
+    )
+    expect(after.filter((r) => r !== null)).toHaveLength(0)
   })
 
   it('หน้าต่างเวลาเลื่อนจริง: attempt ที่แก่กว่า 30 นาทีไม่ถูกนับ โควตาเปิดใหม่', async () => {
     for (let i = 0; i < QUOTA; i++) {
-      expect(await issueAttempt(ctx('n-window'), SAMPLE_PARAMS, '1.0.0')).not.toBeNull()
+      const issued = await issueAttempt(ctx('n-window'), SAMPLE_PARAMS, '1.0.0')
+      expect(issued).not.toBeNull()
+      await consumeAttempt(ctx('n-window'), issued!.attemptId)
     }
     expect(await issueAttempt(ctx('n-window'), SAMPLE_PARAMS, '1.0.0')).toBeNull()
     // ย้อนเวลาแถวทั้งหมดให้พ้นหน้าต่าง 30 นาที — ครั้งถัดไปต้องออกได้อีก

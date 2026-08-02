@@ -21,6 +21,14 @@ export const CHECKPOINT_CHALLENGE_ID = 'checkpoint'
 export interface AttemptParams {
   /** ข้อที่สุ่มมาใช้ครั้งนี้ เรียงตามลำดับที่แสดง */
   questionIds: string[]
+  /**
+   * โจทย์ MCQ ที่ **เรนเดอร์ได้เลย** (remap key แล้ว ไม่มีเฉลย) — snapshot เช่นกัน
+   *
+   * เหตุผลเดียวกับ `simulations`: attempt หนึ่งใบต้องมีทุกอย่างที่ใช้แสดงและตรวจงาน
+   * ของตัวเอง · ถ้าประกอบจากไฟล์ตอนแสดงผล การเปิดหน้าซ้ำ (ซึ่งคืนใบเดิม) จะได้
+   * ข้อความจากไฟล์ปัจจุบันคู่กับตาราง remap ของใบเก่า = โจทย์กับเฉลยคนละชุด
+   */
+  questions: PublicAttemptQuestion[]
   /** ต่อข้อ: key ที่ client เห็น → key จริงในไฟล์คอร์ส */
   keyMaps: Record<string, Record<string, string>>
   /**
@@ -89,7 +97,14 @@ export function buildAttemptParams(bank: readonly CheckpointQuestion[], serveCou
     keyMaps[q.id] = map
     answerKeys[q.id] = [...q.correct]
   }
-  return { questionIds: sampled.map((q) => q.id), keyMaps, answerKeys }
+  const params: AttemptParams = {
+    questionIds: sampled.map((q) => q.id),
+    questions: [],
+    keyMaps,
+    answerKeys,
+  }
+  params.questions = toPublicQuestions(sampled, params)
+  return params
 }
 
 /** รูปที่ส่งให้ client: ข้อความตัวเลือกอยู่ใต้ key ตามตาราง remap ของ attempt นี้ */

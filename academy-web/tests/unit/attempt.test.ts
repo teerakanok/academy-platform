@@ -106,6 +106,7 @@ describe('toPublicQuestions', () => {
     expect(() =>
       toPublicQuestions(bank, {
         questionIds: ['ghost'],
+        questions: [],
         keyMaps: { ghost: { A: 'A' } },
         answerKeys: { ghost: ['A'] },
       }),
