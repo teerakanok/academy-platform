@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { ContentValidationError } from './loader'
 import type { CourseCopy, CourseStructure, LessonContent } from './course-types'
+import { placeholdersIn } from '@/lib/simulation/variables'
 
 // Validation ของโครงคอร์ส — นอกจากชนิดข้อมูล ต้องกันความพังเชิงความหมายที่ทำให้
 // ผู้เรียนติดตาย: prerequisite ชี้ node ที่ไม่มี, กราฟวน (deadlock ถาวร),
@@ -221,6 +222,21 @@ const simulationChallengeSchema = z.object({
     .min(1),
   hints: z.array(z.string().min(1)).optional(),
   debrief: z.string().min(1).optional(),
+  // ตัวแปรที่สุ่มค่าใหม่ทุก attempt (W1) — ไม่ประกาศ = โจทย์ค่าตายตัวเหมือนเดิม
+  variables: z
+    .record(
+      z.string().min(1),
+      z.discriminatedUnion('kind', [
+        z.object({
+          kind: z.literal('ipv4-host'),
+          network: z.string().regex(/^\d{1,3}\.\d{1,3}\.\d{1,3}$/, 'network ต้องเป็นสามอ็อกเท็ตแรก เช่น 192.168.10'),
+          min: z.number().int().min(1).max(254),
+          max: z.number().int().min(1).max(254),
+        }),
+        z.object({ kind: z.literal('oneOf'), values: z.array(z.string().min(1)).min(2) }),
+      ]),
+    )
+    .optional(),
 })
 
 const blockSchema = z.discriminatedUnion('kind', [
@@ -369,6 +385,27 @@ export function loadLesson(file: string, data: unknown, structure: CourseStructu
       file,
       `node ${node.id} เป็น capstone (ข้ามไม่ได้) แต่มีด่านแค่ ${lesson.checkpoint.length} — ต้องมีอย่างน้อย 3`,
     )
+  }
+
+  // ทุก {{ชื่อ}} ที่โจทย์อ้างต้องมีตัวแปรรองรับจริง — ไม่งั้นผู้เรียนจะเห็นข้อความ
+  // ดิบอย่าง "{{targetIp}}" บนหน้าจอ และเงื่อนไขจะตรวจกับสตริงนั้นตรงๆ (W1)
+  for (const item of lesson.checkpoint) {
+    if (item.kind !== 'simulation') continue
+    const known = new Set(Object.keys(item.challenge.variables ?? {}))
+    const texts = [
+      item.challenge.brief,
+      ...item.challenge.requirements.flatMap((r) => [
+        r.label,
+        ...(typeof r.value === 'string' ? [r.value] : Array.isArray(r.value) ? r.value : []),
+      ]),
+      ...(item.challenge.hints ?? []),
+      ...(item.challenge.debrief ? [item.challenge.debrief] : []),
+    ]
+    for (const name of texts.flatMap(placeholdersIn)) {
+      if (!known.has(name)) {
+        throw new ContentValidationError(file, `โจทย์ ${item.challenge.id}: อ้างตัวแปร {{${name}}} ที่ไม่ได้ประกาศ`)
+      }
+    }
   }
 
   // id ของด่านต้องไม่ซ้ำกัน — คำตอบที่ส่งกลับมาผูกกับ id นี้

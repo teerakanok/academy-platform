@@ -32,8 +32,18 @@ export interface SimulationRequirement {
 export interface SimulationChallenge {
   id: string
   title: string
-  /** โจทย์ที่ผู้เรียนอ่านก่อนลงมือ */
+  /**
+   * โจทย์ที่ผู้เรียนอ่านก่อนลงมือ
+   *
+   * อ้างตัวแปรที่สุ่มต่อ attempt ได้ด้วย `{{ชื่อ}}` (W1 · ดู simulation/variables.ts)
+   */
   brief: string
+  /**
+   * ตัวแปรที่สุ่มค่าใหม่ทุก attempt — ทำให้คำตอบแชร์กันไม่ได้
+   *
+   * ไม่ประกาศ = โจทย์ค่าตายตัวเหมือนเดิม (เนื้อหาเก่าไม่ต้องแก้)
+   */
+  variables?: import('./variables').SimulationVariables
   surface: SimulationSurface
   /** สถานะตั้งต้นของหน้าจอ — ควรเป็นสถานะที่ "ยังไม่ถูก" เพื่อให้มีอะไรให้ทำ */
   initial: SimulationState
