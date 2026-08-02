@@ -511,3 +511,76 @@ describe('ล้มกลางทางแล้วต้องไม่กิ�
     expect(row.rows[0].outcome).toBeNull()
   })
 })
+
+describe('retention ของตาราง attempt (0011)', () => {
+  // ตารางโตทางเดียว (~2–3 KB/แถวรวม index) · แต่การกวาดต้องไม่แตะสองอย่าง:
+  // แถวที่ผู้เรียนกำลังใช้อยู่ และแถวที่ยังทำหน้าที่เป็นสมุดนับโควตา
+  // (การคืนโควตาให้ฟรีคือบั๊กเดียวกับที่ reset เคยทำแล้วถูก RIL จับ)
+
+  async function purge(retainDays = 30) {
+    return withDb(async (db) => {
+      const res = await db.query(`select academy.purge_expired_attempts($1, 5000) as deleted`, [
+        retainDays,
+      ])
+      return res.rows[0].deleted as number
+    })
+  }
+
+  async function ageAttempt(attemptId: string, days: number) {
+    await withDb((db) =>
+      db.query(
+        `update academy.attempt
+            set created_at = now() - make_interval(days => $2),
+                expires_at = now() - make_interval(days => $2)
+          where attempt_id = $1`,
+        [attemptId, days],
+      ),
+    )
+  }
+
+  it('🔴 ไม่แตะ attempt ที่ยังใช้ได้อยู่', async () => {
+    const live = await issueAttempt(ctx('n-retain-live'), SAMPLE_PARAMS, '1.0.0')
+    expect(await purge()).toBe(0)
+    expect(await consumeAttempt(ctx('n-retain-live'), live!.attemptId)).not.toBeNull()
+  })
+
+  it('🔴 ไม่แตะแถวที่หมดอายุแต่ยังอยู่ในระยะเก็บรักษา (สมุดนับโควตา)', async () => {
+    const recent = await issueAttempt(ctx('n-retain-recent'), SAMPLE_PARAMS, '1.0.0')
+    await ageAttempt(recent!.attemptId, 3)
+    expect(await purge(30)).toBe(0)
+  })
+
+  it('🔴 กวาดแถวที่หมดอายุเกินระยะเก็บรักษา', async () => {
+    const old = await issueAttempt(ctx('n-retain-old'), SAMPLE_PARAMS, '1.0.0')
+    await ageAttempt(old!.attemptId, 90)
+    expect(await purge(30)).toBe(1)
+    expect(await purge(30)).toBe(0)
+  })
+
+  it('🔴 กวาดแล้วหลักฐานของใบรับรองต้องยังอยู่ (ตัวชี้ไม่ถูกลบตาม)', async () => {
+    const passed = await issueAttempt(ctx('n-retain-cert'), SAMPLE_PARAMS, 'v-cert')
+    await consumeAttempt(ctx('n-retain-cert'), passed!.attemptId)
+    await recordNodeEvent(owner.id, {
+      slug: COURSE,
+      nodeId: 'n-retain-cert',
+      status: 'completed',
+      simulationEvidence: { 'sim-1': { passed: true, requirements: [], challengeVersion: 'sim-x', at: 'now' } },
+      passedAttemptId: passed!.attemptId,
+      passedChallengeVersion: 'v-cert',
+    })
+    await ageAttempt(passed!.attemptId, 90)
+    expect(await purge(30)).toBe(1)
+
+    const row = await withDb((db) =>
+      db.query(
+        `select passed_attempt_id, passed_challenge_version, simulation_evidence
+           from academy.node_progress
+          where user_id = $1 and course_slug = $2 and node_id = 'n-retain-cert'`,
+        [owner.id, COURSE],
+      ),
+    )
+    expect(row.rows[0].passed_attempt_id).toBe(passed!.attemptId)
+    expect(row.rows[0].passed_challenge_version).toBe('v-cert')
+    expect(row.rows[0].simulation_evidence['sim-1'].passed).toBe(true)
+  })
+})
