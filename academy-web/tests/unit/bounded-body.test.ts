@@ -37,8 +37,32 @@ function endlessStream(chunkBytes = 256): {
         emitted += chunkBytes
         controller.enqueue(new Uint8Array(chunkBytes).fill(120))
       },
-      cancel() {
+      // async และตั้งธงหลังรอ **macrotask** โดยตั้งใจ — ถ้าโค้ดเรียก cancel()
+      // โดยไม่ await ธงจะยังไม่ถูกตั้งตอนฟังก์ชันคืนค่า เทสจึงพิสูจน์ "รอจนยกเลิกเสร็จ"
+      // ได้จริง · ใช้ `Promise.resolve()` ไม่พอ เพราะ microtask จะเสร็จทันภายใน
+      // await หลายชั้นที่ตามมาอยู่ดี แล้วเทสจะเขียวแม้โค้ดไม่ได้รอ (RIL รอบ 5 ชี้)
+      async cancel() {
+        await new Promise((resolve) => setTimeout(resolve, 0))
         canceled = true
+      },
+    }),
+  }
+}
+
+/** stream ที่พังกลางทาง — ใช้พิสูจน์ว่า lock ถูกปล่อยแม้ในเส้นทาง error */
+function failingStream(): { body: ReadableStream<Uint8Array>; boom: Error } {
+  const boom = new Error('อ่าน body ไม่สำเร็จ')
+  let sent = false
+  return {
+    boom,
+    body: new ReadableStream({
+      pull(controller) {
+        if (!sent) {
+          sent = true
+          controller.enqueue(new Uint8Array(8).fill(65))
+          return
+        }
+        controller.error(boom)
       },
     }),
   }
@@ -107,6 +131,21 @@ describe('readBoundedBody', () => {
     const req = request('{"a":1}')
     expect((await readBoundedBody(req, MAX)).ok).toBe(true)
     expect(req.body?.locked ?? false).toBe(false)
+  })
+
+  it('body ที่พังกลางทาง: error ส่งต่อ และ lock ต้องถูกปล่อยด้วย', async () => {
+    // เส้นทางที่สามที่เทสรุ่นก่อนไม่มี — implementation ที่ปล่อย lock เฉพาะ
+    // success/oversize จะยังผ่านทั้งที่ error path ถือ lock ค้าง (RIL รอบ 5 ชี้)
+    const stream = failingStream()
+    const req = new Request('https://example.test/api', {
+      method: 'POST',
+      body: stream.body,
+      // @ts-expect-error — undici ต้องการ duplex เมื่อ body เป็น stream
+      duplex: 'half',
+    })
+
+    await expect(readBoundedBody(req, MAX)).rejects.toThrow(stream.boom.message)
+    expect(req.body?.locked ?? false, 'error path ก็ต้องไม่ถือ lock ค้าง').toBe(false)
   })
 
   it('body ว่างไม่พัง', async () => {
