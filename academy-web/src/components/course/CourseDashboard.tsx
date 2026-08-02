@@ -30,7 +30,7 @@ function LessonProgress({
   loaded,
   label,
   testId,
-  provenPercent,
+  finishedPercent,
   skipped,
 }: {
   structure: DashboardCourse['structure']
@@ -38,7 +38,7 @@ function LessonProgress({
   loaded: boolean
   label: string
   testId: string
-  provenPercent: number
+  finishedPercent: number
   skipped: number
 }) {
   const useDots = structure.nodes.length <= MAX_DOTS
@@ -49,7 +49,7 @@ function LessonProgress({
         <span className="font-medium text-cs-text" data-testid={testId}>
           {/* "proven" สงวนไว้ให้ด่านวัดผลเท่านั้นตั้งแต่ W0-3 — ตัวเลขนี้คือ
               ความคืบหน้าของบทเรียน */}
-          {!loaded ? '—' : provenPercent > 0 ? `${provenPercent}% done` : 'Not started yet'}
+          {!loaded ? '—' : finishedPercent > 0 ? `${finishedPercent}% done` : 'Not started yet'}
         </span>
         {skipped > 0 && <span className="text-cs-muted">{skipped} skipped</span>}
       </div>
@@ -58,7 +58,7 @@ function LessonProgress({
         <ul
           className="flex flex-wrap gap-1 sm:gap-1.5"
           role="progressbar"
-          aria-valuenow={provenPercent}
+          aria-valuenow={finishedPercent}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-label={`${label} progress`}
@@ -85,14 +85,14 @@ function LessonProgress({
         <div
           className="h-1.5 overflow-hidden rounded-full bg-cs-surface-sunken"
           role="progressbar"
-          aria-valuenow={provenPercent}
+          aria-valuenow={finishedPercent}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-label={`${label} progress`}
         >
           <div
             className="h-full rounded-full bg-cs-accent-fill transition-[width] duration-500"
-            style={{ width: `${provenPercent}%` }}
+            style={{ width: `${finishedPercent}%` }}
           />
         </div>
       )}
@@ -249,7 +249,7 @@ export function CourseDashboard({
                         loaded={loaded}
                         label={course.title}
                         testId={`course-progress-${course.structure.slug}`}
-                        provenPercent={summary.provenPercent}
+                        finishedPercent={summary.finishedPercent}
                         skipped={summary.skipped}
                       />
                     </div>

@@ -21,7 +21,9 @@ export function courseSkillData(
   labels: Record<string, string>,
   state: LearnerCourseState,
 ): SkillDatum[] {
-  const proven = new Set([...state.completed, ...state.testedOut])
+  // บทที่ทำจบแล้ว — ใช้คำว่า finished ไม่ใช่ proven เพราะ "พิสูจน์แล้ว"
+  // สงวนไว้ให้ด่านวัดผลตั้งแต่ W0-3 (ดู assessment-policy)
+  const finished = new Set([...state.completed, ...state.testedOut])
 
   return structure.skills.map((skill) => {
     let earned = 0
@@ -30,7 +32,7 @@ export function courseSkillData(
       const weight = node.skillWeights[skill.id]
       if (!weight) continue
       total += weight
-      if (proven.has(node.id)) earned += weight
+      if (finished.has(node.id)) earned += weight
     }
     return {
       id: skill.id,
@@ -72,12 +74,12 @@ export function globalSkillData(contributions: CourseContribution[]): SkillDatum
   const availableByDomain = new Map<string, number>()
 
   for (const { structure, state } of contributions) {
-    const proven = new Set([...state.completed, ...state.testedOut])
-    const provenRatio = structure.nodes.length === 0 ? 0 : proven.size / structure.nodes.length
+    const finished = new Set([...state.completed, ...state.testedOut])
+    const finishedRatio = structure.nodes.length === 0 ? 0 : finished.size / structure.nodes.length
 
     for (const [domainId, weight] of Object.entries(structure.globalSkillWeights)) {
       availableByDomain.set(domainId, (availableByDomain.get(domainId) ?? 0) + weight)
-      earnedByDomain.set(domainId, (earnedByDomain.get(domainId) ?? 0) + weight * provenRatio)
+      earnedByDomain.set(domainId, (earnedByDomain.get(domainId) ?? 0) + weight * finishedRatio)
     }
   }
 

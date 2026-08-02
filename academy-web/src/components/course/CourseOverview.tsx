@@ -187,23 +187,36 @@ export function CourseOverview({
               Certificate of completion
             </p>
             <h2 className="mt-1.5 font-display text-xl font-semibold text-cs-text">
-              {cert.eligible ? 'Earned — you passed every checkpoint' : 'Pass the checkpoints and it is yours'}
+              {cert.eligible
+                ? 'Earned — you passed every checkpoint'
+                : 'Finish the lessons and pass every required checkpoint'}
             </h2>
           </div>
-          <span
-            className="shrink-0 rounded-full bg-cs-accent-fill px-3 py-1 font-mono text-xs font-semibold text-cs-on-accent"
-            data-testid="certificate-assessed-count"
-          >
-            {cert.assessedPassed} / {cert.assessedTotal} checkpoints
-          </span>
+          {/* คอร์สที่ยังไม่มีด่านวัดผลเลยต้องไม่โชว์ "0 / 0 checkpoints" ซึ่งอ่านแล้ว
+              เหมือนผู้เรียนทำอะไรผิด ทั้งที่เป็นเรื่องของตัวคอร์สเอง */}
+          {cert.assessedTotal > 0 && (
+            <span
+              className="shrink-0 rounded-full bg-cs-accent-fill px-3 py-1 font-mono text-xs font-semibold text-cs-on-accent"
+              data-testid="certificate-assessed-count"
+            >
+              {cert.assessedPassed} / {cert.assessedTotal} checkpoints
+            </span>
+          )}
         </div>
         <p className="mt-3 max-w-2xl text-sm text-cs-body">
           {cert.eligible
-            ? 'It says you passed every required checkpoint in this course — that is what the certificate stands behind.'
-            : 'The certificate stands on the required checkpoints, where every answer has to be right. Working through the lessons gets you there; the checkpoints are what it certifies.'}
+            ? 'It says you finished every lesson and passed every required checkpoint in this course — that is what the certificate stands behind.'
+            : 'Two things earn it: finishing every lesson, and passing every required checkpoint, where each answer has to be right. The checkpoints are the part the certificate certifies.'}
         </p>
+        {cert.courseIssue === 'no-assessment' && (
+          // ปัญหาของคอร์ส ไม่ใช่ของผู้เรียน — บอกตามจริงและไม่ทำเป็นลิงก์ไปไหน
+          <p className="mt-3 max-w-2xl text-sm text-cs-body" data-testid="certificate-no-assessment">
+            This course does not have a required checkpoint yet, so there is nothing for a certificate to stand behind.
+            We are adding one.
+          </p>
+        )}
         <p className="mt-2 max-w-2xl text-xs text-cs-muted" data-testid="certificate-progress-note">
-          Lessons finished: {cert.provenCount} / {cert.total}
+          Lessons finished: {cert.lessonsFinished} / {cert.total}
         </p>
         {!cert.eligible && skippedBlockers > 0 && (
           <p className="mt-3 max-w-2xl text-sm text-cs-body" data-testid="certificate-skipped-note">
@@ -211,7 +224,9 @@ export function CourseOverview({
                 (assessment-policy) · ข้อความที่ชี้ไปยังทางที่ไม่มีอยู่จริงคือการ
                 ส่งผู้เรียนไปชนกำแพง */}
             {skippedBlockers === 1 ? 'One lesson you skipped is' : `${skippedBlockers} lessons you skipped are`} still
-            open. Its checkpoint is quick if you already know the material.
+            open.{' '}
+            {skippedBlockers === 1 ? 'Its checkpoint is' : 'Their checkpoints are'} quick if you already know the
+            material.
           </p>
         )}
         {!cert.eligible && cert.blocking.length > 0 && (

@@ -23,7 +23,7 @@ describe('ใบรับรองการเรียนจบ', () => {
   it('ยังไม่เริ่ม = ยังไม่ได้ และบอกว่าเหลืออะไร', () => {
     const r = certificateEligibility(structure, state())
     expect(r.eligible).toBe(false)
-    expect(r.provenCount).toBe(0)
+    expect(r.lessonsFinished).toBe(0)
     expect(r.blocking.map((b) => b.reason)).toEqual(['unstarted', 'unstarted', 'unstarted'])
   })
 
@@ -37,7 +37,7 @@ describe('ใบรับรองการเรียนจบ', () => {
     const r = certificateEligibility(structure, state({ completed: ['a', 'c'], testedOut: ['b'] }))
     expect(r.eligible).toBe(true)
     expect(r.blocking).toEqual([])
-    expect(r.provenCount).toBe(3)
+    expect(r.lessonsFinished).toBe(3)
   })
 
   it('รู้อยู่แล้วและ test out ทั้งคอร์ส = ได้ใบเต็ม ไม่มีการลงโทษคนที่รู้มาก่อน', () => {
@@ -92,6 +92,13 @@ describe('ใบรับรองต้องอ้างถึง capstone เ
     const r = certificateEligibility(noCapstone, state({ completed: ['a', 'b'] }))
     expect(r.eligible).toBe(false)
     expect(r.assessedTotal).toBe(0)
-    expect(r.blocking).toEqual([{ id: 'nc', reason: 'unproven' }])
+    // ⚠️ ปัญหาระดับคอร์ส ห้ามปนใน `blocking` เพราะ UI ทำ blocking เป็นลิงก์ไปหน้า
+    // บทเรียน — ใส่ slug ลงไปจะได้ลิงก์ไปบทที่ไม่มีอยู่จริง (RIL จับ)
+    expect(r.blocking).toEqual([])
+    expect(r.courseIssue).toBe('no-assessment')
+  })
+
+  it('คอร์สปกติไม่มี courseIssue', () => {
+    expect(certificateEligibility(structure, state()).courseIssue).toBeNull()
   })
 })

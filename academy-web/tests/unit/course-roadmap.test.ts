@@ -100,7 +100,7 @@ describe('บทถัดไปและสรุปความคืบหน�
 
   it('การข้ามนับเป็นความคืบหน้าแต่ไม่นับว่าพิสูจน์แล้ว', () => {
     const s = summarise(structure, { ...EMPTY_STATE, completed: ['a'], skipped: ['b'], testedOut: ['c'] })
-    expect(s.provenPercent).toBe(50) // a + c จาก 4
+    expect(s.finishedPercent).toBe(50) // a + c จาก 4
     expect(s.coveragePercent).toBe(75) // รวม b ที่ข้าม
   })
 })

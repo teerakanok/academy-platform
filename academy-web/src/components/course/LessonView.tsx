@@ -370,9 +370,11 @@ export function LessonView({
 
           {peeking && (
             <div className="mt-3 border-t border-cs-border pt-3">
+              {/* ⚠️ คำว่า "proven" สงวนไว้ให้ด่านบังคับเท่านั้นตั้งแต่ W0-3 —
+                  บทปกติผ่านแล้วนับเป็นความคืบหน้า ไม่ใช่หลักฐานที่ใบรับรองอ้างถึง */}
               <p className="mb-2.5 text-xs text-cs-muted">
-                Tick anything you could already explain. This is just to help you decide. Only the checkpoint counts
-                as proven.
+                Tick anything you could already explain. This is just to help you decide — nothing here changes your
+                progress.
               </p>
               <SelfCheckList
                 items={lesson.cheatsheet}
@@ -389,13 +391,13 @@ export function LessonView({
                     isTestOutAvailable(node) ? (
                       <>
                         You marked all {lesson.cheatsheet.length}. Then the checkpoint should be quick —{' '}
-                        <span className="font-medium text-cs-text">prove it and move on</span> keeps it on your map as
-                        proven, which skipping does not.
+                        <span className="font-medium text-cs-text">prove it and move on</span> marks this lesson done,
+                        which skipping does not.
                       </>
                     ) : (
                       <>
-                        You marked all {lesson.cheatsheet.length}. Then the checkpoint at the end should be quick —
-                        and passing it is what keeps this lesson on your map as proven, which skipping does not.
+                        You marked all {lesson.cheatsheet.length}. Then the checkpoint at the end should be quick — and
+                        passing it marks this lesson done, which skipping does not.
                       </>
                     )
                   ) : (

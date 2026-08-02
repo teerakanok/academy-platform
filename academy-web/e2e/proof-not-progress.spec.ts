@@ -13,6 +13,8 @@ import { test, expect } from '@playwright/test'
 const COURSE = 'content-formats-demo'
 const LESSON = 'formats-reading' // บทปกติ 1 ข้อ (A–D)
 const CAPSTONE = 'formats-hands-on'
+/** เฉลยจริงของ capstone — ใช้พิสูจน์ว่าเมื่อทำถูกจริงแล้วใบรับรองมาจริง */
+const CAPSTONE_ANSWERS = { 'cp-1': ['B'], 'cp-2': ['C'], 'cp-3': ['B'] }
 
 interface CheckpointResponse {
   ok: boolean
@@ -85,14 +87,35 @@ test.describe('completed คือความคืบหน้า ไม่ใ
 
   test('ผ่าน capstone จริงจึงจะนับเป็นหลักฐาน', async ({ request }) => {
     // ปิดทางเข้าใจผิดว่า "เข้มจนไม่มีใครผ่านได้" — คนที่ตอบถูกต้องผ่านตามปกติ
-    const body = await answer(request, CAPSTONE, {
-      'cp-1': ['B'],
-      'cp-2': ['C'],
-      'cp-3': ['B'],
-    })
+    const body = await answer(request, CAPSTONE, CAPSTONE_ANSWERS)
     expect(body.passed).toBe(true)
 
     const after = await (await request.get(`/api/progress?slug=${COURSE}`)).json()
     expect(after.record.completed).toContain(CAPSTONE)
+  })
+
+  test('🔴 การ์ดใบรับรองบนหน้าคอร์สต้องสะท้อนสองชั้นจริง', async ({ page, request }) => {
+    // ⚠️ เทสรุ่นก่อนตรวจแต่ค่าใน API — RIL พิสูจน์ว่า mutation ที่บังคับ
+    // `cert.eligible = true` ใน CourseOverview **ไม่ถูกจับเลย** เพราะไม่มีเทสไหน
+    // ดูการ์ดจริง · นี่คือหน้าจอที่ผู้เรียนใช้ตัดสินว่าตัวเองได้ใบหรือยัง
+
+    // เดินบทปกติให้ครบทุกบทที่ไม่ใช่ capstone (คอร์สนี้มี 3 บทปกติ)
+    await answer(request, LESSON, { 'cp-1': ['B'] })
+    await answer(request, 'formats-references', { 'cp-1': ['B'], 'cp-2': ['A'] })
+    await answer(request, 'formats-simulation', { 'cp-1': ['B'], 'cp-2': ['C'], 'cp-3': ['B'] })
+
+    await page.goto(`/courses/${COURSE}`)
+    const card = page.getByTestId('certificate-status')
+    await expect(card).toHaveAttribute('data-eligible', 'false')
+    await expect(page.getByTestId('certificate-assessed-count')).toContainText('0 / 1')
+    // และต้องไม่มีข้อความที่บอกว่าได้ใบแล้ว
+    await expect(card).not.toContainText('Earned')
+
+    // ผ่าน capstone จริง → การ์ดต้องพลิกเป็นได้ใบ
+    expect((await answer(request, CAPSTONE, CAPSTONE_ANSWERS)).passed).toBe(true)
+    await page.reload()
+    await expect(card).toHaveAttribute('data-eligible', 'true')
+    await expect(page.getByTestId('certificate-assessed-count')).toContainText('1 / 1')
+    await expect(card).toContainText('Earned')
   })
 })

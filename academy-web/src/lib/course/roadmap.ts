@@ -180,8 +180,13 @@ export interface CourseProgressSummary {
   completed: number
   testedOut: number
   skipped: number
-  /** นับเฉพาะที่ "ปลอดภัยแล้ว" (เรียนจบ + พิสูจน์แล้ว) — การข้ามไม่นับว่ารู้ */
-  provenPercent: number
+  /**
+   * สัดส่วนบทที่ทำจบแล้ว (เรียนจบ + test out) — การข้ามไม่นับ
+   *
+   * ⚠️ ชื่อเดิมคือ `provenPercent` ซึ่งอ่านแล้วเข้าใจว่าเป็นหลักฐาน · ตั้งแต่ W0-3
+   * คำว่า "พิสูจน์แล้ว" สงวนไว้ให้ด่านวัดผลเท่านั้น (ดู `certificateEligibility`)
+   */
+  finishedPercent: number
   /** ความคืบหน้าในเส้นทาง รวมการข้ามด้วย (ใช้บอกว่าเดินไปถึงไหนแล้ว) */
   coveragePercent: number
 }
@@ -192,14 +197,14 @@ export function summarise(structure: CourseStructure, state: LearnerCourseState)
   const completed = state.completed.filter((id) => ids.has(id)).length
   const testedOut = state.testedOut.filter((id) => ids.has(id)).length
   const skipped = state.skipped.filter((id) => ids.has(id)).length
-  const proven = completed + testedOut
+  const finished = completed + testedOut
   return {
     total,
     completed,
     testedOut,
     skipped,
-    provenPercent: total === 0 ? 0 : Math.round((proven / total) * 100),
-    coveragePercent: total === 0 ? 0 : Math.round(((proven + skipped) / total) * 100),
+    finishedPercent: total === 0 ? 0 : Math.round((finished / total) * 100),
+    coveragePercent: total === 0 ? 0 : Math.round(((finished + skipped) / total) * 100),
   }
 }
 
@@ -230,18 +235,25 @@ export function summarise(structure: CourseStructure, state: LearnerCourseState)
 // ชั้นที่ 2 คือสิ่งที่ใบรับรองอ้างถึงจริง · ห้ามเขียนบนหน้าเว็บหรือบนใบว่าบทปกติ
 // เป็นการวัดผล
 
-export type CertificateBlocker = 'skipped' | 'unstarted' | 'unproven'
+export type CertificateBlocker = 'skipped' | 'unstarted'
 
 export interface CertificateEligibility {
   eligible: boolean
-  /** จำนวน node ที่เดินผ่านแล้ว — ตัวชี้ **ความคืบหน้า** ไม่ใช่หลักฐาน */
-  provenCount: number
+  /** จำนวนบทที่เดินผ่านแล้ว — ตัวชี้ **ความคืบหน้า** ไม่ใช่หลักฐาน */
+  lessonsFinished: number
   total: number
   /** ด่านวัดผล (capstone) ที่ผ่านแล้ว / ทั้งหมด — นี่คือสิ่งที่ใบรับรองอ้างถึง */
   assessedPassed: number
   assessedTotal: number
-  /** node ที่ยังกั้นใบอยู่ พร้อมเหตุผล — ต้องบอกให้ผู้เรียนรู้ว่าต้องทำอะไรต่อ */
+  /**
+   * node ที่ยังกั้นใบอยู่ พร้อมเหตุผล — ต้องบอกให้ผู้เรียนรู้ว่าต้องทำอะไรต่อ
+   *
+   * ⚠️ ทุกรายการต้องเป็น **node จริงที่เปิดได้** เพราะ UI ทำเป็นลิงก์ไปหน้าบทเรียน ·
+   * ปัญหาระดับคอร์ส (เช่น คอร์สไม่มีด่านวัดผลเลย) ห้ามใส่ที่นี่ — ใช้ `courseIssue`
+   */
   blocking: { id: string; reason: CertificateBlocker }[]
+  /** ปัญหาที่ไม่ได้อยู่ที่ node ใด node หนึ่ง — UI ต้องแสดงเป็นข้อความ ไม่ใช่ลิงก์ */
+  courseIssue: 'no-assessment' | null
 }
 
 export function certificateEligibility(
@@ -249,14 +261,14 @@ export function certificateEligibility(
   state: LearnerCourseState,
 ): CertificateEligibility {
   const blocking: { id: string; reason: CertificateBlocker }[] = []
-  let provenCount = 0
+  let lessonsFinished = 0
   let assessedPassed = 0
   let assessedTotal = 0
 
   for (const node of structure.nodes) {
     const status = nodeStatus(node, state)
     const walked = status === 'completed' || status === 'tested-out'
-    if (walked) provenCount += 1
+    if (walked) lessonsFinished += 1
     else blocking.push({ id: node.id, reason: status === 'skipped' ? 'skipped' : 'unstarted' })
 
     if (!isProofBearing(node)) continue
@@ -266,17 +278,16 @@ export function certificateEligibility(
   }
 
   // ต้องมีด่านวัดผลอย่างน้อยหนึ่งจุด ไม่งั้นใบรับรองไม่ได้อ้างถึงหลักฐานใดเลย
+  const courseIssue = assessedTotal === 0 ? ('no-assessment' as const) : null
   const hasProof = assessedTotal > 0 && assessedPassed === assessedTotal
-  if (assessedTotal === 0) {
-    blocking.push({ id: structure.slug, reason: 'unproven' })
-  }
 
   return {
     eligible: blocking.length === 0 && hasProof && structure.nodes.length > 0,
-    provenCount,
+    lessonsFinished,
     total: structure.nodes.length,
     assessedPassed,
     assessedTotal,
     blocking,
+    courseIssue,
   }
 }
