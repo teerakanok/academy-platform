@@ -43,6 +43,8 @@ export type ProgressAction =
       answers: Record<string, string[]>
       /** สถานะหน้าจอของด่านจำลองแต่ละตัว — เซิร์ฟเวอร์ตรวจเองจาก requirements (W1) */
       simulations?: Record<string, Record<string, string | boolean>>
+      /** attempt ที่กำลังทำอยู่ — บังคับเมื่อบทมีโจทย์จำลองที่ค่าเป้าหมายถูกสุ่ม (W1) */
+      attemptId?: string
     }
   | { action: 'video-cue'; slug: string; nodeId: string; cueId: string; answer: string[] }
 

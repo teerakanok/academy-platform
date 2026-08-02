@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import type { PublicCheckpointItem } from '@/lib/content/public-lesson'
+import type { AttemptSimulation, PublicCheckpointItem } from '@/lib/content/public-lesson'
 import type { CheckpointOutcome } from '@/lib/course/progress-client'
 import type { SimulationState } from '@/lib/simulation/types'
 import { SimulationSurface } from './blocks/SimulationSurface'
@@ -36,7 +36,8 @@ export function CheckpointQuiz({
 }) {
   const questions = items.filter((item): item is Extract<PublicCheckpointItem, { kind: 'mcq' }> => item.kind === 'mcq')
   const simulations = items.filter(
-    (item): item is Extract<PublicCheckpointItem, { kind: 'simulation' }> => item.kind === 'simulation',
+    // เฉพาะด่านที่มีโจทย์จริงจาก attempt — ของในไฟล์เป็นแม่แบบที่ยังไม่ได้แทนค่า
+    (item): item is AttemptSimulation => item.kind === 'simulation' && item.challenge !== undefined,
   )
   const [answers, setAnswers] = useState<Record<string, string[]>>({})
   // สถานะหน้าจอจำลองต่อด่าน — ตั้งต้นจาก `initial` ของโจทย์แต่ละตัว

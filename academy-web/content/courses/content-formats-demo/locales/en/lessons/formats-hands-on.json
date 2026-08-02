@@ -106,7 +106,7 @@
       "challenge": {
         "id": "capstone-static-print-server",
         "title": "Give the print server a fixed address",
-        "brief": "The print server has to answer at 192.168.10.50 every time it boots, on the 192.168.10.0/24 network with the router at 192.168.10.1. Set the interface up so that stays true, then apply it.",
+        "brief": "The print server has to answer at {{targetIp}} every time it boots, on the 192.168.10.0/24 network with the router at 192.168.10.1. Set the interface up so that stays true, then apply it.",
         "surface": "network-interface",
         "initial": {
           "addressMode": "dhcp",
@@ -126,10 +126,10 @@
           },
           {
             "id": "r-ip",
-            "label": "It answers at the address the brief asks for",
+            "label": "It answers at {{targetIp}}, the address the brief asks for",
             "field": "ipv4",
             "operator": "equals",
-            "value": "192.168.10.50"
+            "value": "{{targetIp}}"
           },
           {
             "id": "r-subnet",
@@ -152,7 +152,15 @@
             "operator": "isTrue"
           }
         ],
-        "debrief": "A fixed address is what makes a print queue findable. With DHCP the lease can change and every workstation pointing at the old address quietly stops printing."
+        "debrief": "A fixed address is what makes a print queue findable. With DHCP the lease can change and every workstation pointing at the old address quietly stops printing.",
+        "variables": {
+          "targetIp": {
+            "kind": "ipv4-host",
+            "network": "192.168.10",
+            "min": 40,
+            "max": 60
+          }
+        }
       }
     }
   ]

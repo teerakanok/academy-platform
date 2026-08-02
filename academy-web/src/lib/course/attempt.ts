@@ -29,6 +29,13 @@ export interface AttemptParams {
    * เห็น — ต้องตรวจจากของที่ attempt ถือเองเท่านั้น
    */
   answerKeys: Record<string, string[]>
+  /**
+   * ค่าตัวแปรของโจทย์จำลองที่สุ่มไว้สำหรับ attempt นี้ (W1)
+   *
+   * รูป: { checkpointItemId: { ชื่อตัวแปร: ค่า } } · เซิร์ฟเวอร์ใช้ค่าชุดนี้ทั้งตอน
+   * สร้างโจทย์ที่ส่งให้ผู้เรียนอ่าน และตอนตรวจ — สองฝั่งจึงตรงกันเสมอ
+   */
+  simulationVars?: Record<string, Record<string, string>>
 }
 
 /** รูปข้อสอบที่ส่งให้ client — ไม่มี correct ไม่มี explanation โดยโครงสร้าง */
@@ -37,6 +44,9 @@ export interface PublicAttemptQuestion {
   prompt: string
   choices: Record<string, string>
 }
+
+/** ตัวสุ่มของจริง — attempt ต้องเดาไม่ได้ จึงใช้ crypto ไม่ใช่ seedable PRNG */
+export const cryptoPick = (maxExclusive: number): number => randomInt(maxExclusive)
 
 /** Fisher–Yates ด้วย crypto randomInt — attempt ต้องเดาไม่ได้ จึงไม่ใช้ seedable shuffle */
 function cryptoShuffled<T>(items: readonly T[]): T[] {

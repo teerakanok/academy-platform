@@ -74,10 +74,31 @@ export type PublicLessonBlock =
   | Exclude<LessonBlock, { kind: 'simulation' }>
   | { kind: 'simulation'; challenge: PublicSimulationChallenge }
 
-/** ด่านท้ายบทที่ browser เห็น — simulation ถูกลดรูปเหมือนในบล็อกเนื้อหา */
+/**
+ * ด่านท้ายบทที่ browser เห็น
+ *
+ * `challenge` ของ simulation เป็น optional **โดยตั้งใจ**: ตั้งแต่ W1 ค่าเป้าหมายถูก
+ * สุ่มต่อ attempt ไฟล์เนื้อหาจึงเก็บแค่แม่แบบ (`{{targetIp}}`) ซึ่งไม่ใช่โจทย์ของใคร
+ * หน้า lesson จึงส่งมาแค่ "ด่านนี้มีงานจำลอง id นี้" ส่วนตัวโจทย์มาจาก `/api/attempts`
+ * เท่านั้น · เขียนไว้ในชนิดเพื่อให้การเผลอส่งแม่แบบกลับไปหา browser เป็น error
+ * ตอนคอมไพล์ ไม่ใช่ข้อความ `{{targetIp}}` โผล่ใน payload โดยไม่มีใครเห็น
+ */
 export type PublicCheckpointItem =
   | ({ kind: 'mcq' } & PublicCheckpointQuestion)
-  | { kind: 'simulation'; id: string; challenge: PublicSimulationChallenge }
+  | { kind: 'simulation'; id: string; challenge?: PublicSimulationChallenge }
+
+/**
+ * โจทย์จำลองที่ `/api/attempts` ส่งกลับ — รูปเดียวกับด่านท้ายบทที่ browser เห็น
+ *
+ * ตั้งชื่อไว้ให้ route กับ client ผูกกับ **ตัวเดียวกัน**: เดิม route ประกอบ
+ * `{id, challenge}` เองแล้วลืม `kind` ทำให้ UI กรองทิ้งเงียบๆ (ด่านหายทั้งด่าน
+ * โดยไม่มี error) และ client cast `res.json()` จึงไม่มีใครจับได้เลย
+ */
+export interface AttemptSimulation {
+  kind: 'simulation'
+  id: string
+  challenge: PublicSimulationChallenge
+}
 
 export interface PublicLesson {
   nodeId: string
@@ -128,7 +149,8 @@ export function toPublicLesson(lesson: LessonContent): PublicLesson {
     cheatsheet: lesson.cheatsheet,
     checkpoint: lesson.checkpoint.map((item): PublicCheckpointItem =>
       item.kind === 'simulation'
-        ? { kind: 'simulation', id: item.id, challenge: toPublicSimulation(item.challenge) }
+        ? // ไม่มี challenge โดยตั้งใจ — โจทย์จริงมาจาก attempt (ดูเหตุผลที่ชนิดด้านบน)
+          { kind: 'simulation', id: item.id }
         : { kind: 'mcq', ...toPublicQuestion(item) },
     ),
     videoCueQuestions: lesson.videoCueQuestions?.map((q) => ({ ...toPublicQuestion(q), cueId: q.cueId })),

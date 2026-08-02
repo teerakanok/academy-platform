@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import type { CourseNode, CourseStructure, Locale } from '@/lib/content/course-types'
-import type { PublicLesson } from '@/lib/content/public-lesson'
+import type { AttemptSimulation, PublicCheckpointItem, PublicLesson } from '@/lib/content/public-lesson'
 import type { SimulationState } from '@/lib/simulation/types'
 import {
   emptyProgress,
@@ -29,8 +29,21 @@ import { canSkip, nextNode, nodeStatus } from '@/lib/course/roadmap'
 import { CheckpointQuiz } from './CheckpointQuiz'
 import { InteractiveVideo } from './InteractiveVideo'
 import { LessonBody } from './LessonBody'
+import { useLessonAttempt } from './use-lesson-attempt'
 
 type Mode = 'learn' | 'test-out' | 'skipped'
+
+type SimulationCheckpoint = AttemptSimulation
+
+/** แทนโจทย์จำลองในด่านด้วยของที่ attempt ออกให้ (ค่าเป้าหมายถูกสุ่มแล้ว) */
+function withAttemptSimulations(
+  items: PublicCheckpointItem[],
+  fromAttempt: SimulationCheckpoint[] | undefined,
+): PublicCheckpointItem[] {
+  if (!fromAttempt?.length) return items
+  const byId = new Map(fromAttempt.map((s) => [s.id, s]))
+  return items.map((item) => (item.kind === 'simulation' ? byId.get(item.id) ?? item : item))
+}
 
 // รายการติ๊กเองสำหรับผู้เรียน — ตั้งใจให้ "ไม่ใช่ประตู"
 //
@@ -164,6 +177,15 @@ export function LessonView({
     void pushProgress(event).then(({ failure }) => setSyncError(failure))
   }
 
+  // บทที่มีด่านจำลองต้องมี attempt ก่อน — ค่าเป้าหมายอยู่ใน attempt ฝั่งเซิร์ฟเวอร์
+  // ไม่ได้อยู่ในไฟล์เนื้อหา (ไฟล์เก็บแค่แม่แบบ)
+  const hasSimulationTask = lesson.checkpoint.some((item) => item.kind === 'simulation')
+  const { attempt, retry: retryAttempt } = useLessonAttempt({
+    enabled: hasSimulationTask && !done,
+    slug: structure.slug,
+    nodeId: node.id,
+  })
+
   const learnerState = toLearnerState(record)
   const upcoming = loaded ? nextNode(structure, learnerState) : null
   const isCapstone = node.kind === 'capstone'
@@ -190,6 +212,7 @@ export function LessonView({
       mode: quizMode,
       answers: submission.answers,
       simulations: submission.simulations,
+      attemptId: attempt.status === 'ready' ? attempt.id : undefined,
     })
     setSyncError(failure)
     if (failure || !outcome) return null
@@ -555,12 +578,41 @@ export function LessonView({
             </button>
           )}
         </div>
-        <CheckpointQuiz
-          items={lesson.checkpoint}
-          requireAllCorrect={mode === 'test-out' || isCapstone}
-          onSubmit={(submission) => submitCheckpoint(mode === 'test-out' ? 'test-out' : 'learn', submission)}
-          onPassed={() => finishCheckpoint(mode === 'test-out' ? 'test-out' : 'learn')}
-        />
+        {attempt.status === 'loading' && (
+          <p data-testid="checkpoint-attempt-loading" className="text-sm text-cs-muted">
+            Setting up your task…
+          </p>
+        )}
+        {attempt.status === 'failed' && (
+          <div data-testid="checkpoint-attempt-failed" className="flex flex-wrap items-center gap-3">
+            <p className="text-sm text-cs-body">
+              {attempt.reason === 'quota'
+                ? 'You have used this round of attempts. Each one gives you a different task, so a short wait is all it takes — try again in a few minutes.'
+                : 'We could not set up your task. Your progress is safe.'}
+            </p>
+            <button
+              type="button"
+              onClick={retryAttempt}
+              data-testid="checkpoint-attempt-retry"
+              className="rounded-control border border-cs-border bg-cs-surface px-4 py-2 text-sm transition-colors duration-200 hover:border-cs-accent hover:text-cs-accent"
+            >
+              Try again
+            </button>
+          </div>
+        )}
+        {/* ด่านจะแสดงก็ต่อเมื่อโจทย์เป็นของ attempt ตัวเองแล้ว — ของในไฟล์เป็นแม่แบบ
+            ที่ยังไม่ได้แทนค่า จึงเอามาให้ผู้เรียนอ่านไม่ได้ (ดูเหตุผลใน use-lesson-attempt) */}
+        {(attempt.status === 'not-needed' || attempt.status === 'ready') && (
+          <CheckpointQuiz
+            items={withAttemptSimulations(
+              lesson.checkpoint,
+              attempt.status === 'ready' ? attempt.simulations : undefined,
+            )}
+            requireAllCorrect={mode === 'test-out' || isCapstone}
+            onSubmit={(submission) => submitCheckpoint(mode === 'test-out' ? 'test-out' : 'learn', submission)}
+            onPassed={() => finishCheckpoint(mode === 'test-out' ? 'test-out' : 'learn')}
+          />
+        )}
         </div>
       )}
 

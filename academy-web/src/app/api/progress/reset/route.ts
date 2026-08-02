@@ -22,6 +22,23 @@ export async function POST(request: Request) {
     .eq('user_id', user.account.id)
     .eq('course_slug', slug)
 
+  // ล้าง attempt ของคอร์สนี้ด้วย — เริ่มใหม่แปลว่าเริ่มใหม่จริง
+  //
+  // ⚠️ พิจารณาแล้วว่านี่ไม่ใช่ช่องเลี่ยงโควตา (3 ครั้ง/30 นาที ต่อ user×node):
+  // ราคาของการ reset คือ **ทิ้งความคืบหน้าทั้งคอร์สของตัวเอง** ซึ่งแพงกว่าการรอ
+  // 30 นาทีมากสำหรับคนที่ตั้งใจเรียน · ส่วนคนที่ตั้งใจไล่ลองเฉลย โควตาเป็นแค่
+  // speed bump อยู่แล้วเพราะ D1 เปิดสมัครเสรี (บันทึกไว้ในแผน §5 W0-1)
+  // ถ้าไม่ล้าง ผู้เรียนที่กด "เริ่มใหม่" จะเจอ 429 โดยไม่มีทางเข้าใจว่าทำไม
+  const { error: attemptError } = await db
+    .from('attempt')
+    .delete()
+    .eq('user_id', user.account.id)
+    .eq('course_slug', slug)
+
+  if (attemptError) {
+    console.error('[api/progress/reset] ล้าง attempt ไม่สำเร็จ:', attemptError.message)
+  }
+
   if (error) {
     console.error('[api/progress/reset] ลบไม่สำเร็จ:', error.message)
     return NextResponse.json({ ok: false, error: 'ล้างความคืบหน้าไม่สำเร็จ' }, { status: 500 })

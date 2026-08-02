@@ -2,9 +2,11 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { currentUser } from '@/lib/auth/session'
 import { getCourseStructure } from '@/lib/content/course-source'
-import { CHECKPOINT_CHALLENGE_ID, buildAttemptParams, toPublicQuestions } from '@/lib/course/attempt'
-import { getLessonAnswerKey, mcqItems } from '@/lib/content/answer-key'
+import { CHECKPOINT_CHALLENGE_ID, buildAttemptParams, cryptoPick, toPublicQuestions } from '@/lib/course/attempt'
+import { getLessonAnswerKey, mcqItems, simulationItems } from '@/lib/content/answer-key'
 import { issueAttempt } from '@/lib/course/attempt-db'
+import { toPublicSimulation, type AttemptSimulation } from '@/lib/content/public-lesson'
+import { resolveChallenge, rollVariables } from '@/lib/simulation/variables'
 import { readBoundedBody } from '@/lib/http/bounded-body'
 
 export const runtime = 'nodejs'
@@ -63,9 +65,9 @@ export async function POST(request: Request) {
   }
 
   const answerKey = getLessonAnswerKey(input.slug, input.nodeId)
-  // attempt วันนี้หมุนเฉพาะ MCQ — โจทย์จำลองใช้การสุ่มพารามิเตอร์คนละแบบ (W1c)
   const bank = mcqItems(answerKey?.checkpoint ?? [])
-  if (bank.length === 0) {
+  const sims = simulationItems(answerKey?.checkpoint ?? [])
+  if (bank.length === 0 && sims.length === 0) {
     return NextResponse.json({ ok: false, error: 'บทนี้ยังไม่มีคลังข้อ' }, { status: 400 })
   }
 
@@ -73,6 +75,14 @@ export async function POST(request: Request) {
     // วันนี้เสิร์ฟเท่าขนาดคลัง (คลังมีเท่าที่ใช้พอดี) — เมื่อคลังโต ≥3 เท่า (W-content)
     // จำนวนเสิร์ฟจะมาจากนิยาม challenge ไม่ใช่ขนาดคลัง
     const params = buildAttemptParams(bank, bank.length)
+
+    // สุ่มค่าตัวแปรของโจทย์จำลองต่อ attempt (W1) — ค่าที่สุ่มถูกเก็บใน params
+    // ฝ่ายเดียว แล้วใช้ทั้งตอนสร้างโจทย์ที่ผู้เรียนอ่านและตอนตรวจ สองฝั่งจึงตรงกัน
+    const simulationVars: Record<string, Record<string, string>> = {}
+    for (const sim of sims) {
+      simulationVars[sim.id] = rollVariables(sim.challenge.variables, cryptoPick)
+    }
+    params.simulationVars = simulationVars
     const issued = await issueAttempt(
       {
         userId: user.account.id,
@@ -91,11 +101,21 @@ export async function POST(request: Request) {
       )
     }
 
+    // โจทย์จำลองที่แทนค่าตัวแปรของ attempt นี้แล้ว — ยังผ่าน toPublicSimulation
+    // เหมือนเดิม จึงไม่มี operator/value/hints ติดไปกับ response · ประกาศชนิดไว้
+    // เพื่อให้ลืมฟิลด์ใดฟิลด์หนึ่ง (เช่น `kind`) เป็น error ตอนคอมไพล์ ไม่ใช่ด่านหายเงียบๆ
+    const simulations: AttemptSimulation[] = sims.map((sim) => ({
+      kind: 'simulation',
+      id: sim.id,
+      challenge: toPublicSimulation(resolveChallenge(sim.challenge, simulationVars[sim.id] ?? {})),
+    }))
+
     return NextResponse.json({
       ok: true,
       attemptId: issued.attemptId,
       expiresAt: issued.expiresAt,
       questions: toPublicQuestions(bank, params),
+      simulations,
     })
   } catch (err) {
     console.error('[api/attempts] ออก attempt ไม่สำเร็จ:', err)

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { passCapstone, startCapstoneAttempt } from './support/capstone'
 
 // W0-3 — `completed` ของบทปกติไม่ใช่หลักฐาน (แก้ F2 + F3)
 //
@@ -13,21 +14,8 @@ import { test, expect } from '@playwright/test'
 const COURSE = 'content-formats-demo'
 const LESSON = 'formats-reading' // บทปกติ 1 ข้อ (A–D)
 const CAPSTONE = 'formats-hands-on'
-/** เฉลยจริงของ capstone — ใช้พิสูจน์ว่าเมื่อทำถูกจริงแล้วใบรับรองมาจริง */
-const CAPSTONE_ANSWERS = { 'cp-1': ['B'], 'cp-2': ['C'], 'cp-3': ['B'] }
-/**
- * capstone มีด่านจำลองด้วยตั้งแต่ W1 — ตอบ MCQ ถูกอย่างเดียวไม่ผ่านแล้ว
- * (เทสของ W1 พิสูจน์ข้อนี้โดยตรงใน capstone-simulation.spec.ts)
- */
-const CAPSTONE_SIMULATIONS = {
-  'sim-1': {
-    addressMode: 'static',
-    ipv4: '192.168.10.50',
-    subnet: '255.255.255.0',
-    gateway: '192.168.10.1',
-    applied: true,
-  },
-}
+// capstone มีด่านจำลองที่ค่าเป้าหมาย **สุ่มต่อ attempt** ตั้งแต่ W1 — จึงเขียนค่า
+// ตายตัวไม่ได้ ต้องขอ attempt แล้วอ่านค่าจาก brief (ดู support/capstone.ts)
 
 interface CheckpointResponse {
   ok: boolean
@@ -78,9 +66,13 @@ test.describe('completed คือความคืบหน้า ไม่ใ
     ).toContain(LESSON)
 
     // ── ชั้นที่ 2: ทำแบบเดียวกันไม่ได้กับ capstone และใบรับรองยังไม่มา ──
-    // ยิงคำตอบผิดซ้ำๆ ที่ capstone — response ต้องไม่บอกอะไรที่ช่วยไล่ทีละข้อ
+    //
+    // ยิงคำตอบผิดซ้ำๆ — response ต้องไม่บอกอะไรที่ช่วยไล่ทีละข้อ · ตั้งแต่ W1
+    // capstone ต้องมี attempt (ค่าเป้าหมายของด่านจำลองสุ่มต่อครั้ง) และ attempt
+    // ใช้ได้ครั้งเดียว จึงต้องขอใหม่ทุกรอบ — ซึ่งทำให้การไล่ลองแพงขึ้นอีกชั้น
     const shapes = new Set<string>()
-    for (const letter of ['A', 'B', 'C', 'D']) {
+    for (const letter of ['A', 'B', 'C']) {
+      const attempt = await startCapstoneAttempt(request)
       const res = await request.post('/api/progress', {
         data: {
           slug: COURSE,
@@ -88,6 +80,8 @@ test.describe('completed คือความคืบหน้า ไม่ใ
           action: 'checkpoint',
           mode: 'learn',
           answers: { 'cp-1': [letter], 'cp-2': ['A'], 'cp-3': ['A'] },
+          simulations: { 'sim-1': attempt.correctState },
+          attemptId: attempt.attemptId,
         },
       })
       shapes.add(JSON.stringify(await res.json()))
@@ -101,8 +95,7 @@ test.describe('completed คือความคืบหน้า ไม่ใ
 
   test('ผ่าน capstone จริงจึงจะนับเป็นหลักฐาน', async ({ request }) => {
     // ปิดทางเข้าใจผิดว่า "เข้มจนไม่มีใครผ่านได้" — คนที่ตอบถูกต้องผ่านตามปกติ
-    const body = await answer(request, CAPSTONE, CAPSTONE_ANSWERS, CAPSTONE_SIMULATIONS)
-    expect(body.passed).toBe(true)
+    await passCapstone(request)
 
     const after = await (await request.get(`/api/progress?slug=${COURSE}`)).json()
     expect(after.record.completed).toContain(CAPSTONE)
@@ -126,7 +119,7 @@ test.describe('completed คือความคืบหน้า ไม่ใ
     await expect(card).not.toContainText('Earned')
 
     // ผ่าน capstone จริง → การ์ดต้องพลิกเป็นได้ใบ
-    expect((await answer(request, CAPSTONE, CAPSTONE_ANSWERS, CAPSTONE_SIMULATIONS)).passed).toBe(true)
+    await passCapstone(request)
     await page.reload()
     await expect(card).toHaveAttribute('data-eligible', 'true')
     await expect(page.getByTestId('certificate-assessed-count')).toContainText('1 / 1')
@@ -136,7 +129,7 @@ test.describe('completed คือความคืบหน้า ไม่ใ
   test('🔴 ผ่าน capstone แล้วแต่บทปกติยังค้าง → การ์ดต้องยังไม่ให้ใบ', async ({ page, request }) => {
     // ⚠️ อีกด้านของเงื่อนไขสองชั้น · เทสก่อนหน้าเดินจาก "บทครบ+capstone ไม่ผ่าน"
     // ไป "ครบทั้งคู่" จึงไม่จับ UI ที่ตัดเงื่อนไขบทปกติทิ้ง (RIL จับ mutation นี้ได้)
-    expect((await answer(request, CAPSTONE, CAPSTONE_ANSWERS, CAPSTONE_SIMULATIONS)).passed).toBe(true)
+    await passCapstone(request)
 
     await page.goto(`/courses/${COURSE}`)
     const card = page.getByTestId('certificate-status')

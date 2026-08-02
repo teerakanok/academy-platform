@@ -10,6 +10,9 @@ import {
 } from '@/lib/course/assessment-policy'
 import { readBoundedBody } from '@/lib/http/bounded-body'
 import { gradeSimulation, gradingFingerprint } from '@/lib/simulation/types'
+import { resolveChallenge } from '@/lib/simulation/variables'
+import { consumeAttempt } from '@/lib/course/attempt-db'
+import { CHECKPOINT_CHALLENGE_ID } from '@/lib/course/attempt'
 import {
   loadAllProgress,
   loadProgress,
@@ -90,6 +93,13 @@ const schema = z.discriminatedUnion('action', [
         message: `ส่งด่านจำลองได้ไม่เกิน ${MAX_SIM_ITEMS} ด่าน`,
       })
       .optional(),
+    /**
+     * attempt ที่ผู้เรียนกำลังทำอยู่ (W1)
+     *
+     * บังคับเมื่อบทนั้นมีโจทย์จำลองที่ค่าเป้าหมายถูกสุ่ม — ไม่มี attempt แปลว่าไม่มี
+     * ค่าที่ตรวจได้ · ไม่บังคับกับบทที่เป็น MCQ ล้วน เพื่อไม่ทำลายของเดิม
+     */
+    attemptId: z.string().uuid().optional(),
   }),
   z.object({
     action: z.literal('video-cue'),
@@ -178,19 +188,49 @@ export async function POST(request: Request) {
       results[q.id] = sameAnswerSet(input.answers[q.id] ?? [], q.correct)
     }
 
+    // ── โจทย์จำลอง: ค่าเป้าหมายมาจาก attempt ไม่ใช่จากไฟล์ตรงๆ (W1) ──────────
+    //
+    // โจทย์ที่มีตัวแปรจะถูกสุ่มค่าตอนออก attempt · เซิร์ฟเวอร์ต้องตรวจด้วยค่าชุด
+    // เดียวกับที่ผู้เรียนอ่าน ไม่งั้นเขาทำตามโจทย์แล้วไม่ผ่านโดยไม่มีทางเดาสาเหตุ
+    //
+    // ⚠️ consume เป็น atomic และเงื่อนไข ownership/context/expiry อยู่ใน WHERE
+    // เดียวกันทั้งหมด (W0-0) — attempt ของคนอื่นหรือของบทอื่นใช้ไม่ได้ และใช้ซ้ำไม่ได้
+    const needsAttempt = sims.some((s) => Object.keys(s.challenge.variables ?? {}).length > 0)
+    let attemptVars: Record<string, Record<string, string>> = {}
+    if (needsAttempt) {
+      if (!input.attemptId) {
+        return NextResponse.json({ ok: false, error: 'ต้องเริ่มความพยายามใหม่ก่อนส่งคำตอบ' }, { status: 400 })
+      }
+      const consumed = await consumeAttempt(
+        {
+          userId: user.account.id,
+          courseSlug: input.slug,
+          nodeId: input.nodeId,
+          challengeId: CHECKPOINT_CHALLENGE_ID,
+        },
+        input.attemptId,
+      )
+      if (!consumed) {
+        // ไม่แยกเหตุผล — รายละเอียดคือ oracle ให้คนเดา attempt_id (W0-0)
+        return NextResponse.json({ ok: false, error: 'ความพยายามนี้ใช้ไม่ได้แล้ว' }, { status: 409 })
+      }
+      attemptVars = consumed.params.simulationVars ?? {}
+    }
+
     // ⚠️ หลักฐานของโจทย์จำลองต้องเก็บ **ผลราย requirement + เวอร์ชันของโจทย์**
     // ไม่ใช่ boolean รวม เพราะใบรับรองอ้างอิงหลักฐานนี้และต้องตรวจย้อนหลังได้ว่า
     // ผ่านด้วยอะไร (แผน §5 W1 ข้อ 4)
     const simulationEvidence: Record<string, SimulationEvidence> = {}
     for (const sim of sims) {
       const submitted = input.simulations?.[sim.id] ?? {}
-      const verdict = gradeSimulation(sim.challenge, submitted)
+      const challenge = resolveChallenge(sim.challenge, attemptVars[sim.id] ?? {})
+      const verdict = gradeSimulation(challenge, submitted)
       results[sim.id] = verdict.passed
       simulationEvidence[sim.id] = {
         passed: verdict.passed,
         requirements: verdict.results.map((r) => ({ id: r.id, met: r.met })),
         // ลายนิ้วมือของกติกาจริง ไม่ใช่เวอร์ชันคอร์ส — ดูเหตุผลใน gradingFingerprint
-        challengeVersion: gradingFingerprint(sim.challenge),
+        challengeVersion: gradingFingerprint(challenge),
         at: new Date().toISOString(),
       }
     }

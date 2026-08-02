@@ -49,9 +49,13 @@ describe('toPublicLesson — เนื้อหาจริงทุกไฟล
       expect(serialized, `${file}: ${q.id} ยังพา explanation ไปด้วย`).not.toContain(q.explanation)
     }
 
+    // แม่แบบตัวแปรต้องไม่หลุดไปหา browser เลย — ถ้าหลุด ผู้เรียนอ่านเจอ `{{targetIp}}`
+    expect(serialized, `${file}: แม่แบบตัวแปรหลุดไปกับ payload`).not.toContain('{{')
+
     // กติกาการตรวจของโจทย์จำลอง — ทั้งที่อยู่ในบล็อกเนื้อหาและที่เป็นด่านท้ายบท (W1)
     const simulationChallenges = [
       ...lesson.blocks.flatMap((b) => (b.kind === 'simulation' ? [b.challenge] : [])),
+      // ด่านท้ายบทไม่ถูกส่งมากับหน้าแล้ว (W1) แต่ยังตรวจว่าไม่มีอะไรของมันหลุดมา
       ...lesson.checkpoint.flatMap((item) => ('kind' in item && item.kind === 'simulation' ? [item.challenge] : [])),
     ]
     for (const challenge of simulationChallenges) {
@@ -80,9 +84,14 @@ describe('toPublicLesson — เนื้อหาจริงทุกไฟล
     for (const [i, item] of lesson.checkpoint.entries()) {
       const pubItem = pub.checkpoint[i]
       if ('kind' in item && item.kind === 'simulation') {
+        // ด่านจำลองผูกกับ attempt ตั้งแต่ W1 — หน้า lesson บอกได้แค่ว่า "มีด่าน id นี้"
+        // ตัวโจทย์ (ที่แทนค่าสุ่มแล้ว) มาจาก /api/attempts เท่านั้น · ถ้าส่งของในไฟล์
+        // มาด้วย ผู้เรียนจะเห็นแม่แบบ `{{targetIp}}` ซึ่งไม่ใช่โจทย์ของใครเลย
         expect(pubItem.kind).toBe('simulation')
-        // brief คือโจทย์ที่ผู้เรียนต้องอ่าน — ต้องรอดมาถึงหน้าเสมอ
-        if (pubItem.kind === 'simulation') expect(pubItem.challenge.brief).toBe(item.challenge.brief)
+        if (pubItem.kind === 'simulation') {
+          expect(pubItem.id).toBe(item.id)
+          expect(pubItem.challenge, 'หน้า lesson ต้องไม่ส่งโจทย์ในไฟล์มาด้วย').toBeUndefined()
+        }
         continue
       }
       expect(pubItem.kind).toBe('mcq')
