@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { currentUser } from '@/lib/auth/session'
 import { getCourseStructure } from '@/lib/content/course-source'
-import { getLessonAnswerKey } from '@/lib/content/answer-key'
+import { getLessonAnswerKey, mcqItems } from '@/lib/content/answer-key'
 import { loadProgress } from '@/lib/course/progress-db'
 
 export const runtime = 'nodejs'
@@ -64,7 +64,7 @@ export async function GET(request: Request) {
 
   return NextResponse.json({
     ok: true,
-    questions: answerKey.checkpoint.map((q) => ({
+    questions: mcqItems(answerKey.checkpoint).map((q) => ({
       id: q.id,
       correct: q.correct,
       explanation: q.explanation,

@@ -15,6 +15,19 @@ const LESSON = 'formats-reading' // บทปกติ 1 ข้อ (A–D)
 const CAPSTONE = 'formats-hands-on'
 /** เฉลยจริงของ capstone — ใช้พิสูจน์ว่าเมื่อทำถูกจริงแล้วใบรับรองมาจริง */
 const CAPSTONE_ANSWERS = { 'cp-1': ['B'], 'cp-2': ['C'], 'cp-3': ['B'] }
+/**
+ * capstone มีด่านจำลองด้วยตั้งแต่ W1 — ตอบ MCQ ถูกอย่างเดียวไม่ผ่านแล้ว
+ * (เทสของ W1 พิสูจน์ข้อนี้โดยตรงใน capstone-simulation.spec.ts)
+ */
+const CAPSTONE_SIMULATIONS = {
+  'sim-1': {
+    addressMode: 'static',
+    ipv4: '192.168.10.50',
+    subnet: '255.255.255.0',
+    gateway: '192.168.10.1',
+    applied: true,
+  },
+}
 
 interface CheckpointResponse {
   ok: boolean
@@ -26,9 +39,10 @@ async function answer(
   request: import('@playwright/test').APIRequestContext,
   nodeId: string,
   answers: Record<string, string[]>,
+  simulations?: Record<string, Record<string, string | boolean>>,
 ): Promise<CheckpointResponse> {
   const res = await request.post('/api/progress', {
-    data: { slug: COURSE, nodeId, action: 'checkpoint', mode: 'learn', answers },
+    data: { slug: COURSE, nodeId, action: 'checkpoint', mode: 'learn', answers, simulations },
   })
   expect(res.ok()).toBeTruthy()
   return res.json()
@@ -87,7 +101,7 @@ test.describe('completed คือความคืบหน้า ไม่ใ
 
   test('ผ่าน capstone จริงจึงจะนับเป็นหลักฐาน', async ({ request }) => {
     // ปิดทางเข้าใจผิดว่า "เข้มจนไม่มีใครผ่านได้" — คนที่ตอบถูกต้องผ่านตามปกติ
-    const body = await answer(request, CAPSTONE, CAPSTONE_ANSWERS)
+    const body = await answer(request, CAPSTONE, CAPSTONE_ANSWERS, CAPSTONE_SIMULATIONS)
     expect(body.passed).toBe(true)
 
     const after = await (await request.get(`/api/progress?slug=${COURSE}`)).json()
@@ -112,7 +126,7 @@ test.describe('completed คือความคืบหน้า ไม่ใ
     await expect(card).not.toContainText('Earned')
 
     // ผ่าน capstone จริง → การ์ดต้องพลิกเป็นได้ใบ
-    expect((await answer(request, CAPSTONE, CAPSTONE_ANSWERS)).passed).toBe(true)
+    expect((await answer(request, CAPSTONE, CAPSTONE_ANSWERS, CAPSTONE_SIMULATIONS)).passed).toBe(true)
     await page.reload()
     await expect(card).toHaveAttribute('data-eligible', 'true')
     await expect(page.getByTestId('certificate-assessed-count')).toContainText('1 / 1')
@@ -122,7 +136,7 @@ test.describe('completed คือความคืบหน้า ไม่ใ
   test('🔴 ผ่าน capstone แล้วแต่บทปกติยังค้าง → การ์ดต้องยังไม่ให้ใบ', async ({ page, request }) => {
     // ⚠️ อีกด้านของเงื่อนไขสองชั้น · เทสก่อนหน้าเดินจาก "บทครบ+capstone ไม่ผ่าน"
     // ไป "ครบทั้งคู่" จึงไม่จับ UI ที่ตัดเงื่อนไขบทปกติทิ้ง (RIL จับ mutation นี้ได้)
-    expect((await answer(request, CAPSTONE, CAPSTONE_ANSWERS)).passed).toBe(true)
+    expect((await answer(request, CAPSTONE, CAPSTONE_ANSWERS, CAPSTONE_SIMULATIONS)).passed).toBe(true)
 
     await page.goto(`/courses/${COURSE}`)
     const card = page.getByTestId('certificate-status')

@@ -2,14 +2,20 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { currentUser } from '@/lib/auth/session'
 import { getCourseStructure } from '@/lib/content/course-source'
-import { getLessonAnswerKey, sameAnswerSet } from '@/lib/content/answer-key'
+import { getLessonAnswerKey, mcqItems, sameAnswerSet, simulationItems } from '@/lib/content/answer-key'
 import {
   isTestOutAvailable,
   passesLearnMode,
   TEST_OUT_UNAVAILABLE_REASON,
 } from '@/lib/course/assessment-policy'
 import { readBoundedBody } from '@/lib/http/bounded-body'
-import { loadAllProgress, loadProgress, recordNodeEvent } from '@/lib/course/progress-db'
+import { gradeSimulation } from '@/lib/simulation/types'
+import {
+  loadAllProgress,
+  loadProgress,
+  recordNodeEvent,
+  type SimulationEvidence,
+} from '@/lib/course/progress-db'
 
 export const runtime = 'nodejs'
 
@@ -42,6 +48,9 @@ export const runtime = 'nodejs'
 const MAX_BODY_BYTES = 8 * 1024
 /** checkpoint ที่ยาวที่สุดวันนี้มี 5 ข้อ — เผื่อไว้พอสมควรแต่ไม่เปิดให้ส่งไม่จำกัด */
 const MAX_ANSWER_ENTRIES = 64
+/** ขอบเขตของด่านจำลองต่อ checkpoint และช่องต่อหน้าจอ — เหตุผลเดียวกับ MAX_ANSWER_ENTRIES */
+const MAX_SIM_ITEMS = 16
+const MAX_SIM_FIELDS = 32
 
 const answerMap = z
   .record(z.string().max(64), z.array(z.string().max(8)).max(12))
@@ -67,6 +76,20 @@ const schema = z.discriminatedUnion('action', [
     /** 'learn' = อ่านแล้วทำ checkpoint · 'test-out' = ข้ามการอ่านโดยพิสูจน์ */
     mode: z.enum(['learn', 'test-out']),
     answers: answerMap,
+    /** สถานะหน้าจอของด่านจำลอง — client ส่ง "สิ่งที่ตั้งค่าไว้" เซิร์ฟเวอร์ตัดสินเอง */
+    simulations: z
+      .record(
+        z.string().max(64),
+        z
+          .record(z.string().max(64), z.union([z.string().max(200), z.boolean()]))
+          .refine((state) => Object.keys(state).length <= MAX_SIM_FIELDS, {
+            message: `หน้าจอจำลองมีได้ไม่เกิน ${MAX_SIM_FIELDS} ช่อง`,
+          }),
+      )
+      .refine((s) => Object.keys(s).length <= MAX_SIM_ITEMS, {
+        message: `ส่งด่านจำลองได้ไม่เกิน ${MAX_SIM_ITEMS} ด่าน`,
+      })
+      .optional(),
   }),
   z.object({
     action: z.literal('video-cue'),
@@ -145,20 +168,42 @@ export async function POST(request: Request) {
     }
 
     // ── checkpoint: เซิร์ฟเวอร์ตรวจเอง ────────────────────────────────────
-    const questions = answerKey.checkpoint
+    //
+    // ด่านหนึ่งบทมีได้ทั้ง MCQ และโจทย์จำลอง (W1) · ทั้งสองถูกตรวจที่นี่ที่เดียว
+    // และนับรวมเป็นชุดเดียว — ผู้เรียนกด "ตรวจ" ครั้งเดียวได้ผลของทั้งด่าน
+    const questions = mcqItems(answerKey.checkpoint)
+    const sims = simulationItems(answerKey.checkpoint)
     const results: Record<string, boolean> = {}
     for (const q of questions) {
       results[q.id] = sameAnswerSet(input.answers[q.id] ?? [], q.correct)
     }
+
+    // ⚠️ หลักฐานของโจทย์จำลองต้องเก็บ **ผลราย requirement + เวอร์ชันของโจทย์**
+    // ไม่ใช่ boolean รวม เพราะใบรับรองอ้างอิงหลักฐานนี้และต้องตรวจย้อนหลังได้ว่า
+    // ผ่านด้วยอะไร (แผน §5 W1 ข้อ 4)
+    const simulationEvidence: Record<string, SimulationEvidence> = {}
+    for (const sim of sims) {
+      const submitted = input.simulations?.[sim.id] ?? {}
+      const verdict = gradeSimulation(sim.challenge, submitted)
+      results[sim.id] = verdict.passed
+      simulationEvidence[sim.id] = {
+        passed: verdict.passed,
+        requirements: verdict.results.map((r) => ({ id: r.id, met: r.met })),
+        challengeVersion: structure.version,
+        at: new Date().toISOString(),
+      }
+    }
+
     const correctCount = Object.values(results).filter(Boolean).length
+    const totalTasks = questions.length + sims.length
     // capstone และการ test-out ต้องถูกทุกข้อ · บทปกติใช้เกณฑ์ของโหมดสอน (W0-3)
     //
     // เดิมบทปกติผ่านด้วย "ตอบครบ" เฉยๆ — ตอบผิดทุกข้อก็ได้ `completed` (F2)
     const assessed = node.kind === 'capstone' || input.mode === 'test-out'
+    // โจทย์จำลองไม่มี "ยังไม่ตอบ" — หน้าจอมีค่าตั้งต้นเสมอ จึงนับความครบเฉพาะ MCQ
     const answeredAll = questions.every((q) => (input.answers[q.id]?.length ?? 0) > 0)
     const passed =
-      answeredAll &&
-      (assessed ? correctCount === questions.length : passesLearnMode(correctCount, questions.length))
+      answeredAll && (assessed ? correctCount === totalTasks : passesLearnMode(correctCount, totalTasks))
 
     await recordNodeEvent(user.account.id, {
       slug: input.slug,
@@ -166,6 +211,7 @@ export async function POST(request: Request) {
       // ตอบแล้วแต่ยังไม่ผ่าน — เก็บผลไว้ แต่สถานะยังไม่ขยับ
       status: passed ? (input.mode === 'test-out' ? 'tested-out' : 'completed') : 'in-progress',
       checkpointResults: results,
+      simulationEvidence: Object.keys(simulationEvidence).length > 0 ? simulationEvidence : undefined,
     })
 
     // assessed: รูปของ response ต้องเหมือนกันทั้งผ่านและไม่ผ่าน — ขนาด/จำนวน field
@@ -174,7 +220,7 @@ export async function POST(request: Request) {
 
     const explanations: Record<string, string> = {}
     for (const q of questions) explanations[q.id] = q.explanation
-    return NextResponse.json({ ok: true, passed, results, correctCount, total: questions.length, explanations })
+    return NextResponse.json({ ok: true, passed, results, correctCount, total: totalTasks, explanations })
   } catch (err) {
     console.error('[api/progress] บันทึกไม่สำเร็จ:', err)
     // ตอบตามจริง — ถ้าบอกว่าสำเร็จทั้งที่ไม่ได้บันทึก ผู้เรียนจะเสียงานโดยไม่รู้ตัว

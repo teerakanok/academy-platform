@@ -13,6 +13,11 @@ import { join } from 'node:path'
 
 const contentRoot = join(__dirname, '..', 'content', 'courses')
 
+interface SimChallenge {
+  requirements: { operator: string }[]
+  hints?: string[]
+}
+
 interface LessonFixture {
   slug: string
   nodeId: string
@@ -28,16 +33,21 @@ function lessonsWithSecrets(): LessonFixture[] {
     for (const name of readdirSync(lessonsDir)) {
       const lesson = JSON.parse(readFileSync(join(lessonsDir, name), 'utf8')) as {
         nodeId: string
-        checkpoint: { explanation: string }[]
+        // ด่านท้ายบทมีได้ทั้ง MCQ (ไม่มี `kind` ในไฟล์) และ simulation (W1)
+        checkpoint: { kind?: string; explanation?: string; challenge?: SimChallenge }[]
         videoCueQuestions?: { explanation: string }[]
-        blocks: { kind: string; challenge?: { requirements: { operator: string }[]; hints?: string[] } }[]
+        blocks: { kind: string; challenge?: SimChallenge }[]
       }
-      const sims = lesson.blocks.filter((b) => b.kind === 'simulation')
+      // โจทย์จำลองอยู่ได้ทั้งในบล็อกเนื้อหาและในด่านท้ายบท — ต้องตรวจทั้งสองที่
+      const sims = [
+        ...lesson.blocks.filter((b) => b.kind === 'simulation'),
+        ...lesson.checkpoint.filter((c) => c.kind === 'simulation'),
+      ]
       out.push({
         slug,
         nodeId: lesson.nodeId,
         explanations: [
-          ...lesson.checkpoint.map((q) => q.explanation),
+          ...lesson.checkpoint.flatMap((q) => (q.explanation ? [q.explanation] : [])),
           ...(lesson.videoCueQuestions ?? []).map((q) => q.explanation),
         ],
         operators: sims.flatMap((b) => b.challenge?.requirements.map((r) => r.operator) ?? []),

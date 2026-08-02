@@ -1,6 +1,6 @@
 import 'server-only'
 import { getLesson } from './course-source'
-import type { CheckpointQuestion, Locale, VideoCueQuestion } from './course-types'
+import type { CheckpointItem, CheckpointQuestion, Locale, VideoCueQuestion } from './course-types'
 import type { SimulationChallenge } from '@/lib/simulation/types'
 
 // ทางเข้าเดียวของ "ของที่เป็นเฉลย" — โมดูลนี้ห้ามถูก import จากฝั่ง browser
@@ -13,9 +13,23 @@ import type { SimulationChallenge } from '@/lib/simulation/types'
 // public-lesson.ts ซึ่งเป็นทางเดียวที่เนื้อหาควรข้ามไป browser
 
 export interface LessonAnswerKey {
-  checkpoint: CheckpointQuestion[]
+  /** ด่านท้ายบททั้งหมดตามลำดับจริง (MCQ + simulation) */
+  checkpoint: CheckpointItem[]
   videoCueQuestions: VideoCueQuestion[]
+  /** โจทย์จำลองที่อยู่ในเนื้อหา (โหมดฝึก) — คนละชุดกับที่อยู่ในด่านท้ายบท */
   simulations: SimulationChallenge[]
+}
+
+/** เฉพาะ MCQ ในด่าน — ใช้ตอนตรวจคำตอบแบบเลือกตอบ */
+export function mcqItems(checkpoint: readonly CheckpointItem[]): CheckpointQuestion[] {
+  return checkpoint.filter((item): item is CheckpointItem & { kind: 'mcq' } => item.kind === 'mcq')
+}
+
+/** เฉพาะโจทย์จำลองในด่าน — ใช้ตอนตรวจสถานะหน้าจอ */
+export function simulationItems(
+  checkpoint: readonly CheckpointItem[],
+): { id: string; challenge: SimulationChallenge }[] {
+  return checkpoint.flatMap((item) => (item.kind === 'simulation' ? [{ id: item.id, challenge: item.challenge }] : []))
 }
 
 // เนื้อหาเป็นไฟล์นิ่งที่ผูกเข้ามาตอน build — เฉลยของบทเดิมจึงเหมือนเดิมตลอดอายุ

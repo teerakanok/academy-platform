@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import type { CourseNode, CourseStructure, Locale } from '@/lib/content/course-types'
 import type { PublicLesson } from '@/lib/content/public-lesson'
+import type { SimulationState } from '@/lib/simulation/types'
 import {
   emptyProgress,
   markCompleted,
@@ -180,14 +181,15 @@ export function LessonView({
    */
   async function submitCheckpoint(
     quizMode: 'learn' | 'test-out',
-    answers: Record<string, string[]>,
+    submission: { answers: Record<string, string[]>; simulations: Record<string, SimulationState> },
   ): Promise<CheckpointOutcome | null> {
     const { failure, outcome } = await pushProgress({
       action: 'checkpoint',
       slug: structure.slug,
       nodeId: node.id,
       mode: quizMode,
-      answers,
+      answers: submission.answers,
+      simulations: submission.simulations,
     })
     setSyncError(failure)
     if (failure || !outcome) return null
@@ -554,9 +556,9 @@ export function LessonView({
           )}
         </div>
         <CheckpointQuiz
-          questions={lesson.checkpoint}
+          items={lesson.checkpoint}
           requireAllCorrect={mode === 'test-out' || isCapstone}
-          onSubmit={(answers) => submitCheckpoint(mode === 'test-out' ? 'test-out' : 'learn', answers)}
+          onSubmit={(submission) => submitCheckpoint(mode === 'test-out' ? 'test-out' : 'learn', submission)}
           onPassed={() => finishCheckpoint(mode === 'test-out' ? 'test-out' : 'learn')}
         />
         </div>

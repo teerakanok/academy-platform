@@ -220,7 +220,7 @@ describe('RLS ของ attempt — default deny เหมือนตารา�
   const FUNCTIONS = [
     'academy.issue_attempt(uuid, text, text, text, jsonb, text, int, int, int)',
     'academy.consume_attempt(uuid, uuid, text, text, text)',
-    'academy.record_node_progress(uuid, text, text, text, jsonb, jsonb)',
+    'academy.record_node_progress(uuid, text, text, text, jsonb, jsonb, jsonb)',
     'academy.status_rank(text)',
     'academy.has_course_entitlement(uuid, text)',
   ]
@@ -234,5 +234,64 @@ describe('RLS ของ attempt — default deny เหมือนตารา�
     )
     expect(res.rows[0].anon).toBe(false)
     expect(res.rows[0].authed).toBe(false)
+  })
+})
+
+// ── W1: หลักฐานของด่านจำลอง ──────────────────────────────────────────────────
+//
+// ใบรับรอง (W4) จะอ้างอิงหลักฐานนี้ จึงต้องเก็บ **ผลราย requirement + เวอร์ชันโจทย์**
+// ไม่ใช่ boolean รวม — ไม่งั้นตอบไม่ได้ว่าผ่านด้วยอะไร ณ โจทย์รุ่นไหน
+describe('simulation evidence ใน node_progress', () => {
+  const COURSE_SIM = 'evidence-test-course'
+
+  it('บันทึกผลราย requirement + เวอร์ชัน และรวมกับของเดิมโดยไม่ทับ', async () => {
+    const { recordNodeEvent } = await import('@/lib/course/progress-db')
+
+    await recordNodeEvent(owner.id, {
+      slug: COURSE_SIM,
+      nodeId: 'n1',
+      status: 'in-progress',
+      simulationEvidence: {
+        'sim-a': {
+          passed: false,
+          requirements: [
+            { id: 'r1', met: true },
+            { id: 'r2', met: false },
+          ],
+          challengeVersion: '1.0.0',
+          at: '2026-08-02T00:00:00.000Z',
+        },
+      },
+    })
+
+    // ส่งด่านที่สองมาทีหลัง — ของเดิมต้องไม่หาย
+    await recordNodeEvent(owner.id, {
+      slug: COURSE_SIM,
+      nodeId: 'n1',
+      status: 'completed',
+      simulationEvidence: {
+        'sim-b': { passed: true, requirements: [{ id: 'r9', met: true }], challengeVersion: '1.1.0', at: '2026-08-02T01:00:00.000Z' },
+      },
+    })
+
+    const row = await withDb((db) =>
+      db.query(
+        `select simulation_evidence from academy.node_progress
+          where user_id = $1 and course_slug = $2 and node_id = 'n1'`,
+        [owner.id, COURSE_SIM],
+      ),
+    )
+    const evidence = row.rows[0].simulation_evidence
+    expect(Object.keys(evidence).sort()).toEqual(['sim-a', 'sim-b'])
+    expect(evidence['sim-a'].requirements).toEqual([
+      { id: 'r1', met: true },
+      { id: 'r2', met: false },
+    ])
+    expect(evidence['sim-a'].challengeVersion).toBe('1.0.0')
+    expect(evidence['sim-b'].passed).toBe(true)
+
+    await withDb((db) =>
+      db.query(`delete from academy.node_progress where user_id = $1 and course_slug = $2`, [owner.id, COURSE_SIM]),
+    )
   })
 })

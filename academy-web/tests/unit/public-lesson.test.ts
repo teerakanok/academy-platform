@@ -43,13 +43,19 @@ describe('toPublicLesson — เนื้อหาจริงทุกไฟล
 
     // ใช้ `explanation` เป็นตัวชี้วัด ไม่ใช่ค่าเฉลย — เฉลย MCQ คือตัวอักษรเดี่ยว
     // ("A"/"B") ซึ่งเป็น key ของ choices ที่ **ต้อง** อยู่ใน payload อยู่แล้ว
-    for (const q of [...lesson.checkpoint, ...(lesson.videoCueQuestions ?? [])]) {
+    // MCQ ในด่าน (รูปไฟล์เดิมไม่มี `kind` — loader เติมให้ แต่ไฟล์ดิบยังไม่มี)
+    const mcqs = lesson.checkpoint.filter((item) => !('kind' in item) || item.kind === 'mcq')
+    for (const q of [...mcqs, ...(lesson.videoCueQuestions ?? [])]) {
       expect(serialized, `${file}: ${q.id} ยังพา explanation ไปด้วย`).not.toContain(q.explanation)
     }
 
-    // กติกาการตรวจของโจทย์จำลอง: operator/value ต้องไม่เหลือ และ hints ต้องหายไป
-    for (const block of lesson.blocks) {
-      if (block.kind !== 'simulation') continue
+    // กติกาการตรวจของโจทย์จำลอง — ทั้งที่อยู่ในบล็อกเนื้อหาและที่เป็นด่านท้ายบท (W1)
+    const simulationChallenges = [
+      ...lesson.blocks.flatMap((b) => (b.kind === 'simulation' ? [b.challenge] : [])),
+      ...lesson.checkpoint.flatMap((item) => ('kind' in item && item.kind === 'simulation' ? [item.challenge] : [])),
+    ]
+    for (const challenge of simulationChallenges) {
+      const block = { challenge }
       for (const req of block.challenge.requirements) {
         expect(serialized, `${file}: requirement ${req.id} ยังพา operator ไปด้วย`).not.toContain(
           `"operator":"${req.operator}"`,
@@ -71,9 +77,19 @@ describe('toPublicLesson — เนื้อหาจริงทุกไฟล
     expect(pub.title).toBe(lesson.title)
     expect(pub.blocks).toHaveLength(lesson.blocks.length)
     expect(pub.checkpoint).toHaveLength(lesson.checkpoint.length)
-    for (const [i, q] of lesson.checkpoint.entries()) {
-      expect(pub.checkpoint[i].prompt).toBe(q.prompt)
-      expect(pub.checkpoint[i].choices).toEqual(q.choices)
+    for (const [i, item] of lesson.checkpoint.entries()) {
+      const pubItem = pub.checkpoint[i]
+      if ('kind' in item && item.kind === 'simulation') {
+        expect(pubItem.kind).toBe('simulation')
+        // brief คือโจทย์ที่ผู้เรียนต้องอ่าน — ต้องรอดมาถึงหน้าเสมอ
+        if (pubItem.kind === 'simulation') expect(pubItem.challenge.brief).toBe(item.challenge.brief)
+        continue
+      }
+      expect(pubItem.kind).toBe('mcq')
+      if (pubItem.kind === 'mcq') {
+        expect(pubItem.prompt).toBe(item.prompt)
+        expect(pubItem.choices).toEqual(item.choices)
+      }
     }
     // cueId ต้องรอด — ไม่งั้นส่งคำตอบกลับไม่ได้ว่าเป็นคำถามไหน
     for (const [i, q] of (lesson.videoCueQuestions ?? []).entries()) {

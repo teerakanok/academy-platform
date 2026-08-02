@@ -74,6 +74,11 @@ export type PublicLessonBlock =
   | Exclude<LessonBlock, { kind: 'simulation' }>
   | { kind: 'simulation'; challenge: PublicSimulationChallenge }
 
+/** ด่านท้ายบทที่ browser เห็น — simulation ถูกลดรูปเหมือนในบล็อกเนื้อหา */
+export type PublicCheckpointItem =
+  | ({ kind: 'mcq' } & PublicCheckpointQuestion)
+  | { kind: 'simulation'; id: string; challenge: PublicSimulationChallenge }
+
 export interface PublicLesson {
   nodeId: string
   locale: Locale
@@ -82,7 +87,7 @@ export interface PublicLesson {
   blocks: PublicLessonBlock[]
   attribution?: string
   cheatsheet: string[]
-  checkpoint: PublicCheckpointQuestion[]
+  checkpoint: PublicCheckpointItem[]
   videoCueQuestions?: PublicVideoCueQuestion[]
 }
 
@@ -121,7 +126,11 @@ export function toPublicLesson(lesson: LessonContent): PublicLesson {
     ),
     attribution: lesson.attribution,
     cheatsheet: lesson.cheatsheet,
-    checkpoint: lesson.checkpoint.map(toPublicQuestion),
+    checkpoint: lesson.checkpoint.map((item): PublicCheckpointItem =>
+      item.kind === 'simulation'
+        ? { kind: 'simulation', id: item.id, challenge: toPublicSimulation(item.challenge) }
+        : { kind: 'mcq', ...toPublicQuestion(item) },
+    ),
     videoCueQuestions: lesson.videoCueQuestions?.map((q) => ({ ...toPublicQuestion(q), cueId: q.cueId })),
   }
 }

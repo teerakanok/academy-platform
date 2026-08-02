@@ -66,13 +66,29 @@ test.describe('โหมด assessed — response บอกได้แค่ผ
   })
 
   test('ตอบถูกครบ: response ก็ยังมีเฉพาะ ok กับ passed ไม่มีเฉลยแนบมา', async ({ request }) => {
+    // capstone มีด่านจำลองด้วยตั้งแต่ W1 — ต้องส่งสถานะหน้าจอที่ถูกมาด้วย
     // ⚠️ ตรวจกรณี "ผ่าน" ด้วย ไม่ใช่แค่ "ไม่ผ่าน" — ถ้าวันหนึ่งมีคนแนบเฉลยเฉพาะตอน
     // ผ่าน เทสที่ดูแต่กรณีไม่ผ่านจะเขียวทั้งที่รูเปิด (RIL cross-model จับ)
-    const body = await submitCheckpoint(request, CAPSTONE, 'learn', {
-      'cp-1': ['B'],
-      'cp-2': ['C'],
-      'cp-3': ['B'],
+    const res = await request.post('/api/progress', {
+      data: {
+        slug: COURSE,
+        nodeId: CAPSTONE,
+        action: 'checkpoint',
+        mode: 'learn',
+        answers: { 'cp-1': ['B'], 'cp-2': ['C'], 'cp-3': ['B'] },
+        simulations: {
+          'sim-1': {
+            addressMode: 'static',
+            ipv4: '192.168.10.50',
+            subnet: '255.255.255.0',
+            gateway: '192.168.10.1',
+            applied: true,
+          },
+        },
+      },
     })
+    expect(res.ok()).toBeTruthy()
+    const body = (await res.json()) as Record<string, unknown>
     expect(body.passed).toBe(true)
     expect(Object.keys(body).sort()).toEqual(['ok', 'passed'])
   })

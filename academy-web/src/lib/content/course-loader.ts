@@ -189,6 +189,28 @@ export function loadCourseCopy(file: string, data: unknown, structure: CourseStr
   return copy
 }
 
+/** โจทย์จำลองหนึ่งชิ้น — ใช้ทั้งในบล็อกเนื้อหาและในด่านท้ายบท (W1) */
+const simulationChallengeSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1),
+  brief: z.string().min(1),
+  surface: z.enum(['network-interface']),
+  initial: z.record(z.string(), z.union([z.string(), z.boolean()])),
+  requirements: z
+    .array(
+      z.object({
+        id: z.string().min(1),
+        label: z.string().min(1),
+        field: z.string().min(1),
+        operator: z.enum(['equals', 'notEquals', 'oneOf', 'isTrue', 'isFalse']),
+        value: z.union([z.string(), z.array(z.string())]).optional(),
+      }),
+    )
+    .min(1),
+  hints: z.array(z.string().min(1)).optional(),
+  debrief: z.string().min(1).optional(),
+})
+
 const blockSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('paragraph'), text: z.string().min(1) }),
   z.object({ kind: z.literal('heading'), text: z.string().min(1) }),
@@ -237,26 +259,7 @@ const blockSchema = z.discriminatedUnion('kind', [
   }),
   z.object({
     kind: z.literal('simulation'),
-    challenge: z.object({
-      id: z.string().min(1),
-      title: z.string().min(1),
-      brief: z.string().min(1),
-      surface: z.enum(['network-interface']),
-      initial: z.record(z.string(), z.union([z.string(), z.boolean()])),
-      requirements: z
-        .array(
-          z.object({
-            id: z.string().min(1),
-            label: z.string().min(1),
-            field: z.string().min(1),
-            operator: z.enum(['equals', 'notEquals', 'oneOf', 'isTrue', 'isFalse']),
-            value: z.union([z.string(), z.array(z.string())]).optional(),
-          }),
-        )
-        .min(1),
-      hints: z.array(z.string().min(1)).optional(),
-      debrief: z.string().min(1).optional(),
-    }),
+    challenge: simulationChallengeSchema,
   }),
   z.object({
     kind: z.literal('lab'),
@@ -276,6 +279,19 @@ const questionSchema = z.object({
   explanation: z.string().min(1),
 })
 
+// ด่านท้ายบทรับได้สองรูป (W1):
+//   · รูปเดิม — คำถาม MCQ ล้วน ไม่มี `kind` (ไฟล์เนื้อหาทุกไฟล์วันนี้เป็นแบบนี้)
+//   · รูปใหม่ — ระบุ `kind` เป็น 'mcq' หรือ 'simulation'
+// ทั้งสองถูกทำให้เป็นรูปเดียวกัน (`kind` ครบเสมอ) ก่อนออกจาก loader
+const checkpointItemSchema = z.union([
+  questionSchema.extend({ kind: z.literal('mcq').optional() }),
+  z.object({
+    kind: z.literal('simulation'),
+    id: z.string().min(1),
+    challenge: simulationChallengeSchema,
+  }),
+])
+
 const lessonSchema = z.object({
   nodeId: z.string().min(1),
   locale: z.enum(['en', 'th']),
@@ -284,19 +300,28 @@ const lessonSchema = z.object({
   blocks: z.array(blockSchema).min(1),
   attribution: z.string().optional(),
   cheatsheet: z.array(z.string().min(1)).min(1),
-  checkpoint: z.array(questionSchema).min(1),
+  checkpoint: z.array(checkpointItemSchema).min(1),
   videoCueQuestions: z.array(questionSchema.extend({ cueId: z.string().min(1) })).optional(),
 })
 
 export function loadLesson(file: string, data: unknown, structure: CourseStructure): LessonContent {
   const parsed = lessonSchema.safeParse(data)
   if (!parsed.success) fail(file, parsed.error)
-  const lesson = parsed.data as LessonContent
+
+  // เติม kind ให้รายการรูปเดิม — ตั้งแต่จุดนี้ไปทุกอย่างเป็น discriminated union
+  // ที่มี `kind` ครบเสมอ ไม่ต้องมีใครเดาอีก
+  const raw = parsed.data as { checkpoint: Record<string, unknown>[] } & Record<string, unknown>
+  const lesson = {
+    ...raw,
+    checkpoint: raw.checkpoint.map((item) => (item.kind ? item : { ...item, kind: 'mcq' })),
+  } as unknown as LessonContent
 
   const node = structure.nodes.find((n) => n.id === lesson.nodeId)
   if (!node) throw new ContentValidationError(file, `nodeId "${lesson.nodeId}" ไม่มีในโครงคอร์ส`)
 
-  const allQuestions = [...lesson.checkpoint, ...(lesson.videoCueQuestions ?? [])]
+  const mcqItems = lesson.checkpoint.filter((item) => item.kind === 'mcq')
+  const simulationItems = lesson.checkpoint.filter((item) => item.kind === 'simulation')
+  const allQuestions = [...mcqItems, ...(lesson.videoCueQuestions ?? [])]
   for (const q of allQuestions) {
     const letters = new Set(Object.keys(q.choices))
     if (letters.size < 2) {
@@ -325,13 +350,21 @@ export function loadLesson(file: string, data: unknown, structure: CourseStructu
     }
   }
 
-  // capstone คือด่านบังคับ — ถ้ามีคำถามเดียวมันไม่ใช่การพิสูจน์ความสามารถ
+  // capstone คือด่านบังคับ — ถ้ามีด่านเดียวมันไม่ใช่การพิสูจน์ความสามารถ
+  // (นับรวมโจทย์จำลองด้วย เพราะมันคือด่านเหมือนกัน ไม่ใช่ของประกอบ)
   if (node.kind === 'capstone' && lesson.checkpoint.length < 3) {
     throw new ContentValidationError(
       file,
-      `node ${node.id} เป็น capstone (ข้ามไม่ได้) แต่มีคำถามแค่ ${lesson.checkpoint.length} ข้อ — ต้องมีอย่างน้อย 3 ข้อ`,
+      `node ${node.id} เป็น capstone (ข้ามไม่ได้) แต่มีด่านแค่ ${lesson.checkpoint.length} — ต้องมีอย่างน้อย 3`,
     )
   }
+
+  // id ของด่านต้องไม่ซ้ำกัน — คำตอบที่ส่งกลับมาผูกกับ id นี้
+  const ids = lesson.checkpoint.map((item) => item.id)
+  if (new Set(ids).size !== ids.length) {
+    throw new ContentValidationError(file, `ด่านท้ายบทมี id ซ้ำกัน (${ids.join(',')})`)
+  }
+  void simulationItems
 
   return lesson
 }

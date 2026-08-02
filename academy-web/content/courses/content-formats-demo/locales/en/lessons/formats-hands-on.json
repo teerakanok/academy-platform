@@ -99,6 +99,61 @@
         "B"
       ],
       "explanation": "Making someone enter a separate environment for two minutes of work is why short exercises get skipped. Starting inline removes that cost; keeping the expand control means a small screen or an awkward task is never a dead end."
+    },
+    {
+      "kind": "simulation",
+      "id": "sim-1",
+      "challenge": {
+        "id": "capstone-static-print-server",
+        "title": "Give the print server a fixed address",
+        "brief": "The print server has to answer at 192.168.10.50 every time it boots, on the 192.168.10.0/24 network with the router at 192.168.10.1. Set the interface up so that stays true, then apply it.",
+        "surface": "network-interface",
+        "initial": {
+          "addressMode": "dhcp",
+          "ipv4": "",
+          "subnet": "",
+          "gateway": "",
+          "dns1": "",
+          "applied": false
+        },
+        "requirements": [
+          {
+            "id": "r-mode",
+            "label": "The address does not change between boots",
+            "field": "addressMode",
+            "operator": "equals",
+            "value": "static"
+          },
+          {
+            "id": "r-ip",
+            "label": "It answers at the address the brief asks for",
+            "field": "ipv4",
+            "operator": "equals",
+            "value": "192.168.10.50"
+          },
+          {
+            "id": "r-subnet",
+            "label": "The subnet matches the network it sits on",
+            "field": "subnet",
+            "operator": "equals",
+            "value": "255.255.255.0"
+          },
+          {
+            "id": "r-gateway",
+            "label": "It can reach the rest of the network",
+            "field": "gateway",
+            "operator": "equals",
+            "value": "192.168.10.1"
+          },
+          {
+            "id": "r-applied",
+            "label": "The settings are applied, not just typed in",
+            "field": "applied",
+            "operator": "isTrue"
+          }
+        ],
+        "debrief": "A fixed address is what makes a print queue findable. With DHCP the lease can change and every workstation pointing at the old address quietly stops printing."
+      }
     }
   ]
 }

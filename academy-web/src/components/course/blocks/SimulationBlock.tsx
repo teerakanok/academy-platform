@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import type { PublicSimulationChallenge } from '@/lib/content/public-lesson'
 import type { SimulationState } from '@/lib/simulation/types'
-import { NetworkInterfaceSim } from './NetworkInterfaceSim'
+import { SimulationSurface } from './SimulationSurface'
 
 // โจทย์จำลอง — โจทย์ + หน้าจอ + ปุ่มตรวจ · **เซิร์ฟเวอร์เป็นคนตรวจ**
 //
@@ -16,10 +16,6 @@ import { NetworkInterfaceSim } from './NetworkInterfaceSim'
 //   practice — ตรวจกี่ครั้งก็ได้ · บทปกติบอกได้ว่าข้อไหนยังไม่ผ่าน · ด่านของ capstone
 //              ปิดเท่าโหมดวัดผล (เซิร์ฟเวอร์เป็นคนเลือกให้ ไม่ใช่หน้านี้)
 //   assessed — ใช้ตอนวัดผลจริง บอกแค่ผ่าน/ไม่ผ่าน (ต่อเข้า checkpoint ใน W1)
-
-const SURFACES = {
-  'network-interface': NetworkInterfaceSim,
-} as const
 
 interface PracticeVerdict {
   passed: boolean
@@ -50,7 +46,6 @@ export function SimulationBlock({
   // คำใบ้ที่ขอมาแล้วจะแสดงทันที — สถานะนี้มีไว้ให้พับเก็บได้เท่านั้น
   const [hintsHidden, setHintsHidden] = useState(false)
 
-  const Surface = SURFACES[challenge.surface]
   const locked = mode === 'assessed' && verdict !== null
 
   async function check(wantHint = false) {
@@ -99,7 +94,7 @@ export function SimulationBlock({
       </p>
 
       <div className="mt-5">
-        <Surface state={state} onChange={setState} readOnly={locked} />
+        <SimulationSurface surface={challenge.surface} state={state} onChange={setState} readOnly={locked} />
       </div>
 
       <div className="mt-5 flex flex-wrap items-center gap-3">

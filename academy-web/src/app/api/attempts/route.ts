@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { currentUser } from '@/lib/auth/session'
-import { getCourseStructure, getLesson } from '@/lib/content/course-source'
+import { getCourseStructure } from '@/lib/content/course-source'
 import { CHECKPOINT_CHALLENGE_ID, buildAttemptParams, toPublicQuestions } from '@/lib/course/attempt'
+import { getLessonAnswerKey, mcqItems } from '@/lib/content/answer-key'
 import { issueAttempt } from '@/lib/course/attempt-db'
 import { readBoundedBody } from '@/lib/http/bounded-body'
 
@@ -61,8 +62,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: 'บทนี้ยังไม่เปิดให้วัดผลแบบ attempt' }, { status: 400 })
   }
 
-  const resolved = getLesson(input.slug, input.nodeId)
-  const bank = resolved?.lesson.checkpoint ?? []
+  const answerKey = getLessonAnswerKey(input.slug, input.nodeId)
+  // attempt วันนี้หมุนเฉพาะ MCQ — โจทย์จำลองใช้การสุ่มพารามิเตอร์คนละแบบ (W1c)
+  const bank = mcqItems(answerKey?.checkpoint ?? [])
   if (bank.length === 0) {
     return NextResponse.json({ ok: false, error: 'บทนี้ยังไม่มีคลังข้อ' }, { status: 400 })
   }

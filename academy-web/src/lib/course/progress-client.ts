@@ -35,7 +35,15 @@ export async function fetchProgress(slug: string): Promise<CourseProgressRecord>
 export type ProgressAction =
   | { action: 'open'; slug: string; nodeId: string }
   | { action: 'skip'; slug: string; nodeId: string }
-  | { action: 'checkpoint'; slug: string; nodeId: string; mode: 'learn' | 'test-out'; answers: Record<string, string[]> }
+  | {
+      action: 'checkpoint'
+      slug: string
+      nodeId: string
+      mode: 'learn' | 'test-out'
+      answers: Record<string, string[]>
+      /** สถานะหน้าจอของด่านจำลองแต่ละตัว — เซิร์ฟเวอร์ตรวจเองจาก requirements (W1) */
+      simulations?: Record<string, Record<string, string | boolean>>
+    }
   | { action: 'video-cue'; slug: string; nodeId: string; cueId: string; answer: string[] }
 
 /**

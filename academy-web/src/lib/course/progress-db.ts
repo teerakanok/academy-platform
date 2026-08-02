@@ -56,12 +56,26 @@ export async function loadProgress(userId: string, slug: string): Promise<Course
   return rowsToRecord(slug, (data ?? []) as NodeRow[])
 }
 
+/**
+ * หลักฐานของด่านจำลองหนึ่งด่าน (W1)
+ *
+ * เก็บผล **ราย requirement** ไม่ใช่ boolean รวม เพราะใบรับรองอ้างอิงข้อมูลนี้และ
+ * ต้องตอบได้ย้อนหลังว่าผ่านด้วยอะไร ณ โจทย์เวอร์ชันไหน
+ */
+export interface SimulationEvidence {
+  passed: boolean
+  requirements: { id: string; met: boolean }[]
+  challengeVersion: string
+  at: string
+}
+
 export interface NodeEvent {
   slug: string
   nodeId: string
   status: NodeProgressStatus
   checkpointResults?: Record<string, boolean>
   videoCueResults?: Record<string, boolean>
+  simulationEvidence?: Record<string, SimulationEvidence>
 }
 
 /**
@@ -85,6 +99,7 @@ export async function recordNodeEvent(userId: string, event: NodeEvent): Promise
     p_status: event.status,
     p_checkpoint_results: event.checkpointResults ?? null,
     p_video_cue_results: event.videoCueResults ?? null,
+    p_simulation_evidence: event.simulationEvidence ?? null,
   })
   if (error) throw new Error(`บันทึกความคืบหน้าไม่สำเร็จ: ${error.message}`)
 }

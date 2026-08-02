@@ -22,7 +22,7 @@ const lessonFile = JSON.parse(
     join(__dirname, '..', 'content', 'courses', COURSE, 'locales', 'en', 'lessons', `${CAPSTONE}.json`),
     'utf8',
   ),
-) as { checkpoint: { id: string; prompt: string; choices: Record<string, string>; explanation: string }[] }
+) as { checkpoint: { kind?: string; id: string; prompt?: string; choices?: Record<string, string>; explanation?: string }[] }
 
 test.describe('POST /api/attempts', () => {
   test('ไม่ล็อกอิน = ไม่มี attempt (401)', async ({ playwright, baseURL }) => {
@@ -56,8 +56,9 @@ test.describe('POST /api/attempts', () => {
     expect(body.attemptId).toMatch(/^[0-9a-f-]{36}$/)
     expect(Date.parse(body.expiresAt)).toBeGreaterThan(Date.now())
 
-    // โจทย์ครบตามจำนวนของ capstone และแต่ละข้อมีของที่ใช้แสดงผลเท่านั้น
-    expect(body.questions).toHaveLength(lessonFile.checkpoint.length)
+    // attempt หมุนเฉพาะ MCQ — ด่านจำลองใช้การสุ่มพารามิเตอร์คนละแบบ (W1)
+    const mcqCount = lessonFile.checkpoint.filter((q) => q.kind !== 'simulation').length
+    expect(body.questions).toHaveLength(mcqCount)
     for (const q of body.questions as Record<string, unknown>[]) {
       expect(Object.keys(q).sort()).toEqual(['choices', 'id', 'prompt'])
     }
@@ -65,7 +66,7 @@ test.describe('POST /api/attempts', () => {
     // เฉลยต้องไม่รั่ว: explanation เป็นสตริงยาวไม่ซ้ำกับอะไร ใช้เป็นตัวชี้วัดได้จริง
     const payload = JSON.stringify(body)
     for (const q of lessonFile.checkpoint) {
-      expect(payload).not.toContain(q.explanation)
+      if (q.explanation) expect(payload).not.toContain(q.explanation)
     }
   })
 

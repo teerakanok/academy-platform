@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import type { PublicCheckpointQuestion } from '@/lib/content/public-lesson'
+import type { PublicCheckpointItem } from '@/lib/content/public-lesson'
 import type { CheckpointOutcome } from '@/lib/course/progress-client'
+import type { SimulationState } from '@/lib/simulation/types'
+import { SimulationSurface } from './blocks/SimulationSurface'
 
 // Checkpoint ท้ายบท — **เซิร์ฟเวอร์เป็นคนตรวจ ไม่ใช่หน้านี้**
 //
@@ -15,29 +17,42 @@ import type { CheckpointOutcome } from '@/lib/course/progress-client'
 //   learn (บทปกติ) → ผลรายข้อ + คำอธิบาย เพราะเป็นการสอน
 
 export function CheckpointQuiz({
-  questions,
+  items,
   requireAllCorrect,
   onSubmit,
   onPassed,
 }: {
-  questions: PublicCheckpointQuestion[]
+  /** ด่านท้ายบท — MCQ และ/หรือโจทย์จำลอง (W1) */
+  items: PublicCheckpointItem[]
   /** true เมื่อเป็น capstone หรือ test-out — ข้อความบอกผู้เรียนว่าต้องถูกทุกข้อ */
   requireAllCorrect: boolean
-  /** ส่งคำตอบให้เซิร์ฟเวอร์ตรวจ · null = ตรวจไม่สำเร็จ (เครือข่าย/เซิร์ฟเวอร์) */
-  onSubmit: (answers: Record<string, string[]>) => Promise<CheckpointOutcome | null>
+  /** ส่งสิ่งที่ผู้เรียนทำให้เซิร์ฟเวอร์ตรวจ · null = ตรวจไม่สำเร็จ */
+  onSubmit: (submission: {
+    answers: Record<string, string[]>
+    simulations: Record<string, SimulationState>
+  }) => Promise<CheckpointOutcome | null>
   /** ผู้เรียนกดไปต่อหลังผ่านแล้ว */
   onPassed: () => void
 }) {
+  const questions = items.filter((item): item is Extract<PublicCheckpointItem, { kind: 'mcq' }> => item.kind === 'mcq')
+  const simulations = items.filter(
+    (item): item is Extract<PublicCheckpointItem, { kind: 'simulation' }> => item.kind === 'simulation',
+  )
   const [answers, setAnswers] = useState<Record<string, string[]>>({})
+  // สถานะหน้าจอจำลองต่อด่าน — ตั้งต้นจาก `initial` ของโจทย์แต่ละตัว
+  const [simStates, setSimStates] = useState<Record<string, SimulationState>>(() =>
+    Object.fromEntries(simulations.map((s) => [s.id, { ...s.challenge.initial }])),
+  )
   const [grading, setGrading] = useState(false)
   const [outcome, setOutcome] = useState<CheckpointOutcome | null>(null)
   const [failed, setFailed] = useState(false)
 
+  // โจทย์จำลองไม่มี "ยังไม่ตอบ" — หน้าจอมีค่าตั้งต้นเสมอ จึงนับเฉพาะ MCQ
   const allAnswered = questions.every((q) => (answers[q.id]?.length ?? 0) > 0)
   const results = outcome?.results
   const explanations = outcome?.explanations
 
-  function toggle(question: PublicCheckpointQuestion, letter: string) {
+  function toggle(question: Extract<PublicCheckpointItem, { kind: 'mcq' }>, letter: string) {
     if (grading || outcome) return
     setAnswers((prev) => {
       const current = prev[question.id] ?? []
@@ -55,7 +70,7 @@ export function CheckpointQuiz({
   async function grade() {
     setGrading(true)
     setFailed(false)
-    const next = await onSubmit(answers)
+    const next = await onSubmit({ answers, simulations: simStates })
     setGrading(false)
     if (!next) {
       setFailed(true)
@@ -66,6 +81,7 @@ export function CheckpointQuiz({
 
   function retry() {
     setAnswers({})
+    setSimStates(Object.fromEntries(simulations.map((s) => [s.id, { ...s.challenge.initial }])))
     setOutcome(null)
     setFailed(false)
   }
@@ -77,7 +93,7 @@ export function CheckpointQuiz({
           {requireAllCorrect ? 'Required checkpoint' : 'Check yourself'}
         </h2>
         <span className="font-mono text-xs text-cs-muted">
-          {questions.length} {questions.length === 1 ? 'question' : 'questions'}
+          {items.length} {items.length === 1 ? 'task' : 'tasks'}
         </span>
       </div>
       <p className="mb-6 text-sm text-cs-muted">
@@ -149,6 +165,28 @@ export function CheckpointQuiz({
           )
         })}
       </div>
+
+      {simulations.length > 0 && (
+        <div className="mt-8 space-y-6 border-t border-cs-border pt-7">
+          {simulations.map((item) => (
+            <div key={item.id} data-testid={`checkpoint-sim-${item.id}`}>
+              <p className="mb-1 font-mono text-[11px] uppercase tracking-wide text-cs-muted">
+                Hands-on · set it up
+              </p>
+              <h3 className="mb-2 font-display text-lg font-semibold text-cs-text">{item.challenge.title}</h3>
+              <p className="mb-4 max-w-2xl text-[0.95rem] leading-relaxed text-cs-body">{item.challenge.brief}</p>
+              {/* หน้าจอเดียวกับโหมดฝึก — ต่างกันแค่ว่าผลถูกส่งไปพร้อม checkpoint
+                  และเซิร์ฟเวอร์ตรวจทีเดียวทั้งด่าน ไม่มีปุ่มตรวจแยกของตัวเอง */}
+              <SimulationSurface
+                surface={item.challenge.surface}
+                state={simStates[item.id] ?? item.challenge.initial}
+                onChange={(next) => setSimStates((prev) => ({ ...prev, [item.id]: next }))}
+                readOnly={grading || outcome !== null}
+              />
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="mt-7 flex flex-wrap items-center gap-3 border-t border-cs-border pt-5">
         {!outcome ? (

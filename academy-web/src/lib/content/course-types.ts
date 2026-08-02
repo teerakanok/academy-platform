@@ -157,6 +157,28 @@ export interface CheckpointQuestion {
   explanation: string
 }
 
+// ── ด่านท้ายบทรับได้มากกว่า MCQ (W1) ──────────────────────────────────────────
+//
+// เดิม `checkpoint` เป็น `CheckpointQuestion[]` ล้วน — โจทย์จำลอง (simulation) จึงอยู่
+// ได้แค่ในเนื้อหาให้ลองเล่น ไม่เคยถูกใช้ตัดสินอะไร ทั้งที่มันคือชิ้นที่พิสูจน์ "ตั้งค่า
+// เป็น" ซึ่งต่างจาก "เลือกข้อถูก" อย่างสิ้นเชิง
+//
+// รูปใหม่เป็น discriminated union แต่ **ไฟล์เนื้อหาเดิมต้องไม่ต้องแก้เลย** — loader
+// แปลงรายการที่ไม่มี `kind` ให้เป็น `{kind:'mcq'}` ให้เอง (ดู course-loader)
+
+export interface McqCheckpointItem extends CheckpointQuestion {
+  kind: 'mcq'
+}
+
+export interface SimulationCheckpointItem {
+  kind: 'simulation'
+  id: string
+  /** โจทย์จำลองที่ผู้เรียนต้องตั้งค่าให้ถูก — เฉลยคือ requirements ฝั่งเซิร์ฟเวอร์ */
+  challenge: import('@/lib/simulation/types').SimulationChallenge
+}
+
+export type CheckpointItem = McqCheckpointItem | SimulationCheckpointItem
+
 /** คำถามที่เด้งกลางวิดีโอ — ผูกกับ cue id ในโครง */
 export interface VideoCueQuestion extends CheckpointQuestion {
   cueId: string
@@ -175,7 +197,13 @@ export interface LessonContent {
   attribution?: string
   /** ใช้ทั้งตอนจบบท และตอนผู้เรียนเลือกข้าม (แก้ skip anxiety) */
   cheatsheet: string[]
-  checkpoint: CheckpointQuestion[]
+  /**
+   * ด่านท้ายบท — MCQ และ/หรือโจทย์จำลอง
+   *
+   * loader รับไฟล์เนื้อหาแบบเดิม (อาร์เรย์ของคำถามล้วน) แล้วเติม `kind:'mcq'` ให้
+   * จึงไม่มีไฟล์เนื้อหาไหนต้องแก้เพราะการเปลี่ยนนี้
+   */
+  checkpoint: CheckpointItem[]
   videoCueQuestions?: VideoCueQuestion[]
 }
 
