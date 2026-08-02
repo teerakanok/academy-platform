@@ -128,7 +128,7 @@ describe('scoreExam — denominator + breakdown + attribution', () => {
   it('weakest domain: เฉพาะ module ≥3 หน่วย; ต่ำกว่า = ไม่เข้าเกณฑ์', () => {
     const score = scoreExam(
       { questions, pbqs: [] },
-      { mcq: { Q1: ['A'], Q2: ['X'], Q3: ['X'], Q4: ['X'] } }, // m1 = 1/3, m2 = 0/1
+      { mcq: { Q1: ['A'], Q2: ['X'], Q3: ['X'], Q4: ['X'] }, pbq: {} }, // m1 = 1/3, m2 = 0/1
     )
     // m2 มีแค่ 1 หน่วย → ไม่เข้าเกณฑ์ แม้ 0%
     expect(score.weakestModules).toHaveLength(1)
@@ -138,7 +138,7 @@ describe('scoreExam — denominator + breakdown + attribution', () => {
   it('weakest domain: ไม่มี module ถึง 3 หน่วย → null (ข้อมูลไม่พอ)', () => {
     const score = scoreExam(
       { questions: questions.slice(2), pbqs: [] },
-      { mcq: {} },
+      { mcq: {}, pbq: {} },
     )
     expect(score.weakestModules).toBeNull()
   })
@@ -148,7 +148,7 @@ describe('scoreExam — denominator + breakdown + attribution', () => {
       ...['a', 'b', 'c'].map((s, i) => mcq({ id: `A${i}`, moduleId: 'm1', moduleTitle: 'M1', objective: '1.1' })),
       ...['a', 'b', 'c'].map((s, i) => mcq({ id: `B${i}`, moduleId: 'm2', moduleTitle: 'M2', objective: '2.1' })),
     ]
-    const score = scoreExam({ questions: qs, pbqs: [] }, { mcq: {} }) // ทุกข้อผิด → 0% เสมอ
+    const score = scoreExam({ questions: qs, pbqs: [] }, { mcq: {}, pbq: {} }) // ทุกข้อผิด → 0% เสมอ
     expect(score.weakestModules!.map((g) => g.key).sort()).toEqual(['m1', 'm2'])
   })
 

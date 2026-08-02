@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { getIdentityAdapter, resetIdentityAdapterForTest } from '@/lib/identity/registry'
 
 // adapter ปลอมหลุดขึ้น production = ทุกคนล็อกอินได้โดยไม่มีการยืนยันตัวตนใดๆ
@@ -7,6 +7,7 @@ import { getIdentityAdapter, resetIdentityAdapterForTest } from '@/lib/identity/
 const original = { ...process.env }
 
 afterEach(() => {
+  vi.unstubAllEnvs()
   process.env = { ...original }
   resetIdentityAdapterForTest()
 })
@@ -20,7 +21,8 @@ describe('การเลือก identity adapter', () => {
 
   it('fake ใช้ได้นอก production', () => {
     process.env.IDENTITY_ADAPTER = 'fake'
-    process.env.NODE_ENV = 'test'
+    // NODE_ENV เป็น read-only ในชนิดของ Node — ต้อง stub ผ่าน vitest ไม่ใช่ assign ตรง
+    vi.stubEnv('NODE_ENV', 'test')
     resetIdentityAdapterForTest()
     const adapter = getIdentityAdapter()
     expect(adapter?.name).toBe('fake')
@@ -29,7 +31,7 @@ describe('การเลือก identity adapter', () => {
 
   it('fake บน production ต้องพังทันที', () => {
     process.env.IDENTITY_ADAPTER = 'fake'
-    process.env.NODE_ENV = 'production'
+    vi.stubEnv('NODE_ENV', 'production')
     resetIdentityAdapterForTest()
     expect(() => getIdentityAdapter()).toThrow(/production/)
   })
