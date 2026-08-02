@@ -53,12 +53,20 @@ describe('meets — ทุก operator ต้อง fail-closed เมื่อ�
 
   it('ชื่อ field ที่ตกไปโดน Object.prototype ต้องไม่ทะลุ', () => {
     // สถานะมาจาก client ทั้งก้อน — index ตรงๆ จะเจอ function บน prototype
+    //
+    // ⚠️ ต้องใช้ `notEquals` ไม่ใช่ `isTrue` — เทสรุ่นแรกใช้ isTrue ซึ่ง false positive
+    // เพราะ function ที่ทะลุมาก็ไม่เท่ากับ `true` อยู่ดี เทสจึงเขียวแม้ guard ถูกถอด
+    // (RIL รอบ 3 พิสูจน์ด้วย in-memory mutation) · notEquals จับได้จริงเพราะ
+    // function !== 'x' → ผ่านทันทีถ้า prototype ทะลุ
     for (const field of ['toString', 'constructor', 'hasOwnProperty']) {
-      const verdict = gradeSimulation(
-        challenge([{ id: 'r', label: 'l', field, operator: 'isTrue' }]),
+      const notEquals = gradeSimulation(
+        challenge([{ id: 'r', label: 'l', field, operator: 'notEquals', value: 'x' }]),
         {},
       )
-      expect(verdict.passed, `field=${field} ทะลุไปเจอ prototype`).toBe(false)
+      expect(notEquals.passed, `field=${field} ทะลุไปเจอ prototype (notEquals)`).toBe(false)
+
+      const isTrue = gradeSimulation(challenge([{ id: 'r', label: 'l', field, operator: 'isTrue' }]), {})
+      expect(isTrue.passed).toBe(false)
     }
   })
 })
