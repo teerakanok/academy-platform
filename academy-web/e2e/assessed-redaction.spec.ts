@@ -197,6 +197,30 @@ test.describe('โจทย์จำลองโหมดฝึก — เซิ
     expect(res.status()).toBe(413)
   })
 
+  test('body ภาษาไทยที่ใหญ่เกินขอบเขตก็ต้อง 413 — ขอบเขตต้องนับเป็น byte ไม่ใช่ตัวอักษร', async ({
+    request,
+  }) => {
+    // ⚠️ เทสรุ่นแรกใช้ ASCII ล้วนจึงเขียวทั้งที่ช่องโหว่เปิดอยู่: อักษรไทยหนึ่งตัวนับ
+    // เป็น 1 ใน String.length แต่กิน 3 byte จริง — 32 ช่อง × 200 ตัวอักษรไทย
+    // ผ่าน guard ที่นับด้วย String.length ได้สบายทั้งที่เกิน 8 KiB ไปหลายเท่า
+    const thai: Record<string, string> = {}
+    for (let i = 0; i < 32; i++) thai[`f${i}`] = 'ก'.repeat(200)
+    const payload = JSON.stringify({
+      slug: COURSE,
+      nodeId: SIM_LESSON,
+      challengeId: 'static-print-server',
+      state: thai,
+    })
+    expect(payload.length, 'payload ต้องเล็กพอในหน่วยตัวอักษร มิฉะนั้นเทสไม่ได้พิสูจน์อะไร').toBeLessThan(8 * 1024)
+    expect(new TextEncoder().encode(payload).length).toBeGreaterThan(8 * 1024)
+
+    const res = await request.post('/api/practice/simulation', {
+      headers: { 'content-type': 'application/json' },
+      data: payload,
+    })
+    expect(res.status()).toBe(413)
+  })
+
   test('ไม่ล็อกอิน = ตรวจไม่ได้', async ({ playwright, baseURL }) => {
     const anon = await playwright.request.newContext({
       baseURL: baseURL!,

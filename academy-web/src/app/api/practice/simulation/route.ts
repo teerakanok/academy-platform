@@ -45,15 +45,20 @@ export async function POST(request: Request) {
   const user = await currentUser()
   if (!user) return NextResponse.json({ ok: false, error: 'ต้องเข้าสู่ระบบก่อน' }, { status: 401 })
 
-  // อ่านเป็นข้อความก่อนแล้ววัดขนาด — `request.json()` ตรงๆ จะ parse ให้เสร็จก่อน
+  // อ่านเป็น byte ก่อนแล้ววัดขนาด — `request.json()` ตรงๆ จะ parse ให้เสร็จก่อน
   // ไม่ว่าจะใหญ่แค่ไหน แปลว่างาน parse เกิดไปแล้วก่อนเราจะได้ปฏิเสธ
+  //
+  // ⚠️ ต้องวัดที่ `byteLength` ไม่ใช่ `String.length` — String.length นับ UTF-16
+  // code unit ซึ่งข้อความไทยหนึ่งตัวใช้ 1 หน่วยแต่กินจริง 3 byte ใน UTF-8
+  // (RIL cross-model พิสูจน์: payload ไทย 19,601 byte ผ่าน guard 8 KiB ที่นับด้วย
+  // String.length มาแล้ว) · เว็บนี้เป็นสองภาษาโดยตั้งใจ ช่องนี้จึงไม่ใช่กรณีทฤษฎี
   let body: unknown
   try {
-    const raw = await request.text()
-    if (raw.length > MAX_BODY_BYTES) {
+    const bytes = await request.arrayBuffer()
+    if (bytes.byteLength > MAX_BODY_BYTES) {
       return NextResponse.json({ ok: false, error: 'คำขอใหญ่เกินไป' }, { status: 413 })
     }
-    body = JSON.parse(raw)
+    body = JSON.parse(new TextDecoder().decode(bytes))
   } catch {
     return NextResponse.json({ ok: false, error: 'รูปแบบคำขอไม่ถูกต้อง' }, { status: 400 })
   }
