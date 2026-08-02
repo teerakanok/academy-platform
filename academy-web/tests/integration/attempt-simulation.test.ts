@@ -68,27 +68,29 @@ function ctx(userId = learner.id) {
   return { userId, courseSlug: COURSE, nodeId: NODE, challengeId: CHALLENGE_ID }
 }
 
-/** ออก attempt ที่มีค่าตัวแปรสุ่ม เหมือนที่ `/api/attempts` ทำ */
+/** ออก attempt ที่ snapshot โจทย์ทั้งชิ้นหลังแทนค่า เหมือนที่ `/api/attempts` ทำ */
 async function issueWithVars(userId = learner.id) {
   const vars = rollVariables(CHALLENGE.variables, cryptoPick)
+  const challenge = resolveChallenge(CHALLENGE, vars)
+  expect(challenge, 'แทนค่าตัวแปรไม่ครบ').not.toBeNull()
   const params: AttemptParams = {
     questionIds: [],
     keyMaps: {},
     answerKeys: {},
-    simulationVars: { 'sim-1': vars },
+    simulations: [{ id: 'sim-1', challenge: challenge! }],
   }
   const issued = await issueAttempt(ctx(userId), params, 'v1')
   expect(issued).not.toBeNull()
   return { attemptId: issued!.attemptId, targetIp: vars.targetIp }
 }
 
-/** ตรวจเหมือนที่ `/api/progress` ทำ: consume แล้วใช้ค่าจาก attempt เท่านั้น */
+/** ตรวจเหมือนที่ `/api/progress` ทำ: consume แล้วใช้ **โจทย์ที่ attempt ถือเอง** */
 async function gradeWithAttempt(attemptId: string, submittedIp: string, userId = learner.id) {
   const consumed = await consumeAttempt(ctx(userId), attemptId)
   if (!consumed) return { rejected: true as const }
-  const challenge = resolveChallenge(CHALLENGE, consumed.params.simulationVars?.['sim-1'] ?? {})
-  if (!challenge) return { rejected: true as const }
-  const verdict = gradeSimulation(challenge, { addressMode: 'static', ipv4: submittedIp })
+  const snapshot = consumed.params.simulations?.find((s) => s.id === 'sim-1')
+  if (!snapshot) return { rejected: true as const }
+  const verdict = gradeSimulation(snapshot.challenge, { addressMode: 'static', ipv4: submittedIp })
   return { rejected: false as const, passed: verdict.passed }
 }
 
@@ -137,6 +139,12 @@ describe('โจทย์จำลองผูกกับ attempt', () => {
     const row = await withDb((db) =>
       db.query(`select params from academy.attempt where attempt_id = $1`, [mine.attemptId]),
     )
-    expect(row.rows[0].params.simulationVars['sim-1'].targetIp).toBe(mine.targetIp)
+    // โจทย์ทั้งชิ้นถูกเก็บไว้ ไม่ใช่แค่ค่าตัวแปร — กติกาการตรวจจึงไม่ขึ้นกับไฟล์ปัจจุบัน
+    const stored = row.rows[0].params.simulations[0]
+    expect(stored.id).toBe('sim-1')
+    expect(stored.challenge.brief).toContain(mine.targetIp)
+    expect(stored.challenge.requirements.find((r: { id: string }) => r.id === 'r-ip').value).toBe(
+      mine.targetIp,
+    )
   })
 })

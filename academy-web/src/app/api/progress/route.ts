@@ -13,9 +13,9 @@ import {
 import { toPublicProgress } from '@/lib/course/public-progress'
 import { readBoundedBody } from '@/lib/http/bounded-body'
 import { gradeSimulation, gradingFingerprint } from '@/lib/simulation/types'
-import { resolveChallenge } from '@/lib/simulation/variables'
 import { consumeAttempt, type ConsumedAttempt } from '@/lib/course/attempt-db'
 import { CHECKPOINT_CHALLENGE_ID, remapAnswersToReal } from '@/lib/course/attempt'
+import { simulationsToGrade } from '@/lib/course/attempt-grading'
 import {
   loadAllProgress,
   loadProgress,
@@ -215,7 +215,6 @@ export async function POST(request: Request) {
         return NextResponse.json({ ok: false, error: 'ความพยายามนี้ใช้ไม่ได้แล้ว' }, { status: 409 })
       }
     }
-    const attemptVars = consumed?.params.simulationVars ?? {}
 
     // ── MCQ ──────────────────────────────────────────────────────────────
     //
@@ -254,31 +253,34 @@ export async function POST(request: Request) {
     // ไม่ใช่ boolean รวม เพราะใบรับรองอ้างอิงหลักฐานนี้และต้องตรวจย้อนหลังได้ว่า
     // ผ่านด้วยอะไร (แผน §5 W1 ข้อ 4)
     const simulationEvidence: Record<string, SimulationEvidence> = {}
-    for (const sim of sims) {
+    // ⚠️ ตรวจจาก **โจทย์ที่ attempt ถือเอง** ไม่ใช่จากไฟล์ปัจจุบัน
+    //
+    // attempt อายุ 60 นาที · deploy ระหว่างนั้นเปลี่ยนกติกาได้ (หรือลบด่านทิ้ง) ·
+    // ตรวจจากไฟล์ = ผู้เรียนถูกตัดสินด้วยกติกาที่เขาไม่เคยเห็น และบทอาจถูกบันทึกว่า
+    // ผ่านโดยไม่มีหลักฐานของด่านที่เขาถูกเสิร์ฟมาจริง (RIL cross-model รอบ 2)
+    const source = simulationsToGrade(consumed?.params ?? null, sims)
+    if (!source.ok) {
+      return NextResponse.json(
+        { ok: false, error: 'โจทย์ชุดนี้หมดอายุแล้ว เริ่มใหม่อีกครั้ง' },
+        { status: 409 },
+      )
+    }
+    const gradedSims = source.simulations
+    for (const sim of gradedSims) {
       const submitted = input.simulations?.[sim.id] ?? {}
-      const challenge = resolveChallenge(sim.challenge, attemptVars[sim.id] ?? {})
-      if (!challenge) {
-        // attempt ที่ออกก่อนโจทย์นี้มีตัวแปร (หรือ deploy คร่อมกัน) — ตรวจด้วยโจทย์ที่ยัง
-        // มีแม่แบบไม่ได้เด็ดขาด เพราะค่าที่ใช้ตรวจจะกลายเป็นสตริง "{{targetIp}}" ตรงตัว
-        // ซึ่งใครกรอกตามก็ผ่าน · ให้เริ่ม attempt ใหม่แทน
-        return NextResponse.json(
-          { ok: false, error: 'โจทย์ชุดนี้หมดอายุแล้ว เริ่มใหม่อีกครั้ง' },
-          { status: 409 },
-        )
-      }
-      const verdict = gradeSimulation(challenge, submitted)
+      const verdict = gradeSimulation(sim.challenge, submitted)
       results[sim.id] = verdict.passed
       simulationEvidence[sim.id] = {
         passed: verdict.passed,
         requirements: verdict.results.map((r) => ({ id: r.id, met: r.met })),
         // ลายนิ้วมือของกติกาจริง ไม่ใช่เวอร์ชันคอร์ส — ดูเหตุผลใน gradingFingerprint
-        challengeVersion: gradingFingerprint(challenge),
+        challengeVersion: gradingFingerprint(sim.challenge),
         at: new Date().toISOString(),
       }
     }
 
     const correctCount = Object.values(results).filter(Boolean).length
-    const totalTasks = gradedQuestionIds.length + sims.length
+    const totalTasks = gradedQuestionIds.length + gradedSims.length
     // capstone และการ test-out ต้องถูกทุกข้อ · บทปกติใช้เกณฑ์ของโหมดสอน (W0-3)
     //
     // เดิมบทปกติผ่านด้วย "ตอบครบ" เฉยๆ — ตอบผิดทุกข้อก็ได้ `completed` (F2)
@@ -295,6 +297,9 @@ export async function POST(request: Request) {
       status: passed ? (input.mode === 'test-out' ? 'tested-out' : 'completed') : 'in-progress',
       checkpointResults: results,
       simulationEvidence: Object.keys(simulationEvidence).length > 0 ? simulationEvidence : undefined,
+      // ตัวชี้ว่า "ผ่านด้วยความพยายามครั้งไหน" — ส่งเฉพาะตอนผ่านจริงและมี attempt
+      passedAttemptId: passed && consumed ? input.attemptId : undefined,
+      passedChallengeVersion: passed && consumed ? consumed.challengeVersion : undefined,
     })
 
     // assessed: รูปของ response ต้องเหมือนกันทั้งผ่านและไม่ผ่าน — ขนาด/จำนวน field

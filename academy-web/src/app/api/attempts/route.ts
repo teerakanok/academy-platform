@@ -8,6 +8,7 @@ import { requiresAttempt } from '@/lib/course/assessment-policy'
 import { issueAttempt, nextAttemptAt } from '@/lib/course/attempt-db'
 import { toPublicSimulation, type AttemptSimulation } from '@/lib/content/public-lesson'
 import { resolveChallenge, rollVariables } from '@/lib/simulation/variables'
+import type { SimulationChallenge } from '@/lib/simulation/types'
 import { readBoundedBody } from '@/lib/http/bounded-body'
 
 export const runtime = 'nodejs'
@@ -80,13 +81,21 @@ export async function POST(request: Request) {
     // จำนวนเสิร์ฟจะมาจากนิยาม challenge ไม่ใช่ขนาดคลัง
     const params = buildAttemptParams(bank, bank.length)
 
-    // สุ่มค่าตัวแปรของโจทย์จำลองต่อ attempt (W1) — ค่าที่สุ่มถูกเก็บใน params
-    // ฝ่ายเดียว แล้วใช้ทั้งตอนสร้างโจทย์ที่ผู้เรียนอ่านและตอนตรวจ สองฝั่งจึงตรงกัน
-    const simulationVars: Record<string, Record<string, string>> = {}
+    // สุ่มค่าตัวแปรของโจทย์จำลองต่อ attempt แล้ว **เก็บโจทย์ทั้งชิ้นหลังแทนค่า**
+    // ลง params · ทั้งโจทย์ที่ผู้เรียนอ่านและกติกาที่ใช้ตรวจมาจากวัตถุชิ้นเดียวกันนี้
+    // deploy ระหว่างทางจึงเปลี่ยนกติกาของ attempt ที่ออกไปแล้วไม่ได้
+    const resolvedSims: { id: string; challenge: SimulationChallenge }[] = []
     for (const sim of sims) {
-      simulationVars[sim.id] = rollVariables(sim.challenge.variables, cryptoPick)
+      const rolled = rollVariables(sim.challenge.variables, cryptoPick)
+      const challenge = resolveChallenge(sim.challenge, rolled)
+      if (!challenge) {
+        // เพิ่งสุ่มค่าไปเองเมื่อกี้ — แทนค่าไม่ครบแปลว่าไฟล์เนื้อหาประกาศตัวแปรไม่ครบ
+        console.error(`[api/attempts] โจทย์ ${sim.id} แทนค่าตัวแปรไม่ครบ`)
+        return NextResponse.json({ ok: false, error: 'ออก attempt ไม่สำเร็จ' }, { status: 500 })
+      }
+      resolvedSims.push({ id: sim.id, challenge })
     }
-    params.simulationVars = simulationVars
+    params.simulations = resolvedSims
     const ctx = {
       userId: user.account.id,
       courseSlug: input.slug,
@@ -113,17 +122,12 @@ export async function POST(request: Request) {
     // โจทย์จำลองที่แทนค่าตัวแปรของ attempt นี้แล้ว — ยังผ่าน toPublicSimulation
     // เหมือนเดิม จึงไม่มี operator/value/hints ติดไปกับ response · ประกาศชนิดไว้
     // เพื่อให้ลืมฟิลด์ใดฟิลด์หนึ่ง (เช่น `kind`) เป็น error ตอนคอมไพล์ ไม่ใช่ด่านหายเงียบๆ
-    const simulations: AttemptSimulation[] = []
-    for (const sim of sims) {
-      const resolved = resolveChallenge(sim.challenge, simulationVars[sim.id] ?? {})
-      if (!resolved) {
-        // เพิ่งสุ่มค่าไปเองเมื่อกี้ — แทนค่าไม่ครบแปลว่าไฟล์เนื้อหาประกาศตัวแปรไม่ครบ
-        // ส่งโจทย์ที่ยังมีแม่แบบให้ผู้เรียนไม่ได้ ต้องดังทันทีไม่ใช่ปล่อยผ่าน
-        console.error(`[api/attempts] โจทย์ ${sim.id} แทนค่าตัวแปรไม่ครบ`)
-        return NextResponse.json({ ok: false, error: 'ออก attempt ไม่สำเร็จ' }, { status: 500 })
-      }
-      simulations.push({ kind: 'simulation', id: sim.id, challenge: toPublicSimulation(resolved) })
-    }
+    // รูป public ของโจทย์ชุดเดียวกับที่เก็บใน params — ไม่มี operator/value/hints
+    const simulations: AttemptSimulation[] = resolvedSims.map((sim) => ({
+      kind: 'simulation',
+      id: sim.id,
+      challenge: toPublicSimulation(sim.challenge),
+    }))
 
     return NextResponse.json({
       ok: true,

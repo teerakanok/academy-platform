@@ -81,6 +81,15 @@ export interface NodeEvent {
   checkpointResults?: Record<string, boolean>
   videoCueResults?: Record<string, boolean>
   simulationEvidence?: Record<string, SimulationEvidence>
+  /**
+   * attempt ที่ทำให้บทนี้ผ่าน — ส่งมาเฉพาะตอน **ผ่านจริง** เท่านั้น
+   *
+   * ใบรับรอง (W4) snapshot หลักฐาน ณ วันออก ถ้าไม่มีตัวชี้นี้ คำถามว่า "ใบนี้ออกจาก
+   * อะไร" ตอบได้แค่ "บทนี้ completed" ซึ่งไม่บอกว่าโจทย์ชุดไหน กติกาเวอร์ชันไหน
+   * (RIL cross-model รอบ 2) · ฝั่ง DB กันไม่ให้ค่านี้ถูกทับด้วยการส่งครั้งหลังอยู่แล้ว
+   */
+  passedAttemptId?: string
+  passedChallengeVersion?: string
 }
 
 /**
@@ -105,6 +114,8 @@ export async function recordNodeEvent(userId: string, event: NodeEvent): Promise
     p_checkpoint_results: event.checkpointResults ?? null,
     p_video_cue_results: event.videoCueResults ?? null,
     p_simulation_evidence: event.simulationEvidence ?? null,
+    p_passed_attempt_id: event.passedAttemptId ?? null,
+    p_passed_challenge_version: event.passedChallengeVersion ?? null,
   })
   if (error) throw new Error(`บันทึกความคืบหน้าไม่สำเร็จ: ${error.message}`)
 }

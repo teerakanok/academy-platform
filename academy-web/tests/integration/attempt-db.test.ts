@@ -10,6 +10,7 @@ import {
   ATTEMPT_TTL_MINUTES,
 } from '@/lib/course/attempt-db'
 import type { AttemptParams } from '@/lib/course/attempt'
+import { recordNodeEvent } from '@/lib/course/progress-db'
 
 // โครง attempt (W0-0) — ทดสอบกับ DB จริงเพราะสิ่งที่ต้องพิสูจน์คือพฤติกรรม atomic
 // ของคำสั่งเดียวใน DB (race, replay, โควตา) ซึ่ง mock พิสูจน์ไม่ได้โดยนิยาม
@@ -224,7 +225,8 @@ describe('RLS ของ attempt — default deny เหมือนตารา�
   const FUNCTIONS = [
     'academy.issue_attempt(uuid, text, text, text, jsonb, text, int, int, int)',
     'academy.consume_attempt(uuid, uuid, text, text, text)',
-    'academy.record_node_progress(uuid, text, text, text, jsonb, jsonb, jsonb)',
+    // ลายเซ็นใหม่ตั้งแต่ 0008 (เพิ่มตัวชี้ว่าผ่านด้วย attempt ไหน) — รุ่นเก่าถูก drop ทิ้ง
+    'academy.record_node_progress(uuid, text, text, text, jsonb, jsonb, jsonb, uuid, text)',
     'academy.status_rank(text)',
     'academy.has_course_entitlement(uuid, text)',
   ]
@@ -355,5 +357,58 @@ describe('merge_simulation_evidence — หลักฐานเลื่อน�
       db.query(`select academy.merge_simulation_evidence('{"a":{"passed":true}}'::jsonb, null) as merged`),
     )
     expect(res.rows[0].merged).toEqual({ a: { passed: true } })
+  })
+})
+
+describe('ตัวชี้ว่าผ่านด้วย attempt ไหน (0008)', () => {
+  // ใบรับรอง (W4) snapshot หลักฐาน ณ วันออก · ถ้าไม่มีตัวชี้นี้ คำถาม "ใบนี้ออกจาก
+  // อะไร" ตอบได้แค่ "บทนี้ completed" ซึ่งไม่บอกว่าโจทย์ชุดไหน กติกาเวอร์ชันไหน
+  // (RIL cross-model รอบ 2)
+
+  const NODE = 'n-passing-pointer'
+
+  async function pointerOf(nodeId: string) {
+    return withDb(async (db) => {
+      const res = await db.query(
+        `select passed_attempt_id, passed_challenge_version
+           from academy.node_progress
+          where user_id = $1 and course_slug = $2 and node_id = $3`,
+        [owner.id, COURSE, nodeId],
+      )
+      return res.rows[0] ?? null
+    })
+  }
+
+  it('🔴 ผ่านแล้วบันทึกว่า attempt ไหน/เวอร์ชันไหน', async () => {
+    const issued = await issueAttempt(ctx(NODE), SAMPLE_PARAMS, 'v-pass')
+    expect(issued).not.toBeNull()
+    await recordNodeEvent(owner.id, {
+      slug: COURSE,
+      nodeId: NODE,
+      status: 'completed',
+      passedAttemptId: issued!.attemptId,
+      passedChallengeVersion: 'v-pass',
+    })
+    expect(await pointerOf(NODE)).toEqual({
+      passed_attempt_id: issued!.attemptId,
+      passed_challenge_version: 'v-pass',
+    })
+  })
+
+  it('🔴 การส่งครั้งหลังที่ไม่ได้ทำให้ผ่าน ต้องไม่ลบตัวชี้ทิ้ง', async () => {
+    const before = await pointerOf(NODE)
+    expect(before.passed_attempt_id).toBeTruthy()
+
+    // กดทำซ้ำแล้วไม่ผ่าน — route ไม่ส่งตัวชี้มา (null) · DB ต้องคงของเดิมไว้
+    await recordNodeEvent(owner.id, { slug: COURSE, nodeId: NODE, status: 'in-progress' })
+    expect(await pointerOf(NODE)).toEqual(before)
+  })
+
+  it('บทที่ผ่านโดยไม่มี attempt (บทสอนทั่วไป) → ตัวชี้เป็น null ไม่ใช่ค่ามั่ว', async () => {
+    await recordNodeEvent(owner.id, { slug: COURSE, nodeId: 'n-plain', status: 'completed' })
+    expect(await pointerOf('n-plain')).toEqual({
+      passed_attempt_id: null,
+      passed_challenge_version: null,
+    })
   })
 })

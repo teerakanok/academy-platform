@@ -1,5 +1,6 @@
 import { randomInt } from 'node:crypto'
 import type { CheckpointQuestion } from '@/lib/content/course-types'
+import type { SimulationChallenge } from '@/lib/simulation/types'
 import type { AttemptQuestion } from '@/lib/content/public-lesson'
 
 // โครง attempt (W0-0) — เซิร์ฟเวอร์สุ่มชุดข้อ + remap key ของตัวเลือกต่อ attempt
@@ -31,12 +32,18 @@ export interface AttemptParams {
    */
   answerKeys: Record<string, string[]>
   /**
-   * ค่าตัวแปรของโจทย์จำลองที่สุ่มไว้สำหรับ attempt นี้ (W1)
+   * โจทย์จำลองของ attempt นี้ **ทั้งชิ้นหลังแทนค่าแล้ว** (snapshot ไม่ใช่ pointer)
    *
-   * รูป: { checkpointItemId: { ชื่อตัวแปร: ค่า } } · เซิร์ฟเวอร์ใช้ค่าชุดนี้ทั้งตอน
-   * สร้างโจทย์ที่ส่งให้ผู้เรียนอ่าน และตอนตรวจ — สองฝั่งจึงตรงกันเสมอ
+   * เหตุผลเดียวกับ `answerKeys` แต่แรงกว่า (RIL cross-model รอบ 2 จับ): เดิมเก็บแค่
+   * ค่าตัวแปรแล้วไปประกอบกับกติกาจากไฟล์ตอนตรวจ · ถ้ามี deploy ระหว่างที่ attempt
+   * ยังไม่หมดอายุ (60 นาที) ผู้เรียนจะถูกตรวจด้วยกติกาชุดใหม่ทั้งที่อ่านโจทย์ชุดเก่า
+   * — ตั้งค่าตามที่อ่านแล้วไม่ผ่านโดยไม่มีทางเดาสาเหตุ · และถ้า deploy **ลบ** ด่าน
+   * จำลองออก บทนั้นจะถูกบันทึกว่าผ่านทั้งที่ไม่มีหลักฐานของด่านที่ผู้เรียนถูกเสิร์ฟมา
+   *
+   * เก็บกติกาการตรวจไว้ด้วย (operator/value) — อยู่ฝั่งเซิร์ฟเวอร์ฝ่ายเดียวเสมอ
+   * สิ่งที่ส่งออกไปหา client คือรูป public ที่ผ่าน `toPublicSimulation` เท่านั้น
    */
-  simulationVars?: Record<string, Record<string, string>>
+  simulations?: { id: string; challenge: SimulationChallenge }[]
 }
 
 /**
