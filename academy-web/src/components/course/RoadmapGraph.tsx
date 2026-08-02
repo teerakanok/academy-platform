@@ -191,7 +191,9 @@ export function RoadmapGraph({
             label="Proven, you tested out of it"
             icon="★"
           />
-          <LegendItem swatch="bg-cs-surface-2 border border-dashed border-cs-border-2" label="Skipped, still unproven" icon="↷" />
+          {/* ⚠️ เดิมเขียนว่า "still unproven" ซึ่งสื่อว่าบทธรรมดาเป็น proven ได้ —
+              ตั้งแต่ W0-3 คำนั้นสงวนให้ด่านวัดผลเท่านั้น (RIL รอบ 3 จับจุดนี้) */}
+          <LegendItem swatch="bg-cs-surface-2 border border-dashed border-cs-border-2" label="Skipped, still open" icon="↷" />
           <LegendItem swatch="bg-cs-surface border border-cs-border-2" label="Ready to start" icon="›" />
           <li className="flex items-center gap-1.5">
             <span
