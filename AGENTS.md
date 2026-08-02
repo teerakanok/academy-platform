@@ -110,11 +110,15 @@ DIY บน CYBERSKILLS defaults: Next.js App Router (TypeScript) · Tailwind +
 > ⚠️ Pool A เป็น shared infra (Crux/STAR/Forge/Academy) — ก่อนแตะ auth, migration,
 > หรือ SQL ตรง ให้อ่าน `ecosystem/SHARED_INFRA_ACCESS.md` และ `reports/state/supabase.md`
 > ของ director repo ก่อนเสมอ
-deploy Vercel `sin1` + CNAME `academy.cyberskills.co.th` + Zero Trust ก่อน
-public · Lab = Crux lab plane บน GCP (M4) · video = managed stream ผ่าน custom
-HLS player (M5, vendor ยังไม่ commit) — เวอร์ชัน/รายละเอียดตรึงใน
-`plans/platform-build-oneshot-2026-07-31.md`; การเปลี่ยน stack ต้องมี founder
-decision ใหม่ + บันทึกใน `plans/completed_log.md`.
+deploy ปัจจุบัน = **Cloudflare Workers** ผ่าน `npm run deploy:cf`
+(`cyberskills-academy.songpon-te.workers.dev` — D6 2026-08-01 "hosting เอียง
+Cloudflare"; การยืนยันขั้นสุดท้ายรอวัด latency หลัง M3 — ดู `plans/active_plan.md`
+ส่วน Hosting; ขั้นตอน Vercel `sin1` เดิมพักไว้) + CNAME
+`academy.cyberskills.co.th` + Zero Trust ก่อน public · Lab = Crux lab plane บน
+GCP (M4) · video = managed stream ผ่าน custom HLS player (M5, vendor ยังไม่
+commit) — เวอร์ชัน/รายละเอียดตรึงใน `plans/platform-build-oneshot-2026-07-31.md`;
+การเปลี่ยน stack ต้องมี founder decision ใหม่ + บันทึกใน
+`plans/completed_log.md`.
 
 ---
 

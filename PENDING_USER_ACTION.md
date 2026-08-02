@@ -5,21 +5,30 @@
 > `plans/platform-build-oneshot-2026-07-31.md` §5)
 > เรียงตามลำดับที่ต้องเกิด
 
-## 1) Vercel — สร้าง project
+## 1) Cloudflare Workers — production env vars
+> (แก้ 2026-08-02: deploy จริงปัจจุบันอยู่บน **Cloudflare Workers** —
+> `cyberskills-academy.songpon-te.workers.dev` ผ่าน `npm run deploy:cf` ตาม D6
+> "hosting เอียง Cloudflare" · ขั้นตอน Vercel เดิมจึงพัก — การยืนยัน hosting
+> ขั้นสุดท้ายรอวัด latency จริงหลัง M3 ตาม `plans/active_plan.md` ส่วน Hosting)
 
-- สร้าง project + ผูก repo `github.com/teerakanok/academy-platform`
-  (ต้อง push ก่อน — ดูข้อ 6)
-- **Root Directory = `academy-web`** · framework Next.js · region `sin1`
-- Node ตาม `academy-web/.nvmrc` (= 24; `engines.node = 24.x` ใน package.json
-  ชี้เวอร์ชันให้ Vercel อยู่แล้ว — ตรวจใน dashboard ว่าตรง)
-- ตั้ง env vars ตามรายชื่อใน `academy-web/.env.example`:
-  `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (ค่า prod Pool A — ใส่เมื่อทำข้อ 3
-  แล้วเท่านั้น; `TEST_*` ไม่ต้องใส่บน Vercel)
-- **ยังไม่เปิด public**
+- ตั้ง secret บน Worker `cyberskills-academy` ตามรายชื่อใน
+  `academy-web/.env.example`: `SUPABASE_URL` + DB credential
+  (ใส่เมื่อทำข้อ 3 แล้วเท่านั้น; `TEST_*` ใช้เฉพาะเทส local)
+- ⚠️ **อย่าเพิ่งเอา `SUPABASE_SERVICE_ROLE_KEY` (shared Pool A) ขึ้น Worker** —
+  ข้อขัด "Academy ถือ shared service-role" ยังรอ session identity ตัดสิน
+  (ทางแก้ที่เสนอ: Postgres role เฉพาะสคีมา `academy` — ดู `plans/active_plan.md`
+  ส่วนข้อขัดสองข้อ) · key รั่วจาก Worker = blast radius เกินสคีมา Academy
+  ถ้าจำเป็นต้องขึ้นก่อนมี role เฉพาะ ให้เป็น founder decision ที่บันทึก
+  risk/rollback ชัดเจนเท่านั้น
+- **ยังไม่เปิด public** (ตอนนี้ `NEXT_PUBLIC_SEARCH_INDEXING=off` และระบบบัญชี
+  ยังไม่เปิดบน preview)
 
-## 2) Cloudflare — CNAME + Zero Trust
+## 2) Cloudflare — custom domain + Zero Trust
 
-- CNAME `academy.cyberskills.co.th` → ค่าที่ Vercel ให้ตอน add custom domain
+- ผูก custom domain `academy.cyberskills.co.th` เข้ากับ Worker
+  `cyberskills-academy` (Workers custom domain — ไม่มีค่า CNAME จาก vendor อื่น)
+  · การผูก domain คือจุด commit ของ hosting — ทำเมื่อ founder ยืนยันผลวัด
+  latency หลัง M3 แล้ว (ดูหมายเหตุข้อ 1)
 - Zero Trust Access app **ครอบทุก path** (allowlist email founder/ทีม)
 - ตรวจ free-tier seat ตอน setup
 
@@ -27,8 +36,10 @@
 
 ลำดับตามแผน §5-3 (ทำผ่าน `ssh-db` ตาม `ecosystem/SHARED_INFRA_ACCESS.md`):
 1. Backup point ก่อน
-2. Apply `academy-web/supabase/migrations/0001_academy_schema.sql`
-   (schema `academy` เท่านั้น)
+2. Apply migration **ทุกไฟล์**ใน `academy-web/supabase/migrations/`
+   ตามลำดับเลข (ปัจจุบัน 0001–0005: schema · accounts+progress ·
+   record_node_progress · activation+entitlement · attempt)
+   — schema `academy` เท่านั้น
 3. เพิ่ม `academy` เข้า `PGRST_DB_SCHEMAS` ของ Pool A แล้ว restart PostgREST —
    **cross-product change**: ตรวจ consumer อื่น (star/forge/crux/phalanx/angler/
    helm/crucible) ก่อน + เตรียม rollback เป็นค่าเดิม
@@ -63,6 +74,22 @@ login สองทาง) — รายละเอียดและเหต�
 ### 4.3 consent text ฉบับ ecosystem
 - แตะ privacy notice ของทุก product = เรื่อง legal ไม่ใช่ technical
 - reuse pattern versioning ที่ Academy M1 ทำไว้แล้ว
+
+## 4b) W2 (`/media/*`) — founder blockers สองตัว (ตามแผน 2026-08-02 §4.2b)
+
+> `/media/*` ทุกวันนี้เปิดสาธารณะ (เสิร์ฟผ่าน ASSETS binding — request ไม่ถึง
+> Worker) · W2 ปิดไม่ได้ถ้าสองข้อนี้ยังไม่เกิด — บันทึกไว้ตั้งแต่เปิด session
+> ไม่ใช่ค้นพบตอนติด
+
+1. **สร้าง R2 bucket** สำหรับย้าย media ออกจาก `public/` (ทาง ก ของ W2-0 —
+   ทางที่แผนเอนไป) — external service, founder เท่านั้น
+   · ถ้ายังไม่พร้อม: ทาง ข ชั่วคราวคือ `run_worker_first` สำหรับ `/media/*`
+     (ทุก byte วิ่งผ่าน Worker — ต้องเขียนไว้ว่าเป็นของชั่วคราว)
+2. **อนุญาต deploy หนึ่งครั้ง** เพื่อ verify `/media/*` บนสภาพแวดล้อมที่มี
+   ASSETS binding จริง (แผน §4.1 ห้าม agent deploy เอง · `npm run start`
+   เขียวปลอมเพราะไม่มี ASSETS binding)
+   · agent ต้องลองทางสำรองก่อนขอ: `wrangler dev --remote` หรือ preview worker
+     — สองทางนี้นับว่าปิดเกณฑ์ได้
 
 ## 5) M4+ / M5 (ยังไม่ถึงเวลา — บันทึกไว้ตามแผน)
 

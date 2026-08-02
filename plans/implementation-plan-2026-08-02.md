@@ -472,6 +472,9 @@ binding → เกณฑ์รับงานของ `/media/*` **ต้อง
 1. **ทำ inventory ของทุกทางที่ปล่อยทรัพยากรก่อน** แล้วค่อยเขียนโค้ด:
    - หน้า `/courses/[slug]/lessons/[nodeId]`
    - `/api/progress` (ทุก action) · `/api/progress/reset`
+   - `/api/attempts` *(เพิ่ม 2026-08-02 — W0-0 สร้างพื้นผิวนี้ขึ้นใหม่ ตอนนี้ตรวจแค่
+     login + node มีจริง ยังไม่ตรวจ entitlement/ปลดล็อก — RIL cross-model ยืนยันว่า
+     ต้องเข้า guard กลางของ W2 ด้วย)*
    - `/player/*`
    - **`/media/*` — วิดีโอบทเรียนและ PDF · ดู W2-0 ก่อน เพราะปิดด้วย middleware ไม่ได้**
 2. guard กลางตัวเดียว `authorizeCourseResource(userId, courseSlug, nodeId?)` ที่ตรวจ

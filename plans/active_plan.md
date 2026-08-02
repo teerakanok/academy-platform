@@ -33,6 +33,22 @@
 R2 bucket สำหรับย้าย media · และอนุญาต deploy หนึ่งครั้งเพื่อ verify `/media/*`
 (ลอง `wrangler dev --remote` ก่อน)
 
+**ความคืบหน้า W0-0 (2026-08-02) — โครง attempt เสร็จ ผ่าน RIL cross-model 2 รอบ:**
+- migration 0005: ตาราง `academy.attempt` (RLS default deny) + `issue_attempt`
+  (โควตา 3/30นาที นับจากแถว DB + advisory lock) + `consume_attempt` (UPDATE เดียว
+  เงื่อนไข ownership/context/replay/expiry ใน `WHERE` เดียว) + revoke execute
+  PUBLIC/anon/authenticated ทั้ง 5 ฟังก์ชันของสคีมา + index รองรับ retention
+- `POST /api/attempts` ออกโจทย์สุ่ม + remap key ต่อ attempt · `params` ฝั่ง server
+  เก็บ **answerKeys snapshot** ณ ตอน issue (กัน version drift ระหว่าง issue/consume)
+- เทส 30 ตัว (unit 12 · integration 13 · e2e 5) — race/replay/ownership/expiry/
+  โควตา concurrent/window rollover/function grants/no-leak — full chain เขียว
+- **ยังไม่ปิด W0-0**: เหลือต่อ consume เข้า `/api/progress` (คู่กับ W0-1) ·
+  คลังข้อ 39 (W-content) · retention job (รอเลือกกลไก cron)
+- **หนี้ระบบที่พบ**: ภาพ artifact ที่ track ไว้ถูก e2e regen ทุก run เพราะฝัง
+  อีเมล `e2e-learner-<timestamp>` ใน header → byte ต่างตลอด (เทียบภาพแล้วเนื้อหา
+  เหมือนเดิม จึง `git restore` ทุกครั้ง) — ควรแก้ให้ e2e ไม่เขียนทับ artifact
+  ที่ track หรือ mask อีเมลตอน capture
+
 ---
 
 ## Objective
