@@ -13,15 +13,32 @@ function request(body: BodyInit | null, headers: Record<string, string> = {}): R
   return new Request('https://example.test/api', { method: 'POST', body, headers })
 }
 
-/** stream ที่ปล่อย chunk ไปเรื่อยๆ ไม่มีวันจบ — ถ้าโค้ดไม่ตัดสาย เทสจะค้างจน timeout */
-function endlessStream(chunkBytes = 256): { body: ReadableStream<Uint8Array>; emitted: () => number } {
+/**
+ * stream ที่ปล่อย chunk ไปเรื่อยๆ ไม่มีวันจบ
+ *
+ * นับสองอย่างแยกกันโดยตั้งใจ:
+ *   `emitted`  — อ่านไปเท่าไร (พิสูจน์ว่าไม่รอ EOF)
+ *   `canceled` — underlying source ได้รับสัญญาณยกเลิกไหม (พิสูจน์ว่า *ตัดสายจริง*)
+ * ข้อหลังสำคัญกว่าและเทสรุ่นแรกไม่มี — RIL รอบ 4 พิสูจน์ว่าลบ `reader.cancel()` ออก
+ * แล้วเทสยังเขียว เพราะดูแต่จำนวน byte ที่อ่าน
+ */
+function endlessStream(chunkBytes = 256): {
+  body: ReadableStream<Uint8Array>
+  emitted: () => number
+  canceled: () => boolean
+} {
   let emitted = 0
+  let canceled = false
   return {
     emitted: () => emitted,
+    canceled: () => canceled,
     body: new ReadableStream({
       pull(controller) {
         emitted += chunkBytes
         controller.enqueue(new Uint8Array(chunkBytes).fill(120))
+      },
+      cancel() {
+        canceled = true
       },
     }),
   }
@@ -60,6 +77,9 @@ describe('readBoundedBody', () => {
     // ReadableStream ดึง chunk แรกไว้ล่วงหน้าเองตั้งแต่ตอนสร้าง (พฤติกรรมของ stream
     // ไม่ใช่ของเรา) — สิ่งที่ต้องพิสูจน์คือเราไม่ได้ "ไล่อ่านต่อ" หลังเห็น header
     expect(stream.emitted(), 'ไม่ควรไล่อ่าน body ต่อเมื่อ header บอกว่าเกินแล้ว').toBeLessThanOrEqual(256)
+    // และต้องบอกฝั่งที่ส่งว่าเลิกสนใจแล้ว ไม่ใช่ทิ้งค้างไว้เฉยๆ
+    expect(stream.canceled(), 'fast reject ต้อง cancel body ด้วย').toBe(true)
+    expect(req.body?.locked ?? false).toBe(false)
   })
 
   it('🔴 stream ที่ไม่มีวันจบ: ต้องตัดสายเมื่อเกินเพดาน ไม่ใช่รอ EOF', async () => {
@@ -76,6 +96,17 @@ describe('readBoundedBody', () => {
     expect(await readBoundedBody(req, MAX)).toEqual({ ok: false, reason: 'too-large' })
     // อ่านไปเกินเพดานแค่ไม่กี่ chunk แล้วหยุด ไม่ใช่ไหลไปเรื่อยๆ
     expect(stream.emitted()).toBeLessThanOrEqual(MAX + 256 * 4)
+    // 🔴 ข้อที่พิสูจน์ว่า "ตัดสาย" จริง — ไม่ใช่แค่เลิกอ่านแล้วปล่อยฝั่งส่งค้างไว้
+    // (ลบ reader.cancel() ออกแล้วเทสต้องแดงที่บรรทัดนี้)
+    expect(stream.canceled(), 'ต้องส่งสัญญาณยกเลิกไปถึง underlying source').toBe(true)
+    // และต้องไม่ถือ lock ค้าง — cancel() ไม่ปล่อย lock ให้เองตาม spec
+    expect(req.body?.locked ?? false, 'request.body ต้องไม่ถูกล็อกค้าง').toBe(false)
+  })
+
+  it('เส้นทางปกติก็ต้องไม่ทิ้ง lock ค้างไว้', async () => {
+    const req = request('{"a":1}')
+    expect((await readBoundedBody(req, MAX)).ok).toBe(true)
+    expect(req.body?.locked ?? false).toBe(false)
   })
 
   it('body ว่างไม่พัง', async () => {
