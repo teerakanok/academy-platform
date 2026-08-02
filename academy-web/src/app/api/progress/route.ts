@@ -9,7 +9,7 @@ import {
   TEST_OUT_UNAVAILABLE_REASON,
 } from '@/lib/course/assessment-policy'
 import { readBoundedBody } from '@/lib/http/bounded-body'
-import { gradeSimulation } from '@/lib/simulation/types'
+import { gradeSimulation, gradingFingerprint } from '@/lib/simulation/types'
 import {
   loadAllProgress,
   loadProgress,
@@ -189,7 +189,8 @@ export async function POST(request: Request) {
       simulationEvidence[sim.id] = {
         passed: verdict.passed,
         requirements: verdict.results.map((r) => ({ id: r.id, met: r.met })),
-        challengeVersion: structure.version,
+        // ลายนิ้วมือของกติกาจริง ไม่ใช่เวอร์ชันคอร์ส — ดูเหตุผลใน gradingFingerprint
+        challengeVersion: gradingFingerprint(sim.challenge),
         at: new Date().toISOString(),
       }
     }

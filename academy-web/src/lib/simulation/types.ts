@@ -57,19 +57,43 @@ export interface SimulationVerdict {
   total: number
 }
 
+/**
+ * อ่านค่าของ field จากสถานะที่ client ส่งมา
+ *
+ * ⚠️ ต้องเป็น own property เท่านั้น — สถานะมาจาก client ทั้งก้อน การ index ตรงๆ
+ * จะไปเจอของบน Object.prototype ได้ (field='toString' คืน function)
+ */
 function valueOf(state: SimulationState, field: string): SimulationValue | undefined {
-  return state[field]
+  return Object.prototype.hasOwnProperty.call(state, field) ? state[field] : undefined
 }
 
+/**
+ * เงื่อนไขข้อนี้ผ่านไหม — **ตัดสินแบบ fail-closed เสมอ**
+ *
+ * 🔴 รุ่นก่อนมีกรณีที่ "ผ่านเพราะไม่มีอะไรเลย" (RIL cross-model จับ):
+ *   · `equals` ที่ requirement ไม่ระบุ `value` และ client ไม่ส่ง field มา
+ *     → `undefined === undefined` → ผ่าน
+ *   · `notEquals` และ `isFalse` → ผ่านทันทีเมื่อ client **ละ field ทิ้ง**
+ * แปลว่าการไม่ทำอะไรเลยผ่านด่านได้ · วันนี้ capstone ที่มีอยู่ไม่โดนเพราะระบุ value
+ * ครบ แต่สัญญาของ operator เปิดรูไว้ให้เนื้อหาชุดถัดไป
+ *
+ * กติกาใหม่: ไม่มี field ในสถานะ = ไม่ผ่านเสมอ · operator ที่ต้องมี `value`
+ * แต่ไม่มี = ไม่ผ่านเสมอ (และ loader ปฏิเสธตั้งแต่ตอนโหลดเนื้อหาด้วย)
+ */
 function meets(state: SimulationState, req: SimulationRequirement): boolean {
   const actual = valueOf(state, req.field)
+  // ไม่ได้ตั้งค่าอะไรเลยไม่มีทางผ่าน ไม่ว่าเงื่อนไขจะเป็นแบบไหน
+  if (actual === undefined) return false
+
   switch (req.operator) {
     case 'equals':
+      if (req.value === undefined) return false
       // เทียบแบบตัดช่องว่างหัวท้าย — ผู้เรียนพิมพ์เว้นวรรคเกินไม่ควรถือว่าผิด
       return typeof actual === 'string' && typeof req.value === 'string'
         ? actual.trim() === req.value.trim()
         : actual === req.value
     case 'notEquals':
+      if (req.value === undefined) return false
       return !(typeof actual === 'string' && typeof req.value === 'string'
         ? actual.trim() === req.value.trim()
         : actual === req.value)
@@ -78,7 +102,7 @@ function meets(state: SimulationState, req: SimulationRequirement): boolean {
     case 'isTrue':
       return actual === true
     case 'isFalse':
-      return actual === false || actual === undefined
+      return actual === false
   }
 }
 
@@ -88,6 +112,32 @@ function meets(state: SimulationState, req: SimulationRequirement): boolean {
  * คืนผลรายข้อเสมอ ไม่ใช่แค่ผ่าน/ไม่ผ่าน — ผู้เรียนต้องรู้ว่าเหลืออะไร ไม่ใช่รู้แค่ว่า
  * "ยังผิดอยู่" ซึ่งไม่ได้บอกอะไรและทำให้เดาสุ่มแทนที่จะคิด
  */
+/**
+ * ลายนิ้วมือของ "กติกาการตรวจ" ของโจทย์หนึ่งชิ้น
+ *
+ * 🔴 เดิมหลักฐานบันทึก `structure.version` ของทั้งคอร์สเป็นเวอร์ชันของโจทย์ ซึ่ง
+ * ไม่ขยับเมื่อ requirements เปลี่ยน (RIL cross-model จับ) — แปลว่าตอบไม่ได้จริงว่า
+ * ผู้เรียนผ่านด้วยกติกาชุดไหน ทั้งที่นั่นคือเหตุผลทั้งหมดที่เก็บ field นี้
+ *
+ * ค่านี้คำนวณจาก surface + requirements โดยตรง จึงเปลี่ยนเองอัตโนมัติเมื่อกติกา
+ * เปลี่ยน ไม่ต้องพึ่งว่ามีใครจำได้ว่าต้อง bump เลขเวอร์ชัน
+ */
+export function gradingFingerprint(challenge: SimulationChallenge): string {
+  const canonical = JSON.stringify({
+    surface: challenge.surface,
+    requirements: challenge.requirements
+      .map((r) => ({ id: r.id, field: r.field, operator: r.operator, value: r.value ?? null }))
+      .sort((a, b) => a.id.localeCompare(b.id)),
+  })
+  // FNV-1a — สั้น อ่านออก และไม่ต้องพึ่ง crypto (ฟังก์ชันนี้ต้องรันได้ทั้งสองฝั่ง)
+  let hash = 0x811c9dc5
+  for (let i = 0; i < canonical.length; i++) {
+    hash ^= canonical.charCodeAt(i)
+    hash = Math.imul(hash, 0x01000193) >>> 0
+  }
+  return `sim-${hash.toString(16).padStart(8, '0')}`
+}
+
 export function gradeSimulation(
   challenge: SimulationChallenge,
   state: SimulationState,

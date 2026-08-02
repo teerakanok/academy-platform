@@ -19,6 +19,13 @@ export interface CourseProgressRecord {
   checkpointResults: Record<string, Record<string, boolean>>
   /** ผลคำถามที่เด้งกลางวิดีโอ: nodeId → cueId → ถูก/ผิด */
   videoCueResults: Record<string, Record<string, boolean>>
+  /**
+   * หลักฐานของด่านจำลองต่อบท (W1) — รูปคือ { nodeId: { itemId: evidence } }
+   *
+   * เก็บเป็น unknown ตรงนี้โดยตั้งใจ: ฝั่ง client ไม่ต้องรู้โครงข้างในและไม่ควร
+   * ตัดสินอะไรจากมัน · ผู้ใช้จริงคือใบรับรอง (W4) ซึ่งอ่านฝั่งเซิร์ฟเวอร์
+   */
+  simulationEvidence: Record<string, Record<string, unknown>>
   lastNodeId: string | null
   updatedAt: number
 }
@@ -51,6 +58,7 @@ export function emptyProgress(slug: string, now = 0): CourseProgressRecord {
     inProgress: [],
     checkpointResults: {},
     videoCueResults: {},
+    simulationEvidence: {},
     lastNodeId: null,
     updatedAt: now,
   }
@@ -87,6 +95,10 @@ function isValid(value: unknown): value is CourseProgressRecord {
     isStringArray(r.inProgress) &&
     isBooleanMapMap(r.checkpointResults) &&
     isBooleanMapMap(r.videoCueResults) &&
+    // หลักฐานด่านจำลองเป็น map ของ map — ตรวจแค่รูปนอก ไม่ตีความข้างใน
+    // (ฝั่ง client ไม่ควรตัดสินอะไรจากมันอยู่แล้ว) · ยอมให้ไม่มีเพื่อไม่ทำให้
+    // record ที่บันทึกไว้ก่อน W1 อ่านไม่ได้
+    (r.simulationEvidence === undefined || isPlainObject(r.simulationEvidence)) &&
     (r.lastNodeId === null || typeof r.lastNodeId === 'string') &&
     typeof r.updatedAt === 'number' &&
     Number.isFinite(r.updatedAt)

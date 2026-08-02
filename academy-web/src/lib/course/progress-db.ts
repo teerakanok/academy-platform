@@ -14,6 +14,7 @@ interface NodeRow {
   status: NodeProgressStatus
   checkpoint_results: Record<string, boolean>
   video_cue_results: Record<string, boolean>
+  simulation_evidence: Record<string, SimulationEvidence>
   updated_at: string
 }
 
@@ -33,6 +34,10 @@ export function rowsToRecord(slug: string, rows: NodeRow[]): CourseProgressRecor
     if (Object.keys(row.video_cue_results ?? {}).length) {
       record.videoCueResults[row.node_id] = row.video_cue_results
     }
+    // หลักฐานด่านจำลอง — ต้องอ่านกลับได้ ไม่งั้นการบันทึกก็เท่ากับไม่มี (W1)
+    if (Object.keys(row.simulation_evidence ?? {}).length) {
+      record.simulationEvidence[row.node_id] = row.simulation_evidence
+    }
 
     const ts = Date.parse(row.updated_at)
     if (Number.isFinite(ts) && ts > latest) {
@@ -49,7 +54,7 @@ export async function loadProgress(userId: string, slug: string): Promise<Course
   const db = academyDb()
   const { data, error } = await db
     .from('node_progress')
-    .select('node_id, status, checkpoint_results, video_cue_results, updated_at')
+    .select('node_id, status, checkpoint_results, video_cue_results, simulation_evidence, updated_at')
     .eq('user_id', userId)
     .eq('course_slug', slug)
   if (error) throw new Error(`อ่านความคืบหน้าไม่สำเร็จ: ${error.message}`)
@@ -109,7 +114,7 @@ export async function loadAllProgress(userId: string): Promise<Record<string, Co
   const db = academyDb()
   const { data, error } = await db
     .from('node_progress')
-    .select('course_slug, node_id, status, checkpoint_results, video_cue_results, updated_at')
+    .select('course_slug, node_id, status, checkpoint_results, video_cue_results, simulation_evidence, updated_at')
     .eq('user_id', userId)
   if (error) throw new Error(`อ่านความคืบหน้าไม่สำเร็จ: ${error.message}`)
 

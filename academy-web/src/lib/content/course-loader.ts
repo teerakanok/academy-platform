@@ -198,13 +198,25 @@ const simulationChallengeSchema = z.object({
   initial: z.record(z.string(), z.union([z.string(), z.boolean()])),
   requirements: z
     .array(
-      z.object({
-        id: z.string().min(1),
-        label: z.string().min(1),
-        field: z.string().min(1),
-        operator: z.enum(['equals', 'notEquals', 'oneOf', 'isTrue', 'isFalse']),
-        value: z.union([z.string(), z.array(z.string())]).optional(),
-      }),
+      z
+        .object({
+          id: z.string().min(1),
+          label: z.string().min(1),
+          field: z.string().min(1),
+          operator: z.enum(['equals', 'notEquals', 'oneOf', 'isTrue', 'isFalse']),
+          value: z.union([z.string(), z.array(z.string())]).optional(),
+        })
+        // operator ที่ต้องเทียบกับค่า ต้องมีค่าให้เทียบ — ไม่งั้นเงื่อนไขนั้นตัดสิน
+        // อะไรไม่ได้เลย และเคยเป็นช่องที่ทำให้ "ไม่ทำอะไร" ผ่านด่านได้ (RIL จับ)
+        .superRefine((req, ctx) => {
+          const needsValue = req.operator === 'equals' || req.operator === 'notEquals' || req.operator === 'oneOf'
+          if (needsValue && req.value === undefined) {
+            ctx.addIssue({ code: 'custom', message: `requirement ${req.id}: operator ${req.operator} ต้องมี value` })
+          }
+          if (req.operator === 'oneOf' && !Array.isArray(req.value)) {
+            ctx.addIssue({ code: 'custom', message: `requirement ${req.id}: oneOf ต้องมี value เป็นอาร์เรย์` })
+          }
+        }),
     )
     .min(1),
   hints: z.array(z.string().min(1)).optional(),

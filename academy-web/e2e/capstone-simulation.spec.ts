@@ -89,6 +89,73 @@ test.describe('capstone ที่มีโจทย์จำลองต้อ�
     expect((await res.json()).passed).toBe(true)
   })
 
+  test('🔴 ผู้เรียนกรอกบนหน้าจอจริงแล้วกดตรวจครั้งเดียว → ผ่านทั้งด่าน', async ({ page }) => {
+    // ⚠️ เทสอื่นในไฟล์นี้ยิง API ตรง จึงไม่พิสูจน์ว่า `CheckpointQuiz` ส่งสถานะหน้าจอ
+    // ไปพร้อม MCQ จริง — mutation ที่ลบ `simulations` ออกจาก LessonView ไม่ถูกจับเลย
+    // (RIL cross-model ยืนยัน) · ข้อนี้เดินผ่าน UI ทั้งเส้น
+    await page.goto(`/courses/${COURSE}/lessons/${CAPSTONE}`)
+
+    // ตอบ MCQ ให้ถูกครบ
+    await page.getByTestId('checkpoint-q-cp-1').locator('input[value="B"]').check()
+    await page.getByTestId('checkpoint-q-cp-2').locator('input[value="C"]').check()
+    await page.getByTestId('checkpoint-q-cp-3').locator('input[value="B"]').check()
+
+    // ตั้งค่าบนหน้าจอจำลองเหมือนผู้เรียนจริง
+    const sim = page.getByTestId('checkpoint-sim-sim-1')
+    await sim.getByTestId('sim-mode-static').click()
+    await sim.getByTestId('sim-ipv4').fill('192.168.10.50')
+    await sim.getByTestId('sim-subnet').fill('255.255.255.0')
+    await sim.getByTestId('sim-gateway').fill('192.168.10.1')
+    await sim.getByTestId('sim-apply').click()
+
+    // ปุ่มตรวจเดียวสำหรับทั้งด่าน
+    await page.getByTestId('checkpoint-submit').click()
+    await expect(page.getByTestId('checkpoint-continue')).toBeVisible()
+
+    // ยืนยันจากสถานะจริงหลัง reload ไม่ใช่ข้อความบนหน้าจอ
+    const after = await (await page.request.get(`/api/progress?slug=${COURSE}`)).json()
+    expect(after.record.completed).toContain(CAPSTONE)
+  })
+
+  test('🔴 หลักฐานที่บันทึกจริงมาจากการตรวจของ route — ไม่ใช่ของที่ใครป้อนเข้ามา', async ({ request }) => {
+    // ⚠️ integration test ป้อน evidence ที่แต่งเองเข้า recordNodeEvent จึงพิสูจน์แค่
+    // ชั้น DB · mutation ที่ลบ `simulationEvidence` ออกจาก route ไม่ถูกจับเลย
+    // (RIL ยืนยัน) · ข้อนี้เดิน route จริงแล้วอ่านสิ่งที่ถูกบันทึก
+    expect((await submit(request, { 'sim-1': SIM_CORRECT })).passed).toBe(true)
+
+    const res = await request.get(`/api/progress?slug=${COURSE}`)
+    const record = (await res.json()).record as {
+      simulationEvidence?: Record<string, Record<string, unknown>>
+    }
+    const evidence = record.simulationEvidence?.[CAPSTONE]?.['sim-1'] as
+      | { passed: boolean; requirements: { id: string; met: boolean }[]; challengeVersion: string; at: string }
+      | undefined
+
+    expect(evidence, 'route ต้องบันทึกหลักฐานของด่านจำลอง').toBeTruthy()
+    expect(evidence!.passed).toBe(true)
+    // ผลราย requirement ครบทั้ง 5 ข้อ ไม่ใช่ boolean รวม
+    expect(evidence!.requirements).toHaveLength(5)
+    expect(evidence!.requirements.every((r) => r.met)).toBe(true)
+    // เวอร์ชันต้องเป็นลายนิ้วมือของกติกา ไม่ใช่เวอร์ชันคอร์ส
+    expect(evidence!.challengeVersion).toMatch(/^sim-[0-9a-f]{8}$/)
+    expect(Date.parse(evidence!.at)).toBeGreaterThan(0)
+  })
+
+  test('🔴 ผ่านแล้วส่งผิดซ้ำ → หลักฐานต้องไม่ถอยหลัง', async ({ request }) => {
+    // สถานะบทถูกกันไม่ให้ถอยอยู่แล้ว แต่เดิม **หลักฐานไม่ถูกกัน** → บทที่ระบบบอกว่า
+    // ผ่าน มีหลักฐานบอกว่าไม่ผ่าน ขัดกันเอง และใบรับรอง (W4) อ้างอิงหลักฐานชุดนี้
+    expect((await submit(request, { 'sim-1': SIM_CORRECT })).passed).toBe(true)
+    expect((await submit(request, { 'sim-1': { addressMode: 'dhcp', applied: false } })).passed).toBe(false)
+
+    const record = (await (await request.get(`/api/progress?slug=${COURSE}`)).json()).record as {
+      completed: string[]
+      simulationEvidence?: Record<string, Record<string, { passed: boolean }>>
+    }
+    // สถานะยังผ่าน (ถูกต้อง) — และหลักฐานต้องยังบอกว่าผ่านเหมือนกัน
+    expect(record.completed).toContain(CAPSTONE)
+    expect(record.simulationEvidence?.[CAPSTONE]?.['sim-1'].passed).toBe(true)
+  })
+
   test('หน้าจอจำลองปรากฏในด่านท้ายบทจริง และไม่พากติกาการตรวจไปด้วย', async ({ page }) => {
     const bodies: string[] = []
     page.on('response', async (res) => {

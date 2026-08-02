@@ -12,10 +12,12 @@ import { SimulationSurface } from './SimulationSurface'
 // อยู่ใน payload ที่ view-source เห็น และคนอ่านจากโหมดฝึกเอาไปตอบโหมดวัดผลได้
 // ตอนนี้ทั้งการตรวจและการตัดสินว่า "ถึงเวลาให้คำใบ้หรือยัง" อยู่ที่ `/api/practice/simulation`
 //
-// สองโหมดต่างกันที่ "ผู้เรียนได้อะไรกลับมา" ไม่ใช่ต่างที่หน้าจอ:
-//   practice — ตรวจกี่ครั้งก็ได้ · บทปกติบอกได้ว่าข้อไหนยังไม่ผ่าน · ด่านของ capstone
-//              ปิดเท่าโหมดวัดผล (เซิร์ฟเวอร์เป็นคนเลือกให้ ไม่ใช่หน้านี้)
-//   assessed — ใช้ตอนวัดผลจริง บอกแค่ผ่าน/ไม่ผ่าน (ต่อเข้า checkpoint ใน W1)
+// บล็อกนี้เป็น **โหมดฝึกเท่านั้น** — ตรวจกี่ครั้งก็ได้ · บทปกติบอกได้ว่าข้อไหนยังไม่
+// ผ่าน · ด่านของ capstone ปิดเท่าโหมดวัดผล (เซิร์ฟเวอร์เป็นคนเลือกให้ ไม่ใช่หน้านี้)
+//
+// ⚠️ เคยมี `mode='assessed'` อยู่ที่นี่ด้วย แต่ไม่เคยมีใครใช้ — พอ W1 ต่อ simulation
+// เข้าด่านจริง ด่านนั้นใช้ `SimulationSurface` ตรงๆ ผ่าน `CheckpointQuiz` แทน
+// เส้นที่กดแล้วไม่ขยับอะไรถูกตัดทิ้ง ไม่ปล่อยไว้ให้คนหลังเข้าใจผิดว่ามันทำงาน
 
 interface PracticeVerdict {
   passed: boolean
@@ -30,13 +32,11 @@ export function SimulationBlock({
   challenge,
   slug,
   nodeId,
-  mode = 'practice',
 }: {
   // ⚠️ PublicSimulationChallenge — ไม่มี operator/value/hints อยู่ในโครงเลย
   challenge: PublicSimulationChallenge
   slug: string
   nodeId: string
-  mode?: 'practice' | 'assessed'
 }) {
   const [state, setState] = useState<SimulationState>(() => ({ ...challenge.initial }))
   const [verdict, setVerdict] = useState<PracticeVerdict | null>(null)
@@ -45,8 +45,6 @@ export function SimulationBlock({
   const [failed, setFailed] = useState(false)
   // คำใบ้ที่ขอมาแล้วจะแสดงทันที — สถานะนี้มีไว้ให้พับเก็บได้เท่านั้น
   const [hintsHidden, setHintsHidden] = useState(false)
-
-  const locked = mode === 'assessed' && verdict !== null
 
   async function check(wantHint = false) {
     if (checking) return
@@ -83,10 +81,10 @@ export function SimulationBlock({
       className="not-prose card-feature card-takeaway p-6 sm:p-7"
       data-testid="simulation-block"
       data-challenge={challenge.id}
-      data-mode={mode}
+      data-mode="practice"
     >
       <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-cs-accent">
-        {mode === 'assessed' ? 'Prove it · hands-on' : 'Set it up yourself'}
+        Set it up yourself
       </p>
       <h3 className="mt-1.5 font-display text-xl font-semibold text-cs-text">{challenge.title}</h3>
       <p className="mt-3 max-w-2xl text-[0.95rem] leading-relaxed text-cs-body" data-testid="simulation-brief">
@@ -94,20 +92,20 @@ export function SimulationBlock({
       </p>
 
       <div className="mt-5">
-        <SimulationSurface surface={challenge.surface} state={state} onChange={setState} readOnly={locked} />
+        <SimulationSurface surface={challenge.surface} state={state} onChange={setState} />
       </div>
 
       <div className="mt-5 flex flex-wrap items-center gap-3">
         <button
           type="button"
           onClick={() => check()}
-          disabled={locked || checking}
+          disabled={checking}
           data-testid="simulation-check"
           className="rounded-control bg-cs-accent-fill px-5 py-2.5 text-sm font-semibold text-cs-on-accent transition-transform duration-200 hover:-translate-y-0.5 disabled:opacity-60 disabled:hover:translate-y-0"
         >
-          {checking ? 'Checking…' : mode === 'assessed' ? 'Submit' : 'Check my setup'}
+          {checking ? 'Checking…' : 'Check my setup'}
         </button>
-        {mode === 'practice' && (
+        {(
           <button
             type="button"
             onClick={reset}
@@ -120,7 +118,7 @@ export function SimulationBlock({
         {/* คำใบ้ต้องขอจากเซิร์ฟเวอร์ — เดิมหน้านี้ถือคำใบ้ไว้เองแล้วนับครั้งเอง
             ซึ่งเปิด devtools ก็อ่านได้ตั้งแต่วินาทีแรก · เสนอปุ่มหลังลองเองสองครั้ง
             (จังหวะของ UI) แต่ตัวคำใบ้มาจากเซิร์ฟเวอร์เสมอ */}
-        {mode === 'practice' && attempts >= 2 && verdict && !verdict.passed && (
+        {attempts >= 2 && verdict && !verdict.passed && (
           <button
             type="button"
             onClick={() => (verdict.hints ? setHintsHidden((v) => !v) : check(true))}
