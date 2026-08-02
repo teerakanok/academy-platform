@@ -84,6 +84,39 @@ test.describe('โหมด learn — สอนได้ จึงบอกผ�
   })
 })
 
+test.describe('endpoint เฉลย — เปิดได้เฉพาะบทที่ผ่านแล้วจริง', () => {
+  test('ยังไม่ผ่าน → ถูกปฏิเสธ (ไม่งั้นคือย้าย oracle ไปที่ใหม่แล้วไม่มีใครเฝ้า)', async ({ request }) => {
+    const res = await request.get(`/api/explanations?slug=${COURSE}&nodeId=${CAPSTONE}`)
+    expect(res.status()).toBe(403)
+    expect(await res.text()).not.toContain('"correct"')
+  })
+
+  test('ผ่านแล้ว → ได้เฉลยและคำอธิบายไปทบทวน', async ({ request }) => {
+    // ทำบทปกติให้ผ่านจริงก่อน แล้วค่อยขอเฉลยของบทนั้น
+    const graded = await submitCheckpoint(request, LESSON, 'learn', { 'cp-1': ['B'] })
+    expect(graded.passed).toBe(true)
+
+    const res = await request.get(`/api/explanations?slug=${COURSE}&nodeId=${LESSON}`)
+    expect(res.ok()).toBeTruthy()
+    const body = await res.json()
+    expect(body.questions.length).toBeGreaterThan(0)
+    for (const q of body.questions) {
+      expect(Array.isArray(q.correct)).toBe(true)
+      expect(typeof q.explanation).toBe('string')
+    }
+  })
+
+  test('ไม่ล็อกอิน = ขอไม่ได้', async ({ playwright, baseURL }) => {
+    const anon = await playwright.request.newContext({
+      baseURL: baseURL!,
+      storageState: { cookies: [], origins: [] },
+    })
+    const res = await anon.get(`/api/explanations?slug=${COURSE}&nodeId=${LESSON}`)
+    expect(res.status()).toBe(401)
+    await anon.dispose()
+  })
+})
+
 test.describe('โจทย์จำลองโหมดฝึก — เซิร์ฟเวอร์เป็นคนตรวจและเป็นคนให้คำใบ้', () => {
   test('ยังไม่ผ่าน + ลองครั้งแรก → บอกข้อที่ยังไม่ผ่าน แต่ยังไม่ให้คำใบ้', async ({ request }) => {
     const res = await request.post('/api/practice/simulation', {
