@@ -42,8 +42,24 @@ R2 bucket สำหรับย้าย media · และอนุญาต de
   เก็บ **answerKeys snapshot** ณ ตอน issue (กัน version drift ระหว่าง issue/consume)
 - เทส 30 ตัว (unit 12 · integration 13 · e2e 5) — race/replay/ownership/expiry/
   โควตา concurrent/window rollover/function grants/no-leak — full chain เขียว
-- **ยังไม่ปิด W0-0**: เหลือต่อ consume เข้า `/api/progress` (คู่กับ W0-1) ·
+- **ยังไม่ปิด W0-0**: เหลือต่อ consume เข้า `/api/progress` (คู่กับ W1) ·
   คลังข้อ 39 (W-content) · retention job (รอเลือกกลไก cron)
+
+**W0-1 เสร็จ (2026-08-02) — เฉลยไม่ออกจากเซิร์ฟเวอร์แล้ว (ปิด F1) และ F4/W0-2 ปิดตาม:**
+- `public-lesson.ts` — `PublicLesson` DTO เป็น **ชนิดที่บังคับ** ไม่ใช่วินัยของคนเขียน:
+  client component รับได้เฉพาะชนิดที่ไม่มี `correct`/`explanation`/`operator`/`hints`
+  อยู่ในโครง · `answer-key.ts` เป็นทางเข้าเดียวของเฉลย ปิดด้วย `server-only`
+  (เพิ่ม dependency ตามที่ W0 acceptance ระบุ · SBOM อัปเดตแล้ว)
+- `/api/progress` — assessed (capstone/test-out) คืน `{ passed }` เท่านั้น เหมือนกัน
+  ทั้งผ่านและไม่ผ่าน · learn คืนผลรายข้อ + คำอธิบาย
+- `/api/practice/simulation` ใหม่ — โหมดฝึกตรวจที่เซิร์ฟเวอร์ และเซิร์ฟเวอร์เป็นคน
+  ตัดสินว่าถึงเวลาให้คำใบ้ (เดิม `SimulationBlock` ถือ hints เองแล้วนับครั้งเอง)
+- `/api/explanations` ใหม่ — เปิดเฉลยเฉพาะบทที่อ่านจาก DB แล้วพบว่าผ่านจริง
+- **F4/W0-2 ปิดไปด้วย**: client ไม่มีเฉลยแล้วจึงต้องรอ `outcome.passed` จากเซิร์ฟเวอร์
+  ก่อน `setDone()` · ระหว่างรอแสดง "Checking…" ไม่ประกาศผลล่วงหน้า
+- เทสใหม่: `answer-leak` ยิงหน้าจริงทั้ง 15 บทอ่าน HTML+RSC+JS chunk ·
+  `assessed-redaction` ตรวจรูป response รวม Mastermind · `player-boundary` กันขอบเขต
+  `/player` (ยกเว้นตามแผน แต่ต้องมีคนเฝ้า) — chain เขียว: vitest 219 · playwright 83
 - **หนี้ระบบที่พบ**: ภาพ artifact ที่ track ไว้ถูก e2e regen ทุก run เพราะฝัง
   อีเมล `e2e-learner-<timestamp>` ใน header → byte ต่างตลอด (เทียบภาพแล้วเนื้อหา
   เหมือนเดิม จึง `git restore` ทุกครั้ง) — ควรแก้ให้ e2e ไม่เขียนทับ artifact
