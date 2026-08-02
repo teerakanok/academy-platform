@@ -25,7 +25,8 @@ test.describe('ความสมบูรณ์ของหลักฐาน�
   test('ส่งคำตอบผิดแล้วไม่ผ่าน และสถานะไม่ขยับ', async ({ request }) => {
     // ⚠️ เดิมข้อนี้ยิงด้วย mode 'test-out' — ตอนนี้ test-out ถูกปิดทั้งหมดจนกว่าจะมี
     // คลังข้อแยกสำหรับโหมดวัดผล (assessment-policy.ts) จึงยิงด้วยโหมด learn ที่ยัง
-    // ใช้อยู่จริง โดยตอบไม่ครบทุกข้อ ซึ่งต้องไม่ผ่านตามเกณฑ์ "ตอบครบ"
+    // ใช้อยู่จริง โดยตอบไม่ครบทุกข้อ ซึ่งไม่ผ่านเกณฑ์ของโหมดสอน (ต้องตอบครบ และ
+    // ต้องมีข้อที่ถูกอย่างน้อยหนึ่งข้อ โดยผิดได้ไม่เกินหนึ่ง — assessment-policy)
     const res = await request.post('/api/progress', {
       data: { slug: COURSE, nodeId: NODE, action: 'checkpoint', mode: 'learn', answers: { 'cp-1': ['A'] } },
     })
@@ -79,7 +80,8 @@ test.describe('ความสมบูรณ์ของหลักฐาน�
     })
     expect(res.ok()).toBeTruthy()
     const body = await res.json()
-    // mode 'learn' บทปกติ: ตอบครบก็ผ่าน (ความถูกผิดใช้สอน ไม่ใช่ด่าน)
+    // mode 'learn' บทปกติ: ตอบครบและถูกตามเกณฑ์โหมดสอนจึงผ่าน (W0-3)
+    // — ความถูกผิดยังใช้สอนอยู่ แต่ตอบผิดหมดไม่ผ่านแล้ว
     expect(body.passed).toBe(true)
 
     const after = await (await request.get(`/api/progress?slug=${COURSE}`)).json()

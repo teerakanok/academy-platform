@@ -29,19 +29,19 @@ export function courseSkillData(
   const finished = new Set([...state.completed, ...state.testedOut])
 
   return structure.skills.map((skill) => {
-    let earned = 0
+    let covered = 0
     let total = 0
     for (const node of structure.nodes) {
       const weight = node.skillWeights[skill.id]
       if (!weight) continue
       total += weight
-      if (finished.has(node.id)) earned += weight
+      if (finished.has(node.id)) covered += weight
     }
     return {
       id: skill.id,
       label: labels[skill.id] ?? skill.id,
-      value: total === 0 ? 0 : Math.round((earned / total) * 100),
-      notStarted: earned === 0,
+      value: total === 0 ? 0 : Math.round((covered / total) * 100),
+      notStarted: covered === 0,
     }
   })
 }
@@ -73,7 +73,7 @@ export interface CourseContribution {
  * "ยังไม่ได้เริ่มตรงนี้" (ซึ่งเป็นข้อมูลที่มีประโยชน์) ไม่ใช่ "คุณได้ศูนย์"
  */
 export function globalSkillData(contributions: CourseContribution[]): SkillDatum[] {
-  const earnedByDomain = new Map<string, number>()
+  const coveredByDomain = new Map<string, number>()
   const availableByDomain = new Map<string, number>()
 
   for (const { structure, state } of contributions) {
@@ -82,18 +82,18 @@ export function globalSkillData(contributions: CourseContribution[]): SkillDatum
 
     for (const [domainId, weight] of Object.entries(structure.globalSkillWeights)) {
       availableByDomain.set(domainId, (availableByDomain.get(domainId) ?? 0) + weight)
-      earnedByDomain.set(domainId, (earnedByDomain.get(domainId) ?? 0) + weight * finishedRatio)
+      coveredByDomain.set(domainId, (coveredByDomain.get(domainId) ?? 0) + weight * finishedRatio)
     }
   }
 
   return GLOBAL_DOMAINS.map((domain) => {
     const available = availableByDomain.get(domain.id) ?? 0
-    const earned = earnedByDomain.get(domain.id) ?? 0
+    const covered = coveredByDomain.get(domain.id) ?? 0
     return {
       id: domain.id,
       label: domain.label,
-      value: available === 0 ? 0 : Math.round((earned / available) * 100),
-      notStarted: earned === 0,
+      value: available === 0 ? 0 : Math.round((covered / available) * 100),
+      notStarted: covered === 0,
     }
   })
 }
