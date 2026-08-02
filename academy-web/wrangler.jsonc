@@ -1,11 +1,15 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "main": ".open-next/worker.js",
+  // entry ของเราเอง — ห่อ handler ที่ OpenNext สร้างแล้วเพิ่ม `scheduled` (ดู worker.ts)
+  "main": "worker.ts",
   "name": "cyberskills-academy",
   "compatibility_date": "2025-03-25",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
   "observability": { "enabled": true },
+  // กวาด attempt ที่หมดอายุ วันละครั้งตอนตี 3 UTC (~10 โมงเช้าไทย — นอกช่วงที่คนใช้งาน)
+  // ตัวฟังก์ชันฝั่ง DB เป็นคนตัดสินว่าลบอะไรได้ (migration 0011) ที่นี่แค่เรียกตามเวลา
+  "triggers": { "crons": ["0 3 * * *"] },
   "vars": {
     // preview: ยังไม่เปิดให้ค้นเจอ และยังไม่เปิดระบบบัญชี
     // (ไม่มี NEXT_PUBLIC_SUPABASE_* = หน้า sign-in จะบอกตรงๆ ว่ายังไม่เปิด
