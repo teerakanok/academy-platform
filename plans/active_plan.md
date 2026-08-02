@@ -59,7 +59,23 @@ R2 bucket สำหรับย้าย media · และอนุญาต de
   ก่อน `setDone()` · ระหว่างรอแสดง "Checking…" ไม่ประกาศผลล่วงหน้า
 - เทสใหม่: `answer-leak` ยิงหน้าจริงทั้ง 15 บทอ่าน HTML+RSC+JS chunk ·
   `assessed-redaction` ตรวจรูป response รวม Mastermind · `player-boundary` กันขอบเขต
-  `/player` (ยกเว้นตามแผน แต่ต้องมีคนเฝ้า) — chain เขียว: vitest 219 · playwright 83
+  `/player` · `ui-waits-for-server` วัดบนหน้าจอก่อน reload (เกณฑ์ W0-2 ที่แผนล็อก)
+
+**RIL cross-model บน W0-1 จับสองรูที่ผมมองข้าม — แก้แล้ว (commit 4c1c07c):**
+- 🔴 **โหมดสอนเป็นเครื่องเฉลยของโหมดวัดผล**: บทปกติใช้ checkpoint ชุดเดียวกันทั้ง
+  learn/test-out → ยิง learn เก็บเฉลย แล้วไปยิง test-out ได้ `tested-out` ที่นับเป็น
+  พิสูจน์แล้ว → `assessment-policy.ts` **ปิด test-out ทั้งหมด** จนกว่า node จะมีคลังข้อ
+  ของตัวเอง (แผน W0-0 ล็อกไว้ตั้งแต่แรกแต่ยังไม่ได้ทำ) · ปุ่มและ copy บน UI ผูกกับ
+  นโยบายเดียวกัน — **การเปิด test-out กลับต้องมาพร้อมคลังข้อ ≥3 เท่า (W-content)**
+- 🔴 **`/player` เปิดให้ผู้เรียนทุกคนที่ล็อกอิน** (เทสรุ่นแรกวัดแค่ anon จึงเขียวทั้งที่
+  รูเปิด) → `internal-surface.ts` fail-closed ด้วย `INTERNAL_SURFACES` (ไม่ตั้ง = ปิด,
+  ตอบ 404 ก่อนชั้น auth) · ซ่อนลิงก์ทั้งเมนูและ dashboard · spec ของ `/player`
+  (player, visual-matrix, full-acceptance) ข้ามเมื่อปิดและผ่านเมื่อเปิด — ยืนยันสองโหมด
+- MAJOR: DTO บังคับจริงด้วย `?: never` + เทสระดับชนิด (พิสูจน์ด้วยการถอด guard แล้วแดง) ·
+  `course-source.ts` ใส่ `server-only` · practice endpoint จำกัด body/จำนวน key ·
+  คำใบ้เปลี่ยนเป็นผู้เรียนกดขอ (เดิมเชื่อ attempt count จาก client ที่ปลอมได้) ·
+  cache answer key
+- chain: vitest **241** (รวม type tests) · playwright **85 + 10 skipped** (พื้นผิวภายใน)
 - **หนี้ระบบที่พบ**: ภาพ artifact ที่ track ไว้ถูก e2e regen ทุก run เพราะฝัง
   อีเมล `e2e-learner-<timestamp>` ใน header → byte ต่างตลอด (เทียบภาพแล้วเนื้อหา
   เหมือนเดิม จึง `git restore` ทุกครั้ง) — ควรแก้ให้ e2e ไม่เขียนทับ artifact
