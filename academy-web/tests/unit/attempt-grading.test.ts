@@ -42,15 +42,24 @@ describe('simulationsToGrade', () => {
     expect(result.simulations[0].challenge.requirements[0].value).toBe('192.168.10.41')
   })
 
-  it('🔴 deploy เพิ่มด่านใหม่หลังออก attempt → ไม่ตรวจต่อ ให้เริ่มใหม่', () => {
+  it('🔴 deploy เพิ่มด่านใหม่ระหว่างทาง → ยังตรวจจาก snapshot ของ attempt', () => {
+    // ⚠️ เดิมข้อนี้บังคับให้ตอบ stale · RIL red-team ชี้ว่านั่นทำให้ผู้เรียนที่กำลังทำ
+    // อยู่เสียสิทธิ์หนึ่งช่องเพราะ deploy ของเรา ทั้งที่ attempt มีโจทย์และกติกาครบ
+    // สิ่งที่ถูกคือตัดสินจากสิ่งที่เขาถูกเสิร์ฟ แล้วบันทึกว่าผ่านด้วยเวอร์ชันไหน
     const snapshot: SimulationSet = [{ id: 'sim-1', challenge: challenge('192.168.10.41') }]
     const grown: SimulationSet = [...fromContent, { id: 'sim-2', challenge: challenge('10.0.0.5') }]
-    expect(simulationsToGrade(params(snapshot), grown)).toEqual({ ok: false, reason: 'stale-attempt' })
+    const result = simulationsToGrade(params(snapshot), grown)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.simulations).toBe(snapshot)
   })
 
-  it('🔴 deploy ลบด่านทิ้งหลังออก attempt → ไม่ตรวจต่อ ให้เริ่มใหม่', () => {
+  it('🔴 deploy ลบด่านทิ้งระหว่างทาง → ยังตรวจด่านที่ผู้เรียนถูกเสิร์ฟมา', () => {
     const snapshot: SimulationSet = [{ id: 'sim-1', challenge: challenge('192.168.10.41') }]
-    expect(simulationsToGrade(params(snapshot), [])).toEqual({ ok: false, reason: 'stale-attempt' })
+    const result = simulationsToGrade(params(snapshot), [])
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.simulations).toBe(snapshot)
   })
 
   it('🔴 attempt ที่ออกก่อนมี snapshot (deploy คร่อม) → ไม่ตรวจต่อ', () => {

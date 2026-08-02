@@ -557,30 +557,131 @@ describe('retention ของตาราง attempt (0011)', () => {
     expect(await purge(30)).toBe(0)
   })
 
-  it('🔴 กวาดแล้วหลักฐานของใบรับรองต้องยังอยู่ (ตัวชี้ไม่ถูกลบตาม)', async () => {
-    const passed = await issueAttempt(ctx('n-retain-cert'), SAMPLE_PARAMS, 'v-cert')
-    await consumeAttempt(ctx('n-retain-cert'), passed!.attemptId)
-    await recordNodeEvent(owner.id, {
-      slug: COURSE,
-      nodeId: 'n-retain-cert',
-      status: 'completed',
-      simulationEvidence: { 'sim-1': { passed: true, requirements: [], challengeVersion: 'sim-x', at: 'now' } },
-      passedAttemptId: passed!.attemptId,
-      passedChallengeVersion: 'v-cert',
-    })
-    await ageAttempt(passed!.attemptId, 90)
-    expect(await purge(30)).toBe(1)
+  it('🔴 attempt ที่ไม่ได้เป็นหลักฐาน กวาดได้ และแถวความคืบหน้าไม่กระทบ', async () => {
+    // ⚠️ เทสรุ่นแรกของข้อนี้ยืนยันว่า "กวาดใบที่เป็นหลักฐานได้ ตราบใดที่ตัวชี้ยังอยู่"
+    // ซึ่ง **ผิด** — RIL ทั้งสองเลนชี้ว่าเหลือแต่ UUID ที่ชี้ไปยังแถวที่ไม่มีอยู่ จึง
+    // ตอบไม่ได้ว่าผ่านด้วยโจทย์ชุดไหน · ตอนนี้ใบที่เป็นหลักฐานถูกกันไว้ (0012) และ
+    // ข้อนี้เหลือหน้าที่พิสูจน์ว่าใบ **อื่น** ยังกวาดได้ตามปกติ
+    const spent = await issueAttempt(ctx('n-retain-spent'), SAMPLE_PARAMS, 'v1')
+    await consumeAttempt(ctx('n-retain-spent'), spent!.attemptId)
+    await recordNodeEvent(owner.id, { slug: COURSE, nodeId: 'n-retain-spent', status: 'in-progress' })
+    await ageAttempt(spent!.attemptId, 90)
 
+    expect(await purge(30)).toBe(1)
     const row = await withDb((db) =>
       db.query(
-        `select passed_attempt_id, passed_challenge_version, simulation_evidence
-           from academy.node_progress
-          where user_id = $1 and course_slug = $2 and node_id = 'n-retain-cert'`,
+        `select status from academy.node_progress
+          where user_id = $1 and course_slug = $2 and node_id = 'n-retain-spent'`,
         [owner.id, COURSE],
       ),
     )
-    expect(row.rows[0].passed_attempt_id).toBe(passed!.attemptId)
-    expect(row.rows[0].passed_challenge_version).toBe('v-cert')
+    expect(row.rows[0].status).toBe('in-progress')
+  })
+})
+
+describe('ปิดรูที่ RIL สองเลนชี้ตรงกัน (0012)', () => {
+  async function ageClaimTo(attemptId: string, seconds: number) {
+    await withDb((db) =>
+      db.query(
+        `update academy.attempt set consumed_at = now() - make_interval(secs => $2) where attempt_id = $1`,
+        [attemptId, seconds],
+      ),
+    )
+  }
+
+  it('🔴 claim ค้างแล้วยิงพร้อมกันหลายเส้น → ยึดได้เส้นเดียว', async () => {
+    // รูเดิม: `consumed_at = coalesce(consumed_at, now())` ไม่ต่ออายุ claim ·
+    // พอเลย 30 วินาที ทุกเส้นที่ยิงพร้อมกันผ่านเงื่อนไขหมด = ตรวจได้หลายชุดคำตอบ
+    // จากโควตาช่องเดียว (RIL ทั้งสองเลนเดินเคสให้ดู)
+    const NODE = 'n-stale-race'
+    const issued = await issueAttempt(ctx(NODE), SAMPLE_PARAMS, 'v1')
+    await consumeAttempt(ctx(NODE), issued!.attemptId)
+    await ageClaimTo(issued!.attemptId, 60)
+
+    const racers = await Promise.all(
+      Array.from({ length: 5 }, () => consumeAttempt(ctx(NODE), issued!.attemptId)),
+    )
+    expect(racers.filter((r) => r !== null), 'ยึดพร้อมกันต้องผ่านได้เส้นเดียว').toHaveLength(1)
+  })
+
+  it('🔴 ยึดสำเร็จแล้วต้องต่ออายุ claim (เส้นถัดไปเห็นของสด)', async () => {
+    const NODE = 'n-stale-renew'
+    const issued = await issueAttempt(ctx(NODE), SAMPLE_PARAMS, 'v1')
+    await consumeAttempt(ctx(NODE), issued!.attemptId)
+    await ageClaimTo(issued!.attemptId, 60)
+
+    expect(await consumeAttempt(ctx(NODE), issued!.attemptId)).not.toBeNull()
+    // ยึดรอบสองไปแล้ว → รอบสามต้องถูกปฏิเสธทันที เพราะ claim ถูกต่ออายุ
+    expect(await consumeAttempt(ctx(NODE), issued!.attemptId)).toBeNull()
+  })
+
+  it('🔴 ผ่านแล้ว ผลรายข้อถูกทับไม่ได้อีก (หลักฐานถูกแช่แข็งทั้งชุด)', async () => {
+    // สถานะกับตัวชี้ถูกกันไม่ให้ถอยอยู่แล้ว แต่ `checkpoint_results` ยังใช้ `||` ·
+    // ผ่านแล้วขอ attempt ใหม่แล้วตอบมั่ว = บทที่ระบบบอกว่าผ่าน มีผลรายข้อว่าผิดหมด
+    const NODE = 'n-frozen-evidence'
+    const first = await issueAttempt(ctx(NODE), SAMPLE_PARAMS, 'v-pass')
+    await recordNodeEvent(owner.id, {
+      slug: COURSE,
+      nodeId: NODE,
+      status: 'completed',
+      checkpointResults: { q1: true },
+      simulationEvidence: { 'sim-1': { passed: true, requirements: [], challengeVersion: 's1', at: 'now' } },
+      passedAttemptId: first!.attemptId,
+      passedChallengeVersion: 'v-pass',
+    })
+
+    // ทำซ้ำแล้วตอบผิด — ระบบยังรับการทำซ้ำได้ แต่ต้องไม่แตะหลักฐาน
+    await recordNodeEvent(owner.id, {
+      slug: COURSE,
+      nodeId: NODE,
+      status: 'in-progress',
+      checkpointResults: { q1: false },
+      simulationEvidence: { 'sim-1': { passed: false, requirements: [], challengeVersion: 's1', at: 'later' } },
+    })
+
+    const row = await withDb((db) =>
+      db.query(
+        `select status, checkpoint_results, simulation_evidence, passed_attempt_id
+           from academy.node_progress where user_id = $1 and course_slug = $2 and node_id = $3`,
+        [owner.id, COURSE, NODE],
+      ),
+    )
+    expect(row.rows[0].status).toBe('completed')
+    expect(row.rows[0].checkpoint_results.q1, 'ผลรายข้อของการผ่านถูกทับ').toBe(true)
     expect(row.rows[0].simulation_evidence['sim-1'].passed).toBe(true)
+    expect(row.rows[0].passed_attempt_id).toBe(first!.attemptId)
+  })
+
+  it('🔴 ตัวกวาดต้องไม่ลบ attempt ที่เป็นหลักฐานของการผ่าน', async () => {
+    // ตัวชี้ตั้งใจไม่มี FK (retention ต้องกวาดได้) กติกาจึงต้องอยู่ในตัวกวาดเอง
+    // ไม่งั้นเหลือแต่ UUID ที่ชี้ไปยังแถวที่ไม่มีอยู่
+    const NODE = 'n-purge-protected'
+    const passed = await issueAttempt(ctx(NODE), SAMPLE_PARAMS, 'v-cert')
+    await recordNodeEvent(owner.id, {
+      slug: COURSE,
+      nodeId: NODE,
+      status: 'completed',
+      passedAttemptId: passed!.attemptId,
+      passedChallengeVersion: 'v-cert',
+    })
+    await withDb((db) =>
+      db.query(
+        `update academy.attempt set created_at = now() - interval '90 days',
+                                    expires_at = now() - interval '89 days'
+          where attempt_id = $1`,
+        [passed!.attemptId],
+      ),
+    )
+
+    const deleted = await withDb(async (db) => {
+      const res = await db.query(`select academy.purge_expired_attempts(30, 5000) as deleted`)
+      return res.rows[0].deleted as number
+    })
+    expect(deleted, 'ใบที่เป็นหลักฐานต้องไม่ถูกกวาด').toBe(0)
+
+    const still = await withDb((db) =>
+      db.query(`select params from academy.attempt where attempt_id = $1`, [passed!.attemptId]),
+    )
+    expect(still.rows, 'โจทย์ที่ใช้พิสูจน์ต้องยังอยู่').toHaveLength(1)
   })
 })

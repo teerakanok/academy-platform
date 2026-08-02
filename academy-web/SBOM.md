@@ -32,6 +32,7 @@
 | @types/react | `^18.3.31` | 18.3.31 | types |
 | @types/react-dom | `^18.3.7` | 18.3.7 | types |
 | autoprefixer | `^10.5.4` | 10.5.4 | CSS postprocess |
+| @cloudflare/workers-types | `^5.20260801.1` | 5.20260801.1 | types ของ workerd สำหรับ worker.ts (cron) — ใช้เฉพาะตอน typecheck |
 | eslint | `^9.39.5` | 9.39.5 | linter |
 | eslint-config-next | `^15.5.22` | 15.5.22 | lint rules ของ Next |
 | pg | `^8.22.0` | 8.22.0 | Postgres client สำหรับ RLS hardening tests |

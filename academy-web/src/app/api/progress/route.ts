@@ -233,12 +233,14 @@ export async function POST(request: Request) {
     if (consumed) {
       // ชุดคำตอบต้องตรงกับชุดข้อของ attempt **พอดี** ไม่ขาดไม่เกิน
       //
-      // เดิมวนเฉพาะ questionIds จึงเมิน key แปลกปลอมเงียบๆ ทั้งที่ comment บอกว่า
-      // "เจอของแปลกปลอม = ปฏิเสธทั้งชุด" — กติกาที่เขียนไว้กับที่ทำจริงต้องตรงกัน
-      // ไม่งั้นรอบหน้าจะไม่มีใครรู้ว่าอันไหนคือของจริง (RIL cross-model รอบ 2)
+      // ⚠️ ตรวจให้จบก่อนเริ่มตรวจคำตอบ และเมื่อไม่ผ่านต้อง finalize ปิด attempt ทิ้ง
+      // (ดูด้านล่าง) — เดิม route consume ไปแล้วค่อยตอบ 400 ทำให้เหลือ attempt ที่
+      // ถูกยึดแต่ไม่มีผล ซึ่งเป็นสภาพที่ใช้เปิดช่อง "ยึดซ้ำหลัง 30 วินาที" ได้ฟรี
+      // (RIL red-team เดินเคสให้ดู)
       const submittedIds = Object.keys(input.answers)
       const expected = new Set(gradedQuestionIds)
       if (submittedIds.length !== expected.size || submittedIds.some((id) => !expected.has(id))) {
+        await finalizeAttempt(user.account.id, input.attemptId!, { passed: false })
         return NextResponse.json({ ok: false, error: 'คำตอบไม่ตรงกับโจทย์ชุดนี้' }, { status: 400 })
       }
       for (const id of gradedQuestionIds) {
@@ -246,6 +248,7 @@ export async function POST(request: Request) {
         if (real === null) {
           // key ที่ไม่มีในตาราง / ข้อที่ไม่ได้อยู่ใน attempt นี้ / key ซ้ำ → ปฏิเสธทั้งชุด
           // ไม่ใช่ตัดตัวปลอมทิ้งเงียบๆ (ดูเหตุผลใน remapAnswersToReal)
+          await finalizeAttempt(user.account.id, input.attemptId!, { passed: false })
           return NextResponse.json({ ok: false, error: 'คำตอบไม่ตรงกับโจทย์ชุดนี้' }, { status: 400 })
         }
         results[id] = sameAnswerSet(real, consumed.params.answerKeys[id] ?? [])
@@ -267,6 +270,9 @@ export async function POST(request: Request) {
     // ผ่านโดยไม่มีหลักฐานของด่านที่เขาถูกเสิร์ฟมาจริง (RIL cross-model รอบ 2)
     const source = simulationsToGrade(consumed?.params ?? null, sims)
     if (!source.ok) {
+      if (consumed && input.attemptId) {
+        await finalizeAttempt(user.account.id, input.attemptId, { passed: false })
+      }
       return NextResponse.json(
         { ok: false, error: 'โจทย์ชุดนี้หมดอายุแล้ว เริ่มใหม่อีกครั้ง' },
         { status: 409 },

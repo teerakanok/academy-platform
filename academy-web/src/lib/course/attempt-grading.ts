@@ -23,10 +23,17 @@ export function simulationsToGrade(
   // ไม่มี attempt (บทสอนทั่วไปที่ไม่ต้องใช้) — ใช้ของในไฟล์ตามเดิม
   if (!params) return { ok: true, simulations: fromContent }
 
-  const snapshot = params.simulations ?? []
-  // จำนวนด่านต่างกัน = เนื้อหาเปลี่ยนหลัง attempt ออกไปแล้ว · ถ้าปล่อยผ่านโดยใช้
-  // snapshot บทอาจถูกบันทึกว่าผ่านโดยไม่มีหลักฐานของด่านที่เพิ่งเพิ่ม และถ้าใช้ไฟล์
-  // ผู้เรียนก็ถูกตัดสินด้วยกติกาที่ไม่เคยเห็น — ทางที่ซื่อสัตย์คือให้เริ่มใหม่
-  if (snapshot.length !== fromContent.length) return { ok: false, reason: 'stale-attempt' }
+  // ⚠️ ไม่เทียบกับเนื้อหาปัจจุบันเลย — attempt คือ "สัญญาของงานครั้งนี้"
+  //
+  // เดิมถ้าจำนวนด่านไม่ตรงกับไฟล์วันนี้จะตอบ stale · ผลคือ deploy ที่เพิ่มด่านทำให้
+  // ผู้เรียนที่กำลังทำอยู่เสียสิทธิ์หนึ่งช่องทั้งที่ attempt มีโจทย์และกติกาครบอยู่แล้ว
+  // (RIL red-team ข้อ 4) · สิ่งที่ถูกต้องคือตัดสินจากสิ่งที่เขาถูกเสิร์ฟ แล้วบันทึกว่า
+  // ผ่านด้วยกติกาเวอร์ชันไหน (`passed_challenge_version` ทำหน้าที่นี้อยู่แล้ว)
+  //
+  // เหลือ stale ไว้กรณีเดียว: attempt ที่ออกก่อนระบบเก็บ snapshot (deploy คร่อม) —
+  // ตรวจด้วยไฟล์ไม่ได้เพราะค่าตัวแปรของเขาไม่มีใครรู้แล้ว
+  const snapshot = params.simulations
+  if (snapshot === undefined) return { ok: false, reason: 'stale-attempt' }
+  void fromContent
   return { ok: true, simulations: snapshot }
 }

@@ -32,10 +32,11 @@ interface Env {
 async function purgeExpiredAttempts(env: Env): Promise<{ rounds: number; deleted: number }> {
   const url = env.SUPABASE_URL
   const key = env.SUPABASE_SERVICE_ROLE_KEY
+  // ⚠️ ต้อง throw ไม่ใช่ return เงียบๆ — Cloudflare นับ invocation ที่ไม่ reject ว่า
+  // สำเร็จ · ของเดิม log error แล้วคืน 0 ทำให้ cron ที่พังทุกวันดูเหมือนทำงานปกติ
+  // (RIL ข้อ 4) · งานเบื้องหลังที่ล้มเงียบคือสิ่งที่ไม่มีใครรู้จนกว่าจะสาย
   if (!url || !key) {
-    // ไม่ตั้ง env = ยังไม่พร้อมทำงานนี้ · เงียบไม่ได้ ต้องเห็นใน log ว่าไม่ได้ทำ
-    console.error('[cron/purge-attempts] ยังไม่ได้ตั้ง SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY')
-    return { rounds: 0, deleted: 0 }
+    throw new Error('[cron/purge-attempts] ยังไม่ได้ตั้ง SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY')
   }
 
   let deleted = 0
@@ -53,8 +54,7 @@ async function purgeExpiredAttempts(env: Env): Promise<{ rounds: number; deleted
       body: JSON.stringify({ p_retain_days: RETAIN_DAYS, p_limit: BATCH }),
     })
     if (!res.ok) {
-      console.error(`[cron/purge-attempts] เรียกไม่สำเร็จ (${res.status})`)
-      return { rounds: round, deleted }
+      throw new Error(`[cron/purge-attempts] เรียกไม่สำเร็จ (${res.status}) หลังลบไปแล้ว ${deleted} แถว`)
     }
     const removed = Number(await res.json())
     deleted += Number.isFinite(removed) ? removed : 0
