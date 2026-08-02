@@ -1,4 +1,4 @@
-import type { LessonBlock } from '@/lib/content/course-types'
+import type { PublicLessonBlock } from '@/lib/content/public-lesson'
 import { ImageBlock } from './blocks/ImageBlock'
 import { LabBlock } from './blocks/LabBlock'
 import { SimulationBlock } from './blocks/SimulationBlock'
@@ -18,7 +18,16 @@ const CALLOUT_TONE = {
   warning: { wrap: 'border-cs-amber-border bg-cs-amber-dim', label: 'text-cs-amber' },
 } as const
 
-export function LessonBody({ blocks }: { blocks: LessonBlock[] }) {
+export function LessonBody({
+  blocks,
+  slug,
+  nodeId,
+}: {
+  // ⚠️ PublicLessonBlock ไม่ใช่ LessonBlock — simulation ถูกลดรูปจนไม่มีกติกาการตรวจ
+  blocks: PublicLessonBlock[]
+  slug: string
+  nodeId: string
+}) {
   return (
     <div className="prose-lesson space-y-5 text-cs-body">
       {blocks.map((block, index) => {
@@ -99,7 +108,7 @@ export function LessonBody({ blocks }: { blocks: LessonBlock[] }) {
             return <ImageBlock key={index} src={block.src} alt={block.alt} caption={block.caption} />
 
           case 'simulation':
-            return <SimulationBlock key={index} challenge={block.challenge} />
+            return <SimulationBlock key={index} challenge={block.challenge} slug={slug} nodeId={nodeId} />
 
           case 'lab':
             return (

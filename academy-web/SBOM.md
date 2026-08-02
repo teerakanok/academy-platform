@@ -16,6 +16,7 @@
 | next | `^15.5.22` | 15.5.22 | framework (App Router) |
 | react | `^18.3.1` | 18.3.1 | UI runtime |
 | react-dom | `^18.3.1` | 18.3.1 | UI runtime (DOM) |
+| server-only | `^0.0.1` | 0.0.1 | ทำให้ build **แดง** ถ้าโมดูลที่ถือเฉลยถูก import จาก client component (W0-1) — ไม่มี transitive dependency |
 | wrangler | `^4.118.0` | 4.118.0 | CLI ของ Cloudflare Workers — ใช้ build/รันทดสอบบน workerd จริงในเครื่อง |
 | zod | `^4.4.3` | 4.4.3 | input validation ที่ API boundary |
 

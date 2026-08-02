@@ -150,7 +150,10 @@ test.describe('learner journey through a course', () => {
     await page.getByTestId('checkpoint-q-cp-4').locator('input[value="B"]').check()
     await page.getByTestId('checkpoint-q-cp-5').locator('input[value="B"]').check()
     await page.getByTestId('checkpoint-submit').click()
-    await expect(page.getByTestId('checkpoint-score')).toContainText('5/5')
+    // ⚠️ capstone เป็นโหมด assessed — response มีแค่ผ่าน/ไม่ผ่าน จึง **ต้องไม่มี**
+    // คะแนนรายข้อขึ้นบนหน้าจอ (W0-1: จำนวนที่ถูกคือเครื่องเฉลยแบบ Mastermind)
+    await expect(page.getByTestId('checkpoint-continue')).toBeVisible()
+    await expect(page.getByTestId('checkpoint-score')).toHaveCount(0)
     await page.getByTestId('checkpoint-continue').click()
     await expect(page.getByTestId('lesson-status')).toContainText('Done')
   })

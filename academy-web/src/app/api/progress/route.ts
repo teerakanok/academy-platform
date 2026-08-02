@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { currentUser } from '@/lib/auth/session'
-import { getCourseStructure, getLesson } from '@/lib/content/course-source'
+import { getCourseStructure } from '@/lib/content/course-source'
+import { getLessonAnswerKey, sameAnswerSet } from '@/lib/content/answer-key'
 import { loadAllProgress, loadProgress, recordNodeEvent } from '@/lib/course/progress-db'
 
 export const runtime = 'nodejs'
@@ -21,6 +22,15 @@ export const runtime = 'nodejs'
 //
 // หมายเหตุ: 'skip' ยังให้ client ประกาศได้ เพราะมันคือการ *สละสิทธิ์* ไม่ใช่การอ้างว่า
 // รู้ — และตัวมันเองไม่เคยนับเป็นหลักฐานอยู่แล้ว
+//
+// ── สิ่งที่ response บอกได้ ต่างกันตามโหมด (W0-1) ────────────────────────────────
+// **assessed** (capstone หรือ test-out) → `{ passed }` เท่านั้น เหมือนกันทั้งกรณีผ่าน
+//   และไม่ผ่าน · ไม่มีผลรายข้อ ไม่มีจำนวนที่ถูก ไม่มีคำอธิบาย
+//   เหตุผล: capstone คือ 5 ข้อ single-answer 4 ตัวเลือก การรู้ "ถูกกี่ข้อ" ทำให้ไล่
+//   ทีละข้อแบบ Mastermind ได้ (~10–15 ครั้งได้เฉลยครบโดยไม่รู้เนื้อหาเลย) — ตัวเลข
+//   หรือสัญญาณใดๆ ที่แปรตามคำตอบคือเครื่องเฉลย
+// **learn** (บทปกติ) → บอกผลรายข้อ + คำอธิบายได้ เพราะเป็นการสอน ไม่ใช่ด่านพิสูจน์
+//   (น้ำหนักของใบรับรองอยู่ที่ capstone ทั้งหมด — W0-3)
 
 const answerMap = z.record(z.string().max(64), z.array(z.string().max(8)).max(12))
 
@@ -51,13 +61,6 @@ const schema = z.discriminatedUnion('action', [
     answer: z.array(z.string().max(8)).max(12),
   }),
 ])
-
-function sameSet(a: string[], b: string[]): boolean {
-  if (a.length !== b.length) return false
-  const left = [...a].sort()
-  const right = [...b].sort()
-  return left.every((v, i) => v === right[i])
-}
 
 export async function POST(request: Request) {
   const user = await currentUser()
@@ -98,52 +101,52 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true })
     }
 
-    const resolved = getLesson(input.slug, input.nodeId)
-    if (!resolved) return NextResponse.json({ ok: false, error: 'ไม่พบเนื้อหาบทนี้' }, { status: 404 })
+    const answerKey = getLessonAnswerKey(input.slug, input.nodeId)
+    if (!answerKey) return NextResponse.json({ ok: false, error: 'ไม่พบเนื้อหาบทนี้' }, { status: 404 })
 
     if (input.action === 'video-cue') {
-      const cue = resolved.lesson.videoCueQuestions?.find((q) => q.cueId === input.cueId)
+      const cue = answerKey.videoCueQuestions.find((q) => q.cueId === input.cueId)
       if (!cue) return NextResponse.json({ ok: false, error: 'ไม่พบคำถามนี้' }, { status: 404 })
-      const correct = sameSet(input.answer, cue.correct)
+      const correct = sameAnswerSet(input.answer, cue.correct)
       await recordNodeEvent(user.account.id, {
         slug: input.slug,
         nodeId: input.nodeId,
         status: 'in-progress',
         videoCueResults: { [input.cueId]: correct },
       })
-      return NextResponse.json({ ok: true, correct })
+      // คำถามกลางวิดีโอเป็น formative ไม่ใช่ด่าน (W0-4) — คำอธิบายคือทั้งหมดของ
+      // ประโยชน์มัน จึงส่งกลับตรงนี้แทนที่จะฝังมากับหน้า
+      return NextResponse.json({ ok: true, correct, explanation: cue.explanation })
     }
 
     // ── checkpoint: เซิร์ฟเวอร์ตรวจเอง ────────────────────────────────────
-    const questions = resolved.lesson.checkpoint
+    const questions = answerKey.checkpoint
     const results: Record<string, boolean> = {}
     for (const q of questions) {
-      results[q.id] = sameSet(input.answers[q.id] ?? [], q.correct)
+      results[q.id] = sameAnswerSet(input.answers[q.id] ?? [], q.correct)
     }
     const correctCount = Object.values(results).filter(Boolean).length
     // capstone และการ test-out ต้องถูกทุกข้อ · บทปกติแค่ทำครบก็ผ่าน
-    const mustBePerfect = node.kind === 'capstone' || input.mode === 'test-out'
+    // (เกณฑ์บทปกติจะเปลี่ยนเป็น "ผิดไม่เกิน 1 ข้อ" ใน W0-3 — คนละงานกัน จงใจไม่แตะที่นี่)
+    const assessed = node.kind === 'capstone' || input.mode === 'test-out'
     const answeredAll = questions.every((q) => (input.answers[q.id]?.length ?? 0) > 0)
-    const passed = answeredAll && (mustBePerfect ? correctCount === questions.length : true)
+    const passed = answeredAll && (assessed ? correctCount === questions.length : true)
 
-    if (passed) {
-      await recordNodeEvent(user.account.id, {
-        slug: input.slug,
-        nodeId: input.nodeId,
-        status: input.mode === 'test-out' ? 'tested-out' : 'completed',
-        checkpointResults: results,
-      })
-    } else {
+    await recordNodeEvent(user.account.id, {
+      slug: input.slug,
+      nodeId: input.nodeId,
       // ตอบแล้วแต่ยังไม่ผ่าน — เก็บผลไว้ แต่สถานะยังไม่ขยับ
-      await recordNodeEvent(user.account.id, {
-        slug: input.slug,
-        nodeId: input.nodeId,
-        status: 'in-progress',
-        checkpointResults: results,
-      })
-    }
+      status: passed ? (input.mode === 'test-out' ? 'tested-out' : 'completed') : 'in-progress',
+      checkpointResults: results,
+    })
 
-    return NextResponse.json({ ok: true, passed, results, correctCount, total: questions.length })
+    // assessed: รูปของ response ต้องเหมือนกันทั้งผ่านและไม่ผ่าน — ขนาด/จำนวน field
+    // ที่ต่างกันก็บอกใบ้ได้ จึงคืน key เดียวเสมอ
+    if (assessed) return NextResponse.json({ ok: true, passed })
+
+    const explanations: Record<string, string> = {}
+    for (const q of questions) explanations[q.id] = q.explanation
+    return NextResponse.json({ ok: true, passed, results, correctCount, total: questions.length, explanations })
   } catch (err) {
     console.error('[api/progress] บันทึกไม่สำเร็จ:', err)
     // ตอบตามจริง — ถ้าบอกว่าสำเร็จทั้งที่ไม่ได้บันทึก ผู้เรียนจะเสียงานโดยไม่รู้ตัว

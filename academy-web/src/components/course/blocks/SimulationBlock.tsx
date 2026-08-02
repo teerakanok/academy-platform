@@ -1,49 +1,86 @@
 'use client'
 
 import { useState } from 'react'
-import { gradeSimulation, type SimulationChallenge, type SimulationState, type SimulationVerdict } from '@/lib/simulation/types'
+import type { PublicSimulationChallenge } from '@/lib/content/public-lesson'
+import type { SimulationState } from '@/lib/simulation/types'
 import { NetworkInterfaceSim } from './NetworkInterfaceSim'
 
-// โจทย์จำลอง — โจทย์ + หน้าจอ + ปุ่มตรวจ
+// โจทย์จำลอง — โจทย์ + หน้าจอ + ปุ่มตรวจ · **เซิร์ฟเวอร์เป็นคนตรวจ**
 //
-// สองโหมด ต่างกันที่ "ผู้เรียนได้อะไรกลับมา" ไม่ใช่ต่างที่หน้าจอ:
-//   practice — ตรวจกี่ครั้งก็ได้ บอกทีละข้อว่าอะไรยังไม่ผ่าน (แต่ไม่เฉลยค่า)
-//   assessed — ตรวจครั้งเดียว บอกแค่ผ่าน/ไม่ผ่าน ใช้ตอนวัดผลจริง
+// เดิม component นี้ได้ `requirements[].operator/value` มาทั้งชุดแล้วตรวจเอง และโชว์
+// `hints` ให้เองหลังลองสองครั้งโดยไม่ผ่านเซิร์ฟเวอร์เลย — แปลว่ากติกาการตรวจกับคำใบ้
+// อยู่ใน payload ที่ view-source เห็น และคนอ่านจากโหมดฝึกเอาไปตอบโหมดวัดผลได้
+// ตอนนี้ทั้งการตรวจและการตัดสินว่า "ถึงเวลาให้คำใบ้หรือยัง" อยู่ที่ `/api/practice/simulation`
 //
-// ที่ไม่เฉลยค่าที่ถูกแม้ในโหมดฝึก เพราะจุดประสงค์คือให้กลับไปคิดจากโจทย์
-// ถ้าเฉลยเลขให้ ผู้เรียนก็แค่ก๊อปลงช่อง แล้วไม่ได้อะไรติดตัวไป
+// สองโหมดต่างกันที่ "ผู้เรียนได้อะไรกลับมา" ไม่ใช่ต่างที่หน้าจอ:
+//   practice — ตรวจกี่ครั้งก็ได้ · บทปกติบอกได้ว่าข้อไหนยังไม่ผ่าน · ด่านของ capstone
+//              ปิดเท่าโหมดวัดผล (เซิร์ฟเวอร์เป็นคนเลือกให้ ไม่ใช่หน้านี้)
+//   assessed — ใช้ตอนวัดผลจริง บอกแค่ผ่าน/ไม่ผ่าน (ต่อเข้า checkpoint ใน W1)
 
 const SURFACES = {
   'network-interface': NetworkInterfaceSim,
 } as const
 
+interface PracticeVerdict {
+  passed: boolean
+  results?: { id: string; label: string; met: boolean }[]
+  metCount?: number
+  total?: number
+  debrief?: string
+  hints?: string[]
+}
+
 export function SimulationBlock({
   challenge,
+  slug,
+  nodeId,
   mode = 'practice',
-  onResult,
 }: {
-  challenge: SimulationChallenge
+  // ⚠️ PublicSimulationChallenge — ไม่มี operator/value/hints อยู่ในโครงเลย
+  challenge: PublicSimulationChallenge
+  slug: string
+  nodeId: string
   mode?: 'practice' | 'assessed'
-  onResult?: (verdict: SimulationVerdict) => void
 }) {
   const [state, setState] = useState<SimulationState>(() => ({ ...challenge.initial }))
-  const [verdict, setVerdict] = useState<SimulationVerdict | null>(null)
+  const [verdict, setVerdict] = useState<PracticeVerdict | null>(null)
   const [attempts, setAttempts] = useState(0)
+  const [checking, setChecking] = useState(false)
+  const [failed, setFailed] = useState(false)
   const [showHints, setShowHints] = useState(false)
 
   const Surface = SURFACES[challenge.surface]
   const locked = mode === 'assessed' && verdict !== null
 
-  function check() {
-    const next = gradeSimulation(challenge, state)
-    setVerdict(next)
-    setAttempts((n) => n + 1)
-    onResult?.(next)
+  async function check() {
+    if (checking) return
+    const attempt = attempts + 1
+    setAttempts(attempt)
+    setChecking(true)
+    setFailed(false)
+    try {
+      const res = await fetch('/api/practice/simulation', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ slug, nodeId, challengeId: challenge.id, state, attempt }),
+      })
+      const body = (await res.json().catch(() => ({}))) as { ok?: boolean } & PracticeVerdict
+      if (!res.ok || !body.ok) {
+        setFailed(true)
+        return
+      }
+      setVerdict(body)
+    } catch {
+      setFailed(true)
+    } finally {
+      setChecking(false)
+    }
   }
 
   function reset() {
     setState({ ...challenge.initial })
     setVerdict(null)
+    setShowHints(false)
   }
 
   return (
@@ -69,11 +106,11 @@ export function SimulationBlock({
         <button
           type="button"
           onClick={check}
-          disabled={locked}
+          disabled={locked || checking}
           data-testid="simulation-check"
           className="rounded-control bg-cs-accent-fill px-5 py-2.5 text-sm font-semibold text-cs-on-accent transition-transform duration-200 hover:-translate-y-0.5 disabled:opacity-60 disabled:hover:translate-y-0"
         >
-          {mode === 'assessed' ? 'Submit' : 'Check my setup'}
+          {checking ? 'Checking…' : mode === 'assessed' ? 'Submit' : 'Check my setup'}
         </button>
         {mode === 'practice' && (
           <button
@@ -85,8 +122,9 @@ export function SimulationBlock({
             Start over
           </button>
         )}
-        {mode === 'practice' && challenge.hints && challenge.hints.length > 0 && attempts >= 2 && !verdict?.passed && (
-          // คำใบ้โผล่หลังลองเองสองครั้ง — ให้เร็วกว่านี้คือชิงคิดแทน
+        {/* ปุ่มคำใบ้โผล่ก็ต่อเมื่อ **เซิร์ฟเวอร์ส่งคำใบ้มาแล้ว** — เดิมหน้านี้ถือคำใบ้
+            ไว้เองแล้วนับครั้งเอง ซึ่งเปิด devtools ก็อ่านได้ตั้งแต่วินาทีแรก */}
+        {mode === 'practice' && verdict?.hints && verdict.hints.length > 0 && (
           <button
             type="button"
             onClick={() => setShowHints((v) => !v)}
@@ -96,11 +134,16 @@ export function SimulationBlock({
             {showHints ? 'Hide the nudge' : 'Give me a nudge'}
           </button>
         )}
+        {failed && (
+          <span className="text-sm text-cs-amber" data-testid="simulation-check-failed">
+            We could not check your setup just now. Try again in a moment.
+          </span>
+        )}
       </div>
 
-      {showHints && challenge.hints && (
+      {showHints && verdict?.hints && (
         <ul className="mt-4 space-y-1.5 border-l-2 border-cs-accent pl-4" data-testid="simulation-hints">
-          {challenge.hints.map((h, i) => (
+          {verdict.hints.map((h, i) => (
             <li key={i} className="text-sm leading-relaxed text-cs-body">
               {h}
             </li>
@@ -115,13 +158,14 @@ export function SimulationBlock({
               <p className="font-display text-base font-semibold text-cs-text">
                 That configuration meets the brief.
               </p>
-              {challenge.debrief && (
-                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-cs-body">{challenge.debrief}</p>
+              {verdict.debrief && (
+                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-cs-body">{verdict.debrief}</p>
               )}
             </>
-          ) : mode === 'assessed' ? (
-            <p className="font-display text-base font-semibold text-cs-text">
-              {verdict.metCount} of {verdict.total} requirements met.
+          ) : !verdict.results ? (
+            // เซิร์ฟเวอร์ไม่ส่งผลรายข้อมา (ด่านของ capstone) — บอกได้แค่ว่ายังไม่ผ่าน
+            <p className="font-display text-base font-semibold text-cs-text" data-testid="simulation-passed-only">
+              Not yet. Read the brief again and adjust the setup.
             </p>
           ) : (
             <>

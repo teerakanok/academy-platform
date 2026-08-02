@@ -1,65 +1,73 @@
 'use client'
 
 import { useState } from 'react'
-import type { CheckpointQuestion } from '@/lib/content/course-types'
+import type { PublicCheckpointQuestion } from '@/lib/content/public-lesson'
+import type { CheckpointOutcome } from '@/lib/course/progress-client'
 
-// Checkpoint ท้ายบท — ใช้เกณฑ์ all-or-nothing เดียวกับ engine ข้อสอบ (multi ต้องถูกครบชุด)
+// Checkpoint ท้ายบท — **เซิร์ฟเวอร์เป็นคนตรวจ ไม่ใช่หน้านี้**
 //
-// บทเรียนปกติ: ตอบเสร็จก็ผ่าน ตอบผิดได้ (เรียนรู้ ไม่ใช่คัดออก)
-// capstone: ต้องถูกทุกข้อจึงจะนับว่าผ่าน — นี่คือด่านที่ทำให้คำว่า "พิสูจน์แล้ว" มีความหมาย
-
-function sameSet(a: string[], b: string[]): boolean {
-  const sa = new Set(a)
-  const sb = new Set(b)
-  return sa.size === sb.size && [...sa].every((x) => sb.has(x))
-}
+// เดิม component นี้รับ `correct` มากับคำถามแล้วเทียบเอง ซึ่งแปลว่าเฉลยทั้งชุดอยู่ใน
+// payload ที่ view-source เห็น — ไม่ต้องปลอมผลก็ผ่านได้ (F1) ตอนนี้มันรับได้แค่
+// `PublicCheckpointQuestion` ซึ่งไม่มีเฉลยอยู่ในโครง และผลทุกอย่างมาจาก `onSubmit`
+//
+// สิ่งที่แสดงได้จึงขึ้นกับสิ่งที่เซิร์ฟเวอร์ยอมบอก:
+//   assessed (capstone / test-out) → มีแค่ผ่าน/ไม่ผ่าน
+//   learn (บทปกติ) → ผลรายข้อ + คำอธิบาย เพราะเป็นการสอน
 
 export function CheckpointQuiz({
   questions,
   requireAllCorrect,
+  onSubmit,
   onPassed,
-  onAnswered,
 }: {
-  questions: CheckpointQuestion[]
-  /** true เมื่อเป็น capstone — ต้องถูกทุกข้อ */
+  questions: PublicCheckpointQuestion[]
+  /** true เมื่อเป็น capstone หรือ test-out — ข้อความบอกผู้เรียนว่าต้องถูกทุกข้อ */
   requireAllCorrect: boolean
-  onPassed: (results: Record<string, boolean>, answers: Record<string, string[]>) => void
-  onAnswered?: (results: Record<string, boolean>, answers: Record<string, string[]>) => void
+  /** ส่งคำตอบให้เซิร์ฟเวอร์ตรวจ · null = ตรวจไม่สำเร็จ (เครือข่าย/เซิร์ฟเวอร์) */
+  onSubmit: (answers: Record<string, string[]>) => Promise<CheckpointOutcome | null>
+  /** ผู้เรียนกดไปต่อหลังผ่านแล้ว */
+  onPassed: () => void
 }) {
   const [answers, setAnswers] = useState<Record<string, string[]>>({})
-  const [graded, setGraded] = useState(false)
+  const [grading, setGrading] = useState(false)
+  const [outcome, setOutcome] = useState<CheckpointOutcome | null>(null)
+  const [failed, setFailed] = useState(false)
 
-  const results: Record<string, boolean> = Object.fromEntries(
-    questions.map((q) => [q.id, sameSet(answers[q.id] ?? [], q.correct)]),
-  )
-  const correctCount = Object.values(results).filter(Boolean).length
   const allAnswered = questions.every((q) => (answers[q.id]?.length ?? 0) > 0)
-  const passed = requireAllCorrect ? correctCount === questions.length : true
+  const results = outcome?.results
+  const explanations = outcome?.explanations
 
-  function toggle(question: CheckpointQuestion, letter: string) {
-    if (graded) return
-    const isMulti = question.correct.length > 1
+  function toggle(question: PublicCheckpointQuestion, letter: string) {
+    if (grading || outcome) return
     setAnswers((prev) => {
-      const current = new Set(prev[question.id] ?? [])
-      if (isMulti) {
-        if (current.has(letter)) current.delete(letter)
-        else current.add(letter)
-      } else {
-        current.clear()
-        current.add(letter)
+      const current = prev[question.id] ?? []
+      // `multiple` มาจากเซิร์ฟเวอร์ — เดิมหน้านี้ดูจาก `correct.length > 1` ซึ่งคือ
+      // การอ่านเฉลยเพื่อตัดสินรูปแบบการเลือก
+      if (!question.multiple) {
+        return { ...prev, [question.id]: current[0] === letter ? [] : [letter] }
       }
-      return { ...prev, [question.id]: [...current].sort() }
+      const set = new Set(current)
+      if (!set.delete(letter)) set.add(letter)
+      return { ...prev, [question.id]: [...set].sort() }
     })
   }
 
-  function grade() {
-    setGraded(true)
-    onAnswered?.(results, answers)
+  async function grade() {
+    setGrading(true)
+    setFailed(false)
+    const next = await onSubmit(answers)
+    setGrading(false)
+    if (!next) {
+      setFailed(true)
+      return
+    }
+    setOutcome(next)
   }
 
   function retry() {
     setAnswers({})
-    setGraded(false)
+    setOutcome(null)
+    setFailed(false)
   }
 
   return (
@@ -81,39 +89,40 @@ export function CheckpointQuiz({
       <div className="space-y-7">
         {questions.map((question, index) => {
           const picked = answers[question.id] ?? []
-          const isMulti = question.correct.length > 1
-          const isCorrect = results[question.id]
+          const isCorrect = results?.[question.id]
+          const explanation = explanations?.[question.id]
           return (
             <div key={question.id} data-testid={`checkpoint-q-${question.id}`}>
               <p className="mb-1 font-mono text-[11px] uppercase tracking-wide text-cs-muted">
                 Question {index + 1}
-                {isMulti ? ' · select all that apply' : ''}
+                {question.multiple ? ' · select all that apply' : ''}
               </p>
               <p className="mb-3 leading-relaxed text-cs-text">{question.prompt}</p>
               <div className="space-y-2">
                 {Object.entries(question.choices).map(([letter, text]) => {
                   const isPicked = picked.includes(letter)
-                  const answerIsRight = question.correct.includes(letter)
-                  const tone = graded
-                    ? answerIsRight
-                      ? 'border-cs-accent bg-cs-accent-dim'
+                  // ระบายสีได้เฉพาะเมื่อเซิร์ฟเวอร์บอกผลรายข้อมา (โหมด learn)
+                  // โหมด assessed ไม่มี results จึงไม่มีสีที่แปรตามความถูกผิด — ถ้ามี
+                  // มันจะกลายเป็นเครื่องเฉลยที่ดูออกจากหน้าจอโดยไม่ต้องอ่าน response
+                  const tone =
+                    isCorrect !== undefined && isPicked
+                      ? isCorrect
+                        ? 'border-cs-accent bg-cs-accent-dim'
+                        : 'border-cs-amber bg-cs-amber-dim'
                       : isPicked
-                        ? 'border-cs-amber bg-cs-amber-dim'
-                        : 'border-cs-border'
-                    : isPicked
-                      ? 'border-cs-accent bg-cs-accent-dim'
-                      : 'border-cs-border hover:border-cs-border-2'
+                        ? 'border-cs-accent bg-cs-accent-dim'
+                        : 'border-cs-border hover:border-cs-border-2'
                   return (
                     <label
                       key={letter}
                       className={`flex cursor-pointer items-start gap-3 rounded-xl border bg-cs-surface px-4 py-2.5 text-sm transition-colors ${tone}`}
                     >
                       <input
-                        type={isMulti ? 'checkbox' : 'radio'}
+                        type={question.multiple ? 'checkbox' : 'radio'}
                         name={`q-${question.id}`}
                         value={letter}
                         checked={isPicked}
-                        disabled={graded}
+                        disabled={grading || outcome !== null}
                         onChange={() => toggle(question, letter)}
                         className="mt-0.5 h-4 w-4 accent-cs-accent"
                       />
@@ -125,7 +134,7 @@ export function CheckpointQuiz({
                   )
                 })}
               </div>
-              {graded && (
+              {explanation && (
                 <p
                   className="mt-2.5 rounded-xl border border-cs-border bg-cs-surface-2 px-4 py-3 text-sm leading-relaxed text-cs-body"
                   data-testid={`checkpoint-explanation-${question.id}`}
@@ -133,7 +142,7 @@ export function CheckpointQuiz({
                   <span className={`font-semibold ${isCorrect ? 'text-cs-accent' : 'text-cs-amber'}`}>
                     {isCorrect ? 'Correct. ' : 'Not quite. '}
                   </span>
-                  {question.explanation}
+                  {explanation}
                 </p>
               )}
             </div>
@@ -142,25 +151,40 @@ export function CheckpointQuiz({
       </div>
 
       <div className="mt-7 flex flex-wrap items-center gap-3 border-t border-cs-border pt-5">
-        {!graded ? (
-          <button
-            type="button"
-            onClick={grade}
-            disabled={!allAnswered}
-            data-testid="checkpoint-submit"
-            className="rounded-control bg-cs-accent-fill px-6 py-3 text-sm font-semibold text-cs-on-accent shadow-card transition-transform duration-200 hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-40 disabled:shadow-none"
-          >
-            Check my answers
-          </button>
+        {!outcome ? (
+          <>
+            <button
+              type="button"
+              onClick={grade}
+              disabled={!allAnswered || grading}
+              data-testid="checkpoint-submit"
+              className="rounded-control bg-cs-accent-fill px-6 py-3 text-sm font-semibold text-cs-on-accent shadow-card transition-transform duration-200 hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-40 disabled:shadow-none"
+            >
+              {grading ? 'Checking…' : 'Check my answers'}
+            </button>
+            {/* ระหว่างรอ ห้ามประกาศผลล่วงหน้า — หน้าจอต้องบอกว่ากำลังตรวจ (W0-2) */}
+            {grading && (
+              <span className="text-sm text-cs-muted" data-testid="checkpoint-grading">
+                Checking your answers…
+              </span>
+            )}
+            {failed && (
+              <span className="text-sm text-cs-amber" data-testid="checkpoint-grade-failed">
+                We could not check your answers just now. Try again in a moment.
+              </span>
+            )}
+          </>
         ) : (
           <>
-            <span className="font-mono text-sm text-cs-muted" data-testid="checkpoint-score">
-              {correctCount}/{questions.length} correct
-            </span>
-            {passed ? (
+            {outcome.correctCount !== undefined && outcome.total !== undefined && (
+              <span className="font-mono text-sm text-cs-muted" data-testid="checkpoint-score">
+                {outcome.correctCount}/{outcome.total} correct
+              </span>
+            )}
+            {outcome.passed ? (
               <button
                 type="button"
-                onClick={() => onPassed(results, answers)}
+                onClick={onPassed}
                 data-testid="checkpoint-continue"
                 className="rounded-control bg-cs-accent-fill px-6 py-3 text-sm font-semibold text-cs-on-accent shadow-card transition-transform duration-200 hover:-translate-y-0.5"
               >
@@ -169,7 +193,9 @@ export function CheckpointQuiz({
             ) : (
               <>
                 <span className="text-sm text-cs-amber" data-testid="checkpoint-not-passed">
-                  This checkpoint needs every answer correct.
+                  {requireAllCorrect
+                    ? 'This checkpoint needs every answer correct.'
+                    : 'Answer every question to finish the lesson.'}
                 </span>
                 <button
                   type="button"
@@ -183,7 +209,7 @@ export function CheckpointQuiz({
             )}
           </>
         )}
-        {!allAnswered && !graded && (
+        {!allAnswered && !outcome && !grading && (
           <span className="text-sm text-cs-muted">Answer every question to continue.</span>
         )}
       </div>

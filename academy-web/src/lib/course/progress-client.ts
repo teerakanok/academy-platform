@@ -38,16 +38,29 @@ export type ProgressAction =
   | { action: 'checkpoint'; slug: string; nodeId: string; mode: 'learn' | 'test-out'; answers: Record<string, string[]> }
   | { action: 'video-cue'; slug: string; nodeId: string; cueId: string; answer: string[] }
 
+/**
+ * ผลการตรวจที่เซิร์ฟเวอร์ตอบกลับ
+ *
+ * ⚠️ โหมด assessed (capstone / test-out) จะมี **แค่ `passed`** — ไม่มีผลรายข้อ
+ * ไม่มีจำนวนที่ถูก ไม่มีคำอธิบาย (ดูเหตุผลใน `api/progress/route.ts`) UI จึงต้อง
+ * ทำงานได้โดยไม่พึ่ง field ที่เหลือเสมอ ไม่ใช่ถือว่ามันมาแน่
+ */
 export interface CheckpointOutcome {
   passed: boolean
-  results: Record<string, boolean>
-  correctCount: number
-  total: number
+  results?: Record<string, boolean>
+  correctCount?: number
+  total?: number
+  explanations?: Record<string, string>
+}
+
+export interface VideoCueOutcome {
+  correct: boolean
+  explanation?: string
 }
 
 export async function pushProgress(
   event: ProgressAction,
-): Promise<{ failure: ProgressSyncFailure | null; outcome?: CheckpointOutcome; correct?: boolean }> {
+): Promise<{ failure: ProgressSyncFailure | null; outcome?: CheckpointOutcome; cue?: VideoCueOutcome }> {
   try {
     const res = await fetch('/api/progress', {
       method: 'POST',
@@ -65,7 +78,9 @@ export async function pushProgress(
       results?: Record<string, boolean>
       correctCount?: number
       total?: number
+      explanations?: Record<string, string>
       correct?: boolean
+      explanation?: string
     }
     if (!res.ok || !body.ok) {
       return { failure: { nodeId: event.nodeId, message: body.error ?? 'บันทึกความคืบหน้าไม่สำเร็จ' } }
@@ -74,9 +89,15 @@ export async function pushProgress(
       failure: null,
       outcome:
         body.passed !== undefined
-          ? { passed: body.passed, results: body.results ?? {}, correctCount: body.correctCount ?? 0, total: body.total ?? 0 }
+          ? {
+              passed: body.passed,
+              results: body.results,
+              correctCount: body.correctCount,
+              total: body.total,
+              explanations: body.explanations,
+            }
           : undefined,
-      correct: body.correct,
+      cue: body.correct !== undefined ? { correct: body.correct, explanation: body.explanation } : undefined,
     }
   } catch {
     return { failure: { nodeId: event.nodeId, message: 'บันทึกความคืบหน้าไม่สำเร็จ — เครือข่ายมีปัญหา' } }

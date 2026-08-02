@@ -1,7 +1,9 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { LessonVideo, Locale, VideoCueQuestion } from '@/lib/content/course-types'
+import type { LessonVideo, Locale } from '@/lib/content/course-types'
+import type { PublicVideoCueQuestion } from '@/lib/content/public-lesson'
+import type { VideoCueOutcome } from '@/lib/course/progress-client'
 import { useUi } from '@/components/i18n/LocaleProvider'
 
 // Custom video player พร้อมคำถามแทรกกลางเรื่อง
@@ -26,9 +28,10 @@ export function InteractiveVideo({
   onCueAnswered,
 }: {
   video: LessonVideo
-  questions: VideoCueQuestion[]
+  questions: PublicVideoCueQuestion[]
   answeredCueIds: string[]
-  onCueAnswered: (cueId: string, correct: boolean, answer: string[]) => void
+  /** ส่งคำตอบให้เซิร์ฟเวอร์ตรวจ — คำถามกลางวิดีโอไม่มีเฉลยอยู่ฝั่งนี้แล้ว (W0-1) */
+  onCueAnswered: (cueId: string, answer: string[]) => Promise<VideoCueOutcome | null>
 }) {
   const { t: ui } = useUi()
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -36,7 +39,8 @@ export function InteractiveVideo({
   const [answered, setAnswered] = useState<string[]>(answeredCueIds)
   const [activeCueId, setActiveCueId] = useState<string | null>(null)
   const [selected, setSelected] = useState<string | null>(null)
-  const [submitted, setSubmitted] = useState(false)
+  const [cueOutcome, setCueOutcome] = useState<VideoCueOutcome | null>(null)
+  const [checking, setChecking] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [playing, setPlaying] = useState(false)
   const [unavailable, setUnavailable] = useState(false)
@@ -66,7 +70,7 @@ export function InteractiveVideo({
   function openCue(cueId: string) {
     setActiveCueId(cueId)
     setSelected(null)
-    setSubmitted(false)
+    setCueOutcome(null)
     videoRef.current?.pause()
   }
 
@@ -94,11 +98,13 @@ export function InteractiveVideo({
     }
   }
 
-  function submitAnswer() {
-    if (!activeQuestion || !selected) return
-    setSubmitted(true)
-    const correct = activeQuestion.correct.length === 1 && activeQuestion.correct[0] === selected
-    onCueAnswered(activeQuestion.cueId, correct, selected ? [selected] : [])
+  async function submitAnswer() {
+    if (!activeQuestion || !selected || checking) return
+    setChecking(true)
+    const result = await onCueAnswered(activeQuestion.cueId, [selected])
+    setChecking(false)
+    // ตรวจไม่สำเร็จ = ยังไม่มีผล ปล่อยให้กดใหม่ได้ ไม่ใช่แกล้งบอกว่าถูก
+    if (result) setCueOutcome(result)
   }
 
   function continueAfterCue() {
@@ -106,7 +112,7 @@ export function InteractiveVideo({
     setAnswered((prev) => (prev.includes(activeCueId) ? prev : [...prev, activeCueId]))
     setActiveCueId(null)
     setSelected(null)
-    setSubmitted(false)
+    setCueOutcome(null)
     void videoRef.current?.play()
   }
 
@@ -247,17 +253,16 @@ export function InteractiveVideo({
               <div className="space-y-2">
                 {Object.entries(activeQuestion.choices).map(([letter, text]) => {
                   const isPicked = selected === letter
-                  const isCorrect = activeQuestion.correct.includes(letter)
-                  const showResult = submitted
-                  const tone = showResult
-                    ? isCorrect
-                      ? 'border-cs-accent bg-cs-accent-dim'
+                  // ระบายสีตามผลได้เฉพาะตัวเลือกที่ผู้เรียนเลือกเอง และเฉพาะเมื่อ
+                  // เซิร์ฟเวอร์ตอบแล้ว — ฝั่งนี้ไม่รู้ว่าข้อไหนถูก (และไม่ควรรู้)
+                  const tone =
+                    cueOutcome && isPicked
+                      ? cueOutcome.correct
+                        ? 'border-cs-accent bg-cs-accent-dim'
+                        : 'border-cs-amber bg-cs-amber-dim'
                       : isPicked
-                        ? 'border-cs-amber bg-cs-amber-dim'
-                        : 'border-cs-border'
-                    : isPicked
-                      ? 'border-cs-accent bg-cs-accent-dim'
-                      : 'border-cs-border hover:border-cs-border-2'
+                        ? 'border-cs-accent bg-cs-accent-dim'
+                        : 'border-cs-border hover:border-cs-border-2'
                   return (
                     <label
                       key={letter}
@@ -268,7 +273,7 @@ export function InteractiveVideo({
                         name={`cue-${activeQuestion.cueId}`}
                         value={letter}
                         checked={isPicked}
-                        disabled={submitted}
+                        disabled={checking || cueOutcome !== null}
                         onChange={() => setSelected(letter)}
                         className="mt-0.5 h-4 w-4 accent-cs-accent"
                       />
@@ -281,25 +286,25 @@ export function InteractiveVideo({
                 })}
               </div>
 
-              {submitted && (
+              {cueOutcome?.explanation && (
                 <p
                   className="mt-3 rounded-xl border border-cs-border bg-cs-surface-2 px-4 py-3 text-sm leading-relaxed text-cs-body"
                   data-testid="video-quiz-explanation"
                 >
-                  {activeQuestion.explanation}
+                  {cueOutcome.explanation}
                 </p>
               )}
 
               <div className="mt-4 flex justify-end gap-2">
-                {!submitted ? (
+                {!cueOutcome ? (
                   <button
                     type="button"
                     onClick={submitAnswer}
-                    disabled={!selected}
+                    disabled={!selected || checking}
                     data-testid="video-quiz-submit"
                     className="rounded-xl bg-cs-accent-fill px-5 py-2 text-sm font-semibold text-cs-on-accent transition-opacity hover:opacity-90 disabled:opacity-40"
                   >
-                    Check answer
+                    {checking ? 'Checking…' : 'Check answer'}
                   </button>
                 ) : (
                   <button

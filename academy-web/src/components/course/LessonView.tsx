@@ -3,7 +3,8 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import type { CourseNode, CourseStructure, LessonContent, Locale } from '@/lib/content/course-types'
+import type { CourseNode, CourseStructure, Locale } from '@/lib/content/course-types'
+import type { PublicLesson } from '@/lib/content/public-lesson'
 import {
   emptyProgress,
   markCompleted,
@@ -14,7 +15,14 @@ import {
   toLearnerState,
   type CourseProgressRecord,
 } from '@/lib/course/progress'
-import { fetchProgress, pushProgress, type ProgressAction, type ProgressSyncFailure } from '@/lib/course/progress-client'
+import {
+  fetchProgress,
+  pushProgress,
+  type CheckpointOutcome,
+  type ProgressAction,
+  type ProgressSyncFailure,
+  type VideoCueOutcome,
+} from '@/lib/course/progress-client'
 import { canSkip, nextNode, nodeStatus } from '@/lib/course/roadmap'
 import { CheckpointQuiz } from './CheckpointQuiz'
 import { InteractiveVideo } from './InteractiveVideo'
@@ -90,7 +98,9 @@ export function LessonView({
 }: {
   structure: CourseStructure
   node: CourseNode
-  lesson: LessonContent
+  // ⚠️ PublicLesson ไม่ใช่ LessonContent โดยเจตนา — ชนิดนี้คือด่านที่กันเฉลย
+  // ไม่ให้ข้ามมาฝั่ง browser (W0-1) ห้ามเปลี่ยนกลับเป็น LessonContent
+  lesson: PublicLesson
   courseTitle: string
   nodeTitles: Record<string, string>
   servedLocale: Locale
@@ -159,28 +169,54 @@ export function LessonView({
   const prevNode = nodeIndex > 0 ? structure.nodes[nodeIndex - 1] : null
   const followingNode = nodeIndex < structure.nodes.length - 1 ? structure.nodes[nodeIndex + 1] : null
 
-  // หมายเหตุ: การตัดสินว่า "ผ่าน" เกิดที่เซิร์ฟเวอร์แล้ว ตรงนี้แค่สะท้อนผลที่ได้กลับมา
-  // ให้หน้าจอทันที (optimistic) — ถ้าเซิร์ฟเวอร์ไม่เห็นด้วย syncError จะขึ้นเตือน
-  function finishLesson(results: Record<string, boolean>, answers: Record<string, string[]>) {
-    persist(markCompleted(record, node.id, results), {
+  /**
+   * ส่งคำตอบให้เซิร์ฟเวอร์ตรวจ แล้วค่อยอัปเดตสถานะจากผลที่ได้จริง
+   *
+   * ⚠️ ห้ามกลับไปเป็นแบบเดิมที่ `setDone()` ทันทีแล้วค่อยยิง API (F4) — หน้าจอ
+   * ประกาศว่าผ่านทั้งที่เซิร์ฟเวอร์อาจปฏิเสธ ทำให้ผู้เรียนเห็นสถานะที่ไม่มีอยู่จริง
+   * และทำให้ e2e เขียวปลอมด้วย · ตรงนี้คือจุดเดียวที่แปลผลของเซิร์ฟเวอร์เป็นสถานะ
+   */
+  async function submitCheckpoint(
+    quizMode: 'learn' | 'test-out',
+    answers: Record<string, string[]>,
+  ): Promise<CheckpointOutcome | null> {
+    const { failure, outcome } = await pushProgress({
       action: 'checkpoint',
       slug: structure.slug,
       nodeId: node.id,
-      mode: 'learn',
+      mode: quizMode,
       answers,
     })
-    setDone('completed')
+    setSyncError(failure)
+    if (failure || !outcome) return null
+
+    if (outcome.passed) {
+      const results = outcome.results ?? {}
+      setRecord(
+        quizMode === 'test-out'
+          ? markTestedOut(record, node.id, results)
+          : markCompleted(record, node.id, results),
+      )
+    }
+    return outcome
   }
 
-  function finishTestOut(results: Record<string, boolean>, answers: Record<string, string[]>) {
-    persist(markTestedOut(record, node.id, results), {
-      action: 'checkpoint',
+  function finishCheckpoint(quizMode: 'learn' | 'test-out') {
+    setDone(quizMode === 'test-out' ? 'tested-out' : 'completed')
+  }
+
+  async function submitVideoCue(cueId: string, answer: string[]): Promise<VideoCueOutcome | null> {
+    const { failure, cue } = await pushProgress({
+      action: 'video-cue',
       slug: structure.slug,
       nodeId: node.id,
-      mode: 'test-out',
-      answers,
+      cueId,
+      answer,
     })
-    setDone('tested-out')
+    setSyncError(failure)
+    if (failure || !cue) return null
+    setRecord((prev) => recordVideoCue(prev, node.id, cueId, cue.correct))
+    return cue
   }
 
   function skipLesson() {
@@ -384,10 +420,7 @@ export function LessonView({
           video={node.video}
           questions={lesson.videoCueQuestions}
           answeredCueIds={Object.keys(record.videoCueResults[node.id] ?? {})}
-          onCueAnswered={(cueId, correct, answer) => {
-            const next = recordVideoCue(record, node.id, cueId, correct)
-            persist(next, { action: 'video-cue', slug: structure.slug, nodeId: node.id, cueId, answer })
-          }}
+          onCueAnswered={submitVideoCue}
         />
       )}
 
@@ -410,7 +443,7 @@ export function LessonView({
 
       {mode === 'learn' && !focused && (
         <>
-          <LessonBody blocks={lesson.blocks} />
+          <LessonBody blocks={lesson.blocks} slug={structure.slug} nodeId={node.id} />
           {lesson.attribution && (
             <p className="prose-lesson border-t border-cs-border pt-4 text-xs text-cs-muted">
               {lesson.attribution}
@@ -506,7 +539,8 @@ export function LessonView({
         <CheckpointQuiz
           questions={lesson.checkpoint}
           requireAllCorrect={mode === 'test-out' || isCapstone}
-          onPassed={mode === 'test-out' ? finishTestOut : finishLesson}
+          onSubmit={(answers) => submitCheckpoint(mode === 'test-out' ? 'test-out' : 'learn', answers)}
+          onPassed={() => finishCheckpoint(mode === 'test-out' ? 'test-out' : 'learn')}
         />
         </div>
       )}
