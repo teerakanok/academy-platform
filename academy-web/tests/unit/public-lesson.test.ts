@@ -147,3 +147,34 @@ describe('toPublicSimulation', () => {
     expect(serialized).not.toContain('gradingNotes')
   })
 })
+
+describe('ด่านที่ผูกกับ attempt — หน้า lesson ส่งได้แค่รายชื่องาน', () => {
+  // รูที่ชุดนี้ปิด (RIL cross-model รอบ 2): หน้ายังส่ง `choices` ชุด key จริงมาด้วย
+  // คนที่ผ่านแล้วบอกเพื่อนว่า "B, C, B" เพื่อนเทียบข้อความระหว่างหน้ากับ /api/attempts
+  // แล้วแปลงเป็น key ของ attempt ตัวเองได้ทันที — remap จึงไม่เหลือความหมายเลย
+  const withCheckpoint = lessons.find(({ lesson }) =>
+    lesson.checkpoint.some((item) => !('kind' in item) || item.kind === 'mcq'),
+  )!
+
+  it('🔴 tasksFromAttempt: ไม่มี prompt/choices ติดไปกับหน้า', () => {
+    const pub = toPublicLesson(withCheckpoint.lesson, { tasksFromAttempt: true })
+    for (const item of pub.checkpoint) {
+      expect(item.kind === 'mcq' ? item.choices : undefined).toBeUndefined()
+      expect(item.kind === 'mcq' ? item.prompt : undefined).toBeUndefined()
+      expect(item.id).toBeTruthy()
+    }
+    const serialized = JSON.stringify(pub)
+    for (const item of withCheckpoint.lesson.checkpoint) {
+      if ('kind' in item && item.kind === 'simulation') continue
+      for (const text of Object.values(item.choices)) {
+        expect(serialized, `ข้อความตัวเลือกของ ${item.id} ยังติดมากับหน้า`).not.toContain(text)
+      }
+    }
+  })
+
+  it('ค่าเริ่มต้น (บทสอนทั่วไป) ยังส่งโจทย์มาเหมือนเดิม', () => {
+    const pub = toPublicLesson(withCheckpoint.lesson)
+    const mcq = pub.checkpoint.find((item) => item.kind === 'mcq')!
+    expect(mcq.kind === 'mcq' ? mcq.choices : undefined).toBeTruthy()
+  })
+})

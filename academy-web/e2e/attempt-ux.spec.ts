@@ -86,6 +86,39 @@ test.describe('การรอโจทย์ของ attempt', () => {
     await expect(page.getByTestId('checkpoint-continue')).toBeVisible()
   })
 
+  test('🔴 attempt หมดอายุ/ใช้ไปแล้ว → ได้โจทย์ชุดใหม่อัตโนมัติ ไม่ใช่ปุ่มที่กดแล้ว error ซ้ำ', async ({
+    page,
+  }) => {
+    // จำลอง 409 (attempt ใช้ไม่ได้แล้ว) ครั้งเดียวตอนกดตรวจ · ของเดิมหน้าจะบอกให้
+    // "ลองใหม่อีกครั้ง" แล้วปุ่มก็ส่ง attempt id เดิมซ้ำ → 409 ตลอดกาล
+    await page.goto(LESSON_URL)
+    await expect(page.getByTestId('checkpoint-sim-sim-1')).toBeVisible()
+    await answerOnPage(page, COURSE, CAPSTONE)
+
+    let blocked = false
+    await page.route('**/api/progress', async (route) => {
+      if (route.request().method() === 'POST' && !blocked) {
+        blocked = true
+        await route.fulfill({
+          status: 409,
+          contentType: 'application/json',
+          body: JSON.stringify({ ok: false, error: 'ความพยายามนี้ใช้ไม่ได้แล้ว' }),
+        })
+        return
+      }
+      await route.continue()
+    })
+
+    const [issued] = await Promise.all([
+      page.waitForResponse((r) => r.url().includes('/api/attempts') && r.request().method() === 'POST'),
+      page.getByTestId('checkpoint-submit').click(),
+    ])
+    expect(issued.status(), 'เจอ 409 แล้วต้องขอโจทย์ชุดใหม่ให้เอง').toBe(200)
+    // ด่านกลับมาพร้อมโจทย์ชุดใหม่ ไม่ใช่ปุ่มค้างที่กดแล้ว error เดิม
+    await expect(page.getByTestId('checkpoint-sim-sim-1')).toBeVisible()
+    await expect(page.getByTestId('checkpoint-submit')).toBeVisible()
+  })
+
   test('🔴 โควตาเต็ม → บอกตรงๆ พร้อมทางไปต่อ ไม่ใช่ปล่อยให้ทำจนเสร็จแล้วเด้ง', async ({ page }) => {
     let attempts = 0
     await page.route('**/api/attempts', async (route) => {

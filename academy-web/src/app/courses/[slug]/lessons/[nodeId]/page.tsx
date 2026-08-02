@@ -3,6 +3,7 @@ import { privatePage } from '@/lib/seo'
 import { notFound } from 'next/navigation'
 import { getCourse, getLesson } from '@/lib/content/course-source'
 import { toPublicLesson } from '@/lib/content/public-lesson'
+import { requiresAttempt } from '@/lib/course/assessment-policy'
 import type { Locale } from '@/lib/content/course-types'
 import { LessonView } from '@/components/course/LessonView'
 
@@ -36,7 +37,15 @@ export default async function LessonPage({
       <LessonView
         structure={course.structure}
         node={node}
-        lesson={toPublicLesson(resolved.lesson)}
+        lesson={toPublicLesson(resolved.lesson, {
+          // ด่านที่ต้องมี attempt: หน้าส่งได้แค่รายชื่องาน เนื้อโจทย์มาจาก /api/attempts
+          // ไม่งั้นชุด key จริงของตัวเลือกจะติดไปกับ payload และคนที่ผ่านแล้วบอกเพื่อน
+          // ว่า "B, C, B" เพื่อนก็แปลงเป็น key ของ attempt ตัวเองได้ทันที
+          tasksFromAttempt: requiresAttempt(
+            node,
+            resolved.lesson.checkpoint.some((item) => item.kind === 'simulation'),
+          ),
+        })}
         courseTitle={course.copy.title}
         nodeTitles={course.copy.nodeTitles}
         servedLocale={resolved.servedLocale}

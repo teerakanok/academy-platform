@@ -62,11 +62,20 @@ export async function GET(request: Request) {
   const answerKey = getLessonAnswerKey(input.slug, input.nodeId)
   if (!answerKey) return NextResponse.json({ ok: false, error: 'ไม่พบเนื้อหาบทนี้' }, { status: 404 })
 
+  // ⚠️ คืน **คำอธิบายอย่างเดียว ไม่คืน key เฉลย**
+  //
+  // key เฉลยเป็น key จริงในไฟล์ ซึ่งใช้ได้กับทุกคน: คนที่ผ่านแล้วบอกเพื่อนว่า
+  // "B, C, B" เพื่อนเทียบข้อความแล้วแปลงเป็น key ของ attempt ตัวเองได้ทันที
+  // (RIL cross-model รอบ 2 เดินเคสนี้ให้ดู) · คนที่ผ่านแล้วรู้อยู่แล้วว่าตัวเองตอบอะไร
+  // สิ่งที่เขายังไม่รู้และเป็นประโยชน์จริงคือ **ทำไม** จึงคืนเฉพาะส่วนนั้น
+  //
+  // หมายเหตุตรงๆ: ตราบใดที่คลังข้อยังเท่าจำนวนที่เสิร์ฟ (W-content ยังไม่เข้า)
+  // การบอกต่อ "ข้อความ" ของตัวเลือกที่ถูกก็ยังทำได้อยู่ดี — การหมุนคลังข้อคือสิ่งที่
+  // ปิดช่องนั้น ไม่ใช่การซ่อน key
   return NextResponse.json({
     ok: true,
     questions: mcqItems(answerKey.checkpoint).map((q) => ({
       id: q.id,
-      correct: q.correct,
       explanation: q.explanation,
     })),
   })

@@ -110,3 +110,48 @@ test.describe('เฉลยต้องไม่ออกไปถึง browser
     })
   }
 })
+
+test.describe('ด่านวัดผล — ชุด key จริงของตัวเลือกต้องไม่ติดไปกับหน้า', () => {
+  // รูที่ข้อนี้ปิด (RIL cross-model รอบ 2 เดินเคสให้ดูตรงๆ):
+  // หน้า capstone เคยส่ง `lesson.checkpoint` ที่มี `choices` ชุด **key จริง** มาด้วย
+  // แม้ UI จะแสดงชุดที่ remap แล้วจาก attempt · คนที่ผ่านแล้วบอกเพื่อนว่า "B, C, B"
+  // เพื่อนเทียบข้อความระหว่างหน้ากับ `/api/attempts` แล้วแปลงเป็น key ของ attempt
+  // ตัวเองได้ทันที → ผ่านโดยไม่ต้องรู้เนื้อหาเลย และ remap ก็ไม่เหลือความหมาย
+  //
+  // ยิงหน้าแบบไม่รัน JS (request.get) เพื่อดูเฉพาะสิ่งที่เซิร์ฟเวอร์ส่งมากับหน้า —
+  // ถ้าใช้ page.goto ข้อความของตัวเลือกจะมาจาก /api/attempts ซึ่งถูกต้องแล้วที่จะมี
+  const CAPSTONES = [
+    { slug: 'content-formats-demo', node: 'formats-hands-on' },
+    { slug: 'basic-os-linux', node: 'permissions' },
+    { slug: 'basic-os-linux', node: 'pipes-and-logs' },
+  ]
+
+  for (const { slug, node } of CAPSTONES) {
+    test(`${slug}/${node}: ข้อความตัวเลือกไม่อยู่ใน payload ของหน้า`, async ({ request }) => {
+      const res = await request.get(`/courses/${slug}/lessons/${node}`)
+      expect(res.ok()).toBeTruthy()
+      const html = await res.text()
+
+      const lesson = JSON.parse(
+        readFileSync(join(contentRoot, slug, 'locales', 'en', 'lessons', `${node}.json`), 'utf8'),
+      ) as { checkpoint: { kind?: string; id: string; choices?: Record<string, string> }[] }
+
+      // ตรวจ **การจับคู่ key จริง → ข้อความ** ไม่ใช่ตัวข้อความลอยๆ
+      //
+      // ข้อความของตัวเลือกบางอันปรากฏในเนื้อบทเรียนเองได้ตามธรรมชาติ (เช่นคำสั่ง
+      // `sort | uniq -c` ที่สอนอยู่ในบท) — สิ่งที่เป็นอันตรายคือคู่ `"B":"ข้อความ"`
+      // ซึ่งบอกว่า key ไหนคือข้อความไหน · payload ของ Next escape เป็น \"B\":\"...\"
+      let checked = 0
+      for (const item of lesson.checkpoint) {
+        if (item.kind === 'simulation' || !item.choices) continue
+        for (const [key, text] of Object.entries(item.choices)) {
+          const pair = `\\"${key}\\":\\"${text}\\"`
+          expect(html, `การจับคู่ key จริงของ ${item.id} ติดมากับหน้า`).not.toContain(pair)
+          checked += 1
+        }
+      }
+      // กันเทสกลวง: ถ้าไฟล์ไม่มีตัวเลือกให้ตรวจเลย แปลว่าเทสนี้ไม่ได้พิสูจน์อะไร
+      expect(checked, 'ไม่มีตัวเลือกให้ตรวจ — fixture เปลี่ยนไปแล้ว').toBeGreaterThan(3)
+    })
+  }
+})

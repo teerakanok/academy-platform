@@ -225,6 +225,16 @@ export async function POST(request: Request) {
     const results: Record<string, boolean> = {}
     const gradedQuestionIds = consumed ? consumed.params.questionIds : questions.map((q) => q.id)
     if (consumed) {
+      // ชุดคำตอบต้องตรงกับชุดข้อของ attempt **พอดี** ไม่ขาดไม่เกิน
+      //
+      // เดิมวนเฉพาะ questionIds จึงเมิน key แปลกปลอมเงียบๆ ทั้งที่ comment บอกว่า
+      // "เจอของแปลกปลอม = ปฏิเสธทั้งชุด" — กติกาที่เขียนไว้กับที่ทำจริงต้องตรงกัน
+      // ไม่งั้นรอบหน้าจะไม่มีใครรู้ว่าอันไหนคือของจริง (RIL cross-model รอบ 2)
+      const submittedIds = Object.keys(input.answers)
+      const expected = new Set(gradedQuestionIds)
+      if (submittedIds.length !== expected.size || submittedIds.some((id) => !expected.has(id))) {
+        return NextResponse.json({ ok: false, error: 'คำตอบไม่ตรงกับโจทย์ชุดนี้' }, { status: 400 })
+      }
       for (const id of gradedQuestionIds) {
         const real = remapAnswersToReal(consumed.params, id, input.answers[id] ?? [])
         if (real === null) {

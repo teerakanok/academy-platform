@@ -4,6 +4,7 @@ import { currentUser } from '@/lib/auth/session'
 import { getCourseStructure } from '@/lib/content/course-source'
 import { CHECKPOINT_CHALLENGE_ID, buildAttemptParams, cryptoPick, toPublicQuestions } from '@/lib/course/attempt'
 import { getLessonAnswerKey, mcqItems, simulationItems } from '@/lib/content/answer-key'
+import { requiresAttempt } from '@/lib/course/assessment-policy'
 import { issueAttempt, nextAttemptAt } from '@/lib/course/attempt-db'
 import { toPublicSimulation, type AttemptSimulation } from '@/lib/content/public-lesson'
 import { resolveChallenge, rollVariables } from '@/lib/simulation/variables'
@@ -59,14 +60,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: 'ไม่พบบทเรียนนี้' }, { status: 404 })
   }
 
-  // คลังข้อมีเฉพาะ capstone (W0-0 ล็อกขอบเขตนี้) — บทปกติไม่มีพื้นผิววัดผลแบบ attempt
-  if (node.kind !== 'capstone') {
-    return NextResponse.json({ ok: false, error: 'บทนี้ยังไม่เปิดให้วัดผลแบบ attempt' }, { status: 400 })
-  }
-
   const answerKey = getLessonAnswerKey(input.slug, input.nodeId)
   const bank = mcqItems(answerKey?.checkpoint ?? [])
   const sims = simulationItems(answerKey?.checkpoint ?? [])
+  // ⚠️ ต้องใช้เกณฑ์เดียวกับ UI และ `/api/progress` เป๊ะๆ
+  //
+  // เดิมที่นี่ตัดสินเองว่า "เฉพาะ capstone" ส่วนอีกสองที่ใช้ `requiresAttempt` ·
+  // บทปกติที่มีด่านจำลอง (schema ยอมรับได้) จึงกลายเป็นทางตัน: UI ขอ attempt
+  // แต่ที่นี่ปฏิเสธ ผู้เรียนเห็นแต่ "เตรียมโจทย์ไม่สำเร็จ" ตลอดกาล (RIL รอบ 2)
+  if (!requiresAttempt(node, sims.length > 0)) {
+    return NextResponse.json({ ok: false, error: 'บทนี้ยังไม่เปิดให้วัดผลแบบ attempt' }, { status: 400 })
+  }
   if (bank.length === 0 && sims.length === 0) {
     return NextResponse.json({ ok: false, error: 'บทนี้ยังไม่มีคลังข้อ' }, { status: 400 })
   }

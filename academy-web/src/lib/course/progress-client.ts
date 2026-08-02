@@ -12,6 +12,13 @@ import { emptyProgress } from './progress'
 export interface ProgressSyncFailure {
   nodeId: string
   message: string
+  /**
+   * โจทย์ชุดนี้ใช้ไม่ได้แล้ว (หมดอายุ / ถูกใช้ไปแล้ว) — ต้องเริ่มด้วยโจทย์ชุดใหม่
+   *
+   * ต้องแยกจากความล้มเหลวทั่วไป เพราะทางออกคนละทาง: อันนี้กด "ลองใหม่" ด้วยคำขอ
+   * เดิมกี่ครั้งก็ได้ 409 เหมือนเดิม (RIL cross-model รอบ 2 เดินเคสให้ดู)
+   */
+  needsNewAttempt?: boolean
 }
 
 export async function fetchProgress(slug: string): Promise<CourseProgressRecord> {
@@ -93,7 +100,14 @@ export async function pushProgress(
       explanation?: string
     }
     if (!res.ok || !body.ok) {
-      return { failure: { nodeId: event.nodeId, message: body.error ?? 'บันทึกความคืบหน้าไม่สำเร็จ' } }
+      return {
+        failure: {
+          nodeId: event.nodeId,
+          message: body.error ?? 'บันทึกความคืบหน้าไม่สำเร็จ',
+          // 409 = attempt ใช้ไม่ได้แล้ว · 400 ตอนส่ง checkpoint = โจทย์คนละชุด
+          needsNewAttempt: res.status === 409 || (res.status === 400 && event.action === 'checkpoint'),
+        },
+      }
     }
     return {
       failure: null,

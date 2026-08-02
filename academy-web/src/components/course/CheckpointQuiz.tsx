@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import type { AttemptSimulation, PublicCheckpointItem } from '@/lib/content/public-lesson'
+import type { AttemptQuestion, AttemptSimulation, PublicCheckpointItem } from '@/lib/content/public-lesson'
 import type { CheckpointOutcome } from '@/lib/course/progress-client'
 import type { SimulationState } from '@/lib/simulation/types'
 import { SimulationSurface } from './blocks/SimulationSurface'
@@ -41,7 +41,10 @@ export function CheckpointQuiz({
    */
   onRetry?: () => void
 }) {
-  const questions = items.filter((item): item is Extract<PublicCheckpointItem, { kind: 'mcq' }> => item.kind === 'mcq')
+  // เฉพาะข้อที่มีโจทย์จริงจาก attempt — ด่านที่ผูกกับ attempt จะส่งมาแค่รายชื่องาน
+  const questions = items.filter(
+    (item): item is AttemptQuestion => item.kind === 'mcq' && item.choices !== undefined,
+  )
   const simulations = items.filter(
     // เฉพาะด่านที่มีโจทย์จริงจาก attempt — ของในไฟล์เป็นแม่แบบที่ยังไม่ได้แทนค่า
     (item): item is AttemptSimulation => item.kind === 'simulation' && item.challenge !== undefined,

@@ -241,6 +241,11 @@ export function LessonView({
       attemptId: attempt.status === 'ready' ? attempt.id : undefined,
     })
     setSyncError(failure)
+    if (failure?.needsNewAttempt) {
+      // โจทย์ชุดนี้ใช้ไม่ได้แล้ว — ขอชุดใหม่ให้เลย ผู้เรียนจะได้ไม่ติดอยู่กับปุ่มที่
+      // กดแล้วได้ error เดิมทุกครั้ง (ด่านจะกลับมาเมื่อโจทย์ชุดใหม่มาถึง)
+      retryAttempt()
+    }
     if (failure || !outcome) return null
 
     if (outcome.passed) {

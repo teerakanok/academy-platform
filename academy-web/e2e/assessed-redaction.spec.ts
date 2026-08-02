@@ -159,8 +159,8 @@ test.describe('endpoint เฉลย — เปิดได้เฉพาะบ
     expect(await res.text()).not.toContain('"correct"')
   })
 
-  test('ผ่านแล้ว → ได้เฉลยและคำอธิบายไปทบทวน', async ({ request }) => {
-    // ทำบทปกติให้ผ่านจริงก่อน แล้วค่อยขอเฉลยของบทนั้น
+  test('ผ่านแล้ว → ได้คำอธิบายไปทบทวน แต่ไม่ได้ key เฉลย', async ({ request }) => {
+    // ทำบทปกติให้ผ่านจริงก่อน แล้วค่อยขอคำอธิบายของบทนั้น
     const graded = await submitCheckpoint(request, LESSON, 'learn', { 'cp-1': ['B'] })
     expect(graded.passed).toBe(true)
 
@@ -169,9 +169,13 @@ test.describe('endpoint เฉลย — เปิดได้เฉพาะบ
     const body = await res.json()
     expect(body.questions.length).toBeGreaterThan(0)
     for (const q of body.questions) {
-      expect(Array.isArray(q.correct)).toBe(true)
       expect(typeof q.explanation).toBe('string')
+      // ⚠️ key เฉลยเป็น key จริงในไฟล์ ซึ่งใช้ได้กับทุกคน — คนที่ผ่านแล้วบอกเพื่อน
+      // ว่า "B, C, B" เพื่อนแปลงเป็น key ของ attempt ตัวเองได้ทันที (RIL รอบ 2)
+      // คนที่ผ่านแล้วรู้อยู่แล้วว่าตัวเองตอบอะไร สิ่งที่เขายังไม่รู้คือ "ทำไม"
+      expect(q.correct, 'endpoint นี้ต้องไม่คืน key เฉลย').toBeUndefined()
     }
+    expect(JSON.stringify(body)).not.toContain('"correct"')
   })
 
   test('ไม่ล็อกอิน = ขอไม่ได้', async ({ playwright, baseURL }) => {

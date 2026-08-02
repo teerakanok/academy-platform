@@ -77,14 +77,16 @@ export type PublicLessonBlock =
 /**
  * ด่านท้ายบทที่ browser เห็น
  *
- * `challenge` ของ simulation เป็น optional **โดยตั้งใจ**: ตั้งแต่ W1 ค่าเป้าหมายถูก
- * สุ่มต่อ attempt ไฟล์เนื้อหาจึงเก็บแค่แม่แบบ (`{{targetIp}}`) ซึ่งไม่ใช่โจทย์ของใคร
- * หน้า lesson จึงส่งมาแค่ "ด่านนี้มีงานจำลอง id นี้" ส่วนตัวโจทย์มาจาก `/api/attempts`
- * เท่านั้น · เขียนไว้ในชนิดเพื่อให้การเผลอส่งแม่แบบกลับไปหา browser เป็น error
- * ตอนคอมไพล์ ไม่ใช่ข้อความ `{{targetIp}}` โผล่ใน payload โดยไม่มีใครเห็น
+ * เนื้อของงานเป็น optional **โดยตั้งใจ** — ด่านที่ต้องมี attempt จะส่งมาแค่
+ * "มีงาน id นี้" ส่วนตัวโจทย์มาจาก `/api/attempts` เท่านั้น:
+ *   · simulation — ค่าเป้าหมายสุ่มต่อ attempt ไฟล์เก็บแค่แม่แบบ (`{{targetIp}}`)
+ *   · mcq — key ของตัวเลือกถูก remap ต่อ attempt · ถ้าหน้ายังส่งชุด key จริงมาด้วย
+ *     คนที่ผ่านแล้วบอกเพื่อนว่า "B, C, B" เพื่อนก็เทียบข้อความจากหน้ากับของ attempt
+ *     ตัวเองแล้วแปลงเป็น key ของตัวเองได้ทันที — remap ก็ไม่เหลือความหมาย
+ *     (RIL cross-model รอบ 2 เดินเคสนี้ให้ดูตรงๆ)
  */
 export type PublicCheckpointItem =
-  | ({ kind: 'mcq' } & PublicCheckpointQuestion)
+  | ({ kind: 'mcq'; id: string } & Partial<Omit<PublicCheckpointQuestion, 'id'>>)
   | { kind: 'simulation'; id: string; challenge?: PublicSimulationChallenge }
 
 /**
@@ -148,7 +150,10 @@ export function toPublicSimulation(challenge: SimulationChallenge): PublicSimula
  *
  * นี่คือ **ทางเดียว** ที่เนื้อหาบทเรียนควรข้ามไปฝั่ง browser
  */
-export function toPublicLesson(lesson: LessonContent): PublicLesson {
+export function toPublicLesson(
+  lesson: LessonContent,
+  options: { tasksFromAttempt?: boolean } = {},
+): PublicLesson {
   return {
     nodeId: lesson.nodeId,
     locale: lesson.locale,
@@ -161,12 +166,13 @@ export function toPublicLesson(lesson: LessonContent): PublicLesson {
     ),
     attribution: lesson.attribution,
     cheatsheet: lesson.cheatsheet,
-    checkpoint: lesson.checkpoint.map((item): PublicCheckpointItem =>
-      item.kind === 'simulation'
-        ? // ไม่มี challenge โดยตั้งใจ — โจทย์จริงมาจาก attempt (ดูเหตุผลที่ชนิดด้านบน)
-          { kind: 'simulation', id: item.id }
-        : { kind: 'mcq', ...toPublicQuestion(item) },
-    ),
+    // ด่านที่ต้องมี attempt ส่งได้แค่รายชื่องาน — เนื้อโจทย์มาจาก `/api/attempts`
+    // (ดูเหตุผลเต็มที่ชนิด PublicCheckpointItem)
+    checkpoint: lesson.checkpoint.map((item): PublicCheckpointItem => {
+      if (item.kind === 'simulation') return { kind: 'simulation', id: item.id }
+      if (options.tasksFromAttempt) return { kind: 'mcq', id: item.id }
+      return { kind: 'mcq', ...toPublicQuestion(item) }
+    }),
     videoCueQuestions: lesson.videoCueQuestions?.map((q) => ({ ...toPublicQuestion(q), cueId: q.cueId })),
   }
 }
