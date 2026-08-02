@@ -34,6 +34,13 @@ export interface IssuedAttempt {
 export interface ConsumedAttempt {
   params: AttemptParams
   challengeVersion: string
+  /**
+   * ผลสุดท้ายที่ attempt นี้เคยได้ — มีค่า = ส่งซ้ำหลังจบสมบูรณ์แล้ว
+   *
+   * null ทั้งที่ consume ไปแล้ว = ครั้งก่อนล้มกลางทาง (บันทึกความคืบหน้าไม่สำเร็จ)
+   * ผู้เรียนจึงส่งใหม่ด้วย attempt เดิมได้โดยไม่เสียสิทธิ์ (ดูเหตุผลใน 0009)
+   */
+  outcome: { passed: boolean } | null
 }
 
 export interface AttemptContext {
@@ -81,9 +88,11 @@ export async function consumeAttempt(ctx: AttemptContext, attemptId: string): Pr
     p_challenge_id: ctx.challengeId,
   })
   if (error) throw new Error(`ใช้ attempt ไม่สำเร็จ: ${error.message}`)
-  const row = (data as { params: AttemptParams; challenge_version: string }[] | null)?.[0]
+  const row = (data as
+    | { params: AttemptParams; challenge_version: string; outcome: { passed: boolean } | null }[]
+    | null)?.[0]
   if (!row) return null
-  return { params: row.params, challengeVersion: row.challenge_version }
+  return { params: row.params, challengeVersion: row.challenge_version, outcome: row.outcome ?? null }
 }
 
 /**
@@ -106,4 +115,24 @@ export async function nextAttemptAt(ctx: AttemptContext): Promise<Date | null> {
     .limit(1)
   if (error || !data?.length) return null
   return new Date(Date.parse(data[0].created_at as string) + ATTEMPT_WINDOW_MINUTES * 60_000)
+}
+
+/**
+ * ปิดท้าย attempt ด้วยผลที่ตรวจได้ — เรียก **หลัง** บันทึกความคืบหน้าสำเร็จเท่านั้น
+ *
+ * ลำดับนี้สำคัญ: ถ้าเขียนผลก่อนบันทึก แล้วการบันทึกล้ม attempt จะถูกปิดตายทั้งที่
+ * ความคืบหน้าไม่ได้ถูกเก็บ — ผู้เรียนเสียสิทธิ์และไม่ได้อะไร ซึ่งคือบั๊กที่ 0009 แก้
+ */
+export async function finalizeAttempt(
+  userId: string,
+  attemptId: string,
+  outcome: { passed: boolean },
+): Promise<void> {
+  const db = academyDb()
+  const { error } = await db.rpc('finalize_attempt', {
+    p_attempt_id: attemptId,
+    p_user_id: userId,
+    p_outcome: outcome,
+  })
+  if (error) throw new Error(`ปิดท้าย attempt ไม่สำเร็จ: ${error.message}`)
 }

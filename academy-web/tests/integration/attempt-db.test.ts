@@ -4,6 +4,7 @@ import { requiredEnv } from './setup'
 import { findOrCreateUser } from '@/lib/account/users'
 import {
   consumeAttempt,
+  finalizeAttempt,
   issueAttempt,
   attemptQuota,
   ATTEMPT_WINDOW_MINUTES,
@@ -410,5 +411,78 @@ describe('ตัวชี้ว่าผ่านด้วย attempt ไหน 
       passed_attempt_id: null,
       passed_challenge_version: null,
     })
+  })
+})
+
+describe('ล้มกลางทางแล้วต้องไม่กินสิทธิ์ (0009)', () => {
+  // การส่งคำตอบมีสองขั้นที่ไม่ atomic ต่อกัน: consume แล้วจึงบันทึกความคืบหน้า ·
+  // ถ้าขั้นหลังล้ม ผู้เรียนได้ 500 ไม่ได้บันทึกอะไร และเสียสิทธิ์หนึ่งครั้งจากสาม
+  // (RIL cross-model รอบ W1 ข้อ 6)
+
+  async function ageClaim(attemptId: string, seconds: number) {
+    await withDb((db) =>
+      db.query(
+        `update academy.attempt set consumed_at = now() - make_interval(secs => $2)
+          where attempt_id = $1`,
+        [attemptId, seconds],
+      ),
+    )
+  }
+
+  it('🔴 consume แล้วบันทึกล้ม (ไม่ได้ finalize) → ส่งใหม่ด้วย attempt เดิมได้', async () => {
+    const NODE = 'n-finalize-crash'
+    const issued = await issueAttempt(ctx(NODE), SAMPLE_PARAMS, 'v1')
+    expect(await consumeAttempt(ctx(NODE), issued!.attemptId)).not.toBeNull()
+    // จำลองว่าคำขอแรกตายหลัง consume — เวลาผ่านไปพอที่จะรู้ว่าไม่ใช่การยิงซ้ำ
+    await ageClaim(issued!.attemptId, 60)
+
+    const again = await consumeAttempt(ctx(NODE), issued!.attemptId)
+    expect(again, 'attempt ที่ค้างไม่มีผลต้องกลับมาใช้ได้').not.toBeNull()
+    expect(again!.outcome).toBeNull()
+  })
+
+  it('🔴 ยิงซ้ำทันที (ยังไม่ค้างนาน) → ยังถูกปฏิเสธเหมือนเดิม', async () => {
+    const NODE = 'n-finalize-replay'
+    const issued = await issueAttempt(ctx(NODE), SAMPLE_PARAMS, 'v1')
+    expect(await consumeAttempt(ctx(NODE), issued!.attemptId)).not.toBeNull()
+    // ไม่มีการเลื่อนเวลา — นี่คือ replay/ยิงคู่ ไม่ใช่การล้มกลางทาง
+    expect(await consumeAttempt(ctx(NODE), issued!.attemptId)).toBeNull()
+  })
+
+  it('🔴 finalize แล้ว → ส่งซ้ำได้ผลเดิม ไม่ใช่ตรวจใหม่', async () => {
+    const NODE = 'n-finalize-idempotent'
+    const issued = await issueAttempt(ctx(NODE), SAMPLE_PARAMS, 'v1')
+    await consumeAttempt(ctx(NODE), issued!.attemptId)
+    await finalizeAttempt(owner.id, issued!.attemptId, { passed: true })
+    await ageClaim(issued!.attemptId, 60)
+
+    const again = await consumeAttempt(ctx(NODE), issued!.attemptId)
+    expect(again, 'attempt ที่จบแล้วต้องคืนผลเดิมให้ route ตัดสินใจ').not.toBeNull()
+    expect(again!.outcome).toEqual({ passed: true })
+  })
+
+  it('🔴 finalize เขียนได้ครั้งเดียว — ผลที่บันทึกไว้แล้วทับไม่ได้', async () => {
+    const NODE = 'n-finalize-once'
+    const issued = await issueAttempt(ctx(NODE), SAMPLE_PARAMS, 'v1')
+    await consumeAttempt(ctx(NODE), issued!.attemptId)
+    await finalizeAttempt(owner.id, issued!.attemptId, { passed: false })
+    await finalizeAttempt(owner.id, issued!.attemptId, { passed: true })
+
+    const row = await withDb((db) =>
+      db.query(`select outcome from academy.attempt where attempt_id = $1`, [issued!.attemptId]),
+    )
+    expect(row.rows[0].outcome).toEqual({ passed: false })
+  })
+
+  it('🔴 finalize ของคนอื่นไม่มีผล', async () => {
+    const NODE = 'n-finalize-owner'
+    const issued = await issueAttempt(ctx(NODE), SAMPLE_PARAMS, 'v1')
+    await consumeAttempt(ctx(NODE), issued!.attemptId)
+    await finalizeAttempt(stranger.id, issued!.attemptId, { passed: true })
+
+    const row = await withDb((db) =>
+      db.query(`select outcome from academy.attempt where attempt_id = $1`, [issued!.attemptId]),
+    )
+    expect(row.rows[0].outcome).toBeNull()
   })
 })

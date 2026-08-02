@@ -13,7 +13,7 @@ import {
 import { toPublicProgress } from '@/lib/course/public-progress'
 import { readBoundedBody } from '@/lib/http/bounded-body'
 import { gradeSimulation, gradingFingerprint } from '@/lib/simulation/types'
-import { consumeAttempt, type ConsumedAttempt } from '@/lib/course/attempt-db'
+import { consumeAttempt, finalizeAttempt, type ConsumedAttempt } from '@/lib/course/attempt-db'
 import { CHECKPOINT_CHALLENGE_ID, remapAnswersToReal } from '@/lib/course/attempt'
 import { simulationsToGrade } from '@/lib/course/attempt-grading'
 import {
@@ -214,6 +214,13 @@ export async function POST(request: Request) {
         // ไม่แยกเหตุผล — รายละเอียดคือ oracle ให้คนเดา attempt_id (W0-0)
         return NextResponse.json({ ok: false, error: 'ความพยายามนี้ใช้ไม่ได้แล้ว' }, { status: 409 })
       }
+      if (consumed.outcome) {
+        // ส่งซ้ำหลังจบสมบูรณ์แล้ว — คืนผลเดิม ไม่ตรวจใหม่ ไม่เขียนซ้ำ
+        //
+        // เกิดได้จริงเมื่อ response ของครั้งแรกหายกลางทางแล้วผู้เรียนกดส่งอีกครั้ง ·
+        // รูปของ response ยังเป็น `{ok, passed}` เหมือนเดิมทุกประการ (W0-1)
+        return NextResponse.json({ ok: true, passed: consumed.outcome.passed })
+      }
     }
 
     // ── MCQ ──────────────────────────────────────────────────────────────
@@ -301,6 +308,12 @@ export async function POST(request: Request) {
       passedAttemptId: passed && consumed ? input.attemptId : undefined,
       passedChallengeVersion: passed && consumed ? consumed.challengeVersion : undefined,
     })
+
+    // ปิดท้าย attempt **หลัง** บันทึกความคืบหน้าสำเร็จ — ลำดับนี้คือทั้งหมดของ 0009:
+    // ถ้าปิดก่อนแล้วการบันทึกล้ม ผู้เรียนเสียสิทธิ์โดยไม่ได้อะไร
+    if (consumed && input.attemptId) {
+      await finalizeAttempt(user.account.id, input.attemptId, { passed })
+    }
 
     // assessed: รูปของ response ต้องเหมือนกันทั้งผ่านและไม่ผ่าน — ขนาด/จำนวน field
     // ที่ต่างกันก็บอกใบ้ได้ จึงคืน key เดียวเสมอ
