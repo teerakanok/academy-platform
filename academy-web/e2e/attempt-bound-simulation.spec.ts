@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { answersFor } from './support/capstone'
 
 // W1 (สไลซ์ปิดท้าย) — โจทย์จำลองผูกกับ attempt และค่าเป้าหมายสุ่มต่อครั้ง
 //
@@ -12,10 +13,10 @@ import { test, expect } from '@playwright/test'
 
 const COURSE = 'content-formats-demo'
 const CAPSTONE = 'formats-hands-on'
-const MCQ_CORRECT = { 'cp-1': ['B'], 'cp-2': ['C'], 'cp-3': ['B'] }
 
 interface AttemptResponse {
   attemptId: string
+  questions: { id: string; prompt: string; choices: Record<string, string> }[]
   simulations: { id: string; challenge: { brief: string } }[]
 }
 
@@ -45,6 +46,7 @@ function stateFor(ip: string) {
 
 async function submit(
   request: import('@playwright/test').APIRequestContext,
+  attempt: AttemptResponse,
   attemptId: string | undefined,
   ip: string,
 ) {
@@ -54,7 +56,7 @@ async function submit(
       nodeId: CAPSTONE,
       action: 'checkpoint',
       mode: 'learn',
-      answers: MCQ_CORRECT,
+      answers: answersFor(attempt),
       simulations: { 'sim-1': stateFor(ip) },
       attemptId,
     },
@@ -82,13 +84,13 @@ test.describe('โจทย์จำลองผูกกับ attempt', () => 
 
   test('ทำตามโจทย์ของ attempt ตัวเอง → ผ่าน', async ({ request }) => {
     const attempt = await newAttempt(request)
-    const { body } = await submit(request, attempt.attemptId, targetIpOf(attempt))
+    const { body } = await submit(request, attempt, attempt.attemptId, targetIpOf(attempt))
     expect(body.passed).toBe(true)
   })
 
   test('🔴 ไม่ส่ง attemptId มาเลย → ถูกปฏิเสธ (ไม่ใช่ตรวจด้วยค่าจากไฟล์)', async ({ request }) => {
     const attempt = await newAttempt(request)
-    const { status } = await submit(request, undefined, targetIpOf(attempt))
+    const { status } = await submit(request, attempt, undefined, targetIpOf(attempt))
     expect(status).toBe(400)
   })
 

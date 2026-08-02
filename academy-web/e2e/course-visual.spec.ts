@@ -48,7 +48,10 @@ for (const vp of VIEWPORTS) {
       await expect(page.getByTestId('video-quiz')).toBeVisible({ timeout: 15_000 })
       await shoot(page, 'video-popquiz', vp.name, false)
 
-      await page.goto('/courses/basic-os-linux/lessons/permissions')
+      // ⚠️ ใช้ capstone ที่ **ไม่มี spec ไหนทำจบ** — บทที่ทำจบแล้วจะไม่แสดงด่านอีก
+      // (หน้าจะเป็น lesson-complete แทน) ทำให้ภาพนี้ขึ้นกับลำดับของไฟล์เทสอื่น
+      // `permissions` ถูก course-journey ทำจบไปก่อนเสมอ จึงย้ายมาที่ `pipes-and-logs`
+      await page.goto('/courses/basic-os-linux/lessons/pipes-and-logs')
       await expect(page.getByTestId('checkpoint')).toBeVisible()
       await shoot(page, 'capstone-lesson', vp.name)
 

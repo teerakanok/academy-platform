@@ -5,6 +5,7 @@ import { getCourseStructure } from '@/lib/content/course-source'
 import { getLessonAnswerKey, mcqItems, sameAnswerSet, simulationItems } from '@/lib/content/answer-key'
 import {
   isAssessedNode,
+  requiresAttempt,
   isTestOutAvailable,
   passesLearnMode,
   TEST_OUT_UNAVAILABLE_REASON,
@@ -13,8 +14,8 @@ import { toPublicProgress } from '@/lib/course/public-progress'
 import { readBoundedBody } from '@/lib/http/bounded-body'
 import { gradeSimulation, gradingFingerprint } from '@/lib/simulation/types'
 import { resolveChallenge } from '@/lib/simulation/variables'
-import { consumeAttempt } from '@/lib/course/attempt-db'
-import { CHECKPOINT_CHALLENGE_ID } from '@/lib/course/attempt'
+import { consumeAttempt, type ConsumedAttempt } from '@/lib/course/attempt-db'
+import { CHECKPOINT_CHALLENGE_ID, remapAnswersToReal } from '@/lib/course/attempt'
 import {
   loadAllProgress,
   loadProgress,
@@ -185,25 +186,22 @@ export async function POST(request: Request) {
     // และนับรวมเป็นชุดเดียว — ผู้เรียนกด "ตรวจ" ครั้งเดียวได้ผลของทั้งด่าน
     const questions = mcqItems(answerKey.checkpoint)
     const sims = simulationItems(answerKey.checkpoint)
-    const results: Record<string, boolean> = {}
-    for (const q of questions) {
-      results[q.id] = sameAnswerSet(input.answers[q.id] ?? [], q.correct)
-    }
 
-    // ── โจทย์จำลอง: ค่าเป้าหมายมาจาก attempt ไม่ใช่จากไฟล์ตรงๆ (W1) ──────────
+    // ── attempt: แหล่งเดียวของ "โจทย์ครั้งนี้" ────────────────────────────
     //
-    // โจทย์ที่มีตัวแปรจะถูกสุ่มค่าตอนออก attempt · เซิร์ฟเวอร์ต้องตรวจด้วยค่าชุด
-    // เดียวกับที่ผู้เรียนอ่าน ไม่งั้นเขาทำตามโจทย์แล้วไม่ผ่านโดยไม่มีทางเดาสาเหตุ
+    // บังคับสำหรับพื้นผิววัดผลทุกกรณี ไม่ใช่เฉพาะบทที่มีโจทย์จำลอง — เพราะ MCQ ก็
+    // ถูก **remap key ต่อ attempt** เหมือนกัน · ถ้าไม่บังคับ ผู้เรียนส่ง key จริงจาก
+    // ไฟล์มาได้ตรงๆ แปลว่าคำตอบคงที่ตลอดและแชร์กันได้ = การ remap ไม่มีความหมาย
     //
     // ⚠️ consume เป็น atomic และเงื่อนไข ownership/context/expiry อยู่ใน WHERE
     // เดียวกันทั้งหมด (W0-0) — attempt ของคนอื่นหรือของบทอื่นใช้ไม่ได้ และใช้ซ้ำไม่ได้
-    const needsAttempt = sims.some((s) => Object.keys(s.challenge.variables ?? {}).length > 0)
-    let attemptVars: Record<string, Record<string, string>> = {}
+    const needsAttempt = requiresAttempt(node, sims.length > 0)
+    let consumed: ConsumedAttempt | null = null
     if (needsAttempt) {
       if (!input.attemptId) {
         return NextResponse.json({ ok: false, error: 'ต้องเริ่มความพยายามใหม่ก่อนส่งคำตอบ' }, { status: 400 })
       }
-      const consumed = await consumeAttempt(
+      consumed = await consumeAttempt(
         {
           userId: user.account.id,
           courseSlug: input.slug,
@@ -216,7 +214,30 @@ export async function POST(request: Request) {
         // ไม่แยกเหตุผล — รายละเอียดคือ oracle ให้คนเดา attempt_id (W0-0)
         return NextResponse.json({ ok: false, error: 'ความพยายามนี้ใช้ไม่ได้แล้ว' }, { status: 409 })
       }
-      attemptVars = consumed.params.simulationVars ?? {}
+    }
+    const attemptVars = consumed?.params.simulationVars ?? {}
+
+    // ── MCQ ──────────────────────────────────────────────────────────────
+    //
+    // มี attempt = ตรวจจากของที่ attempt ถือเองทั้งหมด: แปลง key ที่ client เห็น
+    // กลับเป็น key จริงด้วยตาราง remap ของ attempt นั้น แล้วเทียบกับ **เฉลย snapshot**
+    // ไม่ใช่ไฟล์ปัจจุบัน (attempt อายุ 60 นาที เนื้อหาอาจถูก deploy ทับระหว่างนั้น)
+    const results: Record<string, boolean> = {}
+    const gradedQuestionIds = consumed ? consumed.params.questionIds : questions.map((q) => q.id)
+    if (consumed) {
+      for (const id of gradedQuestionIds) {
+        const real = remapAnswersToReal(consumed.params, id, input.answers[id] ?? [])
+        if (real === null) {
+          // key ที่ไม่มีในตาราง / ข้อที่ไม่ได้อยู่ใน attempt นี้ / key ซ้ำ → ปฏิเสธทั้งชุด
+          // ไม่ใช่ตัดตัวปลอมทิ้งเงียบๆ (ดูเหตุผลใน remapAnswersToReal)
+          return NextResponse.json({ ok: false, error: 'คำตอบไม่ตรงกับโจทย์ชุดนี้' }, { status: 400 })
+        }
+        results[id] = sameAnswerSet(real, consumed.params.answerKeys[id] ?? [])
+      }
+    } else {
+      for (const q of questions) {
+        results[q.id] = sameAnswerSet(input.answers[q.id] ?? [], q.correct)
+      }
     }
 
     // ⚠️ หลักฐานของโจทย์จำลองต้องเก็บ **ผลราย requirement + เวอร์ชันของโจทย์**
@@ -247,13 +268,13 @@ export async function POST(request: Request) {
     }
 
     const correctCount = Object.values(results).filter(Boolean).length
-    const totalTasks = questions.length + sims.length
+    const totalTasks = gradedQuestionIds.length + sims.length
     // capstone และการ test-out ต้องถูกทุกข้อ · บทปกติใช้เกณฑ์ของโหมดสอน (W0-3)
     //
     // เดิมบทปกติผ่านด้วย "ตอบครบ" เฉยๆ — ตอบผิดทุกข้อก็ได้ `completed` (F2)
     const assessed = isAssessedNode(node) || input.mode === 'test-out'
     // โจทย์จำลองไม่มี "ยังไม่ตอบ" — หน้าจอมีค่าตั้งต้นเสมอ จึงนับความครบเฉพาะ MCQ
-    const answeredAll = questions.every((q) => (input.answers[q.id]?.length ?? 0) > 0)
+    const answeredAll = gradedQuestionIds.every((id) => (input.answers[id]?.length ?? 0) > 0)
     const passed =
       answeredAll && (assessed ? correctCount === totalTasks : passesLearnMode(correctCount, totalTasks))
 

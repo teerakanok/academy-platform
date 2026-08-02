@@ -77,3 +77,18 @@ export function isProofBearing(node: CourseNode): boolean {
 export function isAssessedNode(node: CourseNode): boolean {
   return node.kind === 'capstone'
 }
+
+/**
+ * ด่านนี้ต้องมี attempt ก่อนส่งคำตอบไหม — **จุดเดียวที่ตัดสิน** ทั้ง UI และ API
+ *
+ * ต้องมีเมื่อ:
+ *   · เป็นพื้นผิววัดผล — MCQ ถูก remap key ต่อ attempt เฉลยจึงแชร์กันไม่ได้
+ *   · หรือมีด่านจำลอง — ค่าเป้าหมายสุ่มต่อ attempt
+ *
+ * ⚠️ สองฝั่งต้องตอบเหมือนกันเสมอ ถ้า UI คิดว่า "ไม่ต้อง" แต่ API คิดว่า "ต้อง"
+ * ผู้เรียนจะกดตรวจแล้วได้ 400 โดยไม่มีอะไรบนหน้าจอบอกว่าเกิดอะไรขึ้น — จึงอยู่ที่นี่
+ * ที่เดียว ไม่ใช่เขียนเงื่อนไขซ้ำสองที่
+ */
+export function requiresAttempt(node: CourseNode, hasSimulationTask: boolean): boolean {
+  return isAssessedNode(node) || hasSimulationTask
+}

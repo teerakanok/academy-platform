@@ -1,5 +1,6 @@
 import { randomInt } from 'node:crypto'
 import type { CheckpointQuestion } from '@/lib/content/course-types'
+import type { AttemptQuestion } from '@/lib/content/public-lesson'
 
 // โครง attempt (W0-0) — เซิร์ฟเวอร์สุ่มชุดข้อ + remap key ของตัวเลือกต่อ attempt
 //
@@ -38,12 +39,13 @@ export interface AttemptParams {
   simulationVars?: Record<string, Record<string, string>>
 }
 
-/** รูปข้อสอบที่ส่งให้ client — ไม่มี correct ไม่มี explanation โดยโครงสร้าง */
-export interface PublicAttemptQuestion {
-  id: string
-  prompt: string
-  choices: Record<string, string>
-}
+/**
+ * รูปข้อสอบที่ส่งให้ client — ไม่มี correct ไม่มี explanation โดยโครงสร้าง
+ *
+ * ใช้ชนิดร่วมกับด่านท้ายบทที่ UI เรนเดอร์ (`AttemptQuestion`) เพื่อให้ลืมฟิลด์
+ * ใดฟิลด์หนึ่งเป็น error ตอนคอมไพล์ ไม่ใช่ข้อหายไปจากหน้าจอเงียบๆ
+ */
+export type PublicAttemptQuestion = AttemptQuestion
 
 /** ตัวสุ่มของจริง — attempt ต้องเดาไม่ได้ จึงใช้ crypto ไม่ใช่ seedable PRNG */
 export const cryptoPick = (maxExclusive: number): number => randomInt(maxExclusive)
@@ -97,7 +99,9 @@ export function toPublicQuestions(
     for (const clientKey of Object.keys(map).sort()) {
       choices[clientKey] = q.choices[map[clientKey]]
     }
-    return { id: q.id, prompt: q.prompt, choices }
+    // `multiple` เป็นข้อมูลของโจทย์ ไม่ใช่เฉลย — ผู้เรียนต้องรู้ว่าเลือกได้กี่ตัว
+    // จึงคำนวณฝั่งเซิร์ฟเวอร์จากจำนวนเฉลย (เหมือน toPublicQuestion ของหน้า lesson)
+    return { kind: 'mcq', id: q.id, prompt: q.prompt, choices, multiple: q.correct.length > 1 }
   })
 }
 

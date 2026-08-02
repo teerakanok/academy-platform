@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import type { AttemptSimulation } from '@/lib/content/public-lesson'
+import type { AttemptQuestion, AttemptSimulation } from '@/lib/content/public-lesson'
 
 /**
  * สถานะ attempt ของบทที่มีด่านจำลอง (W1)
@@ -18,11 +18,12 @@ import type { AttemptSimulation } from '@/lib/content/public-lesson'
 export type LessonAttempt =
   | { status: 'not-needed' }
   | { status: 'loading' }
-  | { status: 'ready'; id: string; simulations: AttemptSimulation[] }
+  | { status: 'ready'; id: string; questions: AttemptQuestion[]; simulations: AttemptSimulation[] }
   | { status: 'failed'; reason: 'quota' | 'error'; retryAfterSeconds?: number }
 
 interface AttemptResponse {
   attemptId?: string
+  questions?: AttemptQuestion[]
   simulations?: AttemptSimulation[]
 }
 
@@ -76,7 +77,12 @@ export function useLessonAttempt(options: {
           setAttempt({ status: 'failed', reason: 'error' })
           return
         }
-        setAttempt({ status: 'ready', id: body.attemptId, simulations: body.simulations ?? [] })
+        setAttempt({
+          status: 'ready',
+          id: body.attemptId,
+          questions: body.questions ?? [],
+          simulations: body.simulations ?? [],
+        })
       })
       .catch(() => {
         if (alive) setAttempt({ status: 'failed', reason: 'error' })

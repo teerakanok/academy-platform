@@ -60,7 +60,9 @@ test.describe('POST /api/attempts', () => {
     const mcqCount = lessonFile.checkpoint.filter((q) => q.kind !== 'simulation').length
     expect(body.questions).toHaveLength(mcqCount)
     for (const q of body.questions as Record<string, unknown>[]) {
-      expect(Object.keys(q).sort()).toEqual(['choices', 'id', 'prompt'])
+      // รูปเดียวกับด่านท้ายบทที่ UI เรนเดอร์ (`AttemptQuestion`) — `multiple` เป็น
+      // ข้อมูลของโจทย์ ไม่ใช่เฉลย · ที่ห้ามมีคือ correct/explanation
+      expect(Object.keys(q).sort()).toEqual(['choices', 'id', 'kind', 'multiple', 'prompt'])
     }
 
     // เฉลยต้องไม่รั่ว: explanation เป็นสตริงยาวไม่ซ้ำกับอะไร ใช้เป็นตัวชี้วัดได้จริง

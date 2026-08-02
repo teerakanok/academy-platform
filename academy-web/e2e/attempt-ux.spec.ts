@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { answerOnPage } from './support/capstone'
 
 // W1 — หน้าจอต้องไม่แสดงโจทย์ที่ยังไม่ใช่ของผู้เรียน
 //
@@ -56,10 +57,8 @@ test.describe('การรอโจทย์ของ attempt', () => {
     await expect(sim).toBeVisible()
     const firstTarget = /192\.168\.10\.\d+/.exec((await sim.textContent()) ?? '')?.[0]
 
-    // ตอบผิดทั้ง MCQ และด่านจำลอง แล้วกดตรวจ
-    await page.getByTestId('checkpoint-q-cp-1').locator('input[value="A"]').check()
-    await page.getByTestId('checkpoint-q-cp-2').locator('input[value="A"]').check()
-    await page.getByTestId('checkpoint-q-cp-3').locator('input[value="A"]').check()
+    // ตอบผิดทั้ง MCQ และด่านจำลอง แล้วกดตรวจ (เลือกจากข้อความ — key ถูก remap ต่อ attempt)
+    await answerOnPage(page, COURSE, CAPSTONE, { wrongFor: ['cp-1', 'cp-2', 'cp-3'] })
     await page.getByTestId('checkpoint-submit').click()
     await expect(page.getByTestId('checkpoint-not-passed')).toBeVisible()
 
@@ -77,9 +76,7 @@ test.describe('การรอโจทย์ของ attempt', () => {
     const secondTarget = /192\.168\.10\.\d+/.exec((await sim2.textContent()) ?? '')?.[0]
     expect(secondTarget).toBeTruthy()
     expect(firstTarget).toBeTruthy()
-    await page.getByTestId('checkpoint-q-cp-1').locator('input[value="B"]').check()
-    await page.getByTestId('checkpoint-q-cp-2').locator('input[value="C"]').check()
-    await page.getByTestId('checkpoint-q-cp-3').locator('input[value="B"]').check()
+    await answerOnPage(page, COURSE, CAPSTONE)
     await sim2.getByTestId('sim-mode-static').click()
     await sim2.getByTestId('sim-ipv4').fill(secondTarget!)
     await sim2.getByTestId('sim-subnet').fill('255.255.255.0')

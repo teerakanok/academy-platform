@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { startCapstoneAttempt } from './support/capstone'
+import { answerOnPage, startCapstoneAttempt } from './support/capstone'
 import { learnerEmail, storedSimulationEvidence } from './support/evidence'
 
 // W1 — โจทย์จำลองเป็น "ด่าน" ของ capstone ไม่ใช่ของเล่นข้างทาง
@@ -16,7 +16,6 @@ import { learnerEmail, storedSimulationEvidence } from './support/evidence'
 
 const COURSE = 'content-formats-demo'
 const CAPSTONE = 'formats-hands-on'
-const MCQ_CORRECT = { 'cp-1': ['B'], 'cp-2': ['C'], 'cp-3': ['B'] }
 
 /**
  * ส่งคำตอบ capstone พร้อม attempt ของตัวเอง
@@ -36,7 +35,7 @@ async function submit(
       nodeId: CAPSTONE,
       action: 'checkpoint',
       mode: 'learn',
-      answers: MCQ_CORRECT,
+      answers: attempt.answers,
       simulations: state ? { 'sim-1': state } : undefined,
       attemptId: attempt.attemptId,
     },
@@ -97,9 +96,7 @@ test.describe('capstone ที่มีโจทย์จำลองต้อ�
     await page.goto(`/courses/${COURSE}/lessons/${CAPSTONE}`)
 
     // ตอบ MCQ ให้ถูกครบ
-    await page.getByTestId('checkpoint-q-cp-1').locator('input[value="B"]').check()
-    await page.getByTestId('checkpoint-q-cp-2').locator('input[value="C"]').check()
-    await page.getByTestId('checkpoint-q-cp-3').locator('input[value="B"]').check()
+    await answerOnPage(page, COURSE, CAPSTONE)
 
     // ตั้งค่าบนหน้าจอจำลองเหมือนผู้เรียนจริง — ค่าเป้าหมายอ่านจากโจทย์ที่หน้าจอแสดง
     // (สุ่มต่อ attempt ตั้งแต่ W1) ไม่ใช่ค่าตายตัวที่เทสรู้ล่วงหน้า

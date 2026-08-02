@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { answerOnPage } from './support/capstone'
 import { mkdirSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -141,22 +142,20 @@ test.describe('learner journey through a course', () => {
     await expect(page.getByTestId('checkpoint')).toContainText('Required checkpoint')
 
     // ตอบผิดหนึ่งข้อ → ต้องไม่ผ่าน
-    await page.getByTestId('checkpoint-q-cp-1').locator('input[value="B"]').check()
-    await page.getByTestId('checkpoint-q-cp-2').locator('input[value="B"]').check()
-    await page.getByTestId('checkpoint-q-cp-3').locator('input[value="B"]').check()
-    await page.getByTestId('checkpoint-q-cp-4').locator('input[value="B"]').check()
-    await page.getByTestId('checkpoint-q-cp-5').locator('input[value="A"]').check()
+    //
+    // ⚠️ capstone remap key ของตัวเลือกต่อ attempt (W0-0b) — เลือกจาก **ข้อความ**
+    // เท่านั้น · การคลิก `input[value="B"]` จะเขียวเองแบบสุ่มประมาณ 1 ใน 4 ครั้ง
+    await answerOnPage(page, 'basic-os-linux', 'permissions', { wrongFor: ['cp-5'] })
     await page.getByTestId('checkpoint-submit').click()
     await expect(page.getByTestId('checkpoint-not-passed')).toBeVisible()
     await expect(page.getByTestId('checkpoint-continue')).toHaveCount(0)
 
-    // แก้ให้ถูกครบแล้วจึงผ่าน
-    await page.getByTestId('checkpoint-retry').click()
-    await page.getByTestId('checkpoint-q-cp-1').locator('input[value="A"]').check()
-    await page.getByTestId('checkpoint-q-cp-2').locator('input[value="B"]').check()
-    await page.getByTestId('checkpoint-q-cp-3').locator('input[value="B"]').check()
-    await page.getByTestId('checkpoint-q-cp-4').locator('input[value="B"]').check()
-    await page.getByTestId('checkpoint-q-cp-5').locator('input[value="B"]').check()
+    // แก้ให้ถูกครบแล้วจึงผ่าน — กดลองใหม่แล้วต้องได้โจทย์ชุดใหม่ (attempt เดิมถูกใช้ไปแล้ว)
+    await Promise.all([
+      page.waitForResponse((r) => r.url().includes('/api/attempts') && r.request().method() === 'POST'),
+      page.getByTestId('checkpoint-retry').click(),
+    ])
+    await answerOnPage(page, 'basic-os-linux', 'permissions')
     await page.getByTestId('checkpoint-submit').click()
     // ⚠️ capstone เป็นโหมด assessed — response มีแค่ผ่าน/ไม่ผ่าน จึง **ต้องไม่มี**
     // คะแนนรายข้อขึ้นบนหน้าจอ (W0-1: จำนวนที่ถูกคือเครื่องเฉลยแบบ Mastermind)

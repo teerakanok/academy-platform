@@ -50,10 +50,12 @@ async function submitCheckpoint(
  */
 async function submitCapstone(
   request: import('@playwright/test').APIRequestContext,
-  answers: Record<string, string[]>,
+  pick: 'correct' | 'wrong' | ((attempt: Awaited<ReturnType<typeof startCapstoneAttempt>>) => Record<string, string[]>),
 ) {
   await request.post(`/api/progress/reset?slug=${encodeURIComponent(COURSE)}`)
   const attempt = await startCapstoneAttempt(request)
+  const answers =
+    pick === 'correct' ? attempt.answers : pick === 'wrong' ? attempt.wrongAnswers : pick(attempt)
   const res = await request.post('/api/progress', {
     data: {
       slug: COURSE,
@@ -72,7 +74,7 @@ async function submitCapstone(
 
 test.describe('โหมด assessed — response บอกได้แค่ผ่าน/ไม่ผ่าน', () => {
   test('ตอบผิด: มีเฉพาะ ok กับ passed ไม่มีผลรายข้อ/จำนวน/คำอธิบาย', async ({ request }) => {
-    const body = await submitCapstone(request, { 'cp-1': ['A'], 'cp-2': ['A'], 'cp-3': ['A'] })
+    const body = await submitCapstone(request, 'wrong')
     expect(Object.keys(body).sort()).toEqual(['ok', 'passed'])
     expect(body.passed).toBe(false)
   })
@@ -80,8 +82,12 @@ test.describe('โหมด assessed — response บอกได้แค่ผ
   test('Mastermind: เปลี่ยนคำตอบทีละข้อ → response ต้องแยกไม่ออกว่าข้อไหนขยับ', async ({ request }) => {
     // ทุกคำตอบผิดหมด ยกเว้นค่อยๆ สลับข้อละตัว — ถ้ามีสัญญาณใดแปรตาม จะเห็นตรงนี้
     const shapes = new Set<string>()
-    for (const letter of ['A', 'B', 'C', 'D']) {
-      const body = await submitCapstone(request, { 'cp-1': [letter], 'cp-2': ['A'], 'cp-3': ['A'] })
+    for (const index of [0, 1, 2, 3]) {
+      const body = await submitCapstone(request, (attempt) => ({
+        ...attempt.wrongAnswers,
+        // สลับเฉพาะข้อแรกไปทีละตัวเลือก — ถ้ามีสัญญาณใดแปรตามคำตอบ จะเห็นตรงนี้
+        'cp-1': [Object.keys(attempt.questions.find((q) => q.id === 'cp-1')!.choices).sort()[index]],
+      }))
       shapes.add(JSON.stringify(body))
     }
     // ทุกครั้งที่ยังไม่ผ่าน response ต้องเหมือนกันเป๊ะ — ไม่มีอะไรให้เดา
@@ -92,7 +98,7 @@ test.describe('โหมด assessed — response บอกได้แค่ผ
     // capstone มีด่านจำลองด้วยตั้งแต่ W1 — ต้องส่งสถานะหน้าจอที่ถูกมาด้วย
     // ⚠️ ตรวจกรณี "ผ่าน" ด้วย ไม่ใช่แค่ "ไม่ผ่าน" — ถ้าวันหนึ่งมีคนแนบเฉลยเฉพาะตอน
     // ผ่าน เทสที่ดูแต่กรณีไม่ผ่านจะเขียวทั้งที่รูเปิด (RIL cross-model จับ)
-    const body = await submitCapstone(request, { 'cp-1': ['B'], 'cp-2': ['C'], 'cp-3': ['B'] })
+    const body = await submitCapstone(request, 'correct')
     expect(body.passed).toBe(true)
     expect(Object.keys(body).sort()).toEqual(['ok', 'passed'])
   })
@@ -103,7 +109,7 @@ test.describe('โหมด assessed — response บอกได้แค่ผ
     // requirement ของด่านจำลองมาให้ — ส่งผิดสามชุด (A,A,A / B,B,B / C,C,C) แล้ว
     // อ่านจาก GET ก็ได้เฉลยครบโดยไม่ต้องรู้เนื้อหาเลย
     // **ปิดรูที่จุดหนึ่งแล้วเปิดที่อีกจุด คือรูเดิม**
-    await submitCapstone(request, { 'cp-1': ['A'], 'cp-2': ['A'], 'cp-3': ['A'] })
+    await submitCapstone(request, 'wrong')
 
     const body = await (await request.get(`/api/progress?slug=${COURSE}`)).json()
     const record = body.record as {

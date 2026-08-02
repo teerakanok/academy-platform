@@ -4,7 +4,12 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import type { CourseNode, CourseStructure, Locale } from '@/lib/content/course-types'
-import type { AttemptSimulation, PublicCheckpointItem, PublicLesson } from '@/lib/content/public-lesson'
+import type {
+  AttemptQuestion,
+  AttemptSimulation,
+  PublicCheckpointItem,
+  PublicLesson,
+} from '@/lib/content/public-lesson'
 import type { SimulationState } from '@/lib/simulation/types'
 import {
   emptyProgress,
@@ -24,7 +29,7 @@ import {
   type ProgressSyncFailure,
   type VideoCueOutcome,
 } from '@/lib/course/progress-client'
-import { isTestOutAvailable } from '@/lib/course/assessment-policy'
+import { isTestOutAvailable, requiresAttempt } from '@/lib/course/assessment-policy'
 import { canSkip, nextNode, nodeStatus } from '@/lib/course/roadmap'
 import { CheckpointQuiz } from './CheckpointQuiz'
 import { InteractiveVideo } from './InteractiveVideo'
@@ -43,14 +48,24 @@ function waitCopy(retryAfterSeconds: number | undefined): string {
   return `try again in about ${minutes} minutes`
 }
 
-/** แทนโจทย์จำลองในด่านด้วยของที่ attempt ออกให้ (ค่าเป้าหมายถูกสุ่มแล้ว) */
-function withAttemptSimulations(
+/**
+ * แทนงานในด่านด้วยของที่ attempt ออกให้
+ *
+ * ทั้งสองอย่างต้องมาจาก attempt: โจทย์จำลองมีค่าเป้าหมายที่สุ่มแล้ว และ MCQ มี
+ * **key ของตัวเลือกที่ remap ต่อ attempt** — ถ้าเรนเดอร์ MCQ จากไฟล์ ตัวอักษรที่
+ * ผู้เรียนส่งกลับจะเป็น key จริงเสมอ ซึ่งแปลว่าคำตอบคงที่ตลอดและแชร์กันได้
+ * (การ remap ก็ไม่มีความหมายอะไรเลย)
+ */
+function withAttemptTasks(
   items: PublicCheckpointItem[],
-  fromAttempt: SimulationCheckpoint[] | undefined,
+  attempt: { questions: AttemptQuestion[]; simulations: SimulationCheckpoint[] } | null,
 ): PublicCheckpointItem[] {
-  if (!fromAttempt?.length) return items
-  const byId = new Map(fromAttempt.map((s) => [s.id, s]))
-  return items.map((item) => (item.kind === 'simulation' ? byId.get(item.id) ?? item : item))
+  if (!attempt) return items
+  const sims = new Map(attempt.simulations.map((s) => [s.id, s]))
+  const withSims = items.filter((item) => item.kind === 'simulation').map((item) => sims.get(item.id) ?? item)
+  // ลำดับข้อ MCQ มาจาก attempt (สุ่มต่อครั้ง) — ด่านจำลองต่อท้ายตามลำดับเดิมของบท
+  if (attempt.questions.length) return [...attempt.questions, ...withSims]
+  return items.map((item) => (item.kind === 'simulation' ? sims.get(item.id) ?? item : item))
 }
 
 // รายการติ๊กเองสำหรับผู้เรียน — ตั้งใจให้ "ไม่ใช่ประตู"
@@ -189,7 +204,7 @@ export function LessonView({
   // ไม่ได้อยู่ในไฟล์เนื้อหา (ไฟล์เก็บแค่แม่แบบ)
   const hasSimulationTask = lesson.checkpoint.some((item) => item.kind === 'simulation')
   const { attempt, retry: retryAttempt } = useLessonAttempt({
-    enabled: hasSimulationTask && !done,
+    enabled: requiresAttempt(node, hasSimulationTask) && !done,
     // รอให้รู้สถานะบทก่อนค่อยขอจริง — ระหว่างยังไม่รู้ `done` เป็น null ถ้ายิงเลย
     // บทที่ทำจบแล้วจะออก attempt ใหม่ทุกครั้งที่เปิดหน้า กินโควตาฟรีๆ
     hold: !loaded,
@@ -615,10 +630,7 @@ export function LessonView({
             ที่ยังไม่ได้แทนค่า จึงเอามาให้ผู้เรียนอ่านไม่ได้ (ดูเหตุผลใน use-lesson-attempt) */}
         {(attempt.status === 'not-needed' || attempt.status === 'ready') && (
           <CheckpointQuiz
-            items={withAttemptSimulations(
-              lesson.checkpoint,
-              attempt.status === 'ready' ? attempt.simulations : undefined,
-            )}
+            items={withAttemptTasks(lesson.checkpoint, attempt.status === 'ready' ? attempt : null)}
             requireAllCorrect={mode === 'test-out' || isCapstone}
             onSubmit={(submission) => submitCheckpoint(mode === 'test-out' ? 'test-out' : 'learn', submission)}
             onPassed={() => finishCheckpoint(mode === 'test-out' ? 'test-out' : 'learn')}

@@ -94,6 +94,20 @@ export type PublicCheckpointItem =
  * `{id, challenge}` เองแล้วลืม `kind` ทำให้ UI กรองทิ้งเงียบๆ (ด่านหายทั้งด่าน
  * โดยไม่มี error) และ client cast `res.json()` จึงไม่มีใครจับได้เลย
  */
+/**
+ * MCQ ที่ `/api/attempts` ส่งกลับ — รูปเดียวกับด่านท้ายบทที่ browser เห็น
+ *
+ * ต่างจากของในไฟล์ตรงที่ **key ของตัวเลือกถูก remap ต่อ attempt** ข้อความใต้ key
+ * "A" ของคนละ attempt จึงเป็นคนละตัวเลือก · เฉลยจริงอยู่ใน `params` ฝั่งเซิร์ฟเวอร์
+ */
+export interface AttemptQuestion {
+  kind: 'mcq'
+  id: string
+  prompt: string
+  choices: Record<string, string>
+  multiple: boolean
+}
+
 export interface AttemptSimulation {
   kind: 'simulation'
   id: string
