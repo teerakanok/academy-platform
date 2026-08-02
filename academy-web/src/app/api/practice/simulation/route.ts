@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { currentUser } from '@/lib/auth/session'
 import { getCourseStructure } from '@/lib/content/course-source'
 import { getLessonAnswerKey } from '@/lib/content/answer-key'
+import { readBoundedBody } from '@/lib/http/bounded-body'
 import { gradeSimulation } from '@/lib/simulation/types'
 
 export const runtime = 'nodejs'
@@ -38,27 +39,20 @@ const schema = z.object({
   wantHint: z.boolean().optional(),
 })
 
-/** ขนาด body สูงสุดที่ยอมอ่าน — กันการยัด JSON ก้อนใหญ่ให้ parser ทำงานฟรี */
+/** ขนาด body สูงสุดที่ยอมอ่าน (byte จริง) — กันการยัด JSON ก้อนใหญ่ให้ parser ทำงานฟรี */
 const MAX_BODY_BYTES = 8 * 1024
 
 export async function POST(request: Request) {
   const user = await currentUser()
   if (!user) return NextResponse.json({ ok: false, error: 'ต้องเข้าสู่ระบบก่อน' }, { status: 401 })
 
-  // อ่านเป็น byte ก่อนแล้ววัดขนาด — `request.json()` ตรงๆ จะ parse ให้เสร็จก่อน
-  // ไม่ว่าจะใหญ่แค่ไหน แปลว่างาน parse เกิดไปแล้วก่อนเราจะได้ปฏิเสธ
-  //
-  // ⚠️ ต้องวัดที่ `byteLength` ไม่ใช่ `String.length` — String.length นับ UTF-16
-  // code unit ซึ่งข้อความไทยหนึ่งตัวใช้ 1 หน่วยแต่กินจริง 3 byte ใน UTF-8
-  // (RIL cross-model พิสูจน์: payload ไทย 19,601 byte ผ่าน guard 8 KiB ที่นับด้วย
-  // String.length มาแล้ว) · เว็บนี้เป็นสองภาษาโดยตั้งใจ ช่องนี้จึงไม่ใช่กรณีทฤษฎี
+  // อ่านแบบมีเพดานและหยุดกลางทางเมื่อเกิน — เหตุผลทั้งหมดอยู่ใน bounded-body.ts
+  const raw = await readBoundedBody(request, MAX_BODY_BYTES)
+  if (!raw.ok) return NextResponse.json({ ok: false, error: 'คำขอใหญ่เกินไป' }, { status: 413 })
+
   let body: unknown
   try {
-    const bytes = await request.arrayBuffer()
-    if (bytes.byteLength > MAX_BODY_BYTES) {
-      return NextResponse.json({ ok: false, error: 'คำขอใหญ่เกินไป' }, { status: 413 })
-    }
-    body = JSON.parse(new TextDecoder().decode(bytes))
+    body = JSON.parse(raw.text)
   } catch {
     return NextResponse.json({ ok: false, error: 'รูปแบบคำขอไม่ถูกต้อง' }, { status: 400 })
   }

@@ -4,6 +4,7 @@ import { currentUser } from '@/lib/auth/session'
 import { getCourseStructure } from '@/lib/content/course-source'
 import { getLessonAnswerKey, sameAnswerSet } from '@/lib/content/answer-key'
 import { isTestOutAvailable, TEST_OUT_UNAVAILABLE_REASON } from '@/lib/course/assessment-policy'
+import { readBoundedBody } from '@/lib/http/bounded-body'
 import { loadAllProgress, loadProgress, recordNodeEvent } from '@/lib/course/progress-db'
 
 export const runtime = 'nodejs'
@@ -33,7 +34,16 @@ export const runtime = 'nodejs'
 // **learn** (บทปกติ) → บอกผลรายข้อ + คำอธิบายได้ เพราะเป็นการสอน ไม่ใช่ด่านพิสูจน์
 //   (น้ำหนักของใบรับรองอยู่ที่ capstone ทั้งหมด — W0-3)
 
-const answerMap = z.record(z.string().max(64), z.array(z.string().max(8)).max(12))
+/** ขนาด body สูงสุดที่ยอมอ่าน (byte จริง) — ดูเหตุผลใน lib/http/bounded-body.ts */
+const MAX_BODY_BYTES = 8 * 1024
+/** checkpoint ที่ยาวที่สุดวันนี้มี 5 ข้อ — เผื่อไว้พอสมควรแต่ไม่เปิดให้ส่งไม่จำกัด */
+const MAX_ANSWER_ENTRIES = 64
+
+const answerMap = z
+  .record(z.string().max(64), z.array(z.string().max(8)).max(12))
+  .refine((a) => Object.keys(a).length <= MAX_ANSWER_ENTRIES, {
+    message: `ส่งคำตอบได้ไม่เกิน ${MAX_ANSWER_ENTRIES} ข้อ`,
+  })
 
 const schema = z.discriminatedUnion('action', [
   z.object({
@@ -67,9 +77,12 @@ export async function POST(request: Request) {
   const user = await currentUser()
   if (!user) return NextResponse.json({ ok: false, error: 'ต้องเข้าสู่ระบบก่อน' }, { status: 401 })
 
+  const raw = await readBoundedBody(request, MAX_BODY_BYTES)
+  if (!raw.ok) return NextResponse.json({ ok: false, error: 'คำขอใหญ่เกินไป' }, { status: 413 })
+
   let body: unknown
   try {
-    body = await request.json()
+    body = JSON.parse(raw.text)
   } catch {
     return NextResponse.json({ ok: false, error: 'รูปแบบคำขอไม่ถูกต้อง' }, { status: 400 })
   }

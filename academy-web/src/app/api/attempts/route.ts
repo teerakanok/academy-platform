@@ -4,6 +4,7 @@ import { currentUser } from '@/lib/auth/session'
 import { getCourseStructure, getLesson } from '@/lib/content/course-source'
 import { CHECKPOINT_CHALLENGE_ID, buildAttemptParams, toPublicQuestions } from '@/lib/course/attempt'
 import { issueAttempt } from '@/lib/course/attempt-db'
+import { readBoundedBody } from '@/lib/http/bounded-body'
 
 export const runtime = 'nodejs'
 
@@ -26,13 +27,19 @@ const schema = z.object({
   nodeId: z.string().trim().min(1).max(120),
 })
 
+/** body ของ endpoint นี้เล็กมากอยู่แล้ว — เพดานจึงแคบกว่าที่อื่น */
+const MAX_BODY_BYTES = 2 * 1024
+
 export async function POST(request: Request) {
   const user = await currentUser()
   if (!user) return NextResponse.json({ ok: false, error: 'ต้องเข้าสู่ระบบก่อน' }, { status: 401 })
 
+  const raw = await readBoundedBody(request, MAX_BODY_BYTES)
+  if (!raw.ok) return NextResponse.json({ ok: false, error: 'คำขอใหญ่เกินไป' }, { status: 413 })
+
   let body: unknown
   try {
-    body = await request.json()
+    body = JSON.parse(raw.text)
   } catch {
     return NextResponse.json({ ok: false, error: 'รูปแบบคำขอไม่ถูกต้อง' }, { status: 400 })
   }
