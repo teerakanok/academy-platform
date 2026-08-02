@@ -44,7 +44,8 @@ export function CourseCover({
   className?: string
 }) {
   const layout = layoutRoadmap(structure, state)
-  const proven = new Set([...state.completed, ...state.testedOut])
+  // บทที่ทำจบแล้ว — คำว่า "proven" สงวนให้ด่านวัดผลตั้งแต่ W0-3
+  const finished = new Set([...state.completed, ...state.testedOut])
 
   // พลิกแกน: แผนที่จริงไหลบนลงล่าง ปกไหลซ้ายไปขวา
   const toCover = (x: number, y: number) => ({ cx: y, cy: x })
@@ -107,7 +108,7 @@ export function CourseCover({
 
         {layout.nodes.map((item) => {
           const { cx, cy } = toCover(item.x, item.y)
-          const isProven = proven.has(item.node.id)
+          const isFinished = finished.has(item.node.id)
           const isCapstone = item.node.kind === 'capstone'
           const r = nodeR * (isCapstone ? 1.32 : 1)
 
@@ -122,8 +123,8 @@ export function CourseCover({
                 height={r * 2}
                 rx={nodeR * 0.3}
                 transform={`rotate(45 ${cx} ${cy})`}
-                fill={isProven ? 'rgb(var(--cs-accent-fill))' : 'rgb(var(--cs-surface))'}
-                fillOpacity={isProven ? 0.95 : 0.75}
+                fill={isFinished ? 'rgb(var(--cs-accent-fill))' : 'rgb(var(--cs-surface))'}
+                fillOpacity={isFinished ? 0.95 : 0.75}
                 stroke="rgb(var(--cs-accent))"
                 strokeWidth={edgeW * 0.8}
                 strokeOpacity={0.7}
@@ -137,8 +138,8 @@ export function CourseCover({
               cx={cx}
               cy={cy}
               r={r}
-              fill={isProven ? 'rgb(var(--cs-accent-fill))' : 'rgb(var(--cs-surface))'}
-              fillOpacity={isProven ? 0.95 : 0.75}
+              fill={isFinished ? 'rgb(var(--cs-accent-fill))' : 'rgb(var(--cs-surface))'}
+              fillOpacity={isFinished ? 0.95 : 0.75}
               stroke="rgb(var(--cs-accent))"
               strokeWidth={edgeW * 0.7}
               strokeOpacity={0.55}

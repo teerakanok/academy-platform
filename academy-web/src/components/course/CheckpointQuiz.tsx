@@ -82,7 +82,7 @@ export function CheckpointQuiz({
       </div>
       <p className="mb-6 text-sm text-cs-muted">
         {requireAllCorrect
-          ? 'This one is required. Answer every question correctly to mark the checkpoint as proven — you can retry as many times as you like.'
+          ? 'This one is required. Answer every question correctly to pass it — you can retry as many times as you like.'
           : 'Getting one wrong is fine. The explanations are the point.'}
       </p>
 
@@ -188,7 +188,7 @@ export function CheckpointQuiz({
                 data-testid="checkpoint-continue"
                 className="rounded-control bg-cs-accent-fill px-6 py-3 text-sm font-semibold text-cs-on-accent shadow-card transition-transform duration-200 hover:-translate-y-0.5"
               >
-                {requireAllCorrect ? 'Mark as proven' : 'Mark lesson done'}
+                {requireAllCorrect ? 'Mark checkpoint passed' : 'Mark lesson done'}
               </button>
             ) : (
               <>

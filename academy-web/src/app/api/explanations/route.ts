@@ -47,12 +47,14 @@ export async function GET(request: Request) {
   }
 
   const record = await loadProgress(user.account.id, input.slug)
-  const proven = record.completed.includes(input.nodeId) || record.testedOut.includes(input.nodeId)
+  // บทนี้ผ่านแล้วหรือยัง — ใช้คำว่า finished ไม่ใช่ proven เพราะสิ่งที่ตัดสินคือ
+  // "เดินผ่านแล้ว" ส่วนคำว่าพิสูจน์แล้วสงวนให้ด่านวัดผล (W0-3)
+  const finished = record.completed.includes(input.nodeId) || record.testedOut.includes(input.nodeId)
   // เงื่อนไขนี้พึ่งข้อเท็จจริงสองข้อ ซึ่งถ้าข้อใดเปลี่ยนต้องกลับมาแก้ที่นี่ทันที:
   //   1. capstone ได้ `completed` ก็ต่อเมื่อถูกทุกข้อ (assessed) เท่านั้น
   //   2. `tested-out` เกิดได้เฉพาะบน node ที่นโยบายเปิด test-out ให้ ซึ่งวันนี้ปิดหมด
   //      (assessment-policy.ts) — ไม่งั้นเฉลยจากโหมด learn จะเปิดคลังเฉลยของโหมดวัดผล
-  if (!proven) {
+  if (!finished) {
     // ตอบเหมือนกันทุกกรณีที่ยังไม่ควรเปิดเผย — ไม่บอกว่า "ใกล้แล้ว" หรือ "อีกนิดเดียว"
     return NextResponse.json({ ok: false, error: 'บทนี้ยังไม่ผ่าน' }, { status: 403 })
   }

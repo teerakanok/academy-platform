@@ -289,7 +289,7 @@ export function LessonView({
           {structure.nodes.map((n) => {
             const status = nodeStatus(n, learnerState)
             const isCurrent = n.id === node.id
-            const isProven = status === 'completed' || status === 'tested-out'
+            const isFinished = status === 'completed' || status === 'tested-out'
             return (
               <li key={n.id}>
                 <Link
@@ -304,7 +304,7 @@ export function LessonView({
                     className={`block h-1.5 rounded-full transition-all ${
                       isCurrent
                         ? 'w-10 bg-cs-accent-fill'
-                        : isProven
+                        : isFinished
                           ? 'w-5 bg-cs-accent-fill/70 group-hover:w-7'
                           : status === 'skipped'
                             ? 'w-5 bg-cs-border-2/60 group-hover:w-7'
@@ -565,7 +565,7 @@ export function LessonView({
         <div className="card-feature hero-wash flex flex-wrap items-center gap-3 p-6 sm:p-7" data-testid="lesson-complete">
           <p className="text-sm text-cs-body">
             {done === 'skipped'
-              ? 'Marked as skipped. It stays on your map as unproven, and you can come back any time.'
+              ? 'Marked as skipped. It stays open on your map, and you can come back any time.'
               : done === 'tested-out'
                 ? 'Marked as proven. It shows on your map as tested out.'
                 : 'Lesson complete.'}

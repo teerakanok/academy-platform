@@ -65,13 +65,13 @@ function LessonProgress({
         >
           {structure.nodes.map((node) => {
             const status = nodeStatus(node, state)
-            const isProven = status === 'completed' || status === 'tested-out'
+            const isFinished = status === 'completed' || status === 'tested-out'
             const isSkipped = status === 'skipped'
             return (
               <li
                 key={node.id}
                 className={`h-2.5 w-2.5 rounded-full transition-colors ${
-                  isProven
+                  isFinished
                     ? 'bg-cs-accent-fill'
                     : isSkipped
                       ? 'border border-dashed border-cs-border-2 bg-transparent'

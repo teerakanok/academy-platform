@@ -118,4 +118,21 @@ test.describe('completed คือความคืบหน้า ไม่ใ
     await expect(page.getByTestId('certificate-assessed-count')).toContainText('1 / 1')
     await expect(card).toContainText('Earned')
   })
+
+  test('🔴 ผ่าน capstone แล้วแต่บทปกติยังค้าง → การ์ดต้องยังไม่ให้ใบ', async ({ page, request }) => {
+    // ⚠️ อีกด้านของเงื่อนไขสองชั้น · เทสก่อนหน้าเดินจาก "บทครบ+capstone ไม่ผ่าน"
+    // ไป "ครบทั้งคู่" จึงไม่จับ UI ที่ตัดเงื่อนไขบทปกติทิ้ง (RIL จับ mutation นี้ได้)
+    expect((await answer(request, CAPSTONE, CAPSTONE_ANSWERS)).passed).toBe(true)
+
+    await page.goto(`/courses/${COURSE}`)
+    const card = page.getByTestId('certificate-status')
+    await expect(card).toHaveAttribute('data-eligible', 'false')
+    // ด่านวัดผลผ่านครบแล้ว แต่ยังไม่ได้ใบ เพราะบทปกติยังไม่ครบ
+    await expect(page.getByTestId('certificate-assessed-count')).toContainText('1 / 1')
+    await expect(card).not.toContainText('Earned')
+    // และต้องบอกผู้เรียนตรงๆ ว่าเหลืออะไร — ทั้งจำนวนบทและลิงก์ไปบทที่ค้าง
+    await expect(page.getByTestId('certificate-progress-note')).toContainText('1 / 4')
+    await expect(card).toContainText('Finish the lessons and pass every required checkpoint')
+    await expect(page.getByTestId(`certificate-blocker-${LESSON}`)).toBeVisible()
+  })
 })

@@ -29,7 +29,7 @@ export default function CoursesPage() {
         </h1>
         <p className="mt-4 max-w-2xl text-lg leading-relaxed text-cs-body">
           Each course is a map you can take your own route through. Prove a lesson and move on. Skip one and it
-          stays marked as unproven until you come back for it.
+          stays open until you come back for it.
         </p>
       </header>
 
