@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Fraunces, Inter, JetBrains_Mono } from 'next/font/google'
 import { LocaleProvider } from '@/components/i18n/LocaleProvider'
 import { SiteChrome } from '@/components/i18n/SiteChrome'
+import { internalSurfacesEnabled } from '@/lib/internal-surface'
 import './globals.css'
 
 // Fraunces (soft serif) พูดแทน "คน/ความรู้" · Inter อ่านยาวสบาย · JetBrains Mono
@@ -61,7 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen flex flex-col">
         <LocaleProvider>
-          <SiteChrome>{children}</SiteChrome>
+          <SiteChrome showInternalSurfaces={internalSurfacesEnabled()}>{children}</SiteChrome>
         </LocaleProvider>
       </body>
     </html>

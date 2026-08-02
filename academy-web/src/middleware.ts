@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { internalSurfacesEnabled, isInternalSurface } from '@/lib/internal-surface'
 
 // ประตูเดียวของทั้งเว็บ — ตัดสินว่าเส้นทางไหนเปิด เส้นทางไหนต้องมีบัญชี
 //
@@ -42,6 +43,14 @@ function isPublic(pathname: string): boolean {
 }
 
 export async function middleware(request: NextRequest) {
+  // พื้นผิวภายในถูกปิดก่อนทุกอย่าง — ก่อนแม้แต่จะดูว่าใครล็อกอินอยู่
+  //
+  // ต้องอยู่ก่อนชั้น auth เพราะปัญหาที่แก้คือ "ผู้เรียนที่ล็อกอินแล้วก็เข้าไม่ได้"
+  // ไม่ใช่แค่ผู้ไม่ล็อกอิน · ตอบ 404 ไม่ใช่ 403 เพื่อไม่ประกาศว่ามีอะไรอยู่ตรงนี้
+  if (isInternalSurface(request.nextUrl.pathname) && !internalSurfacesEnabled()) {
+    return new NextResponse(null, { status: 404 })
+  }
+
   // ต่ออายุ session ทุก request — ถ้าไม่ทำ cookie จะหมดอายุกลางคันแล้วผู้เรียน
   // ถูกเด้งออกระหว่างทำ quiz ซึ่งเสียงานที่ยังไม่ได้บันทึก
   let response = NextResponse.next({ request })

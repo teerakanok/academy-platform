@@ -18,16 +18,27 @@ export interface LessonAnswerKey {
   simulations: SimulationChallenge[]
 }
 
+// เนื้อหาเป็นไฟล์นิ่งที่ผูกเข้ามาตอน build — เฉลยของบทเดิมจึงเหมือนเดิมตลอดอายุ
+// ของ process · เดิมทุกครั้งที่ผู้เรียนกดตรวจจะ parse + validate บทนั้นใหม่ทั้งก้อน
+// ซึ่งเป็น CPU ที่เสียเปล่าต่อคลิก (สำคัญบน Workers ที่คิดตาม CPU time)
+const cache = new Map<string, LessonAnswerKey>()
+
 /** เฉลยทั้งหมดของบทหนึ่ง — เรียกได้จาก route handler/server component เท่านั้น */
 export function getLessonAnswerKey(slug: string, nodeId: string, locale?: Locale): LessonAnswerKey | null {
+  const key = `${slug}::${nodeId}::${locale ?? 'default'}`
+  const cached = cache.get(key)
+  if (cached) return cached
+
   const resolved = getLesson(slug, nodeId, locale)
   if (!resolved) return null
   const { lesson } = resolved
-  return {
+  const answerKey: LessonAnswerKey = {
     checkpoint: lesson.checkpoint,
     videoCueQuestions: lesson.videoCueQuestions ?? [],
     simulations: lesson.blocks.flatMap((b) => (b.kind === 'simulation' ? [b.challenge] : [])),
   }
+  cache.set(key, answerKey)
+  return answerKey
 }
 
 /** เปรียบเทียบชุดคำตอบแบบไม่สนลำดับ — เกณฑ์ all-or-nothing เดียวกับ engine ข้อสอบ */

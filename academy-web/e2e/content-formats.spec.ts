@@ -120,8 +120,10 @@ test.describe('content formats', () => {
     const items = peek.getByTestId('self-check-item')
     const total = await items.count()
     for (let i = 0; i < total; i++) await items.nth(i).click()
-    await expect(page.getByTestId('peek-verdict')).toContainText('prove it and move on')
-    await expect(page.getByTestId('test-out')).toBeEnabled()
+    // "พิสูจน์แล้วข้าม" ถูกปิดทั้งคอร์สจนกว่าจะมีคลังข้อแยกสำหรับโหมดวัดผล
+    // (assessment-policy.ts) — ข้อความสรุปจึงต้องไม่ชี้ไปที่ปุ่มนั้น และปุ่มต้องไม่มี
+    await expect(page.getByTestId('peek-verdict')).toContainText('checkpoint at the end')
+    await expect(page.getByTestId('test-out')).toHaveCount(0)
     await expect(page.getByTestId('skip-lesson')).toBeEnabled()
 
     // กล่องสรุปท้ายบทต้องนับให้เห็น และ quiz ต้องเข้าถึงได้โดยไม่ต้องติ๊กครบก่อน

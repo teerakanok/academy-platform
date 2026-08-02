@@ -23,8 +23,11 @@ test.describe('ความสมบูรณ์ของหลักฐาน�
   })
 
   test('ส่งคำตอบผิดแล้วไม่ผ่าน และสถานะไม่ขยับ', async ({ request }) => {
+    // ⚠️ เดิมข้อนี้ยิงด้วย mode 'test-out' — ตอนนี้ test-out ถูกปิดทั้งหมดจนกว่าจะมี
+    // คลังข้อแยกสำหรับโหมดวัดผล (assessment-policy.ts) จึงยิงด้วยโหมด learn ที่ยัง
+    // ใช้อยู่จริง โดยตอบไม่ครบทุกข้อ ซึ่งต้องไม่ผ่านตามเกณฑ์ "ตอบครบ"
     const res = await request.post('/api/progress', {
-      data: { slug: COURSE, nodeId: NODE, action: 'checkpoint', mode: 'test-out', answers: { 'cp-1': ['A'], 'cp-2': ['B'] } },
+      data: { slug: COURSE, nodeId: NODE, action: 'checkpoint', mode: 'learn', answers: { 'cp-1': ['A'] } },
     })
     expect(res.ok()).toBeTruthy()
     const body = await res.json()
@@ -33,6 +36,16 @@ test.describe('ความสมบูรณ์ของหลักฐาน�
     const after = await (await request.get(`/api/progress?slug=${COURSE}`)).json()
     expect(after.record.testedOut).not.toContain(NODE)
     expect(after.record.completed).not.toContain(NODE)
+  })
+
+  test('ยิง test-out ตรงๆ ถูกปฏิเสธ — โหมดสอนต้องไม่เป็นทางลัดสู่ "พิสูจน์แล้ว"', async ({ request }) => {
+    const res = await request.post('/api/progress', {
+      data: { slug: COURSE, nodeId: NODE, action: 'checkpoint', mode: 'test-out', answers: { 'cp-1': ['B'], 'cp-2': ['A'] } },
+    })
+    expect(res.status()).toBe(400)
+
+    const after = await (await request.get(`/api/progress?slug=${COURSE}`)).json()
+    expect(after.record.testedOut).not.toContain(NODE)
   })
 
   test('node ที่ไม่มีอยู่จริงถูกปฏิเสธ ไม่สร้างแถวขยะ', async ({ request }) => {

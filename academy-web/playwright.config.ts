@@ -40,5 +40,11 @@ export default defineConfig({
     url: 'http://127.0.0.1:3000',
     reuseExistingServer: false,
     timeout: 60_000,
+    env: {
+      // ค่าตั้งต้นของ e2e = เหมือน production คือ **พื้นผิวภายในปิด** (`/player`)
+      // อยากทดสอบพื้นผิวภายในให้รัน `INTERNAL_SURFACES=on npm run test:e2e`
+      // ซึ่งจะเปิดทั้งเซิร์ฟเวอร์และปลดล็อก spec ที่ข้ามอยู่
+      INTERNAL_SURFACES: process.env.INTERNAL_SURFACES ?? '',
+    },
   },
 })

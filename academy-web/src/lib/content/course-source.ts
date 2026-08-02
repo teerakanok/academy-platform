@@ -1,3 +1,4 @@
+import 'server-only'
 import { loadCourseCopy, loadCourseStructure, loadLesson } from './course-loader'
 import { COURSE_REGISTRY } from './registry.generated'
 import type { Course, CourseStructure, LessonContent, Locale } from './course-types'
@@ -14,6 +15,11 @@ import type { Course, CourseStructure, LessonContent, Locale } from './course-ty
 //
 // หมายเหตุที่มา: คอร์สนี้เขียนขึ้นใน repo นี้เพื่อพิสูจน์ประสบการณ์การเรียน —
 // ที่ authoring จริงของเนื้อหาคือ Crucible ซึ่งต้องผลิต shape เดียวกันนี้ส่งมา
+//
+// ⚠️ `import 'server-only'` (W0-1): `getLesson()` คืน `LessonContent` เต็มซึ่งมีเฉลย
+// และ registry ที่โมดูลนี้ผูกไว้ก็มีเนื้อหาทั้งคอร์สพร้อมเฉลย — client component ที่
+// เผลอ import เข้าไปครั้งเดียวจะลากทั้งก้อนเข้า bundle · RIL cross-model ชี้ว่าการ
+// ประกาศให้ `answer-key.ts` เป็น "ทางเข้าเดียว" ไม่จริงจนกว่าโมดูลนี้จะถูกกันด้วย
 
 type LocaleBucket = { __copy: unknown } & Record<string, unknown>
 type CourseBucket = { __structure: unknown } & Record<string, LocaleBucket>

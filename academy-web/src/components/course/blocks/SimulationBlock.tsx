@@ -47,22 +47,22 @@ export function SimulationBlock({
   const [attempts, setAttempts] = useState(0)
   const [checking, setChecking] = useState(false)
   const [failed, setFailed] = useState(false)
-  const [showHints, setShowHints] = useState(false)
+  // คำใบ้ที่ขอมาแล้วจะแสดงทันที — สถานะนี้มีไว้ให้พับเก็บได้เท่านั้น
+  const [hintsHidden, setHintsHidden] = useState(false)
 
   const Surface = SURFACES[challenge.surface]
   const locked = mode === 'assessed' && verdict !== null
 
-  async function check() {
+  async function check(wantHint = false) {
     if (checking) return
-    const attempt = attempts + 1
-    setAttempts(attempt)
+    setAttempts((n) => n + 1)
     setChecking(true)
     setFailed(false)
     try {
       const res = await fetch('/api/practice/simulation', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ slug, nodeId, challengeId: challenge.id, state, attempt }),
+        body: JSON.stringify({ slug, nodeId, challengeId: challenge.id, state, wantHint }),
       })
       const body = (await res.json().catch(() => ({}))) as { ok?: boolean } & PracticeVerdict
       if (!res.ok || !body.ok) {
@@ -80,7 +80,7 @@ export function SimulationBlock({
   function reset() {
     setState({ ...challenge.initial })
     setVerdict(null)
-    setShowHints(false)
+    setHintsHidden(false)
   }
 
   return (
@@ -105,7 +105,7 @@ export function SimulationBlock({
       <div className="mt-5 flex flex-wrap items-center gap-3">
         <button
           type="button"
-          onClick={check}
+          onClick={() => check()}
           disabled={locked || checking}
           data-testid="simulation-check"
           className="rounded-control bg-cs-accent-fill px-5 py-2.5 text-sm font-semibold text-cs-on-accent transition-transform duration-200 hover:-translate-y-0.5 disabled:opacity-60 disabled:hover:translate-y-0"
@@ -122,16 +122,18 @@ export function SimulationBlock({
             Start over
           </button>
         )}
-        {/* ปุ่มคำใบ้โผล่ก็ต่อเมื่อ **เซิร์ฟเวอร์ส่งคำใบ้มาแล้ว** — เดิมหน้านี้ถือคำใบ้
-            ไว้เองแล้วนับครั้งเอง ซึ่งเปิด devtools ก็อ่านได้ตั้งแต่วินาทีแรก */}
-        {mode === 'practice' && verdict?.hints && verdict.hints.length > 0 && (
+        {/* คำใบ้ต้องขอจากเซิร์ฟเวอร์ — เดิมหน้านี้ถือคำใบ้ไว้เองแล้วนับครั้งเอง
+            ซึ่งเปิด devtools ก็อ่านได้ตั้งแต่วินาทีแรก · เสนอปุ่มหลังลองเองสองครั้ง
+            (จังหวะของ UI) แต่ตัวคำใบ้มาจากเซิร์ฟเวอร์เสมอ */}
+        {mode === 'practice' && attempts >= 2 && verdict && !verdict.passed && (
           <button
             type="button"
-            onClick={() => setShowHints((v) => !v)}
+            onClick={() => (verdict.hints ? setHintsHidden((v) => !v) : check(true))}
+            disabled={checking}
             data-testid="simulation-hint-toggle"
             className="text-sm text-cs-accent underline underline-offset-4 hover:text-cs-text"
           >
-            {showHints ? 'Hide the nudge' : 'Give me a nudge'}
+            {verdict.hints && !hintsHidden ? 'Hide the nudge' : 'Give me a nudge'}
           </button>
         )}
         {failed && (
@@ -141,7 +143,7 @@ export function SimulationBlock({
         )}
       </div>
 
-      {showHints && verdict?.hints && (
+      {verdict?.hints && !hintsHidden && (
         <ul className="mt-4 space-y-1.5 border-l-2 border-cs-accent pl-4" data-testid="simulation-hints">
           {verdict.hints.map((h, i) => (
             <li key={i} className="text-sm leading-relaxed text-cs-body">

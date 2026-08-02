@@ -23,6 +23,7 @@ import {
   type ProgressSyncFailure,
   type VideoCueOutcome,
 } from '@/lib/course/progress-client'
+import { isTestOutAvailable } from '@/lib/course/assessment-policy'
 import { canSkip, nextNode, nodeStatus } from '@/lib/course/roadmap'
 import { CheckpointQuiz } from './CheckpointQuiz'
 import { InteractiveVideo } from './InteractiveVideo'
@@ -344,14 +345,18 @@ export function LessonView({
               </button>
             </div>
             <span className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => setMode('test-out')}
-                data-testid="test-out"
-                className="rounded-control border-2 border-cs-accent bg-cs-surface px-4 py-2 text-sm font-medium text-cs-accent transition-colors hover:bg-cs-accent-dim"
-              >
-                Prove it and move on
-              </button>
+              {/* ปุ่มนี้ผูกกับนโยบายเดียวกับที่ API บังคับ — เดิมผูกกับ canSkip()
+                  อย่างเดียว จึงขึ้นบนบทที่เซิร์ฟเวอร์ปฏิเสธ test-out อยู่ดี */}
+              {isTestOutAvailable(node) && (
+                <button
+                  type="button"
+                  onClick={() => setMode('test-out')}
+                  data-testid="test-out"
+                  className="rounded-control border-2 border-cs-accent bg-cs-surface px-4 py-2 text-sm font-medium text-cs-accent transition-colors hover:bg-cs-accent-dim"
+                >
+                  Prove it and move on
+                </button>
+              )}
               <button
                 type="button"
                 onClick={skipLesson}
@@ -379,11 +384,20 @@ export function LessonView({
               {known.size > 0 && (
                 <p className="mt-3 text-sm text-cs-body" data-testid="peek-verdict">
                   {known.size === lesson.cheatsheet.length ? (
-                    <>
-                      You marked all {lesson.cheatsheet.length}. Then the checkpoint should be quick —{' '}
-                      <span className="font-medium text-cs-text">prove it and move on</span> keeps it on your map as
-                      proven, which skipping does not.
-                    </>
+                    // ข้อความต้องไม่ชี้ไปที่ปุ่มที่ไม่มีอยู่จริง — เมื่อ "พิสูจน์แล้วข้าม"
+                    // ถูกปิด (assessment-policy) การบอกให้ไปกดมันคือการส่งผู้เรียนไปชนกำแพง
+                    isTestOutAvailable(node) ? (
+                      <>
+                        You marked all {lesson.cheatsheet.length}. Then the checkpoint should be quick —{' '}
+                        <span className="font-medium text-cs-text">prove it and move on</span> keeps it on your map as
+                        proven, which skipping does not.
+                      </>
+                    ) : (
+                      <>
+                        You marked all {lesson.cheatsheet.length}. Then the checkpoint at the end should be quick —
+                        and passing it is what keeps this lesson on your map as proven, which skipping does not.
+                      </>
+                    )
                   ) : (
                     <>
                       <span className="font-medium text-cs-text">

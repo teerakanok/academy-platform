@@ -14,7 +14,15 @@ import { useUi } from './LocaleProvider'
 // ลิงก์ privacy บน footer ซึ่งเขียนไทยคาไว้บนหน้าอังกฤษ คนต่างชาติที่เปิดมาเจอ
 // ก็ไม่รู้ว่าลิงก์นั้นคืออะไร
 
-export function SiteChrome({ children }: { children: React.ReactNode }) {
+export function SiteChrome({
+  children,
+  showInternalSurfaces = false,
+}: {
+  children: React.ReactNode
+  /** เมนูของพื้นผิวภายใน — ค่าตั้งต้นคือซ่อน · ตัดสินฝั่งเซิร์ฟเวอร์แล้วส่งลงมา
+   *  (ซ่อนเมนูไม่ใช่การควบคุมสิทธิ์ — ตัวกันจริงอยู่ที่ middleware) */
+  showInternalSurfaces?: boolean
+}) {
   const { t } = useUi()
 
   return (
@@ -51,12 +59,14 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
             >
               {t.nav.myLearning}
             </Link>
-            <Link
-              href="/player"
-              className="whitespace-nowrap rounded-lg px-2 py-2 text-cs-muted transition-colors hover:bg-cs-surface-2 hover:text-cs-text sm:px-3 sm:py-1.5"
-            >
-              {t.nav.practice}
-            </Link>
+            {showInternalSurfaces && (
+              <Link
+                href="/player"
+                className="whitespace-nowrap rounded-lg px-2 py-2 text-cs-muted transition-colors hover:bg-cs-surface-2 hover:text-cs-text sm:px-3 sm:py-1.5"
+              >
+                {t.nav.practice}
+              </Link>
+            )}
           </nav>
 
           {/* ตัวสลับภาษาซ่อนบนจอเล็กสุด — ที่ 390px มีของครบเกินจะใส่ทั้งหมด

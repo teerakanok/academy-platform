@@ -5,6 +5,13 @@ import { join } from 'node:path'
 // @full-acceptance — ทำ full-length-02 จบจริงผ่าน UI ทั้งชุด (แผน §4-M2-8)
 // ตอบถูกทุกหน่วยยกเว้น MCQ 1 ข้อ (เจตนา) → คะแนน deterministic 105/106 = 99.1%
 // PBQ ทุก kind (checks/select/order) ถูก grade จริง — ห้ามมี banner ในเส้นทางนี้
+//
+// ⚠️ เส้นทางนี้อยู่บน `/player` ซึ่งเป็นพื้นผิว **ภายใน** ที่ปิดโดยค่าตั้งต้นตั้งแต่
+// W0-1 (internal-surface.ts) — รันด้วย `INTERNAL_SURFACES=on npm run test:e2e`
+test.skip(
+  process.env.INTERNAL_SURFACES?.trim() !== 'on',
+  'พื้นผิวภายในปิดอยู่ — รันด้วย INTERNAL_SURFACES=on เพื่อทดสอบ /player',
+)
 
 interface FixtureMcq {
   id: string

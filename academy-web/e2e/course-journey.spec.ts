@@ -59,15 +59,19 @@ test.describe('learner journey through a course', () => {
     await expect(page.getByTestId('lesson-status')).toContainText('Done')
     await expect(page.getByTestId('cheatsheet')).toBeVisible()
 
-    // 2) บทที่สอง: พิสูจน์ว่ารู้แล้ว (test out) → ต้องได้สถานะ Proven
+    // 2) บทที่สอง: ทำ checkpoint ตามปกติ
+    //
+    // ⚠️ เดิมขั้นนี้ใช้ "พิสูจน์แล้วข้าม" (test-out) — ตอนนี้ปิดทั้งหมดจนกว่าจะมีคลังข้อ
+    // แยกสำหรับโหมดวัดผล (assessment-policy.ts) เพราะโหมด learn ใช้ checkpoint ชุด
+    // เดียวกันและคืนคำอธิบาย จึงเป็นเครื่องเฉลยให้ test-out ได้ตรงๆ
     await page.goto(`${COURSE}/lessons/linux-and-distros`)
-    await page.getByTestId('test-out').click()
+    await expect(page.getByTestId('test-out')).toHaveCount(0)
     await page.getByTestId('checkpoint-q-cp-1').locator('input[value="B"]').check()
     await page.getByTestId('checkpoint-q-cp-2').locator('input[value="C"]').check()
     await page.getByTestId('checkpoint-q-cp-3').locator('input[value="A"]').check()
     await page.getByTestId('checkpoint-submit').click()
     await page.getByTestId('checkpoint-continue').click()
-    await expect(page.getByTestId('lesson-status')).toContainText('Proven')
+    await expect(page.getByTestId('lesson-status')).toContainText('Done')
 
     // 3) บทที่สาม: ข้ามพร้อมรับสรุป
     await page.goto(`${COURSE}/lessons/get-a-linux`)
@@ -78,7 +82,7 @@ test.describe('learner journey through a course', () => {
     // 4) แผนที่ต้องสะท้อนทั้งสามสถานะ และปลดล็อกบทถัดไป
     await page.goto(COURSE)
     await expect(page.getByTestId('node-os-what-it-does')).toHaveAttribute('data-status', 'completed')
-    await expect(page.getByTestId('node-linux-and-distros')).toHaveAttribute('data-status', 'tested-out')
+    await expect(page.getByTestId('node-linux-and-distros')).toHaveAttribute('data-status', 'completed')
     await expect(page.getByTestId('node-get-a-linux')).toHaveAttribute('data-status', 'skipped')
     await expect(page.getByTestId('node-filesystem-tree')).toHaveAttribute('data-status', 'available')
     // บทที่ยังไม่ถึงต้องยังล็อกอยู่
@@ -128,6 +132,7 @@ test.describe('learner journey through a course', () => {
 
     await page.goto(`${COURSE}/lessons/permissions`)
     // ด่านบังคับ: ไม่มีปุ่มข้าม และไม่มีทางลัด
+    // (capstone ไม่เคยมีปุ่มข้ามอยู่แล้ว · test-out ปิดทั้งคอร์สตาม assessment-policy)
     await expect(page.getByTestId('skip-lesson')).toHaveCount(0)
     await expect(page.getByTestId('test-out')).toHaveCount(0)
     await expect(page.getByTestId('checkpoint')).toContainText('Required checkpoint')

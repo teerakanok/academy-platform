@@ -65,11 +65,30 @@ test.describe('โหมด assessed — response บอกได้แค่ผ
     expect([...shapes]).toEqual(['{"ok":true,"passed":false}'])
   })
 
-  test('test-out บนบทปกติก็เป็น assessed เหมือนกัน', async ({ request }) => {
-    // ตอบผิดโดยตั้งใจ — ไม่ให้บทนี้ขยับสถานะไปรบกวน spec อื่น
-    const body = await submitCheckpoint(request, LESSON, 'test-out', { 'cp-1': ['A'] })
+  test('ตอบถูกครบ: response ก็ยังมีเฉพาะ ok กับ passed ไม่มีเฉลยแนบมา', async ({ request }) => {
+    // ⚠️ ตรวจกรณี "ผ่าน" ด้วย ไม่ใช่แค่ "ไม่ผ่าน" — ถ้าวันหนึ่งมีคนแนบเฉลยเฉพาะตอน
+    // ผ่าน เทสที่ดูแต่กรณีไม่ผ่านจะเขียวทั้งที่รูเปิด (RIL cross-model จับ)
+    const body = await submitCheckpoint(request, CAPSTONE, 'learn', {
+      'cp-1': ['B'],
+      'cp-2': ['C'],
+      'cp-3': ['B'],
+    })
+    expect(body.passed).toBe(true)
     expect(Object.keys(body).sort()).toEqual(['ok', 'passed'])
-    expect(body.passed).toBe(false)
+  })
+
+  test('test-out ถูกปิดทั้งหมด — โหมดสอนต้องไม่กลายเป็นเครื่องเฉลยของโหมดวัดผล', async ({ request }) => {
+    // บทปกติใช้ checkpoint ชุดเดียวกันทั้ง learn และ test-out · learn คืนคำอธิบาย
+    // ตามหน้าที่ของการสอน ถ้า test-out ยังทำงานอยู่ ใครก็เก็บเฉลยจาก learn แล้วไปยิง
+    // test-out ให้ได้ `tested-out` ซึ่งนับเป็นพิสูจน์แล้ว
+    const res = await request.post('/api/progress', {
+      data: { slug: COURSE, nodeId: LESSON, action: 'checkpoint', mode: 'test-out', answers: { 'cp-1': ['B'] } },
+    })
+    expect(res.status()).toBe(400)
+
+    // และต้องไม่มีบทไหนกลายเป็น tested-out ได้เลย
+    const after = await (await request.get(`/api/progress?slug=${COURSE}`)).json()
+    expect(after.record.testedOut).toEqual([])
   })
 })
 
@@ -86,7 +105,8 @@ test.describe('โหมด learn — สอนได้ จึงบอกผ�
 
 test.describe('endpoint เฉลย — เปิดได้เฉพาะบทที่ผ่านแล้วจริง', () => {
   test('ยังไม่ผ่าน → ถูกปฏิเสธ (ไม่งั้นคือย้าย oracle ไปที่ใหม่แล้วไม่มีใครเฝ้า)', async ({ request }) => {
-    const res = await request.get(`/api/explanations?slug=${COURSE}&nodeId=${CAPSTONE}`)
+    // ใช้บทที่ยังไม่มีใครทำในไฟล์นี้ — capstone ถูก describe ก่อนหน้าทำให้ผ่านไปแล้ว
+    const res = await request.get(`/api/explanations?slug=${COURSE}&nodeId=${SIM_LESSON}`)
     expect(res.status()).toBe(403)
     expect(await res.text()).not.toContain('"correct"')
   })
@@ -118,16 +138,19 @@ test.describe('endpoint เฉลย — เปิดได้เฉพาะบ
 })
 
 test.describe('โจทย์จำลองโหมดฝึก — เซิร์ฟเวอร์เป็นคนตรวจและเป็นคนให้คำใบ้', () => {
-  test('ยังไม่ผ่าน + ลองครั้งแรก → บอกข้อที่ยังไม่ผ่าน แต่ยังไม่ให้คำใบ้', async ({ request }) => {
-    const res = await request.post('/api/practice/simulation', {
-      data: {
-        slug: COURSE,
-        nodeId: SIM_LESSON,
-        challengeId: 'static-print-server',
-        state: { addressMode: 'dhcp', ipv4: '', applied: false },
-        attempt: 1,
-      },
+  const WRONG_STATE = { addressMode: 'dhcp', ipv4: '', applied: false }
+
+  function practice(
+    request: import('@playwright/test').APIRequestContext,
+    data: Record<string, unknown>,
+  ) {
+    return request.post('/api/practice/simulation', {
+      data: { slug: COURSE, nodeId: SIM_LESSON, challengeId: 'static-print-server', ...data },
     })
+  }
+
+  test('ยังไม่ผ่าน + ไม่ได้ขอคำใบ้ → บอกข้อที่ยังไม่ผ่าน แต่ไม่มีคำใบ้ติดมา', async ({ request }) => {
+    const res = await practice(request, { state: WRONG_STATE })
     expect(res.ok()).toBeTruthy()
     const body = await res.json()
     expect(body.passed).toBe(false)
@@ -137,19 +160,41 @@ test.describe('โจทย์จำลองโหมดฝึก — เซิ
     expect(body.hints).toBeUndefined()
   })
 
-  test('ลองครบสองครั้งแล้วยังไม่ผ่าน → คำใบ้มาจากเซิร์ฟเวอร์', async ({ request }) => {
-    const res = await request.post('/api/practice/simulation', {
-      data: {
-        slug: COURSE,
-        nodeId: SIM_LESSON,
-        challengeId: 'static-print-server',
-        state: { addressMode: 'dhcp', ipv4: '', applied: false },
-        attempt: 2,
-      },
-    })
+  test('ขอคำใบ้ → คำใบ้มาจากเซิร์ฟเวอร์ ไม่ใช่จาก payload ของหน้า', async ({ request }) => {
+    const res = await practice(request, { state: WRONG_STATE, wantHint: true })
     const body = await res.json()
     expect(Array.isArray(body.hints)).toBe(true)
     expect(body.hints.length).toBeGreaterThan(0)
+  })
+
+  test('ทำถูกแล้วขอคำใบ้ → ไม่ให้ (ไม่มีอะไรให้ใบ้แล้ว)', async ({ request }) => {
+    const res = await practice(request, {
+      state: { addressMode: 'static', ipv4: '192.168.10.50', subnet: '255.255.255.0', gateway: '192.168.10.1', dns1: '192.168.10.1', applied: true },
+      wantHint: true,
+    })
+    const body = await res.json()
+    expect(body.passed).toBe(true)
+    expect(body.hints).toBeUndefined()
+  })
+
+  test('state ที่มีคีย์เกินขอบเขต → ถูกปฏิเสธ ไม่ใช่ปล่อยให้ทำงานฟรี', async ({ request }) => {
+    const bloated: Record<string, string> = {}
+    for (let i = 0; i < 200; i++) bloated[`f${i}`] = 'x'
+    const res = await practice(request, { state: bloated })
+    expect(res.status()).toBe(400)
+  })
+
+  test('body ใหญ่เกินขอบเขต → 413 ก่อนถึงขั้น parse ทั้งก้อน', async ({ request }) => {
+    const res = await request.post('/api/practice/simulation', {
+      headers: { 'content-type': 'application/json' },
+      data: JSON.stringify({
+        slug: COURSE,
+        nodeId: SIM_LESSON,
+        challengeId: 'static-print-server',
+        state: { addressMode: 'x'.repeat(20_000) },
+      }),
+    })
+    expect(res.status()).toBe(413)
   })
 
   test('ไม่ล็อกอิน = ตรวจไม่ได้', async ({ playwright, baseURL }) => {
@@ -158,7 +203,7 @@ test.describe('โจทย์จำลองโหมดฝึก — เซิ
       storageState: { cookies: [], origins: [] },
     })
     const res = await anon.post('/api/practice/simulation', {
-      data: { slug: COURSE, nodeId: SIM_LESSON, challengeId: 'static-print-server', state: {}, attempt: 1 },
+      data: { slug: COURSE, nodeId: SIM_LESSON, challengeId: 'static-print-server', state: {} },
     })
     expect(res.status()).toBe(401)
     await anon.dispose()

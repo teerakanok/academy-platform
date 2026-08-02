@@ -106,7 +106,14 @@ export interface DashboardCourse {
   nodeTitles: Record<string, string>
 }
 
-export function CourseDashboard({ courses }: { courses: DashboardCourse[] }) {
+export function CourseDashboard({
+  courses,
+  showInternalSurfaces = false,
+}: {
+  courses: DashboardCourse[]
+  /** คลังข้อสอบภายใน (`/player`) — ค่าตั้งต้นคือซ่อน · ตัวกันจริงอยู่ที่ middleware */
+  showInternalSurfaces?: boolean
+}) {
   const [progress, setProgress] = useState<Record<string, CourseProgressRecord>>({})
   const [corrupt, setCorrupt] = useState(false)
   const [loaded, setLoaded] = useState(false)
@@ -264,18 +271,20 @@ export function CourseDashboard({ courses }: { courses: DashboardCourse[] }) {
         />
       </section>
 
-      <section className="surface-sunken rounded-feature border border-cs-border p-6">
-        <h2 className="font-display text-lg font-semibold text-cs-text">Practice banks</h2>
-        <p className="mt-1.5 text-sm text-cs-body">
-          Timed practice tests and question banks, separate from the courses.
-        </p>
-        <Link
-          href="/player"
-          className="mt-4 inline-flex rounded-control border border-cs-border bg-cs-surface px-5 py-2.5 text-sm transition-colors hover:border-cs-accent hover:text-cs-accent"
-        >
-          Open practice
-        </Link>
-      </section>
+      {showInternalSurfaces && (
+        <section className="surface-sunken rounded-feature border border-cs-border p-6">
+          <h2 className="font-display text-lg font-semibold text-cs-text">Practice banks</h2>
+          <p className="mt-1.5 text-sm text-cs-body">
+            Timed practice tests and question banks, separate from the courses.
+          </p>
+          <Link
+            href="/player"
+            className="mt-4 inline-flex rounded-control border border-cs-border bg-cs-surface px-5 py-2.5 text-sm transition-colors hover:border-cs-accent hover:text-cs-accent"
+          >
+            Open practice
+          </Link>
+        </section>
+      )}
     </div>
   )
 }

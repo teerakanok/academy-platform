@@ -16,29 +16,44 @@ export const runtime = 'nodejs'
 //
 // สิ่งที่ response บอกได้ ขึ้นกับว่าโจทย์นี้เป็นด่านของอะไร:
 //   · อยู่ใน capstone → `{ passed }` เท่านั้น เหมือนโหมดวัดผลทุกประการ
-//   · อยู่ในบทปกติ → บอกได้ว่า requirement ข้อไหนยังไม่ผ่าน + คำใบ้หลังลอง 2 ครั้ง
+//   · อยู่ในบทปกติ → บอกได้ว่า requirement ข้อไหนยังไม่ผ่าน + คำใบ้เมื่อผู้เรียนกดขอ
 //     (บอก "อะไรยังไม่ครบ" ไม่ใช่ "ค่าที่ถูกคืออะไร" — ผู้เรียนยังต้องคิดเอง)
+
+/** หน้าจอจำลองที่ใหญ่ที่สุดวันนี้มี 6 ช่อง — เผื่อไว้พอสมควรแต่ไม่เปิดให้ส่งไม่จำกัด */
+const MAX_STATE_FIELDS = 32
 
 const schema = z.object({
   slug: z.string().trim().min(1).max(120),
   nodeId: z.string().trim().min(1).max(120),
   challengeId: z.string().trim().min(1).max(120),
   /** สถานะสุดท้ายของหน้าจอที่ผู้เรียนตั้งไว้ */
-  state: z.record(z.string().max(64), z.union([z.string().max(200), z.boolean()])),
-  /** ครั้งที่เท่าไรของการกดตรวจ — ใช้ตัดสินว่าถึงเวลาให้คำใบ้หรือยัง */
-  attempt: z.number().int().min(1).max(1000),
+  state: z
+    .record(z.string().max(64), z.union([z.string().max(200), z.boolean()]))
+    // จำกัดจำนวน key ด้วย ไม่ใช่แค่ความยาวต่อค่า — ไม่งั้นบัญชีฟรีส่ง object ที่มี
+    // คีย์นับหมื่นมาให้ Zod เดินทุกตัวได้ (RIL cross-model ชี้)
+    .refine((s) => Object.keys(s).length <= MAX_STATE_FIELDS, {
+      message: `state มีได้ไม่เกิน ${MAX_STATE_FIELDS} ช่อง`,
+    }),
+  /** ขอคำใบ้มาด้วยไหม — ผู้เรียนกดขอเอง */
+  wantHint: z.boolean().optional(),
 })
 
-/** ให้คำใบ้เมื่อผู้เรียนลองเองมาแล้วอย่างน้อยเท่านี้ครั้ง — เร็วกว่านี้คือชิงคิดแทน */
-const HINT_AFTER_ATTEMPTS = 2
+/** ขนาด body สูงสุดที่ยอมอ่าน — กันการยัด JSON ก้อนใหญ่ให้ parser ทำงานฟรี */
+const MAX_BODY_BYTES = 8 * 1024
 
 export async function POST(request: Request) {
   const user = await currentUser()
   if (!user) return NextResponse.json({ ok: false, error: 'ต้องเข้าสู่ระบบก่อน' }, { status: 401 })
 
+  // อ่านเป็นข้อความก่อนแล้ววัดขนาด — `request.json()` ตรงๆ จะ parse ให้เสร็จก่อน
+  // ไม่ว่าจะใหญ่แค่ไหน แปลว่างาน parse เกิดไปแล้วก่อนเราจะได้ปฏิเสธ
   let body: unknown
   try {
-    body = await request.json()
+    const raw = await request.text()
+    if (raw.length > MAX_BODY_BYTES) {
+      return NextResponse.json({ ok: false, error: 'คำขอใหญ่เกินไป' }, { status: 413 })
+    }
+    body = JSON.parse(raw)
   } catch {
     return NextResponse.json({ ok: false, error: 'รูปแบบคำขอไม่ถูกต้อง' }, { status: 400 })
   }
@@ -67,10 +82,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, passed: verdict.passed })
   }
 
-  const hints =
-    !verdict.passed && input.attempt >= HINT_AFTER_ATTEMPTS && challenge.hints?.length
-      ? challenge.hints
-      : undefined
+  // คำใบ้ให้เมื่อผู้เรียน "กดขอ" เท่านั้น
+  //
+  // เดิมใช้จำนวนครั้งที่ client ส่งมาเป็นเงื่อนไข ซึ่งปลอมได้ (ส่ง attempt:2 ตั้งแต่
+  // ครั้งแรกก็ได้คำใบ้) — การอ้างว่า "เซิร์ฟเวอร์พิสูจน์แล้วว่าลองมา 2 ครั้ง" จึงไม่จริง
+  // และเราไม่มีที่เก็บจำนวนครั้งของโหมดฝึก (ตั้งใจไม่บันทึกสถานะ) · ทางที่ตรงไปตรงมา
+  // กว่าคือให้มันเป็นการขอที่ผู้เรียนตัดสินใจเอง แล้ว UI เป็นคนเสนอตอนเหมาะสม
+  const hints = !verdict.passed && input.wantHint && challenge.hints?.length ? challenge.hints : undefined
 
   return NextResponse.json({
     ok: true,

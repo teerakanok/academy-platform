@@ -2,6 +2,15 @@ import { test, expect, type Page } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 
 // M2 fast suite — hub/module nav/practice/resume/a11y (แผน §4-M2-5/-6/-8)
+//
+// ⚠️ `/player` เป็นพื้นผิว **ภายใน** ที่ปิดโดยค่าตั้งต้น (W0-1 · internal-surface.ts)
+// เทสชุดนี้จึงทำงานเฉพาะเมื่อเปิด flag: `INTERNAL_SURFACES=on npm run test:e2e`
+// — ไม่ลบทิ้งเพราะ fixture ยังใช้งานภายในจริง แต่จะไม่บังคับให้เซิร์ฟเวอร์เปิด
+// พื้นผิวนี้ทุกครั้งที่รัน acceptance ซึ่งจะขัดกับนโยบาย fail-closed ที่เพิ่งตั้ง
+test.skip(
+  process.env.INTERNAL_SURFACES?.trim() !== 'on',
+  'พื้นผิวภายในปิดอยู่ — รันด้วย INTERNAL_SURFACES=on เพื่อทดสอบ /player',
+)
 
 const MODULE_SLUG = 'module-1-governance-risk-compliance'
 

@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { currentUser } from '@/lib/auth/session'
 import { getCourseStructure } from '@/lib/content/course-source'
 import { getLessonAnswerKey, sameAnswerSet } from '@/lib/content/answer-key'
+import { isTestOutAvailable, TEST_OUT_UNAVAILABLE_REASON } from '@/lib/course/assessment-policy'
 import { loadAllProgress, loadProgress, recordNodeEvent } from '@/lib/course/progress-db'
 
 export const runtime = 'nodejs'
@@ -99,6 +100,13 @@ export async function POST(request: Request) {
       }
       await recordNodeEvent(user.account.id, { slug: input.slug, nodeId: input.nodeId, status: 'skipped' })
       return NextResponse.json({ ok: true })
+    }
+
+    // ⚠️ test-out ต้องถูกปิดก่อนแตะเฉลยใดๆ — บทปกติใช้ checkpoint ชุดเดียวกับโหมด
+    // learn ซึ่งตอบกลับผลรายข้อ + คำอธิบาย ถ้าปล่อยให้ test-out ทำงานบน node ที่
+    // ไม่มีคลังข้อของตัวเอง โหมดสอนจะกลายเป็นเครื่องเฉลยของโหมดวัดผลทันที
+    if (input.action === 'checkpoint' && input.mode === 'test-out' && !isTestOutAvailable(node)) {
+      return NextResponse.json({ ok: false, error: TEST_OUT_UNAVAILABLE_REASON }, { status: 400 })
     }
 
     const answerKey = getLessonAnswerKey(input.slug, input.nodeId)

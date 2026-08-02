@@ -10,6 +10,14 @@ import { join } from 'node:path'
 // ผลเขียวไม่ใช่คำรับรองว่าไม่มี visual defect; การตัดสิน defect เป็นขั้น
 // review ภาพโดยคน/agent แยกต่างหาก (บันทึกผลใน completed_log/handoff)
 
+// ⚠️ ทุก state ในเมทริกซ์นี้ (ยกเว้น landing) อยู่บน `/player` ซึ่งเป็นพื้นผิว
+// **ภายใน** ที่ปิดโดยค่าตั้งต้นตั้งแต่ W0-1 (internal-surface.ts) — รันด้วย
+// `INTERNAL_SURFACES=on npm run test:e2e` เมื่อต้องการเก็บหลักฐานภาพชุดนี้ใหม่
+test.skip(
+  process.env.INTERNAL_SURFACES?.trim() !== 'on',
+  'พื้นผิวภายในปิดอยู่ — รันด้วย INTERNAL_SURFACES=on เพื่อเก็บภาพ /player',
+)
+
 const ARTIFACT_DIR = join(__dirname, '..', '..', 'artifacts', 'oneshot-2026-07-31', 'm2')
 const VIEWPORTS = [
   { name: 'desktop-1440', width: 1440, height: 900 },

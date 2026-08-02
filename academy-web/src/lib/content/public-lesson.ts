@@ -23,6 +23,15 @@ import type { SimulationChallenge, SimulationRequirement } from '@/lib/simulatio
 // `Public*` มาใช้ประกาศ props — ของที่ห้ามข้ามฝั่งคือ `LessonContent` เต็มซึ่งอยู่ใน
 // `answer-key.ts` (โมดูลนั้นเป็นตัวที่กันด้วย server-only)
 
+// ⚠️ `Omit<>` อย่างเดียว **ไม่กัน** อะไรเลย เพราะ TypeScript เป็น structural typing:
+// object ที่มี field เกิน (เช่น `CheckpointQuestion` เต็มที่มี `correct`) ยัง assign
+// เป็นชนิดที่ Omit ไว้ได้ตามปกติ — RIL cross-model ยืนยันด้วย compiler แล้วว่า 0 error
+// จึงต้องประกาศ field ต้องห้ามเป็น `never` เพื่อให้ของที่มีเฉลยติดมา **ชนกับชนิดจริงๆ**
+type NoAnswerKey = {
+  correct?: never
+  explanation?: never
+}
+
 /**
  * โจทย์ MCQ ที่ browser เห็น — ไม่มี `correct` ไม่มี `explanation` โดยโครงสร้าง
  *
@@ -30,11 +39,12 @@ import type { SimulationChallenge, SimulationRequirement } from '@/lib/simulatio
  * ทำข้อสอบได้ (UI เดิมก็บอกว่า "select all that apply") · เซิร์ฟเวอร์คำนวณให้จาก
  * จำนวนเฉลย เพื่อไม่ให้ฝั่ง client ต้องมีเฉลยเพื่อรู้ว่าเป็นข้อเลือกหลายตัว
  */
-export type PublicCheckpointQuestion = Omit<CheckpointQuestion, 'correct' | 'explanation'> & {
-  multiple: boolean
-}
+export type PublicCheckpointQuestion = Omit<CheckpointQuestion, 'correct' | 'explanation'> &
+  NoAnswerKey & {
+    multiple: boolean
+  }
 
-export type PublicVideoCueQuestion = Omit<VideoCueQuestion, 'correct' | 'explanation'>
+export type PublicVideoCueQuestion = Omit<VideoCueQuestion, 'correct' | 'explanation'> & NoAnswerKey
 
 /**
  * เงื่อนไขของโจทย์จำลองที่ browser เห็น — เหลือแค่ `label`
@@ -43,12 +53,20 @@ export type PublicVideoCueQuestion = Omit<VideoCueQuestion, 'correct' | 'explana
  * ผู้เรียนต้องอ่าน (เช่น "ต้องเข้าถึงได้ที่ 192.168.10.50") อยู่ใน `brief` และต้องอยู่
  * ในหน้าเสมอ — สิ่งที่ห้ามรั่วคือกติกา ไม่ใช่โจทย์
  */
-export type PublicSimulationRequirement = Pick<SimulationRequirement, 'id' | 'label'>
+export type PublicSimulationRequirement = Pick<SimulationRequirement, 'id' | 'label'> & {
+  field?: never
+  operator?: never
+  value?: never
+}
 
 /** โจทย์จำลองที่ browser เห็น — ไม่มีกติกาการตรวจ และไม่มี `hints`/`debrief` */
-export interface PublicSimulationChallenge
-  extends Omit<SimulationChallenge, 'requirements' | 'hints' | 'debrief'> {
+export type PublicSimulationChallenge = Omit<
+  SimulationChallenge,
+  'requirements' | 'hints' | 'debrief'
+> & {
   requirements: PublicSimulationRequirement[]
+  hints?: never
+  debrief?: never
 }
 
 /** บล็อกเนื้อหาที่ browser เห็น — เหมือนเดิมทุกชนิด ยกเว้น simulation ที่ถูกลดรูป */
