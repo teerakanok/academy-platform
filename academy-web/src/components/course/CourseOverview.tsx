@@ -168,9 +168,11 @@ export function CourseOverview({
       </section>
 
       {/* ใบรับรอง — บอกว่า "ทำได้ในระดับที่ผ่าน" ไม่ใช่ "นั่งอ่านครบ"
-          จึงต้องเขียนโดยนำด้วยสิ่งที่ทำให้ได้ใบ ไม่ใช่สิ่งที่กั้นใบไว้ และต้อง
-          ชัดว่า test out นับเท่ากับอ่านจบทุกประการ — คนที่รู้อยู่แล้วไม่ควรถูก
-          ทำให้รู้สึกว่ากำลังโดนลงโทษที่รู้มาก่อน */}
+          จึงต้องเขียนโดยนำด้วยสิ่งที่ทำให้ได้ใบ ไม่ใช่สิ่งที่กั้นใบไว้
+
+          ⚠️ W0-3: ห้ามเขียนว่าบทปกติเป็นการวัดผล — สิ่งที่ใบรับรองอ้างถึงคือ
+          **ด่านวัดผล (capstone)** เท่านั้น การเดินครบทุกบทเป็นเงื่อนไขความคืบหน้า
+          ไม่ใช่หลักฐาน · เขียนตามจริงเสมอ ผู้เรียนจะได้รู้ว่าใบนี้ยืนยันอะไรจริงๆ */}
       <section
         className={`card-feature p-6 sm:p-7 ${cert.eligible ? 'card-takeaway' : ''}`}
         data-testid="certificate-status"
@@ -182,23 +184,31 @@ export function CourseOverview({
               Certificate of completion
             </p>
             <h2 className="mt-1.5 font-display text-xl font-semibold text-cs-text">
-              {cert.eligible ? 'Earned — you proved all of it' : 'Prove it and it is yours'}
+              {cert.eligible ? 'Earned — you passed every checkpoint' : 'Pass the checkpoints and it is yours'}
             </h2>
           </div>
-          <span className="shrink-0 rounded-full bg-cs-accent-fill px-3 py-1 font-mono text-xs font-semibold text-cs-on-accent">
-            {cert.provenCount} / {cert.total}
+          <span
+            className="shrink-0 rounded-full bg-cs-accent-fill px-3 py-1 font-mono text-xs font-semibold text-cs-on-accent"
+            data-testid="certificate-assessed-count"
+          >
+            {cert.assessedPassed} / {cert.assessedTotal} checkpoints
           </span>
         </div>
         <p className="mt-3 max-w-2xl text-sm text-cs-body">
           {cert.eligible
-            ? 'Every lesson behind it has the evidence to back it up.'
-            : 'The certificate is about what you can do, so reading a lesson and testing out of it count the same.'}
+            ? 'It says you passed every required checkpoint in this course — that is what the certificate stands behind.'
+            : 'The certificate stands on the required checkpoints, where every answer has to be right. Working through the lessons gets you there; the checkpoints are what it certifies.'}
+        </p>
+        <p className="mt-2 max-w-2xl text-xs text-cs-muted" data-testid="certificate-progress-note">
+          Lessons finished: {cert.provenCount} / {cert.total}
         </p>
         {!cert.eligible && skippedBlockers > 0 && (
           <p className="mt-3 max-w-2xl text-sm text-cs-body" data-testid="certificate-skipped-note">
-            {skippedBlockers === 1 ? 'One lesson you skipped has' : `${skippedBlockers} lessons you skipped have`} no
-            evidence yet. If you already know {skippedBlockers === 1 ? 'it' : 'them'}, testing out takes a few questions
-            and counts in full.
+            {/* ⚠️ ห้ามชวนไป "test out" — ปิดอยู่ทั้งคอร์สจนกว่าจะมีคลังข้อแยก
+                (assessment-policy) · ข้อความที่ชี้ไปยังทางที่ไม่มีอยู่จริงคือการ
+                ส่งผู้เรียนไปชนกำแพง */}
+            {skippedBlockers === 1 ? 'One lesson you skipped is' : `${skippedBlockers} lessons you skipped are`} still
+            open. Its checkpoint is quick if you already know the material.
           </p>
         )}
         {!cert.eligible && cert.blocking.length > 0 && (
@@ -210,7 +220,7 @@ export function CourseOverview({
                 data-testid={`certificate-blocker-${b.id}`}
                 className="rounded-control border border-cs-border bg-cs-surface px-3 py-1.5 text-sm text-cs-body transition-colors hover:border-cs-accent hover:text-cs-accent"
               >
-                {b.reason === 'skipped' ? 'Test out: ' : 'Open: '}
+                {'Open: '}
                 {copy.nodeTitles[b.id] ?? b.id}
               </Link>
             ))}

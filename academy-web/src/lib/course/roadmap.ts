@@ -1,4 +1,5 @@
 import type { CourseNode, CourseStructure } from '@/lib/content/course-types'
+import { isProofBearing } from './assessment-policy'
 
 // แผนที่เส้นทางของคอร์ส: จัดวาง DAG เป็นชั้น แล้วคำนวณสถานะของแต่ละ node ต่อผู้เรียน
 // ทั้งหมดเป็นฟังก์ชันบริสุทธิ์ + deterministic → เทสได้ และภาพ screenshot นิ่ง
@@ -217,13 +218,28 @@ export function summarise(structure: CourseStructure, state: LearnerCourseState)
 //
 // ถ้าให้ใบทั้งที่มีบทที่ไม่มีหลักฐาน ใบนั้นก็ไม่ได้บอกอะไรกับใคร และเราจะเป็นคนแรก
 // ที่รู้ว่ามันไม่มีความหมาย
+//
+// ── W0-3: `completed` ของบทปกติ **ไม่ใช่หลักฐาน** ─────────────────────────────
+// เดิมฟังก์ชันนี้นับ `completed` เป็น proven ตรงๆ (F3) ซึ่งแปลว่าใบรับรองออกให้คน
+// ที่ไล่ลองจนผ่านโดยไม่รู้เนื้อหาเลยก็ได้ — โหมด learn บอกผลรายข้อ + คำอธิบาย และ
+// retry ไม่จำกัด นั่นคือธรรมชาติของโหมดสอน ไม่ใช่บั๊กที่จะไปปิด
+//
+// เกณฑ์จึงแยกเป็นสองชั้นที่ต้องผ่าน **ทั้งคู่**:
+//   1. ความคืบหน้า — ทุก node ต้อง `completed`/`tested-out` (ไม่มีบทที่ข้ามหรือค้าง)
+//   2. หลักฐาน — ทุก capstone ต้องผ่านแบบวัดผลจริง (ดู assessment-policy)
+// ชั้นที่ 2 คือสิ่งที่ใบรับรองอ้างถึงจริง · ห้ามเขียนบนหน้าเว็บหรือบนใบว่าบทปกติ
+// เป็นการวัดผล
 
-export type CertificateBlocker = 'skipped' | 'unstarted'
+export type CertificateBlocker = 'skipped' | 'unstarted' | 'unproven'
 
 export interface CertificateEligibility {
   eligible: boolean
+  /** จำนวน node ที่เดินผ่านแล้ว — ตัวชี้ **ความคืบหน้า** ไม่ใช่หลักฐาน */
   provenCount: number
   total: number
+  /** ด่านวัดผล (capstone) ที่ผ่านแล้ว / ทั้งหมด — นี่คือสิ่งที่ใบรับรองอ้างถึง */
+  assessedPassed: number
+  assessedTotal: number
   /** node ที่ยังกั้นใบอยู่ พร้อมเหตุผล — ต้องบอกให้ผู้เรียนรู้ว่าต้องทำอะไรต่อ */
   blocking: { id: string; reason: CertificateBlocker }[]
 }
@@ -234,15 +250,33 @@ export function certificateEligibility(
 ): CertificateEligibility {
   const blocking: { id: string; reason: CertificateBlocker }[] = []
   let provenCount = 0
+  let assessedPassed = 0
+  let assessedTotal = 0
+
   for (const node of structure.nodes) {
     const status = nodeStatus(node, state)
-    if (status === 'completed' || status === 'tested-out') provenCount += 1
+    const walked = status === 'completed' || status === 'tested-out'
+    if (walked) provenCount += 1
     else blocking.push({ id: node.id, reason: status === 'skipped' ? 'skipped' : 'unstarted' })
+
+    if (!isProofBearing(node)) continue
+    assessedTotal += 1
+    if (walked) assessedPassed += 1
+    // ด่านวัดผลที่ยังไม่ผ่านถูกบันทึกไว้แล้วในลูปด้านบน — ไม่ต้องซ้ำ
   }
+
+  // ต้องมีด่านวัดผลอย่างน้อยหนึ่งจุด ไม่งั้นใบรับรองไม่ได้อ้างถึงหลักฐานใดเลย
+  const hasProof = assessedTotal > 0 && assessedPassed === assessedTotal
+  if (assessedTotal === 0) {
+    blocking.push({ id: structure.slug, reason: 'unproven' })
+  }
+
   return {
-    eligible: blocking.length === 0 && structure.nodes.length > 0,
+    eligible: blocking.length === 0 && hasProof && structure.nodes.length > 0,
     provenCount,
     total: structure.nodes.length,
+    assessedPassed,
+    assessedTotal,
     blocking,
   }
 }

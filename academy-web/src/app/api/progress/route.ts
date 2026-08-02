@@ -3,7 +3,11 @@ import { z } from 'zod'
 import { currentUser } from '@/lib/auth/session'
 import { getCourseStructure } from '@/lib/content/course-source'
 import { getLessonAnswerKey, sameAnswerSet } from '@/lib/content/answer-key'
-import { isTestOutAvailable, TEST_OUT_UNAVAILABLE_REASON } from '@/lib/course/assessment-policy'
+import {
+  isTestOutAvailable,
+  passesLearnMode,
+  TEST_OUT_UNAVAILABLE_REASON,
+} from '@/lib/course/assessment-policy'
 import { readBoundedBody } from '@/lib/http/bounded-body'
 import { loadAllProgress, loadProgress, recordNodeEvent } from '@/lib/course/progress-db'
 
@@ -147,11 +151,14 @@ export async function POST(request: Request) {
       results[q.id] = sameAnswerSet(input.answers[q.id] ?? [], q.correct)
     }
     const correctCount = Object.values(results).filter(Boolean).length
-    // capstone และการ test-out ต้องถูกทุกข้อ · บทปกติแค่ทำครบก็ผ่าน
-    // (เกณฑ์บทปกติจะเปลี่ยนเป็น "ผิดไม่เกิน 1 ข้อ" ใน W0-3 — คนละงานกัน จงใจไม่แตะที่นี่)
+    // capstone และการ test-out ต้องถูกทุกข้อ · บทปกติใช้เกณฑ์ของโหมดสอน (W0-3)
+    //
+    // เดิมบทปกติผ่านด้วย "ตอบครบ" เฉยๆ — ตอบผิดทุกข้อก็ได้ `completed` (F2)
     const assessed = node.kind === 'capstone' || input.mode === 'test-out'
     const answeredAll = questions.every((q) => (input.answers[q.id]?.length ?? 0) > 0)
-    const passed = answeredAll && (assessed ? correctCount === questions.length : true)
+    const passed =
+      answeredAll &&
+      (assessed ? correctCount === questions.length : passesLearnMode(correctCount, questions.length))
 
     await recordNodeEvent(user.account.id, {
       slug: input.slug,

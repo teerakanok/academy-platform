@@ -144,8 +144,20 @@ describe('readBoundedBody', () => {
       duplex: 'half',
     })
 
-    await expect(readBoundedBody(req, MAX)).rejects.toThrow(stream.boom.message)
+    // เทียบ **ตัว error เดิม** ไม่ใช่แค่ข้อความ — ถ้าเทียบข้อความ การห่อด้วย
+    // `new Error(err.message)` ระหว่างทาง (ซึ่งทำ stack trace หายและกลบต้นเหตุ)
+    // จะรอดเทสไปได้ (RIL รอบ 6 ยืนยันด้วย mutation)
+    await expect(readBoundedBody(req, MAX)).rejects.toBe(stream.boom)
     expect(req.body?.locked ?? false, 'error path ก็ต้องไม่ถือ lock ค้าง').toBe(false)
+  })
+
+  it('body ขนาดเท่าเพดานพอดีต้องผ่าน — เพดานคือ "ไม่เกิน" ไม่ใช่ "ต่ำกว่า"', async () => {
+    // ไม่มีเคสนี้ mutation `total > maxBytes` → `total >= maxBytes` จะรอด และผู้เรียน
+    // ที่ส่ง body ยาวเท่าเพดานพอดีจะถูกปฏิเสธโดยไม่มีใครรู้ (RIL รอบ 6 ชี้)
+    const exact = 'x'.repeat(MAX)
+    expect(new TextEncoder().encode(exact).length).toBe(MAX)
+    const result = await readBoundedBody(request(exact), MAX)
+    expect(result.ok && result.text).toBe(exact)
   })
 
   it('body ว่างไม่พัง', async () => {
