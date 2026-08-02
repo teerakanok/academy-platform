@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { buildAttemptParams, remapAnswersToReal, toPublicQuestions } from '@/lib/course/attempt'
+import { attemptQuota } from '@/lib/course/attempt-db'
 import type { CheckpointQuestion } from '@/lib/content/course-types'
 
 // ตรรกะ params ของ attempt — สิ่งที่ต้องพิสูจน์คือ "remap แล้วตรวจกลับได้ถูกเสมอ"
@@ -152,5 +153,29 @@ describe('remapAnswersToReal', () => {
       expect(remapAnswersToReal(params, evil, ['A'])).toBeNull()
       expect(remapAnswersToReal(params, 'q1', [evil])).toBeNull()
     }
+  })
+})
+
+describe('attemptQuota', () => {
+  // โควตาเป็นค่าคอนฟิกตั้งแต่ RIL รอบ W1 (เดิม e2e ล้างสมุดนับโควตาทิ้งเพื่อให้รันซ้ำได้
+  // ซึ่งลบ speed bump ในของจริงไปด้วย) · ค่าที่อ่านผิดต้องตกกลับไปที่ค่าตั้งต้นเสมอ
+  // ไม่ใช่กลายเป็น 0 (ปิดตาย) หรือ NaN (เปิดหมด)
+  const cases: [string | undefined, number][] = [
+    [undefined, 3],
+    ['', 3],
+    ['  ', 3],
+    ['500', 500],
+    ['1', 1],
+    ['0', 3],
+    ['-5', 3],
+    ['abc', 3],
+    ['3.9', 3],
+  ]
+
+  it.each(cases)('ATTEMPT_MAX_PER_WINDOW=%s → %i', (value, expected) => {
+    if (value === undefined) vi.stubEnv('ATTEMPT_MAX_PER_WINDOW', '')
+    else vi.stubEnv('ATTEMPT_MAX_PER_WINDOW', value)
+    expect(attemptQuota()).toBe(expected)
+    vi.unstubAllEnvs()
   })
 })

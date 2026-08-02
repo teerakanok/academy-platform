@@ -5,7 +5,7 @@ import { findOrCreateUser } from '@/lib/account/users'
 import {
   consumeAttempt,
   issueAttempt,
-  ATTEMPT_MAX_PER_WINDOW,
+  attemptQuota,
   ATTEMPT_WINDOW_MINUTES,
   ATTEMPT_TTL_MINUTES,
 } from '@/lib/course/attempt-db'
@@ -15,6 +15,10 @@ import type { AttemptParams } from '@/lib/course/attempt'
 // ของคำสั่งเดียวใน DB (race, replay, โควตา) ซึ่ง mock พิสูจน์ไม่ได้โดยนิยาม
 //
 // เทสเขียนแบบ "สคริปต์โจมตี" ตามแผน §8: ยิงซ้ำ ยิงพร้อมกัน ใช้ของคนอื่น ใช้ของหมดอายุ
+
+// โควตาที่โค้ดใช้จริง (env ทับได้) — ยึดค่าคงที่ตรงๆ แล้วเทสจะแดงเพราะคอนฟิก
+// ไม่ใช่เพราะพฤติกรรมผิด
+const QUOTA = attemptQuota()
 
 const ISS = 'https://attempt-test.local'
 const COURSE = 'attempt-test-course'
@@ -59,7 +63,7 @@ function ctx(nodeId: string, userId = owner.id) {
 describe('issue_attempt', () => {
   it('สัญญาโควตาตามแผน W0-1 ถูกตรึงเป็นตัวเลข — เปลี่ยนค่าคงที่แล้วเทสนี้ต้องแดงให้คนตัดสินใจ', () => {
     // ถ้าเทสอ้างค่าคงที่เดียวกับ production ล้วนๆ เพดานพิมพ์ผิดเป็น 4 ก็เขียวหมด (RIL จับ)
-    expect(ATTEMPT_MAX_PER_WINDOW).toBe(3)
+    expect(QUOTA).toBe(3)
     expect(ATTEMPT_WINDOW_MINUTES).toBe(30)
     expect(ATTEMPT_TTL_MINUTES).toBe(60)
   })
@@ -86,8 +90,8 @@ describe('issue_attempt', () => {
     expect(row.rows[0].consumed_at).toBeNull()
   })
 
-  it(`โควตา: ครั้งที่ ${ATTEMPT_MAX_PER_WINDOW + 1} ในหน้าต่างเวลาถูกปฏิเสธ — และตัวนับอยู่ใน DB ไม่ใช่ memory`, async () => {
-    for (let i = 0; i < ATTEMPT_MAX_PER_WINDOW; i++) {
+  it(`โควตา: ครั้งที่ ${QUOTA + 1} ในหน้าต่างเวลาถูกปฏิเสธ — และตัวนับอยู่ใน DB ไม่ใช่ memory`, async () => {
+    for (let i = 0; i < QUOTA; i++) {
       expect(await issueAttempt(ctx('n-quota'), SAMPLE_PARAMS, '1.0.0')).not.toBeNull()
     }
     // แต่ละ call ของ issueAttempt สร้าง client ใหม่ (academyDb() ต่อใหม่ทุกครั้ง) —
@@ -99,15 +103,15 @@ describe('issue_attempt', () => {
 
   it('โควตากันยิงพร้อมกัน: ยิงเกินโควตาพร้อมกันแล้วออกได้ไม่เกินเพดาน', async () => {
     const results = await Promise.all(
-      Array.from({ length: ATTEMPT_MAX_PER_WINDOW + 3 }, () =>
+      Array.from({ length: QUOTA + 3 }, () =>
         issueAttempt(ctx('n-quota-race'), SAMPLE_PARAMS, '1.0.0'),
       ),
     )
-    expect(results.filter((r) => r !== null)).toHaveLength(ATTEMPT_MAX_PER_WINDOW)
+    expect(results.filter((r) => r !== null)).toHaveLength(QUOTA)
   })
 
   it('หน้าต่างเวลาเลื่อนจริง: attempt ที่แก่กว่า 30 นาทีไม่ถูกนับ โควตาเปิดใหม่', async () => {
-    for (let i = 0; i < ATTEMPT_MAX_PER_WINDOW; i++) {
+    for (let i = 0; i < QUOTA; i++) {
       expect(await issueAttempt(ctx('n-window'), SAMPLE_PARAMS, '1.0.0')).not.toBeNull()
     }
     expect(await issueAttempt(ctx('n-window'), SAMPLE_PARAMS, '1.0.0')).toBeNull()

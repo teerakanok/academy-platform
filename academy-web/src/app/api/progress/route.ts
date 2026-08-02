@@ -4,10 +4,12 @@ import { currentUser } from '@/lib/auth/session'
 import { getCourseStructure } from '@/lib/content/course-source'
 import { getLessonAnswerKey, mcqItems, sameAnswerSet, simulationItems } from '@/lib/content/answer-key'
 import {
+  isAssessedNode,
   isTestOutAvailable,
   passesLearnMode,
   TEST_OUT_UNAVAILABLE_REASON,
 } from '@/lib/course/assessment-policy'
+import { toPublicProgress } from '@/lib/course/public-progress'
 import { readBoundedBody } from '@/lib/http/bounded-body'
 import { gradeSimulation, gradingFingerprint } from '@/lib/simulation/types'
 import { resolveChallenge } from '@/lib/simulation/variables'
@@ -224,6 +226,15 @@ export async function POST(request: Request) {
     for (const sim of sims) {
       const submitted = input.simulations?.[sim.id] ?? {}
       const challenge = resolveChallenge(sim.challenge, attemptVars[sim.id] ?? {})
+      if (!challenge) {
+        // attempt ที่ออกก่อนโจทย์นี้มีตัวแปร (หรือ deploy คร่อมกัน) — ตรวจด้วยโจทย์ที่ยัง
+        // มีแม่แบบไม่ได้เด็ดขาด เพราะค่าที่ใช้ตรวจจะกลายเป็นสตริง "{{targetIp}}" ตรงตัว
+        // ซึ่งใครกรอกตามก็ผ่าน · ให้เริ่ม attempt ใหม่แทน
+        return NextResponse.json(
+          { ok: false, error: 'โจทย์ชุดนี้หมดอายุแล้ว เริ่มใหม่อีกครั้ง' },
+          { status: 409 },
+        )
+      }
       const verdict = gradeSimulation(challenge, submitted)
       results[sim.id] = verdict.passed
       simulationEvidence[sim.id] = {
@@ -240,7 +251,7 @@ export async function POST(request: Request) {
     // capstone และการ test-out ต้องถูกทุกข้อ · บทปกติใช้เกณฑ์ของโหมดสอน (W0-3)
     //
     // เดิมบทปกติผ่านด้วย "ตอบครบ" เฉยๆ — ตอบผิดทุกข้อก็ได้ `completed` (F2)
-    const assessed = node.kind === 'capstone' || input.mode === 'test-out'
+    const assessed = isAssessedNode(node) || input.mode === 'test-out'
     // โจทย์จำลองไม่มี "ยังไม่ตอบ" — หน้าจอมีค่าตั้งต้นเสมอ จึงนับความครบเฉพาะ MCQ
     const answeredAll = questions.every((q) => (input.answers[q.id]?.length ?? 0) > 0)
     const passed =
@@ -275,10 +286,22 @@ export async function GET(request: Request) {
 
   const slug = new URL(request.url).searchParams.get('slug')?.trim()
   try {
+    // ⚠️ ทุกเส้นทางที่ส่งความคืบหน้าออกไปหา browser ต้องผ่าน toPublicProgress
+    // ผลรายข้อของพื้นผิววัดผลคือเครื่องเฉลย — ดูเหตุผลเต็มใน public-progress.ts
     if (slug) {
-      return NextResponse.json({ ok: true, record: await loadProgress(user.account.id, slug) })
+      const record = await loadProgress(user.account.id, slug)
+      return NextResponse.json({ ok: true, record: toPublicProgress(record, getCourseStructure(slug)) })
     }
-    return NextResponse.json({ ok: true, records: await loadAllProgress(user.account.id) })
+    const records = await loadAllProgress(user.account.id)
+    return NextResponse.json({
+      ok: true,
+      records: Object.fromEntries(
+        Object.entries(records).map(([courseSlug, record]) => [
+          courseSlug,
+          toPublicProgress(record, getCourseStructure(courseSlug)),
+        ]),
+      ),
+    })
   } catch (err) {
     console.error('[api/progress] อ่านไม่สำเร็จ:', err)
     return NextResponse.json({ ok: false, error: 'อ่านความคืบหน้าไม่สำเร็จ' }, { status: 500 })

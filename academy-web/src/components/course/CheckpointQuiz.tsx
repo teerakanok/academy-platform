@@ -21,6 +21,7 @@ export function CheckpointQuiz({
   requireAllCorrect,
   onSubmit,
   onPassed,
+  onRetry,
 }: {
   /** ด่านท้ายบท — MCQ และ/หรือโจทย์จำลอง (W1) */
   items: PublicCheckpointItem[]
@@ -33,6 +34,12 @@ export function CheckpointQuiz({
   }) => Promise<CheckpointOutcome | null>
   /** ผู้เรียนกดไปต่อหลังผ่านแล้ว */
   onPassed: () => void
+  /**
+   * ผู้เรียนขอลองใหม่ในด่านที่ผูกกับ attempt — เจ้าของ attempt ต้องออกชุดใหม่ให้
+   *
+   * ไม่ใส่ = ด่านนี้ไม่ได้ผูกกับ attempt (บทสอนทั่วไป) การล้างช่องกรอกก็พอ
+   */
+  onRetry?: () => void
 }) {
   const questions = items.filter((item): item is Extract<PublicCheckpointItem, { kind: 'mcq' }> => item.kind === 'mcq')
   const simulations = items.filter(
@@ -85,6 +92,11 @@ export function CheckpointQuiz({
     setSimStates(Object.fromEntries(simulations.map((s) => [s.id, { ...s.challenge.initial }])))
     setOutcome(null)
     setFailed(false)
+    // ด่านที่ผูกกับ attempt: การส่งคำตอบหนึ่งครั้ง = ใช้ attempt นั้นไปแล้ว (ตรวจซ้ำ
+    // ด้วย attempt เดิมถูกปฏิเสธ 409) · การล้างช่องกรอกอย่างเดียวจึงเป็นทางตัน —
+    // ผู้เรียนกรอกใหม่ทั้งชุดแล้วกดส่งก็ได้แต่ error (RIL cross-model รอบ W1 จับ)
+    // ต้องขอโจทย์ชุดใหม่จริงๆ ซึ่ง LessonView เป็นคนถือ attempt จึงเป็นคนขอ
+    onRetry?.()
   }
 
   return (
@@ -233,7 +245,9 @@ export function CheckpointQuiz({
               <>
                 <span className="text-sm text-cs-amber" data-testid="checkpoint-not-passed">
                   {requireAllCorrect
-                    ? 'This checkpoint needs every answer correct.'
+                    ? onRetry
+                      ? 'This checkpoint needs every answer correct. Try again gives you a fresh task — the details change each time.'
+                      : 'This checkpoint needs every answer correct.'
                     : 'Answer every question to finish the lesson.'}
                 </span>
                 <button

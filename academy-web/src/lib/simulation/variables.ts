@@ -66,27 +66,54 @@ export function placeholdersIn(text: string): string[] {
 
 /**
  * แทนค่าตัวแปรลงในโจทย์ทั้งชิ้น — ทั้งที่ผู้เรียนอ่าน (`brief`, `label`) และที่
- * เซิร์ฟเวอร์ใช้ตรวจ (`requirements[].value`)
+ * เซิร์ฟเวอร์ใช้ตรวจ (`requirements[].value`) · คืน `null` ถ้าแทนค่าไม่ครบ
  *
  * ⚠️ ต้องแทนทั้งสองฝั่งเสมอ ถ้าแทนแค่ `brief` ผู้เรียนจะเห็นโจทย์ใหม่แต่ถูกตรวจ
  * ด้วยค่าเดิม — ตั้งค่าถูกตามที่อ่านแล้วไม่ผ่าน ซึ่งไม่มีทางเดาสาเหตุได้เลย
+ *
+ * ⚠️ ทำไมต้อง fail closed แทนที่จะคืนโจทย์ดิบ (RIL cross-model รอบ W1):
+ * attempt ที่ออก**ก่อน**โค้ดชุดนี้ deploy ไม่มี `simulationVars` แต่ยังไม่หมดอายุ
+ * ในอีก 60 นาที · ถ้าคืนโจทย์ดิบ ค่าที่ใช้ตรวจจะเป็นสตริง `"{{targetIp}}"` ตรงตัว
+ * แปลว่าใครกรอก `{{targetIp}}` ลงช่อง IP ก็ **ผ่านด่าน** ทันที · เคสเดียวกันเกิดได้
+ * ทุกครั้งที่เพิ่มตัวแปรใหม่ในไฟล์เนื้อหาแล้ว attempt เก่ายังค้างอยู่
  */
-export function resolveChallenge(challenge: SimulationChallenge, rolled: RolledVariables): SimulationChallenge {
-  if (Object.keys(rolled).length === 0) return challenge
-  return {
-    ...challenge,
-    brief: fillPlaceholders(challenge.brief, rolled),
-    requirements: challenge.requirements.map((req) => ({
-      ...req,
-      label: fillPlaceholders(req.label, rolled),
-      value:
-        typeof req.value === 'string'
-          ? fillPlaceholders(req.value, rolled)
-          : Array.isArray(req.value)
-            ? req.value.map((v) => fillPlaceholders(v, rolled))
-            : req.value,
-    })),
-    hints: challenge.hints?.map((h) => fillPlaceholders(h, rolled)),
-    debrief: challenge.debrief ? fillPlaceholders(challenge.debrief, rolled) : challenge.debrief,
-  }
+export function resolveChallenge(
+  challenge: SimulationChallenge,
+  rolled: RolledVariables,
+): SimulationChallenge | null {
+  const resolved =
+    Object.keys(rolled).length === 0
+      ? challenge
+      : {
+          ...challenge,
+          brief: fillPlaceholders(challenge.brief, rolled),
+          requirements: challenge.requirements.map((req) => ({
+            ...req,
+            label: fillPlaceholders(req.label, rolled),
+            value:
+              typeof req.value === 'string'
+                ? fillPlaceholders(req.value, rolled)
+                : Array.isArray(req.value)
+                  ? req.value.map((v) => fillPlaceholders(v, rolled))
+                  : req.value,
+          })),
+          hints: challenge.hints?.map((h) => fillPlaceholders(h, rolled)),
+          debrief: challenge.debrief ? fillPlaceholders(challenge.debrief, rolled) : challenge.debrief,
+        }
+
+  return hasUnresolvedPlaceholder(resolved) ? null : resolved
+}
+
+/** ยังมีแม่แบบค้างอยู่ไหม — ตรวจทั้งฝั่งที่อ่านและฝั่งที่ใช้ตรวจ */
+function hasUnresolvedPlaceholder(challenge: SimulationChallenge): boolean {
+  const texts = [
+    challenge.brief,
+    ...(challenge.hints ?? []),
+    challenge.debrief ?? '',
+    ...challenge.requirements.flatMap((req) => [
+      req.label,
+      ...(typeof req.value === 'string' ? [req.value] : Array.isArray(req.value) ? req.value : []),
+    ]),
+  ]
+  return texts.some((text) => placeholdersIn(text).length > 0)
 }

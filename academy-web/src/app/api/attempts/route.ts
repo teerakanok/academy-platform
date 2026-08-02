@@ -4,7 +4,7 @@ import { currentUser } from '@/lib/auth/session'
 import { getCourseStructure } from '@/lib/content/course-source'
 import { CHECKPOINT_CHALLENGE_ID, buildAttemptParams, cryptoPick, toPublicQuestions } from '@/lib/course/attempt'
 import { getLessonAnswerKey, mcqItems, simulationItems } from '@/lib/content/answer-key'
-import { issueAttempt } from '@/lib/course/attempt-db'
+import { issueAttempt, nextAttemptAt } from '@/lib/course/attempt-db'
 import { toPublicSimulation, type AttemptSimulation } from '@/lib/content/public-lesson'
 import { resolveChallenge, rollVariables } from '@/lib/simulation/variables'
 import { readBoundedBody } from '@/lib/http/bounded-body'
@@ -83,20 +83,25 @@ export async function POST(request: Request) {
       simulationVars[sim.id] = rollVariables(sim.challenge.variables, cryptoPick)
     }
     params.simulationVars = simulationVars
-    const issued = await issueAttempt(
-      {
-        userId: user.account.id,
-        courseSlug: input.slug,
-        nodeId: input.nodeId,
-        challengeId: CHECKPOINT_CHALLENGE_ID,
-      },
-      params,
-      structure.version,
-    )
+    const ctx = {
+      userId: user.account.id,
+      courseSlug: input.slug,
+      nodeId: input.nodeId,
+      challengeId: CHECKPOINT_CHALLENGE_ID,
+    }
+    const issued = await issueAttempt(ctx, params, structure.version)
     if (!issued) {
       // โควตาเต็ม (3 ครั้ง/30 นาที) — ใช้สิทธิ์ครบแล้วโจทย์จะหมุนใหม่ ไม่ใช่เปิดเฉลย
+      //
+      // บอกเวลาที่ขอได้อีกครั้งไปด้วย: "รอสักครู่" ทำให้ผู้เรียนต้องเดาเอง ซึ่งจบลงที่
+      // การกดซ้ำไปเรื่อยๆ · ตัวเลขนี้ไม่ใช่ oracle เพราะไม่แปรตามคำตอบ แปรตามเวลา
+      const readyAt = await nextAttemptAt(ctx)
       return NextResponse.json(
-        { ok: false, error: 'ใช้สิทธิ์ครบแล้ว รอสักครู่แล้วลองใหม่' },
+        {
+          ok: false,
+          error: 'ใช้สิทธิ์ครบแล้ว รอสักครู่แล้วลองใหม่',
+          retryAfterSeconds: readyAt ? Math.max(0, Math.ceil((readyAt.getTime() - Date.now()) / 1000)) : undefined,
+        },
         { status: 429 },
       )
     }
@@ -104,11 +109,17 @@ export async function POST(request: Request) {
     // โจทย์จำลองที่แทนค่าตัวแปรของ attempt นี้แล้ว — ยังผ่าน toPublicSimulation
     // เหมือนเดิม จึงไม่มี operator/value/hints ติดไปกับ response · ประกาศชนิดไว้
     // เพื่อให้ลืมฟิลด์ใดฟิลด์หนึ่ง (เช่น `kind`) เป็น error ตอนคอมไพล์ ไม่ใช่ด่านหายเงียบๆ
-    const simulations: AttemptSimulation[] = sims.map((sim) => ({
-      kind: 'simulation',
-      id: sim.id,
-      challenge: toPublicSimulation(resolveChallenge(sim.challenge, simulationVars[sim.id] ?? {})),
-    }))
+    const simulations: AttemptSimulation[] = []
+    for (const sim of sims) {
+      const resolved = resolveChallenge(sim.challenge, simulationVars[sim.id] ?? {})
+      if (!resolved) {
+        // เพิ่งสุ่มค่าไปเองเมื่อกี้ — แทนค่าไม่ครบแปลว่าไฟล์เนื้อหาประกาศตัวแปรไม่ครบ
+        // ส่งโจทย์ที่ยังมีแม่แบบให้ผู้เรียนไม่ได้ ต้องดังทันทีไม่ใช่ปล่อยผ่าน
+        console.error(`[api/attempts] โจทย์ ${sim.id} แทนค่าตัวแปรไม่ครบ`)
+        return NextResponse.json({ ok: false, error: 'ออก attempt ไม่สำเร็จ' }, { status: 500 })
+      }
+      simulations.push({ kind: 'simulation', id: sim.id, challenge: toPublicSimulation(resolved) })
+    }
 
     return NextResponse.json({
       ok: true,

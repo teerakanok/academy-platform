@@ -19,7 +19,7 @@ export type LessonAttempt =
   | { status: 'not-needed' }
   | { status: 'loading' }
   | { status: 'ready'; id: string; simulations: AttemptSimulation[] }
-  | { status: 'failed'; reason: 'quota' | 'error' }
+  | { status: 'failed'; reason: 'quota' | 'error'; retryAfterSeconds?: number }
 
 interface AttemptResponse {
   attemptId?: string
@@ -29,10 +29,18 @@ interface AttemptResponse {
 export function useLessonAttempt(options: {
   /** บทนี้ต้องใช้ attempt ไหม (มีด่านจำลอง และยังไม่จบบท) */
   enabled: boolean
+  /**
+   * ยังไม่ถึงเวลาขอ — คงสถานะ "กำลังเตรียม" ไว้ก่อนโดยไม่ยิงคำขอ
+   *
+   * ใช้ระหว่างรอความคืบหน้าของผู้เรียน: ตอนนั้นยังไม่รู้ว่าบทนี้ทำจบไปแล้วหรือยัง
+   * ถ้ายิงเลย บทที่จบแล้วจะออก attempt ใหม่ทุกครั้งที่เปิดหน้า กินโควตาฟรีๆ
+   * และถ้าเลือกทางกลับกัน (ถือว่า "ไม่ต้องใช้") หน้าจะโชว์ด่านที่ยังไม่มีโจทย์
+   */
+  hold?: boolean
   slug: string
   nodeId: string
 }): { attempt: LessonAttempt; retry: () => void } {
-  const { enabled, slug, nodeId } = options
+  const { enabled, hold = false, slug, nodeId } = options
   const [attempt, setAttempt] = useState<LessonAttempt>(() =>
     enabled ? { status: 'loading' } : { status: 'not-needed' },
   )
@@ -43,8 +51,9 @@ export function useLessonAttempt(options: {
       setAttempt({ status: 'not-needed' })
       return
     }
-    let alive = true
     setAttempt({ status: 'loading' })
+    if (hold) return
+    let alive = true
     fetch('/api/attempts', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -53,7 +62,12 @@ export function useLessonAttempt(options: {
       .then(async (res) => {
         if (!alive) return
         if (!res.ok) {
-          setAttempt({ status: 'failed', reason: res.status === 429 ? 'quota' : 'error' })
+          const body = (await res.json().catch(() => null)) as { retryAfterSeconds?: number } | null
+          setAttempt({
+            status: 'failed',
+            reason: res.status === 429 ? 'quota' : 'error',
+            retryAfterSeconds: body?.retryAfterSeconds,
+          })
           return
         }
         const body = (await res.json()) as AttemptResponse
@@ -70,7 +84,7 @@ export function useLessonAttempt(options: {
     return () => {
       alive = false
     }
-  }, [enabled, slug, nodeId, round])
+  }, [enabled, hold, slug, nodeId, round])
 
   const retry = useCallback(() => setRound((n) => n + 1), [])
   return { attempt, retry }

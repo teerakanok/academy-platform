@@ -76,7 +76,7 @@ describe('fillPlaceholders / placeholdersIn', () => {
 describe('resolveChallenge', () => {
   it('🔴 แทนค่าทั้งฝั่งที่อ่านและฝั่งที่ตรวจ', () => {
     const rolled = rollVariables(VARIABLES, pickFirst)
-    const resolved = resolveChallenge(challenge(), rolled)
+    const resolved = resolveChallenge(challenge(), rolled)!
 
     // ฝั่งที่ผู้เรียนอ่าน
     expect(resolved.brief).toContain(rolled.targetIp)
@@ -92,7 +92,7 @@ describe('resolveChallenge', () => {
 
   it('ตั้งค่าตามโจทย์ที่อ่าน → ผ่านจริง (สองฝั่งตรงกัน)', () => {
     const rolled = rollVariables(VARIABLES, pickFirst)
-    const resolved = resolveChallenge(challenge(), rolled)
+    const resolved = resolveChallenge(challenge(), rolled)!
     const verdict = gradeSimulation(resolved, { ipv4: rolled.targetIp, addressMode: rolled.mode })
     expect(verdict.passed).toBe(true)
   })
@@ -102,7 +102,7 @@ describe('resolveChallenge', () => {
     const theirs = rollVariables(VARIABLES, () => 20) // 192.168.10.60
     expect(mine.targetIp).not.toBe(theirs.targetIp)
 
-    const myChallenge = resolveChallenge(challenge(), mine)
+    const myChallenge = resolveChallenge(challenge(), mine)!
     // ส่งค่าที่ถูกของคนอื่นมา — ต้องไม่ผ่าน
     const verdict = gradeSimulation(myChallenge, { ipv4: theirs.targetIp, addressMode: mine.mode })
     expect(verdict.passed).toBe(false)
@@ -119,6 +119,40 @@ describe('resolveChallenge', () => {
       requirements: [{ id: 'r', label: 'l', field: 'f', operator: 'equals', value: 'x' }],
     }
     expect(resolveChallenge(plain, {})).toBe(plain)
-    expect(gradeSimulation(resolveChallenge(plain, {}), { f: 'x' }).passed).toBe(true)
+    expect(gradeSimulation(resolveChallenge(plain, {})!, { f: 'x' }).passed).toBe(true)
+  })
+})
+
+describe('fail closed เมื่อแทนค่าไม่ครบ', () => {
+  // รูที่ข้อนี้ปิด (RIL cross-model รอบ W1): attempt ที่ออก **ก่อน** โจทย์มีตัวแปร
+  // ยังไม่หมดอายุอีก 60 นาที · ถ้าตรวจด้วยโจทย์ดิบ ค่าที่ต้องได้จะเป็นสตริง
+  // `"{{targetIp}}"` ตรงตัว แปลว่ากรอก `{{targetIp}}` ลงช่อง IP ก็ผ่านด่านทันที
+
+  it('🔴 ไม่มีค่าตัวแปรเลย แต่โจทย์ต้องใช้ → คืน null ไม่ใช่โจทย์ดิบ', () => {
+    expect(resolveChallenge(challenge(), {})).toBeNull()
+  })
+
+  it('🔴 มีค่าบางตัว ขาดบางตัว → คืน null', () => {
+    expect(resolveChallenge(challenge(), { targetIp: '192.168.10.44' })).toBeNull()
+  })
+
+  it('🔴 โจทย์ดิบที่หลุดไปตรวจ จะทำให้กรอกแม่แบบตรงตัวแล้วผ่าน — จึงต้องไม่มีทางได้มันมา', () => {
+    // พิสูจน์ว่าอันตรายที่พูดถึงเป็นของจริง ไม่ใช่ความกังวลลอยๆ
+    const raw = challenge()
+    expect(gradeSimulation(raw, { ipv4: '{{targetIp}}', addressMode: '{{mode}}' }).passed).toBe(true)
+    // และ resolveChallenge ต้องไม่มีวันคืนของชิ้นนี้ออกไป
+    expect(resolveChallenge(raw, {})).toBeNull()
+  })
+
+  it('label/hints/debrief ที่ยังมีแม่แบบก็ถือว่าไม่ครบ', () => {
+    const partial = {
+      ...challenge(),
+      requirements: [
+        { id: 'r', label: 'ตั้งเป็น {{missing}}', field: 'f', operator: 'equals' as const, value: 'x' },
+      ],
+      hints: undefined,
+      debrief: undefined,
+    }
+    expect(resolveChallenge(partial, { targetIp: '1.1.1.1', mode: 'static' })).toBeNull()
   })
 })

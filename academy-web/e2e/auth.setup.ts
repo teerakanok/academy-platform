@@ -12,6 +12,8 @@ import { join } from 'node:path'
 
 const MAILPIT = 'http://127.0.0.1:54324'
 export const STORAGE_STATE = join(__dirname, '..', 'test-results', '.auth', 'learner.json')
+/** อีเมลของบัญชีที่ใช้ในรอบนี้ — เทสที่ต้องอ่านของจริงจาก DB ใช้ตัวนี้หาแถวของตัวเอง */
+export const LEARNER_EMAIL_FILE = join(__dirname, '..', 'test-results', '.auth', 'learner-email.txt')
 
 setup('เตรียมบัญชีผู้เรียนสำหรับ e2e', async ({ page, baseURL }) => {
   const email = `e2e-learner-${Date.now()}@example.com`
@@ -46,4 +48,5 @@ setup('เตรียมบัญชีผู้เรียนสำหรั�
   mkdirSync(join(__dirname, '..', 'test-results', '.auth'), { recursive: true })
   const state = await page.context().storageState()
   writeFileSync(STORAGE_STATE, JSON.stringify(state), 'utf8')
+  writeFileSync(LEARNER_EMAIL_FILE, email, 'utf8')
 })

@@ -35,6 +35,14 @@ type Mode = 'learn' | 'test-out' | 'skipped'
 
 type SimulationCheckpoint = AttemptSimulation
 
+/** "อีกกี่นาที" ที่เป็นความจริง — เซิร์ฟเวอร์เป็นคนบอก ไม่ใช่หน้าเว็บเดาเอง */
+function waitCopy(retryAfterSeconds: number | undefined): string {
+  if (retryAfterSeconds === undefined) return 'try again in a few minutes'
+  const minutes = Math.ceil(retryAfterSeconds / 60)
+  if (minutes <= 1) return 'try again in about a minute'
+  return `try again in about ${minutes} minutes`
+}
+
 /** แทนโจทย์จำลองในด่านด้วยของที่ attempt ออกให้ (ค่าเป้าหมายถูกสุ่มแล้ว) */
 function withAttemptSimulations(
   items: PublicCheckpointItem[],
@@ -182,6 +190,9 @@ export function LessonView({
   const hasSimulationTask = lesson.checkpoint.some((item) => item.kind === 'simulation')
   const { attempt, retry: retryAttempt } = useLessonAttempt({
     enabled: hasSimulationTask && !done,
+    // รอให้รู้สถานะบทก่อนค่อยขอจริง — ระหว่างยังไม่รู้ `done` เป็น null ถ้ายิงเลย
+    // บทที่ทำจบแล้วจะออก attempt ใหม่ทุกครั้งที่เปิดหน้า กินโควตาฟรีๆ
+    hold: !loaded,
     slug: structure.slug,
     nodeId: node.id,
   })
@@ -587,7 +598,7 @@ export function LessonView({
           <div data-testid="checkpoint-attempt-failed" className="flex flex-wrap items-center gap-3">
             <p className="text-sm text-cs-body">
               {attempt.reason === 'quota'
-                ? 'You have used this round of attempts. Each one gives you a different task, so a short wait is all it takes — try again in a few minutes.'
+                ? `You have used this round of attempts. Each one gives you a different task, so a short wait is all it takes — ${waitCopy(attempt.retryAfterSeconds)}.`
                 : 'We could not set up your task. Your progress is safe.'}
             </p>
             <button
@@ -611,6 +622,7 @@ export function LessonView({
             requireAllCorrect={mode === 'test-out' || isCapstone}
             onSubmit={(submission) => submitCheckpoint(mode === 'test-out' ? 'test-out' : 'learn', submission)}
             onPassed={() => finishCheckpoint(mode === 'test-out' ? 'test-out' : 'learn')}
+            onRetry={attempt.status === 'ready' ? retryAttempt : undefined}
           />
         )}
         </div>

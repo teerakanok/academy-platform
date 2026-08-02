@@ -97,6 +97,28 @@ test.describe('โหมด assessed — response บอกได้แค่ผ
     expect(Object.keys(body).sort()).toEqual(['ok', 'passed'])
   })
 
+  test('🔴 Mastermind ผ่าน GET: อ่านความคืบหน้าแล้วต้องไม่รู้ว่าข้อไหนถูก', async ({ request }) => {
+    // รูที่ข้อนี้ปิด (RIL cross-model รอบ W1): POST ตอบแค่ `{ok, passed}` ตามสัญญา
+    // แล้ว แต่ GET เคยคืน `checkpointResults` รายข้อของ capstone กับผลราย
+    // requirement ของด่านจำลองมาให้ — ส่งผิดสามชุด (A,A,A / B,B,B / C,C,C) แล้ว
+    // อ่านจาก GET ก็ได้เฉลยครบโดยไม่ต้องรู้เนื้อหาเลย
+    // **ปิดรูที่จุดหนึ่งแล้วเปิดที่อีกจุด คือรูเดิม**
+    await submitCapstone(request, { 'cp-1': ['A'], 'cp-2': ['A'], 'cp-3': ['A'] })
+
+    const body = await (await request.get(`/api/progress?slug=${COURSE}`)).json()
+    const record = body.record as {
+      checkpointResults?: Record<string, unknown>
+      simulationEvidence?: Record<string, unknown>
+    }
+
+    expect(record.checkpointResults?.[CAPSTONE], 'ผลรายข้อของ capstone หลุดมากับ GET').toBeUndefined()
+    expect(record.simulationEvidence?.[CAPSTONE], 'หลักฐานราย requirement หลุดมากับ GET').toBeUndefined()
+    // และต้องไม่มีร่องรอยของ id รายข้อใน payload ทั้งก้อน
+    const payload = JSON.stringify(body)
+    expect(payload).not.toContain('cp-1')
+    expect(payload).not.toContain('r-mode')
+  })
+
   test('test-out ถูกปิดทั้งหมด — โหมดสอนต้องไม่กลายเป็นเครื่องเฉลยของโหมดวัดผล', async ({ request }) => {
     // บทปกติใช้ checkpoint ชุดเดียวกันทั้ง learn และ test-out · learn คืนคำอธิบาย
     // ตามหน้าที่ของการสอน ถ้า test-out ยังทำงานอยู่ ใครก็เก็บเฉลยจาก learn แล้วไปยิง

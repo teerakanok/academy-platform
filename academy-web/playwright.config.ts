@@ -45,6 +45,13 @@ export default defineConfig({
       // อยากทดสอบพื้นผิวภายในให้รัน `INTERNAL_SURFACES=on npm run test:e2e`
       // ซึ่งจะเปิดทั้งเซิร์ฟเวอร์และปลดล็อก spec ที่ข้ามอยู่
       INTERNAL_SURFACES: process.env.INTERNAL_SURFACES ?? '',
+      // โควตา attempt ของ production คือ 3 ครั้ง/30 นาที ต่อ (user, node) · ชุด e2e
+      // เดินเส้นทาง capstone ซ้ำหลายสิบครั้งในไม่กี่นาที จึงตั้งเพดานสูงไว้ที่นี่
+      //
+      // ทางที่ **ห้าม** ใช้: ให้ผู้ใช้ล้างสมุดนับโควตาเองผ่าน endpoint (เคยทำแล้ว
+      // RIL จับว่าลบ speed bump ทิ้งทั้งหมด) · พฤติกรรมของโควตาเองถูกทดสอบใน
+      // tests/integration/attempt-db.test.ts ซึ่งกำหนดค่าเองอย่างชัดเจน
+      ATTEMPT_MAX_PER_WINDOW: process.env.ATTEMPT_MAX_PER_WINDOW ?? '500',
     },
   },
 })

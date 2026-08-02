@@ -70,16 +70,11 @@ test.describe('POST /api/attempts', () => {
     }
   })
 
-  test('โควตาต่อบท: 3 ครั้งแรกได้ ครั้งที่ 4 ต้อง 429 เป๊ะ', async ({ request }) => {
-    // ใช้ capstone ของอีกคอร์สที่ไม่มีเทสไหนออก attempt — ลำดับจึงบังคับได้เป๊ะ
-    // (ถ้ายอมรับช่วง "1–3 ครั้ง" เพดานที่พิมพ์ผิดเป็น 4 ก็เขียวได้ — RIL จับ)
-    const statuses: number[] = []
-    for (let i = 0; i < 4; i++) {
-      const res = await request.post('/api/attempts', {
-        data: { slug: 'basic-os-linux', nodeId: 'permissions' },
-      })
-      statuses.push(res.status())
-    }
-    expect(statuses).toEqual([200, 200, 200, 429])
-  })
+  // ⚠️ ขอบเขตของโควตา (ครั้งที่ N+1 ถูกปฏิเสธ · ยิงพร้อมกันไม่ทะลุ · หน้าต่างเวลา
+  // เลื่อนจริง) อยู่ใน tests/integration/attempt-db.test.ts ไม่ใช่ที่นี่
+  //
+  // เหตุผล: ชุด e2e เดินเส้นทาง capstone ซ้ำหลายสิบครั้งในไม่กี่นาที จึงรันด้วย
+  // `ATTEMPT_MAX_PER_WINDOW` ที่ตั้งสูง (ดู playwright.config.ts) — เทสที่ยึดเลข 3
+  // ตายตัวจะแดงด้วยเหตุผลที่ไม่เกี่ยวกับของจริง · ทางเลือกที่ **ไม่** เอาคือให้
+  // endpoint ล้างสมุดนับโควตาได้เอง ซึ่งลบ speed bump ทิ้งทั้งหมด (RIL รอบ W1 จับ)
 })

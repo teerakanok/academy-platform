@@ -64,3 +64,16 @@ export function passesLearnMode(correctCount: number, total: number): boolean {
 export function isProofBearing(node: CourseNode): boolean {
   return node.kind === 'capstone'
 }
+
+/**
+ * บทนี้เป็น "พื้นผิววัดผล" ไหม — ผลรายข้อของมันเป็นความลับ
+ *
+ * ที่เดียวที่ตัดสิน ใช้ทั้งตอนตอบกลับ (`/api/progress` POST) และตอนอ่านความคืบหน้า
+ * (GET) · เดิม POST ปิดผลรายข้อไว้แล้วแต่ GET ยังคืน `checkpointResults` รายข้อกับ
+ * `simulationEvidence[].requirements[].met` ของ capstone มาให้ browser — ไล่เฉลย
+ * แบบ Mastermind ได้ครบใน 3 attempt (RIL cross-model รอบ W1 พิสูจน์)
+ * **ปิดรูที่จุดหนึ่งแล้วเปิดที่อีกจุดคือรูเดิม**
+ */
+export function isAssessedNode(node: CourseNode): boolean {
+  return node.kind === 'capstone'
+}

@@ -47,6 +47,48 @@ test.describe('การรอโจทย์ของ attempt', () => {
     await expect(page.getByTestId('checkpoint-sim-sim-1')).not.toContainText('{{')
   })
 
+  test('🔴 ตอบผิดแล้วกด Try again ต้องได้โจทย์ชุดใหม่ ไม่ใช่ทางตัน', async ({ page }) => {
+    // attempt ถูกใช้ไปแล้วตั้งแต่กดตรวจครั้งแรก (ใช้ซ้ำ = 409) · ของเดิม `retry()`
+    // ล้างแค่ช่องกรอกแล้วส่ง attempt id เดิมอีกครั้ง ผู้เรียนจึงกรอกใหม่ทั้งชุด
+    // แล้วกดส่งได้แต่ error ไปเรื่อยๆ โดยไม่มีทางออก (RIL cross-model รอบ W1)
+    await page.goto(LESSON_URL)
+    const sim = page.getByTestId('checkpoint-sim-sim-1')
+    await expect(sim).toBeVisible()
+    const firstTarget = /192\.168\.10\.\d+/.exec((await sim.textContent()) ?? '')?.[0]
+
+    // ตอบผิดทั้ง MCQ และด่านจำลอง แล้วกดตรวจ
+    await page.getByTestId('checkpoint-q-cp-1').locator('input[value="A"]').check()
+    await page.getByTestId('checkpoint-q-cp-2').locator('input[value="A"]').check()
+    await page.getByTestId('checkpoint-q-cp-3').locator('input[value="A"]').check()
+    await page.getByTestId('checkpoint-submit').click()
+    await expect(page.getByTestId('checkpoint-not-passed')).toBeVisible()
+
+    // กดลองใหม่ → ต้องออก attempt ใหม่จริง (รอ response ไม่ใช่รอเวลา ไม่งั้นอ่านโจทย์
+    // ชุดเดิมที่ยังค้างบนหน้าจอ)
+    const [issued] = await Promise.all([
+      page.waitForResponse((r) => r.url().includes('/api/attempts') && r.request().method() === 'POST'),
+      page.getByTestId('checkpoint-retry').click(),
+    ])
+    expect(issued.status(), 'กดลองใหม่แล้วต้องได้โจทย์ชุดใหม่').toBe(200)
+    const sim2 = page.getByTestId('checkpoint-sim-sim-1')
+    await expect(sim2).toBeVisible()
+
+    // ตอบให้ถูกครบด้วยค่าของโจทย์ชุดใหม่ → ต้องผ่านจริง ไม่ใช่ค้างที่ 409
+    const secondTarget = /192\.168\.10\.\d+/.exec((await sim2.textContent()) ?? '')?.[0]
+    expect(secondTarget).toBeTruthy()
+    expect(firstTarget).toBeTruthy()
+    await page.getByTestId('checkpoint-q-cp-1').locator('input[value="B"]').check()
+    await page.getByTestId('checkpoint-q-cp-2').locator('input[value="C"]').check()
+    await page.getByTestId('checkpoint-q-cp-3').locator('input[value="B"]').check()
+    await sim2.getByTestId('sim-mode-static').click()
+    await sim2.getByTestId('sim-ipv4').fill(secondTarget!)
+    await sim2.getByTestId('sim-subnet').fill('255.255.255.0')
+    await sim2.getByTestId('sim-gateway').fill('192.168.10.1')
+    await sim2.getByTestId('sim-apply').click()
+    await page.getByTestId('checkpoint-submit').click()
+    await expect(page.getByTestId('checkpoint-continue')).toBeVisible()
+  })
+
   test('🔴 โควตาเต็ม → บอกตรงๆ พร้อมทางไปต่อ ไม่ใช่ปล่อยให้ทำจนเสร็จแล้วเด้ง', async ({ page }) => {
     let attempts = 0
     await page.route('**/api/attempts', async (route) => {

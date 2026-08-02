@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { startCapstoneAttempt } from './support/capstone'
+import { learnerEmail, storedSimulationEvidence } from './support/evidence'
 
 // W1 — โจทย์จำลองเป็น "ด่าน" ของ capstone ไม่ใช่ของเล่นข้างทาง
 //
@@ -127,22 +128,18 @@ test.describe('capstone ที่มีโจทย์จำลองต้อ�
     // (RIL ยืนยัน) · ข้อนี้เดิน route จริงแล้วอ่านสิ่งที่ถูกบันทึก
     expect((await submit(request, (correct) => correct)).passed).toBe(true)
 
-    const res = await request.get(`/api/progress?slug=${COURSE}`)
-    const record = (await res.json()).record as {
-      simulationEvidence?: Record<string, Record<string, unknown>>
-    }
-    const evidence = record.simulationEvidence?.[CAPSTONE]?.['sim-1'] as
-      | { passed: boolean; requirements: { id: string; met: boolean }[]; challengeVersion: string; at: string }
-      | undefined
+    // อ่านจาก DB ไม่ใช่จาก API — GET ไม่ส่งหลักฐานของพื้นผิววัดผลกลับมาแล้ว
+    // (มันแปรตามคำตอบ = เครื่องเฉลย) ดู support/evidence.ts
+    const evidence = (await storedSimulationEvidence(learnerEmail(), COURSE, CAPSTONE))['sim-1']
 
     expect(evidence, 'route ต้องบันทึกหลักฐานของด่านจำลอง').toBeTruthy()
-    expect(evidence!.passed).toBe(true)
+    expect(evidence.passed).toBe(true)
     // ผลราย requirement ครบทั้ง 5 ข้อ ไม่ใช่ boolean รวม
-    expect(evidence!.requirements).toHaveLength(5)
-    expect(evidence!.requirements.every((r) => r.met)).toBe(true)
+    expect(evidence.requirements).toHaveLength(5)
+    expect(evidence.requirements.every((r) => r.met)).toBe(true)
     // เวอร์ชันต้องเป็นลายนิ้วมือของกติกา ไม่ใช่เวอร์ชันคอร์ส
-    expect(evidence!.challengeVersion).toMatch(/^sim-[0-9a-f]{8}$/)
-    expect(Date.parse(evidence!.at)).toBeGreaterThan(0)
+    expect(evidence.challengeVersion).toMatch(/^sim-[0-9a-f]{8}$/)
+    expect(Date.parse(evidence.at)).toBeGreaterThan(0)
   })
 
   test('🔴 ผ่านแล้วส่งผิดซ้ำ → หลักฐานต้องไม่ถอยหลัง', async ({ request }) => {
@@ -153,11 +150,11 @@ test.describe('capstone ที่มีโจทย์จำลองต้อ�
 
     const record = (await (await request.get(`/api/progress?slug=${COURSE}`)).json()).record as {
       completed: string[]
-      simulationEvidence?: Record<string, Record<string, { passed: boolean }>>
     }
-    // สถานะยังผ่าน (ถูกต้อง) — และหลักฐานต้องยังบอกว่าผ่านเหมือนกัน
+    // สถานะยังผ่าน (ถูกต้อง) — และหลักฐานใน DB ต้องยังบอกว่าผ่านเหมือนกัน
     expect(record.completed).toContain(CAPSTONE)
-    expect(record.simulationEvidence?.[CAPSTONE]?.['sim-1'].passed).toBe(true)
+    const evidence = await storedSimulationEvidence(learnerEmail(), COURSE, CAPSTONE)
+    expect(evidence['sim-1'].passed).toBe(true)
   })
 
   test('หน้าจอจำลองปรากฏในด่านท้ายบทจริง และไม่พากติกาการตรวจไปด้วย', async ({ page }) => {

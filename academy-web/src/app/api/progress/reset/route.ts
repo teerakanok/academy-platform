@@ -22,22 +22,15 @@ export async function POST(request: Request) {
     .eq('user_id', user.account.id)
     .eq('course_slug', slug)
 
-  // ล้าง attempt ของคอร์สนี้ด้วย — เริ่มใหม่แปลว่าเริ่มใหม่จริง
+  // ⚠️ **ห้าม** ลบแถวใน `attempt` ที่นี่ — นั่นคือสมุดนับโควตา
   //
-  // ⚠️ พิจารณาแล้วว่านี่ไม่ใช่ช่องเลี่ยงโควตา (3 ครั้ง/30 นาที ต่อ user×node):
-  // ราคาของการ reset คือ **ทิ้งความคืบหน้าทั้งคอร์สของตัวเอง** ซึ่งแพงกว่าการรอ
-  // 30 นาทีมากสำหรับคนที่ตั้งใจเรียน · ส่วนคนที่ตั้งใจไล่ลองเฉลย โควตาเป็นแค่
-  // speed bump อยู่แล้วเพราะ D1 เปิดสมัครเสรี (บันทึกไว้ในแผน §5 W0-1)
-  // ถ้าไม่ล้าง ผู้เรียนที่กด "เริ่มใหม่" จะเจอ 429 โดยไม่มีทางเข้าใจว่าทำไม
-  const { error: attemptError } = await db
-    .from('attempt')
-    .delete()
-    .eq('user_id', user.account.id)
-    .eq('course_slug', slug)
-
-  if (attemptError) {
-    console.error('[api/progress/reset] ล้าง attempt ไม่สำเร็จ:', attemptError.message)
-  }
+  // เคยลบไปแล้วรอบหนึ่งด้วยเหตุผลเรื่อง UX ("กดเริ่มใหม่แล้วเจอ 429 งงแน่") ·
+  // RIL cross-model จับว่ามันลบโควตาทิ้งทั้งหมด: คนที่ตั้งใจไล่ลองเฉลยไม่มีความ
+  // คืบหน้าให้เสียอยู่แล้ว จึงกด reset สลับกับขอ attempt ได้ไม่จำกัด — speed bump
+  // หายเกลี้ยงโดยที่หน้าเว็บดูปกติดี
+  //
+  // ปัญหา UX เดิมแก้ที่ปลายทางแทน: `/api/attempts` บอกเวลาที่ขอได้อีกครั้ง และหน้าจอ
+  // แสดงข้อความจริงแทนที่จะเงียบ (ดู use-lesson-attempt.ts)
 
   if (error) {
     console.error('[api/progress/reset] ลบไม่สำเร็จ:', error.message)

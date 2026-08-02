@@ -87,6 +87,7 @@ async function gradeWithAttempt(attemptId: string, submittedIp: string, userId =
   const consumed = await consumeAttempt(ctx(userId), attemptId)
   if (!consumed) return { rejected: true as const }
   const challenge = resolveChallenge(CHALLENGE, consumed.params.simulationVars?.['sim-1'] ?? {})
+  if (!challenge) return { rejected: true as const }
   const verdict = gradeSimulation(challenge, { addressMode: 'static', ipv4: submittedIp })
   return { rejected: false as const, passed: verdict.passed }
 }
