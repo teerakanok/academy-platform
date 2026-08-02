@@ -295,3 +295,61 @@ describe('simulation evidence ใน node_progress', () => {
     )
   })
 })
+
+// ── W1 (RIL รอบ 2): ตรรกะ merge ต้องมีเทสที่เรียก SQL ตรงๆ ────────────────────
+//
+// เทส e2e จับ mutation ของ merge ได้เฉพาะเมื่อ migration กลายพันธุ์ถูก apply ลง DB
+// ใหม่ — บน DB ที่ apply ไปแล้ว การแก้ไฟล์ .sql ไม่กระทบอะไรเลย จึงต้องมีเทสที่
+// เรียกฟังก์ชันจริงในฐานข้อมูล
+describe('merge_simulation_evidence — หลักฐานเลื่อนขึ้นอย่างเดียว', () => {
+  async function merge(existing: unknown, incoming: unknown) {
+    const res = await withDb((db) =>
+      db.query('select academy.merge_simulation_evidence($1::jsonb, $2::jsonb) as merged', [
+        JSON.stringify(existing),
+        JSON.stringify(incoming),
+      ]),
+    )
+    return res.rows[0].merged as Record<string, { passed: boolean; v?: number }>
+  }
+
+  it('ครั้งแรก: รับของใหม่ตามปกติ', async () => {
+    expect(await merge({}, { a: { passed: true, v: 1 } })).toEqual({ a: { passed: true, v: 1 } })
+  })
+
+  it('🔴 ผ่านแล้วส่งผลไม่ผ่านมาทีหลัง → คงของเดิมไว้', async () => {
+    // นี่คือกรณีที่ทำให้ "สถานะบอกว่าผ่าน แต่หลักฐานบอกว่าไม่ผ่าน"
+    expect(await merge({ a: { passed: true, v: 1 } }, { a: { passed: false, v: 2 } })).toEqual({
+      a: { passed: true, v: 1 },
+    })
+  })
+
+  it('ยังไม่ผ่าน → รับผลใหม่ได้ตามปกติ (ทั้งผ่านและไม่ผ่าน)', async () => {
+    expect(await merge({ a: { passed: false, v: 1 } }, { a: { passed: true, v: 2 } })).toEqual({
+      a: { passed: true, v: 2 },
+    })
+    expect(await merge({ a: { passed: false, v: 1 } }, { a: { passed: false, v: 2 } })).toEqual({
+      a: { passed: false, v: 2 },
+    })
+  })
+
+  it('ผ่านแล้วทำใหม่ให้ผ่านอีก → อัปเดตได้ (เช่นโจทย์เวอร์ชันใหม่)', async () => {
+    expect(await merge({ a: { passed: true, v: 1 } }, { a: { passed: true, v: 2 } })).toEqual({
+      a: { passed: true, v: 2 },
+    })
+  })
+
+  it('ด่านอื่นไม่กระทบกัน และด่านที่ไม่ได้ส่งมาต้องไม่หาย', async () => {
+    expect(await merge({ a: { passed: true, v: 1 } }, { b: { passed: false, v: 1 } })).toEqual({
+      a: { passed: true, v: 1 },
+      b: { passed: false, v: 1 },
+    })
+  })
+
+  it('null/ว่าง ไม่ทำให้ของเดิมหาย', async () => {
+    expect(await merge({ a: { passed: true, v: 1 } }, {})).toEqual({ a: { passed: true, v: 1 } })
+    const res = await withDb((db) =>
+      db.query(`select academy.merge_simulation_evidence('{"a":{"passed":true}}'::jsonb, null) as merged`),
+    )
+    expect(res.rows[0].merged).toEqual({ a: { passed: true } })
+  })
+})

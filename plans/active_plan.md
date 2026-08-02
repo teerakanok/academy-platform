@@ -82,6 +82,28 @@ R2 bucket สำหรับย้าย media · และอนุญาต de
   cache answer key
 - chain: vitest **241** (รวม type tests) · playwright **85 + 10 skipped** (พื้นผิวภายใน)
 
+**W1 เสร็จ (2026-08-02) — simulation เป็นด่านจริงแล้ว · RIL 2 รอบ:**
+- `CheckpointItem` union (MCQ | simulation) **ไม่ breaking** — loader เติม `kind:'mcq'`
+  ให้รูปเดิม ไฟล์เนื้อหา 20 ไฟล์ไม่ต้องแก้
+- เซิร์ฟเวอร์ตรวจ simulation เอง · MCQ+simulation นับรวมเป็นชุดเดียว (กดตรวจครั้งเดียว)
+- migration 0006: เก็บหลักฐาน **ราย requirement + ลายนิ้วมือกติกา + เวลา**
+- migration 0007: **หลักฐานเลื่อนขึ้นอย่างเดียวเหมือนสถานะ** — RIL จับว่าเดิมผ่านแล้ว
+  ส่งผิดซ้ำจะทำให้ "สถานะบอกว่าผ่าน แต่หลักฐานบอกว่าไม่ผ่าน" ขัดกันเอง
+- `gradingFingerprint()` — เดิมบันทึก `structure.version` ของคอร์สซึ่งไม่ขยับเมื่อ
+  requirements เปลี่ยน จึงตอบไม่ได้ว่าผ่านด้วยกติกาชุดไหน
+- grader **fail-closed**: ไม่มี field ในสถานะ = ไม่ผ่านเสมอ · operator ที่ต้องมี value
+  แต่ไม่มี = ไม่ผ่าน (เดิม `undefined === undefined` ทำให้ "ไม่ทำอะไรเลย" ผ่านด่านได้)
+- เขียน simulation ลง capstone จริง 1 จุด (static IP ให้ print server, 5 requirements)
+- chain: vitest **288** · playwright **100 + 10 skipped**
+
+**ข้อจำกัดที่รู้อยู่และต้องปิดใน W4:** `certificateEligibility` ตัดสินจากสถานะอย่างเดียว
+ยังไม่อ่าน `simulationEvidence` — ถ้าเนื้อหาเพิ่มด่านใหม่เข้า capstone ที่ผ่านไปแล้ว
+สถานะจะยัง completed ทั้งที่หลักฐานของด่านใหม่ยังไม่มี · W4 ต้องอ่านหลักฐานจริงประกอบ
+เพราะใบรับรอง snapshot หลักฐาน ณ วันออก ไม่ใช่สถานะปัจจุบัน (บันทึกในโค้ดแล้ว)
+
+**สิ่งที่ยังเหลือใน W1:** สุ่มพารามิเตอร์ต่อ attempt (ค่าเป้าหมายต่างกันทุกครั้ง)
+โดยใช้โครง attempt ของ W0-0 — ยังไม่ทำ
+
 **W0-3 + W0-4 เสร็จ (2026-08-02) — ปิด F2/F3/F5 · W0 ครบทั้งห้าข้อแล้ว:**
 - `assessment-policy.ts` เป็น **จุดเดียว** ที่ตอบสองคำถาม: "อะไรผ่าน" (`passesLearnMode`)
   และ "อะไรนับเป็นหลักฐาน" (`isProofBearing`) — เดิมสองคำถามนี้กระจายอยู่ API/UI/

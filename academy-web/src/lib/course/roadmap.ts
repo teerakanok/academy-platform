@@ -255,6 +255,16 @@ export interface CertificateEligibility {
   courseIssue: 'no-assessment' | null
 }
 
+/**
+ * ⚠️ ข้อจำกัดที่รู้อยู่และต้องปิดใน W4 (RIL รอบ 2 ของ W1 ชี้)
+ *
+ * ฟังก์ชันนี้ตัดสินจาก **สถานะ** อย่างเดียว ยังไม่อ่าน `simulationEvidence` ·
+ * ผลคือถ้าเนื้อหาเพิ่มด่านจำลองใหม่เข้า capstone ที่ผู้เรียนผ่านไปแล้ว สถานะจะยัง
+ * `completed` (ถูกตามกติกากันถอยหลัง) ทั้งที่ยังไม่มีหลักฐานของด่านใหม่
+ *
+ * W4 (ใบรับรองที่ตรวจสอบได้) ต้องอ่านหลักฐานจริงประกอบ ไม่ใช่เชื่อสถานะอย่างเดียว —
+ * เพราะใบรับรอง snapshot หลักฐาน ณ วันออก ไม่ใช่สถานะปัจจุบัน
+ */
 export function certificateEligibility(
   structure: CourseStructure,
   state: LearnerCourseState,
