@@ -117,38 +117,61 @@ export function CourseDashboard({
   showInternalSurfaces?: boolean
 }) {
   const [progress, setProgress] = useState<Record<string, CourseProgressRecord>>({})
-  const [corrupt, setCorrupt] = useState(false)
-  const [loaded, setLoaded] = useState(false)
+  const [accessState, setAccessState] = useState<'loading' | 'ready' | 'signed-out' | 'denied' | 'unavailable'>('loading')
+  const [accessibleSlugs, setAccessibleSlugs] = useState<string[]>([])
+  const [reload, setReload] = useState(0)
 
   useEffect(() => {
     let alive = true
     // ดึงทุกคอร์สในครั้งเดียว — ยิงทีละคอร์สทำให้ dashboard ช้าขึ้นตามจำนวนคอร์ส
+    setAccessState('loading')
     fetch('/api/progress', { cache: 'no-store' })
-      .then((r) => r.json())
-      .then((body: { ok: boolean; records?: Record<string, CourseProgressRecord> }) => {
+      .then(async (response) => {
+        const body = (await response.json().catch(() => ({}))) as {
+          ok?: boolean
+          records?: Record<string, CourseProgressRecord>
+          accessibleCourseSlugs?: string[]
+        }
+        if (!response.ok || !body.ok) {
+          if (response.status === 401) return { state: 'signed-out' as const }
+          if (response.status === 403) return { state: 'denied' as const }
+          return { state: 'unavailable' as const }
+        }
+        return { state: 'ready' as const, body }
+      })
+      .then((result) => {
         if (!alive) return
+        if (result.state !== 'ready') {
+          setProgress({})
+          setAccessibleSlugs([])
+          setAccessState(result.state)
+          return
+        }
+        const allowed = new Set(result.body.accessibleCourseSlugs ?? [])
         const next: Record<string, CourseProgressRecord> = {}
-        for (const course of courses) {
-          next[course.structure.slug] = body.records?.[course.structure.slug] ?? emptyProgress(course.structure.slug)
+        for (const course of courses.filter((candidate) => allowed.has(candidate.structure.slug))) {
+          next[course.structure.slug] = result.body.records?.[course.structure.slug] ?? emptyProgress(course.structure.slug)
         }
         setProgress(next)
-        setCorrupt(false)
-        setLoaded(true)
+        setAccessibleSlugs([...allowed])
+        setAccessState('ready')
       })
       .catch(() => {
-        if (alive) setLoaded(true)
+        if (alive) setAccessState('unavailable')
       })
     return () => {
       alive = false
     }
-  }, [courses])
+  }, [courses, reload])
+
+  const accessibleCourses = courses.filter((course) => accessibleSlugs.includes(course.structure.slug))
 
   function stateFor(slug: string): LearnerCourseState {
     const record = progress[slug]
     return record ? toLearnerState(record) : EMPTY_STATE
   }
 
-  const started = courses
+  const started = accessibleCourses
     .map((course) => ({ course, record: progress[course.structure.slug] }))
     .filter((entry) => entry.record && entry.record.lastNodeId !== null)
     .sort((a, b) => (b.record?.updatedAt ?? 0) - (a.record?.updatedAt ?? 0))
@@ -157,7 +180,7 @@ export function CourseDashboard({
   const resumeNode = resume ? nextNode(resume.course.structure, stateFor(resume.course.structure.slug)) : null
 
   const globalData = globalSkillData(
-    courses.map((course) => ({ structure: course.structure, state: stateFor(course.structure.slug) })),
+    accessibleCourses.map((course) => ({ structure: course.structure, state: stateFor(course.structure.slug) })),
   )
 
   return (
@@ -165,20 +188,74 @@ export function CourseDashboard({
       <header className="hero-bleed pb-2">
         <p className="font-mono text-xs uppercase tracking-[0.14em] text-cs-accent">My learning</p>
         <h1 className="mt-3 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-cs-text sm:text-5xl">
-          {resume ? 'Pick up where you left off' : 'Start something today'}
+          {accessState === 'signed-out'
+            ? 'Sign in to continue learning'
+            : accessState === 'denied'
+              ? 'Academy enrollment is not active'
+              : accessState === 'unavailable'
+                ? 'My learning is temporarily unavailable'
+                : resume
+                  ? 'Pick up where you left off'
+                  : accessState === 'ready'
+                    ? 'Start something today'
+                    : 'My learning'}
         </h1>
         <p className="mt-3 max-w-2xl text-lg leading-relaxed text-cs-body">
-          Your progress is saved in this browser. Sign-in and cross-device sync arrive with learner accounts.
+          {accessState === 'signed-out'
+            ? 'Your session ended. Sign in again to load the learning record saved to your account.'
+            : accessState === 'denied'
+              ? 'Your account is signed in, but it does not currently have an active Academy enrollment.'
+              : accessState === 'unavailable'
+                ? 'We could not load your courses. Your account and learning record are unchanged.'
+                : 'Your learning record is saved to your CYBERSKILLS account and follows you across devices.'}
         </p>
       </header>
 
-      {corrupt && (
-        <p role="alert" className="rounded-2xl border border-cs-amber-border bg-cs-amber-dim px-5 py-3 text-sm text-cs-amber">
-          Saved progress for one of your courses could not be read and was cleared. Nothing else was affected.
+      {accessState === 'loading' && (
+        <p role="status" className="text-sm text-cs-muted" data-testid="dashboard-loading">
+          Loading your courses…
         </p>
       )}
 
-      {resume && resumeNode && (
+      {accessState === 'denied' && (
+        <section role="status" aria-live="polite" className="border-l-2 border-cs-accent py-2 pl-5" data-testid="dashboard-access-inactive">
+          <h2 className="font-display text-xl font-semibold text-cs-text">Academy enrollment is not active</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-cs-body">
+            Your CYBERSKILLS account is signed in, but no Academy enrollment is active for it. No learning record has been changed.
+          </p>
+          <Link href="/courses" className="mt-4 inline-block text-sm font-medium text-cs-accent underline underline-offset-4">
+            Browse available courses
+          </Link>
+        </section>
+      )}
+
+      {accessState === 'signed-out' && (
+        <section role="status" aria-live="polite" className="border-l-2 border-cs-accent py-2 pl-5" data-testid="dashboard-signed-out">
+          <h2 className="font-display text-xl font-semibold text-cs-text">Your session ended</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-cs-body">
+            Sign in again to continue from the learning record saved to your account.
+          </p>
+          <Link href="/sign-in?next=%2Fdashboard" className="mt-4 inline-block rounded-control bg-cs-accent-fill px-5 py-2.5 text-sm font-semibold text-cs-on-accent">
+            Sign in again
+          </Link>
+        </section>
+      )}
+
+      {accessState === 'unavailable' && (
+        <section role="alert" className="border-l-2 border-cs-amber py-2 pl-5" data-testid="dashboard-unavailable">
+          <h2 className="font-display text-xl font-semibold text-cs-text">Your courses are temporarily unavailable</h2>
+          <p className="mt-2 text-sm text-cs-body">Your account and learning record are unchanged.</p>
+          <button
+            type="button"
+            onClick={() => setReload((value) => value + 1)}
+            className="mt-4 rounded-control border border-cs-border bg-cs-surface px-4 py-2 text-sm hover:border-cs-accent"
+          >
+            Try again
+          </button>
+        </section>
+      )}
+
+      {accessState === 'ready' && resume && resumeNode && (
         <section
           className="card-feature hero-wash relative overflow-hidden p-6 sm:p-8"
           data-testid="resume-card"
@@ -203,12 +280,12 @@ export function CourseDashboard({
         </section>
       )}
 
-      <section aria-labelledby="courses-heading">
+      {accessState === 'ready' && <section aria-labelledby="courses-heading">
         <h2 id="courses-heading" className="mb-4 font-display text-2xl font-semibold text-cs-text">
           Courses
         </h2>
         <ul className="grid gap-4 md:grid-cols-2">
-          {courses.map((course) => {
+          {accessibleCourses.map((course) => {
             const state = stateFor(course.structure.slug)
             const summary = summarise(course.structure, state)
             return (
@@ -246,7 +323,7 @@ export function CourseDashboard({
                       <LessonProgress
                         structure={course.structure}
                         state={state}
-                        loaded={loaded}
+                        loaded
                         label={course.title}
                         testId={`course-progress-${course.structure.slug}`}
                         finishedPercent={summary.finishedPercent}
@@ -259,9 +336,14 @@ export function CourseDashboard({
             )
           })}
         </ul>
-      </section>
+        {accessibleCourses.length === 0 && (
+          <p className="text-sm text-cs-body" data-testid="dashboard-no-courses">
+            No courses are included in your current enrollment.
+          </p>
+        )}
+      </section>}
 
-      <section className="card-feature p-6 sm:p-8" aria-labelledby="skills-heading">
+      {accessState === 'ready' && accessibleCourses.length > 0 && <section className="card-feature p-6 sm:p-8" aria-labelledby="skills-heading">
         <h2 id="skills-heading" className="sr-only">
           Skill map
         </h2>
@@ -271,9 +353,9 @@ export function CourseDashboard({
           accent="accent-2"
           testId="global-radar"
         />
-      </section>
+      </section>}
 
-      {showInternalSurfaces && (
+      {accessState === 'ready' && showInternalSurfaces && (
         <section className="surface-sunken rounded-feature border border-cs-border p-6">
           <h2 className="font-display text-lg font-semibold text-cs-text">Practice banks</h2>
           <p className="mt-1.5 text-sm text-cs-body">

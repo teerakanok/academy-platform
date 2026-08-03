@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { ContentValidationError } from './loader'
 import type { CourseCopy, CourseStructure, LessonContent } from './course-types'
 import { placeholdersIn } from '@/lib/simulation/variables'
+import { SIMULATION_SURFACE_INPUT_FIELDS } from '@/lib/simulation/types'
 
 // Validation ของโครงคอร์ส — นอกจากชนิดข้อมูล ต้องกันความพังเชิงความหมายที่ทำให้
 // ผู้เรียนติดตาย: prerequisite ชี้ node ที่ไม่มี, กราฟวน (deadlock ถาวร),
@@ -197,6 +198,10 @@ const simulationChallengeSchema = z.object({
   brief: z.string().min(1),
   surface: z.enum(['network-interface']),
   initial: z.record(z.string(), z.union([z.string(), z.boolean()])),
+  requiredFields: z.object({
+    dhcp: z.array(z.string().min(1)).max(32),
+    static: z.array(z.string().min(1)).max(32),
+  }),
   requirements: z
     .array(
       z
@@ -237,6 +242,16 @@ const simulationChallengeSchema = z.object({
       ]),
     )
     .optional(),
+}).superRefine((challenge, ctx) => {
+  const supported = new Set(SIMULATION_SURFACE_INPUT_FIELDS[challenge.surface])
+  for (const field of [...challenge.requiredFields.dhcp, ...challenge.requiredFields.static]) {
+    if (!Object.prototype.hasOwnProperty.call(challenge.initial, field)) {
+      ctx.addIssue({ code: 'custom', message: `required field ${field} ไม่มีใน initial state` })
+    }
+    if (!supported.has(field)) {
+      ctx.addIssue({ code: 'custom', message: `required field ${field} แก้ไม่ได้บน surface ${challenge.surface}` })
+    }
+  }
 })
 
 const blockSchema = z.discriminatedUnion('kind', [

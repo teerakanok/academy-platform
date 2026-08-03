@@ -141,6 +141,7 @@ export function toPublicSimulation(challenge: SimulationChallenge): PublicSimula
     brief: challenge.brief,
     surface: challenge.surface,
     initial: challenge.initial,
+    requiredFields: challenge.requiredFields,
     requirements: challenge.requirements.map(({ id, label }) => ({ id, label })),
   }
 }

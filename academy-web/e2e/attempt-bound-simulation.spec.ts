@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { answersFor } from './support/capstone'
+import { prepareNodeAccess } from './support/access'
 
 // W1 (สไลซ์ปิดท้าย) — โจทย์จำลองผูกกับ attempt และค่าเป้าหมายสุ่มต่อครั้ง
 //
@@ -65,8 +66,12 @@ async function submit(
 }
 
 test.describe('โจทย์จำลองผูกกับ attempt', () => {
+  test.beforeEach(async () => {
+    await prepareNodeAccess(COURSE, CAPSTONE)
+  })
+
   test.afterEach(async ({ request }) => {
-    await request.post(`/api/progress/reset?slug=${encodeURIComponent(COURSE)}`)
+    await request.post(`/api/progress/reset?slug=${encodeURIComponent(COURSE)}&operationId=${crypto.randomUUID()}`)
   })
 
   test('attempt ออกโจทย์ที่มีค่าเป้าหมายจริง และไม่พากติกาการตรวจมาด้วย', async ({ request }) => {

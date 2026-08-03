@@ -27,7 +27,14 @@ describe('internalSurfacesEnabled', () => {
 
   it('"on" เท่านั้นที่เปิด', () => {
     vi.stubEnv('INTERNAL_SURFACES', 'on')
+    vi.stubEnv('NODE_ENV', 'development')
     expect(internalSurfacesEnabled()).toBe(true)
+  })
+
+  it('production เปิดไม่ได้จนกว่าจะมี staff authorization จริง', () => {
+    vi.stubEnv('INTERNAL_SURFACES', 'on')
+    vi.stubEnv('NODE_ENV', 'production')
+    expect(internalSurfacesEnabled()).toBe(false)
   })
 })
 

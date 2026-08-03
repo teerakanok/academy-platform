@@ -13,6 +13,7 @@ import {
   revokeCourseEntitlement,
   syncActivation,
 } from '@/lib/account/access'
+import { getCourseAccess } from '@/lib/account/course-access'
 
 // ทิศทาง Identity Control: account exists → service activation → product entitlement
 // → resource authorization และ **ชั้นก่อนหน้าไม่เคยแปลว่าได้ชั้นถัดไป**
@@ -124,6 +125,10 @@ describe('ชั้นสถานะต้องแยกจากกันจ�
     // เปิดใช้บริการแล้ว แต่ยังไม่มีสิทธิ์คอร์สไหนเลย
     expect(await hasCourseEntitlement(user.id, 'basic-os-linux')).toBe(false)
     expect(await hasCourseEntitlement(user.id, 'content-formats-demo')).toBe(false)
+    expect(await getCourseAccess(user.id, 'basic-os-linux')).toEqual({
+      allowed: false,
+      reason: 'not-entitled',
+    })
   })
 
   it('มีบัญชีอย่างเดียว ยังไม่นับว่าเปิดใช้บริการ', async () => {
@@ -168,6 +173,79 @@ describe('ชั้นสถานะต้องแยกจากกันจ�
     expect(isServiceUsable(await getActivation(user.id))).toBe(false)
     // สิทธิ์คอร์สยังอยู่ (คนละชั้น) — การกันเข้าเว็บเป็นหน้าที่ของชั้น activation
     expect(await hasCourseEntitlement(user.id, 'basic-os-linux')).toBe(true)
+    expect(await getCourseAccess(user.id, 'basic-os-linux')).toEqual({
+      allowed: false,
+      reason: 'inactive',
+    })
+  })
+
+  it('เข้า course content ได้เมื่อ activation และ entitlement ผ่านพร้อมกันเท่านั้น', async () => {
+    const user = await findOrCreateUser({ issuer: ISS, subject: 'sub-access', email: 'access@example.com' })
+    await syncActivation(user.id, {
+      issuer: ISS,
+      subject: 'sub-access',
+      verifiedEmail: 'access@example.com',
+      audience: 'academy-web',
+      serviceId: 'academy',
+      nonce: 'n',
+      activation: { status: 'active', revision: 1 },
+    })
+    await grantCourseEntitlement(user.id, 'basic-os-linux', 'free')
+
+    expect(await getCourseAccess(user.id, 'basic-os-linux')).toEqual({ allowed: true })
+  })
+
+  it('activation revision เก่าที่มาช้าห้ามทับสถานะ revision ใหม่', async () => {
+    const user = await findOrCreateUser({ issuer: ISS, subject: 'sub-revision', email: 'revision@example.com' })
+    const result = (status: 'active' | 'suspended', revision: number) => ({
+      issuer: ISS,
+      subject: 'sub-revision',
+      verifiedEmail: 'revision@example.com',
+      audience: 'academy-web',
+      serviceId: 'academy',
+      nonce: `revision-${revision}`,
+      activation: { status, revision },
+    })
+
+    await syncActivation(user.id, result('suspended', 9))
+    await syncActivation(user.id, result('active', 8))
+
+    expect(await getActivation(user.id)).toEqual({ status: 'suspended', revision: 9 })
+  })
+
+  it('activation revision เท่ากันแต่สถานะขัดกันต้อง reject ไม่ใช่ last-write-wins', async () => {
+    const user = await findOrCreateUser({ issuer: ISS, subject: 'sub-conflict', email: 'conflict@example.com' })
+    const base = {
+      issuer: ISS,
+      subject: 'sub-conflict',
+      verifiedEmail: 'conflict@example.com',
+      audience: 'academy-web',
+      serviceId: 'academy',
+      nonce: 'same-revision',
+    }
+    await syncActivation(user.id, { ...base, activation: { status: 'suspended', revision: 4 } })
+
+    await expect(
+      syncActivation(user.id, { ...base, activation: { status: 'active', revision: 4 } }),
+    ).rejects.toThrow(/revision|สถานะ/i)
+    expect(await getActivation(user.id)).toEqual({ status: 'suspended', revision: 4 })
+  })
+
+  it('activation events ต่าง revision ที่มาพร้อมกันต้องจบที่ revision สูงสุด', async () => {
+    const user = await findOrCreateUser({ issuer: ISS, subject: 'sub-race', email: 'race@example.com' })
+    const base = {
+      issuer: ISS,
+      subject: 'sub-race',
+      verifiedEmail: 'race@example.com',
+      audience: 'academy-web',
+      serviceId: 'academy',
+      nonce: 'race',
+    }
+    await Promise.all([
+      syncActivation(user.id, { ...base, activation: { status: 'active', revision: 10 } }),
+      syncActivation(user.id, { ...base, activation: { status: 'suspended', revision: 11 } }),
+    ])
+    expect(await getActivation(user.id)).toEqual({ status: 'suspended', revision: 11 })
   })
 })
 

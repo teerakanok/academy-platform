@@ -28,6 +28,7 @@ function challenge(): SimulationChallenge {
     brief: 'ต้องเข้าถึงได้ที่ {{targetIp}} เสมอ',
     surface: 'network-interface',
     initial: {},
+    requiredFields: { dhcp: [], static: ['ipv4'] },
     variables: VARIABLES,
     requirements: [
       { id: 'r-ip', label: 'ตั้ง IP เป็น {{targetIp}}', field: 'ipv4', operator: 'equals', value: '{{targetIp}}' },
@@ -116,6 +117,7 @@ describe('resolveChallenge', () => {
       brief: 'ตั้งค่าให้ถูก',
       surface: 'network-interface',
       initial: {},
+      requiredFields: { dhcp: [], static: [] },
       requirements: [{ id: 'r', label: 'l', field: 'f', operator: 'equals', value: 'x' }],
     }
     expect(resolveChallenge(plain, {})).toBe(plain)

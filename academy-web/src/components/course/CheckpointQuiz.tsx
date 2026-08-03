@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import type { AttemptQuestion, AttemptSimulation, PublicCheckpointItem } from '@/lib/content/public-lesson'
 import type { CheckpointOutcome } from '@/lib/course/progress-client'
-import type { SimulationState } from '@/lib/simulation/types'
+import { simulationReadiness, type SimulationState } from '@/lib/simulation/types'
 import { SimulationSurface } from './blocks/SimulationSurface'
 
 // Checkpoint ท้ายบท — **เซิร์ฟเวอร์เป็นคนตรวจ ไม่ใช่หน้านี้**
@@ -31,7 +31,7 @@ export function CheckpointQuiz({
   onSubmit: (submission: {
     answers: Record<string, string[]>
     simulations: Record<string, SimulationState>
-  }) => Promise<CheckpointOutcome | null>
+  }) => Promise<CheckpointOutcome | { validationError: 'simulation-incomplete' } | null>
   /** ผู้เรียนกดไปต่อหลังผ่านแล้ว */
   onPassed: () => void
   /**
@@ -57,14 +57,25 @@ export function CheckpointQuiz({
   const [grading, setGrading] = useState(false)
   const [outcome, setOutcome] = useState<CheckpointOutcome | null>(null)
   const [failed, setFailed] = useState(false)
+  const [validationError, setValidationError] = useState(false)
 
   // โจทย์จำลองไม่มี "ยังไม่ตอบ" — หน้าจอมีค่าตั้งต้นเสมอ จึงนับเฉพาะ MCQ
-  const allAnswered = questions.every((q) => (answers[q.id]?.length ?? 0) > 0)
+  const allQuestionsAnswered = questions.every((q) => (answers[q.id]?.length ?? 0) > 0)
+  const allSimulationsReady = simulations.every((item) =>
+    simulationReadiness(
+      item.challenge.surface,
+      item.challenge.initial,
+      simStates[item.id] ?? item.challenge.initial,
+      item.challenge.requiredFields,
+    ).ready,
+  )
+  const allAnswered = allQuestionsAnswered && allSimulationsReady
   const results = outcome?.results
   const explanations = outcome?.explanations
 
   function toggle(question: Extract<PublicCheckpointItem, { kind: 'mcq' }>, letter: string) {
     if (grading || outcome) return
+    setValidationError(false)
     setAnswers((prev) => {
       const current = prev[question.id] ?? []
       // `multiple` มาจากเซิร์ฟเวอร์ — เดิมหน้านี้ดูจาก `correct.length > 1` ซึ่งคือ
@@ -81,10 +92,15 @@ export function CheckpointQuiz({
   async function grade() {
     setGrading(true)
     setFailed(false)
+    setValidationError(false)
     const next = await onSubmit({ answers, simulations: simStates })
     setGrading(false)
     if (!next) {
       setFailed(true)
+      return
+    }
+    if ('validationError' in next) {
+      setValidationError(true)
       return
     }
     setOutcome(next)
@@ -95,6 +111,7 @@ export function CheckpointQuiz({
     setSimStates(Object.fromEntries(simulations.map((s) => [s.id, { ...s.challenge.initial }])))
     setOutcome(null)
     setFailed(false)
+    setValidationError(false)
     // ด่านที่ผูกกับ attempt: การส่งคำตอบหนึ่งครั้ง = ใช้ attempt นั้นไปแล้ว (ตรวจซ้ำ
     // ด้วย attempt เดิมถูกปฏิเสธ 409) · การล้างช่องกรอกอย่างเดียวจึงเป็นทางตัน —
     // ผู้เรียนกรอกใหม่ทั้งชุดแล้วกดส่งก็ได้แต่ error (RIL cross-model รอบ W1 จับ)
@@ -196,7 +213,10 @@ export function CheckpointQuiz({
               <SimulationSurface
                 surface={item.challenge.surface}
                 state={simStates[item.id] ?? item.challenge.initial}
-                onChange={(next) => setSimStates((prev) => ({ ...prev, [item.id]: next }))}
+                onChange={(next) => {
+                  setValidationError(false)
+                  setSimStates((prev) => ({ ...prev, [item.id]: next }))
+                }}
                 readOnly={grading || outcome !== null}
               />
             </div>
@@ -225,6 +245,11 @@ export function CheckpointQuiz({
             {failed && (
               <span className="text-sm text-cs-amber" data-testid="checkpoint-grade-failed">
                 We could not check your answers just now. Try again in a moment.
+              </span>
+            )}
+            {validationError && (
+              <span className="text-sm text-cs-amber" data-testid="checkpoint-validation-error">
+                Finish every hands-on field and apply the settings, then check again. Your answers are still here.
               </span>
             )}
           </>
@@ -266,7 +291,11 @@ export function CheckpointQuiz({
           </>
         )}
         {!allAnswered && !outcome && !grading && (
-          <span className="text-sm text-cs-muted">Answer every question to continue.</span>
+          <span className="text-sm text-cs-muted">
+            {allQuestionsAnswered && !allSimulationsReady
+              ? 'Finish and apply each hands-on task before checking.'
+              : 'Answer every question to continue.'}
+          </span>
         )}
       </div>
     </section>

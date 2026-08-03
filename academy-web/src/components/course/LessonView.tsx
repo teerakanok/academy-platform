@@ -25,7 +25,6 @@ import {
   fetchProgress,
   pushProgress,
   type CheckpointOutcome,
-  type ProgressAction,
   type ProgressSyncFailure,
   type VideoCueOutcome,
 } from '@/lib/course/progress-client'
@@ -172,12 +171,18 @@ export function LessonView({
   }
 
   const [syncError, setSyncError] = useState<ProgressSyncFailure | null>(null)
+  const [accessIssue, setAccessIssue] = useState<'signed-out' | 'access-lost' | 'unavailable' | null>(null)
 
   useEffect(() => {
     let alive = true
-    fetchProgress(structure.slug).then((loadedRecord) => {
+    fetchProgress(structure.slug).then((result) => {
       if (!alive) return
-      const started = markStarted(loadedRecord, node.id)
+      if (!result.ok) {
+        setAccessIssue(result.reason)
+        setLoaded(true)
+        return
+      }
+      const started = markStarted(result.record, node.id)
       setRecord(started)
       setLoaded(true)
       const status = nodeStatus(node, toLearnerState(started))
@@ -185,7 +190,11 @@ export function LessonView({
       else if (status === 'tested-out') setDone('tested-out')
       else if (status === 'skipped') setDone('skipped')
       // แค่ "เปิดอ่าน" ก็บันทึก เพื่อให้กลับมาต่อจากที่ค้างได้จากเครื่องไหนก็ได้
-      void pushProgress({ action: 'open', slug: structure.slug, nodeId: node.id })
+      void pushProgress({ action: 'open', slug: structure.slug, nodeId: node.id }).then(({ failure }) => {
+        if (!alive || !failure) return
+        setSyncError(failure)
+        if (failure.accessLost) setAccessIssue('access-lost')
+      })
     })
     return () => {
       alive = false
@@ -194,12 +203,6 @@ export function LessonView({
 
   // อัปเดตหน้าจอทันที แล้วค่อยบันทึก — ผู้เรียนไม่ควรต้องรอ network ระหว่างตอบคำถาม
   // แต่ถ้าบันทึกไม่สำเร็จต้องบอกให้รู้ ไม่ใช่เงียบแล้วปล่อยให้เขาเสียงานไปเฉยๆ
-  function persist(next: CourseProgressRecord, event?: ProgressAction) {
-    setRecord(next)
-    if (!event) return
-    void pushProgress(event).then(({ failure }) => setSyncError(failure))
-  }
-
   // บทที่มีด่านจำลองต้องมี attempt ก่อน — ค่าเป้าหมายอยู่ใน attempt ฝั่งเซิร์ฟเวอร์
   // ไม่ได้อยู่ในไฟล์เนื้อหา (ไฟล์เก็บแค่แม่แบบ)
   const hasSimulationTask = lesson.checkpoint.some((item) => item.kind === 'simulation')
@@ -230,7 +233,7 @@ export function LessonView({
   async function submitCheckpoint(
     quizMode: 'learn' | 'test-out',
     submission: { answers: Record<string, string[]>; simulations: Record<string, SimulationState> },
-  ): Promise<CheckpointOutcome | null> {
+  ): Promise<CheckpointOutcome | { validationError: 'simulation-incomplete' } | null> {
     const { failure, outcome } = await pushProgress({
       action: 'checkpoint',
       slug: structure.slug,
@@ -240,11 +243,33 @@ export function LessonView({
       simulations: submission.simulations,
       attemptId: attempt.status === 'ready' ? attempt.id : undefined,
     })
-    setSyncError(failure)
+    setSyncError(failure?.simulationIncomplete ? null : failure)
+    if (failure?.accessLost) setAccessIssue('access-lost')
+    if (failure?.claimReplaced) {
+      // อีก request อาจ commit ใบเดียวกันสำเร็จแล้ว: อ่าน state จริงก่อนเสมอ ห้ามออก
+      // attempt ใหม่ทันที เพราะจะให้ผู้เรียนทำซ้ำและกินโควตาทั้งที่ผลมีอยู่แล้ว
+      const fresh = await fetchProgress(structure.slug)
+      if (!fresh.ok) {
+        setAccessIssue(fresh.reason)
+        return null
+      }
+      setRecord(fresh.record)
+      if (fresh.record.completed.includes(node.id) || fresh.record.testedOut.includes(node.id)) {
+        setSyncError(null)
+        return {
+          passed: true,
+          results: fresh.record.checkpointResults[node.id],
+        }
+      }
+      return null
+    }
     if (failure?.needsNewAttempt) {
       // โจทย์ชุดนี้ใช้ไม่ได้แล้ว — ขอชุดใหม่ให้เลย ผู้เรียนจะได้ไม่ติดอยู่กับปุ่มที่
       // กดแล้วได้ error เดิมทุกครั้ง (ด่านจะกลับมาเมื่อโจทย์ชุดใหม่มาถึง)
       retryAttempt()
+    }
+    if (failure?.simulationIncomplete) {
+      return { validationError: 'simulation-incomplete' }
     }
     if (failure || !outcome) return null
 
@@ -272,13 +297,18 @@ export function LessonView({
       answer,
     })
     setSyncError(failure)
+    if (failure?.accessLost) setAccessIssue('access-lost')
     if (failure || !cue) return null
     setRecord((prev) => recordVideoCue(prev, node.id, cueId, cue.correct))
     return cue
   }
 
-  function skipLesson() {
-    persist(markSkipped(record, node.id), { action: 'skip', slug: structure.slug, nodeId: node.id })
+  async function skipLesson() {
+    const { failure } = await pushProgress({ action: 'skip', slug: structure.slug, nodeId: node.id })
+    setSyncError(failure)
+    if (failure?.accessLost) setAccessIssue('access-lost')
+    if (failure) return
+    setRecord(markSkipped(record, node.id))
     setDone('skipped')
     setMode('skipped')
   }
@@ -286,8 +316,43 @@ export function LessonView({
   async function goNext() {
     // อ่านสดจากบัญชีก่อนเลือกบทถัดไป — อาจมีเครื่องอื่นเรียนคืบไปแล้ว
     const fresh = await fetchProgress(structure.slug)
-    const target = nextNode(structure, toLearnerState(fresh))
+    if (!fresh.ok) {
+      setAccessIssue(fresh.reason)
+      return
+    }
+    const target = nextNode(structure, toLearnerState(fresh.record))
     router.push(target ? `/courses/${structure.slug}/lessons/${target.id}` : `/courses/${structure.slug}`)
+  }
+
+  const accessLost = accessIssue ?? (attempt.status === 'failed' && attempt.reason === 'access-lost' ? 'access-lost' : null)
+  if (accessLost) {
+    return (
+      <article className="space-y-6" data-testid="lesson-access-lost">
+        <nav aria-label="Breadcrumb" className="font-mono text-xs text-cs-muted">
+          <Link href="/dashboard" className="hover:text-cs-accent">My learning</Link>
+          <span aria-hidden="true"> / </span>
+          <Link href={`/courses/${structure.slug}`} className="hover:text-cs-accent">{courseTitle}</Link>
+        </nav>
+        <section role="alert" className="border-l-2 border-cs-amber py-2 pl-5">
+          <h1 className="font-display text-2xl font-semibold text-cs-text">
+            {accessLost === 'unavailable' ? 'We could not confirm course access' : 'Course access changed'}
+          </h1>
+          <p className="mt-3 text-sm leading-relaxed text-cs-body">
+            {accessLost === 'signed-out'
+              ? 'Your session ended before this work could be saved. Sign in again to continue.'
+              : accessLost === 'access-lost'
+                ? 'This lesson is no longer available to this account. Work that the server did not confirm has not been marked complete.'
+                : 'Your learning record is unchanged. Return to My learning and try again.'}
+          </p>
+          <Link
+            href={accessLost === 'signed-out' ? `/sign-in?next=${encodeURIComponent(`/courses/${structure.slug}/lessons/${node.id}`)}` : '/dashboard'}
+            className="mt-5 inline-block rounded-control bg-cs-accent-fill px-5 py-3 text-sm font-semibold text-cs-on-accent"
+          >
+            {accessLost === 'signed-out' ? 'Sign in again' : 'Return to My learning'}
+          </Link>
+        </section>
+      </article>
+    )
   }
 
   return (

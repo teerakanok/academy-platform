@@ -2,7 +2,76 @@
 
 > Open work only. Move closed items to `completed_log.md` with evidence.
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
-> **Last updated:** 2026-08-02
+> **Last updated:** 2026-08-03
+
+---
+
+## ⛔ Pre-continuation audit gate — 2026-08-02
+
+ตรวจ implementation เดิมทั้ง code, security และ learner UX แล้ว แม้ baseline ผ่าน
+`lint` (0 errors), test 347 ตัว และ E2E 111 ตัว แต่ยังพบ production blockers ที่ suite
+ไม่ครอบคลุม จึง **ห้ามถือว่า Academy พร้อมรับ production traffic หรือออก certificate**
+จนกว่าจะปิด P0 ใน
+[`reports/reviews/academy-implementation-audit-2026-08-02.md`](../reports/reviews/academy-implementation-audit-2026-08-02.md)
+
+ลำดับที่ใช้เดินงาน: local security batch → integrity batch → learner-safety batch →
+owner decisions → Pool A ภายใต้ authorization ใหม่ → release verification
+
+Pool A, production schema/PGRST, R2, deploy และ secrets **ยังไม่ได้ถูกแตะ** ใน audit นี้
+และยังคงใช้ authorization gate ตาม active handoff
+
+### Local Security Batch — ปิดแล้ว 2026-08-03
+
+- [x] auth cookie policy จุดเดียว: `HttpOnly`, `SameSite=Lax`, host/path scope และ
+      production fail-secure; auth mutation ปฏิเสธ transport ที่ไม่ผ่าน HTTPS edge
+- [x] same-origin/Fetch Metadata + JSON content-type guard ครบ mutation routes
+- [x] bounded streaming JSON ครบ public/mutation endpoints ที่รับ body
+- [x] activation + course entitlement + node prerequisite เป็น resource guard กลาง
+      ครบ lesson, progress, attempts, explanations และ practice
+- [x] dashboard/lesson มี typed denied, unavailable และ access-lost states; sign-out
+      ตรวจ provider failure และไม่ redirect แบบสำเร็จปลอม
+- [x] evidence: lint/typecheck, 388 unit/integration tests, clean build และ Playwright
+      121 passed / 10 skipped; independent Code/Security/UX review = C0/H0/M0 ทุก lane
+
+### Integrity Batch — ปิดแล้ว 2026-08-03
+
+- [x] claim token fence + atomic attempt outcome/progress; concurrent claim แยกจาก invalid
+      และ UI reconcile ผลเดิมก่อนออก attempt ใหม่
+- [x] progress epoch fence ครบ attempt และ generic open/skip/video/checkpoint; reset,
+      activation suspend และ entitlement revoke ชนะ in-flight request ตามลำดับ transaction
+- [x] activation sync เป็น monotonic revision; revision เท่ากันแต่ status ขัดกันถูก reject
+- [x] explanation snapshot ผูกกับ passing attempt และ fail closed เมื่อ pointer/snapshot หาย
+- [x] evidence: lint/typecheck, Vitest 413/413, clean build, DB lint และ Playwright
+      122 passed / 10 skipped; independent Code/Security/UX review = C0/H0/M0 ทุก lane
+
+### Learner-Safety Batch — กำลังทำ
+
+- [x] validation ความครบของ simulation ก่อน consume attempt: per-mode public readiness,
+      Apply/dirty state, legacy snapshot normalization และ policy snapshot; incomplete payload
+      ไม่กิน quota/ปิดใบและ UI คงคำตอบกับ attempt เดิม
+- [x] reset confirmation และ recovery contract ที่บอกผลตามจริงโดยไม่ทำให้ผู้เรียนเสียงาน
+- [x] focus trap/return focus สำหรับ image/lab dialogs และ keyboard/video cue accessibility
+- [ ] แก้ learner-facing copy ที่ยังอ้าง persistence/issuance ไม่ตรง implementation จริง
+
+**Evidence checkpoint 1:** lint/typecheck ผ่าน · Vitest **426/426** · clean build ผ่าน ·
+Playwright **124 passed / 10 skipped** · independent Code/Security/UX review C0/H0/M0 ทุก lane
+
+**Evidence checkpoint 2:** reset ใช้ confirmation ที่บอกขอบเขต/attempt quota ตามจริง,
+operation ID + bounded receipt สำหรับ idempotent recovery, transaction recheck สิทธิ์และ
+progress epoch, current-record reconciliation และ fail-closed overview state · lint/typecheck
+ผ่าน · Vitest **440/440** · fresh local migration + clean build ผ่าน · Playwright
+**136 passed / 10 skipped** · independent Code/Security/UX review **C0/H0/M0 ทุก lane**
+
+**Evidence checkpoint 3:** image/lab ใช้ native modal + shared focus trap และคืน focus
+ไป opener; reset dialog รักษา focus ระหว่าง slow request/reopen/terminal states พร้อม stable
+fallback; video cue ใช้ non-modal semantics, keyboard-only flow, persistent live status และ
+คืน focus ไป video · lint/typecheck ผ่าน · Vitest **440/440** · clean build ผ่าน · Playwright
+**137 passed / 10 skipped** · desktop/mobile visual review ผ่าน · independent
+Code/Security/UX review **C0/H0/M0/L0 ทุก lane**
+
+**ยังไม่ใช่ production-ready:** private `/media/*`, HTTPS runtime `Set-Cookie` proof บน
+deployment topology จริง, privacy/retention, dependency advisories, durable abuse control,
+least-privilege production credential และ learner-safety items ด้านบนยังเป็น launch gates
 
 ---
 
@@ -397,8 +466,8 @@ email เอง**
 - [x] map ด้วย (issuer, subject) และ email เป็น attribute ที่เปลี่ยนได้ — ทำไว้ตั้งแต่ M3
 
 #### ยังไม่ทำ
-- [ ] เสียบ `has_course_entitlement` เข้าเส้นทางที่ปล่อยเนื้อหาจริง (ตอนนี้ middleware
-      ยังเช็คแค่ "มี user ไหม") — ต้องทำก่อนมีคอร์สเสียเงิน
+- [x] เสียบ activation + `has_course_entitlement` + node prerequisite เข้าเส้นทาง
+      lesson/progress/attempt/explanation/practice/reset ผ่าน guard กลาง
 - [ ] transaction store ฝั่ง backend (เก็บ state/PKCE verifier/nonce) แล้วต่อ callback
 - [ ] `/sign-in` เปลี่ยนเป็น redirect ไป Account Center — **ทำเมื่อ Identity Control
       พร้อมต่อจริงเท่านั้น**
@@ -436,8 +505,8 @@ Academy เองเป็นงานที่จะถูกทิ้ง ค�
       header ที่ปลอมได้; บน Workers แต่ละ isolate มี memory แยก รหัส 6 หลัก = ล้านค่า
       → ต้องใช้ limiter แบบ distributed (KV/DO/Redis) จำกัดทั้ง IP และ email
       และล็อก challenge หลังผิดกี่ครั้ง
-- [ ] **HIGH · ไม่มี entitlement ต่อคอร์ส** — middleware เช็คแค่ "มี user ไหม"
-      วันที่มีคอร์สเสียเงิน บัญชีฟรีใบเดียวเปิดได้ทุกคอร์ส
+- [x] **HIGH · ไม่มี entitlement ต่อคอร์ส** — ปิดใน app paths ด้วย activation +
+      entitlement + node prerequisite guard; `/media/*` ยังแยกเป็น launch gate ด้านล่าง
 - [ ] **MEDIUM · ไฟล์บทเรียนอยู่ใน public/** — วิดีโอ/PDF โหลดได้โดยไม่ล็อกอิน
       ขัดกับมติ "ต้องสมัครถ้าจะใช้"
 - [ ] **MEDIUM · shouldCreateUser:true บน endpoint สาธารณะ** — ยิงอีเมลจำนวนมากได้

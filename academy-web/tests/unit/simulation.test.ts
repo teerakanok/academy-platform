@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { gradeSimulation, type SimulationChallenge } from '@/lib/simulation/types'
+import { gradeSimulation, simulationReadiness, type SimulationChallenge } from '@/lib/simulation/types'
 import { getLesson } from '@/lib/content/course-source'
 
 // การตัดสินต้องมาจาก "สถานะสุดท้าย" ไม่ใช่ลำดับการคลิก — ของจริงมีหลายทางไปถึงผล
@@ -97,5 +97,70 @@ describe('การตัดสินโจทย์จำลอง', () => {
         }
       }
     }
+  })
+})
+
+describe('ความพร้อมก่อนส่งโจทย์จำลอง', () => {
+  const initial = {
+    addressMode: 'dhcp',
+    ipv4: '',
+    subnet: '',
+    gateway: '',
+    dns1: '',
+    applied: false,
+  }
+
+  it('initial state และ static ที่กรอกไม่ครบยังไม่พร้อมส่ง', () => {
+    expect(simulationReadiness('network-interface', initial, initial, { dhcp: [], static: ['ipv4', 'subnet', 'gateway'] }).ready).toBe(false)
+    expect(
+      simulationReadiness('network-interface', initial, {
+        ...initial,
+        addressMode: 'static',
+        ipv4: '192.168.10.50',
+        applied: true,
+      }, { dhcp: [], static: ['ipv4', 'subnet', 'gateway'] }).ready,
+    ).toBe(false)
+  })
+
+  it('กรอก static ครบแต่ยังไม่ Apply ก็ยังไม่พร้อม', () => {
+    expect(
+      simulationReadiness('network-interface', initial, {
+        addressMode: 'static',
+        ipv4: '192.168.10.50',
+        subnet: '255.255.255.0',
+        gateway: '192.168.10.1',
+        applied: false,
+      }, { dhcp: [], static: ['ipv4', 'subnet', 'gateway'] }).ready,
+    ).toBe(false)
+  })
+
+  it('พร้อมเมื่อเปลี่ยน state, กรอกตามโครง surface ครบ และ Apply แล้ว แม้คำตอบอาจผิด', () => {
+    expect(
+      simulationReadiness('network-interface', initial, {
+        addressMode: 'static',
+        ipv4: '10.0.0.99',
+        subnet: '255.255.255.0',
+        gateway: '10.0.0.1',
+        applied: true,
+      }, { dhcp: [], static: ['ipv4', 'subnet', 'gateway'] }).ready,
+    ).toBe(true)
+    expect(
+      simulationReadiness('network-interface', initial, { ...initial, applied: true }, {
+        dhcp: [],
+        static: ['ipv4', 'subnet', 'gateway'],
+      }).ready,
+    ).toBe(true)
+  })
+
+  it('static ที่ไม่มี default gateway ยังพร้อมส่งได้ เพราะบาง network ไม่มี gateway', () => {
+    expect(
+      simulationReadiness('network-interface', initial, {
+        addressMode: 'static',
+        ipv4: '10.0.0.99',
+        subnet: '255.255.255.0',
+        gateway: '',
+        applied: true,
+      }, { dhcp: [], static: ['ipv4', 'subnet'] }).ready,
+    ).toBe(true)
   })
 })

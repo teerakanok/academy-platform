@@ -114,6 +114,7 @@ describe('toPublicSimulation', () => {
     brief: 'ต้องเข้าถึงได้ที่ 192.168.10.50 เสมอ',
     surface: 'network-interface',
     initial: { mode: 'dhcp' },
+    requiredFields: { dhcp: [], static: ['ipv4'] },
     requirements: [
       { id: 'r1', label: 'ที่อยู่ไม่เปลี่ยน', field: 'mode', operator: 'equals', value: 'static' },
       { id: 'r2', label: 'ตั้ง IP ตามโจทย์', field: 'ip', operator: 'equals', value: '192.168.10.50' },

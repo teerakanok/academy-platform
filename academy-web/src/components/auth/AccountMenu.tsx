@@ -11,6 +11,8 @@ type State = { loading: true } | { loading: false; signedIn: boolean; email?: st
 
 export function AccountMenu() {
   const [state, setState] = useState<State>({ loading: true })
+  const [signingOut, setSigningOut] = useState(false)
+  const [signOutError, setSignOutError] = useState<string | null>(null)
 
   useEffect(() => {
     let alive = true
@@ -56,12 +58,22 @@ export function AccountMenu() {
       <button
         type="button"
         data-testid="header-sign-out"
+        disabled={signingOut}
         onClick={async () => {
-          await fetch('/api/auth/sign-out', { method: 'POST' })
-          // reload เต็ม — หน้าที่ render ไว้ยังคิดว่าล็อกอินอยู่
-          window.location.assign('/')
+          setSigningOut(true)
+          setSignOutError(null)
+          try {
+            const response = await fetch('/api/auth/sign-out', { method: 'POST' })
+            if (!response.ok) throw new Error('sign-out failed')
+            const result = (await response.json()) as { revocation?: 'confirmed' | 'not-confirmed' }
+            // reload เต็ม — หน้าที่ render ไว้ยังคิดว่าล็อกอินอยู่
+            window.location.assign(result.revocation === 'not-confirmed' ? '/sign-in?notice=local-only' : '/')
+          } catch {
+            setSignOutError('Could not sign out. Your session may still be active. Try again.')
+            setSigningOut(false)
+          }
         }}
-        className="flex items-center gap-1.5 whitespace-nowrap rounded-control border border-cs-border px-2.5 py-2 text-[13px] text-cs-muted transition-colors hover:border-cs-accent hover:text-cs-accent sm:px-3 sm:py-1.5 sm:text-sm"
+        className="flex items-center gap-1.5 whitespace-nowrap rounded-control border border-cs-border px-2.5 py-2 text-[13px] text-cs-muted transition-colors hover:border-cs-accent hover:text-cs-accent disabled:cursor-wait disabled:opacity-60 sm:px-3 sm:py-1.5 sm:text-sm"
       >
         <svg
           aria-hidden="true"
@@ -76,8 +88,17 @@ export function AccountMenu() {
           <path d="M12.5 6.5V4.5a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2" />
           <path d="M16.5 10H8m8.5 0-2.5-2.5M16.5 10 14 12.5" />
         </svg>
-        <span className="sr-only sm:not-sr-only">Sign out</span>
+        <span className="sr-only sm:not-sr-only">{signingOut ? 'Signing out…' : 'Sign out'}</span>
       </button>
+      {signOutError && (
+        <span
+          role="alert"
+          className="fixed right-4 top-20 z-50 max-w-xs border-l-2 border-cs-amber bg-cs-surface px-4 py-3 text-sm text-cs-body shadow-card"
+          data-testid="sign-out-error"
+        >
+          {signOutError}
+        </span>
+      )}
     </div>
   )
 }

@@ -5,6 +5,143 @@
 
 ---
 
+## 2026-08-03 — Learner-Safety checkpoint 3: dialog + video cue accessibility
+
+**Outcome:** ผู้เรียนใช้ image lightbox, lab expansion, reset confirmation และ video cue
+ด้วยคีย์บอร์ดได้ครบ โดย focus ไม่หลุดไป background, กลับไปจุดที่มีความหมายหลังปิด และ
+ผลตรวจ video cue ถูกประกาศให้ assistive technology โดยไม่แตะ production, Pool A, R2,
+deploy หรือ secrets
+
+**What changed:**
+- image และ lab เปลี่ยนเป็น native modal dialog; shared focus trap รองรับทั้งวง Tab ปกติ,
+  non-tabbable focus target และช่วงที่ไม่มี enabled control พร้อมคืน focus ไป opener
+- reset dialog เปิดหลัง phase commit, focus status ระหว่าง slow mutation, กัน Escape ระหว่าง
+  outcome ยังไม่ทราบ และคืน focus ไป trigger หรือ course title ที่ยังอยู่จริงใน terminal state
+- video cue แก้ semantics จาก modal เป็น inline dialog, focus ตัวเลือกแรก, รองรับ keyboard-only
+  submit/continue, ใช้ persistent live status + `aria-describedby` และคืน focus ไป video
+- visual suite scroll cue เข้า viewport จริงและเก็บ image/inline-lab modal ทั้ง desktop/mobile
+
+**Evidence:** lint/typecheck ผ่าน (`0 errors`, generated registry warning เดิม 1 จุด) ·
+Vitest unit/integration/type **440/440** · clean production build ผ่าน · Playwright
+**137 passed / 10 skipped** · focused dialog/video/reset regressions **16/16** · ตรวจภาพ
+desktop/mobile ไม่พบ overflow, clipping หรือ overlap · independent Code/Security/UX
+checkpoint review **C0/H0/M0/L0 ทุก lane**
+
+**Residual risk:** Learner-Safety Batch ยังเหลือ learner-facing copy ที่อ้าง
+persistence/issuance ไม่ตรง implementation; production gates ด้าน privacy/retention,
+private media, dependency, durable abuse control และ least-privilege credential ยังเปิด
+
+---
+
+## 2026-08-03 — Learner-Safety checkpoint 2: safe course reset
+
+**Outcome:** ผู้เรียน reset course progress ได้ผ่าน confirmation ที่บอกผลกระทบจริง;
+response หาย, multi-tab write, access loss และ load failure ไม่ทำให้ UI ประกาศผลเกินหลักฐาน
+หรือทับงานรอบใหม่ โดยไม่แตะ production, Pool A, R2, deploy หรือ secrets
+
+**What changed:**
+- reset ใช้ client operation ID และ DB receipt; operation เดิมเป็น no-op และ receipt ถูกจำกัด
+  128 แถวต่อผู้เรียน/คอร์สพร้อม index เพื่อไม่ให้ storage โตไม่สิ้นสุด
+- DB revalidate activation/entitlement ใน transaction เดียวกับ epoch increment + delete;
+  revoke/suspend race ปฏิเสธ reset และ compatibility caller ได้ error จริง
+- ทุก success อ่าน receipt + current canonical record ก่อนอัปเดต UI; unknown recovery เป็น
+  read-only status check ไม่มี destructive retry และ copy แยก access/load outcome ตามหลักฐาน
+- overview ไม่สร้าง empty progress ปลอมเมื่อ 401/403/503, reset รองรับ record ที่มีเพียง
+  `inProgress`/cue/evidence และ access loss ซ่อน stale roadmap/reset trigger
+
+**Evidence:** lint/typecheck ผ่าน (`0 errors`, generated registry warning เดิม 1 จุด) ·
+Vitest unit/integration/type **440/440** · migration 0001–0015 จาก fresh local DB ผ่าน ·
+clean production build ผ่าน · Playwright **136 passed / 10 skipped** · race regressions ครอบคลุม
+response-lost, delayed 200 + new-tab write, revoke/suspend และ receipt cap · independent
+Code/Security/UX checkpoint review **C0/H0/M0 ทุก lane**
+
+**Residual risk:** receipt รับประกัน idempotency สำหรับ 128 operation ล่าสุดต่อผู้เรียน/คอร์ส;
+Learner-Safety Batch ยังเหลือ dialog/video accessibility และ learner-facing copy ส่วน production
+gates ด้าน privacy/retention, private media, dependency, durable abuse control และ
+least-privilege credential ยังเปิด
+
+---
+
+## 2026-08-03 — Learner-Safety checkpoint 1: simulation readiness
+
+**Outcome:** incomplete simulation ไม่ consume/ปิด attempt และไม่ล้างงานผู้เรียน; คำตอบที่
+ทำครบแต่ผิดยังถูก grade ตามปกติ โดยไม่แตะ production, Pool A, R2, deploy หรือ secrets
+
+**What changed:**
+- readiness ใช้ public `requiredFields` แยก DHCP/static และ server ตรวจ snapshot ก่อน claim
+- field edit หลัง Apply กลับเป็น unapplied; validation แสดงข้างปุ่มและคง MCQ/simulation เดิม
+- active attempt รุ่นเก่าถูก normalize; supplied attempt และ assessed/redaction policy ยังยึด
+  snapshot เดิมเมื่อ deploy เปลี่ยน node/simulation กลางงาน
+- authoring typo ที่ชี้ field ซึ่ง surface แก้ไม่ได้ถูก loader ปฏิเสธ; mobile network form
+  แสดงค่าเต็มและ touch target 44px
+
+**Evidence:** lint/typecheck ผ่าน (`0 errors`, generated registry warning เดิม 1 จุด) ·
+Vitest unit/integration/type **426/426** · clean production build ผ่าน · Playwright
+**124 passed / 10 skipped** · independent Code/Security/UX checkpoint review **C0/H0/M0 ทุก lane**
+
+**Residual risk:** Learner-Safety Batch ยังเหลือ reset recovery, dialog/video accessibility และ
+learner-facing copy; production gates ด้าน privacy/retention, private media, dependency,
+durable abuse control และ least-privilege credential ยังเปิด
+
+---
+
+## 2026-08-03 — Integrity Batch ปิดครบหลัง independent checkpoint
+
+**Outcome:** ปิด race ของ attempt/progress/reset/access, ทำ activation revision ให้ monotonic
+และผูก explanation กับ snapshot ของ attempt ที่ผู้เรียนทำจริง โดยไม่แตะ production, Pool A,
+R2, deploy หรือ secrets
+
+**What changed:**
+- claim token เปลี่ยนทุก reclaim; current claim เท่านั้นที่ commit progress+outcome แบบ atomic
+  ได้ และ concurrent matching claim ถูกแยกจาก invalid เพื่อให้ UI reconcile ก่อนออกใบใหม่
+- progress epoch ครอบคลุม attempt และ generic mutations; reset เพิ่ม epochพร้อมลบ progress
+  ใน transaction เดียว และ final write revalidate activation+entitlement ภายใต้ row locks
+- activation sync รับเฉพาะ revision ที่สูงกว่า; equal revision ต้อง idempotent
+- attempt params เก็บ explanation snapshot; review endpoint เลือกจาก `passed_attempt_id` ก่อน
+  content ปัจจุบัน และ fail closed บน assessed completion ที่หลักฐานหาย
+
+**Evidence:** lint/typecheck ผ่าน (`0 errors`, generated registry warning เดิม 1 จุด) ·
+Vitest unit/integration/type **413/413** · clean production build ผ่าน · DB lint ไม่มี error ·
+Playwright **122 passed / 10 skipped** · deterministic two-connection tests ครอบคลุม
+suspend/reset interleaving · independent Code/Security/UX checkpoint review
+**C0/H0/M0 ทุก lane**
+
+**Residual risk:** ยังห้าม production traffic/certificate จนกว่าจะปิด learner-safety,
+privacy/retention, private media, dependency advisories, durable abuse control และ
+least-privilege production credential; งาน product ถัดไปคือ Learner-Safety Batch
+
+---
+
+## 2026-08-03 — Local Security Batch ปิดครบหลัง implementation audit
+
+**Outcome:** ปิด P0 ข้อ 1–4 จาก audit ครบทั้ง auth cookie/transport,
+same-origin mutation boundary, bounded JSON, activation/entitlement/prerequisite guards
+และ learner-facing denied/unavailable/access-lost states โดยไม่แตะ production, Pool A,
+R2, deploy หรือ secrets
+
+**What changed:**
+- รวม policy ของ auth cookie ให้เป็น `HttpOnly`, `SameSite=Lax`, `Secure` แบบ
+  fail-secure และบังคับ HTTPS auth mutations บน production edge
+- mutation routes ตรวจ same-origin/Fetch Metadata; JSON endpoints อ่าน body แบบมี
+  byte limit; resource routes ตรวจ activation, course entitlement และ node prerequisite
+- dashboard แสดงเฉพาะคอร์สที่มีสิทธิ์และแยก signed-out/inactive/unavailable; lesson และ
+  course overview หยุด action เมื่อสิทธิ์หาย; sign-out ล้าง current-browser cookies แม้
+  provider revoke ยืนยันไม่ได้ พร้อม visible local-only notice
+- เพิ่ม regression coverage สำหรับ direct locked-node access, revoked/suspended access,
+  mid-session revoke, DB non-mutation, partial entitlement, 503 retry และ sign-out fallback
+
+**Evidence:** lint/typecheck ผ่าน (`0 errors`, generated registry warning เดิม 1 จุด) ·
+Vitest unit/integration/type **388/388** · clean production build ผ่าน · Playwright
+**121 passed / 10 skipped** · independent Code/Security/UX checkpoint review
+**C0/H0/M0 ทุก lane**
+
+**Residual risk:** ยังห้าม production traffic/certificate จนกว่าจะปิด Integrity Batch,
+private `/media/*`, HTTPS runtime `Set-Cookie` proof บน topology จริง, privacy/retention,
+dependency advisories และ durable abuse control; งานถัดไปคือ Integrity Batch ตาม
+`active_plan.md`
+
+---
+
 ## 2026-07-31 — One-shot build EXECUTED: M1 + M2 + M3-prep ผ่าน acceptance ครบ
 
 **Outcome:** `academy-web/` เกิดจริงและเขียวทั้ง chain จาก clean install:

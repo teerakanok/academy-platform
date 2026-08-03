@@ -116,6 +116,7 @@
           "dns1": "",
           "applied": false
         },
+        "requiredFields": { "dhcp": [], "static": ["ipv4", "subnet", "gateway"] },
         "requirements": [
           {
             "id": "r-mode",

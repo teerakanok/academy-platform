@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { prepareNodeAccess } from './support/access'
 
 // ใบรับรองจะไม่มีความหมายเลย ถ้า client ประกาศเองได้ว่า "ผ่านแล้ว"
 //
@@ -12,6 +13,10 @@ const COURSE = 'content-formats-demo'
 const NODE = 'formats-references'
 
 test.describe('ความสมบูรณ์ของหลักฐานการเรียน', () => {
+  test.beforeEach(async () => {
+    await prepareNodeAccess(COURSE, 'formats-hands-on')
+  })
+
   test('client ประกาศเองว่าผ่านไม่ได้', async ({ request }) => {
     for (const status of ['completed', 'tested-out']) {
       const res = await request.post('/api/progress', {

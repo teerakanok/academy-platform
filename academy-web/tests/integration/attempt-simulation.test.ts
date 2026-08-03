@@ -4,7 +4,7 @@ import { requiredEnv } from './setup'
 import { findOrCreateUser } from '@/lib/account/users'
 import { consumeAttempt, issueAttempt } from '@/lib/course/attempt-db'
 import { cryptoPick, type AttemptParams } from '@/lib/course/attempt'
-import { gradeSimulation, type SimulationChallenge } from '@/lib/simulation/types'
+import { gradeSimulation, simulationReadiness, type SimulationChallenge } from '@/lib/simulation/types'
 import { resolveChallenge, rollVariables } from '@/lib/simulation/variables'
 
 // W1 — โจทย์จำลองผูกกับ attempt (เกณฑ์รับงานที่ e2e ทำไม่ได้เพราะชนโควตา)
@@ -25,6 +25,7 @@ const CHALLENGE: SimulationChallenge = {
   brief: 'ต้องเข้าถึงได้ที่ {{targetIp}} เสมอ',
   surface: 'network-interface',
   initial: { addressMode: 'dhcp' },
+  requiredFields: { dhcp: [], static: ['ipv4'] },
   variables: { targetIp: { kind: 'ipv4-host', network: '192.168.10', min: 40, max: 60 } },
   requirements: [
     { id: 'r-mode', label: 'คงที่', field: 'addressMode', operator: 'equals', value: 'static' },
@@ -78,6 +79,7 @@ async function issueWithVars(userId = learner.id) {
     questions: [],
     keyMaps: {},
     answerKeys: {},
+    assessment: { assessed: true },
     simulations: [{ id: 'sim-1', challenge: challenge! }],
   }
   const issued = await issueAttempt(ctx(userId), params, 'v1')
@@ -88,7 +90,7 @@ async function issueWithVars(userId = learner.id) {
 /** ตรวจเหมือนที่ `/api/progress` ทำ: consume แล้วใช้ **โจทย์ที่ attempt ถือเอง** */
 async function gradeWithAttempt(attemptId: string, submittedIp: string, userId = learner.id) {
   const consumed = await consumeAttempt(ctx(userId), attemptId)
-  if (!consumed) return { rejected: true as const }
+  if (!consumed || consumed.claimState !== 'claimed') return { rejected: true as const }
   const snapshot = consumed.params.simulations?.find((s) => s.id === 'sim-1')
   if (!snapshot) return { rejected: true as const }
   const verdict = gradeSimulation(snapshot.challenge, { addressMode: 'static', ipv4: submittedIp })
@@ -147,5 +149,42 @@ describe('โจทย์จำลองผูกกับ attempt', () => {
     expect(stored.challenge.requirements.find((r: { id: string }) => r.id === 'r-ip').value).toBe(
       mine.targetIp,
     )
+  })
+
+  it('active snapshot รุ่นเก่าถูก reuse และ normalize ก่อน render/submit', async () => {
+    const legacyChallenge = structuredClone(CHALLENGE) as unknown as Omit<SimulationChallenge, 'requiredFields'> & {
+      requiredFields?: unknown
+    }
+    delete legacyChallenge.requiredFields
+    const legacyParams = {
+      questionIds: [],
+      questions: [],
+      keyMaps: {},
+      answerKeys: {},
+      simulations: [{ id: 'sim-1', challenge: legacyChallenge }],
+    } as unknown as AttemptParams
+    const first = await issueAttempt(ctx(), legacyParams, 'legacy')
+    expect(first).not.toBeNull()
+
+    const currentParams: AttemptParams = {
+      ...legacyParams,
+      assessment: { assessed: true },
+      simulations: [{ id: 'sim-1', challenge: CHALLENGE }],
+    }
+    const reused = await issueAttempt(ctx(), currentParams, 'current')
+    expect(reused?.attemptId).toBe(first?.attemptId)
+    expect(reused?.params.assessment).toEqual({ assessed: true })
+    const snapshot = reused?.params.simulations?.[0].challenge
+    expect(snapshot?.requiredFields).toEqual({ dhcp: [], static: ['ipv4', 'subnet', 'gateway'] })
+    expect(() => simulationReadiness(
+      snapshot!.surface,
+      snapshot!.initial,
+      { addressMode: 'dhcp', applied: true },
+      snapshot!.requiredFields,
+    )).not.toThrow()
+
+    const consumed = await consumeAttempt(ctx(), first!.attemptId)
+    expect(consumed?.params.assessment.assessed).toBe(true)
+    expect(consumed?.params.simulations?.[0].challenge.requiredFields.dhcp).toEqual([])
   })
 })

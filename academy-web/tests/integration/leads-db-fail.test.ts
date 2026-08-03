@@ -13,6 +13,8 @@ function leadRequest(body: unknown): NextRequest {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
+      host: '127.0.0.1:3000',
+      origin: 'http://127.0.0.1:3000',
       'x-forwarded-for': `10.99.0.${Math.floor(Math.random() * 200) + 1}`,
     },
     body: JSON.stringify(body),

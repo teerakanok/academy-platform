@@ -19,7 +19,7 @@ export type LessonAttempt =
   | { status: 'not-needed' }
   | { status: 'loading' }
   | { status: 'ready'; id: string; questions: AttemptQuestion[]; simulations: AttemptSimulation[] }
-  | { status: 'failed'; reason: 'quota' | 'error'; retryAfterSeconds?: number }
+  | { status: 'failed'; reason: 'quota' | 'access-lost' | 'error'; retryAfterSeconds?: number }
 
 interface AttemptResponse {
   attemptId?: string
@@ -66,7 +66,7 @@ export function useLessonAttempt(options: {
           const body = (await res.json().catch(() => null)) as { retryAfterSeconds?: number } | null
           setAttempt({
             status: 'failed',
-            reason: res.status === 429 ? 'quota' : 'error',
+            reason: res.status === 429 ? 'quota' : res.status === 401 || res.status === 403 ? 'access-lost' : 'error',
             retryAfterSeconds: body?.retryAfterSeconds,
           })
           return

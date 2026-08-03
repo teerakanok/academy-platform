@@ -3,7 +3,9 @@ import { z } from 'zod'
 import { currentUser } from '@/lib/auth/session'
 import { getCourseStructure } from '@/lib/content/course-source'
 import { getLessonAnswerKey } from '@/lib/content/answer-key'
-import { readBoundedBody } from '@/lib/http/bounded-body'
+import { readBoundedJson } from '@/lib/http/bounded-body'
+import { validateMutationRequest } from '@/lib/http/mutation-security'
+import { authorizeCourseResource, deniedAccessStatus } from '@/lib/account/course-access'
 import { gradeSimulation } from '@/lib/simulation/types'
 
 export const runtime = 'nodejs'
@@ -43,21 +45,24 @@ const schema = z.object({
 const MAX_BODY_BYTES = 8 * 1024
 
 export async function POST(request: Request) {
+  const mutation = validateMutationRequest(request, { requireJson: true })
+  if (!mutation.ok) {
+    return NextResponse.json({ ok: false, error: mutation.error }, { status: mutation.status })
+  }
+
   const user = await currentUser()
   if (!user) return NextResponse.json({ ok: false, error: 'ต้องเข้าสู่ระบบก่อน' }, { status: 401 })
 
   // อ่านแบบมีเพดานและหยุดกลางทางเมื่อเกิน — เหตุผลทั้งหมดอยู่ใน bounded-body.ts
-  const raw = await readBoundedBody(request, MAX_BODY_BYTES)
-  if (!raw.ok) return NextResponse.json({ ok: false, error: 'คำขอใหญ่เกินไป' }, { status: 413 })
-
-  let body: unknown
-  try {
-    body = JSON.parse(raw.text)
-  } catch {
+  const body = await readBoundedJson(request, MAX_BODY_BYTES)
+  if (!body.ok && body.reason === 'too-large') {
+    return NextResponse.json({ ok: false, error: 'คำขอใหญ่เกินไป' }, { status: 413 })
+  }
+  if (!body.ok) {
     return NextResponse.json({ ok: false, error: 'รูปแบบคำขอไม่ถูกต้อง' }, { status: 400 })
   }
 
-  const parsed = schema.safeParse(body)
+  const parsed = schema.safeParse(body.value)
   if (!parsed.success) {
     return NextResponse.json({ ok: false, error: 'ข้อมูลไม่ครบหรือไม่ถูกต้อง' }, { status: 400 })
   }
@@ -67,6 +72,14 @@ export async function POST(request: Request) {
   const node = structure?.nodes.find((n) => n.id === input.nodeId)
   if (!structure || !node) {
     return NextResponse.json({ ok: false, error: 'ไม่พบบทเรียนนี้' }, { status: 404 })
+  }
+
+  const access = await authorizeCourseResource(user.account.id, input.slug, input.nodeId)
+  if (!access.allowed) {
+    return NextResponse.json(
+      { ok: false, error: access.reason === 'unavailable' ? 'ตรวจสิทธิ์ไม่สำเร็จ' : 'ยังไม่มีสิทธิ์เข้าถึงบทนี้' },
+      { status: deniedAccessStatus(access) },
+    )
   }
 
   const answerKey = getLessonAnswerKey(input.slug, input.nodeId)

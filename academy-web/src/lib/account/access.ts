@@ -20,15 +20,11 @@ export interface ActivationRecord {
 /** บันทึกสถานะการเปิดใช้บริการที่ Identity Control บอกมา — เราไม่ได้เป็นคนตัดสิน */
 export async function syncActivation(userId: string, result: ExchangeResult): Promise<void> {
   const db = academyDb()
-  const { error } = await db.from('service_activation').upsert(
-    {
-      user_id: userId,
-      status: result.activation.status,
-      revision: result.activation.revision,
-      synced_at: new Date().toISOString(),
-    },
-    { onConflict: 'user_id' },
-  )
+  const { error } = await db.rpc('sync_service_activation', {
+    p_user_id: userId,
+    p_status: result.activation.status,
+    p_revision: result.activation.revision,
+  })
   if (error) throw new Error(`บันทึกสถานะการเปิดใช้บริการไม่สำเร็จ: ${error.message}`)
 }
 

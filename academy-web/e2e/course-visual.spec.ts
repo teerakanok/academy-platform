@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test'
 import { mkdirSync } from 'node:fs'
 import { join } from 'node:path'
+import { prepareNodeAccess } from './support/access'
 
 // เก็บหลักฐานภาพของประสบการณ์คอร์ส — suite นี้ "เก็บภาพ" ไม่ใช่ "ตัดสินว่าสวย"
 // การตัดสิน defect เป็นขั้น review ที่คนดูภาพจริง (บันทึกผลไว้นอก test)
@@ -32,6 +33,21 @@ for (const vp of VIEWPORTS) {
       await expect(page.getByTestId('global-radar')).toBeVisible()
       await shoot(page, 'dashboard', vp.name)
 
+      await prepareNodeAccess('content-formats-demo', 'formats-reading')
+      await page.goto('/courses/content-formats-demo/lessons/formats-reading')
+      await page.getByTestId('image-expand').click()
+      await expect(page.getByTestId('image-lightbox')).toBeVisible()
+      await shoot(page, 'image-lightbox', vp.name, false)
+      await page.keyboard.press('Escape')
+
+      await prepareNodeAccess('content-formats-demo', 'formats-hands-on')
+      await page.goto('/courses/content-formats-demo/lessons/formats-hands-on')
+      const inlineLab = page.locator('[data-testid="lab-block"][data-scale="inline"]')
+      await inlineLab.getByTestId('lab-expand').click()
+      await expect(page.getByTestId('lab-fullscreen')).toBeVisible()
+      await shoot(page, 'lab-inline-dialog', vp.name, false)
+      await page.keyboard.press('Escape')
+
       await page.goto('/courses/basic-os-linux')
       await expect(page.getByTestId('roadmap-graph')).toBeVisible()
       await shoot(page, 'course-roadmap', vp.name)
@@ -45,12 +61,15 @@ for (const vp of VIEWPORTS) {
         const el = document.querySelector<HTMLVideoElement>('[data-testid="lesson-video"]')
         if (el) el.currentTime = 16
       })
-      await expect(page.getByTestId('video-quiz')).toBeVisible({ timeout: 15_000 })
+      const videoQuiz = page.getByTestId('video-quiz')
+      await expect(videoQuiz).toBeVisible({ timeout: 15_000 })
+      await videoQuiz.scrollIntoViewIfNeeded()
       await shoot(page, 'video-popquiz', vp.name, false)
 
       // ⚠️ ใช้ capstone ที่ **ไม่มี spec ไหนทำจบ** — บทที่ทำจบแล้วจะไม่แสดงด่านอีก
       // (หน้าจะเป็น lesson-complete แทน) ทำให้ภาพนี้ขึ้นกับลำดับของไฟล์เทสอื่น
       // `permissions` ถูก course-journey ทำจบไปก่อนเสมอ จึงย้ายมาที่ `pipes-and-logs`
+      await prepareNodeAccess('basic-os-linux', 'pipes-and-logs')
       await page.goto('/courses/basic-os-linux/lessons/pipes-and-logs')
       await expect(page.getByTestId('checkpoint')).toBeVisible()
       await shoot(page, 'capstone-lesson', vp.name)

@@ -16,6 +16,7 @@ function challenge(requirements: SimulationChallenge['requirements']): Simulatio
     brief: 'b',
     surface: 'network-interface',
     initial: {},
+    requiredFields: { dhcp: [], static: [] },
     requirements,
   }
 }

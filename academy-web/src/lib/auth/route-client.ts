@@ -1,14 +1,16 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { authCookieOptions, isSecureRequest } from './cookie-policy'
 
 // client สำหรับ route handler — ต้องเขียน cookie ได้จริง (ต่างจากฝั่ง Server Component
 // ที่เขียนไม่ได้ จึงต้องให้ middleware เป็นคนต่ออายุ session)
-export async function routeAuthClient() {
+export async function routeAuthClient(request: Request) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   if (!url || !anonKey) throw new Error('ตัวแปร Supabase ฝั่ง public ยังไม่ถูกตั้งค่า (ดู .env.example)')
   const store = await cookies()
   return createServerClient(url, anonKey, {
+    cookieOptions: authCookieOptions(isSecureRequest(request)),
     cookies: {
       getAll() {
         return store.getAll()
@@ -18,6 +20,14 @@ export async function routeAuthClient() {
       },
     },
   })
+}
+
+/** ล้าง session ของ browser นี้ให้แน่นอน แม้ provider revocation จะตอบไม่สำเร็จ */
+export async function clearRouteAuthCookies(): Promise<void> {
+  const store = await cookies()
+  for (const cookie of store.getAll()) {
+    if (cookie.name.startsWith('sb-')) store.delete(cookie.name)
+  }
 }
 
 /**

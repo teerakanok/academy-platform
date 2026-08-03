@@ -64,6 +64,20 @@ export function emptyProgress(slug: string, now = 0): CourseProgressRecord {
   }
 }
 
+/** ทุก field ที่สะท้อนงานของผู้เรียนต้องว่างก่อนจึงถือว่าไม่มี progress ให้ reset */
+export function isEmptyCourseProgress(record: CourseProgressRecord): boolean {
+  return (
+    record.completed.length === 0 &&
+    record.skipped.length === 0 &&
+    record.testedOut.length === 0 &&
+    record.inProgress.length === 0 &&
+    Object.keys(record.checkpointResults).length === 0 &&
+    Object.keys(record.videoCueResults).length === 0 &&
+    Object.keys(record.simulationEvidence).length === 0 &&
+    record.lastNodeId === null
+  )
+}
+
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
@@ -178,7 +192,10 @@ export function markCompleted(
   const next = place(record, nodeId, 'completed', now)
   return {
     ...next,
-    checkpointResults: { ...next.checkpointResults, [nodeId]: checkpointResults },
+    checkpointResults: {
+      ...next.checkpointResults,
+      [nodeId]: checkpointResults,
+    },
   }
 }
 
@@ -195,7 +212,10 @@ export function markTestedOut(
   const next = place(record, nodeId, 'testedOut', now)
   return {
     ...next,
-    checkpointResults: { ...next.checkpointResults, [nodeId]: checkpointResults },
+    checkpointResults: {
+      ...next.checkpointResults,
+      [nodeId]: checkpointResults,
+    },
   }
 }
 

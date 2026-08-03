@@ -24,6 +24,7 @@
         "brief": "Everyone in the office prints to this machine, and the queue is configured on forty desktops using the address 192.168.10.50. It sits on the 192.168.10.0/24 network, where the router is .1 and also answers DNS. Configure it so that address never changes.",
         "surface": "network-interface",
         "initial": { "addressMode": "dhcp", "ipv4": "", "subnet": "", "gateway": "", "dns1": "", "applied": false },
+        "requiredFields": { "dhcp": [], "static": ["ipv4", "subnet", "gateway", "dns1"] },
         "requirements": [
           {
             "id": "mode",
@@ -97,6 +98,7 @@
           "dns1": "192.168.10.1",
           "applied": true
         },
+        "requiredFields": { "dhcp": [], "static": ["ipv4", "subnet", "gateway", "dns1"] },
         "requirements": [
           {
             "id": "mode",

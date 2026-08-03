@@ -14,9 +14,19 @@
 /** หน้าจอที่จำลอง — เพิ่มชนิดใหม่ = เพิ่ม component + ประกาศฟิลด์ที่มันมี */
 export type SimulationSurface = 'network-interface'
 
+/** input ที่ผู้เรียนแก้ได้จริงบนแต่ละ surface; loader ใช้กัน authoring typo */
+export const SIMULATION_SURFACE_INPUT_FIELDS: Record<SimulationSurface, readonly string[]> = {
+  'network-interface': ['ipv4', 'subnet', 'gateway', 'dns1'],
+}
+
 export type SimulationValue = string | boolean
 
 export type SimulationState = Record<string, SimulationValue>
+
+export interface SimulationRequiredFields {
+  dhcp: string[]
+  static: string[]
+}
 
 export type RequirementOperator = 'equals' | 'notEquals' | 'oneOf' | 'isTrue' | 'isFalse'
 
@@ -47,6 +57,8 @@ export interface SimulationChallenge {
   surface: SimulationSurface
   /** สถานะตั้งต้นของหน้าจอ — ควรเป็นสถานะที่ "ยังไม่ถูก" เพื่อให้มีอะไรให้ทำ */
   initial: SimulationState
+  /** ช่องที่ต้องกรอกก่อนส่งได้ เป็น public structure ไม่ใช่ค่าคำตอบ */
+  requiredFields: SimulationRequiredFields
   requirements: SimulationRequirement[]
   /** คำใบ้ ใช้ได้เฉพาะโหมดฝึก ตอนวัดผลจริงจะไม่แสดง */
   hints?: string[]
@@ -65,6 +77,45 @@ export interface SimulationVerdict {
   results: RequirementResult[]
   metCount: number
   total: number
+}
+
+export type SimulationReadiness =
+  | { ready: true }
+  | { ready: false; reason: 'untouched' | 'invalid-mode' | 'incomplete' | 'unapplied' }
+
+function sameState(left: SimulationState, right: SimulationState): boolean {
+  const keys = new Set([...Object.keys(left), ...Object.keys(right)])
+  for (const key of keys) {
+    if (left[key] !== right[key]) return false
+  }
+  return true
+}
+
+/** ตรวจความพร้อมจาก public surface contract เท่านั้น ไม่อ่านกติกาหรือเฉลย */
+export function simulationReadiness(
+  surface: SimulationSurface,
+  initial: SimulationState,
+  state: SimulationState,
+  requiredFields: SimulationRequiredFields,
+): SimulationReadiness {
+  if (sameState(initial, state)) return { ready: false, reason: 'untouched' }
+
+  switch (surface) {
+    case 'network-interface': {
+      const mode = state.addressMode
+      if (mode !== 'dhcp' && mode !== 'static') return { ready: false, reason: 'invalid-mode' }
+      if (state.applied !== true) return { ready: false, reason: 'unapplied' }
+      if (
+        requiredFields[mode].some((field) => {
+          const value = state[field]
+          return value === undefined || (typeof value === 'string' && !value.trim())
+        })
+      ) {
+        return { ready: false, reason: 'incomplete' }
+      }
+      return { ready: true }
+    }
+  }
 }
 
 /**
@@ -135,6 +186,10 @@ function meets(state: SimulationState, req: SimulationRequirement): boolean {
 export function gradingFingerprint(challenge: SimulationChallenge): string {
   const canonical = JSON.stringify({
     surface: challenge.surface,
+    requiredFields: {
+      dhcp: [...challenge.requiredFields.dhcp].sort(),
+      static: [...challenge.requiredFields.static].sort(),
+    },
     requirements: challenge.requirements
       .map((r) => ({ id: r.id, field: r.field, operator: r.operator, value: r.value ?? null }))
       .sort((a, b) => a.id.localeCompare(b.id)),

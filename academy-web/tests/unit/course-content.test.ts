@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { getAllCourses, getCourse, getLesson, listCourseSlugs } from '@/lib/content/course-source'
+import { getAllCourses, getCourse, getCourseStructure, getLesson, listCourseSlugs } from '@/lib/content/course-source'
+import { loadLesson } from '@/lib/content/course-loader'
 import { courseSkillData, globalSkillData } from '@/lib/course/skills'
 import { EMPTY_STATE } from '@/lib/course/roadmap'
 
@@ -12,6 +13,18 @@ describe('คอร์สที่มีอยู่โหลดได้ทั�
     const slugs = listCourseSlugs()
     expect(slugs.length).toBeGreaterThan(0)
     expect(getAllCourses()).toHaveLength(slugs.length)
+  })
+
+  it('required field ที่ surface ไม่มี control ให้แก้ต้องถูกปฏิเสธตอน authoring', () => {
+    const raw = structuredClone(getLesson('content-formats-demo', 'formats-simulation')!.lesson)
+    const block = raw.blocks.find((item) => item.kind === 'simulation')
+    expect(block?.kind).toBe('simulation')
+    if (!block || block.kind !== 'simulation') return
+    block.challenge.initial.gateaway = ''
+    block.challenge.requiredFields.static = ['gateaway']
+
+    expect(() => loadLesson('invalid-required-field.json', raw, getCourseStructure('content-formats-demo')!))
+      .toThrow(/แก้ไม่ได้บน surface/)
   })
 })
 

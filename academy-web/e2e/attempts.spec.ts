@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { prepareNodeAccess } from './support/access'
 
 // โครง attempt (W0-0) — พื้นผิว API ที่ผู้เรียนได้โจทย์ของด่านวัดผล
 //
@@ -25,6 +26,10 @@ const lessonFile = JSON.parse(
 ) as { checkpoint: { kind?: string; id: string; prompt?: string; choices?: Record<string, string>; explanation?: string }[] }
 
 test.describe('POST /api/attempts', () => {
+  test.beforeAll(async () => {
+    await prepareNodeAccess(COURSE, CAPSTONE)
+  })
+
   test('ไม่ล็อกอิน = ไม่มี attempt (401)', async ({ playwright, baseURL }) => {
     // ⚠️ newContext() ใต้ @playwright/test สืบทอด storageState ของ project —
     // ต้องล้างเป็นค่าว่างชัดๆ ไม่งั้น "anon" จะแอบถือ session ของ learner แล้วเทสนี้
@@ -32,6 +37,7 @@ test.describe('POST /api/attempts', () => {
     const anon = await playwright.request.newContext({
       baseURL: baseURL!,
       storageState: { cookies: [], origins: [] },
+      extraHTTPHeaders: { origin: baseURL! },
     })
     const res = await anon.post('/api/attempts', { data: { slug: COURSE, nodeId: CAPSTONE } })
     expect(res.status()).toBe(401)

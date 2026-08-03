@@ -1,5 +1,6 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 import { answerOnPage } from './support/capstone'
+import { prepareNodeAccess } from './support/access'
 
 // W1 — หน้าจอต้องไม่แสดงโจทย์ที่ยังไม่ใช่ของผู้เรียน
 //
@@ -15,11 +16,32 @@ const COURSE = 'content-formats-demo'
 const CAPSTONE = 'formats-hands-on'
 const LESSON_URL = `/courses/${COURSE}/lessons/${CAPSTONE}`
 
+async function applySimulation(page: Page, correct: boolean) {
+  const sim = page.getByTestId('checkpoint-sim-sim-1')
+  if (!correct) {
+    // DHCP + Apply เป็นการทำงานที่ครบ แต่เป็นคำตอบผิดสำหรับโจทย์ static นี้
+    await sim.getByTestId('sim-apply').click()
+    return
+  }
+
+  const target = /192\.168\.10\.\d+/.exec((await sim.textContent()) ?? '')?.[0]
+  expect(target).toBeTruthy()
+  await sim.getByTestId('sim-mode-static').click()
+  await sim.getByTestId('sim-ipv4').fill(target!)
+  await sim.getByTestId('sim-subnet').fill('255.255.255.0')
+  await sim.getByTestId('sim-gateway').fill('192.168.10.1')
+  await sim.getByTestId('sim-apply').click()
+}
+
 test.describe('การรอโจทย์ของ attempt', () => {
+  test.beforeEach(async () => {
+    await prepareNodeAccess(COURSE, CAPSTONE)
+  })
+
   // คืนโควตาให้ไฟล์ถัดไป — e2e ทั้งชุดใช้บัญชีเดียว และโควตาคือ 3 ครั้ง/30 นาที
   // ต่อ (user, node) · ไฟล์ที่กิน attempt แล้วไม่คืน จะทำให้ไฟล์ถัดไปแดงแบบไม่มีเหตุผล
   test.afterEach(async ({ request }) => {
-    await request.post(`/api/progress/reset?slug=${encodeURIComponent(COURSE)}`)
+    await request.post(`/api/progress/reset?slug=${encodeURIComponent(COURSE)}&operationId=${crypto.randomUUID()}`)
   })
 
   test('🔴 ระหว่างรอโจทย์ ต้องไม่มีด่านให้ทำ และต้องไม่มีแม่แบบโผล่บนหน้าจอ', async ({ page }) => {
@@ -59,6 +81,7 @@ test.describe('การรอโจทย์ของ attempt', () => {
 
     // ตอบผิดทั้ง MCQ และด่านจำลอง แล้วกดตรวจ (เลือกจากข้อความ — key ถูก remap ต่อ attempt)
     await answerOnPage(page, COURSE, CAPSTONE, { wrongFor: ['cp-1', 'cp-2', 'cp-3'] })
+    await applySimulation(page, false)
     await page.getByTestId('checkpoint-submit').click()
     await expect(page.getByTestId('checkpoint-not-passed')).toBeVisible()
 
@@ -94,6 +117,7 @@ test.describe('การรอโจทย์ของ attempt', () => {
     await page.goto(LESSON_URL)
     await expect(page.getByTestId('checkpoint-sim-sim-1')).toBeVisible()
     await answerOnPage(page, COURSE, CAPSTONE)
+    await applySimulation(page, true)
 
     let blocked = false
     await page.route('**/api/progress', async (route) => {
@@ -117,6 +141,106 @@ test.describe('การรอโจทย์ของ attempt', () => {
     // ด่านกลับมาพร้อมโจทย์ชุดใหม่ ไม่ใช่ปุ่มค้างที่กดแล้ว error เดิม
     await expect(page.getByTestId('checkpoint-sim-sim-1')).toBeVisible()
     await expect(page.getByTestId('checkpoint-submit')).toBeVisible()
+  })
+
+  test('simulation ยังไม่พร้อมจาก server drift ต้องคง attempt ใบเดิมไว้', async ({ page }) => {
+    let issued = 0
+    await page.route('**/api/attempts', async (route) => {
+      if (route.request().method() === 'POST') issued += 1
+      await route.continue()
+    })
+    await page.route('**/api/progress', async (route) => {
+      const body = route.request().method() === 'POST'
+        ? (route.request().postDataJSON() as { action?: string })
+        : null
+      if (body?.action === 'checkpoint') {
+        await route.fulfill({
+          status: 400,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            ok: false,
+            error: 'ทำโจทย์จำลองให้ครบและกดยืนยันการตั้งค่าก่อนตรวจ',
+            code: 'simulation-incomplete',
+          }),
+        })
+        return
+      }
+      await route.continue()
+    })
+
+    await page.goto(LESSON_URL)
+    await expect(page.getByTestId('checkpoint-sim-sim-1')).toBeVisible()
+    await answerOnPage(page, COURSE, CAPSTONE)
+    await applySimulation(page, true)
+    await page.getByTestId('checkpoint-submit').click()
+
+    await expect(page.getByTestId('checkpoint-validation-error')).toContainText('Your answers are still here')
+    await expect(page.getByTestId('progress-sync-error')).toHaveCount(0)
+    await expect(page.locator('[data-testid="checkpoint"] input[name^="q-"]:checked')).toHaveCount(3)
+    const target = /192\.168\.10\.\d+/.exec((await page.getByTestId('checkpoint-sim-sim-1').textContent()) ?? '')?.[0]
+    await expect(page.getByTestId('checkpoint-sim-sim-1').getByTestId('sim-ipv4')).toHaveValue(target!)
+    await expect(page.getByTestId('checkpoint-sim-sim-1')).toBeVisible()
+    expect(issued, 'validation error ที่ไม่ consume ต้องไม่ออก attempt ใหม่').toBe(1)
+  })
+
+  test('claim ถูกแทนที่ → reconcile ผลเดิมก่อน และไม่ออก attempt ใหม่ซ้ำ', async ({ page }) => {
+    let issued = 0
+    let reconcile = false
+    await page.route('**/api/attempts', async (route) => {
+      if (route.request().method() === 'POST') issued += 1
+      await route.continue()
+    })
+    await page.route('**/api/progress**', async (route) => {
+      const body = route.request().method() === 'POST'
+        ? (route.request().postDataJSON() as { action?: string })
+        : null
+      if (body?.action === 'checkpoint' && reconcile === false) {
+        reconcile = true
+        await route.fulfill({
+          status: 409,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            ok: false,
+            error: 'กำลังตรวจสอบผลจากคำขออีกครั้ง',
+            code: 'claim-replaced',
+          }),
+        })
+        return
+      }
+      if (route.request().method() === 'GET' && reconcile) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            ok: true,
+            record: {
+              version: 'v1',
+              slug: COURSE,
+              completed: [CAPSTONE],
+              skipped: [],
+              testedOut: [],
+              inProgress: [],
+              checkpointResults: { [CAPSTONE]: {} },
+              videoCueResults: {},
+              simulationEvidence: {},
+              lastNodeId: CAPSTONE,
+              updatedAt: Date.now(),
+            },
+          }),
+        })
+        return
+      }
+      await route.continue()
+    })
+
+    await page.goto(LESSON_URL)
+    await expect(page.getByTestId('checkpoint-sim-sim-1')).toBeVisible()
+    await answerOnPage(page, COURSE, CAPSTONE)
+    await applySimulation(page, true)
+    await page.getByTestId('checkpoint-submit').click()
+
+    await expect(page.getByTestId('checkpoint-continue')).toBeVisible()
+    expect(issued, 'claim-replaced ต้องไม่กินโควตาด้วย attempt ใหม่').toBe(1)
   })
 
   test('🔴 โควตาเต็ม → บอกตรงๆ พร้อมทางไปต่อ ไม่ใช่ปล่อยให้ทำจนเสร็จแล้วเด้ง', async ({ page }) => {
@@ -151,6 +275,10 @@ test.describe('การรอโจทย์ของ attempt', () => {
 })
 
 test.describe('เปิดหน้าซ้ำ', () => {
+  test.beforeEach(async () => {
+    await prepareNodeAccess(COURSE, CAPSTONE)
+  })
+
   // RIL cross-model รอบ 2 ข้อ 4: ทุก reload เคยออก attempt ใหม่ · ผู้เรียนที่ตอบไป
   // ครึ่งทางแล้วเผลอ refresh สามครั้งใน 30 นาที เจอ 429 ทั้งที่ยังไม่เคยกดส่งเลย
   test('🔴 refresh หลายครั้งต้องได้โจทย์ใบเดิม ไม่กินโควตา', async ({ page }) => {

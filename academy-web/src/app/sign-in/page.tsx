@@ -18,13 +18,18 @@ export const metadata = privatePage('Sign in')
 export default async function SignInPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string }>
+  searchParams: Promise<{ next?: string; notice?: string }>
 }) {
-  const { next } = await searchParams
+  const { next, notice } = await searchParams
   const target = safeNextPath(next)
 
   return (
     <div className="mx-auto max-w-lg px-6 py-16">
+      {notice === 'local-only' && (
+        <p role="status" className="mb-6 border-l-2 border-cs-amber py-2 pl-4 text-sm text-cs-body">
+          Signed out of this browser. Refresh-token revocation could not be confirmed; sessions already open on other devices were not changed.
+        </p>
+      )}
       <div className="hero-bleed pb-6 text-center">
         <Image
           src="/brand/logo-academy.svg"

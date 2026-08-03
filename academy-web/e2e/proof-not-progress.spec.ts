@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { passCapstone, startCapstoneAttempt } from './support/capstone'
+import { prepareNodeAccess } from './support/access'
 
 // W0-3 — `completed` ของบทปกติไม่ใช่หลักฐาน (แก้ F2 + F3)
 //
@@ -37,8 +38,12 @@ async function answer(
 }
 
 test.describe('completed คือความคืบหน้า ไม่ใช่หลักฐาน', () => {
+  test.beforeEach(async () => {
+    await prepareNodeAccess(COURSE, CAPSTONE)
+  })
+
   test.afterEach(async ({ request }) => {
-    await request.post(`/api/progress/reset?slug=${encodeURIComponent(COURSE)}`)
+    await request.post(`/api/progress/reset?slug=${encodeURIComponent(COURSE)}&operationId=${crypto.randomUUID()}`)
   })
 
   test('ตอบผิดในบทปกติ (เกินเกณฑ์ที่ยอมให้ผิด) → ไม่ได้ completed', async ({ request }) => {

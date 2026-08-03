@@ -39,6 +39,10 @@ export interface AttemptParams {
    * เห็น — ต้องตรวจจากของที่ attempt ถือเองเท่านั้น
    */
   answerKeys: Record<string, string[]>
+  /** เกณฑ์ผ่าน/การปกปิดผล ณ ตอนออกใบ ป้องกัน deploy เปลี่ยนชนิด node กลางงาน */
+  assessment: { assessed: boolean }
+  /** คำอธิบาย ณ ตอนออก attempt — review หลังผ่านต้องไม่เปลี่ยนตาม deploy รุ่นใหม่ */
+  explanations?: Record<string, string>
   /**
    * โจทย์จำลองของ attempt นี้ **ทั้งชิ้นหลังแทนค่าแล้ว** (snapshot ไม่ใช่ pointer)
    *
@@ -52,6 +56,47 @@ export interface AttemptParams {
    * สิ่งที่ส่งออกไปหา client คือรูป public ที่ผ่าน `toPublicSimulation` เท่านั้น
    */
   simulations?: { id: string; challenge: SimulationChallenge }[]
+}
+
+/**
+ * แปลง snapshot ก่อนมี requiredFields ให้ใช้ contract เดิมได้จน attempt หมดอายุ
+ * DB อาจคืน active attempt ใบเดิมข้าม deploy จึงห้าม cast แล้วใช้ตรงๆ
+ */
+export function normalizeAttemptParams(params: AttemptParams): AttemptParams {
+  const rawAssessment = (params as AttemptParams & { assessment?: unknown }).assessment
+  const assessment = rawAssessment
+    && typeof rawAssessment === 'object'
+    && typeof (rawAssessment as { assessed?: unknown }).assessed === 'boolean'
+    ? { assessed: (rawAssessment as { assessed: boolean }).assessed }
+    // ก่อน field นี้มีเฉพาะ assessed checkpoint ที่ออก attempt ใน production content
+    : { assessed: true }
+  return {
+    ...params,
+    assessment,
+    simulations: params.simulations?.map((item) => {
+      const raw = item.challenge as SimulationChallenge & { requiredFields?: unknown }
+      const legacyFields = Array.isArray(raw.requiredFields)
+        && raw.requiredFields.every((field): field is string => typeof field === 'string')
+        ? raw.requiredFields
+        : null
+      const structured = raw.requiredFields
+        && typeof raw.requiredFields === 'object'
+        && !Array.isArray(raw.requiredFields)
+        ? raw.requiredFields as { dhcp?: unknown; static?: unknown }
+        : null
+      const requiredFields = structured
+        && Array.isArray(structured.dhcp)
+        && structured.dhcp.every((field): field is string => typeof field === 'string')
+        && Array.isArray(structured.static)
+        && structured.static.every((field): field is string => typeof field === 'string')
+        ? { dhcp: [...structured.dhcp], static: [...structured.static] }
+        : {
+            dhcp: [],
+            static: legacyFields ?? (raw.surface === 'network-interface' ? ['ipv4', 'subnet', 'gateway'] : []),
+          }
+      return { ...item, challenge: { ...raw, requiredFields } }
+    }),
+  }
 }
 
 /**
@@ -81,10 +126,15 @@ function cryptoShuffled<T>(items: readonly T[]): T[] {
  * `serveCount` วันนี้ = ขนาดคลัง (คลังมีเท่าที่ใช้พอดี) — เมื่อคลังโต ≥3 เท่า
  * (งาน W-content) จำนวนเสิร์ฟจริงจะมาจากนิยามของ challenge ไม่ใช่ขนาดคลัง
  */
-export function buildAttemptParams(bank: readonly CheckpointQuestion[], serveCount: number): AttemptParams {
+export function buildAttemptParams(
+  bank: readonly CheckpointQuestion[],
+  serveCount: number,
+  assessed = true,
+): AttemptParams {
   const sampled = cryptoShuffled(bank).slice(0, Math.min(serveCount, bank.length))
   const keyMaps: Record<string, Record<string, string>> = {}
   const answerKeys: Record<string, string[]> = {}
+  const explanations: Record<string, string> = {}
   for (const q of sampled) {
     // client เห็นชุด key เดิม (เรียงตามตัวอักษร) แต่ข้อความใต้แต่ละ key ถูกสับใหม่
     const realKeys = Object.keys(q.choices)
@@ -96,15 +146,35 @@ export function buildAttemptParams(bank: readonly CheckpointQuestion[], serveCou
     })
     keyMaps[q.id] = map
     answerKeys[q.id] = [...q.correct]
+    explanations[q.id] = q.explanation
   }
   const params: AttemptParams = {
     questionIds: sampled.map((q) => q.id),
     questions: [],
     keyMaps,
     answerKeys,
+    assessment: { assessed },
+    explanations,
   }
   params.questions = toPublicQuestions(sampled, params)
   return params
+}
+
+/** อ่าน explanation snapshot แบบ fail-closed; ใช้ทั้ง immediate response และ review endpoint */
+export function attemptExplanations(params: AttemptParams): Record<string, string> | null {
+  if (!params.explanations || !Array.isArray(params.questionIds)) return null
+  if (new Set(params.questionIds).size !== params.questionIds.length) return null
+
+  const entries: [string, string][] = []
+  for (const id of params.questionIds) {
+    if (typeof id !== 'string' || !Object.prototype.hasOwnProperty.call(params.explanations, id)) {
+      return null
+    }
+    const explanation = params.explanations[id]
+    if (typeof explanation !== 'string') return null
+    entries.push([id, explanation])
+  }
+  return Object.fromEntries(entries)
 }
 
 /** รูปที่ส่งให้ client: ข้อความตัวเลือกอยู่ใต้ key ตามตาราง remap ของ attempt นี้ */

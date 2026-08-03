@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 import { privatePage } from '@/lib/seo'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { getCourse, getLesson } from '@/lib/content/course-source'
 import { toPublicLesson } from '@/lib/content/public-lesson'
 import { requiresAttempt } from '@/lib/course/assessment-policy'
 import type { Locale } from '@/lib/content/course-types'
 import { LessonView } from '@/components/course/LessonView'
+import { currentUser } from '@/lib/auth/session'
+import { authorizeCourseResource } from '@/lib/account/course-access'
 
 export const metadata: Metadata = privatePage()
 
@@ -21,8 +23,21 @@ export default async function LessonPage({
   const locale: Locale | undefined = lang === 'th' || lang === 'en' ? lang : undefined
 
   const course = getCourse(slug, locale)
+  if (!course) notFound()
+
+  const user = await currentUser()
+  if (!user) redirect(`/sign-in?next=${encodeURIComponent(`/courses/${slug}/lessons/${nodeId}`)}`)
+
+  const access = await authorizeCourseResource(user.account.id, slug, nodeId)
+  if (!access.allowed) {
+    if (access.reason === 'unavailable') throw new Error('Academy access store unavailable')
+    const lessonPath = `/courses/${slug}/lessons/${nodeId}${locale ? `?lang=${locale}` : ''}`
+    const denied = new URLSearchParams({ course: slug, next: lessonPath })
+    redirect(`/access-required?${denied.toString()}`)
+  }
+
   const resolved = getLesson(slug, nodeId, locale)
-  if (!course || !resolved) notFound()
+  if (!resolved) notFound()
 
   const node = course.structure.nodes.find((n) => n.id === nodeId)
   if (!node) notFound()

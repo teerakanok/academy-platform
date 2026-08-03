@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { createClient } from '@supabase/supabase-js'
 
 // F1 — "เปิด view-source แล้วเห็นคำตอบ" คือช่องที่ไม่ต้องปลอมผลก็ผ่านได้
 //
@@ -21,6 +22,7 @@ interface SimChallenge {
 interface LessonFixture {
   slug: string
   nodeId: string
+  priorNodeIds: string[]
   explanations: string[]
   operators: string[]
   hints: string[]
@@ -29,6 +31,9 @@ interface LessonFixture {
 function lessonsWithSecrets(): LessonFixture[] {
   const out: LessonFixture[] = []
   for (const slug of readdirSync(contentRoot)) {
+    const structure = JSON.parse(readFileSync(join(contentRoot, slug, 'course.json'), 'utf8')) as {
+      nodes: { id: string }[]
+    }
     const lessonsDir = join(contentRoot, slug, 'locales', 'en', 'lessons')
     for (const name of readdirSync(lessonsDir)) {
       const lesson = JSON.parse(readFileSync(join(lessonsDir, name), 'utf8')) as {
@@ -46,6 +51,7 @@ function lessonsWithSecrets(): LessonFixture[] {
       out.push({
         slug,
         nodeId: lesson.nodeId,
+        priorNodeIds: structure.nodes.slice(0, structure.nodes.findIndex((node) => node.id === lesson.nodeId)).map((node) => node.id),
         explanations: [
           ...lesson.checkpoint.flatMap((q) => (q.explanation ? [q.explanation] : [])),
           ...(lesson.videoCueQuestions ?? []).map((q) => q.explanation),
@@ -60,6 +66,40 @@ function lessonsWithSecrets(): LessonFixture[] {
 
 const fixtures = lessonsWithSecrets()
 
+function serviceDb() {
+  const url = process.env.SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !key) throw new Error('E2E ต้องมี local Supabase env ตาม .env.example')
+  return createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    db: { schema: 'academy' },
+  })
+}
+
+let cachedLearnerId: string | null = null
+async function prepareLessonAccess(fixture: LessonFixture): Promise<void> {
+  const db = serviceDb()
+  if (!cachedLearnerId) {
+    const email = readFileSync(join(__dirname, '..', 'test-results', '.auth', 'learner-email.txt'), 'utf8').trim()
+    const account = await db.from('users').select('id').eq('email', email).single()
+    if (account.error || !account.data) throw new Error('ไม่พบบัญชี E2E learner')
+    cachedLearnerId = account.data.id as string
+  }
+
+  const cleared = await db.from('node_progress').delete().eq('user_id', cachedLearnerId).eq('course_slug', fixture.slug)
+  if (cleared.error) throw new Error('ล้าง prerequisite fixture ไม่สำเร็จ')
+  if (fixture.priorNodeIds.length === 0) return
+  const inserted = await db.from('node_progress').insert(
+    fixture.priorNodeIds.map((nodeId) => ({
+      user_id: cachedLearnerId,
+      course_slug: fixture.slug,
+      node_id: nodeId,
+      status: 'skipped',
+    })),
+  )
+  if (inserted.error) throw new Error('เตรียม prerequisite fixture ไม่สำเร็จ')
+}
+
 // ⚠️ spec ทั้งชุดใช้บัญชีเดียวกัน (auth.setup) — การเปิดหน้าบทเรียนยิง action 'open'
 // ซึ่งทำให้บทนั้นกลายเป็น in-progress · เทสนี้เปิด **ทุกบทรวมบทที่ควรล็อก** จึงต้อง
 // คืนสภาพเมื่อจบ ไม่งั้น spec ที่ยืนยันสถานะ 'locked' จะตกด้วยเหตุผลที่ไม่เกี่ยวกัน
@@ -67,9 +107,10 @@ test.afterAll(async ({ playwright, baseURL }, testInfo) => {
   const api = await playwright.request.newContext({
     baseURL: baseURL!,
     storageState: testInfo.project.use.storageState as string,
+    extraHTTPHeaders: { origin: baseURL! },
   })
   for (const slug of new Set(fixtures.map((f) => f.slug))) {
-    await api.post(`/api/progress/reset?slug=${encodeURIComponent(slug)}`)
+    await api.post(`/api/progress/reset?slug=${encodeURIComponent(slug)}&operationId=${crypto.randomUUID()}`)
   }
   await api.dispose()
 })
@@ -82,6 +123,7 @@ test.describe('เฉลยต้องไม่ออกไปถึง browser
 
   for (const fixture of fixtures) {
     test(`${fixture.slug}/${fixture.nodeId}: ไม่มี explanation ในสิ่งที่ browser ได้รับ`, async ({ page }) => {
+      await prepareLessonAccess(fixture)
       // เก็บทุก response ที่เป็นข้อความ — HTML, RSC flight, JS chunk
       const bodies: string[] = []
       page.on('response', async (res) => {

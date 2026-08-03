@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { currentUser } from '@/lib/auth/session'
-import { getCourseStructure } from '@/lib/content/course-source'
+import { getAllCourses, getCourseStructure } from '@/lib/content/course-source'
 import { getLessonAnswerKey, mcqItems, sameAnswerSet, simulationItems } from '@/lib/content/answer-key'
 import {
   isAssessedNode,
@@ -11,15 +11,33 @@ import {
   TEST_OUT_UNAVAILABLE_REASON,
 } from '@/lib/course/assessment-policy'
 import { toPublicProgress } from '@/lib/course/public-progress'
-import { readBoundedBody } from '@/lib/http/bounded-body'
-import { gradeSimulation, gradingFingerprint } from '@/lib/simulation/types'
-import { consumeAttempt, finalizeAttempt, type ConsumedAttempt } from '@/lib/course/attempt-db'
-import { CHECKPOINT_CHALLENGE_ID, remapAnswersToReal } from '@/lib/course/attempt'
+import { readBoundedJson } from '@/lib/http/bounded-body'
+import { validateMutationRequest } from '@/lib/http/mutation-security'
+import {
+  authorizeCourseResource,
+  deniedAccessStatus,
+  getCourseAccess,
+  getServiceAccess,
+} from '@/lib/account/course-access'
+import { gradeSimulation, gradingFingerprint, simulationReadiness } from '@/lib/simulation/types'
+import {
+  commitAttemptResult,
+  consumeAttempt,
+  finalizeAttempt,
+  inspectAttempt,
+  type ConsumedAttempt,
+} from '@/lib/course/attempt-db'
+import {
+  attemptExplanations,
+  CHECKPOINT_CHALLENGE_ID,
+  remapAnswersToReal,
+} from '@/lib/course/attempt'
 import { simulationsToGrade } from '@/lib/course/attempt-grading'
 import {
   loadAllProgress,
   loadProgress,
-  recordNodeEvent,
+  captureProgressEpoch,
+  commitNodeEvent,
   type SimulationEvidence,
 } from '@/lib/course/progress-db'
 
@@ -114,20 +132,23 @@ const schema = z.discriminatedUnion('action', [
 ])
 
 export async function POST(request: Request) {
+  const mutation = validateMutationRequest(request, { requireJson: true })
+  if (!mutation.ok) {
+    return NextResponse.json({ ok: false, error: mutation.error }, { status: mutation.status })
+  }
+
   const user = await currentUser()
   if (!user) return NextResponse.json({ ok: false, error: 'ต้องเข้าสู่ระบบก่อน' }, { status: 401 })
 
-  const raw = await readBoundedBody(request, MAX_BODY_BYTES)
-  if (!raw.ok) return NextResponse.json({ ok: false, error: 'คำขอใหญ่เกินไป' }, { status: 413 })
-
-  let body: unknown
-  try {
-    body = JSON.parse(raw.text)
-  } catch {
+  const body = await readBoundedJson(request, MAX_BODY_BYTES)
+  if (!body.ok && body.reason === 'too-large') {
+    return NextResponse.json({ ok: false, error: 'คำขอใหญ่เกินไป' }, { status: 413 })
+  }
+  if (!body.ok) {
     return NextResponse.json({ ok: false, error: 'รูปแบบคำขอไม่ถูกต้อง' }, { status: 400 })
   }
 
-  const parsed = schema.safeParse(body)
+  const parsed = schema.safeParse(body.value)
   if (!parsed.success) {
     return NextResponse.json({ ok: false, error: 'ข้อมูลไม่ครบหรือไม่ถูกต้อง' }, { status: 400 })
   }
@@ -140,9 +161,26 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: 'ไม่พบบทเรียนนี้' }, { status: 404 })
   }
 
+  const access = await authorizeCourseResource(user.account.id, input.slug, input.nodeId)
+  if (!access.allowed) {
+    return NextResponse.json(
+      { ok: false, error: access.reason === 'unavailable' ? 'ตรวจสิทธิ์ไม่สำเร็จ' : 'ยังไม่มีสิทธิ์เข้าถึงบทนี้' },
+      { status: deniedAccessStatus(access) },
+    )
+  }
+
   try {
+    // จับ generation หลัง authorize ทันที ทุก mutation ด้านล่างต้องยืนยันค่าเดิม
+    // ใน transaction สุดท้าย reset ระหว่าง grading จึงชนะ request เก่าเสมอ
+    const progressEpoch = await captureProgressEpoch(user.account.id, input.slug)
+
     if (input.action === 'open') {
-      await recordNodeEvent(user.account.id, { slug: input.slug, nodeId: input.nodeId, status: 'in-progress' })
+      const committed = await commitNodeEvent(
+        user.account.id,
+        { slug: input.slug, nodeId: input.nodeId, status: 'in-progress' },
+        progressEpoch,
+      )
+      if (!committed) return staleProgressResponse()
       return NextResponse.json({ ok: true })
     }
 
@@ -151,7 +189,12 @@ export async function POST(request: Request) {
       if (node.kind === 'capstone') {
         return NextResponse.json({ ok: false, error: 'บทนี้ข้ามไม่ได้' }, { status: 409 })
       }
-      await recordNodeEvent(user.account.id, { slug: input.slug, nodeId: input.nodeId, status: 'skipped' })
+      const committed = await commitNodeEvent(
+        user.account.id,
+        { slug: input.slug, nodeId: input.nodeId, status: 'skipped' },
+        progressEpoch,
+      )
+      if (!committed) return staleProgressResponse()
       return NextResponse.json({ ok: true })
     }
 
@@ -169,12 +212,17 @@ export async function POST(request: Request) {
       const cue = answerKey.videoCueQuestions.find((q) => q.cueId === input.cueId)
       if (!cue) return NextResponse.json({ ok: false, error: 'ไม่พบคำถามนี้' }, { status: 404 })
       const correct = sameAnswerSet(input.answer, cue.correct)
-      await recordNodeEvent(user.account.id, {
-        slug: input.slug,
-        nodeId: input.nodeId,
-        status: 'in-progress',
-        videoCueResults: { [input.cueId]: correct },
-      })
+      const committed = await commitNodeEvent(
+        user.account.id,
+        {
+          slug: input.slug,
+          nodeId: input.nodeId,
+          status: 'in-progress',
+          videoCueResults: { [input.cueId]: correct },
+        },
+        progressEpoch,
+      )
+      if (!committed) return staleProgressResponse()
       // คำถามกลางวิดีโอเป็น formative ไม่ใช่ด่าน (W0-4) — คำอธิบายคือทั้งหมดของ
       // ประโยชน์มัน จึงส่งกลับตรงนี้แทนที่จะฝังมากับหน้า
       return NextResponse.json({ ok: true, correct, explanation: cue.explanation })
@@ -195,24 +243,61 @@ export async function POST(request: Request) {
     //
     // ⚠️ consume เป็น atomic และเงื่อนไข ownership/context/expiry อยู่ใน WHERE
     // เดียวกันทั้งหมด (W0-0) — attempt ของคนอื่นหรือของบทอื่นใช้ไม่ได้ และใช้ซ้ำไม่ได้
-    const needsAttempt = requiresAttempt(node, sims.length > 0)
+    // ถ้า client ถือ attempt มาแล้ว ต้องยึด snapshot ใบนั้นต่อ แม้ deploy ล่าสุดจะ
+    // ถอด assessment/simulation ออกจาก node ไปแล้ว มิฉะนั้น request ระหว่าง deploy
+    // จะหลุดไปตรวจจากเนื้อหาปัจจุบันและข้าม consume contract ของโจทย์ที่เห็นจริง
+    const needsAttempt = requiresAttempt(node, sims.length > 0) || input.attemptId !== undefined
+    const attemptContext = {
+      userId: user.account.id,
+      courseSlug: input.slug,
+      nodeId: input.nodeId,
+      challengeId: CHECKPOINT_CHALLENGE_ID,
+    }
     let consumed: ConsumedAttempt | null = null
     if (needsAttempt) {
       if (!input.attemptId) {
         return NextResponse.json({ ok: false, error: 'ต้องเริ่มความพยายามใหม่ก่อนส่งคำตอบ' }, { status: 400 })
       }
-      consumed = await consumeAttempt(
-        {
-          userId: user.account.id,
-          courseSlug: input.slug,
-          nodeId: input.nodeId,
-          challengeId: CHECKPOINT_CHALLENGE_ID,
-        },
-        input.attemptId,
-      )
+      // อ่าน snapshot โดยยังไม่ claim เพื่อกัน validation error กิน attempt หนึ่งใบ
+      // completed retry ข้าม readiness และคืน outcome เดิมตาม idempotency contract
+      const inspected = await inspectAttempt(attemptContext, input.attemptId)
+      if (inspected && !inspected.outcome) {
+        const preview = simulationsToGrade(inspected.params, sims)
+        if (
+          preview.ok &&
+          preview.simulations.some((sim) => {
+            const state = input.simulations?.[sim.id] ?? {}
+            return !simulationReadiness(
+              sim.challenge.surface,
+              sim.challenge.initial,
+              state,
+              sim.challenge.requiredFields,
+            ).ready
+          })
+        ) {
+          return NextResponse.json(
+            {
+              ok: false,
+              error: 'ทำโจทย์จำลองให้ครบและกดยืนยันการตั้งค่าก่อนตรวจ',
+              code: 'simulation-incomplete',
+            },
+            { status: 400 },
+          )
+        }
+      }
+      consumed = await consumeAttempt(attemptContext, input.attemptId)
       if (!consumed) {
         // ไม่แยกเหตุผล — รายละเอียดคือ oracle ให้คนเดา attempt_id (W0-0)
-        return NextResponse.json({ ok: false, error: 'ความพยายามนี้ใช้ไม่ได้แล้ว' }, { status: 409 })
+        return NextResponse.json(
+          { ok: false, error: 'ความพยายามนี้ใช้ไม่ได้แล้ว', code: 'attempt-invalid' },
+          { status: 409 },
+        )
+      }
+      if (consumed.claimState === 'in-progress') {
+        return NextResponse.json(
+          { ok: false, error: 'กำลังตรวจสอบผลจากคำขออีกครั้ง', code: 'claim-replaced' },
+          { status: 409 },
+        )
       }
       if (consumed.outcome) {
         // ส่งซ้ำหลังจบสมบูรณ์แล้ว — คืนผลเดิม ไม่ตรวจใหม่ ไม่เขียนซ้ำ
@@ -220,6 +305,12 @@ export async function POST(request: Request) {
         // เกิดได้จริงเมื่อ response ของครั้งแรกหายกลางทางแล้วผู้เรียนกดส่งอีกครั้ง ·
         // รูปของ response ยังเป็น `{ok, passed}` เหมือนเดิมทุกประการ (W0-1)
         return NextResponse.json({ ok: true, passed: consumed.outcome.passed })
+      }
+      if (!consumed.claimToken) {
+        return NextResponse.json(
+          { ok: false, error: 'ความพยายามนี้ใช้ไม่ได้แล้ว', code: 'attempt-invalid' },
+          { status: 409 },
+        )
       }
     }
 
@@ -240,7 +331,18 @@ export async function POST(request: Request) {
       const submittedIds = Object.keys(input.answers)
       const expected = new Set(gradedQuestionIds)
       if (submittedIds.length !== expected.size || submittedIds.some((id) => !expected.has(id))) {
-        await finalizeAttempt(user.account.id, input.attemptId!, { passed: false })
+        const closed = await finalizeAttempt(
+          user.account.id,
+          input.attemptId!,
+          consumed.claimToken!,
+          { passed: false },
+        )
+        if (!closed) {
+          return NextResponse.json(
+            { ok: false, error: 'กำลังตรวจสอบผลจากคำขออีกครั้ง', code: 'claim-replaced' },
+            { status: 409 },
+          )
+        }
         return NextResponse.json({ ok: false, error: 'คำตอบไม่ตรงกับโจทย์ชุดนี้' }, { status: 400 })
       }
       for (const id of gradedQuestionIds) {
@@ -248,7 +350,18 @@ export async function POST(request: Request) {
         if (real === null) {
           // key ที่ไม่มีในตาราง / ข้อที่ไม่ได้อยู่ใน attempt นี้ / key ซ้ำ → ปฏิเสธทั้งชุด
           // ไม่ใช่ตัดตัวปลอมทิ้งเงียบๆ (ดูเหตุผลใน remapAnswersToReal)
-          await finalizeAttempt(user.account.id, input.attemptId!, { passed: false })
+          const closed = await finalizeAttempt(
+            user.account.id,
+            input.attemptId!,
+            consumed.claimToken!,
+            { passed: false },
+          )
+          if (!closed) {
+            return NextResponse.json(
+              { ok: false, error: 'กำลังตรวจสอบผลจากคำขออีกครั้ง', code: 'claim-replaced' },
+              { status: 409 },
+            )
+          }
           return NextResponse.json({ ok: false, error: 'คำตอบไม่ตรงกับโจทย์ชุดนี้' }, { status: 400 })
         }
         results[id] = sameAnswerSet(real, consumed.params.answerKeys[id] ?? [])
@@ -271,10 +384,21 @@ export async function POST(request: Request) {
     const source = simulationsToGrade(consumed?.params ?? null, sims)
     if (!source.ok) {
       if (consumed && input.attemptId) {
-        await finalizeAttempt(user.account.id, input.attemptId, { passed: false })
+        const closed = await finalizeAttempt(
+          user.account.id,
+          input.attemptId,
+          consumed.claimToken!,
+          { passed: false },
+        )
+        if (!closed) {
+          return NextResponse.json(
+            { ok: false, error: 'กำลังตรวจสอบผลจากคำขออีกครั้ง', code: 'claim-replaced' },
+            { status: 409 },
+          )
+        }
       }
       return NextResponse.json(
-        { ok: false, error: 'โจทย์ชุดนี้หมดอายุแล้ว เริ่มใหม่อีกครั้ง' },
+        { ok: false, error: 'โจทย์ชุดนี้หมดอายุแล้ว เริ่มใหม่อีกครั้ง', code: 'attempt-invalid' },
         { status: 409 },
       )
     }
@@ -297,36 +421,55 @@ export async function POST(request: Request) {
     // capstone และการ test-out ต้องถูกทุกข้อ · บทปกติใช้เกณฑ์ของโหมดสอน (W0-3)
     //
     // เดิมบทปกติผ่านด้วย "ตอบครบ" เฉยๆ — ตอบผิดทุกข้อก็ได้ `completed` (F2)
-    const assessed = isAssessedNode(node) || input.mode === 'test-out'
+    const assessed = consumed
+      ? consumed.params.assessment.assessed
+      : isAssessedNode(node) || input.mode === 'test-out'
     // โจทย์จำลองไม่มี "ยังไม่ตอบ" — หน้าจอมีค่าตั้งต้นเสมอ จึงนับความครบเฉพาะ MCQ
     const answeredAll = gradedQuestionIds.every((id) => (input.answers[id]?.length ?? 0) > 0)
     const passed =
       answeredAll && (assessed ? correctCount === totalTasks : passesLearnMode(correctCount, totalTasks))
 
-    await recordNodeEvent(user.account.id, {
-      slug: input.slug,
-      nodeId: input.nodeId,
+    const progressEvent = {
       // ตอบแล้วแต่ยังไม่ผ่าน — เก็บผลไว้ แต่สถานะยังไม่ขยับ
-      status: passed ? (input.mode === 'test-out' ? 'tested-out' : 'completed') : 'in-progress',
+      status: passed
+        ? (input.mode === 'test-out' ? 'tested-out' : 'completed')
+        : 'in-progress',
       checkpointResults: results,
       simulationEvidence: Object.keys(simulationEvidence).length > 0 ? simulationEvidence : undefined,
-      // ตัวชี้ว่า "ผ่านด้วยความพยายามครั้งไหน" — ส่งเฉพาะตอนผ่านจริงและมี attempt
-      passedAttemptId: passed && consumed ? input.attemptId : undefined,
-      passedChallengeVersion: passed && consumed ? consumed.challengeVersion : undefined,
-    })
+    } as const
 
-    // ปิดท้าย attempt **หลัง** บันทึกความคืบหน้าสำเร็จ — ลำดับนี้คือทั้งหมดของ 0009:
-    // ถ้าปิดก่อนแล้วการบันทึกล้ม ผู้เรียนเสียสิทธิ์โดยไม่ได้อะไร
     if (consumed && input.attemptId) {
-      await finalizeAttempt(user.account.id, input.attemptId, { passed })
+      // DB ตรวจ claim token แล้วเขียน progress + outcome ใน transaction เดียว
+      // request เก่าที่กลับมาหลัง reclaim จึงเขียนทับผลของ claim ใหม่ไม่ได้
+      const committed = await commitAttemptResult(
+        attemptContext,
+        input.attemptId,
+        consumed.claimToken!,
+        { passed },
+        progressEvent,
+      )
+      if (!committed) {
+        return NextResponse.json(
+          { ok: false, error: 'กำลังตรวจสอบผลจากคำขออีกครั้ง', code: 'claim-replaced' },
+          { status: 409 },
+        )
+      }
+    } else {
+      const committed = await commitNodeEvent(
+        user.account.id,
+        { slug: input.slug, nodeId: input.nodeId, ...progressEvent },
+        progressEpoch,
+      )
+      if (!committed) return staleProgressResponse()
     }
 
     // assessed: รูปของ response ต้องเหมือนกันทั้งผ่านและไม่ผ่าน — ขนาด/จำนวน field
     // ที่ต่างกันก็บอกใบ้ได้ จึงคืน key เดียวเสมอ
     if (assessed) return NextResponse.json({ ok: true, passed })
 
-    const explanations: Record<string, string> = {}
-    for (const q of questions) explanations[q.id] = q.explanation
+    const explanations: Record<string, string> = consumed
+      ? (attemptExplanations(consumed.params) ?? {})
+      : Object.fromEntries(questions.map((q) => [q.id, q.explanation]))
     return NextResponse.json({ ok: true, passed, results, correctCount, total: totalTasks, explanations })
   } catch (err) {
     console.error('[api/progress] บันทึกไม่สำเร็จ:', err)
@@ -335,30 +478,68 @@ export async function POST(request: Request) {
   }
 }
 
+function staleProgressResponse() {
+  return NextResponse.json(
+    { ok: false, error: 'สถานะบทเรียนเปลี่ยนระหว่างบันทึก กรุณาตรวจสอบอีกครั้ง', code: 'progress-stale' },
+    { status: 409 },
+  )
+}
+
 export async function GET(request: Request) {
   const user = await currentUser()
   if (!user) return NextResponse.json({ ok: false, error: 'ต้องเข้าสู่ระบบก่อน' }, { status: 401 })
+
+  const serviceAccess = await getServiceAccess(user.account.id)
+  if (!serviceAccess.allowed) {
+    return NextResponse.json(
+      { ok: false, error: serviceAccess.reason === 'unavailable' ? 'ตรวจสิทธิ์ไม่สำเร็จ' : 'บัญชีนี้ยังใช้ Academy ไม่ได้' },
+      { status: deniedAccessStatus(serviceAccess) },
+    )
+  }
 
   const slug = new URL(request.url).searchParams.get('slug')?.trim()
   try {
     // ⚠️ ทุกเส้นทางที่ส่งความคืบหน้าออกไปหา browser ต้องผ่าน toPublicProgress
     // ผลรายข้อของพื้นผิววัดผลคือเครื่องเฉลย — ดูเหตุผลเต็มใน public-progress.ts
     if (slug) {
+      const structure = getCourseStructure(slug)
+      if (!structure) {
+        return NextResponse.json({ ok: false, error: 'ไม่พบคอร์สนี้' }, { status: 404 })
+      }
+      const access = await getCourseAccess(user.account.id, slug)
+      if (!access.allowed) {
+        return NextResponse.json(
+          { ok: false, error: access.reason === 'unavailable' ? 'ตรวจสิทธิ์ไม่สำเร็จ' : 'ไม่มีสิทธิ์เข้าถึงคอร์สนี้' },
+          { status: deniedAccessStatus(access) },
+        )
+      }
       const record = await loadProgress(user.account.id, slug)
-      return NextResponse.json({ ok: true, record: toPublicProgress(record, getCourseStructure(slug)) })
+      return NextResponse.json({ ok: true, record: toPublicProgress(record, structure) })
     }
     const records = await loadAllProgress(user.account.id)
+    const accessible = await Promise.all(
+      getAllCourses().map(async ({ structure }) => {
+        const courseSlug = structure.slug
+        const access = await getCourseAccess(user.account.id, courseSlug)
+        if (!access.allowed && access.reason === 'unavailable') throw new Error('access store unavailable')
+        return access.allowed ? courseSlug : null
+      }),
+    )
+    const accessibleCourseSlugs = accessible.filter((slug): slug is string => slug !== null)
     return NextResponse.json({
       ok: true,
+      accessibleCourseSlugs,
       records: Object.fromEntries(
-        Object.entries(records).map(([courseSlug, record]) => [
-          courseSlug,
-          toPublicProgress(record, getCourseStructure(courseSlug)),
-        ]),
+        accessibleCourseSlugs
+          .filter((courseSlug) => records[courseSlug])
+          .map((courseSlug) => [
+            courseSlug,
+            toPublicProgress(records[courseSlug], getCourseStructure(courseSlug)),
+          ]),
       ),
     })
   } catch (err) {
     console.error('[api/progress] อ่านไม่สำเร็จ:', err)
-    return NextResponse.json({ ok: false, error: 'อ่านความคืบหน้าไม่สำเร็จ' }, { status: 500 })
+    return NextResponse.json({ ok: false, error: 'อ่านความคืบหน้าไม่สำเร็จ' }, { status: 503 })
   }
 }

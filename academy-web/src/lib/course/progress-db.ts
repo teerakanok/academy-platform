@@ -61,6 +61,32 @@ export async function loadProgress(userId: string, slug: string): Promise<Course
   return rowsToRecord(slug, (data ?? []) as NodeRow[])
 }
 
+/** ล้าง progress ด้วย operation ID เดิมได้ซ้ำโดยไม่เพิ่ม epoch หรือลบงานรอบใหม่ */
+export async function resetProgress(userId: string, slug: string, operationId: string): Promise<boolean> {
+  const db = academyDb()
+  const { data, error } = await db.rpc('reset_course_progress', {
+    p_user_id: userId,
+    p_course_slug: slug,
+    p_operation_id: operationId,
+  })
+  if (error) throw new Error(`ล้างความคืบหน้าไม่สำเร็จ: ${error.message}`)
+  return data === true
+}
+
+/** receipt เป็นหลักฐานของ operation เดิม; record ว่างหรือไม่ไม่ใช่หลักฐานว่า reset สำเร็จ */
+export async function loadResetReceipt(userId: string, slug: string, operationId: string): Promise<boolean> {
+  const db = academyDb()
+  const { data, error } = await db
+    .from('course_progress_reset_operation')
+    .select('operation_id')
+    .eq('user_id', userId)
+    .eq('course_slug', slug)
+    .eq('operation_id', operationId)
+    .maybeSingle()
+  if (error) throw new Error(`ตรวจ reset receipt ไม่สำเร็จ: ${error.message}`)
+  return data !== null
+}
+
 /**
  * หลักฐานของด่านจำลองหนึ่งด่าน (W1)
  *
@@ -118,6 +144,36 @@ export async function recordNodeEvent(userId: string, event: NodeEvent): Promise
     p_passed_challenge_version: event.passedChallengeVersion ?? null,
   })
   if (error) throw new Error(`บันทึกความคืบหน้าไม่สำเร็จ: ${error.message}`)
+}
+
+/** จับ generation ทันทีหลัง authorize เพื่อกัน reset ที่เกิดระหว่าง grading/write */
+export async function captureProgressEpoch(userId: string, slug: string): Promise<number> {
+  const db = academyDb()
+  const { data, error } = await db.rpc('capture_progress_epoch', {
+    p_user_id: userId,
+    p_course_slug: slug,
+  })
+  if (error || typeof data !== 'number') {
+    throw new Error(`จับ progress generation ไม่สำเร็จ: ${error?.message ?? 'ผลลัพธ์ไม่ถูกต้อง'}`)
+  }
+  return data
+}
+
+/** เขียน mutation ทั่วไปโดย revalidate access และ generation ใน transaction สุดท้าย */
+export async function commitNodeEvent(userId: string, event: NodeEvent, expectedEpoch: number): Promise<boolean> {
+  const db = academyDb()
+  const { data, error } = await db.rpc('commit_node_progress', {
+    p_user_id: userId,
+    p_course_slug: event.slug,
+    p_node_id: event.nodeId,
+    p_status: event.status,
+    p_expected_epoch: expectedEpoch,
+    p_checkpoint_results: event.checkpointResults ?? null,
+    p_video_cue_results: event.videoCueResults ?? null,
+    p_simulation_evidence: event.simulationEvidence ?? null,
+  })
+  if (error) throw new Error(`บันทึกความคืบหน้าไม่สำเร็จ: ${error.message}`)
+  return data === true
 }
 
 /** ความคืบหน้าของทุกคอร์สในครั้งเดียว — dashboard ต้องใช้ ไม่ควรยิงทีละคอร์ส */

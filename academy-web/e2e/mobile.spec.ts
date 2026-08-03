@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { prepareNodeAccess } from './support/access'
 
 // Academy เป็นปลายทางที่คนเปิดจากลิงก์บนมือถือได้ตรงๆ — หน้าแรกที่เห็นคือหน้าที่
 // ตัดสินว่าเขาจะอยู่ต่อไหม การเลื่อนซ้ายขวาได้คือสัญญาณ "เว็บพัง" ที่คนอ่านออกทันที
@@ -12,6 +13,11 @@ import { test, expect } from '@playwright/test'
 // มาด้วย ทำให้ทั้งไฟล์เด้งไปขอ WebKit ที่ไม่ได้ติดตั้ง — ที่ต้องการจริงคือ "ขนาดจอ
 // กับนิ้ว" ไม่ใช่ "เบราว์เซอร์อื่น"
 test.use({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true })
+
+test.beforeAll(async () => {
+  await prepareNodeAccess('basic-os-linux', 'permissions')
+  await prepareNodeAccess('content-formats-demo', 'formats-hands-on')
+})
 
 const PAGES = [
   ['/dashboard', 'หน้า My learning'],

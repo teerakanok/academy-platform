@@ -10,6 +10,10 @@
 
 export type BoundedBody = { ok: true; text: string } | { ok: false; reason: 'too-large' }
 
+export type BoundedJson =
+  | { ok: true; value: unknown }
+  | { ok: false; reason: 'too-large' | 'invalid-json' | 'read-error' }
+
 export async function readBoundedBody(request: Request, maxBytes: number): Promise<BoundedBody> {
   const body = request.body
 
@@ -60,4 +64,21 @@ export async function readBoundedBody(request: Request, maxBytes: number): Promi
     offset += chunk.byteLength
   }
   return { ok: true, text: new TextDecoder().decode(merged) }
+}
+
+/** อ่านและ parse JSON โดยไม่เปิดทางให้ request.json() buffer payload แบบไร้เพดาน */
+export async function readBoundedJson(request: Request, maxBytes: number): Promise<BoundedJson> {
+  let body: BoundedBody
+  try {
+    body = await readBoundedBody(request, maxBytes)
+  } catch {
+    return { ok: false, reason: 'read-error' }
+  }
+  if (!body.ok) return body
+
+  try {
+    return { ok: true, value: JSON.parse(body.text) as unknown }
+  } catch {
+    return { ok: false, reason: 'invalid-json' }
+  }
 }

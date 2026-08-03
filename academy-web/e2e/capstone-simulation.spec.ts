@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { answerOnPage, startCapstoneAttempt } from './support/capstone'
 import { learnerEmail, storedSimulationEvidence } from './support/evidence'
+import { prepareNodeAccess } from './support/access'
 
 // W1 — โจทย์จำลองเป็น "ด่าน" ของ capstone ไม่ใช่ของเล่นข้างทาง
 //
@@ -45,13 +46,17 @@ async function submit(
 }
 
 test.describe('capstone ที่มีโจทย์จำลองต้องทำถูกทั้งสองอย่าง', () => {
+  test.beforeEach(async () => {
+    await prepareNodeAccess(COURSE, CAPSTONE)
+  })
+
   test.afterEach(async ({ request }) => {
-    await request.post(`/api/progress/reset?slug=${encodeURIComponent(COURSE)}`)
+    await request.post(`/api/progress/reset?slug=${encodeURIComponent(COURSE)}&operationId=${crypto.randomUUID()}`)
   })
 
   test('🔴 MCQ ถูกครบแต่ตั้งค่าหน้าจอผิด → ไม่ผ่าน', async ({ request }) => {
     // ถ้าข้อนี้เขียวแบบ "ผ่าน" แปลว่า simulation เป็นของประดับเหมือนเดิม
-    const body = await submit(request, () => ({ addressMode: 'dhcp', applied: false }))
+    const body = await submit(request, () => ({ addressMode: 'dhcp', applied: true }))
     expect(body.passed).toBe(false)
     // โหมดวัดผลยังคืนแค่ passed — simulation ต้องไม่เปิดช่องรั่วใหม่
     expect(Object.keys(body).sort()).toEqual(['ok', 'passed'])
@@ -65,14 +70,51 @@ test.describe('capstone ที่มีโจทย์จำลองต้อ�
     expect(after.record.completed).toContain(CAPSTONE)
   })
 
-  test('ตั้งค่าเกือบถูก (ขาด applied) ก็ยังไม่ผ่าน — ทุก requirement ต้องครบ', async ({ request }) => {
-    const body = await submit(request, (correct) => ({ ...correct, applied: false }))
-    expect(body.passed).toBe(false)
+  test('ตั้งค่าครบแต่ยังไม่ Apply → validation error ก่อน consume', async ({ request }) => {
+    const attempt = await startCapstoneAttempt(request)
+    const response = await request.post('/api/progress', {
+      data: {
+        slug: COURSE,
+        nodeId: CAPSTONE,
+        action: 'checkpoint',
+        mode: 'learn',
+        answers: attempt.answers,
+        simulations: { 'sim-1': { ...attempt.correctState, applied: false } },
+        attemptId: attempt.attemptId,
+      },
+    })
+    expect(response.status()).toBe(400)
+    await expect(response.json()).resolves.toMatchObject({ ok: false, code: 'simulation-incomplete' })
   })
 
-  test('ไม่ส่งสถานะหน้าจอมาเลย → ไม่ผ่าน (ไม่ใช่ข้ามด่านไปเฉยๆ)', async ({ request }) => {
-    const body = await submit(request, () => null)
-    expect(body.passed).toBe(false)
+  test('ไม่ส่งสถานะหน้าจอ → ปฏิเสธก่อน consume และ retry ด้วยใบเดิมได้', async ({ request }) => {
+    const attempt = await startCapstoneAttempt(request)
+    const incomplete = await request.post('/api/progress', {
+      data: {
+        slug: COURSE,
+        nodeId: CAPSTONE,
+        action: 'checkpoint',
+        mode: 'learn',
+        answers: attempt.answers,
+        attemptId: attempt.attemptId,
+      },
+    })
+    expect(incomplete.status()).toBe(400)
+    await expect(incomplete.json()).resolves.toMatchObject({ ok: false, code: 'simulation-incomplete' })
+
+    const retry = await request.post('/api/progress', {
+      data: {
+        slug: COURSE,
+        nodeId: CAPSTONE,
+        action: 'checkpoint',
+        mode: 'learn',
+        answers: attempt.answers,
+        simulations: { 'sim-1': attempt.correctState },
+        attemptId: attempt.attemptId,
+      },
+    })
+    expect(retry.ok()).toBeTruthy()
+    await expect(retry.json()).resolves.toMatchObject({ ok: true, passed: true })
   })
 
   test('บทปกติที่มีแต่ MCQ ยังทำงานเหมือนเดิม (ไม่ breaking)', async ({ request }) => {
@@ -102,13 +144,22 @@ test.describe('capstone ที่มีโจทย์จำลองต้อ�
     // (สุ่มต่อ attempt ตั้งแต่ W1) ไม่ใช่ค่าตายตัวที่เทสรู้ล่วงหน้า
     const sim = page.getByTestId('checkpoint-sim-sim-1')
     await expect(sim).toBeVisible()
+    await expect(page.getByTestId('checkpoint-submit')).toBeDisabled()
     const targetIp = /192\.168\.10\.\d+/.exec((await sim.textContent()) ?? '')?.[0]
     expect(targetIp, 'โจทย์บนหน้าจอไม่มีค่าเป้าหมาย').toBeTruthy()
     await sim.getByTestId('sim-mode-static').click()
     await sim.getByTestId('sim-ipv4').fill(targetIp!)
     await sim.getByTestId('sim-subnet').fill('255.255.255.0')
     await sim.getByTestId('sim-gateway').fill('192.168.10.1')
+    await expect(page.getByTestId('checkpoint-submit')).toBeDisabled()
     await sim.getByTestId('sim-apply').click()
+    await expect(page.getByTestId('checkpoint-submit')).toBeEnabled()
+    await sim.getByTestId('sim-ipv4').fill('192.168.10.254')
+    await expect(page.getByTestId('checkpoint-submit')).toBeDisabled()
+    await expect(sim.getByTestId('sim-status')).toContainText('Not applied yet')
+    await sim.getByTestId('sim-ipv4').fill(targetIp!)
+    await sim.getByTestId('sim-apply').click()
+    await expect(page.getByTestId('checkpoint-submit')).toBeEnabled()
 
     // ปุ่มตรวจเดียวสำหรับทั้งด่าน
     await page.getByTestId('checkpoint-submit').click()
@@ -143,7 +194,7 @@ test.describe('capstone ที่มีโจทย์จำลองต้อ�
     // สถานะบทถูกกันไม่ให้ถอยอยู่แล้ว แต่เดิม **หลักฐานไม่ถูกกัน** → บทที่ระบบบอกว่า
     // ผ่าน มีหลักฐานบอกว่าไม่ผ่าน ขัดกันเอง และใบรับรอง (W4) อ้างอิงหลักฐานชุดนี้
     expect((await submit(request, (correct) => correct)).passed).toBe(true)
-    expect((await submit(request, () => ({ addressMode: 'dhcp', applied: false }))).passed).toBe(false)
+    expect((await submit(request, () => ({ addressMode: 'dhcp', applied: true }))).passed).toBe(false)
 
     const record = (await (await request.get(`/api/progress?slug=${COURSE}`)).json()).record as {
       completed: string[]

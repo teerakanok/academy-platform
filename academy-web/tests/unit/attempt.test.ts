@@ -1,5 +1,12 @@
 import { describe, expect, it, vi } from 'vitest'
-import { buildAttemptParams, remapAnswersToReal, toPublicQuestions } from '@/lib/course/attempt'
+import {
+  attemptExplanations,
+  buildAttemptParams,
+  normalizeAttemptParams,
+  remapAnswersToReal,
+  toPublicQuestions,
+  type AttemptParams,
+} from '@/lib/course/attempt'
 import { attemptQuota } from '@/lib/course/attempt-db'
 import type { CheckpointQuestion } from '@/lib/content/course-types'
 
@@ -64,6 +71,29 @@ describe('buildAttemptParams', () => {
     }
   })
 
+  it('snapshot คำอธิบายตาม attempt โดยไม่ส่งออกไปกับโจทย์ public', () => {
+    const params = buildAttemptParams(bank, bank.length)
+    for (const q of bank) {
+      expect(params.explanations?.[q.id]).toBe(q.explanation)
+      expect(JSON.stringify(params.questions)).not.toContain(q.explanation)
+    }
+    expect(attemptExplanations(params)).toEqual(
+      Object.fromEntries(params.questionIds.map((id) => [id, bank.find((q) => q.id === id)!.explanation])),
+    )
+  })
+
+  it('attempt เก่าที่ไม่มี explanation snapshot ต้อง fail closed', () => {
+    expect(
+      attemptExplanations({
+        questionIds: ['q1'],
+        questions: [],
+        keyMaps: {},
+        answerKeys: {},
+        assessment: { assessed: true },
+      }),
+    ).toBeNull()
+  })
+
   it('remap ต่างกันได้ระหว่าง attempt (สุ่มจริง ไม่ใช่ identity ตายตัว)', () => {
     // ข้อ 4 ตัวเลือกมี 24 permutation — 20 attempt แล้วยังได้ map เดิมทุกครั้ง
     // มีโอกาส (1/24)^19 ≈ 0 · ถ้าเทสนี้ตก แปลว่า shuffle ไม่ได้ทำงาน
@@ -109,6 +139,7 @@ describe('toPublicQuestions', () => {
         questions: [],
         keyMaps: { ghost: { A: 'A' } },
         answerKeys: { ghost: ['A'] },
+        assessment: { assessed: true },
       }),
     ).toThrow()
   })
@@ -178,5 +209,38 @@ describe('attemptQuota', () => {
     else vi.stubEnv('ATTEMPT_MAX_PER_WINDOW', value)
     expect(attemptQuota()).toBe(expected)
     vi.unstubAllEnvs()
+  })
+})
+
+describe('legacy attempt snapshot normalization', () => {
+  it('เติม readiness และ assessed policy เดิมโดยไม่ crash ระหว่าง reuse ข้าม deploy', () => {
+    const legacy = {
+      questionIds: [],
+      questions: [],
+      keyMaps: {},
+      answerKeys: {},
+      simulations: [{
+        id: 'sim-1',
+        challenge: {
+          id: 'legacy',
+          title: 'Legacy',
+          brief: 'Configure the interface',
+          surface: 'network-interface',
+          initial: { addressMode: 'dhcp', ipv4: '', subnet: '', gateway: '', applied: false },
+          requirements: [],
+        },
+      }],
+    } as unknown as AttemptParams
+
+    const normalized = normalizeAttemptParams(legacy)
+    expect(normalized.assessment).toEqual({ assessed: true })
+    expect(normalized.simulations?.[0].challenge.requiredFields).toEqual({
+      dhcp: [],
+      static: ['ipv4', 'subnet', 'gateway'],
+    })
+  })
+
+  it('snapshot policy ที่ออกใหม่เก็บ learn mode ได้ ไม่ถูก fallback เป็น assessed', () => {
+    expect(normalizeAttemptParams(buildAttemptParams(bank, bank.length, false)).assessment).toEqual({ assessed: false })
   })
 })

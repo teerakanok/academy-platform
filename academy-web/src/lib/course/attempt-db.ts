@@ -1,5 +1,6 @@
 import { academyDb } from '@/lib/db/server'
-import type { AttemptParams } from './attempt'
+import { attemptExplanations, normalizeAttemptParams, type AttemptParams } from './attempt'
+import type { NodeEvent } from './progress-db'
 
 // ทางเข้า DB ของโครง attempt — ทั้งสองคำสั่งเป็นฟังก์ชันฝั่งฐานข้อมูล (migration 0005)
 // เพราะเงื่อนไขความถูกต้องของมัน (โควตานับแบบ atomic · consume ครั้งเดียวพร้อม
@@ -49,6 +50,9 @@ export interface ConsumedAttempt {
    * ผู้เรียนจึงส่งใหม่ด้วย attempt เดิมได้โดยไม่เสียสิทธิ์ (ดูเหตุผลใน 0009)
    */
   outcome: { passed: boolean } | null
+  /** token ของ claim ปัจจุบัน; null มีได้เฉพาะ retry ที่ outcome จบแล้ว */
+  claimToken: string | null
+  claimState: 'claimed' | 'completed' | 'in-progress'
 }
 
 export interface AttemptContext {
@@ -56,6 +60,29 @@ export interface AttemptContext {
   courseSlug: string
   nodeId: string
   challengeId: string
+}
+
+export interface InspectedAttempt {
+  params: AttemptParams
+  outcome: { passed: boolean } | null
+}
+
+/** อ่าน snapshot เพื่อ validate รูป submission โดยยังไม่ claim/consume attempt */
+export async function inspectAttempt(
+  ctx: AttemptContext,
+  attemptId: string,
+): Promise<InspectedAttempt | null> {
+  const db = academyDb()
+  const { data, error } = await db.rpc('inspect_attempt', {
+    p_attempt_id: attemptId,
+    p_user_id: ctx.userId,
+    p_course_slug: ctx.courseSlug,
+    p_node_id: ctx.nodeId,
+    p_challenge_id: ctx.challengeId,
+  })
+  if (error) throw new Error(`อ่าน attempt เพื่อ validate ไม่สำเร็จ: ${error.message}`)
+  const row = (data as { params: AttemptParams; outcome: { passed: boolean } | null }[] | null)?.[0]
+  return row ? { params: normalizeAttemptParams(row.params), outcome: row.outcome ?? null } : null
 }
 
 /** ออก attempt ใหม่ — คืน null เมื่อโควตาในหน้าต่างเวลาเต็ม */
@@ -79,7 +106,7 @@ export async function issueAttempt(
   if (error) throw new Error(`ออก attempt ไม่สำเร็จ: ${error.message}`)
   const row = (data as { attempt_id: string; expires_at: string; params: AttemptParams }[] | null)?.[0]
   if (!row) return null
-  return { attemptId: row.attempt_id, expiresAt: row.expires_at, params: row.params }
+  return { attemptId: row.attempt_id, expiresAt: row.expires_at, params: normalizeAttemptParams(row.params) }
 }
 
 /**
@@ -97,10 +124,22 @@ export async function consumeAttempt(ctx: AttemptContext, attemptId: string): Pr
   })
   if (error) throw new Error(`ใช้ attempt ไม่สำเร็จ: ${error.message}`)
   const row = (data as
-    | { params: AttemptParams; challenge_version: string; outcome: { passed: boolean } | null }[]
+    | {
+        params: AttemptParams
+        challenge_version: string
+        outcome: { passed: boolean } | null
+        claim_token: string | null
+        claim_state: 'claimed' | 'completed' | 'in-progress'
+      }[]
     | null)?.[0]
   if (!row) return null
-  return { params: row.params, challengeVersion: row.challenge_version, outcome: row.outcome ?? null }
+  return {
+    params: normalizeAttemptParams(row.params),
+    challengeVersion: row.challenge_version,
+    outcome: row.outcome ?? null,
+    claimToken: row.claim_token ?? null,
+    claimState: row.claim_state,
+  }
 }
 
 /**
@@ -125,22 +164,87 @@ export async function nextAttemptAt(ctx: AttemptContext): Promise<Date | null> {
   return new Date(Date.parse(data[0].created_at as string) + ATTEMPT_WINDOW_MINUTES * 60_000)
 }
 
-/**
- * ปิดท้าย attempt ด้วยผลที่ตรวจได้ — เรียก **หลัง** บันทึกความคืบหน้าสำเร็จเท่านั้น
- *
- * ลำดับนี้สำคัญ: ถ้าเขียนผลก่อนบันทึก แล้วการบันทึกล้ม attempt จะถูกปิดตายทั้งที่
- * ความคืบหน้าไม่ได้ถูกเก็บ — ผู้เรียนเสียสิทธิ์และไม่ได้อะไร ซึ่งคือบั๊กที่ 0009 แก้
- */
+/** ปิด claim ที่ payload ใช้ไม่ได้; valid grading ต้องใช้ commitAttemptResult เท่านั้น */
 export async function finalizeAttempt(
   userId: string,
   attemptId: string,
+  claimToken: string,
   outcome: { passed: boolean },
-): Promise<void> {
+): Promise<boolean> {
   const db = academyDb()
-  const { error } = await db.rpc('finalize_attempt', {
+  const { data, error } = await db.rpc('finalize_attempt', {
     p_attempt_id: attemptId,
     p_user_id: userId,
+    p_claim_token: claimToken,
     p_outcome: outcome,
   })
   if (error) throw new Error(`ปิดท้าย attempt ไม่สำเร็จ: ${error.message}`)
+  return data === true
+}
+
+type AttemptNodeEvent = Pick<
+  NodeEvent,
+  'status' | 'checkpointResults' | 'videoCueResults' | 'simulationEvidence'
+>
+
+/** เขียน progress + outcome ใน transaction เดียว และรับเฉพาะ claim token ปัจจุบัน */
+export async function commitAttemptResult(
+  ctx: AttemptContext,
+  attemptId: string,
+  claimToken: string,
+  outcome: { passed: boolean },
+  event: AttemptNodeEvent,
+): Promise<boolean> {
+  const db = academyDb()
+  const { data, error } = await db.rpc('commit_attempt_result', {
+    p_attempt_id: attemptId,
+    p_user_id: ctx.userId,
+    p_claim_token: claimToken,
+    p_course_slug: ctx.courseSlug,
+    p_node_id: ctx.nodeId,
+    p_challenge_id: ctx.challengeId,
+    p_outcome: outcome,
+    p_status: event.status,
+    p_checkpoint_results: event.checkpointResults ?? null,
+    p_video_cue_results: event.videoCueResults ?? null,
+    p_simulation_evidence: event.simulationEvidence ?? null,
+  })
+  if (error) throw new Error(`บันทึกผล attempt ไม่สำเร็จ: ${error.message}`)
+  return data === true
+}
+
+export type PassedAttemptExplanations =
+  | { status: 'none' }
+  | { status: 'unavailable' }
+  | { status: 'ready'; explanations: Record<string, string> }
+
+/** แยกบทที่ไม่เคยใช้ attempt ออกจาก pointer ที่มีแต่ snapshot เสีย/หาย */
+export async function loadPassedAttemptExplanations(
+  ctx: Omit<AttemptContext, 'challengeId'>,
+): Promise<PassedAttemptExplanations> {
+  const db = academyDb()
+  const { data: progress, error: progressError } = await db
+    .from('node_progress')
+    .select('passed_attempt_id')
+    .eq('user_id', ctx.userId)
+    .eq('course_slug', ctx.courseSlug)
+    .eq('node_id', ctx.nodeId)
+    .maybeSingle()
+  if (progressError) throw new Error(`อ่านตัวชี้ attempt ไม่สำเร็จ: ${progressError.message}`)
+  const attemptId = progress?.passed_attempt_id as string | null | undefined
+  if (!attemptId) return { status: 'none' }
+
+  const { data: attempt, error: attemptError } = await db
+    .from('attempt')
+    .select('params')
+    .eq('attempt_id', attemptId)
+    .eq('user_id', ctx.userId)
+    .eq('course_slug', ctx.courseSlug)
+    .eq('node_id', ctx.nodeId)
+    .eq('challenge_id', 'checkpoint')
+    .maybeSingle()
+  if (attemptError) throw new Error(`อ่าน snapshot attempt ไม่สำเร็จ: ${attemptError.message}`)
+  const params = attempt?.params as AttemptParams | undefined
+  const explanations = params ? attemptExplanations(params) : null
+  return explanations ? { status: 'ready', explanations } : { status: 'unavailable' }
 }

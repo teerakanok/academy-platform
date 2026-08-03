@@ -16,6 +16,9 @@ export default defineConfig({
   reporter: [['list']],
   use: {
     baseURL: 'http://127.0.0.1:3000',
+    // APIRequestContext ไม่ได้สร้าง Origin ให้เหมือน browser fetch เอง แต่ production
+    // mutation boundary บังคับ origin จริง จึงระบุ origin ของ test server ตรงๆ
+    extraHTTPHeaders: { origin: 'http://127.0.0.1:3000' },
     trace: 'retain-on-failure',
   },
   projects: [

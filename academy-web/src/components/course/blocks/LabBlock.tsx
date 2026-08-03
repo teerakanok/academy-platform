@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { trapDialogFocus } from '@/components/course/dialog-focus'
 
 // ช่อง lab — เป็นของที่ผู้เรียนต้อง "ลงมือ" จึงเป็นกรณีเดียวที่เราฝังของที่รันอยู่
 // ข้างในหน้าเรา
@@ -52,35 +53,53 @@ export function LabBlock({
   scale?: 'inline' | 'full'
 }) {
   const [expanded, setExpanded] = useState(false)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const dialogRef = useRef<HTMLDialogElement>(null)
+  const closeRef = useRef<HTMLButtonElement>(null)
   const isInline = scale === 'inline'
 
   useEffect(() => {
     if (!expanded) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setExpanded(false)
-    }
-    document.addEventListener('keydown', onKey)
+    const dialog = dialogRef.current
+    if (!dialog) return
+    if (!dialog.open) dialog.showModal()
+    closeRef.current?.focus()
     const previousOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     return () => {
-      document.removeEventListener('keydown', onKey)
       document.body.style.overflow = previousOverflow
     }
   }, [expanded])
 
+  function close() {
+    dialogRef.current?.close()
+  }
+
+  function finishClosing() {
+    setExpanded(false)
+    triggerRef.current?.focus()
+  }
+
   const overlay = expanded && (
-    <div
+    <dialog
+      ref={dialogRef}
       className={
         isInline
-          ? 'fixed inset-0 z-50 flex items-center justify-center bg-cs-text/40 p-4 backdrop-blur-sm sm:p-8'
-          : 'fixed inset-0 z-50 flex flex-col bg-cs-bg p-4 sm:p-6'
+          ? 'fixed inset-0 m-0 h-dvh max-h-none w-screen max-w-none border-0 bg-cs-text/40 p-4 text-cs-text backdrop-blur-sm open:flex open:items-center open:justify-center sm:p-8'
+          : 'fixed inset-0 m-0 h-dvh max-h-none w-screen max-w-none border-0 bg-cs-bg p-4 text-cs-text open:flex open:flex-col sm:p-6'
       }
-      role="dialog"
-      aria-modal="true"
       aria-label={title}
       data-testid="lab-fullscreen"
       data-mode={isInline ? 'dialog' : 'fullscreen'}
-      onClick={isInline ? () => setExpanded(false) : undefined}
+      onClose={finishClosing}
+      onKeyDown={trapDialogFocus}
+      onClick={
+        isInline
+          ? (event) => {
+              if (event.target === event.currentTarget) close()
+            }
+          : undefined
+      }
     >
       <div
         className={
@@ -93,10 +112,10 @@ export function LabBlock({
         <div className="mb-3 flex items-center justify-between gap-4">
           <p className="min-w-0 truncate font-display text-base font-semibold text-cs-text">{title}</p>
           <button
+            ref={closeRef}
             type="button"
-            onClick={() => setExpanded(false)}
+            onClick={close}
             data-testid="lab-fullscreen-close"
-            autoFocus
             className="shrink-0 rounded-control border border-cs-border px-4 py-2 text-sm text-cs-body transition-colors hover:border-cs-accent hover:text-cs-accent"
           >
             {/* บนมือถือไม่มีปุ่ม Escape จะบอกให้กดก็ไร้ความหมาย — และคำเต็มยาวเกิน
@@ -110,7 +129,7 @@ export function LabBlock({
           <Placeholder status={status} compact={false} />
         </div>
       </div>
-    </div>
+    </dialog>
   )
 
   // ---------- แบบฝึกสั้น: อยู่ในสายการอ่าน ----------
@@ -135,6 +154,7 @@ export function LabBlock({
           {/* ปุ่มขยายเบาๆ ไม่แย่งความสนใจจากการอ่าน แต่เข้าถึงด้วยคีย์บอร์ดได้เสมอ
               (ไม่ซ่อนไว้ให้โผล่ตอน hover เพราะทัชสกรีนกับคีย์บอร์ดจะหาไม่เจอ) */}
           <button
+            ref={triggerRef}
             type="button"
             onClick={() => setExpanded(true)}
             data-testid="lab-expand"
@@ -164,6 +184,7 @@ export function LabBlock({
           <p className="mt-1 text-sm leading-relaxed text-cs-body">{description}</p>
         </div>
         <button
+          ref={triggerRef}
           type="button"
           onClick={() => setExpanded(true)}
           data-testid="lab-expand"

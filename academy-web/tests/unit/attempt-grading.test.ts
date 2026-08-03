@@ -17,6 +17,7 @@ function challenge(value: string): SimulationChallenge {
     brief: `ตั้งเป็น ${value}`,
     surface: 'network-interface',
     initial: {},
+    requiredFields: { dhcp: [], static: [] },
     requirements: [{ id: 'r', label: 'l', field: 'ipv4', operator: 'equals', value }],
   }
 }
@@ -24,7 +25,7 @@ function challenge(value: string): SimulationChallenge {
 const fromContent: SimulationSet = [{ id: 'sim-1', challenge: challenge('192.168.10.99') }]
 
 function params(simulations?: SimulationSet): AttemptParams {
-  return { questionIds: [], questions: [], keyMaps: {}, answerKeys: {}, simulations }
+  return { questionIds: [], questions: [], keyMaps: {}, answerKeys: {}, assessment: { assessed: true }, simulations }
 }
 
 describe('simulationsToGrade', () => {

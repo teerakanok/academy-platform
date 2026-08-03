@@ -37,8 +37,11 @@ function Field({
   onChange: (v: string) => void
 }) {
   return (
-    <div className="flex items-center gap-3">
-      <label htmlFor={`sim-${name}`} className="w-[10.5rem] shrink-0 text-right text-[13px] text-cs-body">
+    <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
+      <label
+        htmlFor={`sim-${name}`}
+        className="w-full text-left text-[13px] text-cs-body sm:w-[10.5rem] sm:shrink-0 sm:text-right"
+      >
         {label}
       </label>
       <input
@@ -49,7 +52,7 @@ function Field({
         placeholder={placeholder}
         inputMode="decimal"
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-[3px] border border-cs-border-2 bg-cs-surface px-2 py-1 font-mono text-[13px] text-cs-text outline-none transition-colors focus:border-cs-accent disabled:cursor-not-allowed disabled:bg-cs-surface-2 disabled:text-cs-muted"
+        className="min-h-11 w-full min-w-0 rounded-[3px] border border-cs-border-2 bg-cs-surface px-2 py-1 font-mono text-[13px] text-cs-text outline-none transition-colors focus:border-cs-accent disabled:cursor-not-allowed disabled:bg-cs-surface-2 disabled:text-cs-muted sm:min-h-0"
       />
     </div>
   )
@@ -93,7 +96,7 @@ export function NetworkInterfaceSim({
         </span>
       </div>
 
-      <div className="space-y-4 px-5 py-4">
+      <div className="space-y-4 px-3 py-4 sm:px-5">
         <p className="text-[12.5px] leading-relaxed text-cs-muted">
           You can get IP settings assigned automatically if your network supports this capability. Otherwise, you need
           to ask your network administrator for the appropriate IP settings.
@@ -120,35 +123,35 @@ export function NetworkInterfaceSim({
           ))}
         </fieldset>
 
-        <div className={`space-y-2 pl-6 ${isStatic ? '' : 'opacity-60'}`}>
+        <div className={`space-y-3 sm:space-y-2 sm:pl-6 ${isStatic ? '' : 'opacity-60'}`}>
           <Field
             label="IP address:"
             name="ipv4"
             value={shown('ipv4')}
             disabled={readOnly || !isStatic}
             placeholder={isStatic ? '' : '(assigned automatically)'}
-            onChange={(v) => set({ ipv4: v })}
+            onChange={(v) => set({ ipv4: v, applied: false })}
           />
           <Field
             label="Subnet mask:"
             name="subnet"
             value={shown('subnet')}
             disabled={readOnly || !isStatic}
-            onChange={(v) => set({ subnet: v })}
+            onChange={(v) => set({ subnet: v, applied: false })}
           />
           <Field
             label="Default gateway:"
             name="gateway"
             value={shown('gateway')}
             disabled={readOnly || !isStatic}
-            onChange={(v) => set({ gateway: v })}
+            onChange={(v) => set({ gateway: v, applied: false })}
           />
           <Field
             label="Preferred DNS server:"
             name="dns1"
             value={shown('dns1')}
             disabled={readOnly || !isStatic}
-            onChange={(v) => set({ dns1: v })}
+            onChange={(v) => set({ dns1: v, applied: false })}
           />
         </div>
 
@@ -167,7 +170,7 @@ export function NetworkInterfaceSim({
               type="button"
               disabled={readOnly}
               onClick={() => set({ applied: false, ...(isStatic ? {} : {}) })}
-              className="rounded-[3px] border border-cs-border-2 bg-cs-surface px-4 py-1.5 text-[13px] text-cs-body transition-colors hover:border-cs-accent disabled:opacity-50"
+              className="min-h-11 rounded-[3px] border border-cs-border-2 bg-cs-surface px-4 py-1.5 text-[13px] text-cs-body transition-colors hover:border-cs-accent disabled:opacity-50"
             >
               Cancel
             </button>
@@ -176,7 +179,7 @@ export function NetworkInterfaceSim({
               data-testid="sim-apply"
               disabled={readOnly}
               onClick={() => set({ applied: true })}
-              className="rounded-[3px] border border-cs-accent bg-cs-accent-dim px-5 py-1.5 text-[13px] font-medium text-cs-accent transition-colors hover:bg-cs-surface disabled:opacity-50"
+              className="min-h-11 rounded-[3px] border border-cs-accent bg-cs-accent-dim px-5 py-1.5 text-[13px] font-medium text-cs-accent transition-colors hover:bg-cs-surface disabled:opacity-50"
             >
               OK
             </button>

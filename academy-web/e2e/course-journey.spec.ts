@@ -28,19 +28,29 @@ test.describe('learner journey through a course', () => {
     })
 
     // ต้องถูกดึงกลับมาที่คำถาม ไม่ใช่ปล่อยให้ข้ามไป
-    await expect(page.getByTestId('video-quiz')).toBeVisible({ timeout: 15_000 })
+    const quiz = page.getByTestId('video-quiz')
+    await expect(quiz).toBeVisible({ timeout: 15_000 })
+    await expect(quiz.locator('input[type="radio"]').first()).toBeFocused()
+    await expect(quiz).not.toHaveAttribute('aria-modal', 'true')
     const clampedTime = await page.evaluate(
       () => document.querySelector<HTMLVideoElement>('[data-testid="lesson-video"]')!.currentTime,
     )
     expect(clampedTime).toBeLessThan(20)
 
-    // ตอบผิดก็ต้องไปต่อได้ (หลัก user override) แต่ต้องเห็นคำอธิบายก่อน
-    await page.getByTestId('video-quiz').locator('input[type="radio"]').first().check()
-    await page.getByTestId('video-quiz-submit').click()
+    // ตอบด้วยคีย์บอร์ดล้วน และตอบผิดก็ต้องไปต่อได้ตามหลัก user override
+    await page.keyboard.press('Space')
+    await page.keyboard.press('Tab')
+    await expect(page.getByTestId('video-quiz-submit')).toBeFocused()
+    await page.keyboard.press('Enter')
     await expect(page.getByTestId('video-quiz-explanation')).toBeVisible()
-    await page.getByTestId('video-quiz-continue').click()
+    await expect(page.getByTestId('video-quiz-status')).toHaveAttribute('role', 'status')
+    await expect(page.getByTestId('video-quiz-status')).toContainText(/Correct|Not quite/)
+    await expect(page.getByTestId('video-quiz-continue')).toBeFocused()
+    await expect(page.getByTestId('video-quiz-continue')).toHaveAttribute('aria-describedby', /video-quiz-result/)
+    await page.keyboard.press('Enter')
     await expect(page.getByTestId('video-quiz')).toBeHidden()
     await expect(page.getByTestId('video-cue-progress')).toContainText('1/3')
+    await expect(page.getByTestId('lesson-video')).toBeFocused()
   })
 
   test('full route: learn → skip, and the map + radar reflect both', async ({ page }) => {

@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { startCapstoneAttempt } from './support/capstone'
+import { prepareNodeAccess } from './support/access'
 
 // สัญญาของ response ในโหมดวัดผล (W0-1)
 //
@@ -16,13 +17,18 @@ const CAPSTONE = 'formats-hands-on'
 const LESSON = 'formats-reading'
 const SIM_LESSON = 'formats-simulation'
 
+test.beforeEach(async () => {
+  await prepareNodeAccess(COURSE, CAPSTONE)
+})
+
 // คืนสภาพเมื่อจบ — เทสชุดนี้ทำให้บทเรียนขยับสถานะจริง (ดูเหตุผลเดียวกันใน answer-leak)
 test.afterAll(async ({ playwright, baseURL }, testInfo) => {
   const api = await playwright.request.newContext({
     baseURL: baseURL!,
     storageState: testInfo.project.use.storageState as string,
+    extraHTTPHeaders: { origin: baseURL! },
   })
-  await api.post(`/api/progress/reset?slug=${encodeURIComponent(COURSE)}`)
+  await api.post(`/api/progress/reset?slug=${encodeURIComponent(COURSE)}&operationId=${crypto.randomUUID()}`)
   await api.dispose()
 })
 
@@ -52,7 +58,8 @@ async function submitCapstone(
   request: import('@playwright/test').APIRequestContext,
   pick: 'correct' | 'wrong' | ((attempt: Awaited<ReturnType<typeof startCapstoneAttempt>>) => Record<string, string[]>),
 ) {
-  await request.post(`/api/progress/reset?slug=${encodeURIComponent(COURSE)}`)
+  await request.post(`/api/progress/reset?slug=${encodeURIComponent(COURSE)}&operationId=${crypto.randomUUID()}`)
+  await prepareNodeAccess(COURSE, CAPSTONE)
   const attempt = await startCapstoneAttempt(request)
   const answers =
     pick === 'correct' ? attempt.answers : pick === 'wrong' ? attempt.wrongAnswers : pick(attempt)
@@ -182,6 +189,7 @@ test.describe('endpoint เฉลย — เปิดได้เฉพาะบ
     const anon = await playwright.request.newContext({
       baseURL: baseURL!,
       storageState: { cookies: [], origins: [] },
+      extraHTTPHeaders: { origin: baseURL! },
     })
     const res = await anon.get(`/api/explanations?slug=${COURSE}&nodeId=${LESSON}`)
     expect(res.status()).toBe(401)
@@ -277,6 +285,7 @@ test.describe('โจทย์จำลองโหมดฝึก — เซิ
     const anon = await playwright.request.newContext({
       baseURL: baseURL!,
       storageState: { cookies: [], origins: [] },
+      extraHTTPHeaders: { origin: baseURL! },
     })
     const res = await anon.post('/api/practice/simulation', {
       data: { slug: COURSE, nodeId: SIM_LESSON, challengeId: 'static-print-server', state: {} },

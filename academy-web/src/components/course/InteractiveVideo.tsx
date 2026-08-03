@@ -35,6 +35,8 @@ export function InteractiveVideo({
 }) {
   const { t: ui } = useUi()
   const videoRef = useRef<HTMLVideoElement>(null)
+  const firstChoiceRef = useRef<HTMLInputElement>(null)
+  const continueRef = useRef<HTMLButtonElement>(null)
   const clampingRef = useRef(false)
   const [answered, setAnswered] = useState<string[]>(answeredCueIds)
   const [activeCueId, setActiveCueId] = useState<string | null>(null)
@@ -66,6 +68,8 @@ export function InteractiveVideo({
   )
 
   const activeQuestion = activeCueId ? questionByCue.get(activeCueId) ?? null : null
+  const cueResultId = activeQuestion ? `video-quiz-result-${activeQuestion.cueId}` : undefined
+  const cueExplanationId = activeQuestion ? `video-quiz-explanation-${activeQuestion.cueId}` : undefined
 
   function openCue(cueId: string) {
     setActiveCueId(cueId)
@@ -113,8 +117,17 @@ export function InteractiveVideo({
     setActiveCueId(null)
     setSelected(null)
     setCueOutcome(null)
+    videoRef.current?.focus()
     void videoRef.current?.play()
   }
+
+  useEffect(() => {
+    if (activeCueId) firstChoiceRef.current?.focus()
+  }, [activeCueId])
+
+  useEffect(() => {
+    if (cueOutcome) continueRef.current?.focus()
+  }, [cueOutcome])
 
   useEffect(() => {
     const el = videoRef.current
@@ -240,15 +253,19 @@ export function InteractiveVideo({
             // เฟรมที่เป็นต้นเหตุของคำถามค้างอยู่ข้างบน
             className="card-feature card-takeaway mt-3 p-5 sm:p-6"
             role="dialog"
-            aria-modal="true"
-            aria-label="Question"
+            aria-labelledby={`video-quiz-title-${activeQuestion.cueId}`}
             data-testid="video-quiz"
           >
             <div className="w-full">
               <p className="mb-1 font-mono text-[11px] uppercase tracking-wide text-cs-accent">
                 Quick check · paused at {formatTime(cues.find((c) => c.id === activeCueId)?.atSeconds ?? 0)}
               </p>
-              <p className="mb-4 font-display text-lg font-semibold text-cs-text">{activeQuestion.prompt}</p>
+              <p
+                id={`video-quiz-title-${activeQuestion.cueId}`}
+                className="mb-4 font-display text-lg font-semibold text-cs-text"
+              >
+                {activeQuestion.prompt}
+              </p>
 
               <div className="space-y-2">
                 {Object.entries(activeQuestion.choices).map(([letter, text]) => {
@@ -269,6 +286,7 @@ export function InteractiveVideo({
                       className={`flex cursor-pointer items-start gap-3 rounded-xl border bg-cs-surface px-4 py-2.5 text-sm transition-colors ${tone}`}
                     >
                       <input
+                        ref={letter === Object.keys(activeQuestion.choices)[0] ? firstChoiceRef : undefined}
                         type="radio"
                         name={`cue-${activeQuestion.cueId}`}
                         value={letter}
@@ -286,13 +304,25 @@ export function InteractiveVideo({
                 })}
               </div>
 
-              {cueOutcome?.explanation && (
-                <p
-                  className="mt-3 rounded-xl border border-cs-border bg-cs-surface-2 px-4 py-3 text-sm leading-relaxed text-cs-body"
-                  data-testid="video-quiz-explanation"
-                >
-                  {cueOutcome.explanation}
-                </p>
+              <p role="status" aria-live="polite" aria-atomic="true" className="sr-only" data-testid="video-quiz-status">
+                {checking
+                  ? 'Checking your answer'
+                  : cueOutcome
+                    ? `${cueOutcome.correct ? 'Correct.' : 'Not quite.'} ${cueOutcome.explanation ?? ''}`
+                    : ''}
+              </p>
+
+              {cueOutcome && (
+                <div className="mt-3 rounded-xl border border-cs-border bg-cs-surface-2 px-4 py-3 text-sm leading-relaxed text-cs-body">
+                  <p id={cueResultId} data-testid="video-quiz-result" className="font-semibold text-cs-text">
+                    {cueOutcome.correct ? 'Correct.' : 'Not quite.'}
+                  </p>
+                  {cueOutcome.explanation && (
+                    <p id={cueExplanationId} className="mt-1" data-testid="video-quiz-explanation">
+                      {cueOutcome.explanation}
+                    </p>
+                  )}
+                </div>
               )}
 
               <div className="mt-4 flex justify-end gap-2">
@@ -308,8 +338,12 @@ export function InteractiveVideo({
                   </button>
                 ) : (
                   <button
+                    ref={continueRef}
                     type="button"
                     onClick={continueAfterCue}
+                    aria-describedby={
+                      [cueResultId, cueOutcome.explanation ? cueExplanationId : undefined].filter(Boolean).join(' ')
+                    }
                     data-testid="video-quiz-continue"
                     className="rounded-xl bg-cs-accent-fill px-5 py-2 text-sm font-semibold text-cs-on-accent transition-opacity hover:opacity-90"
                   >

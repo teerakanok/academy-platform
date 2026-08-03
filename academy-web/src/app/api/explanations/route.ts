@@ -2,8 +2,11 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { currentUser } from '@/lib/auth/session'
 import { getCourseStructure } from '@/lib/content/course-source'
-import { getLessonAnswerKey, mcqItems } from '@/lib/content/answer-key'
+import { getLessonAnswerKey, mcqItems, simulationItems } from '@/lib/content/answer-key'
+import { requiresAttempt } from '@/lib/course/assessment-policy'
 import { loadProgress } from '@/lib/course/progress-db'
+import { authorizeCourseResource, deniedAccessStatus } from '@/lib/account/course-access'
+import { loadPassedAttemptExplanations } from '@/lib/course/attempt-db'
 
 export const runtime = 'nodejs'
 
@@ -46,6 +49,14 @@ export async function GET(request: Request) {
     return NextResponse.json({ ok: false, error: 'ไม่พบบทเรียนนี้' }, { status: 404 })
   }
 
+  const access = await authorizeCourseResource(user.account.id, input.slug, input.nodeId)
+  if (!access.allowed) {
+    return NextResponse.json(
+      { ok: false, error: access.reason === 'unavailable' ? 'ตรวจสิทธิ์ไม่สำเร็จ' : 'ยังไม่มีสิทธิ์เข้าถึงบทนี้' },
+      { status: deniedAccessStatus(access) },
+    )
+  }
+
   const record = await loadProgress(user.account.id, input.slug)
   // บทนี้ผ่านแล้วหรือยัง — ใช้คำว่า finished ไม่ใช่ proven เพราะสิ่งที่ตัดสินคือ
   // "เดินผ่านแล้ว" ส่วนคำว่าพิสูจน์แล้วสงวนให้ด่านวัดผล (W0-3)
@@ -59,8 +70,36 @@ export async function GET(request: Request) {
     return NextResponse.json({ ok: false, error: 'บทนี้ยังไม่ผ่าน' }, { status: 403 })
   }
 
+  // ใช้หลักฐาน persisted เป็นตัวตัดสิน ไม่เดาจาก content ปัจจุบัน: deploy อาจเพิ่ม
+  // หรือลบด่าน attempt หลังผู้เรียนผ่านไปแล้ว แต่ review ต้องตามรุ่นที่เขาทำจริง
+  const snapshot = await loadPassedAttemptExplanations({
+    userId: user.account.id,
+    courseSlug: input.slug,
+    nodeId: input.nodeId,
+  })
+  if (snapshot.status === 'unavailable') {
+    return NextResponse.json(
+      { ok: false, error: 'คำอธิบายของความพยายามนี้ไม่พร้อมใช้งาน' },
+      { status: 409 },
+    )
+  }
+  if (snapshot.status === 'ready') {
+    return NextResponse.json({
+      ok: true,
+      questions: Object.entries(snapshot.explanations).map(([id, explanation]) => ({ id, explanation })),
+    })
+  }
+
   const answerKey = getLessonAnswerKey(input.slug, input.nodeId)
   if (!answerKey) return NextResponse.json({ ok: false, error: 'ไม่พบเนื้อหาบทนี้' }, { status: 404 })
+  if (requiresAttempt(node, simulationItems(answerKey.checkpoint).length > 0)) {
+    // completion ของพื้นผิววัดผลที่ไม่มี passing attempt pointer ไม่ใช่หลักฐานพอ
+    // สำหรับเปิดคำอธิบาย; fail closed แทนการเสิร์ฟคลังจาก deploy ปัจจุบัน
+    return NextResponse.json(
+      { ok: false, error: 'คำอธิบายของความพยายามนี้ไม่พร้อมใช้งาน' },
+      { status: 409 },
+    )
+  }
 
   // ⚠️ คืน **คำอธิบายอย่างเดียว ไม่คืน key เฉลย**
   //

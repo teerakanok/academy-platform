@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { internalSurfacesEnabled, isInternalSurface } from '@/lib/internal-surface'
+import { authCookieOptions, isSecureRequest } from '@/lib/auth/cookie-policy'
 
 // ประตูเดียวของทั้งเว็บ — ตัดสินว่าเส้นทางไหนเปิด เส้นทางไหนต้องมีบัญชี
 //
@@ -65,6 +66,7 @@ export async function middleware(request: NextRequest) {
   }
 
   const supabase = createServerClient(url, anonKey, {
+    cookieOptions: authCookieOptions(isSecureRequest(request)),
     cookies: {
       getAll() {
         return request.cookies.getAll()

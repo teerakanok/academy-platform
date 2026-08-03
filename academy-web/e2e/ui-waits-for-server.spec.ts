@@ -18,7 +18,7 @@ const NODE = 'formats-reading'
 test.describe('UI รอผลจากเซิร์ฟเวอร์ก่อนประกาศว่าผ่าน', () => {
   // เทสแรกทำให้บทนี้ผ่านจริง — คืนสภาพให้ spec อื่นที่ใช้บัญชีเดียวกัน
   test.afterEach(async ({ request }) => {
-    await request.post(`/api/progress/reset?slug=${encodeURIComponent(COURSE)}`)
+    await request.post(`/api/progress/reset?slug=${encodeURIComponent(COURSE)}&operationId=${crypto.randomUUID()}`)
   })
 
   test('ระหว่างรอ: แสดง "กำลังตรวจ" และยังไม่มีสถานะผ่านบนหน้าจอ', async ({ page }) => {

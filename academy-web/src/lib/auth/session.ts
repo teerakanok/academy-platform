@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { findOrCreateUser, type AcademyUser } from '@/lib/account/users'
+import { authCookieOptions, isSecureServerContext } from './cookie-policy'
 
 // Session ของผู้เรียน — ใช้ issuer กลางของ ecosystem (GoTrue) ตาม ADR single-account
 //
@@ -28,7 +29,9 @@ function authEnv() {
 export async function authClient() {
   const { url, anonKey } = authEnv()
   const store = await cookies()
+  const requestHeaders = await headers()
   return createServerClient(url, anonKey, {
+    cookieOptions: authCookieOptions(isSecureServerContext(requestHeaders)),
     cookies: {
       getAll() {
         return store.getAll()

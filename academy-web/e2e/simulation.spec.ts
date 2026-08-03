@@ -1,9 +1,14 @@
 import { test, expect } from '@playwright/test'
+import { prepareNodeAccess } from './support/access'
 
 const LESSON = '/courses/content-formats-demo/lessons/formats-simulation'
 const ARTIFACTS = 'artifacts/simulation'
 
 test.describe('โจทย์จำลองหน้าจอจริง', () => {
+  test.beforeAll(async () => {
+    await prepareNodeAccess('content-formats-demo', 'formats-simulation')
+  })
+
   test('หน้าจอเปลี่ยนตามโหมด — เลือกรับอัตโนมัติแล้วช่องกรอกถูกปิด', async ({ page }) => {
     // นี่คือสิ่งที่อ่านสิบบรรทัดก็ไม่ชัดเท่าเห็นกับตา: สองอย่างนี้อยู่ด้วยกันไม่ได้
     await page.goto(LESSON)
@@ -19,6 +24,21 @@ test.describe('โจทย์จำลองหน้าจอจริง', ()
     await sim.getByTestId('sim-apply').click()
     await expect(sim.getByTestId('sim-status')).toContainText('Lease obtained')
     await expect(sim.getByTestId('sim-ipv4')).not.toHaveValue('')
+  })
+
+  test('mobile แสดงค่า network เต็มช่องและปุ่มกดมี touch target เพียงพอ', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await page.goto(LESSON)
+    const sim = page.locator('[data-testid="simulation-block"]').first()
+    await sim.getByTestId('sim-mode-static').click()
+
+    const input = await sim.getByTestId('sim-ipv4').boundingBox()
+    const apply = await sim.getByTestId('sim-apply').boundingBox()
+    const cancel = await sim.getByRole('button', { name: 'Cancel' }).boundingBox()
+    expect(input?.width).toBeGreaterThan(200)
+    expect(apply?.height).toBeGreaterThanOrEqual(44)
+    expect(cancel?.height).toBeGreaterThanOrEqual(44)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
   })
 
   test('ตัดสินจากสถานะสุดท้าย และบอกได้ว่าข้อไหนยังไม่ผ่านโดยไม่เฉลย', async ({ page }) => {
@@ -39,6 +59,13 @@ test.describe('โจทย์จำลองหน้าจอจริง', ()
     await sim.getByTestId('sim-ipv4').fill('192.168.10.50')
     await sim.getByTestId('sim-subnet').fill('255.255.255.0')
     await sim.getByTestId('sim-gateway').fill('192.168.10.1')
+    await sim.getByTestId('sim-dns1').fill('192.168.10.1')
+    await sim.getByTestId('sim-apply').click()
+    await expect(sim.getByTestId('sim-status')).toContainText('Settings applied')
+
+    // แก้ค่าหลัง Apply = configuration ปัจจุบันยังไม่ถูกยืนยัน ต้องไม่ค้างป้ายผ่าน
+    await sim.getByTestId('sim-dns1').fill('8.8.8.8')
+    await expect(sim.getByTestId('sim-status')).toContainText('Not applied yet')
     await sim.getByTestId('sim-dns1').fill('192.168.10.1')
     await sim.getByTestId('sim-apply').click()
     await sim.getByTestId('simulation-check').click()

@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { mkdirSync } from 'node:fs'
 import { join } from 'node:path'
+import { prepareNodeAccess } from './support/access'
 
 // ตรวจพฤติกรรมของชนิดเนื้อหาตามหลักที่ล็อกไว้:
 // อ่าน = เป็นเนื้อหาของเราเอง · ดู/ลงมือ = ฝัง + ขยายเต็มจอ · ของคนอื่น = ลิงก์ออก
@@ -10,23 +11,35 @@ const ARTIFACT_DIR = join(__dirname, '..', '..', 'artifacts', 'oneshot-2026-07-3
 
 test.describe('content formats', () => {
   test('ภาพ: อยู่ในหน้า คลิกขยายเต็มจอ แล้ว Escape กลับที่เดิม', async ({ page }) => {
+    await prepareNodeAccess('content-formats-demo', 'formats-reading')
     await page.goto(`${COURSE}/lessons/formats-reading`)
     await expect(page.getByTestId('image-block')).toBeVisible()
     await expect(page.getByTestId('image-lightbox')).toHaveCount(0)
 
     await page.getByTestId('image-expand').click()
-    await expect(page.getByTestId('image-lightbox')).toBeVisible()
+    const lightbox = page.getByTestId('image-lightbox')
+    const lightboxClose = page.getByTestId('image-lightbox-close')
+    await expect(lightbox).toBeVisible()
+    await expect(lightboxClose).toBeFocused()
+
+    // Modal จริงต้องกัก focus ไว้ข้างใน ไม่ปล่อยให้ Tab หลุดไปหา chrome ของบทเรียน
+    await page.keyboard.press('Tab')
+    expect(await lightbox.evaluate((dialog) => dialog.contains(document.activeElement))).toBe(true)
+    await page.keyboard.press('Shift+Tab')
+    expect(await lightbox.evaluate((dialog) => dialog.contains(document.activeElement))).toBe(true)
 
     mkdirSync(ARTIFACT_DIR, { recursive: true })
     await page.screenshot({ path: join(ARTIFACT_DIR, 'image-lightbox-desktop-1440.png'), animations: 'disabled' })
 
     await page.keyboard.press('Escape')
     await expect(page.getByTestId('image-lightbox')).toHaveCount(0)
+    await expect(page.getByTestId('image-expand')).toBeFocused()
     // ยังอยู่หน้าเดิม ไม่ได้ถูกพาไปไหน
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Written material')
   })
 
   test('บทความแสดงที่มาโดยไม่ต้องฝัง iframe ใดๆ ในหน้า', async ({ page }) => {
+    await prepareNodeAccess('content-formats-demo', 'formats-reading')
     await page.goto(`${COURSE}/lessons/formats-reading`)
     await expect(page.getByText('Adapted from a note written in Crux')).toBeVisible()
     // หลักการสำคัญ: ทั้งหน้าต้องไม่มี iframe เลย
@@ -34,6 +47,7 @@ test.describe('content formats', () => {
   })
 
   test('PDF และลิงก์นอก: เปิดแท็บใหม่ + บอกผู้เรียนว่ากำลังออกไปไหน', async ({ page }) => {
+    await prepareNodeAccess('content-formats-demo', 'formats-references')
     await page.goto(`${COURSE}/lessons/formats-references`)
 
     const attachment = page.getByTestId('attachment-block')
@@ -67,6 +81,7 @@ test.describe('content formats', () => {
   })
 
   test('Lab ขยายได้ทั้งสองขนาด แต่คนละท่า: inline = กล่องใหญ่ · full = เต็มจอ', async ({ page }) => {
+    await prepareNodeAccess('content-formats-demo', 'formats-hands-on')
     await page.goto(`${COURSE}/lessons/formats-hands-on`)
     const viewport = page.viewportSize()!
 
@@ -77,9 +92,14 @@ test.describe('content formats', () => {
     await expect(page.getByTestId('lab-fullscreen')).toHaveCount(0)
 
     // แบบฝึกสั้น: ตั้งต้นอยู่ในสายการอ่าน แต่ต้องขยายได้ถ้าจอเล็กหรือทำไม่ถนัด
-    await inline.getByTestId('lab-expand').click()
+    const inlineExpand = inline.getByTestId('lab-expand')
+    await inlineExpand.click()
     const dialog = page.getByTestId('lab-fullscreen')
     await expect(dialog).toHaveAttribute('data-mode', 'dialog')
+    const inlineClose = dialog.getByTestId('lab-fullscreen-close')
+    await expect(inlineClose).toBeFocused()
+    await page.keyboard.press('Tab')
+    expect(await dialog.evaluate((element) => element.contains(document.activeElement))).toBe(true)
     // ตั้งใจให้ไม่เต็มจอ — ยังเห็นหน้าบทเรียนอยู่ข้างหลัง = ยังไม่ได้ออกจากบทเรียน
     const panel = dialog.locator('> div')
     const dialogBox = (await panel.boundingBox())!
@@ -89,9 +109,11 @@ test.describe('content formats', () => {
     await page.screenshot({ path: join(ARTIFACT_DIR, 'lab-inline-dialog-desktop-1440.png'), animations: 'disabled' })
     await page.keyboard.press('Escape')
     await expect(page.getByTestId('lab-fullscreen')).toHaveCount(0)
+    await expect(inlineExpand).toBeFocused()
 
     // สถานการณ์เต็ม: เข้าโหมดทำงาน กินทั้งหน้าจอจริง
-    await full.getByTestId('lab-expand').click()
+    const fullExpand = full.getByTestId('lab-expand')
+    await fullExpand.click()
     const overlay = page.getByTestId('lab-fullscreen')
     await expect(overlay).toHaveAttribute('data-mode', 'fullscreen')
     const box = (await overlay.boundingBox())!
@@ -104,10 +126,12 @@ test.describe('content formats', () => {
     await page.keyboard.press('Escape')
     await expect(page.getByTestId('lab-fullscreen')).toHaveCount(0)
     await expect(full).toBeVisible()
+    await expect(fullExpand).toBeFocused()
   })
 
   test('ก่อนตัดสินว่า "รู้แล้ว" ต้องเปิดดูสาระของบทได้', async ({ page }) => {
     // ชื่อบทกับหนึ่งประโยคไม่พอให้ใครตัดสินว่าตัวเองรู้แล้วจริงไหม
+    await prepareNodeAccess('basic-os-linux', 'linux-and-distros')
     await page.goto('/courses/basic-os-linux/lessons/linux-and-distros')
     await expect(page.getByTestId('key-ideas-peek')).toHaveCount(0)
     await page.getByTestId('peek-key-ideas').click()
@@ -133,6 +157,7 @@ test.describe('content formats', () => {
     await page.getByTestId('key-takeaway-list').getByTestId('self-check-item').first().click()
     await expect(page.getByTestId('takeaway-count')).toContainText(`1 / ${total}`)
     // capstone ข้ามไม่ได้ จึงไม่มีแถบนี้เลย
+    await prepareNodeAccess('content-formats-demo', 'formats-hands-on')
     await page.goto(`${COURSE}/lessons/formats-hands-on`)
     await expect(page.getByTestId('peek-key-ideas')).toHaveCount(0)
   })

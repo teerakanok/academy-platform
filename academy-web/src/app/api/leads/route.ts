@@ -3,6 +3,8 @@ import { z } from 'zod'
 import { academyDb } from '@/lib/db/server'
 import { CURRENT_CONSENT_VERSION } from '@/lib/consent'
 import { allowRequest } from '@/lib/rate-limit'
+import { readBoundedJson } from '@/lib/http/bounded-body'
+import { validateMutationRequest } from '@/lib/http/mutation-security'
 
 export const runtime = 'nodejs'
 
@@ -26,6 +28,11 @@ function clientKey(request: NextRequest): string {
 }
 
 export async function POST(request: NextRequest) {
+  const mutation = validateMutationRequest(request, { requireJson: true })
+  if (!mutation.ok) {
+    return NextResponse.json({ ok: false, error: mutation.error }, { status: mutation.status })
+  }
+
   if (!allowRequest(clientKey(request))) {
     return NextResponse.json(
       { ok: false, error: 'ส่งคำขอถี่เกินไป โปรดลองใหม่ในอีกสักครู่' },
@@ -33,37 +40,15 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const contentType = request.headers.get('content-type') ?? ''
-  if (!contentType.toLowerCase().includes('application/json')) {
-    return NextResponse.json(
-      { ok: false, error: 'content-type ต้องเป็น application/json' },
-      { status: 415 },
-    )
-  }
-
-  const declaredLength = Number(request.headers.get('content-length') ?? '0')
-  if (declaredLength > MAX_BODY_BYTES) {
+  const body = await readBoundedJson(request, MAX_BODY_BYTES)
+  if (!body.ok && body.reason === 'too-large') {
     return NextResponse.json({ ok: false, error: 'ขนาดคำขอเกินกำหนด' }, { status: 413 })
   }
-
-  let rawBody: string
-  try {
-    rawBody = await request.text()
-  } catch {
-    return NextResponse.json({ ok: false, error: 'อ่านคำขอไม่สำเร็จ' }, { status: 400 })
-  }
-  if (Buffer.byteLength(rawBody, 'utf8') > MAX_BODY_BYTES) {
-    return NextResponse.json({ ok: false, error: 'ขนาดคำขอเกินกำหนด' }, { status: 413 })
-  }
-
-  let parsedJson: unknown
-  try {
-    parsedJson = JSON.parse(rawBody)
-  } catch {
+  if (!body.ok) {
     return NextResponse.json({ ok: false, error: 'รูปแบบ JSON ไม่ถูกต้อง' }, { status: 400 })
   }
 
-  const parsed = leadSchema.safeParse(parsedJson)
+  const parsed = leadSchema.safeParse(body.value)
   if (!parsed.success) {
     // sanitized: ตอบเฉพาะชื่อ field ที่ไม่ผ่าน — ไม่สะท้อน internal error/stack
     const fields = [...new Set(parsed.error.issues.map((i) => i.path.join('.') || 'body'))]
