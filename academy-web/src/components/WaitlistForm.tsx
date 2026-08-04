@@ -93,7 +93,7 @@ export function WaitlistForm({ consentSummary }: { consentSummary: string }) {
           data-testid="consent-checkbox"
           className="mt-1 h-4 w-4 accent-cs-accent"
         />
-        <span>
+        <span className="whitespace-pre-line">
           {consentSummary}{' '}
           <Link href="/privacy" className="text-cs-accent underline underline-offset-4">
             Read the privacy notice

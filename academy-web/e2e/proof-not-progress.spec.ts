@@ -106,10 +106,10 @@ test.describe('completed คือความคืบหน้า ไม่ใ
     expect(after.record.completed).toContain(CAPSTONE)
   })
 
-  test('🔴 การ์ดใบรับรองบนหน้าคอร์สต้องสะท้อนสองชั้นจริง', async ({ page, request }) => {
+  test('🔴 การ์ด record ต้องสะท้อนเกณฑ์สองชั้นโดยไม่แอบอ้างว่าออกใบแล้ว', async ({ page, request }) => {
     // ⚠️ เทสรุ่นก่อนตรวจแต่ค่าใน API — RIL พิสูจน์ว่า mutation ที่บังคับ
-    // `cert.eligible = true` ใน CourseOverview **ไม่ถูกจับเลย** เพราะไม่มีเทสไหน
-    // ดูการ์ดจริง · นี่คือหน้าจอที่ผู้เรียนใช้ตัดสินว่าตัวเองได้ใบหรือยัง
+    // `record.recordComplete = true` ใน CourseOverview **ไม่ถูกจับเลย** เพราะไม่มีเทสไหน
+    // ดูการ์ดจริง · นี่คือหน้าจอที่ผู้เรียนใช้ดูว่า learning record บันทึกอะไรไว้แล้ว
 
     // เดินบทปกติให้ครบทุกบทที่ไม่ใช่ capstone (คอร์สนี้มี 3 บทปกติ)
     await answer(request, LESSON, { 'cp-1': ['B'] })
@@ -118,30 +118,31 @@ test.describe('completed คือความคืบหน้า ไม่ใ
 
     await page.goto(`/courses/${COURSE}`)
     const card = page.getByTestId('certificate-status')
-    await expect(card).toHaveAttribute('data-eligible', 'false')
+    await expect(card).toHaveAttribute('data-record-complete', 'false')
     await expect(page.getByTestId('certificate-assessed-count')).toContainText('0 / 1')
-    // และต้องไม่มีข้อความที่บอกว่าได้ใบแล้ว
-    await expect(card).not.toContainText('Earned')
+    await expect(card).not.toContainText('Course record complete')
 
-    // ผ่าน capstone จริง → การ์ดต้องพลิกเป็นได้ใบ
+    // ผ่าน capstone จริง → การ์ดบอกว่า record ครบ แต่ไม่อ้างว่าออกใบแล้ว
     await passCapstone(request)
     await page.reload()
-    await expect(card).toHaveAttribute('data-eligible', 'true')
+    await expect(card).toHaveAttribute('data-record-complete', 'true')
     await expect(page.getByTestId('certificate-assessed-count')).toContainText('1 / 1')
-    await expect(card).toContainText('Earned')
+    await expect(card).toContainText('Course record complete')
+    await expect(card).toContainText('Certificate issuance and verification are planned for a later release.')
+    await expect(card).not.toContainText(/earned|certificate of completion/i)
   })
 
-  test('🔴 ผ่าน capstone แล้วแต่บทปกติยังค้าง → การ์ดต้องยังไม่ให้ใบ', async ({ page, request }) => {
+  test('🔴 ผ่าน capstone แล้วแต่บทปกติยังค้าง → record ต้องยังไม่ครบ', async ({ page, request }) => {
     // ⚠️ อีกด้านของเงื่อนไขสองชั้น · เทสก่อนหน้าเดินจาก "บทครบ+capstone ไม่ผ่าน"
     // ไป "ครบทั้งคู่" จึงไม่จับ UI ที่ตัดเงื่อนไขบทปกติทิ้ง (RIL จับ mutation นี้ได้)
     await passCapstone(request)
 
     await page.goto(`/courses/${COURSE}`)
     const card = page.getByTestId('certificate-status')
-    await expect(card).toHaveAttribute('data-eligible', 'false')
-    // ด่านวัดผลผ่านครบแล้ว แต่ยังไม่ได้ใบ เพราะบทปกติยังไม่ครบ
+    await expect(card).toHaveAttribute('data-record-complete', 'false')
+    // ด่านวัดผลผ่านครบแล้ว แต่ยังไม่ครบเกณฑ์ เพราะบทปกติยังค้าง
     await expect(page.getByTestId('certificate-assessed-count')).toContainText('1 / 1')
-    await expect(card).not.toContainText('Earned')
+    await expect(card).not.toContainText('Course record complete')
     // และต้องบอกผู้เรียนตรงๆ ว่าเหลืออะไร — ทั้งจำนวนบทและลิงก์ไปบทที่ค้าง
     await expect(page.getByTestId('certificate-progress-note')).toContainText('1 / 4')
     await expect(card).toContainText('Finish the lessons and pass every required checkpoint')

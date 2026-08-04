@@ -257,11 +257,14 @@ referrer policy, permissions policy และ HSTS policy สำหรับ pro
 - [ปิด 2026-08-03] `/api/explanations` อ่าน persisted snapshot จาก passing attempt และ
   fail closed เมื่อ assessed completion ไม่มี pointer/snapshot
 - `rowsToRecord()` เลือก resume node แบบไม่ deterministic เมื่อ timestamp เท่ากัน
-- dashboard ยังบอกว่า progress เก็บใน browser ทั้งที่ persistence ย้ายไป server แล้ว
+- [ปิด 2026-08-03] dashboard บอก server-backed CYBERSKILLS account record ตามจริง
+  และ E2E พิสูจน์ resume จาก browser context ใหม่ที่ไม่มี local storage เดิม
 - roadmap mobile ใช้ fixed-width horizontal canvas โดยไม่มี affordance ว่ายังมี node ด้านขวา
 - `ImageBlock`/`LabBlock` dialogs ไม่มี focus trap และคืน focus ให้ opener
 - i18n ยังไม่ครอบคลุม UI หลายพื้นผิว; waitlist ไม่มี client-side email validation
-- certificate card ใช้คำว่า “Earned” ทั้งที่ issuance/verification ยังไม่ implement (known W4)
+- [ปิด 2026-08-03] card แสดงเพียง “Course record complete” ตาม persisted state;
+  ระบุชัดว่า certificate issuance/verification ยังเป็น later release และไม่ใช้
+  status นี้แทน evidence-aware W4 readiness
 - default shell ใช้ Node `25.5.0` ไม่ตรง `.nvmrc` `24.18.0`
 - ก่อน cleanup disk เหลือต่ำกว่า 1 GiB ทำให้ clean build มีความเสี่ยง; cleanup วันที่
   2026-08-03 ลบเฉพาะ generated build/test output และ Playwright revisions เก่า คืนพื้นที่

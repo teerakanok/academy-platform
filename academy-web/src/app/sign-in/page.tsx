@@ -7,8 +7,7 @@ import { privatePage } from '@/lib/seo'
 
 // หน้าเข้าสู่ระบบ — พูดในนาม **CYBERSKILLS** ไม่ใช่ Academy
 //
-// founder ระบุชัด 2026-08-01: บัญชีเดียวใช้ได้ทุกบริการของเรา รวมถึง certification
-// ที่อาจออกเองในอนาคต ถ้าหน้านี้เขียนว่า "สมัคร Academy" คนจะเข้าใจว่าต้องสมัครใหม่
+// ใช้ชื่อบัญชี CYBERSKILLS แต่อธิบายเฉพาะ capability ของ Academy ที่พิสูจน์ได้แล้ว
 // ทุกผลิตภัณฑ์ ซึ่งตรงข้ามกับสิ่งที่เรากำลังสร้าง
 //
 // noindex เพราะหน้าล็อกอินไม่ใช่หน้าร้าน — ไม่มีอะไรให้ค้นเจอ
@@ -43,7 +42,7 @@ export default async function SignInPage({
           One CYBERSKILLS account
         </h1>
         <p className="mx-auto mt-3 max-w-md text-cs-body">
-          The same account works across everything we run. Academy now, and the certifications we issue later.
+          Your CYBERSKILLS account keeps your Academy learning record with you across devices.
         </p>
       </div>
 

@@ -53,7 +53,7 @@ test.describe('learner journey through a course', () => {
     await expect(page.getByTestId('lesson-video')).toBeFocused()
   })
 
-  test('full route: learn → skip, and the map + radar reflect both', async ({ page }) => {
+  test('full route: learn → skip, and the map + radar reflect both', async ({ page, browser }) => {
     test.setTimeout(180_000)
 
     // 1) บทแรก: เรียนจบผ่าน checkpoint
@@ -118,6 +118,8 @@ test.describe('learner journey through a course', () => {
 
     // 5) dashboard ต้องเห็นความคืบหน้าและปุ่มเรียนต่อ
     await page.goto('/dashboard')
+    await expect(page.getByText('Your learning record is saved to your CYBERSKILLS account and follows you across devices.')).toBeVisible()
+    await expect(page.getByText(/progress is saved in this browser/i)).toHaveCount(0)
     await expect(page.getByTestId('resume-card')).toBeVisible()
     await expect(page.getByTestId('course-progress-basic-os-linux')).toContainText('20% done')
     await page.screenshot({
@@ -125,6 +127,25 @@ test.describe('learner journey through a course', () => {
       fullPage: true,
       animations: 'disabled',
     })
+
+    // context ใหม่ไม่มี localStorage/IndexedDB ของหน้าเดิม แต่ใช้ session บัญชีเดียวกัน
+    // จึงพิสูจน์ว่า resume มาจาก server-backed learning record ไม่ใช่ browser เดิม
+    const otherDevice = await browser.newContext({
+      baseURL: 'http://127.0.0.1:3000',
+      storageState: 'test-results/.auth/learner.json',
+    })
+    try {
+      const otherPage = await otherDevice.newPage()
+      await otherPage.goto('/dashboard')
+      await expect(otherPage.getByTestId('course-progress-basic-os-linux')).toContainText('20% done')
+      await expect(
+        otherPage.getByText(
+          'Your learning record is saved to your CYBERSKILLS account and follows you across devices.',
+        ),
+      ).toBeVisible()
+    } finally {
+      await otherDevice.close()
+    }
   })
 
   test('a capstone cannot be skipped and demands every answer', async ({ page }) => {

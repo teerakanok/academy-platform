@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test'
 import { createClient } from '@supabase/supabase-js'
 import { mkdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { CURRENT_CONSENT_VERSION } from '../src/lib/consent'
 
 // M1 e2e — landing + lead capture บน local Supabase จริง
 // Verify row เกิดจริงด้วย query ฝั่ง test (service role) — ไม่เชื่อ response อย่างเดียว
@@ -22,22 +23,37 @@ test.describe('landing', () => {
   test('render brand + waitlist form + ลิงก์ privacy โดยไม่ประกาศ course ใดๆ', async ({ page }) => {
     await page.goto('/')
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Stop relearning')
+    await expect(page.getByText(/prove what you already have|prove it in a few questions/i)).toHaveCount(0)
+    await expect(page.getByRole('link', { name: 'Browse courses' })).toHaveAttribute('href', '/courses')
     await expect(page.getByRole('textbox', { name: 'Email' })).toBeVisible()
     await expect(page.getByTestId('consent-checkbox')).not.toBeChecked()
     await expect(page.getByRole('link', { name: 'Read the privacy notice' })).toHaveAttribute('href', '/privacy')
 
     // ข้อความ consent ที่ผู้ใช้เห็นต้องเป็นฉบับเดียวกับไฟล์ versioned ที่ API บันทึก
-    // (กัน copy แยกร่างจาก v1.md — หลักฐาน consent ผิดฉบับ)
+    // (กัน copy แยกร่างจาก current artifact — หลักฐาน consent ผิดฉบับ)
     const consentFileText = readFileSync(
-      join(__dirname, '..', 'src', 'content', 'consent', 'v1.md'),
+      join(__dirname, '..', 'src', 'content', 'consent', `${CURRENT_CONSENT_VERSION}.md`),
       'utf8',
     ).trim()
     await expect(page.locator('label').filter({ has: page.getByTestId('consent-checkbox') })).toContainText(
       consentFileText.slice(0, 60),
     )
+    await expect(page.locator('label').filter({ has: page.getByTestId('consent-checkbox') })).toContainText(
+      'I consent to CYBERSKILLS',
+    )
 
     mkdirSync(ARTIFACT_DIR, { recursive: true })
     await page.screenshot({ path: join(ARTIFACT_DIR, 'landing-desktop-1440.png'), fullPage: true })
+  })
+
+  test('catalogue และ sign-in อธิบาย capability ที่มีจริงเท่านั้น', async ({ page }) => {
+    await page.goto('/courses')
+    await expect(page.getByText(/prove a lesson|prove what you already know/i)).toHaveCount(0)
+
+    await page.context().clearCookies()
+    await page.goto('/sign-in')
+    await expect(page.getByText('Your CYBERSKILLS account keeps your Academy learning record with you across devices.')).toBeVisible()
+    await expect(page.getByText(/certifications we issue|everything we run/i)).toHaveCount(0)
   })
 
   test('หน้า /privacy render สาระ PDPA ครบทั้งสองภาษา และไม่ปนกัน', async ({ page }) => {
@@ -88,11 +104,19 @@ test.describe('lead capture ผ่าน UI', () => {
     await expect(page.getByTestId('waitlist-success')).toBeVisible()
 
     const db = serviceDb()
-    const { data, error } = await db.from('leads').select('email, consent_text_version, consent_at').eq('email', email)
+    const { data, error } = await db.from('leads').select('id, email, consent_text_version, consent_at').eq('email', email)
     expect(error).toBeNull()
     expect(data).toHaveLength(1)
-    expect(data![0].consent_text_version).toBe('v1')
+    expect(data![0].consent_text_version).toBe('v2')
     expect(data![0].consent_at).toBeTruthy()
+
+    const { data: events, error: eventError } = await db
+      .from('consent_events')
+      .select('consent_text_version, consent_at')
+      .eq('lead_id', data![0].id)
+    expect(eventError).toBeNull()
+    expect(events).toHaveLength(1)
+    expect(events![0].consent_text_version).toBe('v2')
 
     await db.from('leads').delete().eq('email', email)
   })

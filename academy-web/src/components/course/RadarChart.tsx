@@ -134,7 +134,7 @@ export function RadarChart({
           {untouched.length > 0 && (
             <p className="mt-3 text-xs leading-relaxed text-cs-muted">
               {nothingYet
-                ? 'Nothing recorded yet. Finish a lesson or test out of one and this fills in — it is a map of where to go next, not a score.'
+                ? 'Nothing recorded yet. Finish a lesson and this fills in — it is a map of where to go next, not a score.'
                 : `${untouched.length} ${untouched.length === 1 ? 'area has' : 'areas have'} nothing recorded yet — that is a map of where to go next, not a score.`}
             </p>
           )}

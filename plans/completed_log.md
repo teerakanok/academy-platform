@@ -5,6 +5,37 @@
 
 ---
 
+## 2026-08-03 — Learner-Safety checkpoint 4: truthful learner copy + versioned consent
+
+**Outcome:** learner-facing surfaces พูดตรงกับ capability ปัจจุบัน: progress มาจาก
+CYBERSKILLS account ข้าม browser context, course card ไม่อ้างว่าออกใบรับรองแล้ว,
+test-out/cross-product account copy ที่ยังพิสูจน์ไม่ได้ถูกตัด และ consent ที่ผู้เรียนเห็น
+เป็น bilingual `v2` artifact ที่อ้างกลับได้ทั้งก้อน
+
+**What changed:**
+- เปลี่ยน issuance-oriented `certificateEligibility` เป็น `courseRecordSummary`;
+  UI ใช้ Learning record/Course record complete และแยก future issuance note
+- landing/catalog/sign-in/radar/roadmap copy อธิบายเฉพาเส้นทางที่เปิดจริง;
+  historical test-out legend แสดงเฉพา record เก่าและบอกว่า route ถูกพัก
+- CTA “Browse courses” ไป `/courses`; dashboard E2E สร้าง browser context ใหม่เพื่อพิสูจน์
+  server-backed persistence โดยไม่อาศัย local browser state
+- consent `v2` เก็บ English+ไทยใน tracked artifact เดียว; migration `0016` เพิ่ม
+  default-deny `consent_events`, backfill `v1` และ atomic/idempotent RPC สำหรับ v1→v2 โดย
+  `service_role` มีเฉพา `SELECT, INSERT` บน consent history
+
+**Evidence:** lint/typecheck ผ่าน (`0 errors`, generated registry warning เดิม 1 จุด) ·
+Vitest unit/integration/type **444/444** · clean production build ผ่าน · local DB reset จากศูนย์
+และ apply migration 0001–0016 ผ่าน · Playwright **138 passed / 10 skipped** · focused
+post-reset consent/RLS **21/21** + landing E2E **12/12** · desktop/mobile visual review ผ่าน ·
+independent Code/Security/UX review **C0/H0/M0/L0 ทุก lane**
+
+**Residual risk:** production ยังไม่มี migration `0016`; ต้อง apply migration ก่อน deploy code
+ที่เรียก consent `v2` RPC ไม่เช่นนั้น lead submission จะ fail; W4 ยังต้อง evidence-aware
+snapshot/version ก่อนเปิด certificate issuance/verification; private media, privacy/retention,
+dependency, durable abuse control และ least-privilege production credential ยังเป็น launch gates
+
+---
+
 ## 2026-08-03 — Learner-Safety checkpoint 3: dialog + video cue accessibility
 
 **Outcome:** ผู้เรียนใช้ image lightbox, lab expansion, reset confirmation และ video cue

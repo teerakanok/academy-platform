@@ -70,15 +70,16 @@ const en: UiStrings = {
     // ⚠️ "พิสูจน์แล้วข้ามได้" ถูกปิดทั้งคอร์ส (assessment-policy) — ข้อความต้อง
     // ไม่สัญญาเส้นทางที่ยังไม่มี · และต้องบอกตรงๆ ว่าอะไรคือสิ่งที่นับเป็นหลักฐาน
     intro:
-      'Each course is a map, not a queue — take the route that fits you. The required checkpoints are what the certificate stands behind, and a lesson you skip stays open until you come back for it.',
+      'Each course is a map, not a queue — take the route that fits you. Required checkpoints record assessed results in your learning record, and a lesson you skip stays open until you return.',
     openToAll:
-      'Course pages are open to everyone. Taking a course needs a free CYBERSKILLS account, which works across everything we run.',
+      'Course pages are open to everyone. Taking a course needs a free CYBERSKILLS account.',
     lessons: (n) => `${n} lessons`,
     level: { beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced' },
   },
   signIn: {
     title: 'One CYBERSKILLS account',
-    subtitle: 'The same account works across everything we run. Academy now, and the certifications we issue later.',
+    subtitle:
+      'Your CYBERSKILLS account keeps your Academy learning record with you across devices.',
     emailLabel: 'Email address',
     emailHelp: 'We send a six-digit code. There is no password to set.',
     sendCode: 'Send me a code',
@@ -115,15 +116,16 @@ const th: UiStrings = {
     eyebrow: 'CYBERSKILLS Academy',
     heading: 'คอร์สทั้งหมด',
     intro:
-      'แต่ละคอร์สเป็นแผนที่ ไม่ใช่คิวที่ต้องไล่ตามลำดับ เลือกเส้นทางที่เหมาะกับคุณได้ · ด่านบังคับคือสิ่งที่ใบรับรองยืนยัน ส่วนบทที่ข้ามไว้จะค้างอยู่จนกว่าจะกลับมาทำ',
+      'แต่ละคอร์สเป็นแผนที่ ไม่ใช่คิวที่ต้องไล่ตามลำดับ เลือกเส้นทางที่เหมาะกับคุณได้ ด่านบังคับจะบันทึกผลการวัดไว้ในประวัติการเรียน ส่วนบทที่ข้ามไว้จะค้างอยู่จนกว่าจะกลับมาทำ',
     openToAll:
-      'หน้าคอร์สเปิดให้ทุกคนอ่าน ส่วนการเข้าเรียนต้องมีบัญชี CYBERSKILLS ซึ่งสมัครฟรีและใช้ได้กับทุกบริการของเรา',
+      'หน้าคอร์สเปิดให้ทุกคนอ่าน ส่วนการเข้าเรียนต้องมีบัญชี CYBERSKILLS ซึ่งสมัครฟรี',
     lessons: (n) => `${n} บท`,
     level: { beginner: 'เริ่มต้น', intermediate: 'ระดับกลาง', advanced: 'ขั้นสูง' },
   },
   signIn: {
-    title: 'บัญชีเดียว ใช้ได้ทุกบริการ',
-    subtitle: 'บัญชี CYBERSKILLS ใบเดียวใช้ได้กับทุกอย่างที่เราทำ ตอนนี้คือ Academy และต่อไปคือใบรับรองที่เราออกเอง',
+    title: 'บัญชี CYBERSKILLS ของคุณ',
+    subtitle:
+      'บัญชี CYBERSKILLS จะเก็บประวัติการเรียน Academy ไว้ให้เรียนต่อข้ามอุปกรณ์ได้',
     emailLabel: 'อีเมล',
     emailHelp: 'เราจะส่งรหัส 6 หลักไปให้ ไม่ต้องตั้งรหัสผ่าน',
     sendCode: 'ส่งรหัสให้ฉัน',

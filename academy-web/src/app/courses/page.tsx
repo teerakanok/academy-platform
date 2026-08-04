@@ -14,7 +14,7 @@ export const metadata = publicPage({
   path: '/courses',
   title: 'Courses',
   description:
-    'Cybersecurity courses you take at your own pace. Prove what you already know and skip it, and keep a map of what you have earned.',
+    'Cybersecurity courses you take at your own pace, with a clear map of completed lessons and required checkpoints.',
 })
 
 export default function CoursesPage() {
@@ -28,8 +28,8 @@ export default function CoursesPage() {
           Courses
         </h1>
         <p className="mt-4 max-w-2xl text-lg leading-relaxed text-cs-body">
-          Each course is a map you can take your own route through. Prove a lesson and move on. Skip one and it
-          stays open until you come back for it.
+          Each course is a map you can take your own route through. Finish a lesson through its checkpoint, or skip
+          an ordinary lesson and return to it later.
         </p>
       </header>
 
@@ -57,8 +57,7 @@ export default function CoursesPage() {
       </ul>
 
       <p className="mt-10 text-sm text-cs-muted">
-        Course pages are open to everyone. Taking a course needs a free CYBERSKILLS account, which works across
-        everything we run.
+        Course pages are open to everyone. Taking a course needs a free CYBERSKILLS account.
       </p>
     </div>
   )

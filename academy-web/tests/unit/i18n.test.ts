@@ -63,6 +63,19 @@ describe('ภาษาของตัวเว็บ', () => {
       expect(PRIVACY[l], `ไม่มีนโยบายของ ${l}`).toBeTruthy()
     }
   })
+
+  it('ไม่สัญญาว่า Academy ออกใบรับรองได้แล้ว', () => {
+    const out: [string, string][] = []
+    collectStrings(UI, 'UI', out)
+    const copy = out.map(([, text]) => text).join('\n')
+
+    expect(copy).not.toMatch(/certifications we issue|certificate stands behind|the certificate certifies/i)
+    expect(copy).not.toMatch(/works across everything we run|everything we run/i)
+    expect(copy).not.toContain('ใบรับรองที่เราออกเอง')
+    expect(copy).not.toContain('ใบรับรองยืนยัน')
+    expect(copy).not.toContain('ทุกบริการของเรา')
+    expect(copy).not.toContain('ใช้ได้ทุกบริการ')
+  })
 })
 
 describe('ชนิดของ dictionary', () => {

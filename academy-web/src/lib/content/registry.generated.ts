@@ -64,4 +64,5 @@ export const COURSE_REGISTRY: Record<
 /** ข้อความ consent ต่อเวอร์ชัน — ต้องตรงกับ CONSENT_VERSIONS ใน src/lib/consent.ts */
 export const CONSENT_TEXTS: Record<string, string> = {
   "v1": "ข้าพเจ้ายินยอมให้ CYBERSKILLS เก็บและใช้อีเมลของข้าพเจ้าเพื่อแจ้งข่าวการเปิดตัวและความคืบหน้าของ CyberSkills Academy ตามที่ระบุในนโยบายความเป็นส่วนตัว และทราบว่าสามารถถอนความยินยอมได้ทุกเมื่อตามช่องทางในนโยบายดังกล่าว\n",
+  "v2": "I consent to CYBERSKILLS collecting and using my email to send launch and progress updates about CyberSkills Academy, as described in the privacy notice. I understand that I can withdraw consent at any time using the contact details in that notice.\n\nภาษาไทย: ข้าพเจ้ายินยอมให้ CYBERSKILLS เก็บและใช้อีเมลของข้าพเจ้าเพื่อแจ้งข่าวการเปิดตัวและความคืบหน้าของ CyberSkills Academy ตามที่ระบุในนโยบายความเป็นส่วนตัว และทราบว่าสามารถถอนความยินยอมได้ทุกเมื่อตามช่องทางในนโยบายดังกล่าว\n",
 }

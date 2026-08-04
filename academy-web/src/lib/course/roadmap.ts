@@ -184,7 +184,7 @@ export interface CourseProgressSummary {
    * สัดส่วนบทที่ทำจบแล้ว (เรียนจบ + test out) — การข้ามไม่นับ
    *
    * ⚠️ ชื่อเดิมคือ `provenPercent` ซึ่งอ่านแล้วเข้าใจว่าเป็นหลักฐาน · ตั้งแต่ W0-3
-   * คำว่า "พิสูจน์แล้ว" สงวนไว้ให้ด่านวัดผลเท่านั้น (ดู `certificateEligibility`)
+   * คำว่า "พิสูจน์แล้ว" สงวนไว้ให้ด่านวัดผลเท่านั้น (ดู `courseRecordSummary`)
    */
   finishedPercent: number
   /** ความคืบหน้าในเส้นทาง รวมการข้ามด้วย (ใช้บอกว่าเดินไปถึงไหนแล้ว) */
@@ -234,10 +234,11 @@ export function summarise(structure: CourseStructure, state: LearnerCourseState)
 // ชั้นที่ 2 คือสิ่งที่ใบรับรองอ้างถึงจริง · ห้ามเขียนบนหน้าเว็บหรือบนใบว่าบทปกติ
 // เป็นการวัดผล
 
-export type CertificateBlocker = 'skipped' | 'unstarted'
+export type CourseRecordBlocker = 'skipped' | 'unstarted'
 
-export interface CertificateEligibility {
-  eligible: boolean
+export interface CourseRecordSummary {
+  /** record ปัจจุบันแสดงว่าเดินผ่านทุก node และ capstone แล้วหรือไม่ */
+  recordComplete: boolean
   /** จำนวนบทที่เดินผ่านแล้ว — ตัวชี้ **ความคืบหน้า** ไม่ใช่หลักฐาน */
   lessonsFinished: number
   total: number
@@ -250,7 +251,7 @@ export interface CertificateEligibility {
    * ⚠️ ทุกรายการต้องเป็น **node จริงที่เปิดได้** เพราะ UI ทำเป็นลิงก์ไปหน้าบทเรียน ·
    * ปัญหาระดับคอร์ส (เช่น คอร์สไม่มีด่านวัดผลเลย) ห้ามใส่ที่นี่ — ใช้ `courseIssue`
    */
-  blocking: { id: string; reason: CertificateBlocker }[]
+  blocking: { id: string; reason: CourseRecordBlocker }[]
   /** ปัญหาที่ไม่ได้อยู่ที่ node ใด node หนึ่ง — UI ต้องแสดงเป็นข้อความ ไม่ใช่ลิงก์ */
   courseIssue: 'no-assessment' | null
 }
@@ -265,11 +266,11 @@ export interface CertificateEligibility {
  * W4 (ใบรับรองที่ตรวจสอบได้) ต้องอ่านหลักฐานจริงประกอบ ไม่ใช่เชื่อสถานะอย่างเดียว —
  * เพราะใบรับรอง snapshot หลักฐาน ณ วันออก ไม่ใช่สถานะปัจจุบัน
  */
-export function certificateEligibility(
+export function courseRecordSummary(
   structure: CourseStructure,
   state: LearnerCourseState,
-): CertificateEligibility {
-  const blocking: { id: string; reason: CertificateBlocker }[] = []
+): CourseRecordSummary {
+  const blocking: { id: string; reason: CourseRecordBlocker }[] = []
   let lessonsFinished = 0
   let assessedPassed = 0
   let assessedTotal = 0
@@ -291,7 +292,7 @@ export function certificateEligibility(
   const hasProof = assessedTotal > 0 && assessedPassed === assessedTotal
 
   return {
-    eligible: blocking.length === 0 && hasProof && structure.nodes.length > 0,
+    recordComplete: blocking.length === 0 && hasProof && structure.nodes.length > 0,
     lessonsFinished,
     total: structure.nodes.length,
     assessedPassed,

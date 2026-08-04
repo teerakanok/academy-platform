@@ -18,12 +18,12 @@ export default function HomePage() {
           Stop relearning what you already know.
         </h1>
         <p className="mt-5 max-w-2xl text-lg leading-relaxed text-cs-body">
-          Every course here is a map, not a queue. Prove what you already have, skip it with a summary in hand, and
-          spend your time on the parts that are actually new to you.
+          Every course here is a map, not a queue. Finish the lessons you need, skip an ordinary lesson with its
+          summary in hand, and return whenever you are ready.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
-            href="/dashboard"
+            href="/courses"
             className="rounded-control bg-cs-accent-fill px-6 py-3 text-sm font-semibold text-cs-on-accent shadow-card transition-transform duration-200 hover:-translate-y-0.5"
           >
             Browse courses
@@ -47,7 +47,7 @@ export default function HomePage() {
           },
           {
             title: 'Skipping is allowed',
-            body: 'Know a topic already? Prove it in a few questions and move on — or take the summary and skip. Your call, every time.',
+            body: 'Know a topic already? Take the summary and skip that ordinary lesson. It stays open whenever you want to return.',
           },
           {
             title: 'Some gates are real',

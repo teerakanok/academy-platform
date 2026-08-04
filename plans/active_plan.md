@@ -44,14 +44,14 @@ Pool A, production schema/PGRST, R2, deploy และ secrets **ยังไม�
 - [x] evidence: lint/typecheck, Vitest 413/413, clean build, DB lint และ Playwright
       122 passed / 10 skipped; independent Code/Security/UX review = C0/H0/M0 ทุก lane
 
-### Learner-Safety Batch — กำลังทำ
+### Learner-Safety Batch — ปิดแล้ว 2026-08-03
 
 - [x] validation ความครบของ simulation ก่อน consume attempt: per-mode public readiness,
       Apply/dirty state, legacy snapshot normalization และ policy snapshot; incomplete payload
       ไม่กิน quota/ปิดใบและ UI คงคำตอบกับ attempt เดิม
 - [x] reset confirmation และ recovery contract ที่บอกผลตามจริงโดยไม่ทำให้ผู้เรียนเสียงาน
 - [x] focus trap/return focus สำหรับ image/lab dialogs และ keyboard/video cue accessibility
-- [ ] แก้ learner-facing copy ที่ยังอ้าง persistence/issuance ไม่ตรง implementation จริง
+- [x] แก้ learner-facing copy ที่ยังอ้าง persistence/issuance ไม่ตรง implementation จริง
 
 **Evidence checkpoint 1:** lint/typecheck ผ่าน · Vitest **426/426** · clean build ผ่าน ·
 Playwright **124 passed / 10 skipped** · independent Code/Security/UX review C0/H0/M0 ทุก lane
@@ -69,9 +69,19 @@ fallback; video cue ใช้ non-modal semantics, keyboard-only flow, persisten
 **137 passed / 10 skipped** · desktop/mobile visual review ผ่าน · independent
 Code/Security/UX review **C0/H0/M0/L0 ทุก lane**
 
-**ยังไม่ใช่ production-ready:** private `/media/*`, HTTPS runtime `Set-Cookie` proof บน
+**Evidence checkpoint 4:** dashboard พิสูจน์ server-backed learning record ผ่าน
+browser context ใหม่; certificate surface แสดงเพียง course-record status และบอก
+ว่า issuance/verification ยังไม่เปิด; ตัด test-out/cross-product capability ที่ยังไม่มี;
+CTA ไป public catalog; consent `v2` เป็น bilingual artifact ที่ versioned ทั้งก้อนและ
+`consent_events` เก็บ v1→v2 แบบ additive/idempotent ด้วย `SELECT, INSERT` เท่านั้น ·
+lint/typecheck ผ่าน · Vitest **444/444** · clean build ผ่าน · clean local DB reset
+ผ่าน migration 0001–0016 · Playwright **138 passed / 10 skipped** · desktop/mobile visual
+review ผ่าน · independent Code/Security/UX review **C0/H0/M0/L0 ทุก lane**
+
+**ยังไม่ใช่ production-ready:** migration `0016` ต้อง apply ก่อน deploy code ที่ใช้
+consent `v2`/RPC; private `/media/*`, HTTPS runtime `Set-Cookie` proof บน
 deployment topology จริง, privacy/retention, dependency advisories, durable abuse control,
-least-privilege production credential และ learner-safety items ด้านบนยังเป็น launch gates
+least-privilege production credential และ owner decisions ที่ค้างยังเป็น launch gates
 
 ---
 

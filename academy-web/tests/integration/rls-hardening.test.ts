@@ -91,6 +91,80 @@ describe('RLS hardening — academy.leads', () => {
     expect(error).not.toBeNull()
     expect(error!.code).toBe('23514')
   })
+
+  it('consent_events เปิด RLS, default deny และ RPC ไม่เปิดให้ anon/authenticated', async () => {
+    const result = await withDb(async (db) => {
+      const table = await db.query(
+        `select c.relrowsecurity
+           from pg_class c join pg_namespace n on n.oid = c.relnamespace
+          where n.nspname = 'academy' and c.relname = 'consent_events'`,
+      )
+      const policies = await db.query(
+        `select count(*)::int as n from pg_policies
+          where schemaname = 'academy' and tablename = 'consent_events'`,
+      )
+      const grants = await db.query(
+        `select grantee, privilege_type from information_schema.role_table_grants
+          where table_schema = 'academy' and table_name = 'consent_events'
+            and grantee in ('anon', 'authenticated')`,
+      )
+      const serviceGrants = await db.query(
+        `select privilege_type from information_schema.role_table_grants
+          where table_schema = 'academy' and table_name = 'consent_events'
+            and grantee = 'service_role' order by privilege_type`,
+      )
+      const execute = await db.query(
+        `select has_function_privilege('anon', 'academy.record_lead_consent(text,timestamptz,text,text,text,text,text)', 'execute') as anon,
+                has_function_privilege('authenticated', 'academy.record_lead_consent(text,timestamptz,text,text,text,text,text)', 'execute') as authenticated`,
+      )
+      return {
+        table: table.rows,
+        policies: policies.rows[0].n,
+        grants: grants.rows,
+        serviceGrants: serviceGrants.rows.map((row) => row.privilege_type),
+        execute: execute.rows[0],
+      }
+    })
+    expect(result.table).toEqual([{ relrowsecurity: true }])
+    expect(result.policies).toBe(0)
+    expect(result.grants).toEqual([])
+    expect(result.serviceGrants).toEqual(['INSERT', 'SELECT'])
+    expect(result.execute).toEqual({ anon: false, authenticated: false })
+  })
+
+  it('record_lead_consent เก็บ v2 เพิ่มให้ lead v1 โดยไม่ทับหลักฐานเดิมและไม่ซ้ำเมื่อ retry', async () => {
+    const email = `consent-history-${Date.now()}@example.com`
+    const versions = await withDb(async (db) => {
+      try {
+        const lead = await db.query(
+          `insert into academy.leads (email, consent_at, consent_text_version)
+           values ($1, now() - interval '1 day', 'v1') returning id`,
+          [email],
+        )
+        await db.query(
+          `insert into academy.consent_events (lead_id, consent_at, consent_text_version)
+           values ($1, now() - interval '1 day', 'v1') on conflict do nothing`,
+          [lead.rows[0].id],
+        )
+        for (let i = 0; i < 2; i += 1) {
+          await db.query(
+            `select academy.record_lead_consent($1, now(), 'v2', null, null, null, null)`,
+            [email],
+          )
+        }
+        const result = await db.query(
+          `select e.consent_text_version
+             from academy.consent_events e join academy.leads l on l.id = e.lead_id
+            where l.email = $1 order by e.consent_text_version`,
+          [email],
+        )
+        return result.rows.map((row) => row.consent_text_version)
+      } finally {
+        await db.query(`delete from academy.leads where email = $1`, [email])
+      }
+    })
+    expect(versions).toEqual(['v1', 'v2'])
+  })
 })
 
 describe('PostgREST access model — schema academy', () => {

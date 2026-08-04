@@ -20,8 +20,7 @@ import {
 // วาดเส้นด้วย SVG ชั้นล่าง แล้ววาง node เป็น HTML ทับ — ได้ข้อความตัดบรรทัด,
 // โฟกัสคีย์บอร์ด และลิงก์จริงฟรี โดยไม่ต้องดิ้นรนกับ text ใน SVG
 
-// Done กับ Proven ใช้ "สีเดียวกันคนละน้ำหนัก" โดยตั้งใจ — ทั้งคู่แปลว่าปลอดภัยแล้ว
-// ต่างกันแค่เส้นทางที่มา (เรียนจบ vs พิสูจน์ผ่าน) การใช้คนละสีจะสื่อผิดว่าเป็นคนละพวก
+// Done กับ historical test-out ใช้สีเดียวกันคนละน้ำหนักโดยตั้งใจ เพราะทั้งคู่คือบทที่เดินผ่านแล้ว
 // และไม่มีสีไหนแยกจากฟ้าได้จริงในสายตา deuteran อยู่ดี — ตัวแยกจริงคือไอคอน + ป้าย
 // แม่กุญแจวาดเป็น SVG ไม่ใช้ emoji — emoji มีสีของตัวเอง (ทอง) ซึ่งเป็นสีเดียว
 // บนหน้าที่ไม่อยู่ในระบบสี และเด่นผิดที่โดยเฉพาะบนธีมมืด
@@ -39,7 +38,7 @@ const STATUS_META: Record<NodeStatus, { label: string; icon: React.ReactNode; ma
     marker: 'bg-cs-accent-fill text-cs-on-accent border-cs-accent-fill',
   },
   'tested-out': {
-    label: 'Proven',
+    label: 'Tested out',
     icon: '★',
     marker: 'bg-cs-surface text-cs-accent border-cs-accent ring-4 ring-cs-accent-dim',
   },
@@ -80,6 +79,7 @@ export function RoadmapGraph({
 }) {
   const layout = layoutRoadmap(structure, state)
   const satisfied = new Set([...state.completed, ...state.testedOut, ...state.skipped])
+  const hasHistoricalTestOut = state.testedOut.length > 0
 
   return (
     <figure className="m-0">
@@ -186,11 +186,13 @@ export function RoadmapGraph({
       <figcaption className="mt-6">
         <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-cs-muted">
           <LegendItem swatch="bg-cs-accent-fill text-cs-on-accent" label="Done, you worked through it" icon="✓" />
-          <LegendItem
-            swatch="bg-cs-surface border-2 border-cs-accent text-cs-accent"
-            label="Proven, you tested out of it"
-            icon="★"
-          />
+          {hasHistoricalTestOut && (
+            <LegendItem
+              swatch="bg-cs-surface border-2 border-cs-accent text-cs-accent"
+              label="Tested out before this route was paused"
+              icon="★"
+            />
+          )}
           {/* ⚠️ เดิมเขียนว่า "still unproven" ซึ่งสื่อว่าบทธรรมดาเป็น proven ได้ —
               ตั้งแต่ W0-3 คำนั้นสงวนให้ด่านวัดผลเท่านั้น (RIL รอบ 3 จับจุดนี้) */}
           <LegendItem swatch="bg-cs-surface-2 border border-dashed border-cs-border-2" label="Skipped, still open" icon="↷" />

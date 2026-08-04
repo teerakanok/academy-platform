@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { CourseCopy, CourseStructure, Locale } from '@/lib/content/course-types'
 import { isEmptyCourseProgress, toLearnerState, type CourseProgressRecord } from '@/lib/course/progress'
 import { fetchProgress } from '@/lib/course/progress-client'
-import { certificateEligibility } from '@/lib/course/roadmap'
+import { courseRecordSummary } from '@/lib/course/roadmap'
 import { EMPTY_STATE, nextNode, summarise } from '@/lib/course/roadmap'
 import { courseSkillData } from '@/lib/course/skills'
 import { RadarChart } from './RadarChart'
@@ -49,8 +49,8 @@ export function CourseOverview({
 
   const state = record ? toLearnerState(record) : EMPTY_STATE
   const summary = summarise(structure, state)
-  const cert = certificateEligibility(structure, state)
-  const skippedBlockers = cert.blocking.filter((b) => b.reason === 'skipped').length
+  const recordSummary = courseRecordSummary(structure, state)
+  const skippedBlockers = recordSummary.blocking.filter((b) => b.reason === 'skipped').length
   const next = nextNode(structure, state)
   const skills = courseSkillData(structure, copy.skillLabels, state)
   const untranslated = structure.nodes.length - translatedNodeIds.length
@@ -228,48 +228,51 @@ export function CourseOverview({
           **ด่านวัดผล (capstone)** เท่านั้น การเดินครบทุกบทเป็นเงื่อนไขความคืบหน้า
           ไม่ใช่หลักฐาน · เขียนตามจริงเสมอ ผู้เรียนจะได้รู้ว่าใบนี้ยืนยันอะไรจริงๆ */}
           <section
-            className={`card-feature p-6 sm:p-7 ${cert.eligible ? 'card-takeaway' : ''}`}
+            className={`card-feature p-6 sm:p-7 ${recordSummary.recordComplete ? 'card-takeaway' : ''}`}
             data-testid="certificate-status"
-            data-eligible={cert.eligible}
+            data-record-complete={recordSummary.recordComplete}
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-cs-accent">
-                  Certificate of completion
+                  Learning record
                 </p>
                 <h2 className="mt-1.5 font-display text-xl font-semibold text-cs-text">
-                  {cert.eligible
-                    ? 'Earned — you passed every checkpoint'
+                  {recordSummary.recordComplete
+                    ? 'Course record complete — every required checkpoint passed'
                     : 'Finish the lessons and pass every required checkpoint'}
                 </h2>
               </div>
               {/* คอร์สที่ยังไม่มีด่านวัดผลเลยต้องไม่โชว์ "0 / 0 checkpoints" ซึ่งอ่านแล้ว
               เหมือนผู้เรียนทำอะไรผิด ทั้งที่เป็นเรื่องของตัวคอร์สเอง */}
-              {cert.assessedTotal > 0 && (
+              {recordSummary.assessedTotal > 0 && (
                 <span
                   className="shrink-0 rounded-full bg-cs-accent-fill px-3 py-1 font-mono text-xs font-semibold text-cs-on-accent"
                   data-testid="certificate-assessed-count"
                 >
-                  {cert.assessedPassed} / {cert.assessedTotal} checkpoints
+                  {recordSummary.assessedPassed} / {recordSummary.assessedTotal} checkpoints
                 </span>
               )}
             </div>
             <p className="mt-3 max-w-2xl text-sm text-cs-body">
-              {cert.eligible
-                ? 'It says you finished every lesson and passed every required checkpoint in this course — that is what the certificate stands behind.'
-                : 'Two things earn it: finishing every lesson, and passing every required checkpoint, where each answer has to be right. The checkpoints are the part the certificate certifies.'}
+              {recordSummary.recordComplete
+                ? 'Your learning record shows every lesson finished and every required checkpoint passed.'
+                : 'A complete course record needs every lesson finished and every required checkpoint passed. Passing required checkpoints provides the assessed evidence.'}
             </p>
-            {cert.courseIssue === 'no-assessment' && (
+            {recordSummary.courseIssue === 'no-assessment' && (
               // ปัญหาของคอร์ส ไม่ใช่ของผู้เรียน — บอกตามจริงและไม่ทำเป็นลิงก์ไปไหน
               <p className="mt-3 max-w-2xl text-sm text-cs-body" data-testid="certificate-no-assessment">
-                This course does not have a required checkpoint yet, so there is nothing for a certificate to stand
-                behind. We are adding one.
+                This course needs at least one required checkpoint before its completion record can be final. We are
+                adding one.
               </p>
             )}
-            <p className="mt-2 max-w-2xl text-xs text-cs-muted" data-testid="certificate-progress-note">
-              Lessons finished: {cert.lessonsFinished} / {cert.total}
+            <p className="mt-2 max-w-2xl text-xs text-cs-muted" data-testid="certificate-availability-note">
+              Certificate issuance and verification are planned for a later release.
             </p>
-            {!cert.eligible && skippedBlockers > 0 && (
+            <p className="mt-2 max-w-2xl text-xs text-cs-muted" data-testid="certificate-progress-note">
+              Lessons finished: {recordSummary.lessonsFinished} / {recordSummary.total}
+            </p>
+            {!recordSummary.recordComplete && skippedBlockers > 0 && (
               <p className="mt-3 max-w-2xl text-sm text-cs-body" data-testid="certificate-skipped-note">
                 {/* ⚠️ ห้ามชวนไป "test out" — ปิดอยู่ทั้งคอร์สจนกว่าจะมีคลังข้อแยก
                 (assessment-policy) · ข้อความที่ชี้ไปยังทางที่ไม่มีอยู่จริงคือการ
@@ -279,9 +282,9 @@ export function CourseOverview({
                 know the material.
               </p>
             )}
-            {!accessIssue && !cert.eligible && cert.blocking.length > 0 && (
+            {!accessIssue && !recordSummary.recordComplete && recordSummary.blocking.length > 0 && (
               <div className="mt-4 flex flex-wrap gap-2">
-                {cert.blocking.slice(0, 4).map((b) => (
+                {recordSummary.blocking.slice(0, 4).map((b) => (
                   <Link
                     key={b.id}
                     href={`/courses/${structure.slug}/lessons/${b.id}`}
@@ -292,8 +295,8 @@ export function CourseOverview({
                     {copy.nodeTitles[b.id] ?? b.id}
                   </Link>
                 ))}
-                {cert.blocking.length > 4 && (
-                  <span className="self-center font-mono text-xs text-cs-muted">+{cert.blocking.length - 4} more</span>
+                {recordSummary.blocking.length > 4 && (
+                  <span className="self-center font-mono text-xs text-cs-muted">+{recordSummary.blocking.length - 4} more</span>
                 )}
               </div>
             )}

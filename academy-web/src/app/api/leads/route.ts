@@ -71,22 +71,17 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const { error } = await db.from('leads').insert({
-    email,
-    consent_at: new Date().toISOString(),
-    consent_text_version: CURRENT_CONSENT_VERSION,
-    utm_source: utmSource ?? null,
-    utm_medium: utmMedium ?? null,
-    utm_campaign: utmCampaign ?? null,
-    referrer: referrer ?? null,
+  const { error } = await db.rpc('record_lead_consent', {
+    p_email: email,
+    p_consent_at: new Date().toISOString(),
+    p_consent_text_version: CURRENT_CONSENT_VERSION,
+    p_utm_source: utmSource ?? null,
+    p_utm_medium: utmMedium ?? null,
+    p_utm_campaign: utmCampaign ?? null,
+    p_referrer: referrer ?? null,
   })
 
   if (error) {
-    // unique violation = email ซ้ำ → idempotent success — status/body ต้อง
-    // เหมือน path สร้างใหม่ทุกประการ กัน enumeration จาก response ที่ต่างกัน
-    if (error.code === '23505') {
-      return NextResponse.json({ ok: true }, { status: 200 })
-    }
     // DB ล้มจริงต้องตอบ fail จริง — ห้าม success ปลอม (บทเรียน Server Action
     // masked errors); รายละเอียด error อยู่ log ฝั่ง server เท่านั้น
     console.error('[api/leads] insert failed:', error.code, error.message)
