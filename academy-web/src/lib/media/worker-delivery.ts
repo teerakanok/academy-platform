@@ -75,7 +75,10 @@ export async function servePrivateMedia(request: MediaRequest, env: MediaWorkerE
   headers.set('content-type', asset.contentType)
   headers.set('cache-control', 'private, no-store')
   if (object.httpEtag) headers.set('etag', object.httpEtag)
-  if (object.range && object.size !== undefined) {
+  if (requestedRange && (!object.range || object.size === undefined)) {
+    return new Response(null, { status: 416 })
+  }
+  if (requestedRange && object.range && object.size !== undefined) {
     const offset = object.range.offset ?? (object.range.suffix ? Math.max(0, object.size - object.range.suffix) : 0)
     const length = object.range.length ?? (object.range.suffix ? Math.min(object.range.suffix, object.size) : object.size - offset)
     const end = offset + length - 1
@@ -87,7 +90,7 @@ export async function servePrivateMedia(request: MediaRequest, env: MediaWorkerE
   }
 
   return new Response(request.method === 'HEAD' ? null : object.body, {
-    status: object.range ? 206 : 200,
+    status: requestedRange && object.range ? 206 : 200,
     headers,
   })
 }

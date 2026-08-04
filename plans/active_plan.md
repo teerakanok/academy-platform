@@ -36,7 +36,11 @@ Checkpoint 4 ถูก commit/push แล้วที่ `725a705` และ pro
      dry-run, targeted media E2E; full E2E 139 ผ่าน/10 skipped และ stateful capstone
      failure 1 รายการที่ isolated rerun ผ่าน;
      independent Code/Security/UX review = C0/H0/M0 ทุก lane
-   - ขั้นถัดไปต้องขอ authorization แยกสำหรับ R2 bucket/upload/binding/secret และ remote proof
+   - remote topology checkpoint 2026-08-04: สร้าง private bucket
+     `cyberskills-academy-media`, upload 5 registry objects และ remote GET/SHA/Range/
+     HEAD/caption/tamper/legacy/expiry proof ผ่าน; tracked `COURSE_MEDIA` binding แล้ว
+   - production secret และ Worker deploy ยังไม่ทำ เพราะ deploy ปัจจุบันจะพา code ที่พึ่ง
+     migration `0017` ขึ้นไปด้วย; ต้องปิด Pool A migration/release gate ก่อน
 3. **Staff authorization model** — เคาะว่าใครเข้าถึงงานดูแลผู้เรียน/คำขอสิทธิได้
    ก่อนสร้าง staff/admin surface
 4. **Certificate evidence claim** — เคาะข้อความว่าใบรับรองในอนาคตยืนยันอะไรได้จริง
@@ -45,9 +49,8 @@ Checkpoint 4 ถูก commit/push แล้วที่ `725a705` และ pro
    local tests และ review ครบ; apply migration `0001`–`0016` รวม migration ใหม่จาก
    `0017` ก่อน deploy code ที่พึ่ง schema เหล่านี้
 
-**งานหลักถัดไป:** ขอ owner authorization เพื่อ activate private media topology บน R2
-หรือเดินข้อ 3 staff authorization model หากยังไม่อนุญาต external activation โดยยังไม่แตะ
-Pool A, R2, production secrets หรือ deploy. Public launch ยังต้องมี distributed edge
+**งานหลักถัดไป:** ข้อ 3 staff authorization model หรือปิด Pool A migration/release gate
+ก่อนตั้ง production media secret และ deploy binding ที่ตรวจแล้ว. Public launch ยังต้องมี distributed edge
 rate limit/log redaction, restricted case-system owner/access configuration และ legal review.
 
 ---

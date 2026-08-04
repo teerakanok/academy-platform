@@ -6,8 +6,10 @@
   "compatibility_date": "2025-03-25",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
-  // COURSE_MEDIA R2 binding is added only after the owner authorizes bucket creation.
-  // Never place private MP4/VTT/PDF files under the ASSETS directory.
+  // Private lesson media only. Never place MP4/VTT/PDF files under ASSETS.
+  "r2_buckets": [
+    { "binding": "COURSE_MEDIA", "bucket_name": "cyberskills-academy-media" }
+  ],
   "observability": { "enabled": true },
   // กวาด attempt, waitlist และบัญชีที่ครบอายุ วันละครั้งตอนตี 3 UTC
   // ตัวฟังก์ชันฝั่ง DB เป็นคนตัดสินว่าลบอะไรได้ (migration 0017) ที่นี่แค่เรียกตามเวลา

@@ -35,7 +35,8 @@ describe('private media Worker delivery', () => {
   })
 
   it('serves a registered object only with a valid bound grant', async () => {
-    const media = bucket()
+    // Remote R2 may expose a full-object range shape even without a Range request.
+    const media = bucket('PDF', { offset: 0, length: 3 }, 3)
     const response = await servePrivateMedia(
       new Request(`https://academy.test/course-media/${await token()}`),
       { MEDIA_SIGNING_SECRET: SECRET, COURSE_MEDIA: media },
@@ -111,5 +112,14 @@ describe('private media Worker delivery', () => {
       )
       expect(response?.status).toBe(416)
     }
+  })
+
+  it('does not emit a malformed 206 when R2 omits range metadata', async () => {
+    const response = await servePrivateMedia(
+      new Request(`https://academy.test/course-media/${await token()}`, { headers: { range: 'bytes=0-1' } }),
+      { MEDIA_SIGNING_SECRET: SECRET, COURSE_MEDIA: bucket('PDF') },
+    )
+    expect(response?.status).toBe(416)
+    expect(response?.headers.get('content-range')).toBeNull()
   })
 })

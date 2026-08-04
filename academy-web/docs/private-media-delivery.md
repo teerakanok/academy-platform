@@ -32,14 +32,22 @@ and requires the private bucket binding.
 
 ## External activation gate
 
-Do not deploy this checkpoint until all of the following are complete:
+Remote R2 topology was prepared and verified on 2026-08-04:
 
-1. Owner authorizes creation or selection of the Academy private R2 bucket.
-2. Upload every registry object using its exact key and verify size/hash.
-3. Add the `COURSE_MEDIA` R2 binding and a random `MEDIA_SIGNING_SECRET` Worker secret.
-4. Build with OpenNext and verify direct legacy `/media/*.mp4|vtt|pdf` URLs fail on a
+- Private bucket: `cyberskills-academy-media` (APAC, Standard).
+- Five registry objects uploaded; remote downloads matched local SHA-256 values.
+- Remote preview verified full PDF, suffix range, HEAD, video range, caption,
+  tampered token, legacy public URL, and expired-token renewal behavior.
+- `COURSE_MEDIA` is tracked in `wrangler.jsonc`.
+
+Do not deploy this checkpoint until the remaining release gates are complete:
+
+1. Apply and verify the pending production database migrations required by the same
+   application build.
+2. Add a random `MEDIA_SIGNING_SECRET` Worker secret without exposing its value.
+3. Build with OpenNext and verify direct legacy `/media/*.mp4|vtt|pdf` URLs fail on a
    real environment where ASSETS binding is active.
-5. Verify valid grants, expiry, tampering, byte-range video playback, captions, PDF,
+4. Verify valid grants, expiry, tampering, byte-range video playback, captions, PDF,
    entitlement revocation, and missing-object behavior on that environment.
 
 Local `next start` proves the application contract but cannot close the ASSETS/R2
