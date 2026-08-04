@@ -5,6 +5,7 @@ import { getAllCourses, getCourse, getCourseStructure, getLesson, listCourseSlug
 import { loadLesson } from '@/lib/content/course-loader'
 import { courseSkillData, globalSkillData } from '@/lib/course/skills'
 import { EMPTY_STATE } from '@/lib/course/roadmap'
+import { privateMediaByLegacyPath } from '@/lib/media/registry'
 
 // Integrity ของเนื้อหาจริง — กันเคส "คอร์สโหลดได้แต่ผู้เรียนเจอหลุมกลางทาง"
 
@@ -78,12 +79,18 @@ describe('Basic OS & Linux — ครบถ้วนพร้อมสอน', (
       const tracks = node.video!.audio ?? (node.video!.src ? [{ locale: 'en' as const, src: node.video!.src, label: 'default' }] : [])
       expect(tracks.length, 'วิดีโอต้องมีเสียงอย่างน้อยหนึ่งแทร็ก').toBeGreaterThan(0)
       for (const track of tracks) {
-        const file = join(process.cwd(), 'public', track.src.replace(/^\//, ''))
+        const asset = privateMediaByLegacyPath(track.src)
+        expect(asset, `private media ไม่ได้ register: ${track.src}`).not.toBeNull()
+        const file = join(process.cwd(), 'private-media', asset!.key)
         expect(existsSync(file), `ไม่พบไฟล์วิดีโอ ${track.src} (เสียง ${track.locale}) — รัน scripts/make-dummy-video-tracks.sh`).toBe(true)
+        expect(existsSync(join(process.cwd(), 'public', track.src.replace(/^\//, '')))).toBe(false)
       }
       for (const cap of node.video!.captions ?? []) {
-        const file = join(process.cwd(), 'public', cap.src.replace(/^\//, ''))
+        const asset = privateMediaByLegacyPath(cap.src)
+        expect(asset, `private media ไม่ได้ register: ${cap.src}`).not.toBeNull()
+        const file = join(process.cwd(), 'private-media', asset!.key)
         expect(existsSync(file), `ไม่พบไฟล์คำบรรยาย ${cap.src} (${cap.locale})`).toBe(true)
+        expect(existsSync(join(process.cwd(), 'public', cap.src.replace(/^\//, '')))).toBe(false)
         // WebVTT ที่ไม่ขึ้นต้นด้วย WEBVTT เบราว์เซอร์จะเมินเงียบๆ ไม่มี error ให้เห็น
         expect(readFileSync(file, 'utf8').startsWith('WEBVTT'), `${cap.src} ไม่ใช่ WebVTT ที่ถูกต้อง`).toBe(true)
       }

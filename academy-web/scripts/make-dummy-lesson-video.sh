@@ -9,7 +9,7 @@
 # ใช้: bash scripts/make-dummy-lesson-video.sh
 set -euo pipefail
 
-OUT="public/media/lesson-demo.mp4"
+OUT="private-media/basic-os-linux/os-what-it-does/lesson-demo.mp4"
 DURATION=150
 
 mkdir -p "$(dirname "$OUT")"

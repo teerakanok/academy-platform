@@ -51,7 +51,7 @@ export interface UiStrings {
     notOpenTitle: string
     notOpenBody: string
   }
-  video: { audio: string; captionsHint: (labels: string) => string }
+  video: { audio: string; captionsHint: (labels: string) => string; unavailable: string; retry: string }
   language: { label: string }
 }
 
@@ -99,6 +99,8 @@ const en: UiStrings = {
   video: {
     audio: 'Audio',
     captionsHint: (labels) => `Subtitles in ${labels} are available from the CC button on the player.`,
+    unavailable: 'The video could not be loaded. Check your connection and try again.',
+    retry: 'Reload video',
   },
   language: { label: 'Language' },
 }
@@ -145,6 +147,8 @@ const th: UiStrings = {
   video: {
     audio: 'เสียง',
     captionsHint: (labels) => `มีคำบรรยาย ${labels} เปิดได้จากปุ่ม CC บนตัวเล่น`,
+    unavailable: 'โหลดวิดีโอไม่สำเร็จ โปรดตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง',
+    retry: 'โหลดวิดีโอใหม่',
   },
   language: { label: 'ภาษา' },
 }

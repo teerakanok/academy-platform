@@ -23,8 +23,20 @@ Checkpoint 4 ถูก commit/push แล้วที่ `725a705` และ pro
      production build, full E2E 138 passed/10 skipped ก่อน review และ targeted E2E
      หลังแก้ findings; independent Code/Security/UX review = C0/H0/M0 ทุก lane
    - ก่อน public launch ต้องให้ทนายไทยตรวจข้อความ/ระยะเวลาอีกครั้ง
-2. **Private media boundary** — เตรียม local contract/test ก่อน แล้วค่อยขอ authorization
-   สำหรับ R2/remote proof แยกต่างหาก; ห้ามถือ middleware ปัจจุบันว่าป้องกัน `/media/*`
+2. **Private media boundary — local checkpoint ปิดแล้ว 2026-08-04**
+   - ย้าย MP4/VTT/PDF ออกจาก `public/` ไป registry-backed `private-media/`; OpenNext
+     assets ไม่มี private binary
+   - lesson authorization ออก opaque signed open grant; open endpoint re-check session,
+     activation, entitlement และ prerequisite ก่อนออก delivery grant 5 นาที
+   - Worker delivery รองรับ GET/HEAD/Range; expired signed grant renew ผ่าน authenticated
+     open endpoint; revoke หยุด renewal ทันทีและ bearer เดิมมี bounded delay ไม่เกิน 5 นาที
+   - local E2E adapter fail closed หากไม่ตั้ง explicit root/secret; video retry localized,
+     accessible และรักษาตำแหน่ง/สถานะเล่น
+   - evidence: Vitest 475/475, lint/typecheck, production/OpenNext build, Wrangler
+     dry-run, targeted media E2E; full E2E 139 ผ่าน/10 skipped และ stateful capstone
+     failure 1 รายการที่ isolated rerun ผ่าน;
+     independent Code/Security/UX review = C0/H0/M0 ทุก lane
+   - ขั้นถัดไปต้องขอ authorization แยกสำหรับ R2 bucket/upload/binding/secret และ remote proof
 3. **Staff authorization model** — เคาะว่าใครเข้าถึงงานดูแลผู้เรียน/คำขอสิทธิได้
    ก่อนสร้าง staff/admin surface
 4. **Certificate evidence claim** — เคาะข้อความว่าใบรับรองในอนาคตยืนยันอะไรได้จริง
@@ -33,7 +45,8 @@ Checkpoint 4 ถูก commit/push แล้วที่ `725a705` และ pro
    local tests และ review ครบ; apply migration `0001`–`0016` รวม migration ใหม่จาก
    `0017` ก่อน deploy code ที่พึ่ง schema เหล่านี้
 
-**งานหลักถัดไป:** private media boundary local contract/test (ข้อ 2) โดยยังไม่แตะ
+**งานหลักถัดไป:** ขอ owner authorization เพื่อ activate private media topology บน R2
+หรือเดินข้อ 3 staff authorization model หากยังไม่อนุญาต external activation โดยยังไม่แตะ
 Pool A, R2, production secrets หรือ deploy. Public launch ยังต้องมี distributed edge
 rate limit/log redaction, restricted case-system owner/access configuration และ legal review.
 

@@ -10,7 +10,9 @@ import os
 import zlib
 
 OUT_DIR = os.path.join("public", "media")
+PRIVATE_DIR = os.path.join("private-media", "content-formats-demo", "formats-references")
 os.makedirs(OUT_DIR, exist_ok=True)
+os.makedirs(PRIVATE_DIR, exist_ok=True)
 
 # ---------- ไดอะแกรมตัวอย่าง (SVG = ข้อความล้วน ไม่ใช่ binary) ----------
 SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" role="img" aria-label="Diagram placeholder">
@@ -88,7 +90,7 @@ def make_pdf(path: str, lines: list[str]) -> None:
         f.write(bytes(out))
 
 
-pdf_path = os.path.join(OUT_DIR, "sample-handout.pdf")
+pdf_path = os.path.join(PRIVATE_DIR, "sample-handout.pdf")
 make_pdf(
     pdf_path,
     [

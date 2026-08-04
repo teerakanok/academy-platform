@@ -66,6 +66,10 @@ test.describe('security boundaries', () => {
   test('revoked entitlement ปิดทั้ง API และหน้า lesson แล้วคืนสิทธิ์หลังจบ test', async ({ request, page }) => {
     const userId = await learnerId()
     const db = serviceDb()
+    await prepareNodeAccess(COURSE, 'formats-references')
+    await page.goto(`/courses/${COURSE}/lessons/formats-references`)
+    const mediaOpenUrl = await page.getByTestId('attachment-block').getAttribute('href')
+    expect(mediaOpenUrl).toMatch(/^\/api\/media\/open\?token=/)
     const revoked = await db
       .from('course_entitlement')
       .update({ revoked_at: new Date().toISOString() })
@@ -96,6 +100,8 @@ test.describe('security boundaries', () => {
         }),
       ])
       expect(denied.map((response) => response.status())).toEqual([403, 403, 403, 403, 403, 403])
+      const deniedMedia = await request.get(mediaOpenUrl!, { maxRedirects: 0 })
+      expect(deniedMedia.status()).toBe(403)
 
       const all = await request.get('/api/progress')
       expect(all.status()).toBe(200)

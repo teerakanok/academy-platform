@@ -52,7 +52,7 @@ test.describe('content formats', () => {
 
     const attachment = page.getByTestId('attachment-block')
     await expect(attachment).toBeVisible()
-    await expect(attachment).toHaveAttribute('href', '/media/sample-handout.pdf')
+    await expect(attachment).toHaveAttribute('href', /^\/api\/media\/open\?token=/)
     await expect(attachment).toHaveAttribute('target', '_blank')
     await expect(attachment).toContainText('Opens in a new tab')
 
@@ -72,12 +72,38 @@ test.describe('content formats', () => {
     })
   })
 
-  test('ไฟล์ PDF ตัวอย่างเสิร์ฟได้จริงและเป็น PDF จริง', async ({ request }) => {
-    const res = await request.get('/media/sample-handout.pdf')
-    expect(res.status()).toBe(200)
-    expect(res.headers()['content-type']).toContain('pdf')
-    const body = await res.body()
-    expect(body.subarray(0, 5).toString()).toBe('%PDF-')
+  test('ไฟล์ PDF ต้องผ่าน signed URL; legacy public URL เข้าไม่ได้', async ({ page, request }) => {
+    await prepareNodeAccess('content-formats-demo', 'formats-references')
+    await page.goto(`${COURSE}/lessons/formats-references`)
+    const href = await page.getByTestId('attachment-block').getAttribute('href')
+    expect(href).toMatch(/^\/api\/media\/open\?token=/)
+
+    const redirect = await request.get(href!, {
+      maxRedirects: 0,
+      headers: { 'x-forwarded-host': 'attacker.example', 'x-forwarded-proto': 'https' },
+    })
+    expect(redirect.status()).toBe(307)
+    expect(redirect.headers().location).toMatch(/^\/course-media\//)
+
+    const signed = await request.get(href!)
+    expect(signed.status()).toBe(200)
+    expect(signed.headers()['content-type']).toContain('pdf')
+    expect((await signed.body()).subarray(0, 5).toString()).toBe('%PDF-')
+
+    const suffix = await request.get(href!, { headers: { range: 'bytes=-5' } })
+    expect(suffix.status()).toBe(206)
+    expect(suffix.headers()['content-range']).toMatch(/^bytes \d+-\d+\/\d+$/)
+    expect((await suffix.body()).byteLength).toBe(5)
+
+    const head = await request.head(href!)
+    expect(head.status()).toBe(200)
+    expect(await head.body()).toHaveLength(0)
+
+    const malformed = await request.get(href!, { headers: { range: 'bytes=0-1,4-5' } })
+    expect(malformed.status()).toBe(416)
+
+    const legacy = await request.get('/media/sample-handout.pdf')
+    expect(legacy.status()).toBe(404)
   })
 
   test('Lab ขยายได้ทั้งสองขนาด แต่คนละท่า: inline = กล่องใหญ่ · full = เต็มจอ', async ({ page }) => {

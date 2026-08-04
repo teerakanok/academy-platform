@@ -1,4 +1,5 @@
 import openNextHandler from './.open-next/worker.js'
+import { servePrivateMedia, type MediaWorkerEnv } from './src/lib/media/worker-delivery'
 
 // Worker entry ของจริง — ห่อ handler ที่ OpenNext สร้าง แล้วเพิ่ม `scheduled`
 //
@@ -15,7 +16,7 @@ const DEFAULT_BATCH = 5000
 /** เพดานรอบต่อการทำงานหนึ่งครั้ง — งานที่เหลือรอรอบหน้า ดีกว่าค้างจนโดนตัด */
 const MAX_ROUNDS = 20
 
-interface Env {
+interface Env extends MediaWorkerEnv {
   SUPABASE_URL?: string
   SUPABASE_SERVICE_ROLE_KEY?: string
 }
@@ -90,7 +91,10 @@ async function runRetention(env: Env): Promise<void> {
 }
 
 export default {
-  fetch: openNextHandler.fetch,
+  async fetch(request, env, ctx) {
+    const media = await servePrivateMedia(request, env)
+    return media ?? openNextHandler.fetch(request, env, ctx)
+  },
 
   async scheduled(_event: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
     // `waitUntil` เพื่อให้งานเดินจนจบแม้ handler คืนค่าไปแล้ว

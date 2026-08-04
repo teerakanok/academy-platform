@@ -16,6 +16,28 @@ const COURSE = '/courses/basic-os-linux'
 const ARTIFACT_DIR = join(__dirname, '..', '..', 'artifacts', 'oneshot-2026-07-31', 'course')
 
 test.describe('learner journey through a course', () => {
+  test('video load failure gives a learner-facing retry that reopens media authorization', async ({ page }) => {
+    await page.goto(`${COURSE}/lessons/os-what-it-does`)
+    await page.getByTestId('lesson-video').evaluate((video: HTMLVideoElement) => {
+      video.currentTime = 7
+      video.dispatchEvent(new Event('error'))
+    })
+    const alert = page.getByRole('alert').filter({ hasText: 'video could not be loaded' })
+    await expect(alert).toBeVisible()
+    const reopened = page.waitForResponse(
+      (response) =>
+        response.url().includes('/api/media/open') &&
+        response.url().includes('retry=') &&
+        response.status() < 400,
+    )
+    await alert.getByRole('button', { name: 'Reload video' }).click()
+    await reopened
+    await expect(page.getByTestId('lesson-video')).toHaveAttribute('src', /[?&]retry=\d+/)
+    await expect
+      .poll(() => page.getByTestId('lesson-video').evaluate((video: HTMLVideoElement) => video.currentTime))
+      .toBeGreaterThanOrEqual(7)
+  })
+
   test('video pop quiz fires at its cue and blocks seeking past an unanswered question', async ({ page }) => {
     await page.goto(`${COURSE}/lessons/os-what-it-does`)
     await expect(page.getByTestId('interactive-video')).toBeVisible()

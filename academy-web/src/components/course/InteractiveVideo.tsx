@@ -38,6 +38,8 @@ export function InteractiveVideo({
   const firstChoiceRef = useRef<HTMLInputElement>(null)
   const continueRef = useRef<HTMLButtonElement>(null)
   const clampingRef = useRef(false)
+  const retryPositionRef = useRef(0)
+  const retryWasPlayingRef = useRef(false)
   const [answered, setAnswered] = useState<string[]>(answeredCueIds)
   const [activeCueId, setActiveCueId] = useState<string | null>(null)
   const [selected, setSelected] = useState<string | null>(null)
@@ -46,6 +48,7 @@ export function InteractiveVideo({
   const [currentTime, setCurrentTime] = useState(0)
   const [playing, setPlaying] = useState(false)
   const [unavailable, setUnavailable] = useState(false)
+  const [mediaRetry, setMediaRetry] = useState<number | null>(null)
 
   // ── ภาษาเสียง ─────────────────────────────────────────────────────────────
   // เนื้อหาเดิมที่มีแค่ src เดียว = ถือว่ามีหนึ่งแทร็ก ไม่ต้องแก้ไฟล์คอร์สเก่า
@@ -57,6 +60,9 @@ export function InteractiveVideo({
         : []
   const [audioLocale, setAudioLocale] = useState<Locale>(() => audioTracks[0]?.locale ?? 'en')
   const activeAudio = audioTracks.find((a) => a.locale === audioLocale) ?? audioTracks[0]
+  const activeMediaSrc = activeAudio
+    ? `${activeAudio.src}${mediaRetry === null ? '' : `${activeAudio.src.includes('?') ? '&' : '?'}retry=${mediaRetry}`}`
+    : undefined
   const captions = video.captions ?? []
 
   const cues = [...video.cues].sort((a, b) => a.atSeconds - b.atSeconds)
@@ -101,6 +107,28 @@ export function InteractiveVideo({
       openCue(firstPending.id)
     }
   }
+
+  function retryVideo() {
+    const el = videoRef.current
+    retryPositionRef.current = el?.currentTime ?? currentTime
+    retryWasPlayingRef.current = el ? !el.paused : playing
+    setUnavailable(false)
+    setMediaRetry(Date.now())
+  }
+
+  useEffect(() => {
+    if (mediaRetry === null) return
+    const el = videoRef.current
+    if (!el) return
+    const restore = () => {
+      el.currentTime = retryPositionRef.current
+      if (retryWasPlayingRef.current) void el.play()
+      el.focus()
+    }
+    if (el.readyState >= 1) restore()
+    else el.addEventListener('loadedmetadata', restore, { once: true })
+    return () => el.removeEventListener('loadedmetadata', restore)
+  }, [mediaRetry])
 
   async function submitAnswer() {
     if (!activeQuestion || !selected || checking) return
@@ -194,10 +222,11 @@ export function InteractiveVideo({
 
       <div className="relative overflow-hidden rounded-feature border border-cs-border bg-black shadow-feature">
         <video
+          key={`${audioLocale}-${mediaRetry ?? 'initial'}`}
           ref={videoRef}
-          src={activeAudio?.src}
+          src={activeMediaSrc}
           className="block aspect-video w-full"
-          controls
+          controls={!unavailable}
           preload="metadata"
           playsInline
           data-testid="lesson-video"
@@ -223,10 +252,19 @@ export function InteractiveVideo({
         </video>
 
         {unavailable && (
-          <div className="absolute inset-0 flex items-center justify-center bg-cs-surface p-6 text-center text-sm text-cs-muted">
-            The demo video is not available in this environment. Run
-            <code className="mx-1 font-mono text-xs">bash scripts/make-dummy-lesson-video.sh</code>
-            to generate it.
+          <div
+            role="alert"
+            aria-live="assertive"
+            className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-cs-surface p-6 text-center text-sm text-cs-muted"
+          >
+            <p>{ui.video.unavailable}</p>
+            <button
+              type="button"
+              onClick={retryVideo}
+              className="rounded-control bg-cs-accent-fill px-4 py-2 font-semibold text-cs-on-accent"
+            >
+              {ui.video.retry}
+            </button>
           </div>
         )}
 

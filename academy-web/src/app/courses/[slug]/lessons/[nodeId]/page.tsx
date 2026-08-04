@@ -8,6 +8,7 @@ import type { Locale } from '@/lib/content/course-types'
 import { LessonView } from '@/components/course/LessonView'
 import { currentUser } from '@/lib/auth/session'
 import { authorizeCourseResource } from '@/lib/account/course-access'
+import { resolveAuthorizedLessonMedia } from '@/lib/media/resolve'
 
 export const metadata: Metadata = privatePage()
 
@@ -42,6 +43,20 @@ export default async function LessonPage({
   const node = course.structure.nodes.find((n) => n.id === nodeId)
   if (!node) notFound()
 
+  const mediaSecret = process.env.MEDIA_SIGNING_SECRET
+  if (!mediaSecret) throw new Error('Private lesson media is not configured')
+  const publicLesson = toPublicLesson(resolved.lesson, {
+    tasksFromAttempt: requiresAttempt(
+      node,
+      resolved.lesson.checkpoint.some((item) => item.kind === 'simulation'),
+    ),
+  })
+  const authorizedMedia = await resolveAuthorizedLessonMedia(node, publicLesson, {
+    courseSlug: slug,
+    nodeId,
+    secret: mediaSecret,
+  })
+
   return (
     // ~70ch ที่ขนาดตัวอักษรของเนื้อหา — กว้างพอสำหรับตาราง/โค้ด แต่ยังอ่านยาวสบาย
     // และทุกบล็อกใช้ขอบเดียวกันหมด
@@ -51,16 +66,8 @@ export default async function LessonPage({
     <div className="mx-auto max-w-[46rem] px-6 py-12">
       <LessonView
         structure={course.structure}
-        node={node}
-        lesson={toPublicLesson(resolved.lesson, {
-          // ด่านที่ต้องมี attempt: หน้าส่งได้แค่รายชื่องาน เนื้อโจทย์มาจาก /api/attempts
-          // ไม่งั้นชุด key จริงของตัวเลือกจะติดไปกับ payload และคนที่ผ่านแล้วบอกเพื่อน
-          // ว่า "B, C, B" เพื่อนก็แปลงเป็น key ของ attempt ตัวเองได้ทันที
-          tasksFromAttempt: requiresAttempt(
-            node,
-            resolved.lesson.checkpoint.some((item) => item.kind === 'simulation'),
-          ),
-        })}
+        node={authorizedMedia.node}
+        lesson={authorizedMedia.lesson}
         courseTitle={course.copy.title}
         nodeTitles={course.copy.nodeTitles}
         servedLocale={resolved.servedLocale}

@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test'
+import { join } from 'node:path'
 
 // โหลด env สำหรับ test-side DB assertions (service role/anon keys) จาก .env.local
 // — Node ≥20.12 มี loadEnvFile ในตัว ไม่ต้องพึ่ง dotenv
@@ -55,6 +56,8 @@ export default defineConfig({
       // RIL จับว่าลบ speed bump ทิ้งทั้งหมด) · พฤติกรรมของโควตาเองถูกทดสอบใน
       // tests/integration/attempt-db.test.ts ซึ่งกำหนดค่าเองอย่างชัดเจน
       ATTEMPT_MAX_PER_WINDOW: process.env.ATTEMPT_MAX_PER_WINDOW ?? '500',
+      MEDIA_SIGNING_SECRET: 'playwright-only-media-signing-secret-32-bytes-minimum',
+      MEDIA_LOCAL_ROOT: join(process.cwd(), 'private-media'),
     },
   },
 })

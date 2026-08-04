@@ -40,8 +40,9 @@ function isPublic(pathname: string): boolean {
   // สำหรับคนที่ยังไม่มีบัญชี ซึ่งคือคนทั้งหมดที่ฟอร์มนี้มีไว้รับ
   if (pathname === '/api/leads') return true
   if (pathname === '/api/leads/unsubscribe') return true
-  // ไฟล์นิ่ง: ภาพ วิดีโอ เอกสารประกอบ — ไม่ใช่ "การใช้งาน" และต้องโหลดได้จากหน้าร้าน
-  if (pathname.startsWith('/media/') || pathname.startsWith('/brand/')) return true
+  // Brand assets are public. Lesson MP4/VTT/PDF use signed /course-media grants
+  // and must never be added to this allowlist or public ASSETS.
+  if (pathname.startsWith('/brand/')) return true
   return false
 }
 

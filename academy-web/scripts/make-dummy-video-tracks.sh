@@ -5,8 +5,8 @@
 # ไม่ใช่เนื้อหาจริง เสียงเป็นโทนคนละความถี่เพื่อให้แยกออกด้วยหูว่าสลับแทร็กสำเร็จ
 set -euo pipefail
 cd "$(dirname "$0")/.."
-OUT=public/media
-mkdir -p "$OUT/captions"
+OUT=private-media/basic-os-linux/os-what-it-does
+mkdir -p "$OUT"
 
 make_video() {
   local name="$1" hz="$2" label="$3"
@@ -23,7 +23,7 @@ make_video() {
 make_video "lesson-demo-th.mp4" 330 "เสียงไทย"
 
 # คำบรรยาย WebVTT — เวลาตรงกับ cue ของบทเรียนเพื่อให้เห็นว่าจับคู่กันจริง
-cat > "$OUT/captions/os-what-it-does.en.vtt" <<'VTT'
+cat > "$OUT/os-what-it-does.en.vtt" <<'VTT'
 WEBVTT
 
 00:00:02.000 --> 00:00:12.000
@@ -39,7 +39,7 @@ Every running program is a process, with an owner and memory of its own.
 Permission checks are the fourth job: deciding who may do what.
 VTT
 
-cat > "$OUT/captions/os-what-it-does.th.vtt" <<'VTT'
+cat > "$OUT/os-what-it-does.th.vtt" <<'VTT'
 WEBVTT
 
 00:00:02.000 --> 00:00:12.000
