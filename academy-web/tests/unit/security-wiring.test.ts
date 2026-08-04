@@ -11,6 +11,7 @@ function source(path: string): string {
 describe('security boundary wiring', () => {
   const mutationRoutes = [
     'src/app/api/leads/route.ts',
+    'src/app/api/leads/unsubscribe/route.ts',
     'src/app/api/auth/otp/route.ts',
     'src/app/api/auth/verify/route.ts',
     'src/app/api/auth/sign-out/route.ts',
@@ -57,5 +58,16 @@ describe('security boundary wiring', () => {
 
   it('progress ใช้ assessed policy จาก attempt snapshot ไม่ใช่ node หลัง deploy', () => {
     expect(source('src/app/api/progress/route.ts')).toContain('consumed.params.assessment.assessed')
+  })
+
+  it('scheduled worker บังคับ retention ที่อนุมัติครบทั้งสามหมวด', () => {
+    const worker = source('worker.ts')
+    expect(worker).toContain("rpc: 'purge_expired_attempts'")
+    expect(worker).toContain('p_retain_days: 90')
+    expect(worker).toContain("rpc: 'purge_expired_leads'")
+    expect(worker).toContain('p_retain_years: 3')
+    expect(worker).toContain("rpc: 'purge_inactive_users'")
+    expect(worker).toContain('p_inactive_years: 2')
+    expect(worker).toContain("rpc: 'purge_expired_privacy_requests'")
   })
 })

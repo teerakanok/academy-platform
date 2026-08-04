@@ -2,7 +2,40 @@
 
 > Open work only. Move closed items to `completed_log.md` with evidence.
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
-> **Last updated:** 2026-08-03
+> **Last updated:** 2026-08-04
+
+## Current execution lane — owner decisions before production
+
+Checkpoint 4 ถูก commit/push แล้วที่ `725a705` และ product repo ตรงกับ
+`origin/main`. งานหลักถัดไปไม่ใช่ feature/backlog ใหม่ แต่เป็นการปิด release blockers
+ตามลำดับนี้:
+
+1. **Privacy / retention / data-subject requests — local checkpoint ปิดแล้ว 2026-08-04**
+   - waitlist 3 ปี · attempt ที่ไม่เป็นหลักฐาน 90 วัน · account/learning record
+     2 ปีหลังใช้งานครั้งสุดท้าย · consent/request evidence 3 ปี
+   - ผู้สอบ appeal ได้ภายใน 30 วันหลังออกผล; attempt ที่มีเคสเปิดถูกพักการลบ
+     จนปิดเคสแล้วจึงกลับเข้ากฎ 90 วัน
+   - ต้องมีช่องทาง unsubscribe marketing ที่หยุดส่งทันทีและเก็บหลักฐานการถอน
+   - consent v3, privacy notice, unsubscribe token flow, appeal hold, restricted
+     privacy-request evidence, processing register, request runbook และ daily bounded
+     purge ครบใน migration `0017`/worker บน local
+   - evidence: fresh migration reset 0001–0017, Vitest 458/458, lint/typecheck,
+     production build, full E2E 138 passed/10 skipped ก่อน review และ targeted E2E
+     หลังแก้ findings; independent Code/Security/UX review = C0/H0/M0 ทุก lane
+   - ก่อน public launch ต้องให้ทนายไทยตรวจข้อความ/ระยะเวลาอีกครั้ง
+2. **Private media boundary** — เตรียม local contract/test ก่อน แล้วค่อยขอ authorization
+   สำหรับ R2/remote proof แยกต่างหาก; ห้ามถือ middleware ปัจจุบันว่าป้องกัน `/media/*`
+3. **Staff authorization model** — เคาะว่าใครเข้าถึงงานดูแลผู้เรียน/คำขอสิทธิได้
+   ก่อนสร้าง staff/admin surface
+4. **Certificate evidence claim** — เคาะข้อความว่าใบรับรองในอนาคตยืนยันอะไรได้จริง
+   ก่อนสร้าง issuance/verification
+5. **Pool A / release verification** — ขอ explicit authorization ใหม่หลัง migrations,
+   local tests และ review ครบ; apply migration `0001`–`0016` รวม migration ใหม่จาก
+   `0017` ก่อน deploy code ที่พึ่ง schema เหล่านี้
+
+**งานหลักถัดไป:** private media boundary local contract/test (ข้อ 2) โดยยังไม่แตะ
+Pool A, R2, production secrets หรือ deploy. Public launch ยังต้องมี distributed edge
+rate limit/log redaction, restricted case-system owner/access configuration และ legal review.
 
 ---
 

@@ -63,7 +63,7 @@ test.describe('landing', () => {
     await expect(article).toHaveAttribute('data-locale', 'en')
     await expect(page.getByRole('heading', { level: 1 })).toContainText('privacy notice')
     await expect(page.getByText('How long we keep it')).toBeVisible()
-    await expect(page.getByText('Your rights, and how to withdraw')).toBeVisible()
+    await expect(page.getByText('Your rights, withdrawal, and result appeals')).toBeVisible()
     await expect(page.getByRole('link', { name: 'contact@cyberskills.co.th' }).first()).toBeVisible()
     // ห้ามมีอักษรไทยหลุดบนหน้าอังกฤษเลยแม้แต่ตัวเดียว
     const enText = (await article.innerText()).replace(/contact@cyberskills\.co\.th/g, '')
@@ -77,7 +77,7 @@ test.describe('landing', () => {
     await expect(article).toHaveAttribute('data-locale', 'th')
     await expect(page.getByRole('heading', { level: 1 })).toContainText('นโยบายความเป็นส่วนตัว')
     await expect(page.getByText('ระยะเวลาเก็บรักษา')).toBeVisible()
-    await expect(page.getByText('การถอนความยินยอม', { exact: false })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 2, name: /สิทธิ การถอนความยินยอม และการอุทธรณ์ผล/ })).toBeVisible()
     await page.screenshot({ path: join(ARTIFACT_DIR, 'privacy-th-desktop-1440.png'), fullPage: true })
   })
 
@@ -107,7 +107,7 @@ test.describe('lead capture ผ่าน UI', () => {
     const { data, error } = await db.from('leads').select('id, email, consent_text_version, consent_at').eq('email', email)
     expect(error).toBeNull()
     expect(data).toHaveLength(1)
-    expect(data![0].consent_text_version).toBe('v2')
+    expect(data![0].consent_text_version).toBe('v3')
     expect(data![0].consent_at).toBeTruthy()
 
     const { data: events, error: eventError } = await db
@@ -116,8 +116,36 @@ test.describe('lead capture ผ่าน UI', () => {
       .eq('lead_id', data![0].id)
     expect(eventError).toBeNull()
     expect(events).toHaveLength(1)
-    expect(events![0].consent_text_version).toBe('v2')
+    expect(events![0].consent_text_version).toBe('v3')
 
+    await db.from('leads').delete().eq('email', email)
+  })
+
+  test('unsubscribe link หยุด marketing โดยไม่เปิดเผยว่าลิงก์ถูกใช้แล้วหรือไม่', async ({ page }) => {
+    const email = `e2e-unsubscribe-${Date.now()}@example.com`
+    await page.goto('/')
+    await page.getByRole('textbox', { name: 'Email' }).fill(email)
+    await page.getByTestId('consent-checkbox').check()
+    await page.getByRole('button', { name: 'Notify me' }).click()
+    await expect(page.getByTestId('waitlist-success')).toBeVisible()
+
+    const db = serviceDb()
+    const lead = await db.from('leads').select('unsubscribe_token').eq('email', email).single()
+    expect(lead.error).toBeNull()
+    await page.goto(`/unsubscribe?token=${lead.data!.unsubscribe_token}&lang=th`)
+    await expect(page.getByRole('heading', { name: 'หยุดรับอีเมลการตลาดจาก Academy' })).toBeVisible()
+    await expect(page.locator('html')).toHaveAttribute('lang', 'th')
+    await expect(page.getByRole('banner').getByRole('link', { name: 'คอร์สของฉัน' })).toBeVisible()
+    await page.getByRole('button', { name: 'ยกเลิกรับอีเมล' }).click()
+    await expect(page.getByTestId('unsubscribe-result')).toBeVisible()
+
+    const withdrawn = await db.from('leads').select('marketing_withdrawn_at').eq('email', email).single()
+    expect(withdrawn.data!.marketing_withdrawn_at).toBeTruthy()
+
+    // ลิงก์เก่าถูก rotate แล้ว แต่ response ยังเหมือน success เพื่อไม่เป็น lead oracle
+    await page.goto(`/unsubscribe?token=${lead.data!.unsubscribe_token}&lang=th`)
+    await page.getByRole('button', { name: 'ยกเลิกรับอีเมล' }).click()
+    await expect(page.getByTestId('unsubscribe-result')).toBeVisible()
     await db.from('leads').delete().eq('email', email)
   })
 

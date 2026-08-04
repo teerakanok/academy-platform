@@ -111,3 +111,37 @@ describe('RLS ของตารางใหม่ — default deny เหมื
     expect(res.rows).toEqual([])
   })
 })
+
+describe('account retention', () => {
+  it('ลบบัญชีที่ไม่ใช้งานเกิน 2 ปี แต่คง lead ไว้ตามอายุของ waitlist', async () => {
+    const email = 'acct-test-retention-old@example.com'
+    const user = await findOrCreateUser({ issuer: ISS, subject: 'retention-old', email })
+    await withDb(async (db) => {
+      await db.query(
+        `insert into academy.leads (email, consent_at, consent_text_version, user_id)
+         values ($1, now(), 'v3', $2)`,
+        [email, user.id],
+      )
+      await db.query(`update academy.users set last_seen_at = now() - interval '2 years 1 day' where id = $1`, [user.id])
+      const purge = await db.query(`select academy.purge_inactive_users() as deleted`)
+      expect(Number(purge.rows[0].deleted)).toBeGreaterThanOrEqual(1)
+      const account = await db.query(`select id from academy.users where id = $1`, [user.id])
+      const lead = await db.query(`select user_id from academy.leads where email = $1`, [email])
+      expect(account.rowCount).toBe(0)
+      expect(lead.rows[0].user_id).toBeNull()
+    })
+  })
+
+  it('ไม่ลบบัญชีที่ยัง active ภายใน 2 ปี', async () => {
+    const user = await findOrCreateUser({
+      issuer: ISS,
+      subject: 'retention-recent',
+      email: 'acct-test-retention-recent@example.com',
+    })
+    await withDb(async (db) => {
+      await db.query(`select academy.purge_inactive_users()`)
+      const account = await db.query(`select id from academy.users where id = $1`, [user.id])
+      expect(account.rowCount).toBe(1)
+    })
+  })
+})

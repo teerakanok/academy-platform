@@ -17,6 +17,7 @@ const PUBLIC_EXACT = new Set([
   '/',
   '/courses',
   '/privacy',
+  '/unsubscribe',
   '/sign-in',
   '/sign-in/sent',
   '/robots.txt',
@@ -38,6 +39,7 @@ function isPublic(pathname: string): boolean {
   // ฟอร์ม waitlist อยู่บนหน้าร้านซึ่งเปิดสาธารณะ — ถ้าปิดตรงนี้ ฟอร์มจะพังเงียบๆ
   // สำหรับคนที่ยังไม่มีบัญชี ซึ่งคือคนทั้งหมดที่ฟอร์มนี้มีไว้รับ
   if (pathname === '/api/leads') return true
+  if (pathname === '/api/leads/unsubscribe') return true
   // ไฟล์นิ่ง: ภาพ วิดีโอ เอกสารประกอบ — ไม่ใช่ "การใช้งาน" และต้องโหลดได้จากหน้าร้าน
   if (pathname.startsWith('/media/') || pathname.startsWith('/brand/')) return true
   return false

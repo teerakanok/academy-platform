@@ -165,6 +165,100 @@ describe('RLS hardening — academy.leads', () => {
     })
     expect(versions).toEqual(['v1', 'v2'])
   })
+
+  it('unsubscribe หยุด marketing ทันที, retry ไม่เพิ่ม event และ re-consent เปิดใหม่ด้วย token ใหม่', async () => {
+    const email = `unsubscribe-${Date.now()}@example.com`
+    const result = await withDb(async (db) => {
+      try {
+        await db.query(`select academy.record_lead_consent($1, now(), 'v3', null, null, null, null)`, [email])
+        const before = await db.query(
+          `select id, unsubscribe_token, marketing_consent_expires_at
+             from academy.leads where email = $1`,
+          [email],
+        )
+        const lead = before.rows[0]
+        const activeBefore = await db.query(`select email from academy.active_marketing_leads where id = $1`, [lead.id])
+        const first = await db.query(`select academy.withdraw_marketing_consent($1, now()) as changed`, [
+          lead.unsubscribe_token,
+        ])
+        const retry = await db.query(`select academy.withdraw_marketing_consent($1, now()) as changed`, [
+          lead.unsubscribe_token,
+        ])
+        const activeAfter = await db.query(`select email from academy.active_marketing_leads where id = $1`, [lead.id])
+        const withdrawn = await db.query(
+          `select unsubscribe_token, marketing_withdrawn_at from academy.leads where id = $1`,
+          [lead.id],
+        )
+        const eventsAfterWithdraw = await db.query(
+          `select event_type from academy.consent_events where lead_id = $1 order by created_at, id`,
+          [lead.id],
+        )
+
+        await db.query(`select academy.record_lead_consent($1, now(), 'v3', null, null, null, null)`, [email])
+        const reopened = await db.query(
+          `select unsubscribe_token, marketing_withdrawn_at from academy.leads where id = $1`,
+          [lead.id],
+        )
+        const eventsAfterRegrant = await db.query(
+          `select event_type from academy.consent_events where lead_id = $1 order by created_at, id`,
+          [lead.id],
+        )
+        return {
+          activeBefore: activeBefore.rows,
+          activeAfter: activeAfter.rows,
+          first: first.rows[0].changed,
+          retry: retry.rows[0].changed,
+          oldToken: lead.unsubscribe_token,
+          withdrawn: withdrawn.rows[0],
+          reopened: reopened.rows[0],
+          afterWithdraw: eventsAfterWithdraw.rows.map((row) => row.event_type),
+          afterRegrant: eventsAfterRegrant.rows.map((row) => row.event_type),
+          expiresAt: lead.marketing_consent_expires_at,
+        }
+      } finally {
+        await db.query(`delete from academy.leads where email = $1`, [email])
+      }
+    })
+
+    expect(result.activeBefore).toEqual([{ email }])
+    expect(result.first).toBe(true)
+    expect(result.retry).toBe(false)
+    expect(result.activeAfter).toEqual([])
+    expect(result.withdrawn.marketing_withdrawn_at).not.toBeNull()
+    expect(result.withdrawn.unsubscribe_token).not.toBe(result.oldToken)
+    expect(result.afterWithdraw).toEqual(['granted', 'withdrawn'])
+    expect(result.reopened.marketing_withdrawn_at).toBeNull()
+    expect(result.reopened.unsubscribe_token).not.toBe(result.withdrawn.unsubscribe_token)
+    expect(result.afterRegrant).toEqual(['granted', 'withdrawn', 'granted'])
+    expect(new Date(result.expiresAt).getUTCFullYear()).toBe(new Date().getUTCFullYear() + 3)
+  })
+
+  it('purge waitlist ใช้ค่า default 3 ปีนับจาก consent หรือ withdrawal ล่าสุด', async () => {
+    const oldEmail = `lead-old-${Date.now()}@example.com`
+    const recentEmail = `lead-recent-${Date.now()}@example.com`
+    const deleted = await withDb(async (db) => {
+      try {
+        await db.query(`select academy.record_lead_consent($1, now(), 'v3', null, null, null, null)`, [oldEmail])
+        await db.query(`select academy.record_lead_consent($1, now(), 'v3', null, null, null, null)`, [recentEmail])
+        await db.query(
+          `update academy.leads
+              set consent_at = now() - interval '4 years',
+                  marketing_consent_expires_at = now() - interval '1 year'
+            where email = $1`,
+          [oldEmail],
+        )
+        const purge = await db.query(`select academy.purge_expired_leads() as deleted`)
+        const remain = await db.query(`select email from academy.leads where email = any($1::text[]) order by email`, [
+          [oldEmail, recentEmail],
+        ])
+        return { count: purge.rows[0].deleted, remain: remain.rows.map((row) => row.email) }
+      } finally {
+        await db.query(`delete from academy.leads where email = any($1::text[])`, [[oldEmail, recentEmail]])
+      }
+    })
+    expect(deleted.count).toBeGreaterThanOrEqual(1)
+    expect(deleted.remain).toEqual([recentEmail])
+  })
 })
 
 describe('PostgREST access model — schema academy', () => {
@@ -225,5 +319,47 @@ describe('PostgREST access model — schema academy', () => {
       method: 'DELETE',
       headers: restHeaders(serviceKey),
     })
+  })
+})
+
+describe('privacy request evidence', () => {
+  it('default deny และลบเฉพาะเคสที่ปิดเกิน 3 ปี', async () => {
+    const marker = Date.now()
+    const result = await withDb(async (db) => {
+      await db.query(
+        `insert into academy.privacy_request
+          (case_reference, subject_email, request_type, status, received_at, completed_at)
+         values
+          ($1, $3, 'access', 'completed', now() - interval '4 years 1 day', now() - interval '4 years'),
+          ($2, $4, 'deletion', 'open', now() - interval '4 years', null)`,
+        [`PRIV-OLD-${marker}`, `PRIV-OPEN-${marker}`, `privacy-old-${marker}@example.com`, `privacy-open-${marker}@example.com`],
+      )
+      await db.query('begin')
+      await db.query('set local role service_role')
+      const purge = await db.query(`select academy.purge_expired_privacy_requests() as deleted`)
+      await db.query('commit')
+      const rows = await db.query(
+        `select case_reference from academy.privacy_request where case_reference = any($1::text[])`,
+        [[`PRIV-OLD-${marker}`, `PRIV-OPEN-${marker}`]],
+      )
+      const rls = await db.query(
+        `select c.relrowsecurity from pg_class c join pg_namespace n on n.oid = c.relnamespace
+          where n.nspname = 'academy' and c.relname = 'privacy_request'`,
+      )
+      const anonExecute = await db.query(
+        `select has_function_privilege('anon', 'academy.purge_expired_privacy_requests(integer, integer)', 'execute') as allowed`,
+      )
+      await db.query(`delete from academy.privacy_request where case_reference = $1`, [`PRIV-OPEN-${marker}`])
+      return {
+        deleted: Number(purge.rows[0].deleted),
+        remain: rows.rows,
+        rls: rls.rows[0].relrowsecurity,
+        anonExecute: anonExecute.rows[0].allowed,
+      }
+    })
+    expect(result.deleted).toBeGreaterThanOrEqual(1)
+    expect(result.remain).toEqual([{ case_reference: `PRIV-OPEN-${marker}` }])
+    expect(result.rls).toBe(true)
+    expect(result.anonExecute).toBe(false)
   })
 })

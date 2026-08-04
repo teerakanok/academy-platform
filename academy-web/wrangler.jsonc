@@ -7,8 +7,8 @@
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
   "observability": { "enabled": true },
-  // กวาด attempt ที่หมดอายุ วันละครั้งตอนตี 3 UTC (~10 โมงเช้าไทย — นอกช่วงที่คนใช้งาน)
-  // ตัวฟังก์ชันฝั่ง DB เป็นคนตัดสินว่าลบอะไรได้ (migration 0011) ที่นี่แค่เรียกตามเวลา
+  // กวาด attempt, waitlist และบัญชีที่ครบอายุ วันละครั้งตอนตี 3 UTC
+  // ตัวฟังก์ชันฝั่ง DB เป็นคนตัดสินว่าลบอะไรได้ (migration 0017) ที่นี่แค่เรียกตามเวลา
   "triggers": { "crons": ["0 3 * * *"] },
   "vars": {
     // preview: ยังไม่เปิดให้ค้นเจอ และยังไม่เปิดระบบบัญชี

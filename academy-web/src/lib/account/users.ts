@@ -61,13 +61,26 @@ export async function findOrCreateUser(claims: IdentityClaims): Promise<AcademyU
   if (existing.error) throw new Error(`อ่านบัญชีไม่สำเร็จ: ${existing.error.message}`)
 
   if (existing.data) {
+    const seenAt = new Date().toISOString()
     // อีเมลที่ issuer ยืนยันอาจเปลี่ยน — sync ให้ตรง แต่ตัวตนยังเป็นคนเดิมเพราะ subject เท่าเดิม
     if (existing.data.email !== email) {
-      await db.from('users').update({ email, last_seen_at: new Date().toISOString() }).eq('id', existing.data.id)
-      return toUser({ ...existing.data, email })
+      const updated = await db
+        .from('users')
+        .update({ email, last_seen_at: seenAt })
+        .eq('id', existing.data.id)
+        .select('*')
+        .single()
+      if (updated.error) throw new Error(`อัปเดตกิจกรรมบัญชีไม่สำเร็จ: ${updated.error.message}`)
+      return toUser(updated.data)
     }
-    await db.from('users').update({ last_seen_at: new Date().toISOString() }).eq('id', existing.data.id)
-    return toUser(existing.data)
+    const updated = await db
+      .from('users')
+      .update({ last_seen_at: seenAt })
+      .eq('id', existing.data.id)
+      .select('*')
+      .single()
+    if (updated.error) throw new Error(`อัปเดตกิจกรรมบัญชีไม่สำเร็จ: ${updated.error.message}`)
+    return toUser(updated.data)
   }
 
   const created = await db

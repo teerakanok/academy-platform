@@ -32,7 +32,7 @@ export function PrivacyContent({ version }: { version: string }) {
               <p key={i} className={i > 0 ? 'mt-3' : ''}>
                 {line}
                 {/* ที่อยู่ติดต่ออยู่ท้ายย่อหน้าที่พูดถึงมัน ไม่ใช่ลอยอยู่ท้ายหน้า */}
-                {section.body.length === i + 1 && /reach us at|ติดต่อได้ที่อีเมล|email us at the address below/.test(line) ? (
+                {/reach us at$|ติดต่อได้ที่อีเมล$|ส่งคำขอมาที่อีเมล$|email us at$/.test(line) ? (
                   <>
                     {' '}
                     <a

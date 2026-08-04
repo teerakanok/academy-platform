@@ -298,6 +298,19 @@ export function CheckpointQuiz({
           </span>
         )}
       </div>
+
+      {outcome && requireAllCorrect && (
+        <p className="mt-5 text-sm leading-relaxed text-cs-muted" data-testid="assessment-appeal-window">
+          You can appeal this result within 30 days after it was issued.{' '}
+          <a
+            href="mailto:contact@cyberskills.co.th?subject=Academy%20result%20appeal"
+            className="text-cs-accent underline underline-offset-4"
+          >
+            Contact CYBERSKILLS
+          </a>{' '}
+          and include your account email, course, and approximate attempt time.
+        </p>
+      )}
     </section>
   )
 }

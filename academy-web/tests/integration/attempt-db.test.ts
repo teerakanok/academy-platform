@@ -288,6 +288,8 @@ describe('RLS ของ attempt — default deny เหมือนตารา�
     'academy.reset_course_progress(uuid, text)',
     'academy.reset_course_progress(uuid, text, uuid)',
     'academy.sync_service_activation(uuid, text, integer)',
+    'academy.open_attempt_appeal(uuid, uuid, text, timestamptz)',
+    'academy.resolve_attempt_appeal(text, timestamptz)',
   ]
   it.each(FUNCTIONS)('%s ไม่เปิด execute ให้ anon/authenticated', async (fn) => {
     const res = await withDb((db) =>
@@ -299,6 +301,25 @@ describe('RLS ของ attempt — default deny เหมือนตารา�
     )
     expect(res.rows[0].anon).toBe(false)
     expect(res.rows[0].authed).toBe(false)
+  })
+
+  it('attempt_appeal เปิด RLS, ไม่มี policy และไม่ให้สิทธิ์ browser roles', async () => {
+    const res = await withDb((db) =>
+      db.query(
+        `select c.relrowsecurity,
+                (select count(*) from pg_policy p where p.polrelid = c.oid) as policies,
+                has_table_privilege('anon', 'academy.attempt_appeal', 'select') as anon_select,
+                has_table_privilege('authenticated', 'academy.attempt_appeal', 'insert') as authed_insert
+           from pg_class c join pg_namespace n on n.oid = c.relnamespace
+          where n.nspname = 'academy' and c.relname = 'attempt_appeal'`,
+      ),
+    )
+    expect(res.rows[0]).toEqual({
+      relrowsecurity: true,
+      policies: '0',
+      anon_select: false,
+      authed_insert: false,
+    })
   })
 })
 
@@ -572,12 +593,12 @@ describe('ล้มกลางทางแล้วต้องไม่กิ�
   })
 })
 
-describe('retention ของตาราง attempt (0011)', () => {
+describe('retention ของตาราง attempt (0011, 0017)', () => {
   // ตารางโตทางเดียว (~2–3 KB/แถวรวม index) · แต่การกวาดต้องไม่แตะสองอย่าง:
   // แถวที่ผู้เรียนกำลังใช้อยู่ และแถวที่ยังทำหน้าที่เป็นสมุดนับโควตา
   // (การคืนโควตาให้ฟรีคือบั๊กเดียวกับที่ reset เคยทำแล้วถูก RIL จับ)
 
-  async function purge(retainDays = 30) {
+  async function purge(retainDays = 90) {
     return withDb(async (db) => {
       const res = await db.query(`select academy.purge_expired_attempts($1, 5000) as deleted`, [retainDays])
       return res.rows[0].deleted as number
@@ -605,14 +626,14 @@ describe('retention ของตาราง attempt (0011)', () => {
   it('🔴 ไม่แตะแถวที่หมดอายุแต่ยังอยู่ในระยะเก็บรักษา (สมุดนับโควตา)', async () => {
     const recent = await issueAttempt(ctx('n-retain-recent'), SAMPLE_PARAMS, '1.0.0')
     await ageAttempt(recent!.attemptId, 3)
-    expect(await purge(30)).toBe(0)
+    expect(await purge()).toBe(0)
   })
 
   it('🔴 กวาดแถวที่หมดอายุเกินระยะเก็บรักษา', async () => {
     const old = await issueAttempt(ctx('n-retain-old'), SAMPLE_PARAMS, '1.0.0')
-    await ageAttempt(old!.attemptId, 90)
-    expect(await purge(30)).toBe(1)
-    expect(await purge(30)).toBe(0)
+    await ageAttempt(old!.attemptId, 91)
+    expect(await purge()).toBe(1)
+    expect(await purge()).toBe(0)
   })
 
   it('🔴 attempt ที่ไม่ได้เป็นหลักฐาน กวาดได้ และแถวความคืบหน้าไม่กระทบ', async () => {
@@ -627,9 +648,9 @@ describe('retention ของตาราง attempt (0011)', () => {
       nodeId: 'n-retain-spent',
       status: 'in-progress',
     })
-    await ageAttempt(spent!.attemptId, 90)
+    await ageAttempt(spent!.attemptId, 91)
 
-    expect(await purge(30)).toBe(1)
+    expect(await purge()).toBe(1)
     const row = await withDb((db) =>
       db.query(
         `select status from academy.node_progress
@@ -638,6 +659,78 @@ describe('retention ของตาราง attempt (0011)', () => {
       ),
     )
     expect(row.rows[0].status).toBe('in-progress')
+  })
+
+  it('ค่า default เก็บ attempt ที่ไม่เป็นหลักฐาน 90 วัน', async () => {
+    const recent = await issueAttempt(ctx('n-retain-default-89'), SAMPLE_PARAMS, 'v-retain')
+    const old = await issueAttempt(ctx('n-retain-default-91'), SAMPLE_PARAMS, 'v-retain')
+    await ageAttempt(recent!.attemptId, 89)
+    await ageAttempt(old!.attemptId, 91)
+
+    expect(await purge()).toBe(1)
+    const rows = await withDb((db) =>
+      db.query(`select attempt_id from academy.attempt where attempt_id = any($1::uuid[])`, [
+        [recent!.attemptId, old!.attemptId],
+      ]),
+    )
+    expect(rows.rows.map((row) => row.attempt_id)).toEqual([recent!.attemptId])
+  })
+
+  it('appeal เปิดภายใน 30 วันพักการลบจน resolve แล้วจึงกวาดได้', async () => {
+    const NODE = 'n-retain-appeal'
+    const issued = await issueAttempt(ctx(NODE), SAMPLE_PARAMS, 'v-appeal')
+    const claim = await consumeAttempt(ctx(NODE), issued!.attemptId)
+    expect(claim?.claimToken).toBeTruthy()
+    expect(await finalizeAttempt(owner.id, issued!.attemptId, claim!.claimToken!, { passed: false })).toBe(true)
+
+    await withDb((db) =>
+      db.query(
+        `update academy.attempt
+            set created_at = now() - interval '121 days',
+                expires_at = now() - interval '120 days',
+                result_recorded_at = now() - interval '100 days'
+          where attempt_id = $1`,
+        [issued!.attemptId],
+      ),
+    )
+    const appealId = await withDb(async (db) => {
+      const result = await db.query(
+        `select academy.open_attempt_appeal($1, $2, $3, now() - interval '90 days') as id`,
+        [issued!.attemptId, owner.id, `ACA-${randomUUID()}`],
+      )
+      return result.rows[0].id as string
+    })
+    expect(appealId).toMatch(/^[0-9a-f-]{36}$/)
+    expect(await purge()).toBe(0)
+
+    const resolved = await withDb(async (db) => {
+      const ref = await db.query(`select case_reference from academy.attempt_appeal where appeal_id = $1`, [appealId])
+      const result = await db.query(`select academy.resolve_attempt_appeal($1, now()) as ok`, [ref.rows[0].case_reference])
+      return result.rows[0].ok as boolean
+    })
+    expect(resolved).toBe(true)
+    expect(await purge()).toBe(1)
+  })
+
+  it('appeal หลังผลออกเกิน 30 วันถูกปฏิเสธและไม่สร้าง retention hold', async () => {
+    const NODE = 'n-retain-late-appeal'
+    const issued = await issueAttempt(ctx(NODE), SAMPLE_PARAMS, 'v-appeal')
+    const claim = await consumeAttempt(ctx(NODE), issued!.attemptId)
+    expect(await finalizeAttempt(owner.id, issued!.attemptId, claim!.claimToken!, { passed: false })).toBe(true)
+    await withDb((db) =>
+      db.query(`update academy.attempt set result_recorded_at = now() - interval '31 days' where attempt_id = $1`, [
+        issued!.attemptId,
+      ]),
+    )
+
+    const result = await withDb((db) =>
+      db.query(`select academy.open_attempt_appeal($1, $2, $3, now()) as id`, [
+        issued!.attemptId,
+        owner.id,
+        `ACA-${randomUUID()}`,
+      ]),
+    )
+    expect(result.rows[0].id).toBeNull()
   })
 })
 
@@ -751,11 +844,7 @@ describe('ปิดรูที่ RIL สองเลนชี้ตรงก�
       ),
     )
 
-    const deleted = await withDb(async (db) => {
-      const res = await db.query(`select academy.purge_expired_attempts(30, 5000) as deleted`)
-      return res.rows[0].deleted as number
-    })
-    expect(deleted, 'ใบที่เป็นหลักฐานต้องไม่ถูกกวาด').toBe(0)
+    await withDb((db) => db.query(`select academy.purge_expired_attempts(30, 5000)`))
 
     const still = await withDb((db) =>
       db.query(`select params from academy.attempt where attempt_id = $1`, [passed!.attemptId]),

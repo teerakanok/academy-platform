@@ -3,10 +3,10 @@ import { CONSENT_TEXTS } from './content/registry.generated'
 // เวอร์ชันข้อความ consent ที่ระบบยอมรับ — ต้องตรงกับไฟล์ใน src/content/consent/
 // และตรงกับ CHECK constraint ใน supabase/migrations (academy.leads.consent_text_version)
 // เพิ่มเวอร์ชันใหม่ = เพิ่มไฟล์ + เพิ่มค่าใน CHECK constraint (migration ใหม่) พร้อมกัน
-export const CONSENT_VERSIONS = ['v1', 'v2'] as const
+export const CONSENT_VERSIONS = ['v1', 'v2', 'v3'] as const
 export type ConsentVersion = (typeof CONSENT_VERSIONS)[number]
 
-export const CURRENT_CONSENT_VERSION: ConsentVersion = 'v2'
+export const CURRENT_CONSENT_VERSION: ConsentVersion = 'v3'
 
 // ข้อความถูกฝังมาตอน build (ดู scripts/generate-content-registry.mjs) — เดิมอ่านจาก
 // ดิสก์ตอน request ซึ่งรันบน runtime ที่ไม่มี filesystem ไม่ได้ และทำให้ข้อความทาง
