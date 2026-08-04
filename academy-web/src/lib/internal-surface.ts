@@ -9,12 +9,11 @@
 // และมีลิงก์จากเมนูกับหน้า dashboard ด้วย แปลว่าผู้เรียนที่สมัครฟรี (D1 เปิดสมัครเสรี)
 // เปิดคลังข้อสอบพร้อมเฉลยได้ทันที · เทสที่มีอยู่ตรวจแค่ผู้ไม่ล็อกอิน จึงเขียวทั้งที่รูเปิด
 //
-// กติกาชั่วคราวจนกว่าจะมี staff authorization จริง: เปิดได้เฉพาะ local development
-// และต้องตั้ง INTERNAL_SURFACES=on อย่างชัดเจน · production ปิดเสมอ แม้ตั้ง env ผิด
-// เพราะ env บอกได้แค่ว่า feature พร้อม ไม่ได้บอกว่าผู้ร้องขอเป็น staff
+// Environment toggle เป็น prerequisite เท่านั้น; ทุก page ใต้ /player ยังต้องตรวจ
+// content-ops/owner จากฐานข้อมูลอีกชั้นก่อนส่ง fixture ไป browser
 
 export function internalSurfacesEnabled(): boolean {
-  return process.env.NODE_ENV !== 'production' && process.env.INTERNAL_SURFACES?.trim() === 'on'
+  return process.env.INTERNAL_SURFACES?.trim() === 'on'
 }
 
 /** เส้นทางที่ถือเป็นพื้นผิวภายใน — ใช้ร่วมกันระหว่าง middleware และหน้าเว็บ */

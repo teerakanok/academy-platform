@@ -39,6 +39,7 @@ const RETENTION_JOBS: PurgeJob[] = [
   { name: 'waitlist', rpc: 'purge_expired_leads', args: { p_retain_years: 3, p_limit: DEFAULT_BATCH } },
   { name: 'accounts', rpc: 'purge_inactive_users', args: { p_inactive_years: 2, p_limit: 500 } },
   { name: 'privacy-requests', rpc: 'purge_expired_privacy_requests', args: { p_retain_years: 3, p_limit: 500 } },
+  { name: 'staff-authorization', rpc: 'purge_expired_staff_authorization_history', args: { p_retain_years: 3, p_limit: 500 } },
 ]
 
 async function runPurgeJob(env: Env, job: PurgeJob): Promise<{ rounds: number; deleted: number }> {

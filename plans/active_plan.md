@@ -41,15 +41,26 @@ Checkpoint 4 ถูก commit/push แล้วที่ `725a705` และ pro
      HEAD/caption/tamper/legacy/expiry proof ผ่าน; tracked `COURSE_MEDIA` binding แล้ว
    - production secret และ Worker deploy ยังไม่ทำ เพราะ deploy ปัจจุบันจะพา code ที่พึ่ง
      migration `0017` ขึ้นไปด้วย; ต้องปิด Pool A migration/release gate ก่อน
-3. **Staff authorization model** — เคาะว่าใครเข้าถึงงานดูแลผู้เรียน/คำขอสิทธิได้
-   ก่อนสร้าง staff/admin surface
+3. **Staff authorization model — local checkpoint ปิดแล้ว 2026-08-04**
+   - founder เป็น staff คนเดียวใน v1 แต่ใช้ roles แยก `owner`, `learner-support`,
+     `privacy-officer`, `content-ops`; owner ถือ capability ทั้งหมด โดย support/privacy
+     เป็น policy labels ที่ยังไม่มี operator workflow ใน checkpoint นี้
+   - migration `0018` บังคับ owner-controlled grant/revoke, append-only audit,
+     browser/runtime-mutation deny, separate control-plane role, active-staff retention
+     hold และ purge ประวัติ grant/revoke หลัง 3 ปี
+   - `/player` ต้องผ่านทั้ง explicit env toggle และ `content-ops`/`owner` ทุก request;
+     ทุก route เป็น force-dynamic เพื่อไม่ cache authorization decision
+   - evidence: clean DB reset, targeted 49/49, full Vitest 481/481, build/lint/typecheck,
+     default boundary E2E 8/8, internal staff E2E 2/2 + clean teardown;
+     independent Code/Security/UX review = C0/H0/M0/L0 ทุก lane
+   - production owner bootstrap ยังรอ Pool A migration/release gate; ไม่มี admin UI ใน v1
 4. **Certificate evidence claim** — เคาะข้อความว่าใบรับรองในอนาคตยืนยันอะไรได้จริง
    ก่อนสร้าง issuance/verification
 5. **Pool A / release verification** — ขอ explicit authorization ใหม่หลัง migrations,
    local tests และ review ครบ; apply migration `0001`–`0016` รวม migration ใหม่จาก
    `0017` ก่อน deploy code ที่พึ่ง schema เหล่านี้
 
-**งานหลักถัดไป:** ข้อ 3 staff authorization model หรือปิด Pool A migration/release gate
+**งานหลักถัดไป:** ข้อ 4 certificate evidence claim แล้วปิด Pool A migration/release gate
 ก่อนตั้ง production media secret และ deploy binding ที่ตรวจแล้ว. Public launch ยังต้องมี distributed edge
 rate limit/log redaction, restricted case-system owner/access configuration และ legal review.
 

@@ -43,8 +43,13 @@ handling requests other than unsubscribe in production.
 
 ## Daily retention check
 
-The scheduled worker must complete all four jobs: attempt 90 days, waitlist 3 years,
-inactive accounts 2 years, and completed privacy-request evidence 3 years. It attempts
+The scheduled worker must complete all five jobs: attempt 90 days, waitlist 3 years,
+inactive accounts 2 years, completed privacy-request evidence 3 years, and revoked
+staff-role/audit history 3 years. It attempts
 every job even when one fails, then reports the combined failure. Investigate each failed
 RPC and rerun only after the cause is understood. Never bypass hold predicates with
 direct bulk deletion.
+
+The procedures in this runbook are backend operations, not proof that the reserved
+`privacy-officer` role has a usable operator workflow. Do not expose these operations in
+a staff surface until that surface enforces `privacy-officer` or `owner` on every request.

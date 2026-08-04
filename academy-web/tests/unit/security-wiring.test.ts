@@ -60,7 +60,7 @@ describe('security boundary wiring', () => {
     expect(source('src/app/api/progress/route.ts')).toContain('consumed.params.assessment.assessed')
   })
 
-  it('scheduled worker บังคับ retention ที่อนุมัติครบทั้งสามหมวด', () => {
+  it('scheduled worker บังคับ retention ที่อนุมัติครบทุกหมวด', () => {
     const worker = source('worker.ts')
     expect(worker).toContain("rpc: 'purge_expired_attempts'")
     expect(worker).toContain('p_retain_days: 90')
@@ -69,5 +69,6 @@ describe('security boundary wiring', () => {
     expect(worker).toContain("rpc: 'purge_inactive_users'")
     expect(worker).toContain('p_inactive_years: 2')
     expect(worker).toContain("rpc: 'purge_expired_privacy_requests'")
+    expect(worker).toContain("rpc: 'purge_expired_staff_authorization_history'")
   })
 })

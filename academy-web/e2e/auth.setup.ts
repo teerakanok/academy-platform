@@ -2,6 +2,7 @@ import { test as setup, expect } from '@playwright/test'
 import { writeFileSync, mkdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { createClient } from '@supabase/supabase-js'
+import { Client } from 'pg'
 
 // สร้าง session ผู้เรียนหนึ่งคนไว้ให้ spec อื่นใช้ร่วมกัน
 //
@@ -87,6 +88,32 @@ setup('เตรียมบัญชีผู้เรียนสำหรั�
     { onConflict: 'user_id,course_slug' },
   )
   if (entitled.error) throw new Error('provision course entitlement สำหรับ E2E ไม่สำเร็จ')
+
+  if (process.env.INTERNAL_SURFACES?.trim() === 'on') {
+    const databaseUrl = process.env.TEST_DATABASE_URL
+    if (!databaseUrl) throw new Error('internal E2E ต้องมี TEST_DATABASE_URL ของ local Supabase')
+    const control = new Client({ connectionString: databaseUrl })
+    await control.connect()
+    try {
+      await control.query('begin')
+      const fixture = await control.query(
+        `insert into academy.users(issuer, subject, email)
+         values ('https://e2e-staff-control.invalid', 'owner', 'owner@e2e.invalid')
+         on conflict (issuer, subject) do update set last_seen_at = now()
+         returning id`,
+      )
+      const ownerId = fixture.rows[0].id
+      await control.query('set local role academy_staff_admin')
+      await control.query(`select academy.set_staff_role($1, $1, 'owner', true, 'E2E-STAFF-BOOTSTRAP')`, [ownerId])
+      await control.query(`select academy.set_staff_role($1, $2, 'content-ops', true, 'E2E-STAFF-CONTENT')`, [ownerId, account.data.id])
+      await control.query('commit')
+    } catch (error) {
+      await control.query('rollback').catch(() => undefined)
+      throw error
+    } finally {
+      await control.end()
+    }
+  }
 
   // Fixture ด้านล่างนี้มีไว้ทดสอบ learner surfaces ที่อยู่หลัง control plane เท่านั้น
   // ก่อน control plane production พร้อม พื้นผิวจริงด้านบนต้องปิดอย่าง truthful เสมอ

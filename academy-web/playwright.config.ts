@@ -15,6 +15,7 @@ export default defineConfig({
   workers: 1,
   retries: 0,
   reporter: [['list']],
+  globalTeardown: './e2e/global.teardown.ts',
   use: {
     baseURL: 'http://127.0.0.1:3000',
     // APIRequestContext ไม่ได้สร้าง Origin ให้เหมือน browser fetch เอง แต่ production

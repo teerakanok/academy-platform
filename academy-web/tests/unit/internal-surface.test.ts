@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { internalSurfacesEnabled, isInternalSurface } from '@/lib/internal-surface'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 
 // นโยบายพื้นผิวภายในต้อง **ปิดก่อนเสมอ** — เปิดได้ด้วยค่าที่ตั้งใจตั้งเท่านั้น
 //
@@ -31,10 +33,10 @@ describe('internalSurfacesEnabled', () => {
     expect(internalSurfacesEnabled()).toBe(true)
   })
 
-  it('production เปิดไม่ได้จนกว่าจะมี staff authorization จริง', () => {
+  it('production toggle เปิดได้ แต่ page ยังต้องตรวจ staff authorization', () => {
     vi.stubEnv('INTERNAL_SURFACES', 'on')
     vi.stubEnv('NODE_ENV', 'production')
-    expect(internalSurfacesEnabled()).toBe(false)
+    expect(internalSurfacesEnabled()).toBe(true)
   })
 })
 
@@ -47,6 +49,17 @@ describe('isInternalSurface', () => {
     '%s = ไม่ใช่ภายใน (ห้ามกันเส้นทางปกติโดยไม่ตั้งใจ)',
     (path) => {
       expect(isInternalSurface(path)).toBe(false)
+    },
+  )
+})
+
+describe('player route authorization wiring', () => {
+  it.each(['src/app/player/page.tsx', 'src/app/player/module/[slug]/page.tsx', 'src/app/player/exam/[id]/page.tsx'])(
+    '%s ตรวจ staff ทุก request และห้ามถูก prerender',
+    (path) => {
+      const source = readFileSync(join(process.cwd(), path), 'utf8')
+      expect(source).toContain("export const dynamic = 'force-dynamic'")
+      expect(source).toContain('await requireInternalContentStaff()')
     },
   )
 })

@@ -3,11 +3,14 @@ import { privatePage } from '@/lib/seo'
 import Link from 'next/link'
 import { getCourseContent } from '@/lib/content/source'
 import { PlayerHub } from '@/components/player/PlayerHub'
+import { requireInternalContentStaff } from '@/lib/staff/authorization'
 
 export const metadata: Metadata = privatePage('Course Player (dev)')
+export const dynamic = 'force-dynamic'
 
 // Internal dev player — เสพ fixture ผ่าน loader เท่านั้น (content-agnostic engine)
-export default function PlayerPage() {
+export default async function PlayerPage() {
+  await requireInternalContentStaff()
   const content = getCourseContent()
   return (
     <div className="mx-auto max-w-4xl px-6 py-12">

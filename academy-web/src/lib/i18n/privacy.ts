@@ -76,11 +76,15 @@ const th: PrivacyDoc = {
         },
         {
           term: 'บัญชีและประวัติการเรียน',
-          text: '2 ปีหลังใช้งาน Academy ครั้งล่าสุด เว้นแต่คุณขอลบก่อน หรือมีการอุทธรณ์ที่ยังไม่ปิดหรือเหตุจำเป็นตามกฎหมาย',
+          text: '2 ปีหลังใช้งาน Academy ครั้งล่าสุด เว้นแต่คุณขอลบก่อน มีการอุทธรณ์ที่ยังไม่ปิด มีหน้าที่ดูแลระบบที่ยังใช้งานอยู่ หรือมีเหตุจำเป็นตามกฎหมาย',
         },
         {
           term: 'หลักฐานความยินยอมและคำขอใช้สิทธิ',
           text: '3 ปีหลังเหตุการณ์ล่าสุด เพื่อพิสูจน์ว่าเราได้รับและดำเนินการตามคำขออย่างไร',
+        },
+        {
+          term: 'ประวัติสิทธิ์ผู้ดูแลระบบ',
+          text: 'สิทธิ์และประวัติที่เกี่ยวข้องจะเก็บไว้ตราบที่สิทธิ์นั้นยังใช้งาน หลังถอนสิทธิ์แล้วจะเก็บรายการและประวัติอีก 3 ปีเพื่อความปลอดภัยและตรวจสอบย้อนหลัง',
         },
       ],
     },
@@ -176,11 +180,15 @@ const en: PrivacyDoc = {
         },
         {
           term: 'Account and learning record',
-          text: 'two years after your last Academy activity, unless you ask us to delete it earlier or an unresolved appeal or law requires a hold.',
+          text: 'two years after your last Academy activity, unless you ask us to delete it earlier, an appeal remains unresolved, an active system responsibility requires the account, or law requires a hold.',
         },
         {
           term: 'Consent and rights-request evidence',
           text: 'three years after the latest event so we can show what was requested and how it was handled.',
+        },
+        {
+          term: 'Staff access history',
+          text: 'access and its related history are kept while that access remains active; after revocation, the assignment and history are kept for three years for security and accountability.',
         },
       ],
     },
