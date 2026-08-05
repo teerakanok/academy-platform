@@ -9,6 +9,9 @@
 Academy runtime data boundary ทำงานแล้วโดยใช้ dedicated Academy credential;
 Worker ไม่มีและห้ามเพิ่ม shared Pool A `SUPABASE_SERVICE_ROLE_KEY`.
 
+- Identity Control ยังอยู่ที่ Gate 3 founder policy checkpoint; จนกว่าจะอนุมัติ
+  production configuration ของ account runtime ห้ามเปิด Academy sign-in หรือผูก
+  endpoint production เอง.
 - ยืนยัน configuration ของ single-account runtime ก่อนเปิด build ที่มี
   `NEXT_PUBLIC_SUPABASE_*`; deployment ต้องพิสูจน์ว่า sign-in ใช้ issuer ที่อนุมัติ
   และ session cookie เป็น HTTPS จริง.
