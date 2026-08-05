@@ -33,3 +33,21 @@ without turning all traffic into one coordination bottleneck.
 
 The source change alone does not create a Cloudflare resource or change the
 currently deployed Worker.
+
+## Production Rollout — 2026-08-06
+
+`RATE_LIMIT_KEY_SECRET` was generated through standard input without recording
+its value, then the Academy Worker was deployed as version
+`b85b7a6d-ceaa-4708-81fd-0d8096462251`. The production proof used eleven
+invalid JSON lead requests, so it sent neither an email nor a database mutation:
+the first ten returned `400`, and the eleventh returned `429` with
+`Retry-After: 53`.
+
+The first upload version, `7426e155-5d1c-4b12-996c-419db1d8deb6`, was not
+accepted as evidence: Wrangler auto-detected OpenNext and deployed its inner
+worker, which omitted the exported Durable Object class and caused intermittent
+`503`. A rollback was correctly rejected because migration
+`v1-edge-rate-limiter` had already been applied. The forward deployment used
+the configured `worker.ts` entrypoint with `--autoconfig=false`, restoring the
+expected limiter behavior. `deploy:cf` includes that flag permanently; do not
+deploy this project with bare `wrangler deploy`.

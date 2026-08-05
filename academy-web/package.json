@@ -17,7 +17,7 @@
     "test:e2e": "playwright test",
     "test:e2e:fast": "playwright test --grep-invert @full-acceptance",
     "build:cf": "NEXT_PUBLIC_SUPABASE_URL= NEXT_PUBLIC_SUPABASE_ANON_KEY= opennextjs-cloudflare build",
-    "deploy:cf": "npm run build:cf && wrangler deploy"
+    "deploy:cf": "npm run build:cf && wrangler deploy --autoconfig=false --keep-vars"
   },
   "dependencies": {
     "@cyberskills/tokens": "file:packages/tokens",

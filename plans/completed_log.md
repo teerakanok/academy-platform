@@ -5,6 +5,36 @@
 
 ---
 
+## 2026-08-06 — Edge rate limit deployed and production-verified
+
+**Outcome:** public lead and future auth mutations are limited by a Durable Object
+per opaque actor-route pair before OpenNext. `RATE_LIMIT_KEY_SECRET` was created
+through standard input without recording its value. Academy Worker version
+`b85b7a6d-ceaa-4708-81fd-0d8096462251` is active with the binding and migration
+`v1-edge-rate-limiter`.
+
+**Verification:** eleven invalid `POST /api/leads` requests, with no email or
+database mutation, returned `400` ten times then `429` with `Retry-After: 53`.
+An invalid `POST /api/auth/verify` returned `400`; Worker tail recorded the
+invocation as `Ok`. Public `/`, `/courses`, and `/sign-in` returned `200`; a
+legacy media path returned `404`.
+
+**Deployment correction:** the first upload,
+`7426e155-5d1c-4b12-996c-419db1d8deb6`, was not accepted as evidence because
+Wrangler auto-detected OpenNext and deployed its inner worker without the Durable
+Object class, causing intermittent `503`. Cloudflare correctly rejected rollback
+after the migration was applied. A forward deployment using
+`--autoconfig=false` restored the configured `worker.ts` entrypoint. `deploy:cf`
+now permanently includes `--autoconfig=false --keep-vars`.
+
+**Residual risk:** privacy/media/account-runtime public-launch gates remain
+separate; any future deployment must retain the guarded deploy command and rerun
+the bounded `429` proof.
+
+**Evidence:** `academy-web/docs/edge-rate-limit.md`.
+
+---
+
 ## 2026-08-06 — Dedicated Academy retention scheduler deployed
 
 **Outcome:** งาน retention แยกออกจาก Academy runtime Worker แล้ว. Dedicated
