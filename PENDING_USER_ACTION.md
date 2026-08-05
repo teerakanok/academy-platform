@@ -37,8 +37,6 @@ runtime deployment อยู่ใน
 
 source และ Worker version ปัจจุบัน deploy แล้ว แต่ proof ต่อไปต้องใช้ session จริง:
 
-- unsubscribe link ต้องใช้ URL fragment และต้องตรวจ edge/request logs ว่าไม่มี bearer
-  token ใน URL;
 - private-media delivery ต้องมี clean URL, cookie issuance/renewal, video range,
   captions และ PDF proof บน environment จริง;
 - ทบทวนก่อน public launch ว่า CAS-005 fixture ยังคง INTERNAL ONLY และ `/player`

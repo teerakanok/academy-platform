@@ -5,6 +5,24 @@
 
 ---
 
+## 2026-08-06 — Unsubscribe URL bearer redaction deployed and verified
+
+**Outcome:** unsubscribe tokens are carried only in the URL fragment. The browser
+reads the token once, removes the fragment from history, and sends it only in the
+POST body; the initial HTTP request has no bearer token in its URL.
+
+**Verification:** a deployed-browser request to
+`/unsubscribe?lang=th#not-a-token` was intercepted as exactly
+`/unsubscribe?lang=th`. Worker tail recorded the same clean URL twice with
+invocation status `Ok`. No real recipient or unsubscribe token was used for the
+proof. Unit and static security wiring tests cover fragment parsing, history
+replacement, and the absence of query-token links.
+
+**Residual risk:** account and private-media activation remain separate launch
+gates; this evidence proves URL/log redaction, not delivery of a marketing email.
+
+---
+
 ## 2026-08-06 — Edge rate limit deployed and production-verified
 
 **Outcome:** public lead and future auth mutations are limited by a Durable Object

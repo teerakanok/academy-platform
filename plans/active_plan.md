@@ -35,9 +35,6 @@ anonymous, forged `service_role`, และ cross-schema ถูกปฏิเ�
    - หลักฐาน deployment/rollback อยู่ใน
      [`reports/academy-retention-api-rollout-2026-08-06.md`](../reports/academy-retention-api-rollout-2026-08-06.md)
 3. **ปิด public-launch gates ที่เหลือ**
-   - log redaction: unsubscribe bearer token ย้ายจาก query ไป URL fragment แล้ว
-     จึงไม่ถึง initial edge request; หลัง deploy ต้องตรวจ Worker/edge log ว่าไม่มี
-     token ใน request URL ก่อนถือว่า launch gate ปิด
    - private media: delivery grant ย้ายจาก URL ไป `HttpOnly` path-scoped cookie แล้ว;
      source test/build/dry-run ผ่าน แต่หลัง deploy ต้องตรวจ clean media URL, cookie
      renewal, video range/captions/PDF และ edge log ก่อนถือว่า gate ปิด
