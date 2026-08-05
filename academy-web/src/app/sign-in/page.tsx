@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import React from 'react'
 import { SignInForm } from '@/components/auth/SignInForm'
 import { accountsEnabled } from '@/lib/auth/enabled'
 import { safeNextPath } from '@/lib/auth/route-client'
@@ -21,6 +22,7 @@ export default async function SignInPage({
 }) {
   const { next, notice } = await searchParams
   const target = safeNextPath(next)
+  const accountAccessOpen = accountsEnabled()
 
   return (
     <div className="mx-auto max-w-lg px-6 py-16">
@@ -46,7 +48,7 @@ export default async function SignInPage({
         </p>
       </div>
 
-      {accountsEnabled() ? (
+      {accountAccessOpen ? (
         <SignInForm next={target} />
       ) : (
         <div className="card-feature p-6 sm:p-8" data-testid="accounts-not-open">
@@ -65,15 +67,17 @@ export default async function SignInPage({
         </Link>{' '}
         without an account.
       </p>
-      <p className="mx-auto mt-3 max-w-sm text-center text-xs text-cs-muted">
-        By continuing you agree to how we handle your data.{' '}
-        <Link
-          href="/privacy"
-          className="whitespace-nowrap underline underline-offset-4 hover:text-cs-accent"
-        >
-          นโยบายความเป็นส่วนตัว (Privacy)
-        </Link>
-      </p>
+      {accountAccessOpen && (
+        <p className="mx-auto mt-3 max-w-sm text-center text-xs text-cs-muted">
+          By continuing you agree to how we handle your data.{' '}
+          <Link
+            href="/privacy"
+            className="whitespace-nowrap underline underline-offset-4 hover:text-cs-accent"
+          >
+            นโยบายความเป็นส่วนตัว (Privacy)
+          </Link>
+        </p>
+      )}
     </div>
   )
 }

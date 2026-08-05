@@ -53,6 +53,9 @@ test.describe('landing', () => {
     await page.context().clearCookies()
     await page.goto('/sign-in')
     await expect(page.getByText('Your CYBERSKILLS account keeps your Academy learning record with you across devices.')).toBeVisible()
+    await expect(page.getByTestId('accounts-not-open')).toBeVisible()
+    await expect(page.getByTestId('sign-in-card')).toHaveCount(0)
+    await expect(page.getByText('By continuing you agree to how we handle your data.')).toHaveCount(0)
     await expect(page.getByText(/certifications we issue|everything we run/i)).toHaveCount(0)
   })
 

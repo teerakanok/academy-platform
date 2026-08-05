@@ -20,8 +20,8 @@ anonymous, forged `service_role`, และ cross-schema ถูกปฏิเ�
 
 1. **เปิด auth/runtime และ bootstrap owner จาก stable identity จริง**
    - build ปัจจุบันตั้งใจปิด `NEXT_PUBLIC_SUPABASE_*`; หน้า sign-in แจ้งว่า account ยังไม่เปิด
-   - owner: Academy frontend; ก่อนเปิด account ให้ซ่อนหรือปรับ “By continuing…” ใน
-     closed state ซึ่งปัจจุบันไม่มี continue action แล้ว verify ด้วย closed-state E2E/visual
+   - Academy frontend: closed state ซ่อน “By continuing…” แล้ว เพราะยังไม่มี
+     continue action; page-level unit test และ production-built HTTP proof ผ่าน
    - founder ต้อง sign in หนึ่งครั้งหลัง runtime พร้อม เพื่อสร้าง `academy.users` จาก
      `(issuer, subject)`; จากนั้น dry-run/apply `scripts/manage-staff-role.mjs`
    - ปัจจุบัน `academy.users=0`, active owner `=0`; ห้ามสร้าง UUID หรือใช้ email แทน identity
