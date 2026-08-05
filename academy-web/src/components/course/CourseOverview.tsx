@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { CourseCopy, CourseStructure, Locale } from '@/lib/content/course-types'
 import { isEmptyCourseProgress, toLearnerState, type CourseProgressRecord } from '@/lib/course/progress'
 import { fetchProgress } from '@/lib/course/progress-client'
+import { CERTIFICATE_COMPLETE_PREVIEW, CERTIFICATE_INCOMPLETE_PREVIEW } from '@/lib/course/certificate-claim'
 import { courseRecordSummary } from '@/lib/course/roadmap'
 import { EMPTY_STATE, nextNode, summarise } from '@/lib/course/roadmap'
 import { courseSkillData } from '@/lib/course/skills'
@@ -267,7 +268,7 @@ export function CourseOverview({
               </p>
             )}
             <p className="mt-2 max-w-2xl text-xs text-cs-muted" data-testid="certificate-availability-note">
-              Certificate issuance and verification are planned for a later release.
+              {recordSummary.recordComplete ? CERTIFICATE_COMPLETE_PREVIEW : CERTIFICATE_INCOMPLETE_PREVIEW}
             </p>
             <p className="mt-2 max-w-2xl text-xs text-cs-muted" data-testid="certificate-progress-note">
               Lessons finished: {recordSummary.lessonsFinished} / {recordSummary.total}

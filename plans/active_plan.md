@@ -2,7 +2,7 @@
 
 > Open work only. Move closed items to `completed_log.md` with evidence.
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
-> **Last updated:** 2026-08-04
+> **Last updated:** 2026-08-05
 
 ## Current execution lane — owner decisions before production
 
@@ -54,13 +54,17 @@ Checkpoint 4 ถูก commit/push แล้วที่ `725a705` และ pro
      default boundary E2E 8/8, internal staff E2E 2/2 + clean teardown;
      independent Code/Security/UX review = C0/H0/M0/L0 ทุก lane
    - production owner bootstrap ยังรอ Pool A migration/release gate; ไม่มี admin UI ใน v1
-4. **Certificate evidence claim** — เคาะข้อความว่าใบรับรองในอนาคตยืนยันอะไรได้จริง
-   ก่อนสร้าง issuance/verification
+4. **Certificate evidence claim — ปิดแล้ว 2026-08-05**
+   - canonical title: `Certificate of Course Completion: [Course]`
+   - claim: completed all course requirements and passed every required assessed checkpoint
+   - disclaimer: this is not a professional certification
+   - ห้ามอ้าง mastery, job readiness, skill certification หรือ hands-on performance
+     จนกว่าจะมี competency framework และหลักฐานที่รองรับจริง
 5. **Pool A / release verification** — ขอ explicit authorization ใหม่หลัง migrations,
    local tests และ review ครบ; apply migration `0001`–`0016` รวม migration ใหม่จาก
    `0017` ก่อน deploy code ที่พึ่ง schema เหล่านี้
 
-**งานหลักถัดไป:** ข้อ 4 certificate evidence claim แล้วปิด Pool A migration/release gate
+**งานหลักถัดไป:** ปิด Pool A migration/release gate
 ก่อนตั้ง production media secret และ deploy binding ที่ตรวจแล้ว. Public launch ยังต้องมี distributed edge
 rate limit/log redaction, restricted case-system owner/access configuration และ legal review.
 
@@ -235,7 +239,7 @@ R2 bucket สำหรับย้าย media · และอนุญาต de
 - เขียน simulation ลง capstone จริง 1 จุด (static IP ให้ print server, 5 requirements)
 - chain: vitest **288** · playwright **100 + 10 skipped**
 
-**ข้อจำกัดที่รู้อยู่และต้องปิดใน W4:** `certificateEligibility` ตัดสินจากสถานะอย่างเดียว
+**ข้อจำกัดที่รู้อยู่และต้องปิดใน W4:** `courseRecordSummary` ตัดสินจากสถานะอย่างเดียว
 ยังไม่อ่าน `simulationEvidence` — ถ้าเนื้อหาเพิ่มด่านใหม่เข้า capstone ที่ผ่านไปแล้ว
 สถานะจะยัง completed ทั้งที่หลักฐานของด่านใหม่ยังไม่มี · W4 ต้องอ่านหลักฐานจริงประกอบ
 เพราะใบรับรอง snapshot หลักฐาน ณ วันออก ไม่ใช่สถานะปัจจุบัน (บันทึกในโค้ดแล้ว)
@@ -345,7 +349,7 @@ UI เรนเดอร์จากไฟล์ (key จริง) และ `/
   ⚠️ เกณฑ์ "ผิดไม่เกิน 1" ตามที่แผนล็อกไว้ใช้ตรงๆ ไม่ได้ เพราะคอร์สจริงมีบทที่มี
   checkpoint 1–2 ข้อ ซึ่งจะกลายเป็น "ผ่านโดยไม่ต้องตอบถูกสักข้อ" (เทส e2e จับได้
   ตั้งแต่รันครั้งแรก) — founder เปลี่ยนตัวเลขได้ที่ `LEARN_MODE_ALLOWED_WRONG`
-- `certificateEligibility` แยกสองชั้นที่ต้องผ่านทั้งคู่ (เดินครบทุกบท **และ** ทุก
+- `courseRecordSummary` แยกสองชั้นที่ต้องผ่านทั้งคู่ (เดินครบทุกบท **และ** ทุก
   capstone ผ่าน) · คอร์สที่ไม่มี capstone ออกใบไม่ได้ → `courseIssue: 'no-assessment'`
   แยกจาก `blocking` เพราะ UI ทำ blocking เป็นลิงก์ไปหน้าบทเรียน
 - คำว่า **proven สงวนให้ด่านวัดผลเท่านั้น** ทั้ง codebase — rename `provenCount`→
@@ -434,10 +438,14 @@ validation ต่อ course เป็นรอบ pitch + poll ของ founder
 
 - [ ] **M3.5 — Certificate of completion** (founder เพิ่ม 2026-08-01: Academy ต้อง
   ออกใบรับรองเมื่อเรียนจบคอร์ส)
-  - ✅ **กติกาความหมายของ "จบ" ทำแล้ว** — `certificateEligibility()` ใน
-    `src/lib/course/roadmap.ts` + แสดงบนหน้าคอร์ส: ทุก node ต้องพิสูจน์แล้ว
-    (completed หรือ tested-out) การข้ามกั้นใบไว้แต่ไม่ปิดประตู กลับมาพิสูจน์
-    เมื่อไหร่ก็ได้ — เพราะถ้าข้ามครึ่งคอร์สแล้วยังได้ใบ ใบนั้นก็ไม่ได้บอกอะไรกับใคร
+  - ✅ **claim ล็อกแล้ว 2026-08-05** — `Certificate of Course Completion`; เรียนครบ
+    ทุก requirement และผ่าน required assessed checkpoint ทุกด่าน; ระบุชัดว่าไม่ใช่
+    professional certification
+  - ✅ **กติกา course record สองชั้นทำแล้ว** — `courseRecordSummary()` ใน
+    `src/lib/course/roadmap.ts`: บททั่วไปต้องทำครบในฐานะความคืบหน้า และ capstone
+    ทุกจุดต้องผ่านในฐานะ assessed evidence; การข้ามกั้น record แต่กลับมาทำได้
+  - [ ] **W4 ต้องตัดสินจากหลักฐานจริง** — ห้ามออกใบจาก progress status อย่างเดียว;
+    ต้องตรวจและ snapshot passing attempt/simulation evidence + course version
   - [ ] **ต้องมี account ก่อน** (ขึ้นกับ M3) — ใบรับรองเอ่ยชื่อคน จึงออกให้คนที่
     ไม่มีตัวตนไม่ได้ ข้อนี้ยืนยันการตัดสินใจบังคับสมัครของ founder อีกทาง
   - [ ] **ชื่อบนใบ** — ต้องมีฟิลด์ชื่อจริงตอนสมัคร (email อย่างเดียวไม่พอ) และ
@@ -598,8 +606,9 @@ Academy เองเป็นงานที่จะถูกทิ้ง ค�
 >
 > **ผลต่อลำดับงาน: "รอยต่อที่ยังไม่เชื่อม" มีค่ากว่า "ชิ้นส่วนใหม่"**
 >
-> รอยต่อที่เชื่อมแล้ว: **checkpoint → ใบรับรอง → แผนที่ทักษะ** (W0-3 · ใบรับรอง
-> อ้างถึง capstone เท่านั้น)
+> รอยต่อที่เชื่อมแล้ว: **checkpoint → course-record gate → แผนที่ความครอบคลุม**
+> (W0-3 · ยังไม่ใช่ certificate issuance หรือ skill mastery; W4 ต้อง snapshot
+> หลักฐานจริงก่อนออกใบ)
 > ⚠️ **คำถามกลางวิดีโอไม่ใช่รอยต่อของแกนหลักฐาน** — มันเป็น *formative* คือมีไว้ให้
 > ผู้เรียนตื่นตัวและจับว่าตัวเองเข้าใจผิดตรงไหน ผลถูกบันทึกไว้ใช้ปรับปรุงเนื้อหา
 > แต่ไม่ถูกใช้ตัดสินสถานะใดๆ (W0-4 ล็อก) — ถ้าทำให้เป็นด่านจะกลายเป็นการบังคับ

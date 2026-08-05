@@ -1,0 +1,32 @@
+{
+  "call": "ใช้ Certificate of Course Completion โดยระบุว่าเรียนครบและผ่านด่านวัดผลที่บังคับทุกด่าน พร้อมบอกชัดว่าไม่ใช่ใบรับรองวิชาชีพ",
+  "why": "ข้อความนี้มีน้ำหนักกว่าการรับรองว่าเรียนจบเฉย ๆ แต่ไม่อ้างว่าผู้เรียนเชี่ยวชาญหรือพร้อมทำงานเกินหลักฐานที่ระบบมี; ข้อแลกเปลี่ยนคือชื่อใบอาจดูไม่หวือหวา และยังออกจริงไม่ได้จนกว่าจะทำ snapshot หลักฐานกับหน้าตรวจสอบใน W4 เสร็จ",
+  "alternatives": [
+    {
+      "option": "Skills หรือ Mastery Certificate",
+      "winsWhen": "มีกรอบสมรรถนะ ระดับผลงาน และหลักฐานการปฏิบัติจริงที่ตรวจสอบได้ครบ ไม่ใช่เพียงคำตอบหรือสถานะปลายทาง"
+    },
+    {
+      "option": "Certificate of Completion แบบไม่กล่าวถึงด่านวัดผล",
+      "winsWhen": "ต้องการรับรองเพียงการเรียนจบหรือการเข้าร่วม และไม่ได้ใช้ผลด่านบังคับเพิ่มน้ำหนักให้ใบ"
+    }
+  ],
+  "groundedIn": {
+    "currentState": "ตรวจ CourseOverview.tsx, roadmap.ts, certificate.test.ts, migration หลักฐาน attempt/progress และแผน W4 ใน session วันที่ 2026-08-05; ระบบแยกความคืบหน้าจากด่านวัดผลแล้ว แต่ยังไม่มี issuance snapshot หรือ public verification และ simulation ยังไม่พิสูจน์การลงมือใน lab จริง",
+    "externalSource": "ตรวจ 1EdTech Open Badges 3.0 https://www.1edtech.org/standards/open-badges ซึ่งแยก defined achievement จาก skill claim และ Credential Engine https://guidance.credentialengine.org/credential-data-types/ ซึ่งนิยาม Certificate of Completion แยกจาก credential ที่อ้างทักษะหรือสมรรถนะ"
+  },
+  "jargonGlossed": [
+    {
+      "term": "Skills หรือ Mastery Certificate",
+      "plain": "ใบที่อ้างว่าผู้ถือมีทักษะหรือเชี่ยวชาญแล้ว ไม่ใช่เพียงเรียนจบ"
+    },
+    {
+      "term": "snapshot",
+      "plain": "สำเนาหลักฐานที่แช่แข็งไว้ ณ วันที่ออกใบ เพื่อไม่ให้ความหมายเปลี่ยนตามคอร์สรุ่นใหม่"
+    },
+    {
+      "term": "W4",
+      "plain": "งานส่วนออกใบและสร้างหน้าตรวจสอบสาธารณะตามแผน Academy"
+    }
+  ]
+}

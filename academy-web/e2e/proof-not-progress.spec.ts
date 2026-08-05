@@ -128,8 +128,9 @@ test.describe('completed คือความคืบหน้า ไม่ใ
     await expect(card).toHaveAttribute('data-record-complete', 'true')
     await expect(page.getByTestId('certificate-assessed-count')).toContainText('1 / 1')
     await expect(card).toContainText('Course record complete')
-    await expect(card).toContainText('Certificate issuance and verification are planned for a later release.')
-    await expect(card).not.toContainText(/earned|certificate of completion/i)
+    await expect(card).toContainText('A shareable Certificate of Course Completion with public verification is planned for a later release.')
+    await expect(card).toContainText('it is separate from a professional certification.')
+    await expect(card).not.toContainText(/earned|issued|mastery|job.ready/i)
   })
 
   test('🔴 ผ่าน capstone แล้วแต่บทปกติยังค้าง → record ต้องยังไม่ครบ', async ({ page, request }) => {

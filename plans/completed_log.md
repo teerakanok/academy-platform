@@ -5,6 +5,29 @@
 
 ---
 
+## 2026-08-05 — Certificate evidence claim approved
+
+**Outcome:** Academy จะออก `Certificate of Course Completion: [Course]` โดยยืนยัน
+เฉพาะว่าผู้เรียนทำ course requirements ครบและผ่าน required assessed checkpoints ทุกด่าน
+พร้อมระบุชัดว่าไม่ใช่ professional certification
+
+**Evidence:** independent learner, hiring-manager, enterprise-learning และ
+digital-credential personas เลือก claim นี้เป็นอันดับหนึ่งทั้งหมด (4–5/5); ตรวจ current
+progress/attempt/evidence implementation และเทียบ 1EdTech Open Badges 3.0 กับ Credential
+Engine credential taxonomy; decision brief validator ผ่าน
+
+**Implementation verification:** canonical title/claim/disclaimer + state-specific preview
+constants ถูกใช้บน course record surface; targeted claim/course/i18n 19/19, full Vitest
+483/483, production build, lint/typecheck (warning generated registry เดิม 1 จุด), targeted
+course-record E2E 2/2; independent Code/Security/UX review C0/H0/M0/L0 และ
+reader-first PASS
+
+**Residual risk:** ยังออกใบไม่ได้จนกว่า W4 จะตรวจหลักฐานจริง, snapshot course/evidence
+version, สร้าง idempotent issuance/status และเปิด privacy-controlled verification;
+simulation ปัจจุบันไม่พิสูจน์ observed hands-on performance
+
+---
+
 ## 2026-08-03 — Learner-Safety checkpoint 4: truthful learner copy + versioned consent
 
 **Outcome:** learner-facing surfaces พูดตรงกับ capability ปัจจุบัน: progress มาจาก
