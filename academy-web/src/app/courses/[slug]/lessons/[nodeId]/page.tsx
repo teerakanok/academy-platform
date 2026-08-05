@@ -54,7 +54,6 @@ export default async function LessonPage({
   const authorizedMedia = await resolveAuthorizedLessonMedia(node, publicLesson, {
     courseSlug: slug,
     nodeId,
-    secret: mediaSecret,
   })
 
   return (

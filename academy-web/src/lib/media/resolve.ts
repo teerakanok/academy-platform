@@ -1,17 +1,13 @@
 import type { CourseNode } from '@/lib/content/course-types'
 import type { PublicLesson, PublicLessonBlock } from '@/lib/content/public-lesson'
-import { issueMediaGrant } from './grant'
+import { mediaDeliveryPath } from './cookie'
 import { privateMediaByLegacyPath } from './registry'
 
 const PRIVATE_EXTENSION = /\.(?:mp4|vtt|pdf|zip)$/i
-export const DELIVERY_GRANT_TTL_SECONDS = 5 * 60
 
 interface MediaContext {
   courseSlug: string
   nodeId: string
-  secret: string
-  nowSeconds?: number
-  ttlSeconds?: number
 }
 
 async function resolveReference(reference: string, context: MediaContext): Promise<string> {
@@ -25,19 +21,7 @@ async function resolveReference(reference: string, context: MediaContext): Promi
   if (asset.courseSlug !== context.courseSlug || asset.nodeId !== context.nodeId) {
     throw new Error(`private media ownership mismatch: ${reference}`)
   }
-  const now = context.nowSeconds ?? Math.floor(Date.now() / 1000)
-  const ttl = context.ttlSeconds ?? DELIVERY_GRANT_TTL_SECONDS
-  if (!Number.isSafeInteger(ttl) || ttl < 60 || ttl > 60 * 60) throw new Error('invalid media grant TTL')
-  const token = await issueMediaGrant(
-    {
-      assetId: asset.id,
-      courseSlug: context.courseSlug,
-      nodeId: context.nodeId,
-      expiresAt: now + ttl,
-    },
-    context.secret,
-  )
-  return `/api/media/open?token=${encodeURIComponent(token)}`
+  return mediaDeliveryPath(asset.id)
 }
 
 export async function resolveAuthorizedLessonMedia(

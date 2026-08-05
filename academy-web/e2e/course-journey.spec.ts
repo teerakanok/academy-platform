@@ -16,7 +16,7 @@ const COURSE = '/courses/basic-os-linux'
 const ARTIFACT_DIR = join(__dirname, '..', '..', 'artifacts', 'oneshot-2026-07-31', 'course')
 
 test.describe('learner journey through a course', () => {
-  test('video load failure gives a learner-facing retry that reopens media authorization', async ({ page }) => {
+  test('video load failure gives a learner-facing retry that reloads the protected media path', async ({ page }) => {
     await page.goto(`${COURSE}/lessons/os-what-it-does`)
     await page.getByTestId('lesson-video').evaluate((video: HTMLVideoElement) => {
       video.currentTime = 7
@@ -26,7 +26,7 @@ test.describe('learner journey through a course', () => {
     await expect(alert).toBeVisible()
     const reopened = page.waitForResponse(
       (response) =>
-        response.url().includes('/api/media/open') &&
+        response.url().includes('/course-media/os-video-en') &&
         response.url().includes('retry=') &&
         response.status() < 400,
     )

@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { issueMediaGrant } from '@/lib/media/grant'
+import { MEDIA_DELIVERY_COOKIE } from '@/lib/media/cookie'
 import { PRIVATE_MEDIA_ASSETS } from '@/lib/media/registry'
 import { servePrivateMedia } from '@/lib/media/worker-delivery'
 
@@ -54,7 +55,9 @@ describe('private media Worker delivery', () => {
     // Remote R2 may expose a full-object range shape even without a Range request.
     const media = bucket('PDF', { offset: 0, length: 3 }, 3)
     const response = await servePrivateMedia(
-      new Request(`https://academy.test/course-media/${await token()}`),
+      new Request('https://academy.test/course-media/formats-handout', {
+        headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${await token()}` },
+      }),
       { MEDIA_SIGNING_SECRET: SECRET, COURSE_MEDIA: media },
     )
     expect(response?.status).toBe(200)
@@ -67,34 +70,37 @@ describe('private media Worker delivery', () => {
     )
   })
 
-  it('rejects tampered, ownership-mismatched, and missing grants before R2', async () => {
+  it('forwards missing, tampered, and ownership-mismatched grants to the authorization route before R2', async () => {
     const media = bucket()
     const valid = await token()
     const mismatched = await token({ nodeId: 'wrong-node' })
-    for (const candidate of [`${valid}x`, mismatched, 'not-a-token']) {
-      const response = await servePrivateMedia(new Request(`https://academy.test/course-media/${candidate}`), {
+    for (const candidate of [`${valid}x`, mismatched, 'not-a-token', null]) {
+      const response = await servePrivateMedia(new Request('https://academy.test/course-media/formats-handout', {
+        headers: candidate ? { cookie: `${MEDIA_DELIVERY_COOKIE}=${candidate}` } : undefined,
+      }), {
         MEDIA_SIGNING_SECRET: SECRET,
         COURSE_MEDIA: media,
       })
-      expect(response?.status).toBe(404)
+      expect(response).toBeNull()
     }
     expect(media.get).not.toHaveBeenCalled()
   })
 
-  it('sends an expired signed delivery grant through authenticated renewal without reading R2', async () => {
+  it('forwards an expired delivery cookie through authenticated renewal without reading R2', async () => {
     const media = bucket()
     const expired = await token({ expiresAt: 1 })
-    const response = await servePrivateMedia(new Request(`https://academy.test/course-media/${expired}`), {
+    const response = await servePrivateMedia(new Request('https://academy.test/course-media/formats-handout', {
+      headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${expired}` },
+    }), {
       MEDIA_SIGNING_SECRET: SECRET,
       COURSE_MEDIA: media,
     })
-    expect(response?.status).toBe(307)
-    expect(response?.headers.get('location')).toBe(`/api/media/open?token=${encodeURIComponent(expired)}`)
+    expect(response).toBeNull()
     expect(media.get).not.toHaveBeenCalled()
   })
 
   it('fails closed when the private binding or signing secret is absent', async () => {
-    const response = await servePrivateMedia(new Request(`https://academy.test/course-media/${await token()}`), {})
+    const response = await servePrivateMedia(new Request('https://academy.test/course-media/formats-handout'), {})
     expect(response?.status).toBe(503)
   })
 
@@ -104,7 +110,9 @@ describe('private media Worker delivery', () => {
     { label: 'suffix', header: 'bytes=-3', range: { suffix: 3 }, expected: 'bytes 7-9/10' },
   ])('normalizes $label R2 range responses', async ({ header, range, expected }) => {
     const response = await servePrivateMedia(
-      new Request(`https://academy.test/course-media/${await token()}`, { headers: { range: header } }),
+      new Request('https://academy.test/course-media/formats-handout', {
+        headers: { range: header, cookie: `${MEDIA_DELIVERY_COOKIE}=${await token()}` },
+      }),
       { MEDIA_SIGNING_SECRET: SECRET, COURSE_MEDIA: bucket('part', range, 10) },
     )
     expect(response?.status).toBe(206)
@@ -114,7 +122,9 @@ describe('private media Worker delivery', () => {
   it('supports HEAD and rejects malformed, multiple, and impossible ranges before R2', async () => {
     const media = bucket('PDF')
     const grant = await token()
-    const head = await servePrivateMedia(new Request(`https://academy.test/course-media/${grant}`, { method: 'HEAD' }), {
+    const head = await servePrivateMedia(new Request('https://academy.test/course-media/formats-handout', {
+      method: 'HEAD', headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${grant}` },
+    }), {
       MEDIA_SIGNING_SECRET: SECRET,
       COURSE_MEDIA: media,
     })
@@ -123,7 +133,9 @@ describe('private media Worker delivery', () => {
 
     for (const range of ['bytes=5-2', 'bytes=0-1,4-5', 'bytes=-0', 'items=0-2']) {
       const response = await servePrivateMedia(
-        new Request(`https://academy.test/course-media/${grant}`, { headers: { range } }),
+        new Request('https://academy.test/course-media/formats-handout', {
+          headers: { range, cookie: `${MEDIA_DELIVERY_COOKIE}=${grant}` },
+        }),
         { MEDIA_SIGNING_SECRET: SECRET, COURSE_MEDIA: media },
       )
       expect(response?.status).toBe(416)
@@ -132,7 +144,9 @@ describe('private media Worker delivery', () => {
 
   it('does not emit a malformed 206 when R2 omits range metadata', async () => {
     const response = await servePrivateMedia(
-      new Request(`https://academy.test/course-media/${await token()}`, { headers: { range: 'bytes=0-1' } }),
+      new Request('https://academy.test/course-media/formats-handout', {
+        headers: { range: 'bytes=0-1', cookie: `${MEDIA_DELIVERY_COOKIE}=${await token()}` },
+      }),
       { MEDIA_SIGNING_SECRET: SECRET, COURSE_MEDIA: bucket('PDF') },
     )
     expect(response?.status).toBe(416)

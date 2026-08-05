@@ -52,7 +52,7 @@ test.describe('content formats', () => {
 
     const attachment = page.getByTestId('attachment-block')
     await expect(attachment).toBeVisible()
-    await expect(attachment).toHaveAttribute('href', /^\/api\/media\/open\?token=/)
+    await expect(attachment).toHaveAttribute('href', '/course-media/formats-handout')
     await expect(attachment).toHaveAttribute('target', '_blank')
     await expect(attachment).toContainText('Opens in a new tab')
 
@@ -72,18 +72,18 @@ test.describe('content formats', () => {
     })
   })
 
-  test('ไฟล์ PDF ต้องผ่าน signed URL; legacy public URL เข้าไม่ได้', async ({ page, request }) => {
+  test('ไฟล์ PDF ต้องผ่าน path ที่ไม่ใช่ bearer URL; legacy public URL เข้าไม่ได้', async ({ page, request }) => {
     await prepareNodeAccess('content-formats-demo', 'formats-references')
     await page.goto(`${COURSE}/lessons/formats-references`)
     const href = await page.getByTestId('attachment-block').getAttribute('href')
-    expect(href).toMatch(/^\/api\/media\/open\?token=/)
+    expect(href).toBe('/course-media/formats-handout')
 
     const redirect = await request.get(href!, {
       maxRedirects: 0,
       headers: { 'x-forwarded-host': 'attacker.example', 'x-forwarded-proto': 'https' },
     })
     expect(redirect.status()).toBe(307)
-    expect(redirect.headers().location).toMatch(/^\/course-media\//)
+    expect(redirect.headers().location).toBe('/course-media/formats-handout')
 
     const signed = await request.get(href!)
     expect(signed.status()).toBe(200)

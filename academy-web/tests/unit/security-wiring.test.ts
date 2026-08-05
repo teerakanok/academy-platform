@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
@@ -116,5 +116,21 @@ describe('security boundary wiring', () => {
     expect(form).toContain('window.history.replaceState')
     expect(e2e).not.toContain('/unsubscribe?token=')
     expect(e2e).toContain('/unsubscribe?lang=th#')
+  })
+
+  it('private-media grant อยู่ใน HttpOnly path-scoped cookie ไม่อยู่ใน URL', () => {
+    const resolver = source('src/lib/media/resolve.ts')
+    const delivery = source('src/lib/media/worker-delivery.ts')
+    const route = source('src/app/course-media/[assetId]/route.ts')
+
+    expect(resolver).toContain('mediaDeliveryPath(asset.id)')
+    expect(resolver).not.toContain('issueMediaGrant')
+    expect(delivery).toContain('mediaDeliveryCookie(request.headers)')
+    expect(delivery).not.toContain('location: `/api/media/open?token=')
+    expect(route).toContain('httpOnly: true')
+    expect(route).toContain("sameSite: 'lax'")
+    expect(route).toContain('path: mediaDeliveryPath(asset.id)')
+    expect(route).toContain('authorizeCourseResource')
+    expect(existsSync(join(ROOT, 'src/app/api/media/open/route.ts'))).toBe(false)
   })
 })

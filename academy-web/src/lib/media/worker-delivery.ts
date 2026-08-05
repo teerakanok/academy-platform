@@ -1,4 +1,5 @@
 import { verifyMediaGrantSignature } from './grant'
+import { mediaDeliveryCookie } from './cookie'
 import { privateMediaById, privateMediaByLegacyPath } from './registry'
 
 interface MediaObject {
@@ -33,18 +34,14 @@ export async function servePrivateMedia(request: MediaRequest, env: MediaWorkerE
     return new Response('Private media is not configured', { status: 503 })
   }
 
-  const token = url.pathname.slice('/course-media/'.length)
+  const assetId = url.pathname.slice('/course-media/'.length)
+  const asset = privateMediaById(assetId)
+  if (!asset) return null
+  const token = mediaDeliveryCookie(request.headers)
+  if (!token) return null
   const grant = await verifyMediaGrantSignature(token, env.MEDIA_SIGNING_SECRET)
-  const asset = grant ? privateMediaById(grant.assetId) : null
-  if (!grant || !asset || asset.courseSlug !== grant.courseSlug || asset.nodeId !== grant.nodeId) {
-    return new Response(null, { status: 404 })
-  }
-  if (grant.expiresAt <= Math.floor(Date.now() / 1000)) {
-    return new Response(null, {
-      status: 307,
-      headers: { location: `/api/media/open?token=${encodeURIComponent(token)}`, 'cache-control': 'private, no-store' },
-    })
-  }
+  if (!grant || grant.assetId !== asset.id || asset.courseSlug !== grant.courseSlug || asset.nodeId !== grant.nodeId) return null
+  if (grant.expiresAt <= Math.floor(Date.now() / 1000)) return null
 
   const requestedRange = request.headers.get('range')
   if (requestedRange) {

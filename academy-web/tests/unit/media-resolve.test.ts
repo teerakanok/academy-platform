@@ -1,12 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import type { CourseNode } from '@/lib/content/course-types'
 import type { PublicLesson } from '@/lib/content/public-lesson'
-import { verifyMediaGrant } from '@/lib/media/grant'
 import { resolveAuthorizedLessonMedia } from '@/lib/media/resolve'
 import { readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-
-const SECRET = 'test-only-media-signing-secret-32-bytes-minimum'
 
 function lesson(nodeId: string, href = '/media/sample-handout.pdf'): PublicLesson {
   return {
@@ -46,22 +43,13 @@ describe('authorized lesson media resolver', () => {
     expect(files.filter((file) => /\.(?:mp4|vtt|pdf|zip)$/i.test(file))).toEqual([])
   })
 
-  it('signs only the registered asset bound to the authorized course and node', async () => {
+  it('uses only the registered asset ID in the delivery path', async () => {
     const result = await resolveAuthorizedLessonMedia(node('formats-references'), lesson('formats-references'), {
       courseSlug: 'content-formats-demo',
       nodeId: 'formats-references',
-      secret: SECRET,
-      nowSeconds: 1_000,
-      ttlSeconds: 300,
     })
     const href = result.lesson.blocks[0].kind === 'attachment' ? result.lesson.blocks[0].href : ''
-    expect(href).toMatch(/^\/api\/media\/open\?token=/)
-    const token = decodeURIComponent(href.slice('/api/media/open?token='.length))
-    await expect(verifyMediaGrant(token, SECRET, 1_299)).resolves.toMatchObject({
-      assetId: 'formats-handout',
-      courseSlug: 'content-formats-demo',
-      nodeId: 'formats-references',
-    })
+    expect(href).toBe('/course-media/formats-handout')
   })
 
   it('leaves public instructional images unchanged', async () => {
@@ -69,7 +57,6 @@ describe('authorized lesson media resolver', () => {
     const result = await resolveAuthorizedLessonMedia(node('formats-references'), publicLesson, {
       courseSlug: 'content-formats-demo',
       nodeId: 'formats-references',
-      secret: SECRET,
     })
     expect(result.lesson.blocks[0]).toMatchObject({ href: '/media/sample-diagram.svg' })
   })
@@ -79,14 +66,12 @@ describe('authorized lesson media resolver', () => {
       resolveAuthorizedLessonMedia(node('formats-references'), lesson('formats-references', '/media/new.pdf'), {
         courseSlug: 'content-formats-demo',
         nodeId: 'formats-references',
-        secret: SECRET,
       }),
     ).rejects.toThrow(/not registered/)
     await expect(
       resolveAuthorizedLessonMedia(node('wrong-node'), lesson('wrong-node'), {
         courseSlug: 'content-formats-demo',
         nodeId: 'wrong-node',
-        secret: SECRET,
       }),
     ).rejects.toThrow(/ownership mismatch/)
   })
@@ -99,10 +84,9 @@ describe('authorized lesson media resolver', () => {
     const result = await resolveAuthorizedLessonMedia(videoNode, lesson('os-what-it-does', '/media/sample-diagram.svg'), {
       courseSlug: 'basic-os-linux',
       nodeId: 'os-what-it-does',
-      secret: SECRET,
     })
-    expect(result.node.video?.src).toMatch(/^\/api\/media\/open\?token=/)
-    expect(result.node.video?.captions?.[0].src).toMatch(/^\/api\/media\/open\?token=/)
+    expect(result.node.video?.src).toBe('/course-media/os-video-en')
+    expect(result.node.video?.captions?.[0].src).toBe('/course-media/os-captions-en')
     expect(JSON.stringify(result)).not.toContain('basic-os-linux/os-what-it-does/lesson-demo.mp4')
   })
 })
