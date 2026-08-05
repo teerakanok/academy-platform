@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  // entry ของเราเอง — ห่อ handler ที่ OpenNext สร้างแล้วเพิ่ม `scheduled` (ดู worker.ts)
+  // entry ของหน้าร้าน Academy; retention scheduler มี Worker/credential แยกต่างหาก
   "main": "worker.ts",
   "name": "cyberskills-academy",
   "compatibility_date": "2025-03-25",
@@ -11,9 +11,6 @@
     { "binding": "COURSE_MEDIA", "bucket_name": "cyberskills-academy-media" }
   ],
   "observability": { "enabled": true },
-  // กวาด attempt, waitlist และบัญชีที่ครบอายุ วันละครั้งตอนตี 3 UTC
-  // ตัวฟังก์ชันฝั่ง DB เป็นคนตัดสินว่าลบอะไรได้ (migration 0017) ที่นี่แค่เรียกตามเวลา
-  "triggers": { "crons": ["0 3 * * *"] },
   "vars": {
     // preview: ยังไม่เปิดให้ค้นเจอ และยังไม่เปิดระบบบัญชี
     // (ไม่มี NEXT_PUBLIC_SUPABASE_* = หน้า sign-in จะบอกตรงๆ ว่ายังไม่เปิด

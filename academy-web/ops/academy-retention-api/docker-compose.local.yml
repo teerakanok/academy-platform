@@ -1,0 +1,6 @@
+# Disposable Academy local-stack override. The Supabase CLI project_id in
+# supabase/config.toml creates this network; production must use the base file.
+networks:
+  supabase_default:
+    external: true
+    name: supabase_network_academy-web

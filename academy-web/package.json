@@ -10,7 +10,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . && tsc --noEmit && tsc -p tsconfig.worker.json",
+    "lint": "eslint . && tsc --noEmit && tsc -p tsconfig.worker.json && tsc -p ops/academy-retention-worker/tsconfig.json",
     "test": "vitest run",
     "test:unit": "vitest run --project unit",
     "test:integration": "vitest run --project integration",

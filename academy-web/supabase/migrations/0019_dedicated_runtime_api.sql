@@ -5,9 +5,9 @@
 -- server-authorized and all Academy tables intentionally have default-deny RLS.
 -- Its blast radius is bounded by explicit Academy-only object grants and by a
 -- separate PostgREST authenticator that has no membership in service_role.
--- Role bootstrap belongs in ../roles.sql because BYPASSRLS and role membership
--- require a database superuser; this migration runs with normal schema-owner
--- authority only.
+-- Role bootstrap belongs in ../privileged/academy-data-api-roles.sql because
+-- BYPASSRLS and role membership require a database superuser; this migration
+-- runs with normal schema-owner authority only.
 
 -- Re-establish an allowlist if this migration is reapplied after an operator
 -- experiment. PUBLIC has no executable Academy function surface after this.

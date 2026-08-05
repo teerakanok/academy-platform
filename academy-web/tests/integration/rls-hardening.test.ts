@@ -334,10 +334,7 @@ describe('privacy request evidence', () => {
           ($2, $4, 'deletion', 'open', now() - interval '4 years', null)`,
         [`PRIV-OLD-${marker}`, `PRIV-OPEN-${marker}`, `privacy-old-${marker}@example.com`, `privacy-open-${marker}@example.com`],
       )
-      await db.query('begin')
-      await db.query('set local role service_role')
       const purge = await db.query(`select academy.purge_expired_privacy_requests() as deleted`)
-      await db.query('commit')
       const rows = await db.query(
         `select case_reference from academy.privacy_request where case_reference = any($1::text[])`,
         [[`PRIV-OLD-${marker}`, `PRIV-OPEN-${marker}`]],

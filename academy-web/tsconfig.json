@@ -23,5 +23,5 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "worker.ts", "types/open-next-worker.d.ts", ".open-next"]
+  "exclude": ["node_modules", "worker.ts", "types/open-next-worker.d.ts", ".open-next", "ops/academy-retention-worker"]
 }
