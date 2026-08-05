@@ -28,6 +28,16 @@ can resume an issued task after a reload on the same browser, but cross-device
 draft synchronization remains intentionally out of scope until account runtime
 is open.
 
+**Follow-up browser proof:** a clean local Supabase start and `db reset` now
+apply migrations `0001` through `0020`; compatibility roles in
+`supabase/roles.sql` provide only the names/grants required for that local
+migration path. A disposable loopback-only dedicated data API with ephemeral
+credentials then ran `e2e/attempt-ux.spec.ts`: 9/9 passed. That proof found and
+closed one lifecycle race: a queued browser save could recreate a draft after
+automatic attempt replacement. The save guard is now synchronous, and the
+`409` fixture returns a distinct replacement attempt as the real invalid-attempt
+state does.
+
 ---
 
 ## 2026-08-06 — Unsubscribe URL bearer redaction deployed and verified

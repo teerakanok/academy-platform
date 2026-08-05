@@ -109,11 +109,18 @@ is also entered as a secret for `cyberskills-academy-retention`.
    all zero for an unchanged dataset. Confirm that direct table access and the
    original parameterized purge RPCs still return access denied.
 
-For local scheduling behavior, use only a disposable Supabase stack. Bootstrap
-the privileged local roles and migrations from a clean schema first:
+For local scheduling behavior, use only a disposable Supabase stack. The local
+`supabase/roles.sql` compatibility placeholders are not a production bootstrap:
+never run remote `db reset --linked` or include roles in a remote deployment.
+For Pool A, use the privileged deployment order above. Bootstrap the privileged
+local roles and migrations from a clean schema first:
 
 ```sh
 npx supabase db reset --local --version 0018 --no-seed
+# The CLI grants local custom roles to `postgres`; remove only those generated
+# membership edges so the same fail-closed production boundary can be rehearsed.
+docker exec supabase_db_academy-web psql -U supabase_admin -d postgres -v ON_ERROR_STOP=1 \
+  -c "revoke academy_runtime, academy_api_anon, academy_api_authenticator, academy_retention, academy_retention_definer, academy_retention_api_anon, academy_retention_api_authenticator from postgres cascade;"
 docker exec -i supabase_db_academy-web psql -U supabase_admin -d postgres -v ON_ERROR_STOP=1 \
   < supabase/privileged/academy-data-api-roles.sql
 docker exec -i supabase_db_academy-web psql -U supabase_admin -d postgres -v ON_ERROR_STOP=1 \

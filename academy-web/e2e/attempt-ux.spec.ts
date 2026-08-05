@@ -114,7 +114,7 @@ test.describe('การรอโจทย์ของ attempt', () => {
     await expect(page.getByTestId('checkpoint-continue')).toBeVisible()
   })
 
-  test('🔴 attempt หมดอายุ/ใช้ไปแล้ว → ได้โจทย์ชุดใหม่อัตโนมัติ ไม่ใช่ปุ่มที่กดแล้ว error ซ้ำ', async ({
+  test('🔴 attempt หมดอายุ/ใช้ไปแล้ว → ได้ attempt ใหม่อัตโนมัติ ไม่ใช่ปุ่มที่กดแล้ว error ซ้ำ', async ({
     page,
   }) => {
     // จำลอง 409 (attempt ใช้ไม่ได้แล้ว) ครั้งเดียวตอนกดตรวจ · ของเดิมหน้าจะบอกให้
@@ -125,6 +125,17 @@ test.describe('การรอโจทย์ของ attempt', () => {
     await applySimulation(page, true)
     const oldDraftKeys = await page.evaluate(() => Object.keys(window.localStorage).filter((key) => key.startsWith('academy.checkpoint-draft:v1:')))
     expect(oldDraftKeys).toHaveLength(1)
+
+    // Route mocking intercepts the submit before the server can consume the
+    // original attempt. In the real `attempt-invalid` case it is already
+    // unusable, so issue_attempt returns a new ID. This client-replacement
+    // fixture changes only that identity: it proves remount and removal of the
+    // old scoped draft, while the real retry path covers a full replacement run.
+    await page.route('**/api/attempts', async (route) => {
+      const response = await route.fetch()
+      const body = (await response.json()) as Record<string, unknown>
+      await route.fulfill({ response, body: JSON.stringify({ ...body, attemptId: crypto.randomUUID() }) })
+    })
 
     let blocked = false
     await page.route('**/api/progress', async (route) => {
@@ -145,7 +156,7 @@ test.describe('การรอโจทย์ของ attempt', () => {
       page.getByTestId('checkpoint-submit').click(),
     ])
     expect(issued.status(), 'เจอ 409 แล้วต้องขอโจทย์ชุดใหม่ให้เอง').toBe(200)
-    // ด่านกลับมาพร้อมโจทย์ชุดใหม่ ไม่ใช่ปุ่มค้างที่กดแล้ว error เดิม
+    // ด่าน remount ด้วย attempt ใหม่ ไม่ใช่ปุ่มค้างที่กดแล้ว error เดิม
     await expect(page.getByTestId('checkpoint-sim-sim-1')).toBeVisible()
     await expect(page.getByTestId('checkpoint-submit')).toBeVisible()
     await expect

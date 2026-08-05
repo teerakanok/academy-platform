@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { AttemptQuestion, AttemptSimulation, PublicCheckpointItem } from '@/lib/content/public-lesson'
 import type { CheckpointOutcome } from '@/lib/course/progress-client'
 import {
@@ -80,13 +80,15 @@ export function CheckpointQuiz({
   const [validationError, setValidationError] = useState(false)
   const draftKey = draftScope ? checkpointDraftKey(draftScope) : null
   const [hydratedDraftKey, setHydratedDraftKey] = useState<string | null>(null)
-  const [persistDraft, setPersistDraft] = useState(true)
+  const persistDraftRef = useRef(true)
   const hydrating = Boolean(draftScope && hydratedDraftKey !== draftKey)
 
   function discardDraft() {
+    // Effects scheduled by the input render can run after this event. Make the
+    // no-save decision synchronous so they cannot recreate the deleted attempt.
+    persistDraftRef.current = false
     const store = browserCheckpointDraftStore()
     if (draftScope && store) clearCheckpointDraft(store, draftScope)
-    setPersistDraft(false)
   }
 
   // Hydrate หลัง mount เพื่อไม่ให้ SSR กับ browser localStorage ให้ markup เริ่มต้นต่างกัน.
@@ -107,10 +109,10 @@ export function CheckpointQuiz({
   }, [draftKey, draftScope, draftSimulations, hydratedDraftKey, questions, simulations])
 
   useEffect(() => {
-    if (!draftScope || !persistDraft || hydratedDraftKey !== draftKey) return
+    if (!draftScope || !persistDraftRef.current || hydratedDraftKey !== draftKey) return
     const store = browserCheckpointDraftStore()
     if (store) saveCheckpointDraft(store, draftScope, questions, draftSimulations, { answers, simulations: simStates })
-  }, [answers, draftKey, draftScope, draftSimulations, hydratedDraftKey, persistDraft, questions, simStates])
+  }, [answers, draftKey, draftScope, draftSimulations, hydratedDraftKey, questions, simStates])
 
   // โจทย์จำลองไม่มี "ยังไม่ตอบ" — หน้าจอมีค่าตั้งต้นเสมอ จึงนับเฉพาะ MCQ
   const allQuestionsAnswered = questions.every((q) => (answers[q.id]?.length ?? 0) > 0)
