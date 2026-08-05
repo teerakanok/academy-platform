@@ -5,6 +5,27 @@
 
 ---
 
+## 2026-08-05 — Dedicated Academy runtime data API deployed
+
+**Outcome:** Academy Worker ไม่มีเส้นทาง runtime ที่ต้องถือ shared Pool A
+`service_role` อีกต่อไป. Dedicated PostgREST อยู่หลัง tunnel hostname
+`academy-data.cyberskills.co.th`, expose เฉพาะ schema `academy`, bind loopback และใช้
+`academy_runtime` แบบ `NOLOGIN`/`BYPASSRLS` ที่มี exact Academy allowlist เท่านั้น.
+
+**Verification:** backup Academy schema/roles ก่อนเปลี่ยน, privileged role bootstrap,
+transaction rollback rehearsal และ migration `0019` ผ่าน; health sidecar ของ container
+รายงาน `healthy`; runtime JWT อายุ 60 วินาทีจาก public path ตอบ `200` ขณะที่ anonymous,
+forged `service_role` และ cross-schema ถูกปฏิเสธ `401/403/406`. Worker deployment
+`4861c000-d987-40ac-971e-d6e47e1a92e0` เรียก RPC ผ่าน boundary นี้สำเร็จด้วย unknown
+unsubscribe token ที่ไม่สร้างหรือเปิดเผยข้อมูลผู้เรียน. Local suite 498 tests, lint/type
+checks และ Cloudflare build ผ่าน; independent Code/Security/UX review `C0/H0/M0/L0`.
+
+**Residual risk:** runtime role เป็น trusted backend capability จึง route ยังต้อง bind
+learner identity เองเสมอ; auth/owner bootstrap ยังปิด, retention cron ต้องมี credential
+แยกที่จำกัดสิทธิ์, และ public launch gates อื่นยังคงอยู่.
+
+---
+
 ## 2026-08-05 — Pool A migrations and private-media Worker deployed
 
 **Outcome:** ติดตั้ง Academy schema `0001`–`0018` บน production Pool A แบบ transaction

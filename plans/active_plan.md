@@ -6,41 +6,36 @@
 
 ## Current execution lane — activate identity without widening Pool A access
 
-Production checkpoint 2026-08-05 ปิดแล้วสำหรับฐานข้อมูลและ private-media delivery:
-migrations `0001`–`0018` อยู่ใน Pool A, PostgREST expose schema `academy`, Worker
-version `566b1d4e-ed2e-434e-9ca6-3a66282fadfb` ใช้ private R2 binding และมีเฉพาะ
-`MEDIA_SIGNING_SECRET`; legacy media ทั้ง 5 paths และ tampered grant ตอบ `404`.
+Production checkpoint 2026-08-05 ปิดแล้วสำหรับฐานข้อมูล, private-media delivery และ
+least-privilege runtime data boundary: migrations `0001`–`0019` อยู่ใน Pool A;
+dedicated PostgREST เผยเฉพาะ `academy` ผ่าน
+`academy-data.cyberskills.co.th`, bind ที่ loopback, และ Worker version
+`4861c000-d987-40ac-971e-d6e47e1a92e0` ถือ Academy-scoped secret เท่านั้น
+(`MEDIA_SIGNING_SECRET`, runtime API URL/secret). Valid runtime JWT ตอบ `200`;
+anonymous, forged `service_role`, และ cross-schema ถูกปฏิเสธ `401/403/406` ตามลำดับ.
 หลักฐานและ rollback อยู่ใน
 [`reports/sessions/academy-production-release-2026-08-05.md`](../reports/sessions/academy-production-release-2026-08-05.md).
 
 งานหลักถัดไปตามลำดับ:
 
-1. **Deploy least-privilege Academy runtime credential**
-   - ห้ามใส่ shared `service_role` ใน Worker เพราะ bypass RLS และเข้าถึงข้อมูลทั้ง Pool A
-   - local implementation พร้อมแล้ว: dedicated PostgREST, `academy_runtime`, JWT อายุ 60 วินาที,
-     exact allowlist, role-membership fail-close, loopback health probe, และ real API contract
-     test ผ่าน; evidence อยู่ใน `reports/sessions/academy-dedicated-data-api-2026-08-05.md`
-   - ก่อนเปิด auth: backup Academy schema/roles, apply privileged role bootstrap + `0019`, deploy
-     digest-pinned container/tunnel exact hostname, set Worker secrets, และ rerun positive/anon/
-     forged-role/cross-schema smoke บน production
-2. **เปิด auth/runtime และ bootstrap owner จาก stable identity จริง**
+1. **เปิด auth/runtime และ bootstrap owner จาก stable identity จริง**
    - build ปัจจุบันตั้งใจปิด `NEXT_PUBLIC_SUPABASE_*`; หน้า sign-in แจ้งว่า account ยังไม่เปิด
    - owner: Academy frontend; ก่อนเปิด account ให้ซ่อนหรือปรับ “By continuing…” ใน
      closed state ซึ่งปัจจุบันไม่มี continue action แล้ว verify ด้วย closed-state E2E/visual
    - founder ต้อง sign in หนึ่งครั้งหลัง runtime พร้อม เพื่อสร้าง `academy.users` จาก
      `(issuer, subject)`; จากนั้น dry-run/apply `scripts/manage-staff-role.mjs`
    - ปัจจุบัน `academy.users=0`, active owner `=0`; ห้ามสร้าง UUID หรือใช้ email แทน identity
-3. **ทำให้ retention cron ใช้ credential ที่จำกัดและพิสูจน์ execution จริง**
+2. **ทำให้ retention cron ใช้ credential ที่จำกัดและพิสูจน์ execution จริง**
    - cron trigger deploy แล้ว แต่ยังไม่มี DB credential จึงต้องถือว่ายังไม่ operational
    - ตรวจ purge jobs ทั้ง 5 แบบ zero-delete/held-case และ failure visibility ก่อนเปิด traffic
-4. **ปิด public-launch gates ที่เหลือ**
+3. **ปิด public-launch gates ที่เหลือ**
    - distributed edge rate limit และ log redaction
    - restricted case-system owner/access configuration
    - legal review ภาษาไทยสำหรับ privacy/retention/appeal
    - CNAME/Zero Trust/public exposure decision แยกจาก Worker preview deployment
 
 **สถานะ release:** production infrastructure checkpoint ผ่าน แต่ยังไม่พร้อม public launch
-และยังไม่พร้อมรับ learner account จนกว่างาน 1–3 จะปิดครบ.
+และยังไม่พร้อมรับ learner account จนกว่างาน 1–2 จะปิดครบ.
 
 ---
 

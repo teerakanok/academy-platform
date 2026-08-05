@@ -41,21 +41,31 @@ Academy no longer has an application code path that requires Pool A's shared
 
 ## Production State
 
-No production database role, container, tunnel, Worker secret, or deployment
-was changed by this checkpoint. The existing shared Pool A API and Academy
-preview remain unchanged.
+Production rollout completed on 2026-08-05:
 
-## Next Deployment Gate
+- Fresh backup at `/root/academy-db-backups/20260805T162324Z-dedicated-api`
+  (schema SHA-256 `ba46ad0017857d64743b64f66f7e3e464fe5ec34af5c886db6c27ea313328d5f`,
+  role export SHA-256 `5694895c1417e12223d88446271a168bf72edc87982e6c5edaac268f3a6479a9`).
+- `academy-data-api-roles.sql` was applied as database superuser; migration
+  `0019` passed a transaction rollback rehearsal and then applied to Pool A
+  `postgres`.
+- The dedicated digest-pinned PostgREST and health sidecar are running on the
+  database host. The service binds only `127.0.0.1:50600`; the health sidecar
+  reports `healthy`.
+- The tunnel has one exact ingress for `academy-data.cyberskills.co.th` to
+  `http://127.0.0.1:50600`. Its configuration was validated before restart;
+  rollback copy: `/etc/cloudflared/config.yml.pre-academy-data-api-20260805T162624Z`.
+- The Academy Worker has the two required runtime settings as secret bindings
+  and was deployed as version `4861c000-d987-40ac-971e-d6e47e1a92e0`.
+- External acceptance: valid runtime request `200`; anonymous `401`; forged
+  `service_role` claim `403`; cross-schema request `406`. A harmless unknown
+  unsubscribe-token request through the deployed Worker returned `200`, proving
+  the Worker-to-data-API path without creating or exposing learner data.
+- The shared Pool A gateway was not reconfigured or recreated. Its unauthenticated
+  public gateway responses remain protected (`401`).
 
-1. Create a fresh Academy schema/role backup and rehearse the rollback.
-2. Apply `supabase/privileged/academy-data-api-roles.sql` as database
-   superuser, then `0019_dedicated_runtime_api.sql` to Pool A `postgres`.
-3. Provision the authenticator password and runtime JWT secret only on their
-   intended hosts; deploy `ops/academy-data-api/docker-compose.yml`.
-4. Add exactly one tunnel ingress for `academy-data.cyberskills.co.th` to
-   `http://127.0.0.1:50600`; verify health before setting Worker secrets.
-5. Deploy the Worker, run the four runtime API smoke paths, then retire any
-   stale local application `SUPABASE_SERVICE_ROLE_KEY` configuration.
+## Next Gate
 
-Retention remains a separate limited-credential rollout. It must not use this
-runtime role or a shared Pool A service role.
+Activate the real account runtime and bootstrap the first owner from an actual
+stable identity. Retention remains a separate limited-credential rollout and
+must not use this runtime role or a shared Pool A service role.
