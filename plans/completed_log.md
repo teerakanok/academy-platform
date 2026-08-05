@@ -5,6 +5,37 @@
 
 ---
 
+## 2026-08-05 — Pool A migrations and private-media Worker deployed
+
+**Outcome:** ติดตั้ง Academy schema `0001`–`0018` บน production Pool A แบบ transaction
+เดียว, เพิ่ม `academy` เข้า PostgREST และ deploy Worker ที่ใช้ private R2 media พร้อม
+`MEDIA_SIGNING_SECRET` โดยไม่ส่ง local Supabase credentials ขึ้น Cloudflare
+
+**Verification:** backup schema/roles/`.env` ผ่าน `pg_restore` inventory; Academy มี 13
+tables, 1 view, 28 functions และทุก table เปิด RLS; `academy_staff_admin` เป็น NOLOGIN
+role; schema `academy` ตอบ PostgREST `200` ขณะที่ schema ปลอมตอบ `PGRST106`; container
+อื่นไม่ถูก recreate; Worker version `566b1d4e-ed2e-434e-9ca6-3a66282fadfb`; public pages
+ตอบ `200`, legacy media 5 paths และ tampered grant ตอบ `404`; remote secret inventory
+มีเพียง `MEDIA_SIGNING_SECRET`; production anon table/RPC ถูกปฏิเสธด้วย `401/42501`
+ขณะที่ `public` และ `helm` profiles เดิมยังตอบ `200`; SQL rollback ผ่าน bounded
+transaction dry-run แล้วจบด้วย `ROLLBACK` และ `.env` rollback delta มีเพียง `academy`
+
+**Production fix:** เพิ่ม Worker-boundary deny สำหรับ registered legacy MP4/VTT/PDF
+ก่อน OpenNext พร้อม registry-derived regression tests 15/15 และ lint/typecheck ผ่าน;
+full suite non-DB tests ผ่าน 364 รายการ ส่วน DB integration 13 รายการรันไม่ได้เพราะ local
+Supabase ไม่ได้เปิดที่ `127.0.0.1:54321/54322`
+
+**Independent review:** Code C0/H0/M0/L0; Security C0/H0/M0/L0; UX C0/H0/M0/L1
+PASS โดย Low ที่เหลือเป็น stale closed-auth copy ซึ่งมี owner, removal trigger และ
+E2E/visual verification ระบุใน active plan แล้ว; visual lane N/A เพราะ production diff
+ไม่มี DOM/CSS/layout change
+
+**Residual risk:** auth/runtime ยังปิด, `academy.users=0`, owner bootstrap ยังทำไม่ได้,
+retention cron ยังไม่มี DB credential และห้ามใช้ shared `service_role`; ต้องออกแบบ
+least-privilege credential และปิด launch gates ใน active plan ก่อนรับ learner traffic
+
+---
+
 ## 2026-08-05 — Certificate evidence claim approved
 
 **Outcome:** Academy จะออก `Certificate of Course Completion: [Course]` โดยยืนยัน

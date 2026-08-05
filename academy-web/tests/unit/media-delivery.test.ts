@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { issueMediaGrant } from '@/lib/media/grant'
+import { PRIVATE_MEDIA_ASSETS } from '@/lib/media/registry'
 import { servePrivateMedia } from '@/lib/media/worker-delivery'
 
 const SECRET = 'test-only-media-signing-secret-32-bytes-minimum'
@@ -32,7 +33,22 @@ function bucket(body = 'PDF', range?: { offset?: number; length?: number; suffix
 describe('private media Worker delivery', () => {
   it('ignores unrelated paths so OpenNext remains the handler', async () => {
     await expect(servePrivateMedia(new Request('https://academy.test/courses'), {})).resolves.toBeNull()
+    await expect(servePrivateMedia(new Request('https://academy.test/media/sample-diagram.svg'), {})).resolves.toBeNull()
   })
+
+  it.each(PRIVATE_MEDIA_ASSETS.map(({ legacyPath }) => legacyPath))(
+    'blocks the registered legacy path %s before OpenNext',
+    async (path) => {
+      const media = bucket()
+      const response = await servePrivateMedia(new Request(`https://academy.test${path}`), {
+        MEDIA_SIGNING_SECRET: SECRET,
+        COURSE_MEDIA: media,
+      })
+
+      expect(response?.status).toBe(404)
+      expect(media.get).not.toHaveBeenCalled()
+    },
+  )
 
   it('serves a registered object only with a valid bound grant', async () => {
     // Remote R2 may expose a full-object range shape even without a Range request.

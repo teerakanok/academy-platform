@@ -1,5 +1,5 @@
 import { verifyMediaGrantSignature } from './grant'
-import { privateMediaById } from './registry'
+import { privateMediaById, privateMediaByLegacyPath } from './registry'
 
 interface MediaObject {
   body: ReadableStream
@@ -26,6 +26,7 @@ interface MediaRequest {
 
 export async function servePrivateMedia(request: MediaRequest, env: MediaWorkerEnv): Promise<Response | null> {
   const url = new URL(request.url)
+  if (privateMediaByLegacyPath(url.pathname)) return new Response(null, { status: 404 })
   if (!url.pathname.startsWith('/course-media/')) return null
   if (request.method !== 'GET' && request.method !== 'HEAD') return new Response(null, { status: 405 })
   if (!env.MEDIA_SIGNING_SECRET || !env.COURSE_MEDIA) {

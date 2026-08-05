@@ -4,69 +4,39 @@
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
 > **Last updated:** 2026-08-05
 
-## Current execution lane — owner decisions before production
+## Current execution lane — activate identity without widening Pool A access
 
-Checkpoint 4 ถูก commit/push แล้วที่ `725a705` และ product repo ตรงกับ
-`origin/main`. งานหลักถัดไปไม่ใช่ feature/backlog ใหม่ แต่เป็นการปิด release blockers
-ตามลำดับนี้:
+Production checkpoint 2026-08-05 ปิดแล้วสำหรับฐานข้อมูลและ private-media delivery:
+migrations `0001`–`0018` อยู่ใน Pool A, PostgREST expose schema `academy`, Worker
+version `566b1d4e-ed2e-434e-9ca6-3a66282fadfb` ใช้ private R2 binding และมีเฉพาะ
+`MEDIA_SIGNING_SECRET`; legacy media ทั้ง 5 paths และ tampered grant ตอบ `404`.
+หลักฐานและ rollback อยู่ใน
+[`reports/sessions/academy-production-release-2026-08-05.md`](../reports/sessions/academy-production-release-2026-08-05.md).
 
-1. **Privacy / retention / data-subject requests — local checkpoint ปิดแล้ว 2026-08-04**
-   - waitlist 3 ปี · attempt ที่ไม่เป็นหลักฐาน 90 วัน · account/learning record
-     2 ปีหลังใช้งานครั้งสุดท้าย · consent/request evidence 3 ปี
-   - ผู้สอบ appeal ได้ภายใน 30 วันหลังออกผล; attempt ที่มีเคสเปิดถูกพักการลบ
-     จนปิดเคสแล้วจึงกลับเข้ากฎ 90 วัน
-   - ต้องมีช่องทาง unsubscribe marketing ที่หยุดส่งทันทีและเก็บหลักฐานการถอน
-   - consent v3, privacy notice, unsubscribe token flow, appeal hold, restricted
-     privacy-request evidence, processing register, request runbook และ daily bounded
-     purge ครบใน migration `0017`/worker บน local
-   - evidence: fresh migration reset 0001–0017, Vitest 458/458, lint/typecheck,
-     production build, full E2E 138 passed/10 skipped ก่อน review และ targeted E2E
-     หลังแก้ findings; independent Code/Security/UX review = C0/H0/M0 ทุก lane
-   - ก่อน public launch ต้องให้ทนายไทยตรวจข้อความ/ระยะเวลาอีกครั้ง
-2. **Private media boundary — local checkpoint ปิดแล้ว 2026-08-04**
-   - ย้าย MP4/VTT/PDF ออกจาก `public/` ไป registry-backed `private-media/`; OpenNext
-     assets ไม่มี private binary
-   - lesson authorization ออก opaque signed open grant; open endpoint re-check session,
-     activation, entitlement และ prerequisite ก่อนออก delivery grant 5 นาที
-   - Worker delivery รองรับ GET/HEAD/Range; expired signed grant renew ผ่าน authenticated
-     open endpoint; revoke หยุด renewal ทันทีและ bearer เดิมมี bounded delay ไม่เกิน 5 นาที
-   - local E2E adapter fail closed หากไม่ตั้ง explicit root/secret; video retry localized,
-     accessible และรักษาตำแหน่ง/สถานะเล่น
-   - evidence: Vitest 475/475, lint/typecheck, production/OpenNext build, Wrangler
-     dry-run, targeted media E2E; full E2E 139 ผ่าน/10 skipped และ stateful capstone
-     failure 1 รายการที่ isolated rerun ผ่าน;
-     independent Code/Security/UX review = C0/H0/M0 ทุก lane
-   - remote topology checkpoint 2026-08-04: สร้าง private bucket
-     `cyberskills-academy-media`, upload 5 registry objects และ remote GET/SHA/Range/
-     HEAD/caption/tamper/legacy/expiry proof ผ่าน; tracked `COURSE_MEDIA` binding แล้ว
-   - production secret และ Worker deploy ยังไม่ทำ เพราะ deploy ปัจจุบันจะพา code ที่พึ่ง
-     migration `0017` ขึ้นไปด้วย; ต้องปิด Pool A migration/release gate ก่อน
-3. **Staff authorization model — local checkpoint ปิดแล้ว 2026-08-04**
-   - founder เป็น staff คนเดียวใน v1 แต่ใช้ roles แยก `owner`, `learner-support`,
-     `privacy-officer`, `content-ops`; owner ถือ capability ทั้งหมด โดย support/privacy
-     เป็น policy labels ที่ยังไม่มี operator workflow ใน checkpoint นี้
-   - migration `0018` บังคับ owner-controlled grant/revoke, append-only audit,
-     browser/runtime-mutation deny, separate control-plane role, active-staff retention
-     hold และ purge ประวัติ grant/revoke หลัง 3 ปี
-   - `/player` ต้องผ่านทั้ง explicit env toggle และ `content-ops`/`owner` ทุก request;
-     ทุก route เป็น force-dynamic เพื่อไม่ cache authorization decision
-   - evidence: clean DB reset, targeted 49/49, full Vitest 481/481, build/lint/typecheck,
-     default boundary E2E 8/8, internal staff E2E 2/2 + clean teardown;
-     independent Code/Security/UX review = C0/H0/M0/L0 ทุก lane
-   - production owner bootstrap ยังรอ Pool A migration/release gate; ไม่มี admin UI ใน v1
-4. **Certificate evidence claim — ปิดแล้ว 2026-08-05**
-   - canonical title: `Certificate of Course Completion: [Course]`
-   - claim: completed all course requirements and passed every required assessed checkpoint
-   - disclaimer: this is not a professional certification
-   - ห้ามอ้าง mastery, job readiness, skill certification หรือ hands-on performance
-     จนกว่าจะมี competency framework และหลักฐานที่รองรับจริง
-5. **Pool A / release verification** — ขอ explicit authorization ใหม่หลัง migrations,
-   local tests และ review ครบ; apply migration `0001`–`0016` รวม migration ใหม่จาก
-   `0017` ก่อน deploy code ที่พึ่ง schema เหล่านี้
+งานหลักถัดไปตามลำดับ:
 
-**งานหลักถัดไป:** ปิด Pool A migration/release gate
-ก่อนตั้ง production media secret และ deploy binding ที่ตรวจแล้ว. Public launch ยังต้องมี distributed edge
-rate limit/log redaction, restricted case-system owner/access configuration และ legal review.
+1. **ออกแบบ least-privilege Academy runtime credential**
+   - ห้ามใส่ shared `service_role` ใน Worker เพราะ bypass RLS และเข้าถึงข้อมูลทั้ง Pool A
+   - ต้องกำหนด custom JWT role/credential ที่จำกัดเฉพาะ Academy contract และทดสอบทั้ง
+     positive path กับ cross-schema denial ก่อนเปิด auth หรือ cron
+2. **เปิด auth/runtime และ bootstrap owner จาก stable identity จริง**
+   - build ปัจจุบันตั้งใจปิด `NEXT_PUBLIC_SUPABASE_*`; หน้า sign-in แจ้งว่า account ยังไม่เปิด
+   - owner: Academy frontend; ก่อนเปิด account ให้ซ่อนหรือปรับ “By continuing…” ใน
+     closed state ซึ่งปัจจุบันไม่มี continue action แล้ว verify ด้วย closed-state E2E/visual
+   - founder ต้อง sign in หนึ่งครั้งหลัง runtime พร้อม เพื่อสร้าง `academy.users` จาก
+     `(issuer, subject)`; จากนั้น dry-run/apply `scripts/manage-staff-role.mjs`
+   - ปัจจุบัน `academy.users=0`, active owner `=0`; ห้ามสร้าง UUID หรือใช้ email แทน identity
+3. **ทำให้ retention cron ใช้ credential ที่จำกัดและพิสูจน์ execution จริง**
+   - cron trigger deploy แล้ว แต่ยังไม่มี DB credential จึงต้องถือว่ายังไม่ operational
+   - ตรวจ purge jobs ทั้ง 5 แบบ zero-delete/held-case และ failure visibility ก่อนเปิด traffic
+4. **ปิด public-launch gates ที่เหลือ**
+   - distributed edge rate limit และ log redaction
+   - restricted case-system owner/access configuration
+   - legal review ภาษาไทยสำหรับ privacy/retention/appeal
+   - CNAME/Zero Trust/public exposure decision แยกจาก Worker preview deployment
+
+**สถานะ release:** production infrastructure checkpoint ผ่าน แต่ยังไม่พร้อม public launch
+และยังไม่พร้อมรับ learner account จนกว่างาน 1–3 จะปิดครบ.
 
 ---
 
