@@ -15,10 +15,14 @@ version `566b1d4e-ed2e-434e-9ca6-3a66282fadfb` ใช้ private R2 binding แ�
 
 งานหลักถัดไปตามลำดับ:
 
-1. **ออกแบบ least-privilege Academy runtime credential**
+1. **Deploy least-privilege Academy runtime credential**
    - ห้ามใส่ shared `service_role` ใน Worker เพราะ bypass RLS และเข้าถึงข้อมูลทั้ง Pool A
-   - ต้องกำหนด custom JWT role/credential ที่จำกัดเฉพาะ Academy contract และทดสอบทั้ง
-     positive path กับ cross-schema denial ก่อนเปิด auth หรือ cron
+   - local implementation พร้อมแล้ว: dedicated PostgREST, `academy_runtime`, JWT อายุ 60 วินาที,
+     exact allowlist, role-membership fail-close, loopback health probe, และ real API contract
+     test ผ่าน; evidence อยู่ใน `reports/sessions/academy-dedicated-data-api-2026-08-05.md`
+   - ก่อนเปิด auth: backup Academy schema/roles, apply privileged role bootstrap + `0019`, deploy
+     digest-pinned container/tunnel exact hostname, set Worker secrets, และ rerun positive/anon/
+     forged-role/cross-schema smoke บน production
 2. **เปิด auth/runtime และ bootstrap owner จาก stable identity จริง**
    - build ปัจจุบันตั้งใจปิด `NEXT_PUBLIC_SUPABASE_*`; หน้า sign-in แจ้งว่า account ยังไม่เปิด
    - owner: Academy frontend; ก่อนเปิด account ให้ซ่อนหรือปรับ “By continuing…” ใน

@@ -1,0 +1,35 @@
+services:
+  academy-data-api:
+    image: postgrest/postgrest:v14.8@sha256:4173b72e0be29cf15349dc827798c3e464c5f2cc7f9c1697022f9cd1874b4c36
+    container_name: academy-data-api
+    restart: unless-stopped
+    env_file:
+      - .env.academy-data-api
+    environment:
+      PGRST_DB_SCHEMAS: academy
+      PGRST_DB_ANON_ROLE: academy_api_anon
+      PGRST_JWT_AUD: academy-data-api
+      PGRST_SERVER_PORT: 3000
+    ports:
+      - 127.0.0.1:50600:3000
+    networks: [default]
+  academy-data-api-health:
+    image: curlimages/curl:8.14.1@sha256:9a1ed35addb45476afa911696297f8e115993df459278ed036182dd2cd22b67b
+    container_name: academy-data-api-health
+    restart: unless-stopped
+    command: ['sh', '-c', 'while :; do sleep 3600; done']
+    depends_on:
+      academy-data-api:
+        condition: service_started
+    healthcheck:
+      test: ['CMD', 'curl', '--fail', '--silent', 'http://academy-data-api:3000/']
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 15s
+    networks: [default]
+
+networks:
+  default:
+    name: supabase_default
+    external: true
