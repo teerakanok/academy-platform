@@ -5,6 +5,30 @@
 
 ---
 
+## 2026-08-06 — Dedicated Academy retention scheduler deployed
+
+**Outcome:** งาน retention แยกออกจาก Academy runtime Worker แล้ว. Dedicated
+PostgREST API expose เฉพาะ schema `academy`, bind ที่ loopback และรับ JWT อายุสั้นจาก
+Worker `cyberskills-academy-retention` เท่านั้น. Role `academy_retention` execute ได้
+เฉพาะ wrapper purge ที่ไม่มีพารามิเตอร์ 5 งาน; runtime และ shared `service_role`
+ไม่มีสิทธิ์เรียก parameterized attempt purge.
+
+**Verification:** backup schema/role ก่อนเปลี่ยน, transaction rollback rehearsal,
+apply จริง และตรวจ owner/`SECURITY DEFINER`/`search_path=pg_catalog` ของ wrapper ครบ;
+API กับ health sidecar healthy, tunnel/DNS ผ่าน, external root ตอบ `200` และ anonymous
+table request ตอบ `401`. Worker version
+`d2c0f761-c387-46d1-b28d-654b44a9af25` deploy 100% พร้อม schedule `0 3 * * *`.
+Local suite 508/508, lint, Cloudflare build/deploy dry-run และ independent
+Code/Security/UX review `C0/H0/M0/L0` ผ่าน.
+
+**Residual risk:** ยังต้องเก็บหลักฐานจาก Cron event รอบแรกว่า job ทั้ง 5 รายงาน
+`retention.purge_complete` หรือ failure ถูก surfaced ชัดเจน; ห้ามเรียก production purge
+RPC ด้วยมือเพียงเพื่อเร่งผล. Public launch และ identity gates อื่นยังเปิดอยู่.
+
+**Evidence:** `reports/academy-retention-api-rollout-2026-08-06.md`.
+
+---
+
 ## 2026-08-05 — Dedicated Academy runtime data API deployed
 
 **Outcome:** Academy Worker ไม่มีเส้นทาง runtime ที่ต้องถือ shared Pool A
@@ -21,8 +45,8 @@ unsubscribe token ที่ไม่สร้างหรือเปิดเ�
 checks และ Cloudflare build ผ่าน; independent Code/Security/UX review `C0/H0/M0/L0`.
 
 **Residual risk:** runtime role เป็น trusted backend capability จึง route ยังต้อง bind
-learner identity เองเสมอ; auth/owner bootstrap ยังปิด, retention cron ต้องมี credential
-แยกที่จำกัดสิทธิ์, และ public launch gates อื่นยังคงอยู่.
+learner identity เองเสมอ; auth/owner bootstrap ยังปิด, retention cron รอบแรกยังต้องมี
+execution evidence, และ public launch gates อื่นยังคงอยู่.
 
 ---
 
@@ -52,8 +76,8 @@ E2E/visual verification ระบุใน active plan แล้ว; visual lane
 ไม่มี DOM/CSS/layout change
 
 **Residual risk:** auth/runtime ยังปิด, `academy.users=0`, owner bootstrap ยังทำไม่ได้,
-retention cron ยังไม่มี DB credential และห้ามใช้ shared `service_role`; ต้องออกแบบ
-least-privilege credential และปิด launch gates ใน active plan ก่อนรับ learner traffic
+retention cron รอบแรกยังต้องมี execution evidence; launch gates อื่นใน active plan ต้อง
+ปิดก่อนรับ learner traffic
 
 ---
 

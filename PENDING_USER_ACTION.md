@@ -112,20 +112,23 @@ login สองทาง) — รายละเอียดและเหต�
   (`cyberskills-website/cyberskills-web/packages/tokens/products.js`) —
   ตอนนี้ academy-web vendored tokens ใช้ preset key `website` ไปก่อน
 
-## 7b) ตั้งเวลาให้ตัวกวาด attempt (ตัดสินใจระดับ infra — ต้องให้เจ้าของระบบเคาะ)
+## 7b) ✅ Retention scheduler deploy แล้ว — รอหลักฐาน Cron รอบแรก
 
-migration 0011 มีฟังก์ชัน `academy.purge_expired_attempts(retain_days, limit)` แล้ว
-เขียนให้เรียกซ้ำได้อย่างปลอดภัย (มีเพดานต่อรอบ · คืนจำนวนที่ลบ · เรียกจนได้ 0)
-**แต่ยังไม่มีอะไรเรียกมันตามเวลา** เพราะการเลือกกลไกเป็นการตัดสินใจของเจ้าของระบบ:
+ได้เลือกและ deploy Dedicated Cloudflare Cron Worker + Dedicated PostgREST API แล้ว;
+ไม่ใช้ shared `service_role` และไม่มี manual-maintenance path. Worker
+`cyberskills-academy-retention` รันทุกวัน `0 3 * * *` พร้อม role
+`academy_retention` ที่ execute ได้เฉพาะ wrapper purge 5 งาน:
 
-| ทาง | ได้ | เสีย |
-|---|---|---|
-| `pg_cron` บน Postgres ที่โฮสต์เอง | อยู่ใกล้ข้อมูล ไม่ต้องมี worker | ต้องเปิด extension บนเซิร์ฟเวอร์จริง |
-| Cloudflare Cron Trigger เรียก route ภายใน | ใช้ของที่ deploy อยู่แล้ว | ต้องมี route + ความลับสำหรับเรียก |
-| สั่งมือตอน maintenance | ไม่ต้องตั้งอะไร | ลืมได้ และโตขึ้นเงียบๆ |
+- attempt เก็บ 90 วัน, lead/waitlist 3 ปี, inactive user 2 ปี, privacy request และ
+  staff authorization history 3 ปี
+- batch size ถูกจำกัดตามชนิดข้อมูล; API bind loopback และ public anonymous request
+  ถูกปฏิเสธ
+- ก่อนถือว่า operational ต้องตรวจ Trigger Events/logs ของรอบที่ scheduler รันจริงให้
+  ครบทั้ง 5 `retention.purge_complete` หรือมี `retention.purge_failed` ที่ surfaced
+  ชัดเจน โดยห้ามเรียก production purge RPC ด้วยมือเพื่อเร่งผล
 
-ก่อนเปิด traffic จริงควรเลือกสักทาง · ค่าเริ่มต้นที่ตั้งไว้คือเก็บ 30 วันหลังหมดอายุ
-(attempt อายุ 60 นาที + หน้าต่างโควตา 30 นาที — 30 วันเผื่อการไล่ปัญหาย้อนหลังพอ)
+หลักฐาน deployment และ rollback อยู่ที่
+[`reports/academy-retention-api-rollout-2026-08-06.md`](reports/academy-retention-api-rollout-2026-08-06.md).
 
 ## 8) ⚠️ สุขภาพเครื่อง dev (พบระหว่าง run — ควรจัดการ)
 

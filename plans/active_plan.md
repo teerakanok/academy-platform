@@ -2,7 +2,7 @@
 
 > Open work only. Move closed items to `completed_log.md` with evidence.
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
-> **Last updated:** 2026-08-05
+> **Last updated:** 2026-08-06
 
 ## Current execution lane — activate identity without widening Pool A access
 
@@ -25,9 +25,15 @@ anonymous, forged `service_role`, และ cross-schema ถูกปฏิเ�
    - founder ต้อง sign in หนึ่งครั้งหลัง runtime พร้อม เพื่อสร้าง `academy.users` จาก
      `(issuer, subject)`; จากนั้น dry-run/apply `scripts/manage-staff-role.mjs`
    - ปัจจุบัน `academy.users=0`, active owner `=0`; ห้ามสร้าง UUID หรือใช้ email แทน identity
-2. **ทำให้ retention cron ใช้ credential ที่จำกัดและพิสูจน์ execution จริง**
-   - cron trigger deploy แล้ว แต่ยังไม่มี DB credential จึงต้องถือว่ายังไม่ operational
-   - ตรวจ purge jobs ทั้ง 5 แบบ zero-delete/held-case และ failure visibility ก่อนเปิด traffic
+2. **ยืนยัน execution จริงของ retention cron รอบแรก**
+   - dedicated retention API และ Worker แยกจาก runtime deploy แล้ว: role
+     `academy_retention` เรียกได้เฉพาะ wrapper purge ทั้ง 5, PostgREST expose
+     เฉพาะ schema `academy`, และ Worker ถือ credential เฉพาะของ API นี้
+   - Cron `0 3 * * *` ยังต้องมีหลักฐานจาก event จริง: log ต้องพบ
+     `retention.purge_complete` ครบทั้ง 5 งาน หรือ `retention.purge_failed` ที่
+     surfaced ชัดเจน; ห้ามเรียก production purge RPC ด้วยมือเพียงเพื่อบังคับ retry
+   - หลักฐาน deployment/rollback อยู่ใน
+     [`reports/academy-retention-api-rollout-2026-08-06.md`](../reports/academy-retention-api-rollout-2026-08-06.md)
 3. **ปิด public-launch gates ที่เหลือ**
    - distributed edge rate limit และ log redaction
    - restricted case-system owner/access configuration
