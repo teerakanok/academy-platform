@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { routeAuthClient, safeNextPath } from '@/lib/auth/route-client'
 import { allowRequest } from '@/lib/rate-limit'
 import { clientKey } from '@/lib/request-ip'
+import { hasEdgeRateLimitMarker } from '@/lib/edge-rate-limit-policy'
 import { readBoundedJson } from '@/lib/http/bounded-body'
 import { validateMutationRequest } from '@/lib/http/mutation-security'
 import { acceptsAuthTransport } from '@/lib/auth/cookie-policy'
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: mutation.error }, { status: mutation.status })
   }
 
-  if (!allowRequest(`verify:${clientKey(request)}`)) {
+  if (!hasEdgeRateLimitMarker(request.headers) && !allowRequest(`verify:${clientKey(request)}`)) {
     return NextResponse.json({ ok: false, error: 'ลองถี่เกินไป รอสักครู่แล้วลองใหม่' }, { status: 429 })
   }
 

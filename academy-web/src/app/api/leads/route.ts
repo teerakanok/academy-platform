@@ -3,6 +3,8 @@ import { z } from 'zod'
 import { academyDb } from '@/lib/db/server'
 import { CURRENT_CONSENT_VERSION } from '@/lib/consent'
 import { allowRequest } from '@/lib/rate-limit'
+import { hasEdgeRateLimitMarker } from '@/lib/edge-rate-limit-policy'
+import { clientKey } from '@/lib/request-ip'
 import { readBoundedJson } from '@/lib/http/bounded-body'
 import { validateMutationRequest } from '@/lib/http/mutation-security'
 
@@ -21,19 +23,13 @@ const leadSchema = z.object({
   referrer: z.string().trim().max(500).optional(),
 })
 
-function clientKey(request: NextRequest): string {
-  // pre-public (หลัง Zero Trust) — XFF พอสำหรับ rate-limit ขั้นต่ำ;
-  // edge rate-limit จริงเป็นเงื่อนไข public release (PENDING_USER_ACTION.md)
-  return request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'local'
-}
-
 export async function POST(request: NextRequest) {
   const mutation = validateMutationRequest(request, { requireJson: true })
   if (!mutation.ok) {
     return NextResponse.json({ ok: false, error: mutation.error }, { status: mutation.status })
   }
 
-  if (!allowRequest(clientKey(request))) {
+  if (!hasEdgeRateLimitMarker(request.headers) && !allowRequest(`leads:${clientKey(request)}`)) {
     return NextResponse.json(
       { ok: false, error: 'ส่งคำขอถี่เกินไป โปรดลองใหม่ในอีกสักครู่' },
       { status: 429 },

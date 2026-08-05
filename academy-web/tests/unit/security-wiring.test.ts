@@ -82,4 +82,27 @@ describe('security boundary wiring', () => {
     expect(retentionWorker).not.toContain('SUPABASE_SERVICE_ROLE_KEY')
     expect(retentionConfig).toContain('"triggers": { "crons": ["0 3 * * *"] }')
   })
+
+  it('public mutation rate limit อยู่ก่อน OpenNext และใช้ Durable Object ที่มี migration', () => {
+    const worker = source('worker.ts')
+    const config = source('wrangler.jsonc')
+    const policy = source('src/lib/edge-rate-limit-policy.ts')
+
+    expect(worker).toContain('enforceEdgeRateLimit')
+    expect(worker).toContain('EDGE_RATE_LIMITER')
+    expect(worker).toContain('RATE_LIMIT_KEY_SECRET')
+    expect(config).toContain('"class_name": "EdgeRateLimiter"')
+    expect(config).toContain('"new_sqlite_classes": ["EdgeRateLimiter"]')
+    expect(policy).toContain("'cf-connecting-ip'")
+    expect(policy).not.toContain("get('x-forwarded-for')")
+  })
+
+  it.each([
+    'src/app/api/leads/route.ts',
+    'src/app/api/leads/unsubscribe/route.ts',
+    'src/app/api/auth/otp/route.ts',
+    'src/app/api/auth/verify/route.ts',
+  ])('%s เชื่อใจ edge marker ที่มีค่า exact เท่านั้น', (path) => {
+    expect(source(path)).toContain('hasEdgeRateLimitMarker')
+  })
 })

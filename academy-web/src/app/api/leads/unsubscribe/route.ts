@@ -4,26 +4,20 @@ import { academyDb } from '@/lib/db/server'
 import { readBoundedJson } from '@/lib/http/bounded-body'
 import { validateMutationRequest } from '@/lib/http/mutation-security'
 import { allowRequest } from '@/lib/rate-limit'
+import { hasEdgeRateLimitMarker } from '@/lib/edge-rate-limit-policy'
+import { clientKey } from '@/lib/request-ip'
 
 export const runtime = 'nodejs'
 
 const MAX_BODY_BYTES = 1_000
 const schema = z.object({ token: z.string().uuid() })
 
-function clientKey(request: NextRequest): string {
-  const edgeIp = request.headers.get('cf-connecting-ip')?.trim()
-  const localIp = process.env.NODE_ENV !== 'production'
-    ? request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-    : null
-  return `unsubscribe:${edgeIp || localIp || 'unknown'}`
-}
-
 export async function POST(request: NextRequest) {
   const mutation = validateMutationRequest(request, { requireJson: true })
   if (!mutation.ok) {
     return NextResponse.json({ ok: false, error: mutation.error }, { status: mutation.status })
   }
-  if (!allowRequest(clientKey(request))) {
+  if (!hasEdgeRateLimitMarker(request.headers) && !allowRequest(`unsubscribe:${clientKey(request)}`)) {
     return NextResponse.json({ ok: false, error: 'โปรดลองใหม่ในอีกสักครู่' }, { status: 429 })
   }
 

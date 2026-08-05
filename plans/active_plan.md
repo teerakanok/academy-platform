@@ -35,7 +35,10 @@ anonymous, forged `service_role`, และ cross-schema ถูกปฏิเ�
    - หลักฐาน deployment/rollback อยู่ใน
      [`reports/academy-retention-api-rollout-2026-08-06.md`](../reports/academy-retention-api-rollout-2026-08-06.md)
 3. **ปิด public-launch gates ที่เหลือ**
-   - distributed edge rate limit และ log redaction
+   - distributed edge rate limit: source/test/build/dry-run พร้อมแล้ว แต่ยังต้อง
+     set `RATE_LIMIT_KEY_SECRET`, deploy และตรวจบน Cloudflare production ตาม
+     [`academy-web/docs/edge-rate-limit.md`](../academy-web/docs/edge-rate-limit.md)
+     ก่อนถือว่า launch gate ปิด; log redaction ยังเปิดอยู่
    - restricted case-system owner/access configuration
    - legal review ภาษาไทยสำหรับ privacy/retention/appeal
    - CNAME/Zero Trust/public exposure decision แยกจาก Worker preview deployment
