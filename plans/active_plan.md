@@ -10,11 +10,15 @@ Production checkpoint 2026-08-05 ปิดแล้วสำหรับฐา�
 least-privilege runtime data boundary: migrations `0001`–`0019` อยู่ใน Pool A;
 dedicated PostgREST เผยเฉพาะ `academy` ผ่าน
 `academy-data.cyberskills.co.th`, bind ที่ loopback, และ Worker version
-`4861c000-d987-40ac-971e-d6e47e1a92e0` ถือ Academy-scoped secret เท่านั้น
+`b85b7a6d-ceaa-4708-81fd-0d8096462251` ถือ Academy-scoped secret เท่านั้น
 (`MEDIA_SIGNING_SECRET`, runtime API URL/secret). Valid runtime JWT ตอบ `200`;
 anonymous, forged `service_role`, และ cross-schema ถูกปฏิเสธ `401/403/406` ตามลำดับ.
 หลักฐานและ rollback อยู่ใน
 [`reports/sessions/academy-production-release-2026-08-05.md`](../reports/sessions/academy-production-release-2026-08-05.md).
+
+Retention boundary ใช้ migration `0020_dedicated_retention_api.sql` แยกจาก runtime
+data boundary และ deploy แล้ว; เหลือเพียงหลักฐาน cron รอบ scheduled event แรกตาม
+[`reports/academy-retention-api-rollout-2026-08-06.md`](../reports/academy-retention-api-rollout-2026-08-06.md).
 
 งานหลักถัดไปตามลำดับ:
 
