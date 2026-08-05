@@ -38,7 +38,10 @@ anonymous, forged `service_role`, และ cross-schema ถูกปฏิเ�
    - distributed edge rate limit: source/test/build/dry-run พร้อมแล้ว แต่ยังต้อง
      set `RATE_LIMIT_KEY_SECRET`, deploy และตรวจบน Cloudflare production ตาม
      [`academy-web/docs/edge-rate-limit.md`](../academy-web/docs/edge-rate-limit.md)
-     ก่อนถือว่า launch gate ปิด; log redaction ยังเปิดอยู่
+     ก่อนถือว่า launch gate ปิด
+   - log redaction: unsubscribe bearer token ย้ายจาก query ไป URL fragment แล้ว
+     จึงไม่ถึง initial edge request; หลัง deploy ต้องตรวจ Worker/edge log ว่าไม่มี
+     token ใน request URL ก่อนถือว่า launch gate ปิด
    - restricted case-system owner/access configuration
    - legal review ภาษาไทยสำหรับ privacy/retention/appeal
    - CNAME/Zero Trust/public exposure decision แยกจาก Worker preview deployment

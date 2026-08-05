@@ -10,11 +10,9 @@ export const metadata: Metadata = {
 export default async function UnsubscribePage({
   searchParams,
 }: {
-  searchParams: Promise<{ token?: string | string[]; lang?: string | string[] }>
+  searchParams: Promise<{ lang?: string | string[] }>
 }) {
   const params = await searchParams
-  const value = params.token
-  const token = typeof value === 'string' && /^[0-9a-f-]{36}$/i.test(value) ? value : null
   const requestedLocale = params.lang === 'th' || params.lang === 'en' ? params.lang : null
-  return <UnsubscribeForm token={token} requestedLocale={requestedLocale} />
+  return <UnsubscribeForm requestedLocale={requestedLocale} />
 }

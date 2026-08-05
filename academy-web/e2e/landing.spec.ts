@@ -132,7 +132,7 @@ test.describe('lead capture ผ่าน UI', () => {
     const db = serviceDb()
     const lead = await db.from('leads').select('unsubscribe_token').eq('email', email).single()
     expect(lead.error).toBeNull()
-    await page.goto(`/unsubscribe?token=${lead.data!.unsubscribe_token}&lang=th`)
+    await page.goto(`/unsubscribe?lang=th#${lead.data!.unsubscribe_token}`)
     await expect(page.getByRole('heading', { name: 'หยุดรับอีเมลการตลาดจาก Academy' })).toBeVisible()
     await expect(page.locator('html')).toHaveAttribute('lang', 'th')
     await expect(page.getByRole('banner').getByRole('link', { name: 'คอร์สของฉัน' })).toBeVisible()
@@ -143,7 +143,7 @@ test.describe('lead capture ผ่าน UI', () => {
     expect(withdrawn.data!.marketing_withdrawn_at).toBeTruthy()
 
     // ลิงก์เก่าถูก rotate แล้ว แต่ response ยังเหมือน success เพื่อไม่เป็น lead oracle
-    await page.goto(`/unsubscribe?token=${lead.data!.unsubscribe_token}&lang=th`)
+    await page.goto(`/unsubscribe?lang=th#${lead.data!.unsubscribe_token}`)
     await page.getByRole('button', { name: 'ยกเลิกรับอีเมล' }).click()
     await expect(page.getByTestId('unsubscribe-result')).toBeVisible()
     await db.from('leads').delete().eq('email', email)

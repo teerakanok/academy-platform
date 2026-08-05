@@ -21,7 +21,10 @@ certificates, analytics, new processors, or a new data destination.
 ## Processing boundaries
 
 - Marketing senders must select recipients only from `academy.active_marketing_leads`.
-- The unsubscribe URL contains a random recipient token. It must not expose an email address.
+- The unsubscribe URL carries a random recipient token in its fragment
+  (`/unsubscribe#<token>`), never a query string. Fragments are not sent to the
+  edge; the browser reads the token once, removes it from history, then posts it
+  to the unsubscribe endpoint. It must not expose an email address.
 - The public unsubscribe response is identical for valid, invalid, expired, and already-used tokens.
 - Academy application code reaches personal data through server-side service functions. Browser clients receive no database credentials.
 - The final processor names, processing locations, transfer grounds, and contracts remain a launch gate because production providers are not yet authorized.

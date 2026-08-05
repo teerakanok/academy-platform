@@ -105,4 +105,16 @@ describe('security boundary wiring', () => {
   ])('%s เชื่อใจ edge marker ที่มีค่า exact เท่านั้น', (path) => {
     expect(source(path)).toContain('hasEdgeRateLimitMarker')
   })
+
+  it('unsubscribe bearer token อยู่ใน fragment เท่านั้น ไม่ผ่าน query เข้า server หรือ edge', () => {
+    const page = source('src/app/unsubscribe/page.tsx')
+    const form = source('src/app/unsubscribe/UnsubscribeForm.tsx')
+    const e2e = source('e2e/landing.spec.ts')
+
+    expect(page).not.toContain('token?:')
+    expect(form).toContain('unsubscribeTokenFromFragment(window.location.hash)')
+    expect(form).toContain('window.history.replaceState')
+    expect(e2e).not.toContain('/unsubscribe?token=')
+    expect(e2e).toContain('/unsubscribe?lang=th#')
+  })
 })

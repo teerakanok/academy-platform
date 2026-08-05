@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useUi } from '@/components/i18n/LocaleProvider'
+import { unsubscribeTokenFromFragment } from '@/lib/unsubscribe-token'
 
 type Phase = 'ready' | 'submitting' | 'done' | 'failed'
 
@@ -33,14 +34,21 @@ const COPY = {
   },
 } as const
 
-export function UnsubscribeForm({ token, requestedLocale }: { token: string | null; requestedLocale: 'th' | 'en' | null }) {
+export function UnsubscribeForm({ requestedLocale }: { requestedLocale: 'th' | 'en' | null }) {
   const { locale, setLocale } = useUi()
   const copy = COPY[requestedLocale ?? locale]
   const [phase, setPhase] = useState<Phase>('ready')
+  const [token, setToken] = useState<string | null | undefined>(undefined)
 
   useEffect(() => {
     if (requestedLocale) setLocale(requestedLocale)
   }, [requestedLocale, setLocale])
+
+  useEffect(() => {
+    setToken(unsubscribeTokenFromFragment(window.location.hash))
+    // Do not keep a bearer token in browser history after this single read.
+    window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`)
+  }, [])
 
   async function unsubscribe() {
     if (!token || phase === 'submitting' || phase === 'done') return
@@ -64,7 +72,7 @@ export function UnsubscribeForm({ token, requestedLocale }: { token: string | nu
       <p className="mt-4 leading-relaxed text-cs-body">{copy.body}</p>
 
       <div className="mt-8 border-y border-cs-border py-6">
-        {!token ? (
+        {token === undefined ? null : !token ? (
           <p role="alert" className="text-sm leading-relaxed text-cs-amber">{copy.invalid}</p>
         ) : phase === 'done' ? (
           <p role="status" className="text-sm leading-relaxed text-cs-text" data-testid="unsubscribe-result">

@@ -20,7 +20,8 @@ handling requests other than unsubscribe in production.
 
 ## Marketing withdrawal
 
-- Recipient links call `POST /api/leads/unsubscribe` with the opaque token.
+- Recipient links use `/unsubscribe#<opaque-token>`; the browser posts the token
+  to `POST /api/leads/unsubscribe` without putting it in the initial request URL.
 - A verified email request is processed with `withdraw_marketing_consent_by_email`.
 - Withdrawal takes effect immediately for future selections. Never export recipients directly from `leads`; use `active_marketing_leads`.
 - Do not disclose whether an address was subscribed. Confirm only that the request has been applied where applicable.

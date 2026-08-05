@@ -97,9 +97,10 @@ login สองทาง) — รายละเอียดและเหต�
 - (M5) DD payment gateway ไทย + ยืนยัน CF Stream + ราคา ณ วันใช้จริง
 - ก่อน public release: deploy edge rate limit ที่ source พร้อมแล้ว โดย set
   `RATE_LIMIT_KEY_SECRET` ก่อน และตรวจ bounded `429`/`Retry-After` ตาม
-  `academy-web/docs/edge-rate-limit.md`; ห้ามถือว่า gate ปิดก่อน production proof
-  + ทบทวนการเอา CAS-005 fixture ออกจาก deploy (ตอนนี้ INTERNAL ONLY — `/player`
-  ห้าม public)
+  `academy-web/docs/edge-rate-limit.md`; deploy fragment-based unsubscribe link
+  และตรวจ edge log ว่า URL ไม่มี bearer token; ห้ามถือว่า gate ปิดก่อน production
+  proof + ทบทวนการเอา CAS-005 fixture ออกจาก deploy (ตอนนี้ INTERNAL ONLY —
+  `/player` ห้าม public)
 
 ## 6) Push + submodule pointer (รอ authorization)
 
