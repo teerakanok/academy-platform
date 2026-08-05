@@ -5,6 +5,31 @@
 
 ---
 
+## 2026-08-06 — Checkpoint drafts survive a reload within one issued attempt
+
+**Outcome:** learner-entered checkpoint answers and simulation state are now
+stored as a versioned browser draft keyed by course, node, and server-issued
+attempt ID. Reloading returns only that attempt's work; a different attempt
+cannot read it. The draft is removed when the checkpoint passes or the learner
+requests a new attempt.
+
+**Safety:** the browser store accepts only current question IDs and choice keys,
+and only simulation fields/types permitted by that issued public challenge.
+Malformed storage is discarded. The draft contains no answer key, grading rule,
+session credential, or authority; server-side attempt and grading controls
+remain authoritative.
+
+**Verification:** draft unit contract covers round-trip isolation, malformed or
+out-of-contract storage, and scoped clearing. Academy unit suite passed
+400/400; lint/typecheck and Cloudflare build passed.
+
+**Residual risk:** browser storage is best-effort and device-local. A learner
+can resume an issued task after a reload on the same browser, but cross-device
+draft synchronization remains intentionally out of scope until account runtime
+is open.
+
+---
+
 ## 2026-08-06 — Unsubscribe URL bearer redaction deployed and verified
 
 **Outcome:** unsubscribe tokens are carried only in the URL fragment. The browser

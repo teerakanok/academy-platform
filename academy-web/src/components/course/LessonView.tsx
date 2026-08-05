@@ -233,6 +233,7 @@ export function LessonView({
   async function submitCheckpoint(
     quizMode: 'learn' | 'test-out',
     submission: { answers: Record<string, string[]>; simulations: Record<string, SimulationState> },
+    controls?: { discardDraft: () => void },
   ): Promise<CheckpointOutcome | { validationError: 'simulation-incomplete' } | null> {
     const { failure, outcome } = await pushProgress({
       action: 'checkpoint',
@@ -266,6 +267,7 @@ export function LessonView({
     if (failure?.needsNewAttempt) {
       // โจทย์ชุดนี้ใช้ไม่ได้แล้ว — ขอชุดใหม่ให้เลย ผู้เรียนจะได้ไม่ติดอยู่กับปุ่มที่
       // กดแล้วได้ error เดิมทุกครั้ง (ด่านจะกลับมาเมื่อโจทย์ชุดใหม่มาถึง)
+      controls?.discardDraft()
       retryAttempt()
     }
     if (failure?.simulationIncomplete) {
@@ -700,11 +702,19 @@ export function LessonView({
             ที่ยังไม่ได้แทนค่า จึงเอามาให้ผู้เรียนอ่านไม่ได้ (ดูเหตุผลใน use-lesson-attempt) */}
         {(attempt.status === 'not-needed' || attempt.status === 'ready') && (
           <CheckpointQuiz
+            key={attempt.status === 'ready' ? attempt.id : 'checkpoint-not-needed'}
             items={withAttemptTasks(lesson.checkpoint, attempt.status === 'ready' ? attempt : null)}
             requireAllCorrect={mode === 'test-out' || isCapstone}
-            onSubmit={(submission) => submitCheckpoint(mode === 'test-out' ? 'test-out' : 'learn', submission)}
+            onSubmit={(submission, controls) =>
+              submitCheckpoint(mode === 'test-out' ? 'test-out' : 'learn', submission, controls)
+            }
             onPassed={() => finishCheckpoint(mode === 'test-out' ? 'test-out' : 'learn')}
             onRetry={attempt.status === 'ready' ? retryAttempt : undefined}
+            draftScope={
+              attempt.status === 'ready'
+                ? { courseSlug: structure.slug, nodeId: node.id, attemptId: attempt.id }
+                : undefined
+            }
           />
         )}
         </div>

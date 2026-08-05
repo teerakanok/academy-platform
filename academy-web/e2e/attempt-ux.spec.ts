@@ -82,6 +82,8 @@ test.describe('การรอโจทย์ของ attempt', () => {
     // ตอบผิดทั้ง MCQ และด่านจำลอง แล้วกดตรวจ (เลือกจากข้อความ — key ถูก remap ต่อ attempt)
     await answerOnPage(page, COURSE, CAPSTONE, { wrongFor: ['cp-1', 'cp-2', 'cp-3'] })
     await applySimulation(page, false)
+    const oldDraftKeys = await page.evaluate(() => Object.keys(window.localStorage).filter((key) => key.startsWith('academy.checkpoint-draft:v1:')))
+    expect(oldDraftKeys).toHaveLength(1)
     await page.getByTestId('checkpoint-submit').click()
     await expect(page.getByTestId('checkpoint-not-passed')).toBeVisible()
 
@@ -94,6 +96,9 @@ test.describe('การรอโจทย์ของ attempt', () => {
     expect(issued.status(), 'กดลองใหม่แล้วต้องได้โจทย์ชุดใหม่').toBe(200)
     const sim2 = page.getByTestId('checkpoint-sim-sim-1')
     await expect(sim2).toBeVisible()
+    await expect
+      .poll(() => page.evaluate(() => Object.keys(window.localStorage).filter((key) => key.startsWith('academy.checkpoint-draft:v1:'))))
+      .not.toContain(oldDraftKeys[0])
 
     // ตอบให้ถูกครบด้วยค่าของโจทย์ชุดใหม่ → ต้องผ่านจริง ไม่ใช่ค้างที่ 409
     const secondTarget = /192\.168\.10\.\d+/.exec((await sim2.textContent()) ?? '')?.[0]
@@ -118,6 +123,8 @@ test.describe('การรอโจทย์ของ attempt', () => {
     await expect(page.getByTestId('checkpoint-sim-sim-1')).toBeVisible()
     await answerOnPage(page, COURSE, CAPSTONE)
     await applySimulation(page, true)
+    const oldDraftKeys = await page.evaluate(() => Object.keys(window.localStorage).filter((key) => key.startsWith('academy.checkpoint-draft:v1:')))
+    expect(oldDraftKeys).toHaveLength(1)
 
     let blocked = false
     await page.route('**/api/progress', async (route) => {
@@ -141,6 +148,9 @@ test.describe('การรอโจทย์ของ attempt', () => {
     // ด่านกลับมาพร้อมโจทย์ชุดใหม่ ไม่ใช่ปุ่มค้างที่กดแล้ว error เดิม
     await expect(page.getByTestId('checkpoint-sim-sim-1')).toBeVisible()
     await expect(page.getByTestId('checkpoint-submit')).toBeVisible()
+    await expect
+      .poll(() => page.evaluate(() => Object.keys(window.localStorage).filter((key) => key.startsWith('academy.checkpoint-draft:v1:'))))
+      .not.toContain(oldDraftKeys[0])
   })
 
   test('simulation ยังไม่พร้อมจาก server drift ต้องคง attempt ใบเดิมไว้', async ({ page }) => {
@@ -308,5 +318,43 @@ test.describe('เปิดหน้าซ้ำ', () => {
     // ผู้เรียนจะเห็นโจทย์ใหม่คู่กับเฉลยเก่าที่เก็บไว้ใน attempt (mutation จับได้ตรงนี้)
     expect(new Set(targets).size, 'ค่าเป้าหมายต้องไม่เปลี่ยนระหว่าง refresh').toBe(1)
     expect(new Set(prompts).size, 'ตัวเลือกของ MCQ ต้องไม่สลับระหว่าง refresh').toBe(1)
+  })
+
+  test('🔴 reload คืนคำตอบและสถานะจำลองของ attempt เดิม แล้วล้าง draft หลังผ่าน', async ({ page }) => {
+    await page.goto(LESSON_URL)
+    const sim = page.getByTestId('checkpoint-sim-sim-1')
+    await expect(sim).toBeVisible()
+
+    const firstChoice = page.getByTestId('checkpoint-q-cp-1').locator('input').first()
+    await firstChoice.check()
+    await sim.getByTestId('sim-mode-static').check()
+    await sim.getByTestId('sim-ipv4').fill('198.51.100.25')
+    await sim.getByTestId('sim-subnet').fill('255.255.255.0')
+    await sim.getByTestId('sim-gateway').fill('198.51.100.1')
+    await sim.getByTestId('sim-apply').click()
+
+    const draftKeys = await page.evaluate(() => Object.keys(window.localStorage).filter((key) => key.startsWith('academy.checkpoint-draft:v1:')))
+    expect(draftKeys).toHaveLength(1)
+
+    await page.reload()
+    const restored = page.getByTestId('checkpoint-sim-sim-1')
+    await expect(restored).toBeVisible()
+    await expect(firstChoice).toBeChecked()
+    await expect(restored.getByTestId('sim-mode-static')).toBeChecked()
+    await expect(restored.getByTestId('sim-ipv4')).toHaveValue('198.51.100.25')
+    await expect(restored.getByTestId('sim-status')).toHaveText('Settings applied')
+
+    const target = /192\.168\.10\.\d+/.exec((await restored.textContent()) ?? '')?.[0]
+    expect(target).toBeTruthy()
+    await answerOnPage(page, COURSE, CAPSTONE)
+    await restored.getByTestId('sim-ipv4').fill(target!)
+    await restored.getByTestId('sim-subnet').fill('255.255.255.0')
+    await restored.getByTestId('sim-gateway').fill('192.168.10.1')
+    await restored.getByTestId('sim-apply').click()
+    await page.getByTestId('checkpoint-submit').click()
+    await expect(page.getByTestId('checkpoint-continue')).toBeVisible()
+    await expect
+      .poll(() => page.evaluate(() => Object.keys(window.localStorage).filter((key) => key.startsWith('academy.checkpoint-draft:v1:'))))
+      .toHaveLength(0)
   })
 })

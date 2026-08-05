@@ -1,8 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { AttemptQuestion, AttemptSimulation, PublicCheckpointItem } from '@/lib/content/public-lesson'
 import type { CheckpointOutcome } from '@/lib/course/progress-client'
+import {
+  browserCheckpointDraftStore,
+  checkpointDraftKey,
+  clearCheckpointDraft,
+  loadCheckpointDraft,
+  saveCheckpointDraft,
+  type CheckpointDraftScope,
+} from '@/lib/course/checkpoint-draft'
 import { simulationReadiness, type SimulationState } from '@/lib/simulation/types'
 import { SimulationSurface } from './blocks/SimulationSurface'
 
@@ -22,6 +30,7 @@ export function CheckpointQuiz({
   onSubmit,
   onPassed,
   onRetry,
+  draftScope,
 }: {
   /** ด่านท้ายบท — MCQ และ/หรือโจทย์จำลอง (W1) */
   items: PublicCheckpointItem[]
@@ -31,7 +40,7 @@ export function CheckpointQuiz({
   onSubmit: (submission: {
     answers: Record<string, string[]>
     simulations: Record<string, SimulationState>
-  }) => Promise<CheckpointOutcome | { validationError: 'simulation-incomplete' } | null>
+  }, controls: { discardDraft: () => void }) => Promise<CheckpointOutcome | { validationError: 'simulation-incomplete' } | null>
   /** ผู้เรียนกดไปต่อหลังผ่านแล้ว */
   onPassed: () => void
   /**
@@ -40,14 +49,25 @@ export function CheckpointQuiz({
    * ไม่ใส่ = ด่านนี้ไม่ได้ผูกกับ attempt (บทสอนทั่วไป) การล้างช่องกรอกก็พอ
    */
   onRetry?: () => void
+  /** เก็บ draft ได้เฉพาะโจทย์ที่ server issue แล้ว และแยกตาม attempt เสมอ */
+  draftScope?: CheckpointDraftScope
 }) {
   // เฉพาะข้อที่มีโจทย์จริงจาก attempt — ด่านที่ผูกกับ attempt จะส่งมาแค่รายชื่องาน
-  const questions = items.filter(
-    (item): item is AttemptQuestion => item.kind === 'mcq' && item.choices !== undefined,
+  const questions = useMemo(
+    () => items.filter((item): item is AttemptQuestion => item.kind === 'mcq' && item.choices !== undefined),
+    [items],
   )
-  const simulations = items.filter(
-    // เฉพาะด่านที่มีโจทย์จริงจาก attempt — ของในไฟล์เป็นแม่แบบที่ยังไม่ได้แทนค่า
-    (item): item is AttemptSimulation => item.kind === 'simulation' && item.challenge !== undefined,
+  const simulations = useMemo(
+    () =>
+      items.filter(
+        // เฉพาะด่านที่มีโจทย์จริงจาก attempt — ของในไฟล์เป็นแม่แบบที่ยังไม่ได้แทนค่า
+        (item): item is AttemptSimulation => item.kind === 'simulation' && item.challenge !== undefined,
+      ),
+    [items],
+  )
+  const draftSimulations = useMemo(
+    () => simulations.map(({ id, challenge }) => ({ id, surface: challenge.surface, initial: challenge.initial })),
+    [simulations],
   )
   const [answers, setAnswers] = useState<Record<string, string[]>>({})
   // สถานะหน้าจอจำลองต่อด่าน — ตั้งต้นจาก `initial` ของโจทย์แต่ละตัว
@@ -58,6 +78,39 @@ export function CheckpointQuiz({
   const [outcome, setOutcome] = useState<CheckpointOutcome | null>(null)
   const [failed, setFailed] = useState(false)
   const [validationError, setValidationError] = useState(false)
+  const draftKey = draftScope ? checkpointDraftKey(draftScope) : null
+  const [hydratedDraftKey, setHydratedDraftKey] = useState<string | null>(null)
+  const [persistDraft, setPersistDraft] = useState(true)
+  const hydrating = Boolean(draftScope && hydratedDraftKey !== draftKey)
+
+  function discardDraft() {
+    const store = browserCheckpointDraftStore()
+    if (draftScope && store) clearCheckpointDraft(store, draftScope)
+    setPersistDraft(false)
+  }
+
+  // Hydrate หลัง mount เพื่อไม่ให้ SSR กับ browser localStorage ให้ markup เริ่มต้นต่างกัน.
+  // เมื่อ attempt เปลี่ยน LessonView จะ remount component ด้วย key ของ attempt นั้น.
+  useEffect(() => {
+    if (!draftScope || !draftKey) {
+      setHydratedDraftKey(null)
+      return
+    }
+    if (hydratedDraftKey === draftKey) return
+    const store = browserCheckpointDraftStore()
+    const saved = store ? loadCheckpointDraft(store, draftScope, questions, draftSimulations) : null
+    setAnswers(saved?.answers ?? {})
+    setSimStates(
+      saved?.simulations ?? Object.fromEntries(simulations.map((s) => [s.id, { ...s.challenge.initial }])),
+    )
+    setHydratedDraftKey(draftKey)
+  }, [draftKey, draftScope, draftSimulations, hydratedDraftKey, questions, simulations])
+
+  useEffect(() => {
+    if (!draftScope || !persistDraft || hydratedDraftKey !== draftKey) return
+    const store = browserCheckpointDraftStore()
+    if (store) saveCheckpointDraft(store, draftScope, questions, draftSimulations, { answers, simulations: simStates })
+  }, [answers, draftKey, draftScope, draftSimulations, hydratedDraftKey, persistDraft, questions, simStates])
 
   // โจทย์จำลองไม่มี "ยังไม่ตอบ" — หน้าจอมีค่าตั้งต้นเสมอ จึงนับเฉพาะ MCQ
   const allQuestionsAnswered = questions.every((q) => (answers[q.id]?.length ?? 0) > 0)
@@ -74,7 +127,7 @@ export function CheckpointQuiz({
   const explanations = outcome?.explanations
 
   function toggle(question: Extract<PublicCheckpointItem, { kind: 'mcq' }>, letter: string) {
-    if (grading || outcome) return
+    if (hydrating || grading || outcome) return
     setValidationError(false)
     setAnswers((prev) => {
       const current = prev[question.id] ?? []
@@ -90,10 +143,11 @@ export function CheckpointQuiz({
   }
 
   async function grade() {
+    if (hydrating) return
     setGrading(true)
     setFailed(false)
     setValidationError(false)
-    const next = await onSubmit({ answers, simulations: simStates })
+    const next = await onSubmit({ answers, simulations: simStates }, { discardDraft })
     setGrading(false)
     if (!next) {
       setFailed(true)
@@ -103,10 +157,12 @@ export function CheckpointQuiz({
       setValidationError(true)
       return
     }
+    if (next.passed) discardDraft()
     setOutcome(next)
   }
 
   function retry() {
+    discardDraft()
     setAnswers({})
     setSimStates(Object.fromEntries(simulations.map((s) => [s.id, { ...s.challenge.initial }])))
     setOutcome(null)
@@ -120,7 +176,12 @@ export function CheckpointQuiz({
   }
 
   return (
-    <section className="card-feature p-6 sm:p-8" aria-labelledby="checkpoint-heading" data-testid="checkpoint">
+    <section
+      className="card-feature p-6 sm:p-8"
+      aria-labelledby="checkpoint-heading"
+      aria-busy={hydrating || grading}
+      data-testid="checkpoint"
+    >
       <div className="mb-1 flex flex-wrap items-baseline justify-between gap-2">
         <h2 id="checkpoint-heading" className="font-display text-2xl font-semibold text-cs-text">
           {requireAllCorrect ? 'Required checkpoint' : 'Check yourself'}
@@ -131,8 +192,19 @@ export function CheckpointQuiz({
       </div>
       <p className="mb-6 text-sm text-cs-muted">
         {requireAllCorrect
-          ? 'This one is required. Answer every question correctly to pass it — you can retry as many times as you like.'
+          ? 'This one is required. Answer every question correctly to pass it. You can try again with a fresh task.'
           : 'Getting one wrong is fine. The explanations are the point.'}
+      </p>
+      <p role="status" aria-live="polite" aria-atomic="true" className="sr-only" data-testid="checkpoint-status">
+        {hydrating
+          ? 'Restoring your saved answers.'
+          : grading
+            ? 'Checking your answers.'
+            : outcome?.passed
+              ? 'Checkpoint passed.'
+              : outcome
+                ? 'Checkpoint not passed. You can try again with a fresh task.'
+                : ''}
       </p>
 
       <div className="space-y-7">
@@ -171,7 +243,7 @@ export function CheckpointQuiz({
                         name={`q-${question.id}`}
                         value={letter}
                         checked={isPicked}
-                        disabled={grading || outcome !== null}
+                        disabled={hydrating || grading || outcome !== null}
                         onChange={() => toggle(question, letter)}
                         className="mt-0.5 h-4 w-4 accent-cs-accent"
                       />
@@ -214,10 +286,11 @@ export function CheckpointQuiz({
                 surface={item.challenge.surface}
                 state={simStates[item.id] ?? item.challenge.initial}
                 onChange={(next) => {
+                  if (hydrating) return
                   setValidationError(false)
                   setSimStates((prev) => ({ ...prev, [item.id]: next }))
                 }}
-                readOnly={grading || outcome !== null}
+                readOnly={hydrating || grading || outcome !== null}
               />
             </div>
           ))}
@@ -230,25 +303,25 @@ export function CheckpointQuiz({
             <button
               type="button"
               onClick={grade}
-              disabled={!allAnswered || grading}
+              disabled={!allAnswered || hydrating || grading}
               data-testid="checkpoint-submit"
               className="rounded-control bg-cs-accent-fill px-6 py-3 text-sm font-semibold text-cs-on-accent shadow-card transition-transform duration-200 hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-40 disabled:shadow-none"
             >
-              {grading ? 'Checking…' : 'Check my answers'}
+              {hydrating ? 'Restoring…' : grading ? 'Checking…' : 'Check my answers'}
             </button>
             {/* ระหว่างรอ ห้ามประกาศผลล่วงหน้า — หน้าจอต้องบอกว่ากำลังตรวจ (W0-2) */}
-            {grading && (
+            {(hydrating || grading) && (
               <span className="text-sm text-cs-muted" data-testid="checkpoint-grading">
-                Checking your answers…
+                {hydrating ? 'Restoring your saved answers…' : 'Checking your answers…'}
               </span>
             )}
             {failed && (
-              <span className="text-sm text-cs-amber" data-testid="checkpoint-grade-failed">
+              <span role="alert" className="text-sm text-cs-amber" data-testid="checkpoint-grade-failed">
                 We could not check your answers just now. Try again in a moment.
               </span>
             )}
             {validationError && (
-              <span className="text-sm text-cs-amber" data-testid="checkpoint-validation-error">
+              <span role="alert" className="text-sm text-cs-amber" data-testid="checkpoint-validation-error">
                 Finish every hands-on field and apply the settings, then check again. Your answers are still here.
               </span>
             )}
