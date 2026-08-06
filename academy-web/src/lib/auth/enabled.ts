@@ -1,3 +1,5 @@
+import { legacyDirectOtpFixtureAllowedForHost } from './legacy-direct-otp'
+
 // ระบบบัญชีเปิดใช้งานได้จริงหรือยัง
 //
 // ตัวชี้วัดคือ "ตั้งค่าครบไหม" ไม่ใช่ flag แยกต่างหาก — flag ที่ต้องตั้งเองมักถูกลืม
@@ -9,8 +11,8 @@
 // โชว์ฟอร์มที่กดแล้วพังทุกครั้ง ทั้งที่โค้ดตั้งใจให้ขึ้นว่า "ยังไม่เปิด"
 // ทางแก้: build ผ่าน `npm run build:cf` ซึ่ง set ค่าว่างที่ shell (สิทธิ์สูงสุด)
 // อย่า build ด้วย opennextjs-cloudflare ตรงๆ เวลาจะ deploy
-export function accountsEnabled(): boolean {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()
-  return Boolean(url && key)
+export function accountsEnabled(requestHost: string): boolean {
+  // Account Center ไม่พร้อมใช้งานจริงจนกว่า Identity Control จะ release. เส้นทาง
+  // Supabase เดิมมีไว้ให้ local E2E fixture เท่านั้นและต้องเปิดแบบ explicit.
+  return legacyDirectOtpFixtureAllowedForHost(requestHost)
 }

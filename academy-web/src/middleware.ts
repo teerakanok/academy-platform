@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { internalSurfacesEnabled, isInternalSurface } from '@/lib/internal-surface'
 import { authCookieOptions, isSecureRequest } from '@/lib/auth/cookie-policy'
+import { legacyDirectOtpFixtureAllowedForRequest } from '@/lib/auth/legacy-direct-otp'
 
 // ประตูเดียวของทั้งเว็บ — ตัดสินว่าเส้นทางไหนเปิด เส้นทางไหนต้องมีบัญชี
 //
@@ -59,8 +60,9 @@ export async function middleware(request: NextRequest) {
   // ถูกเด้งออกระหว่างทำ quiz ซึ่งเสียงานที่ยังไม่ได้บันทึก
   let response = NextResponse.next({ request })
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const allowLegacyFixture = legacyDirectOtpFixtureAllowedForRequest(request)
+  const url = allowLegacyFixture ? process.env.NEXT_PUBLIC_SUPABASE_URL : undefined
+  const anonKey = allowLegacyFixture ? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY : undefined
   if (!url || !anonKey) {
     // ตั้ง env ไม่ครบ = ตัดสินสิทธิ์ไม่ได้ → ปิดไว้ก่อน ไม่ใช่ปล่อยผ่าน
     return isPublic(request.nextUrl.pathname)

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getIdentityAdapter } from '@/lib/identity/registry'
+import { IdentityTransactionError, parseIdentityCallback } from '@/lib/identity/transaction'
 
 export const runtime = 'nodejs'
 
@@ -11,27 +12,20 @@ export const runtime = 'nodejs'
 // ตั้งแต่ก่อนแลก code เพราะถ้ามีของพวกนั้นมาด้วย แปลว่าอีกฝั่งทำผิดสัญญา
 // และเราต้องไม่ทำให้มันดูเหมือนใช้ได้
 //
-// PKCE verifier อยู่ใน transaction ฝั่ง backend เท่านั้น ไม่เคยออกไปที่ browser
-// (ยังไม่ได้ทำ transaction store — เป็นงานถัดไปเมื่อจะต่อจริง)
-
-const FORBIDDEN_PARAMS = ['subject', 'sub', 'email', 'access_token', 'id_token', 'otp', 'invite', 'invitation', 'enrollment_code']
+// PKCE verifier อยู่ใน transaction ฝั่ง backend เท่านั้น ไม่เคยออกไปที่ browser.
+// Local in-memory transaction contract มีไว้ทดสอบ boundary แล้ว แต่ route นี้ยังห้าม
+// wire เข้ากับ runtime จนกว่า Identity Control จะ release registry และ authorization
+// สำหรับ durable store/session ของ Academy.
 
 export async function GET(request: Request) {
   const url = new URL(request.url)
-
-  const leaked = FORBIDDEN_PARAMS.filter((p) => url.searchParams.has(p))
-  if (leaked.length > 0) {
-    console.error('[auth/callback] callback มีข้อมูลที่ห้ามส่งผ่าน browser:', leaked.join(', '))
-    return NextResponse.json(
-      { ok: false, error: 'callback ไม่เป็นไปตามสัญญา — มีข้อมูลที่ห้ามส่งผ่าน browser' },
-      { status: 400 },
-    )
-  }
-
-  const code = url.searchParams.get('code')
-  const state = url.searchParams.get('state')
-  if (!code || !state) {
-    return NextResponse.json({ ok: false, error: 'callback ต้องมี code และ state' }, { status: 400 })
+  try {
+    parseIdentityCallback(url)
+  } catch (error) {
+    if (error instanceof IdentityTransactionError) {
+      return NextResponse.json({ ok: false, error: error.message }, { status: 400 })
+    }
+    throw error
   }
 
   const adapter = getIdentityAdapter()
@@ -51,7 +45,7 @@ export async function GET(request: Request) {
   //   5. syncActivation ตามผลที่ได้
   //   6. ตั้ง session ของ Academy เอง แบบ host-scoped
   return NextResponse.json(
-    { ok: false, error: 'ยังไม่เปิดใช้งาน — transaction store ฝั่ง backend ยังไม่ได้ทำ' },
+    { ok: false, error: 'ยังไม่เปิดใช้งาน — ยังไม่มี Identity Control runtime ที่ได้รับอนุมัติ' },
     { status: 501 },
   )
 }

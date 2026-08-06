@@ -1,11 +1,11 @@
 import { academyDb } from '@/lib/db/server'
 
-// ชั้นบัญชีของ Academy — ตัวตนจริงอยู่ที่ issuer กลาง (GoTrue บน Pool A)
+// ชั้นบัญชีของ Academy — ตัวตนจริงอยู่ที่ canonical issuer ของ Identity Control
 // ตารางนี้เก็บแค่ส่วนที่ Academy ต้องใช้ และผูกกับ issuer ด้วย (issuer, subject)
 //
 // กฎเหล็กจาก ADR: **ห้ามใช้ email เป็น key ในการหาบัญชี** email เปลี่ยนได้ ใช้ซ้ำได้
 // และ Forge เคยพลาดตรงนี้มาแล้ว ยิ่งมีแผนออก certification เอง ตัวตนยิ่งต้องผูกกับ
-// สิ่งที่ไม่เปลี่ยนตามอีเมล — email ในตารางมีไว้ "แสดงผล + ผูก waitlist ครั้งเดียว"
+// สิ่งที่ไม่เปลี่ยนตามอีเมล — email ในตารางมีไว้แสดงผลเท่านั้น
 
 export interface AcademyUser {
   id: string
@@ -41,10 +41,10 @@ function toUser(row: Record<string, unknown>): AcademyUser {
 }
 
 /**
- * หาบัญชีจากตัวตน หรือสร้างถ้ายังไม่มี แล้วผูก waitlist lead ที่ใช้อีเมลเดียวกัน
+ * หาบัญชีจาก canonical principal หรือสร้างถ้ายังไม่มี.
  *
- * การผูก lead เกิด "ครั้งเดียวตอนสมัคร" โดยเจตนา — ไม่ใช่ join ถาวรด้วยอีเมล
- * ถ้าผู้ใช้เปลี่ยนอีเมลภายหลัง lead เดิมยังผูกอยู่กับบัญชีเดิมอย่างถูกต้อง
+ * Waitlist lead ห้ามเชื่อมหรือย้ายด้วย email equality: email เดียวอาจเป็นคนละ
+ * principal และ consent lead ต้องไม่ถูก inherit โดยเงียบ ๆ.
  */
 export async function findOrCreateUser(claims: IdentityClaims): Promise<AcademyUser> {
   const email = normaliseEmail(claims.email)
@@ -103,9 +103,6 @@ export async function findOrCreateUser(claims: IdentityClaims): Promise<AcademyU
     }
     throw new Error(`สร้างบัญชีไม่สำเร็จ: ${created.error.message}`)
   }
-
-  // ผูก waitlist ที่เคยลงชื่อไว้ด้วยอีเมลเดียวกัน — ทำครั้งเดียว และเฉพาะที่ยังไม่ถูกผูก
-  await db.from('leads').update({ user_id: created.data.id }).eq('email', email).is('user_id', null)
 
   return toUser(created.data)
 }

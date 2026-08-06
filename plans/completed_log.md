@@ -5,6 +5,52 @@
 
 ---
 
+## 2026-08-06 — Identity Control local convergence preparation
+
+**Outcome:** Academy now follows the accepted central-account boundary without
+inventing production identity configuration. The local fake flow creates and
+one-time-consumes server-held state, PKCE verifier, and nonce; it rejects every
+browser callback payload except one opaque `code` plus one opaque `state`, then
+validates audience, service ID, nonce, principal shape, and activation shape
+before any future Academy session/profile orchestration. It also requires the
+code-exchange client assertion through a server-held provider boundary; no key,
+signer, or production client value was invented locally.
+
+**Safety:** direct Academy-to-GoTrue OTP is quarantined to an explicit,
+loopback-only local E2E fixture. A deployed Academy cannot reopen that path by
+receiving public Supabase values. Fake mode requires an explicit local-only
+issuer and is rejected on production; Academy does not guess the canonical
+issuer, Account Center endpoint, client/service registration, audience, callback
+registry, key, or secret.
+
+**Identity ownership correction:** a new canonical principal no longer inherits
+or links a waitlist lead through email equality. Migration `0021` nulls legacy
+`leads.user_id` associations while retaining the underlying waitlist and consent
+records.
+
+**Ownership:** Identity Control remains responsible for canonical principals,
+Account Center, OTP, service activation, authorization codes, lifecycle and
+client registry. Academy retains only its profile projection, orders, course
+entitlements/invites, learning records, attempts, and certificates. Activation
+does not grant a course entitlement.
+
+**Verification:** local transaction/callback, direct-OTP quarantine, registry,
+sign-in state, and full Academy unit suite passed 420/420; lint/typecheck and
+Cloudflare build passed with only the pre-existing generated-registry warning.
+The independent code/debt, security, and UX review loop closed with no remaining
+critical, high, medium, or low finding.
+No Pool A, Identity Control production configuration, DNS, credential, or
+deployment was touched.
+The independent review record is
+`reports/reviews/academy-identity-control-preparation-2026-08-06.md`.
+
+**Residual risk:** production integration remains intentionally unwired until
+Identity Control publishes the registered values and receives separate release
+authorization. The local in-memory transaction store is test preparation only,
+not a production persistence design.
+
+---
+
 ## 2026-08-06 — Checkpoint drafts survive a reload within one issued attempt
 
 **Outcome:** learner-entered checkpoint answers and simulation state are now

@@ -5,7 +5,8 @@
 // แล้วรับ one-time code กลับมาแลกที่ backend ของตัวเอง
 //
 // contract ตัวจริงอยู่ที่ products/cyberskills/identity-control/packages/contracts
-// (`AuthorizationStart`, `CodeExchange`, `ExchangeResult`) — ชนิดข้างล่างสะท้อนของนั้น
+// (`AuthorizationStart`, `CodeExchange`, `ExchangeResult`) — ชนิดข้างล่างสะท้อนส่วน
+// interface ที่ Academy ต้องใช้ รวมถึง client assertion ของ backend
 // โดยไม่ import ข้ามรีโป เพราะ Academy ยังไม่ควรผูก build กับรีโปที่ยัง bootstrap อยู่
 // เมื่อ Identity Control publish package แล้วให้เปลี่ยนมา import ของจริงและลบชนิดซ้ำนี้
 //
@@ -45,6 +46,15 @@ export interface AuthorizationRequest {
   serviceId: string
 }
 
+/**
+ * Obtains a code-exchange assertion from Academy's server-side key boundary.
+ * The browser never supplies this value. The real provider cannot be written
+ * until Identity Control releases the registered key/rotation contract.
+ */
+export interface IdentityClientAssertionProvider {
+  createClientAssertion(): Promise<string>
+}
+
 export interface IdentityAdapter {
   /** ชื่อสำหรับ log และสำหรับกันไม่ให้ adapter ที่ใช้ได้เฉพาะ dev หลุดขึ้น production */
   readonly name: string
@@ -55,6 +65,8 @@ export interface IdentityAdapter {
   /** แลก code ที่ backend เท่านั้น — ต้องส่ง PKCE verifier ที่ไม่เคยออกไปฝั่ง browser */
   exchangeCode(input: {
     clientId: string
+    /** ES256 compact JWS from Academy's server-held signer; never browser input. */
+    clientAssertion: string
     redirectUri: string
     code: string
     codeVerifier: string

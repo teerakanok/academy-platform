@@ -21,6 +21,7 @@ import { getCourseAccess } from '@/lib/account/course-access'
 // เทสชุดนี้คือด่านที่ทำให้กฎนั้นเป็นจริงในโค้ด ไม่ใช่แค่ในเอกสาร
 
 const ISS = 'https://accounts.cyberskills.co.th'
+const LOCAL_FAKE_ISSUER = 'https://identity.local.invalid'
 
 async function withDb<T>(fn: (c: Client) => Promise<T>): Promise<T> {
   const client = new Client({ connectionString: requiredEnv('TEST_DATABASE_URL') })
@@ -68,39 +69,39 @@ function verifierFor(req: AuthorizationRequest, verifier: string) {
 
 describe('adapter ต้องบังคับกฎเดียวกับของจริง (ไม่ใช่ stub ที่ตอบ ok เสมอ)', () => {
   it('code ใช้ได้ครั้งเดียว', async () => {
-    const a = new FakeIdentityAdapter(ISS)
+    const a = new FakeIdentityAdapter(LOCAL_FAKE_ISSUER)
     const verifier = randomBytes(48).toString('base64url')
     const req = { ...request(), codeChallenge: createHash('sha256').update(verifier).digest('base64url') }
     const code = a.issueCodeForTest(req, { subject: 'sub-once', verifiedEmail: 'once@example.com' })
 
-    await expect(a.exchangeCode({ ...verifierFor(req, verifier), code })).resolves.toMatchObject({
+    await expect(a.exchangeCode({ ...verifierFor(req, verifier), code, clientAssertion: 'test-header.test-payload.test-signature' })).resolves.toMatchObject({
       subject: 'sub-once',
     })
-    await expect(a.exchangeCode({ ...verifierFor(req, verifier), code })).rejects.toThrow()
+    await expect(a.exchangeCode({ ...verifierFor(req, verifier), code, clientAssertion: 'test-header.test-payload.test-signature' })).rejects.toThrow()
   })
 
   it('PKCE verifier ผิด แลกไม่ได้', async () => {
-    const a = new FakeIdentityAdapter(ISS)
+    const a = new FakeIdentityAdapter(LOCAL_FAKE_ISSUER)
     const verifier = randomBytes(48).toString('base64url')
     const req = { ...request(), codeChallenge: createHash('sha256').update(verifier).digest('base64url') }
     const code = a.issueCodeForTest(req, { subject: 'sub-pkce', verifiedEmail: 'p@example.com' })
     await expect(
-      a.exchangeCode({ ...verifierFor(req, randomBytes(48).toString('base64url')), code }),
+      a.exchangeCode({ ...verifierFor(req, randomBytes(48).toString('base64url')), code, clientAssertion: 'test-header.test-payload.test-signature' }),
     ).rejects.toThrow(/PKCE/)
   })
 
   it('redirect_uri ไม่ตรงกับตอนเริ่ม แลกไม่ได้', async () => {
-    const a = new FakeIdentityAdapter(ISS)
+    const a = new FakeIdentityAdapter(LOCAL_FAKE_ISSUER)
     const verifier = randomBytes(48).toString('base64url')
     const req = { ...request(), codeChallenge: createHash('sha256').update(verifier).digest('base64url') }
     const code = a.issueCodeForTest(req, { subject: 'sub-uri', verifiedEmail: 'u@example.com' })
     await expect(
-      a.exchangeCode({ clientId: req.clientId, redirectUri: 'http://evil.example/cb', codeVerifier: verifier, code }),
+      a.exchangeCode({ clientId: req.clientId, clientAssertion: 'test-header.test-payload.test-signature', redirectUri: 'http://evil.example/cb', codeVerifier: verifier, code }),
     ).rejects.toThrow()
   })
 
   it('adapter ปลอมต้องประกาศตัวว่าใช้บน production ไม่ได้', () => {
-    expect(new FakeIdentityAdapter().productionSafe).toBe(false)
+    expect(new FakeIdentityAdapter(LOCAL_FAKE_ISSUER).productionSafe).toBe(false)
   })
 })
 

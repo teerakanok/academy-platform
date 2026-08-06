@@ -20,14 +20,30 @@ Retention boundary ใช้ migration `0020_dedicated_retention_api.sql` แย
 data boundary และ deploy แล้ว; เหลือเพียงหลักฐาน cron รอบ scheduled event แรกตาม
 [`reports/academy-retention-api-rollout-2026-08-06.md`](../reports/academy-retention-api-rollout-2026-08-06.md).
 
+**Identity Control alignment (2026-08-06):** Gate 3 policy ได้รับอนุมัติแล้ว และ
+Identity Control กำลังจัดทำ reviewed production change records แยกตาม boundary;
+สิ่งนั้นยังไม่ใช่ runtime, endpoint registry, credential หรือ deployment ที่ Academy
+เชื่อมต่อได้. Academy local preparation ใช้ fake transaction boundary ที่เก็บ state,
+PKCE verifier และ nonce ฝั่ง server, ปฏิเสธ callback ที่ไม่ใช่ `code` + `state`, และ
+quarantine direct GoTrue OTP เป็น loopback E2E fixture ที่ต้องเปิด explicit เท่านั้น.
+Academy ห้ามเดา issuer, client ID, service ID, audience, callback registry, signing
+key หรือ Identity Control endpoint; ดู
+`reports/reviews/academy-identity-control-preparation-2026-08-06.md`.
+การสร้าง principal ใหม่ไม่เชื่อมหรือย้าย waitlist lead ด้วย email; migration `0021`
+จะ null ความสัมพันธ์ legacy เดิมโดยเก็บ lead/consent ไว้. Code exchange local
+boundary รับ client assertion ในรูป compact JWS จาก signer ฝั่ง server เท่านั้น
+แต่ยังไม่มี signer/key/runtime จริงจนกว่าจะได้รับ release inputs.
+
 งานหลักถัดไปตามลำดับ:
 
 1. **เปิด auth/runtime และ bootstrap owner จาก stable identity จริง**
-   - build ปัจจุบันตั้งใจปิด `NEXT_PUBLIC_SUPABASE_*`; หน้า sign-in แจ้งว่า account ยังไม่เปิด
-   - Academy frontend: closed state ซ่อน “By continuing…” แล้ว เพราะยังไม่มี
-     continue action; page-level unit test และ production-built HTTP proof ผ่าน
+   - Academy ปิด direct GoTrue OTP บน non-loopback เสมอ แม้มี public Supabase values;
+     local E2E fixture ต้องมี explicit switch + loopback Academy/Supabase origin
+   - callback real flow รอ Identity Control publish endpoint, registered client/service,
+     exact callback, audience, client-assertion/key-rotation contract และ release authorization;
+     ห้าม redirect `/sign-in` ไป Account Center หรือเขียน Academy session ก่อนครบ
    - founder ต้อง sign in หนึ่งครั้งหลัง runtime พร้อม เพื่อสร้าง `academy.users` จาก
-     `(issuer, subject)`; จากนั้น dry-run/apply `scripts/manage-staff-role.mjs`
+     `(canonical_issuer, subject)`; จากนั้น dry-run/apply `scripts/manage-staff-role.mjs`
    - ปัจจุบัน `academy.users=0`, active owner `=0`; ห้ามสร้าง UUID หรือใช้ email แทน identity
 2. **ยืนยัน execution จริงของ retention cron รอบแรก**
    - dedicated retention API และ Worker แยกจาก runtime deploy แล้ว: role
@@ -524,7 +540,9 @@ email เอง**
 #### ยังไม่ทำ
 - [x] เสียบ activation + `has_course_entitlement` + node prerequisite เข้าเส้นทาง
       lesson/progress/attempt/explanation/practice/reset ผ่าน guard กลาง
-- [ ] transaction store ฝั่ง backend (เก็บ state/PKCE verifier/nonce) แล้วต่อ callback
+- [~] local transaction contract ฝั่ง backend (เก็บ state/PKCE verifier/nonce) พร้อม
+      fake-first tests แล้ว; durable store และ callback runtime รอ registered runtime
+      inputs กับ authorization จาก Identity Control
 - [ ] `/sign-in` เปลี่ยนเป็น redirect ไป Account Center — **ทำเมื่อ Identity Control
       พร้อมต่อจริงเท่านั้น**
 - [ ] adapter ตัวจริงที่คุยกับ Identity Control (รอ P3 provider/persistence + release gates)

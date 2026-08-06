@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server'
 import { clearRouteAuthCookies, routeAuthClient } from '@/lib/auth/route-client'
 import { validateMutationRequest } from '@/lib/http/mutation-security'
+import { legacyDirectOtpFixtureAllowedForRequest } from '@/lib/auth/legacy-direct-otp'
 
 export const runtime = 'nodejs'
 
 export async function POST(request: Request) {
+  if (!legacyDirectOtpFixtureAllowedForRequest(request)) {
+    return NextResponse.json({ ok: false, error: 'ไม่มี Academy session สำหรับสภาพแวดล้อมนี้' }, { status: 503 })
+  }
   const mutation = validateMutationRequest(request)
   if (!mutation.ok) {
     return NextResponse.json({ ok: false, error: mutation.error }, { status: mutation.status })

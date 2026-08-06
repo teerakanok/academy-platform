@@ -57,6 +57,9 @@ export default defineConfig({
       // RIL จับว่าลบ speed bump ทิ้งทั้งหมด) · พฤติกรรมของโควตาเองถูกทดสอบใน
       // tests/integration/attempt-db.test.ts ซึ่งกำหนดค่าเองอย่างชัดเจน
       ATTEMPT_MAX_PER_WINDOW: process.env.ATTEMPT_MAX_PER_WINDOW ?? '500',
+      // Direct GoTrue OTP remains only to provision local learner fixtures. It
+      // is rejected for non-loopback requests and cannot be a production path.
+      ACADEMY_LEGACY_DIRECT_OTP_LOCAL_FIXTURE: '1',
       MEDIA_SIGNING_SECRET: 'playwright-only-media-signing-secret-32-bytes-minimum',
       MEDIA_LOCAL_ROOT: join(process.cwd(), 'private-media'),
     },

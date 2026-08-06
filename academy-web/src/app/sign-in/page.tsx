@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { headers } from 'next/headers'
 import React from 'react'
 import { SignInForm } from '@/components/auth/SignInForm'
 import { accountsEnabled } from '@/lib/auth/enabled'
@@ -22,7 +23,8 @@ export default async function SignInPage({
 }) {
   const { next, notice } = await searchParams
   const target = safeNextPath(next)
-  const accountAccessOpen = accountsEnabled()
+  const requestHeaders = await headers()
+  const accountAccessOpen = accountsEnabled(requestHeaders.get('host') ?? '')
 
   return (
     <div className="mx-auto max-w-lg px-6 py-16">

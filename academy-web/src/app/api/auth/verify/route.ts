@@ -6,6 +6,7 @@ import { hasEdgeRateLimitMarker } from '@/lib/edge-rate-limit-policy'
 import { readBoundedJson } from '@/lib/http/bounded-body'
 import { validateMutationRequest } from '@/lib/http/mutation-security'
 import { acceptsAuthTransport } from '@/lib/auth/cookie-policy'
+import { legacyDirectOtpFixtureAllowedForRequest } from '@/lib/auth/legacy-direct-otp'
 
 export const runtime = 'nodejs'
 const MAX_BODY_BYTES = 4 * 1024
@@ -15,6 +16,12 @@ const MAX_BODY_BYTES = 4 * 1024
 // rate limit สำคัญเป็นพิเศษตรงนี้: รหัส 6 หลักมีค่าที่เป็นไปได้แค่ล้านค่า
 // ถ้าเดาได้ไม่จำกัด ความปลอดภัยของทั้งระบบเท่ากับศูนย์
 export async function POST(request: Request) {
+  if (!legacyDirectOtpFixtureAllowedForRequest(request)) {
+    return NextResponse.json(
+      { ok: false, error: 'ระบบบัญชีส่วนกลางยังไม่เปิดใช้สำหรับสภาพแวดล้อมนี้' },
+      { status: 503 },
+    )
+  }
   if (!acceptsAuthTransport(request)) {
     return NextResponse.json({ ok: false, error: 'ต้องเชื่อมต่อผ่าน HTTPS' }, { status: 400 })
   }

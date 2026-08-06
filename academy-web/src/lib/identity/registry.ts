@@ -7,8 +7,8 @@ import type { IdentityAdapter } from './adapter'
 // production** — และต้องพังตั้งแต่ตอนเรียก ไม่ใช่ปล่อยผ่านแล้วไปพบทีหลังว่าคนทั้งระบบ
 // ล็อกอินผ่าน adapter ปลอม
 //
-// ตอนนี้ยังไม่มี adapter ตัวจริง เพราะ Identity Control ยังอยู่ใน local bootstrap
-// และยังไม่อนุญาตให้ product ผูก production endpoint (ดูทิศทาง 2026-08-01)
+// ตอนนี้ยังไม่มี adapter ตัวจริง เพราะ Identity Control ยังไม่ release runtime,
+// registry และ authorization ที่ให้ Academy ผูก production endpoint ได้.
 let cached: IdentityAdapter | null | undefined
 
 export function getIdentityAdapter(): IdentityAdapter | null {
@@ -25,7 +25,11 @@ function build(): IdentityAdapter | null {
     if (process.env.NODE_ENV === 'production') {
       throw new Error('IDENTITY_ADAPTER=fake ใช้บน production ไม่ได้ — adapter นี้ไม่ยืนยันตัวตนใดๆ')
     }
-    return new FakeIdentityAdapter(process.env.IDENTITY_ISSUER ?? 'https://accounts.cyberskills.co.th')
+    const issuer = process.env.IDENTITY_LOCAL_FAKE_ISSUER?.trim()
+    if (!issuer) {
+      throw new Error('IDENTITY_ADAPTER=fake ต้องกำหนด IDENTITY_LOCAL_FAKE_ISSUER สำหรับ local fixture โดย explicit')
+    }
+    return new FakeIdentityAdapter(issuer)
   }
 
   throw new Error(`ไม่รู้จัก IDENTITY_ADAPTER=${mode}`)

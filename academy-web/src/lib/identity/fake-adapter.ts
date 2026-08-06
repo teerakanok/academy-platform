@@ -8,8 +8,8 @@ import {
 
 // Adapter ปลอมสำหรับ dev และเทส
 //
-// มีไว้เพื่อให้ Academy สร้าง flow ทั้งเส้นได้ตั้งแต่ Identity Control ยังไม่ deploy
-// (ทิศทางระบุชัดว่า "อย่ารอ Identity Control ยกเว้นงานที่ต้องใช้ issuer จริง")
+// มีไว้เพื่อให้ Academy ทดสอบ local boundary โดยไม่เดา runtime ของ Identity Control.
+// ห้ามใช้ยืนยันตัวตนจริงหรือใช้แทน Account Center.
 //
 // ตัวนี้บังคับกฎเดียวกับของจริงทุกข้อ ไม่ใช่ stub ที่ตอบ ok เสมอ — ถ้าเทสผ่านกับตัวนี้
 // แล้วไปพังกับของจริง แปลว่า fake หลวมเกินไปและไม่ได้ทำหน้าที่ของมัน:
@@ -31,6 +31,15 @@ interface PendingTransaction {
 
 const CODE_TTL_MS = 60_000
 
+function isLocalFakeIssuer(issuer: string): boolean {
+  try {
+    const hostname = new URL(issuer).hostname
+    return hostname === 'localhost' || hostname.endsWith('.invalid')
+  } catch {
+    return false
+  }
+}
+
 function s256(verifier: string): string {
   return createHash('sha256').update(verifier).digest('base64url')
 }
@@ -43,7 +52,13 @@ export class FakeIdentityAdapter implements IdentityAdapter {
   private readonly codes = new Map<string, PendingTransaction>()
   private readonly issuer: string
 
-  constructor(issuer = 'https://accounts.cyberskills.co.th') {
+  constructor(
+    issuer: string,
+    private readonly audience = 'local-fake-audience',
+  ) {
+    if (!isLocalFakeIssuer(issuer)) {
+      throw new Error('fake identity adapter ต้องได้รับ local-only issuer (localhost หรือ .invalid) แบบ explicit')
+    }
     this.issuer = issuer
   }
 
@@ -78,6 +93,7 @@ export class FakeIdentityAdapter implements IdentityAdapter {
 
   async exchangeCode(input: {
     clientId: string
+    clientAssertion: string
     redirectUri: string
     code: string
     codeVerifier: string
@@ -100,7 +116,7 @@ export class FakeIdentityAdapter implements IdentityAdapter {
       issuer: tx.principal.issuer,
       subject: tx.principal.subject,
       verifiedEmail: tx.principal.verifiedEmail,
-      audience: tx.clientId,
+      audience: this.audience,
       serviceId: tx.serviceId,
       nonce: tx.nonce,
       activation: tx.activation,

@@ -21,6 +21,7 @@ describe('การเลือก identity adapter', () => {
 
   it('fake ใช้ได้นอก production', () => {
     process.env.IDENTITY_ADAPTER = 'fake'
+    process.env.IDENTITY_LOCAL_FAKE_ISSUER = 'https://identity.local.invalid'
     // NODE_ENV เป็น read-only ในชนิดของ Node — ต้อง stub ผ่าน vitest ไม่ใช่ assign ตรง
     vi.stubEnv('NODE_ENV', 'test')
     resetIdentityAdapterForTest()
@@ -34,6 +35,22 @@ describe('การเลือก identity adapter', () => {
     vi.stubEnv('NODE_ENV', 'production')
     resetIdentityAdapterForTest()
     expect(() => getIdentityAdapter()).toThrow(/production/)
+  })
+
+  it('fake ต้องไม่เดา canonical issuer จาก Account Center URL', () => {
+    process.env.IDENTITY_ADAPTER = 'fake'
+    delete process.env.IDENTITY_LOCAL_FAKE_ISSUER
+    vi.stubEnv('NODE_ENV', 'test')
+    resetIdentityAdapterForTest()
+    expect(() => getIdentityAdapter()).toThrow(/IDENTITY_LOCAL_FAKE_ISSUER/)
+  })
+
+  it('fake ปฏิเสธ issuer ที่หน้าตาเป็น production เพื่อไม่ให้ fixture เลียนแบบ canonical identity', () => {
+    process.env.IDENTITY_ADAPTER = 'fake'
+    process.env.IDENTITY_LOCAL_FAKE_ISSUER = 'https://accounts.cyberskills.co.th'
+    vi.stubEnv('NODE_ENV', 'test')
+    resetIdentityAdapterForTest()
+    expect(() => getIdentityAdapter()).toThrow(/local-only/)
   })
 
   it('ค่าที่ไม่รู้จักต้องพัง ไม่ใช่เงียบแล้วกลายเป็นไม่มี auth', () => {

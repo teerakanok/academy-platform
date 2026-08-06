@@ -3,7 +3,7 @@ import { Client } from 'pg'
 import { requiredEnv } from './setup'
 import { findOrCreateUser, setDisplayName } from '@/lib/account/users'
 
-// บัญชี + การผูก waitlist — ทดสอบกับ DB จริง (local) เพราะสิ่งที่ต้องพิสูจน์คือ
+// บัญชี Academy — ทดสอบกับ DB จริง (local) เพราะสิ่งที่ต้องพิสูจน์คือ
 // constraint และพฤติกรรมของ unique/RLS ซึ่ง mock พิสูจน์ไม่ได้
 
 const ISS = 'https://test-issuer.local'
@@ -56,7 +56,7 @@ describe('บัญชี Academy', () => {
     expect(b.id).not.toBe(a.id)
   })
 
-  it('ผูก waitlist lead ที่ใช้อีเมลเดียวกัน ครั้งเดียวตอนสมัคร', async () => {
+  it('ไม่ผูก waitlist lead ด้วย email ตอนสร้าง principal ใหม่', async () => {
     const email = 'acct-test-4@example.com'
     await withDb((db) =>
       db.query(
@@ -64,9 +64,9 @@ describe('บัญชี Academy', () => {
         [email],
       ),
     )
-    const user = await findOrCreateUser({ issuer: ISS, subject: 'sub-4', email })
+    await findOrCreateUser({ issuer: ISS, subject: 'sub-4', email })
     const linked = await withDb((db) => db.query(`select user_id from academy.leads where email = $1`, [email]))
-    expect(linked.rows[0].user_id).toBe(user.id)
+    expect(linked.rows[0].user_id).toBeNull()
   })
 
   it('ชื่อบนใบรับรองว่างได้ตอนสมัคร แล้วค่อยเติม', async () => {

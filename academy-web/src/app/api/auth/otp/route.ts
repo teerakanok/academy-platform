@@ -6,6 +6,7 @@ import { hasEdgeRateLimitMarker } from '@/lib/edge-rate-limit-policy'
 import { readBoundedJson } from '@/lib/http/bounded-body'
 import { validateMutationRequest } from '@/lib/http/mutation-security'
 import { acceptsAuthTransport } from '@/lib/auth/cookie-policy'
+import { legacyDirectOtpFixtureAllowedForRequest } from '@/lib/auth/legacy-direct-otp'
 
 export const runtime = 'nodejs'
 const MAX_BODY_BYTES = 2 * 1024
@@ -15,6 +16,12 @@ const MAX_BODY_BYTES = 2 * 1024
 // ตอบเหมือนกันเสมอไม่ว่าอีเมลนั้นมีบัญชีอยู่แล้วหรือไม่ — ถ้าตอบต่างกัน หน้านี้จะกลาย
 // เป็นเครื่องมือให้ใครก็ได้ไล่ตรวจว่าอีเมลไหนสมัครกับเราไว้
 export async function POST(request: Request) {
+  if (!legacyDirectOtpFixtureAllowedForRequest(request)) {
+    return NextResponse.json(
+      { ok: false, error: 'ระบบบัญชีส่วนกลางยังไม่เปิดใช้สำหรับสภาพแวดล้อมนี้' },
+      { status: 503 },
+    )
+  }
   if (!acceptsAuthTransport(request)) {
     return NextResponse.json({ ok: false, error: 'ต้องเชื่อมต่อผ่าน HTTPS' }, { status: 400 })
   }

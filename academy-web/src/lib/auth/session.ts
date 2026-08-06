@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies, headers } from 'next/headers'
 import { findOrCreateUser, type AcademyUser } from '@/lib/account/users'
 import { authCookieOptions, isSecureServerContext } from './cookie-policy'
+import { legacyDirectOtpFixtureEnabled } from './legacy-direct-otp'
 
 // Session ของผู้เรียน — ใช้ issuer กลางของ ecosystem (GoTrue) ตาม ADR single-account
 //
@@ -65,6 +66,9 @@ export interface SessionUser {
  * คือใบที่อ้างถึงคนที่เราไม่รู้ว่ามีตัวตนจริงไหม
  */
 export async function currentUser(): Promise<SessionUser | null> {
+  // Direct GoTrue sessions are never an Academy production identity path. The
+  // future Account Center adapter creates an Academy-owned session instead.
+  if (!legacyDirectOtpFixtureEnabled()) return null
   const supabase = await authClient()
   const { data, error } = await supabase.auth.getUser()
   if (error || !data.user) return null
