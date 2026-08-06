@@ -5,6 +5,7 @@ is still an Academy-side evidence record, not a production registration,
 deployment instruction, or authorization to enable Academy sign-in.
 
 **Prepared:** 2026-08-06  
+**Academy source revision:** `main` at `32bbc13`.  
 **Canonical sources:**
 `products/cyberskills/identity-control/config/consumer-registry-v1.approved.json`
 and `products/cyberskills/identity-control/docs/integration/consumer-registry-v1.md`.
