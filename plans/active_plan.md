@@ -29,6 +29,9 @@ quarantine direct GoTrue OTP เป็น loopback E2E fixture ที่ต้�
 Academy ห้ามเดา issuer, client ID, service ID, audience, callback registry, signing
 key หรือ Identity Control endpoint; ดู
 `reports/reviews/academy-identity-control-preparation-2026-08-06.md`.
+Consumer registration candidate ที่อิงเฉพาะ Academy source/deployed evidence อยู่ที่
+`reports/integration/academy-identity-control-consumer-registration-candidate-2026-08-06.md`;
+Identity Control ต้อง validate/publish ค่าจริงทั้งหมดก่อน Academy wire runtime.
 การสร้าง principal ใหม่ไม่เชื่อมหรือย้าย waitlist lead ด้วย email; migration `0021`
 จะ null ความสัมพันธ์ legacy เดิมโดยเก็บ lead/consent ไว้. Code exchange local
 boundary รับ client assertion ในรูป compact JWS จาก signer ฝั่ง server เท่านั้น

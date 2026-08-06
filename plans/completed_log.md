@@ -5,6 +5,27 @@
 
 ---
 
+## 2026-08-06 — Identity Control consumer registration candidate prepared
+
+**Outcome:** Academy prepared a non-secret candidate from its tracked source and
+deployed Worker evidence. The exact production callback remains `UNKNOWN`
+because custom-domain/exposure is still pending. The deployed Worker callback is
+recorded only as an unregistered preview candidate for Identity Control to assess
+separately. Client ID, service ID, identity result audience, central activation
+policy, client public-key references, lifecycle consumer/reconciliation details,
+configuration revision, and kill-switch owner are explicitly `UNKNOWN`, not
+inferred from local fixtures or unrelated runtime tokens.
+
+**Safety:** no key, token, secret, credential, external configuration, or
+production system was read or changed. The candidate is recorded at
+`reports/integration/academy-identity-control-consumer-registration-candidate-2026-08-06.md`.
+
+**Residual risk:** Academy cannot open sign-in or implement the real adapter
+until Identity Control validates and publishes the registration values and
+separately authorizes runtime integration.
+
+---
+
 ## 2026-08-06 — Identity Control local convergence preparation
 
 **Outcome:** Academy now follows the accepted central-account boundary without
