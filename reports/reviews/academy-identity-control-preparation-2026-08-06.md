@@ -56,10 +56,12 @@ account exists -> service activation -> Academy course entitlement -> resource a
 
 ### Remediated in this preparation slice
 
-- `src/lib/identity/transaction.ts` provides a local in-memory transaction
-  contract. It generates state, PKCE verifier, and nonce server-side; atomically
-  consumes state; expires it; validates the exchange result's audience, service,
-  nonce, principal and activation fields; and refuses arbitrary return URLs.
+- `src/lib/identity/transaction.ts` provides local in-memory and restart-safe
+  file transaction contracts. Both generate state, PKCE verifier, and nonce
+  server-side; consume state once; expire it; validate the exchange result's
+  audience, service, nonce, principal and activation fields; and refuse arbitrary
+  return URLs. The file implementation is local-only evidence preparation, not
+  a Cloudflare production persistence choice.
 - Callback parsing now permits exactly one opaque `code` and one opaque `state`.
   It rejects duplicate, unknown, principal, email, token, OTP, invitation, and
   return-url query parameters before an adapter call.
@@ -81,7 +83,7 @@ account exists -> service activation -> Academy course entitlement -> resource a
 | Registered client ID, service ID, exact callback and audience | Identity Control owns client registry and allowlist |
 | Client assertion, public-key overlap and rotation metadata | Identity Control owns key/rotation contract |
 | Canonical issuer literal | It must be observed from a signed production token, not inferred from a URL |
-| Durable transaction/session persistence and Academy session signing | It must be selected against the released runtime topology and reviewed separately |
+| Production transaction/session persistence and Academy session signing | The local file stores are only restart-test preparation; production storage and session signing still require the released runtime topology and separate review |
 | Founder owner bootstrap | It begins only after the founder signs in through canonical identity; no UUID or email substitute is permitted |
 
 ## Verification
@@ -115,11 +117,12 @@ millisecond as expired. Final verification passed 50 files and 420 unit tests;
 the code/debt, security, and UX re-reviews each reported no remaining C/H/M/L
 finding.
 
-Not applicable to this slice: migration rehearsal, production deployment,
-remote adapter call, browser redirect E2E, durable transaction restart test,
-key rotation test, and Account Center visual review. Each depends on the
-currently unavailable registered runtime inputs above; none was simulated as a
-production claim.
+Not applicable to the original preparation slice: migration rehearsal,
+production deployment, remote adapter call, browser redirect E2E, production
+durable-store rollout, key rotation test, and Account Center visual review. Each
+depends on the released runtime inputs above; none was simulated as a production
+claim. The later local-only durable transaction/session tests are recorded in
+the approval update below.
 
 ## Remaining Integration Gates
 
@@ -130,5 +133,23 @@ production claim.
    event reconciliation.
 3. Academy proves redirect, code exchange, session host scope, failure/replay,
    entitlement separation, and cross-schema denial against that exact release.
+
+## Post-approval local preparation addendum — Consumer Registry v1
+
+Identity Control approved the non-secret Consumer Registry v1 policy on
+2026-08-06. Academy recorded the canonical values and kept the initial registry
+state disabled in
+`reports/integration/academy-identity-control-consumer-registration-candidate-2026-08-06.md`.
+The local contract projection is not production configuration.
+
+The follow-up local tests cover policy fidelity, assertion-audience propagation,
+restart-safe transaction consume/expiry/corruption handling, exclusive-lock
+serialization, restart-safe opaque session get/revoke/expiry, host-scoped
+cookie attributes, and the activation-without-entitlement denial. Full unit
+verification after this update passed 53 files and 429 tests; lint/typecheck,
+Cloudflare build, and gitleaks also passed. No DNS, key generation, deployment,
+credential, Identity Control mutation, or owner bootstrap occurred.
+The local lock intentionally fails closed on stale contention; it does not claim
+production-grade crash recovery.
 4. The founder signs in once through canonical identity, then Academy performs
    the recorded staff-bootstrap dry-run/apply flow.

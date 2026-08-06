@@ -1,63 +1,78 @@
 # Academy Identity Control Consumer Registration Candidate
 
-**Status:** candidate for Identity Control validation only. It is not a
-registration, deployment instruction, or authorization to enable Academy sign-in.
+**Status:** Identity Control approved Consumer Registry v1 policy. This report
+is still an Academy-side evidence record, not a production registration,
+deployment instruction, or authorization to enable Academy sign-in.
 
 **Prepared:** 2026-08-06  
-**Academy source:** `main` at `6f61ffb`  
-**Evidence method:** read-only inspection of Academy implementation and its
-tracked deployed-state evidence. No external system, credential, key, or
-production configuration was read or changed.
+**Canonical sources:**
+`products/cyberskills/identity-control/config/consumer-registry-v1.approved.json`
+and `products/cyberskills/identity-control/docs/integration/consumer-registry-v1.md`.
+**Academy evidence:** identity boundary implementation, local tests, and the
+deployed-state report cited below. No external system, credential, private key,
+or production configuration was read or changed.
 
 ## Registration Fields
 
 | Required field | Academy candidate | Evidence and interpretation |
 | --- | --- | --- |
-| Proposed `client_id` | `UNKNOWN` | The only literal, `academy-web-local`, is a local fake test fixture in `academy-web/tests/unit/identity-transaction.test.ts:15-20`. `academy-web/src/lib/identity/transaction.ts:45-51` requires registered values to be supplied by its caller and forbids Academy from inventing production values. |
-| `service_id` | `UNKNOWN` | `academy` appears only in the same local fake fixture (`tests/unit/identity-transaction.test.ts:15-20`). Academy has no production service registry. |
-| Exact production callback URI | `UNKNOWN` | Academy custom-domain/exposure remains an open launch decision (`plans/active_plan.md:63-67`). A production callback must be published only after that decision. |
-| Currently deployed preview callback candidate (unregistered) | `https://cyberskills-academy.songpon-te.workers.dev/auth/callback` | This is assembled from the deployed Worker URL in `reports/sessions/academy-production-release-2026-08-05.md:44-50` and the implemented callback route in `academy-web/src/app/auth/callback/route.ts:20-50`. It is not a production callback and must not be registered unless Identity Control separately validates a preview registration. |
-| Expected result audience | `UNKNOWN` | `academy-api-local` is local fixture data only (`tests/unit/identity-transaction.test.ts:15-20`). `academy-data-api` is a separate Academy-to-PostgREST runtime-token audience, not an Identity Control result audience (`academy-web/src/lib/db/runtime-token.ts:1-31`). |
-| Activation policy | `UNKNOWN` for the central policy choice | Academy can consume only an activation result with one of `pending`, `active`, `suspended`, or `deactivated` and revision `>= 1` (`academy-web/src/lib/identity/adapter.ts:22-36`, `academy-web/src/lib/identity/transaction.ts:156-168`). Academy treats only `active` as service-usable and never turns activation into a course entitlement (`academy-web/src/lib/account/access.ts:20-45`). Identity Control must select and publish the registered policy (`open`, `invite_only`, `request_access`, or `unavailable`). |
-| Client-assertion active public-key ID/reference | `UNKNOWN` | Academy defines only a server-side assertion provider boundary and deliberately has no signer/key reference (`academy-web/src/lib/identity/adapter.ts:49-73`). No key was generated or inspected. |
-| Client-assertion overlap public-key ID/reference | `UNKNOWN` | Same evidence as the active public-key field. The Pool A issuer signing `kid` in the shared registry is an issuer/JWKS key, not evidence of an Academy client-assertion key, so it is intentionally not copied here. |
-| Lifecycle event audience | `UNKNOWN` | Academy contains no configured lifecycle consumer audience. Identity Control owns the event names and lifecycle outbox (`ecosystem/IDENTITY_AND_ACCOUNT_CONTRACT.md:209-227`). |
-| Lifecycle consumer endpoint | `UNKNOWN` | Academy has no implemented lifecycle consumer route. Its only identity callback route is deliberately unavailable pending released runtime inputs (`academy-web/src/app/auth/callback/route.ts:31-50`). |
-| Pull-reconciliation endpoint | `UNKNOWN` | Academy has no implemented pull-reconciliation route or client. The central contract requires a pull reconciliation API, but does not provide an Academy value in this repository (`ecosystem/IDENTITY_AND_ACCOUNT_CONTRACT.md:209-214`). |
-| Pull-reconciliation contract | `UNKNOWN` | Academy will need the released Identity Control contract. The existing local projection accepts a received activation status/revision through `sync_service_activation` only (`academy-web/src/lib/account/access.ts:20-29`); it is not a reconciliation client. |
-| Current registration config revision | `UNKNOWN` | No non-secret Identity Control registry/config revision is present in Academy. `academy-web/src/lib/identity/registry.ts:20-35` supports only `none` or a non-production fake adapter. |
-| Per-client kill-switch owner | `UNKNOWN` | Academy has no client registration or kill-switch configuration. The canonical registry assigns kill-switch status to the future non-secret identity registry, owned by Director/shared infrastructure (`ecosystem/IDENTITY_OPERATIONS_REGISTRY.md:11,34-37`). Identity Control must publish the accountable operator for this client. |
+| Proposed `client_id` | `academy-web` | Identity Control approved registry v1 (`clients[]` entry with `clientId=academy-web`). Academy local client values remain caller-supplied; Academy does not invent a production ID (`academy-web/src/lib/identity/transaction.ts`). |
+| `service_id` | `academy` | Identity Control approved registry v1 (`clients[]` entry with `serviceId=academy`). |
+| Exact production callback URI | `https://academy.cyberskills.co.th/auth/callback` | Identity Control approved registry v1. Academy callback parsing is implemented at `academy-web/src/app/auth/callback/route.ts`; the custom-domain production exposure and registration remain release-gated. |
+| Currently deployed preview callback | `https://cyberskills-academy.songpon-te.workers.dev/auth/callback` | Preview Worker URL from `reports/sessions/academy-production-release-2026-08-05.md:44-50` plus the callback route. This is not the canonical production callback and must not be registered or enabled as production. |
+| Expected result audience | `https://academy.cyberskills.co.th` | Identity Control approved registry v1 (`clients.academy.resultAudience`). Academy validates the returned audience against the transaction client before accepting a result. |
+| Client-assertion audience | `https://accounts.cyberskills.co.th/v1/code/exchange` | Identity Control approved registry v1 and `codeExchangeAudience`. The signer boundary receives this audience explicitly; no signer or key is present yet (`academy-web/src/lib/identity/adapter.ts`, `academy-web/src/lib/identity/transaction.ts`). |
+| Activation policy | `open` | Identity Control approved registry v1. This permits Academy service activation/profile creation only; Academy grants course access only after its own entitlement, resource authorization, and prerequisite checks (`academy-web/src/lib/account/access.ts`, `academy-web/src/lib/account/course-access.ts`). |
+| Initial registry state | `disabled` | Identity Control approved registry v1 (`clients[]` Academy entry `enabled: false`). Academy real adapter and production sign-in remain disabled (`academy-web/src/lib/identity/registry.ts`, `academy-web/src/app/auth/callback/route.ts`). |
+| Current registration config revision | `1` | Identity Control approved registry v1 (`clients[]` Academy entry `configRevision`). The projection is non-secret evidence only and is not loaded as runtime configuration (`academy-web/src/lib/identity/consumer-policy.ts`). |
+| Client-assertion active public-key ID/reference | `null` (not published) | Approved registry v1 has `verificationKeys.active: null`. Academy runtime owns the future private key; no key was generated or inspected. |
+| Client-assertion overlap public-key ID/reference | `[]` (none published) | Approved registry v1 has `verificationKeys.overlap: []`. Rotation and key-ceremony evidence remain blocked. |
+| Lifecycle transport | `authenticated_pull` | Identity Control approved registry v1. Academy has only local activation projection logic; no inbound generic webhook is implemented. |
+| Lifecycle event audience | `null` (not published) | Approved registry v1 leaves `lifecycle.eventAudience` null; no event audience is assumed by Academy. |
+| Lifecycle consumer endpoint | `null` (not published) | Approved registry v1 leaves `lifecycle.publisherEndpoint` null. Identity Control owns lifecycle publication and must publish any future consumer contract. |
+| Pull-reconciliation endpoint | `null` (not published) | The approved record does not publish an Academy endpoint. Academy has not created or guessed one. |
+| Pull-reconciliation contract | `null` (not published) | The transport is approved as authenticated pull, but endpoint, request/response shape, authorization inputs, and replay/reconciliation details are not published in the Academy evidence set. |
+| Per-client kill-switch owner | `null` (not published) | Approved registry v1 leaves `killSwitchOwner` null. Academy must not name an operator or implement a production switch from inference. |
 
-## Consumer Behavior Already Implemented
+## Consumer Behavior Prepared Locally
 
 - Browser callback authority is restricted to exactly one opaque `code` and one
-  opaque `state`; email, subject, token, OTP, invitation, and arbitrary return
-  values are rejected before any exchange (`academy-web/src/lib/identity/transaction.ts:141-153`).
-- A local transaction holds state, PKCE verifier, nonce, registered-client
-  fields, and the internal return path server-side; a callback consumes state
-  once and checks audience, service, nonce, canonical principal, and activation
-  revision (`academy-web/src/lib/identity/transaction.ts:45-206`).
-- Academy requires a compact-JWS-shaped client assertion from a server-held
-  provider boundary; the browser cannot supply it (`academy-web/src/lib/identity/adapter.ts:49-73`,
-  `academy-web/src/lib/identity/transaction.ts:171-204`).
-- Direct Academy OTP is limited to an explicit loopback E2E fixture, so it is
-  not a consumer-registration alternative (`academy-web/src/lib/auth/legacy-direct-otp.ts:1-39`).
+  opaque `state`; subject, email, token, OTP, invitation, and arbitrary return
+  values are rejected before exchange (`academy-web/src/lib/identity/transaction.ts`).
+- Local transaction persistence now has an in-memory implementation and a
+  restart-safe file implementation with an exclusive inter-process lock,
+  atomic replace, mode `0600` data, mode `0700` directory, one-time consume,
+  expiry, and fail-closed corruption handling. The file store is deliberately
+  not wired into Worker production; lock contention or a stale lock also fails
+  closed rather than attempting an unsafe reclaim.
+- A local durable opaque session store is prepared with lifecycle/activation
+  claims only. It serializes create/get/revoke/expiry updates with the same
+  exclusive lock, has no course-entitlement claims, uses an HttpOnly
+  host-scoped cookie without a parent-domain `Domain` attribute, and is not
+  wired into the current direct-OTP session path.
+- The code-exchange signer boundary receives the approved assertion audience;
+  Academy does not generate, store, or transmit a private key.
+- Activation remains separate from course entitlement. Regression tests prove
+  that an active activation without an Academy-owned entitlement is denied.
+- Direct Academy OTP remains an explicit loopback fixture only. It is not a
+  production identity path.
 
-## Identity Control Validation Needed
+## Remaining Identity Control Gates
 
-1. Decide the custom-domain/exposure path, then publish the exact production
-   callback allowlist. Identity Control may separately decide whether the
-   currently deployed preview callback is eligible for a scoped preview client.
-2. Publish the canonical `client_id`, `service_id`, result audience, central
-   activation policy, config revision, active/overlap client public-key
-   references, and the accountable kill-switch operator.
-3. Publish lifecycle event delivery audience/consumer contract and the pull
-   reconciliation contract before Academy implements either consumer path.
-4. Issue separate authorization for Academy to wire the real adapter, durable
-   transaction/session store, lifecycle convergence, and founder bootstrap.
+1. Identity Control must publish the registered public-key reference and key
+   ceremony/rotation evidence before any real client assertion is configured.
+2. Identity Control must publish lifecycle pull endpoint/contract and the named
+   kill-switch operator; Academy must then implement conformance and
+   reconciliation locally before requesting a production enablement change.
+3. Academy must obtain separate production authorization, wire the released
+   real adapter, and keep the initial registry state disabled until the
+   conformance rehearsal and deployment evidence pass.
+4. Founder bootstrap occurs only after canonical sign-in is enabled and must
+   create ownership from `(canonical_issuer, subject)`, never a generated UUID
+   or email equality.
 
 ## Explicit Exclusions
 
-This candidate contains no private key, client assertion, token, credential,
-or secret. It neither creates a key nor changes an Identity Control, Pool A,
-DNS, Worker, or other production configuration.
+This candidate contains no private key, client assertion, token, credential, or
+secret. It does not generate keys or change Identity Control, Pool A, DNS,
+Worker deployment, production config, or account ownership.

@@ -20,31 +20,39 @@ Retention boundary ใช้ migration `0020_dedicated_retention_api.sql` แย
 data boundary และ deploy แล้ว; เหลือเพียงหลักฐาน cron รอบ scheduled event แรกตาม
 [`reports/academy-retention-api-rollout-2026-08-06.md`](../reports/academy-retention-api-rollout-2026-08-06.md).
 
-**Identity Control alignment (2026-08-06):** Gate 3 policy ได้รับอนุมัติแล้ว และ
-Identity Control กำลังจัดทำ reviewed production change records แยกตาม boundary;
-สิ่งนั้นยังไม่ใช่ runtime, endpoint registry, credential หรือ deployment ที่ Academy
-เชื่อมต่อได้. Academy local preparation ใช้ fake transaction boundary ที่เก็บ state,
-PKCE verifier และ nonce ฝั่ง server, ปฏิเสธ callback ที่ไม่ใช่ `code` + `state`, และ
-quarantine direct GoTrue OTP เป็น loopback E2E fixture ที่ต้องเปิด explicit เท่านั้น.
-Academy ห้ามเดา issuer, client ID, service ID, audience, callback registry, signing
-key หรือ Identity Control endpoint; ดู
-`reports/reviews/academy-identity-control-preparation-2026-08-06.md`.
-Consumer registration candidate ที่อิงเฉพาะ Academy source/deployed evidence อยู่ที่
-`reports/integration/academy-identity-control-consumer-registration-candidate-2026-08-06.md`;
-Identity Control ต้อง validate/publish ค่าจริงทั้งหมดก่อน Academy wire runtime.
+**Identity Control alignment (2026-08-06):** Identity Control อนุมัติ Consumer
+Registry v1 policy แล้ว: `client_id=academy-web`, `service_id=academy`,
+`activation_policy=open`, callback
+`https://academy.cyberskills.co.th/auth/callback`, result audience
+`https://academy.cyberskills.co.th`, client-assertion audience
+`https://accounts.cyberskills.co.th/v1/code/exchange`, config revision `1`, และ
+lifecycle transport `authenticated_pull`. Registry state เริ่มต้นยัง `disabled`;
+public-key references, lifecycle endpoint/audience และ kill-switch owner ยังเป็น
+canonical `null`/ว่างจนกว่าจะมี evidence และ change record.
+
+Academy local preparation ใช้ transaction boundary ที่เก็บ state, PKCE verifier
+และ nonce ฝั่ง server, มี durable file store สำหรับ local restart tests, มี durable
+opaque session store ที่ไม่ถือ course entitlement และปฏิเสธ callback ที่ไม่ใช่
+`code` + `state`. Direct GoTrue OTP ยังคงเป็น loopback E2E fixture ที่ต้องเปิด
+explicit เท่านั้น; real adapter, sign-in production และ session runtime ยังไม่ถูก
+wire. ดู
+`reports/reviews/academy-identity-control-preparation-2026-08-06.md` และ
+`reports/integration/academy-identity-control-consumer-registration-candidate-2026-08-06.md`.
+
 การสร้าง principal ใหม่ไม่เชื่อมหรือย้าย waitlist lead ด้วย email; migration `0021`
 จะ null ความสัมพันธ์ legacy เดิมโดยเก็บ lead/consent ไว้. Code exchange local
-boundary รับ client assertion ในรูป compact JWS จาก signer ฝั่ง server เท่านั้น
-แต่ยังไม่มี signer/key/runtime จริงจนกว่าจะได้รับ release inputs.
+boundary รับ client assertion ในรูป compact JWS จาก signer ฝั่ง server เท่านั้น และ
+ส่ง canonical assertion audience เข้า provider แต่ยังไม่มี signer/key/runtime จริง.
 
 งานหลักถัดไปตามลำดับ:
 
 1. **เปิด auth/runtime และ bootstrap owner จาก stable identity จริง**
    - Academy ปิด direct GoTrue OTP บน non-loopback เสมอ แม้มี public Supabase values;
      local E2E fixture ต้องมี explicit switch + loopback Academy/Supabase origin
-   - callback real flow รอ Identity Control publish endpoint, registered client/service,
-     exact callback, audience, client-assertion/key-rotation contract และ release authorization;
-     ห้าม redirect `/sign-in` ไป Account Center หรือเขียน Academy session ก่อนครบ
+   - callback real flow รอ Identity Control publish client public-key reference,
+     lifecycle pull contract, kill-switch owner, conformance evidence และ separate
+     production authorization; ห้าม redirect `/sign-in` ไป Account Center หรือเขียน
+     Academy session ก่อนครบ
    - founder ต้อง sign in หนึ่งครั้งหลัง runtime พร้อม เพื่อสร้าง `academy.users` จาก
      `(canonical_issuer, subject)`; จากนั้น dry-run/apply `scripts/manage-staff-role.mjs`
    - ปัจจุบัน `academy.users=0`, active owner `=0`; ห้ามสร้าง UUID หรือใช้ email แทน identity

@@ -52,7 +52,7 @@ export interface AuthorizationRequest {
  * until Identity Control releases the registered key/rotation contract.
  */
 export interface IdentityClientAssertionProvider {
-  createClientAssertion(): Promise<string>
+  createClientAssertion(input: { audience: string }): Promise<string>
 }
 
 export interface IdentityAdapter {

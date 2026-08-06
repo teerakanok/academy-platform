@@ -5,16 +5,45 @@
 
 ---
 
+## 2026-08-06 — Consumer Registry v1 approval incorporated locally
+
+**Outcome:** Academy updated its non-secret candidate and local contract mirror
+from pre-approval `UNKNOWN` values to the canonical Identity Control policy:
+`academy-web`, `academy`, `open`,
+`https://academy.cyberskills.co.th/auth/callback`, result audience
+`https://academy.cyberskills.co.th`, client-assertion audience
+`https://accounts.cyberskills.co.th/v1/code/exchange`, config revision `1`,
+initial state `disabled`, and lifecycle transport `authenticated_pull`.
+Public-key references, lifecycle endpoints/audiences, and kill-switch owner stay
+canonical `null`/empty because Identity Control has not published those values.
+
+**Local preparation:** Added restart-safe file stores for authorization
+transactions and opaque Academy sessions with an exclusive inter-process lock,
+atomic writes, restrictive file permissions, one-time consume/revoke, expiry,
+and fail-closed corruption/lock handling. Session claims contain lifecycle/
+activation only; course entitlement remains an Academy-owned authorization
+decision. The real adapter, production
+sign-in, owner bootstrap, DNS, key generation, and deployment remain disabled.
+
+**Verification:** Identity boundary, policy mirror, durable transaction/session,
+and course-access tests pass. The candidate report is
+`reports/integration/academy-identity-control-consumer-registration-candidate-2026-08-06.md`.
+No Identity Control, Pool A, DNS, credential, key, or production system was
+touched.
+
+**Residual risk:** Identity Control still needs to publish public-key
+registration/rotation evidence, lifecycle pull contract, kill-switch owner,
+and separate production authorization before Academy can wire runtime.
+
+---
+
 ## 2026-08-06 — Identity Control consumer registration candidate prepared
 
 **Outcome:** Academy prepared a non-secret candidate from its tracked source and
-deployed Worker evidence. The exact production callback remains `UNKNOWN`
-because custom-domain/exposure is still pending. The deployed Worker callback is
-recorded only as an unregistered preview candidate for Identity Control to assess
-separately. Client ID, service ID, identity result audience, central activation
-policy, client public-key references, lifecycle consumer/reconciliation details,
-configuration revision, and kill-switch owner are explicitly `UNKNOWN`, not
-inferred from local fixtures or unrelated runtime tokens.
+deployed Worker evidence. This was the pre-approval snapshot; its `UNKNOWN`
+values are superseded by the canonical policy entry above. The deployed Worker
+callback remains recorded only as an unregistered preview candidate for Identity
+Control to assess separately.
 
 **Safety:** no key, token, secret, credential, external configuration, or
 production system was read or changed. The candidate is recorded at

@@ -1,10 +1,13 @@
 import { createHash, randomBytes } from 'node:crypto'
+import { chmodSync, existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'node:fs'
+import { dirname, isAbsolute } from 'node:path'
 import type {
   ExchangeResult,
   AuthorizationRequest,
   IdentityAdapter,
   IdentityClientAssertionProvider,
 } from './adapter'
+import { withExclusiveFileStoreLock } from './file-store-lock'
 
 const CALLBACK_KEYS = new Set(['code', 'state'])
 const OPAQUE_VALUE = /^[A-Za-z0-9_-]{16,160}$/
@@ -16,15 +19,23 @@ export interface LocalIdentityClient {
   redirectUri: string
   serviceId: string
   audience: string
+  clientAssertionAudience: string
 }
 
-interface PendingIdentityTransaction {
+export interface PendingIdentityTransaction {
   readonly state: string
   readonly codeVerifier: string
   readonly nonce: string
   readonly client: LocalIdentityClient
   readonly returnPath: string
   readonly expiresAt: number
+}
+
+export type PendingIdentityTransactionInput = Omit<PendingIdentityTransaction, 'expiresAt'>
+
+export interface IdentityTransactionStore {
+  create(input: PendingIdentityTransactionInput): PendingIdentityTransaction
+  consume(state: string): PendingIdentityTransaction
 }
 
 export interface IdentityCallback {
@@ -59,7 +70,7 @@ export class InMemoryIdentityTransactionStore {
     this.ttlMs = ttlMs
   }
 
-  create(input: Omit<PendingIdentityTransaction, 'expiresAt'>): PendingIdentityTransaction {
+  create(input: PendingIdentityTransactionInput): PendingIdentityTransaction {
     const now = this.now()
     this.prune(now)
     const transaction = { ...input, expiresAt: now + this.ttlMs }
@@ -85,6 +96,144 @@ export class InMemoryIdentityTransactionStore {
   }
 }
 
+export class IdentityTransactionStoreError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'IdentityTransactionStoreError'
+  }
+}
+
+interface PersistedTransactionFile {
+  version: 1
+  transactions: PendingIdentityTransaction[]
+}
+
+function isPersistedTransaction(value: unknown): value is PendingIdentityTransaction {
+  if (!value || typeof value !== 'object') return false
+  const candidate = value as Partial<PendingIdentityTransaction>
+  if (
+    typeof candidate.state !== 'string' ||
+    !OPAQUE_VALUE.test(candidate.state) ||
+    typeof candidate.codeVerifier !== 'string' ||
+    !/^[A-Za-z0-9._~-]{43,128}$/.test(candidate.codeVerifier) ||
+    typeof candidate.nonce !== 'string' ||
+    !OPAQUE_VALUE.test(candidate.nonce) ||
+    typeof candidate.returnPath !== 'string' ||
+    !isInternalReturnPath(candidate.returnPath) ||
+    typeof candidate.expiresAt !== 'number' ||
+    !Number.isSafeInteger(candidate.expiresAt) ||
+    !candidate.client ||
+    typeof candidate.client !== 'object'
+  ) {
+    return false
+  }
+  const client = candidate.client as Partial<LocalIdentityClient>
+  return (
+    typeof client.clientId === 'string' &&
+    client.clientId.length > 0 &&
+    typeof client.redirectUri === 'string' &&
+    isAllowedRedirectUri(client.redirectUri) &&
+    typeof client.serviceId === 'string' &&
+    client.serviceId.length > 0 &&
+    typeof client.audience === 'string' &&
+    client.audience.length > 0 &&
+    typeof client.clientAssertionAudience === 'string' &&
+    client.clientAssertionAudience.length > 0
+  )
+}
+
+/**
+ * Local-only durable transaction store for restart-safe preparation.
+ *
+ * This is deliberately not wired into a Worker route: Cloudflare runtime state
+ * must use the released Academy persistence boundary, not a local filesystem.
+ */
+export class FileIdentityTransactionStore implements IdentityTransactionStore {
+  private readonly now: () => number
+  private readonly ttlMs: number
+
+  constructor(
+    private readonly filePath: string,
+    { now = Date.now, ttlMs = 5 * 60_000 }: { now?: () => number; ttlMs?: number } = {},
+  ) {
+    if (!isAbsolute(filePath)) throw new IdentityTransactionStoreError('identity transaction store ต้องใช้ absolute file path')
+    if (!Number.isSafeInteger(ttlMs) || ttlMs <= 0) throw new IdentityTransactionStoreError('identity transaction store TTL ไม่ถูกต้อง')
+    this.now = now
+    this.ttlMs = ttlMs
+  }
+
+  create(input: PendingIdentityTransactionInput): PendingIdentityTransaction {
+    return withExclusiveFileStoreLock(this.filePath, () => {
+      const now = this.now()
+      const state = this.read().filter((transaction) => transaction.expiresAt > now)
+      const transaction = { ...input, expiresAt: now + this.ttlMs }
+      state.push(transaction)
+      this.write(state)
+      return transaction
+    })
+  }
+
+  consume(state: string): PendingIdentityTransaction {
+    return withExclusiveFileStoreLock(this.filePath, () => {
+      const transactions = this.read()
+      const index = transactions.findIndex((transaction) => transaction.state === state)
+      if (index === -1) throw new IdentityTransactionError('ไม่พบ state หรือ state ถูกใช้ไปแล้ว', 'unknown_state')
+
+      const [transaction] = transactions.splice(index, 1)
+      // Persist the one-time claim before checking expiry. A failed callback can
+      // never be replayed after a process restart, including at the expiry edge.
+      this.write(transactions)
+      if (this.now() >= transaction.expiresAt) {
+        throw new IdentityTransactionError('state ของการเข้าสู่ระบบหมดอายุแล้ว', 'expired_state')
+      }
+      return transaction
+    })
+  }
+
+  private read(): PendingIdentityTransaction[] {
+    if (!existsSync(this.filePath)) return []
+    let parsed: unknown
+    try {
+      parsed = JSON.parse(readFileSync(this.filePath, 'utf8'))
+    } catch {
+      throw new IdentityTransactionStoreError('identity transaction store อ่านข้อมูลไม่ได้')
+    }
+    if (!parsed || typeof parsed !== 'object') throw new IdentityTransactionStoreError('identity transaction store มีรูปแบบไม่ถูกต้อง')
+    const file = parsed as Partial<PersistedTransactionFile>
+    if (file.version !== 1 || !Array.isArray(file.transactions) || !file.transactions.every(isPersistedTransaction)) {
+      throw new IdentityTransactionStoreError('identity transaction store มีรูปแบบไม่ถูกต้อง')
+    }
+    return file.transactions.map((transaction) => ({
+      ...transaction,
+      client: { ...transaction.client },
+    }))
+  }
+
+  private write(transactions: PendingIdentityTransaction[]): void {
+    const directory = dirname(this.filePath)
+    mkdirSync(directory, { recursive: true, mode: 0o700 })
+    chmodSync(directory, 0o700)
+    const temporaryPath = `${this.filePath}.tmp-${process.pid}-${randomBytes(8).toString('hex')}`
+    try {
+      writeFileSync(
+        temporaryPath,
+        JSON.stringify({ version: 1, transactions } satisfies PersistedTransactionFile),
+        { encoding: 'utf8', mode: 0o600 },
+      )
+      chmodSync(temporaryPath, 0o600)
+      renameSync(temporaryPath, this.filePath)
+      chmodSync(this.filePath, 0o600)
+    } catch {
+      try {
+        unlinkSync(temporaryPath)
+      } catch {
+        // Best-effort cleanup; the original durable file remains untouched.
+      }
+      throw new IdentityTransactionStoreError('identity transaction store เขียนข้อมูลไม่ได้')
+    }
+  }
+}
+
 function opaque(bytes = 32): string {
   return randomBytes(bytes).toString('base64url')
 }
@@ -94,24 +243,36 @@ function s256(value: string): string {
 }
 
 function requireLocalClient(client: LocalIdentityClient): void {
-  if (!client.clientId || !client.serviceId || !client.audience) {
-    throw new Error('local identity client ต้องมี clientId, serviceId และ audience ที่ระบุชัดเจน')
+  if (!client.clientId || !client.serviceId || !client.audience || !client.clientAssertionAudience) {
+    throw new Error('local identity client ต้องมี clientId, serviceId, audience และ client assertion audience ที่ระบุชัดเจน')
   }
-  const redirect = new URL(client.redirectUri)
-  if (redirect.protocol !== 'https:' && !(redirect.protocol === 'http:' && redirect.hostname === 'localhost')) {
+  if (!isAllowedRedirectUri(client.redirectUri)) {
     throw new Error('local identity callback ต้องเป็น HTTPS หรือ loopback HTTP เท่านั้น')
   }
 }
 
 function requireInternalReturnPath(returnPath: string): void {
-  if (!returnPath.startsWith('/') || returnPath.startsWith('//') || returnPath.startsWith('/\\')) {
+  if (!isInternalReturnPath(returnPath)) {
     throw new Error('identity transaction รับ return path ภายใน Academy เท่านั้น')
+  }
+}
+
+function isInternalReturnPath(returnPath: string): boolean {
+  return returnPath.startsWith('/') && !returnPath.startsWith('//') && !returnPath.startsWith('/\\')
+}
+
+function isAllowedRedirectUri(value: string): boolean {
+  try {
+    const redirect = new URL(value)
+    return redirect.protocol === 'https:' || (redirect.protocol === 'http:' && redirect.hostname === 'localhost')
+  } catch {
+    return false
   }
 }
 
 /** Starts an authorization request without exposing the verifier or nonce to the browser. */
 export function beginIdentityAuthorization(
-  store: InMemoryIdentityTransactionStore,
+  store: IdentityTransactionStore,
   client: LocalIdentityClient,
   returnPath: string,
   newVerifier: () => string = () => opaque(48),
@@ -176,23 +337,25 @@ export async function completeIdentityCallback({
   clientAssertionProvider,
 }: {
   adapter: IdentityAdapter
-  store: InMemoryIdentityTransactionStore
+  store: IdentityTransactionStore
   client: LocalIdentityClient
   callback: IdentityCallback
   clientAssertionProvider: IdentityClientAssertionProvider
 }): Promise<{ exchange: ExchangeResult; returnPath: string }> {
-  const clientAssertion = await clientAssertionProvider.createClientAssertion()
-  if (!/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(clientAssertion) || clientAssertion.length < 32 || clientAssertion.length > 4096) {
-    throw new IdentityTransactionError('client assertion สำหรับการแลก code ไม่ตรง contract', 'invalid_result')
-  }
   const transaction = store.consume(callback.state)
   if (
     transaction.client.clientId !== client.clientId ||
     transaction.client.redirectUri !== client.redirectUri ||
     transaction.client.serviceId !== client.serviceId ||
-    transaction.client.audience !== client.audience
+    transaction.client.audience !== client.audience ||
+    transaction.client.clientAssertionAudience !== client.clientAssertionAudience
   ) {
     throw new IdentityTransactionError('state ถูกออกให้กับ Academy client คนละรายการ', 'audience_mismatch')
+  }
+
+  const clientAssertion = await clientAssertionProvider.createClientAssertion({ audience: transaction.client.clientAssertionAudience })
+  if (!/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(clientAssertion) || clientAssertion.length < 32 || clientAssertion.length > 4096) {
+    throw new IdentityTransactionError('client assertion สำหรับการแลก code ไม่ตรง contract', 'invalid_result')
   }
 
   const exchange = await adapter.exchangeCode({

@@ -17,6 +17,7 @@ const client: LocalIdentityClient = {
   redirectUri: 'http://localhost:3000/auth/callback',
   serviceId: 'academy',
   audience: 'academy-api-local',
+  clientAssertionAudience: 'https://accounts.local.invalid/v1/code/exchange',
 }
 const LOCAL_FAKE_CLIENT_ASSERTION = 'local-fake-header.local-fake-payload.local-fake-signature'
 const localFakeClientAssertionProvider = { createClientAssertion: async () => LOCAL_FAKE_CLIENT_ASSERTION }
@@ -181,5 +182,31 @@ describe('local identity transaction boundary', () => {
         clientAssertionProvider: { createClientAssertion: async () => '' },
       }),
     ).rejects.toMatchObject({ reason: 'invalid_result' } satisfies Partial<IdentityTransactionError>)
+  })
+
+  it('gives the signer the registered code-exchange audience', async () => {
+    const adapter = new FakeIdentityAdapter(LOCAL_ISSUER, client.audience)
+    const store = new InMemoryIdentityTransactionStore()
+    const started = beginIdentityAuthorization(store, client, '/dashboard')
+    const code = adapter.issueCodeForTest(started.request, {
+      subject: 'learner-audience',
+      verifiedEmail: 'audience@example.test',
+    })
+    const audiences: string[] = []
+
+    await completeIdentityCallback({
+      adapter,
+      store,
+      client,
+      callback: parseIdentityCallback(new URL(`https://academy.local/auth/callback?code=${code}&state=${started.state}`)),
+      clientAssertionProvider: {
+        createClientAssertion: async ({ audience }: { audience: string }) => {
+          audiences.push(audience)
+          return LOCAL_FAKE_CLIENT_ASSERTION
+        },
+      },
+    })
+
+    expect(audiences).toEqual([client.clientAssertionAudience])
   })
 })
