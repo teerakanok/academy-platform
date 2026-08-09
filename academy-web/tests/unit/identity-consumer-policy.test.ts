@@ -14,7 +14,7 @@ describe('approved Identity Control consumer policy mirror', () => {
       status: 'approved-policy-release-blocked',
       identityControlSource: {
         repository: 'products/cyberskills/identity-control',
-        sourceRevision: 'b63a1fd5f2822cdcf4187df952a6f356d9bee324',
+        sourceRevision: 'a6ef1f430e1939a76fdccdcc35a1da41ff7a4606',
         contractDigests: {
           'config/consumer-registry-v1.approved.json': '572d230a9f84c219e5b82eeb84dd1350bd8a319e180f2208f45db3abc03d1875',
           'docs/integration/consumer-registry-v1.md': 'd880b0e2a8000f6898b76b91ee47ab18b886ac8e2f413f214448a8a2bed575a4',
