@@ -165,7 +165,8 @@ function isP256PublicJwk(value: JsonWebKey): boolean {
     && /^[A-Za-z0-9_-]{43}$/.test(value.y)
     && value.d === undefined
     && (value.use === undefined || value.use === 'sig')
-    && (value.key_ops === undefined || (value.key_ops.length === 1 && value.key_ops[0] === 'verify'))
+    && (value.key_ops === undefined
+      || (Array.isArray(value.key_ops) && value.key_ops.length === 1 && value.key_ops[0] === 'verify'))
 }
 
 function decodeJsonObject(encoded: string, maxBytes: number): Record<string, unknown> | null {

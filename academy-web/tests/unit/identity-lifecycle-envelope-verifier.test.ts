@@ -116,8 +116,18 @@ describe('lifecycle.envelope-cryptographic-verification', () => {
         publicJwk: { ...PRODUCER_VECTOR.verification.key.publicJwk, x: 'not-a-coordinate' },
       },
     })
+    const arrayLikeKeyOps = policy({
+      key: {
+        ...PRODUCER_VECTOR.verification.key,
+        publicJwk: {
+          ...PRODUCER_VECTOR.verification.key.publicJwk,
+          key_ops: { 0: 'verify', length: 1 } as unknown as string[],
+        },
+      },
+    })
 
     await expect(verifyIdentityLifecycleEnvelope(PRODUCER_VECTOR.envelope, malformedKey)).resolves.toBeNull()
+    await expect(verifyIdentityLifecycleEnvelope(PRODUCER_VECTOR.envelope, arrayLikeKeyOps)).resolves.toBeNull()
     await expect(verifyIdentityLifecycleEnvelope('not.a.valid.compact-jws', policy())).resolves.toBeNull()
   })
 })
