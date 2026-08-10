@@ -5,6 +5,37 @@
 
 ---
 
+## 2026-08-10 — Local Identity lifecycle pull JSON operation implemented
+
+**Outcome:** Academy added a pure local adapter between an injected response
+transport and injected strict JSON reader. It preserves both captured receivers,
+passes the exact lifecycle request through, returns only a successful parsed
+value, and collapses transport/parser failures to one fixed detail-free error.
+
+**Verification:** TDD first stopped on the missing module. The first
+implementation passed 8/9; the remaining failure was a receiver expectation in
+the Proxy fixture, and correcting only that fixture produced focused 9/9. The
+first independent RIL returned `C0/H0/M1/L0` because async return adopted a
+rejecting thenable after leaving the fixed catch boundary. Test-only RED passed
+10/13. Awaiting the value inside the catch closed Promise, callable-thenable,
+and throwing-getter detail leaks; focused GREEN now passes 13/13.
+Strict-reader plus lifecycle tests passed 206/206, full unit passed 900/900, and
+the Identity Control lifecycle pull contract passed 14/14. Scoped ESLint and
+full lint/all TypeScript checks passed with one pre-existing generated-registry
+warning. Real strict-reader composition rejects duplicate keys; valid and
+invalid pages reach commit/retry outcomes without bypassing the verifier.
+Evidence is in
+`reports/reviews/academy-identity-lifecycle-pull-json-operation-local-checkpoint-2026-08-10.md`.
+
+**Residual risk:** Different independent closure review bound the regenerated
+manifest, reran focused 13/13, relevant 206/206, producer 14/14 and proportional
+static gates, then passed final `C0/H0/M0/L0`. The response transport still owns
+the approved endpoint, credentials, HTTP
+method/status/media behavior, and cancellation. Parser bounds, scheduler and
+retry ownership, runtime bindings, deployment evidence, registry enablement,
+release approval, and production authorization remain separate gates. Current
+values stay `enabled=false`, `releaseApproval=false`, and `runtimeWired=false`.
+
 ## 2026-08-10 — Local Identity lifecycle pull-operation transport implemented
 
 **Outcome:** Academy added a pure local transport that composes the accepted

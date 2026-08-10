@@ -243,6 +243,25 @@ credential/key ownership, scheduler/runtime/deploy และ production authoriz
 ยังเป็น gates แยก; `enabled=false`, `releaseApproval=false`,
 `runtimeWired=false` และ production NO-GO คงเดิม.
 
+**Identity lifecycle pull JSON operation local checkpoint (2026-08-10):**
+Academy เพิ่ม pure local adapter ระหว่าง injected response transport กับ injected
+strict JSON reader. Adapter capture method ทั้งสองครั้งเดียว, preserve receiver,
+ส่ง exact pull request และคืนเฉพาะ parsed `unknown` เมื่อ reader ให้ `ok=true`.
+Missing-module RED หยุดก่อน collection; first implementation ผ่าน 8/9 โดย failure
+เดียวเป็น fixture ที่คาด raw target แทน Proxy receiver. แก้เฉพาะ fixture แล้ว
+focused ผ่าน 9/9. Independent RIL แรกคืน `C0/H0/M1/L0` เพราะ async return
+adopt rejecting thenable หลังออกจาก local catch และปล่อย error detail ได้.
+Thenable RED ผ่าน 10/13; remediation ใช้ `return await value` ภายใน catch แล้ว
+GREEN ผ่าน focused 13/13, strict-reader+lifecycle 206/206, full unit 900/900,
+producer 14/14 และ full lint/typechecks. Real strict-reader test reject duplicate keys;
+valid page commit ใต้ lease และ invalid cursor retry โดยไม่ commit. หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-lifecycle-pull-json-operation-local-checkpoint-2026-08-10.md`](../reports/reviews/academy-identity-lifecycle-pull-json-operation-local-checkpoint-2026-08-10.md).
+Different independent re-review bind manifest ก่อนและหลังทุก gate, rerun focused
+13/13, relevant 206/206 และ producer 14/14 แล้วผ่าน final `C0/H0/M0/L0`.
+Response transport ยังเป็นเจ้าของ endpoint/auth/HTTP/status; parser values,
+scheduler/runtime/deploy และ production authorization เป็น gates แยก. `enabled=false`,
+`releaseApproval=false`, `runtimeWired=false` และ production NO-GO คงเดิม.
+
 **Shared strict JSON response boundary checkpoint (2026-08-10):** Academy รับช่วง
 existing untracked BYOB + duplicate-safe parser จาก concurrent client work มา
 audit และเพิ่ม standalone adversarial suite โดยไม่ stage consumer/UI files. RED
