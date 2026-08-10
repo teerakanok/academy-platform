@@ -282,6 +282,31 @@ endpoint/key/audience/HTTP/parser/scheduler/operator/deploy และ production
 authorization เป็น gates แยก. `enabled=false`, `releaseApproval=false`,
 `runtimeWired=false` และ production NO-GO คงเดิม.
 
+**Identity client-assertion provider local checkpoint (2026-08-11):** Academy
+เพิ่ม provider ฝั่ง server ที่สร้าง compact JWS ตาม producer verifier โดยเรียก
+injected ES256 signer เท่านั้น ไม่ generate/import/export key และไม่อ่าน secret.
+แต่ละ instance pin client ID, exact HTTPS audience, key ID, lifetime 30–300 วินาที
+และ purpose `code_exchange | lifecycle_pull`; cross-purpose request หยุดก่อน clock,
+JTI หรือ signer. Missing-module RED หยุดก่อน collection; first GREEN 20/20.
+Resource RED ล้ม 2/22 ก่อนเพิ่ม producer-aligned header/claims ceilings และตรวจ
+signature 64 ไบต์ก่อน fixed copy. Purpose-isolation RED ล้ม 3/25 ก่อน pin purpose;
+first different RIL พบ `C0/H0/M1/L0` เพราะ signer port ยังไม่ bind
+client/purpose/key จึง reuse capability ข้าม boundary ได้. Remediation RED ผ่าน
+25 เดิมและล้ม 3 binding cases; provider จึงตรวจ signer binding ก่อน side effect
+และส่ง binding เดิมเข้า `sign` ให้ runtime signer ตรวจซ้ำ. Focused ปัจจุบันผ่าน
+30/30, Identity regression 17 files/258 tests, full unit+type 90 files/952 tests,
+producer verifier + lifecycle contract 22/22 และ full lint/TypeScript ทุก config
+ผ่านโดยมี warning เดิมใน generated registry 1 จุด.
+หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-client-assertion-provider-local-checkpoint-2026-08-11.md`](../reports/reviews/academy-identity-client-assertion-provider-local-checkpoint-2026-08-11.md).
+Different independent re-review bind manifest ก่อนและหลัง gates แล้วผ่าน final
+`C0/H0/M0/L0`. Test ใช้ ephemeral non-exportable key
+และ `.example` lifecycle audience เท่านั้น; production key ceremony, public-key
+registration/rotation, exact lifecycle endpoint/audiences, secret-store binding,
+JTI owner, HTTP/scheduler/runtime/deploy และ authorization ยังเป็น gates แยก.
+`enabled=false`, `releaseApproval=false`, `runtimeWired=false` และ production
+NO-GO คงเดิม.
+
 **Shared strict JSON response boundary checkpoint (2026-08-10):** Academy รับช่วง
 existing untracked BYOB + duplicate-safe parser จาก concurrent client work มา
 audit และเพิ่ม standalone adversarial suite โดยไม่ stage consumer/UI files. RED

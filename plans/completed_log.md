@@ -5,6 +5,45 @@
 
 ---
 
+## 2026-08-11 — Local Identity client-assertion provider implemented
+
+**Outcome:** Academy added a pure server-side ES256 assertion provider that
+consumes an injected clock, JTI source and signer. It pins one client, exact
+audience, key ID, bounded lifetime and protocol purpose per instance. The module
+does not generate, import, export, read or store private key material.
+
+**Verification:** The first RED stopped before collection because the module did
+not exist, and first GREEN passed 20/20. A resource self-audit then produced RED
+at 20/22 for overbound audience work and signature cloning before length
+rejection; producer-aligned byte ceilings and a fixed 64-byte post-validation
+copy closed both. Purpose-isolation RED then passed 22/25: invalid purpose was
+ignored and one provider could serve both code exchange and lifecycle pull. The
+provider now pins the purpose and exact request shape before side effects;
+focused passed 25/25. First different RIL then returned `C0/H0/M1/L0` because
+the signer port did not bind client, purpose or key ID. Remediation RED passed
+25 existing checks and failed 3 binding cases; the provider now rejects a
+mismatched signer capability before side effects and passes the frozen binding
+into `sign` for runtime revalidation. Focused passes 30/30, Identity regression
+passes 17 files / 258 tests, full unit+type passes 90 files / 952 tests, the
+Identity Control verifier plus lifecycle contract passes 22/22, and full lint
+plus all TypeScript configurations passes with one pre-existing
+generated-registry warning. Evidence is in
+`reports/reviews/academy-identity-client-assertion-provider-local-checkpoint-2026-08-11.md`.
+
+**Independent review:** Different independent re-review verified the remediated
+manifest and passed final `C0/H0/M0/L0`.
+
+**Residual risk:** This checkpoint does not authorize or create any key. The
+runtime signer and key ceremony must
+still prove that underlying key material maps to exactly one client and purpose;
+the provider can enforce only the capability binding it receives. The approved
+code-exchange audience still
+requires product-owned key provisioning, public-key registration and rotation
+evidence. Lifecycle endpoint and assertion/event audiences remain unresolved;
+secret-store binding, JTI ownership, HTTP and scheduler policy, named operators,
+runtime deployment and production authorization remain external gates. Registry
+state stays disabled and production readiness does not change.
+
 ## 2026-08-11 — Local Identity lifecycle pull transport composed
 
 **Outcome:** Academy added one pure composition factory for the reviewed
