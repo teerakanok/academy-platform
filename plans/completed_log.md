@@ -5,6 +5,34 @@
 
 ---
 
+## 2026-08-10 — Local Identity lifecycle verified-page transport implemented
+
+**Outcome:** Academy added a pure local decorator between a future
+duplicate-safe parsed-page transport and the accepted lifecycle pull-page
+verifier/pull cycle. It binds the exact request cursor and configured limit,
+uses the cycle's one verification time and explicit envelope policy, and returns
+only a fully verified fresh page. Transport or verification failures collapse to
+one bounded detail-free error; through the cycle they require retry and cannot
+reach the fenced page commit.
+
+**Verification:** TDD first stopped on the missing module. Initial GREEN passed
+8/8. A Proxy RED then passed 8 and failed 1 because the parsed-page method was
+read twice; capturing it once with its original receiver restored focused GREEN
+at 9/9. Relevant lifecycle tests passed 131/131, full unit passed 825/825, and
+the Identity Control lifecycle pull contract passed 14/14. The accepted producer
+contract paths are unchanged from `a6ef1f4`. Scoped ESLint and full lint/all
+TypeScript checks passed with one pre-existing generated-registry warning.
+Evidence is in
+`reports/reviews/academy-identity-lifecycle-verified-page-transport-local-checkpoint-2026-08-10.md`.
+
+**Residual risk:** Different independent checkpoint review bound the manifest,
+reran focused 9/9, lifecycle 131/131, producer 14/14, and proportional static
+gates, and passed `C0/H0/M0/L0`. This module is local-only and unwired. Bounded
+duplicate-safe raw JSON parsing, authenticated HTTP/client assertion,
+endpoint/key/audience configuration, deadline/retry/lag ownership,
+scheduler/runtime bindings, deployment evidence, registry enablement, release
+approval, and production authorization remain separate gates.
+
 ## 2026-08-10 — Local Identity lifecycle pull-page verifier implemented
 
 **Outcome:** Academy added a pure local verifier between a future authenticated

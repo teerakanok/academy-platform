@@ -193,6 +193,23 @@ envelopes และ JWK `key_ops` Proxy ถูก enumerate อย่างล�
 lint/typechecks. Different independent final re-review ผ่าน `C0/H0/M0/L0`;
 checkpoint ยัง local-only/unwired และ production gates เดิมไม่เปลี่ยน.
 
+**Identity lifecycle verified-page transport local checkpoint (2026-08-10):**
+Academy มี pure local decorator ที่เชื่อม future duplicate-safe parsed-page port
+เข้ากับ pull-page verifier และ pull cycle ที่ผ่าน independent RIL แล้ว. Boundary
+ส่ง exact cursor+configured limit, ใช้ verification time หนึ่งค่าจาก cycle และ
+explicit envelope policy ก่อนคืน verified page แบบ all-or-nothing. Missing-module
+RED หยุดก่อน collection; GREEN แรกผ่าน 8/8. Author review เพิ่ม Proxy proof แล้ว
+RED รอบสองผ่าน 8/9 เพราะ method ถูกอ่านซ้ำ; implementation จึง capture method
+ครั้งเดียวพร้อม receiver เดิมและ GREEN ผ่าน 9/9. Relevant lifecycle ผ่าน 131/131,
+full unit 825/825, producer contract 14/14 และ full lint/typechecks ผ่าน. หลักฐาน
+อยู่ที่
+[`reports/reviews/academy-identity-lifecycle-verified-page-transport-local-checkpoint-2026-08-10.md`](../reports/reviews/academy-identity-lifecycle-verified-page-transport-local-checkpoint-2026-08-10.md).
+Different independent RIL bind manifest แล้วผ่าน `C0/H0/M0/L0`. Checkpoint คง
+local-only/unwired: raw JSON, HTTP authentication/client assertion,
+endpoint/key/audience, deadline/retry/lag, scheduler/runtime/deploy และ owner
+approval ยังเป็น gates แยก; `enabled=false`, `releaseApproval=false`,
+`runtimeWired=false` และ production NO-GO คงเดิม.
+
 **Identity session-cookie local checkpoint (2026-08-09):** future
 `academy_session` มี raw-header parser ที่รับเฉพาะ canonical name แบบ exact-one,
 reject duplicate โดยไม่พึ่ง order และจำกัด opaque ID ที่ URL-safe 32-160 ตัวอักษร.
