@@ -307,6 +307,25 @@ JTI owner, HTTP/scheduler/runtime/deploy และ authorization ยังเป
 `enabled=false`, `releaseApproval=false`, `runtimeWired=false` และ production
 NO-GO คงเดิม.
 
+**Identity client-assertion JTI source local checkpoint (2026-08-11):** Academy
+เพิ่ม zero-argument server adapter ที่ใช้เฉพาะ `globalThis.crypto.randomUUID()`
+เพื่อสร้าง canonical UUID v4 ซึ่งตรง producer JTI grammar. Module capture
+Web Crypto object/method ครั้งเดียว, preserve receiver, reject missing/throwing/
+malformed output ด้วย fixed failure และไม่เปิด entropy injection หรือ fallback
+ไป weak randomness. Missing-module RED หยุดก่อน collection; first implementation
+ผ่าน 9/10 เพราะ explicit `null` fallback ไป global crypto, แล้ว GREEN 10/10 หลัง
+แยก omitted/malformed input. Security self-audit RED 10/11 เพราะ factory ยังรับ
+entropy override; zero-argument API ทำให้ final GREEN 11/11. Identity regression
+ผ่าน 18 files/269 tests, full unit+type 91 files/963 tests, producer 22/22 และ
+full lint/TypeScript ผ่านโดยมี generated warning เดิม 1 จุด. หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-client-assertion-jti-source-local-checkpoint-2026-08-11.md`](../reports/reviews/academy-identity-client-assertion-jti-source-local-checkpoint-2026-08-11.md).
+Different independent RIL verified the frozen manifest and returned final
+`C0/H0/M0/L0`. Identity Control ยังเป็นเจ้าของ
+atomic replay reservation; signer/key ceremony, exact lifecycle values,
+HTTP/scheduler/runtime/deploy และ release authorization ยังเป็น gates แยก.
+`enabled=false`, `releaseApproval=false`, `runtimeWired=false` และ production
+NO-GO คงเดิม.
+
 **Shared strict JSON response boundary checkpoint (2026-08-10):** Academy รับช่วง
 existing untracked BYOB + duplicate-safe parser จาก concurrent client work มา
 audit และเพิ่ม standalone adversarial suite โดยไม่ stage consumer/UI files. RED

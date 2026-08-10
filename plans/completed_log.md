@@ -5,6 +5,32 @@
 
 ---
 
+## 2026-08-11 - Local Identity client-assertion JTI source implemented
+
+**Outcome:** Academy added a zero-argument server-side JTI source that uses only
+Web Crypto `randomUUID()`. It emits canonical lowercase UUID v4 values and
+collapses missing, throwing, or malformed runtime behavior to one fixed failure.
+The production API exposes no entropy override or weak-random fallback.
+
+**Verification:** Missing-module RED stopped before collection. The first
+implementation passed 9/10 because explicit `null` incorrectly selected the
+global default; the input boundary fix returned GREEN 10/10. Security self-audit
+then produced RED 10/11 because the factory still exposed caller-supplied
+entropy. The zero-argument global-Web-Crypto-only API passes focused 11/11,
+Identity regression 18 files / 269 tests, full unit+type 91 files / 963 tests,
+producer assertion/lifecycle 22/22, and full lint plus all TypeScript configs
+with one pre-existing generated warning. Evidence is in
+`reports/reviews/academy-identity-client-assertion-jti-source-local-checkpoint-2026-08-11.md`.
+
+**Independent review:** Different independent RIL verified the frozen manifest
+and returned final `C0/H0/M0/L0`.
+
+**Residual risk:** UUID v4 collision resistance is probabilistic; Identity
+Control retains authoritative atomic replay reservation. Runtime signer/key
+ceremony, exact lifecycle values,
+HTTP/scheduler ownership, deployment, and release authorization remain external
+gates. Registry and runtime wiring remain disabled.
+
 ## 2026-08-11 — Local Identity client-assertion provider implemented
 
 **Outcome:** Academy added a pure server-side ES256 assertion provider that

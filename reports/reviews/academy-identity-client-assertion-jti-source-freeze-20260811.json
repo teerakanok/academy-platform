@@ -1,0 +1,31 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/src/lib/identity/client-assertion-jti-source.ts",
+      "sha256": "044e1be50c00d087d90028c4a6354ff24f71cf54247953391ed14922e215f0f5",
+      "bytes": 1247
+    },
+    {
+      "path": "academy-web/tests/unit/identity-client-assertion-jti-source.test.ts",
+      "sha256": "eeff59963db8575eaf3f1d99d221b94b06c29205d14a77febe763eeda3d5abce",
+      "bytes": 5374
+    },
+    {
+      "path": "plans/active_plan.md",
+      "sha256": "ed796a031febd73875bb6ab1af074b4ba8bbe7ed3f5d64b6dbf89477da41463e",
+      "bytes": 177662
+    },
+    {
+      "path": "plans/completed_log.md",
+      "sha256": "b9b325497920fdcd658aa4c65929a2bc22111154a7d2fd911a9a97c730c3ccb8",
+      "bytes": 118925
+    },
+    {
+      "path": "reports/reviews/academy-identity-client-assertion-jti-source-local-checkpoint-2026-08-11.md",
+      "sha256": "cc870a5c9ffb473c95822a6b389f6b8292080170f502b6a3a0bdca0ba07d99f6",
+      "bytes": 6165
+    }
+  ]
+}
