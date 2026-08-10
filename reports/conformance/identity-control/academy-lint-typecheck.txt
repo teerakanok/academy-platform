@@ -1,0 +1,5 @@
+> eslint . && tsc --noEmit && tsc -p tsconfig.worker.json && tsc -p ops/academy-retention-worker/tsconfig.json
+/Users/teerakanok/Dev/cyberskills-director/products/cyberskills/academy-platform/academy-web/src/lib/content/registry.generated.ts
+  4:1  warning  Unused eslint-disable directive (no problems were reported)
+✖ 1 problem (0 errors, 1 warning)
+  0 errors and 1 warning potentially fixable with the `--fix` option.

@@ -1,0 +1,150 @@
+{
+  "schema": "academy-identity-control-local-evidence/v1",
+  "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+  "identityControlSourceRevision": "a6ef1f430e1939a76fdccdcc35a1da41ff7a4606",
+  "registryEnabled": false,
+  "releaseApproval": false,
+  "runtimeWired": false,
+  "retainedLocalEvidence": {
+    "scenarios": [
+      "authorization.state-expiry-replay",
+      "callback.code-and-state-only",
+      "callback.server-held-intent",
+      "exchange.pkce-s256",
+      "exchange.result-binding",
+      "session.host-scoped",
+      "activation.grants-zero-product-access",
+      "outage.fail-closed",
+      "academy.course-entitlement"
+    ],
+    "testArtifact": {
+      "path": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
+      "sha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
+    },
+    "independentReview": {
+      "path": "reports/reviews/identity-control-conformance-ril-2026-08-08.md",
+      "sha256": "62f44a6e81a77ababeacbc063f1e4d5d8509b3c5239406f45f4a9af7e7573c4b"
+    }
+  },
+  "checkpoints": [
+    {
+      "id": "envelope-verifier",
+      "verdict": "C0/H0/M0/L0",
+      "report": {
+        "path": "reports/reviews/academy-identity-lifecycle-envelope-local-conformance-2026-08-09.md",
+        "sha256": "b32fa794f721e06ce4ca830128262d77acf160a4c28a89b3c07586c70b1ed165"
+      },
+      "receipt": {
+        "path": "reports/conformance/identity-control/academy-lifecycle-envelope-local-conformance.json",
+        "sha256": "152b159f88a603028d3bbed80136a89c326a6eafc880fe5751aa16295245c4d1"
+      },
+      "scenarios": [
+        "lifecycle.envelope-cryptographic-verification"
+      ]
+    },
+    {
+      "id": "projection-reducer",
+      "verdict": "C0/H0/M0/L0",
+      "report": {
+        "path": "reports/reviews/academy-identity-lifecycle-reducer-local-checkpoint-2026-08-09.md",
+        "sha256": "0828c7467e7d96190d31a6758cb6b413b1dbd957786cd0cd645be718992e7fb2"
+      },
+      "scenarios": [
+        "lifecycle.duplicate-stale",
+        "lifecycle.gap-conflict"
+      ]
+    },
+    {
+      "id": "durable-page-store",
+      "verdict": "C0/H0/M0/L0",
+      "report": {
+        "path": "reports/reviews/academy-identity-lifecycle-page-store-local-checkpoint-2026-08-10.md",
+        "sha256": "6685acf996b69c4901c9a13fec725c69113b9993bbdd4e9321e13cb53db79093"
+      },
+      "scenarios": [
+        "lifecycle.duplicate-stale",
+        "lifecycle.gap-conflict",
+        "lifecycle.config-revision-change",
+        "lifecycle.cursor-after-commit"
+      ]
+    },
+    {
+      "id": "pull-lease",
+      "verdict": "C0/H0/M0/L0",
+      "report": {
+        "path": "reports/reviews/academy-identity-lifecycle-pull-lease-local-checkpoint-2026-08-10.md",
+        "sha256": "79a703286d06064505ce9bd51aaf8185825344f733d90eed36cb7e5d4c112f8f"
+      },
+      "freezeManifest": {
+        "path": "reports/reviews/academy-identity-lifecycle-pull-lease-m01-freeze-20260810.json",
+        "sha256": "a8599a1d1f5624238b85c85b3692d5886f58650af4bd7dbb9fae56e7a9c6570e"
+      },
+      "scenarios": [
+        "lifecycle.cursor-after-commit"
+      ]
+    },
+    {
+      "id": "pure-pull-cycle",
+      "verdict": "C0/H0/M0/L0",
+      "report": {
+        "path": "reports/reviews/academy-identity-lifecycle-pull-cycle-local-checkpoint-2026-08-10.md",
+        "sha256": "64dd594cb590dc856094c3d28bab75b4034a65d8e5c5faf928417fd99972b971"
+      },
+      "freezeManifest": {
+        "path": "reports/reviews/academy-identity-lifecycle-pull-cycle-freeze-20260810.json",
+        "sha256": "550b02f9d692ad9c3734397ad72624667afb644c668704adea5cc1cc5f16e065"
+      },
+      "scenarios": [
+        "lifecycle.config-revision-change",
+        "lifecycle.cursor-after-commit"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "lifecycle.envelope-cryptographic-verification",
+      "result": "pass",
+      "checkpointIds": [
+        "envelope-verifier"
+      ]
+    },
+    {
+      "id": "lifecycle.duplicate-stale",
+      "result": "pass",
+      "checkpointIds": [
+        "projection-reducer",
+        "durable-page-store"
+      ]
+    },
+    {
+      "id": "lifecycle.gap-conflict",
+      "result": "pass",
+      "checkpointIds": [
+        "projection-reducer",
+        "durable-page-store"
+      ]
+    },
+    {
+      "id": "lifecycle.config-revision-change",
+      "result": "pass",
+      "checkpointIds": [
+        "durable-page-store",
+        "pure-pull-cycle"
+      ]
+    },
+    {
+      "id": "lifecycle.cursor-after-commit",
+      "result": "pass",
+      "checkpointIds": [
+        "durable-page-store",
+        "pull-lease",
+        "pure-pull-cycle"
+      ]
+    }
+  ],
+  "limitations": [
+    "No Identity Control endpoint, key distribution, audience, or authenticated transport is configured.",
+    "No Academy runtime route, scheduler, session flow, or production database is wired by this evidence.",
+    "Local checkpoint evidence does not enable the registry or approve a release."
+  ]
+}

@@ -1,0 +1,27 @@
+> vitest run --project integration tests/integration/identity-boundary.test.ts
+ RUN  v3.2.7 /Users/teerakanok/Dev/cyberskills-director/products/cyberskills/academy-platform/academy-web
+ ❯ |integration| tests/integration/identity-boundary.test.ts (15 tests | 15 skipped) 4ms
+   ↓ adapter ต้องบังคับกฎเดียวกับของจริง (ไม่ใช่ stub ที่ตอบ ok เสมอ) > code ใช้ได้ครั้งเดียว
+   ↓ adapter ต้องบังคับกฎเดียวกับของจริง (ไม่ใช่ stub ที่ตอบ ok เสมอ) > PKCE verifier ผิด แลกไม่ได้
+   ↓ adapter ต้องบังคับกฎเดียวกับของจริง (ไม่ใช่ stub ที่ตอบ ok เสมอ) > redirect_uri ไม่ตรงกับตอนเริ่ม แลกไม่ได้
+   ↓ adapter ต้องบังคับกฎเดียวกับของจริง (ไม่ใช่ stub ที่ตอบ ok เสมอ) > adapter ปลอมต้องประกาศตัวว่าใช้บน production ไม่ได้
+   ↓ ชั้นสถานะต้องแยกจากกันจริง > เปิดใช้บริการสำเร็จ ไม่ได้ให้สิทธิ์เข้าคอร์สใดเลย
+   ↓ ชั้นสถานะต้องแยกจากกันจริง > มีบัญชีอย่างเดียว ยังไม่นับว่าเปิดใช้บริการ
+   ↓ ชั้นสถานะต้องแยกจากกันจริง > สิทธิ์ที่ถูกเพิกถอนแล้วใช้ไม่ได้ แต่ยังตอบได้ว่าเคยมี
+   ↓ ชั้นสถานะต้องแยกจากกันจริง > สิทธิ์ที่หมดอายุแล้วใช้ไม่ได้
+   ↓ ชั้นสถานะต้องแยกจากกันจริง > สถานะ suspended ใช้บริการไม่ได้ แม้จะเคยมีสิทธิ์คอร์สอยู่
+   ↓ ชั้นสถานะต้องแยกจากกันจริง > เข้า course content ได้เมื่อ activation และ entitlement ผ่านพร้อมกันเท่านั้น
+   ↓ ชั้นสถานะต้องแยกจากกันจริง > activation revision เก่าที่มาช้าห้ามทับสถานะ revision ใหม่
+   ↓ ชั้นสถานะต้องแยกจากกันจริง > activation revision เท่ากันแต่สถานะขัดกันต้อง reject ไม่ใช่ last-write-wins
+   ↓ ชั้นสถานะต้องแยกจากกันจริง > activation events ต่าง revision ที่มาพร้อมกันต้องจบที่ revision สูงสุด
+   ↓ RLS ของตารางใหม่ > service_activation default deny และไม่ให้สิทธิ์ anon
+   ↓ RLS ของตารางใหม่ > course_entitlement default deny และไม่ให้สิทธิ์ anon
+ Test Files  1 failed (1)
+      Tests  15 skipped (15)
+   Start at  19:40:22
+   Duration  488ms (transform 109ms, setup 11ms, collect 209ms, tests 4ms, environment 0ms, prepare 51ms)
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  |integration| tests/integration/identity-boundary.test.ts [ tests/integration/identity-boundary.test.ts ]
+ FAIL  |integration| tests/integration/identity-boundary.test.ts [ tests/integration/identity-boundary.test.ts ]
+Error: connect EPERM 127.0.0.1:54322 - Local (0.0.0.0:0)
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯

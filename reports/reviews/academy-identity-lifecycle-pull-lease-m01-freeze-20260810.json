@@ -1,0 +1,61 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/scripts/test-identity-lifecycle-page-store-postgres.mjs",
+      "sha256": "e9d46ac78d1009ec71afc15fc89647b68688ae46703bfef8320457a2c5f17056",
+      "bytes": 19441
+    },
+    {
+      "path": "academy-web/scripts/test-identity-lifecycle-page-store-postgres.test.mjs",
+      "sha256": "a6d8cdf237845e2ee7075220cb4176e79669081cafe107e5ad4d5b80a1d889b6",
+      "bytes": 11091
+    },
+    {
+      "path": "academy-web/src/lib/identity/lifecycle-page-store.ts",
+      "sha256": "8de54aac14194cbd8c3bcd347cd32624e24ca935e1e5190ceb0e87a22b80c320",
+      "bytes": 27298
+    },
+    {
+      "path": "academy-web/src/lib/identity/lifecycle-pull-lease.ts",
+      "sha256": "8f8ba92d6ba02fd23d74c072cea674fd26de610f17b818b9aff9d48c2d3fe23d",
+      "bytes": 6547
+    },
+    {
+      "path": "academy-web/supabase/migrations/0023_identity_lifecycle_pull_lease.sql",
+      "sha256": "eff6bf92af29569cfac15201184a17f5cc201d8092a783866a0d973c3087f5c1",
+      "bytes": 9094
+    },
+    {
+      "path": "academy-web/tests/integration/identity-lifecycle-page-store.test.ts",
+      "sha256": "5c7fd39d9a833f7e3388532baa01f85a25e9a52cbac0c383b8e64c27484011d6",
+      "bytes": 35747
+    },
+    {
+      "path": "academy-web/tests/unit/identity-lifecycle-page-store.test.ts",
+      "sha256": "7460d0551eb1f97162532350cc382d60ae6b1ba2cab605de58ae936cfb165151",
+      "bytes": 18966
+    },
+    {
+      "path": "academy-web/tests/unit/identity-lifecycle-pull-lease.test.ts",
+      "sha256": "f6cea513f50b11f59f2f1ed8a390070f49dccdf846cdcb439f18948d92f491ac",
+      "bytes": 4166
+    },
+    {
+      "path": "plans/active_plan.md",
+      "sha256": "2a17789094284eb1080a8dbaa237fc11a140b7b28117799aa6f4f75a7f7c0a51",
+      "bytes": 153621
+    },
+    {
+      "path": "plans/completed_log.md",
+      "sha256": "4bc31765e02cba07ecbe56ba66b5a87b1f9dcc05d2d4ce63ea004becc93e75c0",
+      "bytes": 95269
+    },
+    {
+      "path": "reports/reviews/academy-identity-lifecycle-pull-lease-local-checkpoint-2026-08-10.md",
+      "sha256": "79a703286d06064505ce9bd51aaf8185825344f733d90eed36cb7e5d4c112f8f",
+      "bytes": 8797
+    }
+  ]
+}

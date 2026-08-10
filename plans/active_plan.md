@@ -2,7 +2,7 @@
 
 > Open work only. Move closed items to `completed_log.md` with evidence.
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
-> **Last updated:** 2026-08-06
+> **Last updated:** 2026-08-10
 
 ## Current execution lane — activate identity without widening Pool A access
 
@@ -19,6 +19,13 @@ anonymous, forged `service_role`, และ cross-schema ถูกปฏิเ�
 Retention boundary ใช้ migration `0020_dedicated_retention_api.sql` แยกจาก runtime
 data boundary และ deploy แล้ว; เหลือเพียงหลักฐาน cron รอบ scheduled event แรกตาม
 [`reports/academy-retention-api-rollout-2026-08-06.md`](../reports/academy-retention-api-rollout-2026-08-06.md).
+Local scheduler checkpoint 2026-08-09 ปิด false completion แล้ว: หากครบ
+`MAX_ROUNDS` แต่ทุก round ยังลบได้ job จะ log `retention.backlog_remaining`, emit
+`retention.purge_failed`, ทำ job อื่นต่อ และ aggregate reject โดยไม่ emit
+`purge_complete` ให้ job ที่ backlog ยังเหลือ. Focused 7/7, security wiring 40/40,
+full unit 485/485, lint/typecheck/Next/OpenNext build ผ่าน. นี่ยังไม่แทน cron event
+จริง; หลักฐาน local อยู่ที่
+[`reports/reviews/academy-retention-backlog-fail-closed-local-checkpoint-2026-08-09.md`](../reports/reviews/academy-retention-backlog-fail-closed-local-checkpoint-2026-08-09.md).
 
 **Identity Control alignment (2026-08-06):** Identity Control อนุมัติ Consumer
 Registry v1 policy แล้ว: `client_id=academy-web`, `service_id=academy`,
@@ -44,6 +51,371 @@ wire. ดู
 boundary รับ client assertion ในรูป compact JWS จาก signer ฝั่ง server เท่านั้น และ
 ส่ง canonical assertion audience เข้า provider แต่ยังไม่มี signer/key/runtime จริง.
 
+**Identity lifecycle-envelope local conformance checkpoint (2026-08-09):** Academy
+มี local-only WebCrypto verifier ที่ผ่าน exact fixture vector จาก Identity Control
+revision `a6ef1f430e1939a76fdccdcc35a1da41ff7a4606`; implementation freeze อยู่ที่
+`845e371173efb7b15b7605ecbc9496c47e2068fb` และ fail closed สำหรับ signature,
+algorithm, key ID, issuer, audience, time/skew/lifetime, strict event schema และ
+malformed public key/JWS. Focused suite ผ่าน 4/4, identity regression 48/48, full
+unit 478/478, lint/typecheck/build และ secret scan ผ่าน. หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-lifecycle-envelope-local-conformance-2026-08-09.md`](../reports/reviews/academy-identity-lifecycle-envelope-local-conformance-2026-08-09.md).
+final independent closure review ผ่าน C0/H0/M0/L0; งานไม่ได้ wire transport, route, config, session หรือ
+key distribution; `enabled=false` และ `releaseApproval=false` ยังเหมือนเดิม.
+
+**Identity lifecycle projection reducer local checkpoint (2026-08-09):** Academy
+มี pure local reducer ที่ mirror executable producer contract revision
+`a6ef1f430e1939a76fdccdcc35a1da41ff7a4606`: รับ first valid seed และ contiguous
+revision; projected duplicate/stale/gap/conflict ไม่เปลี่ยน current projection;
+principal scope และ exact event/projection schema fail closed. Initial RIL
+`C0/H0/M1/L0` พบว่า descriptor validation ยัง re-read Proxy ผ่าน `get`.
+Remediation จึง snapshot `descriptor.value` ครั้งเดียวต่อ key ลง null-prototype
+object แล้ว validate/classify จาก snapshot เท่านั้น; Proxy RED ล้ม 4/25 และ GREEN
+ผ่าน focused 25/25, Identity regression 61/61 และ full unit 723/723 บน Node 24.18.0;
+lint/typechecks, Next/OpenNext build, offline audits และ dependency tree ผ่าน.
+หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-lifecycle-reducer-local-checkpoint-2026-08-09.md`](../reports/reviews/academy-identity-lifecycle-reducer-local-checkpoint-2026-08-09.md).
+Final independent re-review ผ่าน `C0/H0/M0/L0`. Boundary ยัง library-only/unwired; endpoint/key/audience,
+authenticated pull, durable page+cursor commit, owner, DB, deploy และ browser proof
+ยังเป็น production gates แยก โดย `enabled=false` และ `releaseApproval=false`.
+
+**Identity lifecycle durable page-store local checkpoint (2026-08-10):** Academy
+มี unwired page builder + PostgreSQL RPC boundary สำหรับ verified page แล้ว:
+singleton `academy-web` เก็บ cursor กับ approved/observed config latch; projection
+ต่อ issuer/subject เก็บ applied state/revision, ready/gap/conflict และ
+highest-known revision โดยไม่มี FK/user/email/activation. Commit ล็อก checkpoint,
+CAS expected cursor, เขียน final update ต่อ principal, configuration และ cursor
+สุดท้ายใน atomic statement เดียว; error ใด ๆ rollback ทั้ง page. TDD ผ่าน focused
+41/41, disposable PostgreSQL 16/16, Identity 84/84 และ full unit 739/739 บน Node
+24.18.0. Initial RIL `C0/H1/M2/L0` พบ ambient Docker authority/cleanup ambiguity,
+raw-RPC gap evidence overwrite และ SQL issuer/UTF-16 parity. Remediation hardwire
+validated local Unix socket + minimal Docker env, prove bounded cleanup, preserve
+first gap observation และ enforce canonical issuer/UTF-16 bounds; adversarial
+harness ผ่าน 7/7. Later RIL `C0/H1/M1/L0` พบว่า direct Vitest ยังเชื่อ marker+URL
+ก่อน inspect owned container และ PostgreSQL text เก็บ lone UTF-16 surrogate
+ไม่ได้. Remediation จึงบังคับ child inspect exact running ID/name/nonce label/
+image/127.0.0.1 port ผ่าน pinned local Docker authority ก่อนสร้าง DB client และ
+เปลี่ยน physical/RPC subject เป็น canonical four-hex-per-code-unit `subject_key`
+ที่ decode กลับ lossless. GREEN ผ่าน harness 10/10, focused 47/47, disposable
+PostgreSQL 23/23, identity-named 83/83 และ full unit 745/745. Lint/typechecks,
+Next/OpenNext build, offline audits, dependency tree และ gitleaks ผ่าน. หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-lifecycle-page-store-local-checkpoint-2026-08-10.md`](../reports/reviews/academy-identity-lifecycle-page-store-local-checkpoint-2026-08-10.md).
+Final independent re-review ผ่าน `C0/H0/M0/L0`; migration ยังไม่
+apply นอก disposable loopback PostgreSQL และยังไม่มี puller/endpoint/key/
+audience/runtime wiring, PostgREST deploy หรือ reconciliation authority. Registry
+`enabled=false` และ `releaseApproval=false` คงเดิม.
+
+**Identity lifecycle pull-lease local checkpoint (2026-08-10):** Migration
+`0023` เพิ่ม database-clock singleton lease สำหรับ logical puller หนึ่งตัวและ
+fenced page commit ที่ lock active token ใน transaction เดียวกับ aggregate commit
+ของ `0022`. Independent RIL แรกพบ `C0/H0/M1/L0`: narrowed runtime port ไม่มี
+unfenced commit แต่ concrete production class ยัง export `commitPage`. M-01
+remediation ลบ lower interface/method และ exact unfenced RPC literal ออกจาก
+production module แล้ว; 0022 coverage ใช้ test-local `rawCommit` เท่านั้น และ
+SQL revoke เดิมยังอยู่. RED ยืนยัน 1 failed / 23 passed ก่อน GREEN focused 28/28;
+harness 13/13, disposable PostgreSQL 27/27 พร้อม cleanup, Identity 89/89 และ
+typechecks ผ่านบน Node 24.18.0. `academy_runtime` ถูก revoke old commit RPC;
+PUBLIC/runtime เขียน lease tableโดยตรงไม่ได้. หลักฐานก่อน remediation ยังมี
+full unit 751/751; lint/typechecks,
+Next/OpenNext builds, offline audits และ gitleaks ผ่าน. Local database fixture ใช้
+exact content-addressed PostgreSQL image ID ที่ inspect แล้วตรงกับ pinned RepoDigest
+และ `arm64`, พร้อม `--pull never`; นี่ไม่ใช่ portable CI proof. หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-lifecycle-pull-lease-local-checkpoint-2026-08-10.md`](../reports/reviews/academy-identity-lifecycle-pull-lease-local-checkpoint-2026-08-10.md).
+Different independent re-review ยืนยัน machine freeze manifest 11 ไฟล์และผ่าน
+`C0/H0/M0/L0`; ผู้ตรวจรันซ้ำ focused 28/28, Identity 89/89, harness 13/13,
+disposable PostgreSQL 27/27 พร้อม cleanup, Node 24 typecheck, diff, reader และ
+secret gates. Checkpoint นี้ยังไม่ wire pull cycle, scheduler, endpoint,
+key/audience, runtime config หรือ deploy; registry `enabled=false` และ
+`releaseApproval=false` คงเดิม.
+
+**Identity lifecycle pure pull-cycle local checkpoint (2026-08-10):** Academy
+มี unwired composition boundary ที่ claim database-clock lease, อ่าน durable
+cursor/config, ส่ง cursor กับ cloned verification time ให้ injected verified-page
+transport, build strict aggregate และ commit ผ่าน leased fence เท่านั้น. Busy
+lease คืน bounded `lease_busy`; transport failure คืน `retry_required` พร้อมปิด
+sensitive operations; schema/reducer/store failure reject และไม่ advance cursor.
+Page result แยก gap/conflict flags โดยไม่กำหนด precedence และรายงาน
+`config_revision_changed` โดยไม่ self-approve observed revision. TDD RED เริ่มจาก
+missing module และ durable-config guard 1 failed/9 passed ก่อน GREEN focused
+10/10; Identity regression 99/99, full unit 761/761, producer contract 20/20,
+Node 24 lint/typecheck/Next build, offline audits และ gitleaks ผ่าน. หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-lifecycle-pull-cycle-local-checkpoint-2026-08-10.md`](../reports/reviews/academy-identity-lifecycle-pull-cycle-local-checkpoint-2026-08-10.md).
+Independent RIL แรกคืน `C0/H0/M1/L0` เพราะ release `false` ไม่มีสถานะ และ release
+throw จาก `finally` กลบ committed/retry/local failure เดิม. Remediation RED ล้ม
+14/20; GREEN 20/20 หลังผลทุกชนิดที่ถือ lease มี `leaseRelease` แบบ
+`confirmed|not_confirmed|unknown`, committed/retry คง primary outcome และ local
+failure wrapper คง original cause. Identity regression หลังแก้ผ่าน 109/109 และ
+producer contract 20/20; scoped lint/typecheck ผ่าน. Closure re-review คืน
+`C0/H0/M1/L0` อีกครั้งด้วย M-02 เพราะ wrapper
+คัดลอก `cause.message` ที่อาจมี credential-like/path/SQL detail ลง public message,
+String และ stack. M-02 RED ล้ม 9/29; GREEN 29/29 หลังใช้ fixed allowlisted message,
+เก็บ exact cause แบบ non-enumerable และให้ JSON/`Object.keys` เห็นเฉพาะ
+`leaseRelease`. Identity regression หลัง M-02 ผ่าน 118/118, producer 20/20 และ
+lint/typecheck ผ่าน. Different independent final re-review ยืนยัน remediation
+freeze และผ่าน `C0/H0/M0/L0`. Checkpoint ยังไม่ wire endpoint/key/audience,
+transport authentication/verification adapter, scheduler, retry/lag policy,
+Worker/runtime
+binding หรือ deploy; registry `enabled=false` และ `releaseApproval=false` คงเดิม.
+
+**Identity Control conformance ledger local refresh (2026-08-10):** Academy
+มี deterministic generator ที่ bind HEAD `845e371173efb7b15b7605ecbc9496c47e2068fb`
+กับ Identity Control `a6ef1f430e1939a76fdccdcc35a1da41ff7a4606`, หก producer artifacts และ
+final local lifecycle checkpoint evidence แบบ exact digest. Ledger 23 scenarios
+คง 9 local passes เดิม, promote เฉพาะ 5 lifecycle scenarios ที่ independent RIL
+ผ่านแล้ว และเก็บ 9 runtime-dependent scenarios เป็น `not_proven`. TDD RED ล้ม
+เพราะ generator ยังไม่มี; GREEN ผ่าน focused 5/5, Identity unit 125/125 และ full
+unit 780/780 บน Node 24.18.0. Canonical receipt exclude เฉพาะ report กับ declared
+manifest; final intake ผ่าน 23 verified / 14 pass / 9 not-proven และ manifest
+verify ผ่าน exact 8 content files. หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-control-conformance-ledger-refresh-local-checkpoint-2026-08-10.md`](../reports/reviews/academy-identity-control-conformance-ledger-refresh-local-checkpoint-2026-08-10.md).
+Different independent RIL ผ่าน `C0/H0/M0/L0` และ root re-verify manifest ครบ 8
+content files; `enabled=false`, `releaseApproval=false`, `runtimeWired=false` และ
+production NO-GO คงเดิม เพราะ endpoint/key/audience/runtime/owner/deployed evidence
+ยังไม่พร้อม.
+
+**Identity lifecycle pull-page verifier local checkpoint (2026-08-10):** Academy
+มี pure local boundary ที่ validate exact producer page schema, requested limit,
+canonical signed-bigint cursor arithmetic และ positive safe config revision ก่อน
+verify compact JWS ทุก envelope ด้วย time/policy snapshot เดียว. Test-only RED
+หยุดที่ missing module; GREEN ผ่าน focused 34/34, lifecycle 120/120, full unit
+814/814, producer contract 14/14 และ full lint/typechecks. Static import proof
+ยืนยันว่า Worker/Wrangler/OpenNext/middleware/registry/callback ยังไม่ import
+boundary นี้. หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-lifecycle-pull-page-verifier-local-checkpoint-2026-08-10.md`](../reports/reviews/academy-identity-lifecycle-pull-page-verifier-local-checkpoint-2026-08-10.md).
+Checkpoint คง local-only/unwired หลัง different independent final RIL ผ่าน;
+`enabled=false`, `releaseApproval=false`, `runtimeWired=false` และ production
+NO-GO คงเดิมจน endpoint/key/audience/transport/scheduler/owner/deployed evidence
+ได้รับ authorization แยก.
+Independent RIL แรกคืน `C0/H0/M1/L0`: dense-array parser เรียก `ownKeys` ก่อน
+reject own length ที่เกิน bound. M-01 test-only RED ล้ม 2/36 เพราะ overbound
+envelopes และ JWK `key_ops` Proxy ถูก enumerate อย่างละหนึ่งครั้ง. Remediation
+ตรวจ own length data descriptor และ bound ก่อน enumeration; GREEN ผ่าน focused
+36/36 โดย trap เป็นศูนย์, lifecycle 122/122, producer 14/14 และ full
+lint/typechecks. Different independent final re-review ผ่าน `C0/H0/M0/L0`;
+checkpoint ยัง local-only/unwired และ production gates เดิมไม่เปลี่ยน.
+
+**Identity session-cookie local checkpoint (2026-08-09):** future
+`academy_session` มี raw-header parser ที่รับเฉพาะ canonical name แบบ exact-one,
+reject duplicate โดยไม่พึ่ง order และจำกัด opaque ID ที่ URL-safe 32-160 ตัวอักษร.
+Creation/deletion ใช้ host-only `Path=/`, `HttpOnly`, `SameSite=Lax` และ `Secure`
+policy เดียวกัน; deletion เป็น deterministic `Max-Age=0`. Focused 6/6, full unit
+484/484, lint/typecheck/build ผ่าน. Boundary นี้ยัง unit-only/unwired; production
+browser proof และ runtime wiring ยังเป็น gate แยก. หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-session-cookie-local-checkpoint-2026-08-09.md`](../reports/reviews/academy-identity-session-cookie-local-checkpoint-2026-08-09.md).
+
+**HTTP security-header local checkpoint (2026-08-09):** `next.config.ts` ส่ง
+report-only CSP สำหรับ observation, HSTS, nosniff, `X-Frame-Options: DENY`,
+referrer policy, permissions policy และ
+DNS-prefetch control แบบ catch-all แล้ว. Unit 481/481, lint/typecheck/build ผ่าน และ
+local production response ของทั้ง page/API มี header ครบ. หลักฐานอยู่ที่
+[`reports/reviews/academy-security-headers-local-checkpoint-2026-08-09.md`](../reports/reviews/academy-security-headers-local-checkpoint-2026-08-09.md).
+CSP ยังอยู่ใน observation mode; การ enforce ต้องรอ browser evidence บน deployed
+topology และ external media ที่อนุมัติแล้ว.
+
+**Production dependency-audit local checkpoint (2026-08-09):** local production tree
+ย้าย transitive `nanoid` เป็น 3.3.17, PostCSS เป็น 8.5.26 และ sharp เป็น 0.35.2
+ผ่าน npm overrides โดย Next ยังเป็น 15.5.22. `npm audit --omit=dev
+--audit-level=high` จาก RED 4 High เป็น 0 vulnerabilities; full unit 484/484,
+lint/typecheck/build ผ่านและ SBOM ตรง lockfile. Node 24.19.0 runtime optimizer
+รับ real PNG แล้วคืน 200 PNG 64x64, reject malformed/unapproved source เป็น 400,
+และ OpenNext/Cloudflare build ผ่าน. อย่างไรก็ตาม sharp 0.35.2 ยังอยู่นอก optional
+range `^0.34.3` ของทั้ง Next 15.5.22 และ 15.5.23 จึงเป็น release-blocked
+compatibility exception; local evidence ไม่ใช่ upstream support. Dev-inclusive audit
+จาก 2 High + 2 Moderate เป็น 0 หลังยก Wrangler เป็น 4.120.0, Miniflare เป็น
+5.20260801.1-alpha, `undici` เป็น 7.29.0 และ `js-yaml` เป็น 4.3.1; Node 24
+OpenNext build ผ่านและ dependency tree ไม่มี invalid/peer error. Repo/director ยังไม่มี
+canonical CI workflow จึงไม่ได้สร้าง gate ใหม่. หลักฐานอยู่ที่
+[`reports/reviews/academy-production-dependency-audit-local-checkpoint-2026-08-09.md`](../reports/reviews/academy-production-dependency-audit-local-checkpoint-2026-08-09.md).
+
+**Public syllabus checkpoint (2026-08-09):** ผู้เยี่ยมชมดูผลลัพธ์, ลำดับบท,
+prerequisite, เวลาประมาณการ และ required checkpoint ของ `basic-os-linux` ได้ก่อนมี
+บัญชี โดยไม่ส่ง lesson body, ข้อสอบ, เฉลย, private-media path หรือ learning record
+ไป browser. `publicAvailability` เป็น default-deny ใน portable course contract;
+`content-formats-demo` จึงถูกตัดจาก catalog, direct public route, sitemap และ OG
+params. หน้า public ตรวจสถานะบัญชีหลัง hydrate: ผู้ที่ยังไม่ลงชื่อเข้าใช้หรือ
+ตรวจไม่ได้เห็น syllabus โดยไม่เรียก progress; ผู้ที่ยืนยัน session แล้วจึงโหลด
+overview/progress เดิม. การทำงานนี้เป็น preview surface เท่านั้น ไม่ได้เปิดบัญชี,
+บทเรียน หรือประกาศว่าเป็น catalog ที่พร้อมขาย. หลักฐานอยู่ที่
+[`reports/reviews/public-course-syllabus-checkpoint-2026-08-09.md`](../reports/reviews/public-course-syllabus-checkpoint-2026-08-09.md).
+
+**Public course locale-continuity checkpoint (2026-08-09):** `?lang=en|th`
+บน public course เป็น source of truth ที่ตรงกันสำหรับ course content, chrome,
+`html[lang]`, cookie และ metadata หลัง hydrate. ผู้ที่มี locale เดิมเปิด bare
+course URL จะถูก canonicalize เฉพาะภาษาที่คอร์สนั้นเสิร์ฟได้จริง; query/hash เดิม
+ไม่หาย และ locale ที่คอร์สไม่รองรับจะ normalize ไป locale ที่ serve จริง. หน้าร้าน
+catalog ยังคง static แต่หน้า course ที่ใช้ `?lang` ไม่ใช่ prerendered query variant;
+ข้อแก้ไขและ static-evidence control อยู่ใน
+`memory/feedback_static_evidence_and_generated_manifest_hygiene.md`. Signed-out flow
+ไม่เรียก progress. หลักฐานและ RIL อยู่ที่
+[`reports/reviews/public-course-locale-continuity-checkpoint-2026-08-09.md`](../reports/reviews/public-course-locale-continuity-checkpoint-2026-08-09.md).
+
+**Public course catalog locale checkpoint (2026-08-09):** `/courses` เป็น
+static catalog ที่แสดงเฉพาะ course preview ซึ่ง opt-in ผ่าน
+`publicAvailability`; catalog card ใช้ DTO allowlist และพา locale ไปหน้าคอร์สโดย
+ไม่ส่ง lesson, เฉลย, media, cue, skill weight หรือ learner data ไป browser. ทุก
+locale ที่ course ประกาศต้องมี `course.json` copy ที่ไม่เป็น null ก่อน registry
+จะผ่าน validation จึงไม่มี card ที่โฆษณาภาษาแล้วพาไป 404. Thai/English catalog,
+chrome, landmark และ mobile language control ตรงกันหลัง hydrate; invalid/duplicate
+locale normalize เป็นค่าเดียวโดยเก็บ query/hash ที่ไม่เกี่ยวข้องไว้. ยังเป็น preview
+surface ไม่ได้เปิดบัญชี บทเรียน หรือประกาศ catalog พร้อมขาย. หลักฐานและ RIL อยู่ที่
+[`reports/reviews/public-course-catalog-locale-checkpoint-2026-08-09.md`](../reports/reviews/public-course-catalog-locale-checkpoint-2026-08-09.md).
+
+**Public course localized share-image checkpoint (2026-08-09):** metadata ของ
+public course ใช้ภาพ `/courses/{slug}/share/{locale}` ตาม locale ที่ serve จริง;
+ทั้ง PNG ภาษาอังกฤษและไทย prerender จาก public course DTO เท่านั้น พร้อมฟอนต์ไทยที่
+เก็บใน repo พร้อม license/provenance จึงไม่มีการดึง font หรือ content ระหว่าง runtime.
+Route สร้าง static params เฉพาะ public course และ locale ที่ประกาศ, ปฏิเสธ slug/locale
+อื่นเป็น `404`, และ middleware ไม่ส่ง invalid share URL ไปหน้า sign-in. Build
+verification ตรวจ Next manifest, Cloudflare static cache และ pixel bounds ของ
+brand/title/footer ทั้งสองภาษา. นี่ทำให้ **ภาพแชร์** static; ไม่ได้เปลี่ยนสถานะของ
+หน้า course ที่ใช้ `?lang`. หลักฐานและ RIL อยู่ที่
+[`reports/reviews/public-course-share-image-checkpoint-2026-08-09.md`](../reports/reviews/public-course-share-image-checkpoint-2026-08-09.md).
+
+**Public course canonical locale checkpoint (2026-08-09):** หน้า preview ใช้
+URL หลัก `/courses/{slug}/{locale}` และ prerender เฉพาะ public course กับ locale
+ที่ประกาศจริงเท่านั้น. HTML static, chrome ตั้งต้น, canonical/hreflang, JSON-LD และ
+share image ตรงกันทั้ง EN/TH ตั้งแต่ก่อน hydration; legacy `?lang=` redirect แบบ
+ถาวรไป URL หลักโดยเก็บ query/hash ที่ไม่ใช่ภาษา. Public route ใช้ DTO allowlist และ
+ไม่เรียก progress เมื่อ signed-out; learner overview แยกไป `/learn` ที่ต้องผ่าน
+session, activation และ course entitlement. Next และ OpenNext cache ตรวจจาก
+content admission list แล้ว. รายละเอียดและ RIL อยู่ที่
+[`reports/reviews/public-course-canonical-locale-checkpoint-2026-08-09.md`](../reports/reviews/public-course-canonical-locale-checkpoint-2026-08-09.md).
+
+**Learner course skill-map checkpoint (2026-08-09):** ผู้เรียนที่ผ่าน session,
+activation และ course entitlement เห็นแผนที่ความครอบคลุมตามหัวข้อบน `/learn` เท่านั้น.
+แผนที่นับเฉพาะบทที่เรียนจบ, ไม่นับการข้าม, และบอกตรงๆ ว่าไม่ใช่คะแนนหรือหลักฐานการ
+ประเมิน; ด่านที่ผ่านยังอยู่ใน Learning record แยกต่างหาก. API คืนเฉพาะค่าที่คำนวณแล้ว
+และไม่ cache; public page/Flight ไม่ส่ง weights, media, cue, skill label หรือ map request.
+EN/TH, loading, unavailable/retry, session expiry และ access loss มี state ที่แยกกัน.
+หลักฐานและ RIL อยู่ที่
+[`reports/reviews/learner-course-skill-map-checkpoint-2026-08-09.md`](../reports/reviews/learner-course-skill-map-checkpoint-2026-08-09.md).
+
+Local skill-map client response checkpoint 2026-08-09 เปลี่ยน
+`response.json()` ที่ไม่จำกัดเป็น shared bounded, duplicate-safe JSON boundary
+พร้อม exact deep projection ใหม่ก่อนข้อมูลถึง chart. Wrapper/item ต้องมี keys
+ตรงทั้งหมด, coverage ต้องไม่ว่าง, ID ไม่ซ้ำ, value เป็น integer 0-100 และผลลัพธ์
+ไม่คืน object จาก response โดยตรง. AbortController เดียวครอบทั้ง fetch และ body;
+401/403/non-success ยังใช้ state เดิมและไม่อ่าน body. Initial RIL
+`C0/H0/M1/L0` พบว่า client รับ `notStarted=true` พร้อม positive value;
+remediation บังคับ invariant ทางเดียวนี้ให้ value เป็นศูนย์ แต่ยังรับ
+`notStarted=false,value=0` ที่เกิดจากการปัดเศษได้. RED ล้ม 1/34 แล้ว focused ผ่าน
+34/34, relevant 42/42 และ full unit 687/687 บน Node 24.18.0; lint/typechecks,
+Next/OpenNext builds, offline audits, dependency tree และ gitleaks ผ่าน. Independent
+closure review ผ่าน C0/H0/M0/L0. Route, shared parser, UI, DB และ config ไม่ถูกแก้;
+authenticated route/browser proof ยังเป็น gate แยก.
+หลักฐานอยู่ที่
+[`reports/reviews/academy-course-skill-map-client-response-validation-local-checkpoint-2026-08-09.md`](../reports/reviews/academy-course-skill-map-client-response-validation-local-checkpoint-2026-08-09.md).
+
+**Learner dashboard data-boundary checkpoint (2026-08-09):** `/dashboard` ไม่ส่ง
+course registry ผ่าน Flight อีกต่อไป. หลัง session, service activation และ
+course entitlement เท่านั้น `GET /api/progress` จึงคืน DTO ของ dashboard ที่มีเพียง
+roadmap/card copy และ global coverage weights; ไม่มี version, public availability,
+skill รายบท, media, cue หรือ skill label. ทุก GET response เป็น `private, no-store`;
+client reject DTO/progress ที่ malformed, duplicate หรือ entitlement list ไม่ตรงกันไป
+state unavailable/retry แทนการบอกผิดว่าไม่มีคอร์ส. radar อธิบายชัดว่าเป็น lesson
+coverage ไม่ใช่ proficiency. หลักฐานและ RIL อยู่ที่
+[`reports/reviews/learner-dashboard-data-boundary-checkpoint-2026-08-09.md`](../reports/reviews/learner-dashboard-data-boundary-checkpoint-2026-08-09.md).
+
+Local resume correctness checkpoint 2026-08-09 ทำให้ dashboard ส่ง
+`record.lastNodeId` เข้า roadmap boundary และเลือกค่านั้นเฉพาะเมื่อ node ยังเป็น
+`in-progress`; หาก completed, skipped, tested-out, locked, missing หรือไม่ส่งค่า จะ
+fallback ตามลำดับเดิม. Equal `updatedAt` tie ยังไม่เปลี่ยนเพราะ record ไม่มี causal
+sequence ที่รองรับ tie-break policy. Focused 20/20 และ full unit 488/488 ผ่าน;
+หลักฐาน local อยู่ที่
+[`reports/reviews/academy-dashboard-resume-last-node-local-checkpoint-2026-08-09.md`](../reports/reviews/academy-dashboard-resume-last-node-local-checkpoint-2026-08-09.md).
+
+Local progress-client response checkpoint 2026-08-09 ปฏิเสธ learner record ที่
+malformed หรือ slug ไม่ตรงกับคอร์สที่ร้องขอในทั้ง lesson load และ reset reconcile
+ด้วย exact local schema projection ที่ตรวจ wrapper/record keys, nested arrays/maps
+และไม่คืน object ที่ยังเป็นของ response; ผล fail-closed ยังเป็น
+`unavailable`/`unknown` ตาม contract เดิม. Preliminary RIL `C0/H0/M2/L0` พบ
+dependency กับ dirty `progress.ts` และ incomplete projection; remediation ตัด import
+นั้นออกแล้ว โดยไม่แก้ `progress.ts`. Focused 19/19 และ full unit 499/499 ผ่าน;
+independent re-review ยัง pending. หลักฐาน local อยู่ที่
+[`reports/reviews/academy-progress-client-response-validation-local-checkpoint-2026-08-09.md`](../reports/reviews/academy-progress-client-response-validation-local-checkpoint-2026-08-09.md).
+
+Local player-attempt storage checkpoint 2026-08-09 คง record schema `v1` แต่ key ใหม่
+ใช้ private `k2` namespace กับ length-prefixed segments ที่ไม่ชนกันเมื่อ ID มี
+delimiter หรือ lone surrogate. Loader จะ copy legacy ไป k2 เมื่อ record ผ่าน
+deep validation และ ID ตรงทั้งคู่เท่านั้น; legacy ที่ invalid/mismatch จะคงอยู่และไม่
+แจ้ง reset เพราะ ownership ของ raw key กำกวม. `latestAttempt` parse k2 ตาม exact
+content, parse legacy จาก record, dedupe โดยเลือก k2 และเรียง tie ด้วย attemptId
+code-unit ascending. Original RIL ได้ `C0/H0/M2/L0`; remediation RED ล้ม
+9/17, focused GREEN 17/17, relevant 32/32 และ full unit 698/698 บน Node 24.18.0.
+ไม่มี UI, route, DB, Identity, config หรือ deploy เปลี่ยน; final independent re-review
+ผ่าน `C0/H0/M0/L0`. หลักฐานอยู่ที่
+[`reports/reviews/academy-player-attempt-storage-scope-local-checkpoint-2026-08-09.md`](../reports/reviews/academy-player-attempt-storage-scope-local-checkpoint-2026-08-09.md).
+
+Local unsubscribe-client response checkpoint 2026-08-09 แสดงสถานะสำเร็จเดิม
+เฉพาะเมื่อ same-origin request ได้ทั้ง HTTP success และ JSON แบบ exact one-key
+`{ok:true}`. HTTP 2xx ที่ body เป็น explicit failure, wrong type, extra key, null,
+array, malformed หรือว่างจะใช้ failure/retry state เดิมแทน โดยไม่เปลี่ยน request,
+API route, anti-enumeration contract, bearer-token fragment, copy หรือ layout.
+Behavior RED ล้ม 7/10 และ initial GREEN ผ่าน 10/10. Preliminary RIL
+`C0/H0/M1/L0` พบว่า `response.json()` collapse duplicate key ก่อนตรวจ one-key;
+remediation จึง require `application/json`, อ่าน raw stream ไม่เกิน 128 bytes,
+decode UTF-8 แบบ fatal และยอมรับเฉพาะ sole raw envelope โดย duplicate ทั้งสองลำดับ
+ถูกปฏิเสธและ valid JSON whitespace ยังผ่าน. Remediation RED ล้ม 3/15, GREEN ผ่าน
+15/15. Re-review พบ L-01 ว่า `TextDecoder` default กลืน UTF-8 BOM ก่อน raw match;
+เพิ่ม `ignoreBOM:true` ให้ BOM คงอยู่และถูก regex ปฏิเสธ, โดย BOM RED ล้ม 1/16
+และ GREEN ผ่าน 16/16. Unsubscribe/security regression ผ่าน 51/51 และ full unit
+515/515; Node 24 lint/typechecks, Next/OpenNext build และ audits ผ่าน. นี่เป็น local
+client-contract evidence; deployed browser/DB proof ยังอยู่ใน gate แยก และ
+independent closure review ยัง pending. หลักฐานอยู่ที่
+[`reports/reviews/academy-unsubscribe-client-response-validation-local-checkpoint-2026-08-09.md`](../reports/reviews/academy-unsubscribe-client-response-validation-local-checkpoint-2026-08-09.md).
+
+Local attempt-client response checkpoint 2026-08-09 ย้าย lesson attempt hook ออกจาก
+inline `response.json()` casts มาผ่าน raw response boundary ที่อ่านไม่เกิน 256 KiB,
+reject duplicate JSON key ทุกระดับ และสร้าง exact deep projection ของ wrapper,
+MCQ, simulation และ public challenge. UUIDv4, Gregorian calendar-valid RFC3339
+expiry profile, arrays ที่ต้องมี,
+nested maps และ unique task IDs ต้องผ่านทั้งหมด; malformed success ใช้ `error`
+เดิม ส่วน 401/403/429 ยังเป็น `access-lost`/`quota` และรับ retry เฉพาะ exact bounded
+integer. Behavior RED ล้ม 34/47, focused GREEN ผ่าน 50/50, attempt/security ผ่าน
+170/170 และ full unit ผ่าน 565/565. Preliminary RIL `C0/H0/M1/L0` พบว่า
+`Date.parse()` normalize วันที่/เวลาที่ไม่มีจริง; remediation RED ล้ม 4/64 แล้ว
+GREEN ผ่าน 64/64 โดยตรวจ component ranges, days-in-month และ century leap-year
+rule โดยไม่เทียบ device clock. Regression ใหม่ผ่าน 177/177 และ full unit 579/579;
+RFC3339 re-review ปิด finding นี้แล้วแต่พบ medium ใหม่ว่า required field อาจไม่มีใน
+`initial` หรือ surface ไม่รองรับ. Cross-field RED ล้ม 2/67 แล้ว GREEN ผ่าน 67/67
+โดย reuse shared `network-interface` allowlist เดียวกับ producer; regression ผ่าน
+180/180 และ full unit 582/582. Node 24 lint/typechecks, Next/OpenNext build และ
+audits ผ่าน. Route/public types/LessonView/progress ไม่ถูกแก้; independent re-review
+ของ remediation ล่าสุดยัง pending. หลักฐานอยู่ที่
+[`reports/reviews/academy-attempt-client-response-validation-local-checkpoint-2026-08-09.md`](../reports/reviews/academy-attempt-client-response-validation-local-checkpoint-2026-08-09.md).
+
+Local public-waitlist response checkpoint 2026-08-09 ปิด false success ของหน้า
+landing แล้ว: Form จะขึ้นสถานะสำเร็จเฉพาะ HTTP success ที่เป็น raw JSON exact
+one-key `{ok:true}` ไม่เกิน 128 bytes และ media type ถูกต้อง. Final review พบ
+M-01 ว่า default reader อาจ materialize single chunk ขนาดใหญ่ก่อนเช็ก bound และ
+ไม่มี deadline; M-02 พบ non-ok `response.json()` แบบ unbounded พร้อมส่ง server text
+เข้า Form. Remediation ใช้ BYOB view ไม่เกิน `max+1`, deadline 5 วินาที,
+optional AbortSignal และ cancel แบบไม่รอผล; non-ok ไม่อ่าน/parse body และคืน generic
+local rejection เท่านั้น. Request contract, network copy และ UI layout ไม่เปลี่ยน.
+Remediation RED เป็น 12 failed / 36 passed; GREEN ผ่าน waitlist 32/32 + unsubscribe 16/16,
+waitlist/security 114/114 และ full unit 614/614; Node 24 lint/typechecks,
+Next/OpenNext build และ audits ผ่าน. Independent final review ผ่าน C0/H0/M0/L0.
+Route/E2E/DB/legal/Identity/config ไม่ถูกแก้; deployed-browser BYOB proof ยังเป็น
+release gate แยก. หลักฐานอยู่ที่
+[`reports/reviews/academy-waitlist-client-response-validation-local-checkpoint-2026-08-09.md`](../reports/reviews/academy-waitlist-client-response-validation-local-checkpoint-2026-08-09.md).
+
+Local practice-simulation client response checkpoint 2026-08-09 ย้าย learner
+verdict ออกจาก inline `response.json()`/truthy `ok` มาผ่าน shared bounded BYOB +
+deadline + duplicate-safe JSON boundary และ exact deep projector. Capstone รับเพียง
+`{ok:true,passed:boolean}`; regular verdict ต้องตรง public requirements ตาม ID,
+label, ลำดับ, counts, passed และ hint/debrief policy ก่อน UI ใช้. Parser เดิมของ
+attempt ถูก extract แทนการสร้างชุดที่สาม; exact-ok ยังคง sole 128-byte raw envelope.
+Behavior RED ล้ม 29/37; GREEN ผ่าน simulation 37/37, shared consumers 152/152,
+relevant/security 208/208 และ full unit 651/651. Node 24 lint/typechecks,
+Next/OpenNext builds, offline audits, dependency tree และ gitleaks ผ่าน.
+Independent RIL `C0/H0/M2/L0` พบว่า variant ไม่ได้ bind กับ trusted `node.kind`
+และ deadline เริ่มหลัง fetch พร้อม reset budget ตอนอ่าน body. Remediation RED ล้ม
+6/41; GREEN ผ่าน focused 41/41, shared consumers 156/156, relevant/security
+278/278 และ full unit 655/655. Variant chain ตอนนี้มาจาก LessonView และ capstone
+ปฏิเสธไม่ให้ per-requirement response ผ่านเข้า verdict/UI; AbortController เดียวเริ่มก่อน fetch และ reader
+ได้เฉพาะเวลาที่เหลือ. Independent final re-review ผ่าน C0/H0/M0/L0. Route, DB/SQL,
+Identity, config, deploy, copy/layout ไม่ถูกแก้; browser/runtime proof ยังเป็น gate แยก. หลักฐานอยู่ที่
+[`reports/reviews/academy-practice-simulation-client-response-validation-local-checkpoint-2026-08-09.md`](../reports/reviews/academy-practice-simulation-client-response-validation-local-checkpoint-2026-08-09.md).
+
 งานหลักถัดไปตามลำดับ:
 
 1. **เปิด auth/runtime และ bootstrap owner จาก stable identity จริง**
@@ -53,6 +425,10 @@ boundary รับ client assertion ในรูป compact JWS จาก signer
      lifecycle pull contract, kill-switch owner, conformance evidence และ separate
      production authorization; ห้าม redirect `/sign-in` ไป Account Center หรือเขียน
      Academy session ก่อนครบ
+   - local lifecycle-envelope verifier ถูก freeze และ final independent review ผ่าน
+     C0/H0/M0/L0; ยังใช้แทน runtime key distribution/transport evidence ไม่ได้
+   - durable page store และ database-clock lease มีเฉพาะ local checkpoint;
+     pure pull-cycle composition, production migration และ runtime wiring ยังไม่ทำ
    - founder ต้อง sign in หนึ่งครั้งหลัง runtime พร้อม เพื่อสร้าง `academy.users` จาก
      `(canonical_issuer, subject)`; จากนั้น dry-run/apply `scripts/manage-staff-role.mjs`
    - ปัจจุบัน `academy.users=0`, active owner `=0`; ห้ามสร้าง UUID หรือใช้ email แทน identity
@@ -71,7 +447,20 @@ boundary รับ client assertion ในรูป compact JWS จาก signer
      renewal, video range/captions/PDF และ edge log ก่อนถือว่า gate ปิด
    - restricted case-system owner/access configuration
    - legal review ภาษาไทยสำหรับ privacy/retention/appeal
+   - เก็บ deployed browser CSP compatibility evidence แล้วจึงตัดสิน enforce policy
    - CNAME/Zero Trust/public exposure decision แยกจาก Worker preview deployment
+4. **ตัดสินการเปิด public indexing หรือ Thai social campaign เมื่อมี release authorization**
+   - canonical static URL `/courses/{slug}/{locale}` และ legacy compatibility redirect
+     ปิดแล้ว; ก่อนเปิด indexing ให้ตรวจ environment switch, catalog approval และ
+     public-launch gates ทั้งหมดอีกครั้ง
+   - งานนี้แยกจาก identity และไม่อนุญาตให้เปิดบัญชีหรือ lesson ก่อนเวลา
+5. **ยืนยัน learner-only visual data กับ identity runtime ก่อนเปิด account**
+   - course-specific skill map กลับมาแล้วผ่าน protected derived-data boundary โดย
+     ไม่ส่ง weights ข้าม Flight; เมื่อ identity runtime/fixture พร้อม ให้ทำ browser
+     E2E ของผู้เรียนที่มีสิทธิ์จริงทั้ง EN/TH, retry/access-loss/reset/locale และ
+     viewport 320/390 ก่อนถือว่า UX runtime ผ่าน
+   - ภาพแชร์และ metadata ไทยพร้อมตาม locale แล้ว; ก่อนเปิด indexing หรือ Thai social
+     campaign ให้ตรวจ release authorization และ public-launch gates ทั้งหมดอีกครั้ง
 
 **สถานะ release:** production infrastructure checkpoint ผ่าน แต่ยังไม่พร้อม public launch
 และยังไม่พร้อมรับ learner account จนกว่างาน 1–2 จะปิดครบ.

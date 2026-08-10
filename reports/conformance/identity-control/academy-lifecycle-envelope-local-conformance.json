@@ -1,0 +1,113 @@
+{
+  "schema": "academy-identity-lifecycle-envelope-local-conformance/v1",
+  "scenarioId": "lifecycle.envelope-cryptographic-verification",
+  "result": "pass-local-only",
+  "consumer": {
+    "repository": "products/cyberskills/academy-platform",
+    "observedHeadBeforeImplementation": "9efac4ea24d58734303de11657085ebea6b85e05",
+    "observedDirtyEntryCount": 169,
+    "implementationRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+    "implementationPaths": [
+      "academy-web/src/lib/identity/consumer-policy.ts",
+      "academy-web/src/lib/identity/lifecycle-envelope-verifier.ts",
+      "academy-web/tests/unit/identity-consumer-policy.test.ts",
+      "academy-web/tests/unit/identity-lifecycle-envelope-verifier.test.ts"
+    ],
+    "implementationRevisionStatus": "frozen-local"
+  },
+  "producer": {
+    "repository": "products/cyberskills/identity-control",
+    "revision": "a6ef1f430e1939a76fdccdcc35a1da41ff7a4606",
+    "artifacts": {
+      "config/consumer-registry-v1.approved.json": "572d230a9f84c219e5b82eeb84dd1350bd8a319e180f2208f45db3abc03d1875",
+      "docs/integration/consumer-registry-v1.md": "d880b0e2a8000f6898b76b91ee47ab18b886ac8e2f413f214448a8a2bed575a4",
+      "docs/integration/consumer-conformance-kit.md": "d49d25592785c38dbebadd0ec7ed87088fd215478a0c57d3d7306f8af7c96ad0",
+      "docs/integration/lifecycle-pull-consumer-contract.md": "7a507be4303b1bea40abb9331f02c7b331ae53e981e7dee6be45932abe6975f5",
+      "packages/contracts/src/index.ts": "74103c92a46b87831e173ff433600271ddac4238b6ad2518203ee10ca726e6d6",
+      "packages/testing/src/index.ts": "f2b7fc3c417104a9c9d5bf2adfed4178fb67226167ed143927939c353f6942f9"
+    },
+    "vector": {
+      "export": "consumerLifecycleEnvelopeConformanceVectorV1",
+      "fixtureOnly": true,
+      "compactJwsSha256": "8768d5258b9cfa2ae602ff24ddf273b37b48f26075bbeb2d5b6498c6d2b0b730",
+      "algorithm": "ES256",
+      "keyId": "identity-events-conformance-v1",
+      "expectedIssuer": "https://identity.example.test/",
+      "expectedAudience": "https://consumer.example.test/auth/events",
+      "verificationTime": "2026-08-09T02:01:00.000Z",
+      "clockSkewSeconds": 30,
+      "maximumLifetimeSeconds": 180
+    }
+  },
+  "coverage": {
+    "positive": [
+      "exact compact JWS and exact expected event"
+    ],
+    "failClosed": [
+      "signature tamper",
+      "header algorithm tamper",
+      "header key ID tamper",
+      "strict event schema tamper",
+      "issuer mismatch",
+      "audience mismatch",
+      "verification key ID mismatch",
+      "verification algorithm mismatch",
+      "expiry boundary",
+      "clock-skew boundary",
+      "maximum lifetime mismatch",
+      "malformed P-256 public JWK",
+      "array-like non-array JWK key_ops",
+      "malformed compact JWS"
+    ]
+  },
+  "verification": [
+    {
+      "phase": "red",
+      "command": "npm run test:unit -- tests/unit/identity-lifecycle-envelope-verifier.test.ts",
+      "result": "failed as expected because the verifier module did not exist"
+    },
+    {
+      "phase": "green",
+      "command": "npm run test:unit -- tests/unit/identity-lifecycle-envelope-verifier.test.ts",
+      "result": "4 tests passed"
+    },
+    {
+      "phase": "identity-regression",
+      "command": "npm run test:unit -- tests/unit/identity-lifecycle-envelope-verifier.test.ts tests/unit/identity-consumer-policy.test.ts tests/unit/identity-registry.test.ts tests/unit/identity-transaction.test.ts tests/unit/identity-durable-store.test.ts tests/unit/identity-session-store.test.ts tests/unit/auth-callback-route.test.ts tests/unit/course-access.test.ts tests/unit/legacy-direct-otp.test.ts tests/unit/sign-in-page.test.ts tests/unit/sign-out-route.test.ts",
+      "result": "48 tests passed"
+    },
+    {
+      "phase": "unit-regression",
+      "command": "npm run test:unit",
+      "result": "478 tests passed"
+    },
+    {
+      "phase": "static-checks",
+      "command": "npm run lint",
+      "result": "passed with one pre-existing generated-registry warning"
+    },
+    {
+      "phase": "build",
+      "command": "npm run build",
+      "result": "passed; 29 static pages generated"
+    },
+    {
+      "phase": "secret-scan",
+      "command": "gitleaks detect --source . --no-banner",
+      "result": "no leaks found"
+    },
+    {
+      "phase": "dependency-audit",
+      "command": "npm audit --omit=dev --audit-level=low",
+      "result": "4 pre-existing high-severity transitive advisories remain in nanoid, Next-bundled postcss, and sharp; this slice changed no dependency manifest or lockfile"
+    }
+  ],
+  "releaseBoundary": {
+    "releaseApproval": false,
+    "academyEnabled": false,
+    "cruxEnabled": false,
+    "runtimeWired": false,
+    "productionAuthorization": false,
+    "review": "pass-c0-h0-m0-l0"
+  }
+}

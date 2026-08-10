@@ -1,0 +1,21 @@
+{
+  "schema": "academy-identity-control-unproven-scenarios/v2",
+  "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+  "identityControlSourceRevision": "a6ef1f430e1939a76fdccdcc35a1da41ff7a4606",
+  "command": "academy-identity-control-unproven-v2",
+  "result": "not_proven",
+  "scenarios": {
+    "authorization.exact-registered-redirect": "The production authorization entry point is unwired and has no deployed exact-redirect evidence.",
+    "authorization.state-binding-mismatch": "The production authorization entry point is unwired and has no deployed browser transaction-binding evidence.",
+    "callback.login-csrf": "The production callback and session path is unwired, so login-session swapping is not proven.",
+    "callback.origin-fetch-metadata": "Academy does not yet enforce the released Origin and Fetch Metadata mutation policy at a production callback.",
+    "exchange.client-assertion": "No operational signer, registered public key, replay store, or released exchange endpoint is configured.",
+    "exchange.code-replay-expiry": "Local units cover replay and expiry pieces, but the released end-to-end exchange contract is not deployed.",
+    "exchange.result-key-rotation": "No released Identity Control result-key distribution or active/overlap rotation path is wired.",
+    "academy.activation-profile-only": "The production callback and profile activation transaction remains unwired.",
+    "academy.canonical-founder-bootstrap": "Founder bootstrap still requires a canonical production sign-in and separate owner operation."
+  },
+  "registryEnabled": false,
+  "releaseApproval": false,
+  "productionMutation": false
+}

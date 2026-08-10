@@ -5,6 +5,572 @@
 
 ---
 
+## 2026-08-10 — Local Identity lifecycle pull-page verifier implemented
+
+**Outcome:** Academy added a pure local verifier between a future authenticated
+transport and the accepted durable pull-cycle port. It snapshots exact producer
+page descriptors, enforces request limit and canonical cursor arithmetic, and
+returns a fresh ordered page only after every compact JWS passes the existing
+WebCrypto envelope verifier with one validated time and explicit policy.
+
+**Verification:** TDD first stopped on the missing module. GREEN passed focused
+34/34, relevant lifecycle 120/120, full unit 814/814, and the producer lifecycle
+contract 14/14. Scoped and full lint/TypeScript checks passed with the one
+pre-existing generated-registry warning. Static source assertions prove the
+Worker, Wrangler/OpenNext configuration, middleware, Identity registry, and
+callback remain disconnected. Evidence is in
+`reports/reviews/academy-identity-lifecycle-pull-page-verifier-local-checkpoint-2026-08-10.md`.
+The first independent RIL returned `C0/H0/M1/L0`: an overbound Array Proxy could
+reach `ownKeys` before its own length was rejected. M-01 test-only RED failed
+2/36 assertions and observed one trap call for both overbound envelope and JWK
+`key_ops` arrays. The parser now validates the own length data descriptor and
+bound before enumeration. Remediation GREEN passes focused 36/36, lifecycle
+122/122, producer 14/14, and full lint/TypeScript checks with both trap counts at
+zero. A different independent final re-review passed `C0/H0/M0/L0`.
+
+**Residual risk:** Final independent re-review passed `C0/H0/M0/L0`. The
+verifier remains local-only and unwired. Endpoint, issuer/audience/key policy,
+client assertions, authenticated bounded transport, deadlines/retries,
+scheduler/runtime bindings, operator ownership, deployed evidence, registry
+enablement, release approval, and production authorization remain separate
+gates.
+
+## 2026-08-10 — Local Identity Control conformance ledger refreshed
+
+**Outcome:** Academy added a deterministic, source-bound generator for the local
+Identity Control consumer-conformance ledger. The ledger retains nine accepted
+local scenarios, promotes only the five lifecycle scenarios supported by final
+independent reports, and keeps nine endpoint/key/runtime/bootstrap/deployed gaps
+as `not_proven`. Its exact checkpoint declaration covers eight content paths;
+the machine freeze manifest is the ninth artifact and is excluded only from its
+own list. Academy stays `enabled=false`, `releaseApproval=false`, unwired, and
+production NO-GO.
+
+**Verification:** TDD first failed with `ERR_MODULE_NOT_FOUND`. GREEN passed the
+generator contract 5/5, relevant Academy Identity units 125/125, and full unit
+780/780 on Node 24.18.0. The producer intake regression, scoped ESLint, and Node
+syntax checks passed. Canonical intake passed 23 verified / 14 pass / 9
+not-proven; the exact eight-file manifest, secret, diff, and author reader gates
+also passed. Evidence is recorded in
+`reports/reviews/academy-identity-control-conformance-ledger-refresh-local-checkpoint-2026-08-10.md`.
+
+**Residual risk:** Different independent checkpoint review passed
+`C0/H0/M0/L0`; root separately re-verified the exact eight-file manifest. This
+local evidence does not configure or call Identity Control. Publisher endpoint,
+keys, audiences, kill-switch owner, authenticated transport, runtime/scheduler
+wiring, canonical owner bootstrap, deployed browser proof, registry enablement,
+and separate production authorization remain external gates.
+
+## 2026-08-10 — Local Identity lifecycle pure pull cycle implemented
+
+**Outcome:** Academy added an unwired pure cycle that composes the accepted
+database-clock lease, durable checkpoint, strict page builder, and leased commit
+around an injected verified-page transport and clock. It distinguishes busy,
+transport retry, and committed results; reports independent page gap/conflict
+flags plus configuration health; rejects durable approved-config drift before
+transport; and never exposes an unfenced commit path.
+
+**Verification:** TDD first failed because the module was missing. A second RED
+failed 1/10 assertions because the clock and transport remained reachable before
+the durable approved revision guard. GREEN passed focused 10/10, Identity 99/99,
+full unit 761/761, and producer contract 20/20 on Node 24.18.0. Scoped lint,
+typecheck, Next production build, offline production/dev audits, static policy
+checks, and gitleaks passed. Evidence is in
+`reports/reviews/academy-identity-lifecycle-pull-cycle-local-checkpoint-2026-08-10.md`.
+The first independent RIL returned `C0/H0/M1/L0`: release `false` was ignored,
+and a release exception could replace an already known primary outcome.
+Remediation RED failed 14/20 assertions. GREEN passes focused 20/20, Identity
+109/109, producer contract 20/20, scoped lint, and Node 24 typecheck. Every
+acquired committed/retry result now carries exact release acknowledgement; local
+failure preserves its original cause with the same status. A different
+independent re-review then returned `C0/H0/M1/L0` with M-02 because the wrapper
+copied cause text into its public message, string form, and stack. M-02 RED failed
+9/29 assertions across read/parse/commit and all three release states. GREEN
+passes focused 29/29, Identity 118/118, producer 20/20, scoped lint, and Node 24
+typecheck. The wrapper now emits one fixed classification; exact cause identity
+is non-enumerable, and JSON/enumerable keys expose only allowlisted
+`leaseRelease`. A different final re-review verified the remediated checkpoint
+freeze and passed `C0/H0/M0/L0`.
+
+**Residual risk:** Final independent re-review passed `C0/H0/M0/L0`. The module
+is local-only and unwired. Endpoint/key/audience approval, authenticated strict
+transport, runtime credentials and bindings, scheduler/topology,
+timeout/retry/lag policy, monitoring/owner, authorized migrations and deployment,
+registry enablement, and release approval remain external gates.
+
+## 2026-08-10 — Local Identity lifecycle pull lease implemented
+
+**Outcome:** Academy added an unwired database-clock lease for one logical
+Identity lifecycle puller. Claim, renew, release, and fenced page commit require
+an exact token/worker pair; page commit locks the active lease row in the same
+transaction as the accepted `0022` aggregate commit. The first independent RIL
+returned `C0/H0/M1/L0` because the concrete production class still exposed the
+unfenced method even though its narrowed runtime type and SQL grant were fenced.
+Remediation removed the lower interface, method, and exact unfenced RPC literal
+from production code; administrative aggregate tests now use test-local
+`rawCommit` only. SQL continues to expose leased commit only.
+
+**Verification:** Initial TDD failed on the missing lease module and store method.
+Image-pin tests then failed on missing/existing mutable-reference behavior, and a
+descriptor Proxy RED showed 1 failed / 27 passed before validated inputs were
+projected from their descriptors. GREEN passed focused 28/28, Identity 89/89,
+hardened harness 13/13, disposable PostgreSQL 27/27, and full unit 751/751 on
+Node 24.18.0. Lint/typechecks, Next and OpenNext builds, both offline audits, and
+gitleaks passed. The owned PostgreSQL run used a verified content-addressed local
+arm64 image with `--pull never` and proved cleanup. Evidence is in
+`reports/reviews/academy-identity-lifecycle-pull-lease-local-checkpoint-2026-08-10.md`.
+The remediation RED was 1 failed / 23 passed; GREEN passed focused 28/28,
+Identity 89/89, hardened harness 13/13, disposable PostgreSQL 27/27 with cleanup,
+and Node 24.18.0 typechecks. A different independent reviewer verified the
+machine-generated eleven-file freeze manifest, reran focused 28/28, Identity
+89/89, harness 13/13, disposable PostgreSQL 27/27 with cleanup, Node 24
+typecheck, diff, reader, and secret gates, and passed the checkpoint at
+`C0/H0/M0/L0`.
+
+**Residual risk:** Final independent re-review passed `C0/H0/M0/L0`. Migration
+`0023` is unapplied outside the disposable loopback container. Pull-cycle
+composition, endpoint/key/audience policy, scheduler and runtime binding,
+operational owner, production
+migration/rollback, monitoring, registry enablement, and release approval remain
+separate gates. The PostgreSQL run is local arm64 fixture evidence, not portable
+CI or deployed runtime proof.
+
+## 2026-08-10 — Local Identity lifecycle atomic page store implemented
+
+**Outcome:** Academy added an unwired page builder, one-RPC durable snapshot,
+and atomic PostgreSQL page commit for already verified lifecycle pages. The
+singleton `academy-web` checkpoint owns cursor and approved/observed config
+health; issuer/subject projections keep applied state, revision, gap/conflict
+fences, and highest-known revision without linking Academy users, email, or
+activation. Runtime can call the two security-definer RPCs but cannot write the
+tables directly; PUBLIC cannot execute the RPCs.
+
+**Verification:** TDD first failed on the missing source and then on the missing
+`0022` migration. Initial RIL returned `C0/H1/M2/L0` for ambient Docker authority
+and uncertain cleanup, divergent raw-RPC gap evidence overwrite, and SQL issuer/
+UTF-16 parity. Remediation RED reproduced the missing harness controls and 2/16
+PostgreSQL failures. GREEN passed the adversarial harness 7/7, focused unit/reducer
+41/41, disposable PostgreSQL 17.5 matrix 16/16 with migration reapply and cleanup
+absence proof, Identity regression 84/84, and full unit 739/739 on Node 24.18.0.
+Lint/typechecks, Next and OpenNext builds, both offline audits, dependency-tree
+validation, and gitleaks passed. Later RIL returned `C0/H1/M1/L0` because direct
+Vitest could trust marker+URL without inspecting its container and raw PostgreSQL
+text could not preserve every accepted UTF-16 subject. The current remediation
+requires exact running container ID/name/nonce label/image/loopback port inspection
+before DB connection and uses a lossless canonical `subject_key` wire/table key.
+GREEN passed harness 10/10, focused 47/47, disposable PostgreSQL 23/23,
+identity-named 83/83, and full unit 745/745; lint/typechecks, Next/OpenNext,
+offline audits, dependency tree, and gitleaks passed. Evidence is in
+`reports/reviews/academy-identity-lifecycle-page-store-local-checkpoint-2026-08-10.md`.
+
+**Residual risk:** Final independent re-review passed `C0/H0/M0/L0`. Migration
+`0022` is unapplied outside the owned disposable loopback container.
+Puller/lease, endpoint/key/audience policy, runtime wiring,
+PostgREST deployment, reconciliation authority, production migration/rollback,
+monitoring, and browser evidence remain separate release gates. Registry
+enablement and release approval remain false.
+
+## 2026-08-09 — Local identity lifecycle projection reducer implemented
+
+**Outcome:** Academy added an unwired pure reducer that mirrors Identity Control
+revision `a6ef1f430e1939a76fdccdcc35a1da41ff7a4606` for first seed, contiguous
+revision, projected duplicate, stale, gap, and conflict handling. It validates
+exact event/projection schemas and principal scope, returns fresh projections,
+preserves valid state on every non-applied disposition, and keeps the producer
+wire states without inventing an Academy database or activation mapping.
+
+**Verification:** TDD collection failed before the module existed. The first
+implementation passed focused 21/21, Identity 57/57, and full unit 719/719.
+Initial RIL returned `C0/H0/M1/L0` because descriptor validation re-read Proxy
+properties through `get`. Remediation RED reproduced four event/current throw
+and divergent-get cases at 4 failed / 21 passed. The reducer now snapshots each
+descriptor value once and never invokes input `get`; GREEN passed focused 25/25,
+Identity 61/61, and full unit 723/723 across 78 files on Node 24.18.0.
+Lint/typechecks, Next and OpenNext builds, both offline npm audits,
+dependency-tree validation, and secret scanning passed.
+Evidence is in
+`reports/reviews/academy-identity-lifecycle-reducer-local-checkpoint-2026-08-09.md`.
+
+**Residual risk:** Final independent re-review passed `C0/H0/M0/L0` after M-01
+remediation. The reducer remains library-only and unwired; endpoint/key/audience
+approval, authenticated pull, durable page and
+cursor commit, operational owner, database transaction, deployment, and browser
+proof remain separate production gates. Registry enablement and release approval
+remain false.
+
+## 2026-08-09 — Player resume rejects cross-scope browser records locally
+
+**Outcome:** The exam/practice record schema remains `v1`, while new saves use an
+injective private k2 key with two UTF-16-length-prefixed segments. Exact valid
+legacy records copy to k2 and keep their old key; invalid or mismatching legacy
+candidates remain untouched because their delimiter-based ownership is
+ambiguous. Latest selection decodes exact k2 content, derives legacy scope from
+validated records, prefers k2 when an attempt exists in both namespaces, and
+breaks equal timestamps by ascending attempt-ID code units. No UI, route, DB,
+Identity, or configuration code changed.
+
+**Verification:** The original RED reproduced scope mismatches at 3 failed / 6
+passed; the first GREEN reached relevant 24/24 and full unit 690/690. Independent
+RIL returned `C0/H0/M2/L0` for delimiter collisions and enumeration-dependent
+ties. Remediation RED failed 9/17; GREEN passed focused 17/17, relevant 32/32,
+and full unit 698/698 across 77 files on Node 24.18.0. Lint/typechecks, Next and
+OpenNext builds, both offline npm audits, dependency-tree validation, gitleaks,
+and patch checks passed. Evidence is in
+`reports/reviews/academy-player-attempt-storage-scope-local-checkpoint-2026-08-09.md`.
+
+**Residual risk:** Browser storage remains best-effort local UX state, not
+trusted grading evidence. Browser/E2E and production-runtime proof were not
+needed for this pure data-boundary change. Final independent re-review passed
+`C0/H0/M0/L0` after exercising delimiter, malformed-key, migration-failure,
+dedupe, and deterministic tie cases.
+
+## 2026-08-09 — Course skill-map client rejects ambiguous responses locally
+
+**Outcome:** The protected learner skill-map client now uses the existing
+bounded, duplicate-safe raw JSON reader and builds an exact deep projection
+before coverage reaches the chart. Extra, missing, duplicate, malformed,
+wrong-media, oversized, or stalled responses fail to the existing unavailable
+state. One deadline covers fetch and body parsing; 401/403 preserve their
+existing states and non-success bodies are canceled without being read. The
+one-way producer invariant now also rejects `notStarted=true` with a positive
+value while preserving the valid rounded-zero `notStarted=false` state. The
+route, shared parser, UI, DB, and configuration were not edited.
+
+**Verification:** The targeted RED failed because the former fetch had no abort
+signal; a full-matrix RED was stopped when the unresolved-fetch case did not
+settle under the former implementation. GREEN passed focused 32/32, relevant
+40/40, and full unit 685/685 on Node 24.18.0. Lint/typechecks, Next and OpenNext
+builds, both offline npm audits, dependency-tree validation, gitleaks, and
+scoped patch checks passed. Initial RIL returned `C0/H0/M1/L0`. Remediation RED
+failed the inconsistent start state at 1 failed / 33 passed; GREEN passed
+focused 34/34, relevant 42/42, and full unit 687/687 on Node 24.18.0, with
+lint/typechecks, both offline audits, and gitleaks passing. Evidence is in
+`reports/reviews/academy-course-skill-map-client-response-validation-local-checkpoint-2026-08-09.md`.
+
+**Residual risk:** This is local consumer-boundary evidence. Independent closure
+review passed at C0/H0/M0/L0. Authenticated route/DB behavior and
+deployed-browser stream behavior remain separate production gates; no server,
+deployment, or production state was changed.
+
+## 2026-08-09 — Practice simulation rejects ambiguous verdicts locally
+
+**Outcome:** The practice simulation UI now receives only an exact, bounded,
+duplicate-safe deep projection. Capstone and regular response variants follow
+the existing route contract; regular results must match public requirements and
+their counts, pass flag, hints, and debrief must be internally consistent. The
+request and existing failure/UI states remain unchanged. The existing attempt
+parser was extracted into the shared raw boundary instead of adding a third
+parser; exact-ok keeps its sole 128-byte raw envelope contract.
+Trusted `node.kind` now selects the only accepted response variant through the
+LessonView/LessonBody/SimulationBlock chain. Capstones reject per-requirement
+responses. One AbortController deadline covers fetch and body parsing, with the
+reader receiving only the remaining time.
+
+**Verification:** Missing-helper collection failed first. The temporary former
+behavior reproduced 29 failures while 8 controls passed. GREEN passed practice
+37/37, the four shared consumers 152/152, relevant/security 208/208, and full
+unit 651/651 on Node 24.18.0. Lint/typechecks, Next and OpenNext builds, offline
+npm audits, dependency-tree validation, gitleaks, and patch checks passed.
+Independent RIL returned `C0/H0/M2/L0`. Remediation RED reproduced both
+cross-variant accepts, missing fetch deadline, reset body budget, missing signal,
+and missing trusted prop chain at 6 failed / 35 passed. GREEN passed focused
+41/41, shared consumers 156/156, relevant/security 278/278, and full unit
+655/655; lint/typechecks and both builds passed. Independent final re-review
+passed at C0/H0/M0/L0.
+Evidence is in
+`reports/reviews/academy-practice-simulation-client-response-validation-local-checkpoint-2026-08-09.md`.
+
+**Residual risk:** This is local consumer-contract evidence. Authenticated route,
+DB-backed authorization, deployed-browser BYOB behavior, and production proof
+remain separate gates. Route, DB/SQL, Identity, configuration, deployment, and
+production state were not changed. Independent checkpoint review is pending.
+
+## 2026-08-09 — Public waitlist rejects ambiguous success locally
+
+**Outcome:** The public waitlist form now shows its existing success state only
+for an HTTP success carrying the sole bounded raw JSON envelope `{ok:true}`.
+Truthy non-boolean flags, extra or duplicate keys, a BOM, wrong media type,
+oversized and malformed bodies, explicit failures, and non-success HTTP status
+cannot claim that the learner is on the list. The shared success reader now uses
+BYOB views bounded to `max+1`, a five-second deadline, optional AbortSignal, and
+non-blocking safe cancellation. Non-success HTTP bodies are never read or parsed,
+and server text is never returned to the form; the existing generic rejection
+and network copy remain. Request fields, layout, route behavior, and persistence
+are unchanged.
+
+**Verification:** Missing-helper collection failed first. A behavior-preserving
+extraction then reproduced the defect at 8 failed / 12 passed; GREEN passed
+20/20. Final review returned C0/H0/M2/L0; remediation RED reproduced the unbounded
+single-chunk/no-deadline reader and unbounded non-success error propagation at
+12 failed / 36 passed. GREEN passed waitlist 32/32 and unsubscribe 16/16.
+Waitlist/security regression passed 114/114 and full unit passed 614/614. Node 24
+lint/typechecks, Next and OpenNext builds, both npm audits, dependency-tree
+validation, gitleaks, and patch checks passed. Independent final review passed
+at C0/H0/M0/L0.
+Evidence is in
+`reports/reviews/academy-waitlist-client-response-validation-local-checkpoint-2026-08-09.md`.
+
+**Residual risk:** This is local client-contract evidence. DB-backed persistence,
+deployed-browser behavior, and email delivery remain separate gates. No route,
+E2E, DB/SQL, legal, Identity, configuration, deployment, or production state was
+changed. Final-review M-01/M-02 remediation is complete locally; different
+independent re-review is pending.
+
+## 2026-08-09 — Lesson attempts reject malformed and ambiguous responses locally
+
+**Outcome:** The lesson attempt hook now receives only a bounded, duplicate-safe,
+exact recursive projection. False/missing/extra wrappers, omitted arrays,
+malformed or answer-bearing nested tasks, invalid attempt IDs/expiry, duplicate
+wire keys, duplicate task IDs, and invalid retry values no longer reach the
+lesson as a ready attempt. The request and existing failure-state union remain
+unchanged; route, public types, `LessonView`, progress, and DB code were not
+edited. Expiry validation now checks the Gregorian date, component ranges, and
+century leap-year rule instead of accepting JavaScript-normalized dates/times;
+it does not compare against the learner device clock. Each network-interface
+required field must also exist in the initial state and belong to the shared
+surface input allowlist, matching the existing producer invariant.
+
+**Verification:** The missing-helper import failed first. A behavior-preserving
+extraction of the former casts then produced RED at 34 failed / 13 passed;
+expanded GREEN passed 50/50 on Node 24.18.0. Attempt/security regression passed
+170/170 and full unit regression passed 565/565. Node 24 lint/typechecks, Next
+build, OpenNext build, both npm audits, dependency-tree validation, gitleaks, and
+scoped patch checks passed. Evidence is in
+`reports/reviews/academy-attempt-client-response-validation-local-checkpoint-2026-08-09.md`.
+Preliminary RIL returned `C0/H0/M1/L0`; the expiry remediation reproduced four
+normalized invalid timestamps at RED (`4 failed / 60 passed`), then passed
+64/64 focused, 177/177 attempt/security, and 579/579 full unit tests. Independent
+re-review closed that finding and identified a separate medium cross-field gap.
+Its RED reproduced both violations (`2 failed / 65 passed`); GREEN passed 67/67
+focused, 180/180 attempt/security, and 582/582 full unit tests. Independent
+re-review of the latest remediation is pending.
+
+**Residual risk:** This is local client-contract evidence. DB-backed attempt
+issuance/consumption and deployed authenticated-browser proof remain separate
+gates. No API behavior, persistence, SQL, configuration, Identity, deployment,
+or production state changed; independent checkpoint review is pending.
+
+## 2026-08-09 — Unsubscribe client rejects ambiguous success locally
+
+**Outcome:** The unsubscribe form now enters its existing completion state only
+when the request has an HTTP success status and the response is exact one-key
+`{ok:true}` JSON. Malformed, empty, wrong-type, extra-key, and explicit-failure
+HTTP 2xx responses use the existing failure/retry state instead of reporting
+that marketing email has stopped. Request and anti-enumeration contracts remain
+unchanged; the API route was not edited.
+
+**Verification:** A behavior-preserving RED of the former `response.ok` decision
+failed all seven malformed HTTP-success cases while three controls passed, then
+initial GREEN passed 10/10. Preliminary RIL returned `C0/H0/M1/L0` because
+`response.json()` collapsed duplicate wire keys before the one-key check. The
+remediation now validates `application/json` and a bounded raw UTF-8 envelope;
+duplicate keys in both orders fail while valid JSON whitespace passes.
+Remediation RED failed 3/15 and GREEN passed 15/15; unsubscribe/security
+re-review then found L-01 because default UTF-8 decoding consumed a leading BOM
+before raw matching. BOM RED failed 1/16; preserving the BOM for rejection made
+GREEN pass 16/16. Unsubscribe/security regression passed 51/51 and full unit
+regression passed 515/515. Node 24 lint/typechecks, Next build, OpenNext build,
+both npm audits, gitleaks, and scoped patch checks passed. Evidence is in
+`reports/reviews/academy-unsubscribe-client-response-validation-local-checkpoint-2026-08-09.md`.
+
+**Residual risk:** This is local client-contract evidence. Deployed browser and
+DB-backed withdrawal proof remain separate gates; no route, SQL, configuration,
+legal policy, Identity boundary, deployment, or production state changed.
+The M-01 and L-01 findings are remediated locally; independent closure review
+is pending.
+
+## 2026-08-09 — Progress clients reject malformed and foreign-course records locally
+
+**Outcome:** Lesson progress loading and reset reconciliation now accept a
+learner record only when a scoped exact validator/projector accepts the wrapper,
+record keys, nested arrays/maps, and requested slug. Returned data is a new
+projection rather than the response object. Invalid responses keep the
+established `unavailable` or `unknown` result instead of reaching learner state
+as success.
+
+**Verification:** TDD RED reproduced four unchecked response paths while nine
+positive/existing cases passed. Focused GREEN passed 13/13, full unit regression
+initially passed 493/493. Preliminary RIL returned `C0/H0/M2/L0`; remediation RED
+reproduced exact-key, nested-map, and defensive-projection gaps, then GREEN passed
+19/19 and full unit regression passed 499/499. Node 24 lint/typechecks, Next
+build, OpenNext build, and both npm audits passed. The remediation removes the
+dependency on pre-existing dirty `progress.ts` without editing that file.
+Evidence is in
+`reports/reviews/academy-progress-client-response-validation-local-checkpoint-2026-08-09.md`.
+
+**Residual risk:** This is local client-contract evidence only. DB-backed,
+Identity-runtime, deployed-network, and authenticated-browser proof remain with
+their separate gates. No API, persistence, database, Identity, configuration,
+deployment, or production state changed. The preliminary findings are remediated
+locally; independent re-review is pending.
+
+## 2026-08-09 — Dashboard resume honors the recorded in-progress lesson locally
+
+**Outcome:** The dashboard now passes `record.lastNodeId` into the roadmap resume
+boundary. That preference wins only while the exact node is `in-progress`;
+completed, skipped, tested-out, locked, missing, and omitted preferences retain
+the established deterministic fallback.
+
+**Verification:** TDD RED reproduced both the pure selection defect and missing
+dashboard-consumer boundary. Focused GREEN passed 20/20, full unit regression
+passed 488/488, and Node 24 lint/typechecks, Next build, and OpenNext build
+passed. Both npm audits found zero vulnerabilities; secret and patch-hygiene
+checks also passed. Evidence is in
+`reports/reviews/academy-dashboard-resume-last-node-local-checkpoint-2026-08-09.md`.
+
+**Residual risk:** This is local consumer evidence only; authenticated browser
+proof remains gated on the unwired Identity runtime. Equal course timestamps
+remain unchanged because the persistence contract provides no causal tie-break.
+No SQL, configuration, deployment, Identity, or production state changed;
+independent review is pending.
+
+## 2026-08-09 — Retention backlog now fails closed locally
+
+**Outcome:** The scheduled retention worker no longer treats an unfinished
+bounded backlog as success. At `MAX_ROUNDS` it records
+`retention.backlog_remaining`, fails that job, continues independent jobs, emits
+`retention.purge_failed`, never emits false completion for the exhausted job,
+and rejects the aggregate run.
+
+**Verification:** TDD RED reproduced two false-success paths. Focused GREEN passed
+7/7, retention plus security wiring passed 40/40, full unit regression passed
+485/485, and Node 24 lint/typechecks, Next build, OpenNext build, dev-inclusive
+audit, secret scan, and patch-hygiene checks passed. Evidence is in
+`reports/reviews/academy-retention-backlog-fail-closed-local-checkpoint-2026-08-09.md`.
+
+**Residual risk:** This is local worker behavior evidence only. A real scheduled
+event must still prove all five jobs reach completion or surface failure. No SQL,
+retention period, credential, configuration, deployment, or production state
+changed; independent review is pending.
+
+## 2026-08-09 — Production dependency audit reduced locally; release exception open
+
+**Outcome:** Targeted npm overrides move transitive `nanoid`, PostCSS, and sharp
+to patched `3.3.17`, `8.5.26`, and `0.35.2` resolutions while Next remains
+`15.5.22`. The lockfile and direct-dependency SBOM receipt were updated together;
+no force install or major framework upgrade was used. This clears the scoped
+local production audit but does not close release readiness. The dev toolchain
+also moves to Wrangler 4.120.0 / Miniflare 5.20260801.1-alpha, which owns patched
+`undici@7.29.0`; the existing `@eslint/eslintrc` range resolves patched
+`js-yaml@4.3.1`.
+
+**Verification:** The production audit moved from four High findings to `found 0
+vulnerabilities`. Focused SBOM tests passed 2/2, full unit regression passed
+484/484, and lint/typechecks plus production build passed. On Node 24.19.0 the
+Next optimizer converted a real 400x400 PNG to a nonempty 64x64 PNG, rejected
+malformed and unapproved sources, and the OpenNext/Cloudflare build completed.
+The dev-inclusive audit moved from 2 High + 2 Moderate findings to `found 0
+vulnerabilities`; the updated toolchain tree has no invalid/peer errors and its
+Node 24 OpenNext build passed.
+Evidence is in
+`reports/reviews/academy-production-dependency-audit-local-checkpoint-2026-08-09.md`.
+
+**Residual risk:** Independent re-review is pending. Sharp 0.35.2 is outside the
+`^0.34.3` optional range declared by Next 15.5.22 and 15.5.23, so this remains a
+release-blocked compatibility exception despite passing local runtime evidence.
+Academy/director has no canonical CI workflow, so neither audit command is yet a
+required CI gate. The Wrangler/Miniflare toolchain findings are closed locally;
+the sharp compatibility exception remains the dependency release blocker.
+
+## 2026-08-09 — Local identity session-cookie boundary completed
+
+**Outcome:** The future `academy_session` library now accepts one exact
+case-sensitive canonical cookie from a raw header, rejects duplicate names in
+every order, and validates the existing URL-safe 32-160 character opaque ID
+contract. Creation and deterministic deletion share host-only `Path=/`,
+`HttpOnly`, `SameSite=Lax`, and matching `Secure` behavior; deletion uses
+`Max-Age=0` and no parent `Domain`.
+
+**Verification:** TDD RED failed four new cases before the parser/deletion helper
+existed. Focused GREEN passed 6/6, full unit regression passed 484/484, and
+lint/typechecks plus production build passed. Evidence is in
+`reports/reviews/academy-identity-session-cookie-local-checkpoint-2026-08-09.md`.
+
+**Residual risk:** This boundary is unit-only and unwired. Runtime integration
+and production browser proof for canonical host-only issuance, duplicate-name
+failure, refresh, deletion, revocation, and sibling-host isolation remain
+separate authorized work. Independent review is pending; the dependency audit
+is locally green, but the sharp compatibility exception still blocks release.
+
+## 2026-08-09 — Local HTTP security-header delivery completed
+
+**Outcome:** Academy added a catch-all Next.js header rule with report-only CSP,
+HSTS, MIME sniffing protection, active frame denial from `X-Frame-Options: DENY`,
+strict-origin referrer handling, restricted browser capabilities, and disabled DNS prefetching. The CSP remains
+in observation mode until deployed browser compatibility evidence supports an
+enforcement decision.
+
+**Verification:** TDD RED failed 3/3 because `nextConfig.headers` was absent;
+focused GREEN passed 3/3. Full unit regression passed 481/481, lint/typechecks
+and production build passed, and a temporary local production server returned
+all seven headers on both `/courses` and `/api/auth/me`. The temporary port was
+closed after verification. Evidence is in
+`reports/reviews/academy-security-headers-local-checkpoint-2026-08-09.md`.
+
+**Residual risk:** final independent review is pending. CSP enforcement still
+needs deployed browser evidence, and the sharp compatibility exception still
+blocks dependency release readiness. No deployment, production state, registry, key,
+database, or Identity Control system changed in this checkpoint.
+
+---
+
+## 2026-08-09 — Local lifecycle-envelope verifier implementation completed
+
+**Outcome:** Academy added one unwired WebCrypto consumer boundary for
+`lifecycle.envelope-cryptographic-verification`. It accepts the exact
+producer-owned fixture-only ES256 vector from Identity Control revision
+`a6ef1f430e1939a76fdccdcc35a1da41ff7a4606`. The reviewed implementation is
+frozen locally at `845e371173efb7b15b7605ecbc9496c47e2068fb` and returns `null` for signature,
+algorithm, key ID, issuer, audience, time/skew/lifetime, strict schema, malformed
+key, and malformed compact-JWS failures. No replacement key or signature was
+created.
+
+**Verification:** TDD RED was captured before the verifier existed. Focused tests
+passed 4/4, focused identity regression 48/48, full unit regression 478/478,
+lint/typechecks and production build passed, and gitleaks found no leak. The
+source-bound receipt and author report are under
+`reports/conformance/identity-control/academy-lifecycle-envelope-local-conformance.json`
+and
+`reports/reviews/academy-identity-lifecycle-envelope-local-conformance-2026-08-09.md`.
+
+**Independent review:** the closure pass reproduced the array-only `key_ops`
+fix and final revisions, passing C0/H0/M0/L0.
+
+**Residual risk:** the dependency audit is locally green, but the sharp compatibility exception still blocks release. Runtime key distribution,
+lifecycle transport/cursor, configuration, session/auth wiring, owner bootstrap,
+and production authorization remain blocked; Academy and Crux remain disabled
+and local evidence keeps `releaseApproval=false`.
+
+---
+
+## 2026-08-09 — Public learning previews and learner-data boundary hardened
+
+**Outcome:** Academy now provides a truthful public decision surface before
+accounts are available: static EN/TH course previews, catalog, canonical
+localized metadata, and localized static share images. Public projections
+exclude lesson bodies, answers, private media, cues, skill weights, and learner
+records. The protected learner map and dashboard use derived/allowlisted DTOs;
+the dashboard no longer serializes the course registry through Flight.
+
+**Authorization and data minimization:** dashboard course data is created only
+after session, service activation, and per-course entitlement. `GET
+/api/progress` is `private, no-store`, rejects malformed success payloads, and
+reads progress only for the entitlement-approved slug allowlist. An empty
+allowlist opens no DB query.
+
+**Verification:** full unit suite passed `474/474`; production build passed;
+public E2E passed `24/24`; `git diff --check` passed. Independent code/debt,
+security, and UX reviews closed without C/H/M findings. Reports are under
+`reports/reviews/*checkpoint-2026-08-09.md`.
+
+**Residual risk:** real learner sign-in, owner bootstrap, and entitled browser
+proof remain blocked on Identity Control runtime release, public-key/lifecycle
+publication, named kill-switch owner, conformance rehearsal, and separate
+production authorization. No database, deployment, or external configuration
+was changed.
+
+---
+
 ## 2026-08-06 — Consumer Registry v1 approval incorporated locally
 
 **Outcome:** Academy updated its non-secret candidate and local contract mirror

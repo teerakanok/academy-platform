@@ -1,0 +1,12 @@
+> vitest run --project unit tests/unit/identity-consumer-policy.test.ts tests/unit/identity-registry.test.ts tests/unit/identity-transaction.test.ts tests/unit/auth-callback-route.test.ts tests/unit/identity-session-store.test.ts tests/unit/course-access.test.ts
+ RUN  v3.2.7 /Users/teerakanok/Dev/cyberskills-director/products/cyberskills/academy-platform/academy-web
+ ✓ |unit| tests/unit/identity-consumer-policy.test.ts (3 tests) 3ms
+ ✓ |unit| tests/unit/identity-registry.test.ts (7 tests) 7ms
+ ✓ |unit| tests/unit/identity-session-store.test.ts (3 tests) 13ms
+ ✓ |unit| tests/unit/identity-transaction.test.ts (11 tests) 14ms
+ ✓ |unit| tests/unit/auth-callback-route.test.ts (2 tests) 9ms
+ ✓ |unit| tests/unit/course-access.test.ts (4 tests) 2ms
+ Test Files  6 passed (6)
+      Tests  30 passed (30)
+   Start at  19:40:00
+   Duration  910ms (transform 450ms, setup 0ms, collect 947ms, tests 49ms, environment 1ms, prepare 640ms)
