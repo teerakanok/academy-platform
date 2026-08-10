@@ -5,6 +5,41 @@
 
 ---
 
+## 2026-08-11 — Local Identity lifecycle pull transport composed
+
+**Outcome:** Academy added one pure composition factory for the reviewed
+lifecycle request, JSON response, and verified-page adapters. It snapshots all
+seven public options once and supplies one shared request limit to both request
+construction and response verification without selecting runtime values.
+
+**Verification:** The test-only RED stopped before collection on the missing
+module. Focused GREEN passed 7/7, then invalid-limit characterization proved
+`0`, `101`, `1.5`, and `NaN` stop before response port method access, producing
+final focused 11/11. Strict-reader plus lifecycle regression passed 217/217,
+full unit passed 88 files / 911 tests, and the Identity Control lifecycle pull
+contract passed 14/14. Full lint and all TypeScript configurations passed on
+Node 24.18.0 with one pre-existing warning in the generated registry. Runtime
+import search found the module only in its focused test. Evidence is in
+`reports/reviews/academy-identity-lifecycle-pull-transport-local-checkpoint-2026-08-11.md`.
+
+The first independent RIL returned `C0/H0/M1/L0` because runtime input was
+destructured before the verified-page catch boundary. A throwing Proxy getter
+could expose its detail, while malformed cursor/time values could call
+downstream first. Test-only RED passed 10/16 and failed six cases. The owner
+module now snapshots both fields once inside `try` and validates them before
+`pullPage`; owner GREEN passes 16/16, combined focus 27/27, relevant 224/224,
+full unit 918/918, and full lint/typechecks.
+
+**Residual risk:** Different independent closure review bound the regenerated
+manifest, reran owner plus composition 27/27, relevant 224/224, producer 14/14
+and proportional static gates, then passed final `C0/H0/M0/L0`. The private
+endpoint, assertion and event audiences, signing and verification keys, HTTP
+behavior, parser and scheduler policy, named operators, runtime bindings,
+deployment evidence, and production authorization remain separately owned.
+Current values stay `enabled=false`, `releaseApproval=false`, and
+`runtimeWired=false`; production readiness does not increase from this local
+composition checkpoint.
+
 ## 2026-08-10 — Local Identity lifecycle pull JSON operation implemented
 
 **Outcome:** Academy added a pure local adapter between an injected response

@@ -131,6 +131,80 @@ describe('Academy Identity lifecycle verified-page transport', () => {
   })
 
   it.each([
+    ['null input', null],
+    ['missing verification time', { cursor: null }],
+    ['noncanonical cursor', { cursor: '01', verificationTime: VERIFICATION_TIME }],
+    ['invalid verification time', { cursor: null, verificationTime: new Date(Number.NaN) }],
+  ])('rejects %s before calling the parsed-page port', async (_label, input) => {
+    const pullPage = vi.fn(async () => page())
+    const transport = createIdentityLifecycleVerifiedPageTransport({
+      pageTransport: { pullPage },
+      requestedLimit: 2,
+      envelopePolicy: envelopePolicy(),
+    })
+    const error = await captureFailure(transport.pullVerifiedPage(input as never))
+
+    expect(error).toBeInstanceOf(IdentityLifecycleVerifiedPageTransportFailure)
+    expect(error.name).toBe('IdentityLifecycleVerifiedPageTransportFailure')
+    expect(error.message).toBe('Identity lifecycle verified-page transport failed')
+    expect(Object.keys(error)).toEqual([])
+    expect(pullPage).not.toHaveBeenCalled()
+  })
+
+  it.each(['cursor', 'verificationTime'] as const)(
+    'contains a throwing %s getter without leaking detail or calling downstream',
+    async (throwingKey) => {
+      const pullPage = vi.fn(async () => page())
+      const transport = createIdentityLifecycleVerifiedPageTransport({
+        pageTransport: { pullPage },
+        requestedLimit: 2,
+        envelopePolicy: envelopePolicy(),
+      })
+      const input = new Proxy({ cursor: null, verificationTime: VERIFICATION_TIME }, {
+        get(target, key, receiver) {
+          if (key === throwingKey) throw new Error('credential=TOP_SECRET')
+          return Reflect.get(target, key, receiver)
+        },
+      })
+      const error = await captureFailure(transport.pullVerifiedPage(input))
+
+      expect(error).toBeInstanceOf(IdentityLifecycleVerifiedPageTransportFailure)
+      expect(error.name).toBe('IdentityLifecycleVerifiedPageTransportFailure')
+      expect(error.message).toBe('Identity lifecycle verified-page transport failed')
+      expect([String(error), error.stack ?? '', JSON.stringify(error)].join('\n'))
+        .not.toContain('TOP_SECRET')
+      expect(Object.keys(error)).toEqual([])
+      expect(pullPage).not.toHaveBeenCalled()
+    },
+  )
+
+  it('snapshots cursor and verification time once before downstream work', async () => {
+    const pullPage = vi.fn(async () => page())
+    const transport = createIdentityLifecycleVerifiedPageTransport({
+      pageTransport: { pullPage },
+      requestedLimit: 2,
+      envelopePolicy: envelopePolicy(),
+    })
+    const reads = new Map<PropertyKey, number>()
+    const input = new Proxy({ cursor: null, verificationTime: VERIFICATION_TIME }, {
+      get(target, key, receiver) {
+        const count = (reads.get(key) ?? 0) + 1
+        reads.set(key, count)
+        if (count > 1) throw new Error(`runtime input re-read: ${String(key)}`)
+        return Reflect.get(target, key, receiver)
+      },
+    })
+
+    await expect(transport.pullVerifiedPage(input)).resolves.toEqual({
+      nextCursor: null,
+      configRevision: 1,
+      events: [],
+    })
+    expect(Object.fromEntries(reads)).toEqual({ cursor: 1, verificationTime: 1 })
+    expect(pullPage).toHaveBeenCalledOnce()
+  })
+
+  it.each([
     ['request', () => ({
       pageTransport: {
         pullPage: vi.fn(async () => {

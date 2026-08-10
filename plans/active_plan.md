@@ -2,7 +2,7 @@
 
 > Open work only. Move closed items to `completed_log.md` with evidence.
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
-> **Last updated:** 2026-08-10
+> **Last updated:** 2026-08-11
 
 ## Current execution lane — activate identity without widening Pool A access
 
@@ -261,6 +261,26 @@ Different independent re-review bind manifest ก่อนและหลัง�
 Response transport ยังเป็นเจ้าของ endpoint/auth/HTTP/status; parser values,
 scheduler/runtime/deploy และ production authorization เป็น gates แยก. `enabled=false`,
 `releaseApproval=false`, `runtimeWired=false` และ production NO-GO คงเดิม.
+
+**Identity lifecycle pull transport composition local checkpoint (2026-08-11):**
+Academy เพิ่ม pure factory ที่ snapshot consumer/audience/limit/assertion provider/
+response transport/strict reader/envelope policy ครั้งเดียว แล้ว compose JSON
+operation, request operation transport และ verified-page transport ที่ผ่าน RIL
+แล้ว. Shared `requestedLimit` ค่าเดียวจึงผูกทั้ง signed request กับ page relation.
+Missing-module RED หยุดก่อน collection; GREEN ผ่าน focused 11/11 หลังเพิ่ม
+invalid-limit characterization, strict-reader+lifecycle 217/217, full unit
+911/911, producer 14/14 และ full lint/typechecks บน Node 24.18.0. หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-lifecycle-pull-transport-local-checkpoint-2026-08-11.md`](../reports/reviews/academy-identity-lifecycle-pull-transport-local-checkpoint-2026-08-11.md).
+Independent RIL แรกคืน `C0/H0/M1/L0` เพราะ verified-page owner destructure runtime
+input ก่อน `try`; throwing Proxy getter จึงปล่อย raw detail และ malformed input
+เรียก downstream ได้. RED ล้ม 6/16; remediation snapshot cursor/time ครั้งเดียว
+ภายใน catch, validate ก่อน `pullPage`, แล้ว GREEN ผ่าน owner 16/16, combined
+focus 27/27, relevant 224/224, full 918/918 และ full lint/typechecks. Different
+independent re-review bind manifest ก่อนและหลัง gates แล้วผ่าน final
+`C0/H0/M0/L0`. Module ยังไม่มี runtime import;
+endpoint/key/audience/HTTP/parser/scheduler/operator/deploy และ production
+authorization เป็น gates แยก. `enabled=false`, `releaseApproval=false`,
+`runtimeWired=false` และ production NO-GO คงเดิม.
 
 **Shared strict JSON response boundary checkpoint (2026-08-10):** Academy รับช่วง
 existing untracked BYOB + duplicate-safe parser จาก concurrent client work มา
