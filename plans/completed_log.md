@@ -5,6 +5,40 @@
 
 ---
 
+## 2026-08-11 - Local Identity client-assertion Web Crypto signer implemented
+
+**Outcome:** Academy added a pure server-side signer that accepts one opaque,
+non-exportable, private, sign-only P-256 `CryptoKey`; binds one client, assertion
+purpose and key ID; and delegates bounded owned bytes to captured Web Crypto.
+It does not generate, import, export, serialize, load, log or persist key
+material.
+
+**Verification:** Missing-module RED stopped before collection and first GREEN
+passed 13/13. Security self-audit then produced RED 14/15 because a stateful
+nested `namedCurve` value was read twice; one-read capture returned GREEN 15/15.
+First different independent RIL returned `C0/H0/M1/L0`: ordinary metadata reads
+trusted an own shadow, so a genuine extractable key could present
+`extractable=false` and sign. Remediation RED passed 15 checks and failed three
+brand cases; native `CryptoKey.prototype` getters now reject the shadow and duck
+object and bypass Proxy traps, producing GREEN 18/18 on supported Node 24.
+Different independent closure RIL bound the remediated manifest and returned
+final `C0/H0/M0/L0`. A Node 25 observation still returned real native metadata
+through the Proxy and did not permit an extractable-key bypass; literal Proxy
+behavior will be reprobed against the pinned `workerd` compatibility date during
+runtime wiring. Provider/JTI/signer focus passes 59/59,
+Academy Identity regression passes 19 files / 287 tests, full unit passes 91
+files / 977 tests, Identity Control assertion+lifecycle passes 22/22, and full
+lint plus every TypeScript config
+passes with one pre-existing generated warning. Evidence is in
+`reports/reviews/academy-identity-client-assertion-webcrypto-signer-local-checkpoint-2026-08-11.md`.
+
+**Residual risk:** Final independent re-review passed `C0/H0/M0/L0`. The module
+cannot prove that equivalent private material was imported into another
+`CryptoKey` or reused across purposes. The approved key ceremony, protected secret-store
+identity, public-key digest, registry revision, lifecycle values, HTTP/scheduler
+ownership, deployment and release authorization remain external gates. Runtime
+wiring and registry release remain disabled.
+
 ## 2026-08-11 - Local Identity client-assertion JTI source implemented
 
 **Outcome:** Academy added a zero-argument server-side JTI source that uses only

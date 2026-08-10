@@ -326,6 +326,32 @@ HTTP/scheduler/runtime/deploy และ release authorization ยังเป็
 `enabled=false`, `releaseApproval=false`, `runtimeWired=false` และ production
 NO-GO คงเดิม.
 
+**Identity client-assertion Web Crypto signer local checkpoint (2026-08-11):**
+Academy เพิ่ม pure server capability ที่รับ opaque `CryptoKey` ซึ่งต้องเป็น
+private P-256, non-exportable และ sign-only ก่อน bind client/purpose/key ID แล้ว
+เรียก captured `crypto.subtle.sign`. Module ไม่ generate/import/export/read secret
+และคืน raw 64-byte ES256 signature ให้ provider ที่ผ่าน RIL แล้ว. Missing-module
+RED หยุดก่อน collection; first GREEN 13/13. Security self-audit เพิ่ม stateful
+key-metadata case แล้ว RED ล้ม 1/15 เพราะอ่าน nested `namedCurve` ซ้ำ; one-read
+fix ทำให้ GREEN 15/15 พร้อม byte-snapshot proof. Different independent RIL แรก
+คืน `C0/H0/M1/L0` เพราะ ordinary key metadata reads เชื่อ own-property shadow;
+extractable key จึงปลอม `extractable=false` แล้ว sign ได้. Remediation RED ผ่าน
+15 เดิมและล้ม 3 native-brand cases; captured `CryptoKey.prototype` getters ทำให้
+GREEN 18/18. Provider/JTI/signer focus ผ่าน 59/59, Academy Identity 287/287,
+full unit 91 files/977 tests, producer 22/22 และ full lint/ทุก TypeScript config
+ผ่านโดยมี generated warning เดิม 1 จุด. หลักฐาน
+อยู่ที่
+[`reports/reviews/academy-identity-client-assertion-webcrypto-signer-local-checkpoint-2026-08-11.md`](../reports/reviews/academy-identity-client-assertion-webcrypto-signer-local-checkpoint-2026-08-11.md).
+Different independent re-review bind manifest และผ่าน final `C0/H0/M0/L0` บน
+supported Node 24. Node 25 compatibility probe ยังคืน native metadata จริงและไม่
+เกิด extractable bypass; literal Proxy behavior ต้อง rerun กับ pinned `workerd`
+compatibility date ตอน runtime wiring. Module พิสูจน์ได้เฉพาะ native metadata และ
+call binding ของ opaque capability; key ceremony/secret-store/public digest ยัง
+ต้องพิสูจน์ว่า underlying key ไม่ถูก reuse ข้าม purpose. ไม่มี runtime import;
+exact values, public-key registration/rotation, HTTP/scheduler/deploy/release ยัง
+เป็น external gates. `enabled=false`, `releaseApproval=false`,
+`runtimeWired=false` และ production NO-GO คงเดิม.
+
 **Shared strict JSON response boundary checkpoint (2026-08-10):** Academy รับช่วง
 existing untracked BYOB + duplicate-safe parser จาก concurrent client work มา
 audit และเพิ่ม standalone adversarial suite โดยไม่ stage consumer/UI files. RED
