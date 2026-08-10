@@ -5,6 +5,34 @@
 
 ---
 
+## 2026-08-10 — Local Identity lifecycle pull request builder implemented
+
+**Outcome:** Academy added a pure local builder for the accepted lifecycle pull
+request schema. It binds the configured consumer ID and assertion audience to
+an injected server-side provider, validates cursor and limit before signer use,
+and returns a fresh exact initial or continued request. Provider failures and
+malformed assertions collapse to one bounded detail-free error.
+
+**Verification:** TDD first stopped on the missing module. The first
+implementation run passed 23/25; both failures were corrected test fixtures,
+after which focused tests passed 25/25. Author review then exposed implicit
+consumer-ID object coercion with a 25-pass/1-fail RED. The implementation now
+checks string type before regex evaluation, and final focused tests pass 26/26
+with zero coercion calls. Relevant lifecycle tests passed 157/157, full unit
+passed 851/851, and the producer lifecycle pull contract passed 14/14. Scoped
+ESLint and full lint/all TypeScript checks passed with one pre-existing
+generated-registry warning. Evidence is in
+`reports/reviews/academy-identity-lifecycle-pull-request-local-checkpoint-2026-08-10.md`.
+
+**Residual risk:** Different independent checkpoint review bound the manifest,
+reran focused 26/26, lifecycle 157/157, producer 14/14, and proportional static
+gates, and passed `C0/H0/M0/L0`. The builder is local-only and unwired; it
+performs lexical assertion validation but does not own signature/claim/replay
+verification. Raw JSON and authenticated HTTP, endpoint and credential values,
+key rotation, deadline/backoff/lag, scheduler/runtime bindings, deployment
+evidence, registry enablement, release approval, and production authorization
+remain separate gates.
+
 ## 2026-08-10 — Local Identity lifecycle verified-page transport implemented
 
 **Outcome:** Academy added a pure local decorator between a future

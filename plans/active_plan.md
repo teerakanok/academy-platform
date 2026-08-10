@@ -210,6 +210,23 @@ endpoint/key/audience, deadline/retry/lag, scheduler/runtime/deploy และ ow
 approval ยังเป็น gates แยก; `enabled=false`, `releaseApproval=false`,
 `runtimeWired=false` และ production NO-GO คงเดิม.
 
+**Identity lifecycle pull-request builder local checkpoint (2026-08-10):**
+Academy มี pure local builder ที่ bind configured consumer ID กับ client-assertion
+audience, ตรวจ canonical durable cursor และ limit ก่อนเรียก injected server-side
+signer แล้วคืน exact initial/continued request shape ตาม producer contract.
+Missing-module RED หยุดก่อน collection. First run ผ่าน 23/25 โดยสอง failure เป็น
+fixture ที่กำหนด length ผิดและ Proxy ขวาง receiver proof ของ test เอง; แก้เฉพาะ
+fixture แล้วผ่าน 25/25. Author review เพิ่ม zero-coercion invariant; RED ล้ม 1/26
+เพราะ regex เรียก object `toString()`, จากนั้น explicit string guard ทำให้ GREEN
+ผ่าน 26/26. Relevant lifecycle ผ่าน 157/157, full unit 851/851, producer 14/14
+และ full lint/typechecks ผ่าน. หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-lifecycle-pull-request-local-checkpoint-2026-08-10.md`](../reports/reviews/academy-identity-lifecycle-pull-request-local-checkpoint-2026-08-10.md).
+Different independent RIL bind manifest แล้วผ่าน `C0/H0/M0/L0`. Checkpoint คง
+local-only/unwired. Assertion signature/claims/replay, raw JSON, HTTP endpoint,
+credentials/key rotation, deadline/backoff/lag, scheduler/runtime/deploy และ
+owner authorization ยังเป็น gates แยก; `enabled=false`, `releaseApproval=false`,
+`runtimeWired=false` และ production NO-GO คงเดิม.
+
 **Identity session-cookie local checkpoint (2026-08-09):** future
 `academy_session` มี raw-header parser ที่รับเฉพาะ canonical name แบบ exact-one,
 reject duplicate โดยไม่พึ่ง order และจำกัด opaque ID ที่ URL-safe 32-160 ตัวอักษร.
