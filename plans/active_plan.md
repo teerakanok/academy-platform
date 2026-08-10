@@ -227,6 +227,49 @@ credentials/key rotation, deadline/backoff/lag, scheduler/runtime/deploy แล�
 owner authorization ยังเป็น gates แยก; `enabled=false`, `releaseApproval=false`,
 `runtimeWired=false` และ production NO-GO คงเดิม.
 
+**Shared strict JSON response boundary checkpoint (2026-08-10):** Academy รับช่วง
+existing untracked BYOB + duplicate-safe parser จาก concurrent client work มา
+audit และเพิ่ม standalone adversarial suite โดยไม่ stage consumer/UI files. RED
+ผ่าน 18/20 และล้มตรง caller ขอ allocation เกิน 1 MiB กับ depth 65 ยังถูกยอมรับ.
+Helper ปัจจุบันมี hard ceilings 1 MiB/depth 64 และ reject/cancel ก่อน read;
+GREEN รอบแรกผ่าน focused 20/20, importer clients 210/210 และ full unit 871/871.
+Full lint/typechecks ผ่านหลังแก้ test fixture ให้ copy bytes ลง owned ArrayBuffer;
+source behavior ไม่เปลี่ยนจากการแก้ type นั้น. หลักฐานอยู่ที่
+[`reports/reviews/academy-strict-json-response-local-checkpoint-2026-08-10.md`](../reports/reviews/academy-strict-json-response-local-checkpoint-2026-08-10.md).
+Independent RIL แรกพบ `C0/H0/M1/L1`: stateful option getter bypass hard cap หรือ
+throw หลัง lock reader ได้ และ report ใช้คำว่า tracked/committed เร็วเกินจริง.
+Test-only RED ใหม่ผ่าน 20/22; remediation snapshot byte/depth/signal/timeout
+ครั้งเดียวก่อน body access/allocation, allocate ก่อน acquire reader และแก้ wording.
+GREEN ผ่าน focused 22/22, current importers 212/212 และ full unit 877/877.
+Closure RIL รอบสองพบ `C0/H0/M1/L0`: Proxy(native AbortSignal) ยัง throw จาก
+state/listener หลัง acquire reader, leak error detail และทิ้ง body lock ได้.
+Signal-boundary RED ผ่าน 22/25; remediation capture/preflight signal ก่อน body,
+ใช้ internal deadline controller และแยก deadline cleanup จาก reader release.
+GREEN รอบนั้นผ่าน focused 25/25, importers 215/215 และ full unit 880/880.
+Closure RIL รอบสามพบ `C0/H0/M1/L0`: one-byte fragmentation ทำให้ BYOB view
+allocation สะสมแบบกำลังสองและ microtask chain วิ่งข้าม nominal timer ได้.
+Deterministic RED ผ่าน 25/26; remediation ใช้ scratch buffer ไม่เกิน 256 KiB+1,
+reuse backing buffer และหยุดก่อน read ครั้งที่ 129. GREEN ปัจจุบันผ่าน focused
+26/26, importers 216/216 และ full unit 85 files/877 tests; ยังรอ different
+independent closure review ที่ bind manifest ใหม่. Review รอบสี่พบ
+`C0/H0/M1/L0`: hostile add wrapper attach listener แล้ว throw ก่อน cleanup flag
+ทำให้ internal deadline listener ค้างได้. Listener RED ผ่าน 26/27; first fix
+เผย fail-closed regression 23/27 ก่อน final implementation จะ require native
+signal method identities, ใช้ module-captured EventTarget intrinsics และ arm
+cleanup ก่อน add. GREEN ปัจจุบันผ่าน focused 27/27, importers 217/217 และ full
+unit 85 files/878 tests. Review รอบห้าพบ `C0/H0/M1/L0`: read loop ยัง register
+internal deadline listener แบบ dynamic จึง leak ได้เมื่อ prototype ถูก wrap ก่อน
+module load. Fresh-module RED ผ่าน 27/28 และพบ listener ค้างสองตัว. Final design
+ตัด internal listener ออกทั้งหมด โดย race BYOB read กับ private deadline promise;
+external signal ยังใช้ native transaction เดิม. GREEN ปัจจุบันผ่าน focused
+28/28, importers 218/218 และ full unit 85 files/879 tests; ยังรอ different
+closure review ใหม่. Review รอบหกผ่าน code/security `C0/H0/M0` แต่คืน `L1`
+เพราะ report ระบุสาเหตุ timer ไม่ตรง source; wording แก้เป็น scheduled callback
+ถูก microtask starvation แล้ว. Different independent text-only closure bind
+manifest ใหม่, rerun focused 28/28 และคืน final `C0/H0/M0/L0`. Helper เป็น
+raw-response primitive เท่านั้น; lifecycle network listener/method/status/endpoint,
+request credentials และ runtime authorization ยังเป็นงานถัดไป.
+
 **Identity session-cookie local checkpoint (2026-08-09):** future
 `academy_session` มี raw-header parser ที่รับเฉพาะ canonical name แบบ exact-one,
 reject duplicate โดยไม่พึ่ง order และจำกัด opaque ID ที่ URL-safe 32-160 ตัวอักษร.

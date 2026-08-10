@@ -1,0 +1,31 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/src/lib/http/strict-json-response.ts",
+      "sha256": "a3a3484bbd52909550f3d78d5f6c7f1988f05464ef419932e48842618fdd00f8",
+      "bytes": 15060
+    },
+    {
+      "path": "academy-web/tests/unit/strict-json-response.test.ts",
+      "sha256": "c4d014f443bf0d9bcc8b2be83f4ca6304ea24ecd769bc29579ae126858946dc7",
+      "bytes": 16673
+    },
+    {
+      "path": "plans/active_plan.md",
+      "sha256": "cd544b5796223017bbc3d7a73a8eb51b4c898562d7dabca7d065122d2cffea98",
+      "bytes": 167963
+    },
+    {
+      "path": "plans/completed_log.md",
+      "sha256": "8442964b295d8180ff2ac4568ab17c99cb19a18f7c5d72e130cf76ee6809655d",
+      "bytes": 109144
+    },
+    {
+      "path": "reports/reviews/academy-strict-json-response-local-checkpoint-2026-08-10.md",
+      "sha256": "f469869eb8b7ac7506b93f1b63b01e283723f87d1f50a54eb98246fa48a13059",
+      "bytes": 10457
+    }
+  ]
+}

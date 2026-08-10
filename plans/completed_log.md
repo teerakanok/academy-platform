@@ -5,6 +5,76 @@
 
 ---
 
+## 2026-08-10 — Shared strict JSON response boundary hardened
+
+**Outcome:** Academy adopted the existing untracked shared BYOB response reader
+and duplicate-safe JSON parser as a reviewed dependency. The helper enforces
+strict UTF-8, media type, timeout/abort, byte and depth ceilings, rejects
+duplicate semantic keys and ambiguous JSON, and returns `unknown` for an owning
+client to project safely. Concurrent consumer/UI files were not staged.
+
+**Verification:** A standalone adversarial RED passed 18/20 and failed because
+caller options could exceed a 1 MiB allocation and depth 64. The helper now
+rejects both before read/allocation; focused tests first passed 20/20. A later type gate
+found only a test utility's `ArrayBufferLike` mismatch, fixed by copying fixture
+bytes into an owned buffer. The first current-byte importer/full runs passed
+210/210 and 871/871; scoped ESLint plus full lint/all TypeScript checks passed with one
+pre-existing generated-registry warning. Evidence is in
+`reports/reviews/academy-strict-json-response-local-checkpoint-2026-08-10.md`.
+
+The first independent RIL returned `C0/H0/M1/L1`: repeated option reads allowed
+a stateful getter to bypass the allocation cap or throw after reader acquisition,
+and two report labels described untracked freeze bytes as tracked/committed.
+Test-only RED passed 20/22. The helper now snapshots and validates all public
+options once, allocates before acquiring the reader, and keeps cleanup on captured
+values. Focused GREEN passes 22/22, current importers pass 212/212, and the
+current full unit suite passes 877/877. Report wording is corrected.
+
+The second independent RIL returned `C0/H0/M1/L0`: an `AbortSignal` Proxy could
+throw from state/listener access after the reader was acquired, reject with
+injected detail, and leave the stream locked. Signal-boundary RED passed 22/25.
+Signal state and methods are now captured and preflighted before body access;
+deadline cleanup and reader release are independently guarded. Current focused,
+importer, and full-unit suites pass 25/25, 215/215, and 880/880 respectively.
+
+The third independent RIL returned `C0/H0/M1/L0`: one-byte response
+fragmentation caused cumulative BYOB view capacity to grow quadratically and a
+microtask chain could outlive the nominal timer. Deterministic RED passed 25/26.
+The reader now reuses a scratch buffer capped at 256 KiB plus one byte and
+cancels before read 129. Current focused and importer suites pass 26/26 and
+216/216; the current full workspace shape passes 85 files / 877 tests.
+
+The fourth independent RIL returned `C0/H0/M1/L0`: a hostile signal wrapper
+could attach the internal deadline listener and throw before cleanup ownership
+was recorded. RED passed 26/27 with one retained listener. An intermediate fix
+removed the leak but failed four existing hostile-signal assertions. The final
+implementation validates native signal method identities, uses captured native
+EventTarget operations only, and arms cleanup before registration. Focused,
+importer, and full-unit suites now pass 27/27, 217/217, and 878/878.
+
+The fifth independent RIL returned `C0/H0/M1/L0`: the read loop still attached
+an internal listener dynamically, so prototype methods wrapped before module
+load could retain it after add mutated then threw. Fresh-module RED passed
+27/28 with two retained listeners. The reader now races each read against a
+private deadline promise and creates no internal event listener; only the
+already-transactional external listener remains. Focused, importer, and
+full-unit suites now pass 28/28, 218/218, and 879/879.
+
+The sixth independent closure RIL passed code/security at `C0/H0/M0` and found
+one Low documentation error: the timer was already scheduled, while its callback
+was starved by the microtask chain. The checkpoint report now records that exact
+cause; source and test bytes are unchanged.
+
+Different independent text-only closure then verified the regenerated manifest,
+confirmed unchanged source/test hashes, reran focused 28/28, and returned final
+`C0/H0/M0/L0`.
+
+**Residual risk:** Product clients still own exact schema/status projection. The
+actual Identity lifecycle
+HTTP adapter, endpoint, assertion credentials, runtime bindings, scheduling,
+deployment evidence, registry enablement, release approval, and production
+authorization remain separate gates.
+
 ## 2026-08-10 — Local Identity lifecycle pull request builder implemented
 
 **Outcome:** Academy added a pure local builder for the accepted lifecycle pull
