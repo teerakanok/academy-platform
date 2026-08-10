@@ -227,6 +227,22 @@ credentials/key rotation, deadline/backoff/lag, scheduler/runtime/deploy แล�
 owner authorization ยังเป็น gates แยก; `enabled=false`, `releaseApproval=false`,
 `runtimeWired=false` และ production NO-GO คงเดิม.
 
+**Identity lifecycle pull-operation transport local checkpoint (2026-08-10):**
+Academy เพิ่ม pure local composition ระหว่าง pull-request builder กับ injected
+logical operation แล้ว. Factory capture config และ operation method ครั้งเดียว,
+ตรวจ configured/call limit ก่อน signer/operation และเรียก method ด้วย receiver
+เดิม. Missing-module RED หยุดก่อน collection; first GREEN ผ่าน focused 8/8,
+relevant lifecycle 165/165, full unit 887/887, producer contract 14/14 และ full
+lint/typechecks. Valid empty page วิ่งผ่าน real verifier ไป fenced commit; invalid
+cursor relation คืน bounded retry และไม่ commit. หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-lifecycle-pull-operation-transport-local-checkpoint-2026-08-10.md`](../reports/reviews/academy-identity-lifecycle-pull-operation-transport-local-checkpoint-2026-08-10.md).
+Different independent RIL bind manifest, รัน focused 8/8, lifecycle 165/165,
+producer 14/14 และ adversarial one-read/thenable probes แล้วผ่าน
+`C0/H0/M0/L0`. HTTP endpoint/status, bounded raw transport,
+credential/key ownership, scheduler/runtime/deploy และ production authorization
+ยังเป็น gates แยก; `enabled=false`, `releaseApproval=false`,
+`runtimeWired=false` และ production NO-GO คงเดิม.
+
 **Shared strict JSON response boundary checkpoint (2026-08-10):** Academy รับช่วง
 existing untracked BYOB + duplicate-safe parser จาก concurrent client work มา
 audit และเพิ่ม standalone adversarial suite โดยไม่ stage consumer/UI files. RED

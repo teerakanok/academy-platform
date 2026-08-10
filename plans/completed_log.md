@@ -5,6 +5,31 @@
 
 ---
 
+## 2026-08-10 — Local Identity lifecycle pull-operation transport implemented
+
+**Outcome:** Academy added a pure local transport that composes the accepted
+pull-request builder with an injected logical operation. It creates the exact
+initial or continued producer request, captures the operation method once with
+its original receiver, and hands one opaque result to the existing verified-page
+boundary. Failures collapse to one fixed detail-free error.
+
+**Verification:** TDD first stopped on the missing module, then the first
+implementation passed focused 8/8. Relevant lifecycle tests passed 165/165,
+full unit passed 887/887, and the Identity Control lifecycle pull contract passed
+14/14. Scoped ESLint and full lint/all TypeScript checks passed with one
+pre-existing generated-registry warning. A valid empty page reaches the
+lease-fenced commit; an invalid cursor relation returns bounded retry and never
+commits. Evidence is in
+`reports/reviews/academy-identity-lifecycle-pull-operation-transport-local-checkpoint-2026-08-10.md`.
+
+**Residual risk:** Different independent review bound the manifest, reran
+focused 8/8, lifecycle 165/165, producer 14/14 and proportional static gates,
+and passed `C0/H0/M0/L0`. The actual authenticated HTTP operation, endpoint and
+credential values, bounded response parsing, status/deadline/retry policy,
+scheduler/runtime bindings, deployment evidence, registry enablement, release
+approval, and production authorization remain separate gates. Current values
+stay `enabled=false`, `releaseApproval=false`, and `runtimeWired=false`.
+
 ## 2026-08-10 — Shared strict JSON response boundary hardened
 
 **Outcome:** Academy adopted the existing untracked shared BYOB response reader
