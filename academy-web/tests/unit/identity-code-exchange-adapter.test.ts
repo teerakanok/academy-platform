@@ -11,6 +11,7 @@ import {
   beginIdentityAuthorization,
   completeIdentityCallback,
   InMemoryIdentityTransactionStore,
+  type LocalIdentityAuthorizationRegistration,
   type LocalIdentityClient,
 } from '@/lib/identity/transaction'
 
@@ -23,6 +24,10 @@ const CLIENT: LocalIdentityClient = {
   expectedIssuer: 'https://identity.example.test/auth/v1',
   clientAssertionAudience: 'https://accounts.example.test/v1/code/exchange',
 }
+const REGISTRATION = {
+  client: CLIENT,
+  redirectUris: [CLIENT.redirectUri],
+} as const satisfies LocalIdentityAuthorizationRegistration
 const REQUEST = {
   clientId: CLIENT.clientId,
   clientAssertion: ASSERTION,
@@ -129,7 +134,7 @@ describe('Academy Identity code exchange adapter', () => {
 
   it('drives the real local callback seam without broad adapter authority', async () => {
     const store = new InMemoryIdentityTransactionStore()
-    const started = beginIdentityAuthorization(store, CLIENT, '/dashboard', () => REQUEST.codeVerifier)
+    const started = beginIdentityAuthorization(store, REGISTRATION, '/dashboard', () => REQUEST.codeVerifier)
     let receivedEndpoint: unknown
     let receivedInit: RequestInit | undefined
     const operation = createIdentityCodeExchangeTransport({

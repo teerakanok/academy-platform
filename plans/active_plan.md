@@ -599,6 +599,24 @@ rerun focused/canonical/static/security/reader gates และผ่าน final
 authenticated exchange, durable runtime transaction, operator/deploy/release
 gates ยังคงเป็น NO-GO.
 
+**Identity registered authorization redirect local checkpoint (2026-08-11):**
+Academy เปลี่ยน authorization-start boundary ให้รับ exact
+`{client, redirectUris}` จาก future trusted server composition. Selected
+callback ต้องตรงกับ canonical registered entry แบบ byte-exact ก่อน
+สร้าง PKCE/browser binding หรือเขียน transaction. List จำกัด 16
+entries, snapshot own data descriptors, และ reject duplicate/sparse/accessor/
+symbol/hostile/overbound/query/fragment/non-canonical input ก่อน mutation.
+TDD RED ผ่านเดิม 17 แล้วล้ม valid registration; intermediate RED จับ
+empty `?` alias; final GREEN ผ่าน focused 19/19, affected seam 48/48,
+Academy Identity 452/452, full unit 1,139/1,139, producer 51/51 และ full
+lint/all TypeScript configs. หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-authorization-registered-redirect-local-checkpoint-2026-08-11.md`](../reports/reviews/academy-identity-authorization-registered-redirect-local-checkpoint-2026-08-11.md).
+Different independent RIL bind manifest 8/8, rerun focused 19/19, affected seam
+48/48, Academy Identity 452/452, producer 51/51 และ proportional
+static/security/reader gates แล้วผ่าน final `C0/H0/M0/L0`. Source ไม่มี
+runtime caller, conformance คง 16/23, readiness ไม่เพิ่ม และ production
+NO-GO.
+
 **Shared strict JSON response boundary checkpoint (2026-08-10):** Academy รับช่วง
 existing untracked BYOB + duplicate-safe parser จาก concurrent client work มา
 audit และเพิ่ม standalone adversarial suite โดยไม่ stage consumer/UI files. RED

@@ -5,6 +5,35 @@
 
 ---
 
+## 2026-08-11 - Local Identity registered authorization redirect boundary implemented
+
+**Outcome:** Academy authorization start now accepts one exact client plus a
+bounded server-owned registered redirect list. The selected callback must be an
+exact canonical member before PKCE/browser-binding generation or transaction
+storage. Invalid, duplicate, non-canonical, hostile, accessor, sparse, symbol,
+or overbound registrations stop with a fixed local error and no mutation. The
+persisted transaction schema is unchanged.
+
+**Verification:** The test-only RED passed 17 prior tests and failed the new
+valid-registration call shape. An intermediate RED then exposed the empty `?`
+URL alias. Current GREEN passes focused 19/19, the four-file affected seam
+48/48, Academy Identity 452/452, full unit 1,139/1,139, Identity Control
+authorization/API 51/51, and full lint plus all TypeScript configurations with
+one pre-existing generated-registry warning. Evidence is in
+`reports/reviews/academy-identity-authorization-registered-redirect-local-checkpoint-2026-08-11.md`.
+
+**Review:** A different independent reviewer verified the exact eight-file
+manifest before and after semantics, reran focused 19/19, the affected seam
+48/48, Academy Identity 452/452, producer 51/51, and proportional static,
+security, secret, reader, and staged-empty gates, then returned final
+`C0/H0/M0/L0`.
+
+**Residual risk:** The registered list is injected local data, not producer or
+release authority. No route imports this boundary. Trusted runtime composition,
+Account Center redirect, callback recovery, cookie/session issuance, operators,
+deployment evidence, and release approval remain external. Conformance stays
+16/23, readiness does not increase, and production remains NO-GO.
+
 ## 2026-08-11 - Profile-only activation conformance promoted locally
 
 **Outcome:** The deterministic Academy consumer-conformance generator now binds

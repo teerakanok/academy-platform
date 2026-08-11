@@ -22,6 +22,8 @@ const LOCAL_CLIENT_KEYS = [
   'expectedIssuer',
   'clientAssertionAudience',
 ] as const
+const AUTHORIZATION_REGISTRATION_KEYS = ['client', 'redirectUris'] as const
+const MAX_REGISTERED_REDIRECT_URIS = 16
 const TRANSACTION_INPUT_KEYS = [
   'state',
   'codeVerifier',
@@ -40,6 +42,11 @@ export interface LocalIdentityClient {
   audience: string
   expectedIssuer: string
   clientAssertionAudience: string
+}
+
+export interface LocalIdentityAuthorizationRegistration {
+  readonly client: LocalIdentityClient
+  readonly redirectUris: readonly string[]
 }
 
 export interface PendingIdentityTransaction {
@@ -186,6 +193,62 @@ function snapshotLocalIdentityClient(value: unknown): LocalIdentityClient {
     expectedIssuer: candidate.expectedIssuer,
     clientAssertionAudience: candidate.clientAssertionAudience,
   }
+}
+
+function snapshotRegisteredRedirectUris(value: unknown): string[] {
+  try {
+    if (!Array.isArray(value) || Reflect.getPrototypeOf(value) !== Array.prototype) {
+      throw new Error('invalid redirect list')
+    }
+    const lengthDescriptor = Reflect.getOwnPropertyDescriptor(value, 'length')
+    if (!lengthDescriptor || !('value' in lengthDescriptor)) {
+      throw new Error('invalid redirect list length descriptor')
+    }
+    const lengthValue = lengthDescriptor.value
+    if (
+      !Number.isSafeInteger(lengthValue) ||
+      typeof lengthValue !== 'number' ||
+      lengthValue < 1 ||
+      lengthValue > MAX_REGISTERED_REDIRECT_URIS
+    ) {
+      throw new Error('invalid redirect list length')
+    }
+
+    const length = lengthValue
+    const ownKeys = Reflect.ownKeys(value)
+    if (
+      ownKeys.length !== length + 1 ||
+      ownKeys.some((key) => key !== 'length' && (typeof key !== 'string' || !/^(?:0|[1-9][0-9]*)$/.test(key)))
+    ) {
+      throw new Error('invalid redirect list keys')
+    }
+
+    const redirects: string[] = []
+    for (let index = 0; index < length; index += 1) {
+      const descriptor = Reflect.getOwnPropertyDescriptor(value, String(index))
+      if (!descriptor || !descriptor.enumerable || !('value' in descriptor) || typeof descriptor.value !== 'string') {
+        throw new Error('invalid redirect entry')
+      }
+      if (!isCanonicalRegisteredRedirectUri(descriptor.value)) {
+        throw new Error('invalid registered redirect')
+      }
+      redirects.push(descriptor.value)
+    }
+    if (new Set(redirects).size !== redirects.length) throw new Error('duplicate registered redirect')
+    return redirects
+  } catch {
+    throw new IdentityTransactionStoreError('identity authorization registration มี redirect URI ไม่ถูกต้อง')
+  }
+}
+
+function snapshotAuthorizationRegistration(value: unknown): LocalIdentityAuthorizationRegistration {
+  const candidate = snapshotExactDataRecord(value, AUTHORIZATION_REGISTRATION_KEYS)
+  const client = snapshotLocalIdentityClient(candidate.client)
+  const redirectUris = snapshotRegisteredRedirectUris(candidate.redirectUris)
+  if (!redirectUris.includes(client.redirectUri)) {
+    throw new IdentityTransactionStoreError('identity authorization callback ไม่ตรงกับ registered redirect URI')
+  }
+  return { client, redirectUris }
 }
 
 function snapshotPendingTransactionInput(value: unknown): PendingIdentityTransactionInput {
@@ -412,14 +475,32 @@ function isAllowedRedirectUri(value: string): boolean {
   }
 }
 
+function isCanonicalRegisteredRedirectUri(value: string): boolean {
+  try {
+    const redirect = new URL(value)
+    return (
+      redirect.href === value &&
+      redirect.username === '' &&
+      redirect.password === '' &&
+      !value.includes('?') &&
+      !value.includes('#') &&
+      redirect.search === '' &&
+      redirect.hash === '' &&
+      (redirect.protocol === 'https:' || (redirect.protocol === 'http:' && redirect.hostname === 'localhost'))
+    )
+  } catch {
+    return false
+  }
+}
+
 /** Starts authorization and returns a separate raw binding for a future HttpOnly cookie setter. */
 export function beginIdentityAuthorization(
   store: IdentityTransactionStore,
-  client: LocalIdentityClient,
+  registration: LocalIdentityAuthorizationRegistration,
   returnPath: string,
   newVerifier: () => string = () => opaque(48),
 ): { state: string; browserBinding: string; codeVerifier: string; request: AuthorizationRequest } {
-  const exactClient = snapshotLocalIdentityClient(client)
+  const exactClient = snapshotAuthorizationRegistration(registration).client
   requireInternalReturnPath(returnPath)
   const state = opaque()
   const nonce = opaque()

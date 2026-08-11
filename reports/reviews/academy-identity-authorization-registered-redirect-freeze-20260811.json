@@ -1,0 +1,46 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/src/lib/identity/transaction.ts",
+      "sha256": "f3744a3a147d6a1130c94bdd6b60128172ef6eb8de2d3d1bc8b8e4c76a829a24",
+      "bytes": 24620
+    },
+    {
+      "path": "academy-web/tests/unit/identity-code-exchange-adapter.test.ts",
+      "sha256": "c36a2f361fcdd6144b6fee03acdee7b25e28f44aa01b238d7c500e4108e4591c",
+      "bytes": 7653
+    },
+    {
+      "path": "academy-web/tests/unit/identity-code-exchange-port.test.ts",
+      "sha256": "7c339d9e3a6ac336cc7779dcdfdf1e262b4f4f63c9f55fe36e232e9351cc861d",
+      "bytes": 10371
+    },
+    {
+      "path": "academy-web/tests/unit/identity-durable-store.test.ts",
+      "sha256": "e69f76b3886f8405361a51ed8a7e99335afaf3f49c5fce3d8d0f47c1bd0bb729",
+      "bytes": 12456
+    },
+    {
+      "path": "academy-web/tests/unit/identity-transaction.test.ts",
+      "sha256": "344788f51c14aba46608b812b89cd41ad72bdf00879571fb6b071610476d547b",
+      "bytes": 21791
+    },
+    {
+      "path": "plans/active_plan.md",
+      "sha256": "76cdf3a98a7a00cfd5e287735ab1cf5e0bf99ced06b78b7048a4a2afe44c1a75",
+      "bytes": 205492
+    },
+    {
+      "path": "plans/completed_log.md",
+      "sha256": "959bfba69fdaa86207b99bca97fe562f0a4012c3d4cc73594ee3939649fe0df4",
+      "bytes": 144273
+    },
+    {
+      "path": "reports/reviews/academy-identity-authorization-registered-redirect-local-checkpoint-2026-08-11.md",
+      "sha256": "4ab0a6ebee7a147efd6f03524aa0a995fbed91d21783ac88e3b3dc7c779e4ae3",
+      "bytes": 5568
+    }
+  ]
+}

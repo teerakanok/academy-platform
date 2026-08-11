@@ -14,6 +14,7 @@ import {
   beginIdentityAuthorization,
   completeIdentityCallback,
   InMemoryIdentityTransactionStore,
+  type LocalIdentityAuthorizationRegistration,
   type LocalIdentityClient,
 } from '@/lib/identity/transaction'
 
@@ -34,6 +35,10 @@ const CLIENT: LocalIdentityClient = {
   expectedIssuer: 'https://identity.example.test/auth/v1',
   clientAssertionAudience: ENDPOINT,
 }
+const REGISTRATION = {
+  client: CLIENT,
+  redirectUris: [CLIENT.redirectUri],
+} as const satisfies LocalIdentityAuthorizationRegistration
 const REQUEST = {
   clientId: CLIENT.clientId,
   clientAssertion: ASSERTION,
@@ -268,7 +273,7 @@ describe('Academy Identity final code exchange port composition', () => {
 
   it('completes the real local callback seam without a broad adapter', async () => {
     const store = new InMemoryIdentityTransactionStore()
-    const started = beginIdentityAuthorization(store, CLIENT, '/dashboard', () => REQUEST.codeVerifier)
+    const started = beginIdentityAuthorization(store, REGISTRATION, '/dashboard', () => REQUEST.codeVerifier)
     const port = createIdentityCodeExchangePort({
       config: ADMITTED_CONFIG,
       fetchPort: {
