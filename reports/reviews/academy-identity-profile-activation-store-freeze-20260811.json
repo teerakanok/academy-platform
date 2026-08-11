@@ -1,0 +1,41 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/src/lib/identity/profile-activation-store.ts",
+      "sha256": "bd3f7999d6c336b84189a7b9445b57c9c64220a03e33a5a5a132e2aec8fe6b6c",
+      "bytes": 5283
+    },
+    {
+      "path": "academy-web/supabase/migrations/0024_identity_profile_activation.sql",
+      "sha256": "f0322b64ab270dec8d73e663f0cc2017c0c91df0a558488bb70aa32232fa7cab",
+      "bytes": 2372
+    },
+    {
+      "path": "academy-web/tests/integration/identity-profile-activation-store.test.ts",
+      "sha256": "0887ea66a215e97d227dcbba1b9bd3cc6b330cb958d67ba152e636141b0a8f04",
+      "bytes": 10480
+    },
+    {
+      "path": "academy-web/tests/unit/identity-profile-activation-store.test.ts",
+      "sha256": "970d8d44e1b1b23da8b9397649bc7425a12701cb4744d8ba623dd666990b02ba",
+      "bytes": 10024
+    },
+    {
+      "path": "plans/active_plan.md",
+      "sha256": "b7a697d150f353ff8b7711adf308b95a56ce0cf05d3d5b1a0806a9499fede80b",
+      "bytes": 202907
+    },
+    {
+      "path": "plans/completed_log.md",
+      "sha256": "8636eeb4541d963e3eff359f32390121c64b0256b376a6ef970a7a0642831e68",
+      "bytes": 140818
+    },
+    {
+      "path": "reports/reviews/academy-identity-profile-activation-store-local-checkpoint-2026-08-11.md",
+      "sha256": "a56ff9a9e96b5aa09a6348136b1603cff84da42e3659ac60107dcf3ce19c258f",
+      "bytes": 8146
+    }
+  ]
+}

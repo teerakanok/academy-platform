@@ -5,6 +5,42 @@
 
 ---
 
+## 2026-08-11 - Local Identity profile activation store implemented
+
+**Outcome:** Academy now has one narrow RPC store plus migration 0024 for the
+profile-and-activation part of a future approved callback. The function upserts
+one Academy profile by canonical `(issuer, subject)` and applies the existing
+revision-aware activation projection in one PostgreSQL statement transaction.
+It contains no course-entitlement or staff-role mutation. Equal email never
+merges principals, activation conflicts roll the profile write back, and
+concurrent repeats converge on one account.
+
+**Verification:** The missing-module RED stopped before collection. Current
+Node 24 evidence passes focused 21/21, local PostgreSQL integration 11/11,
+Academy Identity 448/448, full unit 1,137/1,137, Identity Control producer
+59/59, and full lint plus all TypeScript configurations with one pre-existing
+generated-registry warning. The temporary Academy Supabase stack was stopped
+and verified absent after the integration run. Evidence is in
+`reports/reviews/academy-identity-profile-activation-store-local-checkpoint-2026-08-11.md`.
+
+**Review:** First independent RIL returned `C0/H1/M0/L0` because a stale lower
+activation revision could update the profile and return success while the
+durable activation stayed at a newer revision. Remediation RED passed 10 cases
+and failed that stale case. Migration 0024 now requires the durable
+status/revision to equal the input inside the same statement transaction;
+exact duplicates remain accepted and stale/conflicting input rolls the profile
+write back. GREEN local PostgreSQL integration passes 11/11. A different
+independent closure reviewer bound the remediated manifest, reran focused
+21/21, Academy Identity+callback 450/450 and producer 59/59 with proportional
+static/security/reader gates, and returned final `C0/H0/M0/L0`.
+
+**Residual risk:** The store remains unwired. `academy.activation-profile-only`
+stays `not_proven`, conformance remains 15/23, and production remains NO-GO.
+The approved callback/session recovery transaction, Origin/Fetch Metadata and
+browser binding, producer endpoint/key/replay contracts, existing runtime-role
+ACL review, operators, deployment evidence, and release authorization remain
+separate gates.
+
 ## 2026-08-11 - Final Identity code-exchange port now enforces admission
 
 **Outcome:** The existing canonical final port factory now projects one exact

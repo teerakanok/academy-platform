@@ -561,6 +561,31 @@ operators, deploy และ release authorization เป็น external gates. C
 15/23 (`65.2%`), readiness ไม่เพิ่ม, registry/runtime disabled และ production
 NO-GO.
 
+**Identity profile activation store local checkpoint (2026-08-11):** Academy
+เพิ่ม durable boundary สำหรับส่วนที่ product เป็นเจ้าของหลังผล code exchange
+ผ่าน verifier แล้ว: exact profile projection กับ activation copy ถูก commit ผ่าน
+RPC เดียวและ PostgreSQL statement transaction เดียว. Migration 0024 upsert
+ผู้ใช้ด้วย canonical `(issuer, subject)` และ reuse revision-aware activation
+sync; function body ไม่มี entitlement หรือ staff-role mutation. Test-only RED
+หยุดก่อน collection เพราะ module ยังไม่มี; GREEN ปัจจุบันผ่าน focused 21/21,
+local PostgreSQL integration 11/11, Academy Identity 29 files/448 tests, full unit
+100 files/1,137 tests, producer 59/59 และ full lint/all TypeScript configs โดยมี
+generated warning เดิม 1 จุด. หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-profile-activation-store-local-checkpoint-2026-08-11.md`](../reports/reviews/academy-identity-profile-activation-store-local-checkpoint-2026-08-11.md).
+First different independent RIL คืน `C0/H1/M0/L0`: stale lower activation
+revision ยังอัปเดต profile และคืน success ได้เพราะ migration ไม่ตรวจผล durable
+หลัง revision-aware sync. Remediation RED ผ่าน 10 และล้ม 1 stale case; migration
+จึง require durable status/revision ให้ตรง input ภายใน statement transaction,
+ยอม exact duplicate และ rollback profile เมื่อ stale/conflict. GREEN local
+PostgreSQL integration ปัจจุบันผ่าน 11/11. Different independent closure RIL
+bind remediated manifest 7/7, rerun focused 21/21, Academy Identity+callback
+450/450, producer 59/59 กับ proportional static/security/reader gates และผ่าน
+final `C0/H0/M0/L0`. Checkpoint ยังไม่ promote
+`academy.activation-profile-only`: callback/session transaction ไม่มี runtime
+import, existing `academy_runtime` ACL ที่กว้างกว่า function นี้ยังต้อง review
+ตอน production, conformance คง 15/23, registry/runtime disabled และ production
+NO-GO.
+
 **Shared strict JSON response boundary checkpoint (2026-08-10):** Academy รับช่วง
 existing untracked BYOB + duplicate-safe parser จาก concurrent client work มา
 audit และเพิ่ม standalone adversarial suite โดยไม่ stage consumer/UI files. RED
