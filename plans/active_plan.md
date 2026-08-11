@@ -421,6 +421,23 @@ activation transaction/operator/deploy/release ยังเป็น external ga
 `enabled=false`, `releaseApproval=false`, `runtimeWired=false` และ production
 NO-GO คงเดิม.
 
+**Identity code-exchange JSON operation checkpoint (2026-08-11):** Academy เพิ่ม
+pure local operation ที่ snapshot exact five-field producer request, ส่ง fresh
+projection ให้ injected response transport, ส่ง `Response` ต่อให้ accepted strict
+JSON reader และคืน parsed `unknown` เฉพาะผล reader ที่สำเร็จ. Module จับ method ของ
+สอง port ครั้งเดียว, รักษา receiver และรวม transport/reader/thenable failures เป็น
+fixed detail-free error. Missing-module RED หยุดก่อน collection; focused ผ่าน
+17/17, Academy Identity ผ่าน 22 files/345 tests, full unit ผ่าน 94 files/1,035
+tests, Identity producer authorization+assertion ผ่าน 38/38 และ full lint/all
+TypeScript configs ผ่านโดยมี generated warning เดิม 1 จุด. หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-code-exchange-json-operation-local-checkpoint-2026-08-11.md`](../reports/reviews/academy-identity-code-exchange-json-operation-local-checkpoint-2026-08-11.md).
+Different independent RIL bind manifest, rerun focused 17/17, Identity 345/345,
+producer 38/38, proportional static/security/reader gates และผ่าน final
+`C0/H0/M0/L0`. Slice นี้ไม่เลือก endpoint, credential, HTTP
+method/status/deadline, runtime import หรือ deploy policy; canonical conformance
+คง 15/23 (`65.2%`), readiness ไม่เพิ่ม, registry/runtime disabled และ production
+NO-GO คงเดิม.
+
 **Shared strict JSON response boundary checkpoint (2026-08-10):** Academy รับช่วง
 existing untracked BYOB + duplicate-safe parser จาก concurrent client work มา
 audit และเพิ่ม standalone adversarial suite โดยไม่ stage consumer/UI files. RED

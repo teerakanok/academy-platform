@@ -5,6 +5,33 @@
 
 ---
 
+## 2026-08-11 - Local Identity code-exchange JSON operation implemented
+
+**Outcome:** Academy now snapshots the exact five-field Identity Control
+code-exchange request, passes one fresh projection through an injected response
+transport, delegates the returned `Response` to the accepted strict JSON reader,
+and returns one parsed but still untrusted `unknown` value. The operation captures
+both port methods once, preserves their receivers, and exposes one fixed
+detail-free failure for malformed input, transport, reader, and async-value
+failures.
+
+**Verification:** Missing-module RED stopped before collection. Focused tests pass
+17/17, Academy Identity regression passes 22 files / 345 tests, full unit passes
+94 files / 1,035 tests, Identity Control authorization and assertion regression
+passes 38/38, and full lint plus all TypeScript configurations pass with one
+pre-existing generated-registry warning. A different independent reviewer bound
+the four-file author freeze, reran proportional code, security, secret, diff, and
+reader gates, and returned PASS `C0/H0/M0/L0`. Evidence is in
+`reports/reviews/academy-identity-code-exchange-json-operation-local-checkpoint-2026-08-11.md`.
+
+**Residual risk:** This pure module is not imported by a route, Worker, registry,
+or runtime entry and adds no conformance or readiness points. The approved
+endpoint, authenticated response transport, HTTP status and cancellation policy,
+protected key material and rotation, replay storage, durable callback and
+activation transactions, deployment evidence, operators, and release
+authorization remain external. Registry/runtime stay disabled and production
+remains NO-GO.
+
 ## 2026-08-11 - Local Identity callback browser binding implemented
 
 **Outcome:** Academy now generates a separate 32-byte browser binding at local
