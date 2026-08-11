@@ -2161,3 +2161,29 @@ progress ผูกบัญชี (migration 0002/0003) · พิสูจน์
 (ปลด blocker STAR ที่ค้างตั้งแต่ 2026-06-13)
 
 verification: build + lint + vitest 139/139 + playwright 50/50
+
+## 2026-08-11 - Shared-account local browser journey published
+
+**Outcome:** Academy now has a complete local browser journey from sign-in through
+CYBERSKILLS Account Center email/code verification, exact callback validation, an opaque
+Academy session, and the My learning dashboard. The empty-account state offers a direct
+`Browse available courses` action instead of ending the journey without a next step.
+
+**Customer-visible improvements:**
+- Malformed authorization requests stop with a clear restart action instead of falling
+  through to the visual fixture flow.
+- Email and code forms transfer keyboard focus and announce the destination email.
+- Expired, revoked, unknown, or unreadable session cookies no longer trap the learner away
+  from sign-in; sign-out expires the browser cookie even when durable revocation is not
+  confirmed.
+- Suspended Academy activation remains signed in at the identity layer but cannot access
+  Academy course data, and a valid new account receives no invented entitlement.
+
+**Evidence:** Desktop/mobile Chromium **4/4** with zero console and request failures;
+isolated focused **25/25**, full unit **904/904**, ESLint, all TypeScript configs, and
+production Next build **29/29**; different independent review **PASS C0/H0/M0/L0**.
+Academy commit `9b096307cac6400cc6e7b6a8b7e54a5a770c4d1e` is verified on remote `main`.
+
+**Residual boundary:** This checkpoint is local-only. Production identity runtime,
+endpoint, credentials, signing and verification keys, real email delivery, deployment,
+operator evidence, and release approval remain disabled and require separate authorization.

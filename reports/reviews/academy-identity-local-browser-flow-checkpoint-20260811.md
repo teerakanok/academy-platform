@@ -76,3 +76,10 @@ ESLint, all three TypeScript configs, staged diff and secret checks, reader-firs
 and final manifest verification. The review confirmed the loopback listener contract,
 stale-cookie recovery, unconditional browser cookie expiry, route integrity, and the
 desktop/mobile customer next action without introducing production authority.
+
+## Publication
+
+The exact 39-path isolated tree was committed as
+`9b096307cac6400cc6e7b6a8b7e54a5a770c4d1e` and verified at remote `main`. The commit
+was created from an index whose tree hash matched the independently reviewed worktree
+byte-for-byte, so concurrent Academy course and route work was not included.

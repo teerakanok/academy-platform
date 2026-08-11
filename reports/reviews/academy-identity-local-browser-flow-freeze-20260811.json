@@ -184,13 +184,18 @@
     },
     {
       "path": "plans/active_plan.md",
-      "sha256": "d7c86fd04745810c8662394e4df3b716a58372ab25c8fb16d88249b56d645f8d",
-      "bytes": 208226
+      "sha256": "1f80e7dcb545f3f31898e042f515d5ad5a0f40a35010fd9dbf4af9c4d1621d36",
+      "bytes": 208307
+    },
+    {
+      "path": "plans/completed_log.md",
+      "sha256": "0ac9824617386795e6b573809d30bf4a5dca5da3465a8b061301fcdae31ded00",
+      "bytes": 147760
     },
     {
       "path": "reports/reviews/academy-identity-local-browser-flow-checkpoint-20260811.md",
-      "sha256": "a34d9d5e712f3a34e4c9201899d621030215fc09230cf418e064f60698b177f1",
-      "bytes": 4726
+      "sha256": "d2d6621578c5d68ed81879b55869b1208d105e7fd79846e63c55e539f9171a5f",
+      "bytes": 5040
     }
   ]
 }

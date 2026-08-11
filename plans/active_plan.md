@@ -1939,7 +1939,7 @@ Package CYBERSKILLS Academy content as a **commercially licensed trainer starter
   pass focused 25/25, full unit 904/904, lint/typechecks, and the production Next build.
 - [x] Close the isolated independent checkpoint review at `C0/H0/M0/L0` with focused
   25/25, full unit 904/904, lint/typechecks, staged secret/diff checks, and route review.
-- [ ] Commit and push only the exact Identity journey paths without staging unrelated
-  Academy work.
+- [x] Commit and push only the exact Identity journey paths without staging unrelated
+  Academy work: Academy `9b096307cac6400cc6e7b6a8b7e54a5a770c4d1e` is verified on remote `main`.
 - [ ] Production remains disabled pending real endpoint/credential/key/email/runtime,
   deployment, operator, and separate release authorization.
