@@ -517,6 +517,32 @@ credential, strict-reader values, env, route, registry, DB หรือ deploy v
 conformance คง 15/23 (`65.2%`), readiness ไม่เพิ่ม, registry/runtime disabled
 และ production NO-GO.
 
+**Identity code-exchange runtime config projection checkpoint (2026-08-11):**
+Academy เพิ่ม pure data-only projector สำหรับ exact scalar config ของ future
+server composition. Input ต้องมี own enumerable data fields ห้าตัวตรงชุด,
+endpoint/client-assertion audience/timeout ต้อง absent ทั้งชุดหรือ valid ทั้งชุด,
+และ projector จะคืน usable values เฉพาะเมื่อทั้ง `enabled` กับ
+`releaseApproval` เป็น `true`; blocked result ไม่คืน endpoint หรือ authority
+ใด ๆ. Endpoint/timeout predicates ถูกแยกเป็น identity-local scalar policy เดียว
+ที่ response transport reuse จึงไม่ duplicate validation. Missing-module RED
+หยุดก่อน collection; GREEN ผ่าน focused config+transport 53/53, Identity 27
+files/420 tests, full unit 99 files/1,110 tests, producer 59/59 และ full
+lint/all TypeScript configs โดยมี generated warning เดิม 1 จุด. หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-code-exchange-runtime-config-local-checkpoint-2026-08-11.md`](../reports/reviews/academy-identity-code-exchange-runtime-config-local-checkpoint-2026-08-11.md).
+คำว่า `admitted` ใน module นี้เป็น local scalar classification เท่านั้น; gate
+provenance, env schema, fetch/reader/signer capabilities, runtime import, deploy
+และ production admission ยังอยู่นอก slice. Canonical state คง
+`enabled=false`, `releaseApproval=false`, `runtimeWired=false` และ production
+NO-GO. Different independent RIL แรกคืน `C0/H0/M1/L1`: empty trailing `?`/`#`
+ผ่าน URL checks เดิมเป็น noncanonical aliases และ report reader count stale.
+Remediation RED ล้ม 4 cases ขณะที่เดิมผ่าน 53; shared predicate ตอนนี้ require
+raw value เท่ากับ canonical origin+exact path ทำให้ aliases หยุดก่อน fetch
+method access. GREEN ผ่าน focused 57/57, Identity 424/424, full unit 1,114/1,114,
+producer 59/59 และ full lint/type. Different reviewer bind manifest 8/8,
+rerun focused 57/57, Identity
+424/424, producer 59/59 และ proportional static/security/reader gates แล้วผ่าน
+final `C0/H0/M0/L0`; source/test คง frozen semantic set เดิม.
+
 **Shared strict JSON response boundary checkpoint (2026-08-10):** Academy รับช่วง
 existing untracked BYOB + duplicate-safe parser จาก concurrent client work มา
 audit และเพิ่ม standalone adversarial suite โดยไม่ stage consumer/UI files. RED

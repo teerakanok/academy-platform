@@ -183,6 +183,8 @@ describe('Academy Identity code exchange response transport', () => {
     ['credentialed endpoint', 'https://user@accounts.example.test/v1/code/exchange', 1_000],
     ['fragment endpoint', `${ENDPOINT}#fragment`, 1_000],
     ['query endpoint', `${ENDPOINT}?tenant=academy`, 1_000],
+    ['empty query delimiter endpoint', `${ENDPOINT}?`, 1_000],
+    ['empty fragment delimiter endpoint', `${ENDPOINT}#`, 1_000],
     ['wrong route', 'https://accounts.example.test/v1/other', 1_000],
     ['noncanonical endpoint', 'https://ACCOUNTS.example.test/v1/code/exchange', 1_000],
     ['zero timeout', ENDPOINT, 0],

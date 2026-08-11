@@ -5,6 +5,41 @@
 
 ---
 
+## 2026-08-11 - Local Identity code-exchange runtime config projection implemented
+
+**Outcome:** Academy now has a pure exact-data projector for the scalar values
+needed by a future trusted server composition. It admits endpoint, assertion
+audience, and timeout values only when both consumer enablement and release
+approval are true. Every other valid gate combination yields a blocked result
+without usable values, and malformed dark configuration is rejected instead of
+being retained for later activation.
+
+The canonical endpoint and fetch-timeout predicates now live in one
+identity-local scalar-policy module shared by the projector and accepted
+response transport. The missing-module RED stopped before collection. GREEN
+initially passed focused config+transport 53/53, Academy Identity 27 files / 420 tests,
+full unit 99 files / 1,110 tests, Identity Control API/authorization/assertion
+59/59, and full lint plus all TypeScript configurations with one pre-existing
+generated-registry warning.
+
+**Review:** the first different independent RIL returned `C0/H0/M1/L1` because
+WHATWG URL parsing allowed trailing empty query/fragment delimiters as bytewise
+aliases, and the report reader count was stale. Remediation RED failed four new
+cases while 53 prior cases passed. The shared predicate now requires canonical
+origin-plus-path serialization; GREEN passes focused 57/57, Identity 424/424,
+full unit 1,114/1,114, producer 59/59, and full lint/typechecks. A regenerated
+freeze was verified by a different reviewer, who reran focused 57/57, Identity
+424/424, producer 59/59 and proportional static/security/reader gates and
+returned final `C0/H0/M0/L0`. Evidence is in
+`reports/reviews/academy-identity-code-exchange-runtime-config-local-checkpoint-2026-08-11.md`.
+
+**Residual risk:** `admitted` proves only local scalar coherence. A future
+trusted runtime must prove the enablement and release values' provenance and
+supply endpoint ownership, strict-reader values, fetch/signer/replay
+capabilities, durable transactions, operators, deployment evidence, and release
+authorization. The module reads no env and has no runtime import. Conformance
+remains 15/23; registry/runtime remain disabled and production remains NO-GO.
+
 ## 2026-08-11 - Local Identity final code-exchange port composition implemented
 
 **Outcome:** Academy now has one pure final factory that combines the accepted

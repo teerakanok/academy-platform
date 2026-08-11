@@ -1,0 +1,46 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/src/lib/identity/code-exchange-response-transport.ts",
+      "sha256": "2ba8e38a7b104807266e7160de7b86d862244f5abcd20cd50453571030d4a070",
+      "bytes": 4869
+    },
+    {
+      "path": "academy-web/src/lib/identity/code-exchange-runtime-config.ts",
+      "sha256": "13582808020737a61c283d9244186fd8353af4a7728a83c046a25af3a7f7c24a",
+      "bytes": 2710
+    },
+    {
+      "path": "academy-web/src/lib/identity/code-exchange-runtime-values.ts",
+      "sha256": "31a698ebc12156505fdb1cbfdda73e391589df9d9d487a738ee2594720c03301",
+      "bytes": 905
+    },
+    {
+      "path": "academy-web/tests/unit/identity-code-exchange-response-transport.test.ts",
+      "sha256": "85b6d0df4e431967ee4cbcb0eeaddb8d0ad7b516813b5090489280d52a572327",
+      "bytes": 16064
+    },
+    {
+      "path": "academy-web/tests/unit/identity-code-exchange-runtime-config.test.ts",
+      "sha256": "e95af84077f6b9942231d937228dc9163e8278e4c9bde50adf6e4f62cd3fe4e8",
+      "bytes": 7010
+    },
+    {
+      "path": "plans/active_plan.md",
+      "sha256": "b25c20545597f88e7c73d0e0996ca00f63c02bac4b17a8982fa880a5767779be",
+      "bytes": 198766
+    },
+    {
+      "path": "plans/completed_log.md",
+      "sha256": "a1bb700bd6416f9c6f0fa5bb6395b3d912d6f77fd8c19709c834342bb231ef6b",
+      "bytes": 136845
+    },
+    {
+      "path": "reports/reviews/academy-identity-code-exchange-runtime-config-local-checkpoint-2026-08-11.md",
+      "sha256": "e8e42a8ff96b01fbfb30e03626260d88cc31c118fd88072a5af6f53c9ef66c0a",
+      "bytes": 7201
+    }
+  ]
+}
