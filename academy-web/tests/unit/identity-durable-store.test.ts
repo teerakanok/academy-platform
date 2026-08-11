@@ -55,19 +55,19 @@ function noncanonicalDigestAlias(canonical: string): string {
   return alias
 }
 
-function withTempStore(test: (path: string) => void): void {
+async function withTempStore(test: (path: string) => void | Promise<void>): Promise<void> {
   const dir = mkdtempSync(join(tmpdir(), 'academy-identity-transaction-'))
   try {
-    test(join(dir, 'transactions.json'))
+    await test(join(dir, 'transactions.json'))
   } finally {
     rmSync(dir, { recursive: true, force: true })
   }
 }
 
 describe('local durable identity transaction store', () => {
-  it('survives a store instance restart and consumes state only once', () => {
-    withTempStore((path) => {
-      const started = beginIdentityAuthorization(new FileIdentityTransactionStore(path), registration, '/dashboard')
+  it('survives a store instance restart and consumes state only once', async () => {
+    await withTempStore(async (path) => {
+      const started = await beginIdentityAuthorization(new FileIdentityTransactionStore(path), registration, '/dashboard')
       expect(existsSync(`${path}.lock`)).toBe(false)
       const restarted = new FileIdentityTransactionStore(path)
 
@@ -89,11 +89,11 @@ describe('local durable identity transaction store', () => {
     })
   })
 
-  it('deletes an expired state durably before returning the expiry error', () => {
-    withTempStore((path) => {
+  it('deletes an expired state durably before returning the expiry error', async () => {
+    await withTempStore(async (path) => {
       let now = 10_000
       const store = new FileIdentityTransactionStore(path, { now: () => now, ttlMs: 1_000 })
-      const started = beginIdentityAuthorization(store, registration, '/dashboard')
+      const started = await beginIdentityAuthorization(store, registration, '/dashboard')
       now += 1_000
 
       expect(() => store.consume(started.state, started.browserBinding)).toThrowError(
@@ -105,8 +105,8 @@ describe('local durable identity transaction store', () => {
     })
   })
 
-  it('fails closed when the persistence file is corrupted', () => {
-    withTempStore((path) => {
+  it('fails closed when the persistence file is corrupted', async () => {
+    await withTempStore((path) => {
       writeFileSync(path, '{not-json', { mode: 0o600 })
 
       expect(() => new FileIdentityTransactionStore(path).consume('state-that-does-not-matter', randomBytes(32).toString('base64url'))).toThrow(
@@ -116,9 +116,9 @@ describe('local durable identity transaction store', () => {
     })
   })
 
-  it('persists only a digest of the browser binding in the versioned transaction file', () => {
-    withTempStore((path) => {
-      const started = beginIdentityAuthorization(new FileIdentityTransactionStore(path), registration, '/dashboard')
+  it('persists only a digest of the browser binding in the versioned transaction file', async () => {
+    await withTempStore(async (path) => {
+      const started = await beginIdentityAuthorization(new FileIdentityTransactionStore(path), registration, '/dashboard')
       const persistedText = readFileSync(path, 'utf8')
       const persisted = JSON.parse(persistedText) as {
         version: unknown
@@ -135,8 +135,8 @@ describe('local durable identity transaction store', () => {
     })
   })
 
-  it('rejects surplus transaction data before memory or file mutation', () => {
-    withTempStore((path) => {
+  it('rejects surplus transaction data before memory or file mutation', async () => {
+    await withTempStore((path) => {
       const marker = 'RAW_BROWSER_BINDING_MUST_NOT_PERSIST'
       const { browserBinding, input } = transactionFixture()
       const badInputs = [
@@ -160,8 +160,8 @@ describe('local durable identity transaction store', () => {
     })
   })
 
-  it('rejects accessor and hostile Proxy input without invoking hidden behavior or mutating storage', () => {
-    withTempStore((path) => {
+  it('rejects accessor and hostile Proxy input without invoking hidden behavior or mutating storage', async () => {
+    await withTempStore((path) => {
       const marker = 'credential=TOP_SECRET_TRANSACTION_PROXY'
       const { input } = transactionFixture()
       let getterCalls = 0
@@ -197,8 +197,8 @@ describe('local durable identity transaction store', () => {
     })
   })
 
-  it('rejects a noncanonical base64url alias for the same digest bytes', () => {
-    withTempStore((path) => {
+  it('rejects a noncanonical base64url alias for the same digest bytes', async () => {
+    await withTempStore((path) => {
       const { input } = transactionFixture()
       const alias = noncanonicalDigestAlias(input.browserBindingDigest)
       expect(alias).not.toBe(input.browserBindingDigest)
@@ -210,8 +210,8 @@ describe('local durable identity transaction store', () => {
     })
   })
 
-  it('rejects duplicate live state in memory and across file-store instances', () => {
-    withTempStore((path) => {
+  it('rejects duplicate live state in memory and across file-store instances', async () => {
+    await withTempStore((path) => {
       const { browserBinding, input } = transactionFixture()
       const memory = new InMemoryIdentityTransactionStore()
       memory.create(input)
@@ -230,9 +230,9 @@ describe('local durable identity transaction store', () => {
     })
   })
 
-  it('rejects a duplicate-state persisted file without consuming or rewriting it', () => {
-    withTempStore((path) => {
-      const started = beginIdentityAuthorization(new FileIdentityTransactionStore(path), registration, '/dashboard')
+  it('rejects a duplicate-state persisted file without consuming or rewriting it', async () => {
+    await withTempStore(async (path) => {
+      const started = await beginIdentityAuthorization(new FileIdentityTransactionStore(path), registration, '/dashboard')
       const persisted = JSON.parse(readFileSync(path, 'utf8')) as {
         transactions: Array<Record<string, unknown>>
       }
@@ -247,9 +247,9 @@ describe('local durable identity transaction store', () => {
     })
   })
 
-  it('fails closed without rewriting a legacy version-one transaction file', () => {
-    withTempStore((path) => {
-      const started = beginIdentityAuthorization(new FileIdentityTransactionStore(path), registration, '/dashboard')
+  it('fails closed without rewriting a legacy version-one transaction file', async () => {
+    await withTempStore(async (path) => {
+      const started = await beginIdentityAuthorization(new FileIdentityTransactionStore(path), registration, '/dashboard')
       const legacyText = readFileSync(path, 'utf8').replace('"version":2', '"version":1')
       writeFileSync(path, legacyText, { mode: 0o600 })
 
@@ -260,9 +260,9 @@ describe('local durable identity transaction store', () => {
     })
   })
 
-  it('fails closed without rewriting a malformed browser-binding digest', () => {
-    withTempStore((path) => {
-      const started = beginIdentityAuthorization(new FileIdentityTransactionStore(path), registration, '/dashboard')
+  it('fails closed without rewriting a malformed browser-binding digest', async () => {
+    await withTempStore(async (path) => {
+      const started = await beginIdentityAuthorization(new FileIdentityTransactionStore(path), registration, '/dashboard')
       const persisted = JSON.parse(readFileSync(path, 'utf8')) as {
         transactions: Array<Record<string, unknown>>
       }
@@ -277,11 +277,11 @@ describe('local durable identity transaction store', () => {
     })
   })
 
-  it('creates the parent directory before taking the first lock', () => {
+  it('creates the parent directory before taking the first lock', async () => {
     const dir = mkdtempSync(join(tmpdir(), 'academy-identity-nested-'))
     const path = join(dir, 'new', 'transactions.json')
     try {
-      expect(() => beginIdentityAuthorization(new FileIdentityTransactionStore(path), registration, '/dashboard')).not.toThrow()
+      await expect(beginIdentityAuthorization(new FileIdentityTransactionStore(path), registration, '/dashboard')).resolves.toBeDefined()
     } finally {
       rmSync(dir, { recursive: true, force: true })
     }

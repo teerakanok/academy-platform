@@ -5,6 +5,36 @@
 
 ---
 
+## 2026-08-11 - PostgreSQL authorization transaction store implemented
+
+**Outcome:** Academy now has a PostgreSQL-backed store for the short-lived
+authorization transaction used by the future Identity Control sign-in journey.
+Authorization start waits for durable creation, callback waits for an atomic
+one-time consume, raw browser-binding material is never persisted, and the
+transaction can survive a process restart or callback landing on another
+Academy instance. This is backend foundation; no customer-facing route or
+screen changed in this checkpoint.
+
+**Verification:** The missing-module RED was followed by focused unit GREEN
+`61/61`, local PostgreSQL GREEN `9/9`, existing profile-activation PostgreSQL
+`11/11`, full Academy unit `1,152/1,152`, and full lint plus all TypeScript
+configurations. The real database cases cover restart, one-time concurrent
+consume, digest-only persistence, wrong-binding preservation, expiry cleanup,
+lock-wait clock refresh, RPC-only runtime access, and denied direct table
+access. The local Supabase stack was stopped and verified absent afterward.
+
+**Review:** First independent RIL returned `C0/H0/M1/L0` because create and
+consume sampled database time before waits on unique-index or row locks. Two
+real-PostgreSQL RED cases reproduced stale time; the migration now refreshes
+time after arbitration or lock acquisition. A different closure reviewer
+verified the remediated manifest and returned final `C0/H0/M0/L0`.
+
+**Residual risk:** The store is not imported by a route and does not change the
+current sign-in experience. Registry/runtime remain disabled and production is
+NO-GO. The next product slice must compose authorization start, Account Center,
+callback exchange, profile activation, session issuance, and dashboard entry
+behind an explicit local-only gate, then prove that journey in a real browser.
+
 ## 2026-08-11 - Local Identity registered authorization redirect boundary implemented
 
 **Outcome:** Academy authorization start now accepts one exact client plus a

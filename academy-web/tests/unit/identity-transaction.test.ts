@@ -35,10 +35,37 @@ function verifier(): string {
 }
 
 describe('local identity transaction boundary', () => {
+  it('waits for the durable transaction create before exposing a browser handoff', async () => {
+    let releaseCreate: (() => void) | undefined
+    const create = vi.fn((input: Parameters<IdentityTransactionStore['create']>[0]) => new Promise((resolve) => {
+      releaseCreate = () => resolve({ ...input, expiresAt: Date.now() + 60_000 })
+    }))
+    const store = {
+      create,
+      consume: vi.fn(),
+    } as unknown as IdentityTransactionStore
+
+    const startedPromise = Promise.resolve(beginIdentityAuthorization(store, registration, '/dashboard'))
+    let settled = false
+    void startedPromise.then(() => { settled = true })
+    await Promise.resolve()
+
+    expect(create).toHaveBeenCalledOnce()
+    expect(settled).toBe(false)
+    expect(releaseCreate).toBeTypeOf('function')
+    releaseCreate?.()
+    await expect(startedPromise).resolves.toMatchObject({
+      request: {
+        clientId: client.clientId,
+        redirectUri: client.redirectUri,
+      },
+    })
+  })
+
   it('keeps state, PKCE verifier, and nonce on the server until one callback exchange', async () => {
     const adapter = new FakeIdentityAdapter(LOCAL_ISSUER, client.audience)
     const store = new InMemoryIdentityTransactionStore()
-    const started = beginIdentityAuthorization(store, registration, '/dashboard')
+    const started = await beginIdentityAuthorization(store, registration, '/dashboard')
     const code = adapter.issueCodeForTest(started.request, {
       subject: 'learner-1',
       verifiedEmail: 'learner@example.test',
@@ -78,7 +105,7 @@ describe('local identity transaction boundary', () => {
   it('binds the callback to the initiating browser without consuming state on mismatch', async () => {
     const adapter = new FakeIdentityAdapter(LOCAL_ISSUER, client.audience)
     const store = new InMemoryIdentityTransactionStore()
-    const started = beginIdentityAuthorization(store, registration, '/dashboard')
+    const started = await beginIdentityAuthorization(store, registration, '/dashboard')
     const code = adapter.issueCodeForTest(started.request, {
       subject: 'learner-browser-binding',
       verifiedEmail: 'browser-binding@example.test',
@@ -120,15 +147,15 @@ describe('local identity transaction boundary', () => {
     expect(exchangeCode).toHaveBeenCalledOnce()
   })
 
-  it('keeps the browser binding out of the authorization request', () => {
-    const started = beginIdentityAuthorization(new InMemoryIdentityTransactionStore(), registration, '/dashboard')
+  it('keeps the browser binding out of the authorization request', async () => {
+    const started = await beginIdentityAuthorization(new InMemoryIdentityTransactionStore(), registration, '/dashboard')
 
     expect(started.browserBinding).toMatch(/^[A-Za-z0-9_-]{43}$/)
     expect(started.request).not.toHaveProperty('browserBinding')
     expect(JSON.stringify(started.request)).not.toContain(started.browserBinding)
   })
 
-  it('rejects surplus, accessor, and hostile Proxy client metadata before creating a transaction', () => {
+  it('rejects surplus, accessor, and hostile Proxy client metadata before creating a transaction', async () => {
     const create = vi.fn<IdentityTransactionStore['create']>((input) => ({ ...input, expiresAt: Date.now() + 60_000 }))
     const store: IdentityTransactionStore = {
       create,
@@ -158,7 +185,7 @@ describe('local identity transaction boundary', () => {
     ]) {
       let captured: unknown
       try {
-        beginIdentityAuthorization(store, {
+        await beginIdentityAuthorization(store, {
           client: candidate,
           redirectUris: [client.redirectUri],
         } as unknown as LocalIdentityAuthorizationRegistration, '/dashboard')
@@ -173,7 +200,7 @@ describe('local identity transaction boundary', () => {
     expect(create).not.toHaveBeenCalled()
   })
 
-  it('requires the selected callback to exactly match one canonical registered redirect before mutation', () => {
+  it('requires the selected callback to exactly match one canonical registered redirect before mutation', async () => {
     const create = vi.fn<IdentityTransactionStore['create']>((input) => ({ ...input, expiresAt: Date.now() + 60_000 }))
     const store: IdentityTransactionStore = {
       create,
@@ -191,10 +218,10 @@ describe('local identity transaction boundary', () => {
       newVerifier,
     )
 
-    expect(() => start({
+    await expect(start({
       client: productionClient,
       redirectUris: [productionClient.redirectUri],
-    })).not.toThrow()
+    })).resolves.toBeDefined()
     expect(create).toHaveBeenCalledOnce()
     expect(newVerifier).toHaveBeenCalledOnce()
 
@@ -222,13 +249,13 @@ describe('local identity transaction boundary', () => {
     ]) {
       create.mockClear()
       newVerifier.mockClear()
-      expect(() => start(candidate)).toThrow(IdentityTransactionStoreError)
+      await expect(start(candidate)).rejects.toBeInstanceOf(IdentityTransactionStoreError)
       expect(create).not.toHaveBeenCalled()
       expect(newVerifier).not.toHaveBeenCalled()
     }
   })
 
-  it('bounds and snapshots registered redirects before attacker-controlled enumeration or getters', () => {
+  it('bounds and snapshots registered redirects before attacker-controlled enumeration or getters', async () => {
     const create = vi.fn<IdentityTransactionStore['create']>((input) => ({ ...input, expiresAt: Date.now() + 60_000 }))
     const store: IdentityTransactionStore = {
       create,
@@ -268,7 +295,7 @@ describe('local identity transaction boundary', () => {
     for (const redirectUris of [overbound, accessor, symbolEntry, sparse, hostile]) {
       let captured: unknown
       try {
-        beginIdentityAuthorization(store, { client: productionClient, redirectUris }, '/dashboard', newVerifier)
+        await beginIdentityAuthorization(store, { client: productionClient, redirectUris }, '/dashboard', newVerifier)
       } catch (error) {
         captured = error
       }
@@ -295,7 +322,7 @@ describe('local identity transaction boundary', () => {
   it('rejects an exchange result whose audience, service, or nonce differs from the local transaction', async () => {
     const adapter = new FakeIdentityAdapter(LOCAL_ISSUER, client.audience)
     const store = new InMemoryIdentityTransactionStore()
-    const started = beginIdentityAuthorization(store, registration, '/courses')
+    const started = await beginIdentityAuthorization(store, registration, '/courses')
     const code = adapter.issueCodeForTest(started.request, {
       subject: 'learner-2',
       verifiedEmail: 'learner2@example.test',
@@ -322,7 +349,7 @@ describe('local identity transaction boundary', () => {
   it('returns a fresh verified projection instead of the adapter result object', async () => {
     const adapter = new FakeIdentityAdapter(LOCAL_ISSUER, client.audience)
     const store = new InMemoryIdentityTransactionStore()
-    const started = beginIdentityAuthorization(store, registration, '/courses')
+    const started = await beginIdentityAuthorization(store, registration, '/courses')
     const code = adapter.issueCodeForTest(started.request, {
       subject: 'learner-projection',
       verifiedEmail: 'projection@example.test',
@@ -359,7 +386,7 @@ describe('local identity transaction boundary', () => {
   it('rejects an exchange result from a different issuer', async () => {
     const adapter = new FakeIdentityAdapter(LOCAL_ISSUER, client.audience)
     const store = new InMemoryIdentityTransactionStore()
-    const started = beginIdentityAuthorization(store, registration, '/courses')
+    const started = await beginIdentityAuthorization(store, registration, '/courses')
     const code = adapter.issueCodeForTest(started.request, {
       subject: 'learner-wrong-issuer',
       verifiedEmail: 'wrong-issuer@example.test',
@@ -389,7 +416,7 @@ describe('local identity transaction boundary', () => {
   it('rejects surplus adapter fields before returning the callback result', async () => {
     const adapter = new FakeIdentityAdapter(LOCAL_ISSUER, client.audience)
     const store = new InMemoryIdentityTransactionStore()
-    const started = beginIdentityAuthorization(store, registration, '/courses')
+    const started = await beginIdentityAuthorization(store, registration, '/courses')
     const code = adapter.issueCodeForTest(started.request, {
       subject: 'learner-surplus',
       verifiedEmail: 'surplus@example.test',
@@ -415,27 +442,27 @@ describe('local identity transaction boundary', () => {
     ).rejects.toMatchObject({ reason: 'invalid_result' } satisfies Partial<IdentityTransactionError>)
   })
 
-  it('expires a transaction before any exchange is attempted', () => {
+  it('expires a transaction before any exchange is attempted', async () => {
     let now = 100
     const store = new InMemoryIdentityTransactionStore({ now: () => now, ttlMs: 1_000 })
-    const started = beginIdentityAuthorization(store, registration, '/dashboard')
+    const started = await beginIdentityAuthorization(store, registration, '/dashboard')
     now += 1_001
 
     expect(() => store.consume(started.state, started.browserBinding)).toThrow(/หมดอายุ/)
   })
 
-  it('treats the exact expiry millisecond as expired', () => {
+  it('treats the exact expiry millisecond as expired', async () => {
     let now = 100
     const store = new InMemoryIdentityTransactionStore({ now: () => now, ttlMs: 1_000 })
-    const started = beginIdentityAuthorization(store, registration, '/dashboard')
+    const started = await beginIdentityAuthorization(store, registration, '/dashboard')
     now += 1_000
 
     expect(() => store.consume(started.state, started.browserBinding)).toThrow(/หมดอายุ/)
   })
 
-  it('uses S256 PKCE and never creates a verifier from browser input', () => {
+  it('uses S256 PKCE and never creates a verifier from browser input', async () => {
     const store = new InMemoryIdentityTransactionStore()
-    const started = beginIdentityAuthorization(store, registration, '/dashboard', () => verifier())
+    const started = await beginIdentityAuthorization(store, registration, '/dashboard', () => verifier())
 
     expect(started.request.codeChallengeMethod).toBe('S256')
     expect(started.request.codeChallenge).toMatch(/^[A-Za-z0-9_-]{43}$/)
@@ -445,25 +472,25 @@ describe('local identity transaction boundary', () => {
     )
   })
 
-  it('does not broaden the Identity Control local callback rule to a numeric loopback host', () => {
+  it('does not broaden the Identity Control local callback rule to a numeric loopback host', async () => {
     const store = new InMemoryIdentityTransactionStore()
-    expect(() =>
+    await expect(
       beginIdentityAuthorization(store, {
         client: { ...client, redirectUri: 'http://127.0.0.1:3000/auth/callback' },
         redirectUris: [client.redirectUri],
       }, '/dashboard'),
-    ).toThrow(/loopback HTTP/)
+    ).rejects.toThrow(/loopback HTTP/)
   })
 
-  it('does not retain an arbitrary return URL in the server transaction', () => {
+  it('does not retain an arbitrary return URL in the server transaction', async () => {
     const store = new InMemoryIdentityTransactionStore()
-    expect(() => beginIdentityAuthorization(store, registration, 'https://evil.example')).toThrow(/return path/)
+    await expect(beginIdentityAuthorization(store, registration, 'https://evil.example')).rejects.toThrow(/return path/)
   })
 
   it('rejects a zero activation revision because the canonical exchange contract starts at 1', async () => {
     const adapter = new FakeIdentityAdapter(LOCAL_ISSUER, client.audience)
     const store = new InMemoryIdentityTransactionStore()
-    const started = beginIdentityAuthorization(store, registration, '/dashboard')
+    const started = await beginIdentityAuthorization(store, registration, '/dashboard')
     const code = adapter.issueCodeForTest(
       started.request,
       { subject: 'learner-revision', verifiedEmail: 'revision@example.test' },
@@ -485,7 +512,7 @@ describe('local identity transaction boundary', () => {
   it('does not exchange a code without server-held client authentication material', async () => {
     const adapter = new FakeIdentityAdapter(LOCAL_ISSUER, client.audience)
     const store = new InMemoryIdentityTransactionStore()
-    const started = beginIdentityAuthorization(store, registration, '/dashboard')
+    const started = await beginIdentityAuthorization(store, registration, '/dashboard')
     const code = adapter.issueCodeForTest(started.request, {
       subject: 'learner-authn',
       verifiedEmail: 'authn@example.test',
@@ -506,7 +533,7 @@ describe('local identity transaction boundary', () => {
   it('gives the signer the registered code-exchange audience', async () => {
     const adapter = new FakeIdentityAdapter(LOCAL_ISSUER, client.audience)
     const store = new InMemoryIdentityTransactionStore()
-    const started = beginIdentityAuthorization(store, registration, '/dashboard')
+    const started = await beginIdentityAuthorization(store, registration, '/dashboard')
     const code = adapter.issueCodeForTest(started.request, {
       subject: 'learner-audience',
       verifiedEmail: 'audience@example.test',

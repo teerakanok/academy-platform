@@ -1,0 +1,66 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/src/lib/identity/postgres-transaction-store.ts",
+      "sha256": "e387ecfa5e4e2e1f09ddf25ce644c1b015ff34b265e47fcc73c7e3ed9083af12",
+      "bytes": 10967
+    },
+    {
+      "path": "academy-web/src/lib/identity/transaction.ts",
+      "sha256": "eacb681c06ed960c5d97dca8099215b6792ead3b141e4b09208a4991d1548ca4",
+      "bytes": 25171
+    },
+    {
+      "path": "academy-web/supabase/migrations/0025_identity_authorization_transaction.sql",
+      "sha256": "14934b499d3cb1a27751c8e3552577b0aa5c55bd8c649e5f67187cea1155e94d",
+      "bytes": 9959
+    },
+    {
+      "path": "academy-web/tests/integration/identity-postgres-transaction-store.test.ts",
+      "sha256": "de516c1b8cfe993da74aa05a5997f470ac9e7d10f225aca2cb1962544010ebda",
+      "bytes": 16390
+    },
+    {
+      "path": "academy-web/tests/unit/identity-code-exchange-adapter.test.ts",
+      "sha256": "028332c3587beda54f2a5b0651f7e36f6398e2af5d6c74a268aec334fbb4add4",
+      "bytes": 7659
+    },
+    {
+      "path": "academy-web/tests/unit/identity-code-exchange-port.test.ts",
+      "sha256": "23dcf58fc57fe0453a804001f128163ab58597dcb9b2e361f817e24b4abd8dd0",
+      "bytes": 10377
+    },
+    {
+      "path": "academy-web/tests/unit/identity-durable-store.test.ts",
+      "sha256": "03e12576ca4c644bd4d059071876ec1b8fe1e58ef0f71f741a13cd4e0b8ddc12",
+      "bytes": 12712
+    },
+    {
+      "path": "academy-web/tests/unit/identity-postgres-transaction-store.test.ts",
+      "sha256": "e4a95ca765998dd10893e8eb99caf7f46e99e2d580ff2a6eb48c869c7b9b86c1",
+      "bytes": 12270
+    },
+    {
+      "path": "academy-web/tests/unit/identity-transaction.test.ts",
+      "sha256": "0ad77196d838ed74d9f9c9bab38495d25886a8b78d0bbe0c525f59ea3b4423d6",
+      "bytes": 22961
+    },
+    {
+      "path": "plans/active_plan.md",
+      "sha256": "3c4584aebe636cf1ca907d4006f08c6772de77373c6acff36e5385b140d5d2f5",
+      "bytes": 207192
+    },
+    {
+      "path": "plans/completed_log.md",
+      "sha256": "aa9c44177f8551520e3c18a38ba3a7ff547674bf280d2ff40f23ad261aa020fe",
+      "bytes": 146135
+    },
+    {
+      "path": "reports/reviews/academy-identity-postgres-transaction-store-local-checkpoint-2026-08-11.md",
+      "sha256": "cec806f28d0b1f078169c4411d031c9df9e9fb4ed97d30c5a0743ad247e61a7b",
+      "bytes": 6819
+    }
+  ]
+}

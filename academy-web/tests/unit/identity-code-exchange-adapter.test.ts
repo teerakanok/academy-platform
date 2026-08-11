@@ -134,7 +134,7 @@ describe('Academy Identity code exchange adapter', () => {
 
   it('drives the real local callback seam without broad adapter authority', async () => {
     const store = new InMemoryIdentityTransactionStore()
-    const started = beginIdentityAuthorization(store, REGISTRATION, '/dashboard', () => REQUEST.codeVerifier)
+    const started = await beginIdentityAuthorization(store, REGISTRATION, '/dashboard', () => REQUEST.codeVerifier)
     let receivedEndpoint: unknown
     let receivedInit: RequestInit | undefined
     const operation = createIdentityCodeExchangeTransport({

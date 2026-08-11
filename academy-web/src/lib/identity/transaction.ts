@@ -62,8 +62,8 @@ export interface PendingIdentityTransaction {
 export type PendingIdentityTransactionInput = Omit<PendingIdentityTransaction, 'expiresAt'>
 
 export interface IdentityTransactionStore {
-  create(input: PendingIdentityTransactionInput): PendingIdentityTransaction
-  consume(state: string, browserBinding: string): PendingIdentityTransaction
+  create(input: PendingIdentityTransactionInput): PendingIdentityTransaction | PromiseLike<PendingIdentityTransaction>
+  consume(state: string, browserBinding: string): PendingIdentityTransaction | PromiseLike<PendingIdentityTransaction>
 }
 
 export interface IdentityCallback {
@@ -99,7 +99,7 @@ export class InMemoryIdentityTransactionStore {
   }
 
   create(input: PendingIdentityTransactionInput): PendingIdentityTransaction {
-    const exactInput = snapshotPendingTransactionInput(input)
+    const exactInput = snapshotPendingIdentityTransactionInput(input)
     const now = this.now()
     const existing = this.transactions.get(exactInput.state)
     if (existing && existing.expiresAt > now) {
@@ -251,10 +251,10 @@ function snapshotAuthorizationRegistration(value: unknown): LocalIdentityAuthori
   return { client, redirectUris }
 }
 
-function snapshotPendingTransactionInput(value: unknown): PendingIdentityTransactionInput {
+export function snapshotPendingIdentityTransactionInput(value: unknown): PendingIdentityTransactionInput {
   const candidate = snapshotExactDataRecord(value, TRANSACTION_INPUT_KEYS)
   if (
-    typeof candidate.state !== 'string' || !OPAQUE_VALUE.test(candidate.state) ||
+    !isCanonicalIdentityTransactionState(candidate.state) ||
     typeof candidate.codeVerifier !== 'string' || !CODE_VERIFIER.test(candidate.codeVerifier) ||
     typeof candidate.nonce !== 'string' || !OPAQUE_VALUE.test(candidate.nonce) ||
     typeof candidate.browserBindingDigest !== 'string' ||
@@ -273,9 +273,9 @@ function snapshotPendingTransactionInput(value: unknown): PendingIdentityTransac
   }
 }
 
-function snapshotPersistedTransaction(value: unknown): PendingIdentityTransaction {
+export function snapshotPendingIdentityTransaction(value: unknown): PendingIdentityTransaction {
   const candidate = snapshotExactDataRecord(value, PERSISTED_TRANSACTION_KEYS)
-  const input = snapshotPendingTransactionInput({
+  const input = snapshotPendingIdentityTransactionInput({
     state: candidate.state,
     codeVerifier: candidate.codeVerifier,
     nonce: candidate.nonce,
@@ -347,7 +347,7 @@ export class FileIdentityTransactionStore implements IdentityTransactionStore {
   }
 
   create(input: PendingIdentityTransactionInput): PendingIdentityTransaction {
-    const exactInput = snapshotPendingTransactionInput(input)
+    const exactInput = snapshotPendingIdentityTransactionInput(input)
     return withExclusiveFileStoreLock(this.filePath, () => {
       const now = this.now()
       const state = this.read().filter((transaction) => transaction.expiresAt > now)
@@ -397,7 +397,7 @@ export class FileIdentityTransactionStore implements IdentityTransactionStore {
       if (file.version !== 2 || !Array.isArray(file.transactions)) {
         throw new IdentityTransactionStoreError('identity transaction store มีรูปแบบไม่ถูกต้อง')
       }
-      const transactions = file.transactions.map(snapshotPersistedTransaction)
+      const transactions = file.transactions.map(snapshotPendingIdentityTransaction)
       if (new Set(transactions.map((transaction) => transaction.state)).size !== transactions.length) {
         throw new IdentityTransactionStoreError('identity transaction store มี state ซ้ำกัน')
       }
@@ -449,10 +449,20 @@ function decodeCanonicalSha256(value: unknown): Buffer | null {
   return decoded.length === 32 && decoded.toString('base64url') === value ? decoded : null
 }
 
+export function isCanonicalIdentityTransactionState(value: unknown): value is string {
+  return typeof value === 'string' && OPAQUE_VALUE.test(value)
+}
+
+export function digestIdentityBrowserBinding(browserBinding: unknown): string | null {
+  if (typeof browserBinding !== 'string' || !OPAQUE_VALUE.test(browserBinding)) return null
+  return createHash('sha256').update(browserBinding).digest('base64url')
+}
+
 function matchesBrowserBinding(expectedDigest: string, browserBinding: unknown): boolean {
   const expected = decodeCanonicalSha256(expectedDigest)
-  if (!expected || typeof browserBinding !== 'string' || !OPAQUE_VALUE.test(browserBinding)) return false
-  const actual = createHash('sha256').update(browserBinding).digest()
+  const actualDigest = digestIdentityBrowserBinding(browserBinding)
+  if (!expected || !actualDigest) return false
+  const actual = Buffer.from(actualDigest, 'base64url')
   return timingSafeEqual(expected, actual)
 }
 
@@ -494,12 +504,12 @@ function isCanonicalRegisteredRedirectUri(value: string): boolean {
 }
 
 /** Starts authorization and returns a separate raw binding for a future HttpOnly cookie setter. */
-export function beginIdentityAuthorization(
+export async function beginIdentityAuthorization(
   store: IdentityTransactionStore,
   registration: LocalIdentityAuthorizationRegistration,
   returnPath: string,
   newVerifier: () => string = () => opaque(48),
-): { state: string; browserBinding: string; codeVerifier: string; request: AuthorizationRequest } {
+): Promise<{ state: string; browserBinding: string; codeVerifier: string; request: AuthorizationRequest }> {
   const exactClient = snapshotAuthorizationRegistration(registration).client
   requireInternalReturnPath(returnPath)
   const state = opaque()
@@ -519,7 +529,7 @@ export function beginIdentityAuthorization(
     codeChallengeMethod: 'S256',
     serviceId: exactClient.serviceId,
   }
-  store.create({
+  await store.create({
     state,
     codeVerifier,
     nonce,
@@ -560,7 +570,7 @@ export async function completeIdentityCallback({
   browserBinding: string
   clientAssertionProvider: IdentityClientAssertionProvider
 }): Promise<{ exchange: ExchangeResult; returnPath: string }> {
-  const transaction = store.consume(callback.state, browserBinding)
+  const transaction = await store.consume(callback.state, browserBinding)
   if (
     transaction.client.clientId !== client.clientId ||
     transaction.client.redirectUri !== client.redirectUri ||

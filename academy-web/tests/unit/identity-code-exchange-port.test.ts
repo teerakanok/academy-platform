@@ -273,7 +273,7 @@ describe('Academy Identity final code exchange port composition', () => {
 
   it('completes the real local callback seam without a broad adapter', async () => {
     const store = new InMemoryIdentityTransactionStore()
-    const started = beginIdentityAuthorization(store, REGISTRATION, '/dashboard', () => REQUEST.codeVerifier)
+    const started = await beginIdentityAuthorization(store, REGISTRATION, '/dashboard', () => REQUEST.codeVerifier)
     const port = createIdentityCodeExchangePort({
       config: ADMITTED_CONFIG,
       fetchPort: {

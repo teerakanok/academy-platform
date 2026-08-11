@@ -46,6 +46,24 @@ wire. ดู
 `reports/reviews/academy-identity-control-preparation-2026-08-06.md` และ
 `reports/integration/academy-identity-control-consumer-registration-candidate-2026-08-06.md`.
 
+**Identity authorization PostgreSQL transaction store (2026-08-11):** Academy
+มี durable local adapter + migration `0025` สำหรับ state, PKCE verifier, nonce,
+browser-binding digest, exact client projection และ return path แล้ว.
+Authorization start รอ durable create ก่อนส่ง browser ออก; callback รอ atomic
+consume ก่อน exchange. Real local PostgreSQL ผ่าน 9/9 โดยพิสูจน์ restart,
+one-time concurrent consume, wrong-binding preservation, expiry cleanup และ
+runtime RPC-only ACL; focused unit ผ่าน 61/61, full unit 1,152/1,152 และ full
+lint/typechecks ผ่าน. หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-postgres-transaction-store-local-checkpoint-2026-08-11.md`](../reports/reviews/academy-identity-postgres-transaction-store-local-checkpoint-2026-08-11.md).
+First independent RIL คืน `C0/H0/M1/L0` เพราะ create/consume ใช้ DB clock ที่
+snapshot ก่อนรอ row/unique lock. Real PostgreSQL RED ผ่าน 7 และล้ม 2 กรณี;
+migration refresh clock หลัง arbitration/lock แล้ว GREEN ผ่าน 9/9 พร้อม focused
+61/61. Different closure RIL verify manifest 11/11 และผ่าน final
+`C0/H0/M0/L0`. Slice นี้ยังไม่มี route caller หรือผลที่
+ลูกค้าเห็น; งานถัดไปคือ compose local-disabled authorization start -> callback ->
+profile activation -> session แล้วพิสูจน์ด้วย real browser ก่อนเพิ่ม hardening
+ย่อยอื่น.
+
 การสร้าง principal ใหม่ไม่เชื่อมหรือย้าย waitlist lead ด้วย email; migration `0021`
 จะ null ความสัมพันธ์ legacy เดิมโดยเก็บ lead/consent ไว้. Code exchange local
 boundary รับ client assertion ในรูป compact JWS จาก signer ฝั่ง server เท่านั้น และ
