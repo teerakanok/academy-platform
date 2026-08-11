@@ -5,6 +5,33 @@
 
 ---
 
+## 2026-08-11 - Local Identity final code-exchange port composition implemented
+
+**Outcome:** Academy now has one pure final factory that combines the accepted
+response/JSON transport with the accepted least-capability adapter and returns
+an `IdentityCodeExchangePort`. The port's one request-scoped authority is code
+exchange through the injected operation; it exposes no raw fetch,
+endpoint/configuration, authorization-start, registry, or production-admission
+surface. Parsed output remains `unknown` until the callback verifier accepts it.
+
+The missing-module RED stopped before collection. GREEN passes focused 8/8,
+callback/code-exchange seam 112/112, Academy Identity 26 files / 397 tests, full
+unit 98 files / 1,087 tests, and Identity Control API, authorization, and
+assertion regression 59/59. Full lint and all TypeScript configurations pass
+with one pre-existing generated-registry warning.
+
+**Review:** different independent RIL verified the manifest, reran focused 8/8,
+seam 112/112, Academy Identity 397/397, producer 59/59 and proportional
+static/security/reader gates, then returned final `C0/H0/M0/L0`. Evidence is in
+`reports/reviews/academy-identity-code-exchange-port-local-checkpoint-2026-08-11.md`.
+
+**Residual risk:** canonical conformance remains 15/23 and readiness does not
+increase. The module is pure and unwired. Exact production endpoint, protected
+signer and rotation, replay storage, strict-reader values, durable callback and
+activation transactions, operators, deployment, and release authorization
+remain separate gates. Registry/runtime stay disabled and production remains
+NO-GO.
+
 ## 2026-08-11 - Local Identity code-exchange least-capability adapter implemented
 
 **Outcome:** Academy now exposes the accepted composed code-exchange operation

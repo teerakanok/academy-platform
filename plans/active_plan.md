@@ -500,6 +500,23 @@ static/security/reader gates แล้วผ่าน final `C0/H0/M0/L0`. Slice
 endpoint/credential, registry, route, DB หรือ deploy value; conformance คง 15/23
 (`65.2%`), readiness ไม่เพิ่ม, registry/runtime disabled และ production NO-GO.
 
+**Identity final code-exchange port composition checkpoint (2026-08-11):**
+Academy เพิ่ม pure final factory ที่ compose accepted response/JSON transport
+กับ least-capability adapter แล้วคืน `IdentityCodeExchangePort` โดยตรง. Port มี
+request-scoped exchange authority แต่ไม่เปิด raw fetch, endpoint/configuration,
+authorization-start, registry หรือ production-admission surface. Missing-module
+RED หยุดก่อน collection; GREEN ผ่าน focused 8/8, callback/code-exchange seam
+112/112, Academy Identity 26 files/397 tests, full unit 98 files/1,087 tests,
+Identity producer API+authorization+assertion 59/59 และ full lint/all TypeScript
+configs ผ่านโดยมี generated warning เดิม 1 จุด. หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-code-exchange-port-local-checkpoint-2026-08-11.md`](../reports/reviews/academy-identity-code-exchange-port-local-checkpoint-2026-08-11.md).
+Different independent RIL bind manifest, rerun focused 8/8, seam 112/112,
+Academy Identity 397/397, producer 59/59 และ proportional
+static/security/reader gates แล้วผ่าน final `C0/H0/M0/L0`. Slice นี้ไม่เลือก endpoint,
+credential, strict-reader values, env, route, registry, DB หรือ deploy value;
+conformance คง 15/23 (`65.2%`), readiness ไม่เพิ่ม, registry/runtime disabled
+และ production NO-GO.
+
 **Shared strict JSON response boundary checkpoint (2026-08-10):** Academy รับช่วง
 existing untracked BYOB + duplicate-safe parser จาก concurrent client work มา
 audit และเพิ่ม standalone adversarial suite โดยไม่ stage consumer/UI files. RED
