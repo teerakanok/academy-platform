@@ -5,6 +5,29 @@
 
 ---
 
+## 2026-08-11 - Local Identity code-exchange transport composition implemented
+
+**Outcome:** Academy now has one pure factory that composes the accepted
+code-exchange response transport and strict JSON operation. It captures the
+injected endpoint, timeout, fetch port, and strict reader once, preserves nested
+port receivers, and returns parsed data as `unknown` for the transaction-bound
+result verifier.
+
+**Verification:** Missing-module RED stopped before collection. GREEN passes
+focused 7/7, response+JSON+result seam 80/80, Academy Identity 24 files / 382
+tests, full unit 96 files / 1,072 tests, Identity Control API/authorization/
+assertion 59/59, and full lint/all TypeScript configs. Different independent RIL
+verified the exact freeze, reran proportional code/security/reader gates, and
+returned final `C0/H0/M0/L0`. Evidence is in
+`reports/reviews/academy-identity-code-exchange-transport-local-checkpoint-2026-08-11.md`.
+
+**Residual risk:** This composition has no runtime import and adds no conformance
+or production-readiness points. The exact approved endpoint, protected signer
+and key rotation, deployed replay storage, strict reader values, durable callback
+and activation transactions, operators, deployment evidence, and separate
+release authorization remain external. Registry/runtime stay disabled and
+production remains NO-GO.
+
 ## 2026-08-11 - Local Identity code-exchange response transport implemented
 
 **Outcome:** Academy now has a pure injected HTTP boundary for the exact
