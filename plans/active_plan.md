@@ -352,6 +352,28 @@ exact values, public-key registration/rotation, HTTP/scheduler/deploy/release �
 เป็น external gates. `enabled=false`, `releaseApproval=false`,
 `runtimeWired=false` และ production NO-GO คงเดิม.
 
+**Identity client-assertion canonical conformance refresh (2026-08-11):**
+Academy เพิ่ม focused composition ที่ใช้ JTI source, provider และ Web Crypto
+signer ที่ผ่าน RIL ร่วมกันเพื่อสร้าง ES256 assertion จริงสองใบสำหรับ exact
+`academy-web` + code-exchange audience, ตรวจ signature/claims/lifetime/JTI และ
+reject wrong audience ก่อนขอ JTI เพิ่ม. Generator RED หยุดเพราะยังไม่มี
+client-assertion scenario export; GREEN ผ่าน 5/5 หลัง source-bind integration test
+กับ final provider/JTI/signer reports+manifests. Identity regression ผ่าน 288/288,
+full unit 92 files/978 tests, producer assertion+lifecycle 22/22 และ full lint/
+TypeScript ผ่านโดยมี generated warning เดิม 1 จุด. Canonical ledger ขยับ
+จาก 14 pass/9 not-proven เป็น 15 pass/8 not-proven โดยยังคง `enabled=false`,
+`releaseApproval=false`, `runtimeWired=false` และ production NO-GO. Generator
+current check, final canonical intake 23 verified/15 pass/8 not-proven และ
+freeze manifest 9 files ผ่านใน author freeze; first RIL history และ final
+closure อยู่ด้านล่าง. Public-key registration/rotation, deployed replay store,
+endpoint/runtime/operator/deploy/release ยังเป็น external gates.
+First different RIL พบ `C0/H0/M1/L0`: composition test ถูกใส่ verdict ทั้งที่
+ไม่มี review report และ machine evidence ยังไม่ bind producer verifier/replay.
+Test-only RED ผ่าน 4/6; remediation แยก test evidence ออกจาก reviewed checkpoint,
+ลบ empty report/self-verdict, bind exact Identity verifier+replay test digests และ
+เพิ่ม drift rejection จน generator GREEN 6/6. Different closure RIL bind exact
+nine-file manifest และผ่าน final `C0/H0/M0/L0`.
+
 **Shared strict JSON response boundary checkpoint (2026-08-10):** Academy รับช่วง
 existing untracked BYOB + duplicate-safe parser จาก concurrent client work มา
 audit และเพิ่ม standalone adversarial suite โดยไม่ stage consumer/UI files. RED

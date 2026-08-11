@@ -1,7 +1,7 @@
 {
   "schema": "academy-identity-control-local-evidence/v1",
-  "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
-  "identityControlSourceRevision": "a6ef1f430e1939a76fdccdcc35a1da41ff7a4606",
+  "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
+  "identityControlSourceRevision": "ad97ba2236bddbc4857d45359bb37b032aebbb05",
   "registryEnabled": false,
   "releaseApproval": false,
   "runtimeWired": false,
@@ -27,6 +27,74 @@
     }
   },
   "checkpoints": [
+    {
+      "id": "client-assertion-provider",
+      "verdict": "C0/H0/M0/L0",
+      "report": {
+        "path": "reports/reviews/academy-identity-client-assertion-provider-local-checkpoint-2026-08-11.md",
+        "sha256": "9518d4ededd4dae566140003700ee09b8d80024143aabd8c20528a2b65546547"
+      },
+      "freezeManifest": {
+        "path": "reports/reviews/academy-identity-client-assertion-provider-freeze-20260811.json",
+        "sha256": "962ffd42dd848a1496237b0c55ba5021cffb78a8d3c3e35175985c61b341e27d"
+      },
+      "scenarios": [
+        "exchange.client-assertion"
+      ]
+    },
+    {
+      "id": "client-assertion-jti-source",
+      "verdict": "C0/H0/M0/L0",
+      "report": {
+        "path": "reports/reviews/academy-identity-client-assertion-jti-source-local-checkpoint-2026-08-11.md",
+        "sha256": "cc870a5c9ffb473c95822a6b389f6b8292080170f502b6a3a0bdca0ba07d99f6"
+      },
+      "freezeManifest": {
+        "path": "reports/reviews/academy-identity-client-assertion-jti-source-freeze-20260811.json",
+        "sha256": "e44344fae1580429ea3fa5b666b0872919e3f448c5e3fc65b2aeb3b26a37b652"
+      },
+      "scenarios": [
+        "exchange.client-assertion"
+      ]
+    },
+    {
+      "id": "client-assertion-webcrypto-signer",
+      "verdict": "C0/H0/M0/L0",
+      "report": {
+        "path": "reports/reviews/academy-identity-client-assertion-webcrypto-signer-local-checkpoint-2026-08-11.md",
+        "sha256": "3b0870639b0244531df9aeeea096f6ab55749102f0aa939b88fc7a4d191f5a76"
+      },
+      "freezeManifest": {
+        "path": "reports/reviews/academy-identity-client-assertion-webcrypto-signer-freeze-20260811.json",
+        "sha256": "b056eafdc00fa833dc2c2777235dbcc80c8b8f926e02f333c22f5d6d5a1f6ec7"
+      },
+      "scenarios": [
+        "exchange.client-assertion"
+      ]
+    },
+    {
+      "id": "client-assertion-composition",
+      "evidenceType": "test",
+      "testSource": {
+        "path": "academy-web/tests/unit/identity-client-assertion-conformance.test.ts",
+        "sha256": "5b4371c87ff19595fe95ad38eed3379ce48fd50598c8c02a6ab7fe13cfcb1672"
+      },
+      "producerEvidence": [
+        {
+          "repository": "identity-control",
+          "path": "packages/core/src/client-assertion.ts",
+          "sha256": "6cc0f77cae9782420883802fc3a92f181773fa22d298ec9b9998dc3718f8fff6"
+        },
+        {
+          "repository": "identity-control",
+          "path": "packages/core/test/client-assertion.test.ts",
+          "sha256": "58b67a100de26a7d8ffcbce20e4c021c9b84b3a0c9c4351c4c702121981d8d61"
+        }
+      ],
+      "scenarios": [
+        "exchange.client-assertion"
+      ]
+    },
     {
       "id": "envelope-verifier",
       "verdict": "C0/H0/M0/L0",
@@ -102,6 +170,16 @@
   ],
   "scenarios": [
     {
+      "id": "exchange.client-assertion",
+      "result": "pass",
+      "checkpointIds": [
+        "client-assertion-provider",
+        "client-assertion-jti-source",
+        "client-assertion-webcrypto-signer",
+        "client-assertion-composition"
+      ]
+    },
+    {
       "id": "lifecycle.envelope-cryptographic-verification",
       "result": "pass",
       "checkpointIds": [
@@ -143,7 +221,7 @@
     }
   ],
   "limitations": [
-    "No Identity Control endpoint, key distribution, audience, or authenticated transport is configured.",
+    "No registered production public key, released Identity Control endpoint, result-key distribution, or authenticated transport is configured.",
     "No Academy runtime route, scheduler, session flow, or production database is wired by this evidence.",
     "Local checkpoint evidence does not enable the registry or approve a release."
   ]

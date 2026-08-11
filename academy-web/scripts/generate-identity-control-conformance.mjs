@@ -17,8 +17,8 @@ const scriptDirectory = dirname(fileURLToPath(import.meta.url))
 const academyRoot = resolve(scriptDirectory, '..', '..')
 const identityRoot = resolve(academyRoot, '..', 'identity-control')
 
-export const ACADEMY_SOURCE_REVISION = '845e371173efb7b15b7605ecbc9496c47e2068fb'
-export const IDENTITY_SOURCE_REVISION = 'a6ef1f430e1939a76fdccdcc35a1da41ff7a4606'
+export const ACADEMY_SOURCE_REVISION = '18a92e942fb101e6f413a1579d20251bf2b08160'
+export const IDENTITY_SOURCE_REVISION = 'ad97ba2236bddbc4857d45359bb37b032aebbb05'
 
 const reportPath = 'reports/conformance/identity-control/academy-identity-control-conformance.json'
 const evidencePath = 'reports/conformance/identity-control/academy-identity-local-evidence.json'
@@ -27,16 +27,17 @@ const unprovenPath = 'reports/conformance/identity-control/academy-identity-unpr
 export const CHECKPOINT_FREEZE_DECLARATION = Object.freeze({
   schema: 'checkpoint-freeze-manifest.v1',
   role: 'identity-consumer-conformance-checkpoint',
-  path: 'reports/reviews/academy-identity-control-conformance-ledger-refresh-freeze-20260810.json',
+  path: 'reports/reviews/academy-identity-control-client-assertion-conformance-freeze-20260811.json',
   contentPaths: Object.freeze([
     'academy-web/scripts/generate-identity-control-conformance.mjs',
     'academy-web/scripts/generate-identity-control-conformance.test.mjs',
+    'academy-web/tests/unit/identity-client-assertion-conformance.test.ts',
     'plans/active_plan.md',
     'plans/completed_log.md',
     reportPath,
     evidencePath,
     unprovenPath,
-    'reports/reviews/academy-identity-control-conformance-ledger-refresh-local-checkpoint-2026-08-10.md',
+    'reports/reviews/academy-identity-control-client-assertion-conformance-local-checkpoint-2026-08-11.md',
   ]),
 })
 
@@ -48,6 +49,17 @@ const identityContractDigests = Object.freeze({
   'packages/contracts/src/index.ts': '74103c92a46b87831e173ff433600271ddac4238b6ad2518203ee10ca726e6d6',
   'packages/testing/src/index.ts': 'f2b7fc3c417104a9c9d5bf2adfed4178fb67226167ed143927939c353f6942f9',
 })
+
+const expectedIdentityEvidenceDigests = new Map([
+  [
+    'packages/core/src/client-assertion.ts',
+    '6cc0f77cae9782420883802fc3a92f181773fa22d298ec9b9998dc3718f8fff6',
+  ],
+  [
+    'packages/core/test/client-assertion.test.ts',
+    '58b67a100de26a7d8ffcbce20e4c021c9b84b3a0c9c4351c4c702121981d8d61',
+  ],
+])
 
 const expectedEvidenceDigests = new Map([
   [
@@ -90,6 +102,34 @@ const expectedEvidenceDigests = new Map([
     'reports/reviews/academy-identity-lifecycle-pull-cycle-freeze-20260810.json',
     '550b02f9d692ad9c3734397ad72624667afb644c668704adea5cc1cc5f16e065',
   ],
+  [
+    'academy-web/tests/unit/identity-client-assertion-conformance.test.ts',
+    '5b4371c87ff19595fe95ad38eed3379ce48fd50598c8c02a6ab7fe13cfcb1672',
+  ],
+  [
+    'reports/reviews/academy-identity-client-assertion-provider-local-checkpoint-2026-08-11.md',
+    '9518d4ededd4dae566140003700ee09b8d80024143aabd8c20528a2b65546547',
+  ],
+  [
+    'reports/reviews/academy-identity-client-assertion-provider-freeze-20260811.json',
+    '962ffd42dd848a1496237b0c55ba5021cffb78a8d3c3e35175985c61b341e27d',
+  ],
+  [
+    'reports/reviews/academy-identity-client-assertion-jti-source-local-checkpoint-2026-08-11.md',
+    'cc870a5c9ffb473c95822a6b389f6b8292080170f502b6a3a0bdca0ba07d99f6',
+  ],
+  [
+    'reports/reviews/academy-identity-client-assertion-jti-source-freeze-20260811.json',
+    'e44344fae1580429ea3fa5b666b0872919e3f448c5e3fc65b2aeb3b26a37b652',
+  ],
+  [
+    'reports/reviews/academy-identity-client-assertion-webcrypto-signer-local-checkpoint-2026-08-11.md',
+    '3b0870639b0244531df9aeeea096f6ab55749102f0aa939b88fc7a4d191f5a76',
+  ],
+  [
+    'reports/reviews/academy-identity-client-assertion-webcrypto-signer-freeze-20260811.json',
+    'b056eafdc00fa833dc2c2777235dbcc80c8b8f926e02f333c22f5d6d5a1f6ec7',
+  ],
 ])
 
 const retainedScenarioIds = Object.freeze([
@@ -112,12 +152,20 @@ export const LIFECYCLE_SCENARIO_IDS = Object.freeze([
   'lifecycle.cursor-after-commit',
 ])
 
+export const CLIENT_ASSERTION_SCENARIO_IDS = Object.freeze([
+  'exchange.client-assertion',
+])
+
+const localCheckpointScenarioIds = Object.freeze([
+  ...CLIENT_ASSERTION_SCENARIO_IDS,
+  ...LIFECYCLE_SCENARIO_IDS,
+])
+
 export const NOT_PROVEN_SCENARIO_IDS = Object.freeze([
   'authorization.exact-registered-redirect',
   'authorization.state-binding-mismatch',
   'callback.login-csrf',
   'callback.origin-fetch-metadata',
-  'exchange.client-assertion',
   'exchange.code-replay-expiry',
   'exchange.result-key-rotation',
   'academy.activation-profile-only',
@@ -151,7 +199,6 @@ const unprovenReasons = Object.freeze({
   'authorization.state-binding-mismatch': 'The production authorization entry point is unwired and has no deployed browser transaction-binding evidence.',
   'callback.login-csrf': 'The production callback and session path is unwired, so login-session swapping is not proven.',
   'callback.origin-fetch-metadata': 'Academy does not yet enforce the released Origin and Fetch Metadata mutation policy at a production callback.',
-  'exchange.client-assertion': 'No operational signer, registered public key, replay store, or released exchange endpoint is configured.',
   'exchange.code-replay-expiry': 'Local units cover replay and expiry pieces, but the released end-to-end exchange contract is not deployed.',
   'exchange.result-key-rotation': 'No released Identity Control result-key distribution or active/overlap rotation path is wired.',
   'academy.activation-profile-only': 'The production callback and profile activation transaction remains unwired.',
@@ -159,6 +206,30 @@ const unprovenReasons = Object.freeze({
 })
 
 const checkpointDefinitions = Object.freeze([
+  {
+    id: 'client-assertion-provider',
+    reportPath: 'reports/reviews/academy-identity-client-assertion-provider-local-checkpoint-2026-08-11.md',
+    manifestPath: 'reports/reviews/academy-identity-client-assertion-provider-freeze-20260811.json',
+    scenarios: [...CLIENT_ASSERTION_SCENARIO_IDS],
+  },
+  {
+    id: 'client-assertion-jti-source',
+    reportPath: 'reports/reviews/academy-identity-client-assertion-jti-source-local-checkpoint-2026-08-11.md',
+    manifestPath: 'reports/reviews/academy-identity-client-assertion-jti-source-freeze-20260811.json',
+    scenarios: [...CLIENT_ASSERTION_SCENARIO_IDS],
+  },
+  {
+    id: 'client-assertion-webcrypto-signer',
+    reportPath: 'reports/reviews/academy-identity-client-assertion-webcrypto-signer-local-checkpoint-2026-08-11.md',
+    manifestPath: 'reports/reviews/academy-identity-client-assertion-webcrypto-signer-freeze-20260811.json',
+    scenarios: [...CLIENT_ASSERTION_SCENARIO_IDS],
+  },
+  {
+    id: 'client-assertion-composition',
+    testPath: 'academy-web/tests/unit/identity-client-assertion-conformance.test.ts',
+    producerEvidencePaths: [...expectedIdentityEvidenceDigests.keys()],
+    scenarios: [...CLIENT_ASSERTION_SCENARIO_IDS],
+  },
   {
     id: 'envelope-verifier',
     reportPath: 'reports/reviews/academy-identity-lifecycle-envelope-local-conformance-2026-08-09.md',
@@ -216,23 +287,64 @@ function assertSourceBoundEvidence(observedEvidenceDigests) {
   }
 }
 
-function artifactReference(path, observedEvidenceDigests) {
-  return { path, sha256: observedEvidenceDigests.get(path) }
+function assertSourceBoundIdentityEvidence(observedIdentityEvidenceDigests) {
+  if (!(observedIdentityEvidenceDigests instanceof Map)) {
+    throw new TypeError('observed Identity evidence digests must be a Map')
+  }
+  if (observedIdentityEvidenceDigests.size !== expectedIdentityEvidenceDigests.size) {
+    throw new Error('source-bound Identity evidence file set mismatch')
+  }
+  for (const [path, expected] of expectedIdentityEvidenceDigests) {
+    if (observedIdentityEvidenceDigests.get(path) !== expected) {
+      throw new Error(`source-bound Identity evidence digest mismatch: ${path}`)
+    }
+  }
 }
 
-function buildEvidence(observedEvidenceDigests) {
-  const checkpoints = checkpointDefinitions.map((checkpoint) => ({
-    id: checkpoint.id,
-    verdict: 'C0/H0/M0/L0',
-    report: artifactReference(checkpoint.reportPath, observedEvidenceDigests),
-    ...(checkpoint.receiptPath
-      ? { receipt: artifactReference(checkpoint.receiptPath, observedEvidenceDigests) }
-      : {}),
-    ...(checkpoint.manifestPath
-      ? { freezeManifest: artifactReference(checkpoint.manifestPath, observedEvidenceDigests) }
-      : {}),
-    scenarios: [...checkpoint.scenarios],
-  }))
+function artifactReference(path, observedEvidenceDigests) {
+  if (typeof path !== 'string' || path.length === 0) {
+    throw new Error('artifact reference path is missing')
+  }
+  const digest = observedEvidenceDigests.get(path)
+  if (typeof digest !== 'string' || !/^[a-f0-9]{64}$/.test(digest)) {
+    throw new Error(`artifact reference digest is missing: ${path}`)
+  }
+  return { path, sha256: digest }
+}
+
+function identityArtifactReference(path, observedIdentityEvidenceDigests) {
+  return {
+    repository: 'identity-control',
+    ...artifactReference(path, observedIdentityEvidenceDigests),
+  }
+}
+
+function buildEvidence(observedEvidenceDigests, observedIdentityEvidenceDigests) {
+  const checkpoints = checkpointDefinitions.map((checkpoint) => {
+    const evidence = { id: checkpoint.id }
+    if (checkpoint.reportPath) {
+      evidence.verdict = 'C0/H0/M0/L0'
+      evidence.report = artifactReference(checkpoint.reportPath, observedEvidenceDigests)
+    } else if (checkpoint.testPath) {
+      evidence.evidenceType = 'test'
+      evidence.testSource = artifactReference(checkpoint.testPath, observedEvidenceDigests)
+    } else {
+      throw new Error(`checkpoint has no reviewed report or test evidence: ${checkpoint.id}`)
+    }
+    if (checkpoint.receiptPath) {
+      evidence.receipt = artifactReference(checkpoint.receiptPath, observedEvidenceDigests)
+    }
+    if (checkpoint.manifestPath) {
+      evidence.freezeManifest = artifactReference(checkpoint.manifestPath, observedEvidenceDigests)
+    }
+    if (checkpoint.producerEvidencePaths) {
+      evidence.producerEvidence = checkpoint.producerEvidencePaths.map((path) => (
+        identityArtifactReference(path, observedIdentityEvidenceDigests)
+      ))
+    }
+    evidence.scenarios = [...checkpoint.scenarios]
+    return evidence
+  })
 
   return {
     schema: 'academy-identity-control-local-evidence/v1',
@@ -253,7 +365,7 @@ function buildEvidence(observedEvidenceDigests) {
       ),
     },
     checkpoints,
-    scenarios: LIFECYCLE_SCENARIO_IDS.map((id) => ({
+    scenarios: localCheckpointScenarioIds.map((id) => ({
       id,
       result: 'pass',
       checkpointIds: checkpoints
@@ -261,7 +373,7 @@ function buildEvidence(observedEvidenceDigests) {
         .map((checkpoint) => checkpoint.id),
     })),
     limitations: [
-      'No Identity Control endpoint, key distribution, audience, or authenticated transport is configured.',
+      'No registered production public key, released Identity Control endpoint, result-key distribution, or authenticated transport is configured.',
       'No Academy runtime route, scheduler, session flow, or production database is wired by this evidence.',
       'Local checkpoint evidence does not enable the registry or approve a release.',
     ],
@@ -306,7 +418,7 @@ function buildReport({
   unprovenSha256,
 }) {
   const retained = new Set(retainedScenarioIds)
-  const lifecycle = new Set(LIFECYCLE_SCENARIO_IDS)
+  const localCheckpoint = new Set(localCheckpointScenarioIds)
   const unproven = new Set(NOT_PROVEN_SCENARIO_IDS)
   const scenarios = allScenarioIds.map((id) => {
     if (retained.has(id)) {
@@ -320,13 +432,13 @@ function buildReport({
         'academy-identity-control-local-v1',
       )
     }
-    if (lifecycle.has(id)) {
+    if (localCheckpoint.has(id)) {
       return evidenceRecord(
         id,
         'pass',
         evidencePath,
         evidenceSha256,
-        'academy-identity-lifecycle-checkpoints-v1',
+        'academy-identity-checkpoints-v2',
       )
     }
     if (unproven.has(id)) {
@@ -376,7 +488,7 @@ function buildReport({
         ),
       },
       {
-        commandId: 'academy-identity-lifecycle-checkpoints-v1',
+        commandId: 'academy-identity-checkpoints-v2',
         result: 'pass',
         artifactPath: evidencePath,
         artifactSha256: evidenceSha256,
@@ -395,9 +507,9 @@ function buildReport({
     },
     scenarios,
     summary: {
-      trackedScenarioCount: 23,
-      provenLocally: 14,
-      notProven: 9,
+      trackedScenarioCount: allScenarioIds.length,
+      provenLocally: retainedScenarioIds.length + localCheckpointScenarioIds.length,
+      notProven: NOT_PROVEN_SCENARIO_IDS.length,
       productionReady: false,
       noProductionMutation: true,
     },
@@ -408,9 +520,11 @@ export function buildGeneratedArtifacts({
   localWorkingTreeReceipt,
   identityControlLocalArtifactReceipt,
   observedEvidenceDigests,
+  observedIdentityEvidenceDigests,
 }) {
   assertSourceBoundEvidence(observedEvidenceDigests)
-  const evidence = buildEvidence(observedEvidenceDigests)
+  assertSourceBoundIdentityEvidence(observedIdentityEvidenceDigests)
+  const evidence = buildEvidence(observedEvidenceDigests, observedIdentityEvidenceDigests)
   const unproven = buildUnproven()
   const evidenceSha256 = sha256(renderCanonicalJson(evidence))
   const unprovenSha256 = sha256(renderCanonicalJson(unproven))
@@ -435,6 +549,13 @@ function readRegularFile(root, path) {
 function collectEvidenceDigests() {
   return new Map(
     [...expectedEvidenceDigests].map(([path]) => [path, sha256(readRegularFile(academyRoot, path))]),
+  )
+}
+
+function collectIdentityEvidenceDigests() {
+  return new Map(
+    [...expectedIdentityEvidenceDigests]
+      .map(([path]) => [path, sha256(readRegularFile(identityRoot, path))]),
   )
 }
 
@@ -502,7 +623,7 @@ function parseCurrentReport() {
   return JSON.parse(readRegularFile(academyRoot, reportPath).toString('utf8'))
 }
 
-function artifactsFromCurrentReceipt(observedEvidenceDigests) {
+function artifactsFromCurrentReceipt(observedEvidenceDigests, observedIdentityEvidenceDigests) {
   const current = parseCurrentReport()
   if (JSON.stringify(current.checkpointFreezeManifest) !== JSON.stringify(CHECKPOINT_FREEZE_DECLARATION)) {
     throw new Error('current report checkpoint declaration mismatch')
@@ -511,6 +632,7 @@ function artifactsFromCurrentReceipt(observedEvidenceDigests) {
   return buildGeneratedArtifacts({
     ...receipts,
     observedEvidenceDigests,
+    observedIdentityEvidenceDigests,
   })
 }
 
@@ -526,7 +648,7 @@ function assertCurrentArtifacts(expected) {
   }
 }
 
-function writeArtifacts(observedEvidenceDigests) {
+function writeArtifacts(observedEvidenceDigests, observedIdentityEvidenceDigests) {
   const originals = new Map()
   for (const path of [evidencePath, unprovenPath, reportPath]) {
     try {
@@ -537,7 +659,7 @@ function writeArtifacts(observedEvidenceDigests) {
     }
   }
 
-  const evidence = buildEvidence(observedEvidenceDigests)
+  const evidence = buildEvidence(observedEvidenceDigests, observedIdentityEvidenceDigests)
   const unproven = buildUnproven()
   try {
     atomicWrite(evidencePath, renderCanonicalJson(evidence))
@@ -549,6 +671,7 @@ function writeArtifacts(observedEvidenceDigests) {
     const generated = buildGeneratedArtifacts({
       ...receipts,
       observedEvidenceDigests,
+      observedIdentityEvidenceDigests,
     })
     atomicWrite(reportPath, renderCanonicalJson(generated.report))
     return generated
@@ -567,9 +690,11 @@ function main(args) {
   }
   assertSourceRevisions()
   const observedEvidenceDigests = collectEvidenceDigests()
+  const observedIdentityEvidenceDigests = collectIdentityEvidenceDigests()
   assertSourceBoundEvidence(observedEvidenceDigests)
+  assertSourceBoundIdentityEvidence(observedIdentityEvidenceDigests)
   if (args[0] === '--write') {
-    const generated = writeArtifacts(observedEvidenceDigests)
+    const generated = writeArtifacts(observedEvidenceDigests, observedIdentityEvidenceDigests)
     process.stdout.write(`${JSON.stringify({
       status: 'written',
       paths: [evidencePath, unprovenPath, reportPath],
@@ -577,7 +702,10 @@ function main(args) {
     })}\n`)
     return
   }
-  const expected = artifactsFromCurrentReceipt(observedEvidenceDigests)
+  const expected = artifactsFromCurrentReceipt(
+    observedEvidenceDigests,
+    observedIdentityEvidenceDigests,
+  )
   assertCurrentArtifacts(expected)
   process.stdout.write(`${JSON.stringify({
     status: 'current',

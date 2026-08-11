@@ -3,6 +3,7 @@ import { describe, test } from 'node:test'
 import {
   ACADEMY_SOURCE_REVISION,
   CHECKPOINT_FREEZE_DECLARATION,
+  CLIENT_ASSERTION_SCENARIO_IDS,
   IDENTITY_SOURCE_REVISION,
   LIFECYCLE_SCENARIO_IDS,
   NOT_PROVEN_SCENARIO_IDS,
@@ -82,6 +83,45 @@ const expectedEvidenceDigests = new Map([
     'reports/reviews/academy-identity-lifecycle-pull-cycle-freeze-20260810.json',
     '550b02f9d692ad9c3734397ad72624667afb644c668704adea5cc1cc5f16e065',
   ],
+  [
+    'academy-web/tests/unit/identity-client-assertion-conformance.test.ts',
+    '5b4371c87ff19595fe95ad38eed3379ce48fd50598c8c02a6ab7fe13cfcb1672',
+  ],
+  [
+    'reports/reviews/academy-identity-client-assertion-provider-local-checkpoint-2026-08-11.md',
+    '9518d4ededd4dae566140003700ee09b8d80024143aabd8c20528a2b65546547',
+  ],
+  [
+    'reports/reviews/academy-identity-client-assertion-provider-freeze-20260811.json',
+    '962ffd42dd848a1496237b0c55ba5021cffb78a8d3c3e35175985c61b341e27d',
+  ],
+  [
+    'reports/reviews/academy-identity-client-assertion-jti-source-local-checkpoint-2026-08-11.md',
+    'cc870a5c9ffb473c95822a6b389f6b8292080170f502b6a3a0bdca0ba07d99f6',
+  ],
+  [
+    'reports/reviews/academy-identity-client-assertion-jti-source-freeze-20260811.json',
+    'e44344fae1580429ea3fa5b666b0872919e3f448c5e3fc65b2aeb3b26a37b652',
+  ],
+  [
+    'reports/reviews/academy-identity-client-assertion-webcrypto-signer-local-checkpoint-2026-08-11.md',
+    '3b0870639b0244531df9aeeea096f6ab55749102f0aa939b88fc7a4d191f5a76',
+  ],
+  [
+    'reports/reviews/academy-identity-client-assertion-webcrypto-signer-freeze-20260811.json',
+    'b056eafdc00fa833dc2c2777235dbcc80c8b8f926e02f333c22f5d6d5a1f6ec7',
+  ],
+])
+
+const expectedIdentityEvidenceDigests = new Map([
+  [
+    'packages/core/src/client-assertion.ts',
+    '6cc0f77cae9782420883802fc3a92f181773fa22d298ec9b9998dc3718f8fff6',
+  ],
+  [
+    'packages/core/test/client-assertion.test.ts',
+    '58b67a100de26a7d8ffcbce20e4c021c9b84b3a0c9c4351c4c702121981d8d61',
+  ],
 ])
 
 function build() {
@@ -89,29 +129,31 @@ function build() {
     localWorkingTreeReceipt: consumerReceipt,
     identityControlLocalArtifactReceipt: producerReceipt,
     observedEvidenceDigests: expectedEvidenceDigests,
+    observedIdentityEvidenceDigests: expectedIdentityEvidenceDigests,
   })
 }
 
 describe('Academy Identity Control conformance generator', () => {
-  test('declares the exact bytewise-sorted eight-file checkpoint content set', () => {
+  test('declares the exact bytewise-sorted nine-file checkpoint content set', () => {
     assert.deepEqual(CHECKPOINT_FREEZE_DECLARATION, {
       schema: 'checkpoint-freeze-manifest.v1',
       role: 'identity-consumer-conformance-checkpoint',
-      path: 'reports/reviews/academy-identity-control-conformance-ledger-refresh-freeze-20260810.json',
+      path: 'reports/reviews/academy-identity-control-client-assertion-conformance-freeze-20260811.json',
       contentPaths: [
         'academy-web/scripts/generate-identity-control-conformance.mjs',
         'academy-web/scripts/generate-identity-control-conformance.test.mjs',
+        'academy-web/tests/unit/identity-client-assertion-conformance.test.ts',
         'plans/active_plan.md',
         'plans/completed_log.md',
         'reports/conformance/identity-control/academy-identity-control-conformance.json',
         'reports/conformance/identity-control/academy-identity-local-evidence.json',
         'reports/conformance/identity-control/academy-identity-unproven-scenarios.json',
-        'reports/reviews/academy-identity-control-conformance-ledger-refresh-local-checkpoint-2026-08-10.md',
+        'reports/reviews/academy-identity-control-client-assertion-conformance-local-checkpoint-2026-08-11.md',
       ],
     })
   })
 
-  test('promotes exactly five lifecycle scenarios while retaining nine explicit gaps', () => {
+  test('promotes the client assertion plus five lifecycle scenarios while retaining eight explicit gaps', () => {
     const { evidence, report, unproven } = build()
     const byId = new Map(report.scenarios.map((scenario) => [scenario.id, scenario]))
 
@@ -123,19 +165,47 @@ describe('Academy Identity Control conformance generator', () => {
     assert.deepEqual(report.checkpointFreezeManifest, CHECKPOINT_FREEZE_DECLARATION)
     assert.deepEqual(report.summary, {
       trackedScenarioCount: 23,
-      provenLocally: 14,
-      notProven: 9,
+      provenLocally: 15,
+      notProven: 8,
       productionReady: false,
       noProductionMutation: true,
     })
 
-    assert.deepEqual(evidence.scenarios.map(({ id }) => id), LIFECYCLE_SCENARIO_IDS)
+    assert.deepEqual(
+      evidence.scenarios.map(({ id }) => id),
+      [...CLIENT_ASSERTION_SCENARIO_IDS, ...LIFECYCLE_SCENARIO_IDS],
+    )
     assert.deepEqual(Object.keys(unproven.scenarios), NOT_PROVEN_SCENARIO_IDS)
     assert.equal(report.scenarios.length, 23)
-    assert.equal(report.scenarios.filter(({ result }) => result === 'pass').length, 14)
-    assert.equal(report.scenarios.filter(({ result }) => result === 'not_proven').length, 9)
+    assert.equal(report.scenarios.filter(({ result }) => result === 'pass').length, 15)
+    assert.equal(report.scenarios.filter(({ result }) => result === 'not_proven').length, 8)
 
-    for (const id of LIFECYCLE_SCENARIO_IDS) {
+    assert.deepEqual(
+      evidence.checkpoints.find(({ id }) => id === 'client-assertion-composition'),
+      {
+        id: 'client-assertion-composition',
+        evidenceType: 'test',
+        testSource: {
+          path: 'academy-web/tests/unit/identity-client-assertion-conformance.test.ts',
+          sha256: '5b4371c87ff19595fe95ad38eed3379ce48fd50598c8c02a6ab7fe13cfcb1672',
+        },
+        producerEvidence: [
+          {
+            repository: 'identity-control',
+            path: 'packages/core/src/client-assertion.ts',
+            sha256: '6cc0f77cae9782420883802fc3a92f181773fa22d298ec9b9998dc3718f8fff6',
+          },
+          {
+            repository: 'identity-control',
+            path: 'packages/core/test/client-assertion.test.ts',
+            sha256: '58b67a100de26a7d8ffcbce20e4c021c9b84b3a0c9c4351c4c702121981d8d61',
+          },
+        ],
+        scenarios: ['exchange.client-assertion'],
+      },
+    )
+
+    for (const id of [...CLIENT_ASSERTION_SCENARIO_IDS, ...LIFECYCLE_SCENARIO_IDS]) {
       assert.equal(byId.get(id)?.result, 'pass')
       assert.equal(
         byId.get(id)?.evidence.artifactPath,
@@ -172,6 +242,21 @@ describe('Academy Identity Control conformance generator', () => {
         observedEvidenceDigests: drifted,
       }),
       /source-bound evidence digest mismatch/,
+    )
+  })
+
+  test('fails closed on drift in the producer verifier or replay evidence', () => {
+    const drifted = new Map(expectedIdentityEvidenceDigests)
+    drifted.set('packages/core/test/client-assertion.test.ts', '0'.repeat(64))
+
+    assert.throws(
+      () => buildGeneratedArtifacts({
+        localWorkingTreeReceipt: consumerReceipt,
+        identityControlLocalArtifactReceipt: producerReceipt,
+        observedEvidenceDigests: expectedEvidenceDigests,
+        observedIdentityEvidenceDigests: drifted,
+      }),
+      /source-bound Identity evidence digest mismatch/,
     )
   })
 

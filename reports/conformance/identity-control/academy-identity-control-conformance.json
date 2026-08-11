@@ -2,36 +2,37 @@
   "schema": "identity-consumer-conformance-report/v1",
   "registryRevision": 1,
   "clientId": "academy-web",
-  "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+  "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
   "checkpointFreezeManifest": {
     "schema": "checkpoint-freeze-manifest.v1",
     "role": "identity-consumer-conformance-checkpoint",
-    "path": "reports/reviews/academy-identity-control-conformance-ledger-refresh-freeze-20260810.json",
+    "path": "reports/reviews/academy-identity-control-client-assertion-conformance-freeze-20260811.json",
     "contentPaths": [
       "academy-web/scripts/generate-identity-control-conformance.mjs",
       "academy-web/scripts/generate-identity-control-conformance.test.mjs",
+      "academy-web/tests/unit/identity-client-assertion-conformance.test.ts",
       "plans/active_plan.md",
       "plans/completed_log.md",
       "reports/conformance/identity-control/academy-identity-control-conformance.json",
       "reports/conformance/identity-control/academy-identity-local-evidence.json",
       "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
-      "reports/reviews/academy-identity-control-conformance-ledger-refresh-local-checkpoint-2026-08-10.md"
+      "reports/reviews/academy-identity-control-client-assertion-conformance-local-checkpoint-2026-08-11.md"
     ]
   },
   "localWorkingTreeReceipt": {
     "schema": "identity-consumer-local-receipt/v2",
     "mode": "local-git-state",
-    "head": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+    "head": "18a92e942fb101e6f413a1579d20251bf2b08160",
     "excludedPaths": [
       "reports/conformance/identity-control/academy-identity-control-conformance.json",
-      "reports/reviews/academy-identity-control-conformance-ledger-refresh-freeze-20260810.json"
+      "reports/reviews/academy-identity-control-client-assertion-conformance-freeze-20260811.json"
     ],
-    "indexStateSha256": "ce38967c5bcc406a1d51c9db68982d5f36ef4f4f89e038dbbfe0a3335b6b8cbb",
-    "indexEntryCount": 457,
-    "trackedWorktreeStateSha256": "2813673d74669a121b8e9e303b252c2b091b310b4534d19336857eb936c3a5b0",
-    "trackedWorktreeEntryCount": 457,
-    "untrackedStateSha256": "341a6add3afa5b2f1988d92decb8290f14fc295ff2dc7b1d6254fcfddd092b94",
-    "untrackedEntryCount": 141,
+    "indexStateSha256": "e0e7a416f2670046a982e26a7ea8f3c291c02c8f989dd166d8e8dc86a29af78c",
+    "indexEntryCount": 529,
+    "trackedWorktreeStateSha256": "6ec6629277b4a14d2b747b3caf8e7564df5d2789affcb239d48cf1bc2779e5a1",
+    "trackedWorktreeEntryCount": 529,
+    "untrackedStateSha256": "9fcbff8b29c6d49bc1f0e387ba15d2e055906222f06e4e54c631b2d453c15624",
+    "untrackedEntryCount": 111,
     "untrackedFileSha256": [
       {
         "path": "academy-web/assets/fonts/noto-sans-thai/LICENSE",
@@ -70,18 +71,6 @@
         "sha256": "0bd3d7e4646f520fc82e1ed0d2aba1004064fa1ecccc22a71f73e59a4048f459"
       },
       {
-        "path": "academy-web/scripts/generate-identity-control-conformance.mjs",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "50e6e2594e291bf648411d6c0e4fa884a8f5a106b03503418a7bf5a094d1f54d"
-      },
-      {
-        "path": "academy-web/scripts/generate-identity-control-conformance.test.mjs",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "9af69c2acacf1bd1735f612b9c521bbeee35b7359cf63d881dbde0db848355ea"
-      },
-      {
         "path": "academy-web/scripts/public-course-page-paths.mjs",
         "kind": "file",
         "mode": "0644",
@@ -92,18 +81,6 @@
         "kind": "file",
         "mode": "0644",
         "sha256": "817df31bc84fc14cf32045d9294ac87b63768c9266a523c8f7595d2657005889"
-      },
-      {
-        "path": "academy-web/scripts/test-identity-lifecycle-page-store-postgres.mjs",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "e9d46ac78d1009ec71afc15fc89647b68688ae46703bfef8320457a2c5f17056"
-      },
-      {
-        "path": "academy-web/scripts/test-identity-lifecycle-page-store-postgres.test.mjs",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "a6d8cdf237845e2ee7075220cb4176e79669081cafe107e5ad4d5b80a1d889b6"
       },
       {
         "path": "academy-web/scripts/verify-cf-public-course-pages.mjs",
@@ -430,36 +407,6 @@
         "sha256": "4f8c24126371413a1686ac8e4c5b563b7ec3d6346741e2dbd6218fc6155fe201"
       },
       {
-        "path": "academy-web/src/lib/http/strict-json-response.ts",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "1cb130118027db67a4f00531c2e6d24d241e692b7df791e314d8d07a4ebf6e8a"
-      },
-      {
-        "path": "academy-web/src/lib/identity/lifecycle-page-store.ts",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "8de54aac14194cbd8c3bcd347cd32624e24ca935e1e5190ceb0e87a22b80c320"
-      },
-      {
-        "path": "academy-web/src/lib/identity/lifecycle-pull-cycle.ts",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "dd1655b79c02c77da51dd2bf8510a26287efa7633b46e21d08518947b19764e1"
-      },
-      {
-        "path": "academy-web/src/lib/identity/lifecycle-pull-lease.ts",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "8f8ba92d6ba02fd23d74c072cea674fd26de610f17b818b9aff9d48c2d3fe23d"
-      },
-      {
-        "path": "academy-web/src/lib/identity/lifecycle-reducer.ts",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "9c1aee15ce5463f1dbe0c53d62454dec648deee928e8c7b6dd0f82ed830ec676"
-      },
-      {
         "path": "academy-web/src/lib/simulation/practice-client.ts",
         "kind": "file",
         "mode": "0644",
@@ -476,24 +423,6 @@
         "kind": "file",
         "mode": "0644",
         "sha256": "b4f95458f00424e5d2dae1830cdb9f426a642f7ada6716d8e533714889dcdf48"
-      },
-      {
-        "path": "academy-web/supabase/migrations/0022_identity_lifecycle_projection.sql",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "df3e746d5c3863a626c93993730ffec0c805a9d4b63f32883745592037edd8e0"
-      },
-      {
-        "path": "academy-web/supabase/migrations/0023_identity_lifecycle_pull_lease.sql",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "eff6bf92af29569cfac15201184a17f5cc201d8092a783866a0d973c3087f5c1"
-      },
-      {
-        "path": "academy-web/tests/integration/identity-lifecycle-page-store.test.ts",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "5c7fd39d9a833f7e3388532baa01f85a25e9a52cbac0c383b8e64c27484011d6"
       },
       {
         "path": "academy-web/tests/unit/attempt-client.test.ts",
@@ -550,28 +479,10 @@
         "sha256": "1646b1eefe975d8cd29f610896e495abfab23d2fd2bcad5b6d2367b6dcae76c3"
       },
       {
-        "path": "academy-web/tests/unit/identity-lifecycle-page-store.test.ts",
+        "path": "academy-web/tests/unit/identity-client-assertion-conformance.test.ts",
         "kind": "file",
         "mode": "0644",
-        "sha256": "7460d0551eb1f97162532350cc382d60ae6b1ba2cab605de58ae936cfb165151"
-      },
-      {
-        "path": "academy-web/tests/unit/identity-lifecycle-pull-cycle.test.ts",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "2671d68d60fd58aaf4575d91a84e0cb10a6ffd9deb54d09b9db38a3a1a33a78f"
-      },
-      {
-        "path": "academy-web/tests/unit/identity-lifecycle-pull-lease.test.ts",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "f6cea513f50b11f59f2f1ed8a390070f49dccdf846cdcb439f18948d92f491ac"
-      },
-      {
-        "path": "academy-web/tests/unit/identity-lifecycle-reducer.test.ts",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "269bc84f295dd7acca1b4b720fddc7b6aaac73bfd60a4cff648e6a48e464b52e"
+        "sha256": "5b4371c87ff19595fe95ad38eed3379ce48fd50598c8c02a6ab7fe13cfcb1672"
       },
       {
         "path": "academy-web/tests/unit/learner-course-page.test.ts",
@@ -670,48 +581,6 @@
         "sha256": "2acee5d8e9489e2f53bfa89f9d03020a79be1b95b8e0b2e644425a9af42b2c0f"
       },
       {
-        "path": "reports/conformance/identity-control/academy-identity-integration-conformance.txt",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "053923d751a197306eb0fa64c5c86c931ad62bb0518059d9d4b6209dc9ff8554"
-      },
-      {
-        "path": "reports/conformance/identity-control/academy-identity-local-evidence.json",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "35c3ec127eda8a7defacec87e187e137d4dc28d9068e601d3ae010e6762769ec"
-      },
-      {
-        "path": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
-      },
-      {
-        "path": "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "8becc1fa91ec1044fe1bbc4c8c6ddd1b6af72e217b3998670ee9ebc9a647f2a0"
-      },
-      {
-        "path": "reports/conformance/identity-control/academy-lifecycle-envelope-local-conformance.json",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "152b159f88a603028d3bbed80136a89c326a6eafc880fe5751aa16295245c4d1"
-      },
-      {
-        "path": "reports/conformance/identity-control/academy-lint-typecheck.txt",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "36c6592f45caf7e741453fa24d1c92543d4972e6bec3817cc5f47c5c4c6b3e82"
-      },
-      {
-        "path": "reports/conformance/identity-control/academy-unit-regression.txt",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "5d2d6b8db1a5ca7e60925de393cc6ecfc6102a71dc8bb9ecc71d266e9646500c"
-      },
-      {
         "path": "reports/reviews/academy-attempt-client-response-validation-local-checkpoint-2026-08-09.md",
         "kind": "file",
         "mode": "0644",
@@ -730,52 +599,10 @@
         "sha256": "b3ec44011e1f327bb3f4560bccc1d145cdaca8fb78589bed4e2e4a473e39741f"
       },
       {
-        "path": "reports/reviews/academy-identity-control-conformance-ledger-refresh-local-checkpoint-2026-08-10.md",
+        "path": "reports/reviews/academy-identity-control-client-assertion-conformance-local-checkpoint-2026-08-11.md",
         "kind": "file",
         "mode": "0644",
-        "sha256": "f17eaecb1952a4dc4ba199da3bc0f2dfa453ae1b62dbd445c1171e287413a589"
-      },
-      {
-        "path": "reports/reviews/academy-identity-lifecycle-envelope-local-conformance-2026-08-09.md",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "b32fa794f721e06ce4ca830128262d77acf160a4c28a89b3c07586c70b1ed165"
-      },
-      {
-        "path": "reports/reviews/academy-identity-lifecycle-page-store-local-checkpoint-2026-08-10.md",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "6685acf996b69c4901c9a13fec725c69113b9993bbdd4e9321e13cb53db79093"
-      },
-      {
-        "path": "reports/reviews/academy-identity-lifecycle-pull-cycle-freeze-20260810.json",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "550b02f9d692ad9c3734397ad72624667afb644c668704adea5cc1cc5f16e065"
-      },
-      {
-        "path": "reports/reviews/academy-identity-lifecycle-pull-cycle-local-checkpoint-2026-08-10.md",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "64dd594cb590dc856094c3d28bab75b4034a65d8e5c5faf928417fd99972b971"
-      },
-      {
-        "path": "reports/reviews/academy-identity-lifecycle-pull-lease-local-checkpoint-2026-08-10.md",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "79a703286d06064505ce9bd51aaf8185825344f733d90eed36cb7e5d4c112f8f"
-      },
-      {
-        "path": "reports/reviews/academy-identity-lifecycle-pull-lease-m01-freeze-20260810.json",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "a8599a1d1f5624238b85c85b3692d5886f58650af4bd7dbb9fae56e7a9c6570e"
-      },
-      {
-        "path": "reports/reviews/academy-identity-lifecycle-reducer-local-checkpoint-2026-08-09.md",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "0828c7467e7d96190d31a6758cb6b413b1dbd957786cd0cd645be718992e7fb2"
+        "sha256": "ba339a2843fe741c6db9236c0c1072127b1a0a0b35f26de1cfe7adc939da5c75"
       },
       {
         "path": "reports/reviews/academy-identity-session-cookie-local-checkpoint-2026-08-09.md",
@@ -832,12 +659,6 @@
         "sha256": "19b805c569361649e5cb37b7adbee0dc18ea41e2ed63ae218aede9c763c8f7c1"
       },
       {
-        "path": "reports/reviews/identity-control-conformance-ril-2026-08-08.md",
-        "kind": "file",
-        "mode": "0644",
-        "sha256": "62f44a6e81a77ababeacbc063f1e4d5d8509b3c5239406f45f4a9af7e7573c4b"
-      },
-      {
         "path": "reports/reviews/learner-course-skill-map-checkpoint-2026-08-09.md",
         "kind": "file",
         "mode": "0644",
@@ -882,7 +703,7 @@
     ]
   },
   "identityControl": {
-    "sourceRevision": "a6ef1f430e1939a76fdccdcc35a1da41ff7a4606",
+    "sourceRevision": "ad97ba2236bddbc4857d45359bb37b032aebbb05",
     "contractDigests": {
       "config/consumer-registry-v1.approved.json": "572d230a9f84c219e5b82eeb84dd1350bd8a319e180f2208f45db3abc03d1875",
       "docs/integration/consumer-registry-v1.md": "d880b0e2a8000f6898b76b91ee47ab18b886ac8e2f413f214448a8a2bed575a4",
@@ -894,7 +715,7 @@
     "localArtifactReceipt": {
       "schema": "identity-control-producer-local-receipt/v1",
       "mode": "local-git-artifact-state",
-      "head": "a6ef1f430e1939a76fdccdcc35a1da41ff7a4606",
+      "head": "ad97ba2236bddbc4857d45359bb37b032aebbb05",
       "scope": [
         "config/consumer-registry-v1.approved.json",
         "docs/integration/consumer-registry-v1.md",
@@ -958,16 +779,16 @@
       "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
     },
     {
-      "commandId": "academy-identity-lifecycle-checkpoints-v1",
+      "commandId": "academy-identity-checkpoints-v2",
       "result": "pass",
       "artifactPath": "reports/conformance/identity-control/academy-identity-local-evidence.json",
-      "artifactSha256": "35c3ec127eda8a7defacec87e187e137d4dc28d9068e601d3ae010e6762769ec"
+      "artifactSha256": "82be75bf0bf545766af5158e48f3e37ac787f9f596f7b04cef9d68568e271685"
     },
     {
       "commandId": "academy-identity-control-unproven-v2",
       "result": "not_proven",
       "artifactPath": "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
-      "artifactSha256": "8becc1fa91ec1044fe1bbc4c8c6ddd1b6af72e217b3998670ee9ebc9a647f2a0"
+      "artifactSha256": "cb2c915265c72935bea15b982df9abf2cb7c5538404f93317c28e08ad573bb39"
     }
   ],
   "canonicalIntake": {
@@ -982,9 +803,9 @@
       "evidence": {
         "testId": "authorization.exact-registered-redirect",
         "command": "academy-identity-control-unproven-v2",
-        "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+        "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
-        "artifactSha256": "8becc1fa91ec1044fe1bbc4c8c6ddd1b6af72e217b3998670ee9ebc9a647f2a0",
+        "artifactSha256": "cb2c915265c72935bea15b982df9abf2cb7c5538404f93317c28e08ad573bb39",
         "supportsClaim": false
       }
     },
@@ -994,9 +815,9 @@
       "evidence": {
         "testId": "authorization.state-binding-mismatch",
         "command": "academy-identity-control-unproven-v2",
-        "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+        "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
-        "artifactSha256": "8becc1fa91ec1044fe1bbc4c8c6ddd1b6af72e217b3998670ee9ebc9a647f2a0",
+        "artifactSha256": "cb2c915265c72935bea15b982df9abf2cb7c5538404f93317c28e08ad573bb39",
         "supportsClaim": false
       }
     },
@@ -1006,7 +827,7 @@
       "evidence": {
         "testId": "authorization.state-expiry-replay",
         "command": "academy-identity-control-local-v1",
-        "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+        "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
         "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
       }
@@ -1017,7 +838,7 @@
       "evidence": {
         "testId": "callback.code-and-state-only",
         "command": "academy-identity-control-local-v1",
-        "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+        "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
         "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
       }
@@ -1028,7 +849,7 @@
       "evidence": {
         "testId": "callback.server-held-intent",
         "command": "academy-identity-control-local-v1",
-        "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+        "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
         "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
       }
@@ -1039,9 +860,9 @@
       "evidence": {
         "testId": "callback.login-csrf",
         "command": "academy-identity-control-unproven-v2",
-        "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+        "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
-        "artifactSha256": "8becc1fa91ec1044fe1bbc4c8c6ddd1b6af72e217b3998670ee9ebc9a647f2a0",
+        "artifactSha256": "cb2c915265c72935bea15b982df9abf2cb7c5538404f93317c28e08ad573bb39",
         "supportsClaim": false
       }
     },
@@ -1051,9 +872,9 @@
       "evidence": {
         "testId": "callback.origin-fetch-metadata",
         "command": "academy-identity-control-unproven-v2",
-        "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+        "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
-        "artifactSha256": "8becc1fa91ec1044fe1bbc4c8c6ddd1b6af72e217b3998670ee9ebc9a647f2a0",
+        "artifactSha256": "cb2c915265c72935bea15b982df9abf2cb7c5538404f93317c28e08ad573bb39",
         "supportsClaim": false
       }
     },
@@ -1063,21 +884,20 @@
       "evidence": {
         "testId": "exchange.pkce-s256",
         "command": "academy-identity-control-local-v1",
-        "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+        "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
         "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
       }
     },
     {
       "id": "exchange.client-assertion",
-      "result": "not_proven",
+      "result": "pass",
       "evidence": {
         "testId": "exchange.client-assertion",
-        "command": "academy-identity-control-unproven-v2",
-        "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
-        "artifactPath": "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
-        "artifactSha256": "8becc1fa91ec1044fe1bbc4c8c6ddd1b6af72e217b3998670ee9ebc9a647f2a0",
-        "supportsClaim": false
+        "command": "academy-identity-checkpoints-v2",
+        "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
+        "artifactPath": "reports/conformance/identity-control/academy-identity-local-evidence.json",
+        "artifactSha256": "82be75bf0bf545766af5158e48f3e37ac787f9f596f7b04cef9d68568e271685"
       }
     },
     {
@@ -1086,7 +906,7 @@
       "evidence": {
         "testId": "exchange.result-binding",
         "command": "academy-identity-control-local-v1",
-        "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+        "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
         "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
       }
@@ -1097,9 +917,9 @@
       "evidence": {
         "testId": "exchange.code-replay-expiry",
         "command": "academy-identity-control-unproven-v2",
-        "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+        "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
-        "artifactSha256": "8becc1fa91ec1044fe1bbc4c8c6ddd1b6af72e217b3998670ee9ebc9a647f2a0",
+        "artifactSha256": "cb2c915265c72935bea15b982df9abf2cb7c5538404f93317c28e08ad573bb39",
         "supportsClaim": false
       }
     },
@@ -1109,9 +929,9 @@
       "evidence": {
         "testId": "exchange.result-key-rotation",
         "command": "academy-identity-control-unproven-v2",
-        "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+        "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
-        "artifactSha256": "8becc1fa91ec1044fe1bbc4c8c6ddd1b6af72e217b3998670ee9ebc9a647f2a0",
+        "artifactSha256": "cb2c915265c72935bea15b982df9abf2cb7c5538404f93317c28e08ad573bb39",
         "supportsClaim": false
       }
     },
@@ -1121,7 +941,7 @@
       "evidence": {
         "testId": "session.host-scoped",
         "command": "academy-identity-control-local-v1",
-        "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+        "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
         "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
       }
@@ -1132,7 +952,7 @@
       "evidence": {
         "testId": "activation.grants-zero-product-access",
         "command": "academy-identity-control-local-v1",
-        "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+        "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
         "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
       }
@@ -1142,10 +962,10 @@
       "result": "pass",
       "evidence": {
         "testId": "lifecycle.envelope-cryptographic-verification",
-        "command": "academy-identity-lifecycle-checkpoints-v1",
-        "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+        "command": "academy-identity-checkpoints-v2",
+        "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
         "artifactPath": "reports/conformance/identity-control/academy-identity-local-evidence.json",
-        "artifactSha256": "35c3ec127eda8a7defacec87e187e137d4dc28d9068e601d3ae010e6762769ec"
+        "artifactSha256": "82be75bf0bf545766af5158e48f3e37ac787f9f596f7b04cef9d68568e271685"
       }
     },
     {
@@ -1153,10 +973,10 @@
       "result": "pass",
       "evidence": {
         "testId": "lifecycle.duplicate-stale",
-        "command": "academy-identity-lifecycle-checkpoints-v1",
-        "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+        "command": "academy-identity-checkpoints-v2",
+        "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
         "artifactPath": "reports/conformance/identity-control/academy-identity-local-evidence.json",
-        "artifactSha256": "35c3ec127eda8a7defacec87e187e137d4dc28d9068e601d3ae010e6762769ec"
+        "artifactSha256": "82be75bf0bf545766af5158e48f3e37ac787f9f596f7b04cef9d68568e271685"
       }
     },
     {
@@ -1164,10 +984,10 @@
       "result": "pass",
       "evidence": {
         "testId": "lifecycle.gap-conflict",
-        "command": "academy-identity-lifecycle-checkpoints-v1",
-        "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+        "command": "academy-identity-checkpoints-v2",
+        "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
         "artifactPath": "reports/conformance/identity-control/academy-identity-local-evidence.json",
-        "artifactSha256": "35c3ec127eda8a7defacec87e187e137d4dc28d9068e601d3ae010e6762769ec"
+        "artifactSha256": "82be75bf0bf545766af5158e48f3e37ac787f9f596f7b04cef9d68568e271685"
       }
     },
     {
@@ -1175,10 +995,10 @@
       "result": "pass",
       "evidence": {
         "testId": "lifecycle.config-revision-change",
-        "command": "academy-identity-lifecycle-checkpoints-v1",
-        "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+        "command": "academy-identity-checkpoints-v2",
+        "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
         "artifactPath": "reports/conformance/identity-control/academy-identity-local-evidence.json",
-        "artifactSha256": "35c3ec127eda8a7defacec87e187e137d4dc28d9068e601d3ae010e6762769ec"
+        "artifactSha256": "82be75bf0bf545766af5158e48f3e37ac787f9f596f7b04cef9d68568e271685"
       }
     },
     {
@@ -1186,10 +1006,10 @@
       "result": "pass",
       "evidence": {
         "testId": "lifecycle.cursor-after-commit",
-        "command": "academy-identity-lifecycle-checkpoints-v1",
-        "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+        "command": "academy-identity-checkpoints-v2",
+        "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
         "artifactPath": "reports/conformance/identity-control/academy-identity-local-evidence.json",
-        "artifactSha256": "35c3ec127eda8a7defacec87e187e137d4dc28d9068e601d3ae010e6762769ec"
+        "artifactSha256": "82be75bf0bf545766af5158e48f3e37ac787f9f596f7b04cef9d68568e271685"
       }
     },
     {
@@ -1198,7 +1018,7 @@
       "evidence": {
         "testId": "outage.fail-closed",
         "command": "academy-identity-control-local-v1",
-        "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+        "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
         "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
       }
@@ -1209,9 +1029,9 @@
       "evidence": {
         "testId": "academy.activation-profile-only",
         "command": "academy-identity-control-unproven-v2",
-        "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+        "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
-        "artifactSha256": "8becc1fa91ec1044fe1bbc4c8c6ddd1b6af72e217b3998670ee9ebc9a647f2a0",
+        "artifactSha256": "cb2c915265c72935bea15b982df9abf2cb7c5538404f93317c28e08ad573bb39",
         "supportsClaim": false
       }
     },
@@ -1221,7 +1041,7 @@
       "evidence": {
         "testId": "academy.course-entitlement",
         "command": "academy-identity-control-local-v1",
-        "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+        "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
         "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
       }
@@ -1232,17 +1052,17 @@
       "evidence": {
         "testId": "academy.canonical-founder-bootstrap",
         "command": "academy-identity-control-unproven-v2",
-        "sourceRevision": "845e371173efb7b15b7605ecbc9496c47e2068fb",
+        "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
-        "artifactSha256": "8becc1fa91ec1044fe1bbc4c8c6ddd1b6af72e217b3998670ee9ebc9a647f2a0",
+        "artifactSha256": "cb2c915265c72935bea15b982df9abf2cb7c5538404f93317c28e08ad573bb39",
         "supportsClaim": false
       }
     }
   ],
   "summary": {
     "trackedScenarioCount": 23,
-    "provenLocally": 14,
-    "notProven": 9,
+    "provenLocally": 15,
+    "notProven": 8,
     "productionReady": false,
     "noProductionMutation": true
   }

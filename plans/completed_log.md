@@ -5,6 +5,35 @@
 
 ---
 
+## 2026-08-11 - Local Identity client-assertion conformance promoted
+
+**Outcome:** Academy composed its accepted JTI source, assertion provider, and
+Web Crypto signer in one focused local test. Two assertions carry distinct
+canonical JTI values, exact client/audience/lifetime claims, and real verifiable
+ES256 signatures; a wrong audience stops before another JTI request. The
+deterministic conformance generator now classifies
+`exchange.client-assertion` as locally proven and targets 15 pass / 8
+`not_proven` scenarios.
+
+**Verification:** Generator test-only RED stopped because the new scenario set
+did not exist. Initial GREEN passed 5/5. First different RIL then returned
+`C0/H0/M1/L0` because the composition entry self-declared a review verdict with
+an empty report and did not machine-bind producer replay evidence. A second RED
+passed 4/6; remediation distinguishes test evidence, removes that verdict/report,
+binds the exact Identity verifier and replay test, and rejects digest drift.
+Generator GREEN is now 6/6. Composition 1/1, Academy Identity 20 files / 288
+tests, full unit 92 files / 978 tests, producer assertion+lifecycle 22/22, and
+full lint/all TypeScript configs pass with one pre-existing generated warning.
+Evidence is in
+`reports/reviews/academy-identity-control-client-assertion-conformance-local-checkpoint-2026-08-11.md`.
+
+**Residual risk:** Generator current check, canonical intake at 23 verified / 15
+pass / 8 not-proven, and the exact nine-file freeze manifest pass. Different
+independent closure RIL returned final `C0/H0/M0/L0`. This is local conformance evidence,
+not a deployed key or replay store. Public-key registration/rotation,
+endpoint/runtime binding, named operators, deployment evidence, client
+enablement, and release authorization remain external gates.
+
 ## 2026-08-11 - Local Identity client-assertion Web Crypto signer implemented
 
 **Outcome:** Academy added a pure server-side signer that accepts one opaque,
