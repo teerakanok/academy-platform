@@ -1927,3 +1927,19 @@ Package CYBERSKILLS Academy content as a **commercially licensed trainer starter
 - Cross-sell into other CYBERSKILLS services (SAT, TTX/PhalanX, pentest, SOC) via nurture.
 - Corporate B2B training packages (likely the largest revenue line).
 - Single learner identity / account unifying bank + courses + waitlists.
+
+## 2026-08-11 - Shared-account local browser journey
+
+- [x] Implement Academy sign-in -> Account Center email/code -> callback -> opaque
+  Academy session -> My learning as one local-only browser journey.
+- [x] Preserve zero-entitlement behavior and deny suspended Academy activation.
+- [x] Pass desktop/mobile Chromium execution, console/network failure gates, and visual
+  inspection for sign-in, email, code, and dashboard states.
+- [x] Rebuild the journey from Academy `HEAD` without concurrent course/route work and
+  pass focused 25/25, full unit 904/904, lint/typechecks, and the production Next build.
+- [x] Close the isolated independent checkpoint review at `C0/H0/M0/L0` with focused
+  25/25, full unit 904/904, lint/typechecks, staged secret/diff checks, and route review.
+- [ ] Commit and push only the exact Identity journey paths without staging unrelated
+  Academy work.
+- [ ] Production remains disabled pending real endpoint/credential/key/email/runtime,
+  deployment, operator, and separate release authorization.

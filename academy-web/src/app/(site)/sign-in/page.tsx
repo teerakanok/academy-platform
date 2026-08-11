@@ -5,6 +5,7 @@ import React from 'react'
 import { SignInForm } from '@/components/auth/SignInForm'
 import { accountsEnabled } from '@/lib/auth/enabled'
 import { safeNextPath } from '@/lib/auth/route-client'
+import { identityControlLocalFixtureAllowedForHost } from '@/lib/identity/local-fixture'
 import { privatePage } from '@/lib/seo'
 
 // หน้าเข้าสู่ระบบ — พูดในนาม **CYBERSKILLS** ไม่ใช่ Academy
@@ -24,13 +25,20 @@ export default async function SignInPage({
   const { next, notice } = await searchParams
   const target = safeNextPath(next)
   const requestHeaders = await headers()
-  const accountAccessOpen = accountsEnabled(requestHeaders.get('host') ?? '')
+  const requestHost = requestHeaders.get('host') ?? ''
+  const accountAccessOpen = accountsEnabled(requestHost)
+  const localIdentityControl = identityControlLocalFixtureAllowedForHost(requestHost)
 
   return (
     <div className="mx-auto max-w-lg px-6 py-16">
       {notice === 'local-only' && (
         <p role="status" className="mb-6 border-l-2 border-cs-amber py-2 pl-4 text-sm text-cs-body">
           Signed out of this browser. Refresh-token revocation could not be confirmed; sessions already open on other devices were not changed.
+        </p>
+      )}
+      {notice === 'identity-unavailable' && (
+        <p role="alert" className="mb-6 border-l-2 border-cs-amber py-2 pl-4 text-sm text-cs-body">
+          Sign-in could not be completed. Please start again.
         </p>
       )}
       <div className="hero-bleed pb-6 text-center">
@@ -51,7 +59,7 @@ export default async function SignInPage({
       </div>
 
       {accountAccessOpen ? (
-        <SignInForm next={target} />
+        <SignInForm next={target} identityControl={localIdentityControl} />
       ) : (
         <div className="card-feature p-6 sm:p-8" data-testid="accounts-not-open">
           <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-cs-accent">Preview</p>

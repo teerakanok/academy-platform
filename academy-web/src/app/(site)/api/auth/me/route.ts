@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { routeAuthClient } from '@/lib/auth/route-client'
 import { legacyDirectOtpFixtureAllowedForRequest } from '@/lib/auth/legacy-direct-otp'
+import { identityControlLocalFixtureAllowedForRequest } from '@/lib/identity/local-fixture'
+import { readLocalAcademySession } from '@/lib/identity/local-runtime'
 
 export const runtime = 'nodejs'
 
@@ -10,6 +12,12 @@ export const runtime = 'nodejs'
 // จะทำให้**ทุกหน้าในเว็บกลายเป็น dynamic** ซึ่งฆ่า static/SSG ที่หน้าร้านพึ่งพาอยู่
 // (และ SEO กับความเร็วบน edge ก็หายไปด้วย) header จึงดึงสถานะหลัง hydrate แทน
 export async function GET(request: Request) {
+  if (identityControlLocalFixtureAllowedForRequest(request)) {
+    const session = readLocalAcademySession(request)
+    return session
+      ? NextResponse.json({ signedIn: true, email: session.verifiedEmail })
+      : NextResponse.json({ signedIn: false })
+  }
   if (!legacyDirectOtpFixtureAllowedForRequest(request)) {
     return NextResponse.json({ signedIn: false })
   }

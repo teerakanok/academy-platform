@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { currentUser } from '@/lib/auth/session'
+import { identityControlLocalFixtureAllowedForRequest } from '@/lib/identity/local-fixture'
+import { readLocalAcademySession } from '@/lib/identity/local-runtime'
 import { getAllCourses, getCourseStructure } from '@/lib/content/course-source'
 import { getLessonAnswerKey, mcqItems, sameAnswerSet, simulationItems } from '@/lib/content/answer-key'
 import {
@@ -486,6 +488,23 @@ function staleProgressResponse() {
 }
 
 export async function GET(request: Request) {
+  if (identityControlLocalFixtureAllowedForRequest(request)) {
+    const session = readLocalAcademySession(request)
+    const responseOptions = { headers: { 'Cache-Control': 'private, no-store' } }
+    if (!session) {
+      return NextResponse.json({ ok: false, error: 'ต้องเข้าสู่ระบบก่อน' }, { status: 401, ...responseOptions })
+    }
+    if (session.activation.status !== 'active') {
+      return NextResponse.json(
+        { ok: false, error: 'บัญชีนี้ยังใช้ Academy ไม่ได้' },
+        { status: 403, ...responseOptions },
+      )
+    }
+    return NextResponse.json(
+      { ok: true, accessibleCourseSlugs: [], courses: [], records: {} },
+      responseOptions,
+    )
+  }
   const user = await currentUser()
   if (!user) return NextResponse.json({ ok: false, error: 'ต้องเข้าสู่ระบบก่อน' }, { status: 401 })
 

@@ -11,6 +11,13 @@ import type { IdentityAdapter } from './adapter'
 // registry และ authorization ที่ให้ Academy ผูก production endpoint ได้.
 let cached: IdentityAdapter | null | undefined
 
+export class IdentityAdapterUnavailableError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'IdentityAdapterUnavailableError'
+  }
+}
+
 export function getIdentityAdapter(): IdentityAdapter | null {
   if (cached !== undefined) return cached
   cached = build()
@@ -30,6 +37,10 @@ function build(): IdentityAdapter | null {
       throw new Error('IDENTITY_ADAPTER=fake ต้องกำหนด IDENTITY_LOCAL_FAKE_ISSUER สำหรับ local fixture โดย explicit')
     }
     return new FakeIdentityAdapter(issuer)
+  }
+
+  if (mode === 'identity-control') {
+    throw new IdentityAdapterUnavailableError('Identity Control runtime ยังไม่ได้รับ release authorization สำหรับ Academy')
   }
 
   throw new Error(`ไม่รู้จัก IDENTITY_ADAPTER=${mode}`)

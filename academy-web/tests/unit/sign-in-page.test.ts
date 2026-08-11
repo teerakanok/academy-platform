@@ -5,7 +5,7 @@ const { headers } = vi.hoisted(() => ({ headers: vi.fn() }))
 
 vi.mock('next/headers', () => ({ headers }))
 
-import SignInPage from '@/app/sign-in/page'
+import SignInPage from '@/app/(site)/sign-in/page'
 
 vi.mock('@/components/auth/SignInForm', () => ({
   SignInForm: () => 'enabled-sign-in-form',

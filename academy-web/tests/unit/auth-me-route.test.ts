@@ -4,7 +4,7 @@ const { routeAuthClient } = vi.hoisted(() => ({ routeAuthClient: vi.fn() }))
 
 vi.mock('@/lib/auth/route-client', () => ({ routeAuthClient }))
 
-import { GET } from '@/app/api/auth/me/route'
+import { GET } from '@/app/(site)/api/auth/me/route'
 
 describe('GET /api/auth/me', () => {
   beforeEach(() => {

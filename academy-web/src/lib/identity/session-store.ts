@@ -6,6 +6,7 @@ import { withExclusiveFileStoreLock } from './file-store-lock'
 
 const SESSION_ID = /^[A-Za-z0-9_-]{32,160}$/
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const ACADEMY_SESSION_COOKIE_NAME = 'academy_session'
 
 export interface IdentitySessionClaims {
   issuer: string
@@ -171,16 +172,61 @@ function validateClaims(claims: IdentitySessionClaims): void {
   }
 }
 
-export function academySessionCookie(
-  sessionId: string,
-  { secure = true, maxAge }: { secure?: boolean; maxAge?: number } = {},
-): string {
-  if (!SESSION_ID.test(sessionId)) throw new Error('identity session cookie ต้องใช้ opaque session id')
-  const parts = [`academy_session=${encodeURIComponent(sessionId)}`, 'Path=/', 'HttpOnly', 'SameSite=Lax']
+function academySessionCookieAttributes({ secure, maxAge }: { secure: boolean; maxAge?: number }): string[] {
+  const parts = ['Path=/', 'HttpOnly', 'SameSite=Lax']
   if (secure) parts.push('Secure')
   if (maxAge !== undefined) {
     if (!Number.isSafeInteger(maxAge) || maxAge < 0) throw new Error('identity session cookie maxAge ไม่ถูกต้อง')
     parts.push(`Max-Age=${maxAge}`)
   }
-  return parts.join('; ')
+  return parts
+}
+
+export function academySessionCookie(
+  sessionId: string,
+  { secure = true, maxAge }: { secure?: boolean; maxAge?: number } = {},
+): string {
+  if (!SESSION_ID.test(sessionId)) throw new Error('identity session cookie ต้องใช้ opaque session id')
+  return [
+    `${ACADEMY_SESSION_COOKIE_NAME}=${sessionId}`,
+    ...academySessionCookieAttributes({ secure, maxAge }),
+  ].join('; ')
+}
+
+export function expireAcademySessionCookie({ secure = true }: { secure?: boolean } = {}): string {
+  return [
+    `${ACADEMY_SESSION_COOKIE_NAME}=`,
+    ...academySessionCookieAttributes({ secure, maxAge: 0 }),
+  ].join('; ')
+}
+
+/** Local-only raw-header parser; normalization must not discard duplicate names first. */
+export function parseAcademySessionCookie(cookieHeader: string | null | undefined): string | null {
+  if (!cookieHeader) return null
+
+  let occurrences = 0
+  let candidate: string | null = null
+  let malformed = false
+
+  for (const rawPair of cookieHeader.split(';')) {
+    const pair = rawPair.trim()
+    const separator = pair.indexOf('=')
+    const name = (separator === -1 ? pair : pair.slice(0, separator)).trim()
+    if (name !== ACADEMY_SESSION_COOKIE_NAME) continue
+
+    occurrences += 1
+    if (separator === -1) {
+      malformed = true
+      continue
+    }
+
+    const value = pair.slice(separator + 1).trim()
+    if (!SESSION_ID.test(value)) {
+      malformed = true
+      continue
+    }
+    candidate = value
+  }
+
+  return occurrences === 1 && !malformed ? candidate : null
 }

@@ -5,6 +5,8 @@ import { describe, expect, it } from 'vitest'
 import {
   FileIdentitySessionStore,
   academySessionCookie,
+  expireAcademySessionCookie,
+  parseAcademySessionCookie,
   type IdentitySessionClaims,
 } from '@/lib/identity/session-store'
 
@@ -57,14 +59,66 @@ describe('local durable identity session store', () => {
     })
   })
 
-  it('returns a host-scoped HttpOnly cookie without a parent-domain attribute', () => {
-    const cookie = academySessionCookie('session_token_123456789012345678901234', { secure: true, maxAge: 900 })
+  it('serializes and expires the host-only cookie with one deterministic attribute policy', () => {
+    const sessionId = 'session_token_123456789012345678901234'
 
-    expect(cookie).toContain('HttpOnly')
-    expect(cookie).toContain('SameSite=Lax')
-    expect(cookie).toContain('Path=/')
-    expect(cookie).toContain('Secure')
-    expect(cookie).toContain('Max-Age=900')
+    expect(academySessionCookie(sessionId, { secure: true, maxAge: 900 })).toBe(
+      `academy_session=${sessionId}; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=900`,
+    )
+    expect(academySessionCookie(sessionId, { secure: false })).toBe(
+      `academy_session=${sessionId}; Path=/; HttpOnly; SameSite=Lax`,
+    )
+    expect(expireAcademySessionCookie({ secure: true })).toBe(
+      'academy_session=; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=0',
+    )
+    expect(expireAcademySessionCookie({ secure: false })).toBe(
+      'academy_session=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0',
+    )
+
+    const cookie = expireAcademySessionCookie()
     expect(cookie).not.toMatch(/Domain=/i)
+  })
+
+  it('parses only one canonical opaque session cookie from the raw header', () => {
+    const sessionId = 'opaque_session-id_12345678901234567890'
+
+    expect(parseAcademySessionCookie(`theme=dark; academy_session=${sessionId}; locale=th`)).toBe(sessionId)
+    expect(parseAcademySessionCookie(` academy_session = ${sessionId} `)).toBe(sessionId)
+    expect(parseAcademySessionCookie(`Academy_Session=ignored; academy_session=${sessionId}`)).toBe(sessionId)
+    expect(parseAcademySessionCookie('theme=dark')).toBeNull()
+    expect(parseAcademySessionCookie(null)).toBeNull()
+  })
+
+  it('rejects every duplicate canonical name without depending on cookie order', () => {
+    const valid = 'A'.repeat(32)
+    const invalid = 'short'
+    const duplicateHeaders = [
+      `academy_session=${valid}; academy_session=${valid}`,
+      `academy_session=${valid}; theme=dark; academy_session=${invalid}`,
+      `academy_session=${invalid}; theme=dark; academy_session=${valid}`,
+      `academy_session=; academy_session=${valid}`,
+      `academy_session=${valid}; academy_session`,
+    ]
+
+    for (const header of duplicateHeaders) {
+      expect(parseAcademySessionCookie(header)).toBeNull()
+    }
+  })
+
+  it('enforces the opaque session id alphabet and inclusive length bounds', () => {
+    expect(parseAcademySessionCookie(`academy_session=${'A'.repeat(32)}`)).toBe('A'.repeat(32))
+    expect(parseAcademySessionCookie(`academy_session=${'A'.repeat(160)}`)).toBe('A'.repeat(160))
+
+    for (const value of [
+      'A'.repeat(31),
+      'A'.repeat(161),
+      `${'A'.repeat(31)}.`,
+      `${'A'.repeat(31)}%`,
+      `${'A'.repeat(31)}=`,
+      `${'A'.repeat(31)} `,
+      '',
+    ]) {
+      expect(parseAcademySessionCookie(`academy_session=${value}`)).toBeNull()
+    }
   })
 })

@@ -5,7 +5,10 @@ import { describe, expect, it } from 'vitest'
 const ROOT = join(__dirname, '..', '..')
 
 function source(path: string): string {
-  return readFileSync(join(ROOT, path), 'utf8')
+  const direct = join(ROOT, path)
+  if (existsSync(direct)) return readFileSync(direct, 'utf8')
+  const siteRoute = join(ROOT, path.replace('src/app/', 'src/app/(site)/'))
+  return readFileSync(siteRoute, 'utf8')
 }
 
 describe('security boundary wiring', () => {

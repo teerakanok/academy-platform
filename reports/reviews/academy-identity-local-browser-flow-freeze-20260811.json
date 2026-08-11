@@ -1,0 +1,196 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/artifacts/identity-local-browser-flow-2026-08-11/academy-dashboard-desktop.png",
+      "sha256": "1ba2c77ed609c5c2d01545413a8f155f907448d28fd0e8800fc5d608a343cff9",
+      "bytes": 171201
+    },
+    {
+      "path": "academy-web/artifacts/identity-local-browser-flow-2026-08-11/academy-dashboard-mobile.png",
+      "sha256": "0ae0e7a6670dce6d6a91ad0deed75aea81d05add2c5c9eb55f96e80730972104",
+      "bytes": 298414
+    },
+    {
+      "path": "academy-web/artifacts/identity-local-browser-flow-2026-08-11/academy-sign-in-desktop.png",
+      "sha256": "2c9f888de5b6139b6027b2b6378b2b6dd361f82ee3ea7e2c6dab97ba45c0b35d",
+      "bytes": 207372
+    },
+    {
+      "path": "academy-web/artifacts/identity-local-browser-flow-2026-08-11/academy-sign-in-mobile.png",
+      "sha256": "1064aca14dd265c03c0312998f25910980e26f20ea652d26289c92f8b97ebfba",
+      "bytes": 405688
+    },
+    {
+      "path": "academy-web/artifacts/identity-local-browser-flow-2026-08-11/account-center-code-desktop.png",
+      "sha256": "1a7e7291510588aeb16800e46e21af21c73c6e67b34c97d178fd37f70d1665cd",
+      "bytes": 82221
+    },
+    {
+      "path": "academy-web/artifacts/identity-local-browser-flow-2026-08-11/account-center-code-mobile.png",
+      "sha256": "964a3f1e26147a69d504ea34ce253189481438fc6115f3837504cd50b51e6b3f",
+      "bytes": 205723
+    },
+    {
+      "path": "academy-web/artifacts/identity-local-browser-flow-2026-08-11/account-center-email-desktop.png",
+      "sha256": "dd01b38cdb7fe0ae3d28e14ca58cb1408bd59d1183c5dd7070d6e7fa9030a831",
+      "bytes": 83364
+    },
+    {
+      "path": "academy-web/artifacts/identity-local-browser-flow-2026-08-11/account-center-email-mobile.png",
+      "sha256": "b7ac96dd3cfdc5157d2c531da2bd12ea8c9cd90c25501e62a4f568f0943c83ba",
+      "bytes": 211701
+    },
+    {
+      "path": "academy-web/e2e/identity-local-sign-in.spec.ts",
+      "sha256": "ec3216596e759eb2e285c883fc68f2ea240189c5fdadff1fa474724a770657c6",
+      "bytes": 3971
+    },
+    {
+      "path": "academy-web/next.config.ts",
+      "sha256": "5ec7138d624d7986bbdc4516ab6ccac9868096188773c8f7ed8208563f858b5b",
+      "bytes": 2141
+    },
+    {
+      "path": "academy-web/package.json",
+      "sha256": "4d7ef304b22b10f7d192864617109540f7d8beb62b2cf33e149b83720803ab61",
+      "bytes": 1745
+    },
+    {
+      "path": "academy-web/playwright.identity-local.config.ts",
+      "sha256": "068b645b846081dbca860bd0a49dbb3d584a8bac4aad8eef4060a3f706ec1805",
+      "bytes": 533
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/auth/identity/start/route.ts",
+      "sha256": "ead3729425c9a975dc3ba2df8c1ab77ee579d636868bfd4ab023aefa0d918ce4",
+      "bytes": 1965
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/auth/me/route.ts",
+      "sha256": "9c9bf9df5e52b796cd2d9071363072a63c349e482e1c3d771a235ddfa07f1af0",
+      "bytes": 1937
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/auth/sign-out/route.ts",
+      "sha256": "b093c9d200d4e749cf19b5d58af78ddbcabae2bdf4cc168da6bf46717a154967",
+      "bytes": 2670
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/progress/route.ts",
+      "sha256": "0b458e62951cdfbacb3b094865cc2bdeb19aecda670957b7a61270f55097f25d",
+      "bytes": 33325
+    },
+    {
+      "path": "academy-web/src/app/(site)/auth/callback/route.ts",
+      "sha256": "a520c11452ff43c6a50970e347596f1839fcc91dc16f770a63b546ca5a777ac4",
+      "bytes": 5377
+    },
+    {
+      "path": "academy-web/src/app/(site)/sign-in/page.tsx",
+      "sha256": "c1c5976bb0620bc87623411d6c5640892e76c8af987eab435ef57f8ab097b2a3",
+      "bytes": 4042
+    },
+    {
+      "path": "academy-web/src/components/auth/SignInForm.tsx",
+      "sha256": "c4cd315fb89bc737ba94cbe50ee7ebed0cb3a3dff9fd71b50091346bdbfa67cc",
+      "bytes": 7175
+    },
+    {
+      "path": "academy-web/src/components/course/CourseDashboard.tsx",
+      "sha256": "e278795320d44e0d74df985d87f7751f948eb4d8cb7a2259f3a7b163d1cc2a9c",
+      "bytes": 16787
+    },
+    {
+      "path": "academy-web/src/lib/auth/enabled.ts",
+      "sha256": "e47b03e6eda16f0778db8ab7fe3c33e8079abe685908317a089c57b98358b621",
+      "bytes": 2142
+    },
+    {
+      "path": "academy-web/src/lib/identity/local-fixture.ts",
+      "sha256": "ad82204996d2ff02d408679a71323bde93c001242cb3692f0e2aab7dd3cb938e",
+      "bytes": 2299
+    },
+    {
+      "path": "academy-web/src/lib/identity/local-runtime.ts",
+      "sha256": "dc925188cb8e69ee6f082f4777da270cac791052f1f5b9b3aa7cd172be99a038",
+      "bytes": 8321
+    },
+    {
+      "path": "academy-web/src/lib/identity/registry.ts",
+      "sha256": "7136911d0189ca0586588c5c22fc5799b3ac184cceef116870300c73fd088a8b",
+      "bytes": 2389
+    },
+    {
+      "path": "academy-web/src/lib/identity/session-store.ts",
+      "sha256": "4972e36f459487612a6006c872c71c9ed10d5254977c95447d0447922f869cd1",
+      "bytes": 9159
+    },
+    {
+      "path": "academy-web/src/middleware.ts",
+      "sha256": "cc4a86d8490c8faa51075c90f705a24ce964bc50c3c973810f6875834a0c2cba",
+      "bytes": 8746
+    },
+    {
+      "path": "academy-web/tests/unit/auth-callback-route.test.ts",
+      "sha256": "779228c99001bca6744dee9affb2ca812518cfdd00d8a3459a2057f0516d2140",
+      "bytes": 1681
+    },
+    {
+      "path": "academy-web/tests/unit/auth-me-route.test.ts",
+      "sha256": "7aa5e5724b58a0ef031cc078f59af27dcdf5cdad7c6fbc89ead52cd3ddc594fc",
+      "bytes": 966
+    },
+    {
+      "path": "academy-web/tests/unit/identity-local-browser-flow.test.ts",
+      "sha256": "242f0205950be26646e6279fbf3f4d32270042f171607c83c08a6edf5b5d80b4",
+      "bytes": 8418
+    },
+    {
+      "path": "academy-web/tests/unit/identity-local-fixture.test.ts",
+      "sha256": "b132e21d9d605a1479d5b7dcbfa990b8248075e06199be608a13279ee82f72a0",
+      "bytes": 1656
+    },
+    {
+      "path": "academy-web/tests/unit/identity-local-recovery.test.ts",
+      "sha256": "df452f0b5fd476cd49ca0a46abc0ab96d10124bbfb8bc78486e828a36213d077",
+      "bytes": 985
+    },
+    {
+      "path": "academy-web/tests/unit/identity-session-store.test.ts",
+      "sha256": "1ed74407f269acbeb91b797e5c9b4b02fb70c4f829c3dfd9c4e628b349ff9b38",
+      "bytes": 4678
+    },
+    {
+      "path": "academy-web/tests/unit/security-headers.test.ts",
+      "sha256": "5b17cf2c46769f8d79fb06c5f708637edf4224f21e3c8ccac5030d89e7f3c2ec",
+      "bytes": 2910
+    },
+    {
+      "path": "academy-web/tests/unit/security-wiring.test.ts",
+      "sha256": "c90e3647802bc63d36c3f94044b635b8dc7c2de576580dfbb810092236340e50",
+      "bytes": 6298
+    },
+    {
+      "path": "academy-web/tests/unit/sign-in-page.test.ts",
+      "sha256": "23e0ae519a15ddd182d6360e70aebd23ac344bbf63a71c9e9688de0a5759eba9",
+      "bytes": 2486
+    },
+    {
+      "path": "academy-web/tests/unit/sign-out-route.test.ts",
+      "sha256": "d326d953813797037ce689e65c3548bad8ce61b1575469fc9fc1bc51fe601f1a",
+      "bytes": 2712
+    },
+    {
+      "path": "plans/active_plan.md",
+      "sha256": "d7c86fd04745810c8662394e4df3b716a58372ab25c8fb16d88249b56d645f8d",
+      "bytes": 208226
+    },
+    {
+      "path": "reports/reviews/academy-identity-local-browser-flow-checkpoint-20260811.md",
+      "sha256": "a34d9d5e712f3a34e4c9201899d621030215fc09230cf418e064f60698b177f1",
+      "bytes": 4726
+    }
+  ]
+}

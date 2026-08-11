@@ -3,6 +3,10 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { internalSurfacesEnabled, isInternalSurface } from '@/lib/internal-surface'
 import { authCookieOptions, isSecureRequest } from '@/lib/auth/cookie-policy'
 import { legacyDirectOtpFixtureAllowedForRequest } from '@/lib/auth/legacy-direct-otp'
+import {
+  hasSyntacticallyValidLocalAcademySession,
+  identityControlLocalFixtureAllowedForRequest,
+} from '@/lib/identity/local-fixture'
 
 // ประตูเดียวของทั้งเว็บ — ตัดสินว่าเส้นทางไหนเปิด เส้นทางไหนต้องมีบัญชี
 //
@@ -59,6 +63,23 @@ export async function middleware(request: NextRequest) {
   // ต่ออายุ session ทุก request — ถ้าไม่ทำ cookie จะหมดอายุกลางคันแล้วผู้เรียน
   // ถูกเด้งออกระหว่างทำ quiz ซึ่งเสียงานที่ยังไม่ได้บันทึก
   let response = NextResponse.next({ request })
+
+  const allowIdentityFixture = identityControlLocalFixtureAllowedForRequest(request)
+  if (allowIdentityFixture) {
+    const { pathname, search } = request.nextUrl
+    const hasLocalSession = hasSyntacticallyValidLocalAcademySession(request.headers.get('cookie'))
+    if (!hasLocalSession && !isPublic(pathname)) {
+      if (pathname.startsWith('/api/')) {
+        return NextResponse.json({ ok: false, error: 'ต้องเข้าสู่ระบบก่อน' }, { status: 401 })
+      }
+      const signIn = new URL('/sign-in', request.url)
+      signIn.searchParams.set('next', pathname + search)
+      return NextResponse.redirect(signIn)
+    }
+    // Cookie syntax is only a coarse prefilter. Durable Node routes own session
+    // validation, so sign-in remains reachable after expiry, revocation, or loss.
+    return response
+  }
 
   const allowLegacyFixture = legacyDirectOtpFixtureAllowedForRequest(request)
   const url = allowLegacyFixture ? process.env.NEXT_PUBLIC_SUPABASE_URL : undefined

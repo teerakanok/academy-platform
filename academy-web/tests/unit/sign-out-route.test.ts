@@ -1,8 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { routeAuthClient, clearRouteAuthCookies } = vi.hoisted(() => ({
+const { routeAuthClient, clearRouteAuthCookies, revokeLocalAcademySession } = vi.hoisted(() => ({
   routeAuthClient: vi.fn(),
   clearRouteAuthCookies: vi.fn(),
+  revokeLocalAcademySession: vi.fn(),
 }))
 
 vi.mock('@/lib/auth/route-client', () => ({
@@ -10,7 +11,9 @@ vi.mock('@/lib/auth/route-client', () => ({
   clearRouteAuthCookies,
 }))
 
-import { POST } from '@/app/api/auth/sign-out/route'
+vi.mock('@/lib/identity/local-runtime', () => ({ revokeLocalAcademySession }))
+
+import { POST } from '@/app/(site)/api/auth/sign-out/route'
 
 function request() {
   return new Request('http://127.0.0.1:3000/api/auth/sign-out', {
@@ -43,5 +46,33 @@ describe('POST /api/auth/sign-out', () => {
       scope: 'local',
       revocation: 'not-confirmed',
     })
+  })
+
+  it('local store revoke ล้มเหลวก็ expire browser cookie และคืน not-confirmed', async () => {
+    vi.stubEnv('NODE_ENV', 'test')
+    vi.stubEnv('ACADEMY_IDENTITY_CONTROL_LOCAL_FIXTURE', '1')
+    vi.stubEnv('ACADEMY_IDENTITY_CONTROL_LOCAL_APP_ORIGIN', 'http://localhost:3000')
+    revokeLocalAcademySession.mockImplementation(() => {
+      throw new Error('local store unavailable')
+    })
+
+    const response = await POST(new Request('http://localhost:3000/api/auth/sign-out', {
+      method: 'POST',
+      headers: {
+        cookie: `academy_session=${'A'.repeat(32)}`,
+        host: 'localhost:3000',
+        origin: 'http://localhost:3000',
+        'sec-fetch-site': 'same-origin',
+      },
+    }))
+
+    expect(response.status).toBe(200)
+    await expect(response.json()).resolves.toEqual({
+      ok: true,
+      scope: 'local',
+      revocation: 'not-confirmed',
+    })
+    expect(response.headers.get('set-cookie')).toContain('academy_session=;')
+    expect(response.headers.get('set-cookie')).toContain('Max-Age=0')
   })
 })

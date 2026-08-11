@@ -337,9 +337,14 @@ export function CourseDashboard({
           })}
         </ul>
         {accessibleCourses.length === 0 && (
-          <p className="text-sm text-cs-body" data-testid="dashboard-no-courses">
-            No courses are included in your current enrollment.
-          </p>
+          <div>
+            <p className="text-sm text-cs-body" data-testid="dashboard-no-courses">
+              No courses are included in your current enrollment.
+            </p>
+            <Link href="/courses" className="mt-4 inline-block text-sm font-medium text-cs-accent underline underline-offset-4">
+              Browse available courses
+            </Link>
+          </div>
         )}
       </section>}
 

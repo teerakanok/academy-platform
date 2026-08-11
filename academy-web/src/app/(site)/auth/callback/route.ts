@@ -1,6 +1,14 @@
 import { NextResponse } from 'next/server'
-import { getIdentityAdapter } from '@/lib/identity/registry'
+import { IdentityAdapterUnavailableError, getIdentityAdapter } from '@/lib/identity/registry'
 import { IdentityTransactionError, parseIdentityCallback } from '@/lib/identity/transaction'
+import { identityControlLocalFixtureAllowedForRequest } from '@/lib/identity/local-fixture'
+import {
+  createIdentityLocalRuntime,
+  createLocalAcademySession,
+  expireLocalIdentityBrowserBindingCookie,
+  readLocalIdentityBrowserBinding,
+} from '@/lib/identity/local-runtime'
+import { completeIdentityCallback } from '@/lib/identity/transaction'
 
 export const runtime = 'nodejs'
 
@@ -19,8 +27,9 @@ export const runtime = 'nodejs'
 
 export async function GET(request: Request) {
   const url = new URL(request.url)
+  let callback
   try {
-    parseIdentityCallback(url)
+    callback = parseIdentityCallback(url)
   } catch (error) {
     if (error instanceof IdentityTransactionError) {
       return NextResponse.json({ ok: false, error: error.message }, { status: 400 })
@@ -28,7 +37,44 @@ export async function GET(request: Request) {
     throw error
   }
 
-  const adapter = getIdentityAdapter()
+  if (identityControlLocalFixtureAllowedForRequest(request)) {
+    let stateCookie: string | undefined
+    try {
+      const local = createIdentityLocalRuntime(request)
+      stateCookie = expireLocalIdentityBrowserBindingCookie(callback.state)
+      const browserBinding = readLocalIdentityBrowserBinding(request.headers.get('cookie'), callback.state)
+      if (!browserBinding) throw new IdentityTransactionError('ไม่พบ browser binding', 'browser_mismatch')
+      const completed = await completeIdentityCallback({
+        adapter: local.codeExchangePort,
+        store: local.transactionStore,
+        client: local.client,
+        callback,
+        browserBinding,
+        clientAssertionProvider: local.clientAssertionProvider,
+      })
+      const response = NextResponse.redirect(new URL(completed.returnPath, request.url), 303)
+      response.headers.append('set-cookie', createLocalAcademySession(local, completed.exchange))
+      response.headers.append('set-cookie', stateCookie)
+      return response
+    } catch {
+      const response = NextResponse.redirect(new URL('/sign-in?notice=identity-unavailable', request.url), 303)
+      if (stateCookie) response.headers.append('set-cookie', stateCookie)
+      return response
+    }
+  }
+
+  let adapter
+  try {
+    adapter = getIdentityAdapter()
+  } catch (error) {
+    if (error instanceof IdentityAdapterUnavailableError) {
+      return NextResponse.json(
+        { ok: false, error: 'ยังไม่ได้เชื่อมต่อ Identity Control สำหรับสภาพแวดล้อมนี้' },
+        { status: 503 },
+      )
+    }
+    throw error
+  }
   if (!adapter) {
     // ยังไม่ได้ต่อ Identity Control — ตอบตามจริง ไม่ใช่ทำเป็นว่าใช้ได้
     return NextResponse.json(

@@ -1,4 +1,5 @@
 import { legacyDirectOtpFixtureAllowedForHost } from './legacy-direct-otp'
+import { identityControlLocalFixtureAllowedForHost } from '@/lib/identity/local-fixture'
 
 // ระบบบัญชีเปิดใช้งานได้จริงหรือยัง
 //
@@ -14,5 +15,6 @@ import { legacyDirectOtpFixtureAllowedForHost } from './legacy-direct-otp'
 export function accountsEnabled(requestHost: string): boolean {
   // Account Center ไม่พร้อมใช้งานจริงจนกว่า Identity Control จะ release. เส้นทาง
   // Supabase เดิมมีไว้ให้ local E2E fixture เท่านั้นและต้องเปิดแบบ explicit.
-  return legacyDirectOtpFixtureAllowedForHost(requestHost)
+  return identityControlLocalFixtureAllowedForHost(requestHost)
+    || legacyDirectOtpFixtureAllowedForHost(requestHost)
 }

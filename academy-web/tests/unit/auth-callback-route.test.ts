@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { GET } from '@/app/auth/callback/route'
+import { GET } from '@/app/(site)/auth/callback/route'
 import { resetIdentityAdapterForTest } from '@/lib/identity/registry'
 
 afterEach(() => {
@@ -25,5 +25,15 @@ describe('GET /auth/callback', () => {
 
     expect(response.status).toBe(503)
     await expect(response.json()).resolves.toMatchObject({ ok: false })
+  })
+
+  it('returns a bounded unavailable response when identity-control mode is enabled before runtime release', async () => {
+    vi.stubEnv('IDENTITY_ADAPTER', 'identity-control')
+    const response = await GET(
+      new Request('https://academy.cyberskills.co.th/auth/callback?code=aaaaaaaaaaaaaaaa&state=bbbbbbbbbbbbbbbb'),
+    )
+
+    expect(response.status).toBe(503)
+    await expect(response.json()).resolves.toMatchObject({ ok: false, error: expect.stringMatching(/ยังไม่ได้เชื่อมต่อ/) })
   })
 })
