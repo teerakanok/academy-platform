@@ -374,6 +374,30 @@ Test-only RED ผ่าน 4/6; remediation แยก test evidence ออกจ
 เพิ่ม drift rejection จน generator GREEN 6/6. Different closure RIL bind exact
 nine-file manifest และผ่าน final `C0/H0/M0/L0`.
 
+**Identity callback browser-binding checkpoint (2026-08-11):** Academy เพิ่ม
+browser secret แยกจาก `state` ใน local transaction boundary. Begin คืน raw
+32-byte opaque binding ให้ server caller แยกจาก authorization request และ store
+เก็บเฉพาะ SHA-256 digest. Memory consume เทียบแล้ว delete ใน synchronous no-await
+operation เดียว; file consume ทำ compare-before-delete ภายใต้ exclusive lock.
+Binding ผิดหรือสั้นคืน `browser_mismatch`, ไม่เรียก signer/exchange และไม่กิน
+transaction ของ browser ที่เริ่ม flow. Local file schema ขยับ
+เป็น v2; v1 และ digest เสีย fail closed โดยไม่ rewrite. Initial TDD RED ล้ม
+4/21 ก่อน GREEN 21/21 และ expanded focused 23/23. First different RIL พบ
+`C0/H0/M2/L0`: concrete stores ยังรับ surplus/raw caller fields, digest alias และ
+state ซ้ำที่ consume ได้สองครั้งหลัง restart. Remediation RED 23 ผ่าน/6 ล้ม;
+exact own-data projection, canonical digest re-encode และ lock-held duplicate-state
+rejection ปิดเป็น GREEN 29/29. Identity regression ผ่าน 328/328, full unit ผ่าน
+93 files/1018 tests, Identity producer authorization 30/30 และ full lint/all
+TypeScript configs ผ่านโดยมี generated warning เดิม 1 จุด. หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-callback-browser-binding-local-checkpoint-2026-08-11.md`](../reports/reviews/academy-identity-callback-browser-binding-local-checkpoint-2026-08-11.md).
+Different independent closure RIL ปิด implementation เป็น `C0/H0/M0/L1` และชี้
+เฉพาะคำอธิบาย lock ของ memory/file store ที่กว้างกว่าสource; แก้ wording แล้ว
+text-only recheck ผ่าน final `C0/H0/M0/L0`. Slice นี้ไม่แตะ route/cookie/session/
+registry/Wrangler/DB/runtime และไม่ promote `callback.login-csrf`; canonical
+conformance คง 15/23 (`65.2%`), production readiness ประมาณ 20% และ production
+NO-GO คงเดิมจน cookie/Origin/Fetch Metadata/durable runtime/browser/deploy/release
+evidence พร้อม.
+
 **Identity code-exchange result verifier checkpoint (2026-08-11):** Academy
 เพิ่ม strict local boundary ก่อน callback ใช้ผลจาก Identity Control. Verifier
 รับเฉพาะ exact seven-field result + two-field activation, snapshot own data

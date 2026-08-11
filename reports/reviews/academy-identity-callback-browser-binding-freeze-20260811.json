@@ -1,0 +1,36 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/src/lib/identity/transaction.ts",
+      "sha256": "51545d879af617792605890f4545e1b92a6e8bea65c3c98f1c22f94fc6550c39",
+      "bytes": 21440
+    },
+    {
+      "path": "academy-web/tests/unit/identity-durable-store.test.ts",
+      "sha256": "e916abb197f8912ffe13b6d0428308630e75cd08f4f4be3b55ac4f89bbcebc4c",
+      "bytes": 12236
+    },
+    {
+      "path": "academy-web/tests/unit/identity-transaction.test.ts",
+      "sha256": "7f02057a0943c9243b56e783c4175dbd8b9cfa58a715721f389137097b9b7a1c",
+      "bytes": 17302
+    },
+    {
+      "path": "plans/active_plan.md",
+      "sha256": "47c055647f6ec388caccfe22fd21a39cc5163c76a1517638177c191c3c83787f",
+      "bytes": 186933
+    },
+    {
+      "path": "plans/completed_log.md",
+      "sha256": "f1d6df1b706c020ddf218dc92f288c5b56e9b6d33aac84df59f1b86a469b4e5a",
+      "bytes": 126056
+    },
+    {
+      "path": "reports/reviews/academy-identity-callback-browser-binding-local-checkpoint-2026-08-11.md",
+      "sha256": "1cac16a1bd4356910d3e144e7d2b5558d9ed4a5c1ea223c00b1479ac4f78428f",
+      "bytes": 7327
+    }
+  ]
+}

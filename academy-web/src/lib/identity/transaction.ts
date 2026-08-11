@@ -1,4 +1,4 @@
-import { createHash, randomBytes } from 'node:crypto'
+import { createHash, randomBytes, timingSafeEqual } from 'node:crypto'
 import { chmodSync, existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'node:fs'
 import { dirname, isAbsolute } from 'node:path'
 import type {
@@ -12,6 +12,26 @@ import { withExclusiveFileStoreLock } from './file-store-lock'
 
 const CALLBACK_KEYS = new Set(['code', 'state'])
 const OPAQUE_VALUE = /^[A-Za-z0-9_-]{16,160}$/
+const SHA256_BASE64URL = /^[A-Za-z0-9_-]{43}$/
+const CODE_VERIFIER = /^[A-Za-z0-9._~-]{43,128}$/
+const LOCAL_CLIENT_KEYS = [
+  'clientId',
+  'redirectUri',
+  'serviceId',
+  'audience',
+  'expectedIssuer',
+  'clientAssertionAudience',
+] as const
+const TRANSACTION_INPUT_KEYS = [
+  'state',
+  'codeVerifier',
+  'nonce',
+  'browserBindingDigest',
+  'client',
+  'returnPath',
+] as const
+const PERSISTED_TRANSACTION_KEYS = [...TRANSACTION_INPUT_KEYS, 'expiresAt'] as const
+const PERSISTED_FILE_KEYS = ['version', 'transactions'] as const
 
 export interface LocalIdentityClient {
   clientId: string
@@ -26,6 +46,7 @@ export interface PendingIdentityTransaction {
   readonly state: string
   readonly codeVerifier: string
   readonly nonce: string
+  readonly browserBindingDigest: string
   readonly client: LocalIdentityClient
   readonly returnPath: string
   readonly expiresAt: number
@@ -35,7 +56,7 @@ export type PendingIdentityTransactionInput = Omit<PendingIdentityTransaction, '
 
 export interface IdentityTransactionStore {
   create(input: PendingIdentityTransactionInput): PendingIdentityTransaction
-  consume(state: string): PendingIdentityTransaction
+  consume(state: string, browserBinding: string): PendingIdentityTransaction
 }
 
 export interface IdentityCallback {
@@ -46,7 +67,7 @@ export interface IdentityCallback {
 export class IdentityTransactionError extends Error {
   constructor(
     message: string,
-    readonly reason: 'unknown_state' | 'expired_state' | 'invalid_callback' | 'audience_mismatch' | 'invalid_result',
+    readonly reason: 'unknown_state' | 'expired_state' | 'browser_mismatch' | 'invalid_callback' | 'audience_mismatch' | 'invalid_result',
   ) {
     super(message)
     this.name = 'IdentityTransactionError'
@@ -71,27 +92,36 @@ export class InMemoryIdentityTransactionStore {
   }
 
   create(input: PendingIdentityTransactionInput): PendingIdentityTransaction {
+    const exactInput = snapshotPendingTransactionInput(input)
     const now = this.now()
+    const existing = this.transactions.get(exactInput.state)
+    if (existing && existing.expiresAt > now) {
+      throw new IdentityTransactionStoreError('identity transaction store มี state ที่ยังใช้งานอยู่ซ้ำกัน')
+    }
     this.prune(now)
-    const transaction = { ...input, expiresAt: now + this.ttlMs }
+    const transaction = transactionWithExpiry(exactInput, now + this.ttlMs)
     this.transactions.set(transaction.state, transaction)
-    return transaction
+    return cloneTransaction(transaction)
   }
 
   /** Atomically claim state before code exchange so a callback cannot replay it. */
-  consume(state: string): PendingIdentityTransaction {
+  consume(state: string, browserBinding: string): PendingIdentityTransaction {
     const transaction = this.transactions.get(state)
     if (!transaction) throw new IdentityTransactionError('ไม่พบ state หรือ state ถูกใช้ไปแล้ว', 'unknown_state')
-    this.transactions.delete(state)
     if (this.now() >= transaction.expiresAt) {
+      this.transactions.delete(state)
       throw new IdentityTransactionError('state ของการเข้าสู่ระบบหมดอายุแล้ว', 'expired_state')
     }
-    return transaction
+    if (!matchesBrowserBinding(transaction.browserBindingDigest, browserBinding)) {
+      throw new IdentityTransactionError('callback ไม่ได้มาจาก browser ที่เริ่มเข้าสู่ระบบ', 'browser_mismatch')
+    }
+    this.transactions.delete(state)
+    return cloneTransaction(transaction)
   }
 
   private prune(now: number): void {
     for (const [state, transaction] of this.transactions) {
-      if (transaction.expiresAt < now) this.transactions.delete(state)
+      if (transaction.expiresAt <= now) this.transactions.delete(state)
     }
   }
 }
@@ -104,44 +134,133 @@ export class IdentityTransactionStoreError extends Error {
 }
 
 interface PersistedTransactionFile {
-  version: 1
+  version: 2
   transactions: PendingIdentityTransaction[]
 }
 
-function isPersistedTransaction(value: unknown): value is PendingIdentityTransaction {
-  if (!value || typeof value !== 'object') return false
-  const candidate = value as Partial<PendingIdentityTransaction>
-  if (
-    typeof candidate.state !== 'string' ||
-    !OPAQUE_VALUE.test(candidate.state) ||
-    typeof candidate.codeVerifier !== 'string' ||
-    !/^[A-Za-z0-9._~-]{43,128}$/.test(candidate.codeVerifier) ||
-    typeof candidate.nonce !== 'string' ||
-    !OPAQUE_VALUE.test(candidate.nonce) ||
-    typeof candidate.returnPath !== 'string' ||
-    !isInternalReturnPath(candidate.returnPath) ||
-    typeof candidate.expiresAt !== 'number' ||
-    !Number.isSafeInteger(candidate.expiresAt) ||
-    !candidate.client ||
-    typeof candidate.client !== 'object'
-  ) {
-    return false
+function snapshotExactDataRecord(value: unknown, expectedKeys: readonly string[]): Record<string, unknown> {
+  try {
+    if (!value || typeof value !== 'object') throw new Error('invalid record')
+    const prototype = Reflect.getPrototypeOf(value)
+    if (prototype !== Object.prototype && prototype !== null) throw new Error('invalid prototype')
+    const ownKeys = Reflect.ownKeys(value)
+    if (
+      ownKeys.length !== expectedKeys.length ||
+      ownKeys.some((key) => typeof key !== 'string' || !expectedKeys.includes(key))
+    ) {
+      throw new Error('invalid keys')
+    }
+
+    const snapshot: Record<string, unknown> = Object.create(null) as Record<string, unknown>
+    for (const key of expectedKeys) {
+      const descriptor = Reflect.getOwnPropertyDescriptor(value, key)
+      if (!descriptor || !descriptor.enumerable || !('value' in descriptor)) throw new Error('invalid descriptor')
+      snapshot[key] = descriptor.value
+    }
+    return snapshot
+  } catch {
+    throw new IdentityTransactionStoreError('identity transaction store รับข้อมูลที่มีรูปแบบไม่ถูกต้อง')
   }
-  const client = candidate.client as Partial<LocalIdentityClient>
-  return (
-    typeof client.clientId === 'string' &&
-    client.clientId.length > 0 &&
-    typeof client.redirectUri === 'string' &&
-    isAllowedRedirectUri(client.redirectUri) &&
-    typeof client.serviceId === 'string' &&
-    client.serviceId.length > 0 &&
-    typeof client.audience === 'string' &&
-    client.audience.length > 0 &&
-    typeof client.expectedIssuer === 'string' &&
-    client.expectedIssuer.length > 0 &&
-    typeof client.clientAssertionAudience === 'string' &&
-    client.clientAssertionAudience.length > 0
-  )
+}
+
+function snapshotLocalIdentityClient(value: unknown): LocalIdentityClient {
+  const candidate = snapshotExactDataRecord(value, LOCAL_CLIENT_KEYS)
+  if (
+    typeof candidate.clientId !== 'string' || candidate.clientId.length === 0 ||
+    typeof candidate.redirectUri !== 'string' ||
+    typeof candidate.serviceId !== 'string' || candidate.serviceId.length === 0 ||
+    typeof candidate.audience !== 'string' || candidate.audience.length === 0 ||
+    typeof candidate.expectedIssuer !== 'string' || candidate.expectedIssuer.length === 0 ||
+    typeof candidate.clientAssertionAudience !== 'string' || candidate.clientAssertionAudience.length === 0
+  ) {
+    throw new IdentityTransactionStoreError('local identity client ต้องมีค่าที่ระบุชัดเจนครบถ้วน')
+  }
+  if (!isAllowedRedirectUri(candidate.redirectUri)) {
+    throw new IdentityTransactionStoreError('local identity callback ต้องเป็น HTTPS หรือ loopback HTTP เท่านั้น')
+  }
+  return {
+    clientId: candidate.clientId,
+    redirectUri: candidate.redirectUri,
+    serviceId: candidate.serviceId,
+    audience: candidate.audience,
+    expectedIssuer: candidate.expectedIssuer,
+    clientAssertionAudience: candidate.clientAssertionAudience,
+  }
+}
+
+function snapshotPendingTransactionInput(value: unknown): PendingIdentityTransactionInput {
+  const candidate = snapshotExactDataRecord(value, TRANSACTION_INPUT_KEYS)
+  if (
+    typeof candidate.state !== 'string' || !OPAQUE_VALUE.test(candidate.state) ||
+    typeof candidate.codeVerifier !== 'string' || !CODE_VERIFIER.test(candidate.codeVerifier) ||
+    typeof candidate.nonce !== 'string' || !OPAQUE_VALUE.test(candidate.nonce) ||
+    typeof candidate.browserBindingDigest !== 'string' ||
+    decodeCanonicalSha256(candidate.browserBindingDigest) === null ||
+    typeof candidate.returnPath !== 'string' || !isInternalReturnPath(candidate.returnPath)
+  ) {
+    throw new IdentityTransactionStoreError('identity transaction store รับข้อมูลที่มีรูปแบบไม่ถูกต้อง')
+  }
+  return {
+    state: candidate.state,
+    codeVerifier: candidate.codeVerifier,
+    nonce: candidate.nonce,
+    browserBindingDigest: candidate.browserBindingDigest,
+    client: snapshotLocalIdentityClient(candidate.client),
+    returnPath: candidate.returnPath,
+  }
+}
+
+function snapshotPersistedTransaction(value: unknown): PendingIdentityTransaction {
+  const candidate = snapshotExactDataRecord(value, PERSISTED_TRANSACTION_KEYS)
+  const input = snapshotPendingTransactionInput({
+    state: candidate.state,
+    codeVerifier: candidate.codeVerifier,
+    nonce: candidate.nonce,
+    browserBindingDigest: candidate.browserBindingDigest,
+    client: candidate.client,
+    returnPath: candidate.returnPath,
+  })
+  if (typeof candidate.expiresAt !== 'number' || !Number.isSafeInteger(candidate.expiresAt)) {
+    throw new IdentityTransactionStoreError('identity transaction store มีรูปแบบไม่ถูกต้อง')
+  }
+  return transactionWithExpiry(input, candidate.expiresAt)
+}
+
+function transactionWithExpiry(
+  input: PendingIdentityTransactionInput,
+  expiresAt: number,
+): PendingIdentityTransaction {
+  return {
+    state: input.state,
+    codeVerifier: input.codeVerifier,
+    nonce: input.nonce,
+    browserBindingDigest: input.browserBindingDigest,
+    client: cloneLocalIdentityClient(input.client),
+    returnPath: input.returnPath,
+    expiresAt,
+  }
+}
+
+function cloneLocalIdentityClient(client: LocalIdentityClient): LocalIdentityClient {
+  return {
+    clientId: client.clientId,
+    redirectUri: client.redirectUri,
+    serviceId: client.serviceId,
+    audience: client.audience,
+    expectedIssuer: client.expectedIssuer,
+    clientAssertionAudience: client.clientAssertionAudience,
+  }
+}
+
+function cloneTransaction(transaction: PendingIdentityTransaction): PendingIdentityTransaction {
+  return transactionWithExpiry({
+    state: transaction.state,
+    codeVerifier: transaction.codeVerifier,
+    nonce: transaction.nonce,
+    browserBindingDigest: transaction.browserBindingDigest,
+    client: transaction.client,
+    returnPath: transaction.returnPath,
+  }, transaction.expiresAt)
 }
 
 /**
@@ -165,30 +284,40 @@ export class FileIdentityTransactionStore implements IdentityTransactionStore {
   }
 
   create(input: PendingIdentityTransactionInput): PendingIdentityTransaction {
+    const exactInput = snapshotPendingTransactionInput(input)
     return withExclusiveFileStoreLock(this.filePath, () => {
       const now = this.now()
       const state = this.read().filter((transaction) => transaction.expiresAt > now)
-      const transaction = { ...input, expiresAt: now + this.ttlMs }
+      if (state.some((transaction) => transaction.state === exactInput.state)) {
+        throw new IdentityTransactionStoreError('identity transaction store มี state ที่ยังใช้งานอยู่ซ้ำกัน')
+      }
+      const transaction = transactionWithExpiry(exactInput, now + this.ttlMs)
       state.push(transaction)
       this.write(state)
-      return transaction
+      return cloneTransaction(transaction)
     })
   }
 
-  consume(state: string): PendingIdentityTransaction {
+  consume(state: string, browserBinding: string): PendingIdentityTransaction {
     return withExclusiveFileStoreLock(this.filePath, () => {
       const transactions = this.read()
       const index = transactions.findIndex((transaction) => transaction.state === state)
       if (index === -1) throw new IdentityTransactionError('ไม่พบ state หรือ state ถูกใช้ไปแล้ว', 'unknown_state')
 
-      const [transaction] = transactions.splice(index, 1)
-      // Persist the one-time claim before checking expiry. A failed callback can
-      // never be replayed after a process restart, including at the expiry edge.
-      this.write(transactions)
+      const transaction = transactions[index]
       if (this.now() >= transaction.expiresAt) {
+        transactions.splice(index, 1)
+        this.write(transactions)
         throw new IdentityTransactionError('state ของการเข้าสู่ระบบหมดอายุแล้ว', 'expired_state')
       }
-      return transaction
+      if (!matchesBrowserBinding(transaction.browserBindingDigest, browserBinding)) {
+        throw new IdentityTransactionError('callback ไม่ได้มาจาก browser ที่เริ่มเข้าสู่ระบบ', 'browser_mismatch')
+      }
+      // Persist the one-time claim while the same lock still holds the verified
+      // browser binding, so a mismatch cannot consume a legitimate callback.
+      transactions.splice(index, 1)
+      this.write(transactions)
+      return cloneTransaction(transaction)
     })
   }
 
@@ -200,15 +329,19 @@ export class FileIdentityTransactionStore implements IdentityTransactionStore {
     } catch {
       throw new IdentityTransactionStoreError('identity transaction store อ่านข้อมูลไม่ได้')
     }
-    if (!parsed || typeof parsed !== 'object') throw new IdentityTransactionStoreError('identity transaction store มีรูปแบบไม่ถูกต้อง')
-    const file = parsed as Partial<PersistedTransactionFile>
-    if (file.version !== 1 || !Array.isArray(file.transactions) || !file.transactions.every(isPersistedTransaction)) {
+    try {
+      const file = snapshotExactDataRecord(parsed, PERSISTED_FILE_KEYS)
+      if (file.version !== 2 || !Array.isArray(file.transactions)) {
+        throw new IdentityTransactionStoreError('identity transaction store มีรูปแบบไม่ถูกต้อง')
+      }
+      const transactions = file.transactions.map(snapshotPersistedTransaction)
+      if (new Set(transactions.map((transaction) => transaction.state)).size !== transactions.length) {
+        throw new IdentityTransactionStoreError('identity transaction store มี state ซ้ำกัน')
+      }
+      return transactions
+    } catch {
       throw new IdentityTransactionStoreError('identity transaction store มีรูปแบบไม่ถูกต้อง')
     }
-    return file.transactions.map((transaction) => ({
-      ...transaction,
-      client: { ...transaction.client },
-    }))
   }
 
   private write(transactions: PendingIdentityTransaction[]): void {
@@ -219,7 +352,10 @@ export class FileIdentityTransactionStore implements IdentityTransactionStore {
     try {
       writeFileSync(
         temporaryPath,
-        JSON.stringify({ version: 1, transactions } satisfies PersistedTransactionFile),
+        JSON.stringify({
+          version: 2,
+          transactions: transactions.map(cloneTransaction),
+        } satisfies PersistedTransactionFile),
         { encoding: 'utf8', mode: 0o600 },
       )
       chmodSync(temporaryPath, 0o600)
@@ -244,13 +380,17 @@ function s256(value: string): string {
   return createHash('sha256').update(value).digest('base64url')
 }
 
-function requireLocalClient(client: LocalIdentityClient): void {
-  if (!client.clientId || !client.serviceId || !client.audience || !client.expectedIssuer || !client.clientAssertionAudience) {
-    throw new Error('local identity client ต้องมี clientId, serviceId, audience, expected issuer และ client assertion audience ที่ระบุชัดเจน')
-  }
-  if (!isAllowedRedirectUri(client.redirectUri)) {
-    throw new Error('local identity callback ต้องเป็น HTTPS หรือ loopback HTTP เท่านั้น')
-  }
+function decodeCanonicalSha256(value: unknown): Buffer | null {
+  if (typeof value !== 'string' || !SHA256_BASE64URL.test(value)) return null
+  const decoded = Buffer.from(value, 'base64url')
+  return decoded.length === 32 && decoded.toString('base64url') === value ? decoded : null
+}
+
+function matchesBrowserBinding(expectedDigest: string, browserBinding: unknown): boolean {
+  const expected = decodeCanonicalSha256(expectedDigest)
+  if (!expected || typeof browserBinding !== 'string' || !OPAQUE_VALUE.test(browserBinding)) return false
+  const actual = createHash('sha256').update(browserBinding).digest()
+  return timingSafeEqual(expected, actual)
 }
 
 function requireInternalReturnPath(returnPath: string): void {
@@ -272,33 +412,41 @@ function isAllowedRedirectUri(value: string): boolean {
   }
 }
 
-/** Starts an authorization request without exposing the verifier or nonce to the browser. */
+/** Starts authorization and returns a separate raw binding for a future HttpOnly cookie setter. */
 export function beginIdentityAuthorization(
   store: IdentityTransactionStore,
   client: LocalIdentityClient,
   returnPath: string,
   newVerifier: () => string = () => opaque(48),
-): { state: string; codeVerifier: string; request: AuthorizationRequest } {
-  requireLocalClient(client)
+): { state: string; browserBinding: string; codeVerifier: string; request: AuthorizationRequest } {
+  const exactClient = snapshotLocalIdentityClient(client)
   requireInternalReturnPath(returnPath)
   const state = opaque()
   const nonce = opaque()
+  const browserBinding = opaque()
   const codeVerifier = newVerifier()
-  if (!/^[A-Za-z0-9._~-]{43,128}$/.test(codeVerifier)) {
+  if (!CODE_VERIFIER.test(codeVerifier)) {
     throw new Error('PKCE verifier สำหรับ local transaction ไม่อยู่ในรูปแบบที่ contract อนุญาต')
   }
 
   const request: AuthorizationRequest = {
-    clientId: client.clientId,
-    redirectUri: client.redirectUri,
+    clientId: exactClient.clientId,
+    redirectUri: exactClient.redirectUri,
     stateRef: state,
     nonce,
     codeChallenge: s256(codeVerifier),
     codeChallengeMethod: 'S256',
-    serviceId: client.serviceId,
+    serviceId: exactClient.serviceId,
   }
-  store.create({ state, codeVerifier, nonce, client: { ...client }, returnPath })
-  return { state, codeVerifier, request }
+  store.create({
+    state,
+    codeVerifier,
+    nonce,
+    browserBindingDigest: s256(browserBinding),
+    client: cloneLocalIdentityClient(exactClient),
+    returnPath,
+  })
+  return { state, browserBinding, codeVerifier, request }
 }
 
 /** Enforces the Account Center callback contract before any adapter call or log. */
@@ -321,15 +469,17 @@ export async function completeIdentityCallback({
   store,
   client,
   callback,
+  browserBinding,
   clientAssertionProvider,
 }: {
   adapter: IdentityAdapter
   store: IdentityTransactionStore
   client: LocalIdentityClient
   callback: IdentityCallback
+  browserBinding: string
   clientAssertionProvider: IdentityClientAssertionProvider
 }): Promise<{ exchange: ExchangeResult; returnPath: string }> {
-  const transaction = store.consume(callback.state)
+  const transaction = store.consume(callback.state, browserBinding)
   if (
     transaction.client.clientId !== client.clientId ||
     transaction.client.redirectUri !== client.redirectUri ||

@@ -5,6 +5,32 @@
 
 ---
 
+## 2026-08-11 - Local Identity callback browser binding implemented
+
+**Outcome:** Academy now generates a separate 32-byte browser binding at local
+authorization start, persists only its canonical SHA-256 digest, and requires
+the same binding before a callback can release the transaction. A mismatch
+leaves the live state available to the browser that began the flow; a match
+claims it once.
+
+**Verification:** Initial TDD moved from 4 failed / 17 passed to focused 23/23.
+The first independent RIL returned `C0/H0/M2/L0` after proving surplus caller
+fields, a noncanonical digest alias, and duplicate live states could cross the
+reference stores. Remediation RED was 23 passed / 6 failed. Exact own-data
+projection, canonical digest re-encoding, fresh clones, and atomic duplicate
+state rejection produced focused 29/29, Identity 328/328, full unit 93 files /
+1018 tests, producer authorization 30/30, and clean lint/typechecks. The closure
+RIL then returned `C0/H0/M0/L1` for one lock-description overclaim; the text-only
+fix passed final `C0/H0/M0/L0`. Evidence is in
+`reports/reviews/academy-identity-callback-browser-binding-local-checkpoint-2026-08-11.md`.
+
+**Residual risk:** This local store contract does not set or verify a browser
+cookie and adds no conformance or production-readiness points. Runtime cookie
+scope and cleanup, Origin/Fetch Metadata policy, durable production storage,
+endpoint and key operations, deployment evidence, named operators, and release
+authorization remain external. Registry/runtime stay disabled and production
+remains NO-GO.
+
 ## 2026-08-11 - Local Identity code-exchange result verifier implemented
 
 **Outcome:** Academy now snapshots the exact Identity Control exchange result

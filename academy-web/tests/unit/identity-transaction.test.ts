@@ -1,13 +1,15 @@
 import { createHash, randomBytes } from 'node:crypto'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import type { IdentityAdapter } from '@/lib/identity/adapter'
 import { FakeIdentityAdapter } from '@/lib/identity/fake-adapter'
 import {
   beginIdentityAuthorization,
   completeIdentityCallback,
   IdentityTransactionError,
+  IdentityTransactionStoreError,
   InMemoryIdentityTransactionStore,
   parseIdentityCallback,
+  type IdentityTransactionStore,
   type LocalIdentityClient,
 } from '@/lib/identity/transaction'
 
@@ -42,6 +44,7 @@ describe('local identity transaction boundary', () => {
       store,
       client,
       callback: parseIdentityCallback(new URL(`https://academy.local/auth/callback?code=${code}&state=${started.state}`)),
+      browserBinding: started.browserBinding,
       clientAssertionProvider: localFakeClientAssertionProvider,
     })
 
@@ -61,9 +64,105 @@ describe('local identity transaction boundary', () => {
         store,
         client,
         callback: parseIdentityCallback(new URL(`https://academy.local/auth/callback?code=${code}&state=${started.state}`)),
+        browserBinding: started.browserBinding,
         clientAssertionProvider: localFakeClientAssertionProvider,
       }),
     ).rejects.toMatchObject({ reason: 'unknown_state' } satisfies Partial<IdentityTransactionError>)
+  })
+
+  it('binds the callback to the initiating browser without consuming state on mismatch', async () => {
+    const adapter = new FakeIdentityAdapter(LOCAL_ISSUER, client.audience)
+    const store = new InMemoryIdentityTransactionStore()
+    const started = beginIdentityAuthorization(store, client, '/dashboard')
+    const code = adapter.issueCodeForTest(started.request, {
+      subject: 'learner-browser-binding',
+      verifiedEmail: 'browser-binding@example.test',
+    })
+    const createClientAssertion = vi.fn(async () => LOCAL_FAKE_CLIENT_ASSERTION)
+    const exchangeCode = vi.fn((input: Parameters<IdentityAdapter['exchangeCode']>[0]) => adapter.exchangeCode(input))
+    const callback = parseIdentityCallback(
+      new URL(`https://academy.local/auth/callback?code=${code}&state=${started.state}`),
+    )
+    const boundAdapter: IdentityAdapter = {
+      name: adapter.name,
+      productionSafe: adapter.productionSafe,
+      startAuthorization: (request) => adapter.startAuthorization(request),
+      exchangeCode,
+    }
+
+    for (const browserBinding of ['too-short', randomBytes(32).toString('base64url')]) {
+      await expect(completeIdentityCallback({
+        adapter: boundAdapter,
+        store,
+        client,
+        callback,
+        browserBinding,
+        clientAssertionProvider: { createClientAssertion },
+      })).rejects.toMatchObject({ reason: 'browser_mismatch' } satisfies Partial<IdentityTransactionError>)
+    }
+
+    expect(createClientAssertion).not.toHaveBeenCalled()
+    expect(exchangeCode).not.toHaveBeenCalled()
+    await expect(completeIdentityCallback({
+      adapter: boundAdapter,
+      store,
+      client,
+      callback,
+      browserBinding: started.browserBinding,
+      clientAssertionProvider: { createClientAssertion },
+    })).resolves.toMatchObject({ returnPath: '/dashboard' })
+    expect(createClientAssertion).toHaveBeenCalledOnce()
+    expect(exchangeCode).toHaveBeenCalledOnce()
+  })
+
+  it('keeps the browser binding out of the authorization request', () => {
+    const started = beginIdentityAuthorization(new InMemoryIdentityTransactionStore(), client, '/dashboard')
+
+    expect(started.browserBinding).toMatch(/^[A-Za-z0-9_-]{43}$/)
+    expect(started.request).not.toHaveProperty('browserBinding')
+    expect(JSON.stringify(started.request)).not.toContain(started.browserBinding)
+  })
+
+  it('rejects surplus, accessor, and hostile Proxy client metadata before creating a transaction', () => {
+    const create = vi.fn<IdentityTransactionStore['create']>((input) => ({ ...input, expiresAt: Date.now() + 60_000 }))
+    const store: IdentityTransactionStore = {
+      create,
+      consume: () => { throw new Error('consume must not run') },
+    }
+    const secretMarker = 'credential=TOP_SECRET_BROWSER_BINDING'
+    const getterCalls = { count: 0 }
+    const accessorClient = { ...client }
+    Object.defineProperty(accessorClient, 'clientId', {
+      enumerable: true,
+      get() {
+        getterCalls.count += 1
+        return client.clientId
+      },
+    })
+    const hostileClient = new Proxy({ ...client }, {
+      ownKeys() {
+        throw new Error(secretMarker)
+      },
+    })
+
+    for (const candidate of [
+      Object.assign({ ...client }, { clientSecret: secretMarker }),
+      Object.assign({ ...client }, { toJSON: () => ({ clientId: client.clientId }) }),
+      accessorClient,
+      hostileClient,
+    ]) {
+      let captured: unknown
+      try {
+        beginIdentityAuthorization(store, candidate, '/dashboard')
+      } catch (error) {
+        captured = error
+      }
+      expect(captured).toBeInstanceOf(IdentityTransactionStoreError)
+      expect(String(captured)).not.toContain(secretMarker)
+    }
+
+    expect(getterCalls.count).toBe(0)
+    expect(create).not.toHaveBeenCalled()
   })
 
   it('rejects every callback parameter except exactly one code and one opaque state', () => {
@@ -97,6 +196,7 @@ describe('local identity transaction boundary', () => {
         store,
         client,
         callback: parseIdentityCallback(new URL(`https://academy.local/auth/callback?code=${code}&state=${started.state}`)),
+        browserBinding: started.browserBinding,
         clientAssertionProvider: localFakeClientAssertionProvider,
       }),
     ).rejects.toMatchObject({ reason: 'audience_mismatch' } satisfies Partial<IdentityTransactionError>)
@@ -126,6 +226,7 @@ describe('local identity transaction boundary', () => {
       store,
       client,
       callback: parseIdentityCallback(new URL(`https://academy.local/auth/callback?code=${code}&state=${started.state}`)),
+      browserBinding: started.browserBinding,
       clientAssertionProvider: localFakeClientAssertionProvider,
     })
 
@@ -162,6 +263,7 @@ describe('local identity transaction boundary', () => {
         store,
         client,
         callback: parseIdentityCallback(new URL(`https://academy.local/auth/callback?code=${code}&state=${started.state}`)),
+        browserBinding: started.browserBinding,
         clientAssertionProvider: localFakeClientAssertionProvider,
       }),
     ).rejects.toMatchObject({ reason: 'invalid_result' } satisfies Partial<IdentityTransactionError>)
@@ -190,6 +292,7 @@ describe('local identity transaction boundary', () => {
         store,
         client,
         callback: parseIdentityCallback(new URL(`https://academy.local/auth/callback?code=${code}&state=${started.state}`)),
+        browserBinding: started.browserBinding,
         clientAssertionProvider: localFakeClientAssertionProvider,
       }),
     ).rejects.toMatchObject({ reason: 'invalid_result' } satisfies Partial<IdentityTransactionError>)
@@ -201,7 +304,7 @@ describe('local identity transaction boundary', () => {
     const started = beginIdentityAuthorization(store, client, '/dashboard')
     now += 1_001
 
-    expect(() => store.consume(started.state)).toThrow(/หมดอายุ/)
+    expect(() => store.consume(started.state, started.browserBinding)).toThrow(/หมดอายุ/)
   })
 
   it('treats the exact expiry millisecond as expired', () => {
@@ -210,7 +313,7 @@ describe('local identity transaction boundary', () => {
     const started = beginIdentityAuthorization(store, client, '/dashboard')
     now += 1_000
 
-    expect(() => store.consume(started.state)).toThrow(/หมดอายุ/)
+    expect(() => store.consume(started.state, started.browserBinding)).toThrow(/หมดอายุ/)
   })
 
   it('uses S256 PKCE and never creates a verifier from browser input', () => {
@@ -253,6 +356,7 @@ describe('local identity transaction boundary', () => {
         store,
         client,
         callback: parseIdentityCallback(new URL(`https://academy.local/auth/callback?code=${code}&state=${started.state}`)),
+        browserBinding: started.browserBinding,
         clientAssertionProvider: localFakeClientAssertionProvider,
       }),
     ).rejects.toMatchObject({ reason: 'invalid_result' } satisfies Partial<IdentityTransactionError>)
@@ -273,6 +377,7 @@ describe('local identity transaction boundary', () => {
         store,
         client,
         callback: parseIdentityCallback(new URL(`https://academy.local/auth/callback?code=${code}&state=${started.state}`)),
+        browserBinding: started.browserBinding,
         clientAssertionProvider: { createClientAssertion: async () => '' },
       }),
     ).rejects.toMatchObject({ reason: 'invalid_result' } satisfies Partial<IdentityTransactionError>)
@@ -293,6 +398,7 @@ describe('local identity transaction boundary', () => {
       store,
       client,
       callback: parseIdentityCallback(new URL(`https://academy.local/auth/callback?code=${code}&state=${started.state}`)),
+      browserBinding: started.browserBinding,
       clientAssertionProvider: {
         createClientAssertion: async ({ audience }: { audience: string }) => {
           audiences.push(audience)
