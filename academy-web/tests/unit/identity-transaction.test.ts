@@ -17,6 +17,7 @@ const client: LocalIdentityClient = {
   redirectUri: 'http://localhost:3000/auth/callback',
   serviceId: 'academy',
   audience: 'academy-api-local',
+  expectedIssuer: LOCAL_ISSUER,
   clientAssertionAudience: 'https://accounts.local.invalid/v1/code/exchange',
 }
 const LOCAL_FAKE_CLIENT_ASSERTION = 'local-fake-header.local-fake-payload.local-fake-signature'
@@ -99,6 +100,99 @@ describe('local identity transaction boundary', () => {
         clientAssertionProvider: localFakeClientAssertionProvider,
       }),
     ).rejects.toMatchObject({ reason: 'audience_mismatch' } satisfies Partial<IdentityTransactionError>)
+  })
+
+  it('returns a fresh verified projection instead of the adapter result object', async () => {
+    const adapter = new FakeIdentityAdapter(LOCAL_ISSUER, client.audience)
+    const store = new InMemoryIdentityTransactionStore()
+    const started = beginIdentityAuthorization(store, client, '/courses')
+    const code = adapter.issueCodeForTest(started.request, {
+      subject: 'learner-projection',
+      verifiedEmail: 'projection@example.test',
+    })
+    let rawResult: Awaited<ReturnType<IdentityAdapter['exchangeCode']>> | undefined
+    const capturingAdapter: IdentityAdapter = {
+      name: adapter.name,
+      productionSafe: adapter.productionSafe,
+      startAuthorization: (request) => adapter.startAuthorization(request),
+      exchangeCode: async (input) => {
+        rawResult = await adapter.exchangeCode(input)
+        return rawResult
+      },
+    }
+
+    const completed = await completeIdentityCallback({
+      adapter: capturingAdapter,
+      store,
+      client,
+      callback: parseIdentityCallback(new URL(`https://academy.local/auth/callback?code=${code}&state=${started.state}`)),
+      clientAssertionProvider: localFakeClientAssertionProvider,
+    })
+
+    expect(completed.exchange).not.toBe(rawResult)
+    expect(completed.exchange.activation).not.toBe(rawResult?.activation)
+    if (!rawResult) throw new Error('expected the adapter result to be captured')
+    rawResult.subject = 'mutated-after-callback'
+    rawResult.activation.revision = 99
+    expect(completed.exchange.subject).toBe('learner-projection')
+    expect(completed.exchange.activation.revision).toBe(1)
+  })
+
+  it('rejects an exchange result from a different issuer', async () => {
+    const adapter = new FakeIdentityAdapter(LOCAL_ISSUER, client.audience)
+    const store = new InMemoryIdentityTransactionStore()
+    const started = beginIdentityAuthorization(store, client, '/courses')
+    const code = adapter.issueCodeForTest(started.request, {
+      subject: 'learner-wrong-issuer',
+      verifiedEmail: 'wrong-issuer@example.test',
+    })
+    const wrongIssuer: IdentityAdapter = {
+      name: adapter.name,
+      productionSafe: adapter.productionSafe,
+      startAuthorization: (request) => adapter.startAuthorization(request),
+      exchangeCode: async (input) => ({
+        ...(await adapter.exchangeCode(input)),
+        issuer: 'https://foreign-issuer.example/auth/v1',
+      }),
+    }
+
+    await expect(
+      completeIdentityCallback({
+        adapter: wrongIssuer,
+        store,
+        client,
+        callback: parseIdentityCallback(new URL(`https://academy.local/auth/callback?code=${code}&state=${started.state}`)),
+        clientAssertionProvider: localFakeClientAssertionProvider,
+      }),
+    ).rejects.toMatchObject({ reason: 'invalid_result' } satisfies Partial<IdentityTransactionError>)
+  })
+
+  it('rejects surplus adapter fields before returning the callback result', async () => {
+    const adapter = new FakeIdentityAdapter(LOCAL_ISSUER, client.audience)
+    const store = new InMemoryIdentityTransactionStore()
+    const started = beginIdentityAuthorization(store, client, '/courses')
+    const code = adapter.issueCodeForTest(started.request, {
+      subject: 'learner-surplus',
+      verifiedEmail: 'surplus@example.test',
+    })
+    const surplusAdapter: IdentityAdapter = {
+      name: adapter.name,
+      productionSafe: adapter.productionSafe,
+      startAuthorization: (request) => adapter.startAuthorization(request),
+      exchangeCode: async (input) => Object.assign(await adapter.exchangeCode(input), {
+        entitlement: 'admin',
+      }),
+    }
+
+    await expect(
+      completeIdentityCallback({
+        adapter: surplusAdapter,
+        store,
+        client,
+        callback: parseIdentityCallback(new URL(`https://academy.local/auth/callback?code=${code}&state=${started.state}`)),
+        clientAssertionProvider: localFakeClientAssertionProvider,
+      }),
+    ).rejects.toMatchObject({ reason: 'invalid_result' } satisfies Partial<IdentityTransactionError>)
   })
 
   it('expires a transaction before any exchange is attempted', () => {

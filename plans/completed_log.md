@@ -5,6 +5,31 @@
 
 ---
 
+## 2026-08-11 - Local Identity code-exchange result verifier implemented
+
+**Outcome:** Academy now snapshots the exact Identity Control exchange result
+before callback use, binds issuer, audience, service ID and nonce to the
+server-held transaction, and returns a fresh projection. Surplus, hidden,
+accessor, symbol, invalid-prototype and throwing-reflection inputs fail closed.
+
+**Verification:** Missing-module RED preceded the implementation. Two focused
+self-audits closed malformed expectation handling and binding-field
+classification. The first independent RIL returned `C0/H0/M1/L1` because a
+foreign issuer was accepted and the reader count was stale. Issuer-binding RED
+failed 2/39; remediation added caller-provided `expectedIssuer`, durable
+transaction persistence and callback-time recheck without a production literal
+or endpoint inference. Final focused passes 44/44, Academy Identity regression
+317/317, full unit 93 files / 1007 tests, producer contract 44/44, and full
+lint/typechecks. Different independent closure verified the freeze and passed
+`C0/H0/M0/L0`. Evidence is in
+`reports/reviews/academy-identity-code-exchange-result-verifier-local-checkpoint-2026-08-11.md`.
+
+**Residual risk:** Canonical local conformance remains 15/23 (`65.2%`) and this
+hardening adds no production-readiness points. Endpoint/key rotation/replay
+storage/strict HTTP operation/durable production callback and activation
+transaction/operators/deployment/release authorization remain external.
+Registry and runtime wiring stay disabled; production remains NO-GO.
+
 ## 2026-08-11 - Local Identity client-assertion conformance promoted
 
 **Outcome:** Academy composed its accepted JTI source, assertion provider, and

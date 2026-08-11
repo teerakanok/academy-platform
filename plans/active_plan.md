@@ -374,6 +374,29 @@ Test-only RED ผ่าน 4/6; remediation แยก test evidence ออกจ
 เพิ่ม drift rejection จน generator GREEN 6/6. Different closure RIL bind exact
 nine-file manifest และผ่าน final `C0/H0/M0/L0`.
 
+**Identity code-exchange result verifier checkpoint (2026-08-11):** Academy
+เพิ่ม strict local boundary ก่อน callback ใช้ผลจาก Identity Control. Verifier
+รับเฉพาะ exact seven-field result + two-field activation, snapshot own data
+descriptor ครั้งเดียว, bind issuer/audience/service/nonce กับ server transaction และคืน
+fresh projection แทน object ของ adapter. Missing-module RED หยุดก่อน collection;
+self-audit RED เพิ่มอีกสองรอบเพื่อปิด malformed expectation และ binding field
+classification. First different RIL พบ `C0/H0/M1/L1`: verifier ยอมรับ foreign
+issuer และ report นับ reader units คลาดหนึ่ง. Issuer RED ล้ม 2/39; remediation
+เพิ่ม caller-provided `expectedIssuer` ลง exact expectation และ server transaction
+โดยไม่ hardcode/infer production issuer. Final focused ผ่าน 44/44, Identity
+regression 317/317, full unit final bytes 93 files/1007 tests, producer 44/44
+และ full lint/all TypeScript configs ผ่านโดยมี generated warning เดิม 1 จุด.
+หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-code-exchange-result-verifier-local-checkpoint-2026-08-11.md`](../reports/reviews/academy-identity-code-exchange-result-verifier-local-checkpoint-2026-08-11.md).
+Different independent closure RIL bind manifest 7/7, rerun focused 44/44 กับ
+producer 44/44 และผ่าน final `C0/H0/M0/L0`; final bookkeeping reader lint ได้
+107 units / 0 findings. Canonical conformance คง 15/23 (`65.2%`) เพราะ
+`exchange.result-binding` ผ่านอยู่ก่อนแล้ว; production readiness ไม่เพิ่ม.
+Endpoint/key/rotation/replay store/strict HTTP operation/durable callback และ
+activation transaction/operator/deploy/release ยังเป็น external gates โดย
+`enabled=false`, `releaseApproval=false`, `runtimeWired=false` และ production
+NO-GO คงเดิม.
+
 **Shared strict JSON response boundary checkpoint (2026-08-10):** Academy รับช่วง
 existing untracked BYOB + duplicate-safe parser จาก concurrent client work มา
 audit และเพิ่ม standalone adversarial suite โดยไม่ stage consumer/UI files. RED

@@ -7,18 +7,18 @@ import type {
   IdentityAdapter,
   IdentityClientAssertionProvider,
 } from './adapter'
+import { verifyIdentityCodeExchangeResult } from './code-exchange-result'
 import { withExclusiveFileStoreLock } from './file-store-lock'
 
 const CALLBACK_KEYS = new Set(['code', 'state'])
 const OPAQUE_VALUE = /^[A-Za-z0-9_-]{16,160}$/
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const ACTIVATION_STATUSES = new Set(['pending', 'active', 'suspended', 'deactivated'])
 
 export interface LocalIdentityClient {
   clientId: string
   redirectUri: string
   serviceId: string
   audience: string
+  expectedIssuer: string
   clientAssertionAudience: string
 }
 
@@ -137,6 +137,8 @@ function isPersistedTransaction(value: unknown): value is PendingIdentityTransac
     client.serviceId.length > 0 &&
     typeof client.audience === 'string' &&
     client.audience.length > 0 &&
+    typeof client.expectedIssuer === 'string' &&
+    client.expectedIssuer.length > 0 &&
     typeof client.clientAssertionAudience === 'string' &&
     client.clientAssertionAudience.length > 0
   )
@@ -243,8 +245,8 @@ function s256(value: string): string {
 }
 
 function requireLocalClient(client: LocalIdentityClient): void {
-  if (!client.clientId || !client.serviceId || !client.audience || !client.clientAssertionAudience) {
-    throw new Error('local identity client ต้องมี clientId, serviceId, audience และ client assertion audience ที่ระบุชัดเจน')
+  if (!client.clientId || !client.serviceId || !client.audience || !client.expectedIssuer || !client.clientAssertionAudience) {
+    throw new Error('local identity client ต้องมี clientId, serviceId, audience, expected issuer และ client assertion audience ที่ระบุชัดเจน')
   }
   if (!isAllowedRedirectUri(client.redirectUri)) {
     throw new Error('local identity callback ต้องเป็น HTTPS หรือ loopback HTTP เท่านั้น')
@@ -314,21 +316,6 @@ export function parseIdentityCallback(url: URL): IdentityCallback {
   return { code, state }
 }
 
-function validateExchangeResult(result: ExchangeResult, transaction: PendingIdentityTransaction): void {
-  if (result.audience !== transaction.client.audience || result.serviceId !== transaction.client.serviceId) {
-    throw new IdentityTransactionError('ผลการแลก code ไม่ได้ผูกกับ Academy client ที่เริ่ม transaction', 'audience_mismatch')
-  }
-  if (result.nonce !== transaction.nonce) {
-    throw new IdentityTransactionError('nonce จากผลการแลก code ไม่ตรงกับ transaction', 'invalid_result')
-  }
-  if (!result.issuer || !result.subject || !EMAIL.test(result.verifiedEmail)) {
-    throw new IdentityTransactionError('ผลการแลก code ไม่มี canonical principal หรือ verified email ที่ใช้ได้', 'invalid_result')
-  }
-  if (!ACTIVATION_STATUSES.has(result.activation.status) || !Number.isSafeInteger(result.activation.revision) || result.activation.revision < 1) {
-    throw new IdentityTransactionError('ผลการแลก code มี activation state ที่ผิด contract', 'invalid_result')
-  }
-}
-
 export async function completeIdentityCallback({
   adapter,
   store,
@@ -348,6 +335,7 @@ export async function completeIdentityCallback({
     transaction.client.redirectUri !== client.redirectUri ||
     transaction.client.serviceId !== client.serviceId ||
     transaction.client.audience !== client.audience ||
+    transaction.client.expectedIssuer !== client.expectedIssuer ||
     transaction.client.clientAssertionAudience !== client.clientAssertionAudience
   ) {
     throw new IdentityTransactionError('state ถูกออกให้กับ Academy client คนละรายการ', 'audience_mismatch')
@@ -358,13 +346,24 @@ export async function completeIdentityCallback({
     throw new IdentityTransactionError('client assertion สำหรับการแลก code ไม่ตรง contract', 'invalid_result')
   }
 
-  const exchange = await adapter.exchangeCode({
+  const exchangeValue = await adapter.exchangeCode({
     clientId: transaction.client.clientId,
     clientAssertion,
     redirectUri: transaction.client.redirectUri,
     code: callback.code,
     codeVerifier: transaction.codeVerifier,
   })
-  validateExchangeResult(exchange, transaction)
-  return { exchange, returnPath: transaction.returnPath }
+  const verified = verifyIdentityCodeExchangeResult(exchangeValue, {
+    audience: transaction.client.audience,
+    expectedIssuer: transaction.client.expectedIssuer,
+    nonce: transaction.nonce,
+    serviceId: transaction.client.serviceId,
+  })
+  if (!verified.ok) {
+    if (verified.reason === 'audience_mismatch') {
+      throw new IdentityTransactionError('ผลการแลก code ไม่ได้ผูกกับ Academy client ที่เริ่ม transaction', 'audience_mismatch')
+    }
+    throw new IdentityTransactionError('ผลการแลก code ไม่ตรงกับ contract', 'invalid_result')
+  }
+  return { exchange: verified.result, returnPath: transaction.returnPath }
 }

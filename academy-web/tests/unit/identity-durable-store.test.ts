@@ -14,6 +14,7 @@ const client: LocalIdentityClient = {
   redirectUri: 'http://localhost:3000/auth/callback',
   serviceId: 'academy',
   audience: 'academy-api-local',
+  expectedIssuer: 'https://identity.local.invalid',
   clientAssertionAudience: 'https://accounts.local.invalid/v1/code/exchange',
 }
 
