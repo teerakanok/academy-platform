@@ -5,6 +5,33 @@
 
 ---
 
+## 2026-08-11 - Local Identity code-exchange response transport implemented
+
+**Outcome:** Academy now has a pure injected HTTP boundary for the exact
+`/v1/code/exchange` path. It projects the five-field producer request, sends one
+JSON `POST` without ambient credentials or redirect following, requires a real
+status-200 response with `no-store`, and uses an independent private deadline.
+Late responses are cancelled, and platform setup, timeout, abort, cleanup,
+fetch, status, and cache-policy failures share one fixed detail-free error.
+
+**Verification:** Missing-module RED preceded the implementation. The first
+GREEN passed 41/41; an abort mutate-then-throw self-audit RED then closed the
+timer callback. The first different RIL returned `C0/H0/M1/L0` because controller
+and timer setup plus cleanup could escape the bounded failure path. Four focused
+RED cases reproduced the platform failures while 26 prior cases stayed green.
+Transactional setup and guarded cleanup produced transport 30/30, final seam
+73/73, Academy Identity 23 files / 375 tests, full unit 95 files / 1,065 tests,
+Identity Control API/authorization/assertion 59/59, and clean lint/typechecks.
+Different independent re-review returned final `C0/H0/M0/L0`. Evidence is in
+`reports/reviews/academy-identity-code-exchange-response-transport-local-checkpoint-2026-08-11.md`.
+
+**Residual risk:** This transport is not imported by a route, Worker, registry,
+or runtime entry and adds no conformance or production-readiness points. Runtime
+must still bind the exact approved host, signer/key rotation and replay storage,
+strict body-reader values, durable callback and activation transactions,
+operators, deployment evidence, and separate release authorization. Registry
+and runtime remain disabled; production remains NO-GO.
+
 ## 2026-08-11 - Local Identity code-exchange JSON operation implemented
 
 **Outcome:** Academy now snapshots the exact five-field Identity Control

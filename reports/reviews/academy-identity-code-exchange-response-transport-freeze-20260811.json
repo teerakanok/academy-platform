@@ -1,0 +1,41 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/src/lib/identity/code-exchange-json-operation.ts",
+      "sha256": "8a807abf3ac7697b400e50b82ae578296bce303fcdfc6ba85ca7fea0e1d3120c",
+      "bytes": 2376
+    },
+    {
+      "path": "academy-web/src/lib/identity/code-exchange-request.ts",
+      "sha256": "ec7ee5df9cd929b0ffcda96a79c67258eddc24fcc03b4af364025f7fb6c1078f",
+      "bytes": 2413
+    },
+    {
+      "path": "academy-web/src/lib/identity/code-exchange-response-transport.ts",
+      "sha256": "14686de70e9fb34cff4bc44e2b66b2b14a2ffa928aa776e25375997f1de64342",
+      "bytes": 5415
+    },
+    {
+      "path": "academy-web/tests/unit/identity-code-exchange-response-transport.test.ts",
+      "sha256": "97b2a284e6ed356856998a27c50930191b518b71368c9381f26da7b3ce90c3ea",
+      "bytes": 15935
+    },
+    {
+      "path": "plans/active_plan.md",
+      "sha256": "d144fa11b8c41d3d9190c44550cbeede3070b64d908ddaa265d3f6c83624a820",
+      "bytes": 191027
+    },
+    {
+      "path": "plans/completed_log.md",
+      "sha256": "fec4dee7bc47440dc82ce0569235b4eb2e6f903b13e2bbb12fbcbd358a327f33",
+      "bytes": 129520
+    },
+    {
+      "path": "reports/reviews/academy-identity-code-exchange-response-transport-local-checkpoint-2026-08-11.md",
+      "sha256": "904105db4a481c1e203aa9747450187dc07f105c81fa1b11bec3dd20562b036f",
+      "bytes": 7548
+    }
+  ]
+}

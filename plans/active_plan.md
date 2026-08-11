@@ -438,6 +438,30 @@ method/status/deadline, runtime import หรือ deploy policy; canonical con
 คง 15/23 (`65.2%`), readiness ไม่เพิ่ม, registry/runtime disabled และ production
 NO-GO คงเดิม.
 
+**Identity code-exchange response transport checkpoint (2026-08-11):** Academy
+เพิ่ม pure injected HTTP boundary สำหรับ exact `/v1/code/exchange`: canonical
+HTTPS endpoint, fresh five-field JSON body, POST + JSON headers, omitted ambient
+credentials, redirect refusal, cache bypass, exact status 200 และ response
+`no-store`. Shared request projector เดียวกันป้องกัน JSON operation กับ transport
+validation drift. Private deadline สูงสุด 5 วินาทีปิดงานได้แม้ fetch ไม่ร่วมมือ
+และ cancel late response. Missing-module RED หยุดก่อน collection; first GREEN
+41/41. Abort mutate-then-throw self-audit RED ล้ม 1 selected case ก่อน guard จะทำ
+targeted GREEN. Different independent RIL แรกคืน `C0/H0/M1/L0` เพราะ controller/
+timer setup อยู่นอก bounded `try` และ timer cleanup อาจปล่อย platform error เดิม.
+Adversarial RED ล้ม 4/30 โดย 26 เคสเดิมผ่าน; remediation ย้าย deadline transaction
+เข้า bounded path, track armed timer, guard cleanup และ cancel response เมื่อ cleanup
+ไม่ยืนยัน. GREEN ผ่าน transport 30/30; final seam transport+JSON+result verifier
+ผ่าน 73/73, Academy Identity 23 files/375 tests, full unit 95 files/1,065 tests,
+Identity producer API+authorization+assertion 59/59 และ full lint/all TypeScript
+configs ผ่านโดยมี generated warning เดิม 1 จุด. หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-code-exchange-response-transport-local-checkpoint-2026-08-11.md`](../reports/reviews/academy-identity-code-exchange-response-transport-local-checkpoint-2026-08-11.md).
+Different independent re-review bind remediation manifest, rerun focused 73/73,
+Identity 375/375, producer 59/59 และ proportional static/security/reader gates
+แล้วผ่าน final `C0/H0/M0/L0`. Module รับ endpoint/fetch เป็น injected capability
+และไม่มี production import/network call; exact approved host,
+key/rotation/replay/runtime/deploy/release ยังเป็น external gates. Conformance คง
+15/23 (`65.2%`), readiness ไม่เพิ่ม และ production NO-GO คงเดิม.
+
 **Shared strict JSON response boundary checkpoint (2026-08-10):** Academy รับช่วง
 existing untracked BYOB + duplicate-safe parser จาก concurrent client work มา
 audit และเพิ่ม standalone adversarial suite โดยไม่ stage consumer/UI files. RED
