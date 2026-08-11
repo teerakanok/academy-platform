@@ -5,6 +5,33 @@
 
 ---
 
+## 2026-08-11 - Profile-only activation conformance promoted locally
+
+**Outcome:** The deterministic Academy consumer-conformance generator now binds
+the independently accepted profile-activation store report and freeze manifest
+at exact digests. It promotes only `academy.activation-profile-only`, moving the
+local ledger from 15/23 to 16/23 while retaining seven named `not_proven`
+scenarios. Registry enablement, runtime wiring, production evidence, release
+approval, and production readiness remain false.
+
+**Verification:** The test-only RED passed 6/7 and failed while the profile-only
+scenario remained unproven. GREEN passes generator 7/7 and the accepted profile
+store unit regression 21/21. Generator write/current returns 23 scenarios; the
+canonical Identity Control intake verifies 23/23 with 16 pass and 7
+`not_proven`, and the director utility verifies the exact eight-file manifest.
+Evidence is in
+`reports/reviews/academy-identity-control-profile-activation-conformance-local-checkpoint-2026-08-11.md`.
+
+**Review:** A different independent reviewer rebound the manifest before and
+after semantics, confirmed the exact single-scenario delta and accepted evidence
+digests, reran the focused generator, canonical intake, static, security, and
+reader gates, and returned final `C0/H0/M0/L0`.
+
+**Residual risk:** This is evidence bookkeeping rather than runtime enablement.
+Callback cookie provenance, authenticated exchange, durable production
+transaction ownership, operator controls, deployment, and release authorization
+remain separate gates. Production remains NO-GO.
+
 ## 2026-08-11 - Local Identity profile activation store implemented
 
 **Outcome:** Academy now has one narrow RPC store plus migration 0024 for the
@@ -34,12 +61,13 @@ independent closure reviewer bound the remediated manifest, reran focused
 21/21, Academy Identity+callback 450/450 and producer 59/59 with proportional
 static/security/reader gates, and returned final `C0/H0/M0/L0`.
 
-**Residual risk:** The store remains unwired. `academy.activation-profile-only`
-stays `not_proven`, conformance remains 15/23, and production remains NO-GO.
-The approved callback/session recovery transaction, Origin/Fetch Metadata and
-browser binding, producer endpoint/key/replay contracts, existing runtime-role
-ACL review, operators, deployment evidence, and release authorization remain
-separate gates.
+**Residual risk:** At this implementation checkpoint the store remained unwired,
+`academy.activation-profile-only` remained `not_proven`, and conformance stayed
+15/23. The later source-bound conformance refresh records the local promotion;
+production remains NO-GO. The approved callback/session recovery transaction,
+Origin/Fetch Metadata and browser binding, producer endpoint/key/replay
+contracts, existing runtime-role ACL review, operators, deployment evidence,
+and release authorization remain separate gates.
 
 ## 2026-08-11 - Final Identity code-exchange port now enforces admission
 

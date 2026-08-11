@@ -1,6 +1,6 @@
 {
   "schema": "academy-identity-control-local-evidence/v1",
-  "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
+  "sourceRevision": "1039c2c53397a9404523c7941bc532ee1cce91f6",
   "identityControlSourceRevision": "ad97ba2236bddbc4857d45359bb37b032aebbb05",
   "registryEnabled": false,
   "releaseApproval": false,
@@ -93,6 +93,21 @@
       ],
       "scenarios": [
         "exchange.client-assertion"
+      ]
+    },
+    {
+      "id": "profile-activation-store",
+      "verdict": "C0/H0/M0/L0",
+      "report": {
+        "path": "reports/reviews/academy-identity-profile-activation-store-local-checkpoint-2026-08-11.md",
+        "sha256": "a56ff9a9e96b5aa09a6348136b1603cff84da42e3659ac60107dcf3ce19c258f"
+      },
+      "freezeManifest": {
+        "path": "reports/reviews/academy-identity-profile-activation-store-freeze-20260811.json",
+        "sha256": "735bbb10654bfd7994c3b982c766341bbfda66e3def1f7dfab57b1a458159f45"
+      },
+      "scenarios": [
+        "academy.activation-profile-only"
       ]
     },
     {
@@ -217,6 +232,13 @@
         "durable-page-store",
         "pull-lease",
         "pure-pull-cycle"
+      ]
+    },
+    {
+      "id": "academy.activation-profile-only",
+      "result": "pass",
+      "checkpointIds": [
+        "profile-activation-store"
       ]
     }
   ],

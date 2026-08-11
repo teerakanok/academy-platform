@@ -1,0 +1,46 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/scripts/generate-identity-control-conformance.mjs",
+      "sha256": "7415470c5500d6f02d3e8984da80fb1f7088fd92124120d232623fc548285e09",
+      "bytes": 27547
+    },
+    {
+      "path": "academy-web/scripts/generate-identity-control-conformance.test.mjs",
+      "sha256": "5f9a7e41209284d6a133d4072e2953fd3190898fffaed3670bbf6de452f8296b",
+      "bytes": 12815
+    },
+    {
+      "path": "plans/active_plan.md",
+      "sha256": "4b7409152f32dfefb63fa908289683a07b4431436326158dfd4123ffd0c6a510",
+      "bytes": 203987
+    },
+    {
+      "path": "plans/completed_log.md",
+      "sha256": "3c813b850cd0b24f0e5d9e695b03c8124bdf1291cf42596127c2c28d2c702881",
+      "bytes": 142513
+    },
+    {
+      "path": "reports/conformance/identity-control/academy-identity-control-conformance.json",
+      "sha256": "9ee74fe3716bc8f96828833d7be9bb93b70a3cea266ff4939a54af4aa0c87231",
+      "bytes": 42588
+    },
+    {
+      "path": "reports/conformance/identity-control/academy-identity-local-evidence.json",
+      "sha256": "85c8db0f00376f9c98bc1ff8fd2f032d36a5c22e954a9a60ed25a58506a0541a",
+      "bytes": 8632
+    },
+    {
+      "path": "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
+      "sha256": "2af3e448135ac30b56dc6d420566f6993448658294fbde7d60314fbf36eaa44b",
+      "bytes": 1393
+    },
+    {
+      "path": "reports/reviews/academy-identity-control-profile-activation-conformance-local-checkpoint-2026-08-11.md",
+      "sha256": "579204930360bd9426cb57821ae3915b06e2d2b520a8f72018fea0177bc8d709",
+      "bytes": 5044
+    }
+  ]
+}

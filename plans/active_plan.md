@@ -586,6 +586,19 @@ import, existing `academy_runtime` ACL ที่กว้างกว่า func
 ตอน production, conformance คง 15/23, registry/runtime disabled และ production
 NO-GO.
 
+**Identity Control profile-activation conformance refresh (2026-08-11):** หลัง
+profile-activation store checkpoint ผ่าน different RIL แล้ว deterministic
+generator bind exact report+manifest digests และ promote เฉพาะ
+`academy.activation-profile-only`. TDD RED ผ่าน 6/7 และล้ม scenario ที่ยังเป็น
+`not_proven`; GREEN ผ่าน 7/7 พร้อม exact 16 pass/7 not-proven summary และยืนยัน
+`enabled=false`, `releaseApproval=false`, `runtimeWired=false`. Generator
+write/current, canonical intake 23/23 และ manifest exact 8 content files ผ่านแล้ว.
+Different independent RIL rebind authority, ยืนยัน delta เฉพาะ scenario เดียว,
+rerun focused/canonical/static/security/reader gates และผ่าน final
+`C0/H0/M0/L0`. Production readiness ไม่เพิ่ม และ callback cookie provenance,
+authenticated exchange, durable runtime transaction, operator/deploy/release
+gates ยังคงเป็น NO-GO.
+
 **Shared strict JSON response boundary checkpoint (2026-08-10):** Academy รับช่วง
 existing untracked BYOB + duplicate-safe parser จาก concurrent client work มา
 audit และเพิ่ม standalone adversarial suite โดยไม่ stage consumer/UI files. RED

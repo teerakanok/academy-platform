@@ -1,6 +1,6 @@
 {
   "schema": "academy-identity-control-unproven-scenarios/v2",
-  "sourceRevision": "18a92e942fb101e6f413a1579d20251bf2b08160",
+  "sourceRevision": "1039c2c53397a9404523c7941bc532ee1cce91f6",
   "identityControlSourceRevision": "ad97ba2236bddbc4857d45359bb37b032aebbb05",
   "command": "academy-identity-control-unproven-v2",
   "result": "not_proven",
@@ -11,7 +11,6 @@
     "callback.origin-fetch-metadata": "Academy does not yet enforce the released Origin and Fetch Metadata mutation policy at a production callback.",
     "exchange.code-replay-expiry": "Local units cover replay and expiry pieces, but the released end-to-end exchange contract is not deployed.",
     "exchange.result-key-rotation": "No released Identity Control result-key distribution or active/overlap rotation path is wired.",
-    "academy.activation-profile-only": "The production callback and profile activation transaction remains unwired.",
     "academy.canonical-founder-bootstrap": "Founder bootstrap still requires a canonical production sign-in and separate owner operation."
   },
   "registryEnabled": false,

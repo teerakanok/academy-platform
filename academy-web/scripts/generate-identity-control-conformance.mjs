@@ -17,7 +17,7 @@ const scriptDirectory = dirname(fileURLToPath(import.meta.url))
 const academyRoot = resolve(scriptDirectory, '..', '..')
 const identityRoot = resolve(academyRoot, '..', 'identity-control')
 
-export const ACADEMY_SOURCE_REVISION = '18a92e942fb101e6f413a1579d20251bf2b08160'
+export const ACADEMY_SOURCE_REVISION = '1039c2c53397a9404523c7941bc532ee1cce91f6'
 export const IDENTITY_SOURCE_REVISION = 'ad97ba2236bddbc4857d45359bb37b032aebbb05'
 
 const reportPath = 'reports/conformance/identity-control/academy-identity-control-conformance.json'
@@ -27,17 +27,16 @@ const unprovenPath = 'reports/conformance/identity-control/academy-identity-unpr
 export const CHECKPOINT_FREEZE_DECLARATION = Object.freeze({
   schema: 'checkpoint-freeze-manifest.v1',
   role: 'identity-consumer-conformance-checkpoint',
-  path: 'reports/reviews/academy-identity-control-client-assertion-conformance-freeze-20260811.json',
+  path: 'reports/reviews/academy-identity-control-profile-activation-conformance-freeze-20260811.json',
   contentPaths: Object.freeze([
     'academy-web/scripts/generate-identity-control-conformance.mjs',
     'academy-web/scripts/generate-identity-control-conformance.test.mjs',
-    'academy-web/tests/unit/identity-client-assertion-conformance.test.ts',
     'plans/active_plan.md',
     'plans/completed_log.md',
     reportPath,
     evidencePath,
     unprovenPath,
-    'reports/reviews/academy-identity-control-client-assertion-conformance-local-checkpoint-2026-08-11.md',
+    'reports/reviews/academy-identity-control-profile-activation-conformance-local-checkpoint-2026-08-11.md',
   ]),
 })
 
@@ -130,6 +129,14 @@ const expectedEvidenceDigests = new Map([
     'reports/reviews/academy-identity-client-assertion-webcrypto-signer-freeze-20260811.json',
     'b056eafdc00fa833dc2c2777235dbcc80c8b8f926e02f333c22f5d6d5a1f6ec7',
   ],
+  [
+    'reports/reviews/academy-identity-profile-activation-store-local-checkpoint-2026-08-11.md',
+    'a56ff9a9e96b5aa09a6348136b1603cff84da42e3659ac60107dcf3ce19c258f',
+  ],
+  [
+    'reports/reviews/academy-identity-profile-activation-store-freeze-20260811.json',
+    '735bbb10654bfd7994c3b982c766341bbfda66e3def1f7dfab57b1a458159f45',
+  ],
 ])
 
 const retainedScenarioIds = Object.freeze([
@@ -156,9 +163,14 @@ export const CLIENT_ASSERTION_SCENARIO_IDS = Object.freeze([
   'exchange.client-assertion',
 ])
 
+export const PROFILE_ACTIVATION_SCENARIO_IDS = Object.freeze([
+  'academy.activation-profile-only',
+])
+
 const localCheckpointScenarioIds = Object.freeze([
   ...CLIENT_ASSERTION_SCENARIO_IDS,
   ...LIFECYCLE_SCENARIO_IDS,
+  ...PROFILE_ACTIVATION_SCENARIO_IDS,
 ])
 
 export const NOT_PROVEN_SCENARIO_IDS = Object.freeze([
@@ -168,7 +180,6 @@ export const NOT_PROVEN_SCENARIO_IDS = Object.freeze([
   'callback.origin-fetch-metadata',
   'exchange.code-replay-expiry',
   'exchange.result-key-rotation',
-  'academy.activation-profile-only',
   'academy.canonical-founder-bootstrap',
 ])
 
@@ -201,7 +212,6 @@ const unprovenReasons = Object.freeze({
   'callback.origin-fetch-metadata': 'Academy does not yet enforce the released Origin and Fetch Metadata mutation policy at a production callback.',
   'exchange.code-replay-expiry': 'Local units cover replay and expiry pieces, but the released end-to-end exchange contract is not deployed.',
   'exchange.result-key-rotation': 'No released Identity Control result-key distribution or active/overlap rotation path is wired.',
-  'academy.activation-profile-only': 'The production callback and profile activation transaction remains unwired.',
   'academy.canonical-founder-bootstrap': 'Founder bootstrap still requires a canonical production sign-in and separate owner operation.',
 })
 
@@ -229,6 +239,12 @@ const checkpointDefinitions = Object.freeze([
     testPath: 'academy-web/tests/unit/identity-client-assertion-conformance.test.ts',
     producerEvidencePaths: [...expectedIdentityEvidenceDigests.keys()],
     scenarios: [...CLIENT_ASSERTION_SCENARIO_IDS],
+  },
+  {
+    id: 'profile-activation-store',
+    reportPath: 'reports/reviews/academy-identity-profile-activation-store-local-checkpoint-2026-08-11.md',
+    manifestPath: 'reports/reviews/academy-identity-profile-activation-store-freeze-20260811.json',
+    scenarios: [...PROFILE_ACTIVATION_SCENARIO_IDS],
   },
   {
     id: 'envelope-verifier',

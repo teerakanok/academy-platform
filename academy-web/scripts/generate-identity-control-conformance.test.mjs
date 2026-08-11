@@ -7,6 +7,7 @@ import {
   IDENTITY_SOURCE_REVISION,
   LIFECYCLE_SCENARIO_IDS,
   NOT_PROVEN_SCENARIO_IDS,
+  PROFILE_ACTIVATION_SCENARIO_IDS,
   buildGeneratedArtifacts,
   renderCanonicalJson,
 } from './generate-identity-control-conformance.mjs'
@@ -111,6 +112,14 @@ const expectedEvidenceDigests = new Map([
     'reports/reviews/academy-identity-client-assertion-webcrypto-signer-freeze-20260811.json',
     'b056eafdc00fa833dc2c2777235dbcc80c8b8f926e02f333c22f5d6d5a1f6ec7',
   ],
+  [
+    'reports/reviews/academy-identity-profile-activation-store-local-checkpoint-2026-08-11.md',
+    'a56ff9a9e96b5aa09a6348136b1603cff84da42e3659ac60107dcf3ce19c258f',
+  ],
+  [
+    'reports/reviews/academy-identity-profile-activation-store-freeze-20260811.json',
+    '735bbb10654bfd7994c3b982c766341bbfda66e3def1f7dfab57b1a458159f45',
+  ],
 ])
 
 const expectedIdentityEvidenceDigests = new Map([
@@ -134,26 +143,25 @@ function build() {
 }
 
 describe('Academy Identity Control conformance generator', () => {
-  test('declares the exact bytewise-sorted nine-file checkpoint content set', () => {
+  test('declares the exact bytewise-sorted eight-file checkpoint content set', () => {
     assert.deepEqual(CHECKPOINT_FREEZE_DECLARATION, {
       schema: 'checkpoint-freeze-manifest.v1',
       role: 'identity-consumer-conformance-checkpoint',
-      path: 'reports/reviews/academy-identity-control-client-assertion-conformance-freeze-20260811.json',
+      path: 'reports/reviews/academy-identity-control-profile-activation-conformance-freeze-20260811.json',
       contentPaths: [
         'academy-web/scripts/generate-identity-control-conformance.mjs',
         'academy-web/scripts/generate-identity-control-conformance.test.mjs',
-        'academy-web/tests/unit/identity-client-assertion-conformance.test.ts',
         'plans/active_plan.md',
         'plans/completed_log.md',
         'reports/conformance/identity-control/academy-identity-control-conformance.json',
         'reports/conformance/identity-control/academy-identity-local-evidence.json',
         'reports/conformance/identity-control/academy-identity-unproven-scenarios.json',
-        'reports/reviews/academy-identity-control-client-assertion-conformance-local-checkpoint-2026-08-11.md',
+        'reports/reviews/academy-identity-control-profile-activation-conformance-local-checkpoint-2026-08-11.md',
       ],
     })
   })
 
-  test('promotes the client assertion plus five lifecycle scenarios while retaining eight explicit gaps', () => {
+  test('promotes client assertion, lifecycle, and profile activation while retaining seven explicit gaps', () => {
     const { evidence, report, unproven } = build()
     const byId = new Map(report.scenarios.map((scenario) => [scenario.id, scenario]))
 
@@ -165,20 +173,20 @@ describe('Academy Identity Control conformance generator', () => {
     assert.deepEqual(report.checkpointFreezeManifest, CHECKPOINT_FREEZE_DECLARATION)
     assert.deepEqual(report.summary, {
       trackedScenarioCount: 23,
-      provenLocally: 15,
-      notProven: 8,
+      provenLocally: 16,
+      notProven: 7,
       productionReady: false,
       noProductionMutation: true,
     })
 
     assert.deepEqual(
       evidence.scenarios.map(({ id }) => id),
-      [...CLIENT_ASSERTION_SCENARIO_IDS, ...LIFECYCLE_SCENARIO_IDS],
+      [...CLIENT_ASSERTION_SCENARIO_IDS, ...LIFECYCLE_SCENARIO_IDS, ...PROFILE_ACTIVATION_SCENARIO_IDS],
     )
     assert.deepEqual(Object.keys(unproven.scenarios), NOT_PROVEN_SCENARIO_IDS)
     assert.equal(report.scenarios.length, 23)
-    assert.equal(report.scenarios.filter(({ result }) => result === 'pass').length, 15)
-    assert.equal(report.scenarios.filter(({ result }) => result === 'not_proven').length, 8)
+    assert.equal(report.scenarios.filter(({ result }) => result === 'pass').length, 16)
+    assert.equal(report.scenarios.filter(({ result }) => result === 'not_proven').length, 7)
 
     assert.deepEqual(
       evidence.checkpoints.find(({ id }) => id === 'client-assertion-composition'),
@@ -205,7 +213,7 @@ describe('Academy Identity Control conformance generator', () => {
       },
     )
 
-    for (const id of [...CLIENT_ASSERTION_SCENARIO_IDS, ...LIFECYCLE_SCENARIO_IDS]) {
+    for (const id of [...CLIENT_ASSERTION_SCENARIO_IDS, ...LIFECYCLE_SCENARIO_IDS, ...PROFILE_ACTIVATION_SCENARIO_IDS]) {
       assert.equal(byId.get(id)?.result, 'pass')
       assert.equal(
         byId.get(id)?.evidence.artifactPath,
@@ -273,5 +281,37 @@ describe('Academy Identity Control conformance generator', () => {
     assert.doesNotMatch(rendered, /"enabled": true/)
     assert.doesNotMatch(rendered, /"releaseApproval": true/)
     assert.doesNotMatch(rendered, /"runtimeWired": true/)
+  })
+
+  test('promotes the reviewed profile-only activation boundary without granting runtime authority', () => {
+    const { evidence, report, unproven } = build()
+    const scenario = report.scenarios.find(({ id }) => id === 'academy.activation-profile-only')
+    const checkpoint = evidence.checkpoints.find(({ id }) => id === 'profile-activation-store')
+
+    assert.equal(scenario?.result, 'pass')
+    assert.notEqual(scenario?.evidence.supportsClaim, false)
+    assert.deepEqual(report.summary, {
+      trackedScenarioCount: 23,
+      provenLocally: 16,
+      notProven: 7,
+      productionReady: false,
+      noProductionMutation: true,
+    })
+    assert.equal(Object.hasOwn(unproven.scenarios, 'academy.activation-profile-only'), false)
+    assert.deepEqual(checkpoint, {
+      id: 'profile-activation-store',
+      verdict: 'C0/H0/M0/L0',
+      report: {
+        path: 'reports/reviews/academy-identity-profile-activation-store-local-checkpoint-2026-08-11.md',
+        sha256: 'a56ff9a9e96b5aa09a6348136b1603cff84da42e3659ac60107dcf3ce19c258f',
+      },
+      freezeManifest: {
+        path: 'reports/reviews/academy-identity-profile-activation-store-freeze-20260811.json',
+        sha256: '735bbb10654bfd7994c3b982c766341bbfda66e3def1f7dfab57b1a458159f45',
+      },
+      scenarios: ['academy.activation-profile-only'],
+    })
+    assert.equal(evidence.runtimeWired, false)
+    assert.equal(evidence.releaseApproval, false)
   })
 })
