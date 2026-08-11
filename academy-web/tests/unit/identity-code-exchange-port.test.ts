@@ -7,6 +7,9 @@ import {
   IdentityCodeExchangePortFailure,
   type IdentityCodeExchangePortOptions,
 } from '@/lib/identity/code-exchange-port'
+import type {
+  IdentityCodeExchangeRuntimeConfigInput,
+} from '@/lib/identity/code-exchange-runtime-config'
 import {
   beginIdentityAuthorization,
   completeIdentityCallback,
@@ -15,6 +18,13 @@ import {
 } from '@/lib/identity/transaction'
 
 const ENDPOINT = 'https://accounts.example.test/v1/code/exchange'
+const ADMITTED_CONFIG: IdentityCodeExchangeRuntimeConfigInput = {
+  enabled: true,
+  releaseApproval: true,
+  endpoint: ENDPOINT,
+  clientAssertionAudience: ENDPOINT,
+  timeoutMs: 1_000,
+}
 const ASSERTION = `${'a'.repeat(32)}.${'b'.repeat(32)}.${'c'.repeat(32)}`
 const CLIENT: LocalIdentityClient = {
   clientId: 'academy-web',
@@ -88,8 +98,7 @@ describe('Academy Identity final code exchange port composition', () => {
     let receivedEndpoint: unknown
     let receivedInit: RequestInit | undefined
     const port = createIdentityCodeExchangePort({
-      endpoint: ENDPOINT,
-      timeoutMs: 1_000,
+      config: ADMITTED_CONFIG,
       fetchPort: {
         async fetch(endpoint, init) {
           receivedEndpoint = endpoint
@@ -127,9 +136,19 @@ describe('Academy Identity final code exchange port composition', () => {
     })
     const responseReader = new Proxy({ read }, { get: readerReads })
     const optionReads = new Map<PropertyKey, number>()
+    const configReads = new Map<PropertyKey, number>()
+    const configGet = vi.fn(() => {
+      throw new Error('runtime config must not use ordinary property access')
+    })
+    const config = new Proxy({ ...ADMITTED_CONFIG }, {
+      get: configGet,
+      getOwnPropertyDescriptor(target, key) {
+        configReads.set(key, (configReads.get(key) ?? 0) + 1)
+        return Reflect.getOwnPropertyDescriptor(target, key)
+      },
+    })
     const options = new Proxy({
-      endpoint: ENDPOINT,
-      timeoutMs: 1_000,
+      config,
       fetchPort,
       responseReader,
     }, {
@@ -143,10 +162,17 @@ describe('Academy Identity final code exchange port composition', () => {
 
     await expect(port.exchangeCode(REQUEST)).resolves.toEqual(RESULT)
     expect(Object.fromEntries(optionReads)).toEqual({
-      endpoint: 1,
-      timeoutMs: 1,
+      config: 1,
       fetchPort: 1,
       responseReader: 1,
+    })
+    expect(configGet).not.toHaveBeenCalled()
+    expect(Object.fromEntries(configReads)).toEqual({
+      enabled: 1,
+      releaseApproval: 1,
+      endpoint: 1,
+      clientAssertionAudience: 1,
+      timeoutMs: 1,
     })
     expect(fetchReads).toHaveBeenCalledOnce()
     expect(readerReads).toHaveBeenCalledOnce()
@@ -155,9 +181,26 @@ describe('Academy Identity final code exchange port composition', () => {
   })
 
   it.each([
-    ['invalid endpoint', 'http://accounts.example.test/v1/code/exchange', 1_000],
-    ['invalid timeout', ENDPOINT, 5_001],
-  ])('rejects %s before reading either nested method', (_label, endpoint, timeoutMs) => {
+    ['disabled and unreleased', {
+      ...ADMITTED_CONFIG,
+      enabled: false,
+      releaseApproval: false,
+    }],
+    ['disabled despite release approval', {
+      ...ADMITTED_CONFIG,
+      enabled: false,
+      releaseApproval: true,
+    }],
+    ['unreleased despite enablement', {
+      ...ADMITTED_CONFIG,
+      enabled: true,
+      releaseApproval: false,
+    }],
+    ['malformed scalar config', {
+      ...ADMITTED_CONFIG,
+      timeoutMs: 5_001,
+    }],
+  ])('rejects %s before reading either nested method', (_label, config) => {
     const fetchGet = vi.fn(() => {
       throw new Error('fetch method must not be read')
     })
@@ -165,8 +208,7 @@ describe('Academy Identity final code exchange port composition', () => {
       throw new Error('reader method must not be read')
     })
     const input = {
-      endpoint,
-      timeoutMs,
+      config,
       fetchPort: new Proxy({}, { get: fetchGet }),
       responseReader: new Proxy({}, { get: readerGet }),
     } as IdentityCodeExchangePortOptions
@@ -185,13 +227,12 @@ describe('Academy Identity final code exchange port composition', () => {
 
   it('uses one bounded construction error for a hostile public option', () => {
     const input = new Proxy({
-      endpoint: ENDPOINT,
-      timeoutMs: 1_000,
+      config: ADMITTED_CONFIG,
       fetchPort: { fetch: async () => acceptedResponse() },
       responseReader: strictReader(),
     }, {
       get(target, key, receiver) {
-        if (key === 'timeoutMs') throw new Error('credential=TOP_SECRET')
+        if (key === 'config') throw new Error('credential=TOP_SECRET')
         return Reflect.get(target, key, receiver)
       },
     })
@@ -208,8 +249,7 @@ describe('Academy Identity final code exchange port composition', () => {
 
   it('keeps execution failures on the accepted bounded adapter surface', async () => {
     const port = createIdentityCodeExchangePort({
-      endpoint: ENDPOINT,
-      timeoutMs: 1_000,
+      config: ADMITTED_CONFIG,
       fetchPort: {
         async fetch() {
           throw new Error('credential=TOP_SECRET')
@@ -230,8 +270,7 @@ describe('Academy Identity final code exchange port composition', () => {
     const store = new InMemoryIdentityTransactionStore()
     const started = beginIdentityAuthorization(store, CLIENT, '/dashboard', () => REQUEST.codeVerifier)
     const port = createIdentityCodeExchangePort({
-      endpoint: ENDPOINT,
-      timeoutMs: 1_000,
+      config: ADMITTED_CONFIG,
       fetchPort: {
         fetch: async () => acceptedResponse({ ...RESULT, nonce: started.request.nonce }),
       },
@@ -261,6 +300,7 @@ describe('Academy Identity final code exchange port composition', () => {
       import.meta.url,
     ), 'utf8')
 
+    expect(source).toContain('projectIdentityCodeExchangeRuntimeConfig')
     expect(source).not.toMatch(/\bfetch\s*\(|\bResponse\b|process\.env|registry|wrangler/i)
     expect(source).not.toMatch(/accounts\.cyberskills\.co\.th|supabase\.cyberskills\.co\.th/)
   })

@@ -543,6 +543,24 @@ rerun focused 57/57, Identity
 424/424, producer 59/59 และ proportional static/security/reader gates แล้วผ่าน
 final `C0/H0/M0/L0`; source/test คง frozen semantic set เดิม.
 
+**Identity final code-exchange port admission gate checkpoint (2026-08-11):**
+Academy เปลี่ยน canonical final factory เดิมให้รับ exact runtime config แล้วเรียก
+accepted projector ก่อนอ่าน injected fetch/strict-reader capabilities. Factory
+สร้าง least-capability port เฉพาะ `admitted`; ทั้งสาม blocked gate combinations
+และ malformed config คืน fixed construction failure โดยไม่อ่าน nested method.
+ไม่มี factory คู่ขนาน, runtime import, env/registry read หรือ production value.
+Test-only RED ล้ม 5/8; GREEN ผ่าน focused 10/10, code-exchange/callback seam
+141/141, Academy Identity 426/426, full unit 1,116/1,116, producer 59/59 และ full
+lint/all TypeScript configs โดยมี generated warning เดิม 1 จุด. หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-code-exchange-port-admission-gate-local-checkpoint-2026-08-11.md`](../reports/reviews/academy-identity-code-exchange-port-admission-gate-local-checkpoint-2026-08-11.md).
+Different independent RIL bind manifest 5/5, rerun focused 10/10, seam 141/141,
+Academy Identity 426/426, producer 59/59 และ proportional static/security/reader
+gates แล้วผ่าน final `C0/H0/M0/L0`. Slice ยังคง local/unwired; gate provenance,
+signer coherence, endpoint ownership, strict-reader values, durable transactions,
+operators, deploy และ release authorization เป็น external gates. Conformance คง
+15/23 (`65.2%`), readiness ไม่เพิ่ม, registry/runtime disabled และ production
+NO-GO.
+
 **Shared strict JSON response boundary checkpoint (2026-08-10):** Academy รับช่วง
 existing untracked BYOB + duplicate-safe parser จาก concurrent client work มา
 audit และเพิ่ม standalone adversarial suite โดยไม่ stage consumer/UI files. RED

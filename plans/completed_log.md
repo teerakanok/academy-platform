@@ -5,6 +5,35 @@
 
 ---
 
+## 2026-08-11 - Final Identity code-exchange port now enforces admission
+
+**Outcome:** The existing canonical final port factory now projects one exact
+runtime configuration before it can read either injected capability. Only an
+`admitted` projection reaches the accepted response/JSON transport and
+least-capability adapter. Every valid blocked gate combination and malformed
+configuration stops with the fixed construction failure before fetch or reader
+method access. No parallel factory, runtime import, environment read, registry
+read, route, or production value was added.
+
+The test-only RED produced five failures and three passes against the prior
+factory. GREEN passes focused 10/10, code-exchange/callback seam 141/141,
+Academy Identity 426/426, full unit 1,116/1,116, Identity Control producer
+59/59, and full lint plus all TypeScript configurations with one pre-existing
+generated-registry warning. Evidence is in
+`reports/reviews/academy-identity-code-exchange-port-admission-gate-local-checkpoint-2026-08-11.md`.
+
+**Review:** Different independent RIL verified the named manifest twice, reran
+focused 10/10, seam 141/141, Academy Identity 426/426, producer 59/59 and the
+proportional static, security and reader gates, then returned final
+`C0/H0/M0/L0`.
+
+**Residual risk:** Admission remains a local classification. A future trusted
+server composition must establish gate provenance and source the assertion
+signer, endpoint, strict-reader settings, replay capability, durable
+transactions, operators, deployment evidence, and release authorization from
+accepted authority. Conformance remains 15/23, registry/runtime remain disabled,
+readiness does not increase, and production remains NO-GO.
+
 ## 2026-08-11 - Local Identity code-exchange runtime config projection implemented
 
 **Outcome:** Academy now has a pure exact-data projector for the scalar values
