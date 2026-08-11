@@ -4,7 +4,7 @@ import { dirname, isAbsolute } from 'node:path'
 import type {
   ExchangeResult,
   AuthorizationRequest,
-  IdentityAdapter,
+  IdentityCodeExchangePort,
   IdentityClientAssertionProvider,
 } from './adapter'
 import { verifyIdentityCodeExchangeResult } from './code-exchange-result'
@@ -472,7 +472,7 @@ export async function completeIdentityCallback({
   browserBinding,
   clientAssertionProvider,
 }: {
-  adapter: IdentityAdapter
+  adapter: IdentityCodeExchangePort
   store: IdentityTransactionStore
   client: LocalIdentityClient
   callback: IdentityCallback

@@ -480,6 +480,26 @@ exact endpoint, signer/key rotation, replay store, strict
 reader values, durable callback/activation, operator/deploy/release ยังเป็น gates
 แยก. Conformance คง 15/23 (`65.2%`), readiness ไม่เพิ่ม และ production NO-GO.
 
+**Identity code-exchange least-capability adapter checkpoint (2026-08-11):**
+Academy เพิ่ม pure bridge จาก accepted composed JSON operation ไปยัง
+`IdentityCodeExchangePort` ที่มีเฉพาะ `exchangeCode`; callback transaction
+เปลี่ยนจาก broad `IdentityAdapter` มา depend on port แคบ และ remote result ยังคง
+เป็น `unknown` จน transaction verifier ตรวจ issuer/audience/service/nonce/shape.
+Missing-module RED หยุดก่อน collection; GREEN ผ่าน focused 7/7, callback/code-
+exchange seam 104/104, Academy Identity 25 files/389 tests, full unit 97 files/
+1,079 tests, Identity producer API+authorization+assertion 59/59 และ full
+lint/all TypeScript configs ผ่านโดยมี generated warning เดิม 1 จุด. หลักฐานอยู่ที่
+[`reports/reviews/academy-identity-code-exchange-adapter-local-checkpoint-2026-08-11.md`](../reports/reviews/academy-identity-code-exchange-adapter-local-checkpoint-2026-08-11.md).
+Different independent RIL แรกคืน `C0/H0/M0/L1`: code/security ผ่าน แต่ report ใช้
+คำว่าไม่มี network authority กว้างเกินจริง เพราะ `exchangeCode` เรียก injected
+network operation ได้. Text-only remediation แยก request-scoped exchange
+capability ออกจาก raw fetch/endpoint/configuration surface แล้ว; source/test ไม่
+เปลี่ยน. Different closure re-review bind manifest ใหม่, rerun focused 7/7,
+seam 104/104, Academy Identity 389/389, producer 59/59 และ proportional
+static/security/reader gates แล้วผ่าน final `C0/H0/M0/L0`. Slice นี้ไม่มี runtime import,
+endpoint/credential, registry, route, DB หรือ deploy value; conformance คง 15/23
+(`65.2%`), readiness ไม่เพิ่ม, registry/runtime disabled และ production NO-GO.
+
 **Shared strict JSON response boundary checkpoint (2026-08-10):** Academy รับช่วง
 existing untracked BYOB + duplicate-safe parser จาก concurrent client work มา
 audit และเพิ่ม standalone adversarial suite โดยไม่ stage consumer/UI files. RED

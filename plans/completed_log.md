@@ -5,6 +5,40 @@
 
 ---
 
+## 2026-08-11 - Local Identity code-exchange least-capability adapter implemented
+
+**Outcome:** Academy now exposes the accepted composed code-exchange operation
+to callback logic through a narrow `IdentityCodeExchangePort` containing only
+`exchangeCode`. The callback transaction no longer requires the broad adapter
+surface, and the shared five-field request type is named once at the Identity
+boundary. The port returns `unknown`; the callback still requires the exact
+issuer, audience, service, nonce, and result-shape verifier before use.
+
+The test-only RED stopped before collection on the missing bridge module. GREEN
+passes focused 7/7, callback/code-exchange seam 104/104, Academy Identity 25
+files / 389 tests, full unit 97 files / 1,079 tests, and Identity Control API,
+authorization, and assertion regression 59/59. Full lint and all TypeScript
+configurations pass with one pre-existing generated-registry warning.
+
+**Review:** the first different independent review returned `C0/H0/M0/L1`.
+Code and security passed; the Low finding corrected an overbroad report claim
+that the port had no network authority even though its one request-scoped
+capability invokes the injected exchange operation. Text-only remediation now
+states that the port exposes no raw fetch, endpoint/configuration,
+authorization-start, registry, or production-admission surface. Source and test
+bytes remain unchanged. Different closure re-review verified the regenerated
+manifest, reran focused 7/7, seam 104/104, Academy Identity 389/389, producer
+59/59 and proportional static/security/reader gates, then returned final
+`C0/H0/M0/L0`. Evidence is in
+`reports/reviews/academy-identity-code-exchange-adapter-local-checkpoint-2026-08-11.md`.
+
+**Residual risk:** canonical conformance remains 15/23 and readiness does not
+increase. The module is pure and unwired. Exact production endpoint, protected
+signer and rotation, replay storage, strict-reader values, durable callback and
+activation transactions, operators, deployment, and release authorization
+remain separate gates. Registry/runtime stay disabled and production remains
+NO-GO.
+
 ## 2026-08-11 - Local Identity code-exchange transport composition implemented
 
 **Outcome:** Academy now has one pure factory that composes the accepted

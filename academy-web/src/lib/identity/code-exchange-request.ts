@@ -1,4 +1,4 @@
-import type { IdentityAdapter } from './adapter'
+import type { IdentityCodeExchangeRequest as IdentityCodeExchangeRequestContract } from './adapter'
 
 const REQUEST_KEYS = [
   'clientId',
@@ -11,7 +11,7 @@ const OPAQUE_VALUE = /^[A-Za-z0-9_-]{16,160}$/
 const COMPACT_JWS = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/
 const CODE_VERIFIER = /^[A-Za-z0-9._~-]{43,128}$/
 
-export type IdentityCodeExchangeRequest = Parameters<IdentityAdapter['exchangeCode']>[0]
+export type IdentityCodeExchangeRequest = IdentityCodeExchangeRequestContract
 
 export function projectIdentityCodeExchangeRequest(
   value: unknown,

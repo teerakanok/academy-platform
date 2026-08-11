@@ -55,6 +55,20 @@ export interface IdentityClientAssertionProvider {
   createClientAssertion(input: { audience: string }): Promise<string>
 }
 
+export interface IdentityCodeExchangeRequest {
+  clientId: string
+  /** ES256 compact JWS from Academy's server-held signer; never browser input. */
+  clientAssertion: string
+  redirectUri: string
+  code: string
+  codeVerifier: string
+}
+
+/** Least-capability boundary required by the callback transaction. */
+export interface IdentityCodeExchangePort {
+  exchangeCode(input: IdentityCodeExchangeRequest): Promise<unknown>
+}
+
 export interface IdentityAdapter {
   /** ชื่อสำหรับ log และสำหรับกันไม่ให้ adapter ที่ใช้ได้เฉพาะ dev หลุดขึ้น production */
   readonly name: string
@@ -63,14 +77,7 @@ export interface IdentityAdapter {
   /** เริ่ม transaction แล้วคืน URL ที่จะพา browser ไป Account Center */
   startAuthorization(request: AuthorizationRequest): Promise<{ authorizeUrl: string }>
   /** แลก code ที่ backend เท่านั้น — ต้องส่ง PKCE verifier ที่ไม่เคยออกไปฝั่ง browser */
-  exchangeCode(input: {
-    clientId: string
-    /** ES256 compact JWS from Academy's server-held signer; never browser input. */
-    clientAssertion: string
-    redirectUri: string
-    code: string
-    codeVerifier: string
-  }): Promise<ExchangeResult>
+  exchangeCode(input: IdentityCodeExchangeRequest): Promise<ExchangeResult>
 }
 
 export class IdentityAdapterError extends Error {
