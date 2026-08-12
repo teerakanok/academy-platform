@@ -1,0 +1,71 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/src/lib/identity/lifecycle-envelope-verifier.ts",
+      "sha256": "da1dd458b121e654149183e77f67adbfc94eaf528e829f104281c85317035d28",
+      "bytes": 7882
+    },
+    {
+      "path": "academy-web/src/lib/identity/lifecycle-page-store.ts",
+      "sha256": "66f9524afe9673bb5e55260c9eac8218bf71a8d86be36ef9372c9f0b4e68287a",
+      "bytes": 27122
+    },
+    {
+      "path": "academy-web/src/lib/identity/lifecycle-principal.ts",
+      "sha256": "722f32d5ff4f7925dd9c6206cdba9b0cd8b18cac1849c794819520f99b18a869",
+      "bytes": 1250
+    },
+    {
+      "path": "academy-web/src/lib/identity/lifecycle-reducer.ts",
+      "sha256": "0ef5469a20b8b14bc927d13cc510f045a5c5d2347683a155b06ab8d079153162",
+      "bytes": 5779
+    },
+    {
+      "path": "academy-web/supabase/migrations/0026_identity_lifecycle_principal_contract.sql",
+      "sha256": "5739f1257fa5a18419b8296236dc17f04d21e11ee491da1e85cca90d2f4beaf4",
+      "bytes": 2445
+    },
+    {
+      "path": "academy-web/tests/integration/identity-lifecycle-page-store.test.ts",
+      "sha256": "ed384538847aaec25d108e92d6bb9eb854cbf22d6c6beee0c055c608b3ee18a1",
+      "bytes": 39171
+    },
+    {
+      "path": "academy-web/tests/unit/identity-lifecycle-envelope-verifier.test.ts",
+      "sha256": "3c775bada1fe25f51b53619925665263ca9dbaf2c74731869aab1ec7355945f9",
+      "bytes": 8094
+    },
+    {
+      "path": "academy-web/tests/unit/identity-lifecycle-page-store.test.ts",
+      "sha256": "57ba2a71e825d2f370fd441cbda6a9bab1defbc6978adc68f7fa6041a2d2fda1",
+      "bytes": 19156
+    },
+    {
+      "path": "academy-web/tests/unit/identity-lifecycle-principal.test.ts",
+      "sha256": "04397c1cd166e352377175ae5bd55b782ee84cf7d78300f3fbc3d11e10aca928",
+      "bytes": 2532
+    },
+    {
+      "path": "academy-web/tests/unit/identity-lifecycle-reducer.test.ts",
+      "sha256": "9dd3a7d0e137399757a79c355960341462b0bf178fd1ffa195341fbe489cc101",
+      "bytes": 8248
+    },
+    {
+      "path": "plans/active_plan.md",
+      "sha256": "fc61e4457a5ff74b369d3c678e46ed792463c438d52a0356a5ed813606f9fbe2",
+      "bytes": 211172
+    },
+    {
+      "path": "plans/completed_log.md",
+      "sha256": "5ca708d486d751fef24c08271d3d44d8dc275e912f8d3f15287c905c286a23c5",
+      "bytes": 151199
+    },
+    {
+      "path": "reports/reviews/academy-identity-lifecycle-principal-contract-local-checkpoint-2026-08-12.md",
+      "sha256": "fc7818c63d840d638ea6a0fd6a749f484c0835ae8735c0f26d99d2f7c8175e80",
+      "bytes": 4251
+    }
+  ]
+}

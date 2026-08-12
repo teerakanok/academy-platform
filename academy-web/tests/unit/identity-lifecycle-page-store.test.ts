@@ -424,8 +424,16 @@ describe('Academy Identity lifecycle page-store boundary', () => {
     expect((await store.read())?.projections).not.toBe(snapshot.projections)
   })
 
-  it('round-trips lone UTF-16 surrogates and pairs without subject-key collisions', async () => {
-    const subjects = ['\ud800', '\udc00', '\ud800\udc00']
+  it('rejects lone UTF-16 surrogates and round-trips a valid pair', async () => {
+    for (const subject of ['\ud800', '\udc00']) {
+      expect(() => buildIdentityLifecyclePageCommit(null, {
+        nextCursor: '1',
+        configRevision: 1,
+        events: [event(subject, 'active', 1)],
+      }, 1)).toThrow(/invalid event/)
+    }
+
+    const subjects = ['\ud800\udc00']
     const commit = buildIdentityLifecyclePageCommit(null, {
       nextCursor: '1',
       configRevision: 1,
@@ -444,11 +452,9 @@ describe('Academy Identity lifecycle page-store boundary', () => {
       current: { subjectKey: string; subject?: string }
     }>
     expect(wireProjections.map((projection) => projection.current.subjectKey)).toEqual([
-      'd800',
       'd800dc00',
-      'dc00',
     ])
-    expect(new Set(wireProjections.map((projection) => projection.current.subjectKey)).size).toBe(3)
+    expect(new Set(wireProjections.map((projection) => projection.current.subjectKey)).size).toBe(1)
     expect(wireProjections.every((projection) => !('subject' in projection.current))).toBe(true)
 
     const readRpc = vi.fn(async () => ({

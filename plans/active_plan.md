@@ -2,7 +2,7 @@
 
 > Open work only. Move closed items to `completed_log.md` with evidence.
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
-> **Last updated:** 2026-08-11
+> **Last updated:** 2026-08-12
 
 ## Current execution lane — activate identity without widening Pool A access
 
@@ -121,6 +121,20 @@ Final independent re-review ผ่าน `C0/H0/M0/L0`; migration ยังไ�
 apply นอก disposable loopback PostgreSQL และยังไม่มี puller/endpoint/key/
 audience/runtime wiring, PostgREST deploy หรือ reconciliation authority. Registry
 `enabled=false` และ `releaseApproval=false` คงเดิม.
+
+**Identity lifecycle principal-contract parity checkpoint (2026-08-12):**
+Identity Control revision `d7f517adb408ee2f50f3b5734c10dd14cbea6530`
+นิยาม canonical principal issuer แบบ portable ASCII subset และ require subject
+เป็น well-formed UTF-16 ไม่เกิน 512 code units. Academy ใช้ predicate เดียวกันใน
+envelope verifier, reducer และ durable page-store แล้ว. Forward migration `0026`
+แทน SQL helpers ให้ตรง producer และหยุดก่อน deploy หาก projection เดิมมี issuer
+หรือ subject key ที่ผิด contract; ไม่มีการลบหรือ rewrite row อัตโนมัติ. TDD จาก
+missing-module/lone-surrogate RED เป็น GREEN: lifecycle units 170/170, disposable
+PostgreSQL 28/28 พร้อม migration-abort/rollback และ cleanup, scoped ESLint กับ
+TypeScript ผ่าน. Different independent RIL bind exact checkpoint authority,
+rerun focused 170/170 กับ static/data/reader gates และผ่าน final
+`C0/H0/M0/L0`. Checkpoint ยังเป็น local/unwired; migration ที่ Pool A, runtime
+wiring, deploy และ release ต้องผ่าน production gate แยก.
 
 **Identity lifecycle pull-lease local checkpoint (2026-08-10):** Migration
 `0023` เพิ่ม database-clock singleton lease สำหรับ logical puller หนึ่งตัวและ

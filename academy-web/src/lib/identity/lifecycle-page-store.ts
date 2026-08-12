@@ -1,5 +1,9 @@
 import type { IdentityLifecycleEvent } from './lifecycle-envelope-verifier'
 import {
+  isCanonicalIdentityLifecyclePrincipalIssuer,
+  isWellFormedIdentityLifecycleSubject,
+} from './lifecycle-principal'
+import {
   reduceIdentityLifecycleProjection,
   type IdentityLifecycleProjection,
 } from './lifecycle-reducer'
@@ -441,12 +445,8 @@ function parseCurrent(value: unknown): IdentityLifecycleProjection | null {
   const snapshot = snapshotExactDataProperties(value, CURRENT_KEYS)
   if (!snapshot
     || typeof snapshot.issuer !== 'string'
-    || !isCanonicalHttpsUrl(snapshot.issuer)
-    || snapshot.issuer.length > MAX_PRINCIPAL_LENGTH
-    || typeof snapshot.subject !== 'string'
-    || snapshot.subject.length < 1
-    || snapshot.subject.length > MAX_PRINCIPAL_LENGTH
-    || snapshot.subject.includes('\0')
+    || !isCanonicalIdentityLifecyclePrincipalIssuer(snapshot.issuer)
+    || !isWellFormedIdentityLifecycleSubject(snapshot.subject)
     || !STATES.includes(snapshot.state as IdentityLifecycleProjection['state'])
     || !isPositiveSafeInteger(snapshot.revision)) {
     return null
@@ -480,7 +480,7 @@ function decodeSubjectKey(value: string): string | null {
     if (group === '0000') return null
     subject += String.fromCharCode(Number.parseInt(group, 16))
   }
-  return subject
+  return isWellFormedIdentityLifecycleSubject(subject) ? subject : null
 }
 
 function toWireCurrent(current: IdentityLifecycleProjection) {
@@ -740,13 +740,4 @@ function compareDurableProjections(
 
 function codeUnitCompare(left: string, right: string): number {
   return left < right ? -1 : left > right ? 1 : 0
-}
-
-function isCanonicalHttpsUrl(value: string): boolean {
-  try {
-    const url = new URL(value)
-    return url.protocol === 'https:' && url.toString() === value && !value.includes('\0')
-  } catch {
-    return false
-  }
 }

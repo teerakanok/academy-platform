@@ -3,6 +3,30 @@
 > Closed items only, with outcome + evidence + residual risk. Newest first.
 > Provider-neutral. See `active_plan.md` for open work.
 
+## 2026-08-12 - Identity lifecycle principal contract aligned locally
+
+**Outcome:** Academy now applies the exact Identity Control producer contract
+for lifecycle principal issuers and subjects in its envelope verifier, reducer,
+durable store, and forward PostgreSQL migration. Canonical issuer aliases and
+malformed UTF-16 stop before projection or commit. Migration `0026` preflights
+existing rows and aborts without deleting or rewriting incompatible data.
+
+**Verification:** The initial missing-module and lone-surrogate REDs became
+focused lifecycle GREEN `170/170`. Academy Identity regression passed
+`500/500`; producer contract regression passed `33/33`; disposable PostgreSQL
+17.5 passed `28/28` with migration-abort/rollback and owned cleanup. Scoped
+ESLint, TypeScript, whitespace, and secret gates passed.
+
+**Review:** A different reviewer bound the semantic 12-file authority, reviewed
+code/debt, security/data/migration, and UX/operator/reader lanes, reran the
+focused/static gates, and returned final `C0/H0/M0/L0`. The final bookkeeping
+authority preserves every reviewed implementation, test, and migration hash.
+
+**Residual risk:** This checkpoint is local and unwired. Migration `0026` has
+not been applied to Pool A. Registry enablement, endpoint and key distribution,
+scheduler and monitoring ownership, deployment, and release authorization remain
+separate production gates.
+
 ---
 
 ## 2026-08-12 - Public-to-learner feature wave integrated locally

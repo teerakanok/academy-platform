@@ -68,6 +68,49 @@ function tamperSegment(
   return parts.join('.')
 }
 
+async function createSignedEnvelopeFixture() {
+  const keyPair = await crypto.subtle.generateKey(
+    { name: 'ECDSA', namedCurve: 'P-256' },
+    true,
+    ['sign', 'verify'],
+  ) as CryptoKeyPair
+  const publicJwk = await crypto.subtle.exportKey('jwk', keyPair.publicKey)
+  const issuedAt = 1_786_240_800
+
+  return {
+    policy: policy({
+      verificationTime: new Date(issuedAt * 1_000 + 60_000),
+      key: {
+        keyId: 'identity-events-contract-parity',
+        algorithm: 'ES256',
+        publicJwk,
+      },
+    }),
+    sign: async (event: Record<string, unknown>) => {
+      const header = Buffer.from(JSON.stringify({
+        alg: 'ES256',
+        kid: 'identity-events-contract-parity',
+        typ: 'identity-event+jwt',
+      })).toString('base64url')
+      const claims = Buffer.from(JSON.stringify({
+        aud: PRODUCER_VECTOR.verification.expectedAudience,
+        event,
+        exp: issuedAt + 120,
+        iat: issuedAt,
+        iss: PRODUCER_VECTOR.verification.expectedIssuer,
+        jti: event.eventId,
+      })).toString('base64url')
+      const signingInput = `${header}.${claims}`
+      const signature = await crypto.subtle.sign(
+        { name: 'ECDSA', hash: 'SHA-256' },
+        keyPair.privateKey,
+        Buffer.from(signingInput),
+      )
+      return `${signingInput}.${Buffer.from(signature).toString('base64url')}`
+    },
+  }
+}
+
 describe('lifecycle.envelope-cryptographic-verification', () => {
   it('accepts the exact fixture-only producer vector', async () => {
     expect(createHash('sha256').update(PRODUCER_VECTOR.envelope).digest('hex'))
@@ -129,5 +172,21 @@ describe('lifecycle.envelope-cryptographic-verification', () => {
     await expect(verifyIdentityLifecycleEnvelope(PRODUCER_VECTOR.envelope, malformedKey)).resolves.toBeNull()
     await expect(verifyIdentityLifecycleEnvelope(PRODUCER_VECTOR.envelope, arrayLikeKeyOps)).resolves.toBeNull()
     await expect(verifyIdentityLifecycleEnvelope('not.a.valid.compact-jws', policy())).resolves.toBeNull()
+  })
+
+  it('rejects signed events outside the producer principal contract', async () => {
+    const fixture = await createSignedEnvelopeFixture()
+    for (const event of [
+      { ...PRODUCER_VECTOR.expectedEvent, issuer: 'https://a.1/' },
+      { ...PRODUCER_VECTOR.expectedEvent, issuer: 'https://xn--a.example/' },
+      { ...PRODUCER_VECTOR.expectedEvent, issuer: 'https://identity-control.example.test/' },
+      { ...PRODUCER_VECTOR.expectedEvent, subject: '\ud800' },
+      { ...PRODUCER_VECTOR.expectedEvent, subject: '\udc00' },
+    ]) {
+      await expect(verifyIdentityLifecycleEnvelope(
+        await fixture.sign(event),
+        fixture.policy,
+      )).resolves.toBeNull()
+    }
   })
 })

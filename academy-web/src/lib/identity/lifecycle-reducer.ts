@@ -1,4 +1,8 @@
 import type { IdentityLifecycleEvent } from './lifecycle-envelope-verifier'
+import {
+  isCanonicalIdentityLifecyclePrincipalIssuer,
+  isWellFormedIdentityLifecycleSubject,
+} from './lifecycle-principal'
 
 const EVENT_KEYS = ['eventId', 'issuer', 'kind', 'occurredAt', 'reason', 'revision', 'state', 'subject'] as const
 const PROJECTION_KEYS = ['issuer', 'revision', 'state', 'subject'] as const
@@ -149,13 +153,8 @@ function snapshotExactDataProperties<const Keys extends readonly string[]>(
 
 function isPrincipal(value: Record<string, unknown>): boolean {
   return typeof value.issuer === 'string'
-    && isExactHttpsUrl(value.issuer)
-    && value.issuer.length <= 512
-    && !value.issuer.includes('\0')
-    && typeof value.subject === 'string'
-    && value.subject.length >= 1
-    && value.subject.length <= 512
-    && !value.subject.includes('\0')
+    && isCanonicalIdentityLifecyclePrincipalIssuer(value.issuer)
+    && isWellFormedIdentityLifecycleSubject(value.subject)
 }
 
 function isRevision(value: unknown): value is number {
@@ -165,13 +164,4 @@ function isRevision(value: unknown): value is number {
 function isExactTimestamp(value: string): boolean {
   const parsed = new Date(value)
   return Number.isFinite(parsed.getTime()) && parsed.toISOString() === value
-}
-
-function isExactHttpsUrl(value: string): boolean {
-  try {
-    const url = new URL(value)
-    return url.protocol === 'https:' && url.toString() === value
-  } catch {
-    return false
-  }
 }

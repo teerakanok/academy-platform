@@ -16,7 +16,37 @@ import {
 const migrationPaths = [
   join(process.cwd(), 'supabase/migrations/0022_identity_lifecycle_projection.sql'),
   join(process.cwd(), 'supabase/migrations/0023_identity_lifecycle_pull_lease.sql'),
+  join(process.cwd(), 'supabase/migrations/0026_identity_lifecycle_principal_contract.sql'),
 ]
+const principalMigrationPath = migrationPaths[2]!
+const PRODUCER_ACCEPTED_ISSUERS = [
+  'https://accounts.example.test/',
+  'https://accounts.example.test/auth/v1',
+  'https://accounts.example.test/auth/v1/',
+  'https://supabase.cyberskills.co.th/auth/v1',
+] as const
+const PRODUCER_REJECTED_ISSUERS = [
+  'https://ACCOUNTS.example.test/auth/v1',
+  'https://accounts.example.test:443/auth/v1',
+  'https://accounts.example.test/a/../auth/v1',
+  'https://accounts.example.test/auth/v1?tenant=one',
+  'https://accounts.example.test/auth/v1#fragment',
+  'https://user@accounts.example.test/auth/v1',
+  'https://accounts.example.test',
+  'https://accounts.example.test/auth%2Fv1',
+  'https://accounts.example.test//auth/v1',
+  'https://a.1/',
+  'https://127.1/',
+  'https://0x7f.1/',
+  'https://0177.0.0.1/',
+  'https://127.000.000.001/',
+  'https://xn--a.example/',
+  'https://xn--abc.example/',
+  'https://xn--bcher-kva.example/',
+  'https://identity-control.example.test/',
+  'https://accounts.example.test/\n',
+  'https://accounts.example.test/\r',
+] as const
 let admin: Client
 let databaseUrl: string
 
@@ -696,11 +726,30 @@ describe('Academy Identity lifecycle atomic PostgreSQL page store', () => {
   })
 
   it('enforces canonical issuer and canonical UTF-16 subject keys in SQL', async () => {
-    const approvedFixture = await admin.query(`select
-      academy.identity_lifecycle_issuer_is_canonical(
-        'https://accounts.example.test/auth/v1'
-      ) as accepted`)
-    expect(approvedFixture.rows[0]?.accepted).toBe(true)
+    for (const issuer of PRODUCER_ACCEPTED_ISSUERS) {
+      const result = await admin.query(`select
+        academy.identity_lifecycle_issuer_is_canonical($1::text) as accepted`, [issuer])
+      expect(result.rows[0]?.accepted).toBe(true)
+    }
+    for (const issuer of PRODUCER_REJECTED_ISSUERS) {
+      const result = await admin.query(`select
+        academy.identity_lifecycle_issuer_is_canonical($1::text) as accepted`, [issuer])
+      expect(result.rows[0]?.accepted).toBe(false)
+    }
+
+    for (const [subjectKey, accepted] of [
+      ['0061', true],
+      ['0e01'.repeat(512), true],
+      ['d83dde00'.repeat(256), true],
+      ['d800', false],
+      ['dc00', false],
+      ['d8000061', false],
+      ['0061dc00', false],
+    ] as const) {
+      const result = await admin.query(`select
+        academy.identity_lifecycle_subject_key_is_valid($1::text) as accepted`, [subjectKey])
+      expect(result.rows[0]?.accepted).toBe(accepted)
+    }
 
     const invalidIssuer = seedCommit()
     invalidIssuer.projections[0]!.current.issuer = 'https://ACCOUNTS.example.test/auth/v1'
@@ -720,8 +769,41 @@ describe('Academy Identity lifecycle atomic PostgreSQL page store', () => {
     await expect(rawCommit(admin, overBoundary)).rejects.toThrow(/projection values|principal/)
   })
 
-  it('round-trips lone UTF-16 surrogates and pairs without physical-key collisions', async () => {
-    const subjects = ['\ud800', '\udc00', '\ud800\udc00']
+  it('aborts the forward migration when a legacy principal violates the producer contract', async () => {
+    const migration = await readFile(principalMigrationPath, 'utf8')
+    await admin.query(`create or replace function academy.identity_lifecycle_subject_key_is_valid(
+      p_value text
+    ) returns boolean language sql immutable security invoker set search_path = pg_catalog
+    as $function$ select true $function$`)
+    await admin.query(`insert into academy.identity_lifecycle_projection (
+      consumer_id, issuer, subject_key, state, revision, health, highest_known_revision
+    ) values (
+      'academy-web', 'https://accounts.example.test/auth/v1', 'd800',
+      'active', 1, 'ready', 1
+    )`)
+
+    await expect(admin.query(migration)).rejects.toThrow(/violate the producer contract/)
+    expect((await admin.query(`select subject_key from academy.identity_lifecycle_projection`))
+      .rows).toEqual([{ subject_key: 'd800' }])
+
+    await admin.query(`delete from academy.identity_lifecycle_projection`)
+    await admin.query(migration)
+    expect((await admin.query(`select
+      academy.identity_lifecycle_subject_key_is_valid('d800') as accepted`))
+      .rows[0]?.accepted).toBe(false)
+  })
+
+  it('rejects lone UTF-16 surrogate keys and round-trips a valid pair', async () => {
+    for (const subjectKey of ['d800', 'dc00']) {
+      const commit = seedCommit()
+      const projections = wireProjections(commit.projections)
+      projections[0]!.current.subjectKey = subjectKey
+      await expect(rawCommit(admin, commit, projections)).rejects.toThrow(/subject key|projection/)
+      expect((await admin.query(`select count(*)::int as count
+        from academy.identity_lifecycle_consumer_checkpoint`)).rows[0]?.count).toBe(0)
+    }
+
+    const subjects = ['\ud800\udc00']
     const store = new AcademyIdentityLifecyclePageStore(new PostgreSqlRpcClient(admin))
     await rawCommit(admin, buildIdentityLifecyclePageCommit(null, {
       nextCursor: '1',
@@ -730,12 +812,10 @@ describe('Academy Identity lifecycle atomic PostgreSQL page store', () => {
     }, 1))
 
     expect((await store.read())?.projections.map((projection) => projection.current.subject))
-      .toEqual(['\ud800', '\ud800\udc00', '\udc00'])
+      .toEqual(['\ud800\udc00'])
     expect((await admin.query(`select subject_key from academy.identity_lifecycle_projection
       order by subject_key collate "C"`)).rows).toEqual([
-      { subject_key: 'd800' },
       { subject_key: 'd800dc00' },
-      { subject_key: 'dc00' },
     ])
   })
 

@@ -1,3 +1,8 @@
+import {
+  isCanonicalIdentityLifecyclePrincipalIssuer,
+  isWellFormedIdentityLifecycleSubject,
+} from './lifecycle-principal'
+
 const HEADER_KEYS = ['alg', 'kid', 'typ']
 const CLAIM_KEYS = ['aud', 'event', 'exp', 'iat', 'iss', 'jti']
 const EVENT_KEYS = ['eventId', 'issuer', 'kind', 'occurredAt', 'reason', 'revision', 'state', 'subject']
@@ -138,13 +143,8 @@ function isIdentityLifecycleEvent(value: unknown): value is IdentityLifecycleEve
     && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(event.eventId)
     && event.kind === 'account.lifecycle.changed'
     && typeof event.issuer === 'string'
-    && isExactHttpsUrl(event.issuer)
-    && event.issuer.length <= 512
-    && !event.issuer.includes('\0')
-    && typeof event.subject === 'string'
-    && event.subject.length >= 1
-    && event.subject.length <= 512
-    && !event.subject.includes('\0')
+    && isCanonicalIdentityLifecyclePrincipalIssuer(event.issuer)
+    && isWellFormedIdentityLifecycleSubject(event.subject)
     && ['active', 'disabled', 'deleted'].includes(event.state as string)
     && Number.isSafeInteger(event.revision)
     && (event.revision as number) >= 1
