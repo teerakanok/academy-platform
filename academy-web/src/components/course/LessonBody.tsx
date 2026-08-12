@@ -1,4 +1,5 @@
 import type { PublicLessonBlock } from '@/lib/content/public-lesson'
+import type { PracticeSimulationResponseVariant } from '@/lib/simulation/practice-client'
 import { ImageBlock } from './blocks/ImageBlock'
 import { LabBlock } from './blocks/LabBlock'
 import { SimulationBlock } from './blocks/SimulationBlock'
@@ -22,11 +23,13 @@ export function LessonBody({
   blocks,
   slug,
   nodeId,
+  responseVariant,
 }: {
   // ⚠️ PublicLessonBlock ไม่ใช่ LessonBlock — simulation ถูกลดรูปจนไม่มีกติกาการตรวจ
   blocks: PublicLessonBlock[]
   slug: string
   nodeId: string
+  responseVariant: PracticeSimulationResponseVariant
 }) {
   return (
     <div className="prose-lesson space-y-5 text-cs-body">
@@ -108,7 +111,15 @@ export function LessonBody({
             return <ImageBlock key={index} src={block.src} alt={block.alt} caption={block.caption} />
 
           case 'simulation':
-            return <SimulationBlock key={index} challenge={block.challenge} slug={slug} nodeId={nodeId} />
+            return (
+              <SimulationBlock
+                key={index}
+                challenge={block.challenge}
+                slug={slug}
+                nodeId={nodeId}
+                responseVariant={responseVariant}
+              />
+            )
 
           case 'lab':
             return (

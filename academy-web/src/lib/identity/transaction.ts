@@ -1,4 +1,5 @@
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto'
+import { isAcademyInternalReturnPath } from '@/lib/auth/internal-return-path'
 import { chmodSync, existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'node:fs'
 import { dirname, isAbsolute } from 'node:path'
 import type {
@@ -259,7 +260,7 @@ export function snapshotPendingIdentityTransactionInput(value: unknown): Pending
     typeof candidate.nonce !== 'string' || !OPAQUE_VALUE.test(candidate.nonce) ||
     typeof candidate.browserBindingDigest !== 'string' ||
     decodeCanonicalSha256(candidate.browserBindingDigest) === null ||
-    typeof candidate.returnPath !== 'string' || !isInternalReturnPath(candidate.returnPath)
+    typeof candidate.returnPath !== 'string' || !isAcademyInternalReturnPath(candidate.returnPath)
   ) {
     throw new IdentityTransactionStoreError('identity transaction store รับข้อมูลที่มีรูปแบบไม่ถูกต้อง')
   }
@@ -467,13 +468,9 @@ function matchesBrowserBinding(expectedDigest: string, browserBinding: unknown):
 }
 
 function requireInternalReturnPath(returnPath: string): void {
-  if (!isInternalReturnPath(returnPath)) {
+  if (!isAcademyInternalReturnPath(returnPath)) {
     throw new Error('identity transaction รับ return path ภายใน Academy เท่านั้น')
   }
-}
-
-function isInternalReturnPath(returnPath: string): boolean {
-  return returnPath.startsWith('/') && !returnPath.startsWith('//') && !returnPath.startsWith('/\\')
 }
 
 function isAllowedRedirectUri(value: string): boolean {

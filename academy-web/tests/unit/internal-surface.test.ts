@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { internalSurfacesEnabled, isInternalSurface } from '@/lib/internal-surface'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 // นโยบายพื้นผิวภายในต้อง **ปิดก่อนเสมอ** — เปิดได้ด้วยค่าที่ตั้งใจตั้งเท่านั้น
@@ -11,6 +11,12 @@ import { join } from 'node:path'
 afterEach(() => {
   vi.unstubAllEnvs()
 })
+
+function routeSource(path: string): string {
+  const direct = join(process.cwd(), path)
+  const resolved = existsSync(direct) ? direct : join(process.cwd(), path.replace('src/app/', 'src/app/(site)/'))
+  return readFileSync(resolved, 'utf8')
+}
 
 describe('internalSurfacesEnabled', () => {
   it('ไม่ตั้งค่า = ปิด', () => {
@@ -57,7 +63,7 @@ describe('player route authorization wiring', () => {
   it.each(['src/app/player/page.tsx', 'src/app/player/module/[slug]/page.tsx', 'src/app/player/exam/[id]/page.tsx'])(
     '%s ตรวจ staff ทุก request และห้ามถูก prerender',
     (path) => {
-      const source = readFileSync(join(process.cwd(), path), 'utf8')
+      const source = routeSource(path)
       expect(source).toContain("export const dynamic = 'force-dynamic'")
       expect(source).toContain('await requireInternalContentStaff()')
     },

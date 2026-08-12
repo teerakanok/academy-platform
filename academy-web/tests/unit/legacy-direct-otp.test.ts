@@ -3,7 +3,7 @@ import {
   legacyDirectOtpFixtureEnabled,
   legacyDirectOtpFixtureAllowedForRequest,
 } from '@/lib/auth/legacy-direct-otp'
-import { POST as startLegacyOtp } from '@/app/api/auth/otp/route'
+import { POST as startLegacyOtp } from '@/app/(site)/api/auth/otp/route'
 
 afterEach(() => vi.unstubAllEnvs())
 

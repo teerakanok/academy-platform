@@ -87,6 +87,8 @@ export interface CourseStructure {
   id: string
   slug: string
   version: string
+  /** พื้นผิวสาธารณะต้อง opt-in รายคอร์ส; ค่าอื่นทั้งหมดถือเป็น internal */
+  publicAvailability: 'internal' | 'syllabus-preview'
   defaultLocale: Locale
   availableLocales: Locale[]
   level: 'beginner' | 'intermediate' | 'advanced'
@@ -97,6 +99,33 @@ export interface CourseStructure {
   /** คอร์สนี้ป้อนทักษะระดับ ecosystem ตัวไหนบ้าง (ใช้กับ radar ภาพรวม) */
   globalSkillWeights: Record<string, number>
   nodes: CourseNode[]
+}
+
+/** ข้อมูลโครงสร้างขั้นต่ำที่ใช้วาดเส้นทางและหน้าปกได้ โดยไม่มี media หรือ skill metadata */
+export type CourseRoadmapNode = Pick<CourseNode, 'id' | 'kind' | 'prerequisites' | 'estimatedMinutes'>
+
+export type CourseRoadmapStructure = Pick<
+  CourseStructure,
+  'slug' | 'defaultLocale' | 'availableLocales' | 'level' | 'estimatedMinutes' | 'coverMotif'
+> & {
+  nodes: CourseRoadmapNode[]
+}
+
+/** contract สำหรับส่งเข้า public client component เท่านั้น */
+export type PublicCourseStructure = CourseRoadmapStructure
+
+/**
+ * ข้อมูลคอร์สขั้นต่ำสำหรับ dashboard ที่ยืนยันสิทธิ์แล้ว. dashboard ต้องใช้ global
+ * weights เพื่อคำนวณภาพรวมข้ามคอร์ส แต่ไม่ต้องรับ skill metadata รายบทหรือ media.
+ */
+export type LearnerDashboardCourseStructure = CourseRoadmapStructure & Pick<CourseStructure, 'globalSkillWeights'>
+
+export interface LearnerDashboardCourse {
+  structure: LearnerDashboardCourseStructure
+  title: string
+  subtitle: string
+  level: CourseStructure['level']
+  nodeTitles: Record<string, string>
 }
 
 // ---------- ชั้นข้อความ (ต่อภาษา) ----------
@@ -219,6 +248,9 @@ export interface CourseCopy {
   nodeTitles: Record<string, string>
 }
 
+/** ข้อความที่ public course surface จำเป็นต้องใช้เท่านั้น */
+export type PublicCourseCopy = Pick<CourseCopy, 'title' | 'subtitle' | 'audience' | 'outcomes' | 'nodeTitles'>
+
 /** คอร์สที่ประกอบเสร็จแล้วสำหรับภาษาหนึ่ง */
 export interface Course {
   structure: CourseStructure
@@ -226,6 +258,19 @@ export interface Course {
   locale: Locale
   /** locale ที่มีเนื้อหาบทเรียนครบจริง (ใช้บอกผู้เรียนตรงๆ ว่าบทไหนยังไม่มีภาษานี้) */
   translatedNodeIds: string[]
+}
+
+export interface PublicCourse {
+  structure: PublicCourseStructure
+  copy: PublicCourseCopy
+  locale: Locale
+  translatedNodeIds: string[]
+}
+
+/** ข้อมูลขั้นต่ำของ card ใน catalog สาธารณะ — ไม่มีเนื้อหาบทหรือ metadata ผู้เรียน */
+export interface PublicCourseCatalogItem {
+  structure: PublicCourseStructure
+  copies: Partial<Record<Locale, Pick<PublicCourseCopy, 'title' | 'subtitle'>>>
 }
 
 export interface GlobalSkill {

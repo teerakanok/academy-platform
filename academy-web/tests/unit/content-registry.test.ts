@@ -3,7 +3,14 @@ import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { COURSE_REGISTRY, CONSENT_TEXTS } from '@/lib/content/registry.generated'
-import { listCourseSlugs } from '@/lib/content/course-source'
+import {
+  assertDeclaredLocaleCopies,
+  getAllPublicCourses,
+  getPublicCourse,
+  getCourseStructure,
+  listCourseSlugs,
+  listPublicCourseSlugs,
+} from '@/lib/content/course-source'
 import { CONSENT_VERSIONS } from '@/lib/consent'
 
 // registry ที่ generate แล้วล้าสมัยแบบเงียบๆ คือกับดักคลาสสิก: เพิ่มคอร์สใหม่แล้ว
@@ -26,6 +33,23 @@ describe('registry ของเนื้อหา', () => {
     const slugs = listCourseSlugs()
     expect(slugs.length).toBeGreaterThan(0)
     expect(slugs).toEqual(Object.keys(COURSE_REGISTRY).sort())
+    for (const slug of slugs) {
+      expect(getCourseStructure(slug), `${slug} ต้องผ่าน structural และ locale-copy validation`).not.toBeNull()
+    }
+  })
+
+  it('เผยต่อสาธารณะเฉพาะคอร์สที่ประกาศ syllabus preview ไว้อย่างชัดเจน', () => {
+    expect(listPublicCourseSlugs()).toEqual(['basic-os-linux'])
+    expect(getAllPublicCourses().map((course) => course.structure.slug)).toEqual(['basic-os-linux'])
+    expect(getPublicCourse('basic-os-linux')).not.toBeNull()
+    expect(getPublicCourse('content-formats-demo')).toBeNull()
+  })
+
+  it('ไม่ยอมรับ locale ที่ประกาศไว้แต่ registry ให้ course copy เป็น null', () => {
+    expect(() => assertDeclaredLocaleCopies('missing-th-copy', ['en', 'th'], { en: {}, th: null })).toThrow(
+      /locales\/th\/course\.json/,
+    )
+    expect(() => assertDeclaredLocaleCopies('complete-locales', ['en', 'th'], { en: {}, th: {} })).not.toThrow()
   })
 
   it('ข้อความ consent ทุกเวอร์ชันที่ประกาศไว้มีอยู่จริงใน registry', () => {

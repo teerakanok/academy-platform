@@ -34,7 +34,7 @@ describe('lead intake — DB-fail honesty', () => {
   })
 
   it('DB ต่อไม่ได้ → ตอบ 5xx พร้อม ok:false — ไม่ใช่ success ปลอม', async () => {
-    const { POST } = await import('@/app/api/leads/route')
+    const { POST } = await import('@/app/(site)/api/leads/route')
     const res = await POST(leadRequest({ email: 'honest-fail@example.com', consent: true }))
     expect(res.status).toBeGreaterThanOrEqual(500)
     const body = (await res.json()) as { ok: boolean; error?: string }
@@ -46,7 +46,7 @@ describe('lead intake — DB-fail honesty', () => {
   it('env DB ไม่ถูกตั้งค่า → ตอบ 500 ok:false ไม่ใช่ success ปลอม', async () => {
     delete process.env.ACADEMY_DATA_API_URL
     delete process.env.ACADEMY_DATA_API_JWT_SECRET
-    const { POST } = await import('@/app/api/leads/route')
+    const { POST } = await import('@/app/(site)/api/leads/route')
     const res = await POST(leadRequest({ email: 'no-env@example.com', consent: true }))
     expect(res.status).toBe(500)
     const body = (await res.json()) as { ok: boolean }

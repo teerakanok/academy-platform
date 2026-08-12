@@ -32,12 +32,20 @@ const PUBLIC_EXACT = new Set([
 
 // หน้าแนะนำคอร์ส (`/courses/<slug>`) เปิด — แต่บทเรียนข้างใน (`/courses/<slug>/lessons/...`) ปิด
 const COURSE_OVERVIEW = /^\/courses\/[^/]+$/
+const COURSE_LOCALIZED_OVERVIEW = /^\/courses\/[^/]+\/(?:en|th)$/
+const COURSE_THREE_SEGMENT = /^\/courses\/[^/]+\/[^/]+$/
+const COURSE_LEARNER_OVERVIEW = /^\/courses\/[^/]+\/learn$/
 const COURSE_OG_IMAGE = /^\/courses\/[^/]+\/opengraph-image$/
+// ปล่อยให้ static route ตอบ 404 กับ locale ที่ไม่ได้ enumerate; ถ้าปิดตรงนี้ก่อน
+// middleware จะพาคนดูภาพแชร์ที่พิมพ์ locale ผิดไปหน้า sign-in แทน.
+const COURSE_SHARE_IMAGE = /^\/courses\/[^/]+\/share\/[^/]+$/
 
 function isPublic(pathname: string): boolean {
   if (PUBLIC_EXACT.has(pathname)) return true
   if (COURSE_OVERVIEW.test(pathname)) return true
+  if (COURSE_LOCALIZED_OVERVIEW.test(pathname)) return true
   if (COURSE_OG_IMAGE.test(pathname)) return true
+  if (COURSE_SHARE_IMAGE.test(pathname)) return true
   // เส้นทางของระบบ auth เอง ต้องเข้าได้ตอนยังไม่ล็อกอิน ไม่งั้นล็อกอินไม่ได้เลย
   // (เจอตอนเทส: ลืมข้อนี้แล้ว /api/auth/otp ถูกเด้งไปหน้า sign-in = ล็อกอินไม่ได้เลย)
   if (pathname.startsWith('/auth/') || pathname.startsWith('/api/auth/')) return true
@@ -60,6 +68,18 @@ export async function middleware(request: NextRequest) {
     return new NextResponse(null, { status: 404 })
   }
 
+  // locale ของ overview สาธารณะเป็น enum ที่แคบ. รูปสาม segment อื่นต้องตายที่
+  // middleware เพื่อไม่ถูกพาไป sign-in และไม่ขยาย allowlist ไปชน lesson.
+  const requestPath = request.nextUrl.pathname
+  if (
+    COURSE_THREE_SEGMENT.test(requestPath) &&
+    !COURSE_LOCALIZED_OVERVIEW.test(requestPath) &&
+    !COURSE_OG_IMAGE.test(requestPath) &&
+    !COURSE_LEARNER_OVERVIEW.test(requestPath)
+  ) {
+    return new NextResponse(null, { status: 404 })
+  }
+
   // ต่ออายุ session ทุก request — ถ้าไม่ทำ cookie จะหมดอายุกลางคันแล้วผู้เรียน
   // ถูกเด้งออกระหว่างทำ quiz ซึ่งเสียงานที่ยังไม่ได้บันทึก
   let response = NextResponse.next({ request })
@@ -76,8 +96,9 @@ export async function middleware(request: NextRequest) {
       signIn.searchParams.set('next', pathname + search)
       return NextResponse.redirect(signIn)
     }
-    // Cookie syntax is only a coarse prefilter. Durable Node routes own session
-    // validation, so sign-in remains reachable after expiry, revocation, or loss.
+    // A syntactically valid cookie is only a coarse middleware prefilter. The
+    // Node routes own durable session validation, so sign-in must stay reachable
+    // when the file-backed session expired, was revoked, or cannot be read.
     return response
   }
 

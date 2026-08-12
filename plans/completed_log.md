@@ -5,6 +5,39 @@
 
 ---
 
+## 2026-08-12 - Public-to-learner feature wave integrated locally
+
+**Outcome:** Academy now presents a coherent localized catalogue and syllabus,
+protected learner overview, dashboard/progress/attempt/simulation/skill-map
+boundaries, persistent theme, and bounded retention workflow. English-only root
+content routes a Thai selection into the translated catalogue. Signed-in Thai
+learners keep Thai overview, roadmap, recovery, and reset controls without
+mobile horizontal overflow. All changed response clients use bounded,
+duplicate-safe JSON and exact projections; one shared same-origin return-path
+policy covers routes, response projection, and durable Identity transactions.
+
+**Verification:** TDD reproduced the account/dashboard/progress/retention,
+return-path, locale/theme, Thai learner-copy, and mobile roadmap defects before
+their fixes. Current Node 24 evidence passes 107 unit files / 1,184 tests,
+ESLint and all TypeScript configurations, the Next.js production build with 30
+route entries, and public Chromium/Pixel 5 34/34. Static page, share-image,
+Cloudflare cache, dependency-audit, whitespace, and secret gates also pass.
+Post-fix Thai public and learner captures were inspected across desktop/mobile
+and light/dark states.
+
+**Review:** Original independent lanes returned code/debt `C0/H0/M2/L0`,
+security `C0/H0/M2/L0`, and UX `C0/H0/M2/L1`. Subsequent reviews found and
+closed further return-path, response-cancellation, mixed-language, Thai learner
+copy, and mobile roadmap defects. Final code/debt review passed
+`C0/H0/M0/L0`; security and UX behavior passed with report-only Low findings.
+After the exact count and reader-first text fixes, a different text/authority
+recheck passed final `C0/H0/M0/L0`.
+
+**Residual risk:** This local checkpoint does not enable Identity Control,
+mutate Pool A, run retention, deploy Cloudflare, open production traffic, or
+grant release approval. Production remains NO-GO until the separate Identity,
+DB, runtime configuration, operator, deployment, and release gates are closed.
+
 ## 2026-08-11 - PostgreSQL authorization transaction store implemented
 
 **Outcome:** Academy now has a PostgreSQL-backed store for the short-lived

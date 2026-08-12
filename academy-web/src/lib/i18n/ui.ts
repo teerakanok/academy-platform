@@ -22,7 +22,16 @@ export const UI_LOCALE_LABEL: Record<UiLocale, string> = {
 }
 
 export interface UiStrings {
-  nav: { myLearning: string; practice: string; signIn: string; signOut: string; skipToContent: string }
+  nav: {
+    main: string
+    myLearning: string
+    practice: string
+    signIn: string
+    signOut: string
+    signingOut: string
+    signOutError: string
+    skipToContent: string
+  }
   footer: { privacy: string }
   courses: {
     eyebrow: string
@@ -30,7 +39,11 @@ export interface UiStrings {
     intro: string
     openToAll: string
     lessons: (n: number) => string
+    checkpoints: (n: number) => string
     level: Record<'beginner' | 'intermediate' | 'advanced', string>
+    emptyHeading: string
+    emptyBody: string
+    updates: string
   }
   signIn: {
     title: string
@@ -53,28 +66,32 @@ export interface UiStrings {
   }
   video: { audio: string; captionsHint: (labels: string) => string; unavailable: string; retry: string }
   language: { label: string }
+  theme: { switchToLight: string; switchToDark: string }
 }
 
 const en: UiStrings = {
   nav: {
+    main: 'Main',
     myLearning: 'My learning',
     practice: 'Practice',
     signIn: 'Sign in',
     signOut: 'Sign out',
+    signingOut: 'Signing out…',
+    signOutError: 'Could not sign out. Your session may still be active. Try again.',
     skipToContent: 'Skip to content',
   },
   footer: { privacy: 'Privacy notice' },
   courses: {
     eyebrow: 'CYBERSKILLS Academy',
-    heading: 'Courses',
-    // ⚠️ "พิสูจน์แล้วข้ามได้" ถูกปิดทั้งคอร์ส (assessment-policy) — ข้อความต้อง
-    // ไม่สัญญาเส้นทางที่ยังไม่มี · และต้องบอกตรงๆ ว่าอะไรคือสิ่งที่นับเป็นหลักฐาน
-    intro:
-      'Each course is a map, not a queue — take the route that fits you. Required checkpoints record assessed results in your learning record, and a lesson you skip stays open until you return.',
-    openToAll:
-      'Course pages are open to everyone. Taking a course needs a free CYBERSKILLS account.',
+    heading: 'Course previews',
+    intro: 'See each course route before learning access opens: the lessons, prerequisite order, and required checkpoints.',
+    openToAll: 'Previews are open to everyone. Learning access will open with a CYBERSKILLS account.',
     lessons: (n) => `${n} lessons`,
+    checkpoints: (n) => `${n} required checkpoint${n === 1 ? '' : 's'}`,
     level: { beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced' },
+    emptyHeading: 'Course previews are being prepared',
+    emptyBody: 'There are no public course previews at the moment. Get launch updates when the next route is ready.',
+    updates: 'Get launch updates',
   },
   signIn: {
     title: 'One CYBERSKILLS account',
@@ -103,26 +120,32 @@ const en: UiStrings = {
     retry: 'Reload video',
   },
   language: { label: 'Language' },
+  theme: { switchToLight: 'Switch to light theme', switchToDark: 'Switch to dark theme' },
 }
 
 const th: UiStrings = {
   nav: {
+    main: 'เมนูหลัก',
     myLearning: 'คอร์สของฉัน',
     practice: 'ทำข้อสอบ',
     signIn: 'เข้าสู่ระบบ',
     signOut: 'ออกจากระบบ',
+    signingOut: 'กำลังออกจากระบบ…',
+    signOutError: 'ออกจากระบบไม่สำเร็จ เซสชันอาจยังใช้งานอยู่ ลองอีกครั้ง',
     skipToContent: 'ข้ามไปที่เนื้อหา',
   },
   footer: { privacy: 'นโยบายความเป็นส่วนตัว' },
   courses: {
     eyebrow: 'CYBERSKILLS Academy',
-    heading: 'คอร์สทั้งหมด',
-    intro:
-      'แต่ละคอร์สเป็นแผนที่ ไม่ใช่คิวที่ต้องไล่ตามลำดับ เลือกเส้นทางที่เหมาะกับคุณได้ ด่านบังคับจะบันทึกผลการวัดไว้ในประวัติการเรียน ส่วนบทที่ข้ามไว้จะค้างอยู่จนกว่าจะกลับมาทำ',
-    openToAll:
-      'หน้าคอร์สเปิดให้ทุกคนอ่าน ส่วนการเข้าเรียนต้องมีบัญชี CYBERSKILLS ซึ่งสมัครฟรี',
+    heading: 'ตัวอย่างคอร์ส',
+    intro: 'ดูเส้นทางของแต่ละคอร์สก่อนเปิดให้เรียน: บทเรียน ลำดับก่อนหลัง และด่านบังคับ',
+    openToAll: 'ทุกคนดูตัวอย่างคอร์สได้ ส่วนการเข้าเรียนจะเปิดพร้อมบัญชี CYBERSKILLS',
     lessons: (n) => `${n} บท`,
+    checkpoints: (n) => `${n} ด่านบังคับ`,
     level: { beginner: 'เริ่มต้น', intermediate: 'ระดับกลาง', advanced: 'ขั้นสูง' },
+    emptyHeading: 'กำลังเตรียมตัวอย่างคอร์ส',
+    emptyBody: 'ตอนนี้ยังไม่มีตัวอย่างคอร์สที่เปิดให้ดู รับข่าวเมื่อเส้นทางถัดไปพร้อมได้',
+    updates: 'รับข่าวเมื่อเปิดให้เรียน',
   },
   signIn: {
     title: 'บัญชี CYBERSKILLS ของคุณ',
@@ -151,6 +174,7 @@ const th: UiStrings = {
     retry: 'โหลดวิดีโอใหม่',
   },
   language: { label: 'ภาษา' },
+  theme: { switchToLight: 'เปลี่ยนเป็นโหมดสว่าง', switchToDark: 'เปลี่ยนเป็นโหมดมืด' },
 }
 
 export const UI: Record<UiLocale, UiStrings> = { en, th }

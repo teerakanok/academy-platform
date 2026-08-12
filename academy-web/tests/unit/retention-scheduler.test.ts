@@ -20,6 +20,13 @@ function json(value: unknown, status = 200): Response {
   return new Response(JSON.stringify(value), { status, headers: { 'content-type': 'application/json' } })
 }
 
+function byteStream(source: UnderlyingByteSource): ReadableStream<Uint8Array> {
+  const ByteReadableStream = ReadableStream as unknown as {
+    new (underlyingSource: UnderlyingByteSource): ReadableStream<Uint8Array>
+  }
+  return new ByteReadableStream(source)
+}
+
 describe('Academy retention scheduler', () => {
   it('mints only the retention role and audience', async () => {
     const token = await issueRetentionToken(secret, new Date('2026-08-05T00:00:00.000Z'))
@@ -56,6 +63,48 @@ describe('Academy retention scheduler', () => {
     await expect(runPurgeJob(env, attempts, { fetcher: vi.fn().mockResolvedValue(json('1')) })).rejects.toThrow('invalid deletion count')
   })
 
+  it('keeps the deadline active while reading the response body', async () => {
+    let cancels = 0
+    const response = new Response(byteStream({
+      type: 'bytes',
+      pull() {
+        // Headers arrived, but the body never makes progress or closes.
+      },
+      cancel() {
+        cancels += 1
+      },
+    }), { headers: { 'content-type': 'application/json' } })
+
+    const outcome = await Promise.race([
+      runPurgeJob(env, attempts, {
+        fetcher: vi.fn().mockResolvedValue(response),
+        timeoutMs: 5,
+      }).then(
+        () => ({ kind: 'resolved' as const }),
+        (error: unknown) => ({
+          kind: 'rejected' as const,
+          message: error instanceof Error ? error.message : String(error),
+        }),
+      ),
+      new Promise<{ kind: 'pending' }>((resolve) => {
+        setTimeout(() => resolve({ kind: 'pending' }), 80)
+      }),
+    ])
+
+    expect(outcome).toMatchObject({ kind: 'rejected', message: expect.stringContaining('request timed out') })
+    expect(cancels).toBe(1)
+    expect(response.body?.locked).toBe(false)
+  })
+
+  it.each([
+    ['oversized body', new Response(`${' '.repeat(65)}0`, { headers: { 'content-type': 'application/json' } })],
+    ['wrong media type', new Response('0', { headers: { 'content-type': 'text/plain' } })],
+  ])('rejects an invalid bounded deletion-count response: %s', async (_label, response) => {
+    await expect(runPurgeJob(env, attempts, {
+      fetcher: vi.fn().mockResolvedValue(response),
+    })).rejects.toThrow('invalid deletion count')
+  })
+
   it('continues independent jobs, then exposes aggregate failure', async () => {
     const completed = vi.fn()
     const warned = vi.fn()
@@ -72,12 +121,41 @@ describe('Academy retention scheduler', () => {
     expect(warned).toHaveBeenCalledWith(expect.stringContaining('"event":"retention.purge_failed"'))
   })
 
-  it('records an unfinished bounded backlog and keeps the scheduler worker closed to fetch traffic', async () => {
+  it('fails an unfinished bounded backlog and keeps the scheduler worker closed to fetch traffic', async () => {
     const warn = vi.fn()
     const fetcher = vi.fn(() => Promise.resolve(json(1)))
-    await expect(runPurgeJob(env, attempts, { fetcher, logger: { log: vi.fn(), warn } })).resolves.toEqual({ rounds: MAX_ROUNDS, deleted: MAX_ROUNDS })
+    await expect(runPurgeJob(env, attempts, { fetcher, logger: { log: vi.fn(), warn } })).rejects.toThrow(
+      `backlog remains after ${MAX_ROUNDS} rounds and ${MAX_ROUNDS} deletions`,
+    )
     expect(fetcher).toHaveBeenCalledTimes(MAX_ROUNDS)
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('retention.backlog_remaining'))
     expect(retentionWorker.fetch(new Request('https://worker.test/'))).toMatchObject({ status: 404 })
+  })
+
+  it('continues after backlog exhaustion but never reports that job as complete', async () => {
+    const completed = vi.fn()
+    const warned = vi.fn()
+    const fetcher = vi.fn((input: RequestInfo | URL) => {
+      const path = new URL(input.toString()).pathname
+      return Promise.resolve(path.endsWith('/first') ? json(1) : json(0))
+    })
+
+    await expect(runRetention(env, { fetcher, logger: { log: completed, warn: warned } }, [
+      { name: 'first', rpc: 'first' },
+      { name: 'second', rpc: 'second' },
+    ])).rejects.toThrow('first:')
+
+    expect(fetcher).toHaveBeenCalledTimes(MAX_ROUNDS + 1)
+    expect(completed.mock.calls.map(([event]) => JSON.parse(event as string))).toEqual([
+      { event: 'retention.purge_complete', job: 'second', rounds: 1, deleted: 0 },
+    ])
+    expect(warned.mock.calls.map(([event]) => JSON.parse(event as string))).toEqual([
+      { event: 'retention.backlog_remaining', job: 'first', deleted: MAX_ROUNDS, rounds: MAX_ROUNDS },
+      {
+        event: 'retention.purge_failed',
+        job: 'first',
+        error: `[retention/first] backlog remains after ${MAX_ROUNDS} rounds and ${MAX_ROUNDS} deletions`,
+      },
+    ])
   })
 })

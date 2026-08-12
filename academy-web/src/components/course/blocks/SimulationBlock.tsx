@@ -2,6 +2,11 @@
 
 import { useState } from 'react'
 import type { PublicSimulationChallenge } from '@/lib/content/public-lesson'
+import {
+  requestPracticeSimulation,
+  type PracticeSimulationResponseVariant,
+  type PracticeVerdict,
+} from '@/lib/simulation/practice-client'
 import type { SimulationState } from '@/lib/simulation/types'
 import { SimulationSurface } from './SimulationSurface'
 
@@ -19,24 +24,17 @@ import { SimulationSurface } from './SimulationSurface'
 // เข้าด่านจริง ด่านนั้นใช้ `SimulationSurface` ตรงๆ ผ่าน `CheckpointQuiz` แทน
 // เส้นที่กดแล้วไม่ขยับอะไรถูกตัดทิ้ง ไม่ปล่อยไว้ให้คนหลังเข้าใจผิดว่ามันทำงาน
 
-interface PracticeVerdict {
-  passed: boolean
-  results?: { id: string; label: string; met: boolean }[]
-  metCount?: number
-  total?: number
-  debrief?: string
-  hints?: string[]
-}
-
 export function SimulationBlock({
   challenge,
   slug,
   nodeId,
+  responseVariant,
 }: {
   // ⚠️ PublicSimulationChallenge — ไม่มี operator/value/hints อยู่ในโครงเลย
   challenge: PublicSimulationChallenge
   slug: string
   nodeId: string
+  responseVariant: PracticeSimulationResponseVariant
 }) {
   const [state, setState] = useState<SimulationState>(() => ({ ...challenge.initial }))
   const [verdict, setVerdict] = useState<PracticeVerdict | null>(null)
@@ -52,17 +50,20 @@ export function SimulationBlock({
     setChecking(true)
     setFailed(false)
     try {
-      const res = await fetch('/api/practice/simulation', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ slug, nodeId, challengeId: challenge.id, state, wantHint }),
+      const result = await requestPracticeSimulation({
+        slug,
+        nodeId,
+        challengeId: challenge.id,
+        state,
+        wantHint,
+        requirements: challenge.requirements,
+        responseVariant,
       })
-      const body = (await res.json().catch(() => ({}))) as { ok?: boolean } & PracticeVerdict
-      if (!res.ok || !body.ok) {
+      if (result.status !== 'ready') {
         setFailed(true)
         return
       }
-      setVerdict(body)
+      setVerdict(result.verdict)
     } catch {
       setFailed(true)
     } finally {

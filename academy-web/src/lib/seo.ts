@@ -52,19 +52,22 @@ export function publicPage({
   title,
   description,
   imagePath,
+  languagePaths,
 }: {
   path: string
   title: string
   description: string
   imagePath?: string
+  languagePaths?: Record<string, string>
 }): Metadata {
   const url = absoluteUrl(path)
   const indexable = searchIndexingEnabled()
   const images = imagePath ? [{ url: absoluteUrl(imagePath) }] : undefined
+  const languages = languagePaths && Object.fromEntries(Object.entries(languagePaths).map(([locale, languagePath]) => [locale, absoluteUrl(languagePath)]))
   return {
     title,
     description,
-    alternates: { canonical: url },
+    alternates: { canonical: url, ...(languages ? { languages } : {}) },
     robots: indexable ? { index: true, follow: true } : { index: false, follow: false },
     openGraph: {
       type: 'website',

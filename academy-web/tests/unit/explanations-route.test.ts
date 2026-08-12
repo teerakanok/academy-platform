@@ -26,7 +26,7 @@ vi.mock('@/lib/account/course-access', () => ({
 }))
 vi.mock('@/lib/course/attempt-db', () => ({ loadPassedAttemptExplanations }))
 
-import { GET } from '@/app/api/explanations/route'
+import { GET } from '@/app/(site)/api/explanations/route'
 
 describe('explanations route ใช้หลักฐานตอนผ่าน', () => {
   beforeEach(() => {

@@ -9,7 +9,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock('@/lib/auth/session', () => ({ currentUser: mocks.currentUser }))
 vi.mock('@/lib/account/course-access', () => ({ authorizeCourseResource: mocks.authorizeCourseResource }))
 
-import { GET } from '@/app/course-media/[assetId]/route'
+import { GET } from '@/app/(site)/course-media/[assetId]/route'
 
 afterEach(() => {
   vi.unstubAllEnvs()

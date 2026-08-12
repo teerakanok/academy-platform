@@ -1,6 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import {
+  readOtpResponse,
+  readVerifyResponse,
+} from '@/lib/auth/account-response-client'
 
 // เข้าสู่ระบบด้วยรหัสทางอีเมล — สองขั้นในหน้าเดียว
 //
@@ -47,8 +51,9 @@ export function SignInForm({ next, identityControl = false }: { next: string; id
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ email }),
       })
-      const body = (await res.json()) as { ok: boolean; error?: string }
-      if (!body.ok) throw new Error(body.error ?? 'ส่งรหัสไม่สำเร็จ')
+      const body = await readOtpResponse(res)
+      if (!body) throw new Error('ส่งรหัสไม่สำเร็จ')
+      if (!body.ok) throw new Error(body.error)
       setPhase('code')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'ส่งรหัสไม่สำเร็จ')
@@ -67,11 +72,12 @@ export function SignInForm({ next, identityControl = false }: { next: string; id
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ email, token: code, next }),
       })
-      const body = (await res.json()) as { ok: boolean; error?: string; next?: string }
-      if (!body.ok) throw new Error(body.error ?? 'ยืนยันไม่สำเร็จ')
+      const body = await readVerifyResponse(res)
+      if (!body) throw new Error('ยืนยันไม่สำเร็จ')
+      if (!body.ok) throw new Error(body.error)
       // full reload โดยตั้งใจ — session cookie เพิ่งถูกตั้ง หน้าที่ render ไว้แล้ว
       // ยังไม่รู้จักผู้ใช้คนนี้
-      window.location.assign(body.next ?? '/dashboard')
+      window.location.assign(body.next)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'ยืนยันไม่สำเร็จ')
       setBusy(false)

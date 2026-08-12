@@ -2,6 +2,7 @@
   "id": "content-formats-demo",
   "slug": "content-formats-demo",
   "version": "1.0.0",
+  "publicAvailability": "internal",
   "defaultLocale": "en",
   "availableLocales": [
     "en"

@@ -1,3 +1,4 @@
+import * as React from 'react'
 import type { CoverMotif as MotifName } from '@/lib/content/course-types'
 
 // ลายพื้นหลังประจำคอร์ส — งานของมันคือตอบคำถาม "คอร์สนี้เรื่องอะไร" ตั้งแต่ยังไม่อ่านชื่อ

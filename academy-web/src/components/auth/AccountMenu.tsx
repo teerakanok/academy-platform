@@ -1,6 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useUi } from '@/components/i18n/LocaleProvider'
+import {
+  readAccountResponse,
+  readSignOutResponse,
+} from '@/lib/auth/account-response-client'
 
 // สถานะบัญชีบน header — ดึงหลัง hydrate เพื่อให้หน้าร้านยังเป็น static ได้
 //
@@ -10,16 +15,20 @@ import { useEffect, useState } from 'react'
 type State = { loading: true } | { loading: false; signedIn: boolean; email?: string }
 
 export function AccountMenu() {
+  const { t } = useUi()
   const [state, setState] = useState<State>({ loading: true })
   const [signingOut, setSigningOut] = useState(false)
-  const [signOutError, setSignOutError] = useState<string | null>(null)
+  const [signOutError, setSignOutError] = useState(false)
 
   useEffect(() => {
     let alive = true
     fetch('/api/auth/me')
-      .then((r) => r.json())
-      .then((d: { signedIn: boolean; email?: string }) => {
-        if (alive) setState({ loading: false, signedIn: d.signedIn, email: d.email })
+      .then(readAccountResponse)
+      .then((account) => {
+        if (!alive) return
+        setState(account?.signedIn === true
+          ? { loading: false, signedIn: true, email: account.email }
+          : { loading: false, signedIn: false })
       })
       .catch(() => {
         if (alive) setState({ loading: false, signedIn: false })
@@ -38,7 +47,7 @@ export function AccountMenu() {
         data-testid="header-sign-in"
         className="whitespace-nowrap rounded-control border border-cs-accent px-3 py-1.5 text-[13px] font-medium text-cs-accent transition-colors hover:bg-cs-accent-dim sm:px-4 sm:text-sm"
       >
-        Sign in
+        {t.nav.signIn}
       </a>
     )
   }
@@ -61,15 +70,15 @@ export function AccountMenu() {
         disabled={signingOut}
         onClick={async () => {
           setSigningOut(true)
-          setSignOutError(null)
+          setSignOutError(false)
           try {
             const response = await fetch('/api/auth/sign-out', { method: 'POST' })
-            if (!response.ok) throw new Error('sign-out failed')
-            const result = (await response.json()) as { revocation?: 'confirmed' | 'not-confirmed' }
+            const result = await readSignOutResponse(response)
+            if (!result) throw new Error('sign-out failed')
             // reload เต็ม — หน้าที่ render ไว้ยังคิดว่าล็อกอินอยู่
             window.location.assign(result.revocation === 'not-confirmed' ? '/sign-in?notice=local-only' : '/')
           } catch {
-            setSignOutError('Could not sign out. Your session may still be active. Try again.')
+            setSignOutError(true)
             setSigningOut(false)
           }
         }}
@@ -88,7 +97,7 @@ export function AccountMenu() {
           <path d="M12.5 6.5V4.5a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2" />
           <path d="M16.5 10H8m8.5 0-2.5-2.5M16.5 10 14 12.5" />
         </svg>
-        <span className="sr-only sm:not-sr-only">{signingOut ? 'Signing out…' : 'Sign out'}</span>
+        <span className="sr-only sm:not-sr-only">{signingOut ? t.nav.signingOut : t.nav.signOut}</span>
       </button>
       {signOutError && (
         <span
@@ -96,7 +105,7 @@ export function AccountMenu() {
           className="fixed right-4 top-20 z-50 max-w-xs border-l-2 border-cs-amber bg-cs-surface px-4 py-3 text-sm text-cs-body shadow-card"
           data-testid="sign-out-error"
         >
-          {signOutError}
+          {t.nav.signOutError}
         </span>
       )}
     </div>

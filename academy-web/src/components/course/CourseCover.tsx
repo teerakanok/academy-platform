@@ -1,4 +1,5 @@
-import type { CourseStructure } from '@/lib/content/course-types'
+import * as React from 'react'
+import type { CourseRoadmapStructure } from '@/lib/content/course-types'
 import { CoverMotif } from './CoverMotif'
 import { EMPTY_STATE, layoutRoadmap, type LearnerCourseState } from '@/lib/course/roadmap'
 
@@ -39,7 +40,7 @@ export function CourseCover({
   state = EMPTY_STATE,
   className = '',
 }: {
-  structure: CourseStructure
+  structure: CourseRoadmapStructure
   state?: LearnerCourseState
   className?: string
 }) {

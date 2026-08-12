@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next'
-import { getAllCourses } from '@/lib/content/course-source'
+import { getPublicCourse, listPublicCourseSlugs } from '@/lib/content/course-source'
 import { absoluteUrl, searchIndexingEnabled } from '@/lib/seo'
 
 // ลงเฉพาะหน้าร้าน — บทเรียนต้องมี account จึงไม่ควรอยู่ใน sitemap
@@ -9,11 +9,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: absoluteUrl('/'), changeFrequency: 'weekly', priority: 1 },
     { url: absoluteUrl('/courses'), changeFrequency: 'weekly', priority: 0.9 },
-    ...getAllCourses().map((c) => ({
-      url: absoluteUrl(`/courses/${c.structure.slug}`),
-      changeFrequency: 'weekly' as const,
-      priority: 0.8,
-    })),
+    ...listPublicCourseSlugs().flatMap((slug) => {
+      const course = getPublicCourse(slug)
+      return course?.structure.availableLocales.map((locale) => ({
+        url: absoluteUrl(`/courses/${slug}/${locale}`),
+        changeFrequency: 'weekly' as const,
+        priority: 0.8,
+      })) ?? []
+    }),
     { url: absoluteUrl('/privacy'), changeFrequency: 'yearly', priority: 0.1 },
   ]
 }

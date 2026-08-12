@@ -52,7 +52,7 @@ export function SiteChrome({
             </span>
           </Link>
 
-          <nav aria-label="Main" className="ml-auto flex items-center gap-0.5 text-[13px] sm:gap-1 sm:text-sm">
+          <nav aria-label={t.nav.main} className="ml-auto flex items-center gap-0.5 text-[13px] sm:gap-1 sm:text-sm">
             <Link
               href="/dashboard"
               className="whitespace-nowrap rounded-lg px-2 py-2 text-cs-muted transition-colors hover:bg-cs-surface-2 hover:text-cs-text sm:px-3 sm:py-1.5"

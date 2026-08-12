@@ -75,6 +75,7 @@ const structureSchema = z.object({
   id: z.string().min(1),
   slug: z.string().min(1),
   version: z.string().min(1),
+  publicAvailability: z.enum(['internal', 'syllabus-preview']),
   defaultLocale: z.enum(['en', 'th']),
   availableLocales: z.array(z.enum(['en', 'th'])).min(1),
   level: z.enum(['beginner', 'intermediate', 'advanced']),

@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { authCookieOptions, isSecureRequest } from './cookie-policy'
+import { safeAcademyInternalReturnPath } from './internal-return-path'
 
 // client สำหรับ route handler — ต้องเขียน cookie ได้จริง (ต่างจากฝั่ง Server Component
 // ที่เขียนไม่ได้ จึงต้องให้ middleware เป็นคนต่ออายุ session)
@@ -37,9 +38,5 @@ export async function clearRouteAuthCookies(): Promise<void> {
  * เป็นเครื่องมือพาเหยื่อไปเว็บปลอมที่ดูน่าเชื่อเพราะลิงก์ออกมาจากโดเมนเรา
  */
 export function safeNextPath(raw: string | null | undefined): string {
-  if (!raw) return '/dashboard'
-  if (!raw.startsWith('/')) return '/dashboard'
-  // `//host` และ `/\host` ถูกเบราว์เซอร์ตีความเป็น URL ข้ามโดเมน
-  if (raw.startsWith('//') || raw.startsWith('/\\')) return '/dashboard'
-  return raw
+  return safeAcademyInternalReturnPath(raw)
 }

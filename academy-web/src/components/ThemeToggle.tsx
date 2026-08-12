@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useUi } from '@/components/i18n/LocaleProvider'
 
 // Academy ตั้งต้นเป็น light (บรรยากาศห้องเรียน ไม่ใช่ห้อง SOC) — สลับ dark ได้และจำไว้
 export const THEME_STORAGE_KEY = 'academy.theme'
@@ -8,11 +9,21 @@ export const THEME_STORAGE_KEY = 'academy.theme'
 type Theme = 'light' | 'dark'
 
 export function ThemeToggle() {
+  const { t } = useUi()
   const [theme, setTheme] = useState<Theme>('light')
 
   useEffect(() => {
-    const current = document.documentElement.getAttribute('data-theme')
-    setTheme(current === 'dark' ? 'dark' : 'light')
+    let current: Theme = document.documentElement.getAttribute('data-theme') === 'dark'
+      ? 'dark'
+      : 'light'
+    try {
+      const stored = window.localStorage.getItem(THEME_STORAGE_KEY)
+      if (stored === 'light' || stored === 'dark') current = stored
+    } catch {
+      // The pre-paint DOM state remains authoritative when storage is unavailable.
+    }
+    document.documentElement.setAttribute('data-theme', current)
+    setTheme(current)
   }, [])
 
   function toggle() {
@@ -31,7 +42,7 @@ export function ThemeToggle() {
       type="button"
       onClick={toggle}
       data-testid="theme-toggle"
-      aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+      aria-label={theme === 'dark' ? t.theme.switchToLight : t.theme.switchToDark}
       className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-cs-border text-cs-muted transition-colors hover:border-cs-accent hover:text-cs-accent"
     >
       <span aria-hidden="true" className="text-sm">

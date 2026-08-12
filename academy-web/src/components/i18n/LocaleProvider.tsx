@@ -39,16 +39,49 @@ function readCookie(): UiLocale | null {
   return isUiLocale(value) ? value : null
 }
 
-export function LocaleProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<UiLocale>(DEFAULT_UI_LOCALE)
+function routeSupportsUiLocale(pathname: string): boolean {
+  return pathname === '/courses'
+    || pathname.startsWith('/courses/')
+    || pathname === '/access-required'
+    || pathname === '/dashboard'
+    || pathname === '/privacy'
+}
+
+export function requestedUiLocale(pathname: string, search: string): UiLocale | null {
+  if (!routeSupportsUiLocale(pathname)) return null
+  const values = new URLSearchParams(search).getAll('lang')
+  return values.length === 1 && isUiLocale(values[0]) ? values[0] : null
+}
+
+function readLocalePreference(): UiLocale | null {
+  if (typeof window === 'undefined') return null
+  if (!routeSupportsUiLocale(window.location.pathname)) return null
+  return requestedUiLocale(window.location.pathname, window.location.search) ?? readCookie()
+}
+
+export function LocaleProvider({
+  children,
+  initialLocale = DEFAULT_UI_LOCALE,
+  fixedLocale = false,
+}: {
+  children: React.ReactNode
+  initialLocale?: UiLocale
+  fixedLocale?: boolean
+}) {
+  const [locale, setLocaleState] = useState<UiLocale>(initialLocale)
 
   useEffect(() => {
-    const stored = readCookie()
+    if (fixedLocale) {
+      document.documentElement.lang = initialLocale
+      document.cookie = `${UI_LOCALE_COOKIE}=${initialLocale}; path=/; max-age=31536000; SameSite=Lax`
+      return
+    }
+    const stored = readLocalePreference()
     if (stored) {
       setLocaleState(stored)
       document.documentElement.lang = stored
     }
-  }, [])
+  }, [fixedLocale, initialLocale])
 
   const setLocale = useCallback((next: UiLocale) => {
     setLocaleState(next)

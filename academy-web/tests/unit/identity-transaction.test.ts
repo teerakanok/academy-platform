@@ -484,7 +484,15 @@ describe('local identity transaction boundary', () => {
 
   it('does not retain an arbitrary return URL in the server transaction', async () => {
     const store = new InMemoryIdentityTransactionStore()
-    await expect(beginIdentityAuthorization(store, registration, 'https://evil.example')).rejects.toThrow(/return path/)
+    for (const returnPath of [
+      'https://evil.example',
+      '//evil.example',
+      '/\\evil.example',
+      '/\n/evil.example',
+      '/\t/evil.example',
+    ]) {
+      await expect(beginIdentityAuthorization(store, registration, returnPath)).rejects.toThrow(/return path/)
+    }
   })
 
   it('rejects a zero activation revision because the canonical exchange contract starts at 1', async () => {

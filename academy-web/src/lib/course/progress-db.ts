@@ -176,13 +176,24 @@ export async function commitNodeEvent(userId: string, event: NodeEvent, expected
   return data === true
 }
 
-/** ความคืบหน้าของทุกคอร์สในครั้งเดียว — dashboard ต้องใช้ ไม่ควรยิงทีละคอร์ส */
-export async function loadAllProgress(userId: string): Promise<Record<string, CourseProgressRecord>> {
+/**
+ * ความคืบหน้าของหลายคอร์สในครั้งเดียว — dashboard ต้องใช้ ไม่ควรยิงทีละคอร์ส.
+ * เมื่อมี allowlist จาก entitlement แล้วต้องส่งมาเสมอ เพื่อไม่อ่าน record ของคอร์สที่
+ * ถูกเพิกถอนเกินจำเป็น.
+ */
+export async function loadAllProgress(
+  userId: string,
+  courseSlugs: readonly string[],
+): Promise<Record<string, CourseProgressRecord>> {
+  if (courseSlugs.length === 0) return {}
+
   const db = academyDb()
-  const { data, error } = await db
+  let query = db
     .from('node_progress')
     .select('course_slug, node_id, status, checkpoint_results, video_cue_results, simulation_evidence, updated_at')
     .eq('user_id', userId)
+  query = query.in('course_slug', [...courseSlugs])
+  const { data, error } = await query
   if (error) throw new Error(`อ่านความคืบหน้าไม่สำเร็จ: ${error.message}`)
 
   const bySlug = new Map<string, NodeRow[]>()

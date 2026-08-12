@@ -145,6 +145,8 @@ export function LessonView({
   requestedLocale: Locale
 }) {
   const router = useRouter()
+  const coursePath = `/courses/${structure.slug}/learn?lang=${requestedLocale}`
+  const lessonPath = (nodeId: string) => `/courses/${structure.slug}/lessons/${nodeId}?lang=${requestedLocale}`
   const [record, setRecord] = useState<CourseProgressRecord>(() => emptyProgress(structure.slug))
   const [loaded, setLoaded] = useState(false)
   const [mode, setMode] = useState<Mode>('learn')
@@ -323,7 +325,7 @@ export function LessonView({
       return
     }
     const target = nextNode(structure, toLearnerState(fresh.record))
-    router.push(target ? `/courses/${structure.slug}/lessons/${target.id}` : `/courses/${structure.slug}`)
+    router.push(target ? lessonPath(target.id) : coursePath)
   }
 
   const accessLost = accessIssue ?? (attempt.status === 'failed' && attempt.reason === 'access-lost' ? 'access-lost' : null)
@@ -333,7 +335,7 @@ export function LessonView({
         <nav aria-label="Breadcrumb" className="font-mono text-xs text-cs-muted">
           <Link href="/dashboard" className="hover:text-cs-accent">My learning</Link>
           <span aria-hidden="true"> / </span>
-          <Link href={`/courses/${structure.slug}`} className="hover:text-cs-accent">{courseTitle}</Link>
+          <Link href={coursePath} className="hover:text-cs-accent">{courseTitle}</Link>
         </nav>
         <section role="alert" className="border-l-2 border-cs-amber py-2 pl-5">
           <h1 className="font-display text-2xl font-semibold text-cs-text">
@@ -347,7 +349,7 @@ export function LessonView({
                 : 'Your learning record is unchanged. Return to My learning and try again.'}
           </p>
           <Link
-            href={accessLost === 'signed-out' ? `/sign-in?next=${encodeURIComponent(`/courses/${structure.slug}/lessons/${node.id}`)}` : '/dashboard'}
+            href={accessLost === 'signed-out' ? `/sign-in?next=${encodeURIComponent(lessonPath(node.id))}` : '/dashboard'}
             className="mt-5 inline-block rounded-control bg-cs-accent-fill px-5 py-3 text-sm font-semibold text-cs-on-accent"
           >
             {accessLost === 'signed-out' ? 'Sign in again' : 'Return to My learning'}
@@ -373,7 +375,7 @@ export function LessonView({
           My learning
         </Link>
         <span aria-hidden="true"> / </span>
-        <Link href={`/courses/${structure.slug}`} className="hover:text-cs-accent">
+        <Link href={coursePath} className="hover:text-cs-accent">
           {courseTitle}
         </Link>
       </nav>
@@ -417,7 +419,7 @@ export function LessonView({
             return (
               <li key={n.id}>
                 <Link
-                  href={`/courses/${structure.slug}/lessons/${n.id}`}
+                  href={lessonPath(n.id)}
                   aria-label={`${nodeTitles[n.id] ?? n.id}${isCurrent ? ' (current)' : ''}`}
                   aria-current={isCurrent ? 'step' : undefined}
                   // แถบสูง 6px กดด้วยเมาส์ได้ แต่นิ้วกดไม่โดน — ขยายพื้นที่กดด้วย
@@ -583,7 +585,12 @@ export function LessonView({
 
       {mode === 'learn' && !focused && (
         <>
-          <LessonBody blocks={lesson.blocks} slug={structure.slug} nodeId={node.id} />
+          <LessonBody
+            blocks={lesson.blocks}
+            slug={structure.slug}
+            nodeId={node.id}
+            responseVariant={isCapstone ? 'capstone' : 'regular'}
+          />
           {lesson.attribution && (
             <p className="prose-lesson border-t border-cs-border pt-4 text-xs text-cs-muted">
               {lesson.attribution}
@@ -731,7 +738,7 @@ export function LessonView({
           </p>
           <div className="ml-auto flex gap-2">
             <Link
-              href={`/courses/${structure.slug}`}
+              href={coursePath}
               className="rounded-control border border-cs-border bg-cs-surface px-5 py-3 text-sm transition-colors duration-200 hover:border-cs-accent hover:text-cs-accent"
             >
               Back to the map
@@ -755,7 +762,7 @@ export function LessonView({
       >
         {prevNode ? (
           <Link
-            href={`/courses/${structure.slug}/lessons/${prevNode.id}`}
+            href={lessonPath(prevNode.id)}
             className="group min-w-0 rounded-control border border-cs-border bg-cs-surface px-4 py-3 text-left transition-colors hover:border-cs-accent"
           >
             <span className="block font-mono text-[10px] uppercase tracking-wide text-cs-muted">Previous</span>
@@ -768,7 +775,7 @@ export function LessonView({
         )}
         {followingNode && (
           <Link
-            href={`/courses/${structure.slug}/lessons/${followingNode.id}`}
+            href={lessonPath(followingNode.id)}
             className="group min-w-0 rounded-control border border-cs-border bg-cs-surface px-4 py-3 text-right transition-colors hover:border-cs-accent"
           >
             <span className="block font-mono text-[10px] uppercase tracking-wide text-cs-muted">Next in course</span>

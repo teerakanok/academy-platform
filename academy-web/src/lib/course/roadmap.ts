@@ -1,4 +1,4 @@
-import type { CourseNode, CourseStructure } from '@/lib/content/course-types'
+import type { CourseRoadmapNode, CourseRoadmapStructure } from '@/lib/content/course-types'
 import { isProofBearing } from './assessment-policy'
 
 // แผนที่เส้นทางของคอร์ส: จัดวาง DAG เป็นชั้น แล้วคำนวณสถานะของแต่ละ node ต่อผู้เรียน
@@ -37,7 +37,7 @@ function isSatisfied(nodeId: string, state: LearnerCourseState): boolean {
   )
 }
 
-export function nodeStatus(node: CourseNode, state: LearnerCourseState): NodeStatus {
+export function nodeStatus(node: CourseRoadmapNode, state: LearnerCourseState): NodeStatus {
   if (state.completed.includes(node.id)) return 'completed'
   if (state.testedOut.includes(node.id)) return 'tested-out'
   if (state.skipped.includes(node.id)) return 'skipped'
@@ -48,12 +48,12 @@ export function nodeStatus(node: CourseNode, state: LearnerCourseState): NodeSta
 }
 
 /** capstone ข้ามไม่ได้ — ต้องพิสูจน์เท่านั้น */
-export function canSkip(node: CourseNode): boolean {
+export function canSkip(node: CourseRoadmapNode): boolean {
   return node.kind !== 'capstone'
 }
 
 export interface RankedNode {
-  node: CourseNode
+  node: CourseRoadmapNode
   /** ชั้นความลึก = ระยะทางที่ยาวที่สุดจากจุดเริ่ม (ทำให้เส้นชี้ลงเสมอ) */
   rank: number
   /** ตำแหน่งภายในชั้น (0-based, ซ้ายไปขวา) */
@@ -61,7 +61,7 @@ export interface RankedNode {
   rankSize: number
 }
 
-export function rankNodes(structure: CourseStructure): RankedNode[] {
+export function rankNodes(structure: CourseRoadmapStructure): RankedNode[] {
   const byId = new Map(structure.nodes.map((n) => [n.id, n]))
   const depthCache = new Map<string, number>()
 
@@ -127,7 +127,7 @@ export const NODE_TOP_OFFSET = 62
 /** ลงไปพ้นบรรทัดสถานะใต้ชื่อบท */
 export const NODE_BOTTOM_OFFSET = 76
 
-export function layoutRoadmap(structure: CourseStructure, state: LearnerCourseState): RoadmapLayout {
+export function layoutRoadmap(structure: CourseRoadmapStructure, state: LearnerCourseState): RoadmapLayout {
   const ranked = rankNodes(structure)
   const maxRankSize = Math.max(...ranked.map((r) => r.rankSize))
   const maxRank = Math.max(...ranked.map((r) => r.rank))
@@ -167,8 +167,16 @@ export function layoutRoadmap(structure: CourseStructure, state: LearnerCourseSt
 }
 
 /** บทถัดไปที่ควรทำ — ตัวขับปุ่ม "เรียนต่อ" */
-export function nextNode(structure: CourseStructure, state: LearnerCourseState): CourseNode | null {
+export function nextNode(
+  structure: CourseRoadmapStructure,
+  state: LearnerCourseState,
+  preferredNodeId: string | null = null,
+): CourseRoadmapNode | null {
   const ranked = rankNodes(structure)
+  const preferred = preferredNodeId
+    ? ranked.find((entry) => entry.node.id === preferredNodeId)
+    : undefined
+  if (preferred && nodeStatus(preferred.node, state) === 'in-progress') return preferred.node
   const inProgress = ranked.find((r) => nodeStatus(r.node, state) === 'in-progress')
   if (inProgress) return inProgress.node
   const available = ranked.find((r) => nodeStatus(r.node, state) === 'available')
@@ -191,7 +199,7 @@ export interface CourseProgressSummary {
   coveragePercent: number
 }
 
-export function summarise(structure: CourseStructure, state: LearnerCourseState): CourseProgressSummary {
+export function summarise(structure: CourseRoadmapStructure, state: LearnerCourseState): CourseProgressSummary {
   const total = structure.nodes.length
   const ids = new Set(structure.nodes.map((n) => n.id))
   const completed = state.completed.filter((id) => ids.has(id)).length
@@ -267,7 +275,7 @@ export interface CourseRecordSummary {
  * เพราะใบรับรอง snapshot หลักฐาน ณ วันออก ไม่ใช่สถานะปัจจุบัน
  */
 export function courseRecordSummary(
-  structure: CourseStructure,
+  structure: CourseRoadmapStructure,
   state: LearnerCourseState,
 ): CourseRecordSummary {
   const blocking: { id: string; reason: CourseRecordBlocker }[] = []

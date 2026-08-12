@@ -711,6 +711,20 @@ OpenNext build ผ่านและ dependency tree ไม่มี invalid/pee
 canonical CI workflow จึงไม่ได้สร้าง gate ใหม่. หลักฐานอยู่ที่
 [`reports/reviews/academy-production-dependency-audit-local-checkpoint-2026-08-09.md`](../reports/reviews/academy-production-dependency-audit-local-checkpoint-2026-08-09.md).
 
+**Public-to-learner feature-wave integration checkpoint (2026-08-12):** งาน public
+catalogue/syllabus, learner dashboard/progress/attempt/simulation/skill map,
+localized chrome/theme และ retention boundary ถูกรวมเป็น journey เดียวแล้ว. Response
+ของ surface ที่เปลี่ยนใช้ bounded duplicate-safe JSON และ exact projection; return path
+ใช้ canonical same-origin policy จุดเดียว. ผู้เรียนไทยเห็น overview, roadmap, recovery
+และ reset flow เป็นไทยทั้ง desktop/mobile โดย roadmap ไม่มี horizontal overflow.
+Node 24 full unit ผ่าน 1,184/1,184, production Next build ผ่าน 30 routes และ public
+Chromium/Pixel 5 ผ่าน 34/34. Different-agent code/debt review ผ่าน
+`C0/H0/M0/L0`; security และ UX behavior ผ่านโดยเหลือเฉพาะ Low ในรายงาน และ
+different text/authority recheck หลังแก้ถ้อยคำผ่าน final `C0/H0/M0/L0`.
+Checkpoint นี้ปิด local แล้ว แต่ยังห้าม deploy, migrate DB, run retention หรือเปิด
+Identity/runtime จนกว่า production gates แยกจะปิด. หลักฐานอยู่ที่
+[`reports/reviews/academy-public-learner-feature-wave-integration-checkpoint-20260812.md`](../reports/reviews/academy-public-learner-feature-wave-integration-checkpoint-20260812.md).
+
 **Public syllabus checkpoint (2026-08-09):** ผู้เยี่ยมชมดูผลลัพธ์, ลำดับบท,
 prerequisite, เวลาประมาณการ และ required checkpoint ของ `basic-os-linux` ได้ก่อนมี
 บัญชี โดยไม่ส่ง lesson body, ข้อสอบ, เฉลย, private-media path หรือ learning record

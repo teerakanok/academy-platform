@@ -7,7 +7,7 @@ vi.mock('next/headers', () => ({
   cookies: vi.fn(async () => ({ getAll, delete: deleteCookie })),
 }))
 
-import { clearRouteAuthCookies } from '@/lib/auth/route-client'
+import { clearRouteAuthCookies, safeNextPath } from '@/lib/auth/route-client'
 
 describe('route auth cookies', () => {
   beforeEach(() => {
@@ -27,5 +27,19 @@ describe('route auth cookies', () => {
       ['sb-project-auth-token'],
       ['sb-project-auth-token.0'],
     ])
+  })
+
+  it('rejects browser-normalized cross-origin return paths', () => {
+    for (const value of [
+      'https://evil.example',
+      '//evil.example',
+      '/\\evil.example',
+      '/\n/evil.example',
+      '/\t/evil.example',
+    ]) {
+      expect(safeNextPath(value)).toBe('/dashboard')
+    }
+    expect(safeNextPath('/courses/basic-os-linux/learn?lang=th#progress'))
+      .toBe('/courses/basic-os-linux/learn?lang=th#progress')
   })
 })

@@ -16,6 +16,12 @@
     "test:integration": "vitest run --project integration",
     "test:e2e": "playwright test",
     "test:e2e:fast": "playwright test --grep-invert @full-acceptance",
+    "test:e2e:public": "playwright test --config=playwright.public.config.ts",
+    "verify:public-share-images": "node scripts/verify-public-share-images.mjs",
+    "verify:public-share-image-composition": "node scripts/verify-public-share-image-composition.mjs",
+    "verify:public-course-pages": "node scripts/verify-public-course-pages.mjs",
+    "verify:cf-public-share-images": "node scripts/verify-cf-public-share-images.mjs",
+    "verify:cf-public-course-pages": "node scripts/verify-cf-public-course-pages.mjs",
     "build:cf": "NEXT_PUBLIC_SUPABASE_URL= NEXT_PUBLIC_SUPABASE_ANON_KEY= opennextjs-cloudflare build",
     "deploy:cf": "npm run build:cf && wrangler deploy --autoconfig=false --keep-vars"
   },
@@ -48,6 +54,11 @@
     "tailwindcss": "^3.4.19",
     "typescript": "^5.9.3",
     "vitest": "^3.2.7",
-    "wrangler": "^4.118.0"
+    "wrangler": "^4.120.0"
+  },
+  "overrides": {
+    "nanoid": "3.3.17",
+    "postcss": "$postcss",
+    "sharp": "0.35.2"
   }
 }

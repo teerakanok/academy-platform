@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import type { AttemptQuestion, AttemptSimulation } from '@/lib/content/public-lesson'
+import { requestLessonAttempt, type AttemptClientResult } from '@/lib/course/attempt-client'
 
 /**
  * สถานะ attempt ของบทที่มีด่านจำลอง (W1)
@@ -18,14 +18,7 @@ import type { AttemptQuestion, AttemptSimulation } from '@/lib/content/public-le
 export type LessonAttempt =
   | { status: 'not-needed' }
   | { status: 'loading' }
-  | { status: 'ready'; id: string; questions: AttemptQuestion[]; simulations: AttemptSimulation[] }
-  | { status: 'failed'; reason: 'quota' | 'access-lost' | 'error'; retryAfterSeconds?: number }
-
-interface AttemptResponse {
-  attemptId?: string
-  questions?: AttemptQuestion[]
-  simulations?: AttemptSimulation[]
-}
+  | AttemptClientResult
 
 export function useLessonAttempt(options: {
   /** บทนี้ต้องใช้ attempt ไหม (มีด่านจำลอง และยังไม่จบบท) */
@@ -55,34 +48,9 @@ export function useLessonAttempt(options: {
     setAttempt({ status: 'loading' })
     if (hold) return
     let alive = true
-    fetch('/api/attempts', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ slug, nodeId }),
-    })
-      .then(async (res) => {
-        if (!alive) return
-        if (!res.ok) {
-          const body = (await res.json().catch(() => null)) as { retryAfterSeconds?: number } | null
-          setAttempt({
-            status: 'failed',
-            reason: res.status === 429 ? 'quota' : res.status === 401 || res.status === 403 ? 'access-lost' : 'error',
-            retryAfterSeconds: body?.retryAfterSeconds,
-          })
-          return
-        }
-        const body = (await res.json()) as AttemptResponse
-        if (!alive) return
-        if (!body.attemptId) {
-          setAttempt({ status: 'failed', reason: 'error' })
-          return
-        }
-        setAttempt({
-          status: 'ready',
-          id: body.attemptId,
-          questions: body.questions ?? [],
-          simulations: body.simulations ?? [],
-        })
+    requestLessonAttempt(slug, nodeId)
+      .then((result) => {
+        if (alive) setAttempt(result)
       })
       .catch(() => {
         if (alive) setAttempt({ status: 'failed', reason: 'error' })

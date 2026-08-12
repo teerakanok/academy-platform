@@ -1,0 +1,846 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/SBOM.md",
+      "sha256": "979b5a1a57d5fb81a1ef9f796d5d310c1f1268a563a8ad499d861a01e1082e44",
+      "bytes": 3001
+    },
+    {
+      "path": "academy-web/assets/fonts/noto-sans-thai/LICENSE",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357
+    },
+    {
+      "path": "academy-web/assets/fonts/noto-sans-thai/NotoSansThai-Bold.ttf",
+      "sha256": "2ac6c6e8a478e23b15f76e4894af1fa2210f8f350e4e6e54aad530bec03efbfb",
+      "bytes": 37824
+    },
+    {
+      "path": "academy-web/assets/fonts/noto-sans-thai/NotoSansThai-Regular.ttf",
+      "sha256": "61cf814eec46b294d6ea4401ac295d0cecd5207bd2331dcc5a15e7301d30ee44",
+      "bytes": 37780
+    },
+    {
+      "path": "academy-web/assets/fonts/noto-sans-thai/README.md",
+      "sha256": "ae0a592587f32479d37f35aec7443a95d4624564db10eee9e823e3af2c60afdb",
+      "bytes": 727
+    },
+    {
+      "path": "academy-web/content/courses/basic-os-linux/course.json",
+      "sha256": "272a7bbd0d744e2858f11c3583fdfe9b9e197ee060f55e93ee33a6d5747efa72",
+      "bytes": 4146
+    },
+    {
+      "path": "academy-web/content/courses/content-formats-demo/course.json",
+      "sha256": "92b43d542bf63c6db034f89ac053da493a1231d43b8159ba5b71ca6c4095ae78",
+      "bytes": 1470
+    },
+    {
+      "path": "academy-web/e2e/course-experience.spec.ts",
+      "sha256": "8264a7ce84345d2c91fe653121a00c926db68cd74e4f1b6ec8bc2a279fd4acba",
+      "bytes": 17123
+    },
+    {
+      "path": "academy-web/ops/academy-retention-worker/retention.ts",
+      "sha256": "14df3a3beae858d67cdbb47a92a17115a131d298b613e2dcff4b5bc4588e88ce",
+      "bytes": 6739
+    },
+    {
+      "path": "academy-web/package-lock.json",
+      "sha256": "3d5385398d9d6d021048cfae70924babee29a03c128333e57a4cac6914ac882b",
+      "bytes": 456109
+    },
+    {
+      "path": "academy-web/package.json",
+      "sha256": "30a5602441e237765b6b707715258c2de1c1258de9747daef167cfe33990aee7",
+      "bytes": 2358
+    },
+    {
+      "path": "academy-web/playwright.public.config.ts",
+      "sha256": "0bd3d7e4646f520fc82e1ed0d2aba1004064fa1ecccc22a71f73e59a4048f459",
+      "bytes": 1201
+    },
+    {
+      "path": "academy-web/scripts/public-course-page-paths.mjs",
+      "sha256": "ec92fce50ced60437d3194193f71e8ee862b068f6382d356ab6202b81b1bc9a4",
+      "bytes": 673
+    },
+    {
+      "path": "academy-web/scripts/public-share-image-paths.mjs",
+      "sha256": "817df31bc84fc14cf32045d9294ac87b63768c9266a523c8f7595d2657005889",
+      "bytes": 871
+    },
+    {
+      "path": "academy-web/scripts/verify-cf-public-course-pages.mjs",
+      "sha256": "9fbfc34737b57f21e5e35a11fc01c067bb8f13054545e9e1cbf61b10c1719867",
+      "bytes": 914
+    },
+    {
+      "path": "academy-web/scripts/verify-cf-public-share-images.mjs",
+      "sha256": "cee581fd996030d716c38ecc8f56ff7db123e148c440cb382f8a1ce7f201f6ee",
+      "bytes": 956
+    },
+    {
+      "path": "academy-web/scripts/verify-public-course-pages.mjs",
+      "sha256": "3ab19641244953f0ea7a416e64279bd12ada65891f6d18ab5e5847696bcf8401",
+      "bytes": 1344
+    },
+    {
+      "path": "academy-web/scripts/verify-public-share-image-composition.mjs",
+      "sha256": "c44b2f8dbf7c92907aecc63eb8abed2eb740946552a5938e04f61932d224ac18",
+      "bytes": 3863
+    },
+    {
+      "path": "academy-web/scripts/verify-public-share-images.mjs",
+      "sha256": "fbc0d2731e566c89c8de677580eaaac5f771851742ab41f4d44f76425c3b4fd9",
+      "bytes": 778
+    },
+    {
+      "path": "academy-web/src/app/(localized)/courses/[slug]/[locale]/layout.tsx",
+      "sha256": "f390a8e16cfe39b73330d0f56c1e4ce425e8c023d882e186dd567ee4120418ec",
+      "bytes": 728
+    },
+    {
+      "path": "academy-web/src/app/(localized)/courses/[slug]/[locale]/page.tsx",
+      "sha256": "5c3ae8fd0d5163e5dc716aa5a8c50d89fd2e16a2651944c464ca63ef440606ee",
+      "bytes": 2937
+    },
+    {
+      "path": "academy-web/src/app/(site)/access-required/page.tsx",
+      "sha256": "458ae9ce135607e8e6f721593a0e38122903b79c75dcbb42c84b38c7dcc99a0e",
+      "bytes": 2475
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/attempts/route.ts",
+      "sha256": "1a648549da642b3fe68a74863c472e2668038e7e4051f669b2965f346d635877",
+      "bytes": 10784
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/auth/otp/route.ts",
+      "sha256": "e0f5c4bdb310776cdec5f8fe0a9a5d01e0520013f0c1d5c0f5532f9f4a92a985",
+      "bytes": 3494
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/auth/verify/route.ts",
+      "sha256": "11be1a7613b1be727290996c3fd1dc3cb27345d7fa035edb8f9cc3264400938f",
+      "bytes": 3334
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/courses/[slug]/skill-map/route.ts",
+      "sha256": "230e3be84923f9bbedfeeabc6c583983c2be84bb1d323cc6d15dd840daaadd4f",
+      "bytes": 2460
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/explanations/route.ts",
+      "sha256": "5e941f6a708ebf5fc2f4beb99af27ec728778b389e3498c26a8a5b81e87bbc47",
+      "bytes": 8813
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/leads/route.ts",
+      "sha256": "972ade3f6ce4bebcdef71f0464724dbb056b4fdadfaca32b06a3c80b4cf8e8a5",
+      "bytes": 3980
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/leads/unsubscribe/route.ts",
+      "sha256": "7d6f923b19c8c0a48b49defd59d737d647c5c57720725d585171b52600a4e25f",
+      "bytes": 2618
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/practice/simulation/route.ts",
+      "sha256": "434329477d38b84125611eca42323ee0df89b7c4039308e537e5f767f60ce2d3",
+      "bytes": 7787
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/progress/reset/route.ts",
+      "sha256": "3f8273370b71676c5a11c4894999f455fed909f8edaf4a001f07aaa079e97b22",
+      "bytes": 6287
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/progress/route.ts",
+      "sha256": "d11ec5fcddfe832e2232bd17eeb2d5b9427ea331dcdfb3220625b3ca9664b5b9",
+      "bytes": 33940
+    },
+    {
+      "path": "academy-web/src/app/(site)/course-media/[assetId]/route.ts",
+      "sha256": "f9a458e130355a9be29ac0043b898594425a4756ca9561a1900c6ce3a5042410",
+      "bytes": 4834
+    },
+    {
+      "path": "academy-web/src/app/(site)/courses/[slug]/learn/page.tsx",
+      "sha256": "558b6eb26436b599c741a6732315249dbe7b6771be7240ffefaa2a113e0b2d48",
+      "bytes": 1645
+    },
+    {
+      "path": "academy-web/src/app/(site)/courses/[slug]/lessons/[nodeId]/page.tsx",
+      "sha256": "3876f0b3500a20209a53e0426eb6a5046183f21348a3bae2b252f11fbfe34742",
+      "bytes": 3264
+    },
+    {
+      "path": "academy-web/src/app/(site)/courses/[slug]/page.tsx",
+      "sha256": "93327ceb930489b8c16529945fd0fa6ff5a79975831d9c2ea801bba358ecfef3",
+      "bytes": 858
+    },
+    {
+      "path": "academy-web/src/app/(site)/courses/[slug]/share/[locale]/route.tsx",
+      "sha256": "f738d93361e3f315b034c47fc5dbe045ec27f912a4ba66c733e1fb3d30802d68",
+      "bytes": 1020
+    },
+    {
+      "path": "academy-web/src/app/(site)/courses/page.tsx",
+      "sha256": "9937a46731574743589a2dc9e7285506739903fa7c43e6469e7f928ebeb7c65a",
+      "bytes": 1458
+    },
+    {
+      "path": "academy-web/src/app/(site)/dashboard/page.tsx",
+      "sha256": "dc27abdfe4c37b34a646f531821caa19c815acb3c84645c90e92003b61287125",
+      "bytes": 516
+    },
+    {
+      "path": "academy-web/src/app/(site)/error.tsx",
+      "sha256": "6266e23bb3b12a280067cc7f51b41d41a9b58314dd7bac17820073e8dd695c2a",
+      "bytes": 2024
+    },
+    {
+      "path": "academy-web/src/app/(site)/layout.tsx",
+      "sha256": "bbb05fc4c09fe73e8c0cccec68d3c4dce29ae09cca2363d3c56472c76b7c882f",
+      "bytes": 576
+    },
+    {
+      "path": "academy-web/src/app/(site)/page.tsx",
+      "sha256": "8d8f4832eaa86f2ef7d2875e2e909aceb94def7b7a98f59db31347dd6aed276c",
+      "bytes": 5448
+    },
+    {
+      "path": "academy-web/src/app/(site)/player/exam/[id]/page.tsx",
+      "sha256": "27af666d2bd8c7c02252a375051ad4d9a711f4fc8c013d0eb9ed00da8516b348",
+      "bytes": 1024
+    },
+    {
+      "path": "academy-web/src/app/(site)/player/module/[slug]/page.tsx",
+      "sha256": "3a3753690e09e4edbc33722b56f407c66e13a152aac66736ce7e420dbf4e7319",
+      "bytes": 1044
+    },
+    {
+      "path": "academy-web/src/app/(site)/player/page.tsx",
+      "sha256": "a249581dd80474d7ca2eba3cbeb28f398eb2296e6b1578781fcba76eaec84bb2",
+      "bytes": 1612
+    },
+    {
+      "path": "academy-web/src/app/(site)/privacy/PrivacyContent.tsx",
+      "sha256": "27cc1193378d0dc97d1dbe8515afadf95bbd5b4c4fb7c0148ee393bf74b93368",
+      "bytes": 3071
+    },
+    {
+      "path": "academy-web/src/app/(site)/privacy/page.tsx",
+      "sha256": "f53099c4fb9d0be8b7f8c58f8ef3b10b231a0b9aa1580d8e34a649f700d25e6e",
+      "bytes": 980
+    },
+    {
+      "path": "academy-web/src/app/(site)/unsubscribe/UnsubscribeForm.tsx",
+      "sha256": "610fb2ef1e330a85c8cc6d34e4a1f00580a6bb97a1311bae8b5a144384212c12",
+      "bytes": 5026
+    },
+    {
+      "path": "academy-web/src/app/(site)/unsubscribe/page.tsx",
+      "sha256": "0740d068910038456530ec38ce861d30572bf9e8773d807c1d10a36fd6459748",
+      "bytes": 581
+    },
+    {
+      "path": "academy-web/src/app/courses/[slug]/opengraph-image.tsx",
+      "sha256": "4b476238ca84e46e13b691884d0c7c1df227b1007ce34e504122563a0301c64a",
+      "bytes": 1766
+    },
+    {
+      "path": "academy-web/src/app/sitemap.ts",
+      "sha256": "2ccfd1042f852215a282bc609f1a16baf0d8ab5bc26ce8fea1fbc11e6bd9af9f",
+      "bytes": 1200
+    },
+    {
+      "path": "academy-web/src/components/AppShell.tsx",
+      "sha256": "0872b509a282a7a0eb461eaade2567d3800709d0c7639940367a0809bff7c617",
+      "bytes": 1774
+    },
+    {
+      "path": "academy-web/src/components/ThemeToggle.tsx",
+      "sha256": "fa3de37a97789d7beeb0797dde2c26b09a64d1bec73154de3b82b5477a31d598",
+      "bytes": 1900
+    },
+    {
+      "path": "academy-web/src/components/WaitlistForm.tsx",
+      "sha256": "879a9439f46a9a53077037b675a08b8c07a6320c4a87509dafd89a7d0ac62ec4",
+      "bytes": 3784
+    },
+    {
+      "path": "academy-web/src/components/auth/AccountMenu.tsx",
+      "sha256": "daa7f44b1e1c31e4955427d312b287624b71fe252e237947372f4228e7d8028f",
+      "bytes": 4867
+    },
+    {
+      "path": "academy-web/src/components/auth/SignInForm.tsx",
+      "sha256": "79511ac79d97fd2c3c285e1aee57b12cdee7bc1bb368625c837fe5f0bbd17906",
+      "bytes": 7249
+    },
+    {
+      "path": "academy-web/src/components/course/AccessRequiredView.tsx",
+      "sha256": "7554cc28cf63a49e31cb265997c28294f6a9634d9ea196eac8b1657651159360",
+      "bytes": 3865
+    },
+    {
+      "path": "academy-web/src/components/course/CourseCover.tsx",
+      "sha256": "4d561cae62a2813540bf61cd2959aed5486dd4e8ed29b85be2f8ac8fb936c70a",
+      "bytes": 8875
+    },
+    {
+      "path": "academy-web/src/components/course/CourseDashboard.tsx",
+      "sha256": "81c1120eb3728f011b132ea61b13cd24f3615f9c37fcced28d037b9c62f714bd",
+      "bytes": 24386
+    },
+    {
+      "path": "academy-web/src/components/course/CourseExperience.tsx",
+      "sha256": "00f931d36bcf3465f8a8c8a24dac3d8cce3e79aeffdc0f5f71d061c4361d9ef1",
+      "bytes": 2652
+    },
+    {
+      "path": "academy-web/src/components/course/CourseLocaleChromeSync.tsx",
+      "sha256": "c789933c10a899708d16bc1b194d7da66266d278a5d172584bb81d0da366ce05",
+      "bytes": 2044
+    },
+    {
+      "path": "academy-web/src/components/course/CourseOverview.tsx",
+      "sha256": "a2a60372ac5f7d7ccf00d95f51f8fcb4b7f3f63ee07e093aa16be0a67d490940",
+      "bytes": 17336
+    },
+    {
+      "path": "academy-web/src/components/course/CourseSkillMap.tsx",
+      "sha256": "98b2d0e571e5e41256177eae884e98545de7164dc37eccbacd292a8660f1002b",
+      "bytes": 3539
+    },
+    {
+      "path": "academy-web/src/components/course/CoverMotif.tsx",
+      "sha256": "e1cabcbed692758dfae77e6eaafa3e7a50e0c8a3d1e44ac7a37c075efcfda6ce",
+      "bytes": 6843
+    },
+    {
+      "path": "academy-web/src/components/course/LessonBody.tsx",
+      "sha256": "98cd6049e029ce8f2724d995f34f228b38d77c53994da7c7b001f5d721e4a991",
+      "bytes": 9889
+    },
+    {
+      "path": "academy-web/src/components/course/LessonView.tsx",
+      "sha256": "eda55e2461677a77f2f279174808cc826330e189f819dc1ab27bd37d5a68b381",
+      "bytes": 41563
+    },
+    {
+      "path": "academy-web/src/components/course/PublicCourseCatalog.tsx",
+      "sha256": "6f1d3093845836a9aa0475f24d8c11e3872c432604b1137f1efabcdfbd6c214d",
+      "bytes": 5001
+    },
+    {
+      "path": "academy-web/src/components/course/PublicCourseLocaleLink.tsx",
+      "sha256": "52ef756d12505475be16a6154aad916ed449718b8d66a9e24f53b15dc8071be2",
+      "bytes": 937
+    },
+    {
+      "path": "academy-web/src/components/course/PublicCourseSyllabus.tsx",
+      "sha256": "9122bc6f04fe9d049227ae36e567de239870dd2ee5143fad0c5c8027738aeb1f",
+      "bytes": 11015
+    },
+    {
+      "path": "academy-web/src/components/course/RadarChart.tsx",
+      "sha256": "c5eb68f28d51919610fd8ad72eb25864810683c509e817109c500908d6088a50",
+      "bytes": 6771
+    },
+    {
+      "path": "academy-web/src/components/course/ResetCourseProgress.tsx",
+      "sha256": "3c2336cf46cae8f5512f9e0e975a3a9545fd7eda98684d5537b87c82f06b32d3",
+      "bytes": 9117
+    },
+    {
+      "path": "academy-web/src/components/course/RoadmapGraph.tsx",
+      "sha256": "10226b9ca9830bd5a6535f9a9fd39cd5406286688b05e0ee20d17fc7b3cb1320",
+      "bytes": 11094
+    },
+    {
+      "path": "academy-web/src/components/course/blocks/SimulationBlock.tsx",
+      "sha256": "d7b31dc321f353be6b119b36a27a646362c4f9035b24a91d947635da718263c9",
+      "bytes": 9541
+    },
+    {
+      "path": "academy-web/src/components/course/use-lesson-attempt.ts",
+      "sha256": "d40464e598318ae1b2c6569462ad61958dd68cd51d1c8628c7b25edbc0833f18",
+      "bytes": 3711
+    },
+    {
+      "path": "academy-web/src/components/i18n/LanguageToggle.tsx",
+      "sha256": "8b5a3400a97b7713f668497d1a4c2a7397cfd7034191308ad46a72955fbd41c1",
+      "bytes": 3054
+    },
+    {
+      "path": "academy-web/src/components/i18n/LocaleProvider.tsx",
+      "sha256": "e659e53e808e3de2287f89a620bd4cade569d6c37babbee6b039aed0d79c8b16",
+      "bytes": 4044
+    },
+    {
+      "path": "academy-web/src/components/i18n/SiteChrome.tsx",
+      "sha256": "159149daf033e8484d3cb278fda2469b2712486beba647f0586721dda359aa76",
+      "bytes": 5277
+    },
+    {
+      "path": "academy-web/src/lib/auth/account-response-client.ts",
+      "sha256": "31b5e5288c2110048bffd0cf8bbeb6a93e832be97c5e3b284bfe0185fb8a4b2c",
+      "bytes": 4660
+    },
+    {
+      "path": "academy-web/src/lib/auth/internal-return-path.ts",
+      "sha256": "7fecf5fa18affa8513e929086feb16335f44cde7b0a0813de8241518ca5d794d",
+      "bytes": 813
+    },
+    {
+      "path": "academy-web/src/lib/auth/route-client.ts",
+      "sha256": "202bf3f782883858858bd265d568cb4db6c3266c88f0daf0a2d8523af11998c4",
+      "bytes": 2220
+    },
+    {
+      "path": "academy-web/src/lib/content/course-loader.ts",
+      "sha256": "531311256e66ef3cbaeb67d954bec5195212e4212bea77c1cd093c3d6e0d5472",
+      "bytes": 20200
+    },
+    {
+      "path": "academy-web/src/lib/content/course-source.ts",
+      "sha256": "b313dc1e7ab4e7846fa75c917c0784bb62a71b683e961e70e13fae9b1d832e71",
+      "bytes": 7522
+    },
+    {
+      "path": "academy-web/src/lib/content/course-step-summary.ts",
+      "sha256": "b5469167561b87957ab12a778c74dd120a0ac9faecfc2562e186ccdf1fb259bb",
+      "bytes": 383
+    },
+    {
+      "path": "academy-web/src/lib/content/course-types.ts",
+      "sha256": "8fc7f53749c16cd7c51320cf4e6e0a0621240924ed0085c918d2c6e9931ab0b1",
+      "bytes": 16879
+    },
+    {
+      "path": "academy-web/src/lib/content/legacy-public-course-route.ts",
+      "sha256": "0eb2cdd7796298403a4cdf982748c09917ea6f724f2068ace939808c152ab421",
+      "bytes": 1048
+    },
+    {
+      "path": "academy-web/src/lib/content/public-course.ts",
+      "sha256": "5ea58e7d8a42ce88d4355d6647867d72f013d8b34198187644dfb4d8f4c044bb",
+      "bytes": 2846
+    },
+    {
+      "path": "academy-web/src/lib/course-share-image.tsx",
+      "sha256": "997c83010ffc9204af86f9cd863526cb3700a6e8a4f9eb93c1936fb00b9f1145",
+      "bytes": 4299
+    },
+    {
+      "path": "academy-web/src/lib/course/assessment-policy.ts",
+      "sha256": "3a07e3b86ac680a7b9dc335e61f1532e6c913373ce615c274cd4987a4801a128",
+      "bytes": 7873
+    },
+    {
+      "path": "academy-web/src/lib/course/attempt-client.ts",
+      "sha256": "054197f899b843b723fa4e374810a65baf3e6eb121c1c14cb1b72efa5de6cb0b",
+      "bytes": 9135
+    },
+    {
+      "path": "academy-web/src/lib/course/progress-client.ts",
+      "sha256": "515cbbcbe0fc96c7418a1e6536cba8dfa5ad002b4fdf4e83055db7cf44548b7d",
+      "bytes": 20235
+    },
+    {
+      "path": "academy-web/src/lib/course/progress-db.ts",
+      "sha256": "7e52ce5c5b07a1a49c56ecb7bdaf9874799a690e452311ddf3e250030d274b39",
+      "bytes": 11292
+    },
+    {
+      "path": "academy-web/src/lib/course/progress.ts",
+      "sha256": "d1e9ec53a1b9970cf5adb4ce3a5de8a7cc04ca3c70438be353224b13a6f1f565",
+      "bytes": 9434
+    },
+    {
+      "path": "academy-web/src/lib/course/roadmap.ts",
+      "sha256": "dbe5f60527dcb2a0a52d998a221a750dab7a4a76f2281cad52fb826d9bdb6a7d",
+      "bytes": 17694
+    },
+    {
+      "path": "academy-web/src/lib/course/skill-map-client.ts",
+      "sha256": "6b6236eea60e7fb37686006b7f4a74b27a95986be24f65cd59eaa7003cda971e",
+      "bytes": 4487
+    },
+    {
+      "path": "academy-web/src/lib/course/skill-map-state.ts",
+      "sha256": "7c11fc113ef5f80e602bbf9d1610b23c7d1b5c037930b1a30b31a7989af262e8",
+      "bytes": 741
+    },
+    {
+      "path": "academy-web/src/lib/course/skills.ts",
+      "sha256": "14f1c990b07dcd5dd67f2d2907c321dae266c2f76937aa3294ccf0a3c9386a4b",
+      "bytes": 4715
+    },
+    {
+      "path": "academy-web/src/lib/http/exact-ok-response.ts",
+      "sha256": "4f8c24126371413a1686ac8e4c5b563b7ec3d6346741e2dbd6218fc6155fe201",
+      "bytes": 872
+    },
+    {
+      "path": "academy-web/src/lib/i18n/learner-course.ts",
+      "sha256": "de10eb922eaa05698e0c3ba6bf8d01558fb0cdb47c457825f7d738a292fe936f",
+      "bytes": 15877
+    },
+    {
+      "path": "academy-web/src/lib/i18n/ui.ts",
+      "sha256": "026b3ae9c1063d8bb8826d88d2da13e8867fc43b02700a115bf66e0a8baa2c4b",
+      "bytes": 9490
+    },
+    {
+      "path": "academy-web/src/lib/identity/transaction.ts",
+      "sha256": "0c2067e423cfbe5975ce7444706766a9546a4638358f6bd71e20e24acd3800e3",
+      "bytes": 25098
+    },
+    {
+      "path": "academy-web/src/lib/player/progress.ts",
+      "sha256": "2f4cd7818a4c7058f2a282e44ac776b0e9c6f7956c9dc260f62d227672a0825b",
+      "bytes": 9983
+    },
+    {
+      "path": "academy-web/src/lib/seo.ts",
+      "sha256": "778c90e782b4c9958e09827c93405d9dc500e7ba55f3097b9f0d92de9953d4f0",
+      "bytes": 4473
+    },
+    {
+      "path": "academy-web/src/lib/simulation/practice-client.ts",
+      "sha256": "11975f56a058c7aa27e772b93ce6999f7d0f7b4dc9c336b199740445d5cb799d",
+      "bytes": 6831
+    },
+    {
+      "path": "academy-web/src/lib/unsubscribe-client.ts",
+      "sha256": "36c6709b2f6735880795c76850f7b61a5a99f04a128caac519f9fe4fe5fa1ecb",
+      "bytes": 424
+    },
+    {
+      "path": "academy-web/src/lib/waitlist-client.ts",
+      "sha256": "b4f95458f00424e5d2dae1830cdb9f426a642f7ada6716d8e533714889dcdf48",
+      "bytes": 925
+    },
+    {
+      "path": "academy-web/src/middleware.ts",
+      "sha256": "44cc39008bde237b37ce65049dfe74f179044e21a7135293920981606a74be42",
+      "bytes": 10071
+    },
+    {
+      "path": "academy-web/tests/integration/leads-db-fail.test.ts",
+      "sha256": "df4b62188f806575b0c9af8fdc29a77079ab1c0774017423fead98922490904b",
+      "bytes": 2542
+    },
+    {
+      "path": "academy-web/tests/unit/access-required-view.test.ts",
+      "sha256": "b0c4bbafbdf4e249b270d2251505860508c8673168f7792e7d6f8f802ba80d7c",
+      "bytes": 1471
+    },
+    {
+      "path": "academy-web/tests/unit/account-response-client.test.ts",
+      "sha256": "e2991e1d7eab07c42927a0f57eac1308c2b384e7eff0cc0ce5d1935f45b6e8a1",
+      "bytes": 4589
+    },
+    {
+      "path": "academy-web/tests/unit/attempt-client.test.ts",
+      "sha256": "c1d3b60b66a0b31b70e56aad053663976d659c6ffb4dea46779d6676c6090843",
+      "bytes": 14064
+    },
+    {
+      "path": "academy-web/tests/unit/content-registry.test.ts",
+      "sha256": "f3b8bfb80a76deafef248e5264e413c7df518df6e415d2b2c7d77d6cafc0196e",
+      "bytes": 3203
+    },
+    {
+      "path": "academy-web/tests/unit/course-experience.test.ts",
+      "sha256": "6f5dd159445832bf5666778348d336b1cd82a892104cf9b4e01e41a1e61384a1",
+      "bytes": 1242
+    },
+    {
+      "path": "academy-web/tests/unit/course-locale-chrome-sync.test.ts",
+      "sha256": "106be65a17c02696d54e11c187745250f009e5b52a932aa2a3f581264adcea47",
+      "bytes": 1310
+    },
+    {
+      "path": "academy-web/tests/unit/course-roadmap.test.ts",
+      "sha256": "51133b3f07dd1e245253dc6ad29abb7235e58189a5cd67ad594e0822c30897f9",
+      "bytes": 8215
+    },
+    {
+      "path": "academy-web/tests/unit/course-skill-map-client.test.ts",
+      "sha256": "71a20cd7dd3d8e37939e8d56bb608b8f4f681d55512bd867d25794cccd719cdb",
+      "bytes": 11667
+    },
+    {
+      "path": "academy-web/tests/unit/course-skill-map-route.test.ts",
+      "sha256": "b419d13a7b6fd5be82df371b412a6a1511d96da2c16b208c3dc6906286ee8d99",
+      "bytes": 3796
+    },
+    {
+      "path": "academy-web/tests/unit/course-skill-map.test.ts",
+      "sha256": "59d2b38e66440156bb4fd61a65d041a37adbc1e28a60084d74b4497d445ac162",
+      "bytes": 1665
+    },
+    {
+      "path": "academy-web/tests/unit/course-step-summary.test.ts",
+      "sha256": "66821b40ecd73b7b40ad0e8c6fd385d690830aae81939e697d0952d8fcf90710",
+      "bytes": 624
+    },
+    {
+      "path": "academy-web/tests/unit/dashboard-page.test.ts",
+      "sha256": "eb57b27125aeef1fb0be7c4c739f5591ee4298a0aa399a74f3e2c4156094a70e",
+      "bytes": 750
+    },
+    {
+      "path": "academy-web/tests/unit/dashboard-response.test.ts",
+      "sha256": "006b45f5e4c381f28ca841a0d5af7f27a23010aa273e855587b20df3491d5954",
+      "bytes": 5097
+    },
+    {
+      "path": "academy-web/tests/unit/explanations-route.test.ts",
+      "sha256": "27103555f21f3d9d4946dcc830bb6b5751e7c758bff67aa76801266da74fd0c3",
+      "bytes": 3164
+    },
+    {
+      "path": "academy-web/tests/unit/identity-registry.test.ts",
+      "sha256": "d9915c3c8d5d587cfe54f9eff25a418e6b5c2937e450f82b62f91c50fd4f212c",
+      "bytes": 3251
+    },
+    {
+      "path": "academy-web/tests/unit/identity-transaction.test.ts",
+      "sha256": "ae17c55578ba7d6cac87b168679e62eae9d1ce5127338852cf53d2a27d9d208d",
+      "bytes": 23128
+    },
+    {
+      "path": "academy-web/tests/unit/internal-surface.test.ts",
+      "sha256": "6dfea8d3d89ad736b276731e9fd624cb64d59df8c706cfb8589067c3fa757db2",
+      "bytes": 3285
+    },
+    {
+      "path": "academy-web/tests/unit/language-navigation.test.ts",
+      "sha256": "ce2787503666fdf3da679658db2c9b38da6881d57304c94b9150789e03c66aa3",
+      "bytes": 2257
+    },
+    {
+      "path": "academy-web/tests/unit/learner-course-page.test.ts",
+      "sha256": "44ca26fa7ddb0ff8902ccc2c6ac7e94715a771a83e59e18afd89083f3eb8d05f",
+      "bytes": 2319
+    },
+    {
+      "path": "academy-web/tests/unit/learner-dashboard-course.test.ts",
+      "sha256": "7da673ae2881e2bdcaeca15eb98f18cf19355f60effd13a5de8e39a5db2fb510",
+      "bytes": 1647
+    },
+    {
+      "path": "academy-web/tests/unit/legacy-direct-otp.test.ts",
+      "sha256": "d93295ee2350c82fa5c81b217c85336f90866d1d419d370bf2f63309c71f8708",
+      "bytes": 1916
+    },
+    {
+      "path": "academy-web/tests/unit/media-route.test.ts",
+      "sha256": "e8c063f8221103cb0410f24542f8fda5c864bdeb4c9359414782ef767307f7ad",
+      "bytes": 2228
+    },
+    {
+      "path": "academy-web/tests/unit/progress-client.test.ts",
+      "sha256": "1b839859a8093b37857fc80f9e721d681342d1a7803e1a9139f1e7c1f153462f",
+      "bytes": 13993
+    },
+    {
+      "path": "academy-web/tests/unit/progress-dashboard-route.test.ts",
+      "sha256": "daaabdb589ced53d5428664a1aa04e555f5c267fdd6e37848897b0d44f8fa9e8",
+      "bytes": 6330
+    },
+    {
+      "path": "academy-web/tests/unit/progress-db-allowlist.test.ts",
+      "sha256": "e18b3df17fcebabfaaebeccef39d2edd8c81b70a561e979d01ce27e84bfb4c28",
+      "bytes": 1202
+    },
+    {
+      "path": "academy-web/tests/unit/progress.test.ts",
+      "sha256": "6511be0d45d51eb502f04507cd8e80034d9b9d0ae56d6a3c79c15e4c3ed9cfb9",
+      "bytes": 10561
+    },
+    {
+      "path": "academy-web/tests/unit/public-course-catalog.test.ts",
+      "sha256": "292611d1eedbdf030aa5beff66e5a60b8050f2f81d49e465f4a0749d3ad58685",
+      "bytes": 846
+    },
+    {
+      "path": "academy-web/tests/unit/public-course-projection.test.ts",
+      "sha256": "fc88d3f8f6caf263b4bbb266d5e3dc1404b83184fc2c8e11893d3b592bceac8f",
+      "bytes": 2280
+    },
+    {
+      "path": "academy-web/tests/unit/public-course-route.test.ts",
+      "sha256": "d2f4f267d750245b3890b93bea0276d0ebfc25155533ebcaafdc34aa4f2e86d3",
+      "bytes": 2675
+    },
+    {
+      "path": "academy-web/tests/unit/public-course-share-route.test.ts",
+      "sha256": "7ab43e4fa455250188eddbdf42ff65dbdaf1158b09e472d4f27a4c1e23ba6a69",
+      "bytes": 416
+    },
+    {
+      "path": "academy-web/tests/unit/public-course-syllabus.test.ts",
+      "sha256": "96eef89f9c8c35375a28f0cbec1b092c25ae5ee7935b814538de9945fe669ec6",
+      "bytes": 3243
+    },
+    {
+      "path": "academy-web/tests/unit/retention-scheduler.test.ts",
+      "sha256": "fa678c3816c4d30ede413f0d77d847d99c12e6475cb9ae5ac9ea6622c547d287",
+      "bytes": 7271
+    },
+    {
+      "path": "academy-web/tests/unit/route-client.test.ts",
+      "sha256": "b89fa4272654417404b43c17b76b3146f0587b6ad51279f84fd17a95d975f430",
+      "bytes": 1301
+    },
+    {
+      "path": "academy-web/tests/unit/simulation-practice-client.test.ts",
+      "sha256": "9fd830c7eafa7609dc7c97a6d69fe2e3a6a101ee56a80a17c3c53916a5334426",
+      "bytes": 14594
+    },
+    {
+      "path": "academy-web/tests/unit/skill-map-state.test.ts",
+      "sha256": "7ba49d6077b1f21cf2766e57ec0386eb3aa5ff2eaa17463922fa3e6dd08e072a",
+      "bytes": 1223
+    },
+    {
+      "path": "academy-web/tests/unit/unsubscribe-client.test.ts",
+      "sha256": "b4766834b6a99e6ebca123d0170c6e99d839c4f5cd7743b43db62c74f772e61d",
+      "bytes": 3852
+    },
+    {
+      "path": "academy-web/tests/unit/waitlist-client.test.ts",
+      "sha256": "ac1e39723c5e2142319b2351a95d876a43568d22cedcfcfa2fdc178f5bba6eaa",
+      "bytes": 11078
+    },
+    {
+      "path": "artifacts/public-course-syllabus-flight-boundary-2026-08-09.md",
+      "sha256": "db0d085625109c20000fb1423fea7e0dff2a47a896f930bf3f84797d58460966",
+      "bytes": 1102
+    },
+    {
+      "path": "memory/feedback_static_evidence_and_generated_manifest_hygiene.md",
+      "sha256": "2acee5d8e9489e2f53bfa89f9d03020a79be1b95b8e0b2e644425a9af42b2c0f",
+      "bytes": 1896
+    },
+    {
+      "path": "plans/active_plan.md",
+      "sha256": "1c61624c4873ac8b8fc7be4b36e6c3970cc08b217d9dc33a5807d7b7b96b6df6",
+      "bytes": 209869
+    },
+    {
+      "path": "plans/completed_log.md",
+      "sha256": "3a06e03053e5c557cd57909ad2d64d0fb7e315b2723133efd2fe8e1dd4f0ba1a",
+      "bytes": 149801
+    },
+    {
+      "path": "reports/reviews/academy-attempt-client-response-validation-local-checkpoint-2026-08-09.md",
+      "sha256": "f17c2e20909feeeebbedc5eb1955a6ec8435ad5ab0b8963e48252737d029d12f",
+      "bytes": 9789
+    },
+    {
+      "path": "reports/reviews/academy-course-skill-map-client-response-validation-local-checkpoint-2026-08-09.md",
+      "sha256": "ffe147d2686cf0f7085a6ec493ada1b3009719f629a447596624d211ec4d2bd5",
+      "bytes": 7830
+    },
+    {
+      "path": "reports/reviews/academy-dashboard-resume-last-node-local-checkpoint-2026-08-09.md",
+      "sha256": "3bba2318157403cd9183432e5822b8a0b007de760428119c47b668ecfe956b61",
+      "bytes": 3920
+    },
+    {
+      "path": "reports/reviews/academy-identity-session-cookie-local-checkpoint-2026-08-09.md",
+      "sha256": "2fd88cbab0f64d0a66550bce6927e454324827c2ad16a79088405e1be3b451f1",
+      "bytes": 2421
+    },
+    {
+      "path": "reports/reviews/academy-player-attempt-storage-scope-local-checkpoint-2026-08-09.md",
+      "sha256": "07cc24726f33d6fac91ca964762ab0f93fcc1ab97ce865d7b3317263f4817f14",
+      "bytes": 6238
+    },
+    {
+      "path": "reports/reviews/academy-practice-simulation-client-response-validation-local-checkpoint-2026-08-09.md",
+      "sha256": "67ab6d551ced579db9eae162d2749434690ab732da8ba6268132673549cd335a",
+      "bytes": 12620
+    },
+    {
+      "path": "reports/reviews/academy-production-dependency-audit-local-checkpoint-2026-08-09.md",
+      "sha256": "ed2ecb2d32bd586500fb17b20f91e8d62f888af6e0af0825b03816ae129cf738",
+      "bytes": 6155
+    },
+    {
+      "path": "reports/reviews/academy-progress-client-response-validation-local-checkpoint-2026-08-09.md",
+      "sha256": "05b4001e592e620a6381c8f31f92dc21f64b420cbd8e61646d79e15e9bb9e4be",
+      "bytes": 5008
+    },
+    {
+      "path": "reports/reviews/academy-public-learner-feature-wave-integration-checkpoint-20260812.md",
+      "sha256": "6e4ca8270fbb02e33456b68f5a90eca8cf4b840c7d79425a0b2385b40f7bcb28",
+      "bytes": 9903
+    },
+    {
+      "path": "reports/reviews/academy-retention-backlog-fail-closed-local-checkpoint-2026-08-09.md",
+      "sha256": "747758e13e902b48ad00296106fc2e74c4e5cbe5785d549905a701bd783669e6",
+      "bytes": 2902
+    },
+    {
+      "path": "reports/reviews/academy-security-headers-local-checkpoint-2026-08-09.md",
+      "sha256": "b839297c6d7ecfefd1cf3fb840bba0b031398f6b401f9fe657432adcb9c70de1",
+      "bytes": 3746
+    },
+    {
+      "path": "reports/reviews/academy-unsubscribe-client-response-validation-local-checkpoint-2026-08-09.md",
+      "sha256": "4402ae7dd2e0dcf508146334ccbe00d54bd957e60711769b2b98c7e472fac2c3",
+      "bytes": 8670
+    },
+    {
+      "path": "reports/reviews/academy-waitlist-client-response-validation-local-checkpoint-2026-08-09.md",
+      "sha256": "19b805c569361649e5cb37b7adbee0dc18ea41e2ed63ae218aede9c763c8f7c1",
+      "bytes": 9660
+    },
+    {
+      "path": "reports/reviews/learner-course-skill-map-checkpoint-2026-08-09.md",
+      "sha256": "9bbf0cdaaf72d84cb4591830398e1efae49ac728c39f099a5c65ef7f220bb24a",
+      "bytes": 3675
+    },
+    {
+      "path": "reports/reviews/learner-dashboard-data-boundary-checkpoint-2026-08-09.md",
+      "sha256": "d0f98910365cc633ed4d0a66c3f2ea31ff69f4fe97241e4505e47dae45b4a3a3",
+      "bytes": 2966
+    },
+    {
+      "path": "reports/reviews/public-course-canonical-locale-checkpoint-2026-08-09.md",
+      "sha256": "f3c6662036ee2e7f162ac50ac1a3e3720a4fab6bf9ca708cc03b8d02b10c2411",
+      "bytes": 3475
+    },
+    {
+      "path": "reports/reviews/public-course-catalog-locale-checkpoint-2026-08-09.md",
+      "sha256": "c99b03cec6490444e33e38936145fac30ab51680cdc025f0f497d6d28ef59099",
+      "bytes": 3963
+    },
+    {
+      "path": "reports/reviews/public-course-locale-continuity-checkpoint-2026-08-09.md",
+      "sha256": "6541d2c20632aee6eea2b2b07087eafacde5a46d6887037645568719d801f4bf",
+      "bytes": 3584
+    },
+    {
+      "path": "reports/reviews/public-course-share-image-checkpoint-2026-08-09.md",
+      "sha256": "2e0897806a141d84e8cc3e4f31800d2532226211cfb1f7bba903293402d980f6",
+      "bytes": 4291
+    },
+    {
+      "path": "reports/reviews/public-course-syllabus-checkpoint-2026-08-09.md",
+      "sha256": "0776f564271b19146e7ccb4592ab745ad438d1ca3dafcc6cc3660cd343bb3602",
+      "bytes": 2558
+    }
+  ]
+}

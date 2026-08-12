@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState, type RefObject } from 'react'
 import { trapDialogFocus } from '@/components/course/dialog-focus'
+import type { Locale } from '@/lib/content/course-types'
+import { learnerCourseUi } from '@/lib/i18n/learner-course'
 import type { CourseProgressRecord } from '@/lib/course/progress'
 import { reconcileCourseReset, resetCourseProgress, type ResetProgressResult } from '@/lib/course/progress-client'
 
@@ -13,13 +15,16 @@ export function ResetCourseProgress({
   onRecord,
   onInvalidated,
   returnFocusRef,
+  locale,
 }: {
   slug: string
   canReset: boolean
   onRecord: (record: CourseProgressRecord) => void
   onInvalidated: (reason: 'access-lost' | 'reset-completed-unavailable') => void
   returnFocusRef: RefObject<HTMLElement | null>
+  locale: Locale
 }) {
+  const text = learnerCourseUi(locale).reset
   const dialogRef = useRef<HTMLDialogElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const cancelRef = useRef<HTMLButtonElement>(null)
@@ -96,7 +101,7 @@ export function ResetCourseProgress({
           data-testid="reset-course"
           className="rounded-control border border-cs-border bg-cs-surface px-6 py-3 text-sm text-cs-muted transition-colors duration-200 hover:border-cs-amber hover:text-cs-amber"
         >
-          Reset my progress
+          {text.trigger}
         </button>
       )}
 
@@ -112,16 +117,13 @@ export function ResetCourseProgress({
       >
         <div className="p-6 sm:p-7">
           <h2 id="reset-course-title" className="font-display text-xl font-semibold">
-            {phase === 'success' ? 'Progress reset' : 'Reset course progress?'}
+            {phase === 'success' ? text.successTitle : text.title}
           </h2>
 
           {phase === 'confirm' && (
             <div className="mt-3 space-y-3 text-sm leading-relaxed text-cs-body">
-              <p>
-                This permanently removes your lesson progress, checkpoint results, and certificate evidence for this
-                course.
-              </p>
-              <p>Checkpoint attempts already issued and retry limits are not restored.</p>
+              <p>{text.warning}</p>
+              <p>{text.attempts}</p>
             </div>
           )}
           {phase === 'submitting' && (
@@ -133,7 +135,7 @@ export function ResetCourseProgress({
               role="status"
               data-testid="reset-result"
             >
-              Resetting your course progress…
+              {text.submitting}
             </p>
           )}
           {phase === 'success' && (
@@ -144,7 +146,7 @@ export function ResetCourseProgress({
               role="status"
               data-testid="reset-result"
             >
-              Progress reset. This course is ready to start again.
+              {text.success}
             </p>
           )}
           {phase === 'unknown' && (
@@ -155,8 +157,7 @@ export function ResetCourseProgress({
               role="alert"
               data-testid="reset-result"
             >
-              We could not confirm whether the reset completed. Check the reset status again, or close and review your
-              current progress before deciding what to do next.
+              {text.unknown}
             </p>
           )}
           {phase === 'access-lost' && (
@@ -167,7 +168,7 @@ export function ResetCourseProgress({
               role="alert"
               data-testid="reset-result"
             >
-              Your Academy access changed before the reset. Your progress was not reset.
+              {text.accessLost}
             </p>
           )}
           {phase === 'completed-unavailable' && (
@@ -178,8 +179,7 @@ export function ResetCourseProgress({
               role="alert"
               data-testid="reset-result"
             >
-              The reset completed, but we could not load your current learning record. Close this message and try
-              loading the course again.
+              {text.completedUnavailable}
             </p>
           )}
 
@@ -193,7 +193,7 @@ export function ResetCourseProgress({
                   data-testid="reset-cancel"
                   className="min-h-11 rounded-control border border-cs-border bg-cs-surface px-5 py-2.5 text-sm hover:border-cs-accent"
                 >
-                  Keep my progress
+                  {text.keep}
                 </button>
                 <button
                   type="button"
@@ -201,7 +201,7 @@ export function ResetCourseProgress({
                   data-testid="reset-confirm"
                   className="min-h-11 rounded-control border border-cs-amber bg-cs-amber-dim px-5 py-2.5 text-sm font-semibold text-cs-amber"
                 >
-                  Reset course progress
+                  {text.confirm}
                 </button>
               </>
             )}
@@ -211,7 +211,7 @@ export function ResetCourseProgress({
                 disabled
                 className="min-h-11 rounded-control border border-cs-border px-5 py-2.5 text-sm opacity-50"
               >
-                Resetting…
+                {text.submittingButton}
               </button>
             )}
             {phase === 'unknown' && (
@@ -222,7 +222,7 @@ export function ResetCourseProgress({
                   data-testid="reset-close"
                   className="min-h-11 rounded-control border border-cs-border px-5 py-2.5 text-sm"
                 >
-                  Close
+                  {text.close}
                 </button>
                 <button
                   type="button"
@@ -230,7 +230,7 @@ export function ResetCourseProgress({
                   data-testid="reset-check"
                   className="min-h-11 rounded-control bg-cs-accent-fill px-5 py-2.5 text-sm font-semibold text-cs-on-accent"
                 >
-                  Check reset status
+                  {text.check}
                 </button>
               </>
             )}
@@ -241,7 +241,7 @@ export function ResetCourseProgress({
                 data-testid="reset-done"
                 className="min-h-11 rounded-control bg-cs-accent-fill px-5 py-2.5 text-sm font-semibold text-cs-on-accent"
               >
-                Done
+                {text.done}
               </button>
             )}
             {phase === 'access-lost' && (
@@ -251,7 +251,7 @@ export function ResetCourseProgress({
                 data-testid="reset-done"
                 className="min-h-11 rounded-control bg-cs-accent-fill px-5 py-2.5 text-sm font-semibold text-cs-on-accent"
               >
-                Done
+                {text.done}
               </button>
             )}
             {phase === 'completed-unavailable' && (
@@ -261,7 +261,7 @@ export function ResetCourseProgress({
                 data-testid="reset-done"
                 className="min-h-11 rounded-control bg-cs-accent-fill px-5 py-2.5 text-sm font-semibold text-cs-on-accent"
               >
-                Close
+                {text.close}
               </button>
             )}
           </div>

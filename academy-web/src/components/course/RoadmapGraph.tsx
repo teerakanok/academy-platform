@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import type { CourseStructure } from '@/lib/content/course-types'
+import type { CourseRoadmapStructure, Locale } from '@/lib/content/course-types'
+import { learnerCourseUi } from '@/lib/i18n/learner-course'
 import {
   layoutRoadmap,
   NODE_BOTTOM_OFFSET,
@@ -31,34 +32,28 @@ const LockGlyph = () => (
   </svg>
 )
 
-const STATUS_META: Record<NodeStatus, { label: string; icon: React.ReactNode; marker: string }> = {
+const STATUS_META: Record<NodeStatus, { icon: React.ReactNode; marker: string }> = {
   completed: {
-    label: 'Done',
     icon: '✓',
     marker: 'bg-cs-accent-fill text-cs-on-accent border-cs-accent-fill',
   },
   'tested-out': {
-    label: 'Tested out',
     icon: '★',
     marker: 'bg-cs-surface text-cs-accent border-cs-accent ring-4 ring-cs-accent-dim',
   },
   skipped: {
-    label: 'Skipped',
     icon: '↷',
     marker: 'bg-cs-surface-2 text-cs-muted border-cs-border-2 border-dashed',
   },
   'in-progress': {
-    label: 'In progress',
     icon: '◐',
     marker: 'bg-cs-accent-dim text-cs-accent border-cs-accent',
   },
   available: {
-    label: 'Ready',
     icon: '›',
     marker: 'bg-cs-surface text-cs-text border-cs-border-2',
   },
   locked: {
-    label: 'Locked',
     icon: <LockGlyph />,
     marker: 'bg-cs-surface-2 text-cs-faint border-cs-border',
   },
@@ -71,27 +66,32 @@ export function RoadmapGraph({
   state,
   nodeTitles,
   courseSlug,
+  locale,
 }: {
-  structure: CourseStructure
+  structure: CourseRoadmapStructure
   state: LearnerCourseState
   nodeTitles: Record<string, string>
   courseSlug: string
+  locale: Locale
 }) {
+  const text = learnerCourseUi(locale).roadmap
   const layout = layoutRoadmap(structure, state)
   const satisfied = new Set([...state.completed, ...state.testedOut, ...state.skipped])
   const hasHistoricalTestOut = state.testedOut.length > 0
 
   return (
     <figure className="m-0">
-      <div className="overflow-x-auto">
+      <div className="overflow-hidden">
         <div
-          className="relative mx-auto"
-          style={{ width: layout.width, height: layout.height }}
+          className="relative mx-auto w-full"
+          style={{ maxWidth: layout.width, height: layout.height }}
           data-testid="roadmap-graph"
         >
           <svg
-            width={layout.width}
+            width="100%"
             height={layout.height}
+            viewBox={`0 0 ${layout.width} ${layout.height}`}
+            preserveAspectRatio="none"
             className="pointer-events-none absolute inset-0"
             aria-hidden="true"
           >
@@ -113,6 +113,7 @@ export function RoadmapGraph({
                   strokeOpacity={traversed ? 0.75 : 0.5}
                   strokeDasharray={traversed ? undefined : '4 5'}
                   strokeLinecap="round"
+                  vectorEffect="non-scaling-stroke"
                 />
               )
             })}
@@ -120,6 +121,7 @@ export function RoadmapGraph({
 
           {layout.nodes.map((item) => {
             const meta = STATUS_META[item.status]
+            const statusLabel = text.status[item.status]
             const isCapstone = item.node.kind === 'capstone'
             const title = nodeTitles[item.node.id] ?? item.node.id
             const locked = item.status === 'locked'
@@ -133,17 +135,17 @@ export function RoadmapGraph({
                 >
                   {meta.icon}
                 </span>
-                <span className="mt-2.5 block max-w-[180px] text-center text-[13px] font-medium leading-snug text-cs-text">
+                <span className="mt-2.5 block max-w-[132px] text-center text-xs font-medium leading-snug text-cs-text sm:max-w-[180px] sm:text-[13px]">
                   {title}
                 </span>
                 <span className="mt-0.5 block text-center font-mono text-[10px] uppercase tracking-wide text-cs-muted">
-                  {meta.label}
-                  {isCapstone ? ' · required' : ''}
+                  {statusLabel}
+                  {isCapstone ? ` · ${text.required}` : ''}
                 </span>
               </>
             )
 
-            const accessibleLabel = `${title} — ${meta.label}${isCapstone ? ', required checkpoint' : ''}, ${item.node.estimatedMinutes} minutes`
+            const accessibleLabel = text.accessibleLabel(title, statusLabel, isCapstone, item.node.estimatedMinutes)
             const inner = 'group flex flex-col items-center rise-in'
             const animation = { animationDelay: `${item.rank * 60}ms` } as const
 
@@ -154,7 +156,7 @@ export function RoadmapGraph({
               <div
                 key={item.node.id}
                 className="absolute -translate-x-1/2 -translate-y-1/2"
-                style={{ left: item.x, top: item.y }}
+                style={{ left: `${(item.x / layout.width) * 100}%`, top: item.y }}
                 data-testid={`node-${item.node.id}`}
                 data-status={item.status}
               >
@@ -162,14 +164,14 @@ export function RoadmapGraph({
                   <div
                     className={`${inner} cursor-not-allowed opacity-60`}
                     style={animation}
-                    title={`Locked until you clear: ${item.node.prerequisites.map((p) => nodeTitles[p] ?? p).join(', ')}`}
+                    title={text.lockedUntil(item.node.prerequisites.map((p) => nodeTitles[p] ?? p).join(', '))}
                     aria-label={accessibleLabel}
                   >
                     {marker}
                   </div>
                 ) : (
                   <Link
-                    href={`/courses/${courseSlug}/lessons/${item.node.id}`}
+                    href={`/courses/${courseSlug}/lessons/${item.node.id}?lang=${locale}`}
                     className={`${inner} rounded-xl focus-visible:outline-2`}
                     style={animation}
                     aria-label={accessibleLabel}
@@ -185,25 +187,25 @@ export function RoadmapGraph({
 
       <figcaption className="mt-6">
         <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-cs-muted">
-          <LegendItem swatch="bg-cs-accent-fill text-cs-on-accent" label="Done, you worked through it" icon="✓" />
+          <LegendItem swatch="bg-cs-accent-fill text-cs-on-accent" label={text.doneLegend} icon="✓" />
           {hasHistoricalTestOut && (
             <LegendItem
               swatch="bg-cs-surface border-2 border-cs-accent text-cs-accent"
-              label="Tested out before this route was paused"
+              label={text.testedOutLegend}
               icon="★"
             />
           )}
           {/* ⚠️ เดิมเขียนว่า "still unproven" ซึ่งสื่อว่าบทธรรมดาเป็น proven ได้ —
               ตั้งแต่ W0-3 คำนั้นสงวนให้ด่านวัดผลเท่านั้น (RIL รอบ 3 จับจุดนี้) */}
-          <LegendItem swatch="bg-cs-surface-2 border border-dashed border-cs-border-2" label="Skipped, still open" icon="↷" />
-          <LegendItem swatch="bg-cs-surface border border-cs-border-2" label="Ready to start" icon="›" />
+          <LegendItem swatch="bg-cs-surface-2 border border-dashed border-cs-border-2" label={text.skippedLegend} icon="↷" />
+          <LegendItem swatch="bg-cs-surface border border-cs-border-2" label={text.readyLegend} icon="›" />
           <li className="flex items-center gap-1.5">
             <span
               className="h-3.5 w-3.5 border border-cs-border-2 bg-cs-surface"
               style={{ clipPath: HEX_CLIP }}
               aria-hidden="true"
             />
-            <span>Hexagon = required checkpoint, cannot be skipped</span>
+            <span>{text.requiredLegend}</span>
           </li>
         </ul>
       </figcaption>

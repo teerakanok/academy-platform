@@ -1,8 +1,14 @@
+import {
+  cancelResponseBody,
+  readStrictJsonResponse,
+} from '../../src/lib/http/strict-json-response'
+
 export const DEFAULT_BATCH = 5000
 export const MAX_ROUNDS = 20
-export const REQUEST_TIMEOUT_MS = 10_000
+export const REQUEST_TIMEOUT_MS = 5_000
 export const TOKEN_TTL_SECONDS = 60
 const MINIMUM_SECRET_BYTES = 32
+const MAX_DELETION_COUNT_RESPONSE_BYTES = 64
 const encoder = new TextEncoder()
 
 export interface RetentionEnv {
@@ -68,11 +74,36 @@ export function retentionApiBase(raw: string): URL {
   return url
 }
 
-async function fetchWithTimeout(fetcher: Fetcher, input: RequestInfo | URL, init: RequestInit, timeoutMs: number): Promise<Response> {
+function boundedTimeoutMs(value: number): number {
+  if (!Number.isSafeInteger(value) || value <= 0) {
+    throw new Error('request timeout is invalid')
+  }
+  return Math.min(value, REQUEST_TIMEOUT_MS)
+}
+
+async function fetchDeletionCount(
+  fetcher: Fetcher,
+  input: RequestInfo | URL,
+  init: RequestInit,
+  requestedTimeoutMs: number,
+): Promise<{ response: Response; value: unknown | null }> {
+  const timeoutMs = boundedTimeoutMs(requestedTimeoutMs)
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), timeoutMs)
   try {
-    return await fetcher(input, { ...init, signal: controller.signal })
+    const response = await fetcher(input, { ...init, signal: controller.signal })
+    if (!response.ok) {
+      cancelResponseBody(response)
+      return { response, value: null }
+    }
+    const parsed = await readStrictJsonResponse(response, {
+      maxBytes: MAX_DELETION_COUNT_RESPONSE_BYTES,
+      maxDepth: 0,
+      signal: controller.signal,
+      timeoutMs,
+    })
+    if (controller.signal.aborted) throw new Error('request timed out')
+    return { response, value: parsed.ok ? parsed.value : null }
   } catch (error) {
     if (controller.signal.aborted) throw new Error('request timed out')
     throw error
@@ -98,8 +129,9 @@ export async function runPurgeJob(
   for (let round = 1; round <= MAX_ROUNDS; round++) {
     const token = await issueRetentionToken(env.ACADEMY_RETENTION_API_JWT_SECRET, now())
     let response: Response
+    let responseValue: unknown | null
     try {
-      response = await fetchWithTimeout(fetcher, new URL(`/rpc/${job.rpc}`, base), {
+      const result = await fetchDeletionCount(fetcher, new URL(`/rpc/${job.rpc}`, base), {
         method: 'POST',
         headers: {
           authorization: `Bearer ${token}`,
@@ -107,13 +139,15 @@ export async function runPurgeJob(
         },
         body: '{}',
       }, timeoutMs)
+      response = result.response
+      responseValue = result.value
     } catch (error) {
       throw new Error(`[retention/${job.name}] ${error instanceof Error ? error.message : 'request failed'}`)
     }
     if (!response.ok) {
       throw new Error(`[retention/${job.name}] API returned ${response.status} after ${deleted} deletions`)
     }
-    const removed = await response.json()
+    const removed = responseValue
     if (typeof removed !== 'number' || !Number.isSafeInteger(removed) || removed < 0) {
       throw new Error(`[retention/${job.name}] API returned an invalid deletion count`)
     }
@@ -122,7 +156,7 @@ export async function runPurgeJob(
   }
 
   dependencies.logger?.warn(JSON.stringify({ event: 'retention.backlog_remaining', job: job.name, deleted, rounds: MAX_ROUNDS }))
-  return { rounds: MAX_ROUNDS, deleted }
+  throw new Error(`[retention/${job.name}] backlog remains after ${MAX_ROUNDS} rounds and ${deleted} deletions`)
 }
 
 export async function runRetention(

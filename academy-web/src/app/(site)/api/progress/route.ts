@@ -4,6 +4,7 @@ import { currentUser } from '@/lib/auth/session'
 import { identityControlLocalFixtureAllowedForRequest } from '@/lib/identity/local-fixture'
 import { readLocalAcademySession } from '@/lib/identity/local-runtime'
 import { getAllCourses, getCourseStructure } from '@/lib/content/course-source'
+import { toLearnerDashboardCourse } from '@/lib/content/public-course'
 import { getLessonAnswerKey, mcqItems, sameAnswerSet, simulationItems } from '@/lib/content/answer-key'
 import {
   isAssessedNode,
@@ -487,32 +488,28 @@ function staleProgressResponse() {
   )
 }
 
+/** GET ส่ง learning record และ catalog หลังยืนยันสิทธิ์ จึงห้ามให้ shared cache เก็บไว้. */
+function learnerProgressResponse(body: unknown, status = 200) {
+  return NextResponse.json(body, { status, headers: { 'Cache-Control': 'private, no-store' } })
+}
+
 export async function GET(request: Request) {
   if (identityControlLocalFixtureAllowedForRequest(request)) {
     const session = readLocalAcademySession(request)
-    const responseOptions = { headers: { 'Cache-Control': 'private, no-store' } }
-    if (!session) {
-      return NextResponse.json({ ok: false, error: 'ต้องเข้าสู่ระบบก่อน' }, { status: 401, ...responseOptions })
-    }
+    if (!session) return learnerProgressResponse({ ok: false, error: 'ต้องเข้าสู่ระบบก่อน' }, 401)
     if (session.activation.status !== 'active') {
-      return NextResponse.json(
-        { ok: false, error: 'บัญชีนี้ยังใช้ Academy ไม่ได้' },
-        { status: 403, ...responseOptions },
-      )
+      return learnerProgressResponse({ ok: false, error: 'บัญชีนี้ยังใช้ Academy ไม่ได้' }, 403)
     }
-    return NextResponse.json(
-      { ok: true, accessibleCourseSlugs: [], courses: [], records: {} },
-      responseOptions,
-    )
+    return learnerProgressResponse({ ok: true, accessibleCourseSlugs: [], courses: [], records: {} })
   }
   const user = await currentUser()
-  if (!user) return NextResponse.json({ ok: false, error: 'ต้องเข้าสู่ระบบก่อน' }, { status: 401 })
+  if (!user) return learnerProgressResponse({ ok: false, error: 'ต้องเข้าสู่ระบบก่อน' }, 401)
 
   const serviceAccess = await getServiceAccess(user.account.id)
   if (!serviceAccess.allowed) {
-    return NextResponse.json(
+    return learnerProgressResponse(
       { ok: false, error: serviceAccess.reason === 'unavailable' ? 'ตรวจสิทธิ์ไม่สำเร็จ' : 'บัญชีนี้ยังใช้ Academy ไม่ได้' },
-      { status: deniedAccessStatus(serviceAccess) },
+      deniedAccessStatus(serviceAccess),
     )
   }
 
@@ -523,42 +520,47 @@ export async function GET(request: Request) {
     if (slug) {
       const structure = getCourseStructure(slug)
       if (!structure) {
-        return NextResponse.json({ ok: false, error: 'ไม่พบคอร์สนี้' }, { status: 404 })
+        return learnerProgressResponse({ ok: false, error: 'ไม่พบคอร์สนี้' }, 404)
       }
       const access = await getCourseAccess(user.account.id, slug)
       if (!access.allowed) {
-        return NextResponse.json(
+        return learnerProgressResponse(
           { ok: false, error: access.reason === 'unavailable' ? 'ตรวจสิทธิ์ไม่สำเร็จ' : 'ไม่มีสิทธิ์เข้าถึงคอร์สนี้' },
-          { status: deniedAccessStatus(access) },
+          deniedAccessStatus(access),
         )
       }
       const record = await loadProgress(user.account.id, slug)
-      return NextResponse.json({ ok: true, record: toPublicProgress(record, structure) })
+      return learnerProgressResponse({ ok: true, record: toPublicProgress(record, structure) })
     }
-    const records = await loadAllProgress(user.account.id)
     const accessible = await Promise.all(
-      getAllCourses().map(async ({ structure }) => {
-        const courseSlug = structure.slug
+      getAllCourses().map(async (course) => {
+        const courseSlug = course.structure.slug
         const access = await getCourseAccess(user.account.id, courseSlug)
         if (!access.allowed && access.reason === 'unavailable') throw new Error('access store unavailable')
-        return access.allowed ? courseSlug : null
+        return access.allowed ? course : null
       }),
     )
-    const accessibleCourseSlugs = accessible.filter((slug): slug is string => slug !== null)
-    return NextResponse.json({
+    const accessibleCourses = accessible.filter((course): course is NonNullable<typeof course> => course !== null)
+    const accessibleCourseSlugs = accessibleCourses.map((course) => course.structure.slug)
+    const records = accessibleCourseSlugs.length > 0
+      ? await loadAllProgress(user.account.id, accessibleCourseSlugs)
+      : {}
+    return learnerProgressResponse({
       ok: true,
       accessibleCourseSlugs,
+      // DTO ถูกสร้างหลัง entitlement gate เท่านั้น; dashboard ไม่รับ registry ทั้งก้อนผ่าน Flight.
+      courses: accessibleCourses.map(toLearnerDashboardCourse),
       records: Object.fromEntries(
-        accessibleCourseSlugs
-          .filter((courseSlug) => records[courseSlug])
-          .map((courseSlug) => [
-            courseSlug,
-            toPublicProgress(records[courseSlug], getCourseStructure(courseSlug)),
+        accessibleCourses
+          .filter((course) => records[course.structure.slug])
+          .map((course) => [
+            course.structure.slug,
+            toPublicProgress(records[course.structure.slug], course.structure),
           ]),
       ),
     })
   } catch (err) {
     console.error('[api/progress] อ่านไม่สำเร็จ:', err)
-    return NextResponse.json({ ok: false, error: 'อ่านความคืบหน้าไม่สำเร็จ' }, { status: 503 })
+    return learnerProgressResponse({ ok: false, error: 'อ่านความคืบหน้าไม่สำเร็จ' }, 503)
   }
 }

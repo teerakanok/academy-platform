@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { submitWaitlistRequest } from '@/lib/waitlist-client'
 
 type Status = 'idle' | 'submitting' | 'success' | 'error'
 
@@ -22,24 +23,23 @@ export function WaitlistForm({ consentSummary }: { consentSummary: string }) {
     setErrorMessage('')
     try {
       const params = new URLSearchParams(window.location.search)
-      const response = await fetch('/api/leads', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          consent,
-          utmSource: params.get('utm_source') ?? undefined,
-          utmMedium: params.get('utm_medium') ?? undefined,
-          utmCampaign: params.get('utm_campaign') ?? undefined,
-          referrer: document.referrer || undefined,
-        }),
+      const result = await submitWaitlistRequest({
+        email,
+        consent,
+        utmSource: params.get('utm_source') ?? undefined,
+        utmMedium: params.get('utm_medium') ?? undefined,
+        utmCampaign: params.get('utm_campaign') ?? undefined,
+        referrer: document.referrer || undefined,
       })
-      const data = (await response.json().catch(() => null)) as { ok?: boolean; error?: string } | null
-      if (response.ok && data?.ok) {
+      if (result.status === 'success') {
         setStatus('success')
       } else {
         setStatus('error')
-        setErrorMessage(data?.error ?? 'Could not save that. Please try again.')
+        setErrorMessage(
+          result.status === 'network-error'
+            ? 'Could not reach the server. Please try again.'
+            : 'Could not save that. Please try again.',
+        )
       }
     } catch {
       setStatus('error')

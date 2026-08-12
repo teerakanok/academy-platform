@@ -15,6 +15,7 @@ const structure: CourseStructure = {
   id: 'c',
   slug: 'c',
   version: '1.0.0',
+  publicAvailability: 'internal',
   defaultLocale: 'en',
   availableLocales: ['en'],
   level: 'beginner',
@@ -91,6 +92,22 @@ describe('บทถัดไปและสรุปความคืบหน�
   it('บทที่ค้างอยู่มาก่อนบทที่ยังไม่เริ่ม', () => {
     expect(nextNode(structure, EMPTY_STATE)?.id).toBe('a')
     expect(nextNode(structure, { ...EMPTY_STATE, completed: ['a'], inProgress: ['c'] })?.id).toBe('c')
+  })
+
+  it('เลือกบทที่เปิดล่าสุดเมื่อมีหลายบทค้างพร้อมกัน', () => {
+    const state = { ...EMPTY_STATE, completed: ['a'], inProgress: ['b', 'c'] }
+    expect(nextNode(structure, state, 'c')?.id).toBe('c')
+    expect(nextNode(structure, state)?.id).toBe('b')
+  })
+
+  it('ใช้ fallback เดิมเมื่อ preferred node ไม่ได้อยู่ในสถานะ in-progress', () => {
+    const state = { ...EMPTY_STATE, completed: ['a'], inProgress: ['b'] }
+    expect(nextNode(structure, state, 'a')?.id).toBe('b')
+    expect(nextNode(structure, state, 'c')?.id).toBe('b')
+    expect(nextNode(structure, state, 'gate')?.id).toBe('b')
+    expect(nextNode(structure, state, 'missing')?.id).toBe('b')
+    expect(nextNode(structure, { ...state, inProgress: ['c'], skipped: ['b'] }, 'b')?.id).toBe('c')
+    expect(nextNode(structure, { ...state, inProgress: ['c'], testedOut: ['b'] }, 'b')?.id).toBe('c')
   })
 
   it('เดินจบทั้งเส้นแล้วไม่มีบทถัดไป', () => {

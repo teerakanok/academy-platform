@@ -2,12 +2,17 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import type { CourseStructure } from '@/lib/content/course-types'
+import type { LearnerDashboardCourse } from '@/lib/content/course-types'
 import {
   emptyProgress,
   toLearnerState,
   type CourseProgressRecord,
 } from '@/lib/course/progress'
+import { projectProgressRecord } from '@/lib/course/progress-client'
+import {
+  cancelResponseBody,
+  readStrictJsonResponse,
+} from '@/lib/http/strict-json-response'
 import {
   EMPTY_STATE,
   nextNode,
@@ -23,6 +28,7 @@ import { RadarChart } from './RadarChart'
 // และไม่บอกอะไรเลย ส่วนจุดบอกได้ทันทีว่าคอร์สยาวแค่ไหนและเดินไปถึงไหน
 // คอร์สที่ยาวมากกลับไปใช้แถบ เพราะจุด 50 จุดอ่านไม่ออก
 const MAX_DOTS = 12
+const MAX_DASHBOARD_RESPONSE_BYTES = 256 * 1024
 
 function LessonProgress({
   structure,
@@ -101,21 +107,182 @@ function LessonProgress({
 }
 
 export interface DashboardCourse {
-  structure: CourseStructure
-  title: string
-  subtitle: string
-  level: string
-  nodeTitles: Record<string, string>
+  structure: LearnerDashboardCourse['structure']
+  title: LearnerDashboardCourse['title']
+  subtitle: LearnerDashboardCourse['subtitle']
+  level: LearnerDashboardCourse['level']
+  nodeTitles: LearnerDashboardCourse['nodeTitles']
+}
+
+type DashboardResponse = {
+  courses: DashboardCourse[]
+  accessibleCourseSlugs: string[]
+  records: Record<string, CourseProgressRecord>
+}
+
+function record(value: unknown): Record<string, unknown> | null {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) return null
+  const prototype = Object.getPrototypeOf(value)
+  return prototype === Object.prototype || prototype === null
+    ? value as Record<string, unknown>
+    : null
+}
+
+function hasExactKeys(value: Record<string, unknown>, expected: readonly string[]): boolean {
+  const keys = Object.keys(value)
+  return keys.length === expected.length
+    && expected.every((key) => Object.prototype.hasOwnProperty.call(value, key))
+}
+
+function stringRecord(value: unknown): Record<string, string> | null {
+  const values = record(value)
+  if (!values || !Object.values(values).every((item) => typeof item === 'string')) return null
+  return Object.fromEntries(Object.entries(values)) as Record<string, string>
+}
+
+function dashboardCourse(value: unknown): DashboardCourse | null {
+  const course = record(value)
+  const structure = record(course?.structure)
+  const nodes = structure?.nodes
+  const nodeTitles = stringRecord(course?.nodeTitles)
+  const globalSkillWeights = record(structure?.globalSkillWeights)
+  const structureKeys = structure && Object.prototype.hasOwnProperty.call(structure, 'coverMotif')
+    ? ['slug', 'defaultLocale', 'availableLocales', 'level', 'estimatedMinutes', 'coverMotif', 'globalSkillWeights', 'nodes']
+    : ['slug', 'defaultLocale', 'availableLocales', 'level', 'estimatedMinutes', 'globalSkillWeights', 'nodes']
+
+  if (
+    !course ||
+    !structure ||
+    !nodeTitles ||
+    !globalSkillWeights ||
+    !hasExactKeys(course, ['structure', 'title', 'subtitle', 'level', 'nodeTitles']) ||
+    !hasExactKeys(structure, structureKeys) ||
+    typeof course.title !== 'string' ||
+    typeof course.subtitle !== 'string' ||
+    !['beginner', 'intermediate', 'advanced'].includes(course.level as string) ||
+    typeof structure.slug !== 'string' ||
+    !['en', 'th'].includes(structure.defaultLocale as string) ||
+    !Array.isArray(structure.availableLocales) ||
+    !structure.availableLocales.every((locale) => locale === 'en' || locale === 'th') ||
+    new Set(structure.availableLocales).size !== structure.availableLocales.length ||
+    !structure.availableLocales.includes(structure.defaultLocale) ||
+    structure.level !== course.level ||
+    typeof structure.estimatedMinutes !== 'number' ||
+    !Number.isFinite(structure.estimatedMinutes) ||
+    structure.estimatedMinutes <= 0 ||
+    (structure.coverMotif !== undefined && typeof structure.coverMotif !== 'string') ||
+    !Object.values(globalSkillWeights).every((weight) => typeof weight === 'number' && Number.isFinite(weight)) ||
+    !Array.isArray(nodes)
+  ) return null
+
+  const roadmapNodes = nodes.map((node) => {
+    const item = record(node)
+    if (
+      !item ||
+      !hasExactKeys(item, ['id', 'kind', 'prerequisites', 'estimatedMinutes']) ||
+      typeof item.id !== 'string' ||
+      (item.kind !== 'lesson' && item.kind !== 'capstone') ||
+      !Array.isArray(item.prerequisites) ||
+      !item.prerequisites.every((prerequisite) => typeof prerequisite === 'string') ||
+      typeof item.estimatedMinutes !== 'number' ||
+      !Number.isFinite(item.estimatedMinutes) ||
+      item.estimatedMinutes <= 0
+    ) return null
+    return {
+      id: item.id,
+      kind: item.kind as DashboardCourse['structure']['nodes'][number]['kind'],
+      prerequisites: [...item.prerequisites],
+      estimatedMinutes: item.estimatedMinutes,
+    }
+  })
+  if (roadmapNodes.some((node) => node === null)) return null
+  const verifiedRoadmapNodes = roadmapNodes as NonNullable<typeof roadmapNodes[number]>[]
+  const nodeIds = verifiedRoadmapNodes.map((node) => node.id)
+  if (
+    new Set(nodeIds).size !== nodeIds.length
+    || Object.keys(nodeTitles).length !== nodeIds.length
+    || nodeIds.some((nodeId) => !Object.prototype.hasOwnProperty.call(nodeTitles, nodeId))
+  ) return null
+
+  return {
+    structure: {
+      slug: structure.slug,
+      defaultLocale: structure.defaultLocale as DashboardCourse['structure']['defaultLocale'],
+      availableLocales: [...structure.availableLocales] as DashboardCourse['structure']['availableLocales'],
+      level: course.level as DashboardCourse['level'],
+      estimatedMinutes: structure.estimatedMinutes,
+      ...(typeof structure.coverMotif === 'string' ? { coverMotif: structure.coverMotif as DashboardCourse['structure']['coverMotif'] } : {}),
+      globalSkillWeights: { ...globalSkillWeights } as Record<string, number>,
+      nodes: verifiedRoadmapNodes,
+    },
+    title: course.title,
+    subtitle: course.subtitle,
+    level: course.level as DashboardCourse['level'],
+    nodeTitles: { ...nodeTitles },
+  }
+}
+
+export function parseDashboardResponse(body: unknown): DashboardResponse | null {
+  const response = record(body)
+  if (
+    !response
+    || !hasExactKeys(response, ['ok', 'accessibleCourseSlugs', 'records', 'courses'])
+    || response.ok !== true
+    || !Array.isArray(response.courses)
+    || !Array.isArray(response.accessibleCourseSlugs)
+  ) return null
+  if (!response.accessibleCourseSlugs.every((slug) => typeof slug === 'string')) return null
+  const records = record(response.records)
+  const courses = response.courses.map(dashboardCourse)
+  if (!records || courses.some((course) => course === null)) return null
+
+  const allowed = new Set(response.accessibleCourseSlugs)
+  const courseSlugs = courses.map((course) => course!.structure.slug)
+  const uniqueCourses = new Set(courseSlugs)
+  if (
+    allowed.size !== response.accessibleCourseSlugs.length ||
+    uniqueCourses.size !== courseSlugs.length ||
+    uniqueCourses.size !== allowed.size ||
+    courseSlugs.some((slug) => !allowed.has(slug))
+  ) return null
+  const projectedRecords: [string, CourseProgressRecord][] = []
+  for (const [slug, progress] of Object.entries(records)) {
+    if (!allowed.has(slug)) return null
+    const projected = projectProgressRecord(progress, slug)
+    if (!projected) return null
+    projectedRecords.push([slug, projected])
+  }
+
+  return {
+    courses: courses as DashboardCourse[],
+    accessibleCourseSlugs: [...response.accessibleCourseSlugs],
+    records: Object.fromEntries(projectedRecords),
+  }
+}
+
+export async function readDashboardResponse(response: Response): Promise<DashboardResponse | null> {
+  if (!response.ok) {
+    cancelResponseBody(response)
+    return null
+  }
+  const parsed = await readStrictJsonResponse(response, {
+    maxBytes: MAX_DASHBOARD_RESPONSE_BYTES,
+    maxDepth: 16,
+  })
+  return parsed.ok ? parseDashboardResponse(parsed.value) : null
+}
+
+export function dashboardResumeNode(course: DashboardCourse, progress: CourseProgressRecord) {
+  return nextNode(course.structure, toLearnerState(progress), progress.lastNodeId)
 }
 
 export function CourseDashboard({
-  courses,
   showInternalSurfaces = false,
 }: {
-  courses: DashboardCourse[]
   /** คลังข้อสอบภายใน (`/player`) — ค่าตั้งต้นคือซ่อน · ตัวกันจริงอยู่ที่ middleware */
   showInternalSurfaces?: boolean
 }) {
+  const [courses, setCourses] = useState<DashboardCourse[]>([])
   const [progress, setProgress] = useState<Record<string, CourseProgressRecord>>({})
   const [accessState, setAccessState] = useState<'loading' | 'ready' | 'signed-out' | 'denied' | 'unavailable'>('loading')
   const [accessibleSlugs, setAccessibleSlugs] = useState<string[]>([])
@@ -127,42 +294,46 @@ export function CourseDashboard({
     setAccessState('loading')
     fetch('/api/progress', { cache: 'no-store' })
       .then(async (response) => {
-        const body = (await response.json().catch(() => ({}))) as {
-          ok?: boolean
-          records?: Record<string, CourseProgressRecord>
-          accessibleCourseSlugs?: string[]
-        }
-        if (!response.ok || !body.ok) {
+        if (!response.ok) {
+          cancelResponseBody(response)
           if (response.status === 401) return { state: 'signed-out' as const }
           if (response.status === 403) return { state: 'denied' as const }
           return { state: 'unavailable' as const }
         }
-        return { state: 'ready' as const, body }
+        const dashboard = await readDashboardResponse(response)
+        return dashboard ? { state: 'ready' as const, body: dashboard } : { state: 'unavailable' as const }
       })
       .then((result) => {
         if (!alive) return
         if (result.state !== 'ready') {
+          setCourses([])
           setProgress({})
           setAccessibleSlugs([])
           setAccessState(result.state)
           return
         }
-        const allowed = new Set(result.body.accessibleCourseSlugs ?? [])
+        const allowed = new Set(result.body.accessibleCourseSlugs)
+        const authorizedCourses = result.body.courses
         const next: Record<string, CourseProgressRecord> = {}
-        for (const course of courses.filter((candidate) => allowed.has(candidate.structure.slug))) {
-          next[course.structure.slug] = result.body.records?.[course.structure.slug] ?? emptyProgress(course.structure.slug)
+        for (const course of authorizedCourses.filter((candidate) => allowed.has(candidate.structure.slug))) {
+          next[course.structure.slug] = result.body.records[course.structure.slug] ?? emptyProgress(course.structure.slug)
         }
+        setCourses(authorizedCourses)
         setProgress(next)
         setAccessibleSlugs([...allowed])
         setAccessState('ready')
       })
       .catch(() => {
-        if (alive) setAccessState('unavailable')
+        if (!alive) return
+        setCourses([])
+        setProgress({})
+        setAccessibleSlugs([])
+        setAccessState('unavailable')
       })
     return () => {
       alive = false
     }
-  }, [courses, reload])
+  }, [reload])
 
   const accessibleCourses = courses.filter((course) => accessibleSlugs.includes(course.structure.slug))
 
@@ -177,7 +348,7 @@ export function CourseDashboard({
     .sort((a, b) => (b.record?.updatedAt ?? 0) - (a.record?.updatedAt ?? 0))
 
   const resume = started[0]
-  const resumeNode = resume ? nextNode(resume.course.structure, stateFor(resume.course.structure.slug)) : null
+  const resumeNode = resume?.record ? dashboardResumeNode(resume.course, resume.record) : null
 
   const globalData = globalSkillData(
     accessibleCourses.map((course) => ({ structure: course.structure, state: stateFor(course.structure.slug) })),
@@ -294,7 +465,7 @@ export function CourseDashboard({
               // แล้วดันทั้งหน้าให้เลื่อนซ้ายขวาได้ (gate มือถือจับได้)
               <li key={course.structure.slug} className="min-w-0">
                 <Link
-                  href={`/courses/${course.structure.slug}`}
+                  href={`/courses/${course.structure.slug}/learn?lang=${course.structure.defaultLocale}`}
                   className="card-feature card-interactive group block h-full overflow-hidden"
                   data-testid={`course-card-${course.structure.slug}`}
                 >
@@ -358,6 +529,9 @@ export function CourseDashboard({
           accent="accent-2"
           testId="global-radar"
         />
+        <p className="mt-4 max-w-xl text-sm leading-relaxed text-cs-body">
+          Shows lesson coverage across your enrolled courses, not proficiency.
+        </p>
       </section>}
 
       {accessState === 'ready' && showInternalSurfaces && (

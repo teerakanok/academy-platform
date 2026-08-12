@@ -97,7 +97,8 @@ function isBooleanMapMap(value: unknown): boolean {
   return true
 }
 
-function isValid(value: unknown): value is CourseProgressRecord {
+/** Guard สำหรับ response/storage ก่อนส่งต่อให้ UI ที่จะอ่าน progress arrays โดยตรง. */
+export function isCourseProgressRecord(value: unknown): value is CourseProgressRecord {
   if (!isPlainObject(value)) return false
   const r = value
   return (
@@ -130,7 +131,7 @@ export function loadCourseProgress(store: CourseProgressStore, slug: string): Lo
   if (raw === null) return { record: emptyProgress(slug), corruptReset: false }
   try {
     const parsed: unknown = JSON.parse(raw)
-    if (!isValid(parsed)) throw new Error('shape ไม่ตรง')
+    if (!isCourseProgressRecord(parsed)) throw new Error('shape ไม่ตรง')
     return { record: parsed, corruptReset: false }
   } catch {
     store.removeItem(key(slug))

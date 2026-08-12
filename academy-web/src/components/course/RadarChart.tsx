@@ -1,5 +1,6 @@
 'use client'
 
+import * as React from 'react'
 import type { SkillDatum } from '@/lib/course/skills'
 
 // Spider chart ของทักษะ — วาด SVG เอง ไม่พึ่ง library (คุม CSP ได้ + ภาพนิ่งพอให้เทส)
@@ -14,6 +15,23 @@ const CENTER = SIZE / 2
 const RADIUS = 92
 const RINGS = [25, 50, 75, 100]
 
+export type RadarCopy = {
+  notStarted: string
+  emptyMarker: string
+  numericValues: string
+  nothingYet: string
+  someNotStarted: (count: number) => string
+}
+
+const DEFAULT_COPY: RadarCopy = {
+  notStarted: 'not started',
+  emptyMarker: 'you start here',
+  numericValues: 'numeric values',
+  nothingYet: 'Nothing recorded yet. Finish a lesson and this fills in — it is a map of where to go next, not a score.',
+  someNotStarted: (count) =>
+    `${count} ${count === 1 ? 'area has' : 'areas have'} nothing recorded yet — that is a map of where to go next, not a score.`,
+}
+
 function pointOn(index: number, count: number, value: number): { x: number; y: number } {
   const angle = (Math.PI * 2 * index) / count - Math.PI / 2
   const r = (value / 100) * RADIUS
@@ -25,11 +43,13 @@ export function RadarChart({
   title,
   accent = 'accent',
   testId,
+  copy = DEFAULT_COPY,
 }: {
   data: SkillDatum[]
   title: string
   accent?: 'accent' | 'accent-2'
   testId?: string
+  copy?: RadarCopy
 }) {
   const count = data.length
   const stroke = accent === 'accent' ? 'rgb(var(--cs-accent))' : 'rgb(var(--cs-accent-2))'
@@ -49,9 +69,9 @@ export function RadarChart({
           viewBox={`0 0 ${SIZE} ${SIZE}`}
           // ยังไม่มีข้อมูล = ใส่ wash อ่อนๆ ไว้ ไม่ปล่อยให้เป็นโครงลวดขาวโล่ง
           // ซึ่งอ่านเหมือน "พัง" มากกว่า "ยังไม่เริ่ม"
-          className={`h-[268px] w-[268px] shrink-0 rounded-feature ${nothingYet ? 'cover-wash' : ''}`}
+          className={`aspect-square h-auto w-full max-w-[268px] shrink-0 rounded-feature ${nothingYet ? 'cover-wash' : ''}`}
           role="img"
-          aria-label={`${title}: ${data.map((d) => `${d.label} ${d.notStarted ? 'not started' : `${d.value} percent`}`).join(', ')}`}
+          aria-label={`${title}: ${data.map((d) => `${d.label} ${d.notStarted ? copy.notStarted : `${d.value}%`}`).join(', ')}`}
         >
           {RINGS.map((ring) => (
             <polygon
@@ -109,7 +129,7 @@ export function RadarChart({
                 className="fill-cs-accent"
                 style={{ fontSize: 11, fontWeight: 600 }}
               >
-                you start here
+                {copy.emptyMarker}
               </text>
             </>
           )}
@@ -117,7 +137,7 @@ export function RadarChart({
 
         <div className="w-full min-w-0">
           <table className="w-full text-sm">
-            <caption className="sr-only">{title} — numeric values</caption>
+            <caption className="sr-only">{title} — {copy.numericValues}</caption>
             <tbody>
               {data.map((d) => (
                 <tr key={d.id} className="border-b border-cs-border/70 last:border-0">
@@ -125,7 +145,7 @@ export function RadarChart({
                     {d.label}
                   </th>
                   <td className="py-1.5 text-right font-mono text-xs tabular-nums text-cs-muted">
-                    {d.notStarted ? 'not started' : `${d.value}%`}
+                    {d.notStarted ? copy.notStarted : `${d.value}%`}
                   </td>
                 </tr>
               ))}
@@ -133,9 +153,7 @@ export function RadarChart({
           </table>
           {untouched.length > 0 && (
             <p className="mt-3 text-xs leading-relaxed text-cs-muted">
-              {nothingYet
-                ? 'Nothing recorded yet. Finish a lesson and this fills in — it is a map of where to go next, not a score.'
-                : `${untouched.length} ${untouched.length === 1 ? 'area has' : 'areas have'} nothing recorded yet — that is a map of where to go next, not a score.`}
+              {nothingYet ? copy.nothingYet : copy.someNotStarted(untouched.length)}
             </p>
           )}
         </div>

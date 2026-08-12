@@ -1,4 +1,5 @@
 import 'server-only'
+import { ContentValidationError } from './loader'
 import { loadCourseCopy, loadCourseStructure, loadLesson } from './course-loader'
 import { COURSE_REGISTRY } from './registry.generated'
 import type { Course, CourseStructure, LessonContent, Locale } from './course-types'
@@ -38,12 +39,34 @@ export function listCourseSlugs(): string[] {
   return Object.keys(registry).sort()
 }
 
+/** รายชื่อคอร์สที่อนุญาตให้มีหน้า syllabus สาธารณะอย่างชัดเจน */
+export function listPublicCourseSlugs(): string[] {
+  return listCourseSlugs().filter((slug) => getCourseStructure(slug)?.publicAvailability === 'syllabus-preview')
+}
+
+/** ทุก locale ที่ประกาศต้องมี course copy เพื่อให้ public catalog สร้างลิงก์ที่เปิดได้จริง */
+export function assertDeclaredLocaleCopies(
+  slug: string,
+  declaredLocales: readonly Locale[],
+  copies: Partial<Record<Locale, unknown>>,
+): void {
+  for (const locale of declaredLocales) {
+    if (copies[locale] == null) {
+      throw new ContentValidationError(`${slug}/course.json`, `ประกาศ locale "${locale}" แต่ไม่มี locales/${locale}/course.json`)
+    }
+  }
+}
+
 export function getCourseStructure(slug: string): CourseStructure | null {
   const cached = structureCache.get(slug)
   if (cached) return cached
   const raw = registry[slug]?.__structure
   if (!raw) return null
   const structure = loadCourseStructure(`${slug}/course.json`, raw)
+  const copies = Object.fromEntries(
+    structure.availableLocales.map((locale) => [locale, localeBucket(slug, locale)?.__copy]),
+  ) as Partial<Record<Locale, unknown>>
+  assertDeclaredLocaleCopies(slug, structure.availableLocales, copies)
   structureCache.set(slug, structure)
   return structure
 }
@@ -68,6 +91,15 @@ export function getCourse(slug: string, requested?: Locale): Course | null {
   const copy = loadCourseCopy(`${slug}/locales/${locale}/course.json`, rawCopy, structure)
 
   return { structure, copy, locale, translatedNodeIds: translatedNodeIds(structure, locale) }
+}
+
+/**
+ * ข้อมูลสำหรับหน้าร้านเท่านั้น. การมีคอร์สใน registry ไม่ได้แปลว่าเผยต่อ public ได้;
+ * ทั้ง route, catalog, sitemap และภาพแชร์ต้องผ่าน gate เดียวกันนี้.
+ */
+export function getPublicCourse(slug: string, requested?: Locale): Course | null {
+  const course = getCourse(slug, requested)
+  return course?.structure.publicAvailability === 'syllabus-preview' ? course : null
 }
 
 export interface ResolvedLesson {
@@ -95,5 +127,11 @@ export function getLesson(slug: string, nodeId: string, requested?: Locale): Res
 export function getAllCourses(locale?: Locale): Course[] {
   return listCourseSlugs()
     .map((slug) => getCourse(slug, locale))
+    .filter((course): course is Course => course !== null)
+}
+
+export function getAllPublicCourses(locale?: Locale): Course[] {
+  return listPublicCourseSlugs()
+    .map((slug) => getPublicCourse(slug, locale))
     .filter((course): course is Course => course !== null)
 }

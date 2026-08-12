@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { getIdentityAdapter, resetIdentityAdapterForTest } from '@/lib/identity/registry'
+import {
+  IdentityAdapterUnavailableError,
+  getIdentityAdapter,
+  resetIdentityAdapterForTest,
+} from '@/lib/identity/registry'
 
 // adapter ปลอมหลุดขึ้น production = ทุกคนล็อกอินได้โดยไม่มีการยืนยันตัวตนใดๆ
 // จึงต้องพังตั้งแต่ตอนเรียก ไม่ใช่ปล่อยผ่านแล้วไปพบทีหลังว่าคนทั้งระบบเข้ามาทางนั้น
@@ -57,5 +61,11 @@ describe('การเลือก identity adapter', () => {
     process.env.IDENTITY_ADAPTER = 'something-else'
     resetIdentityAdapterForTest()
     expect(() => getIdentityAdapter()).toThrow()
+  })
+
+  it('real Identity Control startup fails closed without loading the policy mirror as runtime config', () => {
+    process.env.IDENTITY_ADAPTER = 'identity-control'
+    resetIdentityAdapterForTest()
+    expect(() => getIdentityAdapter()).toThrow(IdentityAdapterUnavailableError)
   })
 })

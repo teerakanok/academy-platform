@@ -1,4 +1,4 @@
-import type { CourseNode } from '@/lib/content/course-types'
+import type { CourseRoadmapNode } from '@/lib/content/course-types'
 
 // นโยบายว่า "อะไรนับเป็นการวัดผล" — ที่เดียวที่ตัดสิน ทั้ง API และ UI ใช้ร่วมกัน
 //
@@ -18,7 +18,7 @@ import type { CourseNode } from '@/lib/content/course-types'
  * วันนี้ยังไม่มี node ไหนมีคลังข้อแยกสำหรับโหมดวัดผล จึงปิดทั้งหมด — ค่านี้จะ
  * เปลี่ยนเป็นการอ่านจากนิยามคอร์สเมื่อคลังข้อของ W-content เข้ามา
  */
-export function isTestOutAvailable(_node: CourseNode): boolean {
+export function isTestOutAvailable(_node: CourseRoadmapNode): boolean {
   void _node
   return false
 }
@@ -61,7 +61,7 @@ export function passesLearnMode(correctCount: number, total: number): boolean {
  * ไม่กี่รอบก็ผ่านโดยไม่ต้องรู้เนื้อหา · **นี่ไม่ใช่บั๊ก มันคือธรรมชาติของโหมดสอน**
  * จะปิดก็ต้องทิ้ง feedback ที่เป็นหัวใจของการเรียนไป
  */
-export function isProofBearing(node: CourseNode): boolean {
+export function isProofBearing(node: CourseRoadmapNode): boolean {
   return node.kind === 'capstone'
 }
 
@@ -74,7 +74,7 @@ export function isProofBearing(node: CourseNode): boolean {
  * แบบ Mastermind ได้ครบใน 3 attempt (RIL cross-model รอบ W1 พิสูจน์)
  * **ปิดรูที่จุดหนึ่งแล้วเปิดที่อีกจุดคือรูเดิม**
  */
-export function isAssessedNode(node: CourseNode): boolean {
+export function isAssessedNode(node: CourseRoadmapNode): boolean {
   return node.kind === 'capstone'
 }
 
@@ -89,6 +89,6 @@ export function isAssessedNode(node: CourseNode): boolean {
  * ผู้เรียนจะกดตรวจแล้วได้ 400 โดยไม่มีอะไรบนหน้าจอบอกว่าเกิดอะไรขึ้น — จึงอยู่ที่นี่
  * ที่เดียว ไม่ใช่เขียนเงื่อนไขซ้ำสองที่
  */
-export function requiresAttempt(node: CourseNode, hasSimulationTask: boolean): boolean {
+export function requiresAttempt(node: CourseRoadmapNode, hasSimulationTask: boolean): boolean {
   return isAssessedNode(node) || hasSimulationTask
 }

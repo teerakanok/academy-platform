@@ -1,4 +1,4 @@
-import type { CourseStructure } from '@/lib/content/course-types'
+import type { CourseStructure, LearnerDashboardCourseStructure } from '@/lib/content/course-types'
 import type { LearnerCourseState } from './roadmap'
 
 // คำนวณข้อมูลสำหรับ spider chart
@@ -62,7 +62,7 @@ export const GLOBAL_DOMAINS: GlobalDomain[] = [
 ]
 
 export interface CourseContribution {
-  structure: CourseStructure
+  structure: LearnerDashboardCourseStructure
   state: LearnerCourseState
 }
 

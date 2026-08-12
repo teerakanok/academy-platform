@@ -2,6 +2,7 @@
   "id": "basic-os-linux",
   "slug": "basic-os-linux",
   "version": "1.0.0",
+  "publicAvailability": "syllabus-preview",
   "defaultLocale": "en",
   "availableLocales": [
     "en",
