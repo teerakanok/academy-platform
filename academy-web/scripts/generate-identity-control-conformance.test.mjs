@@ -120,6 +120,14 @@ const expectedEvidenceDigests = new Map([
     'reports/reviews/academy-identity-profile-activation-store-freeze-20260811.json',
     '735bbb10654bfd7994c3b982c766341bbfda66e3def1f7dfab57b1a458159f45',
   ],
+  [
+    'reports/reviews/academy-identity-lifecycle-principal-contract-local-checkpoint-2026-08-12.md',
+    'fc7818c63d840d638ea6a0fd6a749f484c0835ae8735c0f26d99d2f7c8175e80',
+  ],
+  [
+    'reports/reviews/academy-identity-lifecycle-principal-contract-freeze-20260812.json',
+    '2c9c228ad8a2e82a8c6f54ad5fe7327099f7c1b40b5a84134848291809deb7a0',
+  ],
 ])
 
 const expectedIdentityEvidenceDigests = new Map([
@@ -130,6 +138,14 @@ const expectedIdentityEvidenceDigests = new Map([
   [
     'packages/core/test/client-assertion.test.ts',
     '58b67a100de26a7d8ffcbce20e4c021c9b84b3a0c9c4351c4c702121981d8d61',
+  ],
+  [
+    'packages/core/src/signed-lifecycle-event.ts',
+    'be8782234bedf5b817d12d77c10e417b1ba435bf62ec47edfe2f6025cb05cf51',
+  ],
+  [
+    'packages/core/test/signed-lifecycle-event.test.ts',
+    'ce86309be5a715fa5f6ac1566142d67bb203479dc93e4053156c6dbabc6cb5ee',
   ],
 ])
 
@@ -143,20 +159,24 @@ function build() {
 }
 
 describe('Academy Identity Control conformance generator', () => {
-  test('declares the exact bytewise-sorted eight-file checkpoint content set', () => {
+  test('declares the exact bytewise-sorted twelve-file checkpoint content set', () => {
     assert.deepEqual(CHECKPOINT_FREEZE_DECLARATION, {
       schema: 'checkpoint-freeze-manifest.v1',
       role: 'identity-consumer-conformance-checkpoint',
-      path: 'reports/reviews/academy-identity-control-profile-activation-conformance-freeze-20260811.json',
+      path: 'reports/reviews/academy-identity-control-lifecycle-principal-conformance-freeze-20260812.json',
       contentPaths: [
         'academy-web/scripts/generate-identity-control-conformance.mjs',
         'academy-web/scripts/generate-identity-control-conformance.test.mjs',
+        'academy-web/src/lib/identity/consumer-policy.ts',
+        'academy-web/tests/unit/identity-consumer-policy.test.ts',
         'plans/active_plan.md',
         'plans/completed_log.md',
         'reports/conformance/identity-control/academy-identity-control-conformance.json',
         'reports/conformance/identity-control/academy-identity-local-evidence.json',
         'reports/conformance/identity-control/academy-identity-unproven-scenarios.json',
-        'reports/reviews/academy-identity-control-profile-activation-conformance-local-checkpoint-2026-08-11.md',
+        'reports/reviews/academy-identity-control-lifecycle-principal-conformance-local-checkpoint-2026-08-12.md',
+        'reports/reviews/academy-identity-lifecycle-principal-contract-freeze-20260812.json',
+        'reports/reviews/academy-identity-lifecycle-principal-contract-local-checkpoint-2026-08-12.md',
       ],
     })
   })
@@ -167,6 +187,8 @@ describe('Academy Identity Control conformance generator', () => {
 
     assert.equal(report.sourceRevision, ACADEMY_SOURCE_REVISION)
     assert.equal(report.identityControl.sourceRevision, IDENTITY_SOURCE_REVISION)
+    assert.equal(ACADEMY_SOURCE_REVISION, 'cbab363b6f7b7af25cb92673b5dfe35540cc8d23')
+    assert.equal(IDENTITY_SOURCE_REVISION, 'd7f517adb408ee2f50f3b5734c10dd14cbea6530')
     assert.equal(report.registryState.enabled, false)
     assert.equal(report.scope.releaseApproval, false)
     assert.equal(report.scope.runtimeWired, false)
@@ -210,6 +232,35 @@ describe('Academy Identity Control conformance generator', () => {
           },
         ],
         scenarios: ['exchange.client-assertion'],
+      },
+    )
+
+    assert.deepEqual(
+      evidence.checkpoints.find(({ id }) => id === 'lifecycle-principal-contract'),
+      {
+        id: 'lifecycle-principal-contract',
+        verdict: 'C0/H0/M0/L0',
+        report: {
+          path: 'reports/reviews/academy-identity-lifecycle-principal-contract-local-checkpoint-2026-08-12.md',
+          sha256: 'fc7818c63d840d638ea6a0fd6a749f484c0835ae8735c0f26d99d2f7c8175e80',
+        },
+        freezeManifest: {
+          path: 'reports/reviews/academy-identity-lifecycle-principal-contract-freeze-20260812.json',
+          sha256: '2c9c228ad8a2e82a8c6f54ad5fe7327099f7c1b40b5a84134848291809deb7a0',
+        },
+        producerEvidence: [
+          {
+            repository: 'identity-control',
+            path: 'packages/core/src/signed-lifecycle-event.ts',
+            sha256: 'be8782234bedf5b817d12d77c10e417b1ba435bf62ec47edfe2f6025cb05cf51',
+          },
+          {
+            repository: 'identity-control',
+            path: 'packages/core/test/signed-lifecycle-event.test.ts',
+            sha256: 'ce86309be5a715fa5f6ac1566142d67bb203479dc93e4053156c6dbabc6cb5ee',
+          },
+        ],
+        scenarios: [...LIFECYCLE_SCENARIO_IDS],
       },
     )
 

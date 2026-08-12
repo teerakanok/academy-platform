@@ -1,7 +1,7 @@
 {
   "schema": "academy-identity-control-local-evidence/v1",
-  "sourceRevision": "1039c2c53397a9404523c7941bc532ee1cce91f6",
-  "identityControlSourceRevision": "ad97ba2236bddbc4857d45359bb37b032aebbb05",
+  "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+  "identityControlSourceRevision": "d7f517adb408ee2f50f3b5734c10dd14cbea6530",
   "registryEnabled": false,
   "releaseApproval": false,
   "runtimeWired": false,
@@ -181,6 +181,37 @@
         "lifecycle.config-revision-change",
         "lifecycle.cursor-after-commit"
       ]
+    },
+    {
+      "id": "lifecycle-principal-contract",
+      "verdict": "C0/H0/M0/L0",
+      "report": {
+        "path": "reports/reviews/academy-identity-lifecycle-principal-contract-local-checkpoint-2026-08-12.md",
+        "sha256": "fc7818c63d840d638ea6a0fd6a749f484c0835ae8735c0f26d99d2f7c8175e80"
+      },
+      "freezeManifest": {
+        "path": "reports/reviews/academy-identity-lifecycle-principal-contract-freeze-20260812.json",
+        "sha256": "2c9c228ad8a2e82a8c6f54ad5fe7327099f7c1b40b5a84134848291809deb7a0"
+      },
+      "producerEvidence": [
+        {
+          "repository": "identity-control",
+          "path": "packages/core/src/signed-lifecycle-event.ts",
+          "sha256": "be8782234bedf5b817d12d77c10e417b1ba435bf62ec47edfe2f6025cb05cf51"
+        },
+        {
+          "repository": "identity-control",
+          "path": "packages/core/test/signed-lifecycle-event.test.ts",
+          "sha256": "ce86309be5a715fa5f6ac1566142d67bb203479dc93e4053156c6dbabc6cb5ee"
+        }
+      ],
+      "scenarios": [
+        "lifecycle.envelope-cryptographic-verification",
+        "lifecycle.duplicate-stale",
+        "lifecycle.gap-conflict",
+        "lifecycle.config-revision-change",
+        "lifecycle.cursor-after-commit"
+      ]
     }
   ],
   "scenarios": [
@@ -198,7 +229,8 @@
       "id": "lifecycle.envelope-cryptographic-verification",
       "result": "pass",
       "checkpointIds": [
-        "envelope-verifier"
+        "envelope-verifier",
+        "lifecycle-principal-contract"
       ]
     },
     {
@@ -206,7 +238,8 @@
       "result": "pass",
       "checkpointIds": [
         "projection-reducer",
-        "durable-page-store"
+        "durable-page-store",
+        "lifecycle-principal-contract"
       ]
     },
     {
@@ -214,7 +247,8 @@
       "result": "pass",
       "checkpointIds": [
         "projection-reducer",
-        "durable-page-store"
+        "durable-page-store",
+        "lifecycle-principal-contract"
       ]
     },
     {
@@ -222,7 +256,8 @@
       "result": "pass",
       "checkpointIds": [
         "durable-page-store",
-        "pure-pull-cycle"
+        "pure-pull-cycle",
+        "lifecycle-principal-contract"
       ]
     },
     {
@@ -231,7 +266,8 @@
       "checkpointIds": [
         "durable-page-store",
         "pull-lease",
-        "pure-pull-cycle"
+        "pure-pull-cycle",
+        "lifecycle-principal-contract"
       ]
     },
     {

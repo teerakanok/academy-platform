@@ -136,6 +136,18 @@ rerun focused 170/170 กับ static/data/reader gates และผ่าน f
 `C0/H0/M0/L0`. Checkpoint ยังเป็น local/unwired; migration ที่ Pool A, runtime
 wiring, deploy และ release ต้องผ่าน production gate แยก.
 
+**Identity conformance principal-contract rebind (2026-08-12):** Academy
+consumer policy mirror กับ deterministic conformance ledger pin Academy
+`cbab363b6f7b7af25cb92673b5dfe35540cc8d23` และ Identity Control
+`d7f517adb408ee2f50f3b5734c10dd14cbea6530` พร้อม contract digests ล่าสุดแล้ว.
+Ledger bind principal-contract report/manifest และ producer signer/verifier bytes
+แบบ exact digest โดยไม่ promote scenario ใหม่: คง 16 pass / 7 `not_proven`,
+`enabled=false`, `runtimeWired=false`, `releaseApproval=false` และ production
+NO-GO. Generator/policy RED จับ revision/evidence mismatch ก่อน GREEN 7/7 และ
+4/4. Different independent RIL bind authority 12/12, rerun generator/policy,
+canonical intake, receipt, reader และ diff gates แล้วผ่าน final
+`C0/H0/M0/L0`; production boundary เดิมยังคงอยู่.
+
 **Identity lifecycle pull-lease local checkpoint (2026-08-10):** Migration
 `0023` เพิ่ม database-clock singleton lease สำหรับ logical puller หนึ่งตัวและ
 fenced page commit ที่ lock active token ใน transaction เดียวกับ aggregate commit

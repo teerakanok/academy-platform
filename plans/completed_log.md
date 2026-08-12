@@ -27,6 +27,30 @@ not been applied to Pool A. Registry enablement, endpoint and key distribution,
 scheduler and monitoring ownership, deployment, and release authorization remain
 separate production gates.
 
+## 2026-08-12 - Identity conformance ledger rebound to current producer
+
+**Outcome:** Academy's non-secret consumer policy mirror and deterministic
+conformance ledger now pin Academy `cbab363b6f7b7af25cb92673b5dfe35540cc8d23`
+and Identity Control `d7f517adb408ee2f50f3b5734c10dd14cbea6530`.
+The ledger binds the accepted lifecycle principal report, freeze manifest, and
+producer signer/verifier bytes at exact digests. No scenario was promoted:
+local conformance remains 16 pass / 7 `not_proven`.
+
+**Verification:** Test-only RED failed generator 0/7 and policy 3/4 on the old
+revision, file set, and digests. GREEN passes generator 7/7 and policy 4/4.
+Canonical write/current and Identity intake verify all 23 scenarios while
+registry enablement, runtime wiring, production evidence, release approval, and
+production readiness remain false.
+
+**Review:** A different reviewer bound and reverified the exact 12-file
+authority, checked the producer and consumer revisions, evidence-purpose
+separation, receipt exclusions, generator/policy/current/intake behavior, and
+reader/diff gates, then returned final `C0/H0/M0/L0`.
+
+**Residual risk:** This is a source/evidence rebind, not runtime admission.
+Production still requires the seven named conformance gaps plus endpoint/key,
+operator, deployment, and explicit release evidence.
+
 ---
 
 ## 2026-08-12 - Public-to-learner feature wave integrated locally

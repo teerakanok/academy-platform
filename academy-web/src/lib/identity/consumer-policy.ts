@@ -11,14 +11,14 @@ export const APPROVED_ACADEMY_CONSUMER_REGISTRY_V1 = {
   status: 'approved-policy-release-blocked',
   identityControlSource: {
     repository: 'products/cyberskills/identity-control',
-    sourceRevision: 'a6ef1f430e1939a76fdccdcc35a1da41ff7a4606',
+    sourceRevision: 'd7f517adb408ee2f50f3b5734c10dd14cbea6530',
     contractDigests: {
       'config/consumer-registry-v1.approved.json': '572d230a9f84c219e5b82eeb84dd1350bd8a319e180f2208f45db3abc03d1875',
       'docs/integration/consumer-registry-v1.md': 'd880b0e2a8000f6898b76b91ee47ab18b886ac8e2f413f214448a8a2bed575a4',
-      'docs/integration/consumer-conformance-kit.md': 'd49d25592785c38dbebadd0ec7ed87088fd215478a0c57d3d7306f8af7c96ad0',
-      'docs/integration/lifecycle-pull-consumer-contract.md': '7a507be4303b1bea40abb9331f02c7b331ae53e981e7dee6be45932abe6975f5',
-      'packages/contracts/src/index.ts': '74103c92a46b87831e173ff433600271ddac4238b6ad2518203ee10ca726e6d6',
-      'packages/testing/src/index.ts': 'f2b7fc3c417104a9c9d5bf2adfed4178fb67226167ed143927939c353f6942f9',
+      'docs/integration/consumer-conformance-kit.md': '52c402cc4582d5dfc1f54ce12cf9d9ed96bf4e6eace10a411585e1c8ee92c6f9',
+      'docs/integration/lifecycle-pull-consumer-contract.md': 'ba7ca71fd5ab845821f6dc9cfc09bc612bef1ed12914331e4ad4e65a0ce6f17c',
+      'packages/contracts/src/index.ts': '185e8e95282036bb5d979cdc2c2c163cf5cdabe4816880dc08cb484631c9b39f',
+      'packages/testing/src/index.ts': '72aa668be65434cac203c15e16d3c5c7c2d1bf89143bc1b1255d3972305069f6',
     },
   },
   accountCenter: {

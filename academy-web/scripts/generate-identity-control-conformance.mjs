@@ -17,8 +17,8 @@ const scriptDirectory = dirname(fileURLToPath(import.meta.url))
 const academyRoot = resolve(scriptDirectory, '..', '..')
 const identityRoot = resolve(academyRoot, '..', 'identity-control')
 
-export const ACADEMY_SOURCE_REVISION = '1039c2c53397a9404523c7941bc532ee1cce91f6'
-export const IDENTITY_SOURCE_REVISION = 'ad97ba2236bddbc4857d45359bb37b032aebbb05'
+export const ACADEMY_SOURCE_REVISION = 'cbab363b6f7b7af25cb92673b5dfe35540cc8d23'
+export const IDENTITY_SOURCE_REVISION = 'd7f517adb408ee2f50f3b5734c10dd14cbea6530'
 
 const reportPath = 'reports/conformance/identity-control/academy-identity-control-conformance.json'
 const evidencePath = 'reports/conformance/identity-control/academy-identity-local-evidence.json'
@@ -27,27 +27,41 @@ const unprovenPath = 'reports/conformance/identity-control/academy-identity-unpr
 export const CHECKPOINT_FREEZE_DECLARATION = Object.freeze({
   schema: 'checkpoint-freeze-manifest.v1',
   role: 'identity-consumer-conformance-checkpoint',
-  path: 'reports/reviews/academy-identity-control-profile-activation-conformance-freeze-20260811.json',
+  path: 'reports/reviews/academy-identity-control-lifecycle-principal-conformance-freeze-20260812.json',
   contentPaths: Object.freeze([
     'academy-web/scripts/generate-identity-control-conformance.mjs',
     'academy-web/scripts/generate-identity-control-conformance.test.mjs',
+    'academy-web/src/lib/identity/consumer-policy.ts',
+    'academy-web/tests/unit/identity-consumer-policy.test.ts',
     'plans/active_plan.md',
     'plans/completed_log.md',
     reportPath,
     evidencePath,
     unprovenPath,
-    'reports/reviews/academy-identity-control-profile-activation-conformance-local-checkpoint-2026-08-11.md',
+    'reports/reviews/academy-identity-control-lifecycle-principal-conformance-local-checkpoint-2026-08-12.md',
+    'reports/reviews/academy-identity-lifecycle-principal-contract-freeze-20260812.json',
+    'reports/reviews/academy-identity-lifecycle-principal-contract-local-checkpoint-2026-08-12.md',
   ]),
 })
 
 const identityContractDigests = Object.freeze({
   'config/consumer-registry-v1.approved.json': '572d230a9f84c219e5b82eeb84dd1350bd8a319e180f2208f45db3abc03d1875',
   'docs/integration/consumer-registry-v1.md': 'd880b0e2a8000f6898b76b91ee47ab18b886ac8e2f413f214448a8a2bed575a4',
-  'docs/integration/consumer-conformance-kit.md': 'd49d25592785c38dbebadd0ec7ed87088fd215478a0c57d3d7306f8af7c96ad0',
-  'docs/integration/lifecycle-pull-consumer-contract.md': '7a507be4303b1bea40abb9331f02c7b331ae53e981e7dee6be45932abe6975f5',
-  'packages/contracts/src/index.ts': '74103c92a46b87831e173ff433600271ddac4238b6ad2518203ee10ca726e6d6',
-  'packages/testing/src/index.ts': 'f2b7fc3c417104a9c9d5bf2adfed4178fb67226167ed143927939c353f6942f9',
+  'docs/integration/consumer-conformance-kit.md': '52c402cc4582d5dfc1f54ce12cf9d9ed96bf4e6eace10a411585e1c8ee92c6f9',
+  'docs/integration/lifecycle-pull-consumer-contract.md': 'ba7ca71fd5ab845821f6dc9cfc09bc612bef1ed12914331e4ad4e65a0ce6f17c',
+  'packages/contracts/src/index.ts': '185e8e95282036bb5d979cdc2c2c163cf5cdabe4816880dc08cb484631c9b39f',
+  'packages/testing/src/index.ts': '72aa668be65434cac203c15e16d3c5c7c2d1bf89143bc1b1255d3972305069f6',
 })
+
+const clientAssertionIdentityEvidencePaths = Object.freeze([
+  'packages/core/src/client-assertion.ts',
+  'packages/core/test/client-assertion.test.ts',
+])
+
+const lifecyclePrincipalIdentityEvidencePaths = Object.freeze([
+  'packages/core/src/signed-lifecycle-event.ts',
+  'packages/core/test/signed-lifecycle-event.test.ts',
+])
 
 const expectedIdentityEvidenceDigests = new Map([
   [
@@ -57,6 +71,14 @@ const expectedIdentityEvidenceDigests = new Map([
   [
     'packages/core/test/client-assertion.test.ts',
     '58b67a100de26a7d8ffcbce20e4c021c9b84b3a0c9c4351c4c702121981d8d61',
+  ],
+  [
+    'packages/core/src/signed-lifecycle-event.ts',
+    'be8782234bedf5b817d12d77c10e417b1ba435bf62ec47edfe2f6025cb05cf51',
+  ],
+  [
+    'packages/core/test/signed-lifecycle-event.test.ts',
+    'ce86309be5a715fa5f6ac1566142d67bb203479dc93e4053156c6dbabc6cb5ee',
   ],
 ])
 
@@ -136,6 +158,14 @@ const expectedEvidenceDigests = new Map([
   [
     'reports/reviews/academy-identity-profile-activation-store-freeze-20260811.json',
     '735bbb10654bfd7994c3b982c766341bbfda66e3def1f7dfab57b1a458159f45',
+  ],
+  [
+    'reports/reviews/academy-identity-lifecycle-principal-contract-local-checkpoint-2026-08-12.md',
+    'fc7818c63d840d638ea6a0fd6a749f484c0835ae8735c0f26d99d2f7c8175e80',
+  ],
+  [
+    'reports/reviews/academy-identity-lifecycle-principal-contract-freeze-20260812.json',
+    '2c9c228ad8a2e82a8c6f54ad5fe7327099f7c1b40b5a84134848291809deb7a0',
   ],
 ])
 
@@ -237,7 +267,7 @@ const checkpointDefinitions = Object.freeze([
   {
     id: 'client-assertion-composition',
     testPath: 'academy-web/tests/unit/identity-client-assertion-conformance.test.ts',
-    producerEvidencePaths: [...expectedIdentityEvidenceDigests.keys()],
+    producerEvidencePaths: [...clientAssertionIdentityEvidencePaths],
     scenarios: [...CLIENT_ASSERTION_SCENARIO_IDS],
   },
   {
@@ -278,6 +308,13 @@ const checkpointDefinitions = Object.freeze([
     reportPath: 'reports/reviews/academy-identity-lifecycle-pull-cycle-local-checkpoint-2026-08-10.md',
     manifestPath: 'reports/reviews/academy-identity-lifecycle-pull-cycle-freeze-20260810.json',
     scenarios: ['lifecycle.config-revision-change', 'lifecycle.cursor-after-commit'],
+  },
+  {
+    id: 'lifecycle-principal-contract',
+    reportPath: 'reports/reviews/academy-identity-lifecycle-principal-contract-local-checkpoint-2026-08-12.md',
+    manifestPath: 'reports/reviews/academy-identity-lifecycle-principal-contract-freeze-20260812.json',
+    producerEvidencePaths: [...lifecyclePrincipalIdentityEvidencePaths],
+    scenarios: [...LIFECYCLE_SCENARIO_IDS],
   },
 ])
 
