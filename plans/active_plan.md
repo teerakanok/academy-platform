@@ -2,9 +2,22 @@
 
 > Open work only. Move closed items to `completed_log.md` with evidence.
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
-> **Last updated:** 2026-08-12
+> **Last updated:** 2026-08-14
 
 ## Current execution lane — activate identity without widening Pool A access
+
+**Current contract rebind (2026-08-14):** Academy's local conformance ledger
+now pins Academy `f497649d06aeaad90eb3d7ac1f9cf0031a100f96` and Identity
+Control `4efd9b7e76f48e00aa6e3896bc14626cd38bcb6a`. The only changed
+producer contract file is `packages/contracts/src/index.ts`: it exports the new
+bot-challenge action and browser authorization/OTP request schemas, and tightens
+the existing authorization-start schema to reject surplus keys. The lifecycle
+and client-assertion evidence digests remain unchanged. Local conformance stays
+16 pass / 7 `not_proven`.
+Registry `enabled=false`, `runtimeWired=false`, `releaseApproval=false`, and
+production readiness remains false. Different-reviewer closure passed final
+`C0/H0/M0/L0`; this rebind does not authorize migration, runtime wiring,
+deploy, or release.
 
 Production checkpoint 2026-08-05 ปิดแล้วสำหรับฐานข้อมูล, private-media delivery และ
 least-privilege runtime data boundary: migrations `0001`–`0019` อยู่ใน Pool A;

@@ -2,11 +2,11 @@
   "schema": "identity-consumer-conformance-report/v1",
   "registryRevision": 1,
   "clientId": "academy-web",
-  "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+  "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
   "checkpointFreezeManifest": {
     "schema": "checkpoint-freeze-manifest.v1",
     "role": "identity-consumer-conformance-checkpoint",
-    "path": "reports/reviews/academy-identity-control-lifecycle-principal-conformance-freeze-20260812.json",
+    "path": "reports/reviews/academy-identity-control-contract-rebind-freeze-20260814.json",
     "contentPaths": [
       "academy-web/scripts/generate-identity-control-conformance.mjs",
       "academy-web/scripts/generate-identity-control-conformance.test.mjs",
@@ -17,7 +17,7 @@
       "reports/conformance/identity-control/academy-identity-control-conformance.json",
       "reports/conformance/identity-control/academy-identity-local-evidence.json",
       "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
-      "reports/reviews/academy-identity-control-lifecycle-principal-conformance-local-checkpoint-2026-08-12.md",
+      "reports/reviews/academy-identity-control-contract-rebind-local-checkpoint-20260814.md",
       "reports/reviews/academy-identity-lifecycle-principal-contract-freeze-20260812.json",
       "reports/reviews/academy-identity-lifecycle-principal-contract-local-checkpoint-2026-08-12.md"
     ]
@@ -25,40 +25,40 @@
   "localWorkingTreeReceipt": {
     "schema": "identity-consumer-local-receipt/v2",
     "mode": "local-git-state",
-    "head": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+    "head": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
     "excludedPaths": [
       "reports/conformance/identity-control/academy-identity-control-conformance.json",
-      "reports/reviews/academy-identity-control-lifecycle-principal-conformance-freeze-20260812.json"
+      "reports/reviews/academy-identity-control-contract-rebind-freeze-20260814.json"
     ],
-    "indexStateSha256": "760dda3a60411bd8e88e76be2951a480d2b6df78c6396600ea3ee4e69421be11",
-    "indexEntryCount": 694,
-    "trackedWorktreeStateSha256": "5bad9467e3a9656a866f8e3f841e9351f65f1102ea21f2da4bccae89e2497802",
-    "trackedWorktreeEntryCount": 694,
-    "untrackedStateSha256": "84cc3ab26bd10e8d512e46f0a7b6e277338d07e0257e50eb30d222e6e79bb224",
+    "indexStateSha256": "e43be835b68a0ffa0104370c7cb7ed2ec478237993742e44ac190a0ff3162eb8",
+    "indexEntryCount": 697,
+    "trackedWorktreeStateSha256": "a71ffc9e5d6ce1b086d5f25200e35a6fad94e8d634fae84652803902b97dde1b",
+    "trackedWorktreeEntryCount": 697,
+    "untrackedStateSha256": "d888195a0572eabe65acba0262deed941e757260695693aecab7463b2990e75d",
     "untrackedEntryCount": 1,
     "untrackedFileSha256": [
       {
-        "path": "reports/reviews/academy-identity-control-lifecycle-principal-conformance-local-checkpoint-2026-08-12.md",
+        "path": "reports/reviews/academy-identity-control-contract-rebind-local-checkpoint-20260814.md",
         "kind": "file",
         "mode": "0644",
-        "sha256": "e1447ac3aa862c9128dc83b2e36b6e0fe1b7a5baba43a211c7481857fb8741c8"
+        "sha256": "9d456a85635deb18586142fb34973c811623df161c3fb47c3ce63a0554cda47d"
       }
     ]
   },
   "identityControl": {
-    "sourceRevision": "d7f517adb408ee2f50f3b5734c10dd14cbea6530",
+    "sourceRevision": "4efd9b7e76f48e00aa6e3896bc14626cd38bcb6a",
     "contractDigests": {
       "config/consumer-registry-v1.approved.json": "572d230a9f84c219e5b82eeb84dd1350bd8a319e180f2208f45db3abc03d1875",
       "docs/integration/consumer-registry-v1.md": "d880b0e2a8000f6898b76b91ee47ab18b886ac8e2f413f214448a8a2bed575a4",
       "docs/integration/consumer-conformance-kit.md": "52c402cc4582d5dfc1f54ce12cf9d9ed96bf4e6eace10a411585e1c8ee92c6f9",
       "docs/integration/lifecycle-pull-consumer-contract.md": "ba7ca71fd5ab845821f6dc9cfc09bc612bef1ed12914331e4ad4e65a0ce6f17c",
-      "packages/contracts/src/index.ts": "185e8e95282036bb5d979cdc2c2c163cf5cdabe4816880dc08cb484631c9b39f",
+      "packages/contracts/src/index.ts": "3954689f4749b0f43763b02b4cd1bf4c840304ca594d5a565a5f0af77d910aaa",
       "packages/testing/src/index.ts": "72aa668be65434cac203c15e16d3c5c7c2d1bf89143bc1b1255d3972305069f6"
     },
     "localArtifactReceipt": {
       "schema": "identity-control-producer-local-receipt/v1",
       "mode": "local-git-artifact-state",
-      "head": "d7f517adb408ee2f50f3b5734c10dd14cbea6530",
+      "head": "4efd9b7e76f48e00aa6e3896bc14626cd38bcb6a",
       "scope": [
         "config/consumer-registry-v1.approved.json",
         "docs/integration/consumer-registry-v1.md",
@@ -67,11 +67,11 @@
         "packages/contracts/src/index.ts",
         "packages/testing/src/index.ts"
       ],
-      "headStateSha256": "9593f89dfea2e22108a82bd171ca55c757df6b625022b3e4f2019129f19db82f",
+      "headStateSha256": "5e92cec705b33049df5bd49b8414c2c925712543934dd7f290d4086c0910f46b",
       "headEntryCount": 6,
-      "indexStateSha256": "34fdb6bfd8c3b2abbd668d021eac4ca8044938aa664ab7234da2e5e2f2b02980",
+      "indexStateSha256": "ca17599d8828ba27c6fb9d01f2b67b171dc46e36c53635133dfb8541cf0818ff",
       "indexEntryCount": 6,
-      "worktreeStateSha256": "ceca1eb6786f583cab33735ec80858d87ed2e2da3dc002632ae71b3faa569fbc",
+      "worktreeStateSha256": "c35f5d111d022a478c0aee242cd6f850310fa78f3c05840305d4f6d354973ec4",
       "worktreeEntryCount": 6,
       "artifactFileSha256": [
         {
@@ -92,7 +92,7 @@
         },
         {
           "path": "packages/contracts/src/index.ts",
-          "sha256": "185e8e95282036bb5d979cdc2c2c163cf5cdabe4816880dc08cb484631c9b39f"
+          "sha256": "3954689f4749b0f43763b02b4cd1bf4c840304ca594d5a565a5f0af77d910aaa"
         },
         {
           "path": "packages/testing/src/index.ts",
@@ -125,13 +125,13 @@
       "commandId": "academy-identity-checkpoints-v2",
       "result": "pass",
       "artifactPath": "reports/conformance/identity-control/academy-identity-local-evidence.json",
-      "artifactSha256": "c95d94c98ab85b8327d0af141e0612d91dd67369b2359199dc9ed5f114b4c58a"
+      "artifactSha256": "6524bd00c60466b13f0dc122bb69757504502c1df3bed82c1b3277fe7656c6eb"
     },
     {
       "commandId": "academy-identity-control-unproven-v2",
       "result": "not_proven",
       "artifactPath": "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
-      "artifactSha256": "7e285a54fd9ed99e1e17a0e28f850d2ad53fc01c3ecd839cdc250d34c1e35092"
+      "artifactSha256": "eb65c8159a163ea0c4ba17320434b835dc3f8abf9cd1cad673682f88be2b4f9b"
     }
   ],
   "canonicalIntake": {
@@ -146,9 +146,9 @@
       "evidence": {
         "testId": "authorization.exact-registered-redirect",
         "command": "academy-identity-control-unproven-v2",
-        "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+        "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
-        "artifactSha256": "7e285a54fd9ed99e1e17a0e28f850d2ad53fc01c3ecd839cdc250d34c1e35092",
+        "artifactSha256": "eb65c8159a163ea0c4ba17320434b835dc3f8abf9cd1cad673682f88be2b4f9b",
         "supportsClaim": false
       }
     },
@@ -158,9 +158,9 @@
       "evidence": {
         "testId": "authorization.state-binding-mismatch",
         "command": "academy-identity-control-unproven-v2",
-        "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+        "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
-        "artifactSha256": "7e285a54fd9ed99e1e17a0e28f850d2ad53fc01c3ecd839cdc250d34c1e35092",
+        "artifactSha256": "eb65c8159a163ea0c4ba17320434b835dc3f8abf9cd1cad673682f88be2b4f9b",
         "supportsClaim": false
       }
     },
@@ -170,7 +170,7 @@
       "evidence": {
         "testId": "authorization.state-expiry-replay",
         "command": "academy-identity-control-local-v1",
-        "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+        "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
         "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
       }
@@ -181,7 +181,7 @@
       "evidence": {
         "testId": "callback.code-and-state-only",
         "command": "academy-identity-control-local-v1",
-        "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+        "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
         "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
       }
@@ -192,7 +192,7 @@
       "evidence": {
         "testId": "callback.server-held-intent",
         "command": "academy-identity-control-local-v1",
-        "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+        "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
         "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
       }
@@ -203,9 +203,9 @@
       "evidence": {
         "testId": "callback.login-csrf",
         "command": "academy-identity-control-unproven-v2",
-        "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+        "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
-        "artifactSha256": "7e285a54fd9ed99e1e17a0e28f850d2ad53fc01c3ecd839cdc250d34c1e35092",
+        "artifactSha256": "eb65c8159a163ea0c4ba17320434b835dc3f8abf9cd1cad673682f88be2b4f9b",
         "supportsClaim": false
       }
     },
@@ -215,9 +215,9 @@
       "evidence": {
         "testId": "callback.origin-fetch-metadata",
         "command": "academy-identity-control-unproven-v2",
-        "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+        "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
-        "artifactSha256": "7e285a54fd9ed99e1e17a0e28f850d2ad53fc01c3ecd839cdc250d34c1e35092",
+        "artifactSha256": "eb65c8159a163ea0c4ba17320434b835dc3f8abf9cd1cad673682f88be2b4f9b",
         "supportsClaim": false
       }
     },
@@ -227,7 +227,7 @@
       "evidence": {
         "testId": "exchange.pkce-s256",
         "command": "academy-identity-control-local-v1",
-        "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+        "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
         "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
       }
@@ -238,9 +238,9 @@
       "evidence": {
         "testId": "exchange.client-assertion",
         "command": "academy-identity-checkpoints-v2",
-        "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+        "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
         "artifactPath": "reports/conformance/identity-control/academy-identity-local-evidence.json",
-        "artifactSha256": "c95d94c98ab85b8327d0af141e0612d91dd67369b2359199dc9ed5f114b4c58a"
+        "artifactSha256": "6524bd00c60466b13f0dc122bb69757504502c1df3bed82c1b3277fe7656c6eb"
       }
     },
     {
@@ -249,7 +249,7 @@
       "evidence": {
         "testId": "exchange.result-binding",
         "command": "academy-identity-control-local-v1",
-        "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+        "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
         "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
       }
@@ -260,9 +260,9 @@
       "evidence": {
         "testId": "exchange.code-replay-expiry",
         "command": "academy-identity-control-unproven-v2",
-        "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+        "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
-        "artifactSha256": "7e285a54fd9ed99e1e17a0e28f850d2ad53fc01c3ecd839cdc250d34c1e35092",
+        "artifactSha256": "eb65c8159a163ea0c4ba17320434b835dc3f8abf9cd1cad673682f88be2b4f9b",
         "supportsClaim": false
       }
     },
@@ -272,9 +272,9 @@
       "evidence": {
         "testId": "exchange.result-key-rotation",
         "command": "academy-identity-control-unproven-v2",
-        "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+        "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
-        "artifactSha256": "7e285a54fd9ed99e1e17a0e28f850d2ad53fc01c3ecd839cdc250d34c1e35092",
+        "artifactSha256": "eb65c8159a163ea0c4ba17320434b835dc3f8abf9cd1cad673682f88be2b4f9b",
         "supportsClaim": false
       }
     },
@@ -284,7 +284,7 @@
       "evidence": {
         "testId": "session.host-scoped",
         "command": "academy-identity-control-local-v1",
-        "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+        "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
         "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
       }
@@ -295,7 +295,7 @@
       "evidence": {
         "testId": "activation.grants-zero-product-access",
         "command": "academy-identity-control-local-v1",
-        "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+        "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
         "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
       }
@@ -306,9 +306,9 @@
       "evidence": {
         "testId": "lifecycle.envelope-cryptographic-verification",
         "command": "academy-identity-checkpoints-v2",
-        "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+        "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
         "artifactPath": "reports/conformance/identity-control/academy-identity-local-evidence.json",
-        "artifactSha256": "c95d94c98ab85b8327d0af141e0612d91dd67369b2359199dc9ed5f114b4c58a"
+        "artifactSha256": "6524bd00c60466b13f0dc122bb69757504502c1df3bed82c1b3277fe7656c6eb"
       }
     },
     {
@@ -317,9 +317,9 @@
       "evidence": {
         "testId": "lifecycle.duplicate-stale",
         "command": "academy-identity-checkpoints-v2",
-        "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+        "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
         "artifactPath": "reports/conformance/identity-control/academy-identity-local-evidence.json",
-        "artifactSha256": "c95d94c98ab85b8327d0af141e0612d91dd67369b2359199dc9ed5f114b4c58a"
+        "artifactSha256": "6524bd00c60466b13f0dc122bb69757504502c1df3bed82c1b3277fe7656c6eb"
       }
     },
     {
@@ -328,9 +328,9 @@
       "evidence": {
         "testId": "lifecycle.gap-conflict",
         "command": "academy-identity-checkpoints-v2",
-        "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+        "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
         "artifactPath": "reports/conformance/identity-control/academy-identity-local-evidence.json",
-        "artifactSha256": "c95d94c98ab85b8327d0af141e0612d91dd67369b2359199dc9ed5f114b4c58a"
+        "artifactSha256": "6524bd00c60466b13f0dc122bb69757504502c1df3bed82c1b3277fe7656c6eb"
       }
     },
     {
@@ -339,9 +339,9 @@
       "evidence": {
         "testId": "lifecycle.config-revision-change",
         "command": "academy-identity-checkpoints-v2",
-        "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+        "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
         "artifactPath": "reports/conformance/identity-control/academy-identity-local-evidence.json",
-        "artifactSha256": "c95d94c98ab85b8327d0af141e0612d91dd67369b2359199dc9ed5f114b4c58a"
+        "artifactSha256": "6524bd00c60466b13f0dc122bb69757504502c1df3bed82c1b3277fe7656c6eb"
       }
     },
     {
@@ -350,9 +350,9 @@
       "evidence": {
         "testId": "lifecycle.cursor-after-commit",
         "command": "academy-identity-checkpoints-v2",
-        "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+        "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
         "artifactPath": "reports/conformance/identity-control/academy-identity-local-evidence.json",
-        "artifactSha256": "c95d94c98ab85b8327d0af141e0612d91dd67369b2359199dc9ed5f114b4c58a"
+        "artifactSha256": "6524bd00c60466b13f0dc122bb69757504502c1df3bed82c1b3277fe7656c6eb"
       }
     },
     {
@@ -361,7 +361,7 @@
       "evidence": {
         "testId": "outage.fail-closed",
         "command": "academy-identity-control-local-v1",
-        "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+        "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
         "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
       }
@@ -372,9 +372,9 @@
       "evidence": {
         "testId": "academy.activation-profile-only",
         "command": "academy-identity-checkpoints-v2",
-        "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+        "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
         "artifactPath": "reports/conformance/identity-control/academy-identity-local-evidence.json",
-        "artifactSha256": "c95d94c98ab85b8327d0af141e0612d91dd67369b2359199dc9ed5f114b4c58a"
+        "artifactSha256": "6524bd00c60466b13f0dc122bb69757504502c1df3bed82c1b3277fe7656c6eb"
       }
     },
     {
@@ -383,7 +383,7 @@
       "evidence": {
         "testId": "academy.course-entitlement",
         "command": "academy-identity-control-local-v1",
-        "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+        "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
         "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
       }
@@ -394,9 +394,9 @@
       "evidence": {
         "testId": "academy.canonical-founder-bootstrap",
         "command": "academy-identity-control-unproven-v2",
-        "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
+        "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
         "artifactPath": "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
-        "artifactSha256": "7e285a54fd9ed99e1e17a0e28f850d2ad53fc01c3ecd839cdc250d34c1e35092",
+        "artifactSha256": "eb65c8159a163ea0c4ba17320434b835dc3f8abf9cd1cad673682f88be2b4f9b",
         "supportsClaim": false
       }
     }

@@ -3,6 +3,31 @@
 > Closed items only, with outcome + evidence + residual risk. Newest first.
 > Provider-neutral. See `active_plan.md` for open work.
 
+## 2026-08-14 - Identity contract rebind prepared locally
+
+**Outcome:** Academy's non-secret consumer mirror and deterministic conformance
+artifacts now bind Academy `f497649d06aeaad90eb3d7ac1f9cf0031a100f96`,
+Identity Control `4efd9b7e76f48e00aa6e3896bc14626cd38bcb6a`, and the
+current six producer contract digests. The producer delta adds the bot action
+and browser authorization/OTP request schemas, and changes the existing
+authorization-start schema to reject surplus keys. It does not change the
+lifecycle or client-assertion evidence used by this ledger.
+
+**Verification:** Generator expectations failed on the old source revision and
+policy expectations failed on the old producer revision/digest. After the
+bounded rebind, generator `7/7`, policy `4/4`, and canonical write/current pass
+for all 23 scenarios. The result remains 16 pass / 7 `not_proven` with every
+runtime, registry, production-evidence, readiness, and release flag false.
+
+**Review:** The first different-reviewer pass found one Medium documentation
+error: the summary omitted the existing authorization-start strictness change.
+After correction, a different reviewer rebound the 12-file authority and passed
+final `C0/H0/M0/L0` without a broad new review.
+
+**Residual risk:** The seven named production scenarios, Identity endpoint and
+keys, operators, Pool A migrations, deployed runtime, and explicit release
+authority remain open. This checkpoint changes local evidence only.
+
 ## 2026-08-12 - Identity lifecycle principal contract aligned locally
 
 **Outcome:** Academy now applies the exact Identity Control producer contract

@@ -163,7 +163,7 @@ describe('Academy Identity Control conformance generator', () => {
     assert.deepEqual(CHECKPOINT_FREEZE_DECLARATION, {
       schema: 'checkpoint-freeze-manifest.v1',
       role: 'identity-consumer-conformance-checkpoint',
-      path: 'reports/reviews/academy-identity-control-lifecycle-principal-conformance-freeze-20260812.json',
+      path: 'reports/reviews/academy-identity-control-contract-rebind-freeze-20260814.json',
       contentPaths: [
         'academy-web/scripts/generate-identity-control-conformance.mjs',
         'academy-web/scripts/generate-identity-control-conformance.test.mjs',
@@ -174,7 +174,7 @@ describe('Academy Identity Control conformance generator', () => {
         'reports/conformance/identity-control/academy-identity-control-conformance.json',
         'reports/conformance/identity-control/academy-identity-local-evidence.json',
         'reports/conformance/identity-control/academy-identity-unproven-scenarios.json',
-        'reports/reviews/academy-identity-control-lifecycle-principal-conformance-local-checkpoint-2026-08-12.md',
+        'reports/reviews/academy-identity-control-contract-rebind-local-checkpoint-20260814.md',
         'reports/reviews/academy-identity-lifecycle-principal-contract-freeze-20260812.json',
         'reports/reviews/academy-identity-lifecycle-principal-contract-local-checkpoint-2026-08-12.md',
       ],
@@ -187,8 +187,8 @@ describe('Academy Identity Control conformance generator', () => {
 
     assert.equal(report.sourceRevision, ACADEMY_SOURCE_REVISION)
     assert.equal(report.identityControl.sourceRevision, IDENTITY_SOURCE_REVISION)
-    assert.equal(ACADEMY_SOURCE_REVISION, 'cbab363b6f7b7af25cb92673b5dfe35540cc8d23')
-    assert.equal(IDENTITY_SOURCE_REVISION, 'd7f517adb408ee2f50f3b5734c10dd14cbea6530')
+    assert.equal(ACADEMY_SOURCE_REVISION, 'f497649d06aeaad90eb3d7ac1f9cf0031a100f96')
+    assert.equal(IDENTITY_SOURCE_REVISION, '4efd9b7e76f48e00aa6e3896bc14626cd38bcb6a')
     assert.equal(report.registryState.enabled, false)
     assert.equal(report.scope.releaseApproval, false)
     assert.equal(report.scope.runtimeWired, false)

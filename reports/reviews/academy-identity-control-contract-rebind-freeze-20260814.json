@@ -1,0 +1,66 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/scripts/generate-identity-control-conformance.mjs",
+      "sha256": "dacf7f822bc419eea96bde7f1dc994428e201a93fe6cb51f49a2b75315b3997f",
+      "bytes": 29154
+    },
+    {
+      "path": "academy-web/scripts/generate-identity-control-conformance.test.mjs",
+      "sha256": "2e48d217f915ae4b7f16157e1cf419316cde564139a821d2cee40e18bf044e8d",
+      "bytes": 15098
+    },
+    {
+      "path": "academy-web/src/lib/identity/consumer-policy.ts",
+      "sha256": "7d48c216660c2177ce93cc3863b8eb5c28a19da45b007316177a923ff8428d4b",
+      "bytes": 3690
+    },
+    {
+      "path": "academy-web/tests/unit/identity-consumer-policy.test.ts",
+      "sha256": "2fff61813922c9cf926ba4e4c0d28aefaba58f8cbb08b7332596faf3f198b34e",
+      "bytes": 3448
+    },
+    {
+      "path": "plans/active_plan.md",
+      "sha256": "24d0dfd81e5c653fa790b1fba6df64b6175e0265b1422e824ebb2291e1f942c7",
+      "bytes": 212928
+    },
+    {
+      "path": "plans/completed_log.md",
+      "sha256": "8207d6b0d9dbf40bf6779b7c1915e736e5bd8390c99c596d7bb49ef1c3b85056",
+      "bytes": 153986
+    },
+    {
+      "path": "reports/conformance/identity-control/academy-identity-control-conformance.json",
+      "sha256": "d15158f87790eac39f3d6625bee14aea626f4572163838b820136fa3329c546f",
+      "bytes": 18205
+    },
+    {
+      "path": "reports/conformance/identity-control/academy-identity-local-evidence.json",
+      "sha256": "6524bd00c60466b13f0dc122bb69757504502c1df3bed82c1b3277fe7656c6eb",
+      "bytes": 10084
+    },
+    {
+      "path": "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
+      "sha256": "eb65c8159a163ea0c4ba17320434b835dc3f8abf9cd1cad673682f88be2b4f9b",
+      "bytes": 1393
+    },
+    {
+      "path": "reports/reviews/academy-identity-control-contract-rebind-local-checkpoint-20260814.md",
+      "sha256": "9d456a85635deb18586142fb34973c811623df161c3fb47c3ce63a0554cda47d",
+      "bytes": 2669
+    },
+    {
+      "path": "reports/reviews/academy-identity-lifecycle-principal-contract-freeze-20260812.json",
+      "sha256": "2c9c228ad8a2e82a8c6f54ad5fe7327099f7c1b40b5a84134848291809deb7a0",
+      "bytes": 2585
+    },
+    {
+      "path": "reports/reviews/academy-identity-lifecycle-principal-contract-local-checkpoint-2026-08-12.md",
+      "sha256": "fc7818c63d840d638ea6a0fd6a749f484c0835ae8735c0f26d99d2f7c8175e80",
+      "bytes": 4251
+    }
+  ]
+}

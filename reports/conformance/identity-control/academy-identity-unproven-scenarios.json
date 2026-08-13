@@ -1,7 +1,7 @@
 {
   "schema": "academy-identity-control-unproven-scenarios/v2",
-  "sourceRevision": "cbab363b6f7b7af25cb92673b5dfe35540cc8d23",
-  "identityControlSourceRevision": "d7f517adb408ee2f50f3b5734c10dd14cbea6530",
+  "sourceRevision": "f497649d06aeaad90eb3d7ac1f9cf0031a100f96",
+  "identityControlSourceRevision": "4efd9b7e76f48e00aa6e3896bc14626cd38bcb6a",
   "command": "academy-identity-control-unproven-v2",
   "result": "not_proven",
   "scenarios": {

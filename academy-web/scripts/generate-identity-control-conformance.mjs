@@ -17,8 +17,8 @@ const scriptDirectory = dirname(fileURLToPath(import.meta.url))
 const academyRoot = resolve(scriptDirectory, '..', '..')
 const identityRoot = resolve(academyRoot, '..', 'identity-control')
 
-export const ACADEMY_SOURCE_REVISION = 'cbab363b6f7b7af25cb92673b5dfe35540cc8d23'
-export const IDENTITY_SOURCE_REVISION = 'd7f517adb408ee2f50f3b5734c10dd14cbea6530'
+export const ACADEMY_SOURCE_REVISION = 'f497649d06aeaad90eb3d7ac1f9cf0031a100f96'
+export const IDENTITY_SOURCE_REVISION = '4efd9b7e76f48e00aa6e3896bc14626cd38bcb6a'
 
 const reportPath = 'reports/conformance/identity-control/academy-identity-control-conformance.json'
 const evidencePath = 'reports/conformance/identity-control/academy-identity-local-evidence.json'
@@ -27,7 +27,7 @@ const unprovenPath = 'reports/conformance/identity-control/academy-identity-unpr
 export const CHECKPOINT_FREEZE_DECLARATION = Object.freeze({
   schema: 'checkpoint-freeze-manifest.v1',
   role: 'identity-consumer-conformance-checkpoint',
-  path: 'reports/reviews/academy-identity-control-lifecycle-principal-conformance-freeze-20260812.json',
+  path: 'reports/reviews/academy-identity-control-contract-rebind-freeze-20260814.json',
   contentPaths: Object.freeze([
     'academy-web/scripts/generate-identity-control-conformance.mjs',
     'academy-web/scripts/generate-identity-control-conformance.test.mjs',
@@ -38,7 +38,7 @@ export const CHECKPOINT_FREEZE_DECLARATION = Object.freeze({
     reportPath,
     evidencePath,
     unprovenPath,
-    'reports/reviews/academy-identity-control-lifecycle-principal-conformance-local-checkpoint-2026-08-12.md',
+    'reports/reviews/academy-identity-control-contract-rebind-local-checkpoint-20260814.md',
     'reports/reviews/academy-identity-lifecycle-principal-contract-freeze-20260812.json',
     'reports/reviews/academy-identity-lifecycle-principal-contract-local-checkpoint-2026-08-12.md',
   ]),
@@ -49,7 +49,7 @@ const identityContractDigests = Object.freeze({
   'docs/integration/consumer-registry-v1.md': 'd880b0e2a8000f6898b76b91ee47ab18b886ac8e2f413f214448a8a2bed575a4',
   'docs/integration/consumer-conformance-kit.md': '52c402cc4582d5dfc1f54ce12cf9d9ed96bf4e6eace10a411585e1c8ee92c6f9',
   'docs/integration/lifecycle-pull-consumer-contract.md': 'ba7ca71fd5ab845821f6dc9cfc09bc612bef1ed12914331e4ad4e65a0ce6f17c',
-  'packages/contracts/src/index.ts': '185e8e95282036bb5d979cdc2c2c163cf5cdabe4816880dc08cb484631c9b39f',
+  'packages/contracts/src/index.ts': '3954689f4749b0f43763b02b4cd1bf4c840304ca594d5a565a5f0af77d910aaa',
   'packages/testing/src/index.ts': '72aa668be65434cac203c15e16d3c5c7c2d1bf89143bc1b1255d3972305069f6',
 })
 
