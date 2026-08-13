@@ -6,6 +6,23 @@
 
 ## Current execution lane — activate identity without widening Pool A access
 
+**Runtime completion seam remediation checkpoint (2026-08-14):** At current Academy
+HEAD `ef7bdf21ec3b7ea6886ee14ae62dcf32bc3f75eb`, one local-only injected
+composition boundary now orders durable transaction consume -> verified code
+exchange -> Academy profile activation commit -> Academy-owned session create.
+Original different RIL returned `C0/H0/M1/L0`: activation/session return values
+were not bound back to the verified principal. Test-only RED produced 7 exact
+failures; remediation binds issuer, subject, canonical email, activation status
+and revision, validates exact session claims, and proves session-write failure
+preserves callback consumption while fresh authorization can recover. Focused
+`13/13`, relevant Identity `111/111`, TypeScript, and scoped ESLint pass.
+Different closure RIL bound the remediated authority, reran `133/133` plus
+TypeScript/scoped ESLint, and passed final `C0/H0/M0/L0` against
+`reports/reviews/academy-identity-runtime-completion-freeze-20260814.json`.
+No route, registry, config, migration, DB, Cloudflare, or UI byte changed;
+`enabled=false`, `runtimeWired=false`, `releaseApproval=false`, and production
+NO-GO remain unchanged.
+
 **Current contract rebind (2026-08-14):** Academy's local conformance ledger
 now pins Academy `f497649d06aeaad90eb3d7ac1f9cf0031a100f96` and Identity
 Control `4efd9b7e76f48e00aa6e3896bc14626cd38bcb6a`. The only changed

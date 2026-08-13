@@ -3,6 +3,31 @@
 > Closed items only, with outcome + evidence + residual risk. Newest first.
 > Provider-neutral. See `active_plan.md` for open work.
 
+## 2026-08-14 - Identity runtime completion author phase closed locally
+
+**Outcome:** Added a pure injected completion seam that consumes the existing
+one-time transaction, verifies the Identity-owned exchange result, commits the
+Academy-owned profile activation, and only then creates an Academy-owned
+session. Exchange and activation failures never create a session; a consumed
+callback remains unavailable on replay.
+
+**Verification:** Initial test-only RED failed because the module was absent and
+initial GREEN passed focused `5/5`. Original RIL returned `C0/H0/M1/L0` because
+activation/session return values were not bound back to the verified principal.
+M-01 RED passed 6 and failed 7 exact mismatch cases. Remediation passes focused
+`13/13`, relevant Identity regression `111/111`, TypeScript, and scoped ESLint.
+The test also proves the accepted registry remains disabled and the production
+authorization/callback routes remain fail-closed at `404`/`503`.
+
+**Review:** Original different RIL failed `C0/H0/M1/L0`; M-01 was remediated.
+A different-independent closure reviewer rebound the authority, reran `133/133`
+plus TypeScript/scoped ESLint, and passed final `C0/H0/M0/L0`.
+
+**Residual risk:** The seam is unwired and receives only injected capabilities.
+`enabled=false`, `runtimeWired=false`, `releaseApproval=false`, and production
+NO-GO remain unchanged. Endpoint/key authority, migrations, deployed browser
+evidence, and explicit release authorization remain external gates.
+
 ## 2026-08-14 - Identity contract rebind prepared locally
 
 **Outcome:** Academy's non-secret consumer mirror and deterministic conformance
