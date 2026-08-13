@@ -3,6 +3,41 @@
 > Closed items only, with outcome + evidence + residual risk. Newest first.
 > Provider-neutral. See `active_plan.md` for open work.
 
+## 2026-08-14 - Durable Identity session store author phase prepared locally
+
+**Outcome:** Added an injected PostgreSQL session adapter and forward migration
+`0027` for the exact Academy-owned session claims already accepted by runtime
+completion. The boundary generates a 256-bit opaque ID, retries one impossible-
+to-trust collision, uses database time for TTL, rejects mismatched receipts,
+returns expired sessions as absent, and revokes repeatedly without widening the
+capability. It stores no course entitlement and exposes no direct table access.
+
+**Verification:** Test-only RED failed before collection because the adapter was
+absent. GREEN passes focused `9/9`, relevant session/runtime/transaction/
+activation `69/69`, supported-runtime Identity `534/534`, TypeScript, and scoped ESLint. Static migration assertions
+cover row locking, database clock, RLS, table revocation from `service_role` and
+`academy_runtime`, and exactly three runtime-only RPC grants. An initial sweep
+under unsupported Node 25 failed one unchanged WebCrypto proxy-forgery test; the
+exact sweep passes `534/534` under the package-declared Node 24 engine without a
+source change.
+
+**Review:** The first different-independent review returned `C0/H0/M2/L0`.
+M-01 identified principal-contract drift between session storage and the exact
+lifecycle issuer/UTF-16 subject boundary. M-02 identified SQL `integer`
+narrowing of valid safe activation revisions. Test-only RED passed 10 and failed
+8. Remediation reuses the lifecycle validator, stores the canonical UTF-16 hex
+`subjectKey` checked by the 0026 predicates, and uses `bigint` constrained to
+`1..9007199254740991`. Focused `26/26`, related `112/112`, TypeScript, and scoped
+ESLint pass. A different-independent closure reviewer rebound the refreshed
+authority, reran focused `26/26`, expanded relevant `124/124`, additional
+durable-store `12/12`, TypeScript, and scoped ESLint, and passed final
+`C0/H0/M0/L0`.
+
+**Residual risk:** Migration `0027` has not been applied to Pool A and no real
+database was contacted. The adapter is not imported by a route or registry;
+`enabled=false`, `runtimeWired=false`, `releaseApproval=false`, and production
+NO-GO remain unchanged.
+
 ## 2026-08-14 - Identity runtime browser-flow checkpoint closed locally
 
 **Outcome:** Added one injected browser orchestration seam that validates the

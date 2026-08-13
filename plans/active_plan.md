@@ -6,6 +6,33 @@
 
 ## Current execution lane — activate identity without widening Pool A access
 
+**Durable Identity session store author checkpoint (2026-08-14):** A new
+local, injected PostgreSQL adapter and forward migration `0027` now prepare the
+Academy-owned production session persistence boundary without wiring it into a
+route or registry. The adapter accepts only the runtime-completion principal and
+activation claims, creates a 256-bit opaque ID, binds the database-clock receipt
+back to the exact input, reads with expiry handling, and revokes idempotently.
+The table remains inaccessible to browser, `service_role`, and Academy runtime
+roles; `academy_runtime` receives only three exact RPC capabilities. Test-only
+RED stopped on the missing module; focused `9/9`, related session/completion/
+transaction/activation `69/69`, TypeScript, and scoped ESLint pass. The broader
+Identity sweep passes `534/534` on the package-supported Node 24 runtime. An
+initial Node 25 run reproduced one WebCrypto proxy-test incompatibility; rerun
+on the declared engine removed it without a code change. Author evidence is at
+`reports/reviews/academy-identity-postgres-session-store-local-checkpoint-20260814.md`.
+The first different-independent review returned `C0/H0/M2/L0`. M-01 found that
+session principals did not yet reuse the exact lifecycle issuer/UTF-16 subject
+contract. M-02 found that SQL `integer` narrowed valid safe revisions above
+`2^31-1`. Test-only RED expanded to `18` tests with `10` pass / `8` fail.
+Remediation now uses the shared principal validator and the 0026 `subjectKey`
+representation/predicates, while SQL uses `bigint` bounded through
+`9007199254740991`. Focused `26/26`, related `112/112`, TypeScript, and scoped
+ESLint pass. A different-independent closure reviewer rebound the refreshed
+six-file authority, reran focused `26/26`, expanded relevant `124/124`,
+additional durable-store `12/12`, TypeScript, and scoped ESLint, and passed
+final `C0/H0/M0/L0`. Migration `0027` is unapplied, the adapter is unwired,
+registry flags remain false, and production stays NO-GO.
+
 **Runtime browser-flow local checkpoint (2026-08-14):** At Academy HEAD
 `221fea08264c51bfa982d1237d2b19637e945982`, a local-only injected
 boundary now composes authorization start, exact registered redirect, secure

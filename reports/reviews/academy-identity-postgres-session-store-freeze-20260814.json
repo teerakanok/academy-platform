@@ -1,0 +1,36 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/src/lib/identity/postgres-session-store.ts",
+      "sha256": "2a34b385ba2e1655cea5147c60329caad063f695b295ac3498fe30942a3b8e0c",
+      "bytes": 10871
+    },
+    {
+      "path": "academy-web/supabase/migrations/0027_identity_session_store.sql",
+      "sha256": "48d916aa5ae8cac47c800d116ae1c9780580940788f4804c2208fc9f52583fe0",
+      "bytes": 7801
+    },
+    {
+      "path": "academy-web/tests/unit/identity-postgres-session-store.test.ts",
+      "sha256": "dec11c70a569ccefe96ad9ebd0ce1ab09f850568cf5c47a9c7a438bf27cea016",
+      "bytes": 14232
+    },
+    {
+      "path": "plans/active_plan.md",
+      "sha256": "3a2a4e82554723b60d01abfeeb20a75f4727595e9be7b99b0b2dd438a939d720",
+      "bytes": 217550
+    },
+    {
+      "path": "plans/completed_log.md",
+      "sha256": "b008aab7ef242399a168aeb344cbb604f8f4958956e0d43d676e95bc1262ae51",
+      "bytes": 159333
+    },
+    {
+      "path": "reports/reviews/academy-identity-postgres-session-store-local-checkpoint-20260814.md",
+      "sha256": "65a21c9a5d4571eef5c952f950a4920866de22ea57f3fef9f17281e0c361105a",
+      "bytes": 4821
+    }
+  ]
+}
