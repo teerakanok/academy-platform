@@ -1,5 +1,6 @@
 import { FakeIdentityAdapter } from './fake-adapter'
 import type { IdentityAdapter } from './adapter'
+import type { AcademyIdentityRuntimeBrowserFlow } from './runtime-browser-flow'
 
 // เลือก adapter ตามสภาพแวดล้อม
 //
@@ -22,6 +23,19 @@ export function getIdentityAdapter(): IdentityAdapter | null {
   if (cached !== undefined) return cached
   cached = build()
   return cached
+}
+
+/**
+ * Least-capability route seam for the future approved runtime composition.
+ * Current registry bytes intentionally provide no production capabilities.
+ */
+export function getIdentityRuntimeBrowserFlow(): AcademyIdentityRuntimeBrowserFlow | null {
+  const mode = process.env.IDENTITY_ADAPTER?.trim()
+  if (!mode || mode === 'none' || mode === 'fake') return null
+  if (mode === 'identity-control') {
+    throw new IdentityAdapterUnavailableError('Identity Control runtime ยังไม่ได้รับ release authorization สำหรับ Academy')
+  }
+  throw new Error(`ไม่รู้จัก IDENTITY_ADAPTER=${mode}`)
 }
 
 function build(): IdentityAdapter | null {

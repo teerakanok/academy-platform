@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { IdentityAdapterUnavailableError, getIdentityAdapter } from '@/lib/identity/registry'
+import { IdentityAdapterUnavailableError, getIdentityRuntimeBrowserFlow } from '@/lib/identity/registry'
 import { IdentityTransactionError, parseIdentityCallback } from '@/lib/identity/transaction'
 import { identityControlLocalFixtureAllowedForRequest } from '@/lib/identity/local-fixture'
 import {
@@ -27,17 +27,17 @@ export const runtime = 'nodejs'
 
 export async function GET(request: Request) {
   const url = new URL(request.url)
-  let callback
-  try {
-    callback = parseIdentityCallback(url)
-  } catch (error) {
-    if (error instanceof IdentityTransactionError) {
-      return NextResponse.json({ ok: false, error: error.message }, { status: 400 })
-    }
-    throw error
-  }
 
   if (identityControlLocalFixtureAllowedForRequest(request)) {
+    let callback
+    try {
+      callback = parseIdentityCallback(url)
+    } catch (error) {
+      if (error instanceof IdentityTransactionError) {
+        return NextResponse.json({ ok: false, error: error.message }, { status: 400 })
+      }
+      throw error
+    }
     let stateCookie: string | undefined
     try {
       const local = createIdentityLocalRuntime(request)
@@ -63,9 +63,9 @@ export async function GET(request: Request) {
     }
   }
 
-  let adapter
+  let browserFlow
   try {
-    adapter = getIdentityAdapter()
+    browserFlow = getIdentityRuntimeBrowserFlow()
   } catch (error) {
     if (error instanceof IdentityAdapterUnavailableError) {
       return NextResponse.json(
@@ -75,23 +75,30 @@ export async function GET(request: Request) {
     }
     throw error
   }
-  if (!adapter) {
-    // ยังไม่ได้ต่อ Identity Control — ตอบตามจริง ไม่ใช่ทำเป็นว่าใช้ได้
-    return NextResponse.json(
-      { ok: false, error: 'ยังไม่ได้เชื่อมต่อ Identity Control สำหรับสภาพแวดล้อมนี้' },
-      { status: 503 },
-    )
+  if (browserFlow) {
+    const result = await browserFlow.complete(request)
+    if (result.kind === 'error') {
+      const response = NextResponse.json({ ok: false, error: result.error }, { status: result.status })
+      for (const cookie of result.cookies) response.headers.append('set-cookie', cookie)
+      return response
+    }
+    const response = NextResponse.redirect(new URL(result.location, request.url), result.status)
+    for (const cookie of result.cookies) response.headers.append('set-cookie', cookie)
+    return response
   }
 
-  // ขั้นตอนที่เหลือ (ทำเมื่อ Identity Control พร้อมต่อจริง):
-  //   1. ดึง transaction จาก state ref ฝั่ง backend และตรวจว่ายังไม่หมดอายุ/ยังไม่ถูกใช้
-  //   2. adapter.exchangeCode ด้วย PKCE verifier ที่เก็บไว้กับ transaction นั้น
-  //   3. ตรวจ nonce ที่ได้กลับมาว่าตรงกับที่ส่งไป
-  //   4. findOrCreateUser ด้วย (issuer, subject) เท่านั้น — ห้ามค้นด้วย email
-  //   5. syncActivation ตามผลที่ได้
-  //   6. ตั้ง session ของ Academy เอง แบบ host-scoped
+  try {
+    parseIdentityCallback(url)
+  } catch (error) {
+    if (error instanceof IdentityTransactionError) {
+      return NextResponse.json({ ok: false, error: error.message }, { status: 400 })
+    }
+    throw error
+  }
+
+  // ยังไม่ได้ต่อ Identity Control — ตอบตามจริง ไม่ใช่ทำเป็นว่าใช้ได้
   return NextResponse.json(
-    { ok: false, error: 'ยังไม่เปิดใช้งาน — ยังไม่มี Identity Control runtime ที่ได้รับอนุมัติ' },
-    { status: 501 },
+    { ok: false, error: 'ยังไม่ได้เชื่อมต่อ Identity Control สำหรับสภาพแวดล้อมนี้' },
+    { status: 503 },
   )
 }

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { safeNextPath } from '@/lib/auth/route-client'
 import { validateMutationRequest } from '@/lib/http/mutation-security'
 import { identityControlLocalFixtureAllowedForRequest } from '@/lib/identity/local-fixture'
+import { IdentityAdapterUnavailableError, getIdentityRuntimeBrowserFlow } from '@/lib/identity/registry'
 import {
   createIdentityLocalRuntime,
   localAccountCenterUrl,
@@ -13,7 +14,25 @@ export const runtime = 'nodejs'
 
 export async function POST(request: Request) {
   if (!identityControlLocalFixtureAllowedForRequest(request)) {
-    return new NextResponse(null, { status: 404 })
+    try {
+      const browserFlow = getIdentityRuntimeBrowserFlow()
+      if (!browserFlow) return new NextResponse(null, { status: 404 })
+      const result = await browserFlow.start(request)
+      if (result.kind === 'error') {
+        return NextResponse.json({ ok: false, error: result.error }, { status: result.status })
+      }
+      const response = NextResponse.redirect(new URL(result.location, request.url), result.status)
+      for (const cookie of result.cookies) response.headers.append('set-cookie', cookie)
+      return response
+    } catch (error) {
+      if (error instanceof IdentityAdapterUnavailableError) {
+        return NextResponse.json(
+          { ok: false, error: 'ยังไม่ได้เชื่อมต่อ Identity Control สำหรับสภาพแวดล้อมนี้' },
+          { status: 503 },
+        )
+      }
+      throw error
+    }
   }
   const mutation = validateMutationRequest(request)
   if (!mutation.ok) {

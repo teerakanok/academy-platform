@@ -3,6 +3,34 @@
 > Closed items only, with outcome + evidence + residual risk. Newest first.
 > Provider-neutral. See `active_plan.md` for open work.
 
+## 2026-08-14 - Identity runtime browser-flow checkpoint closed locally
+
+**Outcome:** Added one injected browser orchestration seam that validates the
+authorization mutation before reading its form, creates the server-held
+transaction only after exact redirect validation, binds the callback to one
+secure browser cookie, and delegates verified completion to the accepted
+activation/session boundary. Activation or session failure consumes the old
+callback; a fresh authorization can recover.
+
+**Verification:** Test-only RED failed before collection because the new module
+was absent. GREEN passes focused `8/8`, related route/runtime/security `67/67`,
+Academy Identity `537/537`, TypeScript, and scoped ESLint. Tests prove swapped
+binding and replay issue no extra exchange/session, disabled admission reads no
+nested capability, and default production routes remain unavailable.
+
+**Review:** A different-independent reviewer rebound the frozen eight-file
+authority and passed `C0/H0/M0/L1` after fresh focused `8/8`, related seam
+`67/67`, TypeScript, scoped ESLint, diff, and staged-empty checks.
+
+**Residual risk:** The registry intentionally supplies no production flow.
+Canonical conformance remains 16 pass / 7 `not_proven`; endpoint/key authority,
+Pool A application, deployed browser evidence, operators, and release approval
+remain external. `enabled=false`, `runtimeWired=false`,
+`releaseApproval=false`, and production NO-GO are unchanged. One nonblocking
+Low is owned by the future registry-wiring slice: add mocked route tests for
+enabled status, redirect, and multiple `Set-Cookie` propagation before that
+registry can be enabled.
+
 ## 2026-08-14 - Identity runtime completion author phase closed locally
 
 **Outcome:** Added a pure injected completion seam that consumes the existing

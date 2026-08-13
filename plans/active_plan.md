@@ -6,6 +6,26 @@
 
 ## Current execution lane — activate identity without widening Pool A access
 
+**Runtime browser-flow local checkpoint (2026-08-14):** At Academy HEAD
+`221fea08264c51bfa982d1237d2b19637e945982`, a local-only injected
+boundary now composes authorization start, exact registered redirect, secure
+browser-binding cookie, callback parsing, and the accepted runtime-completion
+seam. TDD RED stopped on the missing module; GREEN passes focused `8/8`, related
+route/runtime/security `67/67`, Academy Identity `537/537`, TypeScript, and
+scoped ESLint. The existing routes delegate only through a least-capability
+registry seam; the current registry returns no capability, so default start
+remains `404` and unreleased Identity mode remains `503`. No endpoint, key,
+audience, migration, DB, Cloudflare, deploy, or UI value changed. Conformance
+remains 16 pass / 7 `not_proven`; `enabled=false`, `runtimeWired=false`,
+`releaseApproval=false`, and production NO-GO remain unchanged. Author evidence
+is at `reports/reviews/academy-identity-runtime-browser-flow-local-checkpoint-20260814.md`.
+A different-independent RIL rebound the frozen eight-file authority, reran
+focused `8/8`, related seam `67/67`, TypeScript, and scoped ESLint, and passed
+`C0/H0/M0/L1`. The Low is nonblocking: before registry wiring, add direct
+route-level mocks for the future enabled branches to verify status, redirect,
+and multiple `Set-Cookie` propagation. It does not widen this disabled local
+checkpoint or change the seven production evidence gates.
+
 **Runtime completion seam remediation checkpoint (2026-08-14):** At current Academy
 HEAD `ef7bdf21ec3b7ea6886ee14ae62dcf32bc3f75eb`, one local-only injected
 composition boundary now orders durable transaction consume -> verified code
