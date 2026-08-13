@@ -55,6 +55,8 @@ export function verifyIdentityCodeExchangeResult(
       || !isNonEmptyString(result.issuer)
       || !isNonEmptyString(result.subject)
       || typeof result.verifiedEmail !== 'string'
+      || result.verifiedEmail.length < 3
+      || result.verifiedEmail.length > 320
       || !EMAIL.test(result.verifiedEmail)
       || typeof activation.status !== 'string'
       || !ACTIVATION_STATUSES.has(activation.status)

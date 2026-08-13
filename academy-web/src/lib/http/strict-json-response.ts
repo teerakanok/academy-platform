@@ -475,6 +475,22 @@ class DuplicateSafeJsonParser {
   }
 }
 
+export function parseStrictJsonText(
+  text: string,
+  maximumCharacters: number,
+  maxDepth: number,
+): StrictJsonResult {
+  if (typeof text !== 'string'
+    || !validLimit(maximumCharacters)
+    || text.length > maximumCharacters
+    || !Number.isSafeInteger(maxDepth)
+    || maxDepth < 0
+    || maxDepth > MAX_JSON_DEPTH) {
+    return { ok: false }
+  }
+  return new DuplicateSafeJsonParser(text, maxDepth).parse()
+}
+
 export async function readStrictJsonResponse(
   response: Response,
   options: BoundedResponseOptions,
@@ -489,5 +505,5 @@ export async function readStrictJsonResponse(
     return { ok: false }
   }
   const text = await readBoundedResponseTextWithPlan(response, plan)
-  return text === null ? { ok: false } : new DuplicateSafeJsonParser(text, plan.maxDepth).parse()
+  return text === null ? { ok: false } : parseStrictJsonText(text, plan.maxBytes, plan.maxDepth)
 }

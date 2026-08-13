@@ -3,6 +3,24 @@
 > Closed items only, with outcome + evidence + residual risk. Newest first.
 > Provider-neutral. See `active_plan.md` for open work.
 
+## 2026-08-14 - Signed code-exchange result consumer prepared locally
+
+- Added an unwired Academy-local ES256 consumer for Identity Control's strict
+  signed-result envelope and bounded active/overlap/retired public keyring.
+- Bound the exact producer vectors and issuer, audience, client, nonce,
+  principal, service, activation, time, and result-key namespace contracts;
+  shared duplicate-safe JSON parsing prevents a second parser implementation.
+- TDD RED failed on the absent module. Initial GREEN passed focused `34/34` and
+  related Identity `202/202`. The first different-independent review returned
+  `C0/H0/M1/L0`: verified-email format validation omitted the producer's exact
+  3..320 UTF-16 code-unit bound. Remediation RED passed 26 and failed the
+  321-code-unit rejection; the narrow shared predicate fix passes focused
+  `61/61`, related Identity `203/203`, TypeScript, and scoped ESLint.
+- A different-independent closure reviewer passed final `C0/H0/M0/L0`. No
+  runtime importer, endpoint, environment value, key, registry, route,
+  migration, database, provider, deployment, or production authority changed.
+  Conformance remains 16/23 and all release flags remain false.
+
 ## 2026-08-14 - Durable Identity session store author phase prepared locally
 
 **Outcome:** Added an injected PostgreSQL session adapter and forward migration

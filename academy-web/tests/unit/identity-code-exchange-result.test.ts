@@ -26,6 +26,11 @@ function validResult() {
   }
 }
 
+function emailWithLength(length: number): string {
+  const domain = '@example.test'
+  return `${'a'.repeat(length - domain.length)}${domain}`
+}
+
 describe('identity code-exchange result verifier', () => {
   it('returns a fresh exact projection for a contract-valid result', () => {
     const input = validResult()
@@ -40,6 +45,21 @@ describe('identity code-exchange result verifier', () => {
     input.activation.revision = 99
     expect(verified.result.subject).toBe('principal-123')
     expect(verified.result.activation.revision).toBe(4)
+  })
+
+  it('matches the producer verified-email UTF-16 length boundary', () => {
+    const maximum = emailWithLength(320)
+    const overbound = emailWithLength(321)
+    expect(maximum).toHaveLength(320)
+    expect(overbound).toHaveLength(321)
+    expect(verifyIdentityCodeExchangeResult(
+      { ...validResult(), verifiedEmail: maximum },
+      expectations,
+    )).toMatchObject({ ok: true })
+    expect(verifyIdentityCodeExchangeResult(
+      { ...validResult(), verifiedEmail: overbound },
+      expectations,
+    )).toEqual({ ok: false, reason: 'invalid_result' })
   })
 
   it.each([

@@ -6,6 +6,23 @@
 
 ## Current execution lane — activate identity without widening Pool A access
 
+**Signed code-exchange result consumer checkpoint (2026-08-14):** Academy now
+has a local-only Web Crypto ES256 verifier and bounded active/overlap result-key
+ring bound to Identity Control producer revision
+`5cf3d58e7e0a1dc3fe355de19f6b44a8a1742171`. It accepts the exact producer
+positive, active, and overlap vectors and rejects retired, mismatched, tampered,
+expired, malformed, ambiguous, lifecycle-key, and client-assertion-key input.
+TDD RED stopped on the missing module; initial GREEN passed focused `34/34` and
+related Identity `202/202`. The first different-independent review returned
+`C0/H0/M1/L0` because the shared raw-result validator omitted the producer's
+3..320 verified-email length bound. Remediation RED passed 26 and failed the
+321-code-unit rejection; GREEN now passes focused `61/61`, related Identity
+`203/203`, TypeScript, and scoped ESLint. A different-independent closure
+reviewer passed final `C0/H0/M0/L0`. The consumer is not imported by transport,
+callback, routes, or registry; conformance remains 16 pass / 7 `not_proven`,
+all enablement/release flags remain false, and production stays NO-GO. Evidence:
+`reports/reviews/academy-identity-code-exchange-result-envelope-local-checkpoint-20260814.md`.
+
 **Durable Identity session store author checkpoint (2026-08-14):** A new
 local, injected PostgreSQL adapter and forward migration `0027` now prepare the
 Academy-owned production session persistence boundary without wiring it into a
