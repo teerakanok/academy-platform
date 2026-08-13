@@ -61,7 +61,7 @@ describe('Academy Identity runtime browser flow', () => {
     const completed = await fixture.flow.complete(callbackRequest(started, started.binding))
     expect(completed).toMatchObject({ kind: 'redirect', location: '/dashboard' })
     expect(fixture.calls).toEqual([
-      'create', 'authorize', 'consume', 'consume', 'assertion', 'exchange', 'activation', 'session',
+      'create', 'authorize', 'consume', 'consume', 'assertion', 'exchange', 'verify', 'activation', 'session',
     ])
   })
 
@@ -139,6 +139,7 @@ describe('Academy Identity runtime browser flow', () => {
       authorizationPort: unavailable,
       registration: unavailable,
       codeExchangePort: unavailable,
+      codeExchangeResultVerifier: unavailable,
       profileActivationStore: unavailable,
       sessionStore: unavailable,
       client: unavailable,
@@ -195,6 +196,25 @@ function createFixture(overrides: {
     codeExchangePort: {
       async exchangeCode() {
         calls.push('exchange')
+        return { signedResult: 'fixture.signed.result' }
+      },
+    },
+    codeExchangeResultVerifier: {
+      async verify(_value: unknown, binding: {
+        expectedAudience: string
+        expectedClientId: string
+        expectedNonce: string
+        expectedPrincipalIssuer: string
+        expectedServiceId: string
+      }) {
+        calls.push('verify')
+        expect(binding).toEqual({
+          expectedAudience: CLIENT.audience,
+          expectedClientId: CLIENT.clientId,
+          expectedNonce: fixtureNonce,
+          expectedPrincipalIssuer: CLIENT.expectedIssuer,
+          expectedServiceId: CLIENT.serviceId,
+        })
         return {
           issuer: CLIENT.expectedIssuer,
           subject: 'founder-subject',

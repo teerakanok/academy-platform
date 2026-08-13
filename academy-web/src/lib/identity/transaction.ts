@@ -9,6 +9,7 @@ import type {
   IdentityClientAssertionProvider,
 } from './adapter'
 import { verifyIdentityCodeExchangeResult } from './code-exchange-result'
+import type { IdentityCodeExchangeResultVerifierPort } from './code-exchange-result-verifier-port'
 import { withExclusiveFileStoreLock } from './file-store-lock'
 
 const CALLBACK_KEYS = new Set(['code', 'state'])
@@ -567,6 +568,82 @@ export async function completeIdentityCallback({
   browserBinding: string
   clientAssertionProvider: IdentityClientAssertionProvider
 }): Promise<{ exchange: ExchangeResult; returnPath: string }> {
+  return completeIdentityCallbackWithVerification({
+    adapter,
+    store,
+    client,
+    callback,
+    browserBinding,
+    clientAssertionProvider,
+  }, (exchangeValue, transaction) => {
+    const verified = verifyIdentityCodeExchangeResult(exchangeValue, {
+      audience: transaction.client.audience,
+      expectedIssuer: transaction.client.expectedIssuer,
+      nonce: transaction.nonce,
+      serviceId: transaction.client.serviceId,
+    })
+    if (!verified.ok) {
+      if (verified.reason === 'audience_mismatch') {
+        throw new IdentityTransactionError(
+          'ผลการแลก code ไม่ได้ผูกกับ Academy client ที่เริ่ม transaction',
+          'audience_mismatch',
+        )
+      }
+      throw new IdentityTransactionError('ผลการแลก code ไม่ตรงกับ contract', 'invalid_result')
+    }
+    return verified.result
+  })
+}
+
+/** Production composition requires a signed-result verifier; there is no raw-result fallback. */
+export async function completeSignedIdentityCallback({
+  resultVerifier,
+  ...input
+}: {
+  adapter: IdentityCodeExchangePort
+  store: IdentityTransactionStore
+  client: LocalIdentityClient
+  callback: IdentityCallback
+  browserBinding: string
+  clientAssertionProvider: IdentityClientAssertionProvider
+  resultVerifier: IdentityCodeExchangeResultVerifierPort
+}): Promise<{ exchange: ExchangeResult; returnPath: string }> {
+  return completeIdentityCallbackWithVerification(input, async (exchangeValue, transaction) => {
+    try {
+      return await resultVerifier.verify(exchangeValue, {
+        expectedAudience: transaction.client.audience,
+        expectedClientId: transaction.client.clientId,
+        expectedNonce: transaction.nonce,
+        expectedPrincipalIssuer: transaction.client.expectedIssuer,
+        expectedServiceId: transaction.client.serviceId,
+      })
+    } catch {
+      throw new IdentityTransactionError('ผลการแลก code ไม่ตรงกับ contract', 'invalid_result')
+    }
+  })
+}
+
+async function completeIdentityCallbackWithVerification(
+  {
+    adapter,
+    store,
+    client,
+    callback,
+    browserBinding,
+    clientAssertionProvider,
+  }: {
+    adapter: IdentityCodeExchangePort
+    store: IdentityTransactionStore
+    client: LocalIdentityClient
+    callback: IdentityCallback
+    browserBinding: string
+    clientAssertionProvider: IdentityClientAssertionProvider
+  },
+  verifyResult: (
+    value: unknown,
+    transaction: PendingIdentityTransaction,
+  ) => ExchangeResult | PromiseLike<ExchangeResult>,
+): Promise<{ exchange: ExchangeResult; returnPath: string }> {
   const transaction = await store.consume(callback.state, browserBinding)
   if (
     transaction.client.clientId !== client.clientId ||
@@ -591,17 +668,6 @@ export async function completeIdentityCallback({
     code: callback.code,
     codeVerifier: transaction.codeVerifier,
   })
-  const verified = verifyIdentityCodeExchangeResult(exchangeValue, {
-    audience: transaction.client.audience,
-    expectedIssuer: transaction.client.expectedIssuer,
-    nonce: transaction.nonce,
-    serviceId: transaction.client.serviceId,
-  })
-  if (!verified.ok) {
-    if (verified.reason === 'audience_mismatch') {
-      throw new IdentityTransactionError('ผลการแลก code ไม่ได้ผูกกับ Academy client ที่เริ่ม transaction', 'audience_mismatch')
-    }
-    throw new IdentityTransactionError('ผลการแลก code ไม่ตรงกับ contract', 'invalid_result')
-  }
-  return { exchange: verified.result, returnPath: transaction.returnPath }
+  const verified = await verifyResult(exchangeValue, transaction)
+  return { exchange: verified, returnPath: transaction.returnPath }
 }

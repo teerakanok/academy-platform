@@ -1,0 +1,61 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/src/lib/identity/code-exchange-result-verifier-port.ts",
+      "sha256": "f39176aff4794efb22dd6ac5854118c4140a3185ca3be416ec6cc587c1e14d5b",
+      "bytes": 7647
+    },
+    {
+      "path": "academy-web/src/lib/identity/runtime-browser-flow.ts",
+      "sha256": "057963c731cee0ad3a9a3847af0f724d67415bd43d5f208748c720f9dcd20668",
+      "bytes": 9942
+    },
+    {
+      "path": "academy-web/src/lib/identity/runtime-completion.ts",
+      "sha256": "9b8688e579e39c6e44402ce9e0110f9cbe0984fa9d57ce93f2a9cefddd746371",
+      "bytes": 11153
+    },
+    {
+      "path": "academy-web/src/lib/identity/transaction.ts",
+      "sha256": "905dce209849b17db2156d71c560097ed0eb0096a15fcf0aef23e6789de99f2e",
+      "bytes": 27261
+    },
+    {
+      "path": "academy-web/tests/unit/identity-code-exchange-result-verifier-port.test.ts",
+      "sha256": "ef463bf88f1c5956e3965909d64fbb1e0156e08f50c9b3b5464361f53009680a",
+      "bytes": 7409
+    },
+    {
+      "path": "academy-web/tests/unit/identity-runtime-browser-flow.test.ts",
+      "sha256": "d176ccb078be558a4635a548115e5b4772a15e3677b92fec409a68ed2b52d24a",
+      "bytes": 11262
+    },
+    {
+      "path": "academy-web/tests/unit/identity-runtime-completion.test.ts",
+      "sha256": "7699a2f07aada1ca7cf1c5683e78c072c9b3df7a94019f31d46454715582b159",
+      "bytes": 13386
+    },
+    {
+      "path": "academy-web/tests/unit/identity-transaction.test.ts",
+      "sha256": "1cfa5e6912123a088d1d047e8bce569a1f890aa0791d20c58c048cbc6ab41487",
+      "bytes": 25596
+    },
+    {
+      "path": "plans/active_plan.md",
+      "sha256": "08f5b651e2436b8ac8b2aca2ee56bd3661340e37dfd4f2ed3cedbc757f4cd487",
+      "bytes": 220021
+    },
+    {
+      "path": "plans/completed_log.md",
+      "sha256": "81dc07a93940fed61a6b6a1f1f2ed49177a0a7b11270a72fe4ed8bf2ffa375e6",
+      "bytes": 161859
+    },
+    {
+      "path": "reports/reviews/academy-identity-signed-result-runtime-composition-local-checkpoint-20260814.md",
+      "sha256": "7aef400764ed95b54d66c59469f4ea5ffe7cc7369656f115e5334c2aca0ff9d6",
+      "bytes": 3730
+    }
+  ]
+}

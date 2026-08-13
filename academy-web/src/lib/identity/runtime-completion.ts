@@ -7,8 +7,9 @@ import type {
   IdentityProfileActivationInput,
 } from './profile-activation-store'
 import type { IdentitySessionClaims } from './session-store'
+import type { IdentityCodeExchangeResultVerifierPort } from './code-exchange-result-verifier-port'
 import {
-  completeIdentityCallback,
+  completeSignedIdentityCallback,
   parseIdentityCallback,
   type IdentityTransactionStore,
   type LocalIdentityClient,
@@ -18,6 +19,7 @@ const OPTION_KEYS = [
   'admission',
   'transactionStore',
   'codeExchangePort',
+  'codeExchangeResultVerifier',
   'profileActivationStore',
   'sessionStore',
   'client',
@@ -116,6 +118,10 @@ export function createAcademyIdentityRuntimeCompletion(optionsValue: unknown): {
     const client = snapshotClient(options.client)
     const consume = bindMethod<IdentityTransactionStore['consume']>(options.transactionStore, 'consume')
     const exchangeCode = bindMethod<IdentityCodeExchangePort['exchangeCode']>(options.codeExchangePort, 'exchangeCode')
+    const verifyResult = bindMethod<IdentityCodeExchangeResultVerifierPort['verify']>(
+      options.codeExchangeResultVerifier,
+      'verify',
+    )
     const commit = bindMethod<ProfileActivationPort['commit']>(options.profileActivationStore, 'commit')
     const createSession = bindMethod<SessionPort['create']>(options.sessionStore, 'create')
     const createClientAssertion = bindMethod<IdentityClientAssertionProvider['createClientAssertion']>(
@@ -130,6 +136,7 @@ export function createAcademyIdentityRuntimeCompletion(optionsValue: unknown): {
       consume,
     }
     const codeExchangePort: IdentityCodeExchangePort = { exchangeCode }
+    const resultVerifier: IdentityCodeExchangeResultVerifierPort = { verify: verifyResult }
     const clientAssertionProvider: IdentityClientAssertionProvider = { createClientAssertion }
 
     return Object.freeze({
@@ -140,13 +147,14 @@ export function createAcademyIdentityRuntimeCompletion(optionsValue: unknown): {
             throw new Error(FAILURE_MESSAGE)
           }
           const callback = parseIdentityCallback(input.callbackUrl)
-          const completed = await completeIdentityCallback({
+          const completed = await completeSignedIdentityCallback({
             adapter: codeExchangePort,
             store: transactionStore,
             client,
             callback,
             browserBinding: input.browserBinding,
             clientAssertionProvider,
+            resultVerifier,
           })
 
           const activationInput: IdentityProfileActivationInput = {

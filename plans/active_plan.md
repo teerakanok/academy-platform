@@ -6,6 +6,20 @@
 
 ## Current execution lane — activate identity without widening Pool A access
 
+**Signed-result runtime composition author checkpoint (2026-08-14):** Academy's production-disabled
+callback composition now requires the accepted signed code-exchange result verifier through one
+least-capability injected port. Active/overlap producer vectors pass; retired, unknown-key, tampered,
+unsigned, issuer/audience/client/nonce/principal/service/time mismatches stop before profile
+activation or session creation. The existing dev-local raw fixture remains a separate explicit seam;
+registry, routes, config, environment, migrations, database, Cloudflare, deploy, and UI are unchanged.
+TDD RED stopped on the missing port. An integration RED passed `53/60` before direct transaction
+tests were aligned to the mandatory signed seam. Node 24 focused tests pass `45/45`, related Academy
+Identity passes `558/558`, and TypeScript/scoped ESLint pass. A different-independent reviewer
+rebound the 11-file authority, verified exact producer compatibility and disabled zero-capability
+behavior, and passed final `C0/H0/M0/L0`. Conformance remains `16/23`; all enablement/release flags
+remain false and production is `NO-GO`. Evidence:
+`reports/reviews/academy-identity-signed-result-runtime-composition-local-checkpoint-20260814.md`.
+
 **Signed code-exchange result consumer checkpoint (2026-08-14):** Academy now
 has a local-only Web Crypto ES256 verifier and bounded active/overlap result-key
 ring bound to Identity Control producer revision

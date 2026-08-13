@@ -5,6 +5,7 @@ import { FakeIdentityAdapter } from '@/lib/identity/fake-adapter'
 import {
   beginIdentityAuthorization,
   completeIdentityCallback,
+  completeSignedIdentityCallback,
   IdentityTransactionError,
   IdentityTransactionStoreError,
   InMemoryIdentityTransactionStore,
@@ -100,6 +101,61 @@ describe('local identity transaction boundary', () => {
         clientAssertionProvider: localFakeClientAssertionProvider,
       }),
     ).rejects.toMatchObject({ reason: 'unknown_state' } satisfies Partial<IdentityTransactionError>)
+  })
+
+  it('requires the injected signed-result verifier and never falls back to a valid raw result', async () => {
+    const adapter = new FakeIdentityAdapter(LOCAL_ISSUER, client.audience)
+    const store = new InMemoryIdentityTransactionStore()
+    const started = await beginIdentityAuthorization(store, registration, '/dashboard')
+    const code = adapter.issueCodeForTest(started.request, {
+      subject: 'signed-result-principal',
+      verifiedEmail: 'signed-result@example.test',
+    })
+    const verify = vi.fn(async () => ({
+      issuer: LOCAL_ISSUER,
+      subject: 'signed-result-principal',
+      verifiedEmail: 'signed-result@example.test',
+      audience: client.audience,
+      serviceId: client.serviceId,
+      nonce: started.request.nonce,
+      activation: { status: 'active' as const, revision: 1 },
+    }))
+
+    await expect(completeSignedIdentityCallback({
+      adapter,
+      store,
+      client,
+      callback: { code, state: started.state },
+      browserBinding: started.browserBinding,
+      clientAssertionProvider: localFakeClientAssertionProvider,
+      resultVerifier: { verify },
+    })).resolves.toMatchObject({ exchange: { subject: 'signed-result-principal' } })
+    expect(verify).toHaveBeenCalledWith(expect.anything(), {
+      expectedAudience: client.audience,
+      expectedClientId: client.clientId,
+      expectedNonce: started.request.nonce,
+      expectedPrincipalIssuer: client.expectedIssuer,
+      expectedServiceId: client.serviceId,
+    })
+
+    const rejected = await beginIdentityAuthorization(store, registration, '/dashboard')
+    const rejectedCode = adapter.issueCodeForTest(rejected.request, {
+      subject: 'unsigned-fallback-must-not-run',
+      verifiedEmail: 'no-fallback@example.test',
+    })
+    const rejectedInput = {
+      adapter,
+      store,
+      client,
+      callback: { code: rejectedCode, state: rejected.state },
+      browserBinding: rejected.browserBinding,
+      clientAssertionProvider: localFakeClientAssertionProvider,
+      resultVerifier: { verify: async () => { throw new Error('fixed test rejection') } },
+    }
+    await expect(completeSignedIdentityCallback(rejectedInput))
+      .rejects.toMatchObject({ reason: 'invalid_result' } satisfies Partial<IdentityTransactionError>)
+    await expect(completeSignedIdentityCallback(rejectedInput))
+      .rejects.toMatchObject({ reason: 'unknown_state' } satisfies Partial<IdentityTransactionError>)
   })
 
   it('binds the callback to the initiating browser without consuming state on mismatch', async () => {

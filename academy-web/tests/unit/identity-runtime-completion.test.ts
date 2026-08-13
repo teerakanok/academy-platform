@@ -54,7 +54,7 @@ describe('Academy Identity runtime completion seam', () => {
       browserBinding,
     })
 
-    expect(fixture.calls).toEqual(['consume', 'assertion', 'exchange', 'activation', 'session'])
+    expect(fixture.calls).toEqual(['consume', 'assertion', 'exchange', 'verify', 'activation', 'session'])
     expect(result).toEqual({
       accountId,
       sessionId: expect.stringMatching(/^[A-Za-z0-9_-]{32,160}$/),
@@ -79,6 +79,18 @@ describe('Academy Identity runtime completion seam', () => {
     expect(fixture.sessionCreates()).toBe(0)
   })
 
+  it('does not activate a profile or create a session when signed-result verification fails', async () => {
+    const fixture = await createFixture({ resultVerificationFailure: true })
+
+    await expect(fixture.runtime.complete({
+      callbackUrl: callbackUrl(),
+      browserBinding,
+    })).rejects.toBeInstanceOf(AcademyIdentityRuntimeCompletionFailure)
+    expect(fixture.calls).toEqual(['consume', 'assertion', 'exchange', 'verify'])
+    expect(fixture.activationCommits()).toBe(0)
+    expect(fixture.sessionCreates()).toBe(0)
+  })
+
   it('keeps the consumed callback one-time when activation fails and never creates a session', async () => {
     const fixture = await createFixture({ activationFailure: true })
     const input = { callbackUrl: callbackUrl(), browserBinding }
@@ -90,7 +102,7 @@ describe('Academy Identity runtime completion seam', () => {
       AcademyIdentityRuntimeCompletionFailure,
     )
     expect(fixture.calls).toEqual([
-      'consume', 'assertion', 'exchange', 'activation',
+      'consume', 'assertion', 'exchange', 'verify', 'activation',
       'consume',
     ])
     expect(fixture.sessionCreates()).toBe(0)
@@ -118,7 +130,7 @@ describe('Academy Identity runtime completion seam', () => {
       callbackUrl: callbackUrl(),
       browserBinding,
     }))
-    expect(fixture.calls).toEqual(['consume', 'assertion', 'exchange', 'activation'])
+    expect(fixture.calls).toEqual(['consume', 'assertion', 'exchange', 'verify', 'activation'])
     expect(fixture.sessionCreates()).toBe(0)
   })
 
@@ -135,7 +147,7 @@ describe('Academy Identity runtime completion seam', () => {
       callbackUrl: callbackUrl(),
       browserBinding,
     }))
-    expect(fixture.calls).toEqual(['consume', 'assertion', 'exchange', 'activation', 'session'])
+    expect(fixture.calls).toEqual(['consume', 'assertion', 'exchange', 'verify', 'activation', 'session'])
   })
 
   it('preserves the activation commit when session creation fails and permits only fresh authorization recovery', async () => {
@@ -152,9 +164,9 @@ describe('Academy Identity runtime completion seam', () => {
 
     expect(recovered.accountId).toBe(accountId)
     expect(fixture.calls).toEqual([
-      'consume', 'assertion', 'exchange', 'activation', 'session',
+      'consume', 'assertion', 'exchange', 'verify', 'activation', 'session',
       'consume',
-      'consume', 'assertion', 'exchange', 'activation', 'session',
+      'consume', 'assertion', 'exchange', 'verify', 'activation', 'session',
     ])
     expect(fixture.activationCommits()).toBe(2)
     expect(fixture.sessionCreates()).toBe(2)
@@ -173,6 +185,7 @@ describe('Academy Identity runtime completion seam', () => {
       admission: { enabled: false, runtimeWired: false, releaseApproval: false },
       transactionStore: unavailable(),
       codeExchangePort: unavailable(),
+      codeExchangeResultVerifier: unavailable(),
       profileActivationStore: unavailable(),
       sessionStore: unavailable(),
       client,
@@ -203,6 +216,7 @@ describe('Academy Identity runtime completion seam', () => {
 
 async function createFixture(options: {
   exchangeFailure?: boolean
+  resultVerificationFailure?: boolean
   activationFailure?: boolean
   activationCommit?: IdentityProfileActivationCommit
   sessionFailures?: number
@@ -237,6 +251,26 @@ async function createFixture(options: {
       async exchangeCode() {
         calls.push('exchange')
         if (options.exchangeFailure) throw new Error('exchange detail must not escape')
+        return { signedResult: 'fixture.signed.result' }
+      },
+    },
+    codeExchangeResultVerifier: {
+      async verify(_value: unknown, binding: {
+        expectedAudience: string
+        expectedClientId: string
+        expectedNonce: string
+        expectedPrincipalIssuer: string
+        expectedServiceId: string
+      }) {
+        calls.push('verify')
+        expect(binding).toEqual({
+          expectedAudience: client.audience,
+          expectedClientId: client.clientId,
+          expectedNonce: nonce,
+          expectedPrincipalIssuer: client.expectedIssuer,
+          expectedServiceId: client.serviceId,
+        })
+        if (options.resultVerificationFailure) throw new Error('verification detail must not escape')
         return {
           issuer: client.expectedIssuer,
           subject: 'principal-subject',

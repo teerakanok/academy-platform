@@ -3,6 +3,23 @@
 > Closed items only, with outcome + evidence + residual risk. Newest first.
 > Provider-neutral. See `active_plan.md` for open work.
 
+## 2026-08-14 - Signed-result runtime composition prepared locally
+
+- Added a least-capability result-verifier port and composed it into the production-disabled
+  callback transaction, runtime completion, and browser flow. The signed seam has no unsigned
+  fallback; the existing raw callback remains confined to the explicit dev-local fixture path.
+- Exact producer active/overlap vectors pass. Retired, unknown-key, tampered, unsigned, binding,
+  principal, service, and time failures stop before activation/session; callback consumption remains
+  one-time and disabled admission reads no capability.
+- RED stopped on the absent port; a resumed integration RED passed `53/60` until direct transaction
+  tests reflected the new required seam. Node 24 focused `45/45`, Academy Identity `558/558`,
+  TypeScript, scoped ESLint, diff, and staged-empty gates pass.
+- A different-independent reviewer rebound the 11-file authority, verified exact producer
+  compatibility and disabled zero-capability behavior, reran focused `45/45`, Academy Identity
+  `558/558`, TypeScript, and scoped ESLint, and passed final `C0/H0/M0/L0`. No registry, route,
+  endpoint, environment, operational key, migration, database, Cloudflare, deployment, or UI value
+  changed. Conformance remains `16/23`; all flags remain false and production is `NO-GO`.
+
 ## 2026-08-14 - Signed code-exchange result consumer prepared locally
 
 - Added an unwired Academy-local ES256 consumer for Identity Control's strict
