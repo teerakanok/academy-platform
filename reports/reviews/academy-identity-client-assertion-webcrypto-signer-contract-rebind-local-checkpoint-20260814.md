@@ -1,7 +1,7 @@
 # Academy Identity Client-Assertion Web Crypto Signer — Contract Rebind Local Checkpoint
 
 **Date:** 2026-08-14
-**Status:** รีวิวอิสระสามรอบ ล่าสุด `C0/H0/M3/L1 — REJECT` แก้ครบแล้ว รอ delta re-review
+**Status:** รีวิวอิสระสี่รอบ ล่าสุด `C0/H0/M3/L0 — REJECT` แก้ครบแล้ว รอ delta re-review รอบห้า
 **Production:** NO-GO
 **Supersedes:** `academy-identity-client-assertion-webcrypto-signer-local-checkpoint-2026-08-11.md`
 
@@ -135,7 +135,29 @@ padding ที่ไม่ canonical) เก็บ regex ไว้เพื่�
    ชุดใหม่แล้ว** ซึ่งยังไม่มีจริง จึงไม่แตะ ต้องมีรอบรีวิวข้าม repo ก่อน แล้วค่อย
    regenerate ทั้งชุด
 
-2. **ยังไม่มี delta re-review บนการแก้รอบสาม** — รอบสามคืน `C0/H0/M3/L1 — REJECT`
+2. **รอบสี่ปิดครบสามข้อแล้ว แต่ยังไม่ผ่านสายตาอิสระอีกรอบ**
+
+   - **M-02 ด่าน not-wired หลบได้ 5 ทางใหม่** — ทางที่ร้ายที่สุดคือ
+     `src/instrumentation.ts` ซึ่ง reviewer build จริงแล้วโค้ดจากโมดูลต้องห้าม
+     ไปโผล่ใน `.open-next/middleware/handler.mjs` ขณะที่ด่านยังเขียว
+     รากปัญหาคือรายการทางเข้าและ resolver เป็นของที่ hardcode ไว้เอง ไม่ได้อ่านจาก
+     สิ่งที่ toolchain ใช้จริง ตอนนี้อ่าน `compilerOptions.paths` ทุก alias, รองรับ
+     self-import ผ่าน `exports`, `realpath` ทุกพาธก่อนเทียบ, เพิ่มทางเข้า
+     `instrumentation*`, `src/pages`, `next.config.ts`, `open-next.config.ts`
+     และอ่าน wrangler `main` หลังตัดคอมเมนต์เท่านั้น
+     **ของที่ไม่รู้มาก่อน:** รีโปนี้มี worker ที่ deploy จริงสองตัว ไม่ใช่ตัวเดียว
+     (หน้าร้าน + `ops/academy-retention-worker`) เพิ่ม self-check บังคับไว้แล้ว
+     ยิงทางหลบ 10 ทางถูกจับครบ
+   - **M-01 runner อ่าน config ไม่ตรง wrangler** — parser ที่เขียนเทียบเคียงจบ
+     คอมเมนต์บรรทัดที่ `\n` อย่างเดียว ส่วน wrangler จบที่ `\r` ด้วย เปลี่ยนมาใช้
+     `unstable_readConfig` ของ wrangler เอง ปัญหาทั้งชั้นหายไป
+     (รอบก่อนผมสรุปผิดว่าไม่มี API นี้ เพราะดูแค่ `exports` ใน package.json)
+   - **M-04 สคริปต์ adversarial ลบไฟล์คนอื่นได้และรายงานผลที่ไม่ได้ยิง** — สร้าง
+     `scripts/adversarial/sandbox.mjs` บังคับว่าลบได้เฉพาะสิ่งที่รอบนี้สร้างเอง
+     และคืนสภาพแม้ถูกสัญญาณ · squatter ต้องบอกเองว่า listen สำเร็จก่อนถึงจะนับผล
+     · แยกรหัสออก `2` สำหรับ "ยิงไม่ออก" ไม่ให้กลืนเป็น "ผ่าน"
+
+   *(บันทึกของรอบสาม)* ยังไม่มี delta re-review บนการแก้รอบสาม — รอบสามคืน `C0/H0/M3/L1 — REJECT`
    โดยชี้ว่า runner ยังถูกหลอกได้ (nonce อยู่ใน query, ไม่ตรวจ `signalCode`,
    เทียบชื่อ check ด้วย `join()` โดยไม่นับสมาชิก, `fetch` ไม่มี deadline, parser JSONC
    ต่างจาก wrangler สามจุด), ด่าน not-wired หลบได้สี่ทาง, และ freeze manifest
