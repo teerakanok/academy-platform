@@ -2,57 +2,69 @@
  * ยิงทางหลบใส่ด่าน "โมดูล identity ยังไม่ถูกต่อเข้า production" แล้วรายงานว่ากัดจริงไหม
  *
  * มีอยู่เพราะข้ออ้างว่า "mutation ตายครบ" ในรายงานตรวจซ้ำไม่ได้ถ้าไม่มีสคริปต์
- * รีวิวอิสระชี้จุดนี้ตรงๆ ทางหลบทั้งสี่ด้านล่างคือของจริงที่รีวิวใช้แล้วผ่านด่านรุ่นก่อน
+ * ทางหลบด้านล่างคือของจริงที่รีวิวอิสระใช้แล้วผ่านด่านรุ่นก่อนมาแล้วทั้งหมด
  *
  *   node scripts/adversarial/not-wired-gate-evasions.mjs
  *
- * ออก 0 เมื่อทุกทางหลบถูกจับ และเลนปกติยังผ่าน มิฉะนั้นออก 1
- * แก้ไฟล์จริงชั่วคราวแล้วคืนสภาพเสมอ รวมถึงตอนถูกขัดจังหวะ
+ * รหัสออก: 0 = ทางหลบทุกทางถูกจับและเลนปกติยังผ่าน · 1 = มีทางหลบรอด หรือเลน
+ * ปกติพัง · 2 = รันไม่ได้บางรายการ จึงพิสูจน์อะไรไม่ได้ (ไม่ใช่ผ่าน)
+ *
+ * ความปลอดภัย: ทุกการแก้ไฟล์ผ่าน Sandbox ซึ่งลบได้เฉพาะสิ่งที่รอบนี้สร้างเอง
+ * และคืนสภาพแม้ถูกสัญญาณขัดจังหวะ รุ่นก่อนของสคริปต์นี้ลบโฟลเดอร์ `extra/`
+ * ทั้งอันโดยไม่สนว่าใครสร้าง ทำงานของคนอื่นหายทั้งที่ออก 0 ตามปกติ
  */
 import { execFileSync } from 'node:child_process'
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+
+import { restoreOnExit, Sandbox } from './sandbox.mjs'
 
 const root = fileURLToPath(new URL('../..', import.meta.url))
 const gate = 'tests/unit/identity-key-distribution-not-wired.test.ts'
 const route = 'src/app/(site)/api/auth/me/route.ts'
-const original = readFileSync(join(root, route), 'utf8')
 
+const sandbox = new Sandbox(root)
+restoreOnExit(sandbox)
+
+/** แต่ละทางหลบบอกว่าจะสร้างไฟล์อะไรใหม่ และจะแก้ไฟล์ไหนที่มีอยู่แล้ว */
 const EVASIONS = [
   {
     name: 're-export bridge ภายใน src/lib/identity',
-    files: {
+    create: {
       'src/lib/identity/session-helpers.ts':
         "export { importIdentityResultKeySet } from './result-key-set-importer'\n",
-      [route]:
+    },
+    modify: {
+      [route]: (before) =>
         "import { importIdentityResultKeySet } from '@/lib/identity/session-helpers'\n"
-        + `void importIdentityResultKeySet\n${original}`,
+        + `void importIdentityResultKeySet\n${before}`,
     },
   },
   {
     name: 'dynamic import ที่ประกอบ specifier เอง',
-    files: {
-      [route]: `void import('@/lib/identity/' + 'result-key-set-importer')\n${original}`,
+    create: {},
+    modify: {
+      [route]: (before) => `void import('@/lib/identity/' + 'result-key-set-importer')\n${before}`,
     },
   },
   {
     name: 'wrangler entry ตัวใหม่นอกรากที่เคย hardcode ไว้',
-    files: {
-      'extra/alt-worker.ts':
+    create: {
+      'adversarial-probe/alt-worker.ts':
         "import { importIdentityResultKeySet } from '../src/lib/identity/result-key-set-importer'\n"
         + "export default { async fetch() { void importIdentityResultKeySet; return new Response('x') } }\n",
-      'wrangler.alt.jsonc':
-        '{\n  "name": "alt",\n  "main": "extra/alt-worker.ts",\n'
+      'wrangler.adversarial-probe.jsonc':
+        '{\n  "name": "adversarial-probe",\n  "main": "adversarial-probe/alt-worker.ts",\n'
         + '  "compatibility_date": "2025-03-25"\n}\n',
     },
+    modify: {},
   },
   {
     name: 'static import ตรงๆ จาก route',
-    files: {
-      [route]:
+    create: {},
+    modify: {
+      [route]: (before) =>
         "import { createIdentityResultKeySetCache } from '@/lib/identity/result-key-set-cache'\n"
-        + `void createIdentityResultKeySetCache\n${original}`,
+        + `void createIdentityResultKeySetCache\n${before}`,
     },
   },
 ]
@@ -63,39 +75,60 @@ function gatePasses() {
       cwd: root, stdio: 'pipe', timeout: 300_000,
     })
     return true
-  } catch {
+  } catch (error) {
+    // แยก "ด่านตัดสินว่าไม่ผ่าน" ออกจาก "รันไม่ได้เลย" — สองอย่างนี้ไม่เหมือนกัน
+    if (error?.code === 'ETIMEDOUT' || error?.status === undefined) {
+      throw new Error(`รันด่านไม่สำเร็จ: ${error?.message ?? error}`)
+    }
     return false
   }
 }
 
-function restore(files) {
-  for (const path of Object.keys(files)) {
-    if (path === route) writeFileSync(join(root, route), original)
-    else rmSync(join(root, path), { force: true })
-  }
-  rmSync(join(root, 'extra'), { recursive: true, force: true })
-}
-
-let failures = 0
-process.on('exit', () => writeFileSync(join(root, route), original))
+let survived = 0
+let unproven = 0
 
 for (const evasion of EVASIONS) {
-  for (const [path, content] of Object.entries(evasion.files)) {
-    mkdirSync(dirname(join(root, path)), { recursive: true })
-    writeFileSync(join(root, path), content)
+  sandbox.reopen()
+  let outcome
+  try {
+    for (const [path, content] of Object.entries(evasion.create)) sandbox.create(path, content)
+    for (const [path, build] of Object.entries(evasion.modify)) {
+      sandbox.modify(path, build(sandbox.original(path)))
+    }
+    outcome = gatePasses() ? 'SURVIVED' : 'KILLED'
+  } catch (error) {
+    // ยิงไม่ออกไม่ใช่ยิงแล้วไม่โดน ห้ามรายงานเป็น KILLED
+    outcome = 'ยิงไม่ได้'
+    console.log(`ยิงไม่ได้   ${evasion.name} — ${error.message}`)
+    unproven += 1
+  } finally {
+    sandbox.restore()
   }
-  const survived = gatePasses()
-  restore(evasion.files)
-  console.log(`${survived ? 'SURVIVED' : 'KILLED  '}  ${evasion.name}`)
-  if (survived) failures += 1
+  if (outcome === 'SURVIVED' || outcome === 'KILLED') {
+    console.log(`${outcome === 'SURVIVED' ? 'SURVIVED' : 'KILLED  '}  ${evasion.name}`)
+    if (outcome === 'SURVIVED') survived += 1
+  }
 }
 
-const baseline = gatePasses()
-console.log(`${baseline ? 'PASS    ' : 'BROKEN  '}  เลนปกติที่ไม่ได้แก้อะไร`)
-if (!baseline) failures += 1
+sandbox.reopen()
+let baseline
+try {
+  baseline = gatePasses()
+} catch (error) {
+  console.log(`ยิงไม่ได้   เลนปกติ — ${error.message}`)
+  unproven += 1
+  baseline = null
+}
+if (baseline !== null) {
+  console.log(`${baseline ? 'PASS    ' : 'BROKEN  '}  เลนปกติที่ไม่ได้แก้อะไร`)
+}
 
-if (failures > 0) {
-  console.error(`\nมี ${failures} รายการที่ไม่เป็นไปตามที่ควร`)
+if (survived > 0 || baseline === false) {
+  console.error(`\nมีทางหลบที่รอด ${survived} ทาง${baseline === false ? ' และเลนปกติพัง' : ''}`)
   process.exit(1)
+}
+if (unproven > 0) {
+  console.error(`\nรันไม่ได้ ${unproven} รายการ — สคริปต์นี้ยังพิสูจน์อะไรไม่ได้`)
+  process.exit(2)
 }
 console.log('\nทางหลบทุกทางถูกจับ และเลนปกติยังผ่าน')

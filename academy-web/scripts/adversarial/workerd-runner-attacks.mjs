@@ -1,28 +1,39 @@
 /**
  * ยิงใส่ `scripts/workerd-signer-check.mjs` เพื่อพิสูจน์ว่ามันโกหกไม่ได้
  *
- * รีวิวอิสระเคยหลอกมันสำเร็จสองรอบ รอบแรกด้วย `{"ok":true,"checks":[]}`
- * รอบสองด้วย nonce ที่ลอกจาก query, check เดียวที่ชื่อเป็นรายการที่ join กัน,
- * และ child ที่ตายด้วยสัญญาณแต่ถูกนับว่ายังมีชีวิต การโจมตีด้านล่างคือชุดนั้น
+ * รีวิวอิสระเคยหลอกมันสำเร็จสองรอบ ทั้งด้วย `{"ok":true,"checks":[]}` และด้วย
+ * nonce ที่ลอกจาก query, check เดียวที่ชื่อเป็นรายการที่ join กัน, และ child ที่
+ * ตายด้วยสัญญาณแต่ถูกนับว่ายังมีชีวิต การโจมตีด้านล่างคือชุดนั้น
  *
  *   node scripts/adversarial/workerd-runner-attacks.mjs
  *
- * ข้อจำกัดที่ต้องรู้: สคริปต์นี้พิสูจน์ได้เฉพาะการโจมตี "จากนอกโปรเซส"
- * ใครที่ preload โค้ดเข้ามาในโปรเซสของ runner ได้ ปลอม `spawn` กับ `fetch`
- * พร้อมกันแล้วผ่านทุกด่านได้อยู่ดี นั่นปิดในโปรเซสไม่ได้ตามนิยาม
+ * รหัสออก: 0 = ทุกการโจมตีถูกยิงจริงและได้ผลตามที่ควร · 1 = มีการโจมตีที่รอด
+ * · 2 = ยิงไม่ออกบางรายการ จึงพิสูจน์อะไรไม่ได้
+ *
+ * สองข้อจำกัดที่ต้องอ่านคู่กันเสมอ:
+ *
+ *   - สคริปต์นี้พิสูจน์ได้เฉพาะการโจมตี "จากนอกโปรเซส" ใครที่ preload โค้ดเข้ามา
+ *     ในโปรเซสของ runner ได้ ปลอม `spawn` กับ `fetch` พร้อมกันแล้วผ่านทุกด่านได้อยู่ดี
+ *     นั่นปิดในโปรเซสไม่ได้ตามนิยาม
+ *   - ถ้าสภาพแวดล้อม bind 127.0.0.1 ไม่ได้ การโจมตีแบบครองพอร์ตจะ **ยิงไม่ออก**
+ *     รุ่นก่อนพิมพ์ `KILLED` ให้ทั้งห้ารายการทั้งที่ squatter ไม่เคยขึ้นเลย ซึ่งเป็น
+ *     หลักฐานเท็จ ตอนนี้ต้องเห็นว่ามัน listen จริงก่อนถึงจะนับผล
  */
 import { execFileSync, spawn } from 'node:child_process'
-import { copyFileSync, readFileSync, writeFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { connect } from 'node:net'
 import { setTimeout as delay } from 'node:timers/promises'
 import { fileURLToPath } from 'node:url'
 
+import { restoreOnExit, Sandbox } from './sandbox.mjs'
+
+const PORT = 61987
 const root = fileURLToPath(new URL('../..', import.meta.url))
 const runner = 'scripts/workerd-signer-check.mjs'
-const appConfig = join(root, 'wrangler.jsonc')
-const harnessConfig = join(root, 'tests/workerd/wrangler.jsonc')
-const appOriginal = readFileSync(appConfig, 'utf8')
-const harnessOriginal = readFileSync(harnessConfig, 'utf8')
+const appConfig = 'wrangler.jsonc'
+const harnessConfig = 'tests/workerd/wrangler.jsonc'
+
+const sandbox = new Sandbox(root)
+restoreOnExit(sandbox)
 
 const REQUIRED = [
   'cryptokey-introspection-shape',
@@ -35,39 +46,74 @@ const REQUIRED = [
   'signs-and-verifies',
 ].sort()
 
+let survived = 0
+let unproven = 0
+
 function runRunner(timeoutMs = 400_000) {
   try {
     execFileSync(process.execPath, [runner], { cwd: root, stdio: 'pipe', timeout: timeoutMs })
     return 0
   } catch (error) {
-    return error.status ?? 'timeout'
+    if (error?.code === 'ETIMEDOUT') return 'timeout'
+    return error.status ?? 'ไม่ทราบ'
   }
+}
+
+/** มีใครสักคน listen อยู่ที่พอร์ตนี้ไหม (ไม่ได้บอกว่าเป็นใคร) */
+async function anyoneListening(port) {
+  return new Promise((resolveUp) => {
+    const socket = connect({ port, host: '127.0.0.1' })
+    socket.once('connect', () => { socket.destroy(); resolveUp(true) })
+    socket.once('error', () => { socket.destroy(); resolveUp(false) })
+  })
 }
 
 async function withSquatter(body, run) {
   const source = body === null
-    ? "require('node:http').createServer(() => {}).listen(61987, '127.0.0.1')"
+    ? `require('node:http').createServer(() => {}).listen(${PORT}, '127.0.0.1')`
     : "const http = require('node:http');http.createServer((q, s) => {"
       + "s.setHeader('content-type', 'application/json');"
-      + `s.end(${JSON.stringify(JSON.stringify(body))})}).listen(61987, '127.0.0.1')`
-  const child = spawn(process.execPath, ['-e', source], { stdio: 'ignore' })
-  await delay(1_500)
+      + `s.end(${JSON.stringify(JSON.stringify(body))})}).listen(${PORT}, '127.0.0.1')`
+  // squatter บอกเองว่า listen สำเร็จ แทนที่จะให้เราเดาจากการต่อพอร์ตติด —
+  // การต่อติดพิสูจน์แค่ว่า "มีใครสักคน" ถือพอร์ตอยู่ ซึ่งอาจไม่ใช่ตัวนี้
+  const child = spawn(process.execPath, ['-e', `${source}.on('listening', () => console.log('READY'))`], {
+    stdio: ['ignore', 'pipe', 'ignore'],
+  })
   try {
-    return await run()
+    const ready = await new Promise((resolveReady) => {
+      const timer = setTimeout(() => resolveReady(false), 8_000)
+      child.stdout.on('data', (chunk) => {
+        if (String(chunk).includes('READY')) { clearTimeout(timer); resolveReady(true) }
+      })
+      child.once('exit', () => { clearTimeout(timer); resolveReady(false) })
+    })
+    if (!ready) return { fired: false }
+    return { fired: true, code: await run() }
   } finally {
     child.kill('SIGTERM')
     await delay(300)
   }
 }
 
-const checks = (names) => names.map((name) => ({ name, passed: true, detail: 'fabricated' }))
-let failures = 0
-
-function report(label, code, shouldFail) {
-  const ok = shouldFail ? code !== 0 : code === 0
-  console.log(`${ok ? 'KILLED  ' : 'SURVIVED'}  ${label} (exit ${code})`)
-  if (!ok) failures += 1
+function report(label, result, shouldFail) {
+  if (result.fired === false) {
+    console.log(`ยิงไม่ได้   ${label} — bind 127.0.0.1:${PORT} ไม่สำเร็จ`)
+    unproven += 1
+    return
+  }
+  const ok = shouldFail ? result.code !== 0 : result.code === 0
+  console.log(`${ok ? 'KILLED  ' : 'SURVIVED'}  ${label} (exit ${result.code})`)
+  if (!ok) survived += 1
 }
+
+// ถ้ามีอย่างอื่นครองพอร์ตอยู่ก่อน ทั้งสคริปต์เชื่อถือไม่ได้: squatter ของเราขึ้นไม่ได้
+// และ wrangler ตัวจริงในเคส baseline ก็ bind ไม่ได้ ผลทุกบรรทัดจะแปลผิดหมด
+if (await anyoneListening(PORT)) {
+  console.error(`มีอย่างอื่นครอง 127.0.0.1:${PORT} อยู่แล้ว — สคริปต์นี้รันไม่ได้ ไม่ใช่ว่าผ่านหรือไม่ผ่าน`)
+  process.exit(2)
+}
+
+const checks = (names) => names.map((name) => ({ name, passed: true, detail: 'fabricated' }))
 
 report('squatter ที่แต่งผลผ่านครบแปดข้อ',
   await withSquatter({ ok: true, nonce: 'guessed', checks: checks(REQUIRED) }, () => runRunner()), true)
@@ -84,32 +130,34 @@ report('ชื่อซ้ำเพื่อปั๊มจำนวนให้
 report('การเชื่อมต่อที่รับแล้วไม่เคยตอบ',
   await withSquatter(null, () => runRunner()), true)
 
-writeFileSync(appConfig, `${appOriginal}\n/* never closed\n`)
-report('config ของแอปที่มีคอมเมนต์บล็อกไม่ปิด (wrangler ก็ปฏิเสธ)', runRunner(), true)
-writeFileSync(appConfig, appOriginal)
+// การโจมตีที่เหลือแก้ไฟล์แทนการครองพอร์ต จึงยิงออกเสมอ
+sandbox.reopen()
+sandbox.modify(appConfig, `${sandbox.original(appConfig)}\n/* never closed\n`)
+report('config ของแอปที่มีคอมเมนต์บล็อกไม่ปิด (wrangler ก็ปฏิเสธ)', { fired: true, code: runRunner() }, true)
+sandbox.restore()
 
-writeFileSync(harnessConfig, `﻿${harnessOriginal.replace(
+sandbox.reopen()
+sandbox.modify(harnessConfig, `﻿${sandbox.original(harnessConfig).replace(
   '"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"]',
   '"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],',
 )}`)
-report('BOM และ trailing comma ที่ wrangler ยอมรับ ต้องไม่ทำให้เลนพัง', runRunner(), false)
-writeFileSync(harnessConfig, harnessOriginal)
+report('BOM และ trailing comma ที่ wrangler ยอมรับ ต้องไม่ทำให้เลนพัง', { fired: true, code: runRunner() }, false)
+sandbox.restore()
 
-writeFileSync(harnessConfig, harnessOriginal.replace('"compatibility_date": "', '"compatibility_date": "2020-01-01", "unused": "'))
-report('compatibility ของ harness เลื่อนออกจากแอป', runRunner(), true)
-writeFileSync(harnessConfig, harnessOriginal)
+sandbox.reopen()
+sandbox.modify(harnessConfig, sandbox.original(harnessConfig)
+  .replace('"compatibility_date": "', '"compatibility_date": "2020-01-01", "unused": "'))
+report('compatibility ของ harness เลื่อนออกจากแอป', { fired: true, code: runRunner() }, true)
+sandbox.restore()
 
-report('เลนปกติที่ไม่ได้แก้อะไร', runRunner(), false)
+report('เลนปกติที่ไม่ได้แก้อะไร', { fired: true, code: runRunner() }, false)
 
-copyFileSync(appConfig, appConfig)
-if (readFileSync(appConfig, 'utf8') !== appOriginal
-  || readFileSync(harnessConfig, 'utf8') !== harnessOriginal) {
-  console.error('คืนสภาพไฟล์ไม่ครบ')
+if (survived > 0) {
+  console.error(`\nมีการโจมตีที่รอด ${survived} รายการ`)
   process.exit(1)
 }
-
-if (failures > 0) {
-  console.error(`\nมี ${failures} รายการที่ไม่เป็นไปตามที่ควร`)
-  process.exit(1)
+if (unproven > 0) {
+  console.error(`\nยิงไม่ออก ${unproven} รายการ — สคริปต์นี้ยังพิสูจน์อะไรไม่ได้`)
+  process.exit(2)
 }
-console.log('\nการโจมตีจากนอกโปรเซสทุกแบบถูกจับ และเลนปกติยังผ่าน')
+console.log('\nการโจมตีจากนอกโปรเซสทุกแบบถูกยิงจริงและถูกจับ และเลนปกติยังผ่าน')
