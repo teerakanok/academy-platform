@@ -30,6 +30,17 @@ const SKIPPED_DIRECTORIES = new Set(['node_modules', '.next', '.open-next', '.wr
  */
 const GENERATED_SEGMENTS = ['/.open-next/', '/.next/', '/.wrangler/', '/node_modules/']
 const SOURCE_EXTENSIONS = ['', '.ts', '.tsx', '.mts', '.mjs', '.js', '.jsx']
+/**
+ * `moduleResolution: bundler` ยอมให้เขียน `./x.js` แล้วไปได้ `./x.ts` จริง
+ * resolver ที่ต่อนามสกุลอย่างเดียวจึงมองไม่เห็น — `./x.js.ts` ไม่มีอยู่จริง
+ * เป็นทางหลบที่การ refactor ปกติสร้างขึ้นเองได้โดยไม่ต้องตั้งใจ
+ */
+const JS_TO_TS = new Map([
+  ['.js', ['.ts', '.tsx']],
+  ['.jsx', ['.tsx']],
+  ['.mjs', ['.mts']],
+  ['.cjs', ['.cts']],
+])
 const INDEX_CANDIDATES = ['index.ts', 'index.tsx', 'index.mts', 'index.js']
 // `from '…'` ครอบทั้ง import และ re-export — `export { x } from` และ
 // `export * as ns from` คือทางหลบทางแรกที่รีวิวอิสระใช้ได้จริง
@@ -175,6 +186,13 @@ function canonical(path: string): string {
 function resolveSpecifier(fromFile: string, specifier: string): string | null {
   for (const base of candidatesFor(fromFile, specifier)) {
     if (GENERATED_SEGMENTS.some((segment) => `${base}/`.includes(segment))) continue
+    for (const [javascript, typescripts] of JS_TO_TS) {
+      if (!base.endsWith(javascript)) continue
+      for (const typescript of typescripts) {
+        const swapped = `${base.slice(0, -javascript.length)}${typescript}`
+        if (existsSync(swapped) && statSync(swapped).isFile()) return canonical(swapped)
+      }
+    }
     for (const extension of SOURCE_EXTENSIONS) {
       const candidate = `${base}${extension}`
       if (existsSync(candidate) && statSync(candidate).isFile()) return canonical(candidate)

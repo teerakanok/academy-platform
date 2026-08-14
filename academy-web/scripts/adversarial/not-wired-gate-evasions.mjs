@@ -132,6 +132,17 @@ const EVASIONS = [
     },
   },
   {
+    // TypeScript แทนนามสกุลให้เองภายใต้ moduleResolution: bundler
+    // ทางนี้เกิดจาก refactor ปกติได้โดยไม่ต้องตั้งใจ จึงต่างจากทางหลบอื่นที่ต้องจงใจ
+    name: 'specifier ลงท้าย .js ที่ TypeScript แทนด้วย .ts ให้',
+    create: {},
+    modify: {
+      [route]: (before) =>
+        "import { importIdentityResultKeySet } from '@/lib/identity/result-key-set-importer.js'\n"
+        + `void importIdentityResultKeySet\n${before}`,
+    },
+  },
+  {
     name: 'static import ตรงๆ จาก route',
     create: {},
     modify: {
@@ -159,6 +170,7 @@ function gatePasses() {
 
 let survived = 0
 let unproven = 0
+let blocked = 0
 
 for (const evasion of EVASIONS) {
   sandbox.reopen()
@@ -177,6 +189,12 @@ for (const evasion of EVASIONS) {
     unproven += 1
   } finally {
     sandbox.restore()
+    const problems = sandbox.problems()
+    if (problems.length > blocked) {
+      // คืนสภาพไม่ครบคือปัญหาของข้อมูล ไม่ใช่ผลของการทดสอบ ต้องดังกว่าผลการทดสอบ
+      for (const problem of problems.slice(blocked)) console.error(`คืนสภาพไม่ครบ: ${problem}`)
+      blocked = problems.length
+    }
   }
   if (outcome === 'SURVIVED' || outcome === 'KILLED') {
     console.log(`${outcome === 'SURVIVED' ? 'SURVIVED' : 'KILLED  '}  ${evasion.name}`)
@@ -197,6 +215,10 @@ if (baseline !== null) {
   console.log(`${baseline ? 'PASS    ' : 'BROKEN  '}  เลนปกติที่ไม่ได้แก้อะไร`)
 }
 
+if (blocked > 0) {
+  console.error(`\nคืนสภาพไม่ครบ ${blocked} รายการ — ต้องเก็บด้วยมือก่อนเชื่อผลใดๆ`)
+  process.exit(1)
+}
 if (survived > 0 || baseline === false) {
   console.error(`\nมีทางหลบที่รอด ${survived} ทาง${baseline === false ? ' และเลนปกติพัง' : ''}`)
   process.exit(1)

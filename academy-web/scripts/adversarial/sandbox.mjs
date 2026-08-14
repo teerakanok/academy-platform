@@ -1,118 +1,209 @@
 /**
  * ที่กันเปื้อนสำหรับสคริปต์ที่ต้องแก้ไฟล์จริงเพื่อทดสอบว่าด่านกัดจริงไหม
  *
- * มีอยู่เพราะรุ่นก่อนของสคริปต์พวกนั้น **ลบงานที่ไม่ใช่ของตัวเอง** — มันเรียก
- * `rmSync('extra', { recursive: true })` ตอนเก็บกวาด โดยไม่สนว่าใครสร้างโฟลเดอร์นั้น
- * รีวิวอิสระวางไฟล์ไว้ในนั้นแล้วมันหายไปทั้งที่สคริปต์ออก 0 ตามปกติ และเมื่อถูก
- * SIGTERM กลางทาง มันทิ้งไฟล์ที่แก้ค้างไว้ทั้งอย่างนั้น
+ * มีอยู่เพราะสคริปต์พวกนั้นถืออำนาจลบของในรีโปอยู่ในมือ รุ่นแรกใช้อำนาจนั้นผิด:
+ * `rmSync('extra', { recursive: true })` ตอนเก็บกวาดโดยไม่สนว่าใครสร้าง งานของ
+ * reviewer หายไปทั้งที่สคริปต์ออก 0 ตามปกติ
  *
- * กติกาสองข้อที่โมดูลนี้บังคับ:
+ * รุ่นที่สองปิดเคสนั้นแต่ยังพังอีกหกทางที่รีวิวอิสระ reproduce ให้ดู ทั้งหมดมาจาก
+ * รากเดียวกันสามอย่าง และรุ่นนี้แก้ที่รากทั้งสาม:
  *
- *   1. **ลบได้เฉพาะสิ่งที่รอบนี้สร้างเอง** ถ้าพาธมีอยู่ก่อนแล้ว `create` จะปฏิเสธ
- *      ทันทีแทนที่จะทับ และ `restore` จะไม่แตะอะไรที่ไม่ได้อยู่ในบัญชี
- *   2. **คืนสภาพเสมอ** ไม่ว่าจบปกติ, โยน error, หรือโดนสัญญาณ
+ *   1. **containment ด้วยสตริง** — เทียบว่าพาธขึ้นต้นด้วย root หรือไม่ ซึ่ง symlink
+ *      ที่ชั้น parent พาออกนอก root ได้ทั้งที่สตริงยังดูอยู่ข้างใน ตอนนี้ resolve
+ *      บรรพบุรุษที่มีอยู่จริงด้วย `realpath` ก่อนเสมอ แล้วค่อยตัดสิน
+ *   2. **`existsSync` แล้วค่อยเขียน** — มีช่องว่างระหว่างสองจังหวะ และ `existsSync`
+ *      ตอบ false ให้ symlink ที่ชี้ไปที่ที่ไม่มีอยู่ ทำให้เขียนทะลุออกไปได้
+ *      ตอนนี้สร้างด้วย `O_CREAT|O_EXCL` ซึ่งล้มเหลวทันทีถ้ามีอะไรอยู่ตรงนั้นแล้ว
+ *      รวมทั้ง symlink ที่ห้อยอยู่ และไม่มีช่องว่างให้แทรก
+ *   3. **ผูกความเป็นเจ้าของกับชื่อพาธ** — ไฟล์ที่ถูกสลับระหว่างทางยังชื่อเดิม
+ *      การคืนสภาพจึงลบของคนอื่นหรือเขียนทับงานที่เพิ่งแก้ ตอนนี้จำ `dev`/`ino`
+ *      ของสิ่งที่สร้าง/แก้ไว้ และคืนสภาพเฉพาะเมื่อยังเป็นก้อนเดิมจริงๆ
  *
- * ไฟล์ที่จะถูกแก้ต้องถูก `modify` ซึ่งเก็บไบต์เดิมไว้ก่อน การคืนสภาพเขียนไบต์ชุดเดิม
- * กลับ ไม่ใช่ `git checkout` เพราะของที่ยังไม่ commit จะหายไปด้วย
+ * การคืนสภาพจะไม่โยน error ออกไป เพราะมันถูกเรียกจาก `finally` และจาก handler
+ * ของสัญญาณ ปัญหาที่พบจะถูกเก็บไว้ใน `problems()` ให้ผู้เรียกรายงานและออกด้วย
+ * รหัสที่ไม่ใช่ 0 — เงียบไม่ได้ แต่ก็ห้ามทำให้ทางออกอื่นพัง
  */
-import { existsSync, mkdirSync, readFileSync, rmdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
-import { dirname, relative, resolve } from 'node:path'
+import {
+  closeSync, constants, existsSync, fstatSync, lstatSync, mkdirSync, openSync,
+  readSync, realpathSync, rmdirSync, symlinkSync, unlinkSync, writeSync,
+} from 'node:fs'
+import { createHash } from 'node:crypto'
+import { basename, dirname, join, relative, resolve } from 'node:path'
+
+const sameNode = (a, b) => a !== null && b !== null && a.dev === b.dev && a.ino === b.ino
+const digest = (bytes) => createHash('sha256').update(bytes).digest('hex')
 
 export class Sandbox {
   #root
-  /** พาธ -> ไบต์เดิม สำหรับไฟล์ที่มีอยู่ก่อนและถูกแก้ */
+  /** พาธจริง -> { bytes, dev, ino, wroteDigest } ของไฟล์ที่มีอยู่ก่อนและถูกแก้ */
   #saved = new Map()
-  /** ไฟล์ที่รอบนี้สร้างเอง ลบได้ */
+  /** { path, dev, ino } ของไฟล์ที่รอบนี้สร้างเอง */
   #createdFiles = []
-  /** โฟลเดอร์ที่รอบนี้สร้างเอง ลบได้เมื่อว่าง เรียงลึกสุดก่อน */
+  /** โฟลเดอร์ที่รอบนี้สร้างเอง เรียงลึกสุดก่อน */
   #createdDirectories = []
   #restored = false
+  #problems = []
 
   constructor(root) {
-    this.#root = resolve(root)
+    this.#root = realOf(resolve(root))
   }
 
-  #absolute(path) {
-    const full = resolve(this.#root, path)
+  /**
+   * พาธจริงที่อยู่ใน root แน่นอน
+   *
+   * เดินขึ้นไปหาบรรพบุรุษที่มีอยู่จริง resolve ด้วย realpath แล้วต่อส่วนที่ยังไม่มี
+   * กลับเข้าไป — symlink ที่ชั้นใดก็ตามของส่วนที่มีอยู่จริงจะถูกคลี่ออกก่อนตัดสิน
+   */
+  #contained(path) {
+    const lexical = resolve(this.#root, path)
+    const missing = []
+    let existing = lexical
+    while (!existsSync(existing) && dirname(existing) !== existing) {
+      missing.unshift(basename(existing))
+      existing = dirname(existing)
+    }
+    const real = realOf(existing)
+    const full = missing.length > 0 ? join(real, ...missing) : real
     if (full !== this.#root && !full.startsWith(`${this.#root}/`)) {
       throw new Error(`ปฏิเสธพาธนอกราก: ${path}`)
     }
     return full
   }
 
-  /** สร้างไฟล์ใหม่ ปฏิเสธถ้ามีอยู่แล้ว — ของที่มีอยู่ก่อนไม่ใช่ของเรา */
+  /** สร้างไฟล์ใหม่แบบ atomic ปฏิเสธถ้ามีอะไรอยู่ตรงนั้นแล้ว รวมทั้ง symlink ที่ห้อยอยู่ */
   create(path, content) {
-    const full = this.#absolute(path)
-    if (existsSync(full)) {
-      throw new Error(`ปฏิเสธการทับ ${relative(this.#root, full)} — สคริปต์นี้ไม่ได้สร้างมัน`)
+    const full = this.#contained(path)
+    this.#makeParents(full)
+    let fd
+    try {
+      // O_EXCL คือด่านเดียวที่ไม่มีช่องว่างให้แทรก — ไม่มีการถามก่อนแล้วค่อยเขียน
+      fd = openSync(full, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL, 0o600)
+    } catch (error) {
+      if (error.code === 'EEXIST') {
+        throw new Error(`ปฏิเสธการทับ ${relative(this.#root, full)} — สคริปต์นี้ไม่ได้สร้างมัน`)
+      }
+      throw error
     }
-    for (const directory of this.#missingParents(full)) {
-      mkdirSync(directory)
-      this.#createdDirectories.unshift(directory)
+    try {
+      writeSync(fd, Buffer.from(content))
+      const meta = fstatSync(fd)
+      this.#createdFiles.push({ path: full, dev: meta.dev, ino: meta.ino })
+    } finally {
+      closeSync(fd)
     }
-    writeFileSync(full, content)
-    this.#createdFiles.push(full)
   }
 
-  /** สร้าง symlink ใหม่ ปฏิเสธถ้ามีอยู่แล้ว เหมือน create ทุกประการ */
+  /** สร้าง symlink ใหม่ ทั้งตัวลิงก์และเป้าหมายต้องอยู่ในราก */
   symlink(path, target) {
-    const full = this.#absolute(path)
-    if (existsSync(full)) {
-      throw new Error(`ปฏิเสธการทับ ${relative(this.#root, full)} — สคริปต์นี้ไม่ได้สร้างมัน`)
+    const full = this.#contained(path)
+    const destination = this.#contained(target)
+    this.#makeParents(full)
+    try {
+      // `symlinkSync` ล้มเหลวด้วย EEXIST ถ้ามีอะไรอยู่แล้ว จึง atomic เหมือน create
+      symlinkSync(destination, full)
+    } catch (error) {
+      if (error.code === 'EEXIST') {
+        throw new Error(`ปฏิเสธการทับ ${relative(this.#root, full)} — สคริปต์นี้ไม่ได้สร้างมัน`)
+      }
+      throw error
     }
-    for (const directory of this.#missingParents(full)) {
-      mkdirSync(directory)
-      this.#createdDirectories.unshift(directory)
-    }
-    symlinkSync(this.#absolute(target), full)
-    this.#createdFiles.push(full)
+    const meta = lstatSync(full)
+    this.#createdFiles.push({ path: full, dev: meta.dev, ino: meta.ino })
   }
 
-  /** แก้ไฟล์ที่มีอยู่ โดยจำไบต์เดิมไว้คืนทีหลัง */
+  /** แก้ไฟล์ที่มีอยู่ โดยจำทั้งไบต์เดิมและตัวตนของไฟล์ไว้คืนทีหลัง */
   modify(path, content) {
-    const full = this.#absolute(path)
-    if (!existsSync(full)) throw new Error(`ไม่มีไฟล์ให้แก้: ${relative(this.#root, full)}`)
-    if (!this.#saved.has(full)) this.#saved.set(full, readFileSync(full))
-    writeFileSync(full, content)
+    const full = this.#contained(path)
+    const meta = lstatSync(full)
+    if (!meta.isFile()) throw new Error(`แก้ได้เฉพาะไฟล์ธรรมดา: ${relative(this.#root, full)}`)
+    if (!this.#saved.has(full)) {
+      this.#saved.set(full, { bytes: readNoFollow(full), dev: meta.dev, ino: meta.ino, wroteDigest: null })
+    }
+    writeNoFollow(full, Buffer.from(content))
+    this.#saved.get(full).wroteDigest = digest(Buffer.from(content))
   }
 
   /** ไบต์เดิมของไฟล์ ใช้ประกอบเนื้อหาที่จะเขียนทับโดยไม่ต้องอ่านซ้ำ */
   original(path) {
-    const full = this.#absolute(path)
-    if (this.#saved.has(full)) return this.#saved.get(full).toString('utf8')
-    return readFileSync(full, 'utf8')
+    const full = this.#contained(path)
+    const saved = this.#saved.get(full)
+    return saved ? saved.bytes.toString('utf8') : readNoFollow(full).toString('utf8')
   }
 
-  #missingParents(full) {
+  #makeParents(full) {
     const missing = []
     let directory = dirname(full)
     while (!existsSync(directory) && directory.startsWith(this.#root)) {
       missing.unshift(directory)
       directory = dirname(directory)
     }
-    return missing
+    for (const target of missing) {
+      mkdirSync(target, { mode: 0o700 })
+      this.#createdDirectories.unshift(target)
+    }
   }
 
-  /** คืนทุกอย่างที่รอบนี้แตะ เรียกซ้ำได้ */
+  /**
+   * คืนทุกอย่างที่รอบนี้แตะ เรียกซ้ำได้ และไม่โยน error ออกไป
+   *
+   * แต่ละรายการอยู่ใน try ของตัวเอง รายการแรกที่พังจึงไม่ทำให้ที่เหลือค้าง และ
+   * ธงว่า "คืนแล้ว" ตั้งหลังลูปจบ ไม่ใช่ก่อน — ของเดิมตั้งก่อนแล้วเรียกซ้ำไม่ทำงาน
+   */
   restore() {
     if (this.#restored) return
-    this.#restored = true
-    for (const [full, bytes] of this.#saved) writeFileSync(full, bytes)
-    for (const full of this.#createdFiles) rmSync(full, { force: true })
+    for (const [full, saved] of this.#saved) {
+      try {
+        const meta = lstatSync(full)
+        if (!meta.isFile()) {
+          this.#note(full, 'ไม่ใช่ไฟล์ธรรมดาแล้ว อาจถูกสลับเป็น symlink — ไม่เขียนทับ')
+          continue
+        }
+        if (!sameNode(meta, saved)) {
+          this.#note(full, 'ถูกแทนที่ด้วยไฟล์คนละก้อน — ไม่เขียนทับ')
+          continue
+        }
+        if (saved.wroteDigest !== null && digest(readNoFollow(full)) !== saved.wroteDigest) {
+          this.#note(full, 'มีคนแก้หลังจากเราเขียน — ไม่เขียนทับงานนั้น')
+          continue
+        }
+        writeNoFollow(full, saved.bytes)
+      } catch (error) {
+        this.#note(full, `คืนไม่สำเร็จ: ${error.code ?? error.message}`)
+      }
+    }
+    for (const created of this.#createdFiles) {
+      try {
+        const meta = lstatSync(created.path)
+        if (!sameNode(meta, created)) {
+          this.#note(created.path, 'ไม่ใช่ก้อนที่เราสร้าง — ไม่ลบ')
+          continue
+        }
+        unlinkSync(created.path)
+      } catch (error) {
+        if (error.code !== 'ENOENT') this.#note(created.path, `ลบไม่สำเร็จ: ${error.code ?? error.message}`)
+      }
+    }
     for (const directory of this.#createdDirectories) {
-      // `rmdirSync` ลบได้เฉพาะโฟลเดอร์ว่าง และโยน ENOTEMPTY ถ้าไม่ว่าง ซึ่งตรงกับ
-      // กติกาพอดี: ถ้ามีคนอื่นวางของไว้ระหว่างทาง ปล่อยทั้งโฟลเดอร์ไว้
-      // (`rmSync(dir, { recursive: false })` โยน EISDIR เสมอ แล้ว catch จะกลืน
-      //  ไว้เงียบๆ จนโฟลเดอร์ค้าง — เทสจับได้ตอนเขียนโมดูลนี้)
+      // `rmdirSync` ลบได้เฉพาะโฟลเดอร์ว่าง ถ้ามีคนอื่นวางของไว้ระหว่างทาง ปล่อยไว้
       try {
         rmdirSync(directory)
       } catch {
-        // ไม่ว่าง หรือถูกลบไปแล้ว — ทั้งสองกรณีไม่ใช่เรื่องที่ต้องบังคับ
+        // ไม่ว่าง หรือถูกลบไปแล้ว ทั้งสองกรณีไม่ใช่เรื่องที่ต้องบังคับ
       }
     }
     this.#saved.clear()
     this.#createdFiles = []
     this.#createdDirectories = []
+    this.#restored = true
+  }
+
+  #note(path, reason) {
+    this.#problems.push(`${relative(this.#root, path)}: ${reason}`)
+  }
+
+  /** สิ่งที่คืนสภาพไม่ได้ ผู้เรียกต้องรายงานและออกด้วยรหัสที่ไม่ใช่ 0 */
+  problems() {
+    return [...this.#problems]
   }
 
   /** เริ่มรอบใหม่หลังคืนสภาพแล้ว */
@@ -121,14 +212,57 @@ export class Sandbox {
   }
 }
 
+function realOf(path) {
+  try {
+    return realpathSync(path)
+  } catch {
+    return path
+  }
+}
+
+/** อ่านโดยไม่ตาม symlink ที่ชั้นสุดท้าย */
+function readNoFollow(path) {
+  const fd = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW)
+  try {
+    const size = fstatSync(fd).size
+    const buffer = Buffer.alloc(size)
+    let read = 0
+    while (read < size) {
+      const count = readSync(fd, buffer, read, size - read, read)
+      if (count === 0) break
+      read += count
+    }
+    return buffer.subarray(0, read)
+  } finally {
+    closeSync(fd)
+  }
+}
+
+/** เขียนโดยไม่ตาม symlink — ถ้าถูกสลับเป็นลิงก์ระหว่างทาง จะล้มเหลวแทนที่จะเขียนทะลุ */
+function writeNoFollow(path, bytes) {
+  const fd = openSync(path, constants.O_WRONLY | constants.O_TRUNC | constants.O_NOFOLLOW)
+  try {
+    writeSync(fd, bytes)
+  } finally {
+    closeSync(fd)
+  }
+}
+
 /**
  * ผูกการคืนสภาพเข้ากับทุกทางออกของโปรเซส รวมทั้งสัญญาณ
  *
  * `process.on('exit')` อย่างเดียวไม่พอ: SIGTERM ฆ่าโปรเซสโดยไม่ผ่าน exit handler
- * ซึ่งเป็นเหตุผลที่รุ่นก่อนทิ้งไฟล์ค้างไว้ตอนถูกขัดจังหวะ
+ * ซึ่งเป็นเหตุผลที่รุ่นแรกทิ้งไฟล์ค้างไว้ตอนถูกขัดจังหวะ
  */
 export function restoreOnExit(sandbox) {
-  const restore = () => sandbox.restore()
+  const restore = () => {
+    sandbox.restore()
+    const problems = sandbox.problems()
+    if (problems.length > 0) {
+      console.error('คืนสภาพไม่ครบ:')
+      for (const problem of problems) console.error(`  ${problem}`)
+    }
+  }
   process.on('exit', restore)
   for (const signal of ['SIGINT', 'SIGTERM', 'SIGHUP']) {
     process.on(signal, () => {

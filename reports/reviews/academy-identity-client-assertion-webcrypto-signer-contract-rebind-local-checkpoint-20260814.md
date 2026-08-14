@@ -1,7 +1,7 @@
 # Academy Identity Client-Assertion Web Crypto Signer — Contract Rebind Local Checkpoint
 
 **Date:** 2026-08-14
-**Status:** รีวิวอิสระห้ารอบ ล่าสุด `C0/H0/M3/L2 — REJECT` · triage แล้วเป็น in-bound 3 / deferred 3
+**Status:** รีวิวอิสระห้ารอบ · triage เป็น in-bound 3 / deferred 3 · **in-bound ปิดครบแล้ว** รอ delta re-review รอบหก
 **Production:** NO-GO
 **Supersedes:** `academy-identity-client-assertion-webcrypto-signer-local-checkpoint-2026-08-11.md`
 
@@ -63,13 +63,13 @@ parser แบบ first-wins อ่านไฟล์เดียวกันแ�
 
 | ด่าน | ผล |
 |---|---|
-| unit ทั้ง repo | 1335 ข้อผ่าน (117 ไฟล์) |
-| เลน signer + ด่าน not-wired | 54 ข้อผ่าน บนทั้ง node 24.18.0 (engine ที่ประกาศ) และ 25.5.0 |
+| unit ทั้ง repo | 1341 ข้อผ่าน (117 ไฟล์) |
+| เลน signer + ด่าน not-wired + sandbox | 66 ข้อผ่าน บนทั้ง node 24.18.0 (engine ที่ประกาศ) และ 25.5.0 |
 | `tsc --noEmit` | สะอาด |
 | eslint | 0 error · 1 warning ที่มีมาก่อนใน `src/lib/content/registry.generated.ts` (ไฟล์ generated ไม่เกี่ยวกับลานนี้) |
 | `npm run test:workerd-signer` | 8 ข้อผ่านบน workerd จริง ที่ compatibility ของแอป |
-| `scripts/adversarial/not-wired-gate-evasions.mjs` | ทางหลบ 10 แบบถูกจับครบ เลนปกติผ่าน |
-| `scripts/adversarial/workerd-runner-attacks.mjs` | 10 รายการเป็นไปตามที่ควรครบ **แต่ดูข้อจำกัดด้านล่าง** |
+| `scripts/adversarial/not-wired-gate-evasions.mjs` | ทางหลบ 11 แบบถูกจับครบ เลนปกติผ่าน |
+| `scripts/adversarial/workerd-runner-attacks.mjs` | 11 รายการเป็นไปตามที่ควรครบ รวมการโจมตีตัวจริงที่เคยหลอกสำเร็จ |
 
 หลักฐาน H2 ตรงจาก runtime: `prototype type getter: absent; structuredClone:
 throws DataCloneError`
@@ -136,12 +136,19 @@ finding เหลือตั้งแต่รอบสอง ที่เจ�
 ว่า child ยังมีชีวิตและไม่ได้ตายด้วยสัญญาณ, ว่า HTTP เป็น 200, ว่าชื่อ check ตรง
 รายการครบถ้วนและไม่ซ้ำ, และว่าทุก check ผ่าน
 
-**ข้ออ้างที่ถูกหักล้างแล้ว (รอบห้า):** ประโยคเดิมที่ว่า "สิ่งที่ตัดผู้ครองพอร์ตออกจริง
-คือ liveness" **ไม่จริง** reviewer ครองพอร์ตไว้ก่อน อ่าน nonce จาก `ps` แล้วตอบ JSON
-ปลอมครบแปดข้อ**ก่อน**ที่ wrangler จะ bind ไม่สำเร็จ runner จึงออก 0 พร้อมข้อความ
-"8 checks ผ่านทั้งหมด" ทั้งที่ workerd ไม่เคยรัน — `alive()` ตรวจแค่ "ยังไม่ตาย ณ
-วินาทีนั้น" ไม่ได้รอหลักฐานว่า bind สำเร็จ กำลังแก้ให้รอ readiness จาก output ของ
-wrangler เอง จนกว่าจะแก้เสร็จ **ห้ามอ้างตัวเลขจากเลนนี้เป็นหลักฐาน**
+**ข้ออ้างที่เคยผิดและแก้แล้ว:** รอบห้าหักล้างประโยคที่ว่า "สิ่งที่ตัดผู้ครองพอร์ตออกจริง
+คือ liveness" — reviewer ครองพอร์ตไว้ก่อน อ่าน nonce จาก `ps` (มันเป็น argument ของ
+โปรเซส ไม่ใช่ความลับ) แล้วตอบครบแปดข้อ**ก่อน**ที่ wrangler จะ bind ไม่สำเร็จ runner
+จึงออก 0 ทั้งที่ workerd ไม่เคยรัน
+
+ตอนนี้ runner **ไม่ยิง fetch จนกว่าจะเห็นหลักฐานการ bind จากปาก wrangler เอง** คือ
+บรรทัด `Ready on http://…:61987` ยิงพิสูจน์ทั้งสองทางแล้ว: เมื่อพอร์ตว่าง wrangler
+พิมพ์บรรทัดนั้น เมื่อพอร์ตถูกครอง มันตายด้วย `Address already in use` โดย
+**ไม่ fallback ไปพอร์ตอื่น** บรรทัดนั้นจึงพิสูจน์ว่าใครถือพอร์ตอยู่
+
+การโจมตีตัวเดียวกันถูกใส่เป็นเคสถาวรใน `workerd-runner-attacks.mjs` แล้ว และ
+mutation ยืนยันว่า readiness คือด่านที่ฆ่ามัน: เปลี่ยนกลับไปเชื่อ `alive()` เมื่อไร
+การโจมตีนั้น **SURVIVED (exit 0)** ทันที
 
 สิ่งที่มัน **ไม่** ให้: ความคุ้มกันจากโค้ดที่รันอยู่ในโปรเซสของมันเองแล้ว ใครที่ preload
 โค้ดเข้ามาได้จะปลอม `spawn` และ `fetch` พร้อมกันแล้วป้อนคำตอบที่ผ่านทุกด่านได้ทั้งหมด
@@ -163,7 +170,22 @@ wrangler เอง จนกว่าจะแก้เสร็จ **ห้า�
    ชุดใหม่แล้ว** ซึ่งยังไม่มีจริง จึงไม่แตะ ต้องมีรอบรีวิวข้าม repo ก่อน แล้วค่อย
    regenerate ทั้งชุด
 
-2. **รอบสี่ปิดครบสามข้อแล้ว แต่ยังไม่ผ่านสายตาอิสระอีกรอบ**
+2. **in-bound ของรอบห้าปิดครบแล้ว รอ delta re-review รอบหก**
+
+   - **M2 runner ถูกปลอมผลได้** — ปิดด้วย readiness proof จาก wrangler (ดูด้านบน)
+   - **M3 Sandbox ทำลายข้อมูลได้** — รีวิวให้ POC มา 6 แบบ ทั้งหมดมาจากรากสามอย่าง
+     และแก้ที่รากทั้งสาม: containment ใช้ `realpath` ของบรรพบุรุษที่มีอยู่จริงแทนการ
+     เทียบสตริง (ปิด parent symlink) · สร้างไฟล์ด้วย `O_CREAT|O_EXCL` แทน
+     `existsSync` แล้วค่อยเขียน (ปิด dangling symlink และช่องว่าง TOCTOU) · ผูก
+     ความเป็นเจ้าของกับ `dev`/`ino` แทนชื่อพาธ (ปิดการลบของที่ถูกสลับ และการเขียนทับ
+     งานที่คนอื่นเพิ่งแก้) · อ่าน/เขียนด้วย `O_NOFOLLOW` · ธง "คืนแล้ว" ตั้งหลังลูปจบ
+     และแต่ละรายการมี try ของตัวเอง · สิ่งที่คืนไม่ได้ออกทาง `problems()` ให้ผู้เรียก
+     รายงานและออกด้วยรหัสที่ไม่ใช่ 0 แทนที่จะเงียบ
+   - **M1 ทางหลบ `.js` → `.ts`** — resolver รองรับการแทนนามสกุลแบบที่
+     `moduleResolution: bundler` ทำให้ ทางนี้ต่างจากทางหลบอื่นตรงที่ refactor ปกติ
+     สร้างขึ้นเองได้โดยไม่ต้องตั้งใจ
+
+   *(รอบสี่)* ปิดครบสามข้อแล้ว
 
    - **M-02 ด่าน not-wired หลบได้ 5 ทางใหม่** — ทางที่ร้ายที่สุดคือ
      `src/instrumentation.ts` ซึ่ง reviewer build จริงแล้วโค้ดจากโมดูลต้องห้าม

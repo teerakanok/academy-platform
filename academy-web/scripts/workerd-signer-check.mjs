@@ -12,9 +12,16 @@
  * ประกาศไว้ครบถ้วนและไม่ซ้ำ, และว่าทุก check ผ่าน
  *
  * **nonce ไม่ใช่ความลับ** — มันเดินทางเป็น argument ของโปรเซส โปรเซสสิทธิ์เดียวกัน
- * อ่านจาก `ps` ได้ตามปกติ สิ่งที่ตัดผู้ครองพอร์ตออกจริงคือ **liveness**: ถ้ามีอย่างอื่น
- * ถือพอร์ตนี้อยู่ wrangler จะ bind ไม่สำเร็จแล้วตาย ซึ่งด่าน liveness จับได้
- * ส่วน nonce ทำหน้าที่ตัดคำตอบค้างจากรอบก่อนและคำตอบที่ไม่ได้มาจาก worker ตัวนี้
+ * อ่านจาก `ps` ได้ตามปกติ รุ่นก่อนเขียนว่า "สิ่งที่ตัดผู้ครองพอร์ตออกคือ liveness"
+ * ซึ่ง **ไม่จริง**: รีวิวอิสระครองพอร์ตไว้ อ่าน nonce จาก `ps` แล้วตอบครบแปดข้อ
+ * **ก่อน** ที่ wrangler จะ bind ไม่สำเร็จ — `alive()` ตรวจแค่ "ยังไม่ตาย ณ วินาทีนั้น"
+ * ช่องว่างระหว่าง spawn กับ bind fail คือสิ่งที่ถูกใช้
+ *
+ * สิ่งที่ตัดผู้ครองพอร์ตออกจริงคือ **หลักฐานการ bind จากปาก wrangler เอง**: มันพิมพ์
+ * `Ready on http://…:<port>` ต่อเมื่อ bind สำเร็จ และเมื่อพอร์ตถูกครองอยู่ มันตาย
+ * ด้วย `Address already in use` โดยไม่ fallback ไปพอร์ตอื่น (ยิงพิสูจน์แล้วทั้งสองทาง)
+ * runner จึงไม่ยิง fetch จนกว่าจะเห็นบรรทัดนั้นพร้อมเลขพอร์ตของเรา
+ * ส่วน nonce กับ liveness ยังอยู่เป็นชั้นรอง ไม่ใช่ชั้นเดียว
  *
  * **ไม่ให้:** ความคุ้มกันจากโค้ดที่รันอยู่ในโปรเซสนี้แล้ว ใครที่ preload โค้ดเข้ามาได้
  * จะปลอม `spawn` และ `fetch` พร้อมกัน แล้วป้อนคำตอบที่ผ่านทุกด่านข้างบนได้ทั้งหมด
@@ -110,7 +117,8 @@ const child = spawn('npx', [
   '--port', String(PORT),
   '--inspector-port', String(INSPECTOR_PORT),
   '--var', `SIGNER_CHECK_NONCE:${nonce}`,
-  '--log-level', 'warn',
+  // ต้องเป็น info จึงจะได้บรรทัด `Ready on …` ซึ่งเป็นหลักฐานการ bind
+  '--log-level', 'info',
   '--show-interactive-dev-session', 'false',
 ], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] })
 
@@ -123,24 +131,35 @@ const shutdown = () => { if (child.exitCode === null) child.kill('SIGTERM') }
 process.on('exit', shutdown)
 process.on('SIGINT', () => { shutdown(); process.exit(130) })
 
-let response = null
+// wrangler พิมพ์บรรทัดนี้ต่อเมื่อ bind พอร์ตสำเร็จ ถ้ามีอย่างอื่นครองอยู่มันจะตาย
+// ด้วย "Address already in use" แทน — บรรทัดนี้จึงเป็นหลักฐานว่าใครถือพอร์ตอยู่
+const READY = new RegExp(String.raw`Ready on https?://\S*:${PORT}(?:\D|$)`)
 const deadline = Date.now() + BOOT_TIMEOUT_MS
+let bound = false
 while (Date.now() < deadline) {
+  if (READY.test(log)) { bound = true; break }
   if (!alive()) break
-  try {
-    // ต้องมี deadline ของตัวเอง มิฉะนั้นคำตอบที่ไม่มีวันมาถึงจะแขวนไว้ตลอดกาล
-    response = await fetch(`http://127.0.0.1:${PORT}/`, {
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-    })
-    break
-  } catch {
-    await delay(500)
-  }
+  await delay(250)
 }
 
-if (!response) {
+if (!bound) {
   shutdown()
-  fail(`wrangler dev ไม่ตอบภายใน ${BOOT_TIMEOUT_MS / 1000}s`, log.slice(-4_000))
+  fail(
+    `wrangler dev ไม่ได้รายงานว่า bind 127.0.0.1:${PORT} สำเร็จภายใน ${BOOT_TIMEOUT_MS / 1000}s`,
+    log.slice(-4_000),
+  )
+  process.exit(1)
+}
+
+let response = null
+try {
+  // ต้องมี deadline ของตัวเอง มิฉะนั้นคำตอบที่ไม่มีวันมาถึงจะแขวนไว้ตลอดกาล
+  response = await fetch(`http://127.0.0.1:${PORT}/`, {
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+  })
+} catch (error) {
+  shutdown()
+  fail(`ยิงไม่ถึง worker ที่ bind แล้ว: ${error?.message ?? error}`, log.slice(-2_000))
   process.exit(1)
 }
 // worker ต้องยังมีชีวิตตอนตอบ ไม่ใช่ตายไปแล้วและมีอย่างอื่นมารับแทน

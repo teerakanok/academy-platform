@@ -4,23 +4,23 @@
   "files": [
     {
       "path": "academy-web/scripts/adversarial/not-wired-gate-evasions.mjs",
-      "sha256": "1806e3f8d78638f9270315d650109ad5a7a25a634d7e4f4ee2e5930e42100022",
-      "bytes": 9675
+      "sha256": "3565497f7dea78c4168ab96979d190fc6edf655aaadb3d290dd58eba7dc8725f",
+      "bytes": 11034
     },
     {
       "path": "academy-web/scripts/adversarial/sandbox.mjs",
-      "sha256": "02c868fb3af3e95d8c550435b3f6444557e9577eb55149f5bf4c6cebd6e9b4c5",
-      "bytes": 7765
+      "sha256": "0f480fdfe27fc6bf164f0bccef52b5cb4fd5a4ffc662b5db870130ca26f94c4c",
+      "bytes": 14398
     },
     {
       "path": "academy-web/scripts/adversarial/workerd-runner-attacks.mjs",
-      "sha256": "c773ee547fbfff447be465c0c4688e7e885b0e03c33cdd11304f995531862a62",
-      "bytes": 10070
+      "sha256": "9c857cebf62b5d7f9af40e65e20a16407a9f57140c60c88e416d51a945c538b0",
+      "bytes": 12154
     },
     {
       "path": "academy-web/scripts/workerd-signer-check.mjs",
-      "sha256": "98e3682de41d171c383881e1010d45370ce3236933633e5f9892076a3c9b46b6",
-      "bytes": 11062
+      "sha256": "4ca5882cd5a690837d7f81769b7d52e7ea9ed0f92405061c35baebaa316a96db",
+      "bytes": 12933
     },
     {
       "path": "academy-web/src/lib/identity/client-assertion-webcrypto-signer.ts",
@@ -29,8 +29,8 @@
     },
     {
       "path": "academy-web/tests/unit/adversarial-sandbox.test.ts",
-      "sha256": "21393ec1c411a5d4fe224e1d4660e7a145ccf6a939d7f818588405d8dd843970",
-      "bytes": 5747
+      "sha256": "d4a7400f3a4e861212fa17728765fa3e28f43837da9232376b814e0ff9de4317",
+      "bytes": 10631
     },
     {
       "path": "academy-web/tests/unit/identity-client-assertion-webcrypto-signer.test.ts",
@@ -39,8 +39,8 @@
     },
     {
       "path": "academy-web/tests/unit/identity-key-distribution-not-wired.test.ts",
-      "sha256": "55430254d9591fe1b9fa14f316da7477844cd484eea040714a2ea00c60d9d8f5",
-      "bytes": 19518
+      "sha256": "8fae781f8ae710873f2965a63d05cfe54e2f459021aa3d8dfd2d48ffef4cca1f",
+      "bytes": 20446
     },
     {
       "path": "academy-web/tests/workerd/signer-worker.ts",
@@ -64,8 +64,8 @@
     },
     {
       "path": "reports/reviews/academy-identity-client-assertion-webcrypto-signer-contract-rebind-local-checkpoint-20260814.md",
-      "sha256": "72a798674080c229adc8793bc95de710c16541a11ebf7f8dda3c74152041e838",
-      "bytes": 19602
+      "sha256": "b5c8a509b0763ddfe16473a87b75e7d3903d08d5883f3ee9d5f326e805c7f4f8",
+      "bytes": 27578
     }
   ]
 }

@@ -130,6 +130,37 @@ report('ชื่อซ้ำเพื่อปั๊มจำนวนให้
 report('การเชื่อมต่อที่รับแล้วไม่เคยตอบ',
   await withSquatter(null, () => runRunner()), true)
 
+// การโจมตีตัวจริงที่รีวิวอิสระใช้หลอกเลนนี้สำเร็จ: ครองพอร์ตไว้ก่อน อ่าน nonce
+// จาก `ps` (มันเป็น argument ของโปรเซส ไม่ใช่ความลับ) แล้วตอบครบทุกข้อพร้อม nonce
+// ที่ถูกต้อง ก่อนที่ wrangler จะ bind ไม่สำเร็จ — ทุกด่านที่อาศัย "คำตอบหน้าตาถูก"
+// จึงผ่านหมด สิ่งเดียวที่ตัดมันออกได้คือหลักฐานการ bind จากปาก wrangler เอง
+{
+  const body = { ok: true, checks: checks(REQUIRED) }
+  const source = "const http=require('node:http');const {execSync}=require('node:child_process');"
+    + "const find=()=>{try{const m=/SIGNER_CHECK_NONCE:([0-9a-f-]{36})/.exec("
+    + "execSync('ps -Ao args',{encoding:'utf8'}));return m?m[1]:''}catch{return ''}};"
+    + `http.createServer((q,s)=>{s.setHeader('content-type','application/json');`
+    + `s.end(JSON.stringify(Object.assign({nonce:find()}, ${JSON.stringify(body)})))})`
+    + `.listen(${PORT}, '127.0.0.1')`
+  const child = spawn(process.execPath, ['-e', `${source}.on('listening', () => console.log('READY'))`], {
+    stdio: ['ignore', 'pipe', 'ignore'],
+  })
+  try {
+    const ready = await new Promise((resolveReady) => {
+      const timer = setTimeout(() => resolveReady(false), 8_000)
+      child.stdout.on('data', (chunk) => {
+        if (String(chunk).includes('READY')) { clearTimeout(timer); resolveReady(true) }
+      })
+      child.once('exit', () => { clearTimeout(timer); resolveReady(false) })
+    })
+    report('squatter ที่อ่าน nonce จาก ps แล้วตอบครบทุกข้อ',
+      ready ? { fired: true, code: runRunner() } : { fired: false }, true)
+  } finally {
+    child.kill('SIGTERM')
+    await delay(300)
+  }
+}
+
 // การโจมตีที่เหลือแก้ไฟล์แทนการครองพอร์ต จึงยิงออกเสมอ
 sandbox.reopen()
 sandbox.modify(appConfig, `${sandbox.original(appConfig)}\n/* never closed\n`)
