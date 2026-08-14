@@ -5,7 +5,11 @@ import type {
 
 const CLIENT_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:/-]{0,79}$/
 const KEY_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]{0,47}$/
+const COORDINATE_PATTERN = /^[A-Za-z0-9_-]{43}$/
+const SCALAR_PATTERN = /^[A-Za-z0-9_-]{43}$/
+const JWK_KEYS = ['kty', 'crv', 'x', 'y', 'd'] as const
 const MAX_SIGNING_INPUT_BYTES = 4_096
+const MAX_JWK_BYTES = 4_096
 const SIGNATURE_BYTES = 64
 const FAILURE_MESSAGE = 'Identity client assertion Web Crypto signer failed'
 const TYPED_ARRAY_PROTOTYPE = Object.getPrototypeOf(Uint8Array.prototype)
@@ -21,25 +25,16 @@ const ARRAY_BUFFER_BYTE_LENGTH = Object.getOwnPropertyDescriptor(
   ArrayBuffer.prototype,
   'byteLength',
 )?.get
-const CRYPTO_KEY_PROTOTYPE = typeof CryptoKey === 'function' ? CryptoKey.prototype : null
-const CRYPTO_KEY_TYPE = CRYPTO_KEY_PROTOTYPE
-  ? Object.getOwnPropertyDescriptor(CRYPTO_KEY_PROTOTYPE, 'type')?.get
-  : null
-const CRYPTO_KEY_EXTRACTABLE = CRYPTO_KEY_PROTOTYPE
-  ? Object.getOwnPropertyDescriptor(CRYPTO_KEY_PROTOTYPE, 'extractable')?.get
-  : null
-const CRYPTO_KEY_ALGORITHM = CRYPTO_KEY_PROTOTYPE
-  ? Object.getOwnPropertyDescriptor(CRYPTO_KEY_PROTOTYPE, 'algorithm')?.get
-  : null
-const CRYPTO_KEY_USAGES = CRYPTO_KEY_PROTOTYPE
-  ? Object.getOwnPropertyDescriptor(CRYPTO_KEY_PROTOTYPE, 'usages')?.get
-  : null
 
 export type IdentityClientAssertionWebCryptoSignerOptions = {
   clientId: string
   purpose: IdentityClientAssertionPurpose
   keyId: string
-  privateKey: CryptoKey
+  /**
+   * The private key as JWK text, exactly as it comes from protected
+   * configuration. Not a `CryptoKey`, and not an object — see the factory.
+   */
+  privateJwk: string
 }
 
 type IdentityClientAssertionSigningSnapshot = {
@@ -61,72 +56,73 @@ export class IdentityClientAssertionWebCryptoSignerFailure extends Error {
 }
 
 /**
- * Prove the key is a real CryptoKey and not something wearing one as a costume.
+ * Build a signer that owns its key instead of inspecting one it was handed.
  *
- * Reading metadata through the prototype getters is the right technique in a
- * browser, where `CryptoKey` is a WebIDL interface and calling its getter on a
- * foreign `this` fails the brand check. It is NOT sufficient under Node, where
- * the getter reaches the underlying key through a property that a Proxy simply
- * forwards — so a Proxy can report `extractable: false` while wrapping a key
- * that is extractable, and every metadata check below would agree with it.
+ * The earlier contract took a `CryptoKey` from the caller and validated its
+ * metadata through the `CryptoKey.prototype` getters. That is the correct
+ * technique on a runtime where `CryptoKey` is a WebIDL interface with a brand
+ * check — and it holds on the Node version this package declares. It does not
+ * hold everywhere: on Node 25 the key's state lives in own symbols, so an
+ * ordinary object inheriting from a real key with `Symbol(kExtractable)`
+ * shadowed reports `extractable: false` through those same getters while
+ * wrapping an extractable key. Trying to detect the forgery instead — with
+ * `structuredClone`, `subtle.sign`, or `Object.prototype.toString` — either
+ * misses that shape or rejects genuine keys on workerd.
  *
- * `structuredClone` is a brand check that holds in both: a genuine CryptoKey is
- * serializable per the HTML specification, and a Proxy around one is not
- * cloneable. A runtime that cannot clone a genuine CryptoKey would fail closed
- * here, which is why the test suite pins that a genuine key still passes.
+ * So the key is not inspected: it is imported here, from JWK text, with
+ * `extractable: false` and `['sign']` as the only usage. Nothing the caller can
+ * pass is treated as a key, so there is nothing to forge, and the check works
+ * the same on every runtime because it does not depend on how that runtime
+ * represents a `CryptoKey`.
+ *
+ * The honest limit: a caller that holds the JWK could copy the key material
+ * before handing it over. `extractable: false` after import contains mistakes
+ * inside this process; it is not proof of provenance. Key material that must
+ * never be exportable belongs in a KMS, an HSM, or a signing service that holds
+ * it and never releases it.
  */
-function assertGenuineCryptoKey(value: unknown): void {
-  try {
-    structuredClone(value)
-  } catch {
-    throw new IdentityClientAssertionWebCryptoSignerFailure()
-  }
-}
-
-export function createIdentityClientAssertionWebCryptoSigner(
+export async function createIdentityClientAssertionWebCryptoSigner(
   input: IdentityClientAssertionWebCryptoSignerOptions,
-): IdentityEs256AssertionSigner {
+): Promise<IdentityEs256AssertionSigner> {
   try {
     const clientId = input.clientId
     const purpose = input.purpose
     const keyId = input.keyId
-    const privateKey = input.privateKey
     const crypto = globalThis.crypto
     const subtle = crypto?.subtle
     const sign = subtle?.sign
-    if (!CRYPTO_KEY_TYPE
-      || !CRYPTO_KEY_EXTRACTABLE
-      || !CRYPTO_KEY_ALGORITHM
-      || !CRYPTO_KEY_USAGES) {
-      throw new IdentityClientAssertionWebCryptoSignerFailure()
-    }
-    assertGenuineCryptoKey(privateKey)
-    const keyType = CRYPTO_KEY_TYPE.call(privateKey)
-    const extractable = CRYPTO_KEY_EXTRACTABLE.call(privateKey)
-    const algorithm = CRYPTO_KEY_ALGORITHM.call(privateKey) as KeyAlgorithm
-    const keyUsages = CRYPTO_KEY_USAGES.call(privateKey) as readonly KeyUsage[]
-    const algorithmName = algorithm?.name
-    const namedCurve = (algorithm as Partial<EcKeyAlgorithm> | undefined)?.namedCurve
-    const usageLength = keyUsages?.length
-    const usage = usageLength === 1 ? keyUsages[0] : null
+    const importKey = subtle?.importKey
 
     if (typeof clientId !== 'string'
       || !CLIENT_ID_PATTERN.test(clientId)
       || (purpose !== 'code_exchange' && purpose !== 'lifecycle_pull')
       || typeof keyId !== 'string'
       || !KEY_ID_PATTERN.test(keyId)
-      || !privateKey
-      || keyType !== 'private'
-      || extractable !== false
-      || algorithmName !== 'ECDSA'
-      || namedCurve !== 'P-256'
-      || usageLength !== 1
-      || usage !== 'sign'
       || !crypto
       || !subtle
-      || typeof sign !== 'function') {
+      || typeof sign !== 'function'
+      || typeof importKey !== 'function') {
       throw new IdentityClientAssertionWebCryptoSignerFailure()
     }
+
+    const jwk = parsePrivateJwk(input.privateJwk)
+    // The captured reference is called explicitly against `subtle` so a later
+    // reassignment of `crypto.subtle.importKey` cannot redirect this import.
+    const importJwk = importKey as (
+      format: 'jwk',
+      keyData: JsonWebKey,
+      algorithm: EcKeyImportParams,
+      extractable: boolean,
+      keyUsages: readonly KeyUsage[],
+    ) => Promise<CryptoKey>
+    const privateKey = await importJwk.call(
+      subtle,
+      'jwk',
+      jwk,
+      { name: 'ECDSA', namedCurve: 'P-256' },
+      false,
+      ['sign'],
+    )
 
     return {
       clientId,
@@ -164,6 +160,41 @@ export function createIdentityClientAssertionWebCryptoSigner(
   } catch {
     throw new IdentityClientAssertionWebCryptoSignerFailure()
   }
+}
+
+/**
+ * JWK text only. Parsing here means the value below is plain data: a Proxy, an
+ * accessor, or an inherited property cannot come out of `JSON.parse`, so there
+ * is no hostile object graph to defend against.
+ */
+function parsePrivateJwk(text: unknown): JsonWebKey {
+  if (typeof text !== 'string' || text.length === 0 || text.length > MAX_JWK_BYTES) {
+    throw new IdentityClientAssertionWebCryptoSignerFailure()
+  }
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(text)
+  } catch {
+    throw new IdentityClientAssertionWebCryptoSignerFailure()
+  }
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)
+    || Object.getPrototypeOf(parsed) !== Object.prototype) {
+    throw new IdentityClientAssertionWebCryptoSignerFailure()
+  }
+  const actual = Object.keys(parsed as object)
+  if (actual.length !== JWK_KEYS.length
+    || actual.some((key) => !JWK_KEYS.includes(key as (typeof JWK_KEYS)[number]))) {
+    throw new IdentityClientAssertionWebCryptoSignerFailure()
+  }
+  const record = parsed as Record<(typeof JWK_KEYS)[number], unknown>
+  if (record.kty !== 'EC'
+    || record.crv !== 'P-256'
+    || typeof record.x !== 'string' || !COORDINATE_PATTERN.test(record.x)
+    || typeof record.y !== 'string' || !COORDINATE_PATTERN.test(record.y)
+    || typeof record.d !== 'string' || !SCALAR_PATTERN.test(record.d)) {
+    throw new IdentityClientAssertionWebCryptoSignerFailure()
+  }
+  return { kty: 'EC', crv: 'P-256', x: record.x, y: record.y, d: record.d }
 }
 
 function snapshotSigningInput(

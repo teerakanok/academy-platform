@@ -23,7 +23,8 @@
     "verify:cf-public-share-images": "node scripts/verify-cf-public-share-images.mjs",
     "verify:cf-public-course-pages": "node scripts/verify-cf-public-course-pages.mjs",
     "build:cf": "NEXT_PUBLIC_SUPABASE_URL= NEXT_PUBLIC_SUPABASE_ANON_KEY= opennextjs-cloudflare build",
-    "deploy:cf": "npm run build:cf && wrangler deploy --autoconfig=false --keep-vars"
+    "deploy:cf": "npm run build:cf && wrangler deploy --autoconfig=false --keep-vars",
+    "test:workerd-signer": "node scripts/workerd-signer-check.mjs"
   },
   "dependencies": {
     "@cyberskills/tokens": "file:packages/tokens",

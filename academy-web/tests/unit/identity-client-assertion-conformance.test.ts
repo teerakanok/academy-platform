@@ -38,14 +38,21 @@ describe('Academy Identity client-assertion conformance', () => {
 
     const keys = await webcrypto.subtle.generateKey(
       { name: 'ECDSA', namedCurve: 'P-256' },
-      false,
+      true,
       ['sign', 'verify'],
     ) as CryptoKeyPair
-    const signer = createIdentityClientAssertionWebCryptoSigner({
+    const exported = await webcrypto.subtle.exportKey('jwk', keys.privateKey)
+    const signer = await createIdentityClientAssertionWebCryptoSigner({
       clientId: CLIENT_ID,
       purpose: PURPOSE,
       keyId: KEY_ID,
-      privateKey: keys.privateKey,
+      privateJwk: JSON.stringify({
+        kty: exported.kty,
+        crv: exported.crv,
+        x: exported.x,
+        y: exported.y,
+        d: exported.d,
+      }),
     })
     const provider = createIdentityClientAssertionProvider({
       clientId: CLIENT_ID,

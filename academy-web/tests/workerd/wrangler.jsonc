@@ -1,0 +1,10 @@
+{
+  // Harness ที่รัน signer บน workerd จริง ไม่ใช่ Node
+  // ข้อ H2 ของรีวิว: contract ที่ผ่านบน Node อาจพังบน workerd ได้เงียบๆ
+  // compatibility_date/flags ต้องตรงกับ ../../wrangler.jsonc เสมอ —
+  // scripts/workerd-signer-check.mjs บังคับไว้ ถ้าเลื่อนแล้วไม่ตามจะ fail
+  "name": "academy-identity-signer-workerd-check",
+  "main": "signer-worker.ts",
+  "compatibility_date": "2025-03-25",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"]
+}
