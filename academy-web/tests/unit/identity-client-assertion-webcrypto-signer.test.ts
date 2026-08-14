@@ -95,6 +95,18 @@ describe('Academy Identity client assertion Web Crypto signer', () => {
       .toThrow(IdentityClientAssertionWebCryptoSignerFailure)
   })
 
+  it('still accepts a genuine key, so the brand check cannot silently fail closed', async () => {
+    // The Proxy defence rejects anything that cannot be structured-cloned. If a
+    // runtime ever stopped cloning a genuine CryptoKey, every signer would stop
+    // working — safe, but broken. Pin the positive side so that shows up here
+    // rather than in production.
+    installWebCrypto()
+    const keys = await generateP256(false)
+    expect(() => structuredClone(keys.privateKey)).not.toThrow()
+    const signer = createIdentityClientAssertionWebCryptoSigner(options(keys.privateKey))
+    expect(typeof signer.sign).toBe('function')
+  })
+
   it('rejects a Proxy that forges metadata around a genuine key', async () => {
     installWebCrypto()
     const keys = await generateP256(false)

@@ -60,6 +60,29 @@ export class IdentityClientAssertionWebCryptoSignerFailure extends Error {
   }
 }
 
+/**
+ * Prove the key is a real CryptoKey and not something wearing one as a costume.
+ *
+ * Reading metadata through the prototype getters is the right technique in a
+ * browser, where `CryptoKey` is a WebIDL interface and calling its getter on a
+ * foreign `this` fails the brand check. It is NOT sufficient under Node, where
+ * the getter reaches the underlying key through a property that a Proxy simply
+ * forwards — so a Proxy can report `extractable: false` while wrapping a key
+ * that is extractable, and every metadata check below would agree with it.
+ *
+ * `structuredClone` is a brand check that holds in both: a genuine CryptoKey is
+ * serializable per the HTML specification, and a Proxy around one is not
+ * cloneable. A runtime that cannot clone a genuine CryptoKey would fail closed
+ * here, which is why the test suite pins that a genuine key still passes.
+ */
+function assertGenuineCryptoKey(value: unknown): void {
+  try {
+    structuredClone(value)
+  } catch {
+    throw new IdentityClientAssertionWebCryptoSignerFailure()
+  }
+}
+
 export function createIdentityClientAssertionWebCryptoSigner(
   input: IdentityClientAssertionWebCryptoSignerOptions,
 ): IdentityEs256AssertionSigner {
@@ -77,6 +100,7 @@ export function createIdentityClientAssertionWebCryptoSigner(
       || !CRYPTO_KEY_USAGES) {
       throw new IdentityClientAssertionWebCryptoSignerFailure()
     }
+    assertGenuineCryptoKey(privateKey)
     const keyType = CRYPTO_KEY_TYPE.call(privateKey)
     const extractable = CRYPTO_KEY_EXTRACTABLE.call(privateKey)
     const algorithm = CRYPTO_KEY_ALGORITHM.call(privateKey) as KeyAlgorithm
