@@ -161,6 +161,49 @@ report('การเชื่อมต่อที่รับแล้วไม
   }
 }
 
+// การยึดพอร์ต **หลัง** workerd bind สำเร็จแล้ว — readiness ผ่านไปแล้ว nonce ก็อ่านได้
+// จาก `ps` สิ่งเดียวที่เหลือให้ตัดคือตัวตนของ process ที่ listen อยู่ตอนตอบ
+{
+  const takeover = `
+const { spawnSync, spawn } = require('node:child_process')
+const http = require('node:http')
+const PORT = ${PORT}
+const pids = () => {
+  const p = spawnSync('lsof', ['-nP', '-iTCP:' + PORT, '-sTCP:LISTEN', '-t'], { encoding: 'utf8' })
+  return (p.stdout || '').trim().split('\\n').map(Number).filter(Boolean)
+}
+const nonce = () => {
+  const p = spawnSync('ps', ['-Ao', 'args'], { encoding: 'utf8' })
+  const m = /SIGNER_CHECK_NONCE:([0-9a-f-]{36})/.exec(p.stdout || '')
+  return m ? m[1] : ''
+}
+const deadline = Date.now() + 180000
+const wait = setInterval(() => {
+  const current = pids()
+  if (current.length === 0) { if (Date.now() > deadline) process.exit(0); return }
+  clearInterval(wait)
+  for (const pid of current) { try { process.kill(pid, 'SIGKILL') } catch {} }
+  const serve = () => {
+    const server = http.createServer((q, s) => {
+      s.setHeader('content-type', 'application/json')
+      s.end(JSON.stringify({ ok: true, nonce: nonce(), checks: ${JSON.stringify(JSON.stringify(REQUIRED.map((name) => ({ name, passed: true, detail: 'takeover' }))))} && ${JSON.stringify(REQUIRED)}.map(n => ({ name: n, passed: true, detail: 'takeover' })) }))
+    })
+    server.on('error', () => setTimeout(serve, 20))
+    server.listen(PORT, '127.0.0.1')
+  }
+  serve()
+}, 20)
+`
+  const attacker = spawn(process.execPath, ['-e', takeover], { stdio: 'ignore', detached: true })
+  try {
+    report('ยึดพอร์ตหลัง workerd bind สำเร็จ แล้วตอบด้วย nonce ที่อ่านจาก ps',
+      { fired: true, code: runRunner() }, true)
+  } finally {
+    try { process.kill(-attacker.pid, 'SIGKILL') } catch { attacker.kill('SIGKILL') }
+    await delay(500)
+  }
+}
+
 // การโจมตีที่เหลือแก้ไฟล์แทนการครองพอร์ต จึงยิงออกเสมอ
 sandbox.reopen()
 sandbox.modify(appConfig, `${sandbox.original(appConfig)}\n/* never closed\n`)

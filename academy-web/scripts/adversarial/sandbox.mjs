@@ -151,24 +151,33 @@ export class Sandbox {
    */
   restore() {
     if (this.#restored) return
+    // สิ่งที่คืนสำเร็จเท่านั้นที่ถูกลบออกจากบัญชี ที่เหลือเก็บไว้ให้เรียกซ้ำได้
+    // ของเดิมล้างบัญชีทิ้งทุกกรณี พอ restore ติด EACCES ชั่วคราว ไบต์เดิมก็หายถาวร
+    // แม้ permission จะคืนมาแล้วก็กู้ไม่ได้ — เป็นการทำข้อมูลหายโดยไม่ต้องมีผู้โจมตี
+    const restoredPaths = []
+    const removedFiles = []
     for (const [full, saved] of this.#saved) {
       try {
         const meta = lstatSync(full)
         if (!meta.isFile()) {
           this.#note(full, 'ไม่ใช่ไฟล์ธรรมดาแล้ว อาจถูกสลับเป็น symlink — ไม่เขียนทับ')
+          restoredPaths.push(full)
           continue
         }
         if (!sameNode(meta, saved)) {
           this.#note(full, 'ถูกแทนที่ด้วยไฟล์คนละก้อน — ไม่เขียนทับ')
+          restoredPaths.push(full)
           continue
         }
         if (saved.wroteDigest !== null && digest(readNoFollow(full)) !== saved.wroteDigest) {
           this.#note(full, 'มีคนแก้หลังจากเราเขียน — ไม่เขียนทับงานนั้น')
+          restoredPaths.push(full)
           continue
         }
         writeNoFollow(full, saved.bytes)
+        restoredPaths.push(full)
       } catch (error) {
-        this.#note(full, `คืนไม่สำเร็จ: ${error.code ?? error.message}`)
+        this.#note(full, `คืนไม่สำเร็จ: ${error.code ?? error.message} — เก็บไบต์เดิมไว้ให้เรียกซ้ำ`)
       }
     }
     for (const created of this.#createdFiles) {
@@ -176,11 +185,14 @@ export class Sandbox {
         const meta = lstatSync(created.path)
         if (!sameNode(meta, created)) {
           this.#note(created.path, 'ไม่ใช่ก้อนที่เราสร้าง — ไม่ลบ')
+          removedFiles.push(created.path)
           continue
         }
         unlinkSync(created.path)
+        removedFiles.push(created.path)
       } catch (error) {
-        if (error.code !== 'ENOENT') this.#note(created.path, `ลบไม่สำเร็จ: ${error.code ?? error.message}`)
+        if (error.code === 'ENOENT') removedFiles.push(created.path)
+        else this.#note(created.path, `ลบไม่สำเร็จ: ${error.code ?? error.message} — เก็บไว้ให้เรียกซ้ำ`)
       }
     }
     for (const directory of this.#createdDirectories) {
@@ -191,10 +203,18 @@ export class Sandbox {
         // ไม่ว่าง หรือถูกลบไปแล้ว ทั้งสองกรณีไม่ใช่เรื่องที่ต้องบังคับ
       }
     }
-    this.#saved.clear()
-    this.#createdFiles = []
-    this.#createdDirectories = []
-    this.#restored = true
+    for (const full of restoredPaths) this.#saved.delete(full)
+    this.#createdFiles = this.#createdFiles.filter((entry) => !removedFiles.includes(entry.path))
+    // ธง "คืนแล้ว" ตั้งได้ก็ต่อเมื่อไม่มีอะไรค้าง ถ้ายังค้าง การเรียกซ้ำต้องได้ลองใหม่จริง
+    if (this.#saved.size === 0 && this.#createdFiles.length === 0) {
+      this.#createdDirectories = []
+      this.#restored = true
+    }
+  }
+
+  /** ยังมีอะไรค้างที่ต้องคืนอีกไหม — ผู้เรียกใช้ตัดสินว่าจะลองซ้ำหรือหยุด */
+  pending() {
+    return this.#saved.size + this.#createdFiles.length
   }
 
   #note(path, reason) {
@@ -256,7 +276,9 @@ function writeNoFollow(path, bytes) {
  */
 export function restoreOnExit(sandbox) {
   const restore = () => {
+    // ลองซ้ำหนึ่งครั้ง เผื่อรอบแรกติดสภาพชั่วคราว (permission, ไฟล์ถูกล็อกอยู่)
     sandbox.restore()
+    if (sandbox.pending() > 0) sandbox.restore()
     const problems = sandbox.problems()
     if (problems.length > 0) {
       console.error('คืนสภาพไม่ครบ:')

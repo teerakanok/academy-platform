@@ -1,7 +1,7 @@
 # Academy Identity Client-Assertion Web Crypto Signer — Contract Rebind Local Checkpoint
 
 **Date:** 2026-08-14
-**Status:** รีวิวอิสระห้ารอบ · triage เป็น in-bound 3 / deferred 3 · **in-bound ปิดครบแล้ว** รอ delta re-review รอบหก
+**Status:** รีวิวอิสระหกรอบ · in-bound ของรอบห้าและรอบหกปิดครบแล้ว · รอ delta re-review รอบเจ็ด
 **Production:** NO-GO
 **Supersedes:** `academy-identity-client-assertion-webcrypto-signer-local-checkpoint-2026-08-11.md`
 
@@ -63,13 +63,13 @@ parser แบบ first-wins อ่านไฟล์เดียวกันแ�
 
 | ด่าน | ผล |
 |---|---|
-| unit ทั้ง repo | 1341 ข้อผ่าน (117 ไฟล์) |
+| unit ทั้ง repo | 1343 ข้อผ่าน (117 ไฟล์) |
 | เลน signer + ด่าน not-wired + sandbox | 66 ข้อผ่าน บนทั้ง node 24.18.0 (engine ที่ประกาศ) และ 25.5.0 |
 | `tsc --noEmit` | สะอาด |
 | eslint | 0 error · 1 warning ที่มีมาก่อนใน `src/lib/content/registry.generated.ts` (ไฟล์ generated ไม่เกี่ยวกับลานนี้) |
 | `npm run test:workerd-signer` | 8 ข้อผ่านบน workerd จริง ที่ compatibility ของแอป |
 | `scripts/adversarial/not-wired-gate-evasions.mjs` | ทางหลบ 11 แบบถูกจับครบ เลนปกติผ่าน |
-| `scripts/adversarial/workerd-runner-attacks.mjs` | 11 รายการเป็นไปตามที่ควรครบ รวมการโจมตีตัวจริงที่เคยหลอกสำเร็จ |
+| `scripts/adversarial/workerd-runner-attacks.mjs` | 12 รายการเป็นไปตามที่ควรครบ รวมการยึดพอร์ตหลัง bind |
 
 หลักฐาน H2 ตรงจาก runtime: `prototype type getter: absent; structuredClone:
 throws DataCloneError`
@@ -141,14 +141,23 @@ finding เหลือตั้งแต่รอบสอง ที่เจ�
 โปรเซส ไม่ใช่ความลับ) แล้วตอบครบแปดข้อ**ก่อน**ที่ wrangler จะ bind ไม่สำเร็จ runner
 จึงออก 0 ทั้งที่ workerd ไม่เคยรัน
 
-ตอนนี้ runner **ไม่ยิง fetch จนกว่าจะเห็นหลักฐานการ bind จากปาก wrangler เอง** คือ
-บรรทัด `Ready on http://…:61987` ยิงพิสูจน์ทั้งสองทางแล้ว: เมื่อพอร์ตว่าง wrangler
-พิมพ์บรรทัดนั้น เมื่อพอร์ตถูกครอง มันตายด้วย `Address already in use` โดย
-**ไม่ fallback ไปพอร์ตอื่น** บรรทัดนั้นจึงพิสูจน์ว่าใครถือพอร์ตอยู่
+**ชั้นที่ 1 — หลักฐานการ bind จากปาก wrangler เอง.** runner ไม่ยิง fetch จนกว่าจะเห็น
+บรรทัด `Ready on http://…:61987` ยิงพิสูจน์ทั้งสองทางแล้ว: พอร์ตว่าง wrangler พิมพ์
+บรรทัดนั้น · พอร์ตถูกครอง มันตายด้วย `Address already in use` โดย**ไม่ fallback
+ไปพอร์ตอื่น**
 
-การโจมตีตัวเดียวกันถูกใส่เป็นเคสถาวรใน `workerd-runner-attacks.mjs` แล้ว และ
-mutation ยืนยันว่า readiness คือด่านที่ฆ่ามัน: เปลี่ยนกลับไปเชื่อ `alive()` เมื่อไร
-การโจมตีนั้น **SURVIVED (exit 0)** ทันที
+**ชั้นที่ 2 — ผูกคำตอบเข้ากับตัว process.** รอบหกชี้ว่าชั้นแรกยังไม่พอ เพราะ readiness
+พิสูจน์แค่ว่า **เคย** ถือพอร์ต ณ ขณะหนึ่ง ไม่ได้ผูกคำตอบที่ได้ทีหลังเข้ากับ process นั้น
+reviewer จึงรอ bind สำเร็จ → ฆ่าเฉพาะ process ที่ listen → ยึดพอร์ตต่อทันที → อ่าน
+nonce จาก `ps` แล้วตอบครบแปดข้อ ผลคือ runner ออก 0 อีกครั้ง
+
+ตอนนี้ก่อนยิงและหลังได้คำตอบ runner ตรวจว่า **PID ที่ listen พอร์ตนี้เป็นลูกหลานของ
+child ที่เราสตาร์ทเอง และเป็นชุดเดียวกันทั้งสองครั้ง** ผู้ยึดพอร์ตไม่ใช่ลูกหลานของเรา
+จึงตกด่านนี้ไม่ว่าจะรู้ nonce หรือไม่ — ตัวตนของ process ปลอมไม่ได้ด้วยการรู้ค่า
+
+การโจมตีทั้งสองแบบเป็นเคสถาวรใน `workerd-runner-attacks.mjs` แล้ว และ mutation
+ยืนยันว่าแต่ละชั้นคือตัวที่ฆ่าแบบของมันจริง: ตัด readiness ออก การครองพอร์ตก่อน bind
+**SURVIVED** · ตัด ownership ออก การยึดพอร์ตหลัง bind **SURVIVED** (ทั้งคู่ exit 0)
 
 สิ่งที่มัน **ไม่** ให้: ความคุ้มกันจากโค้ดที่รันอยู่ในโปรเซสของมันเองแล้ว ใครที่ preload
 โค้ดเข้ามาได้จะปลอม `spawn` และ `fetch` พร้อมกันแล้วป้อนคำตอบที่ผ่านทุกด่านได้ทั้งหมด
@@ -170,7 +179,18 @@ mutation ยืนยันว่า readiness คือด่านที่ฆ
    ชุดใหม่แล้ว** ซึ่งยังไม่มีจริง จึงไม่แตะ ต้องมีรอบรีวิวข้าม repo ก่อน แล้วค่อย
    regenerate ทั้งชุด
 
-2. **in-bound ของรอบห้าปิดครบแล้ว รอ delta re-review รอบหก**
+2. **รอบหก `C0/H0/M2/L0` — in-bound ทั้งสองปิดแล้ว รอ delta re-review รอบเจ็ด**
+
+   - **ยึดพอร์ตหลัง bind** — ปิดด้วยการผูกคำตอบเข้ากับ PID ที่ listen (ดูด้านบน)
+   - **Sandbox ทิ้ง snapshot หลัง restore ล้มเหลวชั่วคราว** — ของเดิมล้างบัญชีทิ้งทุกกรณี
+     พอ `restore()` ติด `EACCES` ชั่วคราว ไบต์เดิมหายถาวร แม้ permission กลับมาแล้ว
+     ก็กู้ไม่ได้ เป็นการทำข้อมูลหายโดยไม่ต้องมีผู้โจมตี ตอนนี้ลบออกจากบัญชีเฉพาะสิ่งที่
+     **คืนสำเร็จจริง** · ธง "คืนแล้ว" ตั้งได้ต่อเมื่อไม่มีอะไรค้าง · เพิ่ม `pending()`
+     ให้ผู้เรียกตัดสินใจ และ exit handler ลองซ้ำหนึ่งครั้งเผื่อสภาพชั่วคราว
+     ทำซ้ำได้ตรงตาม POC: restore แรกล้มและเก็บไบต์เดิมไว้ → คืน permission →
+     เรียกซ้ำแล้วได้ข้อมูลเดิมกลับมา
+
+   *(รอบห้า)* in-bound ปิดครบแล้ว
 
    - **M2 runner ถูกปลอมผลได้** — ปิดด้วย readiness proof จาก wrangler (ดูด้านบน)
    - **M3 Sandbox ทำลายข้อมูลได้** — รีวิวให้ POC มา 6 แบบ ทั้งหมดมาจากรากสามอย่าง

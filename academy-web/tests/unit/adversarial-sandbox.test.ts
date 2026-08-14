@@ -1,5 +1,5 @@
 import {
-  existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, realpathSync,
+  chmodSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, realpathSync,
   rmSync, symlinkSync, unlinkSync, writeFileSync,
 } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -25,6 +25,7 @@ describe('ที่กันเปื้อนของสคริปต์ adv
   })
 
   afterEach(() => {
+    try { chmodSync(root, 0o700) } catch { /* โฟลเดอร์อาจถูกลบไปแล้ว */ }
     rmSync(root, { recursive: true, force: true })
     rmSync(outside, { recursive: true, force: true })
   })
@@ -138,6 +139,41 @@ describe('ที่กันเปื้อนของสคริปต์ adv
     writeFileSync(join(root, 'ของฉัน/คนอื่นวางไว้.txt'), 'ห้ามหาย')
     second.restore()
     expect(readFileSync(join(root, 'ของฉัน/คนอื่นวางไว้.txt'), 'utf8')).toBe('ห้ามหาย')
+  })
+
+  it('เก็บไบต์เดิมไว้เมื่อคืนไม่สำเร็จ แล้วเรียกซ้ำต้องกู้ได้', () => {
+    // ของเดิมล้างบัญชีทิ้งทุกกรณี พอ restore ติด EACCES ชั่วคราว ไบต์เดิมก็หายถาวร
+    // แม้ permission จะคืนมาแล้ว — เป็นการทำข้อมูลหายโดยไม่ต้องมีผู้โจมตี
+    const path = join(root, 'ยังไม่ commit.txt')
+    writeFileSync(path, 'งานของเจ้าของที่ยังไม่ commit')
+    const sandbox = new Sandbox(root)
+    sandbox.modify('ยังไม่ commit.txt', 'ที่ harness เขียน')
+
+    chmodSync(path, 0o444)
+    sandbox.restore()
+    expect(readFileSync(path, 'utf8')).toBe('ที่ harness เขียน')
+    expect(sandbox.pending()).toBe(1)
+    expect(sandbox.problems().join()).toMatch(/EACCES/)
+
+    chmodSync(path, 0o644)
+    sandbox.restore()
+    expect(readFileSync(path, 'utf8')).toBe('งานของเจ้าของที่ยังไม่ commit')
+    expect(sandbox.pending()).toBe(0)
+  })
+
+  it('ลบไม่สำเร็จก็ต้องเก็บไว้ลองซ้ำ ไม่ใช่ลืมไปเฉยๆ', () => {
+    const sandbox = new Sandbox(root)
+    sandbox.create('ในโฟลเดอร์/ชั่วคราว.txt', 'x')
+    chmodSync(join(root, 'ในโฟลเดอร์'), 0o500)
+
+    sandbox.restore()
+    expect(existsSync(join(root, 'ในโฟลเดอร์/ชั่วคราว.txt'))).toBe(true)
+    expect(sandbox.pending()).toBe(1)
+
+    chmodSync(join(root, 'ในโฟลเดอร์'), 0o700)
+    sandbox.restore()
+    expect(existsSync(join(root, 'ในโฟลเดอร์/ชั่วคราว.txt'))).toBe(false)
+    expect(sandbox.pending()).toBe(0)
   })
 
   it('คืนสภาพซ้ำได้ และไม่ลบซ้ำสิ่งที่ถูกสร้างใหม่หลังคืนแล้ว', () => {

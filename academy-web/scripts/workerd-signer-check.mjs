@@ -17,11 +17,18 @@
  * **ก่อน** ที่ wrangler จะ bind ไม่สำเร็จ — `alive()` ตรวจแค่ "ยังไม่ตาย ณ วินาทีนั้น"
  * ช่องว่างระหว่าง spawn กับ bind fail คือสิ่งที่ถูกใช้
  *
- * สิ่งที่ตัดผู้ครองพอร์ตออกจริงคือ **หลักฐานการ bind จากปาก wrangler เอง**: มันพิมพ์
- * `Ready on http://…:<port>` ต่อเมื่อ bind สำเร็จ และเมื่อพอร์ตถูกครองอยู่ มันตาย
- * ด้วย `Address already in use` โดยไม่ fallback ไปพอร์ตอื่น (ยิงพิสูจน์แล้วทั้งสองทาง)
- * runner จึงไม่ยิง fetch จนกว่าจะเห็นบรรทัดนั้นพร้อมเลขพอร์ตของเรา
- * ส่วน nonce กับ liveness ยังอยู่เป็นชั้นรอง ไม่ใช่ชั้นเดียว
+ * ชั้นแรกคือ **หลักฐานการ bind จากปาก wrangler เอง**: มันพิมพ์ `Ready on http://…:<port>`
+ * ต่อเมื่อ bind สำเร็จ และเมื่อพอร์ตถูกครองอยู่ มันตายด้วย `Address already in use`
+ * โดยไม่ fallback ไปพอร์ตอื่น (ยิงพิสูจน์แล้วทั้งสองทาง)
+ *
+ * แต่ readiness พิสูจน์แค่ว่า **เคย** ถือพอร์ตไว้ ณ ขณะหนึ่ง ไม่ได้ผูกคำตอบที่ได้
+ * ทีหลังเข้ากับ process นั้น รีวิวอิสระใช้ช่องนี้: รอ bind สำเร็จ → ฆ่าเฉพาะ process
+ * ที่ listen → ยึดพอร์ตต่อทันที → อ่าน nonce จาก `ps` แล้วตอบครบแปดข้อ ผลคือ runner
+ * ออก 0 พร้อม "8 checks ผ่านทั้งหมด"
+ *
+ * ชั้นที่ปิดช่องนั้นคือ **ผูกคำตอบเข้ากับตัว process**: ก่อนยิงและหลังได้คำตอบ ตรวจว่า
+ * PID ที่ listen พอร์ตนี้เป็นลูกหลานของ child ที่เราสตาร์ทเอง และเป็นชุดเดียวกันทั้งสองครั้ง
+ * ผู้ยึดพอร์ตไม่ใช่ลูกหลานของเรา จึงตกด่านนี้ไม่ว่าจะรู้ nonce หรือไม่
  *
  * **ไม่ให้:** ความคุ้มกันจากโค้ดที่รันอยู่ในโปรเซสนี้แล้ว ใครที่ preload โค้ดเข้ามาได้
  * จะปลอม `spawn` และ `fetch` พร้อมกัน แล้วป้อนคำตอบที่ผ่านทุกด่านข้างบนได้ทั้งหมด
@@ -29,7 +36,7 @@
  * ความน่าเชื่อถือของหลักฐานชุดนี้จึงอยู่ที่ "ใครเป็นคนสั่งรัน" ไม่ใช่ที่สคริปต์
  * (เหตุผลเดียวกับที่ archive-transfer CLI ฝั่ง director บันทึกไว้เรื่อง preload)
  */
-import { spawn } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
 import { setTimeout as delay } from 'node:timers/promises'
 import { fileURLToPath } from 'node:url'
@@ -127,6 +134,44 @@ child.stdout.on('data', (chunk) => { log += chunk })
 child.stderr.on('data', (chunk) => { log += chunk })
 
 const alive = () => child.exitCode === null && child.signalCode === null
+
+/** PID ที่ listen พอร์ตนี้อยู่จริง ณ วินาทีนี้ */
+function listeningPids(port) {
+  const probe = spawnSync('lsof', ['-nP', `-iTCP:${port}`, '-sTCP:LISTEN', '-t'], {
+    encoding: 'utf8', timeout: 10_000,
+  })
+  if (probe.status !== 0 || typeof probe.stdout !== 'string') return []
+  return probe.stdout.trim().split('\n').map(Number).filter((pid) => Number.isInteger(pid) && pid > 1)
+}
+
+function parentOf(pid) {
+  const probe = spawnSync('ps', ['-o', 'ppid=', '-p', String(pid)], { encoding: 'utf8', timeout: 10_000 })
+  const value = Number((probe.stdout ?? '').trim())
+  return Number.isInteger(value) && value > 1 ? value : null
+}
+
+function descendsFrom(pid, ancestor) {
+  let current = pid
+  for (let depth = 0; depth < 32; depth += 1) {
+    if (current === ancestor) return true
+    const parent = parentOf(current)
+    if (parent === null || parent === current) return false
+    current = parent
+  }
+  return false
+}
+
+/**
+ * พอร์ตนี้ถูกถือโดย process ในสายของเราเท่านั้นหรือไม่
+ *
+ * ผู้ที่ยึดพอร์ตต่อจาก workerd ที่ถูกฆ่า จะไม่ได้เป็นลูกหลานของ child ที่เราสตาร์ท
+ * ต่อให้มันอ่าน nonce จาก `ps` ได้ก็ตาม — ตัวตนของ process ปลอมไม่ได้ด้วยการรู้ค่า
+ */
+function ownedByUs() {
+  const pids = listeningPids(PORT)
+  if (pids.length === 0) return null
+  return pids.every((pid) => descendsFrom(pid, child.pid)) ? pids.sort().join(',') : null
+}
 const shutdown = () => { if (child.exitCode === null) child.kill('SIGTERM') }
 process.on('exit', shutdown)
 process.on('SIGINT', () => { shutdown(); process.exit(130) })
@@ -151,6 +196,13 @@ if (!bound) {
   process.exit(1)
 }
 
+const ownerBefore = ownedByUs()
+if (ownerBefore === null) {
+  shutdown()
+  fail(`พอร์ต ${PORT} ไม่ได้ถูกถือโดย process ในสายของเรา — คำตอบใดๆ ก็ไม่ใช่ของ worker นี้`)
+  process.exit(1)
+}
+
 let response = null
 try {
   // ต้องมี deadline ของตัวเอง มิฉะนั้นคำตอบที่ไม่มีวันมาถึงจะแขวนไว้ตลอดกาล
@@ -162,6 +214,9 @@ try {
   fail(`ยิงไม่ถึง worker ที่ bind แล้ว: ${error?.message ?? error}`, log.slice(-2_000))
   process.exit(1)
 }
+
+// ตรวจซ้ำหลังได้คำตอบ — การยึดพอร์ตที่แทรกระหว่างสองจังหวะจะทำให้ชุด PID เปลี่ยน
+const ownerAfter = ownedByUs()
 // worker ต้องยังมีชีวิตตอนตอบ ไม่ใช่ตายไปแล้วและมีอย่างอื่นมารับแทน
 // ตายด้วยสัญญาณก็คือตาย: exitCode ยังเป็น null อยู่ในกรณีนั้น
 const aliveAtResponse = alive()
@@ -169,6 +224,9 @@ const status = response.status
 const body = await response.json().catch(() => null)
 shutdown()
 
+if (ownerAfter === null || ownerAfter !== ownerBefore) {
+  fail(`พอร์ต ${PORT} เปลี่ยนเจ้าของระหว่างการร้องขอ — คำตอบนี้ไม่ใช่ของ worker ที่เราสตาร์ท`, log.slice(-2_000))
+}
 if (!aliveAtResponse) fail('worker ตายก่อนที่คำตอบจะมาถึง — คำตอบนี้ไม่ใช่ของมัน', log.slice(-2_000))
 if (status !== 200) fail(`HTTP ${status} ไม่ใช่ 200`)
 if (body === null || typeof body !== 'object' || Array.isArray(body)) fail('คำตอบไม่ใช่ JSON object')
