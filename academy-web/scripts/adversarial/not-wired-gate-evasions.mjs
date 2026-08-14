@@ -59,6 +59,79 @@ const EVASIONS = [
     modify: {},
   },
   {
+    // ทางหลบที่อันตรายที่สุดที่รีวิวอิสระเจอ: build จริงแล้วโค้ดจากโมดูลต้องห้าม
+    // ไปโผล่ใน .open-next/middleware/handler.mjs ขณะที่ด่านยังเขียว 10/10
+    name: 'src/instrumentation.ts ซึ่ง Next ถือเป็น entrypoint เอง',
+    create: {
+      'src/instrumentation.ts':
+        "import { createIdentityResultKeySetCache } from '@/lib/identity/result-key-set-cache'\n"
+        + 'export function register() { void createIdentityResultKeySetCache }\n',
+    },
+    modify: {},
+  },
+  {
+    name: 'src/pages ซึ่งไม่เคยถูกสแกน',
+    create: {
+      'src/pages/api/probe.ts':
+        "import { importIdentityResultKeySet } from '@/lib/identity/result-key-set-importer'\n"
+        + 'export default function handler() { void importIdentityResultKeySet }\n',
+    },
+    modify: {},
+  },
+  {
+    name: 'alias ตัวใหม่ใน tsconfig ที่ resolver เดิมไม่รู้จัก',
+    create: {
+      'src/app/(site)/api/auth/alias-probe.ts':
+        "export { importIdentityResultKeySet } from '#identity/result-key-set-importer'\n",
+    },
+    modify: {
+      'tsconfig.json': (before) => before.replace(
+        '"@/*": ["./src/*"]',
+        '"@/*": ["./src/*"], "#identity/*": ["./src/lib/identity/*"]',
+      ),
+      [route]: (before) => "import '@/app/(site)/api/auth/alias-probe'\n" + before,
+    },
+  },
+  {
+    name: 'self-import ผ่านชื่อแพ็กเกจตัวเองใน package.json exports',
+    create: {},
+    modify: {
+      'package.json': (before) => {
+        const manifest = JSON.parse(before)
+        manifest.exports = { './identity/*': './src/lib/identity/*' }
+        return `${JSON.stringify(manifest, null, 2)}\n`
+      },
+      [route]: (before) =>
+        "import { createIdentityResultKeySetCache } from 'academy-web/identity/result-key-set-cache'\n"
+        + `void createIdentityResultKeySetCache\n${before}`,
+    },
+  },
+  {
+    name: 'wrangler config ที่มี "main" ลวงอยู่ในคอมเมนต์',
+    create: {
+      'adversarial-probe/decoy.ts': "export default { async fetch() { return new Response('x') } }\n",
+      'adversarial-probe/real-worker.ts':
+        "import { importIdentityResultKeySet } from '../src/lib/identity/result-key-set-importer'\n"
+        + "export default { async fetch() { void importIdentityResultKeySet; return new Response('x') } }\n",
+      'wrangler.decoy-probe.jsonc':
+        '{\n  "name": "decoy-probe",\n'
+        + '  // "main": "adversarial-probe/decoy.ts",\n'
+        + '  "main": "adversarial-probe/real-worker.ts",\n'
+        + '  "compatibility_date": "2025-03-25"\n}\n',
+    },
+    modify: {},
+  },
+  {
+    name: 'symlink ที่ชี้ไปโมดูลต้องห้าม',
+    create: {},
+    symlink: { 'src/lib/identity/mirror.ts': 'src/lib/identity/result-key-set-importer.ts' },
+    modify: {
+      [route]: (before) =>
+        "import { importIdentityResultKeySet } from '@/lib/identity/mirror'\n"
+        + `void importIdentityResultKeySet\n${before}`,
+    },
+  },
+  {
     name: 'static import ตรงๆ จาก route',
     create: {},
     modify: {
@@ -92,6 +165,7 @@ for (const evasion of EVASIONS) {
   let outcome
   try {
     for (const [path, content] of Object.entries(evasion.create)) sandbox.create(path, content)
+    for (const [path, target] of Object.entries(evasion.symlink ?? {})) sandbox.symlink(path, target)
     for (const [path, build] of Object.entries(evasion.modify)) {
       sandbox.modify(path, build(sandbox.original(path)))
     }

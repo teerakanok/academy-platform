@@ -15,7 +15,7 @@
  * ไฟล์ที่จะถูกแก้ต้องถูก `modify` ซึ่งเก็บไบต์เดิมไว้ก่อน การคืนสภาพเขียนไบต์ชุดเดิม
  * กลับ ไม่ใช่ `git checkout` เพราะของที่ยังไม่ commit จะหายไปด้วย
  */
-import { existsSync, mkdirSync, readFileSync, rmdirSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, rmdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { dirname, relative, resolve } from 'node:path'
 
 export class Sandbox {
@@ -51,6 +51,20 @@ export class Sandbox {
       this.#createdDirectories.unshift(directory)
     }
     writeFileSync(full, content)
+    this.#createdFiles.push(full)
+  }
+
+  /** สร้าง symlink ใหม่ ปฏิเสธถ้ามีอยู่แล้ว เหมือน create ทุกประการ */
+  symlink(path, target) {
+    const full = this.#absolute(path)
+    if (existsSync(full)) {
+      throw new Error(`ปฏิเสธการทับ ${relative(this.#root, full)} — สคริปต์นี้ไม่ได้สร้างมัน`)
+    }
+    for (const directory of this.#missingParents(full)) {
+      mkdirSync(directory)
+      this.#createdDirectories.unshift(directory)
+    }
+    symlinkSync(this.#absolute(target), full)
     this.#createdFiles.push(full)
   }
 
