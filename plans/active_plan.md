@@ -504,6 +504,16 @@ exact values, public-key registration/rotation, HTTP/scheduler/deploy/release �
 เป็น external gates. `enabled=false`, `releaseApproval=false`,
 `runtimeWired=false` และ production NO-GO คงเดิม.
 
+> **แทนที่แล้ว (2026-08-14):** ย่อหน้าข้างบนบรรยาย contract ที่เลิกใช้แล้ว signer
+> ไม่รับ opaque `CryptoKey` จากผู้เรียกอีกต่อไป และไม่ตรวจ native metadata อีกแล้ว
+> ข้อความ "Node 25 ... ไม่เกิด extractable bypass" กับ "Proxy behavior ต้อง rerun
+> กับ pinned workerd compatibility date" ได้รับการพิสูจน์แล้วว่าข้อแรกผิดและข้อสอง
+> จำเป็นจริง: บน Node 25 `Object.create(realKey)` ที่บัง `Symbol(kExtractable)`
+> ผ่านทุก getter แล้วถูกรับไปเซ็น และบน workerd ที่ compatibility ของแอป
+> `CryptoKey.prototype` ไม่มี getter เลยส่วน `structuredClone` โยน `DataCloneError`
+> สถานะปัจจุบันอยู่ที่
+> [`academy-identity-client-assertion-webcrypto-signer-contract-rebind-local-checkpoint-20260814.md`](../reports/reviews/academy-identity-client-assertion-webcrypto-signer-contract-rebind-local-checkpoint-20260814.md)
+
 **Identity client-assertion canonical conformance refresh (2026-08-11):**
 Academy เพิ่ม focused composition ที่ใช้ JTI source, provider และ Web Crypto
 signer ที่ผ่าน RIL ร่วมกันเพื่อสร้าง ES256 assertion จริงสองใบสำหรับ exact
@@ -2091,3 +2101,29 @@ Package CYBERSKILLS Academy content as a **commercially licensed trainer starter
   Academy work: Academy `9b096307cac6400cc6e7b6a8b7e54a5a770c4d1e` is verified on remote `main`.
 - [ ] Production remains disabled pending real endpoint/credential/key/email/runtime,
   deployment, operator, and separate release authorization.
+
+## 2026-08-14 - Identity client-assertion signer contract rebind
+
+- [x] เปลี่ยน contract ให้ signer เป็นเจ้าของ key เอง: รับ `privateJwk` เป็นข้อความ
+  แล้ว import ภายใน boundary ด้วย `extractable: false`, `usages: ['sign']` ปิดไว้ใน
+  closure ไม่มี API ที่รับ `CryptoKey` จากผู้เรียกอีกต่อไป
+- [x] ถอดการตรวจ metadata ผ่าน prototype getter และ `structuredClone` ออกทั้งหมด —
+  ปฏิเสธ key ที่ถูกต้องบน workerd และตรวจของปลอมบน Node 25 ไม่ได้อยู่ดี
+- [x] บังคับให้ JWK text เป็นการสะกดแบบ canonical แบบเดียว ปิด parser-differential
+  จากสมาชิกซ้ำ, `\uXXXX` escape, ลำดับสมาชิก, ช่องว่าง และบิตว่างท้าย base64url
+- [x] สร้างเลนทดสอบบน workerd จริง (`npm run test:workerd-signer`) ที่กิน source
+  ตัวจริงด้วย compatibility ชุดเดียวกับแอป และบังคับให้ harness ตรงกับ
+  `wrangler.jsonc` ของแอปเสมอ
+- [x] ทำให้เลนนั้นโกหกไม่ได้: ผูก check เข้ากับ argument ที่ signer ใช้ import จริง,
+  บังคับ HTTP 200 / nonce / ชื่อ check ครบตามรายการ / child ยังมีชีวิต
+- [x] ตั้งด่านบังคับว่าโมดูล key distribution ยังไม่ถูกต่อเข้า production
+  (`tests/unit/identity-key-distribution-not-wired.test.ts`) พร้อมกันตัวเองไม่ให้
+  ผ่านด้วยเหตุผลผิดเมื่อไฟล์ถูกเปลี่ยนชื่อหรือรากสแกนพัง
+- [ ] รีวิวอิสระรอบใหม่บน contract ล่าสุด (รอบล่าสุดคือ `C0/H0/M5/L1 — REJECT`
+  ซึ่ง commit ชุดนี้แก้ตาม)
+- [ ] regenerate หลักฐาน conformance — ตอนนี้ค้างคนละ revision ทั้งสอง repo และ
+  หยุดที่ `Identity Control contract digest mismatch:
+  docs/integration/consumer-conformance-kit.md` การเลื่อน digest ชุดนั้นเท่ากับ
+  อ้างว่ามีรีวิวข้าม repo ชุดใหม่แล้ว จึงต้องมีรอบรีวิวจริงก่อน
+- [ ] Production ยังปิด: `enabled=false`, `releaseApproval=false`,
+  `runtimeWired=false` และ NO-GO คงเดิม

@@ -1,0 +1,41 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/scripts/workerd-signer-check.mjs",
+      "sha256": "7831de1cd2628358fd81ac61aa4c9196460720143afaf3bea879ffb32db4d46e",
+      "bytes": 8327
+    },
+    {
+      "path": "academy-web/src/lib/identity/client-assertion-webcrypto-signer.ts",
+      "sha256": "9b1a0f4218c64d0e1326490eaebd93cbc109d43d21dcd3787dc3df839a12b7b2",
+      "bytes": 11893
+    },
+    {
+      "path": "academy-web/tests/unit/identity-client-assertion-webcrypto-signer.test.ts",
+      "sha256": "4e196250e9e8769aaa9f5a13c7e94fe396c983d2ebef92e503d438f3453351cb",
+      "bytes": 20928
+    },
+    {
+      "path": "academy-web/tests/unit/identity-key-distribution-not-wired.test.ts",
+      "sha256": "15edac403733a61d0f792eb24243e57c74b1dae539d3e252502dc6bebaf4820c",
+      "bytes": 4823
+    },
+    {
+      "path": "academy-web/tests/workerd/signer-worker.ts",
+      "sha256": "15083f808cac56b321cf9dee8373b893081674945774a09e31381025e6f8ab6b",
+      "bytes": 7944
+    },
+    {
+      "path": "academy-web/tests/workerd/wrangler.jsonc",
+      "sha256": "92402104562228554a89fae41f465c461253a2613c8fc3cacf57401820d3abb3",
+      "bytes": 670
+    },
+    {
+      "path": "reports/reviews/academy-identity-client-assertion-webcrypto-signer-contract-rebind-local-checkpoint-20260814.md",
+      "sha256": "c11883b63684aa9e3bb00e4ddf8a7661df855a2d0f66ab865e006ca84dabe645",
+      "bytes": 9000
+    }
+  ]
+}
