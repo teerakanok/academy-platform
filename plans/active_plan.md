@@ -2127,3 +2127,43 @@ Package CYBERSKILLS Academy content as a **commercially licensed trainer starter
   อ้างว่ามีรีวิวข้าม repo ชุดใหม่แล้ว จึงต้องมีรอบรีวิวจริงก่อน
 - [ ] Production ยังปิด: `enabled=false`, `releaseApproval=false`,
   `runtimeWired=false` และ NO-GO คงเดิม
+
+## 2026-08-14 - Three-product pilot: ตารางลำดับความสำคัญและเกณฑ์ journey/state
+
+รวมเข้ามาตาม `three-product-pilot-execution-brief-20260814.md` §First Pass ข้อ 5
+ตารางเต็มและแผนที่การพึ่งพาข้ามผลิตภัณฑ์อยู่ที่ director:
+`reports/director-briefs/three-product-pilot-integrated-priority-20260814.md`
+ส่วนด้านล่างคือส่วนที่เป็นของผลิตภัณฑ์นี้ เขียนไว้ให้อ่านจบได้ในไฟล์เดียว
+ไม่แทนที่ประวัติที่พิสูจน์แล้วด้านบน
+
+### เกณฑ์พื้นของทุก public web journey (ตั้งก่อนลงมือ ห้ามผ่อนหลังสอบตก)
+
+- ทำงานจบได้ด้วยคีย์บอร์ดล้วน
+- ทุก control มี label ที่เครื่องอ่านหน้าจอออกเสียงได้
+- ไม่มี automated accessibility finding ระดับ critical หรือ serious
+- วัดบน mobile profile ตัวแทนที่ตกลงกันแล้ว: LCP <= 2.5 s, INP <= 200 ms, CLS <= 0.1
+- ต้องเห็นสถานะครบ: loading / empty / error / permission / recovery
+- ตรวจทั้ง desktop และ mobile viewport
+
+ถ้าไม่ผ่าน ให้แก้ของ ไม่ใช่แก้เกณฑ์ การผ่อนเกณฑ์ต้องมีหลักฐานผู้ใช้ชุดใหม่เท่านั้น
+
+### Persona ที่ผลิตภัณฑ์นี้เป็นเจ้าของ
+
+| Persona | Journey | เริ่มที่ | จบที่ | Viewport | สถานะที่ต้องเห็น | เกณฑ์เพิ่มเติม |
+|---|---|---|---|---|---|---|
+| ผู้เรียนใหม่ | สมัคร → ยืนยันตัวตนผ่าน Identity → เข้าคอร์สแรก | ยังไม่มีบัญชี | เห็นคอร์สที่มีสิทธิ์จริง | desktop + mobile | รอโหลด, ยังไม่มีคอร์ส, ยืนยันล้มเหลว, ไม่มีสิทธิ์, กู้คืนหลัง session หมดอายุ | เกณฑ์พื้น |
+| ผู้สอน / ผู้ดูแลคอร์ส | เข้าระบบ → จัดการผู้เรียน | มีบัญชีแล้ว | เห็นรายชื่อจริง | desktop + mobile | ว่าง, ผิดพลาด, ไม่มีสิทธิ์ | เกณฑ์พื้น |
+
+### ลำดับที่ผูกกับผลิตภัณฑ์นี้
+
+- P1-ACA-1 (production-disabled key-set importer + runtime capability)
+  **ปิดแล้ว** — importer, cache และ signer อยู่ครบ และ "ยังไม่ต่อเข้า production"
+  ถูกบังคับด้วยด่าน `tests/unit/identity-key-distribution-not-wired.test.ts`
+  ไม่ใช่จริงเพราะบังเอิญไม่มีใครต่อ
+- migration `0021-0027` ยังใช้ไม่ได้จนกว่าหลักฐาน Pool A backup + restore
+  จะผ่าน (P0A-4) — ข้อนี้เป็น prerequisite ที่ Academy ไม่ได้เป็นเจ้าของเอง
+- ลำดับหลังจากนั้น: wire disabled production runtime → พิสูจน์ 6 scenario
+  ที่ไม่ใช่ owner ด้วย real route/browser evidence → founder bootstrap เป็น
+  operation ที่ authorize แยก แล้วจึงเคลม 23/23 ได้
+- conformance ยัง `16/23` และหลักฐานชุดปัจจุบันยังชี้ revision เก่า ดูรายละเอียด
+  ในหัวข้อ "2026-08-14 - Identity client-assertion signer contract rebind"
