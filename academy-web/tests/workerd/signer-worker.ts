@@ -18,7 +18,7 @@ const CLIENT_ID = 'academy-web'
 const PURPOSE = 'lifecycle_pull' as const
 const KEY_ID = 'academy-lifecycle-2026-08'
 
-export default {
+const handler = {
   async fetch(): Promise<Response> {
     const checks: Check[] = []
     const record = async (name: string, run: () => Promise<string>): Promise<void> => {
@@ -78,10 +78,14 @@ export default {
         signingInput,
       })
       if (signature.byteLength !== 64) throw new Error(`length ${signature.byteLength}`)
+      // สำเนาลง buffer ใหม่แทนการ cast — signer คืน Uint8Array ที่ผูกกับ
+      // ArrayBufferLike ส่วน verify ต้องการ ArrayBuffer จริง
+      const bytes = new Uint8Array(signature.byteLength)
+      bytes.set(signature)
       const verified = await crypto.subtle.verify(
         { name: 'ECDSA', hash: 'SHA-256' },
         pair.publicKey,
-        signature,
+        bytes,
         signingInput,
       )
       if (!verified) throw new Error('signature did not verify')
@@ -137,3 +141,5 @@ export default {
     })
   },
 }
+
+export default handler
