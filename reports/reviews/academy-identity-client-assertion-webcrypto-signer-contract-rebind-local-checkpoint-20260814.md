@@ -1,7 +1,7 @@
 # Academy Identity Client-Assertion Web Crypto Signer — Contract Rebind Local Checkpoint
 
 **Date:** 2026-08-14
-**Status:** รีวิวอิสระสี่รอบ ล่าสุด `C0/H0/M3/L0 — REJECT` แก้ครบแล้ว รอ delta re-review รอบห้า
+**Status:** รีวิวอิสระห้ารอบ ล่าสุด `C0/H0/M3/L2 — REJECT` · triage แล้วเป็น in-bound 3 / deferred 3
 **Production:** NO-GO
 **Supersedes:** `academy-identity-client-assertion-webcrypto-signer-local-checkpoint-2026-08-11.md`
 
@@ -63,13 +63,13 @@ parser แบบ first-wins อ่านไฟล์เดียวกันแ�
 
 | ด่าน | ผล |
 |---|---|
-| unit ทั้ง repo | 1327 ข้อผ่าน (116 ไฟล์) |
-| เลน signer + ด่าน not-wired | 52 ข้อผ่าน บนทั้ง node 24.18.0 (engine ที่ประกาศ) และ 25.5.0 |
+| unit ทั้ง repo | 1335 ข้อผ่าน (117 ไฟล์) |
+| เลน signer + ด่าน not-wired | 54 ข้อผ่าน บนทั้ง node 24.18.0 (engine ที่ประกาศ) และ 25.5.0 |
 | `tsc --noEmit` | สะอาด |
 | eslint | 0 error · 1 warning ที่มีมาก่อนใน `src/lib/content/registry.generated.ts` (ไฟล์ generated ไม่เกี่ยวกับลานนี้) |
 | `npm run test:workerd-signer` | 8 ข้อผ่านบน workerd จริง ที่ compatibility ของแอป |
-| `scripts/adversarial/not-wired-gate-evasions.mjs` | ทางหลบ 4 แบบถูกจับครบ เลนปกติผ่าน |
-| `scripts/adversarial/workerd-runner-attacks.mjs` | การโจมตีจากนอกโปรเซส 8 แบบเป็นไปตามที่ควรครบ |
+| `scripts/adversarial/not-wired-gate-evasions.mjs` | ทางหลบ 10 แบบถูกจับครบ เลนปกติผ่าน |
+| `scripts/adversarial/workerd-runner-attacks.mjs` | 10 รายการเป็นไปตามที่ควรครบ **แต่ดูข้อจำกัดด้านล่าง** |
 
 หลักฐาน H2 ตรงจาก runtime: `prototype type getter: absent; structuredClone:
 throws DataCloneError`
@@ -108,12 +108,40 @@ padding ที่ไม่ canonical) เก็บ regex ไว้เพื่�
 
 ทั้งสองสคริปต์ออก 0 เมื่อทุกการโจมตีถูกจับ **และ**เลนปกติยังผ่าน คืนสภาพไฟล์เสมอ
 
+## Triage ของรีวิวรอบห้า (ตาม `checkpoint-ril` §3)
+
+ป้ายความรุนแรงบอกว่า defect ร้ายแค่ไหน ไม่ได้บอกว่าควรทำอะไรต่อ — reviewer ไม่รู้ว่า
+โมดูลชุดนี้ยังไม่มีผู้เรียกใน production และไม่รู้ว่าลานไหนกำลังล็อกผลิตภัณฑ์อื่นอยู่
+ตารางนี้คือการตัดสินของเจ้าของงาน ไม่ใช่การคัดลอกป้ายของ reviewer
+
+| Finding | In-bound? | เหตุผล |
+|---|---|---|
+| M2 runner ถูกปลอมผลได้ | **ใช่** | หักล้างข้ออ้าง "workerd 8 checks ผ่าน" ที่เขียนไว้ในรายงานฉบับนี้แล้ว — เข้าเกณฑ์ "invalidates a claim already written into an evidence artifact" |
+| M3 Sandbox ทำลายข้อมูลได้ | **ใช่** | ลบไฟล์ที่ไม่ได้เป็นเจ้าของได้โดยไม่ต้องมีผู้โจมตี และเกิดขึ้นจริงมาแล้วหนึ่งครั้ง — data integrity |
+| M1 ทางหลบ `.js` → `.ts` specifier | **ใช่** | `moduleResolution: bundler` แทนนามสกุลให้เอง การ refactor ปกติสร้างทางนี้ได้โดยไม่ตั้งใจ |
+| M1 ทางหลบ `instrumentation-client.ts` ที่ราก | ไม่ | ต้องสร้างไฟล์ใหม่ที่รากโดยตั้งใจ ด่านนี้มีไว้กันการต่อสายที่หลุดมาโดยไม่ตั้งใจ ไม่ใช่กันคนที่ตั้งใจแก้ซอร์สซึ่งลบชื่อออกจากรายการได้อยู่แล้ว · เจ้าของ: Academy identity lane · ปลดเมื่อ: ก่อนโมดูลใดในรายการถูกต่อเข้า production จริง |
+| M1 conditional `exports` | ไม่ | เหมือนข้างบน และ repo นี้ยังไม่มี `exports` เลยแม้แต่ตัวเดียว · เจ้าของและเงื่อนไขปลดเดียวกัน |
+| L1 ตัวเลขในรายงานเก่า | **ใช่** | รายงานนี้ถูกใช้เป็นหลักฐาน แก้แล้วในรอบนี้ |
+| L2 `KILLED` รายบรรทัดกำกวม | ไม่ | สคริปต์ยังออก non-zero เมื่อ baseline พัง จึงยังไม่เกิด false acceptance ทั้งสคริปต์ · เจ้าของ: harness maintainer · ปลดเมื่อ: ก่อนเอาผลรายบรรทัดไปนับ mutation coverage ด้วยเครื่อง |
+
+**บทเรียนของรอบนี้:** สามรอบหลังสุดไม่ได้เจอปัญหาในตัวผลิตภัณฑ์เลย — signer ไม่มี
+finding เหลือตั้งแต่รอบสอง ที่เจอทั้งหมดคือปัญหาใน**เครื่องมือที่สร้างมาเพื่อพิสูจน์
+ผลิตภัณฑ์** ซึ่งเป็นหลุมที่ไม่มีพื้น เพราะ harness ที่รันบนเครื่องเดียวกับผู้โจมตี
+ย่อมถูกหลอกได้เสมอ กติกาหยุดถูกเขียนเข้า `skills/checkpoint-ril` §3 แล้ว
+
 ## ขอบเขตของ runner ที่ต้องอ่านคู่กับตัวเลข "8 checks"
 
 `scripts/workerd-signer-check.mjs` ยืนยันได้ว่าคำตอบมาจาก worker ที่มันสตาร์ทเอง
 (nonce เดินทางเข้าไปทาง `--var` ไม่ใช่ทาง URL ผู้ครองพอร์ตจึงไม่มีอะไรให้ลอก),
 ว่า child ยังมีชีวิตและไม่ได้ตายด้วยสัญญาณ, ว่า HTTP เป็น 200, ว่าชื่อ check ตรง
 รายการครบถ้วนและไม่ซ้ำ, และว่าทุก check ผ่าน
+
+**ข้ออ้างที่ถูกหักล้างแล้ว (รอบห้า):** ประโยคเดิมที่ว่า "สิ่งที่ตัดผู้ครองพอร์ตออกจริง
+คือ liveness" **ไม่จริง** reviewer ครองพอร์ตไว้ก่อน อ่าน nonce จาก `ps` แล้วตอบ JSON
+ปลอมครบแปดข้อ**ก่อน**ที่ wrangler จะ bind ไม่สำเร็จ runner จึงออก 0 พร้อมข้อความ
+"8 checks ผ่านทั้งหมด" ทั้งที่ workerd ไม่เคยรัน — `alive()` ตรวจแค่ "ยังไม่ตาย ณ
+วินาทีนั้น" ไม่ได้รอหลักฐานว่า bind สำเร็จ กำลังแก้ให้รอ readiness จาก output ของ
+wrangler เอง จนกว่าจะแก้เสร็จ **ห้ามอ้างตัวเลขจากเลนนี้เป็นหลักฐาน**
 
 สิ่งที่มัน **ไม่** ให้: ความคุ้มกันจากโค้ดที่รันอยู่ในโปรเซสของมันเองแล้ว ใครที่ preload
 โค้ดเข้ามาได้จะปลอม `spawn` และ `fetch` พร้อมกันแล้วป้อนคำตอบที่ผ่านทุกด่านได้ทั้งหมด
