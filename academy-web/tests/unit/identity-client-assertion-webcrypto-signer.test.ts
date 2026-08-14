@@ -132,6 +132,57 @@ describe('Academy Identity client assertion Web Crypto signer', () => {
     )
   })
 
+  it.each([
+    ['a duplicate member that a first-wins reader sees differently', (jwk: string) =>
+      jwk.replace('{"kty":"EC"', '{"kty":"RSA","kty":"EC"')],
+    ['a duplicate private scalar', (jwk: string) =>
+      jwk.replace('"d":"', '"d":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","d":"')],
+    ['a member name written as an escape', (jwk: string) => jwk.replace('"kty"', '"\\u006bty"')],
+    ['members in another order', (jwk: string) => {
+      const parsed = JSON.parse(jwk) as Jwk
+      return JSON.stringify({ crv: parsed.crv, kty: parsed.kty, x: parsed.x, y: parsed.y, d: parsed.d })
+    }],
+    ['insignificant whitespace', (jwk: string) => JSON.stringify(JSON.parse(jwk), null, 2)],
+    ['a leading space', (jwk: string) => ` ${jwk}`],
+  ])('rejects a JWK text carrying %s', async (_label, respell) => {
+    // The bytes a person audits and the key the process signs with must be the
+    // same object, and "same" has to mean byte-for-byte. `JSON.parse` collapses
+    // duplicates last-wins and resolves escapes, so a document can look clean
+    // here while reading as a different key everywhere else.
+    installWebCrypto()
+    const key = await generateP256Jwk()
+
+    await expectFixedFailure(
+      createIdentityClientAssertionWebCryptoSigner(options(respell(key.jwk))),
+    )
+  })
+
+  it('rejects a base64url value respelled in its unused bits', async () => {
+    // 43 base64url characters carry 258 bits for a 256-bit value, so the final
+    // character has two bits that decode to nothing. Left free, one key has four
+    // spellings and no file is comparable to another.
+    installWebCrypto()
+    const key = await generateP256Jwk()
+    const parsed = JSON.parse(key.jwk) as Jwk
+    const respelled = respellUnusedBits(parsed.d)
+    expect(respelled).not.toBe(parsed.d)
+    expect(decodeBase64Url(respelled)).toEqual(decodeBase64Url(parsed.d))
+
+    await expectFixedFailure(createIdentityClientAssertionWebCryptoSigner(
+      options(JSON.stringify({ ...parsed, d: respelled })),
+    ))
+  })
+
+  it('accepts the canonical text with or without a trailing newline', async () => {
+    installWebCrypto()
+    const key = await generateP256Jwk()
+
+    for (const text of [key.jwk, `${key.jwk}\n`]) {
+      const signer = await createIdentityClientAssertionWebCryptoSigner(options(text))
+      await expect(signer.sign(validSigningInput())).resolves.toHaveLength(64)
+    }
+  })
+
   it('rejects a well-formed JWK whose scalar does not belong to its point', async () => {
     // Shape is not validity. A JWK can pass every syntactic check and still be a
     // scalar from one key pasted onto the public point of another; the runtime's
@@ -354,6 +405,18 @@ describe('Academy Identity client assertion Web Crypto signer', () => {
 })
 
 type Jwk = { kty: string, crv: string, x: string, y: string, d: string }
+
+const BASE64URL = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'
+
+/** Flip the lowest bit of the final character: unused padding, same 32 bytes. */
+function respellUnusedBits(value: string): string {
+  const index = BASE64URL.indexOf(value.at(-1)!)
+  return `${value.slice(0, -1)}${BASE64URL[index ^ 1]}`
+}
+
+function decodeBase64Url(value: string): Buffer {
+  return Buffer.from(value, 'base64url')
+}
 
 function without(jwk: Jwk, member: keyof Jwk): Record<string, unknown> {
   const copy: Record<string, unknown> = { ...jwk }

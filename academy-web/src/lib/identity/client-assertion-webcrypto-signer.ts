@@ -10,6 +10,7 @@ const SCALAR_PATTERN = /^[A-Za-z0-9_-]{43}$/
 const JWK_KEYS = ['kty', 'crv', 'x', 'y', 'd'] as const
 const MAX_SIGNING_INPUT_BYTES = 4_096
 const MAX_JWK_BYTES = 4_096
+const COORDINATE_BYTES = 32
 const SIGNATURE_BYTES = 64
 const FAILURE_MESSAGE = 'Identity client assertion Web Crypto signer failed'
 const TYPED_ARRAY_PROTOTYPE = Object.getPrototypeOf(Uint8Array.prototype)
@@ -163,9 +164,32 @@ export async function createIdentityClientAssertionWebCryptoSigner(
 }
 
 /**
- * JWK text only. Parsing here means the value below is plain data: a Proxy, an
- * accessor, or an inherited property cannot come out of `JSON.parse`, so there
- * is no hostile object graph to defend against.
+ * JWK text only, in exactly one spelling.
+ *
+ * Parsing here means the value below is plain data: a Proxy, an accessor, or an
+ * inherited property cannot come out of `JSON.parse`, so there is no hostile
+ * object graph to defend against.
+ *
+ * But parsing alone is not enough, because `JSON.parse` is lossy in ways that
+ * matter for a private key. It collapses duplicate members last-wins, so
+ * `{"kty":"RSA",…,"kty":"EC"}` reaches this code looking like a clean five-member
+ * document while a reviewer, a linter, or any first-wins parser reading the same
+ * bytes sees a different key. It also resolves `\u006bty` to `kty`, and base64url
+ * leaves the last character's unused bits free, so the same key has several
+ * spellings that all decode identically.
+ *
+ * None of that is exploitable on its own — the key that gets used is still the
+ * key the runtime imports. It is a provenance problem: the file a person audited
+ * and the key the process signs with must be the same object, and "same" has to
+ * mean byte-for-byte or it means nothing.
+ *
+ * So the text must be the canonical spelling of the key it denotes:
+ *
+ *     {"kty":"EC","crv":"P-256","x":"…","y":"…","d":"…"}
+ *
+ * exactly those members, exactly that order, no insignificant whitespace, no
+ * escapes, each value the canonical base64url encoding of its 32 bytes, with at
+ * most one trailing newline. One key, one file, one reading.
  */
 function parsePrivateJwk(text: unknown): JsonWebKey {
   if (typeof text !== 'string' || text.length === 0 || text.length > MAX_JWK_BYTES) {
@@ -194,7 +218,42 @@ function parsePrivateJwk(text: unknown): JsonWebKey {
     || typeof record.d !== 'string' || !SCALAR_PATTERN.test(record.d)) {
     throw new IdentityClientAssertionWebCryptoSignerFailure()
   }
-  return { kty: 'EC', crv: 'P-256', x: record.x, y: record.y, d: record.d }
+  if (!isCanonicalBase64Url(record.x)
+    || !isCanonicalBase64Url(record.y)
+    || !isCanonicalBase64Url(record.d)) {
+    throw new IdentityClientAssertionWebCryptoSignerFailure()
+  }
+
+  const jwk = { kty: 'EC', crv: 'P-256', x: record.x, y: record.y, d: record.d } as const
+  // Built from the parsed values and compared against the original bytes, so the
+  // member order is the canonical one by construction rather than by assertion.
+  const canonical = JSON.stringify(jwk)
+  if (text !== canonical && text !== `${canonical}\n`) {
+    throw new IdentityClientAssertionWebCryptoSignerFailure()
+  }
+  return { ...jwk }
+}
+
+/**
+ * One 32-byte value, one spelling. base64url leaves the final character's unused
+ * bits free, so several strings decode to the same key; re-encoding the decoded
+ * bytes is what decides which one this file is allowed to contain.
+ */
+function isCanonicalBase64Url(value: string): boolean {
+  let binary: string
+  try {
+    binary = atob(`${value.replaceAll('-', '+').replaceAll('_', '/')}=`)
+  } catch {
+    return false
+  }
+  if (binary.length !== COORDINATE_BYTES) return false
+  const bytes = new Uint8Array(COORDINATE_BYTES)
+  for (let index = 0; index < COORDINATE_BYTES; index += 1) {
+    bytes[index] = binary.charCodeAt(index)
+  }
+  let reencoded = ''
+  for (const byte of bytes) reencoded += String.fromCharCode(byte)
+  return btoa(reencoded).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '') === value
 }
 
 function snapshotSigningInput(

@@ -19,7 +19,8 @@ const PURPOSE = 'lifecycle_pull' as const
 const KEY_ID = 'academy-lifecycle-2026-08'
 
 const handler = {
-  async fetch(): Promise<Response> {
+  async fetch(request: Request): Promise<Response> {
+    const nonce = new URL(request.url).searchParams.get('nonce') ?? ''
     const checks: Check[] = []
     const record = async (name: string, run: () => Promise<string>): Promise<void> => {
       try {
@@ -92,25 +93,67 @@ const handler = {
       return '64-byte signature verifies against the public key'
     })
 
-    await record('imports-non-extractable-sign-only', async () => {
-      const imported = await crypto.subtle.importKey(
+    await record('signer-imports-non-extractable-sign-only', async () => {
+      // Observe the terms the SIGNER used. Importing a key here with the right
+      // arguments would prove only that this check can type them: the earlier
+      // version of this check passed unchanged when the source was mutated to
+      // `extractable: true`, because it never looked at the signer at all.
+      const subtle = crypto.subtle
+      const original = subtle.importKey
+      const calls: unknown[][] = []
+      Object.defineProperty(subtle, 'importKey', {
+        configurable: true,
+        writable: true,
+        value: (...args: unknown[]) => {
+          calls.push(args)
+          return Reflect.apply(original, subtle, args as never)
+        },
+      })
+      try {
+        await createIdentityClientAssertionWebCryptoSigner(options)
+      } finally {
+        Reflect.deleteProperty(subtle, 'importKey')
+      }
+      if (subtle.importKey !== original) throw new Error('failed to restore importKey')
+      if (calls.length !== 1) throw new Error(`importKey calls: ${calls.length}`)
+      const [format, keyData, algorithm, extractable, usages] = calls[0]!
+      if (format !== 'jwk') throw new Error(`format ${String(format)}`)
+      if (extractable !== false) throw new Error(`extractable ${String(extractable)}`)
+      if (!Array.isArray(usages) || usages.length !== 1 || usages[0] !== 'sign') {
+        throw new Error(`usages ${JSON.stringify(usages)}`)
+      }
+      const named = (algorithm as { name?: unknown, namedCurve?: unknown } | null)
+      if (named?.name !== 'ECDSA' || named?.namedCurve !== 'P-256') {
+        throw new Error(`algorithm ${JSON.stringify(algorithm)}`)
+      }
+      if (Object.keys(keyData as object).sort().join() !== 'crv,d,kty,x,y') {
+        throw new Error(`jwk members ${Object.keys(keyData as object).sort().join()}`)
+      }
+
+      // And the terms have to mean something on this runtime, not just be typed.
+      const importJwk = original as unknown as (
+        format: 'jwk',
+        keyData: JsonWebKey,
+        algorithm: EcKeyImportParams,
+        extractable: boolean,
+        keyUsages: readonly KeyUsage[],
+      ) => Promise<CryptoKey>
+      const imported = await importJwk.call(
+        subtle,
         'jwk',
         JSON.parse(privateJwk) as JsonWebKey,
         { name: 'ECDSA', namedCurve: 'P-256' },
         false,
         ['sign'],
       )
-      if (imported.usages.length !== 1 || imported.usages[0] !== 'sign') {
-        throw new Error(`usages ${JSON.stringify(imported.usages)}`)
-      }
       let exportable = true
       try {
-        await crypto.subtle.exportKey('jwk', imported)
+        await subtle.exportKey('jwk', imported)
       } catch {
         exportable = false
       }
       if (exportable) throw new Error('workerd exported a non-extractable key')
-      return 'sign-only and refused export'
+      return 'signer imported jwk/ECDSA P-256/extractable=false/["sign"], and workerd refuses to export such a key'
     })
 
     for (const [name, value] of [
@@ -136,7 +179,7 @@ const handler = {
     }
 
     const failed = checks.filter((check) => !check.passed)
-    return Response.json({ ok: failed.length === 0, checks }, {
+    return Response.json({ ok: failed.length === 0, nonce, checks }, {
       status: failed.length === 0 ? 200 : 500,
     })
   },
