@@ -3,9 +3,19 @@
   "algorithm": "sha256",
   "files": [
     {
+      "path": "academy-web/scripts/adversarial/not-wired-gate-evasions.mjs",
+      "sha256": "9792c89a301e414abe7c2eee0332f877c423206f64757c1f8348309a32817346",
+      "bytes": 4316
+    },
+    {
+      "path": "academy-web/scripts/adversarial/workerd-runner-attacks.mjs",
+      "sha256": "5d21f3944fbe8df852bffd9ab4d43f8860a2c2712581a15330a9f4bc8cb56c3c",
+      "bytes": 5865
+    },
+    {
       "path": "academy-web/scripts/workerd-signer-check.mjs",
-      "sha256": "7831de1cd2628358fd81ac61aa4c9196460720143afaf3bea879ffb32db4d46e",
-      "bytes": 8327
+      "sha256": "30e895c4bba472fa1c8271d3735df05dad406a76131e8b279e3589d18ee3b02a",
+      "bytes": 12193
     },
     {
       "path": "academy-web/src/lib/identity/client-assertion-webcrypto-signer.ts",
@@ -19,13 +29,13 @@
     },
     {
       "path": "academy-web/tests/unit/identity-key-distribution-not-wired.test.ts",
-      "sha256": "15edac403733a61d0f792eb24243e57c74b1dae539d3e252502dc6bebaf4820c",
-      "bytes": 4823
+      "sha256": "5ad8127a1b0dd3634c846034ca91f737b7dbef427fcdbbce01768956376da948",
+      "bytes": 13284
     },
     {
       "path": "academy-web/tests/workerd/signer-worker.ts",
-      "sha256": "15083f808cac56b321cf9dee8373b893081674945774a09e31381025e6f8ab6b",
-      "bytes": 7944
+      "sha256": "60039c980421766944f1e5cbb4ce1a4e94a41f450e7c5897b564fad058724c60",
+      "bytes": 8121
     },
     {
       "path": "academy-web/tests/workerd/wrangler.jsonc",
@@ -33,9 +43,19 @@
       "bytes": 670
     },
     {
+      "path": "academy-web/wrangler.jsonc",
+      "sha256": "db20c61b2e59ce07feafc39091ff18350e4ab93a0c6e06d7030bb30cfc1f9c02",
+      "bytes": 1286
+    },
+    {
+      "path": "plans/active_plan.md",
+      "sha256": "380f935ac3e5710960def996494529eaa21120704ab3161010def8f188263e46",
+      "bytes": 228714
+    },
+    {
       "path": "reports/reviews/academy-identity-client-assertion-webcrypto-signer-contract-rebind-local-checkpoint-20260814.md",
-      "sha256": "c11883b63684aa9e3bb00e4ddf8a7661df855a2d0f66ab865e006ca84dabe645",
-      "bytes": 9000
+      "sha256": "717a5c00857a0497d419cfe88c7932e1afcd3631de24a32e0fde1e288ad5b02f",
+      "bytes": 16621
     }
   ]
 }

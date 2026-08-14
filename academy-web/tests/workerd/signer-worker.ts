@@ -19,8 +19,9 @@ const PURPOSE = 'lifecycle_pull' as const
 const KEY_ID = 'academy-lifecycle-2026-08'
 
 const handler = {
-  async fetch(request: Request): Promise<Response> {
-    const nonce = new URL(request.url).searchParams.get('nonce') ?? ''
+  // nonce มาทาง binding ไม่ใช่ทาง URL คำขอจากภายนอกจึงไม่มีอะไรให้ลอก
+  async fetch(_request: Request, env: { SIGNER_CHECK_NONCE?: string }): Promise<Response> {
+    const nonce = env?.SIGNER_CHECK_NONCE ?? ''
     const checks: Check[] = []
     const record = async (name: string, run: () => Promise<string>): Promise<void> => {
       try {
