@@ -7,10 +7,14 @@
  *
  * ## ขอบเขตที่สคริปต์นี้ให้ และไม่ให้
  *
- * ให้: ยืนยันว่าคำตอบมาจาก worker ที่สคริปต์นี้สตาร์ทเอง (ผ่าน nonce ที่ส่งเข้าไป
- * ทาง `--var` ไม่ใช่ทาง URL ผู้ที่ครองพอร์ตอยู่จึงไม่มีทางรู้ว่าต้องตอบอะไร),
- * ว่า child ยังมีชีวิตและไม่ได้ตายด้วยสัญญาณ, ว่า HTTP เป็น 200,
- * ว่าชื่อ check ตรงรายการที่ประกาศไว้ครบถ้วนและไม่ซ้ำ, และว่าทุก check ผ่าน
+ * ให้: ยืนยันว่า child ยังมีชีวิตและไม่ได้ตายด้วยสัญญาณ, ว่า HTTP เป็น 200,
+ * ว่า nonce ที่ worker สะท้อนกลับตรงกับที่ส่งเข้าไป, ว่าชื่อ check ตรงรายการที่
+ * ประกาศไว้ครบถ้วนและไม่ซ้ำ, และว่าทุก check ผ่าน
+ *
+ * **nonce ไม่ใช่ความลับ** — มันเดินทางเป็น argument ของโปรเซส โปรเซสสิทธิ์เดียวกัน
+ * อ่านจาก `ps` ได้ตามปกติ สิ่งที่ตัดผู้ครองพอร์ตออกจริงคือ **liveness**: ถ้ามีอย่างอื่น
+ * ถือพอร์ตนี้อยู่ wrangler จะ bind ไม่สำเร็จแล้วตาย ซึ่งด่าน liveness จับได้
+ * ส่วน nonce ทำหน้าที่ตัดคำตอบค้างจากรอบก่อนและคำตอบที่ไม่ได้มาจาก worker ตัวนี้
  *
  * **ไม่ให้:** ความคุ้มกันจากโค้ดที่รันอยู่ในโปรเซสนี้แล้ว ใครที่ preload โค้ดเข้ามาได้
  * จะปลอม `spawn` และ `fetch` พร้อมกัน แล้วป้อนคำตอบที่ผ่านทุกด่านข้างบนได้ทั้งหมด
@@ -20,9 +24,9 @@
  */
 import { spawn } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
-import { readFile } from 'node:fs/promises'
 import { setTimeout as delay } from 'node:timers/promises'
 import { fileURLToPath } from 'node:url'
+import { unstable_readConfig } from 'wrangler'
 
 // โซน ephemeral ตาม ecosystem/PORT_REGISTRY.md — ไม่จองเลขถาวร
 const PORT = 61987
@@ -52,85 +56,20 @@ const appConfig = `${root}wrangler.jsonc`
 const harnessConfig = `${root}tests/workerd/wrangler.jsonc`
 
 /**
- * ตัดคอมเมนต์และ trailing comma ออกจาก JSONC ด้วยการเดินทีละตัวอักษร ไม่ใช่ regex
+ * อ่าน config ด้วย **ตัวอ่านของ wrangler เอง** ไม่ใช่ parser ที่เขียนขึ้นมาเทียบเคียง
  *
- * รุ่นแรกยิง regex ใส่ข้อความดิบ จึงอ่านบรรทัดที่ถูกคอมเมนต์ทิ้งไว้
- * (`// "compatibility_date": "2025-03-25"`) เป็นค่าจริง แล้วรายงานว่าตรงกัน
- * ทั้งที่ config จริงเลื่อนไปแล้ว
+ * รุ่นก่อนเขียน parser เองแล้วต่างจาก wrangler อย่างน้อยสามจุด รีวิวอิสระยิงให้ดู
+ * ทีละอัน จุดที่ร้ายที่สุดคือคอมเมนต์บรรทัด: ของเราจบที่ `\n` อย่างเดียว ส่วน
+ * wrangler จบที่ `\r` ด้วย ทำให้ config ที่ซ่อน `compatibility_date` อีกค่าไว้หลัง
+ * `\r` ในคอมเมนต์ อ่านได้คนละค่ากับที่ deploy ใช้จริง — เลนนี้จะรายงานว่า "ตรงกับแอป"
+ * ทั้งที่ไม่ตรง
  *
- * รุ่นถัดมายังต่างจาก Wrangler สามจุด ซึ่งรีวิวอิสระยิงให้ดูทีละอัน: BOM และ
- * trailing comma ที่ Wrangler รับแต่ตัวนี้ปฏิเสธ (lane พังทั้งที่ config ใช้ได้)
- * และคอมเมนต์บล็อกที่ไม่ปิดซึ่ง Wrangler ปฏิเสธแต่ตัวนี้รับ (lane ผ่านทั้งที่
- * deploy จริงพัง) ทั้งสามแก้แล้ว
+ * ตราบใดที่เราอ่านด้วยตัวอ่านตัวเดียวกับที่ deploy ใช้ ปัญหาทั้งชั้นนี้หายไป
+ * และพฤติกรรมที่เลนนี้พึ่งพาก็เป็นของ wrangler โดยตรง (ยืนยันด้วยการยิงจริง):
+ * คอมเมนต์บล็อกไม่ปิด -> โยน UnexpectedEndOfComment · BOM และ trailing comma -> ยอมรับ
  */
-function parseJsonc(text, label) {
-  const source = text.charCodeAt(0) === 0xfeff ? text.slice(1) : text
-  let output = ''
-  let index = 0
-  let inString = false
-  while (index < source.length) {
-    const character = source[index]
-    if (inString) {
-      output += character
-      if (character === '\\') {
-        output += source[index + 1] ?? ''
-        index += 2
-        continue
-      }
-      if (character === '"') inString = false
-      index += 1
-      continue
-    }
-    if (character === '"') {
-      inString = true
-      output += character
-      index += 1
-      continue
-    }
-    if (character === '/' && source[index + 1] === '/') {
-      while (index < source.length && source[index] !== '\n') index += 1
-      continue
-    }
-    if (character === '/' && source[index + 1] === '*') {
-      const closed = source.indexOf('*/', index + 2)
-      if (closed === -1) throw new Error(`คอมเมนต์บล็อกไม่ถูกปิดใน ${label}`)
-      index = closed + 2
-      continue
-    }
-    output += character
-    index += 1
-  }
-  return JSON.parse(dropTrailingCommas(output))
-}
-
-/** `,` ที่ตามด้วยช่องว่างแล้วปิดวงเล็บ — Wrangler ยอม, JSON.parse ไม่ยอม */
-function dropTrailingCommas(text) {
-  let output = ''
-  let index = 0
-  let inString = false
-  while (index < text.length) {
-    const character = text[index]
-    if (inString) {
-      output += character
-      if (character === '\\') { output += text[index + 1] ?? ''; index += 2; continue }
-      if (character === '"') inString = false
-      index += 1
-      continue
-    }
-    if (character === '"') { inString = true; output += character; index += 1; continue }
-    if (character === ',') {
-      let ahead = index + 1
-      while (ahead < text.length && /\s/.test(text[ahead])) ahead += 1
-      if (text[ahead] === '}' || text[ahead] === ']') { index += 1; continue }
-    }
-    output += character
-    index += 1
-  }
-  return output
-}
-
-async function compatibilityOf(path) {
-  const config = parseJsonc(await readFile(path, 'utf8'), path)
+function compatibilityOf(path) {
+  const config = unstable_readConfig({ config: path })
   const { compatibility_date: date, compatibility_flags: flags } = config
   if (typeof date !== 'string' || !Array.isArray(flags)) {
     throw new Error(`ไม่พบ compatibility ใน ${path}`)
@@ -152,8 +91,8 @@ function fail(message, detail = '') {
   process.exitCode = 1
 }
 
-const app = await compatibilityOf(appConfig)
-const harness = await compatibilityOf(harnessConfig)
+const app = compatibilityOf(appConfig)
+const harness = compatibilityOf(harnessConfig)
 if (app.date !== harness.date || app.flags.join() !== harness.flags.join()) {
   console.error('compatibility ของ harness ไม่ตรงกับแอป — แก้ tests/workerd/wrangler.jsonc ให้ตรง')
   console.error(`  แอป:     ${app.date} ${JSON.stringify(app.flags)}`)

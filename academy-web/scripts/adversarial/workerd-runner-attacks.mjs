@@ -150,6 +150,16 @@ sandbox.modify(harnessConfig, sandbox.original(harnessConfig)
 report('compatibility ของ harness เลื่อนออกจากแอป', { fired: true, code: runRunner() }, true)
 sandbox.restore()
 
+// ค่าจริงซ่อนหลัง \r ในคอมเมนต์ — ตัวอ่านที่จบคอมเมนต์เฉพาะ \n จะอ่านค่าแรก
+// ส่วน wrangler อ่านค่าหลัง ทำให้เลนรายงานว่า "ตรงกับแอป" ทั้งที่ deploy ใช้คนละค่า
+sandbox.reopen()
+sandbox.modify(harnessConfig, sandbox.original(harnessConfig).replace(
+  '"compatibility_date": "2025-03-25",',
+  '"compatibility_date": "2025-03-25",\n  // ซ่อนไว้\r"compatibility_date": "2026-08-14",',
+))
+report('compatibility_date ที่ซ่อนไว้หลัง \\r ในคอมเมนต์', { fired: true, code: runRunner() }, true)
+sandbox.restore()
+
 report('เลนปกติที่ไม่ได้แก้อะไร', { fired: true, code: runRunner() }, false)
 
 if (survived > 0) {
