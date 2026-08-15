@@ -6,6 +6,20 @@
 
 ## Current execution lane — activate identity without widening Pool A access
 
+**Identity conformance rebind หลังรีวิวข้าม repo (2026-08-15):** ลานตรวจอิสระข้าม repo
+(read-only ทั้ง Academy `86e94eb` และ Identity Control `fdcaf30`) สรุปว่าไม่พบ contract gap
+ที่ต้องปิดก่อนเลื่อน `identityContractDigests` และให้ค่าที่ควร pin มาครบ — ตรวจเองซ้ำแล้ว
+digest ทั้งหกไฟล์ที่วัดจากเครื่องตรงกับที่ผู้ตรวจให้มาทุกตัว ที่เปลี่ยนจริงมีสามค่า
+(`consumer-conformance-kit.md`, `packages/contracts/src/index.ts`, `packages/testing/src/index.ts`)
+· evidence digest ฝั่ง Academy drift หนึ่งไฟล์คือ `identity-client-assertion-conformance.test.ts`
+ซึ่งเปลี่ยนที่ `3ea4646` ตอน signer เลิกรับ `CryptoKey` จากผู้เรียก — อธิบายได้และผ่านรีวิวมาแล้ว
+อีก 20 ไฟล์ไม่ขยับ · **ledger ไม่ขยับ: 23 scenario 16 pass / 7 not_proven เท่าเดิม** งานนี้
+เลื่อนเฉพาะ revision ที่หลักฐานผูกอยู่ ไม่ได้เลื่อนข้ออ้างว่าอะไรพิสูจน์แล้ว · generator
+`--write` แล้วเช็คซ้ำได้ `current` · generator test 7/7 · unit 1348/1348 · tsc สะอาด
+· eslint 0 error · `releaseApproval=false`, `runtimeWired=false`, `productionEvidence=false`
+และ production NO-GO คงเดิม · คำตัดสินดิบ:
+`reports/reviews/identity-academy-cross-repo-conformance-review-20260815.md`
+
 **Adversarial sandbox durable snapshot (2026-08-15):** รีวิวอิสระรอบเจ็ดบน HEAD `86e94eb`
 คืน `C0/H0/M1/L1 — REJECT` โดยยืนยันว่า M-01 (ยึดพอร์ตหลัง workerd bind) ปิดจริง แต่ชี้ว่า
 `restoreOnExit()` ยังทำข้อมูลหายได้โดยไม่ต้องมีผู้โจมตี: snapshot อยู่แต่ในหน่วยความจำ
