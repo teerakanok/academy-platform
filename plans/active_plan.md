@@ -2,9 +2,26 @@
 
 > Open work only. Move closed items to `completed_log.md` with evidence.
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
-> **Last updated:** 2026-08-14
+> **Last updated:** 2026-08-15
 
 ## Current execution lane — activate identity without widening Pool A access
+
+**Adversarial sandbox durable snapshot (2026-08-15):** รีวิวอิสระรอบเจ็ดบน HEAD `86e94eb`
+คืน `C0/H0/M1/L1 — REJECT` โดยยืนยันว่า M-01 (ยึดพอร์ตหลัง workerd bind) ปิดจริง แต่ชี้ว่า
+`restoreOnExit()` ยังทำข้อมูลหายได้โดยไม่ต้องมีผู้โจมตี: snapshot อยู่แต่ในหน่วยความจำ
+ถ้า `EACCES` นานเกินสองครั้งที่ handler เรียกติดกัน ไบต์เดิมหายไปพร้อมโปรเซส ทั้งสองข้อ
+เป็น in-bound ตาม `checkpoint-ril` §3 (เกณฑ์ ก และ ค) แม้จะอยู่ในเครื่องมือที่ใช้พิสูจน์
+ปิดแล้วด้วยการเขียนไบต์เดิมลงดิสก์นอกรีโปพร้อม `manifest.json` ในทุกทางที่ปล่อยไบต์เดิมทิ้ง
+แล้ว exit handler พิมพ์คำสั่ง `cp` ที่กู้ได้จริง · POC เดียวกับที่ reviewer ใช้ REJECT commit
+ไว้ที่ `academy-web/scripts/adversarial/sandbox-exit-path-poc.mjs` และผ่าน · ตัวเลขหลักฐาน
+นับใหม่จากการรันจริง: unit 1348 ข้อ, เลนที่แตะ 73 ข้อ บนทั้ง node 24.18.0 และ 25.5.0,
+`tsc` สะอาด, eslint 0 error, ทางหลบ not-wired 11 ทางถูกจับครบ, runner attack 12 รายการ
+เป็นไปตามที่ควร · freeze manifest ขยายเป็น 14 ไฟล์ · `enabled=false`,
+`releaseApproval=false`, `runtimeWired=false` และ production NO-GO คงเดิม.
+ระหว่างทางเจอและปิดเพิ่มหนึ่งข้อ: สัญญาณที่จับไม่ได้ (`SIGKILL`/timeout ที่ฆ่าทั้ง
+process group) ทำให้ไฟล์ที่สคริปต์แก้ค้างอยู่ แล้วรอบถัดไปอ่านสภาพนั้นเป็น "ของเดิม"
+จนความเสียหายกลายเป็น baseline ถาวรพร้อมผลลวง `SURVIVED` · ปิดด้วย `assertPristine()`
+ที่ทั้งสองสคริปต์เรียกก่อนแตะไฟล์แรก ออกด้วยรหัส `2` พร้อมคำสั่งคืนที่ใช้ได้จริง.
 
 **Signed-result runtime composition author checkpoint (2026-08-14):** Academy's production-disabled
 callback composition now requires the accepted signed code-exchange result verifier through one

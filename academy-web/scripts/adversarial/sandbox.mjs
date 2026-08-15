@@ -19,19 +19,57 @@
  *      การคืนสภาพจึงลบของคนอื่นหรือเขียนทับงานที่เพิ่งแก้ ตอนนี้จำ `dev`/`ino`
  *      ของสิ่งที่สร้าง/แก้ไว้ และคืนสภาพเฉพาะเมื่อยังเป็นก้อนเดิมจริงๆ
  *
+ * รีวิวรอบเจ็ดเพิ่มรากที่สี่: **snapshot ที่อยู่แต่ในหน่วยความจำหายไปพร้อมโปรเซส**
+ * "เก็บไว้ลองซ้ำ" ช่วยได้เฉพาะตอนที่ยังมีใครเรียกซ้ำ ถ้า EACCES นานเกินสองครั้งที่
+ * exit handler เรียกติดกัน ไบต์เดิมก็หายถาวรอยู่ดี ตอนนี้ทุกทางที่ปล่อยไบต์เดิมทิ้ง
+ * จะเขียนสำเนาลงดิสก์นอกรีโปพร้อม `manifest.json` แล้วพิมพ์คำสั่งกู้ออกมา
+ *
  * การคืนสภาพจะไม่โยน error ออกไป เพราะมันถูกเรียกจาก `finally` และจาก handler
  * ของสัญญาณ ปัญหาที่พบจะถูกเก็บไว้ใน `problems()` ให้ผู้เรียกรายงานและออกด้วย
  * รหัสที่ไม่ใช่ 0 — เงียบไม่ได้ แต่ก็ห้ามทำให้ทางออกอื่นพัง
  */
 import {
-  closeSync, constants, existsSync, fstatSync, lstatSync, mkdirSync, openSync,
-  readSync, realpathSync, rmdirSync, symlinkSync, unlinkSync, writeSync,
+  closeSync, constants, existsSync, fstatSync, lstatSync, mkdirSync, mkdtempSync,
+  openSync, readSync, realpathSync, rmdirSync, symlinkSync, unlinkSync, writeFileSync,
+  writeSync,
 } from 'node:fs'
+import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
+import { tmpdir } from 'node:os'
 import { basename, dirname, join, relative, resolve } from 'node:path'
 
 const sameNode = (a, b) => a !== null && b !== null && a.dev === b.dev && a.ino === b.ino
 const digest = (bytes) => createHash('sha256').update(bytes).digest('hex')
+
+/**
+ * ปฏิเสธที่จะเริ่ม ถ้าไฟล์ที่กำลังจะถูกแก้ไม่ตรงกับ HEAD อยู่ก่อนแล้ว
+ *
+ * มีอยู่เพราะสัญญาณที่ **จับไม่ได้** ยังมีจริง: `SIGKILL` และ timeout ของเครื่องมือ
+ * ที่ฆ่าทั้ง process group ไม่ผ่าน handler ใดๆ ทั้งสิ้น รอบนั้นไฟล์จะค้างอยู่ในสภาพ
+ * ที่ถูกแก้ และรอบถัดไปจะอ่านสภาพนั้นเป็น "ของเดิม" แล้ว **ผูกความเสียหายเข้าเป็น
+ * baseline** — คืนกลับไม่ได้อีกเลย พร้อมรายงานผลลวงว่าเลนปกติพัง ทั้งที่ผลิตภัณฑ์
+ * ไม่ได้เปลี่ยนอะไร (เกิดจริงในเลนนี้ 2026-08-15)
+ *
+ * การเช็คนี้ราคาถูกและตัดสินได้เด็ดขาด: สภาพสกปรกที่เราไม่ได้สร้างเอง = หยุด ไม่ใช่เดา
+ */
+export function assertPristine(root, paths) {
+  let status
+  try {
+    status = execFileSync('git', ['status', '--porcelain', '--', ...paths], { cwd: root, encoding: 'utf8' })
+  } catch (error) {
+    throw new Error(`ตรวจสภาพไฟล์ก่อนเริ่มไม่ได้ จึงไม่เริ่ม: ${error.message}`)
+  }
+  const dirty = status.split('\n').map((line) => line.trim()).filter(Boolean)
+  if (dirty.length === 0) return
+  throw new Error([
+    'ไฟล์ที่สคริปต์นี้จะแก้ไม่ตรงกับ HEAD อยู่ก่อนแล้ว จึงไม่เริ่ม',
+    ...dirty.map((line) => `  ${line}`),
+    'ถ้าเป็นเศษจากรอบก่อนที่ถูกฆ่าด้วยสัญญาณที่จับไม่ได้ ให้คืนด้วย:',
+    ...paths.map((path) => `  git checkout -- ${path}`),
+    'ถ้าเป็นงานที่ตั้งใจแก้ ให้ commit หรือ stash ก่อน — สคริปต์นี้แก้ไฟล์จริงและ',
+    'จะจำสภาพปัจจุบันเป็นของเดิม ซึ่งทำให้ของที่ค้างอยู่กลายเป็น baseline ถาวร',
+  ].join('\n'))
+}
 
 export class Sandbox {
   #root
@@ -43,6 +81,15 @@ export class Sandbox {
   #createdDirectories = []
   #restored = false
   #problems = []
+  /** ข้อความที่บันทึกไปแล้ว กันไม่ให้การเรียกซ้ำพิมพ์เรื่องเดิมซ้อนกันเป็นชั้น */
+  #noted = new Set()
+  /**
+   * โฟลเดอร์นอกรีโปที่เก็บไบต์เดิมลงดิสก์ สร้างเมื่อจำเป็นเท่านั้น
+   * @type {string | null}
+   */
+  #spillRoot = null
+  /** พาธจริง -> { spill, sha256, bytes } ของสำเนาไบต์เดิมบนดิสก์ */
+  #spilled = new Map()
 
   constructor(root) {
     this.#root = realOf(resolve(root))
@@ -160,24 +207,24 @@ export class Sandbox {
       try {
         const meta = lstatSync(full)
         if (!meta.isFile()) {
-          this.#note(full, 'ไม่ใช่ไฟล์ธรรมดาแล้ว อาจถูกสลับเป็น symlink — ไม่เขียนทับ')
+          this.#abandon(full, saved, 'ไม่ใช่ไฟล์ธรรมดาแล้ว อาจถูกสลับเป็น symlink — ไม่เขียนทับ')
           restoredPaths.push(full)
           continue
         }
         if (!sameNode(meta, saved)) {
-          this.#note(full, 'ถูกแทนที่ด้วยไฟล์คนละก้อน — ไม่เขียนทับ')
+          this.#abandon(full, saved, 'ถูกแทนที่ด้วยไฟล์คนละก้อน — ไม่เขียนทับ')
           restoredPaths.push(full)
           continue
         }
         if (saved.wroteDigest !== null && digest(readNoFollow(full)) !== saved.wroteDigest) {
-          this.#note(full, 'มีคนแก้หลังจากเราเขียน — ไม่เขียนทับงานนั้น')
+          this.#abandon(full, saved, 'มีคนแก้หลังจากเราเขียน — ไม่เขียนทับงานนั้น')
           restoredPaths.push(full)
           continue
         }
         writeNoFollow(full, saved.bytes)
         restoredPaths.push(full)
       } catch (error) {
-        this.#note(full, `คืนไม่สำเร็จ: ${error.code ?? error.message} — เก็บไบต์เดิมไว้ให้เรียกซ้ำ`)
+        this.#abandon(full, saved, `คืนไม่สำเร็จ: ${error.code ?? error.message} — เก็บไบต์เดิมไว้ให้เรียกซ้ำ`)
       }
     }
     for (const created of this.#createdFiles) {
@@ -217,8 +264,71 @@ export class Sandbox {
     return this.#saved.size + this.#createdFiles.length
   }
 
+  /**
+   * เก็บไบต์เดิมของทุกไฟล์ที่ยังคืนไม่ได้ลงดิสก์ ก่อนโปรเซสจะออก
+   *
+   * เป็นทางออกสุดท้าย ไม่ใช่ทางปกติ — ทางปกติคือ `restore()` เขียนกลับได้เอง
+   */
+  spillPending() {
+    for (const [full, saved] of this.#saved) this.#spill(full, saved)
+  }
+
+  /** คู่ (ไฟล์เป้าหมาย, สำเนาไบต์เดิมบนดิสก์) ที่ผู้ใช้กู้เองได้หลังโปรเซสออกไปแล้ว */
+  recovery() {
+    return [...this.#spilled].map(([target, entry]) => ({ target, ...entry }))
+  }
+
+  /** โฟลเดอร์ที่เก็บสำเนาไบต์เดิม หรือ null ถ้ายังไม่เคยต้องใช้ */
+  spillDirectory() {
+    return this.#spillRoot
+  }
+
+  /**
+   * ปล่อยไบต์เดิมของไฟล์หนึ่ง โดยเก็บสำเนาลงดิสก์ก่อนเสมอ
+   *
+   * รีวิวอิสระรอบเจ็ดพิสูจน์ว่า snapshot ที่อยู่แต่ในหน่วยความจำหายไปพร้อมโปรเซส:
+   * ถ้า `restore()` ติด EACCES ที่นานเกินสองครั้งที่ handler เรียกติดกัน ไบต์เดิม
+   * จะกู้ไม่ได้อีกแม้ permission คืนมาแล้ว — เป็นการทำข้อมูลหายโดยไม่ต้องมีผู้โจมตี
+   *
+   * ทางที่ "ตัดสินใจไม่เขียนทับ" (ไฟล์ถูกสลับ / มีคนแก้ทับ) ก็ผ่านที่นี่ด้วย เพราะมัน
+   * ทิ้งไบต์เดิมเหมือนกัน ต่างกันแค่เจตนา ผู้ใช้ควรได้ของเดิมกลับไม่ว่าทางไหน
+   */
+  #abandon(full, saved, reason) {
+    const spill = this.#spill(full, saved)
+    this.#note(full, spill === null ? reason : `${reason} · ไบต์เดิมอยู่ที่ ${spill}`)
+  }
+
+  #spill(full, saved) {
+    const already = this.#spilled.get(full)
+    if (already !== undefined) return already.spill
+    try {
+      if (this.#spillRoot === null) {
+        this.#spillRoot = mkdtempSync(join(tmpdir(), 'academy-sandbox-recovery-'))
+      }
+      const target = join(this.#spillRoot, `${digest(Buffer.from(full)).slice(0, 16)}-${basename(full)}`)
+      writeFileSync(target, saved.bytes, { mode: 0o600 })
+      // จดรายละเอียดไว้ตั้งแต่ตอนนี้ ไม่ใช่ไปอ่านจาก #saved ทีหลัง — ทางที่ตัดสินใจ
+      // ไม่เขียนทับจะถูกลบออกจาก #saved ท้าย restore() แล้ว manifest จะกลายเป็นศูนย์ไบต์
+      this.#spilled.set(full, { spill: target, sha256: digest(saved.bytes), bytes: saved.bytes.length })
+      // เขียน manifest ใหม่ทั้งไฟล์ทุกครั้ง เพื่อให้มันตรงกับสิ่งที่มีอยู่จริงเสมอ
+      writeFileSync(
+        join(this.#spillRoot, 'manifest.json'),
+        `${JSON.stringify(this.recovery(), null, 2)}\n`,
+        { mode: 0o600 },
+      )
+      return target
+    } catch (error) {
+      this.#note(full, `เก็บไบต์เดิมลงดิสก์ไม่สำเร็จ: ${error.code ?? error.message}`)
+      return null
+    }
+  }
+
   #note(path, reason) {
-    this.#problems.push(`${relative(this.#root, path)}: ${reason}`)
+    const line = `${relative(this.#root, path)}: ${reason}`
+    // การเรียกซ้ำเป็นเรื่องปกติของ restore — ข้อความเดิมจึงต้องไม่ซ้อนกันเป็นชั้น
+    if (this.#noted.has(line)) return
+    this.#noted.add(line)
+    this.#problems.push(line)
   }
 
   /** สิ่งที่คืนสภาพไม่ได้ ผู้เรียกต้องรายงานและออกด้วยรหัสที่ไม่ใช่ 0 */
@@ -279,10 +389,18 @@ export function restoreOnExit(sandbox) {
     // ลองซ้ำหนึ่งครั้ง เผื่อรอบแรกติดสภาพชั่วคราว (permission, ไฟล์ถูกล็อกอยู่)
     sandbox.restore()
     if (sandbox.pending() > 0) sandbox.restore()
+    // สภาพชั่วคราวที่นานเกินสองครั้งนี้ยังเป็นไปได้ ตอนนั้นห้ามให้ไบต์เดิมหายไป
+    // พร้อมโปรเซส — เก็บลงดิสก์แล้วบอกที่อยู่ ผู้ใช้กู้เองได้แม้เรากู้ไม่ได้
+    if (sandbox.pending() > 0) sandbox.spillPending()
     const problems = sandbox.problems()
     if (problems.length > 0) {
       console.error('คืนสภาพไม่ครบ:')
       for (const problem of problems) console.error(`  ${problem}`)
+    }
+    const recovery = sandbox.recovery()
+    if (recovery.length > 0) {
+      console.error(`ไบต์เดิมถูกเก็บไว้ที่ ${sandbox.spillDirectory()} (พร้อม manifest.json) — กู้ด้วย:`)
+      for (const entry of recovery) console.error(`  cp ${entry.spill} ${entry.target}`)
     }
   }
   process.on('exit', restore)

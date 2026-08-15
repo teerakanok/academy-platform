@@ -16,7 +16,7 @@
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
-import { restoreOnExit, Sandbox } from './sandbox.mjs'
+import { assertPristine, restoreOnExit, Sandbox } from './sandbox.mjs'
 
 const root = fileURLToPath(new URL('../..', import.meta.url))
 const gate = 'tests/unit/identity-key-distribution-not-wired.test.ts'
@@ -166,6 +166,14 @@ function gatePasses() {
     }
     return false
   }
+}
+
+// ต้องเริ่มจากสภาพที่ตรงกับ HEAD เท่านั้น ไม่งั้นเศษจากรอบก่อนจะกลายเป็น baseline
+try {
+  assertPristine(root, [...new Set(EVASIONS.flatMap((evasion) => Object.keys(evasion.modify)))])
+} catch (error) {
+  console.error(error.message)
+  process.exit(2)
 }
 
 let survived = 0

@@ -24,13 +24,21 @@ import { connect } from 'node:net'
 import { setTimeout as delay } from 'node:timers/promises'
 import { fileURLToPath } from 'node:url'
 
-import { restoreOnExit, Sandbox } from './sandbox.mjs'
+import { assertPristine, restoreOnExit, Sandbox } from './sandbox.mjs'
 
 const PORT = 61987
 const root = fileURLToPath(new URL('../..', import.meta.url))
 const runner = 'scripts/workerd-signer-check.mjs'
 const appConfig = 'wrangler.jsonc'
 const harnessConfig = 'tests/workerd/wrangler.jsonc'
+
+// ต้องเริ่มจากสภาพที่ตรงกับ HEAD เท่านั้น ไม่งั้นเศษจากรอบก่อนจะกลายเป็น baseline
+try {
+  assertPristine(root, [appConfig, harnessConfig])
+} catch (error) {
+  console.error(error.message)
+  process.exit(2)
+}
 
 const sandbox = new Sandbox(root)
 restoreOnExit(sandbox)
