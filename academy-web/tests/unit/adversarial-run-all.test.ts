@@ -1,6 +1,9 @@
+import { mkdtempSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-import { composeVerdict, runSequentially } from '../../scripts/adversarial/run-all.mjs'
+import { acquireAdversarialLock, composeVerdict, runSequentially } from '../../scripts/adversarial/run-all.mjs'
 
 /**
  * `node scripts/adversarial/*.mjs` รันตัวแรกเท่านั้นทั้งที่คนสั่งคิดว่ารันครบ —
@@ -28,5 +31,22 @@ describe('runner ของสคริปต์ adversarial', () => {
       { name: 'b.mjs', code: 1 },
       { name: 'c.mjs', code: 0 },
     ])
+  })
+
+  /**
+   * เกิดจริงมาแล้ว: run-all (แก้ไฟล์จริง) ถูกรันขนานกับ vitest (เดินกราฟ import
+   * ไฟล์เดียวกัน) แล้ว suite fail ปลอม — lock ต้องกันการรันซ้อนและปล่อยเมื่อจบ
+   */
+  it('lock กันรันซ้อน และปล่อยคืนเมื่อ release แล้ว', () => {
+    const root = mkdtempSync(join(tmpdir(), 'adv-lock-test-'))
+    try {
+      const release = acquireAdversarialLock(root)
+      expect(() => acquireAdversarialLock(root)).toThrow(/มีการรัน adversarial อยู่แล้ว/)
+      release()
+      const second = acquireAdversarialLock(root)
+      second()
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
   })
 })
