@@ -80,9 +80,8 @@ export class Sandbox {
   /** โฟลเดอร์ที่รอบนี้สร้างเอง เรียงลึกสุดก่อน */
   #createdDirectories = []
   #restored = false
-  #problems = []
-  /** ข้อความที่บันทึกไปแล้ว กันไม่ให้การเรียกซ้ำพิมพ์เรื่องเดิมซ้อนกันเป็นชั้น */
-  #noted = new Set()
+  /** พาธจริง -> ข้อความปัญหาของพาธนั้น เก็บแยกรายพาธเพื่อให้ลบทิ้งได้เมื่อพาธนั้นคืน/ลบสำเร็จในรอบถัดไป — ไม่งั้น retry ที่สำเร็จก็ยังถูกรายงานว่าล้ม (debt ที่ handoff ระบุชื่อ) */
+  #problems = new Map()
   /**
    * โฟลเดอร์นอกรีโปที่เก็บไบต์เดิมลงดิสก์ สร้างเมื่อจำเป็นเท่านั้น
    * @type {string | null}
@@ -223,6 +222,8 @@ export class Sandbox {
         }
         writeNoFollow(full, saved.bytes)
         restoredPaths.push(full)
+        // คืนสำเร็จ: ปัญหาของพาธนี้จากรอบก่อน (เช่น EACCES ชั่วคราว) หมดอายุแล้ว
+        this.#problems.delete(full)
       } catch (error) {
         this.#abandon(full, saved, `คืนไม่สำเร็จ: ${error.code ?? error.message} — เก็บไบต์เดิมไว้ให้เรียกซ้ำ`)
       }
@@ -237,9 +238,13 @@ export class Sandbox {
         }
         unlinkSync(created.path)
         removedFiles.push(created.path)
+        // ลบสำเร็จ (หรือไม่มีอยู่แล้ว): ปัญหาเดิมของพาธนี้หมดอายุ
+        this.#problems.delete(created.path)
       } catch (error) {
-        if (error.code === 'ENOENT') removedFiles.push(created.path)
-        else this.#note(created.path, `ลบไม่สำเร็จ: ${error.code ?? error.message} — เก็บไว้ให้เรียกซ้ำ`)
+        if (error.code === 'ENOENT') {
+          removedFiles.push(created.path)
+          this.#problems.delete(created.path)
+        } else this.#note(created.path, `ลบไม่สำเร็จ: ${error.code ?? error.message} — เก็บไว้ให้เรียกซ้ำ`)
       }
     }
     for (const directory of this.#createdDirectories) {
@@ -325,15 +330,16 @@ export class Sandbox {
 
   #note(path, reason) {
     const line = `${relative(this.#root, path)}: ${reason}`
-    // การเรียกซ้ำเป็นเรื่องปกติของ restore — ข้อความเดิมจึงต้องไม่ซ้อนกันเป็นชั้น
-    if (this.#noted.has(line)) return
-    this.#noted.add(line)
-    this.#problems.push(line)
+    // การเรียกซ้ำเป็นเรื่องปกติของ restore — ข้อความเดิมของพาธเดียวกันจึงต้องไม่ซ้อนกัน
+    // เป็นชั้น แต่ต้องจำแยกรายพาธ เพื่อให้พาธที่คืนสำเร็จภายหลังลบปัญหาของตัวเองได้
+    const lines = this.#problems.get(path) ?? []
+    if (!lines.includes(line)) lines.push(line)
+    this.#problems.set(path, lines)
   }
 
-  /** สิ่งที่คืนสภาพไม่ได้ ผู้เรียกต้องรายงานและออกด้วยรหัสที่ไม่ใช่ 0 */
+  /** สิ่งที่ยังคืนสภาพไม่ได้ ณ ตอนนี้ ผู้เรียกต้องรายงานและออกด้วยรหัสที่ไม่ใช่ 0 */
   problems() {
-    return [...this.#problems]
+    return [...this.#problems.values()].flat()
   }
 
   /** เริ่มรอบใหม่หลังคืนสภาพแล้ว */

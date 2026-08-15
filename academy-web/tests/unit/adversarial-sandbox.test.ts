@@ -169,6 +169,9 @@ describe('ที่กันเปื้อนของสคริปต์ adv
     sandbox.restore()
     expect(readFileSync(path, 'utf8')).toBe('งานของเจ้าของที่ยังไม่ commit')
     expect(sandbox.pending()).toBe(0)
+    // คืนสำเร็จแล้วปัญหาเดิมต้องหายไปด้วย ไม่ใช่ค้างทำให้ gate รายงานล้ม
+    // ทั้งที่ทุกอย่างกลับมาเรียบร้อย (debt: problems() เก็บ error เก่า)
+    expect(sandbox.problems()).toEqual([])
     spills.push(sandbox.spillDirectory())
   })
 
@@ -185,6 +188,8 @@ describe('ที่กันเปื้อนของสคริปต์ adv
     sandbox.restore()
     expect(existsSync(join(root, 'ในโฟลเดอร์/ชั่วคราว.txt'))).toBe(false)
     expect(sandbox.pending()).toBe(0)
+    // เช่นเดียวกันฝั่งลบ: ลบสำเร็จรอบสองแล้วปัญหารอบแรกต้องถูกลบทิ้ง
+    expect(sandbox.problems()).toEqual([])
   })
 
   it('คืนสภาพซ้ำได้ และไม่ลบซ้ำสิ่งที่ถูกสร้างใหม่หลังคืนแล้ว', () => {
