@@ -86,7 +86,7 @@ const expectedEvidenceDigests = new Map([
   ],
   [
     'academy-web/tests/unit/identity-client-assertion-conformance.test.ts',
-    '5b4371c87ff19595fe95ad38eed3379ce48fd50598c8c02a6ab7fe13cfcb1672',
+    '241540492ecc9234356298cec111b89332b6b8b96bccb3c9c0a2dd57e56ef42e',
   ],
   [
     'reports/reviews/academy-identity-client-assertion-provider-local-checkpoint-2026-08-11.md',
@@ -187,8 +187,8 @@ describe('Academy Identity Control conformance generator', () => {
 
     assert.equal(report.sourceRevision, ACADEMY_SOURCE_REVISION)
     assert.equal(report.identityControl.sourceRevision, IDENTITY_SOURCE_REVISION)
-    assert.equal(ACADEMY_SOURCE_REVISION, 'f497649d06aeaad90eb3d7ac1f9cf0031a100f96')
-    assert.equal(IDENTITY_SOURCE_REVISION, '4efd9b7e76f48e00aa6e3896bc14626cd38bcb6a')
+    assert.equal(ACADEMY_SOURCE_REVISION, 'f6b043c6b7acb9131f23b3f8e39a3bca9d401b86')
+    assert.equal(IDENTITY_SOURCE_REVISION, 'fdcaf30bfb9b3644c43dcabb192d99820d52a336')
     assert.equal(report.registryState.enabled, false)
     assert.equal(report.scope.releaseApproval, false)
     assert.equal(report.scope.runtimeWired, false)
@@ -217,7 +217,7 @@ describe('Academy Identity Control conformance generator', () => {
         evidenceType: 'test',
         testSource: {
           path: 'academy-web/tests/unit/identity-client-assertion-conformance.test.ts',
-          sha256: '5b4371c87ff19595fe95ad38eed3379ce48fd50598c8c02a6ab7fe13cfcb1672',
+          sha256: '241540492ecc9234356298cec111b89332b6b8b96bccb3c9c0a2dd57e56ef42e',
         },
         producerEvidence: [
           {

@@ -17,8 +17,8 @@ const scriptDirectory = dirname(fileURLToPath(import.meta.url))
 const academyRoot = resolve(scriptDirectory, '..', '..')
 const identityRoot = resolve(academyRoot, '..', 'identity-control')
 
-export const ACADEMY_SOURCE_REVISION = 'f497649d06aeaad90eb3d7ac1f9cf0031a100f96'
-export const IDENTITY_SOURCE_REVISION = '4efd9b7e76f48e00aa6e3896bc14626cd38bcb6a'
+export const ACADEMY_SOURCE_REVISION = 'f6b043c6b7acb9131f23b3f8e39a3bca9d401b86'
+export const IDENTITY_SOURCE_REVISION = 'fdcaf30bfb9b3644c43dcabb192d99820d52a336'
 
 const reportPath = 'reports/conformance/identity-control/academy-identity-control-conformance.json'
 const evidencePath = 'reports/conformance/identity-control/academy-identity-local-evidence.json'
@@ -47,10 +47,10 @@ export const CHECKPOINT_FREEZE_DECLARATION = Object.freeze({
 const identityContractDigests = Object.freeze({
   'config/consumer-registry-v1.approved.json': '572d230a9f84c219e5b82eeb84dd1350bd8a319e180f2208f45db3abc03d1875',
   'docs/integration/consumer-registry-v1.md': 'd880b0e2a8000f6898b76b91ee47ab18b886ac8e2f413f214448a8a2bed575a4',
-  'docs/integration/consumer-conformance-kit.md': '52c402cc4582d5dfc1f54ce12cf9d9ed96bf4e6eace10a411585e1c8ee92c6f9',
+  'docs/integration/consumer-conformance-kit.md': 'df1ef8c8b385be09cfcf0481f6e0643db4517eb3a72fb406e8612e388beadb97',
   'docs/integration/lifecycle-pull-consumer-contract.md': 'ba7ca71fd5ab845821f6dc9cfc09bc612bef1ed12914331e4ad4e65a0ce6f17c',
-  'packages/contracts/src/index.ts': '3954689f4749b0f43763b02b4cd1bf4c840304ca594d5a565a5f0af77d910aaa',
-  'packages/testing/src/index.ts': '72aa668be65434cac203c15e16d3c5c7c2d1bf89143bc1b1255d3972305069f6',
+  'packages/contracts/src/index.ts': 'e3f22d7bb02f255c01d3552022b874202df849cf31410ebff98fac7460f5799f',
+  'packages/testing/src/index.ts': 'd12f81616596dc37a9f62ae16e37873c08efabc222427f4b82ced187c0b6a51d',
 })
 
 const clientAssertionIdentityEvidencePaths = Object.freeze([
@@ -125,7 +125,7 @@ const expectedEvidenceDigests = new Map([
   ],
   [
     'academy-web/tests/unit/identity-client-assertion-conformance.test.ts',
-    '5b4371c87ff19595fe95ad38eed3379ce48fd50598c8c02a6ab7fe13cfcb1672',
+    '241540492ecc9234356298cec111b89332b6b8b96bccb3c9c0a2dd57e56ef42e',
   ],
   [
     'reports/reviews/academy-identity-client-assertion-provider-local-checkpoint-2026-08-11.md',
