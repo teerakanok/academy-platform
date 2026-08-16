@@ -31,6 +31,14 @@ function tokenFor(role: string): string {
   return `${signed}.${createHmac('sha256', signingSecret).update(signed).digest('base64url')}`
 }
 
+describe('dedicated Academy retention PostgREST contract configuration', () => {
+  // skip สงวนไว้เฉพาะ "ไม่ได้ตั้งค่าเลย" — ถ้าตั้ง TEST_ACADEMY_RETENTION_API_URL แล้วแต่
+  // ชี้ target ที่ predicate ความปลอดภัยของ suite นี้ปฏิเสธ ต้อง fail ทันที ไม่ใช่ skip เงียบ
+  it('fails when TEST_ACADEMY_RETENTION_API_URL is configured to a target the local test safety predicate rejects', () => {
+    expect(apiUrl === undefined || isSafeLocalTestTarget(apiUrl)).toBe(true)
+  })
+})
+
 describe.skipIf(!hasDedicatedApi)('dedicated Academy retention PostgREST contract', () => {
   const request = (path: string, authorization?: string, profile = 'academy') =>
     fetch(`${apiUrl}${path}`, {
