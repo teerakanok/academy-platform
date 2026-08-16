@@ -187,7 +187,7 @@ describe('Academy Identity Control conformance generator', () => {
 
     assert.equal(report.sourceRevision, ACADEMY_SOURCE_REVISION)
     assert.equal(report.identityControl.sourceRevision, IDENTITY_SOURCE_REVISION)
-    assert.equal(ACADEMY_SOURCE_REVISION, 'f6b043c6b7acb9131f23b3f8e39a3bca9d401b86')
+    assert.equal(ACADEMY_SOURCE_REVISION, '6de80c2f066d7c32866434d4b6afdaf0b217c9ca')
     assert.equal(IDENTITY_SOURCE_REVISION, 'fdcaf30bfb9b3644c43dcabb192d99820d52a336')
     assert.equal(report.registryState.enabled, false)
     assert.equal(report.scope.releaseApproval, false)

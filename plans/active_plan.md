@@ -2265,3 +2265,35 @@ Package CYBERSKILLS Academy content as a **commercially licensed trainer starter
 - หมายเหตุถือไว้: `academy-retention-api.test.ts` ใช้รูป skip เดิมของ repo
   กับ `isSafeLocalTestTarget` (เก่าก่อน checkpoint นี้) — จุดเดียวกันแต่อยู่นอก
   delta จึงไม่แตะ บันทึกเป็น debt ตามรูปแบบ guard เดียวกันเมื่อแตะไฟล์นั้นจริง
+
+## 2026-08-16 - Identity conformance rebind รอบ revision-only (เลื่อน revision ไม่เลื่อนข้ออ้าง)
+
+ตาม procedure ของ `reports/reviews/academy-identity-contract-digest-rebind-analysis-20260816.md` §4b:
+ชุด digest rebind จริงเกิดไปแล้วที่ `b715a09` (2026-08-15 หลังรีวิวข้าม repo)
+สิ่งที่ค้างมีเพียง pin `ACADEMY_SOURCE_REVISION=f6b043c6` ต่ำกว่า HEAD ทำให้
+generator verify fail-closed ที่ "Academy source revision mismatch" รอบนี้จึงเลื่อน
+เฉพาะ revision ฝั่ง Academy ตามคำแนะนำข้อ 5.1 ของเอกสารนั้น (วัด digest ก่อนแตะเสมอ):
+
+- **วัด digest ซ้ำก่อนแตะ (read-only):** `identityContractDigests` ทั้งหกไฟล์ +
+  `expectedIdentityEvidenceDigests` อีก 4 ไฟล์ วัดจาก worktree identity-control
+  จริง (HEAD `fdcaf30` ตรง pin, worktree สะอาด) — **ตรงค่า pin ทุกตัว ไม่มีตัวใดขยับ**
+  จึงไม่ต้องขยับ digest ชุดไหน และไม่เปิด rule รีวิวข้าม repo รอบใหม่
+  (rule ที่หัวข้อ rebind 2026-08-14 บังคับเฉพาะการเลื่อน digest)
+- **แก้สองจุด:** `academy-web/scripts/generate-identity-control-conformance.mjs`
+  `ACADEMY_SOURCE_REVISION` `f6b043c6 → 6de80c2` + literal เดียวใน self-test
+  ที่ hard-pin ค่าเดียวกัน ไม่แตะอย่างอื่นใน generator
+- **ledger ไม่ขยับ:** diff JSON สาม artifact ก่อน/หลัง — scenario
+  id/result/supportsClaim/command byte-identical, summary identical,
+  **23 scenarios 16 pass / 7 not_proven เท่าเดิม** ฟิลด์ที่ต่างมีเฉพาะ:
+  `sourceRevision` (ทั้งสาม artifact รวม per-scenario `evidence.sourceRevision` 23 จุด),
+  `localWorkingTreeReceipt` (head + สถานะ git ปัจจุบัน — receipt เห็น untracked
+  `.mimosa/` `reports/security/` ซึ่ง lane นี้ไม่ได้อ่านหรือแตะ), และ
+  `artifactSha256` ของ evidence/unproven artifact ที่ derive จาก sourceRevision ใหม่
+- **ตรวจ:** generator verify `current` ที่ HEAD `6de80c2` · self-test 7/7 ·
+  unit 1359/1359 (118 files) · `tsc --noEmit` exit 0 · eslint 0 error
+  (1 warning เดิมจาก `registry.generated.ts`, รันจาก `academy-web/` ที่เป็นที่อยู่
+  ของ flat config)
+- **แฟล็ก production คงเดิมทั้งหมด:** `enabled=false`, `releaseApproval=false`,
+  `runtimeWired=false`, `productionEvidence=false` — NO-GO ไม่เปลี่ยน
+  `exchange.result-key-rotation` ยัง `not_proven` ตามเหตุผลเดิม (ยังไม่มี
+  distribution endpoint/runtime wiring จริง)

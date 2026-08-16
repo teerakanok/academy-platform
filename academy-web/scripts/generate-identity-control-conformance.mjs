@@ -17,7 +17,7 @@ const scriptDirectory = dirname(fileURLToPath(import.meta.url))
 const academyRoot = resolve(scriptDirectory, '..', '..')
 const identityRoot = resolve(academyRoot, '..', 'identity-control')
 
-export const ACADEMY_SOURCE_REVISION = 'f6b043c6b7acb9131f23b3f8e39a3bca9d401b86'
+export const ACADEMY_SOURCE_REVISION = '6de80c2f066d7c32866434d4b6afdaf0b217c9ca'
 export const IDENTITY_SOURCE_REVISION = 'fdcaf30bfb9b3644c43dcabb192d99820d52a336'
 
 const reportPath = 'reports/conformance/identity-control/academy-identity-control-conformance.json'
