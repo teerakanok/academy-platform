@@ -27,6 +27,20 @@ function validateAcademyDataApiUrl(value: string): string {
   return url.origin
 }
 
+/**
+ * Boolean form of the same origin rule `createAcademyDb` enforces — lets test
+ * harnesses pin their raw fetch targets to exactly the origins the production
+ * client would accept (HTTPS or HTTP loopback 127.0.0.1, bare origin).
+ */
+export function isSafeAcademyDataApiUrl(value: string): boolean {
+  try {
+    validateAcademyDataApiUrl(value)
+    return true
+  } catch {
+    return false
+  }
+}
+
 export function academyDataApiFetch(baseFetch: typeof globalThis.fetch): typeof globalThis.fetch {
   return (input, init) => {
     const inputUrl = input instanceof Request ? input.url : input.toString()

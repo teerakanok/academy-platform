@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import { describe, expect, it, vi } from 'vitest'
-import { academyDataApiFetch, createAcademyDb } from '@/lib/db/server'
+import { academyDataApiFetch, createAcademyDb, isSafeAcademyDataApiUrl } from '@/lib/db/server'
 import {
   ACADEMY_RUNTIME_AUDIENCE,
   ACADEMY_RUNTIME_ROLE,
@@ -49,6 +49,19 @@ describe('Academy runtime data credential', () => {
     'https://academy-data.test/unexpected-path',
   ])('rejects an unsafe dedicated API URL: %s', (url) => {
     expect(() => createAcademyDb({ url, signingSecret: SECRET })).toThrow(/ACADEMY_DATA_API_URL/i)
+  })
+
+  it.each([
+    ['http loopback origin', 'http://127.0.0.1:50600', true],
+    ['https bare origin', 'https://academy-data.example.test', true],
+    ['arbitrary http host', 'http://203.0.113.9:50600', false],
+    ['loopback DNS alias', 'http://localhost:50600', false],
+    ['credentialed origin', 'https://user@academy-data.example.test', false],
+    ['non-origin path', 'https://academy-data.example.test/rest/v1', false],
+    ['not a URL', 'not-a-url', false],
+    ['empty', '', false],
+  ])('dedicated API URL safety predicate accepts only app-client origins: %s', (_label, url, expected) => {
+    expect(isSafeAcademyDataApiUrl(url)).toBe(expected)
   })
 
   it('rewrites a Request without losing its method, headers, or body', async () => {

@@ -1,11 +1,14 @@
 import { createHmac } from 'node:crypto'
 import { describe, expect, it } from 'vitest'
-import { createAcademyDb } from '@/lib/db/server'
+import { createAcademyDb, isSafeAcademyDataApiUrl } from '@/lib/db/server'
 import { ACADEMY_RUNTIME_AUDIENCE, ACADEMY_RUNTIME_ROLE } from '@/lib/db/runtime-token'
 
 const apiUrl = process.env.ACADEMY_DATA_API_URL
 const signingSecret = process.env.ACADEMY_DATA_API_JWT_SECRET
-const hasDedicatedApi = Boolean(apiUrl && signingSecret)
+// raw fetch ด้านล่างไม่ผ่าน createAcademyDb — กัน env ที่ตั้งผิดทำให้เทสส่ง bearer
+// ที่เซ็นด้วย secret ไปหา origin ที่ตัว production client เองปฏิเสธ จึง pin ด้วย
+// rule เดียวกับ src/lib/db/server.ts (HTTPS หรือ HTTP loopback 127.0.0.1, origin เปล่า)
+const hasDedicatedApi = Boolean(apiUrl && signingSecret && isSafeAcademyDataApiUrl(apiUrl))
 
 function tokenFor(role: string): string {
   if (!signingSecret) throw new Error('dedicated API test configuration is missing')
@@ -19,6 +22,14 @@ function tokenFor(role: string): string {
   })}`
   return `${signed}.${createHmac('sha256', signingSecret).update(signed).digest('base64url')}`
 }
+
+describe('dedicated Academy PostgREST contract configuration', () => {
+  // skip สงวนไว้เฉพาะ "ไม่ได้ตั้งค่าเลย" — ถ้าตั้ง ACADEMY_DATA_API_URL แล้วแต่
+  // ชี้ origin ที่ production client ปฏิเสธ ต้อง fail ทันที ไม่ใช่ skip เงียบ
+  it('fails when ACADEMY_DATA_API_URL is configured to an origin the app client rejects', () => {
+    expect(apiUrl === undefined || isSafeAcademyDataApiUrl(apiUrl)).toBe(true)
+  })
+})
 
 describe.skipIf(!hasDedicatedApi)('dedicated Academy PostgREST contract', () => {
   it('accepts the runtime JWT through the application client', async () => {

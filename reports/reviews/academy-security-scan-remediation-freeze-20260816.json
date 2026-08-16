@@ -1,0 +1,31 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/playwright.config.ts",
+      "sha256": "c35937ae712bdaebcdf03b8c273d41d186ee6e3708c31742366c24f5bccaa279",
+      "bytes": 4323
+    },
+    {
+      "path": "academy-web/src/lib/db/server.ts",
+      "sha256": "671ce5037dc4b9e5a4d05a91fddc2208b361c622d6f551c60ce82f2230fa2df3",
+      "bytes": 3131
+    },
+    {
+      "path": "academy-web/tests/integration/academy-runtime-api.test.ts",
+      "sha256": "b95908b3e6be643988ea87c5fa5184e62d29c81125a5dd0c0797bee58da65b61",
+      "bytes": 3569
+    },
+    {
+      "path": "academy-web/tests/unit/academy-runtime-db.test.ts",
+      "sha256": "79018032958e92ae9b9aa2908e9601a51b96611514ec1eeace88523bbdd0ebeb",
+      "bytes": 4772
+    },
+    {
+      "path": "reports/reviews/academy-security-scan-remediation-20260816.md",
+      "sha256": "70c5518377675e0eacd3b310cac91e5af019a749fe2882ff580f7c5640c36327",
+      "bytes": 8547
+    }
+  ]
+}

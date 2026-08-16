@@ -60,7 +60,10 @@ export default defineConfig({
       // Direct GoTrue OTP remains only to provision local learner fixtures. It
       // is rejected for non-loopback requests and cannot be a production path.
       ACADEMY_LEGACY_DIRECT_OTP_LOCAL_FIXTURE: '1',
-      MEDIA_SIGNING_SECRET: 'playwright-only-media-signing-secret-32-bytes-minimum',
+      // ค่า throwaway สำหรับ e2e เท่านั้น (ชื่อประกาศตัวเอง) — override ได้ผ่าน env
+      // แต่ default ต้องรัน offline ได้เสมอ ห้ามใช้ secret จริง
+      MEDIA_SIGNING_SECRET:
+        process.env.PLAYWRIGHT_MEDIA_SIGNING_SECRET ?? 'playwright-only-media-signing-secret-32-bytes-minimum',
       MEDIA_LOCAL_ROOT: join(process.cwd(), 'private-media'),
     },
   },
