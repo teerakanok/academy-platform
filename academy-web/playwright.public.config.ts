@@ -4,7 +4,7 @@ import { defineConfig, devices } from '@playwright/test'
 // test zone ตาม registry เพื่อพิสูจน์ public surface ด้วย server build จริง.
 export default defineConfig({
   testDir: './e2e',
-  testMatch: 'course-experience.spec.ts',
+  testMatch: ['course-experience.spec.ts', 'public-a11y.spec.ts'],
   workers: 1,
   retries: 0,
   reporter: [['list']],
@@ -19,7 +19,8 @@ export default defineConfig({
     },
     {
       name: 'public-mobile',
-      use: { ...devices['Pixel 5'] },
+      // ผู้ก่อตั้งตัดสิน 2026-08-16: mobile profile ทางการของ three-product pilot คือ Pixel 7
+      use: { ...devices['Pixel 7'] },
     },
   ],
   webServer: {

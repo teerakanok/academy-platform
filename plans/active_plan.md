@@ -2297,3 +2297,12 @@ generator verify fail-closed ที่ "Academy source revision mismatch" รอ
   `runtimeWired=false`, `productionEvidence=false` — NO-GO ไม่เปลี่ยน
   `exchange.result-key-rotation` ยัง `not_proven` ตามเหตุผลเดิม (ยังไม่มี
   distribution endpoint/runtime wiring จริง)
+
+### 2026-08-16 - ตัดสินของผู้ก่อตั้ง: mobile profile ทางการ = Pixel 7
+
+เกณฑ์พื้นของทุก public web journey อ้าง "mobile profile ตัวแทนที่ตกลงกันแล้ว"
+— ผู้ก่อตั้งตัดสินเป็น **Pixel 7** (ตรงกับที่ identity-local config และ
+Crux ใช้อยู่แล้ว) การวัด LCP/INP/CLS และการตรวจ viewport ของ Academy
+ตั้งแต่บัดนี้ต้องอ้าง Pixel 7; `playwright.public.config.ts` ที่ยังเป็น
+Pixel 5 ต้องสลับเป็น Pixel 7 ใน checkpoint ถัดไปที่แตะไฟล์นั้น
+(ไม่ผ่อนเกณฑ์ ไม่เปลี่ยนตัวเลขขีด — เปลี่ยนเฉพาะอุปกรณ์ตัวแทน)
