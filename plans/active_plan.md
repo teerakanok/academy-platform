@@ -2,7 +2,7 @@
 
 > Open work only. Move closed items to `completed_log.md` with evidence.
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
-> **Last updated:** 2026-08-15
+> **Last updated:** 2026-08-16
 
 ## Current execution lane — activate identity without widening Pool A access
 
@@ -2198,3 +2198,70 @@ Package CYBERSKILLS Academy content as a **commercially licensed trainer starter
   operation ที่ authorize แยก แล้วจึงเคลม 23/23 ได้
 - conformance ยัง `16/23` และหลักฐานชุดปัจจุบันยังชี้ revision เก่า ดูรายละเอียด
   ในหัวข้อ "2026-08-14 - Identity client-assertion signer contract rebind"
+
+## 2026-08-16 - Adversarial harness debt closure: freeze-pin + ยืนยันเต็มรูปแบบ
+
+ปิด Done-Definition ที่ค้างของ c22a823 + cd83b20 (problems เป็นรายพาธ + run-all
+จับ exclusive lock) ให้ครบสองข้อที่ค้าง: หลักฐานถูกตรึงใน freeze manifest และ
+รันยืนยันเต็มชุดอีกรอบบนไบต์ปัจจุบัน
+
+- [x] รีเฟรช manifest `reports/reviews/academy-identity-client-assertion-webcrypto-signer-contract-rebind-freeze-20260814.json`
+  ให้ตรงไบต์ปัจจุบันของ `sandbox.mjs` และ `adversarial-sandbox.test.ts`
+  และ pin ไฟล์ใหม่สองไฟล์: `run-all.mjs` และ `adversarial-run-all.test.ts`
+  (อัปเดต digest ด้วย sha256 + ขนาดไบต์ของไบต์จริง ตามแบบ commit 17536d0
+  รวมถึง digest ของ `plans/active_plan.md` ที่รายการนี้เพิ่งเขียน —
+  ผลตรงกับ canonical renderer ของ director `scripts/checkpoint-freeze-manifest.mjs`
+  แบบ byte-for-byte ยืนยันโดยรีวิวอิสระรอบนี้) — ตรวจซ้ำแล้ว zero drift ทุกไฟล์ใน manifest
+- [x] ยืนยันเต็มชุดจาก `academy-web/`: unit `1351/1351` ผ่าน (118 ไฟล์),
+  `tsc --noEmit` exit 0, `eslint .` exit 0 (0 error, 1 warning เดิมใน
+  `registry.generated.ts` ซึ่งเป็นไฟล์ generated), และ
+  `node scripts/adversarial/run-all.mjs` รันเดี่ยวล็อกเอกซ์คลูซีฟ —
+  สามด่านผ่านครบ (not-wired-gate-evasions / workerd-runner-attacks /
+  sandbox-exit-path-poc) exit 0
+- สถานะเดิมคงอยู่: production ยังปิด และข้อ conformance/regenerate
+  ในหัวข้อ 2026-08-14 ไม่แตะในรอบนี้ ขอบเขตไฟล์ของ checkpoint นี้คือสองไฟล์ข้างบน
+  เท่านั้น (`reports/security/` เป็น audit ของอีกเซสชัน ไม่อยู่ในขอบเขต
+  และไม่ถูกอ่าน แตะ หรือ stage)
+
+### หนี้ที่บันทึกไว้ (ไม่เกิดจาก checkpoint นี้) — Mimosa pre-commit scan 2026-08-16
+
+สแกน pre-commit ของ harness พบ findings เดิมในโค้ดที่ checkpoint นี้ไม่ได้แตะ
+(delta เป็น docs/manifest เท่านั้น) บันทึกครั้งเดียวตามกฎ debt:
+
+- เจ้าของ: security-hardening checkpoint ถัดไปของ Academy (ประสาน security lane)
+- ทริกเกอร์เอาหนี้ออก: แก้ใน checkpoint ที่แตะไฟล์เหล่านี้จริง หรือ dedicated
+  hardening checkpoint ที่วางแผนแยก
+- รายการ (ตามที่สแกนรายงาน): path traversal ใน `scripts/make-dummy-assets.py`
+  (2 จุด), hardcoded-credential heuristic ใน `playwright.config.ts` และ
+  test 2 ไฟล์, SSRF heuristic ใน integration test 2 ไฟล์, taint/path-traversal
+  heuristic ใน `src/lib/content/source.ts` (3 จุด), และ
+  `src/components/WaitlistForm.tsx` (1 จุด)
+- ข้อสังเกต: สแกนระบุเองว่า coverage ไม่สมบูรณ์ — การไม่พบเพิ่มไม่ใช่การรับรองความปลอดภัย
+
+### ผล adjudication หนี้ security นั้น (checkpoint เดียวกัน 2026-08-16)
+
+ปิดจบใน `reports/reviews/academy-security-scan-remediation-20260816.md`:
+- จริง 1 จุด: integration runtime-api test fetch ตรงเข้า `ACADEMY_DATA_API_URL`
+  ใดๆ โดยข้าม origin rule ของ production client — แก้ด้วย
+  `isSafeAcademyDataApiUrl()` (export ใหม่จาก `src/lib/db/server.ts`, ไม่เปลี่ยน
+  พฤติกรรม production) + เทสเจาะจง 8 เคส (แดง→เขียว) ชุด unit 16/16,
+  เต็มชุด 1359/1359
+- ปรับแข็ง 1 จุด: `playwright.config.ts` ค่าเดิม (playwright-only) ย้ายเป็น
+  env-default pattern แบบ byte-identical — offline/CI ไม่เปลี่ยน
+- false positive 10 จุด พร้อมหลักฐานตามไฟล์ (script ไร้ input surface,
+  leak-canary literals, isSafeLocalTestTarget, zod fail-closed, ไม่มี mongo,
+  ตรวจที่ trust boundary แล้ว)
+- tsc exit 0 · eslint 0 error (1 warning เดิม) · แฟล็ก production ยัง false ทั้งหมด
+
+### ปิด M2 ของ codex review รอบรวม (2026-08-16)
+
+- M2-1 skip ที่อ่อนกว่าเดิม: เพิ่ม guard test ที่รันเสมอใน
+  `tests/integration/academy-runtime-api.test.ts` — ถ้าตั้ง
+  `ACADEMY_DATA_API_URL` แล้วชี้ origin ที่ app client ปฏิเสธ ต้อง fail
+  ทันที (skip เหลือเฉพาะกรณีไม่ได้ตั้งค่าเลย)
+- M2-2 freeze manifest Part 2 แยก:
+  `reports/reviews/academy-security-scan-remediation-freeze-20260816.json`
+  (VERIFIED 5 files — code/test 4 ไฟล์ + รายงาน remediation)
+- หมายเหตุถือไว้: `academy-retention-api.test.ts` ใช้รูป skip เดิมของ repo
+  กับ `isSafeLocalTestTarget` (เก่าก่อน checkpoint นี้) — จุดเดียวกันแต่อยู่นอก
+  delta จึงไม่แตะ บันทึกเป็น debt ตามรูปแบบ guard เดียวกันเมื่อแตะไฟล์นั้นจริง

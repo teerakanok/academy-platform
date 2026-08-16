@@ -8,14 +8,19 @@
       "bytes": 11432
     },
     {
+      "path": "academy-web/scripts/adversarial/run-all.mjs",
+      "sha256": "3abdfec18d22130a4f7659577f8f8cd88fdcebf20273fde350a5e4e209fb1a9c",
+      "bytes": 5964
+    },
+    {
       "path": "academy-web/scripts/adversarial/sandbox-exit-path-poc.mjs",
       "sha256": "fb87facc9f22e14b45ee6f280400b9d2498574198206d4c40d7986baf004b61c",
       "bytes": 3226
     },
     {
       "path": "academy-web/scripts/adversarial/sandbox.mjs",
-      "sha256": "788ae20b8d69b4468ebc54a4b5bbc454df043338eb89bffcf19dc22e8b89ea26",
-      "bytes": 25998
+      "sha256": "970b215d60d7a8b1fe5f64478040cf033aff50a70d19b4e1c66f6d5442c2424e",
+      "bytes": 27060
     },
     {
       "path": "academy-web/scripts/adversarial/workerd-runner-attacks.mjs",
@@ -33,9 +38,14 @@
       "bytes": 11893
     },
     {
+      "path": "academy-web/tests/unit/adversarial-run-all.test.ts",
+      "sha256": "9f5101d8ebfcf21bd9a81d3ec2626a6c86f5272292baecce6ee3879be53f805d",
+      "bytes": 2769
+    },
+    {
       "path": "academy-web/tests/unit/adversarial-sandbox.test.ts",
-      "sha256": "93a95a2d84aff3053c53457a531bbf4045fd921f795f49d09ad243f2d031dfce",
-      "bytes": 19887
+      "sha256": "8be735c2b5019b98b5fb278ceabc74faa91869c9b413721c3a81fbde619ec49c",
+      "bytes": 20504
     },
     {
       "path": "academy-web/tests/unit/identity-client-assertion-webcrypto-signer.test.ts",
@@ -64,8 +74,8 @@
     },
     {
       "path": "plans/active_plan.md",
-      "sha256": "3d70744bb9dc3914799c41856bdd85718b4de3a42c23c9177ec73dbad3968234",
-      "bytes": 233485
+      "sha256": "21c4d9ed9cc82e897de7a4f517f8487553b04f2e259823b0614503547d102837",
+      "bytes": 239931
     },
     {
       "path": "reports/reviews/academy-identity-client-assertion-webcrypto-signer-contract-rebind-local-checkpoint-20260814.md",
