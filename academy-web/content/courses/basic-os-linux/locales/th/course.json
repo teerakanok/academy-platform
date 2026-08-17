@@ -28,6 +28,9 @@
     "users-and-root": "ผู้ใช้ กลุ่ม และ root",
     "permissions": "อ่านและแก้ permission",
     "processes-and-packages": "โปรเซสและการอัปเดตซอฟต์แวร์",
-    "pipes-and-logs": "Pipe, grep และการอ่าน log"
+    "signals-and-jobs": "signal, job และการสั่งหยุดอย่างถูกวิธี",
+    "pipes-and-logs": "Pipe, grep และการอ่าน log",
+    "text-and-regex": "แพตเทิร์น: regular expression เท่าที่ใช้จริง",
+    "sed-and-awk": "ดัดรูปข้อความ: sed และ awk"
   }
 }

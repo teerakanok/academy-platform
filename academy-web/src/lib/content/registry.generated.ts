@@ -12,26 +12,32 @@ import c5 from '../../../content/courses/basic-os-linux/locales/en/lessons/os-wh
 import c6 from '../../../content/courses/basic-os-linux/locales/en/lessons/permissions.json'
 import c7 from '../../../content/courses/basic-os-linux/locales/en/lessons/pipes-and-logs.json'
 import c8 from '../../../content/courses/basic-os-linux/locales/en/lessons/processes-and-packages.json'
-import c9 from '../../../content/courses/basic-os-linux/locales/en/lessons/users-and-root.json'
-import c10 from '../../../content/courses/basic-os-linux/locales/en/course.json'
-import c11 from '../../../content/courses/basic-os-linux/locales/th/lessons/files-and-safety.json'
-import c12 from '../../../content/courses/basic-os-linux/locales/th/lessons/filesystem-tree.json'
-import c13 from '../../../content/courses/basic-os-linux/locales/th/lessons/get-a-linux.json'
-import c14 from '../../../content/courses/basic-os-linux/locales/th/lessons/linux-and-distros.json'
-import c15 from '../../../content/courses/basic-os-linux/locales/th/lessons/navigate-and-look.json'
-import c16 from '../../../content/courses/basic-os-linux/locales/th/lessons/os-what-it-does.json'
-import c17 from '../../../content/courses/basic-os-linux/locales/th/lessons/permissions.json'
-import c18 from '../../../content/courses/basic-os-linux/locales/th/lessons/pipes-and-logs.json'
-import c19 from '../../../content/courses/basic-os-linux/locales/th/lessons/processes-and-packages.json'
-import c20 from '../../../content/courses/basic-os-linux/locales/th/lessons/users-and-root.json'
-import c21 from '../../../content/courses/basic-os-linux/locales/th/course.json'
-import c22 from '../../../content/courses/basic-os-linux/course.json'
-import c23 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-hands-on.json'
-import c24 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-reading.json'
-import c25 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-references.json'
-import c26 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-simulation.json'
-import c27 from '../../../content/courses/content-formats-demo/locales/en/course.json'
-import c28 from '../../../content/courses/content-formats-demo/course.json'
+import c9 from '../../../content/courses/basic-os-linux/locales/en/lessons/sed-and-awk.json'
+import c10 from '../../../content/courses/basic-os-linux/locales/en/lessons/signals-and-jobs.json'
+import c11 from '../../../content/courses/basic-os-linux/locales/en/lessons/text-and-regex.json'
+import c12 from '../../../content/courses/basic-os-linux/locales/en/lessons/users-and-root.json'
+import c13 from '../../../content/courses/basic-os-linux/locales/en/course.json'
+import c14 from '../../../content/courses/basic-os-linux/locales/th/lessons/files-and-safety.json'
+import c15 from '../../../content/courses/basic-os-linux/locales/th/lessons/filesystem-tree.json'
+import c16 from '../../../content/courses/basic-os-linux/locales/th/lessons/get-a-linux.json'
+import c17 from '../../../content/courses/basic-os-linux/locales/th/lessons/linux-and-distros.json'
+import c18 from '../../../content/courses/basic-os-linux/locales/th/lessons/navigate-and-look.json'
+import c19 from '../../../content/courses/basic-os-linux/locales/th/lessons/os-what-it-does.json'
+import c20 from '../../../content/courses/basic-os-linux/locales/th/lessons/permissions.json'
+import c21 from '../../../content/courses/basic-os-linux/locales/th/lessons/pipes-and-logs.json'
+import c22 from '../../../content/courses/basic-os-linux/locales/th/lessons/processes-and-packages.json'
+import c23 from '../../../content/courses/basic-os-linux/locales/th/lessons/sed-and-awk.json'
+import c24 from '../../../content/courses/basic-os-linux/locales/th/lessons/signals-and-jobs.json'
+import c25 from '../../../content/courses/basic-os-linux/locales/th/lessons/text-and-regex.json'
+import c26 from '../../../content/courses/basic-os-linux/locales/th/lessons/users-and-root.json'
+import c27 from '../../../content/courses/basic-os-linux/locales/th/course.json'
+import c28 from '../../../content/courses/basic-os-linux/course.json'
+import c29 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-hands-on.json'
+import c30 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-reading.json'
+import c31 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-references.json'
+import c32 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-simulation.json'
+import c33 from '../../../content/courses/content-formats-demo/locales/en/course.json'
+import c34 from '../../../content/courses/content-formats-demo/course.json'
 
 /** โครง + ข้อความของทุกคอร์ส ผูกเข้ามาตอน build ไม่ใช่ตอน request */
 export const COURSE_REGISTRY: Record<
@@ -39,9 +45,9 @@ export const COURSE_REGISTRY: Record<
   { __structure: unknown } & Record<string, { __copy: unknown } & Record<string, unknown>>
 > = {
   "basic-os-linux": {
-    __structure: c22,
+    __structure: c28,
     "en": {
-      __copy: c10,
+      __copy: c13,
       "files-and-safety": c0,
       "filesystem-tree": c1,
       "get-a-linux": c2,
@@ -51,30 +57,36 @@ export const COURSE_REGISTRY: Record<
       "permissions": c6,
       "pipes-and-logs": c7,
       "processes-and-packages": c8,
-      "users-and-root": c9,
+      "sed-and-awk": c9,
+      "signals-and-jobs": c10,
+      "text-and-regex": c11,
+      "users-and-root": c12,
     },
     "th": {
-      __copy: c21,
-      "files-and-safety": c11,
-      "filesystem-tree": c12,
-      "get-a-linux": c13,
-      "linux-and-distros": c14,
-      "navigate-and-look": c15,
-      "os-what-it-does": c16,
-      "permissions": c17,
-      "pipes-and-logs": c18,
-      "processes-and-packages": c19,
-      "users-and-root": c20,
+      __copy: c27,
+      "files-and-safety": c14,
+      "filesystem-tree": c15,
+      "get-a-linux": c16,
+      "linux-and-distros": c17,
+      "navigate-and-look": c18,
+      "os-what-it-does": c19,
+      "permissions": c20,
+      "pipes-and-logs": c21,
+      "processes-and-packages": c22,
+      "sed-and-awk": c23,
+      "signals-and-jobs": c24,
+      "text-and-regex": c25,
+      "users-and-root": c26,
     },
   },
   "content-formats-demo": {
-    __structure: c28,
+    __structure: c34,
     "en": {
-      __copy: c27,
-      "formats-hands-on": c23,
-      "formats-reading": c24,
-      "formats-references": c25,
-      "formats-simulation": c26,
+      __copy: c33,
+      "formats-hands-on": c29,
+      "formats-reading": c30,
+      "formats-references": c31,
+      "formats-simulation": c32,
     },
   },
 } as never

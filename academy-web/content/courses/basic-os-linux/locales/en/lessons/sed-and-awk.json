@@ -1,0 +1,160 @@
+{
+  "nodeId": "sed-and-awk",
+  "locale": "en",
+  "title": "Reshaping text: sed and awk",
+  "objective": "By the end of this lesson you can replace text across files without opening an editor, and pull specific fields out of structured output to answer a question.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "grep decides which lines you keep. sed changes what is in them. awk splits each line into fields and lets you work with them by position. Between the three, most text-shaped questions have a one-line answer."
+    },
+    {
+      "kind": "heading",
+      "text": "sed: substitution, mostly"
+    },
+    {
+      "kind": "paragraph",
+      "text": "sed can do many things, but in real use it is a search-and-replace tool. The pattern is always the same four parts: s for substitute, what to find, what to put there, and optional flags."
+    },
+    {
+      "kind": "code",
+      "caption": "The one form to learn",
+      "lines": [
+        "sed 's/old/new/' file        # replace the FIRST match on each line",
+        "sed 's/old/new/g' file       # g = every match on the line",
+        "sed 's/old/new/gi' file      # i = ignore case as well",
+        "sed -E 's/[0-9]+/N/g' file   # -E for the same modern patterns grep -E uses",
+        "sed '/^#/d' config.conf      # delete lines that start with #",
+        "sed -n '10,20p' file         # print only lines 10 to 20"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "sed -i edits the file in place",
+      "text": "Without -i, sed prints the result and leaves the file alone — which is what you want while you are still checking the pattern. With -i it rewrites the file, and if the pattern was wrong you have already lost the original. Run it without -i first, read the output, and only then add it. On a file that matters, keep a copy: sed -i.bak writes one for you."
+    },
+    {
+      "kind": "heading",
+      "text": "awk: fields by position"
+    },
+    {
+      "kind": "paragraph",
+      "text": "awk splits every line on whitespace and numbers the pieces: $1 is the first field, $2 the second, $NF the last one, and $0 the whole line. That is 90% of the awk anyone uses."
+    },
+    {
+      "kind": "code",
+      "caption": "Pulling fields out",
+      "lines": [
+        "awk '{print $1}' access.log            # the first field of every line",
+        "awk '{print $1, $NF}' access.log       # first and last",
+        "awk -F: '{print $1}' /etc/passwd       # -F sets the separator: usernames",
+        "awk '$3 > 1000' /etc/passwd            # only lines where field 3 is over 1000",
+        "awk -F: '$3 >= 1000 {print $1}' /etc/passwd   # combine: real user accounts",
+        "ps aux | awk '$3 > 5 {print $1, $2, $3}'      # processes using over 5% CPU"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "The pattern-then-action shape",
+      "text": "An awk program reads as condition { what to do }. Leave out the condition and it runs on every line. Leave out the action and it prints matching lines. Once you see that shape, awk stops looking cryptic."
+    },
+    {
+      "kind": "heading",
+      "text": "Adding things up"
+    },
+    {
+      "kind": "code",
+      "caption": "Totals in one line",
+      "lines": [
+        "du -k * | awk '{total += $1} END {print total \" KB\"}'",
+        "awk -F: '{count++} END {print count \" accounts\"}' /etc/passwd",
+        "awk '{sum += $10} END {print sum/NR}' access.log   # NR = number of records read"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "END runs once after the last line, which is where totals belong. That single idea covers most counting and summing you will ever need to do at a shell."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Where this matters in security work",
+      "text": "Auditing accounts, summing bytes transferred per address, extracting the user field from an authentication log, normalising a config before comparing two machines — these are field-and-substitution problems. The engineer who can do them at the shell answers questions in seconds that otherwise wait for someone to build a report."
+    },
+    {
+      "kind": "try",
+      "title": "Reshape real system files",
+      "steps": [
+        "Run: awk -F: '{print $1}' /etc/passwd | head              (usernames only)",
+        "Run: awk -F: '$3 >= 1000 {print $1, $3}' /etc/passwd      (human accounts, by convention UID 1000+)",
+        "Run: awk -F: '{count++} END {print count}' /etc/passwd    (how many accounts exist)",
+        "Run: ps aux | awk '{print $1}' | sort | uniq -c | sort -rn   (processes grouped by owner)",
+        "Run: sed 's/:/ | /g' /etc/passwd | head                   (same file, different shape — no -i, nothing changed)"
+      ],
+      "expected": "Usernames, then only real user accounts, then a count, then a per-owner process tally, and finally a reformatted view of a system file that was never modified — because you left -i off."
+    }
+  ],
+  "cheatsheet": [
+    "sed 's/old/new/g' replaces every match on each line",
+    "sed -E uses the same modern patterns as grep -E",
+    "sed without -i prints the result; sed -i rewrites the file for real",
+    "sed -i.bak keeps a copy of the original — cheap insurance",
+    "awk splits on whitespace: $1 first field, $NF last, $0 whole line",
+    "awk -F: splits on a different separator",
+    "awk reads as condition { action } — either part can be omitted",
+    "END { } runs after the last line: totals and counts live there",
+    "NR is how many lines were read — divide by it for an average"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What is the difference between sed 's/a/b/' and sed 's/a/b/g' ?",
+      "choices": {
+        "A": "No difference",
+        "B": "The first replaces only the first match on each line; g replaces every match on the line",
+        "C": "The first is case-insensitive",
+        "D": "g means global across all files"
+      },
+      "correct": ["B"],
+      "explanation": "g applies to every occurrence within each line. Without it, only the first occurrence on a line is replaced — a common source of surprise."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "You are about to run a substitution across an important configuration file. What do you do first?",
+      "choices": {
+        "A": "Run it with -i so the change takes effect immediately",
+        "B": "Run it without -i, read the output, and only then add -i (or use -i.bak)",
+        "C": "Copy the file to /tmp and edit there instead",
+        "D": "Nothing — sed always keeps a backup"
+      },
+      "correct": ["B"],
+      "explanation": "Without -i, sed only prints what the result would be. That is the free preview. -i rewrites in place, and a wrong pattern has then already destroyed the original."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "In awk, what does $NF refer to?",
+      "choices": {
+        "A": "The number of fields",
+        "B": "The last field on the line",
+        "C": "The first field",
+        "D": "The whole line"
+      },
+      "correct": ["B"],
+      "explanation": "NF is the number of fields, so $NF is the field at that position — the last one. $0 is the whole line."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Which command prints the usernames of accounts with UID 1000 or higher?",
+      "choices": {
+        "A": "awk -F: '$3 >= 1000 {print $1}' /etc/passwd",
+        "B": "grep 1000 /etc/passwd",
+        "C": "sed 's/1000//' /etc/passwd",
+        "D": "awk '{print $1000}' /etc/passwd"
+      },
+      "correct": ["A"],
+      "explanation": "-F: splits on the colon used in /etc/passwd, the condition filters on the third field (the UID), and the action prints the first field (the name)."
+    }
+  ]
+}

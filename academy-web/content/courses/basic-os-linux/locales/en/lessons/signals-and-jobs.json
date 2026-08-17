@@ -1,0 +1,144 @@
+{
+  "nodeId": "signals-and-jobs",
+  "locale": "en",
+  "title": "Signals, jobs, and stopping things properly",
+  "objective": "By the end of this lesson you can stop a process the right way, understand what kill -9 actually costs, and keep long-running work alive after you disconnect.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "You already know how to find a process. This lesson is about the other half: telling it what to do. Linux does that with signals — small messages the kernel delivers to a running process. kill is badly named: it sends a signal, and most of those signals are polite requests."
+    },
+    {
+      "kind": "heading",
+      "text": "The signals worth knowing"
+    },
+    {
+      "kind": "table",
+      "headers": ["Signal", "What it asks", "Can the process ignore it?"],
+      "rows": [
+        ["TERM (15)", "Shut down cleanly — finish writing, close files, exit", "Yes, and that is the point"],
+        ["HUP (1)", "Reload your configuration without restarting", "Yes — many services use it exactly for this"],
+        ["INT (2)", "The interrupt you send with Ctrl+C", "Yes"],
+        ["KILL (9)", "Stop existing, right now", "No — the kernel removes it"],
+        ["STOP / CONT", "Pause · resume", "No"]
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "Sending them",
+      "lines": [
+        "kill 4821            # TERM by default — the polite request",
+        "kill -HUP 4821       # reload configuration in place",
+        "kill -9 4821         # KILL — no cleanup, last resort",
+        "pkill -f myscript.sh # match by command line instead of PID",
+        "killall nginx        # every process with that name"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "What kill -9 actually costs",
+      "text": "TERM lets a process finish the write it was in the middle of, flush its buffers, and remove its lock files. KILL gives it none of that. Reaching for -9 first is how you get half-written files, stale locks that block the next start, and databases that need recovery on boot. Try TERM, wait a few seconds, and only then escalate."
+    },
+    {
+      "kind": "heading",
+      "text": "Jobs: several things at once in one terminal"
+    },
+    {
+      "kind": "code",
+      "caption": "Foreground and background",
+      "lines": [
+        "long-task.sh &        # start it in the background",
+        "jobs                  # list what this shell started",
+        "fg %1                 # bring job 1 back to the foreground",
+        "bg %1                 # let a paused job continue in the background",
+        "Ctrl+Z                # pause what is in the foreground",
+        "Ctrl+C                # send INT to what is in the foreground"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Why your job dies when you close the terminal",
+      "text": "When your session ends, the shell sends HUP to the jobs it started — hangup, a name inherited from the era of dial-up terminals. That is why a long copy over SSH dies the moment your laptop sleeps."
+    },
+    {
+      "kind": "heading",
+      "text": "Surviving a disconnect"
+    },
+    {
+      "kind": "code",
+      "caption": "Three ways to keep it running",
+      "lines": [
+        "nohup long-task.sh &         # ignore HUP; output goes to nohup.out",
+        "tmux                         # a session you can detach from and return to",
+        "systemd-run --user long-task.sh   # hand it to the service manager"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "For anything you will come back to, tmux is worth learning: start it, run your work inside, press Ctrl+B then d to detach, and reconnect later with tmux attach. The work kept running on the server while your connection did not."
+    },
+    {
+      "kind": "try",
+      "title": "Feel the difference between TERM and KILL",
+      "steps": [
+        "Run: sleep 600 &            (start a background job)",
+        "Run: jobs                   (see it)",
+        "Run: kill %1                (polite TERM — it exits)",
+        "Run: sleep 600 & then: ps aux | grep sleep    (find its PID)",
+        "Run: kill -9 <that PID>     (forced — note there is no shutdown at all)",
+        "Run: nohup sleep 60 &       (start something that survives a hangup)"
+      ],
+      "expected": "A job you start, list, and stop politely; then the same thing removed by force; and finally a process detached from your session. On a real service the difference between the second and the first is whether its files were closed properly."
+    }
+  ],
+  "cheatsheet": [
+    "kill sends a signal — it is not only about killing",
+    "TERM (15) asks to shut down cleanly · KILL (9) removes it with no cleanup",
+    "HUP (1) usually means reload configuration without restarting",
+    "Try TERM first, wait, then escalate to -9 only if it is stuck",
+    "pkill -f matches the command line · killall matches the name",
+    "command & backgrounds · jobs lists · fg/bg move it · Ctrl+Z pauses",
+    "Closing the terminal sends HUP to its jobs — that is why they die",
+    "nohup, tmux, or a service manager keep work alive after you disconnect"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A service is not responding. Which signal do you send first?",
+      "choices": {
+        "A": "KILL (9), to be certain it stops",
+        "B": "TERM (15), so it can close files and release locks before exiting",
+        "C": "STOP, to pause it forever",
+        "D": "HUP, which always stops a process"
+      },
+      "correct": ["B"],
+      "explanation": "TERM is the request to shut down cleanly. Escalate to KILL only when the process ignores it, because KILL gives no opportunity to finish writes or clean up locks."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why does a long-running command die when you close the SSH session that started it?",
+      "choices": {
+        "A": "The server reboots",
+        "B": "The shell sends HUP to its jobs when the session ends",
+        "C": "Background jobs always have a time limit",
+        "D": "The file it was writing gets locked"
+      },
+      "correct": ["B"],
+      "explanation": "Hangup is delivered to the jobs of an ending session. nohup, tmux, or handing the work to a service manager are the ways around it."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "What is the realistic risk of routinely using kill -9?",
+      "choices": {
+        "A": "It uses more CPU than kill",
+        "B": "Half-written files, stale lock files, and data that needs recovery — because the process never gets to clean up",
+        "C": "It requires root every time",
+        "D": "There is no risk; it is the recommended default"
+      },
+      "correct": ["B"],
+      "explanation": "KILL cannot be caught or handled. Whatever the process was in the middle of stays in the middle of it."
+    }
+  ]
+}

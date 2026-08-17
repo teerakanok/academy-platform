@@ -28,6 +28,9 @@
     "users-and-root": "Users, groups, and root",
     "permissions": "Read and change permissions",
     "processes-and-packages": "Processes and keeping software current",
-    "pipes-and-logs": "Pipes, grep, and reading logs"
+    "signals-and-jobs": "Signals, jobs, and stopping things properly",
+    "pipes-and-logs": "Pipes, grep, and reading logs",
+    "text-and-regex": "Patterns: regular expressions that earn their keep",
+    "sed-and-awk": "Reshaping text: sed and awk"
   }
 }

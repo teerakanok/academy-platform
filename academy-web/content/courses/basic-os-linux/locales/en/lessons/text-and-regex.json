@@ -1,0 +1,162 @@
+{
+  "nodeId": "text-and-regex",
+  "locale": "en",
+  "title": "Patterns: regular expressions that earn their keep",
+  "objective": "By the end of this lesson you can write the handful of regular expressions that answer most real questions, and you know when a pattern is the wrong tool.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "You have used grep to find lines containing a word. A regular expression is the same idea with a shape instead of a fixed word: not \"find failed\" but \"find something that looks like an IP address at the start of a line\". Ten symbols cover almost everything you will actually need."
+    },
+    {
+      "kind": "heading",
+      "text": "The symbols that matter"
+    },
+    {
+      "kind": "table",
+      "headers": ["Pattern", "Matches", "Example"],
+      "rows": [
+        [".", "Any single character", "a.c matches abc, a7c"],
+        ["*", "Zero or more of what came before", "ab*c matches ac, abc, abbc"],
+        ["+", "One or more (needs grep -E)", "ab+c matches abc but not ac"],
+        ["?", "Optional (needs grep -E)", "colou?r matches color and colour"],
+        ["^", "Start of the line", "^Jan matches lines beginning with Jan"],
+        ["$", "End of the line", "failed$ matches lines ending in failed"],
+        ["[abc]", "Any one of these characters", "[Ee]rror matches Error and error"],
+        ["[0-9]", "Any digit — [a-z] any lowercase letter", "[0-9][0-9]* matches a number"],
+        ["\\|", "Either side (grep -E: | )", "grep -E 'error|fail'"],
+        ["{2,4}", "Between 2 and 4 repeats (grep -E)", "[0-9]{3} matches exactly three digits"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Use grep -E and stop escaping things",
+      "text": "Plain grep uses an older dialect where +, ?, | and {} must be written with a backslash. grep -E uses the modern one where they do not. Reach for grep -E by default and your patterns will look like the ones in every tutorial and language you meet later."
+    },
+    {
+      "kind": "heading",
+      "text": "Four patterns you will reuse constantly"
+    },
+    {
+      "kind": "code",
+      "caption": "Worth memorising",
+      "lines": [
+        "grep -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}' app.log      # lines starting with a date",
+        "grep -E '([0-9]{1,3}\\.){3}[0-9]{1,3}' access.log  # anything shaped like an IPv4 address",
+        "grep -Ei 'error|fail|denied' app.log               # any of several words, case-insensitive",
+        "grep -E '^\\s*$' notes.txt                          # blank lines (spaces only)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Flags that turn grep into an investigation tool"
+    },
+    {
+      "kind": "table",
+      "headers": ["Flag", "What it gives you"],
+      "rows": [
+        ["-n", "Line numbers — so you can go straight there in an editor"],
+        ["-r", "Search a whole directory tree"],
+        ["-o", "Print only the matching part, not the whole line"],
+        ["-A 3 / -B 3 / -C 3", "Show 3 lines after / before / around each match"],
+        ["-l", "Print only the names of files that matched"],
+        ["--include='*.conf'", "Limit a recursive search to certain files"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Context is what makes a log readable",
+      "text": "An error line alone rarely explains itself. grep -C 3 shows you the three lines either side — what the system was doing before it failed and what it did next. In practice that is the difference between finding the error and understanding it."
+    },
+    {
+      "kind": "code",
+      "caption": "Combining them the way people actually do",
+      "lines": [
+        "grep -rn --include='*.conf' 'password' /etc     # credentials sitting in config files",
+        "grep -C 3 'segfault' /var/log/syslog            # a crash with its surroundings",
+        "grep -oE '([0-9]{1,3}\\.){3}[0-9]{1,3}' access.log | sort | uniq -c | sort -rn | head",
+        "#  ^ pull out every IP, count them, rank them — the pipeline from the previous lesson"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "When a pattern is the wrong tool",
+      "text": "Regular expressions match shapes in text; they do not understand structure. Parsing JSON, HTML, or nested configuration with a pattern works on your sample and breaks on the real file. When the data has structure, use a tool that knows that structure — jq for JSON, the service's own query command for its data."
+    },
+    {
+      "kind": "try",
+      "title": "Build up one pattern at a time",
+      "steps": [
+        "Run: grep -c '' /var/log/syslog                          (how many lines you are dealing with)",
+        "Run: grep -Ei 'error|warn' /var/log/syslog | head        (a first filter)",
+        "Run: grep -En '^[A-Z][a-z]{2} [ 0-9]' /var/log/syslog | head   (lines starting with a date stamp)",
+        "Run: grep -C 2 -i error /var/log/syslog | head -30       (errors with their context)",
+        "Run: grep -rn 'PermitRootLogin' /etc/ssh/                (a specific setting, with line numbers)"
+      ],
+      "expected": "A count, then progressively sharper filters, then errors shown with the lines around them, and finally a configuration setting located by file and line — which is exactly how a real question gets answered."
+    }
+  ],
+  "cheatsheet": [
+    ". any character · * zero or more · + one or more · ? optional",
+    "^ start of line · $ end of line · [abc] one of these · [0-9] a digit",
+    "{3} exactly three · {2,4} between two and four",
+    "Use grep -E so +, ?, | and {} work without backslashes",
+    "-n line numbers · -r recursive · -o only the match · -l only filenames",
+    "-C 3 shows three lines around each match — context makes logs readable",
+    "grep -oE 'pattern' | sort | uniq -c | sort -rn ranks what appears most",
+    "Do not parse JSON or HTML with a pattern — use a tool that understands the structure"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Which pattern matches lines that begin with three digits?",
+      "choices": {
+        "A": "grep -E '[0-9]{3}$'",
+        "B": "grep -E '^[0-9]{3}'",
+        "C": "grep -E '[0-9]*'",
+        "D": "grep -E '^{3}[0-9]'"
+      },
+      "correct": ["B"],
+      "explanation": "^ anchors to the start of the line and {3} means exactly three repeats. The first option anchors to the end instead, and the third matches almost everything because * allows zero."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "You found an error line in a log but it does not explain itself. What is the quickest next step?",
+      "choices": {
+        "A": "grep -c to count how often it happens",
+        "B": "grep -C 3 to show the lines around it",
+        "C": "grep -l to list the file names",
+        "D": "grep -v to hide it"
+      },
+      "correct": ["B"],
+      "explanation": "Context lines show what happened immediately before and after — usually where the actual explanation is."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why is a regular expression a poor tool for reading a JSON configuration file?",
+      "choices": {
+        "A": "Patterns cannot match curly braces",
+        "B": "Patterns match shapes in text but do not understand nesting or structure, so they work on your sample and break on real data",
+        "C": "JSON files are always too large",
+        "D": "grep cannot open .json files"
+      },
+      "correct": ["B"],
+      "explanation": "Structure needs a parser. jq understands JSON nesting; a pattern only sees characters in a line."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "What does grep -oE '([0-9]{1,3}\\.){3}[0-9]{1,3}' access.log give you?",
+      "choices": {
+        "A": "Every whole line that contains an IPv4-shaped address",
+        "B": "Only the IPv4-shaped addresses themselves, one per match",
+        "C": "The number of addresses found",
+        "D": "The lines that do not contain an address"
+      },
+      "correct": ["B"],
+      "explanation": "-o prints just the matching portion rather than the full line, which is what makes it feedable into sort | uniq -c for counting."
+    }
+  ]
+}

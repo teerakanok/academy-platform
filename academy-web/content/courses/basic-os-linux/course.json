@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "beginner",
-  "estimatedMinutes": 165,
+  "estimatedMinutes": 217,
   "coverMotif": "terminal",
   "skills": [
     {
@@ -192,6 +192,19 @@
       }
     },
     {
+      "id": "signals-and-jobs",
+      "kind": "lesson",
+      "prerequisites": [
+        "processes-and-packages"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "processes": 5,
+        "cli": 2,
+        "security-lens": 1
+      }
+    },
+    {
       "id": "pipes-and-logs",
       "kind": "capstone",
       "prerequisites": [
@@ -202,6 +215,30 @@
         "cli": 4,
         "processes": 3,
         "security-lens": 4
+      }
+    },
+    {
+      "id": "text-and-regex",
+      "kind": "lesson",
+      "prerequisites": [
+        "pipes-and-logs"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "cli": 5,
+        "security-lens": 2
+      }
+    },
+    {
+      "id": "sed-and-awk",
+      "kind": "lesson",
+      "prerequisites": [
+        "text-and-regex"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "cli": 5,
+        "filesystem": 1
       }
     }
   ]

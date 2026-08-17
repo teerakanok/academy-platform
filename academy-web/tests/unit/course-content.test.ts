@@ -44,11 +44,14 @@ describe('Basic OS & Linux — ครบถ้วนพร้อมสอน', (
     expect(course.locale).toBe('en')
   })
 
-  it('ความยาวรวมอยู่ในช่วงที่ประกาศไว้ 2–3 ชั่วโมง', () => {
+  it('ความยาวรวมตรงกับที่ประกาศ และอยู่ในช่วงของคอร์สพื้นฐานเต็มรูป 3–6 ชั่วโมง', () => {
+    // ช่วงเดิมคือ 2–3 ชั่วโมงตอนคอร์สมี 10 บท ตอนนี้คอร์สขยายเป็น 18 บท
+    // (เพิ่มโมดูล signal/job, การประมวลผลข้อความ และการเขียนสคริปต์)
+    // เกตยังทำหน้าที่เดิม: กันคอร์สบวมเกินและกันบทหายไปเงียบ ๆ
     const summed = course.structure.nodes.reduce((total, n) => total + n.estimatedMinutes, 0)
     expect(summed).toBe(course.structure.estimatedMinutes)
-    expect(summed).toBeGreaterThanOrEqual(120)
-    expect(summed).toBeLessThanOrEqual(180)
+    expect(summed).toBeGreaterThanOrEqual(180)
+    expect(summed).toBeLessThanOrEqual(360)
   })
 
   it('ทุก node มีบทเรียนจริงในภาษาเริ่มต้น — ไม่มีหลุมกลางเส้นทาง', () => {
