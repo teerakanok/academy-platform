@@ -1,0 +1,168 @@
+{
+  "nodeId": "compilation-pipeline",
+  "locale": "en",
+  "title": "From source file to running program",
+  "objective": "By the end of this lesson you can name the four stages between your source file and an executable, inspect the output of each one, and tell from an error message which stage failed.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "One command turns a text file into a program, which makes it easy to treat the whole thing as magic. It is four separate steps, each with its own input, output, and failure messages — and knowing which one failed is most of the work of fixing a build error."
+    },
+    {
+      "kind": "code",
+      "caption": "The pipeline",
+      "lines": [
+        "  hello.c        your source",
+        "     │  preprocessor      (#include, #define — text substitution)",
+        "  hello.i        expanded source, still C",
+        "     │  compiler          (C → assembly for this machine)",
+        "  hello.s        assembly",
+        "     │  assembler         (assembly → machine code)",
+        "  hello.o        object file — machine code with unresolved names",
+        "     │  linker            (join object files and libraries)",
+        "  hello          executable"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Watching each stage happen"
+    },
+    {
+      "kind": "code",
+      "caption": "Stop after any step and look",
+      "lines": [
+        "gcc -E hello.c -o hello.i    # preprocess only",
+        "gcc -S hello.c -o hello.s    # stop after producing assembly",
+        "gcc -c hello.c -o hello.o    # compile and assemble, do not link",
+        "gcc hello.c -o hello         # all four stages",
+        "",
+        "wc -l hello.c hello.i        # note how much #include pulled in"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The preprocessor is only text",
+      "text": "#include does not import a module — it pastes the entire contents of another file in place. #define does not create a constant — it replaces text before the compiler ever sees it. That is why a 5-line program can preprocess to tens of thousands of lines, and why a badly written macro produces errors that mention code you did not write."
+    },
+    {
+      "kind": "heading",
+      "text": "Reading the error and knowing who produced it"
+    },
+    {
+      "kind": "table",
+      "headers": ["Message", "Stage", "Usually means"],
+      "rows": [
+        ["No such file or directory: stdio.h", "Preprocessor", "Missing header or wrong include path"],
+        ["expected ';' before ...", "Compiler", "A syntax error in your C"],
+        ["implicit declaration of function 'foo'", "Compiler", "You called something with no declaration in scope"],
+        ["undefined reference to 'foo'", "Linker", "It compiled, but nothing provides the actual function"],
+        ["ld: library not found for -lssl", "Linker", "The library is not installed or not on the search path"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "'undefined reference' is a linker error, not a typo",
+      "text": "It means the compiler accepted the call because a declaration existed, but at link time no object file or library actually contained the function. The usual causes are a missing source file in the build, or a library you did not link with -l. Reading the stage from the message saves you from searching your syntax for a problem that is not there."
+    },
+    {
+      "kind": "heading",
+      "text": "Flags worth knowing now"
+    },
+    {
+      "kind": "table",
+      "headers": ["Flag", "Effect"],
+      "rows": [
+        ["-Wall -Wextra", "Turn on the warnings that catch real defects"],
+        ["-Werror", "Treat warnings as errors — common in real projects"],
+        ["-g", "Include debug information, so a debugger can show your source"],
+        ["-O0 / -O2", "No optimisation while learning / optimised for release"],
+        ["-o name", "Name the output file"],
+        ["-c", "Compile to an object file without linking"],
+        ["-lm, -lssl", "Link against a library (m is the maths library)"],
+        ["-fsanitize=address", "Add runtime memory checking — you will use this later"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Learn with -O0 -g",
+      "text": "Optimisation rearranges and removes code, so a debugger shows lines executing out of order or variables that no longer exist. While you are learning, turn it off. Turn it back on when you measure performance, and be aware that optimisation can change what undefined behaviour does — a subject of its own lesson."
+    },
+    {
+      "kind": "try",
+      "title": "Take the pipeline apart",
+      "steps": [
+        "Create hello.c:  #include <stdio.h>  then  int main(void){ printf(\"hi\\n\"); return 0; }",
+        "Run: gcc -E hello.c -o hello.i && wc -l hello.c hello.i    (how much came in)",
+        "Run: gcc -S hello.c -o hello.s && head -20 hello.s          (the assembly)",
+        "Run: gcc -c hello.c -o hello.o && file hello.o              (an object file)",
+        "Run: nm hello.o                                             (symbols: printf is undefined here)",
+        "Run: gcc hello.o -o hello && ./hello",
+        "Now break it on purpose: delete the #include and rebuild — read which stage complains"
+      ],
+      "expected": "A tiny source file expanding to a very large preprocessed file, then assembly, then an object file whose symbol table shows printf as unresolved until the linker supplies it. The deliberate break shows you the error message that belongs to a specific stage."
+    }
+  ],
+  "cheatsheet": [
+    "Four stages: preprocess → compile → assemble → link",
+    "-E stops after preprocessing · -S after assembly · -c after the object file",
+    "#include pastes a whole file in; #define is text replacement before compiling",
+    "'expected ;' is the compiler · 'undefined reference' is the linker",
+    "undefined reference = declared but nothing provides it: missing file or missing -l",
+    "-Wall -Wextra always; -Werror in real projects",
+    "-g for debug info, -O0 while learning, -O2 for release",
+    "nm shows the symbols an object file defines and needs"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What does the preprocessor actually do with #include <stdio.h> ?",
+      "choices": {
+        "A": "Loads a compiled module",
+        "B": "Pastes the entire contents of that header file into your source before compilation",
+        "C": "Links the standard library",
+        "D": "Downloads the header if missing"
+      },
+      "correct": ["B"],
+      "explanation": "It is text substitution. That is why a short program can preprocess into tens of thousands of lines."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "You get 'undefined reference to sqrt'. Which stage failed and why?",
+      "choices": {
+        "A": "The compiler — a syntax error",
+        "B": "The linker — the declaration existed so it compiled, but no library or object file provided the function (here, missing -lm)",
+        "C": "The preprocessor — a missing header",
+        "D": "The assembler — an invalid instruction"
+      },
+      "correct": ["B"],
+      "explanation": "Declaration and definition are separate things in C. The header promised the function exists; the linker is the stage that has to find it."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "What does gcc -c produce?",
+      "choices": {
+        "A": "An executable",
+        "B": "An object file: machine code with names that are not yet resolved",
+        "C": "Preprocessed source",
+        "D": "Assembly text"
+      },
+      "correct": ["B"],
+      "explanation": "-c compiles and assembles but does not link, which is how multi-file projects are built before being joined together."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why compile with -O0 while learning?",
+      "choices": {
+        "A": "It makes the program run faster",
+        "B": "Optimisation rearranges and removes code, so a debugger shows lines out of order and variables that no longer exist",
+        "C": "It is required for -Wall to work",
+        "D": "It reduces the executable size"
+      },
+      "correct": ["B"],
+      "explanation": "You want the running program to match the source you are reading. Turn optimisation on when you are measuring performance, not while you are learning what the code does."
+    }
+  ]
+}

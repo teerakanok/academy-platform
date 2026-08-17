@@ -1,0 +1,28 @@
+{
+  "locale": "en",
+  "title": "C & Low-level Programming",
+  "subtitle": "Learn what your code actually does to memory — the layer every higher-level language is standing on, and the one attackers work in.",
+  "audience": "For programmers who can write code in a higher-level language and have never had to think about memory, pointers, or what the compiler is doing. No C experience needed.",
+  "outcomes": [
+    "Explain what happens between your source file and a running program",
+    "Write C that handles memory deliberately instead of hoping",
+    "Read and reason about pointers, including the cases that confuse people",
+    "Recognise the memory bugs behind a large share of real vulnerabilities, and find them with tools",
+    "Work with bits, integer representation, and floating point without guessing",
+    "Build a multi-file project and explain what the linker did"
+  ],
+  "skillLabels": {
+    "c-syntax": "The C language",
+    "memory-model": "How memory is laid out",
+    "pointers": "Pointers",
+    "debugging": "Finding memory bugs",
+    "bits-numbers": "Bits & numbers",
+    "build-systems": "Compiling & linking"
+  },
+  "nodeTitles": {
+    "why-c": "Why C is still worth learning",
+    "compilation-pipeline": "From source file to running program",
+    "first-c-program": "Your first C program",
+    "undefined-behavior": "Undefined behaviour: when C stops promising"
+  }
+}

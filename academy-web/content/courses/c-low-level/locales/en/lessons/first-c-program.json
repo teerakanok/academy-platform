@@ -1,0 +1,203 @@
+{
+  "nodeId": "first-c-program",
+  "locale": "en",
+  "title": "Your first C program",
+  "objective": "By the end of this lesson you can write, compile, and run a C program that takes input and produces output, and you can read every line of it without guessing.",
+  "blocks": [
+    {
+      "kind": "code",
+      "caption": "greet.c — every part explained below",
+      "lines": [
+        "#include <stdio.h>          /* declarations for printf and friends */",
+        "",
+        "int main(void) {            /* the program starts here */",
+        "    int count = 3;",
+        "    const char *name = \"world\";",
+        "",
+        "    for (int i = 0; i < count; i++) {",
+        "        printf(\"hello, %s (%d)\\n\", name, i);",
+        "    }",
+        "",
+        "    return 0;               /* 0 means success, as in the shell */",
+        "}"
+      ]
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Every statement ends with a semicolon; blocks are wrapped in braces",
+        "Every variable declares its type, and the type never changes",
+        "main returns int — the exit code the shell reads, which you met in the Linux course",
+        "Text in double quotes is a string; single quotes are one character: 'a' is not \"a\""
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The types you will actually use"
+    },
+    {
+      "kind": "table",
+      "headers": ["Type", "Holds", "Typical size"],
+      "rows": [
+        ["int", "A whole number", "4 bytes"],
+        ["long", "A larger whole number", "8 bytes on most 64-bit systems"],
+        ["char", "One byte — a character or a small number", "1 byte"],
+        ["float / double", "A number with a fractional part", "4 / 8 bytes"],
+        ["size_t", "A size or count — never negative", "8 bytes on 64-bit"],
+        ["bool", "true or false (needs <stdbool.h>)", "1 byte"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Sizes are not guaranteed, which matters more than it sounds",
+      "text": "The standard specifies minimums, not exact sizes. Code that assumes int is 4 bytes can break when moved to a different platform. When the size matters — a network protocol, a file format, anything crossing a boundary — use the explicit types from <stdint.h>: int32_t, uint64_t, and so on. sizeof tells you the truth on the machine you are on."
+    },
+    {
+      "kind": "heading",
+      "text": "printf: the format string is a small language"
+    },
+    {
+      "kind": "code",
+      "caption": "Placeholders and what they consume",
+      "lines": [
+        "printf(\"%d\\n\", 42);              // int",
+        "printf(\"%ld\\n\", 42L);            // long",
+        "printf(\"%zu\\n\", sizeof(int));    // size_t",
+        "printf(\"%f\\n\", 3.14);            // double",
+        "printf(\"%s\\n\", \"text\");          // string",
+        "printf(\"%c\\n\", 'x');             // one character",
+        "printf(\"%p\\n\", (void *)&count);  // an address",
+        "printf(\"%x\\n\", 255);             // hexadecimal: ff"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "A wrong format specifier is undefined behaviour, not a display bug",
+      "text": "printf trusts the format string completely: it reads arguments according to what you wrote there. Passing a long where %d is expected, or forgetting an argument entirely, makes it read whatever happens to be in that position. This is why -Wall matters — the compiler checks format strings against their arguments and will tell you."
+    },
+    {
+      "kind": "heading",
+      "text": "Reading input, carefully"
+    },
+    {
+      "kind": "code",
+      "caption": "Two ways, one of which is safe",
+      "lines": [
+        "char line[64];",
+        "",
+        "gets(line);                       /* removed from the language — never use it */",
+        "",
+        "if (fgets(line, sizeof line, stdin) != NULL) {   /* bounded: cannot overflow */",
+        "    printf(\"you typed: %s\", line);",
+        "}",
+        "",
+        "int n;",
+        "if (scanf(\"%d\", &n) == 1) {       /* always check the return value */",
+        "    printf(\"n = %d\\n\", n);",
+        "}"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Why gets was deleted from the language",
+      "text": "It read input into a buffer with no way to specify the buffer's size — so any input longer than the buffer wrote past the end of it. That single function was behind a long list of exploited vulnerabilities, and the standards committee eventually removed it. fgets takes a size, which is the entire difference."
+    },
+    {
+      "kind": "heading",
+      "text": "Arguments from the command line"
+    },
+    {
+      "kind": "code",
+      "caption": "argc and argv",
+      "lines": [
+        "int main(int argc, char *argv[]) {",
+        "    printf(\"program name: %s\\n\", argv[0]);",
+        "    for (int i = 1; i < argc; i++) {",
+        "        printf(\"argument %d: %s\\n\", i, argv[i]);",
+        "    }",
+        "    return 0;",
+        "}",
+        "",
+        "/* ./prog one two  ->  argc == 3, argv[0]=\"./prog\", argv[1]=\"one\" */"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Write, break, and fix a program",
+      "steps": [
+        "Create greet.c with the first example above",
+        "Run: gcc -Wall -Wextra -O0 -g greet.c -o greet && ./greet",
+        "Change %d to %s in the printf and rebuild — read the warning carefully, then run it",
+        "Fix it, then add: printf(\"int is %zu bytes\\n\", sizeof(int));",
+        "Rewrite main as int main(int argc, char *argv[]) and print every argument",
+        "Run: ./greet alpha beta && echo \"exit code: $?\"",
+        "Replace the greeting name with input read using fgets"
+      ],
+      "expected": "A program you wrote from scratch, a deliberate format-string mistake that the compiler warned you about before it could misbehave, the real size of an int on your machine, and command-line arguments printed back. Notice that -Wall caught the mistake at compile time — that is the habit worth keeping."
+    }
+  ],
+  "cheatsheet": [
+    "int main(void) or int main(int argc, char *argv[]); return 0 means success",
+    "Every variable has a declared type; every statement ends in a semicolon",
+    "\"text\" is a string, 'x' is a single character — they are different things",
+    "Sizes are not guaranteed: use <stdint.h> types when the size matters, and sizeof to check",
+    "printf: %d int · %ld long · %zu size_t · %f double · %s string · %c char · %p address",
+    "A mismatched format specifier is undefined behaviour — -Wall catches it",
+    "Never use gets; fgets(buf, sizeof buf, stdin) takes a size and cannot overflow",
+    "Always check the return value of scanf and fgets",
+    "argv[0] is the program name; real arguments start at argv[1]"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What does return 0 from main mean?",
+      "choices": {
+        "A": "The program produced no output",
+        "B": "It is the exit code: 0 means success, non-zero means failure — the same convention the shell uses",
+        "C": "It frees all memory",
+        "D": "It is required syntax with no meaning"
+      },
+      "correct": ["B"],
+      "explanation": "It is the same exit code you read with echo $? in the shell, which is how scripts and CI know whether your program succeeded."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why was gets removed from the C standard?",
+      "choices": {
+        "A": "It was too slow",
+        "B": "It had no way to limit how much it read, so any input longer than the buffer wrote past the end of it",
+        "C": "It only worked on Windows",
+        "D": "It was replaced by scanf"
+      },
+      "correct": ["B"],
+      "explanation": "A function that cannot be used safely regardless of caller care. fgets takes a size, which is the whole difference."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "You write printf(\"%d\\n\", someLongValue) where the value is a long. What is the situation?",
+      "choices": {
+        "A": "It prints the value correctly; C converts automatically",
+        "B": "It is undefined behaviour — printf reads the argument according to the format string, so the output may be wrong or worse",
+        "C": "It is a compile error",
+        "D": "It prints zero"
+      },
+      "correct": ["B"],
+      "explanation": "printf trusts the format string. -Wall checks format strings against their arguments, which is why the warnings are worth turning on."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why should you use <stdint.h> types like uint32_t when the size matters?",
+      "choices": {
+        "A": "They are faster",
+        "B": "Because the standard only specifies minimum sizes, so int can differ between platforms — explicit types keep the layout the same everywhere",
+        "C": "They are required by -Wall",
+        "D": "They cannot overflow"
+      },
+      "correct": ["B"],
+      "explanation": "Anything crossing a boundary — a file format, a network protocol, shared memory — needs a layout that does not depend on which machine compiled the code."
+    }
+  ]
+}

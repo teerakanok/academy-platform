@@ -1,0 +1,92 @@
+{
+  "id": "c-low-level",
+  "slug": "c-low-level",
+  "version": "0.1.0",
+  "publicAvailability": "internal",
+  "defaultLocale": "en",
+  "availableLocales": [
+    "en",
+    "th"
+  ],
+  "level": "intermediate",
+  "estimatedMinutes": 64,
+  "coverMotif": "probe",
+  "skills": [
+    {
+      "id": "c-syntax",
+      "maxScore": 100
+    },
+    {
+      "id": "memory-model",
+      "maxScore": 100
+    },
+    {
+      "id": "pointers",
+      "maxScore": 100
+    },
+    {
+      "id": "debugging",
+      "maxScore": 100
+    },
+    {
+      "id": "bits-numbers",
+      "maxScore": 100
+    },
+    {
+      "id": "build-systems",
+      "maxScore": 100
+    }
+  ],
+  "globalSkillWeights": {
+    "foundations": 0.9,
+    "security-ops": 0.1
+  },
+  "nodes": [
+    {
+      "id": "why-c",
+      "kind": "lesson",
+      "prerequisites": [],
+      "estimatedMinutes": 14,
+      "skillWeights": {
+        "c-syntax": 3,
+        "memory-model": 2
+      }
+    },
+    {
+      "id": "compilation-pipeline",
+      "kind": "lesson",
+      "prerequisites": [
+        "why-c"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "build-systems": 5,
+        "c-syntax": 1
+      }
+    },
+    {
+      "id": "first-c-program",
+      "kind": "lesson",
+      "prerequisites": [
+        "compilation-pipeline"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "c-syntax": 5,
+        "build-systems": 2
+      }
+    },
+    {
+      "id": "undefined-behavior",
+      "kind": "lesson",
+      "prerequisites": [
+        "first-c-program"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "c-syntax": 3,
+        "debugging": 4
+      }
+    }
+  ]
+}

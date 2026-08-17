@@ -1,0 +1,166 @@
+{
+  "nodeId": "why-c",
+  "locale": "en",
+  "title": "Why C is still worth learning",
+  "objective": "By the end of this lesson you can explain what C gives you that higher-level languages hide, and why that layer keeps appearing in security work decades after people declared it obsolete.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "In most languages, memory is somebody else's problem. You make a list, it grows; you stop using an object, it disappears. C removes that layer. You get the memory you asked for, exactly that much, and it stays yours until you give it back. Everything that follows in this course comes from that one difference."
+    },
+    {
+      "kind": "heading",
+      "text": "What C actually is"
+    },
+    {
+      "kind": "paragraph",
+      "text": "C is a small language that maps closely onto what the machine does. There is no runtime deciding things on your behalf while the program runs, no automatic memory reclamation, and very little happening that you did not write. That makes it demanding, and it makes it predictable — which is why it is still where operating systems, databases, and embedded devices are written."
+    },
+    {
+      "kind": "table",
+      "headers": ["", "Higher-level language", "C"],
+      "rows": [
+        ["Memory", "Allocated and reclaimed for you", "You request it and you release it"],
+        ["Out-of-range access", "An exception you can catch", "It reads or writes whatever is there"],
+        ["Data layout", "Abstracted away", "Exactly the bytes you declared, in order"],
+        ["Runtime", "A garbage collector or virtual machine", "Almost nothing"],
+        ["When it breaks", "A stack trace", "A crash, or worse, silence"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The trade is real in both directions",
+      "text": "This is not a claim that C is better. Memory-safe languages exist because manual memory management produces a well-documented class of bugs. The reason to learn C is that it makes the machine's actual behaviour visible — and that behaviour is still there underneath every language you use."
+    },
+    {
+      "kind": "heading",
+      "text": "Where you will meet it whether you choose to or not"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Operating system kernels, including the one on the machine you are reading this on",
+        "Databases, web servers, language runtimes — the fast parts of the stack your code sits on",
+        "Embedded and industrial devices, where there is no room for a runtime",
+        "Security work: exploitation, reverse engineering, and vulnerability research all happen at this level"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Why this matters for security specifically",
+      "text": "Memory-safety defects — reading past the end of a buffer, using memory after it was freed, arithmetic that silently wraps — have accounted for a large share of serious vulnerabilities in widely used software for decades, and industry and government analyses keep reporting the same pattern. You cannot understand those reports, or the mitigations built to stop them, without knowing what the code was doing to memory."
+    },
+    {
+      "kind": "heading",
+      "text": "What C does not protect you from"
+    },
+    {
+      "kind": "code",
+      "caption": "Three lines that compile without complaint",
+      "lines": [
+        "int numbers[5];",
+        "numbers[10] = 42;        // past the end of the array — no error, no exception",
+        "",
+        "char *p = malloc(100);",
+        "free(p);",
+        "p[0] = 'x';              // writing to memory you gave back",
+        "",
+        "int big = 2147483647;",
+        "big = big + 1;           // silently wraps to a negative number"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "None of these stop your program at the moment of the mistake. Each one may work fine in testing and fail in production, or corrupt something quietly. Learning C means learning to see these before they happen — which is exactly the skill that transfers to reading someone else's code for defects."
+    },
+    {
+      "kind": "heading",
+      "text": "How this course goes"
+    },
+    {
+      "kind": "list",
+      "ordered": true,
+      "items": [
+        "How a source file becomes a program, so the toolchain stops being magic",
+        "The language itself: enough C to write real programs",
+        "Pointers and the memory model — the heart of the course",
+        "The memory bugs that matter, and the tools that find them",
+        "Bits, integers, and floating point, without hand-waving",
+        "Building something out of several files, and what the linker does"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Check that you can compile",
+      "steps": [
+        "Run: gcc --version      (or: clang --version — either is fine)",
+        "If neither exists: on Debian/Ubuntu run sudo apt install build-essential; on macOS run xcode-select --install",
+        "Run: echo 'int main(void){return 0;}' > check.c",
+        "Run: gcc check.c -o check && ./check && echo 'toolchain works'",
+        "Run: gcc -Wall -Wextra -O0 -g check.c -o check    (the flags this course will use)"
+      ],
+      "expected": "A compiler version, then a program that builds and runs with exit code 0. Those four flags will appear in every example: warnings on, no optimisation, debug information included."
+    }
+  ],
+  "cheatsheet": [
+    "C gives you the memory you asked for and expects you to manage it",
+    "No runtime, no automatic reclamation, almost nothing happening you did not write",
+    "Out-of-range access is not an error in C — it reads or writes whatever is there",
+    "Kernels, databases, servers, and embedded devices are written at this level",
+    "Memory-safety defects are behind a large share of serious vulnerabilities",
+    "Signed integer overflow, use-after-free, and out-of-bounds access all compile silently",
+    "Build with: gcc -Wall -Wextra -O0 -g file.c -o file"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What is the fundamental difference between C and a memory-managed language?",
+      "choices": {
+        "A": "C is faster to write",
+        "B": "In C you request memory and release it yourself; there is no runtime reclaiming it for you",
+        "C": "C has no functions",
+        "D": "C cannot allocate memory at runtime"
+      },
+      "correct": ["B"],
+      "explanation": "That single difference is where the power, the danger, and most of this course come from."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "What happens when C code writes past the end of an array?",
+      "choices": {
+        "A": "An exception is raised",
+        "B": "The program stops immediately",
+        "C": "It writes into whatever memory is there — often with no visible symptom at that moment",
+        "D": "The array grows automatically"
+      },
+      "correct": ["C"],
+      "explanation": "There is no bounds check. The damage may appear much later, somewhere unrelated, which is what makes these bugs hard to trace."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why is C central to security work even for people who write in other languages?",
+      "choices": {
+        "A": "Security tools are all written in C",
+        "B": "Memory-safety defects have accounted for a large share of serious vulnerabilities, and understanding them requires knowing what the code does to memory",
+        "C": "C is required for certification exams",
+        "D": "Other languages compile to C"
+      },
+      "correct": ["B"],
+      "explanation": "Advisories, exploit write-ups, and the mitigations built to block them all describe behaviour at this level."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why compile with -Wall -Wextra during this course?",
+      "choices": {
+        "A": "They make the program faster",
+        "B": "They turn on warnings, so the compiler tells you about suspicious code instead of silently accepting it",
+        "C": "They are required for the program to run",
+        "D": "They enable memory safety"
+      },
+      "correct": ["B"],
+      "explanation": "C accepts a great deal of questionable code by default. Warnings are the cheapest defect-finding tool you have, and most real C projects treat them as errors."
+    }
+  ]
+}

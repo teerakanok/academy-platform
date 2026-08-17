@@ -1,0 +1,194 @@
+{
+  "nodeId": "undefined-behavior",
+  "locale": "en",
+  "title": "Undefined behaviour: when C stops promising",
+  "objective": "By the end of this lesson you can name the common kinds of undefined behaviour, explain why 'it worked when I tested it' is not evidence, and use the tools that make it visible.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "The C standard describes what programs do. For some operations it deliberately says nothing at all — those are undefined behaviour. Not 'unspecified result', not 'implementation-dependent': the standard imposes no requirement whatsoever, so a compiler may do anything, including assuming the situation never happens and rewriting your code accordingly."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Why this is stranger than it first sounds",
+      "text": "Optimisers work by assuming your program has no undefined behaviour. If a check would only matter in a case the standard says cannot happen, the optimiser is allowed to delete the check. This is how a security test disappears at -O2 while working perfectly at -O0 — the code was correct-looking and the assumption underneath it was not."
+    },
+    {
+      "kind": "heading",
+      "text": "The ones you will actually hit"
+    },
+    {
+      "kind": "table",
+      "headers": ["Operation", "What people expect", "What is guaranteed"],
+      "rows": [
+        ["Reading past the end of an array", "A crash", "Nothing — it may read anything, or appear to work"],
+        ["Signed integer overflow", "Wrapping to a negative number", "Nothing — the optimiser may assume it cannot happen"],
+        ["Using memory after free", "A crash", "Nothing — the memory may still look valid"],
+        ["Dereferencing NULL", "A reliable crash", "Nothing, though it usually does crash"],
+        ["Reading an uninitialised variable", "Zero", "Nothing — often the leftovers of earlier data"],
+        ["Shifting by more than the width", "Zero, or wrapping", "Nothing"]
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "The classic disappearing check",
+      "lines": [
+        "int add(int a, int b) {",
+        "    int sum = a + b;",
+        "    if (sum < a) return -1;   /* meant to detect overflow */",
+        "    return sum;",
+        "}",
+        "",
+        "/* Signed overflow is undefined, so the compiler may assume it never occurs.",
+        "   If it never occurs, sum < a is always false. The check can be removed.",
+        "   Correct way: check BEFORE the operation, or use unsigned, or __builtin_add_overflow. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Unsigned wraps; signed does not"
+    },
+    {
+      "kind": "code",
+      "caption": "One of these is defined, the other is not",
+      "lines": [
+        "unsigned int u = 4294967295u;",
+        "u = u + 1;      /* defined: wraps to 0 — the standard says so */",
+        "",
+        "int s = 2147483647;",
+        "s = s + 1;      /* undefined behaviour — no guarantee at all */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Why 'it worked when I tested it' proves nothing here",
+      "text": "Undefined behaviour is not a bug that reliably shows itself. The same code may work for a year, then break when the compiler is upgraded, when optimisation is turned on, when an unrelated function is added nearby, or when the input is slightly different. Testing shows what happened once; it cannot show that behaviour was guaranteed."
+    },
+    {
+      "kind": "heading",
+      "text": "Making it visible: the sanitizers"
+    },
+    {
+      "kind": "code",
+      "caption": "Two flags that turn silence into a report",
+      "lines": [
+        "gcc -Wall -Wextra -g -fsanitize=address,undefined prog.c -o prog",
+        "./prog",
+        "",
+        "# AddressSanitizer catches out-of-bounds access, use-after-free, leaks",
+        "# UndefinedBehaviorSanitizer catches signed overflow, bad shifts, misaligned access",
+        "",
+        "# Slower at runtime — for development and CI, not for release builds."
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "What a report looks like",
+      "lines": [
+        "==12345==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7ffd...",
+        "WRITE of size 4 at 0x7ffd... thread T0",
+        "    #0 0x5561... in main prog.c:7",
+        "",
+        "Address is located in stack of thread T0 at offset 36 in frame",
+        "    #0 0x5561... in main prog.c:4",
+        "  'numbers' (line 5) <== Memory access at offset 36 overflows this variable"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "That report names the file, the line, the variable, and what kind of access it was. Compare that with the alternative: a program that appears to work and corrupts something three functions away. Running your tests under the sanitizers is one of the highest-value habits in C."
+    },
+    {
+      "kind": "heading",
+      "text": "Writing code that does not depend on luck"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Initialise every variable at declaration — an uninitialised read is undefined and reads old data",
+        "Check bounds before indexing, not after; the read itself is already the error",
+        "Check for overflow before the arithmetic, or use unsigned types where wrapping is intended",
+        "Set a pointer to NULL after freeing it, so a later mistake fails loudly instead of quietly",
+        "Compile with -Wall -Wextra and treat warnings as errors on anything shared",
+        "Run the test suite under -fsanitize=address,undefined in CI"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "See undefined behaviour appear and disappear",
+      "steps": [
+        "Create ub.c:  #include <stdio.h>  then  int main(void){ int a[5]; a[7] = 1; printf(\"%d\\n\", a[7]); return 0; }",
+        "Run: gcc -Wall -Wextra -O0 -g ub.c -o ub && ./ub          (it may print 1 and exit cleanly)",
+        "Run: gcc -Wall -Wextra -O0 -g -fsanitize=address ub.c -o ub && ./ub    (now it is reported)",
+        "Read the report: file, line, variable, and the kind of access",
+        "Now try the overflow example: int s = 2147483647; s = s + 1; printf(\"%d\\n\", s);",
+        "Run it at -O0, then at -O2, and compare the output",
+        "Run it with -fsanitize=undefined and read what it says"
+      ],
+      "expected": "The same program behaving differently under different flags, and a sanitizer report naming the exact line. The first run 'working' is the lesson: undefined behaviour does not announce itself, which is why the tools exist."
+    }
+  ],
+  "cheatsheet": [
+    "Undefined behaviour = the standard imposes no requirement at all",
+    "Optimisers assume it never happens, so checks that rely on it can be deleted",
+    "Common: out-of-bounds access, signed overflow, use-after-free, NULL dereference, uninitialised reads",
+    "Unsigned overflow is defined and wraps; signed overflow is undefined",
+    "'It worked when I tested it' is not evidence of defined behaviour",
+    "-fsanitize=address catches out-of-bounds, use-after-free, leaks",
+    "-fsanitize=undefined catches signed overflow, bad shifts, misalignment",
+    "Sanitizers are for development and CI, not release builds",
+    "Initialise variables, check bounds and overflow before the operation, NULL pointers after free"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What does undefined behaviour mean in C?",
+      "choices": {
+        "A": "The result varies between platforms but is always one of a few values",
+        "B": "The standard imposes no requirement at all, so the compiler may do anything — including assuming the situation never occurs",
+        "C": "The program always crashes",
+        "D": "The behaviour is decided by the operating system"
+      },
+      "correct": ["B"],
+      "explanation": "That last part is what makes it dangerous: the optimiser is entitled to rewrite code based on the assumption that undefined behaviour never happens."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why can an overflow check written as if (sum < a) be removed by the compiler?",
+      "choices": {
+        "A": "Because the comparison is inefficient",
+        "B": "Because signed overflow is undefined, so the compiler may assume it never happened — making the condition always false",
+        "C": "Because sum and a have different types",
+        "D": "It cannot be removed; that would be a compiler bug"
+      },
+      "correct": ["B"],
+      "explanation": "The check only matters in a case the standard says cannot occur. Check before the operation, or use unsigned arithmetic where wrapping is defined."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Which of these has defined behaviour?",
+      "choices": {
+        "A": "Signed integer overflow",
+        "B": "Unsigned integer overflow, which wraps around",
+        "C": "Reading one element past the end of an array",
+        "D": "Using a pointer after free"
+      },
+      "correct": ["B"],
+      "explanation": "Unsigned arithmetic is defined to wrap modulo 2^N. The other three are undefined, which is why they can appear to work and then stop."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "You add -fsanitize=address and the program now reports an error at line 7. What did you learn?",
+      "choices": {
+        "A": "The sanitizer introduced a bug",
+        "B": "The bug was always there — the sanitizer added the checking that C does not do by default, and named the exact location",
+        "C": "The program is too slow to run normally",
+        "D": "The compiler version is wrong"
+      },
+      "correct": ["B"],
+      "explanation": "The instrumentation makes invalid access visible at the moment it happens, instead of leaving it to corrupt something elsewhere and surface later."
+    }
+  ]
+}
