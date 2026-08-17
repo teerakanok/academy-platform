@@ -35,6 +35,11 @@
     "push-pull-fetch": "Exchanging commits: push, fetch, pull",
     "pull-request-flow": "The pull request workflow",
     "code-review-basics": "Reviewing someone else's change",
-    "tags-and-releases": "Tags: naming a version you can return to"
+    "tags-and-releases": "Tags: naming a version you can return to",
+    "worktree": "Worktrees: several branches checked out at once",
+    "atomic-commits": "Atomic commits: one commit, one change",
+    "working-with-agents": "Keeping a history an AI assistant can work in",
+    "git-hooks": "Hooks: running checks automatically",
+    "github-actions-ci": "Running your tests on every proposed change"
   }
 }

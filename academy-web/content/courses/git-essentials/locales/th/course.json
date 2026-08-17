@@ -35,6 +35,11 @@
     "push-pull-fetch": "แลกเปลี่ยน commit: push, fetch, pull",
     "pull-request-flow": "ขั้นตอนการทำงานแบบ pull request",
     "code-review-basics": "ตรวจการเปลี่ยนแปลงของคนอื่น",
-    "tags-and-releases": "tag: ตั้งชื่อเวอร์ชันที่กลับไปหาได้"
+    "tags-and-releases": "tag: ตั้งชื่อเวอร์ชันที่กลับไปหาได้",
+    "worktree": "worktree: เปิดหลาย branch พร้อมกัน",
+    "atomic-commits": "atomic commit: หนึ่ง commit หนึ่งการเปลี่ยนแปลง",
+    "working-with-agents": "รักษาประวัติให้ผู้ช่วย AI ทำงานด้วยได้",
+    "git-hooks": "hook: รันการตรวจอัตโนมัติ",
+    "github-actions-ci": "รันชุดทดสอบทุกครั้งที่มีการเสนอการเปลี่ยนแปลง"
   }
 }

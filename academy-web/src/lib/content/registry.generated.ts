@@ -48,39 +48,49 @@ import c41 from '../../../content/courses/content-formats-demo/locales/en/lesson
 import c42 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-simulation.json'
 import c43 from '../../../content/courses/content-formats-demo/locales/en/course.json'
 import c44 from '../../../content/courses/content-formats-demo/course.json'
-import c45 from '../../../content/courses/git-essentials/locales/en/lessons/branching.json'
-import c46 from '../../../content/courses/git-essentials/locales/en/lessons/code-review-basics.json'
-import c47 from '../../../content/courses/git-essentials/locales/en/lessons/gitignore.json'
-import c48 from '../../../content/courses/git-essentials/locales/en/lessons/init-and-commit.json'
-import c49 from '../../../content/courses/git-essentials/locales/en/lessons/merging.json'
-import c50 from '../../../content/courses/git-essentials/locales/en/lessons/pull-request-flow.json'
-import c51 from '../../../content/courses/git-essentials/locales/en/lessons/push-pull-fetch.json'
-import c52 from '../../../content/courses/git-essentials/locales/en/lessons/rebase-vs-merge.json'
-import c53 from '../../../content/courses/git-essentials/locales/en/lessons/reflog-rescue.json'
-import c54 from '../../../content/courses/git-essentials/locales/en/lessons/remotes-and-clone.json'
-import c55 from '../../../content/courses/git-essentials/locales/en/lessons/resolving-conflicts.json'
-import c56 from '../../../content/courses/git-essentials/locales/en/lessons/status-diff-log.json'
-import c57 from '../../../content/courses/git-essentials/locales/en/lessons/tags-and-releases.json'
-import c58 from '../../../content/courses/git-essentials/locales/en/lessons/undo-and-restore.json'
-import c59 from '../../../content/courses/git-essentials/locales/en/lessons/why-version-control.json'
-import c60 from '../../../content/courses/git-essentials/locales/en/course.json'
-import c61 from '../../../content/courses/git-essentials/locales/th/lessons/branching.json'
-import c62 from '../../../content/courses/git-essentials/locales/th/lessons/code-review-basics.json'
-import c63 from '../../../content/courses/git-essentials/locales/th/lessons/gitignore.json'
-import c64 from '../../../content/courses/git-essentials/locales/th/lessons/init-and-commit.json'
-import c65 from '../../../content/courses/git-essentials/locales/th/lessons/merging.json'
-import c66 from '../../../content/courses/git-essentials/locales/th/lessons/pull-request-flow.json'
-import c67 from '../../../content/courses/git-essentials/locales/th/lessons/push-pull-fetch.json'
-import c68 from '../../../content/courses/git-essentials/locales/th/lessons/rebase-vs-merge.json'
-import c69 from '../../../content/courses/git-essentials/locales/th/lessons/reflog-rescue.json'
-import c70 from '../../../content/courses/git-essentials/locales/th/lessons/remotes-and-clone.json'
-import c71 from '../../../content/courses/git-essentials/locales/th/lessons/resolving-conflicts.json'
-import c72 from '../../../content/courses/git-essentials/locales/th/lessons/status-diff-log.json'
-import c73 from '../../../content/courses/git-essentials/locales/th/lessons/tags-and-releases.json'
-import c74 from '../../../content/courses/git-essentials/locales/th/lessons/undo-and-restore.json'
-import c75 from '../../../content/courses/git-essentials/locales/th/lessons/why-version-control.json'
-import c76 from '../../../content/courses/git-essentials/locales/th/course.json'
-import c77 from '../../../content/courses/git-essentials/course.json'
+import c45 from '../../../content/courses/git-essentials/locales/en/lessons/atomic-commits.json'
+import c46 from '../../../content/courses/git-essentials/locales/en/lessons/branching.json'
+import c47 from '../../../content/courses/git-essentials/locales/en/lessons/code-review-basics.json'
+import c48 from '../../../content/courses/git-essentials/locales/en/lessons/git-hooks.json'
+import c49 from '../../../content/courses/git-essentials/locales/en/lessons/github-actions-ci.json'
+import c50 from '../../../content/courses/git-essentials/locales/en/lessons/gitignore.json'
+import c51 from '../../../content/courses/git-essentials/locales/en/lessons/init-and-commit.json'
+import c52 from '../../../content/courses/git-essentials/locales/en/lessons/merging.json'
+import c53 from '../../../content/courses/git-essentials/locales/en/lessons/pull-request-flow.json'
+import c54 from '../../../content/courses/git-essentials/locales/en/lessons/push-pull-fetch.json'
+import c55 from '../../../content/courses/git-essentials/locales/en/lessons/rebase-vs-merge.json'
+import c56 from '../../../content/courses/git-essentials/locales/en/lessons/reflog-rescue.json'
+import c57 from '../../../content/courses/git-essentials/locales/en/lessons/remotes-and-clone.json'
+import c58 from '../../../content/courses/git-essentials/locales/en/lessons/resolving-conflicts.json'
+import c59 from '../../../content/courses/git-essentials/locales/en/lessons/status-diff-log.json'
+import c60 from '../../../content/courses/git-essentials/locales/en/lessons/tags-and-releases.json'
+import c61 from '../../../content/courses/git-essentials/locales/en/lessons/undo-and-restore.json'
+import c62 from '../../../content/courses/git-essentials/locales/en/lessons/why-version-control.json'
+import c63 from '../../../content/courses/git-essentials/locales/en/lessons/working-with-agents.json'
+import c64 from '../../../content/courses/git-essentials/locales/en/lessons/worktree.json'
+import c65 from '../../../content/courses/git-essentials/locales/en/course.json'
+import c66 from '../../../content/courses/git-essentials/locales/th/lessons/atomic-commits.json'
+import c67 from '../../../content/courses/git-essentials/locales/th/lessons/branching.json'
+import c68 from '../../../content/courses/git-essentials/locales/th/lessons/code-review-basics.json'
+import c69 from '../../../content/courses/git-essentials/locales/th/lessons/git-hooks.json'
+import c70 from '../../../content/courses/git-essentials/locales/th/lessons/github-actions-ci.json'
+import c71 from '../../../content/courses/git-essentials/locales/th/lessons/gitignore.json'
+import c72 from '../../../content/courses/git-essentials/locales/th/lessons/init-and-commit.json'
+import c73 from '../../../content/courses/git-essentials/locales/th/lessons/merging.json'
+import c74 from '../../../content/courses/git-essentials/locales/th/lessons/pull-request-flow.json'
+import c75 from '../../../content/courses/git-essentials/locales/th/lessons/push-pull-fetch.json'
+import c76 from '../../../content/courses/git-essentials/locales/th/lessons/rebase-vs-merge.json'
+import c77 from '../../../content/courses/git-essentials/locales/th/lessons/reflog-rescue.json'
+import c78 from '../../../content/courses/git-essentials/locales/th/lessons/remotes-and-clone.json'
+import c79 from '../../../content/courses/git-essentials/locales/th/lessons/resolving-conflicts.json'
+import c80 from '../../../content/courses/git-essentials/locales/th/lessons/status-diff-log.json'
+import c81 from '../../../content/courses/git-essentials/locales/th/lessons/tags-and-releases.json'
+import c82 from '../../../content/courses/git-essentials/locales/th/lessons/undo-and-restore.json'
+import c83 from '../../../content/courses/git-essentials/locales/th/lessons/why-version-control.json'
+import c84 from '../../../content/courses/git-essentials/locales/th/lessons/working-with-agents.json'
+import c85 from '../../../content/courses/git-essentials/locales/th/lessons/worktree.json'
+import c86 from '../../../content/courses/git-essentials/locales/th/course.json'
+import c87 from '../../../content/courses/git-essentials/course.json'
 
 /** โครง + ข้อความของทุกคอร์ส ผูกเข้ามาตอน build ไม่ใช่ตอน request */
 export const COURSE_REGISTRY: Record<
@@ -143,42 +153,52 @@ export const COURSE_REGISTRY: Record<
     },
   },
   "git-essentials": {
-    __structure: c77,
+    __structure: c87,
     "en": {
-      __copy: c60,
-      "branching": c45,
-      "code-review-basics": c46,
-      "gitignore": c47,
-      "init-and-commit": c48,
-      "merging": c49,
-      "pull-request-flow": c50,
-      "push-pull-fetch": c51,
-      "rebase-vs-merge": c52,
-      "reflog-rescue": c53,
-      "remotes-and-clone": c54,
-      "resolving-conflicts": c55,
-      "status-diff-log": c56,
-      "tags-and-releases": c57,
-      "undo-and-restore": c58,
-      "why-version-control": c59,
+      __copy: c65,
+      "atomic-commits": c45,
+      "branching": c46,
+      "code-review-basics": c47,
+      "git-hooks": c48,
+      "github-actions-ci": c49,
+      "gitignore": c50,
+      "init-and-commit": c51,
+      "merging": c52,
+      "pull-request-flow": c53,
+      "push-pull-fetch": c54,
+      "rebase-vs-merge": c55,
+      "reflog-rescue": c56,
+      "remotes-and-clone": c57,
+      "resolving-conflicts": c58,
+      "status-diff-log": c59,
+      "tags-and-releases": c60,
+      "undo-and-restore": c61,
+      "why-version-control": c62,
+      "working-with-agents": c63,
+      "worktree": c64,
     },
     "th": {
-      __copy: c76,
-      "branching": c61,
-      "code-review-basics": c62,
-      "gitignore": c63,
-      "init-and-commit": c64,
-      "merging": c65,
-      "pull-request-flow": c66,
-      "push-pull-fetch": c67,
-      "rebase-vs-merge": c68,
-      "reflog-rescue": c69,
-      "remotes-and-clone": c70,
-      "resolving-conflicts": c71,
-      "status-diff-log": c72,
-      "tags-and-releases": c73,
-      "undo-and-restore": c74,
-      "why-version-control": c75,
+      __copy: c86,
+      "atomic-commits": c66,
+      "branching": c67,
+      "code-review-basics": c68,
+      "git-hooks": c69,
+      "github-actions-ci": c70,
+      "gitignore": c71,
+      "init-and-commit": c72,
+      "merging": c73,
+      "pull-request-flow": c74,
+      "push-pull-fetch": c75,
+      "rebase-vs-merge": c76,
+      "reflog-rescue": c77,
+      "remotes-and-clone": c78,
+      "resolving-conflicts": c79,
+      "status-diff-log": c80,
+      "tags-and-releases": c81,
+      "undo-and-restore": c82,
+      "why-version-control": c83,
+      "working-with-agents": c84,
+      "worktree": c85,
     },
   },
 } as never

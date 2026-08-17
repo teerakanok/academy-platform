@@ -1,15 +1,15 @@
 {
   "id": "git-essentials",
   "slug": "git-essentials",
-  "version": "0.1.0",
-  "publicAvailability": "internal",
+  "version": "1.0.0",
+  "publicAvailability": "syllabus-preview",
   "defaultLocale": "en",
   "availableLocales": [
     "en",
     "th"
   ],
   "level": "beginner",
-  "estimatedMinutes": 250,
+  "estimatedMinutes": 340,
   "coverMotif": "layers",
   "skills": [
     {
@@ -215,6 +215,67 @@
       "skillWeights": {
         "collaboration": 3,
         "git-cli": 3
+      }
+    },
+    {
+      "id": "worktree",
+      "kind": "lesson",
+      "prerequisites": [
+        "code-review-basics"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "branching": 4,
+        "git-cli": 3
+      }
+    },
+    {
+      "id": "atomic-commits",
+      "kind": "capstone",
+      "prerequisites": [
+        "worktree"
+      ],
+      "estimatedMinutes": 20,
+      "skillWeights": {
+        "vcs-model": 4,
+        "recovery": 3,
+        "git-cli": 3
+      }
+    },
+    {
+      "id": "working-with-agents",
+      "kind": "lesson",
+      "prerequisites": [
+        "atomic-commits"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "collaboration": 4,
+        "vcs-model": 3
+      }
+    },
+    {
+      "id": "git-hooks",
+      "kind": "lesson",
+      "prerequisites": [
+        "working-with-agents"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "automation": 5,
+        "git-cli": 2
+      }
+    },
+    {
+      "id": "github-actions-ci",
+      "kind": "capstone",
+      "prerequisites": [
+        "git-hooks"
+      ],
+      "estimatedMinutes": 20,
+      "skillWeights": {
+        "automation": 6,
+        "collaboration": 3
       }
     }
   ]

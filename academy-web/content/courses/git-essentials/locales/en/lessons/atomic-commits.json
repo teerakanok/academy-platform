@@ -1,0 +1,191 @@
+{
+  "nodeId": "atomic-commits",
+  "locale": "en",
+  "title": "Atomic commits: one commit, one change",
+  "objective": "By the end of this lesson you can build a history where each commit does exactly one thing, and you can use that history to find a bug automatically instead of by guesswork.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "An atomic commit contains one complete change and nothing else. Not one file — one change, which may touch several files. The test is simple: could this commit be reverted on its own without breaking something unrelated, and does its message describe a single thing?"
+    },
+    {
+      "kind": "table",
+      "headers": ["Not atomic", "Atomic"],
+      "rows": [
+        ["Add upload limit, fix typo, reformat file, bump version", "Reject uploads over 10MB"],
+        ["'various fixes'", "Fix timezone shift on the report export"],
+        ["Half a feature that does not run", "A working slice, even if small"],
+        ["A rename mixed into a behaviour change", "The rename alone, then the behaviour change"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Why the mixed commit hurts later",
+      "text": "When the upload limit turns out to be wrong, you want to revert it. If the same commit also reformatted a file and bumped a version, reverting takes those with it — so you end up doing surgery on a commit instead of reverting it. Atomic commits are what make revert a real option rather than a theoretical one."
+    },
+    {
+      "kind": "heading",
+      "text": "Separating a rename from a behaviour change"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This is the highest-value habit in the whole lesson. A commit that renames a function across forty files produces an enormous diff that a reviewer cannot read. The same commit with two changed lines of logic buried inside it hides the only part that matters."
+    },
+    {
+      "kind": "code",
+      "caption": "Two commits, both readable",
+      "lines": [
+        "git commit -m \"Rename calculateTotal to calculateOrderTotal\"   # 40 files, zero behaviour change",
+        "git commit -m \"Include tax in the order total\"                  # 2 lines, all the meaning",
+        "",
+        "# The reviewer skims the first and reads the second carefully.",
+        "# One commit containing both gets a shallow review of everything."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Building atomic commits from messy work"
+    },
+    {
+      "kind": "paragraph",
+      "text": "You do not have to work in a tidy order. Work however you think, then shape the commits afterwards — which is exactly what the staging area and interactive rebase are for."
+    },
+    {
+      "kind": "code",
+      "caption": "Splitting what you already did",
+      "lines": [
+        "git add -p             # stage change by change: y, n, s to split a hunk further",
+        "git commit -m \"Reject uploads over 10MB\"",
+        "git add -p             # now stage the next distinct change",
+        "git commit -m \"Log rejected uploads with their size\"",
+        "",
+        "git rebase -i HEAD~5   # or reshape commits you already made"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Every commit should leave the project working",
+      "text": "If a commit leaves tests failing, later tools cannot use your history: a bisect will land on it and report a false result, and a revert will produce a broken state. 'Working' can mean small — a slice with its test — but it should not mean 'half a rename'."
+    },
+    {
+      "kind": "heading",
+      "text": "The payoff: finding a bug automatically"
+    },
+    {
+      "kind": "paragraph",
+      "text": "git bisect performs a binary search through your history. You tell it a commit where the bug exists and one where it does not; it checks out the middle commit, you say whether the bug is present, and it halves the range each time. Twenty commits take five checks. A thousand take ten."
+    },
+    {
+      "kind": "code",
+      "caption": "A manual bisect",
+      "lines": [
+        "git bisect start",
+        "git bisect bad                 # the current commit has the bug",
+        "git bisect good v2.3.0         # this released version did not",
+        "",
+        "# Git checks out a commit in the middle. Test it, then:",
+        "git bisect bad     # or: git bisect good",
+        "# repeat until Git names the first bad commit",
+        "",
+        "git bisect reset               # return to where you started"
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "An automatic bisect",
+      "lines": [
+        "git bisect start HEAD v2.3.0",
+        "git bisect run npm test -- upload.test.js",
+        "",
+        "# Git runs the command at each step and reads the exit code:",
+        "# 0 = good, non-zero = bad. It reports the first bad commit unattended."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Bisect is only as good as the history",
+      "text": "It assumes each commit builds and runs. A history full of half-finished commits produces a bisect that stops on one of them and blames it — you have found where the tree was broken, not where the bug was introduced. This is the concrete reason atomic commits are worth the discipline."
+    },
+    {
+      "kind": "try",
+      "title": "Split a messy change, then bisect for a bug",
+      "steps": [
+        "In ~/git-lab: make two unrelated edits to one file — one you would call a fix, one you would call a rename",
+        "Run: git add -p        (stage only the fix; answer n to the other hunk)",
+        "Run: git commit -m \"Fix the limit check\"",
+        "Run: git add -p && git commit -m \"Rename the helper\"",
+        "Run: git log --oneline -3   (two commits, each doing one thing)",
+        "Now create a bug to find: make five commits, one of which writes a wrong value into a file",
+        "Run: git bisect start HEAD HEAD~5",
+        "At each step check the file and answer git bisect good or git bisect bad",
+        "Run: git bisect reset"
+      ],
+      "expected": "One messy working state turned into two commits that each say one thing, then a deliberately planted bug located by binary search in about three checks instead of five manual inspections."
+    }
+  ],
+  "cheatsheet": [
+    "Atomic = one complete change, possibly across several files",
+    "Test: could this be reverted alone, and does one sentence describe it?",
+    "Separate a rename from a behaviour change — always",
+    "Every commit should leave the project in a working state",
+    "git add -p stages change by change (y / n / s to split further)",
+    "git rebase -i reshapes commits you already made",
+    "git bisect start / bad / good — binary search for the commit that introduced a bug",
+    "git bisect run <command> — fully automatic, using the exit code",
+    "git bisect reset returns you to where you started",
+    "Bisect only works on a history where each commit runs"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What makes a commit atomic?",
+      "choices": {
+        "A": "It changes only one file",
+        "B": "It contains one complete change — possibly across several files — that could be reverted on its own",
+        "C": "It is under fifty lines",
+        "D": "It has a short message"
+      },
+      "correct": ["B"],
+      "explanation": "The unit is the change, not the file. A single coherent change often touches a handful of files together."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why separate a large rename from a small behaviour change?",
+      "choices": {
+        "A": "Git handles renames faster in isolation",
+        "B": "Mixed together, the two lines that matter are invisible inside a forty-file diff, so the review is shallow",
+        "C": "Renames cannot be reverted",
+        "D": "It is required by most platforms"
+      },
+      "correct": ["B"],
+      "explanation": "Reviewers skim mechanical changes and read logic changes. Combining them means the logic gets skimmed too."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "What does git bisect do?",
+      "choices": {
+        "A": "Splits a commit into two",
+        "B": "Performs a binary search through history to find the commit that introduced a bug",
+        "C": "Divides a branch into two branches",
+        "D": "Compares two branches"
+      },
+      "correct": ["B"],
+      "explanation": "You mark a good and a bad commit; it halves the range at each step. A thousand commits take about ten checks."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why does bisect fail on a history of half-finished commits?",
+      "choices": {
+        "A": "It refuses to run on branches",
+        "B": "It assumes every commit builds and runs; if one does not, bisect stops there and blames a commit that was merely broken, not the one that introduced the bug",
+        "C": "It only works on the main branch",
+        "D": "It requires tags"
+      },
+      "correct": ["B"],
+      "explanation": "This is the practical payoff of the discipline: a history where each commit works is a history you can search automatically."
+    }
+  ]
+}

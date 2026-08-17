@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import { toPublicLesson, toPublicSimulation } from '@/lib/content/public-lesson'
 import type { LessonContent } from '@/lib/content/course-types'
 import type { SimulationChallenge } from '@/lib/simulation/types'
+import { placeholdersIn } from '@/lib/simulation/variables'
 
 // เส้นแบ่ง "เซิร์ฟเวอร์รู้ / browser เห็น" (W0-1)
 //
@@ -50,7 +51,10 @@ describe('toPublicLesson — เนื้อหาจริงทุกไฟล
     }
 
     // แม่แบบตัวแปรต้องไม่หลุดไปหา browser เลย — ถ้าหลุด ผู้เรียนอ่านเจอ `{{targetIp}}`
-    expect(serialized, `${file}: แม่แบบตัวแปรหลุดไปกับ payload`).not.toContain('{{')
+    // ใช้ตัวจับตัวเดียวกับที่ engine ใช้จริง ไม่ใช่การค้นหา '{{' ดิบ ๆ:
+    // เนื้อหาบางบทสอน syntax ของเครื่องมืออื่นที่มีปีกกาคู่ (เช่น ${{ secrets.X }})
+    // ซึ่งไม่ใช่ตัวแปรของเราและไม่มีอะไรรอการแทนค่า
+    expect(placeholdersIn(serialized), `${file}: แม่แบบตัวแปรหลุดไปกับ payload`).toEqual([])
 
     // กติกาการตรวจของโจทย์จำลอง — ทั้งที่อยู่ในบล็อกเนื้อหาและที่เป็นด่านท้ายบท (W1)
     const simulationChallenges = [

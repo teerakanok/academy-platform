@@ -1,0 +1,214 @@
+{
+  "nodeId": "working-with-agents",
+  "locale": "en",
+  "title": "Keeping a history an AI assistant can work in",
+  "objective": "By the end of this lesson you can set up a repository so that AI-assisted changes stay reviewable, reversible, and attributable — instead of arriving as one enormous commit nobody can unpick.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "An assistant can produce a large change quickly. That shifts where the risk sits: not in typing the code, but in reviewing it, reverting it if it is wrong, and knowing later which parts a human actually verified. Git already has the tools for all three — they just have to be used deliberately."
+    },
+    {
+      "kind": "heading",
+      "text": "Rule 1: the assistant works on its own branch"
+    },
+    {
+      "kind": "code",
+      "caption": "Never on the shared branch",
+      "lines": [
+        "git switch -c ai/extract-report-service",
+        "# ...assisted work happens here...",
+        "git switch main    # your own branch is untouched and always shippable"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "This is the same rule as for any other contributor. Its value here is that a branch can be abandoned entirely at no cost, which is exactly what you want when a generated change turns out to be wrong in a way that is faster to redo than to fix."
+    },
+    {
+      "kind": "heading",
+      "text": "Rule 2: commit in small steps, not one large one"
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The 2,000-line commit is the real problem",
+      "text": "A single commit containing an entire generated change is unreviewable in practice, unrevertable in part, and useless to bisect. The output arriving quickly is not the risk. The risk is that its size defeats every tool you would use to check it."
+    },
+    {
+      "kind": "code",
+      "caption": "Shape it as you go",
+      "lines": [
+        "git add -p                        # stage one coherent piece",
+        "git commit -m \"Extract the report service interface\"",
+        "git add -p",
+        "git commit -m \"Move the export logic behind the interface\"",
+        "",
+        "git rebase -i main                # or reshape it afterwards"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Rule 3: read the diff, not the summary"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A description of what a change does is not evidence of what it does. Read git diff --staged before committing, and read the full branch diff before merging. An assistant's summary is a claim to check, exactly like a colleague's pull request description."
+    },
+    {
+      "kind": "code",
+      "caption": "What to check, every time",
+      "lines": [
+        "git diff --staged                 # before each commit",
+        "git diff main...ai/extract-report-service   # the whole change before merging",
+        "git log --stat main..ai/extract-report-service   # which files, how much",
+        "",
+        "git status --porcelain            # anything created that should not be committed?"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Watch for files you did not ask for",
+      "text": "Generated work often leaves extra files behind: scratch scripts, sample data, a config written to make something run, a log. Read the file list, not only the code changes. A tight ignore file plus git status before every commit catches nearly all of it."
+    },
+    {
+      "kind": "heading",
+      "text": "Rule 4: run it in a separate worktree"
+    },
+    {
+      "kind": "code",
+      "caption": "Parallel work without collisions",
+      "lines": [
+        "git worktree add -b ai/refactor-exports ../project-ai",
+        "# the assistant works in ../project-ai",
+        "# you keep working in the original directory, undisturbed",
+        "",
+        "git worktree remove ../project-ai   # when the task is finished"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "One checkout with two parties writing to it produces edits landing on top of each other and switches that pull the ground out from under a running task. Separate directories remove that entirely, and the shared history still lets you review and merge normally."
+    },
+    {
+      "kind": "heading",
+      "text": "Rule 5: record who did what"
+    },
+    {
+      "kind": "code",
+      "caption": "Attribution in the commit itself",
+      "lines": [
+        "git commit -m \"Extract the report service interface\" \\",
+        "  -m \"Generated with an assistant; reviewed and tested by me.\"",
+        "",
+        "# Or the trailer convention many teams use:",
+        "# Co-Authored-By: Assistant <assistant@example.com>"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Six months later, this is the difference between 'we know a person read this and ran it' and 'nobody remembers'. It is not about credit — it is about knowing which parts of the codebase have had human eyes on them, which is a question you will eventually be asked."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Two things to check before every assisted commit",
+      "text": "First: did anything sensitive get written into a file — a value from your environment pasted into an example, a real endpoint, a token used while testing? Second: does the change touch files nobody asked about? Both are cheap to check with git diff --staged and expensive to discover after the fact."
+    },
+    {
+      "kind": "heading",
+      "text": "The workflow, assembled"
+    },
+    {
+      "kind": "list",
+      "ordered": true,
+      "items": [
+        "Create a branch, and a worktree if the work runs alongside your own",
+        "Let the change happen there, committing in small coherent steps",
+        "Read every diff before committing it — the summary is a claim, the diff is the evidence",
+        "Run the tests yourself; a passing test you did not run is not evidence",
+        "Tidy the history with an interactive rebase before asking anyone to review",
+        "Open a pull request like any other, and review it as if a stranger wrote it",
+        "Merge, remove the worktree, delete the branch"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Set up a safe assisted-work lane",
+      "steps": [
+        "In ~/git-lab: git worktree add -b ai/demo-task ../git-lab-ai",
+        "Run: cd ../git-lab-ai",
+        "Make a change of several parts, as an assistant would produce",
+        "Run: git add -p && git commit -m \"First coherent piece\"   (stage only part of it)",
+        "Run: git add -p && git commit -m \"Second coherent piece\"",
+        "Run: git status --porcelain      (any files you did not intend?)",
+        "Run: git diff main...HEAD        (read the whole change as a reviewer)",
+        "Run: cd ~/git-lab && git merge ai/demo-task && git worktree remove ../git-lab-ai",
+        "Run: git branch -d ai/demo-task"
+      ],
+      "expected": "A separate directory that never disturbed your checkout, one large change split into reviewable commits, a file list you actually looked at, and a clean merge and teardown. The same discipline that makes any contribution reviewable — applied where the output arrives faster than you can read it."
+    }
+  ],
+  "cheatsheet": [
+    "Assisted work goes on its own branch — a branch can be abandoned for free",
+    "Small commits, not one enormous one: large commits defeat review, revert, and bisect",
+    "Read git diff --staged before every commit; the summary is a claim, the diff is evidence",
+    "git status --porcelain catches files you did not ask for",
+    "Use a worktree so two parties never write into one checkout",
+    "Run the tests yourself — a result you did not observe is not evidence",
+    "Record who generated and who reviewed, in the commit message",
+    "Check every assisted diff for values that should not be committed",
+    "Tidy with rebase -i before review, then treat it as any other pull request"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why is one very large commit the main risk in assisted work?",
+      "choices": {
+        "A": "Git slows down with large commits",
+        "B": "It is unreviewable in practice, cannot be partially reverted, and is useless to bisect — so every checking tool stops working",
+        "C": "Large commits cannot be pushed",
+        "D": "It uses more disk space"
+      },
+      "correct": ["B"],
+      "explanation": "Speed of output is not the problem. Size is, because it defeats review, revert, and automatic bug-finding all at once."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "An assistant summarises its change as 'refactored the export logic, no behaviour change'. What do you do?",
+      "choices": {
+        "A": "Trust it and merge",
+        "B": "Read the diff and run the tests yourself — the summary is a claim to verify, like any pull request description",
+        "C": "Ask for a longer summary",
+        "D": "Merge and revert later if something breaks"
+      },
+      "correct": ["B"],
+      "explanation": "A description of a change is not evidence about the change. The diff and a test run you observed are."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why run assisted work in a separate worktree?",
+      "choices": {
+        "A": "It makes the assistant faster",
+        "B": "Two parties writing into one checkout overwrite each other, and a branch switch pulls the ground out from under a running task",
+        "C": "It keeps the work out of the history",
+        "D": "It avoids the need for review"
+      },
+      "correct": ["B"],
+      "explanation": "Separate directories remove the collision. The shared history still lets you review and merge in the normal way."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why record in the commit who generated a change and who reviewed it?",
+      "choices": {
+        "A": "For credit",
+        "B": "So that later you can tell which parts of the codebase a person actually read and ran — a question that eventually gets asked",
+        "C": "Because Git requires an author",
+        "D": "To make the history longer"
+      },
+      "correct": ["B"],
+      "explanation": "It is a provenance record. Without it, nobody can distinguish reviewed code from code that merely landed."
+    }
+  ]
+}

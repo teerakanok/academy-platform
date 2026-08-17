@@ -1,14 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import { generateMetadata, generateStaticParams } from '@/app/(localized)/courses/[slug]/[locale]/page'
 import { legacyCourseRedirectPath } from '@/lib/content/legacy-public-course-route'
+import { getCourseStructure, listPublicCourseSlugs } from '@/lib/content/course-source'
 import { getCourse } from '@/lib/content/course-source'
 
 describe('public course route', () => {
   it('pre-renders each available locale of public courses only', () => {
-    expect(generateStaticParams()).toEqual([
-      { slug: 'basic-os-linux', locale: 'en' },
-      { slug: 'basic-os-linux', locale: 'th' },
-    ])
+    // ผูกกับกติกา: ทุกคอร์สที่ประกาศ syllabus-preview คูณทุกภาษาที่มันประกาศไว้
+    // เกตจึงยังจับคอร์ส internal ที่หลุดออกสาธารณะได้ แม้ catalog จะโตขึ้น
+    const expected = listPublicCourseSlugs().flatMap((slug) =>
+      (getCourseStructure(slug)?.availableLocales ?? []).map((locale) => ({ slug, locale })),
+    )
+    expect(expected.length).toBeGreaterThan(0)
+    expect(generateStaticParams()).toEqual(expected)
   })
 
   it('uses the path locale for canonical, language, and share metadata', async () => {

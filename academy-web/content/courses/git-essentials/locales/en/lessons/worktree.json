@@ -1,0 +1,164 @@
+{
+  "nodeId": "worktree",
+  "locale": "en",
+  "title": "Worktrees: several branches checked out at once",
+  "objective": "By the end of this lesson you can have two or more branches open simultaneously in separate directories, and you know when that is genuinely better than switching or stashing.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Switching branches replaces the files in front of you. That is usually fine — until you want to compare two versions side by side, run a long build on one branch while working on another, or hand a branch to a background process that must not be disturbed by your next switch."
+    },
+    {
+      "kind": "paragraph",
+      "text": "A worktree gives you a second working directory attached to the same repository. Both are real checkouts, both share one history, and neither can be checked out on the other's branch at the same time."
+    },
+    {
+      "kind": "code",
+      "caption": "Creating and using one",
+      "lines": [
+        "git worktree add ../project-review fix/upload-limit   # existing branch",
+        "git worktree add -b hotfix/urgent ../project-hotfix    # new branch",
+        "",
+        "git worktree list",
+        "# /home/you/project          a3f91c2 [main]",
+        "# /home/you/project-review   8b02e5d [fix/upload-limit]",
+        "",
+        "cd ../project-review     # a full checkout: build it, run it, edit it"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "One repository, several checkouts",
+      "text": "The extra directories are not clones. They share .git, so a commit made in one is immediately visible from the other, and there is no second copy of the history to keep in sync. Disk cost is one working copy of the files, not another history."
+    },
+    {
+      "kind": "heading",
+      "text": "When a worktree beats switching"
+    },
+    {
+      "kind": "table",
+      "headers": ["Situation", "Why a worktree wins"],
+      "rows": [
+        ["Comparing two versions in a running app", "Both can run at once, on different ports"],
+        ["A long build or test run", "It continues while you work on another branch"],
+        ["An urgent fix mid-feature", "Nothing to stash; your work stays exactly as it is"],
+        ["Reviewing someone's branch", "Read and run it without disturbing your own checkout"],
+        ["Two agents or tasks working in parallel", "Each gets its own directory and cannot overwrite the other's files"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "This is the setup that makes parallel AI-assisted work safe",
+      "text": "When an assistant is editing files while you also edit them, a single checkout means both are writing to the same directory and each switch or revert affects the other. One worktree per task removes that entire class of collision: separate directories, separate branches, one shared history to merge from when each piece is done."
+    },
+    {
+      "kind": "heading",
+      "text": "Cleaning up"
+    },
+    {
+      "kind": "code",
+      "caption": "Remove it when the task is finished",
+      "lines": [
+        "git worktree remove ../project-review",
+        "git worktree prune                     # tidy records of directories deleted by hand",
+        "",
+        "# forgot and deleted the folder manually? prune fixes the bookkeeping"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Worktrees are temporary by design",
+      "text": "Five stale worktrees mean five directories where you might edit the wrong copy, and five branches nobody has finished. Create one for a task, remove it when the task is done. If a worktree has lived for a week, it is a branch that needed a decision, not a directory that needed keeping."
+    },
+    {
+      "kind": "heading",
+      "text": "The rules that surprise people"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "The same branch cannot be checked out in two worktrees at once — Git refuses, which prevents two directories fighting over one branch",
+        "Use --detach to inspect a commit or tag in a worktree without occupying a branch",
+        "Files ignored by Git, such as local settings and installed dependencies, do not come with the new worktree — you may need to install them there",
+        "Stashes are shared across worktrees, so a stash pushed in one appears in the list of another"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Run two branches at once",
+      "steps": [
+        "In ~/git-lab: git switch main",
+        "Run: git worktree add -b experiment ../git-lab-experiment",
+        "Run: git worktree list",
+        "Run: cd ../git-lab-experiment && echo 'experimental' > experiment.txt && git add . && git commit -m \"Try something\"",
+        "Run: cd ~/git-lab && ls          (your files are untouched)",
+        "Run: git log --oneline --all --graph -5   (the commit is visible — one shared history)",
+        "Run: git worktree remove ../git-lab-experiment && git worktree list"
+      ],
+      "expected": "Two directories on two branches at the same time, a commit made in one and immediately visible from the other, and a clean removal. Your original checkout never changed, which is the entire point."
+    }
+  ],
+  "cheatsheet": [
+    "git worktree add <path> <branch> — check out another branch in a second directory",
+    "git worktree add -b <new-branch> <path> — create the branch at the same time",
+    "git worktree list — every checkout attached to this repository",
+    "Worktrees share one .git: a commit in one is instantly visible in the other",
+    "The same branch cannot be checked out twice; use --detach to inspect a commit or tag",
+    "Ignored files (local settings, dependencies) do not come along — install them again if needed",
+    "git worktree remove <path> when the task is finished; git worktree prune after manual deletion",
+    "One worktree per parallel task is what makes concurrent editing safe"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What does git worktree add give you?",
+      "choices": {
+        "A": "A second clone with its own copy of the history",
+        "B": "An additional working directory attached to the same repository, on a different branch",
+        "C": "A backup of the current branch",
+        "D": "A compressed archive of the working tree"
+      },
+      "correct": ["B"],
+      "explanation": "One repository, several checkouts. They share .git, so there is no second history to keep synchronised."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "You are mid-feature with uncommitted work when an urgent fix arrives. Why might a worktree beat stashing?",
+      "choices": {
+        "A": "Stash is unreliable",
+        "B": "Your current checkout stays exactly as it is — nothing to stash, nothing to restore, and nothing to forget",
+        "C": "Worktrees are faster to create than a stash",
+        "D": "Stash cannot hold uncommitted work"
+      },
+      "correct": ["B"],
+      "explanation": "The fix happens in a separate directory. Your half-finished state is never disturbed, so there is no restore step to get wrong later."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why does Git refuse to check out the same branch in two worktrees?",
+      "choices": {
+        "A": "A licensing restriction",
+        "B": "Two directories advancing one branch pointer would conflict with each other; use --detach to inspect the same commit instead",
+        "C": "It would double the disk usage",
+        "D": "It does allow it, with a flag"
+      },
+      "correct": ["B"],
+      "explanation": "A branch is a single pointer. Two checkouts moving it independently is a contradiction, so Git prevents it up front."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why is one worktree per task the safe setup for parallel work, including AI-assisted work?",
+      "choices": {
+        "A": "It makes commands run faster",
+        "B": "Each task gets its own directory and branch, so concurrent edits and branch switches cannot overwrite each other's files",
+        "C": "It prevents merge conflicts entirely",
+        "D": "It hides the changes from other tools"
+      },
+      "correct": ["B"],
+      "explanation": "The collision comes from two things writing into one checkout. Separate directories remove it; the shared history still lets you merge each piece when it is done."
+    }
+  ]
+}

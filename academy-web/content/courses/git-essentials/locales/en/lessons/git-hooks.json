@@ -1,0 +1,194 @@
+{
+  "nodeId": "git-hooks",
+  "locale": "en",
+  "title": "Hooks: running checks automatically",
+  "objective": "By the end of this lesson you can run a check before every commit, and you know the limit of what a local hook can be trusted to enforce.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A hook is a script Git runs at a particular moment. The most useful one runs just before a commit is created and can refuse it. That turns a rule everyone agreed to remember into a rule the machine applies."
+    },
+    {
+      "kind": "code",
+      "caption": "Where they live",
+      "lines": [
+        "ls .git/hooks/",
+        "# pre-commit.sample  pre-push.sample  commit-msg.sample ...",
+        "",
+        "# Remove the .sample suffix and make it executable to activate one.",
+        "# Note: .git/hooks is NOT part of the repository — see the end of this lesson."
+      ]
+    },
+    {
+      "kind": "table",
+      "headers": ["Hook", "Runs", "Typical use"],
+      "rows": [
+        ["pre-commit", "Before the commit is created", "Format, lint, run fast tests, block obvious mistakes"],
+        ["commit-msg", "After the message is written", "Enforce a message convention"],
+        ["pre-push", "Before commits are sent", "Run the slower test suite"],
+        ["post-merge", "After a merge completes", "Reinstall dependencies if they changed"]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "A pre-commit hook worth having"
+    },
+    {
+      "kind": "code",
+      "caption": ".git/hooks/pre-commit",
+      "lines": [
+        "#!/bin/sh",
+        "set -eu",
+        "",
+        "# 1. Refuse leftover debugging markers in staged changes",
+        "if git diff --cached | grep -nE '^\\+.*(TODO-REMOVE|console\\.log\\(|breakpoint\\(\\))'; then",
+        "  echo 'Remove the debugging lines above before committing.' >&2",
+        "  exit 1",
+        "fi",
+        "",
+        "# 2. Refuse very large files",
+        "for f in $(git diff --cached --name-only --diff-filter=A); do",
+        "  size=$(wc -c < \"$f\")",
+        "  [ \"$size\" -gt 5000000 ] && { echo \"$f is over 5MB — is it generated?\" >&2; exit 1; }",
+        "done",
+        "",
+        "# 3. Run the fast checks",
+        "npm run lint --silent"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Keep the pre-commit hook fast",
+      "text": "A commit is something people do many times an hour. A hook that takes thirty seconds will be bypassed with --no-verify within a day, and then it protects nothing. Put the fast checks here and the slow suite in pre-push or CI."
+    },
+    {
+      "kind": "heading",
+      "text": "The limit you must understand"
+    },
+    {
+      "kind": "code",
+      "caption": "Two facts about local hooks",
+      "lines": [
+        "git commit --no-verify -m \"...\"     # skips pre-commit and commit-msg entirely",
+        "",
+        "# And .git/hooks is not committed, so a fresh clone has NO hooks at all."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "A local hook is a helpful reminder, not a control",
+      "text": "It can be skipped with one flag and does not exist in a new clone until someone installs it. Anything that genuinely must not enter the shared branch — secrets, failing tests, unreviewed changes — has to be enforced on the server, where nobody can pass --no-verify. Hooks catch mistakes; server-side rules enforce policy."
+    },
+    {
+      "kind": "heading",
+      "text": "Sharing hooks with the team"
+    },
+    {
+      "kind": "code",
+      "caption": "Commit them, then point Git at them",
+      "lines": [
+        "mkdir .githooks",
+        "# write your hooks there and commit them",
+        "chmod +x .githooks/*",
+        "git config core.hooksPath .githooks",
+        "",
+        "# Each person still runs that config line once — record it in the README,",
+        "# or run it from your project's setup script."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "core.hooksPath is the plain solution: the hooks live in the repository, so they are versioned and reviewed like any other code. Tool-managed alternatives exist for various ecosystems, and they all do the same thing underneath."
+    },
+    {
+      "kind": "heading",
+      "text": "What belongs in a hook, and what does not"
+    },
+    {
+      "kind": "table",
+      "headers": ["Good in pre-commit", "Belongs elsewhere"],
+      "rows": [
+        ["Formatting and linting the staged files", "The full test suite — too slow"],
+        ["Blocking obvious debugging leftovers", "Anything the team must not be able to skip"],
+        ["Rejecting accidental large files", "Deployment steps"],
+        ["A fast unit subset for the touched area", "Anything needing network access"]
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Write a hook and watch it stop you",
+      "steps": [
+        "In ~/git-lab: printf '#!/bin/sh\\nif git diff --cached | grep -q \"DO-NOT-COMMIT\"; then echo \"blocked\" >&2; exit 1; fi\\n' > .git/hooks/pre-commit",
+        "Run: chmod +x .git/hooks/pre-commit",
+        "Run: echo 'DO-NOT-COMMIT experiment' > risky.txt && git add risky.txt",
+        "Run: git commit -m \"Try it\"        (blocked — the hook refused)",
+        "Run: git commit --no-verify -m \"Bypassed\"   (it goes through — this is the limit)",
+        "Run: git reset --hard HEAD~1",
+        "Move it into the repository: mkdir -p .githooks && cp .git/hooks/pre-commit .githooks/ && git config core.hooksPath .githooks"
+      ],
+      "expected": "A commit refused by your own rule, the same commit succeeding with --no-verify, and the hook moved into the repository so a colleague can get it. Seeing the bypass work is the point: it is why the real gate lives on the server."
+    }
+  ],
+  "cheatsheet": [
+    "A hook is a script Git runs at a moment in its lifecycle",
+    "pre-commit: format, lint, fast checks, block obvious mistakes",
+    "commit-msg: enforce a message convention · pre-push: the slower suite",
+    "Keep pre-commit fast, or people will bypass it",
+    "git commit --no-verify skips hooks entirely",
+    ".git/hooks is not committed — a fresh clone has none",
+    "Share hooks by committing them and setting core.hooksPath",
+    "Hooks catch mistakes; only server-side rules enforce policy"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why can a pre-commit hook not be relied on to keep secrets out of a shared repository?",
+      "choices": {
+        "A": "Hooks cannot read file contents",
+        "B": "It can be skipped with --no-verify and does not exist in a fresh clone until someone installs it",
+        "C": "Hooks only run on the default branch",
+        "D": "Hooks run after the commit is created"
+      },
+      "correct": ["B"],
+      "explanation": "It is a local convenience, not a control. Anything that must not enter the shared branch has to be enforced where the contributor cannot bypass it."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Your pre-commit hook takes 40 seconds. What is the likely outcome?",
+      "choices": {
+        "A": "People commit less often, which is fine",
+        "B": "People start passing --no-verify, and the hook stops protecting anything",
+        "C": "Git caches the result",
+        "D": "The hook is skipped automatically"
+      },
+      "correct": ["B"],
+      "explanation": "A check people route around is worse than no check, because it creates the belief that something is being checked. Move slow work to pre-push or CI."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "How do you make hooks available to everyone on the team?",
+      "choices": {
+        "A": "Commit them to .git/hooks",
+        "B": "Commit them to a tracked directory and set core.hooksPath to it",
+        "C": "Email the files",
+        "D": "Hooks are shared automatically on clone"
+      },
+      "correct": ["B"],
+      "explanation": ".git/hooks is not part of the repository. A tracked directory plus core.hooksPath makes hooks versioned and reviewable like any other code."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Which check belongs in CI rather than in pre-commit?",
+      "choices": {
+        "A": "Formatting the staged files",
+        "B": "The full test suite that takes several minutes",
+        "C": "Blocking a stray debugging line",
+        "D": "Rejecting an accidental 200MB file"
+      },
+      "correct": ["B"],
+      "explanation": "Pre-commit should be fast enough to be invisible. Long-running suites belong where they do not stand between a person and their commit."
+    }
+  ]
+}

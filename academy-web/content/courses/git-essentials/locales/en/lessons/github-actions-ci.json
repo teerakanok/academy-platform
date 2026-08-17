@@ -1,0 +1,213 @@
+{
+  "nodeId": "github-actions-ci",
+  "locale": "en",
+  "title": "Running your tests on every proposed change",
+  "objective": "By the end of this lesson you can set up an automated check that runs on every pull request, and you can read a failing run well enough to fix it — which is the last piece that makes review trustworthy.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Continuous integration means: every proposed change is built and tested automatically, on a clean machine, before anyone merges it. That last part matters more than it sounds — 'it works on my machine' stops being a defence when the check runs somewhere neither of you configured."
+    },
+    {
+      "kind": "heading",
+      "text": "A workflow is a file in the repository"
+    },
+    {
+      "kind": "code",
+      "caption": ".github/workflows/test.yml",
+      "lines": [
+        "name: Tests",
+        "",
+        "on:",
+        "  pull_request:            # run on every proposed change",
+        "  push:",
+        "    branches: [main]       # and on the shared branch itself",
+        "",
+        "jobs:",
+        "  test:",
+        "    runs-on: ubuntu-latest",
+        "    steps:",
+        "      - uses: actions/checkout@v4",
+        "      - uses: actions/setup-node@v4",
+        "        with:",
+        "          node-version: '22'",
+        "          cache: 'npm'",
+        "      - run: npm ci          # install exactly what the lockfile says",
+        "      - run: npm run lint",
+        "      - run: npm test"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The workflow is versioned like everything else",
+      "text": "It lives in the repository, so a change to how the project is tested arrives as a reviewable diff. That also means a branch can change its own checks — which is why the branch protection rule specifies which checks must pass, rather than trusting whatever the branch happens to define."
+    },
+    {
+      "kind": "heading",
+      "text": "What the run gives you"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "A pass or fail marker on the pull request, before anyone spends time reviewing",
+        "A log for each step, so a failure names the command and the output",
+        "The same environment for everyone — no more 'passes locally'",
+        "A record afterwards: this commit passed these checks at this time"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Reading a failure"
+    },
+    {
+      "kind": "code",
+      "caption": "Work from the bottom of the failing step",
+      "lines": [
+        "Run npm test",
+        "  FAIL  tests/upload.test.js",
+        "    ● rejects files over the limit",
+        "      expected 413, received 200",
+        "      at tests/upload.test.js:42:18",
+        "Error: Process completed with exit code 1."
+      ]
+    },
+    {
+      "kind": "list",
+      "ordered": true,
+      "items": [
+        "Find the first step that failed — later steps often fail because of it, not on their own",
+        "Read the actual command output, not just the red marker",
+        "Reproduce it locally with the same command the workflow ran",
+        "If it passes locally but fails there, the difference is environment: version, missing file, or something not committed"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "'It passes on my machine' usually means something is uncommitted",
+      "text": "The clean machine has exactly what the repository contains and nothing else. A local file you never committed, a dependency installed globally, an environment value only you have — each produces a pass locally and a failure in CI. The CI machine is telling you the truth about what a fresh clone can do."
+    },
+    {
+      "kind": "heading",
+      "text": "Making the check mean something"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A check that is allowed to fail is decoration. Two settings turn it into a gate: require the check to pass before merging, and require the branch to be up to date with the target first — so the tests run against the combination that will actually exist after the merge, not against a snapshot from last week."
+    },
+    {
+      "kind": "code",
+      "caption": "Two more checks worth having early",
+      "lines": [
+        "      # fail if the lockfile and manifest disagree",
+        "      - run: npm ci",
+        "",
+        "      # scan for credentials that should never have been committed",
+        "      - uses: gitleaks/gitleaks-action@v2",
+        "",
+        "      # run the suite against several versions if you support several",
+        "    strategy:",
+        "      matrix:",
+        "        node-version: ['20', '22']"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Keep the required checks fast",
+      "text": "A twenty-minute pipeline turns every review comment into a twenty-minute wait, and people start merging without waiting. Put the fast, decisive checks in the required set and let the long ones run separately — the goal is a gate people keep respecting."
+    },
+    {
+      "kind": "heading",
+      "text": "Where secrets go"
+    },
+    {
+      "kind": "code",
+      "caption": "Never in the workflow file",
+      "lines": [
+        "      - run: ./deploy.sh",
+        "        env:",
+        "          API_TOKEN: ${{ secrets.API_TOKEN }}   # stored in the platform, not the repo",
+        "",
+        "# The workflow file is committed and readable by anyone with the repository.",
+        "# Anything sensitive is stored in the platform's secret store and referenced."
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Add a check and watch it fail honestly",
+      "steps": [
+        "In a repository you own on a hosting platform, create .github/workflows/test.yml with the example above",
+        "Adjust the steps to match your project — or use a single step that runs echo and exit 0",
+        "Commit and push it on a branch, then open a pull request",
+        "Watch the check run and pass",
+        "Push a commit that deliberately breaks the check (exit 1) and watch the pull request turn red",
+        "Read the log: find the failing step and the exact command output",
+        "Fix it, push again, and confirm the check turns green",
+        "Enable the branch protection rule requiring that check to pass before merging"
+      ],
+      "expected": "A pull request that runs your checks by itself, fails visibly when the code is wrong, and cannot be merged until it passes. That is the point at which review stops depending on everyone remembering to run the tests."
+    }
+  ],
+  "cheatsheet": [
+    "CI builds and tests every proposed change on a clean machine",
+    "The workflow lives in .github/workflows/*.yml and is reviewed like code",
+    "on: pull_request runs it for every proposed change; push for the shared branch",
+    "Read failures from the FIRST failing step and its real output",
+    "Passes locally but fails in CI = something uncommitted or environment-specific",
+    "Require the check to pass, and require the branch to be up to date, or it is decoration",
+    "Keep required checks fast, or people stop waiting for them",
+    "Never put credentials in the workflow file — use the platform's secret store"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why does running the tests on a clean machine matter?",
+      "choices": {
+        "A": "Clean machines are faster",
+        "B": "It proves the tests pass with exactly what the repository contains, rather than with whatever happens to exist on your machine",
+        "C": "It uses less disk space",
+        "D": "It is required by Git"
+      },
+      "correct": ["B"],
+      "explanation": "It removes 'works on my machine' as an explanation, because the environment is defined by the repository and nothing else."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A test passes locally but fails in CI. What is the most likely cause?",
+      "choices": {
+        "A": "CI is unreliable",
+        "B": "Something exists on your machine that is not in the repository — an uncommitted file, a global dependency, or a local environment value",
+        "C": "The test is flaky by definition",
+        "D": "The workflow file is malformed"
+      },
+      "correct": ["B"],
+      "explanation": "The clean machine has only what a fresh clone gives it. The gap between that and your machine is the bug."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "What makes a CI check an actual gate rather than decoration?",
+      "choices": {
+        "A": "Running it on every push",
+        "B": "Requiring it to pass before merging, and requiring the branch to be up to date so it runs against what will exist after the merge",
+        "C": "Sending an email when it fails",
+        "D": "Running it on several operating systems"
+      },
+      "correct": ["B"],
+      "explanation": "A check nobody is required to satisfy changes nothing. Requiring it — against a current branch — is what makes it decisive."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Where do credentials used by a workflow belong?",
+      "choices": {
+        "A": "In the workflow file, since only the team can read the repository",
+        "B": "In the platform's secret store, referenced from the workflow — the workflow file itself is committed and readable",
+        "C": "In an environment file committed to the branch",
+        "D": "Passed as command-line arguments"
+      },
+      "correct": ["B"],
+      "explanation": "The workflow is part of the repository. Anything sensitive placed there is committed, permanent in the history, and readable by everyone with access."
+    }
+  ]
+}
