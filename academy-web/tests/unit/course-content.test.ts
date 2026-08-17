@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { getAllCourses, getCourse, getCourseStructure, getLesson, listCourseSlugs } from '@/lib/content/course-source'
+import {
+  getAllCourses,
+  getCourse,
+  getCourseStructure,
+  getLesson,
+  listCourseSlugs,
+  translatedNodeIds,
+} from '@/lib/content/course-source'
 import { loadLesson } from '@/lib/content/course-loader'
 import { courseSkillData, globalSkillData } from '@/lib/course/skills'
 import { EMPTY_STATE } from '@/lib/course/roadmap'
@@ -105,10 +112,34 @@ describe('ระบบสองภาษา', () => {
     expect(resolved.lesson.title).toContain('ระบบปฏิบัติการ')
   })
 
-  it('บทที่ยังไม่แปล → คืนภาษาเริ่มต้นพร้อมบอกว่าไม่ใช่ภาษาที่ขอ (ไม่สลับเงียบ)', () => {
-    const resolved = getLesson('basic-os-linux', 'permissions', 'th')!
-    expect(resolved.requestedLocale).toBe('th')
-    expect(resolved.servedLocale).toBe('en')
+  it('ภาษาที่ได้จริงต้องตรงกับไฟล์ที่มีอยู่จริง — ไม่สลับภาษาเงียบ', () => {
+    // ผูกกับ contract ไม่ผูกกับบทตัวอย่าง: ทุกคอร์ส ทุกภาษาที่ประกาศไว้
+    // บทที่มีคำแปลต้องได้ภาษานั้น บทที่ยังไม่มีต้องถอยไปภาษาเริ่มต้น
+    // โดยยังรายงาน requestedLocale ตามที่ผู้เรียนขอ เกตนี้จึงไม่แดง
+    // เมื่อคำแปลถูกเติมจนครบ และยังจับเคส fallback ได้ทันทีที่มีบทใหม่ที่ยังไม่แปล
+    for (const slug of listCourseSlugs()) {
+      const structure = getCourseStructure(slug)!
+      for (const locale of structure.availableLocales) {
+        const translated = new Set(translatedNodeIds(structure, locale))
+        for (const node of structure.nodes) {
+          const resolved = getLesson(slug, node.id, locale)!
+          expect(resolved.requestedLocale).toBe(locale)
+          expect(
+            resolved.servedLocale,
+            `${slug}/${node.id} (${locale}) รายงานภาษาไม่ตรงกับไฟล์ที่มีจริง`,
+          ).toBe(translated.has(node.id) ? locale : structure.defaultLocale)
+        }
+      }
+    }
+  })
+
+  it('คอร์ส Linux แปลไทยครบทุกบท — ไม่มีบทไหนตกหล่นให้ผู้เรียนไทยเจอภาษาอังกฤษ', () => {
+    const structure = getCourseStructure('basic-os-linux')!
+    expect(structure.availableLocales).toContain('th')
+    const translated = new Set(translatedNodeIds(structure, 'th'))
+    for (const node of structure.nodes) {
+      expect(translated.has(node.id), `บท ${node.id} ยังไม่มีคำแปลไทย`).toBe(true)
+    }
   })
 
   it('checkpoint id ตรงกันข้ามภาษา — ความคืบหน้าจึงย้ายภาษาได้โดยไม่หาย', () => {

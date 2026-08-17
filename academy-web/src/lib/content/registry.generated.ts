@@ -20,15 +20,18 @@ import c13 from '../../../content/courses/basic-os-linux/locales/th/lessons/get-
 import c14 from '../../../content/courses/basic-os-linux/locales/th/lessons/linux-and-distros.json'
 import c15 from '../../../content/courses/basic-os-linux/locales/th/lessons/navigate-and-look.json'
 import c16 from '../../../content/courses/basic-os-linux/locales/th/lessons/os-what-it-does.json'
-import c17 from '../../../content/courses/basic-os-linux/locales/th/lessons/users-and-root.json'
-import c18 from '../../../content/courses/basic-os-linux/locales/th/course.json'
-import c19 from '../../../content/courses/basic-os-linux/course.json'
-import c20 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-hands-on.json'
-import c21 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-reading.json'
-import c22 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-references.json'
-import c23 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-simulation.json'
-import c24 from '../../../content/courses/content-formats-demo/locales/en/course.json'
-import c25 from '../../../content/courses/content-formats-demo/course.json'
+import c17 from '../../../content/courses/basic-os-linux/locales/th/lessons/permissions.json'
+import c18 from '../../../content/courses/basic-os-linux/locales/th/lessons/pipes-and-logs.json'
+import c19 from '../../../content/courses/basic-os-linux/locales/th/lessons/processes-and-packages.json'
+import c20 from '../../../content/courses/basic-os-linux/locales/th/lessons/users-and-root.json'
+import c21 from '../../../content/courses/basic-os-linux/locales/th/course.json'
+import c22 from '../../../content/courses/basic-os-linux/course.json'
+import c23 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-hands-on.json'
+import c24 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-reading.json'
+import c25 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-references.json'
+import c26 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-simulation.json'
+import c27 from '../../../content/courses/content-formats-demo/locales/en/course.json'
+import c28 from '../../../content/courses/content-formats-demo/course.json'
 
 /** โครง + ข้อความของทุกคอร์ส ผูกเข้ามาตอน build ไม่ใช่ตอน request */
 export const COURSE_REGISTRY: Record<
@@ -36,7 +39,7 @@ export const COURSE_REGISTRY: Record<
   { __structure: unknown } & Record<string, { __copy: unknown } & Record<string, unknown>>
 > = {
   "basic-os-linux": {
-    __structure: c19,
+    __structure: c22,
     "en": {
       __copy: c10,
       "files-and-safety": c0,
@@ -51,24 +54,27 @@ export const COURSE_REGISTRY: Record<
       "users-and-root": c9,
     },
     "th": {
-      __copy: c18,
+      __copy: c21,
       "files-and-safety": c11,
       "filesystem-tree": c12,
       "get-a-linux": c13,
       "linux-and-distros": c14,
       "navigate-and-look": c15,
       "os-what-it-does": c16,
-      "users-and-root": c17,
+      "permissions": c17,
+      "pipes-and-logs": c18,
+      "processes-and-packages": c19,
+      "users-and-root": c20,
     },
   },
   "content-formats-demo": {
-    __structure: c25,
+    __structure: c28,
     "en": {
-      __copy: c24,
-      "formats-hands-on": c20,
-      "formats-reading": c21,
-      "formats-references": c22,
-      "formats-simulation": c23,
+      __copy: c27,
+      "formats-hands-on": c23,
+      "formats-reading": c24,
+      "formats-references": c25,
+      "formats-simulation": c26,
     },
   },
 } as never
