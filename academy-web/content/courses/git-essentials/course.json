@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "beginner",
-  "estimatedMinutes": 164,
+  "estimatedMinutes": 250,
   "coverMotif": "layers",
   "skills": [
     {
@@ -157,6 +157,64 @@
       "skillWeights": {
         "recovery": 6,
         "vcs-model": 1
+      }
+    },
+    {
+      "id": "remotes-and-clone",
+      "kind": "lesson",
+      "prerequisites": [
+        "reflog-rescue"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "collaboration": 4,
+        "git-cli": 2
+      }
+    },
+    {
+      "id": "push-pull-fetch",
+      "kind": "lesson",
+      "prerequisites": [
+        "remotes-and-clone"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "collaboration": 5,
+        "git-cli": 3
+      }
+    },
+    {
+      "id": "pull-request-flow",
+      "kind": "lesson",
+      "prerequisites": [
+        "push-pull-fetch"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "collaboration": 6
+      }
+    },
+    {
+      "id": "code-review-basics",
+      "kind": "lesson",
+      "prerequisites": [
+        "pull-request-flow"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "collaboration": 6
+      }
+    },
+    {
+      "id": "tags-and-releases",
+      "kind": "lesson",
+      "prerequisites": [
+        "push-pull-fetch"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "collaboration": 3,
+        "git-cli": 3
       }
     }
   ]

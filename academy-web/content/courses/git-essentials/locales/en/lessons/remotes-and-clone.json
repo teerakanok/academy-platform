@@ -1,0 +1,189 @@
+{
+  "nodeId": "remotes-and-clone",
+  "locale": "en",
+  "title": "Remotes: the shared copy",
+  "objective": "By the end of this lesson you can clone a project, understand what origin actually is, and read the difference between your branches and the ones on the server.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Everything so far worked on your machine alone. A remote is another copy of the same repository that you have agreed to synchronise with — usually one hosted somewhere everyone can reach. Nothing about Git changes when you add one; you simply gain a way to exchange commits."
+    },
+    {
+      "kind": "code",
+      "caption": "Getting a copy",
+      "lines": [
+        "git clone https://github.com/org/project.git",
+        "cd project",
+        "",
+        "# You now have: the full history, all branches, and a remote named 'origin'",
+        "git remote -v"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "origin is a nickname, not a rule",
+      "text": "Git names the remote you cloned from 'origin' by convention. It has no special powers — it is a short name for a URL. A project can have several remotes, which is how you work with a fork and the original at the same time."
+    },
+    {
+      "kind": "heading",
+      "text": "Three kinds of branch, which is where confusion starts"
+    },
+    {
+      "kind": "table",
+      "headers": ["Name", "What it is", "Who moves it"],
+      "rows": [
+        ["main", "Your local branch", "You, by committing"],
+        ["origin/main", "Your last-known snapshot of the server's main", "git fetch or git pull"],
+        ["main on the server", "The actual state on the remote", "Whoever pushes to it"]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "origin/main is not live. It is a note your machine made the last time it talked to the server. When someone says 'my branch is behind', they mean their local branch has fewer commits than that note — and the note itself may already be out of date."
+    },
+    {
+      "kind": "code",
+      "caption": "Seeing all three",
+      "lines": [
+        "git branch            # local branches only",
+        "git branch -r         # remote-tracking: origin/main, origin/feature-x ...",
+        "git branch -a        # both",
+        "git fetch origin      # update the notes without changing your work",
+        "git status            # now tells you ahead/behind accurately"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "fetch is always safe",
+      "text": "It downloads commits and updates your remote-tracking notes, and touches nothing you are working on. When you are unsure of the situation, fetch first and then look — it is the read-only half of pull."
+    },
+    {
+      "kind": "heading",
+      "text": "Adding and managing remotes"
+    },
+    {
+      "kind": "code",
+      "caption": "Common operations",
+      "lines": [
+        "git remote add origin https://github.com/org/project.git   # connect an existing local repo",
+        "git remote -v                                              # list with URLs",
+        "git remote add upstream https://github.com/original/project.git  # the fork pattern",
+        "git remote set-url origin git@github.com:org/project.git   # switch to SSH",
+        "git remote remove upstream"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "HTTPS or SSH"
+    },
+    {
+      "kind": "table",
+      "headers": ["", "HTTPS", "SSH"],
+      "rows": [
+        ["Setup", "Nothing to configure", "Generate a key and add the public half to the host"],
+        ["Each push", "Asks for a token unless a credential helper stores it", "Silent, uses your key"],
+        ["Works through restrictive networks", "Usually", "Sometimes blocked"],
+        ["Best for", "Occasional or read-only use", "Anything you push to regularly"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The password prompt is not a password anymore",
+      "text": "Major hosts stopped accepting account passwords for Git operations years ago. If HTTPS asks you to authenticate, it wants a personal access token — treat that token like a credential, give it the narrowest scope that works, and never paste it into a file the repository tracks."
+    },
+    {
+      "kind": "heading",
+      "text": "Cloning options worth knowing"
+    },
+    {
+      "kind": "code",
+      "caption": "When the default is too much",
+      "lines": [
+        "git clone --depth 1 <url>          # only the latest commit — fast, no usable history",
+        "git clone --branch release <url>   # start on a specific branch",
+        "git clone <url> my-folder          # clone into a different directory name"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "A shallow clone is right for a build server that only needs current files. It is wrong for your own work, because most of what makes Git useful — log, blame, bisect — needs the history you just declined to download."
+    },
+    {
+      "kind": "try",
+      "title": "Work with a remote you control",
+      "steps": [
+        "Create a bare repository to act as a server: git init --bare ~/git-server/demo.git",
+        "In ~/git-lab: git remote add origin ~/git-server/demo.git",
+        "Run: git remote -v",
+        "Run: git push -u origin main",
+        "Run: git branch -a               (note origin/main appearing)",
+        "Clone it as if you were a colleague: git clone ~/git-server/demo.git ~/git-lab-clone",
+        "In the clone: git log --oneline   (the whole history came with it)"
+      ],
+      "expected": "A local repository connected to a remote you own, a push that succeeds, and a second clone containing the complete history — the same model as a hosted service, with no account required."
+    }
+  ],
+  "cheatsheet": [
+    "A remote is another copy of the same repository you sync with",
+    "origin is just the conventional nickname for the URL you cloned from",
+    "main = yours · origin/main = your last-known note of the server · the server has its own",
+    "git fetch updates the notes and changes nothing you are working on — always safe",
+    "git branch -r lists remote-tracking branches; -a lists everything",
+    "git remote add <name> <url> connects a repository to a remote",
+    "SSH for anything you push regularly; HTTPS needs a token, not a password",
+    "--depth 1 is for build servers, not for work that needs log, blame, or bisect"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What is origin/main?",
+      "choices": {
+        "A": "A live view of the server's main branch",
+        "B": "Your machine's note of where the server's main branch was the last time you fetched",
+        "C": "A backup of your local main",
+        "D": "The branch you are currently on"
+      },
+      "correct": ["B"],
+      "explanation": "It only updates when you fetch or pull. Until then it can be as stale as your last conversation with the server."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why is git fetch considered safe to run at any time?",
+      "choices": {
+        "A": "It requires no authentication",
+        "B": "It downloads commits and updates remote-tracking branches without touching your working files or your branch",
+        "C": "It only reads the first commit",
+        "D": "It creates a backup before running"
+      },
+      "correct": ["B"],
+      "explanation": "Fetch is the read-only half of pull. It changes what you know, not what you have."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "HTTPS prompts you for a password when pushing. What does it actually want?",
+      "choices": {
+        "A": "Your account password",
+        "B": "A personal access token with the narrowest scope that works",
+        "C": "Your SSH private key",
+        "D": "The repository name"
+      },
+      "correct": ["B"],
+      "explanation": "Major hosts stopped accepting account passwords for Git operations. A token is a credential — scope it tightly and never commit it."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "When is git clone --depth 1 the wrong choice?",
+      "choices": {
+        "A": "On a build server that only compiles the current code",
+        "B": "For your own working copy, because log, blame, and bisect all need the history it skips",
+        "C": "When the repository is small",
+        "D": "When cloning over SSH"
+      },
+      "correct": ["B"],
+      "explanation": "A shallow clone trades away exactly the capabilities that make Git worth using day to day."
+    }
+  ]
+}

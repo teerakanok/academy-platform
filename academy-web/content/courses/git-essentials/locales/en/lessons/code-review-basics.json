@@ -1,0 +1,185 @@
+{
+  "nodeId": "code-review-basics",
+  "locale": "en",
+  "title": "Reviewing someone else's change",
+  "objective": "By the end of this lesson you can review a change usefully — reading it in the right order, knowing what to look for, and writing comments that improve the work instead of defending your taste.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Reviewing is a skill separate from writing code, and it is the one most people are never taught. A good review catches the defect that tests missed and leaves the author better informed. A bad review either waves the change through or turns into an argument about brace placement."
+    },
+    {
+      "kind": "heading",
+      "text": "Read it in this order"
+    },
+    {
+      "kind": "list",
+      "ordered": true,
+      "items": [
+        "The description: what is this change for? If you cannot tell, that is your first comment",
+        "The tests: what does the author believe this does, and which cases did they consider?",
+        "The main change: does it actually do that, in a way that will still make sense in a year?",
+        "The edges: empty input, failure of the thing it calls, two users doing it at once",
+        "Then, last and least, style — most of which a formatter should be handling anyway"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Start from the tests, not the diff",
+      "text": "Tests state intent. Reading them first tells you what the author was trying to do, so you can review the implementation against that rather than against your own guess. It also makes missing cases obvious — the ones nobody wrote a test for are usually the ones that break."
+    },
+    {
+      "kind": "heading",
+      "text": "What is worth a comment"
+    },
+    {
+      "kind": "table",
+      "headers": ["Look for", "Example question"],
+      "rows": [
+        ["Correctness", "What happens when this list is empty?"],
+        ["Failure handling", "If that call times out, what does the user see?"],
+        ["Security", "Where does this value come from, and is it trusted?"],
+        ["Data safety", "Is this delete reversible? Is it scoped to one account?"],
+        ["Concurrency", "Two requests arrive together — does this still hold?"],
+        ["Readability", "Will the next person understand why, or only what?"],
+        ["Scope", "This also renames something unrelated — separate change?"]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Say which kind of comment it is"
+    },
+    {
+      "kind": "code",
+      "caption": "A convention worth adopting",
+      "lines": [
+        "blocking: this deletes rows for every account, not just the current one",
+        "question: is the retry safe if the first attempt partially succeeded?",
+        "suggestion: this reads more clearly as a guard clause — your call",
+        "nit: spelling in the log message",
+        "praise: the fallback path here is genuinely well handled"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Prefixes remove the biggest friction in review: the author cannot tell what must change from what you merely prefer. Without them, every comment reads as a demand, and authors either argue or comply with all of it resentfully."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Review the change, not the person",
+      "text": "'This function is confusing' invites defence. 'I could not work out when the second branch runs — can you add a comment or split it?' invites a fix. Same observation; one is about the code and offers a way forward. Write the second one, especially when you are tired."
+    },
+    {
+      "kind": "heading",
+      "text": "Approving honestly"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Approve when you understand the change and believe it is safe to ship",
+        "Say what you did not review — 'I read the API layer; I did not check the migration' is useful and honest",
+        "Do not approve a change you did not understand; ask instead. An approval you did not mean is worse than a delay",
+        "Request changes for anything blocking, and be specific about what would unblock it"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Reviewing is how you learn a codebase",
+      "text": "Reading other people's changes teaches you a system faster than reading it cold, because every change comes with an explanation of why it exists. New team members who review early become useful sooner — which makes it worth including them before they feel ready."
+    },
+    {
+      "kind": "heading",
+      "text": "Reviewing locally when the diff is not enough"
+    },
+    {
+      "kind": "code",
+      "caption": "Some changes have to be run",
+      "lines": [
+        "git fetch origin",
+        "git switch --detach origin/fix/upload-limit    # look without creating a branch",
+        "# run it, run the tests, try the failure cases yourself",
+        "git switch -                                   # return to your own work",
+        "",
+        "git diff main...origin/fix/upload-limit        # the change as a whole",
+        "git log --oneline main..origin/fix/upload-limit # the commits, in order"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Review a change as if you did not write it",
+      "steps": [
+        "In ~/git-lab: git switch -c feature/review-me",
+        "Make a small change with a deliberate gap — for example, handle only the success case",
+        "Run: git add . && git commit -m \"Add the lookup helper\" && git push -u origin feature/review-me",
+        "Run: git switch main",
+        "Run: git diff main...feature/review-me     (read it as a reviewer, top to bottom)",
+        "Write down three comments using the prefixes: one blocking, one question, one nit",
+        "Run: git switch feature/review-me and address your own blocking comment with a new commit"
+      ],
+      "expected": "Your own change read as an outsider, three comments in the prefixed style, and a follow-up commit fixing the blocking one. Reviewing your own work at a distance is the cheapest way to practise the habit."
+    }
+  ],
+  "cheatsheet": [
+    "Read in order: description → tests → main change → edge cases → style last",
+    "Tests state intent; reading them first shows what the author meant to do",
+    "Look for correctness, failure handling, security, data safety, concurrency, readability, scope",
+    "Prefix comments: blocking / question / suggestion / nit / praise",
+    "Comment on the change, not the person, and offer a way forward",
+    "Say what you did not review — partial review honestly stated is useful",
+    "Never approve what you did not understand; ask instead",
+    "git switch --detach origin/<branch> to run a change locally before approving"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What should you read first when reviewing a change?",
+      "choices": {
+        "A": "The largest file in the diff",
+        "B": "The description and the tests, because together they state what the change is meant to do",
+        "C": "The style issues, to get them out of the way",
+        "D": "The commit messages only"
+      },
+      "correct": ["B"],
+      "explanation": "Reviewing an implementation without knowing its intent means reviewing it against your own assumption. Intent comes from the description and the tests."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why prefix review comments with blocking / question / suggestion / nit?",
+      "choices": {
+        "A": "Platforms require it",
+        "B": "So the author can tell what must change from what you merely prefer, instead of reading every comment as a demand",
+        "C": "It makes reviews shorter",
+        "D": "It hides disagreements"
+      },
+      "correct": ["B"],
+      "explanation": "Unlabelled comments force the author to guess your severity. That guessing is where most review friction comes from."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "You do not understand part of a change well enough to judge it. What is the right action?",
+      "choices": {
+        "A": "Approve it and trust the author",
+        "B": "Ask a question, and state which parts you did review",
+        "C": "Request changes with no explanation",
+        "D": "Reject the pull request"
+      },
+      "correct": ["B"],
+      "explanation": "An approval means 'I understand this and believe it is safe'. Asking, plus being honest about your coverage, is more useful than a signature you did not mean."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Which comment is more likely to improve the code?",
+      "choices": {
+        "A": "This function is confusing",
+        "B": "I could not work out when the second branch runs — could you add a comment or split it?",
+        "C": "Please rewrite this properly",
+        "D": "I would have done this differently"
+      },
+      "correct": ["B"],
+      "explanation": "It names the specific difficulty and offers two concrete ways forward. The others describe a feeling and leave the author guessing at what to do."
+    }
+  ]
+}

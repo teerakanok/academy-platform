@@ -1,0 +1,197 @@
+{
+  "nodeId": "push-pull-fetch",
+  "locale": "en",
+  "title": "Exchanging commits: push, fetch, pull",
+  "objective": "By the end of this lesson you can send and receive work reliably, and you know what to do when a push is rejected — which is the single most common moment of confusion in shared Git use.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Three commands move commits between your copy and the shared one. They are simple individually; the useful understanding is what each does to your working state, and why one of them regularly refuses."
+    },
+    {
+      "kind": "table",
+      "headers": ["Command", "Direction", "Touches your files?"],
+      "rows": [
+        ["git fetch", "Server → your notes", "No — safest command in Git"],
+        ["git pull", "Server → your branch", "Yes — fetch plus an integration"],
+        ["git push", "Your branch → server", "No, but it changes what everyone else sees"]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Push: sending your commits"
+    },
+    {
+      "kind": "code",
+      "caption": "The first push and every push after",
+      "lines": [
+        "git push -u origin feature/upload   # first time: create it on the server and link them",
+        "git push                            # afterwards: the link is remembered",
+        "",
+        "git push origin --delete old-branch # remove a branch from the server",
+        "git push --tags                     # send tags (they do not travel automatically)"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "What -u does",
+      "text": "It sets the upstream: it records which remote branch your local branch corresponds to. After that, git push and git pull with no arguments know where to go, and git status can tell you how far ahead or behind you are."
+    },
+    {
+      "kind": "heading",
+      "text": "The rejection everyone meets"
+    },
+    {
+      "kind": "code",
+      "caption": "What it looks like",
+      "lines": [
+        "$ git push",
+        "! [rejected]        main -> main (fetch first)",
+        "error: failed to push some refs",
+        "hint: Updates were rejected because the remote contains work that you do",
+        "hint: not have locally."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "This is Git protecting someone else's commits. The server has work you have never seen; accepting your push as-is would leave it behind. The fix is to bring their work into yours first, then push the combined result."
+    },
+    {
+      "kind": "code",
+      "caption": "The correct response",
+      "lines": [
+        "git pull                # fetch their work and integrate it into yours",
+        "# resolve conflicts if any",
+        "git push                # now the server can move forward cleanly",
+        "",
+        "# NEVER the reflex response:",
+        "git push --force        # this deletes their commits from the server"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "--force is how other people's work disappears",
+      "text": "Forcing tells the server to replace its branch with yours, discarding whatever it had that you did not. On a shared branch that is data loss for your colleagues. If you genuinely need to overwrite — after rebasing your own feature branch — use --force-with-lease, which refuses when the remote has moved since you last looked."
+    },
+    {
+      "kind": "heading",
+      "text": "Pull is two operations, and you get to choose the second"
+    },
+    {
+      "kind": "code",
+      "caption": "Merge or rebase on arrival",
+      "lines": [
+        "git pull                       # fetch, then merge (default)",
+        "git pull --rebase              # fetch, then replay your commits on top",
+        "",
+        "git config --global pull.rebase true   # make rebase the default for you"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Plain pull creates a merge commit whenever both sides moved, which produces a history full of 'Merge branch main of ...' entries that say nothing. Pull with rebase replays your local commits on top of theirs and keeps the line straight. Since your unpushed commits are unshared by definition, rebasing them is safe — this is the one place rebase-by-default is a reasonable choice."
+    },
+    {
+      "kind": "heading",
+      "text": "Reading your position"
+    },
+    {
+      "kind": "code",
+      "caption": "Where am I relative to the server",
+      "lines": [
+        "git fetch",
+        "git status",
+        "#   Your branch is ahead of 'origin/main' by 2 commits.     ← you have unpushed work",
+        "#   Your branch is behind 'origin/main' by 5 commits.       ← you need to pull",
+        "#   Your branch and 'origin/main' have diverged             ← both moved; integrate",
+        "",
+        "git log --oneline origin/main..HEAD    # exactly what you would push",
+        "git log --oneline HEAD..origin/main    # exactly what you would receive"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Fetch before you judge",
+      "text": "Ahead and behind are measured against your last-known note of the server, not the server itself. A status that says 'up to date' can be an hour out of date. Fetch first, then read it."
+    },
+    {
+      "kind": "try",
+      "title": "Cause a rejection and resolve it properly",
+      "steps": [
+        "Using the two repositories from the previous lesson (~/git-lab and ~/git-lab-clone)",
+        "In ~/git-lab-clone: echo 'from the clone' >> notes.txt && git commit -am \"Change from the clone\" && git push",
+        "In ~/git-lab: echo 'from the original' >> notes.txt && git commit -am \"Change from the original\"",
+        "Run: git push                  (rejected — the server has work you do not)",
+        "Run: git fetch && git status   (diverged)",
+        "Run: git pull --rebase         (replay your commit on top; resolve the conflict)",
+        "Run: git push && git log --oneline --graph -5"
+      ],
+      "expected": "A rejection you caused on purpose, then the correct resolution: pull, integrate, push. The history stays a straight line because you rebased your own unshared commit rather than forcing it over someone else's."
+    }
+  ],
+  "cheatsheet": [
+    "fetch = download and update notes · pull = fetch + integrate · push = send",
+    "git push -u origin <branch> the first time; git push afterwards",
+    "A rejected push means the server has commits you do not have",
+    "The fix is pull then push — never --force on a shared branch",
+    "--force-with-lease is the safe version, and only for your own rebased branch",
+    "git pull --rebase keeps history straight; pull.rebase true makes it your default",
+    "git log origin/main..HEAD — exactly what you would push",
+    "git log HEAD..origin/main — exactly what you would receive",
+    "Ahead/behind are measured against your last fetch, so fetch before judging",
+    "Tags do not travel with a normal push — use git push --tags"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Your push is rejected with 'the remote contains work that you do not have locally'. What is the correct response?",
+      "choices": {
+        "A": "git push --force",
+        "B": "git pull, integrate the other work, then git push",
+        "C": "Delete your branch and start again",
+        "D": "Clone the repository fresh"
+      },
+      "correct": ["B"],
+      "explanation": "The rejection exists to protect commits you have not seen. Forcing would remove them from the server, which is data loss for whoever made them."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "What is the difference between fetch and pull?",
+      "choices": {
+        "A": "None; pull is an alias",
+        "B": "Fetch downloads and updates your remote-tracking notes only; pull does that and then integrates the work into your branch",
+        "C": "Fetch works offline",
+        "D": "Pull only downloads tags"
+      },
+      "correct": ["B"],
+      "explanation": "Fetch changes what you know. Pull changes what you have — which is why fetch is always safe and pull can produce conflicts."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why is git pull --rebase often preferred over plain git pull?",
+      "choices": {
+        "A": "It is faster over the network",
+        "B": "It replays your unpushed commits on top of the incoming work, avoiding a history full of uninformative merge commits",
+        "C": "It never produces conflicts",
+        "D": "It skips the fetch step"
+      },
+      "correct": ["B"],
+      "explanation": "Your unpushed commits are unshared, so rebasing them is safe — and it keeps the shared history readable instead of filling it with automatic merges."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "git status says you are up to date. What should you check first?",
+      "choices": {
+        "A": "Nothing — status is authoritative",
+        "B": "Run git fetch first, because ahead/behind is measured against your last-known note of the server, not the server itself",
+        "C": "Whether the remote still exists",
+        "D": "Whether you are on the right operating system"
+      },
+      "correct": ["B"],
+      "explanation": "Remote-tracking branches only update when you fetch. Reading status without fetching tells you about a conversation that may be hours old."
+    }
+  ]
+}

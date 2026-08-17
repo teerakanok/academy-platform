@@ -1,0 +1,188 @@
+{
+  "nodeId": "pull-request-flow",
+  "locale": "en",
+  "title": "The pull request workflow",
+  "objective": "By the end of this lesson you can take a change from branch to merged through a pull request, and you understand what the workflow is protecting that direct pushes do not.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A pull request is not a Git feature — it is a convention built on top of Git by hosting platforms. It says: here is a branch, here is what it changes, please look before this becomes part of the shared work. Everything it adds is social and procedural, and that is exactly the point."
+    },
+    {
+      "kind": "heading",
+      "text": "The loop, end to end"
+    },
+    {
+      "kind": "code",
+      "caption": "One change, start to finish",
+      "lines": [
+        "git switch main && git pull                     # start from today's state",
+        "git switch -c fix/upload-limit                  # a branch named for its purpose",
+        "# ...make the change...",
+        "git add -p                                      # stage deliberately, hunk by hunk",
+        "git commit -m \"Reject uploads over 10MB\"",
+        "git push -u origin fix/upload-limit",
+        "# open the pull request on the platform",
+        "# respond to review comments with more commits",
+        "# merge when approved and checks pass",
+        "git switch main && git pull                     # bring the merged work back down",
+        "git branch -d fix/upload-limit                  # tidy up"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "git add -p is worth the extra minute",
+      "text": "It walks you through each change and asks whether to stage it. You catch the debug line, the accidental formatting change, and the unrelated edit — before they become part of a commit someone else has to read."
+    },
+    {
+      "kind": "heading",
+      "text": "What a reviewer needs from you"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "A title that states the effect, not the activity — 'Reject uploads over 10MB', not 'fix upload'",
+        "A description that says why this change exists and what you decided against",
+        "A branch that does one thing; a pull request touching four unrelated areas gets a shallow review",
+        "Commits that make sense in order, tidied with interactive rebase before you ask for eyes",
+        "Anything the reviewer cannot see: how you tested it, what you could not test, what you are unsure about"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Size is the strongest predictor of review quality",
+      "text": "A 50-line change gets read line by line. A 2,000-line change gets skimmed and approved, because thorough review of it would take hours nobody has. If a change must be large, say so and point reviewers at the parts that matter — or split it into a sequence of pull requests that each stand alone."
+    },
+    {
+      "kind": "heading",
+      "text": "Responding to review"
+    },
+    {
+      "kind": "code",
+      "caption": "Push more commits; do not rewrite mid-review",
+      "lines": [
+        "# ...make the requested changes...",
+        "git commit -m \"Move the size check into the validator\"",
+        "git push                       # the pull request updates automatically",
+        "",
+        "# Once review has started, avoid amending or force-pushing:",
+        "# it invalidates the comments reviewers already left."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "How it gets merged"
+    },
+    {
+      "kind": "table",
+      "headers": ["Option", "Result", "Suits"],
+      "rows": [
+        ["Merge commit", "Keeps every commit and records the join", "Branches whose individual commits are meaningful"],
+        ["Squash and merge", "Collapses the branch into one commit on the shared branch", "Most feature branches; keeps the shared history clean"],
+        ["Rebase and merge", "Replays the commits with no merge commit", "Teams that require a strictly linear history"]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Squash is the common default because it makes one shared-history entry per change, which is usually the right granularity for anyone reading main later. The individual commits still exist in the pull request record if anyone needs them."
+    },
+    {
+      "kind": "heading",
+      "text": "Protection rules: why the branch refuses direct pushes"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Require a pull request, so nothing lands without a second pair of eyes",
+        "Require approvals, and require them again when new commits arrive",
+        "Require status checks to pass — tests, linting, build",
+        "Forbid force pushes to the shared branch, which is what stops history from being rewritten under everyone",
+        "Restrict who may merge, for branches that go to production"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The protection you will resent, once",
+      "text": "The day you need to fix something urgently, the rules will be in your way. That is what they are for: the same barrier that slows an emergency fix also stops an unreviewed change at 2am from reaching production. Teams that add an emergency bypass usually find it becomes the normal path within a month."
+    },
+    {
+      "kind": "try",
+      "title": "Rehearse the loop locally",
+      "steps": [
+        "In ~/git-lab: git switch main && git pull",
+        "Run: git switch -c fix/demo-limit",
+        "Edit a file, then run: git add -p        (choose y/n per change)",
+        "Run: git commit -m \"Reject values over the limit\"",
+        "Run: git push -u origin fix/demo-limit",
+        "Run: git log --oneline origin/main..HEAD   (exactly what a reviewer would see)",
+        "Run: git switch main && git merge fix/demo-limit && git push",
+        "Run: git branch -d fix/demo-limit && git push origin --delete fix/demo-limit"
+      ],
+      "expected": "The full cycle without a hosting platform: branch, staged deliberately, pushed, the exact review scope listed, merged, and both copies of the branch cleaned up. On a real platform only the review step is added."
+    }
+  ],
+  "cheatsheet": [
+    "A pull request is a platform convention on top of Git, not a Git feature",
+    "Start from an updated shared branch; branch names state their purpose",
+    "git add -p stages change by change and catches what you did not mean to include",
+    "Title states the effect; description says why and what you rejected",
+    "One concern per pull request — size is the strongest predictor of review quality",
+    "Respond to review with new commits; do not amend or force-push mid-review",
+    "Squash and merge is the usual default: one clean entry per change on the shared branch",
+    "Protection rules require review and passing checks and forbid force pushes",
+    "After merging: pull the shared branch, delete the branch locally and on the server"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What is a pull request, technically?",
+      "choices": {
+        "A": "A Git command that requests a merge",
+        "B": "A convention provided by hosting platforms: a request to review a branch before it joins the shared work",
+        "C": "Another name for git pull",
+        "D": "A protected branch setting"
+      },
+      "correct": ["B"],
+      "explanation": "Git itself has no such concept. The platform adds review, discussion, and gating around an ordinary branch."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why does the size of a change matter so much for review?",
+      "choices": {
+        "A": "Large diffs make Git slow",
+        "B": "Small changes get read line by line; large ones get skimmed and approved because a thorough review would take hours",
+        "C": "Platforms reject large pull requests",
+        "D": "Large changes cannot be squashed"
+      },
+      "correct": ["B"],
+      "explanation": "Review quality falls off sharply with size. Splitting a change into independently reviewable pieces gets you real review rather than a rubber stamp."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A reviewer has left comments. How should you make the requested changes?",
+      "choices": {
+        "A": "Amend the original commit and force-push",
+        "B": "Add new commits and push them, so existing comments stay anchored to what they referred to",
+        "C": "Close the pull request and open a new one",
+        "D": "Merge first and fix afterwards"
+      },
+      "correct": ["B"],
+      "explanation": "Rewriting during review detaches the comments from the code they were about, and reviewers lose their place. Tidy the history before review starts, not during."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "What does forbidding force pushes on a shared branch protect against?",
+      "choices": {
+        "A": "Large files being committed",
+        "B": "History being rewritten under everyone who already has it, silently removing commits from the shared branch",
+        "C": "Merge conflicts",
+        "D": "Slow clones"
+      },
+      "correct": ["B"],
+      "explanation": "It is the rule that keeps the shared history append-only, which is what makes everyone's copy trustworthy."
+    }
+  ]
+}

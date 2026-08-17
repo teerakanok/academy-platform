@@ -30,6 +30,11 @@
     "merging": "Bringing work back together",
     "resolving-conflicts": "Resolving conflicts without panic",
     "rebase-vs-merge": "Rebase, and when not to use it",
-    "reflog-rescue": "Getting back what you thought you lost"
+    "reflog-rescue": "Getting back what you thought you lost",
+    "remotes-and-clone": "Remotes: the shared copy",
+    "push-pull-fetch": "Exchanging commits: push, fetch, pull",
+    "pull-request-flow": "The pull request workflow",
+    "code-review-basics": "Reviewing someone else's change",
+    "tags-and-releases": "Tags: naming a version you can return to"
   }
 }

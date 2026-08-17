@@ -1,0 +1,189 @@
+{
+  "nodeId": "remotes-and-clone",
+  "locale": "th",
+  "title": "remote: สำเนาที่ใช้ร่วมกัน",
+  "objective": "จบบทนี้แล้วคุณจะ clone โปรเจกต์ได้ เข้าใจว่า origin คืออะไรกันแน่ และอ่านความต่างระหว่าง branch ของคุณกับ branch บนเซิร์ฟเวอร์ได้",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "ทุกอย่างที่ผ่านมาทำงานบนเครื่องคุณเครื่องเดียว remote คือสำเนาอีกชุดของ repository เดียวกันที่คุณตกลงจะซิงก์ด้วย — ปกติคือชุดที่โฮสต์ไว้ที่ที่ทุกคนเข้าถึงได้ ไม่มีอะไรของ Git เปลี่ยนไปเมื่อคุณเพิ่ม remote คุณแค่ได้ช่องทางแลกเปลี่ยน commit เพิ่มมา"
+    },
+    {
+      "kind": "code",
+      "caption": "ขอสำเนามาหนึ่งชุด",
+      "lines": [
+        "git clone https://github.com/org/project.git",
+        "cd project",
+        "",
+        "# ตอนนี้คุณมี: ประวัติทั้งหมด ทุก branch และ remote ชื่อ origin",
+        "git remote -v"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "origin เป็นชื่อเล่น ไม่ใช่กฎ",
+      "text": "Git ตั้งชื่อ remote ที่คุณ clone มาว่า origin ตามธรรมเนียม มันไม่มีอำนาจพิเศษอะไร — เป็นแค่ชื่อสั้นๆ ของ URL หนึ่งโปรเจกต์มีหลาย remote ได้ ซึ่งเป็นวิธีที่คุณทำงานกับ fork และต้นฉบับพร้อมกัน"
+    },
+    {
+      "kind": "heading",
+      "text": "branch สามชนิด ซึ่งเป็นจุดเริ่มของความสับสน"
+    },
+    {
+      "kind": "table",
+      "headers": ["ชื่อ", "คืออะไร", "ใครขยับมัน"],
+      "rows": [
+        ["main", "branch ในเครื่องคุณ", "คุณ ด้วยการ commit"],
+        ["origin/main", "ภาพจำล่าสุดของ main บนเซิร์ฟเวอร์ที่เครื่องคุณจดไว้", "git fetch หรือ git pull"],
+        ["main บนเซิร์ฟเวอร์", "สถานะจริงบน remote", "ใครก็ตามที่ push ขึ้นไป"]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "origin/main ไม่ใช่ภาพสด มันคือโน้ตที่เครื่องคุณจดไว้ตอนคุยกับเซิร์ฟเวอร์ครั้งล่าสุด เวลามีคนบอกว่า branch ฉันตามหลังอยู่ เขาหมายถึง branch ในเครื่องเขามี commit น้อยกว่าโน้ตนั้น — และตัวโน้ตเองก็อาจล้าสมัยไปแล้วเหมือนกัน"
+    },
+    {
+      "kind": "code",
+      "caption": "ดูให้เห็นทั้งสามอย่าง",
+      "lines": [
+        "git branch            # เฉพาะ branch ในเครื่อง",
+        "git branch -r         # remote-tracking: origin/main, origin/feature-x ...",
+        "git branch -a        # ทั้งสองแบบ",
+        "git fetch origin      # อัปเดตโน้ตโดยไม่แตะงานของคุณ",
+        "git status            # ตอนนี้บอกได้แม่นว่านำหน้าหรือตามหลังเท่าไร"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "fetch ปลอดภัยเสมอ",
+      "text": "มันดาวน์โหลด commit และอัปเดตโน้ต remote-tracking ของคุณ โดยไม่แตะอะไรที่คุณกำลังทำอยู่เลย เมื่อไม่แน่ใจสถานการณ์ ให้ fetch ก่อนแล้วค่อยดู — มันคือครึ่งที่อ่านอย่างเดียวของ pull"
+    },
+    {
+      "kind": "heading",
+      "text": "เพิ่มและจัดการ remote"
+    },
+    {
+      "kind": "code",
+      "caption": "ปฏิบัติการที่พบบ่อย",
+      "lines": [
+        "git remote add origin https://github.com/org/project.git   # เชื่อม repo ในเครื่องที่มีอยู่แล้ว",
+        "git remote -v                                              # ดูรายการพร้อม URL",
+        "git remote add upstream https://github.com/original/project.git  # รูปแบบของการ fork",
+        "git remote set-url origin git@github.com:org/project.git   # เปลี่ยนไปใช้ SSH",
+        "git remote remove upstream"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "HTTPS หรือ SSH"
+    },
+    {
+      "kind": "table",
+      "headers": ["", "HTTPS", "SSH"],
+      "rows": [
+        ["การตั้งค่า", "ไม่ต้องตั้งอะไร", "สร้าง key แล้วเอาครึ่ง public ไปใส่ที่โฮสต์"],
+        ["ทุกครั้งที่ push", "ถาม token เว้นแต่มีตัวช่วยจำไว้ให้", "เงียบ ใช้ key ของคุณ"],
+        ["ผ่านเครือข่ายที่จำกัดได้ไหม", "ปกติได้", "บางครั้งถูกบล็อก"],
+        ["เหมาะกับ", "ใช้นานๆ ครั้ง หรืออ่านอย่างเดียว", "อะไรก็ตามที่คุณ push บ่อย"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "ช่องที่ถามรหัสผ่าน ไม่ได้ต้องการรหัสผ่านอีกแล้ว",
+      "text": "โฮสต์รายใหญ่เลิกรับรหัสผ่านของบัญชีสำหรับปฏิบัติการ Git มาหลายปีแล้ว ถ้า HTTPS ขอให้คุณยืนยันตัวตน มันต้องการ personal access token ให้ปฏิบัติกับ token นั้นเหมือนข้อมูลลับ ให้สิทธิ์แคบที่สุดเท่าที่ยังใช้ได้ และห้ามวางมันลงในไฟล์ที่ repository ติดตามอยู่"
+    },
+    {
+      "kind": "heading",
+      "text": "ตัวเลือกของ clone ที่ควรรู้"
+    },
+    {
+      "kind": "code",
+      "caption": "เมื่อค่าตั้งต้นมากเกินไป",
+      "lines": [
+        "git clone --depth 1 <url>          # เอาแค่ commit ล่าสุด — เร็ว แต่ประวัติใช้งานไม่ได้",
+        "git clone --branch release <url>   # เริ่มที่ branch ที่ระบุ",
+        "git clone <url> my-folder          # clone ลงไดเรกทอรีชื่ออื่น"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "shallow clone เหมาะกับเครื่อง build ที่ต้องการแค่ไฟล์ปัจจุบัน แต่ไม่เหมาะกับงานของคุณเอง เพราะเกือบทุกอย่างที่ทำให้ Git มีประโยชน์ — log, blame, bisect — ต้องใช้ประวัติที่คุณเพิ่งปฏิเสธจะดาวน์โหลดมา"
+    },
+    {
+      "kind": "try",
+      "title": "ทำงานกับ remote ที่คุณคุมเอง",
+      "steps": [
+        "สร้าง bare repository ให้ทำหน้าที่เป็นเซิร์ฟเวอร์: git init --bare ~/git-server/demo.git",
+        "ใน ~/git-lab: git remote add origin ~/git-server/demo.git",
+        "รัน: git remote -v",
+        "รัน: git push -u origin main",
+        "รัน: git branch -a               (สังเกตว่า origin/main โผล่ขึ้นมา)",
+        "clone มันราวกับคุณเป็นเพื่อนร่วมงาน: git clone ~/git-server/demo.git ~/git-lab-clone",
+        "ในสำเนานั้น: git log --oneline   (ประวัติทั้งหมดติดมาด้วย)"
+      ],
+      "expected": "repository ในเครื่องที่ต่อกับ remote ที่คุณเป็นเจ้าของ การ push ที่สำเร็จ และสำเนาที่สองที่มีประวัติครบถ้วน — โมเดลเดียวกับบริการที่โฮสต์ไว้ โดยไม่ต้องมีบัญชีเลย"
+    }
+  ],
+  "cheatsheet": [
+    "remote คือสำเนาอีกชุดของ repository เดียวกันที่คุณซิงก์ด้วย",
+    "origin เป็นแค่ชื่อเล่นตามธรรมเนียมของ URL ที่คุณ clone มา",
+    "main = ของคุณ · origin/main = โน้ตล่าสุดที่จดไว้เรื่องเซิร์ฟเวอร์ · เซิร์ฟเวอร์มีของมันเอง",
+    "git fetch อัปเดตโน้ตและไม่แตะอะไรที่คุณทำอยู่ — ปลอดภัยเสมอ",
+    "git branch -r แสดง remote-tracking branch; -a แสดงทั้งหมด",
+    "git remote add <ชื่อ> <url> เชื่อม repository เข้ากับ remote",
+    "ใช้ SSH กับอะไรที่ push บ่อย; HTTPS ต้องใช้ token ไม่ใช่รหัสผ่าน",
+    "--depth 1 มีไว้สำหรับเครื่อง build ไม่ใช่งานที่ต้องใช้ log, blame หรือ bisect"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "origin/main คืออะไร",
+      "choices": {
+        "A": "ภาพสดของ branch main บนเซิร์ฟเวอร์",
+        "B": "โน้ตที่เครื่องคุณจดไว้ว่า main บนเซิร์ฟเวอร์อยู่ตรงไหนตอน fetch ครั้งล่าสุด",
+        "C": "ไฟล์สำรองของ main ในเครื่องคุณ",
+        "D": "branch ที่คุณอยู่ตอนนี้"
+      },
+      "correct": ["B"],
+      "explanation": "มันอัปเดตเฉพาะตอนคุณ fetch หรือ pull เท่านั้น ก่อนหน้านั้นมันเก่าได้เท่ากับการคุยกับเซิร์ฟเวอร์ครั้งล่าสุดของคุณ"
+    },
+    {
+      "id": "cp-2",
+      "prompt": "ทำไม git fetch ถึงถือว่ารันได้อย่างปลอดภัยทุกเมื่อ",
+      "choices": {
+        "A": "เพราะมันไม่ต้องยืนยันตัวตน",
+        "B": "เพราะมันดาวน์โหลด commit และอัปเดต remote-tracking branch โดยไม่แตะไฟล์ที่คุณทำงานอยู่หรือ branch ของคุณ",
+        "C": "เพราะมันอ่านแค่ commit แรก",
+        "D": "เพราะมันสำรองข้อมูลก่อนทำงาน"
+      },
+      "correct": ["B"],
+      "explanation": "fetch คือครึ่งที่อ่านอย่างเดียวของ pull มันเปลี่ยนสิ่งที่คุณรู้ ไม่ได้เปลี่ยนสิ่งที่คุณมี"
+    },
+    {
+      "id": "cp-3",
+      "prompt": "HTTPS ถามรหัสผ่านตอน push จริงๆ แล้วมันต้องการอะไร",
+      "choices": {
+        "A": "รหัสผ่านบัญชีของคุณ",
+        "B": "personal access token ที่ให้สิทธิ์แคบที่สุดเท่าที่ยังใช้ได้",
+        "C": "SSH private key ของคุณ",
+        "D": "ชื่อ repository"
+      },
+      "correct": ["B"],
+      "explanation": "โฮสต์รายใหญ่เลิกรับรหัสผ่านบัญชีสำหรับปฏิบัติการ Git แล้ว token คือข้อมูลลับ — ให้สิทธิ์แคบไว้และห้าม commit มันเด็ดขาด"
+    },
+    {
+      "id": "cp-4",
+      "prompt": "git clone --depth 1 เป็นทางเลือกที่ผิดเมื่อไร",
+      "choices": {
+        "A": "บนเครื่อง build ที่แค่คอมไพล์โค้ดปัจจุบัน",
+        "B": "สำหรับสำเนาที่คุณใช้ทำงานเอง เพราะ log, blame และ bisect ล้วนต้องใช้ประวัติที่มันข้ามไป",
+        "C": "เมื่อ repository เล็ก",
+        "D": "เมื่อ clone ผ่าน SSH"
+      },
+      "correct": ["B"],
+      "explanation": "shallow clone แลกความสามารถที่ทำให้ Git คุ้มค่าที่จะใช้ในแต่ละวันทิ้งไปพอดี"
+    }
+  ]
+}

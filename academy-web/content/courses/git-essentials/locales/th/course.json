@@ -30,6 +30,11 @@
     "merging": "รวมงานกลับเข้าด้วยกัน",
     "resolving-conflicts": "แก้ conflict โดยไม่ต้องตกใจ",
     "rebase-vs-merge": "rebase และเวลาที่ไม่ควรใช้มัน",
-    "reflog-rescue": "เอาของที่คิดว่าหายไปแล้วกลับคืนมา"
+    "reflog-rescue": "เอาของที่คิดว่าหายไปแล้วกลับคืนมา",
+    "remotes-and-clone": "remote: สำเนาที่ใช้ร่วมกัน",
+    "push-pull-fetch": "แลกเปลี่ยน commit: push, fetch, pull",
+    "pull-request-flow": "ขั้นตอนการทำงานแบบ pull request",
+    "code-review-basics": "ตรวจการเปลี่ยนแปลงของคนอื่น",
+    "tags-and-releases": "tag: ตั้งชื่อเวอร์ชันที่กลับไปหาได้"
   }
 }

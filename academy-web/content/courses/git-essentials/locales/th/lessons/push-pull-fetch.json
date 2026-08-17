@@ -1,0 +1,197 @@
+{
+  "nodeId": "push-pull-fetch",
+  "locale": "th",
+  "title": "แลกเปลี่ยน commit: push, fetch, pull",
+  "objective": "จบบทนี้แล้วคุณจะส่งและรับงานได้อย่างมั่นใจ และรู้ว่าต้องทำอะไรเมื่อ push ถูกปฏิเสธ ซึ่งเป็นจังหวะที่คนสับสนมากที่สุดในการใช้ Git ร่วมกัน",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "สามคำสั่งย้าย commit ระหว่างสำเนาของคุณกับสำเนาที่ใช้ร่วมกัน แต่ละตัวเรียบง่าย ความเข้าใจที่มีประโยชน์คือแต่ละตัวทำอะไรกับสถานะงานของคุณ และทำไมตัวหนึ่งถึงปฏิเสธเป็นประจำ"
+    },
+    {
+      "kind": "table",
+      "headers": ["คำสั่ง", "ทิศทาง", "แตะไฟล์ของคุณไหม"],
+      "rows": [
+        ["git fetch", "เซิร์ฟเวอร์ → โน้ตของคุณ", "ไม่ — คำสั่งที่ปลอดภัยที่สุดใน Git"],
+        ["git pull", "เซิร์ฟเวอร์ → branch ของคุณ", "ใช่ — fetch บวกการรวมงาน"],
+        ["git push", "branch ของคุณ → เซิร์ฟเวอร์", "ไม่ แต่มันเปลี่ยนสิ่งที่คนอื่นเห็น"]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "push: ส่ง commit ของคุณออกไป"
+    },
+    {
+      "kind": "code",
+      "caption": "ครั้งแรกและครั้งต่อๆ ไป",
+      "lines": [
+        "git push -u origin feature/upload   # ครั้งแรก: สร้างบนเซิร์ฟเวอร์และผูกเข้าด้วยกัน",
+        "git push                            # หลังจากนั้น: มันจำการผูกไว้แล้ว",
+        "",
+        "git push origin --delete old-branch # ลบ branch ออกจากเซิร์ฟเวอร์",
+        "git push --tags                     # ส่ง tag (มันไม่เดินทางไปเองอัตโนมัติ)"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "-u ทำอะไร",
+      "text": "มันตั้ง upstream: บันทึกว่า branch ในเครื่องของคุณคู่กับ branch ไหนบน remote หลังจากนั้น git push และ git pull แบบไม่ใส่อะไรจะรู้ว่าต้องไปที่ไหน และ git status บอกได้ว่าคุณนำหน้าหรือตามหลังอยู่เท่าไร"
+    },
+    {
+      "kind": "heading",
+      "text": "การปฏิเสธที่ทุกคนต้องเจอ"
+    },
+    {
+      "kind": "code",
+      "caption": "หน้าตาของมัน",
+      "lines": [
+        "$ git push",
+        "! [rejected]        main -> main (fetch first)",
+        "error: failed to push some refs",
+        "hint: Updates were rejected because the remote contains work that you do",
+        "hint: not have locally."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "นี่คือ Git กำลังปกป้อง commit ของคนอื่น เซิร์ฟเวอร์มีงานที่คุณไม่เคยเห็น การรับ push ของคุณตามที่เป็นอยู่จะทิ้งงานนั้นไว้ข้างหลัง ทางแก้คือเอางานของเขาเข้ามาในของคุณก่อน แล้วค่อย push ผลลัพธ์ที่รวมกันแล้ว"
+    },
+    {
+      "kind": "code",
+      "caption": "การตอบสนองที่ถูกต้อง",
+      "lines": [
+        "git pull                # ดึงงานของเขามาแล้วรวมเข้ากับของคุณ",
+        "# แก้ conflict ถ้ามี",
+        "git push                # ตอนนี้เซิร์ฟเวอร์เดินหน้าต่อได้อย่างสะอาด",
+        "",
+        "# ห้ามตอบสนองด้วยความเคยชินแบบนี้:",
+        "git push --force        # นี่คือการลบ commit ของเขาออกจากเซิร์ฟเวอร์"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "--force คือวิธีที่งานของคนอื่นหายไป",
+      "text": "การ force คือการบอกเซิร์ฟเวอร์ให้แทนที่ branch ของมันด้วยของคุณ ทิ้งอะไรก็ตามที่มันมีแต่คุณไม่มี บน branch ที่ใช้ร่วมกัน นั่นคือการสูญเสียข้อมูลของเพื่อนร่วมงาน ถ้าจำเป็นต้องเขียนทับจริงๆ — หลังจาก rebase branch ฟีเจอร์ของตัวเอง — ให้ใช้ --force-with-lease ซึ่งจะปฏิเสธเมื่อ remote ขยับไปหลังจากที่คุณดูครั้งล่าสุด"
+    },
+    {
+      "kind": "heading",
+      "text": "pull คือสองปฏิบัติการ และคุณเลือกตัวที่สองได้"
+    },
+    {
+      "kind": "code",
+      "caption": "merge หรือ rebase ตอนของมาถึง",
+      "lines": [
+        "git pull                       # fetch แล้ว merge (ค่าตั้งต้น)",
+        "git pull --rebase              # fetch แล้วเล่น commit ของคุณซ้ำไว้ข้างบน",
+        "",
+        "git config --global pull.rebase true   # ตั้งให้ rebase เป็นค่าตั้งต้นของคุณ"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "pull เฉยๆ สร้าง merge commit ทุกครั้งที่ทั้งสองฝั่งขยับ ซึ่งทำให้ประวัติเต็มไปด้วยบรรทัด Merge branch main of ... ที่ไม่ได้บอกอะไรเลย ส่วน pull แบบ rebase เล่น commit ในเครื่องของคุณซ้ำไว้บนของเขาและทำให้เส้นตรง เนื่องจาก commit ที่ยังไม่ push คือของที่ยังไม่ได้แชร์โดยนิยาม การ rebase มันจึงปลอดภัย — นี่คือที่เดียวที่การตั้ง rebase เป็นค่าตั้งต้นเป็นทางเลือกที่สมเหตุสมผล"
+    },
+    {
+      "kind": "heading",
+      "text": "อ่านตำแหน่งของตัวเอง"
+    },
+    {
+      "kind": "code",
+      "caption": "ตอนนี้อยู่ตรงไหนเทียบกับเซิร์ฟเวอร์",
+      "lines": [
+        "git fetch",
+        "git status",
+        "#   Your branch is ahead of 'origin/main' by 2 commits.     ← มีงานที่ยังไม่ push",
+        "#   Your branch is behind 'origin/main' by 5 commits.       ← ต้อง pull",
+        "#   Your branch and 'origin/main' have diverged             ← ขยับทั้งคู่ ต้องรวมกัน",
+        "",
+        "git log --oneline origin/main..HEAD    # สิ่งที่คุณกำลังจะ push เป๊ะๆ",
+        "git log --oneline HEAD..origin/main    # สิ่งที่คุณกำลังจะได้รับเป๊ะๆ"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "fetch ก่อนตัดสิน",
+      "text": "คำว่านำหน้าและตามหลังถูกวัดเทียบกับโน้ตล่าสุดที่คุณจดไว้เรื่องเซิร์ฟเวอร์ ไม่ใช่เทียบกับตัวเซิร์ฟเวอร์เอง สถานะที่บอกว่า ทันสมัยแล้ว อาจเก่าไปหนึ่งชั่วโมง ให้ fetch ก่อนแล้วค่อยอ่าน"
+    },
+    {
+      "kind": "try",
+      "title": "ทำให้ถูกปฏิเสธแล้วแก้ให้ถูกวิธี",
+      "steps": [
+        "ใช้สอง repository จากบทที่แล้ว (~/git-lab และ ~/git-lab-clone)",
+        "ใน ~/git-lab-clone: echo 'from the clone' >> notes.txt && git commit -am \"Change from the clone\" && git push",
+        "ใน ~/git-lab: echo 'from the original' >> notes.txt && git commit -am \"Change from the original\"",
+        "รัน: git push                  (ถูกปฏิเสธ — เซิร์ฟเวอร์มีงานที่คุณไม่มี)",
+        "รัน: git fetch && git status   (แยกทางกันแล้ว)",
+        "รัน: git pull --rebase         (เล่น commit ของคุณซ้ำไว้ข้างบน แล้วแก้ conflict)",
+        "รัน: git push && git log --oneline --graph -5"
+      ],
+      "expected": "การถูกปฏิเสธที่คุณตั้งใจสร้าง แล้วตามด้วยการแก้ที่ถูกต้อง: pull, รวมงาน, push ประวัติยังเป็นเส้นตรงเพราะคุณ rebase commit ของตัวเองที่ยังไม่ได้แชร์ แทนที่จะ force ทับงานของคนอื่น"
+    }
+  ],
+  "cheatsheet": [
+    "fetch = ดาวน์โหลดและอัปเดตโน้ต · pull = fetch + รวมงาน · push = ส่งออก",
+    "ครั้งแรกใช้ git push -u origin <branch>; หลังจากนั้นใช้ git push",
+    "push ที่ถูกปฏิเสธแปลว่าเซิร์ฟเวอร์มี commit ที่คุณไม่มี",
+    "ทางแก้คือ pull แล้ว push — ห้าม --force บน branch ที่ใช้ร่วมกัน",
+    "--force-with-lease คือเวอร์ชันปลอดภัย และใช้เฉพาะกับ branch ของตัวเองที่ rebase แล้ว",
+    "git pull --rebase ทำให้ประวัติเป็นเส้นตรง; pull.rebase true ตั้งเป็นค่าตั้งต้น",
+    "git log origin/main..HEAD — สิ่งที่คุณกำลังจะ push",
+    "git log HEAD..origin/main — สิ่งที่คุณกำลังจะได้รับ",
+    "นำหน้า/ตามหลัง วัดจาก fetch ครั้งล่าสุด ให้ fetch ก่อนตัดสิน",
+    "tag ไม่เดินทางไปกับ push ปกติ — ใช้ git push --tags"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "push ของคุณถูกปฏิเสธพร้อมข้อความว่า remote มีงานที่คุณไม่มีในเครื่อง การตอบสนองที่ถูกต้องคืออะไร",
+      "choices": {
+        "A": "git push --force",
+        "B": "git pull รวมงานของอีกฝ่าย แล้ว git push",
+        "C": "ลบ branch ของคุณแล้วเริ่มใหม่",
+        "D": "clone repository ใหม่ทั้งอัน"
+      },
+      "correct": ["B"],
+      "explanation": "การปฏิเสธมีไว้ปกป้อง commit ที่คุณยังไม่เห็น การ force จะเอามันออกจากเซิร์ฟเวอร์ ซึ่งคือการสูญเสียข้อมูลของคนที่ทำมัน"
+    },
+    {
+      "id": "cp-2",
+      "prompt": "fetch กับ pull ต่างกันอย่างไร",
+      "choices": {
+        "A": "ไม่ต่าง pull เป็นแค่ชื่อย่อ",
+        "B": "fetch ดาวน์โหลดและอัปเดตโน้ต remote-tracking อย่างเดียว ส่วน pull ทำแบบนั้นแล้วรวมงานเข้า branch ของคุณด้วย",
+        "C": "fetch ทำงานออฟไลน์ได้",
+        "D": "pull ดาวน์โหลดแค่ tag"
+      },
+      "correct": ["B"],
+      "explanation": "fetch เปลี่ยนสิ่งที่คุณรู้ ส่วน pull เปลี่ยนสิ่งที่คุณมี ซึ่งเป็นเหตุผลที่ fetch ปลอดภัยเสมอและ pull ทำให้เกิด conflict ได้"
+    },
+    {
+      "id": "cp-3",
+      "prompt": "ทำไม git pull --rebase ถึงมักถูกเลือกมากกว่า git pull เฉยๆ",
+      "choices": {
+        "A": "เพราะเร็วกว่าบนเครือข่าย",
+        "B": "เพราะมันเล่น commit ที่ยังไม่ push ของคุณซ้ำไว้บนงานที่เข้ามา เลี่ยงประวัติที่เต็มไปด้วย merge commit ที่ไม่บอกอะไร",
+        "C": "เพราะมันไม่เคยทำให้เกิด conflict",
+        "D": "เพราะมันข้ามขั้นตอน fetch"
+      },
+      "correct": ["B"],
+      "explanation": "commit ที่ยังไม่ push คือของที่ยังไม่ได้แชร์ การ rebase มันจึงปลอดภัย และทำให้ประวัติที่ใช้ร่วมกันอ่านรู้เรื่องแทนที่จะเต็มไปด้วย merge อัตโนมัติ"
+    },
+    {
+      "id": "cp-4",
+      "prompt": "git status บอกว่าคุณทันสมัยแล้ว ควรตรวจอะไรก่อน",
+      "choices": {
+        "A": "ไม่ต้องตรวจอะไร status เชื่อถือได้",
+        "B": "รัน git fetch ก่อน เพราะนำหน้า/ตามหลังวัดจากโน้ตล่าสุดที่จดไว้เรื่องเซิร์ฟเวอร์ ไม่ใช่จากตัวเซิร์ฟเวอร์เอง",
+        "C": "ว่า remote ยังมีอยู่ไหม",
+        "D": "ว่าคุณใช้ระบบปฏิบัติการถูกตัวไหม"
+      },
+      "correct": ["B"],
+      "explanation": "remote-tracking branch อัปเดตเฉพาะตอนคุณ fetch การอ่าน status โดยไม่ fetch คือการฟังรายงานของบทสนทนาที่อาจเก่าไปหลายชั่วโมง"
+    }
+  ]
+}

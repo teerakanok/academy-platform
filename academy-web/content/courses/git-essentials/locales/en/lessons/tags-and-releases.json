@@ -1,0 +1,198 @@
+{
+  "nodeId": "tags-and-releases",
+  "locale": "en",
+  "title": "Tags: naming a version you can return to",
+  "objective": "By the end of this lesson you can mark a release so anyone can reproduce that exact state later, and you know why a tag is treated differently from a branch.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A branch moves. A tag does not. When you ship something, you need a name for exactly what you shipped — so that six weeks later, when a customer reports a problem with version 2.3, you can stand on the exact code they are running rather than approximately that code."
+    },
+    {
+      "kind": "code",
+      "caption": "Creating and pushing a tag",
+      "lines": [
+        "git tag -a v2.3.0 -m \"Bulk upload, faster report export\"",
+        "git push origin v2.3.0        # tags do NOT travel with a normal push",
+        "",
+        "git tag                        # list",
+        "git tag -l 'v2.*'              # filter",
+        "git show v2.3.0                # what it points at, plus the message"
+      ]
+    },
+    {
+      "kind": "table",
+      "headers": ["", "Lightweight (git tag v1)", "Annotated (git tag -a v1 -m ...)"],
+      "rows": [
+        ["Stores", "Just a pointer", "A real object: author, date, message"],
+        ["Use for", "A private bookmark for yourself", "Anything you release or share"],
+        ["Recommended", "Rarely", "Always, for releases"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Use annotated tags for anything real",
+      "text": "The extra flag records who tagged it, when, and why. That metadata is what makes a release history readable a year later, and it costs you one -a and one -m."
+    },
+    {
+      "kind": "heading",
+      "text": "Version numbers that carry information"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Semantic versioning is the widespread convention: MAJOR.MINOR.PATCH. It exists so that a version number tells someone whether upgrading is safe."
+    },
+    {
+      "kind": "table",
+      "headers": ["Change", "Bump", "Means"],
+      "rows": [
+        ["Fixed a bug, nothing else changed", "PATCH — 2.3.0 → 2.3.1", "Safe to upgrade"],
+        ["Added a feature, existing use still works", "MINOR — 2.3.1 → 2.4.0", "Safe to upgrade"],
+        ["Changed or removed something people depend on", "MAJOR — 2.4.0 → 3.0.0", "Read the notes before upgrading"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The point of the major number",
+      "text": "It is a promise about compatibility, not a marketing decision. A team that avoids bumping the major number because it 'looks like a big deal' ends up shipping breaking changes inside a patch release — and then nobody can trust any version number they publish."
+    },
+    {
+      "kind": "heading",
+      "text": "Returning to a released state"
+    },
+    {
+      "kind": "code",
+      "caption": "Investigating a version",
+      "lines": [
+        "git switch --detach v2.3.0     # stand exactly on what was released",
+        "# reproduce the bug, read the code as it was",
+        "git switch -                   # come back to your work",
+        "",
+        "git log --oneline v2.3.0..v2.4.0    # what changed between two releases",
+        "git diff v2.3.0 v2.4.0 -- src/upload/   # in one area only",
+        "git describe --tags                 # how far the current commit is from the last tag"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "That first command is the reason tags matter operationally. A support question about a specific version becomes a two-command investigation instead of an argument about which commit was probably deployed."
+    },
+    {
+      "kind": "heading",
+      "text": "Fixing a released version without shipping everything else"
+    },
+    {
+      "kind": "code",
+      "caption": "The patch branch pattern",
+      "lines": [
+        "git switch -c release/2.3 v2.3.0     # a branch starting from the released tag",
+        "git cherry-pick a3f91c2              # bring in just the fix commit from main",
+        "git tag -a v2.3.1 -m \"Fix timezone on report export\"",
+        "git push origin release/2.3 v2.3.1"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "cherry-pick copies one commit's changes onto the branch you are on. This is how a critical fix reaches customers on an older version without dragging along everything else that has landed on main since."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Never move or reuse a published tag",
+      "text": "People and build systems record 'we are running v2.3.0' and trust that it means one specific state. Moving that tag makes every one of those records a lie, and machines that already downloaded it will not agree with machines that download it later. If you tagged the wrong commit, publish v2.3.1 instead."
+    },
+    {
+      "kind": "heading",
+      "text": "Tag maintenance"
+    },
+    {
+      "kind": "code",
+      "caption": "The commands, including the ones to avoid",
+      "lines": [
+        "git push origin --tags          # push all tags at once",
+        "git fetch --tags                # get tags others created",
+        "git tag -d v2.3.0-typo          # delete locally (fine, if never pushed)",
+        "git push origin --delete v2.3.0-typo   # delete on the server — only for genuine mistakes"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Tag a release and investigate it",
+      "steps": [
+        "In ~/git-lab: git switch main",
+        "Run: git tag -a v0.1.0 -m \"First working version\" && git push origin v0.1.0",
+        "Run: echo 'new feature' >> notes.txt && git commit -am \"Add a feature\"",
+        "Run: git tag -a v0.2.0 -m \"Add the feature\" && git push origin v0.2.0",
+        "Run: git tag && git show v0.1.0 | head",
+        "Run: git log --oneline v0.1.0..v0.2.0      (what changed between releases)",
+        "Run: git switch --detach v0.1.0 && cat notes.txt   (the released state exactly)",
+        "Run: git switch - && git describe --tags"
+      ],
+      "expected": "Two annotated tags, the difference between them listed, and the earlier release state standing in front of you. That last step is the whole reason tags exist."
+    }
+  ],
+  "cheatsheet": [
+    "A branch moves; a tag is a permanent name for one commit",
+    "git tag -a v1.2.0 -m \"...\" — always annotated for releases",
+    "Tags do not travel with a normal push: git push origin <tag> or --tags",
+    "git fetch --tags to receive tags others created",
+    "MAJOR.MINOR.PATCH: patch = safe fix, minor = safe addition, major = breaking",
+    "git switch --detach <tag> stands exactly on a released state",
+    "git log v1..v2 — what changed between two releases",
+    "git describe --tags — how far you are from the last tag",
+    "cherry-pick one fix onto a release branch instead of shipping all of main",
+    "Never move a published tag; publish the next patch version instead"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What is the difference between a tag and a branch?",
+      "choices": {
+        "A": "A tag can only be created by maintainers",
+        "B": "A branch moves forward as you commit; a tag is a permanent name for one specific commit",
+        "C": "A tag stores the files separately",
+        "D": "There is none; a tag is a read-only branch"
+      },
+      "correct": ["B"],
+      "explanation": "That permanence is the point: a released version needs a name that will still mean the same state in a year."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "You created a tag and pushed your branch, but colleagues cannot see the tag. Why?",
+      "choices": {
+        "A": "Tags take time to propagate",
+        "B": "Tags do not travel with a normal push — they need git push origin <tag> or --tags",
+        "C": "They need to re-clone",
+        "D": "Only annotated tags are pushed"
+      },
+      "correct": ["B"],
+      "explanation": "It is a common surprise. Pushing a branch sends commits, not tags."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A change removes a function other teams call. Which version bump is correct?",
+      "choices": {
+        "A": "PATCH — it is only one function",
+        "B": "MINOR — something was removed, not added",
+        "C": "MAJOR — existing users' code will break, and the number is a compatibility promise",
+        "D": "No bump; document it in the notes"
+      },
+      "correct": ["C"],
+      "explanation": "The major number exists to signal exactly this. Shipping a breaking change as a patch is how version numbers stop being trustworthy."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "A customer reports a bug in v2.3.0, which shipped six weeks ago. What do you do first?",
+      "choices": {
+        "A": "git switch --detach v2.3.0 and reproduce it on exactly that code",
+        "B": "Reproduce it on main, which is close enough",
+        "C": "Ask them to upgrade first",
+        "D": "Search the log for likely commits"
+      },
+      "correct": ["A"],
+      "explanation": "The tag lets you stand on precisely what they are running. Debugging against main means debugging code the customer does not have."
+    }
+  ]
+}
