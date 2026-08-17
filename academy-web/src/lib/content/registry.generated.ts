@@ -14,18 +14,21 @@ import c7 from '../../../content/courses/basic-os-linux/locales/en/lessons/pipes
 import c8 from '../../../content/courses/basic-os-linux/locales/en/lessons/processes-and-packages.json'
 import c9 from '../../../content/courses/basic-os-linux/locales/en/lessons/users-and-root.json'
 import c10 from '../../../content/courses/basic-os-linux/locales/en/course.json'
-import c11 from '../../../content/courses/basic-os-linux/locales/th/lessons/filesystem-tree.json'
-import c12 from '../../../content/courses/basic-os-linux/locales/th/lessons/get-a-linux.json'
-import c13 from '../../../content/courses/basic-os-linux/locales/th/lessons/linux-and-distros.json'
-import c14 from '../../../content/courses/basic-os-linux/locales/th/lessons/os-what-it-does.json'
-import c15 from '../../../content/courses/basic-os-linux/locales/th/course.json'
-import c16 from '../../../content/courses/basic-os-linux/course.json'
-import c17 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-hands-on.json'
-import c18 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-reading.json'
-import c19 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-references.json'
-import c20 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-simulation.json'
-import c21 from '../../../content/courses/content-formats-demo/locales/en/course.json'
-import c22 from '../../../content/courses/content-formats-demo/course.json'
+import c11 from '../../../content/courses/basic-os-linux/locales/th/lessons/files-and-safety.json'
+import c12 from '../../../content/courses/basic-os-linux/locales/th/lessons/filesystem-tree.json'
+import c13 from '../../../content/courses/basic-os-linux/locales/th/lessons/get-a-linux.json'
+import c14 from '../../../content/courses/basic-os-linux/locales/th/lessons/linux-and-distros.json'
+import c15 from '../../../content/courses/basic-os-linux/locales/th/lessons/navigate-and-look.json'
+import c16 from '../../../content/courses/basic-os-linux/locales/th/lessons/os-what-it-does.json'
+import c17 from '../../../content/courses/basic-os-linux/locales/th/lessons/users-and-root.json'
+import c18 from '../../../content/courses/basic-os-linux/locales/th/course.json'
+import c19 from '../../../content/courses/basic-os-linux/course.json'
+import c20 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-hands-on.json'
+import c21 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-reading.json'
+import c22 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-references.json'
+import c23 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-simulation.json'
+import c24 from '../../../content/courses/content-formats-demo/locales/en/course.json'
+import c25 from '../../../content/courses/content-formats-demo/course.json'
 
 /** โครง + ข้อความของทุกคอร์ส ผูกเข้ามาตอน build ไม่ใช่ตอน request */
 export const COURSE_REGISTRY: Record<
@@ -33,7 +36,7 @@ export const COURSE_REGISTRY: Record<
   { __structure: unknown } & Record<string, { __copy: unknown } & Record<string, unknown>>
 > = {
   "basic-os-linux": {
-    __structure: c16,
+    __structure: c19,
     "en": {
       __copy: c10,
       "files-and-safety": c0,
@@ -48,21 +51,24 @@ export const COURSE_REGISTRY: Record<
       "users-and-root": c9,
     },
     "th": {
-      __copy: c15,
-      "filesystem-tree": c11,
-      "get-a-linux": c12,
-      "linux-and-distros": c13,
-      "os-what-it-does": c14,
+      __copy: c18,
+      "files-and-safety": c11,
+      "filesystem-tree": c12,
+      "get-a-linux": c13,
+      "linux-and-distros": c14,
+      "navigate-and-look": c15,
+      "os-what-it-does": c16,
+      "users-and-root": c17,
     },
   },
   "content-formats-demo": {
-    __structure: c22,
+    __structure: c25,
     "en": {
-      __copy: c21,
-      "formats-hands-on": c17,
-      "formats-reading": c18,
-      "formats-references": c19,
-      "formats-simulation": c20,
+      __copy: c24,
+      "formats-hands-on": c20,
+      "formats-reading": c21,
+      "formats-references": c22,
+      "formats-simulation": c23,
     },
   },
 } as never
