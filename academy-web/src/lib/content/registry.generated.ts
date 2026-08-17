@@ -48,19 +48,29 @@ import c41 from '../../../content/courses/content-formats-demo/locales/en/lesson
 import c42 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-simulation.json'
 import c43 from '../../../content/courses/content-formats-demo/locales/en/course.json'
 import c44 from '../../../content/courses/content-formats-demo/course.json'
-import c45 from '../../../content/courses/git-essentials/locales/en/lessons/gitignore.json'
-import c46 from '../../../content/courses/git-essentials/locales/en/lessons/init-and-commit.json'
-import c47 from '../../../content/courses/git-essentials/locales/en/lessons/status-diff-log.json'
-import c48 from '../../../content/courses/git-essentials/locales/en/lessons/undo-and-restore.json'
-import c49 from '../../../content/courses/git-essentials/locales/en/lessons/why-version-control.json'
-import c50 from '../../../content/courses/git-essentials/locales/en/course.json'
-import c51 from '../../../content/courses/git-essentials/locales/th/lessons/gitignore.json'
-import c52 from '../../../content/courses/git-essentials/locales/th/lessons/init-and-commit.json'
-import c53 from '../../../content/courses/git-essentials/locales/th/lessons/status-diff-log.json'
-import c54 from '../../../content/courses/git-essentials/locales/th/lessons/undo-and-restore.json'
-import c55 from '../../../content/courses/git-essentials/locales/th/lessons/why-version-control.json'
-import c56 from '../../../content/courses/git-essentials/locales/th/course.json'
-import c57 from '../../../content/courses/git-essentials/course.json'
+import c45 from '../../../content/courses/git-essentials/locales/en/lessons/branching.json'
+import c46 from '../../../content/courses/git-essentials/locales/en/lessons/gitignore.json'
+import c47 from '../../../content/courses/git-essentials/locales/en/lessons/init-and-commit.json'
+import c48 from '../../../content/courses/git-essentials/locales/en/lessons/merging.json'
+import c49 from '../../../content/courses/git-essentials/locales/en/lessons/rebase-vs-merge.json'
+import c50 from '../../../content/courses/git-essentials/locales/en/lessons/reflog-rescue.json'
+import c51 from '../../../content/courses/git-essentials/locales/en/lessons/resolving-conflicts.json'
+import c52 from '../../../content/courses/git-essentials/locales/en/lessons/status-diff-log.json'
+import c53 from '../../../content/courses/git-essentials/locales/en/lessons/undo-and-restore.json'
+import c54 from '../../../content/courses/git-essentials/locales/en/lessons/why-version-control.json'
+import c55 from '../../../content/courses/git-essentials/locales/en/course.json'
+import c56 from '../../../content/courses/git-essentials/locales/th/lessons/branching.json'
+import c57 from '../../../content/courses/git-essentials/locales/th/lessons/gitignore.json'
+import c58 from '../../../content/courses/git-essentials/locales/th/lessons/init-and-commit.json'
+import c59 from '../../../content/courses/git-essentials/locales/th/lessons/merging.json'
+import c60 from '../../../content/courses/git-essentials/locales/th/lessons/rebase-vs-merge.json'
+import c61 from '../../../content/courses/git-essentials/locales/th/lessons/reflog-rescue.json'
+import c62 from '../../../content/courses/git-essentials/locales/th/lessons/resolving-conflicts.json'
+import c63 from '../../../content/courses/git-essentials/locales/th/lessons/status-diff-log.json'
+import c64 from '../../../content/courses/git-essentials/locales/th/lessons/undo-and-restore.json'
+import c65 from '../../../content/courses/git-essentials/locales/th/lessons/why-version-control.json'
+import c66 from '../../../content/courses/git-essentials/locales/th/course.json'
+import c67 from '../../../content/courses/git-essentials/course.json'
 
 /** โครง + ข้อความของทุกคอร์ส ผูกเข้ามาตอน build ไม่ใช่ตอน request */
 export const COURSE_REGISTRY: Record<
@@ -123,22 +133,32 @@ export const COURSE_REGISTRY: Record<
     },
   },
   "git-essentials": {
-    __structure: c57,
+    __structure: c67,
     "en": {
-      __copy: c50,
-      "gitignore": c45,
-      "init-and-commit": c46,
-      "status-diff-log": c47,
-      "undo-and-restore": c48,
-      "why-version-control": c49,
+      __copy: c55,
+      "branching": c45,
+      "gitignore": c46,
+      "init-and-commit": c47,
+      "merging": c48,
+      "rebase-vs-merge": c49,
+      "reflog-rescue": c50,
+      "resolving-conflicts": c51,
+      "status-diff-log": c52,
+      "undo-and-restore": c53,
+      "why-version-control": c54,
     },
     "th": {
-      __copy: c56,
-      "gitignore": c51,
-      "init-and-commit": c52,
-      "status-diff-log": c53,
-      "undo-and-restore": c54,
-      "why-version-control": c55,
+      __copy: c66,
+      "branching": c56,
+      "gitignore": c57,
+      "init-and-commit": c58,
+      "merging": c59,
+      "rebase-vs-merge": c60,
+      "reflog-rescue": c61,
+      "resolving-conflicts": c62,
+      "status-diff-log": c63,
+      "undo-and-restore": c64,
+      "why-version-control": c65,
     },
   },
 } as never

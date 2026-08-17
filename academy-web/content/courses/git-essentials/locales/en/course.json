@@ -25,6 +25,11 @@
     "init-and-commit": "Your first repository and commit",
     "status-diff-log": "Reading state: status, diff, and log",
     "gitignore": "What must never enter a repository",
-    "undo-and-restore": "Undoing things safely"
+    "undo-and-restore": "Undoing things safely",
+    "branching": "Branches: working on several things at once",
+    "merging": "Bringing work back together",
+    "resolving-conflicts": "Resolving conflicts without panic",
+    "rebase-vs-merge": "Rebase, and when not to use it",
+    "reflog-rescue": "Getting back what you thought you lost"
   }
 }

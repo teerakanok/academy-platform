@@ -1,0 +1,181 @@
+{
+  "nodeId": "merging",
+  "locale": "th",
+  "title": "รวมงานกลับเข้าด้วยกัน",
+  "objective": "จบบทนี้แล้วคุณจะ merge branch ได้อย่างตั้งใจ อ่านออกว่า merge เกิดได้สองรูปแบบ และรู้ว่าต้องตรวจอะไรก่อน merge เข้า branch ที่ใช้ร่วมกัน",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "branch ที่ไม่เคยถูก merge คือ branch ที่ไม่ได้ทำอะไรเลย การ merge คือการเอา commit จากเส้นงานหนึ่งมาเข้าอีกเส้นหนึ่ง ตัวคำสั่งสั้นมาก ความรู้ที่มีประโยชน์คือ Git ทำอะไรกับมัน และคุณควรดูอะไรก่อน"
+    },
+    {
+      "kind": "code",
+      "caption": "ทิศทางสำคัญ",
+      "lines": [
+        "git switch main               # ไปที่ branch ที่จะเป็นฝ่ายรับงาน",
+        "git merge feature/upload      # เอา commit ของ branch นั้นเข้ามาใน main",
+        "",
+        "# คุณ merge จาก branch หนึ่ง เข้า branch ที่คุณกำลังยืนอยู่เสมอ"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "สองรูปแบบที่ merge เกิดได้"
+    },
+    {
+      "kind": "paragraph",
+      "text": "จะได้แบบไหนขึ้นอยู่กับว่า branch ฝ่ายรับขยับไปข้างหน้าหรือเปล่าระหว่างที่คุณไม่อยู่ ทั้งสองแบบเป็นเรื่องปกติ"
+    },
+    {
+      "kind": "code",
+      "caption": "fast-forward: main ไม่ได้ขยับ",
+      "lines": [
+        "ก่อน:   a1 ── b2            ← main",
+        "               └── c3 ── d4 ← feature",
+        "",
+        "หลัง:   a1 ── b2 ── c3 ── d4",
+        "                          ↑ main และ feature",
+        "",
+        "# Git แค่เลื่อนป้ายไปข้างหน้า ไม่ต้องมี merge commit"
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "merge commit: ทั้งสอง branch ขยับ",
+      "lines": [
+        "ก่อน:   a1 ── b2 ── e5      ← main",
+        "               └── c3 ── d4 ← feature",
+        "",
+        "หลัง:   a1 ── b2 ── e5 ──── m6  ← main",
+        "               └── c3 ── d4 ─┘",
+        "",
+        "# m6 คือ merge commit: มีพ่อแม่สองตัวและเชื่อมสองเส้นเข้าด้วยกัน"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "merge commit ไม่ใช่ขยะรกประวัติ",
+      "text": "มันบันทึกข้อเท็จจริงจริงข้อหนึ่ง — ว่าเส้นการพัฒนาสองเส้นมาบรรจบกันตรงจุดนี้ และเป็นเส้นไหนบ้าง ทีมที่แบน merge commit ทั้งหมดจะสูญเสียข้อมูลนั้นไป ส่วนทีมที่สร้างมันทุกการเปลี่ยนแปลงเล็กๆ ก็ทำให้ประวัติอ่านยาก ทีมส่วนใหญ่อยู่ตรงกลาง: มี merge commit สำหรับ branch ที่มีความหมายจริง และเก็บประวัติภายใน branch ให้เรียบร้อย"
+    },
+    {
+      "kind": "heading",
+      "text": "ต้องทำอะไรก่อน merge เข้า branch ที่ใช้ร่วมกัน"
+    },
+    {
+      "kind": "list",
+      "ordered": true,
+      "items": [
+        "อัปเดต branch ฝ่ายรับก่อน จะได้ merge เข้าสถานะของวันนี้ ไม่ใช่ของสัปดาห์ที่แล้ว",
+        "อ่านว่าอะไรกำลังจะเข้ามาจริงๆ: git log main..feature และ git diff main...feature",
+        "รันชุดทดสอบบนผลลัพธ์ที่ merge แล้ว ไม่ใช่บน branch ของคุณเดี่ยวๆ",
+        "merge แล้วยืนยันว่า branch ฝ่ายรับยังทำงานได้ ก่อนที่คนอื่นจะ pull ไป"
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "การตรวจที่กัน merge พังได้เกือบทั้งหมด",
+      "lines": [
+        "git switch main && git pull        # สถานะของวันนี้",
+        "git log --oneline main..feature    # commit ที่กำลังจะเข้ามา",
+        "git diff main...feature            # การเปลี่ยนแปลงจริง แบบเต็ม",
+        "git merge feature",
+        "# รันชุดทดสอบตรงนี้ — merge ทำให้พังได้ทั้งที่ไม่มี branch ไหนพังเดี่ยวๆ"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "สอง branch ที่สะอาดทั้งคู่ยังให้ผลลัพธ์ที่พังได้",
+      "text": "branch หนึ่งเปลี่ยนชื่อฟังก์ชัน อีก branch เพิ่มการเรียกชื่อเดิมเข้ามา ไม่มี branch ไหนผิดเมื่ออยู่เดี่ยวๆ และไม่มี conflict เชิงข้อความ merge จึงสำเร็จ — แล้วผลลัพธ์ก็ใช้งานไม่ได้ นี่คือเหตุผลที่ชุดทดสอบสำคัญหลัง merge ไม่ใช่แค่ก่อน merge"
+    },
+    {
+      "kind": "heading",
+      "text": "ตัวเลือกที่มีประโยชน์"
+    },
+    {
+      "kind": "table",
+      "headers": ["คำสั่ง", "ทำอะไร", "ใช้เมื่อ"],
+      "rows": [
+        ["git merge feature", "fast-forward ถ้าทำได้ ถ้าไม่ได้ก็สร้าง merge commit", "ค่าตั้งต้น และมักถูกต้องอยู่แล้ว"],
+        ["git merge --no-ff feature", "สร้าง merge commit เสมอ", "อยากให้ branch นั้นปรากฏเป็นก้อนเดียวในประวัติ"],
+        ["git merge --squash feature", "เอาการเปลี่ยนแปลงเข้ามาเป็นก้อนเดียวที่ยังไม่ commit", "มี commit เล็กๆ รกๆ เยอะที่ไม่อยากเก็บไว้"],
+        ["git merge --abort", "กลับไปสถานะก่อนเริ่ม", "merge ที่ชนกันแล้วอยากไปทำใหม่ทีหลัง"]
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "สร้าง merge ทั้งสองรูปแบบอย่างตั้งใจ",
+      "steps": [
+        "ใน ~/git-lab: git switch -c feature/one && echo one > one.txt && git add . && git commit -m \"Add one\"",
+        "รัน: git switch main && git merge feature/one     (fast-forward — ไม่มี merge commit)",
+        "รัน: git log --oneline --graph -5",
+        "รัน: git switch -c feature/two && echo two > two.txt && git add . && git commit -m \"Add two\"",
+        "รัน: git switch main && echo main-side >> notes.txt && git commit -am \"Change on main\"",
+        "รัน: git merge feature/two                        (คราวนี้ต้องมี merge commit)",
+        "รัน: git log --oneline --graph -8"
+      ],
+      "expected": "merge แรกเลื่อนป้ายไปโดยไม่มี commit เพิ่ม ส่วน merge ที่สองสร้าง merge commit ที่เชื่อมสองเส้นเข้าด้วยกัน เห็นทั้งสองแบบสักครั้งก็พอที่จะจำมันได้ในทุก repository หลังจากนั้น"
+    }
+  ],
+  "cheatsheet": [
+    "merge จาก branch หนึ่ง เข้า branch ที่คุณยืนอยู่ — switch ก่อนเสมอ",
+    "fast-forward: branch ฝ่ายรับไม่ได้ขยับ ป้ายจึงเลื่อนไปข้างหน้าเฉยๆ",
+    "merge commit: ขยับทั้งคู่ จึงต้องมี commit ที่มีพ่อแม่สองตัวมาเชื่อม",
+    "อัปเดต branch ฝ่ายรับก่อน merge เข้าไป",
+    "git log main..feature — commit ที่กำลังจะเข้ามา",
+    "git diff main...feature — การเปลี่ยนแปลงเต็มๆ ที่กำลังจะถูก merge",
+    "รันชุดทดสอบหลัง merge: สอง branch ที่สะอาดรวมกันแล้วพังได้",
+    "--no-ff บังคับให้มี merge commit · --squash ยุบเป็นก้อนเดียว · --abort ถอยออก"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "คุณต้องการเอา feature/upload เข้า main ลำดับที่ถูกต้องคืออะไร",
+      "choices": {
+        "A": "git switch feature/upload แล้ว git merge main",
+        "B": "git switch main แล้ว git merge feature/upload",
+        "C": "git merge main feature/upload จากที่ไหนก็ได้",
+        "D": "git switch main แล้ว git merge --abort"
+      },
+      "correct": ["B"],
+      "explanation": "ยืนบน branch ที่เป็นฝ่ายรับงาน แล้ว merge อีกตัวเข้ามา ถ้าทำกลับด้าน จะกลายเป็นการเอา commit ของ main เข้าไปใน branch ฟีเจอร์แทน"
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Git สร้าง merge commit แทน fast-forward เมื่อไร",
+      "choices": {
+        "A": "เมื่อมีไฟล์เปลี่ยนมากกว่าหนึ่งไฟล์",
+        "B": "เมื่อ branch ฝ่ายรับก็ได้ commit เพิ่มมาด้วยหลังจากที่อีก branch แยกออกไป",
+        "C": "เฉพาะเมื่อมี conflict",
+        "D": "เฉพาะเมื่อใส่ --no-ff"
+      },
+      "correct": ["B"],
+      "explanation": "ถ้า branch ฝ่ายรับไม่ได้ขยับ ป้ายก็เลื่อนไปข้างหน้าได้เลย แต่ถ้าขยับทั้งคู่ ต้องมี commit ที่มีพ่อแม่สองตัวมาเชื่อม"
+    },
+    {
+      "id": "cp-3",
+      "prompt": "สอง branch merge กันโดยไม่มี conflict แต่หลังจากนั้นแอปพลิเคชันพัง เป็นไปได้อย่างไร",
+      "choices": {
+        "A": "เป็นไปไม่ได้ — ไม่มี conflict แปลว่า merge ปลอดภัย",
+        "B": "การเปลี่ยนแปลงเข้ากันได้ในเชิงข้อความแต่ขัดกันในเชิงความหมาย — branch หนึ่งเปลี่ยนชื่อของที่อีก branch เพิ่งเริ่มเรียกใช้",
+        "C": "Git ทำไฟล์เสียหาย",
+        "D": "merge commit เขียนทับชุดทดสอบ"
+      },
+      "correct": ["B"],
+      "explanation": "Git เทียบข้อความ ไม่ได้เทียบความหมาย นี่คือเหตุผลพอดีว่าทำไมการรันชุดทดสอบต้องมีทั้งหลัง merge ไม่ใช่แค่ก่อน"
+    },
+    {
+      "id": "cp-4",
+      "prompt": "git merge --squash feature ทำอะไร",
+      "choices": {
+        "A": "ลบ branch ฟีเจอร์หลัง merge",
+        "B": "เอาการเปลี่ยนแปลงของ branch เข้ามาเป็นก้อนเดียวที่ยังไม่ commit โดยไม่เก็บ commit ย่อยของมันไว้",
+        "C": "บีบอัด repository",
+        "D": "merge โดยไม่รัน hook"
+      },
+      "correct": ["B"],
+      "explanation": "เป็นตัวเลือกสำหรับ branch ที่เต็มไปด้วย commit เล็กๆ รกๆ ซึ่งขั้นตอนย่อยของมันไม่คุ้มที่จะเก็บไว้ในประวัติที่ใช้ร่วมกัน"
+    }
+  ]
+}

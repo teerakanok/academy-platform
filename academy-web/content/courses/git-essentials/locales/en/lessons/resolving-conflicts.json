@@ -1,0 +1,184 @@
+{
+  "nodeId": "resolving-conflicts",
+  "locale": "en",
+  "title": "Resolving conflicts without panic",
+  "objective": "By the end of this lesson you can read conflict markers, resolve a conflict deliberately, and back out of one entirely — so a conflict becomes a task rather than an emergency.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A conflict is Git telling you the truth: two people changed the same lines and it will not guess which one is right. It is not damage and nothing is lost. The panic comes from the markers looking alarming and from not knowing that you can always back out."
+    },
+    {
+      "kind": "code",
+      "caption": "What a conflict looks like",
+      "lines": [
+        "$ git merge feature/pricing",
+        "Auto-merging pricing.py",
+        "CONFLICT (content): Merge conflict in pricing.py",
+        "Automatic merge failed; fix conflicts and then commit the result."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Reading the markers"
+    },
+    {
+      "kind": "code",
+      "caption": "Inside the conflicted file",
+      "lines": [
+        "<<<<<<< HEAD",
+        "    discount = 0.10        ← what the branch you are ON has",
+        "=======",
+        "    discount = 0.15        ← what the branch you are MERGING IN has",
+        ">>>>>>> feature/pricing"
+      ]
+    },
+    {
+      "kind": "list",
+      "ordered": true,
+      "items": [
+        "Everything between <<<<<<< and ======= is the receiving branch's version",
+        "Everything between ======= and >>>>>>> is the incoming version",
+        "Your job is to leave the file as it should actually be — and delete all three marker lines"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The result is a decision, not a choice between two buttons",
+      "text": "Often neither side is correct on its own. If one branch added validation and the other changed the same function's signature, the right answer is a version containing both. Editors offer 'accept ours / accept theirs' buttons that make this look binary; read what each side was for before clicking either."
+    },
+    {
+      "kind": "heading",
+      "text": "The resolution loop"
+    },
+    {
+      "kind": "code",
+      "caption": "Same four steps every time",
+      "lines": [
+        "git status                 # which files are conflicted",
+        "# open each one, edit it into the state it should be, remove the markers",
+        "git add pricing.py         # 'this file is resolved'",
+        "git status                 # repeat until nothing is unmerged",
+        "git commit                 # completes the merge (message is pre-filled)"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "You can always leave",
+      "text": "git merge --abort returns everything to exactly how it was before you started, as long as you have not committed the merge. Knowing this is available is most of what turns a conflict from frightening into routine — you can try a resolution, decide it is wrong, and start again."
+    },
+    {
+      "kind": "heading",
+      "text": "Commands that make it easier"
+    },
+    {
+      "kind": "table",
+      "headers": ["Command", "What it gives you"],
+      "rows": [
+        ["git status", "The list of conflicted files — the only reliable to-do list"],
+        ["git diff", "During a conflict, shows the conflicting regions specifically"],
+        ["git checkout --ours <file>", "Take the receiving branch's whole file"],
+        ["git checkout --theirs <file>", "Take the incoming branch's whole file"],
+        ["git merge --abort", "Cancel the merge entirely and go back"],
+        ["git log --merge -p <file>", "The commits from both sides that touched this file"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "'ours' and 'theirs' mean less than they sound like",
+      "text": "During a merge, ours is the branch you are standing on and theirs is the branch arriving. During a rebase these are reversed, because the commits are being replayed onto the other side. When in doubt, read the file rather than trusting the words."
+    },
+    {
+      "kind": "heading",
+      "text": "How to have fewer conflicts"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Merge the shared branch into yours regularly instead of once at the end — small differences conflict less than a month of divergence",
+        "Keep branches short-lived; a branch open for weeks is a conflict being written slowly",
+        "Split large files that everyone edits, when you can — the conflict is a symptom of the layout",
+        "Agree on formatting and enforce it automatically, so nobody's editor rewrites whole files"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Create a conflict on purpose and resolve it",
+      "steps": [
+        "In ~/git-lab: git switch main && echo 'price = 10' > pricing.txt && git add . && git commit -m \"Set price to 10\"",
+        "Run: git switch -c feature/price && echo 'price = 15' > pricing.txt && git commit -am \"Raise price to 15\"",
+        "Run: git switch main && echo 'price = 12' > pricing.txt && git commit -am \"Raise price to 12\"",
+        "Run: git merge feature/price        (CONFLICT — as designed)",
+        "Run: cat pricing.txt                (read the markers)",
+        "Run: git merge --abort && cat pricing.txt   (everything is back)",
+        "Run: git merge feature/price        (again — now resolve it)",
+        "Edit pricing.txt to the value you want, delete the marker lines",
+        "Run: git add pricing.txt && git commit && git log --oneline --graph -5"
+      ],
+      "expected": "A conflict you caused deliberately, backed out of once, then resolved and completed. Having done it on purpose in a sandbox is what stops it being alarming the first time it happens on real work."
+    }
+  ],
+  "cheatsheet": [
+    "A conflict means two changes touched the same lines — nothing is lost",
+    "<<<<<<< HEAD is the branch you are on · >>>>>>> is the branch arriving",
+    "Edit the file to what it should be, then delete all three marker lines",
+    "git add <file> marks it resolved · git commit completes the merge",
+    "git merge --abort returns everything to before the merge",
+    "The answer is often both sides combined, not one side chosen",
+    "ours/theirs swap meaning during a rebase — read the file, not the label",
+    "Merge the shared branch into yours often; long-lived branches breed conflicts"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "In a conflicted file, what is the section between <<<<<<< HEAD and ======= ?",
+      "choices": {
+        "A": "The incoming branch's version",
+        "B": "The version from the branch you are currently on",
+        "C": "The common ancestor",
+        "D": "A backup Git created"
+      },
+      "correct": ["B"],
+      "explanation": "HEAD is where you are standing. The section after ======= is what the arriving branch contains."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "You start resolving a conflict and realise you do not have enough context. What is the safe move?",
+      "choices": {
+        "A": "Pick 'accept theirs' for every file and move on",
+        "B": "git merge --abort, then come back when you can ask the other author",
+        "C": "Delete the branch",
+        "D": "git reset --hard origin/main"
+      },
+      "correct": ["B"],
+      "explanation": "Abort restores the exact state from before the merge. Guessing at a resolution silently discards someone's intent, which is worse than delaying."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Which is true about resolving a conflict?",
+      "choices": {
+        "A": "You must choose one side or the other",
+        "B": "The correct result is often a combination of both sides, because each was solving a different problem",
+        "C": "Git can resolve it automatically with the right flag",
+        "D": "The newest change always wins"
+      },
+      "correct": ["B"],
+      "explanation": "Two people changed the same lines for different reasons. The resolution should preserve both intentions where they are compatible."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "What most reliably reduces how often conflicts happen?",
+      "choices": {
+        "A": "Using a graphical merge tool",
+        "B": "Keeping branches short-lived and merging the shared branch into yours regularly",
+        "C": "Committing less often",
+        "D": "Turning off automatic formatting"
+      },
+      "correct": ["B"],
+      "explanation": "Conflicts scale with divergence. A branch that stays close to the shared branch has little to conflict with; one that runs for a month accumulates the collision in advance."
+    }
+  ]
+}

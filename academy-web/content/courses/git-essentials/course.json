@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "beginner",
-  "estimatedMinutes": 74,
+  "estimatedMinutes": 164,
   "coverMotif": "layers",
   "skills": [
     {
@@ -97,6 +97,66 @@
       "skillWeights": {
         "recovery": 5,
         "git-cli": 2
+      }
+    },
+    {
+      "id": "branching",
+      "kind": "lesson",
+      "prerequisites": [
+        "undo-and-restore"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "branching": 5,
+        "vcs-model": 2
+      }
+    },
+    {
+      "id": "merging",
+      "kind": "lesson",
+      "prerequisites": [
+        "branching"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "branching": 5,
+        "collaboration": 2
+      }
+    },
+    {
+      "id": "resolving-conflicts",
+      "kind": "capstone",
+      "prerequisites": [
+        "merging"
+      ],
+      "estimatedMinutes": 20,
+      "skillWeights": {
+        "branching": 4,
+        "collaboration": 4
+      }
+    },
+    {
+      "id": "rebase-vs-merge",
+      "kind": "lesson",
+      "prerequisites": [
+        "resolving-conflicts"
+      ],
+      "estimatedMinutes": 20,
+      "skillWeights": {
+        "branching": 5,
+        "vcs-model": 3
+      }
+    },
+    {
+      "id": "reflog-rescue",
+      "kind": "lesson",
+      "prerequisites": [
+        "rebase-vs-merge"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "recovery": 6,
+        "vcs-model": 1
       }
     }
   ]

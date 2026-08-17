@@ -1,0 +1,175 @@
+{
+  "nodeId": "branching",
+  "locale": "en",
+  "title": "Branches: working on several things at once",
+  "objective": "By the end of this lesson you can create, switch, and organise branches, and you understand what a branch actually is — which is much less than most people assume.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "You are halfway through a feature when an urgent fix comes in. Without branches you either abandon your work or ship it half-finished. Branches let both exist at once: your feature stays exactly where it is, the fix happens on its own line of development, and neither can break the other."
+    },
+    {
+      "kind": "heading",
+      "text": "A branch is a moveable label"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This is the part worth getting right, because everything else follows from it. A branch is not a copy of the project and not a folder. It is a pointer to one commit, and it moves forward automatically each time you commit. That is why creating one is instant even on a huge repository — Git writes a file containing one commit id."
+    },
+    {
+      "kind": "code",
+      "caption": "Two labels on one history",
+      "lines": [
+        "                      ┌── feature-upload  (points here)",
+        "                      ▼",
+        "  a1 ── b2 ── c3 ── d4",
+        "              ▲",
+        "              └── main  (points here)",
+        "",
+        "# Same commits. Two labels. Nothing was copied."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "HEAD is where you are standing",
+      "text": "HEAD is the label that says which branch you currently have checked out. When you commit, the branch HEAD points at moves forward with it. Reading it as 'you are here' makes the rest of Git considerably easier."
+    },
+    {
+      "kind": "heading",
+      "text": "The commands you will use every day"
+    },
+    {
+      "kind": "code",
+      "caption": "Create, switch, list, delete",
+      "lines": [
+        "git branch                       # list local branches; * marks the current one",
+        "git branch feature-upload        # create, but stay where you are",
+        "git switch feature-upload        # switch to it",
+        "git switch -c feature-upload     # create and switch in one step (the usual)",
+        "git switch -                     # back to the previous branch",
+        "git branch -d feature-upload     # delete (refuses if it has unmerged work)",
+        "git branch -D feature-upload     # delete anyway — the one that discards work"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "switch and restore replaced the overloaded checkout",
+      "text": "Older material uses git checkout for changing branches AND for discarding file changes — two very different operations behind one word, which is exactly why people did the second by accident. Modern Git splits them: switch for branches, restore for files. checkout still works, but prefer the two clear names."
+    },
+    {
+      "kind": "heading",
+      "text": "A branch name is a message to your team"
+    },
+    {
+      "kind": "table",
+      "headers": ["Name", "Reads as"],
+      "rows": [
+        ["fix/login-timeout", "A fix, and you can tell what it fixes"],
+        ["feature/bulk-upload", "A feature, and its scope is obvious"],
+        ["chore/update-deps", "Maintenance, no behaviour change expected"],
+        ["test", "Nobody knows what this is or whether it can be deleted"]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Switching with uncommitted work"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Git will let you switch branches with uncommitted changes when they do not conflict, and will refuse when they do. When it refuses, you have three honest options: commit the work, stash it temporarily, or discard it."
+    },
+    {
+      "kind": "code",
+      "caption": "stash: put work aside without committing it",
+      "lines": [
+        "git stash push -m \"half-done upload form\"",
+        "git switch main                 # deal with the urgent thing",
+        "git switch -                    # come back",
+        "git stash list                  # what is set aside",
+        "git stash pop                   # bring the most recent back and remove it from the list"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "A stash is a drawer, not a filing system",
+      "text": "Stashes have no branch, no message unless you write one, and no visibility in the history. Work parked in a stash for a week is work that gets forgotten. Use it for minutes and hours; for anything longer, make a commit on a branch — commits are cheap and can always be tidied later."
+    },
+    {
+      "kind": "try",
+      "title": "Run two lines of work side by side",
+      "steps": [
+        "In ~/git-lab: git switch -c feature/greeting",
+        "Run: echo 'hello from the feature' > greeting.txt && git add . && git commit -m \"Add a greeting\"",
+        "Run: git switch main && ls          (greeting.txt is not here — this is the point)",
+        "Run: echo 'urgent' >> notes.txt && git commit -am \"Urgent fix on main\"",
+        "Run: git log --oneline --graph --all   (two lines of development, both intact)",
+        "Run: git switch feature/greeting && ls (your file is back, untouched)"
+      ],
+      "expected": "A file that appears and disappears as you switch, and a graph showing two branches from a common point. Nothing was copied and nothing was lost — Git just moved which commit you are standing on."
+    }
+  ],
+  "cheatsheet": [
+    "A branch is a moveable pointer to one commit — not a copy of anything",
+    "HEAD is 'you are here': the branch currently checked out",
+    "git switch -c <name> creates and switches in one step",
+    "git switch - returns to the previous branch",
+    "git branch -d deletes safely; -D deletes even unmerged work",
+    "Use switch for branches and restore for files; checkout did both, which caused accidents",
+    "Name branches so a stranger can tell what they are: fix/... feature/... chore/...",
+    "git stash push -m \"...\" parks uncommitted work for minutes, not weeks",
+    "git stash pop brings it back"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What is a Git branch, technically?",
+      "choices": {
+        "A": "A copy of the project files in a separate folder",
+        "B": "A moveable pointer to a single commit, which advances as you commit",
+        "C": "A compressed archive of the history",
+        "D": "A directory inside .git containing your changed files"
+      },
+      "correct": ["B"],
+      "explanation": "That is why branching is instant regardless of project size: Git writes one commit id, it does not duplicate the working tree."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why did modern Git introduce switch and restore instead of using checkout for everything?",
+      "choices": {
+        "A": "checkout was removed from Git",
+        "B": "checkout did two unrelated jobs — changing branches and discarding file changes — so people destroyed work by accident",
+        "C": "switch is faster",
+        "D": "restore works offline and checkout does not"
+      },
+      "correct": ["B"],
+      "explanation": "One word covering both 'move me' and 'throw away my edits' is a design that produces mistakes. Two names remove the ambiguity."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "You have half-finished work and an urgent fix arrives. Which is the best option for work you will return to within the hour?",
+      "choices": {
+        "A": "git stash push, handle the fix, then git stash pop",
+        "B": "Discard the work and start over later",
+        "C": "Commit it to main with the message 'wip'",
+        "D": "Copy the folder somewhere else"
+      },
+      "correct": ["A"],
+      "explanation": "Stash is designed for exactly this: minutes to hours. For anything longer, a commit on a branch is safer because it is visible and has a message."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "What does git branch -d refuse to do, and why does that matter?",
+      "choices": {
+        "A": "It refuses to delete the current branch only",
+        "B": "It refuses to delete a branch holding commits that are not merged anywhere, so you do not silently discard work",
+        "C": "It refuses to delete branches created today",
+        "D": "It refuses when the branch has been pushed"
+      },
+      "correct": ["B"],
+      "explanation": "-d is the safe delete. -D overrides that check, which is why it should be a deliberate decision rather than a reflex."
+    }
+  ]
+}

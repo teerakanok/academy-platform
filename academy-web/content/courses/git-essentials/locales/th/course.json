@@ -25,6 +25,11 @@
     "init-and-commit": "repository และ commit แรกของคุณ",
     "status-diff-log": "อ่านสถานะ: status, diff และ log",
     "gitignore": "อะไรที่ห้ามเข้า repository เด็ดขาด",
-    "undo-and-restore": "ย้อนกลับอย่างปลอดภัย"
+    "undo-and-restore": "ย้อนกลับอย่างปลอดภัย",
+    "branching": "branch: ทำงานหลายเรื่องพร้อมกัน",
+    "merging": "รวมงานกลับเข้าด้วยกัน",
+    "resolving-conflicts": "แก้ conflict โดยไม่ต้องตกใจ",
+    "rebase-vs-merge": "rebase และเวลาที่ไม่ควรใช้มัน",
+    "reflog-rescue": "เอาของที่คิดว่าหายไปแล้วกลับคืนมา"
   }
 }

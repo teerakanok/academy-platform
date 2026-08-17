@@ -1,0 +1,173 @@
+{
+  "nodeId": "rebase-vs-merge",
+  "locale": "en",
+  "title": "Rebase, and when not to use it",
+  "objective": "By the end of this lesson you can rebase a branch to keep a readable history, and you can state clearly the one rule that decides whether rebasing is safe.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Merge joins two lines of work and records that they met. Rebase does something different: it takes your commits and replays them as if you had started from the current state of the other branch. The result is a straight line instead of a fork."
+    },
+    {
+      "kind": "code",
+      "caption": "The same work, two shapes",
+      "lines": [
+        "start:      a1 ── b2 ── e5        ← main",
+        "                 └── c3 ── d4     ← feature",
+        "",
+        "merge:      a1 ── b2 ── e5 ── m6  ← main",
+        "                 └── c3 ── d4 ─┘",
+        "",
+        "rebase:     a1 ── b2 ── e5 ── c3' ── d4'   ← feature",
+        "",
+        "# c3' and d4' are NEW commits with the same changes and different ids."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Rebase does not move commits — it recreates them",
+      "text": "The originals are not edited; new commits are written with new identities and the old ones are left behind. That single fact explains everything about when rebasing is safe: recreating commits nobody else has is tidying, and recreating commits other people already have is forcing a split reality."
+    },
+    {
+      "kind": "heading",
+      "text": "The rule"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Rebase your own unshared work freely. Do not rebase anything other people have pulled. That is the whole rule, and it is why the common convention is: rebase your feature branch onto the shared branch to keep it current, then merge the feature branch in when it is done."
+    },
+    {
+      "kind": "code",
+      "caption": "The everyday use",
+      "lines": [
+        "git switch feature/upload",
+        "git fetch origin",
+        "git rebase origin/main       # replay my commits on top of today's main",
+        "",
+        "# resolve any conflict, then:",
+        "git rebase --continue",
+        "git rebase --abort           # or back out entirely, at any point"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Conflicts during a rebase arrive one commit at a time",
+      "text": "A merge presents every conflict at once. A rebase replays your commits in order, so you may resolve conflicts several times — once per commit that collides. That is more work, but each conflict is smaller and you can see which of your commits caused it."
+    },
+    {
+      "kind": "heading",
+      "text": "Interactive rebase: tidying before you share"
+    },
+    {
+      "kind": "code",
+      "caption": "Clean up the last few commits",
+      "lines": [
+        "git rebase -i HEAD~4",
+        "",
+        "# an editor opens with one line per commit:",
+        "pick a1b2c3 Add upload form",
+        "squash d4e5f6 fix typo          ← fold into the commit above",
+        "reword 7g8h9i Add validation     ← keep the change, edit the message",
+        "drop  j1k2l3 debug print         ← remove this commit entirely"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "This is how a branch of eleven commits — three of which say 'fix typo' — becomes three commits that each do one thing and explain themselves. Do it before opening a pull request, never after someone has started reviewing it."
+    },
+    {
+      "kind": "table",
+      "headers": ["Situation", "Use", "Why"],
+      "rows": [
+        ["Bring your branch up to date before sharing", "rebase onto the shared branch", "Keeps a straight, readable history"],
+        ["Combine your own messy commits", "interactive rebase", "The steps you took are not information anyone needs"],
+        ["Integrate a finished branch into a shared one", "merge", "Records that the branch existed and joined here"],
+        ["Undo something already shared", "revert", "Never rewrite what others have"],
+        ["Anything already pushed and pulled by others", "do not rebase", "It splits reality for everyone who has it"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "If you must force-push, use --force-with-lease",
+      "text": "After rebasing a branch you already pushed, the remote will reject a normal push. --force-with-lease refuses if someone else has added commits you have not seen, so you overwrite only what you expected to. Plain --force does not check, and that is how other people's work disappears."
+    },
+    {
+      "kind": "try",
+      "title": "Rebase and tidy in a sandbox",
+      "steps": [
+        "In ~/git-lab: git switch main && echo base > base.txt && git add . && git commit -m \"Add base\"",
+        "Run: git switch -c feature/tidy",
+        "Run: echo a > a.txt && git add . && git commit -m \"Add a\"",
+        "Run: echo 'typo' >> a.txt && git commit -am \"fix typo\"",
+        "Run: git switch main && echo more >> base.txt && git commit -am \"Update base on main\"",
+        "Run: git switch feature/tidy && git rebase main && git log --oneline --graph --all",
+        "Run: git rebase -i HEAD~2      (mark the second line as squash, save, then write one message)",
+        "Run: git log --oneline -3"
+      ],
+      "expected": "A branch that now sits on top of main as a straight line, then two commits collapsed into one with a message you wrote deliberately. Compare the graph before and after — same work, a history someone can actually read."
+    }
+  ],
+  "cheatsheet": [
+    "Merge joins and records that two lines met; rebase replays your commits onto another base",
+    "Rebase creates NEW commits with new ids — the originals are left behind",
+    "Rebase your own unshared work freely; never rebase what others have pulled",
+    "Common convention: rebase the feature branch to stay current, merge it in when done",
+    "Rebase conflicts arrive one commit at a time; --continue proceeds, --abort backs out",
+    "git rebase -i HEAD~N — squash, reword, drop, reorder before sharing",
+    "Tidy before a review starts, not after",
+    "If a force push is unavoidable use --force-with-lease, never plain --force"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What does rebase actually do to your commits?",
+      "choices": {
+        "A": "Moves the existing commits to a new position",
+        "B": "Creates new commits containing the same changes, with new identities, on top of the new base",
+        "C": "Merges them and deletes the branch",
+        "D": "Compresses them into one commit automatically"
+      },
+      "correct": ["B"],
+      "explanation": "New commits with new ids. That is precisely why rebasing shared commits is a problem — everyone else still has the originals."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Which is the correct rule for when rebasing is safe?",
+      "choices": {
+        "A": "Rebase everything; merges make history messy",
+        "B": "Rebase only your own work that nobody else has pulled",
+        "C": "Rebase only on Fridays before a release",
+        "D": "Rebase only branches with fewer than five commits"
+      },
+      "correct": ["B"],
+      "explanation": "Unshared history can be rewritten freely. Shared history cannot, because rewriting it gives everyone who has it a conflicting version of the same work."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "You have eleven commits on a branch, four of which are 'fix typo'. What do you do before opening a pull request?",
+      "choices": {
+        "A": "Nothing — reviewers can ignore them",
+        "B": "git rebase -i to squash them into commits that each do one thing",
+        "C": "git merge --squash into main directly",
+        "D": "Delete the branch and start again"
+      },
+      "correct": ["B"],
+      "explanation": "The steps you happened to take are not information a reviewer needs. Interactive rebase turns them into a history that explains the change — done before review begins, not during."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why prefer --force-with-lease over --force?",
+      "choices": {
+        "A": "It is faster",
+        "B": "It refuses the push if the remote gained commits you have not seen, so you cannot silently overwrite someone else's work",
+        "C": "It creates a backup branch automatically",
+        "D": "It works without authentication"
+      },
+      "correct": ["B"],
+      "explanation": "Plain --force overwrites whatever is there. --force-with-lease checks that the remote is still where you last saw it before replacing it."
+    }
+  ]
+}

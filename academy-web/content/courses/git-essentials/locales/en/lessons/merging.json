@@ -1,0 +1,181 @@
+{
+  "nodeId": "merging",
+  "locale": "en",
+  "title": "Bringing work back together",
+  "objective": "By the end of this lesson you can merge a branch deliberately, read the two shapes a merge can take, and know what to check before merging anything into a shared branch.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A branch that is never merged is a branch that did nothing. Merging takes the commits from one line of work and brings them into another. The command is short; the useful knowledge is what Git does with it and what you should look at first."
+    },
+    {
+      "kind": "code",
+      "caption": "The direction matters",
+      "lines": [
+        "git switch main               # go to the branch that will RECEIVE the work",
+        "git merge feature/upload      # bring that branch's commits into main",
+        "",
+        "# You always merge FROM a branch INTO the one you are standing on."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Two shapes a merge can take"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Which one you get is decided by whether the receiving branch moved on while you were away. Both are normal."
+    },
+    {
+      "kind": "code",
+      "caption": "Fast-forward: main did not move",
+      "lines": [
+        "before:   a1 ── b2            ← main",
+        "                 └── c3 ── d4 ← feature",
+        "",
+        "after:    a1 ── b2 ── c3 ── d4",
+        "                            ↑ main and feature",
+        "",
+        "# Git just slides the label forward. No merge commit is needed."
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "Merge commit: both branches moved",
+      "lines": [
+        "before:   a1 ── b2 ── e5      ← main",
+        "                 └── c3 ── d4 ← feature",
+        "",
+        "after:    a1 ── b2 ── e5 ──── m6  ← main",
+        "                 └── c3 ── d4 ─┘",
+        "",
+        "# m6 is a merge commit: it has two parents and joins the two lines."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "A merge commit is not clutter",
+      "text": "It records a true fact — that two lines of development came together at this point, and which two. Teams that ban merge commits entirely lose that information; teams that produce them for every tiny change make the history hard to read. Most teams sit in the middle: merge commits for real branches, tidy history within a branch."
+    },
+    {
+      "kind": "heading",
+      "text": "What to do before merging into a shared branch"
+    },
+    {
+      "kind": "list",
+      "ordered": true,
+      "items": [
+        "Update the receiving branch first, so you are merging into today's state, not last week's",
+        "Read what is actually coming: git log main..feature and git diff main...feature",
+        "Run the tests on the merged result, not just on your branch in isolation",
+        "Merge, then confirm the receiving branch still works before anyone else pulls it"
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "The check that prevents most bad merges",
+      "lines": [
+        "git switch main && git pull        # today's state",
+        "git log --oneline main..feature    # commits that are about to arrive",
+        "git diff main...feature            # the actual change, in full",
+        "git merge feature",
+        "# run the tests here — a merge can break things neither branch broke alone"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Two clean branches can still produce a broken result",
+      "text": "One branch renames a function, another adds a new call to the old name. Neither branch is wrong on its own and there is no textual conflict, so the merge succeeds — and the result does not work. This is why the tests matter after the merge, not only before it."
+    },
+    {
+      "kind": "heading",
+      "text": "Useful options"
+    },
+    {
+      "kind": "table",
+      "headers": ["Command", "What it does", "When"],
+      "rows": [
+        ["git merge feature", "Fast-forward if possible, otherwise a merge commit", "The default, and usually right"],
+        ["git merge --no-ff feature", "Always create a merge commit", "You want the branch visible as a unit in the history"],
+        ["git merge --squash feature", "Bring the changes in as one uncommitted change", "Many small messy commits you do not want to preserve"],
+        ["git merge --abort", "Return to the state before you started", "A conflicted merge you would rather redo later"]
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Produce both merge shapes on purpose",
+      "steps": [
+        "In ~/git-lab: git switch -c feature/one && echo one > one.txt && git add . && git commit -m \"Add one\"",
+        "Run: git switch main && git merge feature/one     (fast-forward — no merge commit)",
+        "Run: git log --oneline --graph -5",
+        "Run: git switch -c feature/two && echo two > two.txt && git add . && git commit -m \"Add two\"",
+        "Run: git switch main && echo main-side >> notes.txt && git commit -am \"Change on main\"",
+        "Run: git merge feature/two                        (now a merge commit is required)",
+        "Run: git log --oneline --graph -8"
+      ],
+      "expected": "The first merge moves the label with no extra commit; the second creates a merge commit joining two lines. Seeing both once is enough to recognise them in any repository afterwards."
+    }
+  ],
+  "cheatsheet": [
+    "Merge FROM a branch INTO the one you are standing on — switch first",
+    "Fast-forward: the receiving branch did not move, so the label slides forward",
+    "Merge commit: both moved, so a commit with two parents joins them",
+    "Update the receiving branch before merging into it",
+    "git log main..feature — what commits are about to arrive",
+    "git diff main...feature — the full change being merged",
+    "Run tests AFTER the merge: two clean branches can still combine into a broken result",
+    "--no-ff forces a merge commit · --squash collapses to one change · --abort backs out"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "You want to bring feature/upload into main. What is the correct sequence?",
+      "choices": {
+        "A": "git switch feature/upload then git merge main",
+        "B": "git switch main then git merge feature/upload",
+        "C": "git merge main feature/upload from anywhere",
+        "D": "git switch main then git merge --abort"
+      },
+      "correct": ["B"],
+      "explanation": "You stand on the branch that receives the work, then merge the other one into it. Doing it the other way round brings main's commits into the feature branch instead."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "When does Git produce a merge commit rather than a fast-forward?",
+      "choices": {
+        "A": "Whenever more than one file changed",
+        "B": "When the receiving branch also gained commits since the other branch split off",
+        "C": "Only when there is a conflict",
+        "D": "Only if you pass --no-ff"
+      },
+      "correct": ["B"],
+      "explanation": "If the receiving branch has not moved, the label can simply slide forward. If both moved, a commit with two parents is needed to join them."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Two branches merge with no conflicts, but the application is broken afterwards. How?",
+      "choices": {
+        "A": "That cannot happen — no conflict means a safe merge",
+        "B": "Changes can be textually compatible but semantically incompatible — one branch renames something the other branch started calling",
+        "C": "Git corrupted a file",
+        "D": "The merge commit overwrote the tests"
+      },
+      "correct": ["B"],
+      "explanation": "Git compares text, not meaning. This is exactly why the test run belongs after the merge as well as before it."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "What does git merge --squash feature do?",
+      "choices": {
+        "A": "Deletes the feature branch after merging",
+        "B": "Brings the branch's changes in as a single uncommitted change, discarding its individual commits",
+        "C": "Compresses the repository",
+        "D": "Merges without running hooks"
+      },
+      "correct": ["B"],
+      "explanation": "It is the option for a branch full of small messy commits whose individual steps are not worth keeping in the shared history."
+    }
+  ]
+}

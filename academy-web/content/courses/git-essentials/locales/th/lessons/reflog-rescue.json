@@ -1,0 +1,182 @@
+{
+  "nodeId": "reflog-rescue",
+  "locale": "th",
+  "title": "เอาของที่คิดว่าหายไปแล้วกลับคืนมา",
+  "objective": "จบบทนี้แล้วคุณจะกู้ branch ที่ลบไป commit ที่ถูกเขียนทับ หรือ reset ที่พลาดกลับมาได้ และรู้ว่ามีกรณีเดียวที่กู้ไม่ได้จริงๆ",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "เรื่องสยองขวัญเกี่ยวกับ Git แทบทุกเรื่องจบเหมือนกัน: งานยังอยู่ Git เก็บบันทึกส่วนตัวไว้ว่าตัวชี้ branch ของคุณเคยไปอยู่ที่ไหนมาบ้าง และบันทึกนั้นคือสิ่งที่เปลี่ยนหายนะส่วนใหญ่ให้กลายเป็นการแก้ด้วยคำสั่งสองตัว"
+    },
+    {
+      "kind": "heading",
+      "text": "reflog: บันทึกว่าคุณเคยไปอยู่ที่ไหนมาบ้าง"
+    },
+    {
+      "kind": "paragraph",
+      "text": "ทุกครั้งที่ HEAD ขยับ — commit, สลับ branch, merge, reset, rebase — Git เขียนบรรทัดต่อท้ายลงใน reflog มันอยู่ในเครื่อง เป็นของส่วนตัวของเครื่องคุณ และเก็บรายการไว้ประมาณเก้าสิบวันตามค่าตั้งต้น"
+    },
+    {
+      "kind": "code",
+      "caption": "การอ่านมัน",
+      "lines": [
+        "git reflog",
+        "",
+        "a3f91c2 HEAD@{0}: reset: moving to HEAD~3",
+        "9d2e8b1 HEAD@{1}: commit: Add the validation step   ← งานที่คุณคิดว่าหายไปแล้ว",
+        "7c1a4f8 HEAD@{2}: commit: Add the upload form",
+        "5b9d3e2 HEAD@{3}: checkout: moving from main to feature/upload"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "กู้ที่ 1: reset ที่ถอยไปไกลเกิน"
+    },
+    {
+      "kind": "code",
+      "caption": "กลับไปที่ที่เคยอยู่",
+      "lines": [
+        "git reflog                     # หารายการจากก่อนที่จะ reset",
+        "git reset --hard 9d2e8b1       # กลับไปสถานะนั้นเป๊ะ",
+        "",
+        "# หรืออ้างด้วยตำแหน่ง:",
+        "git reset --hard HEAD@{1}"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "กู้ที่ 2: branch ที่ถูกลบ"
+    },
+    {
+      "kind": "code",
+      "caption": "ป้าย branch หายไป แต่ commit ไม่ได้หาย",
+      "lines": [
+        "git reflog                          # หา commit ตัวสุดท้ายที่อยู่บนมัน",
+        "git branch feature/upload 9d2e8b1   # เอาป้ายกลับไปแปะ",
+        "",
+        "# การลบ branch เอาออกแค่ตัวชี้",
+        "# commit ยังอยู่จนกว่าระบบเก็บขยะของ Git จะเก็บตัวที่ไปถึงไม่ได้"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "กู้ที่ 3: amend ที่กลืนข้อความหรือเนื้อหาเดิมไป"
+    },
+    {
+      "kind": "code",
+      "caption": "commit เก่ายังถูกบันทึกไว้",
+      "lines": [
+        "git reflog                    # commit ก่อน amend อยู่ในรายการ",
+        "git show HEAD@{1}             # เปิดดูก่อนตัดสินใจ",
+        "git reset --hard HEAD@{1}     # หรือกู้กลับมาทั้งตัว"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "ดูก่อนกระโดด สองรอบ",
+      "text": "git show <id> ให้คุณส่องดู commit ตัวไหนก็ได้จาก reflog ก่อนลงมือกับมัน การกู้กลับไปผิดสถานะก็เป็นหายนะเล็กๆ ของตัวมันเอง และเพราะคำสั่งที่ใช้กู้มักเป็น reset --hard ให้ใช้เวลาเพิ่มอีกสิบวินาทียืนยันว่าคุณได้รายการที่ถูกตัว"
+    },
+    {
+      "kind": "heading",
+      "text": "สิ่งเดียวที่กู้ไม่ได้"
+    },
+    {
+      "kind": "paragraph",
+      "text": "reflog บันทึก commit งานที่ไม่เคยถูก commit — การแก้ที่นั่งอยู่ใน working directory หรือการเปลี่ยนแปลงที่ stage ไว้แต่ยังไม่ได้ commit — ไม่มีรายการอยู่ที่ไหนเลย จึงไม่มีอะไรพากลับมาได้ git restore, git checkout ของไฟล์ และ reset --hard ล้วนทิ้งงานนั้นอย่างถาวร"
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "ซึ่งเป็นเหตุผลว่า commit คือตาข่ายนิรภัยตัวจริง",
+      "text": "commit หนึ่งตัว แม้จะรกและอยู่บน branch ที่ตั้งใจจะทิ้ง ก็กู้กลับมาได้ตลอด ส่วนงานที่ยังไม่ commit คือสิ่งเดียวที่ไม่มีบันทึกเลย ถ้ากำลังจะทำอะไรที่เสี่ยง ประกันที่ถูกที่สุดคือ commit ก่อน — คุณจัดประวัติให้เรียบร้อยทีหลังได้เสมอ และบทนี้คือเหตุผลว่าทำไมประโยคนั้นถึงเป็นจริง"
+    },
+    {
+      "kind": "table",
+      "headers": ["สิ่งที่หาย", "กู้ได้ไหม", "อย่างไร"],
+      "rows": [
+        ["commit ที่หลุดไปเพราะ reset --hard", "ได้", "git reflog แล้ว reset --hard ไปที่รายการก่อนหน้า"],
+        ["branch ที่ถูกลบ", "ได้", "git branch <ชื่อ> <id จาก reflog>"],
+        ["commit ที่ถูกเขียนทับจาก amend", "ได้", "reflog เก็บ commit ก่อน amend ไว้"],
+        ["commit ที่ถูกทิ้งจากการ rebase", "ได้", "reflog เก็บตัวต้นฉบับไว้"],
+        ["การแก้ที่ยังไม่ commit และถูกทิ้งด้วย restore", "ไม่ได้", "มันไม่เคยถูกบันทึกไว้ที่ไหนเลย"]
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "ทำลายงานสักหน่อย แล้วเอากลับมา",
+      "steps": [
+        "ใน ~/git-lab: git switch -c rescue-demo",
+        "รัน: echo important > important.txt && git add . && git commit -m \"Add important work\"",
+        "รัน: git log --oneline -2      (จดรหัส commit ของคุณไว้)",
+        "รัน: git reset --hard HEAD~1   (commit หายไปจาก branch แล้ว)",
+        "รัน: git log --oneline -2      (ยืนยันว่ามันไม่อยู่แล้ว)",
+        "รัน: git reflog                (มันอยู่ตรงนั้นใน reflog)",
+        "รัน: git reset --hard HEAD@{1} && cat important.txt",
+        "รัน: git switch main && git branch -D rescue-demo && git reflog",
+        "รัน: git branch rescued <รหัสจาก reflog> && git switch rescued && ls"
+      ],
+      "expected": "commit ที่ถูกลบแล้วกู้กลับมา จากนั้นคือ branch ทั้ง branch ที่ถูกลบแล้วสร้างขึ้นใหม่จาก reflog การได้ทำสิ่งนี้สักครั้งในพื้นที่ทดลองกำจัดความกลัวส่วนใหญ่ที่ทำให้คนหลีกเลี่ยงส่วนที่มีประโยชน์ของ Git"
+    }
+  ],
+  "cheatsheet": [
+    "git reflog — ทุกตำแหน่งที่ HEAD เคยอยู่ เก็บในเครื่องประมาณ 90 วัน",
+    "กู้ reset ที่พลาด: git reset --hard HEAD@{1} (หรือรหัสจาก reflog)",
+    "กู้ branch ที่ถูกลบ: git branch <ชื่อ> <id จาก reflog>",
+    "กู้ commit ที่ถูก amend: เวอร์ชันก่อน amend อยู่ใน reflog",
+    "กู้จากการ rebase: commit ต้นฉบับอยู่ใน reflog",
+    "git show <id> — ส่องดูก่อนลงมือกับมัน",
+    "การลบ branch เอาออกแค่ป้าย; commit ยังไปถึงได้ผ่าน reflog",
+    "งานที่ยังไม่ commit ไม่มีบันทึกและกู้ไม่ได้ — commit ก่อนทำอะไรที่เสี่ยง"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "reflog บันทึกอะไร",
+      "choices": {
+        "A": "ทุกไฟล์ที่คุณเคยแก้",
+        "B": "ทุกตำแหน่งที่ HEAD เคยชี้ไป — commit, สลับ branch, merge, reset, rebase",
+        "C": "เฉพาะ commit ที่ถูก push",
+        "D": "ประวัติของ repository ฝั่ง remote"
+      },
+      "correct": ["B"],
+      "explanation": "มันคือบันทึกการขยับของตัวชี้ในเครื่อง ซึ่งเป็นสิ่งที่คุณต้องการพอดีเวลาจะกลับไปสถานะที่เผลอออกมา"
+    },
+    {
+      "id": "cp-2",
+      "prompt": "คุณลบ branch ด้วย git branch -D และมันมี commit ที่ยังไม่ถูกรวมอยู่ ข้อไหนถูก",
+      "choices": {
+        "A": "commit หายไปอย่างถาวร",
+        "B": "มีแค่ป้าย branch ที่ถูกเอาออก; commit ยังไปถึงได้ผ่าน reflog และสร้าง branch ขึ้นใหม่ได้",
+        "C": "commit ย้ายไปอยู่ที่ main",
+        "D": "ต้องกู้จากไฟล์สำรอง"
+      },
+      "correct": ["B"],
+      "explanation": "branch คือตัวชี้ การลบตัวชี้ไม่ได้ลบ commit — git branch <ชื่อ> <id> เอาป้ายกลับไปแปะได้"
+    },
+    {
+      "id": "cp-3",
+      "prompt": "ข้อไหนกู้ไม่ได้จริงๆ",
+      "choices": {
+        "A": "commit ที่ถูกเอาออกด้วย reset --hard",
+        "B": "branch ที่ลบไปเมื่อวาน",
+        "C": "การแก้ที่ยังไม่ commit และถูกทิ้งด้วย git restore",
+        "D": "commit ที่ถูกแทนที่ด้วยการ rebase"
+      },
+      "correct": ["C"],
+      "explanation": "reflog บันทึก commit งานที่ไม่เคยถูก commit ไม่มีรายการ จึงไม่มีอะไรให้กลับไปหา"
+    },
+    {
+      "id": "cp-4",
+      "prompt": "คุณกำลังจะลองทำอะไรที่เสี่ยงใน repository ประกันที่ถูกที่สุดคืออะไร",
+      "choices": {
+        "A": "คัดลอกโฟลเดอร์ไปไว้บนเดสก์ท็อป",
+        "B": "commit งานปัจจุบันก่อน แม้จะเป็น branch ชั่วคราวที่รกก็ตาม",
+        "C": "push ขึ้น remote ทันที",
+        "D": "รัน git gc"
+      },
+      "correct": ["B"],
+      "explanation": "เมื่อมันเป็น commit แล้ว มันกู้กลับได้ผ่าน reflog ไม่ว่าจะเกิดอะไรขึ้นต่อจากนั้น และประวัติจัดให้เรียบร้อยทีหลังได้เสมอ"
+    }
+  ]
+}

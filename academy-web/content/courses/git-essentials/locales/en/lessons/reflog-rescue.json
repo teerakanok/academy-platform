@@ -1,0 +1,182 @@
+{
+  "nodeId": "reflog-rescue",
+  "locale": "en",
+  "title": "Getting back what you thought you lost",
+  "objective": "By the end of this lesson you can recover a deleted branch, an overwritten commit, or a bad reset — and you know the one case where recovery is genuinely impossible.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Almost every Git horror story ends the same way: the work was still there. Git keeps a private log of everywhere your branch pointers have been, and that log is what turns most disasters into a two-command fix."
+    },
+    {
+      "kind": "heading",
+      "text": "The reflog: a record of where you have been"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Every time HEAD moves — a commit, a switch, a merge, a reset, a rebase — Git appends a line to the reflog. It is local, it is private to your machine, and it holds entries for about ninety days by default."
+    },
+    {
+      "kind": "code",
+      "caption": "Reading it",
+      "lines": [
+        "git reflog",
+        "",
+        "a3f91c2 HEAD@{0}: reset: moving to HEAD~3",
+        "9d2e8b1 HEAD@{1}: commit: Add the validation step   ← the work you thought was gone",
+        "7c1a4f8 HEAD@{2}: commit: Add the upload form",
+        "5b9d3e2 HEAD@{3}: checkout: moving from main to feature/upload"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Rescue 1: a reset that went too far"
+    },
+    {
+      "kind": "code",
+      "caption": "Go back to where you were",
+      "lines": [
+        "git reflog                     # find the entry from before the reset",
+        "git reset --hard 9d2e8b1       # return to that exact state",
+        "",
+        "# or by position:",
+        "git reset --hard HEAD@{1}"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Rescue 2: a deleted branch"
+    },
+    {
+      "kind": "code",
+      "caption": "The branch label is gone, the commits are not",
+      "lines": [
+        "git reflog                          # find the last commit that was on it",
+        "git branch feature/upload 9d2e8b1   # put the label back",
+        "",
+        "# Deleting a branch only removes the pointer.",
+        "# The commits stay until Git's garbage collection removes unreachable ones."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Rescue 3: an amend that ate the previous message or content"
+    },
+    {
+      "kind": "code",
+      "caption": "The old commit is still recorded",
+      "lines": [
+        "git reflog                    # the pre-amend commit is listed",
+        "git show HEAD@{1}             # look at it before deciding",
+        "git reset --hard HEAD@{1}     # or recover it entirely"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Look before you leap, twice",
+      "text": "git show <id> lets you inspect any commit from the reflog before you act on it. Recovering into the wrong state is its own small disaster — and since reset --hard is usually the recovery command, take the extra ten seconds to confirm you have the right entry."
+    },
+    {
+      "kind": "heading",
+      "text": "The one thing that cannot be recovered"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The reflog records commits. Work that was never committed — edits sitting in your working directory, or changes you staged but never committed — has no entry anywhere, so nothing can bring it back. git restore, git checkout of a file, and reset --hard all discard that work permanently."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Which is why commits are the real safety net",
+      "text": "A commit, even a scruffy one on a throwaway branch, is recoverable forever. Uncommitted work is the only thing with no record. If you are about to do something risky, the cheapest insurance is to commit first — you can always tidy the history afterwards, and this lesson is why that is true."
+    },
+    {
+      "kind": "table",
+      "headers": ["Lost", "Recoverable?", "How"],
+      "rows": [
+        ["Commits dropped by reset --hard", "Yes", "git reflog then reset --hard to the earlier entry"],
+        ["A deleted branch", "Yes", "git branch <name> <id from reflog>"],
+        ["An overwritten commit from amend", "Yes", "reflog holds the pre-amend commit"],
+        ["Commits abandoned by a rebase", "Yes", "reflog holds the originals"],
+        ["Uncommitted edits discarded with restore", "No", "They were never recorded anywhere"]
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Destroy some work, then get it back",
+      "steps": [
+        "In ~/git-lab: git switch -c rescue-demo",
+        "Run: echo important > important.txt && git add . && git commit -m \"Add important work\"",
+        "Run: git log --oneline -2      (note your commit id)",
+        "Run: git reset --hard HEAD~1   (the commit is gone from the branch)",
+        "Run: git log --oneline -2      (confirm it is not there)",
+        "Run: git reflog                (it is right there in the reflog)",
+        "Run: git reset --hard HEAD@{1} && cat important.txt",
+        "Run: git switch main && git branch -D rescue-demo && git reflog",
+        "Run: git branch rescued <the id from the reflog> && git switch rescued && ls"
+      ],
+      "expected": "A commit deleted and recovered, then an entire branch deleted and rebuilt from the reflog. Doing this once in a sandbox removes most of the fear that makes people avoid the useful parts of Git."
+    }
+  ],
+  "cheatsheet": [
+    "git reflog — every position HEAD has held, kept locally for about 90 days",
+    "Recover a bad reset: git reset --hard HEAD@{1} (or the id from the reflog)",
+    "Recover a deleted branch: git branch <name> <id from reflog>",
+    "Recover an amended commit: the pre-amend version is in the reflog",
+    "Recover from a rebase: the original commits are in the reflog",
+    "git show <id> — inspect before you act on it",
+    "Deleting a branch removes only the label; the commits remain reachable via reflog",
+    "Uncommitted work has no record and cannot be recovered — commit before anything risky"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What does the reflog record?",
+      "choices": {
+        "A": "Every file you have edited",
+        "B": "Every position HEAD has pointed to — commits, switches, merges, resets, rebases",
+        "C": "Only commits that were pushed",
+        "D": "The remote repository's history"
+      },
+      "correct": ["B"],
+      "explanation": "It is a local log of pointer movement, which is exactly what you need to return to a state you left by accident."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "You deleted a branch with git branch -D and it had unmerged commits. What is true?",
+      "choices": {
+        "A": "The commits are permanently gone",
+        "B": "Only the branch label was removed; the commits are still reachable via the reflog and the branch can be recreated",
+        "C": "The commits moved to main",
+        "D": "You must restore from a backup"
+      },
+      "correct": ["B"],
+      "explanation": "A branch is a pointer. Deleting the pointer does not delete the commits — git branch <name> <id> puts the label back."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Which of these is genuinely unrecoverable?",
+      "choices": {
+        "A": "A commit removed by reset --hard",
+        "B": "A branch deleted yesterday",
+        "C": "Uncommitted edits discarded with git restore",
+        "D": "Commits replaced by a rebase"
+      },
+      "correct": ["C"],
+      "explanation": "The reflog records commits. Work that was never committed has no entry, so there is nothing to return to."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "You are about to attempt something risky in a repository. What is the cheapest insurance?",
+      "choices": {
+        "A": "Copy the folder to your desktop",
+        "B": "Commit your current work first, even to a scruffy temporary branch",
+        "C": "Push to the remote immediately",
+        "D": "Run git gc"
+      },
+      "correct": ["B"],
+      "explanation": "Once it is a commit it is recoverable through the reflog no matter what happens next, and the history can always be tidied afterwards."
+    }
+  ]
+}
