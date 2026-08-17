@@ -8,7 +8,10 @@
     "Move around a Linux filesystem and read what a listing is telling you",
     "Read and change permissions, and recognise the permission mistakes attackers look for",
     "Inspect running processes and keep a system patched",
-    "Chain commands together to answer a question from a log file"
+    "Chain commands together to answer a question from a log file",
+    "Write a shell script that takes arguments and stops safely when something is wrong",
+    "Schedule work to run unattended, and diagnose it when it fails",
+    "Reach and manage a remote machine over SSH using keys rather than passwords"
   ],
   "skillLabels": {
     "os-concepts": "How systems work",
@@ -31,6 +34,11 @@
     "signals-and-jobs": "Signals, jobs, and stopping things properly",
     "pipes-and-logs": "Pipes, grep, and reading logs",
     "text-and-regex": "Patterns: regular expressions that earn their keep",
-    "sed-and-awk": "Reshaping text: sed and awk"
+    "sed-and-awk": "Reshaping text: sed and awk",
+    "first-shell-script": "Your first shell script",
+    "script-logic": "Decisions and loops",
+    "script-safety": "Writing scripts that fail safely",
+    "scheduling-with-cron": "Scheduling work with cron",
+    "ssh-and-remote": "Working on remote machines with SSH"
   }
 }

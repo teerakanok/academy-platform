@@ -1,0 +1,199 @@
+{
+  "nodeId": "script-logic",
+  "locale": "en",
+  "title": "Decisions and loops",
+  "objective": "By the end of this lesson your scripts can check a condition before acting, repeat work across a list, and stop early when something is wrong.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A script that runs the same commands regardless of what it finds is a recording. A script that checks first is a tool. Two structures cover almost everything: ask a question, and repeat over a list."
+    },
+    {
+      "kind": "heading",
+      "text": "if: acting on a condition"
+    },
+    {
+      "kind": "code",
+      "caption": "The shape",
+      "lines": [
+        "if [ -f \"$config\" ]; then",
+        "  echo \"Config found\"",
+        "elif [ -d \"$config\" ]; then",
+        "  echo \"That is a directory, not a file\"",
+        "else",
+        "  echo \"Missing: $config\" >&2",
+        "  exit 1",
+        "fi"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The >&2 sends that message to the error stream rather than normal output, so a person piping the script's output into a file still sees the problem. Small habit, real difference when something fails at 3am."
+    },
+    {
+      "kind": "heading",
+      "text": "The tests worth memorising"
+    },
+    {
+      "kind": "table",
+      "headers": ["Test", "True when"],
+      "rows": [
+        ["[ -f \"$p\" ]", "p exists and is a regular file"],
+        ["[ -d \"$p\" ]", "p exists and is a directory"],
+        ["[ -r \"$p\" ] / [ -w \"$p\" ] / [ -x \"$p\" ]", "you can read / write / execute it"],
+        ["[ -z \"$s\" ] / [ -n \"$s\" ]", "the string is empty / is not empty"],
+        ["[ \"$a\" = \"$b\" ]", "two strings are equal"],
+        ["[ \"$a\" -eq \"$b\" ]", "two numbers are equal (-lt -gt -le -ge for comparisons)"],
+        ["command", "the command itself succeeded — exit code 0"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "= is for strings, -eq is for numbers",
+      "text": "Using -eq on text produces an error, and using = on numbers compares them as text — so \"10\" = \"9\" is false but \"10\" -lt \"9\" is also false, for different reasons. Pick the operator that matches the kind of data, and quote both sides so an empty value does not break the test entirely."
+    },
+    {
+      "kind": "heading",
+      "text": "Loops: the same work across a list"
+    },
+    {
+      "kind": "code",
+      "caption": "for and while",
+      "lines": [
+        "for file in *.log; do",
+        "  echo \"Compressing $file\"",
+        "  gzip \"$file\"",
+        "done",
+        "",
+        "for host in web1 web2 db1; do",
+        "  ssh \"$host\" uptime",
+        "done",
+        "",
+        "while read -r line; do",
+        "  echo \"Line: $line\"",
+        "done < servers.txt"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Loop over lines with while read, not for",
+      "text": "for line in $(cat file) splits on every space, so a line containing spaces becomes several iterations. while read -r line; do ... done < file reads one whole line at a time. The -r stops backslashes being interpreted, which is what you want when reading data."
+    },
+    {
+      "kind": "heading",
+      "text": "Functions: naming a piece of work"
+    },
+    {
+      "kind": "code",
+      "caption": "Define once, call many times",
+      "lines": [
+        "log() {",
+        "  echo \"[$(date +%H:%M:%S)] $*\"",
+        "}",
+        "",
+        "check_service() {",
+        "  local name=\"$1\"          # local keeps it out of the rest of the script",
+        "  if systemctl is-active --quiet \"$name\"; then",
+        "    log \"$name is running\"",
+        "  else",
+        "    log \"$name is DOWN\"",
+        "    return 1",
+        "  fi",
+        "}",
+        "",
+        "check_service nginx || echo \"Investigate nginx\""
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Functions take arguments the same way scripts do: $1, $2, $@. Use local for variables inside a function, otherwise they leak into the whole script and quietly overwrite something with the same name later."
+    },
+    {
+      "kind": "try",
+      "title": "Build a checker",
+      "steps": [
+        "Create check.sh with:",
+        "  #!/bin/bash",
+        "  target=\"${1:-/etc}\"                 # use $1, or /etc if none given",
+        "  if [ ! -d \"$target\" ]; then",
+        "    echo \"Not a directory: $target\" >&2",
+        "    exit 1",
+        "  fi",
+        "  count=0",
+        "  for f in \"$target\"/*.conf; do",
+        "    [ -e \"$f\" ] || continue          # skip when the pattern matched nothing",
+        "    count=$((count + 1))",
+        "  done",
+        "  echo \"$count .conf files in $target\"",
+        "Run: chmod u+x check.sh && ./check.sh",
+        "Run: ./check.sh /nonexistent          (see it fail on purpose)",
+        "Run: echo $?                          (1, because you set it)"
+      ],
+      "expected": "A count for /etc, then a deliberate failure with a message on the error stream and exit code 1. That is a script that can be trusted inside a bigger pipeline, because it reports honestly when it cannot do its job."
+    }
+  ],
+  "cheatsheet": [
+    "if [ condition ]; then ... elif ... else ... fi",
+    "-f file · -d directory · -r/-w/-x readable/writable/executable",
+    "-z empty string · -n non-empty · = string equality · -eq numeric equality",
+    "Quote both sides of a test so an empty value cannot break it",
+    "for x in a b c; do ... done — repeat over a list",
+    "while read -r line; do ... done < file — one whole line at a time",
+    "$((a + b)) does arithmetic",
+    "${1:-default} uses a default when the argument is missing",
+    "func() { ...; } defines a function; use local for its variables",
+    ">&2 sends a message to the error stream where it belongs"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Which test is true only when the path exists and is a directory?",
+      "choices": {
+        "A": "[ -f \"$p\" ]",
+        "B": "[ -d \"$p\" ]",
+        "C": "[ -n \"$p\" ]",
+        "D": "[ -x \"$p\" ]"
+      },
+      "correct": ["B"],
+      "explanation": "-d tests for a directory, -f for a regular file, -n only checks that the string is not empty, and -x checks the execute permission."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why read lines with while read -r line rather than for line in $(cat file) ?",
+      "choices": {
+        "A": "for cannot read files at all",
+        "B": "The for version splits on every space, so a line containing spaces becomes several iterations",
+        "C": "while is faster on large files",
+        "D": "for requires root"
+      },
+      "correct": ["B"],
+      "explanation": "Word splitting again. while read takes one whole line per iteration, which is what 'for each line' actually means."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "What does ${1:-/etc} mean?",
+      "choices": {
+        "A": "Remove /etc from the first argument",
+        "B": "Use the first argument, or /etc if no argument was given",
+        "C": "Require the first argument to be /etc",
+        "D": "Set the first argument permanently to /etc"
+      },
+      "correct": ["B"],
+      "explanation": "It is a default value. The script stays usable with no arguments while still accepting one."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why send error messages with >&2 ?",
+      "choices": {
+        "A": "It makes them appear in red",
+        "B": "It writes them to the error stream, so they are still visible when normal output is redirected into a file or another command",
+        "C": "It doubles the message",
+        "D": "It is required by bash"
+      },
+      "correct": ["B"],
+      "explanation": "Output and errors are separate streams. Keeping them separate means a failure is still noticed when someone captures the normal output somewhere else."
+    }
+  ]
+}

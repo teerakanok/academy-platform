@@ -1,0 +1,179 @@
+{
+  "nodeId": "script-safety",
+  "locale": "en",
+  "title": "Writing scripts that fail safely",
+  "objective": "By the end of this lesson you can write a script that stops when something goes wrong instead of carrying on and doing damage — the difference between automation you can trust and automation that scales your mistakes.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Automation multiplies whatever you gave it. A careful command run by hand affects one thing; the same command in a script that runs nightly affects everything, every night, with nobody watching. This lesson is the set of habits that make that safe."
+    },
+    {
+      "kind": "heading",
+      "text": "The three-word line that prevents most disasters"
+    },
+    {
+      "kind": "code",
+      "caption": "Put this under the shebang",
+      "lines": [
+        "#!/bin/bash",
+        "set -euo pipefail",
+        "",
+        "# -e  stop immediately if any command fails",
+        "# -u  treat an unset variable as an error instead of an empty string",
+        "# -o pipefail  a pipeline fails if ANY stage fails, not just the last one"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "What each flag actually saves you from",
+      "text": "Without -e, a failed cd is ignored and the next line runs in the wrong directory. Without -u, a typo in a variable name expands to nothing — so rm -rf \"$BACKUP_DIR/old\" becomes rm -rf \"/old\" when the name was misspelt. Without pipefail, a pipeline reports success because the final tee worked, even though the command feeding it failed."
+    },
+    {
+      "kind": "heading",
+      "text": "Say exactly what you mean"
+    },
+    {
+      "kind": "table",
+      "headers": ["Risky", "Safer", "Why"],
+      "rows": [
+        ["rm -rf $dir/*", "rm -rf \"${dir:?dir not set}\"/*", "Refuses to run when dir is empty instead of erasing /"],
+        ["cd $target", "cd \"$target\" || exit 1", "A failed cd no longer leaves you elsewhere"],
+        ["backup.sh", "/usr/local/bin/backup.sh", "A scheduler has a different PATH than your shell"],
+        ["rm *.tmp", "rm -- *.tmp", "-- stops a filename starting with - being read as a flag"],
+        ["cp $a $b", "cp \"$a\" \"$b\"", "Spaces in names no longer split into extra arguments"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "${var:?message} is the cheapest safety net there is",
+      "text": "It expands to the value if set, and exits with your message if not. One extra line in a destructive script converts a silent catastrophe into a clear refusal."
+    },
+    {
+      "kind": "heading",
+      "text": "Clean up after yourself, even when it fails"
+    },
+    {
+      "kind": "code",
+      "caption": "trap runs on the way out",
+      "lines": [
+        "workdir=$(mktemp -d)",
+        "trap 'rm -rf \"$workdir\"' EXIT",
+        "",
+        "# ...work in $workdir...",
+        "# whether the script succeeds, fails, or is interrupted,",
+        "# the temporary directory is removed"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "mktemp -d creates a uniquely named temporary directory instead of a predictable one, which also closes a small security hole: a predictable name in /tmp can be created in advance by someone else, since /tmp is world-writable."
+    },
+    {
+      "kind": "heading",
+      "text": "Show what you would do before you do it"
+    },
+    {
+      "kind": "code",
+      "caption": "A dry-run switch costs four lines",
+      "lines": [
+        "dry_run=false",
+        "[ \"${1:-}\" = \"--dry-run\" ] && dry_run=true",
+        "",
+        "run() {",
+        "  if $dry_run; then echo \"WOULD: $*\"; else \"$@\"; fi",
+        "}",
+        "",
+        "run rm -rf \"$old_backups\"",
+        "run systemctl restart nginx"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Now the same script can be read out loud before it is trusted. On anything destructive, being able to run it in a mode that only prints is worth far more than the four lines it costs."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Check your script before running it",
+      "text": "shellcheck is a linter for shell scripts and it is very good. It catches unquoted variables, unreachable code, and the classic mistakes before they run. Install it and run shellcheck yourscript.sh — treat what it says as a review, not a nuisance."
+    },
+    {
+      "kind": "try",
+      "title": "Watch the safety flags work",
+      "steps": [
+        "Create unsafe.sh:  #!/bin/bash then:  cd /nonexistent   then:  echo \"still running in $(pwd)\"",
+        "Run it — note that it prints a line even though cd failed",
+        "Add set -euo pipefail under the shebang and run it again — now it stops",
+        "Create a script with:  echo \"deleting ${TARGET}/old\"  and run it without setting TARGET",
+        "Add set -u and run again — it now refuses instead of expanding to /old",
+        "Run: shellcheck unsafe.sh    (if installed — read every warning)"
+      ],
+      "expected": "The same script continuing dangerously, then refusing to. The second case is the important one: an unset variable turning a path into / is exactly how a cleanup script erases a system."
+    }
+  ],
+  "cheatsheet": [
+    "set -euo pipefail on line two of every script you will run unattended",
+    "-e stop on failure · -u unset variable is an error · pipefail any stage failing fails the pipeline",
+    "Quote every variable: \"$var\"",
+    "${var:?message} refuses to run when the value is missing",
+    "cd \"$dir\" || exit 1 — never continue after a failed cd",
+    "Use absolute paths in anything a scheduler runs",
+    "rm -- *.tmp so a leading dash is not read as a flag",
+    "mktemp -d for temporary space · trap 'cleanup' EXIT to remove it",
+    "Add a --dry-run mode to anything destructive",
+    "shellcheck script.sh finds these mistakes before they run"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What does set -u protect you from?",
+      "choices": {
+        "A": "Running the script as the wrong user",
+        "B": "A misspelt or unset variable silently expanding to nothing — which can turn \"$DIR/old\" into \"/old\"",
+        "C": "Files with spaces in their names",
+        "D": "Running out of disk space"
+      },
+      "correct": ["B"],
+      "explanation": "By default the shell expands an unset variable to an empty string and carries on. -u makes that an error, which is what you want in anything that deletes or moves data."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why does a scheduled script need absolute paths?",
+      "choices": {
+        "A": "Schedulers run slower",
+        "B": "A scheduler runs with a different, usually much smaller PATH and a different working directory than your interactive shell",
+        "C": "Relative paths are not allowed in scripts",
+        "D": "Absolute paths are faster to resolve"
+      },
+      "correct": ["B"],
+      "explanation": "This is the classic 'works when I run it, fails on schedule' cause: the command was found in your PATH but not in the scheduler's."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "What does trap 'rm -rf \"$workdir\"' EXIT achieve?",
+      "choices": {
+        "A": "It deletes the directory immediately",
+        "B": "It removes the temporary directory when the script exits — whether it succeeded, failed, or was interrupted",
+        "C": "It prevents the script from exiting",
+        "D": "It traps errors and ignores them"
+      },
+      "correct": ["B"],
+      "explanation": "Cleanup that only runs on the success path is cleanup that never runs on the day it matters. trap ... EXIT covers every way out."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "What is the value of a --dry-run mode in a destructive script?",
+      "choices": {
+        "A": "It makes the script run faster",
+        "B": "It prints what the script would do without doing it, so the plan can be reviewed before it is trusted",
+        "C": "It automatically backs up files first",
+        "D": "It restricts the script to non-root users"
+      },
+      "correct": ["B"],
+      "explanation": "It turns an irreversible action into a reviewable one, which is the cheapest safety measure available for automation."
+    }
+  ]
+}

@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "beginner",
-  "estimatedMinutes": 217,
+  "estimatedMinutes": 311,
   "coverMotif": "terminal",
   "skills": [
     {
@@ -239,6 +239,67 @@
       "skillWeights": {
         "cli": 5,
         "filesystem": 1
+      }
+    },
+    {
+      "id": "first-shell-script",
+      "kind": "lesson",
+      "prerequisites": [
+        "sed-and-awk"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "cli": 5,
+        "os-concepts": 1
+      }
+    },
+    {
+      "id": "script-logic",
+      "kind": "lesson",
+      "prerequisites": [
+        "first-shell-script"
+      ],
+      "estimatedMinutes": 20,
+      "skillWeights": {
+        "cli": 6
+      }
+    },
+    {
+      "id": "script-safety",
+      "kind": "lesson",
+      "prerequisites": [
+        "script-logic"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "cli": 4,
+        "security-lens": 4
+      }
+    },
+    {
+      "id": "scheduling-with-cron",
+      "kind": "lesson",
+      "prerequisites": [
+        "script-safety"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "processes": 3,
+        "cli": 3,
+        "security-lens": 2
+      }
+    },
+    {
+      "id": "ssh-and-remote",
+      "kind": "capstone",
+      "prerequisites": [
+        "scheduling-with-cron"
+      ],
+      "estimatedMinutes": 22,
+      "skillWeights": {
+        "security-lens": 5,
+        "cli": 3,
+        "permissions": 2
       }
     }
   ]

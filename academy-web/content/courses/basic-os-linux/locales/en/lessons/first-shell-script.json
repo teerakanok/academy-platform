@@ -1,0 +1,179 @@
+{
+  "nodeId": "first-shell-script",
+  "locale": "en",
+  "title": "Your first shell script",
+  "objective": "By the end of this lesson you can turn commands you already type into a script that runs anywhere, takes arguments, and does not break the first time a filename contains a space.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A shell script is a file containing the commands you would have typed. That is the whole idea. The value is not in learning a new language — it is that a sequence you ran correctly once can now be run correctly every time, by anyone, including a scheduler at 3am."
+    },
+    {
+      "kind": "heading",
+      "text": "Three lines make a script"
+    },
+    {
+      "kind": "code",
+      "caption": "backup.sh",
+      "lines": [
+        "#!/bin/bash",
+        "echo \"Starting backup at $(date)\"",
+        "cp -r ~/documents ~/backup"
+      ]
+    },
+    {
+      "kind": "list",
+      "ordered": true,
+      "items": [
+        "The first line is the shebang: it tells the kernel which interpreter to run this with",
+        "chmod u+x backup.sh makes it executable — you met this in the permissions lesson",
+        "./backup.sh runs it. The ./ matters: it says 'in this directory', because the current directory is deliberately not searched for commands"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Why ./ is required",
+      "text": "The shell looks for commands in the directories listed in PATH, and the current directory is not one of them. That is a security decision: if it were, dropping a file named ls into a shared directory would hijack the next person who ran ls there."
+    },
+    {
+      "kind": "heading",
+      "text": "Variables, and the quotes that keep them safe"
+    },
+    {
+      "kind": "code",
+      "caption": "Assign without spaces, use with $",
+      "lines": [
+        "name=\"deploy\"            # no spaces around =",
+        "target=/var/www",
+        "echo \"Deploying $name to $target\"",
+        "",
+        "today=$(date +%F)        # capture the output of a command",
+        "count=$(ls | wc -l)      # $( ) runs it and gives you the text back"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The single most common shell bug",
+      "text": "Write \"$file\", not $file. Without quotes, a value containing a space becomes two separate arguments — so rm $file on a file called holiday photos.txt tries to delete two files that do not exist, and cp $src $dst silently copies the wrong thing. Quote every variable unless you have a specific reason not to."
+    },
+    {
+      "kind": "heading",
+      "text": "Arguments: making a script reusable"
+    },
+    {
+      "kind": "code",
+      "caption": "greet.sh",
+      "lines": [
+        "#!/bin/bash",
+        "# $1 is the first argument, $2 the second, $@ is all of them, $# is how many",
+        "echo \"Hello, $1\"",
+        "echo \"You passed $# arguments\"",
+        "",
+        "# ./greet.sh Songpon    ->  Hello, Songpon"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "A script that hardcodes a path is a script that works once. A script that takes the path as $1 is a tool. That difference is most of what separates a note-to-self from something a team can use."
+    },
+    {
+      "kind": "heading",
+      "text": "Reading input and reporting a result"
+    },
+    {
+      "kind": "code",
+      "caption": "Interactive and exit codes",
+      "lines": [
+        "read -p \"Delete these files? [y/N] \" answer",
+        "echo \"You said: $answer\"",
+        "",
+        "exit 0     # success",
+        "exit 1     # failure — anything non-zero means failure"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Exit codes are how scripts talk to each other",
+      "text": "Every command sets an exit code: 0 for success, non-zero for failure. Check the last one with echo $?. This is what lets you write a && b — run b only if a succeeded — and it is how a scheduler knows your script failed rather than assuming silence means it worked."
+    },
+    {
+      "kind": "try",
+      "title": "Write and run one",
+      "steps": [
+        "Run: mkdir -p ~/scripts && cd ~/scripts",
+        "Create sysinfo.sh with an editor (nano sysinfo.sh) containing:",
+        "  #!/bin/bash",
+        "  echo \"Host: $(hostname)  User: $(whoami)  Date: $(date +%F)\"",
+        "  echo \"Disk used on /: $(df -h / | awk 'NR==2 {print $5}')\"",
+        "Run: chmod u+x sysinfo.sh",
+        "Run: ./sysinfo.sh",
+        "Run: echo $?          (0 means it succeeded)"
+      ],
+      "expected": "A one-line system summary produced by your own script, and an exit code of 0. You have just written a tool that answers a question you would otherwise type out every time."
+    }
+  ],
+  "cheatsheet": [
+    "#!/bin/bash on line one tells the system what runs this file",
+    "chmod u+x script.sh then ./script.sh",
+    "./ is required because the current directory is not in PATH — deliberately",
+    "name=\"value\" with no spaces around the equals sign",
+    "$(command) captures a command's output into a value",
+    "Always quote variables: \"$file\" not $file",
+    "$1 $2 are arguments · $@ is all of them · $# is how many",
+    "exit 0 means success · any non-zero exit code means failure",
+    "echo $? shows the exit code of the last command"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What does the line #!/bin/bash at the top of a script do?",
+      "choices": {
+        "A": "It is a comment and has no effect",
+        "B": "It tells the system which interpreter should run the file",
+        "C": "It makes the file executable",
+        "D": "It imports bash functions"
+      },
+      "correct": ["B"],
+      "explanation": "The shebang names the interpreter. Making the file executable is a separate step with chmod."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why is rm $file dangerous compared to rm \"$file\" ?",
+      "choices": {
+        "A": "Quotes make the command run faster",
+        "B": "Without quotes, a value containing spaces splits into multiple arguments, so the command acts on the wrong things",
+        "C": "Unquoted variables are always empty",
+        "D": "There is no difference in bash"
+      },
+      "correct": ["B"],
+      "explanation": "Word splitting happens before the command runs. A file named holiday photos.txt becomes two arguments, and the command does something you did not intend."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A script finishes and echo $? prints 1. What does that mean?",
+      "choices": {
+        "A": "It succeeded and produced one line of output",
+        "B": "It failed — any non-zero exit code signals failure",
+        "C": "It is still running",
+        "D": "It was interrupted by the user"
+      },
+      "correct": ["B"],
+      "explanation": "0 is success by convention; anything else is a failure code. Schedulers and CI systems rely on this to know whether to alert."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why must you type ./script.sh rather than just script.sh ?",
+      "choices": {
+        "A": "Because scripts must always have a path",
+        "B": "Because the current directory is deliberately not in PATH, so a dropped file cannot hijack a common command name",
+        "C": "Because bash requires two characters before a filename",
+        "D": "Because the file is not executable otherwise"
+      },
+      "correct": ["B"],
+      "explanation": "Leaving the current directory out of PATH prevents someone placing a malicious file named after a common command in a directory you happen to be in."
+    }
+  ]
+}

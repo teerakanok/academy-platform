@@ -1,0 +1,240 @@
+{
+  "nodeId": "ssh-and-remote",
+  "locale": "en",
+  "title": "Working on remote machines with SSH",
+  "objective": "By the end of this lesson you can log into a remote machine with a key instead of a password, copy files safely in both directions, and explain why the host key warning is the one prompt you must never click through.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Almost every Linux machine you will work on professionally is somewhere else. SSH is how you reach it: an encrypted session that gives you the same shell you have been using for this entire course, on a machine you may never physically see."
+    },
+    {
+      "kind": "code",
+      "caption": "The basics",
+      "lines": [
+        "ssh songpon@server.example.com        # log in",
+        "ssh -p 2222 songpon@server            # a non-default port",
+        "ssh server 'df -h /'                  # run one command and come straight back",
+        "exit                                  # end the session"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Keys, not passwords"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A key pair is two matching files: a private key that never leaves your machine, and a public key you copy to every server you want to reach. The server challenges you, your machine answers using the private key, and nothing secret crosses the network — which is the whole point."
+    },
+    {
+      "kind": "code",
+      "caption": "Set it up once",
+      "lines": [
+        "ssh-keygen -t ed25519 -C \"laptop-2026\"     # create a pair; set a passphrase when asked",
+        "ssh-copy-id songpon@server                 # install the PUBLIC key on the server",
+        "ssh songpon@server                         # no password prompt now",
+        "",
+        "ls -l ~/.ssh/",
+        "#  id_ed25519       <- private. never copy this anywhere. must be 600",
+        "#  id_ed25519.pub   <- public. safe to hand out"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The private key is the credential",
+      "text": "Anyone who copies that file becomes you on every server that trusts it. Give it a passphrase, keep its permissions at 600 — SSH refuses to use a key that is readable by others — and never paste it into a chat, a ticket, or a repository. Keys leaked into public repositories are a routine cause of real breaches."
+    },
+    {
+      "kind": "heading",
+      "text": "Why keys beat passwords, concretely"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Nothing reusable crosses the network, so a captured session reveals no secret to replay",
+        "There is nothing to guess — automated password-guessing against your server simply stops working",
+        "Access is removed per person by deleting one line on the server, without changing anything for anyone else",
+        "A passphrase means a stolen laptop is not immediately a stolen server"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Stop typing the same options: ~/.ssh/config"
+    },
+    {
+      "kind": "code",
+      "caption": "Write it down once",
+      "lines": [
+        "Host web1",
+        "  HostName 203.0.113.10",
+        "  User songpon",
+        "  Port 2222",
+        "  IdentityFile ~/.ssh/id_ed25519",
+        "",
+        "# now: ssh web1"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Moving files"
+    },
+    {
+      "kind": "code",
+      "caption": "scp for one file, rsync for everything else",
+      "lines": [
+        "scp report.pdf web1:~/                 # local -> remote",
+        "scp web1:/var/log/app.log ./           # remote -> local",
+        "",
+        "rsync -av ~/site/ web1:/var/www/site/  # copy only what changed",
+        "rsync -av --dry-run ~/site/ web1:/var/www/site/   # show what WOULD change first"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "rsync --dry-run is the habit from the safety lesson, applied remotely",
+      "text": "A trailing slash on the source means 'the contents of this directory'; without it you copy the directory itself into the target, one level deeper than you meant. Run it with --dry-run first and read the list. This is the same look-then-act rule you learned for rm, and it matters more here because the mistake lands on another machine."
+    },
+    {
+      "kind": "heading",
+      "text": "The warning you must never click through"
+    },
+    {
+      "kind": "code",
+      "caption": "What a changed host key looks like",
+      "lines": [
+        "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",
+        "@  WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!  @",
+        "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",
+        "IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The first time you connect, SSH records the server's identity in ~/.ssh/known_hosts. If that identity later changes, either the server was genuinely rebuilt, or something is sitting between you and it, decrypting everything you type. Do not delete the known_hosts entry to make the message go away. Confirm with whoever runs the server that it was rebuilt, then remove the entry deliberately."
+    },
+    {
+      "kind": "heading",
+      "text": "Hardening the server side"
+    },
+    {
+      "kind": "code",
+      "caption": "In /etc/ssh/sshd_config",
+      "lines": [
+        "PasswordAuthentication no      # keys only",
+        "PermitRootLogin no             # log in as yourself, then sudo",
+        "",
+        "# then: sudo systemctl reload ssh",
+        "# keep your current session open until you have tested a NEW one"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Test in a second window before you close the first",
+      "text": "If the change is wrong, the session you already have is the only way back in. Open a new terminal, confirm you can still log in, and only then close the original. Locking yourself out of a remote server is a specific and very memorable way to learn this."
+    },
+    {
+      "kind": "try",
+      "title": "Set up key access end to end",
+      "steps": [
+        "Run: ssh-keygen -t ed25519 -C \"$(whoami)-$(hostname)\"   (accept the default path, set a passphrase)",
+        "Run: ls -l ~/.ssh/                                       (note that the private key is 600)",
+        "Run: cat ~/.ssh/id_ed25519.pub                           (this is the half you may share)",
+        "If you have a server: ssh-copy-id user@server then ssh user@server",
+        "If you do not: ssh-copy-id \"$(whoami)@localhost\" then ssh \"$(whoami)@localhost\"",
+        "Add a Host block to ~/.ssh/config and connect using the short name",
+        "Run: rsync -av --dry-run ~/scripts/ /tmp/scripts-copy/    (see what would be copied)"
+      ],
+      "expected": "A key pair with correct permissions, a login that never asks for a password, a short alias that replaces a long command, and a dry-run listing of a copy you have not performed yet."
+    },
+    {
+      "kind": "heading",
+      "text": "You have finished the course"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Look at what you can now do. You can explain what an operating system is actually doing. You can move around a filesystem, read and set permissions, and see what is running as whom. You can interrogate a log with a pipeline, reshape text with sed and awk, write a script that fails safely, schedule it to run unattended, and reach another machine securely to do all of it there."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "What to build next",
+      "text": "The habit that carries you further than any single command: when a machine confuses you, ask the machine. A man page, a file in /etc, a log in /var/log, a process list, a crontab. Everything after this course — networking, hardening, incident response, cloud — is built on exactly what you just learned, and assumes you can find these answers yourself."
+    }
+  ],
+  "cheatsheet": [
+    "ssh user@host · ssh -p PORT · ssh host 'command' runs one command remotely",
+    "ssh-keygen -t ed25519 creates a key pair · ssh-copy-id installs the public half",
+    "Private key never leaves your machine and must be mode 600",
+    "Keys beat passwords: nothing reusable crosses the network and nothing can be guessed",
+    "~/.ssh/config turns a long command into a short host alias",
+    "scp for a single file · rsync -av for trees · always --dry-run first",
+    "A trailing slash on an rsync source means 'the contents of', not the directory itself",
+    "A changed host key means rebuilt server OR interception — verify, never just delete the entry",
+    "PasswordAuthentication no and PermitRootLogin no, tested in a second session before closing the first"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Which file may you safely copy to a server?",
+      "choices": {
+        "A": "~/.ssh/id_ed25519",
+        "B": "~/.ssh/id_ed25519.pub",
+        "C": "~/.ssh/known_hosts",
+        "D": "Both keys, so the server can verify them"
+      },
+      "correct": ["B"],
+      "explanation": "Only the public half is meant to be distributed. The private key is the credential itself and never leaves your machine."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why is key-based authentication considered stronger than a password?",
+      "choices": {
+        "A": "Keys are shorter and easier to type",
+        "B": "Nothing reusable is sent across the network and there is nothing for an automated attack to guess",
+        "C": "Keys expire automatically every day",
+        "D": "Passwords cannot be encrypted"
+      },
+      "correct": ["B"],
+      "explanation": "The private key answers a challenge without being transmitted. Password guessing against the service simply has nothing to work with."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "SSH warns that the remote host identification has changed. What do you do?",
+      "choices": {
+        "A": "Delete the known_hosts entry so the warning stops",
+        "B": "Stop and confirm with whoever runs the server whether it was rebuilt — the alternative explanation is that something is intercepting the connection",
+        "C": "Ignore it; this happens normally",
+        "D": "Reconnect using a password instead"
+      },
+      "correct": ["B"],
+      "explanation": "Only two things produce that message: a legitimately rebuilt server, or an interception. Clearing the entry to silence it removes the only warning you would get for the second case."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "You are about to disable password authentication on a remote server. What is the safe procedure?",
+      "choices": {
+        "A": "Apply the change, close the session, and reconnect",
+        "B": "Apply the change, then test a NEW session in a second window while keeping the current one open",
+        "C": "Reboot the server after changing the config",
+        "D": "Change it only from the physical console"
+      },
+      "correct": ["B"],
+      "explanation": "The open session is your way back in if the new configuration is wrong. Verify a fresh login works before you give that up."
+    },
+    {
+      "id": "cp-5",
+      "prompt": "What does the trailing slash change in rsync -av ~/site/ web1:/var/www/site/ ?",
+      "choices": {
+        "A": "Nothing at all",
+        "B": "It copies the contents of ~/site into the target; without it, the site directory itself is placed inside the target",
+        "C": "It enables compression",
+        "D": "It deletes files at the destination"
+      },
+      "correct": ["B"],
+      "explanation": "This one character decides whether you get /var/www/site/index.html or /var/www/site/site/index.html — which is exactly why --dry-run comes first."
+    }
+  ]
+}

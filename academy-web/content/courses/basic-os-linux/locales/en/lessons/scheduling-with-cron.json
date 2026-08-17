@@ -1,0 +1,178 @@
+{
+  "nodeId": "scheduling-with-cron",
+  "locale": "en",
+  "title": "Scheduling work with cron",
+  "objective": "By the end of this lesson you can schedule a script to run unattended, read the schedule syntax without guessing, and diagnose the reason a scheduled job fails when the same command works by hand.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "cron is the part of the system that runs commands on a schedule. Backups, log rotation, certificate renewal, cleanup — the unglamorous work that keeps a server healthy happens here. It is also where a script that works perfectly by hand mysteriously fails, for reasons that are entirely predictable once you know them."
+    },
+    {
+      "kind": "heading",
+      "text": "Five fields, one command"
+    },
+    {
+      "kind": "code",
+      "caption": "The layout",
+      "lines": [
+        "*  *  *  *  *   command",
+        "|  |  |  |  |",
+        "|  |  |  |  +--  day of week (0-6, Sunday is 0)",
+        "|  |  |  +-----  month (1-12)",
+        "|  |  +--------  day of month (1-31)",
+        "|  +-----------  hour (0-23)",
+        "+--------------  minute (0-59)"
+      ]
+    },
+    {
+      "kind": "table",
+      "headers": ["Schedule", "Runs"],
+      "rows": [
+        ["0 2 * * *", "Every day at 02:00"],
+        ["*/15 * * * *", "Every 15 minutes"],
+        ["0 3 * * 0", "Every Sunday at 03:00"],
+        ["30 1 1 * *", "01:30 on the first day of every month"],
+        ["0 9-17 * * 1-5", "Every hour from 09:00 to 17:00, Monday to Friday"]
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "Managing your own schedule",
+      "lines": [
+        "crontab -e      # edit your crontab",
+        "crontab -l      # list what is scheduled",
+        "crontab -r      # remove ALL of your entries — careful, there is no confirmation"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Why your job fails on schedule but works by hand",
+      "text": "cron runs your command with a nearly empty environment: a minimal PATH, no variables from your shell profile, and the home directory as the working directory. Every 'it works when I run it' mystery traces back to one of those three. Use absolute paths for every command and every file, and set what you need explicitly at the top of the script."
+    },
+    {
+      "kind": "heading",
+      "text": "Capture the output or you are flying blind"
+    },
+    {
+      "kind": "code",
+      "caption": "Always log a scheduled job",
+      "lines": [
+        "0 2 * * * /usr/local/bin/backup.sh >> /var/log/backup.log 2>&1",
+        "",
+        "#                                    ^^ append output",
+        "#                                       ^^^^ and errors too",
+        "",
+        "# Without 2>&1 the error messages are the part you lose —",
+        "# which is precisely the part you needed."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "By default cron tries to email you its output, which on most machines goes nowhere. Redirecting to a log file makes the job's history readable with the same tools you already know: tail -f while it runs, grep to find failures afterwards."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Test the schedule without waiting for it",
+      "text": "Run the exact command line from your crontab by hand first, with the same absolute paths. Then temporarily schedule it for two minutes from now and watch the log. Never wait until 02:00 to find out you had a typo."
+    },
+    {
+      "kind": "heading",
+      "text": "systemd timers, briefly"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Most modern distributions also ship systemd timers, which do the same job with more features: dependencies, resource limits, catching up on a run that was missed while the machine was off, and logs that go to the system journal. cron remains everywhere and stays the right tool for something simple, but if you see a .timer unit on a server, that is what it is."
+    },
+    {
+      "kind": "code",
+      "caption": "Reading what a system already schedules",
+      "lines": [
+        "systemctl list-timers --all     # every timer and when it next fires",
+        "journalctl -u backup.service    # the logs of what one unit did",
+        "ls /etc/cron.d/ /etc/cron.daily/  # system-wide scheduled work"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Scheduled jobs are a security surface",
+      "text": "A scheduled task runs by itself, often as root, and nobody reads it again after the day it was created. That combination is exactly what an attacker wants: edit the script the job runs — a script that is 777 will do nicely — and their code executes with the job's privileges on the job's schedule. When you inspect a machine, reading its crontabs and timers is not optional."
+    },
+    {
+      "kind": "try",
+      "title": "Schedule something and watch it run",
+      "steps": [
+        "Run: crontab -l                       (see what you already have — probably nothing)",
+        "Run: crontab -e  and add:  */2 * * * * /bin/date >> /tmp/cron-test.log 2>&1",
+        "Wait two minutes, then run: cat /tmp/cron-test.log",
+        "Run: crontab -e  and remove that line again",
+        "Run: systemctl list-timers --all | head        (what the system schedules for itself)",
+        "Run: ls -l /etc/cron.daily/                    (the daily maintenance jobs on this machine)"
+      ],
+      "expected": "An empty crontab, then a log file gaining a timestamp every two minutes, then a clean removal. Finally, the system's own scheduled work — which on most machines includes log rotation and package cleanup you never set up yourself."
+    }
+  ],
+  "cheatsheet": [
+    "Five fields: minute, hour, day of month, month, day of week",
+    "0 2 * * * = 02:00 daily · */15 * * * * = every 15 minutes · 0 3 * * 0 = Sunday 03:00",
+    "crontab -e edit · crontab -l list · crontab -r deletes everything with no confirmation",
+    "cron has a minimal PATH and no profile — use absolute paths everywhere",
+    "Append output AND errors: >> /var/log/job.log 2>&1",
+    "Test the exact command by hand, then schedule it two minutes out to verify",
+    "systemctl list-timers --all shows systemd's equivalent",
+    "Read crontabs and timers when inspecting a machine — they run unattended, often as root"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What does 30 4 * * 1 mean?",
+      "choices": {
+        "A": "Every 30 minutes on the 4th",
+        "B": "04:30 every Monday",
+        "C": "01:30 every 4 days",
+        "D": "Every minute between 04:00 and 04:30"
+      },
+      "correct": ["B"],
+      "explanation": "Minute 30, hour 4, any day of month, any month, day of week 1 — Monday."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A script runs perfectly when you type it, but fails every night from cron. What is the first thing to check?",
+      "choices": {
+        "A": "Whether the disk is full",
+        "B": "Whether the script uses relative paths or relies on environment variables that cron does not provide",
+        "C": "Whether the machine reboots at night",
+        "D": "Whether the file is owned by root"
+      },
+      "correct": ["B"],
+      "explanation": "cron gives a minimal PATH, no shell profile, and a different working directory. Absolute paths and explicitly set variables remove the whole class of failure."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why append 2>&1 to a scheduled command?",
+      "choices": {
+        "A": "It runs the job twice for reliability",
+        "B": "It sends error messages to the same log as normal output, so a failure leaves a readable trace",
+        "C": "It suppresses all output",
+        "D": "It gives the job higher priority"
+      },
+      "correct": ["B"],
+      "explanation": "Without it you capture only the normal output and lose the errors — the exact part you need when diagnosing why last night's run did nothing."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why are scheduled jobs worth inspecting during a security review?",
+      "choices": {
+        "A": "They consume most of the CPU",
+        "B": "They run unattended and often as root, so a modified script executes an attacker's code on a schedule with those privileges",
+        "C": "They cannot be logged",
+        "D": "They always run as the user who created them and are therefore harmless"
+      },
+      "correct": ["B"],
+      "explanation": "Unattended, privileged, and rarely re-read. A writable script referenced by a root cron entry is a complete escalation path on its own."
+    }
+  ]
+}

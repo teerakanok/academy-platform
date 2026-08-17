@@ -18,7 +18,11 @@ describe('PublicCourseSyllabus', () => {
     )
 
     expect(page).toContain(course.copy.subtitle)
-    expect(page).toContain('10 learning steps · 2 required checkpoints')
+    const lessons = course.structure.nodes.filter((n) => n.kind === 'lesson').length
+    const capstones = course.structure.nodes.filter((n) => n.kind === 'capstone').length
+    expect(page).toContain(
+      `${lessons + capstones} learning steps · ${capstones} required checkpoints`,
+    )
     expect(page).toContain('Course roadmap')
     expect(page).toContain('Required checkpoint')
     expect(page).toContain(course.copy.nodeTitles['os-what-it-does'])
@@ -41,24 +45,33 @@ describe('PublicCourseSyllabus', () => {
     expect(page).not.toContain('/media/lesson-demo.mp4')
   })
 
-  it('is explicit that Thai is partial rather than presenting an English course as fully translated', () => {
+  it('states Thai coverage honestly: complete when it is, partial when it is not', () => {
     const course = getCourse('basic-os-linux', 'th')!
-    const page = renderToStaticMarkup(
-      createElement(PublicCourseSyllabus, {
-        structure: course.structure,
-        copy: course.copy,
-        locale: course.locale,
-        translatedNodeIds: course.translatedNodeIds,
-      }),
-    )
+    const render = (translatedNodeIds: string[]) =>
+      renderToStaticMarkup(
+        createElement(PublicCourseSyllabus, {
+          structure: course.structure,
+          copy: course.copy,
+          locale: course.locale,
+          translatedNodeIds,
+        }),
+      )
 
-    expect(page).toContain('แผนการเรียน')
-    expect(page).toContain('ภาษาไทยพร้อมสำหรับ 1 จาก 10 ขั้นการเรียน')
-    expect(page).toContain('เนื้อหาภาษาอังกฤษ')
-    expect(page).toContain('aria-label="ภาษาของคอร์ส"')
-    expect(page).toContain('aria-label="ดูแผนการเรียนนี้เป็นภาษาไทย"')
-    expect(page).toContain('ดูตัวอย่างคอร์สทั้งหมด')
-    expect(page).toContain('href="/courses?lang=th"')
-    expect(page).not.toContain('Course roadmap')
+    // ครบทุกบท — ต้องไม่บอกเป็นตัวเลขบางส่วน
+    const complete = render(course.translatedNodeIds)
+    expect(complete).toContain('แผนการเรียน')
+    expect(complete).toContain('ภาษาไทยพร้อมสำหรับทุกขั้นการเรียน')
+    expect(complete).not.toContain('เนื้อหาภาษาอังกฤษ')
+    expect(complete).toContain('aria-label="ภาษาของคอร์ส"')
+    expect(complete).toContain('aria-label="ดูแผนการเรียนนี้เป็นภาษาไทย"')
+    expect(complete).toContain('ดูตัวอย่างคอร์สทั้งหมด')
+    expect(complete).toContain('href="/courses?lang=th"')
+    expect(complete).not.toContain('Course roadmap')
+
+    // แปลไม่ครบ — ต้องบอกตรง ๆ ว่ากี่ขั้นจากทั้งหมด ไม่ใช่ปล่อยให้เข้าใจว่าครบ
+    const total = course.structure.nodes.length
+    const partial = render([course.structure.nodes[0].id])
+    expect(partial).toContain(`ภาษาไทยพร้อมสำหรับ 1 จาก ${total} ขั้นการเรียน`)
+    expect(partial).toContain('ภาษาอังกฤษ')
   })
 })

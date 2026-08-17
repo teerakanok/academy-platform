@@ -146,16 +146,16 @@
     },
     {
       "kind": "heading",
-      "text": "Where to go from here"
+      "text": "From reading the system to instructing it"
     },
     {
       "kind": "paragraph",
-      "text": "You now have the foundation the rest of security work is built on: you know what the operating system is doing, you can move around it, you can read and set permissions, you can see what is running, and you can interrogate a log. Every next topic — networking, hardening, incident response, cloud — assumes exactly this and adds to it."
+      "text": "You can now ask a Linux machine almost anything about itself. The next module turns those answers into instructions: the same commands, written down once as a script, checked before they act, and scheduled to run when nobody is watching. Everything you have learned about quoting, permissions and pipelines is what makes that safe."
     },
     {
       "kind": "callout",
       "tone": "tip",
-      "title": "The habit that matters most",
+      "title": "The habit worth keeping",
       "text": "When something on a Linux machine confuses you, the answer is almost always available from the machine itself: a man page, a config file in /etc, a log in /var/log, or a process list. Reach for those before reaching for a search engine. That habit is what makes someone able to work on a system they have never seen."
     }
   ],
