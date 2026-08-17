@@ -244,6 +244,13 @@ rerun focused 170/170 กับ static/data/reader gates และผ่าน f
 `C0/H0/M0/L0`. Checkpoint ยังเป็น local/unwired; migration ที่ Pool A, runtime
 wiring, deploy และ release ต้องผ่าน production gate แยก.
 
+**Pool A backup precondition ปิดแล้ว (2026-08-17):** P0A-4 จบ — Pool A มี
+backup generation จริง receipt-backed
+(`poola-postgres-20260817T070503Z-5da6c5f6f326`) และ restore drill ผ่าน
+(ข้อมูลครบทุกหมวดจากมุม owner; ข้อจำกัด ACL/roles บันทึกที่ director
+`reports/state/backup.md`) — การเดินหน้า migration 0021–0027 ไม่ถูก block
+ด้วยเรื่อง backup ที่ไม่เคยพิสูจน์ restore อีกต่อไป
+
 **Identity conformance principal-contract rebind (2026-08-12):** Academy
 consumer policy mirror กับ deterministic conformance ledger pin Academy
 `cbab363b6f7b7af25cb92673b5dfe35540cc8d23` และ Identity Control
