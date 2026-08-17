@@ -39,8 +39,19 @@ describe('registry ของเนื้อหา', () => {
   })
 
   it('เผยต่อสาธารณะเฉพาะคอร์สที่ประกาศ syllabus preview ไว้อย่างชัดเจน', () => {
-    expect(listPublicCourseSlugs()).toEqual(['basic-os-linux'])
-    expect(getAllPublicCourses().map((course) => course.structure.slug)).toEqual(['basic-os-linux'])
+    // ผูกกับกติกา ไม่ผูกกับรายชื่อคอร์ส ณ วันเขียน: คอร์สที่ยังเขียนไม่เสร็จ
+    // ประกาศตัวเองเป็น internal และต้องไม่หลุดออกหน้าสาธารณะจนกว่าจะเปลี่ยนเอง
+    const declaredPublic = Object.keys(COURSE_REGISTRY)
+      .filter((slug) => getCourseStructure(slug)?.publicAvailability === 'syllabus-preview')
+      .sort()
+    expect(declaredPublic.length).toBeGreaterThan(0)
+    expect(listPublicCourseSlugs()).toEqual(declaredPublic)
+    expect(getAllPublicCourses().map((course) => course.structure.slug)).toEqual(declaredPublic)
+
+    const internalOnly = Object.keys(COURSE_REGISTRY).filter((slug) => !declaredPublic.includes(slug))
+    for (const slug of internalOnly) {
+      expect(listPublicCourseSlugs(), `${slug} ไม่ได้ประกาศ syllabus preview จึงห้ามโผล่สาธารณะ`).not.toContain(slug)
+    }
     expect(getPublicCourse('basic-os-linux')).not.toBeNull()
     expect(getPublicCourse('content-formats-demo')).toBeNull()
   })

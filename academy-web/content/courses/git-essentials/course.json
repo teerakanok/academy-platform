@@ -1,0 +1,103 @@
+{
+  "id": "git-essentials",
+  "slug": "git-essentials",
+  "version": "0.1.0",
+  "publicAvailability": "internal",
+  "defaultLocale": "en",
+  "availableLocales": [
+    "en",
+    "th"
+  ],
+  "level": "beginner",
+  "estimatedMinutes": 74,
+  "coverMotif": "layers",
+  "skills": [
+    {
+      "id": "vcs-model",
+      "maxScore": 100
+    },
+    {
+      "id": "git-cli",
+      "maxScore": 100
+    },
+    {
+      "id": "branching",
+      "maxScore": 100
+    },
+    {
+      "id": "collaboration",
+      "maxScore": 100
+    },
+    {
+      "id": "recovery",
+      "maxScore": 100
+    },
+    {
+      "id": "automation",
+      "maxScore": 100
+    }
+  ],
+  "globalSkillWeights": {
+    "foundations": 0.85,
+    "security-ops": 0.15
+  },
+  "nodes": [
+    {
+      "id": "why-version-control",
+      "kind": "lesson",
+      "prerequisites": [],
+      "estimatedMinutes": 12,
+      "skillWeights": {
+        "vcs-model": 5
+      }
+    },
+    {
+      "id": "init-and-commit",
+      "kind": "lesson",
+      "prerequisites": [
+        "why-version-control"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "git-cli": 5,
+        "vcs-model": 2
+      }
+    },
+    {
+      "id": "status-diff-log",
+      "kind": "lesson",
+      "prerequisites": [
+        "init-and-commit"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "git-cli": 4,
+        "vcs-model": 2
+      }
+    },
+    {
+      "id": "gitignore",
+      "kind": "lesson",
+      "prerequisites": [
+        "init-and-commit"
+      ],
+      "estimatedMinutes": 12,
+      "skillWeights": {
+        "git-cli": 3,
+        "collaboration": 1
+      }
+    },
+    {
+      "id": "undo-and-restore",
+      "kind": "lesson",
+      "prerequisites": [
+        "status-diff-log"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "recovery": 5,
+        "git-cli": 2
+      }
+    }
+  ]
+}

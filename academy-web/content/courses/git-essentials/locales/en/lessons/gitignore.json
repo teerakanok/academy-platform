@@ -1,0 +1,184 @@
+{
+  "nodeId": "gitignore",
+  "locale": "en",
+  "title": "What must never enter a repository",
+  "objective": "By the end of this lesson you can keep secrets, generated files, and local settings out of a repository permanently, and you know what to do when something sensitive gets committed anyway.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A repository should contain the source of the project — the things a person wrote — and nothing else. Three categories keep trying to sneak in: things that are generated, things that are personal to one machine, and things that are secret. The third one is the reason this lesson sits early in the course."
+    },
+    {
+      "kind": "heading",
+      "text": "The ignore file: a list of what Git should not offer to track"
+    },
+    {
+      "kind": "code",
+      "caption": "A .gitignore that covers the usual suspects",
+      "lines": [
+        "# secrets — never in the repository",
+        ".env",
+        ".env.*",
+        "*.pem",
+        "*.key",
+        "credentials.json",
+        "",
+        "# generated — rebuildable, so storing it wastes everyone's time",
+        "node_modules/",
+        "dist/",
+        "build/",
+        "__pycache__/",
+        "*.log",
+        "",
+        "# personal to one machine",
+        ".vscode/",
+        ".DS_Store",
+        "",
+        "# an exception: keep this one even though the rule above would hide it",
+        "!config.example.json"
+      ]
+    },
+    {
+      "kind": "table",
+      "headers": ["Pattern", "Matches"],
+      "rows": [
+        ["*.log", "Any file ending in .log, at any depth"],
+        ["build/", "A directory named build and everything inside it"],
+        ["/notes.txt", "Only at the repository root, not in subdirectories"],
+        ["docs/*.pdf", "PDFs directly inside docs, but not deeper"],
+        ["**/temp", "A directory named temp at any depth"],
+        ["!keep.log", "An exception — track this even though *.log is ignored"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Ignoring only applies to files Git is not already tracking",
+      "text": "Adding a file to the ignore list does nothing if that file has already been committed — Git keeps tracking it. Stop tracking it with git rm --cached, then commit that removal. And note what this does not do: the file stays in every earlier commit."
+    },
+    {
+      "kind": "heading",
+      "text": "Why generated files do not belong"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "They can be rebuilt from the source, so storing them adds nothing you cannot regenerate",
+        "They change on every build, so they fill the history with noise nobody reads",
+        "They cause conflicts constantly — two people build, two different outputs, one collision",
+        "They are enormous: a dependency folder commonly outweighs the entire source it belongs to"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The one that actually hurts: committed credentials"
+    },
+    {
+      "kind": "paragraph",
+      "text": "An API key committed once is in the history permanently. If the repository is public, automated scanners find it within minutes — this is a well-known, continuously running class of attack, not a theoretical risk. If it is private, it is still readable by everyone with access, and by anyone who later gains access to any clone."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "If a credential is committed, treat it as leaked",
+      "text": "The first action is always to rotate it — revoke the key and issue a new one. Rewriting history is a separate, messier job that does not undo the exposure, because copies may already exist. Rotate first, then clean up. A key that has been rotated is worthless to whoever found it."
+    },
+    {
+      "kind": "code",
+      "caption": "Keeping credentials out by design",
+      "lines": [
+        "# Commit an example, never the real thing:",
+        "cp .env .env.example        # then blank out every real value in the example",
+        "git add .env.example        # the real file stays ignored",
+        "",
+        "# Check what you are about to commit — every time",
+        "git diff --staged",
+        "",
+        "# Audit what is already tracked",
+        "git ls-files | grep -Ei 'env|key|secret|credential'"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The example-file convention",
+      "text": "Commit an example file with the setting names present but the values blank or fake. New people copy it and fill in real values locally. The repository documents what configuration is needed without ever holding a real credential."
+    },
+    {
+      "kind": "try",
+      "title": "Prove the rules to yourself",
+      "steps": [
+        "In ~/git-lab, run: printf 'node_modules/\\n*.log\\n' > .gitignore",
+        "Run: mkdir -p node_modules && touch node_modules/x.js app.log",
+        "Run: git status              (neither appears — they are ignored)",
+        "Run: git add .gitignore && git commit -m \"Ignore generated files\"",
+        "Run: echo 'token=abc123' > local.conf && git add -f local.conf && git commit -m \"Oops\"",
+        "Run: echo 'local.conf' >> .gitignore && git status   (still tracked — ignoring came too late)",
+        "Run: git rm --cached local.conf && git commit -m \"Stop tracking the local config\"",
+        "Run: git log -p --all -- local.conf | head -20       (the value is still in history)"
+      ],
+      "expected": "Ignored files never appear, an already-tracked file keeps being tracked until you remove it from the index, and the last command shows the point of the whole lesson: the value is still readable in the earlier commit, which is why rotation — not deletion — is the fix."
+    }
+  ],
+  "cheatsheet": [
+    "A repository holds source; keep out generated, personal, and secret files",
+    "The ignore file lists what Git should not offer to track",
+    "*.log any depth · build/ a directory · /file.txt root only · !keep.log an exception",
+    "Ignoring does not affect files that are already tracked",
+    "git rm --cached <file> stops tracking without deleting your copy",
+    "Removal does not erase the file from earlier commits",
+    "Committed credential = leaked credential: rotate first, clean up second",
+    "Commit an example file with blank values; keep the real one ignored",
+    "git ls-files | grep -Ei 'env|key|secret' audits what is already tracked"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "You add a file to the ignore list, but it keeps showing up in git status. Why?",
+      "choices": {
+        "A": "The ignore file only works after a restart",
+        "B": "The file is already tracked — ignore rules only apply to files Git is not tracking yet",
+        "C": "The pattern must start with a slash",
+        "D": "You need to commit the ignore file first for any rule to apply"
+      },
+      "correct": ["B"],
+      "explanation": "Use git rm --cached to stop tracking it, then commit that. The ignore rule then keeps it out from that point forward."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "An API key was committed and pushed an hour ago. What is the first thing to do?",
+      "choices": {
+        "A": "Delete the file and commit the deletion",
+        "B": "Rotate the credential — revoke it and issue a new one",
+        "C": "Make the repository private",
+        "D": "Rewrite the history immediately"
+      },
+      "correct": ["B"],
+      "explanation": "Exposure has already happened and copies may exist. A rotated key is worthless to whoever has it; history cleanup is a separate follow-up job that does not undo the exposure."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why is committing a build output directory a bad idea?",
+      "choices": {
+        "A": "Git cannot store binary files",
+        "B": "It is rebuildable from source, changes on every build, causes constant conflicts, and is usually far larger than the project itself",
+        "C": "It contains secrets by definition",
+        "D": "It breaks git log"
+      },
+      "correct": ["B"],
+      "explanation": "Generated output adds size and noise while adding no information the source does not already contain."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "What is the example-file convention for?",
+      "choices": {
+        "A": "A backup of the real configuration file",
+        "B": "A committed file that documents which configuration values are needed, with blank or fake values, so the real one never enters the repository",
+        "C": "A file Git reads automatically at build time",
+        "D": "An encrypted version of the configuration"
+      },
+      "correct": ["B"],
+      "explanation": "It gives newcomers the shape of the configuration without ever putting a working credential into the history."
+    }
+  ]
+}

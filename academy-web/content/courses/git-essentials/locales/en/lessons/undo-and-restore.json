@@ -1,0 +1,192 @@
+{
+  "nodeId": "undo-and-restore",
+  "locale": "en",
+  "title": "Undoing things safely",
+  "objective": "By the end of this lesson you can undo any of the four common mistakes deliberately, and you know which undos are safe on shared work and which ones rewrite history.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Most fear of Git is fear of doing something irreversible. Almost nothing is. The reason people panic is that the undo commands have unhelpful names and the internet answers every question with the most destructive one. Four situations cover nearly everything."
+    },
+    {
+      "kind": "heading",
+      "text": "Situation 1: I edited a file and want it back"
+    },
+    {
+      "kind": "code",
+      "caption": "Throw away uncommitted changes to a file",
+      "lines": [
+        "git restore app.py            # discard edits, back to the last commit",
+        "git restore .                 # every unstaged edit — no undo for this one"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "This one is genuinely irreversible",
+      "text": "Uncommitted work has never been recorded anywhere, so discarding it is the one Git operation with nothing to recover from. Run git diff first and look at what you are about to throw away."
+    },
+    {
+      "kind": "heading",
+      "text": "Situation 2: I staged something I did not mean to"
+    },
+    {
+      "kind": "code",
+      "caption": "Unstage without losing the edit",
+      "lines": [
+        "git restore --staged app.py   # remove from the staging area, keep the changes",
+        "git status                    # it is back to 'not staged'"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Situation 3: my last commit was wrong"
+    },
+    {
+      "kind": "code",
+      "caption": "Amend — replace the most recent commit",
+      "lines": [
+        "git commit --amend -m \"A message that is actually correct\"",
+        "",
+        "git add forgotten-file.py",
+        "git commit --amend --no-edit   # fold this into the last commit, keep its message"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Amend rewrites — only before anyone else has it",
+      "text": "Amending replaces the previous commit with a new one that has a different identity. On work only you have, that is tidy. On a commit you have already pushed and someone else has pulled, it forces everyone into a conflicting history. The rule for the whole lesson: rewriting is fine before sharing, and a problem after."
+    },
+    {
+      "kind": "heading",
+      "text": "Situation 4: a commit further back was wrong"
+    },
+    {
+      "kind": "code",
+      "caption": "Revert — undo by adding a new commit",
+      "lines": [
+        "git log --oneline                 # find the bad commit",
+        "git revert a3f91c2                # create a commit that undoes exactly that one",
+        "",
+        "# The history now reads:",
+        "#   b7d2e91  Revert \"Reject uploads over 10MB\"",
+        "#   a3f91c2  Reject uploads over 10MB"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Revert is the safe undo: it changes nothing that already exists, it adds. Anyone who already has the history keeps it intact and simply receives one more commit. This is the correct tool for undoing anything that has been shared."
+    },
+    {
+      "kind": "heading",
+      "text": "The one to understand before you use it: reset"
+    },
+    {
+      "kind": "table",
+      "headers": ["Command", "History", "Your files"],
+      "rows": [
+        ["git reset --soft HEAD~1", "Last commit removed", "Kept, and still staged"],
+        ["git reset HEAD~1", "Last commit removed", "Kept, unstaged"],
+        ["git reset --hard HEAD~1", "Last commit removed", "Discarded — gone from disk"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "--hard is the command people regret",
+      "text": "It discards the commit and your working changes together. Committed work can usually still be recovered through the reflog, which the next module covers — but uncommitted work cannot. Before any reset --hard, ask what is in the working directory that has never been committed."
+    },
+    {
+      "kind": "heading",
+      "text": "Choosing the right undo"
+    },
+    {
+      "kind": "table",
+      "headers": ["Situation", "Use", "Safe on shared work?"],
+      "rows": [
+        ["Discard edits to a file", "git restore <file>", "Yes — nothing was shared"],
+        ["Unstage a file", "git restore --staged <file>", "Yes"],
+        ["Fix the very last commit", "git commit --amend", "Only if not pushed"],
+        ["Undo an older commit", "git revert <id>", "Yes — this is the shared-work answer"],
+        ["Drop recent commits locally", "git reset --soft / --hard", "No — rewrites history"]
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Perform each undo once",
+      "steps": [
+        "In ~/git-lab: echo 'mistake' >> notes.txt && git diff",
+        "Run: git restore notes.txt          (edit discarded)",
+        "Run: echo 'oops' >> notes.txt && git add notes.txt",
+        "Run: git restore --staged notes.txt (unstaged, edit still there)",
+        "Run: git restore notes.txt",
+        "Run: git commit --allow-empty -m \"Wrong message\"",
+        "Run: git commit --amend -m \"Corrected message\" && git log --oneline -3",
+        "Run: git revert --no-edit HEAD && git log --oneline -3"
+      ],
+      "expected": "An edit discarded, a file unstaged, a message corrected in place, and finally an undo that appears as its own commit — which is the difference between rewriting the past and adding to it."
+    }
+  ],
+  "cheatsheet": [
+    "git restore <file> — discard uncommitted edits (irreversible: look with git diff first)",
+    "git restore --staged <file> — unstage but keep the edit",
+    "git commit --amend — replace the last commit (only before pushing)",
+    "git commit --amend --no-edit — fold a forgotten file into the last commit",
+    "git revert <id> — undo by adding a new commit; safe on shared work",
+    "git reset --soft HEAD~1 — drop the commit, keep changes staged",
+    "git reset --hard HEAD~1 — drop the commit AND the changes",
+    "Rewriting is fine before sharing and a problem after",
+    "Uncommitted work is the only thing Git genuinely cannot recover"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A bad commit was pushed three days ago and colleagues have pulled it. How do you undo it?",
+      "choices": {
+        "A": "git reset --hard to before it, then force push",
+        "B": "git revert <id>, which adds a commit undoing that change",
+        "C": "git commit --amend",
+        "D": "Delete the repository and re-clone"
+      },
+      "correct": ["B"],
+      "explanation": "Revert changes nothing that already exists — everyone keeps their history and simply receives one more commit. Rewriting shared history forces conflicts on everyone who has it."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "What is the difference between git reset --soft HEAD~1 and git reset --hard HEAD~1 ?",
+      "choices": {
+        "A": "None; --hard is just faster",
+        "B": "--soft removes the commit but keeps your changes staged; --hard removes the commit and discards the changes from disk",
+        "C": "--soft only works on the first commit",
+        "D": "--hard keeps a backup automatically"
+      },
+      "correct": ["B"],
+      "explanation": "Both drop the commit. The difference is what happens to the content — and --hard is the one that takes your working changes with it."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Which operation can Git genuinely not recover from?",
+      "choices": {
+        "A": "Deleting a branch",
+        "B": "An amended commit",
+        "C": "Discarding uncommitted changes with git restore",
+        "D": "A reverted commit"
+      },
+      "correct": ["C"],
+      "explanation": "Work that was never committed was never recorded anywhere, so there is nothing to recover. Everything already committed leaves a trace that can usually be found again."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "You forgot to include one file in the commit you just made, and have not pushed. What is the tidiest fix?",
+      "choices": {
+        "A": "git revert HEAD then commit everything again",
+        "B": "git add <file> && git commit --amend --no-edit",
+        "C": "git reset --hard HEAD~1",
+        "D": "Make a second commit called 'fix previous commit'"
+      },
+      "correct": ["B"],
+      "explanation": "Amend folds the forgotten file into the existing commit and keeps its message. It is safe here precisely because the commit has not been shared yet."
+    }
+  ]
+}

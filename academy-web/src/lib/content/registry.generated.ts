@@ -48,6 +48,19 @@ import c41 from '../../../content/courses/content-formats-demo/locales/en/lesson
 import c42 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-simulation.json'
 import c43 from '../../../content/courses/content-formats-demo/locales/en/course.json'
 import c44 from '../../../content/courses/content-formats-demo/course.json'
+import c45 from '../../../content/courses/git-essentials/locales/en/lessons/gitignore.json'
+import c46 from '../../../content/courses/git-essentials/locales/en/lessons/init-and-commit.json'
+import c47 from '../../../content/courses/git-essentials/locales/en/lessons/status-diff-log.json'
+import c48 from '../../../content/courses/git-essentials/locales/en/lessons/undo-and-restore.json'
+import c49 from '../../../content/courses/git-essentials/locales/en/lessons/why-version-control.json'
+import c50 from '../../../content/courses/git-essentials/locales/en/course.json'
+import c51 from '../../../content/courses/git-essentials/locales/th/lessons/gitignore.json'
+import c52 from '../../../content/courses/git-essentials/locales/th/lessons/init-and-commit.json'
+import c53 from '../../../content/courses/git-essentials/locales/th/lessons/status-diff-log.json'
+import c54 from '../../../content/courses/git-essentials/locales/th/lessons/undo-and-restore.json'
+import c55 from '../../../content/courses/git-essentials/locales/th/lessons/why-version-control.json'
+import c56 from '../../../content/courses/git-essentials/locales/th/course.json'
+import c57 from '../../../content/courses/git-essentials/course.json'
 
 /** โครง + ข้อความของทุกคอร์ส ผูกเข้ามาตอน build ไม่ใช่ตอน request */
 export const COURSE_REGISTRY: Record<
@@ -107,6 +120,25 @@ export const COURSE_REGISTRY: Record<
       "formats-reading": c40,
       "formats-references": c41,
       "formats-simulation": c42,
+    },
+  },
+  "git-essentials": {
+    __structure: c57,
+    "en": {
+      __copy: c50,
+      "gitignore": c45,
+      "init-and-commit": c46,
+      "status-diff-log": c47,
+      "undo-and-restore": c48,
+      "why-version-control": c49,
+    },
+    "th": {
+      __copy: c56,
+      "gitignore": c51,
+      "init-and-commit": c52,
+      "status-diff-log": c53,
+      "undo-and-restore": c54,
+      "why-version-control": c55,
     },
   },
 } as never

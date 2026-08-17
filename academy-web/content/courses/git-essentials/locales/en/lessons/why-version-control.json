@@ -1,0 +1,128 @@
+{
+  "nodeId": "why-version-control",
+  "locale": "en",
+  "title": "Why version control exists",
+  "objective": "By the end of this lesson you can explain what a commit is, why every professional team keeps its work in Git, and what problem it solves that copying folders never did.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Before version control, keeping history meant copying the folder: report-v2, report-v2-final, report-v2-final-ACTUAL. Everyone recognises it because everyone has done it. It fails at exactly the moment it matters — when two people edit at once, when you need what the file looked like on Tuesday, or when something broke and nobody can say which change did it."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Git replaces all of that with one idea: a project keeps its own history, and every meaningful state of that project gets recorded deliberately."
+    },
+    {
+      "kind": "heading",
+      "text": "A commit is a labelled snapshot"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A commit records what every tracked file looked like at one moment, who recorded it, when, and a message saying why. That last part is what turns a backup into a history: the file tells you what changed, the message tells you what it was for."
+    },
+    {
+      "kind": "code",
+      "caption": "What a history actually looks like",
+      "lines": [
+        "a3f91c2  2026-08-14  Songpon  Reject uploads over 10MB",
+        "8b02e5d  2026-08-13  Malee    Add rate limit to the login route",
+        "1d77af0  2026-08-13  Songpon  Fix timezone on the report export"
+      ]
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Each line is one deliberate save point, not an automatic backup",
+        "The short code at the front is that commit's permanent identity",
+        "Any commit can be looked at, compared, or returned to, at any time"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Distributed: everyone has the whole history"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When you copy a Git project, you get every commit ever made, not just the current files. That is why you can read history, compare versions, and commit while offline on a plane. The shared server is a meeting point, not the only copy — and it means the loss of that server is an inconvenience rather than a catastrophe."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "What this buys you day to day",
+      "text": "Three questions become answerable in seconds: what changed, when did it change, and who changed it. Without a history, all three are guesswork — and the third one turns into blame instead of investigation."
+    },
+    {
+      "kind": "heading",
+      "text": "The security angle"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A repository is an audit trail of every change to a system's source. When something malicious appears in a codebase, the history is what lets you say when it entered and through which change. Teams that do not keep one are left comparing files against memory."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "History cuts both ways",
+      "text": "Anything committed is preserved. Delete a password in the next commit and the original is still there in the earlier one, permanently, for anyone who can read the repository. That is why a later lesson is entirely about what must never be committed in the first place."
+    },
+    {
+      "kind": "try",
+      "title": "Check what you have",
+      "steps": [
+        "Run: git --version          (install it if this fails)",
+        "Run: git config --global user.name \"Your Name\"",
+        "Run: git config --global user.email \"you@example.com\"",
+        "Run: git config --global init.defaultBranch main",
+        "Run: git config --list | head"
+      ],
+      "expected": "A version number, then your identity recorded in Git's global configuration. Every commit you make from now on carries that name and email — which is why setting it correctly matters before your first commit rather than after."
+    }
+  ],
+  "cheatsheet": [
+    "A commit = a snapshot of tracked files + author + time + a message saying why",
+    "The message is what turns a backup into a usable history",
+    "Git is distributed: a copy contains the entire history, not just current files",
+    "You can commit and read history with no network at all",
+    "History answers what changed, when, and by whom — in seconds",
+    "Anything committed is preserved, including a secret you delete later",
+    "git config --global user.name and user.email identify your commits"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What does a single commit record?",
+      "choices": {
+        "A": "Only the lines that changed in one file",
+        "B": "A snapshot of the tracked files at that moment, plus who made it, when, and a message saying why",
+        "C": "A copy of the whole project folder including ignored files",
+        "D": "A reminder to save your work later"
+      },
+      "correct": ["B"],
+      "explanation": "The snapshot plus the metadata is the unit. The message is the part that makes the history readable months later."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "What does it mean that Git is distributed?",
+      "choices": {
+        "A": "The files are split across several servers",
+        "B": "Every copy of the project contains the full history, so you can read it and commit offline",
+        "C": "Only the server keeps history",
+        "D": "Each person gets a different part of the code"
+      },
+      "correct": ["B"],
+      "explanation": "A clone is a complete copy of the history. The shared server is a coordination point, not the sole holder of the project."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "You commit a file containing a password, notice, and delete it in the very next commit. What is the situation?",
+      "choices": {
+        "A": "The password is gone, because the current files no longer contain it",
+        "B": "The password remains in the earlier commit and is readable by anyone with the repository",
+        "C": "Git encrypts old commits automatically",
+        "D": "Only the server copy still has it"
+      },
+      "correct": ["B"],
+      "explanation": "History preserves what was committed. Removing it going forward does not remove it from the past — the credential must be treated as exposed and rotated."
+    }
+  ]
+}

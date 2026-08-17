@@ -1,0 +1,187 @@
+{
+  "nodeId": "status-diff-log",
+  "locale": "en",
+  "title": "Reading state: status, diff, and log",
+  "objective": "By the end of this lesson you can answer three questions at any moment — what have I changed, what exactly did I change, and what happened before me — without guessing.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Most Git trouble comes from acting without looking. These three commands are the looking. They change nothing, they cost nothing, and running them before anything destructive is the single habit that separates confident use from cargo-culting commands off the internet."
+    },
+    {
+      "kind": "heading",
+      "text": "status: where am I and what is pending"
+    },
+    {
+      "kind": "code",
+      "caption": "The first thing to run, always",
+      "lines": [
+        "git status",
+        "git status -s        # short form once you know the layout",
+        "",
+        "# On branch main",
+        "# Changes to be committed:      <- staged, going into the next commit",
+        "#   modified:   app.py",
+        "# Changes not staged for commit: <- edited but not selected yet",
+        "#   modified:   README.md",
+        "# Untracked files:               <- Git is not following these at all",
+        "#   scratch.tmp"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Those three groups map exactly onto the three places from the previous lesson. Reading them tells you what a commit right now would actually contain — which is usually different from what people assume."
+    },
+    {
+      "kind": "heading",
+      "text": "diff: what exactly changed"
+    },
+    {
+      "kind": "code",
+      "caption": "Two questions, two commands",
+      "lines": [
+        "git diff              # changes NOT yet staged",
+        "git diff --staged     # changes that ARE staged — what the commit will contain",
+        "git diff README.md    # one file only",
+        "git diff main..feature-x   # difference between two branches"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "git diff --staged is the last check before committing",
+      "text": "It shows precisely what is about to be recorded permanently. Reading it takes seconds and catches the debug print you left in, the commented-out block, and the credential you pasted in while testing."
+    },
+    {
+      "kind": "code",
+      "caption": "How to read diff output",
+      "lines": [
+        "--- a/app.py        <- the old version",
+        "+++ b/app.py        <- the new version",
+        "@@ -12,7 +12,8 @@    <- location: old lines 12-18, new lines 12-19",
+        " def upload(file):",
+        "-    if file.size > 5_000_000:     <- a line that was removed",
+        "+    if file.size > 10_000_000:    <- a line that was added",
+        "         raise TooLarge()"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "A modified line always appears twice: once removed, once added. Lines with a leading space are unchanged context, shown so you can see where the change sits."
+    },
+    {
+      "kind": "heading",
+      "text": "log: what happened before me"
+    },
+    {
+      "kind": "code",
+      "caption": "Reading history at different depths",
+      "lines": [
+        "git log --oneline                 # one line per commit — the everyday view",
+        "git log --oneline -10             # last ten only",
+        "git log --oneline --graph --all   # the shape of the branches",
+        "git log -p app.py                 # every change ever made to one file",
+        "git log --since='2 weeks ago'     # a time window",
+        "git log --author='Malee'          # by person",
+        "git show a3f91c2                  # one commit in full: message + diff"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The investigation pattern",
+      "text": "A user reports that uploads started failing last Tuesday. git log --since='last tuesday' -- upload/ narrows it to a handful of commits, git show opens the likely one, and the question is answered from the repository rather than from anyone's memory. This is the same shape as reading a log file with grep, applied to code history."
+    },
+    {
+      "kind": "heading",
+      "text": "Who wrote this line, and why"
+    },
+    {
+      "kind": "code",
+      "caption": "blame is a question, not an accusation",
+      "lines": [
+        "git blame app.py            # each line: which commit last touched it",
+        "git blame -L 40,60 app.py   # only lines 40-60"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The name is unfortunate. Its real use is finding the commit that introduced a line so you can read its message and understand the reasoning — most often before changing something that looks wrong but was deliberate."
+    },
+    {
+      "kind": "try",
+      "title": "Read a repository you did not write",
+      "steps": [
+        "Go to any repository you have (or continue in ~/git-lab)",
+        "Run: git status                      (what is pending)",
+        "Edit a file, then run: git diff       (what exactly changed)",
+        "Run: git add . && git diff --staged   (what a commit would contain)",
+        "Run: git log --oneline -10            (recent history)",
+        "Run: git log --oneline --graph --all  (the shape of it)",
+        "Pick a commit id from the log and run: git show <id>"
+      ],
+      "expected": "The pending state, the exact change, the staged change, the recent history, its branch shape, and one commit opened in full. Those six views answer nearly every 'what is going on here' question you will have."
+    }
+  ],
+  "cheatsheet": [
+    "git status — where you are and what is pending; run it constantly",
+    "The three groups in status map to staged / not staged / untracked",
+    "git diff — unstaged changes · git diff --staged — what the commit will contain",
+    "In a diff, - is removed, + is added, a leading space is unchanged context",
+    "git log --oneline — the everyday history view",
+    "git log --oneline --graph --all — the shape of the branches",
+    "git log -p <file> — every change to one file · git show <id> — one commit in full",
+    "git log --since / --author narrow an investigation fast",
+    "git blame <file> — which commit last touched each line, so you can read its reasoning"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "You want to see exactly what your next commit will contain. What do you run?",
+      "choices": {
+        "A": "git diff",
+        "B": "git diff --staged",
+        "C": "git log",
+        "D": "git status -s"
+      },
+      "correct": ["B"],
+      "explanation": "git diff shows what is not yet staged. --staged shows the staged content, which is precisely what the commit will record."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "In diff output, what does a line beginning with a single space mean?",
+      "choices": {
+        "A": "It was deleted",
+        "B": "It was added",
+        "C": "It is unchanged context, shown so you can see where the change sits",
+        "D": "It has a syntax error"
+      },
+      "correct": ["C"],
+      "explanation": "Only - and + lines are changes. Context lines are printed around them so the change is readable rather than floating."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Uploads started failing sometime last week. Which command narrows the search fastest?",
+      "choices": {
+        "A": "git status",
+        "B": "git log --since='1 week ago' -- upload/",
+        "C": "git diff",
+        "D": "git init"
+      },
+      "correct": ["B"],
+      "explanation": "Constrain by time and by path, then open the few candidates with git show. That is the whole investigation loop."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "What is git blame genuinely for?",
+      "choices": {
+        "A": "Identifying who to hold responsible for a bug",
+        "B": "Finding the commit that introduced a line, so you can read its message and understand why it is that way",
+        "C": "Reverting someone else's change",
+        "D": "Listing everyone who has ever contributed"
+      },
+      "correct": ["B"],
+      "explanation": "It links a line to its reasoning. The most common use is checking why something odd-looking was done, before changing it and breaking whatever it was for."
+    }
+  ]
+}

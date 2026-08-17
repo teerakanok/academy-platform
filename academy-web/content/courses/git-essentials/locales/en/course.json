@@ -1,0 +1,30 @@
+{
+  "locale": "en",
+  "title": "Git Essentials",
+  "subtitle": "Keep a history you can trust, work on several things at once, and undo almost anything — including the mistakes that feel unrecoverable.",
+  "audience": "For anyone who writes or edits files for a living and has never used version control properly, or has been copying commands without knowing what they do. No prior Git experience needed.",
+  "outcomes": [
+    "Explain what a commit actually is, and read a history rather than guessing at it",
+    "Work on several things at once with branches, and merge them without fear",
+    "Recover from mistakes — including a deleted branch or a commit you thought was gone",
+    "Collaborate through remotes and pull requests the way real teams do",
+    "Keep secrets and generated files out of a repository permanently",
+    "Run work in parallel with worktrees, and keep a history an AI agent can work in",
+    "Have a test suite run automatically on every change you propose"
+  ],
+  "skillLabels": {
+    "vcs-model": "How Git thinks",
+    "git-cli": "Everyday commands",
+    "branching": "Branching & merging",
+    "collaboration": "Working with others",
+    "recovery": "Undo & recovery",
+    "automation": "Hooks & CI"
+  },
+  "nodeTitles": {
+    "why-version-control": "Why version control exists",
+    "init-and-commit": "Your first repository and commit",
+    "status-diff-log": "Reading state: status, diff, and log",
+    "gitignore": "What must never enter a repository",
+    "undo-and-restore": "Undoing things safely"
+  }
+}

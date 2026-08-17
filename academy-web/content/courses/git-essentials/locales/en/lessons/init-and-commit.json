@@ -1,0 +1,161 @@
+{
+  "nodeId": "init-and-commit",
+  "locale": "en",
+  "title": "Your first repository and commit",
+  "objective": "By the end of this lesson you can turn any folder into a repository, and you understand the staging area well enough to commit deliberately rather than committing everything by reflex.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Git tracks a folder once you tell it to. From that moment the folder has a hidden .git directory holding the entire history, and everything you do happens locally — no account, no server, no network."
+    },
+    {
+      "kind": "code",
+      "caption": "Starting a repository",
+      "lines": [
+        "mkdir notes && cd notes",
+        "git init                 # this folder now has a history",
+        "ls -a                    # note the new .git directory"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The .git directory is the repository",
+      "text": "Delete it and you delete every commit, every branch, and the entire history — the files in the folder stay, but their past is gone. Copy it and you have copied the project. Never edit anything inside it by hand."
+    },
+    {
+      "kind": "heading",
+      "text": "Three places a file can be"
+    },
+    {
+      "kind": "table",
+      "headers": ["Place", "Meaning", "How it gets there"],
+      "rows": [
+        ["Working directory", "The files as they are on disk right now", "You edit them"],
+        ["Staging area", "The changes you have chosen for the next commit", "git add"],
+        ["Repository", "Commits — permanent recorded history", "git commit"]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The staging area is the part newcomers find strange and experienced people find indispensable. It exists so a commit can be a deliberate selection rather than everything you happen to have touched. You changed three things; two of them belong together and one does not; stage the two, commit them, then handle the third separately."
+    },
+    {
+      "kind": "code",
+      "caption": "The everyday loop",
+      "lines": [
+        "echo 'first note' > note.txt",
+        "git status                    # untracked: Git can see it but is not tracking it",
+        "git add note.txt              # stage it",
+        "git commit -m \"Add the first note\"",
+        "",
+        "git add .                     # stage every change below this directory",
+        "git commit -m \"Message that says why, not what\""
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "git add . is convenient and worth a second of care",
+      "text": "It stages everything, including files you did not mean to include — a temporary dump, a local config, a key. Run git status first and read the list. That one habit prevents most accidental commits, and it is the same look-then-act rule that applies to deleting files."
+    },
+    {
+      "kind": "heading",
+      "text": "Writing a message that will still be useful"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The diff already shows what changed. The message exists to record why, for the person reading it in six months, who is usually you. A good message is one line, in the imperative, describing the effect."
+    },
+    {
+      "kind": "table",
+      "headers": ["Weak", "Better", "Why"],
+      "rows": [
+        ["update", "Reject uploads over 10MB", "States the effect, not the activity"],
+        ["fix bug", "Fix timezone shift on the report export", "Names which bug"],
+        ["changes", "Move rate limiting into the middleware", "Someone can find this later"],
+        ["asdf", "Add missing index on orders.created_at", "A history is read by people"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Why the message matters more than it looks",
+      "text": "Every investigation into a change — a regression, an outage, an audit — starts by reading messages to find the commit worth opening. A history of 'update' and 'fix' forces you to open all of them."
+    },
+    {
+      "kind": "try",
+      "title": "Make a repository with three commits",
+      "steps": [
+        "Run: mkdir -p ~/git-lab && cd ~/git-lab && git init",
+        "Run: echo 'line one' > notes.txt && git status",
+        "Run: git add notes.txt && git commit -m \"Start the notes file\"",
+        "Run: echo 'line two' >> notes.txt && echo 'draft' > scratch.tmp",
+        "Run: git status                     (two changes: one you want, one you do not)",
+        "Run: git add notes.txt && git commit -m \"Add the second note\"",
+        "Run: git log --oneline              (your history so far)"
+      ],
+      "expected": "Two commits, and scratch.tmp still sitting untracked — which is exactly the point of staging: you chose what entered the history instead of sweeping in everything present."
+    }
+  ],
+  "cheatsheet": [
+    "git init turns the current folder into a repository",
+    ".git holds the entire history — deleting it deletes the past",
+    "Working directory → staging area (git add) → repository (git commit)",
+    "Staging exists so a commit is a deliberate selection, not a sweep",
+    "git status before git add . — read what you are about to include",
+    "git commit -m \"...\" records the staged changes with a message",
+    "Write the message in the imperative and say why, not what",
+    "git log --oneline reads the history back"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What is the staging area for?",
+      "choices": {
+        "A": "A backup taken before committing",
+        "B": "Choosing exactly which changes go into the next commit, instead of committing everything you touched",
+        "C": "A queue of files waiting to upload to a server",
+        "D": "A cache that makes Git faster"
+      },
+      "correct": ["B"],
+      "explanation": "It separates 'I changed this' from 'this belongs in this commit', which is what lets a history be made of coherent, single-purpose commits."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "You delete the .git directory from a project folder. What happens?",
+      "choices": {
+        "A": "Nothing — it is a cache and Git rebuilds it",
+        "B": "The files remain but every commit, branch, and piece of history is gone",
+        "C": "The files are deleted too",
+        "D": "The project reverts to its first commit"
+      },
+      "correct": ["B"],
+      "explanation": ".git is the repository itself. Without it the folder is just files with no past — and no way to recover one locally."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Which commit message is most useful six months later?",
+      "choices": {
+        "A": "update",
+        "B": "fix bug",
+        "C": "Reject uploads over 10MB",
+        "D": "changes to files"
+      },
+      "correct": ["C"],
+      "explanation": "It states the effect of the change. The diff already shows what lines moved; the message is there to say why, so the right commit can be found without opening every one."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why run git status before git add . ?",
+      "choices": {
+        "A": "git add . fails without it",
+        "B": "It shows exactly what is about to be included, so a temporary file, local config, or key does not get swept into the commit",
+        "C": "It makes the commit faster",
+        "D": "It stages the files for you"
+      },
+      "correct": ["B"],
+      "explanation": "Look before you act. Once a file is committed, removing it later does not remove it from the history."
+    }
+  ]
+}
