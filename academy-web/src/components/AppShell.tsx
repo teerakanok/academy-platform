@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Fraunces, Inter, JetBrains_Mono } from 'next/font/google'
+import { THEME_BOOTSTRAP_SCRIPT } from '@/components/ThemeToggle'
 import { LocaleProvider } from '@/components/i18n/LocaleProvider'
 import { SiteChrome } from '@/components/i18n/SiteChrome'
 import { internalSurfacesEnabled } from '@/lib/internal-surface'
@@ -45,12 +46,7 @@ export function AcademyShell({
       {/* The root layout owns this literal pre-paint theme script. */}
       {/* eslint-disable-next-line @next/next/no-head-element */}
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "try{if(localStorage.getItem('academy.theme')==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}}",
-          }}
-        />
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} />
       </head>
       <body className="min-h-screen flex flex-col">
         <LocaleProvider initialLocale={locale} fixedLocale={fixedLocale}>
