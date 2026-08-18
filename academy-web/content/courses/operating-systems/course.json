@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 125,
+  "estimatedMinutes": 178,
   "coverMotif": "layers",
   "skills": [
     {
@@ -120,6 +120,41 @@
       "skillWeights": {
         "processes": 3,
         "os-security": 2
+      }
+    },
+    {
+      "id": "thread-vs-process",
+      "kind": "lesson",
+      "prerequisites": [
+        "fork-exec-wait"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "concurrency": 4,
+        "processes": 2
+      }
+    },
+    {
+      "id": "pthreads",
+      "kind": "lesson",
+      "prerequisites": [
+        "thread-vs-process"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "concurrency": 4
+      }
+    },
+    {
+      "id": "race-conditions",
+      "kind": "lesson",
+      "prerequisites": [
+        "pthreads"
+      ],
+      "estimatedMinutes": 19,
+      "skillWeights": {
+        "concurrency": 4,
+        "synchronisation": 3
       }
     }
   ]

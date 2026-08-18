@@ -1,0 +1,223 @@
+{
+  "nodeId": "race-conditions",
+  "locale": "en",
+  "title": "Race conditions: when timing decides the answer",
+  "objective": "By the end of this lesson you can explain why counter++ is not one operation, produce a race you can measure, and use a tool that finds races your test run happened not to trigger.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A race condition is a program whose result depends on which thread got there first. The frightening part is not that the answer is wrong — it is that the answer is usually right. A race that corrupts one value in ten thousand passes every test you will write by hand."
+    },
+    {
+      "kind": "heading",
+      "text": "counter++ is three operations"
+    },
+    {
+      "kind": "code",
+      "caption": "One line of C, three machine steps",
+      "lines": [
+        "counter++;",
+        "",
+        "/* becomes, roughly: */",
+        "/*   1. load  counter from memory into a register */",
+        "/*   2. add   1 to the register                   */",
+        "/*   3. store the register back to memory         */",
+        "",
+        "/* Two threads interleaved:                                     */",
+        "/*   Thread A: load 5                                           */",
+        "/*   Thread B: load 5     <- reads before A stored              */",
+        "/*   Thread A: add -> 6, store 6                                */",
+        "/*   Thread B: add -> 6, store 6                                */",
+        "/* Two increments happened. The counter went up by one.         */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "How much gets lost, measured"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Eight threads each incrementing an unsynchronised counter 200,000 times should reach 1,600,000. On one 10-core machine, three consecutive runs produced 424,919 — 316,653 — 364,760. That is not a rounding error. Roughly three-quarters of all the increments vanished, and the amount lost was different every time."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The result that should worry you most",
+      "text": "Compiled with -O2 instead of -O0, the same program printed exactly 1,600,000 on every run. It was not correct — the optimiser had noticed that the loop's only effect was to add 200,000 to a variable, and replaced 200,000 separate increments with a single add. One load, one add, one store: too fast to interleave. The bug was still there; the window had closed. This is why 'I tested it and the number was right' is not evidence that concurrent code is correct."
+    },
+    {
+      "kind": "heading",
+      "text": "Where races actually appear"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Any read-modify-write of shared data: counters, totals, reference counts",
+        "Check-then-act: 'if the key is absent, insert it' — another thread can insert between the two steps",
+        "Lazy initialisation: two threads both find the object missing and both create one",
+        "Linked structures: two threads appending to a list can lose an item or build a cycle",
+        "Files and paths: check that a file does not exist, then create it — the classic security race in the last module of this course"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Note that only the first involves a counter. The general shape is: two steps that must not be separated, with nothing preventing separation."
+    },
+    {
+      "kind": "heading",
+      "text": "The tool that does not depend on luck"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Thread sanitizer instruments memory accesses and reports two threads touching the same location without synchronisation — even when the run happened to produce the right answer. It is the same family of tool as the address sanitizer from the C course, and it belongs in the same place: your normal build during development."
+    },
+    {
+      "kind": "code",
+      "caption": "Finding a race that did not misbehave",
+      "lines": [
+        "gcc -fsanitize=thread -g -O1 -pthread race.c -o race",
+        "./race",
+        "",
+        "#   Read of size 8 at 0x... by thread T2:",
+        "#     #0 bump race.c:13",
+        "#   Previous write of size 8 at 0x... by thread T1:",
+        "#     #0 bump race.c:13",
+        "#   Location is global 'counter' of size 8",
+        "# SUMMARY: ThreadSanitizer: data race race.c:13 in bump",
+        "1600000 / 1600000        <- and the total was CORRECT this run",
+        "",
+        "# It named the line, both threads, and the variable — on a run",
+        "# that produced the right answer."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Two practical notes",
+      "text": "Thread sanitizer slows a program down by roughly an order of magnitude and increases memory use substantially, so it is a development and CI tool, not a production one. It cannot be combined with address sanitizer in one build — run two builds when you want both. And inside a container you may need to relax the default seccomp profile (for example docker run --security-opt seccomp=unconfined), or the sanitizer aborts at startup with a CHECK failure about address randomisation."
+    },
+    {
+      "kind": "heading",
+      "text": "What does not fix it"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Attempt",
+        "Why it fails"
+      ],
+      "rows": [
+        [
+          "Marking the variable volatile",
+          "volatile controls compiler optimisation and reordering; load-add-store is still three steps. Measured at -O2 with volatile: 352,482 / 410,274 / 317,944 out of 1,600,000 — and note that adding volatile made the bug VISIBLE again at -O2 by preventing the loop collapse, without fixing anything"
+        ],
+        [
+          "Making the operation 'small enough'",
+          "There is no size at which read-modify-write becomes one step"
+        ],
+        [
+          "Adding a sleep",
+          "Changes the timing, does not remove the window"
+        ],
+        [
+          "Testing more",
+          "A race that fires rarely will pass a great many tests"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The actual fixes are to make the sequence indivisible — a mutex, which the next lesson covers — or to use an atomic type, where the hardware guarantees the read-modify-write completes as one unit."
+    },
+    {
+      "kind": "try",
+      "title": "Produce the race, hide it, then find it anyway",
+      "steps": [
+        "Write the eight-thread counter program: each thread does counter++ 200,000 times",
+        "Build with: gcc -O0 -pthread race.c -o race     and run it five times",
+        "Record the five totals — none should reach 1,600,000, and none should match each other",
+        "Now build with -O2 and run five times: the total is exactly right every time",
+        "Look at why: gcc -O2 -S race.c -o - | less    and find the loop — it is gone, replaced by a single add",
+        "Build with: gcc -fsanitize=thread -g -O1 -pthread race.c -o race",
+        "Run it — the sanitizer names the racing line even though the count may look plausible",
+        "Optional: change the counter to _Atomic long, rebuild at -O0, and confirm the total is now exactly 1,600,000"
+      ],
+      "expected": "Five different wrong numbers, then a perfectly right number that is a lie, then the assembly showing why, then a tool that reports the bug regardless. That sequence is the most important thing in this module: you cannot test concurrency by running it and looking at the output."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "The most useful thing in this lesson",
+      "text": "In the verified run above, thread sanitizer reported the race and the program still printed exactly 1,600,000. The instrumentation slows execution enough that the threads rarely interleave — so the output looked perfect while the tool named the defect, the line, and the variable. Judge concurrent code by whether accesses are synchronised, never by whether the output looked right."
+    }
+  ],
+  "cheatsheet": [
+    "counter++ is load, add, store — three steps, interruptible between any two",
+    "Measured: 8 threads x 200,000 increments reached 424,919 / 316,653 / 364,760 at -O0",
+    "At -O2 the same program printed exactly 1,600,000 — the optimiser collapsed the loop, hiding the bug",
+    "A right answer is not evidence of correct concurrent code",
+    "Race shapes: read-modify-write, check-then-act, lazy init, linked structures, file existence checks",
+    "volatile does NOT fix a race — it is about optimisation, not atomicity",
+    "gcc -fsanitize=thread finds races the run did not trigger",
+    "Thread sanitizer costs roughly 10x speed and cannot be combined with address sanitizer",
+    "Real fixes: a mutex, or an atomic type"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why can two threads each incrementing a counter 200,000 times end up far below 400,000?",
+      "choices": {
+        "A": "The scheduler drops threads",
+        "B": "Each increment is load-add-store; interleaving makes two increments overwrite each other with the same value",
+        "C": "Integer overflow",
+        "D": "The compiler removes some increments"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Both threads read the same starting value and both write back the same result. One update is lost every time that interleaving occurs."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "The same racy program prints the exactly correct total when built with -O2. What happened?",
+      "choices": {
+        "A": "-O2 inserts synchronisation",
+        "B": "The optimiser replaced the whole loop with a single add, so the window for interleaving nearly disappeared — the bug is unchanged",
+        "C": "-O2 runs the threads sequentially",
+        "D": "The counter was cached in a register per thread"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Verified in the generated assembly: the loop was replaced by one load, one add of 200,000, and one store. Correct output here is a property of the timing, not of the program."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Does declaring the shared counter volatile fix the race?",
+      "choices": {
+        "A": "Yes — volatile makes access atomic",
+        "B": "No — volatile constrains compiler optimisation and reordering, but load-add-store is still three separate steps",
+        "C": "Yes, on x86",
+        "D": "Only with -O0"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "This is one of the most common misconceptions in concurrent programming. Measured: with volatile at -O2, eight threads still lost about three-quarters of their increments. volatile is about how the compiler may transform accesses; atomicity requires a mutex or an atomic type. Verified: switching the same counter to _Atomic long produced exactly 1,600,000 on every run."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Your concurrent code passes 10,000 test runs. What have you established?",
+      "choices": {
+        "A": "It is race-free",
+        "B": "Very little — a race with a narrow window can pass an enormous number of runs; use a tool that checks synchronisation rather than outcomes",
+        "C": "It is race-free on this hardware",
+        "D": "It is race-free at this optimisation level"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "That is what thread sanitizer is for: it reports unsynchronised access to shared data whether or not the run produced a wrong answer."
+    }
+  ]
+}

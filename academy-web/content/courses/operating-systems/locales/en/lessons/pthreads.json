@@ -1,0 +1,238 @@
+{
+  "nodeId": "pthreads",
+  "locale": "en",
+  "title": "Writing a threaded program",
+  "objective": "By the end of this lesson you can create threads, pass each one its own data, collect results, and avoid the two mistakes that make almost every first threaded program wrong.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "The interface is small: create a thread, wait for it, and optionally get a value back. The mistakes are also small, and both of them are about lifetime — what the thread is allowed to point at, and how long that thing lives."
+    },
+    {
+      "kind": "code",
+      "caption": "The whole interface, in one program",
+      "lines": [
+        "#include <pthread.h>",
+        "#include <stdio.h>",
+        "",
+        "void *worker(void *arg) {",
+        "    int id = *(int *)arg;",
+        "    printf(\"worker %d running\\n\", id);",
+        "    return NULL;",
+        "}",
+        "",
+        "int main(void) {",
+        "    pthread_t t[4];",
+        "    int ids[4];                       /* one slot per thread — this matters */",
+        "",
+        "    for (int i = 0; i < 4; i++) {",
+        "        ids[i] = i;",
+        "        pthread_create(&t[i], NULL, worker, &ids[i]);",
+        "    }",
+        "    for (int i = 0; i < 4; i++) {",
+        "        pthread_join(t[i], NULL);     /* wait for each to finish */",
+        "    }",
+        "    return 0;",
+        "}"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Build it with -pthread — that flag is required both to compile and to link, and forgetting it produces confusing errors rather than a clear message. gcc -pthread prog.c -o prog is the command."
+    },
+    {
+      "kind": "heading",
+      "text": "Mistake one: every thread pointing at the same variable"
+    },
+    {
+      "kind": "code",
+      "caption": "Wrong, and why",
+      "lines": [
+        "for (int i = 0; i < 4; i++) {",
+        "    pthread_create(&t[i], NULL, worker, &i);   /* WRONG */",
+        "}",
+        "/* Every thread receives the address of the SAME i.",
+        "   By the time a thread reads it, the loop has moved on — or finished.",
+        "   Typical result: several threads all report id 4. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The array version above is correct because each thread receives the address of a different element, and that array outlives every thread because main is still running. The rule generalises: whatever you hand a thread must remain valid for as long as the thread might read it."
+    },
+    {
+      "kind": "heading",
+      "text": "Mistake two: pointing at a stack frame that returns"
+    },
+    {
+      "kind": "code",
+      "caption": "A dangling pointer, delivered by a thread",
+      "lines": [
+        "void spawn(void) {",
+        "    int value = 42;",
+        "    pthread_t t;",
+        "    pthread_create(&t, NULL, worker, &value);",
+        "}   /* <- spawn returns HERE; value is gone; the thread may still be running */",
+        "",
+        "/* Fixes, in order of preference:                                  */",
+        "/*   1. Wait: pthread_join before returning                        */",
+        "/*   2. Own it: malloc the argument, and let the thread free it     */",
+        "/*   3. Outlive it: use storage that lives long enough (static, or */",
+        "/*      an array in a caller that waits)                           */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "This is the C course's dangling pointer, in a new setting",
+      "text": "You already know that returning a pointer to a local is a bug. Threads make it worse in one specific way: the function returns successfully and the corruption happens elsewhere, later, in a different thread. Address sanitizer still catches it — build with -fsanitize=address -g, exactly as in the C course."
+    },
+    {
+      "kind": "heading",
+      "text": "Getting a result back"
+    },
+    {
+      "kind": "code",
+      "caption": "Returning a value from a thread",
+      "lines": [
+        "void *compute(void *arg) {",
+        "    long n = *(long *)arg;",
+        "    long *result = malloc(sizeof *result);   /* heap: outlives this function */",
+        "    *result = n * n;",
+        "    return result;",
+        "}",
+        "",
+        "long input = 7, *answer;",
+        "pthread_t t;",
+        "pthread_create(&t, NULL, compute, &input);",
+        "pthread_join(t, (void **)&answer);        /* join hands you the return value */",
+        "printf(\"%ld\\n\", *answer);",
+        "free(answer);                             /* the joiner owns it now */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Join or detach — pick one for every thread"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "Joinable (default)",
+        "Detached"
+      ],
+      "rows": [
+        [
+          "Who cleans up",
+          "Whoever calls pthread_join",
+          "Automatic on exit"
+        ],
+        [
+          "Can you get a result?",
+          "Yes",
+          "No"
+        ],
+        [
+          "If you never join",
+          "Resources leak — the thread stays a zombie",
+          "Nothing leaks"
+        ],
+        [
+          "Use when",
+          "You need the result or the timing",
+          "Fire-and-forget background work"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "A joinable thread nobody joins is a leak",
+      "text": "It is the thread version of the zombie from the process module, and it has the same fix: collect it, or say up front that you never will. pthread_detach(t) makes the second choice explicit. A long-running program that creates joinable threads and never joins them will exhaust memory."
+    },
+    {
+      "kind": "try",
+      "title": "Write it, then break it deliberately",
+      "steps": [
+        "Build the four-worker program above: gcc -pthread -Wall prog.c -o prog",
+        "Run it several times and note that the output order changes between runs",
+        "Now change &ids[i] to &i and run it repeatedly — watch ids repeat or all show 4",
+        "Put that back, and write the spawn() function that returns while its thread is still running",
+        "Rebuild with: gcc -pthread -Wall -g -fsanitize=address prog.c -o prog  and run it",
+        "Read the sanitizer report — it names the freed stack frame",
+        "Make a thread return a malloc'd result and collect it with pthread_join",
+        "Create 1000 joinable threads without joining them, watch memory, then add pthread_detach and compare"
+      ],
+      "expected": "Changing output order is your first direct evidence that you no longer control execution order. The &i version shows why every thread needs its own argument, and the sanitizer names the stack-lifetime bug precisely. The last step reproduces the process module's zombie problem in thread form."
+    }
+  ],
+  "cheatsheet": [
+    "Build with -pthread (needed for both compiling and linking)",
+    "pthread_create(&t, NULL, fn, arg) — fn takes and returns void *",
+    "pthread_join(t, &ret) waits and collects the return value",
+    "Give each thread its OWN argument — never the loop variable's address",
+    "Whatever you pass must outlive the thread: join, or malloc, or use longer-lived storage",
+    "Return a value by returning a heap pointer; the joiner frees it",
+    "Joinable threads must be joined or they leak — pthread_detach if you never will",
+    "Output order changes between runs; that is normal and is the point",
+    "-fsanitize=address catches thread lifetime bugs, same as in the C course"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A loop creates four threads, passing &i each time. Several print the same id. Why?",
+      "choices": {
+        "A": "printf is not thread-safe",
+        "B": "All four received the address of the same variable, which the loop keeps changing",
+        "C": "pthread_create copies the argument",
+        "D": "The threads ran in the wrong order"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "They share one variable. Give each thread its own storage — an array element, or a malloc'd copy."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A function creates a thread, passes it the address of a local, and returns immediately. What is the defect?",
+      "choices": {
+        "A": "Nothing, if the thread is fast enough",
+        "B": "The local's stack frame is gone once the function returns, so the thread may read freed memory",
+        "C": "Threads cannot take pointer arguments",
+        "D": "The thread will not start"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "'Fast enough' is not a guarantee, it is a race you usually win. Join before returning, or hand the thread memory it owns."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A server creates a joinable thread per request and never joins them. What happens over time?",
+      "choices": {
+        "A": "Nothing — threads clean up on exit",
+        "B": "Resources for each finished thread are retained, and the process eventually exhausts memory",
+        "C": "The scheduler slows down but memory is fine",
+        "D": "New threads silently fail to start immediately"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "It is the zombie problem again: a finished joinable thread keeps its record until someone collects it. Join it, or detach it up front."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "You run the same threaded program five times and get five different output orders. What does that tell you?",
+      "choices": {
+        "A": "The program is broken",
+        "B": "Nothing is guaranteeing an order — which is normal, and is exactly why shared data needs coordination",
+        "C": "The scheduler is misconfigured",
+        "D": "You need more cores"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Order is not part of the contract unless you create one. That is the observation the next lesson turns into a bug you can measure."
+    }
+  ]
+}

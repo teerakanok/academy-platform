@@ -1,0 +1,202 @@
+{
+  "nodeId": "thread-vs-process",
+  "locale": "en",
+  "title": "Threads and processes: what is actually shared",
+  "objective": "By the end of this lesson you can state exactly which parts of a process threads share and which they do not, choose between a thread and a process for a given job, and explain why one crashing thread takes the whole program with it.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A process is an address space with at least one thread running in it. Adding a thread does not create a new address space — it adds another flow of execution inside the one that already exists. Everything that follows in this module comes from that single sentence."
+    },
+    {
+      "kind": "heading",
+      "text": "The dividing line"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "Shared between threads",
+        "Private to each thread"
+      ],
+      "rows": [
+        [
+          "Memory",
+          "Globals, the heap, code",
+          "The stack"
+        ],
+        [
+          "Files",
+          "Open file descriptors",
+          "—"
+        ],
+        [
+          "Identity",
+          "pid, user, working directory",
+          "Thread id"
+        ],
+        [
+          "Execution",
+          "—",
+          "Registers, program counter"
+        ],
+        [
+          "Signals",
+          "Handlers (process-wide)",
+          "The signal mask"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Two consequences follow immediately. Threads can pass data by simply writing to a shared variable, with no copying and no system call — which is why they are fast. And two threads writing to that same variable can corrupt it, because nothing is coordinating them — which is the entire rest of this module."
+    },
+    {
+      "kind": "code",
+      "caption": "Shared and private, in one program",
+      "lines": [
+        "static int shared_counter = 0;      /* one copy, all threads see it */",
+        "",
+        "void *worker(void *arg) {",
+        "    int local = 0;                  /* one copy PER THREAD, on its own stack */",
+        "    local++;                        /* nobody else can touch this */",
+        "    shared_counter++;               /* everybody can — and this is the problem */",
+        "    return NULL;",
+        "}"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Choosing between them"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Use a thread when",
+        "Use a process when"
+      ],
+      "rows": [
+        [
+          "The work shares a lot of data",
+          "The work is independent"
+        ],
+        [
+          "You need it to be cheap to start",
+          "A crash must not take everything down"
+        ],
+        [
+          "The parts are one program conceptually",
+          "The parts need different privileges"
+        ],
+        [
+          "Example: workers over a shared cache",
+          "Example: a browser tab, a request handler"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Isolation is the real difference, not speed",
+      "text": "A thread that dereferences a bad pointer raises SIGSEGV, and the default action of that signal is to end the process — all of it, every thread. There is no such thing as one thread crashing on its own. A separate process, by contrast, can die while the rest of the system carries on and restarts it. This is why browsers put tabs in processes despite the higher cost: a page that crashes should not take the browser with it."
+    },
+    {
+      "kind": "heading",
+      "text": "The cost difference, measured"
+    },
+    {
+      "kind": "paragraph",
+      "text": "On one 10-core aarch64 machine, creating and joining a thread took about 61 microseconds, while forking and waiting for a process took about 156 — roughly two and a half times more. That is a real difference, but note the units: both are microseconds. If your work item takes milliseconds, the creation cost is noise either way, and you should choose on isolation instead. If you are creating workers per request at high rates, neither number is acceptable and the answer is a pool that creates nothing per request — which is what the producer-consumer capstone builds."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Underneath, Linux barely distinguishes them",
+      "text": "Both fork() and pthread_create() call clone(). What differs is which resources the new task shares with its creator: fork shares almost nothing, pthread_create shares the address space, the file descriptors, and the signal handlers. This is why strace shows clone in both cases, as you saw in the fork lesson — a thread and a process are two settings of one mechanism, not two mechanisms."
+    },
+    {
+      "kind": "try",
+      "title": "Prove what is shared",
+      "steps": [
+        "Write a program with a global int and a local int inside the thread function",
+        "Start two threads; have each print the ADDRESS of the global and the address of its local",
+        "Confirm the global's address is identical in both, and the locals differ — that is the dividing line, seen directly",
+        "Have one thread set the global to 42 and the other read it after a short sleep — confirm it sees 42 with no message passing at all",
+        "Now have one thread dereference a null pointer",
+        "Confirm the whole program dies, not just that thread",
+        "Run: ps -o pid,nlwp,comm -p <pid>       (nlwp = number of threads in that process)",
+        "Run: strace -f -e trace=clone ./yourprog  and compare with a fork-based version"
+      ],
+      "expected": "One address identical, one different; a value visible with no copying; the entire program dying from one thread's mistake; and clone appearing in both traces with different flags. Those four observations are this lesson. Note that if you start threads one at a time and join each before starting the next, their stack addresses may repeat — the same memory reused, not shared. Run them concurrently to see genuinely different stacks."
+    }
+  ],
+  "cheatsheet": [
+    "A process is an address space; a thread is a flow of execution inside one",
+    "Shared: globals, heap, code, file descriptors, pid, signal handlers",
+    "Private: stack, registers, thread id, signal mask",
+    "Sharing needs no copying and no system call — that is the speed",
+    "Sharing without coordination corrupts data — that is the rest of this module",
+    "SIGSEGV in one thread ends the whole process; a separate process can die alone",
+    "Measured: thread create+join ~61us, fork+wait ~156us on one machine",
+    "Choose on isolation first, cost second",
+    "Both are clone() underneath, with different sharing flags"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Two threads in one process each declare a local variable in their function. What is true?",
+      "choices": {
+        "A": "They share one copy because threads share memory",
+        "B": "Each has its own copy, because locals live on the per-thread stack",
+        "C": "Only if declared static",
+        "D": "They share it only on a single-core machine"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The stack is the private part. Globals and the heap are shared; anything on the stack belongs to one thread."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why do browsers put tabs in separate processes despite processes being more expensive?",
+      "choices": {
+        "A": "Processes are faster for rendering",
+        "B": "Isolation — a crashing thread ends its whole process, while a crashing process leaves the rest running",
+        "C": "Threads cannot draw to the screen",
+        "D": "To use more CPU cores"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "SIGSEGV is delivered to the process, so there is no such thing as one thread crashing alone. Isolation is bought with the separate address space."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Your work items each take about 50 milliseconds. Should thread-vs-process creation cost drive the decision?",
+      "choices": {
+        "A": "Yes — threads are always faster",
+        "B": "No — both creation costs are microseconds against a 50 ms item, so decide on isolation and sharing needs",
+        "C": "Yes — fork is too slow for any server",
+        "D": "Only if there are more than four cores"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A ~95 microsecond difference against 50 milliseconds is about two-tenths of one percent. When creation cost genuinely matters, the answer is a pool that creates nothing per item."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "strace shows clone() for both fork() and pthread_create(). Why?",
+      "choices": {
+        "A": "strace cannot tell them apart",
+        "B": "Both are the same kernel call with different flags controlling what the new task shares",
+        "C": "pthread_create calls fork internally",
+        "D": "It is an artefact of the C library"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Linux has one mechanism for creating a task and a set of flags for what it shares. 'Thread' and 'process' are two configurations of it."
+    }
+  ]
+}
