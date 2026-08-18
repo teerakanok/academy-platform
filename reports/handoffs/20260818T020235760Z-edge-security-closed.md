@@ -11,7 +11,7 @@
   "repo": {
     "remote": "github.com/teerakanok/academy-platform",
     "branch": "main",
-    "base_head": "85a90d56feed293fe4b00ee5e66dd877f039aa2f"
+    "base_head": "6d0d07f18f6f4bf3da70d085629693829609fac7"
   },
   "delivery": "local",
   "worktree": {
@@ -122,7 +122,7 @@
 ## Repository State
 - State: blocked
 - Branch: main
-- Baseline: 85a90d56feed293fe4b00ee5e66dd877f039aa2f
+- Baseline: 6d0d07f18f6f4bf3da70d085629693829609fac7
 - Delivery: local
 
 ## Completed This Session
