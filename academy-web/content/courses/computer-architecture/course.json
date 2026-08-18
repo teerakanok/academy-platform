@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 179,
+  "estimatedMinutes": 215,
   "coverMotif": "layers",
   "skills": [
     {
@@ -152,6 +152,30 @@
       "skillWeights": {
         "datapath": 3,
         "performance": 3
+      }
+    },
+    {
+      "id": "pipeline-stages",
+      "kind": "lesson",
+      "prerequisites": [
+        "multi-cycle-and-cpi"
+      ],
+      "estimatedMinutes": 19,
+      "skillWeights": {
+        "pipelining": 4,
+        "performance": 2
+      }
+    },
+    {
+      "id": "throughput-vs-latency",
+      "kind": "lesson",
+      "prerequisites": [
+        "pipeline-stages"
+      ],
+      "estimatedMinutes": 17,
+      "skillWeights": {
+        "performance": 4,
+        "pipelining": 2
       }
     }
   ]

@@ -1,0 +1,203 @@
+{
+  "nodeId": "pipeline-stages",
+  "locale": "en",
+  "title": "Overlapping instructions to finish more",
+  "objective": "By the end of this lesson you can explain what a pipeline overlaps, compute the speedup it offers and the limit on that speedup, and say what a deeper pipeline costs.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "In the multi-cycle design, an instruction uses one stage at a time and the other four sit idle. A pipeline fills them: while instruction one is in execute, instruction two is in decode and instruction three is being fetched. Nothing about a single instruction gets faster — but instructions complete far more often."
+    },
+    {
+      "kind": "heading",
+      "text": "The picture"
+    },
+    {
+      "kind": "code",
+      "caption": "Five instructions in flight, one completing per cycle",
+      "lines": [
+        "  cycle:      1     2     3     4     5     6     7     8     9",
+        "            +-----+-----+-----+-----+-----+",
+        "  instr 1   | IF  | ID  | EX  | MEM | WB  |",
+        "            +-----+-----+-----+-----+-----+",
+        "                  +-----+-----+-----+-----+-----+",
+        "  instr 2         | IF  | ID  | EX  | MEM | WB  |",
+        "                  +-----+-----+-----+-----+-----+",
+        "                        +-----+-----+-----+-----+-----+",
+        "  instr 3               | IF  | ID  | EX  | MEM | WB  |",
+        "                        +-----+-----+-----+-----+-----+",
+        "",
+        "  After cycle 5, one instruction completes every cycle.",
+        "  Each one still takes 5 cycles from start to finish."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Latency unchanged, throughput multiplied",
+      "text": "Each instruction still takes five cycles from fetch to write-back — its latency is identical. What changed is that five instructions are in progress at once, so after the pipeline fills, one finishes every cycle. This is the same distinction as a production line: making one item takes just as long, and the factory produces far more of them."
+    },
+    {
+      "kind": "heading",
+      "text": "The speedup, and its ceiling"
+    },
+    {
+      "kind": "code",
+      "caption": "Computing the gain for a real number of instructions",
+      "lines": [
+        "  Without a pipeline: 1000 instructions x 5 cycles      = 5000 cycles",
+        "",
+        "  With a 5-stage pipeline:",
+        "    4 cycles to fill, then one instruction per cycle",
+        "    4 + 1000                                            = 1004 cycles",
+        "",
+        "  speedup = 5000 / 1004                                 = 4.98x",
+        "",
+        "/* The ceiling is the number of stages: 5 stages can at best give 5x.",
+        "   With 1000 instructions the fill cost is negligible; with 10 it is not:",
+        "     4 + 10 = 14 cycles against 50, which is 3.6x — the same pipeline,",
+        "   a much smaller gain, because filling it dominated. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Why not simply add more stages"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "More stages give",
+        "More stages cost"
+      ],
+      "rows": [
+        [
+          "A shorter stage, so a faster clock",
+          "A longer fill, so short bursts benefit less"
+        ],
+        [
+          "A higher theoretical throughput",
+          "More instructions in flight to be discarded when a branch is mispredicted"
+        ],
+        [
+          "",
+          "More places where one instruction needs another's unfinished result"
+        ],
+        [
+          "",
+          "Storage between every pair of stages, which itself costs time"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Processor designs pushed pipelines to great depth in pursuit of clock speed, and then retreated. The reason is the second row: when a branch is guessed wrongly, everything after it in the pipeline must be thrown away, and a deeper pipeline throws away more. That trade is the subject of the hazard module."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The picture above is the ideal case, and it is not what happens",
+      "text": "It assumes every instruction can proceed every cycle. Three things break that: an instruction needing a result the previous one has not produced yet, a load whose value is not back in time, and a branch whose direction is not yet known. Each has a name and a remedy, and the next three lessons are those three cases. The pipeline is easy; the exceptions are the subject."
+    },
+    {
+      "kind": "heading",
+      "text": "What has to be true for this to work"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Every stage must take the same time, or the slowest one sets the rate for all",
+        "Stages must not need the same hardware at the same time — which is why instruction and data memory are separate paths",
+        "Each stage must carry its instruction's information forward, since the stage before it now holds a different instruction",
+        "Instructions must be easy to decode without knowing what came before — the fixed-length argument from the first module, paid off here"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "That last point is where the RISC-versus-CISC argument finally lands. A variable-length instruction cannot be fetched independently, because you cannot know where it starts without decoding the one before it. Pipelining it is possible — modern x86-64 processors do it — but only by decoding into simpler internal operations first, which is the extra machinery the earlier lesson described."
+    },
+    {
+      "kind": "try",
+      "title": "Compute and compare",
+      "steps": [
+        "For 100 instructions on a 5-stage pipeline, compute the cycles and the speedup",
+        "Do the same for 10 instructions and explain why the speedup is so much lower",
+        "For a 20-stage pipeline with 1000 instructions, compute the cycles",
+        "If the deeper pipeline also allows a 2x faster clock, compare the total times",
+        "Now assume 10% of instructions are branches and 25% of those are mispredicted, discarding the whole pipeline each time",
+        "Recompute both pipelines with that cost included, and say which now wins",
+        "Explain in one sentence why processor designs stopped getting deeper",
+        "Read: sysctl -a 2>/dev/null | grep -i cpu | head -5    or lscpu, and note what your machine reports"
+      ],
+      "expected": "A speedup that approaches the stage count for long runs and falls well short for short ones, and a deep pipeline that loses once mispredictions are included. That final calculation is the argument that ended the pursuit of ever-deeper pipelines, and doing it yourself is more convincing than being told."
+    }
+  ],
+  "cheatsheet": [
+    "A pipeline overlaps stages of different instructions, filling units that would idle",
+    "Latency per instruction is unchanged; throughput approaches one per cycle",
+    "Speedup ceiling is the number of stages; 1000 instructions on 5 stages gives 4.98x",
+    "For short runs, filling the pipeline dominates: 10 instructions give only 3.6x",
+    "Deeper pipelines allow a faster clock but discard more work on a misprediction",
+    "Every stage must take the same time, or the slowest sets the rate",
+    "Instruction and data memory are separate paths so two stages can use memory at once",
+    "Fixed-length instructions can be fetched without decoding the previous one",
+    "The ideal picture assumes no instruction ever waits — the next lessons are the exceptions"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A 5-stage pipeline is running. How long does one instruction take from fetch to write-back?",
+      "choices": {
+        "A": "One cycle",
+        "B": "Five cycles — its latency is unchanged; what improved is how often instructions complete",
+        "C": "Five cycles divided by five",
+        "D": "It depends on the instruction"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Pipelining improves throughput, not latency. One instruction completes per cycle because five are in progress at once, not because any single one got faster."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why does a 5-stage pipeline give only 3.6x on 10 instructions but 4.98x on 1000?",
+      "choices": {
+        "A": "Short programs have worse cache behaviour",
+        "B": "The four cycles spent filling the pipeline are a large fraction of a short run and negligible in a long one",
+        "C": "The clock slows for short runs",
+        "D": "Ten instructions cannot fill five stages"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "4 + 10 against 50 is 3.6x; 4 + 1000 against 5000 is 4.98x. The same pipeline, with the fixed fill cost amortised differently."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why did processor designs stop pursuing ever-deeper pipelines?",
+      "choices": {
+        "A": "Manufacturing limits",
+        "B": "A deeper pipeline discards more work when a branch is predicted wrongly, and that cost grows faster than the clock gain",
+        "C": "Compilers could not keep up",
+        "D": "Deeper pipelines need more registers"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Depth buys clock speed and pays for it in misprediction penalty. Beyond a point the penalty dominates, which is the calculation the exercise asks you to do."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why must instruction memory and data memory be separate paths in a pipelined design?",
+      "choices": {
+        "A": "They store different things",
+        "B": "Fetch and the memory stage occur in the same cycle for different instructions, so both need memory access simultaneously",
+        "C": "For security isolation",
+        "D": "Data memory is slower"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Two stages needing the same hardware in the same cycle would force one to wait. Separate paths — which in practice means separate first-level caches — remove that conflict."
+    }
+  ]
+}

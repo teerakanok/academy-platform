@@ -1,0 +1,241 @@
+{
+  "nodeId": "throughput-vs-latency",
+  "locale": "en",
+  "title": "Two different questions about speed",
+  "objective": "By the end of this lesson you can tell which of the two a given problem is about, explain why improving one often worsens the other, and recognise the same trade in systems far from the processor.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "The pipeline lesson produced a result worth stating plainly: instructions did not get faster, yet the program did. That is only possible because 'faster' means two different things, and confusing them is behind a large share of bad performance decisions."
+    },
+    {
+      "kind": "heading",
+      "text": "The two questions"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "Latency",
+        "Throughput"
+      ],
+      "rows": [
+        [
+          "Asks",
+          "How long does one take?",
+          "How many finish per unit of time?"
+        ],
+        [
+          "Measured in",
+          "Seconds per operation",
+          "Operations per second"
+        ],
+        [
+          "Matters when",
+          "A person is waiting",
+          "A queue is being worked through"
+        ],
+        [
+          "Pipeline effect",
+          "Unchanged, or slightly worse",
+          "Improved by roughly the stage count"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "They are not reciprocals",
+      "text": "If one operation takes 5 units, it is tempting to conclude the system does 0.2 per unit. That is only true when operations run one at a time. In the pipeline, latency stayed at 5 cycles while throughput reached 1 per cycle — a factor of five apart. Whenever work overlaps, the two numbers separate, and knowing which one your problem cares about decides which you should improve."
+    },
+    {
+      "kind": "heading",
+      "text": "Where each one matters"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Situation",
+        "The question that matters",
+        "Why"
+      ],
+      "rows": [
+        [
+          "A user clicks and waits",
+          "Latency",
+          "Throughput does not help one person waiting"
+        ],
+        [
+          "A batch job over a million records",
+          "Throughput",
+          "Nobody is watching an individual record"
+        ],
+        [
+          "An interactive editor",
+          "Latency",
+          "Response must feel immediate"
+        ],
+        [
+          "A build server",
+          "Throughput",
+          "Total completion time is what counts"
+        ],
+        [
+          "A game frame",
+          "Latency, with a deadline",
+          "Late is as bad as not done"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The last row introduces a third idea that neither number captures: a deadline. A frame delivered after its moment is worthless even though it was produced. That is the same reasoning the networking course gave for choosing UDP over TCP in a video call — late data has no value, so retransmitting it costs without benefiting."
+    },
+    {
+      "kind": "heading",
+      "text": "Improving one at the other's expense"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Batching improves throughput and worsens latency: each item waits for the batch to fill",
+        "Buffering does the same, deliberately, to keep a pipeline fed",
+        "A deeper pipeline raises throughput and leaves latency unchanged or slightly worse",
+        "Caching improves latency for repeated work and does little for a single first access",
+        "Adding parallel workers improves throughput; a single request is no faster"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The classic mistake is optimising the one nobody asked about",
+      "text": "A service whose users complain about slow responses is a latency problem, and adding more workers will not fix it — each request still takes as long. A build that takes too long overall is a throughput problem, and shortening one compilation step barely helps. Before optimising anything, say out loud which of the two numbers the complaint is about; the answer usually rules out most of the options."
+    },
+    {
+      "kind": "heading",
+      "text": "The same trade elsewhere in these courses"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Where you met it",
+        "Latency side",
+        "Throughput side"
+      ],
+      "rows": [
+        [
+          "Linux: reading a file",
+          "One byte at a time is responsive",
+          "Large blocks move far more data"
+        ],
+        [
+          "OS: thread per connection",
+          "A request is served immediately",
+          "A pool serves more requests overall"
+        ],
+        [
+          "Networking: connection setup",
+          "One round trip before any data",
+          "Reuse amortises it across requests"
+        ],
+        [
+          "Networking: event loop",
+          "A slow handler delays everyone",
+          "One thread serves thousands"
+        ],
+        [
+          "Architecture: pipelining",
+          "Five cycles per instruction",
+          "One instruction per cycle"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "That table is a summary of five courses in one shape. The reason the same trade keeps appearing is that it is not about processors or networks — it is about what happens whenever work can overlap, and the choice of which number to optimise is always a statement about who is waiting."
+    },
+    {
+      "kind": "try",
+      "title": "Classify and measure",
+      "steps": [
+        "For each row of the second table, state which number a user would notice",
+        "Write a program that processes items one at a time and time a single item",
+        "Add batching in groups of 100 and measure both single-item time and total time",
+        "Confirm that one got worse while the other got better, and by how much",
+        "Take a service or script you use and decide which number its complaints are about",
+        "For a pipeline of 5 stages, compute latency and throughput for 1 and for 1000 items",
+        "Explain why the ratio between them differs so much between the two cases",
+        "Find one place in your own code where a batch would help and one where it would hurt"
+      ],
+      "expected": "A measurement showing batching improving one number and worsening the other, and a decision about your own code that names which number matters. That naming step is the practical content of this lesson — most performance work goes wrong before any code is changed, by optimising the number nobody was complaining about."
+    }
+  ],
+  "cheatsheet": [
+    "Latency: how long one operation takes. Throughput: how many finish per unit time",
+    "They are reciprocals only when operations do not overlap",
+    "In a 5-stage pipeline, latency stayed at 5 cycles while throughput reached 1 per cycle",
+    "Batching and buffering improve throughput and worsen latency",
+    "More parallel workers improve throughput; one request is no faster",
+    "A deadline is a third idea: late work can be worthless even though it completed",
+    "Name which number the complaint is about before optimising anything",
+    "The same trade appears in file I/O, thread pools, connection reuse and event loops"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A pipeline gives 5-cycle latency and 1-per-cycle throughput. Why are those not contradictory?",
+      "choices": {
+        "A": "One of them is measured wrongly",
+        "B": "Five instructions are in progress at once, so one completes each cycle while each still takes five",
+        "C": "The clock changes between them",
+        "D": "Throughput is an average"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "They are reciprocals only when work does not overlap. Overlapping is exactly what a pipeline does, which is why the two numbers separate by the stage count."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Users complain that a service feels slow to respond. What will adding more worker threads achieve?",
+      "choices": {
+        "A": "It will fix the complaint",
+        "B": "Little — each request still takes as long; that is a latency complaint and workers improve throughput",
+        "C": "It will make it worse",
+        "D": "It depends on the number of cores"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "More workers serve more requests at once. If the complaint is that one request feels slow, the number that must change is the time that request takes."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why does batching improve throughput while worsening latency?",
+      "choices": {
+        "A": "Batches use less memory",
+        "B": "Fixed per-operation costs are shared across many items, but each item waits for the batch to fill before anything happens",
+        "C": "Batches are processed in parallel",
+        "D": "It does not — it improves both"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "It is the same shape as reading a file in large blocks rather than byte by byte: fewer fixed costs paid, at the price of the first byte arriving later."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "What does a deadline add that neither latency nor throughput captures?",
+      "choices": {
+        "A": "A measure of cost",
+        "B": "That work completed after a certain moment can be worthless, even though it finished",
+        "C": "A limit on parallelism",
+        "D": "A queueing model"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A late video frame is not a slow frame, it is a useless one. That is the same reasoning behind choosing UDP for a video call in the networking course."
+    }
+  ]
+}
