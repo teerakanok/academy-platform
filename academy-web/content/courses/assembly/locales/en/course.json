@@ -31,6 +31,8 @@
     "call-and-ret": "How a function call actually works",
     "stack-frames": "What a function builds before it starts working",
     "abi-and-calling-convention": "The agreement that lets separately compiled code work together",
-    "recursion-in-assembly": "Capstone: measuring what a recursive call costs"
+    "recursion-in-assembly": "Capstone: measuring what a recursive call costs",
+    "objdump-and-gdb": "The tools that read a binary for you",
+    "reading-real-disassembly": "Capstone: reconstructing a function you have never seen"
   }
 }

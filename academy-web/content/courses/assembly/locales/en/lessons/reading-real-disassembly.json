@@ -1,0 +1,321 @@
+{
+  "nodeId": "reading-real-disassembly",
+  "locale": "en",
+  "title": "Capstone: reconstructing a function you have never seen",
+  "objective": "By the end of this capstone you can take an unfamiliar function's disassembly and produce a C declaration and body that account for every instruction in it.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "This is the whole course applied at once. Below is a real function, compiled from source you have not seen. The task is to work out what it does, what its parameters are, and what data it operates on — using only the instructions."
+    },
+    {
+      "kind": "heading",
+      "text": "The function"
+    },
+    {
+      "kind": "code",
+      "caption": "Real compiler output, labels renamed for readability",
+      "lines": [
+        "  _mystery:",
+        "      mov   eax, -1",
+        "      test  rsi, rsi",
+        "      jle   .L7",
+        "      push  rbp",
+        "      mov   rbp, rsp",
+        "      add   rdi, 4",
+        "      xor   ecx, ecx",
+        "      jmp   .L2",
+        "  .L5:",
+        "      inc   rcx",
+        "      add   rdi, 16",
+        "      cmp   rsi, rcx",
+        "      je    .L6",
+        "  .L2:",
+        "      cmp   dword ptr [rdi - 4], edx",
+        "      jne   .L5",
+        "      test  byte ptr [rdi], 8",
+        "      je    .L5",
+        "      mov   eax, ecx",
+        "  .L6:",
+        "      pop   rbp",
+        "  .L7:",
+        "      ret"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Step one: the shape"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Before reading any instruction in detail, find the structure. There is a backward jump at .L5 to .L2, so there is a loop, and .L2 to .L5 is the body. Two conditional jumps inside the body both go to .L5, which is where the counter is incremented — so both are 'skip to the next iteration'. There are two exits: .L6 reached by the loop finishing or by falling through, and .L7 reached before the loop even starts."
+    },
+    {
+      "kind": "heading",
+      "text": "Step two: the register roles"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Register",
+        "Evidence",
+        "Conclusion"
+      ],
+      "rows": [
+        [
+          "rdi",
+          "Advanced by 16 each iteration; dereferenced",
+          "First parameter, a pointer to 16-byte elements"
+        ],
+        [
+          "rsi",
+          "Compared to rcx to end the loop; tested for <= 0 at the start",
+          "Second parameter, a signed count"
+        ],
+        [
+          "edx",
+          "Compared against a 4-byte field",
+          "Third parameter, a 4-byte value"
+        ],
+        [
+          "rcx",
+          "Starts at 0, incremented once per iteration",
+          "The loop index — not a parameter"
+        ],
+        [
+          "eax",
+          "Set to -1 before the loop, set to ecx on success",
+          "The return value"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "That gives the signature almost completely: three parameters in rdi, rsi and edx, returning an int. The jle rather than jbe on rsi says the count is signed, and the 32-bit edx says the third parameter is 4 bytes wide."
+    },
+    {
+      "kind": "heading",
+      "text": "Step three: the data layout"
+    },
+    {
+      "kind": "code",
+      "caption": "Two instructions define the whole structure",
+      "lines": [
+        "      add  rdi, 4                        ; before the loop, bias the pointer",
+        "      add  rdi, 16                       ; per iteration: element size is 16",
+        "",
+        "      cmp  dword ptr [rdi - 4], edx      ; 4 bytes at offset 0 of the element",
+        "      test byte ptr [rdi], 8             ; 1 byte at offset 4, testing bit 3",
+        "",
+        "/* The +4 bias exists so both accesses can use small displacements. Undo it:",
+        "     [rdi - 4]  is element offset 0,  read as 4 bytes",
+        "     [rdi]      is element offset 4,  read as 1 byte",
+        "   Stride 16, a 4-byte field at 0, a flag byte at 4. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "The pointer bias is a common trick worth recognising",
+      "text": "Adding a constant to a pointer before a loop lets the body reach fields on both sides of it with the smallest possible displacements, which produces shorter instructions. When you see a pointer adjusted once before a loop and then indexed with negative displacements inside, undo the bias mentally before reading the offsets — otherwise every field offset you recover will be wrong by exactly that constant."
+    },
+    {
+      "kind": "heading",
+      "text": "Step four: the reconstruction"
+    },
+    {
+      "kind": "code",
+      "caption": "What the instructions add up to",
+      "lines": [
+        "  struct rec {",
+        "      uint32_t field_at_0;      /* compared against the third argument */",
+        "      uint8_t  flags_at_4;      /* bit 3 tested */",
+        "      /* ... 11 more bytes we cannot see, because this function never",
+        "             touches them; the stride of 16 is how we know they exist */",
+        "  };",
+        "",
+        "  int mystery(const struct rec *a, long n, uint32_t want) {",
+        "      for (long i = 0; i < n; i++)",
+        "          if (a[i].field_at_0 == want && (a[i].flags_at_4 & 0x8))",
+        "              return (int)i;",
+        "      return -1;",
+        "  }",
+        "",
+        "/* The actual source, revealed:",
+        "     struct rec { uint32_t id; uint16_t flags; uint16_t len; const char *name; };",
+        "   Verified by running the program: sizeof(rec)=16, id@0, flags@4, len@6, name@8.",
+        "   The reconstruction got the size, both touched offsets and the whole",
+        "   algorithm right. It could not know about len and name -- because the",
+        "   function never reads them, and nothing in the code refers to them. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "What the limit of the method is, exactly",
+      "text": "The reconstruction recovered everything the function does and nothing it does not. Fields the code never touches are invisible except as the gap the stride implies; whether the flags field is one byte or two cannot be determined from a single byte test; and no name in the result is the real name. That is the honest boundary: disassembly gives you behaviour with complete fidelity and intent not at all. Naming things correctly is the part that requires a hypothesis and evidence from elsewhere — strings, imports, how callers use the result."
+    },
+    {
+      "kind": "heading",
+      "text": "The method, as a checklist"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Find the backward jumps first: those are the loops, and they give you the shape",
+        "Identify the exits and what value each returns",
+        "Classify the registers: parameters in ABI order, an index, an accumulator, a return value",
+        "Note signed versus unsigned from the condition names: jle and jl against jbe and jb",
+        "Recover element size from the stride, and field offsets from the displacements",
+        "Undo any pointer bias applied before the loop",
+        "Read the size annotations for field widths and movsx or movzx for signedness",
+        "Write the C, then account for every instruction — an unexplained instruction means the reconstruction is incomplete"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The last step is the one people skip",
+      "text": "A reconstruction that explains most of the instructions is a guess. Go back and point at each instruction, including the push rbp and the jmp that skips into the middle of the loop, and say why it is there. In the function above, the unconditional jmp .L2 before the loop body exists because the compiler rotated the loop and had to enter it at the test rather than at the increment. If you cannot explain an instruction, you have missed something the function actually does."
+    },
+    {
+      "kind": "heading",
+      "text": "Your task"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Write three small functions of your own without showing them to a partner",
+        "Compile each at -O1, strip the binary, and exchange disassembly with someone else",
+        "Reconstruct their functions using the checklist, and have them reconstruct yours",
+        "Compare each reconstruction against the original and record exactly what was recoverable",
+        "For every difference, decide whether it was unrecoverable in principle or a mistake in method"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "That last distinction is the whole point of the exercise. A field you could not see because the function never touched it is a limit of the evidence. A field offset you got wrong because you forgot a pointer bias is a limit of your method — and the difference between the two is what separates a careful analyst from a confident one."
+    },
+    {
+      "kind": "heading",
+      "text": "Where this goes next"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Direction",
+        "What it adds"
+      ],
+      "rows": [
+        [
+          "Reverse engineering",
+          "Whole programs rather than single functions: control-flow graphs, data structures across many functions, and tools that keep your annotations"
+        ],
+        [
+          "Vulnerability analysis",
+          "Looking for the missing bounds check, the signed comparison that should be unsigned, the buffer written past its end"
+        ],
+        [
+          "Malware analysis",
+          "The same reading, plus packing, obfuscation and anti-analysis defences layered on top"
+        ],
+        [
+          "Performance work",
+          "Reading what the compiler produced to find out why it is slow, which you have now done repeatedly"
+        ],
+        [
+          "Compiler and toolchain work",
+          "The other side of the same material: producing this output rather than reading it"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "All five start from the same skill you have just demonstrated. The binary is the only account of what a program does that is guaranteed to be accurate, because it is the thing that runs. Everything else — the source, the documentation, the commit message — is a claim about it."
+    },
+    {
+      "kind": "try",
+      "title": "One more, harder",
+      "steps": [
+        "Compile a function containing a switch with eight cases and reconstruct it from the disassembly",
+        "Compile one that returns a 32-byte struct and identify the hidden pointer",
+        "Compile one taking a mix of integers and doubles and recover the exact signature",
+        "Compile a recursive function at -O2 and determine whether it still recurses",
+        "Take any function from a system library, disassemble it, and write down what it does",
+        "For that library function, check your conclusion against its documented behaviour",
+        "Record one thing you got wrong and the instruction that would have told you"
+      ],
+      "expected": "Reconstructions that match, and at least one instructive error. The system-library step is the real test: it is the first time the answer is not something you wrote, and checking your reading against the documented behaviour is the closest thing to a ground truth this work has. Recording the instruction that would have told you is how the next reading gets better."
+    }
+  ],
+  "cheatsheet": [
+    "Find backward jumps first: they give you the loops and the shape",
+    "Classify registers by ABI position: rdi, rsi, rdx, rcx, r8, r9 then index and accumulator",
+    "jle and jl mean signed; jbe and jb mean unsigned",
+    "Stride gives element size; displacement gives field offset; size annotation gives field width",
+    "Undo any pointer bias applied before the loop before reading offsets",
+    "In the worked example: stride 16, 4-byte field at 0, flag byte at 4, bit 3 tested",
+    "Verified against the source: sizeof 16, id@0, flags@4, len@6, name@8",
+    "Fields the function never touches are invisible except as the gap the stride implies",
+    "Account for EVERY instruction; an unexplained one means the reconstruction is incomplete",
+    "Disassembly gives behaviour with complete fidelity and intent not at all"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A loop body advances rdi by 16 each iteration and reads dword ptr [rdi - 4] and byte ptr [rdi], with rdi having been increased by 4 before the loop. What are the field offsets?",
+      "choices": {
+        "A": "-4 and 0",
+        "B": "0 and 4 — undo the bias of 4 that was applied before the loop",
+        "C": "4 and 8",
+        "D": "12 and 16"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The bias exists so both accesses use small displacements. Forgetting to undo it makes every recovered field offset wrong by exactly that constant."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "The loop is bounded by cmp rsi, rcx followed by je, and guarded at the top by test rsi, rsi followed by jle. What does that tell you about the count parameter?",
+      "choices": {
+        "A": "It is unsigned",
+        "B": "It is signed — jle is the signed condition, so a negative count is handled by returning immediately",
+        "C": "It is a pointer",
+        "D": "Nothing about its type"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Signedness is visible in the condition names, not the comparison. jle and jl are signed; jbe and jb are unsigned."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "The reconstruction recovered the element size and two field offsets but not the remaining eleven bytes of the structure. Why?",
+      "choices": {
+        "A": "The disassembler failed",
+        "B": "The function never touches them, so nothing in the code refers to them; their existence is known only from the 16-byte stride",
+        "C": "They were optimised away",
+        "D": "They are in a different section"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Disassembly gives behaviour with complete fidelity. What the code does not do leaves no trace beyond the space it occupies."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why is 'account for every instruction' the step that must not be skipped?",
+      "choices": {
+        "A": "To produce a complete report",
+        "B": "A reconstruction that explains most instructions is a guess; an instruction you cannot explain means the function does something you have not accounted for",
+        "C": "To find dead code",
+        "D": "To measure performance"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "In the worked example the unconditional jmp into the middle of the loop is explained by loop rotation. An unexplained instruction is the signal that the reading is incomplete."
+    }
+  ]
+}

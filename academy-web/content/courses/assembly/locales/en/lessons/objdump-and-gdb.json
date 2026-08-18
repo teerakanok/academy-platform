@@ -1,0 +1,294 @@
+{
+  "nodeId": "objdump-and-gdb",
+  "locale": "en",
+  "title": "The tools that read a binary for you",
+  "objective": "By the end of this lesson you can disassemble a binary three different ways, list what a stripped binary still tells you, and drive a debugger to inspect registers, memory and the call stack of a running program.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Everything so far has used compiler output, where names and structure are still present. Real analysis usually starts from a finished binary. These are the tools for that, and the first thing they show is how much survives and how much does not."
+    },
+    {
+      "kind": "heading",
+      "text": "objdump: what is actually in the file"
+    },
+    {
+      "kind": "code",
+      "caption": "Real output, including the machine-code bytes",
+      "lines": [
+        "  $ objdump -d --x86-asm-syntax=intel ./prog",
+        "",
+        "  0000000100000340 <_add3>:",
+        "  100000340: 55                       push  rbp",
+        "  100000341: 48 89 e5                 mov   rbp, rsp",
+        "  100000344: 8d 04 37                 lea   eax, [rdi + rsi]",
+        "  100000347: 01 d0                    add   eax, edx",
+        "  100000349: 5d                       pop   rbp",
+        "  10000034a: c3                       ret",
+        "  10000034b: 0f 1f 44 00 00           nop   dword ptr [rax + rax]",
+        "",
+        "  address    machine code             instruction",
+        "",
+        "/* Six instructions occupying 1, 3, 3, 2, 1 and 1 bytes. That variability",
+        "   is the CISC encoding the architecture course described, made concrete:",
+        "   RISC-V would have used exactly 4 bytes for every one of them. The nop",
+        "   at the end is padding so the next function starts on an aligned address. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The byte column is worth reading, not skipping",
+      "text": "It shows the instruction lengths, which is how you know whether a jump target lands on a real instruction boundary. It also lets you spot data that the disassembler has mistaken for code: a run of bytes that decodes into nonsense mnemonics is usually a string table or a jump table being read as instructions. On a variable-length architecture a disassembler that starts at the wrong offset produces a completely different and completely plausible-looking instruction stream, so knowing where the boundaries really are matters."
+    },
+    {
+      "kind": "heading",
+      "text": "What stripping removes, and what it cannot"
+    },
+    {
+      "kind": "code",
+      "caption": "The same program before and after strip",
+      "lines": [
+        "  $ nm ./prog",
+        "    0000000100000000 T __mh_execute_header",
+        "    0000000100000340 T _add3",
+        "    0000000100000350 T _main",
+        "",
+        "  $ strip ./prog && nm ./prog",
+        "    0000000100000000 T __mh_execute_header",
+        "",
+        "  The same function, disassembled after stripping:",
+        "",
+        "  0000000100000340 <__text>:",
+        "  100000340: 55                       push  rbp",
+        "  100000341: 48 89 e5                 mov   rbp, rsp",
+        "  ...",
+        "",
+        "/* Byte for byte identical code. What was lost is only the names. This is",
+        "   the difference between reading a binary that ships with symbols and one",
+        "   that does not, and it is the whole reason reverse engineering is work:",
+        "   the behaviour is fully visible, and the intent is not. */"
+      ]
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Survives stripping",
+        "Removed by stripping"
+      ],
+      "rows": [
+        [
+          "All the code, byte for byte",
+          "Function and variable names"
+        ],
+        [
+          "All string constants",
+          "Line-number and local-variable debug information"
+        ],
+        [
+          "Dynamically linked function names, in the import table",
+          "Static internal symbol names"
+        ],
+        [
+          "The structure of calls and jumps",
+          "Any hint of the original source layout"
+        ],
+        [
+          "Data layout, readable from address arithmetic",
+          ""
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The third row on the left is often the most valuable: a stripped binary that calls into libc still has to name the functions it imports, so a list of imports tells you a great deal about what the program does. A binary importing socket, connect and send is doing networking whether or not any of its own functions have names."
+    },
+    {
+      "kind": "heading",
+      "text": "A first pass over an unfamiliar binary"
+    },
+    {
+      "kind": "code",
+      "caption": "Four commands, in this order",
+      "lines": [
+        "  file ./prog              # architecture, format, stripped or not, static or dynamic",
+        "  nm -g ./prog             # global symbols, if any survived",
+        "  strings -a ./prog        # embedded text: messages, paths, URLs, format strings",
+        "  objdump -d ./prog        # the code itself",
+        "",
+        "  On Linux add:",
+        "  readelf -h ./prog        # ELF header: entry point, type",
+        "  readelf -d ./prog        # dynamic section: which libraries it needs",
+        "  objdump -T ./prog        # dynamic symbols: what it imports",
+        "",
+        "/* Run them in that order because each narrows the next. strings before",
+        "   objdump in particular: a format string like \"user %s logged in\" tells",
+        "   you what a function does faster than reading its instructions. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Disassembling with a debugger"
+    },
+    {
+      "kind": "code",
+      "caption": "Real output from gdb and lldb on the same binary",
+      "lines": [
+        "  $ gdb ./prog -batch -ex 'set disassembly-flavor intel' -ex 'disassemble add3'",
+        "",
+        "  Dump of assembler code for function add3:",
+        "     0x0000000100000340 <+0>:   push   rbp",
+        "     0x0000000100000341 <+1>:   mov    rbp,rsp",
+        "     0x0000000100000344 <+4>:   lea    eax,[rdi+rsi*1]",
+        "     0x0000000100000347 <+7>:   add    eax,edx",
+        "     0x0000000100000349 <+9>:   pop    rbp",
+        "     0x000000010000034a <+10>:  ret",
+        "  End of assembler dump.",
+        "",
+        "  $ lldb -b -o 'disassemble -n add3' ./prog",
+        "",
+        "  prog`add3:",
+        "  prog[0x100000340] <+0>:  pushq  %rbp",
+        "  prog[0x100000341] <+1>:  movq   %rsp, %rbp",
+        "  prog[0x100000344] <+4>:  leal   (%rdi,%rsi), %eax",
+        "  prog[0x100000347] <+7>:  addl   %edx, %eax",
+        "",
+        "/* The same six instructions from three tools. Note the offsets <+0>, <+1>,",
+        "   <+4> -- both debuggers number instructions by their byte offset from the",
+        "   function's start, which is often more useful than the absolute address",
+        "   because it does not change when the program is loaded somewhere else. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Note that gdb defaults to AT&T and lldb to Intel, so the two outputs above look different despite describing identical bytes. This is the difference the syntax lesson prepared you for, and it is why the first command in the gdb line sets the flavour explicitly."
+    },
+    {
+      "kind": "heading",
+      "text": "Driving a running program"
+    },
+    {
+      "kind": "code",
+      "caption": "The commands that matter, in both debuggers",
+      "lines": [
+        "  purpose                     gdb                          lldb",
+        "  ------------------------    -------------------------    ------------------------",
+        "  break at a function         break add3                   b add3",
+        "  break at an address         break *0x100000344           b -a 0x100000344",
+        "  start                       run                          run",
+        "  one INSTRUCTION forward     stepi                        thread step-inst",
+        "  one source line forward     step                         thread step-in",
+        "  continue                    continue                     continue",
+        "  read registers              info registers rdi rsi       register read rdi rsi",
+        "  read memory as 8-byte hex   x/4xg $rsp                   memory read -f x -s8 -c4 $rsp",
+        "  read memory as a string     x/s $rdi                     memory read -f s $rdi",
+        "  call stack                  bt                           bt",
+        "  disassemble here            disassemble                  disassemble -f",
+        "  watch a memory location     watch *0x1234                watchpoint set expression -- 0x1234",
+        "",
+        "/* stepi is the one that separates debugging source from debugging machine",
+        "   code. step follows source lines and will walk through a whole optimised",
+        "   loop in one keystroke; stepi advances exactly one instruction, which is",
+        "   what you want when the source line no longer corresponds to anything. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "x/4xg $rsp is the single most useful command",
+      "text": "It prints the four 8-byte values at the top of the stack. Immediately after entering a function you will see the return address there; inside a frame you will see saved registers and locals. Learning to read that output against the frame layout from the stack-frames lesson is what turns a debugger from a stepping tool into an inspection tool. The letters are: x for hexadecimal, g for giant, meaning 8 bytes."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "A debugger needs permission to attach",
+      "text": "On macOS, debugging a binary you did not build may require it to be signed with the get-task-allow entitlement, and emulated binaries may not be debuggable at all. On Linux, ptrace_scope may prevent attaching to a process you did not start. If a debugger refuses to run or attach, check the platform's restriction before assuming the binary is doing something clever to resist you — it usually is not."
+    },
+    {
+      "kind": "try",
+      "title": "Analyse a binary you did not build",
+      "steps": [
+        "Compile a small program with several functions, then copy it and strip the copy",
+        "Run file, nm and strings on both and record what differs",
+        "Disassemble one function in both and confirm the bytes are identical",
+        "Set a breakpoint on a function, run, and print the first three argument registers",
+        "Print the top four values on the stack and identify the return address",
+        "Use stepi to advance through the prologue one instruction at a time, watching rsp",
+        "Take a backtrace and match it against the frames you have been watching",
+        "Pick any system binary on your machine and do a first pass with the four commands"
+      ],
+      "expected": "Identical code from both copies, argument registers holding the values you passed, and a stack whose top word is the return address into the caller. The final step is where this becomes a skill rather than an exercise: running the four-command pass on a real binary and forming an accurate impression of what it does within a minute or two is the everyday reality of the work."
+    }
+  ],
+  "cheatsheet": [
+    "objdump -d shows addresses, machine-code bytes and instructions",
+    "The byte column reveals instruction lengths and misdecoded data",
+    "Instruction lengths measured here: 1, 3, 3, 2, 1, 1 bytes for six instructions",
+    "Stripping removes names but not code, strings, imports or structure",
+    "First pass: file, nm -g, strings -a, objdump -d — in that order",
+    "On Linux add readelf -h, readelf -d and objdump -T",
+    "gdb defaults to AT&T; lldb defaults to Intel — set the flavour explicitly",
+    "Both number instructions as <+n>, the byte offset from the function start",
+    "stepi advances one instruction; step advances one source line",
+    "x/4xg $rsp prints the top four 8-byte stack values; x is hex, g is 8 bytes",
+    "A debugger that cannot attach is usually blocked by the platform, not by the binary"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why is the machine-code byte column in objdump output worth reading?",
+      "choices": {
+        "A": "It shows the instruction encodings for reference",
+        "B": "It reveals instruction lengths, so you can tell whether a jump target lands on a real boundary and whether data is being misdecoded as code",
+        "C": "It is needed to patch the binary",
+        "D": "It shows the addresses"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "On a variable-length architecture, starting a disassembly at the wrong offset produces a completely different and completely plausible instruction stream. Knowing where the boundaries are is what prevents that."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A binary has been stripped. What can you still learn about it?",
+      "choices": {
+        "A": "Nothing useful",
+        "B": "All the code, all string constants, the names of dynamically imported functions, and the data layout readable from address arithmetic",
+        "C": "Only the entry point",
+        "D": "Only the strings"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Stripping removes names, not behaviour. The import list is often the most informative part: a binary importing socket, connect and send is doing networking regardless of what its own functions are called."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "You are stopped inside an optimised function whose source line no longer corresponds to anything. Which command do you want?",
+      "choices": {
+        "A": "step, to follow the source",
+        "B": "stepi, which advances exactly one machine instruction",
+        "C": "continue",
+        "D": "finish"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "step follows source lines and can walk an entire optimised loop in one keystroke. stepi is the command for debugging machine code rather than source."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "You have just stopped at the first instruction of a function. What does x/4xg $rsp show you?",
+      "choices": {
+        "A": "The function's local variables",
+        "B": "The top four 8-byte stack values, the first of which is the return address pushed by call",
+        "C": "The argument registers",
+        "D": "The instruction bytes"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Reading that output against the frame layout is what turns a debugger into an inspection tool. x is hexadecimal and g means giant, eight bytes."
+    }
+  ]
+}
