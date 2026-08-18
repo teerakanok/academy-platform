@@ -89,17 +89,41 @@
       "kind": "callout",
       "tone": "info",
       "title": "Which is why commits are the real safety net",
-      "text": "A commit, even a scruffy one on a throwaway branch, is recoverable forever. Uncommitted work is the only thing with no record. If you are about to do something risky, the cheapest insurance is to commit first — you can always tidy the history afterwards, and this lesson is why that is true."
+      "text": "A commit, even a scruffy one on a throwaway branch, leaves a record you can find again — which uncommitted work never does. That record is not permanent, though: Git expires reflog entries for unreachable commits after 30 days by default (90 for reachable ones), and housekeeping then removes the commits themselves. Recovery is reliable in the days after a mistake, not months later. Uncommitted work is the only thing with no record. If you are about to do something risky, the cheapest insurance is to commit first — you can always tidy the history afterwards, and this lesson is why that is true."
     },
     {
       "kind": "table",
-      "headers": ["Lost", "Recoverable?", "How"],
+      "headers": [
+        "Lost",
+        "Recoverable?",
+        "How"
+      ],
       "rows": [
-        ["Commits dropped by reset --hard", "Yes", "git reflog then reset --hard to the earlier entry"],
-        ["A deleted branch", "Yes", "git branch <name> <id from reflog>"],
-        ["An overwritten commit from amend", "Yes", "reflog holds the pre-amend commit"],
-        ["Commits abandoned by a rebase", "Yes", "reflog holds the originals"],
-        ["Uncommitted edits discarded with restore", "No", "They were never recorded anywhere"]
+        [
+          "Commits dropped by reset --hard",
+          "Yes",
+          "git reflog then reset --hard to the earlier entry"
+        ],
+        [
+          "A deleted branch",
+          "Yes",
+          "git branch <name> <id from reflog>"
+        ],
+        [
+          "An overwritten commit from amend",
+          "Yes",
+          "reflog holds the pre-amend commit"
+        ],
+        [
+          "Commits abandoned by a rebase",
+          "Yes",
+          "reflog holds the originals"
+        ],
+        [
+          "Uncommitted edits discarded with restore",
+          "No",
+          "They were never recorded anywhere"
+        ]
       ]
     },
     {
@@ -139,7 +163,9 @@
         "C": "Only commits that were pushed",
         "D": "The remote repository's history"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "It is a local log of pointer movement, which is exactly what you need to return to a state you left by accident."
     },
     {
@@ -151,7 +177,9 @@
         "C": "The commits moved to main",
         "D": "You must restore from a backup"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "A branch is a pointer. Deleting the pointer does not delete the commits — git branch <name> <id> puts the label back."
     },
     {
@@ -163,7 +191,9 @@
         "C": "Uncommitted edits discarded with git restore",
         "D": "Commits replaced by a rebase"
       },
-      "correct": ["C"],
+      "correct": [
+        "C"
+      ],
       "explanation": "The reflog records commits. Work that was never committed has no entry, so there is nothing to return to."
     },
     {
@@ -175,7 +205,9 @@
         "C": "Push to the remote immediately",
         "D": "Run git gc"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Once it is a commit it is recoverable through the reflog no matter what happens next, and the history can always be tidied afterwards."
     }
   ]

@@ -84,11 +84,27 @@
     },
     {
       "kind": "table",
-      "headers": ["Command", "History", "Your files"],
+      "headers": [
+        "Command",
+        "History",
+        "Your files"
+      ],
       "rows": [
-        ["git reset --soft HEAD~1", "Last commit removed", "Kept, and still staged"],
-        ["git reset HEAD~1", "Last commit removed", "Kept, unstaged"],
-        ["git reset --hard HEAD~1", "Last commit removed", "Discarded — gone from disk"]
+        [
+          "git reset --soft HEAD~1",
+          "Last commit removed",
+          "Kept, and still staged"
+        ],
+        [
+          "git reset HEAD~1",
+          "Last commit removed",
+          "Kept, unstaged"
+        ],
+        [
+          "git reset --hard HEAD~1",
+          "Last commit removed",
+          "Discarded — gone from disk"
+        ]
       ]
     },
     {
@@ -103,13 +119,37 @@
     },
     {
       "kind": "table",
-      "headers": ["Situation", "Use", "Safe on shared work?"],
+      "headers": [
+        "Situation",
+        "Use",
+        "Safe on shared work?"
+      ],
       "rows": [
-        ["Discard edits to a file", "git restore <file>", "Yes — nothing was shared"],
-        ["Unstage a file", "git restore --staged <file>", "Yes"],
-        ["Fix the very last commit", "git commit --amend", "Only if not pushed"],
-        ["Undo an older commit", "git revert <id>", "Yes — this is the shared-work answer"],
-        ["Drop recent commits locally", "git reset --soft / --hard", "No — rewrites history"]
+        [
+          "Discard edits to a file",
+          "git restore <file>",
+          "Yes — nothing was shared"
+        ],
+        [
+          "Unstage a file",
+          "git restore --staged <file>",
+          "Yes"
+        ],
+        [
+          "Fix the very last commit",
+          "git commit --amend",
+          "Only if not pushed"
+        ],
+        [
+          "Undo an older commit",
+          "git revert <id>",
+          "Yes — this is the shared-work answer"
+        ],
+        [
+          "Drop recent commits locally",
+          "git reset --soft / --hard",
+          "No — rewrites history"
+        ]
       ]
     },
     {
@@ -121,7 +161,7 @@
         "Run: echo 'oops' >> notes.txt && git add notes.txt",
         "Run: git restore --staged notes.txt (unstaged, edit still there)",
         "Run: git restore notes.txt",
-        "Run: git commit --allow-empty -m \"Wrong message\"",
+        "Run: echo 'a real edit' >> notes.txt && git commit -am \"Wrong message\"",
         "Run: git commit --amend -m \"Corrected message\" && git log --oneline -3",
         "Run: git revert --no-edit HEAD && git log --oneline -3"
       ],
@@ -149,7 +189,9 @@
         "C": "git commit --amend",
         "D": "Delete the repository and re-clone"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Revert changes nothing that already exists — everyone keeps their history and simply receives one more commit. Rewriting shared history forces conflicts on everyone who has it."
     },
     {
@@ -161,7 +203,9 @@
         "C": "--soft only works on the first commit",
         "D": "--hard keeps a backup automatically"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Both drop the commit. The difference is what happens to the content — and --hard is the one that takes your working changes with it."
     },
     {
@@ -173,7 +217,9 @@
         "C": "Discarding uncommitted changes with git restore",
         "D": "A reverted commit"
       },
-      "correct": ["C"],
+      "correct": [
+        "C"
+      ],
       "explanation": "Work that was never committed was never recorded anywhere, so there is nothing to recover. Everything already committed leaves a trace that can usually be found again."
     },
     {
@@ -185,7 +231,9 @@
         "C": "git reset --hard HEAD~1",
         "D": "Make a second commit called 'fix previous commit'"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Amend folds the forgotten file into the existing commit and keeps its message. It is safe here precisely because the commit has not been shared yet."
     }
   ]

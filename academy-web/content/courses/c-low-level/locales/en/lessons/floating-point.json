@@ -41,11 +41,31 @@
     },
     {
       "kind": "table",
-      "headers": ["Type", "Bits", "Roughly", "Use for"],
+      "headers": [
+        "Type",
+        "Bits",
+        "Roughly",
+        "Use for"
+      ],
       "rows": [
-        ["float", "32", "7 significant decimal digits", "Graphics, large arrays where memory matters"],
-        ["double", "64", "15-16 significant decimal digits", "The default for calculations"],
-        ["long double", "80 or more, platform-dependent", "More", "Rarely — and not portably"]
+        [
+          "float",
+          "32",
+          "7 significant decimal digits",
+          "Graphics, large arrays where memory matters"
+        ],
+        [
+          "double",
+          "64",
+          "15-16 significant decimal digits",
+          "The default for calculations"
+        ],
+        [
+          "long double",
+          "80 or more, platform-dependent",
+          "More",
+          "Rarely — and not portably"
+        ]
       ]
     },
     {
@@ -106,13 +126,22 @@
       "lines": [
         "double total = 0.0;",
         "for (int i = 0; i < 1000; i++) total += 0.01;",
-        "printf(\"%.10f\\n\", total);       /* 9.9999999999 — not 10 */",
+        "",
+        "printf(\"%.10f\\n\", total);       /* 10.0000000000 — printf rounded it for you */",
+        "printf(\"%.15f\\n\", total);       /* 9.999999999999831 — the real value */",
+        "printf(\"%s\\n\", total == 10.0 ? \"equal\" : \"not equal\");   /* not equal */",
         "",
         "/* Use integer minor units instead: */",
         "long total_cents = 0;",
         "for (int i = 0; i < 1000; i++) total_cents += 1;",
         "printf(\"%ld.%02ld\\n\", total_cents / 100, total_cents % 100);   /* exactly 10.00 */"
       ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Printing can hide the error entirely",
+      "text": "At ten decimal places the sum prints as 10.0000000000, because printf rounds the value it is given. The stored number is still not ten — the comparison proves it. This is why a bug like this survives testing: it looks correct on screen and fails only where the value is compared, summed again, or checked against another system."
     },
     {
       "kind": "list",
@@ -180,7 +209,9 @@
         "C": "The processor is imprecise",
         "D": "double is too small for these values"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Only fractions whose denominator is a power of two are exact. This is a property of the representation, identical in every language using the same hardware format."
     },
     {
@@ -192,7 +223,9 @@
         "C": "By casting both to int",
         "D": "By printing both and comparing the strings"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "A fixed epsilon that works near 1 is meaningless near a million, which is why a relative tolerance is usually the right choice."
     },
     {
@@ -204,7 +237,9 @@
         "C": "double cannot represent decimals at all",
         "D": "It is slower than integer arithmetic"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Adding 0.01 a thousand times does not give exactly 10. Integer cents are exact, and rounding then happens only where you decide it should."
     },
     {
@@ -216,7 +251,9 @@
         "C": "x == 0",
         "D": "x < 0 && x > 0"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Every comparison involving NaN is false, so == can never detect it. That property also means x != x works as a test, but isnan states the intent."
     }
   ]

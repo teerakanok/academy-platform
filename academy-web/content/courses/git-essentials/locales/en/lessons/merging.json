@@ -56,7 +56,7 @@
       "kind": "callout",
       "tone": "info",
       "title": "A merge commit is not clutter",
-      "text": "It records a true fact — that two lines of development came together at this point, and which two. Teams that ban merge commits entirely lose that information; teams that produce them for every tiny change make the history hard to read. Most teams sit in the middle: merge commits for real branches, tidy history within a branch."
+      "text": "It records a true fact — that two lines of development came together at this point, and which two. Teams that ban merge commits entirely lose that information; teams that produce them for every tiny change make the history hard to read. A common middle ground: merge commits for real branches, tidy history within a branch."
     },
     {
       "kind": "heading",
@@ -95,12 +95,32 @@
     },
     {
       "kind": "table",
-      "headers": ["Command", "What it does", "When"],
+      "headers": [
+        "Command",
+        "What it does",
+        "When"
+      ],
       "rows": [
-        ["git merge feature", "Fast-forward if possible, otherwise a merge commit", "The default, and usually right"],
-        ["git merge --no-ff feature", "Always create a merge commit", "You want the branch visible as a unit in the history"],
-        ["git merge --squash feature", "Bring the changes in as one uncommitted change", "Many small messy commits you do not want to preserve"],
-        ["git merge --abort", "Return to the state before you started", "A conflicted merge you would rather redo later"]
+        [
+          "git merge feature",
+          "Fast-forward if possible, otherwise a merge commit",
+          "The default, and usually right"
+        ],
+        [
+          "git merge --no-ff feature",
+          "Always create a merge commit",
+          "You want the branch visible as a unit in the history"
+        ],
+        [
+          "git merge --squash feature",
+          "Bring the changes in as one uncommitted change",
+          "Many small messy commits you do not want to preserve"
+        ],
+        [
+          "git merge --abort",
+          "Return to the state before you started",
+          "A conflicted merge you would rather redo later"
+        ]
       ]
     },
     {
@@ -138,7 +158,9 @@
         "C": "git merge main feature/upload from anywhere",
         "D": "git switch main then git merge --abort"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "You stand on the branch that receives the work, then merge the other one into it. Doing it the other way round brings main's commits into the feature branch instead."
     },
     {
@@ -150,7 +172,9 @@
         "C": "Only when there is a conflict",
         "D": "Only if you pass --no-ff"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "If the receiving branch has not moved, the label can simply slide forward. If both moved, a commit with two parents is needed to join them."
     },
     {
@@ -162,7 +186,9 @@
         "C": "Git corrupted a file",
         "D": "The merge commit overwrote the tests"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Git compares text, not meaning. This is exactly why the test run belongs after the merge as well as before it."
     },
     {
@@ -174,7 +200,9 @@
         "C": "Compresses the repository",
         "D": "Merges without running hooks"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "It is the option for a branch full of small messy commits whose individual steps are not worth keeping in the shared history."
     }
   ]
