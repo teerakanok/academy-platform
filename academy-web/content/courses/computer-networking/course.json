@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 177,
+  "estimatedMinutes": 231,
   "coverMotif": "cloud",
   "skills": [
     {
@@ -152,6 +152,40 @@
       "estimatedMinutes": 16,
       "skillWeights": {
         "network-security": 4
+      }
+    },
+    {
+      "id": "file-descriptors",
+      "kind": "lesson",
+      "prerequisites": [
+        "layers-and-encapsulation"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "socket-programming": 3
+      }
+    },
+    {
+      "id": "blocking-vs-nonblocking",
+      "kind": "lesson",
+      "prerequisites": [
+        "file-descriptors"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "socket-programming": 4
+      }
+    },
+    {
+      "id": "select-poll-epoll",
+      "kind": "lesson",
+      "prerequisites": [
+        "blocking-vs-nonblocking"
+      ],
+      "estimatedMinutes": 20,
+      "skillWeights": {
+        "socket-programming": 4,
+        "server-design": 3
       }
     }
   ]

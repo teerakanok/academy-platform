@@ -1,0 +1,224 @@
+{
+  "nodeId": "blocking-vs-nonblocking",
+  "locale": "en",
+  "title": "Waiting, or not waiting",
+  "objective": "By the end of this lesson you can explain what a blocking call does to your program, switch a descriptor to non-blocking mode, and handle the error that non-blocking mode introduces without turning your program into a busy loop.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "By default, read() on a socket with no data waits. The thread stops, uses no CPU, and resumes when something arrives. That is blocking, and for a program doing one thing at a time it is exactly right. The moment a program has to attend to two connections, it becomes a problem — because while it waits on one, it cannot notice the other."
+    },
+    {
+      "kind": "heading",
+      "text": "What blocking costs, and what it does not"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "Blocking",
+        "Non-blocking"
+      ],
+      "rows": [
+        [
+          "No data available",
+          "The call waits",
+          "The call returns immediately with an error meaning 'not now'"
+        ],
+        [
+          "CPU while waiting",
+          "None — the thread is asleep",
+          "None, if you wait properly; all of it if you loop"
+        ],
+        [
+          "Code shape",
+          "Straightforward, top to bottom",
+          "Every call needs a 'not ready' branch"
+        ],
+        [
+          "Handling many connections",
+          "One thread each",
+          "One thread can watch them all"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Blocking is not wasteful in itself",
+      "text": "A blocked thread consumes no CPU — the scheduler simply does not run it, exactly as the operating systems course described. What it consumes is a thread, and threads have a memory cost and a switching cost. That is the real limit: not that waiting is expensive, but that having ten thousand threads waiting is."
+    },
+    {
+      "kind": "heading",
+      "text": "Switching a descriptor"
+    },
+    {
+      "kind": "code",
+      "caption": "Setting non-blocking mode without disturbing other flags",
+      "lines": [
+        "#include <fcntl.h>",
+        "",
+        "int flags = fcntl(fd, F_GETFL, 0);",
+        "if (flags < 0) { perror(\"fcntl F_GETFL\"); return -1; }",
+        "if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) < 0) {",
+        "    perror(\"fcntl F_SETFL\");",
+        "    return -1;",
+        "}",
+        "",
+        "/* Read the existing flags and add to them. Setting O_NONBLOCK on its own",
+        "   would clear everything else that was set. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The error that means 'nothing yet'"
+    },
+    {
+      "kind": "paragraph",
+      "text": "On a non-blocking descriptor, a read with no data available returns -1 and sets errno to EAGAIN. The Linux manual states that EAGAIN and EWOULDBLOCK have the same value on all architectures, so testing for either is correct there — but portable code tests for both, because the standard permits them to differ. Neither is a failure: it is the normal answer to 'is there anything?' when there is not, and your code must treat it as a distinct case rather than as an error."
+    },
+    {
+      "kind": "code",
+      "caption": "The three outcomes every non-blocking read has",
+      "lines": [
+        "ssize_t n = read(fd, buf, sizeof buf);",
+        "",
+        "if (n > 0) {",
+        "    /* got n bytes — remember it may be fewer than a whole message */",
+        "} else if (n == 0) {",
+        "    /* the peer closed its side */",
+        "} else if (errno == EAGAIN || errno == EWOULDBLOCK) {",
+        "    /* nothing available right now — NOT an error */",
+        "} else if (errno == EINTR) {",
+        "    /* a signal interrupted the call — just try again */",
+        "} else {",
+        "    /* a real error: connection reset, and so on */",
+        "}"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Non-blocking alone gives you a busy loop, not efficiency",
+      "text": "Making a descriptor non-blocking and then calling read in a tight loop burns an entire core asking 'anything yet?' millions of times a second. It is slower and far more wasteful than the blocking version it replaced. Non-blocking mode is only half of a design — the other half is a call that sleeps until at least one descriptor is ready, which is the subject of the next lesson."
+    },
+    {
+      "kind": "heading",
+      "text": "Writing can block too"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This is the half people forget. If the receiver is slow, the buffers between you fill up, and a blocking write waits until there is room. A non-blocking write returns EAGAIN, or writes only part of what you asked — which means your code must track how much was actually written and send the rest later."
+    },
+    {
+      "kind": "code",
+      "caption": "A partial write is normal and must be handled",
+      "lines": [
+        "size_t sent = 0;",
+        "while (sent < len) {",
+        "    ssize_t n = write(fd, buf + sent, len - sent);",
+        "    if (n > 0) { sent += n; continue; }",
+        "    if (n < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) break;  /* try later */",
+        "    if (n < 0 && errno == EINTR) continue;",
+        "    /* real error */",
+        "    break;",
+        "}",
+        "",
+        "/* Assuming write() sends everything is the same class of bug as",
+        "   assuming read() returns a whole message. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Timeouts: a third option"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Between waiting forever and not waiting at all, a socket can be given a receive or send timeout. The call blocks, but only for a bounded time, and then returns with EAGAIN. For a client that needs to give up on an unresponsive server, this is often simpler than full non-blocking code."
+    },
+    {
+      "kind": "try",
+      "title": "Feel the difference",
+      "steps": [
+        "Write a program that connects to a listening port and calls read() once, then prints the result",
+        "Start a listener that accepts but sends nothing: nc -l 9000",
+        "Run your program — it should hang in read(), and top should show it using no CPU",
+        "Confirm with: cat /proc/<pid>/status | grep State    (it should be sleeping)",
+        "Now set O_NONBLOCK before the read and run it again — it should return immediately",
+        "Print errno with perror and confirm you see 'Resource temporarily unavailable'",
+        "Wrap that read in a tight loop and watch CPU usage go to 100% of one core",
+        "Add a receive timeout with setsockopt SO_RCVTIMEO instead, and confirm it returns after the timeout"
+      ],
+      "expected": "A blocking read that sleeps at zero CPU, a non-blocking read that returns EAGAIN instantly, and a busy loop that pins a core. Seeing that third state is the point: non-blocking without a readiness mechanism is worse than what it replaced, which is exactly why the next lesson exists."
+    }
+  ],
+  "cheatsheet": [
+    "Blocking: the call waits; the thread sleeps and uses no CPU",
+    "The cost of blocking is a thread per connection, not CPU while waiting",
+    "fcntl F_GETFL then F_SETFL with flags | O_NONBLOCK — never set O_NONBLOCK alone",
+    "On a non-blocking descriptor, no data gives -1 with errno EAGAIN (same as EWOULDBLOCK on Linux)",
+    "EAGAIN is not an error; EINTR means retry; anything else is a real failure",
+    "Every read has four outcomes: data, peer closed, not ready, real error",
+    "write can block too, and a partial write is normal — track how much was sent",
+    "Non-blocking plus a tight loop burns a core and is worse than blocking",
+    "SO_RCVTIMEO gives a bounded wait, which is often enough for a client"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A blocking read waits ten seconds for data. How much CPU does the thread use during that time?",
+      "choices": {
+        "A": "One core, spinning",
+        "B": "None — a blocked thread is not scheduled at all",
+        "C": "It depends on the timeout",
+        "D": "Half a core"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Blocking is cheap in CPU terms. What it costs is a thread, which has a memory and switching cost — and that is what limits how many connections this model can handle."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "read() on a non-blocking socket returns -1 with errno EAGAIN. What should your code do?",
+      "choices": {
+        "A": "Close the connection",
+        "B": "Treat it as 'nothing available yet' and come back later — it is not an error",
+        "C": "Retry immediately in a loop",
+        "D": "Report a failure to the user"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "It is the normal answer when there is no data. Retrying immediately in a loop is the busy-wait mistake; the correct next step is to wait for readiness, which the next lesson covers."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why is setting O_NONBLOCK with fcntl(fd, F_SETFL, O_NONBLOCK) wrong?",
+      "choices": {
+        "A": "O_NONBLOCK cannot be set with fcntl",
+        "B": "It replaces all the flags instead of adding one, clearing anything else that was set",
+        "C": "It needs to be done before connect",
+        "D": "It only works on files"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Read the current flags with F_GETFL and OR the new one in. This is a small bug that produces confusing behaviour much later."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Your non-blocking server uses 100% of one core while idle. What is the most likely cause?",
+      "choices": {
+        "A": "Too many connections",
+        "B": "It calls read in a tight loop instead of waiting for readiness",
+        "C": "A memory leak",
+        "D": "The kernel is misconfigured"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Non-blocking mode is only half a design. Without a call that sleeps until a descriptor is ready, the program spends every cycle asking whether anything has arrived."
+    }
+  ]
+}

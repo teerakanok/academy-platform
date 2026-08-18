@@ -1,0 +1,240 @@
+{
+  "nodeId": "file-descriptors",
+  "locale": "en",
+  "title": "A socket is a file descriptor",
+  "objective": "By the end of this lesson you can explain why the same read and write calls work on files, pipes, terminals and sockets, and name the ways a socket genuinely differs from a file.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "You have used file descriptors since the first module of the operating systems course. A socket is one too — the same small integer, the same read and write, the same close. That uniformity is deliberate, and it is why a program can be pointed at a file or a network connection without changing the code that moves the bytes."
+    },
+    {
+      "kind": "heading",
+      "text": "One interface, many kinds of thing"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Descriptor refers to",
+        "Created by",
+        "Reading gives you"
+      ],
+      "rows": [
+        [
+          "A regular file",
+          "open()",
+          "Bytes from disk, at your current position"
+        ],
+        [
+          "A pipe",
+          "pipe()",
+          "Whatever the writing end sent"
+        ],
+        [
+          "A terminal",
+          "Inherited as 0, 1, 2",
+          "What the user typed"
+        ],
+        [
+          "A socket",
+          "socket() or accept()",
+          "Whatever arrived from the network"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Every one of those is read with read() and written with write(). A program that copies its input to its output works on all four without knowing which it has — which is exactly what makes shell pipelines from the Linux course composable, and what lets a network service be tested by pointing it at a file."
+    },
+    {
+      "kind": "code",
+      "caption": "The same code, three sources",
+      "lines": [
+        "int fd;",
+        "",
+        "fd = open(\"data.txt\", O_RDONLY);        /* a file   */",
+        "fd = 0;                                  /* stdin    */",
+        "fd = socket(AF_INET, SOCK_STREAM, 0);    /* a socket */",
+        "",
+        "/* From here on, identical: */",
+        "char buf[4096];",
+        "ssize_t n = read(fd, buf, sizeof buf);",
+        "if (n > 0) write(1, buf, n);",
+        "close(fd);"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Where a socket differs"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "A file",
+        "A socket"
+      ],
+      "rows": [
+        [
+          "A short read means",
+          "End of file is near, or you asked for more than remains",
+          "Only part has arrived so far — more may follow"
+        ],
+        [
+          "read returning 0 means",
+          "End of file",
+          "The other end closed its side"
+        ],
+        [
+          "Position",
+          "You can seek anywhere",
+          "No position; bytes arrive once and are consumed"
+        ],
+        [
+          "Failure",
+          "Rare, and usually fatal",
+          "Routine: resets, timeouts, unreachable networks"
+        ],
+        [
+          "Both directions",
+          "One descriptor, one file",
+          "One descriptor, two independent directions"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The bug this causes, in almost every first network program",
+      "text": "Code that treats a socket like a file assumes one read returns the whole message. On a file that is usually true. On a socket it is not: a 1000-byte message may arrive as 500 and 500, or as 1 and 999, with no warning and no error. The fix is a loop that reads until it has what it needs — and the fact that this bug is invisible on a local connection and appears in production is exactly why it is worth knowing now, before you write the code."
+    },
+    {
+      "kind": "heading",
+      "text": "TCP is a byte stream, not a message queue"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This is the same point stated from the protocol's side. TCP guarantees that the bytes you send arrive in order and without gaps. It does not preserve where one write ended and the next began. Three writes of 100 bytes may be read as one block of 300, and one write of 300 may be read as three blocks."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "If you need message boundaries, the protocol on top must create them",
+        "Fixed length: every message is the same size",
+        "Length prefix: send the size first, then that many bytes — the most common approach",
+        "Delimiter: end each message with a marker, as HTTP does with a blank line",
+        "Whatever you choose, the receiver must handle a message split across reads and two messages in one read"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Descriptors are inherited, and that matters"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The process module showed that a child inherits open descriptors across fork, which is how shell redirection works. The same applies to sockets, and it has a consequence worth knowing: a server that forks a worker per connection must close the listening socket in the child and the connection socket in the parent, or descriptors accumulate and a closed connection is never actually released."
+    },
+    {
+      "kind": "code",
+      "caption": "The close pattern for a forking server",
+      "lines": [
+        "int listener = /* ... */;",
+        "int conn = accept(listener, NULL, NULL);",
+        "",
+        "if (fork() == 0) {",
+        "    close(listener);      /* the child does not accept new connections */",
+        "    handle(conn);",
+        "    close(conn);",
+        "    _exit(0);",
+        "}",
+        "close(conn);              /* the parent is done with this one */",
+        "",
+        "/* Miss either close and the descriptor stays open in the wrong process. */"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Treat four kinds of thing the same way",
+      "steps": [
+        "Write a program that reads from descriptor 0 in a loop and writes to descriptor 1 until read returns 0",
+        "Run it with a file: ./copy < data.txt",
+        "Run it in a pipeline: cat data.txt | ./copy | wc -c",
+        "Run it interactively and end with Ctrl-D — that is what makes read return 0",
+        "Now run it as a network endpoint: nc -l 9000 < /dev/null    in one terminal and connect with nc localhost 9000",
+        "Run: ls -l /proc/self/fd     in a shell and identify what each descriptor points at",
+        "For a running server: ls -l /proc/<pid>/fd | head    and count its open sockets",
+        "Run: ss -tnp | grep <pid>    and match the sockets against the descriptors"
+      ],
+      "expected": "One program that works on a file, a pipe, a terminal and a socket without modification, and a running process whose descriptors you can enumerate and identify. The last two commands are how you diagnose a descriptor leak in production — a count that only grows is the signature."
+    }
+  ],
+  "cheatsheet": [
+    "A socket is a file descriptor: same read, write and close",
+    "One program can therefore work on files, pipes, terminals and sockets unchanged",
+    "On a socket, a short read is normal and means more may follow",
+    "read returning 0 on a socket means the other end closed its side",
+    "TCP preserves order and completeness, not message boundaries",
+    "If you need messages, add fixed length, a length prefix, or a delimiter",
+    "The receiver must handle one message split across reads and two messages in one read",
+    "Descriptors are inherited across fork — close the ones each side does not need",
+    "ls -l /proc/<pid>/fd shows what a process has open; a growing count is a leak"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Your program sends a 1000-byte message over TCP. The receiver's first read returns 500 bytes. What happened?",
+      "choices": {
+        "A": "The message was truncated",
+        "B": "Nothing wrong — TCP is a byte stream, so the rest may arrive on a later read",
+        "C": "The connection dropped",
+        "D": "The buffer was too small"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Order and completeness are guaranteed; boundaries are not. Loop until you have the number of bytes your protocol says to expect."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why can the same read() and write() work on a file, a pipe, a terminal and a socket?",
+      "choices": {
+        "A": "The C library detects the type and adapts",
+        "B": "All four are file descriptors — the kernel presents one interface over different kinds of object",
+        "C": "They are all files on disk underneath",
+        "D": "It only works if the sizes match"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "That uniformity is what makes shell pipelines composable and lets the same program be pointed at a file or a connection without changing the code that moves bytes."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "read() returns 0 on a socket. What does that mean?",
+      "choices": {
+        "A": "No data is available yet",
+        "B": "The other end closed its side of the connection",
+        "C": "An error occurred",
+        "D": "The socket is non-blocking"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "On a file it means end of file; on a socket it means the peer performed an orderly close. 'No data yet' on a blocking socket makes read wait rather than return 0."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "A forking server's descriptor count grows steadily and never falls. What is the likely cause?",
+      "choices": {
+        "A": "A memory leak",
+        "B": "The parent is not closing the connection descriptor after forking, so it stays open in both processes",
+        "C": "Too many threads",
+        "D": "The clients are not disconnecting"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The child inherits every open descriptor. Each side must close what it does not need, or the connection is never fully released and the count only rises."
+    }
+  ]
+}
