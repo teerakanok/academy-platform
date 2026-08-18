@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 145,
+  "estimatedMinutes": 177,
   "coverMotif": "cloud",
   "skills": [
     {
@@ -129,6 +129,29 @@
       "estimatedMinutes": 18,
       "skillWeights": {
         "addressing": 4
+      }
+    },
+    {
+      "id": "bgp-overview",
+      "kind": "lesson",
+      "prerequisites": [
+        "routing-basics"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "addressing": 2,
+        "network-model": 2
+      }
+    },
+    {
+      "id": "vpn-concepts",
+      "kind": "lesson",
+      "prerequisites": [
+        "nat"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "network-security": 4
       }
     }
   ]

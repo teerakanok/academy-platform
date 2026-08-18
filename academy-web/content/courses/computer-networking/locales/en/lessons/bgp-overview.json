@@ -1,0 +1,232 @@
+{
+  "nodeId": "bgp-overview",
+  "locale": "en",
+  "title": "How the internet agrees on where things are",
+  "objective": "By the end of this lesson you can explain what an autonomous system is, describe how routes propagate between networks, and say why a single misconfigured announcement can take a service off the internet.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "The routing lesson showed a machine choosing a next hop from its own table. That leaves a question: where do the routers at the top get their tables? Nobody assigns them. Networks tell each other what they can reach, and the protocol they use for that is BGP. It is the reason the internet works, and the reason it occasionally does not."
+    },
+    {
+      "kind": "heading",
+      "text": "The internet is a network of networks"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Each independently operated network — an internet provider, a university, a large company, a cloud platform — is an autonomous system with its own number. Inside one, the operator chooses how to route. Between them, they exchange announcements: 'these address ranges are reachable through me'."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "Inside one network",
+        "Between networks"
+      ],
+      "rows": [
+        [
+          "Goal",
+          "Find the shortest or cheapest path",
+          "Follow policy: cost, contracts, preference"
+        ],
+        [
+          "Who decides",
+          "One operator",
+          "Two parties agreeing separately"
+        ],
+        [
+          "Changes",
+          "Fast, automatic",
+          "Slower, deliberate"
+        ],
+        [
+          "Protocol family",
+          "OSPF, IS-IS and similar",
+          "BGP"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Between networks, the shortest path is not the goal",
+      "text": "Inside your own network you want the fastest route. Between networks, an operator prefers the path that costs them least, or that a contract requires, or that a peering agreement favours — which may be longer. This is the single most important thing to understand about internet routing: it follows business relationships at least as much as geography, which is why traffic between two cities in one country sometimes leaves the country and comes back."
+    },
+    {
+      "kind": "heading",
+      "text": "How a route spreads"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "A network announces to its neighbours: 'I can reach 203.0.113.0/24'",
+        "Each neighbour that accepts it adds its own identifier to the path and passes it on",
+        "A router receiving several announcements for the same range picks one according to its own policy",
+        "The chosen one is installed in the routing table, and the packet-forwarding decision from the earlier lesson uses it",
+        "Withdrawals propagate the same way when a route disappears"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The path each announcement carries serves two purposes: it lets a receiver compare routes, and it prevents loops — a network that sees its own identifier already in a path rejects that announcement, because accepting it would create a circle."
+    },
+    {
+      "kind": "heading",
+      "text": "The trust problem"
+    },
+    {
+      "kind": "paragraph",
+      "text": "In its original design, BGP has no way to verify that an announcement is legitimate. If a network announces a range it does not own, its neighbours may believe it, and traffic for that range starts flowing to the wrong place. This has happened repeatedly, both by accident — a configuration typo — and deliberately."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Failure",
+        "What it looks like",
+        "Effect"
+      ],
+      "rows": [
+        [
+          "Route leak",
+          "A network passes on routes it should have kept to itself",
+          "Traffic takes a wildly indirect path and slows down or drops"
+        ],
+        [
+          "Prefix hijack",
+          "A network announces addresses it does not hold",
+          "Traffic goes to the wrong operator entirely"
+        ],
+        [
+          "More-specific hijack",
+          "A hijacker announces a smaller prefix than the real owner",
+          "It wins, because longest prefix always wins"
+        ],
+        [
+          "Withdrawal",
+          "A network stops announcing its own range",
+          "It disappears from the internet"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The longest-prefix rule works against you here",
+      "text": "The routing lesson established that the most specific route always wins. In global routing that means an operator announcing a /24 out-competes the legitimate holder announcing the /16 that contains it — everywhere that accepts the announcement. The rule is not a bug; it is the same rule that makes routing tractable. It simply has no notion of who is entitled to announce what, which is what the protections below add."
+    },
+    {
+      "kind": "heading",
+      "text": "What is being done about it"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Address holders can publish signed statements saying which networks may announce their ranges, and receivers can check announcements against them",
+        "Operators filter what they accept from customers, rather than believing everything",
+        "Public route-collector projects make announcements visible, so a hijack is noticed in minutes rather than hours",
+        "Encryption limits the damage: traffic diverted through an attacker is still unreadable if it is properly encrypted end to end"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "That last point connects to the ARP lesson. Both protocols answer 'where should this traffic go' and neither authenticates the answer. In both cases the practical defence is the same: assume the path may be hostile, and encrypt so that a diverted path is an availability problem rather than a confidentiality one."
+    },
+    {
+      "kind": "heading",
+      "text": "Why this matters if you do not run a network"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "It explains outages you cannot fix: sometimes a service is unreachable from your provider and fine from another",
+        "It explains latency that geography does not: traffic follows contracts, not straight lines",
+        "It is the mechanism behind large-scale anycast, where the same address is announced from many locations and each user reaches the nearest",
+        "It is why 'the internet is down' is almost always 'a path is down' — the destination is usually fine"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Look at global routing from outside",
+      "steps": [
+        "Find which network an address belongs to: whois -h whois.cymru.com ' -v 1.1.1.1'    if available",
+        "Run: traceroute -A 1.1.1.1     — the -A flag annotates hops with their network numbers where supported",
+        "Count how many distinct networks your traffic crosses to reach a well-known service",
+        "Compare with a service in another country and note whether the count grows",
+        "Open a public looking-glass or route-collector website and search for a well-known prefix",
+        "Note how many different paths exist to the same destination",
+        "Read one recent public report of a routing incident and identify which failure type from the table it was",
+        "Explain why an encrypted connection limited its impact"
+      ],
+      "expected": "A concrete sense of how few networks separate you from most services, and one real incident you can classify. Being able to say 'that was a more-specific hijack, and it won because longest prefix wins' is the level of understanding this lesson is aiming for."
+    }
+  ],
+  "cheatsheet": [
+    "The internet is independently operated networks exchanging reachability announcements",
+    "Each network is an autonomous system with its own number",
+    "Inside a network, routing optimises for speed; between networks, it follows policy and contracts",
+    "An announcement carries the path it travelled, which enables comparison and prevents loops",
+    "BGP as originally designed does not verify that an announcement is legitimate",
+    "Route leak, prefix hijack, more-specific hijack, withdrawal — four distinct failure modes",
+    "Longest prefix always wins, so a more specific announcement beats the legitimate broader one",
+    "Defences: signed authorisations, customer filtering, public monitoring, end-to-end encryption",
+    "Traffic follows business relationships, which is why latency does not always match geography"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why might traffic between two cities in the same country leave the country and come back?",
+      "choices": {
+        "A": "A misconfiguration, always",
+        "B": "Routing between networks follows policy and contracts rather than geography",
+        "C": "Cables only run between countries",
+        "D": "To balance load"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Inside a single network the goal is the shortest path. Between networks it is the path the operator's agreements and costs favour, which may be much longer physically."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "An operator announces a /24 inside a range legitimately held by someone else announcing a /16. What happens?",
+      "choices": {
+        "A": "The announcement is ignored as invalid",
+        "B": "The /24 wins wherever it is accepted, because the most specific route always wins",
+        "C": "Traffic is split between them",
+        "D": "The older announcement takes precedence"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The longest-prefix rule from the routing lesson applies globally, and it has no notion of entitlement. That is precisely what signed authorisations and customer filtering exist to address."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "What does the path carried in an announcement do, besides letting receivers compare routes?",
+      "choices": {
+        "A": "It measures latency",
+        "B": "It prevents loops — a network that sees its own identifier in a path rejects the announcement",
+        "C": "It authenticates the sender",
+        "D": "It sets the packet's hop limit"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Loop prevention is structural. Note what it does not do: it carries no proof that any network on it was entitled to announce the range."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Traffic to your service is hijacked and routed through an attacker. Your connections use TLS. What is the impact?",
+      "choices": {
+        "A": "The attacker reads everything",
+        "B": "Mainly availability and latency — the traffic is diverted but remains unreadable without a certificate the client accepts",
+        "C": "No impact at all",
+        "D": "TLS prevents the hijack from happening"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Same shape as the ARP lesson: the routing layer cannot authenticate, so encryption converts a confidentiality problem into an availability one. It does not prevent the diversion."
+    }
+  ]
+}

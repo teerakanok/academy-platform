@@ -1,0 +1,240 @@
+{
+  "nodeId": "vpn-concepts",
+  "locale": "en",
+  "title": "Tunnels: carrying one network inside another",
+  "objective": "By the end of this lesson you can explain what a tunnel actually does to a packet, say what a VPN does and does not protect, and choose between a full tunnel and a split tunnel for a given purpose.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A tunnel takes a complete packet, treats it as data, and puts it inside another packet. The outer packet travels the ordinary internet; at the far end the inner packet is unwrapped and released as if it had originated there. That is the whole mechanism, and every VPN is an application of it."
+    },
+    {
+      "kind": "heading",
+      "text": "Encapsulation, again"
+    },
+    {
+      "kind": "code",
+      "caption": "What the layers lesson described, applied deliberately",
+      "lines": [
+        "Ordinary packet:",
+        "  [ IP: you -> server ][ TCP ][ your data ]",
+        "",
+        "The same packet through a tunnel:",
+        "  [ IP: you -> VPN gateway ][ encrypted ][ IP: you -> server ][ TCP ][ your data ]",
+        "  |___ what the network sees ___||_________ what only the endpoints see _______|",
+        "",
+        "/* The network between you and the gateway sees one connection,",
+        "   to one address, carrying opaque bytes. The inner packet is invisible. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "That extra header has a size, which is why a VPN connection has a smaller usable packet size than the link it runs over — and why the MTU problems from the layers lesson appear so often on VPNs specifically. If large transfers hang over a tunnel and small ones work, that is the first thing to check."
+    },
+    {
+      "kind": "heading",
+      "text": "What a VPN actually gives you"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Protects",
+        "Does not protect"
+      ],
+      "rows": [
+        [
+          "Your traffic from the local network and its operator",
+          "Your traffic from the VPN provider — you moved the trust, not removed it"
+        ],
+        [
+          "Which sites you visit, from your internet provider",
+          "Your identity from sites you log into"
+        ],
+        [
+          "Your address from the sites you visit",
+          "Anything the site learns from cookies, fingerprinting, or your account"
+        ],
+        [
+          "A connection back into a private network",
+          "Against malware, phishing, or a compromised device"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "A VPN moves trust; it does not eliminate it",
+      "text": "Without one, your internet provider can see which sites you connect to. With one, they see only the tunnel — and the VPN provider now sees what they used to. That is a real improvement on a public network you do not trust, and it is not anonymity. The clearest way to think about it: you are choosing whose logs you appear in."
+    },
+    {
+      "kind": "heading",
+      "text": "Two shapes, for two different jobs"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "Full tunnel",
+        "Split tunnel"
+      ],
+      "rows": [
+        [
+          "What goes through",
+          "Everything",
+          "Only traffic for specific networks"
+        ],
+        [
+          "Local network access",
+          "Usually lost",
+          "Kept"
+        ],
+        [
+          "Speed",
+          "Everything takes a detour",
+          "Only what needs to"
+        ],
+        [
+          "Right for",
+          "Untrusted networks; policy requiring all traffic inspected",
+          "Reaching a company network while working normally otherwise"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The difference is entirely a matter of routing, and you can see it: a full tunnel installs a default route through the tunnel interface, so the longest-prefix rule from the routing lesson sends everything there. A split tunnel installs only specific routes, so everything else continues to use the original default."
+    },
+    {
+      "kind": "heading",
+      "text": "Where the encryption happens matters"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Approach",
+        "Encrypted between",
+        "Everything else sees"
+      ],
+      "rows": [
+        [
+          "TLS (https)",
+          "Your browser and the server",
+          "Which server, but not the content"
+        ],
+        [
+          "VPN",
+          "Your device and the VPN gateway",
+          "One tunnel; beyond the gateway, ordinary traffic"
+        ],
+        [
+          "Both",
+          "Both segments independently",
+          "Least of all"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "A VPN does not make an unencrypted site safe",
+      "text": "Traffic is protected only as far as the gateway. Past that point it continues as it otherwise would — so a plain http site is still plain http on the second half of the journey. This is worth being clear about because it is a common misunderstanding: end-to-end encryption and tunnel encryption protect different segments, and only the first covers the whole path."
+    },
+    {
+      "kind": "heading",
+      "text": "Related uses of the same idea"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Site-to-site: two office networks joined so machines address each other as if local",
+        "Remote access: one device joining a private network from anywhere",
+        "Overlay networks: containers or virtual machines given their own addressing on top of a physical network",
+        "Reaching a machine behind NAT: the tunnel is an outbound connection, which is the technique from the NAT lesson"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Watch the routing change",
+      "steps": [
+        "Before connecting, record: ip route     and note your default route",
+        "Note your visible address: curl -s https://api.ipify.org ; echo",
+        "Connect a VPN, then run ip route again and find the new default and the tunnel interface",
+        "Check your visible address again — it should be the gateway's",
+        "Run: ip route get 1.1.1.1     and confirm it now goes through the tunnel",
+        "Run: ip link show     and compare the tunnel interface's MTU with your physical interface's",
+        "Try a large transfer over the tunnel; if it hangs, test with ping -M do at decreasing sizes",
+        "Disconnect and confirm the default route and visible address return"
+      ],
+      "expected": "A default route that moves to the tunnel and back, a visible address that changes with it, and a tunnel MTU smaller than the physical one. That last observation connects directly to the layers lesson: the tunnel's own headers are why the usable size shrank, and why VPNs are where MTU problems are most often met."
+    }
+  ],
+  "cheatsheet": [
+    "A tunnel puts a whole packet inside another packet",
+    "The outer header costs space, so a tunnel's usable packet size is smaller",
+    "MTU problems show up on VPNs more than anywhere else, for that reason",
+    "A VPN moves trust from your local network and provider to the VPN provider",
+    "It hides which sites you visit from your provider; it does not make you anonymous to the sites",
+    "Full tunnel installs a default route through the tunnel; split tunnel installs specific routes",
+    "The full-versus-split difference is entirely the longest-prefix rule at work",
+    "Traffic is protected only as far as the gateway — a plain http site stays plain past it",
+    "The same mechanism underlies site-to-site links, overlay networks, and reaching machines behind NAT"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why do large file transfers often hang over a VPN while small requests work?",
+      "choices": {
+        "A": "The VPN throttles large transfers",
+        "B": "The tunnel's outer header reduces the usable packet size, and the MTU problem from the layers lesson appears",
+        "C": "Encryption is slower for large data",
+        "D": "The gateway limits connection duration"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Same failure signature as before: small things work, large things hang. The tunnel headers are why the effective size shrank, which is why VPNs are where this is most commonly met."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "You connect to a plain http site through a VPN. Who can read the content?",
+      "choices": {
+        "A": "Nobody — the VPN encrypts it",
+        "B": "Anyone on the path between the VPN gateway and the site — the tunnel only protects the first segment",
+        "C": "Only your internet provider",
+        "D": "Only the site"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Tunnel encryption and end-to-end encryption protect different segments. Past the gateway the traffic continues exactly as it otherwise would."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "What is the technical difference between a full tunnel and a split tunnel?",
+      "choices": {
+        "A": "The encryption strength",
+        "B": "Which routes are installed: a full tunnel adds a default route through the tunnel, a split tunnel adds only specific ones",
+        "C": "The number of connections",
+        "D": "Whether DNS is included"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "It is entirely a routing decision, and you can watch it happen in ip route. The longest-prefix rule then does the rest."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Which claim about a VPN is accurate?",
+      "choices": {
+        "A": "It makes you anonymous online",
+        "B": "It moves who can observe your traffic from your local network and provider to the VPN provider",
+        "C": "It protects against malware",
+        "D": "It encrypts traffic all the way to every site"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "That is a genuine and useful improvement on an untrusted network. Sites still identify you by your account, cookies and fingerprinting, and the protection ends at the gateway."
+    }
+  ]
+}
