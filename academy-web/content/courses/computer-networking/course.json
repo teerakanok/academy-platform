@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 291,
+  "estimatedMinutes": 309,
   "coverMotif": "cloud",
   "skills": [
     {
@@ -221,6 +221,18 @@
       "skillWeights": {
         "socket-programming": 4,
         "server-design": 3
+      }
+    },
+    {
+      "id": "error-handling",
+      "kind": "lesson",
+      "prerequisites": [
+        "client-and-server"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "socket-programming": 4,
+        "troubleshooting": 3
       }
     }
   ]

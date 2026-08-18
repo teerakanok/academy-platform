@@ -1,0 +1,276 @@
+{
+  "nodeId": "error-handling",
+  "locale": "en",
+  "title": "Every network call can fail, and how",
+  "objective": "By the end of this lesson you can name what each network call fails with, distinguish an error you should retry from one you should not, and write a client that gives up sensibly instead of hanging.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "In a single machine, a failed call usually means a bug. On a network, failure is a normal operating condition: the other end restarts, a cable is unplugged, a firewall changes, a route disappears. The question is never whether calls will fail but which failure this is, and that is decided by the errno value."
+    },
+    {
+      "kind": "heading",
+      "text": "The errors worth recognising by name"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "errno",
+        "Meaning",
+        "What it tells you"
+      ],
+      "rows": [
+        [
+          "ECONNREFUSED",
+          "Nothing listening on that port",
+          "The machine is reachable; the service is not there"
+        ],
+        [
+          "ETIMEDOUT",
+          "No reply within the limit",
+          "Silent filtering, or the host is gone"
+        ],
+        [
+          "ECONNRESET",
+          "The peer aborted an established connection",
+          "It crashed, or something in the middle closed it"
+        ],
+        [
+          "EPIPE",
+          "You wrote to a connection the peer has closed",
+          "Stop writing; also raises SIGPIPE"
+        ],
+        [
+          "EHOSTUNREACH / ENETUNREACH",
+          "The network layer gave up",
+          "Routing, or an interface is down"
+        ],
+        [
+          "EADDRINUSE",
+          "bind() found the address taken",
+          "Another instance, or TIME_WAIT without SO_REUSEADDR"
+        ],
+        [
+          "EAGAIN",
+          "Nothing ready right now",
+          "Not an error — the non-blocking answer"
+        ],
+        [
+          "EINTR",
+          "A signal interrupted the call",
+          "Not an error — just retry"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Two of those are not failures, and treating them as failures is a bug",
+      "text": "EAGAIN means 'not yet' and EINTR means 'a signal arrived, try again'. Code that logs an error and drops the connection for either one is broken in a way that only shows under load, when signals and readiness edges are common. Every network program needs both handled explicitly, which is why the read_all and write_all loops in the previous lesson check for them by name."
+    },
+    {
+      "kind": "heading",
+      "text": "Retry, or do not"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Do retry",
+        "Do not retry"
+      ],
+      "rows": [
+        [
+          "EINTR — immediately",
+          "ECONNREFUSED — nothing is there to answer"
+        ],
+        [
+          "EAGAIN — after waiting for readiness",
+          "EINVAL, EBADF — your own bug"
+        ],
+        [
+          "ETIMEDOUT — with backoff, a bounded number of times",
+          "EACCES — a permission problem that will not change"
+        ],
+        [
+          "ECONNRESET — usually, if the operation is safe to repeat",
+          "EMSGSIZE — the request itself is wrong"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "That last column matters more than the first. Retrying an error that cannot succeed turns one failure into a loop, and retrying without a limit turns a brief outage into an amplified one — every client hammering a service that is already struggling."
+    },
+    {
+      "kind": "heading",
+      "text": "Backoff, and why the randomness is not optional"
+    },
+    {
+      "kind": "code",
+      "caption": "Exponential backoff with jitter",
+      "lines": [
+        "int delay_ms = 100;",
+        "for (int attempt = 0; attempt < 5; attempt++) {",
+        "    if (try_once() == 0) return 0;              /* success */",
+        "",
+        "    int jitter = rand() % delay_ms;             /* spread the retries out */",
+        "    usleep((delay_ms + jitter) * 1000);",
+        "    delay_ms *= 2;                              /* 100, 200, 400, 800, 1600 */",
+        "}",
+        "return -1;                                       /* give up, and say so */",
+        "",
+        "/* Without the jitter, every client that failed at the same moment retries",
+        "   at the same moment, and the service is hit by a synchronised wave each",
+        "   time. The randomness is what breaks that up. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "SIGPIPE: the default that kills servers"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Writing to a connection the peer has closed raises SIGPIPE, and its default action is to terminate the process. For a shell pipeline that is useful — it is what stops a producer when the reader exits. For a server it is a disaster: one client disconnecting at the wrong moment ends the whole process."
+    },
+    {
+      "kind": "code",
+      "caption": "The one line every network server needs",
+      "lines": [
+        "signal(SIGPIPE, SIG_IGN);   /* now write() returns -1 with errno EPIPE instead */",
+        "",
+        "/* With this, a disconnecting client becomes an error you handle on one",
+        "   connection, rather than a signal that ends the program. This is the",
+        "   same mechanism as the signals lesson in the operating systems course,",
+        "   met here in the situation it matters most. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Timeouts: the failure that has no error"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The worst network failure is the one where nothing happens. A peer that accepts a connection and then stops responding leaves your program waiting indefinitely, with no error to report. Every network operation therefore needs a bound on how long it may take."
+    },
+    {
+      "kind": "code",
+      "caption": "Two ways to bound a wait",
+      "lines": [
+        "/* Per-socket, and simple: */",
+        "struct timeval tv = { .tv_sec = 5, .tv_usec = 0 };",
+        "setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof tv);",
+        "setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof tv);",
+        "/* read and write now return -1 with EAGAIN after 5 seconds */",
+        "",
+        "/* Or through the readiness mechanism, which fits an event loop: */",
+        "int n = epoll_wait(ep, events, 64, 5000);   /* milliseconds */",
+        "if (n == 0) { /* nothing became ready in time */ }"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "A connection that is silent is not the same as one that is closed",
+      "text": "A closed connection is reported: read returns 0, or a write fails. A silent one reports nothing at all — the peer may have lost power, or a middlebox may have discarded the connection without telling either side. Without a timeout, a program waits for that forever. This is why long-lived connections send periodic keepalives: not to carry data, but to turn silence into a detectable failure."
+    },
+    {
+      "kind": "heading",
+      "text": "What to log"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "The call that failed, the errno name, and the peer address — all three, or the log is not actionable",
+        "Use strerror(errno) or perror; a bare number sends the reader to a table",
+        "Capture errno immediately — the next library call may overwrite it",
+        "Do not log EAGAIN and EINTR as errors; they are ordinary control flow",
+        "Distinguish 'this connection failed' from 'the server cannot continue' — they need different responses"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Produce each failure deliberately",
+      "steps": [
+        "Connect to a port with nothing listening and print strerror(errno) — expect ECONNREFUSED, immediately",
+        "Connect to a filtered address and time how long it takes — expect ETIMEDOUT after many seconds",
+        "Start a server, connect, kill the server, then write from the client — observe EPIPE or SIGPIPE",
+        "Add signal(SIGPIPE, SIG_IGN) and confirm you now get -1 with EPIPE instead of the process dying",
+        "Start two copies of your server on the same port without SO_REUSEADDR — expect EADDRINUSE",
+        "Set SO_RCVTIMEO to 2 seconds, connect to a server that never replies, and confirm read returns after 2 seconds",
+        "Write a client with the backoff loop above and point it at a port that is not listening; watch the delays grow",
+        "Remove the jitter, run ten copies at once, and observe that their retries line up"
+      ],
+      "expected": "Each error produced on purpose and identified by name, a SIGPIPE turned into a handleable error by one line, and a retry loop whose delays you can see growing. The last step is worth doing: ten clients retrying in lockstep is a small, visible version of the effect that turns a brief outage into a long one."
+    }
+  ],
+  "cheatsheet": [
+    "ECONNREFUSED: reachable, nothing listening · ETIMEDOUT: nothing answered at all",
+    "ECONNRESET: the peer aborted · EPIPE: you wrote to a closed connection",
+    "EADDRINUSE: another instance, or TIME_WAIT without SO_REUSEADDR",
+    "EAGAIN and EINTR are NOT errors — handle them as control flow",
+    "Retry EINTR immediately, EAGAIN after readiness, ETIMEDOUT with bounded backoff",
+    "Never retry ECONNREFUSED, EINVAL, EBADF or EACCES — they will not succeed",
+    "Backoff needs jitter, or every client retries in the same instant",
+    "signal(SIGPIPE, SIG_IGN) in every server, or a disconnect kills the process",
+    "Every operation needs a timeout — silence produces no error at all",
+    "Log the call, the errno name and the peer; capture errno immediately"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Your server dies when a client disconnects mid-response. What is missing?",
+      "choices": {
+        "A": "A timeout",
+        "B": "signal(SIGPIPE, SIG_IGN) — writing to a closed connection raises a signal whose default is to terminate",
+        "C": "SO_REUSEADDR",
+        "D": "A larger backlog"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "With it ignored, the write returns -1 with EPIPE and you handle one connection failing. Without it, one client's timing ends the whole process."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A read fails with EINTR. What should the code do?",
+      "choices": {
+        "A": "Close the connection and log an error",
+        "B": "Retry the call — a signal interrupted it and nothing is wrong",
+        "C": "Wait for readiness first",
+        "D": "Reconnect"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "EINTR and EAGAIN are the two values that are not failures. Treating either as an error produces a program that misbehaves under load, when both become common."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why does a retry loop need random jitter?",
+      "choices": {
+        "A": "To avoid predictable traffic patterns",
+        "B": "Without it, every client that failed at the same moment retries at the same moment, hitting a struggling service with synchronised waves",
+        "C": "To comply with the protocol",
+        "D": "To make the delays shorter on average"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Backoff alone spreads retries in time but not across clients. The randomness is what desynchronises them, and it is the difference between recovery and an amplified outage."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "A peer accepts your connection and then never responds. What does your program see?",
+      "choices": {
+        "A": "ECONNRESET",
+        "B": "Nothing — it waits indefinitely unless you set a timeout",
+        "C": "EPIPE",
+        "D": "read returns 0"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Silence is the failure with no error. A closed connection is reported; a silent one is not, which is why every operation needs a bound and why long-lived connections send keepalives."
+    }
+  ]
+}
