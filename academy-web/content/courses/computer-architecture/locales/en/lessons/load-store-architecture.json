@@ -1,0 +1,217 @@
+{
+  "nodeId": "load-store-architecture",
+  "locale": "en",
+  "title": "Only two instructions touch memory",
+  "objective": "By the end of this lesson you can explain why separating memory access from computation simplifies the hardware, identify loads and stores in generated code, and reason about why register pressure matters.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "In a load-store architecture, arithmetic works only on registers. To operate on a value in memory you must load it, compute, and store it back. That constraint looks like extra work and is the reason the rest of this course is possible to explain."
+    },
+    {
+      "kind": "heading",
+      "text": "The rule, and what it excludes"
+    },
+    {
+      "kind": "code",
+      "caption": "Two ways to add one to a value in memory",
+      "lines": [
+        "/* Load-store: three instructions, each doing one thing */",
+        "  lw   x5, 0(x10)      /* memory -> register */",
+        "  addi x5, x5, 1       /* register arithmetic */",
+        "  sw   x5, 0(x10)      /* register -> memory */",
+        "",
+        "/* x86-64: one instruction that reads memory, adds, and writes back */",
+        "  addl $1, (%rax)",
+        "",
+        "/* Same effect. The difference is what the hardware must be able to do",
+        "   inside a single instruction. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The real benefit is that every instruction takes a predictable amount of work",
+      "text": "An instruction that only computes needs no memory access. An instruction that only loads needs no arithmetic unit. Because no instruction does both, each stage of the hardware does one kind of thing — which is precisely what makes the pipeline in the next module straightforward to build. An instruction that reads memory, computes, and writes back would need the memory stage twice, and that is a far harder machine to design."
+    },
+    {
+      "kind": "heading",
+      "text": "What loads and stores actually specify"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Instruction",
+        "Moves",
+        "Sign extends?"
+      ],
+      "rows": [
+        [
+          "lb / lbu",
+          "One byte",
+          "lb yes, lbu no"
+        ],
+        [
+          "lh / lhu",
+          "Two bytes",
+          "lh yes, lhu no"
+        ],
+        [
+          "lw / lwu",
+          "Four bytes",
+          "lw yes, lwu no"
+        ],
+        [
+          "ld",
+          "Eight bytes",
+          "Not applicable at 64 bits"
+        ],
+        [
+          "sb, sh, sw, sd",
+          "One, two, four, eight bytes",
+          "Stores never sign extend"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Signed and unsigned loads are the C course's integer promotion, in hardware",
+      "text": "Loading a signed byte fills the upper bits with copies of the sign bit, so -1 stored in a byte reads back as -1 in a 64-bit register. An unsigned load fills them with zero, so the same byte reads back as 255. That is exactly the distinction the C course made about char being signed or unsigned by default — and the reason it matters is that the load instruction chosen by the compiler decides it."
+    },
+    {
+      "kind": "heading",
+      "text": "Register pressure"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Because computation happens only in registers, the number of values a function can keep readily available is fixed by the register count. When a function needs more live values than there are registers, the compiler must store some to memory and reload them later. That is called spilling, and it is visible in generated code as loads and stores that do not correspond to anything in the source."
+    },
+    {
+      "kind": "code",
+      "caption": "What spilling looks like",
+      "lines": [
+        "/* A function with many simultaneously live values */",
+        "",
+        "  sd   x18, 16(sp)       <- saving a value that has nowhere to live",
+        "  ...  computation using x18's register for something else ...",
+        "  ld   x18, 16(sp)       <- getting it back",
+        "",
+        "/* Neither instruction corresponds to a variable in the source.",
+        "   They exist because the working set exceeded the register count. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "This is why a function that does less can be faster",
+      "text": "Splitting a large function into smaller ones often speeds it up, and the reason is usually register pressure rather than anything about call overhead: each smaller function has fewer live values and therefore spills less. It is also why the 16 registers of x86-64 versus the 31 of the reduced architectures is a real difference in generated code, even though both can express every program."
+    },
+    {
+      "kind": "heading",
+      "text": "Alignment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A load of four bytes normally expects an address that is a multiple of four. Hardware that requires this can use simpler memory circuitry; hardware that permits misalignment must handle a value that spans two memory words. RISC-V allows implementations to choose, which means a program that relies on misaligned access may work on one chip and fault or run slowly on another."
+    },
+    {
+      "kind": "code",
+      "caption": "Why struct padding exists, seen from below",
+      "lines": [
+        "struct { char c; int i; };",
+        "",
+        "  offset 0: c        1 byte",
+        "  offset 1-3:        3 bytes of padding",
+        "  offset 4: i        4 bytes, correctly aligned",
+        "",
+        "/* The C course measured this padding. Here is the reason for it:",
+        "   the compiler is arranging the struct so that every load is aligned. */"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Find every memory access in a function",
+      "steps": [
+        "Write a C function that sums an array and returns the total",
+        "Compile with: cc -S -O1 f.c -o -    and mark every load and store",
+        "Confirm that no arithmetic instruction touches memory",
+        "Write a function with many simultaneously live local variables — a dozen or more",
+        "Compile it and look for stores and loads to stack offsets that match no variable",
+        "Split that function into two and compare the number of such instructions",
+        "Write a function loading a signed char and one loading an unsigned char; compare the instructions chosen",
+        "Print sizeof for a struct with a char followed by an int and explain the padding in terms of alignment"
+      ],
+      "expected": "A function in which loads and stores are the only memory instructions, spilling you produced on purpose and then reduced by splitting the function, and a signed-versus-unsigned load difference you can point at in the instruction stream. That last one connects directly to the C course's integer conversion rules."
+    }
+  ],
+  "cheatsheet": [
+    "Arithmetic works only on registers; only load and store touch memory",
+    "One instruction per kind of work is what makes a simple pipeline possible",
+    "lb/lh/lw sign extend; lbu/lhu/lwu zero extend; stores never extend",
+    "The signed-versus-unsigned load is where the C course's char signedness is decided",
+    "More live values than registers causes spilling — stores and loads with no source counterpart",
+    "Splitting a large function often helps by reducing register pressure",
+    "x86-64 has 16 registers, reduced architectures 31 — a real difference in spill frequency",
+    "Aligned access lets the hardware use simpler memory circuitry",
+    "Struct padding exists so that every field load is aligned"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why does separating memory access from computation make the hardware simpler?",
+      "choices": {
+        "A": "It uses fewer transistors overall",
+        "B": "Each instruction needs one kind of work, so each hardware stage does one kind of thing — which is what makes a straightforward pipeline possible",
+        "C": "Memory becomes faster",
+        "D": "It removes the need for a cache"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "An instruction that read memory, computed and wrote back would need the memory stage twice. Keeping the work per instruction uniform is what the next module builds on."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Generated code contains stores and loads to stack offsets that match no variable in the source. What are they?",
+      "choices": {
+        "A": "Debug information",
+        "B": "Spilling — the function has more live values than there are registers, so some are held in memory",
+        "C": "Bounds checks",
+        "D": "Alignment padding"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "It is a direct consequence of computation happening only in registers. Splitting the function usually reduces it, which is a common reason smaller functions run faster."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A byte holding 0xFF is loaded with lb into a 64-bit register. What is the register's value?",
+      "choices": {
+        "A": "255",
+        "B": "-1 — lb sign extends, filling the upper bits with copies of the sign bit",
+        "C": "0xFF00000000000000",
+        "D": "Undefined"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "lbu would give 255. This is exactly the signed-versus-unsigned char distinction from the C course, decided here by which load instruction the compiler emitted."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why does a struct with a char followed by an int contain three bytes of padding?",
+      "choices": {
+        "A": "To reserve space for future fields",
+        "B": "So the int begins at an aligned address and can be loaded with a single aligned access",
+        "C": "Because char is really four bytes",
+        "D": "To make sizeof a power of two"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The C course measured the padding; this is the reason for it. Aligned access lets the hardware use simpler and faster memory circuitry."
+    }
+  ]
+}

@@ -1,0 +1,257 @@
+{
+  "nodeId": "addressing-modes",
+  "locale": "en",
+  "title": "How an instruction names its data",
+  "objective": "By the end of this lesson you can list the ways an instruction can refer to a value, explain why a reduced architecture offers so few, and map a C expression onto the instructions it becomes.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "An instruction must say where its operands are. The set of ways it can say that is called the addressing modes, and it is one of the clearest places to see the difference between the two philosophies from earlier in this module."
+    },
+    {
+      "kind": "heading",
+      "text": "The modes a reduced architecture provides"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Mode",
+        "Written",
+        "The value comes from"
+      ],
+      "rows": [
+        [
+          "Register",
+          "add x5, x6, x7",
+          "A register, directly"
+        ],
+        [
+          "Immediate",
+          "addi x5, x6, 42",
+          "A constant inside the instruction"
+        ],
+        [
+          "Base plus offset",
+          "lw x5, 8(x6)",
+          "Memory at register plus a constant"
+        ],
+        [
+          "PC-relative",
+          "beq x5, x6, label",
+          "An address computed from the current instruction"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "That is essentially all of them. There is no mode that reads an address from memory and then reads again, no mode that scales an index and adds two registers, no mode that increments a register as a side effect. Architectures with complex instruction sets have all of those, and more."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Fewer modes is a decision about the decoder, not about expressiveness",
+      "text": "Every addressing mode is a case the hardware must handle, and each one adds a path through the address-generation logic. Keeping the set small keeps that logic shallow, which keeps the clock fast — the same reasoning as fixed-length instructions. Anything the modes cannot express is done with an extra instruction instead, and an extra instruction is cheap when instructions are fast."
+    },
+    {
+      "kind": "heading",
+      "text": "What base plus offset is for"
+    },
+    {
+      "kind": "code",
+      "caption": "The one memory mode, doing everything memory needs",
+      "lines": [
+        "  lw x5, 0(x6)      /* *p           — offset zero */",
+        "  lw x5, 8(x6)      /* p->field     — the field's offset in the struct */",
+        "  lw x5, 16(sp)     /* a local      — its slot in the stack frame */",
+        "  sw x5, 4(x6)      /* p->other = x */",
+        "",
+        "/* One mode covers pointer dereference, struct fields and locals,",
+        "   because all three are 'a base address plus a constant displacement'.",
+        "   The offset is the 12-bit immediate from the encoding lesson. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "What it cannot do, and what happens instead"
+    },
+    {
+      "kind": "code",
+      "caption": "An array index, which needs arithmetic first",
+      "lines": [
+        "  /* C: x = a[i];  where a is int* in x10 and i is in x11 */",
+        "",
+        "  slli x12, x11, 2      /* i * 4, because an int is 4 bytes */",
+        "  add  x12, x10, x12    /* base + scaled index */",
+        "  lw   x5,  0(x12)      /* now a plain base-plus-offset load */",
+        "",
+        "/* Three instructions. On x86-64 this is one, because that architecture",
+        "   has a mode that scales and adds in the address calculation itself.",
+        "   The reduced version is more instructions and simpler hardware —",
+        "   which is the trade this whole module is about. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "This is why array access in a loop is worth looking at",
+      "text": "If the index advances by one each iteration, the compiler can replace the multiply-and-add with a single pointer increment, turning three instructions into one. That transformation is called strength reduction, and it is one of the reasons the assembly for a loop often looks nothing like the source. Seeing the three-instruction form in generated code usually means the compiler could not prove the pattern was regular."
+    },
+    {
+      "kind": "heading",
+      "text": "PC-relative addressing, and why it matters"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Branches and jumps encode an offset from the current instruction rather than an absolute address. That is what allows a block of code to be loaded anywhere in memory and still work — which is exactly the address randomisation from the operating systems course. Position-independent code depends on this mode existing."
+    },
+    {
+      "kind": "code",
+      "caption": "Absolute versus relative, and why relative wins",
+      "lines": [
+        "  beq x5, x6, +16      /* jump 16 bytes forward from here */",
+        "",
+        "/* If this code is loaded at a different address tomorrow, the offset",
+        "   is still correct. An absolute target would have to be patched at",
+        "   load time, which is what a relocation is — and why position-",
+        "   independent code needs fewer of them. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Mapping C onto modes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "C",
+        "Mode used",
+        "Notes"
+      ],
+      "rows": [
+        [
+          "x + y where both are locals in registers",
+          "Register",
+          "No memory touched"
+        ],
+        [
+          "x + 1",
+          "Immediate",
+          "1 fits in 12 bits"
+        ],
+        [
+          "x + 100000",
+          "Immediate then more",
+          "Too large for one field"
+        ],
+        [
+          "*p",
+          "Base plus offset, zero",
+          "p is in a register"
+        ],
+        [
+          "p->field",
+          "Base plus offset",
+          "The offset is known at compile time"
+        ],
+        [
+          "a[i]",
+          "Arithmetic then base plus offset",
+          "Index must be scaled first"
+        ],
+        [
+          "a[3]",
+          "Base plus offset",
+          "The compiler computed 12 already"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The row worth noticing is the last: a constant index costs nothing extra, because the multiplication happened at compile time. A variable index costs the scaling. That difference is invisible in the source and obvious in the instructions."
+    },
+    {
+      "kind": "try",
+      "title": "Find each mode in generated code",
+      "steps": [
+        "Write a C function using each row of the table above",
+        "Compile with: cc -S -O1 f.c -o -    and find the instruction for each",
+        "Identify which mode each instruction uses, from its operand syntax",
+        "Compare a[3] with a[i] and count the instructions each needs",
+        "Write a loop over an array and look for the strength reduction described above",
+        "Compile the same loop with -O0 and compare — the transformation should be absent",
+        "Find a branch in the output and confirm its target is expressed as an offset, not an address",
+        "Try x + 100000 and observe how the compiler builds a constant too large for one field"
+      ],
+      "expected": "Each addressing mode identified in real generated code, a measured difference between a constant and a variable index, and a loop whose optimised form no longer contains the multiply. The last item is the one that connects this lesson to performance: the instruction count for the same source line is a compiler decision, and you can now read which one it made."
+    }
+  ],
+  "cheatsheet": [
+    "Reduced architectures offer four modes: register, immediate, base plus offset, PC-relative",
+    "One memory mode covers pointer dereference, struct fields and stack locals",
+    "The offset is the 12-bit immediate from the encoding lesson",
+    "No scaled-index mode: a[i] needs a shift and an add first",
+    "x86-64 does that in one instruction — more expressive, more decoder work",
+    "A constant index costs nothing extra; a variable index costs the scaling",
+    "Compilers replace the multiply in a loop with a pointer increment (strength reduction)",
+    "Branches use PC-relative offsets, which is what makes code position-independent",
+    "Position independence is what allows the address randomisation from the OS course"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why does a[i] take three instructions on a reduced architecture and one on x86-64?",
+      "choices": {
+        "A": "x86-64 has faster memory",
+        "B": "x86-64 has an addressing mode that scales an index and adds it during address generation; the reduced set does the arithmetic in separate instructions",
+        "C": "The reduced version is a compiler bug",
+        "D": "Arrays are stored differently"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "More expressive modes mean more cases in the address-generation hardware. The reduced design pays extra instructions to keep that logic shallow, which is the trade this module keeps returning to."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why do branches encode an offset rather than an absolute address?",
+      "choices": {
+        "A": "Offsets are smaller to encode",
+        "B": "So the code works wherever it is loaded, which is what makes position-independent code and address randomisation possible",
+        "C": "Absolute addresses are not supported",
+        "D": "To simplify the assembler"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "An absolute target would need patching at load time. PC-relative addressing removes that need, and it is what the operating systems course's address randomisation depends on."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "a[3] compiles to a single load while a[i] does not. Why?",
+      "choices": {
+        "A": "Constants are stored separately",
+        "B": "The compiler computed 3 times the element size at compile time, so it becomes an ordinary base-plus-offset load",
+        "C": "a[3] is in a register",
+        "D": "Small indices are special-cased in hardware"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The scaling still happens; it just happens during compilation. A variable index cannot be resolved then, so the multiply has to appear in the instruction stream."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "An optimised loop over an array contains no multiply, but the -O0 version does. What happened?",
+      "choices": {
+        "A": "The optimiser removed a bounds check",
+        "B": "Strength reduction — the index arithmetic was replaced by advancing a pointer once per iteration",
+        "C": "The array was moved to registers",
+        "D": "The loop was unrolled"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "When the index advances regularly, the address can be advanced instead of recomputed. Seeing the multiply survive usually means the compiler could not prove the access pattern was regular."
+    }
+  ]
+}

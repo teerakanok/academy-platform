@@ -1,0 +1,231 @@
+{
+  "nodeId": "instruction-formats",
+  "locale": "en",
+  "title": "Reading RISC-V instruction formats",
+  "objective": "By the end of this lesson you can identify which format an instruction uses from its opcode, explain why the branch and store formats scatter their immediates, and read any base instruction without a reference card.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "The previous lesson used two formats. There are six in the base set, and they exist because different instructions need different things: some need two source registers, some need a constant, some need a large constant, and some need a jump target. Each format spends the same 32 bits differently."
+    },
+    {
+      "kind": "heading",
+      "text": "The six, and what each is for"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Format",
+        "Used by",
+        "Has",
+        "Lacks"
+      ],
+      "rows": [
+        [
+          "R",
+          "Register arithmetic: add, sub, and, xor",
+          "rd, rs1, rs2, funct3, funct7",
+          "Any constant"
+        ],
+        [
+          "I",
+          "Immediate arithmetic, loads, jalr",
+          "rd, rs1, 12-bit constant",
+          "rs2"
+        ],
+        [
+          "S",
+          "Stores",
+          "rs1, rs2, 12-bit constant",
+          "rd — a store produces no result"
+        ],
+        [
+          "B",
+          "Branches",
+          "rs1, rs2, 13-bit signed offset",
+          "rd — a branch produces no result"
+        ],
+        [
+          "U",
+          "Large constants: lui, auipc",
+          "rd, 20-bit upper constant",
+          "Any source register"
+        ],
+        [
+          "J",
+          "Jumps: jal",
+          "rd, 21-bit signed offset",
+          "Any source register"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The missing field tells you what the instruction does",
+      "text": "S and B have no destination register because neither produces a value: a store writes to memory, a branch changes where execution goes. Their five bits of rd space were reclaimed for the immediate. Reading a format's field list therefore tells you the shape of the operation before you know which instruction it is."
+    },
+    {
+      "kind": "heading",
+      "text": "Why the immediates look scrambled"
+    },
+    {
+      "kind": "code",
+      "caption": "An S-type immediate, split across two places",
+      "lines": [
+        " 31        25 24    20 19    15 14  12 11     7 6         0",
+        "+------------+--------+--------+------+--------+-----------+",
+        "| imm[11:5]  |  rs2   |  rs1   |funct3| imm[4:0]|  opcode  |",
+        "+------------+--------+--------+------+--------+-----------+",
+        "",
+        "/* Compare with I-type, where the same 12 bits sit contiguously at",
+        "   31:20. They were split here so that rs1, rs2 and funct3 stay in",
+        "   exactly the positions they occupy in R-type and I-type. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The reason is the one the previous lesson gave: fixed register positions let the hardware start reading the register file immediately, before it knows what the instruction is. Reassembling a split immediate is free — it is wiring, with no logic in between. A misaligned register field would cost a selector on the path that matters most."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "The bit-13 trick in the branch format",
+      "text": "A B-type immediate encodes a 13-bit signed offset in 12 bits, by leaving out the lowest bit and defining it as always zero. That is legitimate because every instruction is 4-byte aligned, so no branch target can ever be at an odd address. One bit saved by encoding a fact the architecture already guarantees — the same kind of reasoning as the dedicated zero register."
+    },
+    {
+      "kind": "heading",
+      "text": "Identifying a format from the opcode"
+    },
+    {
+      "kind": "code",
+      "caption": "The opcodes you will meet most",
+      "lines": [
+        "  0110011   R    register arithmetic          add, sub, and, or, xor, sll",
+        "  0010011   I    immediate arithmetic         addi, andi, ori, slli",
+        "  0000011   I    loads                        lb, lh, lw, ld",
+        "  0100011   S    stores                       sb, sh, sw, sd",
+        "  1100011   B    branches                     beq, bne, blt, bge",
+        "  1101111   J    jump and link                jal",
+        "  1100111   I    jump and link register       jalr",
+        "  0110111   U    load upper immediate         lui",
+        "",
+        "/* Read the low 7 bits first, and you know the layout of the other 25. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Reading one you have never seen"
+    },
+    {
+      "kind": "code",
+      "caption": "Decoding 0x00a58533 step by step",
+      "lines": [
+        "  0x00a58533 = 0000000 01010 01011 000 01010 0110011",
+        "",
+        "  opcode = 0110011  -> R-type, register arithmetic",
+        "  rd     = 01010    -> x10",
+        "  funct3 = 000",
+        "  rs1    = 01011    -> x11",
+        "  rs2    = 01010    -> x10",
+        "  funct7 = 0000000  -> add, not sub",
+        "",
+        "  therefore: add x10, x11, x10",
+        "",
+        "/* Seven bits told you the layout; the rest is reading fields off it. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "How many instructions the base set has"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The 64-bit base integer set is small enough to list on one page. Everything else — multiplication, atomics, floating point, compressed encodings, vectors — is an optional extension named by a letter, and a given chip states which it implements. That modularity is the design decision that distinguishes RISC-V from architectures where every feature is mandatory forever."
+    },
+    {
+      "kind": "try",
+      "title": "Decode without a reference",
+      "steps": [
+        "Write a decoder that reads the low 7 bits, selects the layout, and prints the fields",
+        "Feed it 0x00a58533 and confirm you get add x10, x11, x10",
+        "Feed it 0x02a30293 from the previous lesson and confirm addi x5, x6, 42",
+        "Encode sw x5, 8(x6) by hand as an S-type and check the immediate split is right",
+        "Encode beq x5, x6, +16 as a B-type and confirm the lowest bit is not stored",
+        "Explain why a branch to an odd address cannot be encoded, and why that is not a limitation",
+        "Take any four-byte word from a real binary and decode it with your program",
+        "Compare your answer with objdump on the same address"
+      ],
+      "expected": "A decoder of your own that agrees with objdump, and two hand encodings whose scattered immediates you got right. The B-type exercise is the one worth doing carefully — understanding why the lowest bit is free is what makes the rest of the encoding feel designed rather than arbitrary."
+    }
+  ],
+  "cheatsheet": [
+    "Six base formats: R, I, S, B, U, J — each spends 32 bits differently",
+    "R: two sources, no constant · I: one source and a 12-bit constant",
+    "S and B have no destination register, because a store and a branch produce no value",
+    "U and J carry large constants and have no source register",
+    "Immediates are split so rs1, rs2 and funct3 stay at fixed positions",
+    "Reassembling a split immediate is wiring; a moved register field would cost a selector",
+    "B-type encodes 13 bits in 12 by omitting the lowest, which is always zero",
+    "Read the low 7 bits first and the layout of the other 25 is determined",
+    "The base integer set fits on a page; everything else is an optional lettered extension"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why does the S-type format have no rd field?",
+      "choices": {
+        "A": "To save encoding space arbitrarily",
+        "B": "A store produces no value, so those five bits were reclaimed for the immediate",
+        "C": "Stores use a fixed destination",
+        "D": "rd is implied by rs1"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The same reasoning applies to B-type: a branch produces no value either. Reading which field a format lacks tells you the shape of the operation."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why is the S-type immediate split across bits 31:25 and 11:7 instead of being contiguous?",
+      "choices": {
+        "A": "To make decoding harder to reverse-engineer",
+        "B": "So rs1, rs2 and funct3 stay at the same bit positions as in other formats, letting the register file be read before decoding finishes",
+        "C": "Because 12 contiguous bits were not available",
+        "D": "For historical compatibility"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Reassembling the immediate is pure wiring with no logic. Moving a register field would put a selector on the critical path, which is far more expensive."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "How does a B-type instruction encode a 13-bit offset in 12 bits?",
+      "choices": {
+        "A": "It truncates the value",
+        "B": "It omits the lowest bit and defines it as zero, which is safe because instructions are 4-byte aligned",
+        "C": "It uses a second instruction",
+        "D": "It stores the offset divided by 4 with rounding"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The architecture already guarantees that no instruction sits at an odd address, so that bit carries no information. Encoding a fact the architecture guarantees buys a bit of range for free."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "You have an unknown 32-bit word. What do you read first?",
+      "choices": {
+        "A": "The high 7 bits",
+        "B": "The low 7 bits — the opcode determines which layout the other 25 follow",
+        "C": "The middle 3 bits",
+        "D": "It must be looked up in a table of all instructions"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "That is why the opcode sits at the bottom. Once you know the format, every other field's position is fixed and decoding is mechanical."
+    }
+  ]
+}

@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 51,
+  "estimatedMinutes": 104,
   "coverMotif": "layers",
   "skills": [
     {
@@ -71,6 +71,41 @@
       "skillWeights": {
         "isa": 4,
         "machine-code": 3
+      }
+    },
+    {
+      "id": "instruction-formats",
+      "kind": "lesson",
+      "prerequisites": [
+        "instruction-encoding"
+      ],
+      "estimatedMinutes": 19,
+      "skillWeights": {
+        "machine-code": 4,
+        "isa": 2
+      }
+    },
+    {
+      "id": "addressing-modes",
+      "kind": "lesson",
+      "prerequisites": [
+        "instruction-formats"
+      ],
+      "estimatedMinutes": 17,
+      "skillWeights": {
+        "machine-code": 3,
+        "isa": 2
+      }
+    },
+    {
+      "id": "load-store-architecture",
+      "kind": "lesson",
+      "prerequisites": [
+        "instruction-formats"
+      ],
+      "estimatedMinutes": 17,
+      "skillWeights": {
+        "isa": 4
       }
     }
   ]
