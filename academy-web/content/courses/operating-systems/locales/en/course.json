@@ -1,0 +1,46 @@
+{
+  "locale": "en",
+  "title": "Operating Systems",
+  "subtitle": "What the kernel is actually doing underneath every program you run",
+  "audience": "For anyone who can already work in a Linux shell and read C, and wants to understand what happens when a program calls the kernel, forks, blocks, races, or runs out of memory. This is the course that turns 'the OS handles it' into something you can trace, measure, and reason about.",
+  "outcomes": [
+    "Explain what a system call costs and follow one from your code into the kernel and back",
+    "Start, wait for, and clean up processes correctly — including the failure modes that leak them",
+    "Write threaded code that shares data safely, and recognise a race condition before it ships",
+    "Diagnose a deadlock from its four conditions instead of guessing",
+    "Read a process's memory map and explain page faults, copy-on-write, and memory-mapped files",
+    "Judge whether a privileged program is safe, and why setuid is where so many local exploits live"
+  ],
+  "skillLabels": {
+    "kernel-interface": "Kernel interface",
+    "processes": "Processes",
+    "concurrency": "Concurrency",
+    "synchronisation": "Synchronisation",
+    "virtual-memory": "Virtual memory",
+    "os-security": "OS protection"
+  },
+  "nodeTitles": {
+    "kernel-vs-user-mode": "Two worlds: kernel mode and user mode",
+    "syscall-mechanism": "How a program asks the kernel for something",
+    "syscall-lifecycle": "Follow one system call all the way down",
+    "fork-exec-wait": "How a program starts another program",
+    "zombie-and-orphan": "Zombies, orphans, and who cleans up",
+    "signals": "Signals: the operating system interrupting you",
+    "async-signal-safety": "What a signal handler is allowed to do",
+    "thread-vs-process": "Threads and processes: what is actually shared",
+    "pthreads": "Writing a threaded program",
+    "race-conditions": "Race conditions: when timing decides the answer",
+    "mutex": "Mutual exclusion, and what it costs",
+    "semaphore-and-condvar": "Waiting properly: semaphores and condition variables",
+    "producer-consumer": "Build a producer-consumer queue that does not corrupt",
+    "deadlock": "Deadlock: four conditions and how to break one",
+    "cpu-scheduling": "How the scheduler decides who runs next",
+    "address-space": "What a process sees: the virtual address space",
+    "page-tables-and-tlb": "From virtual to physical: page tables and the TLB",
+    "demand-paging": "Paging on demand, and what a page fault really is",
+    "cow-and-mmap": "Copy-on-write and mapping files into memory",
+    "privilege-rings": "Privilege levels the hardware itself enforces",
+    "acl-vs-capability": "Two ways to answer 'is this allowed?'",
+    "setuid-and-its-risks": "setuid: the most dangerous bit on the filesystem"
+  }
+}

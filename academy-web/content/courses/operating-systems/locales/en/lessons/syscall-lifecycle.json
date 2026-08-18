@@ -1,0 +1,195 @@
+{
+  "nodeId": "syscall-lifecycle",
+  "locale": "en",
+  "title": "Follow one system call all the way down",
+  "objective": "By the end of this lesson you can trace a real program's entire conversation with the kernel, measure what a crossing costs on your own machine, and use that measurement to explain a performance difference.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "You now have the concepts. This lesson is where you check them against a real machine — because a number you measured yourself is worth more than a number you were told, and because reading strace output fluently is one of the most reusable skills in this whole course."
+    },
+    {
+      "kind": "heading",
+      "text": "Step 1: read the whole conversation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Printing a six-byte file involves far more than one read and one write. Almost everything before the useful part is the dynamic linker finding and loading the C library — work that happens for every dynamically linked program you run."
+    },
+    {
+      "kind": "code",
+      "caption": "strace -e trace=openat,read,write,close cat /tmp/x",
+      "lines": [
+        "openat(AT_FDCWD, \"/etc/ld.so.cache\", O_RDONLY|O_CLOEXEC) = 3",
+        "close(3)                                = 0",
+        "openat(AT_FDCWD, \"/lib/.../libc.so.6\", O_RDONLY|O_CLOEXEC) = 3",
+        "read(3, \"\\177ELF\\2\\1\\1\\3...\", 832)    = 832",
+        "close(3)                                = 0",
+        "openat(AT_FDCWD, \"/tmp/x\", O_RDONLY)    = 3",
+        "read(3, \"hello\\n\", 131072)              = 6",
+        "write(1, \"hello\\n\", 6)                  = 6",
+        "read(3, \"\", 131072)                     = 0        <- 0 means end of file",
+        "close(3)                                = 0"
+      ]
+    },
+    {
+      "kind": "list",
+      "items": [
+        "AT_FDCWD is openat's way of saying 'resolve this path from the current directory' — the compatibility route discussed in the previous lesson",
+        "3 is the first free file descriptor, because 0, 1 and 2 are already standard input, output and error",
+        "read asks for 131072 bytes and gets 6 — a short read is normal, not an error",
+        "The second read returns 0, which is how end-of-file is reported",
+        "The ELF magic bytes in that read are a C library being loaded, exactly the object format from the C course"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Step 2: count, do not guess"
+    },
+    {
+      "kind": "paragraph",
+      "text": "strace -c aggregates instead of listing. On one machine, printing a six-byte file took 43 system calls in total. Only four of them had anything to do with the file. The rest is process startup — which is the real reason spawning a process per item in a loop is slow, and why the shell pipelines in the Linux course prefer one long-running process over many short ones."
+    },
+    {
+      "kind": "heading",
+      "text": "Step 3: measure the crossing yourself"
+    },
+    {
+      "kind": "code",
+      "caption": "syscost.c — build with: gcc -O2 syscost.c -o syscost",
+      "lines": [
+        "#define _GNU_SOURCE",
+        "#include <stdio.h>",
+        "#include <time.h>",
+        "#include <unistd.h>",
+        "#include <sys/syscall.h>",
+        "",
+        "static double now(void) {",
+        "    struct timespec t;",
+        "    clock_gettime(CLOCK_MONOTONIC, &t);",
+        "    return t.tv_sec + t.tv_nsec / 1e9;",
+        "}",
+        "",
+        "int main(void) {",
+        "    enum { N = 300000 };",
+        "    volatile long sink = 0;",
+        "    double t0, t1;",
+        "    struct timespec ts;",
+        "",
+        "    t0 = now();",
+        "    for (int i = 0; i < N; i++) sink += syscall(SYS_getpid);",
+        "    t1 = now();",
+        "    printf(\"real syscall      : %6.0f ns\\n\", (t1 - t0) / N * 1e9);",
+        "",
+        "    t0 = now();",
+        "    for (int i = 0; i < N; i++) { clock_gettime(CLOCK_MONOTONIC, &ts); sink += ts.tv_nsec; }",
+        "    t1 = now();",
+        "    printf(\"vDSO (no crossing): %6.0f ns\\n\", (t1 - t0) / N * 1e9);",
+        "",
+        "    t0 = now();",
+        "    for (int i = 0; i < N; i++) sink += i;",
+        "    t1 = now();",
+        "    printf(\"plain user-mode   : %6.1f ns\\n\", (t1 - t0) / N * 1e9);",
+        "    return 0;",
+        "}"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "What to expect from your own numbers",
+      "text": "On one aarch64 machine these came out at roughly 250 ns, 27 ns, and 2 ns. The absolute values depend on your CPU, your kernel, and the speculative-execution mitigations it has enabled — which is itself worth knowing, because those mitigations made crossings measurably more expensive across the industry. What should hold on any machine is the shape: a real crossing costs on the order of a hundred plain instructions, and the vDSO path avoids nearly all of it."
+    },
+    {
+      "kind": "heading",
+      "text": "Step 4: turn the number into a prediction"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A measured cost is only useful if you can apply it. If a crossing costs 250 ns and your program does one per byte on a 10 MB file, that is 10,000,000 crossings — about 2.5 seconds of pure overhead before any real work. Buffer at 64 KB and it becomes about 160 crossings, or 40 microseconds. Same bytes, same disk, four orders of magnitude of difference, and you can now predict it instead of discovering it."
+    },
+    {
+      "kind": "try",
+      "title": "Trace, count, measure, predict",
+      "steps": [
+        "Run: printf 'hello\\n' > /tmp/x && strace -e trace=openat,read,write,close cat /tmp/x",
+        "Run: strace -c cat /tmp/x 2>&1 | tail -20        (note the total call count)",
+        "Run: strace -c /bin/true 2>&1 | tail -5          (a program that does nothing still costs this much)",
+        "Save the C program above as syscost.c, then: gcc -O2 syscost.c -o syscost && ./syscost",
+        "Write down your three numbers",
+        "Predict: how long should 1,000,000 single-byte reads take on your machine, in seconds?",
+        "Check it: dd if=/dev/zero of=/dev/null bs=1 count=1000000  and compare with your prediction",
+        "Run: dd if=/dev/zero of=/dev/null bs=1000000 count=1  and explain the difference out loud"
+      ],
+      "expected": "Your prediction should land in the right order of magnitude — that is the whole goal. If it is far off, the gap is itself informative: dd does a read and a write per block, so the crossing count is double what you may have assumed. Being able to reason to within a factor of two here is what separates guessing about performance from knowing."
+    }
+  ],
+  "cheatsheet": [
+    "strace -e trace=<calls> <program> shows the sequence with arguments and results",
+    "strace -c <program> aggregates counts and time per call",
+    "Most calls in a small program are the dynamic linker loading libc",
+    "Descriptor 3 is the first free one — 0, 1, 2 are stdin, stdout, stderr",
+    "A short read is normal; read returning 0 means end of file",
+    "Measure the crossing cost on YOUR machine — mitigations change it a lot",
+    "Crossing cost x number of crossings = the overhead you can predict in advance",
+    "Buffering is the single highest-leverage I/O change you can make"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "strace shows read(3, \"hello\\n\", 131072) = 6 on a file that is 6 bytes long. Is the short return an error?",
+      "choices": {
+        "A": "Yes — the read failed and should be retried",
+        "B": "No — read returns how many bytes it actually got, which is normal and must always be checked",
+        "C": "Yes — the buffer was too large",
+        "D": "No, but only for regular files"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "read returns the count it managed to supply. Code that assumes it always fills the buffer is a classic bug, especially on pipes and sockets — which you will meet again in the networking course."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Printing a 6-byte file took 43 system calls. Where did most of them go?",
+      "choices": {
+        "A": "Reading the file in small pieces",
+        "B": "Process startup — mainly the dynamic linker finding and mapping the C library",
+        "C": "Writing to the terminal",
+        "D": "Permission checks on the file"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Only about four calls touched the file. The rest is fixed startup cost, paid every time a process is created — which is exactly why spawning one process per loop iteration is so much slower than it looks."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A crossing costs 250 ns on your machine. Your program reads a 10 MB file one byte at a time. Roughly how much time is pure crossing overhead?",
+      "choices": {
+        "A": "About 2.5 milliseconds",
+        "B": "About 2.5 seconds",
+        "C": "About 250 milliseconds",
+        "D": "It depends entirely on the disk"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "10,000,000 crossings times 250 ns is 2.5 seconds, before a single byte of useful work. This is the calculation worth being able to do in your head."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why do measured syscall costs vary so much between machines, even at similar clock speeds?",
+      "choices": {
+        "A": "Different C library versions",
+        "B": "Kernel version and enabled CPU speculative-execution mitigations change the cost of the crossing itself",
+        "C": "Filesystem type",
+        "D": "The amount of installed RAM"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Mitigations for speculative-execution vulnerabilities added real work to every boundary crossing. This is a good example of a security decision with a directly measurable performance price — and of why you measure on the machine you actually deploy to."
+    }
+  ]
+}

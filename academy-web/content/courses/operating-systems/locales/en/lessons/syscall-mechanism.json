@@ -1,0 +1,245 @@
+{
+  "nodeId": "syscall-mechanism",
+  "locale": "en",
+  "title": "How a program asks the kernel for something",
+  "objective": "By the end of this lesson you can describe what happens between calling write() in C and the kernel running, explain why syscall numbers differ between architectures, and say why some 'system calls' never enter the kernel at all.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "In your C source, write(fd, buf, n) looks exactly like any other function call. It is not one. It is a request handed across the boundary from the previous lesson, and the machinery that carries it is worth understanding — because it explains performance, it explains errno, and it explains what a tool like strace is showing you."
+    },
+    {
+      "kind": "heading",
+      "text": "Three layers, not one"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Layer",
+        "What it is",
+        "Example"
+      ],
+      "rows": [
+        [
+          "Your call",
+          "An ordinary C function call into the C library",
+          "write(1, \"hi\", 2)"
+        ],
+        [
+          "The libc wrapper",
+          "Puts the arguments in the right registers, executes the syscall instruction, translates the result",
+          "glibc's write()"
+        ],
+        [
+          "The kernel",
+          "Looks up the number in its table, validates, does the work, returns a value",
+          "sys_write"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The C library is a thin translator here, not a decision-maker. Its job is to know the calling convention: which register holds the call number, which hold the arguments, what the instruction is on this processor, and how the kernel's return value maps onto the C convention of returning -1 and setting errno."
+    },
+    {
+      "kind": "code",
+      "caption": "The same request at two levels",
+      "lines": [
+        "#include <unistd.h>",
+        "#include <sys/syscall.h>",
+        "",
+        "/* Through the library — portable, this is what you normally write */",
+        "write(1, \"hi\\n\", 3);",
+        "",
+        "/* The same request, naming the call by number yourself */",
+        "syscall(SYS_write, 1, \"hi\\n\", 3);",
+        "",
+        "/* SYS_write is a constant from the headers, not a universal value. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The numbers are per-architecture, and that matters"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Every system call has a number, and the kernel uses it as an index into a table. Those numbers are part of the architecture's ABI, not a Linux-wide constant. The same call has a different number on a 64-bit Intel machine than on a 64-bit ARM machine — and some calls do not exist at all on the newer one."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Call",
+        "x86-64",
+        "aarch64 (64-bit ARM)"
+      ],
+      "rows": [
+        [
+          "read",
+          "0",
+          "63"
+        ],
+        [
+          "write",
+          "1",
+          "64"
+        ],
+        [
+          "openat",
+          "257",
+          "56"
+        ],
+        [
+          "mmap",
+          "9",
+          "222"
+        ],
+        [
+          "execve",
+          "59",
+          "221"
+        ],
+        [
+          "exit_group",
+          "231",
+          "94"
+        ],
+        [
+          "open",
+          "2",
+          "does not exist"
+        ],
+        [
+          "fork",
+          "57",
+          "does not exist"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Why aarch64 has no open() and no fork()",
+      "text": "aarch64 was defined long after those calls had better replacements, so it shipped only the modern ones: openat() takes a directory descriptor plus a path and can therefore express 'relative to this directory' safely, and clone() covers everything fork() did plus threads. On ARM your program still calls open() and fork() in C — the library translates them into openat() and clone(). This is why you should never hardcode a syscall number, and why strace output can look unfamiliar on a different machine."
+    },
+    {
+      "kind": "heading",
+      "text": "How an error comes back"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The kernel does not have errno. It returns a single value: a small negative number means failure and encodes which failure. The library checks for that range, stores the positive equivalent in errno, and returns -1 to you. That is the whole mechanism behind the pattern you already use."
+    },
+    {
+      "kind": "code",
+      "caption": "What the wrapper does on your behalf",
+      "lines": [
+        "int fd = open(\"/nope\", O_RDONLY);",
+        "if (fd < 0) {",
+        "    perror(\"open\");        /* open: No such file or directory */",
+        "    /* the kernel returned -2; the wrapper set errno = 2 (ENOENT) and returned -1 */",
+        "}",
+        "",
+        "/* Which is why errno is only meaningful after a call that FAILED. */",
+        "/* A successful call may leave any value there. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Some calls never enter the kernel"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Reading the clock is requested constantly by almost every program. Crossing the boundary for it would be an enormous, pointless tax — so Linux maps a small page of kernel-provided code into every process, called the vDSO. Calls like clock_gettime() run that code in user mode, reading a shared time page, and return without ever crossing."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "You can measure the difference yourself",
+      "text": "On one aarch64 machine, clock_gettime through the vDSO took about 27 ns per call while the same call forced through the real syscall path took about 298 ns — roughly eleven times slower. Your numbers will differ; the ratio is the point, and the exercise below has you measure it on your own machine rather than trusting anyone's figure."
+    },
+    {
+      "kind": "try",
+      "title": "Watch and time the boundary",
+      "steps": [
+        "Run: strace -c cat /etc/hostname            (a count of every call, grouped)",
+        "Run: strace -e trace=openat,read,write,close cat /etc/hostname",
+        "Read that output as a story: find the library being loaded, then the file, then the write to the screen",
+        "Run: grep -E 'vdso|vvar' /proc/self/maps    (the kernel's code mapped into you)",
+        "Run: strace -e trace=clock_gettime date     (notice how few, or none, appear — that is the vDSO)",
+        "Run: strace -c dd if=/dev/zero of=/dev/null bs=1 count=20000 2>&1 | tail -6",
+        "Run: strace -c dd if=/dev/zero of=/dev/null bs=20000 count=1 2>&1 | tail -6"
+      ],
+      "expected": "The two dd runs move identical bytes; the call counts differ by four orders of magnitude. And the clock_gettime trace shows almost nothing, because that call is answered without a crossing at all — the two facts together are the practical summary of this lesson."
+    }
+  ],
+  "cheatsheet": [
+    "write() in C is a library wrapper, not the system call itself",
+    "The wrapper loads registers, executes the syscall instruction, and translates the result",
+    "Every call has a number that indexes the kernel's table",
+    "Numbers are per-architecture: write is 1 on x86-64 and 64 on aarch64",
+    "aarch64 has no open() or fork() — libc maps them to openat() and clone()",
+    "Never hardcode a syscall number; use the SYS_* constants",
+    "The kernel returns a small negative value on error; the wrapper sets errno and returns -1",
+    "errno is only meaningful after a call that failed",
+    "The vDSO answers clock calls in user mode with no crossing at all",
+    "strace -c counts calls; strace -e trace=... shows the sequence"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Where does errno actually get set?",
+      "choices": {
+        "A": "The kernel writes it into your process",
+        "B": "The C library wrapper sets it after seeing a negative return value from the kernel",
+        "C": "The CPU sets it in a status register",
+        "D": "It is read from /proc after each call"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The kernel returns one value and encodes failure as a small negative number. Translating that into -1 plus errno is entirely the library's work — which is why errno only means anything after a failure."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Your code calls open() and it works on both x86-64 and aarch64, yet aarch64 has no open syscall. How?",
+      "choices": {
+        "A": "The kernel emulates the missing call",
+        "B": "The C library implements open() using the openat() syscall on that architecture",
+        "C": "open() is a macro that becomes a file read",
+        "D": "aarch64 kernels add it at boot"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "This is exactly the job of the wrapper layer: a stable C interface on top of whatever the architecture's ABI actually provides. Hardcoding a syscall number throws that portability away."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why does calling clock_gettime() in a tight loop cost far less than calling getpid() in the same loop?",
+      "choices": {
+        "A": "getpid does more computation",
+        "B": "clock_gettime is answered by vDSO code running in user mode, with no boundary crossing",
+        "C": "The C library caches the time",
+        "D": "getpid always reads from disk"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The vDSO is kernel-provided code mapped into your address space. The clock is read from a shared page in user mode, so the expensive part — the crossing — never happens."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "You want to know which system calls a misbehaving program is making. What is the first tool to reach for?",
+      "choices": {
+        "A": "gdb, stepping through instruction by instruction",
+        "B": "strace, which reports every call, its arguments, and its result",
+        "C": "Reading the kernel source for the syscall table",
+        "D": "Adding printf to the program"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "strace shows the whole conversation between the program and the kernel, including the failing call and its errno — usually before you need a debugger at all."
+    }
+  ]
+}

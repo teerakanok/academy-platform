@@ -1,0 +1,79 @@
+{
+  "id": "operating-systems",
+  "slug": "operating-systems",
+  "version": "1.0.0",
+  "publicAvailability": "internal",
+  "defaultLocale": "en",
+  "availableLocales": [
+    "en",
+    "th"
+  ],
+  "level": "intermediate",
+  "estimatedMinutes": 54,
+  "coverMotif": "layers",
+  "skills": [
+    {
+      "id": "kernel-interface",
+      "maxScore": 100
+    },
+    {
+      "id": "processes",
+      "maxScore": 100
+    },
+    {
+      "id": "concurrency",
+      "maxScore": 100
+    },
+    {
+      "id": "synchronisation",
+      "maxScore": 100
+    },
+    {
+      "id": "virtual-memory",
+      "maxScore": 100
+    },
+    {
+      "id": "os-security",
+      "maxScore": 100
+    }
+  ],
+  "globalSkillWeights": {
+    "foundations": 0.8,
+    "security-ops": 0.2
+  },
+  "nodes": [
+    {
+      "id": "kernel-vs-user-mode",
+      "kind": "lesson",
+      "prerequisites": [],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "kernel-interface": 3,
+        "os-security": 2
+      }
+    },
+    {
+      "id": "syscall-mechanism",
+      "kind": "lesson",
+      "prerequisites": [
+        "kernel-vs-user-mode"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "kernel-interface": 4
+      }
+    },
+    {
+      "id": "syscall-lifecycle",
+      "kind": "capstone",
+      "prerequisites": [
+        "syscall-mechanism"
+      ],
+      "estimatedMinutes": 20,
+      "skillWeights": {
+        "kernel-interface": 4,
+        "processes": 2
+      }
+    }
+  ]
+}

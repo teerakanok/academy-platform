@@ -1,0 +1,46 @@
+{
+  "locale": "th",
+  "title": "ระบบปฏิบัติการ",
+  "subtitle": "สิ่งที่ kernel ทำอยู่จริงใต้ทุกโปรแกรมที่คุณรัน",
+  "audience": "สำหรับคนที่ทำงานบน Linux shell ได้แล้วและอ่านภาษา C ออก และอยากเข้าใจว่าเกิดอะไรขึ้นเมื่อโปรแกรมเรียก kernel, fork, ค้างรอ, แย่งกันเขียน หรือหน่วยความจำหมด คอร์สนี้เปลี่ยน \"เดี๋ยว OS จัดการเอง\" ให้เป็นสิ่งที่คุณตามรอย วัดผล และให้เหตุผลได้",
+  "outcomes": [
+    "อธิบายได้ว่า system call มีราคาเท่าไร และตามรอยมันจากโค้ดของคุณลงไปใน kernel แล้วกลับขึ้นมาได้",
+    "เริ่ม รอ และเก็บกวาดโปรเซสได้ถูกต้อง รวมถึงรูปแบบความผิดพลาดที่ทำให้โปรเซสค้างสะสม",
+    "เขียนโค้ดหลาย thread ที่แชร์ข้อมูลกันได้อย่างปลอดภัย และมองออกว่าตรงไหนเป็น race condition ก่อนของจะขึ้น production",
+    "วินิจฉัย deadlock จากเงื่อนไขสี่ข้อของมัน แทนการเดา",
+    "อ่านแผนที่หน่วยความจำของโปรเซสได้ และอธิบาย page fault, copy-on-write และการ map ไฟล์เข้าหน่วยความจำได้",
+    "ตัดสินได้ว่าโปรแกรมที่มีสิทธิ์พิเศษปลอดภัยหรือไม่ และทำไมช่องโหว่ระดับเครื่องจำนวนมากถึงอยู่ที่ setuid"
+  ],
+  "skillLabels": {
+    "kernel-interface": "การติดต่อกับ kernel",
+    "processes": "โปรเซส",
+    "concurrency": "การทำงานพร้อมกัน",
+    "synchronisation": "การซิงโครไนซ์",
+    "virtual-memory": "หน่วยความจำเสมือน",
+    "os-security": "การป้องกันของระบบปฏิบัติการ"
+  },
+  "nodeTitles": {
+    "kernel-vs-user-mode": "สองโลก: kernel mode กับ user mode",
+    "syscall-mechanism": "โปรแกรมขอให้ kernel ทำอะไรให้ได้อย่างไร",
+    "syscall-lifecycle": "ตามรอย system call หนึ่งตัวลงไปให้สุด",
+    "fork-exec-wait": "โปรแกรมหนึ่งเริ่มอีกโปรแกรมหนึ่งได้อย่างไร",
+    "zombie-and-orphan": "zombie, orphan และใครเป็นคนเก็บกวาด",
+    "signals": "signal: ระบบปฏิบัติการขัดจังหวะคุณ",
+    "async-signal-safety": "signal handler ทำอะไรได้บ้าง",
+    "thread-vs-process": "thread กับ process: อะไรที่แชร์กันจริง",
+    "pthreads": "เขียนโปรแกรมที่มีหลาย thread",
+    "race-conditions": "race condition: เมื่อจังหวะเวลาเป็นตัวตัดสินคำตอบ",
+    "mutex": "การกันไม่ให้เข้าพร้อมกัน และราคาที่ต้องจ่าย",
+    "semaphore-and-condvar": "รอให้ถูกวิธี: semaphore และ condition variable",
+    "producer-consumer": "สร้างคิว producer-consumer ที่ข้อมูลไม่พัง",
+    "deadlock": "deadlock: เงื่อนไขสี่ข้อ และการหักข้อใดข้อหนึ่ง",
+    "cpu-scheduling": "ตัวจัดคิวตัดสินอย่างไรว่าใครได้รันต่อ",
+    "address-space": "สิ่งที่โปรเซสมองเห็น: virtual address space",
+    "page-tables-and-tlb": "จาก virtual ไป physical: page table และ TLB",
+    "demand-paging": "การโหลดหน้าเมื่อต้องใช้ และ page fault คืออะไรกันแน่",
+    "cow-and-mmap": "copy-on-write และการ map ไฟล์เข้าหน่วยความจำ",
+    "privilege-rings": "ระดับสิทธิ์ที่ฮาร์ดแวร์บังคับเอง",
+    "acl-vs-capability": "สองวิธีตอบคำถามว่า 'อันนี้ทำได้ไหม'",
+    "setuid-and-its-risks": "setuid: บิตที่อันตรายที่สุดบนระบบไฟล์"
+  }
+}

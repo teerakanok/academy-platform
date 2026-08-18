@@ -1,0 +1,184 @@
+{
+  "nodeId": "kernel-vs-user-mode",
+  "locale": "en",
+  "title": "Two worlds: kernel mode and user mode",
+  "objective": "By the end of this lesson you can explain why the processor runs your code in a restricted mode, name three things your program genuinely cannot do itself, and read the boundary in a running system.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Your program cannot talk to a disk. It cannot send a packet. It cannot even end itself — not directly. Every one of those actions belongs to the kernel, and your code reaches them by asking. This is not a convention that programs politely follow. It is enforced by the processor, in hardware, on every single instruction."
+    },
+    {
+      "kind": "heading",
+      "text": "The processor has a privilege setting"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A modern CPU always runs in one of at least two modes. In kernel mode, every instruction is available: change the page tables, talk to a device, disable interrupts. In user mode, those instructions do not execute — attempting one does not misbehave quietly, it traps into the kernel, which then decides what to do with your process. Usually it kills it."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "User mode",
+        "Kernel mode"
+      ],
+      "rows": [
+        [
+          "What runs there",
+          "Your programs, shells, browsers, servers",
+          "The kernel and its drivers"
+        ],
+        [
+          "Memory it can touch",
+          "Only its own mapped pages",
+          "All physical memory"
+        ],
+        [
+          "Devices",
+          "None directly",
+          "All of them"
+        ],
+        [
+          "Privileged instructions",
+          "Trap instead of executing",
+          "Execute"
+        ],
+        [
+          "A bug's blast radius",
+          "One process dies",
+          "The machine can die"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "root is not kernel mode — this trips up almost everyone",
+      "text": "In the Linux course you learned that root can do anything a user can be permitted to do. That is a permission check inside the kernel, and a root process still runs in user mode. It still cannot touch physical memory or a device register directly; it just gets 'yes' to requests that another user gets 'no' to. Kernel mode is a hardware state. root is a number in a process's credentials."
+    },
+    {
+      "kind": "heading",
+      "text": "You have already seen the boundary enforced"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When a C program dereferences a wild pointer and dies with a segmentation fault, that is this mechanism firing. The process touched an address the kernel had not mapped for it; the hardware trapped; the kernel looked at the fault, found no legitimate mapping, and delivered a fatal signal. The crash you saw in the C course was the boundary doing its job."
+    },
+    {
+      "kind": "code",
+      "caption": "Three things only the kernel can do for you",
+      "lines": [
+        "/* 1. Open a file — the kernel checks permissions and tracks the handle */",
+        "int fd = open(\"/etc/hostname\", O_RDONLY);",
+        "",
+        "/* 2. Get memory from the system — the kernel maps pages into you */",
+        "void *p = mmap(NULL, 4096, PROT_READ|PROT_WRITE,",
+        "               MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);",
+        "",
+        "/* 3. End the process — the kernel reclaims everything you were holding */",
+        "_exit(0);"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Each of those lines looks like an ordinary function call in your source. None of them is. Each one crosses into the kernel, does its work at a privilege level your code never holds, and returns. The next lesson is about exactly how that crossing happens."
+    },
+    {
+      "kind": "heading",
+      "text": "Crossing costs something"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A crossing is not free. The processor switches mode, the kernel saves your registers, validates what you passed, does the work, and restores you. That overhead is why a program that reads a file one byte at a time is dramatically slower than one that reads it in large blocks — the work is the same, but the number of crossings is not. You will measure this yourself in the capstone."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "This is why the kernel interface is small and stable",
+      "text": "Linux has a few hundred system calls, and their behaviour changes very slowly, because everything ever compiled depends on them. It is a deliberately narrow, deliberately boring door. Narrow doors are easier to guard — which is the same reason the security modules in the last module of this course hang off exactly this boundary."
+    },
+    {
+      "kind": "try",
+      "title": "See the two worlds in a running system",
+      "steps": [
+        "Run: cat /proc/self/status | grep -E 'Name|Pid|Uid'    (a process describing itself through the kernel)",
+        "Run: ps -eo pid,user,comm | head -12                   (some of these are kernel threads)",
+        "Run: ps -eo pid,comm | grep -E '\\[.*\\]' | head        (names in brackets are kernel threads — no user-mode code at all)",
+        "Run: cat /proc/uptime && cat /proc/loadavg             (values the kernel exposes as files)",
+        "Run: dd if=/dev/zero of=/dev/null bs=1 count=100000 2>&1 | tail -1",
+        "Run: dd if=/dev/zero of=/dev/null bs=100000 count=1 2>&1 | tail -1",
+        "Compare the two times: identical bytes moved, wildly different number of crossings"
+      ],
+      "expected": "The last two commands move the same 100,000 bytes. The first does it in 100,000 crossings, the second in one. The time difference is the cost of the boundary, and it is the single most useful number to have a feel for in this whole module."
+    }
+  ],
+  "cheatsheet": [
+    "The CPU runs in user mode or kernel mode — enforced in hardware, per instruction",
+    "User mode: only your mapped memory, no devices, no privileged instructions",
+    "Kernel mode: all memory, all devices — a bug here can take the machine down",
+    "root is a permission inside the kernel, NOT kernel mode",
+    "A segfault is this boundary rejecting an unmapped address",
+    "Crossing the boundary costs time — batch your I/O instead of byte-at-a-time",
+    "/proc is the kernel exposing its own state as files",
+    "Process names in [brackets] are kernel threads"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A process is running as root. Which statement is true?",
+      "choices": {
+        "A": "It runs in kernel mode and can touch any physical address",
+        "B": "It still runs in user mode; root only changes which requests the kernel approves",
+        "C": "It bypasses system calls entirely",
+        "D": "It can execute privileged CPU instructions directly"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Kernel mode is a hardware privilege state. root is a credential the kernel checks when deciding whether to grant a request. A root process makes the same system calls as anyone else — it just gets 'yes' more often."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why is reading a file one byte at a time so much slower than reading it in 64KB blocks, even though the total bytes are identical?",
+      "choices": {
+        "A": "The disk reads single bytes more slowly",
+        "B": "Each read is a crossing into the kernel, and the per-crossing overhead dominates",
+        "C": "The C library refuses to buffer small reads",
+        "D": "Single-byte reads bypass the page cache"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Same bytes, vastly more boundary crossings. Each crossing saves and restores state and re-validates arguments, and that fixed cost is paid once per call."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Your program dereferences a pointer to an address it never allocated. What actually happens?",
+      "choices": {
+        "A": "The C compiler catches it at build time",
+        "B": "The hardware traps to the kernel, which finds no valid mapping and delivers a fatal signal",
+        "C": "The kernel silently allocates the page",
+        "D": "The program reads whatever another process had there"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "This is the user/kernel boundary enforcing itself. Option D describes exactly what memory protection exists to prevent."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why does Linux keep the number of system calls small and their behaviour stable for decades?",
+      "choices": {
+        "A": "Adding them requires new hardware",
+        "B": "Every compiled program depends on them, and a narrow, stable interface is both compatible and easier to secure",
+        "C": "The CPU limits how many can exist",
+        "D": "Each one must fit in a single register"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "It is the contract between every program ever built and the kernel. It is also the attack surface, so keeping it narrow serves compatibility and security at the same time."
+    }
+  ]
+}
