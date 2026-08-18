@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 250,
+  "estimatedMinutes": 306,
   "coverMotif": "probe",
   "skills": [
     {
@@ -206,6 +206,43 @@
       "skillWeights": {
         "pointers": 5,
         "c-syntax": 2
+      }
+    },
+    {
+      "id": "memory-bug-patterns",
+      "kind": "lesson",
+      "prerequisites": [
+        "function-pointers"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "debugging": 6,
+        "memory-model": 3
+      }
+    },
+    {
+      "id": "finding-memory-bugs",
+      "kind": "lesson",
+      "prerequisites": [
+        "memory-bug-patterns"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "debugging": 6,
+        "build-systems": 2
+      }
+    },
+    {
+      "id": "defensive-c",
+      "kind": "capstone",
+      "prerequisites": [
+        "finding-memory-bugs"
+      ],
+      "estimatedMinutes": 20,
+      "skillWeights": {
+        "debugging": 4,
+        "c-syntax": 3,
+        "memory-model": 3
       }
     }
   ]

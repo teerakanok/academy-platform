@@ -1,0 +1,233 @@
+{
+  "nodeId": "defensive-c",
+  "locale": "en",
+  "title": "Writing C that resists mistakes",
+  "objective": "By the end of this lesson you can apply the habits that prevent memory defects rather than finding them afterwards, and you can design a function signature that is hard for a caller to misuse.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Finding bugs with tools is necessary. Not writing them is cheaper. Everything here is a habit that costs you nothing at the moment of writing and removes a category of defect permanently — and most of it is about making the safe version the easy one."
+    },
+    {
+      "kind": "heading",
+      "text": "Habit 1: initialise everything at declaration"
+    },
+    {
+      "kind": "code",
+      "caption": "There is no cost and a real benefit",
+      "lines": [
+        "int    count = 0;",
+        "char  *name  = NULL;",
+        "char   buf[64] = {0};        /* whole array zeroed */",
+        "struct config cfg = {0};     /* whole struct zeroed */",
+        "",
+        "/* An uninitialised read is undefined behaviour, and a pointer full of",
+        "   leftover stack data can look valid enough to write through. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Habit 2: make the buffer size travel with the buffer"
+    },
+    {
+      "kind": "code",
+      "caption": "A signature that cannot be called wrongly",
+      "lines": [
+        "/* Easy to misuse — how long is out? */",
+        "void format_name(char *out, const char *first, const char *last);",
+        "",
+        "/* Hard to misuse — the size is part of the contract */",
+        "int format_name(char *out, size_t out_size, const char *first, const char *last);",
+        "",
+        "/* At the call site, derive the size rather than repeating a number: */",
+        "char line[128];",
+        "format_name(line, sizeof line, first, last);"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "sizeof at the call site, not a repeated literal",
+      "text": "format_name(line, 128, ...) is correct until someone changes the declaration to 64. sizeof line cannot drift out of step with the array it measures. Repeating a size as a literal is one of the most reliable ways to introduce an overflow months later."
+    },
+    {
+      "kind": "heading",
+      "text": "Habit 3: validate at the boundary, once"
+    },
+    {
+      "kind": "code",
+      "caption": "Check where untrusted data arrives",
+      "lines": [
+        "int handle_request(const char *raw_len, const char *body) {",
+        "    char *end;",
+        "    long len = strtol(raw_len, &end, 10);",
+        "",
+        "    if (*end != '\\0')          return -1;   /* not a number at all */",
+        "    if (len < 0)               return -1;   /* negative length is nonsense */",
+        "    if ((size_t)len > MAX_BODY) return -1;  /* and cap it */",
+        "",
+        "    /* From here on, len is known good — no need to re-check everywhere. */",
+        "    return process(body, (size_t)len);",
+        "}"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The negative-length check is the one people leave out",
+      "text": "A length that arrives as -1 and is then converted to size_t becomes an enormous positive number. Every subsequent bounds check compares against it and passes. Reject negative values at the boundary, before any conversion, and the whole class disappears."
+    },
+    {
+      "kind": "heading",
+      "text": "Habit 4: one owner, stated in the name or the comment"
+    },
+    {
+      "kind": "code",
+      "caption": "Make ownership visible",
+      "lines": [
+        "/* Caller owns the result and must free it. */",
+        "char *config_render(const struct config *cfg);",
+        "",
+        "/* Borrows the string; does not keep a reference after returning. */",
+        "int config_parse(struct config *out, const char *text);",
+        "",
+        "/* Takes ownership of data and frees it when the queue is destroyed. */",
+        "int queue_push(struct queue *q, char *data);"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Habit 5: fail closed, and fail early"
+    },
+    {
+      "kind": "code",
+      "caption": "Guard clauses keep the happy path flat",
+      "lines": [
+        "int process(const struct request *req) {",
+        "    if (req == NULL)          return -1;",
+        "    if (req->body == NULL)    return -1;",
+        "    if (req->length == 0)     return 0;",
+        "    if (req->length > MAX)    return -1;",
+        "",
+        "    /* the real work, with everything already known to be valid */",
+        "}"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Checking every precondition at the top leaves the body free of nesting and makes it obvious what the function assumes. It also means the failure cases are all in one place, where a reviewer can see whether any are missing."
+    },
+    {
+      "kind": "heading",
+      "text": "Habit 6: prefer the function that takes a size"
+    },
+    {
+      "kind": "table",
+      "headers": ["Instead of", "Use", "Because"],
+      "rows": [
+        ["gets", "fgets", "The size is a parameter"],
+        ["strcpy / strcat", "snprintf", "Bounded and always terminates"],
+        ["sprintf", "snprintf", "Bounded"],
+        ["atoi", "strtol with checks", "atoi cannot report failure at all"],
+        ["malloc(n * size)", "calloc(n, size)", "Detects the multiplication overflow"],
+        ["A fixed 4096 in two places", "One constant, or sizeof", "They cannot drift apart"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Compile-time checks beat runtime checks",
+      "text": "Where you can, make the mistake impossible rather than detectable: const on parameters you do not modify, static on anything not exported, enum instead of loose integers, and a struct instead of three parallel arrays that can fall out of step. Each of these turns a possible runtime defect into a compile error or removes the possibility entirely."
+    },
+    {
+      "kind": "heading",
+      "text": "A checklist for reviewing C"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Every allocation: is the result checked, and who frees it?",
+        "Every buffer write: is the size known, and does it come from the same place as the buffer?",
+        "Every length or index from outside: is it checked for negative and for maximum, before conversion?",
+        "Every pointer parameter: can it be NULL, and is that handled?",
+        "Every error path: does it free everything acquired so far?",
+        "Every loop bound: is it < or <= , and which one did the author mean?"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Harden a function you would have written the easy way",
+      "steps": [
+        "Write void copy_name(char *out, const char *in) using strcpy",
+        "Call it with an input longer than the destination and run under -fsanitize=address",
+        "Rewrite it as int copy_name(char *out, size_t out_size, const char *in) using snprintf",
+        "Call it with sizeof at the call site and confirm the overflow is gone",
+        "Add guard clauses for NULL inputs and a zero-size buffer",
+        "Write a parse function using strtol with all three checks, and test it with \"-1\", \"abc\", and a huge number",
+        "Add a comment stating who owns each pointer the function returns"
+      ],
+      "expected": "The same function twice: once as it is usually written and once where the caller cannot easily get it wrong. The second version is longer by a few lines and removes an entire category of defect from every future call site."
+    }
+  ],
+  "cheatsheet": [
+    "Initialise every variable at declaration, including pointers to NULL",
+    "Pass the buffer size alongside the buffer, and derive it with sizeof at the call site",
+    "Never repeat a size as a literal in two places",
+    "Validate untrusted lengths at the boundary: reject negatives BEFORE converting to size_t",
+    "State ownership for every returned pointer",
+    "Guard clauses at the top; the happy path stays flat",
+    "fgets over gets, snprintf over strcpy, strtol over atoi, calloc over malloc(n*size)",
+    "Prefer compile-time impossibility to runtime detection: const, static, enum, struct",
+    "Review checklist: allocation checked, size known, bounds validated, NULL handled, error paths free"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why pass sizeof line rather than the literal 128 at a call site?",
+      "choices": {
+        "A": "It is faster",
+        "B": "sizeof cannot drift out of step with the array; a repeated literal becomes wrong the day someone changes the declaration",
+        "C": "The compiler requires it",
+        "D": "It avoids the need for a length parameter"
+      },
+      "correct": ["B"],
+      "explanation": "Duplicated constants are how overflows get introduced long after the code was written and reviewed."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A length arrives from input as -1 and is stored in a size_t. What happens to your bounds check?",
+      "choices": {
+        "A": "It catches the negative value",
+        "B": "The conversion makes it an enormous positive number, so the check passes and the value is then used as a size",
+        "C": "The program crashes at the conversion",
+        "D": "size_t rejects negative values"
+      },
+      "correct": ["B"],
+      "explanation": "Reject negatives at the boundary, before conversion. This is the same rule as the signed/unsigned lesson, applied where untrusted data arrives."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "What is the advantage of guard clauses at the top of a function?",
+      "choices": {
+        "A": "They run faster",
+        "B": "All the preconditions and failure cases sit in one place, and the main body stays flat and free of nesting",
+        "C": "They replace the need for tests",
+        "D": "They prevent memory leaks automatically"
+      },
+      "correct": ["B"],
+      "explanation": "A reviewer can see the complete set of assumptions at a glance, which makes a missing check visible rather than buried."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why prefer const, static, and enum over runtime checks where possible?",
+      "choices": {
+        "A": "They make the binary smaller",
+        "B": "They turn a possible runtime defect into a compile error, or remove the possibility entirely — a check that cannot be skipped",
+        "C": "They are required by the standard",
+        "D": "They improve performance measurably"
+      },
+      "correct": ["B"],
+      "explanation": "A runtime check has to be written, kept, and executed. A compile-time impossibility needs none of those things."
+    }
+  ]
+}

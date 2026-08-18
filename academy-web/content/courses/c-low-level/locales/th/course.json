@@ -33,6 +33,9 @@
     "pointer-arithmetic": "เลขคณิตของ pointer และ array ทำงานอย่างไรจริงๆ",
     "stack-vs-heap": "stack กับ heap",
     "malloc-and-free": "การจองและการคืนหน่วยความจำ",
-    "function-pointers": "function pointer: การส่งพฤติกรรมไปมา"
+    "function-pointers": "function pointer: การส่งพฤติกรรมไปมา",
+    "memory-bug-patterns": "อ่านอาการ: นี่คือบั๊กหน่วยความจำแบบไหน",
+    "finding-memory-bugs": "เครื่องมือที่หาบั๊กหน่วยความจำให้คุณ",
+    "defensive-c": "เขียน C ให้ทนต่อความผิดพลาด"
   }
 }

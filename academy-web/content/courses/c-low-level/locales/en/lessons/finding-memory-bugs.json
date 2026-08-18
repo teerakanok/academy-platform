@@ -1,0 +1,221 @@
+{
+  "nodeId": "finding-memory-bugs",
+  "locale": "en",
+  "title": "The tools that find memory bugs for you",
+  "objective": "By the end of this lesson you can run the three kinds of tool that catch memory defects, read their reports fluently, and put them where they run automatically instead of when you remember.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "C does not check memory access at runtime, which is why it is fast. The tools in this lesson add those checks back when you ask for them. Learning to read their output is one of the highest-return skills in the language — most memory bugs stop being mysteries the moment one of these is running."
+    },
+    {
+      "kind": "heading",
+      "text": "Three kinds of tool, three different jobs"
+    },
+    {
+      "kind": "table",
+      "headers": ["Kind", "Runs", "Finds", "Cost"],
+      "rows": [
+        ["Compiler warnings", "At compile time", "Suspicious code, format mismatches, obvious mistakes", "Free"],
+        ["Sanitizers", "At runtime, on instrumented builds", "Out-of-bounds, use-after-free, leaks, undefined behaviour", "About 2x slower"],
+        ["Valgrind", "At runtime, no rebuild needed", "Similar defects, plus uninitialised reads", "10x or more slower"]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Warnings first, because they are free"
+    },
+    {
+      "kind": "code",
+      "caption": "The set worth using everywhere",
+      "lines": [
+        "gcc -Wall -Wextra -Wpedantic -Wshadow -Wconversion -O2 -g prog.c -o prog",
+        "",
+        "# -Wall -Wextra    the standard pair",
+        "# -Wshadow         a local variable hiding another one",
+        "# -Wconversion     implicit conversions that may lose data",
+        "# -Werror          make them all errors — the right default for a shared project"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "A warning you ignore is worse than no warning",
+      "text": "Once a build prints twenty warnings, nobody reads the twenty-first — and that is the one that mattered. Fix them to zero, then add -Werror so the count cannot creep back up. A clean build is what makes a new warning meaningful."
+    },
+    {
+      "kind": "heading",
+      "text": "AddressSanitizer: the one to reach for first"
+    },
+    {
+      "kind": "code",
+      "caption": "Build and run",
+      "lines": [
+        "gcc -Wall -Wextra -O1 -g -fsanitize=address prog.c -o prog",
+        "./prog",
+        "",
+        "# Combine with the undefined-behaviour sanitizer:",
+        "gcc -O1 -g -fsanitize=address,undefined prog.c -o prog",
+        "",
+        "# Leak reporting is on by default on Linux; enable it explicitly if needed:",
+        "ASAN_OPTIONS=detect_leaks=1 ./prog"
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "Reading a report from the top",
+      "lines": [
+        "==2891==ERROR: AddressSanitizer: heap-use-after-free on address 0x602000000010",
+        "READ of size 4 at 0x602000000010 thread T0",
+        "    #0 0x55d1 in process items.c:42          <- where the bad access happened",
+        "",
+        "0x602000000010 is located 0 bytes inside of 40-byte region",
+        "freed by thread T0 here:",
+        "    #1 0x55c9 in cleanup items.c:31          <- where it was freed",
+        "",
+        "previously allocated by thread T0 here:",
+        "    #2 0x55b2 in create items.c:18           <- where it came from"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Three locations: where it broke, where the memory was released, and where it was created. That is usually the whole investigation. Read them in that order and the fix is normally obvious by the third line."
+    },
+    {
+      "kind": "heading",
+      "text": "What each sanitizer covers"
+    },
+    {
+      "kind": "table",
+      "headers": ["Sanitizer", "Catches"],
+      "rows": [
+        ["address", "Out-of-bounds on heap, stack and globals; use-after-free; use-after-return; double free; leaks"],
+        ["undefined", "Signed overflow, invalid shifts, misaligned access, division by zero, bad casts"],
+        ["thread", "Data races between threads — cannot be combined with address"],
+        ["memory", "Reads of uninitialised memory (Clang; requires all code instrumented)"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Never ship a sanitizer build",
+      "text": "They roughly double memory use and runtime, and their error handlers are diagnostic aids, not security boundaries. Sanitizers belong in development and CI. Production builds use -O2 with warnings clean and, where the platform offers them, hardening options such as stack protection and fortified library calls."
+    },
+    {
+      "kind": "heading",
+      "text": "Valgrind: when you cannot rebuild"
+    },
+    {
+      "kind": "code",
+      "caption": "No instrumentation required",
+      "lines": [
+        "valgrind --leak-check=full --show-leak-kinds=all ./prog",
+        "",
+        "# ==3021== Invalid write of size 4",
+        "# ==3021==    at 0x1091AA: main (prog.c:9)",
+        "# ==3021==  Address 0x4a4b050 is 0 bytes after a block of size 40 alloc'd",
+        "",
+        "# Slower than the sanitizers, but works on an existing binary",
+        "# and catches uninitialised reads that AddressSanitizer does not."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Making it automatic"
+    },
+    {
+      "kind": "code",
+      "caption": "The CI step that keeps this honest",
+      "lines": [
+        "# .github/workflows/test.yml",
+        "      - run: gcc -Wall -Wextra -Werror -O1 -g -fsanitize=address,undefined -o tests tests.c",
+        "      - run: ./tests",
+        "",
+        "# Any sanitizer report exits non-zero, so the check fails and the",
+        "# pull request cannot be merged — which is the point."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "A tool you run when you remember is a tool that does not run",
+      "text": "The value of these checks is not that they exist but that they run on every change, on a machine nobody configured specially. That is the same argument as the CI lesson in the Git course, applied to the class of defect C is most known for."
+    },
+    {
+      "kind": "try",
+      "title": "Run all three against the same bug",
+      "steps": [
+        "Write a program with a heap overflow: char *p = malloc(8); p[10] = 'x';",
+        "Run: gcc -Wall -Wextra -O2 -g prog.c -o prog && ./prog     (probably silent)",
+        "Run: gcc -O1 -g -fsanitize=address prog.c -o prog && ./prog",
+        "Read all three locations in the report",
+        "Run: valgrind ./prog     (if installed) and compare the two reports",
+        "Add a leak and confirm the sanitizer reports it at exit",
+        "Add -Werror to the build and fix everything until it is clean",
+        "Write the CI step above into a workflow file"
+      ],
+      "expected": "The same defect: invisible in a normal build, named precisely by the sanitizer with three locations, described differently by Valgrind, and finally caught automatically by a CI step you wrote. That progression is the working method for C."
+    }
+  ],
+  "cheatsheet": [
+    "Warnings are free: -Wall -Wextra -Wshadow -Wconversion, and -Werror on shared code",
+    "Fix warnings to zero, or the important one gets lost in the noise",
+    "-fsanitize=address finds out-of-bounds, use-after-free, double free, and leaks",
+    "-fsanitize=undefined finds signed overflow, bad shifts, and misalignment",
+    "Combine address and undefined; thread cannot be combined with address",
+    "Read a report as three locations: where it broke, where it was freed, where it was allocated",
+    "Valgrind needs no rebuild and catches uninitialised reads, but is much slower",
+    "Never ship a sanitizer build — they are diagnostics, not protections",
+    "Put the sanitizer build in CI so the check runs without anyone remembering"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What are the three locations in an AddressSanitizer use-after-free report?",
+      "choices": {
+        "A": "The stack, the heap, and the globals",
+        "B": "Where the invalid access happened, where the memory was freed, and where it was allocated",
+        "C": "The compiler, the linker, and the loader",
+        "D": "Three separate threads"
+      },
+      "correct": ["B"],
+      "explanation": "Those three lines usually contain the entire investigation. Read them in order and the fix is normally clear immediately."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why should a sanitizer build never be shipped to production?",
+      "choices": {
+        "A": "It is illegal",
+        "B": "It roughly doubles runtime and memory use, and its checks are diagnostic aids rather than security boundaries",
+        "C": "It cannot be compiled with -O2",
+        "D": "It disables the standard library"
+      },
+      "correct": ["B"],
+      "explanation": "Use sanitizers in development and CI. For production, use a clean warning-free build plus the platform's hardening options."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "When is Valgrind the better choice over a sanitizer?",
+      "choices": {
+        "A": "Always — it is more accurate",
+        "B": "When you cannot rebuild the binary, or you need uninitialised-read detection that AddressSanitizer does not provide",
+        "C": "When the program is very large",
+        "D": "When you only care about leaks"
+      },
+      "correct": ["B"],
+      "explanation": "It works on an existing binary and covers a case the address sanitizer does not, at the cost of running much more slowly."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why put the sanitizer build in CI rather than running it when you suspect a problem?",
+      "choices": {
+        "A": "It runs faster on CI machines",
+        "B": "A check that depends on someone remembering does not run; in CI it runs on every change and blocks the merge when it reports something",
+        "C": "CI machines have more memory",
+        "D": "It replaces the need for tests"
+      },
+      "correct": ["B"],
+      "explanation": "The same argument as any other automated check: the value comes from it running without anyone deciding to run it."
+    }
+  ]
+}

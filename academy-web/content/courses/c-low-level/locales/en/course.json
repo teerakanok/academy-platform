@@ -33,6 +33,9 @@
     "pointer-arithmetic": "Pointer arithmetic and how arrays really work",
     "stack-vs-heap": "The stack and the heap",
     "malloc-and-free": "Allocating and releasing memory",
-    "function-pointers": "Function pointers: passing behaviour around"
+    "function-pointers": "Function pointers: passing behaviour around",
+    "memory-bug-patterns": "Reading the symptoms: which memory bug is this?",
+    "finding-memory-bugs": "The tools that find memory bugs for you",
+    "defensive-c": "Writing C that resists mistakes"
   }
 }
