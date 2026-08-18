@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 90,
+  "estimatedMinutes": 110,
   "coverMotif": "cloud",
   "skills": [
     {
@@ -95,6 +95,18 @@
       "skillWeights": {
         "addressing": 3,
         "troubleshooting": 3
+      }
+    },
+    {
+      "id": "arp-and-icmp",
+      "kind": "capstone",
+      "prerequisites": [
+        "routing-basics"
+      ],
+      "estimatedMinutes": 20,
+      "skillWeights": {
+        "addressing": 3,
+        "troubleshooting": 4
       }
     }
   ]

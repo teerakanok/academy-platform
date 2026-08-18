@@ -1,0 +1,244 @@
+{
+  "nodeId": "arp-and-icmp",
+  "locale": "en",
+  "title": "Trace a packet from your machine to the internet",
+  "objective": "By the end of this lesson you can follow one packet through address resolution and out to the internet, read an ARP table, and interpret the ICMP messages that tools like ping and traceroute are actually built on.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "You now know how a machine picks a next hop. This lesson closes the gap between that decision and the wire: a routing table gives you an IP address, but a network card can only address a device by its hardware address. Something has to translate. That something is ARP, and watching it work is the clearest way to see the boundary between the network layer and the link layer."
+    },
+    {
+      "kind": "heading",
+      "text": "The full path of one packet"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Your program calls connect() to a public address",
+        "The routing table says: not on my network, send it to the gateway",
+        "The link layer needs the gateway's hardware address — does the ARP table have it?",
+        "If not, broadcast: 'who has 192.0.2.1?' to every device on the segment",
+        "The gateway alone replies with its hardware address; the answer is cached",
+        "The frame goes out addressed to the gateway's hardware address, but carrying the far destination's IP address",
+        "The gateway strips the frame, looks up its own routing table, and repeats all of this on its next link"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The destination IP never changes; the destination MAC changes every hop",
+      "text": "This is the single most clarifying fact about the two layers. The IP address in the packet is where it is ultimately going, and stays constant end to end. The hardware address on the frame is only ever the next device on this particular wire, and is rewritten at every hop. If you understand that sentence, you understand the relationship between the network layer and the link layer."
+    },
+    {
+      "kind": "heading",
+      "text": "Reading an ARP table"
+    },
+    {
+      "kind": "code",
+      "caption": "Entries from a real table, with what each kind means",
+      "lines": [
+        "192.0.2.1        1e:d6:21:95:16:f8    <- the gateway, learned by asking",
+        "192.0.2.255      ff:ff:ff:ff:ff:ff    <- broadcast: every device accepts it",
+        "224.0.0.251      01:00:5e:00:00:fb    <- multicast, and computed rather than asked",
+        "239.255.255.250  01:00:5e:7f:ff:fa    <- multicast",
+        "",
+        "/* Only the first was learned over the network. The others follow rules. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Multicast hardware addresses are calculated, not resolved",
+      "text": "For an IPv4 multicast group, the hardware address is 01:00:5e followed by the low 23 bits of the IP address. Verified against a live table: 224.0.0.251 gives 01:00:5e:00:00:fb, and 239.255.255.250 gives 01:00:5e:7f:ff:fa — both match exactly. No query is needed, because both ends can compute the same answer. This is also why the mapping is not unique: several IP groups can collapse onto one hardware address, and the receiver filters the rest out in software."
+    },
+    {
+      "kind": "heading",
+      "text": "ARP has no authentication"
+    },
+    {
+      "kind": "paragraph",
+      "text": "An ARP reply is believed because it arrived. Nothing in the protocol proves that the responder is the machine it claims to be, so any device on the segment can answer for any address. That is the basis of ARP spoofing: an attacker answers 'I am the gateway', your machine caches it, and your traffic goes through the attacker before reaching the real gateway."
+    },
+    {
+      "kind": "paragraph",
+      "text": "It is worth being precise about the scope of that risk. It requires the attacker to already be on your local segment — it is not something reachable from across the internet. It is a serious risk on shared or untrusted networks, and it is a large part of why traffic is encrypted end to end: an attacker who reroutes a TLS connection still cannot read it, and cannot impersonate the server without a certificate the browser will accept."
+    },
+    {
+      "kind": "heading",
+      "text": "ICMP: the network reporting on itself"
+    },
+    {
+      "kind": "paragraph",
+      "text": "ICMP is not a transport for your data. It is how the network tells a sender what happened. The numbers below are as published by IANA."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Type",
+        "Name",
+        "When you see it"
+      ],
+      "rows": [
+        [
+          "0",
+          "Echo Reply",
+          "ping succeeded"
+        ],
+        [
+          "3",
+          "Destination Unreachable",
+          "Nothing there, or something refused"
+        ],
+        [
+          "5",
+          "Redirect",
+          "'Use a different gateway for this'"
+        ],
+        [
+          "8",
+          "Echo Request",
+          "What ping sends"
+        ],
+        [
+          "11",
+          "Time Exceeded",
+          "Hop limit ran out — this is what traceroute uses"
+        ]
+      ]
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Type 3 code",
+        "Meaning",
+        "Typical cause"
+      ],
+      "rows": [
+        [
+          "0",
+          "Net unreachable",
+          "No route to that network"
+        ],
+        [
+          "1",
+          "Host unreachable",
+          "Route exists, machine did not answer"
+        ],
+        [
+          "2",
+          "Protocol unreachable",
+          "Nothing handles that protocol"
+        ],
+        [
+          "3",
+          "Port unreachable",
+          "Nothing listening on that UDP port"
+        ],
+        [
+          "4",
+          "Fragmentation needed, DF set",
+          "Packet too large for a link — the MTU message from the layers lesson"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "How traceroute actually works",
+      "text": "It sends packets with the hop limit set to 1, then 2, then 3. Each router that decrements the limit to zero discards the packet and reports Time Exceeded — type 11, code 0 — and that reply reveals the router's address. The path is discovered one hop at a time by deliberately sending packets that cannot arrive. That also explains the stars: a router configured not to send these replies stays invisible while still forwarding traffic normally."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Blocking all ICMP breaks more than ping",
+      "text": "A firewall rule that drops ICMP entirely also drops type 3 code 4 — the message that tells a sender its packets are too large. The result is the failure from the layers lesson: small requests succeed, large ones hang, and nothing in any log explains it. Block echo requests if you must, but permit destination-unreachable and time-exceeded."
+    },
+    {
+      "kind": "try",
+      "title": "Follow one packet all the way out",
+      "steps": [
+        "Run: ip neigh    (or arp -an) and identify your gateway's entry",
+        "Delete it: sudo ip neigh flush all      then run ping -c 1 <gateway> and check that it reappeared",
+        "In one terminal run: sudo tcpdump -n -i any arp     and in another, flush and ping again — you should see the query and the reply",
+        "Identify any multicast entries and verify the 01:00:5e rule by hand for one of them",
+        "Run: ping -c 2 <a public address>   under tcpdump -n icmp and identify the echo request and reply by type",
+        "Run: traceroute -n 1.1.1.1   under the same capture and find the time-exceeded messages",
+        "Run: nc -u -z <your own address> 9999   and look for a port-unreachable message",
+        "Run: ping -c 1 -M do -s 2000 1.1.1.1   and look for fragmentation-needed"
+      ],
+      "expected": "An ARP exchange you triggered yourself, a multicast address whose hardware address you computed and then confirmed, and captures showing echo, time-exceeded, port-unreachable and fragmentation-needed messages. Having seen all four ICMP messages by name is what makes the earlier lessons' failure signatures recognisable rather than theoretical."
+    }
+  ],
+  "cheatsheet": [
+    "The destination IP is constant end to end; the destination MAC changes at every hop",
+    "ARP asks the whole segment 'who has this IP' and caches the reply",
+    "ip neigh (or arp -an) shows the cache",
+    "Broadcast MAC is ff:ff:ff:ff:ff:ff",
+    "Multicast MAC is 01:00:5e plus the low 23 bits of the IP — computed, never asked",
+    "Verified: 224.0.0.251 gives 01:00:5e:00:00:fb; 239.255.255.250 gives 01:00:5e:7f:ff:fa",
+    "ARP has no authentication — spoofing requires local access but is easy once there",
+    "ICMP types: 0 echo reply, 3 unreachable, 5 redirect, 8 echo request, 11 time exceeded",
+    "Type 3 codes: 0 net, 1 host, 2 protocol, 3 port, 4 fragmentation needed",
+    "traceroute works by sending packets with a hop limit of 1, 2, 3 and reading the time-exceeded replies",
+    "Never block ICMP wholesale: type 3 code 4 is what prevents the silent large-packet hang"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A packet leaves your machine for a server on another continent. What is in the frame's destination hardware address field?",
+      "choices": {
+        "A": "The server's hardware address",
+        "B": "Your gateway's hardware address — the next device on this wire",
+        "C": "The broadcast address",
+        "D": "It is left empty until the packet reaches the internet"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The IP address is the final destination and never changes. The hardware address is only ever the next hop, and is rewritten by every router along the way."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Your ARP table contains 224.0.0.251 mapped to 01:00:5e:00:00:fb. How was that mapping obtained?",
+      "choices": {
+        "A": "By an ARP query",
+        "B": "It was computed — multicast hardware addresses are 01:00:5e plus the low 23 bits of the IP",
+        "C": "From DHCP",
+        "D": "It was configured manually"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Verified against a live table for two different groups. Both ends can calculate the same answer, so no query is needed."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "An administrator blocks all ICMP at the firewall. Users report that small web pages load but large downloads hang. Why?",
+      "choices": {
+        "A": "The firewall is dropping TCP too",
+        "B": "Type 3 code 4 — fragmentation needed — is being blocked, so senders never learn their packets are too large",
+        "C": "DNS is failing",
+        "D": "The connection limit was reached"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "This is the layers lesson's MTU failure with a cause you can now name. Blocking echo requests is a defensible choice; blocking destination-unreachable is not."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "How does traceroute discover the routers along a path?",
+      "choices": {
+        "A": "It asks each router for its neighbours",
+        "B": "It sends packets with hop limits of 1, 2, 3 and so on; each router that discards one reports Time Exceeded, revealing its address",
+        "C": "It reads the routing tables remotely",
+        "D": "It uses DNS records for each hop"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The path is mapped by deliberately sending packets that cannot arrive. A router configured not to send those replies appears as a star while still forwarding traffic normally."
+    }
+  ]
+}
