@@ -1,0 +1,268 @@
+{
+  "nodeId": "cache-mapping",
+  "locale": "en",
+  "title": "Where a block is allowed to live",
+  "objective": "By the end of this lesson you can split an address into tag, index and offset, explain what associativity buys, and reproduce a slowdown caused purely by addresses rather than by data volume.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A cache is much smaller than memory, so it must decide where in itself to keep each block. Searching every entry on every access would be too slow, so the address itself decides — and that decision has consequences you can measure."
+    },
+    {
+      "kind": "heading",
+      "text": "An address, split three ways"
+    },
+    {
+      "kind": "code",
+      "caption": "How the hardware reads a 64-bit address",
+      "lines": [
+        "  For a cache with 128-byte lines and 512 sets:",
+        "",
+        "   63                     16 15        7 6         0",
+        "  +------------------------+------------+-----------+",
+        "  |          tag           |   index    |  offset   |",
+        "  +------------------------+------------+-----------+",
+        "                                |            |",
+        "                                |            +-- which byte inside the block",
+        "                                |                (128 bytes -> 7 bits)",
+        "                                +-- which set this block must go in",
+        "                                    (512 sets -> 9 bits)",
+        "",
+        "  offset = log2(line size)     index = log2(number of sets)",
+        "  tag    = everything left over, stored alongside the data so the cache",
+        "           can tell which of the many blocks with this index it is holding"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The index is not a choice, it is arithmetic",
+      "text": "A block's index bits come straight out of its address. The cache does not get to put a block wherever there is room; it must put it in the set its address names. This is what makes lookup fast — one set to check, not the whole cache — and it is also the source of the problem measured below."
+    },
+    {
+      "kind": "heading",
+      "text": "How many blocks fit in one set"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Organisation",
+        "Blocks per set",
+        "Lookup cost",
+        "Weakness"
+      ],
+      "rows": [
+        [
+          "Direct-mapped",
+          "1",
+          "One comparison",
+          "Two hot addresses with the same index evict each other endlessly"
+        ],
+        [
+          "N-way set-associative",
+          "N",
+          "N comparisons in parallel",
+          "Still fails once N+1 hot addresses share an index"
+        ],
+        [
+          "Fully associative",
+          "All",
+          "Compare everything",
+          "Impractical for anything but tiny caches"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Real data caches are set-associative — typically 8-way or more. That is a compromise: enough ways that ordinary programs rarely notice, few enough that the comparison stays cheap. The compromise holds until a program produces more simultaneously-hot addresses sharing one index than there are ways, and then it fails sharply rather than gradually."
+    },
+    {
+      "kind": "heading",
+      "text": "Making it fail on purpose"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Touch 64 locations over and over. That is 64 blocks of 128 bytes — 8 KB, which fits in a 128 KB L1 sixteen times over. By the capacity argument alone, every access after the first should hit. Vary only how far apart the 64 locations are."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured on an Apple M4",
+      "lines": [
+        "  64 locations touched repeatedly — 8 KB of actual data, which fits in a",
+        "  128 KB L1 sixteen times over. Only the distance between them changes.",
+        "",
+        "  distance between them      ns per access",
+        "        128 B                    1.63",
+        "        256 B                    1.63",
+        "       1024 B                    1.63",
+        "       2048 B                    1.63",
+        "       4096 B                    8.74     <- 5x slower",
+        "       8192 B                   17.57",
+        "      65536 B                   20.71     <- 13x slower",
+        "",
+        "/* 8 KB of data, and it behaves as if it does not fit in a 128 KB cache. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Eight kilobytes of data, behaving at large strides as if it did not fit in a cache sixteen times its size. Capacity cannot explain this. The only thing that changed was the addresses."
+    },
+    {
+      "kind": "heading",
+      "text": "Ruling out the other explanation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A large stride also means each location sits on a different page, so a reader could reasonably suspect address translation rather than the cache. That is a real alternative and it deserves a real test rather than an assertion. Keep the number of pages identical and shift each location by 128 bytes within its own page."
+    },
+    {
+      "kind": "code",
+      "caption": "The discriminating experiment",
+      "lines": [
+        "  Same 64 locations, same 64 pages, same 8 KB of data.",
+        "  Only the offset WITHIN each page changes.",
+        "",
+        "  64 locations, 65536 B apart, all at offset 0      20.84 ns",
+        "  64 locations, 65536 B apart, offset +128 each      1.65 ns",
+        "",
+        "  64 locations, 4096 B apart, all at offset 0        7.59 ns",
+        "  64 locations, 4096 B apart, offset +128 each       1.63 ns",
+        "",
+        "/* The number of distinct pages is identical in every row, so this is not",
+        "   about address translation. Shifting each location 128 bytes within its",
+        "   own page made it 12x faster. Something in the cache is choosing WHERE",
+        "   to store a block based on its address. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "That is the whole argument, in two lines",
+      "text": "Same pages, same data, same access count, twelve times faster. Address translation cannot be responsible, because nothing about the pages changed. What changed is the index bits: at a stride of 65536 with no offset, all 64 addresses produce the same index and fight over one set's worth of ways. Adding 128 bytes per location spreads them across 64 different sets, and the conflict disappears."
+    },
+    {
+      "kind": "heading",
+      "text": "The three kinds of miss"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Kind",
+        "Cause",
+        "Remedy"
+      ],
+      "rows": [
+        [
+          "Compulsory",
+          "First ever access to a block",
+          "Prefetching, or larger blocks if the data is used"
+        ],
+        [
+          "Capacity",
+          "The working set is larger than the cache",
+          "Reduce the working set, or process it in pieces"
+        ],
+        [
+          "Conflict",
+          "Too many hot addresses share one index",
+          "Change the addresses: padding, offsetting, different layout"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The classification matters because the three have different remedies and only one of them is about size. A conflict miss is fixed by changing addresses, not by using less memory — and the experiment above is a conflict miss fixed by adding 128 bytes per location, which used more memory and ran twelve times faster."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Where this bites in ordinary code",
+      "text": "Power-of-two dimensions are the usual cause. A 1024 x 1024 array of floats has rows exactly 4096 bytes apart, so column j of every row lands on a very small number of sets. Walking a column then evicts the previous rows repeatedly. The traditional fix is to pad the row length — allocate 1024+1 or 1024+8 elements per row and use 1024 — which wastes a little memory and can be several times faster. If a numerical routine is unexpectedly slow at exactly a power-of-two size and fine at size plus one, you have found a conflict miss."
+    },
+    {
+      "kind": "try",
+      "title": "Reproduce and then repair it",
+      "steps": [
+        "Write a loop that touches 64 locations at a configurable stride, repeatedly",
+        "Measure at strides from 128 bytes up to 256 KB, doubling each time",
+        "Find the stride at which the cost jumps, and record the ratio",
+        "Add an offset of one line size per location and re-measure at the worst stride",
+        "Confirm the number of pages is unchanged, so translation cannot be the cause",
+        "Estimate your cache's number of ways: how many locations can share an index before it slows down?",
+        "Allocate a 1024x1024 float array and time a column walk",
+        "Reallocate with 1025 floats per row, still walking 1024, and compare"
+      ],
+      "expected": "A large slowdown at power-of-two strides that vanishes when the addresses are offset, and a padded array that beats the exact one. The last two steps are the practical payoff: you have just made a numerical routine faster by making it use more memory, which is only explicable in terms of where blocks are allowed to live."
+    }
+  ],
+  "cheatsheet": [
+    "An address splits into tag, index and offset; the index picks the set",
+    "offset bits = log2(line size); index bits = log2(number of sets)",
+    "Direct-mapped: one block per set. Set-associative: N. Fully associative: all",
+    "The index is arithmetic on the address, not a free choice by the cache",
+    "Measured: 8 KB of data 13x slower purely because of the stride between addresses",
+    "Shifting each location 128 bytes within its own page: 20.84 ns to 1.65 ns",
+    "Same pages before and after, so address translation is ruled out",
+    "Three misses: compulsory (first touch), capacity (too much data), conflict (bad addresses)",
+    "Only capacity misses are about size; conflict misses are fixed by changing addresses",
+    "Power-of-two row lengths are the classic cause; padding the row usually fixes it"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "For a cache with 128-byte lines and 512 sets, how many bits are offset and how many are index?",
+      "choices": {
+        "A": "8 offset, 8 index",
+        "B": "7 offset, 9 index",
+        "C": "9 offset, 7 index",
+        "D": "7 offset, 7 index"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "log2(128) = 7 bits to select a byte within the line, and log2(512) = 9 bits to select the set. Everything above them is the tag."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Touching 64 locations totalling 8 KB was 13x slower at a 64 KB stride than at a 128 byte stride, on a machine with a 128 KB L1. What does that rule out?",
+      "choices": {
+        "A": "Conflict misses",
+        "B": "Capacity as the explanation — 8 KB fits in a 128 KB cache sixteen times over",
+        "C": "Compulsory misses",
+        "D": "Nothing; the data does not fit"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The data is far smaller than the cache, so running out of room cannot be the reason. Only where the blocks are allowed to sit can explain it."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why was shifting each location 128 bytes within its own page the decisive experiment?",
+      "choices": {
+        "A": "It reduced the data size",
+        "B": "It kept the number of pages identical, so address translation could not explain the 12x improvement — only the index bits changed",
+        "C": "It made the access sequential",
+        "D": "It aligned the data"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A large stride changes both the pages and the index bits. Holding pages constant while changing the index isolates which one was responsible."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "A routine on a 1024x1024 float array is slow, and the same routine on a 1025-wide allocation is much faster. What happened?",
+      "choices": {
+        "A": "The larger array fits in cache better",
+        "B": "The power-of-two row length made every row's column j land on the same few sets; padding spread them across sets and removed the conflict misses",
+        "C": "The compiler vectorised the odd size",
+        "D": "Memory alignment improved"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "1024 floats is exactly 4096 bytes, so the index bits repeat every row. One extra element per row breaks that alignment — more memory used, several times faster."
+    }
+  ]
+}

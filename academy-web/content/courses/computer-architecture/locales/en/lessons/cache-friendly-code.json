@@ -1,0 +1,280 @@
+{
+  "nodeId": "cache-friendly-code",
+  "locale": "en",
+  "title": "Capstone: making the same work run fifty times faster",
+  "objective": "By the end of this capstone you can predict which layout changes matter and which do not, and support the prediction with your own measurements rather than with received advice.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "This module has measured the memory hierarchy, where blocks are allowed to live, and what writes cost. This capstone puts those facts to work on ordinary code — and finds that one widely repeated piece of advice is worth far less than the folklore claims, which is itself the most useful result here."
+    },
+    {
+      "kind": "heading",
+      "text": "Experiment one: the order of traversal"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Sum every element of a two-dimensional array, once row by row and once column by column. Both visit every element exactly once and compute the same total. C stores rows contiguously, so row order walks straight through memory while column order jumps by a whole row each step."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured on an Apple M4",
+      "lines": [
+        "  matrix 4096 x 4096 of ints = 64 MB",
+        "  identical arithmetic, identical element count, identical answer",
+        "",
+        "  row order    : 0.0018 s   (37.2 GB/s effective)",
+        "  column order : 0.1050 s   ( 0.6 GB/s effective)   -> 58x slower"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Fifty-eight times, for swapping two lines of a loop nest",
+      "text": "Nothing about the work changed. What changed is that row order uses all 128 bytes of every block it fetches, while column order uses 4 of them and then moves 16 KB away. The effective bandwidth figures say the same thing from the other side: 37 GB/s against 0.6 GB/s. Both loops were fetching at close to the machine's capability; only one was fetching data it would use."
+    },
+    {
+      "kind": "heading",
+      "text": "Experiment two: repairing an order you cannot change"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Sometimes the traversal order is dictated by the algorithm. The remedy is to break the work into tiles small enough that each tile's data stays in cache while it is being used — so the expensive pattern happens within a tile that fits, instead of across the whole array."
+    },
+    {
+      "kind": "code",
+      "caption": "The same column traversal, tiled",
+      "lines": [
+        "  the same column-order traversal, done in square tiles",
+        "",
+        "  tile     time(s)    vs plain column order    tile footprint",
+        "     8     0.0224          4.69x faster            0.2 KB",
+        "    16     0.0178          5.90x faster            1.0 KB",
+        "    32     0.0203          5.16x faster            4.0 KB",
+        "    64     0.0337          3.12x faster           16.0 KB",
+        "   128     0.0328          3.20x faster           64.0 KB",
+        "   256     0.0311          3.38x faster          256.0 KB",
+        "",
+        "/* Best at a 16x16 tile. Note that blocking recovers a large part of the",
+        "   loss but does not reach row order's 0.0018 s — nothing beats simply",
+        "   reading memory in the order it is laid out. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Blocking recovered almost six times, and stopped short of row order. Notice also that bigger tiles were not better: the best tile was 16 x 16, and performance fell as tiles grew past the point where a tile's working set stayed resident. That shape — improving, peaking, then declining — is the signature of a cache-size effect, and finding the peak by measurement is faster than reasoning about which cache level it should land in."
+    },
+    {
+      "kind": "heading",
+      "text": "Experiment three: the advice that turned out to be small"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The standard recommendation is to split an array of structures into separate arrays per field, so that a loop reading one field does not drag the others through the cache. The reasoning is exactly right: reading one 8-byte field of an 80-byte structure means every fetched block is mostly waste. Here is what it was actually worth."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured on the same machine",
+      "lines": [
+        "  struct particle { double x,y,z,vx,vy,vz; int id; char name[28]; };  /* 80 bytes */",
+        "  Summing ONE field (x) of every particle. One useful value per 80 bytes.",
+        "",
+        "   particles  passes | AoS size  x-array | array of structs  separate array  ratio",
+        "     100,000     200 |     8 MB     1 MB |       0.0241 s        0.0207 s    1.16x",
+        "   1,500,000      20 |   114 MB    11 MB |       0.0388 s        0.0311 s    1.24x",
+        "   4,000,000       5 |   305 MB    31 MB |       0.0289 s        0.0209 s    1.38x"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Ten times the bytes, 1.3 times the time",
+      "text": "The array-of-structures version moved roughly ten times as much data and finished only 16 to 38 percent slower. This machine streams sequential memory so well that volume is cheap when the access pattern is predictable — the prefetcher has plenty of warning and plenty of bandwidth. The advice is not wrong, it is small on this hardware and for this access pattern, and reporting it as a large win would be repeating folklore rather than measuring."
+    },
+    {
+      "kind": "heading",
+      "text": "The conclusion the three experiments support together"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "What the change affects",
+        "Measured here",
+        "Why"
+      ],
+      "rows": [
+        [
+          "The order of access",
+          "58x",
+          "Out-of-order access wastes most of every block and defeats prefetching"
+        ],
+        [
+          "Whether the working set fits",
+          "5.9x",
+          "Tiling keeps reused data resident instead of re-fetching it"
+        ],
+        [
+          "The volume of sequential traffic",
+          "1.2 to 1.4x",
+          "Bandwidth is plentiful and prefetching hides the cost"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Order first, residency second, volume last. That ranking is worth more than any individual number, because it tells you where to look when profiling shows a memory problem. It also explains why the same three experiments on a machine with less bandwidth would move the third row upward — the ranking follows from the hardware, so check it on the hardware you actually ship to."
+    },
+    {
+      "kind": "heading",
+      "text": "Your task"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Reproduce all three experiments on your own machine and record your own numbers",
+        "For each, predict the direction and rough size before running it, and note where you were wrong",
+        "Find your best tile size by measurement, and relate it to your measured cache sizes",
+        "Take one loop from your own code and identify which of the three effects it is subject to",
+        "Change it, measure, and report the result — including if the change did nothing"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Reporting a change that did nothing is a result, not a failure",
+      "text": "The third experiment above is exactly that: a well-known optimisation that produced 1.3x where folklore promises much more. Knowing which optimisations are large on your hardware and which are small is what separates measured performance work from ritual. Every number in this module came from a program small enough to write in an afternoon, and every one of them can be checked."
+    },
+    {
+      "kind": "heading",
+      "text": "A checklist you can apply to any loop"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Question",
+        "If the answer is bad",
+        "Try"
+      ],
+      "rows": [
+        [
+          "Does it walk memory in the order it is stored?",
+          "No",
+          "Swap loop order, or transpose the data once"
+        ],
+        [
+          "Does the reused data fit in cache?",
+          "No",
+          "Tile it, and find the tile size by measurement"
+        ],
+        [
+          "Does each fetched block get used?",
+          "No",
+          "Group the fields used together, or split the structure"
+        ],
+        [
+          "Does the address of the next access depend on the current one?",
+          "Yes",
+          "Prefer indices over pointers where possible"
+        ],
+        [
+          "Do parallel threads write near each other?",
+          "Yes",
+          "Pad to separate cache lines"
+        ],
+        [
+          "Are power-of-two strides involved?",
+          "Yes",
+          "Pad the row length to break the conflict"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Every row of that table is something this module measured rather than asserted, and each one names the lesson that produced it. That is the standard worth carrying into your own performance work: an optimisation you can defend with a number you produced is worth more than five you remember reading about."
+    },
+    {
+      "kind": "try",
+      "title": "Prove one of them wrong",
+      "steps": [
+        "Pick any claim in the table above",
+        "Design the smallest program that would show it is false if it were",
+        "Make sure the program cannot be optimised away — check the assembly or add a barrier",
+        "Interleave the two cases and take the best of several runs",
+        "Report what you found, whether or not it agreed with the claim",
+        "If it disagreed, work out whether the claim or your measurement is at fault",
+        "Write down the machine you measured on, since none of these numbers are universal"
+      ],
+      "expected": "Either a confirmation you produced yourself or a genuine disagreement worth understanding. Both are better outcomes than accepting the table. The last step is the one people skip: a performance number without the machine it was measured on is not a fact, it is an anecdote."
+    }
+  ],
+  "cheatsheet": [
+    "Row order versus column order on a 64 MB matrix: 58x, for swapping two loop lines",
+    "Effective bandwidth 37 GB/s against 0.6 GB/s — both fetching hard, one fetching usefully",
+    "Tiling the column traversal recovered 5.9x, best at a 16x16 tile",
+    "Tile performance improves, peaks, then declines — that shape is a cache-size effect",
+    "Array of structs versus separate arrays: only 1.16 to 1.38x on this machine",
+    "Ten times the bytes cost 1.3x the time, because sequential streaming is cheap here",
+    "Ranking: order of access, then residency, then volume of traffic",
+    "The ranking follows from the hardware — re-check it on the machine you ship to",
+    "An optimisation that did nothing is a result worth reporting",
+    "A performance number without its machine is an anecdote, not a fact"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Row order and column order over the same matrix differed by 58x. What is the mechanism?",
+      "choices": {
+        "A": "Column order performs more arithmetic",
+        "B": "Row order uses all 128 bytes of each fetched block, while column order uses 4 and then jumps a whole row away, wasting most of every fetch and defeating prefetching",
+        "C": "The compiler vectorises row order only",
+        "D": "Column order allocates more memory"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The effective bandwidths, 37 GB/s against 0.6 GB/s, say it from the other side: both were fetching hard, only one was fetching data it would use."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Tiling improved up to a 16x16 tile and got worse for larger tiles. What does that shape indicate?",
+      "choices": {
+        "A": "A compiler limit",
+        "B": "A cache-size effect: past a certain tile size the tile's working set no longer stays resident while it is reused",
+        "C": "Larger tiles have more arithmetic",
+        "D": "Random measurement noise"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Improving, peaking, then declining is the characteristic shape. The practical lesson is to find the peak by measurement rather than by reasoning about which level it should fit in."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Splitting an array of 80-byte structures into separate field arrays reduced bytes fetched roughly tenfold but gave only 1.16 to 1.38x. Why?",
+      "choices": {
+        "A": "The measurement was faulty",
+        "B": "The access was sequential, so prefetching and plentiful bandwidth made the extra volume cheap — volume matters much less than order on this hardware",
+        "C": "The structures were already in cache",
+        "D": "The compiler merged the two versions"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Both versions stream predictably. The hardware has ample warning and ample bandwidth, so ten times the traffic cost only about a third more time."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "What is the ranking these three experiments support, and what is the caveat?",
+      "choices": {
+        "A": "Volume, then order, then residency; universally true",
+        "B": "Order of access, then residency, then volume — and the ranking follows from the hardware, so it must be re-checked on the target machine",
+        "C": "Residency, then volume, then order; true for all C programs",
+        "D": "They cannot be ranked"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "58x, 5.9x and 1.3x give the ranking. A machine with less bandwidth would raise the importance of volume, which is why the numbers must be reproduced where the code will run."
+    }
+  ]
+}

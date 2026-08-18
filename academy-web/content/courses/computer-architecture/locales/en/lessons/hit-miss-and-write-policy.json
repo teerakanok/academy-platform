@@ -1,0 +1,252 @@
+{
+  "nodeId": "hit-miss-and-write-policy",
+  "locale": "en",
+  "title": "What happens on a hit, a miss, and a write",
+  "objective": "By the end of this lesson you can trace a read and a write through a cache, explain why writing less data can take longer, and identify false sharing from a measurement.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Reads have been the whole story so far. Writes are where cache design gets its most surprising consequences, and two of them are measurable in a few lines of code."
+    },
+    {
+      "kind": "heading",
+      "text": "A read, step by step"
+    },
+    {
+      "kind": "code",
+      "caption": "What the hardware does with a load",
+      "lines": [
+        "  1. split the address into tag, index, offset",
+        "  2. look in the set named by the index",
+        "  3. compare the tag against every way in that set",
+        "",
+        "     match found      -> HIT:  return the bytes at the offset. Done.",
+        "     no match         -> MISS: continue below",
+        "",
+        "  4. choose a way in that set to evict (usually the least recently used)",
+        "  5. if the evicted block was modified, write it out first",
+        "  6. fetch the whole block from the next level down",
+        "  7. store it, record its tag, and return the requested bytes"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Step six is where the block size does its work, and step five is the first hint that writes complicate things: evicting a block is free if nobody changed it, and costs a transfer if somebody did."
+    },
+    {
+      "kind": "heading",
+      "text": "Two decisions about writes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Question",
+        "Option",
+        "What it means"
+      ],
+      "rows": [
+        [
+          "On a write hit, when does memory get updated?",
+          "Write-through",
+          "Every write goes to the next level immediately"
+        ],
+        [
+          "",
+          "Write-back",
+          "Only the cache is updated; mark the block dirty and write it out when evicted"
+        ],
+        [
+          "On a write miss, is the block fetched first?",
+          "Write-allocate",
+          "Fetch the block, then write into it"
+        ],
+        [
+          "",
+          "No-write-allocate",
+          "Send the write onward without bringing the block in"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Write-back with write-allocate is the common pairing, and the reasoning is the same locality bet as everywhere else: a program that writes to an address will probably write near it again, so it is worth keeping the block and deferring the traffic. That combination has a consequence that surprises most people the first time they measure it."
+    },
+    {
+      "kind": "heading",
+      "text": "Writing less data, taking longer"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Write every byte of a large buffer. Then write only one byte in every 128-byte line of the same buffer — one 128th as many bytes stored."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured on an Apple M4",
+      "lines": [
+        "  buffer 256 MB = 2,097,152 lines of 128 bytes",
+        "",
+        "  write all 268,435,456 bytes        : 0.004 s   (60.0 GB/s)",
+        "  write 1 byte per 128-byte line     : 0.014 s   (2,097,152 bytes stored)",
+        "",
+        "  -> writing 1/128 of the bytes took 321% of the time",
+        "  -> per line: writing all 128 bytes 2.13 ns, writing 1 byte 6.85 ns"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "One 128th of the data, three times the time",
+      "text": "Two things are happening. First, write-allocate: to write one byte of a block the cache must first fetch the whole block, so a sparse write costs a read it never uses. Second, writing a complete line lets the hardware skip that read entirely — it knows every byte is being replaced, so there is nothing worth fetching. The dense write moves 128 times more data and does less work, because it never reads anything back."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This is why a memset of a large region is so much faster per byte than scattered writes, and why filling a structure completely can beat setting one field of each of many structures. It is the write-side version of the rule from the locality lesson: you pay by the block, not by the byte."
+    },
+    {
+      "kind": "heading",
+      "text": "When two cores write to the same block"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Caches are per-core, so the same block can be in several caches at once. Hardware keeps them consistent: before a core may write to a block, it must obtain exclusive ownership, which invalidates every other copy. That protocol is correct and invisible — until two cores keep writing to the same block."
+    },
+    {
+      "kind": "code",
+      "caption": "Four threads, four separate counters, measured on an Apple M4",
+      "lines": [
+        "  4 threads, 50,000,000 increments each, each on its OWN counter.",
+        "  No lock, no shared variable, no data race — every thread owns its counter.",
+        "",
+        "  counters 8 bytes apart   (all in one 128-byte line) : 0.125 s",
+        "  counters 128 bytes apart (one line each)            : 0.032 s",
+        "  -> 3.92x"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "False sharing",
+      "text": "Nothing here is shared in the program's terms. Each thread has its own counter, and the result is correct in both runs. But the hardware works in blocks, not variables, and four counters 8 bytes apart occupy one block. Every increment steals the block from the other three cores, so the block ping-pongs between them. Moving each counter onto its own line makes the same program four times faster with no change to its logic."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This is the performance counterpart of the correctness problems the operating systems course covered. A data race is a correctness bug the hardware cannot save you from; false sharing is a performance bug the hardware creates while keeping you correct. The tell is a parallel program that gets slower as you add threads even though the threads share no data — at which point look at what is next to what in memory, not at the logic."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Symptom",
+        "Likely cause",
+        "Fix"
+      ],
+      "rows": [
+        [
+          "Scattered writes slower than dense ones",
+          "Write-allocate fetching blocks you overwrite",
+          "Write whole blocks; group fields you set together"
+        ],
+        [
+          "Parallel code slows as threads increase, no shared data",
+          "False sharing of one block",
+          "Pad each thread's data to its own line"
+        ],
+        [
+          "A read-only parallel workload scales fine",
+          "No ownership transfers needed",
+          "Nothing to fix; sharing for reading is cheap"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "The last row is worth remembering",
+      "text": "Many cores may hold the same block for reading at once, at no cost. The expense begins at the first write. This is why read-mostly shared data scales well and why a single frequently-written counter can be the bottleneck of an otherwise parallel program — which is exactly what per-thread counters summed at the end are designed to avoid."
+    },
+    {
+      "kind": "try",
+      "title": "Reproduce both effects",
+      "steps": [
+        "Allocate 256 MB, fill it with memset, and time it",
+        "Time a loop writing one byte per 128 bytes over the same buffer",
+        "Compare bytes stored against time taken and explain the direction of the result",
+        "If either timing is 0.000 s, the optimiser removed the writes — add a memory barrier and re-check",
+        "Now write four threads, each incrementing its own counter in an array of longs",
+        "Time it with the counters adjacent, then with each padded to its own cache line",
+        "Confirm the results are identical in both versions and only the time differs",
+        "Increase to eight threads and report how each version scales"
+      ],
+      "expected": "Sparse writes slower than dense ones, and adjacent counters several times slower than padded ones. The scaling step matters most: the padded version should keep improving with more threads while the adjacent version gets worse, which is the signature that distinguishes false sharing from ordinary contention."
+    }
+  ],
+  "cheatsheet": [
+    "Read: index picks the set, tag comparison decides hit or miss, miss fetches a whole block",
+    "Eviction is free for a clean block and costs a write-out for a dirty one",
+    "Write-through updates the next level immediately; write-back defers until eviction",
+    "Write-allocate fetches the block before writing into it",
+    "Measured: writing 1/128 of the bytes took 321% of the time of writing all of them",
+    "A full-line write can skip the fetch entirely; a partial write cannot",
+    "Caches are per-core; writing requires exclusive ownership of the block",
+    "False sharing: separate variables in one block, ping-ponged between cores",
+    "Measured: 4 counters in one line 0.125 s, padded to their own lines 0.032 s — 3.92x",
+    "Many cores may read the same block at once for free; cost begins at the first write"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Writing one byte per 128-byte line over a buffer took three times as long as writing every byte of it. Why?",
+      "choices": {
+        "A": "The loop had more iterations",
+        "B": "Write-allocate fetches each block before writing into it, while writing a complete line lets the hardware skip that fetch",
+        "C": "Sparse writes are not cached",
+        "D": "memset uses a special instruction that is always faster"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The sparse write pays for a read of every block it then partly overwrites. The dense write moves 128 times more data and never reads anything back."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "What does write-back defer, and what does it cost when the deferral ends?",
+      "choices": {
+        "A": "It defers the cache update; costs a stall",
+        "B": "It defers writing to the next level until the block is evicted; the eviction then costs a write-out",
+        "C": "It defers the tag comparison",
+        "D": "Nothing is deferred"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The block is marked dirty and updated only in the cache. Evicting a dirty block requires writing it out; evicting a clean one is free."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Four threads each increment their own counter and the program is 3.92x slower when the counters are adjacent. Is this a data race?",
+      "choices": {
+        "A": "Yes, the counters are shared",
+        "B": "No — each thread owns its counter and both versions produce identical correct results; the cost is that the hardware transfers ownership of the whole block",
+        "C": "Yes, a lock is missing",
+        "D": "No, it is a compiler bug"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Correctness is never in question. The block, not the variable, is the unit the hardware owns, so four private counters in one block behave like one contended location."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why does read-mostly shared data scale well across many cores?",
+      "choices": {
+        "A": "Reads are cached and writes are not",
+        "B": "Any number of caches may hold the same block for reading simultaneously; the expense of transferring exclusive ownership begins at the first write",
+        "C": "Reads do not use the cache line",
+        "D": "The compiler duplicates read-only data"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Sharing for reading needs no ownership transfer. This is the reasoning behind per-thread counters summed at the end rather than one shared counter."
+    }
+  ]
+}

@@ -1,0 +1,240 @@
+{
+  "nodeId": "locality",
+  "locale": "en",
+  "title": "Why the same program is fast on small data and slow on large",
+  "objective": "By the end of this lesson you can measure the memory hierarchy on your own machine, name the two kinds of locality, and explain why hardware bets on both.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "The load-use lesson measured a dependent walk over a 32 KB buffer at 1.87 ns per access. Run exactly the same code over a larger buffer and the number changes dramatically — not because the code changed, but because of where the data now lives."
+    },
+    {
+      "kind": "heading",
+      "text": "Measuring the hierarchy directly"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Follow a randomly ordered chain of pointers through a working set, doubling the working set each time. Because each access depends on the previous one, no overlapping can hide the wait — the time per access is the memory system's honest latency for that working set size."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured on an Apple M4",
+      "lines": [
+        "  working set      ns per dependent access",
+        "        4 KB          1.95",
+        "        8 KB          1.92",
+        "       16 KB          1.92",
+        "       32 KB          1.92",
+        "       64 KB          1.92",
+        "      128 KB          1.93     <- last flat step",
+        "      256 KB          7.61     <- 4x jump",
+        "      512 KB          8.83",
+        "     1024 KB         10.57",
+        "     4096 KB         12.56",
+        "     8192 KB         15.09",
+        "    16384 KB         32.45     <- second climb begins",
+        "    32768 KB        104.56",
+        "    65536 KB        145.78",
+        "   131072 KB        167.20"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "That is not a curve, it is a staircase",
+      "text": "Six sizes in a row cost exactly the same, then the cost quadruples in a single doubling. A gradual curve would suggest memory gets slowly worse with size. It does not: there are distinct levels of storage, each with its own capacity and its own speed, and the steps are where the working set stopped fitting in one and fell into the next."
+    },
+    {
+      "kind": "heading",
+      "text": "Reading the steps against what the machine reports"
+    },
+    {
+      "kind": "code",
+      "caption": "The hardware's own description of itself",
+      "lines": [
+        "  $ sysctl -n hw.cachelinesize hw.perflevel0.l1dcachesize hw.perflevel0.l2cachesize",
+        "  128                    # cache line: 128 bytes",
+        "  131072                 # L1 data cache: 128 KB",
+        "  16777216               # L2 cache: 16 MB",
+        "",
+        "  The flat region ends at 128 KB.   The reported L1 is 128 KB.",
+        "  The second climb starts at 16 MB. The reported L2 is 16 MB."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The measurement and the hardware's self-report agree without either having been used to produce the other. That agreement is what makes the measurement trustworthy: a number that matches an independent source is evidence, while a number that merely looks reasonable is not."
+    },
+    {
+      "kind": "heading",
+      "text": "The two kinds of locality"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Kind",
+        "The bet",
+        "The hardware feature that takes the bet"
+      ],
+      "rows": [
+        [
+          "Temporal",
+          "Something used now will be used again soon",
+          "Keeping it in the cache after use"
+        ],
+        [
+          "Spatial",
+          "Something near what was used will be used soon",
+          "Fetching a whole block, not one byte"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Both are bets about typical programs, not laws. A loop over an array rewards spatial locality; a loop counter or a frequently-called function rewards temporal locality. A program that reads memory in genuinely random order and never revisits anything defeats both, and its performance lands at the bottom step of that staircase."
+    },
+    {
+      "kind": "heading",
+      "text": "Measuring the block size"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The spatial bet is visible on its own. Touch a fixed number of bytes spread over a large buffer, varying only how far apart they are."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured on the same machine",
+      "lines": [
+        "  touching 1,000,000 bytes spread over a 64 MB buffer at a fixed stride",
+        "",
+        "  stride     ns per touched byte",
+        "      4 B         1.94",
+        "      8 B         1.96",
+        "     16 B         1.96",
+        "     32 B         1.94",
+        "     64 B         1.97",
+        "    128 B         6.52     <- the cost jumps here and stays",
+        "    256 B         5.21",
+        "    512 B         5.07",
+        "   1024 B         5.18",
+        "",
+        "/* Below 128 bytes, several touched bytes share one fetched block, so the",
+        "   fetch cost is split between them. At 128 bytes and beyond, each touch",
+        "   pays for its own block. The machine reports hw.cachelinesize = 128. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Constant up to 64 bytes, then a jump at 128 that persists no matter how much further apart the touches get. That is the block size, measured. Below it, several touched bytes arrive in one fetch and share its cost; at and above it, every touch pays for a full block of which it uses a fraction."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "You are always paying for a whole block",
+      "text": "Reading one byte from memory does not fetch one byte. On this machine it fetches 128. If your program uses 4 of those bytes and moves 128 bytes away, it paid for 128 and used 4 — a 3% return on the transfer. This single fact, more than any other, is what separates fast data layouts from slow ones, and the capstone at the end of this module is built on it."
+    },
+    {
+      "kind": "heading",
+      "text": "What this changes about how you read your own code"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "The cost of an access is not a property of the access; it is a property of the working set",
+        "Reducing memory used can speed up code that does exactly the same work",
+        "A structure whose fields you never read still costs you, because it occupies blocks",
+        "An algorithm with more operations can beat one with fewer if its accesses are contiguous",
+        "'Optimising' by adding a lookup table can lose if the table pushes the working set to the next step"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The fourth item is worth pausing on, because it contradicts the way algorithms are usually compared. Counting operations assumes every operation costs the same. On the staircase above, one access can cost 87 times another. An operation count is a useful first approximation and a poor final answer."
+    },
+    {
+      "kind": "try",
+      "title": "Build the staircase for your machine",
+      "steps": [
+        "Allocate a buffer, fill it with a randomly shuffled pointer chain, and follow it",
+        "Time it for working sets from 4 KB to at least 128 MB, doubling each time",
+        "Plot or tabulate nanoseconds per access against working-set size",
+        "Identify the flat regions and the steps between them",
+        "Compare your steps with what your machine reports: sysctl -a | grep cache   (or lscpu)",
+        "Repeat with a sequential chain instead of a shuffled one and explain the difference",
+        "Now measure the stride sweep and find your block size",
+        "State your machine's cache sizes and line size, each supported by one of your own numbers"
+      ],
+      "expected": "Flat regions matching your cache sizes and a step at your line size, agreeing with what the system reports. The sequential version will be much faster at large sizes — that is the hardware prefetcher noticing a pattern and fetching ahead, which is why the shuffled chain is the honest way to measure latency."
+    }
+  ],
+  "cheatsheet": [
+    "Memory is a staircase of levels, not a smooth curve of cost against size",
+    "A dependent pointer chase measures true latency because nothing can overlap it",
+    "Measured on an Apple M4: 1.92 ns flat to 128 KB, 7.61 ns at 256 KB, 167 ns at 128 MB",
+    "Those steps match the reported L1 of 128 KB and L2 of 16 MB",
+    "Temporal locality: reuse the same data soon. Spatial locality: use nearby data soon",
+    "Caches keep data after use (temporal) and fetch whole blocks (spatial)",
+    "Stride sweep found the jump at 128 bytes, matching hw.cachelinesize = 128",
+    "Every access pays for a whole block whether or not you use the rest of it",
+    "Operation counting assumes all operations cost the same; here one can cost 87 times another",
+    "A shuffled chain measures latency; a sequential one measures the prefetcher"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why does a dependent pointer chase measure memory latency more honestly than a loop over an array?",
+      "choices": {
+        "A": "It uses less memory",
+        "B": "Each access cannot begin until the previous one returns, so nothing overlaps and the wait cannot be hidden",
+        "C": "Arrays are stored differently",
+        "D": "It avoids the compiler"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "An array walk lets the processor run far ahead and prefetch, which measures throughput. The chain forces one access at a time, which is what latency means."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "The measurement was flat at 1.92 ns from 4 KB to 128 KB and then jumped to 7.61 ns at 256 KB. What does the flat region mean?",
+      "choices": {
+        "A": "The measurement was not sensitive enough",
+        "B": "Every working set in that range fit entirely in one level of cache, so every access hit at the same speed",
+        "C": "The compiler cached the values",
+        "D": "Small buffers are faster to allocate"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The cost is flat while the data fits and steps when it stops fitting. The last flat size, 128 KB, matches the L1 the machine reports."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A stride sweep showed a constant cost up to 64 bytes and a jump at 128. What has been measured?",
+      "choices": {
+        "A": "The page size",
+        "B": "The cache line size: below it several touches share one fetched block, at and above it each touch pays for its own",
+        "C": "The L1 capacity",
+        "D": "The prefetcher depth"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The system reports hw.cachelinesize = 128, matching the measurement made without consulting it."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why can an algorithm performing more operations beat one performing fewer?",
+      "choices": {
+        "A": "Modern compilers remove extra operations",
+        "B": "Operation counting assumes every operation costs the same, but a memory access can cost tens of times another depending on where the data sits",
+        "C": "It cannot",
+        "D": "Only when the data is sorted"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "On the staircase measured here the ratio between the cheapest and most expensive access was about 87. An operation count cannot see that."
+    }
+  ]
+}
