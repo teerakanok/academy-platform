@@ -11,7 +11,7 @@
   "repo": {
     "remote": "github.com/teerakanok/academy-platform",
     "branch": "main",
-    "base_head": "66449adb36cd26c0643c54df704a4c354666f255"
+    "base_head": "317bbc21a89732ffc80870af6f24d9ffae3cf1cd"
   },
   "delivery": "local",
   "worktree": {
@@ -122,7 +122,7 @@
 ## Repository State
 - State: blocked
 - Branch: main
-- Baseline: 66449adb36cd26c0643c54df704a4c354666f255 (refresh 2026-08-18: HEAD เดินหน้าด้วย commit สาย content ของ session อื่น 4 ตัว — e335fec..66449ad ล้วนเป็น feat(academy) คอร์ส OS; เนื้อ packet เดิมยังถูกต้อง, identity ยัง blocked จึงยัง blocked ต่อ)
+- Baseline: 317bbc21a89732ffc80870af6f24d9ffae3cf1cd (refresh 2026-08-18: HEAD เดินหน้าด้วย commit สาย content ของ session อื่นที่ยังทำงานต่อเนื่อง — feat(academy) คอร์ส OS; เนื้อ packet เดิมยังถูกต้อง, identity ยัง blocked จึงยัง blocked ต่อ)
 - Delivery: local
 
 ## Completed This Session
