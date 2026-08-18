@@ -1,0 +1,199 @@
+{
+  "nodeId": "fork-exec-wait",
+  "locale": "en",
+  "title": "How a program starts another program",
+  "objective": "By the end of this lesson you can explain why starting a program takes two calls instead of one, read the exit status of a child correctly, and avoid the buffering trap that makes forked programs print duplicated output.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Every command your shell runs, every process a web server spawns, every build step your compiler triggers goes through the same three calls. Unusually, creating a process and running a program are separate operations here — and that separation, which looks like an inconvenience, is exactly what makes shell redirection and pipes possible."
+    },
+    {
+      "kind": "heading",
+      "text": "fork: one call that returns twice"
+    },
+    {
+      "kind": "paragraph",
+      "text": "fork() creates a near-copy of the calling process. Both processes then continue from the same line, with the same variables, the same open files, the same position in the code. The only thing that differs is the return value — and that is how each one knows which it is."
+    },
+    {
+      "kind": "code",
+      "caption": "The shape you will write for the rest of your life",
+      "lines": [
+        "pid_t pid = fork();",
+        "",
+        "if (pid < 0) {",
+        "    perror(\"fork\");            /* out of resources — always check */",
+        "} else if (pid == 0) {",
+        "    /* CHILD: fork returned 0 here */",
+        "    printf(\"child, my pid is %d\\n\", getpid());",
+        "    _exit(0);",
+        "} else {",
+        "    /* PARENT: fork returned the child's pid */",
+        "    printf(\"parent, my child is %d\\n\", pid);",
+        "    int status;",
+        "    waitpid(pid, &status, 0);",
+        "}"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The duplicated-output trap, and why it happens",
+      "text": "Output through printf sits in a buffer inside your process until it is flushed. fork() copies that buffer along with everything else — so if the parent has unflushed text and the child later calls exit(), the child flushes ITS copy and the text appears twice. Measured: a program that printed 'A ' before forking produced 'A A ' when the child called exit(), and 'A ' when it called _exit(). The fix is one line: fflush(stdout) before you fork. This is also why child processes should end with _exit() rather than exit() — _exit() skips the flushing that belongs to the parent."
+    },
+    {
+      "kind": "heading",
+      "text": "exec: replace yourself with a different program"
+    },
+    {
+      "kind": "paragraph",
+      "text": "exec does not start a new process. It keeps the process — same pid, same open file descriptors — and replaces the program running inside it. Nothing after a successful exec runs, because the code that would have run no longer exists in memory."
+    },
+    {
+      "kind": "code",
+      "caption": "Why the two are separate: the gap belongs to you",
+      "lines": [
+        "pid_t pid = fork();",
+        "if (pid == 0) {",
+        "    /* This gap is the whole reason fork and exec are separate calls. */",
+        "    /* The child is still 'us', so we can set things up for the new program: */",
+        "    int fd = open(\"out.txt\", O_WRONLY | O_CREAT | O_TRUNC, 0644);",
+        "    dup2(fd, STDOUT_FILENO);      /* make fd 1 point at the file */",
+        "    close(fd);",
+        "",
+        "    execlp(\"ls\", \"ls\", \"-l\", (char *)NULL);",
+        "    perror(\"execlp\");            /* only reached if exec FAILED */",
+        "    _exit(127);",
+        "}"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "That gap is where the shell implements everything you learned in the Linux course. Redirection is a dup2 in the gap. A pipe is a pipe() before the fork and two dup2 calls in the gap. Running as another user is a setuid in the gap. One design decision — separating process creation from program loading — buys all of it."
+    },
+    {
+      "kind": "heading",
+      "text": "wait: collecting the result"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Macro",
+        "Answers"
+      ],
+      "rows": [
+        [
+          "WIFEXITED(status)",
+          "Did it end normally?"
+        ],
+        [
+          "WEXITSTATUS(status)",
+          "If so, with what code? (only the low 8 bits)"
+        ],
+        [
+          "WIFSIGNALED(status)",
+          "Was it killed by a signal?"
+        ],
+        [
+          "WTERMSIG(status)",
+          "If so, which signal?"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "An exit code is 8 bits — verified, not assumed",
+      "text": "A child that calls _exit(300) reports an exit status of 44, because only the low 8 bits survive: 300 minus 256 is 44. Exit codes must therefore live in 0-255, and by convention 0 means success. This is why the shell scripts in the Linux course test for zero rather than for a specific large number."
+    },
+    {
+      "kind": "paragraph",
+      "text": "And a status is not a number you compare directly — it is a packed value. A child killed by SIGKILL reports WIFEXITED as false, WIFSIGNALED as true and WTERMSIG as 9. Code that reads WEXITSTATUS without checking WIFEXITED first is reading a field that has no meaning in that case."
+    },
+    {
+      "kind": "try",
+      "title": "Run the three calls yourself",
+      "steps": [
+        "Write a program with the fork/exec/wait shape above and compile it: gcc -Wall proc.c -o proc",
+        "Have the child _exit(7) and print WEXITSTATUS in the parent — confirm you get 7",
+        "Change it to _exit(300) and predict the result before running it",
+        "Have the child call pause() instead, then from another terminal: kill -9 <pid>",
+        "Print WIFEXITED, WIFSIGNALED and WTERMSIG — confirm the second and third, not the first",
+        "Add printf(\"A \") before the fork with no newline, have the child call exit(0), and redirect output to a file: ./proc > out.txt && cat out.txt",
+        "Now add fflush(stdout) before the fork and run it again — the duplicate disappears",
+        "Run: strace -f -e trace=clone,execve,wait4 ./proc     (-f follows the child)"
+      ],
+      "expected": "You should see 7, then 44, then a signal report instead of an exit code, then a duplicated 'A' that a single fflush removes. The strace at the end shows the three calls by their real names — including clone rather than fork, exactly as the syscall lesson described."
+    }
+  ],
+  "cheatsheet": [
+    "fork() returns 0 in the child and the child's pid in the parent; negative means failure",
+    "exec keeps the process and replaces the program — nothing after a successful exec runs",
+    "The gap between fork and exec is where redirection, pipes and privilege changes happen",
+    "fflush(stdout) before forking, or buffered text prints twice",
+    "Children should end with _exit(), not exit() — exit() flushes the parent's buffers too",
+    "Check WIFEXITED before trusting WEXITSTATUS",
+    "Exit codes are 8 bits: _exit(300) reports 44",
+    "A killed child reports WIFSIGNALED and WTERMSIG instead",
+    "strace -f follows children"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why are creating a process and loading a program two separate calls instead of one?",
+      "choices": {
+        "A": "For historical reasons with no practical benefit today",
+        "B": "The gap between them lets the child set up redirection, pipes, and credentials before the new program starts",
+        "C": "exec is too slow to combine with process creation",
+        "D": "Because the kernel cannot allocate memory and load a file at the same time"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Everything a shell does between typing a command and running it — redirection, pipes, dropping privileges — happens in that gap, in a process that is still under your control."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A child calls _exit(300). What does the parent read from WEXITSTATUS?",
+      "choices": {
+        "A": "300",
+        "B": "44",
+        "C": "-1",
+        "D": "1"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Only the low 8 bits of the exit code survive, and 300 - 256 = 44. Exit codes should stay in 0-255 for this reason."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A program prints 'Done' with printf, then forks, and the child calls exit(0). Output redirected to a file shows 'Done' twice. Why?",
+      "choices": {
+        "A": "The kernel duplicated the write",
+        "B": "fork copied the unflushed stdio buffer, and the child's exit() flushed its own copy",
+        "C": "printf is not thread-safe",
+        "D": "The file was opened twice"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The buffer is ordinary process memory, so fork copies it. Flush before forking, and have children end with _exit(), which does not flush."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Your parent code calls WEXITSTATUS(status) without checking WIFEXITED first. When does this bite you?",
+      "choices": {
+        "A": "Never — the macros are interchangeable",
+        "B": "When the child was killed by a signal, where the exit-status field holds nothing meaningful",
+        "C": "Only if the child forks again",
+        "D": "Only on 32-bit systems"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "status is a packed value. Which fields are meaningful depends on how the child ended, so the WIF* predicate has to be checked before reading the matching value."
+    }
+  ]
+}

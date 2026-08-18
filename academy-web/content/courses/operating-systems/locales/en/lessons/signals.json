@@ -1,0 +1,235 @@
+{
+  "nodeId": "signals",
+  "locale": "en",
+  "title": "Signals: the operating system interrupting you",
+  "objective": "By the end of this lesson you can name the signals you will actually meet, install a handler that shuts a program down cleanly, and explain why two signals can never be caught.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A signal is the smallest possible message: a number, delivered asynchronously, with no payload. It is how Ctrl-C reaches a program, how a service manager asks for a graceful shutdown, and how the kernel reports that your process just did something it cannot recover from. You met them from the outside in the Linux course. This lesson is the inside."
+    },
+    {
+      "kind": "heading",
+      "text": "The ones worth knowing by name"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Signal",
+        "Number",
+        "Sent when",
+        "Default action"
+      ],
+      "rows": [
+        [
+          "SIGINT",
+          "2",
+          "You press Ctrl-C",
+          "Terminate"
+        ],
+        [
+          "SIGTERM",
+          "15",
+          "Polite request to stop (kill's default)",
+          "Terminate"
+        ],
+        [
+          "SIGKILL",
+          "9",
+          "Forced stop",
+          "Terminate — cannot be caught"
+        ],
+        [
+          "SIGSEGV",
+          "11",
+          "Invalid memory access",
+          "Terminate + core dump"
+        ],
+        [
+          "SIGCHLD",
+          "17 (x86-64)",
+          "A child changed state",
+          "Ignored"
+        ],
+        [
+          "SIGHUP",
+          "1",
+          "Terminal closed; by convention: reload config",
+          "Terminate"
+        ],
+        [
+          "SIGPIPE",
+          "13",
+          "You wrote to a pipe with no reader",
+          "Terminate"
+        ],
+        [
+          "SIGSTOP / SIGCONT",
+          "19 / 18",
+          "Ctrl-Z and fg",
+          "Stop / continue — SIGSTOP cannot be caught"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Signal numbers are per-architecture too",
+      "text": "The common ones are the same nearly everywhere, but not all are. Linux's own documentation gives the numbers per architecture: SIGCHLD is 17 on x86 and ARM, 20 on Alpha and SPARC, and 18 on MIPS; SIGUSR1 is 10 on x86/ARM but 30 on Alpha/SPARC. SIGSTOP and SIGCHLD even swap values between those two families. Use the names in code, never the numbers."
+    },
+    {
+      "kind": "heading",
+      "text": "Two that the kernel will not let you touch"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SIGKILL and SIGSTOP cannot be caught, blocked, or ignored. Attempting to install a handler for either fails with EINVAL — verified: signal(SIGKILL, SIG_IGN) returns an error reading 'Invalid argument', while the same call for SIGTERM is accepted. This is deliberate. If a program could refuse SIGKILL, there would be no way for an administrator to stop a misbehaving process, and the whole system would be at the mercy of its worst-behaved program."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Which is why kill -9 should be your second choice, not your first",
+      "text": "SIGTERM gives the program a chance to flush its buffers, finish the request it is serving, and remove its lock files. SIGKILL gives it nothing — the process stops mid-instruction with unflushed data still in memory. Send SIGTERM, wait a few seconds, and only then escalate. This is exactly what a service manager does when it stops a service, and why it waits before it escalates."
+    },
+    {
+      "kind": "heading",
+      "text": "Installing a handler"
+    },
+    {
+      "kind": "code",
+      "caption": "The shutdown pattern used by essentially every server",
+      "lines": [
+        "#include <signal.h>",
+        "",
+        "static volatile sig_atomic_t stop_requested = 0;",
+        "",
+        "static void on_term(int sig) {",
+        "    (void)sig;",
+        "    stop_requested = 1;      /* set a flag — that is ALL a handler should do */",
+        "}",
+        "",
+        "int main(void) {",
+        "    struct sigaction sa = {0};",
+        "    sa.sa_handler = on_term;",
+        "    sigemptyset(&sa.sa_mask);",
+        "    sa.sa_flags = SA_RESTART;      /* resume interrupted calls where possible */",
+        "    sigaction(SIGTERM, &sa, NULL);",
+        "    sigaction(SIGINT,  &sa, NULL);",
+        "",
+        "    while (!stop_requested) {",
+        "        /* do the real work here */",
+        "    }",
+        "",
+        "    /* clean shutdown happens HERE, in normal code, not in the handler */",
+        "    return 0;",
+        "}"
+      ]
+    },
+    {
+      "kind": "list",
+      "items": [
+        "volatile sig_atomic_t is the only type the standard guarantees you can safely set in a handler and read in the main flow",
+        "The handler sets a flag; the main loop notices. The next lesson explains why doing more than this is genuinely dangerous",
+        "Use sigaction, not signal — its behaviour is precisely specified, and signal's historically was not",
+        "SA_RESTART asks the kernel to resume an interrupted blocking call instead of failing it with EINTR"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The two that catch people out"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SIGPIPE terminates your process when you write to a pipe whose reader has gone away. This is why `producer | head -5` ends promptly: head exits, the producer's next write raises SIGPIPE, and it dies. Useful in a shell, disastrous in a network server — a client disconnecting mid-response would kill your process. Servers therefore ignore SIGPIPE and check for the EPIPE error on write instead."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SIGCHLD is delivered whenever a child changes state, and its default action is to be ignored — which is exactly how zombies accumulate unnoticed. The previous lesson's reaping loop belongs in a SIGCHLD handler."
+    },
+    {
+      "kind": "try",
+      "title": "Send, catch, and fail to catch",
+      "steps": [
+        "Write the handler program above with a loop that prints a dot every second",
+        "Run it, press Ctrl-C, and confirm it shuts down through your clean path rather than dying instantly",
+        "From another terminal: kill <pid>        (that is SIGTERM — same clean path)",
+        "Now: kill -9 <pid>                       (no clean path — it just stops)",
+        "Add signal(SIGKILL, SIG_IGN) to the program and print the return value — confirm it fails",
+        "Run: ./yourprog | head -1                (SIGPIPE ends it once head is done)",
+        "Add signal(SIGPIPE, SIG_IGN) and check write's return value and errno instead — confirm EPIPE",
+        "Run: kill -l | head -20                  (every signal this system defines)"
+      ],
+      "expected": "Ctrl-C and kill both reach your handler; kill -9 does not and cannot. The SIGPIPE experiment is the one worth sitting with — it explains a shell behaviour you have used a hundred times, and a server bug you would otherwise meet for the first time in production."
+    }
+  ],
+  "cheatsheet": [
+    "A signal is a number delivered asynchronously — no payload",
+    "SIGINT 2 (Ctrl-C) · SIGTERM 15 (kill default) · SIGKILL 9 (forced) · SIGSEGV 11",
+    "SIGKILL and SIGSTOP cannot be caught, blocked, or ignored — attempting it fails with EINVAL",
+    "Send SIGTERM first and wait; escalate to SIGKILL only if it does not stop",
+    "Use sigaction, not signal — precisely specified behaviour",
+    "A handler should set a volatile sig_atomic_t flag and return",
+    "SA_RESTART resumes interrupted blocking calls instead of failing with EINTR",
+    "SIGPIPE kills you when you write to a pipe with no reader — servers ignore it and check EPIPE",
+    "SIGCHLD is ignored by default, which is how zombies pile up unnoticed",
+    "kill -l lists every signal on the system"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why can no program install a handler for SIGKILL?",
+      "choices": {
+        "A": "It is too fast to intercept",
+        "B": "So that an administrator can always stop a process — a program that could refuse it would be unstoppable",
+        "C": "The number 9 is reserved by the C library",
+        "D": "Only root-owned processes may catch it"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "It is a deliberate escape hatch for the system owner. Verified: attempting to install a handler for SIGKILL fails with 'Invalid argument', while the same call for SIGTERM succeeds."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Your server dies whenever a client disconnects mid-response. Most likely cause?",
+      "choices": {
+        "A": "SIGCHLD",
+        "B": "SIGPIPE — writing to a connection whose reader is gone, with the default action of terminating",
+        "C": "SIGSEGV",
+        "D": "SIGHUP"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Ignore SIGPIPE and check write's return value for EPIPE instead. This is standard practice in every network server, and it is the same mechanism that makes `producer | head` stop early in a shell."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why should a signal handler set a flag rather than doing the shutdown work itself?",
+      "choices": {
+        "A": "Handlers have a strict time limit",
+        "B": "A handler runs at an arbitrary point in your program, so only a very restricted set of operations is safe there",
+        "C": "Handlers cannot access global variables",
+        "D": "The kernel discards long-running handlers"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "It may interrupt your code between any two instructions, including in the middle of a library call. The next lesson makes that restriction concrete."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "What does SA_RESTART change?",
+      "choices": {
+        "A": "It restarts the program after the handler",
+        "B": "An interrupted blocking call is resumed where possible, instead of failing with EINTR",
+        "C": "It re-registers the handler after each signal",
+        "D": "It restarts the timer for periodic signals"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Without it, a signal arriving during a blocking read makes that read fail with EINTR, and your code has to retry it by hand. With it, the kernel resumes the call where it can."
+    }
+  ]
+}

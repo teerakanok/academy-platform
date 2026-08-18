@@ -1,0 +1,171 @@
+{
+  "nodeId": "zombie-and-orphan",
+  "locale": "en",
+  "title": "Zombies, orphans, and who cleans up",
+  "objective": "By the end of this lesson you can recognise a zombie in ps output, explain why the kernel keeps it, name who adopts an orphan, and write a parent that never accumulates either.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Two words that sound alarming and describe ordinary, well-defined states. Both come from the same fact: a parent and child can end in either order, and the kernel has to have an answer for both cases."
+    },
+    {
+      "kind": "heading",
+      "text": "A zombie is a result nobody has collected"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When a process ends, almost everything it held is released immediately — its memory, its open files, its threads. What survives is a small record: the exit status, the pid, and some accounting. The kernel keeps that record because the parent has a right to ask how the child ended. A process in that state is a zombie: finished, holding no resources, waiting to be read."
+    },
+    {
+      "kind": "code",
+      "caption": "What a zombie looks like",
+      "lines": [
+        "$ ps -o pid,stat,comm -p 1277",
+        "  PID STAT COMMAND",
+        " 1277 Z    demo          <- Z is the zombie state",
+        "",
+        "$ ps -eo pid,stat,comm | grep -w Z",
+        "$ ps aux | grep defunct    # some tools label it <defunct> instead"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "A zombie is not using memory — but it is using a pid",
+      "text": "This is why one zombie is harmless and thousands are a real problem. Pids are a finite resource, and a parent that forks in a loop without ever calling wait fills the table until nothing new can start. The symptom is a machine that cannot fork — which looks like a memory problem and is not one."
+    },
+    {
+      "kind": "heading",
+      "text": "An orphan is a child whose parent left first"
+    },
+    {
+      "kind": "paragraph",
+      "text": "If the parent exits while the child is still running, the child keeps going — nothing about it is broken. But its parent field must point somewhere, and the kernel reparents it. In the ordinary case that is pid 1, the first process on the system. Measured: a child with ppid 1274 reported ppid 1 within moments of its parent exiting."
+    },
+    {
+      "kind": "paragraph",
+      "text": "pid 1 is written to expect this. It waits in a loop for whatever children arrive, collects their statuses, and discards them. That is why orphans do not become zombies: their new parent is one whose whole job includes reaping them."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Modern systems can appoint a closer adopter",
+      "text": "Linux lets a process mark itself as a child subreaper, and then orphans in its subtree are reparented to it rather than to pid 1. Measured: with the flag set on a grandparent process with pid 1199, an orphaned grandchild reported ppid 1199, not 1. Session and service managers use this so that a crashed intermediate process does not hand a whole tree over to init. If you see an unexpected ppid, this is usually why."
+    },
+    {
+      "kind": "heading",
+      "text": "Writing a parent that leaks neither"
+    },
+    {
+      "kind": "code",
+      "caption": "Three correct approaches, by situation",
+      "lines": [
+        "/* 1. I need the result now: block until this child ends */",
+        "int status;",
+        "waitpid(pid, &status, 0);",
+        "",
+        "/* 2. I have work to do: poll without blocking */",
+        "while (waitpid(-1, &status, WNOHANG) > 0) {",
+        "    /* reaped one; loop until it returns 0 (none ready) or -1 (none left) */",
+        "}",
+        "",
+        "/* 3. I do not care about the result at all: ask the kernel not to keep one */",
+        "signal(SIGCHLD, SIG_IGN);   /* children are reaped automatically */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The third is the one people miss. Explicitly ignoring SIGCHLD tells the kernel you will never collect statuses, so it does not preserve them — and no zombies accumulate. It is the right answer for a fire-and-forget helper, and the wrong answer whenever you need to know whether the child succeeded."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "A long-running server that forks must reap deliberately",
+      "text": "This is one of the most common production bugs of this whole module: a server forks a worker per request, never waits, and after some weeks cannot fork at all. Nothing looks wrong in memory graphs. The fix is a SIGCHLD handler that calls waitpid with WNOHANG in a loop — a loop, not a single call, because several children can end while the handler runs and signals do not queue."
+    },
+    {
+      "kind": "try",
+      "title": "Make one of each, then clean up after them",
+      "steps": [
+        "Write a program where the parent forks, the child calls _exit(0) immediately, and the parent then sleeps for 30 seconds without waiting",
+        "While it sleeps, from another terminal: ps -o pid,stat,comm -p <child pid>",
+        "Confirm STAT shows Z",
+        "Add waitpid to the parent and run again — check that the pid no longer exists at all",
+        "Now the other way: have the child sleep 10 seconds and the parent _exit immediately",
+        "From the child, print getppid() before and after — confirm it changes to 1",
+        "Add signal(SIGCHLD, SIG_IGN) at the top of a version that forks 5 children and never waits",
+        "Run: ps -eo pid,stat,comm | grep -w Z          (there should be none)"
+      ],
+      "expected": "You will have created a zombie, cleaned it up, watched an orphan get adopted, and then proved that ignoring SIGCHLD prevents zombies entirely. That last program is the one to remember — it is three states of the same relationship, and every fork-based server has to handle all three."
+    }
+  ],
+  "cheatsheet": [
+    "Zombie = finished process whose exit status nobody has collected; STAT shows Z",
+    "A zombie holds no memory, but it does hold a pid",
+    "Thousands of zombies exhaust the pid table — the machine can no longer fork",
+    "Orphan = child whose parent exited; it is reparented, normally to pid 1",
+    "pid 1 reaps its adopted children automatically, so orphans do not linger",
+    "A process marked as a child subreaper adopts orphans in its subtree instead of pid 1",
+    "waitpid(pid, &st, 0) blocks; WNOHANG polls",
+    "Reap in a LOOP — signals do not queue, so one SIGCHLD can mean several children",
+    "signal(SIGCHLD, SIG_IGN) discards statuses and prevents zombies entirely"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A monitoring tool reports thousands of processes in state Z. What is actually being exhausted?",
+      "choices": {
+        "A": "Physical memory",
+        "B": "The pid table — zombies hold no memory but do hold a pid",
+        "C": "Open file descriptors",
+        "D": "Swap space"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "That is why this bug looks so confusing in production: memory graphs are flat, and the symptom is that nothing new can start."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A child's parent exits while the child is still running. What happens to the child?",
+      "choices": {
+        "A": "It is killed with SIGHUP",
+        "B": "It keeps running and is reparented — normally to pid 1, or to the nearest ancestor marked as a subreaper",
+        "C": "It becomes a zombie immediately",
+        "D": "It is suspended until a new parent claims it"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Nothing about the child is broken. Only its parent field changes, and the new parent is one that reaps."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why must a SIGCHLD handler call waitpid in a loop rather than once?",
+      "choices": {
+        "A": "waitpid can fail spuriously",
+        "B": "Signals do not queue — several children can end while the handler runs, and that delivers one signal, not several",
+        "C": "The loop is needed to avoid blocking",
+        "D": "Each call only reaps half a process"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Standard signals collapse: if three children end at nearly the same moment, the handler may run once. Looping with WNOHANG until it returns zero or -1 collects all of them."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "You spawn a helper whose result you genuinely do not care about. What is the cleanest way to avoid zombies?",
+      "choices": {
+        "A": "Call wait() at the end of the program",
+        "B": "signal(SIGCHLD, SIG_IGN) — the kernel then discards statuses instead of preserving them",
+        "C": "kill the child after a timeout",
+        "D": "Have the child call exit(0) instead of _exit(0)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Explicitly ignoring SIGCHLD says you will never collect statuses, so none are kept. Use it only when you truly do not need to know how the child ended."
+    }
+  ]
+}

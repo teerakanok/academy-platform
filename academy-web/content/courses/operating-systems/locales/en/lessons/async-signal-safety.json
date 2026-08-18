@@ -1,0 +1,218 @@
+{
+  "nodeId": "async-signal-safety",
+  "locale": "en",
+  "title": "What a signal handler is allowed to do",
+  "objective": "By the end of this lesson you can explain why printf in a handler is a real bug rather than a style issue, name what is actually safe there, and write a handler that reports something without risking a hang.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Almost every tutorial shows a signal handler calling printf. It usually works. It is also a genuine defect, and the failure mode — a process frozen with no error and no crash — is one of the hardest things to diagnose in this whole course. This lesson is about why, and what to write instead."
+    },
+    {
+      "kind": "heading",
+      "text": "A handler is not a callback. It is an interruption."
+    },
+    {
+      "kind": "paragraph",
+      "text": "A handler does not run after your code finishes something. It runs between two machine instructions, wherever the process happened to be. It can interrupt your code in the middle of updating a data structure, or in the middle of a C library function that is halfway through updating its own."
+    },
+    {
+      "kind": "code",
+      "caption": "The deadlock, step by step",
+      "lines": [
+        "/* main flow */",
+        "char *p = malloc(64);        <- malloc takes an internal lock",
+        "                             <- SIGNAL ARRIVES HERE",
+        "",
+        "/* handler runs, on the same thread, with that lock still held */",
+        "void handler(int sig) {",
+        "    printf(\"got signal %d\\n\", sig);   <- printf allocates, so it wants the SAME lock",
+        "}                                       <- it waits for a lock only it could release",
+        "",
+        "/* The process is now stuck. No crash, no message, no CPU use. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Why this bug is so hard to catch",
+      "text": "It needs the signal to arrive inside a specific window of a few instructions, so it may not reproduce for months. When it finally does, the process simply stops responding: it is not crashed, not looping, not out of memory. Every test passed, because the test never delivered a signal at exactly that moment."
+    },
+    {
+      "kind": "heading",
+      "text": "The rule, and where it is written down"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The standard defines a specific list of functions that are async-signal-safe — meaning they may be called from a handler. The rule is not 'avoid slow functions' or 'keep it short'. It is: call only functions on that list."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Safe in a handler",
+        "Not safe"
+      ],
+      "rows": [
+        [
+          "write()",
+          "printf(), fprintf(), puts()"
+        ],
+        [
+          "read(), open(), close()",
+          "malloc(), free()"
+        ],
+        [
+          "_exit()",
+          "exit()"
+        ],
+        [
+          "kill(), signal(), sigaction()",
+          "snprintf()"
+        ],
+        [
+          "strlen()",
+          "strerror()"
+        ],
+        [
+          "abort()",
+          "Anything that allocates or uses stdio"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "snprintf is not on the list — this surprises people",
+      "text": "It feels safe because it writes into a buffer you provide, but it is not listed as async-signal-safe, so a handler must not call it. That is inconvenient precisely because formatting a number is the thing you most want to do while debugging. The workaround below formats by hand."
+    },
+    {
+      "kind": "heading",
+      "text": "What to write instead"
+    },
+    {
+      "kind": "code",
+      "caption": "Two handlers that are actually correct",
+      "lines": [
+        "/* 1. The default answer: set a flag and get out */",
+        "static volatile sig_atomic_t got_signal = 0;",
+        "",
+        "static void handler(int sig) {",
+        "    (void)sig;",
+        "    got_signal = 1;",
+        "}",
+        "/* The main loop checks got_signal and does the real work in normal code. */",
+        "",
+        "",
+        "/* 2. If you genuinely must report from inside: write() a fixed string */",
+        "static void on_segv(int sig) {",
+        "    (void)sig;",
+        "    static const char msg[] = \"fatal: segmentation fault\\n\";",
+        "    write(STDERR_FILENO, msg, sizeof msg - 1);   /* write IS safe */",
+        "    _exit(1);                                    /* _exit IS safe; exit is not */",
+        "}"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Note what the second one avoids: no formatting, no allocation, no stdio, and _exit rather than exit — because exit runs the cleanup handlers registered by the rest of the program, which is precisely the code that may be halfway through something right now."
+    },
+    {
+      "kind": "heading",
+      "text": "The other half of the rule"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Even with only safe functions, a handler that touches your own global data can corrupt it, for the same reason: the main flow may be halfway through updating it. Anything a handler shares with the main flow should be a single volatile sig_atomic_t — a type the standard guarantees can be read and written without being caught half-updated."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "The industrial-strength answer: don't handle signals in a handler at all",
+      "text": "Linux offers signalfd, which delivers signals as readable events on a file descriptor. The signal then arrives in your normal event loop, at a point you chose, where every function is fair game — none of this lesson's restrictions apply. This is what modern servers do, and it will make immediate sense once you have met event loops in the networking course."
+    },
+    {
+      "kind": "try",
+      "title": "Build the bug, then fix it",
+      "steps": [
+        "Write a program whose main loop calls malloc(64) and free() over and over, forever",
+        "Install a SIGINT handler that calls printf(\"caught\\n\")",
+        "Run it and press Ctrl-C repeatedly — sometimes many times — until it stops responding",
+        "Confirm the shape of the failure: check with top that it is using no CPU, then confirm it ignores further Ctrl-C",
+        "Attach with gdb -p <pid>, run bt, and look for a lock wait inside the allocator",
+        "Now replace the printf with: write(STDOUT_FILENO, \"caught\\n\", 7)",
+        "Run the same test again and confirm it survives",
+        "Finally rewrite it as a flag plus a check in the main loop, which is the form you should default to"
+      ],
+      "expected": "You will have produced a hang that no error message explains, seen its signature (alive, responsive to nothing, zero CPU), and then removed it with a one-line change. Recognising that signature later — in someone else's service, at an unhelpful hour — is the real deliverable of this lesson."
+    }
+  ],
+  "cheatsheet": [
+    "A handler interrupts between two instructions, not between two operations",
+    "The rule is a specific list of async-signal-safe functions — not 'keep it short'",
+    "Safe: write, read, open, close, _exit, kill, sigaction, strlen, abort",
+    "Not safe: printf, malloc, free, exit, snprintf, strerror, anything with stdio",
+    "printf in a handler can deadlock against an allocator lock the main flow holds",
+    "The failure looks like a frozen process: no crash, no message, no CPU",
+    "Default handler: set one volatile sig_atomic_t flag and return",
+    "If you must report, write() a fixed string and _exit()",
+    "signalfd turns signals into ordinary events in your event loop, removing all these limits"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why can printf inside a signal handler deadlock a process?",
+      "choices": {
+        "A": "printf is slow and the handler times out",
+        "B": "The handler can interrupt the main flow while it holds an internal lock that printf then waits for",
+        "C": "The kernel blocks output during signal handling",
+        "D": "printf is not thread-safe"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "printf allocates and uses stdio, both of which take locks. If the interruption happened while those locks were held, the handler waits for a lock that only the interrupted code could release — on the same thread."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Which set is safe to call from a handler?",
+      "choices": {
+        "A": "printf, malloc, exit",
+        "B": "write, _exit, kill",
+        "C": "snprintf, strerror, free",
+        "D": "fprintf, calloc, abort"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "All three are on the async-signal-safe list. Note that _exit is safe while exit is not, because exit runs cleanup handlers belonging to code that may be halfway through something."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A service stops responding. It is not crashed, uses no CPU, and there is nothing in the logs. Which of this lesson's failures fits best?",
+      "choices": {
+        "A": "A zombie child",
+        "B": "A handler that called an unsafe function and deadlocked on an internal lock",
+        "C": "A missed SIGCHLD",
+        "D": "An unhandled SIGPIPE"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "That combination — alive, silent, zero CPU — is the signature. A crash would leave a message and an unhandled SIGPIPE would end the process, not freeze it."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why prefer signalfd in a modern server?",
+      "choices": {
+        "A": "It is faster",
+        "B": "Signals arrive as ordinary readable events in the event loop, so no code runs in an interrupted context and the safety restrictions do not apply",
+        "C": "It can catch SIGKILL",
+        "D": "It removes the need to install handlers for SIGCHLD"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The restriction exists because handler code runs at an arbitrary point. Move that work to a point you chose, and the restriction disappears with it."
+    }
+  ]
+}

@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 54,
+  "estimatedMinutes": 125,
   "coverMotif": "layers",
   "skills": [
     {
@@ -73,6 +73,53 @@
       "skillWeights": {
         "kernel-interface": 4,
         "processes": 2
+      }
+    },
+    {
+      "id": "fork-exec-wait",
+      "kind": "lesson",
+      "prerequisites": [
+        "syscall-lifecycle"
+      ],
+      "estimatedMinutes": 20,
+      "skillWeights": {
+        "processes": 4,
+        "kernel-interface": 2
+      }
+    },
+    {
+      "id": "zombie-and-orphan",
+      "kind": "lesson",
+      "prerequisites": [
+        "fork-exec-wait"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "processes": 4
+      }
+    },
+    {
+      "id": "signals",
+      "kind": "lesson",
+      "prerequisites": [
+        "fork-exec-wait"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "processes": 3,
+        "kernel-interface": 2
+      }
+    },
+    {
+      "id": "async-signal-safety",
+      "kind": "lesson",
+      "prerequisites": [
+        "signals"
+      ],
+      "estimatedMinutes": 17,
+      "skillWeights": {
+        "processes": 3,
+        "os-security": 2
       }
     }
   ]
