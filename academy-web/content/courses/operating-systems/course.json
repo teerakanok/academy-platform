@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 178,
+  "estimatedMinutes": 237,
   "coverMotif": "layers",
   "skills": [
     {
@@ -155,6 +155,41 @@
       "skillWeights": {
         "concurrency": 4,
         "synchronisation": 3
+      }
+    },
+    {
+      "id": "mutex",
+      "kind": "lesson",
+      "prerequisites": [
+        "race-conditions"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "synchronisation": 4,
+        "concurrency": 2
+      }
+    },
+    {
+      "id": "semaphore-and-condvar",
+      "kind": "lesson",
+      "prerequisites": [
+        "mutex"
+      ],
+      "estimatedMinutes": 19,
+      "skillWeights": {
+        "synchronisation": 4
+      }
+    },
+    {
+      "id": "producer-consumer",
+      "kind": "capstone",
+      "prerequisites": [
+        "semaphore-and-condvar"
+      ],
+      "estimatedMinutes": 22,
+      "skillWeights": {
+        "synchronisation": 4,
+        "concurrency": 4
       }
     }
   ]

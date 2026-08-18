@@ -1,0 +1,244 @@
+{
+  "nodeId": "semaphore-and-condvar",
+  "locale": "en",
+  "title": "Waiting properly: semaphores and condition variables",
+  "objective": "By the end of this lesson you can make a thread wait for a condition without burning CPU, explain why the wait must sit in a while loop rather than an if, and choose between a semaphore and a condition variable.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A mutex answers 'only one at a time'. It does not answer 'wait until there is something to do'. For that you need a thread to sleep until another thread tells it the world has changed — and the naive version of that is one of the most wasteful things you can write."
+    },
+    {
+      "kind": "code",
+      "caption": "The wrong way, and why it is wrong",
+      "lines": [
+        "/* Busy waiting: burns a core doing nothing */",
+        "while (queue_is_empty()) {",
+        "    /* spin */",
+        "}",
+        "",
+        "/* Slightly less bad, still wrong: */",
+        "while (queue_is_empty()) {",
+        "    usleep(1000);      /* now it is slow AND still wasteful */",
+        "}",
+        "/* Adds up to 1 ms of latency to every item, and still wakes 1000x/second */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "A condition variable: sleep until told"
+    },
+    {
+      "kind": "paragraph",
+      "text": "pthread_cond_wait does something that looks impossible at first: it releases the mutex and goes to sleep as one indivisible step, and re-acquires the mutex before returning. That atomicity is the entire point — without it, a signal arriving between 'release' and 'sleep' would be missed, and the thread would sleep forever."
+    },
+    {
+      "kind": "code",
+      "caption": "The pattern — memorise this shape",
+      "lines": [
+        "pthread_mutex_t m  = PTHREAD_MUTEX_INITIALIZER;",
+        "pthread_cond_t  cv = PTHREAD_COND_INITIALIZER;",
+        "int items = 0;",
+        "",
+        "/* Waiter */",
+        "pthread_mutex_lock(&m);",
+        "while (items == 0) {                 /* WHILE, never if — see below */",
+        "    pthread_cond_wait(&cv, &m);      /* unlock + sleep atomically; relock on wake */",
+        "}",
+        "items--;",
+        "pthread_mutex_unlock(&m);",
+        "",
+        "/* Notifier */",
+        "pthread_mutex_lock(&m);",
+        "items++;",
+        "pthread_cond_signal(&cv);            /* wake one waiter */",
+        "pthread_mutex_unlock(&m);"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Why it must be while"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This is the single most common bug in code that uses condition variables, and it is easy to demonstrate. Three consumers wait; the producer adds one item and calls broadcast, waking all three. With while, each re-checks the condition, two find nothing and go back to sleep, and the count ends at zero. With if, each assumes the condition must be true because it was woken."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured, on the same program with one line changed",
+      "lines": [
+        "### with while (correct) ###",
+        "  result: items=0, consumers that took a nonexistent item: 0",
+        "",
+        "### with if (the bug) ###",
+        "  consumer 1 took an item that was NOT there (items=0)",
+        "  consumer 2 took an item that was NOT there (items=-1)",
+        "  result: items=-2, consumers that took a nonexistent item: 2"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Three separate reasons the condition can be false after a wake",
+      "text": "First, broadcast wakes every waiter but the resource may only satisfy one — demonstrated above. Second, another thread can take the item between your wake-up and your re-acquiring the mutex. Third, the standard explicitly permits spurious wake-ups: a wait may return with nothing having happened at all. Any one of these is enough; together they make while mandatory. Treat a wake-up as 'go and check', never as 'it is your turn'."
+    },
+    {
+      "kind": "heading",
+      "text": "signal or broadcast"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "pthread_cond_signal",
+        "pthread_cond_broadcast"
+      ],
+      "rows": [
+        [
+          "Wakes",
+          "At least one waiter",
+          "All waiters"
+        ],
+        [
+          "Use when",
+          "One item became available and any waiter can take it",
+          "State changed in a way different waiters judge differently"
+        ],
+        [
+          "Risk",
+          "Waking a waiter that cannot proceed while another could",
+          "A thundering herd: all wake, one proceeds, the rest sleep again"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "A semaphore: a counter you can wait on"
+    },
+    {
+      "kind": "code",
+      "caption": "Simpler, when counting is all you need",
+      "lines": [
+        "#include <semaphore.h>",
+        "",
+        "sem_t slots;",
+        "sem_init(&slots, 0, 5);      /* 5 permits: at most 5 threads inside */",
+        "",
+        "sem_wait(&slots);            /* take one; sleep if the count is 0 */",
+        "/* ... use the limited resource ... */",
+        "sem_post(&slots);            /* give it back; wakes a waiter if any */"
+      ]
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Reach for a semaphore when",
+        "Reach for a condition variable when"
+      ],
+      "rows": [
+        [
+          "The condition is 'how many are available'",
+          "The condition is arbitrary — a predicate over your own state"
+        ],
+        [
+          "Limiting concurrency to N",
+          "Waiting for 'the queue is non-empty and not shutting down'"
+        ],
+        [
+          "No shared data needs protecting alongside",
+          "You already hold a mutex over the data"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "A semaphore remembers; a condition variable does not",
+      "text": "sem_post on a semaphore nobody is waiting on increments the count, and a later sem_wait returns immediately. pthread_cond_signal with no waiter is simply lost — nothing records that it happened. That is precisely why the condition variable pattern keeps its own state variable and re-checks it: the state, not the signal, is the source of truth."
+    },
+    {
+      "kind": "try",
+      "title": "Build the bug and remove it",
+      "steps": [
+        "Write a program with three consumer threads waiting on a condition variable for items > 0",
+        "Have the main thread set items = 1 and call pthread_cond_broadcast",
+        "Run it with the wait inside a while loop and print the final count",
+        "Change while to if, run again, and print the count — expect it to go negative",
+        "Explain out loud which of the three reasons above caused it here",
+        "Now replace the whole thing with a semaphore initialised to 0: sem_post once, and confirm exactly one consumer proceeds",
+        "Add a shutdown flag and make the wait condition (items > 0 || shutting_down) — this is the form a real server needs",
+        "Run the while version under -fsanitize=thread and confirm it is clean"
+      ],
+      "expected": "A count that goes negative with if and stays correct with while, from a one-word change. The last two steps matter for the capstone: a wait condition that only covers the happy path leaves your threads asleep forever when the program tries to shut down."
+    }
+  ],
+  "cheatsheet": [
+    "Busy waiting burns a core; sleeping-and-polling adds latency and still wastes wakeups",
+    "pthread_cond_wait releases the mutex and sleeps atomically, then re-acquires it",
+    "ALWAYS wait in a while loop that re-checks the condition, never an if",
+    "Three reasons the condition can be false on wake: broadcast, another thread took it, spurious wakeups",
+    "Measured: with if, three consumers over one item drove the count to -2",
+    "signal wakes one waiter; broadcast wakes all",
+    "A semaphore counts and remembers; a condition variable signal with no waiter is lost",
+    "Semaphore for 'how many available'; condition variable for an arbitrary predicate",
+    "Include shutdown in the wait condition, or threads sleep forever at exit"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why must pthread_cond_wait release the mutex and sleep as one indivisible step?",
+      "choices": {
+        "A": "To avoid deadlock with the scheduler",
+        "B": "Otherwise a signal arriving between releasing and sleeping would be missed, and the thread would sleep forever",
+        "C": "Because the mutex is recursive",
+        "D": "To let the compiler optimise the loop"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "That gap is exactly the race the atomic release-and-sleep exists to close. It is also why you must hold the mutex when you call it."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Three threads wait on a condition variable. The producer adds one item and calls broadcast. With if instead of while, what happens?",
+      "choices": {
+        "A": "Only one proceeds; the others go back to sleep",
+        "B": "All three proceed as if an item were available, and the count goes negative",
+        "C": "Two get an error",
+        "D": "broadcast blocks until all three are served"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Verified: the count reached -2 in exactly this experiment. Waking up means 'go and check', not 'the condition holds'."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A thread calls pthread_cond_signal while nobody is waiting. What happens to that signal?",
+      "choices": {
+        "A": "It is queued for the next waiter",
+        "B": "It is lost — condition variables keep no state, which is why the pattern re-checks a state variable",
+        "C": "It causes an error",
+        "D": "It wakes the next thread that waits, within one second"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A semaphore would have remembered it by incrementing its count. This difference is usually what decides which one to use."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Your worker threads wait for (queue_not_empty). At shutdown the program hangs. Why?",
+      "choices": {
+        "A": "The mutex was not released",
+        "B": "Nothing ever makes the wait condition true again, so the workers sleep forever — the condition must also cover shutting down",
+        "C": "broadcast was called too early",
+        "D": "The threads were detached"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A wait condition that only describes the happy path has no exit. Make it (queue_not_empty || shutting_down), set the flag, and broadcast."
+    }
+  ]
+}

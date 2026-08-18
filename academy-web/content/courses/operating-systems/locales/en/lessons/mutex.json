@@ -1,0 +1,233 @@
+{
+  "nodeId": "mutex",
+  "locale": "en",
+  "title": "Mutual exclusion, and what it costs",
+  "objective": "By the end of this lesson you can protect shared data with a mutex, choose the right size of critical section, and give real numbers for what locking costs with and without contention.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A mutex makes a sequence indivisible. While one thread holds it, no other thread can hold it — so the load-add-store from the previous lesson completes with nobody in between. That is the whole idea. The interesting part is where you put it and what it costs."
+    },
+    {
+      "kind": "code",
+      "caption": "The fix for the previous lesson's bug",
+      "lines": [
+        "#include <pthread.h>",
+        "",
+        "static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;",
+        "static long counter = 0;",
+        "",
+        "void *worker(void *arg) {",
+        "    for (int i = 0; i < 200000; i++) {",
+        "        pthread_mutex_lock(&lock);",
+        "        counter++;                    /* the critical section */",
+        "        pthread_mutex_unlock(&lock);",
+        "    }",
+        "    return NULL;",
+        "}",
+        "",
+        "/* Eight threads now reach exactly 1,600,000, at every optimisation level. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The rule that keeps this correct"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A mutex protects data, not code. Every access to a piece of shared data — reads included — must be made under the same mutex. One thread reading without the lock while another writes with it is still a data race, and thread sanitizer will still report it. Write down which mutex protects which data, in a comment beside the declaration; a lock whose scope lives only in the author's head is how these bugs return."
+    },
+    {
+      "kind": "heading",
+      "text": "What it actually costs"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Situation",
+        "Measured cost"
+      ],
+      "rows": [
+        [
+          "One thread, no contention — lock+unlock",
+          "about 7 ns per pair"
+        ],
+        [
+          "Atomic increment, one thread",
+          "about 2 ns"
+        ],
+        [
+          "Two threads contending — lock+unlock",
+          "about 36 ns"
+        ],
+        [
+          "Eight threads contending — lock+unlock",
+          "about 43 ns"
+        ],
+        [
+          "Eight threads, atomic increment",
+          "about 34 ns"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "An uncontended lock never enters the kernel",
+      "text": "Seven nanoseconds is far too fast for a system call, and the reason is that Linux mutexes are built on futexes: the fast path is a single atomic operation in user mode, and the kernel is called only when a thread actually has to wait. Verified with strace: 100,000 lock/unlock pairs on one thread produced zero futex system calls, and four threads contending over 400,000 pairs produced only 129. The kernel is involved when there is a genuine wait — not on every lock."
+    },
+    {
+      "kind": "paragraph",
+      "text": "So the cost that matters is contention, not locking. A lock that nobody else wants is nearly free. The way to make a threaded program fast is not to remove locks; it is to reduce how often two threads want the same one at the same moment."
+    },
+    {
+      "kind": "heading",
+      "text": "Sizing the critical section"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Too large",
+        "Too small"
+      ],
+      "rows": [
+        [
+          "Holding the lock during file or network I/O",
+          "Locking and unlocking around each of several related updates"
+        ],
+        [
+          "Threads queue behind work that did not need protecting",
+          "Another thread sees the data half-updated between them"
+        ],
+        [
+          "Symptom: no speedup from adding cores",
+          "Symptom: rare, inconsistent state"
+        ]
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "Both mistakes, and the fix",
+      "lines": [
+        "/* TOO LARGE: the slow part does not touch shared data */",
+        "pthread_mutex_lock(&lock);",
+        "result = fetch_from_network();      /* 50 ms, holding the lock */",
+        "total += result;",
+        "pthread_mutex_unlock(&lock);",
+        "",
+        "/* Fixed: do the slow work outside */",
+        "result = fetch_from_network();",
+        "pthread_mutex_lock(&lock);",
+        "total += result;                    /* nanoseconds */",
+        "pthread_mutex_unlock(&lock);",
+        "",
+        "/* TOO SMALL: two updates that must agree with each other */",
+        "pthread_mutex_lock(&lock); account_a -= 100; pthread_mutex_unlock(&lock);",
+        "pthread_mutex_lock(&lock); account_b += 100; pthread_mutex_unlock(&lock);",
+        "/* Between them, the money exists nowhere. Use ONE critical section. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Two ways to lose"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Forgetting to unlock on an early return or error path — every exit from the function must release the lock",
+        "Locking the same non-recursive mutex twice in one thread — the thread waits for itself, forever",
+        "Two mutexes taken in different orders by different threads — this is deadlock, and it has its own lesson"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "When an atomic is the better answer",
+      "text": "For a single counter or flag, an atomic type is simpler and faster: no lock to forget, no critical section to size. Measured single-threaded: about 2 ns against 7 ns for a mutex pair. But an atomic protects exactly one variable — the moment two values must stay consistent with each other, you need a mutex. Under heavy contention the gap narrows anyway (about 34 ns against 43 ns with eight threads), because both end up fighting over the same cache line."
+    },
+    {
+      "kind": "try",
+      "title": "Fix the race, then measure the lock",
+      "steps": [
+        "Take your racy counter program and add a mutex around the increment",
+        "Run at -O0 and -O2 — both should now give exactly 1,600,000, every time",
+        "Rebuild with -fsanitize=thread and confirm the warning is gone",
+        "Now measure: time 1,000,000 lock/unlock pairs on ONE thread and divide",
+        "Repeat with two, four and eight threads and compare per-operation cost",
+        "Run: strace -c -f -e trace=futex ./yourprog with one thread, then with four",
+        "Confirm the single-threaded run makes no futex calls at all",
+        "Finally: move the increment outside the lock but keep the lock — confirm the race returns, proving the lock protects data, not code"
+      ],
+      "expected": "Correct totals at every optimisation level, a silent sanitizer, a per-lock cost that rises sharply with contention and barely at all without it, and a futex count of zero when nothing is contended. The last step is the one that makes the rule stick: the lock did nothing because the data access was not inside it."
+    }
+  ],
+  "cheatsheet": [
+    "pthread_mutex_lock / unlock around every access to the protected data",
+    "A mutex protects DATA, not code — readers must lock too",
+    "Document which mutex protects which data, next to the declaration",
+    "Measured: ~7 ns per uncontended lock+unlock pair; ~36-43 ns under contention",
+    "An uncontended lock makes no system call: 100,000 pairs produced zero futex calls",
+    "Contention is the cost, not locking",
+    "Too large: never hold a lock across I/O. Too small: keep related updates in one critical section",
+    "Release the lock on every exit path, including errors",
+    "Atomic for one variable (~2 ns); mutex when two values must stay consistent"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "One thread writes a shared counter under a mutex; another reads it without locking. Is that safe?",
+      "choices": {
+        "A": "Yes — reads are always safe",
+        "B": "No — it is still a data race; every access, including reads, must use the same mutex",
+        "C": "Safe if the value fits in a register",
+        "D": "Safe on x86 only"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The mutex protects the data, so it only works if everyone touching that data participates. Thread sanitizer reports exactly this case."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "An uncontended lock/unlock pair costs about 7 ns. Why is that possible when a system call costs far more?",
+      "choices": {
+        "A": "The kernel caches the lock",
+        "B": "The fast path is an atomic operation in user mode; the kernel is called only when a thread must wait",
+        "C": "The compiler removes uncontended locks",
+        "D": "7 ns is a measurement error"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Verified with strace: 100,000 uncontended lock/unlock pairs produced zero futex system calls. Waiting is what costs; locking by itself is not."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A service holds a mutex while making a 50 ms network call. What is the symptom?",
+      "choices": {
+        "A": "Data corruption",
+        "B": "Threads serialise behind work that never needed protecting, so adding cores does not help",
+        "C": "Deadlock",
+        "D": "The mutex is released automatically after a timeout"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Correctness is fine, throughput is not. Do the slow work outside the critical section and take the lock only for the shared update."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "You must subtract from one account and add to another. What is the right locking?",
+      "choices": {
+        "A": "One critical section covering both updates",
+        "B": "Lock and unlock separately around each update",
+        "C": "An atomic type for each balance",
+        "D": "No lock if both are atomic"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Between two separate critical sections there is a moment when the money is in neither account, and another thread can observe it. Atomics do not help here: each is individually atomic, and the pair still is not."
+    }
+  ]
+}
