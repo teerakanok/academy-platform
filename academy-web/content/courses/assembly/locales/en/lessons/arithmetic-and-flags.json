@@ -1,0 +1,295 @@
+{
+  "nodeId": "arithmetic-and-flags",
+  "locale": "en",
+  "title": "Arithmetic, and the four bits it leaves behind",
+  "objective": "By the end of this lesson you can name the four condition flags, explain why one comparison can answer both a signed and an unsigned question, and read cmov as a branchless conditional.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Arithmetic instructions on x86-64 do two things: they compute a result, and they record four facts about that result in a status register. Almost every conditional in every program is built on those four bits."
+    },
+    {
+      "kind": "heading",
+      "text": "The four that matter"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Flag",
+        "Name",
+        "Set when",
+        "Used for"
+      ],
+      "rows": [
+        [
+          "ZF",
+          "Zero",
+          "The result was zero",
+          "Equality tests"
+        ],
+        [
+          "SF",
+          "Sign",
+          "The result's top bit is 1",
+          "Signed comparisons, negative tests"
+        ],
+        [
+          "CF",
+          "Carry",
+          "The unsigned operation carried or borrowed out",
+          "Unsigned comparisons and overflow"
+        ],
+        [
+          "OF",
+          "Overflow",
+          "The signed result did not fit",
+          "Signed overflow detection"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Two overflow flags, because there are two kinds of overflow",
+      "text": "The same bit pattern is a different number depending on interpretation, so overflowing means different things. Adding 0xFFFFFFFF and 1 in 32 bits gives 0 with a carry out — unsigned overflow, CF set. As signed values that is -1 + 1 = 0, perfectly correct, OF clear. The hardware sets both flags on every arithmetic instruction and lets the reader choose which one applies. This is the C course's signed-versus-unsigned discussion appearing as two separate bits in silicon."
+    },
+    {
+      "kind": "heading",
+      "text": "Comparing without keeping the answer"
+    },
+    {
+      "kind": "code",
+      "caption": "cmp and test",
+      "lines": [
+        "  cmp  edi, esi     ; computes edi - esi, sets the flags, DISCARDS the result",
+        "  test edi, edi     ; computes edi & edi, sets the flags, DISCARDS the result",
+        "",
+        "  Compilers use test for comparisons against zero:",
+        "",
+        "  bool isz(int a) { return a == 0; }",
+        "      test edi, edi",
+        "      sete al",
+        "",
+        "/* test edi, edi and cmp edi, 0 answer the same question. test is shorter",
+        "   in bytes because it needs no immediate operand. Read test of a register",
+        "   with itself as 'is this zero?' -- it is one of the most common",
+        "   instructions in any disassembly. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "One comparison, two questions"
+    },
+    {
+      "kind": "code",
+      "caption": "Real compiler output for signed and unsigned less-than",
+      "lines": [
+        "  bool lt_signed  (int a,      int b)      { return a < b; }",
+        "      cmp  edi, esi",
+        "      setl al                     ; set if LESS -- the signed test",
+        "",
+        "  bool lt_unsigned(unsigned a, unsigned b) { return a < b; }",
+        "      cmp  edi, esi               ; the SAME comparison instruction",
+        "      setb al                     ; set if BELOW -- the unsigned test",
+        "",
+        "/* One cmp, two different questions asked of the result. cmp does not know",
+        "   or care whether its operands are signed: it sets all the flags, and the",
+        "   instruction that reads them decides which interpretation applies.",
+        "   This is why signedness lives in the CONDITION, not in the comparison. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "This is where signed and unsigned bugs become visible",
+      "text": "In C the bug is invisible: a < b looks the same whatever the types are. In the disassembly it is a different mnemonic — setl or jl for signed, setb or jb for unsigned. When you are analysing a binary and see an unsigned comparison where a length check should be signed, or the reverse, you have found the class of bug where a negative length passes a 'less than the buffer size' test by being read as an enormous positive number."
+    },
+    {
+      "kind": "heading",
+      "text": "The condition names"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Signed",
+        "Unsigned",
+        "Meaning"
+      ],
+      "rows": [
+        [
+          "l / nge",
+          "b / nae",
+          "less than / below"
+        ],
+        [
+          "le / ng",
+          "be / na",
+          "less or equal / below or equal"
+        ],
+        [
+          "g / nle",
+          "a / nbe",
+          "greater than / above"
+        ],
+        [
+          "ge / nl",
+          "ae / nb",
+          "greater or equal / above or equal"
+        ],
+        [
+          "e / z",
+          "e / z",
+          "equal — the same for both"
+        ],
+        [
+          "ne / nz",
+          "ne / nz",
+          "not equal — the same for both"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Less/greater are the signed words and below/above are the unsigned ones. That single convention lets you read the signedness of any comparison at a glance, and it applies identically to the jump instructions (jl, jb), the set instructions (setl, setb) and the conditional moves (cmovl, cmovb)."
+    },
+    {
+      "kind": "heading",
+      "text": "Conditionals without branches"
+    },
+    {
+      "kind": "code",
+      "caption": "Two conditionals that contain no jump",
+      "lines": [
+        "  int absv(int x)        { return x < 0 ? -x : x; }",
+        "      mov   eax, edi",
+        "      neg   eax                   ; eax = -x, and neg SETS the flags",
+        "      cmovs eax, edi              ; if the result was negative, take x instead",
+        "",
+        "  int maxv(int a, int b) { return a > b ? a : b; }",
+        "      mov   eax, esi              ; assume b",
+        "      cmp   edi, esi",
+        "      cmovg eax, edi              ; if a > b, take a",
+        "",
+        "/* No jumps in either function. cmov copies only if the condition holds,",
+        "   so both possible values are computed and one is discarded. This is the",
+        "   branchless technique the architecture course measured: worth it when the",
+        "   condition is unpredictable and both sides are cheap, which they are here. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "cmov reads the flags and copies its source only if the condition holds. Because it is a single instruction with no branch, there is nothing to predict and nothing to mispredict. The architecture course measured what that is worth: a branch on unpredictable data cost almost seven times as much as a predictable one, and removing the branch removed the difference entirely."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "seto is how you detect overflow correctly",
+      "text": "Signed overflow is undefined behaviour in C, so you cannot test for it by performing the addition and inspecting the result — the compiler is allowed to assume it did not happen. __builtin_add_overflow compiles to add followed by seto, reading the overflow flag the hardware already set. The check the hardware provides for free is exactly the one the language forbids you to write by hand."
+    },
+    {
+      "kind": "heading",
+      "text": "Shifts carry the same signed distinction"
+    },
+    {
+      "kind": "code",
+      "caption": "Right shift depends on the type",
+      "lines": [
+        "  int      shifts(int x)      { return (x << 3) + (x >> 2); }",
+        "      sar  eax, 2                ; arithmetic shift: copies the sign bit in",
+        "      lea  eax, [rax + 8*rdi]    ; the << 3 and the + folded into one lea",
+        "",
+        "  unsigned ushift(unsigned x) { return x >> 2; }",
+        "      shr  eax, 2                ; logical shift: brings in zeros",
+        "",
+        "/* sar for signed, shr for unsigned. Left shift needs no such distinction,",
+        "   so there is only shl. Seeing sar tells you the value was signed even",
+        "   when the binary carries no type information at all. */"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Read the signedness out of a binary",
+      "steps": [
+        "Write four comparison functions: signed and unsigned, less-than and greater-than",
+        "Compile at -O2 and record which set instruction each produced",
+        "Confirm the l/g family goes with signed and the b/a family with unsigned",
+        "Write a == 0 and confirm the compiler chooses test over cmp",
+        "Write a ternary that selects between two cheap values and look for cmov",
+        "Rewrite it so one side calls a function, and confirm the cmov disappears",
+        "Explain why a side with a function call cannot use cmov",
+        "Write x >> 2 for int and unsigned and confirm sar against shr"
+      ],
+      "expected": "setl/setb and setg/seta pairs, test for the zero comparison, a cmov that vanishes when one side has a call, and sar against shr. The disappearing cmov is the important one: cmov computes both sides, so it can only be used when both sides are safe to evaluate. A function call, a memory dereference that might fault, or a division that might trap all force a real branch."
+    }
+  ],
+  "cheatsheet": [
+    "Four flags: ZF zero, SF sign, CF unsigned carry, OF signed overflow",
+    "Both CF and OF are set on every arithmetic instruction; the reader picks which applies",
+    "cmp computes a subtraction and keeps only the flags",
+    "test computes an AND and keeps only the flags; test r,r means 'is r zero?'",
+    "Signed conditions use less/greater: l, le, g, ge",
+    "Unsigned conditions use below/above: b, be, a, ae",
+    "Signedness is visible in the condition, not in the comparison instruction",
+    "cmov copies only if the condition holds — a conditional with no branch",
+    "cmov requires both sides to be safe to evaluate; a call forces a real branch",
+    "sar is the signed right shift, shr the unsigned one; left shift needs only shl"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Signed and unsigned less-than both compile to the same cmp. Where does the difference appear?",
+      "choices": {
+        "A": "In the operand order",
+        "B": "In the condition that reads the flags: setl for signed, setb for unsigned",
+        "C": "In the register widths",
+        "D": "There is no difference"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "cmp sets every flag without interpreting its operands. Less/greater are the signed words, below/above the unsigned ones."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why do compilers emit test edi, edi instead of cmp edi, 0?",
+      "choices": {
+        "A": "cmp cannot take zero",
+        "B": "Both answer the same question and test is shorter, needing no immediate operand",
+        "C": "test sets different flags",
+        "D": "It is required by the ABI"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Read test of a register with itself as 'is this zero?'. It appears constantly in real disassembly."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A ternary compiles to cmov, but adding a function call to one branch makes the cmov disappear. Why?",
+      "choices": {
+        "A": "cmov cannot use the return value",
+        "B": "cmov evaluates both sides and selects afterwards, so it can only be used when evaluating both is safe — a call has effects that must not happen unconditionally",
+        "C": "Calls clobber the flags",
+        "D": "The function is too large"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The same limit the architecture course gave for branchless code: it does both sides' work every time, so a side with an effect cannot be executed unconditionally."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "You see sar eax, 2 in a disassembly with no type information available. What does it tell you?",
+      "choices": {
+        "A": "Nothing about types",
+        "B": "The value was signed — sar copies the sign bit in, while shr brings in zeros for unsigned values",
+        "C": "The value was a pointer",
+        "D": "The shift count was variable"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Recovering type information from instruction choice is a core reverse-engineering technique, and the signed shift is one of the clearest signals available."
+    }
+  ]
+}

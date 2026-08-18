@@ -1,0 +1,100 @@
+{
+  "id": "assembly",
+  "slug": "assembly",
+  "version": "1.0.0",
+  "publicAvailability": "internal",
+  "defaultLocale": "en",
+  "availableLocales": [
+    "en",
+    "th"
+  ],
+  "level": "intermediate",
+  "estimatedMinutes": 85,
+  "coverMotif": "terminal",
+  "skills": [
+    {
+      "id": "reading-disassembly",
+      "maxScore": 100
+    },
+    {
+      "id": "x86-registers",
+      "maxScore": 100
+    },
+    {
+      "id": "instruction-semantics",
+      "maxScore": 100
+    },
+    {
+      "id": "control-flow",
+      "maxScore": 100
+    },
+    {
+      "id": "stack-and-abi",
+      "maxScore": 100
+    },
+    {
+      "id": "tooling",
+      "maxScore": 100
+    }
+  ],
+  "globalSkillWeights": {
+    "foundations": 0.7,
+    "security-ops": 0.3
+  },
+  "nodes": [
+    {
+      "id": "why-read-assembly",
+      "kind": "lesson",
+      "prerequisites": [],
+      "estimatedMinutes": 17,
+      "skillWeights": {
+        "reading-disassembly": 4
+      }
+    },
+    {
+      "id": "registers",
+      "kind": "lesson",
+      "prerequisites": [
+        "why-read-assembly"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "x86-registers": 4
+      }
+    },
+    {
+      "id": "mov-and-lea",
+      "kind": "lesson",
+      "prerequisites": [
+        "registers"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "x86-registers": 3,
+        "instruction-semantics": 4
+      }
+    },
+    {
+      "id": "arithmetic-and-flags",
+      "kind": "lesson",
+      "prerequisites": [
+        "mov-and-lea"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "instruction-semantics": 4
+      }
+    },
+    {
+      "id": "att-vs-intel-syntax",
+      "kind": "lesson",
+      "prerequisites": [
+        "mov-and-lea"
+      ],
+      "estimatedMinutes": 14,
+      "skillWeights": {
+        "reading-disassembly": 4
+      }
+    }
+  ]
+}

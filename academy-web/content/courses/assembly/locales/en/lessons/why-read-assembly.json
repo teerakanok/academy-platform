@@ -1,0 +1,249 @@
+{
+  "nodeId": "why-read-assembly",
+  "locale": "en",
+  "title": "The program you wrote is not the program that runs",
+  "objective": "By the end of this lesson you can state four concrete situations where only the disassembly answers the question, and you will have seen a loop disappear from a real compilation.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Source code is a request. The compiler is free to produce anything that behaves the same way for legal inputs, and it routinely produces something that looks nothing like what you wrote. Most of the time that is fine. This course is about the times it is not."
+    },
+    {
+      "kind": "heading",
+      "text": "A loop that is not there"
+    },
+    {
+      "kind": "code",
+      "caption": "Real output from cc -O2 on x86-64",
+      "lines": [
+        "  int sum_to(int n) {",
+        "    int s = 0;",
+        "    for (int i = 1; i <= n; i++) s += i;",
+        "    return s;",
+        "  }",
+        "",
+        "  $ cc -O2 -S -masm=intel",
+        "",
+        "  _sum_to:",
+        "      test  edi, edi          ; is n <= 0?",
+        "      jle   .Lzero            ; then return 0",
+        "      lea   eax, [rdi - 1]    ; n-1",
+        "      lea   ecx, [rdi - 2]    ; n-2",
+        "      imul  rcx, rax          ; (n-1)(n-2)",
+        "      shr   rcx               ; (n-1)(n-2)/2",
+        "      lea   eax, [rcx + 2*rdi]; + 2n",
+        "      dec   eax               ; - 1",
+        "      ret",
+        "  .Lzero:",
+        "      xor   eax, eax",
+        "      ret",
+        "",
+        "/* There is no loop. The compiler replaced it with (n-1)(n-2)/2 + 2n - 1,",
+        "   which is the closed form of the sum. Check it: n=5 gives 6+10-1 = 15,",
+        "   and 1+2+3+4+5 = 15. n=100 gives 4851+200-1 = 5050. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "That is not an optimisation of your loop, it is a replacement for it",
+      "text": "The compiler recognised the summation, substituted its closed form, and emitted eight instructions with no branch except the check for n <= 0. If you profile this function you will not find a loop to optimise. If you set a breakpoint inside the loop body, there is no loop body. Reading the source tells you what was intended; reading the disassembly tells you what exists."
+    },
+    {
+      "kind": "heading",
+      "text": "A division with no division"
+    },
+    {
+      "kind": "code",
+      "caption": "Real output for x / 10",
+      "lines": [
+        "  int div10(int x) { return x / 10; }",
+        "",
+        "  _div10:",
+        "      movsxd rax, edi",
+        "      imul   rax, rax, 1717986919",
+        "      mov    rcx, rax",
+        "      shr    rcx, 63              ; the sign bit, 0 or 1",
+        "      sar    rax, 34",
+        "      add    eax, ecx             ; adjust for negative x",
+        "      ret",
+        "",
+        "/* There is no division instruction. 1717986919 is 2^34 / 10 rounded up,",
+        "   so multiplying and shifting right by 34 divides by 10. Verified by hand:",
+        "     100 x 1717986919 = 171798691900",
+        "     171798691900 >> 34 = 10",
+        "   Division is one of the slowest integer operations, so compilers avoid it",
+        "   whenever the divisor is a constant. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Both examples are the same lesson from different directions: the compiler is an optimising translator, not a transcriber. Knowing this changes what you can conclude from source alone, and the four situations below are the ones where it matters most."
+    },
+    {
+      "kind": "heading",
+      "text": "When only the disassembly answers the question"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Situation",
+        "Why source is not enough"
+      ],
+      "rows": [
+        [
+          "A performance mystery",
+          "The code that runs may not be the code you wrote; the branch you are blaming may not exist"
+        ],
+        [
+          "A crash with no source",
+          "A stack trace into a library, a stripped binary, or a core dump from a machine you do not control"
+        ],
+        [
+          "Undefined behaviour",
+          "The compiler may have assumed something cannot happen and removed the check you relied on"
+        ],
+        [
+          "Analysing a binary you did not build",
+          "Malware, a vendor library, a firmware image — there is no source to read"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The last row is why this course exists as a step toward reverse engineering. The others are why it is useful even if you never analyse a hostile binary: they are ordinary Tuesday problems in systems programming, and each of them ends with somebody reading disassembly."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The undefined-behaviour case is the one that surprises people",
+      "text": "The C course explained that undefined behaviour permits the compiler to assume the situation never arises. In the binary you can see what that permission was spent on: a bounds check that vanished because a later pointer dereference proved the pointer was non-null, or an overflow test removed because signed overflow cannot legally happen. The source still contains the check. The binary does not. Only one of them runs."
+    },
+    {
+      "kind": "heading",
+      "text": "What you will be able to read by the end"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "The sixteen general-purpose registers, their widths and their conventional roles",
+        "mov, lea and why lea is the compiler's favourite arithmetic instruction",
+        "How comparisons set flags and how conditional jumps read them",
+        "Loops, arrays and address arithmetic as the compiler expresses them",
+        "call, ret, the stack, and how arguments and return values travel",
+        "A real disassembly of code you did not write, read with objdump and a debugger"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "This course targets x86-64, because that is what the binaries you will need to read are compiled for. The architecture course used RISC-V, whose regularity made the encoding and the datapath easy to see. x86-64 is the opposite: irregular, historically layered, and everywhere. Having seen the clean version first makes the messy one legible."
+    },
+    {
+      "kind": "heading",
+      "text": "Getting a disassembly"
+    },
+    {
+      "kind": "code",
+      "caption": "Three ways in, all producing the same information",
+      "lines": [
+        "  # 1. Ask the compiler for assembly instead of an object file",
+        "  cc -O2 -S -masm=intel -o - prog.c",
+        "",
+        "  # 2. Disassemble a compiled binary",
+        "  objdump -d --x86-asm-syntax=intel prog        # LLVM's objdump",
+        "  objdump -d -M intel prog                      # GNU binutils",
+        "",
+        "  # 3. Disassemble one function inside a debugger",
+        "  gdb ./prog -batch -ex 'set disassembly-flavor intel' -ex 'disassemble main'",
+        "",
+        "/* Option 1 shows what the compiler produced, with labels and directives.",
+        "   Option 2 shows what is actually in the file, with addresses and the",
+        "   machine-code bytes. Use 1 while learning and 2 when the source is gone. */"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Make a loop disappear",
+      "steps": [
+        "Write the sum_to function above in a file on its own",
+        "Compile it with cc -O0 -S -masm=intel and count the instructions",
+        "Compile it again with -O2 and count them",
+        "Confirm the -O2 version contains no backward jump",
+        "Work out the arithmetic it uses and check it by hand for n = 5 and n = 100",
+        "Now write a loop the compiler cannot replace, such as summing an array",
+        "Compare the two and describe what made the difference",
+        "Compile x / 10 and x / 8 separately and explain why they look so different"
+      ],
+      "expected": "An -O2 version with no loop, arithmetic you verified by hand, and a second loop that survived because its result depends on data the compiler cannot see. The division comparison is the bonus: division by 8 is a single shift, division by 10 needs the multiply-and-shift trick, and seeing both makes the trick obvious rather than mysterious."
+    }
+  ],
+  "cheatsheet": [
+    "The compiler may produce anything that behaves the same for legal inputs",
+    "A summation loop can be replaced by its closed form: no loop remains in the binary",
+    "x / 10 compiles to a multiply by 1717986919 and a shift right by 34",
+    "1717986919 is 2^34 / 10 rounded up; division by a constant becomes multiplication",
+    "Four cases need disassembly: performance mysteries, crashes without source, undefined behaviour, foreign binaries",
+    "Undefined behaviour lets the compiler delete checks that exist in your source",
+    "cc -O2 -S -masm=intel shows what the compiler produced",
+    "objdump -d shows what is in the file, with addresses and machine-code bytes",
+    "This course targets x86-64 because that is what real binaries are compiled for"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A summation loop compiled at -O2 contains no backward jump. What happened?",
+      "choices": {
+        "A": "The optimiser unrolled it",
+        "B": "The compiler recognised the summation and substituted its closed form, so there is no loop in the binary at all",
+        "C": "The loop moved into a library call",
+        "D": "The compiler made an error"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The emitted arithmetic computes (n-1)(n-2)/2 + 2n - 1, which gives 15 for n=5 and 5050 for n=100. No iteration is performed."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "x / 10 compiles to imul by 1717986919 followed by sar 34. Why?",
+      "choices": {
+        "A": "To handle negative numbers",
+        "B": "1717986919 is 2^34 / 10 rounded up, so multiplying and shifting right by 34 divides by 10 — and division is far slower than multiplication",
+        "C": "The compiler cannot emit a division instruction",
+        "D": "It reduces code size"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Integer division is among the slowest operations, so compilers replace division by a constant with a multiply and a shift. The additional shr by 63 and add corrects the rounding for negative inputs."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Which of these questions can only be answered by reading disassembly?",
+      "choices": {
+        "A": "What the function is supposed to compute",
+        "B": "Whether a bounds check that appears in the source is present in the binary",
+        "C": "Which header a type is declared in",
+        "D": "What the function's name means"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Undefined behaviour permits the compiler to assume a situation cannot arise and remove the corresponding check. The source still shows it; only the binary shows whether it survived."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why does this course use x86-64 when the architecture course used RISC-V?",
+      "choices": {
+        "A": "x86-64 is simpler",
+        "B": "RISC-V's regularity made encodings and datapaths easy to see, while x86-64 is what the binaries you will actually need to read are compiled for",
+        "C": "RISC-V cannot be disassembled",
+        "D": "They are interchangeable"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Each was chosen for its purpose: a clean architecture to learn the concepts from, and the dominant one to read real code in."
+    }
+  ]
+}

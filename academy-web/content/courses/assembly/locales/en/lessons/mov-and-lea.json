@@ -1,0 +1,256 @@
+{
+  "nodeId": "mov-and-lea",
+  "locale": "en",
+  "title": "Moving data, and the instruction that does not move anything",
+  "objective": "By the end of this lesson you can read any x86-64 memory operand, tell mov and lea apart on sight, and recognise lea being used as arithmetic.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Most instructions in a disassembly are mov. Learning to read its operand forms covers most of what a program does with data, and it also sets up the one instruction that looks like mov, uses the same syntax, and means something entirely different."
+    },
+    {
+      "kind": "heading",
+      "text": "The one addressing mode"
+    },
+    {
+      "kind": "code",
+      "caption": "Every memory operand, in one shape",
+      "lines": [
+        "  Every memory operand on x86-64 has the same shape:",
+        "",
+        "      [ base + index*scale + displacement ]",
+        "",
+        "        base          any register",
+        "        index         any register except rsp",
+        "        scale         1, 2, 4 or 8 -- nothing else",
+        "        displacement  a constant",
+        "",
+        "  Any part may be omitted. All of these are one instruction:",
+        "",
+        "      mov eax, dword ptr [rdi]                 ; *p",
+        "      mov eax, dword ptr [rdi + 4]             ; p->second_int_field",
+        "      mov eax, dword ptr [rdi + 4*rsi]         ; a[i]  for int a[]",
+        "      mov eax, dword ptr [rdi + rsi + 12]      ; base + offset + constant",
+        "",
+        "/* The scale values 1, 2, 4 and 8 are exactly the sizes of char, short,",
+        "   int and long or pointer. The addressing mode was designed around",
+        "   array indexing, which is why a[i] costs no extra instruction. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "dword ptr and its relatives",
+      "text": "A memory operand has no size of its own, so when the size cannot be inferred from a register the assembler is told explicitly: byte ptr for 1, word ptr for 2, dword ptr for 4, qword ptr for 8. The names are historical — a 'word' was sixteen bits on the 8086 and the term never updated — so read dword as four bytes and qword as eight, and do not try to make the names mean anything."
+    },
+    {
+      "kind": "heading",
+      "text": "lea: compute the address, do not go there"
+    },
+    {
+      "kind": "paragraph",
+      "text": "lea stands for load effective address. It takes exactly the same bracketed operand as mov, computes the address that operand describes, and puts that address in the destination. It never touches memory. Because the address computation is a multiply-and-add unit sitting right there, compilers use it constantly for arithmetic that has nothing to do with addresses."
+    },
+    {
+      "kind": "code",
+      "caption": "Real compiler output",
+      "lines": [
+        "  long times5(long x)  { return x * 5;  }",
+        "      lea  rax, [rdi + 4*rdi]        ; x + 4x = 5x, one instruction, no multiply",
+        "",
+        "  long times12(long x) { return x * 12; }",
+        "      shl  rdi, 2                    ; x *= 4",
+        "      lea  rax, [rdi + 2*rdi]        ; 4x + 8x = 12x",
+        "",
+        "  int addconst(int x)  { return x + 7;  }",
+        "      lea  eax, [rdi + 7]            ; used purely as an add that writes elsewhere",
+        "",
+        "  int idx(int *a, long i) { return a[i]; }",
+        "      mov  eax, dword ptr [rdi + 4*rsi]     ; mov: the brackets mean FETCH",
+        "",
+        "/* lea computes the address and stops. mov with the same brackets goes and",
+        "   gets what is there. Same syntax, opposite meaning -- the single most",
+        "   common confusion when learning to read x86-64. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "How to tell what a lea is for",
+      "text": "If the result is later dereferenced, it was an address. If it is added, compared or returned as a number, it was arithmetic. lea rax, [rdi + 4*rdi] cannot be an address computation at all — no array has a stride of five times its own base — so it is a multiplication by 5. Reading the intent from the use rather than the instruction is the habit this whole course is training."
+    },
+    {
+      "kind": "heading",
+      "text": "Why compilers like it so much"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "lea can",
+        "add cannot"
+      ],
+      "rows": [
+        [
+          "Write its result to a different register, leaving both inputs intact",
+          "add destroys one of its inputs"
+        ],
+        [
+          "Combine three terms at once: base, scaled index and a constant",
+          "add handles two"
+        ],
+        [
+          "Multiply by 2, 3, 4, 5, 8 or 9 via the scale plus the base",
+          "imul is a separate, slower instruction"
+        ],
+        [
+          "Do all of it without touching the flags",
+          "add sets flags, which may destroy a pending comparison"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The last row is the subtle one and it matters when reading. A compiler that has already compared two values and not yet branched cannot insert an add without losing the comparison result. lea lets it compute in the gap. When you see lea where add would have done, this is often why."
+    },
+    {
+      "kind": "heading",
+      "text": "Widening and narrowing"
+    },
+    {
+      "kind": "code",
+      "caption": "Three conversions, and one that is free",
+      "lines": [
+        "  long widen(int x)                  { return x; }   /* signed */",
+        "      movsxd rax, edi                ; sign-extend 32 to 64",
+        "",
+        "  unsigned long widenu(unsigned x)   { return x; }   /* unsigned */",
+        "      mov    eax, edi                ; that is the WHOLE function",
+        "",
+        "  unsigned char lowbyte(unsigned x)  { return (unsigned char)x; }",
+        "      movzx  eax, dil                ; zero-extend 8 to 32",
+        "",
+        "/* Zero-extending from 32 to 64 bits needs no instruction at all, because",
+        "   writing eax already clears the top half -- the rule from the previous",
+        "   lesson, paying for itself. Sign-extension needs a real instruction",
+        "   because the fill bits depend on the value. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "movsx and movzx are move-with-sign-extend and move-with-zero-extend. The pair widen and widenu above is the clearest possible demonstration of why the register rule from the previous lesson matters in practice: two functions that look identical in C compile to a real instruction and to nothing at all, purely because of what a 32-bit write does to the upper half."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "A missing instruction is information",
+      "text": "When you are reading disassembly and an expected conversion is absent, that is not the compiler forgetting. It means the conversion was free given what the previous instruction already guaranteed. Learning which operations leave guarantees behind — a 32-bit write zeroing the top, a comparison leaving flags set — is what makes short compiled sequences readable instead of mysterious."
+    },
+    {
+      "kind": "heading",
+      "text": "A short reading exercise"
+    },
+    {
+      "kind": "code",
+      "caption": "Read this before continuing",
+      "lines": [
+        "      shl  rsi, 4",
+        "      mov  eax, dword ptr [rdi + rsi + 12]",
+        "",
+        "  Step 1: rsi *= 16",
+        "  Step 2: load 4 bytes from rdi + rsi + 12",
+        "",
+        "  Combined: rdi + 16*i + 12, reading 4 bytes.",
+        "  16 bytes per element and 12 bytes into it: an array of 4-int structures,",
+        "  reading the fourth int of element i.",
+        "",
+        "/* The C it came from was: return a[i*4 + 3]; with a of type int*.",
+        "   Same arithmetic, different way of saying it. */"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Read and predict",
+      "steps": [
+        "Compile a function returning a[i] for int, long and char arrays, and compare the scales",
+        "Predict the scale for each before looking",
+        "Write x*3, x*5, x*7, x*9 and x*10 and see which become a single lea",
+        "Explain why 7 needs more work than 5 or 9",
+        "Write a function returning a pointer to an array element and one returning the element",
+        "Confirm one uses lea and the other mov, with identical bracketed operands",
+        "Compile the signed and unsigned widening functions and confirm one is empty",
+        "Find a lea in a larger program and decide from its use whether it is an address or arithmetic"
+      ],
+      "expected": "Scales of 4, 8 and 1 matching the element sizes, single-lea multiplications for 3, 5 and 9, and more work for 7 and 10. The reason is that lea can form base + scale*base for scale 1, 2, 4 and 8, giving multipliers 2, 3, 5 and 9 directly — and 7 is not among them. That single observation explains a large fraction of the odd-looking arithmetic in optimised code."
+    }
+  ],
+  "cheatsheet": [
+    "Every memory operand is [ base + index*scale + displacement ], scale in 1, 2, 4, 8",
+    "byte ptr, word ptr, dword ptr, qword ptr mean 1, 2, 4 and 8 bytes",
+    "'word' means sixteen bits for historical reasons; do not read the names literally",
+    "mov with brackets fetches; lea with the same brackets computes the address only",
+    "lea rax, [rdi + 4*rdi] is x*5, not an address",
+    "lea can write elsewhere, combine three terms, and does not touch the flags",
+    "Multipliers 2, 3, 5 and 9 come free from lea; 7 does not",
+    "movsxd sign-extends 32 to 64; unsigned widening needs no instruction at all",
+    "movzx zero-extends from 8 or 16 bits",
+    "A missing conversion means it was already guaranteed by the previous instruction"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What does lea rax, [rdi + 4*rdi] compute?",
+      "choices": {
+        "A": "The value at address rdi + 4*rdi",
+        "B": "rdi * 5, as arithmetic — lea computes the address expression without accessing memory",
+        "C": "rdi + 4",
+        "D": "An array element at index 4"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "No array has a stride of four times its own base address, so this cannot be an address computation. It is a multiplication by five in one instruction."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "You see mov eax, dword ptr [rdi + 4*rsi]. What is this in C?",
+      "choices": {
+        "A": "A pointer to a[i]",
+        "B": "a[i] where a is an int* in rdi and i is in rsi — scale 4 is the size of an int",
+        "C": "a + 4*i as a number",
+        "D": "A struct field access"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The scale gives the element size. mov with brackets fetches, so this reads the element rather than computing its address."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "unsigned long widenu(unsigned x) { return x; } compiles to a single mov eax, edi. Why is no conversion instruction needed?",
+      "choices": {
+        "A": "unsigned and unsigned long are the same size",
+        "B": "A 32-bit write already zeroes the upper 32 bits, which is exactly what zero-extension means",
+        "C": "The compiler omitted it by mistake",
+        "D": "The conversion happens at the call site"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The register rule pays for itself. The signed version needs movsxd because the fill bits depend on the value's sign."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why does a compiler sometimes use lea where add would work?",
+      "choices": {
+        "A": "lea is always faster",
+        "B": "lea writes to a different register, can combine three terms, and does not disturb the flags — which matters when a comparison result is still needed",
+        "C": "add cannot use registers",
+        "D": "To confuse readers"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The flags point is the subtle one: inserting an add between a comparison and its branch would destroy the comparison. lea computes in that gap safely."
+    }
+  ]
+}

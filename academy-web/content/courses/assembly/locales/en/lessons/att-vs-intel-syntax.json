@@ -1,0 +1,295 @@
+{
+  "nodeId": "att-vs-intel-syntax",
+  "locale": "en",
+  "title": "Two ways to write the same instruction",
+  "objective": "By the end of this lesson you can read either syntax, translate between them, and never again misread which operand is the destination.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "The same machine instruction is written two different ways depending on which tool you are using. Neither is more correct; they are conventions from different lineages, and both are unavoidable because different tools default to different ones."
+    },
+    {
+      "kind": "heading",
+      "text": "The same function, printed both ways"
+    },
+    {
+      "kind": "code",
+      "caption": "Real output from the same compiler, differing only in one flag",
+      "lines": [
+        "  int f(int *a, long i, int v) { int t = a[i]; a[i] = v + 7; return t; }",
+        "",
+        "  Intel syntax                         AT&T syntax",
+        "  ------------------------------       ----------------------------",
+        "  mov eax, dword ptr [rdi + 4*rsi]     movl (%rdi,%rsi,4), %eax",
+        "  add edx, 7                           addl $7, %edx",
+        "  mov dword ptr [rdi + 4*rsi], edx     movl %edx, (%rdi,%rsi,4)",
+        "  ret                                  retq",
+        "",
+        "/* The same three instructions from the same compilation. Every visible",
+        "   difference is notation: which operand comes first, how registers and",
+        "   constants are marked, how the size is written, and how the memory",
+        "   operand is punctuated. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The operand order is reversed, and this is the dangerous part",
+      "text": "Intel writes destination first: mov eax, edi means eax = edi. AT&T writes source first: movl %edi, %eax means the same thing. If you read one as the other, every data movement in the program runs backwards in your head, and everything you conclude will be wrong in a way that still seems self-consistent. Before reading any disassembly, establish which syntax you are looking at."
+    },
+    {
+      "kind": "heading",
+      "text": "How to tell them apart in one second"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "If you see",
+        "It is"
+      ],
+      "rows": [
+        [
+          "% before every register name",
+          "AT&T"
+        ],
+        [
+          "$ before every constant",
+          "AT&T"
+        ],
+        [
+          "A suffix letter on the mnemonic: movl, addq",
+          "AT&T"
+        ],
+        [
+          "Square brackets around memory operands",
+          "Intel"
+        ],
+        [
+          "dword ptr, qword ptr",
+          "Intel"
+        ],
+        [
+          "Parentheses with commas: (%rdi,%rsi,4)",
+          "AT&T"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Any one of these settles it. In practice the percent signs are the fastest test: AT&T decorates everything, Intel decorates nothing."
+    },
+    {
+      "kind": "heading",
+      "text": "The four differences, in full"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "Intel",
+        "AT&T"
+      ],
+      "rows": [
+        [
+          "Operand order",
+          "destination, source",
+          "source, destination"
+        ],
+        [
+          "Registers",
+          "rax",
+          "%rax"
+        ],
+        [
+          "Constants",
+          "7",
+          "$7"
+        ],
+        [
+          "Operand size",
+          "a separate word: dword ptr",
+          "a suffix: movl, movq, movb, movw"
+        ],
+        [
+          "Memory operand",
+          "[base + index*scale + disp]",
+          "disp(base, index, scale)"
+        ]
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "The memory operand, translated piece by piece",
+      "lines": [
+        "  Intel:   [rdi + 4*rsi + 12]",
+        "  AT&T:    12(%rdi, %rsi, 4)",
+        "",
+        "           displacement first, then base, index and scale in parentheses",
+        "",
+        "  Intel:   [rdi]              AT&T:  (%rdi)",
+        "  Intel:   [rdi + 8]          AT&T:  8(%rdi)",
+        "  Intel:   [rdi + 4*rsi]      AT&T:  (%rdi, %rsi, 4)",
+        "  Intel:   [rip + label]      AT&T:  label(%rip)",
+        "",
+        "/* Same four components in both, arranged differently. The AT&T form puts",
+        "   the displacement outside the parentheses, which is the piece people",
+        "   most often lose track of when translating. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Which tool gives you which"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Tool",
+        "Default",
+        "Switch to the other with"
+      ],
+      "rows": [
+        [
+          "GCC and Clang with -S",
+          "AT&T",
+          "-masm=intel"
+        ],
+        [
+          "GNU objdump",
+          "AT&T",
+          "-M intel"
+        ],
+        [
+          "LLVM objdump",
+          "AT&T",
+          "--x86-asm-syntax=intel"
+        ],
+        [
+          "gdb",
+          "AT&T",
+          "set disassembly-flavor intel"
+        ],
+        [
+          "lldb",
+          "Intel",
+          "settings set target.x86-disassembly-flavor att"
+        ],
+        [
+          "Intel and AMD manuals",
+          "Intel",
+          "not applicable"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Pick one and configure your tools to it",
+      "text": "The cost of switching between syntaxes is small once you know both, but the cost of not noticing which one you are reading is high. Most people working on x86-64 settle on Intel syntax because that is what the vendor manuals use, so an instruction looked up in the manual matches what is on screen. Whichever you choose, set it in every tool so you are never surprised."
+    },
+    {
+      "kind": "heading",
+      "text": "One more difference worth knowing"
+    },
+    {
+      "kind": "code",
+      "caption": "Suffixes carry information that Intel syntax gets from the register",
+      "lines": [
+        "  AT&T:   movl $1, (%rdi)      ; the l says: write 4 bytes",
+        "  Intel:  mov dword ptr [rdi], 1",
+        "",
+        "  b = 1 byte    w = 2 bytes    l = 4 bytes    q = 8 bytes",
+        "",
+        "/* When both operands are registers the size is obvious from the register",
+        "   names, and the suffix is redundant. When the destination is memory and",
+        "   the source is a constant, neither operand carries a size -- so AT&T",
+        "   needs the suffix and Intel needs dword ptr. They are solving the same",
+        "   problem, and it is the only case where either notation is required. */"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Translate in both directions",
+      "steps": [
+        "Compile any function with -S and again with -S -masm=intel",
+        "Place the two outputs side by side and match them line for line",
+        "Translate three Intel instructions into AT&T by hand, then check against the file",
+        "Translate three AT&T instructions into Intel the same way",
+        "Find an instruction with a displacement, base, index and scale and translate it",
+        "Configure your debugger to the syntax you prefer and confirm it took effect",
+        "Take one disassembly you did not produce and identify its syntax in under five seconds",
+        "Write down the one difference you find hardest to remember"
+      ],
+      "expected": "Line-for-line matches and translations that survive checking. The last step is the useful one: for most people the difficulty is the reversed operand order, and writing that down as the thing to check first is worth more than memorising the whole table."
+    }
+  ],
+  "cheatsheet": [
+    "Intel: destination first. AT&T: source first. This is the dangerous difference",
+    "AT&T marks registers with % and constants with $",
+    "AT&T puts the size in a suffix: movb, movw, movl, movq for 1, 2, 4, 8 bytes",
+    "Intel puts the size in a word: byte ptr, word ptr, dword ptr, qword ptr",
+    "Intel memory operand: [base + index*scale + disp]",
+    "AT&T memory operand: disp(base, index, scale)",
+    "Fastest test: percent signs everywhere means AT&T",
+    "GCC, Clang, objdump and gdb default to AT&T; lldb and the vendor manuals use Intel",
+    "-masm=intel, -M intel, --x86-asm-syntax=intel and set disassembly-flavor intel all switch",
+    "A size annotation is required only when no operand implies the size"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "You read mov eax, edi in Intel syntax. What happens?",
+      "choices": {
+        "A": "edi = eax",
+        "B": "eax = edi — Intel writes the destination first",
+        "C": "They are exchanged",
+        "D": "It depends on the size"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The AT&T spelling of the same instruction is movl %edi, %eax. Reading one as the other reverses every data movement in the program."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "How do you identify AT&T syntax at a glance?",
+      "choices": {
+        "A": "By the square brackets",
+        "B": "By the % on every register and the $ on every constant",
+        "C": "By the presence of dword ptr",
+        "D": "By the instruction names"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "AT&T decorates registers and constants; Intel decorates nothing and uses brackets for memory instead."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Translate the Intel operand [rdi + 4*rsi + 12] into AT&T.",
+      "choices": {
+        "A": "(%rdi + 4*%rsi + 12)",
+        "B": "12(%rdi, %rsi, 4)",
+        "C": "(%rdi, %rsi, 4, 12)",
+        "D": "4(%rdi, %rsi, 12)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The displacement goes outside the parentheses, then base, index and scale inside, in that order. Losing track of the displacement is the most common translation error."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why does movl $1, (%rdi) need the l suffix when mov %eax, %ebx does not?",
+      "choices": {
+        "A": "Constants always need a suffix",
+        "B": "Neither a memory operand nor a constant carries a size, so without the suffix the instruction is ambiguous — with two registers the names already imply it",
+        "C": "The l means 'load'",
+        "D": "Memory operands are always 4 bytes"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Intel syntax solves the identical problem with dword ptr. It is the only case where either notation is strictly required."
+    }
+  ]
+}

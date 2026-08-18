@@ -33,14 +33,14 @@
     "pipeline-stages": "Overlapping instructions to finish more",
     "throughput-vs-latency": "Two different questions about speed",
     "data-hazards-and-forwarding": "When an instruction needs a result that is not ready",
-    "load-use-stall": "The one hazard that cannot be forwarded away",
-    "control-hazards-and-prediction": "Guessing which way a branch goes",
-    "locality": "Why the same memory is asked for again",
-    "cache-mapping": "Where a cache decides to put a line",
-    "hit-miss-and-write-policy": "Hits, misses, and what happens on a write",
-    "cache-friendly-code": "Make the same algorithm measurably faster",
-    "dram-cells-and-timing": "What main memory actually is",
-    "ddr-generations": "Reading a memory specification",
-    "bandwidth-numa-hbm": "When bandwidth, not latency, is the limit"
+    "load-use-stall": "The one hazard forwarding cannot remove",
+    "control-hazards-and-prediction": "Capstone: measuring what a wrong guess costs",
+    "locality": "Why the same program is fast on small data and slow on large",
+    "cache-mapping": "Where a block is allowed to live",
+    "hit-miss-and-write-policy": "What happens on a hit, a miss, and a write",
+    "cache-friendly-code": "Capstone: making the same work run fifty times faster",
+    "dram-cells-and-timing": "What memory actually is, and why it is slow",
+    "ddr-generations": "Why memory got wider but not closer",
+    "bandwidth-numa-hbm": "When memory is the shared resource"
   }
 }

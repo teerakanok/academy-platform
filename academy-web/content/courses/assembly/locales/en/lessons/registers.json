@@ -1,0 +1,232 @@
+{
+  "nodeId": "registers",
+  "locale": "en",
+  "title": "Sixteen registers and the names they answer to",
+  "objective": "By the end of this lesson you can name the sixteen general-purpose registers and their sub-register widths, state which are preserved across a call, and predict what a 32-bit write does to the upper half.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "x86-64 has sixteen general-purpose registers. Their names are the clearest surviving evidence of the architecture's history: eight of them carry names inherited from a sixteen-bit design of the 1970s, and eight are simply numbered."
+    },
+    {
+      "kind": "heading",
+      "text": "The sixteen"
+    },
+    {
+      "kind": "code",
+      "caption": "Each register under its four widths",
+      "lines": [
+        "   64-bit   32-bit   16-bit   8-bit low     conventional role",
+        "   ------   ------   ------   ---------     -----------------",
+        "   rax      eax      ax       al            return value",
+        "   rbx      ebx      bx       bl            callee-saved",
+        "   rcx      ecx      cx       cl            4th argument",
+        "   rdx      edx      dx       dl            3rd argument",
+        "   rsi      esi      si       sil           2nd argument",
+        "   rdi      edi      di       dil           1st argument",
+        "   rbp      ebp      bp       bpl           frame pointer, callee-saved",
+        "   rsp      esp      sp       spl           STACK POINTER -- never a scratch register",
+        "   r8       r8d      r8w      r8b           5th argument",
+        "   r9       r9d      r9w      r9b           6th argument",
+        "   r10      r10d     r10w     r10b          caller-saved scratch",
+        "   r11      r11d     r11w     r11b          caller-saved scratch",
+        "   r12-r15  r12d-    r12w-    r12b-         callee-saved"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The names mean nothing today",
+      "text": "rax was once the accumulator, rcx the counter, rsi and rdi the source and destination index for string operations. Those meanings are gone; the hardware treats all sixteen as general-purpose. What remains is convention — which register carries which argument — and convention is enforced by agreement, not by the processor. The one exception is rsp, which the hardware itself uses for push, pop, call and ret."
+    },
+    {
+      "kind": "heading",
+      "text": "The rule that catches everyone"
+    },
+    {
+      "kind": "code",
+      "caption": "What a partial write does to the rest of the register",
+      "lines": [
+        "  Start with rax = 0xFFFFFFFFFFFFFFFF, then write to one sub-register:",
+        "",
+        "    mov eax, 0x11111111   ->  rax = 0x0000000011111111    upper half ZEROED",
+        "    mov ax,  0x2222       ->  rax = 0xffffffffffff2222    upper bits KEPT",
+        "    mov al,  0x33         ->  rax = 0xffffffffffffff33    upper bits KEPT",
+        "",
+        "/* Measured by running it, not quoted from a manual. A 32-bit write clears",
+        "   the top 32 bits; 16-bit and 8-bit writes leave everything above them",
+        "   untouched. This is the single most surprising rule about x86-64",
+        "   registers and it catches people constantly. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The asymmetry is deliberate. Zeroing the upper half on a 32-bit write removes a dependency: the new value does not depend on the old contents, so the processor can start the instruction without waiting for whatever last wrote the register. Preserving the upper bits on an 8-bit or 16-bit write keeps compatibility with code written decades earlier, at the cost of creating exactly that dependency."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "This is why xor eax, eax is everywhere",
+      "text": "To set a register to zero, compilers emit xor eax, eax rather than mov eax, 0. It is shorter in bytes, and because it writes the 32-bit form it clears all 64 bits. The processor also recognises it as a zeroing idiom and breaks the dependency on the old value entirely. When you see xor of a register with itself, read it as 'set to zero', not as an exclusive-or."
+    },
+    {
+      "kind": "heading",
+      "text": "Who is allowed to change what"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Class",
+        "Registers",
+        "Meaning"
+      ],
+      "rows": [
+        [
+          "Caller-saved (volatile)",
+          "rax, rcx, rdx, rsi, rdi, r8-r11",
+          "A called function may destroy these; save them yourself if you need them"
+        ],
+        [
+          "Callee-saved (non-volatile)",
+          "rbx, rbp, r12-r15",
+          "A called function must restore these before returning"
+        ],
+        [
+          "Special",
+          "rsp",
+          "The stack pointer; maintained by hardware and convention alike"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "This division is a contract, not a hardware rule. Nothing stops a function from overwriting rbx and returning; the program simply breaks. The contract exists so that a caller knows what survives a call without having to read the callee, which is the only way separate compilation can work at all."
+    },
+    {
+      "kind": "heading",
+      "text": "Where arguments actually go"
+    },
+    {
+      "kind": "code",
+      "caption": "Six arguments, then seven",
+      "lines": [
+        "  long six(long a,long b,long c,long d,long e,long f) { return a+b+c+d+e+f; }",
+        "",
+        "  _six:",
+        "      add  rsi, rdi          ; b += a",
+        "      lea  rax, [rdx + rcx]  ; c + d",
+        "      add  rax, rsi",
+        "      add  rax, r8           ; + e",
+        "      add  rax, r9           ; + f",
+        "      ret                    ; result already in rax",
+        "",
+        "  Adding one more parameter changes only the end:",
+        "",
+        "  _seven:",
+        "      ...",
+        "      add  rax, r9",
+        "      add  rax, qword ptr [rbp + 16]    ; the 7th argument, from the stack",
+        "      ret",
+        "",
+        "/* Six arguments arrived in rdi, rsi, rdx, rcx, r8, r9 -- in that order.",
+        "   The seventh had nowhere left to go and came from memory. The result",
+        "   left in rax without any instruction being needed to put it there. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The order rdi, rsi, rdx, rcx, r8, r9 is worth memorising, because it turns disassembly from a puzzle into reading. When you see a value moved into rdi just before a call, you are looking at the first argument. This is the System V AMD64 ABI, used by Linux and macOS. Windows x64 uses a different order — rcx, rdx, r8, r9 — which is the first thing to check when disassembly stops making sense."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Recognising a register does not tell you its type",
+      "text": "rdi holding 0x7ffee3b04a10 might be a pointer; holding 3 it might be a count, a boolean, or a pointer to address three. Registers have widths, not types. Reconstructing types is done from how a value is used — dereferenced, compared, passed to a known function — not from where it sits. That reconstruction is most of what reverse engineering consists of."
+    },
+    {
+      "kind": "try",
+      "title": "Confirm each claim yourself",
+      "steps": [
+        "Write a function taking six long parameters that adds them, and compile it at -O2 with -S -masm=intel",
+        "Identify which register each parameter arrived in, and confirm the order",
+        "Add a seventh parameter and find where it comes from",
+        "Write a function returning a value and confirm it leaves in rax with no extra instruction",
+        "Use inline assembly to set rax to all ones, then write to eax, ax and al in turn, printing rax each time",
+        "Confirm the 32-bit write zeroes the upper half and the narrower writes do not",
+        "Search a larger compiled program for 'xor' with a register and itself, and count how many you find",
+        "Write a function that needs more than six values live at once and look for spills to the stack"
+      ],
+      "expected": "The argument order confirmed by your own compilation, the sub-register rule confirmed by your own run, and a count of zeroing idioms that will be higher than you expect. The last step introduces spilling — when a function has more live values than registers, the surplus goes to the stack, and that is what most of a stack frame is for."
+    }
+  ],
+  "cheatsheet": [
+    "Sixteen general-purpose registers: rax rbx rcx rdx rsi rdi rbp rsp and r8-r15",
+    "Widths: rax (64), eax (32), ax (16), al (8 low)",
+    "A 32-bit write ZEROES the upper 32 bits; 8-bit and 16-bit writes preserve them",
+    "Measured: mov eax,0x11111111 gives 0x0000000011111111 from all-ones",
+    "xor eax, eax means 'set to zero': shorter, clears 64 bits, breaks the dependency",
+    "Arguments: rdi, rsi, rdx, rcx, r8, r9 — then the stack (System V, Linux and macOS)",
+    "Windows x64 uses rcx, rdx, r8, r9 instead",
+    "Return value comes back in rax",
+    "Caller-saved: rax rcx rdx rsi rdi r8-r11. Callee-saved: rbx rbp r12-r15",
+    "Registers have widths, not types; the type is reconstructed from how the value is used"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "rax holds all ones. After mov eax, 0x11111111, what is rax?",
+      "choices": {
+        "A": "0xffffffff11111111",
+        "B": "0x0000000011111111 — a 32-bit write zeroes the upper 32 bits",
+        "C": "0x11111111ffffffff",
+        "D": "Unchanged above the low 32 bits"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Measured by running it. The zeroing is deliberate: it removes the dependency on whatever previously wrote the register."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "rax holds all ones. After mov al, 0x33, what is rax?",
+      "choices": {
+        "A": "0x0000000000000033",
+        "B": "0xffffffffffffff33 — 8-bit writes preserve everything above them",
+        "C": "0x00000033",
+        "D": "Undefined"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The asymmetry with the 32-bit case is the point: narrow writes keep compatibility with much older code, at the cost of a dependency on the old value."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "You see a value moved into rdx immediately before a call. What is it, under the System V ABI?",
+      "choices": {
+        "A": "The return value",
+        "B": "The third argument — the order is rdi, rsi, rdx, rcx, r8, r9",
+        "C": "A saved register",
+        "D": "The stack pointer"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Memorising that order turns disassembly from a puzzle into reading. Windows x64 uses rcx, rdx, r8, r9, which is the first thing to check when the reading stops making sense."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why do compilers emit xor eax, eax instead of mov eax, 0?",
+      "choices": {
+        "A": "mov cannot take a zero",
+        "B": "It is shorter, the 32-bit write clears all 64 bits, and the processor recognises it as a zeroing idiom that breaks the dependency on the old value",
+        "C": "It sets flags differently in a useful way",
+        "D": "It is faster on old processors only"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Read xor of a register with itself as 'set to zero'. It is one of the most common instructions in any disassembly."
+    }
+  ]
+}

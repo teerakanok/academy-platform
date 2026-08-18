@@ -1,5 +1,5 @@
 // สร้าง course.json จากรายการบททั้งหมด โดยรวมเฉพาะบทที่มีไฟล์ครบทั้งสองภาษาแล้ว
-import { readdirSync, writeFileSync, existsSync } from 'node:fs'
+import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -67,6 +67,20 @@ const course = {
   skills: ['isa', 'machine-code', 'datapath', 'pipelining', 'memory', 'performance'].map((id) => ({ id, maxScore: 100 })),
   globalSkillWeights: { foundations: 1.0 },
   nodes,
+}
+
+// nodeTitles ของแต่ละภาษาต้องตรงกับบทที่มีอยู่จริงเสมอ — ให้สคริปต์ซิงค์ให้
+// แทนการแก้มือ เพราะการลืมแก้ไฟล์ภาษาคือทางที่คอร์สจะพังแบบเงียบ ๆ
+for (const locale of course.availableLocales) {
+  const copyPath = join(here, `locales/${locale}/course.json`)
+  const copy = JSON.parse(readFileSync(copyPath, 'utf8'))
+  copy.nodeTitles = Object.fromEntries(
+    nodes.map(({ id }) => [
+      id,
+      JSON.parse(readFileSync(join(here, `locales/${locale}/lessons/${id}.json`), 'utf8')).title,
+    ]),
+  )
+  writeFileSync(copyPath, JSON.stringify(copy, null, 2) + '\n')
 }
 
 writeFileSync(join(here, 'course.json'), JSON.stringify(course, null, 2) + '\n')

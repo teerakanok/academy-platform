@@ -1,0 +1,29 @@
+{
+  "locale": "en",
+  "title": "Assembly: Reading Machine Code",
+  "subtitle": "What your program actually became",
+  "audience": "For anyone who can write C and now wants to see what the compiler produced — and for anyone heading toward reverse engineering, exploit analysis or low-level debugging, where the source is not available and the binary is the only evidence.",
+  "outcomes": [
+    "Read x86-64 disassembly and follow what it does, instruction by instruction",
+    "Name the registers, their widths, and which ones survive a function call",
+    "Recognise compiler transformations: division by multiplication, loops replaced by arithmetic, lea used as maths",
+    "Trace control flow through comparisons, conditional jumps and loops",
+    "Follow the stack through a call, a frame and a recursive descent",
+    "Use objdump and a debugger to examine a binary you did not build"
+  ],
+  "skillLabels": {
+    "reading-disassembly": "Reading disassembly",
+    "x86-registers": "Registers and operands",
+    "instruction-semantics": "Instruction semantics",
+    "control-flow": "Control flow",
+    "stack-and-abi": "Stack and calling convention",
+    "tooling": "Tooling"
+  },
+  "nodeTitles": {
+    "why-read-assembly": "The program you wrote is not the program that runs",
+    "registers": "Sixteen registers and the names they answer to",
+    "mov-and-lea": "Moving data, and the instruction that does not move anything",
+    "arithmetic-and-flags": "Arithmetic, and the four bits it leaves behind",
+    "att-vs-intel-syntax": "Two ways to write the same instruction"
+  }
+}
