@@ -5,6 +5,7 @@ import { legacyDirectOtpFixtureAllowedForRequest } from '@/lib/auth/legacy-direc
 import { identityControlLocalFixtureAllowedForRequest } from '@/lib/identity/local-fixture'
 import { revokeLocalAcademySession } from '@/lib/identity/local-runtime'
 import { expireAcademySessionCookie } from '@/lib/identity/session-store'
+import { safeErrorMessage } from '@/lib/safe-log'
 
 export const runtime = 'nodejs'
 
@@ -39,11 +40,11 @@ export async function POST(request: Request) {
     const { error } = await supabase.auth.signOut({ scope: 'local' })
     if (error) {
       revocation = 'not-confirmed'
-      console.error('[auth/sign-out] revoke local refresh token ไม่สำเร็จ:', error.message)
+      console.error('[auth/sign-out] revoke local refresh token ไม่สำเร็จ:', safeErrorMessage(error))
     }
   } catch (error) {
     revocation = 'not-confirmed'
-    console.error('[auth/sign-out] provider ติดต่อไม่ได้:', error)
+    console.error('[auth/sign-out] provider ติดต่อไม่ได้:', safeErrorMessage(error))
   }
   // auth-js ล้าง session ก่อนคืน error ในหลายกรณี แต่ทำซ้ำตรงนี้เพื่อให้ contract
   // current-device deterministic แม้ behavior ภายใน provider เปลี่ยน

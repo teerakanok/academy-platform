@@ -6,6 +6,7 @@ import { validateMutationRequest } from '@/lib/http/mutation-security'
 import { allowRequest } from '@/lib/rate-limit'
 import { hasEdgeRateLimitMarker } from '@/lib/edge-rate-limit-policy'
 import { clientKey } from '@/lib/request-ip'
+import { safeErrorMessage } from '@/lib/safe-log'
 
 export const runtime = 'nodejs'
 
@@ -17,7 +18,8 @@ export async function POST(request: NextRequest) {
   if (!mutation.ok) {
     return NextResponse.json({ ok: false, error: mutation.error }, { status: mutation.status })
   }
-  if (!hasEdgeRateLimitMarker(request.headers) && !allowRequest(`unsubscribe:${clientKey(request)}`)) {
+  if (!await hasEdgeRateLimitMarker(request, { secret: process.env.RATE_LIMIT_KEY_SECRET })
+    && !allowRequest(`unsubscribe:${clientKey(request)}`)) {
     return NextResponse.json({ ok: false, error: 'โปรดลองใหม่ในอีกสักครู่' }, { status: 429 })
   }
 
@@ -40,11 +42,11 @@ export async function POST(request: NextRequest) {
       p_withdrawn_at: new Date().toISOString(),
     })
     if (error) {
-      console.error('[api/leads/unsubscribe] update failed:', error.code, error.message)
+      console.error('[api/leads/unsubscribe] update failed:', safeErrorMessage(error))
       return NextResponse.json({ ok: false, error: 'ดำเนินการไม่สำเร็จ โปรดลองใหม่ภายหลัง' }, { status: 502 })
     }
   } catch (err) {
-    console.error('[api/leads/unsubscribe] DB config error:', err)
+    console.error('[api/leads/unsubscribe] DB config error:', safeErrorMessage(err))
     return NextResponse.json({ ok: false, error: 'ระบบยังไม่พร้อม โปรดลองใหม่ภายหลัง' }, { status: 500 })
   }
 

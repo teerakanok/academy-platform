@@ -12,6 +12,7 @@ import type { SimulationChallenge } from '@/lib/simulation/types'
 import { readBoundedJson } from '@/lib/http/bounded-body'
 import { validateMutationRequest } from '@/lib/http/mutation-security'
 import { authorizeCourseResource, deniedAccessStatus } from '@/lib/account/course-access'
+import { safeErrorMessage } from '@/lib/safe-log'
 
 export const runtime = 'nodejs'
 
@@ -153,7 +154,7 @@ export async function POST(request: Request) {
       })),
     })
   } catch (err) {
-    console.error('[api/attempts] ออก attempt ไม่สำเร็จ:', err)
+    console.error('[api/attempts] ออก attempt ไม่สำเร็จ:', safeErrorMessage(err))
     return NextResponse.json({ ok: false, error: 'ออก attempt ไม่สำเร็จ' }, { status: 500 })
   }
 }

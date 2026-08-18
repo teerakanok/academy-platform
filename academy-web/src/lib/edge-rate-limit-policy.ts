@@ -1,5 +1,5 @@
 export const EDGE_RATE_LIMIT_MARKER_HEADER = 'x-cyberskills-edge-rate-limit'
-export const EDGE_RATE_LIMIT_MARKER = 'v1'
+export const EDGE_RATE_LIMIT_MARKER_VERSION = 'v2'
 
 export type EdgeRateLimitOperation = 'leads' | 'unsubscribe' | 'otp' | 'verify'
 
@@ -11,6 +11,8 @@ export interface EdgeRateLimitRule {
 
 const WINDOW_MS = 60_000
 const LIMIT = 10
+const MARKER_MAX_AGE_MS = 120_000
+const MARKER_FUTURE_SKEW_MS = 30_000
 
 const rules: Record<string, EdgeRateLimitRule> = {
   '/api/leads': { operation: 'leads', limit: LIMIT, windowMs: WINDOW_MS },
@@ -57,13 +59,64 @@ export async function edgeRateLimitObjectName({
   return `v1:${operation}:${base64Url(signature)}`
 }
 
-export function hasEdgeRateLimitMarker(headers: Headers): boolean {
-  return headers.get(EDGE_RATE_LIMIT_MARKER_HEADER) === EDGE_RATE_LIMIT_MARKER
+interface EdgeRateLimitMarkerOptions {
+  secret?: string | null
+  now?: () => number
 }
 
-export function withEdgeRateLimitMarker(request: Request): Request {
+async function hmac(secret: string, value: string): Promise<string> {
+  const encoder = new TextEncoder()
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  )
+  return base64Url(await crypto.subtle.sign('HMAC', key, encoder.encode(value)))
+}
+
+function markerPayload(request: Request, timestampMs: number): string {
+  const pathname = new URL(request.url).pathname
+  return `academy-edge-rate-limit:${EDGE_RATE_LIMIT_MARKER_VERSION}:${request.method}:${pathname}:${timestampMs}`
+}
+
+function constantTimeStringEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false
+  let diff = 0
+  for (let i = 0; i < a.length; i += 1) diff |= a.charCodeAt(i) ^ b.charCodeAt(i)
+  return diff === 0
+}
+
+export async function hasEdgeRateLimitMarker(
+  request: Request,
+  { secret, now = Date.now }: EdgeRateLimitMarkerOptions = {},
+): Promise<boolean> {
+  if (!secret) return false
+  const marker = request.headers.get(EDGE_RATE_LIMIT_MARKER_HEADER)
+  const parts = marker?.split(':') ?? []
+  if (parts.length !== 3 || parts[0] !== EDGE_RATE_LIMIT_MARKER_VERSION) return false
+
+  const timestampMs = Number(parts[1])
+  if (!Number.isSafeInteger(timestampMs) || timestampMs < 0) return false
+  const ageMs = now() - timestampMs
+  if (ageMs > MARKER_MAX_AGE_MS || ageMs < -MARKER_FUTURE_SKEW_MS) return false
+
+  const expected = await hmac(secret, markerPayload(request, timestampMs))
+  return constantTimeStringEqual(parts[2], expected)
+}
+
+export async function withEdgeRateLimitMarker(
+  request: Request,
+  { secret, now = Date.now }: Required<Pick<EdgeRateLimitMarkerOptions, 'secret'>> & Pick<EdgeRateLimitMarkerOptions, 'now'>,
+): Promise<Request> {
+  if (!secret) throw new Error('edge rate-limit marker secret is required')
+  const timestampMs = Math.trunc(now())
   const headers = new Headers(request.headers)
   headers.delete(EDGE_RATE_LIMIT_MARKER_HEADER)
-  headers.set(EDGE_RATE_LIMIT_MARKER_HEADER, EDGE_RATE_LIMIT_MARKER)
+  headers.set(
+    EDGE_RATE_LIMIT_MARKER_HEADER,
+    `${EDGE_RATE_LIMIT_MARKER_VERSION}:${timestampMs}:${await hmac(secret, markerPayload(request, timestampMs))}`,
+  )
   return new Request(request, { headers })
 }

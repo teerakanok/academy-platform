@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { currentUser } from '@/lib/auth/session'
 import { identityControlLocalFixtureAllowedForRequest } from '@/lib/identity/local-fixture'
 import { readLocalAcademySession } from '@/lib/identity/local-runtime'
+import { safeErrorMessage } from '@/lib/safe-log'
 import { getAllCourses, getCourseStructure } from '@/lib/content/course-source'
 import { toLearnerDashboardCourse } from '@/lib/content/public-course'
 import { getLessonAnswerKey, mcqItems, sameAnswerSet, simulationItems } from '@/lib/content/answer-key'
@@ -475,7 +476,7 @@ export async function POST(request: Request) {
       : Object.fromEntries(questions.map((q) => [q.id, q.explanation]))
     return NextResponse.json({ ok: true, passed, results, correctCount, total: totalTasks, explanations })
   } catch (err) {
-    console.error('[api/progress] บันทึกไม่สำเร็จ:', err)
+    console.error('[api/progress] บันทึกไม่สำเร็จ:', safeErrorMessage(err))
     // ตอบตามจริง — ถ้าบอกว่าสำเร็จทั้งที่ไม่ได้บันทึก ผู้เรียนจะเสียงานโดยไม่รู้ตัว
     return NextResponse.json({ ok: false, error: 'บันทึกความคืบหน้าไม่สำเร็จ' }, { status: 500 })
   }
@@ -560,7 +561,7 @@ export async function GET(request: Request) {
       ),
     })
   } catch (err) {
-    console.error('[api/progress] อ่านไม่สำเร็จ:', err)
+    console.error('[api/progress] อ่านไม่สำเร็จ:', safeErrorMessage(err))
     return learnerProgressResponse({ ok: false, error: 'อ่านความคืบหน้าไม่สำเร็จ' }, 503)
   }
 }

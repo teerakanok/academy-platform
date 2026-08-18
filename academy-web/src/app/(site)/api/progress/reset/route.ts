@@ -4,6 +4,7 @@ import { validateMutationRequest } from '@/lib/http/mutation-security'
 import { deniedAccessStatus, getCourseAccess } from '@/lib/account/course-access'
 import { getCourseStructure } from '@/lib/content/course-source'
 import { loadProgress, loadResetReceipt, resetProgress } from '@/lib/course/progress-db'
+import { safeErrorMessage } from '@/lib/safe-log'
 
 export const runtime = 'nodejs'
 
@@ -52,7 +53,7 @@ export async function GET(request: Request) {
       record: completed ? await loadProgress(user.account.id, slug) : undefined,
     })
   } catch (error) {
-    console.error('[api/progress/reset] ตรวจ receipt ไม่สำเร็จ:', error)
+    console.error('[api/progress/reset] ตรวจ receipt ไม่สำเร็จ:', safeErrorMessage(error))
     return NextResponse.json({ ok: false, error: 'ตรวจผลการล้างความคืบหน้าไม่สำเร็จ' }, { status: 500 })
   }
 }
@@ -106,7 +107,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: 'ไม่มีสิทธิ์เข้าถึงคอร์สนี้' }, { status: 403 })
     }
   } catch (error) {
-    console.error('[api/progress/reset] ลบไม่สำเร็จ:', error)
+    console.error('[api/progress/reset] ลบไม่สำเร็จ:', safeErrorMessage(error))
     return NextResponse.json({ ok: false, error: 'ล้างความคืบหน้าไม่สำเร็จ' }, { status: 500 })
   }
   return NextResponse.json({ ok: true })

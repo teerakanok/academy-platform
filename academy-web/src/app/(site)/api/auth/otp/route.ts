@@ -7,6 +7,7 @@ import { readBoundedJson } from '@/lib/http/bounded-body'
 import { validateMutationRequest } from '@/lib/http/mutation-security'
 import { acceptsAuthTransport } from '@/lib/auth/cookie-policy'
 import { legacyDirectOtpFixtureAllowedForRequest } from '@/lib/auth/legacy-direct-otp'
+import { safeErrorMessage } from '@/lib/safe-log'
 
 export const runtime = 'nodejs'
 const MAX_BODY_BYTES = 2 * 1024
@@ -30,7 +31,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: mutation.error }, { status: mutation.status })
   }
 
-  if (!hasEdgeRateLimitMarker(request.headers) && !allowRequest(`otp:${clientKey(request)}`)) {
+  if (!await hasEdgeRateLimitMarker(request, { secret: process.env.RATE_LIMIT_KEY_SECRET })
+    && !allowRequest(`otp:${clientKey(request)}`)) {
     return NextResponse.json({ ok: false, error: 'ขอรหัสถี่เกินไป ลองใหม่ในอีกสักครู่' }, { status: 429 })
   }
 
@@ -52,7 +54,7 @@ export async function POST(request: Request) {
   const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: true } })
 
   if (error) {
-    console.error('[auth/otp] ส่งรหัสไม่สำเร็จ:', error.message)
+    console.error('[auth/otp] ส่งรหัสไม่สำเร็จ:', safeErrorMessage(error))
     // ไม่ส่งข้อความจาก provider กลับไปตรงๆ — มันบอกใบ้สถานะของอีเมลได้
     return NextResponse.json({ ok: false, error: 'ส่งรหัสไม่สำเร็จ ลองใหม่อีกครั้ง' }, { status: 502 })
   }

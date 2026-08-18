@@ -1,0 +1,101 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/next.config.ts",
+      "sha256": "e33d1f23fdabfda5e8e4b32cea0a1edea7792e7a6efbd9d3d3e6a3178e0809bf",
+      "bytes": 2137
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/attempts/route.ts",
+      "sha256": "998b5f22b223e33063f6ce50e801e43260ab7603256b10b85256eaca311c1e0c",
+      "bytes": 10852
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/auth/otp/route.ts",
+      "sha256": "dcf9231cef42adf4e715aec28a72400074ab17d5d4086240726d3cda3f370933",
+      "bytes": 3603
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/auth/sign-out/route.ts",
+      "sha256": "658c9ccf5d9b865381e34cbe156ad4b09210a3f03c62b1f0efd6913d8b6db977",
+      "bytes": 2748
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/auth/verify/route.ts",
+      "sha256": "a50cf4fa257b30817f20562e6775db6785e2975662fa74c8154854743f413ae9",
+      "bytes": 3383
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/courses/[slug]/skill-map/route.ts",
+      "sha256": "693cf9adfba87ac3ba96f72883af919fe380ab145c99c22a9bd857d4d0799486",
+      "bytes": 2528
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/leads/route.ts",
+      "sha256": "534870463db966ce00c4e75aedaa78ea01b5432ce8833135ad161916cc592ced",
+      "bytes": 4095
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/leads/unsubscribe/route.ts",
+      "sha256": "53b4b3e8212fe4dfa98b89665c0ead88a7bb57735aab927a8ad8f25f8a5b75ad",
+      "bytes": 2733
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/progress/reset/route.ts",
+      "sha256": "61fe13880a4352ea8d5d7a31212964e166de3e046c81dd99fe2608c0d994a35f",
+      "bytes": 6373
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/progress/route.ts",
+      "sha256": "c51505434f256e6c1d3763299302fc399fd785bcfb5e901d8a3c3e81404cf96e",
+      "bytes": 34026
+    },
+    {
+      "path": "academy-web/src/lib/account/course-access.ts",
+      "sha256": "efe0c0f58bcec833f3334640cb06b2269bd4f36442245b143b6e6ba6e329ffe3",
+      "bytes": 3308
+    },
+    {
+      "path": "academy-web/src/lib/edge-rate-limit-policy.ts",
+      "sha256": "36e5eb67eedf3e543a24f19ed0c80953e82cb44ea64240dd579feb57e1afc4b6",
+      "bytes": 4334
+    },
+    {
+      "path": "academy-web/src/lib/request-ip.ts",
+      "sha256": "b2d175767dfad19c14100074d4a5be3e34555b829ed71ea8ad7bbd4204d90a7f",
+      "bytes": 401
+    },
+    {
+      "path": "academy-web/src/lib/safe-log.ts",
+      "sha256": "234829c1cf33a3153a974ea148ca52919929a800ccec01cedc7980a6db9f0c22",
+      "bytes": 389
+    },
+    {
+      "path": "academy-web/tests/unit/edge-rate-limit-policy.test.ts",
+      "sha256": "452e91a8b143fadab2cefa918efc59e92d8ee1567b5c1e103f191e626556d764",
+      "bytes": 3108
+    },
+    {
+      "path": "academy-web/tests/unit/request-ip.test.ts",
+      "sha256": "14731014f59ec003cb354708b6a14d8d7eeb254328909a4e8bdba9788b16f3ee",
+      "bytes": 857
+    },
+    {
+      "path": "academy-web/tests/unit/safe-log.test.ts",
+      "sha256": "261d2b583139fba0b370bf6f9ea0c1522e4882177001a649f36469eeb0ee270c",
+      "bytes": 627
+    },
+    {
+      "path": "academy-web/tests/unit/security-headers.test.ts",
+      "sha256": "b08e9ce3623788dab969eac78af6d8c9c8957041bb441a5cd213a47d376058ec",
+      "bytes": 2886
+    },
+    {
+      "path": "academy-web/worker.ts",
+      "sha256": "3d9bdb0bcdb551d022aa0bd870240f21c48e047c60679b0e5f307fcdd1d49fe9",
+      "bytes": 2898
+    }
+  ]
+}

@@ -22,7 +22,7 @@ function localAccountCenterFormActionOrigin(): string | null {
 
 const localAccountCenterOrigin = localAccountCenterFormActionOrigin()
 
-const reportOnlyContentSecurityPolicy = [
+const contentSecurityPolicy = [
   "default-src 'self'",
   "base-uri 'self'",
   `form-action 'self'${localAccountCenterOrigin ? ` ${localAccountCenterOrigin}` : ''}`,
@@ -48,8 +48,8 @@ const nextConfig: NextConfig = {
       {
         source: '/:path*',
         headers: [
-          { key: 'Content-Security-Policy-Report-Only', value: reportOnlyContentSecurityPolicy },
-          { key: 'Strict-Transport-Security', value: 'max-age=31536000' },
+          { key: 'Content-Security-Policy', value: contentSecurityPolicy },
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'X-Frame-Options', value: 'DENY' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },

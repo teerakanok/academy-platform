@@ -7,6 +7,7 @@ import { hasEdgeRateLimitMarker } from '@/lib/edge-rate-limit-policy'
 import { clientKey } from '@/lib/request-ip'
 import { readBoundedJson } from '@/lib/http/bounded-body'
 import { validateMutationRequest } from '@/lib/http/mutation-security'
+import { safeErrorMessage } from '@/lib/safe-log'
 
 export const runtime = 'nodejs'
 
@@ -29,7 +30,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: mutation.error }, { status: mutation.status })
   }
 
-  if (!hasEdgeRateLimitMarker(request.headers) && !allowRequest(`leads:${clientKey(request)}`)) {
+  if (!await hasEdgeRateLimitMarker(request, { secret: process.env.RATE_LIMIT_KEY_SECRET })
+    && !allowRequest(`leads:${clientKey(request)}`)) {
     return NextResponse.json(
       { ok: false, error: 'ส่งคำขอถี่เกินไป โปรดลองใหม่ในอีกสักครู่' },
       { status: 429 },
@@ -60,7 +62,7 @@ export async function POST(request: NextRequest) {
   try {
     db = academyDb()
   } catch (err) {
-    console.error('[api/leads] DB config error:', err)
+    console.error('[api/leads] DB config error:', safeErrorMessage(err))
     return NextResponse.json(
       { ok: false, error: 'ระบบยังไม่พร้อมรับข้อมูล โปรดลองใหม่ภายหลัง' },
       { status: 500 },
@@ -80,7 +82,7 @@ export async function POST(request: NextRequest) {
   if (error) {
     // DB ล้มจริงต้องตอบ fail จริง — ห้าม success ปลอม (บทเรียน Server Action
     // masked errors); รายละเอียด error อยู่ log ฝั่ง server เท่านั้น
-    console.error('[api/leads] insert failed:', error.code, error.message)
+    console.error('[api/leads] insert failed:', safeErrorMessage(error))
     return NextResponse.json(
       { ok: false, error: 'บันทึกไม่สำเร็จ โปรดลองใหม่ภายหลัง' },
       { status: 502 },

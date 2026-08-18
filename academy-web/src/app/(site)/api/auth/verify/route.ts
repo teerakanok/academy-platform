@@ -30,7 +30,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: mutation.error }, { status: mutation.status })
   }
 
-  if (!hasEdgeRateLimitMarker(request.headers) && !allowRequest(`verify:${clientKey(request)}`)) {
+  if (!await hasEdgeRateLimitMarker(request, { secret: process.env.RATE_LIMIT_KEY_SECRET })
+    && !allowRequest(`verify:${clientKey(request)}`)) {
     return NextResponse.json({ ok: false, error: 'ลองถี่เกินไป รอสักครู่แล้วลองใหม่' }, { status: 429 })
   }
 

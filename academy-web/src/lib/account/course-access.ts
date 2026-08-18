@@ -8,6 +8,7 @@ import { getCourseStructure } from '@/lib/content/course-source'
 import { loadProgress } from '@/lib/course/progress-db'
 import { toLearnerState } from '@/lib/course/progress'
 import { nodeStatus } from '@/lib/course/roadmap'
+import { safeErrorMessage } from '@/lib/safe-log'
 
 export type CourseAccess =
   | { allowed: true }
@@ -28,7 +29,7 @@ export async function getServiceAccess(userId: string): Promise<CourseAccess> {
     const activation = await getActivation(userId)
     return isServiceUsable(activation) ? { allowed: true } : { allowed: false, reason: 'inactive' }
   } catch (error) {
-    console.error('[course-access] อ่าน service activation ไม่สำเร็จ:', error)
+    console.error('[course-access] อ่าน service activation ไม่สำเร็จ:', safeErrorMessage(error))
     return { allowed: false, reason: 'unavailable' }
   }
 }
@@ -40,7 +41,7 @@ export async function getCourseAccess(userId: string, courseSlug: string): Promi
     if (!isServiceUsable(activation)) return { allowed: false, reason: 'inactive' }
     return decideCourseAccess(activation, await hasCourseEntitlement(userId, courseSlug))
   } catch (error) {
-    console.error('[course-access] ตรวจ course entitlement ไม่สำเร็จ:', error)
+    console.error('[course-access] ตรวจ course entitlement ไม่สำเร็จ:', safeErrorMessage(error))
     return { allowed: false, reason: 'unavailable' }
   }
 }
@@ -64,7 +65,7 @@ export async function authorizeCourseResource(
       ? { allowed: false, reason: 'locked' }
       : { allowed: true }
   } catch (error) {
-    console.error('[course-access] ตรวจ node prerequisite ไม่สำเร็จ:', error)
+    console.error('[course-access] ตรวจ node prerequisite ไม่สำเร็จ:', safeErrorMessage(error))
     return { allowed: false, reason: 'unavailable' }
   }
 }

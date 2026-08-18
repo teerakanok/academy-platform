@@ -56,7 +56,7 @@ async function enforceEdgeRateLimit(request: Request, env: AcademyWorkerEnv): Pr
     })
   }
 
-  return withEdgeRateLimitMarker(request)
+  return withEdgeRateLimitMarker(request, { secret: env.RATE_LIMIT_KEY_SECRET })
 }
 
 export default {

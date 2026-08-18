@@ -6,6 +6,7 @@ import type { Locale } from '@/lib/content/course-types'
 import { toLearnerState } from '@/lib/course/progress'
 import { loadProgress } from '@/lib/course/progress-db'
 import { courseSkillData } from '@/lib/course/skills'
+import { safeErrorMessage } from '@/lib/safe-log'
 
 export const runtime = 'nodejs'
 
@@ -46,7 +47,7 @@ export async function GET(
       coverage: courseSkillData(course.structure, course.copy.skillLabels, toLearnerState(record)),
     })
   } catch (error) {
-    console.error('[api/course-skill-map] อ่านความคืบหน้าไม่สำเร็จ:', error)
+    console.error('[api/course-skill-map] อ่านความคืบหน้าไม่สำเร็จ:', safeErrorMessage(error))
     return learnerResponse({ ok: false, error: 'อ่านข้อมูลหัวข้อเรียนไม่สำเร็จ' }, 503)
   }
 }

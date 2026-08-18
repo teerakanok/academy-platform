@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import nextConfig from '../../next.config'
 
-const EXPECTED_REPORT_ONLY_CSP = [
+const EXPECTED_CSP = [
   ['default-src', ["'self'"]],
   ['base-uri', ["'self'"]],
   ['form-action', ["'self'"]],
@@ -31,19 +31,19 @@ describe('production HTTP security headers', () => {
     const headers = await globalHeaders()
 
     expect(Object.fromEntries(headers)).toMatchObject({
-      'Strict-Transport-Security': 'max-age=31536000',
+      'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'DENY',
       'Referrer-Policy': 'strict-origin-when-cross-origin',
       'Permissions-Policy': 'camera=(), geolocation=(), microphone=(), payment=(), usb=()',
       'X-DNS-Prefetch-Control': 'off',
     })
-    expect(headers.has('Content-Security-Policy')).toBe(false)
+    expect(headers.has('Content-Security-Policy-Report-Only')).toBe(false)
   })
 
-  it('declares the exact approved CSP directives for report-only observation', async () => {
+  it('enforces the exact approved CSP directives', async () => {
     const headers = await globalHeaders()
-    const policy = headers.get('Content-Security-Policy-Report-Only')
+    const policy = headers.get('Content-Security-Policy')
 
     expect(policy).toBeDefined()
     const directives = policy!.split('; ').map((directive) => {
@@ -52,7 +52,7 @@ describe('production HTTP security headers', () => {
     })
     const names = directives.map(([name]) => name)
 
-    expect(directives).toEqual(EXPECTED_REPORT_ONLY_CSP)
+    expect(directives).toEqual(EXPECTED_CSP)
     expect(new Set(names).size).toBe(names.length)
 
     const sources = directives.flatMap(([, values]) => values)

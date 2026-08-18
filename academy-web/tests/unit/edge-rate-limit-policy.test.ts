@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import {
-  EDGE_RATE_LIMIT_MARKER,
   edgeRateLimitObjectName,
   edgeRateLimitRule,
   edgeClientAddress,
   hasEdgeRateLimitMarker,
+  withEdgeRateLimitMarker,
 } from '@/lib/edge-rate-limit-policy'
 
 describe('edge rate-limit policy', () => {
@@ -51,9 +51,19 @@ describe('edge rate-limit policy', () => {
     expect(first).not.toBe(changedSecret)
   })
 
-  it('accepts only the exact marker written by the outer Worker', () => {
-    expect(hasEdgeRateLimitMarker(new Headers({ 'x-cyberskills-edge-rate-limit': EDGE_RATE_LIMIT_MARKER }))).toBe(true)
-    expect(hasEdgeRateLimitMarker(new Headers({ 'x-cyberskills-edge-rate-limit': 'true' }))).toBe(false)
-    expect(hasEdgeRateLimitMarker(new Headers())).toBe(false)
+  it('accepts only a fresh signed marker bound to the outer Worker request', async () => {
+    const secret = 'test-secret-at-least-32-bytes-long'
+    const request = new Request('https://academy.cyberskills.co.th/api/auth/verify', { method: 'POST' })
+    const marked = await withEdgeRateLimitMarker(request, { secret, now: () => 1_000_000 })
+
+    expect(await hasEdgeRateLimitMarker(marked, { secret, now: () => 1_000_000 })).toBe(true)
+    expect(await hasEdgeRateLimitMarker(new Request(marked, {
+      method: 'GET',
+    }), { secret, now: () => 1_000_000 })).toBe(false)
+    expect(await hasEdgeRateLimitMarker(new Request('https://academy.cyberskills.co.th/api/auth/verify', {
+      method: 'POST',
+      headers: { 'x-cyberskills-edge-rate-limit': 'v1' },
+    }), { secret, now: () => 1_000_000 })).toBe(false)
+    expect(await hasEdgeRateLimitMarker(request, { secret, now: () => 1_000_000 })).toBe(false)
   })
 })
