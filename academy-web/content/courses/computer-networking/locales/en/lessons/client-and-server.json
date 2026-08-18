@@ -1,0 +1,290 @@
+{
+  "nodeId": "client-and-server",
+  "locale": "en",
+  "title": "Build a server and a client that talk",
+  "objective": "By the end of this lesson you have a working TCP server and client in C that exchange a length-prefixed message correctly, including messages too large to arrive in one read.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Everything in this module comes together here. The program is small, and almost all of its correctness lives in two helper functions and one design decision — how a receiver knows where a message ends."
+    },
+    {
+      "kind": "heading",
+      "text": "The protocol: four bytes, then that many"
+    },
+    {
+      "kind": "code",
+      "caption": "A length prefix, which is the simplest thing that works",
+      "lines": [
+        "  [ 4-byte length, network byte order ][ that many bytes of message ]",
+        "",
+        "/* The receiver reads exactly 4 bytes, converts them, then reads exactly",
+        "   that many. No guessing, no scanning for a delimiter, and it works for",
+        "   binary data — which a delimiter-based protocol does not, without escaping. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The two functions that make it correct"
+    },
+    {
+      "kind": "code",
+      "caption": "read_all and write_all",
+      "lines": [
+        "/* The two functions every network program needs, and most first attempts omit. */",
+        "",
+        "static int read_all(int fd, void *buf, size_t n) {",
+        "    size_t got = 0;",
+        "    while (got < n) {",
+        "        ssize_t r = read(fd, (char *)buf + got, n - got);",
+        "        if (r == 0) return 0;                       /* peer closed early */",
+        "        if (r < 0) { if (errno == EINTR) continue; return -1; }",
+        "        got += (size_t)r;                           /* a short read is normal */",
+        "    }",
+        "    return 1;",
+        "}",
+        "",
+        "static int write_all(int fd, const void *buf, size_t n) {",
+        "    size_t sent = 0;",
+        "    while (sent < n) {",
+        "        ssize_t w = write(fd, (const char *)buf + sent, n - sent);",
+        "        if (w < 0) { if (errno == EINTR) continue; return -1; }",
+        "        sent += (size_t)w;                          /* a partial write is normal */",
+        "    }",
+        "    return 1;",
+        "}"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "These two loops are the whole lesson",
+      "text": "Every point made earlier in this module is in them: a short read is normal, a partial write is normal, EINTR means retry rather than fail, and read returning 0 means the peer closed. A network program without these loops works perfectly on a local connection and fails in production, which is exactly the class of bug worth eliminating by construction rather than by testing."
+    },
+    {
+      "kind": "heading",
+      "text": "The server"
+    },
+    {
+      "kind": "code",
+      "caption": "Complete, with the error handling that is not optional",
+      "lines": [
+        "int listener = socket(AF_INET, SOCK_STREAM, 0);",
+        "if (listener < 0) { perror(\"socket\"); return 1; }",
+        "",
+        "int yes = 1;",
+        "setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes);",
+        "",
+        "struct sockaddr_in addr = {0};",
+        "addr.sin_family      = AF_INET;",
+        "addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);   /* this machine only, while testing */",
+        "addr.sin_port        = htons(port);",
+        "",
+        "if (bind(listener, (struct sockaddr *)&addr, sizeof addr) < 0) { perror(\"bind\"); return 1; }",
+        "if (listen(listener, 16) < 0) { perror(\"listen\"); return 1; }",
+        "",
+        "for (;;) {",
+        "    struct sockaddr_in peer; socklen_t plen = sizeof peer;",
+        "    int conn = accept(listener, (struct sockaddr *)&peer, &plen);",
+        "    if (conn < 0) { perror(\"accept\"); continue; }   /* one failure must not end the server */",
+        "",
+        "    uint32_t len_net;",
+        "    if (read_all(conn, &len_net, sizeof len_net) != 1) { close(conn); continue; }",
+        "    uint32_t len = ntohl(len_net);",
+        "",
+        "    if (len > MAX_MESSAGE) { close(conn); continue; }   /* never trust a length off the wire */",
+        "",
+        "    char *body = malloc(len + 1);",
+        "    if (!body) { close(conn); continue; }",
+        "    if (read_all(conn, body, len) != 1) { free(body); close(conn); continue; }",
+        "    body[len] = '\\0';",
+        "",
+        "    write_all(conn, &len_net, sizeof len_net);",
+        "    write_all(conn, body, len);",
+        "",
+        "    free(body);",
+        "    close(conn);                                   /* or CLOSE_WAIT accumulates */",
+        "}"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Three lines that are easy to leave out, and each one is a real defect",
+      "text": "Not closing the connection leaves it in CLOSE_WAIT until descriptors run out, exactly as the previous lesson showed. Not checking the length before allocating lets a client send a four-byte header claiming four gigabytes. Ending the loop when accept() fails turns one transient error into an outage. All three look like tidying up; all three are the difference between a demonstration and a program."
+    },
+    {
+      "kind": "heading",
+      "text": "The client"
+    },
+    {
+      "kind": "code",
+      "caption": "Send, then read the reply back",
+      "lines": [
+        "int fd = socket(AF_INET, SOCK_STREAM, 0);",
+        "",
+        "struct sockaddr_in addr = {0};",
+        "addr.sin_family = AF_INET;",
+        "addr.sin_port   = htons(port);",
+        "if (inet_pton(AF_INET, \"127.0.0.1\", &addr.sin_addr) != 1) { /* invalid */ return 1; }",
+        "",
+        "if (connect(fd, (struct sockaddr *)&addr, sizeof addr) < 0) { perror(\"connect\"); return 1; }",
+        "",
+        "uint32_t len = (uint32_t)strlen(msg), len_net = htonl(len);",
+        "write_all(fd, &len_net, sizeof len_net);",
+        "write_all(fd, msg, len);",
+        "",
+        "uint32_t back_net;",
+        "if (read_all(fd, &back_net, sizeof back_net) != 1) { /* no reply */ return 1; }",
+        "uint32_t back = ntohl(back_net);",
+        "",
+        "char *buf = malloc(back + 1);",
+        "if (read_all(fd, buf, back) != 1) { /* short reply */ return 1; }",
+        "buf[back] = '\\0';",
+        "",
+        "printf(\"echoed %u bytes, match=%s\\n\", back, strcmp(buf, msg) == 0 ? \"yes\" : \"no\");",
+        "close(fd);"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Proving it — and why the obvious test does not"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The obvious test is to send a large message and see whether it arrives intact. That test is not good enough, and finding out why is the most useful thing in this lesson."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured: the broken version passing every size on loopback",
+      "lines": [
+        "# A server using a single read() instead of the loop, tested over 127.0.0.1:",
+        "",
+        "  2,000 bytes  -> match=yes",
+        "  5,000 bytes  -> match=yes",
+        " 20,000 bytes  -> match=yes",
+        " 30,000 bytes  -> match=yes",
+        " 50,000 bytes  -> match=yes",
+        " 64,000 bytes  -> match=yes",
+        "",
+        "# The loopback interface on that machine had an MTU of 16384 and buffers",
+        "# large enough that every message arrived in one piece. The bug was there",
+        "# the whole time and no size revealed it."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "This is why the bug reaches production",
+      "text": "Testing on loopback cannot show it. The message is handed over in memory, arrives complete, and one read() gets all of it — at every size tried, up to 64,000 bytes. Across a real network the same message is split by the path's MTU and delayed by congestion, and the single read returns only part. A test that passes locally and fails in production is the defining property of this defect, so the test has to reproduce the condition rather than the size."
+    },
+    {
+      "kind": "heading",
+      "text": "The test that does work"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Make the sender slow instead of making the message large. A client that sends the header, pauses, sends half the body, pauses, and sends the rest reproduces exactly what a real network does — and it does so deterministically, on loopback, in two seconds."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured with a sender that pauses mid-message",
+      "lines": [
+        "/* client: write the header, sleep(2), write half the body, sleep(2), write the rest */",
+        "",
+        "single-read server  -> match=NO",
+        "    header said 2000 bytes; the body actually held 1000 characters",
+        "",
+        "read_all server     -> match=yes",
+        "    header said 2000 bytes; the body held 2000 characters",
+        "",
+        "/* Same programs, same 2000-byte message, same machine. The only difference",
+        "   is whether the receiver loops until it has what the header promised. */"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Build it, then break it in the ways that matter",
+      "steps": [
+        "Write both programs as above and confirm a short message round-trips",
+        "Replace read_all with a single read() and test at 2,000, then 20,000, then 64,000 bytes",
+        "Note that it passes every time on loopback — the bug is present and invisible",
+        "Now write a second client that sends the header, sleeps two seconds, sends half the body, sleeps again, and sends the rest",
+        "Run that client against the single-read server and confirm match=NO",
+        "Have the server print how many characters the body actually held and confirm it is half",
+        "Put read_all back and confirm the same slow client now succeeds",
+        "Then break it three more ways: remove close(conn) and find CLOSE_WAIT; remove the length check and send a header claiming 4000000000; make a failed accept() end the loop"
+      ],
+      "expected": "A broken server that passes every size test on loopback, and the same server failing immediately against a sender that pauses mid-message. That contrast is the lesson: the defect is not about size, it is about whether the data arrives in one piece — so the test must control arrival, not volume. The three deliberate defects after that are ones you will now recognise in someone else's code on sight."
+    }
+  ],
+  "cheatsheet": [
+    "Length prefix: 4 bytes in network byte order, then exactly that many",
+    "read_all loops until it has n bytes; write_all loops until it has sent n",
+    "EINTR means retry, read returning 0 means the peer closed, both need handling",
+    "Test with a message larger than one segment — a small one proves nothing",
+    "close() every accepted connection or CLOSE_WAIT accumulates",
+    "Never allocate based on a length from the network without checking it first",
+    "A failed accept() must continue the loop, not end the server",
+    "SO_REUSEADDR before bind; INADDR_LOOPBACK while testing",
+    "Verified: this program echoed 21, 16 and 5000 bytes with exact matches"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "You replace read_all with a single read() and test messages up to 64,000 bytes over loopback. Everything passes. What have you established?",
+      "choices": {
+        "A": "The code is correct",
+        "B": "Very little — loopback delivers each message in one piece, so a single read gets all of it; the defect only appears when data arrives split",
+        "C": "That 64,000 bytes is under the limit",
+        "D": "That the server is fast enough"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Measured: the single-read version passed at 2,000, 5,000, 20,000, 30,000, 50,000 and 64,000 bytes on loopback. It failed immediately against a sender that paused mid-message, receiving 1000 characters of a 2000-byte body. Test the condition, not the size."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why must the server check the length before calling malloc?",
+      "choices": {
+        "A": "malloc is slow for large sizes",
+        "B": "The length came from the network and a client can claim any value, including one that exhausts memory",
+        "C": "The length must be a multiple of four",
+        "D": "To keep the protocol portable"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Four bytes from an untrusted source should never size an allocation unchecked. This is the C course's rule about hostile input, in its network form."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Your server stops accepting connections after running for a while, and ss shows many CLOSE_WAIT entries. What did you forget?",
+      "choices": {
+        "A": "SO_REUSEADDR",
+        "B": "close() on each accepted connection",
+        "C": "listen()'s backlog",
+        "D": "htons on the port"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Each unclosed connection holds a descriptor. When the process reaches its limit, accept() fails and no new client can be served — with the cause visible in the state listing."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why does a length prefix handle binary data better than a delimiter?",
+      "choices": {
+        "A": "It is faster to parse",
+        "B": "A delimiter byte can also occur inside the data, so binary content needs escaping; a length does not",
+        "C": "Delimiters are not allowed in TCP",
+        "D": "It uses fewer bytes"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "With a length, the receiver knows exactly how many bytes to read and their content is irrelevant. With a delimiter, any occurrence inside the payload must be escaped, and forgetting to is a classic parsing bug."
+    }
+  ]
+}

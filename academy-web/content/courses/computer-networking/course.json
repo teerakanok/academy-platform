@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 269,
+  "estimatedMinutes": 291,
   "coverMotif": "cloud",
   "skills": [
     {
@@ -209,6 +209,18 @@
       "skillWeights": {
         "network-model": 3,
         "troubleshooting": 3
+      }
+    },
+    {
+      "id": "client-and-server",
+      "kind": "capstone",
+      "prerequisites": [
+        "tcp-handshake"
+      ],
+      "estimatedMinutes": 22,
+      "skillWeights": {
+        "socket-programming": 4,
+        "server-design": 3
       }
     }
   ]
