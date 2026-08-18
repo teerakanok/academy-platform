@@ -40,6 +40,9 @@
     "bitwise-ops": "การทำงานกับบิตทีละตัว",
     "integer-representation": "จำนวนเต็มถูกเก็บอย่างไร และมันพังตรงไหน",
     "endianness-and-layout": "ลำดับไบต์ และข้อมูลที่ข้ามขอบเขตออกไป",
-    "floating-point": "เลขทศนิยม: ทำไม 0.1 + 0.2 ถึงไม่เท่ากับ 0.3"
+    "floating-point": "เลขทศนิยม: ทำไม 0.1 + 0.2 ถึงไม่เท่ากับ 0.3",
+    "object-files-and-symbols": "หลายไฟล์ header และ linker ทำอะไร",
+    "libraries-and-builds": "ไลบรารี และการ build โปรเจกต์ให้ทำซ้ำได้",
+    "reading-real-c": "อ่านโค้ด C ของจริง และจากตรงนี้ไปไหนต่อ"
   }
 }

@@ -1,0 +1,231 @@
+{
+  "nodeId": "object-files-and-symbols",
+  "locale": "en",
+  "title": "Multiple files, headers, and what the linker does",
+  "objective": "By the end of this lesson you can split a program across files correctly, write a header that will not break, and diagnose the two link errors everyone meets.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A C project is a set of source files compiled separately and then joined. Each .c file becomes an object file that knows what it provides and what it still needs; the linker matches those up. Understanding that exchange makes both multi-file design and link errors straightforward."
+    },
+    {
+      "kind": "code",
+      "caption": "A three-file project",
+      "lines": [
+        "/* math_utils.h — the interface others may use */",
+        "#ifndef MATH_UTILS_H",
+        "#define MATH_UTILS_H",
+        "int add(int a, int b);          /* declaration only */",
+        "#endif",
+        "",
+        "/* math_utils.c — the implementation */",
+        "#include \"math_utils.h\"",
+        "int add(int a, int b) { return a + b; }",
+        "",
+        "/* main.c — the user */",
+        "#include <stdio.h>",
+        "#include \"math_utils.h\"",
+        "int main(void) { printf(\"%d\\n\", add(2, 3)); return 0; }"
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "Building it, in two ways",
+      "lines": [
+        "gcc -Wall -Wextra -o prog main.c math_utils.c        # all at once",
+        "",
+        "gcc -Wall -Wextra -c math_utils.c -o math_utils.o    # or separately",
+        "gcc -Wall -Wextra -c main.c       -o main.o",
+        "gcc math_utils.o main.o -o prog                      # then link",
+        "",
+        "# Separate compilation is what lets a large project rebuild only what changed."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "What an object file contains"
+    },
+    {
+      "kind": "code",
+      "caption": "Symbols: provided and required",
+      "lines": [
+        "nm math_utils.o",
+        "0000000000000000 T add          <- T = defined here, in the code section",
+        "",
+        "nm main.o",
+        "                 U add          <- U = undefined: needed, but not provided here",
+        "                 U printf",
+        "0000000000000000 T main",
+        "",
+        "# The linker's whole job: find a T for every U."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The header is a promise; the .c file keeps it",
+      "text": "A declaration in a header tells every file that includes it what exists and what shape it has, so calls can be checked at compile time. The definition in one .c file is what the linker actually finds. Keeping them in step is the whole discipline of multi-file C — and it is why a mismatch shows up at link time, not compile time."
+    },
+    {
+      "kind": "heading",
+      "text": "Include guards, and why they are not optional"
+    },
+    {
+      "kind": "code",
+      "caption": "Without one, a header included twice is a redefinition",
+      "lines": [
+        "#ifndef MATH_UTILS_H     /* if this name is not yet defined */",
+        "#define MATH_UTILS_H     /* define it */",
+        "",
+        "/* ...contents... */",
+        "",
+        "#endif                   /* the second inclusion sees the name and skips everything */",
+        "",
+        "/* Or, supported by every current compiler: */",
+        "#pragma once"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The two link errors, and what each means"
+    },
+    {
+      "kind": "table",
+      "headers": ["Message", "Meaning", "Usual cause"],
+      "rows": [
+        ["undefined reference to 'foo'", "Something calls foo, nothing defines it", "A source file missing from the build, or a missing -l for a library"],
+        ["multiple definition of 'foo'", "Two object files both define foo", "A definition placed in a header, or a global without static"]
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "The classic 'multiple definition'",
+      "lines": [
+        "/* config.h — WRONG: this DEFINES a variable in every file that includes it */",
+        "int global_count = 0;",
+        "",
+        "/* Right: declare in the header, define in exactly one .c file */",
+        "/* config.h */",
+        "extern int global_count;      /* declaration: it exists somewhere */",
+        "",
+        "/* config.c */",
+        "int global_count = 0;         /* definition: exactly one, here */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "static is how you keep a name out of the link",
+      "text": "Marking a function or file-level variable static means it is not exported, so it cannot collide with a same-named symbol elsewhere and cannot be called from another file. Making everything internal static is the cheapest way to keep a module's surface deliberate — and it removes a whole class of accidental coupling."
+    },
+    {
+      "kind": "heading",
+      "text": "What belongs in a header"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Declarations of functions other files may call",
+        "Type definitions those functions need in their signatures",
+        "extern declarations for shared variables — never their definitions",
+        "Constants as const or enum rather than as bare macros where possible",
+        "Nothing that allocates storage, and nothing that another file does not need"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Header discipline that prevents slow builds"
+    },
+    {
+      "kind": "code",
+      "caption": "Include what you use, and no more",
+      "lines": [
+        "/* If the header only needs a pointer to a struct, forward-declare it: */",
+        "struct connection;                       /* no need to include connection.h */",
+        "int send_message(struct connection *c, const char *text);",
+        "",
+        "/* Include the full definition only in the .c file that dereferences it. */",
+        "",
+        "/* Every header a header includes becomes a dependency of every file",
+        "   that includes it — which is how a build ends up recompiling everything",
+        "   because one unrelated header changed. */"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Build a three-file project and break it on purpose",
+      "steps": [
+        "Create math_utils.h, math_utils.c and main.c as above and build with one command",
+        "Build again with -c and separate link steps",
+        "Run: nm main.o and nm math_utils.o — find the U and T entries for add",
+        "Remove math_utils.c from the link command and read the error",
+        "Move the definition of add into the header, include it from two files, and read the new error",
+        "Fix it with extern in the header and one definition in the .c file",
+        "Mark a helper function static and confirm it disappears from nm output"
+      ],
+      "expected": "A working multi-file build, symbol tables that show exactly what each object provides and needs, and both link errors triggered deliberately — with the fix for each one being obvious once you can read the symbols."
+    }
+  ],
+  "cheatsheet": [
+    "Each .c compiles to an object file; the linker joins them",
+    "Header = declarations (a promise); one .c file = the definition",
+    "nm shows symbols: T = defined here, U = needed from elsewhere",
+    "The linker's job is to find a T for every U",
+    "Always use an include guard or #pragma once",
+    "undefined reference = missing source file in the build, or a missing -l",
+    "multiple definition = something defined in a header, or a non-static global",
+    "extern in the header, the definition in exactly one .c file",
+    "static keeps a name out of the link entirely",
+    "Forward-declare struct types in headers instead of including their full definition"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "In nm output, what does U next to a symbol mean?",
+      "choices": {
+        "A": "The symbol is unused",
+        "B": "It is undefined here: this object file needs it but does not provide it",
+        "C": "It is unsigned",
+        "D": "It is a universal symbol available everywhere"
+      },
+      "correct": ["B"],
+      "explanation": "T means defined in this object; U means required from elsewhere. Linking succeeds when every U has a matching T."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "You get 'multiple definition of global_count'. What is the most likely cause?",
+      "choices": {
+        "A": "The variable name is too common",
+        "B": "It was defined in a header, so every file including that header defined its own copy",
+        "C": "Two functions have the same name",
+        "D": "The linker was run twice"
+      },
+      "correct": ["B"],
+      "explanation": "Declare it in the header with extern and define it in exactly one .c file. A header is included many times; a definition must exist once."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "What does an include guard prevent?",
+      "choices": {
+        "A": "Circular dependencies between modules",
+        "B": "The contents of a header being processed twice in one translation unit, which would redefine its types",
+        "C": "The header being read by the wrong compiler",
+        "D": "Slow builds"
+      },
+      "correct": ["B"],
+      "explanation": "Headers commonly include other headers, so the same file arriving twice is normal. The guard makes the second arrival a no-op."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why forward-declare struct connection in a header instead of including connection.h ?",
+      "choices": {
+        "A": "It is required by the standard",
+        "B": "A pointer does not need the full definition, and every header a header pulls in becomes a dependency of every file that includes it",
+        "C": "Forward declarations are faster at runtime",
+        "D": "It hides the struct from the linker"
+      },
+      "correct": ["B"],
+      "explanation": "Include what you use. Transitive header dependencies are how one small change ends up recompiling an entire project."
+    }
+  ]
+}

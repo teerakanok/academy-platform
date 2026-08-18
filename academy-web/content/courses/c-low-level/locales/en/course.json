@@ -40,6 +40,9 @@
     "bitwise-ops": "Working with individual bits",
     "integer-representation": "How integers are stored, and where they break",
     "endianness-and-layout": "Byte order and data that crosses a boundary",
-    "floating-point": "Floating point: why 0.1 + 0.2 is not 0.3"
+    "floating-point": "Floating point: why 0.1 + 0.2 is not 0.3",
+    "object-files-and-symbols": "Multiple files, headers, and what the linker does",
+    "libraries-and-builds": "Libraries, and building a project repeatably",
+    "reading-real-c": "Reading real C, and where to go next"
   }
 }

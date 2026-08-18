@@ -1,0 +1,195 @@
+{
+  "nodeId": "reading-real-c",
+  "locale": "en",
+  "title": "Reading real C, and where to go next",
+  "objective": "By the end of this lesson you can approach an unfamiliar C codebase with a method rather than a hope, and you know which of your new skills carries into which kind of work.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Everything in this course was small enough to hold in your head at once. Real projects are not. What follows is the method people actually use to get oriented in a codebase they did not write — and every step of it uses something you already have."
+    },
+    {
+      "kind": "heading",
+      "text": "A reading order that works"
+    },
+    {
+      "kind": "list",
+      "ordered": true,
+      "items": [
+        "Build it first. A project you cannot build is a project you cannot experiment with, and the build itself tells you the dependencies",
+        "Find main, or the library's public header — that is the surface everything else exists to support",
+        "Read the headers before the implementations: they are the intended interface, written for a reader",
+        "Follow one path end to end — one request, one command, one file being parsed — rather than reading files alphabetically",
+        "Run it under a debugger or with prints on that path, so you see the real order rather than the order you assumed",
+        "Only then read broadly, with the shape already in your head"
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "Tools for finding your way",
+      "lines": [
+        "grep -rn \"function_name\" .          # who calls it, who defines it",
+        "grep -rn --include='*.h' \"struct config\"   # the type's declaration",
+        "nm -C prog | head                   # what a binary defines and needs",
+        "gdb ./prog                          # break, step, inspect",
+        "  break main",
+        "  run",
+        "  next / step / print variable / backtrace",
+        "",
+        "git log --oneline -- src/parser.c   # what this file's history says about it",
+        "git log -p -S\"suspicious_flag\"      # every commit that added or removed that string"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "The history is documentation nobody wrote on purpose",
+      "text": "When a function looks strange, git log and git blame usually explain it in one line — a fix for a case you have not thought of yet. This is the same skill from the Git course, and in C it is often the fastest route to understanding why a piece of code is not as simple as it could be."
+    },
+    {
+      "kind": "heading",
+      "text": "What experienced readers look for first"
+    },
+    {
+      "kind": "table",
+      "headers": ["Question", "Where the answer is"],
+      "rows": [
+        ["Who owns this memory?", "The comment on the function that returns it, or the free at the end of the caller"],
+        ["What can be NULL here?", "The guard clauses at the top of each function"],
+        ["Where does untrusted data enter?", "read, recv, fgets, argv, and anything reading a file"],
+        ["What are the bounds on this loop?", "The length parameter, and where it came from"],
+        ["What happens on failure?", "The error paths — and whether they free what they acquired"],
+        ["What is this struct's lifetime?", "Where it is created and where it is destroyed"]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Reading with security eyes"
+    },
+    {
+      "kind": "code",
+      "caption": "A first-pass grep list for a C codebase",
+      "lines": [
+        "grep -rn \"strcpy\\|strcat\\|sprintf\\|gets(\" .        # unbounded string operations",
+        "grep -rn \"malloc(\" . | grep -v \"if\\|assert\"        # allocations whose result may be unchecked",
+        "grep -rn \"system(\\|popen(\\|exec\" .                 # command execution",
+        "grep -rn \"memcpy\\|memmove\" .                       # bounded, but only if the length is right",
+        "",
+        "# Each hit is a question, not a finding. The question is always the same:",
+        "# where does the size come from, and can an attacker influence it?"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The habit that carries across every language",
+      "text": "This course has repeated one question in many forms: where does this size or index come from, and who checked it? Memory-safe languages answer it for you at runtime. C makes you answer it in the source. Having learned to ask it here, you will keep asking it — and that is what makes this knowledge transfer even when you write in something else."
+    },
+    {
+      "kind": "heading",
+      "text": "Where these skills go next"
+    },
+    {
+      "kind": "table",
+      "headers": ["If you are heading toward", "What you already have", "What to add"],
+      "rows": [
+        ["Systems programming", "Memory model, pointers, the build", "Processes, threads, syscalls — the Operating Systems course"],
+        ["Network programming", "Buffers, byte order, bounded reads", "Sockets and protocols — the Networking course"],
+        ["Reverse engineering and malware analysis", "The memory model and what compiled C looks like", "Assembly, disassembly, and dynamic analysis"],
+        ["Vulnerability research", "The defect classes and the tools that find them", "Fuzzing, exploitation primitives, and mitigations"],
+        ["Embedded work", "Fixed-width types, bit manipulation, static allocation", "Hardware interfaces and real-time constraints"]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "What you can do now"
+    },
+    {
+      "kind": "paragraph",
+      "text": "You can explain what happens between a source file and a running program. You can reason about memory deliberately — stack against heap, lifetime, ownership. You can read pointer code, including the parts that confuse people. You recognise the defect classes behind a large share of real vulnerabilities and you can find them with tools rather than by staring. You can work with bits, integers, and floating point without guessing. And you can build a multi-file project and explain what the linker did."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "The best next step is a small real program",
+      "text": "Write something with a file format: a parser for a simple binary format, a small key-value store, a tool that reads a log and summarises it. It will force every part of this course together — allocation, bounds, byte order, error paths, a Makefile — and it will be the thing you actually remember, because you had to make the decisions yourself."
+    },
+    {
+      "kind": "try",
+      "title": "Orient yourself in a codebase you did not write",
+      "steps": [
+        "Clone a small C project — a command-line tool, not a kernel",
+        "Build it, and read the error if it does not build the first time",
+        "Find main and read only that function",
+        "Pick one command-line option and follow it through to where it takes effect",
+        "Run: grep -rn \"malloc(\" . and pick three allocations — for each, find where it is freed",
+        "Run the first-pass grep list above and turn three hits into questions about where the size comes from",
+        "Run: git log --oneline -20 and read what the recent work has been about",
+        "Build it with -fsanitize=address and run its test suite, if it has one"
+      ],
+      "expected": "A project you can build, one path you can follow end to end, three allocations whose ownership you traced, and a handful of questions you can now ask precisely. That is what orientation looks like — and it is repeatable on the next codebase."
+    }
+  ],
+  "cheatsheet": [
+    "Build it first — a project you cannot build is one you cannot explore",
+    "Read headers before implementations; they are the intended interface",
+    "Follow one path end to end rather than reading files alphabetically",
+    "grep -rn for callers and definitions; nm for what a binary provides and needs",
+    "gdb: break, run, next, print, backtrace",
+    "git log and git blame explain why odd code is odd",
+    "Ask constantly: where does this size come from, and who checked it?",
+    "First-pass greps: strcpy/strcat/sprintf/gets, unchecked malloc, system/exec, memcpy lengths",
+    "Each hit is a question, not a finding",
+    "The best next step is a small real program with a file format"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What is the first thing to do with an unfamiliar C project?",
+      "choices": {
+        "A": "Read every file alphabetically",
+        "B": "Build it — a project you cannot build cannot be experimented with, and the build reveals its dependencies",
+        "C": "Rewrite the parts you dislike",
+        "D": "Run a static analyser"
+      },
+      "correct": ["B"],
+      "explanation": "Everything else in the method depends on being able to compile, run, and modify the code."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why read headers before implementations?",
+      "choices": {
+        "A": "They are shorter",
+        "B": "They are the intended interface, written to be read — they tell you what the module offers before you see how it does it",
+        "C": "They contain the tests",
+        "D": "Implementations are usually generated"
+      },
+      "correct": ["B"],
+      "explanation": "The header is the module's public shape. Reading it first gives you the map that makes the implementation navigable."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "You grep a codebase and find fifty uses of memcpy. What have you found?",
+      "choices": {
+        "A": "Fifty vulnerabilities",
+        "B": "Fifty questions — for each one, where does the length come from and can an attacker influence it?",
+        "C": "Nothing; memcpy is safe",
+        "D": "Fifty places to replace with strcpy"
+      },
+      "correct": ["B"],
+      "explanation": "memcpy is bounded only if the length is correct. The grep gives you a list to examine, not a list of defects."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Which single question has this course kept returning to?",
+      "choices": {
+        "A": "Is this code fast enough?",
+        "B": "Where does this size or index come from, and who checked it?",
+        "C": "Should this be a macro or a function?",
+        "D": "Is this portable to Windows?"
+      },
+      "correct": ["B"],
+      "explanation": "Buffers, allocations, loops, parsing, integer conversions — every defect class in this course is a version of that question going unanswered."
+    }
+  ]
+}

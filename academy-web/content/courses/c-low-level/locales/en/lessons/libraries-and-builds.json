@@ -1,0 +1,205 @@
+{
+  "nodeId": "libraries-and-builds",
+  "locale": "en",
+  "title": "Libraries, and building a project repeatably",
+  "objective": "By the end of this lesson you can link against a library, explain the difference between static and dynamic linking, and write a Makefile that rebuilds only what changed.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A library is compiled code you did not write, joined to your program either at link time or when it runs. Which of those two you choose changes the size of your binary, how updates reach it, and what has to be present on the machine that runs it."
+    },
+    {
+      "kind": "code",
+      "caption": "Linking against one",
+      "lines": [
+        "gcc prog.c -o prog -lm            # the maths library: -lm means libm",
+        "gcc prog.c -o prog -lssl -lcrypto",
+        "",
+        "gcc prog.c -o prog -I/opt/inc -L/opt/lib -lmylib",
+        "#                  ^ where headers are   ^ where libraries are  ^ which library",
+        "",
+        "# The -l flags go AFTER the source files — the linker resolves left to right."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Static and dynamic, side by side"
+    },
+    {
+      "kind": "table",
+      "headers": ["", "Static (.a)", "Dynamic (.so / .dylib / .dll)"],
+      "rows": [
+        ["Joined", "At link time, copied into your binary", "At run time, by the loader"],
+        ["Binary size", "Larger", "Smaller"],
+        ["Library update", "Requires relinking your program", "Takes effect on next run"],
+        ["Deployment", "One self-contained file", "The library must be present on the target"],
+        ["Security patching", "Every dependent binary must be rebuilt", "Patch once, all users pick it up"],
+        ["Typical use", "Containers, embedded, tools shipped as one file", "System packages, shared platform libraries"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The security argument is the important one",
+      "text": "When a widely used library needs an urgent fix, dynamic linking means updating one package and restarting; static linking means finding and rebuilding every binary that embedded a copy. That is why distributions favour dynamic linking, and why an inventory of what you statically link is worth keeping."
+    },
+    {
+      "kind": "code",
+      "caption": "Seeing what a binary depends on",
+      "lines": [
+        "ldd ./prog                # Linux: shared libraries this binary needs",
+        "otool -L ./prog           # macOS equivalent",
+        "",
+        "nm -D /usr/lib/libssl.so | head    # exported symbols of a shared library",
+        "",
+        "# If ldd says 'not found', the loader cannot locate that library at run time."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Why a build system exists"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Typing the compile commands by hand works for two files. At twenty, you start recompiling everything on every change, forgetting a flag, or forgetting a file. A Makefile records the dependencies once and then rebuilds exactly what the change requires."
+    },
+    {
+      "kind": "code",
+      "caption": "A Makefile that covers most small projects",
+      "lines": [
+        "CC      = gcc",
+        "CFLAGS  = -Wall -Wextra -O2 -g",
+        "LDFLAGS = -lm",
+        "",
+        "SRCS = main.c math_utils.c parser.c",
+        "OBJS = $(SRCS:.c=.o)",
+        "TARGET = prog",
+        "",
+        "$(TARGET): $(OBJS)",
+        "\t$(CC) $(OBJS) -o $@ $(LDFLAGS)",
+        "",
+        "%.o: %.c",
+        "\t$(CC) $(CFLAGS) -c $< -o $@",
+        "",
+        ".PHONY: clean test",
+        "clean:",
+        "\trm -f $(OBJS) $(TARGET)",
+        "",
+        "test: $(TARGET)",
+        "\t./$(TARGET) --self-test"
+      ]
+    },
+    {
+      "kind": "list",
+      "items": [
+        "$@ is the target being built; $< is the first prerequisite",
+        "The recipe lines must begin with a real tab, not spaces — this is the classic first Makefile error",
+        ".PHONY marks targets that are commands rather than files, so a file named clean cannot break them",
+        "make rebuilds a target only when a prerequisite is newer than it"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Header dependencies are the part people forget",
+      "text": "The rule above rebuilds a .o when its .c changes — but not when a header it includes changes, so you get a stale build that is hard to explain. Let the compiler generate the dependency information: add -MMD -MP to CFLAGS and include the generated .d files. Without that, 'make clean' becomes a superstition people perform whenever something is strange."
+    },
+    {
+      "kind": "code",
+      "caption": "Automatic header dependencies",
+      "lines": [
+        "CFLAGS = -Wall -Wextra -O2 -g -MMD -MP",
+        "DEPS = $(OBJS:.o=.d)",
+        "",
+        "-include $(DEPS)      # the leading dash: do not fail on the first build",
+        "",
+        "# Now editing a header rebuilds exactly the objects that include it."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Beyond make"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Larger or cross-platform projects usually move to a generator such as CMake or Meson, which produce build files for the platform you are on. The concepts do not change: sources, flags, dependencies, targets. Learn them here, where they are visible, and the generated systems make sense afterwards."
+    },
+    {
+      "kind": "try",
+      "title": "Build a project properly",
+      "steps": [
+        "Take the three-file project from the previous lesson and add a third module",
+        "Write the Makefile above and run: make",
+        "Run make again and confirm it says there is nothing to do",
+        "Touch one .c file and run make — note that only that object is rebuilt",
+        "Edit a header and run make — note that nothing rebuilds, which is the bug",
+        "Add -MMD -MP and the -include line, then repeat: now the right objects rebuild",
+        "Run: ldd ./prog     (or otool -L on macOS) and read its dynamic dependencies",
+        "Link something with -lm and confirm the program still runs after make clean && make"
+      ],
+      "expected": "A build that recompiles only what changed, a header edit that first fails to trigger a rebuild and then does once dependency generation is on, and a list of the shared libraries your binary needs at run time."
+    }
+  ],
+  "cheatsheet": [
+    "-l names a library, -L adds a library search path, -I adds a header search path",
+    "Put -l flags after the source files; the linker resolves left to right",
+    "Static: copied into the binary, self-contained, must be rebuilt to pick up a fix",
+    "Dynamic: loaded at run time, smaller, and a library patch reaches every user",
+    "ldd (Linux) or otool -L (macOS) shows a binary's dynamic dependencies",
+    "make rebuilds a target only when a prerequisite is newer",
+    "$@ is the target, $< is the first prerequisite; recipes must start with a tab",
+    ".PHONY for targets that are commands, not files",
+    "Add -MMD -MP and -include the .d files so header changes trigger rebuilds",
+    "CMake and Meson generate these builds for you; the concepts are the same"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A security fix is released for a library your programs use. Which linking choice makes that easier to deploy?",
+      "choices": {
+        "A": "Static — the fix is already inside each binary",
+        "B": "Dynamic — update the library package once and every program picks it up on next run",
+        "C": "It makes no difference",
+        "D": "Static, because it is faster"
+      },
+      "correct": ["B"],
+      "explanation": "With static linking every dependent binary embeds its own copy, so each one must be found and rebuilt. This is the main operational argument for dynamic linking."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Your Makefile recipe line starts with spaces and make reports a missing separator. Why?",
+      "choices": {
+        "A": "The compiler is missing",
+        "B": "Recipe lines must begin with a real tab character; make treats spaces as a syntax error",
+        "C": "The target name is wrong",
+        "D": "The file needs a .PHONY declaration"
+      },
+      "correct": ["B"],
+      "explanation": "It is the classic first Makefile error, and editors that convert tabs to spaces cause it repeatedly."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "You edit a header and make rebuilds nothing. What is missing?",
+      "choices": {
+        "A": ".PHONY on the target",
+        "B": "Header dependency tracking — add -MMD -MP and include the generated .d files",
+        "C": "A clean target",
+        "D": "The -l flag"
+      },
+      "correct": ["B"],
+      "explanation": "Without it, make only knows that an object depends on its .c file. That gap is why people fall back on running make clean whenever something looks wrong."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "What does ldd ./prog tell you?",
+      "choices": {
+        "A": "Which source files were compiled",
+        "B": "Which shared libraries the binary needs at run time, and whether the loader can find them",
+        "C": "The size of each function",
+        "D": "Whether the program has memory leaks"
+      },
+      "correct": ["B"],
+      "explanation": "A 'not found' line means the program will fail to start on that machine — which is exactly the deployment problem static linking avoids."
+    }
+  ]
+}

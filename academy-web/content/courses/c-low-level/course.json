@@ -1,15 +1,15 @@
 {
   "id": "c-low-level",
   "slug": "c-low-level",
-  "version": "0.1.0",
-  "publicAvailability": "internal",
+  "version": "1.0.0",
+  "publicAvailability": "syllabus-preview",
   "defaultLocale": "en",
   "availableLocales": [
     "en",
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 378,
+  "estimatedMinutes": 434,
   "coverMotif": "probe",
   "skills": [
     {
@@ -290,6 +290,42 @@
       "estimatedMinutes": 18,
       "skillWeights": {
         "bits-numbers": 6
+      }
+    },
+    {
+      "id": "object-files-and-symbols",
+      "kind": "lesson",
+      "prerequisites": [
+        "floating-point"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "build-systems": 6,
+        "c-syntax": 2
+      }
+    },
+    {
+      "id": "libraries-and-builds",
+      "kind": "lesson",
+      "prerequisites": [
+        "object-files-and-symbols"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "build-systems": 6
+      }
+    },
+    {
+      "id": "reading-real-c",
+      "kind": "capstone",
+      "prerequisites": [
+        "libraries-and-builds"
+      ],
+      "estimatedMinutes": 20,
+      "skillWeights": {
+        "debugging": 4,
+        "memory-model": 3,
+        "build-systems": 3
       }
     }
   ]
