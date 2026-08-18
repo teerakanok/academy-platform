@@ -1,0 +1,221 @@
+{
+  "nodeId": "data-hazards-and-forwarding",
+  "locale": "en",
+  "title": "When an instruction needs a result that is not ready",
+  "objective": "By the end of this lesson you can identify a data hazard in a short instruction sequence, explain what forwarding does about it, and measure on your own machine what a dependency chain costs.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "The pipeline picture assumed each instruction could proceed every cycle. Here is a sequence where it cannot."
+    },
+    {
+      "kind": "code",
+      "caption": "The second instruction needs what the first has not yet written",
+      "lines": [
+        "  add  x5, x6, x7      # produces x5",
+        "  sub  x9, x5, x8      # needs x5",
+        "",
+        "  cycle:       1     2     3     4     5     6",
+        "  add        | IF  | ID  | EX  | MEM | WB  |",
+        "  sub              | IF  | ID  | EX  | ...",
+        "                           ^     ^",
+        "                           |     the sub reads x5 here, in cycle 3",
+        "                           the add writes x5 here, in cycle 5",
+        "",
+        "  The sub reads the register file two cycles before the add writes to it.",
+        "  Without a remedy it would read the old value of x5 and be wrong."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "This is called a data hazard",
+      "text": "An instruction needs a value that an earlier, still-in-flight instruction is going to produce. It is a hazard of the pipeline itself: the same two instructions executed one at a time have no problem, because the first completes entirely before the second starts. Overlapping created the difficulty, so overlapping has to solve it."
+    },
+    {
+      "kind": "heading",
+      "text": "Forwarding: use the value before it is stored"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Look at the timing again. The add computes the sum in cycle 3, during its execute stage. The sub needs it in cycle 4, at the start of its own execute stage. The value exists a full cycle before it is needed — it is simply not in the register file yet. Forwarding adds a path that routes the result straight from the output of the arithmetic unit back to its input, skipping the write and the read entirely."
+    },
+    {
+      "kind": "code",
+      "caption": "The forwarding path",
+      "lines": [
+        "                  +---------------------------+",
+        "                  |     forwarding path       |",
+        "                  v                           |",
+        "  registers -> [ arithmetic unit ] -----------+---> memory -> registers",
+        "                       ^                      |",
+        "                       |                      result available here",
+        "                  the sub takes its input",
+        "                  from the path, not from",
+        "                  the register file",
+        "",
+        "/* The register file still gets written. Forwarding does not replace it,",
+        "   it only lets the next instruction skip the wait. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "With forwarding, this hazard costs nothing at all: the sub proceeds in the cycle it was scheduled for. Most back-to-back arithmetic dependencies are handled this way, which is why an ordinary sequence of dependent arithmetic still runs at close to one instruction per cycle."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Forwarding removes the stall, not the dependency",
+      "text": "The sub still cannot start before the add produces its value — that ordering is what the program means. Forwarding shortens the wait from three cycles to zero for arithmetic. What it cannot do is make a dependent chain run in parallel with itself, and that limit is measurable."
+    },
+    {
+      "kind": "heading",
+      "text": "What a dependency chain actually costs"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A modern processor issues several instructions per cycle when they do not depend on each other. Two loops doing exactly the same number of additions — one as a single chain where each add needs the previous result, one as four separate chains — show what that is worth. The values are kept in registers so nothing here is about memory."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured on an Apple M-series processor, best of repeated runs",
+      "lines": [
+        "  identical total additions (400,000,000), values never leave registers",
+        "",
+        "  1 dependent chain    :  0.185 s   0.46 ns per add",
+        "  4 independent chains :  0.048 s   0.12 ns per add",
+        "  ratio                :  4.00x",
+        "",
+        "/* The same number of additions. The four-chain loop finished in a quarter",
+        "   of the time because nothing in it had to wait for anything else. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Four times the work per unit of time, from nothing but breaking one chain into four. The processor was never four times faster; it was idle three quarters of the time in the first loop, waiting for each addition to finish before the next could start."
+    },
+    {
+      "kind": "heading",
+      "text": "Why this matters when you write ordinary code"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Shape",
+        "What it does to the processor"
+      ],
+      "rows": [
+        [
+          "sum += a[i] in one accumulator",
+          "One chain; each addition waits for the previous"
+        ],
+        [
+          "Four partial sums added at the end",
+          "Four chains that proceed independently"
+        ],
+        [
+          "A linked list walk",
+          "A chain by construction; the next address comes from the current node"
+        ],
+        [
+          "An array walk",
+          "Addresses are known in advance and do not form a chain"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "This is the mechanical reason an array outperforms a linked list even when both fit in cache and both touch the same number of elements. The array is not merely more compact — its addresses are independent, so the processor can have many loads in flight. The list forces one at a time. Cache behaviour makes the gap larger still, and that is the subject of the memory module."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "The compiler does this for you, when it is allowed to",
+      "text": "Breaking one floating-point sum into several partial sums changes the result, because floating-point addition is not associative — the rounding lesson in the C course showed why. So a compiler will not do it to floating-point code unless you tell it that reassociation is acceptable. For integers it is free, and compilers do it routinely. When a floating-point loop seems stuck at a fixed rate no matter the optimisation level, a single accumulator is a good first suspect."
+    },
+    {
+      "kind": "try",
+      "title": "Measure your own machine",
+      "steps": [
+        "Write a loop that adds 1 to a single variable 400 million times, and time it",
+        "Write a second loop with four separate variables, 100 million iterations each",
+        "Compile at -O1 or higher and check the timings",
+        "If either time is 0.000 s, the compiler deleted the loop — verify with: cc -O2 -S -o - prog.c | grep -c add",
+        "Prevent deletion with an empty asm barrier: __asm__ volatile(\"\" : \"+r\"(a));",
+        "Re-measure and record the ratio between the two loops",
+        "Try eight chains instead of four and see whether the ratio keeps improving",
+        "Explain what the point where it stops improving tells you about the processor"
+      ],
+      "expected": "A ratio near the number of instructions the processor can issue per cycle, and a point beyond which more chains stop helping. On the machine used above, four chains gave exactly 4.00x and that is the useful measurement: it did not come from a specification sheet, it came from a loop you can run. The deleted-loop step is not optional — an unexplained 0.000 s is always the optimiser, never a fast processor."
+    }
+  ],
+  "cheatsheet": [
+    "A data hazard: an instruction needs a value an earlier in-flight instruction has not written yet",
+    "Executed one at a time the same instructions have no hazard — overlapping created it",
+    "Forwarding routes the result from the arithmetic unit output back to its input",
+    "For back-to-back arithmetic, forwarding removes the stall entirely",
+    "Forwarding removes the wait, not the dependency: a chain still runs one step at a time",
+    "Measured: 1 dependent chain 0.46 ns per add, 4 independent chains 0.12 ns — 4.00x",
+    "Array indices are independent addresses; linked-list addresses form a chain",
+    "Compilers split integer accumulators freely, floating-point ones only with permission",
+    "A timing of 0.000 s means the optimiser deleted the loop, not that it was fast"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "add x5,x6,x7 is followed immediately by sub x9,x5,x8. What is the problem in a pipelined processor?",
+      "choices": {
+        "A": "The registers are the wrong size",
+        "B": "The sub reads the register file before the add has written its result there",
+        "C": "Two instructions cannot use the arithmetic unit",
+        "D": "There is no problem"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The sub reads in cycle 3 and the add writes in cycle 5. Without a remedy the sub reads the stale value of x5."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "How does forwarding fix that without slowing anything down?",
+      "choices": {
+        "A": "It delays the sub until the write completes",
+        "B": "The result exists at the arithmetic unit's output a cycle before it is needed, so a path routes it directly to the input",
+        "C": "It duplicates the register file",
+        "D": "It reorders the two instructions"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The value is computed in cycle 3 and needed in cycle 4. It is not late, it is merely not in the register file yet — so the path skips the register file."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Four independent addition chains ran 4.00x faster than one chain doing the same total additions. What does that show?",
+      "choices": {
+        "A": "The clock speed increased",
+        "B": "The processor can issue several independent instructions per cycle, and a single chain leaves most of that capacity idle",
+        "C": "Four chains use less memory",
+        "D": "The compiler removed work from the four-chain version"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Identical work, four times the rate. The single chain was not slow because additions are slow; it was slow because each one had to wait for the previous."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why will a compiler split an integer accumulator into several partial sums but refuse to do the same for floating-point?",
+      "choices": {
+        "A": "Floating-point addition is slower",
+        "B": "Floating-point addition is not associative, so regrouping changes the result",
+        "C": "Floating-point registers are scarce",
+        "D": "It does the same for both"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Regrouping is exactly the reassociation the C course's rounding lesson warned about. It is a legal transformation for integers and a change in results for floating-point."
+    }
+  ]
+}

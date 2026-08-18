@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 215,
+  "estimatedMinutes": 272,
   "coverMotif": "layers",
   "skills": [
     {
@@ -176,6 +176,41 @@
       "skillWeights": {
         "performance": 4,
         "pipelining": 2
+      }
+    },
+    {
+      "id": "data-hazards-and-forwarding",
+      "kind": "lesson",
+      "prerequisites": [
+        "pipeline-stages"
+      ],
+      "estimatedMinutes": 19,
+      "skillWeights": {
+        "pipelining": 4
+      }
+    },
+    {
+      "id": "load-use-stall",
+      "kind": "lesson",
+      "prerequisites": [
+        "data-hazards-and-forwarding"
+      ],
+      "estimatedMinutes": 17,
+      "skillWeights": {
+        "pipelining": 4,
+        "performance": 2
+      }
+    },
+    {
+      "id": "control-hazards-and-prediction",
+      "kind": "capstone",
+      "prerequisites": [
+        "data-hazards-and-forwarding"
+      ],
+      "estimatedMinutes": 21,
+      "skillWeights": {
+        "pipelining": 4,
+        "performance": 3
       }
     }
   ]

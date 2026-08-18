@@ -1,0 +1,321 @@
+{
+  "nodeId": "control-hazards-and-prediction",
+  "locale": "en",
+  "title": "Capstone: measuring what a wrong guess costs",
+  "objective": "By the end of this capstone you can explain why a pipeline must guess at every branch, measure the cost of guessing wrongly on your own machine, and recognise when that cost has been removed rather than paid.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Two hazards remain from the pipeline lesson's warning, and both were about data. This one is about control: the processor does not know which instruction comes next."
+    },
+    {
+      "kind": "heading",
+      "text": "The problem"
+    },
+    {
+      "kind": "code",
+      "caption": "A branch decides the next address, and it decides it late",
+      "lines": [
+        "  beq  x5, x6, target      # take the branch only if x5 equals x6",
+        "  add  x9, x1, x2          # is this the next instruction, or is it not?",
+        "",
+        "  cycle:       1     2     3     4     5",
+        "  beq        | IF  | ID  | EX  | MEM | WB  |",
+        "                           ^",
+        "                           the comparison finishes here, cycle 3",
+        "",
+        "  But the fetch stage needed an address in cycle 2 — it cannot sit idle.",
+        "  Every cycle it does not fetch is a cycle of the pipeline left empty."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Waiting is not an option, so the processor guesses",
+      "text": "About one instruction in five or six is a branch. If the pipeline stopped and waited at each one, the overlap that pipelining bought would be lost several times per hundred instructions. So the fetch stage picks a direction and continues fetching. When the branch resolves and the guess was right, nothing was lost. When it was wrong, every instruction fetched since the branch is discarded and fetching restarts at the correct address."
+    },
+    {
+      "kind": "heading",
+      "text": "How the guess is made"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Strategy",
+        "How it decides",
+        "Roughly how often it is right"
+      ],
+      "rows": [
+        [
+          "Always not-taken",
+          "Fetch the next instruction in order",
+          "About half, for typical code"
+        ],
+        [
+          "Backwards taken, forwards not",
+          "A backwards branch is probably a loop",
+          "Good for loops, poor elsewhere"
+        ],
+        [
+          "One-bit history",
+          "Predict what this branch did last time",
+          "Wrong twice per loop: on entry and on exit"
+        ],
+        [
+          "Two-bit saturating",
+          "Needs two wrong guesses to change its mind",
+          "Wrong once per loop instead of twice"
+        ],
+        [
+          "Correlating / pattern",
+          "Uses the outcomes of recent branches as context",
+          "High, when the pattern is learnable"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The progression down that table is one idea repeated: use more history. A loop that runs a thousand times is trivially predictable, and the two-bit scheme exists precisely so that the single not-taken exit does not flip the prediction for the next entry. What no amount of history helps with is a branch whose direction genuinely depends on unpredictable data — and that is what the measurement below constructs."
+    },
+    {
+      "kind": "heading",
+      "text": "The experiment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Sum the elements of an array that exceed a threshold. Run it on the same data twice: once in random order, once sorted. The arithmetic, the element count and the answer are identical. Only the predictability of the branch differs — sorted data means the condition is false for a long run and then true for a long run, which any history-based predictor learns immediately."
+    },
+    {
+      "kind": "code",
+      "caption": "Build it yourself",
+      "lines": [
+        "  enum { N = 1<<20, REP = 64 };",
+        "  static int data[N];",
+        "",
+        "  long sum_branch(void) {",
+        "    long s = 0;",
+        "    for (int r = 0; r < REP; r++)",
+        "      for (int i = 0; i < N; i++)",
+        "        if (data[i] >= 128) s += data[i];      /* the branch under test */",
+        "    return s;",
+        "  }",
+        "",
+        "  /* fill data with values 0..255 from a simple generator, time sum_branch(),",
+        "     then qsort the array, time it again, and print both. */"
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "Measured on an Apple M-series processor, interleaved runs, best of five",
+      "lines": [
+        "  1,048,576 elements x 64 passes, identical data, identical arithmetic,",
+        "  identical element count. The only difference is the order of the elements.",
+        "",
+        "  compiled with -O0 (the branch is really executed):",
+        "    unsorted : 0.560 s",
+        "    sorted   : 0.081 s",
+        "    ratio    : 6.94x",
+        "",
+        "  compiled with -O2 (the compiler removed the branch entirely):",
+        "    unsorted : 0.008 s",
+        "    sorted   : 0.008 s",
+        "    ratio    : 1.00x"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Reading the second half of that result"
+    },
+    {
+      "kind": "paragraph",
+      "text": "At -O0 the branch is genuinely executed and the answer is unambiguous: unpredictable data cost almost seven times as much as predictable data, for identical work. That is the misprediction penalty made visible. At -O2 the difference vanished exactly — 1.00x — and the temptation is to conclude that the optimiser 'made both cases fast'. Check the assembly instead of assuming."
+    },
+    {
+      "kind": "code",
+      "caption": "What -O2 actually produced",
+      "lines": [
+        "  $ cc -O2 -S -o - branch.c | sed -n '/_sum_branch:/,/ret/p'",
+        "",
+        "    cmgt.4s   v3, v1, v2        # compare four values at once, produce a mask",
+        "    and.16b   v4, v1, v3        # keep the ones that passed, zero the rest",
+        "    uaddw.2d  v5, v5, v4        # add them all in, including the zeros",
+        "",
+        "/* There is no conditional branch in the loop body at all. The comparison",
+        "   became a mask and the addition became unconditional: values that failed",
+        "   the test contribute zero. Four elements per instruction, no prediction",
+        "   involved, and therefore nothing to mispredict. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "The optimiser did not predict better; it removed the thing being predicted",
+      "text": "A conditional branch was replaced by a comparison producing a mask and an unconditional addition. Nothing is guessed, so nothing can be guessed wrongly, and the two orderings become indistinguishable — which is exactly the 1.00x that was measured. This is the general technique called branchless or predicated code, and the same idea appears as a conditional-move instruction in the assembly course. It is also why a benchmark of branch prediction must be checked at the optimisation level it was compiled at."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "A measurement discipline worth keeping",
+      "text": "A first attempt at this experiment ran unsorted then sorted, once, at -O2 and reported 1.71x — a plausible-looking number that was pure ordering artifact from the first timed run. Interleaving the two cases and taking the best of five runs gave 1.00x, repeatedly and exactly. When a performance number is small and you have run each case once, you have measured your measurement setup, not the machine."
+    },
+    {
+      "kind": "heading",
+      "text": "Your task"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Build the program above and measure at -O0 and at -O2",
+        "Interleave the sorted and unsorted cases and repeat at least five times, reporting the best of each",
+        "Inspect the -O2 assembly and decide for yourself whether a branch is still there",
+        "Replace the branch with an explicit branchless form and measure it at -O0",
+        "Explain each of the four numbers in one sentence"
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "The branchless form to compare against",
+      "lines": [
+        "  /* with a branch */",
+        "  if (data[i] >= 128) s += data[i];",
+        "",
+        "  /* without: the comparison produces 0 or 1, and the multiply makes",
+        "     the addition unconditional */",
+        "  s += data[i] * (data[i] >= 128);",
+        "",
+        "  /* Or with an explicit mask, which is closer to what the vectoriser did:",
+        "       int m = -(data[i] >= 128);      // 0 or all-ones",
+        "       s += data[i] & m;",
+        "     Measure at -O0, where the compiler is not rewriting your code, so you",
+        "     can see what the transformation is worth by itself. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "What you should be able to say at the end"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Question",
+        "The answer your own numbers support"
+      ],
+      "rows": [
+        [
+          "Why must a processor guess at a branch?",
+          "The fetch stage needs an address several cycles before the branch resolves"
+        ],
+        [
+          "What does a wrong guess cost?",
+          "Everything fetched since the branch, discarded — measured at 6.94x on unpredictable data"
+        ],
+        [
+          "Why did sorting help?",
+          "It made the condition's outcome a long run of one answer, which a history-based predictor learns immediately"
+        ],
+        [
+          "Why did -O2 make the difference disappear?",
+          "It removed the branch, replacing it with a mask and an unconditional add"
+        ],
+        [
+          "When is branchless code worth writing?",
+          "When the condition is genuinely unpredictable and the work on both sides is cheap"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "That last row is the practical rule, and it has a real limit: branchless code does the work of both sides every time. When one side is expensive or has an effect, doing it unconditionally is either slower or wrong. The transformation pays only when the branch is unpredictable and both sides are cheap — which is precisely the case the experiment constructed, and precisely why it is not a general recommendation."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Where this connects",
+      "text": "The deep-pipeline calculation in the pipeline lesson asked you to include a misprediction penalty and found the deeper design losing. You have now measured the phenomenon that calculation was about. The security course's treatment of speculative-execution attacks starts from the same mechanism: the processor really does execute the instructions after a branch before knowing whether it should have, and the effects of that work do not all disappear when it is discarded."
+    },
+    {
+      "kind": "try",
+      "title": "Extend the experiment",
+      "steps": [
+        "Change the threshold from 128 to 0 so the condition is always true, and measure",
+        "Change it to 256 so the condition is always false, and measure",
+        "Explain why both extremes are as fast as the sorted case",
+        "Make the condition depend on i % 2 and measure — is an alternating pattern predictable?",
+        "Make it depend on i % 3, then a pattern of period 7, and find where prediction fails",
+        "Report the shortest repeating pattern your machine could not predict",
+        "Compare that number with what the table above says about correlating predictors"
+      ],
+      "expected": "Both constant conditions as fast as sorted, alternating patterns predicted well, and a period beyond which the predictor loses. The period where it fails is a direct measurement of how much branch history your processor keeps — a hardware property you established without any documentation, using only a loop and a clock."
+    }
+  ],
+  "cheatsheet": [
+    "A control hazard: the next address is not known until the branch resolves",
+    "The fetch stage cannot wait, so it guesses and continues fetching",
+    "A wrong guess discards everything fetched since the branch",
+    "Predictors improve by using more history: one-bit, two-bit saturating, correlating",
+    "Two-bit exists so a loop's single exit does not flip the prediction for the next entry",
+    "Measured at -O0: unpredictable data cost 6.94x predictable data for identical work",
+    "Measured at -O2: exactly 1.00x, because the compiler replaced the branch with a mask",
+    "Branchless code does both sides' work every time — only worth it when both are cheap",
+    "One timed run per case measures your setup; interleave and take the best of several",
+    "Speculative-execution attacks start from this same mechanism"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why does a pipelined processor guess a branch direction instead of waiting?",
+      "choices": {
+        "A": "Guessing is more accurate",
+        "B": "The fetch stage needs an address cycles before the branch resolves, and every cycle it does not fetch leaves the pipeline empty",
+        "C": "Branches are rare enough not to matter",
+        "D": "The compiler requires it"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "About one instruction in five or six is a branch. Stopping at each one would give back most of what pipelining bought."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Sorting the array made the same loop 6.94x faster at -O0. Why?",
+      "choices": {
+        "A": "Sorted data is smaller",
+        "B": "Sorting turned the condition into a long run of false followed by a long run of true, which a history-based predictor learns immediately",
+        "C": "The sum is easier to compute on sorted data",
+        "D": "Sorted data has better cache locality"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Identical elements, identical arithmetic, identical answer. Only the predictability of the branch changed, so only misprediction can explain the difference."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "At -O2 the sorted and unsorted cases took exactly the same time. What does the assembly show happened?",
+      "choices": {
+        "A": "The predictor got better with optimisation",
+        "B": "The conditional branch was replaced by a comparison producing a mask and an unconditional add, so there is nothing to predict",
+        "C": "The loop was deleted",
+        "D": "Both cases became memory-bound"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "cmgt produces the mask, and produces the sum unconditionally with failing elements contributing zero. No branch means no misprediction, hence exactly 1.00x."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "When is rewriting a branch into branchless form a bad idea?",
+      "choices": {
+        "A": "When the branch is predictable, or when one side is expensive or has an effect, since branchless code performs both sides every time",
+        "B": "Whenever the data is sorted",
+        "C": "On processors with deep pipelines",
+        "D": "It is never a bad idea"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "A well-predicted branch already costs almost nothing, so removing it gains nothing while adding the other side's work. And a side with an effect cannot be executed unconditionally at all."
+    }
+  ]
+}

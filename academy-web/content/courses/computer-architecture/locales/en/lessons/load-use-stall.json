@@ -1,0 +1,202 @@
+{
+  "nodeId": "load-use-stall",
+  "locale": "en",
+  "title": "The one hazard forwarding cannot remove",
+  "objective": "By the end of this lesson you can explain why a load followed immediately by a use costs a cycle no matter what hardware is added, and recognise the same shape in code you write.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Forwarding solved the arithmetic hazard because the value existed one cycle before it was needed. Loads break that argument, and the reason is worth being precise about."
+    },
+    {
+      "kind": "code",
+      "caption": "A load whose value is used by the very next instruction",
+      "lines": [
+        "  ld   x5, 0(x6)       # the value arrives at the end of the memory stage",
+        "  add  x9, x5, x8      # needs it at the start of its execute stage",
+        "",
+        "  cycle:       1     2     3     4     5",
+        "  ld         | IF  | ID  | EX  | MEM | WB  |",
+        "                                  ^",
+        "                                  value arrives here, end of cycle 4",
+        "  add              | IF  | ID  | EX  | ...",
+        "                                ^",
+        "                                needed here, start of cycle 4",
+        "",
+        "  The value is needed at the start of the same cycle in which it arrives.",
+        "  Forwarding can move a value across space. It cannot move it back in time."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Why this one is different",
+      "text": "In the arithmetic case the result was ready in cycle 3 and needed in cycle 4 — a full cycle of slack, and forwarding spent it. Here the load's value is not ready until the end of cycle 4, and the add wants it at the start of cycle 4. There is no slack to spend. No amount of extra wiring changes that, because the problem is ordering in time, not distance in the circuit."
+    },
+    {
+      "kind": "heading",
+      "text": "The two remedies"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Remedy",
+        "Who does it",
+        "Cost"
+      ],
+      "rows": [
+        [
+          "Stall one cycle: hold the add back so the value arrives in time",
+          "Hardware, automatically",
+          "One wasted cycle, every time"
+        ],
+        [
+          "Put an unrelated instruction between the load and its use",
+          "The compiler, when it can find one",
+          "None, if such an instruction exists"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The second is why compiled code often looks shuffled compared with the source. A compiler that knows the target has a load-use penalty will try to move an independent instruction into that slot. When it cannot find one, the stall happens. This scheduling is one of the concrete things an optimiser does for you that is invisible in the source and obvious in the disassembly — which the assembly course reads directly."
+    },
+    {
+      "kind": "heading",
+      "text": "What it costs, measured"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The single-cycle stall above is the classic textbook penalty for a simple pipeline. A modern out-of-order processor hides much of it by running other instructions while the load resolves — but it can only do that if other instructions exist and do not themselves depend on the load. When every load's address comes from the previous load, there is nothing to run in the meantime."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured on an Apple M-series processor",
+      "lines": [
+        "  100,000,000 loads from the same 32 KB buffer, every one an L1 hit",
+        "",
+        "  dependent   (each address comes from the previous load) : 0.187 s   1.87 ns per load",
+        "  independent (addresses known in advance)                : 0.097 s   0.97 ns per load",
+        "  ratio                                                   : 1.94x",
+        "",
+        "/* The buffer is small enough to sit in the first-level cache, so neither loop",
+        "   ever waits for main memory. The only difference is whether the address of",
+        "   the next load is known before the current one finishes.",
+        "   Note: the second loop still has an accumulator chain of its own, so 0.97 ns",
+        "   is an upper bound on the independent case, not the machine's best. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Roughly twice the time for identical work, with identical cache behaviour. This is not a cache-miss effect — every access hit the first-level cache in both loops. It is purely the cost of the processor not knowing where to look next until the current load has returned."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "This is the honest explanation of 'linked lists are slow'",
+      "text": "The usual explanation is cache locality, and that is genuinely part of it. But the measurement above removes cache behaviour entirely — the whole buffer was 32 KB and stayed in L1 — and the dependent walk still cost about twice as much. Pointer chasing is slow because the address of the next access is a result of the current one. Improving locality reduces the miss cost; it does not remove the dependency."
+    },
+    {
+      "kind": "heading",
+      "text": "The same shape in code you write"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "node = node->next in a loop: every iteration waits for the previous load",
+        "table[hash(key)] where the hash is computed from a loaded value: two dependent accesses",
+        "A tree walk: each level's address comes from the level above",
+        "An array of indices used to index another array: the classic indirect access, two loads deep",
+        "for (i = 0; i < n; i++) sum += a[i]: no address dependency; the processor can run far ahead"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The last item is why an array walk can approach the memory system's full rate while a list walk of the same length cannot get near it. It is also the argument behind storing structures as separate arrays of fields rather than an array of structures: the fields you actually read become contiguous and independent, instead of arriving through a pointer you must load first."
+    },
+    {
+      "kind": "try",
+      "title": "Separate the two effects",
+      "steps": [
+        "Build an array of 4096 long values, each holding the index of the next: buf[i] = (i+1) % 4096",
+        "Time a loop that follows it: p = buf[p], 100 million times",
+        "Time a loop over the same buffer with a computed index instead: idx = (idx+1) & 4095",
+        "Confirm both fit in L1: 4096 x 8 bytes is 32 KB",
+        "Record the ratio, and note that neither loop can be missing the cache",
+        "Now shuffle the chain into random order and repeat the dependent walk",
+        "Grow the buffer to 64 MB and repeat both loops",
+        "Explain which of the four numbers changed because of dependency and which because of cache misses"
+      ],
+      "expected": "A dependent walk that costs about twice an independent one even entirely in cache, and a much larger gap once the buffer no longer fits. The point of the exercise is that these are two separate effects that are usually described as one. The 32 KB case isolates the dependency; the 64 MB case adds the cache miss on top of it, and the memory module is where the second one gets its own treatment."
+    }
+  ],
+  "cheatsheet": [
+    "A load's value arrives at the end of the memory stage, the cycle the next instruction wants it",
+    "Forwarding moves a value across the circuit; it cannot move it earlier in time",
+    "Remedy one: stall a cycle. Remedy two: schedule an unrelated instruction into the gap",
+    "Compilers reorder code to fill that slot, which is why disassembly looks shuffled",
+    "Measured entirely in L1: dependent 1.87 ns per load, independent 0.97 ns — 1.94x",
+    "That gap is not cache misses; both loops hit the first-level cache every time",
+    "Pointer chasing is slow because the next address is a result of the current load",
+    "Locality improvements reduce miss cost; they do not remove a dependency",
+    "Arrays of fields beat arrays of structures partly for this reason"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why can forwarding fully hide an arithmetic dependency but not a load-use dependency?",
+      "choices": {
+        "A": "Loads use a different register file",
+        "B": "The arithmetic result exists a cycle before it is needed, while the loaded value arrives in the same cycle it is needed",
+        "C": "Memory is slower than arithmetic",
+        "D": "Loads cannot be forwarded at all"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Forwarding spends slack. Arithmetic has a cycle of it; a load has none, because its value is ready at the end of exactly the cycle the next instruction starts."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A compiler moves an unrelated instruction between a load and the instruction that uses it. Why?",
+      "choices": {
+        "A": "To reduce code size",
+        "B": "To fill the cycle that would otherwise be a stall, since the unrelated instruction does not need the loaded value",
+        "C": "To improve cache locality",
+        "D": "To satisfy the calling convention"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The stall exists because nothing useful can run in that cycle. Giving the processor something independent to run removes the cost entirely."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A dependent walk and an independent walk over the same 32 KB buffer differed by 1.94x. What does the 32 KB size rule out as the explanation?",
+      "choices": {
+        "A": "Branch misprediction",
+        "B": "Cache misses — the whole buffer fits in the first-level cache, so both loops hit every time",
+        "C": "Compiler optimisation",
+        "D": "Clock frequency changes"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "That is the purpose of choosing 32 KB. With cache behaviour held identical, the remaining difference can only be the address dependency."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why does improving cache locality not fully fix pointer chasing?",
+      "choices": {
+        "A": "Pointers are larger than indices",
+        "B": "Locality reduces the cost of a miss, but the address of the next access is still a result of the current load",
+        "C": "Caches do not hold pointers",
+        "D": "It does fully fix it"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Two independent problems: how long each access takes, and whether the next access can start before this one finishes. Locality addresses the first only."
+    }
+  ]
+}
