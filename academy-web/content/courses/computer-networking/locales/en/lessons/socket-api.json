@@ -1,0 +1,245 @@
+{
+  "nodeId": "socket-api",
+  "locale": "en",
+  "title": "The seven calls that make a connection",
+  "objective": "By the end of this lesson you can name every call a client and a server make, explain what each one actually does, and write the address setup correctly on the first attempt.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "The socket interface has been essentially unchanged for decades, and it is small: a client makes three calls, a server makes four. Learning what each one changes about the socket's state is enough to write correct network code and to read anyone else's."
+    },
+    {
+      "kind": "heading",
+      "text": "The two sequences, side by side"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Server",
+        "Client",
+        "What it does"
+      ],
+      "rows": [
+        [
+          "socket()",
+          "socket()",
+          "Create an endpoint; you get a descriptor and nothing else"
+        ],
+        [
+          "bind()",
+          "—",
+          "Claim a local address and port"
+        ],
+        [
+          "listen()",
+          "—",
+          "Mark it as accepting connections, and set the queue depth"
+        ],
+        [
+          "accept()",
+          "connect()",
+          "The connection is established here"
+        ],
+        [
+          "read/write",
+          "read/write",
+          "Ordinary descriptor I/O, as the earlier lesson described"
+        ],
+        [
+          "close()",
+          "close()",
+          "Release it"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Note where the asymmetry is: a client does not bind, because it does not care which local port it gets — the kernel picks a free one. A server binds because clients must know where to find it."
+    },
+    {
+      "kind": "heading",
+      "text": "Creating and addressing"
+    },
+    {
+      "kind": "code",
+      "caption": "The constants, read from the system headers",
+      "lines": [
+        "int fd = socket(AF_INET, SOCK_STREAM, 0);",
+        "",
+        "  AF_INET     = 2    IPv4          AF_INET6    = 10   IPv6",
+        "  SOCK_STREAM = 1    TCP           SOCK_DGRAM  = 2    UDP",
+        "",
+        "/* Always use the names. The values differ between systems, which is",
+        "   the same lesson as the syscall numbers in the operating systems course. */"
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "Filling in an address — every field matters",
+      "lines": [
+        "struct sockaddr_in addr = {0};          /* zero it: unset fields must be zero */",
+        "addr.sin_family = AF_INET;",
+        "addr.sin_port   = htons(8080);          /* network byte order, always */",
+        "",
+        "/* For a server, choose what to listen on: */",
+        "addr.sin_addr.s_addr = htonl(INADDR_ANY);        /* every interface */",
+        "addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);   /* this machine only */",
+        "",
+        "/* For a client, convert a text address: */",
+        "if (inet_pton(AF_INET, \"192.0.2.10\", &addr.sin_addr) != 1) {",
+        "    /* not a valid address — check this, it is easy to skip */",
+        "}"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Two mistakes that cost hours",
+      "text": "Forgetting htons on the port is the first: the connection goes to a port nobody is listening on, and the error gives no hint. Forgetting to zero the address structure is the second: leftover stack contents in an unset field produce behaviour that varies between runs. Both are silent, and both are avoided by writing the structure the way shown above every time."
+    },
+    {
+      "kind": "heading",
+      "text": "What listen() actually sets up"
+    },
+    {
+      "kind": "paragraph",
+      "text": "listen() does not wait for anything. It marks the socket as passive and creates a queue for connections the kernel has completed but the program has not yet accepted. The second argument is how deep that queue may be."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The backlog is a queue depth, not a connection limit",
+      "text": "It bounds how many completed connections may wait for accept(), not how many the server can serve. If the program accepts promptly, a small backlog is fine; if it is slow, a large one only delays the point at which clients are refused. Verified on one system: SOMAXCONN, the ceiling the kernel applies, was 4096. Passing a larger number silently gets clamped to it."
+    },
+    {
+      "kind": "heading",
+      "text": "accept and connect"
+    },
+    {
+      "kind": "code",
+      "caption": "Where the connection actually comes into being",
+      "lines": [
+        "/* Server: returns a NEW descriptor for this one connection.",
+        "   The listening socket stays open and keeps accepting. */",
+        "struct sockaddr_in peer;",
+        "socklen_t plen = sizeof peer;",
+        "int conn = accept(listener, (struct sockaddr *)&peer, &plen);",
+        "",
+        "char ip[INET_ADDRSTRLEN];",
+        "inet_ntop(AF_INET, &peer.sin_addr, ip, sizeof ip);",
+        "printf(\"from %s:%d\\n\", ip, ntohs(peer.sin_port));",
+        "",
+        "/* Client: this is the call that performs the handshake. */",
+        "if (connect(fd, (struct sockaddr *)&addr, sizeof addr) < 0) {",
+        "    perror(\"connect\");   /* refused, timed out, unreachable — see the error lesson */",
+        "}"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The most common misunderstanding here is thinking accept() returns the listening socket. It returns a new descriptor for one connection; the listener is untouched and continues to accept. Confusing the two is what leads to a server that serves exactly one client and then stops."
+    },
+    {
+      "kind": "heading",
+      "text": "The option you will always need"
+    },
+    {
+      "kind": "code",
+      "caption": "Why a restarted server says 'address already in use'",
+      "lines": [
+        "int yes = 1;",
+        "setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes);",
+        "",
+        "/* Set this BEFORE bind(). Without it, restarting a server that had",
+        "   connections open fails, because the address is held for a period",
+        "   while old connections finish closing — the state the next lesson",
+        "   explains. This one line removes the most annoying part of",
+        "   developing a server. */"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Write both halves",
+      "steps": [
+        "Write a server: socket, SO_REUSEADDR, bind to loopback, listen, accept, print the peer address, close",
+        "Write a client: socket, connect, then close",
+        "Run the server, then the client, and confirm the peer address printed matches what ss shows",
+        "Deliberately omit htons on the port in the client and observe the failure",
+        "Deliberately skip zeroing the address structure and run it several times",
+        "Remove SO_REUSEADDR, connect once, kill the server, and restart it immediately — observe the bind failure",
+        "Put SO_REUSEADDR back and confirm the restart now succeeds",
+        "Run: ss -tlnp | grep <your port>    while the server is listening"
+      ],
+      "expected": "A working pair, and three failures you produced on purpose: a connection to the wrong port, behaviour that varies between runs, and a bind that fails on restart. Those three account for a large share of the time people lose writing their first socket program."
+    }
+  ],
+  "cheatsheet": [
+    "Server: socket, bind, listen, accept. Client: socket, connect. Both: read/write, close",
+    "A client does not bind — the kernel assigns a free local port",
+    "AF_INET 2, AF_INET6 10, SOCK_STREAM 1, SOCK_DGRAM 2 — always use the names",
+    "Zero the address structure, set the family, and htons the port",
+    "INADDR_ANY listens on every interface; INADDR_LOOPBACK on this machine only",
+    "inet_pton converts text to an address and returns 1 on success — check it",
+    "listen() sets a queue depth, not a connection limit; SOMAXCONN was 4096 on one system",
+    "accept() returns a NEW descriptor; the listener keeps listening",
+    "Set SO_REUSEADDR before bind, or restarting the server fails"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What does accept() return?",
+      "choices": {
+        "A": "The listening socket, now connected",
+        "B": "A new descriptor for one connection, leaving the listener free to accept more",
+        "C": "The client's address only",
+        "D": "The number of connections waiting"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Treating the return value as the listener is what produces a server that handles exactly one client and then stops accepting."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A client connects to port 8080 but reaches nothing, and the server is definitely listening. What is the first thing to check?",
+      "choices": {
+        "A": "The firewall",
+        "B": "Whether htons was applied to the port — without it the bytes are in the wrong order and the port number is different",
+        "C": "The address family",
+        "D": "The backlog"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "It is the most common first-time bug and it fails silently: the connection goes to a real but different port, so the error says only that nothing is listening there."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "What does the second argument to listen() control?",
+      "choices": {
+        "A": "The maximum number of clients the server may serve",
+        "B": "How many completed connections may queue waiting for accept()",
+        "C": "The timeout for accept",
+        "D": "The number of threads"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "It bounds the waiting queue, not the total served. The kernel also caps it — measured as 4096 on one system — so a larger value is silently clamped."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Restarting your server immediately after stopping it fails with 'address already in use'. What is the fix?",
+      "choices": {
+        "A": "Wait several minutes",
+        "B": "Set SO_REUSEADDR before bind()",
+        "C": "Use a different port each time",
+        "D": "Run it as root"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The address is held while previously open connections finish closing. That one setsockopt call, placed before bind, removes the problem entirely."
+    }
+  ]
+}

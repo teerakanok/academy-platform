@@ -1,0 +1,233 @@
+{
+  "nodeId": "tcp-handshake",
+  "locale": "en",
+  "title": "Establishing, and tearing down, a connection",
+  "objective": "By the end of this lesson you can describe what happens before connect() returns, read a connection's state from a running system, and recognise the two states that indicate a bug.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "connect() looks instantaneous. It is not — three messages cross the network before it returns, and a similar exchange happens at the end. Those states are visible on any running machine, and two of them are how you find a whole class of server bug."
+    },
+    {
+      "kind": "heading",
+      "text": "Three messages to start"
+    },
+    {
+      "kind": "code",
+      "caption": "What happens inside connect()",
+      "lines": [
+        "client                                server",
+        "  |                                     |  (listening)",
+        "  |----- I want to connect ------------>|",
+        "  |<---- agreed, and so do I -----------|",
+        "  |----- agreed ----------------------->|",
+        "  |                                     |",
+        "  | connect() returns              accept() returns",
+        "",
+        "/* Three messages, so establishing a connection costs one full round trip",
+        "   before any data moves. On a 100 ms link that is 100 ms of latency you",
+        "   pay before sending a single byte — which is why connection reuse matters",
+        "   so much, and why the second curl in the first lesson was faster. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Both sides also agree on where their byte numbering starts, which is what lets the receiver detect gaps and reorder what arrives. The starting numbers are chosen unpredictably, because a predictable choice would let an attacker who cannot see the traffic inject data into it."
+    },
+    {
+      "kind": "heading",
+      "text": "The states, seen on a real machine"
+    },
+    {
+      "kind": "code",
+      "caption": "Observed with netstat while a server ran",
+      "lines": [
+        "tcp4  127.0.0.1.19100   *.*                LISTEN",
+        "tcp4  127.0.0.1.19100   127.0.0.1.50327    TIME_WAIT",
+        "",
+        "# and across the whole machine at that moment:",
+        "  46  ESTABLISHED",
+        "  18  LISTEN",
+        "  13  CLOSE_WAIT     <- worth investigating",
+        "   4  TIME_WAIT"
+      ]
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "State",
+        "Meaning",
+        "Normal?"
+      ],
+      "rows": [
+        [
+          "LISTEN",
+          "A server waiting for connections",
+          "Yes"
+        ],
+        [
+          "ESTABLISHED",
+          "Data can flow both ways",
+          "Yes"
+        ],
+        [
+          "TIME_WAIT",
+          "This side closed first and is waiting before releasing the address",
+          "Yes, in numbers"
+        ],
+        [
+          "CLOSE_WAIT",
+          "The peer closed; this side has not called close()",
+          "A bug, if it persists"
+        ],
+        [
+          "SYN_SENT",
+          "connect() sent, no reply yet",
+          "Briefly"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Closing takes four messages, and is asymmetric"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Each direction is closed independently. One side says it has no more to send; the other acknowledges and may keep sending. Only when both directions are closed is the connection finished. This is why a socket can be readable after you have stopped writing to it, and why 'the client disconnected' does not automatically mean you may stop sending."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "CLOSE_WAIT that accumulates is always your bug",
+      "text": "It means the peer closed, your program was told — read() returned 0 — and it never called close(). The connection sits there holding a descriptor forever. A machine showing a large and growing number of them has a program that is not closing sockets, and the fix is always in that program, never in the kernel. Thirteen were present on the machine used for this lesson, which is a normal background level for a desktop but would be a warning sign on a busy server."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "TIME_WAIT is not a bug, and you should not try to remove it",
+      "text": "The side that closes first waits before releasing the address, so that any delayed packets from the old connection cannot be delivered to a new one that reuses the same address and port. Verified: a connection from this lesson's test sat in TIME_WAIT after both programs had exited. It is also why restarting a server needs SO_REUSEADDR — the option from the previous lesson exists precisely to work with this state, not against it."
+    },
+    {
+      "kind": "heading",
+      "text": "When establishing fails"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "What you get",
+        "Meaning",
+        "Where the problem is"
+      ],
+      "rows": [
+        [
+          "Connection refused, immediately",
+          "Something answered and said no",
+          "Nothing is listening on that port"
+        ],
+        [
+          "Timeout, after many seconds",
+          "Nothing answered at all",
+          "A firewall dropping silently, or the host is down"
+        ],
+        [
+          "No route to host",
+          "The network layer gave up",
+          "Routing or an interface is down"
+        ],
+        [
+          "Connection reset later",
+          "An established connection was aborted",
+          "The peer crashed, or a middlebox closed it"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The difference between refused and timed out is the most useful diagnostic distinction here. A refusal proves the packet reached the machine and something rejected it — a fast, honest answer. A timeout proves nothing reached anything that would reply, which points at filtering rather than a missing service."
+    },
+    {
+      "kind": "try",
+      "title": "Watch the states change",
+      "steps": [
+        "Start a server that accepts and then sleeps for 30 seconds before closing",
+        "In another terminal: watch -n1 'ss -tan | grep <your port>'    (or netstat -an | grep <port>)",
+        "Connect a client and watch the state go from nothing to ESTABLISHED",
+        "Close the client first and watch which side shows TIME_WAIT",
+        "Now close the server first instead and confirm TIME_WAIT moves to the other side",
+        "Write a server that accepts and then never closes; connect and disconnect a client, then look for CLOSE_WAIT",
+        "Connect to a port nothing is listening on and note how fast the refusal is",
+        "Connect to a filtered address (for example a public IP on a closed port) and note the timeout instead"
+      ],
+      "expected": "A connection you watched move through its states, TIME_WAIT appearing on whichever side closed first, and a CLOSE_WAIT you created on purpose by omitting close(). That last one is the skill worth having: recognising in a production listing that the bug is a missing close, and knowing it is in the program rather than the network."
+    }
+  ],
+  "cheatsheet": [
+    "Establishing takes three messages — one full round trip before any data",
+    "That round trip is why connection reuse and keep-alive matter",
+    "Starting sequence numbers are unpredictable, to prevent blind injection",
+    "Closing takes four messages and closes each direction independently",
+    "LISTEN and ESTABLISHED are normal; SYN_SENT is normal briefly",
+    "TIME_WAIT is normal: the side that closed first waits before releasing the address",
+    "SO_REUSEADDR exists to work with TIME_WAIT, not around a bug",
+    "CLOSE_WAIT that accumulates means your program is not calling close()",
+    "Refused = something answered no. Timeout = nothing answered at all"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A server shows hundreds of connections in CLOSE_WAIT, and the number keeps rising. Where is the problem?",
+      "choices": {
+        "A": "The kernel needs tuning",
+        "B": "In the server program — the peer closed, it was told, and it never called close()",
+        "C": "The clients are disconnecting badly",
+        "D": "The network is dropping packets"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "CLOSE_WAIT means the local side has been informed and has not responded by closing. Each one holds a descriptor, so the count only rises until the program runs out."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Connecting to one address is refused instantly; connecting to another times out after 30 seconds. What does the difference tell you?",
+      "choices": {
+        "A": "The second machine is slower",
+        "B": "The refusal reached the machine and got an answer; the timeout means nothing that would reply was reached, which points at filtering",
+        "C": "Both mean the service is down",
+        "D": "The second address is invalid"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A refusal is a fast honest answer and proves reachability. A timeout proves only silence, which is what a firewall configured to drop rather than reject produces."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why does establishing a TCP connection cost a full round trip before any data moves?",
+      "choices": {
+        "A": "The kernel must allocate buffers",
+        "B": "Three messages must cross before either side may send data",
+        "C": "DNS must be consulted",
+        "D": "Encryption is negotiated"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "On a link with meaningful latency this is paid before a single useful byte. It is the reason connection reuse and keep-alive make such a visible difference."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Should you configure the system to eliminate TIME_WAIT?",
+      "choices": {
+        "A": "Yes — it wastes resources",
+        "B": "No — it prevents delayed packets from an old connection being delivered to a new one on the same address and port",
+        "C": "Yes, on servers only",
+        "D": "It cannot be changed"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "It is a correctness mechanism. SO_REUSEADDR exists so that a server can restart while it is present, which is working with the state rather than removing it."
+    }
+  ]
+}

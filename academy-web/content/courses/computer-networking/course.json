@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 231,
+  "estimatedMinutes": 269,
   "coverMotif": "cloud",
   "skills": [
     {
@@ -186,6 +186,29 @@
       "skillWeights": {
         "socket-programming": 4,
         "server-design": 3
+      }
+    },
+    {
+      "id": "socket-api",
+      "kind": "lesson",
+      "prerequisites": [
+        "file-descriptors"
+      ],
+      "estimatedMinutes": 19,
+      "skillWeights": {
+        "socket-programming": 4
+      }
+    },
+    {
+      "id": "tcp-handshake",
+      "kind": "lesson",
+      "prerequisites": [
+        "socket-api"
+      ],
+      "estimatedMinutes": 19,
+      "skillWeights": {
+        "network-model": 3,
+        "troubleshooting": 3
       }
     }
   ]
