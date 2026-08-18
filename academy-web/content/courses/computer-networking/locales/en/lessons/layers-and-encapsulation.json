@@ -1,0 +1,241 @@
+{
+  "nodeId": "layers-and-encapsulation",
+  "locale": "en",
+  "title": "Layers, and the envelope around every message",
+  "objective": "By the end of this lesson you can say what each layer adds to a packet, compute how much of a packet is overhead, and use the layer model to decide where a fault actually is.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "When your program sends 'hello', five bytes leave your process and considerably more than five bytes go onto the wire. Each layer beneath you wraps what it was given in a header of its own — its addressing, its bookkeeping — and hands the result down. The receiving machine unwraps them in the opposite order. That wrapping is called encapsulation, and it is the single most useful mental model in networking."
+    },
+    {
+      "kind": "heading",
+      "text": "What each layer is responsible for"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Layer",
+        "Answers",
+        "Addresses by",
+        "Examples"
+      ],
+      "rows": [
+        [
+          "Application",
+          "What do these bytes mean?",
+          "—",
+          "HTTP, DNS, SSH"
+        ],
+        [
+          "Transport",
+          "Which program, and is it reliable?",
+          "Port number",
+          "TCP, UDP"
+        ],
+        [
+          "Network",
+          "Which machine, anywhere?",
+          "IP address",
+          "IPv4, IPv6"
+        ],
+        [
+          "Link",
+          "Which device on this local segment?",
+          "MAC address",
+          "Ethernet, Wi-Fi"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Read that table bottom-up and it describes a delivery: the link layer moves a frame to the next device on this wire, the network layer moves a packet across the world one hop at a time, the transport layer gets it to the right program and optionally guarantees it arrived, and the application layer is the only one that knows what the bytes mean."
+    },
+    {
+      "kind": "heading",
+      "text": "The cost of the envelopes, measured"
+    },
+    {
+      "kind": "code",
+      "caption": "Header sizes, read from the system headers themselves",
+      "lines": [
+        "ethernet header  : 14 bytes",
+        "IPv4 header (min): 20 bytes",
+        "IPv6 header      : 40 bytes",
+        "TCP header (min) : 20 bytes",
+        "UDP header       :  8 bytes",
+        "",
+        "/* Sending 5 bytes of 'hello' over TCP/IPv4/Ethernet:",
+        "     14 + 20 + 20 + 5 = 59 bytes on the wire",
+        "   The payload is 8% of it. Over IPv6 it is 14 + 40 + 20 + 5 = 79 bytes,",
+        "   and the payload is 6%. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "This is why small messages are expensive",
+      "text": "A protocol that sends each keystroke separately pays 54 bytes of headers for one byte of content. That overhead is the reason interactive protocols batch, why TCP has an algorithm that delays small sends to combine them, and why a chatty API that makes twenty small requests is so much slower than one that makes a single larger one. The header cost is fixed; only the payload is yours."
+    },
+    {
+      "kind": "heading",
+      "text": "MTU: the largest frame a link will carry"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Ethernet traditionally carries at most 1500 bytes of payload in one frame. Subtract 20 for IPv4 and 20 for TCP and you have 1460 bytes of application data — a number you will meet constantly. A message larger than that is split into several packets, and if a link somewhere along the path has a smaller limit than the sender assumed, the packets either get fragmented or are dropped with a message asking the sender to use a smaller size."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured on a link with MTU 1500",
+      "lines": [
+        "$ ping -c 1 -s 1472 1.1.1.1        # 1472 payload + 8 ICMP + 20 IP = 1500",
+        "1 packets transmitted, 1 packets received, 0.0% packet loss",
+        "round-trip min/avg/max = 89.291 ms",
+        "",
+        "$ ping -c 1 -s 1473 1.1.1.1        # one byte more",
+        "1 packets transmitted, 0 packets received, 100.0% packet loss",
+        "",
+        "# Exactly at the limit it works; one byte past it, nothing comes back."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The classic symptom: small things work, large things hang",
+      "text": "ssh connects and the prompt appears, but the moment you run a command with long output it freezes. A web page loads its HTML and then stalls. That pattern points at a path where the effective MTU is smaller than the sender believes and the messages that would tell it so are being blocked. Testing with progressively larger pings — the second exercise below — identifies it in under a minute."
+    },
+    {
+      "kind": "heading",
+      "text": "Using layers to locate a fault"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Symptom",
+        "Layer to suspect",
+        "First command"
+      ],
+      "rows": [
+        [
+          "No link, no address at all",
+          "Link",
+          "ip link show"
+        ],
+        [
+          "Address exists, cannot reach the gateway",
+          "Link or network",
+          "ip route; ping the gateway"
+        ],
+        [
+          "Gateway replies, the internet does not",
+          "Network",
+          "traceroute 1.1.1.1"
+        ],
+        [
+          "IP works, a name does not resolve",
+          "Application (DNS)",
+          "dig example.com"
+        ],
+        [
+          "Name resolves, connection refused",
+          "Transport",
+          "ss -tlnp on the server"
+        ],
+        [
+          "Connects, then behaves oddly",
+          "Application",
+          "tcpdump, or read the protocol"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The method is always the same: start at the bottom and stop at the first layer that fails. Diagnosing downward from the application wastes time, because a broken cable produces a DNS error message and it is easy to spend an hour on the wrong layer."
+    },
+    {
+      "kind": "try",
+      "title": "See the layers on your own machine",
+      "steps": [
+        "Run: ip link show        (link layer — interfaces and their MAC addresses)",
+        "Run: ip addr show        (network layer — the IP addresses on each of them)",
+        "Run: ip route            (where packets go that are not on your own segment)",
+        "Run: ss -tlnp | head     (transport layer — which ports are listening)",
+        "Run: ping -c 2 -M do -s 1472 1.1.1.1     (1472 + 8 ICMP + 20 IP = exactly 1500)",
+        "Run: ping -c 2 -M do -s 1473 1.1.1.1     (one byte too many — expect a failure)",
+        "Compare the two: the second should report that fragmentation was needed",
+        "Run: tcpdump -c 5 -n -i any port 53   in one terminal, then dig example.com in another"
+      ],
+      "expected": "An address at each layer, a working ping at exactly 1500 bytes and a failing one at 1501, and a capture showing your DNS query and its answer. That MTU boundary is worth finding by hand once — it turns a number you were told into a number you have observed on your own link."
+    }
+  ],
+  "cheatsheet": [
+    "Each layer wraps what it was handed and adds its own header; the receiver unwraps in reverse",
+    "Link addresses a device on this segment (MAC); network addresses a machine anywhere (IP)",
+    "Transport addresses a program (port); application is the only layer that knows what the bytes mean",
+    "Measured header sizes: ethernet 14, IPv4 20, IPv6 40, TCP 20, UDP 8",
+    "Sending 5 bytes over TCP/IPv4/Ethernet puts 59 bytes on the wire",
+    "Ethernet MTU is usually 1500, leaving 1460 bytes for TCP payload",
+    "Small things working while large things hang points at an MTU problem",
+    "Diagnose upward from the bottom layer and stop at the first that fails",
+    "ip link / ip addr / ip route / ss -tlnp — one command per layer"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Your program sends 5 bytes over TCP on IPv4 Ethernet. Roughly how many bytes are on the wire?",
+      "choices": {
+        "A": "5",
+        "B": "About 59 — 14 ethernet, 20 IPv4, 20 TCP, 5 payload",
+        "C": "About 25",
+        "D": "1500"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Verified from the system headers. The payload is about 8% of the frame, which is why protocols batch small messages rather than sending each one on its own."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "ssh connects and shows a prompt, but freezes as soon as a command produces long output. What do you suspect?",
+      "choices": {
+        "A": "A DNS problem",
+        "B": "An MTU problem — small packets pass while large ones are dropped somewhere on the path",
+        "C": "The server is out of memory",
+        "D": "A firewall blocking port 22"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Port 22 is clearly open, since the session was established. The size-dependent behaviour is the signature: test with ping -M do at increasing sizes to find where it stops."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why diagnose from the bottom layer upward rather than from the application down?",
+      "choices": {
+        "A": "Lower layers are faster to check",
+        "B": "A failure at a low layer surfaces as a confusing error at a high one, so starting at the top sends you to the wrong place",
+        "C": "Application tools are unreliable",
+        "D": "It is only a convention"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "An unplugged cable produces a DNS resolution error. Start at the bottom, stop at the first layer that fails, and you skip the misleading symptom entirely."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Which layer knows what the bytes actually mean?",
+      "choices": {
+        "A": "Transport, because it has ports",
+        "B": "Only the application layer",
+        "C": "Network, because it routes them",
+        "D": "Link, because it puts them on the wire"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "That separation is what makes the model work: the middle layers move opaque payloads and need no knowledge of the protocol inside, which is why a router can forward traffic for protocols invented after it was built."
+    }
+  ]
+}

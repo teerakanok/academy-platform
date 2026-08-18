@@ -1,0 +1,217 @@
+{
+  "nodeId": "how-machines-talk",
+  "locale": "en",
+  "title": "What actually happens when two machines talk",
+  "objective": "By the end of this lesson you can describe the path a message takes from one program to another across a network, name what has to be agreed in advance for it to work, and explain why the network is allowed to lose things.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "You have spent three courses inside one machine. Everything so far — a file descriptor, a system call, a page of memory — belonged to a single computer that you could reason about completely. A network breaks that assumption in one specific way: the other end is a machine you do not control, reached over a path that can lose, delay, duplicate or reorder what you send."
+    },
+    {
+      "kind": "heading",
+      "text": "The minimum that must be agreed"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Question",
+        "Answered by"
+      ],
+      "rows": [
+        [
+          "Which machine?",
+          "An address — the subject of the next module"
+        ],
+        [
+          "Which program on it?",
+          "A port number"
+        ],
+        [
+          "How are bytes represented?",
+          "A byte order convention, and the protocol's format"
+        ],
+        [
+          "Who speaks first, and what may they say?",
+          "The protocol itself"
+        ],
+        [
+          "What happens when something is lost?",
+          "The transport: TCP retransmits, UDP does not"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Nothing on that list is optional, and none of it is discovered at run time. Two programs that disagree on any row do not communicate — they produce a hang, or a stream of bytes that means nothing to the receiver."
+    },
+    {
+      "kind": "heading",
+      "text": "Byte order is agreed in advance, and it is not yours"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The C course established that a machine stores a multi-byte number in its own order, and that the order differs between architectures. On a network the order is fixed by the protocol — big-endian, historically called network byte order — regardless of what either machine uses internally."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured on a little-endian machine",
+      "lines": [
+        "uint16_t port = 8080;",
+        "",
+        "  8080 in host order   : 90 1f",
+        "  8080 in network order: 1f 90      <- htons() converted it",
+        "",
+        "/* Every port, every address, every length field in a header goes",
+        "   through htons/htonl on the way out and ntohs/ntohl on the way in.",
+        "   Forgetting one is the classic first networking bug: you connect",
+        "   to port 36895 instead of 8080, and nothing is listening there. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The network is allowed to fail"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A packet crossing the internet passes through equipment owned by organisations you have never heard of. Any of them may drop it — because a buffer was full, because a link went down, because a routing table changed mid-flight. This is not a defect being tolerated; it is the design. Making every link reliable would be impossibly expensive, so the network offers a cheap best-effort service and lets the endpoints add reliability if they want it."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "TCP",
+        "UDP"
+      ],
+      "rows": [
+        [
+          "Lost data",
+          "Detected and retransmitted",
+          "Gone, and you are not told"
+        ],
+        [
+          "Order",
+          "Delivered in the order sent",
+          "Whatever order it arrives in"
+        ],
+        [
+          "Duplicates",
+          "Removed",
+          "Delivered"
+        ],
+        [
+          "Connection",
+          "Established before data flows",
+          "None — each message stands alone"
+        ],
+        [
+          "Costs",
+          "Latency for setup, buffering, acknowledgements",
+          "Almost nothing"
+        ],
+        [
+          "Right for",
+          "Files, web pages, anything where a gap is corruption",
+          "Video calls, games, DNS lookups, telemetry"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "UDP is not 'TCP without the good parts'",
+      "text": "For a video call, retransmitting a frame from 400 ms ago is worse than useless: it arrives too late to display, and the bandwidth it consumed delayed the current frame. UDP is the right answer when late data has no value, or when the application can do a better job of recovery than a general-purpose algorithm can. The whole of QUIC — which now carries a large share of web traffic — is built on UDP for exactly this reason."
+    },
+    {
+      "kind": "heading",
+      "text": "What you will build"
+    },
+    {
+      "kind": "paragraph",
+      "text": "By the end of this course you will have written a TCP server and client in C, made them handle errors properly, and then rewritten the server three ways — a thread per connection, a pool of threads, and a single thread watching many connections at once — to see where each one stops scaling. Everything before that is the knowledge needed to make those programs correct rather than merely working on your own machine."
+    },
+    {
+      "kind": "try",
+      "title": "Look at the connections you already have",
+      "steps": [
+        "Run: ss -tunap 2>/dev/null | head -20    (every socket on this machine, with the program using it)",
+        "Identify one TCP connection and one UDP socket in that output",
+        "Run: ss -s          (a summary — how many sockets are open right now, by type)",
+        "Run: ping -c 3 1.1.1.1     and note the round-trip times and whether any packet was lost",
+        "Run: ping -c 3 -s 1400 1.1.1.1   and compare — a larger packet, the same path",
+        "Run: curl -s -o /dev/null -w 'connect=%{time_connect}s total=%{time_total}s\\n' https://example.com",
+        "Run it again immediately and compare the two connect times",
+        "Explain the difference out loud — that gap is what the rest of this course is about"
+      ],
+      "expected": "A list of live connections you can now name the parts of, a round-trip time that puts a number on distance, and a second curl that is faster than the first. If you cannot yet explain why, that is the correct state to start this course in — the answer involves DNS caching, connection setup, and TLS, and you will meet all three."
+    }
+  ],
+  "cheatsheet": [
+    "A network adds one thing: the other end is a machine you do not control",
+    "Must be agreed in advance: address, port, byte order, protocol, failure behaviour",
+    "Network byte order is big-endian — use htons/htonl and ntohs/ntohl every time",
+    "Measured: 8080 is 90 1f in host order and 1f 90 on the wire",
+    "The network is best-effort by design: it may lose, delay, duplicate or reorder",
+    "TCP adds reliability, ordering and deduplication; UDP adds nothing",
+    "UDP is right when late data is worthless — video, games, DNS, telemetry",
+    "ss -tunap lists sockets; ping measures round trip; curl -w times the phases"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A program sends a port number without calling htons. What is the likely symptom?",
+      "choices": {
+        "A": "A compiler warning",
+        "B": "It connects to a different port than intended — the bytes were interpreted in the other order",
+        "C": "The connection is slower",
+        "D": "Nothing, on modern hardware"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Verified: 8080 is 90 1f in host order and 1f 90 on the wire. Send the host-order bytes and the far end reads a different number entirely, so nothing is listening there."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why would a video call use UDP when TCP guarantees delivery?",
+      "choices": {
+        "A": "UDP is always faster",
+        "B": "A retransmitted frame arrives too late to display, and the delay it causes harms the current frame",
+        "C": "TCP cannot carry video",
+        "D": "UDP encrypts by default"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Reliability is only valuable if late data still has value. When it does not, retransmission spends bandwidth and adds delay for nothing."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why is the network allowed to drop packets rather than being built to never do so?",
+      "choices": {
+        "A": "It is a bug that has not been fixed",
+        "B": "Guaranteeing delivery at every hop would be prohibitively expensive, so the network is cheap and best-effort and the endpoints add reliability if they need it",
+        "C": "Only wireless networks drop packets",
+        "D": "Packets are dropped only under attack"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "This is the end-to-end principle: keep the middle simple and fast, and put the features that only some applications need at the edges."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "You run the same curl twice and the second is noticeably faster. Which explanation is NOT plausible?",
+      "choices": {
+        "A": "The DNS answer was cached",
+        "B": "The route through the internet became shorter",
+        "C": "A TLS session was resumed",
+        "D": "An existing connection was reused"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Routes do change, but not reliably between two commands seconds apart. Caching, session resumption and connection reuse are the everyday explanations — and all three are covered later in this course."
+    }
+  ]
+}

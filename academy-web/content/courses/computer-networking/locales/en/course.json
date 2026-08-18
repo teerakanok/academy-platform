@@ -1,0 +1,48 @@
+{
+  "locale": "en",
+  "title": "Computer Networking",
+  "subtitle": "From one packet on a wire to a server handling thousands of connections",
+  "audience": "For anyone comfortable in a Linux shell and able to read C, who wants to understand what happens between a program calling connect() and bytes arriving on another continent — and to be able to diagnose it when it does not work.",
+  "outcomes": [
+    "Explain what each layer adds to a packet, and read a real capture",
+    "Work out subnets, routes and address ranges without a calculator",
+    "Write a working TCP client and server in C, with error handling that is not optional",
+    "Choose between blocking, non-blocking and event-driven designs for a given load",
+    "Diagnose a broken connection with ping, traceroute, ss, dig and tcpdump",
+    "Explain why a server that works for ten clients fails for ten thousand, and what to do about it"
+  ],
+  "skillLabels": {
+    "network-model": "Network model",
+    "addressing": "Addressing and routing",
+    "socket-programming": "Socket programming",
+    "server-design": "Server design",
+    "troubleshooting": "Troubleshooting",
+    "network-security": "Network security"
+  },
+  "nodeTitles": {
+    "how-machines-talk": "What actually happens when two machines talk",
+    "layers-and-encapsulation": "Layers, and the envelope around every message",
+    "ip-addressing": "Addresses: how a machine is found",
+    "subnetting": "Splitting a network, and the arithmetic behind it",
+    "routing-basics": "How a packet chooses its next hop",
+    "arp-and-icmp": "Trace a packet from your machine to the internet",
+    "nat": "One public address, many private machines",
+    "ipv6": "The address space that does not run out",
+    "bgp-overview": "How the internet agrees on where things are",
+    "vpn-concepts": "Tunnels: carrying one network inside another",
+    "file-descriptors": "A socket is a file descriptor",
+    "blocking-vs-nonblocking": "Waiting, or not waiting",
+    "select-poll-epoll": "Watching many connections at once",
+    "socket-api": "The seven calls that make a connection",
+    "tcp-handshake": "Establishing, and tearing down, a connection",
+    "client-and-server": "Build a server and a client that talk",
+    "error-handling": "Every network call can fail, and how",
+    "dns-and-resolution": "From a name to an address",
+    "http-basics": "The protocol you use all day",
+    "thread-per-connection": "One thread per client, and where it breaks",
+    "thread-pool": "A fixed set of workers over a queue of connections",
+    "event-driven-and-c10k": "Serving thousands of connections from one thread",
+    "rpc-concepts": "Calling a function on another machine",
+    "grpc-and-protobuf": "Schemas, code generation, and why they matter"
+  }
+}

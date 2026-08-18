@@ -1,0 +1,67 @@
+{
+  "id": "computer-networking",
+  "slug": "computer-networking",
+  "version": "1.0.0",
+  "publicAvailability": "internal",
+  "defaultLocale": "en",
+  "availableLocales": [
+    "en",
+    "th"
+  ],
+  "level": "intermediate",
+  "estimatedMinutes": 33,
+  "coverMotif": "cloud",
+  "skills": [
+    {
+      "id": "network-model",
+      "maxScore": 100
+    },
+    {
+      "id": "addressing",
+      "maxScore": 100
+    },
+    {
+      "id": "socket-programming",
+      "maxScore": 100
+    },
+    {
+      "id": "server-design",
+      "maxScore": 100
+    },
+    {
+      "id": "troubleshooting",
+      "maxScore": 100
+    },
+    {
+      "id": "network-security",
+      "maxScore": 100
+    }
+  ],
+  "globalSkillWeights": {
+    "foundations": 0.75,
+    "security-ops": 0.25
+  },
+  "nodes": [
+    {
+      "id": "how-machines-talk",
+      "kind": "lesson",
+      "prerequisites": [],
+      "estimatedMinutes": 15,
+      "skillWeights": {
+        "network-model": 4
+      }
+    },
+    {
+      "id": "layers-and-encapsulation",
+      "kind": "lesson",
+      "prerequisites": [
+        "how-machines-talk"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "network-model": 4,
+        "troubleshooting": 2
+      }
+    }
+  ]
+}
