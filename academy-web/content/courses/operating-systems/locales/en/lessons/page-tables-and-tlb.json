@@ -1,0 +1,173 @@
+{
+  "nodeId": "page-tables-and-tlb",
+  "locale": "en",
+  "title": "From virtual to physical: page tables and the TLB",
+  "objective": "By the end of this lesson you can describe how one address is translated, explain why the translation is cached in hardware, and say why a program's memory access pattern changes its speed even when it touches the same amount of data.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Every memory access your program makes needs a translation from the virtual address it used to a physical address in RAM. That happens on every load and every store, billions of times a second. Understanding how it is made fast explains a class of performance behaviour that otherwise looks like magic."
+    },
+    {
+      "kind": "heading",
+      "text": "Memory is handled in pages"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Translation does not happen per byte — it happens per page. Verified on this system: the page size is 4096 bytes. An address therefore splits in two: the upper bits select a page, and the lower bits are an offset within it. With 4 KB pages, the low 12 bits are the offset and never need translating."
+    },
+    {
+      "kind": "code",
+      "caption": "Splitting a virtual address",
+      "lines": [
+        "virtual address:  [ page number        | offset (12 bits) ]",
+        "                          |                     |",
+        "                          v                     |",
+        "                  page table lookup             |",
+        "                          |                     |",
+        "                          v                     v",
+        "physical address: [ frame number       | offset (12 bits) ]",
+        "",
+        "/* The offset passes through untouched. Only the page number is translated. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The table is a tree, for a good reason"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A flat table mapping every possible page would be enormous and almost entirely empty, because a process uses a tiny fraction of its address space. So the table is a tree of several levels, and a branch that maps nothing does not exist. The cost is that translating one address means several memory reads to walk the tree — which would be ruinous if it happened on every access."
+    },
+    {
+      "kind": "heading",
+      "text": "The TLB: a cache of translations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The processor keeps a small, very fast cache of recently used translations, the TLB. A hit costs essentially nothing. A miss means walking the page table in memory, and only then proceeding with the access you originally wanted. The TLB holds on the order of a few hundred to a couple of thousand entries — so with 4 KB pages, it covers a few megabytes of actively used memory at a time."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Why the TLB's small size shapes performance",
+      "text": "A few hundred to a couple of thousand entries at 4 KB each covers only a few megabytes of actively used memory. A program working within that window finds its translations cached; one whose working set is spread far wider pays a page-table walk far more often. The performance consequences of memory access patterns — locality, cache lines, and how to lay data out for them — are developed properly in the computer architecture course; what belongs here is the reason the window exists and how large it is."
+    },
+    {
+      "kind": "heading",
+      "text": "Huge pages: fewer translations to hold"
+    },
+    {
+      "kind": "paragraph",
+      "text": "If each entry covers 2 MB instead of 4 KB, the same TLB covers 512 times as much memory. Linux can do this transparently for large anonymous mappings, and the effect is directly measurable — not in the TLB, which is hard to observe, but in the number of page faults, since one fault now populates 2 MB."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured: same 256 MB, same loop, one madvise different",
+      "lines": [
+        "MADV_HUGEPAGE     touched 65,536 4KB-pages ->     128 minor faults   (2048 KB per fault)",
+        "MADV_NOHUGEPAGE   touched 65,536 4KB-pages ->  65,536 minor faults   (   4 KB per fault)",
+        "",
+        "# A 512x difference in translation-structure work, from one hint to the kernel."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Huge pages are a trade, not a free win",
+      "text": "Larger pages mean coarser granularity: a mapping that needs only a few kilobytes still consumes a 2 MB page, and the kernel sometimes has to compact memory to produce a contiguous 2 MB region, which costs latency at an unpredictable moment. Databases often enable them deliberately for their buffer pool and disable them system-wide for exactly this reason. Enable them where you have measured a benefit, not by default."
+    },
+    {
+      "kind": "heading",
+      "text": "Why a context switch is not free"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Each process has its own page table, so switching between processes means switching the translation root — and translations cached for the old process are no longer valid for the new one. Modern processors tag TLB entries with an address space identifier so the whole cache does not have to be discarded, but the new process still starts with none of its own translations cached. This is a large part of why switching between processes costs more than switching between threads of one process, which share a page table entirely."
+    },
+    {
+      "kind": "try",
+      "title": "Measure translation cost without needing hardware counters",
+      "steps": [
+        "Allocate 256 MB with mmap and write one byte to every 4096th address",
+        "Print minor faults from getrusage before and after, and divide the region size by the fault count",
+        "Add madvise(p, N, MADV_HUGEPAGE) before the loop and repeat",
+        "Add madvise(p, N, MADV_NOHUGEPAGE) instead and repeat — compare all three",
+        "Read: cat /sys/kernel/mm/transparent_hugepage/enabled   to see this machine's default",
+        "Read: grep -E 'AnonHugePages|VmRSS|VmSize' /proc/self/status from inside the program after touching",
+        "Run: cat /proc/self/smaps | head -20    (per-mapping detail, including huge page use)",
+        "Optional, if perf is available: perf stat -e dTLB-load-misses,page-faults ./yourprog"
+      ],
+      "expected": "A clean 512-to-1 difference in fault count between huge and normal pages, on identical work. If you try to measure translation cost by timing a loop instead, be careful: at -O2 the optimiser will often delete a loop whose result is unused, and you will time nothing at all — the same trap as in the race-conditions lesson. Fault counts are the reliable observable here."
+    }
+  ],
+  "cheatsheet": [
+    "Translation happens per page, not per byte; verified page size here is 4096 bytes",
+    "An address splits into page number (translated) and offset (passed through)",
+    "The page table is a multi-level tree so unmapped regions cost nothing",
+    "The TLB caches recent translations; a miss means walking that tree",
+    "A TLB covers only a few MB at 4 KB per entry — so access pattern matters",
+    "Locality decides how often you pay a walk — the performance side is developed in the architecture course",
+    "Huge pages: 2 MB per entry, measured at 512x fewer faults for the same region",
+    "Huge pages trade granularity and can cause compaction pauses — enable deliberately",
+    "Process switches change the page table; thread switches do not"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why is the page table a multi-level tree instead of one flat array?",
+      "choices": {
+        "A": "Trees are faster to search",
+        "B": "A flat table covering the whole address space would be enormous and almost entirely empty; a tree omits the unmapped parts",
+        "C": "The hardware cannot address a large array",
+        "D": "To support multiple processes"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A process maps a tiny fraction of its possible addresses. The tree makes the unused parts cost nothing, at the price of several reads per translation — which is what the TLB then hides."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A TLB holds on the order of a thousand entries. At 4 KB per entry, roughly how much actively used memory does it cover?",
+      "choices": {
+        "A": "A few gigabytes",
+        "B": "A few megabytes",
+        "C": "A few kilobytes",
+        "D": "The whole address space"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A thousand entries times 4 KB is about four megabytes. That window is why huge pages help large working sets: the same number of entries then covers 512 times as much memory."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "What did the measured 512-to-1 difference in minor faults between MADV_HUGEPAGE and MADV_NOHUGEPAGE show?",
+      "choices": {
+        "A": "Huge pages use less memory",
+        "B": "One fault populated 2 MB instead of 4 KB, so the same region needed 512 times fewer translation-structure operations",
+        "C": "Huge pages avoid the page table entirely",
+        "D": "MADV_NOHUGEPAGE disables caching"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "2 MB divided by 4 KB is 512. The fault count is an observable proxy for work the TLB and page-table machinery would otherwise do."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why does switching between two processes cost more than switching between two threads of one process?",
+      "choices": {
+        "A": "Processes have more registers",
+        "B": "Processes have separate page tables, so the translation root changes and the new process starts with none of its translations cached",
+        "C": "Threads do not need scheduling",
+        "D": "Processes must be reloaded from disk"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Threads share one address space and therefore one page table. That shared translation state is a large part of why they are cheaper to switch between."
+    }
+  ]
+}

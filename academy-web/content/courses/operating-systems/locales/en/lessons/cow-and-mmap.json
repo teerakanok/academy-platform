@@ -1,0 +1,217 @@
+{
+  "nodeId": "cow-and-mmap",
+  "locale": "en",
+  "title": "Copy-on-write and mapping files into memory",
+  "objective": "By the end of this lesson you can explain why fork does not copy memory, demonstrate copy-on-write by counting faults, and choose correctly between MAP_SHARED and MAP_PRIVATE.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Two features fall out of the paging machinery, and both look impossible until you know how they work: a fork that copies gigabytes instantly, and a file you can read by dereferencing a pointer. This capstone is where the module's pieces combine."
+    },
+    {
+      "kind": "heading",
+      "text": "fork does not copy your memory"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The fork lesson said a child gets a copy of the parent's memory. That is what it observes, not what happens. The kernel copies only the page table, marks every writable page read-only in both processes, and returns. Nothing is duplicated. The first time either process writes to a page, the hardware traps, the kernel makes a private copy of just that page, marks it writable for the writer, and the instruction resumes."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured: 64 MB, copied one page at a time, only when written",
+      "lines": [
+        "parent RSS before fork : 66,624 kB",
+        "child  RSS after fork  : 66,072 kB          <- nothing copied yet",
+        "child  RSS after writing every page : 66,644 kB   (minor faults +16,384)",
+        "parent RSS after child : 66,752 kB          <- the parent's data is untouched",
+        "",
+        "# 16,384 faults x 4 KB = 64 MB. One fault per page, and only for pages written."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Why fork-then-exec is not wasteful",
+      "text": "The pattern from the process module looks alarming — duplicate the whole process, then immediately discard it by exec'ing something else. Copy-on-write is why it costs almost nothing: between the fork and the exec, the child writes to almost no pages, so almost nothing is ever copied. The design that seemed wasteful is cheap precisely because of this mechanism."
+    },
+    {
+      "kind": "paragraph",
+      "text": "It also explains a memory pattern that surprises people: a parent with a large heap forks a child, the child writes across that heap, and the machine's memory use climbs afterwards rather than at the moment of forking. Nothing leaked. The copies were deferred, and then they happened."
+    },
+    {
+      "kind": "heading",
+      "text": "Mapping a file into your address space"
+    },
+    {
+      "kind": "paragraph",
+      "text": "mmap places a file's contents at an address range. Reading that memory reads the file — through the same demand paging as everything else, so nothing is loaded until touched. Writing it can write the file back, depending on one flag."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "MAP_SHARED",
+        "MAP_PRIVATE"
+      ],
+      "rows": [
+        [
+          "Your writes",
+          "Go to the file, and to every other process mapping it",
+          "Stay in your own copy"
+        ],
+        [
+          "Backed by",
+          "The file",
+          "The file for reads; private copies once written"
+        ],
+        [
+          "Use for",
+          "Shared memory between processes; editing a file in place",
+          "Reading a file; loading a library's code"
+        ],
+        [
+          "Copy-on-write",
+          "No — writes are shared",
+          "Yes — this is the same mechanism as fork"
+        ]
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "Verified behaviour of both flags",
+      "lines": [
+        "MAP_SHARED : wrote 'S' through the mapping",
+        "             first byte in the file afterwards : 'S'      <- the file changed",
+        "",
+        "MAP_PRIVATE: wrote 'P' through the mapping",
+        "             what the mapping showed           : 'P'",
+        "             first byte in the file afterwards : 'S'      <- the file did NOT change",
+        "",
+        "MAP_SHARED|MAP_ANONYMOUS across fork:",
+        "             parent sees : \"changed by child\"            <- genuinely shared",
+        "MAP_PRIVATE|MAP_ANONYMOUS across fork:",
+        "             parent sees : \"written by parent\"           <- copy-on-write"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "When mapping a file beats reading it"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "mmap suits",
+        "read/write suits"
+      ],
+      "rows": [
+        [
+          "Random access across a large file",
+          "Streaming through data once"
+        ],
+        [
+          "Sharing the same data between processes",
+          "Pipes, sockets, terminals — anything not a file"
+        ],
+        [
+          "Treating file contents as a data structure",
+          "Files that may be truncated by someone else"
+        ],
+        [
+          "Avoiding a copy into your own buffer",
+          "Simple, portable code"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Two ways mmap fails badly",
+      "text": "First: if another process truncates the file while you have it mapped, touching the removed region raises SIGBUS — a crash, not an error return, which is why network filesystems and shared temporary files are risky targets. Second: the writes you make through a MAP_SHARED mapping reach the file when the kernel decides, not when you return; msync forces them. Code that maps a file, writes, and exits without msync can lose the write if the machine goes down."
+    },
+    {
+      "kind": "try",
+      "title": "Prove both mechanisms",
+      "steps": [
+        "Allocate 64 MB with malloc, fill it, and print RSS from /proc/self/status",
+        "fork, and in the child print RSS immediately — it should be similar, not doubled",
+        "In the child, record minor faults, write one byte per page across the whole region, and record them again",
+        "Confirm the increase is about 16,384 — the region size divided by the page size",
+        "Confirm the parent's data still holds its original values",
+        "Now create a file, map it MAP_SHARED, write through the mapping, msync, and read the file with cat",
+        "Repeat with MAP_PRIVATE and confirm the file is unchanged while the mapping shows your write",
+        "Finally map with MAP_SHARED|MAP_ANONYMOUS, fork, have the child write, and confirm the parent sees it"
+      ],
+      "expected": "A fork that copies nothing, a fault count that matches the region size exactly, and four clear demonstrations of what each flag means. The last one is worth remembering as a technique: MAP_SHARED|MAP_ANONYMOUS across a fork is the simplest shared memory between related processes there is."
+    }
+  ],
+  "cheatsheet": [
+    "fork copies the page table, not the pages; both sides are marked read-only",
+    "The first write to a page traps and copies just that page — copy-on-write",
+    "Measured: writing 64 MB after a fork cost 16,384 faults, one per 4 KB page",
+    "fork-then-exec is cheap because the child writes almost nothing before exec",
+    "Memory use climbing after a fork, not during it, is deferred copying — not a leak",
+    "mmap maps a file into your address space; pages load on demand",
+    "MAP_SHARED: writes reach the file and other mappers. MAP_PRIVATE: writes stay yours",
+    "Verified: a MAP_PRIVATE write left the file's byte unchanged",
+    "Truncating a mapped file causes SIGBUS in the mapper — a crash, not an error code",
+    "msync forces MAP_SHARED writes out; without it, timing is the kernel's choice"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A parent with a 4 GB heap forks. How much memory is copied at the moment of the fork?",
+      "choices": {
+        "A": "4 GB",
+        "B": "Essentially none — only the page table is copied and the pages are marked read-only",
+        "C": "Half, on average",
+        "D": "It depends on available RAM"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Copying is deferred until a write. Verified: a child's resident memory right after forking a 64 MB region was unchanged, and copies happened one page at a time as it wrote."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "You map a file MAP_PRIVATE and write through the mapping. What happens to the file?",
+      "choices": {
+        "A": "It is updated immediately",
+        "B": "It is unchanged — your write went to a private copy of that page",
+        "C": "It is updated when you call munmap",
+        "D": "The write fails with EACCES"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Verified directly: after a MAP_PRIVATE write the mapping showed the new byte while the file still held the old one. MAP_SHARED is the flag that writes through."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Memory use on a server climbs sharply a few seconds after each fork, not at the fork itself. What is happening?",
+      "choices": {
+        "A": "A memory leak in the child",
+        "B": "Deferred copy-on-write copies happening as the child writes to inherited pages",
+        "C": "The parent is growing",
+        "D": "Swap is being reclaimed"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The fork was free precisely because the copying had not happened yet. It happens later, as pages are written — which is also why the growth tracks writes rather than the fork."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Your process has a file mapped and another process truncates that file. What happens when you touch the removed region?",
+      "choices": {
+        "A": "You read zeros",
+        "B": "SIGBUS — the process crashes rather than receiving an error return",
+        "C": "The mapping shrinks automatically",
+        "D": "munmap is called for you"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "There is no return value to check on a memory access, so the failure arrives as a signal. This is the main reason to be careful mapping files that others can modify."
+    }
+  ]
+}

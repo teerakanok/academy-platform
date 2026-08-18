@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 273,
+  "estimatedMinutes": 349,
   "coverMotif": "layers",
   "skills": [
     {
@@ -214,6 +214,51 @@
       "skillWeights": {
         "processes": 3,
         "concurrency": 2
+      }
+    },
+    {
+      "id": "address-space",
+      "kind": "lesson",
+      "prerequisites": [
+        "fork-exec-wait"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "virtual-memory": 4
+      }
+    },
+    {
+      "id": "page-tables-and-tlb",
+      "kind": "lesson",
+      "prerequisites": [
+        "address-space"
+      ],
+      "estimatedMinutes": 19,
+      "skillWeights": {
+        "virtual-memory": 4
+      }
+    },
+    {
+      "id": "demand-paging",
+      "kind": "lesson",
+      "prerequisites": [
+        "page-tables-and-tlb"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "virtual-memory": 4
+      }
+    },
+    {
+      "id": "cow-and-mmap",
+      "kind": "capstone",
+      "prerequisites": [
+        "demand-paging"
+      ],
+      "estimatedMinutes": 21,
+      "skillWeights": {
+        "virtual-memory": 4,
+        "processes": 3
       }
     }
   ]

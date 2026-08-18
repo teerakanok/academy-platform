@@ -1,0 +1,193 @@
+{
+  "nodeId": "demand-paging",
+  "locale": "en",
+  "title": "Paging on demand, and what a page fault really is",
+  "objective": "By the end of this lesson you can explain why a page fault is normal rather than an error, tell a minor fault from a major one, and read a machine's fault counters to tell healthy from thrashing.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "The word 'fault' is unfortunate. A page fault is not a bug and usually not even a problem — it is the normal mechanism by which memory comes into existence. Your program touches an address, the hardware finds no physical page behind it, the kernel supplies one, and your instruction resumes as if nothing had happened."
+    },
+    {
+      "kind": "heading",
+      "text": "Why nothing is loaded until it is needed"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When you start a program, the kernel does not read the executable into memory. It creates mappings, and then does nothing. The first instruction executes, faults, and the kernel reads in that page. Only the parts of a program that actually run are ever loaded — which is why starting a large application is far faster than its size suggests, and why a 256 MB allocation costs nothing until it is written to."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured earlier in this module",
+      "lines": [
+        "after mmap 256 MB  VSZ = 264,340 kB    RSS =   1,192 kB   <- reserved, nothing loaded",
+        "after touching     VSZ = 264,340 kB    RSS = 263,424 kB   <- pages appeared on demand",
+        "",
+        "# Nothing was read from anywhere for anonymous memory — the kernel supplied",
+        "# zeroed pages, one fault at a time, as each was first written."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Minor and major: the distinction that matters operationally"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "Minor fault",
+        "Major fault"
+      ],
+      "rows": [
+        [
+          "What happened",
+          "No disk access was needed",
+          "The data had to be read from disk"
+        ],
+        [
+          "Typical cause",
+          "First touch of new memory; copy-on-write; page already in the cache",
+          "Executable page not yet read; a page that was swapped out"
+        ],
+        [
+          "Cost",
+          "Sub-microsecond",
+          "Milliseconds on a spinning disk; tens of microseconds on NVMe"
+        ],
+        [
+          "Normal rate",
+          "Millions — this is routine",
+          "Should be low and stable after startup"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Minor fault counts are large and healthy",
+      "text": "Measured in this module: writing to a 64 MB region after a fork produced 16,384 minor faults, exactly 64 MB divided by the 4 KB page size. Touching a fresh 256 MB anonymous mapping produced faults at the same rate, or 512 times fewer when huge pages were in play. Large minor-fault counts describe a program using memory, not a program misbehaving."
+    },
+    {
+      "kind": "heading",
+      "text": "When memory runs short"
+    },
+    {
+      "kind": "paragraph",
+      "text": "If there is no free physical page when one is needed, the kernel must take one from somewhere: discard a clean page that can be re-read from its file, write out a dirty page to swap, or shrink the file cache. All of these are ordinary. It becomes a problem only when the pages being evicted are the ones about to be needed again."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Thrashing: the system is busy doing nothing",
+      "text": "When the working set does not fit in RAM, every eviction is quickly followed by a fault to bring the same page back. Major faults climb, disk I/O saturates, and CPU utilisation stays low because everything is waiting. The signature is distinctive: high I/O, low CPU, and a system that responds in seconds rather than milliseconds. Adding CPU does not help. Either reduce the working set or add memory."
+    },
+    {
+      "kind": "code",
+      "caption": "Reading the counters",
+      "lines": [
+        "$ ps -o pid,min_flt,maj_flt,rss,comm -p <pid>",
+        "# min_flt large and growing = normal use",
+        "# maj_flt growing steadily after startup = reading from disk repeatedly",
+        "",
+        "$ vmstat 1",
+        "# si/so columns non-zero and sustained = swapping in and out = thrashing",
+        "# wa (io wait) high while us/sy are low = waiting on disk, not computing",
+        "",
+        "$ cat /proc/<pid>/status | grep -E 'VmRSS|VmSwap'",
+        "# VmSwap large = this process's pages have been pushed to disk"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The out-of-memory killer"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Because reserving memory is free and only touching it is real, a system can promise more than it has. Usually that is fine, since most reserved memory is never touched. When the promise cannot be kept, the kernel chooses a process and kills it. It leaves a message in the kernel log naming its victim and the score it used — so a service that 'just disappeared' with no crash in its own logs is a case for dmesg before anything else."
+    },
+    {
+      "kind": "try",
+      "title": "Watch memory appear",
+      "steps": [
+        "Write a program that mmaps 512 MB and then sleeps, without touching it",
+        "In another terminal: ps -o pid,vsz,rss,min_flt -p <pid>     — note the RSS",
+        "Have the program touch one byte per page across the whole region, then sleep again",
+        "Check the same numbers — RSS should now approach 512 MB and min_flt should have risen by about 131,072",
+        "Divide the region size by the fault increase and confirm you get the page size",
+        "Run: vmstat 1 in one terminal while the program runs, and watch the free and si/so columns",
+        "Run: ps -o pid,min_flt,maj_flt,comm -e --sort=-min_flt | head    (the busiest processes)",
+        "Read: dmesg | grep -i 'out of memory' | tail    (any past OOM kills on this machine)"
+      ],
+      "expected": "RSS that climbs only as pages are touched, a fault count that divides cleanly by the page size, and counters you now know how to read. The last two commands are the ones you will actually use later — one shows which process is faulting hardest, the other explains a disappearance."
+    }
+  ],
+  "cheatsheet": [
+    "A page fault is the normal mechanism for supplying memory, not an error",
+    "Programs are loaded lazily — only the pages actually used are ever read",
+    "Minor fault: no disk needed. Major fault: had to read from disk",
+    "Minor faults in the millions are normal; major faults should settle after startup",
+    "Measured: writing 64 MB after a fork produced 16,384 minor faults (64 MB / 4 KB)",
+    "Thrashing signature: high I/O, low CPU, high major faults, seconds-long response",
+    "vmstat 1 — sustained si/so means swapping; high wa with low us/sy means waiting on disk",
+    "Reserving is free, so the system can overcommit; the OOM killer resolves broken promises",
+    "A service that vanished with nothing in its own log: check dmesg first"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A process shows 4 million minor faults and 12 major faults. What does that indicate?",
+      "choices": {
+        "A": "A serious memory problem",
+        "B": "Normal operation — minor faults are how memory is supplied, and major faults are rare after startup",
+        "C": "It is thrashing",
+        "D": "A memory leak"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Minor faults scale with memory used. It is the major-fault rate, and whether it keeps climbing, that tells you about disk pressure."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A machine is slow. CPU is 15%, I/O wait is high, and vmstat shows sustained si/so. What is happening?",
+      "choices": {
+        "A": "Too few cores",
+        "B": "Thrashing — the working set does not fit in RAM, so pages are constantly evicted and faulted back in",
+        "C": "A deadlock",
+        "D": "A network problem"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Low CPU with high I/O wait means the system is waiting, not computing. Sustained swap in and out is the specific signature. More CPU will not help; less working set or more memory will."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why does starting a 500 MB application not read 500 MB from disk?",
+      "choices": {
+        "A": "The file is compressed",
+        "B": "The kernel only maps it, and reads each page on the fault caused by first touching it — most of it is never touched",
+        "C": "It is loaded in the background after startup",
+        "D": "Only the first megabyte is executable"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Demand paging means startup cost is proportional to what actually runs, not to the size of the file."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "A service disappeared with no error in its own logs. Where do you look first?",
+      "choices": {
+        "A": "The application log again, more carefully",
+        "B": "dmesg — the OOM killer records which process it chose and why",
+        "C": "The scheduler",
+        "D": "Disk space"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A process killed by the kernel gets no chance to log anything. The kernel log is the only place the decision is recorded."
+    }
+  ]
+}

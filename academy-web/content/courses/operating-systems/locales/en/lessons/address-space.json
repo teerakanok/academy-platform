@@ -1,0 +1,243 @@
+{
+  "nodeId": "address-space",
+  "locale": "en",
+  "title": "What a process sees: the virtual address space",
+  "objective": "By the end of this lesson you can read a process's memory map, explain why two processes can use the same address for different data, and tell the difference between memory reserved and memory actually used.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Every address your program uses is invented. The pointer values you printed in the C course are not locations in the physical memory chips — they are indices into a private map that the kernel maintains for your process. Two programs can both use address 0x7fff00001000 and never see each other's data, because the same virtual address translates to different physical memory for each one."
+    },
+    {
+      "kind": "heading",
+      "text": "What this buys"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Isolation: your process cannot name a physical address belonging to another, so it cannot read one",
+        "Simplicity: every program can be compiled as if it owned a clean, contiguous space",
+        "Flexibility: the physical pages behind you can move, be shared, or not exist yet, and your addresses never change",
+        "Overcommit: the space you reserve can be far larger than the machine's memory, because reserving is not using"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Reading the map"
+    },
+    {
+      "kind": "code",
+      "caption": "A real /proc/self/maps, trimmed",
+      "lines": [
+        "$ cat /proc/self/maps",
+        "",
+        "aaaaeafd9000-aaaaeaffa000 rw-p ...                        [heap]",
+        "ffff9be40000-ffff9bfcc000 r-xp ...  /usr/lib/.../libc.so.6   <- code: read + execute",
+        "ffff9bfcc000-ffff9bfdc000 ---p ...  /usr/lib/.../libc.so.6   <- a guard: no access at all",
+        "ffff9bfdc000-ffff9bfe0000 r--p ...  /usr/lib/.../libc.so.6   <- constants: read only",
+        "ffff9bfe0000-ffff9bfe2000 rw-p ...  /usr/lib/.../libc.so.6   <- its writable data",
+        "ffffcee83000-ffffceea4000 rw-p ...                        [stack]",
+        "",
+        "# columns: address range | permissions | ... | what it is",
+        "# p = private (a write goes to your copy). r/w/x are what you may do."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Notice the four consecutive entries for the C library. Its executable code is read-and-execute but not writable; its constants are read-only; its variables are read-write but not executable; and between them sits a region with no permissions at all. Those permissions are enforced by the hardware on every access, and they are why overwriting a function's code is not something a stray pointer can do by accident."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Region",
+        "Holds",
+        "Grows"
+      ],
+      "rows": [
+        [
+          "Code (r-xp)",
+          "Machine instructions",
+          "Fixed"
+        ],
+        [
+          "Read-only data (r--p)",
+          "String literals, constants",
+          "Fixed"
+        ],
+        [
+          "Data (rw-p)",
+          "Globals and static variables",
+          "Fixed"
+        ],
+        [
+          "Heap",
+          "malloc'd memory",
+          "Upwards, on demand"
+        ],
+        [
+          "Memory maps",
+          "Shared libraries, mapped files, large allocations",
+          "Placed by the kernel"
+        ],
+        [
+          "Stack",
+          "Locals, return addresses, saved registers",
+          "Downwards, automatically"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "This is the C course's memory model, seen from outside",
+      "text": "Stack versus heap was a rule about lifetime when you were writing C. Here it is two entries in a table, with different growth behaviour and different permissions. A stack overflow is the stack growing into a region it may not have; a segfault is a dereference of an address that appears in none of these lines."
+    },
+    {
+      "kind": "heading",
+      "text": "Reserved is not used"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Two numbers describe a process's memory, and confusing them is one of the most common misreadings in operations work."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "VmSize (VSZ)",
+        "VmRSS (RSS)"
+      ],
+      "rows": [
+        [
+          "Means",
+          "Address space reserved",
+          "Physical memory actually resident"
+        ],
+        [
+          "Includes",
+          "Everything mapped, touched or not",
+          "Only pages that exist in RAM"
+        ],
+        [
+          "Can exceed RAM",
+          "Yes, easily",
+          "No"
+        ],
+        [
+          "Useful for",
+          "Almost nothing on its own",
+          "Judging real memory pressure"
+        ]
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "Measured: reserving 256 MB costs no memory at all",
+      "lines": [
+        "before mmap        VSZ =   2,196 kB    RSS =   1,192 kB",
+        "after mmap 256 MB  VSZ = 264,340 kB    RSS =   1,192 kB   <- RSS unchanged",
+        "after touching     VSZ = 264,340 kB    RSS = 263,424 kB   <- now it is real",
+        "",
+        "# The mapping existed all along. The physical pages appeared only when written to."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "A large VSZ is not a memory leak",
+      "text": "Runtimes routinely reserve enormous address ranges up front — it is free. Reporting a problem because a process shows 40 GB of virtual size, on a machine with 16 GB of RAM, is a misreading of the number. Look at RSS. The mechanism that makes reserving free is the subject of the next two lessons."
+    },
+    {
+      "kind": "heading",
+      "text": "Where the addresses come from"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Run any program twice and compare its maps: the addresses differ. Address space layout randomisation places the stack, the heap and each library at a different offset on every run, so an attacker who finds a way to jump to an address cannot know in advance what will be there. It is one of the cheapest and most effective defences in a modern system, and it is visible in a two-line experiment."
+    },
+    {
+      "kind": "try",
+      "title": "Read your own address space",
+      "steps": [
+        "Run: cat /proc/self/maps | head -20        and identify code, data, heap, and stack",
+        "Find the four consecutive entries for libc and name what each permission set is for",
+        "Run it twice more and compare the addresses — they should differ every time",
+        "Write a C program that prints the address of: a global, a malloc'd block, and a local variable",
+        "Match each against a line in /proc/<pid>/maps for that same process",
+        "Now: allocate 256 MB with mmap, print VmSize and VmRSS from /proc/self/status before and after",
+        "Then write one byte to every 4096th address in that block and print both numbers again",
+        "Compare the RSS change with the VSZ change and explain the difference out loud"
+      ],
+      "expected": "Three pointers you can locate on the map, addresses that move between runs, and a 256 MB reservation that costs nothing until it is touched. That last measurement is the whole reason the next lesson exists."
+    }
+  ],
+  "cheatsheet": [
+    "Every address a process uses is virtual and private to it",
+    "The same virtual address in two processes refers to different physical memory",
+    "/proc/<pid>/maps lists every mapped region with its permissions",
+    "r-xp code · r--p constants · rw-p data · ---p a guard region with no access",
+    "Permissions are enforced by hardware on every access",
+    "VSZ is reserved address space; RSS is physical memory actually resident",
+    "Measured: reserving 256 MB raised VSZ by 262 MB and RSS by zero",
+    "A large VSZ is not a leak — read RSS",
+    "Addresses are randomised on every run (ASLR)"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Two processes both hold a pointer with the value 0x7fff00001000. What is true?",
+      "choices": {
+        "A": "They are looking at the same data",
+        "B": "Each address is translated separately, so they normally refer to different physical memory",
+        "C": "One of them will crash",
+        "D": "The kernel prevents duplicate addresses"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "That independence is the isolation. A process cannot even name another's physical memory, so it cannot read it."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A monitoring alert fires because a process shows 40 GB of virtual size on a 16 GB machine. What should you check?",
+      "choices": {
+        "A": "Add swap immediately",
+        "B": "RSS — virtual size is reserved address space and costs no memory until touched",
+        "C": "Restart the process",
+        "D": "The number is impossible and the tool is wrong"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Verified: reserving 256 MB raised virtual size by 262 MB and resident memory by nothing at all. Reserving is free; residency is what consumes RAM."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why does the C library appear as several separate map entries with different permissions?",
+      "choices": {
+        "A": "It was loaded several times",
+        "B": "Its code, constants and variables need different access rights, and the hardware enforces each region separately",
+        "C": "One entry per thread",
+        "D": "Because of address randomisation"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Code is executable but not writable, constants are read-only, and data is writable but not executable. Splitting them is what makes those guarantees enforceable."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "You print a pointer twice, in two runs of the same program, and get different values. Why?",
+      "choices": {
+        "A": "The program has a bug",
+        "B": "Address space layout randomisation places regions differently on every run, as a defence",
+        "C": "The heap grew",
+        "D": "Pointers are not stable within a run either"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "An attacker who can redirect execution needs to know what is at an address. Randomising the layout removes that knowledge cheaply."
+    }
+  ]
+}
