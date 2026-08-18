@@ -11,6 +11,9 @@ try {
 
 export default defineConfig({
   testDir: './e2e',
+  // journey identity-local ต้องการ 3 service (identity control-api + Account Center + academy)
+  // มี config เฉพาะของมัน (playwright.identity-local.config.ts) — อย่าลากเข้ารอบ e2e ปกติ
+  testIgnore: /identity-local-sign-in\.spec\.ts/,
   fullyParallel: false,
   workers: 1,
   retries: 0,
