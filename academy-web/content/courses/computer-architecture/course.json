@@ -2,14 +2,14 @@
   "id": "computer-architecture",
   "slug": "computer-architecture",
   "version": "1.0.0",
-  "publicAvailability": "internal",
+  "publicAvailability": "syllabus-preview",
   "defaultLocale": "en",
   "availableLocales": [
     "en",
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 349,
+  "estimatedMinutes": 398,
   "coverMotif": "layers",
   "skills": [
     {
@@ -257,6 +257,41 @@
       "skillWeights": {
         "memory": 4,
         "performance": 4
+      }
+    },
+    {
+      "id": "dram-cells-and-timing",
+      "kind": "lesson",
+      "prerequisites": [
+        "hit-miss-and-write-policy"
+      ],
+      "estimatedMinutes": 17,
+      "skillWeights": {
+        "memory": 4
+      }
+    },
+    {
+      "id": "ddr-generations",
+      "kind": "lesson",
+      "prerequisites": [
+        "dram-cells-and-timing"
+      ],
+      "estimatedMinutes": 15,
+      "skillWeights": {
+        "memory": 3,
+        "performance": 2
+      }
+    },
+    {
+      "id": "bandwidth-numa-hbm",
+      "kind": "lesson",
+      "prerequisites": [
+        "dram-cells-and-timing"
+      ],
+      "estimatedMinutes": 17,
+      "skillWeights": {
+        "memory": 3,
+        "performance": 3
       }
     }
   ]

@@ -1,0 +1,270 @@
+{
+  "nodeId": "bandwidth-numa-hbm",
+  "locale": "en",
+  "title": "When memory is the shared resource",
+  "objective": "By the end of this lesson you can measure your machine's memory bandwidth and the point at which it saturates, explain what NUMA changes about where memory is, and say what problem HBM exists to solve.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Latency asks how long one access takes. Bandwidth asks how much data can move per second in total. On a machine with many cores, bandwidth is shared, and a program can be limited by it while every individual access looks perfectly ordinary."
+    },
+    {
+      "kind": "heading",
+      "text": "Measuring the ceiling"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Read a large buffer, split evenly across a growing number of threads. Each thread reads its own region, so there is no sharing and no synchronisation — the only thing they compete for is the path to memory."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured on an Apple M4",
+      "lines": [
+        "  reading a 1 GB buffer, split evenly across N threads",
+        "",
+        "  threads   time(s)    GB/s",
+        "        1   0.0218     49.3",
+        "        2   0.0153     70.0",
+        "        4   0.0114     94.2",
+        "        8   0.0127     84.6",
+        "",
+        "/* One thread reached half the peak. Four threads reached the peak.",
+        "   Eight was slightly worse than four: the memory system was already",
+        "   saturated, so the extra threads added contention and no throughput. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The shape of the curve is the answer",
+      "text": "Improvement up to four threads and none beyond it means the memory system, not the cores, is the limit past that point. A parallel program that stops improving at a thread count well below the core count is usually saturating bandwidth, and adding threads to it cannot help. The measurement also shows that one thread already reached half the peak — this machine gives a single core a very large share, which is not true of every design."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The first attempt at this measurement was wrong, and its shape said so",
+      "text": "Getting a bandwidth number right requires the loop to be limited by memory and nothing else."
+    },
+    {
+      "kind": "code",
+      "caption": "The same benchmark, before and after removing the accumulator chain",
+      "lines": [
+        "  A first attempt at this measurement used ONE accumulator per thread:",
+        "",
+        "  threads   GB/s        threads   GB/s",
+        "        1    3.6              1   49.3",
+        "        2    7.2              2   70.0",
+        "        4   14.4              4   94.2",
+        "        8   27.0              8   84.6",
+        "",
+        "     one accumulator        eight accumulators",
+        "",
+        "/* The left column scales beautifully and is completely wrong. With a single",
+        "   accumulator the loop is limited by its own dependency chain, not by memory,",
+        "   so it measures the chain and calls the result bandwidth. Perfect linear",
+        "   scaling was the clue: a memory-bandwidth measurement that never saturates",
+        "   is not measuring memory bandwidth. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Both columns are real measurements of a real program. Only one of them measures what the benchmark claims to. This is worth as much as the correct number: a performance measurement that scales perfectly is suspicious, because real shared resources saturate, and a result that never does is usually measuring something private to each thread."
+    },
+    {
+      "kind": "heading",
+      "text": "When memory is not all equally far away"
+    },
+    {
+      "kind": "paragraph",
+      "text": "On a machine with several processor packages, each has its own memory controller and its own attached memory. A core can reach the other package's memory, but the request travels across an interconnect first. This is non-uniform memory access, and it means an address's cost depends on which core is asking."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Situation",
+        "Consequence"
+      ],
+      "rows": [
+        [
+          "A thread reads memory attached to its own node",
+          "Local latency and full local bandwidth"
+        ],
+        [
+          "A thread reads memory attached to another node",
+          "Higher latency and interconnect bandwidth, shared with everyone else crossing"
+        ],
+        [
+          "A thread migrates to another node mid-run",
+          "All its previously local memory becomes remote"
+        ],
+        [
+          "One node allocates all the memory at startup",
+          "Every other node's accesses are remote for the program's whole life"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The last row is the classic mistake, and it has a standard remedy: allocate and first-touch memory from the thread that will use it. Operating systems commonly assign a physical page to the node of whichever thread first writes to it, so who touches a page first decides where it lives for the rest of the run. A program that allocates and initialises everything in one thread and then parallelises the work has already made every access remote."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "You have already seen this idea",
+      "text": "The operating systems course covered demand paging: a mapping exists but no physical page is assigned until the first touch. NUMA placement is a consequence of that same mechanism — the moment the fault is taken determines not only when the page appears but on which node. One policy, two visible effects."
+    },
+    {
+      "kind": "heading",
+      "text": "Buying bandwidth by moving the memory closer"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When a workload is bandwidth-limited and no reordering fixes it, the remaining option is a memory technology with a much wider path. High Bandwidth Memory stacks DRAM dies vertically and connects them to the processor through an extremely wide interface over a very short distance, instead of a narrow interface running very fast over a board."
+    },
+    {
+      "kind": "code",
+      "caption": "The two approaches, compared as arithmetic",
+      "lines": [
+        "  DDR5-6400, one 64-bit channel:",
+        "      64 bits x 6400 MT/s = 51.2 GB/s",
+        "      a few channels per socket, signals travelling across a motherboard",
+        "",
+        "  HBM4, one stack (JEDEC JESD270-4, April 2025):",
+        "      2048 bits x 8 Gb/s per pin = 2 TB/s per stack",
+        "      32 independent channels, up to 64 GB per stack, millimetres of distance",
+        "",
+        "  Same underlying DRAM cells. The difference is entirely the width of the",
+        "  connection and how far the signals have to travel."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "HBM buys bandwidth, not latency",
+      "text": "The cells are still DRAM, still refreshed, still requiring a row to be opened before a column can be read. A pointer chase through HBM does not run dramatically faster than one through DDR5 — the same fourteen-nanosecond floor from the previous lesson applies. HBM exists for workloads that stream enormous quantities of data, which is why it appears in graphics processors and machine-learning accelerators and not in laptops. Recognising which of your two numbers a technology improves is the whole skill here."
+    },
+    {
+      "kind": "heading",
+      "text": "Diagnosing a bandwidth problem"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Observation",
+        "What it suggests",
+        "What to try"
+      ],
+      "rows": [
+        [
+          "Scaling stops well below the core count",
+          "Bandwidth saturation",
+          "Reduce data moved: smaller types, better layout, fewer passes"
+        ],
+        [
+          "Scaling continues linearly past every core",
+          "The benchmark is not memory-bound",
+          "Check for a dependency chain or a private working set"
+        ],
+        [
+          "Performance varies by which core runs the thread",
+          "NUMA placement",
+          "First-touch from the using thread; pin threads to nodes"
+        ],
+        [
+          "Each access is fast but total throughput is low",
+          "Latency-bound, not bandwidth-bound",
+          "More requests in flight: independent accesses, prefetching"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The second row is the one this lesson learned the hard way, and it is the reason the wrong measurement is printed above rather than quietly discarded. A benchmark that produces a beautiful straight line is not thereby correct — and in a bandwidth measurement, the straight line is the warning sign."
+    },
+    {
+      "kind": "try",
+      "title": "Find your machine's ceiling",
+      "steps": [
+        "Write a threaded read benchmark over a buffer far larger than your last-level cache",
+        "Give each thread several independent accumulators so its loop is not dependency-limited",
+        "Measure at 1, 2, 4, 8 and more threads, and plot GB/s against thread count",
+        "Identify the thread count at which it stops improving — that is your saturation point",
+        "Deliberately rewrite one thread's loop with a single accumulator and compare the curves",
+        "Explain which of the two curves is the memory measurement and how you can tell",
+        "If your machine has multiple sockets or NUMA nodes, check with: numactl --hardware",
+        "Report your peak bandwidth, your saturation thread count, and your evidence for both"
+      ],
+      "expected": "A curve that rises and then flattens, and a second curve that rises forever and means nothing about memory. Producing the wrong curve on purpose is the most useful step: it teaches you the shape of a benchmark that is measuring the wrong thing, which is a far more common problem in performance work than a machine that is genuinely slow."
+    }
+  ],
+  "cheatsheet": [
+    "Bandwidth is shared across cores; latency is per access",
+    "Measured on an Apple M4: 49.3 GB/s with one thread, 94.2 with four, 84.6 with eight",
+    "Improvement stopping below the core count indicates bandwidth saturation",
+    "A bandwidth benchmark that scales linearly forever is measuring something else",
+    "The wrong version used one accumulator per thread and was limited by its own chain",
+    "NUMA: memory attached to another node costs more and shares the interconnect",
+    "Physical pages are usually placed on the node of the thread that first touches them",
+    "Allocating and initialising everything in one thread makes all later access remote",
+    "HBM4 (JESD270-4, April 2025): 2048-bit interface, 8 Gb/s per pin, up to 2 TB/s per stack",
+    "HBM widens the path; the cells are still DRAM, so the latency floor is unchanged"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A threaded read benchmark gave 49.3, 70.0, 94.2 and 84.6 GB/s at 1, 2, 4 and 8 threads. What does the flattening indicate?",
+      "choices": {
+        "A": "The threads are contending for a lock",
+        "B": "The memory system saturated at around four threads; beyond that the cores are not the limit and extra threads add contention without throughput",
+        "C": "The cores are throttling",
+        "D": "The buffer fits in cache"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Each thread reads its own region with no sharing, so the only contended resource is the path to memory. Rising then flattening is exactly the shape of a saturated shared resource."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "An earlier version of the same benchmark scaled perfectly: 3.6, 7.2, 14.4, 27.0 GB/s. Why was that result wrong?",
+      "choices": {
+        "A": "The buffer was too small",
+        "B": "With one accumulator per thread the loop was limited by its own dependency chain rather than by memory, so perfect scaling was the clue that it was not measuring bandwidth",
+        "C": "The threads were not synchronised",
+        "D": "It used the wrong timer"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A shared resource saturates. A measurement that never saturates is measuring something private to each thread — here, each thread's own accumulator chain."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A program allocates and initialises all its data in one thread at startup, then parallelises the work across NUMA nodes. What has it done?",
+      "choices": {
+        "A": "Improved locality",
+        "B": "Placed every physical page on the initialising thread's node, so every other node's accesses are remote for the program's whole life",
+        "C": "Nothing; placement is decided at allocation",
+        "D": "Reduced total memory use"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Pages are commonly assigned to the node of whichever thread first writes to them — the same demand-paging mechanism the operating systems course covered. First touch decides placement."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "A pointer-chasing workload is moved to a machine with HBM. What should you expect?",
+      "choices": {
+        "A": "A large speedup, since HBM is much faster",
+        "B": "Little change — HBM widens the path but the cells are still DRAM, so the latency floor is unchanged and a dependent chain is latency-bound",
+        "C": "A slowdown",
+        "D": "A speedup proportional to the bandwidth ratio"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "HBM4 offers up to 2 TB/s per stack against roughly 51 GB/s per DDR5 channel, but that is throughput. A chain of dependent accesses cannot use width it has no parallel requests to fill."
+    }
+  ]
+}

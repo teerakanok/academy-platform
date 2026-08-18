@@ -1,0 +1,249 @@
+{
+  "nodeId": "dram-cells-and-timing",
+  "locale": "en",
+  "title": "What memory actually is, and why it is slow",
+  "objective": "By the end of this lesson you can describe a DRAM cell and why it needs refreshing, explain what happens on a read in terms of rows and a row buffer, and account for a 362x difference between two identical loops.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Everything so far has treated main memory as a slow place that caches protect you from. This lesson opens it. The reason memory is slow is not that engineers have failed to make it faster — it is a direct consequence of what a memory cell is made of."
+    },
+    {
+      "kind": "heading",
+      "text": "One bit"
+    },
+    {
+      "kind": "code",
+      "caption": "A DRAM cell",
+      "lines": [
+        "        word line (selects this row)",
+        "            |",
+        "         ---+---",
+        "         |     |",
+        "      [transistor]",
+        "            |",
+        "        [capacitor]      <- the bit is a charge, or the absence of one",
+        "            |",
+        "          ground",
+        "",
+        "  bit line (carries the value in or out)",
+        "",
+        "  One transistor and one capacitor per bit. That is why DRAM is dense",
+        "  and cheap: a static RAM cell, of the kind caches are built from,",
+        "  needs about six transistors and no capacitor."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The charge leaks, so memory must be rewritten constantly",
+      "text": "A capacitor holding a bit is not stable — the charge drains within milliseconds. The memory controller therefore reads and rewrites every row on a schedule, whether or not the program touched it. That is the 'dynamic' in dynamic RAM, and it costs both power and occasional unavailability while a bank is refreshing. A static RAM cell holds its value as long as it is powered, which is one reason caches are fast and also why they are small and expensive."
+    },
+    {
+      "kind": "heading",
+      "text": "Reading is destructive, so it happens a row at a time"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Sensing the tiny charge on a capacitor drains it. A DRAM read therefore cannot touch one bit: it activates an entire row — thousands of bits — into a set of sense amplifiers called the row buffer, and the row must then be written back. The sequence has names you will see in memory specifications."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Step",
+        "Name",
+        "What happens"
+      ],
+      "rows": [
+        [
+          "Open a row",
+          "tRCD",
+          "Activate the row; its contents land in the row buffer"
+        ],
+        [
+          "Read a column",
+          "CL",
+          "Select bytes from the row buffer and send them out"
+        ],
+        [
+          "Close the row",
+          "tRP",
+          "Write the row back and prepare for the next activation"
+        ],
+        [
+          "Keep a row open",
+          "—",
+          "A further read from the same row needs only the column step"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "That last row is the whole performance story",
+      "text": "A read from a row that is already open costs one step. A read from a different row costs close-then-open-then-read. This is why memory is not one speed but two, differing by several times, and which one you get is decided entirely by whether consecutive accesses land in the same row."
+    },
+    {
+      "kind": "heading",
+      "text": "Measuring the difference"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Build a dependent chain of loads through a 128 MB buffer — far larger than any cache, so every access reaches memory. Run it twice: once with the chain following memory order, once with the same links shuffled into random order. Same buffer, same number of loads, same instructions."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured on an Apple M4",
+      "lines": [
+        "  128 MB buffer, a dependent chain of loads, identical instruction count.",
+        "  Only the ORDER the chain visits memory in differs.",
+        "",
+        "  chain follows memory order :   0.52 ns per access   (0.0104 s total)",
+        "  chain in random order      : 188.15 ns per access   (3.7629 s total)",
+        "  ratio                      : 362x",
+        "",
+        "/* 0.52 ns is faster than this machine's measured 1.92 ns L1 latency, which",
+        "   proves those accesses were not actually serialised: the hardware worked",
+        "   out the addresses ahead of the loads. The random chain gives it nothing",
+        "   to predict, so each access waits for the one before it. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Three hundred and sixty-two times, for changing nothing but the order. Two effects compound here: consecutive accesses in memory order stay within the same open row and skip the activation entirely, and their addresses are predictable so the hardware fetches ahead. Random order defeats both, and each access pays the full open-read-close sequence with nothing overlapping it."
+    },
+    {
+      "kind": "heading",
+      "text": "Why the parts have the structure they do"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Level",
+        "What it is",
+        "Why it exists"
+      ],
+      "rows": [
+        [
+          "Cell",
+          "One transistor, one capacitor",
+          "Density: the smallest possible bit"
+        ],
+        [
+          "Row",
+          "Thousands of cells sharing a word line",
+          "Reading is destructive, so it happens wholesale"
+        ],
+        [
+          "Bank",
+          "An array of rows with one row buffer",
+          "One row open at a time per bank"
+        ],
+        [
+          "Multiple banks",
+          "Several banks per chip",
+          "One bank can open a row while another is being read"
+        ],
+        [
+          "Rank / channel",
+          "Groups of chips accessed together",
+          "More independent paths, so more requests in flight"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Every level above the cell exists to work around a limitation of the level below. Banks exist because a single row buffer would serialise everything; channels exist because one path would limit how many requests can be outstanding. The memory controller reorders requests across banks to keep as many rows open and useful as it can — which is one more reason your program's access order matters more than its access count."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "This is where the 'random access' in RAM stops being true",
+      "text": "The name says any location costs the same as any other. At the level of the interface that is roughly true; at the level of timing it has not been true for decades. A location in an open row is several times cheaper than one in a closed row, and the measurement above shows the difference reaching two orders of magnitude once prefetching is included. Treat 'random access memory' as a statement about addressing, not about cost."
+    },
+    {
+      "kind": "try",
+      "title": "Separate the two effects",
+      "steps": [
+        "Build a 128 MB dependent chain in memory order and time it",
+        "Shuffle the chain into random order and time it again",
+        "Record the ratio and compare it with the ratio at a 32 KB working set",
+        "Explain why the small working set shows almost no difference",
+        "Now make a chain that jumps by exactly 8 KB each step, wrapping around",
+        "Compare it with the random chain: is a regular large stride as bad as random?",
+        "Explain what that comparison tells you about prediction versus row locality",
+        "Check whether your machine reports its memory type: system_profiler SPMemoryDataType   or   sudo dmidecode -t memory"
+      ],
+      "expected": "A very large ratio at 128 MB, almost none at 32 KB, and a regular large stride that is faster than random but far slower than sequential. That middle case is the informative one: it separates 'the hardware could predict the address' from 'the access landed in an already-open row', which the sequential and random cases confound together."
+    }
+  ],
+  "cheatsheet": [
+    "A DRAM cell is one transistor and one capacitor; an SRAM cell is about six transistors",
+    "The charge leaks, so every row is refreshed on a schedule — the 'dynamic' in DRAM",
+    "Reading drains the cell, so a read activates a whole row into the row buffer",
+    "tRCD opens a row, CL reads a column from the row buffer, tRP closes it",
+    "A read from an already-open row skips the open and close entirely",
+    "Measured: memory-order chain 0.52 ns per access, random-order chain 188.15 ns — 362x",
+    "0.52 ns is below the machine's 1.92 ns L1 latency, so those loads were not serialised",
+    "Banks let one row open while another is read; channels add independent paths",
+    "'Random access memory' describes addressing, not cost"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why does DRAM need periodic refreshing while SRAM does not?",
+      "choices": {
+        "A": "DRAM is slower",
+        "B": "A DRAM bit is a charge on a capacitor that leaks away within milliseconds, while an SRAM cell holds its value as long as it is powered",
+        "C": "DRAM is further from the processor",
+        "D": "Refreshing improves reliability"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The one-transistor-one-capacitor cell is what makes DRAM dense and cheap, and leakage is the price. SRAM's roughly six transistors hold the value but take far more area."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why does a DRAM read activate an entire row rather than the bits requested?",
+      "choices": {
+        "A": "To improve spatial locality",
+        "B": "Sensing the charge on a cell drains it, so a read must pull a whole row into sense amplifiers and write it back afterwards",
+        "C": "The address bus is too narrow",
+        "D": "Rows are the unit of refresh"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Reading is destructive at the cell level. The row buffer holds the sensed row, and that is also why a second read from the same row is so much cheaper."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "The same 128 MB chain took 0.52 ns per access in memory order and 188.15 ns in random order. What two effects combine to produce that?",
+      "choices": {
+        "A": "Only cache size",
+        "B": "Consecutive accesses in memory order stay within an already-open row, and their addresses are predictable so the hardware fetches ahead; random order defeats both",
+        "C": "Only the refresh schedule",
+        "D": "The random version executed more instructions"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The instruction counts are identical. Row locality removes the open and close steps, and predictability removes the serialisation — which is why 0.52 ns is below the measured L1 latency."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why do memory chips contain multiple banks?",
+      "choices": {
+        "A": "To increase total capacity only",
+        "B": "A bank has one row buffer, so one row at a time; multiple banks let one row be activated while another is being read",
+        "C": "To reduce refresh frequency",
+        "D": "To simplify addressing"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Every level above the cell works around a limit of the level below. One row buffer per bank would serialise every access to a different row."
+    }
+  ]
+}

@@ -1,0 +1,247 @@
+{
+  "nodeId": "ddr-generations",
+  "locale": "en",
+  "title": "Why memory got wider but not closer",
+  "objective": "By the end of this lesson you can convert a CAS latency in cycles into nanoseconds, explain why that number has barely moved across five generations, and say what a faster memory generation actually buys.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Memory generations are marketed by their data rate: DDR4-3200, DDR5-6400, and so on. That number has grown enormously. The number that governs how long a single dependent load waits has not, and the gap between the two is one of the defining facts of modern performance."
+    },
+    {
+      "kind": "heading",
+      "text": "Reading the name"
+    },
+    {
+      "kind": "code",
+      "caption": "What DDR5-6400 CL46 means",
+      "lines": [
+        "  DDR5-6400      6400 million transfers per second",
+        "                 DDR means two transfers per clock, so the clock is 3200 MHz",
+        "",
+        "  CL46           46 CLOCK CYCLES from the column command to the first data",
+        "                 46 cycles at 3200 MHz = 46 / 3200 MHz = 14.4 ns",
+        "",
+        "  latency in ns = CL / clock in MHz x 1000",
+        "                = 46 / 3200 x 1000",
+        "                = 14.4 ns",
+        "",
+        "/* A larger CL number does not mean slower memory. It means the cycles",
+        "   are shorter. Comparing CL across generations without converting is",
+        "   comparing counts of different-sized things. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The most common mistake in memory shopping",
+      "text": "DDR4 modules commonly carry CL16 to CL22 and DDR5 modules CL32 to CL46, which reads as a large regression if you compare the numbers directly. Convert them and the picture changes completely: the cycles got roughly twice as short, so twice as many of them take about the same time. Always convert to nanoseconds before comparing anything across generations."
+    },
+    {
+      "kind": "heading",
+      "text": "The arithmetic across five generations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Turn the question around. Instead of looking up what CL each generation shipped with, ask what CL each would need in order to deliver the same 14 nanoseconds — a figure the DDR5 documentation itself gives as roughly unchanged from DDR3 and DDR4."
+    },
+    {
+      "kind": "code",
+      "caption": "Computed, not looked up",
+      "lines": [
+        "  For a first-word latency of 14 ns, what CAS latency in CYCLES is required?",
+        "",
+        "                 clock     CL needed      peak transfer",
+        "                 (MHz)     for 14 ns      (GB/s per 64 bits)",
+        "  DDR-400          200        2.8              3.2",
+        "  DDR2-800         400        5.6              6.4",
+        "  DDR3-1600        800       11.2             12.8",
+        "  DDR4-3200       1600       22.4             25.6",
+        "  DDR5-6400       3200       44.8             51.2",
+        "  DDR5-8800       4400       61.6             70.4",
+        "",
+        "/* Peak transfer multiplied by 22. The CL numbers multiplied by 22 as well",
+        "   -- and the time they represent did not move. Those computed CL values",
+        "   are close to the ones real modules of each generation carry, which is",
+        "   what makes the flat-latency claim checkable rather than merely repeated. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Peak transfer rate rose by a factor of twenty-two. The latency stayed put. This is not an oversight: latency is dominated by the physics of sensing a tiny charge and driving a signal across a board, and neither improves when the interface runs faster. Transfer rate is a matter of how quickly bits can be pushed down a wire once the row is open, and that has improved enormously."
+    },
+    {
+      "kind": "heading",
+      "text": "What a new generation actually buys"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Improves a lot",
+        "Improves little or not at all"
+      ],
+      "rows": [
+        [
+          "Streaming through large arrays",
+          "A pointer chase through a linked structure"
+        ],
+        [
+          "Serving many independent requests at once",
+          "One dependent load waiting for another"
+        ],
+        [
+          "Copying, filling and scanning memory",
+          "A cache miss on a critical path"
+        ],
+        [
+          "Keeping many cores fed simultaneously",
+          "Single-threaded latency-bound code"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The left column is throughput and the right is latency — the same distinction the pipelining module drew, appearing again at the level of the memory system. A faster memory generation is a throughput improvement, so it helps code shaped like the left column and does almost nothing for code shaped like the right."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "This is why cache design keeps getting more elaborate",
+      "text": "If main memory latency will not improve, the only remaining way to reduce the average cost of an access is to reach main memory less often. That is the entire justification for multi-level caches, larger caches, more sophisticated prefetchers, and speculative execution. The whole edifice this course has described exists because one number stopped improving decades ago and never resumed."
+    },
+    {
+      "kind": "heading",
+      "text": "The generations, briefly"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Generation",
+        "Introduced",
+        "Typical data rate range",
+        "Voltage"
+      ],
+      "rows": [
+        [
+          "DDR",
+          "2000",
+          "200 to 400 MT/s",
+          "2.5 V"
+        ],
+        [
+          "DDR2",
+          "2003",
+          "400 to 1066 MT/s",
+          "1.8 V"
+        ],
+        [
+          "DDR3",
+          "2007",
+          "800 to 2133 MT/s",
+          "1.5 V"
+        ],
+        [
+          "DDR4",
+          "2014",
+          "1600 to 3200 MT/s",
+          "1.2 V"
+        ],
+        [
+          "DDR5",
+          "2020",
+          "4800 MT/s and up, to 8800 in the current standard",
+          "1.1 V"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The voltage column tells its own story: each generation moves more data while using less energy per bit, which is what makes the higher rates thermally possible at all. The DDR5 standard was published in July 2020 and its maximum defined data rate was raised to 8800 MT/s in the JESD79-5C revision of April 2024, so the top of that range is a moving target — check the current standard rather than a remembered figure."
+    },
+    {
+      "kind": "try",
+      "title": "Convert and compare",
+      "steps": [
+        "Find the memory specification of a machine you own",
+        "Write down its data rate and CAS latency in cycles",
+        "Convert the CL to nanoseconds using CL / clock in MHz x 1000",
+        "Compare that number with the 14 ns figure quoted here",
+        "Now measure it: run the random pointer chase from the previous lesson at a working set far larger than your cache",
+        "Compare your measured latency with the CL you computed and explain the gap",
+        "List three things included in the measured number that CL does not cover",
+        "State what fraction of your measured latency the CL actually accounts for"
+      ],
+      "expected": "A measured latency substantially larger than the computed CL — on the machine used in this module, 188 ns measured against a CL of roughly 14 ns. The gap is the point: CL is one step of many, and the rest is address translation, cache lookups at every level, the row open and close, queueing in the memory controller, and the trip across the board. Quoting CL as 'memory latency' understates the real figure by an order of magnitude."
+    }
+  ],
+  "cheatsheet": [
+    "Data rate in MT/s is twice the clock in MHz, because DDR transfers on both edges",
+    "latency in ns = CL / clock in MHz x 1000",
+    "DDR5-6400 CL46 is 46 / 3200 x 1000 = 14.4 ns",
+    "A larger CL number does not mean slower memory; the cycles are shorter",
+    "Computed: holding 14 ns fixed requires CL 2.8 at DDR-400 and CL 61.6 at DDR5-8800",
+    "Peak transfer rose about 22x across those generations while latency stayed flat",
+    "A new generation is a throughput improvement, not a latency one",
+    "It helps streaming and many parallel requests; it barely helps a pointer chase",
+    "Flat memory latency is the reason cache hierarchies keep growing more elaborate",
+    "Measured full latency was 188 ns against a CL of about 14 ns — CL is one step of many"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "DDR5-6400 has a clock of 3200 MHz and CL46. What is the first-word latency?",
+      "choices": {
+        "A": "46 ns",
+        "B": "14.4 ns — 46 cycles at 3200 MHz",
+        "C": "7.2 ns",
+        "D": "3.2 ns"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "CL divided by the clock in MHz, times 1000. The data rate 6400 MT/s is twice the clock because DDR transfers on both clock edges."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "DDR4 modules commonly carry CL16-22 and DDR5 modules CL32-46. Has memory latency roughly doubled?",
+      "choices": {
+        "A": "Yes, DDR5 is slower",
+        "B": "No — the cycles are about half as long, so roughly twice as many of them take about the same time",
+        "C": "Yes, but bandwidth compensates",
+        "D": "It cannot be determined"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Comparing CL across generations without converting to nanoseconds compares counts of different-sized units. Convert first, always."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Peak transfer rate rose roughly 22x from DDR-400 to DDR5-8800 while latency stayed near 14 ns. Which code benefits most from the newer generation?",
+      "choices": {
+        "A": "A linked-list traversal",
+        "B": "Streaming through large arrays and serving many independent requests at once",
+        "C": "Code dominated by one cache miss on the critical path",
+        "D": "All code benefits equally"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A faster generation is a throughput improvement. The same latency-versus-throughput distinction from the pipelining module, applied to the memory system."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why is measured memory latency around 188 ns when CL is about 14 ns?",
+      "choices": {
+        "A": "The measurement is wrong",
+        "B": "CL is one step among many: address translation, cache lookups at every level, opening and closing the row, controller queueing and the trip across the board are all included in the measured figure",
+        "C": "CL is quoted at a different clock",
+        "D": "Refresh accounts for the difference"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Quoting CL as 'memory latency' understates the real cost by roughly an order of magnitude, which is why the measurement and the specification must both be understood."
+    }
+  ]
+}
