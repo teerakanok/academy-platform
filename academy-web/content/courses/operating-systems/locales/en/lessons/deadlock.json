@@ -1,0 +1,230 @@
+{
+  "nodeId": "deadlock",
+  "locale": "en",
+  "title": "Deadlock: four conditions and how to break one",
+  "objective": "By the end of this lesson you can recognise a deadlock from a running process, name the four conditions that must all hold, and remove the one that is practical to remove.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A deadlock is a set of threads each waiting for something another of them holds. Nothing is broken, nothing crashes, no error is reported — the threads simply wait, correctly, forever. It is the quietest failure in this course, and once you know its signature it is also one of the fastest to diagnose."
+    },
+    {
+      "kind": "heading",
+      "text": "The smallest example"
+    },
+    {
+      "kind": "code",
+      "caption": "Two mutexes, two orders",
+      "lines": [
+        "/* Thread 1 */                      /* Thread 2 */",
+        "lock(A);                           lock(B);",
+        "  ...                                ...",
+        "lock(B);   <- waits for T2         lock(A);   <- waits for T1",
+        "",
+        "/* Each holds what the other needs to continue. Neither will let go,",
+        "   because letting go is what happens after acquiring the second lock. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Verified: with this inconsistent order, the program hangs. With both threads taking A then B, it completes immediately, every time. The code inside the critical sections was identical — only the order changed."
+    },
+    {
+      "kind": "heading",
+      "text": "All four must hold"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Condition",
+        "Meaning",
+        "Can you remove it?"
+      ],
+      "rows": [
+        [
+          "Mutual exclusion",
+          "Only one thread can hold the resource",
+          "Rarely — it is usually the point"
+        ],
+        [
+          "Hold and wait",
+          "A thread holds one resource while requesting another",
+          "Sometimes: take everything at once, or nothing"
+        ],
+        [
+          "No preemption",
+          "A resource cannot be taken away from its holder",
+          "Sometimes: use trylock and back off"
+        ],
+        [
+          "Circular wait",
+          "A cycle of threads each waiting on the next",
+          "Yes — and this is the practical answer"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "In practice you break circular wait, with an ordering rule",
+      "text": "Define a global order over your locks and require every thread to acquire them in that order. If everyone takes A before B, no cycle can form — the thread holding B has already passed A, so it is not waiting for it. The rule is easy to state, easy to review, and costs nothing at runtime. Write the order down beside the lock declarations; an ordering that lives only in the author's memory is not an ordering."
+    },
+    {
+      "kind": "heading",
+      "text": "Recognising one at three in the morning"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "The process is alive but produces nothing new",
+        "CPU usage is zero — verified above: the deadlocked process showed 0.0%",
+        "It responds to SIGKILL but not to anything requiring its own progress",
+        "No error, no log entry, no crash"
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "The diagnosis, which takes about thirty seconds",
+      "lines": [
+        "$ ps -o pid,stat,%cpu,comm -p 4394",
+        "  PID STAT %CPU COMMAND",
+        " 4394 Sl    0.0 d              <- alive, sleeping, using nothing",
+        "",
+        "$ gdb -p 4394 -batch -ex 'thread apply all bt'",
+        "",
+        "Thread 3 ...:",
+        "  #0  futex_wait (futex_word=0x...78 <A>)      <- waiting for A",
+        "  #4  t2 (x=0x0) at dead.c:14",
+        "",
+        "Thread 2 ...:",
+        "  #0  futex_wait (futex_word=0x...a8 <B>)      <- waiting for B",
+        "  #4  t1 (x=0x0) at dead.c:10",
+        "",
+        "# The cycle is right there: t2 wants A, t1 wants B, and each holds the other."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The backtrace names the variable, not just the address",
+      "text": "In the real output above, gdb printed <A> and <B> beside the futex addresses because the program was built with -g. Building your production binaries with debug symbols — even when you ship them stripped and keep the symbols separately — is what turns a three-hour incident into a three-minute one."
+    },
+    {
+      "kind": "heading",
+      "text": "The other ways to get there"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Locking the same non-recursive mutex twice in one thread — a deadlock with a single thread and a single lock",
+        "Taking a lock inside a callback that the lock holder invokes",
+        "Two subsystems that each take their own lock and then call into the other",
+        "A lock held while waiting on a condition variable that only another holder of that lock can signal"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "When ordering is not available"
+    },
+    {
+      "kind": "code",
+      "caption": "Try, and back off",
+      "lines": [
+        "pthread_mutex_lock(&A);",
+        "if (pthread_mutex_trylock(&B) != 0) {   /* would block? then do not */",
+        "    pthread_mutex_unlock(&A);           /* release what you hold */",
+        "    /* wait a moment and start over — the cycle cannot form */",
+        "    continue;",
+        "}",
+        "/* both held */",
+        "",
+        "/* This trades a guarantee for a retry loop. Prefer an ordering rule;",
+        "   use this when the set of locks is not known until run time. */"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Deadlock a program, then diagnose it as if you had not written it",
+      "steps": [
+        "Write two threads: one locks A then B, the other locks B then A, with a short sleep between the two locks",
+        "Run it — it should hang within a second",
+        "From another terminal: ps -o pid,stat,%cpu -p <pid>     and confirm CPU is 0.0",
+        "Run: gdb -p <pid> -batch -ex 'thread apply all bt'      (build with -g first)",
+        "Find the two futex_wait frames and name which lock each thread is waiting for",
+        "Fix it by making both threads take A then B — confirm it now completes every run",
+        "Break it a different way: have one thread lock A twice in a row, and diagnose that too",
+        "Optional: rewrite the fix using trylock and back-off, and explain what you gave up"
+      ],
+      "expected": "A hang with zero CPU, a backtrace showing the cycle, and a one-line ordering change that removes it permanently. The single-thread double-lock is worth doing as well: it teaches that a deadlock needs neither two threads nor two locks — just a wait that nothing can end."
+    }
+  ],
+  "cheatsheet": [
+    "Deadlock = threads each waiting for what another holds; correct code, no progress",
+    "Signature: alive, zero CPU, no error, no log",
+    "Four conditions: mutual exclusion, hold and wait, no preemption, circular wait",
+    "In practice, break circular wait: define a global lock order and always follow it",
+    "Write the lock order beside the declarations",
+    "Diagnose with: ps (zero CPU) then gdb -p <pid> -batch -ex 'thread apply all bt'",
+    "Build with -g so the backtrace names the locks, not just addresses",
+    "Locking a non-recursive mutex twice in one thread deadlocks that thread alone",
+    "trylock plus back-off works when the lock set is only known at run time"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Which of the four conditions is the one usually removed in practice?",
+      "choices": {
+        "A": "Mutual exclusion",
+        "B": "Circular wait — by defining and following a global lock order",
+        "C": "No preemption",
+        "D": "Hold and wait"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Mutual exclusion is usually the whole reason the lock exists. A consistent ordering rule is free at run time and easy to review, which is why it is the standard answer."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A service stops responding. It is alive, has no errors, and uses 0% CPU. What do you run first?",
+      "choices": {
+        "A": "strace to see the system calls",
+        "B": "gdb -p <pid> with 'thread apply all bt' to see where every thread is waiting",
+        "C": "Restart it",
+        "D": "Check disk space"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Zero CPU means nothing is executing, so a syscall trace shows nothing new. The backtrace shows the waits directly — and the cycle is usually visible immediately."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Can a single thread deadlock itself with a single mutex?",
+      "choices": {
+        "A": "No — deadlock requires at least two threads",
+        "B": "Yes — locking a non-recursive mutex it already holds makes it wait for itself",
+        "C": "Only with recursive mutexes",
+        "D": "Only on a single-core machine"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The general condition is a wait that nothing can end. Two threads and two locks is the common shape, not a requirement."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "What does trylock-and-back-off give up compared with a lock ordering rule?",
+      "choices": {
+        "A": "Nothing",
+        "B": "A guarantee — it becomes a retry loop that can repeat, instead of a structural impossibility",
+        "C": "Thread safety",
+        "D": "The ability to use condition variables"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Ordering makes the cycle impossible. Back-off makes it recoverable, at the cost of retries and, in the worst case, threads that keep retrying against each other."
+    }
+  ]
+}

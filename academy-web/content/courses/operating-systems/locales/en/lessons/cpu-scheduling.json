@@ -1,0 +1,232 @@
+{
+  "nodeId": "cpu-scheduling",
+  "locale": "en",
+  "title": "How the scheduler decides who runs next",
+  "objective": "By the end of this lesson you can explain what the scheduler is optimising for, predict the effect of a nice value with real numbers, and say why a CPU-bound and an I/O-bound program get treated differently.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "There are almost always more runnable threads than cores. The scheduler decides who gets a core and for how long, thousands of times a second, and it has to satisfy two goals that pull against each other: keep the cores busy, and keep interactive things feeling instant."
+    },
+    {
+      "kind": "heading",
+      "text": "The two kinds of work"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "CPU-bound",
+        "I/O-bound"
+      ],
+      "rows": [
+        [
+          "Behaviour",
+          "Runs until it is stopped",
+          "Runs briefly, then blocks on a read"
+        ],
+        [
+          "Example",
+          "A compile, a video encode",
+          "A shell, an editor, a web server"
+        ],
+        [
+          "Wants",
+          "Throughput — a long uninterrupted run",
+          "Latency — to be run soon after it wakes"
+        ],
+        [
+          "Effect on others",
+          "Can starve interactive work",
+          "Leaves the core free most of the time"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Linux's normal scheduler favours whichever thread has received the least CPU time relative to its weight. A thread that keeps blocking on I/O accumulates very little run time, so when it wakes it is near the front of the queue — which is exactly why your shell stays responsive during a compile. The interactive behaviour falls out of the fairness rule; it is not a special case."
+    },
+    {
+      "kind": "heading",
+      "text": "nice: adjusting the weight"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A nice value from -20 to 19 changes a thread's weight in that calculation. Higher nice means lower priority — it is 'how nice you are being to others'. Only privileged processes may set a negative value."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Setup (two CPU hogs pinned to one core, 3 seconds each)",
+        "Work completed"
+      ],
+      "rows": [
+        [
+          "Both at nice 0",
+          "100,071 vs 95,207 — an even split"
+        ],
+        [
+          "nice 0 vs nice 10",
+          "200,220 vs 18,807 — about 10.6x"
+        ],
+        [
+          "nice 0 vs nice 19",
+          "197,726 vs 2,622 — about 75x"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Where those ratios come from",
+      "text": "Each step of nice multiplies a thread's weight by roughly 1.25. Ten steps is about 1.25^10, near 9.3; nineteen steps is about 1.25^19, near 73. The measured ratios of 10.6 and 75 sit right on those predictions. This is worth knowing because it means nice is not a mild hint: at nice 19 a background job gets a couple of percent of a contended core."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Measure contention, or you measure nothing",
+      "text": "The first version of this experiment ran in a container limited with a CPU quota rather than pinned to a specific core, and the results were meaningless — the nice 19 process sometimes did MORE work, because both processes simply ran on different cores and never competed. Priority only expresses itself when threads are actually contending for the same core. Pin to one core (taskset -c 0, or the container's cpuset option) before drawing any conclusion."
+    },
+    {
+      "kind": "heading",
+      "text": "Policies beyond the default"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Policy",
+        "For",
+        "Priorities"
+      ],
+      "rows": [
+        [
+          "SCHED_OTHER",
+          "Everything normal; fair sharing by weight",
+          "nice -20..19 (priority field is 0)"
+        ],
+        [
+          "SCHED_FIFO",
+          "Real-time: runs until it blocks or yields",
+          "1..99"
+        ],
+        [
+          "SCHED_RR",
+          "Real-time with a time slice between equals",
+          "1..99"
+        ],
+        [
+          "SCHED_IDLE",
+          "Only when nothing else wants the core",
+          "—"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "A real-time policy can hang the machine",
+      "text": "A SCHED_FIFO thread runs until it blocks. A busy loop at that policy will not be preempted by ordinary work, including the shell you would use to kill it. Verified on one machine: the real-time priority range is 1 to 99, while SCHED_OTHER reports a range of 0 to 0 because it uses nice instead. Real-time policies belong to audio, robotics and instrumentation — not to 'this service feels slow'."
+    },
+    {
+      "kind": "heading",
+      "text": "What actually causes a slow system"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Runnable threads far exceeding cores — check the load average against the core count",
+        "Threads blocked on I/O, which no priority change will speed up",
+        "Lock contention, which looks like poor CPU use rather than high CPU use",
+        "One process at a very low nice value being starved by everything else"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Adjusting priorities is the last of those to reach for, not the first. If the load average is well under the core count and things still feel slow, the problem is waiting, not scheduling — and the earlier lessons in this module cover what it is waiting on."
+    },
+    {
+      "kind": "try",
+      "title": "Measure priority, correctly",
+      "steps": [
+        "Write a program that loops doing arithmetic for exactly 3 seconds and prints how many iterations it completed",
+        "Run two copies at the same time on an unloaded machine — they should complete similar amounts",
+        "Now pin both to one core: taskset -c 0 ./hog & taskset -c 0 ./hog & wait",
+        "Confirm they now split that core roughly evenly",
+        "Run: taskset -c 0 ./hog & taskset -c 0 nice -n 10 ./hog & wait     and compare",
+        "Repeat with nice -n 19 and work out the ratio",
+        "Run: uptime and compare the load average with nproc",
+        "Read: cat /proc/self/sched | head -12    (the accounting the scheduler keeps for you)"
+      ],
+      "expected": "Near-equal shares at equal nice, roughly ten-to-one at nice 10, and roughly seventy-to-one at nice 19. If you skip the pinning step, you will get noise — which is the most useful mistake in this lesson to make once, deliberately."
+    }
+  ],
+  "cheatsheet": [
+    "The scheduler balances throughput against interactive latency",
+    "Linux favours the thread with the least run time relative to its weight",
+    "I/O-bound threads accumulate little run time, so they wake up near the front — responsiveness follows from fairness",
+    "nice runs -20 (highest priority) to 19 (lowest); negative values need privilege",
+    "Measured on one contended core: nice 0 vs 10 is about 10.6x; nice 0 vs 19 is about 75x",
+    "Each nice step is roughly a 1.25x weight change",
+    "Priority only matters under contention — pin to one core before measuring",
+    "SCHED_FIFO/RR are real-time, priority 1-99, and a busy loop there can lock up the machine",
+    "Slow system: compare load average with nproc; suspect I/O and locks before priority"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why does your shell stay responsive during a long compile, without any special configuration?",
+      "choices": {
+        "A": "Shells are given a real-time priority",
+        "B": "The shell blocks on input, so it accumulates almost no run time and is near the front of the queue whenever it wakes",
+        "C": "The compiler yields the CPU voluntarily",
+        "D": "The kernel detects interactive programs by name"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Interactive responsiveness falls out of the fairness rule rather than being a special case: whoever has used the least gets picked first."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Two CPU-bound processes share one core, one at nice 0 and one at nice 19. Roughly what share does the nice 19 process get?",
+      "choices": {
+        "A": "About half",
+        "B": "About a percent or two — measured at roughly 75 to 1",
+        "C": "About a tenth",
+        "D": "None at all — it is never scheduled"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Each nice step is about a 1.25x weight change, so nineteen steps is roughly 1.25^19, near 73. It still runs; it just gets very little."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "You compare nice 0 with nice 19 on an idle 10-core machine and see no difference. Why?",
+      "choices": {
+        "A": "nice does not work on modern kernels",
+        "B": "With free cores there is no contention, so both simply run — priority only expresses itself when threads compete for the same core",
+        "C": "You need root to use nice",
+        "D": "The processes were too short-lived"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "This exact mistake produced meaningless numbers when this lesson's measurements were first taken. Pin both to one core, then measure."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "A service feels slow. Load average is 0.4 on an 8-core machine. What is the likely cause?",
+      "choices": {
+        "A": "It needs a better nice value",
+        "B": "It is waiting — on I/O or on a lock — because there is plenty of idle CPU",
+        "C": "Too few cores",
+        "D": "The scheduler policy is wrong"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A load average far below the core count means the CPU is not the constraint. Changing priority cannot speed up something that is not running because it is blocked."
+    }
+  ]
+}
