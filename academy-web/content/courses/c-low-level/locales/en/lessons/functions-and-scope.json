@@ -1,0 +1,235 @@
+{
+  "nodeId": "functions-and-scope",
+  "locale": "en",
+  "title": "Functions, arguments, and lifetimes",
+  "objective": "By the end of this lesson you can write and declare functions correctly, and you can explain how long each kind of variable lives — which is the idea the rest of the course depends on.",
+  "blocks": [
+    {
+      "kind": "code",
+      "caption": "Declaration, definition, call",
+      "lines": [
+        "int add(int a, int b);            /* declaration: the signature, no body */",
+        "",
+        "int add(int a, int b) {           /* definition: the actual code */",
+        "    return a + b;",
+        "}",
+        "",
+        "int main(void) {",
+        "    printf(\"%d\\n\", add(2, 3));   /* call */",
+        "    return 0;",
+        "}"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Declaration and definition are separate on purpose",
+      "text": "The declaration tells the compiler the shape of the function so it can check your calls. The definition provides the code, and the linker matches the two. That separation is what lets a project be split across files — and it is also why a missing definition surfaces as 'undefined reference' at link time rather than as a compile error."
+    },
+    {
+      "kind": "heading",
+      "text": "C passes everything by value"
+    },
+    {
+      "kind": "code",
+      "caption": "The function gets a copy",
+      "lines": [
+        "void try_to_change(int n) {",
+        "    n = 99;                       /* changes the copy only */",
+        "}",
+        "",
+        "int x = 1;",
+        "try_to_change(x);",
+        "printf(\"%d\\n\", x);                /* still 1 */",
+        "",
+        "void really_change(int *n) {      /* pass the address instead */",
+        "    *n = 99;",
+        "}",
+        "really_change(&x);",
+        "printf(\"%d\\n\", x);                /* now 99 */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "There is no exception to this rule. When you pass a pointer, the pointer itself is copied — but the copy holds the same address, so the function can reach the original. This is the whole mechanism behind output parameters, and it is why the next module is the heart of the course."
+    },
+    {
+      "kind": "heading",
+      "text": "Lifetime: how long a variable exists"
+    },
+    {
+      "kind": "table",
+      "headers": ["Where declared", "Lives", "Lives until"],
+      "rows": [
+        ["Inside a function", "On the stack", "The function returns"],
+        ["Inside a block", "On the stack", "The block ends"],
+        ["static inside a function", "In static storage", "The program exits — value persists between calls"],
+        ["Outside all functions", "In static storage", "The program exits"],
+        ["From malloc", "On the heap", "You call free"]
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "static keeps its value between calls",
+      "lines": [
+        "int counter(void) {",
+        "    static int count = 0;    /* initialised once, not on every call */",
+        "    count++;",
+        "    return count;",
+        "}",
+        "",
+        "counter();  counter();  printf(\"%d\\n\", counter());   /* 3 */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Never return the address of a local variable",
+      "text": "A local variable ceases to exist when the function returns, so a pointer to it points at reclaimed stack space. The program may appear to work — the value is often still sitting there untouched — until another call reuses that memory and the value silently changes. This is one of the most common serious mistakes in early C, and -Wall catches the obvious form of it."
+    },
+    {
+      "kind": "code",
+      "caption": "The wrong way and two right ways",
+      "lines": [
+        "char *broken(void) {",
+        "    char buf[64];",
+        "    strcpy(buf, \"hello\");",
+        "    return buf;              /* WRONG: buf is gone when this returns */",
+        "}",
+        "",
+        "void caller_provides(char *out, size_t n) {   /* caller owns the memory */",
+        "    snprintf(out, n, \"hello\");",
+        "}",
+        "",
+        "char *heap_version(void) {   /* or allocate; caller must free */",
+        "    char *p = malloc(64);",
+        "    if (p) strcpy(p, \"hello\");",
+        "    return p;",
+        "}"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "static at file level means 'private to this file'"
+    },
+    {
+      "kind": "code",
+      "caption": "Two meanings, one keyword",
+      "lines": [
+        "static int helper(int x) { ... }   /* not visible to other files */",
+        "static int module_state = 0;       /* file-private global */",
+        "",
+        "int public_api(int x) { ... }      /* visible to the whole program */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Inside a function, static means 'keep the value between calls'. At file level, it means 'do not export this name'. The second use is how C limits what a file exposes, and marking everything internal as static is a cheap way to keep a module's surface small."
+    },
+    {
+      "kind": "heading",
+      "text": "Returning success or failure"
+    },
+    {
+      "kind": "code",
+      "caption": "The C convention: return status, write results through pointers",
+      "lines": [
+        "int parse_port(const char *text, int *out) {",
+        "    char *end;",
+        "    long value = strtol(text, &end, 10);",
+        "    if (*end != '\\0' || value < 1 || value > 65535) {",
+        "        return -1;               /* failure */",
+        "    }",
+        "    *out = (int)value;",
+        "    return 0;                    /* success */",
+        "}",
+        "",
+        "int port;",
+        "if (parse_port(argv[1], &port) != 0) {",
+        "    fprintf(stderr, \"invalid port\\n\");",
+        "    return 1;",
+        "}"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Check every return value, every time",
+      "text": "C has no exceptions. A function that can fail tells you by its return value, and a caller that ignores it continues with a value that was never set. Most memory-corruption stories start with an unchecked malloc, an unchecked fopen, or an unchecked parse."
+    },
+    {
+      "kind": "try",
+      "title": "Watch lifetime and pass-by-value in action",
+      "steps": [
+        "Write try_to_change and really_change from above; print x after each call",
+        "Write the counter() function with static and call it three times",
+        "Write the broken() function that returns a local buffer; compile with -Wall and read the warning",
+        "Run it anyway and see what it prints — then call another function before printing, and compare",
+        "Rewrite it as caller_provides() and confirm the output is stable",
+        "Compile with -fsanitize=address and run the broken version again"
+      ],
+      "expected": "A copy that does not affect the original, a pointer that does, a static counter that remembers, and a returned local buffer that appears to work until something else uses the stack. The sanitizer names the last one precisely: stack-use-after-return."
+    }
+  ],
+  "cheatsheet": [
+    "Declaration = signature (checks calls); definition = code (linker matches them)",
+    "C passes everything by value — pass an address to let a function modify the original",
+    "Local variables live on the stack and die when the function returns",
+    "static inside a function: value persists between calls",
+    "static at file level: the name is private to that file",
+    "Never return a pointer to a local variable",
+    "Either the caller provides the buffer, or you allocate and document who frees it",
+    "Convention: return 0 or a status code, write results through pointer parameters",
+    "Check every return value — C has no exceptions to fall back on"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "You pass an int to a function and it assigns a new value to the parameter. What happens to the caller's variable?",
+      "choices": {
+        "A": "It changes too",
+        "B": "Nothing — C passes by value, so the function received a copy",
+        "C": "It becomes undefined",
+        "D": "It depends on the compiler"
+      },
+      "correct": ["B"],
+      "explanation": "To modify the caller's variable you pass its address and write through the pointer."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why must you never return a pointer to a local variable?",
+      "choices": {
+        "A": "It is a compile error",
+        "B": "The local ceases to exist when the function returns, so the pointer refers to reclaimed stack memory that another call will overwrite",
+        "C": "Local variables cannot be addressed",
+        "D": "It leaks memory"
+      },
+      "correct": ["B"],
+      "explanation": "It often appears to work at first, because the value is still sitting in memory nobody has reused yet — which is what makes it dangerous."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "What does static mean on a variable declared inside a function?",
+      "choices": {
+        "A": "It cannot be modified",
+        "B": "It is initialised once and keeps its value between calls, instead of being recreated each time",
+        "C": "It is stored on the stack",
+        "D": "It is visible to other files"
+      },
+      "correct": ["B"],
+      "explanation": "At file level the same keyword means something different: the name is not exported to other files."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "What is the standard C convention for a function that can fail?",
+      "choices": {
+        "A": "Throw an exception",
+        "B": "Return a status value and write the real result through a pointer parameter, so the caller can check before using it",
+        "C": "Return the result and print errors to the screen",
+        "D": "Call exit() on failure"
+      },
+      "correct": ["B"],
+      "explanation": "There are no exceptions in C. The status return is the only signal, and an unchecked one means continuing with a value that was never set."
+    }
+  ]
+}

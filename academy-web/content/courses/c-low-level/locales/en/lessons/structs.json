@@ -1,0 +1,234 @@
+{
+  "nodeId": "structs",
+  "locale": "en",
+  "title": "Structs: grouping data, and what the compiler adds",
+  "objective": "By the end of this lesson you can define and use structs, and you can explain why sizeof a struct is often larger than the sum of its fields — which matters as soon as data crosses a boundary.",
+  "blocks": [
+    {
+      "kind": "code",
+      "caption": "Defining and using a struct",
+      "lines": [
+        "struct point {",
+        "    int x;",
+        "    int y;",
+        "};",
+        "",
+        "struct point p = {3, 4};",
+        "struct point q = {.x = 3, .y = 4};   /* designated initialisers: clearer, order-free */",
+        "",
+        "printf(\"%d %d\\n\", p.x, p.y);",
+        "",
+        "struct point *ptr = &p;",
+        "printf(\"%d\\n\", ptr->x);              /* -> is (*ptr).x written readably */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Use designated initialisers",
+      "text": "Writing {.x = 3, .y = 4} survives someone reordering the fields, and it states which value is which. Positional initialisation quietly assigns the wrong values the day a field is inserted in the middle."
+    },
+    {
+      "kind": "heading",
+      "text": "typedef: naming the type"
+    },
+    {
+      "kind": "code",
+      "caption": "Two common styles",
+      "lines": [
+        "typedef struct {",
+        "    int x;",
+        "    int y;",
+        "} Point;",
+        "",
+        "Point p = {.x = 1, .y = 2};      /* no need to write 'struct' every time */",
+        "",
+        "/* Or keep the tag, which allows self-reference: */",
+        "typedef struct node {",
+        "    int value;",
+        "    struct node *next;           /* a struct cannot contain itself, but may point to itself */",
+        "} Node;"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Padding: the bytes you did not ask for"
+    },
+    {
+      "kind": "code",
+      "caption": "Same fields, different sizes",
+      "lines": [
+        "struct wasteful {",
+        "    char  a;      /* 1 byte, then 3 bytes of padding */",
+        "    int   b;      /* 4 bytes — must start on a 4-byte boundary */",
+        "    char  c;      /* 1 byte, then 3 bytes of padding at the end */",
+        "};                /* sizeof == 12 */",
+        "",
+        "struct tidy {",
+        "    int   b;      /* 4 */",
+        "    char  a;      /* 1 */",
+        "    char  c;      /* 1, then 2 bytes of padding */",
+        "};                /* sizeof == 8 */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The compiler inserts padding so each field starts at an address the hardware can access efficiently. The fields are the same; only the order changed. Ordering fields from largest to smallest usually removes most of the waste, which matters when you have millions of these in memory."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Never write a struct straight to a file or a socket",
+      "text": "The padding is invisible in your source but present in memory, and its layout depends on the compiler and the platform. Writing the raw bytes produces a file another machine may read incorrectly — and reading a struct straight from untrusted input is worse, because the padding bytes come along with whatever they contained. Serialise field by field with explicit sizes and a defined byte order."
+    },
+    {
+      "kind": "code",
+      "caption": "Measuring the truth",
+      "lines": [
+        "#include <stddef.h>",
+        "",
+        "printf(\"size: %zu\\n\", sizeof(struct wasteful));",
+        "printf(\"offset of b: %zu\\n\", offsetof(struct wasteful, b));",
+        "",
+        "/* offsetof shows exactly where each field sits — including the gaps. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Structs are copied by value"
+    },
+    {
+      "kind": "code",
+      "caption": "Assignment and argument passing both copy the whole thing",
+      "lines": [
+        "struct point a = {1, 2};",
+        "struct point b = a;        /* a full copy — b.x and b.y are independent */",
+        "b.x = 99;                  /* a.x is still 1 */",
+        "",
+        "void move(struct point p);        /* copies the struct on every call */",
+        "void move_ref(struct point *p);   /* copies only a pointer — use this for large structs */",
+        "void read_only(const struct point *p);   /* and const when you will not modify it */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Where structs are actually used"
+    },
+    {
+      "kind": "code",
+      "caption": "Returning several values, and modelling a record",
+      "lines": [
+        "struct parse_result {",
+        "    int   ok;",
+        "    int   value;",
+        "    const char *error;",
+        "};",
+        "",
+        "struct parse_result parse(const char *text) {",
+        "    if (!text) return (struct parse_result){.ok = 0, .error = \"no input\"};",
+        "    return (struct parse_result){.ok = 1, .value = atoi(text)};",
+        "}",
+        "",
+        "/* A function can only return one thing — a struct is how you return several. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Unions and enums, briefly"
+    },
+    {
+      "kind": "code",
+      "caption": "A union holds one field at a time; an enum names a set of values",
+      "lines": [
+        "enum state { IDLE, RUNNING, DONE };      /* 0, 1, 2 unless you assign values */",
+        "",
+        "union value {",
+        "    int    as_int;",
+        "    float  as_float;",
+        "};                                       /* sizeof is the largest member, not the sum */",
+        "",
+        "/* A union does not remember which member you last wrote.",
+        "   Pair it with an enum tag so the code can tell: */",
+        "struct tagged {",
+        "    enum { IS_INT, IS_FLOAT } kind;",
+        "    union value v;",
+        "};"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Measure padding for yourself",
+      "steps": [
+        "Define struct wasteful and struct tidy exactly as above",
+        "Print sizeof for both and compare",
+        "Include <stddef.h> and print offsetof for every field of struct wasteful",
+        "Reorder the fields of one of your own structs from largest type to smallest and re-measure",
+        "Define a Point with typedef and pass it to a function by value, then by pointer",
+        "Write a function returning struct parse_result and use both fields at the call site"
+      ],
+      "expected": "Two structs with identical fields and different sizes, offsets that show exactly where the gaps are, and a function that returns several values at once. The size difference is the lesson: the layout in memory is not the layout in your source."
+    }
+  ],
+  "cheatsheet": [
+    "struct groups related fields; access with . and through a pointer with ->",
+    "Use designated initialisers: {.x = 1, .y = 2} survives field reordering",
+    "typedef lets you drop the 'struct' keyword; keep a tag if the struct points at itself",
+    "The compiler inserts padding so fields are aligned — sizeof is usually more than the sum",
+    "Ordering fields largest to smallest removes most padding",
+    "offsetof shows exactly where each field sits, gaps included",
+    "Never write a raw struct to a file or socket — serialise field by field",
+    "Structs are copied by value on assignment and on every call; pass large ones by pointer",
+    "A union is as large as its biggest member and does not remember which member is live",
+    "Pair a union with an enum tag so the code knows which member to read"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why is sizeof a struct often larger than the sum of its fields?",
+      "choices": {
+        "A": "The compiler stores the field names",
+        "B": "Padding is inserted so each field starts at an address the hardware can access efficiently",
+        "C": "Structs always round up to 16 bytes",
+        "D": "It includes a pointer to the type"
+      },
+      "correct": ["B"],
+      "explanation": "Alignment requirements create gaps between fields. Reordering from largest to smallest usually removes most of them."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why should you not write a struct directly to a file or network socket?",
+      "choices": {
+        "A": "It is too slow",
+        "B": "The layout includes padding whose size and position depend on the compiler and platform, so another machine may read it incorrectly",
+        "C": "Structs cannot be converted to bytes",
+        "D": "The file would be too large"
+      },
+      "correct": ["B"],
+      "explanation": "Anything crossing a boundary needs an explicit format: field by field, with fixed-width types and a defined byte order."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "struct point b = a; What is b?",
+      "choices": {
+        "A": "A reference to a",
+        "B": "A full independent copy — changing b does not affect a",
+        "C": "A pointer to a",
+        "D": "Undefined behaviour"
+      },
+      "correct": ["B"],
+      "explanation": "Structs are copied by value, on assignment and on every function call. For large structs, pass a pointer instead."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "What is the size of a union with an int and a double member, and what does it remember?",
+      "choices": {
+        "A": "The sum of both, and it remembers the last write",
+        "B": "The size of its largest member, and it does not track which member was last written",
+        "C": "Always 8 bytes, and it remembers nothing",
+        "D": "The size of the first member"
+      },
+      "correct": ["B"],
+      "explanation": "That is why a union is normally paired with an enum tag in a surrounding struct — the tag is what makes reading it safe."
+    }
+  ]
+}

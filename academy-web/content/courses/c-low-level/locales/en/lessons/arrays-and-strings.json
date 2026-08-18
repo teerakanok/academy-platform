@@ -1,0 +1,207 @@
+{
+  "nodeId": "arrays-and-strings",
+  "locale": "en",
+  "title": "Arrays and strings: where the bugs live",
+  "objective": "By the end of this lesson you can work with arrays and C strings correctly, and you can explain why the classic string functions are dangerous and what to use instead.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "C has no string type. A string is an array of characters with a zero byte marking the end, and an array is a block of memory with no length attached. Every problem in this lesson comes from those two facts."
+    },
+    {
+      "kind": "code",
+      "caption": "Arrays: fixed size, no bounds checking",
+      "lines": [
+        "int scores[5];                    /* uninitialised — contains whatever was there */",
+        "int ready[5] = {1, 2, 3, 4, 5};",
+        "int zeroed[5] = {0};              /* every element set to 0 */",
+        "",
+        "scores[0] = 10;",
+        "scores[5] = 99;                   /* past the end: compiles, may corrupt something */",
+        "",
+        "size_t n = sizeof ready / sizeof ready[0];   /* 5 — the only way to get the count */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "That sizeof trick stops working the moment the array is passed to a function",
+      "text": "When you pass an array to a function it becomes a pointer, and sizeof then measures the pointer, not the array — usually 8. This is why every C function that takes an array also takes a length. If a function signature has an array without a length beside it, that is a defect waiting to happen."
+    },
+    {
+      "kind": "heading",
+      "text": "Strings are arrays that end in a zero byte"
+    },
+    {
+      "kind": "code",
+      "caption": "The terminator is the string",
+      "lines": [
+        "char greeting[] = \"hi\";      /* 3 bytes: 'h', 'i', '\\0' */",
+        "",
+        "printf(\"%zu\\n\", sizeof greeting);   /* 3 — includes the terminator */",
+        "printf(\"%zu\\n\", strlen(greeting));  /* 2 — counts up to the terminator */",
+        "",
+        "char *literal = \"hello\";     /* points into read-only memory */",
+        "literal[0] = 'H';            /* undefined behaviour — usually a crash */",
+        "",
+        "char editable[] = \"hello\";   /* a copy on the stack — this one you may modify */",
+        "editable[0] = 'H';           /* fine */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Lose the terminator and every string function runs off the end",
+      "text": "strlen, printf(\"%s\"), strcpy and the rest all keep going until they find a zero byte. If it is missing, they read past the end of your buffer into whatever follows — printing memory that was never yours, or crashing. A great many string bugs are really terminator bugs."
+    },
+    {
+      "kind": "heading",
+      "text": "The dangerous functions and their replacements"
+    },
+    {
+      "kind": "table",
+      "headers": ["Avoid", "Why", "Use instead"],
+      "rows": [
+        ["gets(buf)", "No size limit at all — removed from the language", "fgets(buf, sizeof buf, stdin)"],
+        ["strcpy(dst, src)", "Writes until the terminator, however long that is", "snprintf(dst, sizeof dst, \"%s\", src)"],
+        ["strcat(dst, src)", "Same problem, plus it starts at the existing end", "snprintf with the whole result"],
+        ["sprintf(buf, ...)", "No size limit", "snprintf(buf, sizeof buf, ...)"],
+        ["strncpy(dst, src, n)", "May leave the result unterminated", "snprintf, or terminate explicitly"]
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "The overflow, in four lines",
+      "lines": [
+        "char small[8];",
+        "const char *input = \"this is far longer than eight bytes\";",
+        "strcpy(small, input);        /* writes ~35 bytes into 8 — everything after is corrupted */",
+        "",
+        "snprintf(small, sizeof small, \"%s\", input);   /* writes 7 bytes plus a terminator */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "strncpy is not the safe version of strcpy",
+      "text": "It copies at most n bytes — but if the source is n bytes or longer it does not add a terminator, leaving you with a string that no longer ends. It also pads with zeros when the source is shorter, which is slow for large buffers. It was designed for a fixed-width record format, not for safe copying. Prefer snprintf, which always terminates."
+    },
+    {
+      "kind": "heading",
+      "text": "Passing arrays to functions"
+    },
+    {
+      "kind": "code",
+      "caption": "Always pass the length",
+      "lines": [
+        "int sum(const int *values, size_t count) {   /* count is not optional */",
+        "    int total = 0;",
+        "    for (size_t i = 0; i < count; i++) total += values[i];",
+        "    return total;",
+        "}",
+        "",
+        "int data[] = {1, 2, 3, 4};",
+        "printf(\"%d\\n\", sum(data, sizeof data / sizeof data[0]));",
+        "",
+        "/* Inside sum, sizeof values is the size of a pointer — the count must come from outside. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Two-dimensional arrays are one block"
+    },
+    {
+      "kind": "code",
+      "caption": "Rows are laid out one after another",
+      "lines": [
+        "int grid[3][4];              /* 12 ints, contiguous in memory */",
+        "grid[1][2] = 7;",
+        "",
+        "/* In memory: row0[0..3] row1[0..3] row2[0..3] */",
+        "/* grid[1][2] is at offset 1*4 + 2 = 6 */",
+        "",
+        "void print_grid(int rows, int cols, int g[rows][cols]) {   /* dimensions come first */",
+        "    for (int r = 0; r < rows; r++)",
+        "        for (int c = 0; c < cols; c++)",
+        "            printf(\"%d \", g[r][c]);",
+        "}"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Overflow a buffer, then fix it",
+      "steps": [
+        "Write: char small[8]; strcpy(small, \"far too long for eight\"); printf(\"%s\\n\", small);",
+        "Run: gcc -Wall -Wextra -O0 -g str.c -o str && ./str      (it may appear to work)",
+        "Run: gcc -Wall -Wextra -O0 -g -fsanitize=address str.c -o str && ./str",
+        "Read the report: buffer name, size, and how far past the end it wrote",
+        "Replace strcpy with snprintf(small, sizeof small, \"%s\", input) and run again",
+        "Now print sizeof and strlen of a string and explain the difference to yourself",
+        "Write sum(const int *, size_t) and confirm that sizeof inside it gives 8, not the array size"
+      ],
+      "expected": "An overflow that the plain build hides and the sanitizer names exactly, a bounded copy that truncates safely instead, and first-hand proof that an array loses its size the moment it is passed to a function."
+    }
+  ],
+  "cheatsheet": [
+    "An array is memory with no length attached; there is no bounds checking",
+    "sizeof arr / sizeof arr[0] gives the count — but only where the array was declared",
+    "Passing an array to a function turns it into a pointer, so always pass the length too",
+    "A C string is characters plus a terminating zero byte",
+    "sizeof includes the terminator; strlen does not",
+    "String literals are read-only; char s[] = \"...\" makes a modifiable copy",
+    "Never gets, strcpy, strcat, or sprintf",
+    "Use fgets and snprintf — both take a size and always terminate",
+    "strncpy may leave the result unterminated; it is not the safe strcpy",
+    "2D arrays are one contiguous block, laid out row after row"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why must a C function that receives an array also receive its length?",
+      "choices": {
+        "A": "For performance",
+        "B": "Because the array becomes a pointer when passed, so sizeof inside the function measures the pointer, not the array",
+        "C": "Because arrays cannot be passed at all",
+        "D": "To support two-dimensional arrays"
+      },
+      "correct": ["B"],
+      "explanation": "The size information is lost at the call. A signature with an array and no length is a bug waiting for the wrong input."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "char s[] = \"hi\"; What are sizeof s and strlen(s)?",
+      "choices": {
+        "A": "Both 2",
+        "B": "Both 3",
+        "C": "sizeof is 3 (including the terminator), strlen is 2 (up to it)",
+        "D": "sizeof is 2, strlen is 3"
+      },
+      "correct": ["C"],
+      "explanation": "The terminating zero byte is part of the storage but not part of the length. Mixing the two up is a common source of off-by-one errors."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why is strncpy not simply the safe version of strcpy?",
+      "choices": {
+        "A": "It is slower",
+        "B": "If the source is as long as or longer than n, it does not write a terminator — leaving a string that never ends",
+        "C": "It cannot be used with arrays",
+        "D": "It was removed from the standard"
+      },
+      "correct": ["B"],
+      "explanation": "It was designed for fixed-width records, not for safe copying. snprintf always terminates, which is why it is the recommendation."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "What happens if a character array loses its terminating zero byte?",
+      "choices": {
+        "A": "It becomes an empty string",
+        "B": "String functions keep reading past the end of the buffer into unrelated memory, printing or copying whatever is there",
+        "C": "The compiler adds one automatically",
+        "D": "Nothing — the length is stored separately"
+      },
+      "correct": ["B"],
+      "explanation": "The terminator is the only thing that marks the end. Without it, every string function runs off into memory that was never part of your data."
+    }
+  ]
+}

@@ -23,6 +23,11 @@
     "why-c": "Why C is still worth learning",
     "compilation-pipeline": "From source file to running program",
     "first-c-program": "Your first C program",
-    "undefined-behavior": "Undefined behaviour: when C stops promising"
+    "undefined-behavior": "Undefined behaviour: when C stops promising",
+    "types-and-operators": "Types, conversions, and the operators that surprise you",
+    "control-flow": "Control flow and the traps in it",
+    "functions-and-scope": "Functions, arguments, and lifetimes",
+    "arrays-and-strings": "Arrays and strings: where the bugs live",
+    "structs": "Structs: grouping data, and what the compiler adds"
   }
 }

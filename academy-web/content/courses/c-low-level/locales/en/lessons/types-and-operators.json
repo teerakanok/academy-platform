@@ -1,0 +1,199 @@
+{
+  "nodeId": "types-and-operators",
+  "locale": "en",
+  "title": "Types, conversions, and the operators that surprise you",
+  "objective": "By the end of this lesson you can predict what C does when types meet — which is where a large share of real defects begin, including several with security consequences.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "C converts between types silently and often. Most of the time the result is what you wanted. The exceptions are worth knowing by heart, because they produce code that looks correct, compiles without complaint, and computes the wrong answer."
+    },
+    {
+      "kind": "heading",
+      "text": "Integer division truncates"
+    },
+    {
+      "kind": "code",
+      "caption": "The first surprise",
+      "lines": [
+        "int total = 7, count = 2;",
+        "int average = total / count;          /* 3, not 3.5 — the fraction is discarded */",
+        "double correct = (double)total / count;  /* 3.5 — one cast is enough */",
+        "",
+        "printf(\"%d %.1f\\n\", average, correct);"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Division between two integers produces an integer. The conversion to double happens after the division has already thrown the remainder away, so casting the result does not help — you have to cast one operand before the division."
+    },
+    {
+      "kind": "heading",
+      "text": "Mixing signed and unsigned"
+    },
+    {
+      "kind": "code",
+      "caption": "The comparison that is false",
+      "lines": [
+        "int i = -1;",
+        "unsigned int u = 1;",
+        "",
+        "if (i < u) {",
+        "    printf(\"as expected\\n\");",
+        "} else {",
+        "    printf(\"this branch runs\\n\");   /* and it does */",
+        "}",
+        "",
+        "/* i is converted to unsigned first: -1 becomes 4294967295, which is not < 1 */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Where this becomes a vulnerability",
+      "text": "A length check written as if (len > max) with len signed and max unsigned converts len to unsigned. A negative length — from a malformed input, or from subtracting where the result went below zero — becomes an enormous positive number, passes the check backwards, and is then used as a size. This exact pattern appears repeatedly in advisories. Use size_t for sizes and lengths, and never let a signed value reach a size calculation unchecked."
+    },
+    {
+      "kind": "heading",
+      "text": "The promotion rules, briefly"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Types narrower than int (char, short) are promoted to int before arithmetic",
+        "When operands differ, the narrower is converted to the wider",
+        "When they are the same width but differ in sign, the signed one becomes unsigned",
+        "Assigning a wider value to a narrower variable truncates, keeping the low bits"
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "Truncation, visible",
+      "lines": [
+        "int big = 300;",
+        "char small = big;              /* 300 does not fit in a byte */",
+        "printf(\"%d\\n\", small);        /* 44 — the low 8 bits of 300 */",
+        "",
+        "unsigned char c = 255;",
+        "c = c + 1;                     /* 0 — unsigned wraps, and this is defined */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Operators worth a second look"
+    },
+    {
+      "kind": "table",
+      "headers": ["Expression", "Result", "Note"],
+      "rows": [
+        ["7 / 2", "3", "Integer division truncates toward zero"],
+        ["7 % 2", "1", "Remainder; the sign follows the left operand"],
+        ["i++ vs ++i", "Same variable, different value returned", "Use as a statement, not inside a larger expression"],
+        ["a && b", "b is not evaluated if a is false", "Short-circuit — often used deliberately as a guard"],
+        ["x = y = 0", "Both become 0", "Assignment is an expression and returns its value"],
+        ["if (x = 5)", "Always true", "Assignment, not comparison — a classic typo"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Short-circuit evaluation is a safety tool",
+      "text": "if (p != NULL && p->count > 0) is safe precisely because && stops when the left side is false, so p->count is never evaluated on a NULL pointer. Order matters: swap the two conditions and the program dereferences NULL. This idiom appears constantly in C and is worth reading carefully whenever you see it."
+    },
+    {
+      "kind": "heading",
+      "text": "const: saying what must not change"
+    },
+    {
+      "kind": "code",
+      "caption": "It documents intent and lets the compiler enforce it",
+      "lines": [
+        "const int limit = 100;",
+        "limit = 200;                    /* compile error — good */",
+        "",
+        "void print_name(const char *name);   /* promises not to modify what name points to */",
+        "",
+        "#define MAX 100                  /* the older way: text replacement, no type */",
+        "const int max = 100;             /* preferred: has a type, visible to the debugger */"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Reproduce each surprise yourself",
+      "steps": [
+        "Create types.c and print each of these:",
+        "  printf(\"%d\\n\", 7 / 2);",
+        "  printf(\"%.2f\\n\", (double)7 / 2);",
+        "  int i = -1; unsigned u = 1; printf(\"%s\\n\", i < u ? \"less\" : \"NOT less\");",
+        "  int big = 300; char small = big; printf(\"%d\\n\", small);",
+        "  unsigned char c = 255; c = c + 1; printf(\"%d\\n\", c);",
+        "Run: gcc -Wall -Wextra -O0 -g types.c -o types && ./types",
+        "Read every warning the compiler produced — each one marks a real hazard",
+        "Add: printf(\"%zu %zu %zu\\n\", sizeof(int), sizeof(long), sizeof(size_t));"
+      ],
+      "expected": "Truncated division, a signed/unsigned comparison that goes the wrong way, a value that does not fit being cut down to its low bits, defined unsigned wrapping, and the real type sizes on your machine. Every one of these has been the root cause of a real defect."
+    }
+  ],
+  "cheatsheet": [
+    "Integer / integer = integer: cast an operand BEFORE dividing, not the result",
+    "Signed and unsigned in one comparison: the signed side is converted to unsigned",
+    "A negative length compared against an unsigned maximum passes the check backwards",
+    "Use size_t for sizes and lengths; keep signed values out of size calculations",
+    "char and short are promoted to int before arithmetic",
+    "Assigning wide to narrow truncates to the low bits",
+    "Unsigned overflow wraps and is defined; signed overflow is undefined",
+    "&& and || short-circuit — p != NULL && p->x is the standard guard, and order matters",
+    "if (x = 5) is an assignment and always true; -Wall warns about it",
+    "Prefer const over #define: it has a type and the debugger can see it"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What does 7 / 2 evaluate to in C, and why?",
+      "choices": {
+        "A": "3.5 — C promotes to double automatically",
+        "B": "3 — both operands are integers, so integer division discards the fraction",
+        "C": "4 — it rounds to nearest",
+        "D": "It is a compile error"
+      },
+      "correct": ["B"],
+      "explanation": "Casting the result does not help because the fraction is already gone. Cast one operand before the division: (double)7 / 2."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "int i = -1; unsigned u = 1; Is i < u true?",
+      "choices": {
+        "A": "Yes — -1 is less than 1",
+        "B": "No — i is converted to unsigned first, becoming a very large number",
+        "C": "It is undefined behaviour",
+        "D": "It depends on the compiler"
+      },
+      "correct": ["B"],
+      "explanation": "When signed and unsigned of the same width meet, the signed value converts to unsigned. This rule is behind a recurring class of length-check vulnerabilities."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why is if (p != NULL && p->count > 0) safe?",
+      "choices": {
+        "A": "C checks pointers automatically",
+        "B": "Because && short-circuits: if the left side is false, the right side is never evaluated, so p is never dereferenced when NULL",
+        "C": "Because NULL is treated as zero",
+        "D": "It is not safe"
+      },
+      "correct": ["B"],
+      "explanation": "The order is the safety. Written the other way round, the dereference happens before the check."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why should a length or size be stored in size_t rather than int?",
+      "choices": {
+        "A": "size_t is faster",
+        "B": "size_t is unsigned and wide enough for any object, so a negative value cannot silently become an enormous size in a comparison or allocation",
+        "C": "int cannot hold large numbers",
+        "D": "It is required by printf"
+      },
+      "correct": ["B"],
+      "explanation": "Mixing a signed length into an unsigned comparison is exactly how a check gets passed backwards, and it appears in real advisories repeatedly."
+    }
+  ]
+}

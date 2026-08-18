@@ -23,6 +23,11 @@
     "why-c": "ทำไม C ยังคุ้มที่จะเรียน",
     "compilation-pipeline": "จากไฟล์ source สู่โปรแกรมที่ทำงานได้",
     "first-c-program": "โปรแกรม C ตัวแรกของคุณ",
-    "undefined-behavior": "undefined behaviour: เมื่อ C เลิกสัญญา"
+    "undefined-behavior": "undefined behaviour: เมื่อ C เลิกสัญญา",
+    "types-and-operators": "ชนิดข้อมูล การแปลงค่า และตัวดำเนินการที่ทำคนแปลกใจ",
+    "control-flow": "การควบคุมการไหลและกับดักในนั้น",
+    "functions-and-scope": "ฟังก์ชัน argument และอายุของตัวแปร",
+    "arrays-and-strings": "array และ string: ที่ที่บั๊กอาศัยอยู่",
+    "structs": "struct: การจัดกลุ่มข้อมูล และสิ่งที่คอมไพเลอร์แถมมาให้"
   }
 }

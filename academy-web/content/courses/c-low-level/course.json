@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 64,
+  "estimatedMinutes": 154,
   "coverMotif": "probe",
   "skills": [
     {
@@ -86,6 +86,66 @@
       "skillWeights": {
         "c-syntax": 3,
         "debugging": 4
+      }
+    },
+    {
+      "id": "types-and-operators",
+      "kind": "lesson",
+      "prerequisites": [
+        "undefined-behavior"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "c-syntax": 4,
+        "debugging": 3
+      }
+    },
+    {
+      "id": "control-flow",
+      "kind": "lesson",
+      "prerequisites": [
+        "types-and-operators"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "c-syntax": 5
+      }
+    },
+    {
+      "id": "functions-and-scope",
+      "kind": "lesson",
+      "prerequisites": [
+        "control-flow"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "c-syntax": 4,
+        "memory-model": 3
+      }
+    },
+    {
+      "id": "arrays-and-strings",
+      "kind": "capstone",
+      "prerequisites": [
+        "functions-and-scope"
+      ],
+      "estimatedMinutes": 20,
+      "skillWeights": {
+        "memory-model": 4,
+        "debugging": 4,
+        "c-syntax": 2
+      }
+    },
+    {
+      "id": "structs",
+      "kind": "lesson",
+      "prerequisites": [
+        "arrays-and-strings"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "memory-model": 5,
+        "c-syntax": 2
       }
     }
   ]

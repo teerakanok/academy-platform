@@ -1,0 +1,235 @@
+{
+  "nodeId": "control-flow",
+  "locale": "en",
+  "title": "Control flow and the traps in it",
+  "objective": "By the end of this lesson you can write the loops and conditionals C offers, and you recognise the four spelling mistakes that compile cleanly and change what your program does.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "The shapes here are familiar from any language. What is worth your attention is that C accepts several near-misses without complaint — a stray semicolon, a missing brace, a missing break — and each one produces a program that runs and behaves differently from the one you meant to write."
+    },
+    {
+      "kind": "code",
+      "caption": "The forms",
+      "lines": [
+        "if (x > 0) { ... } else if (x < 0) { ... } else { ... }",
+        "",
+        "for (int i = 0; i < n; i++) { ... }",
+        "while (condition) { ... }",
+        "do { ... } while (condition);       /* body runs at least once */",
+        "",
+        "switch (value) {",
+        "    case 1:  ...; break;",
+        "    case 2:  ...; break;",
+        "    default: ...;",
+        "}"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Trap 1: the semicolon that ends the statement early"
+    },
+    {
+      "kind": "code",
+      "caption": "Both compile; neither does what it looks like",
+      "lines": [
+        "if (x > 0);            /* <- this semicolon IS the if-body */",
+        "    do_something();    /* runs unconditionally */",
+        "",
+        "for (int i = 0; i < 10; i++);   /* an empty loop that runs ten times */",
+        "    printf(\"%d\\n\", i);          /* runs once, and i is out of scope here */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Trap 2: the missing brace"
+    },
+    {
+      "kind": "code",
+      "caption": "Only the first statement belongs to the if",
+      "lines": [
+        "if (authenticated)",
+        "    grant_access();",
+        "    log_admin_action();    /* runs whether or not authenticated */",
+        "",
+        "/* Always use braces, even for one statement.",
+        "   A famous TLS vulnerability came from a duplicated goto line",
+        "   under an unbraced if — the second line always executed. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Braces are not a style preference in C",
+      "text": "Indentation means nothing to the compiler, so a line that looks like it belongs to the if simply does not. Writing braces around every body — always, even for a single statement — removes an entire class of defect, and it is why most C style guides make it a rule rather than a suggestion."
+    },
+    {
+      "kind": "heading",
+      "text": "Trap 3: switch falls through without break"
+    },
+    {
+      "kind": "code",
+      "caption": "Execution continues into the next case",
+      "lines": [
+        "switch (level) {",
+        "    case 1:",
+        "        printf(\"low\\n\");      /* no break — falls through */",
+        "    case 2:",
+        "        printf(\"medium\\n\");",
+        "        break;",
+        "    default:",
+        "        printf(\"unknown\\n\");",
+        "}",
+        "",
+        "/* level == 1 prints BOTH low and medium. */",
+        "/* Deliberate fall-through is legitimate — mark it so readers know it was intended: */",
+        "    case 1:",
+        "        setup();",
+        "        /* fall through */",
+        "    case 2:",
+        "        run();",
+        "        break;"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Trap 4: assignment inside a condition"
+    },
+    {
+      "kind": "code",
+      "caption": "One character apart",
+      "lines": [
+        "if (status = READY) { ... }    /* assigns READY, condition is its value: always true */",
+        "if (status == READY) { ... }   /* compares — what you meant */",
+        "",
+        "/* -Wall warns; some people write the constant first to make it a compile error: */",
+        "if (READY == status) { ... }"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Loop control, and the one to avoid"
+    },
+    {
+      "kind": "code",
+      "caption": "break, continue, and goto",
+      "lines": [
+        "for (int i = 0; i < n; i++) {",
+        "    if (items[i] == NULL) continue;   /* skip to the next iteration */",
+        "    if (items[i]->done) break;        /* leave the loop entirely */",
+        "}",
+        "",
+        "/* goto exists. In modern C it has one accepted use: */",
+        "int process(void) {",
+        "    char *buf = malloc(1024);",
+        "    if (!buf) return -1;",
+        "    FILE *f = fopen(\"data\", \"r\");",
+        "    if (!f) goto cleanup_buf;         /* single exit path for cleanup */",
+        "    /* ...work... */",
+        "    fclose(f);",
+        "cleanup_buf:",
+        "    free(buf);",
+        "    return 0;",
+        "}"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The cleanup goto is idiomatic, not a code smell",
+      "text": "C has no destructors and no finally block. When a function acquires several resources, jumping forward to a single cleanup section is how kernel and library code avoids repeating free calls in every error branch — and repetition is where a forgotten free hides. Jumping backwards, or into the middle of a block, is a different matter and is rightly rare."
+    },
+    {
+      "kind": "heading",
+      "text": "Scope: where a name exists"
+    },
+    {
+      "kind": "code",
+      "caption": "Braces create scope",
+      "lines": [
+        "int x = 1;",
+        "{",
+        "    int x = 2;          /* a different variable, shadowing the outer one */",
+        "    printf(\"%d\\n\", x);  /* 2 */",
+        "}",
+        "printf(\"%d\\n\", x);      /* 1 */",
+        "",
+        "for (int i = 0; i < 3; i++) { }",
+        "/* i does not exist here — declare it outside the loop if you need it after */"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Trigger each trap deliberately",
+      "steps": [
+        "Write: if (1 > 2); printf(\"printed anyway\\n\");   then compile and run",
+        "Write an unbraced if with two indented lines under it and confirm the second always runs",
+        "Write a switch without break and watch it fall through",
+        "Write: int s = 0; if (s = 5) printf(\"true\\n\");   and read the -Wall warning",
+        "Run: gcc -Wall -Wextra -O0 -g traps.c -o traps 2>&1 | head -20",
+        "Fix each one and confirm the warnings disappear"
+      ],
+      "expected": "Four programs that compile and do the wrong thing, each with a compiler warning pointing at it. Seeing them once, on purpose, is what makes them visible later in someone else's code."
+    }
+  ],
+  "cheatsheet": [
+    "Always brace every if/for/while body, even a single statement",
+    "A stray semicolon after if(...) or for(...) becomes the entire body",
+    "switch falls through without break — mark deliberate fall-through with a comment",
+    "if (x = 5) assigns and is always true; -Wall warns",
+    "continue skips to the next iteration; break leaves the loop",
+    "do { } while (); runs the body at least once",
+    "goto forward to a single cleanup label is idiomatic C for multi-resource functions",
+    "Braces create scope; a loop variable declared in the for header does not outlive it"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What does if (x > 0); do_something(); do?",
+      "choices": {
+        "A": "Calls do_something only when x is positive",
+        "B": "The semicolon is the if-body, so do_something() runs unconditionally",
+        "C": "It is a compile error",
+        "D": "It calls do_something twice"
+      },
+      "correct": ["B"],
+      "explanation": "An empty statement is a valid body. The following line is simply the next statement, regardless of the condition."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why do C style guides insist on braces even for a single statement?",
+      "choices": {
+        "A": "It compiles faster",
+        "B": "Indentation means nothing to the compiler, so a second indented line silently runs unconditionally — a real vulnerability came from exactly this",
+        "C": "Braces are required by the standard",
+        "D": "It makes the file larger, which helps debugging"
+      },
+      "correct": ["B"],
+      "explanation": "The compiler reads structure, not layout. Braces make the two agree."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A switch case has no break. What happens?",
+      "choices": {
+        "A": "It jumps to default",
+        "B": "Execution continues into the next case — 'fall-through'",
+        "C": "The switch ends",
+        "D": "It is a compile error"
+      },
+      "correct": ["B"],
+      "explanation": "Sometimes that is what you want; when it is, add a comment so the next reader knows it was intended rather than forgotten."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why is a forward goto to a cleanup label accepted in C?",
+      "choices": {
+        "A": "It is faster than returning",
+        "B": "C has no destructors or finally block, so a single cleanup path avoids repeating free calls in every error branch — where a forgotten free hides",
+        "C": "It is required by the standard",
+        "D": "It prevents undefined behaviour"
+      },
+      "correct": ["B"],
+      "explanation": "The alternative is duplicating cleanup in each early return, which is exactly how resource leaks get introduced."
+    }
+  ]
+}
