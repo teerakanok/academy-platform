@@ -85,10 +85,10 @@
       "lines": [
         "  buffer 256 MB = 2,097,152 lines of 128 bytes",
         "",
-        "  write all 268,435,456 bytes        : 0.004 s   (60.0 GB/s)",
-        "  write 1 byte per 128-byte line     : 0.014 s   (2,097,152 bytes stored)",
+        "  write all 268,435,456 bytes        :   4.4 ms   (61.0 GB/s)",
+        "  write 1 byte per 128-byte line     :  14.5 ms   (2,097,152 bytes stored)",
         "",
-        "  -> writing 1/128 of the bytes took 321% of the time",
+        "  -> writing 1/128 of the bytes took 330% of the time",
         "  -> per line: writing all 128 bytes 2.13 ns, writing 1 byte 6.85 ns"
       ]
     },
@@ -119,7 +119,7 @@
         "",
         "  counters 8 bytes apart   (all in one 128-byte line) : 0.125 s",
         "  counters 128 bytes apart (one line each)            : 0.032 s",
-        "  -> 3.92x"
+        "  -> 3.91x"
       ]
     },
     {
@@ -184,11 +184,11 @@
     "Eviction is free for a clean block and costs a write-out for a dirty one",
     "Write-through updates the next level immediately; write-back defers until eviction",
     "Write-allocate fetches the block before writing into it",
-    "Measured: writing 1/128 of the bytes took 321% of the time of writing all of them",
+    "Measured: writing 1/128 of the bytes took 330% of the time of writing all of them",
     "A full-line write can skip the fetch entirely; a partial write cannot",
     "Caches are per-core; writing requires exclusive ownership of the block",
     "False sharing: separate variables in one block, ping-ponged between cores",
-    "Measured: 4 counters in one line 0.125 s, padded to their own lines 0.032 s — 3.92x",
+    "Measured: 4 counters in one line 0.125 s, padded to their own lines 0.032 s — 3.91x",
     "Many cores may read the same block at once for free; cost begins at the first write"
   ],
   "checkpoint": [
@@ -222,7 +222,7 @@
     },
     {
       "id": "cp-3",
-      "prompt": "Four threads each increment their own counter and the program is 3.92x slower when the counters are adjacent. Is this a data race?",
+      "prompt": "Four threads each increment their own counter and the program is 3.91x slower when the counters are adjacent. Is this a data race?",
       "choices": {
         "A": "Yes, the counters are shared",
         "B": "No — each thread owns its counter and both versions produce identical correct results; the cost is that the hardware transfers ownership of the whole block",

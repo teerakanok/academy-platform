@@ -114,7 +114,7 @@
         "  compiled with -O0 (the branch is really executed):",
         "    unsorted : 0.560 s",
         "    sorted   : 0.081 s",
-        "    ratio    : 6.94x",
+        "    ratio    : 6.91x",
         "",
         "  compiled with -O2 (the compiler removed the branch entirely):",
         "    unsorted : 0.008 s",
@@ -207,7 +207,7 @@
         ],
         [
           "What does a wrong guess cost?",
-          "Everything fetched since the branch, discarded — measured at 6.94x on unpredictable data"
+          "Everything fetched since the branch, discarded — measured at 6.91x on unpredictable data"
         ],
         [
           "Why did sorting help?",
@@ -254,7 +254,7 @@
     "A wrong guess discards everything fetched since the branch",
     "Predictors improve by using more history: one-bit, two-bit saturating, correlating",
     "Two-bit exists so a loop's single exit does not flip the prediction for the next entry",
-    "Measured at -O0: unpredictable data cost 6.94x predictable data for identical work",
+    "Measured at -O0: unpredictable data cost 6.91x predictable data for identical work",
     "Measured at -O2: exactly 1.00x, because the compiler replaced the branch with a mask",
     "Branchless code does both sides' work every time — only worth it when both are cheap",
     "One timed run per case measures your setup; interleave and take the best of several",
@@ -277,7 +277,7 @@
     },
     {
       "id": "cp-2",
-      "prompt": "Sorting the array made the same loop 6.94x faster at -O0. Why?",
+      "prompt": "Sorting the array made the same loop 6.91x faster at -O0. Why?",
       "choices": {
         "A": "Sorted data is smaller",
         "B": "Sorting turned the condition into a long run of false followed by a long run of true, which a history-based predictor learns immediately",

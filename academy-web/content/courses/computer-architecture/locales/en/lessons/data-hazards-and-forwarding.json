@@ -84,7 +84,7 @@
         "",
         "  1 dependent chain    :  0.185 s   0.46 ns per add",
         "  4 independent chains :  0.048 s   0.12 ns per add",
-        "  ratio                :  4.00x",
+        "  ratio                :  3.85x",
         "",
         "/* The same number of additions. The four-chain loop finished in a quarter",
         "   of the time because nothing in it had to wait for anything else. */"
@@ -146,7 +146,7 @@
         "Try eight chains instead of four and see whether the ratio keeps improving",
         "Explain what the point where it stops improving tells you about the processor"
       ],
-      "expected": "A ratio near the number of instructions the processor can issue per cycle, and a point beyond which more chains stop helping. On the machine used above, four chains gave exactly 4.00x and that is the useful measurement: it did not come from a specification sheet, it came from a loop you can run. The deleted-loop step is not optional — an unexplained 0.000 s is always the optimiser, never a fast processor."
+      "expected": "A ratio near the number of instructions the processor can issue per cycle, and a point beyond which more chains stop helping. On the machine used above, four chains gave exactly 3.85x and that is the useful measurement: it did not come from a specification sheet, it came from a loop you can run. The deleted-loop step is not optional — an unexplained 0.000 s is always the optimiser, never a fast processor."
     }
   ],
   "cheatsheet": [
@@ -155,7 +155,7 @@
     "Forwarding routes the result from the arithmetic unit output back to its input",
     "For back-to-back arithmetic, forwarding removes the stall entirely",
     "Forwarding removes the wait, not the dependency: a chain still runs one step at a time",
-    "Measured: 1 dependent chain 0.46 ns per add, 4 independent chains 0.12 ns — 4.00x",
+    "Measured: 1 dependent chain 0.46 ns per add, 4 independent chains 0.12 ns — 3.85x",
     "Array indices are independent addresses; linked-list addresses form a chain",
     "Compilers split integer accumulators freely, floating-point ones only with permission",
     "A timing of 0.000 s means the optimiser deleted the loop, not that it was fast"
@@ -191,7 +191,7 @@
     },
     {
       "id": "cp-3",
-      "prompt": "Four independent addition chains ran 4.00x faster than one chain doing the same total additions. What does that show?",
+      "prompt": "Four independent addition chains ran 3.85x faster than one chain doing the same total additions. What does that show?",
       "choices": {
         "A": "The clock speed increased",
         "B": "The processor can issue several independent instructions per cycle, and a single chain leaves most of that capacity idle",

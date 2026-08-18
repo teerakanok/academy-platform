@@ -77,7 +77,7 @@
         "",
         "  dependent   (each address comes from the previous load) : 0.187 s   1.87 ns per load",
         "  independent (addresses known in advance)                : 0.097 s   0.97 ns per load",
-        "  ratio                                                   : 1.94x",
+        "  ratio                                                   : 1.93x",
         "",
         "/* The buffer is small enough to sit in the first-level cache, so neither loop",
         "   ever waits for main memory. The only difference is whether the address of",
@@ -135,7 +135,7 @@
     "Forwarding moves a value across the circuit; it cannot move it earlier in time",
     "Remedy one: stall a cycle. Remedy two: schedule an unrelated instruction into the gap",
     "Compilers reorder code to fill that slot, which is why disassembly looks shuffled",
-    "Measured entirely in L1: dependent 1.87 ns per load, independent 0.97 ns — 1.94x",
+    "Measured entirely in L1: dependent 1.87 ns per load, independent 0.97 ns — 1.93x",
     "That gap is not cache misses; both loops hit the first-level cache every time",
     "Pointer chasing is slow because the next address is a result of the current load",
     "Locality improvements reduce miss cost; they do not remove a dependency",
@@ -172,7 +172,7 @@
     },
     {
       "id": "cp-3",
-      "prompt": "A dependent walk and an independent walk over the same 32 KB buffer differed by 1.94x. What does the 32 KB size rule out as the explanation?",
+      "prompt": "A dependent walk and an independent walk over the same 32 KB buffer differed by 1.93x. What does the 32 KB size rule out as the explanation?",
       "choices": {
         "A": "Branch misprediction",
         "B": "Cache misses — the whole buffer fits in the first-level cache, so both loops hit every time",

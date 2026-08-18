@@ -44,5 +44,9 @@ echo "== ข้ออ้างของคอร์ส Assembly (คอมไพ
 bash "$HERE/asm-claims.sh" < /dev/null || rc=1
 
 echo
+echo "== ความสอดคล้องเชิงเลขคณิตของทุกคอร์ส =="
+node "$HERE/arithmetic-consistency.mjs" || rc=1
+
+echo
 [ $rc -eq 0 ] && echo "ผ่านทั้งหมด" || echo "มีข้ออ้างที่ไม่ผ่าน หรือเกตบางส่วนถูกข้าม"
 exit $rc
