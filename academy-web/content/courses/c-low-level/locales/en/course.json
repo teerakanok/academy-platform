@@ -36,6 +36,10 @@
     "function-pointers": "Function pointers: passing behaviour around",
     "memory-bug-patterns": "Reading the symptoms: which memory bug is this?",
     "finding-memory-bugs": "The tools that find memory bugs for you",
-    "defensive-c": "Writing C that resists mistakes"
+    "defensive-c": "Writing C that resists mistakes",
+    "bitwise-ops": "Working with individual bits",
+    "integer-representation": "How integers are stored, and where they break",
+    "endianness-and-layout": "Byte order and data that crosses a boundary",
+    "floating-point": "Floating point: why 0.1 + 0.2 is not 0.3"
   }
 }

@@ -1,0 +1,223 @@
+{
+  "nodeId": "floating-point",
+  "locale": "en",
+  "title": "Floating point: why 0.1 + 0.2 is not 0.3",
+  "objective": "By the end of this lesson you can explain why floating point loses precision, compare values correctly, and recognise the situations where you should not be using it at all.",
+  "blocks": [
+    {
+      "kind": "code",
+      "caption": "The demonstration everyone should run once",
+      "lines": [
+        "#include <stdio.h>",
+        "",
+        "int main(void) {",
+        "    double a = 0.1 + 0.2;",
+        "    printf(\"%.20f\\n\", a);          /* 0.30000000000000004441 */",
+        "    printf(\"%s\\n\", a == 0.3 ? \"equal\" : \"NOT equal\");",
+        "    return 0;",
+        "}"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "This is not a bug in C, in your compiler, or in your machine. It is the same in every language that uses the same hardware representation, and the reason is simple: 0.1 cannot be written exactly in binary, any more than one third can be written exactly in decimal."
+    },
+    {
+      "kind": "heading",
+      "text": "How a double is stored"
+    },
+    {
+      "kind": "code",
+      "caption": "Three fields in 64 bits",
+      "lines": [
+        "  sign   exponent (11 bits)   fraction (52 bits)",
+        "   1          10000000000        1001100110011...",
+        "",
+        "  value = (-1)^sign x 1.fraction x 2^(exponent - 1023)",
+        "",
+        "/* Only fractions whose denominator is a power of two are exact.",
+        "   0.5, 0.25, 0.75 are exact. 0.1, 0.2, 0.3 are not. */"
+      ]
+    },
+    {
+      "kind": "table",
+      "headers": ["Type", "Bits", "Roughly", "Use for"],
+      "rows": [
+        ["float", "32", "7 significant decimal digits", "Graphics, large arrays where memory matters"],
+        ["double", "64", "15-16 significant decimal digits", "The default for calculations"],
+        ["long double", "80 or more, platform-dependent", "More", "Rarely — and not portably"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Never compare floating point with ==",
+      "text": "Two computations that should give the same answer often differ in the last bits, so equality fails for values that are equal in every sense that matters. Compare against a tolerance instead — and choose the tolerance deliberately, because a fixed epsilon that works for values near 1 is meaningless for values near a million."
+    },
+    {
+      "kind": "code",
+      "caption": "Comparing properly",
+      "lines": [
+        "#include <math.h>",
+        "",
+        "/* Absolute tolerance — fine when the scale is known and small */",
+        "if (fabs(a - b) < 1e-9) { ... }",
+        "",
+        "/* Relative tolerance — better when values may be large */",
+        "int nearly_equal(double a, double b, double rel) {",
+        "    double diff = fabs(a - b);",
+        "    double scale = fmax(fabs(a), fabs(b));",
+        "    return diff <= scale * rel || diff < 1e-12;   /* the second term handles values near zero */",
+        "}"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The special values"
+    },
+    {
+      "kind": "code",
+      "caption": "Infinity and not-a-number",
+      "lines": [
+        "double inf = 1.0 / 0.0;      /* +infinity — not a crash */",
+        "double nan = 0.0 / 0.0;      /* NaN — 'not a number' */",
+        "",
+        "printf(\"%s\\n\", nan == nan ? \"equal\" : \"NOT equal\");   /* NOT equal — NaN equals nothing */",
+        "",
+        "#include <math.h>",
+        "if (isnan(x))    { /* the only correct way to test for NaN */ }",
+        "if (isinf(x))    { }",
+        "if (isfinite(x)) { }"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "NaN is not equal to itself, and that is deliberate",
+      "text": "It means x != x is a valid NaN test, and it means a NaN silently poisons every calculation it touches — every comparison involving it is false, including >= and <=. When a result becomes NaN, look for a division by zero, a square root of a negative, or a parse that produced nothing."
+    },
+    {
+      "kind": "heading",
+      "text": "Where floating point is the wrong tool"
+    },
+    {
+      "kind": "code",
+      "caption": "Money is the classic case",
+      "lines": [
+        "double total = 0.0;",
+        "for (int i = 0; i < 1000; i++) total += 0.01;",
+        "printf(\"%.10f\\n\", total);       /* 9.9999999999 — not 10 */",
+        "",
+        "/* Use integer minor units instead: */",
+        "long total_cents = 0;",
+        "for (int i = 0; i < 1000; i++) total_cents += 1;",
+        "printf(\"%ld.%02ld\\n\", total_cents / 100, total_cents % 100);   /* exactly 10.00 */"
+      ]
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Money — store minor units as integers; a fraction of a cent that rounds the wrong way is a real defect",
+        "Counters and identifiers — an integer that must be exact should be an integer",
+        "Accumulating many small values — error compounds, so sum in a wider type or use a compensated sum",
+        "Equality-driven logic — if the correctness of the program depends on two values being exactly equal, floating point is the wrong representation"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Printing without misleading yourself"
+    },
+    {
+      "kind": "code",
+      "caption": "Precision is a display choice, not a value change",
+      "lines": [
+        "double x = 0.1 + 0.2;",
+        "printf(\"%f\\n\",    x);    /* 0.300000 — six digits by default, which HIDES the problem */",
+        "printf(\"%.20f\\n\", x);    /* 0.30000000000000004441 — the actual stored value */",
+        "printf(\"%g\\n\",    x);    /* 0.3 — shortest reasonable form */",
+        "printf(\"%a\\n\",    x);    /* 0x1.3333333333334p-2 — exact hexadecimal form */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "The default six digits is why this surprises people",
+      "text": "printf(\"%f\") rounds to six decimal places, so a value that is wrong in the seventeenth digit prints as if it were exact. When you are investigating a floating-point discrepancy, print with %.20f or %a — otherwise the output agrees with your expectation and the bug stays hidden."
+    },
+    {
+      "kind": "try",
+      "title": "See the representation for yourself",
+      "steps": [
+        "Run the 0.1 + 0.2 example and print with %f, %.20f, %g and %a",
+        "Print 0.5, 0.25 and 0.1 with %.20f and note which are exact",
+        "Run the money loop and compare the double version with the integer-cents version",
+        "Create a NaN and test nan == nan, then use isnan",
+        "Create an infinity and print it",
+        "Write nearly_equal from above and test it with 1.0 vs 1.0000000001 and with 1e9 vs 1e9 + 1",
+        "Print sizeof(float), sizeof(double), and FLT_EPSILON and DBL_EPSILON from <float.h>"
+      ],
+      "expected": "A value that is not what it printed, exact and inexact fractions side by side, a money calculation that drifts and an integer one that does not, and NaN failing to equal itself. Running this once removes most future confusion about floating point."
+    }
+  ],
+  "cheatsheet": [
+    "Only fractions with power-of-two denominators are exact in binary",
+    "0.1 + 0.2 != 0.3 in every language using the same hardware format",
+    "Never compare floats with == ; compare against a tolerance",
+    "Absolute tolerance for known small scales; relative tolerance for large values",
+    "float is about 7 significant digits, double about 15-16",
+    "NaN is not equal to itself; test with isnan, not ==",
+    "Any comparison involving NaN is false, including >= and <=",
+    "Money belongs in integer minor units, not in floating point",
+    "printf(\"%f\") shows six digits and hides the problem; use %.20f or %a to investigate"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why is 0.1 + 0.2 not exactly 0.3?",
+      "choices": {
+        "A": "A bug in the compiler",
+        "B": "0.1 and 0.2 cannot be represented exactly in binary, so the stored values are slightly off before the addition happens",
+        "C": "The processor is imprecise",
+        "D": "double is too small for these values"
+      },
+      "correct": ["B"],
+      "explanation": "Only fractions whose denominator is a power of two are exact. This is a property of the representation, identical in every language using the same hardware format."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "How should two floating-point values be compared?",
+      "choices": {
+        "A": "With ==",
+        "B": "By checking that the difference is within a tolerance chosen for the scale of the values",
+        "C": "By casting both to int",
+        "D": "By printing both and comparing the strings"
+      },
+      "correct": ["B"],
+      "explanation": "A fixed epsilon that works near 1 is meaningless near a million, which is why a relative tolerance is usually the right choice."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why should money not be stored in a double?",
+      "choices": {
+        "A": "double is not large enough",
+        "B": "Repeated addition accumulates error, so totals drift — store minor units as integers instead",
+        "C": "double cannot represent decimals at all",
+        "D": "It is slower than integer arithmetic"
+      },
+      "correct": ["B"],
+      "explanation": "Adding 0.01 a thousand times does not give exactly 10. Integer cents are exact, and rounding then happens only where you decide it should."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "How do you test whether a value is NaN?",
+      "choices": {
+        "A": "x == NAN",
+        "B": "isnan(x) from <math.h> — NaN is not equal to anything, including itself",
+        "C": "x == 0",
+        "D": "x < 0 && x > 0"
+      },
+      "correct": ["B"],
+      "explanation": "Every comparison involving NaN is false, so == can never detect it. That property also means x != x works as a test, but isnan states the intent."
+    }
+  ]
+}

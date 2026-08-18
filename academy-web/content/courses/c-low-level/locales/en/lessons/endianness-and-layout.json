@@ -1,0 +1,203 @@
+{
+  "nodeId": "endianness-and-layout",
+  "locale": "en",
+  "title": "Byte order and data that crosses a boundary",
+  "objective": "By the end of this lesson you can determine your machine's byte order, explain why the same bytes mean different things on different systems, and write data that another machine can read correctly.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A 32-bit integer occupies four bytes. Which of those bytes holds the most significant part is a choice the hardware made, and different families made it differently. As long as the value stays inside one program on one machine, this never matters. The moment it goes into a file, a socket, or shared memory, it matters completely."
+    },
+    {
+      "kind": "code",
+      "caption": "The same value, two layouts",
+      "lines": [
+        "uint32_t value = 0x12345678;",
+        "",
+        "little-endian (x86, most ARM):    78 56 34 12    <- least significant byte first",
+        "big-endian    (network order):    12 34 56 78    <- most significant byte first"
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "Checking your own machine",
+      "lines": [
+        "#include <stdio.h>",
+        "#include <stdint.h>",
+        "",
+        "int main(void) {",
+        "    uint32_t v = 0x12345678;",
+        "    unsigned char *b = (unsigned char *)&v;",
+        "    for (int i = 0; i < 4; i++) printf(\"%02x \", b[i]);",
+        "    printf(\"\\n%s\\n\", b[0] == 0x78 ? \"little-endian\" : \"big-endian\");",
+        "    return 0;",
+        "}"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Network byte order is big-endian by convention",
+      "text": "Internet protocols specify big-endian, which is why the conversion functions are named htons and htonl — host to network, short and long. On a little-endian machine they swap; on a big-endian machine they do nothing. Using them unconditionally is correct on both, which is the entire point."
+    },
+    {
+      "kind": "heading",
+      "text": "Writing data that another machine can read"
+    },
+    {
+      "kind": "code",
+      "caption": "Never write the raw object; write defined bytes",
+      "lines": [
+        "/* WRONG: layout, padding, and byte order all leak into the file */",
+        "struct record r = { .id = 42, .score = 100 };",
+        "fwrite(&r, sizeof r, 1, f);",
+        "",
+        "/* Right: an explicit format, byte by byte, in a stated order */",
+        "void put_u32_be(unsigned char *out, uint32_t v) {",
+        "    out[0] = (unsigned char)(v >> 24);",
+        "    out[1] = (unsigned char)(v >> 16);",
+        "    out[2] = (unsigned char)(v >> 8);",
+        "    out[3] = (unsigned char)(v);",
+        "}",
+        "",
+        "uint32_t get_u32_be(const unsigned char *in) {",
+        "    return ((uint32_t)in[0] << 24) | ((uint32_t)in[1] << 16)",
+        "         | ((uint32_t)in[2] << 8)  |  (uint32_t)in[3];",
+        "}"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Those two functions are portable by construction: they never depend on how the local machine stores an integer, because they build the value from named byte positions. This is what every serious file format and network protocol does, and it is why they can be read on hardware that did not exist when they were written."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Three reasons a raw struct write is a defect, not a shortcut",
+      "text": "Byte order differs between machines. Padding differs between compilers and platforms, and its contents are whatever was in memory — which may include data you did not intend to disclose. And any change to the struct silently changes the format, with no version marker to detect the mismatch. Reading an untrusted file straight into a struct adds a fourth problem: you have no validation at all."
+    },
+    {
+      "kind": "heading",
+      "text": "Reading untrusted binary data safely"
+    },
+    {
+      "kind": "code",
+      "caption": "Bounds first, then parse",
+      "lines": [
+        "int parse_header(const unsigned char *data, size_t len, struct header *out) {",
+        "    if (len < 8) return -1;                 /* check BEFORE reading */",
+        "",
+        "    out->magic  = get_u32_be(data);",
+        "    out->length = get_u32_be(data + 4);",
+        "",
+        "    if (out->magic != 0x43594252) return -1;    /* validate what you read */",
+        "    if (out->length > MAX_BODY)   return -1;    /* including declared sizes */",
+        "    if (out->length > len - 8)    return -1;    /* and against what you actually have */",
+        "",
+        "    return 0;",
+        "}"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "A declared length is a claim, not a fact",
+      "text": "A length field says how long the sender claims the payload is. Trusting it without comparing it against the bytes you actually received is how a parser reads past the end of its buffer. Check against both your maximum and the real remaining length — and note the order in the example: len - 8 is only safe because len >= 8 was already established."
+    },
+    {
+      "kind": "heading",
+      "text": "Alignment, briefly"
+    },
+    {
+      "kind": "code",
+      "caption": "Why you cannot just cast a byte pointer",
+      "lines": [
+        "unsigned char buffer[16];",
+        "",
+        "/* Tempting, and wrong: */",
+        "uint32_t v = *(uint32_t *)(buffer + 1);   /* likely misaligned — undefined behaviour */",
+        "",
+        "/* Portable: */",
+        "uint32_t v2;",
+        "memcpy(&v2, buffer + 1, sizeof v2);       /* always allowed, and usually just as fast */",
+        "",
+        "/* Or build it from bytes, as above, which also fixes byte order. */"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Prove the layout on your machine",
+      "steps": [
+        "Write the endianness checker above and run it",
+        "Print the bytes of a uint16_t, a uint32_t, and a double the same way",
+        "Write put_u32_be and get_u32_be, round-trip a value, and confirm it survives",
+        "Write a value to a file with fwrite of a raw struct, then hexdump the file: xxd out.bin",
+        "Look for the padding bytes in the dump and note what they contain",
+        "Rewrite the same record using your byte functions and hexdump it again",
+        "Write parse_header with all three checks and feed it a truncated buffer"
+      ],
+      "expected": "Your machine's byte order shown concretely, a value that survives a round trip through an explicit format, padding bytes visible in a hex dump of a raw struct write, and a parser that rejects a truncated input instead of reading past the end of it."
+    }
+  ],
+  "cheatsheet": [
+    "Little-endian stores the least significant byte first; big-endian the most significant",
+    "x86 and most ARM are little-endian; network protocols specify big-endian",
+    "Inspect layout with an unsigned char * over the object",
+    "htons/htonl convert host order to network order and are correct on both kinds of machine",
+    "Never fwrite or send a raw struct: byte order, padding, and silent format drift",
+    "Padding bytes contain leftover memory and can disclose data",
+    "Serialise with explicit shifts into named byte positions",
+    "Validate a declared length against your maximum AND the bytes you actually have",
+    "Use memcpy rather than casting a byte pointer to a wider type — casting can be misaligned"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "You print the bytes of 0x12345678 and see 78 56 34 12. What does that tell you?",
+      "choices": {
+        "A": "The value was corrupted",
+        "B": "The machine is little-endian: the least significant byte is stored first",
+        "C": "The machine is big-endian",
+        "D": "The integer is signed"
+      },
+      "correct": ["B"],
+      "explanation": "The bytes are stored in the opposite order to how the number is written. That is the definition of little-endian, which is what x86 and most ARM systems use."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why is fwrite(&struct, sizeof struct, 1, f) a defect for a file others will read?",
+      "choices": {
+        "A": "fwrite cannot handle structs",
+        "B": "It bakes in this machine's byte order and this compiler's padding, the padding may contain unrelated memory, and any change to the struct silently changes the format",
+        "C": "It is too slow",
+        "D": "The file will be too large"
+      },
+      "correct": ["B"],
+      "explanation": "Anything crossing a boundary needs an explicit format. The padding-disclosure part is why this matters for security and not only for portability."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A header declares a payload length. What must you check?",
+      "choices": {
+        "A": "Only that it is not zero",
+        "B": "That it is within your maximum AND not larger than the bytes actually received",
+        "C": "Only the maximum — the sender knows its own length",
+        "D": "Nothing, if the header magic is correct"
+      },
+      "correct": ["B"],
+      "explanation": "A declared length is a claim from the sender. Without comparing it to what you actually hold, the parser reads past the end of its buffer."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why use memcpy instead of casting a byte pointer to uint32_t * ?",
+      "choices": {
+        "A": "memcpy is faster",
+        "B": "The cast may produce a misaligned access, which is undefined behaviour; memcpy is always permitted and compiles to the same thing when alignment allows",
+        "C": "Casting loses the value",
+        "D": "memcpy handles byte order too"
+      },
+      "correct": ["B"],
+      "explanation": "Alignment requirements are real on many architectures. memcpy expresses the intent without relying on the pointer being suitably aligned."
+    }
+  ]
+}

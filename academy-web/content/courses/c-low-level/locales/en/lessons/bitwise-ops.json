@@ -1,0 +1,213 @@
+{
+  "nodeId": "bitwise-ops",
+  "locale": "en",
+  "title": "Working with individual bits",
+  "objective": "By the end of this lesson you can set, clear, test, and toggle individual bits, and you can read the flag-manipulation code that appears throughout systems and security work.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Permissions, protocol headers, hardware registers, and compact option sets all pack several yes-or-no facts into one integer. The six operators in this lesson are how that packing and unpacking is done — and once you can read them, a whole layer of systems code stops looking cryptic."
+    },
+    {
+      "kind": "table",
+      "headers": ["Operator", "Name", "Effect on each bit position"],
+      "rows": [
+        ["a & b", "AND", "1 only if both are 1 — used to test and to mask"],
+        ["a | b", "OR", "1 if either is 1 — used to set"],
+        ["a ^ b", "XOR", "1 if they differ — used to toggle"],
+        ["~a", "NOT", "flips every bit"],
+        ["a << n", "left shift", "moves bits up, filling with 0 — multiplies by 2^n"],
+        ["a >> n", "right shift", "moves bits down — divides by 2^n for unsigned"]
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "Seeing it in binary",
+      "lines": [
+        "   1100      (12)",
+        " & 1010      (10)",
+        "   ----",
+        "   1000      (8)      /* AND keeps only bits set in both */",
+        "",
+        "   1100  |  1010  =  1110   (14)   /* OR keeps bits set in either */",
+        "   1100  ^  1010  =  0110   (6)    /* XOR keeps bits that differ */",
+        "",
+        "   0011 << 2 = 1100   (3 becomes 12 — multiplied by 4)",
+        "   1100 >> 2 = 0011   (12 becomes 3 — divided by 4)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The four operations you will actually write"
+    },
+    {
+      "kind": "code",
+      "caption": "Set, clear, toggle, test",
+      "lines": [
+        "#define FLAG_READ    (1u << 0)    /* 0001 */",
+        "#define FLAG_WRITE   (1u << 1)    /* 0010 */",
+        "#define FLAG_EXEC    (1u << 2)    /* 0100 */",
+        "",
+        "unsigned int perms = 0;",
+        "",
+        "perms |=  FLAG_READ;              /* set */",
+        "perms &= ~FLAG_WRITE;             /* clear */",
+        "perms ^=  FLAG_EXEC;              /* toggle */",
+        "",
+        "if (perms & FLAG_READ) { ... }    /* test */",
+        "",
+        "perms |= FLAG_READ | FLAG_WRITE;  /* set several at once */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Read &= ~MASK as 'keep everything except'",
+      "text": "~FLAG_WRITE is all ones except that one bit, so ANDing with it preserves every other flag and clears exactly one. This idiom appears constantly, and recognising it on sight — rather than working it out each time — is most of what makes flag code readable."
+    },
+    {
+      "kind": "heading",
+      "text": "Where you will meet this"
+    },
+    {
+      "kind": "code",
+      "caption": "Real examples",
+      "lines": [
+        "/* File permissions, exactly as in the Linux course: */",
+        "if (mode & S_IWOTH) { /* world-writable — a finding */ }",
+        "",
+        "/* Extracting fields from a packed header: */",
+        "unsigned int version = (header >> 28) & 0xF;   /* top 4 bits */",
+        "unsigned int length  = header & 0xFFFF;        /* bottom 16 bits */",
+        "",
+        "/* Building a value from parts: */",
+        "unsigned int packed = (version << 28) | (flags << 16) | length;"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The traps"
+    },
+    {
+      "kind": "code",
+      "caption": "Four ways this goes wrong",
+      "lines": [
+        "/* 1 — & and | bind more loosely than == : parenthesise */",
+        "if (flags & MASK == 0)     { }    /* parsed as flags & (MASK == 0) — wrong */",
+        "if ((flags & MASK) == 0)   { }    /* what you meant */",
+        "",
+        "/* 2 — shifting by the width or more is undefined */",
+        "unsigned int x = 1u << 32;        /* undefined on a 32-bit int */",
+        "",
+        "/* 3 — right shift of a negative signed value is implementation-defined */",
+        "int  n = -8;  n >> 1;             /* result depends on the implementation */",
+        "unsigned u = 8u; u >> 1;          /* well defined: 4 */",
+        "",
+        "/* 4 — & is not && */",
+        "if (a & b)  { }                   /* bitwise: 2 & 1 is 0, so this is false */",
+        "if (a && b) { }                   /* logical: both non-zero, so this is true */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Do bit work on unsigned types",
+      "text": "Signed types bring in sign extension, implementation-defined right shifts, and undefined overflow — none of which you want when you are manipulating bit patterns. Declare flags, masks, and packed fields as unsigned int or uint32_t, and the whole category of surprises disappears."
+    },
+    {
+      "kind": "heading",
+      "text": "Useful patterns worth knowing"
+    },
+    {
+      "kind": "code",
+      "caption": "Idioms you will see",
+      "lines": [
+        "x & 1                  /* is it odd? */",
+        "x & (x - 1)            /* clears the lowest set bit — zero means power of two */",
+        "x | (x - 1)            /* sets all bits below the lowest set bit */",
+        "(x >> n) & 1           /* value of bit n */",
+        "x & (alignment - 1)    /* offset within an alignment boundary, when alignment is a power of 2 */",
+        "",
+        "/* Count the set bits: */",
+        "int count = 0;",
+        "while (x) { x &= x - 1; count++; }   /* one iteration per set bit */"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Manipulate a flag set by hand",
+      "steps": [
+        "Define FLAG_READ, FLAG_WRITE, FLAG_EXEC with (1u << n)",
+        "Write a function that prints a permission set as three characters, like rwx or r--",
+        "Set read and write, print; clear write, print; toggle exec twice, print",
+        "Write printf(\"%u\\n\", perms) after each step and watch the number change",
+        "Write a loop that prints all 32 bits of an unsigned int, most significant first",
+        "Try if (flags & MASK == 0) without parentheses and explain the result to yourself",
+        "Try 1u << 32 with -fsanitize=undefined and read the report"
+      ],
+      "expected": "A flag set you can read as both characters and a number, a bit printer you wrote yourself, and two of the classic traps triggered on purpose — including one the undefined-behaviour sanitizer names for you."
+    }
+  ],
+  "cheatsheet": [
+    "& AND (test/mask) · | OR (set) · ^ XOR (toggle) · ~ NOT (flip)",
+    "<< n multiplies by 2^n · >> n divides by 2^n for unsigned",
+    "Set: x |= MASK · Clear: x &= ~MASK · Toggle: x ^= MASK · Test: if (x & MASK)",
+    "Read &= ~MASK as 'keep everything except this'",
+    "Define flags as (1u << n) so each occupies one bit",
+    "Parenthesise: (flags & MASK) == 0, because & binds more loosely than ==",
+    "Shifting by the type's width or more is undefined",
+    "Do bit work on unsigned types — signed brings sign extension and undefined cases",
+    "& is bitwise and && is logical; they are not interchangeable",
+    "x & (x - 1) clears the lowest set bit — zero means x was a power of two"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "How do you clear a single flag while leaving the others untouched?",
+      "choices": {
+        "A": "x |= FLAG",
+        "B": "x &= ~FLAG",
+        "C": "x ^= FLAG",
+        "D": "x = FLAG"
+      },
+      "correct": ["B"],
+      "explanation": "~FLAG is all ones except that bit, so AND preserves everything else and clears exactly one. XOR would toggle it, which is different when it was already clear."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why does if (flags & MASK == 0) not do what it looks like?",
+      "choices": {
+        "A": "MASK must be a constant",
+        "B": "== binds more tightly than &, so it is parsed as flags & (MASK == 0)",
+        "C": "& cannot be used in a condition",
+        "D": "It needs a cast"
+      },
+      "correct": ["B"],
+      "explanation": "Precedence. Write (flags & MASK) == 0 — and note that -Wall usually warns about exactly this."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why should bit manipulation use unsigned types?",
+      "choices": {
+        "A": "Unsigned is faster",
+        "B": "Signed types bring sign extension, implementation-defined right shift, and undefined overflow — none of which you want when working with bit patterns",
+        "C": "Signed types cannot be shifted at all",
+        "D": "It is required by the standard"
+      },
+      "correct": ["B"],
+      "explanation": "Unsigned arithmetic is fully defined and wraps predictably, which is exactly the behaviour bit work assumes."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "What does x & (x - 1) evaluating to zero tell you?",
+      "choices": {
+        "A": "x is odd",
+        "B": "x had at most one bit set — so it is zero or a power of two",
+        "C": "x is negative",
+        "D": "x is greater than 1"
+      },
+      "correct": ["B"],
+      "explanation": "Subtracting one flips the lowest set bit and everything below it; ANDing clears that bit. If nothing remains, there was only one bit to begin with."
+    }
+  ]
+}

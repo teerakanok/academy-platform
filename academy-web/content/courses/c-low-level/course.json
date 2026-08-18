@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 306,
+  "estimatedMinutes": 378,
   "coverMotif": "probe",
   "skills": [
     {
@@ -243,6 +243,53 @@
         "debugging": 4,
         "c-syntax": 3,
         "memory-model": 3
+      }
+    },
+    {
+      "id": "bitwise-ops",
+      "kind": "lesson",
+      "prerequisites": [
+        "defensive-c"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "bits-numbers": 6,
+        "c-syntax": 2
+      }
+    },
+    {
+      "id": "integer-representation",
+      "kind": "lesson",
+      "prerequisites": [
+        "bitwise-ops"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "bits-numbers": 6,
+        "debugging": 2
+      }
+    },
+    {
+      "id": "endianness-and-layout",
+      "kind": "lesson",
+      "prerequisites": [
+        "integer-representation"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "bits-numbers": 4,
+        "memory-model": 4
+      }
+    },
+    {
+      "id": "floating-point",
+      "kind": "lesson",
+      "prerequisites": [
+        "integer-representation"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "bits-numbers": 6
       }
     }
   ]
