@@ -1,0 +1,244 @@
+{
+  "nodeId": "ipv6",
+  "locale": "en",
+  "title": "The address space that does not run out",
+  "objective": "By the end of this lesson you can read and write IPv6 addresses in their shortened form, recognise the common address types on sight, and explain what changes and what does not when a network moves to IPv6.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "IPv4 has about 4.3 billion addresses and they were exhausted years ago — which is why NAT is everywhere. IPv6 uses 128 bits instead of 32. The difference is not four times bigger; it is larger by a factor of 2 to the 96th power, which is roughly 79 octillion. Every device on earth could have its own network and the space would barely be touched."
+    },
+    {
+      "kind": "code",
+      "caption": "The numbers, computed",
+      "lines": [
+        "IPv4 space:  2^32  = 4,294,967,296",
+        "IPv6 space:  2^128 = 340,282,366,920,938,463,463,374,607,431,768,211,456",
+        "ratio:       2^96  = 79,228,162,514,264,337,593,543,950,336",
+        "",
+        "one /64 subnet contains 18,446,744,073,709,551,616 addresses",
+        "  — that single subnet is 4,294,967,296 times the entire IPv4 internet"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Writing them without going mad"
+    },
+    {
+      "kind": "paragraph",
+      "text": "An address is eight groups of four hexadecimal digits. Two rules shorten it: leading zeros in a group may be dropped, and one run of all-zero groups may be replaced by a double colon."
+    },
+    {
+      "kind": "code",
+      "caption": "The same address, shortened",
+      "lines": [
+        "full:       2001:0db8:0000:0000:0000:ff00:0042:8329",
+        "            |    |    |______________|  |    |",
+        "            |    |    three zero groups |    +- 8329 unchanged",
+        "            |    +- 0db8 -> db8         +- 0042 -> 42",
+        "            +- 2001 unchanged",
+        "",
+        "short:      2001:db8::ff00:42:8329",
+        "",
+        "/* Verified: both forms parse to the same address.",
+        "   The double colon may appear only once — otherwise the length is ambiguous. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The types you will actually see"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Looks like",
+        "Type",
+        "Meaning"
+      ],
+      "rows": [
+        [
+          "::1",
+          "Loopback",
+          "This machine — the IPv6 127.0.0.1"
+        ],
+        [
+          "fe80::...",
+          "Link-local",
+          "Valid only on this segment; every interface has one automatically"
+        ],
+        [
+          "ff02::1",
+          "Multicast",
+          "All nodes on this link — replaces broadcast, which IPv6 does not have"
+        ],
+        [
+          "2001:db8::...",
+          "Documentation",
+          "Reserved for examples, like this lesson's"
+        ],
+        [
+          "2000::/3",
+          "Global unicast",
+          "Ordinary routable addresses"
+        ],
+        [
+          "fc00::/7",
+          "Unique local",
+          "The rough equivalent of private ranges"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "IPv6 has no broadcast at all",
+      "text": "Where IPv4 sends to every device on a segment, IPv6 uses multicast groups instead — ff02::1 for all nodes, ff02::2 for all routers. The practical effect is less noise: a device only processes the groups it has joined, rather than every broadcast on the segment. Verified: ff02::1 is classified as multicast, while fe80::1 is link-local and ::1 is loopback."
+    },
+    {
+      "kind": "heading",
+      "text": "The /64 convention"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Subnetting works exactly as it does in IPv4 — the prefix says how many leading bits identify the network — but the sizes are different in a way that changes the habits. A single LAN is conventionally a /64, and a site is typically delegated a /48, which contains 65,536 of those subnets."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Stop counting hosts and start counting subnets",
+      "text": "In IPv4 you size a subnet to the number of machines. In IPv6 that is meaningless — a /64 holds more addresses than the entire IPv4 internet, four billion times over. Give every network a /64 regardless of size, and spend your planning effort on how many subnets a site needs. A /48 gives you 65,536, which is verified arithmetic and far more than almost any organisation will use."
+    },
+    {
+      "kind": "heading",
+      "text": "What actually changes, and what does not"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Unchanged",
+        "Changed"
+      ],
+      "rows": [
+        [
+          "TCP and UDP work identically",
+          "Addresses are 128 bits, written in hex"
+        ],
+        [
+          "Ports, sockets, the whole API shape",
+          "No broadcast — multicast instead"
+        ],
+        [
+          "Routing is still longest-prefix match",
+          "ARP is replaced by neighbour discovery, which uses ICMPv6"
+        ],
+        [
+          "DNS still maps names to addresses",
+          "AAAA records instead of A records"
+        ],
+        [
+          "The layer model is the same",
+          "Routers do not fragment; the sender must size packets"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Blocking ICMPv6 breaks IPv6 outright",
+      "text": "In IPv4, blocking all ICMP causes the large-packet hang from earlier lessons. In IPv6 it is worse: neighbour discovery — the replacement for ARP — is itself ICMPv6, so a blanket block prevents the network from functioning at all. This is one of the most common IPv6 misconfigurations, and it comes directly from applying an IPv4 firewall habit unchanged."
+    },
+    {
+      "kind": "heading",
+      "text": "Both at once"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Most systems run both protocols side by side, which means a name can resolve to both an A and a AAAA record, and the client must choose. Modern clients try both and use whichever connects first, so a broken IPv6 path is usually hidden by a quick fallback — which is convenient and also why IPv6 problems can go unnoticed for a long time."
+    },
+    {
+      "kind": "try",
+      "title": "Find and use your IPv6 addresses",
+      "steps": [
+        "Run: ip -6 addr show     and identify your link-local (fe80::) and any global addresses",
+        "Note that link-local exists even if you have no IPv6 connectivity at all",
+        "Run: ping6 -c 2 ff02::1%<your interface>     and see which neighbours answer",
+        "Run: ip -6 neigh      (the neighbour table — the IPv6 equivalent of ARP)",
+        "Run: dig AAAA example.com +short     and compare with: dig A example.com +short",
+        "Run: curl -6 -s -o /dev/null -w '%{http_code} via %{remote_ip}\\n' https://example.com",
+        "Run the same with -4 and compare which address family was used",
+        "Write one of your addresses out in full form and then shorten it by hand; check with: python3 -c \"import ipaddress;print(ipaddress.ip_address('...').exploded)\""
+      ],
+      "expected": "A link-local address that exists regardless of connectivity, a neighbour table that mirrors the ARP table from the previous lesson, and a name that resolves to both address families. Shortening an address by hand and having the tool agree is the small skill that makes IPv6 configurations readable."
+    }
+  ],
+  "cheatsheet": [
+    "IPv6 is 128 bits: 2^128 addresses, which is 2^96 times the IPv4 space",
+    "Eight groups of four hex digits; drop leading zeros, and one run of zero groups becomes ::",
+    "The double colon may appear only once per address",
+    "::1 loopback · fe80::/10 link-local · ff00::/8 multicast · 2001:db8::/32 documentation",
+    "No broadcast: ff02::1 is all nodes, ff02::2 is all routers",
+    "A LAN is conventionally a /64; a site is typically delegated a /48 = 65,536 subnets",
+    "One /64 holds 18,446,744,073,709,551,616 addresses — stop sizing subnets by host count",
+    "Neighbour discovery replaces ARP and is carried by ICMPv6",
+    "Blocking ICMPv6 wholesale stops IPv6 working at all",
+    "DNS uses AAAA records; clients try both families and use whichever connects first"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Shorten 2001:0db8:0000:0000:0000:ff00:0042:8329 correctly.",
+      "choices": {
+        "A": "2001:db8::ff00:42:8329",
+        "B": "2001::db8::ff00:42:8329",
+        "C": "2001:0db8::ff00:0042:8329",
+        "D": "2001:db8:0:0:0:ff00:42:8329 only"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Leading zeros drop and the single run of zero groups becomes a double colon. Option B uses two double colons, which is invalid because the length becomes ambiguous. Verified: A parses to the same address as the full form."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why is it pointless to size an IPv6 subnet to the number of machines on it?",
+      "choices": {
+        "A": "Because IPv6 does not support subnetting",
+        "B": "Because a /64 holds over 18 quintillion addresses — around four billion times the entire IPv4 internet — so host count never constrains it",
+        "C": "Because subnets are assigned automatically",
+        "D": "Because all addresses are link-local"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Computed, not estimated. The planning question shifts from how many hosts to how many subnets, and a /48 provides 65,536 of them."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "An administrator applies their IPv4 firewall policy to IPv6 and blocks all ICMP. What happens?",
+      "choices": {
+        "A": "Only ping stops working",
+        "B": "IPv6 stops working entirely — neighbour discovery, the replacement for ARP, is ICMPv6",
+        "C": "Nothing, IPv6 does not use ICMP",
+        "D": "Large packets fail but small ones work"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "In IPv4 the same mistake causes the large-packet hang. In IPv6 the address resolution mechanism itself is ICMPv6, so the network cannot function."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Your machine has no IPv6 internet connectivity, yet ip -6 addr shows an fe80:: address. Why?",
+      "choices": {
+        "A": "A misconfiguration",
+        "B": "Link-local addresses are generated automatically per interface and work on the local segment regardless of any connectivity",
+        "C": "It is left over from a previous connection",
+        "D": "It is a loopback address"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Every IPv6 interface has one, and neighbour discovery uses it. Its presence tells you nothing about whether you can reach the internet."
+    }
+  ]
+}

@@ -1,0 +1,226 @@
+{
+  "nodeId": "nat",
+  "locale": "en",
+  "title": "One public address, many private machines",
+  "objective": "By the end of this lesson you can explain how many machines share one public address, predict which connections NAT allows and which it blocks, and name the techniques used to work around it.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Your home network probably has a dozen devices and one public address. Every connection any of them makes appears to the outside world as coming from that single address. The device doing the translation keeps a table, and almost everything surprising about home and corporate networking follows from how that table works."
+    },
+    {
+      "kind": "heading",
+      "text": "The translation, and the table behind it"
+    },
+    {
+      "kind": "code",
+      "caption": "What the router rewrites, and what it remembers",
+      "lines": [
+        "A laptop opens a connection:",
+        "  from 192.168.1.50:54321  to 93.184.216.34:443",
+        "",
+        "The router rewrites the source and records the mapping:",
+        "  from 203.0.113.7:61001   to 93.184.216.34:443",
+        "",
+        "  table entry:  203.0.113.7:61001  <->  192.168.1.50:54321",
+        "",
+        "The reply arrives addressed to 203.0.113.7:61001,",
+        "the router looks it up, rewrites the destination, and delivers it.",
+        "",
+        "/* The port number is what makes one address serve many machines:",
+        "   each connection gets its own outside port. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Why incoming connections do not work"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The table is built by outgoing traffic. A packet arriving from outside, for a connection nobody inside started, matches no entry — and the router has no way to know which of the twelve machines it was meant for. So it is dropped."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "NAT is not a firewall, but it behaves like one by accident",
+      "text": "Blocking unsolicited inbound traffic is a side effect of not knowing where to send it, not a security decision. It is genuinely useful, and it is not a substitute for a firewall: it does nothing about outbound traffic, nothing about traffic between machines inside, and nothing once a mapping exists. Treat it as a consequence to be aware of rather than a control you are relying on."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Situation",
+        "Works?",
+        "Why"
+      ],
+      "rows": [
+        [
+          "Browsing the web from inside",
+          "Yes",
+          "Outgoing creates the mapping"
+        ],
+        [
+          "Someone connecting to your laptop from outside",
+          "No",
+          "No mapping exists"
+        ],
+        [
+          "Running a server at home",
+          "Only with a forwarding rule",
+          "A permanent, manually created mapping"
+        ],
+        [
+          "Two machines behind different NATs connecting directly",
+          "Not without help",
+          "Neither can start it"
+        ],
+        [
+          "A video call between two home users",
+          "Yes, with a technique",
+          "See below"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Getting through anyway"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Technique",
+        "How it works",
+        "Used by"
+      ],
+      "rows": [
+        [
+          "Port forwarding",
+          "A manual rule: this outside port always goes to that inside machine",
+          "Home servers, game hosts"
+        ],
+        [
+          "Hole punching",
+          "Both sides send outbound at the same moment, each creating a mapping the other can use",
+          "Video calls, peer-to-peer"
+        ],
+        [
+          "Relay server",
+          "Both sides connect outward to a server in the middle, which forwards between them",
+          "Fallback when hole punching fails"
+        ],
+        [
+          "Reverse tunnel",
+          "The inside machine holds an outbound connection open for the outside to use",
+          "Remote access tools, webhooks"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Every one of those works by making the connection outbound from the perspective of the NAT. That is the general principle: if you cannot receive, connect outward and keep it open. It is why almost every remote-access product on the market is built around a persistent outbound connection rather than an inbound one."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Carrier-grade NAT: your provider does it too",
+      "text": "Many providers now put whole neighbourhoods behind shared public addresses because IPv4 addresses ran out. That means you may not have a public address at all — port forwarding on your own router will not help, because there is a second layer of translation above it that you do not control. If forwarding is configured correctly and still does not work, check whether your address is inside 100.64.0.0/10, the range reserved for exactly this."
+    },
+    {
+      "kind": "heading",
+      "text": "What NAT costs"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Every mapping is state, so a router has a finite number of simultaneous connections it can track",
+        "Idle mappings are eventually discarded, which is why long-lived connections send keepalives",
+        "Protocols that put addresses inside their own messages need the router to rewrite those too, which is why some old protocols need special handling",
+        "Diagnosing across a NAT is harder: the address a server sees is not the address of the machine that sent the traffic"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Watch translation happen",
+      "steps": [
+        "Find your private address: ip addr show   and note it",
+        "Find the address the world sees: curl -s https://api.ipify.org ; echo",
+        "Compare them — if they differ, everything you send is being translated",
+        "Check whether you are behind carrier-grade NAT: is your address inside 100.64.0.0/10?",
+        "Run: ss -tn state established | head    and note your local ports",
+        "Open several connections at once (a few curl commands) and watch how many local ports are in use",
+        "If you control a router, look at its NAT or connection-tracking table while doing this",
+        "On a Linux router or with root: conntrack -L 2>/dev/null | head    (the table itself)"
+      ],
+      "expected": "Two different addresses for the same machine, and a set of local ports that each map to a different outside port. If the two addresses are the same you have a public address, which is increasingly unusual for a home connection and worth knowing about your own network either way."
+    }
+  ],
+  "cheatsheet": [
+    "NAT rewrites the source address and port on the way out, and reverses it on the way back",
+    "The port number is what lets one public address serve many machines",
+    "The mapping table is built by outgoing traffic only",
+    "Unsolicited inbound traffic matches no entry and is dropped",
+    "That inbound blocking is a side effect, not a security control — do not rely on it as one",
+    "Port forwarding is a permanent manual mapping",
+    "Hole punching, relays and reverse tunnels all work by making the connection outbound",
+    "Carrier-grade NAT puts you behind a second layer you do not control: check for 100.64.0.0/10",
+    "Mappings are state and expire — long-lived connections need keepalives",
+    "curl https://api.ipify.org shows the address the world sees"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Twelve devices at home share one public address. What distinguishes their connections at the router?",
+      "choices": {
+        "A": "Their MAC addresses",
+        "B": "A different outside port number for each connection, recorded in a mapping table",
+        "C": "Separate public addresses assigned dynamically",
+        "D": "The order the connections were made"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "One address plus many ports is what makes the sharing possible. Each entry maps an outside port back to a specific inside address and port."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Is it accurate to say NAT protects your network like a firewall?",
+      "choices": {
+        "A": "Yes — it blocks all attacks",
+        "B": "No — inbound traffic is dropped because the router does not know where to send it, and that side effect covers nothing else",
+        "C": "Yes, for outbound traffic",
+        "D": "Only with IPv6"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "It genuinely does block unsolicited inbound traffic, which is useful. But it does nothing about outbound traffic, traffic between inside machines, or anything once a mapping exists."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A video call connects two users who are both behind home routers. How?",
+      "choices": {
+        "A": "One of them must have a public address",
+        "B": "Both send outbound at the same moment, each creating a mapping the other's traffic can use — with a relay server as the fallback",
+        "C": "The routers negotiate automatically",
+        "D": "The call always goes through a central server"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Every technique for traversing NAT works by making the connection outbound from each side's point of view. Relaying is the fallback when that fails, not the first choice, because it costs the provider bandwidth."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "You configure port forwarding correctly and it still does not work. What should you check?",
+      "choices": {
+        "A": "The cable",
+        "B": "Whether your provider is using carrier-grade NAT — check for an address inside 100.64.0.0/10",
+        "C": "The server's firewall only",
+        "D": "DNS"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A second layer of translation above your router cannot be configured from your side. That reserved range is the specific sign that you are behind one."
+    }
+  ]
+}

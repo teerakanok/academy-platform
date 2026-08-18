@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 110,
+  "estimatedMinutes": 145,
   "coverMotif": "cloud",
   "skills": [
     {
@@ -107,6 +107,28 @@
       "skillWeights": {
         "addressing": 3,
         "troubleshooting": 4
+      }
+    },
+    {
+      "id": "nat",
+      "kind": "lesson",
+      "prerequisites": [
+        "routing-basics"
+      ],
+      "estimatedMinutes": 17,
+      "skillWeights": {
+        "addressing": 4
+      }
+    },
+    {
+      "id": "ipv6",
+      "kind": "lesson",
+      "prerequisites": [
+        "ip-addressing"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "addressing": 4
       }
     }
   ]
