@@ -1,0 +1,257 @@
+{
+  "nodeId": "event-driven-and-c10k",
+  "locale": "en",
+  "title": "Serving thousands of connections from one thread",
+  "objective": "By the end of this lesson you can restructure a server as an event loop with explicit per-connection state, explain what that buys and what it costs, and choose between the three server designs with a reason.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Both previous designs give each connection a thread, and therefore a stack that remembers where it is in the protocol. An event loop has one thread and many connections, so that position has to be stored somewhere explicit. Making that change is the whole of this lesson, and it is the design behind essentially every server that handles very large numbers of connections."
+    },
+    {
+      "kind": "heading",
+      "text": "The problem the earlier designs run into"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A server holding ten thousand mostly idle connections — a chat service, a push notification system, anything where clients stay connected and speak rarely — pays for ten thousand threads to sit blocked. The threads use no CPU, as established earlier, but the kernel's per-task bookkeeping and the scheduler's work grow regardless. The connections are cheap; the threads are not."
+    },
+    {
+      "kind": "heading",
+      "text": "State on the heap instead of on a stack"
+    },
+    {
+      "kind": "code",
+      "caption": "The loop, with per-connection state made explicit",
+      "lines": [
+        "struct conn {",
+        "    int   fd;",
+        "    char  in[4096];  size_t in_len;      /* what has arrived so far */",
+        "    char  out[4096]; size_t out_len, out_sent;",
+        "    enum { WANT_LENGTH, WANT_BODY } state;",
+        "    uint32_t need;                        /* bytes still expected for the body */",
+        "};",
+        "",
+        "/* One struct per connection replaces one thread per connection.",
+        "   Where a thread kept its position in the protocol on its stack,",
+        "   this keeps it in a field — that is the entire transformation. */",
+        "",
+        "for (;;) {",
+        "    int n = epoll_wait(ep, events, MAX_EVENTS, -1);",
+        "    for (int i = 0; i < n; i++) {",
+        "        struct conn *c = events[i].data.ptr;",
+        "",
+        "        if (c->fd == listener) {",
+        "            for (;;) {                              /* drain the accept queue */",
+        "                int fd = accept(listener, NULL, NULL);",
+        "                if (fd < 0) break;                  /* EAGAIN: no more waiting */",
+        "                set_nonblocking(fd);",
+        "                watch(ep, new_conn(fd), EPOLLIN);",
+        "            }",
+        "            continue;",
+        "        }",
+        "",
+        "        if (events[i].events & EPOLLIN) {",
+        "            ssize_t r = read(c->fd, c->in + c->in_len, sizeof c->in - c->in_len);",
+        "            if (r == 0) { drop(c); continue; }      /* peer closed */",
+        "            if (r < 0) {",
+        "                if (errno == EAGAIN) continue;      /* nothing more right now */",
+        "                drop(c); continue;",
+        "            }",
+        "            c->in_len += (size_t)r;",
+        "            advance(c);            /* may move WANT_LENGTH -> WANT_BODY -> reply */",
+        "        }",
+        "",
+        "        if (events[i].events & EPOLLOUT) {",
+        "            flush(c);              /* send what fits; keep the rest for next time */",
+        "        }",
+        "    }",
+        "}"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Read the state machine against the capstone",
+      "text": "WANT_LENGTH and WANT_BODY are exactly the two read_all calls from the capstone server, turned inside out. A thread could simply call read_all twice and let the stack remember which one it was in. Here the loop returns between them, so the connection records its own position. Same protocol, same correctness requirements, different place to keep the bookmark."
+    },
+    {
+      "kind": "heading",
+      "text": "The rules the loop imposes"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Nothing may block — one slow call stalls every connection, as the readiness lesson showed",
+        "Every descriptor must be non-blocking, including the listener",
+        "Drain the accept queue in a loop; a single event may mean several pending connections",
+        "Partial reads and partial writes are the normal case, not the exception",
+        "Output that does not fit must be buffered and finished when the socket becomes writable"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The write half is where homemade event loops fail",
+      "text": "Reading gets the attention, but a slow client is the harder case: your reply does not fit in the socket buffer, write returns having sent part of it, and the rest must wait. A loop that assumes writes complete will silently truncate responses to exactly the clients that are slowest — and those are the hardest to reproduce. Keep an output buffer per connection, register interest in writability only while it has content, and drop that interest when it empties."
+    },
+    {
+      "kind": "heading",
+      "text": "Choosing between the three"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "Thread per connection",
+        "Thread pool",
+        "Event loop"
+      ],
+      "rows": [
+        [
+          "Code complexity",
+          "Lowest",
+          "Low",
+          "Highest"
+        ],
+        [
+          "Connections it suits",
+          "Tens to hundreds",
+          "Hundreds to thousands",
+          "Thousands and up"
+        ],
+        [
+          "Blocking calls",
+          "Fine",
+          "Fine, within a worker",
+          "Forbidden"
+        ],
+        [
+          "Memory per connection",
+          "A thread",
+          "Shared across the pool",
+          "A small struct"
+        ],
+        [
+          "Failure under overload",
+          "Thread growth, then thrashing",
+          "Queue fills, back-pressure",
+          "Latency rises for everyone"
+        ],
+        [
+          "Debugging",
+          "Easiest — a stack per connection",
+          "Moderate",
+          "Hardest — no stack tells the story"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "That last row deserves weight. With a thread per connection, a backtrace tells you exactly what that connection was doing. In an event loop the stack shows only the loop, and what a connection was doing lives in a struct you must inspect deliberately. Choosing an event loop means accepting that cost, and it is why the honest answer for most services is a pool."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "The combination most large systems actually use",
+      "text": "One event loop per core, each with its own set of connections, plus a thread pool for anything that would block — file access, database calls, expensive computation. The loops stay responsive because they never block, and the slow work happens where blocking is allowed. If you have understood all three designs in this module, you have understood that architecture; it is not a fourth thing to learn."
+    },
+    {
+      "kind": "heading",
+      "text": "What still limits you"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "The per-process descriptor limit — raise it deliberately, and know what you raised it to",
+        "Memory per connection: buffers dominate, so size them for the protocol rather than generously",
+        "The accept queue depth, which is the backlog from the socket lesson",
+        "Ports on the client side, if one machine opens very many outbound connections"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Convert the capstone to an event loop",
+      "steps": [
+        "Take the capstone server and define a per-connection struct holding the buffer, its length, and the protocol state",
+        "Replace the two read_all calls with a state machine that advances as data arrives",
+        "Make every descriptor non-blocking, including the listener, and drain accept in a loop",
+        "Verify correctness first with a handful of clients before measuring anything",
+        "Add an output buffer and register writability interest only when it has content",
+        "Test with a deliberately slow reader — connect, then read one byte per second — and confirm the response is not truncated",
+        "Open as many concurrent connections as you can and compare memory with your thread-per-connection measurement",
+        "Insert a sleep(1) into the handler and watch every connection stall — then explain why in one sentence"
+      ],
+      "expected": "A single-threaded server holding far more connections than the threaded version at the same memory, a slow reader that still receives a complete response, and one deliberate blocking call that stalls everything. The slow-reader test is the one that separates a working event loop from one that merely appears to work."
+    }
+  ],
+  "cheatsheet": [
+    "An event loop replaces a thread per connection with a struct per connection",
+    "The protocol position that lived on a stack now lives in a state field",
+    "Nothing in the loop may block — every descriptor non-blocking, including the listener",
+    "Drain the accept queue in a loop; one event can mean several connections",
+    "Buffer output per connection and watch for writability only while it has content",
+    "A slow reader is the case homemade loops get wrong, and it truncates silently",
+    "Debugging is hardest here: the stack shows the loop, not the connection",
+    "Most large systems use one loop per core plus a pool for anything that blocks",
+    "Remaining limits: descriptor ceiling, per-connection buffers, accept backlog, client ports"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "In an event loop, where does the information a thread would have kept on its stack live?",
+      "choices": {
+        "A": "In thread-local storage",
+        "B": "In a per-connection struct — the loop returns between steps, so each connection records its own position",
+        "C": "In the kernel",
+        "D": "It is re-read from the socket each time"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "That relocation is the whole transformation. The two read_all calls from the capstone become two states a connection can be in."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Your event loop truncates responses to slow clients but works for fast ones. What is missing?",
+      "choices": {
+        "A": "A larger read buffer",
+        "B": "A per-connection output buffer plus writability interest — a partial write must be finished when the socket can accept more",
+        "C": "More epoll events",
+        "D": "A second thread"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A slow client's socket buffer fills, write sends only part, and a loop that assumes completion drops the rest. It fails only for the slowest clients, which is what makes it hard to reproduce."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why is an event loop the hardest of the three designs to debug?",
+      "choices": {
+        "A": "It uses more memory",
+        "B": "There is no stack per connection — a backtrace shows the loop, and what a connection was doing must be read from its struct",
+        "C": "epoll has no error reporting",
+        "D": "It cannot be run under a debugger"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "With a thread per connection, a backtrace answers the question directly. That loss is a real cost of the design and part of why a pool is the right answer for most services."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "What architecture do most large systems actually run?",
+      "choices": {
+        "A": "A single global event loop",
+        "B": "One event loop per core for the connections, plus a thread pool for anything that would block",
+        "C": "A thread per connection with a large limit",
+        "D": "A process per connection"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "It combines all three designs from this module: loops stay responsive because they never block, and blocking work happens in the pool where blocking is allowed."
+    }
+  ]
+}

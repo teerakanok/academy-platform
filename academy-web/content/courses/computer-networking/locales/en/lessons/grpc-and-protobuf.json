@@ -1,0 +1,253 @@
+{
+  "nodeId": "grpc-and-protobuf",
+  "locale": "en",
+  "title": "Schemas, code generation, and why they matter",
+  "objective": "By the end of this course you can explain what a schema-based protocol buys over hand-written parsing, evolve a schema without breaking existing callers, and say when this machinery is worth its cost.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "The capstone protocol was a length prefix and a body you parsed by hand. That works, and it stops scaling the moment several teams and several languages depend on it — because the format lives in each implementation's code rather than in one place both sides agree on. A schema moves it to that one place."
+    },
+    {
+      "kind": "heading",
+      "text": "The schema is the contract"
+    },
+    {
+      "kind": "code",
+      "caption": "A definition both sides compile against",
+      "lines": [
+        "syntax = \"proto3\";",
+        "",
+        "message Order {",
+        "  string id       = 1;      // the number is the field's identity on the wire",
+        "  int64  cents    = 2;      // the NAME is not sent; only the number is",
+        "  repeated Line lines = 3;",
+        "}",
+        "",
+        "message Line {",
+        "  string sku      = 1;",
+        "  int32  quantity = 2;",
+        "}",
+        "",
+        "service Orders {",
+        "  rpc Get (GetRequest) returns (Order);",
+        "  rpc Watch (WatchRequest) returns (stream Order);   // a stream of results",
+        "}"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From that file, a generator produces types and client and server stubs in each language that needs them. Neither side writes parsing code, and neither side can drift from the contract without the file changing — which is the actual benefit, more than the encoding."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The field numbers are the wire format",
+      "text": "Only the numbers travel; the names exist for humans and for generated code. That is why renaming a field is harmless and changing its number is a breaking change — the receiver looks up 2, not 'cents'. It is also why the encoding is compact: no field names on the wire, and integers encoded in as few bytes as their value needs."
+    },
+    {
+      "kind": "heading",
+      "text": "Evolving without breaking callers"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Change",
+        "Safe?",
+        "Why"
+      ],
+      "rows": [
+        [
+          "Add a new field with a new number",
+          "Yes",
+          "Old receivers ignore what they do not know"
+        ],
+        [
+          "Rename a field",
+          "Yes",
+          "Only the number is sent"
+        ],
+        [
+          "Remove a field",
+          "Yes, if the number is never reused",
+          "Old senders may still send it; it is ignored"
+        ],
+        [
+          "Reuse a removed number for something else",
+          "No",
+          "An old sender's data is read as the new field"
+        ],
+        [
+          "Change a field's type",
+          "No",
+          "The bytes are interpreted differently"
+        ],
+        [
+          "Renumber a field",
+          "No",
+          "Both sides stop agreeing about what anything is"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Reusing a retired number is the one that corrupts data silently",
+      "text": "Removing field 2 and later adding a different field as number 2 means an old sender's value is parsed as the new field's type. There is no error — the bytes are valid, they simply mean something else now. Reserve retired numbers explicitly so the generator refuses to reuse them, which is exactly the kind of mistake a schema is supposed to prevent."
+    },
+    {
+      "kind": "heading",
+      "text": "What gRPC adds on top"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Feature",
+        "What it means",
+        "Rests on"
+      ],
+      "rows": [
+        [
+          "Generated stubs",
+          "A remote call looks like a method call",
+          "The schema"
+        ],
+        [
+          "Streaming",
+          "Many messages in one call, either direction",
+          "HTTP/2 multiplexing"
+        ],
+        [
+          "Deadlines",
+          "A budget passed with the call",
+          "The RPC lesson's deadline rule"
+        ],
+        [
+          "Status codes",
+          "Structured errors rather than strings",
+          "A defined set"
+        ],
+        [
+          "Multiplexing",
+          "Many calls on one connection",
+          "HTTP/2, and therefore one handshake"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Every row rests on something from earlier in this course. Multiplexing is why one connection carries many calls without the queuing that HTTP/1.1 had. Deadlines are the mechanism the RPC lesson said a chain of calls needs. And because it is HTTP/2 underneath, the connection is one you now know how to inspect."
+    },
+    {
+      "kind": "heading",
+      "text": "What it costs"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "A build step: the generator must run, and generated code must stay in step with the schema",
+        "Opacity: the traffic is binary, so you cannot read a capture without a decoder",
+        "A learning cost for everyone who touches the interface",
+        "Weaker fit for browsers and for public interfaces, where plain HTTP and JSON are the expectation"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Choosing honestly",
+      "text": "For internal service-to-service traffic with several languages and a schema that will change, this machinery pays for itself quickly. For a public interface, a small internal tool, or a single-language system, plain HTTP with JSON is usually the better answer — it is readable in a capture, debuggable with curl, and needs no build step. The measure is whether the contract has enough consumers to be worth formalising, not whether the technology is modern."
+    },
+    {
+      "kind": "heading",
+      "text": "Where this course leaves you"
+    },
+    {
+      "kind": "paragraph",
+      "text": "You began with two machines and a wire, and you now have a working TCP server written three ways, a diagnostic method for each layer, and a view of what the frameworks above are actually doing. A gRPC call is a request and a response, serialised according to a schema, multiplexed over an HTTP/2 connection, carried by TCP, routed by IP, and delivered by a link layer that resolved a hardware address to reach the next hop. Every one of those is a lesson in this course, and you can now inspect each of them independently when something goes wrong."
+    },
+    {
+      "kind": "try",
+      "title": "Compare the two approaches on your own protocol",
+      "steps": [
+        "Write a schema describing the message your capstone server exchanges",
+        "Generate code for it in the language of your choice and write a client against the generated stub",
+        "Capture the traffic with tcpdump and compare its readability with your hand-written protocol",
+        "Add a field to the schema, regenerate only the client, and confirm the old server still works",
+        "Now change an existing field's number, regenerate, and observe the failure",
+        "Remove a field, reuse its number for a different type, and observe that data is silently misread",
+        "Add the reservation that prevents that, and confirm the generator now refuses",
+        "Finally, list the parts of your system where JSON over HTTP would be the better choice, and say why for each"
+      ],
+      "expected": "A working generated client, a compatible change and two incompatible ones you caused deliberately, and a reasoned list of where you would not use this. That last item is the point of the lesson: the goal is to choose between the two with a reason, not to adopt whichever is newer."
+    }
+  ],
+  "cheatsheet": [
+    "A schema puts the message format in one place both sides compile against",
+    "Field numbers are the wire format; names are for humans and generated code",
+    "Safe: add a field, rename a field, remove one whose number is never reused",
+    "Unsafe: reuse a retired number, change a type, renumber a field",
+    "Reserve retired numbers so the generator refuses to reuse them",
+    "gRPC adds generated stubs, streaming, deadlines and status codes over HTTP/2",
+    "Multiplexing means many calls share one connection and one handshake",
+    "Costs: a build step, binary traffic you cannot read directly, a learning curve",
+    "Plain HTTP with JSON is usually better for public interfaces and small systems"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "You rename a field in the schema and regenerate both sides. What happens to compatibility?",
+      "choices": {
+        "A": "It breaks — the name is part of the wire format",
+        "B": "Nothing breaks — only the field number travels",
+        "C": "It breaks only for old clients",
+        "D": "It depends on the field type"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Names exist for humans and generated code. That is also why changing a number is a breaking change while changing a name is not."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Field 2 was removed a year ago. A new field is added and given number 2. What goes wrong?",
+      "choices": {
+        "A": "The generator rejects it",
+        "B": "An old sender's value for the removed field is parsed as the new field's type, silently and without error",
+        "C": "Nothing — the old field is gone",
+        "D": "Only streaming calls are affected"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The bytes are valid; they simply mean something else now. Reserving retired numbers is what makes the generator refuse this, and it is precisely the mistake a schema exists to prevent."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why can gRPC carry many concurrent calls over one connection without them queuing behind each other?",
+      "choices": {
+        "A": "It opens a connection per call",
+        "B": "It runs on HTTP/2, which multiplexes independent streams over one connection",
+        "C": "It uses UDP",
+        "D": "Calls are batched by the client"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "This is the HTTP/2 property from the HTTP lesson, applied. It also means one handshake serves many calls, which is the connection-reuse benefit measured there."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "When is plain HTTP with JSON the better choice?",
+      "choices": {
+        "A": "Never — schemas are always better",
+        "B": "For public interfaces, browser clients, and small single-language systems, where readability and no build step outweigh the schema's benefits",
+        "C": "Only for read-only interfaces",
+        "D": "When performance does not matter"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The measure is whether the contract has enough consumers to be worth formalising. A readable, curl-debuggable interface with no build step is a real advantage where those conditions do not hold."
+    }
+  ]
+}

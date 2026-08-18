@@ -1,0 +1,246 @@
+{
+  "nodeId": "rpc-concepts",
+  "locale": "en",
+  "title": "Calling a function on another machine",
+  "objective": "By the end of this lesson you can describe what a remote call adds to a local one, name the failure that has no local equivalent, and design an interface that survives being called over a network.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A remote procedure call is meant to look like an ordinary function call: you call something, it runs elsewhere, you get a result. The appeal is obvious and the trap is exactly the same thing — code that looks local but is not, written by people who then reason about it as if it were."
+    },
+    {
+      "kind": "heading",
+      "text": "What actually happens"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Your arguments are serialised into bytes",
+        "Those bytes travel over the connection this course has been building",
+        "The far side deserialises them and calls the real function",
+        "Its return value is serialised and sent back",
+        "Your side deserialises it and returns, as if nothing had happened"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Every step can fail, and steps two and four can fail in a way that leaves you unable to tell what happened. That is the whole difficulty, and everything below follows from it."
+    },
+    {
+      "kind": "heading",
+      "text": "The differences that matter"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "Local call",
+        "Remote call"
+      ],
+      "rows": [
+        [
+          "Latency",
+          "Nanoseconds",
+          "Milliseconds — six orders of magnitude"
+        ],
+        [
+          "Failure",
+          "The process crashes, and you know",
+          "The call may or may not have run"
+        ],
+        [
+          "Arguments",
+          "Passed by reference cheaply",
+          "Copied and encoded; large ones are expensive"
+        ],
+        [
+          "Availability",
+          "Always",
+          "The other end may be restarting, or gone"
+        ],
+        [
+          "Versioning",
+          "Compile-time",
+          "Two sides may be running different versions right now"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The failure with no local equivalent",
+      "text": "A timeout does not tell you whether the far side ran your call. The request may have been lost on the way, or it may have executed and the reply lost on the way back. Locally there is no equivalent of this — the function either ran or it did not. Every design decision below exists because of this one property, and any system that retries without accounting for it will eventually perform an operation twice."
+    },
+    {
+      "kind": "heading",
+      "text": "Making retries safe"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The HTTP lesson introduced the idea that some operations may be repeated with the same end result. That is the property a remote interface needs, and when the operation does not have it naturally, it can be given it."
+    },
+    {
+      "kind": "code",
+      "caption": "An operation that cannot be repeated, and the same one made safe",
+      "lines": [
+        "/* Unsafe: retrying after a timeout may charge twice. */",
+        "charge(account, 100);",
+        "",
+        "/* Safe: the caller generates a unique key; the server remembers it. */",
+        "charge(account, 100, request_id = \"3f9a-...\");",
+        "",
+        "/* Server side:",
+        "     if this request_id was already processed:",
+        "         return the recorded result, do not charge again",
+        "     else:",
+        "         charge, record the result against the id, return it",
+        "",
+        "   The retry now produces the same answer as the original, which is",
+        "   what makes it safe for a client to retry without knowing whether",
+        "   the first attempt ran. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Designing an interface for a network"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Coarse rather than fine: one call that fetches an order with its lines beats ten calls, because latency is paid per call",
+        "Explicit failure in the signature: a caller must be able to distinguish 'no result' from 'failed'",
+        "Deadlines, not just timeouts: pass the remaining budget along so a chain of calls does not multiply",
+        "Version tolerantly: a receiver should ignore fields it does not know, and a sender should not require fields the other side may not send",
+        "Bound every payload: an unbounded list becomes an unbounded response and a memory problem"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "The mistake that produces most slow systems",
+      "text": "Fine-grained interfaces feel clean — one call per thing — and they are how you would design locally, where a call costs nothing. Over a network, a loop that makes one call per item pays the round trip per item. A hundred items over a 5 ms link is half a second of pure waiting. This is the single most common performance problem in distributed systems, and it is a design decision rather than an optimisation problem."
+    },
+    {
+      "kind": "heading",
+      "text": "Where the calls are carried"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Approach",
+        "Carried over",
+        "Suits"
+      ],
+      "rows": [
+        [
+          "REST over HTTP",
+          "HTTP/1.1 or HTTP/2",
+          "Public interfaces, browsers, simple tooling"
+        ],
+        [
+          "gRPC",
+          "HTTP/2",
+          "Internal service-to-service, streaming, generated code"
+        ],
+        [
+          "Message queue",
+          "A broker",
+          "Work that need not be answered immediately"
+        ],
+        [
+          "Custom binary",
+          "A raw connection",
+          "Rare, and usually a mistake unless you measured a reason"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "All of these run on top of what this module built. A remote call is a request and a response over a connection, with a serialisation format and a set of conventions layered on — and knowing that is what lets you debug one with tcpdump rather than only with the framework's own tooling."
+    },
+    {
+      "kind": "try",
+      "title": "Turn your server into an RPC service",
+      "steps": [
+        "Extend the capstone protocol so the message body starts with an operation name and its arguments",
+        "Implement two operations: one that is safe to repeat, and one that is not — for example a counter increment",
+        "Call the unsafe one, kill the reply before it arrives, and have the client retry — observe the double effect",
+        "Add a request identifier and have the server remember results by it",
+        "Retry again and confirm the result is now the same as the original",
+        "Write a client that fetches 100 items with 100 calls, and time it",
+        "Add one call that fetches all 100 and compare the times",
+        "Introduce an artificial 5 ms delay per call and repeat both measurements"
+      ],
+      "expected": "A double effect you caused on purpose and then eliminated with a request identifier, and a batched call that is dramatically faster than the loop. The 5 ms delay makes the second point unmissable: interface granularity, not code efficiency, is what determined the result."
+    }
+  ],
+  "cheatsheet": [
+    "A remote call serialises arguments, sends them, executes remotely, and returns a serialised result",
+    "Latency is six orders of magnitude higher than a local call",
+    "A timeout does not tell you whether the call ran — this has no local equivalent",
+    "Make operations repeatable, or give each request a unique id the server remembers",
+    "Design coarse interfaces: latency is paid per call, not per byte",
+    "One call per item over a 5 ms link costs 5 ms per item",
+    "Pass deadlines along a chain so timeouts do not multiply",
+    "Version tolerantly: ignore unknown fields, do not require new ones",
+    "Bound every payload, or an unbounded list becomes an unbounded response"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A remote call times out. What do you know about whether it executed?",
+      "choices": {
+        "A": "It did not execute",
+        "B": "Nothing — the request may have been lost, or it may have run and the reply lost",
+        "C": "It executed but failed",
+        "D": "It will execute later"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "This ambiguity has no local equivalent and is the reason remote interfaces need repeatable operations or request identifiers. Retrying without one eventually performs an operation twice."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A client fetches 100 items with 100 calls over a link with 5 ms round-trip time. Roughly how long does it take?",
+      "choices": {
+        "A": "5 ms",
+        "B": "About 500 ms — the round trip is paid once per call",
+        "C": "Depends only on the payload size",
+        "D": "About 50 ms"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Latency is per call. This is why coarse interfaces matter, and why the fix is a design change rather than a faster implementation."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "How do you make a charge operation safe to retry?",
+      "choices": {
+        "A": "Retry only once",
+        "B": "Have the caller supply a unique request id that the server records, returning the original result on a repeat",
+        "C": "Use a longer timeout",
+        "D": "Make the client check the balance first"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The server can then tell an original from a repeat. Checking the balance first is a check-then-act race, which is the same defect as the operating systems course's TOCTOU bug."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why pass a deadline rather than only a timeout through a chain of calls?",
+      "choices": {
+        "A": "Deadlines are more precise",
+        "B": "Each hop with its own timeout adds up, so a chain can wait far longer than the caller intended",
+        "C": "Timeouts are not supported over HTTP",
+        "D": "To synchronise clocks"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Three hops with a 5 second timeout each can take 15 seconds. Passing the remaining budget lets each hop know how much time is actually left."
+    }
+  ]
+}

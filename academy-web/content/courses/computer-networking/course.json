@@ -2,14 +2,14 @@
   "id": "computer-networking",
   "slug": "computer-networking",
   "version": "1.0.0",
-  "publicAvailability": "internal",
+  "publicAvailability": "syllabus-preview",
   "defaultLocale": "en",
   "availableLocales": [
     "en",
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 381,
+  "estimatedMinutes": 436,
   "coverMotif": "cloud",
   "skills": [
     {
@@ -279,6 +279,42 @@
       "estimatedMinutes": 18,
       "skillWeights": {
         "server-design": 4
+      }
+    },
+    {
+      "id": "event-driven-and-c10k",
+      "kind": "capstone",
+      "prerequisites": [
+        "select-poll-epoll"
+      ],
+      "estimatedMinutes": 22,
+      "skillWeights": {
+        "server-design": 4,
+        "socket-programming": 3
+      }
+    },
+    {
+      "id": "rpc-concepts",
+      "kind": "lesson",
+      "prerequisites": [
+        "http-basics"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "network-model": 3,
+        "server-design": 2
+      }
+    },
+    {
+      "id": "grpc-and-protobuf",
+      "kind": "lesson",
+      "prerequisites": [
+        "rpc-concepts"
+      ],
+      "estimatedMinutes": 17,
+      "skillWeights": {
+        "network-model": 3,
+        "server-design": 2
       }
     }
   ]
