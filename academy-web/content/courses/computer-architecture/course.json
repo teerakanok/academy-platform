@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 104,
+  "estimatedMinutes": 124,
   "coverMotif": "layers",
   "skills": [
     {
@@ -106,6 +106,18 @@
       "estimatedMinutes": 17,
       "skillWeights": {
         "isa": 4
+      }
+    },
+    {
+      "id": "calling-convention",
+      "kind": "capstone",
+      "prerequisites": [
+        "load-store-architecture"
+      ],
+      "estimatedMinutes": 20,
+      "skillWeights": {
+        "machine-code": 4,
+        "isa": 3
       }
     }
   ]

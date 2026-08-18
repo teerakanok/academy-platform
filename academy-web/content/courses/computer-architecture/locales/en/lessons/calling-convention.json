@@ -1,0 +1,236 @@
+{
+  "nodeId": "calling-convention",
+  "locale": "en",
+  "title": "Decode a real function call by hand",
+  "objective": "By the end of this lesson you can read the machine code of a function call, say which registers carry what, and explain why a function that calls nothing needs no stack frame.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Nothing in the instruction set says where arguments go or how a function returns. That is an agreement, not a rule — a calling convention, agreed between compilers so that code compiled separately can be linked together. Once you can read it, generated code stops being opaque."
+    },
+    {
+      "kind": "heading",
+      "text": "The agreement"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Purpose",
+        "Registers",
+        "Who preserves them"
+      ],
+      "rows": [
+        [
+          "Arguments and return value",
+          "The first several registers",
+          "Nobody — the caller assumes they are destroyed"
+        ],
+        [
+          "Return address",
+          "A dedicated link register",
+          "The callee, if it calls anything"
+        ],
+        [
+          "Caller-saved (scratch)",
+          "A defined set",
+          "The caller, if it needs them after the call"
+        ],
+        [
+          "Callee-saved",
+          "Another defined set",
+          "The callee, before using them"
+        ],
+        [
+          "Stack pointer, frame pointer",
+          "Dedicated",
+          "Always restored"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Two save categories exist because both choices are sometimes right",
+      "text": "If every register were caller-saved, a function making many calls would save constantly. If every register were callee-saved, a small function would save registers it barely touches. Splitting the set lets a compiler put short-lived values in scratch registers and long-lived ones in preserved registers, and pay for saving only what is actually needed. Reading which category a value lands in tells you what the compiler concluded about its lifetime."
+    },
+    {
+      "kind": "heading",
+      "text": "A real call, decoded"
+    },
+    {
+      "kind": "code",
+      "caption": "Generated aarch64 for a function that calls another",
+      "lines": [
+        "int caller(int x) {",
+        "    int r = helper(x, x + 1, x + 2);",
+        "    return r * 2;",
+        "}",
+        "",
+        "_caller:",
+        "  stp  x29, x30, [sp, #-16]!    ; push frame pointer and return address",
+        "  mov  x29, sp                  ; establish this frame",
+        "  add  w1, w0, #1               ; second argument   = x + 1",
+        "  add  w2, w0, #2               ; third argument    = x + 2",
+        "                                ; first argument is already in w0",
+        "  bl   _helper                  ; call: jump, and save the return address",
+        "  lsl  w0, w0, #1               ; result arrives in w0; multiply by 2",
+        "  ldp  x29, x30, [sp], #16      ; restore, and pop the frame",
+        "  ret                           ; jump to the saved return address"
+      ]
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Arguments are placed in numbered registers in order, and x is already in the first one",
+        "The call instruction both jumps and records where to come back to",
+        "The return value arrives in the same register the first argument used",
+        "The return address must be saved because the call inside will overwrite it",
+        "The frame is popped in one instruction that also restores both saved registers"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "A function that calls nothing"
+    },
+    {
+      "kind": "code",
+      "caption": "The same compiler, a leaf function",
+      "lines": [
+        "int leaf(int a, int b) { return a + b; }",
+        "",
+        "_leaf:",
+        "  add  w0, w1, w0",
+        "  ret",
+        "",
+        "/* Two instructions. No stack frame at all. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "This is the clearest evidence of what a stack frame is for",
+      "text": "A leaf function calls nothing, so nothing will overwrite its return address, so there is nothing to save — and therefore no frame. The frame in the first example exists entirely because of the call inside it. That is why a leaf function is measurably cheaper, and why compilers work hard to inline small functions: inlining turns a call into no call, and the frame disappears with it."
+    },
+    {
+      "kind": "heading",
+      "text": "What the stack frame holds"
+    },
+    {
+      "kind": "code",
+      "caption": "The layout, from the stack pointer upward",
+      "lines": [
+        "  higher addresses",
+        "     ...caller's frame...",
+        "    +-------------------+",
+        "    | saved return addr |   only if this function calls anything",
+        "    | saved frame ptr   |",
+        "    +-------------------+  <- frame pointer",
+        "    | callee-saved regs |   only those actually used",
+        "    | local variables   |   those that need an address, or were spilled",
+        "    | outgoing args     |   beyond what fits in registers",
+        "    +-------------------+  <- stack pointer",
+        "  lower addresses",
+        "",
+        "/* This is the layout the operating systems course's backtraces walk,",
+        "   and the structure the C course's stack-lifetime bugs corrupt. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Why this matters beyond curiosity"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "A debugger walks these frames to produce a backtrace — the same backtrace the deadlock lesson used",
+        "A buffer overflow that reaches the saved return address changes where the function returns to, which is the mechanism the C course described",
+        "Protections such as stack canaries and shadow stacks exist specifically to defend this structure",
+        "Reading a frame tells you what a function is holding and why, including values that appear in no source line"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Read the convention off your own compiler",
+      "steps": [
+        "Write a function taking three arguments that calls another function, and compile with -O1 -S",
+        "Identify which register each argument was placed in, and where the return value arrives",
+        "Write a leaf function and confirm it has no stack frame at all",
+        "Add a call to the leaf function and watch the frame appear",
+        "Write a function with more arguments than fit in registers and find where the extras go",
+        "Compile with -O2 and check whether the small function was inlined instead of called",
+        "Run the program under a debugger, break inside the inner function, and print a backtrace",
+        "Match each line of that backtrace to a saved return address on the stack"
+      ],
+      "expected": "Argument registers identified by reading real output, a leaf function with no frame, and a frame that appears the moment you add a call. The debugger step ties it together: the backtrace you have used in earlier courses is nothing more than a walk over the saved return addresses you just watched being written."
+    }
+  ],
+  "cheatsheet": [
+    "The calling convention is an agreement between compilers, not part of the ISA",
+    "The first several registers carry arguments; the return value comes back in the first",
+    "The call instruction jumps and saves the return address in a link register",
+    "Caller-saved registers are scratch; callee-saved must be preserved if used",
+    "Two categories exist so short-lived and long-lived values can each be cheap",
+    "A function that calls nothing needs no frame — verified: a leaf compiled to two instructions",
+    "The frame exists because of the call inside it, which is why inlining removes it",
+    "The frame holds the saved return address, saved registers, locals and extra arguments",
+    "A backtrace is a walk over saved return addresses; overflow attacks target the same field"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A leaf function compiles to two instructions with no stack frame. Why does it need none?",
+      "choices": {
+        "A": "It has no local variables",
+        "B": "It calls nothing, so nothing will overwrite its return address — there is nothing to save",
+        "C": "The compiler optimised it away",
+        "D": "Leaf functions use a separate stack"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Verified: the same compiler produced a full frame for a function containing a call and none for one without. The frame exists because of the call, which is also why inlining removes it."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why do calling conventions define both caller-saved and callee-saved registers?",
+      "choices": {
+        "A": "For historical reasons",
+        "B": "So short-lived values can use scratch registers and long-lived ones preserved registers, and each function saves only what it actually needs",
+        "C": "To support recursion",
+        "D": "Because some registers are faster"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "One category alone forces unnecessary saving in one direction or the other. Which category a value lands in tells you what the compiler concluded about its lifetime."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "What does the call instruction do beyond jumping?",
+      "choices": {
+        "A": "It pushes all registers",
+        "B": "It records the return address, so the callee knows where to come back to",
+        "C": "It allocates a stack frame",
+        "D": "It saves the flags"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The callee then saves that address to the stack only if it makes a call of its own, which is precisely the difference between a leaf function and one that is not."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "How does a debugger produce a backtrace?",
+      "choices": {
+        "A": "It reads a log the program wrote",
+        "B": "It walks the chain of stack frames, reading each saved return address to find the caller",
+        "C": "It re-executes the program",
+        "D": "The kernel records every call"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "It is the same structure a buffer overflow corrupts when it reaches the saved return address — which is why the protections around that field exist."
+    }
+  ]
+}
