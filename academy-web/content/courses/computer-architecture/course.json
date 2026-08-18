@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 33,
+  "estimatedMinutes": 51,
   "coverMotif": "layers",
   "skills": [
     {
@@ -59,6 +59,18 @@
       "estimatedMinutes": 17,
       "skillWeights": {
         "isa": 4
+      }
+    },
+    {
+      "id": "instruction-encoding",
+      "kind": "lesson",
+      "prerequisites": [
+        "what-is-an-isa"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "isa": 4,
+        "machine-code": 3
       }
     }
   ]
