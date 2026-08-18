@@ -8,7 +8,7 @@ import {
   expireLocalIdentityBrowserBindingCookie,
   readLocalIdentityBrowserBinding,
 } from '@/lib/identity/local-runtime'
-import { completeIdentityCallback } from '@/lib/identity/transaction'
+import { completeSignedIdentityCallback } from '@/lib/identity/transaction'
 
 export const runtime = 'nodejs'
 
@@ -44,13 +44,14 @@ export async function GET(request: Request) {
       stateCookie = expireLocalIdentityBrowserBindingCookie(callback.state)
       const browserBinding = readLocalIdentityBrowserBinding(request.headers.get('cookie'), callback.state)
       if (!browserBinding) throw new IdentityTransactionError('ไม่พบ browser binding', 'browser_mismatch')
-      const completed = await completeIdentityCallback({
+      const completed = await completeSignedIdentityCallback({
         adapter: local.codeExchangePort,
         store: local.transactionStore,
         client: local.client,
         callback,
         browserBinding,
         clientAssertionProvider: local.clientAssertionProvider,
+        resultVerifier: local.resultVerifier,
       })
       const response = NextResponse.redirect(new URL(completed.returnPath, request.url), 303)
       response.headers.append('set-cookie', createLocalAcademySession(local, completed.exchange))

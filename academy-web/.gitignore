@@ -29,3 +29,6 @@ supabase/.temp/
 
 # secret ฝั่ง workerd ตอน dev — ห้ามเข้า git
 .dev.vars
+
+# playtest local state/logs (สร้างโดย scripts/playtest-identity-local.sh)
+.local/

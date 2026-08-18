@@ -1,5 +1,9 @@
 import { isAbsolute, join, resolve } from 'node:path'
-import { cancelResponseBody, readStrictJsonResponse } from '@/lib/http/strict-json-response'
+import {
+  cancelResponseBody,
+  parseStrictJsonText,
+  readStrictJsonResponse,
+} from '@/lib/http/strict-json-response'
 import type {
   AuthorizationRequest,
   ExchangeResult,
@@ -7,6 +11,13 @@ import type {
   IdentityCodeExchangeRequest,
 } from './adapter'
 import { projectIdentityCodeExchangeRequest } from './code-exchange-request'
+import {
+  createIdentityCodeExchangeResultVerifierPort,
+  IdentityCodeExchangeResultVerifierFailure,
+  type IdentityCodeExchangeResultBinding,
+  type IdentityCodeExchangeResultVerifierPort,
+} from './code-exchange-result-verifier-port'
+import { createIdentityResultKeySetCache, type IdentityResultKeySetCache } from './result-key-set-cache'
 import {
   FileIdentitySessionStore,
   academySessionCookie,
@@ -26,6 +37,8 @@ const LOCAL_CLIENT_ASSERTION = [
   'c3ludGhldGljLXNpZ25hdHVyZQ',
 ].join('.')
 const LOCAL_ASSERTION_AUDIENCE = 'https://identity-control.local/v1/code/exchange'
+const LOCAL_RESULT_ENVELOPE_ISSUER = 'https://identity.local.test/v1/code/results'
+const SIGNED_RESULT_RESPONSE_KEYS = ['signedResult'] as const
 const BROWSER_BINDING = /^[A-Za-z0-9_-]{16,160}$/
 
 export class IdentityLocalRuntimeError extends Error {
@@ -57,8 +70,8 @@ export function createIdentityLocalRuntime(request: Pick<Request, 'url'>) {
       clientId: 'academy-web-local',
       redirectUri,
       serviceId: 'academy',
-      audience: 'academy-api-local',
-      expectedIssuer: 'synthetic-local-issuer',
+      audience: 'https://academy.local.test',
+      expectedIssuer: 'https://identity.local.test/v1',
       clientAssertionAudience: LOCAL_ASSERTION_AUDIENCE,
     }
     const registration: LocalIdentityAuthorizationRegistration = {
@@ -75,6 +88,9 @@ export function createIdentityLocalRuntime(request: Pick<Request, 'url'>) {
       transactionStore,
       sessionStore,
       codeExchangePort: createLocalCodeExchangePort(apiOrigin),
+      resultVerifier: createLocalCodeExchangeResultVerifier(
+        createLocalResultKeySetCache(apiOrigin),
+      ),
       clientAssertionProvider: {
         async createClientAssertion(input: { audience: string }) {
           if (input.audience !== LOCAL_ASSERTION_AUDIENCE) throw new IdentityLocalRuntimeError()
@@ -201,5 +217,110 @@ function createLocalCodeExchangePort(apiOrigin: string): IdentityCodeExchangePor
         clearTimeout(timeout)
       }
     },
+  }
+}
+
+function createLocalResultKeySetCache(apiOrigin: string): IdentityResultKeySetCache {
+  const endpoint = `${apiOrigin}/v1/code/result-keys`
+  const fetchMethod = globalThis.fetch
+  if (typeof fetchMethod !== 'function') throw new IdentityLocalRuntimeError()
+  return createIdentityResultKeySetCache({
+    async load(): Promise<string> {
+      let response: Response | undefined
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 5_000)
+      try {
+        response = await fetchMethod(endpoint, {
+          method: 'GET',
+          headers: { accept: 'application/json' },
+          cache: 'no-store',
+          credentials: 'omit',
+          redirect: 'error',
+          signal: controller.signal,
+        })
+        if (response.status !== 200
+          || !(response.headers.get('cache-control') ?? '').toLowerCase().includes('no-store')) {
+          cancelResponseBody(response)
+          throw new IdentityLocalRuntimeError()
+        }
+        const parsed = await readStrictJsonResponse(response, {
+          maxBytes: 64 * 1024,
+          maxDepth: 5,
+          timeoutMs: 5_000,
+        })
+        if (!parsed.ok) throw new IdentityLocalRuntimeError()
+        return JSON.stringify(parsed.value)
+      } catch {
+        if (response) cancelResponseBody(response)
+        throw new IdentityLocalRuntimeError()
+      } finally {
+        clearTimeout(timeout)
+      }
+    },
+    clock: Date.now,
+    cooldownMs: 1_000,
+    negativeCacheMs: 5_000,
+  })
+}
+
+export function createLocalCodeExchangeResultVerifier(
+  keySetCache: IdentityResultKeySetCache,
+): IdentityCodeExchangeResultVerifierPort {
+  return Object.freeze({
+    async verify(
+      value: unknown,
+      binding: IdentityCodeExchangeResultBinding,
+    ): Promise<ExchangeResult> {
+      const signedResult = readSignedResult(value)
+      const keyId = readEnvelopeKeyId(signedResult)
+      const key = await keySetCache.resolve(LOCAL_RESULT_ENVELOPE_ISSUER, keyId)
+      const importedKeySet = keySetCache.current()
+      if (!key
+        || !importedKeySet
+        || importedKeySet.keySet.issuer !== LOCAL_RESULT_ENVELOPE_ISSUER
+        || !importedKeySet.keySet.keys.some((candidate) => candidate.keyId === key.keyId)) {
+        throw new IdentityCodeExchangeResultVerifierFailure()
+      }
+      const verifier = createIdentityCodeExchangeResultVerifierPort({
+        clock: () => new Date(),
+        clockSkewSeconds: 5,
+        keySet: { ...importedKeySet.keySet, keys: [...importedKeySet.keySet.keys] },
+        maximumLifetimeSeconds: 120,
+      })
+      return verifier.verify(value, binding)
+    },
+  })
+}
+
+function readSignedResult(value: unknown): string {
+  if (!value
+    || typeof value !== 'object'
+    || Array.isArray(value)
+    || Reflect.getPrototypeOf(value) !== Object.prototype
+    || Reflect.ownKeys(value).length !== SIGNED_RESULT_RESPONSE_KEYS.length
+    || Reflect.ownKeys(value)[0] !== SIGNED_RESULT_RESPONSE_KEYS[0]
+    || typeof (value as { signedResult?: unknown }).signedResult !== 'string') {
+    throw new IdentityCodeExchangeResultVerifierFailure()
+  }
+  return (value as { signedResult: string }).signedResult
+}
+
+function readEnvelopeKeyId(signedResult: string): string {
+  try {
+    const [headerPart] = signedResult.split('.')
+    if (!headerPart || headerPart.length > 512 || !/^[A-Za-z0-9_-]+$/.test(headerPart)) {
+      throw new Error()
+    }
+    const base64 = headerPart.replace(/-/g, '+').replace(/_/g, '/')
+    const headerText = atob(base64)
+    const parsed = parseStrictJsonText(headerText, 512, 2)
+    if (!parsed.ok
+      || !parsed.value
+      || typeof parsed.value !== 'object'
+      || Array.isArray(parsed.value)
+      || typeof (parsed.value as { kid?: unknown }).kid !== 'string') throw new Error()
+    return (parsed.value as { kid: string }).kid
+  } catch {
+    throw new IdentityCodeExchangeResultVerifierFailure()
   }
 }

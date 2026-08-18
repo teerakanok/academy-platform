@@ -11,6 +11,7 @@ import { createIdentityLocalRuntime, createLocalAcademySession } from '@/lib/ide
 
 const originalEnvironment = { ...process.env }
 const originalFetch = globalThis.fetch
+const encoder = new TextEncoder()
 
 function byteJsonResponse(value: unknown): Response {
   const bytes = new TextEncoder().encode(JSON.stringify(value))
@@ -43,6 +44,69 @@ function cookiePair(setCookie: string, name: string): string {
   const match = new RegExp(`(?:^|, )(${name}[^=]*=[^;]*)`).exec(setCookie)
   if (!match?.[1]) throw new Error(`missing ${name} cookie`)
   return match[1]
+}
+
+function base64Url(value: Uint8Array): string {
+  let binary = ''
+  for (const byte of value) binary += String.fromCharCode(byte)
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/u, '')
+}
+
+async function signedLocalResultFixture(nonce: string) {
+  const keyPair = await crypto.subtle.generateKey(
+    { name: 'ECDSA', namedCurve: 'P-256' },
+    true,
+    ['sign', 'verify'],
+  )
+  const publicJwk = await crypto.subtle.exportKey('jwk', keyPair.publicKey)
+  const result = {
+    issuer: 'https://identity.local.test/v1',
+    subject: 'synthetic-local-subject',
+    verifiedEmail: 'learner@example.com',
+    audience: 'https://academy.local.test',
+    serviceId: 'academy',
+    nonce,
+    activation: { status: 'active', revision: 1 },
+  }
+  const issuedAt = Math.floor(Date.now() / 1_000)
+  const headerPart = base64Url(encoder.encode(JSON.stringify({
+    alg: 'ES256',
+    kid: 'identity-result-local-dev-v1',
+    typ: 'identity-code-exchange-result+jwt',
+  })))
+  const claimsPart = base64Url(encoder.encode(JSON.stringify({
+    aud: result.audience,
+    clientId: 'academy-web-local',
+    exp: issuedAt + 60,
+    iat: issuedAt,
+    iss: 'https://identity.local.test/v1/code/results',
+    result,
+  })))
+  const signature = await crypto.subtle.sign(
+    { name: 'ECDSA', hash: 'SHA-256' },
+    keyPair.privateKey,
+    encoder.encode(`${headerPart}.${claimsPart}`),
+  )
+  return {
+    keySetDocument: {
+      issuer: 'https://identity.local.test/v1/code/results',
+      revision: 1,
+      keys: [{
+        keyId: 'identity-result-local-dev-v1',
+        algorithm: 'ES256',
+        publicJwk: {
+          kty: 'EC',
+          crv: 'P-256',
+          x: publicJwk.x!,
+          y: publicJwk.y!,
+        },
+        state: 'active',
+      }],
+      retiredKeyFingerprints: [],
+      retiredKeyIds: [],
+    },
+    signedResult: `${headerPart}.${claimsPart}.${base64Url(new Uint8Array(signature))}`,
+  }
 }
 
 describe('Academy local Identity Control browser flow', () => {
@@ -99,22 +163,19 @@ describe('Academy local Identity Control browser flow', () => {
 
     const state = accountCenterUrl.searchParams.get('state')!
     const nonce = accountCenterUrl.searchParams.get('nonce')!
+    const { keySetDocument, signedResult } = await signedLocalResultFixture(nonce)
     globalThis.fetch = vi.fn(async (input, init) => {
+      if (String(input) === 'http://localhost:8788/v1/code/result-keys') {
+        expect(init?.method).toBe('GET')
+        return byteJsonResponse(keySetDocument)
+      }
       expect(String(input)).toBe('http://localhost:8788/v1/code/exchange')
       expect(init?.method).toBe('POST')
       const request = JSON.parse(String(init?.body)) as Record<string, unknown>
       expect(request.clientId).toBe('academy-web-local')
       expect(request.redirectUri).toBe('http://localhost:3000/auth/callback')
       expect(request.clientAssertion).toMatch(/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/)
-      return byteJsonResponse({
-        issuer: 'synthetic-local-issuer',
-        subject: 'synthetic-local-subject',
-        verifiedEmail: 'learner@example.com',
-        audience: 'academy-api-local',
-        serviceId: 'academy',
-        nonce,
-        activation: { status: 'active', revision: 1 },
-      })
+      return byteJsonResponse({ signedResult })
     }) as typeof fetch
 
     const callback = await completeCallback(new Request(
@@ -183,10 +244,10 @@ describe('Academy local Identity Control browser flow', () => {
     })
     const runtime = createIdentityLocalRuntime(request)
     const sessionCookie = createLocalAcademySession(runtime, {
-      issuer: 'synthetic-local-issuer',
+      issuer: 'https://identity.local.test/v1',
       subject: 'synthetic-local-subject',
       verifiedEmail: 'learner@example.com',
-      audience: 'academy-api-local',
+      audience: 'https://academy.local.test',
       serviceId: 'academy',
       nonce: 'synthetic-nonce',
       activation: { status: 'suspended', revision: 2 },

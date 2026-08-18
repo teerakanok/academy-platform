@@ -7,8 +7,8 @@ const SRC = join(ROOT, 'src')
 const IDENTITY_LIB = join(SRC, 'lib', 'identity')
 
 /**
- * โมดูลที่สร้างไว้แล้วแต่ **ยังไม่เปิดใช้** เพราะฝั่ง Identity ยังไม่ published
- * result verification-key set จริง และการเปิดเป็นการตัดสินใจของ founder
+ * โมดูลที่สร้างไว้แล้วแต่ **ยังไม่เปิดใช้ใน production/registry**
+ * result-key distribution อนุญาตเฉพาะ explicit local fixture เท่านั้น
  *
  * ข้อความว่า "ยังไม่มีผู้เรียกใน production" เคยเป็นจริงเพราะบังเอิญยังไม่มีใครต่อ
  * ไม่ใช่เพราะมีอะไรห้าม ด่านนี้เปลี่ยนให้เป็นจริงโดยโครงสร้าง — ใครจะต่อจริงต้อง
@@ -285,7 +285,10 @@ function withoutComments(text: string): string {
   return output
 }
 
-function reachableFrom(entrypoints: string[]): { files: Set<string>, computed: string[] } {
+function reachableFrom(
+  entrypoints: string[],
+  boundaries = new Set<string>(),
+): { files: Set<string>, computed: string[] } {
   const files = new Set<string>()
   const computed: string[] = []
   const queue = [...entrypoints]
@@ -293,6 +296,7 @@ function reachableFrom(entrypoints: string[]): { files: Set<string>, computed: s
     const current = queue.pop()!
     if (files.has(current)) continue
     files.add(current)
+    if (boundaries.has(current)) continue
     const text = withoutComments(readFileSync(current, 'utf8'))
 
     ANY_DYNAMIC_IMPORT.lastIndex = 0
@@ -320,7 +324,12 @@ function reachableFrom(entrypoints: string[]): { files: Set<string>, computed: s
 
 describe('การกระจาย verification key ของ Identity ยังไม่ถูกต่อเข้า production', () => {
   const entrypoints = productionEntrypoints()
-  const { files: reachable, computed } = reachableFrom(entrypoints)
+  const { files: reachable } = reachableFrom(entrypoints)
+  const localRuntimePath = canonical(join(IDENTITY_LIB, 'local-runtime.ts'))
+  const {
+    files: productionReachable,
+    computed: productionComputed,
+  } = reachableFrom(entrypoints, new Set([localRuntimePath]))
   const gatedPaths = NOT_YET_ENABLED.map((name) => canonical(join(IDENTITY_LIB, `${name}.ts`)))
 
   it.each(NOT_YET_ENABLED)('%s ยังมีอยู่จริง ด่านนี้จึงไม่ได้เฝ้าของที่หายไปแล้ว', (name) => {
@@ -331,7 +340,15 @@ describe('การกระจาย verification key ของ Identity ยั
     expect(entrypoints.length).toBeGreaterThan(20)
     expect(reachable.size).toBeGreaterThan(60)
     // ไฟล์ที่รู้แน่ว่า route เรียกถึง ถ้าเดินไม่ถึงแปลว่า resolver พัง
-    expect(reachable.has(canonical(join(IDENTITY_LIB, 'local-runtime.ts')))).toBe(true)
+    expect(reachable.has(localRuntimePath)).toBe(true)
+  })
+
+  it('result-key distribution เปิดเฉพาะชั้น explicit local fixture', () => {
+    for (const name of ['result-key-set-cache', 'result-key-set-importer']) {
+      const path = canonical(join(IDENTITY_LIB, `${name}.ts`))
+      expect(reachable.has(path), `${name} ต้องถูกเรียกจาก local fixture`).toBe(true)
+      expect(productionReachable.has(path), `${name} ห้ามถูกต่อนอก local fixture`).toBe(false)
+    }
   })
 
   it('ทางเข้าครอบทุก wrangler worker ที่ deploy จริง ไม่ใช่แค่ตัวหลัก', () => {
@@ -362,20 +379,20 @@ describe('การกระจาย verification key ของ Identity ยั
   })
 
   it('ไม่มี dynamic import ที่ประกอบชื่อเอง ในกราฟของ production', () => {
-    expect(computed, 'ห้าม dynamic import ที่ specifier ไม่ใช่ string literal').toEqual([])
+    expect(productionComputed, 'ห้าม dynamic import ที่ specifier ไม่ใช่ string literal').toEqual([])
   })
 
   it('ไม่มีโมดูลที่ยังไม่เปิดใช้ตัวไหนถูกเดินถึงจากทางเข้า production', () => {
     const wired = gatedPaths
-      .filter((path) => reachable.has(path))
+      .filter((path) => productionReachable.has(path))
       .map((path) => relative(ROOT, path))
 
     expect(wired, [
       'มีทางเข้า production ที่เดินถึงโมดูล identity ที่ยังไม่เปิดใช้',
       'การเดินกราฟตาม import, re-export, dynamic import ที่เป็น string literal, require,',
       'ทุก alias ใน tsconfig, self-import ผ่านชื่อแพ็กเกจ และพาธจริงหลัง realpath',
-      'ถ้าตั้งใจเปิดจริง ให้ลบชื่อออกจาก NOT_YET_ENABLED ในเทสนี้พร้อมกัน',
-      'และต้องมีหลักฐานว่า Identity published key set จริงแล้ว',
+      'local fixture เป็นข้อยกเว้นเดียว และต้องหยุดที่ local-runtime เท่านั้น',
+      'การเปิดจริงต้องผ่าน registry/release ที่รีวิวเป็นเรื่องของมันเอง',
     ].join(' · ')).toEqual([])
   })
 
