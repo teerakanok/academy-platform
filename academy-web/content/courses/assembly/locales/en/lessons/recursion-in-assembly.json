@@ -1,0 +1,344 @@
+{
+  "nodeId": "recursion-in-assembly",
+  "locale": "en",
+  "title": "Capstone: measuring what a recursive call costs",
+  "objective": "By the end of this capstone you can explain recursion entirely in terms of frames, predict a program's maximum recursion depth from two measurements, and recognise when the compiler has removed the recursion altogether.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Recursion is often taught as a concept requiring a leap of faith. In assembly there is no leap: it is a function that calls a function, and the only thing that makes it work is that each call gets its own frame. This capstone makes that concrete and then measures it."
+    },
+    {
+      "kind": "heading",
+      "text": "The whole mechanism"
+    },
+    {
+      "kind": "code",
+      "caption": "Factorial, compiled at -O0 so nothing is hidden",
+      "lines": [
+        "  long fact(long n) { return n <= 1 ? 1 : n * fact(n-1); }",
+        "",
+        "  _fact:                              compiled at -O0",
+        "      push  rbp",
+        "      mov   rbp, rsp",
+        "      sub   rsp, 32                   ; a frame, every single call",
+        "      mov   qword ptr [rbp - 8], rdi  ; n",
+        "      cmp   qword ptr [rbp - 8], 1",
+        "      jg    .Lrecurse",
+        "      mov   eax, 1",
+        "      mov   qword ptr [rbp - 16], rax  ## 8-byte Spill",
+        "      jmp   .Ldone",
+        "  .Lrecurse:",
+        "      mov   rax, qword ptr [rbp - 8]",
+        "      mov   qword ptr [rbp - 24], rax  ## 8-byte Spill   <- n saved across the call",
+        "      mov   rdi, qword ptr [rbp - 8]",
+        "      sub   rdi, 1",
+        "      call  _fact                      ; <- the recursive call",
+        "      mov   rcx, rax",
+        "      mov   rax, qword ptr [rbp - 24]  ## 8-byte Reload   <- n recovered",
+        "      imul  rax, rcx",
+        "      mov   qword ptr [rbp - 16], rax  ## 8-byte Spill",
+        "  .Ldone:",
+        "      mov   rax, qword ptr [rbp - 16]  ## 8-byte Reload",
+        "      add   rsp, 32",
+        "      pop   rbp",
+        "      ret",
+        "",
+        "/* Nothing about recursion is special. It is one function calling a",
+        "   function, which happens to be itself. What makes it work is that each",
+        "   call gets its own frame, so each call's n is a different 8 bytes of",
+        "   memory. The spill of n before the call and its reload afterwards is",
+        "   the whole mechanism, stated in two instructions. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The spill before the call is the entire secret",
+      "text": "The function needs n after the recursive call returns, in order to multiply. But the call may destroy any caller-saved register, and rdi in particular will hold a different value inside the callee. So n is written to this frame's own memory before the call and read back afterwards. Every recursive algorithm you have written works because of that store and load — the values of the outer call sit in memory that the inner call cannot reach, because the inner call's frame is somewhere else entirely."
+    },
+    {
+      "kind": "heading",
+      "text": "Experiment one: how deep can it go"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Recursion consumes stack. That statement is usually left there. It can be made exact with two independent measurements and one division."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured on macOS with a default 8 MB main-thread stack",
+      "lines": [
+        "  Three measurements, taken separately, that predict each other:",
+        "",
+        "  1. Frame size, measured by printing addresses of locals at each depth:",
+        "         frame 1: this frame is 32 bytes below the previous",
+        "         frame 2: this frame is 32 bytes below the previous",
+        "         frame 3: this frame is 32 bytes below the previous",
+        "",
+        "  2. Stack limit, from the shell:",
+        "         $ ulimit -s",
+        "         8176            (kilobytes)",
+        "",
+        "  3. Prediction:  8176 x 1024 / 32  =  261,632 frames",
+        "",
+        "  4. Measured, by catching SIGSEGV on an alternate stack and printing",
+        "     the depth reached:",
+        "         stack exhausted after 261,448 frames",
+        "",
+        "/* 261,448 against a predicted 261,632 -- 0.07% apart. The shortfall is the",
+        "   frames already on the stack before the recursion started. Three separate",
+        "   measurements agreeing to within a fraction of a percent is what turns",
+        "   'recursion uses stack' from a slogan into an engineering quantity. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "This is a number you can use",
+      "text": "Once you can measure a frame size and read a stack limit, you can answer a real engineering question: is this recursive algorithm safe on my inputs? A tree walk over a balanced structure of a million nodes goes twenty levels deep and is fine. The same walk over a degenerate structure goes a million levels deep and dies at about a quarter of that. The difference between those two cases is not a matter of style, and now it is a calculation rather than a hope."
+    },
+    {
+      "kind": "heading",
+      "text": "Experiment two: when the recursion is not there"
+    },
+    {
+      "kind": "code",
+      "caption": "The same functions at -O2",
+      "lines": [
+        "  long fact_tail(long n, long acc) { return n <= 1 ? acc : fact_tail(n-1, n*acc); }",
+        "",
+        "  At -O2 there is NO call instruction in this function at all:",
+        "",
+        "  .Lloop:",
+        "      imul rax, rdi         ; acc *= n",
+        "      dec  rdi              ; n--",
+        "      dec  rdx",
+        "      jne  .Lloop           ; a backward jump: this is a LOOP",
+        "",
+        "  And the non-tail version, fact, was ALSO turned into a loop at -O2 --",
+        "  and unrolled eight times on top of that.",
+        "",
+        "/* Tail-call elimination is the rule that a call in tail position needs no",
+        "   new frame, because the current one has no further use for itself. Here",
+        "   the compiler went further and eliminated the call entirely, in both the",
+        "   tail-recursive and the ordinary version. Recursion depth in the source",
+        "   says nothing about stack depth in the binary. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "This is the result that matters most for reading real binaries. A recursive function in the source may be an ordinary loop in the binary, with no call, no frame growth and no depth limit at all. Conversely, a function that looks iterative may recurse through a function pointer the disassembler cannot follow. The source tells you the author's intent; only the binary tells you what will run."
+    },
+    {
+      "kind": "heading",
+      "text": "When elimination is possible, and when it is not"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Shape",
+        "Can the call be eliminated",
+        "Why"
+      ],
+      "rows": [
+        [
+          "return f(x)",
+          "Yes, always",
+          "Nothing remains to do after the call, so the frame is not needed"
+        ],
+        [
+          "return n * f(x)",
+          "Only by a stronger transformation",
+          "Work remains after the call; here the compiler rewrote it as a loop anyway"
+        ],
+        [
+          "Two recursive calls, as in a tree walk",
+          "One of them at best",
+          "Only the last call can be in tail position"
+        ],
+        [
+          "A call through a function pointer",
+          "No",
+          "The target is not known at compile time"
+        ],
+        [
+          "Any call in a function that took a local's address",
+          "Usually no",
+          "The frame may still be referenced after the call"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The last row explains a common surprise: adding a debugging print or taking the address of a local can prevent tail-call elimination and turn a program that ran fine into one that overflows the stack. If a recursive program works at one optimisation level and crashes at another, this is where to look first."
+    },
+    {
+      "kind": "heading",
+      "text": "Your task"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Measure your own machine's per-frame cost and stack limit, and predict a maximum depth",
+        "Verify the prediction by catching the fault and reporting the depth reached",
+        "Compile a recursive function at -O0 and -O2 and determine whether the call survives",
+        "Rewrite it in tail-recursive form and check whether that changes the answer",
+        "Explain each result in terms of frames rather than in terms of recursion"
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "How to catch the overflow rather than just crashing",
+      "lines": [
+        "  #include <signal.h>",
+        "",
+        "  static char altstack[SIGSTKSZ * 4];",
+        "",
+        "  static void onsegv(int sig) {",
+        "      /* the normal stack is gone, so this handler runs on its own */",
+        "      char msg[64];",
+        "      int n = snprintf(msg, sizeof msg, \"depth %ld\\n\", depth);",
+        "      write(2, msg, n);       /* write, not printf: printf is not safe here */",
+        "      _exit(0);",
+        "  }",
+        "",
+        "  stack_t ss = { .ss_sp = altstack, .ss_size = sizeof altstack };",
+        "  sigaltstack(&ss, NULL);",
+        "  struct sigaction sa = {0};",
+        "  sa.sa_handler = onsegv;",
+        "  sa.sa_flags   = SA_ONSTACK;     /* <- without this the handler cannot run */",
+        "  sigaction(SIGSEGV, &sa, NULL);",
+        "",
+        "/* SA_ONSTACK and sigaltstack are what make this work: the handler needs",
+        "   stack, and the ordinary stack is exactly what has just run out. The",
+        "   async-signal-safety rule from the operating systems course applies in",
+        "   full here -- write is on the safe list, printf is not. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Compile with -fno-optimize-sibling-calls for the depth experiment",
+      "text": "Without it the compiler may eliminate the very calls you are trying to count, and the program will loop forever instead of overflowing. That is not the experiment failing — it is the second experiment succeeding by accident. Being able to tell those two outcomes apart is the point of doing both."
+    },
+    {
+      "kind": "heading",
+      "text": "What you should be able to say at the end"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Question",
+        "The answer your own numbers support"
+      ],
+      "rows": [
+        [
+          "What makes recursion work?",
+          "Each call gets its own frame, so each call's locals are different memory"
+        ],
+        [
+          "Why is n saved before the recursive call?",
+          "The call may destroy caller-saved registers, and n is needed after it returns"
+        ],
+        [
+          "How deep can this program recurse?",
+          "Stack limit divided by frame size — measured to within 0.07% here"
+        ],
+        [
+          "Does a recursive function recurse at runtime?",
+          "Not necessarily; at -O2 both versions became loops"
+        ],
+        [
+          "Why might adding a print break a working program?",
+          "It can prevent tail-call elimination and restore the frame growth"
+        ]
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Extend the measurement",
+      "steps": [
+        "Add a large local array to the recursive function and re-measure the frame size",
+        "Predict the new maximum depth before measuring it",
+        "Verify, and explain any discrepancy",
+        "Raise the stack limit with ulimit -s and confirm the depth scales as predicted",
+        "Write the same algorithm iteratively with an explicit stack and compare the memory used",
+        "Measure how deep the iterative version can go before its heap allocation fails",
+        "State which of the two you would ship, and why, in terms of the numbers",
+        "Find one recursive function in code you already have and compute its safe depth"
+      ],
+      "expected": "A frame size that grows with the local, a depth that falls in proportion, and a scaling that follows the raised limit. The final step is the one that matters: applying this to code you already own turns the capstone from an exercise into a decision you can defend — and 'we measured the frame at N bytes and the limit at M, so this is safe to depth D' is an argument, where 'recursion is risky' is not."
+    }
+  ],
+  "cheatsheet": [
+    "Recursion is ordinary calling; each call gets its own frame, which is why it works",
+    "A value needed after the recursive call is spilled to the frame and reloaded",
+    "Maximum depth = stack limit divided by frame size",
+    "Measured: 32-byte frames, 8176 KB limit, predicted 261,632, measured 261,448 — 0.07% apart",
+    "ulimit -s reports the stack limit in kilobytes",
+    "A tail call needs no new frame: nothing remains to do after it returns",
+    "At -O2 both the tail-recursive and the ordinary factorial became loops with no call",
+    "A recursive source function may not recurse at runtime at all",
+    "Taking a local's address or adding a print can prevent tail-call elimination",
+    "Catch stack overflow with sigaltstack and SA_ONSTACK; use write, not printf, in the handler"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "In the -O0 factorial, why is n stored to the frame before the recursive call and reloaded after it?",
+      "choices": {
+        "A": "To make debugging easier",
+        "B": "The call may destroy caller-saved registers and rdi will hold a different value inside the callee, but n is needed after the call returns",
+        "C": "Because n is a parameter",
+        "D": "To satisfy the stack canary"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "That store and load is the entire mechanism of recursion: the outer call's values live in memory the inner call cannot reach, because the inner call's frame is elsewhere."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Frames measure 32 bytes and ulimit -s reports 8176 KB. What maximum recursion depth do you predict, and what was measured?",
+      "choices": {
+        "A": "About 8,000; measured 8,176",
+        "B": "About 261,632 predicted; 261,448 measured — the shortfall is the frames already on the stack",
+        "C": "About 32,000",
+        "D": "It cannot be predicted"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Two independent measurements and one division, agreeing to within 0.07%. That is what turns 'recursion uses stack' into a quantity you can design with."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A tail-recursive function compiled at -O2 contains no call instruction. What happened?",
+      "choices": {
+        "A": "The function was inlined into its caller",
+        "B": "The recursion became a loop: a call in tail position needs no new frame, so the compiler turned it into a backward jump",
+        "C": "The compiler removed the function",
+        "D": "The recursion moved to the heap"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "In the measured example the ordinary non-tail factorial was also turned into a loop, and unrolled eightfold. Recursion in the source says nothing about stack depth in the binary."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "A recursive program works, then overflows the stack after someone adds a debug print. Why is that plausible?",
+      "choices": {
+        "A": "The print uses too much stack",
+        "B": "The print can prevent tail-call elimination, restoring the per-call frame growth that had been optimised away",
+        "C": "printf is recursive",
+        "D": "It is not plausible; the print is unrelated"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Taking a local's address or adding work after the recursive call both remove the tail position. This is the first thing to check when a recursive program behaves differently between optimisation levels."
+    }
+  ]
+}

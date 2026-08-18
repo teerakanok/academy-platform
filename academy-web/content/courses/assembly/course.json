@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 139,
+  "estimatedMinutes": 214,
   "coverMotif": "terminal",
   "skills": [
     {
@@ -129,6 +129,51 @@
       "skillWeights": {
         "control-flow": 3,
         "instruction-semantics": 3
+      }
+    },
+    {
+      "id": "call-and-ret",
+      "kind": "lesson",
+      "prerequisites": [
+        "cmp-test-jcc"
+      ],
+      "estimatedMinutes": 17,
+      "skillWeights": {
+        "stack-and-abi": 4
+      }
+    },
+    {
+      "id": "stack-frames",
+      "kind": "lesson",
+      "prerequisites": [
+        "call-and-ret"
+      ],
+      "estimatedMinutes": 19,
+      "skillWeights": {
+        "stack-and-abi": 4
+      }
+    },
+    {
+      "id": "abi-and-calling-convention",
+      "kind": "lesson",
+      "prerequisites": [
+        "stack-frames"
+      ],
+      "estimatedMinutes": 19,
+      "skillWeights": {
+        "stack-and-abi": 4
+      }
+    },
+    {
+      "id": "recursion-in-assembly",
+      "kind": "capstone",
+      "prerequisites": [
+        "abi-and-calling-convention"
+      ],
+      "estimatedMinutes": 20,
+      "skillWeights": {
+        "stack-and-abi": 4,
+        "control-flow": 3
       }
     }
   ]

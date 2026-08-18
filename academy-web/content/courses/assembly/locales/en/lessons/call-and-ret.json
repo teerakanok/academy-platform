@@ -1,0 +1,250 @@
+{
+  "nodeId": "call-and-ret",
+  "locale": "en",
+  "title": "How a function call actually works",
+  "objective": "By the end of this lesson you can state what call and ret do to the stack pointer, locate a return address in memory, and explain why the return address being stored in writable memory is the basis of an entire class of attacks.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A function call is two instructions and one memory write. Everything else — arguments, locals, saved registers — is convention layered on top. This lesson is about the two instructions."
+    },
+    {
+      "kind": "heading",
+      "text": "What call and ret really are"
+    },
+    {
+      "kind": "code",
+      "caption": "Defined in terms of instructions you already know",
+      "lines": [
+        "  call target",
+        "     is exactly equivalent to:",
+        "         push (address of the next instruction)",
+        "         jmp  target",
+        "",
+        "  ret",
+        "     is exactly equivalent to:",
+        "         pop  rip          (conceptually -- rip is not directly writable)",
+        "",
+        "  push rax    ==    sub rsp, 8 ; mov [rsp], rax",
+        "  pop  rax    ==    mov rax, [rsp] ; add rsp, 8",
+        "",
+        "/* Note that push SUBTRACTS from rsp. The stack grows toward lower",
+        "   addresses, which the runtime measurement above confirms. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "There is no call stack in the hardware",
+      "text": "The processor has no notion of a function, a frame, or a call depth. It has a register named rsp, a push instruction that decrements it, and a call instruction that pushes an address before jumping. Everything people call 'the call stack' is that one register plus an agreement about how to use the memory it points at. This is why a corrupted rsp destroys a program so completely: nothing else knows where anything is."
+    },
+    {
+      "kind": "heading",
+      "text": "Watching it happen"
+    },
+    {
+      "kind": "code",
+      "caption": "Runtime output from a three-level call chain",
+      "lines": [
+        "  A program that prints its own stack pointers and return addresses:",
+        "",
+        "    main  : rsp=0x304869900  rbp=0x304869920",
+        "    middle: rsp=0x3048698e0  rbp=0x3048698f0  return address=0x1001b44a8",
+        "    inner : rsp=0x3048698b0  rbp=0x3048698d0  return address=0x1001b4515",
+        "",
+        "    the 8 bytes at rbp+8 are: 0x1001b4515",
+        "",
+        "    code addresses: main=0x1001b4470  middle=0x1001b44e0  inner=0x1001b4520",
+        "",
+        "/* Three things are proved at once. The addresses DECREASE with depth, so",
+        "   the stack grows downward. middle's return address 0x1001b44a8 lies inside",
+        "   main, and inner's 0x1001b4515 lies inside middle -- each is the address",
+        "   after the call that got there. And the value at rbp+8 IS that return",
+        "   address, which fixes the frame layout precisely. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Every claim in the previous section is confirmed here by a running program rather than asserted. The stack pointer moved down by 32 and 48 bytes for the two calls, the return addresses point back into the callers, and the return address sits at a fixed, known offset from the frame pointer."
+    },
+    {
+      "kind": "heading",
+      "text": "The frame layout that follows"
+    },
+    {
+      "kind": "code",
+      "caption": "What memory looks like just after a standard prologue",
+      "lines": [
+        "   higher addresses",
+        "        ...",
+        "   [rbp + 24]   seventh argument, if there is one",
+        "   [rbp + 16]   sixth-plus argument, if there is one",
+        "   [rbp + 8]    RETURN ADDRESS      <- pushed by call",
+        "   [rbp + 0]    saved rbp           <- pushed by the prologue",
+        "   [rbp - 8]    first local",
+        "   [rbp - 16]   second local",
+        "        ...",
+        "   [rsp]        top of the stack",
+        "   lower addresses",
+        "",
+        "/* The prologue that creates this is always the same two instructions:",
+        "       push rbp",
+        "       mov  rbp, rsp",
+        "   and the epilogue that undoes it is:",
+        "       pop  rbp",
+        "       ret                                                   */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The return address is data, in writable memory, next to your buffers",
+      "text": "A local array lives below rbp; the return address lives at rbp+8, just above it. Writing past the end of that array walks upward through the saved rbp and into the return address. When ret executes, it jumps to whatever is there. This is the stack buffer overflow, and it exists because the mechanism that makes functions possible stores a code address in the same writable memory as ordinary data. The defences you have met elsewhere — stack canaries, non-executable stacks, address randomisation — all exist because this arrangement cannot be changed without changing the architecture."
+    },
+    {
+      "kind": "heading",
+      "text": "Where the call is going"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "What you see",
+        "What it means"
+      ],
+      "rows": [
+        [
+          "call 0x401136",
+          "A direct call to a known address"
+        ],
+        [
+          "call printf",
+          "A direct call to a named symbol, if the binary keeps names"
+        ],
+        [
+          "call rax",
+          "An indirect call: a function pointer, a callback, or a virtual method"
+        ],
+        [
+          "call qword ptr [rip + 0x2f0a]",
+          "A call through a table — typically a dynamically linked library function"
+        ],
+        [
+          "jmp target with no call",
+          "A tail call: the current frame is reused, so there is nothing to return to"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The last two rows are worth attention. A call through a table is how dynamic linking works: the address is filled in at load time, so a static disassembler sees only the table slot. And a tail call means the function you are reading will not appear in a backtrace — its frame was reused rather than stacked, which is a common source of confusion when a stack trace seems to skip a function."
+    },
+    {
+      "kind": "heading",
+      "text": "Alignment, and a rule that surprises"
+    },
+    {
+      "kind": "code",
+      "caption": "Why you see sub rsp, 8 for no apparent reason",
+      "lines": [
+        "  The System V ABI requires rsp to be 16-byte aligned at the point",
+        "  a call instruction executes.",
+        "",
+        "      at function entry:  rsp is 16-aligned MINUS 8, because call",
+        "                          pushed an 8-byte return address",
+        "      after push rbp:     16-aligned again",
+        "",
+        "  A function that makes no calls need not maintain this. A function that",
+        "  does may emit sub rsp, 8 purely to restore alignment before calling.",
+        "",
+        "/* If you write assembly by hand and ignore this, calls into the C library",
+        "   can crash inside instructions that require aligned memory operands. It",
+        "   is a common first bug when hand-writing x86-64. */"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Observe your own stack",
+      "steps": [
+        "Write three nested functions, each printing __builtin_frame_address(0) and __builtin_return_address(0)",
+        "Confirm the frame addresses decrease with depth",
+        "Confirm each return address falls inside the caller's code range",
+        "Print the eight bytes at frame address + 8 and confirm they equal the return address",
+        "Compile at -O0 and find push rbp, mov rbp rsp, and the matching epilogue",
+        "Add a local array and watch the sub rsp value grow",
+        "Compile at -O2 with a function that makes no calls and see whether rbp is used at all",
+        "Explain what a stack overflow does in terms of the layout you just measured"
+      ],
+      "expected": "Decreasing frame addresses, return addresses inside the callers, and the value at rbp+8 matching exactly. The -O2 step often shows the frame pointer omitted entirely: when a function makes no calls and its frame size is fixed, rbp is not needed and becomes another general-purpose register. Disassembly of optimised code frequently has no push rbp at all, which is why the tooling module teaches reading frames without relying on it."
+    }
+  ],
+  "cheatsheet": [
+    "call = push the address of the next instruction, then jump",
+    "ret = pop that address into the instruction pointer",
+    "push rax = sub rsp, 8 then store; pop = load then add rsp, 8",
+    "The stack grows toward lower addresses — confirmed by measurement",
+    "Standard prologue: push rbp ; mov rbp, rsp. Epilogue: pop rbp ; ret",
+    "[rbp + 8] is the return address; [rbp + 16] and up are stack arguments",
+    "Locals live below rbp, so overflowing one walks upward into the return address",
+    "call rax is an indirect call; call qword ptr [rip + …] is usually a library call",
+    "A tail call is a jmp with no call, so the function does not appear in a backtrace",
+    "System V requires rsp 16-byte aligned at the call instruction"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What does the call instruction do?",
+      "choices": {
+        "A": "Jumps to the target",
+        "B": "Pushes the address of the following instruction onto the stack, then jumps to the target",
+        "C": "Saves all registers, then jumps",
+        "D": "Creates a stack frame"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Everything else — frames, saved registers, argument passing — is convention layered on top of that one push and one jump."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Measured frame addresses were 0x304869920, 0x3048698f0 and 0x3048698d0 going deeper. What does that show?",
+      "choices": {
+        "A": "The stack is fragmented",
+        "B": "The stack grows toward lower addresses, so each nested call sits below its caller",
+        "C": "Each frame is 32 bytes",
+        "D": "Address randomisation is active"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Consistent with push subtracting from rsp. This is why a buffer that overflows upward reaches the return address rather than running off into unused space."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A local array lives below rbp and the return address at rbp+8. Why does that matter for security?",
+      "choices": {
+        "A": "It makes locals slower to access",
+        "B": "Writing past the end of the array walks upward into the saved rbp and the return address, and ret will jump to whatever is written there",
+        "C": "The array cannot be initialised",
+        "D": "It does not matter on 64-bit systems"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The stack buffer overflow exists because a code address is stored in the same writable memory as ordinary data. Canaries, non-executable stacks and randomisation are all responses to this arrangement."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "A stack trace seems to skip a function that you know was called. What is one likely explanation?",
+      "choices": {
+        "A": "The debugger is broken",
+        "B": "A tail call: the compiler emitted jmp instead of call, reusing the frame, so no return address for that function was ever pushed",
+        "C": "The function was inlined into the caller",
+        "D": "Either B or C — both remove the function's separate frame"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Both tail calls and inlining eliminate the separate frame. Recognising them explains a large share of confusing backtraces in optimised builds."
+    }
+  ]
+}

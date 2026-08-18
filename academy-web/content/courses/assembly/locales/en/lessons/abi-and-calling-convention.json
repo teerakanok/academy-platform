@@ -1,0 +1,310 @@
+{
+  "nodeId": "abi-and-calling-convention",
+  "locale": "en",
+  "title": "The agreement that lets separately compiled code work together",
+  "objective": "By the end of this lesson you can state where any argument and any return value travels, explain why a struct's size changes how it is returned, and name what the ABI covers beyond register assignment.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "An Application Binary Interface is the agreement that makes separate compilation possible. Neither side of a call reads the other's source; both follow the same document. This lesson is the System V AMD64 ABI, used by Linux, macOS and the BSDs. Windows x64 is a different agreement, which is why a binary from one does not simply work with the other."
+    },
+    {
+      "kind": "heading",
+      "text": "The core assignment"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "What",
+        "Where"
+      ],
+      "rows": [
+        [
+          "Integer and pointer arguments 1 to 6",
+          "rdi, rsi, rdx, rcx, r8, r9 — in that order"
+        ],
+        [
+          "Floating-point arguments 1 to 8",
+          "xmm0 through xmm7"
+        ],
+        [
+          "Further arguments",
+          "On the stack, pushed right to left"
+        ],
+        [
+          "Integer or pointer return value",
+          "rax, with rdx for a second one"
+        ],
+        [
+          "Floating-point return value",
+          "xmm0, with xmm1 for a second one"
+        ],
+        [
+          "Callee-saved registers",
+          "rbx, rbp, r12, r13, r14, r15"
+        ],
+        [
+          "Number of vector registers used, for variadic calls",
+          "al"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Integer and floating-point arguments are counted separately",
+      "text": "A function taking an int, a double, an int and a double does not use four consecutive registers. It uses the first two integer registers and the first two SSE registers, because each class has its own independent sequence. Assuming a single left-to-right ordering is one of the most common mistakes when reading an unfamiliar function signature out of disassembly."
+    },
+    {
+      "kind": "code",
+      "caption": "Verified by compiling exactly that signature",
+      "lines": [
+        "  double dmix(int a, double b, int c, double d) { return a*b + c*d; }",
+        "",
+        "      cvtsi2sd xmm2, edi        ; a  arrived in edi   (integer class)",
+        "      cvtsi2sd xmm3, esi        ; c  arrived in esi   (integer class)",
+        "      mulsd    xmm3, xmm1       ; d  arrived in xmm1  (SSE class)",
+        "      mulsd    xmm0, xmm2       ; b  arrived in xmm0  (SSE class)",
+        "      addsd    xmm0, xmm3",
+        "      ret                       ; the double returns in xmm0",
+        "",
+        "/* Two independent sequences. The integers took the first two integer",
+        "   registers and the doubles took the first two SSE registers, even though",
+        "   they alternate in the source. Position in the parameter list does not",
+        "   determine the register -- position WITHIN ITS CLASS does. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Returning a structure: three mechanisms, chosen by size"
+    },
+    {
+      "kind": "code",
+      "caption": "The same construction at three sizes",
+      "lines": [
+        "  struct Small { int a, b; };          /*  8 bytes */",
+        "      lea ecx, [rdi + 1]",
+        "      shl rcx, 32",
+        "      mov eax, edi",
+        "      or  rax, rcx                     ; BOTH fields packed into rax",
+        "      ret",
+        "",
+        "  struct Med { long a, b; };           /* 16 bytes */",
+        "      mov rax, rdi                     ; first field in rax",
+        "      lea rdx, [rdi + 1]               ; second field in rdx",
+        "      ret",
+        "",
+        "  struct Large { long a, b, c, d; };   /* 32 bytes */",
+        "      mov rax, rdi                     ; rdi is a HIDDEN POINTER to the result",
+        "      mov qword ptr [rdi], rsi         ; the real argument moved to rsi!",
+        "      mov qword ptr [rdi + 8], rcx",
+        "      ...",
+        "      ret                              ; returns the pointer it was given",
+        "",
+        "/* Three different mechanisms decided purely by size. For the large struct",
+        "   the caller allocated the space and passed its address as an invisible",
+        "   first argument, which is why the function's own parameter arrived in rsi",
+        "   instead of rdi. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The hidden pointer shifts every other argument",
+      "text": "When a returned structure is too large for registers, the caller allocates space and passes its address as an invisible first argument in rdi. Every real parameter then moves one register to the right. Reading such a function and assuming rdi is the first declared parameter gives an answer that is wrong for every argument. The tell is a function that writes through rdi and returns rdi — that pattern almost always means a large structure return."
+    },
+    {
+      "kind": "heading",
+      "text": "Variadic functions need one extra thing"
+    },
+    {
+      "kind": "code",
+      "caption": "What a call to printf actually looks like",
+      "lines": [
+        "  void callprintf(int n, double d) { printf(\"%d %f\\n\", n, d); }",
+        "",
+        "      mov esi, edi              ; n becomes printf's second argument",
+        "      lea rdi, [rip + L_.str]   ; the format string becomes the first",
+        "      mov al, 1                 ; <- AL: how many SSE registers hold arguments",
+        "      jmp _printf               ## TAILCALL",
+        "",
+        "/* Two things worth noticing. AL must hold the number of vector registers",
+        "   used when calling a variadic function -- printf reads it to know how many",
+        "   to save. Forgetting it is a classic crash when calling printf from",
+        "   hand-written assembly. And the call became a jmp: the compiler tail-called",
+        "   printf, and even labelled it. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "A variadic function does not know at compile time how many arguments arrived, so it may need to save all the argument registers to memory in order to walk them. Saving the eight SSE registers is expensive and usually unnecessary, so the ABI has the caller put the number actually used in al. Hand-written assembly that calls printf without setting al is a well-known crash, and it is a good illustration that an ABI is a contract with obligations in both directions."
+    },
+    {
+      "kind": "heading",
+      "text": "What else the ABI settles"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Area",
+        "What is fixed"
+      ],
+      "rows": [
+        [
+          "Data layout",
+          "Sizes and alignments of the primitive types"
+        ],
+        [
+          "Structure layout",
+          "Field order, padding rules, and how a struct is classified for passing"
+        ],
+        [
+          "Stack alignment",
+          "rsp must be 16-byte aligned at the call instruction"
+        ],
+        [
+          "The red zone",
+          "128 bytes below rsp a leaf function may use without adjusting rsp"
+        ],
+        [
+          "Name mangling",
+          "How a source-level name becomes a symbol"
+        ],
+        [
+          "Unwinding",
+          "How a debugger or exception handler walks the stack"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "The red zone explains a puzzling absence",
+      "text": "A leaf function — one that calls nothing — may use the 128 bytes just below rsp without moving rsp at all, because nothing can overwrite them. So you will see writes to [rsp - 8] in functions that never subtract from rsp. It is a small saving repeated everywhere. Note that it does not exist in kernel code, where an interrupt can use the stack at any moment, which is why kernel builds pass a flag to disable it."
+    },
+    {
+      "kind": "heading",
+      "text": "Why two ABIs exist and what it costs"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "System V (Linux, macOS)",
+        "Windows x64"
+      ],
+      "rows": [
+        [
+          "Integer arguments",
+          "rdi, rsi, rdx, rcx, r8, r9",
+          "rcx, rdx, r8, r9"
+        ],
+        [
+          "Floating-point arguments",
+          "xmm0-xmm7",
+          "xmm0-xmm3, sharing positions with the integers"
+        ],
+        [
+          "Shadow space",
+          "None",
+          "32 bytes reserved by the caller"
+        ],
+        [
+          "Callee-saved",
+          "rbx, rbp, r12-r15",
+          "rbx, rbp, rdi, rsi, r12-r15"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Note that rdi and rsi are caller-saved under System V and callee-saved under Windows. This is why the very first thing to establish about an unfamiliar binary is which ABI it follows: read it under the wrong one and every argument is attributed to the wrong parameter, consistently and convincingly."
+    },
+    {
+      "kind": "try",
+      "title": "Verify the whole table yourself",
+      "steps": [
+        "Write a function taking six longs and confirm the register order",
+        "Write one taking an int, a double, an int and a double, and confirm the two independent sequences",
+        "Write three functions returning 8-, 16- and 32-byte structs and identify each mechanism",
+        "For the 32-byte case, confirm the declared parameter arrives in rsi rather than rdi",
+        "Write a call to printf with one double and find the mov al instruction",
+        "Change it to two doubles and confirm al changes accordingly",
+        "Write a leaf function with a local and look for a write below rsp with no sub rsp",
+        "State, for one function of your own, exactly where each argument and the return value travel"
+      ],
+      "expected": "Every row of the table confirmed by your own compilation. The 32-byte struct case is the one worth dwelling on: seeing the declared parameter show up in rsi makes the hidden-pointer convention concrete, and it is exactly the situation where misreading a disassembly produces a confident, consistent, wrong answer."
+    }
+  ],
+  "cheatsheet": [
+    "System V integer arguments: rdi, rsi, rdx, rcx, r8, r9, then the stack",
+    "Floating-point arguments: xmm0 through xmm7",
+    "The two classes are counted separately, not left to right across the signature",
+    "Return: rax (and rdx), or xmm0 (and xmm1) for floating point",
+    "Callee-saved: rbx, rbp, r12, r13, r14, r15",
+    "An 8-byte struct returns packed in rax; 16 bytes in rax and rdx",
+    "A large struct is written through a hidden pointer in rdi, shifting every real argument right",
+    "Variadic calls put the number of SSE registers used in al",
+    "rsp must be 16-byte aligned at the call instruction",
+    "The red zone is 128 bytes below rsp usable by leaf functions; kernels disable it",
+    "Windows x64 uses rcx, rdx, r8, r9 and makes rdi and rsi callee-saved"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A function is declared f(int a, double b, int c, double d). Where do the four arguments arrive?",
+      "choices": {
+        "A": "The first four integer registers, in declaration order",
+        "B": "a in edi, c in esi, b in xmm0, d in xmm1 — the integer and SSE classes are counted separately",
+        "C": "All four in xmm0 to xmm3",
+        "D": "a in edi, b in xmm0, c in xmm1, d in esi"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Position within its own class decides the register, not position in the parameter list. Assuming a single left-to-right ordering is a common misreading."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A function writes four values through rdi and returns rdi. What is it most likely doing?",
+      "choices": {
+        "A": "Filling a caller-supplied array",
+        "B": "Returning a structure too large for registers: the caller allocated the space and passed its address as a hidden first argument",
+        "C": "Implementing memcpy",
+        "D": "Both A and B look identical and cannot be distinguished"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The tell is that rdi is returned in rax. It also means the function's first declared parameter arrived in rsi, so reading rdi as that parameter would misattribute every argument."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why does a call to printf set al before the call?",
+      "choices": {
+        "A": "al holds the return value",
+        "B": "al carries the number of SSE registers holding arguments, so the variadic callee knows how many it must save",
+        "C": "It is the format string length",
+        "D": "It marks the call as variadic to the linker"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Saving all eight SSE registers would usually be wasted work. Hand-written assembly that omits this is a well-known crash when calling printf."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "You see writes to [rsp - 8] in a function that never subtracts from rsp. What is happening?",
+      "choices": {
+        "A": "A bug in the compiler",
+        "B": "The red zone: a leaf function may use the 128 bytes below rsp without adjusting it, because nothing can overwrite them",
+        "C": "The frame pointer was omitted",
+        "D": "The write is to the caller's frame"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "It saves two instructions in every leaf function. It does not exist in kernel code, where an interrupt could use that stack region at any moment."
+    }
+  ]
+}

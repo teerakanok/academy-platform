@@ -27,6 +27,10 @@
     "att-vs-intel-syntax": "Two ways to write the same instruction",
     "cmp-test-jcc": "How an if becomes a jump",
     "loops-in-assembly": "Finding the loop, and what became of it",
-    "arrays-in-assembly": "Recovering data layout from address arithmetic"
+    "arrays-in-assembly": "Recovering data layout from address arithmetic",
+    "call-and-ret": "How a function call actually works",
+    "stack-frames": "What a function builds before it starts working",
+    "abi-and-calling-convention": "The agreement that lets separately compiled code work together",
+    "recursion-in-assembly": "Capstone: measuring what a recursive call costs"
   }
 }

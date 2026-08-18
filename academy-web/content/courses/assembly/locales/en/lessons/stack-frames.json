@@ -1,0 +1,277 @@
+{
+  "nodeId": "stack-frames",
+  "locale": "en",
+  "title": "What a function builds before it starts working",
+  "objective": "By the end of this lesson you can read a prologue and say what the frame contains, recognise register spilling, and explain why optimised code often has no frame pointer at all.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A frame is the block of stack a function claims for itself. What goes in it is decided by three pressures: values that will not fit in registers, registers the function must give back unchanged, and anything whose address is taken."
+    },
+    {
+      "kind": "heading",
+      "text": "The prologue, in order"
+    },
+    {
+      "kind": "code",
+      "caption": "The full sequence, and what each step is for",
+      "lines": [
+        "  push rbp              ; save the caller's frame pointer",
+        "  mov  rbp, rsp         ; establish ours",
+        "  push rbx              ; save any callee-saved registers we intend to use",
+        "  push r12              ;   -- one push each, in a fixed order",
+        "  sub  rsp, N           ; claim N bytes for locals and spills",
+        "",
+        "  ...the function's actual work...",
+        "",
+        "  add  rsp, N           ; release the locals",
+        "  pop  r12              ; restore the saved registers",
+        "  pop  rbx              ;   -- in exactly reverse order",
+        "  pop  rbp              ; restore the caller's frame pointer",
+        "  ret",
+        "",
+        "/* Every step has an exact undo, and the undos run in reverse. A prologue",
+        "   and epilogue that do not mirror each other is either hand-written",
+        "   assembly with a bug, or a function doing something unusual on purpose. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "What ends up in the frame"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "What",
+        "Why it cannot stay in a register"
+      ],
+      "rows": [
+        [
+          "Arrays and structures",
+          "Too large, and they need contiguous addressable memory"
+        ],
+        [
+          "Anything whose address is taken",
+          "A register has no address to take"
+        ],
+        [
+          "Spilled values",
+          "More simultaneously live values than there are registers"
+        ],
+        [
+          "Saved callee-saved registers",
+          "The contract requires giving them back unchanged"
+        ],
+        [
+          "Arguments beyond the sixth",
+          "The ABI puts them there"
+        ],
+        [
+          "A stack canary",
+          "A deliberate guard, when a local array exists"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Spilling, annotated by the compiler itself"
+    },
+    {
+      "kind": "code",
+      "caption": "A function with more live values than registers",
+      "lines": [
+        "  A function with ten parameters that also makes calls:",
+        "",
+        "  _spill:",
+        "      push rbp",
+        "      push r15                                ; five callee-saved registers,",
+        "      push r14                                ; saved because this function",
+        "      push r13                                ; wants to use them and must",
+        "      push r12                                ; give them back unchanged",
+        "      push rbx",
+        "      sub  rsp, 40                            ; then space for locals",
+        "      mov  dword ptr [rbp - 68], r9d          ## 4-byte Spill",
+        "      mov  dword ptr [rbp - 44], r8d          ## 4-byte Spill",
+        "      mov  dword ptr [rbp - 48], edx          ## 4-byte Spill",
+        "      ...",
+        "      add  rsp, 40                            ; the epilogue undoes it",
+        "      pop  rbx                                ; in exactly reverse order",
+        "      pop  r12",
+        "      pop  r13",
+        "      pop  r14",
+        "      pop  r15",
+        "      pop  rbp",
+        "      ret",
+        "",
+        "/* Those Spill comments are the compiler's own annotation: it ran out of",
+        "   registers and moved values to the stack. A frame full of spills is a",
+        "   function with more simultaneously live values than the sixteen",
+        "   registers can hold. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Spills are a readable signal about the source",
+      "text": "A frame with many spills usually means a function doing too much at once: long expressions, many arguments, or a loop body holding a great deal of state. When you are optimising and see heavy spilling in a hot function, splitting it or shortening the live range of some values often helps more than any micro-optimisation of the arithmetic. The compiler has told you, in its own comments, exactly what its problem was."
+    },
+    {
+      "kind": "heading",
+      "text": "The canary, in place"
+    },
+    {
+      "kind": "code",
+      "caption": "The stack protector, as actually emitted",
+      "lines": [
+        "  int leaf(int a, int b) { int t[4] = {a,b,a+b,a*b}; ... }",
+        "",
+        "      push rbp",
+        "      mov  rbp, rsp",
+        "      sub  rsp, 32",
+        "      mov  rax, qword ptr [rip + ___stack_chk_guard@GOTPCREL]",
+        "      mov  rax, qword ptr [rax]",
+        "      mov  qword ptr [rbp - 8], rax        ; the canary, just below saved rbp",
+        "      ...                                  ; the array lives further down",
+        "      mov  rcx, qword ptr [rip + ___stack_chk_guard@GOTPCREL]",
+        "      mov  rcx, qword ptr [rcx]",
+        "      cmp  rcx, qword ptr [rbp - 8]        ; still intact before returning?",
+        "",
+        "  Measured: this file's two array functions produce 6 stack_chk references.",
+        "  A function with no local array produces 0.",
+        "",
+        "/* The canary sits between the locals and the saved rbp and return address.",
+        "   Anything overflowing an array upward must cross it, and the check before",
+        "   ret catches the corruption. It defends the return address specifically,",
+        "   which is why the compiler adds it only when a local array exists. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The previous lesson explained why the return address is vulnerable. This is the standard defence, and its position in the frame is the whole design: it is placed above the locals and below the saved registers, so a linear overflow of a local buffer has to destroy it on the way to anything important. The check happens immediately before the epilogue, so corruption is detected before ret can use a corrupted address."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "It defends against one shape of attack",
+      "text": "A canary catches a contiguous overflow that runs upward from a buffer. It does not catch a write to an arbitrary computed index, an overflow that skips over the canary, or a corrupted pointer used to write elsewhere. Knowing what a mitigation actually covers is more useful than knowing it exists — the compiler's own choice not to insert one in a function without arrays makes its scope explicit."
+    },
+    {
+      "kind": "heading",
+      "text": "When the frame pointer disappears"
+    },
+    {
+      "kind": "code",
+      "caption": "Optimised code often omits it entirely",
+      "lines": [
+        "  A function that:",
+        "    - has a fixed frame size known at compile time, and",
+        "    - does not need to take addresses relative to a stable base",
+        "  does not need rbp at all. Locals are addressed from rsp instead.",
+        "",
+        "  With frame pointer:        Without:",
+        "    push rbp                   sub  rsp, 24",
+        "    mov  rbp, rsp              mov  dword ptr [rsp + 4], edi",
+        "    sub  rsp, 24               ...",
+        "    mov  [rbp - 20], edi       add  rsp, 24",
+        "    ...                        ret",
+        "    add  rsp, 24",
+        "    pop  rbp",
+        "    ret",
+        "",
+        "/* Omitting it frees a register and removes two instructions. The cost is",
+        "   that a debugger can no longer walk frames by following saved rbp values,",
+        "   which is why unwinding then relies on the separate .eh_frame data the",
+        "   .cfi directives in compiler output produce. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "This is why disassembly of optimised code so often begins with sub rsp rather than push rbp, and why a backtrace from an optimised build can be wrong or incomplete when the unwind information is missing. Reading frames without a frame pointer means tracking rsp adjustments yourself, which the tooling module covers."
+    },
+    {
+      "kind": "try",
+      "title": "Read frames of increasing complexity",
+      "steps": [
+        "Write a function with two int parameters and no locals; compile at -O1 and note the frame",
+        "Add a local array of four ints and recompile; find the canary and the larger frame",
+        "Confirm with grep that the array version references stack_chk and the first does not",
+        "Write a function with ten parameters that calls another function, and count the pushes",
+        "Identify which registers are pushed and check them against the callee-saved list",
+        "Find the compiler's own Spill comments and count them",
+        "Compile the same function at -O2 and see whether the frame pointer survives",
+        "For one frame, draw the memory layout from rbp+16 down to rsp"
+      ],
+      "expected": "A frame that grows with each addition, canary references appearing exactly when a local array does, pushes matching the callee-saved list, and a drawing you can check against the offsets in the code. The grep step matters: it turns 'the compiler adds a canary when there is an array' from something you were told into something you verified in one command."
+    }
+  ],
+  "cheatsheet": [
+    "Prologue: push rbp ; mov rbp, rsp ; push callee-saved ; sub rsp, N",
+    "Epilogue undoes each step in exactly reverse order",
+    "The frame holds arrays, address-taken values, spills, saved registers and stack arguments",
+    "Spill comments in compiler output mean more live values than registers",
+    "Heavy spilling suggests splitting the function rather than micro-optimising it",
+    "A stack canary sits above the locals and below the saved rbp and return address",
+    "Verified: functions with a local array reference stack_chk; one without references it 0 times",
+    "A canary catches contiguous upward overflows, not arbitrary-index writes",
+    "Optimised code often omits rbp, addressing locals from rsp instead",
+    "Without a frame pointer, unwinding relies on the separate .eh_frame data"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A prologue pushes rbp, r15, r14, r13, r12 and rbx. What does the epilogue do?",
+      "choices": {
+        "A": "Pops them in the same order",
+        "B": "Pops rbx, r12, r13, r14, r15 and rbp — exactly reverse order, because the stack is last-in first-out",
+        "C": "Restores them with mov instructions",
+        "D": "Nothing; the caller restores them"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Every prologue step has an exact undo and the undos run in reverse. A prologue and epilogue that do not mirror each other is a strong signal something unusual is happening."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "You see many instructions the compiler annotated as 'Spill'. What does that tell you about the source function?",
+      "choices": {
+        "A": "It has a bug",
+        "B": "It has more simultaneously live values than the sixteen registers can hold, so values were moved to the stack",
+        "C": "It uses too much memory",
+        "D": "It was compiled without optimisation"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Heavy spilling usually means the function is doing too much at once. Splitting it or shortening live ranges often helps more than optimising the arithmetic."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why is the stack canary placed above the locals rather than anywhere else in the frame?",
+      "choices": {
+        "A": "To keep the frame aligned",
+        "B": "So that a contiguous overflow running upward from a local buffer must destroy the canary before reaching the saved rbp and return address",
+        "C": "Because rbp-8 is the fastest address to access",
+        "D": "To avoid conflicting with spills"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The position is the entire design. The check runs immediately before the epilogue, so corruption is detected before ret can use a corrupted address."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "An optimised function starts with sub rsp, 24 and never touches rbp. What has happened, and what is the cost?",
+      "choices": {
+        "A": "The function has no locals",
+        "B": "The frame pointer was omitted: locals are addressed from rsp, which frees a register — at the cost that a debugger cannot walk frames by chaining saved rbp values",
+        "C": "The prologue is missing due to a bug",
+        "D": "The function is a leaf and needs no frame"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Unwinding then depends on the separate .eh_frame data. This is why backtraces from optimised builds can be incomplete when that information is stripped."
+    }
+  ]
+}
