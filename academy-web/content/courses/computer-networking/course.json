@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 309,
+  "estimatedMinutes": 346,
   "coverMotif": "cloud",
   "skills": [
     {
@@ -233,6 +233,30 @@
       "skillWeights": {
         "socket-programming": 4,
         "troubleshooting": 3
+      }
+    },
+    {
+      "id": "dns-and-resolution",
+      "kind": "lesson",
+      "prerequisites": [
+        "ip-addressing"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "network-model": 3,
+        "troubleshooting": 3
+      }
+    },
+    {
+      "id": "http-basics",
+      "kind": "lesson",
+      "prerequisites": [
+        "client-and-server"
+      ],
+      "estimatedMinutes": 19,
+      "skillWeights": {
+        "network-model": 3,
+        "network-security": 2
       }
     }
   ]

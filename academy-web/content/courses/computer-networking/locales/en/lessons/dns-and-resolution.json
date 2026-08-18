@@ -1,0 +1,270 @@
+{
+  "nodeId": "dns-and-resolution",
+  "locale": "en",
+  "title": "From a name to an address",
+  "objective": "By the end of this lesson you can trace how a name becomes an address, read a DNS answer including its TTL, and explain why a change you made is not visible everywhere yet.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Every connection in this course started with an address. In practice you almost always start with a name, and something has to turn one into the other before any of the socket calls can happen. That translation is a network operation in its own right — with its own failures, its own latency, and a caching system whose behaviour explains a great deal of everyday confusion."
+    },
+    {
+      "kind": "heading",
+      "text": "Reading an answer"
+    },
+    {
+      "kind": "code",
+      "caption": "A real lookup",
+      "lines": [
+        "$ dig +noall +answer example.com A",
+        "example.com.    11   IN   A      172.66.147.243",
+        "example.com.    11   IN   A      104.20.23.154",
+        "                |    |    |      |",
+        "                |    |    |      +- the address",
+        "                |    |    +- record type",
+        "                |    +- class, effectively always IN",
+        "                +- TTL: seconds this answer may be cached",
+        "",
+        "# Two addresses for one name. A client picks one, and may try the other",
+        "# if the first does not respond — which is the simplest form of redundancy",
+        "# there is."
+      ]
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Record",
+        "Holds",
+        "Example use"
+      ],
+      "rows": [
+        [
+          "A",
+          "An IPv4 address",
+          "Ordinary lookup"
+        ],
+        [
+          "AAAA",
+          "An IPv6 address",
+          "The same name, other family"
+        ],
+        [
+          "CNAME",
+          "Another name to look up instead",
+          "Pointing a name at a hosted service"
+        ],
+        [
+          "MX",
+          "Mail servers for the domain",
+          "Delivering email"
+        ],
+        [
+          "TXT",
+          "Free text",
+          "Domain verification, mail policy"
+        ],
+        [
+          "NS",
+          "The authoritative servers",
+          "Delegation"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "A chain, resolved step by step"
+    },
+    {
+      "kind": "code",
+      "caption": "What a hosted name looks like",
+      "lines": [
+        "$ dig +noall +answer www.github.com",
+        "www.github.com.   2236   IN   CNAME   github.com.",
+        "github.com.         17   IN   A       20.205.243.166",
+        "",
+        "# The first record says 'this name is really that name'.",
+        "# The resolver then looks that one up and returns both, so the",
+        "# client sees the whole chain and ends with an address."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "TTL is a countdown, and you can watch it"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The TTL in an answer is not the value the domain owner configured — it is how much of that value remains in the cache you asked. Query twice and the number falls."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured, two seconds apart",
+      "lines": [
+        "$ dig +noall +answer example.com   ->  TTL 11",
+        "  (wait 2 seconds)",
+        "$ dig +noall +answer example.com   ->  TTL  9",
+        "",
+        "# And asking an authoritative server directly, which has no cache:",
+        "$ dig +noall +answer @a.iana-servers.net example.com   ->  TTL 300",
+        "",
+        "# 300 is the configured value. The 11 was what remained of it in the",
+        "# resolver that answered the first query."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "This is the whole explanation of 'it works for me'",
+      "text": "After changing a record, resolvers that cached the old answer keep serving it until their countdown reaches zero. Two people in different places therefore see different answers for a while, and neither is wrong. Verified above: the same name returned a TTL of 11 from a caching resolver and 300 from the authority. Lowering the TTL before a planned change, and raising it afterwards, is the standard way to control how long that window lasts."
+    },
+    {
+      "kind": "heading",
+      "text": "How a name is found when nothing is cached"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Ask a root server: 'who handles .com?'",
+        "Ask that one: 'who handles example.com?'",
+        "Ask that one: 'what is the address of example.com?'",
+        "Cache the answer for its TTL, and return it"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Your machine does not usually do this itself. It asks a resolver — your provider's, or a public one — which performs the walk and caches the result on behalf of everyone using it. That is why the first lookup of an unfamiliar name is slower than the second, and why a measured lookup time of a few milliseconds usually means the answer was already cached."
+    },
+    {
+      "kind": "heading",
+      "text": "When it fails"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Result",
+        "Meaning",
+        "Where to look"
+      ],
+      "rows": [
+        [
+          "NXDOMAIN",
+          "The name does not exist",
+          "A typo, or the record was never created"
+        ],
+        [
+          "NOERROR with no answer",
+          "The name exists but has no record of that type",
+          "Asking for AAAA where only A exists"
+        ],
+        [
+          "SERVFAIL",
+          "The resolver could not complete the lookup",
+          "The authoritative server, or a signing problem"
+        ],
+        [
+          "Timeout",
+          "No reply at all",
+          "The resolver is unreachable or blocked"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "DNS failure looks like every other failure",
+      "text": "An unresolvable name produces an error at the point of connecting, which reads like a network problem. The first diagnostic step is therefore to separate the two: resolve the name by hand with dig, and if that works, the problem is not DNS. This is the single most useful habit in this lesson, because DNS is blamed for a great many problems it did not cause — and is the cause of many that look like something else."
+    },
+    {
+      "kind": "heading",
+      "text": "What it costs, and what it leaks"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A lookup is a round trip before the connection's own round trip, which is why a page that references many domains is slower than one that does not, and why browsers resolve names ahead of time. Traditional DNS is also unencrypted, so anyone on the path sees which names you look up even when the connections themselves are encrypted — the reason for the encrypted-DNS mechanisms now widely deployed."
+    },
+    {
+      "kind": "try",
+      "title": "Watch resolution happen",
+      "steps": [
+        "Run: dig +noall +answer example.com     and identify the TTL, type and address",
+        "Run it again after a few seconds and confirm the TTL has fallen",
+        "Run: dig +noall +answer @a.iana-servers.net example.com    and compare the TTL with the configured value",
+        "Run: dig +noall +answer www.github.com    and follow the CNAME chain to an address",
+        "Run: dig +trace example.com | head -20    to see the walk from the root",
+        "Run: dig example.com | grep 'Query time'    twice, and compare cached against uncached",
+        "Run: dig AAAA <a name that has no IPv6>    and observe NOERROR with no answer section",
+        "Run: dig thisdoesnotexist.example | grep status    and observe NXDOMAIN"
+      ],
+      "expected": "A TTL you watched count down, a CNAME chain you followed to an address, and two distinct failure results you can now tell apart. The difference between NXDOMAIN and an empty NOERROR is worth internalising: one means the name is wrong, the other means you asked for the wrong type."
+    }
+  ],
+  "cheatsheet": [
+    "A name must become an address before any socket call can happen",
+    "A: IPv4 · AAAA: IPv6 · CNAME: look up this other name · MX, TXT, NS",
+    "One name can return several addresses; a client may try another if one fails",
+    "The TTL in an answer is what remains, not what was configured",
+    "Verified: a resolver returned TTL 11 and 9 two seconds apart, while the authority returned 300",
+    "Lower the TTL before a planned change, raise it after",
+    "Resolvers walk root, then the domain's servers, then cache the result",
+    "NXDOMAIN: no such name · NOERROR with no answer: no record of that type",
+    "Resolve by hand with dig before blaming the network — or DNS",
+    "Traditional DNS is unencrypted: the names you look up are visible on the path"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "You update a record. A colleague sees the new address and you still see the old one. Why?",
+      "choices": {
+        "A": "The change failed",
+        "B": "Your resolver cached the old answer and is still counting down its TTL",
+        "C": "You need to restart your machine",
+        "D": "The record propagates outward geographically"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Verified: a caching resolver returned a TTL of 11 for a name whose configured value was 300. Until that countdown reaches zero, that resolver keeps serving what it has."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "dig returns NOERROR but the answer section is empty. What does that mean?",
+      "choices": {
+        "A": "The name does not exist",
+        "B": "The name exists, but has no record of the type you asked for",
+        "C": "The resolver timed out",
+        "D": "The domain is misconfigured"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "NXDOMAIN is the answer when the name does not exist. An empty NOERROR usually means you asked for AAAA on a name that only has A, or similar."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A lookup shows a query time of 3 ms. What does that tell you?",
+      "choices": {
+        "A": "The authoritative server is nearby",
+        "B": "The answer almost certainly came from a cache — a full walk from the root takes far longer",
+        "C": "The name is invalid",
+        "D": "IPv6 was used"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A few milliseconds is a local round trip to a resolver that already had the answer. The first uncached lookup of an unfamiliar name is visibly slower."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "An application cannot connect and reports a network error. What is the first thing to check?",
+      "choices": {
+        "A": "The firewall",
+        "B": "Whether the name resolves at all — run dig by hand and separate DNS from connectivity",
+        "C": "The routing table",
+        "D": "The server's logs"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A failed lookup surfaces at the point of connecting and reads like a network problem. Separating the two takes one command and eliminates a whole category of wrong investigation."
+    }
+  ]
+}

@@ -1,0 +1,276 @@
+{
+  "nodeId": "http-basics",
+  "locale": "en",
+  "title": "The protocol you use all day",
+  "objective": "By the end of this lesson you can read an HTTP exchange by hand, explain where the time in a request actually goes, and say what changed between the versions you will encounter.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "HTTP sits directly on the connection you built in this module. In its original form it is text you could type yourself: a request line, some headers, a blank line, and optionally a body. Everything the web does is built on that, and knowing the shape lets you diagnose problems without a browser in the way."
+    },
+    {
+      "kind": "heading",
+      "text": "A real response, annotated"
+    },
+    {
+      "kind": "code",
+      "caption": "Captured from a live server",
+      "lines": [
+        "HTTP/1.1 200 OK",
+        "Date: Tue, 18 Aug 2026 08:42:38 GMT",
+        "Content-Type: text/html",
+        "Transfer-Encoding: chunked      <- length not known up front; sent in pieces",
+        "Connection: keep-alive          <- reuse this connection for the next request",
+        "Server: cloudflare",
+        "Last-Modified: Wed, 12 Aug 2026 20:15:57 GMT",
+        "Age: 4588                       <- this answer has been cached for 4588 seconds",
+        "cf-cache-status: HIT            <- and it was served from that cache",
+        "",
+        "(blank line)",
+        "(body)"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Two of those headers tell a story worth reading. Transfer-Encoding says the server did not know the size in advance and sent the body in pieces — the length-prefix problem from the capstone, solved at the protocol level. Age and the cache status say this response never reached the origin server at all."
+    },
+    {
+      "kind": "heading",
+      "text": "The parts you will use"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Method",
+        "Means",
+        "Safe to repeat?"
+      ],
+      "rows": [
+        [
+          "GET",
+          "Retrieve; no side effects intended",
+          "Yes"
+        ],
+        [
+          "POST",
+          "Submit; may create or change something",
+          "No"
+        ],
+        [
+          "PUT",
+          "Replace at this exact location",
+          "Yes — same result if repeated"
+        ],
+        [
+          "DELETE",
+          "Remove",
+          "Yes — same result if repeated"
+        ],
+        [
+          "HEAD",
+          "Like GET, headers only",
+          "Yes"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "That last column is what the retry lesson needed",
+      "text": "Whether an operation can be safely repeated decides whether a client may retry it after a timeout. GET, PUT and DELETE can be repeated with the same end result; POST generally cannot, which is why a failed payment cannot simply be retried by the client and why systems that must retry give each request a unique key the server remembers."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Status",
+        "Class",
+        "Means"
+      ],
+      "rows": [
+        [
+          "200, 201, 204",
+          "Success",
+          "It worked"
+        ],
+        [
+          "301, 302, 304",
+          "Redirect / not modified",
+          "Look elsewhere, or use your cached copy"
+        ],
+        [
+          "400, 401, 403, 404, 429",
+          "Client error",
+          "Your request was wrong — do not retry unchanged"
+        ],
+        [
+          "500, 502, 503, 504",
+          "Server error",
+          "Their problem — retrying with backoff may work"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The 4xx and 5xx split is the practical one: a 4xx will fail again identically, while a 5xx may succeed on a later attempt. That maps directly onto the retry rules from the error-handling lesson."
+    },
+    {
+      "kind": "heading",
+      "text": "Where the time actually goes"
+    },
+    {
+      "kind": "code",
+      "caption": "Measured phases of one https request",
+      "lines": [
+        "dns=0.0025s  connect=0.0436s  tls=0.3513s  firstbyte=0.4724s  total=0.4729s",
+        "",
+        "  dns        2.5 ms   the name lookup from the previous lesson",
+        "  connect     41 ms   the three-message handshake",
+        "  tls        308 ms   negotiating encryption",
+        "  firstbyte  121 ms   the server thinking and the first bytes arriving",
+        "",
+        "# Same request again, immediately afterwards:",
+        "dns=0.0039s  connect=0.1043s  tls=0.1543s  firstbyte=0.3137s  total=0.3143s",
+        "",
+        "# TLS fell from 308 ms to 50 ms because the session was resumed."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "This is the answer to the question from the first lesson",
+      "text": "The very first exercise in this course asked why running the same curl twice makes the second faster, and said the answer involved DNS caching, connection setup and TLS. Here it is measured: the name was already cached, and the encryption negotiation was resumed instead of performed from scratch. Notice also that setup dominated — of 473 ms, only about 121 ms was the server producing an answer."
+    },
+    {
+      "kind": "heading",
+      "text": "Why connection reuse matters so much"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Every new connection costs the handshake plus, for https, the encryption negotiation. A page that fetches thirty resources over thirty connections pays that thirty times. Keep-alive reuses one connection for many requests, and this is the single largest reason a modern page loads faster than the same page would have in 1997."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Version",
+        "Key change",
+        "What it fixes"
+      ],
+      "rows": [
+        [
+          "HTTP/1.0",
+          "One request per connection",
+          "—"
+        ],
+        [
+          "HTTP/1.1",
+          "Keep-alive, virtual hosts, chunked bodies",
+          "Repeated setup cost"
+        ],
+        [
+          "HTTP/2",
+          "Many requests in parallel on one connection, compressed headers",
+          "Requests queuing behind each other"
+        ],
+        [
+          "HTTP/3",
+          "The same, over UDP instead of TCP",
+          "One lost packet stalling everything else"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Verified: the request measured above negotiated HTTP/2. You do not usually choose this — client and server agree during the encryption negotiation, and the version in use is something to check rather than assume."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "HTTP/3 is where the UDP lesson pays off",
+      "text": "In TCP, one lost packet holds up everything behind it, because the protocol must deliver bytes in order. When several independent requests share one connection, a loss affecting one of them stalls all of them. HTTP/3 moves to UDP and manages ordering per stream instead, so a loss affects only the stream it belongs to. This is the concrete reason the first lesson said UDP is not 'TCP without the good parts'."
+    },
+    {
+      "kind": "try",
+      "title": "Speak HTTP by hand",
+      "steps": [
+        "Run: printf 'GET / HTTP/1.1\\r\\nHost: example.com\\r\\nConnection: close\\r\\n\\r\\n' | nc example.com 80",
+        "Read the status line, the headers, the blank line and the body — that is the entire protocol",
+        "Try it without the Host header and observe the error a server gives",
+        "Run: curl -s -D - -o /dev/null http://example.com    and identify Transfer-Encoding and Connection",
+        "Run: curl -s -o /dev/null -w 'dns=%{time_namelookup} connect=%{time_connect} tls=%{time_appconnect} total=%{time_total}\\n' https://example.com",
+        "Run it twice more and watch the TLS phase fall",
+        "Run: curl -s -o /dev/null -w 'version=%{http_version}\\n' https://example.com    and note which version was agreed",
+        "Run: curl -s -o /dev/null -w '%{http_code}\\n' https://example.com/nothing-here    and classify the code"
+      ],
+      "expected": "An HTTP exchange you typed yourself, a timing breakdown showing setup dominating the total, and a TLS phase that shrinks on the second request. Having spoken the protocol by hand once is what makes reading a capture or a server log straightforward afterwards."
+    }
+  ],
+  "cheatsheet": [
+    "HTTP is text on top of the connection: request line, headers, blank line, body",
+    "Transfer-Encoding: chunked means the length was not known in advance",
+    "Connection: keep-alive means the connection is reused for the next request",
+    "GET, PUT, DELETE and HEAD are safe to repeat; POST generally is not",
+    "4xx will fail again identically; 5xx may succeed on retry with backoff",
+    "Measured: dns 2.5 ms, connect 41 ms, TLS 308 ms, server 121 ms — setup dominated",
+    "On the second request TLS fell to about 50 ms because the session was resumed",
+    "HTTP/1.1 added keep-alive; HTTP/2 multiplexes; HTTP/3 moves to UDP",
+    "HTTP/3 exists because one lost TCP packet stalls every request sharing the connection"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A request takes 473 ms in total, of which 121 ms is the server producing an answer. Where did the rest go?",
+      "choices": {
+        "A": "Downloading the body",
+        "B": "Setup — the name lookup, the connection handshake, and negotiating encryption",
+        "C": "Client-side rendering",
+        "D": "Network congestion"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Measured: dns 2.5 ms, connect 41 ms, TLS 308 ms. Setup dominated, which is exactly why connection reuse and session resumption make such a visible difference."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A request fails with a timeout. Which methods can a client safely retry?",
+      "choices": {
+        "A": "All of them",
+        "B": "GET, PUT, DELETE and HEAD — repeating them produces the same end result; POST generally cannot be repeated safely",
+        "C": "Only GET",
+        "D": "None — retrying is never safe"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "This is the retry rule from the error-handling lesson applied to HTTP. When a POST must be retried, the usual answer is a unique key per request that the server remembers."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why does the TLS phase shrink on a second request to the same server?",
+      "choices": {
+        "A": "The certificate is cached",
+        "B": "The session is resumed rather than negotiated from scratch",
+        "C": "The connection is faster the second time",
+        "D": "Encryption is skipped"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Measured: about 308 ms on the first request and about 50 ms on the second. This is one of the three effects the first lesson of this course pointed at without naming."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why does HTTP/3 use UDP when HTTP has always relied on TCP's reliability?",
+      "choices": {
+        "A": "UDP is faster in every case",
+        "B": "In TCP a lost packet stalls every request sharing the connection; over UDP, ordering is managed per stream so a loss affects only its own",
+        "C": "TCP cannot carry encrypted traffic",
+        "D": "To avoid connection setup entirely"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "It rebuilds the reliability it needs on top of UDP, per stream. This is the concrete case behind the first lesson's point that UDP is the right choice when the application can manage recovery better than a general-purpose algorithm."
+    }
+  ]
+}
