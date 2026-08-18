@@ -1,0 +1,224 @@
+{
+  "nodeId": "acl-vs-capability",
+  "locale": "en",
+  "title": "Two ways to answer 'is this allowed?'",
+  "objective": "By the end of this lesson you can explain the difference between listing who may act on a resource and handing out unforgeable rights, read a POSIX ACL, and describe why Linux capabilities exist.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Every access-control system answers the same question — may this actor perform this action on this object? — and there are two fundamentally different ways to store the answer. Recognising which one you are looking at makes a large part of security design legible."
+    },
+    {
+      "kind": "heading",
+      "text": "The two models"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "Access control list",
+        "Capability"
+      ],
+      "rows": [
+        [
+          "Stored with",
+          "The object",
+          "The actor"
+        ],
+        [
+          "Says",
+          "'These actors may do these things to me'",
+          "'The holder of this may do this'"
+        ],
+        [
+          "To grant",
+          "Edit the object's list",
+          "Hand over the right"
+        ],
+        [
+          "To revoke",
+          "Edit the list — immediate",
+          "Hard: you must find every holder"
+        ],
+        [
+          "Question it answers well",
+          "Who can reach this file?",
+          "What can this process do?"
+        ],
+        [
+          "Familiar example",
+          "File permissions, POSIX ACLs, cloud IAM policies",
+          "A file descriptor, an API token, a Linux capability"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "You have been using a capability all course",
+      "text": "A file descriptor is one. Once open() has checked the permissions and given you fd 3, that number is the right to read that file — the check is not repeated on each read, and the descriptor survives even if the file's permissions change afterwards. It can be passed to a child across fork, exactly as you saw in the process module. That is capability behaviour: possession is the authority."
+    },
+    {
+      "kind": "heading",
+      "text": "Unix permissions are a very small ACL"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The classic mode bits express only three subjects — the owner, one group, and everyone else. That is compact and fast, and it cannot express 'and also let this one other user write'. POSIX ACLs extend the same model with named entries."
+    },
+    {
+      "kind": "code",
+      "caption": "A real ACL, and what ls shows",
+      "lines": [
+        "$ setfacl -m u:tester:rw /srv/d/f",
+        "$ getfacl -p /srv/d/f",
+        "user::rw-",
+        "user:tester:rw-        <- a named user, beyond owner/group/other",
+        "group::r--",
+        "mask::rw-              <- an upper bound on all named entries",
+        "other::---",
+        "",
+        "$ ls -l /srv/d/f",
+        "-rw-rw----+ 1 root root 0 /srv/d/f",
+        "#         ^ the plus sign is the only hint in ls that an ACL exists"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "That plus sign is easy to miss",
+      "text": "A file can grant access to users that ls -l does not name at all. If you are auditing who can read something, the mode bits are not the whole answer — check for the trailing plus and run getfacl. This is a routine gap in access reviews that rely on a directory listing."
+    },
+    {
+      "kind": "heading",
+      "text": "Linux capabilities: cutting root into pieces"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Historically a program that needed one privileged ability had to run as root and therefore received all of them. Capabilities split that authority into individual rights that can be granted separately — bind a low port, send raw packets, change file ownership, load a module — so a program can receive exactly the one it needs."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured: the same binary, two ways to give it a privilege",
+      "lines": [
+        "# setuid root",
+        "-rwsr-xr-x root root idtest",
+        "  real uid=1000  effective uid=0",
+        "  CapEff: 00000000a80425fb        <- nearly every capability there is",
+        "",
+        "# file capability instead",
+        "-rwxr-xr-x root root idtest   (cap_net_raw=ep)",
+        "  real uid=1000  effective uid=1000",
+        "  CapEff: 0000000000002000        <- exactly one bit set"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Those two hexadecimal numbers are the entire argument for capabilities. The setuid version, needing one ability, received the authority to do almost anything: load kernel modules, change any file's owner, kill any process. The capability version received one bit. If either program has a bug that an attacker can exploit, the damage differs by exactly that difference."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "ping is the example to remember",
+      "text": "Sending an ICMP echo needs a raw socket, which historically made ping setuid root. On a current Debian system, verified: ping is mode -rwxr-xr-x with no setuid bit at all, and carries cap_net_raw=ep instead. A program that used to run as root now runs as you, holding one specific right. That is the same change you should make to your own privileged tools."
+    },
+    {
+      "kind": "heading",
+      "text": "Choosing between the models"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Use a list when you need to answer 'who can reach this?' and to revoke quickly — files, buckets, database rows",
+        "Use a capability when you want to hand out narrow, delegable authority — descriptors, scoped tokens, per-process rights",
+        "Revocation is the deciding factor more often than anything else: lists revoke cleanly, capabilities do not",
+        "Which is why capabilities in distributed systems get expiry times: you cannot recall them, so you make them stop working"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Read and change both kinds",
+      "steps": [
+        "Create a file readable only by its owner, then: setfacl -m u:<someuser>:rw <file>",
+        "Run getfacl on it and identify the named entry and the mask",
+        "Run ls -l and find the plus sign — note how little the listing tells you",
+        "Remove it with setfacl -b and confirm the plus sign disappears",
+        "Run: getcap /usr/bin/ping     and confirm it uses a capability rather than setuid",
+        "Run: find /usr/bin /usr/sbin -perm -4000 -type f 2>/dev/null    (every setuid binary on this machine)",
+        "For each one, ask what single ability it actually needs, and whether a capability would cover it",
+        "Read: cat /proc/self/status | grep -E 'CapPrm|CapEff'    and compare with the same under sudo"
+      ],
+      "expected": "An ACL entry that ls barely hints at, a ping that no longer needs root, and a list of the setuid programs on your machine — which is exactly the inventory the next lesson works from. The last comparison is worth doing: the capability sets under sudo and under your own account differ by a great deal."
+    }
+  ],
+  "cheatsheet": [
+    "ACL: stored with the object, lists who may act on it, revokes cleanly",
+    "Capability: held by the actor, possession is the authority, hard to revoke",
+    "A file descriptor is a capability — checked once at open, then passed around",
+    "Unix mode bits are a three-entry ACL: owner, group, other",
+    "POSIX ACLs add named users and groups; ls -l shows only a trailing plus",
+    "Audit with getfacl, not with ls, when it matters who can read something",
+    "Linux capabilities split root into individually grantable rights",
+    "Measured: setuid root gave CapEff a80425fb; one file capability gave 2000",
+    "Verified: ping now uses cap_net_raw=ep and is not setuid",
+    "Capabilities in distributed systems expire, because they cannot be recalled"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What makes a file descriptor a capability rather than an ACL entry?",
+      "choices": {
+        "A": "It is a number",
+        "B": "Holding it IS the authority — the permission check happened at open, and possession is what grants access afterwards",
+        "C": "It can be revoked centrally",
+        "D": "It is stored with the file"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "It is held by the actor, it can be passed on, and it keeps working even if the file's permissions change afterwards. All three are capability properties."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "You audit who can read a file using ls -l and see -rw-rw----+ root root. What have you missed?",
+      "choices": {
+        "A": "Nothing",
+        "B": "The trailing plus means an ACL exists, and it may name users the listing does not show — run getfacl",
+        "C": "The file is a symlink",
+        "D": "The group is hidden"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Verified: after granting a named user read-write access, ls showed only a plus while getfacl showed the entry. Access reviews based on a directory listing miss exactly this."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why prefer a file capability over making a binary setuid root?",
+      "choices": {
+        "A": "It is faster",
+        "B": "It grants one specific right instead of all of them — measured as CapEff 2000 versus a80425fb",
+        "C": "setuid does not work on modern kernels",
+        "D": "Capabilities cannot be exploited"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Both programs work. The difference is what an attacker gets when one of them turns out to have a bug."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why do capability-style tokens in distributed systems almost always have an expiry?",
+      "choices": {
+        "A": "To reduce storage",
+        "B": "Because a capability cannot be recalled from every holder, so time-limiting it is the practical substitute for revocation",
+        "C": "To comply with encryption standards",
+        "D": "Because they are stored with the object"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Revocation is the weak point of the capability model. If you cannot take it back, the next best thing is to make sure it stops working on its own."
+    }
+  ]
+}

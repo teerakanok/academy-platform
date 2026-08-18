@@ -1,0 +1,228 @@
+{
+  "nodeId": "privilege-rings",
+  "locale": "en",
+  "title": "Privilege levels the hardware itself enforces",
+  "objective": "By the end of this lesson you can distinguish hardware privilege from operating-system permission, explain what a hypervisor adds beneath the kernel, and say why a bug in each layer has a different blast radius.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "The first lesson of this course said the processor runs in one of two modes and enforces the difference on every instruction. This lesson finishes that thought: what the levels actually are, what sits at each one, and why the answer changed when virtualisation arrived."
+    },
+    {
+      "kind": "heading",
+      "text": "Rings, and the two that get used"
+    },
+    {
+      "kind": "paragraph",
+      "text": "x86 processors define four privilege levels, numbered 0 to 3, where 0 is most privileged. In practice mainstream systems use exactly two: the kernel at ring 0 and everything else at ring 3. The middle rings were designed for finer gradations that operating systems did not adopt, mainly because two levels were enough and because other architectures did not offer four."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Level",
+        "Runs",
+        "May"
+      ],
+      "rows": [
+        [
+          "Ring 0",
+          "Kernel and drivers",
+          "Everything: page tables, device registers, interrupt control"
+        ],
+        [
+          "Ring 1, 2",
+          "Historically unused on Linux and Windows",
+          "—"
+        ],
+        [
+          "Ring 3",
+          "All user programs, including those running as root",
+          "Only what its mappings allow; privileged instructions trap"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Other architectures name the same idea differently",
+      "text": "ARM calls them exception levels, EL0 through EL3: applications at EL0, the kernel at EL1, a hypervisor at EL2, and secure firmware at EL3. RISC-V has user, supervisor and machine modes. The names and counts differ; the principle — that the hardware itself decides what an instruction is allowed to do — is the same everywhere."
+    },
+    {
+      "kind": "heading",
+      "text": "Hardware privilege is not the same as permission"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "Hardware privilege",
+        "OS permission"
+      ],
+      "rows": [
+        [
+          "Decided by",
+          "The processor, per instruction",
+          "The kernel, per request"
+        ],
+        [
+          "Examples",
+          "May this instruction load a page table?",
+          "May this user open this file?"
+        ],
+        [
+          "Values",
+          "Ring 0 or ring 3",
+          "uid, group membership, file mode, capabilities"
+        ],
+        [
+          "A root process",
+          "Still ring 3",
+          "Passes almost every check"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "This is the point the first lesson made and it is worth stating once more, because so much confusion in security discussions comes from mixing the two: root is a permission that the kernel evaluates while running at ring 0 on your behalf. Root code itself runs at ring 3, like everything else."
+    },
+    {
+      "kind": "heading",
+      "text": "What virtualisation added"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A virtual machine's kernel expects to be the most privileged thing on the system, but it cannot be, because the host must remain in control. Hardware virtualisation solved this by adding a level beneath ring 0 — a place for the hypervisor to run, from which it can intercept the guest kernel's privileged operations. The guest kernel keeps behaving as if it owns the machine; the hypervisor decides what that means."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Layer",
+        "Compromise gives an attacker"
+      ],
+      "rows": [
+        [
+          "A user program",
+          "That program's data and permissions"
+        ],
+        [
+          "The kernel",
+          "Everything on that machine"
+        ],
+        [
+          "The hypervisor",
+          "Every virtual machine on that host"
+        ],
+        [
+          "Firmware below it",
+          "The machine itself, surviving reinstallation"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Why kernel code gets so much scrutiny",
+      "text": "A bug in a user program is bounded by that program's permissions. A bug in kernel code has no such boundary — it runs at ring 0 with access to all physical memory. This is why loading a third-party kernel module is a far larger trust decision than installing an application, why kernel patches are treated with the urgency they are, and why so much modern work is about moving functionality out of the kernel rather than into it."
+    },
+    {
+      "kind": "heading",
+      "text": "How the levels are crossed"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "A system call: a deliberate, controlled entry at a fixed point the kernel chose — the mechanism from module one",
+        "An interrupt: a device needs attention, so the processor switches to a handler",
+        "An exception: a page fault, a division by zero, an illegal instruction",
+        "Returning: the kernel restores your registers and drops back to ring 3"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Note that all four are entries the hardware defines. A user program cannot simply set its privilege level — the only ways up are through doors the kernel installed, and it controls what is on the other side of each."
+    },
+    {
+      "kind": "try",
+      "title": "Observe the boundary you cannot cross",
+      "steps": [
+        "Run: lscpu | grep -iE 'virtuali|hypervisor'        (is this machine virtualised, and with what)",
+        "Run: systemd-detect-virt 2>/dev/null || echo none  (a direct answer, if available)",
+        "Run: lsmod | head                                   (kernel modules — each one runs at ring 0)",
+        "Run: cat /proc/sys/kernel/modules_disabled          (1 means no more can be loaded)",
+        "Write a C program that tries to execute a privileged instruction, or simply dereferences address 0",
+        "Run it and confirm the process dies rather than the machine",
+        "Run: dmesg | tail -20    after that crash and find the kernel's record of it",
+        "Read: cat /proc/cpuinfo | grep -o -E 'vmx|svm|sev' | sort -u   (virtualisation support flags, on x86)"
+      ],
+      "expected": "A machine that tells you whether it is itself a guest, a list of modules that each carry ring 0 trust, and a program of yours that dies alone when it oversteps. That last observation is the boundary doing exactly what the first lesson of this course described — now with a name for the level on each side."
+    }
+  ],
+  "cheatsheet": [
+    "x86 defines rings 0-3; mainstream systems use only 0 (kernel) and 3 (everything else)",
+    "ARM: EL0 apps, EL1 kernel, EL2 hypervisor, EL3 secure firmware. RISC-V: user/supervisor/machine",
+    "Hardware privilege is per instruction; OS permission is per request",
+    "A root process still runs at ring 3",
+    "Virtualisation added a level beneath ring 0 for the hypervisor",
+    "Blast radius: program < kernel < hypervisor < firmware",
+    "A third-party kernel module is a ring 0 trust decision, not an app install",
+    "The only ways up are system calls, interrupts and exceptions — all defined by the hardware"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A process running as root executes an instruction that writes a page table register. What happens?",
+      "choices": {
+        "A": "It succeeds, because root is privileged",
+        "B": "It traps — root is an OS permission, while the instruction requires ring 0, and the process is at ring 3",
+        "C": "The kernel asks for confirmation",
+        "D": "It succeeds only with sudo"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Privilege level is a hardware state that a process cannot set for itself. root changes which kernel requests are approved; it does not move the process to ring 0."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why is loading a third-party kernel module a much bigger decision than installing an application?",
+      "choices": {
+        "A": "Modules are larger",
+        "B": "Module code runs at ring 0 with access to all memory, so a bug or backdoor is unbounded",
+        "C": "Modules cannot be uninstalled",
+        "D": "Applications are checked by the kernel"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "An application is bounded by its permissions and its address space. A module has neither boundary."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "What did hardware virtualisation add to the privilege model?",
+      "choices": {
+        "A": "A fifth ring for applications",
+        "B": "A level beneath ring 0 where a hypervisor runs and can intercept a guest kernel's privileged operations",
+        "C": "Encryption of ring 3 memory",
+        "D": "It removed rings 1 and 2"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The guest kernel still believes it is the most privileged software present. The hypervisor sits below it and decides what that belief actually means."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Which of these is NOT a way execution enters the kernel?",
+      "choices": {
+        "A": "A system call",
+        "B": "A hardware interrupt",
+        "C": "A page fault",
+        "D": "A user program setting its own privilege level"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "That is exactly what the mechanism prevents. Entry happens only through doors the kernel installed, and it controls the code on the other side of each."
+    }
+  ]
+}

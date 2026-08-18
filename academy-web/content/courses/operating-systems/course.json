@@ -2,14 +2,14 @@
   "id": "operating-systems",
   "slug": "operating-systems",
   "version": "1.0.0",
-  "publicAvailability": "internal",
+  "publicAvailability": "syllabus-preview",
   "defaultLocale": "en",
   "availableLocales": [
     "en",
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 349,
+  "estimatedMinutes": 401,
   "coverMotif": "layers",
   "skills": [
     {
@@ -259,6 +259,40 @@
       "skillWeights": {
         "virtual-memory": 4,
         "processes": 3
+      }
+    },
+    {
+      "id": "privilege-rings",
+      "kind": "lesson",
+      "prerequisites": [
+        "kernel-vs-user-mode"
+      ],
+      "estimatedMinutes": 15,
+      "skillWeights": {
+        "os-security": 4
+      }
+    },
+    {
+      "id": "acl-vs-capability",
+      "kind": "lesson",
+      "prerequisites": [
+        "privilege-rings"
+      ],
+      "estimatedMinutes": 17,
+      "skillWeights": {
+        "os-security": 4
+      }
+    },
+    {
+      "id": "setuid-and-its-risks",
+      "kind": "capstone",
+      "prerequisites": [
+        "acl-vs-capability"
+      ],
+      "estimatedMinutes": 20,
+      "skillWeights": {
+        "os-security": 4,
+        "processes": 2
       }
     }
   ]

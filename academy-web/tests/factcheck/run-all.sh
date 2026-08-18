@@ -27,5 +27,14 @@ else
 fi
 
 echo
+echo "== ข้ออ้างของคอร์ส Operating Systems (ในคอนเทนเนอร์ Linux จริง) =="
+if command -v docker >/dev/null && docker info >/dev/null 2>&1; then
+  docker run --rm -v "$HERE:/g" -w /tmp debian:12-slim bash -c \
+    'apt-get -qq update >/dev/null 2>&1 && apt-get -qq install -y gcc libc6-dev procps strace >/dev/null 2>&1 && bash /g/os-claims.sh' || rc=1
+else
+  echo "SKIP: ไม่มี docker — ข้ออ้าง OS ยังไม่ถูกตรวจ"; rc=1
+fi
+
+echo
 [ $rc -eq 0 ] && echo "ผ่านทั้งหมด" || echo "มีข้ออ้างที่ไม่ผ่าน หรือเกตบางส่วนถูกข้าม"
 exit $rc

@@ -1,0 +1,235 @@
+{
+  "nodeId": "setuid-and-its-risks",
+  "locale": "en",
+  "title": "setuid: the most dangerous bit on the filesystem",
+  "objective": "By the end of this course you can audit a system's setuid programs, explain three distinct ways they are attacked, and rewrite one to hold the least privilege that still does its job.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Everything in this course meets here. setuid is a single bit that makes a program run with the file owner's identity rather than the caller's — the mechanism behind passwd, mount, and su. It is also where a large share of local privilege escalation lives, because it hands a program written by one person the authority of another, in an environment the attacker controls."
+    },
+    {
+      "kind": "heading",
+      "text": "What the bit does"
+    },
+    {
+      "kind": "code",
+      "caption": "Verified: the same binary, before and after",
+      "lines": [
+        "$ chmod 755 idtest ; ./idtest",
+        "  real uid=1000  effective uid=1000",
+        "  CapEff: 0000000000000000",
+        "",
+        "$ chown root idtest && chmod 4755 idtest",
+        "$ ls -l idtest",
+        "-rwsr-xr-x 1 root root ... idtest        <- the s replaces the owner's x",
+        "",
+        "$ ./idtest                                (still run by uid 1000)",
+        "  real uid=1000  effective uid=0          <- identity changed",
+        "  CapEff: 00000000a80425fb                <- and it received nearly every capability"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Real uid stays as the caller — that is who invoked it. Effective uid becomes the owner, and that is what permission checks use. The capability set is the part people forget: the program did not ask for the ability to load kernel modules or change any file's owner, but it received both."
+    },
+    {
+      "kind": "heading",
+      "text": "Attack one: the environment is the attacker's"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A setuid program inherits the environment of whoever ran it, and an attacker chooses that environment completely. PATH is the classic lever: if the program runs another command by name, the attacker decides which file that name resolves to."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured, on a deliberately vulnerable program that calls system(\"id\")",
+      "lines": [
+        "# normal PATH",
+        "uid=1000(tester) gid=1000(tester)",
+        "",
+        "# attacker's directory placed first in PATH",
+        "  [ATTACKER CODE RAN] real=1000 effective=1000",
+        "",
+        "# The attacker's file named 'id' was executed instead of the real one."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Note what did NOT happen — and why it is not reassuring",
+      "text": "The attacker's code reported effective uid 1000, not 0. Modern shells drop setuid privilege when they start with effective uid different from real uid, so system() did not hand over a root shell. That is a useful defence, and it is not a reason to relax: the attacker still achieved arbitrary code execution inside a privileged program's flow, and any privileged action the program takes afterwards is still taken. Defence in depth means the outer wall held; it does not mean the gate was locked."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Never use system() or popen() in a privileged program — they invoke a shell, which parses what you pass it",
+        "Use execve with an absolute path and an environment you constructed, not the one you inherited",
+        "Reset the environment: sanitise or clear PATH, IFS, LD_PRELOAD, LD_LIBRARY_PATH before doing anything",
+        "The dynamic linker already ignores LD_PRELOAD for setuid binaries — do not rely on that being the only such variable"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Attack two: check then act"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This is the race condition from module three, in its security form. A privileged program checks whether the caller may use a path, and then opens it. Between the two steps the attacker replaces the path with a symlink to something else, and the privileged open follows it."
+    },
+    {
+      "kind": "code",
+      "caption": "The wrong shape, and the right one",
+      "lines": [
+        "/* WRONG: two operations on a name, with a window between them */",
+        "if (access(path, W_OK) == 0) {      /* checks with the REAL uid */",
+        "    FILE *f = fopen(path, \"a\");     /* opens with the EFFECTIVE uid */",
+        "}",
+        "/* The attacker swaps 'path' for a symlink during the window. */",
+        "",
+        "/* RIGHT: drop privilege and let the kernel check once, atomically */",
+        "seteuid(getuid());                  /* now act as the caller */",
+        "int fd = open(path, O_WRONLY | O_APPEND | O_NOFOLLOW);",
+        "/* One operation. No window. O_NOFOLLOW refuses a symlink outright. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "access() exists almost entirely for this bug",
+      "text": "It answers 'could the real uid do this?' — a question that is only interesting to a setuid program, and one whose answer is stale the moment it returns. If you find access() in privileged code, you have almost certainly found this defect. Act with the right identity and let the single operation succeed or fail."
+    },
+    {
+      "kind": "heading",
+      "text": "Attack three: everything the program does on your behalf"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "It writes a file whose path you supplied — you point it at something you should not be able to write",
+        "It reads a file and shows you an error containing part of the contents",
+        "It passes your argument to a format string, or to a buffer sized for smaller input — the C course's bugs, now with root's authority",
+        "It spawns a helper that inherits its privilege"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The unifying rule: in a privileged program, every input is hostile — arguments, environment, file contents, the current directory, resource limits, even the set of open file descriptors it was started with."
+    },
+    {
+      "kind": "heading",
+      "text": "Two facts that will save you time"
+    },
+    {
+      "kind": "paragraph",
+      "text": "First, verified: setting the setuid bit on a shell script does nothing. A script with mode -rwsr-xr-x ran with uid 1000, because Linux ignores the bit on interpreted files — the race between reading the shebang and the interpreter opening the file was unfixable, so the feature was removed. If you need a privileged helper, it must be a compiled binary, or a properly configured sudo rule."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Second, the list is short and worth knowing. On a minimal Debian system the setuid binaries were: chsh, mount, chfn, gpasswd, umount, passwd, su, newgrp. That is the entire privileged attack surface of that install. On your own machines, that list is a security inventory you should be able to justify line by line."
+    },
+    {
+      "kind": "heading",
+      "text": "Designing one correctly"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "First ask whether a file capability would do instead — ping needs cap_net_raw, not root, as the previous lesson verified",
+        "Drop privilege as early as possible, and permanently with setresuid when you will not need it again",
+        "Hold it only around the one operation that requires it",
+        "Use absolute paths for every file and every program you execute",
+        "Construct the environment you pass on; never forward the one you were given",
+        "Validate every argument against what you expect, not against what you know is bad",
+        "Keep the program small — this is the one place where lines of code are directly a risk measure"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Audit, exploit, and then fix",
+      "steps": [
+        "Run: find /usr/bin /usr/sbin /bin /sbin -perm -4000 -type f 2>/dev/null    and list your machine's setuid programs",
+        "For each, write one sentence on what privileged thing it needs — and check with getcap whether it uses capabilities instead",
+        "Write a small setuid-root program that calls system(\"id\"), and run it as a normal user",
+        "Create a directory containing an executable named id, put it first in PATH, and run the program again — confirm your file ran",
+        "Now replace system() with execve(\"/usr/bin/id\", ...) and a constructed environment; confirm the attack no longer works",
+        "Write the access()-then-fopen() version, and race it by swapping the path for a symlink during the window",
+        "Rewrite it with seteuid plus a single open(O_NOFOLLOW) and confirm the race is gone",
+        "Finally: chmod 4755 a shell script and confirm the bit is ignored"
+      ],
+      "expected": "An inventory you can justify, an exploit you built yourself, and two fixes that remove it structurally rather than by luck. If you can explain to someone else why the second version cannot be attacked the same way — not that it is harder, but why the window no longer exists — you have finished this course."
+    }
+  ],
+  "cheatsheet": [
+    "setuid runs a program with the file owner's effective uid; ls shows s in place of the owner's x",
+    "Verified: setuid root gave effective uid 0 AND capability set a80425fb",
+    "Real uid stays the caller's; effective uid is what permission checks use",
+    "The environment belongs to the attacker: PATH, IFS, LD_* — clear or construct it",
+    "Never system() or popen() in a privileged program; execve an absolute path",
+    "Measured: a PATH-injected file was executed by a setuid program's system() call",
+    "Modern shells drop setuid privilege, which limits that attack but does not remove it",
+    "access() then open() is the classic TOCTOU bug — drop privilege and do one atomic operation",
+    "O_NOFOLLOW refuses to follow a symlink",
+    "Verified: Linux ignores the setuid bit on shell scripts entirely",
+    "A minimal Debian had 8 setuid binaries: chsh, mount, chfn, gpasswd, umount, passwd, su, newgrp",
+    "Prefer a file capability; drop privilege early and permanently; keep the program small"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A setuid-root program calls system(\"grep ...\"). An attacker puts their own grep first in PATH. What do they achieve?",
+      "choices": {
+        "A": "Nothing — system uses absolute paths",
+        "B": "Their code executes inside the privileged program's flow; modern shells drop setuid privilege, but the program's own privileged actions still happen",
+        "C": "An immediate root shell in all cases",
+        "D": "The program refuses to start"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Verified: the injected file ran, reporting effective uid 1000 because the shell dropped privilege. That mitigation is real and is not a licence to use system() — the attacker still got code execution inside a privileged process."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why is access() followed by fopen() a security bug in a setuid program?",
+      "choices": {
+        "A": "access is deprecated",
+        "B": "The check and the use are separate operations on a name, and the attacker can swap what that name refers to in between",
+        "C": "fopen cannot open files owned by root",
+        "D": "access ignores ACLs"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "It is module three's race condition with privilege attached. The fix is not a smaller window — it is dropping privilege and performing one atomic operation."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "You add the setuid bit to a shell script owned by root. What happens when a normal user runs it?",
+      "choices": {
+        "A": "It runs as root",
+        "B": "It runs as the calling user — Linux ignores the setuid bit on interpreted files",
+        "C": "It refuses to run",
+        "D": "It runs as root only if the shebang is absolute"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Verified: a script with mode -rwsr-xr-x reported uid 1000. The feature was removed because the gap between reading the shebang and the interpreter opening the file could not be closed."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "What is the first question to ask about a program that currently needs setuid root?",
+      "choices": {
+        "A": "Can we make it faster",
+        "B": "Which single privileged ability does it actually need, and would a file capability grant just that",
+        "C": "Can we hide it from users",
+        "D": "Should it be written in a different language"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "That is the measured difference from the previous lesson: capability set 2000 instead of a80425fb. Same functionality, a fraction of the authority to lose."
+    }
+  ]
+}
