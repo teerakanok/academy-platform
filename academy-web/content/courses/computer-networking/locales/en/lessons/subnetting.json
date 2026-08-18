@@ -1,0 +1,241 @@
+{
+  "nodeId": "subnetting",
+  "locale": "en",
+  "title": "Splitting a network, and the arithmetic behind it",
+  "objective": "By the end of this lesson you can split a range into subnets in your head, say which subnet any address belongs to, and allocate unequal blocks without wasting addresses.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Subnetting has a reputation for being difficult, and it is not. It is one operation — moving the boundary between the network part and the host part — repeated. Everything else is arithmetic you can do without a calculator once you see the pattern."
+    },
+    {
+      "kind": "heading",
+      "text": "Moving the boundary by one bit halves the block"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Each bit you take from the host part doubles the number of subnets and halves the size of each. That single sentence generates the whole table you would otherwise memorise."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Prefix",
+        "Block size",
+        "Usable hosts",
+        "Fourth-octet boundaries"
+      ],
+      "rows": [
+        [
+          "/24",
+          "256",
+          "254",
+          "0"
+        ],
+        [
+          "/25",
+          "128",
+          "126",
+          "0, 128"
+        ],
+        [
+          "/26",
+          "64",
+          "62",
+          "0, 64, 128, 192"
+        ],
+        [
+          "/27",
+          "32",
+          "30",
+          "0, 32, 64, 96, ..."
+        ],
+        [
+          "/28",
+          "16",
+          "14",
+          "0, 16, 32, 48, ..."
+        ],
+        [
+          "/30",
+          "4",
+          "2",
+          "0, 4, 8, 12, ... — used for links between two routers"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "The one number worth carrying in your head",
+      "text": "The block size. A /26 has a block size of 64, so its networks start at 0, 64, 128 and 192 — nothing else is possible. Knowing the block size lets you answer every other question by counting, without converting anything to binary."
+    },
+    {
+      "kind": "heading",
+      "text": "Splitting one range into four"
+    },
+    {
+      "kind": "code",
+      "caption": "192.0.2.0/24 divided into /26 blocks — computed, not recalled",
+      "lines": [
+        "block 0: 192.0.2.0/26     network .0     hosts .1   - .62    broadcast .63",
+        "block 1: 192.0.2.64/26    network .64    hosts .65  - .126   broadcast .127",
+        "block 2: 192.0.2.128/26   network .128   hosts .129 - .190   broadcast .191",
+        "block 3: 192.0.2.192/26   network .192   hosts .193 - .254   broadcast .255",
+        "",
+        "/* Each block is 64 wide. The first address in each is the network,",
+        "   the last is the broadcast, and the 62 in between go to machines. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Which subnet does an address belong to?"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Divide the last octet by the block size, discard the remainder, and multiply back. That is the whole method — no binary required."
+    },
+    {
+      "kind": "code",
+      "caption": "Four addresses, block size 64",
+      "lines": [
+        "192.0.2.5     ->  5 / 64 = 0  ->  0 * 64 = 0    ->  192.0.2.0/26",
+        "192.0.2.70    ->  70 / 64 = 1 ->  1 * 64 = 64   ->  192.0.2.64/26",
+        "192.0.2.130   ->  130 / 64 = 2 ->  2 * 64 = 128 ->  192.0.2.128/26",
+        "192.0.2.200   ->  200 / 64 = 3 ->  3 * 64 = 192 ->  192.0.2.192/26",
+        "",
+        "/* All four verified against a subnet calculator. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The case that catches people: a prefix that is not a multiple of 8",
+      "text": "172.16.5.0/20 does not describe a network starting at 172.16.5.0. With a /20 the block size in the third octet is 16, so the networks start at 172.16.0.0, 172.16.16.0, 172.16.32.0 and so on — and 172.16.5.0 falls inside the first one. Verified: its network is 172.16.0.0 and its broadcast is 172.16.15.255, covering 4096 addresses. Two more of the same kind: 10.1.200.0/22 gives network 10.1.200.0 and broadcast 10.1.203.255; 192.168.7.130/25 gives network 192.168.7.128 and broadcast 192.168.7.255."
+    },
+    {
+      "kind": "heading",
+      "text": "Unequal blocks: allocating what each group needs"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Splitting a range into equal pieces wastes addresses when the groups are different sizes. Allocating variable-sized blocks — largest first, each aligned to its own size — fits them all in without waste."
+    },
+    {
+      "kind": "code",
+      "caption": "Carving 198.51.100.0/24 for four groups",
+      "lines": [
+        "servers        needs 100 -> 198.51.100.0/25     gives 126 usable",
+        "staff          needs  50 -> 198.51.100.128/26   gives  62 usable",
+        "printers       needs  20 -> 198.51.100.192/27   gives  30 usable",
+        "link to router needs   2 -> 198.51.100.224/30   gives   2 usable",
+        "",
+        "/* Largest first, and each block starts at a multiple of its own size.",
+        "   Allocate smallest first and the alignment breaks. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "That /30 at the end is worth noticing: four addresses, of which two are usable, which is exactly what a link between two routers needs. It is the smallest useful subnet, and you will see a lot of them in real networks."
+    },
+    {
+      "kind": "heading",
+      "text": "Counting upward"
+    },
+    {
+      "kind": "code",
+      "caption": "How many smaller blocks fit inside a larger one",
+      "lines": [
+        "a /16 contains 256 /24 blocks       (2^(24-16))",
+        "a /8  contains 65536 /24 blocks     (2^(24-8))",
+        "",
+        "/* The rule: 2 raised to the difference in prefix length.",
+        "   Splitting a /24 into /26 blocks gives 2^(26-24) = 4, which matches above. */"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Do it by hand, then check yourself",
+      "steps": [
+        "Split 10.0.0.0/24 into eight equal subnets — what prefix, and what are the eight network addresses?",
+        "For 10.0.0.0/27, work out the block size, then say which subnet 10.0.0.100 is in",
+        "Work out the network and broadcast of 172.20.30.40/21 without a calculator",
+        "Check all three with: ipcalc <address>/<prefix>   or python3 -c \"import ipaddress; print(ipaddress.ip_interface('...').network)\"",
+        "Design an allocation from 192.168.10.0/24 for: 60 desktops, 25 phones, 10 servers, and two router links",
+        "Verify no two of your blocks overlap and each is aligned to its own size",
+        "Run: ip route     and read each line as a network address plus a prefix",
+        "For one route in that output, say which addresses it covers"
+      ],
+      "expected": "Eight /27 networks at 0, 32, 64, 96, 128, 160, 192 and 224; an allocation with no overlaps; and a routing table you can now read as a list of address ranges. If your hand-computed answers match the calculator on all three, you can subnet — the rest is practice speed."
+    }
+  ],
+  "cheatsheet": [
+    "Each bit taken from the host part doubles the subnets and halves their size",
+    "Block size is the number to carry: /25=128, /26=64, /27=32, /28=16, /30=4",
+    "Subnets always start at multiples of the block size",
+    "To find an address's subnet: divide the octet by the block size, drop the remainder, multiply back",
+    "First address in a block is the network, last is the broadcast, the rest are hosts",
+    "Verified: 172.16.5.0/20 has network 172.16.0.0 and broadcast 172.16.15.255",
+    "Verified: 192.168.7.130/25 has network 192.168.7.128, not 192.168.7.130",
+    "Unequal allocation: largest block first, each aligned to its own size",
+    "/30 gives 2 usable addresses — the standard size for a link between two routers",
+    "Blocks that fit: 2 raised to the difference in prefix length"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Which subnet does 192.0.2.130 belong to, if the network is split into /26 blocks?",
+      "choices": {
+        "A": "192.0.2.0/26",
+        "B": "192.0.2.128/26",
+        "C": "192.0.2.64/26",
+        "D": "192.0.2.192/26"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Block size 64, and 130 divided by 64 is 2 with a remainder, so 2 x 64 = 128. Verified against a calculator along with the other three cases in the lesson."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "What is the network address of 172.16.5.0/20?",
+      "choices": {
+        "A": "172.16.5.0",
+        "B": "172.16.0.0",
+        "C": "172.16.4.0",
+        "D": "172.0.0.0"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A /20 has a block size of 16 in the third octet, so networks start at 172.16.0.0, 172.16.16.0, and so on. 5 falls inside the first block. Verified: broadcast 172.16.15.255, 4096 addresses."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why allocate the largest block first when subnetting for groups of different sizes?",
+      "choices": {
+        "A": "It is only a convention",
+        "B": "Each block must start at a multiple of its own size, and allocating small blocks first leaves gaps that a later large block cannot use",
+        "C": "Large groups are more important",
+        "D": "Small blocks cannot be moved later"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Alignment is the constraint. Place the /25 first and everything after it fits; place the /30 first and the /25 no longer has an aligned home."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "A link between two routers needs how large a subnet?",
+      "choices": {
+        "A": "/24",
+        "B": "/30 — four addresses, two of them usable",
+        "C": "/32",
+        "D": "/28"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Two usable addresses is exactly two router interfaces. It is the smallest subnet that can carry a link, and real networks contain a great many of them."
+    }
+  ]
+}

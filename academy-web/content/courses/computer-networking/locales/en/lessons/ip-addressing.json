@@ -1,0 +1,233 @@
+{
+  "nodeId": "ip-addressing",
+  "locale": "en",
+  "title": "Addresses: how a machine is found",
+  "objective": "By the end of this lesson you can read an IPv4 address as the 32-bit number it is, tell a private range from a public one, and explain what a netmask actually selects.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "An IPv4 address looks like four numbers with dots between them. It is one 32-bit integer, and the dots exist only so people can read it. Almost every confusing thing about addressing becomes obvious once you hold that fact."
+    },
+    {
+      "kind": "code",
+      "caption": "The same address, two ways of writing it",
+      "lines": [
+        "192.168.1.10",
+        "",
+        "  192      168        1       10",
+        "  11000000 10101000 00000001 00001010",
+        "",
+        "  as one 32-bit value: 0xc0a8010a",
+        "",
+        "/* Each of the four parts is one byte, so each is 0-255.",
+        "   That is why 192.168.1.256 is not a typo you can fix — it does not exist. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The netmask selects a prefix"
+    },
+    {
+      "kind": "paragraph",
+      "text": "An address carries two things at once: which network, and which machine on it. The netmask says where the boundary is. Written as /24 it means the first 24 bits identify the network and the remaining 8 identify the host. The same information is often written the long way, as 255.255.255.0, which is simply 24 one-bits followed by 8 zero-bits."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Prefix",
+        "Netmask",
+        "Addresses",
+        "Usable hosts"
+      ],
+      "rows": [
+        [
+          "/24",
+          "255.255.255.0",
+          "256",
+          "254"
+        ],
+        [
+          "/26",
+          "255.255.255.192",
+          "64",
+          "62"
+        ],
+        [
+          "/20",
+          "255.255.240.0",
+          "4096",
+          "4094"
+        ],
+        [
+          "/8",
+          "255.0.0.0",
+          "16777216",
+          "16777214"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Why two addresses are always unusable",
+      "text": "The lowest address in a range identifies the network itself, and the highest is the broadcast address for it. Neither can be given to a machine, which is why a /24 offers 254 hosts rather than 256. Those four rows were computed rather than recalled — the arithmetic is in the exercise, and doing it once is faster than memorising a table."
+    },
+    {
+      "kind": "heading",
+      "text": "Public and private"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Three ranges are reserved for use inside private networks. They are not routed on the internet, so anyone may use them, and almost everyone does."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Range",
+        "Prefix",
+        "Size",
+        "Where you see it"
+      ],
+      "rows": [
+        [
+          "10.0.0.0 – 10.255.255.255",
+          "10.0.0.0/8",
+          "16.7 million",
+          "Corporate networks, cloud VPCs"
+        ],
+        [
+          "172.16.0.0 – 172.31.255.255",
+          "172.16.0.0/12",
+          "1 million",
+          "Docker's default bridge, mid-size networks"
+        ],
+        [
+          "192.168.0.0 – 192.168.255.255",
+          "192.168.0.0/16",
+          "65 thousand",
+          "Home routers"
+        ],
+        [
+          "127.0.0.0 – 127.255.255.255",
+          "127.0.0.0/8",
+          "—",
+          "Loopback: this machine, never leaves it"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Private addresses appear inside the internet too",
+      "text": "Run a traceroute to a public address and you will often see 10.x addresses among the intermediate hops. Those are the provider's own internal links — private ranges used inside their network, which is entirely legitimate. It surprises people who expect every hop on the internet to be publicly addressable. What matters is that no one can route to those addresses from outside that provider."
+    },
+    {
+      "kind": "heading",
+      "text": "Reading a real configuration"
+    },
+    {
+      "kind": "code",
+      "caption": "An interface and what each part means",
+      "lines": [
+        "inet 192.0.2.161  netmask 255.255.255.0  broadcast 192.0.2.255",
+        "",
+        "  address   192.0.2.161     <- this machine",
+        "  netmask   /24             <- the first 24 bits are the network",
+        "  network   192.0.2.0       <- address AND mask",
+        "  broadcast 192.0.2.255     <- address OR the inverted mask",
+        "  range     192.0.2.1 to 192.0.2.254 are available for machines",
+        "",
+        "/* Anything inside that range is reached directly on this segment.",
+        "   Anything outside it is sent to the gateway — the next lesson. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The addresses in that example are from a block reserved for documentation, which is why they are safe to publish. When you run the command on your own machine you will see your real ones, and you should treat them the way you would any other detail about your network."
+    },
+    {
+      "kind": "try",
+      "title": "Read your own address as a number",
+      "steps": [
+        "Run: ip addr show     (or ifconfig on macOS) and find your address and netmask",
+        "Convert your address to binary by hand, one byte at a time",
+        "Apply the mask: keep the bits the mask has as 1, zero the rest — that is your network",
+        "Invert the mask and OR it in — that is your broadcast address",
+        "Check your arithmetic: ipcalc <address>/<prefix>   if it is installed, or a calculator",
+        "Run: ping -c 1 <your broadcast address>    and see whether anything answers",
+        "Work out how many usable addresses your network has, then run: ip neigh   to see how many are in use",
+        "Run: traceroute -n 1.1.1.1   and look for private ranges among the hops"
+      ],
+      "expected": "A network and broadcast address you derived yourself and then confirmed, and a traceroute that probably contains 10.x addresses partway along. Doing the bit arithmetic by hand once is what makes the next lesson's subnetting straightforward rather than a memorisation exercise."
+    }
+  ],
+  "cheatsheet": [
+    "An IPv4 address is one 32-bit number; the dots are for humans",
+    "Each part is one byte, so 0-255 — anything above 255 is not an address",
+    "A prefix like /24 says how many leading bits identify the network",
+    "255.255.255.0 is the same thing as /24 written the long way",
+    "network = address AND mask; broadcast = address OR inverted mask",
+    "Two addresses per range are unusable: the network and the broadcast",
+    "/24 gives 254 hosts, /26 gives 62, /20 gives 4094, /8 gives 16777214",
+    "Private: 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16. Loopback: 127.0.0.0/8",
+    "Private addresses inside a traceroute are the provider's internal links, not an error"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "How many addresses can be assigned to machines in a /26?",
+      "choices": {
+        "A": "64",
+        "B": "62",
+        "C": "32",
+        "D": "26"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A /26 leaves 6 host bits, so 64 addresses, minus the network address and the broadcast address. This was computed rather than recalled — the same arithmetic gives 254 for a /24 and 4094 for a /20."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A traceroute to a public server shows 10.x.x.x addresses at hops 3 and 4. What does that mean?",
+      "choices": {
+        "A": "The trace is being spoofed",
+        "B": "Those are the provider's internal links, using private addressing inside their own network",
+        "C": "Your packets are looping locally",
+        "D": "A misconfiguration on your machine"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Private ranges are unroutable from outside, but perfectly usable inside a provider's network. Seeing them mid-path is normal and tells you nothing is wrong."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "What does a netmask actually do?",
+      "choices": {
+        "A": "Encrypts the address",
+        "B": "Marks which leading bits of the address identify the network rather than the host",
+        "C": "Limits how many machines may connect",
+        "D": "Selects which gateway to use"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "It is a bit pattern of ones followed by zeros. AND it with the address and you have the network; the bits it leaves out are the host part."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why can 192.168.1.256 never be a valid address?",
+      "choices": {
+        "A": "It is reserved",
+        "B": "Each of the four parts is a single byte, so the largest value any of them can hold is 255",
+        "C": "It belongs to a different network",
+        "D": "It is a broadcast address"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The dotted notation is just a readable form of four bytes. 256 does not fit in a byte, so there is no 32-bit number that would produce it."
+    }
+  ]
+}

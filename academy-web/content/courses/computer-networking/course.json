@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 33,
+  "estimatedMinutes": 90,
   "coverMotif": "cloud",
   "skills": [
     {
@@ -61,6 +61,40 @@
       "skillWeights": {
         "network-model": 4,
         "troubleshooting": 2
+      }
+    },
+    {
+      "id": "ip-addressing",
+      "kind": "lesson",
+      "prerequisites": [
+        "layers-and-encapsulation"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "addressing": 4
+      }
+    },
+    {
+      "id": "subnetting",
+      "kind": "lesson",
+      "prerequisites": [
+        "ip-addressing"
+      ],
+      "estimatedMinutes": 20,
+      "skillWeights": {
+        "addressing": 4
+      }
+    },
+    {
+      "id": "routing-basics",
+      "kind": "lesson",
+      "prerequisites": [
+        "subnetting"
+      ],
+      "estimatedMinutes": 19,
+      "skillWeights": {
+        "addressing": 3,
+        "troubleshooting": 3
       }
     }
   ]

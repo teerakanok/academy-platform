@@ -1,0 +1,220 @@
+{
+  "nodeId": "routing-basics",
+  "locale": "en",
+  "title": "How a packet chooses its next hop",
+  "objective": "By the end of this lesson you can read a routing table, predict which route a given destination will match, and explain why a packet's journey is a series of independent local decisions.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "No device on the internet knows the whole path to anywhere. Each one knows only the next hop, and forwards the packet there. The full journey is an emergent result of many small independent decisions, each made by looking up a destination in a table."
+    },
+    {
+      "kind": "heading",
+      "text": "The decision your machine makes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "For every packet, one question: is this destination on a network I am directly attached to? If yes, deliver it on that link. If no, hand it to a router that is closer to it. That is the entire algorithm, and a routing table is just the data it runs on."
+    },
+    {
+      "kind": "code",
+      "caption": "A routing table, with each line read as a rule",
+      "lines": [
+        "Destination      Gateway         Interface",
+        "default          192.0.2.1       eth0        <- everything not matched below",
+        "192.0.2.0/24     0.0.0.0         eth0        <- directly attached: deliver on this link",
+        "10.8.0.0/24      10.8.0.1        tun0        <- reachable through the VPN",
+        "127.0.0.0/8      0.0.0.0         lo          <- this machine",
+        "",
+        "/* A gateway of 0.0.0.0, or a flag meaning 'on-link', says there is no router",
+        "   involved — those addresses are on the same segment as this interface. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Longest prefix wins"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A destination often matches several routes at once. The one chosen is always the most specific — the one with the longest prefix — regardless of the order the lines appear in."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Destination",
+        "Matches",
+        "Chosen",
+        "Why"
+      ],
+      "rows": [
+        [
+          "192.0.2.50",
+          "192.0.2.0/24 and default",
+          "192.0.2.0/24",
+          "/24 is longer than /0"
+        ],
+        [
+          "10.8.0.5",
+          "10.8.0.0/24 and default",
+          "10.8.0.0/24",
+          "/24 beats /0"
+        ],
+        [
+          "93.184.216.34",
+          "default only",
+          "default",
+          "Nothing more specific exists"
+        ],
+        [
+          "127.0.0.1",
+          "127.0.0.0/8 and default",
+          "127.0.0.0/8",
+          "/8 beats /0"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The default route is a /0",
+      "text": "Written out it is 0.0.0.0/0 — a prefix of zero bits, which matches every address. It is the least specific route possible, so it only wins when nothing else matches. That is exactly the behaviour you want from 'if you do not know where this goes, send it here', and it is why a machine with a default route can reach the whole internet while knowing almost nothing about it."
+    },
+    {
+      "kind": "heading",
+      "text": "What the sender knows, and what it does not"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Your machine knows: its own networks, its gateway, and any specific routes configured",
+        "It does not know: the path beyond the first hop, or how many hops there will be",
+        "The gateway repeats the same decision with its own table, and so does the next one",
+        "Nothing along the way is obliged to send the reply back the same way it came"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "That last point explains a class of confusing behaviour: traffic can take one path outward and a different one back, so a traceroute shows you one direction only. It also explains why a firewall rule that permits traffic in one direction can fail if the return path is different from what was assumed."
+    },
+    {
+      "kind": "heading",
+      "text": "Reading a real trace"
+    },
+    {
+      "kind": "code",
+      "caption": "traceroute output, with the parts worth reading",
+      "lines": [
+        "traceroute to 1.1.1.1, 8 hops max",
+        " 1  192.0.2.1        14.293 ms      <- your gateway",
+        " 2  *                               <- this hop did not reply",
+        " 3  *",
+        " 4  10.118.18.10     23.137 ms      <- private address: the provider's internal link",
+        " 5  *",
+        " 6  198.51.100.126   46.314 ms",
+        " 7  198.51.100.143   43.896 ms      <- LOWER than hop 6",
+        " 8  10.30.2.27      213.667 ms",
+        "",
+        "/* Three things worth noticing, all visible above. */"
+      ]
+    },
+    {
+      "kind": "list",
+      "items": [
+        "A star does not mean the packet was lost. It means that hop declined to send the message traceroute relies on, which many routers do deliberately. If later hops reply, traffic is passing through fine",
+        "A later hop can show a lower time than an earlier one. The times are measured independently and a router may be slow to generate a reply while forwarding traffic quickly — so the numbers are not a cumulative total",
+        "Private addresses in the middle are the provider's own links, as the addressing lesson described"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Do not diagnose from a single high number mid-path",
+      "text": "Only the time to the final destination measures what your traffic experiences. An intermediate router showing 200 ms may simply be deprioritising the request for a reply while forwarding your actual packets in a fraction of that. Compare the last hop's time against a plain ping to the destination before concluding anything about a middle hop."
+    },
+    {
+      "kind": "try",
+      "title": "Predict, then verify",
+      "steps": [
+        "Run: ip route      (or netstat -rn on macOS) and write out each line as a rule in words",
+        "Identify your default route and the networks you are directly attached to",
+        "Pick three destinations — one on your own network, one on the internet, one that is 127.x — and predict which route each will match",
+        "Verify with: ip route get <address>     which shows exactly the route the kernel picks",
+        "Run: traceroute -n 1.1.1.1     and count the hops, the stars, and any private addresses",
+        "Compare the final hop's time with: ping -c 3 1.1.1.1",
+        "Explain any difference between the two",
+        "Optional: traceroute to a server in another country and compare the hop count and total time"
+      ],
+      "expected": "Three correct predictions confirmed by ip route get, and a trace whose stars and non-monotonic times you can now explain rather than worry about. Being able to say 'that star is normal and this one matters' is the practical skill this lesson exists for."
+    }
+  ],
+  "cheatsheet": [
+    "Every device knows only the next hop, never the whole path",
+    "One question per packet: is the destination on a network I am attached to?",
+    "The most specific matching route wins — longest prefix, regardless of line order",
+    "The default route is 0.0.0.0/0: matches everything, loses to everything more specific",
+    "A gateway of 0.0.0.0 or an on-link flag means no router is involved",
+    "ip route get <address> shows exactly which route the kernel will use",
+    "A star in traceroute means that hop declined to reply, not that traffic was lost",
+    "Traceroute times are independent per hop and can decrease along the path",
+    "Only the final hop's time reflects what your traffic experiences",
+    "The return path need not match the outbound path"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A routing table has both 10.0.0.0/8 and 10.5.0.0/16. Which does a packet for 10.5.1.1 use?",
+      "choices": {
+        "A": "10.0.0.0/8, because it appears first",
+        "B": "10.5.0.0/16 — the longest matching prefix always wins",
+        "C": "Both, in turn",
+        "D": "Whichever has the lower metric"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Specificity decides, not order. That is what makes it possible to add a narrow exception to a broad route without reordering anything."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "traceroute shows a star at hop 3 but replies at hops 4 through 8. What does that tell you?",
+      "choices": {
+        "A": "Packets are being lost at hop 3",
+        "B": "Hop 3 declined to send the reply traceroute needs; traffic is passing through it fine",
+        "C": "The route changed mid-trace",
+        "D": "Hop 3 is offline"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Later hops replying proves packets traversed hop 3. Many routers deprioritise or block the messages traceroute depends on, which is a configuration choice rather than a fault."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Hop 7 in a trace shows 43 ms while hop 6 shows 46 ms. Is that a problem?",
+      "choices": {
+        "A": "Yes — times must increase along the path",
+        "B": "No — each hop is measured independently, and a router may be slow to answer while forwarding quickly",
+        "C": "Yes — it indicates a routing loop",
+        "D": "It means the packets took different routes"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Observed in a real trace. The measurements are separate round trips, not a running total, so they need not increase monotonically."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why can a machine reach the entire internet while its routing table has only four lines?",
+      "choices": {
+        "A": "The kernel downloads routes as needed",
+        "B": "The default route matches everything it does not otherwise know, and passes the problem to a router that knows more",
+        "C": "DNS supplies the missing routes",
+        "D": "Because most addresses are private"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "That delegation is the design. Each device holds only what it needs to make one decision, and the aggregate of those decisions is the path."
+    }
+  ]
+}
