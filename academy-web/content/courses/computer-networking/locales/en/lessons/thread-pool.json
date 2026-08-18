@@ -1,0 +1,245 @@
+{
+  "nodeId": "thread-pool",
+  "locale": "en",
+  "title": "A fixed set of workers over a queue of connections",
+  "objective": "By the end of this lesson you can replace per-connection thread creation with a pool, explain what bounding the pool actually protects, and choose a size for it with a reason rather than a guess.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "The previous design creates a thread per connection and destroys it afterwards. A pool creates a fixed number once and feeds them work through a queue. The structure needed for that is one you have already built: the bounded producer-consumer queue from the operating systems capstone, with connection descriptors as the items."
+    },
+    {
+      "kind": "heading",
+      "text": "The same queue, a new payload"
+    },
+    {
+      "kind": "code",
+      "caption": "Accept produces, workers consume",
+      "lines": [
+        "/* This is the bounded queue from the operating systems capstone, with",
+        "   connection descriptors as the items. Nothing new is needed. */",
+        "",
+        "static void *worker(void *arg) {",
+        "    (void)arg;",
+        "    int conn;",
+        "    while (q_get(&queue, &conn)) {      /* blocks until work or shutdown */",
+        "        serve(conn);",
+        "        close(conn);",
+        "    }",
+        "    return NULL;                        /* q_get returned 0: queue closed and drained */",
+        "}",
+        "",
+        "int main(void) {",
+        "    q_init(&queue);",
+        "",
+        "    pthread_t pool[WORKERS];",
+        "    for (int i = 0; i < WORKERS; i++)",
+        "        pthread_create(&pool[i], NULL, worker, NULL);   /* created ONCE */",
+        "",
+        "    for (;;) {",
+        "        int conn = accept(listener, NULL, NULL);",
+        "        if (conn < 0) { perror(\"accept\"); continue; }",
+        "        q_put(&queue, conn);            /* blocks if the queue is full: back-pressure */",
+        "    }",
+        "",
+        "    /* On shutdown: q_close(&queue), then join every worker. */",
+        "}"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Everything that made that queue correct still applies",
+      "text": "One mutex for the data, separate condition variables for 'not full' and 'not empty', waits inside while loops, and a close that broadcasts so no worker sleeps forever at shutdown. Those were the four things the operating systems capstone had to get right, and none of them changes because the items are now file descriptors. If that lesson's version passed thread sanitizer, this one does too."
+    },
+    {
+      "kind": "heading",
+      "text": "What the pool actually buys"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "Thread per connection",
+        "Pool"
+      ],
+      "rows": [
+        [
+          "Thread creation",
+          "Once per connection",
+          "Once at startup"
+        ],
+        [
+          "Threads under load",
+          "Grows with connections",
+          "Fixed"
+        ],
+        [
+          "Memory",
+          "Grows with connections",
+          "Bounded"
+        ],
+        [
+          "Behaviour when overloaded",
+          "Degrades everywhere at once",
+          "Queue fills, then back-pressure"
+        ],
+        [
+          "Complexity",
+          "Lower",
+          "A queue and a shutdown protocol"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The fourth row is the one that matters most and is least often stated. With a thread per connection, a traffic spike creates threads until the machine is thrashing and every request is slow. With a pool, the queue fills and then accept blocks — which is worse for the connections that are waiting and much better for the ones being served."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Back-pressure is the point, not a side effect",
+      "text": "A bounded queue that refuses more work is a system telling the truth about its capacity. An unbounded one accepts everything and then fails in a worse way — memory grows, latency grows, and eventually nothing completes. Choosing a bound is choosing which failure you want, and the bounded one is nearly always the better answer because it degrades predictably."
+    },
+    {
+      "kind": "heading",
+      "text": "Sizing the pool"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Work is mostly",
+        "Rough starting point",
+        "Because"
+      ],
+      "rows": [
+        [
+          "CPU-bound",
+          "About the number of cores",
+          "More threads than cores only adds switching"
+        ],
+        [
+          "I/O-bound",
+          "Considerably more than the cores",
+          "Most threads are blocked, not computing"
+        ],
+        [
+          "Mixed",
+          "Measure",
+          "The ratio decides, and only measurement tells you it"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Those are starting points for a measurement, not answers. The honest method is to fix the pool size, apply a realistic load, and record throughput and latency; then change the size and repeat. A pool that is too small leaves cores idle while work waits; one that is too large spends its time switching between threads that are all waiting for the same slow dependency."
+    },
+    {
+      "kind": "heading",
+      "text": "The failure that a pool makes possible"
+    },
+    {
+      "kind": "paragraph",
+      "text": "If every worker blocks on something that never returns — a database that has stopped responding, a lock nobody releases — the pool is exhausted and the server stops serving, even though nothing has crashed and there is CPU to spare. With a thread per connection this shows up as unbounded thread growth; with a pool it shows up as complete silence."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Give every external call a timeout, so a worker cannot be held forever",
+        "Never call into another pool that might call back into this one — that is a deadlock waiting for load",
+        "Instrument how many workers are busy; a pool permanently at capacity is the signal",
+        "Consider a separate pool for slow dependencies, so one slow thing cannot consume every worker"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Pool exhaustion looks like the deadlock lesson, because it is one",
+      "text": "Alive, no CPU, no errors, no progress. The operating systems course gave the diagnostic: attach with gdb and look at where every thread is waiting. If they are all in the same call, you have found it — and the fix is a timeout on that call, not a bigger pool. Growing the pool moves the moment of failure without removing it."
+    },
+    {
+      "kind": "try",
+      "title": "Convert, then measure",
+      "steps": [
+        "Take the producer-consumer queue from the operating systems capstone and change the item type to int",
+        "Create a fixed number of workers at startup; have the accept loop put descriptors into the queue",
+        "Verify correctness first: many clients, all served, no descriptors leaked",
+        "Set the pool to 1 and measure how long 100 sequential requests take",
+        "Set it to 4, then 16, and repeat the same measurement",
+        "Make the handler sleep 100 ms to simulate a slow dependency, and repeat all three sizes",
+        "Note how the best size changes when the work is waiting rather than computing",
+        "Finally: make the handler block forever, send as many requests as there are workers, and confirm the server stops responding — then add a timeout and confirm it recovers"
+      ],
+      "expected": "A pool whose best size you determined by measurement rather than by rule, and a deliberate exhaustion you then fixed with a timeout. That last step is the one worth having done: recognising a pool that is fully occupied by a dependency that will never answer is a skill that transfers to every threaded system you will work on."
+    }
+  ],
+  "cheatsheet": [
+    "A pool creates threads once and feeds them from a bounded queue",
+    "The queue is the operating systems capstone's, with descriptors as items",
+    "One mutex, two condition variables, waits in while loops, broadcast on close",
+    "The pool bounds memory and thread count under load",
+    "A full queue means back-pressure, which is the system telling the truth about capacity",
+    "An unbounded queue accepts everything and fails worse",
+    "Start near the core count for CPU-bound work, higher for I/O-bound, then measure",
+    "Give every external call a timeout or a hung dependency exhausts the pool",
+    "Pool exhaustion presents exactly like a deadlock: alive, no CPU, no progress"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Under a traffic spike, what does a pool do that thread-per-connection does not?",
+      "choices": {
+        "A": "Serve more requests per second",
+        "B": "Bound the thread count and memory, so the queue fills and applies back-pressure instead of the whole machine degrading",
+        "C": "Avoid the need for locks",
+        "D": "Eliminate connection setup cost"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The benefit is predictable degradation. Thread-per-connection grows until the machine is thrashing and every request is slow; a pool keeps serving its current work and makes new work wait."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Your pool has 16 workers and each request spends 90% of its time waiting on a database. Is 16 a good size?",
+      "choices": {
+        "A": "Yes — it matches the core count",
+        "B": "Probably too small — most workers are blocked rather than computing, so more of them can be in flight before the CPU is the limit",
+        "C": "Too large — waiting threads waste CPU",
+        "D": "Size does not affect I/O-bound work"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Blocked threads use no CPU. For I/O-bound work the useful pool size is well above the core count — but the number itself must come from measurement, not from a formula."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Every worker is blocked on a database that stopped responding. What does the server look like?",
+      "choices": {
+        "A": "High CPU and slow responses",
+        "B": "Alive, using no CPU, accepting connections but never answering — the same signature as a deadlock",
+        "C": "It crashes",
+        "D": "It rejects connections immediately"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Diagnose it the way the operating systems course taught: look at where every thread is waiting. The fix is a timeout on that call; enlarging the pool only postpones the same failure."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why prefer a bounded queue over an unbounded one?",
+      "choices": {
+        "A": "It uses less memory when idle",
+        "B": "It refuses excess work instead of accepting everything and failing later with growing memory and latency",
+        "C": "It is faster to implement",
+        "D": "Unbounded queues are not thread-safe"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Both designs fail under enough load; the bounded one fails predictably and at a point you chose. That is what makes back-pressure a feature rather than a limitation."
+    }
+  ]
+}

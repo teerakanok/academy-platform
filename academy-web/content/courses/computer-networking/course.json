@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 346,
+  "estimatedMinutes": 381,
   "coverMotif": "cloud",
   "skills": [
     {
@@ -257,6 +257,28 @@
       "skillWeights": {
         "network-model": 3,
         "network-security": 2
+      }
+    },
+    {
+      "id": "thread-per-connection",
+      "kind": "lesson",
+      "prerequisites": [
+        "client-and-server"
+      ],
+      "estimatedMinutes": 17,
+      "skillWeights": {
+        "server-design": 4
+      }
+    },
+    {
+      "id": "thread-pool",
+      "kind": "lesson",
+      "prerequisites": [
+        "thread-per-connection"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "server-design": 4
       }
     }
   ]

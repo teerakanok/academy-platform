@@ -1,0 +1,205 @@
+{
+  "nodeId": "thread-per-connection",
+  "locale": "en",
+  "title": "One thread per client, and where it breaks",
+  "objective": "By the end of this lesson you can turn a single-client server into one that serves many, explain what each connection costs, and say at roughly what scale this design stops being the right one.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "The server from the capstone serves one client at a time: it accepts, handles, closes, then accepts again. A second client waits. The simplest fix is to hand each connection to its own thread — and it is a genuinely good design, up to a point that is worth being able to estimate."
+    },
+    {
+      "kind": "heading",
+      "text": "The change is small"
+    },
+    {
+      "kind": "code",
+      "caption": "Accept, then hand off",
+      "lines": [
+        "static void *handle_client(void *arg) {",
+        "    int conn = *(int *)arg;",
+        "    free(arg);                       /* the argument was allocated per thread */",
+        "    serve(conn);                     /* the same function as before */",
+        "    close(conn);",
+        "    return NULL;",
+        "}",
+        "",
+        "for (;;) {",
+        "    int conn = accept(listener, NULL, NULL);",
+        "    if (conn < 0) { perror(\"accept\"); continue; }",
+        "",
+        "    int *arg = malloc(sizeof *arg);  /* NOT &conn — that changes next iteration */",
+        "    *arg = conn;",
+        "",
+        "    pthread_t t;",
+        "    if (pthread_create(&t, NULL, handle_client, arg) != 0) {",
+        "        close(conn); free(arg);      /* out of threads: refuse cleanly */",
+        "        continue;",
+        "    }",
+        "    pthread_detach(t);               /* nobody will join it */",
+        "}"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Two lines here are the operating systems course's bugs, in their network form",
+      "text": "Passing &conn instead of a per-thread allocation gives every thread a pointer to the same variable, which the loop overwrites on the next accept — the exact mistake from the pthreads lesson. And omitting pthread_detach leaves every finished thread waiting to be joined, which is the thread version of the zombie problem. Both were covered there; here they appear in the code you would actually write."
+    },
+    {
+      "kind": "heading",
+      "text": "What each connection costs"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Resource",
+        "Per connection",
+        "Consequence"
+      ],
+      "rows": [
+        [
+          "A thread stack",
+          "Reserved address space, typically megabytes",
+          "Bounds how many can exist"
+        ],
+        [
+          "Kernel bookkeeping",
+          "A task structure",
+          "Scheduler work grows"
+        ],
+        [
+          "A file descriptor",
+          "One",
+          "Subject to the process limit"
+        ],
+        [
+          "Scheduling",
+          "A share of the CPU when runnable",
+          "Switching cost rises with thread count"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The stack is reserved, not used — which matters more than it sounds",
+      "text": "A thread's stack is an address-space reservation, and only the pages actually touched become resident. This is the demand-paging lesson from the operating systems course, and it is why thousands of threads do not immediately consume thousands of stacks' worth of memory. What does grow unavoidably is the kernel's per-task bookkeeping and the cost of scheduling among them. Check your own limit with ulimit -s for the stack size and ulimit -u for the process and thread ceiling."
+    },
+    {
+      "kind": "heading",
+      "text": "Where the design stops fitting"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Tens of connections: entirely fine, and simpler than any alternative",
+        "Hundreds: still reasonable on a normal machine",
+        "Thousands: the switching and memory costs become visible, and you should measure rather than assume",
+        "Tens of thousands of mostly idle connections: the wrong model — most threads are asleep waiting for input that rarely comes"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The last row is the important one, and it is about the shape of the load rather than the number alone. A thread blocked in read costs no CPU, as the blocking lesson established. What it costs is a thread — so a design that allocates one per connection is efficient when connections are busy and wasteful when they are numerous and idle."
+    },
+    {
+      "kind": "heading",
+      "text": "The other cost: shared state"
+    },
+    {
+      "kind": "paragraph",
+      "text": "With one thread per connection, anything shared between them needs the protection from the operating systems course. A request counter, a cache, a list of connected users — each one is now touched concurrently, and each one needs a mutex or an atomic. A single-threaded server had none of this to think about, and that simplicity is a real thing being given up."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Keep per-connection state per-connection",
+      "text": "The cheapest way to stay correct is to share as little as possible. State that belongs to one connection should live on that thread's stack, not in a global. Then the only things needing locks are the genuinely shared ones, and those can usually be counted on one hand — which is also what makes the eventual move to a pool or an event loop straightforward rather than a rewrite."
+    },
+    {
+      "kind": "try",
+      "title": "Build it and find its limit",
+      "steps": [
+        "Take the capstone server and move the per-connection work into a thread function",
+        "Verify that two clients are served at once — have the handler sleep 5 seconds and connect twice",
+        "Deliberately pass &conn instead of an allocation, run several clients at once, and watch connections get mixed up",
+        "Put the allocation back, then remove pthread_detach and watch memory grow over many connections",
+        "Check your limits: ulimit -s (stack size) and ulimit -u (process and thread ceiling)",
+        "Write a client loop that opens 1000 connections and holds them open",
+        "Watch the server with: ps -o nlwp,rss -p <pid>    (thread count and resident memory)",
+        "Raise it to as many connections as your system allows and record where it stops"
+      ],
+      "expected": "A server handling many clients at once, both of the pthreads bugs reproduced on purpose, and a measured limit on your own machine. That last number is what makes the next two lessons concrete: you will know what you are trying to get past rather than taking it on faith."
+    }
+  ],
+  "cheatsheet": [
+    "One thread per connection: accept, create a thread, detach it",
+    "Pass a per-thread allocation, never &conn — the loop overwrites it",
+    "pthread_detach every thread nobody will join, or resources accumulate",
+    "A thread stack is reserved address space; only touched pages become resident",
+    "Check limits with ulimit -s and ulimit -u",
+    "Fine for tens or hundreds of connections; measure before assuming thousands",
+    "Wrong for tens of thousands of mostly idle connections — the threads just sleep",
+    "Anything shared between connections now needs a mutex or an atomic",
+    "Keep per-connection state on the thread's stack to minimise what must be locked"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "You pass &conn to pthread_create instead of a heap allocation. What happens?",
+      "choices": {
+        "A": "Nothing — the value is copied",
+        "B": "Every thread receives a pointer to the same variable, which the accept loop overwrites, so connections get mixed up",
+        "C": "The thread fails to start",
+        "D": "It works but leaks memory"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "This is the pthreads lesson's loop-variable bug, met in the code you would actually write. Each thread needs its own storage that outlives the loop iteration."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why is thread-per-connection a poor fit for ten thousand mostly idle connections?",
+      "choices": {
+        "A": "Blocked threads consume CPU",
+        "B": "Each connection costs a thread even while it waits, and the kernel's per-task bookkeeping and scheduling costs grow with the count",
+        "C": "The kernel cannot create that many",
+        "D": "File descriptors run out first"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A blocked thread uses no CPU — that was established earlier. The cost is the thread itself, which is why the model suits busy connections and not numerous idle ones."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "What does omitting pthread_detach cause in this server?",
+      "choices": {
+        "A": "Threads never start",
+        "B": "Each finished thread's resources are retained waiting for a join that never comes",
+        "C": "Connections are not closed",
+        "D": "The accept loop blocks"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "It is the zombie problem from the operating systems course in thread form: collect it, or declare up front that you never will."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Moving from one thread to many introduces which new class of bug?",
+      "choices": {
+        "A": "Memory leaks",
+        "B": "Races on anything shared between connections — counters, caches, shared lists",
+        "C": "Descriptor exhaustion",
+        "D": "Slower request handling"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A single-threaded server has no shared-state problem at all. Keeping per-connection state on the thread's own stack keeps the set of things needing locks small enough to reason about."
+    }
+  ]
+}
