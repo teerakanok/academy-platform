@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 85,
+  "estimatedMinutes": 139,
   "coverMotif": "terminal",
   "skills": [
     {
@@ -94,6 +94,41 @@
       "estimatedMinutes": 14,
       "skillWeights": {
         "reading-disassembly": 4
+      }
+    },
+    {
+      "id": "cmp-test-jcc",
+      "kind": "lesson",
+      "prerequisites": [
+        "arithmetic-and-flags"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "control-flow": 4,
+        "instruction-semantics": 2
+      }
+    },
+    {
+      "id": "loops-in-assembly",
+      "kind": "lesson",
+      "prerequisites": [
+        "cmp-test-jcc"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "control-flow": 4
+      }
+    },
+    {
+      "id": "arrays-in-assembly",
+      "kind": "lesson",
+      "prerequisites": [
+        "loops-in-assembly"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "control-flow": 3,
+        "instruction-semantics": 3
       }
     }
   ]

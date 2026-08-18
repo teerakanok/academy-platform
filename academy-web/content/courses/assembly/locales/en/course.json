@@ -24,6 +24,9 @@
     "registers": "Sixteen registers and the names they answer to",
     "mov-and-lea": "Moving data, and the instruction that does not move anything",
     "arithmetic-and-flags": "Arithmetic, and the four bits it leaves behind",
-    "att-vs-intel-syntax": "Two ways to write the same instruction"
+    "att-vs-intel-syntax": "Two ways to write the same instruction",
+    "cmp-test-jcc": "How an if becomes a jump",
+    "loops-in-assembly": "Finding the loop, and what became of it",
+    "arrays-in-assembly": "Recovering data layout from address arithmetic"
   }
 }

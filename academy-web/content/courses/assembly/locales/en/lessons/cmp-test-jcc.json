@@ -1,0 +1,259 @@
+{
+  "nodeId": "cmp-test-jcc",
+  "locale": "en",
+  "title": "How an if becomes a jump",
+  "objective": "By the end of this lesson you can map any C conditional onto its compiled form, read a conditional jump's condition correctly, and explain why an unsigned comparison can replace two range checks.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "There are no if statements in machine code. Every conditional in every program reduces to the same two-step pattern: an instruction that sets the flags, and an instruction that reads them."
+    },
+    {
+      "kind": "heading",
+      "text": "The pattern"
+    },
+    {
+      "kind": "code",
+      "caption": "Three instructions read the flags, and they differ only in what they do next",
+      "lines": [
+        "  cmp  edi, esi          ; set the flags from edi - esi",
+        "",
+        "  jl   .Lsomewhere       ; JUMP if the condition holds",
+        "  setl al                ; SET a byte to 1 if the condition holds",
+        "  cmovl eax, edx         ; COPY only if the condition holds",
+        "",
+        "/* Same condition, three ways of acting on it. The suffix is identical",
+        "   across all three families, so learning the conditions once covers",
+        "   every conditional instruction in the architecture. */"
+      ]
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "C",
+        "Compiles to (roughly)"
+      ],
+      "rows": [
+        [
+          "if (a == b) X",
+          "cmp a,b ; jne skip ; X ; skip:"
+        ],
+        [
+          "if (a != b) X",
+          "cmp a,b ; je skip ; X ; skip:"
+        ],
+        [
+          "if (a < b) X  (signed)",
+          "cmp a,b ; jge skip ; X ; skip:"
+        ],
+        [
+          "if (a < b) X  (unsigned)",
+          "cmp a,b ; jae skip ; X ; skip:"
+        ],
+        [
+          "if (p) X",
+          "test p,p ; je skip ; X ; skip:"
+        ],
+        [
+          "if (x & MASK) X",
+          "test x,MASK ; je skip ; X ; skip:"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The condition is inverted",
+      "text": "Notice that if (a == b) compiles to jump-if-NOT-equal. The compiler emits code that skips the body, so the jump tests the opposite of the source condition. This trips up almost everyone reading disassembly for the first time: when you see jne, the source almost certainly said ==. Read a conditional jump as 'skip the following block when...' rather than as the condition itself."
+    },
+    {
+      "kind": "heading",
+      "text": "When there is no jump at all"
+    },
+    {
+      "kind": "code",
+      "caption": "Real output for a three-way comparison",
+      "lines": [
+        "  int classify(int x) { if (x < 0) return -1; if (x == 0) return 0; return 1; }",
+        "",
+        "  _classify:",
+        "      test  edi, edi",
+        "      sets  al          ; al = 1 if x is negative",
+        "      setg  cl          ; cl = 1 if x is greater than zero",
+        "      sub   cl, al      ; (x>0) - (x<0)  ->  1, 0 or -1",
+        "      movsx eax, cl",
+        "      ret",
+        "",
+        "/* Two ifs in the source, no jumps in the output. One test set the flags,",
+        "   two set instructions asked two different questions of them, and a",
+        "   subtraction combined the answers. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "An if in the source is not evidence of a branch in the binary. This function has two conditionals and zero jumps: the compiler used the set family instead, turning the conditions into 0-or-1 values and doing arithmetic on them. When a profiler shows no branch mispredictions in a function full of ifs, this is usually why."
+    },
+    {
+      "kind": "heading",
+      "text": "A switch, and the trick inside it"
+    },
+    {
+      "kind": "code",
+      "caption": "Eight cases compiled at -O1",
+      "lines": [
+        "  A switch over 0..7 returning 71, 3, 42, 8, 99, 17, 4, 55:",
+        "",
+        "  _jt:",
+        "      mov  eax, -1                          ; the default",
+        "      cmp  edi, 7",
+        "      ja   .Ldone                           ; UNSIGNED above -- see below",
+        "      mov  eax, edi",
+        "      lea  rcx, [rip + switch.table.jt]",
+        "      mov  eax, dword ptr [rcx + 4*rax]     ; read the answer from a table",
+        "  .Ldone:",
+        "      ret",
+        "",
+        "  switch.table.jt:  .long 71, 3, 42, 8, 99, 17, 4, 55",
+        "",
+        "/* Eight cases became one bounds check and one table load. Note ja, the",
+        "   UNSIGNED above: a negative x read as unsigned is an enormous number,",
+        "   so a single unsigned comparison rejects both x < 0 and x > 7. One",
+        "   instruction doing the work of two range checks. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "One unsigned comparison replaces two signed ones",
+      "text": "Checking 0 <= x && x <= 7 normally takes two comparisons. Reading x as unsigned collapses them into one: any negative value becomes a number above two billion, so a single 'above 7' test rejects it along with everything genuinely too large. This idiom appears in almost every bounds check in optimised code — and recognising it matters, because when it is written incorrectly it is exactly how a negative index gets past a length check."
+    },
+    {
+      "kind": "heading",
+      "text": "What a switch actually becomes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Shape of the cases",
+        "What the compiler produces"
+      ],
+      "rows": [
+        [
+          "Few cases",
+          "A chain of cmp and je"
+        ],
+        [
+          "Dense range, arbitrary results",
+          "A bounds check and a table lookup"
+        ],
+        [
+          "Dense range, arbitrary code",
+          "A bounds check and an indirect jump through a table of addresses"
+        ],
+        [
+          "Dense range, results in arithmetic progression",
+          "Arithmetic — no table and no branch at all"
+        ],
+        [
+          "Sparse values",
+          "A chain of comparisons, or a binary search over the values"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The fourth row is real: a switch returning 10, 20, 30 up to 80 for inputs 0 to 7 compiles to two lea instructions and a cmov, because the compiler noticed the results were 10x + 10. A switch is a request, not an instruction, and what it becomes depends entirely on the shape of the values in it."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "An indirect jump is where static reading gets hard",
+      "text": "jmp rax or jmp qword ptr [rcx + 8*rax] transfers control somewhere the disassembler cannot determine without knowing the register's value. Jump tables, function pointers, virtual method calls and dynamic dispatch all produce these. When a disassembly seems to end abruptly, look for an indirect jump — the code continues, but only the runtime knows where. This is the point at which static analysis usually needs a debugger's help, which is what the tooling module is about."
+    },
+    {
+      "kind": "try",
+      "title": "Map source to jumps",
+      "steps": [
+        "Write six small functions, one for each row of the first table, and compile at -O1",
+        "Confirm each conditional jump tests the opposite of the source condition",
+        "Write the three-way classify function and confirm it compiles without a jump",
+        "Write a switch with eight consecutive cases returning unrelated values and find the table",
+        "Change the returned values to 10, 20, 30 and so on, and watch the table disappear",
+        "Write a switch with cases 1, 100 and 5000 and see what replaces the table",
+        "Find the unsigned bounds-check idiom in one of your compilations",
+        "Explain in one sentence why it rejects negative inputs"
+      ],
+      "expected": "Inverted jump conditions throughout, a branchless classify, a lookup table that vanishes when the results become an arithmetic progression, and comparison chains for sparse cases. The sparse case is worth noticing: with only three widely separated values there is nothing to index, so the compiler falls back to comparing — the same decision you would make by hand."
+    }
+  ],
+  "cheatsheet": [
+    "Every conditional is two steps: set the flags, then read them",
+    "jcc jumps, setcc sets a byte to 0 or 1, cmovcc copies — all use the same condition names",
+    "Compiled conditions are inverted: if (a == b) becomes jne past the body",
+    "Read a conditional jump as 'skip the block when...', not as the source condition",
+    "test p, p is the compiled form of if (p)",
+    "test x, MASK is the compiled form of if (x & MASK)",
+    "An if in the source does not imply a branch in the binary; setcc may replace it",
+    "cmp x, 7 followed by ja is an unsigned bounds check rejecting negatives too",
+    "A switch may become a comparison chain, a table lookup, an indirect jump, or arithmetic",
+    "An indirect jump is where static reading stops and a debugger becomes necessary"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "You see cmp edi, esi followed by jne. What did the source most likely say?",
+      "choices": {
+        "A": "if (a != b)",
+        "B": "if (a == b) — the compiler jumps past the body when the condition fails, so the jump tests the opposite",
+        "C": "while (a != b)",
+        "D": "Cannot be determined"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Read a conditional jump as 'skip the following block when...'. Almost every compiled if has this inversion."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A function with two if statements compiles to sets, setg, sub and no jumps. What happened?",
+      "choices": {
+        "A": "The compiler removed the conditions",
+        "B": "It used the set family: each condition became a 0-or-1 byte, and arithmetic combined them into the result",
+        "C": "The conditions moved into a called function",
+        "D": "The optimiser inlined a branch predictor"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "(x>0) - (x<0) gives 1, 0 or -1. An if in the source is not evidence of a branch in the binary."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why does cmp edi, 7 followed by ja correctly reject negative values as well as values above 7?",
+      "choices": {
+        "A": "ja checks the sign flag",
+        "B": "ja is the unsigned comparison, and a negative value read as unsigned is an enormous number, so it is above 7 too",
+        "C": "The compiler adds a separate check",
+        "D": "It does not; that is a bug"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "One unsigned comparison replaces two signed ones. It appears in nearly every optimised bounds check — and getting it wrong is how a negative index passes a length test."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "A switch over eight consecutive cases compiles to two lea instructions and a cmov, with no table. Why?",
+      "choices": {
+        "A": "The compiler ran out of memory for the table",
+        "B": "The case results formed an arithmetic progression, so the compiler computed them instead of storing them",
+        "C": "Eight cases is below the table threshold",
+        "D": "The switch was on an enum"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A switch is a request, not an instruction. Returning 10, 20 up to 80 for inputs 0 to 7 is just 10x + 10, so no table or branch is needed."
+    }
+  ]
+}

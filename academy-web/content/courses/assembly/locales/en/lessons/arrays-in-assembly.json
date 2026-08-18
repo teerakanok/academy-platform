@@ -1,0 +1,264 @@
+{
+  "nodeId": "arrays-in-assembly",
+  "locale": "en",
+  "title": "Recovering data layout from address arithmetic",
+  "objective": "By the end of this lesson you can read an element size, a field offset and a field width out of a single instruction, and reconstruct a structure definition from a binary that carries no type information.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A compiled binary contains no types. What it contains is address arithmetic, and address arithmetic is a faithful record of the layout the types described. Reading it backwards is one of the most useful skills in this course."
+    },
+    {
+      "kind": "heading",
+      "text": "Everything is in the operand"
+    },
+    {
+      "kind": "code",
+      "caption": "One instruction, three facts",
+      "lines": [
+        "  struct Point { int x, y; };",
+        "  int pt_y(struct Point *p, long i) { return p[i].y; }",
+        "",
+        "      mov eax, dword ptr [rdi + 8*rsi + 4]",
+        "                                ^        ^",
+        "                                |        offset of the field: 4",
+        "                                size of one element: 8",
+        "",
+        "  One instruction states the entire layout: elements are 8 bytes apart, the",
+        "  field being read is 4 bytes in, and it is 4 bytes wide (dword ptr).",
+        "  That is sizeof(struct Point) == 8 and offsetof(y) == 4, recovered from",
+        "  a binary with no source and no debug information."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The three pieces and what each tells you",
+      "text": "The scale is the size of one array element. The displacement is the offset of the field within the element. The size annotation — byte, word, dword, qword — is the width of the field itself. Read those three from any array access and you have a row of the structure definition. Do it for every field the program touches and you have most of the structure."
+    },
+    {
+      "kind": "heading",
+      "text": "Padding is visible too"
+    },
+    {
+      "kind": "code",
+      "caption": "A structure that is bigger than its contents",
+      "lines": [
+        "  struct Big { long a; int b; char c; };     /* 8 + 4 + 1 = 13 bytes of data */",
+        "",
+        "  long big_a(struct Big *b, long i) { return b[i].a; }",
+        "      shl rsi, 4                             ; i * 16",
+        "      mov rax, qword ptr [rdi + rsi]         ; field a at offset 0",
+        "",
+        "  char big_c(struct Big *b, long i) { return b[i].c; }",
+        "      shl   rsi, 4                           ; i * 16",
+        "      movsx eax, byte ptr [rdi + rsi + 12]   ; field c at offset 12",
+        "",
+        "  Confirmed by running the program: sizeof(Big) = 16, offsetof(c) = 12.",
+        "",
+        "/* The struct holds 13 bytes of data and occupies 16. Three bytes of tail",
+        "   padding keep the 8-byte field aligned in the next element. And note the",
+        "   shl instead of a scale: the addressing mode allows only 1, 2, 4 and 8,",
+        "   so any element size outside that set needs a separate multiply or shift.",
+        "   Seeing shl rsi, 4 followed by [base + rsi] means elements of 16 bytes. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The C course explained alignment as a rule about where fields may sit. Here it is as a consequence you can measure: a structure declaring thirteen bytes of fields occupies sixteen, and the binary states both numbers plainly. If you reconstruct a structure and your calculated size does not match the stride the code uses, padding is the first thing to suspect and reordering the fields is the usual explanation."
+    },
+    {
+      "kind": "heading",
+      "text": "When the element size is not 1, 2, 4 or 8"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Element size",
+        "What the compiler emits"
+      ],
+      "rows": [
+        [
+          "1, 2, 4 or 8",
+          "The scale in the addressing mode; no extra instruction"
+        ],
+        [
+          "A power of two above 8",
+          "shl to multiply, then a plain base+index"
+        ],
+        [
+          "3, 5, 6, 7, 9 …",
+          "lea combinations, or imul for awkward sizes"
+        ],
+        [
+          "Not known until runtime",
+          "imul with a register operand"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Each row leaves a distinct fingerprint. A shl by 4 before an array access means sixteen-byte elements. An imul by 24 means a structure of three eight-byte fields. An imul by a register means the stride is a variable, which usually means a manually indexed two-dimensional array or a runtime-sized element."
+    },
+    {
+      "kind": "heading",
+      "text": "Two dimensions"
+    },
+    {
+      "kind": "code",
+      "caption": "A fixed row length against a runtime one",
+      "lines": [
+        "  int m2d(int (*m)[16], long i, long j) { return m[i][j]; }",
+        "      shl rsi, 6                            ; i * 64 -- 16 ints per row",
+        "      add rsi, rdi",
+        "      mov eax, dword ptr [rsi + 4*rdx]      ; + j * 4",
+        "",
+        "  int m2d_var(int *m, long cols, long i, long j) { return m[i*cols + j]; }",
+        "      imul rsi, rdx                         ; a REAL multiply",
+        "      lea  rax, [rdi + 4*rsi]",
+        "      mov  eax, dword ptr [rax + 4*rcx]",
+        "",
+        "/* Same access, two costs. When the row length is part of the type the",
+        "   compiler knows it at compile time and uses a shift; when it is a runtime",
+        "   value it must multiply. That is one reason a fixed-size 2D array can be",
+        "   faster than a pointer-plus-stride one, and it is visible in the binary. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "The row length is the thing to find first",
+      "text": "When reading unfamiliar code that walks a two-dimensional structure, identify the row stride before anything else. It tells you the width of the data, which usually tells you what the data is. A stride of 64 bytes with 4-byte elements is a 16-wide array; a stride of 3 bytes is very likely an image in 24-bit colour; a stride matching a page size suggests something aligned deliberately."
+    },
+    {
+      "kind": "heading",
+      "text": "Pointer walking versus indexing"
+    },
+    {
+      "kind": "code",
+      "caption": "Two source forms that often compile to the same thing",
+      "lines": [
+        "  for (i = 0; i < n; i++) s += a[i];      /* indexing */",
+        "  while (p < end)         s += *p++;      /* pointer walking */",
+        "",
+        "  Both typically become:",
+        "",
+        "      add  eax, dword ptr [rdi + 4*rcx]",
+        "      inc  rcx",
+        "      cmp  rsi, rcx",
+        "      jne  .Lbody",
+        "",
+        "/* The compiler chooses whichever induction variable produces better code",
+        "   and freely converts between the two forms. Writing pointer arithmetic",
+        "   by hand for speed was worthwhile decades ago; today it mostly costs",
+        "   readability and changes nothing in the output. Check before believing",
+        "   otherwise -- the disassembly settles it in seconds. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Reconstructing a structure, in order"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Find every access whose base is the same pointer",
+        "Record each one's scale, displacement and size annotation",
+        "The largest scale, or the shl/imul preceding the accesses, is the element size",
+        "Sort the displacements: those are the field offsets",
+        "The size annotation at each offset is that field's width",
+        "Check for gaps — a gap is padding, and it constrains the alignment of the next field",
+        "Check whether a field is read with movsx or movzx: signed or unsigned"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "That procedure produces a structure definition accurate enough to write in C and use, without ever seeing the original header. It is the everyday work of reverse engineering, and the only part that requires judgement is naming the fields — which the binary cannot tell you and which is why symbol names, when a binary still carries them, are so valuable."
+    },
+    {
+      "kind": "try",
+      "title": "Reconstruct a structure you did not define",
+      "steps": [
+        "Define a structure with fields of mixed sizes and write four accessor functions",
+        "Compile at -O1 and record the scale, displacement and size for each accessor",
+        "From those numbers alone, write down what you think the structure is",
+        "Compare with your definition, including the padding",
+        "Add a printf of sizeof and offsetof to confirm the sizes you inferred",
+        "Reorder the fields to remove padding and recompile; watch the scale change",
+        "Write both an indexed and a pointer-walking loop and compare the assembly",
+        "Write a 2D access with a fixed row length and a runtime one, and find the shl and the imul"
+      ],
+      "expected": "A reconstructed definition that matches, a stride that shrinks when you reorder the fields, and identical assembly from the two loop forms. The reorder step is worth doing twice: it is the same field-ordering advice the C course gave for saving memory, and here you can watch it change the generated code."
+    }
+  ],
+  "cheatsheet": [
+    "A memory operand states three facts: element size (scale), field offset (displacement), field width (size annotation)",
+    "mov eax, dword ptr [rdi + 8*rsi + 4] means 8-byte elements, field at offset 4, 4 bytes wide",
+    "Scale supports only 1, 2, 4 and 8; other element sizes need shl or imul first",
+    "shl by 4 before an access means 16-byte elements",
+    "imul by a register means the stride is a runtime value",
+    "A struct declaring 13 bytes can occupy 16; the padding is visible as the stride",
+    "Fixed-length rows compile to a shift; runtime row lengths compile to a multiply",
+    "Find the row stride first when reading unfamiliar two-dimensional code",
+    "Indexed loops and pointer-walking loops usually compile to the same instructions",
+    "movsx versus movzx at a field tells you whether it is signed"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "You see mov eax, dword ptr [rdi + 8*rsi + 4]. What does it tell you about the data?",
+      "choices": {
+        "A": "Only that it is an array",
+        "B": "Elements are 8 bytes apart, the field starts 4 bytes into each element, and the field is 4 bytes wide",
+        "C": "The array has 8 elements",
+        "D": "The index is multiplied by 4"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Scale, displacement and size annotation give element size, field offset and field width — one row of the structure definition, from one instruction."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "An access is preceded by shl rsi, 4 and then uses [rdi + rsi + 12]. What are the element size and field offset?",
+      "choices": {
+        "A": "4 and 12",
+        "B": "16 and 12 — the shift by 4 multiplies the index by 16 because the scale field cannot express it",
+        "C": "12 and 16",
+        "D": "8 and 12"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The addressing mode allows scales of 1, 2, 4 and 8 only. Any other element size appears as a separate shift or multiply, which is itself the clue."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A struct declares long a; int b; char c; — thirteen bytes of fields — but the stride is 16. Why?",
+      "choices": {
+        "A": "The compiler reserved space for future fields",
+        "B": "Padding: three bytes at the end keep the 8-byte field of the next element aligned",
+        "C": "The char is stored as an int",
+        "D": "Sixteen is the minimum struct size"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Confirmed by running the program: sizeof is 16 and offsetof(c) is 12. If a reconstructed size does not match the stride, padding is the first suspect."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why does m[i][j] with a fixed row length compile to shl while m[i*cols + j] compiles to imul?",
+      "choices": {
+        "A": "The second is written badly",
+        "B": "A fixed row length is known at compile time so the multiply becomes a shift; a runtime row length must actually be multiplied",
+        "C": "imul is faster than shl",
+        "D": "They are unrelated constructs"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Same access, two costs, and the difference is visible in the binary. It is one reason a fixed-size two-dimensional array can outperform a pointer-plus-stride one."
+    }
+  ]
+}

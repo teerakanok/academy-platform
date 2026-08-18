@@ -1,0 +1,271 @@
+{
+  "nodeId": "loops-in-assembly",
+  "locale": "en",
+  "title": "Finding the loop, and what became of it",
+  "objective": "By the end of this lesson you can locate a loop in disassembly in seconds, explain loop rotation and why compilers do it, and recognise a vectorised loop from its instructions.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A loop is the easiest structure to find in a disassembly and one of the hardest to be sure you have understood, because the shape the compiler produces is usually not the shape you wrote."
+    },
+    {
+      "kind": "heading",
+      "text": "Finding one takes two seconds"
+    },
+    {
+      "kind": "code",
+      "caption": "The only structural signature a loop has",
+      "lines": [
+        "  A backward jump. That is all.",
+        "",
+        "  .Lbody:                  <-- a label",
+        "      ...",
+        "      jne  .Lbody          <-- a jump BACKWARD to it",
+        "",
+        "  In objdump output with addresses, look for a jump whose target address",
+        "  is LOWER than the jump's own address:",
+        "",
+        "      1120:  add  eax, [rdi + 4*rcx]",
+        "      1123:  inc  rcx",
+        "      1126:  cmp  rsi, rcx",
+        "      1129:  jne  1120           <-- 1120 is below 1129: a loop",
+        "",
+        "/* Everything between the target and the jump is the loop body. This one",
+        "   test finds every loop in any binary, regardless of what the source",
+        "   said or which language it was written in. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The test moved to the bottom"
+    },
+    {
+      "kind": "code",
+      "caption": "A while loop compiled at -O1",
+      "lines": [
+        "  int w_loop(const int *a, long n) { int s=0; long i=0; while (i<n) { s+=a[i]; i++; } return s; }",
+        "",
+        "  _w_loop:",
+        "      test rsi, rsi                     ; n <= 0?",
+        "      jle  .Lempty                      ; the GUARD, tested once",
+        "      xor  ecx, ecx                     ; i = 0",
+        "      xor  eax, eax                     ; s = 0",
+        "  .Lbody:                               ; <-- the loop starts HERE",
+        "      add  eax, dword ptr [rdi + 4*rcx] ; s += a[i]",
+        "      inc  rcx                          ; i++",
+        "      cmp  rsi, rcx",
+        "      jne  .Lbody                       ; the TEST, at the BOTTOM",
+        "      ret",
+        "  .Lempty:",
+        "      xor  eax, eax",
+        "      ret",
+        "",
+        "/* The source tests at the top; the binary tests at the bottom, with a",
+        "   separate guard for the zero-iteration case. One branch per iteration",
+        "   instead of two, and the bottom branch is taken every time but the last,",
+        "   which is exactly the pattern a predictor learns immediately. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Loop rotation",
+      "text": "A while loop tests before each iteration. Compiled directly that means a test and a backward jump every time round — two branches per iteration. Rotating the loop moves the test to the bottom and hoists a single guard above the loop, giving one branch per iteration. The guard runs once; the body's branch is taken every time except the last. This is why nearly every compiled loop looks like a do-while regardless of what the source said."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "You wrote",
+        "The binary contains",
+        "Because"
+      ],
+      "rows": [
+        [
+          "while (cond) body",
+          "if (!cond) skip; do body while (cond)",
+          "One branch per iteration instead of two"
+        ],
+        [
+          "for (init; cond; step)",
+          "The same, with init before the guard",
+          "for is while with the pieces rearranged"
+        ],
+        [
+          "do body while (cond)",
+          "The same, with no guard",
+          "It always runs at least once, so no guard is needed"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The third row is why a do-while sometimes produces smaller code than the equivalent while: the guard is genuinely unnecessary. When a loop's count is known to be at least one, writing it as do-while tells the compiler something it may not be able to prove."
+    },
+    {
+      "kind": "heading",
+      "text": "Loops that are not there any more"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "What you see instead of a loop",
+        "What happened"
+      ],
+      "rows": [
+        [
+          "Arithmetic with imul and shifts",
+          "The loop had a closed form and the compiler used it"
+        ],
+        [
+          "A call to memcpy, memset or strlen",
+          "The loop was recognised as a standard operation"
+        ],
+        [
+          "The same body repeated several times",
+          "Unrolling: fewer branches, more instructions"
+        ],
+        [
+          "xmm registers and instructions ending in d, q, b or w",
+          "Vectorisation: several elements per iteration"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The second row surprises people",
+      "text": "A hand-written loop that walks a string counting characters can compile into a call to the library strlen. The compiler recognised the idiom and substituted a routine that is faster than anything the loop would have produced. If you are looking for your loop and find a call instead, this is why — and it is a reason to check the disassembly before concluding that a hand-written version beat the library."
+    },
+    {
+      "kind": "heading",
+      "text": "What vectorisation looks like"
+    },
+    {
+      "kind": "code",
+      "caption": "The same three-line loop at a higher optimisation level",
+      "lines": [
+        "  The SAME loop compiled at -O2 instead of -O1:",
+        "",
+        "      cmp     rsi, 8",
+        "      jae     .Lvector                      ; enough elements to vectorise?",
+        "      ...scalar path for short arrays...",
+        "  .Lvector:",
+        "      movabs  rcx, 9223372036854775800      ; n rounded down to a multiple of 8",
+        "      and     rcx, rsi",
+        "      pxor    xmm0, xmm0                    ; two vector accumulators",
+        "      pxor    xmm1, xmm1",
+        "  .Lloop:",
+        "      movdqu  xmm2, xmmword ptr [rdi + 4*rax]        ; 4 ints",
+        "      paddd   xmm0, xmm2",
+        "      movdqu  xmm2, xmmword ptr [rdi + 4*rax + 16]   ; 4 more",
+        "      paddd   xmm1, xmm2",
+        "      add     rax, 8",
+        "      cmp     rcx, rax",
+        "      jne     .Lloop",
+        "      paddd   xmm1, xmm0                    ; combine the two accumulators",
+        "      pshufd  xmm0, xmm1, 238               ; then fold 4 lanes down to 1",
+        "      ...",
+        "      ...scalar tail for the leftover elements...",
+        "",
+        "/* Three lines of C became 111 lines of assembly: a length check, a vector",
+        "   loop handling eight elements per iteration with two accumulators, a",
+        "   horizontal reduction to add the lanes together, and a scalar tail. */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Four features identify a vectorised loop on sight: xmm or ymm registers, instructions whose names end in a size letter such as paddd, a length check before the loop deciding whether vectorising is worthwhile, and a scalar tail afterwards for the elements that did not fill a full vector. Once you recognise the shape, the size letter tells you the element type — paddd is packed add of doublewords, so four 32-bit integers at a time in a 128-bit register."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Two accumulators, again",
+      "text": "The vector loop uses xmm0 and xmm1 as separate accumulators and adds them together at the end. That is exactly the dependency-chain-breaking technique the architecture course measured at four times the throughput. Here the compiler applied it without being asked — for integers, where regrouping is exact. For floating point it would need permission, because regrouping changes the result."
+    },
+    {
+      "kind": "try",
+      "title": "Watch a loop change shape",
+      "steps": [
+        "Write a loop summing an int array and compile it at -O0, -O1 and -O2",
+        "Count the instructions in the loop body at each level",
+        "At -O1, identify the guard, the body and the bottom test",
+        "At -O2, find the vector loop, the length check and the scalar tail",
+        "Rewrite the loop as a do-while and see whether the guard disappears",
+        "Write a loop that copies bytes from one buffer to another and look for a memcpy call",
+        "Write a loop whose result has a closed form and confirm the loop vanishes",
+        "For each backward jump you find, state what its loop body does in one sentence"
+      ],
+      "expected": "A body that shrinks and then explodes: -O0 verbose, -O1 tight and scalar, -O2 long because it contains three versions of the same loop. That last observation is worth keeping — more assembly does not mean slower. The -O2 version is longer precisely because it handles the common case eight elements at a time."
+    }
+  ],
+  "cheatsheet": [
+    "A loop's only signature is a backward jump: a target address lower than the jump's own",
+    "Everything between the target and the jump is the loop body",
+    "Compilers rotate loops: guard above, test at the bottom, one branch per iteration",
+    "This is why compiled while loops look like do-while loops",
+    "A do-while needs no guard, so it can produce slightly smaller code",
+    "A loop replaced by imul and shifts had a closed form",
+    "A loop replaced by a call was recognised as memcpy, memset or strlen",
+    "Vectorisation signs: xmm registers, size-suffixed names like paddd, a length check, a scalar tail",
+    "paddd is packed add of doublewords: four 32-bit integers at once",
+    "Vector loops use several accumulators for the same reason scalar code should"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "How do you find every loop in a disassembly?",
+      "choices": {
+        "A": "Look for labels",
+        "B": "Look for a jump whose target address is lower than the jump's own address",
+        "C": "Look for cmp instructions",
+        "D": "Look for the loop instruction"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A backward jump is the only structural signature a loop has, and it works regardless of source language or optimisation level."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A while loop compiles with a guard at the top and the test at the bottom. Why?",
+      "choices": {
+        "A": "To make the code smaller",
+        "B": "Testing at the bottom gives one branch per iteration instead of two; the guard handles the zero-iteration case once",
+        "C": "The hardware requires it",
+        "D": "To help the debugger"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "This is loop rotation. It is why nearly every compiled loop resembles a do-while regardless of what the source said."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "You see xmm registers, paddd, a cmp against 8 before the loop, and a second scalar loop after it. What is this?",
+      "choices": {
+        "A": "Floating-point code",
+        "B": "A vectorised loop: the check decides whether vectorising is worthwhile, the vector body handles several elements per iteration, and the tail finishes the remainder",
+        "C": "An unrolled loop",
+        "D": "Two unrelated loops"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "All four features together are the signature. paddd is packed add of doublewords — four 32-bit integers per instruction."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "You look for your hand-written character-counting loop and find a call to strlen instead. What happened?",
+      "choices": {
+        "A": "The linker substituted it",
+        "B": "The compiler recognised the idiom and replaced the loop with the library routine",
+        "C": "The source was miscompiled",
+        "D": "strlen was inlined into the loop"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Idiom recognition is routine at higher optimisation levels. It is also a reason to check the disassembly before claiming a hand-written version beat the library."
+    }
+  ]
+}
