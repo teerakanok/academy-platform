@@ -1,0 +1,261 @@
+{
+  "nodeId": "risc-vs-cisc",
+  "locale": "en",
+  "title": "Two philosophies, and what actually survived",
+  "objective": "By the end of this lesson you can state what each approach optimised for, explain why the distinction matters less than it once did, and say which of its consequences you can still observe today.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "For a long time the field had two answers to one question: should an instruction set be large and expressive, or small and regular? Both approaches were reasonable given the constraints of their time, and the interesting part is not who won but which constraints changed."
+    },
+    {
+      "kind": "heading",
+      "text": "The two positions"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "Complex instruction set",
+        "Reduced instruction set"
+      ],
+      "rows": [
+        [
+          "Instruction count",
+          "Many, some very specialised",
+          "Few, deliberately regular"
+        ],
+        [
+          "Instruction length",
+          "Variable",
+          "Usually fixed"
+        ],
+        [
+          "Memory access",
+          "Many instructions can touch memory",
+          "Only load and store"
+        ],
+        [
+          "One instruction can",
+          "Do several things at once",
+          "Do one thing"
+        ],
+        [
+          "Optimised for",
+          "Small programs, hand-written assembly",
+          "Simple, fast hardware"
+        ],
+        [
+          "Example",
+          "x86-64",
+          "RISC-V, aarch64"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The complex approach was right when memory was scarce and expensive and much code was written by hand: an instruction that did more meant a smaller program and less typing. The reduced approach became right when compilers improved and memory became cheap: what mattered then was hardware that could be made fast, and regular instructions are far easier to pipeline."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The decisive argument was about pipelines, which is the next module",
+      "text": "Fixed-length, regular instructions can be decoded before you know what they are, which is what makes it practical to have several in flight at once. Variable-length instructions must be partly decoded to find where the next one begins. That single property is most of why the reduced approach won the architectural argument — and understanding why is the reason the pipeline module comes shortly after this one."
+    },
+    {
+      "kind": "heading",
+      "text": "What actually happened"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Neither side won cleanly. Modern x86-64 processors decode their complex instructions into simpler internal operations and then execute those with the same techniques a reduced design uses. The external contract stayed complex, for compatibility; the internal implementation became something else entirely. That is the ISA-versus-implementation split from the previous lesson, at its largest scale."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "The instruction set you program against is a compatibility surface, not a description of the hardware",
+        "A complex instruction may become several internal operations, or occasionally one",
+        "Reduced designs also grew: modern aarch64 and RISC-V have far more instructions than the original arguments imagined",
+        "The practical difference today is decoding cost, code density, and how easy the ISA is to implement — not a philosophy"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "What you can still observe"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Observable",
+        "On x86-64",
+        "On aarch64 / RISC-V"
+      ],
+      "rows": [
+        [
+          "Instruction length",
+          "1 to 15 bytes",
+          "Fixed 4 bytes (RISC-V also has a 2-byte compressed form)"
+        ],
+        [
+          "Finding the next instruction",
+          "Requires decoding this one",
+          "Add 4"
+        ],
+        [
+          "Code size",
+          "Often smaller",
+          "Often larger"
+        ],
+        [
+          "Disassembly by hand",
+          "Impractical",
+          "Feasible"
+        ],
+        [
+          "Instructions that read and write memory",
+          "Many",
+          "Load and store only"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Variable length is why a corrupted address produces nonsense",
+      "text": "On x86-64, starting to disassemble one byte late produces a completely different, still-valid-looking instruction stream, because the decoder simply reads whatever is there. On a fixed-length architecture that cannot happen — every instruction starts on a four-byte boundary. This is a real consideration when reading disassembly, and it is one of the reasons the Assembly course spends time on where instruction boundaries actually are."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured: real aarch64 object code, addresses and bytes",
+      "lines": [
+        "_add_elem:",
+        "  0000  ldr  w8, [x0, w1, sxtw #2]      b861d808",
+        "  0004  ldr  w9, [x0, w2, sxtw #2]      b862d809",
+        "  0008  add  w0, w9, w8                 0b080120",
+        "  000c  ret                             d65f03c0",
+        "",
+        "# Every address advances by exactly 4, and every instruction is 4 bytes.",
+        "# Note also the load-store rule in action: two ldr instructions bring the",
+        "# values in, and the add works only on registers."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "What fixed length costs"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A four-byte instruction cannot contain a 64-bit constant, so large values must be assembled from several instructions. This is the price paid for the regularity, and it is directly visible in generated code."
+    },
+    {
+      "kind": "code",
+      "caption": "Measured: building one 64-bit constant on aarch64",
+      "lines": [
+        "long big(long x) { return x * 1234567890123L + 987654321; }",
+        "",
+        "  mov   x8, #0x4cb",
+        "  movk  x8, #0x71fb, lsl #16        <- three instructions to place",
+        "  movk  x8, #0x11f,  lsl #32           one 64-bit constant",
+        "  mov   w9, #0x68b1",
+        "  movk  w9, #0x3ade, lsl #16        <- two more for the 32-bit one",
+        "  madd  x0, x0, x8, x9",
+        "",
+        "# A variable-length architecture would encode the constant inline in one",
+        "# instruction. That is the density advantage — paid for with a decoder",
+        "# that must read an instruction to learn where it ends."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The load-store rule is the one that shapes code"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The rule that only load and store touch memory has more effect on generated code than any other difference. It means every computation happens between registers, and any value from memory must be loaded first and stored back explicitly. That makes the cost of memory access visible in the instruction stream, which the next module builds on directly."
+    },
+    {
+      "kind": "try",
+      "title": "Compare the two on your own machine",
+      "steps": [
+        "Write a small C function that adds two array elements and stores the result",
+        "Compile with: cc -S -O2 f.c -o -    and read the assembly for your architecture",
+        "Count how many instructions touch memory and how many operate only on registers",
+        "If you have a cross-compiler or an online compiler, produce the same function for the other architecture and compare",
+        "Compile a whole small program and compare the size of the machine code section: size ./prog",
+        "Run: objdump -d ./prog | head -30    and look at the byte counts per instruction",
+        "On x86-64, note that the byte counts vary; on aarch64, note that they do not",
+        "Explain in one sentence why that difference matters for a pipeline"
+      ],
+      "expected": "Two instruction streams for the same function, a count of memory-touching instructions, and a direct observation of fixed versus variable length in the byte columns. That last observation is the one the pipeline module will assume you have made."
+    }
+  ],
+  "cheatsheet": [
+    "Complex sets: many instructions, variable length, many can touch memory",
+    "Reduced sets: few regular instructions, fixed length, only load and store touch memory",
+    "Complex suited scarce memory and hand-written assembly; reduced suited compilers and fast hardware",
+    "Fixed-length, regular instructions are far easier to pipeline — that was the decisive argument",
+    "Modern x86-64 decodes complex instructions into simpler internal operations",
+    "The ISA is a compatibility surface, not a description of the hardware",
+    "x86-64 instructions are 1 to 15 bytes; aarch64 is fixed at 4",
+    "Variable length means disassembling from the wrong offset yields plausible nonsense",
+    "The load-store rule makes the cost of memory access visible in the instruction stream"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why are fixed-length instructions easier to pipeline?",
+      "choices": {
+        "A": "They execute faster",
+        "B": "The next instruction's position is known without decoding this one, so several can be fetched and decoded at once",
+        "C": "They use fewer registers",
+        "D": "They need no cache"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "With variable length you must partly decode an instruction to learn where the next begins. That serialisation is what makes overlapping harder, and it was the decisive argument in the debate."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A modern x86-64 processor executes complex instructions. How?",
+      "choices": {
+        "A": "Directly, in dedicated hardware per instruction",
+        "B": "It decodes them into simpler internal operations and executes those with the same techniques a reduced design uses",
+        "C": "It emulates them in software",
+        "D": "It translates them to aarch64"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The external contract stayed complex for compatibility while the implementation became something else. That is the ISA-versus-implementation split at its largest scale."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "You disassemble x86-64 code starting one byte too late. What do you see?",
+      "choices": {
+        "A": "An error",
+        "B": "A completely different but still plausible-looking instruction stream, because the decoder reads whatever bytes are there",
+        "C": "The same instructions",
+        "D": "Nothing decodes"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Variable-length encoding has no alignment to resynchronise on. A fixed-length architecture cannot have this problem, since every instruction begins on a four-byte boundary."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "What does the load-store rule change about generated code?",
+      "choices": {
+        "A": "It makes programs smaller",
+        "B": "Every computation happens between registers, so memory access appears explicitly as separate load and store instructions",
+        "C": "It removes the need for a cache",
+        "D": "It allows more registers"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The cost of touching memory becomes visible in the instruction stream rather than hidden inside an arithmetic instruction, which is what the following modules build their reasoning on."
+    }
+  ]
+}

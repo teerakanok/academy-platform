@@ -1,0 +1,46 @@
+{
+  "locale": "en",
+  "title": "Computer Architecture",
+  "subtitle": "What the processor is doing between one instruction and the next",
+  "audience": "For anyone who can read C and has met the operating system's view of memory, and now wants the layer beneath it: how an instruction is encoded, how the hardware executes several at once, and why the same algorithm can be an order of magnitude faster depending on how it touches memory.",
+  "outcomes": [
+    "Decode a real machine instruction into its fields by hand",
+    "Explain what a pipeline overlaps and what stops it",
+    "Reason about a branch's cost in terms of prediction rather than instructions",
+    "Explain a cache miss in terms of the access pattern that caused it",
+    "Rewrite a loop so it runs measurably faster without changing what it computes",
+    "Read a memory specification and say what it does and does not tell you"
+  ],
+  "skillLabels": {
+    "isa": "Instruction set",
+    "machine-code": "Machine code",
+    "datapath": "Datapath",
+    "pipelining": "Pipelining",
+    "memory": "Memory hierarchy",
+    "performance": "Performance reasoning"
+  },
+  "nodeTitles": {
+    "what-is-an-isa": "The contract between hardware and software",
+    "risc-vs-cisc": "Two philosophies, and what actually survived",
+    "instruction-encoding": "How an instruction becomes bits",
+    "instruction-formats": "Reading RISC-V instruction formats",
+    "addressing-modes": "How an instruction names its data",
+    "load-store-architecture": "Only two instructions touch memory",
+    "calling-convention": "Decode a real function call by hand",
+    "single-cycle-datapath": "The path one instruction takes through the hardware",
+    "control-signals": "What tells each part what to do",
+    "multi-cycle-and-cpi": "Cycles per instruction, and why it matters",
+    "pipeline-stages": "Overlapping instructions to finish more",
+    "throughput-vs-latency": "Two different questions about speed",
+    "data-hazards-and-forwarding": "When an instruction needs a result that is not ready",
+    "load-use-stall": "The one hazard that cannot be forwarded away",
+    "control-hazards-and-prediction": "Guessing which way a branch goes",
+    "locality": "Why the same memory is asked for again",
+    "cache-mapping": "Where a cache decides to put a line",
+    "hit-miss-and-write-policy": "Hits, misses, and what happens on a write",
+    "cache-friendly-code": "Make the same algorithm measurably faster",
+    "dram-cells-and-timing": "What main memory actually is",
+    "ddr-generations": "Reading a memory specification",
+    "bandwidth-numa-hbm": "When bandwidth, not latency, is the limit"
+  }
+}

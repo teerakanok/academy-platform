@@ -1,0 +1,65 @@
+{
+  "id": "computer-architecture",
+  "slug": "computer-architecture",
+  "version": "1.0.0",
+  "publicAvailability": "internal",
+  "defaultLocale": "en",
+  "availableLocales": [
+    "en",
+    "th"
+  ],
+  "level": "intermediate",
+  "estimatedMinutes": 33,
+  "coverMotif": "layers",
+  "skills": [
+    {
+      "id": "isa",
+      "maxScore": 100
+    },
+    {
+      "id": "machine-code",
+      "maxScore": 100
+    },
+    {
+      "id": "datapath",
+      "maxScore": 100
+    },
+    {
+      "id": "pipelining",
+      "maxScore": 100
+    },
+    {
+      "id": "memory",
+      "maxScore": 100
+    },
+    {
+      "id": "performance",
+      "maxScore": 100
+    }
+  ],
+  "globalSkillWeights": {
+    "foundations": 1
+  },
+  "nodes": [
+    {
+      "id": "what-is-an-isa",
+      "kind": "lesson",
+      "prerequisites": [],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "isa": 4
+      }
+    },
+    {
+      "id": "risc-vs-cisc",
+      "kind": "lesson",
+      "prerequisites": [
+        "what-is-an-isa"
+      ],
+      "estimatedMinutes": 17,
+      "skillWeights": {
+        "isa": 4
+      }
+    }
+  ]
+}

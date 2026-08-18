@@ -1,0 +1,207 @@
+{
+  "nodeId": "what-is-an-isa",
+  "locale": "en",
+  "title": "The contract between hardware and software",
+  "objective": "By the end of this lesson you can say what an instruction set actually specifies, explain why the same program runs on chips built decades apart, and identify which properties of a machine the ISA does and does not fix.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Every course so far has treated the processor as something that runs your code. This one opens it. The first thing to be clear about is what an instruction set is: not a design for a chip, but a written contract saying what a chip must do — which instructions exist, what each one means, what registers there are, and how memory is addressed. Anything not in that contract is free for the designer to change."
+    },
+    {
+      "kind": "heading",
+      "text": "What the contract fixes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Specified by the ISA",
+        "Left to the implementation"
+      ],
+      "rows": [
+        [
+          "Which instructions exist and what each does",
+          "How many can execute at once"
+        ],
+        [
+          "How many registers, and their names",
+          "How deep the pipeline is"
+        ],
+        [
+          "How instructions are encoded into bits",
+          "Whether there is a cache, and how large"
+        ],
+        [
+          "How memory addresses are formed",
+          "The clock speed"
+        ],
+        [
+          "What happens on an interrupt or fault",
+          "How branches are predicted"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "That split is why a program compiled twenty years ago still runs today. The contract did not change; everything on the right did, repeatedly, and none of it was visible to the program. It is also why two chips implementing the same ISA can differ in speed by a large factor while producing identical results."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "You have already seen the contract's edges",
+      "text": "The operating systems course showed that system call numbers differ between architectures — read is 0 on x86-64 and 63 on aarch64 — and that aarch64 has no open or fork at all. Those are ISA-level facts: different contracts, different numbering. The C course's point that int is not guaranteed to be four bytes has the same root. Each time a course said 'this depends on the architecture', it was pointing at this contract."
+    },
+    {
+      "kind": "heading",
+      "text": "What a processor actually does"
+    },
+    {
+      "kind": "code",
+      "caption": "The loop underneath every program you have written",
+      "lines": [
+        "for (;;) {",
+        "    instruction = memory[program_counter];   /* fetch  */",
+        "    decode(instruction);                     /* decode */",
+        "    execute(instruction);                    /* execute */",
+        "    program_counter = next_address;          /* advance, or jump */",
+        "}",
+        "",
+        "/* Everything in this course is an elaboration of these four steps:",
+        "   how the instruction is encoded so decoding is cheap, how several",
+        "   can be in flight at once, and how the memory read in step one is",
+        "   made fast enough not to dominate. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Registers: the storage the ISA names"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Registers are the small set of storage locations that instructions can name directly. They are the fastest storage a program can use, and the number of them is part of the contract — which means compilers are written against a fixed count and cannot simply ask for more."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Architecture",
+        "General-purpose registers",
+        "Notes"
+      ],
+      "rows": [
+        [
+          "x86-64",
+          "16",
+          "Grew from 8 in the 32-bit form"
+        ],
+        [
+          "aarch64",
+          "31",
+          "Plus a dedicated zero register"
+        ],
+        [
+          "RISC-V (RV64I)",
+          "31",
+          "Plus x0, which always reads as zero"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "A register that is always zero sounds wasteful and is not",
+      "text": "Both aarch64 and RISC-V dedicate a register to the constant zero. It removes the need for separate instructions: comparing against zero, moving a value, and discarding a result all become ordinary arithmetic with that register as an operand. One register spent buys several instructions not needed — which is the kind of trade this course is about."
+    },
+    {
+      "kind": "heading",
+      "text": "Why this course uses RISC-V for the details"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The instruction encodings in the next few lessons are RISC-V, for one reason: they are small enough to decode by hand in a few minutes. The x86-64 encoding is the accumulated result of forty years of compatibility and cannot be taught that way. The concepts — fields, formats, addressing, the calling convention — transfer directly; only the bit layouts differ. The Assembly course that follows this one uses x86-64, because that is what you will meet when reading real disassembly on a desktop or server."
+    },
+    {
+      "kind": "try",
+      "title": "Look at your own machine's contract",
+      "steps": [
+        "Run: uname -m      and note which ISA you are on",
+        "Run: cc -dumpmachine    and read the full target triple",
+        "Write a one-line C function that adds two integers and compile it with: cc -S -O2 f.c -o -",
+        "Read the assembly and identify the register names — they are ISA-defined",
+        "Compile the same file with -O0 and compare how many instructions the same function takes",
+        "Run: cc -march=native -Q --help=target 2>/dev/null | head -20    (the features your chip reports)",
+        "Read: sysctl -a 2>/dev/null | grep -iE 'cpu.*(brand|features)' | head -5    or on Linux: lscpu",
+        "Write down which of the things listed there are ISA and which are implementation"
+      ],
+      "expected": "Your machine's architecture named, its register names read from generated assembly, and a list you have sorted into contract and implementation. That last exercise is the one that matters: being able to say which properties a program may rely on and which it may not is the whole point of this lesson."
+    }
+  ],
+  "cheatsheet": [
+    "An ISA is a contract: which instructions exist, what they mean, how they are encoded",
+    "It fixes registers, encodings, addressing, and fault behaviour",
+    "It leaves pipeline depth, caches, clock speed and branch prediction to the implementation",
+    "That split is why old programs still run and why two chips differ in speed but not in results",
+    "The processor's core loop is fetch, decode, execute, advance",
+    "x86-64 has 16 general-purpose registers; aarch64 and RISC-V have 31 plus a zero register",
+    "A dedicated zero register removes the need for several separate instructions",
+    "This course teaches encodings with RISC-V because they can be decoded by hand",
+    "The Assembly course uses x86-64, because that is what real disassembly shows"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Two processors implement the same ISA. One is three times faster. What must be identical?",
+      "choices": {
+        "A": "Their pipeline depth",
+        "B": "The result of every program — the ISA fixes meaning, not speed",
+        "C": "Their cache sizes",
+        "D": "Their clock speed"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Everything the contract specifies must match; everything else is free. That is precisely what allows one implementation to be much faster without breaking any program."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why does aarch64 have no fork system call while x86-64 does?",
+      "choices": {
+        "A": "aarch64 cannot create processes",
+        "B": "System call numbering is part of each architecture's contract, and aarch64 was defined when clone had already replaced fork",
+        "C": "It is an operating system difference, not an architecture one",
+        "D": "The C library removed it"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The operating systems course measured this directly. It is an ISA-level fact, which is why the C library provides fork on both by translating it to what the architecture actually offers."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "What does dedicating a register to the constant zero buy?",
+      "choices": {
+        "A": "Faster arithmetic",
+        "B": "Several operations — comparison with zero, moving a value, discarding a result — become ordinary instructions instead of needing their own",
+        "C": "More memory bandwidth",
+        "D": "Simpler cache design"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "One register spent removes the need for several special instructions, which keeps both the encoding and the decoder smaller. It is a representative trade for this whole course."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Which of these may a program safely rely on?",
+      "choices": {
+        "A": "The size of the cache",
+        "B": "The number of registers the ISA defines",
+        "C": "The pipeline depth",
+        "D": "The clock speed"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Registers are in the contract; the other three are implementation choices that change between chips implementing the same ISA and must not affect a program's correctness."
+    }
+  ]
+}
