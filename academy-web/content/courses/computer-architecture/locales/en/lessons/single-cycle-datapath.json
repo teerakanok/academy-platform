@@ -1,0 +1,243 @@
+{
+  "nodeId": "single-cycle-datapath",
+  "locale": "en",
+  "title": "The path one instruction takes through the hardware",
+  "objective": "By the end of this lesson you can name the five stages an instruction passes through, say which stages each kind of instruction actually uses, and explain why the slowest instruction sets the clock speed.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "You can now decode an instruction into fields. This lesson follows one through the hardware that acts on those fields. The path is the same for every instruction, which is what makes the design uniform — and it is also the source of its central weakness."
+    },
+    {
+      "kind": "heading",
+      "text": "Five stages"
+    },
+    {
+      "kind": "code",
+      "caption": "The datapath, drawn as the stages an instruction passes through",
+      "lines": [
+        "  +----------+     +----------+     +----------+     +--------+     +--------+",
+        "  |  fetch   | --> |  decode  | --> | execute  | --> | memory | --> | write  |",
+        "  |          |     |          |     |          |     |        |     | back   |",
+        "  | read the |     | split    |     | the ALU  |     | load   |     | put the|",
+        "  | instr at |     | fields,  |     | computes |     | or     |     | result |",
+        "  | the PC   |     | read the |     | or the   |     | store  |     | in rd  |",
+        "  |          |     | registers|     | address  |     |        |     |        |",
+        "  +----------+     +----------+     +----------+     +--------+     +--------+",
+        "",
+        "  Every instruction walks left to right. Not every instruction uses",
+        "  every stage — but in a single-cycle design, every instruction takes",
+        "  the time of the slowest path through all of them."
+      ]
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Stage",
+        "Reads",
+        "Produces"
+      ],
+      "rows": [
+        [
+          "Fetch",
+          "Memory at the program counter",
+          "The 32-bit instruction"
+        ],
+        [
+          "Decode",
+          "The instruction's fields",
+          "Register values, the immediate, control signals"
+        ],
+        [
+          "Execute",
+          "Register values or the immediate",
+          "An arithmetic result, or an address"
+        ],
+        [
+          "Memory",
+          "Data memory, if this is a load or store",
+          "The loaded value, or nothing"
+        ],
+        [
+          "Write back",
+          "The result",
+          "A register updated"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Not every instruction uses every stage"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Instruction",
+        "Fetch",
+        "Decode",
+        "Execute",
+        "Memory",
+        "Write back"
+      ],
+      "rows": [
+        [
+          "add x5, x6, x7",
+          "yes",
+          "yes",
+          "yes",
+          "no",
+          "yes"
+        ],
+        [
+          "lw x5, 8(x6)",
+          "yes",
+          "yes",
+          "yes (address)",
+          "yes",
+          "yes"
+        ],
+        [
+          "sw x5, 8(x6)",
+          "yes",
+          "yes",
+          "yes (address)",
+          "yes",
+          "no"
+        ],
+        [
+          "beq x5, x6, label",
+          "yes",
+          "yes",
+          "yes (compare)",
+          "no",
+          "no"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Read that table against the format lesson and the pattern appears: the instructions with no write-back are exactly the ones whose format has no rd field. The hardware and the encoding agree because they were designed together."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "In a single-cycle design, every instruction costs the same as the slowest",
+      "text": "If one instruction completes per clock cycle, the cycle must be long enough for the longest path — which is a load, because it passes through all five stages including a memory access. An add, which does not touch memory, finishes early and then waits. The clock speed of the entire machine is therefore set by its slowest instruction, and every fast instruction pays for it."
+    },
+    {
+      "kind": "heading",
+      "text": "Where the time goes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The stages are not equally expensive. Reading the register file is fast; reading memory is comparatively slow, which is the entire reason the cache module later in this course exists. A single-cycle design must budget for the slow case on every instruction, and that observation leads directly to the two designs that follow: doing the stages in separate cycles, and overlapping different instructions' stages."
+    },
+    {
+      "kind": "heading",
+      "text": "What the program counter does"
+    },
+    {
+      "kind": "code",
+      "caption": "The default and the exception",
+      "lines": [
+        "  next PC = PC + 4          /* the usual case: the next instruction */",
+        "",
+        "  next PC = PC + offset     /* a taken branch or jump */",
+        "",
+        "/* The +4 is why instructions are 4 bytes and why the branch format",
+        "   could drop its lowest offset bit — the hardware only ever adds",
+        "   multiples of 4 to the program counter. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The branch problem is visible already",
+      "text": "The next instruction's address is known immediately in the common case, but a branch's target is not known until the compare has been done in the execute stage. In a single-cycle design that costs nothing, because the whole instruction finishes before the next begins. The moment instructions overlap, it becomes the central difficulty — which is exactly what the hazard module is about."
+    },
+    {
+      "kind": "try",
+      "title": "Trace instructions through the stages",
+      "steps": [
+        "For add x5, x6, x7, write down what each of the five stages does or does not do",
+        "Do the same for lw x5, 8(x6) and note which stage the address is computed in",
+        "Do the same for sw and explain why write-back is unused",
+        "Do the same for beq and explain why both memory and write-back are unused",
+        "Match each unused write-back against the instruction format that lacks rd",
+        "If a load takes 5 units of time through the stages and an add takes 4, what is the single-cycle clock period?",
+        "How much time does the add waste on each execution?",
+        "Compile a small function and count how many of its instructions are loads or stores"
+      ],
+      "expected": "A stage-by-stage trace for four instruction kinds, the connection between an unused write-back and a missing rd field, and a calculation showing what a fast instruction pays for a slow one. That last number is the motivation for everything in the next two modules."
+    }
+  ],
+  "cheatsheet": [
+    "Five stages: fetch, decode, execute, memory, write back",
+    "Fetch reads at the program counter; decode splits fields and reads registers",
+    "Execute computes a result or an address; memory is used only by loads and stores",
+    "Write back updates rd, and is unused by exactly the formats that have no rd",
+    "In a single-cycle design the clock period is the slowest instruction's path",
+    "A load is the slowest because it uses all five stages including memory",
+    "Every fast instruction therefore pays for the slow one",
+    "next PC is PC + 4, or PC + offset for a taken branch",
+    "A branch target is not known until execute — harmless here, central once stages overlap"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why does a store instruction not use the write-back stage?",
+      "choices": {
+        "A": "It writes to memory in the execute stage",
+        "B": "It produces no value for a register — which is also why its format has no rd field",
+        "C": "Write-back is optional for all instructions",
+        "D": "It writes back during decode"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The hardware and the encoding were designed together: the formats without rd are exactly the instructions that do not write a register."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "In a single-cycle design, what sets the clock period?",
+      "choices": {
+        "A": "The average instruction",
+        "B": "The slowest path — a load, which passes through all five stages including memory",
+        "C": "The fetch stage alone",
+        "D": "The number of registers"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "One instruction completes per cycle, so the cycle must accommodate the longest one. Every faster instruction finishes early and waits, which is what the following designs address."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why is the program counter incremented by 4 rather than 1?",
+      "choices": {
+        "A": "To leave room for future instructions",
+        "B": "Each instruction is 4 bytes, and addresses count bytes",
+        "C": "For alignment with the cache line",
+        "D": "To speed up fetching"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "It is also why every instruction sits at a 4-byte boundary, which is what let the branch format omit the lowest bit of its offset."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "A branch's target is not known until the execute stage. Why does that cost nothing in a single-cycle design?",
+      "choices": {
+        "A": "Branches are predicted",
+        "B": "The whole instruction completes before the next one begins, so the target is known in time",
+        "C": "Branches skip the execute stage",
+        "D": "The compiler resolves it"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Nothing overlaps, so there is nothing to be wrong about. The moment instructions do overlap, this becomes the central difficulty the hazard module addresses."
+    }
+  ]
+}

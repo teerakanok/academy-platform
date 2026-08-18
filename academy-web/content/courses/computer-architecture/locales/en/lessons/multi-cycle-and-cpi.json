@@ -1,0 +1,222 @@
+{
+  "nodeId": "multi-cycle-and-cpi",
+  "locale": "en",
+  "title": "Cycles per instruction, and why it matters",
+  "objective": "By the end of this lesson you can compute a program's execution time from three quantities, explain why comparing instruction counts alone is misleading, and say what each design in this module is actually trading.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "The single-cycle design wastes time on every fast instruction. The obvious fix is to let each instruction take as many cycles as it needs — a short cycle, and a different number of them per instruction. Making that change requires one equation that this whole module then argues about."
+    },
+    {
+      "kind": "heading",
+      "text": "The equation"
+    },
+    {
+      "kind": "code",
+      "caption": "Three quantities, and only three",
+      "lines": [
+        "  time = instructions  x  cycles per instruction  x  time per cycle",
+        "",
+        "  instruction count      what the compiler produced",
+        "  cycles per instruction how the hardware executes them",
+        "  cycle time             the clock period",
+        "",
+        "/* Every architectural improvement moves one of these, and almost every",
+        "   one makes another worse. That is the entire subject of this module. */"
+      ]
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Design",
+        "Cycles per instruction",
+        "Cycle time",
+        "Net effect"
+      ],
+      "rows": [
+        [
+          "Single cycle",
+          "Exactly 1",
+          "Long — set by the slowest instruction",
+          "Simple, wasteful"
+        ],
+        [
+          "Multi cycle",
+          "Varies: 3 to 5",
+          "Short — set by the slowest single stage",
+          "Less waste, more cycles"
+        ],
+        [
+          "Pipelined",
+          "Approaching 1",
+          "Short",
+          "The best of both, with new problems"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The multi-cycle design's real gain is the clock, not the cycles",
+      "text": "It uses more cycles per instruction, which sounds worse. But each cycle is far shorter, because it need only cover one stage rather than all five. A load might take 5 short cycles where it previously took 1 long one — roughly the same — while an add takes 3 short cycles instead of 1 long one, and is genuinely faster. The saving comes entirely from instructions that do not need the memory stage."
+    },
+    {
+      "kind": "heading",
+      "text": "Working an example"
+    },
+    {
+      "kind": "code",
+      "caption": "The same program on two designs",
+      "lines": [
+        "  A program of 1000 instructions: 500 arithmetic, 300 loads, 200 branches",
+        "",
+        "  Single cycle, cycle = 5 units:",
+        "    1000 instructions x 1 cycle x 5 units       = 5000 units",
+        "",
+        "  Multi cycle, cycle = 1 unit:",
+        "    500 arithmetic x 4 cycles                   = 2000",
+        "    300 loads      x 5 cycles                   = 1500",
+        "    200 branches   x 3 cycles                   =  600",
+        "                                                  ----",
+        "                                                  4100 units",
+        "",
+        "  average cycles per instruction = 4100 / 1000  = 4.1",
+        "",
+        "/* An 18% improvement, and it came from instructions that finish early",
+        "   instead of waiting. Change the mix and the answer changes with it. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "This is why instruction count alone tells you nothing",
+      "text": "A version of a program with fewer instructions can be slower if those instructions take more cycles, and a version with more instructions can be faster if they are cheap ones. Comparing two compilations by counting lines of assembly is a common mistake, and the equation is the reason it does not work: you have changed one term while ignoring the other two."
+    },
+    {
+      "kind": "heading",
+      "text": "Where the terms come from"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Term",
+        "Determined by",
+        "Improved by"
+      ],
+      "rows": [
+        [
+          "Instruction count",
+          "The compiler and the instruction set",
+          "Better optimisation; more expressive instructions"
+        ],
+        [
+          "Cycles per instruction",
+          "The hardware design",
+          "Pipelining, better memory behaviour"
+        ],
+        [
+          "Cycle time",
+          "The circuit and the process",
+          "Shorter critical path, newer manufacturing"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Read that table against the earlier lesson and the RISC-versus-CISC argument becomes an arithmetic one. Complex instructions reduce the first term. Reduced instructions improve the second and third, because simple regular instructions pipeline well and keep the critical path short. Which wins depends on the numbers, and the numbers changed over time — which is exactly why the answer changed."
+    },
+    {
+      "kind": "heading",
+      "text": "What cycles per instruction hides"
+    },
+    {
+      "kind": "paragraph",
+      "text": "An average is not a description of behaviour. A program with an average of 1.2 might have most instructions at 1 and a few at 20, or everything uniformly slightly above 1. Those are very different programs with very different fixes, and only a distribution tells them apart. When you meet a cache miss later in this course, it will be a small number of instructions with a very large cycle count — invisible in the average, decisive in the total."
+    },
+    {
+      "kind": "try",
+      "title": "Compute, then predict",
+      "steps": [
+        "Take the example above and recompute it for a program that is 80% arithmetic and 5% loads",
+        "Recompute it for one that is 50% loads, and say which design wins in each case",
+        "Explain in one sentence why the instruction mix, not the count, decided it",
+        "A compiler change removes 10% of instructions but the new ones average 30% more cycles. Faster or slower?",
+        "Work out how much the cycle time must shrink to offset a 20% rise in cycles per instruction",
+        "If measurement tools are available on your machine, run: perf stat ./prog    and read the reported cycles and instructions",
+        "Compute the average cycles per instruction from those two numbers",
+        "Run a program with a deliberately poor memory access pattern and compare the figure"
+      ],
+      "expected": "Three worked examples with different instruction mixes, and if the tools are available, a measured average from a real program. The last step is the one worth keeping: a program whose average is far above 1 is usually waiting for memory, which is the subject of the cache module."
+    }
+  ],
+  "cheatsheet": [
+    "time = instructions x cycles per instruction x cycle time",
+    "Every improvement moves one term and usually worsens another",
+    "Single cycle: 1 cycle per instruction, but the cycle is as long as the slowest instruction",
+    "Multi cycle: more cycles, each much shorter — the gain comes from instructions skipping the memory stage",
+    "Worked example: 5000 units single-cycle against 4100 multi-cycle, an 18% improvement",
+    "Instruction count alone tells you nothing about speed",
+    "Complex instructions reduce the count; reduced instructions improve the other two terms",
+    "An average hides the distribution — a few very slow instructions can dominate the total",
+    "perf stat reports cycles and instructions, from which the average follows"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A multi-cycle design uses more cycles per instruction than a single-cycle one. Why can it still be faster?",
+      "choices": {
+        "A": "It executes instructions in parallel",
+        "B": "Each cycle is far shorter, because it covers one stage rather than all of them — and instructions that skip the memory stage finish in fewer cycles",
+        "C": "It has more registers",
+        "D": "It uses a cache"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The gain comes from arithmetic and branch instructions no longer paying for a memory access they do not perform. The worked example gave 4100 units against 5000."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A compiler change removes 10% of a program's instructions, but the remaining ones average 30% more cycles. What happened to execution time?",
+      "choices": {
+        "A": "It fell by 10%",
+        "B": "It rose — 0.9 times 1.3 is 1.17, so about 17% slower",
+        "C": "It is unchanged",
+        "D": "It depends on the cache"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "This is why comparing instruction counts is misleading: one term improved while another worsened more. The equation is the only way to settle it."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Two programs both average 1.2 cycles per instruction. What might still differ completely?",
+      "choices": {
+        "A": "Nothing — the average determines performance",
+        "B": "The distribution: one may be uniformly just above 1, the other mostly 1 with a few instructions taking 20",
+        "C": "Their instruction counts",
+        "D": "Their clock speeds"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Those are different problems with different fixes. A few very slow instructions — typically cache misses — are invisible in the average and decisive in the total."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Which term does a complex instruction set improve, and which does it worsen?",
+      "choices": {
+        "A": "It improves cycle time and worsens instruction count",
+        "B": "It reduces the instruction count, while making cycles per instruction and cycle time harder to improve",
+        "C": "It improves all three",
+        "D": "It only affects instruction count"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Fewer, more capable instructions against harder pipelining and a longer critical path. Which side wins depends on the numbers, and the numbers changed over time — which is why the answer did too."
+    }
+  ]
+}

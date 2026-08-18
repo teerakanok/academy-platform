@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 124,
+  "estimatedMinutes": 179,
   "coverMotif": "layers",
   "skills": [
     {
@@ -118,6 +118,40 @@
       "skillWeights": {
         "machine-code": 4,
         "isa": 3
+      }
+    },
+    {
+      "id": "single-cycle-datapath",
+      "kind": "lesson",
+      "prerequisites": [
+        "load-store-architecture"
+      ],
+      "estimatedMinutes": 19,
+      "skillWeights": {
+        "datapath": 4
+      }
+    },
+    {
+      "id": "control-signals",
+      "kind": "lesson",
+      "prerequisites": [
+        "single-cycle-datapath"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "datapath": 4
+      }
+    },
+    {
+      "id": "multi-cycle-and-cpi",
+      "kind": "lesson",
+      "prerequisites": [
+        "single-cycle-datapath"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "datapath": 3,
+        "performance": 3
       }
     }
   ]

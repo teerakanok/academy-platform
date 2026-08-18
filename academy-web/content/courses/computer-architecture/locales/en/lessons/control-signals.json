@@ -1,0 +1,202 @@
+{
+  "nodeId": "control-signals",
+  "locale": "en",
+  "title": "What tells each part what to do",
+  "objective": "By the end of this lesson you can explain how an opcode becomes a set of hardware settings, read a control table, and say why decoding is a lookup rather than a computation.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "The datapath is wires and units. Nothing in it knows whether the current instruction is an add or a load — that comes from a separate set of signals derived from the opcode, and setting them correctly is what decoding actually is."
+    },
+    {
+      "kind": "heading",
+      "text": "The signals a simple design needs"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Signal",
+        "Asks",
+        "Set for"
+      ],
+      "rows": [
+        [
+          "RegWrite",
+          "Should a register be written?",
+          "Everything except stores and branches"
+        ],
+        [
+          "ALUSrc",
+          "Second operand: register or immediate?",
+          "Immediate for I-type, loads, stores"
+        ],
+        [
+          "MemRead",
+          "Read data memory?",
+          "Loads only"
+        ],
+        [
+          "MemWrite",
+          "Write data memory?",
+          "Stores only"
+        ],
+        [
+          "MemToReg",
+          "Write back the loaded value or the ALU result?",
+          "Loaded value for loads"
+        ],
+        [
+          "Branch",
+          "May the program counter change?",
+          "Branches"
+        ]
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "The control table, one row per instruction kind",
+      "lines": [
+        "               RegWrite ALUSrc MemRead MemWrite MemToReg Branch",
+        "  add / sub        1      0       0        0        0       0",
+        "  addi             1      1       0        0        0       0",
+        "  lw               1      1       1        0        1       0",
+        "  sw               0      1       0        1        -       0",
+        "  beq              0      0       0        0        -       1",
+        "",
+        "/* A dash means the signal's value cannot be observed, because nothing",
+        "   downstream uses it — a store writes no register, so it does not",
+        "   matter what MemToReg says. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Decoding is a lookup, not a calculation",
+      "text": "That table is the decoder. Given an opcode, the hardware produces the row — and because the opcode sits in fixed bits at the bottom of every instruction, the lookup can begin the moment the instruction arrives. This is why the encoding lesson's point about the opcode's position matters: a decoder that must compute something to find the opcode would put that computation on the critical path of every instruction."
+    },
+    {
+      "kind": "heading",
+      "text": "Reading the table as a description of behaviour"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "add and addi differ in exactly one signal: where the second operand comes from",
+        "lw is the only row with MemRead and MemToReg set, which is why it is the slowest",
+        "sw is the only row with MemWrite set and RegWrite clear",
+        "beq sets no data signals at all — it only affects the program counter",
+        "Every dash marks a signal whose value cannot affect the result"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Read down the columns instead and a different fact appears: each column is one control input on one piece of hardware, and the number of rows that set it tells you how often that hardware is used. MemRead is set in one row out of five, which is a first hint at why the memory stage is worth optimising more than the others."
+    },
+    {
+      "kind": "heading",
+      "text": "Where funct3 and funct7 come in"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The opcode selects the row; funct3 and funct7 select what the arithmetic unit does within it. add and sub share every control signal in the table — the only difference is one input to the unit itself, which is exactly what the encoding lesson measured as a single bit of difference between the two instructions."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "The encoding and the control table are the same design decision",
+      "text": "Instructions that behave alike were given adjacent encodings, and instructions that differ in one respect were given encodings that differ in one field. That is not a coincidence to notice afterwards — the encoding was chosen so that the decoder could be small. When you found add and sub differing by exactly one bit, you were looking at the control table from the other side."
+    },
+    {
+      "kind": "heading",
+      "text": "Why this scales badly with complexity"
+    },
+    {
+      "kind": "paragraph",
+      "text": "With five instruction kinds and six signals, the table fits in a paragraph. An architecture with hundreds of instructions and dozens of addressing modes needs a far larger one, and the logic to produce it is deeper — which puts more delay before anything can start. This is the concrete form of the argument from the RISC versus CISC lesson, and it is why complex designs decode into simpler internal operations rather than controlling the datapath directly."
+    },
+    {
+      "kind": "try",
+      "title": "Derive the table yourself",
+      "steps": [
+        "Write out the six signals for jal, which writes a register and changes the program counter",
+        "Write them out for jalr, and note how it differs from jal",
+        "Add a row for a hypothetical instruction that adds a value from memory to a register",
+        "Count how many extra signals or units that instruction would require",
+        "Explain why a load-store architecture does not have it, in terms of your answer",
+        "For each column, count how many rows set it, and say which hardware is used most",
+        "Explain why the dashes exist, and what would happen if the hardware set them arbitrarily",
+        "Compare your table with add and sub, and say which field distinguishes them"
+      ],
+      "expected": "A control table you derived rather than read, and a hypothetical memory-arithmetic instruction whose cost you can now state in signals and units. That last exercise is the load-store argument made concrete: the instruction is not impossible, it is expensive in a way you can now count."
+    }
+  ],
+  "cheatsheet": [
+    "Control signals turn an opcode into settings for each part of the datapath",
+    "RegWrite, ALUSrc, MemRead, MemWrite, MemToReg, Branch cover a simple design",
+    "The control table has one row per instruction kind",
+    "A dash marks a signal nothing downstream can observe",
+    "Decoding is a lookup, which is why the opcode sits in fixed low bits",
+    "add and addi differ in one signal: where the second operand comes from",
+    "funct3 and funct7 select the operation within the row the opcode chose",
+    "Instructions that differ in one respect were encoded to differ in one field",
+    "More instructions and modes means a larger table and deeper logic before anything starts"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why can the decoder begin working the instant an instruction arrives?",
+      "choices": {
+        "A": "It predicts the instruction",
+        "B": "The opcode is in fixed low bits, so the lookup needs no computation to find it",
+        "C": "Instructions are pre-decoded in memory",
+        "D": "The compiler supplies the signals"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "That is the practical payoff of the encoding lesson's field-position rule. A decoder that had to compute where the opcode was would add that delay to every instruction."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "In the control table, sw has a dash for MemToReg. What does that mean?",
+      "choices": {
+        "A": "The signal is always zero",
+        "B": "Nothing downstream uses it, because a store writes no register — so its value cannot affect the result",
+        "C": "The instruction is invalid",
+        "D": "It depends on the address"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "MemToReg only selects what gets written back, and a store writes nothing back. Marking it as unobservable lets the hardware simplify that path."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "What distinguishes add from sub, given that they share every control signal in the table?",
+      "choices": {
+        "A": "A different opcode",
+        "B": "funct7 — one input to the arithmetic unit, which is the single bit of encoding difference measured earlier",
+        "C": "The register numbers",
+        "D": "A prefix instruction"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The opcode selects the row; funct3 and funct7 select the operation within it. The one-bit encoding difference and the one-input control difference are the same fact seen from two sides."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why does a complex instruction set make direct control of the datapath impractical?",
+      "choices": {
+        "A": "The instructions are too long",
+        "B": "Many instructions and addressing modes mean a much larger table and deeper logic, adding delay before anything can start",
+        "C": "Control signals are limited to eight",
+        "D": "Compilers cannot generate them"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "It is why complex designs decode into simpler internal operations and control the datapath with those instead, which is the RISC-versus-CISC argument in its concrete hardware form."
+    }
+  ]
+}
