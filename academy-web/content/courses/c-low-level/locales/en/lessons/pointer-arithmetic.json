@@ -1,0 +1,201 @@
+{
+  "nodeId": "pointer-arithmetic",
+  "locale": "en",
+  "title": "Pointer arithmetic and how arrays really work",
+  "objective": "By the end of this lesson you can explain why p + 1 moves by the size of the type, why array indexing is pointer arithmetic in disguise, and where the boundary of defined behaviour sits.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Adding to a pointer does not add bytes. It moves by elements — the compiler multiplies by the size of the pointed-to type. Once that clicks, array indexing stops being a separate feature and becomes shorthand for something you already understand."
+    },
+    {
+      "kind": "code",
+      "caption": "The multiplication is implicit",
+      "lines": [
+        "int values[4] = {10, 20, 30, 40};",
+        "int *p = values;          /* an array name used in an expression becomes a pointer to its first element */",
+        "",
+        "printf(\"%d\\n\", *p);        /* 10 */",
+        "printf(\"%d\\n\", *(p + 1));  /* 20 — moved 4 bytes, because int is 4 bytes */",
+        "printf(\"%d\\n\", *(p + 3));  /* 40 */",
+        "",
+        "char *c = (char *)values;",
+        "printf(\"%d\\n\", *(c + 1));  /* moved 1 byte — a different type, a different step */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "a[i] is defined as *(a + i)",
+      "text": "That is not an analogy — it is the definition in the standard. Which also means i[a] compiles and does the same thing, since addition commutes. Nobody writes that, but knowing why it works tells you that indexing and pointer arithmetic are one mechanism, not two."
+    },
+    {
+      "kind": "heading",
+      "text": "Walking an array with a pointer"
+    },
+    {
+      "kind": "code",
+      "caption": "Two spellings of the same loop",
+      "lines": [
+        "for (int i = 0; i < 4; i++) {",
+        "    printf(\"%d \", values[i]);",
+        "}",
+        "",
+        "for (int *q = values; q < values + 4; q++) {",
+        "    printf(\"%d \", *q);",
+        "}",
+        "",
+        "/* Subtracting two pointers gives the number of ELEMENTS between them: */",
+        "int *first = &values[0];",
+        "int *last  = &values[3];",
+        "printf(\"%td\\n\", last - first);   /* 3, not 12 */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The rule that keeps this defined"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "You may point at any element of an array, and at one position past the last element",
+        "That one-past-the-end pointer may be compared and used as a loop limit, but never dereferenced",
+        "Going further than one past the end is undefined — even computing the pointer, without reading it",
+        "Pointer arithmetic between unrelated allocations is undefined, even if the addresses look adjacent"
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "The boundary, precisely",
+      "lines": [
+        "int a[4];",
+        "int *p = a + 4;      /* legal: one past the end — this is why loops can say q < a + 4 */",
+        "int *q = a + 5;      /* undefined behaviour, even though nothing is read */",
+        "",
+        "printf(\"%d\\n\", *p);  /* undefined: reading the one-past-the-end position */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Off-by-one is the most common way this goes wrong",
+      "text": "for (int i = 0; i <= n; i++) reads one element past the end of an n-element array. In a language with bounds checking that is an exception; in C it reads whatever follows in memory. The same mistake in a write turns into memory corruption, and it is exactly the shape behind a great many buffer-overflow findings."
+    },
+    {
+      "kind": "heading",
+      "text": "void pointers: an address with no type"
+    },
+    {
+      "kind": "code",
+      "caption": "Generic, and therefore restricted",
+      "lines": [
+        "void *raw = malloc(100);      /* malloc does not know what you will store */",
+        "int *numbers = raw;           /* assign it to a typed pointer to use it */",
+        "",
+        "/* *raw is not allowed — there is no type, so there is no size to read */",
+        "/* raw + 1 is not portable either — with no element size, there is nothing to multiply by */",
+        "",
+        "void print_bytes(const void *data, size_t n) {   /* the standard 'any data' parameter */",
+        "    const unsigned char *b = data;",
+        "    for (size_t i = 0; i < n; i++) printf(\"%02x \", b[i]);",
+        "}"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Reading bytes deliberately"
+    },
+    {
+      "kind": "code",
+      "caption": "unsigned char is the type for raw memory",
+      "lines": [
+        "int value = 1;",
+        "unsigned char *bytes = (unsigned char *)&value;",
+        "",
+        "for (size_t i = 0; i < sizeof value; i++) {",
+        "    printf(\"%02x \", bytes[i]);",
+        "}",
+        "/* 01 00 00 00 on a little-endian machine; 00 00 00 01 on big-endian */"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Viewing an object as a sequence of unsigned char is explicitly permitted, which is why memcpy, hashing, and serialisation all work through that type. It is also how you inspect what your data really looks like in memory — a technique the endianness lesson uses directly."
+    },
+    {
+      "kind": "try",
+      "title": "Prove that indexing is arithmetic",
+      "steps": [
+        "Write: int v[4] = {10,20,30,40}; int *p = v;",
+        "Print v[2], *(p + 2), and 2[v] — confirm all three are 30",
+        "Print (void *)p and (void *)(p + 1) and note the difference is 4, not 1",
+        "Cast to char * and print the same two addresses — now the step is 1",
+        "Print (v + 3) - v and confirm it is 3, not 12",
+        "Write a loop that runs to i <= 4 by mistake and run it under -fsanitize=address",
+        "Read the report, then fix the condition"
+      ],
+      "expected": "Three spellings of the same element, addresses that step by the type size, a pointer difference measured in elements, and an off-by-one that the sanitizer catches at the exact line. That last one is the single most common defect in C, seen on purpose."
+    }
+  ],
+  "cheatsheet": [
+    "p + 1 moves forward by sizeof(*p) bytes, not one byte",
+    "a[i] is defined as *(a + i) — indexing IS pointer arithmetic",
+    "An array name in an expression becomes a pointer to its first element",
+    "Subtracting two pointers gives a count of elements, not bytes",
+    "You may form a pointer one past the end, and compare it, but never dereference it",
+    "Two past the end is undefined even if you never read it",
+    "for (i = 0; i <= n; i++) is the classic off-by-one — it touches one element too many",
+    "void * has no type: you cannot dereference it or do arithmetic on it portably",
+    "unsigned char * is the correct type for examining raw bytes"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "int *p points at an array. How far does p + 1 move in bytes?",
+      "choices": {
+        "A": "One byte",
+        "B": "sizeof(int) bytes — usually 4",
+        "C": "It depends on the array length",
+        "D": "It is undefined"
+      },
+      "correct": ["B"],
+      "explanation": "Pointer arithmetic counts elements. The compiler multiplies by the size of the pointed-to type, which is why the type on the pointer matters."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "What is the relationship between a[i] and *(a + i) ?",
+      "choices": {
+        "A": "They are similar but a[i] is safer",
+        "B": "They are the same thing — a[i] is defined as *(a + i) in the standard",
+        "C": "a[i] performs bounds checking",
+        "D": "*(a + i) only works for the first element"
+      },
+      "correct": ["B"],
+      "explanation": "Indexing is notation for pointer arithmetic. Neither form does any bounds checking."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "For int a[4], which is allowed?",
+      "choices": {
+        "A": "Computing a + 5 as long as you never read it",
+        "B": "Computing a + 4 and comparing it, but not dereferencing it",
+        "C": "Dereferencing a + 4 to read the terminator",
+        "D": "Both a + 4 and a + 5, since neither is read"
+      },
+      "correct": ["B"],
+      "explanation": "One past the end is a defined position precisely so loop conditions can use it. Two past is undefined even without a read."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why can you not dereference a void * ?",
+      "choices": {
+        "A": "It is always NULL",
+        "B": "It carries no type, so there is no size to read and no interpretation to apply — assign it to a typed pointer first",
+        "C": "It is read-only",
+        "D": "You can; the compiler infers the type"
+      },
+      "correct": ["B"],
+      "explanation": "void * is the way C says 'an address to some data'. The type has to come from somewhere before the memory can be read."
+    }
+  ]
+}

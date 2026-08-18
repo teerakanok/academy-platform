@@ -1,0 +1,220 @@
+{
+  "nodeId": "stack-vs-heap",
+  "locale": "en",
+  "title": "The stack and the heap",
+  "objective": "By the end of this lesson you can say where any variable lives, why the stack is fast and limited, and when you have no choice but to use the heap.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A running program's memory is divided into regions with different rules. Two of them matter constantly: the stack, which the machine manages for you, and the heap, which you manage yourself. Almost every memory bug is a confusion between the two."
+    },
+    {
+      "kind": "code",
+      "caption": "The regions, roughly",
+      "lines": [
+        "  high addresses",
+        "  ┌──────────────┐",
+        "  │    stack     │  local variables, function calls — grows downward",
+        "  │      ↓       │",
+        "  │              │",
+        "  │      ↑       │",
+        "  │     heap     │  malloc — grows upward, managed by you",
+        "  ├──────────────┤",
+        "  │ globals      │  globals and static variables — exist for the whole run",
+        "  ├──────────────┤",
+        "  │ code         │  the program's instructions — read-only",
+        "  └──────────────┘",
+        "  low addresses"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The stack: automatic, fast, and small"
+    },
+    {
+      "kind": "code",
+      "caption": "A frame per call, removed on return",
+      "lines": [
+        "void inner(void) {",
+        "    int b = 2;          /* inner's frame */",
+        "}",
+        "",
+        "void outer(void) {",
+        "    int a = 1;          /* outer's frame */",
+        "    inner();            /* a new frame goes on top, then comes off */",
+        "}                       /* outer's frame is gone here, and so is a */"
+      ]
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Allocation is a single instruction adjusting a register — as fast as memory gets",
+        "Space is reclaimed automatically when the function returns, with nothing to remember",
+        "Size is fixed at compile time and the total is limited — commonly a few megabytes per thread",
+        "The lifetime is exactly the function call: not one instruction longer"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Stack overflow: too deep, or too large",
+      "text": "Unbounded recursion adds frames until the stack runs out and the program dies. So does a single enormous local array — char buffer[10*1024*1024] asks for ten megabytes of stack in one go. If a buffer's size depends on input, that is the heap's job, not the stack's."
+    },
+    {
+      "kind": "heading",
+      "text": "The heap: yours to manage"
+    },
+    {
+      "kind": "code",
+      "caption": "You decide when it starts and when it ends",
+      "lines": [
+        "int *numbers = malloc(1000 * sizeof(int));   /* size can be decided at runtime */",
+        "if (numbers == NULL) {                       /* ALWAYS check */",
+        "    return -1;",
+        "}",
+        "",
+        "numbers[0] = 42;",
+        "free(numbers);          /* nothing reclaims it for you */",
+        "numbers = NULL;         /* so a later mistake fails loudly */"
+      ]
+    },
+    {
+      "kind": "table",
+      "headers": ["", "Stack", "Heap"],
+      "rows": [
+        ["Managed by", "The compiler and hardware", "You"],
+        ["Speed", "Extremely fast", "Slower — bookkeeping is involved"],
+        ["Size", "Small and fixed", "Large, limited by the system"],
+        ["Size known", "At compile time", "Can be decided at runtime"],
+        ["Lifetime", "Until the function returns", "Until you call free"],
+        ["Typical failure", "Overflow from depth or a huge local", "Leaks, double free, use-after-free"]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Choosing between them"
+    },
+    {
+      "kind": "code",
+      "caption": "Three cases",
+      "lines": [
+        "void fixed_and_small(void) {",
+        "    char line[256];               /* stack: size known, short-lived */",
+        "}",
+        "",
+        "char *read_file(const char *path, size_t *out_len) {",
+        "    /* size depends on the file — must be the heap */",
+        "    char *data = malloc(size);",
+        "    ...",
+        "    return data;                  /* and the caller must free it */",
+        "}",
+        "",
+        "void too_big(void) {",
+        "    char buffer[8 * 1024 * 1024]; /* asking for 8MB of stack — likely to crash */",
+        "}"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "The rule of thumb",
+      "text": "Use the stack when the size is known at compile time, is modest, and the data does not need to outlive the function. Use the heap when the size depends on input, when the object is large, or when it must survive the return. If you find yourself unsure, the deciding question is usually 'does this need to exist after this function ends?'"
+    },
+    {
+      "kind": "heading",
+      "text": "Documenting ownership"
+    },
+    {
+      "kind": "code",
+      "caption": "Every allocation needs an owner",
+      "lines": [
+        "/* Caller must free the returned buffer. */",
+        "char *build_message(const char *name);",
+        "",
+        "/* Caller provides the buffer; this function never allocates. */",
+        "int format_message(char *out, size_t out_size, const char *name);",
+        "",
+        "/* Takes ownership: frees data when it is finished with it. */",
+        "void queue_push(struct queue *q, char *data);"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "C has no way to express ownership in the type system, so it lives in the documentation and the naming. A function that returns allocated memory must say so, and the comment above it is the only thing standing between your project and a leak — or a double free when two people both believe they own the same block."
+    },
+    {
+      "kind": "try",
+      "title": "Find the limits yourself",
+      "steps": [
+        "Print addresses of a local variable, a global, and a malloc result — note how far apart the regions are",
+        "Write a recursive function with no base case and run it: observe the crash",
+        "Run: ulimit -s     (your stack limit in kilobytes)",
+        "Declare char big[8*1024*1024]; inside a function, call it, and see what happens",
+        "Move the same buffer to malloc and confirm it works",
+        "Write read_all(const char *path, size_t *len) that returns a heap buffer, and free it at the call site",
+        "Run everything under -fsanitize=address"
+      ],
+      "expected": "Three addresses far apart, a stack overflow you caused deliberately, the actual limit on your system, and the same allocation succeeding on the heap. The contrast between the last two is the whole lesson."
+    }
+  ],
+  "cheatsheet": [
+    "Stack: locals and call frames, automatic, fast, small, dies with the function",
+    "Heap: malloc/free, large, size decided at runtime, lives until you free it",
+    "Globals and statics live for the whole program; code is read-only",
+    "Stack overflow comes from unbounded recursion or a huge local array",
+    "If the size depends on input, it belongs on the heap",
+    "Always check malloc for NULL",
+    "free once, then set the pointer to NULL",
+    "Every allocation needs a documented owner — who frees it, and when"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Where does a local variable declared inside a function live, and how long?",
+      "choices": {
+        "A": "On the heap, until you free it",
+        "B": "On the stack, until the function returns",
+        "C": "In global memory, for the whole program",
+        "D": "In the code region"
+      },
+      "correct": ["B"],
+      "explanation": "The frame is removed on return, which is why returning a pointer to a local is a defect."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "You need a buffer whose size depends on the size of an input file. Stack or heap?",
+      "choices": {
+        "A": "Stack — it is faster",
+        "B": "Heap — the size is not known at compile time and may be large",
+        "C": "Either works identically",
+        "D": "A global array"
+      },
+      "correct": ["B"],
+      "explanation": "Stack sizes are fixed at compile time and the total is small. Input-dependent sizes are exactly the heap's purpose."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "What causes a stack overflow?",
+      "choices": {
+        "A": "Forgetting to call free",
+        "B": "Unbounded recursion, or a single local array large enough to exhaust the stack",
+        "C": "Allocating too much with malloc",
+        "D": "Dereferencing NULL"
+      },
+      "correct": ["B"],
+      "explanation": "Both fill the fixed stack space. Forgetting free is a heap leak, which is a different failure entirely."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Why must a function that returns allocated memory document that fact?",
+      "choices": {
+        "A": "Because C requires a comment",
+        "B": "Because C cannot express ownership in the type system — without a stated owner you get a leak, or a double free when two callers both believe they own it",
+        "C": "Because free needs the original size",
+        "D": "So the compiler can insert the free"
+      },
+      "correct": ["B"],
+      "explanation": "Ownership is a convention in C. Writing it down is the only enforcement mechanism the language offers."
+    }
+  ]
+}

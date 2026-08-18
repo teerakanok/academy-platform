@@ -1,0 +1,235 @@
+{
+  "nodeId": "malloc-and-free",
+  "locale": "en",
+  "title": "Allocating and releasing memory",
+  "objective": "By the end of this lesson you can allocate, resize, and release heap memory correctly, and you recognise the four failure modes that account for most memory defects in C.",
+  "blocks": [
+    {
+      "kind": "code",
+      "caption": "The four functions",
+      "lines": [
+        "void *malloc(size_t size);              /* uninitialised block */",
+        "void *calloc(size_t n, size_t size);    /* n items, zeroed, overflow-checked */",
+        "void *realloc(void *p, size_t size);    /* resize an existing block */",
+        "void  free(void *p);                    /* release it */"
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "The correct shape of an allocation",
+      "lines": [
+        "int *values = malloc(count * sizeof *values);   /* sizeof *values survives a type change */",
+        "if (values == NULL) {                           /* never skip this */",
+        "    return -1;",
+        "}",
+        "",
+        "/* ...use it... */",
+        "",
+        "free(values);",
+        "values = NULL;      /* the pointer no longer refers to anything valid */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Write sizeof *pointer, not sizeof(Type)",
+      "text": "malloc(n * sizeof *values) keeps working when values changes from int * to long *. malloc(n * sizeof(int)) silently allocates the wrong amount the day someone changes the type — and the result is an under-allocated buffer, which is a memory-corruption bug rather than a compile error."
+    },
+    {
+      "kind": "heading",
+      "text": "calloc: zeroed, and it checks the multiplication"
+    },
+    {
+      "kind": "code",
+      "caption": "Two differences that matter",
+      "lines": [
+        "int *a = malloc(n * sizeof *a);    /* contents are whatever was there before */",
+        "int *b = calloc(n, sizeof *b);     /* every byte is zero */",
+        "",
+        "/* And the security-relevant one: */",
+        "size_t n = huge_value_from_input;",
+        "int *c = malloc(n * sizeof(int));  /* n * 4 may overflow and wrap to a small number */",
+        "int *d = calloc(n, sizeof(int));   /* calloc must detect the overflow and return NULL */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The multiplication overflow is a real attack pattern",
+      "text": "If a count comes from input and you compute count * size yourself, a large count can wrap around to a small product. malloc succeeds with a tiny buffer, the code then writes count elements into it, and you have a heap overflow. calloc is required to detect that overflow — which is why it is the safer choice whenever the count is not a constant you wrote."
+    },
+    {
+      "kind": "heading",
+      "text": "realloc: the careful form"
+    },
+    {
+      "kind": "code",
+      "caption": "Never assign realloc's result to the original pointer",
+      "lines": [
+        "/* WRONG: if realloc fails it returns NULL and the original block is leaked */",
+        "buf = realloc(buf, new_size);",
+        "",
+        "/* Right: */",
+        "char *tmp = realloc(buf, new_size);",
+        "if (tmp == NULL) {",
+        "    free(buf);          /* the old block is still valid — decide deliberately */",
+        "    return -1;",
+        "}",
+        "buf = tmp;",
+        "",
+        "/* realloc may move the block, so any other pointer into the old memory is now dangling. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The four failure modes"
+    },
+    {
+      "kind": "table",
+      "headers": ["Mistake", "What happens", "How it is caught"],
+      "rows": [
+        ["Forgetting free", "A leak — memory grows until the process is restarted", "Sanitizer or Valgrind reports it at exit"],
+        ["Using after free", "Reads or writes memory that may now belong to something else", "AddressSanitizer names it precisely"],
+        ["Freeing twice", "Corrupts the allocator's own bookkeeping", "Usually aborts immediately with an allocator message"],
+        ["Freeing a non-heap pointer", "Undefined — the allocator never owned it", "Crash or corruption"]
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "Each one, in miniature",
+      "lines": [
+        "char *p = malloc(10);",
+        "/* ...no free... */                 /* leak */",
+        "",
+        "char *q = malloc(10);",
+        "free(q);",
+        "q[0] = 'x';                         /* use after free */",
+        "",
+        "char *r = malloc(10);",
+        "free(r);",
+        "free(r);                            /* double free */",
+        "",
+        "char local[10];",
+        "free(local);                        /* not from malloc — undefined */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Setting the pointer to NULL after free turns two bugs into one loud failure",
+      "text": "free(p); p = NULL; costs one line. A later use-after-free then becomes a NULL dereference, which crashes immediately at the point of the mistake instead of quietly corrupting whatever now occupies that memory. And free(NULL) is explicitly a no-op, so a double free becomes harmless too."
+    },
+    {
+      "kind": "heading",
+      "text": "Keeping ownership straight"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Every allocation has exactly one owner, and the owner frees it",
+        "Free in the same layer that allocated, when you can — a function that allocates and returns must document who frees",
+        "Free in the reverse order of allocation when objects reference each other",
+        "On an error path, free everything acquired so far — this is what the cleanup goto is for",
+        "Never free memory you did not allocate, and never free the same block twice"
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "The cleanup pattern, complete",
+      "lines": [
+        "int process(const char *path) {",
+        "    int rc = -1;",
+        "    char *buf = malloc(4096);",
+        "    if (!buf) return -1;",
+        "",
+        "    FILE *f = fopen(path, \"r\");",
+        "    if (!f) goto out_buf;",
+        "",
+        "    /* ...work... */",
+        "    rc = 0;",
+        "",
+        "    fclose(f);",
+        "out_buf:",
+        "    free(buf);",
+        "    return rc;",
+        "}"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Commit each mistake under a sanitizer",
+      "steps": [
+        "Write a program that mallocs and never frees; run with -fsanitize=address and read the leak report",
+        "Write a use-after-free; run it and read where the sanitizer says the memory was freed",
+        "Write a double free; run it and read the allocator's message",
+        "Fix all three by adding free and setting the pointer to NULL",
+        "Write the realloc pattern correctly with a tmp pointer",
+        "Compare: int *a = malloc(4 * sizeof *a); versus sizeof(int) — change the type and see which one still allocates correctly",
+        "Run: valgrind ./prog     (if installed) and compare its report to the sanitizer's"
+      ],
+      "expected": "Three reports naming the exact allocation line, the exact free line, and the exact misuse. Those reports are why these bugs are findable in C at all — and why running tests under a sanitizer belongs in CI."
+    }
+  ],
+  "cheatsheet": [
+    "malloc(n * sizeof *p) — write sizeof *p so a type change cannot break it",
+    "Always check the result for NULL",
+    "calloc(n, size) zeroes the memory and detects the multiplication overflow",
+    "Use calloc when the count comes from input — malloc's product can wrap",
+    "realloc: assign to a temporary; on NULL the original block is still yours",
+    "realloc may move the block, invalidating other pointers into it",
+    "free once, then set the pointer to NULL; free(NULL) is safe",
+    "The four failures: leak, use-after-free, double free, freeing a non-heap pointer",
+    "One owner per allocation, documented; free everything on the error path",
+    "-fsanitize=address and Valgrind find all four"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why prefer malloc(n * sizeof *values) over malloc(n * sizeof(int)) ?",
+      "choices": {
+        "A": "It is faster",
+        "B": "It stays correct when the pointer's type changes; the explicit type silently under-allocates the day someone edits the declaration",
+        "C": "sizeof(int) is not portable",
+        "D": "It avoids the need to check for NULL"
+      },
+      "correct": ["B"],
+      "explanation": "An under-allocated buffer is a memory-corruption bug, not a compile error, so this small habit removes a defect that is otherwise easy to introduce."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A count comes from user input and you write malloc(count * sizeof(int)). What is the risk?",
+      "choices": {
+        "A": "It is slower than calloc",
+        "B": "The multiplication can overflow and wrap to a small number, so malloc succeeds with a tiny buffer that the code then overruns",
+        "C": "malloc cannot take a computed size",
+        "D": "There is no risk if count is unsigned"
+      },
+      "correct": ["B"],
+      "explanation": "calloc is required to detect that overflow and return NULL, which is why it is the right choice for input-derived counts."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why is buf = realloc(buf, size); dangerous?",
+      "choices": {
+        "A": "realloc cannot grow a block",
+        "B": "If realloc fails it returns NULL, overwriting your only pointer to the still-valid original block — which is now leaked",
+        "C": "It always moves the block",
+        "D": "It does not preserve the contents"
+      },
+      "correct": ["B"],
+      "explanation": "Assign to a temporary first, then decide what to do on failure while you still hold the original pointer."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "What does setting a pointer to NULL immediately after free achieve?",
+      "choices": {
+        "A": "It releases more memory",
+        "B": "A later use becomes a NULL dereference that crashes at the mistake, and a second free becomes a harmless no-op",
+        "C": "It prevents leaks",
+        "D": "It is required by the standard"
+      },
+      "correct": ["B"],
+      "explanation": "It converts two silent, hard-to-trace bugs into one immediate and obvious failure — at the cost of a single line."
+    }
+  ]
+}

@@ -1,0 +1,209 @@
+{
+  "nodeId": "function-pointers",
+  "locale": "en",
+  "title": "Function pointers: passing behaviour around",
+  "objective": "By the end of this lesson you can declare and use a function pointer, recognise the pattern in real C libraries, and explain why this is where several exploitation techniques aim.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "A function lives in memory and therefore has an address. A function pointer holds that address, which lets you decide at runtime which code to run. Every callback, every plugin system, and every dispatch table in C is built on this."
+    },
+    {
+      "kind": "code",
+      "caption": "Declaring one",
+      "lines": [
+        "int add(int a, int b) { return a + b; }",
+        "int mul(int a, int b) { return a * b; }",
+        "",
+        "int (*op)(int, int);      /* op is a pointer to a function taking (int,int) returning int */",
+        "",
+        "op = add;                 /* the function name is its address */",
+        "printf(\"%d\\n\", op(2, 3)); /* 5 */",
+        "",
+        "op = mul;",
+        "printf(\"%d\\n\", op(2, 3)); /* 6 — same call site, different behaviour */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The parentheses are load-bearing",
+      "text": "int (*op)(int, int) is a pointer to a function. int *op(int, int) is a function returning a pointer to int — a completely different thing. When the declaration gets hard to read, a typedef fixes it: typedef int (*BinaryOp)(int, int); then write BinaryOp op;"
+    },
+    {
+      "kind": "heading",
+      "text": "The callback pattern"
+    },
+    {
+      "kind": "code",
+      "caption": "qsort is the canonical example",
+      "lines": [
+        "#include <stdlib.h>",
+        "",
+        "int compare_ints(const void *a, const void *b) {",
+        "    int x = *(const int *)a;",
+        "    int y = *(const int *)b;",
+        "    return (x > y) - (x < y);      /* -1, 0, or 1 without overflow */",
+        "}",
+        "",
+        "int values[] = {5, 2, 9, 1};",
+        "qsort(values, 4, sizeof values[0], compare_ints);",
+        "",
+        "/* qsort does not know what it is sorting. You supply the comparison. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Do not write return x - y in a comparator",
+      "text": "It looks neat and it overflows: with x = 2000000000 and y = -2000000000 the subtraction is undefined and the result may come out negative when it should be positive, silently producing a wrong sort order. (x > y) - (x < y) computes the same three-way result without any arithmetic that can overflow."
+    },
+    {
+      "kind": "heading",
+      "text": "Dispatch tables"
+    },
+    {
+      "kind": "code",
+      "caption": "An array of function pointers replaces a long switch",
+      "lines": [
+        "typedef int (*Handler)(const char *arg);",
+        "",
+        "int cmd_help(const char *arg)   { ... }",
+        "int cmd_status(const char *arg) { ... }",
+        "",
+        "struct command {",
+        "    const char *name;",
+        "    Handler     run;",
+        "};",
+        "",
+        "static const struct command commands[] = {",
+        "    {\"help\",   cmd_help},",
+        "    {\"status\", cmd_status},",
+        "};",
+        "",
+        "for (size_t i = 0; i < sizeof commands / sizeof commands[0]; i++) {",
+        "    if (strcmp(argv[1], commands[i].name) == 0) {",
+        "        return commands[i].run(argv[2]);",
+        "    }",
+        "}"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Adding a command becomes adding a row to the table. This is how shells, interpreters, and device drivers organise their entry points — and when you read a driver's struct full of function pointers, you are reading exactly this pattern."
+    },
+    {
+      "kind": "heading",
+      "text": "Why this matters for security"
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "A function pointer in writable memory is a control-flow target",
+      "text": "If an attacker can overwrite a function pointer — through a buffer overflow into a nearby struct, or a use-after-free where the freed object is reallocated with attacker data — then the next call through that pointer transfers control to an address they chose. This is why exploitation write-ups talk about vtables, hook tables, and callback fields, and why modern systems add mitigations such as control-flow integrity checks."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Mark tables of function pointers const when they never change — const data can be placed in read-only memory",
+        "Validate an index before using it to select from a dispatch table",
+        "Never build a function pointer from data that came from input",
+        "Treat a struct containing function pointers as a higher-value target when reviewing overflow risk nearby"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Reading declarations that look intimidating"
+    },
+    {
+      "kind": "code",
+      "caption": "Work outward from the name",
+      "lines": [
+        "void (*signal(int sig, void (*handler)(int)))(int);",
+        "",
+        "/* signal is a function",
+        "   taking (int, pointer to function taking int returning void)",
+        "   returning a pointer to a function taking int returning void */",
+        "",
+        "/* With typedefs it is readable: */",
+        "typedef void (*SignalHandler)(int);",
+        "SignalHandler signal(int sig, SignalHandler handler);"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Build a small dispatch table",
+      "steps": [
+        "Write add and mul, then int (*op)(int,int); assign each in turn and call through it",
+        "Add: typedef int (*BinaryOp)(int,int); and rewrite the declaration using it",
+        "Write compare_ints and sort an array with qsort",
+        "Change the comparator to return x - y and test it with INT_MAX and INT_MIN — observe the wrong order",
+        "Build the commands[] table above with two handlers and dispatch on argv[1]",
+        "Mark the table const and confirm it still compiles",
+        "Print the address of a function with printf(\"%p\", (void *)add) and note it sits in the code region"
+      ],
+      "expected": "One call site producing different behaviour, a working qsort, a comparator that breaks on extreme values until you use the three-way form, and a dispatch table that replaces a switch. The address print shows the last piece: functions live in memory just like data."
+    }
+  ],
+  "cheatsheet": [
+    "int (*op)(int,int) is a pointer to a function; int *op(int,int) is a function returning int *",
+    "A function name used as a value is its address",
+    "Call through it exactly like a normal call: op(2, 3)",
+    "typedef makes complicated function-pointer declarations readable",
+    "qsort takes a comparator — the standard callback pattern",
+    "Write (x > y) - (x < y), never x - y, in a comparator",
+    "An array of function pointers is a dispatch table and replaces a long switch",
+    "Mark constant tables const so they can live in read-only memory",
+    "Never derive a function pointer from input; validate any index used to select one"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What is the difference between int (*f)(int) and int *f(int) ?",
+      "choices": {
+        "A": "Nothing — the parentheses are optional",
+        "B": "The first is a pointer to a function; the second is a function that returns a pointer to int",
+        "C": "The first is invalid syntax",
+        "D": "The second is a function pointer array"
+      },
+      "correct": ["B"],
+      "explanation": "The parentheses bind the asterisk to the name rather than to the return type. A typedef removes the ambiguity for readers."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why should a qsort comparator not return x - y ?",
+      "choices": {
+        "A": "It is slower",
+        "B": "The subtraction can overflow for large-magnitude values, which is undefined and can produce the wrong sign — and therefore the wrong order",
+        "C": "qsort requires exactly -1, 0, or 1",
+        "D": "It does not compile"
+      },
+      "correct": ["B"],
+      "explanation": "(x > y) - (x < y) produces the same three-way answer using only comparisons, so nothing can overflow."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why is a writable function pointer a security-relevant target?",
+      "choices": {
+        "A": "It slows down the program",
+        "B": "If an attacker can overwrite it — via an overflow into a neighbouring struct or a use-after-free — the next call through it transfers control to an address they chose",
+        "C": "Function pointers cannot be checked for NULL",
+        "D": "It causes memory leaks"
+      },
+      "correct": ["B"],
+      "explanation": "This is why exploitation discussions focus on vtables, hook tables, and callback fields, and why const tables in read-only memory are a meaningful hardening step."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "What does a dispatch table give you over a long switch statement?",
+      "choices": {
+        "A": "Faster execution in all cases",
+        "B": "Adding a case becomes adding a data row, and the set of handlers becomes inspectable data rather than control flow",
+        "C": "Automatic input validation",
+        "D": "Type safety for the arguments"
+      },
+      "correct": ["B"],
+      "explanation": "It is how shells, interpreters, and drivers organise entry points — the table is data you can read, extend, and mark const."
+    }
+  ]
+}

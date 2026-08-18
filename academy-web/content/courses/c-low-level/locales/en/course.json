@@ -28,6 +28,11 @@
     "control-flow": "Control flow and the traps in it",
     "functions-and-scope": "Functions, arguments, and lifetimes",
     "arrays-and-strings": "Arrays and strings: where the bugs live",
-    "structs": "Structs: grouping data, and what the compiler adds"
+    "structs": "Structs: grouping data, and what the compiler adds",
+    "pointers": "Pointers: variables that hold addresses",
+    "pointer-arithmetic": "Pointer arithmetic and how arrays really work",
+    "stack-vs-heap": "The stack and the heap",
+    "malloc-and-free": "Allocating and releasing memory",
+    "function-pointers": "Function pointers: passing behaviour around"
   }
 }

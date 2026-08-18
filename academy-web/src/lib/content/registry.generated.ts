@@ -46,72 +46,82 @@ import c39 from '../../../content/courses/c-low-level/locales/en/lessons/arrays-
 import c40 from '../../../content/courses/c-low-level/locales/en/lessons/compilation-pipeline.json'
 import c41 from '../../../content/courses/c-low-level/locales/en/lessons/control-flow.json'
 import c42 from '../../../content/courses/c-low-level/locales/en/lessons/first-c-program.json'
-import c43 from '../../../content/courses/c-low-level/locales/en/lessons/functions-and-scope.json'
-import c44 from '../../../content/courses/c-low-level/locales/en/lessons/structs.json'
-import c45 from '../../../content/courses/c-low-level/locales/en/lessons/types-and-operators.json'
-import c46 from '../../../content/courses/c-low-level/locales/en/lessons/undefined-behavior.json'
-import c47 from '../../../content/courses/c-low-level/locales/en/lessons/why-c.json'
-import c48 from '../../../content/courses/c-low-level/locales/en/course.json'
-import c49 from '../../../content/courses/c-low-level/locales/th/lessons/arrays-and-strings.json'
-import c50 from '../../../content/courses/c-low-level/locales/th/lessons/compilation-pipeline.json'
-import c51 from '../../../content/courses/c-low-level/locales/th/lessons/control-flow.json'
-import c52 from '../../../content/courses/c-low-level/locales/th/lessons/first-c-program.json'
-import c53 from '../../../content/courses/c-low-level/locales/th/lessons/functions-and-scope.json'
-import c54 from '../../../content/courses/c-low-level/locales/th/lessons/structs.json'
-import c55 from '../../../content/courses/c-low-level/locales/th/lessons/types-and-operators.json'
-import c56 from '../../../content/courses/c-low-level/locales/th/lessons/undefined-behavior.json'
-import c57 from '../../../content/courses/c-low-level/locales/th/lessons/why-c.json'
-import c58 from '../../../content/courses/c-low-level/locales/th/course.json'
-import c59 from '../../../content/courses/c-low-level/course.json'
-import c60 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-hands-on.json'
-import c61 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-reading.json'
-import c62 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-references.json'
-import c63 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-simulation.json'
-import c64 from '../../../content/courses/content-formats-demo/locales/en/course.json'
-import c65 from '../../../content/courses/content-formats-demo/course.json'
-import c66 from '../../../content/courses/git-essentials/locales/en/lessons/atomic-commits.json'
-import c67 from '../../../content/courses/git-essentials/locales/en/lessons/branching.json'
-import c68 from '../../../content/courses/git-essentials/locales/en/lessons/code-review-basics.json'
-import c69 from '../../../content/courses/git-essentials/locales/en/lessons/git-hooks.json'
-import c70 from '../../../content/courses/git-essentials/locales/en/lessons/github-actions-ci.json'
-import c71 from '../../../content/courses/git-essentials/locales/en/lessons/gitignore.json'
-import c72 from '../../../content/courses/git-essentials/locales/en/lessons/init-and-commit.json'
-import c73 from '../../../content/courses/git-essentials/locales/en/lessons/merging.json'
-import c74 from '../../../content/courses/git-essentials/locales/en/lessons/pull-request-flow.json'
-import c75 from '../../../content/courses/git-essentials/locales/en/lessons/push-pull-fetch.json'
-import c76 from '../../../content/courses/git-essentials/locales/en/lessons/rebase-vs-merge.json'
-import c77 from '../../../content/courses/git-essentials/locales/en/lessons/reflog-rescue.json'
-import c78 from '../../../content/courses/git-essentials/locales/en/lessons/remotes-and-clone.json'
-import c79 from '../../../content/courses/git-essentials/locales/en/lessons/resolving-conflicts.json'
-import c80 from '../../../content/courses/git-essentials/locales/en/lessons/status-diff-log.json'
-import c81 from '../../../content/courses/git-essentials/locales/en/lessons/tags-and-releases.json'
-import c82 from '../../../content/courses/git-essentials/locales/en/lessons/undo-and-restore.json'
-import c83 from '../../../content/courses/git-essentials/locales/en/lessons/why-version-control.json'
-import c84 from '../../../content/courses/git-essentials/locales/en/lessons/working-with-agents.json'
-import c85 from '../../../content/courses/git-essentials/locales/en/lessons/worktree.json'
-import c86 from '../../../content/courses/git-essentials/locales/en/course.json'
-import c87 from '../../../content/courses/git-essentials/locales/th/lessons/atomic-commits.json'
-import c88 from '../../../content/courses/git-essentials/locales/th/lessons/branching.json'
-import c89 from '../../../content/courses/git-essentials/locales/th/lessons/code-review-basics.json'
-import c90 from '../../../content/courses/git-essentials/locales/th/lessons/git-hooks.json'
-import c91 from '../../../content/courses/git-essentials/locales/th/lessons/github-actions-ci.json'
-import c92 from '../../../content/courses/git-essentials/locales/th/lessons/gitignore.json'
-import c93 from '../../../content/courses/git-essentials/locales/th/lessons/init-and-commit.json'
-import c94 from '../../../content/courses/git-essentials/locales/th/lessons/merging.json'
-import c95 from '../../../content/courses/git-essentials/locales/th/lessons/pull-request-flow.json'
-import c96 from '../../../content/courses/git-essentials/locales/th/lessons/push-pull-fetch.json'
-import c97 from '../../../content/courses/git-essentials/locales/th/lessons/rebase-vs-merge.json'
-import c98 from '../../../content/courses/git-essentials/locales/th/lessons/reflog-rescue.json'
-import c99 from '../../../content/courses/git-essentials/locales/th/lessons/remotes-and-clone.json'
-import c100 from '../../../content/courses/git-essentials/locales/th/lessons/resolving-conflicts.json'
-import c101 from '../../../content/courses/git-essentials/locales/th/lessons/status-diff-log.json'
-import c102 from '../../../content/courses/git-essentials/locales/th/lessons/tags-and-releases.json'
-import c103 from '../../../content/courses/git-essentials/locales/th/lessons/undo-and-restore.json'
-import c104 from '../../../content/courses/git-essentials/locales/th/lessons/why-version-control.json'
-import c105 from '../../../content/courses/git-essentials/locales/th/lessons/working-with-agents.json'
-import c106 from '../../../content/courses/git-essentials/locales/th/lessons/worktree.json'
-import c107 from '../../../content/courses/git-essentials/locales/th/course.json'
-import c108 from '../../../content/courses/git-essentials/course.json'
+import c43 from '../../../content/courses/c-low-level/locales/en/lessons/function-pointers.json'
+import c44 from '../../../content/courses/c-low-level/locales/en/lessons/functions-and-scope.json'
+import c45 from '../../../content/courses/c-low-level/locales/en/lessons/malloc-and-free.json'
+import c46 from '../../../content/courses/c-low-level/locales/en/lessons/pointer-arithmetic.json'
+import c47 from '../../../content/courses/c-low-level/locales/en/lessons/pointers.json'
+import c48 from '../../../content/courses/c-low-level/locales/en/lessons/stack-vs-heap.json'
+import c49 from '../../../content/courses/c-low-level/locales/en/lessons/structs.json'
+import c50 from '../../../content/courses/c-low-level/locales/en/lessons/types-and-operators.json'
+import c51 from '../../../content/courses/c-low-level/locales/en/lessons/undefined-behavior.json'
+import c52 from '../../../content/courses/c-low-level/locales/en/lessons/why-c.json'
+import c53 from '../../../content/courses/c-low-level/locales/en/course.json'
+import c54 from '../../../content/courses/c-low-level/locales/th/lessons/arrays-and-strings.json'
+import c55 from '../../../content/courses/c-low-level/locales/th/lessons/compilation-pipeline.json'
+import c56 from '../../../content/courses/c-low-level/locales/th/lessons/control-flow.json'
+import c57 from '../../../content/courses/c-low-level/locales/th/lessons/first-c-program.json'
+import c58 from '../../../content/courses/c-low-level/locales/th/lessons/function-pointers.json'
+import c59 from '../../../content/courses/c-low-level/locales/th/lessons/functions-and-scope.json'
+import c60 from '../../../content/courses/c-low-level/locales/th/lessons/malloc-and-free.json'
+import c61 from '../../../content/courses/c-low-level/locales/th/lessons/pointer-arithmetic.json'
+import c62 from '../../../content/courses/c-low-level/locales/th/lessons/pointers.json'
+import c63 from '../../../content/courses/c-low-level/locales/th/lessons/stack-vs-heap.json'
+import c64 from '../../../content/courses/c-low-level/locales/th/lessons/structs.json'
+import c65 from '../../../content/courses/c-low-level/locales/th/lessons/types-and-operators.json'
+import c66 from '../../../content/courses/c-low-level/locales/th/lessons/undefined-behavior.json'
+import c67 from '../../../content/courses/c-low-level/locales/th/lessons/why-c.json'
+import c68 from '../../../content/courses/c-low-level/locales/th/course.json'
+import c69 from '../../../content/courses/c-low-level/course.json'
+import c70 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-hands-on.json'
+import c71 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-reading.json'
+import c72 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-references.json'
+import c73 from '../../../content/courses/content-formats-demo/locales/en/lessons/formats-simulation.json'
+import c74 from '../../../content/courses/content-formats-demo/locales/en/course.json'
+import c75 from '../../../content/courses/content-formats-demo/course.json'
+import c76 from '../../../content/courses/git-essentials/locales/en/lessons/atomic-commits.json'
+import c77 from '../../../content/courses/git-essentials/locales/en/lessons/branching.json'
+import c78 from '../../../content/courses/git-essentials/locales/en/lessons/code-review-basics.json'
+import c79 from '../../../content/courses/git-essentials/locales/en/lessons/git-hooks.json'
+import c80 from '../../../content/courses/git-essentials/locales/en/lessons/github-actions-ci.json'
+import c81 from '../../../content/courses/git-essentials/locales/en/lessons/gitignore.json'
+import c82 from '../../../content/courses/git-essentials/locales/en/lessons/init-and-commit.json'
+import c83 from '../../../content/courses/git-essentials/locales/en/lessons/merging.json'
+import c84 from '../../../content/courses/git-essentials/locales/en/lessons/pull-request-flow.json'
+import c85 from '../../../content/courses/git-essentials/locales/en/lessons/push-pull-fetch.json'
+import c86 from '../../../content/courses/git-essentials/locales/en/lessons/rebase-vs-merge.json'
+import c87 from '../../../content/courses/git-essentials/locales/en/lessons/reflog-rescue.json'
+import c88 from '../../../content/courses/git-essentials/locales/en/lessons/remotes-and-clone.json'
+import c89 from '../../../content/courses/git-essentials/locales/en/lessons/resolving-conflicts.json'
+import c90 from '../../../content/courses/git-essentials/locales/en/lessons/status-diff-log.json'
+import c91 from '../../../content/courses/git-essentials/locales/en/lessons/tags-and-releases.json'
+import c92 from '../../../content/courses/git-essentials/locales/en/lessons/undo-and-restore.json'
+import c93 from '../../../content/courses/git-essentials/locales/en/lessons/why-version-control.json'
+import c94 from '../../../content/courses/git-essentials/locales/en/lessons/working-with-agents.json'
+import c95 from '../../../content/courses/git-essentials/locales/en/lessons/worktree.json'
+import c96 from '../../../content/courses/git-essentials/locales/en/course.json'
+import c97 from '../../../content/courses/git-essentials/locales/th/lessons/atomic-commits.json'
+import c98 from '../../../content/courses/git-essentials/locales/th/lessons/branching.json'
+import c99 from '../../../content/courses/git-essentials/locales/th/lessons/code-review-basics.json'
+import c100 from '../../../content/courses/git-essentials/locales/th/lessons/git-hooks.json'
+import c101 from '../../../content/courses/git-essentials/locales/th/lessons/github-actions-ci.json'
+import c102 from '../../../content/courses/git-essentials/locales/th/lessons/gitignore.json'
+import c103 from '../../../content/courses/git-essentials/locales/th/lessons/init-and-commit.json'
+import c104 from '../../../content/courses/git-essentials/locales/th/lessons/merging.json'
+import c105 from '../../../content/courses/git-essentials/locales/th/lessons/pull-request-flow.json'
+import c106 from '../../../content/courses/git-essentials/locales/th/lessons/push-pull-fetch.json'
+import c107 from '../../../content/courses/git-essentials/locales/th/lessons/rebase-vs-merge.json'
+import c108 from '../../../content/courses/git-essentials/locales/th/lessons/reflog-rescue.json'
+import c109 from '../../../content/courses/git-essentials/locales/th/lessons/remotes-and-clone.json'
+import c110 from '../../../content/courses/git-essentials/locales/th/lessons/resolving-conflicts.json'
+import c111 from '../../../content/courses/git-essentials/locales/th/lessons/status-diff-log.json'
+import c112 from '../../../content/courses/git-essentials/locales/th/lessons/tags-and-releases.json'
+import c113 from '../../../content/courses/git-essentials/locales/th/lessons/undo-and-restore.json'
+import c114 from '../../../content/courses/git-essentials/locales/th/lessons/why-version-control.json'
+import c115 from '../../../content/courses/git-essentials/locales/th/lessons/working-with-agents.json'
+import c116 from '../../../content/courses/git-essentials/locales/th/lessons/worktree.json'
+import c117 from '../../../content/courses/git-essentials/locales/th/course.json'
+import c118 from '../../../content/courses/git-essentials/course.json'
 
 /** โครง + ข้อความของทุกคอร์ส ผูกเข้ามาตอน build ไม่ใช่ตอน request */
 export const COURSE_REGISTRY: Record<
@@ -164,89 +174,99 @@ export const COURSE_REGISTRY: Record<
     },
   },
   "c-low-level": {
-    __structure: c59,
+    __structure: c69,
     "en": {
-      __copy: c48,
+      __copy: c53,
       "arrays-and-strings": c39,
       "compilation-pipeline": c40,
       "control-flow": c41,
       "first-c-program": c42,
-      "functions-and-scope": c43,
-      "structs": c44,
-      "types-and-operators": c45,
-      "undefined-behavior": c46,
-      "why-c": c47,
+      "function-pointers": c43,
+      "functions-and-scope": c44,
+      "malloc-and-free": c45,
+      "pointer-arithmetic": c46,
+      "pointers": c47,
+      "stack-vs-heap": c48,
+      "structs": c49,
+      "types-and-operators": c50,
+      "undefined-behavior": c51,
+      "why-c": c52,
     },
     "th": {
-      __copy: c58,
-      "arrays-and-strings": c49,
-      "compilation-pipeline": c50,
-      "control-flow": c51,
-      "first-c-program": c52,
-      "functions-and-scope": c53,
-      "structs": c54,
-      "types-and-operators": c55,
-      "undefined-behavior": c56,
-      "why-c": c57,
+      __copy: c68,
+      "arrays-and-strings": c54,
+      "compilation-pipeline": c55,
+      "control-flow": c56,
+      "first-c-program": c57,
+      "function-pointers": c58,
+      "functions-and-scope": c59,
+      "malloc-and-free": c60,
+      "pointer-arithmetic": c61,
+      "pointers": c62,
+      "stack-vs-heap": c63,
+      "structs": c64,
+      "types-and-operators": c65,
+      "undefined-behavior": c66,
+      "why-c": c67,
     },
   },
   "content-formats-demo": {
-    __structure: c65,
+    __structure: c75,
     "en": {
-      __copy: c64,
-      "formats-hands-on": c60,
-      "formats-reading": c61,
-      "formats-references": c62,
-      "formats-simulation": c63,
+      __copy: c74,
+      "formats-hands-on": c70,
+      "formats-reading": c71,
+      "formats-references": c72,
+      "formats-simulation": c73,
     },
   },
   "git-essentials": {
-    __structure: c108,
+    __structure: c118,
     "en": {
-      __copy: c86,
-      "atomic-commits": c66,
-      "branching": c67,
-      "code-review-basics": c68,
-      "git-hooks": c69,
-      "github-actions-ci": c70,
-      "gitignore": c71,
-      "init-and-commit": c72,
-      "merging": c73,
-      "pull-request-flow": c74,
-      "push-pull-fetch": c75,
-      "rebase-vs-merge": c76,
-      "reflog-rescue": c77,
-      "remotes-and-clone": c78,
-      "resolving-conflicts": c79,
-      "status-diff-log": c80,
-      "tags-and-releases": c81,
-      "undo-and-restore": c82,
-      "why-version-control": c83,
-      "working-with-agents": c84,
-      "worktree": c85,
+      __copy: c96,
+      "atomic-commits": c76,
+      "branching": c77,
+      "code-review-basics": c78,
+      "git-hooks": c79,
+      "github-actions-ci": c80,
+      "gitignore": c81,
+      "init-and-commit": c82,
+      "merging": c83,
+      "pull-request-flow": c84,
+      "push-pull-fetch": c85,
+      "rebase-vs-merge": c86,
+      "reflog-rescue": c87,
+      "remotes-and-clone": c88,
+      "resolving-conflicts": c89,
+      "status-diff-log": c90,
+      "tags-and-releases": c91,
+      "undo-and-restore": c92,
+      "why-version-control": c93,
+      "working-with-agents": c94,
+      "worktree": c95,
     },
     "th": {
-      __copy: c107,
-      "atomic-commits": c87,
-      "branching": c88,
-      "code-review-basics": c89,
-      "git-hooks": c90,
-      "github-actions-ci": c91,
-      "gitignore": c92,
-      "init-and-commit": c93,
-      "merging": c94,
-      "pull-request-flow": c95,
-      "push-pull-fetch": c96,
-      "rebase-vs-merge": c97,
-      "reflog-rescue": c98,
-      "remotes-and-clone": c99,
-      "resolving-conflicts": c100,
-      "status-diff-log": c101,
-      "tags-and-releases": c102,
-      "undo-and-restore": c103,
-      "why-version-control": c104,
-      "working-with-agents": c105,
-      "worktree": c106,
+      __copy: c117,
+      "atomic-commits": c97,
+      "branching": c98,
+      "code-review-basics": c99,
+      "git-hooks": c100,
+      "github-actions-ci": c101,
+      "gitignore": c102,
+      "init-and-commit": c103,
+      "merging": c104,
+      "pull-request-flow": c105,
+      "push-pull-fetch": c106,
+      "rebase-vs-merge": c107,
+      "reflog-rescue": c108,
+      "remotes-and-clone": c109,
+      "resolving-conflicts": c110,
+      "status-diff-log": c111,
+      "tags-and-releases": c112,
+      "undo-and-restore": c113,
+      "why-version-control": c114,
+      "working-with-agents": c115,
+      "worktree": c116,
     },
   },
 } as never

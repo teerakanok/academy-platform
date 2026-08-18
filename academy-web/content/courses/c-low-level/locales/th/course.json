@@ -28,6 +28,11 @@
     "control-flow": "การควบคุมการไหลและกับดักในนั้น",
     "functions-and-scope": "ฟังก์ชัน argument และอายุของตัวแปร",
     "arrays-and-strings": "array และ string: ที่ที่บั๊กอาศัยอยู่",
-    "structs": "struct: การจัดกลุ่มข้อมูล และสิ่งที่คอมไพเลอร์แถมมาให้"
+    "structs": "struct: การจัดกลุ่มข้อมูล และสิ่งที่คอมไพเลอร์แถมมาให้",
+    "pointers": "pointer: ตัวแปรที่เก็บที่อยู่",
+    "pointer-arithmetic": "เลขคณิตของ pointer และ array ทำงานอย่างไรจริงๆ",
+    "stack-vs-heap": "stack กับ heap",
+    "malloc-and-free": "การจองและการคืนหน่วยความจำ",
+    "function-pointers": "function pointer: การส่งพฤติกรรมไปมา"
   }
 }

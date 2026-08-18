@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "intermediate",
-  "estimatedMinutes": 154,
+  "estimatedMinutes": 250,
   "coverMotif": "probe",
   "skills": [
     {
@@ -145,6 +145,66 @@
       "estimatedMinutes": 18,
       "skillWeights": {
         "memory-model": 5,
+        "c-syntax": 2
+      }
+    },
+    {
+      "id": "pointers",
+      "kind": "lesson",
+      "prerequisites": [
+        "structs"
+      ],
+      "estimatedMinutes": 20,
+      "skillWeights": {
+        "pointers": 6,
+        "memory-model": 3
+      }
+    },
+    {
+      "id": "pointer-arithmetic",
+      "kind": "lesson",
+      "prerequisites": [
+        "pointers"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "pointers": 5,
+        "memory-model": 3
+      }
+    },
+    {
+      "id": "stack-vs-heap",
+      "kind": "lesson",
+      "prerequisites": [
+        "pointer-arithmetic"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "memory-model": 6
+      }
+    },
+    {
+      "id": "malloc-and-free",
+      "kind": "capstone",
+      "prerequisites": [
+        "stack-vs-heap"
+      ],
+      "estimatedMinutes": 22,
+      "skillWeights": {
+        "memory-model": 5,
+        "debugging": 4,
+        "pointers": 2
+      }
+    },
+    {
+      "id": "function-pointers",
+      "kind": "lesson",
+      "prerequisites": [
+        "malloc-and-free"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "pointers": 5,
         "c-syntax": 2
       }
     }

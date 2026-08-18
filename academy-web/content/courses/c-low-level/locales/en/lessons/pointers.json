@@ -1,0 +1,229 @@
+{
+  "nodeId": "pointers",
+  "locale": "en",
+  "title": "Pointers: variables that hold addresses",
+  "objective": "By the end of this lesson you can read any pointer declaration, use & and * correctly, and explain what a pointer actually contains — which is simpler than its reputation suggests.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Every variable lives at an address in memory. A pointer is a variable whose value is one of those addresses. That is the entire concept. The difficulty people report is almost always about the notation, not the idea."
+    },
+    {
+      "kind": "code",
+      "caption": "The two operators",
+      "lines": [
+        "int x = 42;",
+        "int *p = &x;        /* & takes the address of x; p now holds it */",
+        "",
+        "printf(\"%d\\n\", x);     /* 42  — the value */",
+        "printf(\"%p\\n\", (void *)&x);  /* 0x7ffd...  — where it lives */",
+        "printf(\"%p\\n\", (void *)p);   /* the same address — that is what p holds */",
+        "printf(\"%d\\n\", *p);    /* 42  — * follows the address back to the value */",
+        "",
+        "*p = 99;               /* write through the pointer */",
+        "printf(\"%d\\n\", x);     /* 99 — x changed, because p pointed at it */"
+      ]
+    },
+    {
+      "kind": "table",
+      "headers": ["Written", "Read as"],
+      "rows": [
+        ["&x", "the address of x"],
+        ["*p", "the value at the address in p"],
+        ["int *p", "p is a pointer to an int"],
+        ["p = &x", "make p hold the address of x"],
+        ["*p = 5", "store 5 at the address p holds"]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The asterisk means two different things",
+      "text": "In a declaration, int *p means 'p is a pointer to int'. In an expression, *p means 'the value at p'. Same symbol, opposite directions — declaration describes the type, expression performs the lookup. Reading declarations right to left helps: int *p is 'p is a pointer to int'."
+    },
+    {
+      "kind": "heading",
+      "text": "Why the pointer's type matters"
+    },
+    {
+      "kind": "code",
+      "caption": "The type says how much to read and how far to step",
+      "lines": [
+        "int    *pi;    /* reading *pi reads 4 bytes and interprets them as an int */",
+        "char   *pc;    /* reading *pc reads 1 byte */",
+        "double *pd;    /* reading *pd reads 8 bytes */",
+        "",
+        "/* All three hold an address of the same size.",
+        "   The type is not about the pointer — it is about what happens when you follow it. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "NULL: a pointer that points at nothing"
+    },
+    {
+      "kind": "code",
+      "caption": "The convention, and the check",
+      "lines": [
+        "int *p = NULL;              /* explicitly points nowhere */",
+        "",
+        "if (p != NULL) {",
+        "    printf(\"%d\\n\", *p);     /* only follow it after checking */",
+        "}",
+        "",
+        "int *q;                     /* UNINITIALISED — not NULL, holds garbage */",
+        "*q = 5;                     /* undefined behaviour: writes to an unknown address */",
+        "",
+        "int *r = NULL;              /* always initialise, even to NULL */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "An uninitialised pointer is more dangerous than a NULL one",
+      "text": "Dereferencing NULL usually crashes immediately, which is loud and easy to find. An uninitialised pointer holds whatever bytes were left on the stack, which may be a valid-looking address — so the write succeeds and quietly corrupts something else. Initialise every pointer at declaration, even if only to NULL."
+    },
+    {
+      "kind": "heading",
+      "text": "The main reason pointers exist: letting a function change your variable"
+    },
+    {
+      "kind": "code",
+      "caption": "Output parameters",
+      "lines": [
+        "void get_dimensions(int *width, int *height) {",
+        "    *width = 1920;",
+        "    *height = 1080;",
+        "}",
+        "",
+        "int w = 0, h = 0;",
+        "get_dimensions(&w, &h);       /* pass addresses so the function can write back */",
+        "printf(\"%d x %d\\n\", w, h);",
+        "",
+        "int divide(int a, int b, int *result) {   /* status plus an output value */",
+        "    if (b == 0) return -1;",
+        "    *result = a / b;",
+        "    return 0;",
+        "}"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "const and pointers: three different promises"
+    },
+    {
+      "kind": "code",
+      "caption": "Read the declaration right to left",
+      "lines": [
+        "const char *p;        /* pointer to const char: cannot change *p, can change p */",
+        "char *const p;        /* const pointer to char: can change *p, cannot change p */",
+        "const char *const p;  /* neither can change */",
+        "",
+        "void print(const char *text);   /* promises not to modify what text points at */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "const in a parameter is documentation the compiler enforces",
+      "text": "A function taking const char * is telling every caller that the data will not be modified, and the compiler will reject any attempt inside the function. It costs nothing and removes a question the reader would otherwise have to answer by reading the whole body."
+    },
+    {
+      "kind": "heading",
+      "text": "Pointers to pointers"
+    },
+    {
+      "kind": "code",
+      "caption": "One more level, same rules",
+      "lines": [
+        "int x = 42;",
+        "int *p = &x;",
+        "int **pp = &p;        /* pp holds the address of p */",
+        "",
+        "printf(\"%d\\n\", **pp);  /* follow twice: 42 */",
+        "",
+        "/* Used when a function must change the caller's pointer: */",
+        "void allocate(int **out) {",
+        "    *out = malloc(sizeof(int));",
+        "}",
+        "int *data = NULL;",
+        "allocate(&data);       /* without the extra level, data would stay NULL */"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "See addresses and values side by side",
+      "steps": [
+        "Write: int x = 42; int *p = &x;",
+        "Print all four: x, (void *)&x, (void *)p, *p",
+        "Run: *p = 99; then print x — confirm it changed",
+        "Declare int *q = NULL; and print it with %p",
+        "Write get_dimensions(int *, int *) and call it with &w, &h",
+        "Add const char *name = \"fixed\"; then try name[0] = 'F'; and read the compile error",
+        "Write allocate(int **out) and confirm data is non-NULL after the call"
+      ],
+      "expected": "The same address printed two ways, a value changed through a pointer, a function writing into your variables, a const violation caught at compile time, and a pointer-to-pointer that lets a function replace your pointer. Nothing here is conceptually hard — it is all one idea seen from several angles."
+    }
+  ],
+  "cheatsheet": [
+    "A pointer holds an address; that is the whole concept",
+    "&x = the address of x · *p = the value at p",
+    "In a declaration * marks the type; in an expression * performs the lookup",
+    "The pointer's type decides how many bytes are read when you follow it",
+    "Initialise every pointer, even to NULL — an uninitialised pointer may look valid and corrupt memory",
+    "Check for NULL before dereferencing",
+    "Pass &variable so a function can write back to it",
+    "const char *p protects the data; char *const p protects the pointer",
+    "int **pp is used when a function must change the caller's pointer itself"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "What does a pointer variable actually contain?",
+      "choices": {
+        "A": "A copy of the value it points to",
+        "B": "A memory address",
+        "C": "The name of another variable",
+        "D": "A reference counted by the runtime"
+      },
+      "correct": ["B"],
+      "explanation": "That is all it is. The type attached to it decides how the memory at that address is interpreted when you follow it."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why is an uninitialised pointer more dangerous than a NULL one?",
+      "choices": {
+        "A": "It is not — both crash the same way",
+        "B": "NULL usually crashes immediately and loudly; an uninitialised pointer may hold a plausible address, so the write succeeds and quietly corrupts something else",
+        "C": "Uninitialised pointers cannot be checked",
+        "D": "NULL pointers leak memory"
+      },
+      "correct": ["B"],
+      "explanation": "A loud failure is a good failure. Silent corruption surfaces later, somewhere unrelated, and is far harder to trace."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "You want a function to set two of the caller's variables. How?",
+      "choices": {
+        "A": "Return both values",
+        "B": "Take pointers to them and write through those pointers",
+        "C": "Declare them global",
+        "D": "Use static variables"
+      },
+      "correct": ["B"],
+      "explanation": "C passes by value and can return only one thing, so output parameters are the standard mechanism."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "What does const char *p promise?",
+      "choices": {
+        "A": "p cannot be changed to point elsewhere",
+        "B": "The characters p points to will not be modified through p — though p itself may be reassigned",
+        "C": "Both the pointer and the data are fixed",
+        "D": "The string is stored in read-only memory"
+      },
+      "correct": ["B"],
+      "explanation": "char *const p is the other way round, and const char *const p fixes both. Read the declaration right to left."
+    }
+  ]
+}
