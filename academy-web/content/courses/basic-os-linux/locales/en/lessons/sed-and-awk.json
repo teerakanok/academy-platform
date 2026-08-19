@@ -120,7 +120,7 @@
       "correct": [
         "C"
       ],
-      "explanation": "G replaces every match on the line g applies to every occurrence within each line. Without it, only the first occurrence on a line is replaced — a common source of surprise."
+      "explanation": "G replaces every match on the line. g applies to every occurrence within each line. Without it, only the first occurrence on a line is replaced — a common source of surprise."
     },
     {
       "id": "cp-2",

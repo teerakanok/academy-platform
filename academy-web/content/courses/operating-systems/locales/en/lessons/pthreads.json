@@ -204,7 +204,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "The thread may read freed memory 'Fast enough' is not a guarantee, it is a race you usually win. Join before returning, or hand the thread memory it owns."
+      "explanation": "The thread may read freed memory. 'Fast enough' is not a guarantee, it is a race you usually win. Join before returning, or hand the thread memory it owns."
     },
     {
       "id": "cp-3",

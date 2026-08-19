@@ -250,7 +250,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "A full walk from the root takes far longer A few milliseconds is a local round trip to a resolver that already had the answer. The first uncached lookup of an unfamiliar name is visibly slower."
+      "explanation": "A full walk from the root takes far longer. A few milliseconds is a local round trip to a resolver that already had the answer. The first uncached lookup of an unfamiliar name is visibly slower."
     },
     {
       "id": "cp-4",
@@ -264,7 +264,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "Run dig by hand and separate DNS from connectivity A failed lookup surfaces at the point of connecting and reads like a network problem. Separating the two takes one command and eliminates a whole category of wrong investigation."
+      "explanation": "Run dig by hand and separate DNS from connectivity. A failed lookup surfaces at the point of connecting and reads like a network problem. Separating the two takes one command and eliminates a whole category of wrong investigation."
     }
   ]
 }

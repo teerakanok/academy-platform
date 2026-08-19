@@ -165,7 +165,7 @@
       "correct": [
         "D"
       ],
-      "explanation": "Ignore rules only apply to files. Git is not tracking yet Use git rm --cached to stop tracking it, then commit that. The ignore rule then keeps it out from that point forward."
+      "explanation": "Ignore rules only apply to files Git is not tracking yet. Use git rm --cached to stop tracking it, then commit that. The ignore rule then keeps it out from that point forward."
     },
     {
       "id": "cp-2",

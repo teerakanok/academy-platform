@@ -188,7 +188,7 @@
       "correct": [
         "C"
       ],
-      "explanation": "The summary is a claim to verify, like any pull request description A description of a change is not evidence about the change. The diff and a test run you observed are."
+      "explanation": "The summary is a claim to verify, like any pull request description. A description of a change is not evidence about the change. The diff and a test run you observed are."
     },
     {
       "id": "cp-3",

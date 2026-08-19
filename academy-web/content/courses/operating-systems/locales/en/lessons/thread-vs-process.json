@@ -182,7 +182,7 @@
       "correct": [
         "D"
       ],
-      "explanation": "Decide on isolation and sharing needs A ~95 microsecond difference against 50 milliseconds is about two-tenths of one percent. When creation cost genuinely matters, the answer is a pool that creates nothing per item."
+      "explanation": "Decide on isolation and sharing needs. A ~95 microsecond difference against 50 milliseconds is about two-tenths of one percent. When creation cost genuinely matters, the answer is a pool that creates nothing per item."
     },
     {
       "id": "cp-4",

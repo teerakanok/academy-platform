@@ -198,7 +198,7 @@
       "correct": [
         "C"
       ],
-      "explanation": "Tools you installed disappear later in the course They are the fastest way to run a first command and a poor way to keep a course's worth of state. If you use one, expect to reinstall and keep your work in git."
+      "explanation": "Tools you installed disappear later in the course. They are the fastest way to run a first command and a poor way to keep a course's worth of state. If you use one, expect to reinstall and keep your work in git."
     },
     {
       "id": "cp-4",

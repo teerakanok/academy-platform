@@ -129,7 +129,7 @@
       "correct": [
         "D"
       ],
-      "explanation": "A typo, not installed, or not on PATH Distinguish it from Permission denied, where the program ran and the kernel refused, and from No such file, where the program ran and looked."
+      "explanation": "A typo, not installed, or not on PATH. Distinguish it from Permission denied, where the program ran and the kernel refused, and from No such file, where the program ran and looked."
     },
     {
       "id": "cp-3",

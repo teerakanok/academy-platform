@@ -221,7 +221,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "An uninitialised pointer may hold a plausible address, so the write succeeds and quietly corrupts something else A loud failure is a good failure. Silent corruption surfaces later, somewhere unrelated, and is far harder to trace."
+      "explanation": "An uninitialised pointer may hold a plausible address, so the write succeeds and quietly corrupts something else. A loud failure is a good failure. Silent corruption surfaces later, somewhere unrelated, and is far harder to trace."
     },
     {
       "id": "cp-3",
@@ -249,7 +249,7 @@
       "correct": [
         "D"
       ],
-      "explanation": "Though p itself may be reassigned char *const p is the other way round, and const char *const p fixes both. Read the declaration right to left."
+      "explanation": "Though p itself may be reassigned. char *const p is the other way round, and const char *const p fixes both. Read the declaration right to left."
     }
   ]
 }

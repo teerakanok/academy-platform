@@ -236,7 +236,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "Perfect scaling was the clue that it was not measuring bandwidth A shared resource saturates. A measurement that never saturates is measuring something private to each thread — here, each thread's own accumulator chain."
+      "explanation": "Perfect scaling was the clue that it was not measuring bandwidth. A shared resource saturates. A measurement that never saturates is measuring something private to each thread — here, each thread's own accumulator chain."
     },
     {
       "id": "cp-3",

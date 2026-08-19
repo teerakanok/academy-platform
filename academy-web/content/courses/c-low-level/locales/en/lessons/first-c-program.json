@@ -205,7 +205,7 @@
       "correct": [
         "B"
       ],
-      "explanation": "Any input longer than the buffer wrote past the end of it A function that cannot be used safely regardless of caller care. fgets takes a size, which is the whole difference."
+      "explanation": "Any input longer than the buffer wrote past the end of it. A function that cannot be used safely regardless of caller care. fgets takes a size, which is the whole difference."
     },
     {
       "id": "cp-3",
@@ -219,7 +219,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "Printf reads the argument according to the format string, so the output may be wrong or worse printf trusts the format string. -Wall checks format strings against their arguments, which is why the warnings are worth turning on."
+      "explanation": "Printf reads the argument according to the format string, so the output may be wrong, or worse. printf trusts the format string. -Wall checks format strings against their arguments, which is why the warnings are worth turning on."
     },
     {
       "id": "cp-4",

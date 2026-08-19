@@ -249,7 +249,7 @@
       "correct": [
         "C"
       ],
-      "explanation": "Setl for signed, setb for unsigned cmp sets every flag without interpreting its operands. Less/greater are the signed words, below/above the unsigned ones."
+      "explanation": "Setl for signed, setb for unsigned. cmp sets every flag without interpreting its operands. Less/greater are the signed words, below/above the unsigned ones."
     },
     {
       "id": "cp-2",

@@ -167,7 +167,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "The shell never looks there which finds nothing and echo $PATH shows the list the shell actually searches. Adding the directory to PATH is the fix."
+      "explanation": "The shell never looks there. which finds nothing and echo $PATH shows the list the shell actually searches. Adding the directory to PATH is the fix."
     },
     {
       "id": "cp-2",
@@ -195,7 +195,7 @@
       "correct": [
         "D"
       ],
-      "explanation": "That a file named ls dropped into a directory cannot hijack your next command That is why you write ./name — the ./ says explicitly that you mean the file here, not something found on PATH."
+      "explanation": "That a file named ls dropped into a directory cannot hijack your next command. That is why you write ./name — the ./ says explicitly that you mean the file here, not something found on PATH."
     },
     {
       "id": "cp-4",
@@ -209,7 +209,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "And if the lesson genuinely never mentions the difference, that is a defect in the lesson worth reporting This track states its platform wherever it matters. Silence about a difference you can reproduce is a gap in the material, not necessarily a mistake by you."
+      "explanation": "And if the lesson genuinely never mentions the difference, that is a defect in the lesson worth reporting. This track states its platform wherever it matters. Silence about a difference you can reproduce is a gap in the material, not necessarily a mistake by you."
     }
   ]
 }

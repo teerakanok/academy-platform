@@ -203,7 +203,7 @@
       "correct": [
         "C"
       ],
-      "explanation": "This object file needs it but does not provide it T means defined in this object; U means required from elsewhere. Linking succeeds when every U has a matching T."
+      "explanation": "This object file needs it but does not provide it. T means defined in this object; U means required from elsewhere. Linking succeeds when every U has a matching T."
     },
     {
       "id": "cp-2",

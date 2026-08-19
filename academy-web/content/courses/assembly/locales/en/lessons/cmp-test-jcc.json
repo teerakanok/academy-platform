@@ -253,7 +253,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "The compiler computed them instead of storing them A switch is a request, not an instruction. Returning 10, 20 up to 80 for inputs 0 to 7 is just 10x + 10, so no table or branch is needed."
+      "explanation": "The compiler computed them instead of storing them. A switch is a request, not an instruction. Returning 10, 20 up to 80 for inputs 0 to 7 is just 10x + 10, so no table or branch is needed."
     }
   ]
 }

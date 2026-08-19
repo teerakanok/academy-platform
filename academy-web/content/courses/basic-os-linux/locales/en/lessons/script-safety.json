@@ -163,7 +163,7 @@
       "correct": [
         "B"
       ],
-      "explanation": "Which can turn \"$DIR/old\" into \"/old\" By default the shell expands an unset variable to an empty string and carries on. -u makes that an error, which is what you want in anything that deletes or moves data."
+      "explanation": "Which can turn \"$DIR/old\" into \"/old\". By default the shell expands an unset variable to an empty string and carries on. -u makes that an error, which is what you want in anything that deletes or moves data."
     },
     {
       "id": "cp-2",

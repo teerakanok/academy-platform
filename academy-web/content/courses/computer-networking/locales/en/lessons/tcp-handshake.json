@@ -185,7 +185,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "The peer closed, it was told, and it never called close() CLOSE_WAIT means the local side has been informed and has not responded by closing. Each one holds a descriptor, so the count only rises until the program runs out."
+      "explanation": "The peer closed, it was told, and it never called close(). CLOSE_WAIT means the local side has been informed and has not responded by closing. Each one holds a descriptor, so the count only rises until the program runs out."
     },
     {
       "id": "cp-2",
@@ -199,7 +199,7 @@
       "correct": [
         "C"
       ],
-      "explanation": "The timeout means nothing that would reply was reached, which points at filtering A refusal is a fast honest answer and proves reachability. A timeout proves only silence, which is what a firewall configured to drop rather than reject produces."
+      "explanation": "The timeout means nothing that would reply was reached, which points at filtering. A refusal is a fast honest answer and proves reachability. A timeout proves only silence, which is what a firewall configured to drop rather than reject produces."
     },
     {
       "id": "cp-3",

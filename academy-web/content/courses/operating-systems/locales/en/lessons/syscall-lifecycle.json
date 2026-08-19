@@ -147,7 +147,7 @@
       "correct": [
         "C"
       ],
-      "explanation": "Is normal and must always be checked read returns the count it managed to supply. Code that assumes it always fills the buffer is a classic bug, especially on pipes and sockets — which you will meet again in the networking course."
+      "explanation": "Is normal and must always be checked. read returns the count it managed to supply. Code that assumes it always fills the buffer is a classic bug, especially on pipes and sockets — which you will meet again in the networking course."
     },
     {
       "id": "cp-2",

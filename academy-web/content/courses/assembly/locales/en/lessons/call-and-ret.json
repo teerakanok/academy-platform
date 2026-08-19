@@ -244,7 +244,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "Call was replaced by jmp, so no return address for it was ever pushed and it does not appear in a backtrace A call in tail position has nothing left to do after it returns, so the current frame is free to reuse. That is why a tail-called function is missing from a backtrace: no return address for it exists to walk back through. Inlining removes a function from the trace too, but by a different route — the call site disappears entirely."
+      "explanation": "Call was replaced by jmp, so no return address for it was ever pushed and it does not appear in a backtrace. A call in tail position has nothing left to do after it returns, so the current frame is free to reuse. That is why a tail-called function is missing from a backtrace: no return address for it exists to walk back through. Inlining removes a function from the trace too, but by a different route — the call site disappears entirely."
     }
   ]
 }

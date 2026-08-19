@@ -185,7 +185,7 @@
       "correct": [
         "B"
       ],
-      "explanation": "The commits are still reachable via the reflog and the branch can be recreated A branch is a pointer. Deleting the pointer does not delete the commits — git branch <name> <id> puts the label back."
+      "explanation": "The commits are still reachable via the reflog and the branch can be recreated. A branch is a pointer. Deleting the pointer does not delete the commits — git branch <name> <id> puts the label back."
     },
     {
       "id": "cp-3",

@@ -224,7 +224,7 @@
       "correct": [
         "B"
       ],
-      "explanation": "Is why the pattern re-checks a state variable A semaphore would have remembered it by incrementing its count. This difference is usually what decides which one to use."
+      "explanation": "Is why the pattern re-checks a state variable. A semaphore would have remembered it by incrementing its count. This difference is usually what decides which one to use."
     },
     {
       "id": "cp-4",
@@ -238,7 +238,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "The workers sleep forever — the condition must also cover shutting down A wait condition that only describes the happy path has no exit. Make it (queue_not_empty || shutting_down), set the flag, and broadcast."
+      "explanation": "The workers sleep forever — the condition must also cover shutting down. A wait condition that only describes the happy path has no exit. Make it (queue_not_empty || shutting_down), set the flag, and broadcast."
     }
   ]
 }

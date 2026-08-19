@@ -96,7 +96,7 @@
       "correct": [
         "B"
       ],
-      "explanation": "WSL runs a real Linux kernel next to. Windows. The Windows command prompt is a different system with different commands entirely."
+      "explanation": "WSL runs a real Linux kernel next to Windows. The Windows command prompt is a different system with different commands entirely."
     },
     {
       "id": "cp-2",

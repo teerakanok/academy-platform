@@ -183,7 +183,7 @@
       "correct": [
         "D"
       ],
-      "explanation": "Is undefined and can produce the wrong sign — and therefore the wrong order (x > y) - (x < y) produces the same three-way answer using only comparisons, so nothing can overflow."
+      "explanation": "Is undefined and can produce the wrong sign — and therefore the wrong order. (x > y) - (x < y) produces the same three-way answer using only comparisons, so nothing can overflow."
     },
     {
       "id": "cp-3",

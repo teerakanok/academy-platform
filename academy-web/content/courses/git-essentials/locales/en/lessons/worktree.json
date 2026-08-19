@@ -170,7 +170,7 @@
       "correct": [
         "B"
       ],
-      "explanation": "Use --detach to inspect the same commit instead A branch is a single pointer. Two checkouts moving it independently is a contradiction, so Git prevents it up front."
+      "explanation": "Use --detach to inspect the same commit instead. A branch is a single pointer. Two checkouts moving it independently is a contradiction, so Git prevents it up front."
     },
     {
       "id": "cp-4",

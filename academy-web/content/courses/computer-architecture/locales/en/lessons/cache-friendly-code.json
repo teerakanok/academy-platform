@@ -274,7 +274,7 @@
       "correct": [
         "C"
       ],
-      "explanation": "And the ranking follows from the hardware, so it must be re-checked on the target machine 58x, 5.9x and 1.3x give the ranking. A machine with less bandwidth would raise the importance of volume, which is why the numbers must be reproduced where the code will run."
+      "explanation": "And the ranking follows from the hardware, so it must be re-checked on the target machine. 58x, 5.9x and 1.3x give the ranking. A machine with less bandwidth would raise the importance of volume, which is why the numbers must be reproduced where the code will run."
     }
   ]
 }

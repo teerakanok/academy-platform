@@ -220,7 +220,7 @@
       "correct": [
         "C"
       ],
-      "explanation": "Check for an address inside 100.64.0.0/10 A second layer of translation above your router cannot be configured from your side. That reserved range is the specific sign that you are behind one."
+      "explanation": "Check for an address inside 100.64.0.0/10. A second layer of translation above your router cannot be configured from your side. That reserved range is the specific sign that you are behind one."
     }
   ]
 }

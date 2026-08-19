@@ -130,7 +130,7 @@
       "correct": [
         "B"
       ],
-      "explanation": "GitHub only speaks git and never gives a login shell, so that wording is expected The part that matters is your name appearing. Reading the second half as a failure is a very common false alarm."
+      "explanation": "GitHub only speaks git and never gives a login shell, so that wording is expected. The part that matters is your name appearing. Reading the second half as a failure is a very common false alarm."
     },
     {
       "id": "cp-2",
@@ -158,7 +158,7 @@
       "correct": [
         "B"
       ],
-      "explanation": "Otherwise both sides have commits and the first push is rejected as unrelated histories, before you know what that means It turns a first-push exercise into a merge problem, which is a bad place to meet your first conflict."
+      "explanation": "Otherwise both sides have commits and the first push is rejected as unrelated histories, before you know what that means. It turns a first-push exercise into a merge problem, which is a bad place to meet your first conflict."
     },
     {
       "id": "cp-4",
@@ -172,7 +172,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "Recovering it is The point of pushing is that the work survives the loss of your machine. Deleting and cloning is the smallest experiment that actually tests that claim."
+      "explanation": "Recovering it is. The point of pushing is that the work survives the loss of your machine. Deleting and cloning is the smallest experiment that actually tests that claim."
     }
   ]
 }

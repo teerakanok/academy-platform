@@ -213,7 +213,7 @@
       "correct": [
         "D"
       ],
-      "explanation": "Major hosts stopped accepting account passwords for. Git operations. A token is a credential — scope it tightly and never commit it."
+      "explanation": "Major hosts stopped accepting account passwords for Git operations. A token is a credential — scope it tightly and never commit it."
     },
     {
       "id": "cp-4",
@@ -227,7 +227,7 @@
       "correct": [
         "C"
       ],
-      "explanation": "Log, blame, and bisect all need the history it skips A shallow clone trades away exactly the capabilities that make. Git worth using day to day."
+      "explanation": "Log, blame, and bisect all need the history it skips. A shallow clone trades away exactly the capabilities that make Git worth using day to day."
     }
   ]
 }

@@ -203,7 +203,7 @@
       "correct": [
         "B"
       ],
-      "explanation": "There is no size to read and no interpretation to apply — assign it to a typed pointer first void * is the way C says 'an address to some data'. The type has to come from somewhere before the memory can be read."
+      "explanation": "There is no size to read and no interpretation to apply — assign it to a typed pointer first. void * is the way C says 'an address to some data'. The type has to come from somewhere before the memory can be read."
     }
   ]
 }

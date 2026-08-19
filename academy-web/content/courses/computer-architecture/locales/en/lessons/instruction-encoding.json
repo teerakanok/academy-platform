@@ -173,7 +173,7 @@
       "correct": [
         "B"
       ],
-      "explanation": "The two encodings differ by bit 30 alone 0x007302b3 against 0x407302b3. One bit, because the hardware that adds and the hardware that subtracts are the same unit with one control input flipped."
+      "explanation": "The two encodings differ by bit 30 alone. 0x007302b3 against 0x407302b3. One bit, because the hardware that adds and the hardware that subtracts are the same unit with one control input flipped."
     },
     {
       "id": "cp-3",

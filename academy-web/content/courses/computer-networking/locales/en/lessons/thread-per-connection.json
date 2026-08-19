@@ -199,7 +199,7 @@
       "correct": [
         "B"
       ],
-      "explanation": "Counters, caches, shared lists A single-threaded server has no shared-state problem at all. Keeping per-connection state on the thread's own stack keeps the set of things needing locks small enough to reason about."
+      "explanation": "Counters, caches, shared lists. A single-threaded server has no shared-state problem at all. Keeping per-connection state on the thread's own stack keeps the set of things needing locks small enough to reason about."
     }
   ]
 }

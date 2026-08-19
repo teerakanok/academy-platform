@@ -173,7 +173,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "Because the process never gets to clean up KILL cannot be caught or handled. Whatever the process was in the middle of stays in the middle of it."
+      "explanation": "Because the process never gets to clean up. KILL cannot be caught or handled. Whatever the process was in the middle of stays in the middle of it."
     }
   ]
 }

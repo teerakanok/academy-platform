@@ -192,7 +192,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "The compiler tells you about suspicious code instead of silently accepting it C accepts a great deal of questionable code by default. Warnings are the cheapest defect-finding tool you have, and most real C projects treat them as errors."
+      "explanation": "The compiler tells you about suspicious code instead of silently accepting it. C accepts a great deal of questionable code by default. Warnings are the cheapest defect-finding tool you have, and most real C projects treat them as errors."
     }
   ]
 }

@@ -263,7 +263,7 @@
       "correct": [
         "B"
       ],
-      "explanation": "A check that cannot be skipped A runtime check has to be written, kept, and executed. A compile-time impossibility needs none of those things."
+      "explanation": "A check that cannot be skipped. A runtime check has to be written, kept, and executed. A compile-time impossibility needs none of those things."
     }
   ]
 }

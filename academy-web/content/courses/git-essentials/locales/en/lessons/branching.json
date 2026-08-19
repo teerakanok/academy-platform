@@ -192,7 +192,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "You do not silently discard work -d is the safe delete. -D overrides that check, which is why it should be a deliberate decision rather than a reflex."
+      "explanation": "You do not silently discard work. -d is the safe delete. -D overrides that check, which is why it should be a deliberate decision rather than a reflex."
     }
   ]
 }

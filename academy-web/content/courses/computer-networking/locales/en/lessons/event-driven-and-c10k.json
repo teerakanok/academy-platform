@@ -223,7 +223,7 @@
       "correct": [
         "D"
       ],
-      "explanation": "A partial write must be finished when the socket can accept more A slow client's socket buffer fills, write sends only part, and a loop that assumes completion drops the rest. It fails only for the slowest clients, which is what makes it hard to reproduce."
+      "explanation": "A partial write must be finished when the socket can accept more. A slow client's socket buffer fills, write sends only part, and a loop that assumes completion drops the rest. It fails only for the slowest clients, which is what makes it hard to reproduce."
     },
     {
       "id": "cp-3",

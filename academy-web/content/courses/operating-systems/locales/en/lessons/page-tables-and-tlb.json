@@ -125,7 +125,7 @@
       "correct": [
         "B"
       ],
-      "explanation": "A tree omits the unmapped parts A process maps a tiny fraction of its possible addresses. The tree makes the unused parts cost nothing, at the price of several reads per translation — which is what the TLB then hides."
+      "explanation": "A tree omits the unmapped parts. A process maps a tiny fraction of its possible addresses. The tree makes the unused parts cost nothing, at the price of several reads per translation — which is what the TLB then hides."
     },
     {
       "id": "cp-2",
@@ -153,7 +153,7 @@
       "correct": [
         "B"
       ],
-      "explanation": "The same region needed 512 times fewer translation-structure operations 2 MB divided by 4 KB is 512. The fault count is an observable proxy for work the TLB and page-table machinery would otherwise do."
+      "explanation": "The same region needed 512 times fewer translation-structure operations. 2 MB divided by 4 KB is 512. The fault count is an observable proxy for work the TLB and page-table machinery would otherwise do."
     },
     {
       "id": "cp-4",

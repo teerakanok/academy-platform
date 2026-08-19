@@ -238,7 +238,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "Each router that discards one reports. Time Exceeded, revealing its address The path is mapped by deliberately sending packets that cannot arrive. A router configured not to send those replies appears as a star while still forwarding traffic normally."
+      "explanation": "Each router that discards one reports Time Exceeded, revealing its address. The path is mapped by deliberately sending packets that cannot arrive. A router configured not to send those replies appears as a star while still forwarding traffic normally."
     }
   ]
 }

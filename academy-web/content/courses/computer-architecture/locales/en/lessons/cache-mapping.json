@@ -248,7 +248,7 @@
       "correct": [
         "B"
       ],
-      "explanation": "Address translation could not explain the 12x improvement — only the index bits changed A large stride changes both the pages and the index bits. Holding pages constant while changing the index isolates which one was responsible."
+      "explanation": "Address translation could not explain the 12x improvement — only the index bits changed. A large stride changes both the pages and the index bits. Holding pages constant while changing the index isolates which one was responsible."
     },
     {
       "id": "cp-4",
@@ -262,7 +262,7 @@
       "correct": [
         "D"
       ],
-      "explanation": "Padding spread them across sets and removed the conflict misses 1024 floats is exactly 4096 bytes, so the index bits repeat every row. One extra element per row breaks that alignment — more memory used, several times faster."
+      "explanation": "Padding spread them across sets and removed the conflict misses. 1024 floats is exactly 4096 bytes, so the index bits repeat every row. One extra element per row breaks that alignment — more memory used, several times faster."
     }
   ]
 }

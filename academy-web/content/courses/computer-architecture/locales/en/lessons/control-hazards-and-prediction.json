@@ -301,7 +301,7 @@
       "correct": [
         "D"
       ],
-      "explanation": "There is nothing to predict cmgt produces the mask, and produces the sum unconditionally with failing elements contributing zero. No branch means no misprediction, hence exactly 1.00x."
+      "explanation": "There is nothing to predict. cmgt produces the mask, and produces the sum unconditionally with failing elements contributing zero. No branch means no misprediction, hence exactly 1.00x."
     },
     {
       "id": "cp-4",

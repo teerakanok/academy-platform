@@ -114,7 +114,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "You can read it and commit offline A clone is a complete copy of the history. The shared server is a coordination point, not the sole holder of the project."
+      "explanation": "You can read it and commit offline. A clone is a complete copy of the history. The shared server is a coordination point, not the sole holder of the project."
     },
     {
       "id": "cp-3",

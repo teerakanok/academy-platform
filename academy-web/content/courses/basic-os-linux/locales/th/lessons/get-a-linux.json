@@ -96,7 +96,7 @@
       "correct": [
         "B"
       ],
-      "explanation": "WSL รัน Linux kernel ของจริงคู่ไปกับ. Windows ส่วน command prompt ของ Windows เป็นคนละระบบและใช้คำสั่งคนละชุดกันโดยสิ้นเชิง"
+      "explanation": "WSL รัน Linux kernel ของจริงคู่ไปกับ Windows ส่วน command prompt ของ Windows เป็นคนละระบบและใช้คำสั่งคนละชุดกันโดยสิ้นเชิง"
     },
     {
       "id": "cp-2",

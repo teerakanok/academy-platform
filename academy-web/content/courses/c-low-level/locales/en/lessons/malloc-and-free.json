@@ -231,7 +231,7 @@
       "correct": [
         "D"
       ],
-      "explanation": "Malloc succeeds with a tiny buffer that the code then overruns calloc is required to detect that overflow and return NULL, which is why it is the right choice for input-derived counts."
+      "explanation": "Malloc succeeds with a tiny buffer that the code then overruns. calloc is required to detect that overflow and return NULL, which is why it is the right choice for input-derived counts."
     },
     {
       "id": "cp-3",

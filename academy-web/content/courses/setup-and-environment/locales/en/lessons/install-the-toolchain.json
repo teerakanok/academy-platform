@@ -130,7 +130,7 @@
       "correct": [
         "B"
       ],
-      "explanation": "One command works on Linux and macOS Where the two genuinely differ in a way that matters, the lesson says so rather than quietly assuming one."
+      "explanation": "One command works on Linux and macOS. Where the two genuinely differ in a way that matters, the lesson says so rather than quietly assuming one."
     },
     {
       "id": "cp-3",
