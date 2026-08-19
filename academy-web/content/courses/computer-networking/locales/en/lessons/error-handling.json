@@ -81,7 +81,7 @@
       "rows": [
         [
           "EINTR — immediately",
-          "ECONNREFUSED — nothing is there to answer"
+          "EACCES — permission will not change by asking again"
         ],
         [
           "EAGAIN — after waiting for readiness",
@@ -209,7 +209,7 @@
     "EADDRINUSE: another instance, or TIME_WAIT without SO_REUSEADDR",
     "EAGAIN and EINTR are NOT errors — handle them as control flow",
     "Retry EINTR immediately, EAGAIN after readiness, ETIMEDOUT with bounded backoff",
-    "Never retry ECONNREFUSED, EINVAL, EBADF or EACCES — they will not succeed",
+    "Never retry EINVAL, EBADF or EACCES — they are bugs or permissions, and repeating them changes nothing. ECONNREFUSED is different: nothing is listening YET, so a bounded backoff is right when you are waiting for a service to come up, and wrong when you have the wrong address",
     "Backoff needs jitter, or every client retries in the same instant",
     "signal(SIGPIPE, SIG_IGN) in every server, or a disconnect kills the process",
     "Every operation needs a timeout — silence produces no error at all",

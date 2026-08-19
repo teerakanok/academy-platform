@@ -44,7 +44,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "That is essentially all of them. There is no mode that reads an address from memory and then reads again, no mode that scales an index and adds two registers, no mode that increments a register as a side effect. Architectures with complex instruction sets have all of those, and more."
+      "text": "That is essentially all of them. In RISC-V there is no mode that reads an address from memory and then reads again, no mode that scales an index and adds two registers, and no mode that increments a register as a side effect. That is RISC-V's choice, not a property of every reduced instruction set: aarch64 is also a RISC design and does have a scaled-index mode — you have already seen ldr w8, [x0, w1, sxtw #2] in this course — and a pre-index mode that updates the base register. Architectures with complex instruction sets have all of those, and more."
     },
     {
       "kind": "callout",

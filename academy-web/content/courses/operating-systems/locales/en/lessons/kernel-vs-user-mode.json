@@ -110,7 +110,7 @@
         "Run: dd if=/dev/zero of=/dev/null bs=100000 count=1 2>&1 | tail -1",
         "Compare the two times: identical bytes moved, wildly different number of crossings"
       ],
-      "expected": "The last two commands move the same 100,000 bytes. The first does it in 100,000 crossings, the second in one. The time difference is the cost of the boundary, and it is the single most useful number to have a feel for in this whole module."
+      "expected": "The last two commands move the same 100,000 bytes. The first does it in about 200,000 crossings — a read and a write per block — and the second in two. The time difference is the cost of the boundary, and it is the single most useful number to have a feel for in this whole module."
     }
   ],
   "cheatsheet": [

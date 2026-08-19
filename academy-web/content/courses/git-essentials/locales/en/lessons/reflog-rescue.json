@@ -14,7 +14,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "Every time HEAD moves — a commit, a switch, a merge, a reset, a rebase — Git appends a line to the reflog. It is local, it is private to your machine, and it holds entries for about ninety days by default."
+      "text": "Every time HEAD moves — a commit, a switch, a merge, a reset, a rebase — Git appends a line to the reflog. It is local, it is private to your machine, and it holds entries for 90 days by default — but only 30 for entries pointing at commits nothing else references, which is exactly the case you reach for it in."
     },
     {
       "kind": "code",
@@ -144,7 +144,7 @@
     }
   ],
   "cheatsheet": [
-    "git reflog — every position HEAD has held, kept locally for about 90 days",
+    "git reflog — every position HEAD has held, kept locally for 90 days, or 30 when nothing else references the commit",
     "Recover a bad reset: git reset --hard HEAD@{1} (or the id from the reflog)",
     "Recover a deleted branch: git branch <name> <id from reflog>",
     "Recover an amended commit: the pre-amend version is in the reflog",

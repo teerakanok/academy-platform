@@ -89,14 +89,24 @@
       "kind": "code",
       "caption": "Measured on a link with MTU 1500",
       "lines": [
-        "$ ping -c 1 -s 1472 1.1.1.1        # 1472 payload + 8 ICMP + 20 IP = 1500",
+        "$ ping -c 1 -D -s 1472 1.1.1.1     # -D sets don't-fragment; 1472 + 8 + 20 = 1500",
         "1 packets transmitted, 1 packets received, 0.0% packet loss",
-        "round-trip min/avg/max = 89.291 ms",
+        "round-trip min/avg/max = 6.930 ms",
         "",
-        "$ ping -c 1 -s 1473 1.1.1.1        # one byte more",
+        "$ ping -c 1 -D -s 1473 1.1.1.1     # one byte more, still refusing to fragment",
         "1 packets transmitted, 0 packets received, 100.0% packet loss",
         "",
-        "# Exactly at the limit it works; one byte past it, nothing comes back."
+        "# Exactly at the limit it works; one byte past it, nothing comes back.",
+        "#",
+        "# The -D matters. WITHOUT it the same 1473-byte ping SUCCEEDS, because IP",
+        "# simply splits the packet in two and the far end reassembles it:",
+        "#",
+        "#   $ ping -c 1 -s 1473 1.1.1.1",
+        "#   1 packets transmitted, 1 packets received, 0.0% packet loss",
+        "#",
+        "# That is the whole point of the flag: it turns a silent fragmentation into",
+        "# a visible failure, which is how you find the real limit. On Linux the",
+        "# equivalent is -M do."
       ]
     },
     {

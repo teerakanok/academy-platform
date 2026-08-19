@@ -147,7 +147,7 @@
     },
     {
       "id": "cp-3",
-      "prompt": "You have eleven commits on a branch, four of which are 'fix typo'. What do you do before opening a pull request?",
+      "prompt": "You have eleven commits on a branch, three of which are 'fix typo'. What do you do before opening a pull request?",
       "choices": {
         "A": "Nothing — reviewers can ignore them",
         "B": "git rebase -i to squash them into commits that each do one thing",

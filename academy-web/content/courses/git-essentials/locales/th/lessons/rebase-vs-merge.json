@@ -147,7 +147,7 @@
     },
     {
       "id": "cp-3",
-      "prompt": "คุณมีสิบเอ็ด commit บน branch โดยสี่ตัวเขียนว่า fix typo ควรทำอะไรก่อนเปิด pull request",
+      "prompt": "คุณมีสิบเอ็ด commit บน branch โดยสามตัวเขียนว่า fix typo ควรทำอะไรก่อนเปิด pull request",
       "choices": {
         "A": "ไม่ต้องทำอะไร ผู้ตรวจข้ามมันไปได้",
         "B": "git rebase -i เพื่อยุบให้เหลือ commit ที่แต่ละตัวทำเรื่องเดียว",

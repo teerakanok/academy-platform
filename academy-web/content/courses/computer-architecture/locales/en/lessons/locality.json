@@ -9,6 +9,10 @@
       "text": "The load-use lesson measured a dependent walk over a 32 KB buffer at 1.87 ns per access. Run exactly the same code over a larger buffer and the number changes dramatically — not because the code changed, but because of where the data now lives."
     },
     {
+      "kind": "paragraph",
+      "text": "One caveat, and the DRAM lesson later measures it: a chain is only serialised while the hardware cannot guess where it goes next. A chain whose links happen to run straight through memory in order is predictable, and modern processors work the addresses out ahead of the loads — which is why the sequential chain in that lesson comes in at 0.52 ns per access, below this machine's own L1 latency. Shuffling the chain, as here, is what removes that escape route and leaves you measuring the memory system."
+    },
+    {
       "kind": "heading",
       "text": "Measuring the hierarchy directly"
     },
