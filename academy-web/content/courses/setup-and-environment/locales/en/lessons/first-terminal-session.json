@@ -1,0 +1,163 @@
+{
+  "nodeId": "first-terminal-session",
+  "locale": "en",
+  "title": "Where you are, and how to read what comes back",
+  "objective": "By the end of this lesson you can move around a filesystem from the terminal and read a command's output — including its failures — without guessing.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Three questions answer almost every early confusion: where am I, what is here, and what did that command actually say. This lesson is those three, and nothing else. The other courses assume you can do this without thinking about it."
+    },
+    {
+      "kind": "code",
+      "caption": "The three commands you will use more than any others",
+      "lines": [
+        "  $ pwd",
+        "  /Users/you                 # where am I — the full path, from the root",
+        "",
+        "  $ ls",
+        "  Desktop  Documents  Downloads",
+        "",
+        "  $ cd Documents",
+        "  $ pwd",
+        "  /Users/you/Documents       # cd moved me; pwd proves it",
+        "",
+        "  $ cd ..                    # .. means the directory above this one",
+        "  $ cd                       # cd with nothing goes home",
+        "",
+        "/* Nothing here changes any file. pwd, ls and cd only look and move. */"
+      ]
+    },
+    {
+      "kind": "aside",
+      "title": "Why is there no drive letter?",
+      "forWhom": "for readers coming from Windows",
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "Windows gives each disk its own letter, so a path starts with C: or D:. Unix does not. There is exactly one tree, starting at /, and other disks are attached to a directory somewhere inside it. That is why every path in these courses starts with / and never with a letter."
+        },
+        {
+          "kind": "paragraph",
+          "text": "In WSL your Windows C: drive is attached at /mnt/c, so C:\\Users\\you is /mnt/c/Users/you. It works, but it is slow and its permissions are faked. Keep your course work in the Linux home directory instead — cd with no arguments takes you there."
+        }
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Reading a command that failed"
+    },
+    {
+      "kind": "code",
+      "caption": "Three failures, and what each one is telling you",
+      "lines": [
+        "  $ gti status",
+        "  gti: command not found",
+        "  # the SHELL could not find a program with that name. A typo, or it is",
+        "  # not installed, or it is installed somewhere not on your PATH.",
+        "",
+        "  $ cat /etc/shadow",
+        "  cat: /etc/shadow: Permission denied",
+        "  # the program ran fine. The KERNEL refused the file. Different problem.",
+        "",
+        "  $ cat notes.txt",
+        "  cat: notes.txt: No such file or directory",
+        "  # the program ran, the kernel looked, nothing is there — often because",
+        "  # you are not in the directory you think you are. Check with pwd.",
+        "",
+        "/* Those three cover most of what will stop you. The habit worth building",
+        "   is reading WHICH part complained: the shell, or the program, or the",
+        "   kernel through the program. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "A command that succeeds usually says nothing",
+      "text": "Unix tools print output when they have something to report and stay silent when they do not. If you run a command and nothing appears, that is very often success, not a hang. You can check the last command's exit status with echo $? — zero means success, anything else is a failure code."
+    },
+    {
+      "kind": "try",
+      "title": "Move, look, and break something safely",
+      "steps": [
+        "Run pwd, then cd to a directory you can see with ls, then pwd again",
+        "Run: cd /   then ls — this is the root of the whole tree",
+        "Run: cd     with nothing after it, then pwd — you are home",
+        "Make a directory to work in: mkdir -p ~/coursework && cd ~/coursework",
+        "Create a file: printf 'hello\\n' > first.txt   then read it: cat first.txt",
+        "Now cause each of the three failures on purpose: mistype a command, cat a file that does not exist, and cat /etc/shadow",
+        "After each one, run: echo $?   and note that the number is not zero",
+        "Run a command that succeeds, then echo $? and confirm it prints 0"
+      ],
+      "expected": "Three different error messages that you can now tell apart, and an exit status that is zero exactly when the command worked. The last two steps matter more than they look: scripts you write later decide what to do next by reading that number, and you have just seen where it comes from."
+    }
+  ],
+  "cheatsheet": [
+    "pwd — where am I · ls — what is here · cd — go somewhere",
+    "cd .. goes up one level · cd with nothing goes home",
+    "Unix has one tree starting at /, no drive letters",
+    "In WSL, C:\\ is /mnt/c — usable but slow, with faked permissions",
+    "command not found = the shell could not find the program",
+    "Permission denied = the program ran and the kernel refused",
+    "No such file or directory = often you are in the wrong directory; check pwd",
+    "Silence usually means success; echo $? prints 0 when the last command worked"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "You run a command and nothing is printed at all. What is the most likely explanation?",
+      "choices": {
+        "A": "It succeeded — Unix tools stay quiet when there is nothing to report",
+        "B": "The output went to another window",
+        "C": "It is still running and has hung",
+        "D": "The command does not exist"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Check it rather than assume: echo $? prints the last command's exit status, and zero means success."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "\"gti: command not found\" — which part of the system produced this, and what does it mean?",
+      "choices": {
+        "A": "The kernel denied access to the file",
+        "B": "The program refused the request",
+        "C": "The file exists but is empty",
+        "D": "The shell could not find a program by that name"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "A typo, not installed, or not on PATH Distinguish it from Permission denied, where the program ran and the kernel refused, and from No such file, where the program ran and looked."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "You are sure notes.txt exists, but cat notes.txt says No such file or directory. What is the first thing to check?",
+      "choices": {
+        "A": "Which directory you are in, with pwd",
+        "B": "Whether cat is installed",
+        "C": "Whether the file is corrupted",
+        "D": "Whether you have permission"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Paths are relative to where you are. The file may exist somewhere else in the tree, and pwd tells you where the shell is looking from."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "In WSL, where does your Windows C: drive appear?",
+      "choices": {
+        "A": "At /mnt/c, because Unix has one tree and other disks attach inside it",
+        "B": "At ~/windows",
+        "C": "At C:\\ , unchanged",
+        "D": "It is not accessible from Linux"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "It works, but access across the boundary is slow and the permissions are faked, so keep coursework in the Linux home directory."
+    }
+  ]
+}

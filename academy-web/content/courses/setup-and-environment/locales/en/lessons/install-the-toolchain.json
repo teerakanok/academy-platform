@@ -1,0 +1,164 @@
+{
+  "nodeId": "install-the-toolchain",
+  "locale": "en",
+  "title": "Install the three tools every other course assumes",
+  "objective": "By the end of this lesson git, a C compiler and make are installed on your machine and you have verified each one yourself.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "The seven courses in this track need exactly three things beyond a shell: git for version control, a C compiler for everything from the C course onwards, and make for building more than one file at a time. Nothing else is required, and no course asks you to install a framework."
+    },
+    {
+      "kind": "code",
+      "caption": "One line per platform",
+      "lines": [
+        "  Debian, Ubuntu, WSL:",
+        "    $ sudo apt update && sudo apt install -y git build-essential",
+        "",
+        "  Fedora, RHEL:",
+        "    $ sudo dnf install -y git gcc make",
+        "",
+        "  macOS:",
+        "    $ xcode-select --install        # git, cc and make together",
+        "",
+        "  Inside a Debian container (no sudo needed, you are already root):",
+        "    # apt update && apt install -y git build-essential",
+        "",
+        "/* Verified on Debian 12: after that one apt line, git reports 2.39.5,",
+        "   cc reports 12.2.0 and make reports 4.3. Before it, all three say",
+        "   \"command not found\" — a bare Debian ships none of them. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "cc, gcc and clang are three names for the same job",
+      "text": "cc is the traditional name for \"the system's C compiler\", and it points at whichever one is installed — gcc on most Linux systems, clang on macOS. The courses write cc so the commands work on both. Where the two behave differently in a way that matters, the lesson says so explicitly rather than assuming one of them."
+    },
+    {
+      "kind": "heading",
+      "text": "Verify each one — do not assume the install worked"
+    },
+    {
+      "kind": "code",
+      "caption": "Three commands, three answers",
+      "lines": [
+        "  $ git --version",
+        "  git version 2.39.5",
+        "",
+        "  $ cc --version",
+        "  cc (Debian 12.2.0-14+deb12u1) 12.2.0",
+        "",
+        "  $ make --version",
+        "  GNU Make 4.3",
+        "",
+        "  # and prove the compiler actually produces a program:",
+        "  $ printf '#include <stdio.h>\\nint main(void){puts(\"ok\");return 0;}\\n' > t.c",
+        "  $ cc -o t t.c && ./t",
+        "  ok",
+        "",
+        "/* The last two lines are the real test. A compiler that reports a version",
+        "   but cannot link — a common state on a half-installed macOS — fails here",
+        "   and nowhere earlier. */"
+      ]
+    },
+    {
+      "kind": "aside",
+      "title": "What does sudo do, and is it safe?",
+      "forWhom": "for readers who have not used it",
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "sudo runs one command as the administrator account, called root, and asks for your password first. It exists so that installing software — which changes files the whole system shares — is a deliberate act rather than something any program can do quietly."
+        },
+        {
+          "kind": "paragraph",
+          "text": "It is safe in the sense that it does exactly what you typed. It is dangerous in the same sense: root is not protected from you. Read the command before you run it, and be suspicious of any instruction that tells you to pipe something downloaded from the internet straight into sudo."
+        }
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Install, verify, and prove",
+      "steps": [
+        "Run the install line for your platform",
+        "Run all three --version commands and write down the three version numbers",
+        "Compile and run the one-line C program above; you should see ok",
+        "Delete it: rm -f t t.c",
+        "Check where each tool actually is: which git cc make",
+        "If any of them says nothing, that tool is not on your PATH — the last lesson of this course covers what to do",
+        "On macOS, run make --version and note that it is GNU Make 3.81, much older than Linux ships; the courses do not use features newer than that"
+      ],
+      "expected": "Three version numbers, the word ok from a program you compiled, and three paths from which. The ok is the one that counts: it proves the compiler can find its headers and its linker, which a version number alone does not."
+    }
+  ],
+  "cheatsheet": [
+    "Debian/Ubuntu/WSL: sudo apt install -y git build-essential",
+    "Fedora/RHEL: sudo dnf install -y git gcc make",
+    "macOS: xcode-select --install gives git, cc and make together",
+    "cc means \"the system C compiler\" — gcc on Linux, clang on macOS",
+    "Verify with git --version, cc --version, make --version",
+    "Then actually compile and run something: a version number is not proof",
+    "which <tool> shows where the shell found it",
+    "macOS ships GNU Make 3.81, older than Linux; this track needs nothing newer",
+    "sudo runs one command as root — read it before you run it"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "cc --version prints a version, but a later lesson's build fails with a linker error. What did the version check not prove?",
+      "choices": {
+        "A": "That the compiler is up to date",
+        "B": "That make is installed",
+        "C": "That the compiler can actually find its headers and linker and produce a working program",
+        "D": "That you have permission to compile"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "This is why the lesson has you compile and run a one-line program. A half-installed toolchain reports a version happily and fails at link time."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why do these courses write cc rather than gcc or clang?",
+      "choices": {
+        "A": "cc is faster",
+        "B": "cc is the traditional name for the system's C compiler and points at whichever is installed",
+        "C": "gcc is deprecated",
+        "D": "clang cannot compile C"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "One command works on Linux and macOS Where the two genuinely differ in a way that matters, the lesson says so rather than quietly assuming one."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "What does sudo do?",
+      "choices": {
+        "A": "Installs software",
+        "B": "Permanently gives your account administrator rights",
+        "C": "Runs one command as the root account after asking for your password",
+        "D": "Bypasses file permissions for the rest of the session"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "It makes system-wide changes a deliberate act. It does exactly what you typed, which is also why an instruction to pipe a download straight into sudo deserves suspicion."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "On a bare Debian container, what do git, cc and make report before you install anything?",
+      "choices": {
+        "A": "They are present but not on PATH",
+        "B": "command not found — a bare Debian ships none of the three",
+        "C": "Only git is present",
+        "D": "Older versions than Ubuntu"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Verified: after one apt line the same container reports git 2.39.5, cc 12.2.0 and make 4.3."
+    }
+  ]
+}

@@ -19,6 +19,11 @@ import { fileURLToPath } from 'node:url'
 const here = dirname(fileURLToPath(import.meta.url))
 const coursesDir = join(here, '..', 'content', 'courses')
 const apply = process.argv.includes('--apply')
+// ⚠️ สคริปต์นี้ **ไม่ idempotent**: การสลับเป็น deterministic จาก key ก็จริง
+// แต่การรันซ้ำคือการสลับทับของที่สลับไปแล้ว ซึ่งได้ลำดับใหม่
+// เพราะฉะนั้นเวลามีคอร์สใหม่ ให้จำกัดขอบเขตด้วย --course <slug> เสมอ
+const courseArg = process.argv.indexOf('--course')
+const onlyCourse = courseArg >= 0 ? process.argv[courseArg + 1] : null
 
 const CONN = {
   en: [' — ', ' -- ', '; ', ', because ', ', so ', ', which ', ': '],
@@ -59,6 +64,7 @@ let files = 0
 
 for (const slug of readdirSync(coursesDir).sort()) {
   if (!existsSync(join(coursesDir, slug, 'course.json'))) continue
+  if (onlyCourse && slug !== onlyCourse) continue
   const course = JSON.parse(readFileSync(join(coursesDir, slug, 'course.json'), 'utf8'))
   for (const locale of course.availableLocales) {
     const dir = join(coursesDir, slug, 'locales', locale, 'lessons')

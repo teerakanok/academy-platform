@@ -1,0 +1,218 @@
+{
+  "nodeId": "choose-your-environment",
+  "locale": "en",
+  "title": "Pick an environment you can actually keep",
+  "objective": "By the end of this lesson you have a Unix-like environment on the machine you own, and you can say what you gave up to get it.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Every other course in this track assumes a Unix-like shell: a window where you type a command and it runs. Windows does not give you one by default, macOS does, and Linux is one. This lesson gets you to a working shell and tells you honestly what each route costs, because the cheapest route to start is not always the one you can keep."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Your machine",
+        "Route",
+        "What it costs you"
+      ],
+      "rows": [
+        [
+          "Windows",
+          "WSL 2 — a real Linux kernel inside Windows",
+          "A one-time install and a reboot. Files are in two worlds at once, which confuses people for the first week"
+        ],
+        [
+          "macOS",
+          "The Terminal app you already have",
+          "Nothing to install for the shell. But macOS is not Linux: some commands take different flags, and this track flags those where they matter"
+        ],
+        [
+          "Linux",
+          "You already have it",
+          "Nothing"
+        ],
+        [
+          "A locked-down machine you cannot install on",
+          "A browser shell from a cloud provider",
+          "Sessions reset, so anything you did not save is gone. Fine for a lesson, painful for a course"
+        ],
+        [
+          "A machine you can install on but do not want to change",
+          "A Docker container",
+          "One install, then a clean Linux you can throw away. You must learn one extra command before you learn anything else"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The cloud shell trade-off is real, and people discover it late",
+      "text": "A free browser shell is genuinely the fastest way to run your first command. But most reset after a period of inactivity, and several keep only your home directory — so the compiler you installed in lesson three is gone by lesson five, and you will not know why. If you pick this route, expect to re-install tools, and keep your work in a git repository from the start."
+    },
+    {
+      "kind": "heading",
+      "text": "Windows: installing WSL"
+    },
+    {
+      "kind": "code",
+      "caption": "One command in PowerShell, run as Administrator",
+      "lines": [
+        "  wsl --install",
+        "",
+        "  # then reboot, and Windows will finish the setup and ask you to",
+        "  # choose a username and password for the Linux side",
+        "",
+        "  # after the reboot, open the app called \"Ubuntu\" from the Start menu",
+        "",
+        "/* This gives you a real Linux kernel, not an emulator. The Linux side has its",
+        "   own filesystem; your Windows files appear under /mnt/c. Work inside the Linux",
+        "   home directory (~), not under /mnt/c — file access across the boundary is",
+        "   much slower and permissions behave differently. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "macOS: you already have a shell"
+    },
+    {
+      "kind": "code",
+      "caption": "Open it and check",
+      "lines": [
+        "  Press Command-Space, type Terminal, press Return.",
+        "",
+        "  $ uname -s",
+        "  Darwin",
+        "",
+        "/* Darwin is the name of the macOS kernel. You have a Unix shell. What you do",
+        "   not yet have is a compiler — that is the next lesson but one. */"
+      ]
+    },
+    {
+      "kind": "aside",
+      "title": "What is a terminal, actually?",
+      "forWhom": "for readers who have never opened one",
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "A terminal is a window that shows you a prompt and waits. You type the name of a program, press Return, and the program runs and prints whatever it wants to say. That is the whole idea. It is not a special mode of your computer and it cannot break anything by being open."
+        },
+        {
+          "kind": "paragraph",
+          "text": "The prompt is the text sitting to the left of where you type. It usually tells you who you are and where you are, and it ends in a symbol — often $ or %. When you see a command written as \"$ uname -s\" in these courses, the $ is the prompt, not something you type. Type only what comes after it."
+        },
+        {
+          "kind": "code",
+          "caption": "What you see and what you type",
+          "lines": [
+            "  teerakanok@laptop ~ %  uname -s",
+            "  ^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^",
+            "  the prompt (given)     what you type"
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Linux, or a container on any machine"
+    },
+    {
+      "kind": "code",
+      "caption": "If you want a clean Linux you can throw away",
+      "lines": [
+        "  # install Docker Desktop (macOS, Windows) or docker.io (Linux), then:",
+        "",
+        "  $ docker run --rm -it debian:12-slim bash",
+        "  root@a1b2c3:/#",
+        "",
+        "  # you are now root inside a fresh Debian. --rm means it is deleted when",
+        "  # you exit, so nothing you do here can touch your real machine.",
+        "",
+        "/* This route is worth knowing even if it is not your main one: several",
+        "   exercises later in this track need root or a second user account, and a",
+        "   throwaway container is the safe way to have both. */"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Get to a prompt and prove it",
+      "steps": [
+        "Follow the route for your machine until you have a prompt",
+        "Run: uname -s     — expect Linux, or Darwin on macOS",
+        "Run: whoami       — this is the account you are running as",
+        "Run: pwd          — this is the directory you are in right now",
+        "Write down all three answers; the next lesson uses them",
+        "If any command printed \"command not found\", you are probably in PowerShell or Command Prompt rather than a Unix shell — check that you opened the right app",
+        "Run: echo $SHELL  — bash and zsh both work for everything in this track"
+      ],
+      "expected": "Three answers and a prompt you can get back to tomorrow. That last part is the real test: if your route was a browser shell, open it again in an hour and check whether pwd still shows the same directory and your files are still there. Finding that out now costs a minute; finding it out in lesson twelve costs an evening."
+    }
+  ],
+  "cheatsheet": [
+    "Windows: wsl --install in PowerShell as Administrator, then reboot",
+    "macOS: Terminal is already installed; uname -s prints Darwin",
+    "Linux: you already have a shell",
+    "Cloud browser shells reset — expect to reinstall tools and keep work in git",
+    "docker run --rm -it debian:12-slim bash gives a throwaway Linux with root",
+    "In WSL, work in ~ and not under /mnt/c: slower, and permissions differ",
+    "The $ or % in a printed command is the prompt — do not type it",
+    "uname -s, whoami and pwd answer: what system, who am I, where am I"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "You are on Windows and want a Unix-like shell for this track. What does wsl --install give you?",
+      "choices": {
+        "A": "An emulator that translates Linux commands into Windows ones",
+        "B": "A remote Linux machine you connect to over the internet",
+        "C": "A real Linux kernel running inside Windows, with its own filesystem",
+        "D": "A theme that makes Command Prompt look like Linux"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "WSL 2 runs an actual Linux kernel. Your Windows files appear under /mnt/c, but work inside the Linux home directory: crossing the boundary is slower and permissions behave differently."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A printed command reads \"$ uname -s\". What do you type?",
+      "choices": {
+        "A": "$ uname -s",
+        "B": "uname",
+        "C": "$ uname",
+        "D": "uname -s"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The $ is the prompt the shell prints for you. Typing it back gives \"command not found: $\"."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why does this lesson warn about free browser-based cloud shells?",
+      "choices": {
+        "A": "They cannot run compilers",
+        "B": "They require a credit card",
+        "C": "Many reset after inactivity and keep only your home directory",
+        "D": "They are slower than a local machine"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Tools you installed disappear later in the course They are the fastest way to run a first command and a poor way to keep a course's worth of state. If you use one, expect to reinstall and keep your work in git."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "Which route gives you root and a second user account safely, for the exercises later in this track that need them?",
+      "choices": {
+        "A": "Your own macOS account",
+        "B": "WSL's Windows side under /mnt/c",
+        "C": "A throwaway Docker container started with --rm",
+        "D": "A cloud browser shell"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "--rm deletes the container when you exit, so creating users and changing ownership inside it cannot affect your real machine."
+    }
+  ]
+}

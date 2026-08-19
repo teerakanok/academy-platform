@@ -44,6 +44,12 @@ function renderBlock(b) {
       b.steps.forEach((s, i) => out.push(`${i + 1}. ${s}`))
       out.push('', `**Expected:** ${b.expected}`)
       break
+    case 'aside':
+      // ในไฟล์ export กางออกให้เห็นทั้งหมด — reviewer และผู้อ่านไฟล์ต้องเห็นของครบ
+      out.push(`<details><summary><strong>${b.title}</strong> — ${b.forWhom}</summary>`, '')
+      for (const inner of b.blocks) out.push(renderBlock(inner), '')
+      out.push('</details>')
+      break
     case 'image':
       out.push(`![${b.alt ?? ''}](${b.src})`)
       if (b.caption) out.push('', `_${b.caption}_`)

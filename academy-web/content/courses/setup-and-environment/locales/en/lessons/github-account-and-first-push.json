@@ -1,0 +1,178 @@
+{
+  "nodeId": "github-account-and-first-push",
+  "locale": "en",
+  "title": "An account, a repository, and getting your work off this machine",
+  "objective": "By the end of this lesson you have a GitHub account, a repository you own, and a commit of yours living on a server rather than only on your laptop.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "The git course teaches version control on your own machine for most of its length, and then asks you to push to a hosting platform. This lesson gets that account and that first push out of the way now, because creating an account and authenticating is a different kind of problem from learning git, and mixing the two is where people stall."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "GitHub is one choice, and the courses say so",
+      "text": "Git is the tool; GitHub is one company that hosts git repositories. GitLab, Codeberg and a plain server you own all work the same way for everything git itself does. The one place it matters is the continuous-integration lesson, whose YAML file is GitHub Actions specific — that lesson now says so explicitly. Use GitHub here if you have no reason to prefer another."
+    },
+    {
+      "kind": "heading",
+      "text": "Authenticating: pick one and stop thinking about it"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Method",
+        "What you set up once",
+        "What it costs"
+      ],
+      "rows": [
+        [
+          "HTTPS with a personal access token",
+          "Generate a token in your account settings, then use it in place of a password",
+          "The token is a password: if it leaks, it works from anywhere until you revoke it"
+        ],
+        [
+          "SSH key",
+          "Generate a key pair, upload the public half",
+          "One more concept now, and nothing to type later. This is what the Linux course's ssh lesson teaches"
+        ]
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "The SSH route, which is what most people settle on",
+      "lines": [
+        "  $ ssh-keygen -t ed25519 -C \"your-email@example.com\"",
+        "  # press Return to accept the default path; set a passphrase if you want one",
+        "",
+        "  $ cat ~/.ssh/id_ed25519.pub",
+        "  ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... your-email@example.com",
+        "",
+        "  # copy that whole line into GitHub: Settings -> SSH and GPG keys -> New SSH key",
+        "",
+        "  $ ssh -T git@github.com",
+        "  Hi yourname! You've successfully authenticated, but GitHub does not provide shell access.",
+        "",
+        "/* That message IS success. It says \"no shell access\" because GitHub does not",
+        "   give you a login shell — it only speaks git. The part that matters is your",
+        "   name appearing in it. */"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "The public half is public; the other file never leaves your machine",
+      "text": "ssh-keygen writes two files: id_ed25519.pub, which you paste into websites, and id_ed25519 with no extension, which you never send anywhere. Pasting the wrong one into a website hands over the ability to act as you. The Linux course's ssh lesson explains why the pair works; here, just get the halves the right way round."
+    },
+    {
+      "kind": "heading",
+      "text": "Your first push"
+    },
+    {
+      "kind": "code",
+      "caption": "From an empty directory to a commit on a server",
+      "lines": [
+        "  # on GitHub: New repository, give it a name, create it WITHOUT a README",
+        "",
+        "  $ mkdir -p ~/coursework/first-repo && cd ~/coursework/first-repo",
+        "  $ git init",
+        "  $ git config user.name  \"Your Name\"",
+        "  $ git config user.email \"your-email@example.com\"",
+        "",
+        "  $ printf '# first-repo\\n' > README.md",
+        "  $ git add README.md",
+        "  $ git commit -m \"first commit\"",
+        "",
+        "  $ git remote add origin git@github.com:yourname/first-repo.git",
+        "  $ git push -u origin main",
+        "",
+        "/* Create it WITHOUT a README so the remote starts empty. If the remote",
+        "   already has a commit and yours does too, the first push is rejected and",
+        "   you have to merge two unrelated histories before you have learned what",
+        "   either word means. */"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Get a commit off your machine",
+      "steps": [
+        "Create the account, then set up either a token or an SSH key",
+        "Verify authentication before doing anything else: ssh -T git@github.com, or push once with the token",
+        "Create an empty repository on GitHub, with no README",
+        "Follow the block above until git push succeeds",
+        "Reload the repository page in your browser and confirm README.md is there",
+        "Now prove it is really off your machine: delete the local directory with rm -rf ~/coursework/first-repo, then git clone it back",
+        "Open the cloned README.md and confirm it is the file you wrote"
+      ],
+      "expected": "A file you wrote, deleted from your own disk, and got back from a server. That last pair of steps is the whole point of the lesson: until you have deleted the local copy and recovered it, you have not actually established that the work is somewhere else."
+    }
+  ],
+  "cheatsheet": [
+    "Git is the tool; GitHub is one host among several",
+    "Only the CI lesson is GitHub-specific, and it says so",
+    "ssh-keygen -t ed25519 makes a key pair",
+    "id_ed25519.pub is the half you paste into websites; the other never leaves your machine",
+    "ssh -T git@github.com printing your name IS success, despite the \"no shell access\" wording",
+    "Create the remote repository WITHOUT a README so the first push is not a merge",
+    "git remote add origin <url> then git push -u origin main",
+    "Prove it worked by deleting the local copy and cloning it back"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "ssh -T git@github.com replies \"Hi yourname! You've successfully authenticated, but GitHub does not provide shell access.\" What happened?",
+      "choices": {
+        "A": "The key was uploaded to the wrong account",
+        "B": "Authentication succeeded",
+        "C": "Authentication failed because shell access was denied",
+        "D": "You need to use HTTPS instead"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "GitHub only speaks git and never gives a login shell, so that wording is expected The part that matters is your name appearing. Reading the second half as a failure is a very common false alarm."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "ssh-keygen wrote id_ed25519 and id_ed25519.pub. Which do you paste into GitHub, and why does it matter?",
+      "choices": {
+        "A": "id_ed25519.pub — the other file is the private half, and handing it over gives away the ability to act as you",
+        "B": "Neither; you upload the passphrase",
+        "C": "id_ed25519, because it is the key",
+        "D": "Either; they are interchangeable"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The .pub half is meant to be public. The file with no extension never leaves your machine."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why does this lesson tell you to create the GitHub repository WITHOUT a README?",
+      "choices": {
+        "A": "To save space",
+        "B": "So the remote starts empty",
+        "C": "READMEs are optional",
+        "D": "Because git init already creates one"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Otherwise both sides have commits and the first push is rejected as unrelated histories, before you know what that means It turns a first-push exercise into a merge problem, which is a bad place to meet your first conflict."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "You pushed and the file appears on the website. Why does the lesson still ask you to delete the local directory and clone it back?",
+      "choices": {
+        "A": "Because seeing a file on a page is not proof you can get it back",
+        "B": "To free disk space",
+        "C": "To test your internet connection",
+        "D": "To practise rm"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Recovering it is The point of pushing is that the work survives the loss of your machine. Deleting and cloning is the smallest experiment that actually tests that claim."
+    }
+  ]
+}

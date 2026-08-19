@@ -2,7 +2,7 @@
   "locale": "en",
   "title": "Operating Systems",
   "subtitle": "What the kernel is actually doing underneath every program you run",
-  "audience": "For anyone who can already work in a Linux shell and read C, and wants to understand what happens when a program calls the kernel, forks, blocks, races, or runs out of memory. This is the course that turns 'the OS handles it' into something you can trace, measure, and reason about.",
+  "audience": "For anyone who can already work in a Linux shell and read C, and wants to understand what happens when a program calls the kernel, forks, blocks, races, or runs out of memory. This is the course that turns 'the OS handles it' into something you can trace, measure, and reason about. This course assumes a working Unix-like shell and, from the C course onwards, a C compiler and make. If you do not have those yet — or have never opened a terminal — the Setting Up course installs and verifies all of it first, and nothing here repeats that material.",
   "outcomes": [
     "Explain what a system call costs and follow one from your code into the kernel and back",
     "Start, wait for, and clean up processes correctly — including the failure modes that leak them",

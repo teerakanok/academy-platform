@@ -1,0 +1,27 @@
+{
+  "locale": "en",
+  "title": "Setting Up",
+  "subtitle": "Get a machine, a terminal and a toolchain that the other courses can assume",
+  "audience": "For anyone starting the systems track without a working environment — especially readers coming from outside computing, who have been told to \"open a terminal\" without ever being shown one. Every other course in this track assumes what this one sets up, and says so at the top.",
+  "outcomes": [
+    "Choose an environment that fits the machine you actually own, and know its trade-offs",
+    "Run commands in a terminal and read what comes back, including errors",
+    "Install and verify git, a C compiler and make on your own machine",
+    "Create a GitHub account, a repository, and push to it",
+    "Diagnose the four failures that stop most beginners: not found, permission denied, wrong directory, wrong tool"
+  ],
+  "skillLabels": {
+    "environment": "Choosing an environment",
+    "terminal": "Working in a terminal",
+    "toolchain": "Installing a toolchain",
+    "collaboration": "Accounts and remotes",
+    "troubleshooting": "Diagnosing failures"
+  },
+  "nodeTitles": {
+    "choose-your-environment": "Pick an environment you can actually keep",
+    "first-terminal-session": "Where you are, and how to read what comes back",
+    "install-the-toolchain": "Install the three tools every other course assumes",
+    "github-account-and-first-push": "An account, a repository, and getting your work off this machine",
+    "when-something-does-not-work": "Capstone: diagnosing the four failures that stop beginners"
+  }
+}

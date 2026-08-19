@@ -1,0 +1,97 @@
+{
+  "id": "setup-and-environment",
+  "slug": "setup-and-environment",
+  "version": "1.0.0",
+  "publicAvailability": "syllabus-preview",
+  "defaultLocale": "en",
+  "availableLocales": [
+    "en",
+    "th"
+  ],
+  "level": "beginner",
+  "estimatedMinutes": 78,
+  "coverMotif": "terminal",
+  "skills": [
+    {
+      "id": "environment",
+      "maxScore": 100
+    },
+    {
+      "id": "terminal",
+      "maxScore": 100
+    },
+    {
+      "id": "toolchain",
+      "maxScore": 100
+    },
+    {
+      "id": "collaboration",
+      "maxScore": 100
+    },
+    {
+      "id": "troubleshooting",
+      "maxScore": 100
+    }
+  ],
+  "globalSkillWeights": {
+    "foundations": 1
+  },
+  "nodes": [
+    {
+      "id": "choose-your-environment",
+      "kind": "lesson",
+      "prerequisites": [],
+      "estimatedMinutes": 14,
+      "skillWeights": {
+        "environment": 4
+      }
+    },
+    {
+      "id": "first-terminal-session",
+      "kind": "lesson",
+      "prerequisites": [
+        "choose-your-environment"
+      ],
+      "estimatedMinutes": 15,
+      "skillWeights": {
+        "environment": 2,
+        "terminal": 4
+      }
+    },
+    {
+      "id": "install-the-toolchain",
+      "kind": "lesson",
+      "prerequisites": [
+        "first-terminal-session"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "toolchain": 4
+      }
+    },
+    {
+      "id": "github-account-and-first-push",
+      "kind": "lesson",
+      "prerequisites": [
+        "install-the-toolchain"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "toolchain": 2,
+        "collaboration": 4
+      }
+    },
+    {
+      "id": "when-something-does-not-work",
+      "kind": "capstone",
+      "prerequisites": [
+        "install-the-toolchain"
+      ],
+      "estimatedMinutes": 17,
+      "skillWeights": {
+        "troubleshooting": 4,
+        "terminal": 2
+      }
+    }
+  ]
+}

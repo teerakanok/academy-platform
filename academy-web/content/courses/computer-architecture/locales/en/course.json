@@ -2,7 +2,7 @@
   "locale": "en",
   "title": "Computer Architecture",
   "subtitle": "What the processor is doing between one instruction and the next",
-  "audience": "For anyone who can read C and has met the operating system's view of memory, and now wants the layer beneath it: how an instruction is encoded, how the hardware executes several at once, and why the same algorithm can be an order of magnitude faster depending on how it touches memory.",
+  "audience": "For anyone who can read C and has met the operating system's view of memory, and now wants the layer beneath it: how an instruction is encoded, how the hardware executes several at once, and why the same algorithm can be an order of magnitude faster depending on how it touches memory. This course assumes a working Unix-like shell and, from the C course onwards, a C compiler and make. If you do not have those yet — or have never opened a terminal — the Setting Up course installs and verifies all of it first, and nothing here repeats that material.",
   "outcomes": [
     "Decode a real machine instruction into its fields by hand",
     "Explain what a pipeline overlaps and what stops it",

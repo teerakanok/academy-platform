@@ -2,7 +2,7 @@
   "locale": "en",
   "title": "C & Low-level Programming",
   "subtitle": "Learn what your code actually does to memory — the layer every higher-level language is standing on, and the one attackers work in.",
-  "audience": "For programmers who can write code in a higher-level language and have never had to think about memory, pointers, or what the compiler is doing. No C experience needed.",
+  "audience": "For programmers who can write code in a higher-level language and have never had to think about memory, pointers, or what the compiler is doing. No C experience needed. This course assumes a working Unix-like shell and, from the C course onwards, a C compiler and make. If you do not have those yet — or have never opened a terminal — the Setting Up course installs and verifies all of it first, and nothing here repeats that material.",
   "outcomes": [
     "Explain what happens between your source file and a running program",
     "Write C that handles memory deliberately instead of hoping",

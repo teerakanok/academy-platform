@@ -218,6 +218,29 @@ export function LessonBody({
                 </table>
               </div>
             )
+
+          // ยุบไว้โดยตั้งต้น — คนที่ไม่ต้องการไม่ต้องเลื่อนผ่าน คนที่ต้องการกดเปิดเอง
+          // ใช้ <details> ของ HTML เอง จึงค้นหาในหน้าเจอและใช้คีย์บอร์ดได้โดยไม่ต้องมี JS
+          case 'aside':
+            return (
+              <details key={index} className="not-prose rounded-lg border border-cs-border bg-cs-surface-2/50">
+                <summary className="cursor-pointer list-none px-4 py-3 font-display text-[15px] font-semibold text-cs-text marker:hidden">
+                  <span className="mr-2 text-cs-muted" aria-hidden="true">
+                    ▸
+                  </span>
+                  {block.title}
+                  <span className="ml-2 font-sans text-[13px] font-normal text-cs-muted">{block.forWhom}</span>
+                </summary>
+                <div className="border-t border-cs-border px-4 py-3">
+                  <LessonBody
+                    blocks={block.blocks}
+                    slug={slug}
+                    nodeId={nodeId}
+                    responseVariant={responseVariant}
+                  />
+                </div>
+              </details>
+            )
         }
       })}
     </div>

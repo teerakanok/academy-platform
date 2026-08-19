@@ -2,7 +2,7 @@
   "locale": "en",
   "title": "Computer Networking",
   "subtitle": "From one packet on a wire to a server handling thousands of connections",
-  "audience": "For anyone comfortable in a Linux shell and able to read C, who wants to understand what happens between a program calling connect() and bytes arriving on another continent — and to be able to diagnose it when it does not work.",
+  "audience": "For anyone comfortable in a Linux shell and able to read C, who wants to understand what happens between a program calling connect() and bytes arriving on another continent — and to be able to diagnose it when it does not work. This course assumes a working Unix-like shell and, from the C course onwards, a C compiler and make. If you do not have those yet — or have never opened a terminal — the Setting Up course installs and verifies all of it first, and nothing here repeats that material.",
   "outcomes": [
     "Explain what each layer adds to a packet, and read a real capture",
     "Work out subnets, routes and address ranges without a calculator",

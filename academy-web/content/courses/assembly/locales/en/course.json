@@ -2,7 +2,7 @@
   "locale": "en",
   "title": "Assembly: Reading Machine Code",
   "subtitle": "What your program actually became",
-  "audience": "For anyone who can write C and now wants to see what the compiler produced — and for anyone heading toward reverse engineering, exploit analysis or low-level debugging, where the source is not available and the binary is the only evidence.",
+  "audience": "For anyone who can write C and now wants to see what the compiler produced — and for anyone heading toward reverse engineering, exploit analysis or low-level debugging, where the source is not available and the binary is the only evidence. This course assumes a working Unix-like shell and, from the C course onwards, a C compiler and make. If you do not have those yet — or have never opened a terminal — the Setting Up course installs and verifies all of it first, and nothing here repeats that material.",
   "outcomes": [
     "Read x86-64 disassembly and follow what it does, instruction by instruction",
     "Name the registers, their widths, and which ones survive a function call",

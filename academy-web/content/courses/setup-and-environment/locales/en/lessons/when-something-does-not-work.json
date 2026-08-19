@@ -1,0 +1,215 @@
+{
+  "nodeId": "when-something-does-not-work",
+  "locale": "en",
+  "title": "Capstone: diagnosing the four failures that stop beginners",
+  "objective": "By the end of this capstone you can take any failing command in this track and place it in one of four categories, each with a different next step.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Almost everything that will stop you in the next seven courses is one of four things. None of them is about the subject you are studying, which is exactly why they are so frustrating: you are blocked on the setup while trying to learn something else. This lesson is the four, and how to tell them apart in one command each."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "What you see",
+        "What it actually means",
+        "First thing to run"
+      ],
+      "rows": [
+        [
+          "command not found",
+          "The shell searched PATH and found no program by that name",
+          "which <name> and echo $PATH"
+        ],
+        [
+          "Permission denied",
+          "The program ran; the kernel refused the operation",
+          "ls -l <the file> and id"
+        ],
+        [
+          "No such file or directory",
+          "The path does not resolve from where you are",
+          "pwd and ls"
+        ],
+        [
+          "It works for the lesson and not for you",
+          "Different platform, different tool version, or a flag that is not portable",
+          "<tool> --version and uname -s"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "One: command not found"
+    },
+    {
+      "kind": "code",
+      "caption": "The shell only looks in the directories listed in PATH",
+      "lines": [
+        "  $ which cc",
+        "  /usr/bin/cc              # found: the shell will run this",
+        "",
+        "  $ which cc",
+        "                           # nothing at all: not on PATH",
+        "",
+        "  $ echo $PATH",
+        "  /usr/local/bin:/usr/bin:/bin",
+        "",
+        "  # if you know where it is, add its directory for this session:",
+        "  $ export PATH=\"$PATH:/opt/whatever/bin\"",
+        "",
+        "/* export lasts until you close the terminal. To make it permanent, put the",
+        "   same line in ~/.bashrc or ~/.zshrc — check which shell you have with",
+        "   echo $SHELL first, because editing the wrong file does nothing and is",
+        "   very hard to notice. */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Two: permission denied"
+    },
+    {
+      "kind": "code",
+      "caption": "Two different causes that print the same words",
+      "lines": [
+        "  $ ls -l script.sh",
+        "  -rw-r--r--  1 you  staff  120 Aug 19 09:00 script.sh",
+        "  $ ./script.sh",
+        "  bash: ./script.sh: Permission denied",
+        "  # no x in the permissions: it is not marked executable",
+        "  $ chmod +x script.sh          # fix",
+        "",
+        "  $ cat /etc/shadow",
+        "  cat: /etc/shadow: Permission denied",
+        "  # the file is not yours to read. chmod will NOT fix this, and you should",
+        "  # not reach for sudo reflexively — ask first whether you need that file.",
+        "",
+        "/* Same message, two situations: something you own and forgot to mark",
+        "   executable, and something that is deliberately not yours. Tell them",
+        "   apart with ls -l before doing anything. */"
+      ]
+    },
+    {
+      "kind": "aside",
+      "title": "What is $PATH?",
+      "forWhom": "for readers meeting environment variables for the first time",
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "text": "When you type a bare command name, the shell does not search your whole disk. It looks in a fixed list of directories, in order, and runs the first match it finds. That list is a piece of text held in a variable called PATH, with the directories separated by colons."
+        },
+        {
+          "kind": "paragraph",
+          "text": "This explains two things that otherwise look like magic. A tool that is installed but \"not found\" is simply sitting in a directory that is not on the list. And a program in your current directory does not run when you type its name — you have to write ./name — because the current directory is deliberately not on the list, so that dropping a file called ls into a directory cannot hijack your next command."
+        }
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Three and four: wrong place, wrong platform"
+    },
+    {
+      "kind": "code",
+      "caption": "The two checks that resolve most of the rest",
+      "lines": [
+        "  $ pwd && ls",
+        "  # \"No such file\" almost always means the file is real but you are",
+        "  # somewhere else. Paths without a leading / are relative to pwd.",
+        "",
+        "  $ uname -s && cc --version && make --version",
+        "  # when a lesson's command behaves differently for you, compare these",
+        "  # three answers with what the lesson says it used.",
+        "",
+        "/* This track states its platform wherever it matters: the compiler is",
+        "   clang on macOS and gcc on Linux, macOS ships GNU Make 3.81 while Debian",
+        "   ships 4.3, and AddressSanitizer reports leaks on Linux and silently does",
+        "   not on macOS. When something behaves differently, check the platform",
+        "   before you doubt the lesson — but if the lesson never mentions the",
+        "   difference, that is a defect in the lesson and worth reporting. */"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Cause all four on purpose, then fix each",
+      "steps": [
+        "command not found: run a name that does not exist, then run which on it and echo $PATH",
+        "Permission denied, case one: printf 'echo hi\\n' > s.sh then ./s.sh — read the error, run ls -l s.sh, fix with chmod +x, run it again",
+        "Permission denied, case two: cat /etc/shadow — confirm chmod does not apply here and say in one sentence why",
+        "No such file: cd / then cat s.sh — then fix it by returning to the right directory rather than by using a longer path",
+        "Wrong platform: run uname -s, cc --version and make --version and write the three answers next to your notes from lesson three",
+        "For each of the four, write the single command you would run FIRST next time",
+        "Clean up: rm -f s.sh"
+      ],
+      "expected": "Four failures you produced deliberately and four different first moves. The value is not the fixes — it is that you now read the message rather than the situation. Most people asked to debug \"it does not work\" describe what they were trying to do; the four messages above tell you which layer refused, and that is a much shorter path to the answer."
+    }
+  ],
+  "cheatsheet": [
+    "command not found -> which <name> and echo $PATH",
+    "Permission denied -> ls -l <file> and id",
+    "No such file or directory -> pwd and ls",
+    "Behaves differently from the lesson -> uname -s and <tool> --version",
+    "PATH is a colon-separated list of directories the shell searches, in order",
+    "The current directory is deliberately NOT on PATH — that is why you type ./name",
+    "export PATH=... lasts for the session; ~/.bashrc or ~/.zshrc makes it permanent",
+    "chmod +x fixes a file you own that is not executable; it does not fix a file that is not yours",
+    "If a lesson never mentions a platform difference you hit, that is a defect in the lesson"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "You installed a tool, but running its name says command not found. What is the most likely cause?",
+      "choices": {
+        "A": "It is installed in a directory that is not listed in PATH",
+        "B": "You need sudo to run it",
+        "C": "The install failed silently",
+        "D": "The tool is incompatible with your shell"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The shell never looks there which finds nothing and echo $PATH shows the list the shell actually searches. Adding the directory to PATH is the fix."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "./script.sh says Permission denied. ls -l shows -rw-r--r-- and you own the file. What is wrong?",
+      "choices": {
+        "A": "The script has a syntax error",
+        "B": "There is no x bit, so it is not marked executable — chmod +x fixes it",
+        "C": "The file is owned by root",
+        "D": "You need sudo"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Distinguish it from cat /etc/shadow, which prints the same words because the file is deliberately not yours. chmod does not apply there."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why does typing a program's name not run a program sitting in your current directory?",
+      "choices": {
+        "A": "It does run; the error means something else",
+        "B": "Current directories are read-only",
+        "C": "You must compile it first",
+        "D": "The current directory is deliberately not on PATH"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "That a file named ls dropped into a directory cannot hijack your next command That is why you write ./name — the ./ says explicitly that you mean the file here, not something found on PATH."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "A lesson's command behaves differently on your machine and the lesson never mentions any platform difference. What should you conclude?",
+      "choices": {
+        "A": "Check uname -s and the tool version first",
+        "B": "The tool needs reinstalling",
+        "C": "You made a mistake and should try again",
+        "D": "Your platform is unsupported"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "And if the lesson genuinely never mentions the difference, that is a defect in the lesson worth reporting This track states its platform wherever it matters. Silence about a difference you can reproduce is a gap in the material, not necessarily a mistake by you."
+    }
+  ]
+}

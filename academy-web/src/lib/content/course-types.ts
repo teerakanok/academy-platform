@@ -130,6 +130,12 @@ export interface LearnerDashboardCourse {
 
 // ---------- ชั้นข้อความ (ต่อภาษา) ----------
 
+/** ชนิดที่อยู่ใน aside ได้ — อธิบายอย่างเดียว ไม่มีด่าน ไม่ซ้อนตัวเอง */
+export type AsideInnerBlock = Extract<
+  LessonBlock,
+  { kind: 'paragraph' | 'heading' | 'list' | 'code' | 'callout' | 'table' }
+>
+
 export type LessonBlock =
   | { kind: 'paragraph'; text: string }
   | { kind: 'heading'; text: string }
@@ -139,6 +145,12 @@ export type LessonBlock =
   /** ช่วงลงมือทำ — ตัวตั้งต้นของ prove-it lab จริงในภายหลัง */
   | { kind: 'try'; title: string; steps: string[]; expected?: string }
   | { kind: 'table'; headers: string[]; rows: string[][] }
+  /** เนื้อหาเสริมที่ยุบไว้ — ของที่ผู้เรียนบางกลุ่มต้องการและบางกลุ่มไม่ต้องการ
+   *  มีเพราะลานตรวจพบว่า นศ.นอกสาขาให้คะแนนต่ำสุดจากช่องว่างเรื่อง environment
+   *  และเครื่องมือ แต่การยัดคำอธิบายพวกนั้นลงเนื้อบทหลักทำให้คนในสาขาต้อง
+   *  เลื่อนผ่านทุกครั้ง · `forWhom` บอกตรงๆ ว่ากล่องนี้มีไว้ให้ใคร ผู้เรียนจะได้
+   *  ตัดสินใจได้โดยไม่ต้องเปิดดูก่อน · ห้ามใส่ simulation ข้างใน */
+  | { kind: 'aside'; title: string; forWhom: string; blocks: AsideInnerBlock[] }
   // ---- ชนิดเนื้อหาตามหลักที่ล็อกไว้ (founder 2026-07-31) ----
   // "สิ่งที่ต้องอ่าน = ทำเป็นของเราเอง · สิ่งที่ต้องดู/ลงมือ = ฝังได้ + ขยายเต็มจอ
   //  · ของคนอื่น = ลิงก์ที่พาออกไป"

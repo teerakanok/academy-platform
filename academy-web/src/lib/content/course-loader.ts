@@ -255,6 +255,32 @@ const simulationChallengeSchema = z.object({
   }
 })
 
+// ชนิดที่อนุญาตให้อยู่ข้างใน aside — อธิบายอย่างเดียว ไม่มีด่าน ไม่ซ้อนตัวเอง
+const asideInnerSchema: z.ZodTypeAny = z.lazy(() =>
+  z.discriminatedUnion('kind', [
+    z.object({ kind: z.literal('paragraph'), text: z.string().min(1) }),
+    z.object({ kind: z.literal('heading'), text: z.string().min(1) }),
+    z.object({ kind: z.literal('list'), items: z.array(z.string().min(1)).min(1), ordered: z.boolean().optional() }),
+    z.object({ kind: z.literal('code'), caption: z.string().optional(), lines: z.array(z.string()).min(1) }),
+    z.object({
+      kind: z.literal('callout'),
+      tone: z.enum(['info', 'warning', 'tip']),
+      title: z.string().optional(),
+      text: z.string().min(1),
+    }),
+    z.object({
+      kind: z.literal('table'),
+      headers: z.array(z.string()).min(1),
+      rows: z.array(z.array(z.string())).min(1),
+    }),
+  ]),
+)
+
+/** ทางเข้าให้ test ตรวจ schema ของบล็อกเดี่ยวได้ โดยไม่ต้องประกอบทั้งบทเรียน */
+export function loadCourseCopySchemaForTest(block: unknown) {
+  return blockSchema.parse(block)
+}
+
 const blockSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('paragraph'), text: z.string().min(1) }),
   z.object({ kind: z.literal('heading'), text: z.string().min(1) }),
@@ -276,6 +302,17 @@ const blockSchema = z.discriminatedUnion('kind', [
     kind: z.literal('table'),
     headers: z.array(z.string()).min(1),
     rows: z.array(z.array(z.string())).min(1),
+  }),
+  // ของที่ผู้เรียนบางคนต้องการและบางคนไม่ต้องการ — ยุบไว้ ไม่ให้ขวางเส้นทางหลัก
+  // มีเพราะ นศ.ข้ามสาขาให้คะแนนต่ำสุดจากช่องว่างเรื่อง environment/เครื่องมือ
+  // แต่การยัดคำอธิบายพวกนั้นลงเนื้อบทจะทำให้คนในสาขาต้องเลื่อนผ่านทุกครั้ง
+  z.object({
+    kind: z.literal('aside'),
+    title: z.string().min(1),
+    forWhom: z.string().min(1),
+    // ห้าม simulation ซ้อนใน aside: ตัวลดรูปสำหรับหน้าเว็บทำงานที่ระดับบนสุด
+    // ถ้าปล่อยให้ซ้อนได้ กติกาการตรวจของ simulation จะรั่วออกไปหน้าเว็บ
+    blocks: z.array(z.lazy(() => asideInnerSchema)).min(1),
   }),
   z.object({
     kind: z.literal('image'),

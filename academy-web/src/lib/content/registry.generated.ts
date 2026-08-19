@@ -318,6 +318,19 @@ import c311 from '../../../content/courses/operating-systems/locales/th/lessons/
 import c312 from '../../../content/courses/operating-systems/locales/th/lessons/zombie-and-orphan.json'
 import c313 from '../../../content/courses/operating-systems/locales/th/course.json'
 import c314 from '../../../content/courses/operating-systems/course.json'
+import c315 from '../../../content/courses/setup-and-environment/locales/en/lessons/choose-your-environment.json'
+import c316 from '../../../content/courses/setup-and-environment/locales/en/lessons/first-terminal-session.json'
+import c317 from '../../../content/courses/setup-and-environment/locales/en/lessons/github-account-and-first-push.json'
+import c318 from '../../../content/courses/setup-and-environment/locales/en/lessons/install-the-toolchain.json'
+import c319 from '../../../content/courses/setup-and-environment/locales/en/lessons/when-something-does-not-work.json'
+import c320 from '../../../content/courses/setup-and-environment/locales/en/course.json'
+import c321 from '../../../content/courses/setup-and-environment/locales/th/lessons/choose-your-environment.json'
+import c322 from '../../../content/courses/setup-and-environment/locales/th/lessons/first-terminal-session.json'
+import c323 from '../../../content/courses/setup-and-environment/locales/th/lessons/github-account-and-first-push.json'
+import c324 from '../../../content/courses/setup-and-environment/locales/th/lessons/install-the-toolchain.json'
+import c325 from '../../../content/courses/setup-and-environment/locales/th/lessons/when-something-does-not-work.json'
+import c326 from '../../../content/courses/setup-and-environment/locales/th/course.json'
+import c327 from '../../../content/courses/setup-and-environment/course.json'
 
 /** โครง + ข้อความของทุกคอร์ส ผูกเข้ามาตอน build ไม่ใช่ตอน request */
 export const COURSE_REGISTRY: Record<
@@ -683,6 +696,25 @@ export const COURSE_REGISTRY: Record<
       "syscall-mechanism": c310,
       "thread-vs-process": c311,
       "zombie-and-orphan": c312,
+    },
+  },
+  "setup-and-environment": {
+    __structure: c327,
+    "en": {
+      __copy: c320,
+      "choose-your-environment": c315,
+      "first-terminal-session": c316,
+      "github-account-and-first-push": c317,
+      "install-the-toolchain": c318,
+      "when-something-does-not-work": c319,
+    },
+    "th": {
+      __copy: c326,
+      "choose-your-environment": c321,
+      "first-terminal-session": c322,
+      "github-account-and-first-push": c323,
+      "install-the-toolchain": c324,
+      "when-something-does-not-work": c325,
     },
   },
 } as never
