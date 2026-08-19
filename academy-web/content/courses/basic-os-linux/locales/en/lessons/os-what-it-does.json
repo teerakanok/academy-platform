@@ -103,7 +103,7 @@
     "The kernel is the only code that touches hardware directly",
     "Programs ask the kernel for things using system calls",
     "User space = boxed-in programs · kernel space = full access",
-    "Privilege escalation = getting from user space power to kernel-level power"
+    "Privilege escalation = getting more authority than you were given — most often from an ordinary user account to root"
   ],
   "videoCueQuestions": [
     {

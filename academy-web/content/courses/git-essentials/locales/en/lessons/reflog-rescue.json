@@ -83,7 +83,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "The reflog records commits. Work that was never committed — edits sitting in your working directory, or changes you staged but never committed — has no entry anywhere, so nothing can bring it back. git restore, git checkout of a file, and reset --hard all discard that work permanently."
+      "text": "The reflog records commits. Work that was never committed — edits sitting in your working directory, or changes you staged but never committed have no reflog entry, so no reflog command finds them — though the blobs themselves survive in the object database and git fsck --lost-found can still recover them until gc runs. git restore, git checkout of a file, and reset --hard all discard that work permanently."
     },
     {
       "kind": "callout",

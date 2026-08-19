@@ -16,7 +16,8 @@
       "kind": "code",
       "caption": "ทิ้งการแก้ที่ยังไม่ได้ commit",
       "lines": [
-        "git restore app.py            # ทิ้งการแก้ กลับไปที่ commit ล่าสุด",
+        "git restore app.py            # ทิ้งการแก้ที่ยังไม่ stage — กลับไปที่ตัวที่ stage ไว้",
+        "  #                               (ถ้าไม่ได้ stage อะไรไว้ ตัวนั้นก็คือ commit ล่าสุด)",
         "git restore .                 # ทุกการแก้ที่ยังไม่ stage — อันนี้ไม่มีปุ่มย้อน"
       ]
     },

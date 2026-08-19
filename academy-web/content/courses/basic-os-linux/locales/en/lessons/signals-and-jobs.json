@@ -14,13 +14,42 @@
     },
     {
       "kind": "table",
-      "headers": ["Signal", "What it asks", "Can the process ignore it?"],
+      "headers": [
+        "Signal",
+        "What it asks",
+        "Can the process ignore it?"
+      ],
       "rows": [
-        ["TERM (15)", "Shut down cleanly — finish writing, close files, exit", "Yes, and that is the point"],
-        ["HUP (1)", "Reload your configuration without restarting", "Yes — many services use it exactly for this"],
-        ["INT (2)", "The interrupt you send with Ctrl+C", "Yes"],
-        ["KILL (9)", "Stop existing, right now", "No — the kernel removes it"],
-        ["STOP / CONT", "Pause · resume", "No"]
+        [
+          "TERM (15)",
+          "Shut down cleanly — finish writing, close files, exit",
+          "Yes, and that is the point"
+        ],
+        [
+          "HUP (1)",
+          "Reload your configuration without restarting",
+          "Yes — many services use it exactly for this"
+        ],
+        [
+          "INT (2)",
+          "The interrupt you send with Ctrl+C",
+          "Yes"
+        ],
+        [
+          "KILL (9)",
+          "Stop existing, right now",
+          "No — the kernel removes it"
+        ],
+        [
+          "STOP (19)",
+          "Pause the process immediately",
+          "No — like KILL, the kernel enforces it"
+        ],
+        [
+          "CONT (18)",
+          "Resume a paused process",
+          "Yes — it can be caught, though the process resumes either way"
+        ]
       ]
     },
     {
@@ -113,7 +142,9 @@
         "C": "STOP, to pause it forever",
         "D": "HUP, which always stops a process"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "TERM is the request to shut down cleanly. Escalate to KILL only when the process ignores it, because KILL gives no opportunity to finish writes or clean up locks."
     },
     {
@@ -125,7 +156,9 @@
         "C": "Background jobs always have a time limit",
         "D": "The file it was writing gets locked"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Hangup is delivered to the jobs of an ending session. nohup, tmux, or handing the work to a service manager are the ways around it."
     },
     {
@@ -137,7 +170,9 @@
         "C": "It requires root every time",
         "D": "There is no risk; it is the recommended default"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "KILL cannot be caught or handled. Whatever the process was in the middle of stays in the middle of it."
     }
   ]

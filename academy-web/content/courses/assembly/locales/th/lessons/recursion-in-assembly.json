@@ -190,14 +190,20 @@
       "caption": "ดักการล้นแทนที่จะปล่อยให้ล่มเฉย ๆ ได้อย่างไร",
       "lines": [
         "  #include <signal.h>",
+        "  #include <unistd.h>",
         "",
         "  static char altstack[SIGSTKSZ * 4];",
+        "  static volatile long depth = 0;",
         "",
         "  static void onsegv(int sig) {",
-        "      /* stack ปกติหมดไปแล้ว ตัวจัดการนี้จึงรันบน stack ของตัวเอง */",
-        "      char msg[64];",
-        "      int n = snprintf(msg, sizeof msg, \"depth %ld\\n\", depth);",
-        "      write(2, msg, n);       /* write ไม่ใช่ printf: printf ไม่ปลอดภัยตรงนี้ */",
+        "      /* stack ปกติหมดไปแล้ว ตัวจัดการนี้จึงรันบน stack ของตัวเอง",
+        "         snprintf ไม่อยู่ในรายการที่ปลอดภัยต่อสัญญาณ จึงต้องแปลงเลขเอง */",
+        "      char buf[32];",
+        "      int n = sizeof buf;",
+        "      long v = depth;",
+        "      buf[--n] = '\\n';",
+        "      do { buf[--n] = '0' + (char)(v % 10); v /= 10; } while (v && n);",
+        "      write(2, buf + n, sizeof buf - n);   /* write อยู่ในรายการที่ปลอดภัย */",
         "      _exit(0);",
         "  }",
         "",
@@ -211,7 +217,7 @@
         "/* SA_ONSTACK กับ sigaltstack คือสิ่งที่ทำให้เรื่องนี้ทำงานได้: ตัวจัดการ",
         "   ต้องใช้ stack และ stack ธรรมดาคือสิ่งที่เพิ่งหมดไปพอดี กฎเรื่อง",
         "   ความปลอดภัยต่อสัญญาณแบบอสมวารจากคอร์สระบบปฏิบัติการใช้ได้เต็มที่",
-        "   ตรงนี้ -- write อยู่ในรายการที่ปลอดภัย ส่วน printf ไม่อยู่ */"
+        "   -- write อยู่ในรายการที่ปลอดภัย ส่วน snprintf ไม่อยู่ จึงต้องแปลงเลขเอง */"
       ]
     },
     {
@@ -279,7 +285,7 @@
     "ที่ -O2 ทั้งแฟกทอเรียลแบบ tail-recursive และแบบธรรมดากลายเป็นลูปที่ไม่มี call",
     "ฟังก์ชันที่เรียกซ้ำในซอร์สอาจไม่เรียกซ้ำเลยตอนรัน",
     "การเอาที่อยู่ตัวแปรท้องถิ่นไปใช้หรือการเพิ่มการพิมพ์ อาจกันการกำจัด tail call",
-    "ดัก stack overflow ด้วย sigaltstack และ SA_ONSTACK · ใช้ write ไม่ใช่ printf ในตัวจัดการ"
+    "ดัก stack overflow ด้วย sigaltstack และ SA_ONSTACK · ใช้ write และแปลงเลขเองในตัวจัดการ — snprintf ไม่ปลอดภัยต่อสัญญาณ"
   ],
   "checkpoint": [
     {

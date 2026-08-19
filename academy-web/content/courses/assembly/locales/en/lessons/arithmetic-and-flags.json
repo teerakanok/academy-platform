@@ -195,10 +195,12 @@
       "caption": "Right shift depends on the type",
       "lines": [
         "  int      shifts(int x)      { return (x << 3) + (x >> 2); }",
+        "      mov  eax, edi",
         "      sar  eax, 2                ; arithmetic shift: copies the sign bit in",
         "      lea  eax, [rax + 8*rdi]    ; the << 3 and the + folded into one lea",
         "",
         "  unsigned ushift(unsigned x) { return x >> 2; }",
+        "      mov  eax, edi",
         "      shr  eax, 2                ; logical shift: brings in zeros",
         "",
         "/* sar for signed, shr for unsigned. Left shift needs no such distinction,",

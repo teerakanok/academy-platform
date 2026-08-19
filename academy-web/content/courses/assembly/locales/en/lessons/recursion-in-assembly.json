@@ -192,14 +192,20 @@
       "caption": "How to catch the overflow rather than just crashing",
       "lines": [
         "  #include <signal.h>",
+        "  #include <unistd.h>",
         "",
         "  static char altstack[SIGSTKSZ * 4];",
+        "  static volatile long depth = 0;",
         "",
         "  static void onsegv(int sig) {",
-        "      /* the normal stack is gone, so this handler runs on its own */",
-        "      char msg[64];",
-        "      int n = snprintf(msg, sizeof msg, \"depth %ld\\n\", depth);",
-        "      write(2, msg, n);       /* write, not printf: printf is not safe here */",
+        "      /* the normal stack is gone, so this handler runs on its own.",
+        "         snprintf is NOT on the async-signal-safe list, so format by hand. */",
+        "      char buf[32];",
+        "      int n = sizeof buf;",
+        "      long v = depth;",
+        "      buf[--n] = '\\n';",
+        "      do { buf[--n] = '0' + (char)(v % 10); v /= 10; } while (v && n);",
+        "      write(2, buf + n, sizeof buf - n);   /* write IS on the safe list */",
         "      _exit(0);",
         "  }",
         "",
@@ -213,7 +219,8 @@
         "/* SA_ONSTACK and sigaltstack are what make this work: the handler needs",
         "   stack, and the ordinary stack is exactly what has just run out. The",
         "   async-signal-safety rule from the operating systems course applies in",
-        "   full here -- write is on the safe list, printf is not. */"
+        "   full -- write is on the safe list, snprintf is not, so the digits are",
+        "   produced by hand. */"
       ]
     },
     {
@@ -281,7 +288,7 @@
     "At -O2 both the tail-recursive and the ordinary factorial became loops with no call",
     "A recursive source function may not recurse at runtime at all",
     "Taking a local's address or adding a print can prevent tail-call elimination",
-    "Catch stack overflow with sigaltstack and SA_ONSTACK; use write, not printf, in the handler"
+    "Catch stack overflow with sigaltstack and SA_ONSTACK; use write and hand-formatted digits in the handler — snprintf is not async-signal-safe"
   ],
   "checkpoint": [
     {

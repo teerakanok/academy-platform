@@ -62,9 +62,9 @@
         ],
         [
           "long double",
-          "80 or more, platform-dependent",
-          "More",
-          "Rarely — and not portably"
+          "80 bits on x86-64, but only 64 on Apple Silicon and MSVC",
+          "Depends on the platform",
+          "Rarely — and never portably"
         ]
       ]
     },

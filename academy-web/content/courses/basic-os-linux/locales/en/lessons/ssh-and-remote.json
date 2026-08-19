@@ -143,7 +143,9 @@
         "Run: ls -l ~/.ssh/                                       (note that the private key is 600)",
         "Run: cat ~/.ssh/id_ed25519.pub                           (this is the half you may share)",
         "If you have a server: ssh-copy-id user@server then ssh user@server",
-        "If you do not: ssh-copy-id \"$(whoami)@localhost\" then ssh \"$(whoami)@localhost\"",
+        "If you do not, use your own machine as the server — but install and start sshd first, because most desktops and WSL do not run it: sudo apt install openssh-server && sudo service ssh start (Linux/WSL), or enable Remote Login in System Settings > General > Sharing (macOS)",
+        "Confirm it is listening before going further: ss -tlnp | grep :22   (or: sudo lsof -i :22)",
+        "Then: ssh-copy-id \"$(whoami)@localhost\" and ssh \"$(whoami)@localhost\"",
         "Add a Host block to ~/.ssh/config and connect using the short name",
         "Run: rsync -av --dry-run ~/scripts/ /tmp/scripts-copy/    (see what would be copied)"
       ],
@@ -185,7 +187,9 @@
         "C": "~/.ssh/known_hosts",
         "D": "Both keys, so the server can verify them"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Only the public half is meant to be distributed. The private key is the credential itself and never leaves your machine."
     },
     {
@@ -197,7 +201,9 @@
         "C": "Keys expire automatically every day",
         "D": "Passwords cannot be encrypted"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "The private key answers a challenge without being transmitted. Password guessing against the service simply has nothing to work with."
     },
     {
@@ -209,7 +215,9 @@
         "C": "Ignore it; this happens normally",
         "D": "Reconnect using a password instead"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Only two things produce that message: a legitimately rebuilt server, or an interception. Clearing the entry to silence it removes the only warning you would get for the second case."
     },
     {
@@ -221,7 +229,9 @@
         "C": "Reboot the server after changing the config",
         "D": "Change it only from the physical console"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "The open session is your way back in if the new configuration is wrong. Verify a fresh login works before you give that up."
     },
     {
@@ -233,7 +243,9 @@
         "C": "It enables compression",
         "D": "It deletes files at the destination"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "This one character decides whether you get /var/www/site/index.html or /var/www/site/site/index.html — which is exactly why --dry-run comes first."
     }
   ]

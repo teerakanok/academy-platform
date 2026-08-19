@@ -68,7 +68,7 @@
         "p[0] = 'x';              // writing to memory you gave back",
         "",
         "int big = 2147483647;",
-        "big = big + 1;           // silently wraps to a negative number"
+        "big = big + 1;           // undefined behaviour — in practice often a negative number, but nothing is promised"
       ]
     },
     {

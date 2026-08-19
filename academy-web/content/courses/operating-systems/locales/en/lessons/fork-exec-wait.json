@@ -132,7 +132,7 @@
     "exec keeps the process and replaces the program — nothing after a successful exec runs",
     "The gap between fork and exec is where redirection, pipes and privilege changes happen",
     "fflush(stdout) before forking, or buffered text prints twice",
-    "Children should end with _exit(), not exit() — exit() flushes the parent's buffers too",
+    "Children should end with _exit(), not exit() — exit() flushes the child's own COPY of the inherited buffers, so anything the parent buffered before the fork gets printed a second time",
     "Check WIFEXITED before trusting WEXITSTATUS",
     "Exit codes are 8 bits: _exit(300) reports 44",
     "A killed child reports WIFSIGNALED and WTERMSIG instead",

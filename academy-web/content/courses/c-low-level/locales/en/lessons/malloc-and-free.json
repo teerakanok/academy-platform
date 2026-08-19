@@ -86,12 +86,32 @@
     },
     {
       "kind": "table",
-      "headers": ["Mistake", "What happens", "How it is caught"],
+      "headers": [
+        "Mistake",
+        "What happens",
+        "How it is caught"
+      ],
       "rows": [
-        ["Forgetting free", "A leak — memory grows until the process is restarted", "Sanitizer or Valgrind reports it at exit"],
-        ["Using after free", "Reads or writes memory that may now belong to something else", "AddressSanitizer names it precisely"],
-        ["Freeing twice", "Corrupts the allocator's own bookkeeping", "Usually aborts immediately with an allocator message"],
-        ["Freeing a non-heap pointer", "Undefined — the allocator never owned it", "Crash or corruption"]
+        [
+          "Forgetting free",
+          "A leak — memory grows until the process is restarted",
+          "Sanitizer or Valgrind reports it at exit"
+        ],
+        [
+          "Using after free",
+          "Reads or writes memory that may now belong to something else",
+          "AddressSanitizer names it precisely"
+        ],
+        [
+          "Freeing twice",
+          "Corrupts the allocator's own bookkeeping",
+          "Usually aborts immediately with an allocator message"
+        ],
+        [
+          "Freeing a non-heap pointer",
+          "Undefined — the allocator never owned it",
+          "Crash or corruption"
+        ]
       ]
     },
     {
@@ -159,7 +179,9 @@
       "kind": "try",
       "title": "Commit each mistake under a sanitizer",
       "steps": [
-        "Write a program that mallocs and never frees; run with -fsanitize=address and read the leak report",
+        "Write a program that mallocs and never frees, then run it with -fsanitize=address",
+        "On Linux you get a LeakSanitizer report naming the allocation. On macOS Apple clang ships AddressSanitizer WITHOUT leak detection, so the program exits silently — verified: the same binary reports nothing on macOS and a 100-byte direct leak on Linux",
+        "If you are on macOS, use leaks -atExit -- ./prog instead, or run the exercise inside a Linux container",
         "Write a use-after-free; run it and read where the sanitizer says the memory was freed",
         "Write a double free; run it and read the allocator's message",
         "Fix all three by adding free and setting the pointer to NULL",
@@ -192,7 +214,9 @@
         "C": "sizeof(int) is not portable",
         "D": "It avoids the need to check for NULL"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "An under-allocated buffer is a memory-corruption bug, not a compile error, so this small habit removes a defect that is otherwise easy to introduce."
     },
     {
@@ -204,7 +228,9 @@
         "C": "malloc cannot take a computed size",
         "D": "There is no risk if count is unsigned"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "calloc is required to detect that overflow and return NULL, which is why it is the right choice for input-derived counts."
     },
     {
@@ -216,7 +242,9 @@
         "C": "It always moves the block",
         "D": "It does not preserve the contents"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Assign to a temporary first, then decide what to do on failure while you still hold the original pointer."
     },
     {
@@ -228,7 +256,9 @@
         "C": "It prevents leaks",
         "D": "It is required by the standard"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "It converts two silent, hard-to-trace bugs into one immediate and obvious failure — at the cost of a single line."
     }
   ]

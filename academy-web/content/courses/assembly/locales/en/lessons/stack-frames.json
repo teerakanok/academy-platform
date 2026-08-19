@@ -84,6 +84,7 @@
         "",
         "  _spill:",
         "      push rbp",
+        "      mov  rbp, rsp",
         "      push r15                                ; five callee-saved registers,",
         "      push r14                                ; saved because this function",
         "      push r13                                ; wants to use them and must",

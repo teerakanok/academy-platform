@@ -138,7 +138,7 @@
       "kind": "try",
       "title": "Add a check and watch it fail honestly",
       "steps": [
-        "In a repository you own on a hosting platform, create .github/workflows/test.yml with the example above",
+        "In a repository you own on GitHub, create .github/workflows/test.yml with the example above. The .github/workflows path and the YAML keys below are GitHub Actions specific — GitLab CI uses .gitlab-ci.yml with different keys, and the idea transfers but the file does not",
         "Adjust the steps to match your project — or use a single step that runs echo and exit 0",
         "Commit and push it on a branch, then open a pull request",
         "Watch the check run and pass",
@@ -170,7 +170,9 @@
         "C": "It uses less disk space",
         "D": "It is required by Git"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "It removes 'works on my machine' as an explanation, because the environment is defined by the repository and nothing else."
     },
     {
@@ -182,7 +184,9 @@
         "C": "The test is flaky by definition",
         "D": "The workflow file is malformed"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "The clean machine has only what a fresh clone gives it. The gap between that and your machine is the bug."
     },
     {
@@ -194,7 +198,9 @@
         "C": "Sending an email when it fails",
         "D": "Running it on several operating systems"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "A check nobody is required to satisfy changes nothing. Requiring it — against a current branch — is what makes it decisive."
     },
     {
@@ -206,7 +212,9 @@
         "C": "In an environment file committed to the branch",
         "D": "Passed as command-line arguments"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "The workflow is part of the repository. Anything sensitive placed there is committed, permanent in the history, and readable by everyone with access."
     }
   ]

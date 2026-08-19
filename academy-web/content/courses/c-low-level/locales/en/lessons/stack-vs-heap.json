@@ -80,14 +80,42 @@
     },
     {
       "kind": "table",
-      "headers": ["", "Stack", "Heap"],
+      "headers": [
+        "",
+        "Stack",
+        "Heap"
+      ],
       "rows": [
-        ["Managed by", "The compiler and hardware", "You"],
-        ["Speed", "Extremely fast", "Slower — bookkeeping is involved"],
-        ["Size", "Small and fixed", "Large, limited by the system"],
-        ["Size known", "At compile time", "Can be decided at runtime"],
-        ["Lifetime", "Until the function returns", "Until you call free"],
-        ["Typical failure", "Overflow from depth or a huge local", "Leaks, double free, use-after-free"]
+        [
+          "Managed by",
+          "The compiler and hardware",
+          "You"
+        ],
+        [
+          "Speed",
+          "Extremely fast",
+          "Slower — bookkeeping is involved"
+        ],
+        [
+          "Size",
+          "Small and fixed",
+          "Large, limited by the system"
+        ],
+        [
+          "Size known",
+          "At compile time",
+          "Can be decided at runtime"
+        ],
+        [
+          "Lifetime",
+          "Until the function returns",
+          "Until you call free"
+        ],
+        [
+          "Typical failure",
+          "Overflow from depth or a huge local",
+          "Leaks, double free, use-after-free"
+        ]
       ]
     },
     {
@@ -151,7 +179,7 @@
         "Run: ulimit -s     (your stack limit in kilobytes)",
         "Declare char big[8*1024*1024]; inside a function, call it, and see what happens",
         "Move the same buffer to malloc and confirm it works",
-        "Write read_all(const char *path, size_t *len) that returns a heap buffer, and free it at the call site",
+        "Write grow(size_t *cap) that doubles a heap buffer with realloc and copies nothing by hand — return the new pointer and free it at the call site",
         "Run everything under -fsanitize=address"
       ],
       "expected": "Three addresses far apart, a stack overflow you caused deliberately, the actual limit on your system, and the same allocation succeeding on the heap. The contrast between the last two is the whole lesson."
@@ -177,7 +205,9 @@
         "C": "In global memory, for the whole program",
         "D": "In the code region"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "The frame is removed on return, which is why returning a pointer to a local is a defect."
     },
     {
@@ -189,7 +219,9 @@
         "C": "Either works identically",
         "D": "A global array"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Stack sizes are fixed at compile time and the total is small. Input-dependent sizes are exactly the heap's purpose."
     },
     {
@@ -201,7 +233,9 @@
         "C": "Allocating too much with malloc",
         "D": "Dereferencing NULL"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Both fill the fixed stack space. Forgetting free is a heap leak, which is a different failure entirely."
     },
     {
@@ -213,7 +247,9 @@
         "C": "Because free needs the original size",
         "D": "So the compiler can insert the free"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Ownership is a convention in C. Writing it down is the only enforcement mechanism the language offers."
     }
   ]

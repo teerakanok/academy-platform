@@ -16,7 +16,8 @@
       "kind": "code",
       "caption": "Throw away uncommitted changes to a file",
       "lines": [
-        "git restore app.py            # discard edits, back to the last commit",
+        "git restore app.py            # discard unstaged edits — back to whatever is STAGED",
+        "  #                               (with nothing staged, that is the last commit)",
         "git restore .                 # every unstaged edit — no undo for this one"
       ]
     },
@@ -169,7 +170,7 @@
     }
   ],
   "cheatsheet": [
-    "git restore <file> — discard uncommitted edits (irreversible: look with git diff first)",
+    "git restore <file> — discard unstaged edits, back to the staged version (irreversible: look with git diff first)",
     "git restore --staged <file> — unstage but keep the edit",
     "git commit --amend — replace the last commit (only before pushing)",
     "git commit --amend --no-edit — fold a forgotten file into the last commit",

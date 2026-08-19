@@ -49,7 +49,7 @@
         "awk '{print $1}' access.log            # the first field of every line",
         "awk '{print $1, $NF}' access.log       # first and last",
         "awk -F: '{print $1}' /etc/passwd       # -F sets the separator: usernames",
-        "awk '$3 > 1000' /etc/passwd            # only lines where field 3 is over 1000",
+        "awk -F: '$3 > 1000' /etc/passwd        # only lines where field 3 is over 1000",
         "awk -F: '$3 >= 1000 {print $1}' /etc/passwd   # combine: real user accounts",
         "ps aux | awk '$3 > 5 {print $1, $2, $3}'      # processes using over 5% CPU"
       ]
@@ -117,7 +117,9 @@
         "C": "The first is case-insensitive",
         "D": "g means global across all files"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "g applies to every occurrence within each line. Without it, only the first occurrence on a line is replaced — a common source of surprise."
     },
     {
@@ -129,7 +131,9 @@
         "C": "Copy the file to /tmp and edit there instead",
         "D": "Nothing — sed always keeps a backup"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Without -i, sed only prints what the result would be. That is the free preview. -i rewrites in place, and a wrong pattern has then already destroyed the original."
     },
     {
@@ -141,7 +145,9 @@
         "C": "The first field",
         "D": "The whole line"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "NF is the number of fields, so $NF is the field at that position — the last one. $0 is the whole line."
     },
     {
@@ -153,7 +159,9 @@
         "C": "sed 's/1000//' /etc/passwd",
         "D": "awk '{print $1000}' /etc/passwd"
       },
-      "correct": ["A"],
+      "correct": [
+        "A"
+      ],
       "explanation": "-F: splits on the colon used in /etc/passwd, the condition filters on the third field (the UID), and the action prints the first field (the name)."
     }
   ]

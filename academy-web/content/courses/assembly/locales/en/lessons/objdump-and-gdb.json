@@ -161,7 +161,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "Note that gdb defaults to AT&T and lldb to Intel, so the two outputs above look different despite describing identical bytes. This is the difference the syntax lesson prepared you for, and it is why the first command in the gdb line sets the flavour explicitly."
+      "text": "Both default to AT&T. The gdb output above is Intel only because the command set the flavour explicitly; the lldb output beside it was left at its default and came out AT&T, which is why the two look different despite describing identical bytes. This is the difference the syntax lesson prepared you for, and it is why the first command in the gdb line sets the flavour explicitly."
     },
     {
       "kind": "heading",
@@ -227,7 +227,7 @@
     "Stripping removes names but not code, strings, imports or structure",
     "First pass: file, nm -g, strings -a, objdump -d — in that order",
     "On Linux add readelf -h, readelf -d and objdump -T",
-    "gdb defaults to AT&T; lldb defaults to Intel — set the flavour explicitly",
+    "gdb and lldb both default to AT&T — set the flavour explicitly rather than assuming",
     "Both number instructions as <+n>, the byte offset from the function start",
     "stepi advances one instruction; step advances one source line",
     "x/4xg $rsp prints the top four 8-byte stack values; x is hex, g is 8 bytes",

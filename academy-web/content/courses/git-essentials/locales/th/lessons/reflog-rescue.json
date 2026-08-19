@@ -83,7 +83,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "reflog บันทึก commit งานที่ไม่เคยถูก commit — การแก้ที่นั่งอยู่ใน working directory หรือการเปลี่ยนแปลงที่ stage ไว้แต่ยังไม่ได้ commit — ไม่มีรายการอยู่ที่ไหนเลย จึงไม่มีอะไรพากลับมาได้ git restore, git checkout ของไฟล์ และ reset --hard ล้วนทิ้งงานนั้นอย่างถาวร"
+      "text": "reflog บันทึก commit งานที่ไม่เคยถูก commit — การแก้ที่นั่งอยู่ใน working directory หรือการเปลี่ยนแปลงที่ stage ไว้แต่ยังไม่ได้ commit — ไม่มีรายการใน reflog คำสั่ง reflog จึงหาไม่เจอ (ตัว blob ที่ stage ไว้ยังอยู่ในฐานข้อมูลอ็อบเจกต์ และ git fsck --lost-found ยังกู้ได้จนกว่า gc จะทำงาน ส่วนการแก้ที่ยังไม่ stage ไม่เหลืออะไรเลย) git restore, git checkout ของไฟล์ และ reset --hard ล้วนทิ้งงานนั้นอย่างถาวร"
     },
     {
       "kind": "callout",
@@ -194,7 +194,7 @@
       "correct": [
         "C"
       ],
-      "explanation": "reflog บันทึก commit งานที่ไม่เคยถูก commit ไม่มีรายการ จึงไม่มีอะไรให้กลับไปหา"
+      "explanation": "reflog บันทึกเฉพาะการเคลื่อนของ ref งานที่ไม่เคยถูก commit จึงไม่มีรายการใน reflog ให้กลับไปหา"
     },
     {
       "id": "cp-4",

@@ -169,8 +169,8 @@
         ],
         [
           "lldb",
-          "Intel",
-          "settings set target.x86-disassembly-flavor att"
+          "AT&T",
+          "settings set target.x86-disassembly-flavor intel"
         ],
         [
           "คู่มือของ Intel และ AMD",
@@ -229,7 +229,7 @@
     "ตัวถูกดำเนินการหน่วยความจำแบบ Intel: [ฐาน + ดัชนี*ตัวคูณ + ระยะเลื่อน]",
     "ตัวถูกดำเนินการหน่วยความจำแบบ AT&T: ระยะเลื่อน(ฐาน, ดัชนี, ตัวคูณ)",
     "การทดสอบที่เร็วที่สุด: มีเครื่องหมายเปอร์เซ็นต์เต็มไปหมดแปลว่า AT&T",
-    "GCC, Clang, objdump และ gdb ตั้งค่าเริ่มต้นเป็น AT&T · lldb และคู่มือผู้ผลิตใช้ Intel",
+    "GCC, Clang, objdump, gdb และ lldb ตั้งค่าเริ่มต้นเป็น AT&T ทั้งหมด · มีแต่คู่มือผู้ผลิตที่ใช้ Intel",
     "-masm=intel, -M intel, --x86-asm-syntax=intel และ set disassembly-flavor intel สลับได้ทั้งหมด",
     "การกำกับขนาดจำเป็นเฉพาะเมื่อไม่มีตัวถูกดำเนินการไหนบ่งบอกขนาดได้"
   ],

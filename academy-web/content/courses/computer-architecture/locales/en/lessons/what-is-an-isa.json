@@ -49,7 +49,7 @@
       "kind": "callout",
       "tone": "info",
       "title": "You have already seen the contract's edges",
-      "text": "The operating systems course showed that system call numbers differ between architectures — read is 0 on x86-64 and 63 on aarch64 — and that aarch64 has no open or fork at all. Those are ISA-level facts: different contracts, different numbering. The C course's point that int is not guaranteed to be four bytes has the same root. Each time a course said 'this depends on the architecture', it was pointing at this contract."
+      "text": "The operating systems course showed that system call numbers differ between architectures — read is 0 on x86-64 and 63 on aarch64 — and that aarch64 has no open or fork at all. Those are facts about the kernel's ABI for each architecture, not about the ISA itself: neither the x86-64 nor the ARMv8 specification says anything about system call numbers. Each port of Linux fixes its own numbering, and the ISA only fixes the instruction that makes the call. The C course's point that int is not guaranteed to be four bytes has the same root. Each time a course said 'this depends on the architecture', it was pointing at this contract."
     },
     {
       "kind": "heading",
@@ -163,17 +163,17 @@
     },
     {
       "id": "cp-2",
-      "prompt": "Why does aarch64 have no fork system call while x86-64 does?",
+      "prompt": "aarch64 has no fork system call while x86-64 does. What does that tell you about the two instruction sets?",
       "choices": {
         "A": "aarch64 cannot create processes",
-        "B": "System call numbering is part of each architecture's contract, and aarch64 was defined when clone had already replaced fork",
-        "C": "It is an operating system difference, not an architecture one",
-        "D": "The C library removed it"
+        "B": "Nothing — the set of system calls and their numbers are the kernel's ABI for each architecture; the instruction set only fixes the instruction that makes the call",
+        "C": "The aarch64 instruction set defines a smaller set of system calls",
+        "D": "The C library removed it on aarch64"
       },
       "correct": [
         "B"
       ],
-      "explanation": "The operating systems course measured this directly. It is an ISA-level fact, which is why the C library provides fork on both by translating it to what the architecture actually offers."
+      "explanation": "Neither the x86-64 nor the ARMv8 specification mentions system call numbers. Linux chooses them per architecture, and the aarch64 port was defined after clone had already replaced fork. The instruction set's only contribution is svc (or syscall)."
     },
     {
       "id": "cp-3",

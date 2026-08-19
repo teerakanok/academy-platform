@@ -64,10 +64,16 @@
           "Terminate"
         ],
         [
-          "SIGSTOP / SIGCONT",
-          "19 / 18",
+          "SIGTSTP / SIGCONT",
+          "20 / 18",
           "Ctrl-Z and fg",
-          "Stop / continue — SIGSTOP cannot be caught"
+          "Suspend from the keyboard — SIGTSTP CAN be caught"
+        ],
+        [
+          "SIGSTOP",
+          "19",
+          "kill -STOP",
+          "Stop — cannot be caught or ignored, like SIGKILL"
         ]
       ]
     },
@@ -75,7 +81,7 @@
       "kind": "callout",
       "tone": "info",
       "title": "Signal numbers are per-architecture too",
-      "text": "The common ones are the same nearly everywhere, but not all are. Linux's own documentation gives the numbers per architecture: SIGCHLD is 17 on x86 and ARM, 20 on Alpha and SPARC, and 18 on MIPS; SIGUSR1 is 10 on x86/ARM but 30 on Alpha/SPARC. SIGSTOP and SIGCHLD even swap values between those two families. Use the names in code, never the numbers."
+      "text": "The common ones are the same nearly everywhere, but not all are. Linux's own documentation gives the numbers per architecture: SIGCHLD is 17 on x86 and ARM, 20 on Alpha and SPARC, and 18 on MIPS; SIGUSR1 is 10 on x86/ARM but 30 on Alpha/SPARC. SIGSTOP and SIGCHLD both move between those two families — on x86 they are 19 and 17, on Alpha and SPARC 17 and 20. Use the names in code, never the numbers."
     },
     {
       "kind": "heading",

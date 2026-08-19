@@ -104,7 +104,7 @@
         "# setuid root",
         "-rwsr-xr-x root root idtest",
         "  real uid=1000  effective uid=0",
-        "  CapEff: 00000000a80425fb        <- nearly every capability there is",
+        "  CapEff: 00000000a80425fb        <- 14 of the 41 capabilities (this is a container's default set)",
         "",
         "# file capability instead",
         "-rwxr-xr-x root root idtest   (cap_net_raw=ep)",
@@ -114,7 +114,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "Those two hexadecimal numbers are the entire argument for capabilities. The setuid version, needing one ability, received the authority to do almost anything: load kernel modules, change any file's owner, kill any process. The capability version received one bit. If either program has a bug that an attacker can exploit, the damage differs by exactly that difference."
+      "text": "Those two hexadecimal numbers are the entire argument for capabilities. The setuid version, needing one ability, received a whole bundle of authority it never asked for: change any file's owner, kill any process, bind any port, override every file permission. The capability version received one bit. If either program has a bug that an attacker can exploit, the damage differs by exactly that difference."
     },
     {
       "kind": "callout",

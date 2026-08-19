@@ -170,8 +170,8 @@
         ],
         [
           "lldb",
-          "Intel",
-          "settings set target.x86-disassembly-flavor att"
+          "AT&T",
+          "settings set target.x86-disassembly-flavor intel"
         ],
         [
           "Intel and AMD manuals",
@@ -230,7 +230,7 @@
     "Intel memory operand: [base + index*scale + disp]",
     "AT&T memory operand: disp(base, index, scale)",
     "Fastest test: percent signs everywhere means AT&T",
-    "GCC, Clang, objdump and gdb default to AT&T; lldb and the vendor manuals use Intel",
+    "GCC, Clang, objdump, gdb and lldb all default to AT&T; only the vendor manuals use Intel",
     "-masm=intel, -M intel, --x86-asm-syntax=intel and set disassembly-flavor intel all switch",
     "A size annotation is required only when no operand implies the size"
   ],

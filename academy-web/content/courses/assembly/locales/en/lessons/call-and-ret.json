@@ -77,8 +77,8 @@
       "lines": [
         "   higher addresses",
         "        ...",
-        "   [rbp + 24]   seventh argument, if there is one",
-        "   [rbp + 16]   sixth-plus argument, if there is one",
+        "   [rbp + 24]   eighth argument, if there is one",
+        "   [rbp + 16]   seventh argument — the FIRST one passed on the stack",
         "   [rbp + 8]    RETURN ADDRESS      <- pushed by call",
         "   [rbp + 0]    saved rbp           <- pushed by the prologue",
         "   [rbp - 8]    first local",
@@ -183,7 +183,7 @@
     "push rax = sub rsp, 8 then store; pop = load then add rsp, 8",
     "The stack grows toward lower addresses — confirmed by measurement",
     "Standard prologue: push rbp ; mov rbp, rsp. Epilogue: pop rbp ; ret",
-    "[rbp + 8] is the return address; [rbp + 16] and up are stack arguments",
+    "[rbp + 8] is the return address; [rbp + 16] is the seventh argument, the first one passed on the stack",
     "Locals live below rbp, so overflowing one walks upward into the return address",
     "call rax is an indirect call; call qword ptr [rip + …] is usually a library call",
     "A tail call is a jmp with no call, so the function does not appear in a backtrace",
@@ -234,17 +234,17 @@
     },
     {
       "id": "cp-4",
-      "prompt": "A stack trace seems to skip a function that you know was called. What is one likely explanation?",
+      "prompt": "A stack trace from an optimised build skips a function you know was called. Which explanation is ruled OUT by the fact that the function still appears in the binary's symbol table?",
       "choices": {
-        "A": "The debugger is broken",
-        "B": "A tail call: the compiler emitted jmp instead of call, reusing the frame, so no return address for that function was ever pushed",
-        "C": "The function was inlined into the caller",
-        "D": "Either B or C — both remove the function's separate frame"
+        "A": "It was inlined into its caller, so no separate frame or symbol use remains",
+        "B": "A tail call: the compiler emitted jmp instead of call, so no return address for it was ever pushed",
+        "C": "The debugger lost the unwind information for that frame",
+        "D": "The function was never called at all"
       },
       "correct": [
-        "D"
+        "A"
       ],
-      "explanation": "Both tail calls and inlining eliminate the separate frame. Recognising them explains a large share of confusing backtraces in optimised builds."
+      "explanation": "Inlining removes the call site entirely, so an inlined function does not get its own frame and the compiler usually has no reason to keep emitting it as a separate symbol. A tail call and missing unwind information both leave the function in the binary while removing it from the trace, so neither is ruled out."
     }
   ]
 }

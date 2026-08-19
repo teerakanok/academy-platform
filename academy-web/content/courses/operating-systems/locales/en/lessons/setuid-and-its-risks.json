@@ -26,12 +26,12 @@
         "",
         "$ ./idtest                                (still run by uid 1000)",
         "  real uid=1000  effective uid=0          <- identity changed",
-        "  CapEff: 00000000a80425fb                <- and it received nearly every capability"
+        "  CapEff: 00000000a80425fb                <- and it received a whole set of them, not the one it needed"
       ]
     },
     {
       "kind": "paragraph",
-      "text": "Real uid stays as the caller — that is who invoked it. Effective uid becomes the owner, and that is what permission checks use. The capability set is the part people forget: the program did not ask for the ability to load kernel modules or change any file's owner, but it received both."
+      "text": "Real uid stays as the caller — that is who invoked it. Effective uid becomes the owner, and that is what permission checks use. The capability set is the part people forget: the program did not ask for the ability to change any file's owner or kill any process, but it received both."
     },
     {
       "kind": "heading",

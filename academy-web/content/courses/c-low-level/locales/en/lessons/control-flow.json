@@ -36,8 +36,9 @@
         "if (x > 0);            /* <- this semicolon IS the if-body */",
         "    do_something();    /* runs unconditionally */",
         "",
-        "for (int i = 0; i < 10; i++);   /* an empty loop that runs ten times */",
-        "    printf(\"%d\\n\", i);          /* runs once, and i is out of scope here */"
+        "int i;",
+        "for (i = 0; i < 10; i++);       /* an empty loop that runs ten times */",
+        "    printf(\"%d\\n\", i);          /* runs once, after the loop, printing 10 */"
       ]
     },
     {
@@ -192,7 +193,9 @@
         "C": "It is a compile error",
         "D": "It calls do_something twice"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "An empty statement is a valid body. The following line is simply the next statement, regardless of the condition."
     },
     {
@@ -204,7 +207,9 @@
         "C": "Braces are required by the standard",
         "D": "It makes the file larger, which helps debugging"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "The compiler reads structure, not layout. Braces make the two agree."
     },
     {
@@ -216,7 +221,9 @@
         "C": "The switch ends",
         "D": "It is a compile error"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Sometimes that is what you want; when it is, add a comment so the next reader knows it was intended rather than forgotten."
     },
     {
@@ -228,7 +235,9 @@
         "C": "It is required by the standard",
         "D": "It prevents undefined behaviour"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "The alternative is duplicating cleanup in each early return, which is exactly how resource leaks get introduced."
     }
   ]

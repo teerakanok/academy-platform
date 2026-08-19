@@ -20,14 +20,42 @@
     },
     {
       "kind": "table",
-      "headers": ["Operation", "What people expect", "What is guaranteed"],
+      "headers": [
+        "Operation",
+        "What people expect",
+        "What is guaranteed"
+      ],
       "rows": [
-        ["Reading past the end of an array", "A crash", "Nothing — it may read anything, or appear to work"],
-        ["Signed integer overflow", "Wrapping to a negative number", "Nothing — the optimiser may assume it cannot happen"],
-        ["Using memory after free", "A crash", "Nothing — the memory may still look valid"],
-        ["Dereferencing NULL", "A reliable crash", "Nothing, though it usually does crash"],
-        ["Reading an uninitialised variable", "Zero", "Nothing — often the leftovers of earlier data"],
-        ["Shifting by more than the width", "Zero, or wrapping", "Nothing"]
+        [
+          "Reading past the end of an array",
+          "A crash",
+          "Nothing — it may read anything, or appear to work"
+        ],
+        [
+          "Signed integer overflow",
+          "Wrapping to a negative number",
+          "Nothing — the optimiser may assume it cannot happen"
+        ],
+        [
+          "Using memory after free",
+          "A crash",
+          "Nothing — the memory may still look valid"
+        ],
+        [
+          "Dereferencing NULL",
+          "A reliable crash",
+          "Nothing, though it usually does crash"
+        ],
+        [
+          "Reading an uninitialised variable",
+          "Zero",
+          "Nothing — often the leftovers of earlier data"
+        ],
+        [
+          "Shifting by more than the width",
+          "Zero, or wrapping",
+          "Nothing"
+        ]
       ]
     },
     {
@@ -41,7 +69,9 @@
         "}",
         "",
         "/* Signed overflow is undefined, so the compiler may assume it never occurs.",
-        "   If it never occurs, sum < a is always false. The check can be removed.",
+        "   If it never occurs, sum is exactly a + b, so sum < a means the same as b < 0.",
+        "   Where the compiler can also see that b is not negative, that folds to false",
+        "   and the check is removed.",
         "   Correct way: check BEFORE the operation, or use unsigned, or __builtin_add_overflow. */"
       ]
     },
@@ -151,7 +181,9 @@
         "C": "The program always crashes",
         "D": "The behaviour is decided by the operating system"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "That last part is what makes it dangerous: the optimiser is entitled to rewrite code based on the assumption that undefined behaviour never happens."
     },
     {
@@ -163,7 +195,9 @@
         "C": "Because sum and a have different types",
         "D": "It cannot be removed; that would be a compiler bug"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "The check only matters in a case the standard says cannot occur. Check before the operation, or use unsigned arithmetic where wrapping is defined."
     },
     {
@@ -175,7 +209,9 @@
         "C": "Reading one element past the end of an array",
         "D": "Using a pointer after free"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Unsigned arithmetic is defined to wrap modulo 2^N. The other three are undefined, which is why they can appear to work and then stop."
     },
     {
@@ -187,7 +223,9 @@
         "C": "The program is too slow to run normally",
         "D": "The compiler version is wrong"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "The instrumentation makes invalid access visible at the moment it happens, instead of leaving it to corrupt something elsewhere and surface later."
     }
   ]
