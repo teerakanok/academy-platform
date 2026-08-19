@@ -1,0 +1,37 @@
+{
+  "ok": true,
+  "generatedAt": "2026-08-19T11:30:00Z",
+  "release": "academy-self-study/2026-08-19-v001-systems-track",
+  "vault": {
+    "remote": "gdrive_personal:",
+    "remoteRoot": "[CYBERSKILLS] Crucible Vault",
+    "target": "Courses/academy-self-study/2026-08-19-v001-systems-track"
+  },
+  "writeVia": "rclone (ผ่าน crucible-studio/scripts/drive-export.mjs)",
+  "source": {
+    "repo": "products/cyberskills/academy-platform",
+    "commit": "702adb1ca80389e5957130773feed048faa0d23a",
+    "exporter": "academy-web/scripts/export-course-markdown.mjs"
+  },
+  "contents": {
+    "files": 83,
+    "courses": 14,
+    "reviewReports": 2,
+    "reviewRawLanes": 63,
+    "manifests": 2
+  },
+  "verification": {
+    "listing": "rclone lsf -R เทียบรายชื่อไฟล์กับต้นทาง: ครบ 83/83 ไม่มีค้างและไม่มีขาด",
+    "spotCheck": "rclone cat ยืนยันว่าไฟล์บน vault เป็นฉบับที่แก้เฉลยแล้ว (cp-1 ของบท signals เฉลยอยู่ที่ A ไม่ใช่ B)"
+  },
+  "state": {
+    "unitTests": 1935,
+    "factcheckGate": "ผ่านทั้งหมด",
+    "arithmeticGate": "ผิด 0 · เตือน 4",
+    "answerBiasGate": "ผ่าน — ตำแหน่ง A 25.5 B 24.1 C 25.9 D 24.6 · ยาวที่สุด 83.3%"
+  },
+  "notes": [
+    "receipt อยู่ในรีโปนี้แทน crucible-studio/reports/vault เพราะ lane guard ของ crucible ยังไม่มีเขตครอบ reports/vault",
+    "ชุดนี้เป็นฉบับหลังแก้ must-fix สองรอบและหลังแก้อคติของเฉลยแล้ว"
+  ]
+}
