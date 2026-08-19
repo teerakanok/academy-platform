@@ -132,7 +132,7 @@
         "BREAK 1: change the consumer's while to if — run and watch it take from an empty queue",
         "BREAK 2: change q_close's broadcast to signal — run and watch it hang with consumers asleep",
         "BREAK 3: call q_close before joining the producers — watch items get lost",
-        "BREAK 4: remove '|| closed' from the wait condition — watch it hang at exit",
+        "BREAK 4: change the wait condition from while (q->count == 0 && !q->closed) to while (q->count == 0) — watch it hang at exit",
         "For each break, use Ctrl-\\ to force a core dump, or attach with gdb -p <pid> and run thread apply all bt to see exactly where each thread is stuck"
       ],
       "expected": "One correct implementation and four distinct failures, each with its own signature: corrupted counts, a hang with all consumers in pthread_cond_wait, lost items, and a hang at exit. Being able to look at a stuck program's backtrace and say which of these it is — that is the deliverable of this whole module."

@@ -192,7 +192,7 @@
         "  #include <signal.h>",
         "  #include <unistd.h>",
         "",
-        "  static char altstack[SIGSTKSZ * 4];",
+        "  static char altstack[64 * 1024];   /* ไม่ใช้ SIGSTKSZ: บน glibc >= 2.34 มันเป็นการเรียก sysconf ไม่ใช่ค่าคงที่ */",
         "  static volatile long depth = 0;",
         "",
         "  static void onsegv(int sig) {",

@@ -120,9 +120,14 @@
           "reflog holds the originals"
         ],
         [
-          "Uncommitted edits discarded with restore",
+          "Unstaged edits discarded with restore",
           "No",
           "They were never recorded anywhere"
+        ],
+        [
+          "Staged-but-uncommitted content",
+          "Not by reflog",
+          "No reflog entry — but the blob is in the object database; git fsck --lost-found finds it until gc runs"
         ]
       ]
     },

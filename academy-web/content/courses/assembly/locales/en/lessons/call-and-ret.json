@@ -234,17 +234,17 @@
     },
     {
       "id": "cp-4",
-      "prompt": "A stack trace from an optimised build skips a function you know was called. Which explanation is ruled OUT by the fact that the function still appears in the binary's symbol table?",
+      "prompt": "A function was tail-called. What is true of the stack while that function runs?",
       "choices": {
-        "A": "It was inlined into its caller, so no separate frame or symbol use remains",
-        "B": "A tail call: the compiler emitted jmp instead of call, so no return address for it was ever pushed",
-        "C": "The debugger lost the unwind information for that frame",
-        "D": "The function was never called at all"
+        "A": "It has its own frame sitting below the caller's, as usual",
+        "B": "It reuses the caller's frame — call was replaced by jmp, so no return address for it was ever pushed and it does not appear in a backtrace",
+        "C": "Its frame is allocated on the heap instead",
+        "D": "The caller's frame is duplicated so both are visible"
       },
       "correct": [
-        "A"
+        "B"
       ],
-      "explanation": "Inlining removes the call site entirely, so an inlined function does not get its own frame and the compiler usually has no reason to keep emitting it as a separate symbol. A tail call and missing unwind information both leave the function in the binary while removing it from the trace, so neither is ruled out."
+      "explanation": "A call in tail position has nothing left to do after it returns, so the current frame is free to reuse. That is why a tail-called function is missing from a backtrace: no return address for it exists to walk back through. Inlining removes a function from the trace too, but by a different route — the call site disappears entirely."
     }
   ]
 }

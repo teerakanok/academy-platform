@@ -151,12 +151,19 @@
       "text": "The fix is almost never 777. It is to work out which user needs which access and grant that: usually correcting ownership with chown, or adding the right group, then setting 644 or 755."
     },
     {
-      "kind": "lab",
+      "kind": "try",
       "title": "Read one permission string",
-      "description": "A single file is waiting. Say who can do what to it — then check your answer against the machine.",
-      "estimatedMinutes": 3,
-      "status": "coming-soon",
-      "scale": "inline"
+      "steps": [
+        "Make a file with a known mode: printf 'x\\n' > perm-lab.txt && chmod 640 perm-lab.txt",
+        "Look at it: ls -l perm-lab.txt",
+        "Before reading further, say out loud who can read it, who can write it, and who can do neither",
+        "Check yourself against the machine: stat -f '%Sp %Su %Sg' perm-lab.txt   (Linux: stat -c '%A %U %G' perm-lab.txt)",
+        "Now change one bit at a time and predict the string before each: chmod 644, then 600, then 755",
+        "For each, write the three-character group for owner, group and others before running ls -l",
+        "Finally: chmod 000 perm-lab.txt then try cat perm-lab.txt as yourself — explain the error you get",
+        "Clean up: rm -f perm-lab.txt"
+      ],
+      "expected": "A permission string you can read without hesitating, and one prediction you got wrong — usually 640, because people forget that the group digit is 4 and not 6. The chmod 000 step is the one worth sitting with: the owner of a file can still change its mode back, which is why 000 protects a file from everyone except the person who matters most."
     },
     {
       "kind": "try",
