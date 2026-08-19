@@ -10,11 +10,27 @@
     },
     {
       "kind": "table",
-      "headers": ["Command", "Direction", "Touches your files?"],
+      "headers": [
+        "Command",
+        "Direction",
+        "Touches your files?"
+      ],
       "rows": [
-        ["git fetch", "Server → your notes", "No — safest command in Git"],
-        ["git pull", "Server → your branch", "Yes — fetch plus an integration"],
-        ["git push", "Your branch → server", "No, but it changes what everyone else sees"]
+        [
+          "git fetch",
+          "Server → your notes",
+          "No — safest command in Git"
+        ],
+        [
+          "git pull",
+          "Server → your branch",
+          "Yes — fetch plus an integration"
+        ],
+        [
+          "git push",
+          "Your branch → server",
+          "No, but it changes what everyone else sees"
+        ]
       ]
     },
     {
@@ -151,47 +167,55 @@
       "choices": {
         "A": "git push --force",
         "B": "git pull, integrate the other work, then git push",
-        "C": "Delete your branch and start again",
-        "D": "Clone the repository fresh"
+        "C": "Clone the repository fresh",
+        "D": "Delete your branch and start again"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "The rejection exists to protect commits you have not seen. Forcing would remove them from the server, which is data loss for whoever made them."
     },
     {
       "id": "cp-2",
       "prompt": "What is the difference between fetch and pull?",
       "choices": {
-        "A": "None; pull is an alias",
-        "B": "Fetch downloads and updates your remote-tracking notes only; pull does that and then integrates the work into your branch",
-        "C": "Fetch works offline",
-        "D": "Pull only downloads tags"
+        "A": "Pull only downloads tags",
+        "B": "Fetch works offline",
+        "C": "Fetch downloads and updates your remote-tracking notes only",
+        "D": "None; pull is an alias"
       },
-      "correct": ["B"],
-      "explanation": "Fetch changes what you know. Pull changes what you have — which is why fetch is always safe and pull can produce conflicts."
+      "correct": [
+        "C"
+      ],
+      "explanation": "Pull does that and then integrates the work into your branch. Fetch changes what you know. Pull changes what you have — which is why fetch is always safe and pull can produce conflicts."
     },
     {
       "id": "cp-3",
       "prompt": "Why is git pull --rebase often preferred over plain git pull?",
       "choices": {
-        "A": "It is faster over the network",
-        "B": "It replays your unpushed commits on top of the incoming work, avoiding a history full of uninformative merge commits",
-        "C": "It never produces conflicts",
-        "D": "It skips the fetch step"
+        "A": "It skips the fetch step",
+        "B": "It never produces conflicts",
+        "C": "It replays your unpushed commits on top of the incoming work, avoiding a history full of uninformative merge commits",
+        "D": "It is faster over the network"
       },
-      "correct": ["B"],
+      "correct": [
+        "C"
+      ],
       "explanation": "Your unpushed commits are unshared, so rebasing them is safe — and it keeps the shared history readable instead of filling it with automatic merges."
     },
     {
       "id": "cp-4",
       "prompt": "git status says you are up to date. What should you check first?",
       "choices": {
-        "A": "Nothing — status is authoritative",
-        "B": "Run git fetch first, because ahead/behind is measured against your last-known note of the server, not the server itself",
-        "C": "Whether the remote still exists",
-        "D": "Whether you are on the right operating system"
+        "A": "Whether the remote still exists",
+        "B": "Run git fetch first",
+        "C": "Whether you are on the right operating system",
+        "D": "Nothing — status is authoritative"
       },
-      "correct": ["B"],
-      "explanation": "Remote-tracking branches only update when you fetch. Reading status without fetching tells you about a conversation that may be hours old."
+      "correct": [
+        "B"
+      ],
+      "explanation": "Ahead/behind is measured against your last-known note of the server, not the server itself. Remote-tracking branches only update when you fetch. Reading status without fetching tells you about a conversation that may be hours old."
     }
   ]
 }

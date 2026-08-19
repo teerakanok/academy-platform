@@ -201,55 +201,55 @@
       "id": "cp-1",
       "prompt": "In an event loop, where does the information a thread would have kept on its stack live?",
       "choices": {
-        "A": "In thread-local storage",
-        "B": "In a per-connection struct — the loop returns between steps, so each connection records its own position",
-        "C": "In the kernel",
-        "D": "It is re-read from the socket each time"
+        "A": "In the kernel",
+        "B": "In a per-connection struct",
+        "C": "It is re-read from the socket each time",
+        "D": "In thread-local storage"
       },
       "correct": [
         "B"
       ],
-      "explanation": "That relocation is the whole transformation. The two read_all calls from the capstone become two states a connection can be in."
+      "explanation": "The loop returns between steps, so each connection records its own position. That relocation is the whole transformation. The two read_all calls from the capstone become two states a connection can be in."
     },
     {
       "id": "cp-2",
       "prompt": "Your event loop truncates responses to slow clients but works for fast ones. What is missing?",
       "choices": {
-        "A": "A larger read buffer",
-        "B": "A per-connection output buffer plus writability interest — a partial write must be finished when the socket can accept more",
+        "A": "A second thread",
+        "B": "A larger read buffer",
         "C": "More epoll events",
-        "D": "A second thread"
+        "D": "A per-connection output buffer plus writability interest"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "A slow client's socket buffer fills, write sends only part, and a loop that assumes completion drops the rest. It fails only for the slowest clients, which is what makes it hard to reproduce."
+      "explanation": "A partial write must be finished when the socket can accept more A slow client's socket buffer fills, write sends only part, and a loop that assumes completion drops the rest. It fails only for the slowest clients, which is what makes it hard to reproduce."
     },
     {
       "id": "cp-3",
       "prompt": "Why is an event loop the hardest of the three designs to debug?",
       "choices": {
-        "A": "It uses more memory",
-        "B": "There is no stack per connection — a backtrace shows the loop, and what a connection was doing must be read from its struct",
-        "C": "epoll has no error reporting",
-        "D": "It cannot be run under a debugger"
+        "A": "epoll has no error reporting",
+        "B": "It cannot be run under a debugger",
+        "C": "It uses more memory",
+        "D": "There is no stack per connection"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "With a thread per connection, a backtrace answers the question directly. That loss is a real cost of the design and part of why a pool is the right answer for most services."
+      "explanation": "A backtrace shows the loop, and what a connection was doing must be read from its struct. With a thread per connection, a backtrace answers the question directly. That loss is a real cost of the design and part of why a pool is the right answer for most services."
     },
     {
       "id": "cp-4",
       "prompt": "What architecture do most large systems actually run?",
       "choices": {
-        "A": "A single global event loop",
-        "B": "One event loop per core for the connections, plus a thread pool for anything that would block",
-        "C": "A thread per connection with a large limit",
-        "D": "A process per connection"
+        "A": "A thread per connection with a large limit",
+        "B": "A process per connection",
+        "C": "A single global event loop",
+        "D": "One event loop per core for the connections, plus a thread pool for anything that would block"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "It combines all three designs from this module: loops stay responsive because they never block, and blocking work happens in the pool where blocking is allowed."
     }

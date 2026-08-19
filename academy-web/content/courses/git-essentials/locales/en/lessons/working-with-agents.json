@@ -166,49 +166,57 @@
       "id": "cp-1",
       "prompt": "Why is one very large commit the main risk in assisted work?",
       "choices": {
-        "A": "Git slows down with large commits",
-        "B": "It is unreviewable in practice, cannot be partially reverted, and is useless to bisect — so every checking tool stops working",
+        "A": "It is unreviewable in practice, cannot be partially reverted, and is useless to bisect",
+        "B": "It uses more disk space",
         "C": "Large commits cannot be pushed",
-        "D": "It uses more disk space"
+        "D": "Git slows down with large commits"
       },
-      "correct": ["B"],
-      "explanation": "Speed of output is not the problem. Size is, because it defeats review, revert, and automatic bug-finding all at once."
+      "correct": [
+        "A"
+      ],
+      "explanation": "So every checking tool stops working. Speed of output is not the problem. Size is, because it defeats review, revert, and automatic bug-finding all at once."
     },
     {
       "id": "cp-2",
       "prompt": "An assistant summarises its change as 'refactored the export logic, no behaviour change'. What do you do?",
       "choices": {
-        "A": "Trust it and merge",
-        "B": "Read the diff and run the tests yourself — the summary is a claim to verify, like any pull request description",
-        "C": "Ask for a longer summary",
+        "A": "Ask for a longer summary",
+        "B": "Trust it and merge",
+        "C": "Read the diff and run the tests yourself",
         "D": "Merge and revert later if something breaks"
       },
-      "correct": ["B"],
-      "explanation": "A description of a change is not evidence about the change. The diff and a test run you observed are."
+      "correct": [
+        "C"
+      ],
+      "explanation": "The summary is a claim to verify, like any pull request description A description of a change is not evidence about the change. The diff and a test run you observed are."
     },
     {
       "id": "cp-3",
       "prompt": "Why run assisted work in a separate worktree?",
       "choices": {
-        "A": "It makes the assistant faster",
+        "A": "It keeps the work out of the history",
         "B": "Two parties writing into one checkout overwrite each other, and a branch switch pulls the ground out from under a running task",
-        "C": "It keeps the work out of the history",
-        "D": "It avoids the need for review"
+        "C": "It avoids the need for review",
+        "D": "It makes the assistant faster"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Separate directories remove the collision. The shared history still lets you review and merge in the normal way."
     },
     {
       "id": "cp-4",
       "prompt": "Why record in the commit who generated a change and who reviewed it?",
       "choices": {
-        "A": "For credit",
-        "B": "So that later you can tell which parts of the codebase a person actually read and ran — a question that eventually gets asked",
-        "C": "Because Git requires an author",
-        "D": "To make the history longer"
+        "A": "Because Git requires an author",
+        "B": "To make the history longer",
+        "C": "So that later you can tell which parts of the codebase a person actually read and ran",
+        "D": "For credit"
       },
-      "correct": ["B"],
-      "explanation": "It is a provenance record. Without it, nobody can distinguish reviewed code from code that merely landed."
+      "correct": [
+        "C"
+      ],
+      "explanation": "A question that eventually gets asked. It is a provenance record. Without it, nobody can distinguish reviewed code from code that merely landed."
     }
   ]
 }

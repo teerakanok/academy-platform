@@ -205,24 +205,24 @@
       "id": "cp-1",
       "prompt": "Why are fixed-length instructions easier to pipeline?",
       "choices": {
-        "A": "They execute faster",
-        "B": "The next instruction's position is known without decoding this one, so several can be fetched and decoded at once",
-        "C": "They use fewer registers",
-        "D": "They need no cache"
+        "A": "They use fewer registers",
+        "B": "They need no cache",
+        "C": "The next instruction's position is known without decoding this one",
+        "D": "They execute faster"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "With variable length you must partly decode an instruction to learn where the next begins. That serialisation is what makes overlapping harder, and it was the decisive argument in the debate."
+      "explanation": "Several can be fetched and decoded at once. With variable length you must partly decode an instruction to learn where the next begins. That serialisation is what makes overlapping harder, and it was the decisive argument in the debate."
     },
     {
       "id": "cp-2",
       "prompt": "A modern x86-64 processor executes complex instructions. How?",
       "choices": {
-        "A": "Directly, in dedicated hardware per instruction",
+        "A": "It translates them to aarch64",
         "B": "It decodes them into simpler internal operations and executes those with the same techniques a reduced design uses",
         "C": "It emulates them in software",
-        "D": "It translates them to aarch64"
+        "D": "Directly, in dedicated hardware per instruction"
       },
       "correct": [
         "B"
@@ -233,29 +233,29 @@
       "id": "cp-3",
       "prompt": "You disassemble x86-64 code starting one byte too late. What do you see?",
       "choices": {
-        "A": "An error",
-        "B": "A completely different but still plausible-looking instruction stream, because the decoder reads whatever bytes are there",
-        "C": "The same instructions",
-        "D": "Nothing decodes"
+        "A": "A completely different but still plausible-looking instruction stream",
+        "B": "An error",
+        "C": "Nothing decodes",
+        "D": "The same instructions"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "Variable-length encoding has no alignment to resynchronise on. A fixed-length architecture cannot have this problem, since every instruction begins on a four-byte boundary."
+      "explanation": "The decoder reads whatever bytes are there. Variable-length encoding has no alignment to resynchronise on. A fixed-length architecture cannot have this problem, since every instruction begins on a four-byte boundary."
     },
     {
       "id": "cp-4",
       "prompt": "What does the load-store rule change about generated code?",
       "choices": {
-        "A": "It makes programs smaller",
-        "B": "Every computation happens between registers, so memory access appears explicitly as separate load and store instructions",
-        "C": "It removes the need for a cache",
+        "A": "It removes the need for a cache",
+        "B": "Every computation happens between registers",
+        "C": "It makes programs smaller",
         "D": "It allows more registers"
       },
       "correct": [
         "B"
       ],
-      "explanation": "The cost of touching memory becomes visible in the instruction stream rather than hidden inside an arithmetic instruction, which is what the following modules build their reasoning on."
+      "explanation": "Memory access appears explicitly as separate load and store instructions. The cost of touching memory becomes visible in the instruction stream rather than hidden inside an arithmetic instruction, which is what the following modules build their reasoning on."
     }
   ]
 }

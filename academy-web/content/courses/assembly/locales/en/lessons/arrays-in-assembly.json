@@ -209,12 +209,12 @@
       "prompt": "You see mov eax, dword ptr [rdi + 8*rsi + 4]. What does it tell you about the data?",
       "choices": {
         "A": "Only that it is an array",
-        "B": "Elements are 8 bytes apart, the field starts 4 bytes into each element, and the field is 4 bytes wide",
-        "C": "The array has 8 elements",
-        "D": "The index is multiplied by 4"
+        "B": "The array has 8 elements",
+        "C": "The index is multiplied by 4",
+        "D": "Elements are 8 bytes apart, the field starts 4 bytes into each element, and the field is 4 bytes wide"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "Scale, displacement and size annotation give element size, field offset and field width — one row of the structure definition, from one instruction."
     },
@@ -222,13 +222,13 @@
       "id": "cp-2",
       "prompt": "An access is preceded by shl rsi, 4 and then uses [rdi + rsi + 12]. What are the element size and field offset?",
       "choices": {
-        "A": "4 and 12",
-        "B": "16 and 12 — the shift by 4 multiplies the index by 16 because the scale field cannot express it",
-        "C": "12 and 16",
-        "D": "8 and 12"
+        "A": "8 and 12",
+        "B": "12 and 16",
+        "C": "16 and 12 — the shift by 4 multiplies the index by 16 because the scale field cannot express it",
+        "D": "4 and 12"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "The addressing mode allows scales of 1, 2, 4 and 8 only. Any other element size appears as a separate shift or multiply, which is itself the clue."
     },
@@ -237,12 +237,12 @@
       "prompt": "A struct declares long a; int b; char c; — thirteen bytes of fields — but the stride is 16. Why?",
       "choices": {
         "A": "The compiler reserved space for future fields",
-        "B": "Padding: three bytes at the end keep the 8-byte field of the next element aligned",
-        "C": "The char is stored as an int",
-        "D": "Sixteen is the minimum struct size"
+        "B": "Sixteen is the minimum struct size",
+        "C": "Padding: three bytes at the end keep the 8-byte field of the next element aligned",
+        "D": "The char is stored as an int"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "Confirmed by running the program: sizeof is 16 and offsetof(c) is 12. If a reconstructed size does not match the stride, padding is the first suspect."
     },
@@ -250,15 +250,15 @@
       "id": "cp-4",
       "prompt": "Why does m[i][j] with a fixed row length compile to shl while m[i*cols + j] compiles to imul?",
       "choices": {
-        "A": "The second is written badly",
-        "B": "A fixed row length is known at compile time so the multiply becomes a shift; a runtime row length must actually be multiplied",
+        "A": "They are unrelated constructs",
+        "B": "The second is written badly",
         "C": "imul is faster than shl",
-        "D": "They are unrelated constructs"
+        "D": "A fixed row length is known at compile time so the multiply becomes a shift"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "Same access, two costs, and the difference is visible in the binary. It is one reason a fixed-size two-dimensional array can outperform a pointer-plus-stride one."
+      "explanation": "A runtime row length must actually be multiplied. Same access, two costs, and the difference is visible in the binary. It is one reason a fixed-size two-dimensional array can outperform a pointer-plus-stride one."
     }
   ]
 }

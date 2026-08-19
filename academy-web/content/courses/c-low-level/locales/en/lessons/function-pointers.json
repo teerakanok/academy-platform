@@ -161,48 +161,56 @@
       "id": "cp-1",
       "prompt": "What is the difference between int (*f)(int) and int *f(int) ?",
       "choices": {
-        "A": "Nothing — the parentheses are optional",
-        "B": "The first is a pointer to a function; the second is a function that returns a pointer to int",
-        "C": "The first is invalid syntax",
-        "D": "The second is a function pointer array"
+        "A": "The first is invalid syntax",
+        "B": "Nothing — the parentheses are optional",
+        "C": "The second is a function pointer array",
+        "D": "The first is a pointer to a function"
       },
-      "correct": ["B"],
-      "explanation": "The parentheses bind the asterisk to the name rather than to the return type. A typedef removes the ambiguity for readers."
+      "correct": [
+        "D"
+      ],
+      "explanation": "The second is a function that returns a pointer to int. The parentheses bind the asterisk to the name rather than to the return type. A typedef removes the ambiguity for readers."
     },
     {
       "id": "cp-2",
       "prompt": "Why should a qsort comparator not return x - y ?",
       "choices": {
-        "A": "It is slower",
-        "B": "The subtraction can overflow for large-magnitude values, which is undefined and can produce the wrong sign — and therefore the wrong order",
-        "C": "qsort requires exactly -1, 0, or 1",
-        "D": "It does not compile"
+        "A": "qsort requires exactly -1, 0, or 1",
+        "B": "It is slower",
+        "C": "It does not compile",
+        "D": "The subtraction can overflow for large-magnitude values"
       },
-      "correct": ["B"],
-      "explanation": "(x > y) - (x < y) produces the same three-way answer using only comparisons, so nothing can overflow."
+      "correct": [
+        "D"
+      ],
+      "explanation": "Is undefined and can produce the wrong sign — and therefore the wrong order (x > y) - (x < y) produces the same three-way answer using only comparisons, so nothing can overflow."
     },
     {
       "id": "cp-3",
       "prompt": "Why is a writable function pointer a security-relevant target?",
       "choices": {
         "A": "It slows down the program",
-        "B": "If an attacker can overwrite it — via an overflow into a neighbouring struct or a use-after-free — the next call through it transfers control to an address they chose",
-        "C": "Function pointers cannot be checked for NULL",
-        "D": "It causes memory leaks"
+        "B": "Function pointers cannot be checked for NULL",
+        "C": "It causes memory leaks",
+        "D": "If an attacker can overwrite it"
       },
-      "correct": ["B"],
-      "explanation": "This is why exploitation discussions focus on vtables, hook tables, and callback fields, and why const tables in read-only memory are a meaningful hardening step."
+      "correct": [
+        "D"
+      ],
+      "explanation": "Via an overflow into a neighbouring struct or a use-after-free — the next call through it transfers control to an address they chose. This is why exploitation discussions focus on vtables, hook tables, and callback fields, and why const tables in read-only memory are a meaningful hardening step."
     },
     {
       "id": "cp-4",
       "prompt": "What does a dispatch table give you over a long switch statement?",
       "choices": {
-        "A": "Faster execution in all cases",
-        "B": "Adding a case becomes adding a data row, and the set of handlers becomes inspectable data rather than control flow",
-        "C": "Automatic input validation",
-        "D": "Type safety for the arguments"
+        "A": "Type safety for the arguments",
+        "B": "Automatic input validation",
+        "C": "Adding a case becomes adding a data row, and the set of handlers becomes inspectable data rather than control flow",
+        "D": "Faster execution in all cases"
       },
-      "correct": ["B"],
+      "correct": [
+        "C"
+      ],
       "explanation": "It is how shells, interpreters, and drivers organise entry points — the table is data you can read, extend, and mark const."
     }
   ]

@@ -156,48 +156,56 @@
       "prompt": "You print the bytes of 0x12345678 and see 78 56 34 12. What does that tell you?",
       "choices": {
         "A": "The value was corrupted",
-        "B": "The machine is little-endian: the least significant byte is stored first",
-        "C": "The machine is big-endian",
+        "B": "The machine is big-endian",
+        "C": "The machine is little-endian",
         "D": "The integer is signed"
       },
-      "correct": ["B"],
-      "explanation": "The bytes are stored in the opposite order to how the number is written. That is the definition of little-endian, which is what x86 and most ARM systems use."
+      "correct": [
+        "C"
+      ],
+      "explanation": "The least significant byte is stored first. The bytes are stored in the opposite order to how the number is written. That is the definition of little-endian, which is what x86 and most ARM systems use."
     },
     {
       "id": "cp-2",
       "prompt": "Why is fwrite(&struct, sizeof struct, 1, f) a defect for a file others will read?",
       "choices": {
         "A": "fwrite cannot handle structs",
-        "B": "It bakes in this machine's byte order and this compiler's padding, the padding may contain unrelated memory, and any change to the struct silently changes the format",
-        "C": "It is too slow",
-        "D": "The file will be too large"
+        "B": "It is too slow",
+        "C": "The file will be too large",
+        "D": "It bakes in this machine's byte order and this compiler's padding, the padding may contain unrelated memory, and any change to the struct silently changes the format"
       },
-      "correct": ["B"],
+      "correct": [
+        "D"
+      ],
       "explanation": "Anything crossing a boundary needs an explicit format. The padding-disclosure part is why this matters for security and not only for portability."
     },
     {
       "id": "cp-3",
       "prompt": "A header declares a payload length. What must you check?",
       "choices": {
-        "A": "Only that it is not zero",
+        "A": "Nothing, if the header magic is correct",
         "B": "That it is within your maximum AND not larger than the bytes actually received",
         "C": "Only the maximum — the sender knows its own length",
-        "D": "Nothing, if the header magic is correct"
+        "D": "Only that it is not zero"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "A declared length is a claim from the sender. Without comparing it to what you actually hold, the parser reads past the end of its buffer."
     },
     {
       "id": "cp-4",
       "prompt": "Why use memcpy instead of casting a byte pointer to uint32_t * ?",
       "choices": {
-        "A": "memcpy is faster",
-        "B": "The cast may produce a misaligned access, which is undefined behaviour; memcpy is always permitted and compiles to the same thing when alignment allows",
-        "C": "Casting loses the value",
+        "A": "Casting loses the value",
+        "B": "The cast may produce a misaligned access",
+        "C": "memcpy is faster",
         "D": "memcpy handles byte order too"
       },
-      "correct": ["B"],
-      "explanation": "Alignment requirements are real on many architectures. memcpy expresses the intent without relying on the pointer being suitably aligned."
+      "correct": [
+        "B"
+      ],
+      "explanation": "Is undefined behaviour; memcpy is always permitted and compiles to the same thing when alignment allows. Alignment requirements are real on many architectures. memcpy expresses the intent without relying on the pointer being suitably aligned."
     }
   ]
 }

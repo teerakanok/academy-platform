@@ -153,36 +153,42 @@
       "id": "cp-1",
       "prompt": "int *p points at an array. How far does p + 1 move in bytes?",
       "choices": {
-        "A": "One byte",
+        "A": "It depends on the array length",
         "B": "sizeof(int) bytes — usually 4",
-        "C": "It depends on the array length",
+        "C": "One byte",
         "D": "It is undefined"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Pointer arithmetic counts elements. The compiler multiplies by the size of the pointed-to type, which is why the type on the pointer matters."
     },
     {
       "id": "cp-2",
       "prompt": "What is the relationship between a[i] and *(a + i) ?",
       "choices": {
-        "A": "They are similar but a[i] is safer",
-        "B": "They are the same thing — a[i] is defined as *(a + i) in the standard",
-        "C": "a[i] performs bounds checking",
-        "D": "*(a + i) only works for the first element"
+        "A": "a[i] performs bounds checking",
+        "B": "They are the same thing",
+        "C": "*(a + i) only works for the first element",
+        "D": "They are similar but a[i] is safer"
       },
-      "correct": ["B"],
-      "explanation": "Indexing is notation for pointer arithmetic. Neither form does any bounds checking."
+      "correct": [
+        "B"
+      ],
+      "explanation": "A[i] is defined as *(a + i) in the standard. Indexing is notation for pointer arithmetic. Neither form does any bounds checking."
     },
     {
       "id": "cp-3",
       "prompt": "For int a[4], which is allowed?",
       "choices": {
-        "A": "Computing a + 5 as long as you never read it",
-        "B": "Computing a + 4 and comparing it, but not dereferencing it",
-        "C": "Dereferencing a + 4 to read the terminator",
-        "D": "Both a + 4 and a + 5, since neither is read"
+        "A": "Both a + 4 and a + 5, since neither is read",
+        "B": "Dereferencing a + 4 to read the terminator",
+        "C": "Computing a + 4 and comparing it, but not dereferencing it",
+        "D": "Computing a + 5 as long as you never read it"
       },
-      "correct": ["B"],
+      "correct": [
+        "C"
+      ],
       "explanation": "One past the end is a defined position precisely so loop conditions can use it. Two past is undefined even without a read."
     },
     {
@@ -190,12 +196,14 @@
       "prompt": "Why can you not dereference a void * ?",
       "choices": {
         "A": "It is always NULL",
-        "B": "It carries no type, so there is no size to read and no interpretation to apply — assign it to a typed pointer first",
-        "C": "It is read-only",
-        "D": "You can; the compiler infers the type"
+        "B": "It carries no type",
+        "C": "You can; the compiler infers the type",
+        "D": "It is read-only"
       },
-      "correct": ["B"],
-      "explanation": "void * is the way C says 'an address to some data'. The type has to come from somewhere before the memory can be read."
+      "correct": [
+        "B"
+      ],
+      "explanation": "There is no size to read and no interpretation to apply — assign it to a typed pointer first void * is the way C says 'an address to some data'. The type has to come from somewhere before the memory can be read."
     }
   ]
 }

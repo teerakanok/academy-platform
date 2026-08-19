@@ -187,24 +187,24 @@
       "id": "cp-1",
       "prompt": "Why does a store instruction not use the write-back stage?",
       "choices": {
-        "A": "It writes to memory in the execute stage",
-        "B": "It produces no value for a register — which is also why its format has no rd field",
-        "C": "Write-back is optional for all instructions",
+        "A": "It produces no value for a register",
+        "B": "Write-back is optional for all instructions",
+        "C": "It writes to memory in the execute stage",
         "D": "It writes back during decode"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "The hardware and the encoding were designed together: the formats without rd are exactly the instructions that do not write a register."
+      "explanation": "Which is also why its format has no rd field. The hardware and the encoding were designed together: the formats without rd are exactly the instructions that do not write a register."
     },
     {
       "id": "cp-2",
       "prompt": "In a single-cycle design, what sets the clock period?",
       "choices": {
-        "A": "The average instruction",
+        "A": "The fetch stage alone",
         "B": "The slowest path — a load, which passes through all five stages including memory",
-        "C": "The fetch stage alone",
-        "D": "The number of registers"
+        "C": "The number of registers",
+        "D": "The average instruction"
       },
       "correct": [
         "B"
@@ -215,13 +215,13 @@
       "id": "cp-3",
       "prompt": "Why is the program counter incremented by 4 rather than 1?",
       "choices": {
-        "A": "To leave room for future instructions",
-        "B": "Each instruction is 4 bytes, and addresses count bytes",
+        "A": "Each instruction is 4 bytes, and addresses count bytes",
+        "B": "To speed up fetching",
         "C": "For alignment with the cache line",
-        "D": "To speed up fetching"
+        "D": "To leave room for future instructions"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "It is also why every instruction sits at a 4-byte boundary, which is what let the branch format omit the lowest bit of its offset."
     },
@@ -229,15 +229,15 @@
       "id": "cp-4",
       "prompt": "A branch's target is not known until the execute stage. Why does that cost nothing in a single-cycle design?",
       "choices": {
-        "A": "Branches are predicted",
-        "B": "The whole instruction completes before the next one begins, so the target is known in time",
-        "C": "Branches skip the execute stage",
+        "A": "The whole instruction completes before the next one begins",
+        "B": "Branches skip the execute stage",
+        "C": "Branches are predicted",
         "D": "The compiler resolves it"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "Nothing overlaps, so there is nothing to be wrong about. The moment instructions do overlap, this becomes the central difficulty the hazard module addresses."
+      "explanation": "The target is known in time. Nothing overlaps, so there is nothing to be wrong about. The moment instructions do overlap, this becomes the central difficulty the hazard module addresses."
     }
   ]
 }

@@ -212,13 +212,13 @@
       "id": "cp-1",
       "prompt": "For a cache with 128-byte lines and 512 sets, how many bits are offset and how many are index?",
       "choices": {
-        "A": "8 offset, 8 index",
-        "B": "7 offset, 9 index",
-        "C": "9 offset, 7 index",
-        "D": "7 offset, 7 index"
+        "A": "7 offset, 9 index",
+        "B": "8 offset, 8 index",
+        "C": "7 offset, 7 index",
+        "D": "9 offset, 7 index"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "log2(128) = 7 bits to select a byte within the line, and log2(512) = 9 bits to select the set. Everything above them is the tag."
     },
@@ -227,42 +227,42 @@
       "prompt": "Touching 64 locations totalling 8 KB was 13x slower at a 64 KB stride than at a 128 byte stride, on a machine with a 128 KB L1. What does that rule out?",
       "choices": {
         "A": "Conflict misses",
-        "B": "Capacity as the explanation — 8 KB fits in a 128 KB cache sixteen times over",
+        "B": "Capacity as the explanation",
         "C": "Compulsory misses",
         "D": "Nothing; the data does not fit"
       },
       "correct": [
         "B"
       ],
-      "explanation": "The data is far smaller than the cache, so running out of room cannot be the reason. Only where the blocks are allowed to sit can explain it."
+      "explanation": "8 KB fits in a 128 KB cache sixteen times over. The data is far smaller than the cache, so running out of room cannot be the reason. Only where the blocks are allowed to sit can explain it."
     },
     {
       "id": "cp-3",
       "prompt": "Why was shifting each location 128 bytes within its own page the decisive experiment?",
       "choices": {
-        "A": "It reduced the data size",
-        "B": "It kept the number of pages identical, so address translation could not explain the 12x improvement — only the index bits changed",
-        "C": "It made the access sequential",
-        "D": "It aligned the data"
+        "A": "It aligned the data",
+        "B": "It kept the number of pages identical",
+        "C": "It reduced the data size",
+        "D": "It made the access sequential"
       },
       "correct": [
         "B"
       ],
-      "explanation": "A large stride changes both the pages and the index bits. Holding pages constant while changing the index isolates which one was responsible."
+      "explanation": "Address translation could not explain the 12x improvement — only the index bits changed A large stride changes both the pages and the index bits. Holding pages constant while changing the index isolates which one was responsible."
     },
     {
       "id": "cp-4",
       "prompt": "A routine on a 1024x1024 float array is slow, and the same routine on a 1025-wide allocation is much faster. What happened?",
       "choices": {
         "A": "The larger array fits in cache better",
-        "B": "The power-of-two row length made every row's column j land on the same few sets; padding spread them across sets and removed the conflict misses",
-        "C": "The compiler vectorised the odd size",
-        "D": "Memory alignment improved"
+        "B": "The compiler vectorised the odd size",
+        "C": "Memory alignment improved",
+        "D": "The power-of-two row length made every row's column j land on the same few sets"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "1024 floats is exactly 4096 bytes, so the index bits repeat every row. One extra element per row breaks that alignment — more memory used, several times faster."
+      "explanation": "Padding spread them across sets and removed the conflict misses 1024 floats is exactly 4096 bytes, so the index bits repeat every row. One extra element per row breaks that alignment — more memory used, several times faster."
     }
   ]
 }

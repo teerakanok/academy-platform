@@ -177,13 +177,13 @@
       "id": "cp-1",
       "prompt": "How many addresses can be assigned to machines in a /26?",
       "choices": {
-        "A": "64",
-        "B": "62",
-        "C": "32",
-        "D": "26"
+        "A": "26",
+        "B": "32",
+        "C": "62",
+        "D": "64"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "A /26 leaves 6 host bits, so 64 addresses, minus the network address and the broadcast address. This was computed rather than recalled — the same arithmetic gives 254 for a /24 and 4094 for a /20."
     },
@@ -191,13 +191,13 @@
       "id": "cp-2",
       "prompt": "A traceroute to a public server shows 10.x.x.x addresses at hops 3 and 4. What does that mean?",
       "choices": {
-        "A": "The trace is being spoofed",
-        "B": "Those are the provider's internal links, using private addressing inside their own network",
-        "C": "Your packets are looping locally",
-        "D": "A misconfiguration on your machine"
+        "A": "A misconfiguration on your machine",
+        "B": "Your packets are looping locally",
+        "C": "The trace is being spoofed",
+        "D": "Those are the provider's internal links, using private addressing inside their own network"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "Private ranges are unroutable from outside, but perfectly usable inside a provider's network. Seeing them mid-path is normal and tells you nothing is wrong."
     },
@@ -205,13 +205,13 @@
       "id": "cp-3",
       "prompt": "What does a netmask actually do?",
       "choices": {
-        "A": "Encrypts the address",
-        "B": "Marks which leading bits of the address identify the network rather than the host",
-        "C": "Limits how many machines may connect",
-        "D": "Selects which gateway to use"
+        "A": "Marks which leading bits of the address identify the network rather than the host",
+        "B": "Encrypts the address",
+        "C": "Selects which gateway to use",
+        "D": "Limits how many machines may connect"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "It is a bit pattern of ones followed by zeros. AND it with the address and you have the network; the bits it leaves out are the host part."
     },
@@ -219,15 +219,15 @@
       "id": "cp-4",
       "prompt": "Why can 192.168.1.256 never be a valid address?",
       "choices": {
-        "A": "It is reserved",
-        "B": "Each of the four parts is a single byte, so the largest value any of them can hold is 255",
+        "A": "Each of the four parts is a single byte",
+        "B": "It is reserved",
         "C": "It belongs to a different network",
         "D": "It is a broadcast address"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "The dotted notation is just a readable form of four bytes. 256 does not fit in a byte, so there is no 32-bit number that would produce it."
+      "explanation": "The largest value any of them can hold is 255. The dotted notation is just a readable form of four bytes. 256 does not fit in a byte, so there is no 32-bit number that would produce it."
     }
   ]
 }

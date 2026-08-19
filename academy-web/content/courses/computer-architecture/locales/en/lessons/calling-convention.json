@@ -180,13 +180,13 @@
       "id": "cp-1",
       "prompt": "A leaf function compiles to two instructions with no stack frame. Why does it need none?",
       "choices": {
-        "A": "It has no local variables",
-        "B": "It calls nothing, so nothing will overwrite its return address — there is nothing to save",
+        "A": "It calls nothing, so nothing will overwrite its return address — there is nothing to save",
+        "B": "Leaf functions use a separate stack",
         "C": "The compiler optimised it away",
-        "D": "Leaf functions use a separate stack"
+        "D": "It has no local variables"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "Verified: the same compiler produced a full frame for a function containing a call and none for one without. The frame exists because of the call, which is also why inlining removes it."
     },
@@ -194,13 +194,13 @@
       "id": "cp-2",
       "prompt": "Why do calling conventions define both caller-saved and callee-saved registers?",
       "choices": {
-        "A": "For historical reasons",
-        "B": "So short-lived values can use scratch registers and long-lived ones preserved registers, and each function saves only what it actually needs",
-        "C": "To support recursion",
-        "D": "Because some registers are faster"
+        "A": "Because some registers are faster",
+        "B": "To support recursion",
+        "C": "For historical reasons",
+        "D": "So short-lived values can use scratch registers and long-lived ones preserved registers, and each function saves only what it actually needs"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "One category alone forces unnecessary saving in one direction or the other. Which category a value lands in tells you what the compiler concluded about its lifetime."
     },
@@ -208,27 +208,27 @@
       "id": "cp-3",
       "prompt": "What does the call instruction do beyond jumping?",
       "choices": {
-        "A": "It pushes all registers",
-        "B": "It records the return address, so the callee knows where to come back to",
-        "C": "It allocates a stack frame",
+        "A": "It allocates a stack frame",
+        "B": "It records the return address",
+        "C": "It pushes all registers",
         "D": "It saves the flags"
       },
       "correct": [
         "B"
       ],
-      "explanation": "The callee then saves that address to the stack only if it makes a call of its own, which is precisely the difference between a leaf function and one that is not."
+      "explanation": "The callee knows where to come back to. The callee then saves that address to the stack only if it makes a call of its own, which is precisely the difference between a leaf function and one that is not."
     },
     {
       "id": "cp-4",
       "prompt": "How does a debugger produce a backtrace?",
       "choices": {
-        "A": "It reads a log the program wrote",
-        "B": "It walks the chain of stack frames, reading each saved return address to find the caller",
-        "C": "It re-executes the program",
-        "D": "The kernel records every call"
+        "A": "It walks the chain of stack frames, reading each saved return address to find the caller",
+        "B": "The kernel records every call",
+        "C": "It reads a log the program wrote",
+        "D": "It re-executes the program"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "It is the same structure a buffer overflow corrupts when it reaches the saved return address — which is why the protections around that field exist."
     }

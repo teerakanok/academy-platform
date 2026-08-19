@@ -186,48 +186,56 @@
       "id": "cp-1",
       "prompt": "Why is sizeof a struct often larger than the sum of its fields?",
       "choices": {
-        "A": "The compiler stores the field names",
-        "B": "Padding is inserted so each field starts at an address the hardware can access efficiently",
+        "A": "It includes a pointer to the type",
+        "B": "The compiler stores the field names",
         "C": "Structs always round up to 16 bytes",
-        "D": "It includes a pointer to the type"
+        "D": "Padding is inserted so each field starts at an address the hardware can access efficiently"
       },
-      "correct": ["B"],
+      "correct": [
+        "D"
+      ],
       "explanation": "Alignment requirements create gaps between fields. Reordering from largest to smallest usually removes most of them."
     },
     {
       "id": "cp-2",
       "prompt": "Why should you not write a struct directly to a file or network socket?",
       "choices": {
-        "A": "It is too slow",
-        "B": "The layout includes padding whose size and position depend on the compiler and platform, so another machine may read it incorrectly",
+        "A": "The layout includes padding whose size and position depend on the compiler and platform",
+        "B": "The file would be too large",
         "C": "Structs cannot be converted to bytes",
-        "D": "The file would be too large"
+        "D": "It is too slow"
       },
-      "correct": ["B"],
-      "explanation": "Anything crossing a boundary needs an explicit format: field by field, with fixed-width types and a defined byte order."
+      "correct": [
+        "A"
+      ],
+      "explanation": "Another machine may read it incorrectly. Anything crossing a boundary needs an explicit format: field by field, with fixed-width types and a defined byte order."
     },
     {
       "id": "cp-3",
       "prompt": "struct point b = a; What is b?",
       "choices": {
-        "A": "A reference to a",
-        "B": "A full independent copy — changing b does not affect a",
-        "C": "A pointer to a",
-        "D": "Undefined behaviour"
+        "A": "A pointer to a",
+        "B": "A full independent copy",
+        "C": "Undefined behaviour",
+        "D": "A reference to a"
       },
-      "correct": ["B"],
-      "explanation": "Structs are copied by value, on assignment and on every function call. For large structs, pass a pointer instead."
+      "correct": [
+        "B"
+      ],
+      "explanation": "Changing b does not affect a. Structs are copied by value, on assignment and on every function call. For large structs, pass a pointer instead."
     },
     {
       "id": "cp-4",
       "prompt": "What is the size of a union with an int and a double member, and what does it remember?",
       "choices": {
-        "A": "The sum of both, and it remembers the last write",
+        "A": "The size of the first member",
         "B": "The size of its largest member, and it does not track which member was last written",
-        "C": "Always 8 bytes, and it remembers nothing",
-        "D": "The size of the first member"
+        "C": "The sum of both, and it remembers the last write",
+        "D": "Always 8 bytes, and it remembers nothing"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "That is why a union is normally paired with an enum tag in a surrounding struct — the tag is what makes reading it safe."
     }
   ]

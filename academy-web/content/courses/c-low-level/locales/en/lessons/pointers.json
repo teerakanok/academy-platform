@@ -26,13 +26,31 @@
     },
     {
       "kind": "table",
-      "headers": ["Written", "Read as"],
+      "headers": [
+        "Written",
+        "Read as"
+      ],
       "rows": [
-        ["&x", "the address of x"],
-        ["*p", "the value at the address in p"],
-        ["int *p", "p is a pointer to an int"],
-        ["p = &x", "make p hold the address of x"],
-        ["*p = 5", "store 5 at the address p holds"]
+        [
+          "&x",
+          "the address of x"
+        ],
+        [
+          "*p",
+          "the value at the address in p"
+        ],
+        [
+          "int *p",
+          "p is a pointer to an int"
+        ],
+        [
+          "p = &x",
+          "make p hold the address of x"
+        ],
+        [
+          "*p = 5",
+          "store 5 at the address p holds"
+        ]
       ]
     },
     {
@@ -181,36 +199,42 @@
       "id": "cp-1",
       "prompt": "What does a pointer variable actually contain?",
       "choices": {
-        "A": "A copy of the value it points to",
-        "B": "A memory address",
-        "C": "The name of another variable",
-        "D": "A reference counted by the runtime"
+        "A": "The name of another variable",
+        "B": "A reference counted by the runtime",
+        "C": "A copy of the value it points to",
+        "D": "A memory address"
       },
-      "correct": ["B"],
+      "correct": [
+        "D"
+      ],
       "explanation": "That is all it is. The type attached to it decides how the memory at that address is interpreted when you follow it."
     },
     {
       "id": "cp-2",
       "prompt": "Why is an uninitialised pointer more dangerous than a NULL one?",
       "choices": {
-        "A": "It is not — both crash the same way",
-        "B": "NULL usually crashes immediately and loudly; an uninitialised pointer may hold a plausible address, so the write succeeds and quietly corrupts something else",
-        "C": "Uninitialised pointers cannot be checked",
-        "D": "NULL pointers leak memory"
+        "A": "NULL usually crashes immediately and loudly",
+        "B": "It is not — both crash the same way",
+        "C": "NULL pointers leak memory",
+        "D": "Uninitialised pointers cannot be checked"
       },
-      "correct": ["B"],
-      "explanation": "A loud failure is a good failure. Silent corruption surfaces later, somewhere unrelated, and is far harder to trace."
+      "correct": [
+        "A"
+      ],
+      "explanation": "An uninitialised pointer may hold a plausible address, so the write succeeds and quietly corrupts something else A loud failure is a good failure. Silent corruption surfaces later, somewhere unrelated, and is far harder to trace."
     },
     {
       "id": "cp-3",
       "prompt": "You want a function to set two of the caller's variables. How?",
       "choices": {
         "A": "Return both values",
-        "B": "Take pointers to them and write through those pointers",
-        "C": "Declare them global",
-        "D": "Use static variables"
+        "B": "Use static variables",
+        "C": "Take pointers to them and write through those pointers",
+        "D": "Declare them global"
       },
-      "correct": ["B"],
+      "correct": [
+        "C"
+      ],
       "explanation": "C passes by value and can return only one thing, so output parameters are the standard mechanism."
     },
     {
@@ -218,12 +242,14 @@
       "prompt": "What does const char *p promise?",
       "choices": {
         "A": "p cannot be changed to point elsewhere",
-        "B": "The characters p points to will not be modified through p — though p itself may be reassigned",
-        "C": "Both the pointer and the data are fixed",
-        "D": "The string is stored in read-only memory"
+        "B": "Both the pointer and the data are fixed",
+        "C": "The string is stored in read-only memory",
+        "D": "The characters p points to will not be modified through p"
       },
-      "correct": ["B"],
-      "explanation": "char *const p is the other way round, and const char *const p fixes both. Read the declaration right to left."
+      "correct": [
+        "D"
+      ],
+      "explanation": "Though p itself may be reassigned char *const p is the other way round, and const char *const p fixes both. Read the declaration right to left."
     }
   ]
 }

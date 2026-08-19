@@ -265,13 +265,13 @@
       "id": "cp-1",
       "prompt": "Why does a pipelined processor guess a branch direction instead of waiting?",
       "choices": {
-        "A": "Guessing is more accurate",
-        "B": "The fetch stage needs an address cycles before the branch resolves, and every cycle it does not fetch leaves the pipeline empty",
-        "C": "Branches are rare enough not to matter",
-        "D": "The compiler requires it"
+        "A": "Branches are rare enough not to matter",
+        "B": "Guessing is more accurate",
+        "C": "The compiler requires it",
+        "D": "The fetch stage needs an address cycles before the branch resolves, and every cycle it does not fetch leaves the pipeline empty"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "About one instruction in five or six is a branch. Stopping at each one would give back most of what pipelining bought."
     },
@@ -279,29 +279,29 @@
       "id": "cp-2",
       "prompt": "Sorting the array made the same loop 6.91x faster at -O0. Why?",
       "choices": {
-        "A": "Sorted data is smaller",
-        "B": "Sorting turned the condition into a long run of false followed by a long run of true, which a history-based predictor learns immediately",
-        "C": "The sum is easier to compute on sorted data",
-        "D": "Sorted data has better cache locality"
+        "A": "Sorted data has better cache locality",
+        "B": "Sorting turned the condition into a long run of false followed by a long run of true",
+        "C": "Sorted data is smaller",
+        "D": "The sum is easier to compute on sorted data"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Identical elements, identical arithmetic, identical answer. Only the predictability of the branch changed, so only misprediction can explain the difference."
+      "explanation": "A history-based predictor learns immediately. Identical elements, identical arithmetic, identical answer. Only the predictability of the branch changed, so only misprediction can explain the difference."
     },
     {
       "id": "cp-3",
       "prompt": "At -O2 the sorted and unsorted cases took exactly the same time. What does the assembly show happened?",
       "choices": {
         "A": "The predictor got better with optimisation",
-        "B": "The conditional branch was replaced by a comparison producing a mask and an unconditional add, so there is nothing to predict",
+        "B": "Both cases became memory-bound",
         "C": "The loop was deleted",
-        "D": "Both cases became memory-bound"
+        "D": "The conditional branch was replaced by a comparison producing a mask and an unconditional add"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "cmgt produces the mask, and produces the sum unconditionally with failing elements contributing zero. No branch means no misprediction, hence exactly 1.00x."
+      "explanation": "There is nothing to predict cmgt produces the mask, and produces the sum unconditionally with failing elements contributing zero. No branch means no misprediction, hence exactly 1.00x."
     },
     {
       "id": "cp-4",
@@ -309,8 +309,8 @@
       "choices": {
         "A": "When the branch is predictable, or when one side is expensive or has an effect, since branchless code performs both sides every time",
         "B": "Whenever the data is sorted",
-        "C": "On processors with deep pipelines",
-        "D": "It is never a bad idea"
+        "C": "It is never a bad idea",
+        "D": "On processors with deep pipelines"
       },
       "correct": [
         "A"

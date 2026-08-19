@@ -185,41 +185,41 @@
       "id": "cp-1",
       "prompt": "A pipeline gives 5-cycle latency and 1-per-cycle throughput. Why are those not contradictory?",
       "choices": {
-        "A": "One of them is measured wrongly",
-        "B": "Five instructions are in progress at once, so one completes each cycle while each still takes five",
-        "C": "The clock changes between them",
-        "D": "Throughput is an average"
+        "A": "The clock changes between them",
+        "B": "Throughput is an average",
+        "C": "Five instructions are in progress at once",
+        "D": "One of them is measured wrongly"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "They are reciprocals only when work does not overlap. Overlapping is exactly what a pipeline does, which is why the two numbers separate by the stage count."
+      "explanation": "One completes each cycle while each still takes five. They are reciprocals only when work does not overlap. Overlapping is exactly what a pipeline does, which is why the two numbers separate by the stage count."
     },
     {
       "id": "cp-2",
       "prompt": "Users complain that a service feels slow to respond. What will adding more worker threads achieve?",
       "choices": {
-        "A": "It will fix the complaint",
-        "B": "Little — each request still takes as long; that is a latency complaint and workers improve throughput",
-        "C": "It will make it worse",
-        "D": "It depends on the number of cores"
+        "A": "It will make it worse",
+        "B": "It depends on the number of cores",
+        "C": "Little — each request still takes as long",
+        "D": "It will fix the complaint"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "More workers serve more requests at once. If the complaint is that one request feels slow, the number that must change is the time that request takes."
+      "explanation": "That is a latency complaint and workers improve throughput. More workers serve more requests at once. If the complaint is that one request feels slow, the number that must change is the time that request takes."
     },
     {
       "id": "cp-3",
       "prompt": "Why does batching improve throughput while worsening latency?",
       "choices": {
-        "A": "Batches use less memory",
-        "B": "Fixed per-operation costs are shared across many items, but each item waits for the batch to fill before anything happens",
+        "A": "Fixed per-operation costs are shared across many items, but each item waits for the batch to fill before anything happens",
+        "B": "It does not — it improves both",
         "C": "Batches are processed in parallel",
-        "D": "It does not — it improves both"
+        "D": "Batches use less memory"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "It is the same shape as reading a file in large blocks rather than byte by byte: fewer fixed costs paid, at the price of the first byte arriving later."
     },
@@ -228,12 +228,12 @@
       "prompt": "What does a deadline add that neither latency nor throughput captures?",
       "choices": {
         "A": "A measure of cost",
-        "B": "That work completed after a certain moment can be worthless, even though it finished",
-        "C": "A limit on parallelism",
-        "D": "A queueing model"
+        "B": "A limit on parallelism",
+        "C": "A queueing model",
+        "D": "That work completed after a certain moment can be worthless, even though it finished"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "A late video frame is not a slow frame, it is a useless one. That is the same reasoning behind choosing UDP for a video call in the networking course."
     }

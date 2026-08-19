@@ -21,12 +21,32 @@
     },
     {
       "kind": "table",
-      "headers": ["Hook", "Runs", "Typical use"],
+      "headers": [
+        "Hook",
+        "Runs",
+        "Typical use"
+      ],
       "rows": [
-        ["pre-commit", "Before the commit is created", "Format, lint, run fast tests, block obvious mistakes"],
-        ["commit-msg", "After the message is written", "Enforce a message convention"],
-        ["pre-push", "Before commits are sent", "Run the slower test suite"],
-        ["post-merge", "After a merge completes", "Reinstall dependencies if they changed"]
+        [
+          "pre-commit",
+          "Before the commit is created",
+          "Format, lint, run fast tests, block obvious mistakes"
+        ],
+        [
+          "commit-msg",
+          "After the message is written",
+          "Enforce a message convention"
+        ],
+        [
+          "pre-push",
+          "Before commits are sent",
+          "Run the slower test suite"
+        ],
+        [
+          "post-merge",
+          "After a merge completes",
+          "Reinstall dependencies if they changed"
+        ]
       ]
     },
     {
@@ -108,12 +128,27 @@
     },
     {
       "kind": "table",
-      "headers": ["Good in pre-commit", "Belongs elsewhere"],
+      "headers": [
+        "Good in pre-commit",
+        "Belongs elsewhere"
+      ],
       "rows": [
-        ["Formatting and linting the staged files", "The full test suite — too slow"],
-        ["Blocking obvious debugging leftovers", "Anything the team must not be able to skip"],
-        ["Rejecting accidental large files", "Deployment steps"],
-        ["A fast unit subset for the touched area", "Anything needing network access"]
+        [
+          "Formatting and linting the staged files",
+          "The full test suite — too slow"
+        ],
+        [
+          "Blocking obvious debugging leftovers",
+          "Anything the team must not be able to skip"
+        ],
+        [
+          "Rejecting accidental large files",
+          "Deployment steps"
+        ],
+        [
+          "A fast unit subset for the touched area",
+          "Anything needing network access"
+        ]
       ]
     },
     {
@@ -146,48 +181,56 @@
       "id": "cp-1",
       "prompt": "Why can a pre-commit hook not be relied on to keep secrets out of a shared repository?",
       "choices": {
-        "A": "Hooks cannot read file contents",
+        "A": "Hooks run after the commit is created",
         "B": "It can be skipped with --no-verify and does not exist in a fresh clone until someone installs it",
         "C": "Hooks only run on the default branch",
-        "D": "Hooks run after the commit is created"
+        "D": "Hooks cannot read file contents"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "It is a local convenience, not a control. Anything that must not enter the shared branch has to be enforced where the contributor cannot bypass it."
     },
     {
       "id": "cp-2",
       "prompt": "Your pre-commit hook takes 40 seconds. What is the likely outcome?",
       "choices": {
-        "A": "People commit less often, which is fine",
-        "B": "People start passing --no-verify, and the hook stops protecting anything",
+        "A": "The hook is skipped automatically",
+        "B": "People commit less often, which is fine",
         "C": "Git caches the result",
-        "D": "The hook is skipped automatically"
+        "D": "People start passing --no-verify, and the hook stops protecting anything"
       },
-      "correct": ["B"],
+      "correct": [
+        "D"
+      ],
       "explanation": "A check people route around is worse than no check, because it creates the belief that something is being checked. Move slow work to pre-push or CI."
     },
     {
       "id": "cp-3",
       "prompt": "How do you make hooks available to everyone on the team?",
       "choices": {
-        "A": "Commit them to .git/hooks",
-        "B": "Commit them to a tracked directory and set core.hooksPath to it",
-        "C": "Email the files",
-        "D": "Hooks are shared automatically on clone"
+        "A": "Email the files",
+        "B": "Hooks are shared automatically on clone",
+        "C": "Commit them to a tracked directory and set core.hooksPath to it",
+        "D": "Commit them to .git/hooks"
       },
-      "correct": ["B"],
+      "correct": [
+        "C"
+      ],
       "explanation": ".git/hooks is not part of the repository. A tracked directory plus core.hooksPath makes hooks versioned and reviewable like any other code."
     },
     {
       "id": "cp-4",
       "prompt": "Which check belongs in CI rather than in pre-commit?",
       "choices": {
-        "A": "Formatting the staged files",
-        "B": "The full test suite that takes several minutes",
-        "C": "Blocking a stray debugging line",
-        "D": "Rejecting an accidental 200MB file"
+        "A": "Rejecting an accidental 200MB file",
+        "B": "Blocking a stray debugging line",
+        "C": "Formatting the staged files",
+        "D": "The full test suite that takes several minutes"
       },
-      "correct": ["B"],
+      "correct": [
+        "D"
+      ],
       "explanation": "Pre-commit should be fast enough to be invisible. Long-running suites belong where they do not stand between a person and their commit."
     }
   ]

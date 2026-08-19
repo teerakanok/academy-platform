@@ -91,10 +91,22 @@
     },
     {
       "kind": "table",
-      "headers": ["Message", "Meaning", "Usual cause"],
+      "headers": [
+        "Message",
+        "Meaning",
+        "Usual cause"
+      ],
       "rows": [
-        ["undefined reference to 'foo'", "Something calls foo, nothing defines it", "A source file missing from the build, or a missing -l for a library"],
-        ["multiple definition of 'foo'", "Two object files both define foo", "A definition placed in a header, or a global without static"]
+        [
+          "undefined reference to 'foo'",
+          "Something calls foo, nothing defines it",
+          "A source file missing from the build, or a missing -l for a library"
+        ],
+        [
+          "multiple definition of 'foo'",
+          "Two object files both define foo",
+          "A definition placed in a header, or a global without static"
+        ]
       ]
     },
     {
@@ -183,48 +195,56 @@
       "id": "cp-1",
       "prompt": "In nm output, what does U next to a symbol mean?",
       "choices": {
-        "A": "The symbol is unused",
-        "B": "It is undefined here: this object file needs it but does not provide it",
-        "C": "It is unsigned",
+        "A": "It is unsigned",
+        "B": "The symbol is unused",
+        "C": "It is undefined here",
         "D": "It is a universal symbol available everywhere"
       },
-      "correct": ["B"],
-      "explanation": "T means defined in this object; U means required from elsewhere. Linking succeeds when every U has a matching T."
+      "correct": [
+        "C"
+      ],
+      "explanation": "This object file needs it but does not provide it T means defined in this object; U means required from elsewhere. Linking succeeds when every U has a matching T."
     },
     {
       "id": "cp-2",
       "prompt": "You get 'multiple definition of global_count'. What is the most likely cause?",
       "choices": {
-        "A": "The variable name is too common",
-        "B": "It was defined in a header, so every file including that header defined its own copy",
+        "A": "It was defined in a header",
+        "B": "The linker was run twice",
         "C": "Two functions have the same name",
-        "D": "The linker was run twice"
+        "D": "The variable name is too common"
       },
-      "correct": ["B"],
-      "explanation": "Declare it in the header with extern and define it in exactly one .c file. A header is included many times; a definition must exist once."
+      "correct": [
+        "A"
+      ],
+      "explanation": "Every file including that header defined its own copy. Declare it in the header with extern and define it in exactly one .c file. A header is included many times; a definition must exist once."
     },
     {
       "id": "cp-3",
       "prompt": "What does an include guard prevent?",
       "choices": {
-        "A": "Circular dependencies between modules",
-        "B": "The contents of a header being processed twice in one translation unit, which would redefine its types",
-        "C": "The header being read by the wrong compiler",
-        "D": "Slow builds"
+        "A": "Slow builds",
+        "B": "The header being read by the wrong compiler",
+        "C": "The contents of a header being processed twice in one translation unit",
+        "D": "Circular dependencies between modules"
       },
-      "correct": ["B"],
-      "explanation": "Headers commonly include other headers, so the same file arriving twice is normal. The guard makes the second arrival a no-op."
+      "correct": [
+        "C"
+      ],
+      "explanation": "Would redefine its types. Headers commonly include other headers, so the same file arriving twice is normal. The guard makes the second arrival a no-op."
     },
     {
       "id": "cp-4",
       "prompt": "Why forward-declare struct connection in a header instead of including connection.h ?",
       "choices": {
-        "A": "It is required by the standard",
+        "A": "Forward declarations are faster at runtime",
         "B": "A pointer does not need the full definition, and every header a header pulls in becomes a dependency of every file that includes it",
-        "C": "Forward declarations are faster at runtime",
+        "C": "It is required by the standard",
         "D": "It hides the struct from the linker"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Include what you use. Transitive header dependencies are how one small change ends up recompiling an entire project."
     }
   ]

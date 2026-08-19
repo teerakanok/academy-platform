@@ -146,55 +146,55 @@
       "id": "cp-1",
       "prompt": "Why can the decoder begin working the instant an instruction arrives?",
       "choices": {
-        "A": "It predicts the instruction",
-        "B": "The opcode is in fixed low bits, so the lookup needs no computation to find it",
-        "C": "Instructions are pre-decoded in memory",
+        "A": "Instructions are pre-decoded in memory",
+        "B": "It predicts the instruction",
+        "C": "The opcode is in fixed low bits",
         "D": "The compiler supplies the signals"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "That is the practical payoff of the encoding lesson's field-position rule. A decoder that had to compute where the opcode was would add that delay to every instruction."
+      "explanation": "The lookup needs no computation to find it. That is the practical payoff of the encoding lesson's field-position rule. A decoder that had to compute where the opcode was would add that delay to every instruction."
     },
     {
       "id": "cp-2",
       "prompt": "In the control table, sw has a dash for MemToReg. What does that mean?",
       "choices": {
-        "A": "The signal is always zero",
-        "B": "Nothing downstream uses it, because a store writes no register — so its value cannot affect the result",
-        "C": "The instruction is invalid",
-        "D": "It depends on the address"
+        "A": "It depends on the address",
+        "B": "Nothing downstream uses it",
+        "C": "The signal is always zero",
+        "D": "The instruction is invalid"
       },
       "correct": [
         "B"
       ],
-      "explanation": "MemToReg only selects what gets written back, and a store writes nothing back. Marking it as unobservable lets the hardware simplify that path."
+      "explanation": "A store writes no register — so its value cannot affect the result. MemToReg only selects what gets written back, and a store writes nothing back. Marking it as unobservable lets the hardware simplify that path."
     },
     {
       "id": "cp-3",
       "prompt": "What distinguishes add from sub, given that they share every control signal in the table?",
       "choices": {
         "A": "A different opcode",
-        "B": "funct7 — one input to the arithmetic unit, which is the single bit of encoding difference measured earlier",
-        "C": "The register numbers",
-        "D": "A prefix instruction"
+        "B": "A prefix instruction",
+        "C": "funct7 — one input to the arithmetic unit",
+        "D": "The register numbers"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "The opcode selects the row; funct3 and funct7 select the operation within it. The one-bit encoding difference and the one-input control difference are the same fact seen from two sides."
+      "explanation": "Is the single bit of encoding difference measured earlier. The opcode selects the row; funct3 and funct7 select the operation within it. The one-bit encoding difference and the one-input control difference are the same fact seen from two sides."
     },
     {
       "id": "cp-4",
       "prompt": "Why does a complex instruction set make direct control of the datapath impractical?",
       "choices": {
         "A": "The instructions are too long",
-        "B": "Many instructions and addressing modes mean a much larger table and deeper logic, adding delay before anything can start",
-        "C": "Control signals are limited to eight",
-        "D": "Compilers cannot generate them"
+        "B": "Control signals are limited to eight",
+        "C": "Compilers cannot generate them",
+        "D": "Many instructions and addressing modes mean a much larger table and deeper logic, adding delay before anything can start"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "It is why complex designs decode into simpler internal operations and control the datapath with those instead, which is the RISC-versus-CISC argument in its concrete hardware form."
     }

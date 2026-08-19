@@ -187,8 +187,8 @@
       "choices": {
         "A": "git reset --hard กลับไปก่อนหน้านั้น แล้ว force push",
         "B": "git revert <id> ซึ่งเพิ่ม commit ที่ย้อนการเปลี่ยนแปลงนั้น",
-        "C": "git commit --amend",
-        "D": "ลบ repository แล้ว clone ใหม่"
+        "C": "ลบ repository แล้ว clone ใหม่",
+        "D": "git commit --amend"
       },
       "correct": [
         "B"
@@ -199,9 +199,9 @@
       "id": "cp-2",
       "prompt": "git reset --soft HEAD~1 กับ git reset --hard HEAD~1 ต่างกันอย่างไร",
       "choices": {
-        "A": "ไม่ต่างกัน --hard แค่เร็วกว่า",
+        "A": "--soft ใช้ได้กับ commit แรกเท่านั้น",
         "B": "--soft เอา commit ออกแต่เก็บการเปลี่ยนแปลงไว้ใน stage ส่วน --hard เอา commit ออกและทิ้งการเปลี่ยนแปลงจากดิสก์ด้วย",
-        "C": "--soft ใช้ได้กับ commit แรกเท่านั้น",
+        "C": "ไม่ต่างกัน --hard แค่เร็วกว่า",
         "D": "--hard เก็บสำรองไว้ให้อัตโนมัติ"
       },
       "correct": [
@@ -213,13 +213,13 @@
       "id": "cp-3",
       "prompt": "ปฏิบัติการไหนที่ Git กู้คืนให้ไม่ได้จริงๆ",
       "choices": {
-        "A": "การลบ branch",
-        "B": "commit ที่ถูก amend",
-        "C": "การทิ้งการแก้ที่ยังไม่ commit ด้วย git restore",
-        "D": "commit ที่ถูก revert"
+        "A": "การทิ้งการแก้ที่ยังไม่ commit ด้วย git restore",
+        "B": "commit ที่ถูก revert",
+        "C": "commit ที่ถูก amend",
+        "D": "การลบ branch"
       },
       "correct": [
-        "C"
+        "A"
       ],
       "explanation": "งานที่ไม่เคยถูก commit ไม่เคยถูกบันทึกไว้ที่ไหน จึงไม่มีอะไรให้กู้ ส่วนทุกอย่างที่ commit ไปแล้วทิ้งร่องรอยที่มักตามหากลับมาได้"
     },
@@ -227,13 +227,13 @@
       "id": "cp-4",
       "prompt": "คุณลืมใส่ไฟล์หนึ่งใน commit ที่เพิ่งทำ และยังไม่ได้ push วิธีที่เรียบร้อยที่สุดคืออะไร",
       "choices": {
-        "A": "git revert HEAD แล้ว commit ใหม่ทั้งหมด",
-        "B": "git add <ไฟล์> && git commit --amend --no-edit",
-        "C": "git reset --hard HEAD~1",
-        "D": "ทำ commit ที่สองชื่อว่า fix previous commit"
+        "A": "git reset --hard HEAD~1",
+        "B": "ทำ commit ที่สองชื่อว่า fix previous commit",
+        "C": "git add <ไฟล์> && git commit --amend --no-edit",
+        "D": "git revert HEAD แล้ว commit ใหม่ทั้งหมด"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "amend ยัดไฟล์ที่ลืมเข้าไปใน commit เดิมและคงข้อความไว้ มันปลอดภัยตรงนี้พอดีเพราะ commit นั้นยังไม่ถูกแชร์ออกไป"
     }

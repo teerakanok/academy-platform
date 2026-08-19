@@ -23,8 +23,23 @@
         "title": "The print server",
         "brief": "Everyone in the office prints to this machine, and the queue is configured on forty desktops using the address 192.168.10.50. It sits on the 192.168.10.0/24 network, where the router is .1 and also answers DNS. Configure it so that address never changes.",
         "surface": "network-interface",
-        "initial": { "addressMode": "dhcp", "ipv4": "", "subnet": "", "gateway": "", "dns1": "", "applied": false },
-        "requiredFields": { "dhcp": [], "static": ["ipv4", "subnet", "gateway", "dns1"] },
+        "initial": {
+          "addressMode": "dhcp",
+          "ipv4": "",
+          "subnet": "",
+          "gateway": "",
+          "dns1": "",
+          "applied": false
+        },
+        "requiredFields": {
+          "dhcp": [],
+          "static": [
+            "ipv4",
+            "subnet",
+            "gateway",
+            "dns1"
+          ]
+        },
         "requirements": [
           {
             "id": "mode",
@@ -98,7 +113,15 @@
           "dns1": "192.168.10.1",
           "applied": true
         },
-        "requiredFields": { "dhcp": [], "static": ["ipv4", "subnet", "gateway", "dns1"] },
+        "requiredFields": {
+          "dhcp": [],
+          "static": [
+            "ipv4",
+            "subnet",
+            "gateway",
+            "dns1"
+          ]
+        },
         "requirements": [
           {
             "id": "mode",
@@ -142,24 +165,28 @@
       "id": "cp-1",
       "prompt": "A monitoring server polls twelve switches by IP address. What addressing does the monitoring server itself need?",
       "choices": {
-        "A": "DHCP, so it always gets a valid address",
-        "B": "Static, because the switches are configured to send traps back to a fixed address",
-        "C": "It does not matter",
+        "A": "Static, because the switches are configured to send traps back to a fixed address",
+        "B": "It does not matter",
+        "C": "DHCP, so it always gets a valid address",
         "D": "DHCP with a long lease"
       },
-      "correct": ["B"],
+      "correct": [
+        "A"
+      ],
       "explanation": "Anything that other devices are configured to reach at a specific address has to keep that address. A changed address silently breaks every device pointing at the old one."
     },
     {
       "id": "cp-2",
       "prompt": "You set a laptop to a static address that works at the office. The user takes it home and has no network. Why?",
       "choices": {
-        "A": "The laptop is broken",
+        "A": "The DNS cache needs clearing",
         "B": "Home networks block static addresses",
         "C": "The address, gateway and DNS all belong to the office network and mean nothing on the home one",
-        "D": "The DNS cache needs clearing"
+        "D": "The laptop is broken"
       },
-      "correct": ["C"],
+      "correct": [
+        "C"
+      ],
       "explanation": "A static configuration describes one specific network. Move the machine and every value in it is wrong at once, which is exactly the problem DHCP exists to solve."
     },
     {
@@ -167,12 +194,14 @@
       "prompt": "A machine has a correct IP address and mask but a blank DNS server. What breaks?",
       "choices": {
         "A": "Nothing",
-        "B": "Names do not resolve, so anything referenced by hostname fails while direct IP addresses still work",
-        "C": "The machine cannot get an address",
-        "D": "Only printing"
+        "B": "Only printing",
+        "C": "Names do not resolve",
+        "D": "The machine cannot get an address"
       },
-      "correct": ["B"],
-      "explanation": "This is a useful failure to recognise: pings to an address succeed, everything by name fails. It points straight at DNS rather than at the network itself."
+      "correct": [
+        "C"
+      ],
+      "explanation": "Anything referenced by hostname fails while direct IP addresses still work. This is a useful failure to recognise: pings to an address succeed, everything by name fails. It points straight at DNS rather than at the network itself."
     }
   ]
 }

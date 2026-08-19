@@ -196,13 +196,13 @@
       "id": "cp-1",
       "prompt": "Decode `-rwxr-x---`. Who can do what?",
       "choices": {
-        "A": "Owner: read/write/execute · group: read/execute · others: nothing",
-        "B": "Owner: read/write · group: read · others: read",
-        "C": "Everyone can read, write and execute",
-        "D": "Owner: read only · group: write · others: execute"
+        "A": "Owner: read only · group: write · others: execute",
+        "B": "Everyone can read, write and execute",
+        "C": "Owner: read/write · group: read · others: read",
+        "D": "Owner: read/write/execute · group: read/execute · others: nothing"
       },
       "correct": [
-        "A"
+        "D"
       ],
       "explanation": "Split it into three groups of three after the type character: rwx for the owner, r-x for the group, --- for everyone else."
     },
@@ -211,12 +211,12 @@
       "prompt": "What is 640 in letters?",
       "choices": {
         "A": "rwxr-x---",
-        "B": "rw-r-----",
-        "C": "r--rw----",
-        "D": "rw-rw-r--"
+        "B": "rw-rw-r--",
+        "C": "rw-r-----",
+        "D": "r--rw----"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "6 = 4+2 = rw-, 4 = r--, 0 = ---. A common setting for a config file readable by a service group but by nobody else."
     },
@@ -224,10 +224,10 @@
       "id": "cp-3",
       "prompt": "A colleague fixes a permission error by running chmod -R 777 on an application directory. What have they actually done?",
       "choices": {
-        "A": "Restricted the directory to the owner",
+        "A": "Nothing — 777 is the default",
         "B": "Made every file readable, writable and executable by every user and process on the machine",
         "C": "Given the files to root",
-        "D": "Nothing — 777 is the default"
+        "D": "Restricted the directory to the owner"
       },
       "correct": [
         "B"
@@ -238,13 +238,13 @@
       "id": "cp-4",
       "prompt": "You need a private key file to be readable only by its owner. Which command is correct?",
       "choices": {
-        "A": "chmod 644 id_rsa",
-        "B": "chmod 600 id_rsa",
-        "C": "chmod 755 id_rsa",
-        "D": "chmod 777 id_rsa"
+        "A": "chmod 600 id_rsa",
+        "B": "chmod 777 id_rsa",
+        "C": "chmod 644 id_rsa",
+        "D": "chmod 755 id_rsa"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "600 is rw------- — the owner may read and write, nobody else has any access. SSH will refuse to use a key that is more permissive than this."
     },
@@ -252,13 +252,13 @@
       "id": "cp-5",
       "prompt": "Why can a user delete a file inside a directory even when they have no write permission on the file itself?",
       "choices": {
-        "A": "Because deletion ignores permissions entirely",
-        "B": "Because deleting an entry is controlled by write permission on the containing directory, not on the file",
-        "C": "Because the file was owned by root",
-        "D": "This cannot happen"
+        "A": "Because the file was owned by root",
+        "B": "This cannot happen",
+        "C": "Because deleting an entry is controlled by write permission on the containing directory, not on the file",
+        "D": "Because deletion ignores permissions entirely"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "Removing a name from a directory is a change to the directory. Write permission there is enough — which is why directory permissions deserve as much attention as file permissions."
     }

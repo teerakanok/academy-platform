@@ -10,12 +10,27 @@
     },
     {
       "kind": "table",
-      "headers": ["Not atomic", "Atomic"],
+      "headers": [
+        "Not atomic",
+        "Atomic"
+      ],
       "rows": [
-        ["Add upload limit, fix typo, reformat file, bump version", "Reject uploads over 10MB"],
-        ["'various fixes'", "Fix timezone shift on the report export"],
-        ["Half a feature that does not run", "A working slice, even if small"],
-        ["A rename mixed into a behaviour change", "The rename alone, then the behaviour change"]
+        [
+          "Add upload limit, fix typo, reformat file, bump version",
+          "Reject uploads over 10MB"
+        ],
+        [
+          "'various fixes'",
+          "Fix timezone shift on the report export"
+        ],
+        [
+          "Half a feature that does not run",
+          "A working slice, even if small"
+        ],
+        [
+          "A rename mixed into a behaviour change",
+          "The rename alone, then the behaviour change"
+        ]
       ]
     },
     {
@@ -143,49 +158,57 @@
       "id": "cp-1",
       "prompt": "What makes a commit atomic?",
       "choices": {
-        "A": "It changes only one file",
-        "B": "It contains one complete change — possibly across several files — that could be reverted on its own",
+        "A": "It has a short message",
+        "B": "It contains one complete change",
         "C": "It is under fifty lines",
-        "D": "It has a short message"
+        "D": "It changes only one file"
       },
-      "correct": ["B"],
-      "explanation": "The unit is the change, not the file. A single coherent change often touches a handful of files together."
+      "correct": [
+        "B"
+      ],
+      "explanation": "Possibly across several files — that could be reverted on its own. The unit is the change, not the file. A single coherent change often touches a handful of files together."
     },
     {
       "id": "cp-2",
       "prompt": "Why separate a large rename from a small behaviour change?",
       "choices": {
         "A": "Git handles renames faster in isolation",
-        "B": "Mixed together, the two lines that matter are invisible inside a forty-file diff, so the review is shallow",
-        "C": "Renames cannot be reverted",
+        "B": "Renames cannot be reverted",
+        "C": "Mixed together, the two lines that matter are invisible inside a forty-file diff",
         "D": "It is required by most platforms"
       },
-      "correct": ["B"],
-      "explanation": "Reviewers skim mechanical changes and read logic changes. Combining them means the logic gets skimmed too."
+      "correct": [
+        "C"
+      ],
+      "explanation": "The review is shallow. Reviewers skim mechanical changes and read logic changes. Combining them means the logic gets skimmed too."
     },
     {
       "id": "cp-3",
       "prompt": "What does git bisect do?",
       "choices": {
         "A": "Splits a commit into two",
-        "B": "Performs a binary search through history to find the commit that introduced a bug",
+        "B": "Compares two branches",
         "C": "Divides a branch into two branches",
-        "D": "Compares two branches"
+        "D": "Performs a binary search through history to find the commit that introduced a bug"
       },
-      "correct": ["B"],
+      "correct": [
+        "D"
+      ],
       "explanation": "You mark a good and a bad commit; it halves the range at each step. A thousand commits take about ten checks."
     },
     {
       "id": "cp-4",
       "prompt": "Why does bisect fail on a history of half-finished commits?",
       "choices": {
-        "A": "It refuses to run on branches",
-        "B": "It assumes every commit builds and runs; if one does not, bisect stops there and blames a commit that was merely broken, not the one that introduced the bug",
-        "C": "It only works on the main branch",
-        "D": "It requires tags"
+        "A": "It assumes every commit builds and runs",
+        "B": "It refuses to run on branches",
+        "C": "It requires tags",
+        "D": "It only works on the main branch"
       },
-      "correct": ["B"],
-      "explanation": "This is the practical payoff of the discipline: a history where each commit works is a history you can search automatically."
+      "correct": [
+        "A"
+      ],
+      "explanation": "If one does not, bisect stops there and blames a commit that was merely broken, not the one that introduced the bug. This is the practical payoff of the discipline: a history where each commit works is a history you can search automatically."
     }
   ]
 }

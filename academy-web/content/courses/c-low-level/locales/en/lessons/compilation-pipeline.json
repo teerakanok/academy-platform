@@ -51,13 +51,37 @@
     },
     {
       "kind": "table",
-      "headers": ["Message", "Stage", "Usually means"],
+      "headers": [
+        "Message",
+        "Stage",
+        "Usually means"
+      ],
       "rows": [
-        ["No such file or directory: stdio.h", "Preprocessor", "Missing header or wrong include path"],
-        ["expected ';' before ...", "Compiler", "A syntax error in your C"],
-        ["implicit declaration of function 'foo'", "Compiler", "You called something with no declaration in scope"],
-        ["undefined reference to 'foo'", "Linker", "It compiled, but nothing provides the actual function"],
-        ["ld: library not found for -lssl", "Linker", "The library is not installed or not on the search path"]
+        [
+          "No such file or directory: stdio.h",
+          "Preprocessor",
+          "Missing header or wrong include path"
+        ],
+        [
+          "expected ';' before ...",
+          "Compiler",
+          "A syntax error in your C"
+        ],
+        [
+          "implicit declaration of function 'foo'",
+          "Compiler",
+          "You called something with no declaration in scope"
+        ],
+        [
+          "undefined reference to 'foo'",
+          "Linker",
+          "It compiled, but nothing provides the actual function"
+        ],
+        [
+          "ld: library not found for -lssl",
+          "Linker",
+          "The library is not installed or not on the search path"
+        ]
       ]
     },
     {
@@ -72,16 +96,43 @@
     },
     {
       "kind": "table",
-      "headers": ["Flag", "Effect"],
+      "headers": [
+        "Flag",
+        "Effect"
+      ],
       "rows": [
-        ["-Wall -Wextra", "Turn on the warnings that catch real defects"],
-        ["-Werror", "Treat warnings as errors — common in real projects"],
-        ["-g", "Include debug information, so a debugger can show your source"],
-        ["-O0 / -O2", "No optimisation while learning / optimised for release"],
-        ["-o name", "Name the output file"],
-        ["-c", "Compile to an object file without linking"],
-        ["-lm, -lssl", "Link against a library (m is the maths library)"],
-        ["-fsanitize=address", "Add runtime memory checking — you will use this later"]
+        [
+          "-Wall -Wextra",
+          "Turn on the warnings that catch real defects"
+        ],
+        [
+          "-Werror",
+          "Treat warnings as errors — common in real projects"
+        ],
+        [
+          "-g",
+          "Include debug information, so a debugger can show your source"
+        ],
+        [
+          "-O0 / -O2",
+          "No optimisation while learning / optimised for release"
+        ],
+        [
+          "-o name",
+          "Name the output file"
+        ],
+        [
+          "-c",
+          "Compile to an object file without linking"
+        ],
+        [
+          "-lm, -lssl",
+          "Link against a library (m is the maths library)"
+        ],
+        [
+          "-fsanitize=address",
+          "Add runtime memory checking — you will use this later"
+        ]
       ]
     },
     {
@@ -120,12 +171,14 @@
       "id": "cp-1",
       "prompt": "What does the preprocessor actually do with #include <stdio.h> ?",
       "choices": {
-        "A": "Loads a compiled module",
-        "B": "Pastes the entire contents of that header file into your source before compilation",
-        "C": "Links the standard library",
-        "D": "Downloads the header if missing"
+        "A": "Links the standard library",
+        "B": "Loads a compiled module",
+        "C": "Downloads the header if missing",
+        "D": "Pastes the entire contents of that header file into your source before compilation"
       },
-      "correct": ["B"],
+      "correct": [
+        "D"
+      ],
       "explanation": "It is text substitution. That is why a short program can preprocess into tens of thousands of lines."
     },
     {
@@ -137,31 +190,37 @@
         "C": "The preprocessor — a missing header",
         "D": "The assembler — an invalid instruction"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Declaration and definition are separate things in C. The header promised the function exists; the linker is the stage that has to find it."
     },
     {
       "id": "cp-3",
       "prompt": "What does gcc -c produce?",
       "choices": {
-        "A": "An executable",
-        "B": "An object file: machine code with names that are not yet resolved",
-        "C": "Preprocessed source",
-        "D": "Assembly text"
+        "A": "Assembly text",
+        "B": "Preprocessed source",
+        "C": "An executable",
+        "D": "An object file: machine code with names that are not yet resolved"
       },
-      "correct": ["B"],
+      "correct": [
+        "D"
+      ],
       "explanation": "-c compiles and assembles but does not link, which is how multi-file projects are built before being joined together."
     },
     {
       "id": "cp-4",
       "prompt": "Why compile with -O0 while learning?",
       "choices": {
-        "A": "It makes the program run faster",
+        "A": "It is required for -Wall to work",
         "B": "Optimisation rearranges and removes code, so a debugger shows lines out of order and variables that no longer exist",
-        "C": "It is required for -Wall to work",
+        "C": "It makes the program run faster",
         "D": "It reduces the executable size"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "You want the running program to match the source you are reading. Turn optimisation on when you are measuring performance, not while you are learning what the code does."
     }
   ]

@@ -163,41 +163,41 @@
       "id": "cp-1",
       "prompt": "What does the reflog record?",
       "choices": {
-        "A": "Every file you have edited",
-        "B": "Every position HEAD has pointed to — commits, switches, merges, resets, rebases",
-        "C": "Only commits that were pushed",
-        "D": "The remote repository's history"
+        "A": "Only commits that were pushed",
+        "B": "The remote repository's history",
+        "C": "Every position HEAD has pointed to",
+        "D": "Every file you have edited"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "It is a local log of pointer movement, which is exactly what you need to return to a state you left by accident."
+      "explanation": "Commits, switches, merges, resets, rebases. It is a local log of pointer movement, which is exactly what you need to return to a state you left by accident."
     },
     {
       "id": "cp-2",
       "prompt": "You deleted a branch with git branch -D and it had unmerged commits. What is true?",
       "choices": {
-        "A": "The commits are permanently gone",
-        "B": "Only the branch label was removed; the commits are still reachable via the reflog and the branch can be recreated",
-        "C": "The commits moved to main",
+        "A": "The commits moved to main",
+        "B": "Only the branch label was removed",
+        "C": "The commits are permanently gone",
         "D": "You must restore from a backup"
       },
       "correct": [
         "B"
       ],
-      "explanation": "A branch is a pointer. Deleting the pointer does not delete the commits — git branch <name> <id> puts the label back."
+      "explanation": "The commits are still reachable via the reflog and the branch can be recreated A branch is a pointer. Deleting the pointer does not delete the commits — git branch <name> <id> puts the label back."
     },
     {
       "id": "cp-3",
       "prompt": "Which of these is genuinely unrecoverable?",
       "choices": {
-        "A": "A commit removed by reset --hard",
-        "B": "A branch deleted yesterday",
-        "C": "Uncommitted edits discarded with git restore",
+        "A": "Uncommitted edits discarded with git restore",
+        "B": "A commit removed by reset --hard",
+        "C": "A branch deleted yesterday",
         "D": "Commits replaced by a rebase"
       },
       "correct": [
-        "C"
+        "A"
       ],
       "explanation": "The reflog records commits. Work that was never committed has no entry, so there is nothing to return to."
     },
@@ -205,9 +205,9 @@
       "id": "cp-4",
       "prompt": "You are about to attempt something risky in a repository. What is the cheapest insurance?",
       "choices": {
-        "A": "Copy the folder to your desktop",
+        "A": "Push to the remote immediately",
         "B": "Commit your current work first, even to a scruffy temporary branch",
-        "C": "Push to the remote immediately",
+        "C": "Copy the folder to your desktop",
         "D": "Run git gc"
       },
       "correct": [

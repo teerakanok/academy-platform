@@ -214,10 +214,10 @@
       "id": "cp-1",
       "prompt": "You update a record. A colleague sees the new address and you still see the old one. Why?",
       "choices": {
-        "A": "The change failed",
+        "A": "You need to restart your machine",
         "B": "Your resolver cached the old answer and is still counting down its TTL",
-        "C": "You need to restart your machine",
-        "D": "The record propagates outward geographically"
+        "C": "The record propagates outward geographically",
+        "D": "The change failed"
       },
       "correct": [
         "B"
@@ -228,9 +228,9 @@
       "id": "cp-2",
       "prompt": "dig returns NOERROR but the answer section is empty. What does that mean?",
       "choices": {
-        "A": "The name does not exist",
+        "A": "The resolver timed out",
         "B": "The name exists, but has no record of the type you asked for",
-        "C": "The resolver timed out",
+        "C": "The name does not exist",
         "D": "The domain is misconfigured"
       },
       "correct": [
@@ -242,29 +242,29 @@
       "id": "cp-3",
       "prompt": "A lookup shows a query time of 3 ms. What does that tell you?",
       "choices": {
-        "A": "The authoritative server is nearby",
-        "B": "The answer almost certainly came from a cache — a full walk from the root takes far longer",
-        "C": "The name is invalid",
+        "A": "The answer almost certainly came from a cache",
+        "B": "The name is invalid",
+        "C": "The authoritative server is nearby",
         "D": "IPv6 was used"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "A few milliseconds is a local round trip to a resolver that already had the answer. The first uncached lookup of an unfamiliar name is visibly slower."
+      "explanation": "A full walk from the root takes far longer A few milliseconds is a local round trip to a resolver that already had the answer. The first uncached lookup of an unfamiliar name is visibly slower."
     },
     {
       "id": "cp-4",
       "prompt": "An application cannot connect and reports a network error. What is the first thing to check?",
       "choices": {
-        "A": "The firewall",
-        "B": "Whether the name resolves at all — run dig by hand and separate DNS from connectivity",
-        "C": "The routing table",
-        "D": "The server's logs"
+        "A": "Whether the name resolves at all",
+        "B": "The server's logs",
+        "C": "The firewall",
+        "D": "The routing table"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "A failed lookup surfaces at the point of connecting and reads like a network problem. Separating the two takes one command and eliminates a whole category of wrong investigation."
+      "explanation": "Run dig by hand and separate DNS from connectivity A failed lookup surfaces at the point of connecting and reads like a network problem. Separating the two takes one command and eliminates a whole category of wrong investigation."
     }
   ]
 }

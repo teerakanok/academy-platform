@@ -200,10 +200,10 @@
       "id": "cp-1",
       "prompt": "Where does a local variable declared inside a function live, and how long?",
       "choices": {
-        "A": "On the heap, until you free it",
+        "A": "In global memory, for the whole program",
         "B": "On the stack, until the function returns",
-        "C": "In global memory, for the whole program",
-        "D": "In the code region"
+        "C": "In the code region",
+        "D": "On the heap, until you free it"
       },
       "correct": [
         "B"
@@ -214,13 +214,13 @@
       "id": "cp-2",
       "prompt": "You need a buffer whose size depends on the size of an input file. Stack or heap?",
       "choices": {
-        "A": "Stack — it is faster",
-        "B": "Heap — the size is not known at compile time and may be large",
-        "C": "Either works identically",
+        "A": "Heap — the size is not known at compile time and may be large",
+        "B": "Either works identically",
+        "C": "Stack — it is faster",
         "D": "A global array"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "Stack sizes are fixed at compile time and the total is small. Input-dependent sizes are exactly the heap's purpose."
     },
@@ -228,10 +228,10 @@
       "id": "cp-3",
       "prompt": "What causes a stack overflow?",
       "choices": {
-        "A": "Forgetting to call free",
+        "A": "Allocating too much with malloc",
         "B": "Unbounded recursion, or a single local array large enough to exhaust the stack",
-        "C": "Allocating too much with malloc",
-        "D": "Dereferencing NULL"
+        "C": "Dereferencing NULL",
+        "D": "Forgetting to call free"
       },
       "correct": [
         "B"
@@ -242,15 +242,15 @@
       "id": "cp-4",
       "prompt": "Why must a function that returns allocated memory document that fact?",
       "choices": {
-        "A": "Because C requires a comment",
-        "B": "Because C cannot express ownership in the type system — without a stated owner you get a leak, or a double free when two callers both believe they own it",
+        "A": "So the compiler can insert the free",
+        "B": "Because C requires a comment",
         "C": "Because free needs the original size",
-        "D": "So the compiler can insert the free"
+        "D": "Because C cannot express ownership in the type system"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "Ownership is a convention in C. Writing it down is the only enforcement mechanism the language offers."
+      "explanation": "Without a stated owner you get a leak, or a double free when two callers both believe they own it. Ownership is a convention in C. Writing it down is the only enforcement mechanism the language offers."
     }
   ]
 }

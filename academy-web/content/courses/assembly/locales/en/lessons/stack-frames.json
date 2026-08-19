@@ -222,38 +222,38 @@
       "id": "cp-1",
       "prompt": "A prologue pushes rbp, r15, r14, r13, r12 and rbx. What does the epilogue do?",
       "choices": {
-        "A": "Pops them in the same order",
-        "B": "Pops rbx, r12, r13, r14, r15 and rbp — exactly reverse order, because the stack is last-in first-out",
+        "A": "Pops rbx, r12, r13, r14, r15 and rbp",
+        "B": "Nothing; the caller restores them",
         "C": "Restores them with mov instructions",
-        "D": "Nothing; the caller restores them"
+        "D": "Pops them in the same order"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "Every prologue step has an exact undo and the undos run in reverse. A prologue and epilogue that do not mirror each other is a strong signal something unusual is happening."
+      "explanation": "Exactly reverse order, because the stack is last-in first-out. Every prologue step has an exact undo and the undos run in reverse. A prologue and epilogue that do not mirror each other is a strong signal something unusual is happening."
     },
     {
       "id": "cp-2",
       "prompt": "You see many instructions the compiler annotated as 'Spill'. What does that tell you about the source function?",
       "choices": {
         "A": "It has a bug",
-        "B": "It has more simultaneously live values than the sixteen registers can hold, so values were moved to the stack",
-        "C": "It uses too much memory",
-        "D": "It was compiled without optimisation"
+        "B": "It has more simultaneously live values than the sixteen registers can hold",
+        "C": "It was compiled without optimisation",
+        "D": "It uses too much memory"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Heavy spilling usually means the function is doing too much at once. Splitting it or shortening live ranges often helps more than optimising the arithmetic."
+      "explanation": "Values were moved to the stack. Heavy spilling usually means the function is doing too much at once. Splitting it or shortening live ranges often helps more than optimising the arithmetic."
     },
     {
       "id": "cp-3",
       "prompt": "Why is the stack canary placed above the locals rather than anywhere else in the frame?",
       "choices": {
-        "A": "To keep the frame aligned",
+        "A": "To avoid conflicting with spills",
         "B": "So that a contiguous overflow running upward from a local buffer must destroy the canary before reaching the saved rbp and return address",
-        "C": "Because rbp-8 is the fastest address to access",
-        "D": "To avoid conflicting with spills"
+        "C": "To keep the frame aligned",
+        "D": "Because rbp-8 is the fastest address to access"
       },
       "correct": [
         "B"
@@ -264,15 +264,15 @@
       "id": "cp-4",
       "prompt": "An optimised function starts with sub rsp, 24 and never touches rbp. What has happened, and what is the cost?",
       "choices": {
-        "A": "The function has no locals",
-        "B": "The frame pointer was omitted: locals are addressed from rsp, which frees a register — at the cost that a debugger cannot walk frames by chaining saved rbp values",
-        "C": "The prologue is missing due to a bug",
+        "A": "The frame pointer was omitted",
+        "B": "The prologue is missing due to a bug",
+        "C": "The function has no locals",
         "D": "The function is a leaf and needs no frame"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "Unwinding then depends on the separate .eh_frame data. This is why backtraces from optimised builds can be incomplete when that information is stripped."
+      "explanation": "Locals are addressed from rsp, which frees a register — at the cost that a debugger cannot walk frames by chaining saved rbp values. Unwinding then depends on the separate .eh_frame data. This is why backtraces from optimised builds can be incomplete when that information is stripped."
     }
   ]
 }

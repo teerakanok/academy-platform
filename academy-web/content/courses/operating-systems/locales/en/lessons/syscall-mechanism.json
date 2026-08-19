@@ -189,13 +189,13 @@
       "id": "cp-1",
       "prompt": "Where does errno actually get set?",
       "choices": {
-        "A": "The kernel writes it into your process",
-        "B": "The C library wrapper sets it after seeing a negative return value from the kernel",
-        "C": "The CPU sets it in a status register",
-        "D": "It is read from /proc after each call"
+        "A": "It is read from /proc after each call",
+        "B": "The CPU sets it in a status register",
+        "C": "The kernel writes it into your process",
+        "D": "The C library wrapper sets it after seeing a negative return value from the kernel"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "The kernel returns one value and encodes failure as a small negative number. Translating that into -1 plus errno is entirely the library's work — which is why errno only means anything after a failure."
     },
@@ -203,13 +203,13 @@
       "id": "cp-2",
       "prompt": "Your code calls open() and it works on both x86-64 and aarch64, yet aarch64 has no open syscall. How?",
       "choices": {
-        "A": "The kernel emulates the missing call",
-        "B": "The C library implements open() using the openat() syscall on that architecture",
-        "C": "open() is a macro that becomes a file read",
-        "D": "aarch64 kernels add it at boot"
+        "A": "open() is a macro that becomes a file read",
+        "B": "aarch64 kernels add it at boot",
+        "C": "The kernel emulates the missing call",
+        "D": "The C library implements open() using the openat() syscall on that architecture"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "This is exactly the job of the wrapper layer: a stable C interface on top of whatever the architecture's ABI actually provides. Hardcoding a syscall number throws that portability away."
     },
@@ -217,10 +217,10 @@
       "id": "cp-3",
       "prompt": "Why does calling clock_gettime() in a tight loop cost far less than calling getpid() in the same loop?",
       "choices": {
-        "A": "getpid does more computation",
+        "A": "The C library caches the time",
         "B": "clock_gettime is answered by vDSO code running in user mode, with no boundary crossing",
-        "C": "The C library caches the time",
-        "D": "getpid always reads from disk"
+        "C": "getpid always reads from disk",
+        "D": "getpid does more computation"
       },
       "correct": [
         "B"
@@ -231,13 +231,13 @@
       "id": "cp-4",
       "prompt": "You want to know which system calls a misbehaving program is making. What is the first tool to reach for?",
       "choices": {
-        "A": "gdb, stepping through instruction by instruction",
-        "B": "strace, which reports every call, its arguments, and its result",
-        "C": "Reading the kernel source for the syscall table",
-        "D": "Adding printf to the program"
+        "A": "Reading the kernel source for the syscall table",
+        "B": "gdb, stepping through instruction by instruction",
+        "C": "Adding printf to the program",
+        "D": "strace, which reports every call, its arguments, and its result"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "strace shows the whole conversation between the program and the kernel, including the failing call and its errno — usually before you need a debugger at all."
     }

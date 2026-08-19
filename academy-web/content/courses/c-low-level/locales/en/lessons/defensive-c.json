@@ -123,14 +123,42 @@
     },
     {
       "kind": "table",
-      "headers": ["Instead of", "Use", "Because"],
+      "headers": [
+        "Instead of",
+        "Use",
+        "Because"
+      ],
       "rows": [
-        ["gets", "fgets", "The size is a parameter"],
-        ["strcpy / strcat", "snprintf", "Bounded and always terminates"],
-        ["sprintf", "snprintf", "Bounded"],
-        ["atoi", "strtol with checks", "atoi cannot report failure at all"],
-        ["malloc(n * size)", "calloc(n, size)", "Detects the multiplication overflow"],
-        ["A fixed 4096 in two places", "One constant, or sizeof", "They cannot drift apart"]
+        [
+          "gets",
+          "fgets",
+          "The size is a parameter"
+        ],
+        [
+          "strcpy / strcat",
+          "snprintf",
+          "Bounded and always terminates"
+        ],
+        [
+          "sprintf",
+          "snprintf",
+          "Bounded"
+        ],
+        [
+          "atoi",
+          "strtol with checks",
+          "atoi cannot report failure at all"
+        ],
+        [
+          "malloc(n * size)",
+          "calloc(n, size)",
+          "Detects the multiplication overflow"
+        ],
+        [
+          "A fixed 4096 in two places",
+          "One constant, or sizeof",
+          "They cannot drift apart"
+        ]
       ]
     },
     {
@@ -185,49 +213,57 @@
       "id": "cp-1",
       "prompt": "Why pass sizeof line rather than the literal 128 at a call site?",
       "choices": {
-        "A": "It is faster",
-        "B": "sizeof cannot drift out of step with the array; a repeated literal becomes wrong the day someone changes the declaration",
-        "C": "The compiler requires it",
+        "A": "sizeof cannot drift out of step with the array",
+        "B": "The compiler requires it",
+        "C": "It is faster",
         "D": "It avoids the need for a length parameter"
       },
-      "correct": ["B"],
-      "explanation": "Duplicated constants are how overflows get introduced long after the code was written and reviewed."
+      "correct": [
+        "A"
+      ],
+      "explanation": "A repeated literal becomes wrong the day someone changes the declaration. Duplicated constants are how overflows get introduced long after the code was written and reviewed."
     },
     {
       "id": "cp-2",
       "prompt": "A length arrives from input as -1 and is stored in a size_t. What happens to your bounds check?",
       "choices": {
-        "A": "It catches the negative value",
-        "B": "The conversion makes it an enormous positive number, so the check passes and the value is then used as a size",
-        "C": "The program crashes at the conversion",
+        "A": "The program crashes at the conversion",
+        "B": "It catches the negative value",
+        "C": "The conversion makes it an enormous positive number",
         "D": "size_t rejects negative values"
       },
-      "correct": ["B"],
-      "explanation": "Reject negatives at the boundary, before conversion. This is the same rule as the signed/unsigned lesson, applied where untrusted data arrives."
+      "correct": [
+        "C"
+      ],
+      "explanation": "The check passes and the value is then used as a size. Reject negatives at the boundary, before conversion. This is the same rule as the signed/unsigned lesson, applied where untrusted data arrives."
     },
     {
       "id": "cp-3",
       "prompt": "What is the advantage of guard clauses at the top of a function?",
       "choices": {
-        "A": "They run faster",
-        "B": "All the preconditions and failure cases sit in one place, and the main body stays flat and free of nesting",
-        "C": "They replace the need for tests",
-        "D": "They prevent memory leaks automatically"
+        "A": "All the preconditions and failure cases sit in one place, and the main body stays flat and free of nesting",
+        "B": "They prevent memory leaks automatically",
+        "C": "They run faster",
+        "D": "They replace the need for tests"
       },
-      "correct": ["B"],
+      "correct": [
+        "A"
+      ],
       "explanation": "A reviewer can see the complete set of assumptions at a glance, which makes a missing check visible rather than buried."
     },
     {
       "id": "cp-4",
       "prompt": "Why prefer const, static, and enum over runtime checks where possible?",
       "choices": {
-        "A": "They make the binary smaller",
-        "B": "They turn a possible runtime defect into a compile error, or remove the possibility entirely — a check that cannot be skipped",
-        "C": "They are required by the standard",
-        "D": "They improve performance measurably"
+        "A": "They improve performance measurably",
+        "B": "They turn a possible runtime defect into a compile error, or remove the possibility entirely",
+        "C": "They make the binary smaller",
+        "D": "They are required by the standard"
       },
-      "correct": ["B"],
-      "explanation": "A runtime check has to be written, kept, and executed. A compile-time impossibility needs none of those things."
+      "correct": [
+        "B"
+      ],
+      "explanation": "A check that cannot be skipped A runtime check has to be written, kept, and executed. A compile-time impossibility needs none of those things."
     }
   ]
 }

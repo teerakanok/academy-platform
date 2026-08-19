@@ -185,13 +185,13 @@
       "id": "cp-1",
       "prompt": "Which subnet does 192.0.2.130 belong to, if the network is split into /26 blocks?",
       "choices": {
-        "A": "192.0.2.0/26",
-        "B": "192.0.2.128/26",
-        "C": "192.0.2.64/26",
-        "D": "192.0.2.192/26"
+        "A": "192.0.2.64/26",
+        "B": "192.0.2.0/26",
+        "C": "192.0.2.192/26",
+        "D": "192.0.2.128/26"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "Block size 64, and 130 divided by 64 is 2 with a remainder, so 2 x 64 = 128. Verified against a calculator along with the other three cases in the lesson."
     },
@@ -200,12 +200,12 @@
       "prompt": "What is the network address of 172.16.5.0/20?",
       "choices": {
         "A": "172.16.5.0",
-        "B": "172.16.0.0",
-        "C": "172.16.4.0",
+        "B": "172.16.4.0",
+        "C": "172.16.0.0",
         "D": "172.0.0.0"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "A /20 has a block size of 16 in the third octet, so networks start at 172.16.0.0, 172.16.16.0, and so on. 5 falls inside the first block. Verified: broadcast 172.16.15.255, 4096 addresses."
     },
@@ -213,13 +213,13 @@
       "id": "cp-3",
       "prompt": "Why allocate the largest block first when subnetting for groups of different sizes?",
       "choices": {
-        "A": "It is only a convention",
-        "B": "Each block must start at a multiple of its own size, and allocating small blocks first leaves gaps that a later large block cannot use",
-        "C": "Large groups are more important",
-        "D": "Small blocks cannot be moved later"
+        "A": "Small blocks cannot be moved later",
+        "B": "Large groups are more important",
+        "C": "It is only a convention",
+        "D": "Each block must start at a multiple of its own size, and allocating small blocks first leaves gaps that a later large block cannot use"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "Alignment is the constraint. Place the /25 first and everything after it fits; place the /30 first and the /25 no longer has an aligned home."
     },
@@ -227,13 +227,13 @@
       "id": "cp-4",
       "prompt": "A link between two routers needs how large a subnet?",
       "choices": {
-        "A": "/24",
-        "B": "/30 — four addresses, two of them usable",
-        "C": "/32",
-        "D": "/28"
+        "A": "/32",
+        "B": "/28",
+        "C": "/30 — four addresses, two of them usable",
+        "D": "/24"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "Two usable addresses is exactly two router interfaces. It is the smallest subnet that can carry a link, and real networks contain a great many of them."
     }

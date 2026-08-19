@@ -37,14 +37,42 @@
     },
     {
       "kind": "table",
-      "headers": ["Type", "Holds", "Typical size"],
+      "headers": [
+        "Type",
+        "Holds",
+        "Typical size"
+      ],
       "rows": [
-        ["int", "A whole number", "4 bytes"],
-        ["long", "A larger whole number", "8 bytes on most 64-bit systems"],
-        ["char", "One byte — a character or a small number", "1 byte"],
-        ["float / double", "A number with a fractional part", "4 / 8 bytes"],
-        ["size_t", "A size or count — never negative", "8 bytes on 64-bit"],
-        ["bool", "true or false (needs <stdbool.h>)", "1 byte"]
+        [
+          "int",
+          "A whole number",
+          "4 bytes"
+        ],
+        [
+          "long",
+          "A larger whole number",
+          "8 bytes on most 64-bit systems"
+        ],
+        [
+          "char",
+          "One byte — a character or a small number",
+          "1 byte"
+        ],
+        [
+          "float / double",
+          "A number with a fractional part",
+          "4 / 8 bytes"
+        ],
+        [
+          "size_t",
+          "A size or count — never negative",
+          "8 bytes on 64-bit"
+        ],
+        [
+          "bool",
+          "true or false (needs <stdbool.h>)",
+          "1 byte"
+        ]
       ]
     },
     {
@@ -156,48 +184,56 @@
       "prompt": "What does return 0 from main mean?",
       "choices": {
         "A": "The program produced no output",
-        "B": "It is the exit code: 0 means success, non-zero means failure — the same convention the shell uses",
+        "B": "It is the exit code",
         "C": "It frees all memory",
         "D": "It is required syntax with no meaning"
       },
-      "correct": ["B"],
-      "explanation": "It is the same exit code you read with echo $? in the shell, which is how scripts and CI know whether your program succeeded."
+      "correct": [
+        "B"
+      ],
+      "explanation": "0 means success, non-zero means failure — the same convention the shell uses. It is the same exit code you read with echo $? in the shell, which is how scripts and CI know whether your program succeeded."
     },
     {
       "id": "cp-2",
       "prompt": "Why was gets removed from the C standard?",
       "choices": {
-        "A": "It was too slow",
-        "B": "It had no way to limit how much it read, so any input longer than the buffer wrote past the end of it",
-        "C": "It only worked on Windows",
-        "D": "It was replaced by scanf"
+        "A": "It only worked on Windows",
+        "B": "It had no way to limit how much it read",
+        "C": "It was replaced by scanf",
+        "D": "It was too slow"
       },
-      "correct": ["B"],
-      "explanation": "A function that cannot be used safely regardless of caller care. fgets takes a size, which is the whole difference."
+      "correct": [
+        "B"
+      ],
+      "explanation": "Any input longer than the buffer wrote past the end of it A function that cannot be used safely regardless of caller care. fgets takes a size, which is the whole difference."
     },
     {
       "id": "cp-3",
       "prompt": "You write printf(\"%d\\n\", someLongValue) where the value is a long. What is the situation?",
       "choices": {
-        "A": "It prints the value correctly; C converts automatically",
-        "B": "It is undefined behaviour — printf reads the argument according to the format string, so the output may be wrong or worse",
-        "C": "It is a compile error",
-        "D": "It prints zero"
+        "A": "It is undefined behaviour",
+        "B": "It prints zero",
+        "C": "It prints the value correctly; C converts automatically",
+        "D": "It is a compile error"
       },
-      "correct": ["B"],
-      "explanation": "printf trusts the format string. -Wall checks format strings against their arguments, which is why the warnings are worth turning on."
+      "correct": [
+        "A"
+      ],
+      "explanation": "Printf reads the argument according to the format string, so the output may be wrong or worse printf trusts the format string. -Wall checks format strings against their arguments, which is why the warnings are worth turning on."
     },
     {
       "id": "cp-4",
       "prompt": "Why should you use <stdint.h> types like uint32_t when the size matters?",
       "choices": {
         "A": "They are faster",
-        "B": "Because the standard only specifies minimum sizes, so int can differ between platforms — explicit types keep the layout the same everywhere",
-        "C": "They are required by -Wall",
-        "D": "They cannot overflow"
+        "B": "Because the standard only specifies minimum sizes",
+        "C": "They cannot overflow",
+        "D": "They are required by -Wall"
       },
-      "correct": ["B"],
-      "explanation": "Anything crossing a boundary — a file format, a network protocol, shared memory — needs a layout that does not depend on which machine compiled the code."
+      "correct": [
+        "B"
+      ],
+      "explanation": "Int can differ between platforms — explicit types keep the layout the same everywhere. Anything crossing a boundary — a file format, a network protocol, shared memory — needs a layout that does not depend on which machine compiled the code."
     }
   ]
 }

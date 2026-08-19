@@ -157,13 +157,13 @@
       "id": "cp-1",
       "prompt": "In one line: what is an operating system?",
       "choices": {
-        "A": "The window manager and desktop you see on screen",
-        "B": "The program that decides which other programs use the hardware, and on what terms",
-        "C": "The set of applications installed on a machine",
-        "D": "The firmware built into the motherboard"
+        "A": "The set of applications installed on a machine",
+        "B": "The firmware built into the motherboard",
+        "C": "The program that decides which other programs use the hardware, and on what terms",
+        "D": "The window manager and desktop you see on screen"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "The desktop is one visible part, and firmware sits below the OS. The defining job is arbitrating access to hardware on behalf of programs."
     },
@@ -189,15 +189,15 @@
       "id": "cp-3",
       "prompt": "Why do kernel vulnerabilities get treated more urgently than most application bugs?",
       "choices": {
-        "A": "Kernel bugs are always easier to exploit",
-        "B": "The kernel is the layer that enforces every access decision, so code running there has nothing above it saying no",
-        "C": "Kernels are written in older languages",
-        "D": "Application bugs cannot lead to data loss"
+        "A": "The kernel is the layer that enforces every access decision",
+        "B": "Kernel bugs are always easier to exploit",
+        "C": "Application bugs cannot lead to data loss",
+        "D": "Kernels are written in older languages"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "It is about position, not difficulty. Controls above the kernel depend on the kernel being trustworthy; once that assumption breaks, the controls built on it stop meaning anything."
+      "explanation": "Code running there has nothing above it saying no. It is about position, not difficulty. Controls above the kernel depend on the kernel being trustworthy; once that assumption breaks, the controls built on it stop meaning anything."
     }
   ]
 }

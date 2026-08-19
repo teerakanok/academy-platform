@@ -14,18 +14,62 @@
     },
     {
       "kind": "table",
-      "headers": ["Pattern", "Matches", "Example"],
+      "headers": [
+        "Pattern",
+        "Matches",
+        "Example"
+      ],
       "rows": [
-        [".", "Any single character", "a.c matches abc, a7c"],
-        ["*", "Zero or more of what came before", "ab*c matches ac, abc, abbc"],
-        ["+", "One or more (needs grep -E)", "ab+c matches abc but not ac"],
-        ["?", "Optional (needs grep -E)", "colou?r matches color and colour"],
-        ["^", "Start of the line", "^Jan matches lines beginning with Jan"],
-        ["$", "End of the line", "failed$ matches lines ending in failed"],
-        ["[abc]", "Any one of these characters", "[Ee]rror matches Error and error"],
-        ["[0-9]", "Any digit — [a-z] any lowercase letter", "[0-9][0-9]* matches a number"],
-        ["\\|", "Either side (grep -E: | )", "grep -E 'error|fail'"],
-        ["{2,4}", "Between 2 and 4 repeats (grep -E)", "[0-9]{3} matches exactly three digits"]
+        [
+          ".",
+          "Any single character",
+          "a.c matches abc, a7c"
+        ],
+        [
+          "*",
+          "Zero or more of what came before",
+          "ab*c matches ac, abc, abbc"
+        ],
+        [
+          "+",
+          "One or more (needs grep -E)",
+          "ab+c matches abc but not ac"
+        ],
+        [
+          "?",
+          "Optional (needs grep -E)",
+          "colou?r matches color and colour"
+        ],
+        [
+          "^",
+          "Start of the line",
+          "^Jan matches lines beginning with Jan"
+        ],
+        [
+          "$",
+          "End of the line",
+          "failed$ matches lines ending in failed"
+        ],
+        [
+          "[abc]",
+          "Any one of these characters",
+          "[Ee]rror matches Error and error"
+        ],
+        [
+          "[0-9]",
+          "Any digit — [a-z] any lowercase letter",
+          "[0-9][0-9]* matches a number"
+        ],
+        [
+          "\\|",
+          "Either side (grep -E: | )",
+          "grep -E 'error|fail'"
+        ],
+        [
+          "{2,4}",
+          "Between 2 and 4 repeats (grep -E)",
+          "[0-9]{3} matches exactly three digits"
+        ]
       ]
     },
     {
@@ -54,14 +98,35 @@
     },
     {
       "kind": "table",
-      "headers": ["Flag", "What it gives you"],
+      "headers": [
+        "Flag",
+        "What it gives you"
+      ],
       "rows": [
-        ["-n", "Line numbers — so you can go straight there in an editor"],
-        ["-r", "Search a whole directory tree"],
-        ["-o", "Print only the matching part, not the whole line"],
-        ["-A 3 / -B 3 / -C 3", "Show 3 lines after / before / around each match"],
-        ["-l", "Print only the names of files that matched"],
-        ["--include='*.conf'", "Limit a recursive search to certain files"]
+        [
+          "-n",
+          "Line numbers — so you can go straight there in an editor"
+        ],
+        [
+          "-r",
+          "Search a whole directory tree"
+        ],
+        [
+          "-o",
+          "Print only the matching part, not the whole line"
+        ],
+        [
+          "-A 3 / -B 3 / -C 3",
+          "Show 3 lines after / before / around each match"
+        ],
+        [
+          "-l",
+          "Print only the names of files that matched"
+        ],
+        [
+          "--include='*.conf'",
+          "Limit a recursive search to certain files"
+        ]
       ]
     },
     {
@@ -115,47 +180,55 @@
       "prompt": "Which pattern matches lines that begin with three digits?",
       "choices": {
         "A": "grep -E '[0-9]{3}$'",
-        "B": "grep -E '^[0-9]{3}'",
-        "C": "grep -E '[0-9]*'",
+        "B": "grep -E '[0-9]*'",
+        "C": "grep -E '^[0-9]{3}'",
         "D": "grep -E '^{3}[0-9]'"
       },
-      "correct": ["B"],
+      "correct": [
+        "C"
+      ],
       "explanation": "^ anchors to the start of the line and {3} means exactly three repeats. The first option anchors to the end instead, and the third matches almost everything because * allows zero."
     },
     {
       "id": "cp-2",
       "prompt": "You found an error line in a log but it does not explain itself. What is the quickest next step?",
       "choices": {
-        "A": "grep -c to count how often it happens",
+        "A": "grep -v to hide it",
         "B": "grep -C 3 to show the lines around it",
-        "C": "grep -l to list the file names",
-        "D": "grep -v to hide it"
+        "C": "grep -c to count how often it happens",
+        "D": "grep -l to list the file names"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Context lines show what happened immediately before and after — usually where the actual explanation is."
     },
     {
       "id": "cp-3",
       "prompt": "Why is a regular expression a poor tool for reading a JSON configuration file?",
       "choices": {
-        "A": "Patterns cannot match curly braces",
-        "B": "Patterns match shapes in text but do not understand nesting or structure, so they work on your sample and break on real data",
+        "A": "Patterns match shapes in text but do not understand nesting or structure",
+        "B": "grep cannot open .json files",
         "C": "JSON files are always too large",
-        "D": "grep cannot open .json files"
+        "D": "Patterns cannot match curly braces"
       },
-      "correct": ["B"],
-      "explanation": "Structure needs a parser. jq understands JSON nesting; a pattern only sees characters in a line."
+      "correct": [
+        "A"
+      ],
+      "explanation": "They work on your sample and break on real data. Structure needs a parser. jq understands JSON nesting; a pattern only sees characters in a line."
     },
     {
       "id": "cp-4",
       "prompt": "What does grep -oE '([0-9]{1,3}\\.){3}[0-9]{1,3}' access.log give you?",
       "choices": {
-        "A": "Every whole line that contains an IPv4-shaped address",
+        "A": "The lines that do not contain an address",
         "B": "Only the IPv4-shaped addresses themselves, one per match",
-        "C": "The number of addresses found",
-        "D": "The lines that do not contain an address"
+        "C": "Every whole line that contains an IPv4-shaped address",
+        "D": "The number of addresses found"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "-o prints just the matching portion rather than the full line, which is what makes it feedable into sort | uniq -c for counting."
     }
   ]

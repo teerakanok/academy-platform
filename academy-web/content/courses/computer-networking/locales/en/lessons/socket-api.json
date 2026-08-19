@@ -189,13 +189,13 @@
       "id": "cp-1",
       "prompt": "What does accept() return?",
       "choices": {
-        "A": "The listening socket, now connected",
-        "B": "A new descriptor for one connection, leaving the listener free to accept more",
-        "C": "The client's address only",
+        "A": "The client's address only",
+        "B": "The listening socket, now connected",
+        "C": "A new descriptor for one connection, leaving the listener free to accept more",
         "D": "The number of connections waiting"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "Treating the return value as the listener is what produces a server that handles exactly one client and then stops accepting."
     },
@@ -203,27 +203,27 @@
       "id": "cp-2",
       "prompt": "A client connects to port 8080 but reaches nothing, and the server is definitely listening. What is the first thing to check?",
       "choices": {
-        "A": "The firewall",
-        "B": "Whether htons was applied to the port — without it the bytes are in the wrong order and the port number is different",
-        "C": "The address family",
-        "D": "The backlog"
+        "A": "The backlog",
+        "B": "The firewall",
+        "C": "Whether htons was applied to the port",
+        "D": "The address family"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "It is the most common first-time bug and it fails silently: the connection goes to a real but different port, so the error says only that nothing is listening there."
+      "explanation": "Without it the bytes are in the wrong order and the port number is different. It is the most common first-time bug and it fails silently: the connection goes to a real but different port, so the error says only that nothing is listening there."
     },
     {
       "id": "cp-3",
       "prompt": "What does the second argument to listen() control?",
       "choices": {
-        "A": "The maximum number of clients the server may serve",
-        "B": "How many completed connections may queue waiting for accept()",
-        "C": "The timeout for accept",
-        "D": "The number of threads"
+        "A": "The number of threads",
+        "B": "The timeout for accept",
+        "C": "The maximum number of clients the server may serve",
+        "D": "How many completed connections may queue waiting for accept()"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "It bounds the waiting queue, not the total served. The kernel also caps it — measured as 4096 on one system — so a larger value is silently clamped."
     },
@@ -231,13 +231,13 @@
       "id": "cp-4",
       "prompt": "Restarting your server immediately after stopping it fails with 'address already in use'. What is the fix?",
       "choices": {
-        "A": "Wait several minutes",
-        "B": "Set SO_REUSEADDR before bind()",
+        "A": "Set SO_REUSEADDR before bind()",
+        "B": "Run it as root",
         "C": "Use a different port each time",
-        "D": "Run it as root"
+        "D": "Wait several minutes"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "The address is held while previously open connections finish closing. That one setsockopt call, placed before bind, removes the problem entirely."
     }

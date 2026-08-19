@@ -179,27 +179,27 @@
       "id": "cp-1",
       "prompt": "A setuid-root program calls system(\"grep ...\"). An attacker puts their own grep first in PATH. What do they achieve?",
       "choices": {
-        "A": "Nothing — system uses absolute paths",
-        "B": "Their code executes inside the privileged program's flow; modern shells drop setuid privilege, but the program's own privileged actions still happen",
+        "A": "Their code executes inside the privileged program's flow",
+        "B": "The program refuses to start",
         "C": "An immediate root shell in all cases",
-        "D": "The program refuses to start"
+        "D": "Nothing — system uses absolute paths"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "Verified: the injected file ran, reporting effective uid 1000 because the shell dropped privilege. That mitigation is real and is not a licence to use system() — the attacker still got code execution inside a privileged process."
+      "explanation": "Modern shells drop setuid privilege, but the program's own privileged actions still happen. Verified: the injected file ran, reporting effective uid 1000 because the shell dropped privilege. That mitigation is real and is not a licence to use system() — the attacker still got code execution inside a privileged process."
     },
     {
       "id": "cp-2",
       "prompt": "Why is access() followed by fopen() a security bug in a setuid program?",
       "choices": {
         "A": "access is deprecated",
-        "B": "The check and the use are separate operations on a name, and the attacker can swap what that name refers to in between",
-        "C": "fopen cannot open files owned by root",
-        "D": "access ignores ACLs"
+        "B": "access ignores ACLs",
+        "C": "The check and the use are separate operations on a name, and the attacker can swap what that name refers to in between",
+        "D": "fopen cannot open files owned by root"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "It is module three's race condition with privilege attached. The fix is not a smaller window — it is dropping privilege and performing one atomic operation."
     },
@@ -207,15 +207,15 @@
       "id": "cp-3",
       "prompt": "You add the setuid bit to a shell script owned by root. What happens when a normal user runs it?",
       "choices": {
-        "A": "It runs as root",
-        "B": "It runs as the calling user — Linux ignores the setuid bit on interpreted files",
-        "C": "It refuses to run",
-        "D": "It runs as root only if the shebang is absolute"
+        "A": "It runs as root only if the shebang is absolute",
+        "B": "It refuses to run",
+        "C": "It runs as root",
+        "D": "It runs as the calling user"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "Verified: a script with mode -rwsr-xr-x reported uid 1000. The feature was removed because the gap between reading the shebang and the interpreter opening the file could not be closed."
+      "explanation": "Linux ignores the setuid bit on interpreted files. Verified: a script with mode -rwsr-xr-x reported uid 1000. The feature was removed because the gap between reading the shebang and the interpreter opening the file could not be closed."
     },
     {
       "id": "cp-4",
@@ -223,8 +223,8 @@
       "choices": {
         "A": "Can we make it faster",
         "B": "Which single privileged ability does it actually need, and would a file capability grant just that",
-        "C": "Can we hide it from users",
-        "D": "Should it be written in a different language"
+        "C": "Should it be written in a different language",
+        "D": "Can we hide it from users"
       },
       "correct": [
         "B"

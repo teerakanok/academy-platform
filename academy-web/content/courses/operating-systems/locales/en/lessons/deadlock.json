@@ -174,13 +174,13 @@
       "id": "cp-1",
       "prompt": "Which of the four conditions is the one usually removed in practice?",
       "choices": {
-        "A": "Mutual exclusion",
-        "B": "Circular wait — by defining and following a global lock order",
-        "C": "No preemption",
-        "D": "Hold and wait"
+        "A": "No preemption",
+        "B": "Hold and wait",
+        "C": "Mutual exclusion",
+        "D": "Circular wait — by defining and following a global lock order"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "Mutual exclusion is usually the whole reason the lock exists. A consistent ordering rule is free at run time and easy to review, which is why it is the standard answer."
     },
@@ -189,12 +189,12 @@
       "prompt": "A service stops responding. It is alive, has no errors, and uses 0% CPU. What do you run first?",
       "choices": {
         "A": "strace to see the system calls",
-        "B": "gdb -p <pid> with 'thread apply all bt' to see where every thread is waiting",
-        "C": "Restart it",
-        "D": "Check disk space"
+        "B": "Check disk space",
+        "C": "gdb -p <pid> with 'thread apply all bt' to see where every thread is waiting",
+        "D": "Restart it"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "Zero CPU means nothing is executing, so a syscall trace shows nothing new. The backtrace shows the waits directly — and the cycle is usually visible immediately."
     },
@@ -203,12 +203,12 @@
       "prompt": "Can a single thread deadlock itself with a single mutex?",
       "choices": {
         "A": "No — deadlock requires at least two threads",
-        "B": "Yes — locking a non-recursive mutex it already holds makes it wait for itself",
+        "B": "Only on a single-core machine",
         "C": "Only with recursive mutexes",
-        "D": "Only on a single-core machine"
+        "D": "Yes — locking a non-recursive mutex it already holds makes it wait for itself"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "The general condition is a wait that nothing can end. Two threads and two locks is the common shape, not a requirement."
     },

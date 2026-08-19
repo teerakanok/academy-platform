@@ -48,5 +48,9 @@ echo "== ความสอดคล้องเชิงเลขคณิต�
 node "$HERE/arithmetic-consistency.mjs" || rc=1
 
 echo
+echo "== อคติของเฉลย checkpoint =="
+node "$HERE/checkpoint-answer-bias.mjs" || rc=1
+
+echo
 [ $rc -eq 0 ] && echo "ผ่านทั้งหมด" || echo "มีข้ออ้างที่ไม่ผ่าน หรือเกตบางส่วนถูกข้าม"
 exit $rc

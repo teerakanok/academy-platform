@@ -143,13 +143,13 @@
       "id": "cp-1",
       "prompt": "Why are creating a process and loading a program two separate calls instead of one?",
       "choices": {
-        "A": "For historical reasons with no practical benefit today",
-        "B": "The gap between them lets the child set up redirection, pipes, and credentials before the new program starts",
-        "C": "exec is too slow to combine with process creation",
-        "D": "Because the kernel cannot allocate memory and load a file at the same time"
+        "A": "Because the kernel cannot allocate memory and load a file at the same time",
+        "B": "exec is too slow to combine with process creation",
+        "C": "For historical reasons with no practical benefit today",
+        "D": "The gap between them lets the child set up redirection, pipes, and credentials before the new program starts"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "Everything a shell does between typing a command and running it — redirection, pipes, dropping privileges — happens in that gap, in a process that is still under your control."
     },
@@ -157,13 +157,13 @@
       "id": "cp-2",
       "prompt": "A child calls _exit(300). What does the parent read from WEXITSTATUS?",
       "choices": {
-        "A": "300",
-        "B": "44",
-        "C": "-1",
-        "D": "1"
+        "A": "44",
+        "B": "-1",
+        "C": "1",
+        "D": "300"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "Only the low 8 bits of the exit code survive, and 300 - 256 = 44. Exit codes should stay in 0-255 for this reason."
     },
@@ -171,13 +171,13 @@
       "id": "cp-3",
       "prompt": "A program prints 'Done' with printf, then forks, and the child calls exit(0). Output redirected to a file shows 'Done' twice. Why?",
       "choices": {
-        "A": "The kernel duplicated the write",
-        "B": "fork copied the unflushed stdio buffer, and the child's exit() flushed its own copy",
-        "C": "printf is not thread-safe",
-        "D": "The file was opened twice"
+        "A": "printf is not thread-safe",
+        "B": "The file was opened twice",
+        "C": "fork copied the unflushed stdio buffer, and the child's exit() flushed its own copy",
+        "D": "The kernel duplicated the write"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "The buffer is ordinary process memory, so fork copies it. Flush before forking, and have children end with _exit(), which does not flush."
     },
@@ -185,13 +185,13 @@
       "id": "cp-4",
       "prompt": "Your parent code calls WEXITSTATUS(status) without checking WIFEXITED first. When does this bite you?",
       "choices": {
-        "A": "Never — the macros are interchangeable",
-        "B": "When the child was killed by a signal, where the exit-status field holds nothing meaningful",
-        "C": "Only if the child forks again",
-        "D": "Only on 32-bit systems"
+        "A": "Only if the child forks again",
+        "B": "Only on 32-bit systems",
+        "C": "When the child was killed by a signal, where the exit-status field holds nothing meaningful",
+        "D": "Never — the macros are interchangeable"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "status is a packed value. Which fields are meaningful depends on how the child ended, so the WIF* predicate has to be checked before reading the matching value."
     }

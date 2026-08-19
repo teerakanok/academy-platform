@@ -183,40 +183,40 @@
       "prompt": "A loop creates four threads, passing &i each time. Several print the same id. Why?",
       "choices": {
         "A": "printf is not thread-safe",
-        "B": "All four received the address of the same variable, which the loop keeps changing",
-        "C": "pthread_create copies the argument",
-        "D": "The threads ran in the wrong order"
+        "B": "The threads ran in the wrong order",
+        "C": "All four received the address of the same variable",
+        "D": "pthread_create copies the argument"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "They share one variable. Give each thread its own storage — an array element, or a malloc'd copy."
+      "explanation": "The loop keeps changing. They share one variable. Give each thread its own storage — an array element, or a malloc'd copy."
     },
     {
       "id": "cp-2",
       "prompt": "A function creates a thread, passes it the address of a local, and returns immediately. What is the defect?",
       "choices": {
-        "A": "Nothing, if the thread is fast enough",
-        "B": "The local's stack frame is gone once the function returns, so the thread may read freed memory",
-        "C": "Threads cannot take pointer arguments",
-        "D": "The thread will not start"
+        "A": "The local's stack frame is gone once the function returns",
+        "B": "Nothing, if the thread is fast enough",
+        "C": "The thread will not start",
+        "D": "Threads cannot take pointer arguments"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "'Fast enough' is not a guarantee, it is a race you usually win. Join before returning, or hand the thread memory it owns."
+      "explanation": "The thread may read freed memory 'Fast enough' is not a guarantee, it is a race you usually win. Join before returning, or hand the thread memory it owns."
     },
     {
       "id": "cp-3",
       "prompt": "A server creates a joinable thread per request and never joins them. What happens over time?",
       "choices": {
         "A": "Nothing — threads clean up on exit",
-        "B": "Resources for each finished thread are retained, and the process eventually exhausts memory",
-        "C": "The scheduler slows down but memory is fine",
-        "D": "New threads silently fail to start immediately"
+        "B": "New threads silently fail to start immediately",
+        "C": "Resources for each finished thread are retained, and the process eventually exhausts memory",
+        "D": "The scheduler slows down but memory is fine"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "It is the zombie problem again: a finished joinable thread keeps its record until someone collects it. Join it, or detach it up front."
     },
@@ -225,14 +225,14 @@
       "prompt": "You run the same threaded program five times and get five different output orders. What does that tell you?",
       "choices": {
         "A": "The program is broken",
-        "B": "Nothing is guaranteeing an order — which is normal, and is exactly why shared data needs coordination",
-        "C": "The scheduler is misconfigured",
-        "D": "You need more cores"
+        "B": "The scheduler is misconfigured",
+        "C": "You need more cores",
+        "D": "Nothing is guaranteeing an order"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "Order is not part of the contract unless you create one. That is the observation the next lesson turns into a bug you can measure."
+      "explanation": "Which is normal, and is exactly why shared data needs coordination. Order is not part of the contract unless you create one. That is the observation the next lesson turns into a bug you can measure."
     }
   ]
 }

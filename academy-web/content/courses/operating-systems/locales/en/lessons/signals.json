@@ -185,15 +185,15 @@
       "id": "cp-1",
       "prompt": "Why can no program install a handler for SIGKILL?",
       "choices": {
-        "A": "It is too fast to intercept",
-        "B": "So that an administrator can always stop a process — a program that could refuse it would be unstoppable",
+        "A": "So that an administrator can always stop a process",
+        "B": "It is too fast to intercept",
         "C": "The number 9 is reserved by the C library",
         "D": "Only root-owned processes may catch it"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "It is a deliberate escape hatch for the system owner. Verified: attempting to install a handler for SIGKILL fails with 'Invalid argument', while the same call for SIGTERM succeeds."
+      "explanation": "A program that could refuse it would be unstoppable. It is a deliberate escape hatch for the system owner. Verified: attempting to install a handler for SIGKILL fails with 'Invalid argument', while the same call for SIGTERM succeeds."
     },
     {
       "id": "cp-2",
@@ -201,8 +201,8 @@
       "choices": {
         "A": "SIGCHLD",
         "B": "SIGPIPE — writing to a connection whose reader is gone, with the default action of terminating",
-        "C": "SIGSEGV",
-        "D": "SIGHUP"
+        "C": "SIGHUP",
+        "D": "SIGSEGV"
       },
       "correct": [
         "B"
@@ -214,26 +214,26 @@
       "prompt": "Why should a signal handler set a flag rather than doing the shutdown work itself?",
       "choices": {
         "A": "Handlers have a strict time limit",
-        "B": "A handler runs at an arbitrary point in your program, so only a very restricted set of operations is safe there",
+        "B": "A handler runs at an arbitrary point in your program",
         "C": "Handlers cannot access global variables",
         "D": "The kernel discards long-running handlers"
       },
       "correct": [
         "B"
       ],
-      "explanation": "It may interrupt your code between any two instructions, including in the middle of a library call. The next lesson makes that restriction concrete."
+      "explanation": "Only a very restricted set of operations is safe there. It may interrupt your code between any two instructions, including in the middle of a library call. The next lesson makes that restriction concrete."
     },
     {
       "id": "cp-4",
       "prompt": "What does SA_RESTART change?",
       "choices": {
-        "A": "It restarts the program after the handler",
-        "B": "An interrupted blocking call is resumed where possible, instead of failing with EINTR",
+        "A": "An interrupted blocking call is resumed where possible, instead of failing with EINTR",
+        "B": "It restarts the program after the handler",
         "C": "It re-registers the handler after each signal",
         "D": "It restarts the timer for periodic signals"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "Without it, a signal arriving during a blocking read makes that read fail with EINTR, and your code has to retry it by hand. With it, the kernel resumes the call where it can."
     }

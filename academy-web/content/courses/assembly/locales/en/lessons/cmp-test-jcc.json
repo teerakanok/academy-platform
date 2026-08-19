@@ -203,57 +203,57 @@
       "id": "cp-1",
       "prompt": "You see cmp edi, esi followed by jne. What did the source most likely say?",
       "choices": {
-        "A": "if (a != b)",
-        "B": "if (a == b) — the compiler jumps past the body when the condition fails, so the jump tests the opposite",
-        "C": "while (a != b)",
-        "D": "Cannot be determined"
+        "A": "Cannot be determined",
+        "B": "if (a != b)",
+        "C": "if (a == b) — the compiler jumps past the body when the condition fails",
+        "D": "while (a != b)"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "Read a conditional jump as 'skip the following block when...'. Almost every compiled if has this inversion."
+      "explanation": "The jump tests the opposite. Read a conditional jump as 'skip the following block when...'. Almost every compiled if has this inversion."
     },
     {
       "id": "cp-2",
       "prompt": "A function with two if statements compiles to sets, setg, sub and no jumps. What happened?",
       "choices": {
-        "A": "The compiler removed the conditions",
-        "B": "It used the set family: each condition became a 0-or-1 byte, and arithmetic combined them into the result",
+        "A": "The optimiser inlined a branch predictor",
+        "B": "It used the set family",
         "C": "The conditions moved into a called function",
-        "D": "The optimiser inlined a branch predictor"
+        "D": "The compiler removed the conditions"
       },
       "correct": [
         "B"
       ],
-      "explanation": "(x>0) - (x<0) gives 1, 0 or -1. An if in the source is not evidence of a branch in the binary."
+      "explanation": "Each condition became a 0-or-1 byte, and arithmetic combined them into the result (x>0) - (x<0) gives 1, 0 or -1. An if in the source is not evidence of a branch in the binary."
     },
     {
       "id": "cp-3",
       "prompt": "Why does cmp edi, 7 followed by ja correctly reject negative values as well as values above 7?",
       "choices": {
         "A": "ja checks the sign flag",
-        "B": "ja is the unsigned comparison, and a negative value read as unsigned is an enormous number, so it is above 7 too",
-        "C": "The compiler adds a separate check",
-        "D": "It does not; that is a bug"
+        "B": "It does not; that is a bug",
+        "C": "ja is the unsigned comparison, and a negative value read as unsigned is an enormous number",
+        "D": "The compiler adds a separate check"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "One unsigned comparison replaces two signed ones. It appears in nearly every optimised bounds check — and getting it wrong is how a negative index passes a length test."
+      "explanation": "It is above 7 too. One unsigned comparison replaces two signed ones. It appears in nearly every optimised bounds check — and getting it wrong is how a negative index passes a length test."
     },
     {
       "id": "cp-4",
       "prompt": "A switch over eight consecutive cases compiles to two lea instructions and a cmov, with no table. Why?",
       "choices": {
-        "A": "The compiler ran out of memory for the table",
-        "B": "The case results formed an arithmetic progression, so the compiler computed them instead of storing them",
+        "A": "The case results formed an arithmetic progression",
+        "B": "The switch was on an enum",
         "C": "Eight cases is below the table threshold",
-        "D": "The switch was on an enum"
+        "D": "The compiler ran out of memory for the table"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "A switch is a request, not an instruction. Returning 10, 20 up to 80 for inputs 0 to 7 is just 10x + 10, so no table or branch is needed."
+      "explanation": "The compiler computed them instead of storing them A switch is a request, not an instruction. Returning 10, 20 up to 80 for inputs 0 to 7 is just 10x + 10, so no table or branch is needed."
     }
   ]
 }

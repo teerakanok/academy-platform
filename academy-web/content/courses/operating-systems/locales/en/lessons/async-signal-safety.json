@@ -162,13 +162,13 @@
       "id": "cp-1",
       "prompt": "Why can printf inside a signal handler deadlock a process?",
       "choices": {
-        "A": "printf is slow and the handler times out",
-        "B": "The handler can interrupt the main flow while it holds an internal lock that printf then waits for",
-        "C": "The kernel blocks output during signal handling",
-        "D": "printf is not thread-safe"
+        "A": "The handler can interrupt the main flow while it holds an internal lock that printf then waits for",
+        "B": "The kernel blocks output during signal handling",
+        "C": "printf is not thread-safe",
+        "D": "printf is slow and the handler times out"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "printf allocates and uses stdio, both of which take locks. If the interruption happened while those locks were held, the handler waits for a lock that only the interrupted code could release — on the same thread."
     },
@@ -176,10 +176,10 @@
       "id": "cp-2",
       "prompt": "Which set is safe to call from a handler?",
       "choices": {
-        "A": "printf, malloc, exit",
+        "A": "snprintf, strerror, free",
         "B": "write, _exit, kill",
-        "C": "snprintf, strerror, free",
-        "D": "fprintf, calloc, abort"
+        "C": "fprintf, calloc, abort",
+        "D": "printf, malloc, exit"
       },
       "correct": [
         "B"
@@ -190,13 +190,13 @@
       "id": "cp-3",
       "prompt": "A service stops responding. It is not crashed, uses no CPU, and there is nothing in the logs. Which of this lesson's failures fits best?",
       "choices": {
-        "A": "A zombie child",
-        "B": "A handler that called an unsafe function and deadlocked on an internal lock",
-        "C": "A missed SIGCHLD",
-        "D": "An unhandled SIGPIPE"
+        "A": "A missed SIGCHLD",
+        "B": "An unhandled SIGPIPE",
+        "C": "A handler that called an unsafe function and deadlocked on an internal lock",
+        "D": "A zombie child"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "That combination — alive, silent, zero CPU — is the signature. A crash would leave a message and an unhandled SIGPIPE would end the process, not freeze it."
     },
@@ -205,14 +205,14 @@
       "prompt": "Why prefer signalfd in a modern server?",
       "choices": {
         "A": "It is faster",
-        "B": "Signals arrive as ordinary readable events in the event loop, so no code runs in an interrupted context and the safety restrictions do not apply",
+        "B": "Signals arrive as ordinary readable events in the event loop",
         "C": "It can catch SIGKILL",
         "D": "It removes the need to install handlers for SIGCHLD"
       },
       "correct": [
         "B"
       ],
-      "explanation": "The restriction exists because handler code runs at an arbitrary point. Move that work to a point you chose, and the restriction disappears with it."
+      "explanation": "No code runs in an interrupted context and the safety restrictions do not apply. The restriction exists because handler code runs at an arbitrary point. Move that work to a point you chose, and the restriction disappears with it."
     }
   ]
 }

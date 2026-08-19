@@ -140,48 +140,56 @@
       "prompt": "You want to see exactly what your next commit will contain. What do you run?",
       "choices": {
         "A": "git diff",
-        "B": "git diff --staged",
-        "C": "git log",
-        "D": "git status -s"
+        "B": "git log",
+        "C": "git status -s",
+        "D": "git diff --staged"
       },
-      "correct": ["B"],
+      "correct": [
+        "D"
+      ],
       "explanation": "git diff shows what is not yet staged. --staged shows the staged content, which is precisely what the commit will record."
     },
     {
       "id": "cp-2",
       "prompt": "In diff output, what does a line beginning with a single space mean?",
       "choices": {
-        "A": "It was deleted",
-        "B": "It was added",
-        "C": "It is unchanged context, shown so you can see where the change sits",
-        "D": "It has a syntax error"
+        "A": "It was added",
+        "B": "It has a syntax error",
+        "C": "It was deleted",
+        "D": "It is unchanged context, shown so you can see where the change sits"
       },
-      "correct": ["C"],
+      "correct": [
+        "D"
+      ],
       "explanation": "Only - and + lines are changes. Context lines are printed around them so the change is readable rather than floating."
     },
     {
       "id": "cp-3",
       "prompt": "Uploads started failing sometime last week. Which command narrows the search fastest?",
       "choices": {
-        "A": "git status",
-        "B": "git log --since='1 week ago' -- upload/",
-        "C": "git diff",
-        "D": "git init"
+        "A": "git init",
+        "B": "git diff",
+        "C": "git log --since='1 week ago' -- upload/",
+        "D": "git status"
       },
-      "correct": ["B"],
+      "correct": [
+        "C"
+      ],
       "explanation": "Constrain by time and by path, then open the few candidates with git show. That is the whole investigation loop."
     },
     {
       "id": "cp-4",
       "prompt": "What is git blame genuinely for?",
       "choices": {
-        "A": "Identifying who to hold responsible for a bug",
-        "B": "Finding the commit that introduced a line, so you can read its message and understand why it is that way",
-        "C": "Reverting someone else's change",
+        "A": "Reverting someone else's change",
+        "B": "Finding the commit that introduced a line",
+        "C": "Identifying who to hold responsible for a bug",
         "D": "Listing everyone who has ever contributed"
       },
-      "correct": ["B"],
-      "explanation": "It links a line to its reasoning. The most common use is checking why something odd-looking was done, before changing it and breaking whatever it was for."
+      "correct": [
+        "B"
+      ],
+      "explanation": "You can read its message and understand why it is that way. It links a line to its reasoning. The most common use is checking why something odd-looking was done, before changing it and breaking whatever it was for."
     }
   ]
 }

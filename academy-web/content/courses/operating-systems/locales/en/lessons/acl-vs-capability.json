@@ -169,26 +169,26 @@
       "prompt": "What makes a file descriptor a capability rather than an ACL entry?",
       "choices": {
         "A": "It is a number",
-        "B": "Holding it IS the authority — the permission check happened at open, and possession is what grants access afterwards",
-        "C": "It can be revoked centrally",
-        "D": "It is stored with the file"
+        "B": "It can be revoked centrally",
+        "C": "It is stored with the file",
+        "D": "Holding it IS the authority"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "It is held by the actor, it can be passed on, and it keeps working even if the file's permissions change afterwards. All three are capability properties."
+      "explanation": "The permission check happened at open, and possession is what grants access afterwards. It is held by the actor, it can be passed on, and it keeps working even if the file's permissions change afterwards. All three are capability properties."
     },
     {
       "id": "cp-2",
       "prompt": "You audit who can read a file using ls -l and see -rw-rw----+ root root. What have you missed?",
       "choices": {
-        "A": "Nothing",
-        "B": "The trailing plus means an ACL exists, and it may name users the listing does not show — run getfacl",
-        "C": "The file is a symlink",
-        "D": "The group is hidden"
+        "A": "The group is hidden",
+        "B": "Nothing",
+        "C": "The trailing plus means an ACL exists, and it may name users the listing does not show — run getfacl",
+        "D": "The file is a symlink"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "Verified: after granting a named user read-write access, ls showed only a plus while getfacl showed the entry. Access reviews based on a directory listing miss exactly this."
     },
@@ -196,29 +196,29 @@
       "id": "cp-3",
       "prompt": "Why prefer a file capability over making a binary setuid root?",
       "choices": {
-        "A": "It is faster",
-        "B": "It grants one specific right instead of all of them — measured as CapEff 2000 versus a80425fb",
-        "C": "setuid does not work on modern kernels",
-        "D": "Capabilities cannot be exploited"
+        "A": "It grants one specific right instead of all of them",
+        "B": "It is faster",
+        "C": "Capabilities cannot be exploited",
+        "D": "setuid does not work on modern kernels"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "Both programs work. The difference is what an attacker gets when one of them turns out to have a bug."
+      "explanation": "Measured as CapEff 2000 versus a80425fb. Both programs work. The difference is what an attacker gets when one of them turns out to have a bug."
     },
     {
       "id": "cp-4",
       "prompt": "Why do capability-style tokens in distributed systems almost always have an expiry?",
       "choices": {
         "A": "To reduce storage",
-        "B": "Because a capability cannot be recalled from every holder, so time-limiting it is the practical substitute for revocation",
-        "C": "To comply with encryption standards",
+        "B": "To comply with encryption standards",
+        "C": "Because a capability cannot be recalled from every holder",
         "D": "Because they are stored with the object"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "Revocation is the weak point of the capability model. If you cannot take it back, the next best thing is to make sure it stops working on its own."
+      "explanation": "Time-limiting it is the practical substitute for revocation. Revocation is the weak point of the capability model. If you cannot take it back, the next best thing is to make sure it stops working on its own."
     }
   ]
 }

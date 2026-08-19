@@ -188,27 +188,27 @@
       "id": "cp-1",
       "prompt": "A packet leaves your machine for a server on another continent. What is in the frame's destination hardware address field?",
       "choices": {
-        "A": "The server's hardware address",
-        "B": "Your gateway's hardware address — the next device on this wire",
-        "C": "The broadcast address",
-        "D": "It is left empty until the packet reaches the internet"
+        "A": "It is left empty until the packet reaches the internet",
+        "B": "The server's hardware address",
+        "C": "Your gateway's hardware address",
+        "D": "The broadcast address"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "The IP address is the final destination and never changes. The hardware address is only ever the next hop, and is rewritten by every router along the way."
+      "explanation": "The next device on this wire. The IP address is the final destination and never changes. The hardware address is only ever the next hop, and is rewritten by every router along the way."
     },
     {
       "id": "cp-2",
       "prompt": "Your ARP table contains 224.0.0.251 mapped to 01:00:5e:00:00:fb. How was that mapping obtained?",
       "choices": {
-        "A": "By an ARP query",
-        "B": "It was computed — multicast hardware addresses are 01:00:5e plus the low 23 bits of the IP",
-        "C": "From DHCP",
+        "A": "It was computed — multicast hardware addresses are 01:00:5e plus the low 23 bits of the IP",
+        "B": "From DHCP",
+        "C": "By an ARP query",
         "D": "It was configured manually"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "Verified against a live table for two different groups. Both ends can calculate the same answer, so no query is needed."
     },
@@ -216,13 +216,13 @@
       "id": "cp-3",
       "prompt": "An administrator blocks all ICMP at the firewall. Users report that small web pages load but large downloads hang. Why?",
       "choices": {
-        "A": "The firewall is dropping TCP too",
-        "B": "Type 3 code 4 — fragmentation needed — is being blocked, so senders never learn their packets are too large",
+        "A": "Type 3 code 4 — fragmentation needed — is being blocked, so senders never learn their packets are too large",
+        "B": "The connection limit was reached",
         "C": "DNS is failing",
-        "D": "The connection limit was reached"
+        "D": "The firewall is dropping TCP too"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "This is the layers lesson's MTU failure with a cause you can now name. Blocking echo requests is a defensible choice; blocking destination-unreachable is not."
     },
@@ -230,15 +230,15 @@
       "id": "cp-4",
       "prompt": "How does traceroute discover the routers along a path?",
       "choices": {
-        "A": "It asks each router for its neighbours",
-        "B": "It sends packets with hop limits of 1, 2, 3 and so on; each router that discards one reports Time Exceeded, revealing its address",
-        "C": "It reads the routing tables remotely",
-        "D": "It uses DNS records for each hop"
+        "A": "It sends packets with hop limits of 1, 2, 3 and so on",
+        "B": "It reads the routing tables remotely",
+        "C": "It uses DNS records for each hop",
+        "D": "It asks each router for its neighbours"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "The path is mapped by deliberately sending packets that cannot arrive. A router configured not to send those replies appears as a star while still forwarding traffic normally."
+      "explanation": "Each router that discards one reports. Time Exceeded, revealing its address The path is mapped by deliberately sending packets that cannot arrive. A router configured not to send those replies appears as a star while still forwarding traffic normally."
     }
   ]
 }

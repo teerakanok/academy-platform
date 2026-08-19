@@ -154,57 +154,57 @@
       "id": "cp-1",
       "prompt": "Why must q_close use broadcast rather than signal?",
       "choices": {
-        "A": "broadcast is faster",
-        "B": "Every waiting consumer must learn the queue is closed; signal wakes one and the rest sleep forever",
-        "C": "signal only works with a single mutex",
+        "A": "Every waiting consumer must learn the queue is closed",
+        "B": "signal only works with a single mutex",
+        "C": "broadcast is faster",
         "D": "broadcast flushes the queue"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "Closing is a state change that concerns all waiters, not a single item that one waiter can take."
+      "explanation": "Signal wakes one and the rest sleep forever. Closing is a state change that concerns all waiters, not a single item that one waiter can take."
     },
     {
       "id": "cp-2",
       "prompt": "A consumer waits while (count == 0) and the queue is closed with items still in it. What goes wrong?",
       "choices": {
         "A": "Nothing",
-        "B": "The consumer never learns about the close and sleeps forever, so the program hangs at exit",
-        "C": "The items are lost",
-        "D": "The mutex leaks"
+        "B": "The items are lost",
+        "C": "The mutex leaks",
+        "D": "The consumer never learns about the close and sleeps forever"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "The wait condition must include the shutdown state: while (count == 0 && !closed). Otherwise there is no event that can end the wait."
+      "explanation": "The program hangs at exit. The wait condition must include the shutdown state: while (count == 0 && !closed). Otherwise there is no event that can end the wait."
     },
     {
       "id": "cp-3",
       "prompt": "Why does the queue have two condition variables rather than one?",
       "choices": {
-        "A": "To allow more waiters",
-        "B": "Producers and consumers wait for opposite conditions; one variable would wake threads that still cannot proceed",
-        "C": "Because two mutexes are used",
-        "D": "To avoid spurious wakeups"
+        "A": "To avoid spurious wakeups",
+        "B": "To allow more waiters",
+        "C": "Producers and consumers wait for opposite conditions",
+        "D": "Because two mutexes are used"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "Same mutex, because it is the same data. Separate condition variables, because 'not full' and 'not empty' are different events."
+      "explanation": "One variable would wake threads that still cannot proceed. Same mutex, because it is the same data. Separate condition variables, because 'not full' and 'not empty' are different events."
     },
     {
       "id": "cp-4",
       "prompt": "You close the queue before joining the producers. What is the effect?",
       "choices": {
-        "A": "Nothing, if the queue is empty",
-        "B": "Consumers may exit while producers are still adding items, so work is silently lost",
-        "C": "The producers crash",
+        "A": "The producers crash",
+        "B": "Nothing, if the queue is empty",
+        "C": "Consumers may exit while producers are still adding items",
         "D": "The queue rejects further items automatically"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "Close means 'no more will arrive'. Saying that while more are still arriving makes it untrue, and consumers act on it."
+      "explanation": "Work is silently lost. Close means 'no more will arrive'. Saying that while more are still arriving makes it untrue, and consumers act on it."
     }
   ]
 }

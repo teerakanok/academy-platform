@@ -193,24 +193,24 @@
       "id": "cp-1",
       "prompt": "A summation loop compiled at -O2 contains no backward jump. What happened?",
       "choices": {
-        "A": "The optimiser unrolled it",
-        "B": "The compiler recognised the summation and substituted its closed form, so there is no loop in the binary at all",
+        "A": "The compiler made an error",
+        "B": "The optimiser unrolled it",
         "C": "The loop moved into a library call",
-        "D": "The compiler made an error"
+        "D": "The compiler recognised the summation and substituted its closed form"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "The emitted arithmetic computes (n-1)(n-2)/2 + 2n - 1, which gives 15 for n=5 and 5050 for n=100. No iteration is performed."
+      "explanation": "There is no loop in the binary at all. The emitted arithmetic computes (n-1)(n-2)/2 + 2n - 1, which gives 15 for n=5 and 5050 for n=100. No iteration is performed."
     },
     {
       "id": "cp-2",
       "prompt": "x / 10 compiles to imul by 1717986919 followed by sar 34. Why?",
       "choices": {
-        "A": "To handle negative numbers",
+        "A": "It reduces code size",
         "B": "1717986919 is 2^34 / 10 rounded up, so multiplying and shifting right by 34 divides by 10 — and division is far slower than multiplication",
-        "C": "The compiler cannot emit a division instruction",
-        "D": "It reduces code size"
+        "C": "To handle negative numbers",
+        "D": "The compiler cannot emit a division instruction"
       },
       "correct": [
         "B"
@@ -221,13 +221,13 @@
       "id": "cp-3",
       "prompt": "Which of these questions can only be answered by reading disassembly?",
       "choices": {
-        "A": "What the function is supposed to compute",
-        "B": "Whether a bounds check that appears in the source is present in the binary",
-        "C": "Which header a type is declared in",
+        "A": "Which header a type is declared in",
+        "B": "What the function is supposed to compute",
+        "C": "Whether a bounds check that appears in the source is present in the binary",
         "D": "What the function's name means"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "Undefined behaviour permits the compiler to assume a situation cannot arise and remove the corresponding check. The source still shows it; only the binary shows whether it survived."
     },
@@ -235,13 +235,13 @@
       "id": "cp-4",
       "prompt": "Why does this course use x86-64 when the architecture course used RISC-V?",
       "choices": {
-        "A": "x86-64 is simpler",
-        "B": "RISC-V's regularity made encodings and datapaths easy to see, while x86-64 is what the binaries you will actually need to read are compiled for",
-        "C": "RISC-V cannot be disassembled",
-        "D": "They are interchangeable"
+        "A": "They are interchangeable",
+        "B": "RISC-V cannot be disassembled",
+        "C": "x86-64 is simpler",
+        "D": "RISC-V's regularity made encodings and datapaths easy to see, while x86-64 is what the binaries you will actually need to read are compiled for"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "Each was chosen for its purpose: a clean architecture to learn the concepts from, and the dominant one to read real code in."
     }

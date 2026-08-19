@@ -29,13 +29,31 @@
     },
     {
       "kind": "table",
-      "headers": ["Command", "Use it when"],
+      "headers": [
+        "Command",
+        "Use it when"
+      ],
       "rows": [
-        ["cat file", "The file is short and you want all of it"],
-        ["less file", "The file is long — scroll with arrows, q to quit"],
-        ["head file", "You only need the first 10 lines"],
-        ["tail file", "You only need the last 10 lines"],
-        ["tail -f file", "The file is being written to right now and you want to watch it live"]
+        [
+          "cat file",
+          "The file is short and you want all of it"
+        ],
+        [
+          "less file",
+          "The file is long — scroll with arrows, q to quit"
+        ],
+        [
+          "head file",
+          "You only need the first 10 lines"
+        ],
+        [
+          "tail file",
+          "You only need the last 10 lines"
+        ],
+        [
+          "tail -f file",
+          "The file is being written to right now and you want to watch it live"
+        ]
       ]
     },
     {
@@ -100,36 +118,42 @@
       "id": "cp-1",
       "prompt": "You want to watch new lines appear in a log file as they are written. What do you use?",
       "choices": {
-        "A": "cat logfile",
-        "B": "tail -f logfile",
+        "A": "tail -f logfile",
+        "B": "cat logfile",
         "C": "head logfile",
         "D": "less logfile"
       },
-      "correct": ["B"],
+      "correct": [
+        "A"
+      ],
       "explanation": "tail -f follows the file, printing new lines as they arrive. The others show a snapshot and return."
     },
     {
       "id": "cp-2",
       "prompt": "What is the habit that most reliably prevents deleting the wrong thing?",
       "choices": {
-        "A": "Running rm twice to be sure",
+        "A": "Using rm without -r",
         "B": "Running ls on the exact same path first and reading the output",
         "C": "Deleting only on weekdays",
-        "D": "Using rm without -r"
+        "D": "Running rm twice to be sure"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Look-then-act. Running ls with the identical path shows you precisely what the command will affect, before it is irreversible."
     },
     {
       "id": "cp-3",
       "prompt": "Why is accidental deletion described as a security incident?",
       "choices": {
-        "A": "Because it is always caused by an attacker",
-        "B": "Because availability is part of the security triad alongside confidentiality and integrity",
-        "C": "Because deleted files can be recovered by attackers",
-        "D": "It is not — it is only an operations problem"
+        "A": "It is not — it is only an operations problem",
+        "B": "Because it is always caused by an attacker",
+        "C": "Because availability is part of the security triad alongside confidentiality and integrity",
+        "D": "Because deleted files can be recovered by attackers"
       },
-      "correct": ["B"],
+      "correct": [
+        "C"
+      ],
       "explanation": "Security covers confidentiality, integrity and availability. Data that is gone is an availability failure regardless of whether anyone acted maliciously."
     }
   ]

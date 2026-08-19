@@ -168,40 +168,40 @@
       "prompt": "Why can two threads each incrementing a counter 200,000 times end up far below 400,000?",
       "choices": {
         "A": "The scheduler drops threads",
-        "B": "Each increment is load-add-store; interleaving makes two increments overwrite each other with the same value",
-        "C": "Integer overflow",
-        "D": "The compiler removes some increments"
+        "B": "Integer overflow",
+        "C": "The compiler removes some increments",
+        "D": "Each increment is load-add-store"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "Both threads read the same starting value and both write back the same result. One update is lost every time that interleaving occurs."
+      "explanation": "Interleaving makes two increments overwrite each other with the same value. Both threads read the same starting value and both write back the same result. One update is lost every time that interleaving occurs."
     },
     {
       "id": "cp-2",
       "prompt": "The same racy program prints the exactly correct total when built with -O2. What happened?",
       "choices": {
         "A": "-O2 inserts synchronisation",
-        "B": "The optimiser replaced the whole loop with a single add, so the window for interleaving nearly disappeared — the bug is unchanged",
-        "C": "-O2 runs the threads sequentially",
-        "D": "The counter was cached in a register per thread"
+        "B": "The counter was cached in a register per thread",
+        "C": "The optimiser replaced the whole loop with a single add",
+        "D": "-O2 runs the threads sequentially"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "Verified in the generated assembly: the loop was replaced by one load, one add of 200,000, and one store. Correct output here is a property of the timing, not of the program."
+      "explanation": "The window for interleaving nearly disappeared — the bug is unchanged. Verified in the generated assembly: the loop was replaced by one load, one add of 200,000, and one store. Correct output here is a property of the timing, not of the program."
     },
     {
       "id": "cp-3",
       "prompt": "Does declaring the shared counter volatile fix the race?",
       "choices": {
-        "A": "Yes — volatile makes access atomic",
-        "B": "No — volatile constrains compiler optimisation and reordering, but load-add-store is still three separate steps",
-        "C": "Yes, on x86",
-        "D": "Only with -O0"
+        "A": "Only with -O0",
+        "B": "Yes, on x86",
+        "C": "Yes — volatile makes access atomic",
+        "D": "No — volatile constrains compiler optimisation and reordering, but load-add-store is still three separate steps"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "This is one of the most common misconceptions in concurrent programming. Measured: with volatile at -O2, eight threads still lost about three-quarters of their increments. volatile is about how the compiler may transform accesses; atomicity requires a mutex or an atomic type. Verified: switching the same counter to _Atomic long produced exactly 1,600,000 on every run."
     },
@@ -210,14 +210,14 @@
       "prompt": "Your concurrent code passes 10,000 test runs. What have you established?",
       "choices": {
         "A": "It is race-free",
-        "B": "Very little — a race with a narrow window can pass an enormous number of runs; use a tool that checks synchronisation rather than outcomes",
+        "B": "Very little — a race with a narrow window can pass an enormous number of runs",
         "C": "It is race-free on this hardware",
         "D": "It is race-free at this optimisation level"
       },
       "correct": [
         "B"
       ],
-      "explanation": "That is what thread sanitizer is for: it reports unsynchronised access to shared data whether or not the run produced a wrong answer."
+      "explanation": "Use a tool that checks synchronisation rather than outcomes. That is what thread sanitizer is for: it reports unsynchronised access to shared data whether or not the run produced a wrong answer."
     }
   ]
 }

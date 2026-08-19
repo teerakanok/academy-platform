@@ -188,27 +188,27 @@
       "id": "cp-1",
       "prompt": "What does if (x > 0); do_something(); do?",
       "choices": {
-        "A": "Calls do_something only when x is positive",
-        "B": "The semicolon is the if-body, so do_something() runs unconditionally",
-        "C": "It is a compile error",
+        "A": "The semicolon is the if-body",
+        "B": "It is a compile error",
+        "C": "Calls do_something only when x is positive",
         "D": "It calls do_something twice"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "An empty statement is a valid body. The following line is simply the next statement, regardless of the condition."
+      "explanation": "Do_something() runs unconditionally. An empty statement is a valid body. The following line is simply the next statement, regardless of the condition."
     },
     {
       "id": "cp-2",
       "prompt": "Why do C style guides insist on braces even for a single statement?",
       "choices": {
-        "A": "It compiles faster",
-        "B": "Indentation means nothing to the compiler, so a second indented line silently runs unconditionally — a real vulnerability came from exactly this",
-        "C": "Braces are required by the standard",
-        "D": "It makes the file larger, which helps debugging"
+        "A": "Braces are required by the standard",
+        "B": "It makes the file larger, which helps debugging",
+        "C": "Indentation means nothing to the compiler, so a second indented line silently runs unconditionally — a real vulnerability came from exactly this",
+        "D": "It compiles faster"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "The compiler reads structure, not layout. Braces make the two agree."
     },
@@ -216,13 +216,13 @@
       "id": "cp-3",
       "prompt": "A switch case has no break. What happens?",
       "choices": {
-        "A": "It jumps to default",
-        "B": "Execution continues into the next case — 'fall-through'",
-        "C": "The switch ends",
-        "D": "It is a compile error"
+        "A": "Execution continues into the next case — 'fall-through'",
+        "B": "It jumps to default",
+        "C": "It is a compile error",
+        "D": "The switch ends"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "Sometimes that is what you want; when it is, add a comment so the next reader knows it was intended rather than forgotten."
     },
@@ -231,14 +231,14 @@
       "prompt": "Why is a forward goto to a cleanup label accepted in C?",
       "choices": {
         "A": "It is faster than returning",
-        "B": "C has no destructors or finally block, so a single cleanup path avoids repeating free calls in every error branch — where a forgotten free hides",
-        "C": "It is required by the standard",
-        "D": "It prevents undefined behaviour"
+        "B": "It is required by the standard",
+        "C": "It prevents undefined behaviour",
+        "D": "C has no destructors or finally block"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "The alternative is duplicating cleanup in each early return, which is exactly how resource leaks get introduced."
+      "explanation": "A single cleanup path avoids repeating free calls in every error branch — where a forgotten free hides. The alternative is duplicating cleanup in each early return, which is exactly how resource leaks get introduced."
     }
   ]
 }

@@ -189,55 +189,55 @@
       "id": "cp-1",
       "prompt": "Under a traffic spike, what does a pool do that thread-per-connection does not?",
       "choices": {
-        "A": "Serve more requests per second",
-        "B": "Bound the thread count and memory, so the queue fills and applies back-pressure instead of the whole machine degrading",
-        "C": "Avoid the need for locks",
-        "D": "Eliminate connection setup cost"
+        "A": "Eliminate connection setup cost",
+        "B": "Serve more requests per second",
+        "C": "Bound the thread count and memory",
+        "D": "Avoid the need for locks"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "The benefit is predictable degradation. Thread-per-connection grows until the machine is thrashing and every request is slow; a pool keeps serving its current work and makes new work wait."
+      "explanation": "The queue fills and applies back-pressure instead of the whole machine degrading. The benefit is predictable degradation. Thread-per-connection grows until the machine is thrashing and every request is slow; a pool keeps serving its current work and makes new work wait."
     },
     {
       "id": "cp-2",
       "prompt": "Your pool has 16 workers and each request spends 90% of its time waiting on a database. Is 16 a good size?",
       "choices": {
-        "A": "Yes — it matches the core count",
-        "B": "Probably too small — most workers are blocked rather than computing, so more of them can be in flight before the CPU is the limit",
-        "C": "Too large — waiting threads waste CPU",
+        "A": "Too large — waiting threads waste CPU",
+        "B": "Yes — it matches the core count",
+        "C": "Probably too small",
         "D": "Size does not affect I/O-bound work"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "Blocked threads use no CPU. For I/O-bound work the useful pool size is well above the core count — but the number itself must come from measurement, not from a formula."
+      "explanation": "Most workers are blocked rather than computing, so more of them can be in flight before the CPU is the limit. Blocked threads use no CPU. For I/O-bound work the useful pool size is well above the core count — but the number itself must come from measurement, not from a formula."
     },
     {
       "id": "cp-3",
       "prompt": "Every worker is blocked on a database that stopped responding. What does the server look like?",
       "choices": {
         "A": "High CPU and slow responses",
-        "B": "Alive, using no CPU, accepting connections but never answering — the same signature as a deadlock",
-        "C": "It crashes",
+        "B": "It crashes",
+        "C": "Alive, using no CPU, accepting connections but never answering",
         "D": "It rejects connections immediately"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "Diagnose it the way the operating systems course taught: look at where every thread is waiting. The fix is a timeout on that call; enlarging the pool only postpones the same failure."
+      "explanation": "The same signature as a deadlock. Diagnose it the way the operating systems course taught: look at where every thread is waiting. The fix is a timeout on that call; enlarging the pool only postpones the same failure."
     },
     {
       "id": "cp-4",
       "prompt": "Why prefer a bounded queue over an unbounded one?",
       "choices": {
-        "A": "It uses less memory when idle",
-        "B": "It refuses excess work instead of accepting everything and failing later with growing memory and latency",
-        "C": "It is faster to implement",
-        "D": "Unbounded queues are not thread-safe"
+        "A": "Unbounded queues are not thread-safe",
+        "B": "It uses less memory when idle",
+        "C": "It refuses excess work instead of accepting everything and failing later with growing memory and latency",
+        "D": "It is faster to implement"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "Both designs fail under enough load; the bounded one fails predictably and at a point you chose. That is what makes back-pressure a feature rather than a limitation."
     }

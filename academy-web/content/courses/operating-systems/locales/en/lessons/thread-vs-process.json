@@ -147,26 +147,26 @@
       "prompt": "Two threads in one process each declare a local variable in their function. What is true?",
       "choices": {
         "A": "They share one copy because threads share memory",
-        "B": "Each has its own copy, because locals live on the per-thread stack",
-        "C": "Only if declared static",
+        "B": "Only if declared static",
+        "C": "Each has its own copy",
         "D": "They share it only on a single-core machine"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "The stack is the private part. Globals and the heap are shared; anything on the stack belongs to one thread."
+      "explanation": "Locals live on the per-thread stack. The stack is the private part. Globals and the heap are shared; anything on the stack belongs to one thread."
     },
     {
       "id": "cp-2",
       "prompt": "Why do browsers put tabs in separate processes despite processes being more expensive?",
       "choices": {
-        "A": "Processes are faster for rendering",
-        "B": "Isolation — a crashing thread ends its whole process, while a crashing process leaves the rest running",
+        "A": "Isolation — a crashing thread ends its whole process, while a crashing process leaves the rest running",
+        "B": "To use more CPU cores",
         "C": "Threads cannot draw to the screen",
-        "D": "To use more CPU cores"
+        "D": "Processes are faster for rendering"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "SIGSEGV is delivered to the process, so there is no such thing as one thread crashing alone. Isolation is bought with the separate address space."
     },
@@ -174,27 +174,27 @@
       "id": "cp-3",
       "prompt": "Your work items each take about 50 milliseconds. Should thread-vs-process creation cost drive the decision?",
       "choices": {
-        "A": "Yes — threads are always faster",
-        "B": "No — both creation costs are microseconds against a 50 ms item, so decide on isolation and sharing needs",
+        "A": "Only if there are more than four cores",
+        "B": "Yes — threads are always faster",
         "C": "Yes — fork is too slow for any server",
-        "D": "Only if there are more than four cores"
+        "D": "No — both creation costs are microseconds against a 50 ms item"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "A ~95 microsecond difference against 50 milliseconds is about two-tenths of one percent. When creation cost genuinely matters, the answer is a pool that creates nothing per item."
+      "explanation": "Decide on isolation and sharing needs A ~95 microsecond difference against 50 milliseconds is about two-tenths of one percent. When creation cost genuinely matters, the answer is a pool that creates nothing per item."
     },
     {
       "id": "cp-4",
       "prompt": "strace shows clone() for both fork() and pthread_create(). Why?",
       "choices": {
-        "A": "strace cannot tell them apart",
-        "B": "Both are the same kernel call with different flags controlling what the new task shares",
-        "C": "pthread_create calls fork internally",
-        "D": "It is an artefact of the C library"
+        "A": "It is an artefact of the C library",
+        "B": "pthread_create calls fork internally",
+        "C": "Both are the same kernel call with different flags controlling what the new task shares",
+        "D": "strace cannot tell them apart"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "Linux has one mechanism for creating a task and a set of flags for what it shares. 'Thread' and 'process' are two configurations of it."
     }

@@ -188,55 +188,55 @@
       "id": "cp-1",
       "prompt": "Why does a dependent pointer chase measure memory latency more honestly than a loop over an array?",
       "choices": {
-        "A": "It uses less memory",
-        "B": "Each access cannot begin until the previous one returns, so nothing overlaps and the wait cannot be hidden",
-        "C": "Arrays are stored differently",
-        "D": "It avoids the compiler"
+        "A": "Each access cannot begin until the previous one returns",
+        "B": "Arrays are stored differently",
+        "C": "It avoids the compiler",
+        "D": "It uses less memory"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "An array walk lets the processor run far ahead and prefetch, which measures throughput. The chain forces one access at a time, which is what latency means."
+      "explanation": "Nothing overlaps and the wait cannot be hidden. An array walk lets the processor run far ahead and prefetch, which measures throughput. The chain forces one access at a time, which is what latency means."
     },
     {
       "id": "cp-2",
       "prompt": "The measurement was flat at 1.92 ns from 4 KB to 128 KB and then jumped to 7.61 ns at 256 KB. What does the flat region mean?",
       "choices": {
-        "A": "The measurement was not sensitive enough",
-        "B": "Every working set in that range fit entirely in one level of cache, so every access hit at the same speed",
+        "A": "Every working set in that range fit entirely in one level of cache",
+        "B": "The measurement was not sensitive enough",
         "C": "The compiler cached the values",
         "D": "Small buffers are faster to allocate"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "The cost is flat while the data fits and steps when it stops fitting. The last flat size, 128 KB, matches the L1 the machine reports."
+      "explanation": "Every access hit at the same speed. The cost is flat while the data fits and steps when it stops fitting. The last flat size, 128 KB, matches the L1 the machine reports."
     },
     {
       "id": "cp-3",
       "prompt": "A stride sweep showed a constant cost up to 64 bytes and a jump at 128. What has been measured?",
       "choices": {
         "A": "The page size",
-        "B": "The cache line size: below it several touches share one fetched block, at and above it each touch pays for its own",
+        "B": "The prefetcher depth",
         "C": "The L1 capacity",
-        "D": "The prefetcher depth"
+        "D": "The cache line size"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "The system reports hw.cachelinesize = 128, matching the measurement made without consulting it."
+      "explanation": "Below it several touches share one fetched block, at and above it each touch pays for its own. The system reports hw.cachelinesize = 128, matching the measurement made without consulting it."
     },
     {
       "id": "cp-4",
       "prompt": "Why can an algorithm performing more operations beat one performing fewer?",
       "choices": {
-        "A": "Modern compilers remove extra operations",
-        "B": "Operation counting assumes every operation costs the same, but a memory access can cost tens of times another depending on where the data sits",
-        "C": "It cannot",
-        "D": "Only when the data is sorted"
+        "A": "Only when the data is sorted",
+        "B": "It cannot",
+        "C": "Modern compilers remove extra operations",
+        "D": "Operation counting assumes every operation costs the same, but a memory access can cost tens of times another depending on where the data sits"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "On the staircase measured here the ratio between the cheapest and most expensive access was about 87. An operation count cannot see that."
     }

@@ -99,12 +99,14 @@
       "id": "cp-1",
       "prompt": "What makes the root account different from other accounts?",
       "choices": {
-        "A": "It has a longer password",
-        "B": "It is UID 0, and the normal permission checks do not restrict it",
-        "C": "It can only log in from the console",
-        "D": "It owns every file on the system"
+        "A": "It can only log in from the console",
+        "B": "It owns every file on the system",
+        "C": "It is UID 0, and the normal permission checks do not restrict it",
+        "D": "It has a longer password"
       },
-      "correct": ["B"],
+      "correct": [
+        "C"
+      ],
       "explanation": "root is defined by UID 0. Permission checks that constrain everyone else do not constrain it, which is why it can do anything — including damage."
     },
     {
@@ -116,19 +118,25 @@
         "C": "It makes the command run faster",
         "D": "Programs you launch do not silently inherit unlimited privilege"
       },
-      "correct": ["A", "B", "D"],
+      "correct": [
+        "A",
+        "B",
+        "D"
+      ],
       "explanation": "Scope, accountability, and inheritance are the three reasons. Performance has nothing to do with it."
     },
     {
       "id": "cp-3",
       "prompt": "A file copied between two machines suddenly appears to be owned by an unfamiliar user. What is the most likely explanation?",
       "choices": {
-        "A": "The file was tampered with in transit",
+        "A": "The file lost its permissions entirely",
         "B": "Ownership is stored as a numeric UID, and that number maps to a different account name on the second machine",
-        "C": "The file lost its permissions entirely",
-        "D": "Copying always resets ownership to root"
+        "C": "Copying always resets ownership to root",
+        "D": "The file was tampered with in transit"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "The kernel stores the number, not the name. The same UID can map to different names on different machines, so the same file appears to belong to someone else."
     }
   ]

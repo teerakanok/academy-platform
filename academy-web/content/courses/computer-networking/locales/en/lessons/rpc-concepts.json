@@ -190,13 +190,13 @@
       "id": "cp-1",
       "prompt": "A remote call times out. What do you know about whether it executed?",
       "choices": {
-        "A": "It did not execute",
-        "B": "Nothing — the request may have been lost, or it may have run and the reply lost",
-        "C": "It executed but failed",
+        "A": "It executed but failed",
+        "B": "It did not execute",
+        "C": "Nothing — the request may have been lost, or it may have run and the reply lost",
         "D": "It will execute later"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "This ambiguity has no local equivalent and is the reason remote interfaces need repeatable operations or request identifiers. Retrying without one eventually performs an operation twice."
     },
@@ -204,10 +204,10 @@
       "id": "cp-2",
       "prompt": "A client fetches 100 items with 100 calls over a link with 5 ms round-trip time. Roughly how long does it take?",
       "choices": {
-        "A": "5 ms",
+        "A": "About 50 ms",
         "B": "About 500 ms — the round trip is paid once per call",
-        "C": "Depends only on the payload size",
-        "D": "About 50 ms"
+        "C": "5 ms",
+        "D": "Depends only on the payload size"
       },
       "correct": [
         "B"
@@ -218,13 +218,13 @@
       "id": "cp-3",
       "prompt": "How do you make a charge operation safe to retry?",
       "choices": {
-        "A": "Retry only once",
-        "B": "Have the caller supply a unique request id that the server records, returning the original result on a repeat",
+        "A": "Make the client check the balance first",
+        "B": "Retry only once",
         "C": "Use a longer timeout",
-        "D": "Make the client check the balance first"
+        "D": "Have the caller supply a unique request id that the server records, returning the original result on a repeat"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "The server can then tell an original from a repeat. Checking the balance first is a check-then-act race, which is the same defect as the operating systems course's TOCTOU bug."
     },
@@ -232,15 +232,15 @@
       "id": "cp-4",
       "prompt": "Why pass a deadline rather than only a timeout through a chain of calls?",
       "choices": {
-        "A": "Deadlines are more precise",
-        "B": "Each hop with its own timeout adds up, so a chain can wait far longer than the caller intended",
-        "C": "Timeouts are not supported over HTTP",
-        "D": "To synchronise clocks"
+        "A": "To synchronise clocks",
+        "B": "Deadlines are more precise",
+        "C": "Each hop with its own timeout adds up",
+        "D": "Timeouts are not supported over HTTP"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "Three hops with a 5 second timeout each can take 15 seconds. Passing the remaining budget lets each hop know how much time is actually left."
+      "explanation": "A chain can wait far longer than the caller intended. Three hops with a 5 second timeout each can take 15 seconds. Passing the remaining budget lets each hop know how much time is actually left."
     }
   ]
 }

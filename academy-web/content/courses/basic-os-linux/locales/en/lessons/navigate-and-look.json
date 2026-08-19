@@ -25,13 +25,31 @@
     },
     {
       "kind": "table",
-      "headers": ["Command", "What it adds"],
+      "headers": [
+        "Command",
+        "What it adds"
+      ],
       "rows": [
-        ["ls", "Names only"],
-        ["ls -l", "Long form: permissions, owner, size, modified time"],
-        ["ls -a", "Includes hidden entries — anything starting with a dot"],
-        ["ls -lh", "Long form with human-readable sizes (4.0K instead of 4096)"],
-        ["ls -lt", "Sorted by modification time, newest first"]
+        [
+          "ls",
+          "Names only"
+        ],
+        [
+          "ls -l",
+          "Long form: permissions, owner, size, modified time"
+        ],
+        [
+          "ls -a",
+          "Includes hidden entries — anything starting with a dot"
+        ],
+        [
+          "ls -lh",
+          "Long form with human-readable sizes (4.0K instead of 4096)"
+        ],
+        [
+          "ls -lt",
+          "Sorted by modification time, newest first"
+        ]
       ]
     },
     {
@@ -47,7 +65,9 @@
     {
       "kind": "code",
       "caption": "One line of ls -lh output",
-      "lines": ["-rw-r--r--  1  songpon  staff   2.4K  Jul 31 14:02  notes.txt"]
+      "lines": [
+        "-rw-r--r--  1  songpon  staff   2.4K  Jul 31 14:02  notes.txt"
+      ]
     },
     {
       "kind": "list",
@@ -104,36 +124,42 @@
       "id": "cp-1",
       "prompt": "Which command shows hidden files with readable sizes and full detail?",
       "choices": {
-        "A": "ls",
-        "B": "ls -lah",
-        "C": "ls -R",
-        "D": "pwd -a"
+        "A": "ls -lah",
+        "B": "ls -R",
+        "C": "pwd -a",
+        "D": "ls"
       },
-      "correct": ["B"],
+      "correct": [
+        "A"
+      ],
       "explanation": "-l gives the long form, -a includes dot-files, -h makes sizes readable. Together they are the listing you will use most."
     },
     {
       "id": "cp-2",
       "prompt": "In the listing line `drwxr-xr-x 2 songpon staff 4.0K Jul 31 14:02 reports`, what does the leading `d` tell you?",
       "choices": {
-        "A": "The entry is deleted",
-        "B": "The entry is a directory",
-        "C": "The file is a duplicate",
-        "D": "The owner has disabled the file"
+        "A": "The owner has disabled the file",
+        "B": "The entry is deleted",
+        "C": "The entry is a directory",
+        "D": "The file is a duplicate"
       },
-      "correct": ["B"],
+      "correct": [
+        "C"
+      ],
       "explanation": "The first character is the entry type: d for directory, - for a regular file, l for a symbolic link."
     },
     {
       "id": "cp-3",
       "prompt": "You are asked which configuration files changed most recently on a server. What do you run?",
       "choices": {
-        "A": "ls -lt /etc",
-        "B": "ls -a /etc",
-        "C": "pwd /etc",
-        "D": "cd /etc"
+        "A": "ls -a /etc",
+        "B": "pwd /etc",
+        "C": "cd /etc",
+        "D": "ls -lt /etc"
       },
-      "correct": ["A"],
+      "correct": [
+        "D"
+      ],
       "explanation": "-t sorts by modification time, newest first. That question comes up constantly during incident work."
     }
   ]

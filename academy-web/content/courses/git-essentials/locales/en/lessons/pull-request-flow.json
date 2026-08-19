@@ -77,11 +77,27 @@
     },
     {
       "kind": "table",
-      "headers": ["Option", "Result", "Suits"],
+      "headers": [
+        "Option",
+        "Result",
+        "Suits"
+      ],
       "rows": [
-        ["Merge commit", "Keeps every commit and records the join", "Branches whose individual commits are meaningful"],
-        ["Squash and merge", "Collapses the branch into one commit on the shared branch", "Most feature branches; keeps the shared history clean"],
-        ["Rebase and merge", "Replays the commits with no merge commit", "Teams that require a strictly linear history"]
+        [
+          "Merge commit",
+          "Keeps every commit and records the join",
+          "Branches whose individual commits are meaningful"
+        ],
+        [
+          "Squash and merge",
+          "Collapses the branch into one commit on the shared branch",
+          "Most feature branches; keeps the shared history clean"
+        ],
+        [
+          "Rebase and merge",
+          "Replays the commits with no merge commit",
+          "Teams that require a strictly linear history"
+        ]
       ]
     },
     {
@@ -140,48 +156,56 @@
       "id": "cp-1",
       "prompt": "What is a pull request, technically?",
       "choices": {
-        "A": "A Git command that requests a merge",
-        "B": "A convention provided by hosting platforms: a request to review a branch before it joins the shared work",
+        "A": "A convention provided by hosting platforms",
+        "B": "A Git command that requests a merge",
         "C": "Another name for git pull",
         "D": "A protected branch setting"
       },
-      "correct": ["B"],
-      "explanation": "Git itself has no such concept. The platform adds review, discussion, and gating around an ordinary branch."
+      "correct": [
+        "A"
+      ],
+      "explanation": "A request to review a branch before it joins the shared work. Git itself has no such concept. The platform adds review, discussion, and gating around an ordinary branch."
     },
     {
       "id": "cp-2",
       "prompt": "Why does the size of a change matter so much for review?",
       "choices": {
         "A": "Large diffs make Git slow",
-        "B": "Small changes get read line by line; large ones get skimmed and approved because a thorough review would take hours",
-        "C": "Platforms reject large pull requests",
+        "B": "Platforms reject large pull requests",
+        "C": "Small changes get read line by line",
         "D": "Large changes cannot be squashed"
       },
-      "correct": ["B"],
-      "explanation": "Review quality falls off sharply with size. Splitting a change into independently reviewable pieces gets you real review rather than a rubber stamp."
+      "correct": [
+        "C"
+      ],
+      "explanation": "Large ones get skimmed and approved because a thorough review would take hours. Review quality falls off sharply with size. Splitting a change into independently reviewable pieces gets you real review rather than a rubber stamp."
     },
     {
       "id": "cp-3",
       "prompt": "A reviewer has left comments. How should you make the requested changes?",
       "choices": {
-        "A": "Amend the original commit and force-push",
-        "B": "Add new commits and push them, so existing comments stay anchored to what they referred to",
+        "A": "Add new commits and push them",
+        "B": "Amend the original commit and force-push",
         "C": "Close the pull request and open a new one",
         "D": "Merge first and fix afterwards"
       },
-      "correct": ["B"],
-      "explanation": "Rewriting during review detaches the comments from the code they were about, and reviewers lose their place. Tidy the history before review starts, not during."
+      "correct": [
+        "A"
+      ],
+      "explanation": "Existing comments stay anchored to what they referred to. Rewriting during review detaches the comments from the code they were about, and reviewers lose their place. Tidy the history before review starts, not during."
     },
     {
       "id": "cp-4",
       "prompt": "What does forbidding force pushes on a shared branch protect against?",
       "choices": {
-        "A": "Large files being committed",
+        "A": "Merge conflicts",
         "B": "History being rewritten under everyone who already has it, silently removing commits from the shared branch",
-        "C": "Merge conflicts",
+        "C": "Large files being committed",
         "D": "Slow clones"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "It is the rule that keeps the shared history append-only, which is what makes everyone's copy trustworthy."
     }
   ]

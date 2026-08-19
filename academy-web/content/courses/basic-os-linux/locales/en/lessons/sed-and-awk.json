@@ -113,26 +113,26 @@
       "prompt": "What is the difference between sed 's/a/b/' and sed 's/a/b/g' ?",
       "choices": {
         "A": "No difference",
-        "B": "The first replaces only the first match on each line; g replaces every match on the line",
-        "C": "The first is case-insensitive",
-        "D": "g means global across all files"
+        "B": "g means global across all files",
+        "C": "The first replaces only the first match on each line",
+        "D": "The first is case-insensitive"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "g applies to every occurrence within each line. Without it, only the first occurrence on a line is replaced — a common source of surprise."
+      "explanation": "G replaces every match on the line g applies to every occurrence within each line. Without it, only the first occurrence on a line is replaced — a common source of surprise."
     },
     {
       "id": "cp-2",
       "prompt": "You are about to run a substitution across an important configuration file. What do you do first?",
       "choices": {
         "A": "Run it with -i so the change takes effect immediately",
-        "B": "Run it without -i, read the output, and only then add -i (or use -i.bak)",
+        "B": "Nothing — sed always keeps a backup",
         "C": "Copy the file to /tmp and edit there instead",
-        "D": "Nothing — sed always keeps a backup"
+        "D": "Run it without -i, read the output, and only then add -i (or use -i.bak)"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "Without -i, sed only prints what the result would be. That is the free preview. -i rewrites in place, and a wrong pattern has then already destroyed the original."
     },
@@ -141,12 +141,12 @@
       "prompt": "In awk, what does $NF refer to?",
       "choices": {
         "A": "The number of fields",
-        "B": "The last field on the line",
-        "C": "The first field",
-        "D": "The whole line"
+        "B": "The whole line",
+        "C": "The last field on the line",
+        "D": "The first field"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "NF is the number of fields, so $NF is the field at that position — the last one. $0 is the whole line."
     },
@@ -154,13 +154,13 @@
       "id": "cp-4",
       "prompt": "Which command prints the usernames of accounts with UID 1000 or higher?",
       "choices": {
-        "A": "awk -F: '$3 >= 1000 {print $1}' /etc/passwd",
-        "B": "grep 1000 /etc/passwd",
+        "A": "grep 1000 /etc/passwd",
+        "B": "awk '{print $1000}' /etc/passwd",
         "C": "sed 's/1000//' /etc/passwd",
-        "D": "awk '{print $1000}' /etc/passwd"
+        "D": "awk -F: '$3 >= 1000 {print $1}' /etc/passwd"
       },
       "correct": [
-        "A"
+        "D"
       ],
       "explanation": "-F: splits on the colon used in /etc/passwd, the condition filters on the third field (the UID), and the action prints the first field (the name)."
     }

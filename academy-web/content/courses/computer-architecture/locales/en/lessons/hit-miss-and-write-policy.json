@@ -196,10 +196,10 @@
       "id": "cp-1",
       "prompt": "Writing one byte per 128-byte line over a buffer took three times as long as writing every byte of it. Why?",
       "choices": {
-        "A": "The loop had more iterations",
+        "A": "memset uses a special instruction that is always faster",
         "B": "Write-allocate fetches each block before writing into it, while writing a complete line lets the hardware skip that fetch",
         "C": "Sparse writes are not cached",
-        "D": "memset uses a special instruction that is always faster"
+        "D": "The loop had more iterations"
       },
       "correct": [
         "B"
@@ -210,43 +210,43 @@
       "id": "cp-2",
       "prompt": "What does write-back defer, and what does it cost when the deferral ends?",
       "choices": {
-        "A": "It defers the cache update; costs a stall",
-        "B": "It defers writing to the next level until the block is evicted; the eviction then costs a write-out",
-        "C": "It defers the tag comparison",
-        "D": "Nothing is deferred"
+        "A": "It defers the tag comparison",
+        "B": "Nothing is deferred",
+        "C": "It defers the cache update; costs a stall",
+        "D": "It defers writing to the next level until the block is evicted"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "The block is marked dirty and updated only in the cache. Evicting a dirty block requires writing it out; evicting a clean one is free."
+      "explanation": "The eviction then costs a write-out. The block is marked dirty and updated only in the cache. Evicting a dirty block requires writing it out; evicting a clean one is free."
     },
     {
       "id": "cp-3",
       "prompt": "Four threads each increment their own counter and the program is 3.91x slower when the counters are adjacent. Is this a data race?",
       "choices": {
-        "A": "Yes, the counters are shared",
-        "B": "No — each thread owns its counter and both versions produce identical correct results; the cost is that the hardware transfers ownership of the whole block",
+        "A": "No — each thread owns its counter and both versions produce identical correct results",
+        "B": "No, it is a compiler bug",
         "C": "Yes, a lock is missing",
-        "D": "No, it is a compiler bug"
+        "D": "Yes, the counters are shared"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "Correctness is never in question. The block, not the variable, is the unit the hardware owns, so four private counters in one block behave like one contended location."
+      "explanation": "The cost is that the hardware transfers ownership of the whole block. Correctness is never in question. The block, not the variable, is the unit the hardware owns, so four private counters in one block behave like one contended location."
     },
     {
       "id": "cp-4",
       "prompt": "Why does read-mostly shared data scale well across many cores?",
       "choices": {
         "A": "Reads are cached and writes are not",
-        "B": "Any number of caches may hold the same block for reading simultaneously; the expense of transferring exclusive ownership begins at the first write",
+        "B": "The compiler duplicates read-only data",
         "C": "Reads do not use the cache line",
-        "D": "The compiler duplicates read-only data"
+        "D": "Any number of caches may hold the same block for reading simultaneously"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "Sharing for reading needs no ownership transfer. This is the reasoning behind per-thread counters summed at the end rather than one shared counter."
+      "explanation": "The expense of transferring exclusive ownership begins at the first write. Sharing for reading needs no ownership transfer. This is the reasoning behind per-thread counters summed at the end rather than one shared counter."
     }
   ]
 }

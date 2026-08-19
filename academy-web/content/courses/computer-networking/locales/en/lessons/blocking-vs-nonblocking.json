@@ -169,12 +169,12 @@
       "prompt": "A blocking read waits ten seconds for data. How much CPU does the thread use during that time?",
       "choices": {
         "A": "One core, spinning",
-        "B": "None — a blocked thread is not scheduled at all",
-        "C": "It depends on the timeout",
-        "D": "Half a core"
+        "B": "It depends on the timeout",
+        "C": "Half a core",
+        "D": "None — a blocked thread is not scheduled at all"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "Blocking is cheap in CPU terms. What it costs is a thread, which has a memory and switching cost — and that is what limits how many connections this model can handle."
     },
@@ -182,27 +182,27 @@
       "id": "cp-2",
       "prompt": "read() on a non-blocking socket returns -1 with errno EAGAIN. What should your code do?",
       "choices": {
-        "A": "Close the connection",
-        "B": "Treat it as 'nothing available yet' and come back later — it is not an error",
-        "C": "Retry immediately in a loop",
-        "D": "Report a failure to the user"
+        "A": "Report a failure to the user",
+        "B": "Retry immediately in a loop",
+        "C": "Treat it as 'nothing available yet' and come back later",
+        "D": "Close the connection"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "It is the normal answer when there is no data. Retrying immediately in a loop is the busy-wait mistake; the correct next step is to wait for readiness, which the next lesson covers."
+      "explanation": "It is not an error. It is the normal answer when there is no data. Retrying immediately in a loop is the busy-wait mistake; the correct next step is to wait for readiness, which the next lesson covers."
     },
     {
       "id": "cp-3",
       "prompt": "Why is setting O_NONBLOCK with fcntl(fd, F_SETFL, O_NONBLOCK) wrong?",
       "choices": {
-        "A": "O_NONBLOCK cannot be set with fcntl",
-        "B": "It replaces all the flags instead of adding one, clearing anything else that was set",
-        "C": "It needs to be done before connect",
-        "D": "It only works on files"
+        "A": "It replaces all the flags instead of adding one, clearing anything else that was set",
+        "B": "It needs to be done before connect",
+        "C": "It only works on files",
+        "D": "O_NONBLOCK cannot be set with fcntl"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "Read the current flags with F_GETFL and OR the new one in. This is a small bug that produces confusing behaviour much later."
     },
@@ -210,13 +210,13 @@
       "id": "cp-4",
       "prompt": "Your non-blocking server uses 100% of one core while idle. What is the most likely cause?",
       "choices": {
-        "A": "Too many connections",
-        "B": "It calls read in a tight loop instead of waiting for readiness",
-        "C": "A memory leak",
-        "D": "The kernel is misconfigured"
+        "A": "The kernel is misconfigured",
+        "B": "Too many connections",
+        "C": "It calls read in a tight loop instead of waiting for readiness",
+        "D": "A memory leak"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "Non-blocking mode is only half a design. Without a call that sleeps until a descriptor is ready, the program spends every cycle asking whether anything has arrived."
     }

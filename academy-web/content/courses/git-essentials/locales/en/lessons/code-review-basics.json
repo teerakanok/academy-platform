@@ -35,15 +35,39 @@
     },
     {
       "kind": "table",
-      "headers": ["Look for", "Example question"],
+      "headers": [
+        "Look for",
+        "Example question"
+      ],
       "rows": [
-        ["Correctness", "What happens when this list is empty?"],
-        ["Failure handling", "If that call times out, what does the user see?"],
-        ["Security", "Where does this value come from, and is it trusted?"],
-        ["Data safety", "Is this delete reversible? Is it scoped to one account?"],
-        ["Concurrency", "Two requests arrive together — does this still hold?"],
-        ["Readability", "Will the next person understand why, or only what?"],
-        ["Scope", "This also renames something unrelated — separate change?"]
+        [
+          "Correctness",
+          "What happens when this list is empty?"
+        ],
+        [
+          "Failure handling",
+          "If that call times out, what does the user see?"
+        ],
+        [
+          "Security",
+          "Where does this value come from, and is it trusted?"
+        ],
+        [
+          "Data safety",
+          "Is this delete reversible? Is it scoped to one account?"
+        ],
+        [
+          "Concurrency",
+          "Two requests arrive together — does this still hold?"
+        ],
+        [
+          "Readability",
+          "Will the next person understand why, or only what?"
+        ],
+        [
+          "Scope",
+          "This also renames something unrelated — separate change?"
+        ]
       ]
     },
     {
@@ -138,12 +162,14 @@
       "prompt": "What should you read first when reviewing a change?",
       "choices": {
         "A": "The largest file in the diff",
-        "B": "The description and the tests, because together they state what the change is meant to do",
+        "B": "The commit messages only",
         "C": "The style issues, to get them out of the way",
-        "D": "The commit messages only"
+        "D": "The description and the tests"
       },
-      "correct": ["B"],
-      "explanation": "Reviewing an implementation without knowing its intent means reviewing it against your own assumption. Intent comes from the description and the tests."
+      "correct": [
+        "D"
+      ],
+      "explanation": "Together they state what the change is meant to do. Reviewing an implementation without knowing its intent means reviewing it against your own assumption. Intent comes from the description and the tests."
     },
     {
       "id": "cp-2",
@@ -151,34 +177,40 @@
       "choices": {
         "A": "Platforms require it",
         "B": "So the author can tell what must change from what you merely prefer, instead of reading every comment as a demand",
-        "C": "It makes reviews shorter",
-        "D": "It hides disagreements"
+        "C": "It hides disagreements",
+        "D": "It makes reviews shorter"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Unlabelled comments force the author to guess your severity. That guessing is where most review friction comes from."
     },
     {
       "id": "cp-3",
       "prompt": "You do not understand part of a change well enough to judge it. What is the right action?",
       "choices": {
-        "A": "Approve it and trust the author",
-        "B": "Ask a question, and state which parts you did review",
+        "A": "Reject the pull request",
+        "B": "Approve it and trust the author",
         "C": "Request changes with no explanation",
-        "D": "Reject the pull request"
+        "D": "Ask a question, and state which parts you did review"
       },
-      "correct": ["B"],
+      "correct": [
+        "D"
+      ],
       "explanation": "An approval means 'I understand this and believe it is safe'. Asking, plus being honest about your coverage, is more useful than a signature you did not mean."
     },
     {
       "id": "cp-4",
       "prompt": "Which comment is more likely to improve the code?",
       "choices": {
-        "A": "This function is confusing",
-        "B": "I could not work out when the second branch runs — could you add a comment or split it?",
-        "C": "Please rewrite this properly",
-        "D": "I would have done this differently"
+        "A": "I would have done this differently",
+        "B": "Please rewrite this properly",
+        "C": "This function is confusing",
+        "D": "I could not work out when the second branch runs — could you add a comment or split it?"
       },
-      "correct": ["B"],
+      "correct": [
+        "D"
+      ],
       "explanation": "It names the specific difficulty and offers two concrete ways forward. The others describe a feeling and leave the author guessing at what to do."
     }
   ]

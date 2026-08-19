@@ -36,15 +36,39 @@
     },
     {
       "kind": "table",
-      "headers": ["Test", "True when"],
+      "headers": [
+        "Test",
+        "True when"
+      ],
       "rows": [
-        ["[ -f \"$p\" ]", "p exists and is a regular file"],
-        ["[ -d \"$p\" ]", "p exists and is a directory"],
-        ["[ -r \"$p\" ] / [ -w \"$p\" ] / [ -x \"$p\" ]", "you can read / write / execute it"],
-        ["[ -z \"$s\" ] / [ -n \"$s\" ]", "the string is empty / is not empty"],
-        ["[ \"$a\" = \"$b\" ]", "two strings are equal"],
-        ["[ \"$a\" -eq \"$b\" ]", "two numbers are equal (-lt -gt -le -ge for comparisons)"],
-        ["command", "the command itself succeeded — exit code 0"]
+        [
+          "[ -f \"$p\" ]",
+          "p exists and is a regular file"
+        ],
+        [
+          "[ -d \"$p\" ]",
+          "p exists and is a directory"
+        ],
+        [
+          "[ -r \"$p\" ] / [ -w \"$p\" ] / [ -x \"$p\" ]",
+          "you can read / write / execute it"
+        ],
+        [
+          "[ -z \"$s\" ] / [ -n \"$s\" ]",
+          "the string is empty / is not empty"
+        ],
+        [
+          "[ \"$a\" = \"$b\" ]",
+          "two strings are equal"
+        ],
+        [
+          "[ \"$a\" -eq \"$b\" ]",
+          "two numbers are equal (-lt -gt -le -ge for comparisons)"
+        ],
+        [
+          "command",
+          "the command itself succeeded — exit code 0"
+        ]
       ]
     },
     {
@@ -156,7 +180,9 @@
         "C": "[ -n \"$p\" ]",
         "D": "[ -x \"$p\" ]"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "-d tests for a directory, -f for a regular file, -n only checks that the string is not empty, and -x checks the execute permission."
     },
     {
@@ -164,36 +190,42 @@
       "prompt": "Why read lines with while read -r line rather than for line in $(cat file) ?",
       "choices": {
         "A": "for cannot read files at all",
-        "B": "The for version splits on every space, so a line containing spaces becomes several iterations",
+        "B": "for requires root",
         "C": "while is faster on large files",
-        "D": "for requires root"
+        "D": "The for version splits on every space"
       },
-      "correct": ["B"],
-      "explanation": "Word splitting again. while read takes one whole line per iteration, which is what 'for each line' actually means."
+      "correct": [
+        "D"
+      ],
+      "explanation": "A line containing spaces becomes several iterations. Word splitting again. while read takes one whole line per iteration, which is what 'for each line' actually means."
     },
     {
       "id": "cp-3",
       "prompt": "What does ${1:-/etc} mean?",
       "choices": {
-        "A": "Remove /etc from the first argument",
-        "B": "Use the first argument, or /etc if no argument was given",
-        "C": "Require the first argument to be /etc",
-        "D": "Set the first argument permanently to /etc"
+        "A": "Use the first argument, or /etc if no argument was given",
+        "B": "Require the first argument to be /etc",
+        "C": "Set the first argument permanently to /etc",
+        "D": "Remove /etc from the first argument"
       },
-      "correct": ["B"],
+      "correct": [
+        "A"
+      ],
       "explanation": "It is a default value. The script stays usable with no arguments while still accepting one."
     },
     {
       "id": "cp-4",
       "prompt": "Why send error messages with >&2 ?",
       "choices": {
-        "A": "It makes them appear in red",
-        "B": "It writes them to the error stream, so they are still visible when normal output is redirected into a file or another command",
-        "C": "It doubles the message",
+        "A": "It writes them to the error stream",
+        "B": "It doubles the message",
+        "C": "It makes them appear in red",
         "D": "It is required by bash"
       },
-      "correct": ["B"],
-      "explanation": "Output and errors are separate streams. Keeping them separate means a failure is still noticed when someone captures the normal output somewhere else."
+      "correct": [
+        "A"
+      ],
+      "explanation": "They are still visible when normal output is redirected into a file or another command. Output and errors are separate streams. Keeping them separate means a failure is still noticed when someone captures the normal output somewhere else."
     }
   ]
 }

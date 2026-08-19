@@ -165,13 +165,13 @@
       "id": "cp-1",
       "prompt": "Why does running the tests on a clean machine matter?",
       "choices": {
-        "A": "Clean machines are faster",
-        "B": "It proves the tests pass with exactly what the repository contains, rather than with whatever happens to exist on your machine",
+        "A": "It is required by Git",
+        "B": "Clean machines are faster",
         "C": "It uses less disk space",
-        "D": "It is required by Git"
+        "D": "It proves the tests pass with exactly what the repository contains, rather than with whatever happens to exist on your machine"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "It removes 'works on my machine' as an explanation, because the environment is defined by the repository and nothing else."
     },
@@ -179,24 +179,24 @@
       "id": "cp-2",
       "prompt": "A test passes locally but fails in CI. What is the most likely cause?",
       "choices": {
-        "A": "CI is unreliable",
-        "B": "Something exists on your machine that is not in the repository — an uncommitted file, a global dependency, or a local environment value",
-        "C": "The test is flaky by definition",
+        "A": "Something exists on your machine that is not in the repository",
+        "B": "The test is flaky by definition",
+        "C": "CI is unreliable",
         "D": "The workflow file is malformed"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "The clean machine has only what a fresh clone gives it. The gap between that and your machine is the bug."
+      "explanation": "An uncommitted file, a global dependency, or a local environment value. The clean machine has only what a fresh clone gives it. The gap between that and your machine is the bug."
     },
     {
       "id": "cp-3",
       "prompt": "What makes a CI check an actual gate rather than decoration?",
       "choices": {
-        "A": "Running it on every push",
+        "A": "Running it on several operating systems",
         "B": "Requiring it to pass before merging, and requiring the branch to be up to date so it runs against what will exist after the merge",
-        "C": "Sending an email when it fails",
-        "D": "Running it on several operating systems"
+        "C": "Running it on every push",
+        "D": "Sending an email when it fails"
       },
       "correct": [
         "B"
@@ -207,15 +207,15 @@
       "id": "cp-4",
       "prompt": "Where do credentials used by a workflow belong?",
       "choices": {
-        "A": "In the workflow file, since only the team can read the repository",
-        "B": "In the platform's secret store, referenced from the workflow — the workflow file itself is committed and readable",
-        "C": "In an environment file committed to the branch",
-        "D": "Passed as command-line arguments"
+        "A": "Passed as command-line arguments",
+        "B": "In the workflow file, since only the team can read the repository",
+        "C": "In the platform's secret store, referenced from the workflow",
+        "D": "In an environment file committed to the branch"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "The workflow is part of the repository. Anything sensitive placed there is committed, permanent in the history, and readable by everyone with access."
+      "explanation": "The workflow file itself is committed and readable. The workflow is part of the repository. Anything sensitive placed there is committed, permanent in the history, and readable by everyone with access."
     }
   ]
 }

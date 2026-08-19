@@ -75,14 +75,35 @@
     },
     {
       "kind": "table",
-      "headers": ["Command", "What it gives you"],
+      "headers": [
+        "Command",
+        "What it gives you"
+      ],
       "rows": [
-        ["git status", "The list of conflicted files — the only reliable to-do list"],
-        ["git diff", "During a conflict, shows the conflicting regions specifically"],
-        ["git checkout --ours <file>", "Take the receiving branch's whole file"],
-        ["git checkout --theirs <file>", "Take the incoming branch's whole file"],
-        ["git merge --abort", "Cancel the merge entirely and go back"],
-        ["git log --merge -p <file>", "The commits from both sides that touched this file"]
+        [
+          "git status",
+          "The list of conflicted files — the only reliable to-do list"
+        ],
+        [
+          "git diff",
+          "During a conflict, shows the conflicting regions specifically"
+        ],
+        [
+          "git checkout --ours <file>",
+          "Take the receiving branch's whole file"
+        ],
+        [
+          "git checkout --theirs <file>",
+          "Take the incoming branch's whole file"
+        ],
+        [
+          "git merge --abort",
+          "Cancel the merge entirely and go back"
+        ],
+        [
+          "git log --merge -p <file>",
+          "The commits from both sides that touched this file"
+        ]
       ]
     },
     {
@@ -136,48 +157,56 @@
       "id": "cp-1",
       "prompt": "In a conflicted file, what is the section between <<<<<<< HEAD and ======= ?",
       "choices": {
-        "A": "The incoming branch's version",
-        "B": "The version from the branch you are currently on",
-        "C": "The common ancestor",
-        "D": "A backup Git created"
+        "A": "A backup Git created",
+        "B": "The common ancestor",
+        "C": "The version from the branch you are currently on",
+        "D": "The incoming branch's version"
       },
-      "correct": ["B"],
+      "correct": [
+        "C"
+      ],
       "explanation": "HEAD is where you are standing. The section after ======= is what the arriving branch contains."
     },
     {
       "id": "cp-2",
       "prompt": "You start resolving a conflict and realise you do not have enough context. What is the safe move?",
       "choices": {
-        "A": "Pick 'accept theirs' for every file and move on",
-        "B": "git merge --abort, then come back when you can ask the other author",
-        "C": "Delete the branch",
+        "A": "Delete the branch",
+        "B": "Pick 'accept theirs' for every file and move on",
+        "C": "git merge --abort, then come back when you can ask the other author",
         "D": "git reset --hard origin/main"
       },
-      "correct": ["B"],
+      "correct": [
+        "C"
+      ],
       "explanation": "Abort restores the exact state from before the merge. Guessing at a resolution silently discards someone's intent, which is worse than delaying."
     },
     {
       "id": "cp-3",
       "prompt": "Which is true about resolving a conflict?",
       "choices": {
-        "A": "You must choose one side or the other",
-        "B": "The correct result is often a combination of both sides, because each was solving a different problem",
-        "C": "Git can resolve it automatically with the right flag",
-        "D": "The newest change always wins"
+        "A": "Git can resolve it automatically with the right flag",
+        "B": "You must choose one side or the other",
+        "C": "The newest change always wins",
+        "D": "The correct result is often a combination of both sides"
       },
-      "correct": ["B"],
-      "explanation": "Two people changed the same lines for different reasons. The resolution should preserve both intentions where they are compatible."
+      "correct": [
+        "D"
+      ],
+      "explanation": "Each was solving a different problem. Two people changed the same lines for different reasons. The resolution should preserve both intentions where they are compatible."
     },
     {
       "id": "cp-4",
       "prompt": "What most reliably reduces how often conflicts happen?",
       "choices": {
-        "A": "Using a graphical merge tool",
+        "A": "Committing less often",
         "B": "Keeping branches short-lived and merging the shared branch into yours regularly",
-        "C": "Committing less often",
+        "C": "Using a graphical merge tool",
         "D": "Turning off automatic formatting"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Conflicts scale with divergence. A branch that stays close to the shared branch has little to conflict with; one that runs for a month accumulates the collision in advance."
     }
   ]

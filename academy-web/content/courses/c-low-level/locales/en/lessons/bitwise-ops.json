@@ -10,14 +10,42 @@
     },
     {
       "kind": "table",
-      "headers": ["Operator", "Name", "Effect on each bit position"],
+      "headers": [
+        "Operator",
+        "Name",
+        "Effect on each bit position"
+      ],
       "rows": [
-        ["a & b", "AND", "1 only if both are 1 — used to test and to mask"],
-        ["a | b", "OR", "1 if either is 1 — used to set"],
-        ["a ^ b", "XOR", "1 if they differ — used to toggle"],
-        ["~a", "NOT", "flips every bit"],
-        ["a << n", "left shift", "moves bits up, filling with 0 — multiplies by 2^n"],
-        ["a >> n", "right shift", "moves bits down — divides by 2^n for unsigned"]
+        [
+          "a & b",
+          "AND",
+          "1 only if both are 1 — used to test and to mask"
+        ],
+        [
+          "a | b",
+          "OR",
+          "1 if either is 1 — used to set"
+        ],
+        [
+          "a ^ b",
+          "XOR",
+          "1 if they differ — used to toggle"
+        ],
+        [
+          "~a",
+          "NOT",
+          "flips every bit"
+        ],
+        [
+          "a << n",
+          "left shift",
+          "moves bits up, filling with 0 — multiplies by 2^n"
+        ],
+        [
+          "a >> n",
+          "right shift",
+          "moves bits down — divides by 2^n for unsigned"
+        ]
       ]
     },
     {
@@ -165,49 +193,57 @@
       "id": "cp-1",
       "prompt": "How do you clear a single flag while leaving the others untouched?",
       "choices": {
-        "A": "x |= FLAG",
-        "B": "x &= ~FLAG",
-        "C": "x ^= FLAG",
+        "A": "x ^= FLAG",
+        "B": "x |= FLAG",
+        "C": "x &= ~FLAG",
         "D": "x = FLAG"
       },
-      "correct": ["B"],
+      "correct": [
+        "C"
+      ],
       "explanation": "~FLAG is all ones except that bit, so AND preserves everything else and clears exactly one. XOR would toggle it, which is different when it was already clear."
     },
     {
       "id": "cp-2",
       "prompt": "Why does if (flags & MASK == 0) not do what it looks like?",
       "choices": {
-        "A": "MASK must be a constant",
-        "B": "== binds more tightly than &, so it is parsed as flags & (MASK == 0)",
-        "C": "& cannot be used in a condition",
-        "D": "It needs a cast"
+        "A": "It needs a cast",
+        "B": "& cannot be used in a condition",
+        "C": "== binds more tightly than &",
+        "D": "MASK must be a constant"
       },
-      "correct": ["B"],
-      "explanation": "Precedence. Write (flags & MASK) == 0 — and note that -Wall usually warns about exactly this."
+      "correct": [
+        "C"
+      ],
+      "explanation": "It is parsed as flags & (MASK == 0). Precedence. Write (flags & MASK) == 0 — and note that -Wall usually warns about exactly this."
     },
     {
       "id": "cp-3",
       "prompt": "Why should bit manipulation use unsigned types?",
       "choices": {
-        "A": "Unsigned is faster",
-        "B": "Signed types bring sign extension, implementation-defined right shift, and undefined overflow — none of which you want when working with bit patterns",
-        "C": "Signed types cannot be shifted at all",
-        "D": "It is required by the standard"
+        "A": "Signed types bring sign extension, implementation-defined right shift, and undefined overflow",
+        "B": "It is required by the standard",
+        "C": "Unsigned is faster",
+        "D": "Signed types cannot be shifted at all"
       },
-      "correct": ["B"],
-      "explanation": "Unsigned arithmetic is fully defined and wraps predictably, which is exactly the behaviour bit work assumes."
+      "correct": [
+        "A"
+      ],
+      "explanation": "None of which you want when working with bit patterns. Unsigned arithmetic is fully defined and wraps predictably, which is exactly the behaviour bit work assumes."
     },
     {
       "id": "cp-4",
       "prompt": "What does x & (x - 1) evaluating to zero tell you?",
       "choices": {
-        "A": "x is odd",
-        "B": "x had at most one bit set — so it is zero or a power of two",
-        "C": "x is negative",
-        "D": "x is greater than 1"
+        "A": "x is negative",
+        "B": "x is greater than 1",
+        "C": "x had at most one bit set",
+        "D": "x is odd"
       },
-      "correct": ["B"],
-      "explanation": "Subtracting one flips the lowest set bit and everything below it; ANDing clears that bit. If nothing remains, there was only one bit to begin with."
+      "correct": [
+        "C"
+      ],
+      "explanation": "So it is zero or a power of two. Subtracting one flips the lowest set bit and everything below it; ANDing clears that bit. If nothing remains, there was only one bit to begin with."
     }
   ]
 }

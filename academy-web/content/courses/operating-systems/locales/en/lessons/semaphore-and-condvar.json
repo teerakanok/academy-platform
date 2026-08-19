@@ -188,13 +188,13 @@
       "id": "cp-1",
       "prompt": "Why must pthread_cond_wait release the mutex and sleep as one indivisible step?",
       "choices": {
-        "A": "To avoid deadlock with the scheduler",
-        "B": "Otherwise a signal arriving between releasing and sleeping would be missed, and the thread would sleep forever",
-        "C": "Because the mutex is recursive",
-        "D": "To let the compiler optimise the loop"
+        "A": "To let the compiler optimise the loop",
+        "B": "Because the mutex is recursive",
+        "C": "To avoid deadlock with the scheduler",
+        "D": "Otherwise a signal arriving between releasing and sleeping would be missed, and the thread would sleep forever"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "That gap is exactly the race the atomic release-and-sleep exists to close. It is also why you must hold the mutex when you call it."
     },
@@ -202,13 +202,13 @@
       "id": "cp-2",
       "prompt": "Three threads wait on a condition variable. The producer adds one item and calls broadcast. With if instead of while, what happens?",
       "choices": {
-        "A": "Only one proceeds; the others go back to sleep",
-        "B": "All three proceed as if an item were available, and the count goes negative",
-        "C": "Two get an error",
-        "D": "broadcast blocks until all three are served"
+        "A": "Two get an error",
+        "B": "broadcast blocks until all three are served",
+        "C": "All three proceed as if an item were available, and the count goes negative",
+        "D": "Only one proceeds; the others go back to sleep"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "Verified: the count reached -2 in exactly this experiment. Waking up means 'go and check', not 'the condition holds'."
     },
@@ -216,29 +216,29 @@
       "id": "cp-3",
       "prompt": "A thread calls pthread_cond_signal while nobody is waiting. What happens to that signal?",
       "choices": {
-        "A": "It is queued for the next waiter",
-        "B": "It is lost — condition variables keep no state, which is why the pattern re-checks a state variable",
-        "C": "It causes an error",
-        "D": "It wakes the next thread that waits, within one second"
+        "A": "It causes an error",
+        "B": "It is lost — condition variables keep no state",
+        "C": "It wakes the next thread that waits, within one second",
+        "D": "It is queued for the next waiter"
       },
       "correct": [
         "B"
       ],
-      "explanation": "A semaphore would have remembered it by incrementing its count. This difference is usually what decides which one to use."
+      "explanation": "Is why the pattern re-checks a state variable A semaphore would have remembered it by incrementing its count. This difference is usually what decides which one to use."
     },
     {
       "id": "cp-4",
       "prompt": "Your worker threads wait for (queue_not_empty). At shutdown the program hangs. Why?",
       "choices": {
-        "A": "The mutex was not released",
-        "B": "Nothing ever makes the wait condition true again, so the workers sleep forever — the condition must also cover shutting down",
-        "C": "broadcast was called too early",
-        "D": "The threads were detached"
+        "A": "Nothing ever makes the wait condition true again",
+        "B": "The threads were detached",
+        "C": "The mutex was not released",
+        "D": "broadcast was called too early"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "A wait condition that only describes the happy path has no exit. Make it (queue_not_empty || shutting_down), set the flag, and broadcast."
+      "explanation": "The workers sleep forever — the condition must also cover shutting down A wait condition that only describes the happy path has no exit. Make it (queue_not_empty || shutting_down), set the flag, and broadcast."
     }
   ]
 }

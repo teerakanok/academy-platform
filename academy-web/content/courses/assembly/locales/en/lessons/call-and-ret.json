@@ -194,13 +194,13 @@
       "id": "cp-1",
       "prompt": "What does the call instruction do?",
       "choices": {
-        "A": "Jumps to the target",
-        "B": "Pushes the address of the following instruction onto the stack, then jumps to the target",
+        "A": "Pushes the address of the following instruction onto the stack, then jumps to the target",
+        "B": "Jumps to the target",
         "C": "Saves all registers, then jumps",
         "D": "Creates a stack frame"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "Everything else — frames, saved registers, argument passing — is convention layered on top of that one push and one jump."
     },
@@ -208,9 +208,9 @@
       "id": "cp-2",
       "prompt": "Measured frame addresses were 0x304869920, 0x3048698f0 and 0x3048698d0 going deeper. What does that show?",
       "choices": {
-        "A": "The stack is fragmented",
+        "A": "Each frame is 32 bytes",
         "B": "The stack grows toward lower addresses, so each nested call sits below its caller",
-        "C": "Each frame is 32 bytes",
+        "C": "The stack is fragmented",
         "D": "Address randomisation is active"
       },
       "correct": [
@@ -236,15 +236,15 @@
       "id": "cp-4",
       "prompt": "A function was tail-called. What is true of the stack while that function runs?",
       "choices": {
-        "A": "It has its own frame sitting below the caller's, as usual",
-        "B": "It reuses the caller's frame — call was replaced by jmp, so no return address for it was ever pushed and it does not appear in a backtrace",
-        "C": "Its frame is allocated on the heap instead",
-        "D": "The caller's frame is duplicated so both are visible"
+        "A": "It reuses the caller's frame",
+        "B": "The caller's frame is duplicated so both are visible",
+        "C": "It has its own frame sitting below the caller's, as usual",
+        "D": "Its frame is allocated on the heap instead"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "A call in tail position has nothing left to do after it returns, so the current frame is free to reuse. That is why a tail-called function is missing from a backtrace: no return address for it exists to walk back through. Inlining removes a function from the trace too, but by a different route — the call site disappears entirely."
+      "explanation": "Call was replaced by jmp, so no return address for it was ever pushed and it does not appear in a backtrace A call in tail position has nothing left to do after it returns, so the current frame is free to reuse. That is why a tail-called function is missing from a backtrace: no return address for it exists to walk back through. Inlining removes a function from the trace too, but by a different route — the call site disappears entirely."
     }
   ]
 }

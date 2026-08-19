@@ -239,13 +239,13 @@
       "id": "cp-1",
       "prompt": "You read mov eax, edi in Intel syntax. What happens?",
       "choices": {
-        "A": "edi = eax",
-        "B": "eax = edi — Intel writes the destination first",
-        "C": "They are exchanged",
-        "D": "It depends on the size"
+        "A": "eax = edi — Intel writes the destination first",
+        "B": "They are exchanged",
+        "C": "It depends on the size",
+        "D": "edi = eax"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "The AT&T spelling of the same instruction is movl %edi, %eax. Reading one as the other reverses every data movement in the program."
     },
@@ -253,13 +253,13 @@
       "id": "cp-2",
       "prompt": "How do you identify AT&T syntax at a glance?",
       "choices": {
-        "A": "By the square brackets",
-        "B": "By the % on every register and the $ on every constant",
-        "C": "By the presence of dword ptr",
-        "D": "By the instruction names"
+        "A": "By the presence of dword ptr",
+        "B": "By the square brackets",
+        "C": "By the instruction names",
+        "D": "By the % on every register and the $ on every constant"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "AT&T decorates registers and constants; Intel decorates nothing and uses brackets for memory instead."
     },
@@ -268,12 +268,12 @@
       "prompt": "Translate the Intel operand [rdi + 4*rsi + 12] into AT&T.",
       "choices": {
         "A": "(%rdi + 4*%rsi + 12)",
-        "B": "12(%rdi, %rsi, 4)",
-        "C": "(%rdi, %rsi, 4, 12)",
-        "D": "4(%rdi, %rsi, 12)"
+        "B": "(%rdi, %rsi, 4, 12)",
+        "C": "4(%rdi, %rsi, 12)",
+        "D": "12(%rdi, %rsi, 4)"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "The displacement goes outside the parentheses, then base, index and scale inside, in that order. Losing track of the displacement is the most common translation error."
     },
@@ -281,15 +281,15 @@
       "id": "cp-4",
       "prompt": "Why does movl $1, (%rdi) need the l suffix when mov %eax, %ebx does not?",
       "choices": {
-        "A": "Constants always need a suffix",
-        "B": "Neither a memory operand nor a constant carries a size, so without the suffix the instruction is ambiguous — with two registers the names already imply it",
-        "C": "The l means 'load'",
-        "D": "Memory operands are always 4 bytes"
+        "A": "The l means 'load'",
+        "B": "Memory operands are always 4 bytes",
+        "C": "Neither a memory operand nor a constant carries a size",
+        "D": "Constants always need a suffix"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "Intel syntax solves the identical problem with dword ptr. It is the only case where either notation is strictly required."
+      "explanation": "Without the suffix the instruction is ambiguous — with two registers the names already imply it. Intel syntax solves the identical problem with dword ptr. It is the only case where either notation is strictly required."
     }
   ]
 }

@@ -14,11 +14,31 @@
     },
     {
       "kind": "table",
-      "headers": ["Kind", "Runs", "Finds", "Cost"],
+      "headers": [
+        "Kind",
+        "Runs",
+        "Finds",
+        "Cost"
+      ],
       "rows": [
-        ["Compiler warnings", "At compile time", "Suspicious code, format mismatches, obvious mistakes", "Free"],
-        ["Sanitizers", "At runtime, on instrumented builds", "Out-of-bounds, use-after-free, leaks, undefined behaviour", "About 2x slower"],
-        ["Valgrind", "At runtime, no rebuild needed", "Similar defects, plus uninitialised reads", "10x or more slower"]
+        [
+          "Compiler warnings",
+          "At compile time",
+          "Suspicious code, format mismatches, obvious mistakes",
+          "Free"
+        ],
+        [
+          "Sanitizers",
+          "At runtime, on instrumented builds",
+          "Out-of-bounds, use-after-free, leaks, undefined behaviour",
+          "About 2x slower"
+        ],
+        [
+          "Valgrind",
+          "At runtime, no rebuild needed",
+          "Similar defects, plus uninitialised reads",
+          "10x or more slower"
+        ]
       ]
     },
     {
@@ -87,12 +107,27 @@
     },
     {
       "kind": "table",
-      "headers": ["Sanitizer", "Catches"],
+      "headers": [
+        "Sanitizer",
+        "Catches"
+      ],
       "rows": [
-        ["address", "Out-of-bounds on heap, stack and globals; use-after-free; use-after-return; double free; leaks"],
-        ["undefined", "Signed overflow, invalid shifts, misaligned access, division by zero, bad casts"],
-        ["thread", "Data races between threads — cannot be combined with address"],
-        ["memory", "Reads of uninitialised memory (Clang; requires all code instrumented)"]
+        [
+          "address",
+          "Out-of-bounds on heap, stack and globals; use-after-free; use-after-return; double free; leaks"
+        ],
+        [
+          "undefined",
+          "Signed overflow, invalid shifts, misaligned access, division by zero, bad casts"
+        ],
+        [
+          "thread",
+          "Data races between threads — cannot be combined with address"
+        ],
+        [
+          "memory",
+          "Reads of uninitialised memory (Clang; requires all code instrumented)"
+        ]
       ]
     },
     {
@@ -173,24 +208,28 @@
       "id": "cp-1",
       "prompt": "What are the three locations in an AddressSanitizer use-after-free report?",
       "choices": {
-        "A": "The stack, the heap, and the globals",
+        "A": "The compiler, the linker, and the loader",
         "B": "Where the invalid access happened, where the memory was freed, and where it was allocated",
-        "C": "The compiler, the linker, and the loader",
-        "D": "Three separate threads"
+        "C": "Three separate threads",
+        "D": "The stack, the heap, and the globals"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Those three lines usually contain the entire investigation. Read them in order and the fix is normally clear immediately."
     },
     {
       "id": "cp-2",
       "prompt": "Why should a sanitizer build never be shipped to production?",
       "choices": {
-        "A": "It is illegal",
-        "B": "It roughly doubles runtime and memory use, and its checks are diagnostic aids rather than security boundaries",
-        "C": "It cannot be compiled with -O2",
-        "D": "It disables the standard library"
+        "A": "It cannot be compiled with -O2",
+        "B": "It is illegal",
+        "C": "It disables the standard library",
+        "D": "It roughly doubles runtime and memory use, and its checks are diagnostic aids rather than security boundaries"
       },
-      "correct": ["B"],
+      "correct": [
+        "D"
+      ],
       "explanation": "Use sanitizers in development and CI. For production, use a clean warning-free build plus the platform's hardening options."
     },
     {
@@ -198,24 +237,28 @@
       "prompt": "When is Valgrind the better choice over a sanitizer?",
       "choices": {
         "A": "Always — it is more accurate",
-        "B": "When you cannot rebuild the binary, or you need uninitialised-read detection that AddressSanitizer does not provide",
-        "C": "When the program is very large",
+        "B": "When the program is very large",
+        "C": "When you cannot rebuild the binary, or you need uninitialised-read detection that AddressSanitizer does not provide",
         "D": "When you only care about leaks"
       },
-      "correct": ["B"],
+      "correct": [
+        "C"
+      ],
       "explanation": "It works on an existing binary and covers a case the address sanitizer does not, at the cost of running much more slowly."
     },
     {
       "id": "cp-4",
       "prompt": "Why put the sanitizer build in CI rather than running it when you suspect a problem?",
       "choices": {
-        "A": "It runs faster on CI machines",
-        "B": "A check that depends on someone remembering does not run; in CI it runs on every change and blocks the merge when it reports something",
+        "A": "A check that depends on someone remembering does not run",
+        "B": "It replaces the need for tests",
         "C": "CI machines have more memory",
-        "D": "It replaces the need for tests"
+        "D": "It runs faster on CI machines"
       },
-      "correct": ["B"],
-      "explanation": "The same argument as any other automated check: the value comes from it running without anyone deciding to run it."
+      "correct": [
+        "A"
+      ],
+      "explanation": "In CI it runs on every change and blocks the merge when it reports something. The same argument as any other automated check: the value comes from it running without anyone deciding to run it."
     }
   ]
 }

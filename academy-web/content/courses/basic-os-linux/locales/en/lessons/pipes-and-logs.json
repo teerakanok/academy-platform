@@ -174,13 +174,13 @@
       "id": "cp-1",
       "prompt": "What does the | symbol do?",
       "choices": {
-        "A": "Runs two commands at the same time independently",
-        "B": "Sends the output of the command on the left as the input of the command on the right",
-        "C": "Writes output to a file",
-        "D": "Comments out the rest of the line"
+        "A": "Sends the output of the command on the left as the input of the command on the right",
+        "B": "Runs two commands at the same time independently",
+        "C": "Comments out the rest of the line",
+        "D": "Writes output to a file"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "That connection is the whole idea: small single-purpose commands become an answer when chained."
     },
@@ -188,10 +188,10 @@
       "id": "cp-2",
       "prompt": "You want to append results to an existing file without destroying it. Which do you use?",
       "choices": {
-        "A": "> results.txt",
+        "A": "2> results.txt",
         "B": ">> results.txt",
-        "C": "| results.txt",
-        "D": "2> results.txt"
+        "C": "> results.txt",
+        "D": "| results.txt"
       },
       "correct": [
         "B"
@@ -202,13 +202,13 @@
       "id": "cp-3",
       "prompt": "Which pipeline answers \"which values appear most often, highest first\"?",
       "choices": {
-        "A": "sort | uniq -c | sort -rn",
-        "B": "uniq | wc -l",
+        "A": "sort -rn | grep -c",
+        "B": "sort | uniq -c | sort -rn",
         "C": "grep -v | head",
-        "D": "sort -rn | grep -c"
+        "D": "uniq | wc -l"
       },
       "correct": [
-        "A"
+        "B"
       ],
       "explanation": "uniq only collapses adjacent duplicates, so you sort first, count with uniq -c, then sort numerically in reverse to rank them."
     },
@@ -216,13 +216,13 @@
       "id": "cp-4",
       "prompt": "On a Debian or Ubuntu machine, where do you look for failed login attempts?",
       "choices": {
-        "A": "/etc/passwd",
-        "B": "/tmp/logins",
-        "C": "/var/log/auth.log",
-        "D": "/usr/bin/auth"
+        "A": "/usr/bin/auth",
+        "B": "/var/log/auth.log",
+        "C": "/tmp/logins",
+        "D": "/etc/passwd"
       },
       "correct": [
-        "C"
+        "B"
       ],
       "explanation": "Authentication events — logins, failures, and sudo use — go to /var/log/auth.log. /etc/passwd lists accounts, which is a different question."
     },
@@ -230,13 +230,13 @@
       "id": "cp-5",
       "prompt": "Why is a pipeline often preferable to finding a purpose-built tool for the same question?",
       "choices": {
-        "A": "Pipelines always run faster",
-        "B": "Each stage is simple and replaceable, so a change in the data means editing one stage rather than needing a different tool — and it works on any machine without installing anything",
-        "C": "Purpose-built tools cannot read log files",
-        "D": "Pipelines do not require permissions"
+        "A": "Pipelines do not require permissions",
+        "B": "Purpose-built tools cannot read log files",
+        "C": "Pipelines always run faster",
+        "D": "Each stage is simple and replaceable, so a change in the data means editing one stage rather than needing a different tool — and it works on any machine without installing anything"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "Composability and availability. The commands are already on the machine, and adapting the pipeline is a smaller change than adopting new software."
     }

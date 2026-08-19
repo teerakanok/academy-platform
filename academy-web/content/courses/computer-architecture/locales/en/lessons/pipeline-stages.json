@@ -147,27 +147,27 @@
       "id": "cp-1",
       "prompt": "A 5-stage pipeline is running. How long does one instruction take from fetch to write-back?",
       "choices": {
-        "A": "One cycle",
-        "B": "Five cycles — its latency is unchanged; what improved is how often instructions complete",
+        "A": "It depends on the instruction",
+        "B": "Five cycles — its latency is unchanged",
         "C": "Five cycles divided by five",
-        "D": "It depends on the instruction"
+        "D": "One cycle"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Pipelining improves throughput, not latency. One instruction completes per cycle because five are in progress at once, not because any single one got faster."
+      "explanation": "What improved is how often instructions complete. Pipelining improves throughput, not latency. One instruction completes per cycle because five are in progress at once, not because any single one got faster."
     },
     {
       "id": "cp-2",
       "prompt": "Why does a 5-stage pipeline give only 3.6x on 10 instructions but 4.98x on 1000?",
       "choices": {
-        "A": "Short programs have worse cache behaviour",
-        "B": "The four cycles spent filling the pipeline are a large fraction of a short run and negligible in a long one",
-        "C": "The clock slows for short runs",
-        "D": "Ten instructions cannot fill five stages"
+        "A": "The clock slows for short runs",
+        "B": "Ten instructions cannot fill five stages",
+        "C": "Short programs have worse cache behaviour",
+        "D": "The four cycles spent filling the pipeline are a large fraction of a short run and negligible in a long one"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "4 + 10 against 50 is 3.6x; 4 + 1000 against 5000 is 4.98x. The same pipeline, with the fixed fill cost amortised differently."
     },
@@ -175,10 +175,10 @@
       "id": "cp-3",
       "prompt": "Why did processor designs stop pursuing ever-deeper pipelines?",
       "choices": {
-        "A": "Manufacturing limits",
+        "A": "Deeper pipelines need more registers",
         "B": "A deeper pipeline discards more work when a branch is predicted wrongly, and that cost grows faster than the clock gain",
         "C": "Compilers could not keep up",
-        "D": "Deeper pipelines need more registers"
+        "D": "Manufacturing limits"
       },
       "correct": [
         "B"
@@ -189,15 +189,15 @@
       "id": "cp-4",
       "prompt": "Why must instruction memory and data memory be separate paths in a pipelined design?",
       "choices": {
-        "A": "They store different things",
-        "B": "Fetch and the memory stage occur in the same cycle for different instructions, so both need memory access simultaneously",
+        "A": "Fetch and the memory stage occur in the same cycle for different instructions",
+        "B": "Data memory is slower",
         "C": "For security isolation",
-        "D": "Data memory is slower"
+        "D": "They store different things"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "Two stages needing the same hardware in the same cycle would force one to wait. Separate paths — which in practice means separate first-level caches — remove that conflict."
+      "explanation": "Both need memory access simultaneously. Two stages needing the same hardware in the same cycle would force one to wait. Separate paths — which in practice means separate first-level caches — remove that conflict."
     }
   ]
 }

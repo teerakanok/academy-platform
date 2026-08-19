@@ -64,12 +64,27 @@
     },
     {
       "kind": "table",
-      "headers": ["Name", "Reads as"],
+      "headers": [
+        "Name",
+        "Reads as"
+      ],
       "rows": [
-        ["fix/login-timeout", "A fix, and you can tell what it fixes"],
-        ["feature/bulk-upload", "A feature, and its scope is obvious"],
-        ["chore/update-deps", "Maintenance, no behaviour change expected"],
-        ["test", "Nobody knows what this is or whether it can be deleted"]
+        [
+          "fix/login-timeout",
+          "A fix, and you can tell what it fixes"
+        ],
+        [
+          "feature/bulk-upload",
+          "A feature, and its scope is obvious"
+        ],
+        [
+          "chore/update-deps",
+          "Maintenance, no behaviour change expected"
+        ],
+        [
+          "test",
+          "Nobody knows what this is or whether it can be deleted"
+        ]
       ]
     },
     {
@@ -128,48 +143,56 @@
       "prompt": "What is a Git branch, technically?",
       "choices": {
         "A": "A copy of the project files in a separate folder",
-        "B": "A moveable pointer to a single commit, which advances as you commit",
-        "C": "A compressed archive of the history",
-        "D": "A directory inside .git containing your changed files"
+        "B": "A directory inside .git containing your changed files",
+        "C": "A moveable pointer to a single commit",
+        "D": "A compressed archive of the history"
       },
-      "correct": ["B"],
-      "explanation": "That is why branching is instant regardless of project size: Git writes one commit id, it does not duplicate the working tree."
+      "correct": [
+        "C"
+      ],
+      "explanation": "Advances as you commit. That is why branching is instant regardless of project size: Git writes one commit id, it does not duplicate the working tree."
     },
     {
       "id": "cp-2",
       "prompt": "Why did modern Git introduce switch and restore instead of using checkout for everything?",
       "choices": {
         "A": "checkout was removed from Git",
-        "B": "checkout did two unrelated jobs — changing branches and discarding file changes — so people destroyed work by accident",
+        "B": "checkout did two unrelated jobs",
         "C": "switch is faster",
         "D": "restore works offline and checkout does not"
       },
-      "correct": ["B"],
-      "explanation": "One word covering both 'move me' and 'throw away my edits' is a design that produces mistakes. Two names remove the ambiguity."
+      "correct": [
+        "B"
+      ],
+      "explanation": "Changing branches and discarding file changes — so people destroyed work by accident. One word covering both 'move me' and 'throw away my edits' is a design that produces mistakes. Two names remove the ambiguity."
     },
     {
       "id": "cp-3",
       "prompt": "You have half-finished work and an urgent fix arrives. Which is the best option for work you will return to within the hour?",
       "choices": {
-        "A": "git stash push, handle the fix, then git stash pop",
-        "B": "Discard the work and start over later",
-        "C": "Commit it to main with the message 'wip'",
-        "D": "Copy the folder somewhere else"
+        "A": "Copy the folder somewhere else",
+        "B": "Commit it to main with the message 'wip'",
+        "C": "git stash push, handle the fix, then git stash pop",
+        "D": "Discard the work and start over later"
       },
-      "correct": ["A"],
+      "correct": [
+        "C"
+      ],
       "explanation": "Stash is designed for exactly this: minutes to hours. For anything longer, a commit on a branch is safer because it is visible and has a message."
     },
     {
       "id": "cp-4",
       "prompt": "What does git branch -d refuse to do, and why does that matter?",
       "choices": {
-        "A": "It refuses to delete the current branch only",
-        "B": "It refuses to delete a branch holding commits that are not merged anywhere, so you do not silently discard work",
+        "A": "It refuses to delete a branch holding commits that are not merged anywhere",
+        "B": "It refuses to delete the current branch only",
         "C": "It refuses to delete branches created today",
         "D": "It refuses when the branch has been pushed"
       },
-      "correct": ["B"],
-      "explanation": "-d is the safe delete. -D overrides that check, which is why it should be a deliberate decision rather than a reflex."
+      "correct": [
+        "A"
+      ],
+      "explanation": "You do not silently discard work -d is the safe delete. -D overrides that check, which is why it should be a deliberate decision rather than a reflex."
     }
   ]
 }

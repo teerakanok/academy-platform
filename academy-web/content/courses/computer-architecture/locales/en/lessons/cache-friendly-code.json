@@ -225,12 +225,12 @@
       "prompt": "Row order and column order over the same matrix differed by 58x. What is the mechanism?",
       "choices": {
         "A": "Column order performs more arithmetic",
-        "B": "Row order uses all 128 bytes of each fetched block, while column order uses 4 and then jumps a whole row away, wasting most of every fetch and defeating prefetching",
-        "C": "The compiler vectorises row order only",
-        "D": "Column order allocates more memory"
+        "B": "The compiler vectorises row order only",
+        "C": "Column order allocates more memory",
+        "D": "Row order uses all 128 bytes of each fetched block, while column order uses 4 and then jumps a whole row away, wasting most of every fetch and defeating prefetching"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "The effective bandwidths, 37 GB/s against 0.6 GB/s, say it from the other side: both were fetching hard, only one was fetching data it would use."
     },
@@ -239,42 +239,42 @@
       "prompt": "Tiling improved up to a 16x16 tile and got worse for larger tiles. What does that shape indicate?",
       "choices": {
         "A": "A compiler limit",
-        "B": "A cache-size effect: past a certain tile size the tile's working set no longer stays resident while it is reused",
+        "B": "A cache-size effect",
         "C": "Larger tiles have more arithmetic",
         "D": "Random measurement noise"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Improving, peaking, then declining is the characteristic shape. The practical lesson is to find the peak by measurement rather than by reasoning about which level it should fit in."
+      "explanation": "Past a certain tile size the tile's working set no longer stays resident while it is reused. Improving, peaking, then declining is the characteristic shape. The practical lesson is to find the peak by measurement rather than by reasoning about which level it should fit in."
     },
     {
       "id": "cp-3",
       "prompt": "Splitting an array of 80-byte structures into separate field arrays reduced bytes fetched roughly tenfold but gave only 1.16 to 1.38x. Why?",
       "choices": {
         "A": "The measurement was faulty",
-        "B": "The access was sequential, so prefetching and plentiful bandwidth made the extra volume cheap — volume matters much less than order on this hardware",
-        "C": "The structures were already in cache",
+        "B": "The structures were already in cache",
+        "C": "The access was sequential",
         "D": "The compiler merged the two versions"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "Both versions stream predictably. The hardware has ample warning and ample bandwidth, so ten times the traffic cost only about a third more time."
+      "explanation": "Prefetching and plentiful bandwidth made the extra volume cheap — volume matters much less than order on this hardware. Both versions stream predictably. The hardware has ample warning and ample bandwidth, so ten times the traffic cost only about a third more time."
     },
     {
       "id": "cp-4",
       "prompt": "What is the ranking these three experiments support, and what is the caveat?",
       "choices": {
-        "A": "Volume, then order, then residency; universally true",
-        "B": "Order of access, then residency, then volume — and the ranking follows from the hardware, so it must be re-checked on the target machine",
-        "C": "Residency, then volume, then order; true for all C programs",
-        "D": "They cannot be ranked"
+        "A": "They cannot be ranked",
+        "B": "Residency, then volume, then order; true for all C programs",
+        "C": "Order of access, then residency, then volume",
+        "D": "Volume, then order, then residency; universally true"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "58x, 5.9x and 1.3x give the ranking. A machine with less bandwidth would raise the importance of volume, which is why the numbers must be reproduced where the code will run."
+      "explanation": "And the ranking follows from the hardware, so it must be re-checked on the target machine 58x, 5.9x and 1.3x give the ranking. A machine with less bandwidth would raise the importance of volume, which is why the numbers must be reproduced where the code will run."
     }
   ]
 }

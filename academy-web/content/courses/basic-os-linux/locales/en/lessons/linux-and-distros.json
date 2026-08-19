@@ -18,12 +18,32 @@
     },
     {
       "kind": "table",
-      "headers": ["Distro family", "Package tool", "Typically chosen when"],
+      "headers": [
+        "Distro family",
+        "Package tool",
+        "Typically chosen when"
+      ],
       "rows": [
-        ["Debian / Ubuntu", "apt", "You want the biggest pool of documentation and answers"],
-        ["RHEL / Rocky / Fedora", "dnf", "The organisation wants vendor support and long support windows"],
-        ["Alpine", "apk", "You want the smallest possible container image"],
-        ["Arch", "pacman", "You want the newest software and will accept maintenance work"]
+        [
+          "Debian / Ubuntu",
+          "apt",
+          "You want the biggest pool of documentation and answers"
+        ],
+        [
+          "RHEL / Rocky / Fedora",
+          "dnf",
+          "The organisation wants vendor support and long support windows"
+        ],
+        [
+          "Alpine",
+          "apk",
+          "You want the smallest possible container image"
+        ],
+        [
+          "Arch",
+          "pacman",
+          "You want the newest software and will accept maintenance work"
+        ]
       ]
     },
     {
@@ -87,24 +107,28 @@
       "id": "cp-1",
       "prompt": "Strictly speaking, what is \"Linux\"?",
       "choices": {
-        "A": "A complete operating system including its desktop and applications",
-        "B": "The kernel — the core that manages hardware and enforces access",
-        "C": "A brand owned by a single company",
-        "D": "A package manager"
+        "A": "A brand owned by a single company",
+        "B": "A package manager",
+        "C": "The kernel — the core that manages hardware and enforces access",
+        "D": "A complete operating system including its desktop and applications"
       },
-      "correct": ["B"],
+      "correct": [
+        "C"
+      ],
       "explanation": "Linux is the kernel. The complete systems people install are distributions, which bundle the kernel with tools, defaults, and a package manager."
     },
     {
       "id": "cp-2",
       "prompt": "Why is running a distribution past its end-of-support date risky?",
       "choices": {
-        "A": "The machine stops booting on that date",
-        "B": "Applications are deleted automatically",
+        "A": "Applications are deleted automatically",
+        "B": "The machine stops booting on that date",
         "C": "Security updates stop arriving, and nothing visibly changes to warn you",
         "D": "The filesystem becomes read-only"
       },
-      "correct": ["C"],
+      "correct": [
+        "C"
+      ],
       "explanation": "Nothing dramatic happens on the day. The system keeps working while quietly accumulating unpatched vulnerabilities — which is precisely why it gets missed."
     },
     {
@@ -116,7 +140,9 @@
         "C": "whoami",
         "D": "df -h"
       },
-      "correct": ["A"],
+      "correct": [
+        "A"
+      ],
       "explanation": "/etc/os-release is the standard file for this. whoami shows the current user and df shows disk usage — useful, but not this."
     }
   ]

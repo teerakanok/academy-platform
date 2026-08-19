@@ -176,41 +176,41 @@
       "id": "cp-1",
       "prompt": "What does undefined behaviour mean in C?",
       "choices": {
-        "A": "The result varies between platforms but is always one of a few values",
-        "B": "The standard imposes no requirement at all, so the compiler may do anything — including assuming the situation never occurs",
+        "A": "The standard imposes no requirement at all",
+        "B": "The behaviour is decided by the operating system",
         "C": "The program always crashes",
-        "D": "The behaviour is decided by the operating system"
+        "D": "The result varies between platforms but is always one of a few values"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "That last part is what makes it dangerous: the optimiser is entitled to rewrite code based on the assumption that undefined behaviour never happens."
+      "explanation": "The compiler may do anything — including assuming the situation never occurs. That last part is what makes it dangerous: the optimiser is entitled to rewrite code based on the assumption that undefined behaviour never happens."
     },
     {
       "id": "cp-2",
       "prompt": "Why can an overflow check written as if (sum < a) be removed by the compiler?",
       "choices": {
-        "A": "Because the comparison is inefficient",
-        "B": "Because signed overflow is undefined, so the compiler may assume it never happened — making the condition always false",
-        "C": "Because sum and a have different types",
-        "D": "It cannot be removed; that would be a compiler bug"
+        "A": "Because signed overflow is undefined",
+        "B": "Because the comparison is inefficient",
+        "C": "It cannot be removed; that would be a compiler bug",
+        "D": "Because sum and a have different types"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "The check only matters in a case the standard says cannot occur. Check before the operation, or use unsigned arithmetic where wrapping is defined."
+      "explanation": "The compiler may assume it never happened — making the condition always false. The check only matters in a case the standard says cannot occur. Check before the operation, or use unsigned arithmetic where wrapping is defined."
     },
     {
       "id": "cp-3",
       "prompt": "Which of these has defined behaviour?",
       "choices": {
-        "A": "Signed integer overflow",
-        "B": "Unsigned integer overflow, which wraps around",
+        "A": "Unsigned integer overflow, which wraps around",
+        "B": "Signed integer overflow",
         "C": "Reading one element past the end of an array",
         "D": "Using a pointer after free"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "Unsigned arithmetic is defined to wrap modulo 2^N. The other three are undefined, which is why they can appear to work and then stop."
     },
@@ -218,15 +218,15 @@
       "id": "cp-4",
       "prompt": "You add -fsanitize=address and the program now reports an error at line 7. What did you learn?",
       "choices": {
-        "A": "The sanitizer introduced a bug",
-        "B": "The bug was always there — the sanitizer added the checking that C does not do by default, and named the exact location",
-        "C": "The program is too slow to run normally",
-        "D": "The compiler version is wrong"
+        "A": "The bug was always there",
+        "B": "The compiler version is wrong",
+        "C": "The sanitizer introduced a bug",
+        "D": "The program is too slow to run normally"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "The instrumentation makes invalid access visible at the moment it happens, instead of leaving it to corrupt something elsewhere and surface later."
+      "explanation": "The sanitizer added the checking that C does not do by default, and named the exact location. The instrumentation makes invalid access visible at the moment it happens, instead of leaving it to corrupt something elsewhere and surface later."
     }
   ]
 }

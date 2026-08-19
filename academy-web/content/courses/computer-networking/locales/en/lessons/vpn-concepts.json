@@ -184,13 +184,13 @@
       "id": "cp-1",
       "prompt": "Why do large file transfers often hang over a VPN while small requests work?",
       "choices": {
-        "A": "The VPN throttles large transfers",
-        "B": "The tunnel's outer header reduces the usable packet size, and the MTU problem from the layers lesson appears",
-        "C": "Encryption is slower for large data",
-        "D": "The gateway limits connection duration"
+        "A": "The gateway limits connection duration",
+        "B": "The VPN throttles large transfers",
+        "C": "The tunnel's outer header reduces the usable packet size, and the MTU problem from the layers lesson appears",
+        "D": "Encryption is slower for large data"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "Same failure signature as before: small things work, large things hang. The tunnel headers are why the effective size shrank, which is why VPNs are where this is most commonly met."
     },
@@ -198,29 +198,29 @@
       "id": "cp-2",
       "prompt": "You connect to a plain http site through a VPN. Who can read the content?",
       "choices": {
-        "A": "Nobody — the VPN encrypts it",
-        "B": "Anyone on the path between the VPN gateway and the site — the tunnel only protects the first segment",
-        "C": "Only your internet provider",
+        "A": "Only your internet provider",
+        "B": "Anyone on the path between the VPN gateway and the site",
+        "C": "Nobody — the VPN encrypts it",
         "D": "Only the site"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Tunnel encryption and end-to-end encryption protect different segments. Past the gateway the traffic continues exactly as it otherwise would."
+      "explanation": "The tunnel only protects the first segment. Tunnel encryption and end-to-end encryption protect different segments. Past the gateway the traffic continues exactly as it otherwise would."
     },
     {
       "id": "cp-3",
       "prompt": "What is the technical difference between a full tunnel and a split tunnel?",
       "choices": {
         "A": "The encryption strength",
-        "B": "Which routes are installed: a full tunnel adds a default route through the tunnel, a split tunnel adds only specific ones",
+        "B": "Which routes are installed",
         "C": "The number of connections",
         "D": "Whether DNS is included"
       },
       "correct": [
         "B"
       ],
-      "explanation": "It is entirely a routing decision, and you can watch it happen in ip route. The longest-prefix rule then does the rest."
+      "explanation": "A full tunnel adds a default route through the tunnel, a split tunnel adds only specific ones. It is entirely a routing decision, and you can watch it happen in ip route. The longest-prefix rule then does the rest."
     },
     {
       "id": "cp-4",
@@ -228,8 +228,8 @@
       "choices": {
         "A": "It makes you anonymous online",
         "B": "It moves who can observe your traffic from your local network and provider to the VPN provider",
-        "C": "It protects against malware",
-        "D": "It encrypts traffic all the way to every site"
+        "C": "It encrypts traffic all the way to every site",
+        "D": "It protects against malware"
       },
       "correct": [
         "B"

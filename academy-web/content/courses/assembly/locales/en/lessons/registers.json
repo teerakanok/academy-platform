@@ -176,13 +176,13 @@
       "id": "cp-1",
       "prompt": "rax holds all ones. After mov eax, 0x11111111, what is rax?",
       "choices": {
-        "A": "0xffffffff11111111",
-        "B": "0x0000000011111111 — a 32-bit write zeroes the upper 32 bits",
-        "C": "0x11111111ffffffff",
+        "A": "0x0000000011111111 — a 32-bit write zeroes the upper 32 bits",
+        "B": "0x11111111ffffffff",
+        "C": "0xffffffff11111111",
         "D": "Unchanged above the low 32 bits"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "Measured by running it. The zeroing is deliberate: it removes the dependency on whatever previously wrote the register."
     },
@@ -191,12 +191,12 @@
       "prompt": "rax holds all ones. After mov al, 0x33, what is rax?",
       "choices": {
         "A": "0x0000000000000033",
-        "B": "0xffffffffffffff33 — 8-bit writes preserve everything above them",
-        "C": "0x00000033",
-        "D": "Undefined"
+        "B": "Undefined",
+        "C": "0xffffffffffffff33 — 8-bit writes preserve everything above them",
+        "D": "0x00000033"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "The asymmetry with the 32-bit case is the point: narrow writes keep compatibility with much older code, at the cost of a dependency on the old value."
     },
@@ -204,24 +204,24 @@
       "id": "cp-3",
       "prompt": "You see a value moved into rdx immediately before a call. What is it, under the System V ABI?",
       "choices": {
-        "A": "The return value",
-        "B": "The third argument — the order is rdi, rsi, rdx, rcx, r8, r9",
-        "C": "A saved register",
-        "D": "The stack pointer"
+        "A": "A saved register",
+        "B": "The stack pointer",
+        "C": "The return value",
+        "D": "The third argument"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "Memorising that order turns disassembly from a puzzle into reading. Windows x64 uses rcx, rdx, r8, r9, which is the first thing to check when the reading stops making sense."
+      "explanation": "The order is rdi, rsi, rdx, rcx, r8, r9. Memorising that order turns disassembly from a puzzle into reading. Windows x64 uses rcx, rdx, r8, r9, which is the first thing to check when the reading stops making sense."
     },
     {
       "id": "cp-4",
       "prompt": "Why do compilers emit xor eax, eax instead of mov eax, 0?",
       "choices": {
-        "A": "mov cannot take a zero",
+        "A": "It is faster on old processors only",
         "B": "It is shorter, the 32-bit write clears all 64 bits, and the processor recognises it as a zeroing idiom that breaks the dependency on the old value",
-        "C": "It sets flags differently in a useful way",
-        "D": "It is faster on old processors only"
+        "C": "mov cannot take a zero",
+        "D": "It sets flags differently in a useful way"
       },
       "correct": [
         "B"

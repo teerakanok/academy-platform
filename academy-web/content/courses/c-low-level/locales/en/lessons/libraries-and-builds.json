@@ -27,14 +27,42 @@
     },
     {
       "kind": "table",
-      "headers": ["", "Static (.a)", "Dynamic (.so / .dylib / .dll)"],
+      "headers": [
+        "",
+        "Static (.a)",
+        "Dynamic (.so / .dylib / .dll)"
+      ],
       "rows": [
-        ["Joined", "At link time, copied into your binary", "At run time, by the loader"],
-        ["Binary size", "Larger", "Smaller"],
-        ["Library update", "Requires relinking your program", "Takes effect on next run"],
-        ["Deployment", "One self-contained file", "The library must be present on the target"],
-        ["Security patching", "Every dependent binary must be rebuilt", "Patch once, all users pick it up"],
-        ["Typical use", "Containers, embedded, tools shipped as one file", "System packages, shared platform libraries"]
+        [
+          "Joined",
+          "At link time, copied into your binary",
+          "At run time, by the loader"
+        ],
+        [
+          "Binary size",
+          "Larger",
+          "Smaller"
+        ],
+        [
+          "Library update",
+          "Requires relinking your program",
+          "Takes effect on next run"
+        ],
+        [
+          "Deployment",
+          "One self-contained file",
+          "The library must be present on the target"
+        ],
+        [
+          "Security patching",
+          "Every dependent binary must be rebuilt",
+          "Patch once, all users pick it up"
+        ],
+        [
+          "Typical use",
+          "Containers, embedded, tools shipped as one file",
+          "System packages, shared platform libraries"
+        ]
       ]
     },
     {
@@ -157,48 +185,56 @@
       "id": "cp-1",
       "prompt": "A security fix is released for a library your programs use. Which linking choice makes that easier to deploy?",
       "choices": {
-        "A": "Static — the fix is already inside each binary",
-        "B": "Dynamic — update the library package once and every program picks it up on next run",
-        "C": "It makes no difference",
-        "D": "Static, because it is faster"
+        "A": "Dynamic — update the library package once and every program picks it up on next run",
+        "B": "Static, because it is faster",
+        "C": "Static — the fix is already inside each binary",
+        "D": "It makes no difference"
       },
-      "correct": ["B"],
+      "correct": [
+        "A"
+      ],
       "explanation": "With static linking every dependent binary embeds its own copy, so each one must be found and rebuilt. This is the main operational argument for dynamic linking."
     },
     {
       "id": "cp-2",
       "prompt": "Your Makefile recipe line starts with spaces and make reports a missing separator. Why?",
       "choices": {
-        "A": "The compiler is missing",
-        "B": "Recipe lines must begin with a real tab character; make treats spaces as a syntax error",
+        "A": "Recipe lines must begin with a real tab character",
+        "B": "The compiler is missing",
         "C": "The target name is wrong",
         "D": "The file needs a .PHONY declaration"
       },
-      "correct": ["B"],
-      "explanation": "It is the classic first Makefile error, and editors that convert tabs to spaces cause it repeatedly."
+      "correct": [
+        "A"
+      ],
+      "explanation": "Make treats spaces as a syntax error. It is the classic first Makefile error, and editors that convert tabs to spaces cause it repeatedly."
     },
     {
       "id": "cp-3",
       "prompt": "You edit a header and make rebuilds nothing. What is missing?",
       "choices": {
         "A": ".PHONY on the target",
-        "B": "Header dependency tracking — add -MMD -MP and include the generated .d files",
-        "C": "A clean target",
+        "B": "A clean target",
+        "C": "Header dependency tracking",
         "D": "The -l flag"
       },
-      "correct": ["B"],
-      "explanation": "Without it, make only knows that an object depends on its .c file. That gap is why people fall back on running make clean whenever something looks wrong."
+      "correct": [
+        "C"
+      ],
+      "explanation": "Add -MMD -MP and include the generated .d files. Without it, make only knows that an object depends on its .c file. That gap is why people fall back on running make clean whenever something looks wrong."
     },
     {
       "id": "cp-4",
       "prompt": "What does ldd ./prog tell you?",
       "choices": {
-        "A": "Which source files were compiled",
-        "B": "Which shared libraries the binary needs at run time, and whether the loader can find them",
-        "C": "The size of each function",
-        "D": "Whether the program has memory leaks"
+        "A": "The size of each function",
+        "B": "Which source files were compiled",
+        "C": "Whether the program has memory leaks",
+        "D": "Which shared libraries the binary needs at run time, and whether the loader can find them"
       },
-      "correct": ["B"],
+      "correct": [
+        "D"
+      ],
       "explanation": "A 'not found' line means the program will fail to start on that machine — which is exactly the deployment problem static linking avoids."
     }
   ]

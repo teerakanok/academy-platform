@@ -52,14 +52,35 @@
     },
     {
       "kind": "table",
-      "headers": ["Question", "Where the answer is"],
+      "headers": [
+        "Question",
+        "Where the answer is"
+      ],
       "rows": [
-        ["Who owns this memory?", "The comment on the function that returns it, or the free at the end of the caller"],
-        ["What can be NULL here?", "The guard clauses at the top of each function"],
-        ["Where does untrusted data enter?", "read, recv, fgets, argv, and anything reading a file"],
-        ["What are the bounds on this loop?", "The length parameter, and where it came from"],
-        ["What happens on failure?", "The error paths — and whether they free what they acquired"],
-        ["What is this struct's lifetime?", "Where it is created and where it is destroyed"]
+        [
+          "Who owns this memory?",
+          "The comment on the function that returns it, or the free at the end of the caller"
+        ],
+        [
+          "What can be NULL here?",
+          "The guard clauses at the top of each function"
+        ],
+        [
+          "Where does untrusted data enter?",
+          "read, recv, fgets, argv, and anything reading a file"
+        ],
+        [
+          "What are the bounds on this loop?",
+          "The length parameter, and where it came from"
+        ],
+        [
+          "What happens on failure?",
+          "The error paths — and whether they free what they acquired"
+        ],
+        [
+          "What is this struct's lifetime?",
+          "Where it is created and where it is destroyed"
+        ]
       ]
     },
     {
@@ -91,13 +112,37 @@
     },
     {
       "kind": "table",
-      "headers": ["If you are heading toward", "What you already have", "What to add"],
+      "headers": [
+        "If you are heading toward",
+        "What you already have",
+        "What to add"
+      ],
       "rows": [
-        ["Systems programming", "Memory model, pointers, the build", "Processes, threads, syscalls — the Operating Systems course"],
-        ["Network programming", "Buffers, byte order, bounded reads", "Sockets and protocols — the Networking course"],
-        ["Reverse engineering and malware analysis", "The memory model and what compiled C looks like", "Assembly, disassembly, and dynamic analysis"],
-        ["Vulnerability research", "The defect classes and the tools that find them", "Fuzzing, exploitation primitives, and mitigations"],
-        ["Embedded work", "Fixed-width types, bit manipulation, static allocation", "Hardware interfaces and real-time constraints"]
+        [
+          "Systems programming",
+          "Memory model, pointers, the build",
+          "Processes, threads, syscalls — the Operating Systems course"
+        ],
+        [
+          "Network programming",
+          "Buffers, byte order, bounded reads",
+          "Sockets and protocols — the Networking course"
+        ],
+        [
+          "Reverse engineering and malware analysis",
+          "The memory model and what compiled C looks like",
+          "Assembly, disassembly, and dynamic analysis"
+        ],
+        [
+          "Vulnerability research",
+          "The defect classes and the tools that find them",
+          "Fuzzing, exploitation primitives, and mitigations"
+        ],
+        [
+          "Embedded work",
+          "Fixed-width types, bit manipulation, static allocation",
+          "Hardware interfaces and real-time constraints"
+        ]
       ]
     },
     {
@@ -147,48 +192,56 @@
       "id": "cp-1",
       "prompt": "What is the first thing to do with an unfamiliar C project?",
       "choices": {
-        "A": "Read every file alphabetically",
-        "B": "Build it — a project you cannot build cannot be experimented with, and the build reveals its dependencies",
+        "A": "Build it — a project you cannot build cannot be experimented with, and the build reveals its dependencies",
+        "B": "Run a static analyser",
         "C": "Rewrite the parts you dislike",
-        "D": "Run a static analyser"
+        "D": "Read every file alphabetically"
       },
-      "correct": ["B"],
+      "correct": [
+        "A"
+      ],
       "explanation": "Everything else in the method depends on being able to compile, run, and modify the code."
     },
     {
       "id": "cp-2",
       "prompt": "Why read headers before implementations?",
       "choices": {
-        "A": "They are shorter",
-        "B": "They are the intended interface, written to be read — they tell you what the module offers before you see how it does it",
-        "C": "They contain the tests",
-        "D": "Implementations are usually generated"
+        "A": "They are the intended interface, written to be read",
+        "B": "They contain the tests",
+        "C": "Implementations are usually generated",
+        "D": "They are shorter"
       },
-      "correct": ["B"],
-      "explanation": "The header is the module's public shape. Reading it first gives you the map that makes the implementation navigable."
+      "correct": [
+        "A"
+      ],
+      "explanation": "They tell you what the module offers before you see how it does it. The header is the module's public shape. Reading it first gives you the map that makes the implementation navigable."
     },
     {
       "id": "cp-3",
       "prompt": "You grep a codebase and find fifty uses of memcpy. What have you found?",
       "choices": {
         "A": "Fifty vulnerabilities",
-        "B": "Fifty questions — for each one, where does the length come from and can an attacker influence it?",
-        "C": "Nothing; memcpy is safe",
+        "B": "Nothing; memcpy is safe",
+        "C": "Fifty questions — for each one, where does the length come from and can an attacker influence it?",
         "D": "Fifty places to replace with strcpy"
       },
-      "correct": ["B"],
+      "correct": [
+        "C"
+      ],
       "explanation": "memcpy is bounded only if the length is correct. The grep gives you a list to examine, not a list of defects."
     },
     {
       "id": "cp-4",
       "prompt": "Which single question has this course kept returning to?",
       "choices": {
-        "A": "Is this code fast enough?",
+        "A": "Is this portable to Windows?",
         "B": "Where does this size or index come from, and who checked it?",
-        "C": "Should this be a macro or a function?",
-        "D": "Is this portable to Windows?"
+        "C": "Is this code fast enough?",
+        "D": "Should this be a macro or a function?"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Buffers, allocations, loops, parsing, integer conversions — every defect class in this course is a version of that question going unanswered."
     }
   ]

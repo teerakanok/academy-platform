@@ -164,13 +164,13 @@
       "id": "cp-1",
       "prompt": "A routing table has both 10.0.0.0/8 and 10.5.0.0/16. Which does a packet for 10.5.1.1 use?",
       "choices": {
-        "A": "10.0.0.0/8, because it appears first",
-        "B": "10.5.0.0/16 — the longest matching prefix always wins",
-        "C": "Both, in turn",
-        "D": "Whichever has the lower metric"
+        "A": "Both, in turn",
+        "B": "Whichever has the lower metric",
+        "C": "10.0.0.0/8, because it appears first",
+        "D": "10.5.0.0/16 — the longest matching prefix always wins"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "Specificity decides, not order. That is what makes it possible to add a narrow exception to a broad route without reordering anything."
     },
@@ -178,27 +178,27 @@
       "id": "cp-2",
       "prompt": "traceroute shows a star at hop 3 but replies at hops 4 through 8. What does that tell you?",
       "choices": {
-        "A": "Packets are being lost at hop 3",
-        "B": "Hop 3 declined to send the reply traceroute needs; traffic is passing through it fine",
-        "C": "The route changed mid-trace",
-        "D": "Hop 3 is offline"
+        "A": "The route changed mid-trace",
+        "B": "Packets are being lost at hop 3",
+        "C": "Hop 3 is offline",
+        "D": "Hop 3 declined to send the reply traceroute needs"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "Later hops replying proves packets traversed hop 3. Many routers deprioritise or block the messages traceroute depends on, which is a configuration choice rather than a fault."
+      "explanation": "Traffic is passing through it fine. Later hops replying proves packets traversed hop 3. Many routers deprioritise or block the messages traceroute depends on, which is a configuration choice rather than a fault."
     },
     {
       "id": "cp-3",
       "prompt": "Hop 7 in a trace shows 43 ms while hop 6 shows 46 ms. Is that a problem?",
       "choices": {
         "A": "Yes — times must increase along the path",
-        "B": "No — each hop is measured independently, and a router may be slow to answer while forwarding quickly",
-        "C": "Yes — it indicates a routing loop",
+        "B": "Yes — it indicates a routing loop",
+        "C": "No — each hop is measured independently, and a router may be slow to answer while forwarding quickly",
         "D": "It means the packets took different routes"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "Observed in a real trace. The measurements are separate round trips, not a running total, so they need not increase monotonically."
     },
@@ -206,10 +206,10 @@
       "id": "cp-4",
       "prompt": "Why can a machine reach the entire internet while its routing table has only four lines?",
       "choices": {
-        "A": "The kernel downloads routes as needed",
+        "A": "DNS supplies the missing routes",
         "B": "The default route matches everything it does not otherwise know, and passes the problem to a router that knows more",
-        "C": "DNS supplies the missing routes",
-        "D": "Because most addresses are private"
+        "C": "Because most addresses are private",
+        "D": "The kernel downloads routes as needed"
       },
       "correct": [
         "B"

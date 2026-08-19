@@ -153,10 +153,10 @@
       "id": "cp-1",
       "prompt": "คุณต้องการเอา feature/upload เข้า main ลำดับที่ถูกต้องคืออะไร",
       "choices": {
-        "A": "git switch feature/upload แล้ว git merge main",
+        "A": "git switch main แล้ว git merge --abort",
         "B": "git switch main แล้ว git merge feature/upload",
         "C": "git merge main feature/upload จากที่ไหนก็ได้",
-        "D": "git switch main แล้ว git merge --abort"
+        "D": "git switch feature/upload แล้ว git merge main"
       },
       "correct": [
         "B"
@@ -169,8 +169,8 @@
       "choices": {
         "A": "เมื่อมีไฟล์เปลี่ยนมากกว่าหนึ่งไฟล์",
         "B": "เมื่อ branch ฝ่ายรับก็ได้ commit เพิ่มมาด้วยหลังจากที่อีก branch แยกออกไป",
-        "C": "เฉพาะเมื่อมี conflict",
-        "D": "เฉพาะเมื่อใส่ --no-ff"
+        "C": "เฉพาะเมื่อใส่ --no-ff",
+        "D": "เฉพาะเมื่อมี conflict"
       },
       "correct": [
         "B"
@@ -181,27 +181,27 @@
       "id": "cp-3",
       "prompt": "สอง branch merge กันโดยไม่มี conflict แต่หลังจากนั้นแอปพลิเคชันพัง เป็นไปได้อย่างไร",
       "choices": {
-        "A": "เป็นไปไม่ได้ — ไม่มี conflict แปลว่า merge ปลอดภัย",
-        "B": "การเปลี่ยนแปลงเข้ากันได้ในเชิงข้อความแต่ขัดกันในเชิงความหมาย — branch หนึ่งเปลี่ยนชื่อของที่อีก branch เพิ่งเริ่มเรียกใช้",
+        "A": "การเปลี่ยนแปลงเข้ากันได้ในเชิงข้อความแต่ขัดกันในเชิงความหมาย",
+        "B": "เป็นไปไม่ได้ — ไม่มี conflict แปลว่า merge ปลอดภัย",
         "C": "Git ทำไฟล์เสียหาย",
         "D": "merge commit เขียนทับชุดทดสอบ"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "Git เทียบข้อความ ไม่ได้เทียบความหมาย นี่คือเหตุผลพอดีว่าทำไมการรันชุดทดสอบต้องมีทั้งหลัง merge ไม่ใช่แค่ก่อน"
+      "explanation": "Branch หนึ่งเปลี่ยนชื่อของที่อีก branch เพิ่งเริ่มเรียกใช้. Git เทียบข้อความ ไม่ได้เทียบความหมาย นี่คือเหตุผลพอดีว่าทำไมการรันชุดทดสอบต้องมีทั้งหลัง merge ไม่ใช่แค่ก่อน"
     },
     {
       "id": "cp-4",
       "prompt": "git merge --squash feature ทำอะไร",
       "choices": {
-        "A": "ลบ branch ฟีเจอร์หลัง merge",
-        "B": "เอาการเปลี่ยนแปลงของ branch เข้ามาเป็นก้อนเดียวที่ยังไม่ commit โดยไม่เก็บ commit ย่อยของมันไว้",
-        "C": "บีบอัด repository",
-        "D": "merge โดยไม่รัน hook"
+        "A": "เอาการเปลี่ยนแปลงของ branch เข้ามาเป็นก้อนเดียวที่ยังไม่ commit โดยไม่เก็บ commit ย่อยของมันไว้",
+        "B": "บีบอัด repository",
+        "C": "merge โดยไม่รัน hook",
+        "D": "ลบ branch ฟีเจอร์หลัง merge"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "เป็นตัวเลือกสำหรับ branch ที่เต็มไปด้วย commit เล็กๆ รกๆ ซึ่งขั้นตอนย่อยของมันไม่คุ้มที่จะเก็บไว้ในประวัติที่ใช้ร่วมกัน"
     }

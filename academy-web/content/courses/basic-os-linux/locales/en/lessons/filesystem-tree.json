@@ -119,10 +119,10 @@
       "id": "cp-1",
       "prompt": "What is the difference between /log and log ?",
       "choices": {
-        "A": "No difference, the slash is optional",
+        "A": "/log is on another disk",
         "B": "/log is absolute — a folder directly under the root of the tree. log is relative — a folder inside wherever you currently are",
-        "C": "/log is a file and log is a folder",
-        "D": "/log is on another disk"
+        "C": "No difference, the slash is optional",
+        "D": "/log is a file and log is a folder"
       },
       "correct": [
         "B"
@@ -134,12 +134,12 @@
       "prompt": "Where would you look first for configuration of a service on a Linux server?",
       "choices": {
         "A": "/tmp",
-        "B": "/var/log",
-        "C": "/etc",
-        "D": "/usr/bin"
+        "B": "/etc",
+        "C": "/usr/bin",
+        "D": "/var/log"
       },
       "correct": [
-        "C"
+        "B"
       ],
       "explanation": "/etc holds system configuration as plain text. /var/log holds output about what happened, /usr/bin holds the programs, and /tmp is scratch space."
     },
@@ -147,13 +147,13 @@
       "id": "cp-3",
       "prompt": "A scheduled job runs a script that works perfectly when you run it by hand. What is worth checking first?",
       "choices": {
-        "A": "Whether the script uses relative paths that resolve differently depending on the working directory",
-        "B": "Whether the disk is full",
+        "A": "Whether the disk is full",
+        "B": "Whether the machine has been restarted",
         "C": "Whether the file has a .sh extension",
-        "D": "Whether the machine has been restarted"
+        "D": "Whether the script uses relative paths that resolve differently depending on the working directory"
       },
       "correct": [
-        "A"
+        "D"
       ],
       "explanation": "A relative path silently means something different when the working directory changes. It is the classic cause of \"works for me, fails on schedule\"."
     }

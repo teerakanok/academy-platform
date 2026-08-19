@@ -161,13 +161,13 @@
       "id": "cp-1",
       "prompt": "A parent with a 4 GB heap forks. How much memory is copied at the moment of the fork?",
       "choices": {
-        "A": "4 GB",
-        "B": "Essentially none — only the page table is copied and the pages are marked read-only",
-        "C": "Half, on average",
-        "D": "It depends on available RAM"
+        "A": "It depends on available RAM",
+        "B": "Half, on average",
+        "C": "Essentially none — only the page table is copied and the pages are marked read-only",
+        "D": "4 GB"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "Copying is deferred until a write. Verified: a child's resident memory right after forking a 64 MB region was unchanged, and copies happened one page at a time as it wrote."
     },
@@ -176,12 +176,12 @@
       "prompt": "You map a file MAP_PRIVATE and write through the mapping. What happens to the file?",
       "choices": {
         "A": "It is updated immediately",
-        "B": "It is unchanged — your write went to a private copy of that page",
-        "C": "It is updated when you call munmap",
-        "D": "The write fails with EACCES"
+        "B": "The write fails with EACCES",
+        "C": "It is unchanged — your write went to a private copy of that page",
+        "D": "It is updated when you call munmap"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "Verified directly: after a MAP_PRIVATE write the mapping showed the new byte while the file still held the old one. MAP_SHARED is the flag that writes through."
     },
@@ -189,13 +189,13 @@
       "id": "cp-3",
       "prompt": "Memory use on a server climbs sharply a few seconds after each fork, not at the fork itself. What is happening?",
       "choices": {
-        "A": "A memory leak in the child",
-        "B": "Deferred copy-on-write copies happening as the child writes to inherited pages",
+        "A": "Deferred copy-on-write copies happening as the child writes to inherited pages",
+        "B": "A memory leak in the child",
         "C": "The parent is growing",
         "D": "Swap is being reclaimed"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "The fork was free precisely because the copying had not happened yet. It happens later, as pages are written — which is also why the growth tracks writes rather than the fork."
     },
@@ -203,13 +203,13 @@
       "id": "cp-4",
       "prompt": "Your process has a file mapped and another process truncates that file. What happens when you touch the removed region?",
       "choices": {
-        "A": "You read zeros",
-        "B": "SIGBUS — the process crashes rather than receiving an error return",
-        "C": "The mapping shrinks automatically",
-        "D": "munmap is called for you"
+        "A": "munmap is called for you",
+        "B": "You read zeros",
+        "C": "SIGBUS — the process crashes rather than receiving an error return",
+        "D": "The mapping shrinks automatically"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "There is no return value to check on a memory access, so the failure arrives as a signal. This is the main reason to be careful mapping files that others can modify."
     }

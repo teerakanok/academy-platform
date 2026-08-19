@@ -197,13 +197,13 @@
       "id": "cp-1",
       "prompt": "You rename a field in the schema and regenerate both sides. What happens to compatibility?",
       "choices": {
-        "A": "It breaks — the name is part of the wire format",
-        "B": "Nothing breaks — only the field number travels",
-        "C": "It breaks only for old clients",
-        "D": "It depends on the field type"
+        "A": "It depends on the field type",
+        "B": "It breaks only for old clients",
+        "C": "Nothing breaks — only the field number travels",
+        "D": "It breaks — the name is part of the wire format"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "Names exist for humans and generated code. That is also why changing a number is a breaking change while changing a name is not."
     },
@@ -211,10 +211,10 @@
       "id": "cp-2",
       "prompt": "Field 2 was removed a year ago. A new field is added and given number 2. What goes wrong?",
       "choices": {
-        "A": "The generator rejects it",
+        "A": "Only streaming calls are affected",
         "B": "An old sender's value for the removed field is parsed as the new field's type, silently and without error",
-        "C": "Nothing — the old field is gone",
-        "D": "Only streaming calls are affected"
+        "C": "The generator rejects it",
+        "D": "Nothing — the old field is gone"
       },
       "correct": [
         "B"
@@ -225,10 +225,10 @@
       "id": "cp-3",
       "prompt": "Why can gRPC carry many concurrent calls over one connection without them queuing behind each other?",
       "choices": {
-        "A": "It opens a connection per call",
+        "A": "It uses UDP",
         "B": "It runs on HTTP/2, which multiplexes independent streams over one connection",
-        "C": "It uses UDP",
-        "D": "Calls are batched by the client"
+        "C": "Calls are batched by the client",
+        "D": "It opens a connection per call"
       },
       "correct": [
         "B"
@@ -239,13 +239,13 @@
       "id": "cp-4",
       "prompt": "When is plain HTTP with JSON the better choice?",
       "choices": {
-        "A": "Never — schemas are always better",
-        "B": "For public interfaces, browser clients, and small single-language systems, where readability and no build step outweigh the schema's benefits",
-        "C": "Only for read-only interfaces",
-        "D": "When performance does not matter"
+        "A": "When performance does not matter",
+        "B": "Never — schemas are always better",
+        "C": "For public interfaces, browser clients, and small single-language systems, where readability and no build step outweigh the schema's benefits",
+        "D": "Only for read-only interfaces"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "The measure is whether the contract has enough consumers to be worth formalising. A readable, curl-debuggable interface with no build step is a real advantage where those conditions do not hold."
     }

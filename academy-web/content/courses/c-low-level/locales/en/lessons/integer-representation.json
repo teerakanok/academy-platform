@@ -156,12 +156,14 @@
       "id": "cp-1",
       "prompt": "In two's complement, what value does a byte of all ones represent when read as signed?",
       "choices": {
-        "A": "255",
-        "B": "-1",
-        "C": "127",
-        "D": "-128"
+        "A": "-1",
+        "B": "255",
+        "C": "-128",
+        "D": "127"
       },
-      "correct": ["B"],
+      "correct": [
+        "A"
+      ],
       "explanation": "All ones is -1. The same bits read as unsigned are 255 — the bit pattern does not change, only the interpretation."
     },
     {
@@ -169,35 +171,41 @@
       "prompt": "Why is -INT_MIN undefined behaviour?",
       "choices": {
         "A": "Negation is not defined for signed types",
-        "B": "The range is asymmetric — the positive counterpart of INT_MIN does not exist in the type",
-        "C": "It requires a cast",
-        "D": "It is defined and equals INT_MAX"
+        "B": "It is defined and equals INT_MAX",
+        "C": "The range is asymmetric — the positive counterpart of INT_MIN does not exist in the type",
+        "D": "It requires a cast"
       },
-      "correct": ["B"],
+      "correct": [
+        "C"
+      ],
       "explanation": "With 32 bits the range is -2147483648 to 2147483647. There is one more negative value than positive, and abs(INT_MIN) has the same problem."
     },
     {
       "id": "cp-3",
       "prompt": "How should you check that a + b will not overflow?",
       "choices": {
-        "A": "Compute the sum and test whether it is smaller than a",
-        "B": "Test before adding, for example if (a > 0 && b > INT_MAX - a), or use __builtin_add_overflow",
-        "C": "Cast both to double first",
+        "A": "Test before adding, for example if (a > 0 && b > INT_MAX - a), or use __builtin_add_overflow",
+        "B": "Cast both to double first",
+        "C": "Compute the sum and test whether it is smaller than a",
         "D": "Use an assert after the addition"
       },
-      "correct": ["B"],
+      "correct": [
+        "A"
+      ],
       "explanation": "Testing the result relies on the overflow having happened, which is undefined — so the compiler may remove the check entirely."
     },
     {
       "id": "cp-4",
       "prompt": "A length arrives as a signed -1 and is used as a size_t. What is the security consequence?",
       "choices": {
-        "A": "The program crashes safely",
-        "B": "It becomes an enormous positive value that passes every bounds check and is then used as a size",
-        "C": "size_t clamps it to zero",
-        "D": "The compiler rejects the conversion"
+        "A": "size_t clamps it to zero",
+        "B": "The compiler rejects the conversion",
+        "C": "It becomes an enormous positive value that passes every bounds check and is then used as a size",
+        "D": "The program crashes safely"
       },
-      "correct": ["B"],
+      "correct": [
+        "C"
+      ],
       "explanation": "This is one of the most repeated patterns in real advisories. Reject negative lengths at the boundary, before any conversion happens."
     }
   ]

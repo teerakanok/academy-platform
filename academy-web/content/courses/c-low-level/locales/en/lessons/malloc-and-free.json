@@ -209,55 +209,55 @@
       "id": "cp-1",
       "prompt": "Why prefer malloc(n * sizeof *values) over malloc(n * sizeof(int)) ?",
       "choices": {
-        "A": "It is faster",
-        "B": "It stays correct when the pointer's type changes; the explicit type silently under-allocates the day someone edits the declaration",
-        "C": "sizeof(int) is not portable",
+        "A": "sizeof(int) is not portable",
+        "B": "It stays correct when the pointer's type changes",
+        "C": "It is faster",
         "D": "It avoids the need to check for NULL"
       },
       "correct": [
         "B"
       ],
-      "explanation": "An under-allocated buffer is a memory-corruption bug, not a compile error, so this small habit removes a defect that is otherwise easy to introduce."
+      "explanation": "The explicit type silently under-allocates the day someone edits the declaration. An under-allocated buffer is a memory-corruption bug, not a compile error, so this small habit removes a defect that is otherwise easy to introduce."
     },
     {
       "id": "cp-2",
       "prompt": "A count comes from user input and you write malloc(count * sizeof(int)). What is the risk?",
       "choices": {
-        "A": "It is slower than calloc",
-        "B": "The multiplication can overflow and wrap to a small number, so malloc succeeds with a tiny buffer that the code then overruns",
-        "C": "malloc cannot take a computed size",
-        "D": "There is no risk if count is unsigned"
+        "A": "malloc cannot take a computed size",
+        "B": "There is no risk if count is unsigned",
+        "C": "It is slower than calloc",
+        "D": "The multiplication can overflow and wrap to a small number"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "calloc is required to detect that overflow and return NULL, which is why it is the right choice for input-derived counts."
+      "explanation": "Malloc succeeds with a tiny buffer that the code then overruns calloc is required to detect that overflow and return NULL, which is why it is the right choice for input-derived counts."
     },
     {
       "id": "cp-3",
       "prompt": "Why is buf = realloc(buf, size); dangerous?",
       "choices": {
-        "A": "realloc cannot grow a block",
-        "B": "If realloc fails it returns NULL, overwriting your only pointer to the still-valid original block — which is now leaked",
+        "A": "If realloc fails it returns NULL, overwriting your only pointer to the still-valid original block",
+        "B": "realloc cannot grow a block",
         "C": "It always moves the block",
         "D": "It does not preserve the contents"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "Assign to a temporary first, then decide what to do on failure while you still hold the original pointer."
+      "explanation": "Which is now leaked. Assign to a temporary first, then decide what to do on failure while you still hold the original pointer."
     },
     {
       "id": "cp-4",
       "prompt": "What does setting a pointer to NULL immediately after free achieve?",
       "choices": {
-        "A": "It releases more memory",
-        "B": "A later use becomes a NULL dereference that crashes at the mistake, and a second free becomes a harmless no-op",
-        "C": "It prevents leaks",
-        "D": "It is required by the standard"
+        "A": "It is required by the standard",
+        "B": "It prevents leaks",
+        "C": "A later use becomes a NULL dereference that crashes at the mistake, and a second free becomes a harmless no-op",
+        "D": "It releases more memory"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "It converts two silent, hard-to-trace bugs into one immediate and obvious failure — at the cost of a single line."
     }

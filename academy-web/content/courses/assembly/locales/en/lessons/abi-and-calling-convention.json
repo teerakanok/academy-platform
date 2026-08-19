@@ -255,42 +255,42 @@
       "prompt": "A function is declared f(int a, double b, int c, double d). Where do the four arguments arrive?",
       "choices": {
         "A": "The first four integer registers, in declaration order",
-        "B": "a in edi, c in esi, b in xmm0, d in xmm1 — the integer and SSE classes are counted separately",
-        "C": "All four in xmm0 to xmm3",
-        "D": "a in edi, b in xmm0, c in xmm1, d in esi"
+        "B": "All four in xmm0 to xmm3",
+        "C": "a in edi, b in xmm0, c in xmm1, d in esi",
+        "D": "a in edi, c in esi, b in xmm0, d in xmm1"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "Position within its own class decides the register, not position in the parameter list. Assuming a single left-to-right ordering is a common misreading."
+      "explanation": "The integer and SSE classes are counted separately. Position within its own class decides the register, not position in the parameter list. Assuming a single left-to-right ordering is a common misreading."
     },
     {
       "id": "cp-2",
       "prompt": "A function writes four values through rdi and returns rdi. What is it most likely doing?",
       "choices": {
-        "A": "Filling a caller-supplied array",
-        "B": "Returning a structure too large for registers: the caller allocated the space and passed its address as a hidden first argument",
-        "C": "Implementing memcpy",
+        "A": "Returning a structure too large for registers",
+        "B": "Implementing memcpy",
+        "C": "Filling a caller-supplied array",
         "D": "Both A and B look identical and cannot be distinguished"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "The tell is that rdi is returned in rax. It also means the function's first declared parameter arrived in rsi, so reading rdi as that parameter would misattribute every argument."
+      "explanation": "The caller allocated the space and passed its address as a hidden first argument. The tell is that rdi is returned in rax. It also means the function's first declared parameter arrived in rsi, so reading rdi as that parameter would misattribute every argument."
     },
     {
       "id": "cp-3",
       "prompt": "Why does a call to printf set al before the call?",
       "choices": {
-        "A": "al holds the return value",
-        "B": "al carries the number of SSE registers holding arguments, so the variadic callee knows how many it must save",
-        "C": "It is the format string length",
-        "D": "It marks the call as variadic to the linker"
+        "A": "It is the format string length",
+        "B": "It marks the call as variadic to the linker",
+        "C": "al holds the return value",
+        "D": "al carries the number of SSE registers holding arguments"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "Saving all eight SSE registers would usually be wasted work. Hand-written assembly that omits this is a well-known crash when calling printf."
+      "explanation": "The variadic callee knows how many it must save. Saving all eight SSE registers would usually be wasted work. Hand-written assembly that omits this is a well-known crash when calling printf."
     },
     {
       "id": "cp-4",
@@ -298,8 +298,8 @@
       "choices": {
         "A": "A bug in the compiler",
         "B": "The red zone: a leaf function may use the 128 bytes below rsp without adjusting it, because nothing can overwrite them",
-        "C": "The frame pointer was omitted",
-        "D": "The write is to the caller's frame"
+        "C": "The write is to the caller's frame",
+        "D": "The frame pointer was omitted"
       },
       "correct": [
         "B"

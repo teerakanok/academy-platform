@@ -187,27 +187,27 @@
       "id": "cp-1",
       "prompt": "Two processes both hold a pointer with the value 0x7fff00001000. What is true?",
       "choices": {
-        "A": "They are looking at the same data",
-        "B": "Each address is translated separately, so they normally refer to different physical memory",
-        "C": "One of them will crash",
-        "D": "The kernel prevents duplicate addresses"
+        "A": "The kernel prevents duplicate addresses",
+        "B": "Each address is translated separately",
+        "C": "They are looking at the same data",
+        "D": "One of them will crash"
       },
       "correct": [
         "B"
       ],
-      "explanation": "That independence is the isolation. A process cannot even name another's physical memory, so it cannot read it."
+      "explanation": "They normally refer to different physical memory. That independence is the isolation. A process cannot even name another's physical memory, so it cannot read it."
     },
     {
       "id": "cp-2",
       "prompt": "A monitoring alert fires because a process shows 40 GB of virtual size on a 16 GB machine. What should you check?",
       "choices": {
         "A": "Add swap immediately",
-        "B": "RSS — virtual size is reserved address space and costs no memory until touched",
+        "B": "The number is impossible and the tool is wrong",
         "C": "Restart the process",
-        "D": "The number is impossible and the tool is wrong"
+        "D": "RSS — virtual size is reserved address space and costs no memory until touched"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "Verified: reserving 256 MB raised virtual size by 262 MB and resident memory by nothing at all. Reserving is free; residency is what consumes RAM."
     },
@@ -215,10 +215,10 @@
       "id": "cp-3",
       "prompt": "Why does the C library appear as several separate map entries with different permissions?",
       "choices": {
-        "A": "It was loaded several times",
+        "A": "One entry per thread",
         "B": "Its code, constants and variables need different access rights, and the hardware enforces each region separately",
-        "C": "One entry per thread",
-        "D": "Because of address randomisation"
+        "C": "Because of address randomisation",
+        "D": "It was loaded several times"
       },
       "correct": [
         "B"
@@ -229,13 +229,13 @@
       "id": "cp-4",
       "prompt": "You print a pointer twice, in two runs of the same program, and get different values. Why?",
       "choices": {
-        "A": "The program has a bug",
-        "B": "Address space layout randomisation places regions differently on every run, as a defence",
-        "C": "The heap grew",
-        "D": "Pointers are not stable within a run either"
+        "A": "Address space layout randomisation places regions differently on every run, as a defence",
+        "B": "The heap grew",
+        "C": "Pointers are not stable within a run either",
+        "D": "The program has a bug"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "An attacker who can redirect execution needs to know what is at an address. Randomising the layout removes that knowledge cheaply."
     }

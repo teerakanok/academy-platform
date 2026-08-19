@@ -18,13 +18,37 @@
     },
     {
       "kind": "table",
-      "headers": ["", "Higher-level language", "C"],
+      "headers": [
+        "",
+        "Higher-level language",
+        "C"
+      ],
       "rows": [
-        ["Memory", "Allocated and reclaimed for you", "You request it and you release it"],
-        ["Out-of-range access", "An exception you can catch", "It reads or writes whatever is there"],
-        ["Data layout", "Abstracted away", "Exactly the bytes you declared, in order"],
-        ["Runtime", "A garbage collector or virtual machine", "Almost nothing"],
-        ["When it breaks", "A stack trace", "A crash, or worse, silence"]
+        [
+          "Memory",
+          "Allocated and reclaimed for you",
+          "You request it and you release it"
+        ],
+        [
+          "Out-of-range access",
+          "An exception you can catch",
+          "It reads or writes whatever is there"
+        ],
+        [
+          "Data layout",
+          "Abstracted away",
+          "Exactly the bytes you declared, in order"
+        ],
+        [
+          "Runtime",
+          "A garbage collector or virtual machine",
+          "Almost nothing"
+        ],
+        [
+          "When it breaks",
+          "A stack trace",
+          "A crash, or worse, silence"
+        ]
       ]
     },
     {
@@ -119,48 +143,56 @@
       "prompt": "What is the fundamental difference between C and a memory-managed language?",
       "choices": {
         "A": "C is faster to write",
-        "B": "In C you request memory and release it yourself; there is no runtime reclaiming it for you",
-        "C": "C has no functions",
-        "D": "C cannot allocate memory at runtime"
+        "B": "In C you request memory and release it yourself",
+        "C": "C cannot allocate memory at runtime",
+        "D": "C has no functions"
       },
-      "correct": ["B"],
-      "explanation": "That single difference is where the power, the danger, and most of this course come from."
+      "correct": [
+        "B"
+      ],
+      "explanation": "There is no runtime reclaiming it for you. That single difference is where the power, the danger, and most of this course come from."
     },
     {
       "id": "cp-2",
       "prompt": "What happens when C code writes past the end of an array?",
       "choices": {
-        "A": "An exception is raised",
-        "B": "The program stops immediately",
-        "C": "It writes into whatever memory is there — often with no visible symptom at that moment",
+        "A": "It writes into whatever memory is there",
+        "B": "An exception is raised",
+        "C": "The program stops immediately",
         "D": "The array grows automatically"
       },
-      "correct": ["C"],
-      "explanation": "There is no bounds check. The damage may appear much later, somewhere unrelated, which is what makes these bugs hard to trace."
+      "correct": [
+        "A"
+      ],
+      "explanation": "Often with no visible symptom at that moment. There is no bounds check. The damage may appear much later, somewhere unrelated, which is what makes these bugs hard to trace."
     },
     {
       "id": "cp-3",
       "prompt": "Why is C central to security work even for people who write in other languages?",
       "choices": {
-        "A": "Security tools are all written in C",
-        "B": "Memory-safety defects have accounted for a large share of serious vulnerabilities, and understanding them requires knowing what the code does to memory",
-        "C": "C is required for certification exams",
-        "D": "Other languages compile to C"
+        "A": "C is required for certification exams",
+        "B": "Other languages compile to C",
+        "C": "Security tools are all written in C",
+        "D": "Memory-safety defects have accounted for a large share of serious vulnerabilities, and understanding them requires knowing what the code does to memory"
       },
-      "correct": ["B"],
+      "correct": [
+        "D"
+      ],
       "explanation": "Advisories, exploit write-ups, and the mitigations built to block them all describe behaviour at this level."
     },
     {
       "id": "cp-4",
       "prompt": "Why compile with -Wall -Wextra during this course?",
       "choices": {
-        "A": "They make the program faster",
-        "B": "They turn on warnings, so the compiler tells you about suspicious code instead of silently accepting it",
+        "A": "They turn on warnings",
+        "B": "They make the program faster",
         "C": "They are required for the program to run",
         "D": "They enable memory safety"
       },
-      "correct": ["B"],
-      "explanation": "C accepts a great deal of questionable code by default. Warnings are the cheapest defect-finding tool you have, and most real C projects treat them as errors."
+      "correct": [
+        "A"
+      ],
+      "explanation": "The compiler tells you about suspicious code instead of silently accepting it C accepts a great deal of questionable code by default. Warnings are the cheapest defect-finding tool you have, and most real C projects treat them as errors."
     }
   ]
 }

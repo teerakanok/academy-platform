@@ -172,10 +172,10 @@
       "id": "cp-1",
       "prompt": "A process running as root executes an instruction that writes a page table register. What happens?",
       "choices": {
-        "A": "It succeeds, because root is privileged",
+        "A": "It succeeds only with sudo",
         "B": "It traps — root is an OS permission, while the instruction requires ring 0, and the process is at ring 3",
-        "C": "The kernel asks for confirmation",
-        "D": "It succeeds only with sudo"
+        "C": "It succeeds, because root is privileged",
+        "D": "The kernel asks for confirmation"
       },
       "correct": [
         "B"
@@ -186,15 +186,15 @@
       "id": "cp-2",
       "prompt": "Why is loading a third-party kernel module a much bigger decision than installing an application?",
       "choices": {
-        "A": "Modules are larger",
-        "B": "Module code runs at ring 0 with access to all memory, so a bug or backdoor is unbounded",
+        "A": "Applications are checked by the kernel",
+        "B": "Modules are larger",
         "C": "Modules cannot be uninstalled",
-        "D": "Applications are checked by the kernel"
+        "D": "Module code runs at ring 0 with access to all memory"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "An application is bounded by its permissions and its address space. A module has neither boundary."
+      "explanation": "A bug or backdoor is unbounded. An application is bounded by its permissions and its address space. A module has neither boundary."
     },
     {
       "id": "cp-3",
@@ -202,8 +202,8 @@
       "choices": {
         "A": "A fifth ring for applications",
         "B": "A level beneath ring 0 where a hypervisor runs and can intercept a guest kernel's privileged operations",
-        "C": "Encryption of ring 3 memory",
-        "D": "It removed rings 1 and 2"
+        "C": "It removed rings 1 and 2",
+        "D": "Encryption of ring 3 memory"
       },
       "correct": [
         "B"
@@ -216,11 +216,11 @@
       "choices": {
         "A": "A system call",
         "B": "A hardware interrupt",
-        "C": "A page fault",
-        "D": "A user program setting its own privilege level"
+        "C": "A user program setting its own privilege level",
+        "D": "A page fault"
       },
       "correct": [
-        "D"
+        "C"
       ],
       "explanation": "That is exactly what the mechanism prevents. Entry happens only through doors the kernel installed, and it controls the code on the other side of each."
     }

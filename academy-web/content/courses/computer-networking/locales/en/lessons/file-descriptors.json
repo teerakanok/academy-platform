@@ -184,13 +184,13 @@
       "id": "cp-1",
       "prompt": "Your program sends a 1000-byte message over TCP. The receiver's first read returns 500 bytes. What happened?",
       "choices": {
-        "A": "The message was truncated",
-        "B": "Nothing wrong — TCP is a byte stream, so the rest may arrive on a later read",
-        "C": "The connection dropped",
-        "D": "The buffer was too small"
+        "A": "The buffer was too small",
+        "B": "The connection dropped",
+        "C": "Nothing wrong — TCP is a byte stream, so the rest may arrive on a later read",
+        "D": "The message was truncated"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "Order and completeness are guaranteed; boundaries are not. Loop until you have the number of bytes your protocol says to expect."
     },
@@ -198,27 +198,27 @@
       "id": "cp-2",
       "prompt": "Why can the same read() and write() work on a file, a pipe, a terminal and a socket?",
       "choices": {
-        "A": "The C library detects the type and adapts",
-        "B": "All four are file descriptors — the kernel presents one interface over different kinds of object",
-        "C": "They are all files on disk underneath",
-        "D": "It only works if the sizes match"
+        "A": "All four are file descriptors",
+        "B": "The C library detects the type and adapts",
+        "C": "It only works if the sizes match",
+        "D": "They are all files on disk underneath"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "That uniformity is what makes shell pipelines composable and lets the same program be pointed at a file or a connection without changing the code that moves bytes."
+      "explanation": "The kernel presents one interface over different kinds of object. That uniformity is what makes shell pipelines composable and lets the same program be pointed at a file or a connection without changing the code that moves bytes."
     },
     {
       "id": "cp-3",
       "prompt": "read() returns 0 on a socket. What does that mean?",
       "choices": {
-        "A": "No data is available yet",
-        "B": "The other end closed its side of the connection",
-        "C": "An error occurred",
-        "D": "The socket is non-blocking"
+        "A": "An error occurred",
+        "B": "The socket is non-blocking",
+        "C": "The other end closed its side of the connection",
+        "D": "No data is available yet"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "On a file it means end of file; on a socket it means the peer performed an orderly close. 'No data yet' on a blocking socket makes read wait rather than return 0."
     },
@@ -226,15 +226,15 @@
       "id": "cp-4",
       "prompt": "A forking server's descriptor count grows steadily and never falls. What is the likely cause?",
       "choices": {
-        "A": "A memory leak",
-        "B": "The parent is not closing the connection descriptor after forking, so it stays open in both processes",
-        "C": "Too many threads",
-        "D": "The clients are not disconnecting"
+        "A": "Too many threads",
+        "B": "A memory leak",
+        "C": "The clients are not disconnecting",
+        "D": "The parent is not closing the connection descriptor after forking"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "The child inherits every open descriptor. Each side must close what it does not need, or the connection is never fully released and the count only rises."
+      "explanation": "It stays open in both processes. The child inherits every open descriptor. Each side must close what it does not need, or the connection is never fully released and the count only rises."
     }
   ]
 }

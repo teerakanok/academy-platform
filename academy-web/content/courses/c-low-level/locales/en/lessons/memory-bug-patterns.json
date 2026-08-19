@@ -10,15 +10,47 @@
     },
     {
       "kind": "table",
-      "headers": ["Symptom", "Most likely cause", "Where to look"],
+      "headers": [
+        "Symptom",
+        "Most likely cause",
+        "Where to look"
+      ],
       "rows": [
-        ["Crash at a line that looks fine", "Corruption caused earlier and elsewhere", "The last write to a nearby buffer"],
-        ["A value changes with nothing writing to it", "Overflow from an adjacent buffer", "The neighbouring variable in the same struct or frame"],
-        ["Works alone, breaks when called twice", "Use after free, or a stale pointer into a reused block", "What was freed between the two calls"],
-        ["Memory grows steadily under load", "Leak on a path taken repeatedly", "The error path that returns without freeing"],
-        ["Works at -O0, breaks at -O2", "Undefined behaviour the optimiser assumed away", "Signed overflow, aliasing, uninitialised reads"],
-        ["Different result on each run", "Uninitialised memory being read", "A declaration with no initialiser"],
-        ["Crash inside malloc or free itself", "The allocator's bookkeeping was corrupted earlier", "A heap overflow or a double free before this point"]
+        [
+          "Crash at a line that looks fine",
+          "Corruption caused earlier and elsewhere",
+          "The last write to a nearby buffer"
+        ],
+        [
+          "A value changes with nothing writing to it",
+          "Overflow from an adjacent buffer",
+          "The neighbouring variable in the same struct or frame"
+        ],
+        [
+          "Works alone, breaks when called twice",
+          "Use after free, or a stale pointer into a reused block",
+          "What was freed between the two calls"
+        ],
+        [
+          "Memory grows steadily under load",
+          "Leak on a path taken repeatedly",
+          "The error path that returns without freeing"
+        ],
+        [
+          "Works at -O0, breaks at -O2",
+          "Undefined behaviour the optimiser assumed away",
+          "Signed overflow, aliasing, uninitialised reads"
+        ],
+        [
+          "Different result on each run",
+          "Uninitialised memory being read",
+          "A declaration with no initialiser"
+        ],
+        [
+          "Crash inside malloc or free itself",
+          "The allocator's bookkeeping was corrupted earlier",
+          "A heap overflow or a double free before this point"
+        ]
       ]
     },
     {
@@ -140,48 +172,56 @@
       "id": "cp-1",
       "prompt": "A program crashes on a line that is clearly correct. What does that suggest?",
       "choices": {
-        "A": "The compiler generated bad code",
+        "A": "The line needs a NULL check",
         "B": "Memory was corrupted earlier somewhere else, and this line is merely where the damage became visible",
-        "C": "The line needs a NULL check",
-        "D": "The stack is too small"
+        "C": "The stack is too small",
+        "D": "The compiler generated bad code"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "Corruption separates cause from effect. Look for the write that went out of bounds, not at the line that finally tripped over the result."
     },
     {
       "id": "cp-2",
       "prompt": "A service works fine in testing and slowly consumes memory in production. Which defect fits?",
       "choices": {
-        "A": "Use after free",
-        "B": "A leak on a path taken repeatedly — often an error path that returns before freeing",
-        "C": "Double free",
-        "D": "Stack overflow"
+        "A": "Double free",
+        "B": "Stack overflow",
+        "C": "A leak on a path taken repeatedly",
+        "D": "Use after free"
       },
-      "correct": ["B"],
-      "explanation": "Steady growth under load points to an allocation that is never released on a path that runs often. Error paths are the usual suspects because they are the least tested."
+      "correct": [
+        "C"
+      ],
+      "explanation": "Often an error path that returns before freeing. Steady growth under load points to an allocation that is never released on a path that runs often. Error paths are the usual suspects because they are the least tested."
     },
     {
       "id": "cp-3",
       "prompt": "Code works at -O0 and misbehaves at -O2. What is the first suspicion?",
       "choices": {
-        "A": "A compiler bug",
-        "B": "Undefined behaviour that the optimiser is allowed to assume never happens, such as signed overflow or an uninitialised read",
-        "C": "Missing -Wall",
+        "A": "Undefined behaviour that the optimiser is allowed to assume never happens, such as signed overflow or an uninitialised read",
+        "B": "Missing -Wall",
+        "C": "A compiler bug",
         "D": "A linker problem"
       },
-      "correct": ["B"],
+      "correct": [
+        "A"
+      ],
       "explanation": "Optimisers rewrite code on the assumption that undefined behaviour does not occur. When that assumption is wrong, behaviour changes with the optimisation level."
     },
     {
       "id": "cp-4",
       "prompt": "What is the correct order when diagnosing a suspected memory bug?",
       "choices": {
-        "A": "Read the code carefully, then add printf statements, then guess",
+        "A": "Increase the stack size and retry",
         "B": "Reproduce reliably, rebuild with sanitizers, then read the code around what they report",
-        "C": "Rewrite the function that crashed",
-        "D": "Increase the stack size and retry"
+        "C": "Read the code carefully, then add printf statements, then guess",
+        "D": "Rewrite the function that crashed"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "The tools give you the exact line and the exact allocation. Reading code first means searching a large space for something the sanitizer would have pointed at in seconds."
     }
   ]

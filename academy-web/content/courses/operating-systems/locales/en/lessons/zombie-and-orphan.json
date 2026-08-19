@@ -115,13 +115,13 @@
       "id": "cp-1",
       "prompt": "A monitoring tool reports thousands of processes in state Z. What is actually being exhausted?",
       "choices": {
-        "A": "Physical memory",
-        "B": "The pid table — zombies hold no memory but do hold a pid",
+        "A": "The pid table — zombies hold no memory but do hold a pid",
+        "B": "Physical memory",
         "C": "Open file descriptors",
         "D": "Swap space"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "That is why this bug looks so confusing in production: memory graphs are flat, and the symptom is that nothing new can start."
     },
@@ -129,41 +129,41 @@
       "id": "cp-2",
       "prompt": "A child's parent exits while the child is still running. What happens to the child?",
       "choices": {
-        "A": "It is killed with SIGHUP",
-        "B": "It keeps running and is reparented — normally to pid 1, or to the nearest ancestor marked as a subreaper",
-        "C": "It becomes a zombie immediately",
-        "D": "It is suspended until a new parent claims it"
+        "A": "It becomes a zombie immediately",
+        "B": "It keeps running and is reparented",
+        "C": "It is suspended until a new parent claims it",
+        "D": "It is killed with SIGHUP"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Nothing about the child is broken. Only its parent field changes, and the new parent is one that reaps."
+      "explanation": "Normally to pid 1, or to the nearest ancestor marked as a subreaper. Nothing about the child is broken. Only its parent field changes, and the new parent is one that reaps."
     },
     {
       "id": "cp-3",
       "prompt": "Why must a SIGCHLD handler call waitpid in a loop rather than once?",
       "choices": {
-        "A": "waitpid can fail spuriously",
-        "B": "Signals do not queue — several children can end while the handler runs, and that delivers one signal, not several",
-        "C": "The loop is needed to avoid blocking",
-        "D": "Each call only reaps half a process"
+        "A": "The loop is needed to avoid blocking",
+        "B": "waitpid can fail spuriously",
+        "C": "Each call only reaps half a process",
+        "D": "Signals do not queue"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "Standard signals collapse: if three children end at nearly the same moment, the handler may run once. Looping with WNOHANG until it returns zero or -1 collects all of them."
+      "explanation": "Several children can end while the handler runs, and that delivers one signal, not several. Standard signals collapse: if three children end at nearly the same moment, the handler may run once. Looping with WNOHANG until it returns zero or -1 collects all of them."
     },
     {
       "id": "cp-4",
       "prompt": "You spawn a helper whose result you genuinely do not care about. What is the cleanest way to avoid zombies?",
       "choices": {
         "A": "Call wait() at the end of the program",
-        "B": "signal(SIGCHLD, SIG_IGN) — the kernel then discards statuses instead of preserving them",
+        "B": "Have the child call exit(0) instead of _exit(0)",
         "C": "kill the child after a timeout",
-        "D": "Have the child call exit(0) instead of _exit(0)"
+        "D": "signal(SIGCHLD, SIG_IGN) — the kernel then discards statuses instead of preserving them"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "Explicitly ignoring SIGCHLD says you will never collect statuses, so none are kept. Use it only when you truly do not need to know how the child ended."
     }

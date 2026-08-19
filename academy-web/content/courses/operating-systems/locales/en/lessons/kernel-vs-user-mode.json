@@ -128,27 +128,27 @@
       "id": "cp-1",
       "prompt": "A process is running as root. Which statement is true?",
       "choices": {
-        "A": "It runs in kernel mode and can touch any physical address",
-        "B": "It still runs in user mode; root only changes which requests the kernel approves",
+        "A": "It can execute privileged CPU instructions directly",
+        "B": "It runs in kernel mode and can touch any physical address",
         "C": "It bypasses system calls entirely",
-        "D": "It can execute privileged CPU instructions directly"
+        "D": "It still runs in user mode"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "Kernel mode is a hardware privilege state. root is a credential the kernel checks when deciding whether to grant a request. A root process makes the same system calls as anyone else — it just gets 'yes' more often."
+      "explanation": "Root only changes which requests the kernel approves. Kernel mode is a hardware privilege state. root is a credential the kernel checks when deciding whether to grant a request. A root process makes the same system calls as anyone else — it just gets 'yes' more often."
     },
     {
       "id": "cp-2",
       "prompt": "Why is reading a file one byte at a time so much slower than reading it in 64KB blocks, even though the total bytes are identical?",
       "choices": {
-        "A": "The disk reads single bytes more slowly",
-        "B": "Each read is a crossing into the kernel, and the per-crossing overhead dominates",
-        "C": "The C library refuses to buffer small reads",
-        "D": "Single-byte reads bypass the page cache"
+        "A": "Each read is a crossing into the kernel, and the per-crossing overhead dominates",
+        "B": "The disk reads single bytes more slowly",
+        "C": "Single-byte reads bypass the page cache",
+        "D": "The C library refuses to buffer small reads"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "Same bytes, vastly more boundary crossings. Each crossing saves and restores state and re-validates arguments, and that fixed cost is paid once per call."
     },
@@ -157,26 +157,26 @@
       "prompt": "Your program dereferences a pointer to an address it never allocated. What actually happens?",
       "choices": {
         "A": "The C compiler catches it at build time",
-        "B": "The hardware traps to the kernel, which finds no valid mapping and delivers a fatal signal",
-        "C": "The kernel silently allocates the page",
-        "D": "The program reads whatever another process had there"
+        "B": "The kernel silently allocates the page",
+        "C": "The program reads whatever another process had there",
+        "D": "The hardware traps to the kernel"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "This is the user/kernel boundary enforcing itself. Option D describes exactly what memory protection exists to prevent."
+      "explanation": "Finds no valid mapping and delivers a fatal signal. This is the user/kernel boundary enforcing itself. Option D describes exactly what memory protection exists to prevent."
     },
     {
       "id": "cp-4",
       "prompt": "Why does Linux keep the number of system calls small and their behaviour stable for decades?",
       "choices": {
         "A": "Adding them requires new hardware",
-        "B": "Every compiled program depends on them, and a narrow, stable interface is both compatible and easier to secure",
+        "B": "Each one must fit in a single register",
         "C": "The CPU limits how many can exist",
-        "D": "Each one must fit in a single register"
+        "D": "Every compiled program depends on them, and a narrow, stable interface is both compatible and easier to secure"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "It is the contract between every program ever built and the kernel. It is also the attack surface, so keeping it narrow serves compatibility and security at the same time."
     }

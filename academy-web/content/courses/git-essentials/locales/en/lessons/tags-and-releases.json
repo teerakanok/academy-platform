@@ -22,11 +22,27 @@
     },
     {
       "kind": "table",
-      "headers": ["", "Lightweight (git tag v1)", "Annotated (git tag -a v1 -m ...)"],
+      "headers": [
+        "",
+        "Lightweight (git tag v1)",
+        "Annotated (git tag -a v1 -m ...)"
+      ],
       "rows": [
-        ["Stores", "Just a pointer", "A real object: author, date, message"],
-        ["Use for", "A private bookmark for yourself", "Anything you release or share"],
-        ["Recommended", "Rarely", "Always, for releases"]
+        [
+          "Stores",
+          "Just a pointer",
+          "A real object: author, date, message"
+        ],
+        [
+          "Use for",
+          "A private bookmark for yourself",
+          "Anything you release or share"
+        ],
+        [
+          "Recommended",
+          "Rarely",
+          "Always, for releases"
+        ]
       ]
     },
     {
@@ -45,11 +61,27 @@
     },
     {
       "kind": "table",
-      "headers": ["Change", "Bump", "Means"],
+      "headers": [
+        "Change",
+        "Bump",
+        "Means"
+      ],
       "rows": [
-        ["Fixed a bug, nothing else changed", "PATCH — 2.3.0 → 2.3.1", "Safe to upgrade"],
-        ["Added a feature, existing use still works", "MINOR — 2.3.1 → 2.4.0", "Safe to upgrade"],
-        ["Changed or removed something people depend on", "MAJOR — 2.4.0 → 3.0.0", "Read the notes before upgrading"]
+        [
+          "Fixed a bug, nothing else changed",
+          "PATCH — 2.3.0 → 2.3.1",
+          "Safe to upgrade"
+        ],
+        [
+          "Added a feature, existing use still works",
+          "MINOR — 2.3.1 → 2.4.0",
+          "Safe to upgrade"
+        ],
+        [
+          "Changed or removed something people depend on",
+          "MAJOR — 2.4.0 → 3.0.0",
+          "Read the notes before upgrading"
+        ]
       ]
     },
     {
@@ -150,24 +182,28 @@
       "id": "cp-1",
       "prompt": "What is the difference between a tag and a branch?",
       "choices": {
-        "A": "A tag can only be created by maintainers",
-        "B": "A branch moves forward as you commit; a tag is a permanent name for one specific commit",
-        "C": "A tag stores the files separately",
-        "D": "There is none; a tag is a read-only branch"
+        "A": "A tag stores the files separately",
+        "B": "There is none; a tag is a read-only branch",
+        "C": "A tag can only be created by maintainers",
+        "D": "A branch moves forward as you commit"
       },
-      "correct": ["B"],
-      "explanation": "That permanence is the point: a released version needs a name that will still mean the same state in a year."
+      "correct": [
+        "D"
+      ],
+      "explanation": "A tag is a permanent name for one specific commit. That permanence is the point: a released version needs a name that will still mean the same state in a year."
     },
     {
       "id": "cp-2",
       "prompt": "You created a tag and pushed your branch, but colleagues cannot see the tag. Why?",
       "choices": {
-        "A": "Tags take time to propagate",
-        "B": "Tags do not travel with a normal push — they need git push origin <tag> or --tags",
-        "C": "They need to re-clone",
-        "D": "Only annotated tags are pushed"
+        "A": "Only annotated tags are pushed",
+        "B": "They need to re-clone",
+        "C": "Tags take time to propagate",
+        "D": "Tags do not travel with a normal push — they need git push origin <tag> or --tags"
       },
-      "correct": ["B"],
+      "correct": [
+        "D"
+      ],
       "explanation": "It is a common surprise. Pushing a branch sends commits, not tags."
     },
     {
@@ -176,22 +212,26 @@
       "choices": {
         "A": "PATCH — it is only one function",
         "B": "MINOR — something was removed, not added",
-        "C": "MAJOR — existing users' code will break, and the number is a compatibility promise",
-        "D": "No bump; document it in the notes"
+        "C": "No bump; document it in the notes",
+        "D": "MAJOR — existing users' code will break, and the number is a compatibility promise"
       },
-      "correct": ["C"],
+      "correct": [
+        "D"
+      ],
       "explanation": "The major number exists to signal exactly this. Shipping a breaking change as a patch is how version numbers stop being trustworthy."
     },
     {
       "id": "cp-4",
       "prompt": "A customer reports a bug in v2.3.0, which shipped six weeks ago. What do you do first?",
       "choices": {
-        "A": "git switch --detach v2.3.0 and reproduce it on exactly that code",
+        "A": "Ask them to upgrade first",
         "B": "Reproduce it on main, which is close enough",
-        "C": "Ask them to upgrade first",
-        "D": "Search the log for likely commits"
+        "C": "Search the log for likely commits",
+        "D": "git switch --detach v2.3.0 and reproduce it on exactly that code"
       },
-      "correct": ["A"],
+      "correct": [
+        "D"
+      ],
       "explanation": "The tag lets you stand on precisely what they are running. Debugging against main means debugging code the customer does not have."
     }
   ]

@@ -131,49 +131,57 @@
       "id": "cp-1",
       "prompt": "What does the line #!/bin/bash at the top of a script do?",
       "choices": {
-        "A": "It is a comment and has no effect",
+        "A": "It makes the file executable",
         "B": "It tells the system which interpreter should run the file",
-        "C": "It makes the file executable",
+        "C": "It is a comment and has no effect",
         "D": "It imports bash functions"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "The shebang names the interpreter. Making the file executable is a separate step with chmod."
     },
     {
       "id": "cp-2",
       "prompt": "Why is rm $file dangerous compared to rm \"$file\" ?",
       "choices": {
-        "A": "Quotes make the command run faster",
-        "B": "Without quotes, a value containing spaces splits into multiple arguments, so the command acts on the wrong things",
+        "A": "There is no difference in bash",
+        "B": "Quotes make the command run faster",
         "C": "Unquoted variables are always empty",
-        "D": "There is no difference in bash"
+        "D": "Without quotes, a value containing spaces splits into multiple arguments"
       },
-      "correct": ["B"],
-      "explanation": "Word splitting happens before the command runs. A file named holiday photos.txt becomes two arguments, and the command does something you did not intend."
+      "correct": [
+        "D"
+      ],
+      "explanation": "The command acts on the wrong things. Word splitting happens before the command runs. A file named holiday photos.txt becomes two arguments, and the command does something you did not intend."
     },
     {
       "id": "cp-3",
       "prompt": "A script finishes and echo $? prints 1. What does that mean?",
       "choices": {
-        "A": "It succeeded and produced one line of output",
-        "B": "It failed — any non-zero exit code signals failure",
-        "C": "It is still running",
-        "D": "It was interrupted by the user"
+        "A": "It failed — any non-zero exit code signals failure",
+        "B": "It succeeded and produced one line of output",
+        "C": "It was interrupted by the user",
+        "D": "It is still running"
       },
-      "correct": ["B"],
+      "correct": [
+        "A"
+      ],
       "explanation": "0 is success by convention; anything else is a failure code. Schedulers and CI systems rely on this to know whether to alert."
     },
     {
       "id": "cp-4",
       "prompt": "Why must you type ./script.sh rather than just script.sh ?",
       "choices": {
-        "A": "Because scripts must always have a path",
-        "B": "Because the current directory is deliberately not in PATH, so a dropped file cannot hijack a common command name",
+        "A": "Because the current directory is deliberately not in PATH",
+        "B": "Because scripts must always have a path",
         "C": "Because bash requires two characters before a filename",
         "D": "Because the file is not executable otherwise"
       },
-      "correct": ["B"],
-      "explanation": "Leaving the current directory out of PATH prevents someone placing a malicious file named after a common command in a directory you happen to be in."
+      "correct": [
+        "A"
+      ],
+      "explanation": "A dropped file cannot hijack a common command name. Leaving the current directory out of PATH prevents someone placing a malicious file named after a common command in a directory you happen to be in."
     }
   ]
 }

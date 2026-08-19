@@ -117,27 +117,27 @@
       "id": "cp-1",
       "prompt": "Why is the page table a multi-level tree instead of one flat array?",
       "choices": {
-        "A": "Trees are faster to search",
-        "B": "A flat table covering the whole address space would be enormous and almost entirely empty; a tree omits the unmapped parts",
-        "C": "The hardware cannot address a large array",
+        "A": "The hardware cannot address a large array",
+        "B": "A flat table covering the whole address space would be enormous and almost entirely empty",
+        "C": "Trees are faster to search",
         "D": "To support multiple processes"
       },
       "correct": [
         "B"
       ],
-      "explanation": "A process maps a tiny fraction of its possible addresses. The tree makes the unused parts cost nothing, at the price of several reads per translation — which is what the TLB then hides."
+      "explanation": "A tree omits the unmapped parts A process maps a tiny fraction of its possible addresses. The tree makes the unused parts cost nothing, at the price of several reads per translation — which is what the TLB then hides."
     },
     {
       "id": "cp-2",
       "prompt": "A TLB holds on the order of a thousand entries. At 4 KB per entry, roughly how much actively used memory does it cover?",
       "choices": {
-        "A": "A few gigabytes",
-        "B": "A few megabytes",
-        "C": "A few kilobytes",
-        "D": "The whole address space"
+        "A": "The whole address space",
+        "B": "A few kilobytes",
+        "C": "A few megabytes",
+        "D": "A few gigabytes"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "A thousand entries times 4 KB is about four megabytes. That window is why huge pages help large working sets: the same number of entries then covers 512 times as much memory."
     },
@@ -145,29 +145,29 @@
       "id": "cp-3",
       "prompt": "What did the measured 512-to-1 difference in minor faults between MADV_HUGEPAGE and MADV_NOHUGEPAGE show?",
       "choices": {
-        "A": "Huge pages use less memory",
-        "B": "One fault populated 2 MB instead of 4 KB, so the same region needed 512 times fewer translation-structure operations",
-        "C": "Huge pages avoid the page table entirely",
-        "D": "MADV_NOHUGEPAGE disables caching"
+        "A": "Huge pages avoid the page table entirely",
+        "B": "One fault populated 2 MB instead of 4 KB",
+        "C": "MADV_NOHUGEPAGE disables caching",
+        "D": "Huge pages use less memory"
       },
       "correct": [
         "B"
       ],
-      "explanation": "2 MB divided by 4 KB is 512. The fault count is an observable proxy for work the TLB and page-table machinery would otherwise do."
+      "explanation": "The same region needed 512 times fewer translation-structure operations 2 MB divided by 4 KB is 512. The fault count is an observable proxy for work the TLB and page-table machinery would otherwise do."
     },
     {
       "id": "cp-4",
       "prompt": "Why does switching between two processes cost more than switching between two threads of one process?",
       "choices": {
         "A": "Processes have more registers",
-        "B": "Processes have separate page tables, so the translation root changes and the new process starts with none of its translations cached",
-        "C": "Threads do not need scheduling",
+        "B": "Threads do not need scheduling",
+        "C": "Processes have separate page tables",
         "D": "Processes must be reloaded from disk"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "Threads share one address space and therefore one page table. That shared translation state is a large part of why they are cheaper to switch between."
+      "explanation": "The translation root changes and the new process starts with none of its translations cached. Threads share one address space and therefore one page table. That shared translation state is a large part of why they are cheaper to switch between."
     }
   ]
 }

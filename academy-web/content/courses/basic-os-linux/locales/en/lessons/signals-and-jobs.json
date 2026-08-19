@@ -137,13 +137,13 @@
       "id": "cp-1",
       "prompt": "A service is not responding. Which signal do you send first?",
       "choices": {
-        "A": "KILL (9), to be certain it stops",
-        "B": "TERM (15), so it can close files and release locks before exiting",
-        "C": "STOP, to pause it forever",
-        "D": "HUP, which always stops a process"
+        "A": "TERM (15), so it can close files and release locks before exiting",
+        "B": "HUP, which always stops a process",
+        "C": "KILL (9), to be certain it stops",
+        "D": "STOP, to pause it forever"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "TERM is the request to shut down cleanly. Escalate to KILL only when the process ignores it, because KILL gives no opportunity to finish writes or clean up locks."
     },
@@ -151,13 +151,13 @@
       "id": "cp-2",
       "prompt": "Why does a long-running command die when you close the SSH session that started it?",
       "choices": {
-        "A": "The server reboots",
-        "B": "The shell sends HUP to its jobs when the session ends",
-        "C": "Background jobs always have a time limit",
-        "D": "The file it was writing gets locked"
+        "A": "Background jobs always have a time limit",
+        "B": "The server reboots",
+        "C": "The file it was writing gets locked",
+        "D": "The shell sends HUP to its jobs when the session ends"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "Hangup is delivered to the jobs of an ending session. nohup, tmux, or handing the work to a service manager are the ways around it."
     },
@@ -165,15 +165,15 @@
       "id": "cp-3",
       "prompt": "What is the realistic risk of routinely using kill -9?",
       "choices": {
-        "A": "It uses more CPU than kill",
-        "B": "Half-written files, stale lock files, and data that needs recovery — because the process never gets to clean up",
-        "C": "It requires root every time",
-        "D": "There is no risk; it is the recommended default"
+        "A": "Half-written files, stale lock files, and data that needs recovery",
+        "B": "It uses more CPU than kill",
+        "C": "There is no risk; it is the recommended default",
+        "D": "It requires root every time"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "KILL cannot be caught or handled. Whatever the process was in the middle of stays in the middle of it."
+      "explanation": "Because the process never gets to clean up KILL cannot be caught or handled. Whatever the process was in the middle of stays in the middle of it."
     }
   ]
 }

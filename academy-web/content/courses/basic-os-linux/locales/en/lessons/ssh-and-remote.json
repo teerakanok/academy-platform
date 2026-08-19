@@ -182,13 +182,13 @@
       "id": "cp-1",
       "prompt": "Which file may you safely copy to a server?",
       "choices": {
-        "A": "~/.ssh/id_ed25519",
-        "B": "~/.ssh/id_ed25519.pub",
-        "C": "~/.ssh/known_hosts",
-        "D": "Both keys, so the server can verify them"
+        "A": "~/.ssh/id_ed25519.pub",
+        "B": "~/.ssh/id_ed25519",
+        "C": "Both keys, so the server can verify them",
+        "D": "~/.ssh/known_hosts"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "Only the public half is meant to be distributed. The private key is the credential itself and never leaves your machine."
     },
@@ -196,13 +196,13 @@
       "id": "cp-2",
       "prompt": "Why is key-based authentication considered stronger than a password?",
       "choices": {
-        "A": "Keys are shorter and easier to type",
-        "B": "Nothing reusable is sent across the network and there is nothing for an automated attack to guess",
-        "C": "Keys expire automatically every day",
+        "A": "Keys expire automatically every day",
+        "B": "Keys are shorter and easier to type",
+        "C": "Nothing reusable is sent across the network and there is nothing for an automated attack to guess",
         "D": "Passwords cannot be encrypted"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "The private key answers a challenge without being transmitted. Password guessing against the service simply has nothing to work with."
     },
@@ -211,14 +211,14 @@
       "prompt": "SSH warns that the remote host identification has changed. What do you do?",
       "choices": {
         "A": "Delete the known_hosts entry so the warning stops",
-        "B": "Stop and confirm with whoever runs the server whether it was rebuilt — the alternative explanation is that something is intercepting the connection",
+        "B": "Reconnect using a password instead",
         "C": "Ignore it; this happens normally",
-        "D": "Reconnect using a password instead"
+        "D": "Stop and confirm with whoever runs the server whether it was rebuilt"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "Only two things produce that message: a legitimately rebuilt server, or an interception. Clearing the entry to silence it removes the only warning you would get for the second case."
+      "explanation": "The alternative explanation is that something is intercepting the connection. Only two things produce that message: a legitimately rebuilt server, or an interception. Clearing the entry to silence it removes the only warning you would get for the second case."
     },
     {
       "id": "cp-4",
@@ -226,8 +226,8 @@
       "choices": {
         "A": "Apply the change, close the session, and reconnect",
         "B": "Apply the change, then test a NEW session in a second window while keeping the current one open",
-        "C": "Reboot the server after changing the config",
-        "D": "Change it only from the physical console"
+        "C": "Change it only from the physical console",
+        "D": "Reboot the server after changing the config"
       },
       "correct": [
         "B"
@@ -238,15 +238,15 @@
       "id": "cp-5",
       "prompt": "What does the trailing slash change in rsync -av ~/site/ web1:/var/www/site/ ?",
       "choices": {
-        "A": "Nothing at all",
-        "B": "It copies the contents of ~/site into the target; without it, the site directory itself is placed inside the target",
-        "C": "It enables compression",
-        "D": "It deletes files at the destination"
+        "A": "It enables compression",
+        "B": "Nothing at all",
+        "C": "It deletes files at the destination",
+        "D": "It copies the contents of ~/site into the target"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "This one character decides whether you get /var/www/site/index.html or /var/www/site/site/index.html — which is exactly why --dry-run comes first."
+      "explanation": "Without it, the site directory itself is placed inside the target. This one character decides whether you get /var/www/site/index.html or /var/www/site/site/index.html — which is exactly why --dry-run comes first."
     }
   ]
 }

@@ -238,27 +238,27 @@
       "id": "cp-1",
       "prompt": "Why is the machine-code byte column in objdump output worth reading?",
       "choices": {
-        "A": "It shows the instruction encodings for reference",
-        "B": "It reveals instruction lengths, so you can tell whether a jump target lands on a real boundary and whether data is being misdecoded as code",
-        "C": "It is needed to patch the binary",
-        "D": "It shows the addresses"
+        "A": "It is needed to patch the binary",
+        "B": "It shows the instruction encodings for reference",
+        "C": "It shows the addresses",
+        "D": "It reveals instruction lengths"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "On a variable-length architecture, starting a disassembly at the wrong offset produces a completely different and completely plausible instruction stream. Knowing where the boundaries are is what prevents that."
+      "explanation": "You can tell whether a jump target lands on a real boundary and whether data is being misdecoded as code. On a variable-length architecture, starting a disassembly at the wrong offset produces a completely different and completely plausible instruction stream. Knowing where the boundaries are is what prevents that."
     },
     {
       "id": "cp-2",
       "prompt": "A binary has been stripped. What can you still learn about it?",
       "choices": {
         "A": "Nothing useful",
-        "B": "All the code, all string constants, the names of dynamically imported functions, and the data layout readable from address arithmetic",
-        "C": "Only the entry point",
+        "B": "Only the entry point",
+        "C": "All the code, all string constants, the names of dynamically imported functions, and the data layout readable from address arithmetic",
         "D": "Only the strings"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "Stripping removes names, not behaviour. The import list is often the most informative part: a binary importing socket, connect and send is doing networking regardless of what its own functions are called."
     },
@@ -266,13 +266,13 @@
       "id": "cp-3",
       "prompt": "You are stopped inside an optimised function whose source line no longer corresponds to anything. Which command do you want?",
       "choices": {
-        "A": "step, to follow the source",
-        "B": "stepi, which advances exactly one machine instruction",
-        "C": "continue",
-        "D": "finish"
+        "A": "continue",
+        "B": "finish",
+        "C": "step, to follow the source",
+        "D": "stepi, which advances exactly one machine instruction"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "step follows source lines and can walk an entire optimised loop in one keystroke. stepi is the command for debugging machine code rather than source."
     },
@@ -280,10 +280,10 @@
       "id": "cp-4",
       "prompt": "You have just stopped at the first instruction of a function. What does x/4xg $rsp show you?",
       "choices": {
-        "A": "The function's local variables",
+        "A": "The instruction bytes",
         "B": "The top four 8-byte stack values, the first of which is the return address pushed by call",
         "C": "The argument registers",
-        "D": "The instruction bytes"
+        "D": "The function's local variables"
       },
       "correct": [
         "B"

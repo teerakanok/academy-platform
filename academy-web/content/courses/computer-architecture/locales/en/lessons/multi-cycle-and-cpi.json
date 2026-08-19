@@ -166,38 +166,38 @@
       "id": "cp-1",
       "prompt": "A multi-cycle design uses more cycles per instruction than a single-cycle one. Why can it still be faster?",
       "choices": {
-        "A": "It executes instructions in parallel",
-        "B": "Each cycle is far shorter, because it covers one stage rather than all of them — and instructions that skip the memory stage finish in fewer cycles",
-        "C": "It has more registers",
-        "D": "It uses a cache"
+        "A": "Each cycle is far shorter",
+        "B": "It uses a cache",
+        "C": "It executes instructions in parallel",
+        "D": "It has more registers"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "The gain comes from arithmetic and branch instructions no longer paying for a memory access they do not perform. The worked example gave 4100 units against 5000."
+      "explanation": "It covers one stage rather than all of them — and instructions that skip the memory stage finish in fewer cycles. The gain comes from arithmetic and branch instructions no longer paying for a memory access they do not perform. The worked example gave 4100 units against 5000."
     },
     {
       "id": "cp-2",
       "prompt": "A compiler change removes 10% of a program's instructions, but the remaining ones average 30% more cycles. What happened to execution time?",
       "choices": {
         "A": "It fell by 10%",
-        "B": "It rose — 0.9 times 1.3 is 1.17, so about 17% slower",
-        "C": "It is unchanged",
+        "B": "It is unchanged",
+        "C": "It rose — 0.9 times 1.3 is 1.17",
         "D": "It depends on the cache"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "This is why comparing instruction counts is misleading: one term improved while another worsened more. The equation is the only way to settle it."
+      "explanation": "About 17% slower. This is why comparing instruction counts is misleading: one term improved while another worsened more. The equation is the only way to settle it."
     },
     {
       "id": "cp-3",
       "prompt": "Two programs both average 1.2 cycles per instruction. What might still differ completely?",
       "choices": {
-        "A": "Nothing — the average determines performance",
+        "A": "Their clock speeds",
         "B": "The distribution: one may be uniformly just above 1, the other mostly 1 with a few instructions taking 20",
         "C": "Their instruction counts",
-        "D": "Their clock speeds"
+        "D": "Nothing — the average determines performance"
       },
       "correct": [
         "B"
@@ -208,13 +208,13 @@
       "id": "cp-4",
       "prompt": "Which term does a complex instruction set improve, and which does it worsen?",
       "choices": {
-        "A": "It improves cycle time and worsens instruction count",
-        "B": "It reduces the instruction count, while making cycles per instruction and cycle time harder to improve",
+        "A": "It reduces the instruction count, while making cycles per instruction and cycle time harder to improve",
+        "B": "It only affects instruction count",
         "C": "It improves all three",
-        "D": "It only affects instruction count"
+        "D": "It improves cycle time and worsens instruction count"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "Fewer, more capable instructions against harder pipelining and a longer critical path. Which side wins depends on the numbers, and the numbers changed over time — which is why the answer did too."
     }

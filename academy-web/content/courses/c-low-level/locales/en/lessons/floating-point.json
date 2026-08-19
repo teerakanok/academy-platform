@@ -204,27 +204,27 @@
       "id": "cp-1",
       "prompt": "Why is 0.1 + 0.2 not exactly 0.3?",
       "choices": {
-        "A": "A bug in the compiler",
-        "B": "0.1 and 0.2 cannot be represented exactly in binary, so the stored values are slightly off before the addition happens",
-        "C": "The processor is imprecise",
-        "D": "double is too small for these values"
+        "A": "The processor is imprecise",
+        "B": "0.1 and 0.2 cannot be represented exactly in binary",
+        "C": "double is too small for these values",
+        "D": "A bug in the compiler"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Only fractions whose denominator is a power of two are exact. This is a property of the representation, identical in every language using the same hardware format."
+      "explanation": "The stored values are slightly off before the addition happens. Only fractions whose denominator is a power of two are exact. This is a property of the representation, identical in every language using the same hardware format."
     },
     {
       "id": "cp-2",
       "prompt": "How should two floating-point values be compared?",
       "choices": {
-        "A": "With ==",
-        "B": "By checking that the difference is within a tolerance chosen for the scale of the values",
+        "A": "By printing both and comparing the strings",
+        "B": "With ==",
         "C": "By casting both to int",
-        "D": "By printing both and comparing the strings"
+        "D": "By checking that the difference is within a tolerance chosen for the scale of the values"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "A fixed epsilon that works near 1 is meaningless near a million, which is why a relative tolerance is usually the right choice."
     },
@@ -232,29 +232,29 @@
       "id": "cp-3",
       "prompt": "Why should money not be stored in a double?",
       "choices": {
-        "A": "double is not large enough",
-        "B": "Repeated addition accumulates error, so totals drift — store minor units as integers instead",
+        "A": "It is slower than integer arithmetic",
+        "B": "Repeated addition accumulates error",
         "C": "double cannot represent decimals at all",
-        "D": "It is slower than integer arithmetic"
+        "D": "double is not large enough"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Adding 0.01 a thousand times does not give exactly 10. Integer cents are exact, and rounding then happens only where you decide it should."
+      "explanation": "Totals drift — store minor units as integers instead. Adding 0.01 a thousand times does not give exactly 10. Integer cents are exact, and rounding then happens only where you decide it should."
     },
     {
       "id": "cp-4",
       "prompt": "How do you test whether a value is NaN?",
       "choices": {
-        "A": "x == NAN",
-        "B": "isnan(x) from <math.h> — NaN is not equal to anything, including itself",
-        "C": "x == 0",
-        "D": "x < 0 && x > 0"
+        "A": "isnan(x) from <math.h>",
+        "B": "x == 0",
+        "C": "x < 0 && x > 0",
+        "D": "x == NAN"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "Every comparison involving NaN is false, so == can never detect it. That property also means x != x works as a test, but isnan states the intent."
+      "explanation": "NaN is not equal to anything, including itself. Every comparison involving NaN is false, so == can never detect it. That property also means x != x works as a test, but isnan states the intent."
     }
   ]
 }

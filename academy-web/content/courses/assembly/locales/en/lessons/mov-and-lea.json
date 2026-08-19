@@ -200,57 +200,57 @@
       "id": "cp-1",
       "prompt": "What does lea rax, [rdi + 4*rdi] compute?",
       "choices": {
-        "A": "The value at address rdi + 4*rdi",
-        "B": "rdi * 5, as arithmetic — lea computes the address expression without accessing memory",
+        "A": "An array element at index 4",
+        "B": "The value at address rdi + 4*rdi",
         "C": "rdi + 4",
-        "D": "An array element at index 4"
+        "D": "rdi * 5, as arithmetic"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "No array has a stride of four times its own base address, so this cannot be an address computation. It is a multiplication by five in one instruction."
+      "explanation": "Lea computes the address expression without accessing memory. No array has a stride of four times its own base address, so this cannot be an address computation. It is a multiplication by five in one instruction."
     },
     {
       "id": "cp-2",
       "prompt": "You see mov eax, dword ptr [rdi + 4*rsi]. What is this in C?",
       "choices": {
         "A": "A pointer to a[i]",
-        "B": "a[i] where a is an int* in rdi and i is in rsi — scale 4 is the size of an int",
-        "C": "a + 4*i as a number",
-        "D": "A struct field access"
+        "B": "a[i] where a is an int* in rdi and i is in rsi",
+        "C": "A struct field access",
+        "D": "a + 4*i as a number"
       },
       "correct": [
         "B"
       ],
-      "explanation": "The scale gives the element size. mov with brackets fetches, so this reads the element rather than computing its address."
+      "explanation": "Scale 4 is the size of an int. The scale gives the element size. mov with brackets fetches, so this reads the element rather than computing its address."
     },
     {
       "id": "cp-3",
       "prompt": "unsigned long widenu(unsigned x) { return x; } compiles to a single mov eax, edi. Why is no conversion instruction needed?",
       "choices": {
-        "A": "unsigned and unsigned long are the same size",
-        "B": "A 32-bit write already zeroes the upper 32 bits, which is exactly what zero-extension means",
-        "C": "The compiler omitted it by mistake",
+        "A": "A 32-bit write already zeroes the upper 32 bits",
+        "B": "The compiler omitted it by mistake",
+        "C": "unsigned and unsigned long are the same size",
         "D": "The conversion happens at the call site"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "The register rule pays for itself. The signed version needs movsxd because the fill bits depend on the value's sign."
+      "explanation": "Is exactly what zero-extension means. The register rule pays for itself. The signed version needs movsxd because the fill bits depend on the value's sign."
     },
     {
       "id": "cp-4",
       "prompt": "Why does a compiler sometimes use lea where add would work?",
       "choices": {
-        "A": "lea is always faster",
-        "B": "lea writes to a different register, can combine three terms, and does not disturb the flags — which matters when a comparison result is still needed",
+        "A": "To confuse readers",
+        "B": "lea is always faster",
         "C": "add cannot use registers",
-        "D": "To confuse readers"
+        "D": "lea writes to a different register, can combine three terms, and does not disturb the flags"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "The flags point is the subtle one: inserting an add between a comparison and its branch would destroy the comparison. lea computes in that gap safely."
+      "explanation": "Which matters when a comparison result is still needed. The flags point is the subtle one: inserting an add between a comparison and its branch would destroy the comparison. lea computes in that gap safely."
     }
   ]
 }

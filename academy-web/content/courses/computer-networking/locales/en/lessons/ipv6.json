@@ -189,9 +189,9 @@
       "prompt": "Shorten 2001:0db8:0000:0000:0000:ff00:0042:8329 correctly.",
       "choices": {
         "A": "2001:db8::ff00:42:8329",
-        "B": "2001::db8::ff00:42:8329",
-        "C": "2001:0db8::ff00:0042:8329",
-        "D": "2001:db8:0:0:0:ff00:42:8329 only"
+        "B": "2001:db8:0:0:0:ff00:42:8329 only",
+        "C": "2001::db8::ff00:42:8329",
+        "D": "2001:0db8::ff00:0042:8329"
       },
       "correct": [
         "A"
@@ -202,29 +202,29 @@
       "id": "cp-2",
       "prompt": "Why is it pointless to size an IPv6 subnet to the number of machines on it?",
       "choices": {
-        "A": "Because IPv6 does not support subnetting",
-        "B": "Because a /64 holds over 18 quintillion addresses — around four billion times the entire IPv4 internet — so host count never constrains it",
-        "C": "Because subnets are assigned automatically",
-        "D": "Because all addresses are link-local"
+        "A": "Because a /64 holds over 18 quintillion addresses",
+        "B": "Because IPv6 does not support subnetting",
+        "C": "Because all addresses are link-local",
+        "D": "Because subnets are assigned automatically"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "Computed, not estimated. The planning question shifts from how many hosts to how many subnets, and a /48 provides 65,536 of them."
+      "explanation": "Around four billion times the entire IPv4 internet — so host count never constrains it. Computed, not estimated. The planning question shifts from how many hosts to how many subnets, and a /48 provides 65,536 of them."
     },
     {
       "id": "cp-3",
       "prompt": "An administrator applies their IPv4 firewall policy to IPv6 and blocks all ICMP. What happens?",
       "choices": {
-        "A": "Only ping stops working",
-        "B": "IPv6 stops working entirely — neighbour discovery, the replacement for ARP, is ICMPv6",
+        "A": "Large packets fail but small ones work",
+        "B": "Only ping stops working",
         "C": "Nothing, IPv6 does not use ICMP",
-        "D": "Large packets fail but small ones work"
+        "D": "IPv6 stops working entirely"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "In IPv4 the same mistake causes the large-packet hang. In IPv6 the address resolution mechanism itself is ICMPv6, so the network cannot function."
+      "explanation": "Neighbour discovery, the replacement for ARP, is ICMPv6. In IPv4 the same mistake causes the large-packet hang. In IPv6 the address resolution mechanism itself is ICMPv6, so the network cannot function."
     },
     {
       "id": "cp-4",

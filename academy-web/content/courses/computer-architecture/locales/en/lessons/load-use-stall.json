@@ -146,13 +146,13 @@
       "id": "cp-1",
       "prompt": "Why can forwarding fully hide an arithmetic dependency but not a load-use dependency?",
       "choices": {
-        "A": "Loads use a different register file",
-        "B": "The arithmetic result exists a cycle before it is needed, while the loaded value arrives in the same cycle it is needed",
-        "C": "Memory is slower than arithmetic",
-        "D": "Loads cannot be forwarded at all"
+        "A": "The arithmetic result exists a cycle before it is needed, while the loaded value arrives in the same cycle it is needed",
+        "B": "Loads use a different register file",
+        "C": "Loads cannot be forwarded at all",
+        "D": "Memory is slower than arithmetic"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "Forwarding spends slack. Arithmetic has a cycle of it; a load has none, because its value is ready at the end of exactly the cycle the next instruction starts."
     },
@@ -160,13 +160,13 @@
       "id": "cp-2",
       "prompt": "A compiler moves an unrelated instruction between a load and the instruction that uses it. Why?",
       "choices": {
-        "A": "To reduce code size",
-        "B": "To fill the cycle that would otherwise be a stall, since the unrelated instruction does not need the loaded value",
-        "C": "To improve cache locality",
+        "A": "To fill the cycle that would otherwise be a stall, since the unrelated instruction does not need the loaded value",
+        "B": "To improve cache locality",
+        "C": "To reduce code size",
         "D": "To satisfy the calling convention"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "The stall exists because nothing useful can run in that cycle. Giving the processor something independent to run removes the cost entirely."
     },
@@ -174,13 +174,13 @@
       "id": "cp-3",
       "prompt": "A dependent walk and an independent walk over the same 32 KB buffer differed by 1.93x. What does the 32 KB size rule out as the explanation?",
       "choices": {
-        "A": "Branch misprediction",
-        "B": "Cache misses — the whole buffer fits in the first-level cache, so both loops hit every time",
+        "A": "Cache misses — the whole buffer fits in the first-level cache, so both loops hit every time",
+        "B": "Clock frequency changes",
         "C": "Compiler optimisation",
-        "D": "Clock frequency changes"
+        "D": "Branch misprediction"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "That is the purpose of choosing 32 KB. With cache behaviour held identical, the remaining difference can only be the address dependency."
     },
@@ -188,13 +188,13 @@
       "id": "cp-4",
       "prompt": "Why does improving cache locality not fully fix pointer chasing?",
       "choices": {
-        "A": "Pointers are larger than indices",
-        "B": "Locality reduces the cost of a miss, but the address of the next access is still a result of the current load",
-        "C": "Caches do not hold pointers",
-        "D": "It does fully fix it"
+        "A": "Locality reduces the cost of a miss, but the address of the next access is still a result of the current load",
+        "B": "Pointers are larger than indices",
+        "C": "It does fully fix it",
+        "D": "Caches do not hold pointers"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "Two independent problems: how long each access takes, and whether the next access can start before this one finishes. Locality addresses the first only."
     }

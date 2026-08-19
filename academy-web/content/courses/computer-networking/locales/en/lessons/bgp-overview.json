@@ -176,13 +176,13 @@
       "id": "cp-1",
       "prompt": "Why might traffic between two cities in the same country leave the country and come back?",
       "choices": {
-        "A": "A misconfiguration, always",
-        "B": "Routing between networks follows policy and contracts rather than geography",
-        "C": "Cables only run between countries",
-        "D": "To balance load"
+        "A": "Routing between networks follows policy and contracts rather than geography",
+        "B": "Cables only run between countries",
+        "C": "To balance load",
+        "D": "A misconfiguration, always"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "Inside a single network the goal is the shortest path. Between networks it is the path the operator's agreements and costs favour, which may be much longer physically."
     },
@@ -190,27 +190,27 @@
       "id": "cp-2",
       "prompt": "An operator announces a /24 inside a range legitimately held by someone else announcing a /16. What happens?",
       "choices": {
-        "A": "The announcement is ignored as invalid",
-        "B": "The /24 wins wherever it is accepted, because the most specific route always wins",
-        "C": "Traffic is split between them",
-        "D": "The older announcement takes precedence"
+        "A": "Traffic is split between them",
+        "B": "The older announcement takes precedence",
+        "C": "The announcement is ignored as invalid",
+        "D": "The /24 wins wherever it is accepted"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "The longest-prefix rule from the routing lesson applies globally, and it has no notion of entitlement. That is precisely what signed authorisations and customer filtering exist to address."
+      "explanation": "The most specific route always wins. The longest-prefix rule from the routing lesson applies globally, and it has no notion of entitlement. That is precisely what signed authorisations and customer filtering exist to address."
     },
     {
       "id": "cp-3",
       "prompt": "What does the path carried in an announcement do, besides letting receivers compare routes?",
       "choices": {
         "A": "It measures latency",
-        "B": "It prevents loops — a network that sees its own identifier in a path rejects the announcement",
-        "C": "It authenticates the sender",
-        "D": "It sets the packet's hop limit"
+        "B": "It sets the packet's hop limit",
+        "C": "It prevents loops — a network that sees its own identifier in a path rejects the announcement",
+        "D": "It authenticates the sender"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "Loop prevention is structural. Note what it does not do: it carries no proof that any network on it was entitled to announce the range."
     },
@@ -218,15 +218,15 @@
       "id": "cp-4",
       "prompt": "Traffic to your service is hijacked and routed through an attacker. Your connections use TLS. What is the impact?",
       "choices": {
-        "A": "The attacker reads everything",
-        "B": "Mainly availability and latency — the traffic is diverted but remains unreadable without a certificate the client accepts",
+        "A": "Mainly availability and latency",
+        "B": "TLS prevents the hijack from happening",
         "C": "No impact at all",
-        "D": "TLS prevents the hijack from happening"
+        "D": "The attacker reads everything"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "Same shape as the ARP lesson: the routing layer cannot authenticate, so encryption converts a confidentiality problem into an availability one. It does not prevent the diversion."
+      "explanation": "The traffic is diverted but remains unreadable without a certificate the client accepts. Same shape as the ARP lesson: the routing layer cannot authenticate, so encryption converts a confidentiality problem into an availability one. It does not prevent the diversion."
     }
   ]
 }

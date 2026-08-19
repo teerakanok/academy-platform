@@ -177,55 +177,55 @@
       "id": "cp-1",
       "prompt": "One thread writes a shared counter under a mutex; another reads it without locking. Is that safe?",
       "choices": {
-        "A": "Yes — reads are always safe",
-        "B": "No — it is still a data race; every access, including reads, must use the same mutex",
-        "C": "Safe if the value fits in a register",
-        "D": "Safe on x86 only"
+        "A": "Safe if the value fits in a register",
+        "B": "Safe on x86 only",
+        "C": "Yes — reads are always safe",
+        "D": "No — it is still a data race"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "The mutex protects the data, so it only works if everyone touching that data participates. Thread sanitizer reports exactly this case."
+      "explanation": "Every access, including reads, must use the same mutex. The mutex protects the data, so it only works if everyone touching that data participates. Thread sanitizer reports exactly this case."
     },
     {
       "id": "cp-2",
       "prompt": "An uncontended lock/unlock pair costs about 7 ns. Why is that possible when a system call costs far more?",
       "choices": {
-        "A": "The kernel caches the lock",
-        "B": "The fast path is an atomic operation in user mode; the kernel is called only when a thread must wait",
+        "A": "7 ns is a measurement error",
+        "B": "The fast path is an atomic operation in user mode",
         "C": "The compiler removes uncontended locks",
-        "D": "7 ns is a measurement error"
+        "D": "The kernel caches the lock"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Verified with strace: 100,000 uncontended lock/unlock pairs produced zero futex system calls. Waiting is what costs; locking by itself is not."
+      "explanation": "The kernel is called only when a thread must wait. Verified with strace: 100,000 uncontended lock/unlock pairs produced zero futex system calls. Waiting is what costs; locking by itself is not."
     },
     {
       "id": "cp-3",
       "prompt": "A service holds a mutex while making a 50 ms network call. What is the symptom?",
       "choices": {
-        "A": "Data corruption",
-        "B": "Threads serialise behind work that never needed protecting, so adding cores does not help",
+        "A": "The mutex is released automatically after a timeout",
+        "B": "Threads serialise behind work that never needed protecting",
         "C": "Deadlock",
-        "D": "The mutex is released automatically after a timeout"
+        "D": "Data corruption"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Correctness is fine, throughput is not. Do the slow work outside the critical section and take the lock only for the shared update."
+      "explanation": "Adding cores does not help. Correctness is fine, throughput is not. Do the slow work outside the critical section and take the lock only for the shared update."
     },
     {
       "id": "cp-4",
       "prompt": "You must subtract from one account and add to another. What is the right locking?",
       "choices": {
-        "A": "One critical section covering both updates",
-        "B": "Lock and unlock separately around each update",
-        "C": "An atomic type for each balance",
-        "D": "No lock if both are atomic"
+        "A": "Lock and unlock separately around each update",
+        "B": "No lock if both are atomic",
+        "C": "One critical section covering both updates",
+        "D": "An atomic type for each balance"
       },
       "correct": [
-        "A"
+        "C"
       ],
       "explanation": "Between two separate critical sections there is a moment when the money is in neither account, and another thread can observe it. Atomics do not help here: each is individually atomic, and the pair still is not."
     }

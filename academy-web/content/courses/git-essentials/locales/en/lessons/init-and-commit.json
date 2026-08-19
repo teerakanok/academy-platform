@@ -29,11 +29,27 @@
     },
     {
       "kind": "table",
-      "headers": ["Place", "Meaning", "How it gets there"],
+      "headers": [
+        "Place",
+        "Meaning",
+        "How it gets there"
+      ],
       "rows": [
-        ["Working directory", "The files as they are on disk right now", "You edit them"],
-        ["Staging area", "The changes you have chosen for the next commit", "git add"],
-        ["Repository", "Commits — permanent recorded history", "git commit"]
+        [
+          "Working directory",
+          "The files as they are on disk right now",
+          "You edit them"
+        ],
+        [
+          "Staging area",
+          "The changes you have chosen for the next commit",
+          "git add"
+        ],
+        [
+          "Repository",
+          "Commits — permanent recorded history",
+          "git commit"
+        ]
       ]
     },
     {
@@ -69,12 +85,32 @@
     },
     {
       "kind": "table",
-      "headers": ["Weak", "Better", "Why"],
+      "headers": [
+        "Weak",
+        "Better",
+        "Why"
+      ],
       "rows": [
-        ["update", "Reject uploads over 10MB", "States the effect, not the activity"],
-        ["fix bug", "Fix timezone shift on the report export", "Names which bug"],
-        ["changes", "Move rate limiting into the middleware", "Someone can find this later"],
-        ["asdf", "Add missing index on orders.created_at", "A history is read by people"]
+        [
+          "update",
+          "Reject uploads over 10MB",
+          "States the effect, not the activity"
+        ],
+        [
+          "fix bug",
+          "Fix timezone shift on the report export",
+          "Names which bug"
+        ],
+        [
+          "changes",
+          "Move rate limiting into the middleware",
+          "Someone can find this later"
+        ],
+        [
+          "asdf",
+          "Add missing index on orders.created_at",
+          "A history is read by people"
+        ]
       ]
     },
     {
@@ -113,49 +149,57 @@
       "id": "cp-1",
       "prompt": "What is the staging area for?",
       "choices": {
-        "A": "A backup taken before committing",
+        "A": "A cache that makes Git faster",
         "B": "Choosing exactly which changes go into the next commit, instead of committing everything you touched",
-        "C": "A queue of files waiting to upload to a server",
-        "D": "A cache that makes Git faster"
+        "C": "A backup taken before committing",
+        "D": "A queue of files waiting to upload to a server"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "It separates 'I changed this' from 'this belongs in this commit', which is what lets a history be made of coherent, single-purpose commits."
     },
     {
       "id": "cp-2",
       "prompt": "You delete the .git directory from a project folder. What happens?",
       "choices": {
-        "A": "Nothing — it is a cache and Git rebuilds it",
-        "B": "The files remain but every commit, branch, and piece of history is gone",
+        "A": "The files remain but every commit, branch, and piece of history is gone",
+        "B": "Nothing — it is a cache and Git rebuilds it",
         "C": "The files are deleted too",
         "D": "The project reverts to its first commit"
       },
-      "correct": ["B"],
+      "correct": [
+        "A"
+      ],
       "explanation": ".git is the repository itself. Without it the folder is just files with no past — and no way to recover one locally."
     },
     {
       "id": "cp-3",
       "prompt": "Which commit message is most useful six months later?",
       "choices": {
-        "A": "update",
-        "B": "fix bug",
-        "C": "Reject uploads over 10MB",
-        "D": "changes to files"
+        "A": "fix bug",
+        "B": "update",
+        "C": "changes to files",
+        "D": "Reject uploads over 10MB"
       },
-      "correct": ["C"],
+      "correct": [
+        "D"
+      ],
       "explanation": "It states the effect of the change. The diff already shows what lines moved; the message is there to say why, so the right commit can be found without opening every one."
     },
     {
       "id": "cp-4",
       "prompt": "Why run git status before git add . ?",
       "choices": {
-        "A": "git add . fails without it",
-        "B": "It shows exactly what is about to be included, so a temporary file, local config, or key does not get swept into the commit",
+        "A": "It stages the files for you",
+        "B": "git add . fails without it",
         "C": "It makes the commit faster",
-        "D": "It stages the files for you"
+        "D": "It shows exactly what is about to be included"
       },
-      "correct": ["B"],
-      "explanation": "Look before you act. Once a file is committed, removing it later does not remove it from the history."
+      "correct": [
+        "D"
+      ],
+      "explanation": "A temporary file, local config, or key does not get swept into the commit. Look before you act. Once a file is committed, removing it later does not remove it from the history."
     }
   ]
 }

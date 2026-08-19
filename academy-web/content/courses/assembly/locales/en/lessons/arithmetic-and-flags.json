@@ -241,15 +241,15 @@
       "id": "cp-1",
       "prompt": "Signed and unsigned less-than both compile to the same cmp. Where does the difference appear?",
       "choices": {
-        "A": "In the operand order",
-        "B": "In the condition that reads the flags: setl for signed, setb for unsigned",
-        "C": "In the register widths",
+        "A": "In the register widths",
+        "B": "In the operand order",
+        "C": "In the condition that reads the flags",
         "D": "There is no difference"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "cmp sets every flag without interpreting its operands. Less/greater are the signed words, below/above the unsigned ones."
+      "explanation": "Setl for signed, setb for unsigned cmp sets every flag without interpreting its operands. Less/greater are the signed words, below/above the unsigned ones."
     },
     {
       "id": "cp-2",
@@ -269,29 +269,29 @@
       "id": "cp-3",
       "prompt": "A ternary compiles to cmov, but adding a function call to one branch makes the cmov disappear. Why?",
       "choices": {
-        "A": "cmov cannot use the return value",
-        "B": "cmov evaluates both sides and selects afterwards, so it can only be used when evaluating both is safe — a call has effects that must not happen unconditionally",
-        "C": "Calls clobber the flags",
+        "A": "Calls clobber the flags",
+        "B": "cmov cannot use the return value",
+        "C": "cmov evaluates both sides and selects afterwards",
         "D": "The function is too large"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "The same limit the architecture course gave for branchless code: it does both sides' work every time, so a side with an effect cannot be executed unconditionally."
+      "explanation": "It can only be used when evaluating both is safe — a call has effects that must not happen unconditionally. The same limit the architecture course gave for branchless code: it does both sides' work every time, so a side with an effect cannot be executed unconditionally."
     },
     {
       "id": "cp-4",
       "prompt": "You see sar eax, 2 in a disassembly with no type information available. What does it tell you?",
       "choices": {
-        "A": "Nothing about types",
-        "B": "The value was signed — sar copies the sign bit in, while shr brings in zeros for unsigned values",
-        "C": "The value was a pointer",
+        "A": "The value was signed",
+        "B": "The value was a pointer",
+        "C": "Nothing about types",
         "D": "The shift count was variable"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "Recovering type information from instruction choice is a core reverse-engineering technique, and the signed shift is one of the clearest signals available."
+      "explanation": "Sar copies the sign bit in, while shr brings in zeros for unsigned values. Recovering type information from instruction choice is a core reverse-engineering technique, and the signed shift is one of the clearest signals available."
     }
   ]
 }

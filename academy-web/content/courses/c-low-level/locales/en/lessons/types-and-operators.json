@@ -84,14 +84,42 @@
     },
     {
       "kind": "table",
-      "headers": ["Expression", "Result", "Note"],
+      "headers": [
+        "Expression",
+        "Result",
+        "Note"
+      ],
       "rows": [
-        ["7 / 2", "3", "Integer division truncates toward zero"],
-        ["7 % 2", "1", "Remainder; the sign follows the left operand"],
-        ["i++ vs ++i", "Same variable, different value returned", "Use as a statement, not inside a larger expression"],
-        ["a && b", "b is not evaluated if a is false", "Short-circuit — often used deliberately as a guard"],
-        ["x = y = 0", "Both become 0", "Assignment is an expression and returns its value"],
-        ["if (x = 5)", "Always true", "Assignment, not comparison — a classic typo"]
+        [
+          "7 / 2",
+          "3",
+          "Integer division truncates toward zero"
+        ],
+        [
+          "7 % 2",
+          "1",
+          "Remainder; the sign follows the left operand"
+        ],
+        [
+          "i++ vs ++i",
+          "Same variable, different value returned",
+          "Use as a statement, not inside a larger expression"
+        ],
+        [
+          "a && b",
+          "b is not evaluated if a is false",
+          "Short-circuit — often used deliberately as a guard"
+        ],
+        [
+          "x = y = 0",
+          "Both become 0",
+          "Assignment is an expression and returns its value"
+        ],
+        [
+          "if (x = 5)",
+          "Always true",
+          "Assignment, not comparison — a classic typo"
+        ]
       ]
     },
     {
@@ -152,48 +180,56 @@
       "prompt": "What does 7 / 2 evaluate to in C, and why?",
       "choices": {
         "A": "3.5 — C promotes to double automatically",
-        "B": "3 — both operands are integers, so integer division discards the fraction",
-        "C": "4 — it rounds to nearest",
-        "D": "It is a compile error"
+        "B": "4 — it rounds to nearest",
+        "C": "It is a compile error",
+        "D": "3 — both operands are integers"
       },
-      "correct": ["B"],
-      "explanation": "Casting the result does not help because the fraction is already gone. Cast one operand before the division: (double)7 / 2."
+      "correct": [
+        "D"
+      ],
+      "explanation": "Integer division discards the fraction. Casting the result does not help because the fraction is already gone. Cast one operand before the division: (double)7 / 2."
     },
     {
       "id": "cp-2",
       "prompt": "int i = -1; unsigned u = 1; Is i < u true?",
       "choices": {
-        "A": "Yes — -1 is less than 1",
-        "B": "No — i is converted to unsigned first, becoming a very large number",
-        "C": "It is undefined behaviour",
-        "D": "It depends on the compiler"
+        "A": "No — i is converted to unsigned first, becoming a very large number",
+        "B": "Yes — -1 is less than 1",
+        "C": "It depends on the compiler",
+        "D": "It is undefined behaviour"
       },
-      "correct": ["B"],
+      "correct": [
+        "A"
+      ],
       "explanation": "When signed and unsigned of the same width meet, the signed value converts to unsigned. This rule is behind a recurring class of length-check vulnerabilities."
     },
     {
       "id": "cp-3",
       "prompt": "Why is if (p != NULL && p->count > 0) safe?",
       "choices": {
-        "A": "C checks pointers automatically",
-        "B": "Because && short-circuits: if the left side is false, the right side is never evaluated, so p is never dereferenced when NULL",
-        "C": "Because NULL is treated as zero",
-        "D": "It is not safe"
+        "A": "Because && short-circuits",
+        "B": "It is not safe",
+        "C": "C checks pointers automatically",
+        "D": "Because NULL is treated as zero"
       },
-      "correct": ["B"],
-      "explanation": "The order is the safety. Written the other way round, the dereference happens before the check."
+      "correct": [
+        "A"
+      ],
+      "explanation": "If the left side is false, the right side is never evaluated, so p is never dereferenced when NULL. The order is the safety. Written the other way round, the dereference happens before the check."
     },
     {
       "id": "cp-4",
       "prompt": "Why should a length or size be stored in size_t rather than int?",
       "choices": {
-        "A": "size_t is faster",
-        "B": "size_t is unsigned and wide enough for any object, so a negative value cannot silently become an enormous size in a comparison or allocation",
+        "A": "size_t is unsigned and wide enough for any object",
+        "B": "size_t is faster",
         "C": "int cannot hold large numbers",
         "D": "It is required by printf"
       },
-      "correct": ["B"],
-      "explanation": "Mixing a signed length into an unsigned comparison is exactly how a check gets passed backwards, and it appears in real advisories repeatedly."
+      "correct": [
+        "A"
+      ],
+      "explanation": "A negative value cannot silently become an enormous size in a comparison or allocation. Mixing a signed length into an unsigned comparison is exactly how a check gets passed backwards, and it appears in real advisories repeatedly."
     }
   ]
 }

@@ -195,13 +195,13 @@
       "id": "cp-1",
       "prompt": "Your program sends 5 bytes over TCP on IPv4 Ethernet. Roughly how many bytes are on the wire?",
       "choices": {
-        "A": "5",
-        "B": "About 59 — 14 ethernet, 20 IPv4, 20 TCP, 5 payload",
-        "C": "About 25",
-        "D": "1500"
+        "A": "About 59 — 14 ethernet, 20 IPv4, 20 TCP, 5 payload",
+        "B": "About 25",
+        "C": "1500",
+        "D": "5"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "Verified from the system headers. The payload is about 8% of the frame, which is why protocols batch small messages rather than sending each one on its own."
     },
@@ -210,12 +210,12 @@
       "prompt": "ssh connects and shows a prompt, but freezes as soon as a command produces long output. What do you suspect?",
       "choices": {
         "A": "A DNS problem",
-        "B": "An MTU problem — small packets pass while large ones are dropped somewhere on the path",
-        "C": "The server is out of memory",
-        "D": "A firewall blocking port 22"
+        "B": "A firewall blocking port 22",
+        "C": "An MTU problem — small packets pass while large ones are dropped somewhere on the path",
+        "D": "The server is out of memory"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "Port 22 is clearly open, since the session was established. The size-dependent behaviour is the signature: test with ping -M do at increasing sizes to find where it stops."
     },
@@ -223,27 +223,27 @@
       "id": "cp-3",
       "prompt": "Why diagnose from the bottom layer upward rather than from the application down?",
       "choices": {
-        "A": "Lower layers are faster to check",
-        "B": "A failure at a low layer surfaces as a confusing error at a high one, so starting at the top sends you to the wrong place",
-        "C": "Application tools are unreliable",
-        "D": "It is only a convention"
+        "A": "It is only a convention",
+        "B": "Application tools are unreliable",
+        "C": "Lower layers are faster to check",
+        "D": "A failure at a low layer surfaces as a confusing error at a high one"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "An unplugged cable produces a DNS resolution error. Start at the bottom, stop at the first layer that fails, and you skip the misleading symptom entirely."
+      "explanation": "Starting at the top sends you to the wrong place. An unplugged cable produces a DNS resolution error. Start at the bottom, stop at the first layer that fails, and you skip the misleading symptom entirely."
     },
     {
       "id": "cp-4",
       "prompt": "Which layer knows what the bytes actually mean?",
       "choices": {
         "A": "Transport, because it has ports",
-        "B": "Only the application layer",
+        "B": "Link, because it puts them on the wire",
         "C": "Network, because it routes them",
-        "D": "Link, because it puts them on the wire"
+        "D": "Only the application layer"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "That separation is what makes the model work: the middle layers move opaque payloads and need no knowledge of the protocol inside, which is why a router can forward traffic for protocols invented after it was built."
     }

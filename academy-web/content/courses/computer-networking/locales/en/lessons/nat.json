@@ -170,9 +170,9 @@
       "id": "cp-1",
       "prompt": "Twelve devices at home share one public address. What distinguishes their connections at the router?",
       "choices": {
-        "A": "Their MAC addresses",
+        "A": "Separate public addresses assigned dynamically",
         "B": "A different outside port number for each connection, recorded in a mapping table",
-        "C": "Separate public addresses assigned dynamically",
+        "C": "Their MAC addresses",
         "D": "The order the connections were made"
       },
       "correct": [
@@ -184,13 +184,13 @@
       "id": "cp-2",
       "prompt": "Is it accurate to say NAT protects your network like a firewall?",
       "choices": {
-        "A": "Yes — it blocks all attacks",
-        "B": "No — inbound traffic is dropped because the router does not know where to send it, and that side effect covers nothing else",
-        "C": "Yes, for outbound traffic",
-        "D": "Only with IPv6"
+        "A": "Only with IPv6",
+        "B": "Yes, for outbound traffic",
+        "C": "No — inbound traffic is dropped because the router does not know where to send it, and that side effect covers nothing else",
+        "D": "Yes — it blocks all attacks"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "It genuinely does block unsolicited inbound traffic, which is useful. But it does nothing about outbound traffic, traffic between inside machines, or anything once a mapping exists."
     },
@@ -198,29 +198,29 @@
       "id": "cp-3",
       "prompt": "A video call connects two users who are both behind home routers. How?",
       "choices": {
-        "A": "One of them must have a public address",
-        "B": "Both send outbound at the same moment, each creating a mapping the other's traffic can use — with a relay server as the fallback",
-        "C": "The routers negotiate automatically",
-        "D": "The call always goes through a central server"
+        "A": "Both send outbound at the same moment, each creating a mapping the other's traffic can use",
+        "B": "The routers negotiate automatically",
+        "C": "The call always goes through a central server",
+        "D": "One of them must have a public address"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "Every technique for traversing NAT works by making the connection outbound from each side's point of view. Relaying is the fallback when that fails, not the first choice, because it costs the provider bandwidth."
+      "explanation": "With a relay server as the fallback. Every technique for traversing NAT works by making the connection outbound from each side's point of view. Relaying is the fallback when that fails, not the first choice, because it costs the provider bandwidth."
     },
     {
       "id": "cp-4",
       "prompt": "You configure port forwarding correctly and it still does not work. What should you check?",
       "choices": {
-        "A": "The cable",
-        "B": "Whether your provider is using carrier-grade NAT — check for an address inside 100.64.0.0/10",
-        "C": "The server's firewall only",
-        "D": "DNS"
+        "A": "DNS",
+        "B": "The cable",
+        "C": "Whether your provider is using carrier-grade NAT",
+        "D": "The server's firewall only"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "A second layer of translation above your router cannot be configured from your side. That reserved range is the specific sign that you are behind one."
+      "explanation": "Check for an address inside 100.64.0.0/10 A second layer of translation above your router cannot be configured from your side. That reserved range is the specific sign that you are behind one."
     }
   ]
 }

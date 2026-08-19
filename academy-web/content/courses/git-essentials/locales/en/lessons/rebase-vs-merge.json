@@ -79,13 +79,37 @@
     },
     {
       "kind": "table",
-      "headers": ["Situation", "Use", "Why"],
+      "headers": [
+        "Situation",
+        "Use",
+        "Why"
+      ],
       "rows": [
-        ["Bring your branch up to date before sharing", "rebase onto the shared branch", "Keeps a straight, readable history"],
-        ["Combine your own messy commits", "interactive rebase", "The steps you took are not information anyone needs"],
-        ["Integrate a finished branch into a shared one", "merge", "Records that the branch existed and joined here"],
-        ["Undo something already shared", "revert", "Never rewrite what others have"],
-        ["Anything already pushed and pulled by others", "do not rebase", "It splits reality for everyone who has it"]
+        [
+          "Bring your branch up to date before sharing",
+          "rebase onto the shared branch",
+          "Keeps a straight, readable history"
+        ],
+        [
+          "Combine your own messy commits",
+          "interactive rebase",
+          "The steps you took are not information anyone needs"
+        ],
+        [
+          "Integrate a finished branch into a shared one",
+          "merge",
+          "Records that the branch existed and joined here"
+        ],
+        [
+          "Undo something already shared",
+          "revert",
+          "Never rewrite what others have"
+        ],
+        [
+          "Anything already pushed and pulled by others",
+          "do not rebase",
+          "It splits reality for everyone who has it"
+        ]
       ]
     },
     {
@@ -125,36 +149,42 @@
       "id": "cp-1",
       "prompt": "What does rebase actually do to your commits?",
       "choices": {
-        "A": "Moves the existing commits to a new position",
-        "B": "Creates new commits containing the same changes, with new identities, on top of the new base",
-        "C": "Merges them and deletes the branch",
-        "D": "Compresses them into one commit automatically"
+        "A": "Merges them and deletes the branch",
+        "B": "Moves the existing commits to a new position",
+        "C": "Compresses them into one commit automatically",
+        "D": "Creates new commits containing the same changes, with new identities, on top of the new base"
       },
-      "correct": ["B"],
+      "correct": [
+        "D"
+      ],
       "explanation": "New commits with new ids. That is precisely why rebasing shared commits is a problem — everyone else still has the originals."
     },
     {
       "id": "cp-2",
       "prompt": "Which is the correct rule for when rebasing is safe?",
       "choices": {
-        "A": "Rebase everything; merges make history messy",
-        "B": "Rebase only your own work that nobody else has pulled",
+        "A": "Rebase only your own work that nobody else has pulled",
+        "B": "Rebase everything; merges make history messy",
         "C": "Rebase only on Fridays before a release",
         "D": "Rebase only branches with fewer than five commits"
       },
-      "correct": ["B"],
+      "correct": [
+        "A"
+      ],
       "explanation": "Unshared history can be rewritten freely. Shared history cannot, because rewriting it gives everyone who has it a conflicting version of the same work."
     },
     {
       "id": "cp-3",
       "prompt": "You have eleven commits on a branch, three of which are 'fix typo'. What do you do before opening a pull request?",
       "choices": {
-        "A": "Nothing — reviewers can ignore them",
-        "B": "git rebase -i to squash them into commits that each do one thing",
-        "C": "git merge --squash into main directly",
+        "A": "git merge --squash into main directly",
+        "B": "Nothing — reviewers can ignore them",
+        "C": "git rebase -i to squash them into commits that each do one thing",
         "D": "Delete the branch and start again"
       },
-      "correct": ["B"],
+      "correct": [
+        "C"
+      ],
       "explanation": "The steps you happened to take are not information a reviewer needs. Interactive rebase turns them into a history that explains the change — done before review begins, not during."
     },
     {
@@ -162,12 +192,14 @@
       "prompt": "Why prefer --force-with-lease over --force?",
       "choices": {
         "A": "It is faster",
-        "B": "It refuses the push if the remote gained commits you have not seen, so you cannot silently overwrite someone else's work",
-        "C": "It creates a backup branch automatically",
-        "D": "It works without authentication"
+        "B": "It creates a backup branch automatically",
+        "C": "It works without authentication",
+        "D": "It refuses the push if the remote gained commits you have not seen"
       },
-      "correct": ["B"],
-      "explanation": "Plain --force overwrites whatever is there. --force-with-lease checks that the remote is still where you last saw it before replacing it."
+      "correct": [
+        "D"
+      ],
+      "explanation": "You cannot silently overwrite someone else's work. Plain --force overwrites whatever is there. --force-with-lease checks that the remote is still where you last saw it before replacing it."
     }
   ]
 }

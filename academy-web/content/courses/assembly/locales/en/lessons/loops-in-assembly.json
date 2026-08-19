@@ -215,13 +215,13 @@
       "id": "cp-1",
       "prompt": "How do you find every loop in a disassembly?",
       "choices": {
-        "A": "Look for labels",
-        "B": "Look for a jump whose target address is lower than the jump's own address",
-        "C": "Look for cmp instructions",
+        "A": "Look for cmp instructions",
+        "B": "Look for labels",
+        "C": "Look for a jump whose target address is lower than the jump's own address",
         "D": "Look for the loop instruction"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "A backward jump is the only structural signature a loop has, and it works regardless of source language or optimisation level."
     },
@@ -229,27 +229,27 @@
       "id": "cp-2",
       "prompt": "A while loop compiles with a guard at the top and the test at the bottom. Why?",
       "choices": {
-        "A": "To make the code smaller",
-        "B": "Testing at the bottom gives one branch per iteration instead of two; the guard handles the zero-iteration case once",
-        "C": "The hardware requires it",
-        "D": "To help the debugger"
+        "A": "Testing at the bottom gives one branch per iteration instead of two",
+        "B": "To help the debugger",
+        "C": "To make the code smaller",
+        "D": "The hardware requires it"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "This is loop rotation. It is why nearly every compiled loop resembles a do-while regardless of what the source said."
+      "explanation": "The guard handles the zero-iteration case once. This is loop rotation. It is why nearly every compiled loop resembles a do-while regardless of what the source said."
     },
     {
       "id": "cp-3",
       "prompt": "You see xmm registers, paddd, a cmp against 8 before the loop, and a second scalar loop after it. What is this?",
       "choices": {
-        "A": "Floating-point code",
-        "B": "A vectorised loop: the check decides whether vectorising is worthwhile, the vector body handles several elements per iteration, and the tail finishes the remainder",
+        "A": "A vectorised loop: the check decides whether vectorising is worthwhile, the vector body handles several elements per iteration, and the tail finishes the remainder",
+        "B": "Floating-point code",
         "C": "An unrolled loop",
         "D": "Two unrelated loops"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "All four features together are the signature. paddd is packed add of doublewords — four 32-bit integers per instruction."
     },
@@ -257,13 +257,13 @@
       "id": "cp-4",
       "prompt": "You look for your hand-written character-counting loop and find a call to strlen instead. What happened?",
       "choices": {
-        "A": "The linker substituted it",
-        "B": "The compiler recognised the idiom and replaced the loop with the library routine",
-        "C": "The source was miscompiled",
-        "D": "strlen was inlined into the loop"
+        "A": "The source was miscompiled",
+        "B": "The linker substituted it",
+        "C": "strlen was inlined into the loop",
+        "D": "The compiler recognised the idiom and replaced the loop with the library routine"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "Idiom recognition is routine at higher optimisation levels. It is also a reason to check the disassembly before claiming a hand-written version beat the library."
     }

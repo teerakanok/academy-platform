@@ -31,11 +31,27 @@
     },
     {
       "kind": "table",
-      "headers": ["Name", "What it is", "Who moves it"],
+      "headers": [
+        "Name",
+        "What it is",
+        "Who moves it"
+      ],
       "rows": [
-        ["main", "Your local branch", "You, by committing"],
-        ["origin/main", "Your last-known snapshot of the server's main", "git fetch or git pull"],
-        ["main on the server", "The actual state on the remote", "Whoever pushes to it"]
+        [
+          "main",
+          "Your local branch",
+          "You, by committing"
+        ],
+        [
+          "origin/main",
+          "Your last-known snapshot of the server's main",
+          "git fetch or git pull"
+        ],
+        [
+          "main on the server",
+          "The actual state on the remote",
+          "Whoever pushes to it"
+        ]
       ]
     },
     {
@@ -80,12 +96,32 @@
     },
     {
       "kind": "table",
-      "headers": ["", "HTTPS", "SSH"],
+      "headers": [
+        "",
+        "HTTPS",
+        "SSH"
+      ],
       "rows": [
-        ["Setup", "Nothing to configure", "Generate a key and add the public half to the host"],
-        ["Each push", "Asks for a token unless a credential helper stores it", "Silent, uses your key"],
-        ["Works through restrictive networks", "Usually", "Sometimes blocked"],
-        ["Best for", "Occasional or read-only use", "Anything you push to regularly"]
+        [
+          "Setup",
+          "Nothing to configure",
+          "Generate a key and add the public half to the host"
+        ],
+        [
+          "Each push",
+          "Asks for a token unless a credential helper stores it",
+          "Silent, uses your key"
+        ],
+        [
+          "Works through restrictive networks",
+          "Usually",
+          "Sometimes blocked"
+        ],
+        [
+          "Best for",
+          "Occasional or read-only use",
+          "Anything you push to regularly"
+        ]
       ]
     },
     {
@@ -143,47 +179,55 @@
       "choices": {
         "A": "A live view of the server's main branch",
         "B": "Your machine's note of where the server's main branch was the last time you fetched",
-        "C": "A backup of your local main",
-        "D": "The branch you are currently on"
+        "C": "The branch you are currently on",
+        "D": "A backup of your local main"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "It only updates when you fetch or pull. Until then it can be as stale as your last conversation with the server."
     },
     {
       "id": "cp-2",
       "prompt": "Why is git fetch considered safe to run at any time?",
       "choices": {
-        "A": "It requires no authentication",
-        "B": "It downloads commits and updates remote-tracking branches without touching your working files or your branch",
-        "C": "It only reads the first commit",
+        "A": "It downloads commits and updates remote-tracking branches without touching your working files or your branch",
+        "B": "It only reads the first commit",
+        "C": "It requires no authentication",
         "D": "It creates a backup before running"
       },
-      "correct": ["B"],
+      "correct": [
+        "A"
+      ],
       "explanation": "Fetch is the read-only half of pull. It changes what you know, not what you have."
     },
     {
       "id": "cp-3",
       "prompt": "HTTPS prompts you for a password when pushing. What does it actually want?",
       "choices": {
-        "A": "Your account password",
-        "B": "A personal access token with the narrowest scope that works",
-        "C": "Your SSH private key",
-        "D": "The repository name"
+        "A": "Your SSH private key",
+        "B": "Your account password",
+        "C": "The repository name",
+        "D": "A personal access token with the narrowest scope that works"
       },
-      "correct": ["B"],
-      "explanation": "Major hosts stopped accepting account passwords for Git operations. A token is a credential — scope it tightly and never commit it."
+      "correct": [
+        "D"
+      ],
+      "explanation": "Major hosts stopped accepting account passwords for. Git operations. A token is a credential — scope it tightly and never commit it."
     },
     {
       "id": "cp-4",
       "prompt": "When is git clone --depth 1 the wrong choice?",
       "choices": {
-        "A": "On a build server that only compiles the current code",
-        "B": "For your own working copy, because log, blame, and bisect all need the history it skips",
-        "C": "When the repository is small",
+        "A": "When the repository is small",
+        "B": "On a build server that only compiles the current code",
+        "C": "For your own working copy",
         "D": "When cloning over SSH"
       },
-      "correct": ["B"],
-      "explanation": "A shallow clone trades away exactly the capabilities that make Git worth using day to day."
+      "correct": [
+        "C"
+      ],
+      "explanation": "Log, blame, and bisect all need the history it skips A shallow clone trades away exactly the capabilities that make. Git worth using day to day."
     }
   ]
 }

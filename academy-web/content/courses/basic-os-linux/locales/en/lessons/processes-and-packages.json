@@ -103,12 +103,14 @@
       "id": "cp-1",
       "prompt": "In `ps aux` output, which column matters most for a security question?",
       "choices": {
-        "A": "The memory percentage",
-        "B": "The USER column — which account the process is running as",
+        "A": "The USER column — which account the process is running as",
+        "B": "The terminal it was launched from",
         "C": "The start time",
-        "D": "The terminal it was launched from"
+        "D": "The memory percentage"
       },
-      "correct": ["B"],
+      "correct": [
+        "A"
+      ],
       "explanation": "What a process may do is determined by who it runs as. A process running as root can do anything root can do, so an unexpected root process is the thing to explain."
     },
     {
@@ -116,23 +118,27 @@
       "prompt": "You ran `sudo apt update` and no packages were installed. Why?",
       "choices": {
         "A": "The machine is fully patched already",
-        "B": "apt update only refreshes the catalogue of available versions; apt upgrade installs them",
-        "C": "You needed to reboot first",
-        "D": "The repository was unreachable"
+        "B": "apt update only refreshes the catalogue of available versions",
+        "C": "The repository was unreachable",
+        "D": "You needed to reboot first"
       },
-      "correct": ["B"],
-      "explanation": "The two-step model catches people out constantly. update fetches the list, upgrade applies it. Believing the first one patched the machine leaves it unpatched."
+      "correct": [
+        "B"
+      ],
+      "explanation": "Apt upgrade installs them. The two-step model catches people out constantly. update fetches the list, upgrade applies it. Believing the first one patched the machine leaves it unpatched."
     },
     {
       "id": "cp-3",
       "prompt": "Why is keeping packages current considered high-value security work?",
       "choices": {
         "A": "Because new versions are always faster",
-        "B": "Because most successful intrusions exploit known vulnerabilities that already had patches available",
-        "C": "Because it satisfies auditors and nothing more",
-        "D": "Because it replaces the need for permissions"
+        "B": "Because it replaces the need for permissions",
+        "C": "Because most successful intrusions exploit known vulnerabilities that already had patches available",
+        "D": "Because it satisfies auditors and nothing more"
       },
-      "correct": ["B"],
+      "correct": [
+        "C"
+      ],
       "explanation": "The common case is not a novel exploit against a current system — it is a known issue on a system nobody updated."
     }
   ]

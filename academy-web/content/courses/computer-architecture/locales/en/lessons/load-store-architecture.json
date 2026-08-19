@@ -161,29 +161,29 @@
       "id": "cp-1",
       "prompt": "Why does separating memory access from computation make the hardware simpler?",
       "choices": {
-        "A": "It uses fewer transistors overall",
-        "B": "Each instruction needs one kind of work, so each hardware stage does one kind of thing — which is what makes a straightforward pipeline possible",
-        "C": "Memory becomes faster",
+        "A": "Each instruction needs one kind of work",
+        "B": "Memory becomes faster",
+        "C": "It uses fewer transistors overall",
         "D": "It removes the need for a cache"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "An instruction that read memory, computed and wrote back would need the memory stage twice. Keeping the work per instruction uniform is what the next module builds on."
+      "explanation": "Each hardware stage does one kind of thing — which is what makes a straightforward pipeline possible. An instruction that read memory, computed and wrote back would need the memory stage twice. Keeping the work per instruction uniform is what the next module builds on."
     },
     {
       "id": "cp-2",
       "prompt": "Generated code contains stores and loads to stack offsets that match no variable in the source. What are they?",
       "choices": {
-        "A": "Debug information",
-        "B": "Spilling — the function has more live values than there are registers, so some are held in memory",
-        "C": "Bounds checks",
-        "D": "Alignment padding"
+        "A": "Bounds checks",
+        "B": "Alignment padding",
+        "C": "Spilling — the function has more live values than there are registers",
+        "D": "Debug information"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "It is a direct consequence of computation happening only in registers. Splitting the function usually reduces it, which is a common reason smaller functions run faster."
+      "explanation": "Some are held in memory. It is a direct consequence of computation happening only in registers. Splitting the function usually reduces it, which is a common reason smaller functions run faster."
     },
     {
       "id": "cp-3",
@@ -203,9 +203,9 @@
       "id": "cp-4",
       "prompt": "Why does a struct with a char followed by an int contain three bytes of padding?",
       "choices": {
-        "A": "To reserve space for future fields",
+        "A": "Because char is really four bytes",
         "B": "So the int begins at an aligned address and can be loaded with a single aligned access",
-        "C": "Because char is really four bytes",
+        "C": "To reserve space for future fields",
         "D": "To make sizeof a power of two"
       },
       "correct": [

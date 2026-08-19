@@ -151,55 +151,55 @@
       "id": "cp-1",
       "prompt": "Two processors implement the same ISA. One is three times faster. What must be identical?",
       "choices": {
-        "A": "Their pipeline depth",
-        "B": "The result of every program — the ISA fixes meaning, not speed",
-        "C": "Their cache sizes",
+        "A": "Their cache sizes",
+        "B": "Their pipeline depth",
+        "C": "The result of every program",
         "D": "Their clock speed"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "Everything the contract specifies must match; everything else is free. That is precisely what allows one implementation to be much faster without breaking any program."
+      "explanation": "The ISA fixes meaning, not speed. Everything the contract specifies must match; everything else is free. That is precisely what allows one implementation to be much faster without breaking any program."
     },
     {
       "id": "cp-2",
       "prompt": "aarch64 has no fork system call while x86-64 does. What does that tell you about the two instruction sets?",
       "choices": {
-        "A": "aarch64 cannot create processes",
-        "B": "Nothing — the set of system calls and their numbers are the kernel's ABI for each architecture; the instruction set only fixes the instruction that makes the call",
-        "C": "The aarch64 instruction set defines a smaller set of system calls",
-        "D": "The C library removed it on aarch64"
+        "A": "The aarch64 instruction set defines a smaller set of system calls",
+        "B": "The C library removed it on aarch64",
+        "C": "aarch64 cannot create processes",
+        "D": "Nothing — the set of system calls and their numbers are the kernel's ABI for each architecture"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "Neither the x86-64 nor the ARMv8 specification mentions system call numbers. Linux chooses them per architecture, and the aarch64 port was defined after clone had already replaced fork. The instruction set's only contribution is svc (or syscall)."
+      "explanation": "The instruction set only fixes the instruction that makes the call. Neither the x86-64 nor the ARMv8 specification mentions system call numbers. Linux chooses them per architecture, and the aarch64 port was defined after clone had already replaced fork. The instruction set's only contribution is svc (or syscall)."
     },
     {
       "id": "cp-3",
       "prompt": "What does dedicating a register to the constant zero buy?",
       "choices": {
-        "A": "Faster arithmetic",
-        "B": "Several operations — comparison with zero, moving a value, discarding a result — become ordinary instructions instead of needing their own",
+        "A": "Simpler cache design",
+        "B": "Faster arithmetic",
         "C": "More memory bandwidth",
-        "D": "Simpler cache design"
+        "D": "Several operations"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "One register spent removes the need for several special instructions, which keeps both the encoding and the decoder smaller. It is a representative trade for this whole course."
+      "explanation": "Comparison with zero, moving a value, discarding a result — become ordinary instructions instead of needing their own. One register spent removes the need for several special instructions, which keeps both the encoding and the decoder smaller. It is a representative trade for this whole course."
     },
     {
       "id": "cp-4",
       "prompt": "Which of these may a program safely rely on?",
       "choices": {
         "A": "The size of the cache",
-        "B": "The number of registers the ISA defines",
-        "C": "The pipeline depth",
-        "D": "The clock speed"
+        "B": "The pipeline depth",
+        "C": "The clock speed",
+        "D": "The number of registers the ISA defines"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "Registers are in the contract; the other three are implementation choices that change between chips implementing the same ISA and must not affect a program's correctness."
     }

@@ -137,10 +137,10 @@
       "id": "cp-1",
       "prompt": "A process shows 4 million minor faults and 12 major faults. What does that indicate?",
       "choices": {
-        "A": "A serious memory problem",
+        "A": "It is thrashing",
         "B": "Normal operation — minor faults are how memory is supplied, and major faults are rare after startup",
-        "C": "It is thrashing",
-        "D": "A memory leak"
+        "C": "A memory leak",
+        "D": "A serious memory problem"
       },
       "correct": [
         "B"
@@ -151,41 +151,41 @@
       "id": "cp-2",
       "prompt": "A machine is slow. CPU is 15%, I/O wait is high, and vmstat shows sustained si/so. What is happening?",
       "choices": {
-        "A": "Too few cores",
-        "B": "Thrashing — the working set does not fit in RAM, so pages are constantly evicted and faulted back in",
-        "C": "A deadlock",
-        "D": "A network problem"
+        "A": "A network problem",
+        "B": "Too few cores",
+        "C": "Thrashing — the working set does not fit in RAM",
+        "D": "A deadlock"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "Low CPU with high I/O wait means the system is waiting, not computing. Sustained swap in and out is the specific signature. More CPU will not help; less working set or more memory will."
+      "explanation": "Pages are constantly evicted and faulted back in. Low CPU with high I/O wait means the system is waiting, not computing. Sustained swap in and out is the specific signature. More CPU will not help; less working set or more memory will."
     },
     {
       "id": "cp-3",
       "prompt": "Why does starting a 500 MB application not read 500 MB from disk?",
       "choices": {
         "A": "The file is compressed",
-        "B": "The kernel only maps it, and reads each page on the fault caused by first touching it — most of it is never touched",
+        "B": "Only the first megabyte is executable",
         "C": "It is loaded in the background after startup",
-        "D": "Only the first megabyte is executable"
+        "D": "The kernel only maps it, and reads each page on the fault caused by first touching it"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "Demand paging means startup cost is proportional to what actually runs, not to the size of the file."
+      "explanation": "Most of it is never touched. Demand paging means startup cost is proportional to what actually runs, not to the size of the file."
     },
     {
       "id": "cp-4",
       "prompt": "A service disappeared with no error in its own logs. Where do you look first?",
       "choices": {
-        "A": "The application log again, more carefully",
-        "B": "dmesg — the OOM killer records which process it chose and why",
-        "C": "The scheduler",
-        "D": "Disk space"
+        "A": "dmesg — the OOM killer records which process it chose and why",
+        "B": "Disk space",
+        "C": "The application log again, more carefully",
+        "D": "The scheduler"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "A process killed by the kernel gets no chance to log anything. The kernel log is the only place the decision is recorded."
     }

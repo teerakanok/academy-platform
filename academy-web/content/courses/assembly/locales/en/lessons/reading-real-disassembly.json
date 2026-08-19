@@ -265,13 +265,13 @@
       "id": "cp-1",
       "prompt": "A loop body advances rdi by 16 each iteration and reads dword ptr [rdi - 4] and byte ptr [rdi], with rdi having been increased by 4 before the loop. What are the field offsets?",
       "choices": {
-        "A": "-4 and 0",
-        "B": "0 and 4 — undo the bias of 4 that was applied before the loop",
-        "C": "4 and 8",
-        "D": "12 and 16"
+        "A": "4 and 8",
+        "B": "12 and 16",
+        "C": "0 and 4 — undo the bias of 4 that was applied before the loop",
+        "D": "-4 and 0"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "The bias exists so both accesses use small displacements. Forgetting to undo it makes every recovered field offset wrong by exactly that constant."
     },
@@ -279,13 +279,13 @@
       "id": "cp-2",
       "prompt": "The loop is bounded by cmp rsi, rcx followed by je, and guarded at the top by test rsi, rsi followed by jle. What does that tell you about the count parameter?",
       "choices": {
-        "A": "It is unsigned",
-        "B": "It is signed — jle is the signed condition, so a negative count is handled by returning immediately",
+        "A": "It is signed — jle is the signed condition, so a negative count is handled by returning immediately",
+        "B": "It is unsigned",
         "C": "It is a pointer",
         "D": "Nothing about its type"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "Signedness is visible in the condition names, not the comparison. jle and jl are signed; jbe and jb are unsigned."
     },
@@ -293,29 +293,29 @@
       "id": "cp-3",
       "prompt": "The reconstruction recovered the element size and two field offsets but not the remaining eleven bytes of the structure. Why?",
       "choices": {
-        "A": "The disassembler failed",
-        "B": "The function never touches them, so nothing in the code refers to them; their existence is known only from the 16-byte stride",
+        "A": "They are in a different section",
+        "B": "The disassembler failed",
         "C": "They were optimised away",
-        "D": "They are in a different section"
+        "D": "The function never touches them"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "Disassembly gives behaviour with complete fidelity. What the code does not do leaves no trace beyond the space it occupies."
+      "explanation": "Nothing in the code refers to them; their existence is known only from the 16-byte stride. Disassembly gives behaviour with complete fidelity. What the code does not do leaves no trace beyond the space it occupies."
     },
     {
       "id": "cp-4",
       "prompt": "Why is 'account for every instruction' the step that must not be skipped?",
       "choices": {
-        "A": "To produce a complete report",
-        "B": "A reconstruction that explains most instructions is a guess; an instruction you cannot explain means the function does something you have not accounted for",
-        "C": "To find dead code",
-        "D": "To measure performance"
+        "A": "To find dead code",
+        "B": "To produce a complete report",
+        "C": "To measure performance",
+        "D": "A reconstruction that explains most instructions is a guess"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "In the worked example the unconditional jmp into the middle of the loop is explained by loop rotation. An unexplained instruction is the signal that the reading is incomplete."
+      "explanation": "An instruction you cannot explain means the function does something you have not accounted for. In the worked example the unconditional jmp into the middle of the loop is explained by loop rotation. An unexplained instruction is the signal that the reading is incomplete."
     }
   ]
 }

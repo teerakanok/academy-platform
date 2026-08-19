@@ -59,13 +59,37 @@
     },
     {
       "kind": "table",
-      "headers": ["Where declared", "Lives", "Lives until"],
+      "headers": [
+        "Where declared",
+        "Lives",
+        "Lives until"
+      ],
       "rows": [
-        ["Inside a function", "On the stack", "The function returns"],
-        ["Inside a block", "On the stack", "The block ends"],
-        ["static inside a function", "In static storage", "The program exits — value persists between calls"],
-        ["Outside all functions", "In static storage", "The program exits"],
-        ["From malloc", "On the heap", "You call free"]
+        [
+          "Inside a function",
+          "On the stack",
+          "The function returns"
+        ],
+        [
+          "Inside a block",
+          "On the stack",
+          "The block ends"
+        ],
+        [
+          "static inside a function",
+          "In static storage",
+          "The program exits — value persists between calls"
+        ],
+        [
+          "Outside all functions",
+          "In static storage",
+          "The program exits"
+        ],
+        [
+          "From malloc",
+          "On the heap",
+          "You call free"
+        ]
       ]
     },
     {
@@ -187,49 +211,57 @@
       "id": "cp-1",
       "prompt": "You pass an int to a function and it assigns a new value to the parameter. What happens to the caller's variable?",
       "choices": {
-        "A": "It changes too",
-        "B": "Nothing — C passes by value, so the function received a copy",
-        "C": "It becomes undefined",
-        "D": "It depends on the compiler"
+        "A": "It becomes undefined",
+        "B": "It depends on the compiler",
+        "C": "Nothing — C passes by value",
+        "D": "It changes too"
       },
-      "correct": ["B"],
-      "explanation": "To modify the caller's variable you pass its address and write through the pointer."
+      "correct": [
+        "C"
+      ],
+      "explanation": "The function received a copy. To modify the caller's variable you pass its address and write through the pointer."
     },
     {
       "id": "cp-2",
       "prompt": "Why must you never return a pointer to a local variable?",
       "choices": {
-        "A": "It is a compile error",
-        "B": "The local ceases to exist when the function returns, so the pointer refers to reclaimed stack memory that another call will overwrite",
+        "A": "It leaks memory",
+        "B": "The local ceases to exist when the function returns",
         "C": "Local variables cannot be addressed",
-        "D": "It leaks memory"
+        "D": "It is a compile error"
       },
-      "correct": ["B"],
-      "explanation": "It often appears to work at first, because the value is still sitting in memory nobody has reused yet — which is what makes it dangerous."
+      "correct": [
+        "B"
+      ],
+      "explanation": "The pointer refers to reclaimed stack memory that another call will overwrite. It often appears to work at first, because the value is still sitting in memory nobody has reused yet — which is what makes it dangerous."
     },
     {
       "id": "cp-3",
       "prompt": "What does static mean on a variable declared inside a function?",
       "choices": {
-        "A": "It cannot be modified",
+        "A": "It is visible to other files",
         "B": "It is initialised once and keeps its value between calls, instead of being recreated each time",
-        "C": "It is stored on the stack",
-        "D": "It is visible to other files"
+        "C": "It cannot be modified",
+        "D": "It is stored on the stack"
       },
-      "correct": ["B"],
+      "correct": [
+        "B"
+      ],
       "explanation": "At file level the same keyword means something different: the name is not exported to other files."
     },
     {
       "id": "cp-4",
       "prompt": "What is the standard C convention for a function that can fail?",
       "choices": {
-        "A": "Throw an exception",
-        "B": "Return a status value and write the real result through a pointer parameter, so the caller can check before using it",
+        "A": "Call exit() on failure",
+        "B": "Throw an exception",
         "C": "Return the result and print errors to the screen",
-        "D": "Call exit() on failure"
+        "D": "Return a status value and write the real result through a pointer parameter"
       },
-      "correct": ["B"],
-      "explanation": "There are no exceptions in C. The status return is the only signal, and an unchecked one means continuing with a value that was never set."
+      "correct": [
+        "D"
+      ],
+      "explanation": "The caller can check before using it. There are no exceptions in C. The status return is the only signal, and an unchecked one means continuing with a value that was never set."
     }
   ]
 }

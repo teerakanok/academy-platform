@@ -215,54 +215,54 @@
       "prompt": "A threaded read benchmark gave 49.3, 70.0, 94.2 and 84.6 GB/s at 1, 2, 4 and 8 threads. What does the flattening indicate?",
       "choices": {
         "A": "The threads are contending for a lock",
-        "B": "The memory system saturated at around four threads; beyond that the cores are not the limit and extra threads add contention without throughput",
+        "B": "The memory system saturated at around four threads",
         "C": "The cores are throttling",
         "D": "The buffer fits in cache"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Each thread reads its own region with no sharing, so the only contended resource is the path to memory. Rising then flattening is exactly the shape of a saturated shared resource."
+      "explanation": "Beyond that the cores are not the limit and extra threads add contention without throughput. Each thread reads its own region with no sharing, so the only contended resource is the path to memory. Rising then flattening is exactly the shape of a saturated shared resource."
     },
     {
       "id": "cp-2",
       "prompt": "An earlier version of the same benchmark scaled perfectly: 3.6, 7.2, 14.4, 27.0 GB/s. Why was that result wrong?",
       "choices": {
-        "A": "The buffer was too small",
-        "B": "With one accumulator per thread the loop was limited by its own dependency chain rather than by memory, so perfect scaling was the clue that it was not measuring bandwidth",
+        "A": "With one accumulator per thread the loop was limited by its own dependency chain rather than by memory",
+        "B": "It used the wrong timer",
         "C": "The threads were not synchronised",
-        "D": "It used the wrong timer"
+        "D": "The buffer was too small"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "A shared resource saturates. A measurement that never saturates is measuring something private to each thread — here, each thread's own accumulator chain."
+      "explanation": "Perfect scaling was the clue that it was not measuring bandwidth A shared resource saturates. A measurement that never saturates is measuring something private to each thread — here, each thread's own accumulator chain."
     },
     {
       "id": "cp-3",
       "prompt": "A program allocates and initialises all its data in one thread at startup, then parallelises the work across NUMA nodes. What has it done?",
       "choices": {
-        "A": "Improved locality",
-        "B": "Placed every physical page on the initialising thread's node, so every other node's accesses are remote for the program's whole life",
-        "C": "Nothing; placement is decided at allocation",
-        "D": "Reduced total memory use"
+        "A": "Nothing; placement is decided at allocation",
+        "B": "Improved locality",
+        "C": "Reduced total memory use",
+        "D": "Placed every physical page on the initialising thread's node"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "Pages are commonly assigned to the node of whichever thread first writes to them — the same demand-paging mechanism the operating systems course covered. First touch decides placement."
+      "explanation": "Every other node's accesses are remote for the program's whole life. Pages are commonly assigned to the node of whichever thread first writes to them — the same demand-paging mechanism the operating systems course covered. First touch decides placement."
     },
     {
       "id": "cp-4",
       "prompt": "A pointer-chasing workload is moved to a machine with HBM. What should you expect?",
       "choices": {
-        "A": "A large speedup, since HBM is much faster",
-        "B": "Little change — HBM widens the path but the cells are still DRAM, so the latency floor is unchanged and a dependent chain is latency-bound",
-        "C": "A slowdown",
-        "D": "A speedup proportional to the bandwidth ratio"
+        "A": "A slowdown",
+        "B": "A large speedup, since HBM is much faster",
+        "C": "A speedup proportional to the bandwidth ratio",
+        "D": "Little change — HBM widens the path but the cells are still DRAM, so the latency floor is unchanged and a dependent chain is latency-bound"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "HBM4 offers up to 2 TB/s per stack against roughly 51 GB/s per DDR5 channel, but that is throughput. A chain of dependent accesses cannot use width it has no parallel requests to fill."
     }

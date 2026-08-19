@@ -165,13 +165,13 @@
       "id": "cp-1",
       "prompt": "add x5,x6,x7 is followed immediately by sub x9,x5,x8. What is the problem in a pipelined processor?",
       "choices": {
-        "A": "The registers are the wrong size",
-        "B": "The sub reads the register file before the add has written its result there",
-        "C": "Two instructions cannot use the arithmetic unit",
-        "D": "There is no problem"
+        "A": "Two instructions cannot use the arithmetic unit",
+        "B": "The registers are the wrong size",
+        "C": "There is no problem",
+        "D": "The sub reads the register file before the add has written its result there"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "The sub reads in cycle 3 and the add writes in cycle 5. Without a remedy the sub reads the stale value of x5."
     },
@@ -180,26 +180,26 @@
       "prompt": "How does forwarding fix that without slowing anything down?",
       "choices": {
         "A": "It delays the sub until the write completes",
-        "B": "The result exists at the arithmetic unit's output a cycle before it is needed, so a path routes it directly to the input",
+        "B": "It reorders the two instructions",
         "C": "It duplicates the register file",
-        "D": "It reorders the two instructions"
+        "D": "The result exists at the arithmetic unit's output a cycle before it is needed"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "The value is computed in cycle 3 and needed in cycle 4. It is not late, it is merely not in the register file yet — so the path skips the register file."
+      "explanation": "A path routes it directly to the input. The value is computed in cycle 3 and needed in cycle 4. It is not late, it is merely not in the register file yet — so the path skips the register file."
     },
     {
       "id": "cp-3",
       "prompt": "Four independent addition chains ran 3.85x faster than one chain doing the same total additions. What does that show?",
       "choices": {
-        "A": "The clock speed increased",
-        "B": "The processor can issue several independent instructions per cycle, and a single chain leaves most of that capacity idle",
-        "C": "Four chains use less memory",
-        "D": "The compiler removed work from the four-chain version"
+        "A": "The compiler removed work from the four-chain version",
+        "B": "The clock speed increased",
+        "C": "The processor can issue several independent instructions per cycle, and a single chain leaves most of that capacity idle",
+        "D": "Four chains use less memory"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "Identical work, four times the rate. The single chain was not slow because additions are slow; it was slow because each one had to wait for the previous."
     },
@@ -208,14 +208,14 @@
       "prompt": "Why will a compiler split an integer accumulator into several partial sums but refuse to do the same for floating-point?",
       "choices": {
         "A": "Floating-point addition is slower",
-        "B": "Floating-point addition is not associative, so regrouping changes the result",
-        "C": "Floating-point registers are scarce",
-        "D": "It does the same for both"
+        "B": "Floating-point addition is not associative",
+        "C": "It does the same for both",
+        "D": "Floating-point registers are scarce"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Regrouping is exactly the reassociation the C course's rounding lesson warned about. It is a legal transformation for integers and a change in results for floating-point."
+      "explanation": "Regrouping changes the result. Regrouping is exactly the reassociation the C course's rounding lesson warned about. It is a legal transformation for integers and a change in results for floating-point."
     }
   ]
 }

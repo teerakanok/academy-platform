@@ -36,13 +36,37 @@
     },
     {
       "kind": "table",
-      "headers": ["Risky", "Safer", "Why"],
+      "headers": [
+        "Risky",
+        "Safer",
+        "Why"
+      ],
       "rows": [
-        ["rm -rf $dir/*", "rm -rf \"${dir:?dir not set}\"/*", "Refuses to run when dir is empty instead of erasing /"],
-        ["cd $target", "cd \"$target\" || exit 1", "A failed cd no longer leaves you elsewhere"],
-        ["backup.sh", "/usr/local/bin/backup.sh", "A scheduler has a different PATH than your shell"],
-        ["rm *.tmp", "rm -- *.tmp", "-- stops a filename starting with - being read as a flag"],
-        ["cp $a $b", "cp \"$a\" \"$b\"", "Spaces in names no longer split into extra arguments"]
+        [
+          "rm -rf $dir/*",
+          "rm -rf \"${dir:?dir not set}\"/*",
+          "Refuses to run when dir is empty instead of erasing /"
+        ],
+        [
+          "cd $target",
+          "cd \"$target\" || exit 1",
+          "A failed cd no longer leaves you elsewhere"
+        ],
+        [
+          "backup.sh",
+          "/usr/local/bin/backup.sh",
+          "A scheduler has a different PATH than your shell"
+        ],
+        [
+          "rm *.tmp",
+          "rm -- *.tmp",
+          "-- stops a filename starting with - being read as a flag"
+        ],
+        [
+          "cp $a $b",
+          "cp \"$a\" \"$b\"",
+          "Spaces in names no longer split into extra arguments"
+        ]
       ]
     },
     {
@@ -131,49 +155,57 @@
       "id": "cp-1",
       "prompt": "What does set -u protect you from?",
       "choices": {
-        "A": "Running the script as the wrong user",
-        "B": "A misspelt or unset variable silently expanding to nothing — which can turn \"$DIR/old\" into \"/old\"",
-        "C": "Files with spaces in their names",
+        "A": "Files with spaces in their names",
+        "B": "A misspelt or unset variable silently expanding to nothing",
+        "C": "Running the script as the wrong user",
         "D": "Running out of disk space"
       },
-      "correct": ["B"],
-      "explanation": "By default the shell expands an unset variable to an empty string and carries on. -u makes that an error, which is what you want in anything that deletes or moves data."
+      "correct": [
+        "B"
+      ],
+      "explanation": "Which can turn \"$DIR/old\" into \"/old\" By default the shell expands an unset variable to an empty string and carries on. -u makes that an error, which is what you want in anything that deletes or moves data."
     },
     {
       "id": "cp-2",
       "prompt": "Why does a scheduled script need absolute paths?",
       "choices": {
-        "A": "Schedulers run slower",
-        "B": "A scheduler runs with a different, usually much smaller PATH and a different working directory than your interactive shell",
-        "C": "Relative paths are not allowed in scripts",
-        "D": "Absolute paths are faster to resolve"
+        "A": "Relative paths are not allowed in scripts",
+        "B": "Absolute paths are faster to resolve",
+        "C": "A scheduler runs with a different, usually much smaller PATH and a different working directory than your interactive shell",
+        "D": "Schedulers run slower"
       },
-      "correct": ["B"],
+      "correct": [
+        "C"
+      ],
       "explanation": "This is the classic 'works when I run it, fails on schedule' cause: the command was found in your PATH but not in the scheduler's."
     },
     {
       "id": "cp-3",
       "prompt": "What does trap 'rm -rf \"$workdir\"' EXIT achieve?",
       "choices": {
-        "A": "It deletes the directory immediately",
-        "B": "It removes the temporary directory when the script exits — whether it succeeded, failed, or was interrupted",
+        "A": "It removes the temporary directory when the script exits",
+        "B": "It deletes the directory immediately",
         "C": "It prevents the script from exiting",
         "D": "It traps errors and ignores them"
       },
-      "correct": ["B"],
-      "explanation": "Cleanup that only runs on the success path is cleanup that never runs on the day it matters. trap ... EXIT covers every way out."
+      "correct": [
+        "A"
+      ],
+      "explanation": "Whether it succeeded, failed, or was interrupted. Cleanup that only runs on the success path is cleanup that never runs on the day it matters. trap ... EXIT covers every way out."
     },
     {
       "id": "cp-4",
       "prompt": "What is the value of a --dry-run mode in a destructive script?",
       "choices": {
         "A": "It makes the script run faster",
-        "B": "It prints what the script would do without doing it, so the plan can be reviewed before it is trusted",
-        "C": "It automatically backs up files first",
-        "D": "It restricts the script to non-root users"
+        "B": "It prints what the script would do without doing it",
+        "C": "It restricts the script to non-root users",
+        "D": "It automatically backs up files first"
       },
-      "correct": ["B"],
-      "explanation": "It turns an irreversible action into a reviewable one, which is the cheapest safety measure available for automation."
+      "correct": [
+        "B"
+      ],
+      "explanation": "The plan can be reviewed before it is trusted. It turns an irreversible action into a reviewable one, which is the cheapest safety measure available for automation."
     }
   ]
 }

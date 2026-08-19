@@ -40,14 +40,35 @@
     },
     {
       "kind": "table",
-      "headers": ["Pattern", "Matches"],
+      "headers": [
+        "Pattern",
+        "Matches"
+      ],
       "rows": [
-        ["*.log", "Any file ending in .log, at any depth"],
-        ["build/", "A directory named build and everything inside it"],
-        ["/notes.txt", "Only at the repository root, not in subdirectories"],
-        ["docs/*.pdf", "PDFs directly inside docs, but not deeper"],
-        ["**/temp", "A directory named temp at any depth"],
-        ["!keep.log", "An exception — track this even though *.log is ignored"]
+        [
+          "*.log",
+          "Any file ending in .log, at any depth"
+        ],
+        [
+          "build/",
+          "A directory named build and everything inside it"
+        ],
+        [
+          "/notes.txt",
+          "Only at the repository root, not in subdirectories"
+        ],
+        [
+          "docs/*.pdf",
+          "PDFs directly inside docs, but not deeper"
+        ],
+        [
+          "**/temp",
+          "A directory named temp at any depth"
+        ],
+        [
+          "!keep.log",
+          "An exception — track this even though *.log is ignored"
+        ]
       ]
     },
     {
@@ -136,49 +157,57 @@
       "id": "cp-1",
       "prompt": "You add a file to the ignore list, but it keeps showing up in git status. Why?",
       "choices": {
-        "A": "The ignore file only works after a restart",
-        "B": "The file is already tracked — ignore rules only apply to files Git is not tracking yet",
+        "A": "You need to commit the ignore file first for any rule to apply",
+        "B": "The ignore file only works after a restart",
         "C": "The pattern must start with a slash",
-        "D": "You need to commit the ignore file first for any rule to apply"
+        "D": "The file is already tracked"
       },
-      "correct": ["B"],
-      "explanation": "Use git rm --cached to stop tracking it, then commit that. The ignore rule then keeps it out from that point forward."
+      "correct": [
+        "D"
+      ],
+      "explanation": "Ignore rules only apply to files. Git is not tracking yet Use git rm --cached to stop tracking it, then commit that. The ignore rule then keeps it out from that point forward."
     },
     {
       "id": "cp-2",
       "prompt": "An API key was committed and pushed an hour ago. What is the first thing to do?",
       "choices": {
-        "A": "Delete the file and commit the deletion",
-        "B": "Rotate the credential — revoke it and issue a new one",
+        "A": "Rotate the credential",
+        "B": "Rewrite the history immediately",
         "C": "Make the repository private",
-        "D": "Rewrite the history immediately"
+        "D": "Delete the file and commit the deletion"
       },
-      "correct": ["B"],
-      "explanation": "Exposure has already happened and copies may exist. A rotated key is worthless to whoever has it; history cleanup is a separate follow-up job that does not undo the exposure."
+      "correct": [
+        "A"
+      ],
+      "explanation": "Revoke it and issue a new one. Exposure has already happened and copies may exist. A rotated key is worthless to whoever has it; history cleanup is a separate follow-up job that does not undo the exposure."
     },
     {
       "id": "cp-3",
       "prompt": "Why is committing a build output directory a bad idea?",
       "choices": {
         "A": "Git cannot store binary files",
-        "B": "It is rebuildable from source, changes on every build, causes constant conflicts, and is usually far larger than the project itself",
+        "B": "It breaks git log",
         "C": "It contains secrets by definition",
-        "D": "It breaks git log"
+        "D": "It is rebuildable from source, changes on every build, causes constant conflicts, and is usually far larger than the project itself"
       },
-      "correct": ["B"],
+      "correct": [
+        "D"
+      ],
       "explanation": "Generated output adds size and noise while adding no information the source does not already contain."
     },
     {
       "id": "cp-4",
       "prompt": "What is the example-file convention for?",
       "choices": {
-        "A": "A backup of the real configuration file",
-        "B": "A committed file that documents which configuration values are needed, with blank or fake values, so the real one never enters the repository",
-        "C": "A file Git reads automatically at build time",
-        "D": "An encrypted version of the configuration"
+        "A": "An encrypted version of the configuration",
+        "B": "A committed file that documents which configuration values are needed, with blank or fake values",
+        "C": "A backup of the real configuration file",
+        "D": "A file Git reads automatically at build time"
       },
-      "correct": ["B"],
-      "explanation": "It gives newcomers the shape of the configuration without ever putting a working credential into the history."
+      "correct": [
+        "B"
+      ],
+      "explanation": "The real one never enters the repository. It gives newcomers the shape of the configuration without ever putting a working credential into the history."
     }
   ]
 }

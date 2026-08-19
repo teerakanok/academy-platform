@@ -176,26 +176,26 @@
       "prompt": "Why does the S-type format have no rd field?",
       "choices": {
         "A": "To save encoding space arbitrarily",
-        "B": "A store produces no value, so those five bits were reclaimed for the immediate",
-        "C": "Stores use a fixed destination",
+        "B": "Stores use a fixed destination",
+        "C": "A store produces no value",
         "D": "rd is implied by rs1"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "The same reasoning applies to B-type: a branch produces no value either. Reading which field a format lacks tells you the shape of the operation."
+      "explanation": "Those five bits were reclaimed for the immediate. The same reasoning applies to B-type: a branch produces no value either. Reading which field a format lacks tells you the shape of the operation."
     },
     {
       "id": "cp-2",
       "prompt": "Why is the S-type immediate split across bits 31:25 and 11:7 instead of being contiguous?",
       "choices": {
-        "A": "To make decoding harder to reverse-engineer",
-        "B": "So rs1, rs2 and funct3 stay at the same bit positions as in other formats, letting the register file be read before decoding finishes",
-        "C": "Because 12 contiguous bits were not available",
-        "D": "For historical compatibility"
+        "A": "For historical compatibility",
+        "B": "Because 12 contiguous bits were not available",
+        "C": "So rs1, rs2 and funct3 stay at the same bit positions as in other formats, letting the register file be read before decoding finishes",
+        "D": "To make decoding harder to reverse-engineer"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "Reassembling the immediate is pure wiring with no logic. Moving a register field would put a selector on the critical path, which is far more expensive."
     },
@@ -204,26 +204,26 @@
       "prompt": "How does a B-type instruction encode a 13-bit offset in 12 bits?",
       "choices": {
         "A": "It truncates the value",
-        "B": "It omits the lowest bit and defines it as zero, which is safe because instructions are 4-byte aligned",
+        "B": "It omits the lowest bit and defines it as zero",
         "C": "It uses a second instruction",
         "D": "It stores the offset divided by 4 with rounding"
       },
       "correct": [
         "B"
       ],
-      "explanation": "The architecture already guarantees that no instruction sits at an odd address, so that bit carries no information. Encoding a fact the architecture guarantees buys a bit of range for free."
+      "explanation": "Is safe because instructions are 4-byte aligned. The architecture already guarantees that no instruction sits at an odd address, so that bit carries no information. Encoding a fact the architecture guarantees buys a bit of range for free."
     },
     {
       "id": "cp-4",
       "prompt": "You have an unknown 32-bit word. What do you read first?",
       "choices": {
         "A": "The high 7 bits",
-        "B": "The low 7 bits — the opcode determines which layout the other 25 follow",
-        "C": "The middle 3 bits",
-        "D": "It must be looked up in a table of all instructions"
+        "B": "The middle 3 bits",
+        "C": "It must be looked up in a table of all instructions",
+        "D": "The low 7 bits — the opcode determines which layout the other 25 follow"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "That is why the opcode sits at the bottom. Once you know the format, every other field's position is fixed and decoding is mechanical."
     }

@@ -193,13 +193,13 @@
       "id": "cp-1",
       "prompt": "Why does DRAM need periodic refreshing while SRAM does not?",
       "choices": {
-        "A": "DRAM is slower",
-        "B": "A DRAM bit is a charge on a capacitor that leaks away within milliseconds, while an SRAM cell holds its value as long as it is powered",
+        "A": "A DRAM bit is a charge on a capacitor that leaks away within milliseconds, while an SRAM cell holds its value as long as it is powered",
+        "B": "DRAM is slower",
         "C": "DRAM is further from the processor",
         "D": "Refreshing improves reliability"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "The one-transistor-one-capacitor cell is what makes DRAM dense and cheap, and leakage is the price. SRAM's roughly six transistors hold the value but take far more area."
     },
@@ -208,42 +208,42 @@
       "prompt": "Why does a DRAM read activate an entire row rather than the bits requested?",
       "choices": {
         "A": "To improve spatial locality",
-        "B": "Sensing the charge on a cell drains it, so a read must pull a whole row into sense amplifiers and write it back afterwards",
-        "C": "The address bus is too narrow",
-        "D": "Rows are the unit of refresh"
+        "B": "Sensing the charge on a cell drains it",
+        "C": "Rows are the unit of refresh",
+        "D": "The address bus is too narrow"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Reading is destructive at the cell level. The row buffer holds the sensed row, and that is also why a second read from the same row is so much cheaper."
+      "explanation": "A read must pull a whole row into sense amplifiers and write it back afterwards. Reading is destructive at the cell level. The row buffer holds the sensed row, and that is also why a second read from the same row is so much cheaper."
     },
     {
       "id": "cp-3",
       "prompt": "The same 128 MB chain took 0.52 ns per access in memory order and 188.15 ns in random order. What two effects combine to produce that?",
       "choices": {
-        "A": "Only cache size",
-        "B": "Consecutive accesses in memory order stay within an already-open row, and their addresses are predictable so the hardware fetches ahead; random order defeats both",
-        "C": "Only the refresh schedule",
-        "D": "The random version executed more instructions"
+        "A": "The random version executed more instructions",
+        "B": "Only cache size",
+        "C": "Consecutive accesses in memory order stay within an already-open row, and their addresses are predictable so the hardware fetches ahead",
+        "D": "Only the refresh schedule"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "The instruction counts are identical. Row locality removes the open and close steps, and predictability removes the serialisation — which is why 0.52 ns is below the measured L1 latency."
+      "explanation": "Random order defeats both. The instruction counts are identical. Row locality removes the open and close steps, and predictability removes the serialisation — which is why 0.52 ns is below the measured L1 latency."
     },
     {
       "id": "cp-4",
       "prompt": "Why do memory chips contain multiple banks?",
       "choices": {
-        "A": "To increase total capacity only",
-        "B": "A bank has one row buffer, so one row at a time; multiple banks let one row be activated while another is being read",
-        "C": "To reduce refresh frequency",
-        "D": "To simplify addressing"
+        "A": "To reduce refresh frequency",
+        "B": "To increase total capacity only",
+        "C": "To simplify addressing",
+        "D": "A bank has one row buffer"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "Every level above the cell works around a limit of the level below. One row buffer per bank would serialise every access to a different row."
+      "explanation": "One row at a time; multiple banks let one row be activated while another is being read. Every level above the cell works around a limit of the level below. One row buffer per bank would serialise every access to a different row."
     }
   ]
 }

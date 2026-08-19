@@ -201,55 +201,55 @@
       "id": "cp-1",
       "prompt": "A server watches 10,000 connections of which 3 are active. Why does epoll outperform poll here?",
       "choices": {
-        "A": "epoll uses less memory",
-        "B": "poll passes and examines all 10,000 every call; epoll is told the set once and reports only the 3 that are ready",
-        "C": "epoll uses multiple threads",
-        "D": "poll cannot handle that many"
+        "A": "epoll uses multiple threads",
+        "B": "epoll uses less memory",
+        "C": "poll cannot handle that many",
+        "D": "poll passes and examines all 10,000 every call"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "The cost of poll tracks the number of descriptors watched; the cost of epoll tracks the number that became ready. That is a structural difference, not a tuning one."
+      "explanation": "Epoll is told the set once and reports only the 3 that are ready. The cost of poll tracks the number of descriptors watched; the cost of epoll tracks the number that became ready. That is a structural difference, not a tuning one."
     },
     {
       "id": "cp-2",
       "prompt": "Your event loop calls a database query that takes 200 ms. What happens to the other connections?",
       "choices": {
-        "A": "They are served by another thread",
-        "B": "They all wait 200 ms — one blocking call stalls the entire loop",
-        "C": "They time out",
-        "D": "The kernel reschedules them"
+        "A": "The kernel reschedules them",
+        "B": "They time out",
+        "C": "They all wait 200 ms",
+        "D": "They are served by another thread"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "One thread means one thing at a time. This is why event-driven runtimes hand slow work to a thread pool instead of performing it inside the loop."
+      "explanation": "One blocking call stalls the entire loop. One thread means one thing at a time. This is why event-driven runtimes hand slow work to a thread pool instead of performing it inside the loop."
     },
     {
       "id": "cp-3",
       "prompt": "With edge-triggered epoll, a descriptor is reported readable and you read 100 of the 500 bytes available. What happens next?",
       "choices": {
-        "A": "It is reported again immediately",
-        "B": "It is not reported again until new data arrives — the remaining 400 bytes sit unread and that connection stalls",
-        "C": "The kernel buffers it and retries",
-        "D": "read returns the rest automatically"
+        "A": "It is not reported again until new data arrives",
+        "B": "read returns the rest automatically",
+        "C": "It is reported again immediately",
+        "D": "The kernel buffers it and retries"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "Edge-triggered reports state changes, not state. You must drain the descriptor by reading until EAGAIN, which is why it also requires non-blocking mode."
+      "explanation": "The remaining 400 bytes sit unread and that connection stalls. Edge-triggered reports state changes, not state. You must drain the descriptor by reading until EAGAIN, which is why it also requires non-blocking mode."
     },
     {
       "id": "cp-4",
       "prompt": "Why is select unsuitable for a server that may accumulate thousands of connections?",
       "choices": {
         "A": "It is slower per call",
-        "B": "Its descriptor set is a fixed-size structure, and using a descriptor number at or above the limit is undefined behaviour",
-        "C": "It does not support TCP",
-        "D": "It requires blocking descriptors"
+        "B": "It does not support TCP",
+        "C": "It requires blocking descriptors",
+        "D": "Its descriptor set is a fixed-size structure, and using a descriptor number at or above the limit is undefined behaviour"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "The limit is a compile-time constant, and exceeding it writes past the end of a structure — undefined behaviour that may appear to work, which is the most dangerous kind."
     }

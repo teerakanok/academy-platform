@@ -187,8 +187,8 @@
       "choices": {
         "A": "git reset --hard to before it, then force push",
         "B": "git revert <id>, which adds a commit undoing that change",
-        "C": "git commit --amend",
-        "D": "Delete the repository and re-clone"
+        "C": "Delete the repository and re-clone",
+        "D": "git commit --amend"
       },
       "correct": [
         "B"
@@ -199,27 +199,27 @@
       "id": "cp-2",
       "prompt": "What is the difference between git reset --soft HEAD~1 and git reset --hard HEAD~1 ?",
       "choices": {
-        "A": "None; --hard is just faster",
-        "B": "--soft removes the commit but keeps your changes staged; --hard removes the commit and discards the changes from disk",
-        "C": "--soft only works on the first commit",
+        "A": "--soft only works on the first commit",
+        "B": "--soft removes the commit but keeps your changes staged",
+        "C": "None; --hard is just faster",
         "D": "--hard keeps a backup automatically"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Both drop the commit. The difference is what happens to the content — and --hard is the one that takes your working changes with it."
+      "explanation": "--hard removes the commit and discards the changes from disk. Both drop the commit. The difference is what happens to the content — and --hard is the one that takes your working changes with it."
     },
     {
       "id": "cp-3",
       "prompt": "Which operation can Git genuinely not recover from?",
       "choices": {
-        "A": "Deleting a branch",
-        "B": "An amended commit",
-        "C": "Discarding uncommitted changes with git restore",
-        "D": "A reverted commit"
+        "A": "Discarding uncommitted changes with git restore",
+        "B": "A reverted commit",
+        "C": "An amended commit",
+        "D": "Deleting a branch"
       },
       "correct": [
-        "C"
+        "A"
       ],
       "explanation": "Work that was never committed was never recorded anywhere, so there is nothing to recover. Everything already committed leaves a trace that can usually be found again."
     },
@@ -227,13 +227,13 @@
       "id": "cp-4",
       "prompt": "You forgot to include one file in the commit you just made, and have not pushed. What is the tidiest fix?",
       "choices": {
-        "A": "git revert HEAD then commit everything again",
-        "B": "git add <file> && git commit --amend --no-edit",
-        "C": "git reset --hard HEAD~1",
-        "D": "Make a second commit called 'fix previous commit'"
+        "A": "git reset --hard HEAD~1",
+        "B": "Make a second commit called 'fix previous commit'",
+        "C": "git add <file> && git commit --amend --no-edit",
+        "D": "git revert HEAD then commit everything again"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "Amend folds the forgotten file into the existing commit and keeps its message. It is safe here precisely because the commit has not been shared yet."
     }

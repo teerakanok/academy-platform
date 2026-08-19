@@ -149,27 +149,27 @@
       "id": "cp-1",
       "prompt": "You pass &conn to pthread_create instead of a heap allocation. What happens?",
       "choices": {
-        "A": "Nothing — the value is copied",
-        "B": "Every thread receives a pointer to the same variable, which the accept loop overwrites, so connections get mixed up",
-        "C": "The thread fails to start",
-        "D": "It works but leaks memory"
+        "A": "It works but leaks memory",
+        "B": "The thread fails to start",
+        "C": "Every thread receives a pointer to the same variable",
+        "D": "Nothing — the value is copied"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "This is the pthreads lesson's loop-variable bug, met in the code you would actually write. Each thread needs its own storage that outlives the loop iteration."
+      "explanation": "The accept loop overwrites, so connections get mixed up. This is the pthreads lesson's loop-variable bug, met in the code you would actually write. Each thread needs its own storage that outlives the loop iteration."
     },
     {
       "id": "cp-2",
       "prompt": "Why is thread-per-connection a poor fit for ten thousand mostly idle connections?",
       "choices": {
-        "A": "Blocked threads consume CPU",
-        "B": "Each connection costs a thread even while it waits, and the kernel's per-task bookkeeping and scheduling costs grow with the count",
-        "C": "The kernel cannot create that many",
+        "A": "The kernel cannot create that many",
+        "B": "Blocked threads consume CPU",
+        "C": "Each connection costs a thread even while it waits, and the kernel's per-task bookkeeping and scheduling costs grow with the count",
         "D": "File descriptors run out first"
       },
       "correct": [
-        "B"
+        "C"
       ],
       "explanation": "A blocked thread uses no CPU — that was established earlier. The cost is the thread itself, which is why the model suits busy connections and not numerous idle ones."
     },
@@ -178,12 +178,12 @@
       "prompt": "What does omitting pthread_detach cause in this server?",
       "choices": {
         "A": "Threads never start",
-        "B": "Each finished thread's resources are retained waiting for a join that never comes",
+        "B": "The accept loop blocks",
         "C": "Connections are not closed",
-        "D": "The accept loop blocks"
+        "D": "Each finished thread's resources are retained waiting for a join that never comes"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "It is the zombie problem from the operating systems course in thread form: collect it, or declare up front that you never will."
     },
@@ -192,14 +192,14 @@
       "prompt": "Moving from one thread to many introduces which new class of bug?",
       "choices": {
         "A": "Memory leaks",
-        "B": "Races on anything shared between connections — counters, caches, shared lists",
+        "B": "Races on anything shared between connections",
         "C": "Descriptor exhaustion",
         "D": "Slower request handling"
       },
       "correct": [
         "B"
       ],
-      "explanation": "A single-threaded server has no shared-state problem at all. Keeping per-connection state on the thread's own stack keeps the set of things needing locks small enough to reason about."
+      "explanation": "Counters, caches, shared lists A single-threaded server has no shared-state problem at all. Keeping per-connection state on the thread's own stack keeps the set of things needing locks small enough to reason about."
     }
   ]
 }

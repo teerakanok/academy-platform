@@ -153,10 +153,10 @@
       "id": "cp-1",
       "prompt": "You want to bring feature/upload into main. What is the correct sequence?",
       "choices": {
-        "A": "git switch feature/upload then git merge main",
+        "A": "git switch main then git merge --abort",
         "B": "git switch main then git merge feature/upload",
         "C": "git merge main feature/upload from anywhere",
-        "D": "git switch main then git merge --abort"
+        "D": "git switch feature/upload then git merge main"
       },
       "correct": [
         "B"
@@ -169,8 +169,8 @@
       "choices": {
         "A": "Whenever more than one file changed",
         "B": "When the receiving branch also gained commits since the other branch split off",
-        "C": "Only when there is a conflict",
-        "D": "Only if you pass --no-ff"
+        "C": "Only if you pass --no-ff",
+        "D": "Only when there is a conflict"
       },
       "correct": [
         "B"
@@ -181,27 +181,27 @@
       "id": "cp-3",
       "prompt": "Two branches merge with no conflicts, but the application is broken afterwards. How?",
       "choices": {
-        "A": "That cannot happen — no conflict means a safe merge",
-        "B": "Changes can be textually compatible but semantically incompatible — one branch renames something the other branch started calling",
+        "A": "Changes can be textually compatible but semantically incompatible",
+        "B": "That cannot happen — no conflict means a safe merge",
         "C": "Git corrupted a file",
         "D": "The merge commit overwrote the tests"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "Git compares text, not meaning. This is exactly why the test run belongs after the merge as well as before it."
+      "explanation": "One branch renames something the other branch started calling. Git compares text, not meaning. This is exactly why the test run belongs after the merge as well as before it."
     },
     {
       "id": "cp-4",
       "prompt": "What does git merge --squash feature do?",
       "choices": {
-        "A": "Deletes the feature branch after merging",
-        "B": "Brings the branch's changes in as a single uncommitted change, discarding its individual commits",
-        "C": "Compresses the repository",
-        "D": "Merges without running hooks"
+        "A": "Brings the branch's changes in as a single uncommitted change, discarding its individual commits",
+        "B": "Compresses the repository",
+        "C": "Merges without running hooks",
+        "D": "Deletes the feature branch after merging"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "It is the option for a branch full of small messy commits whose individual steps are not worth keeping in the shared history."
     }

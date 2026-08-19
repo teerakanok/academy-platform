@@ -177,42 +177,42 @@
       "prompt": "Why does your shell stay responsive during a long compile, without any special configuration?",
       "choices": {
         "A": "Shells are given a real-time priority",
-        "B": "The shell blocks on input, so it accumulates almost no run time and is near the front of the queue whenever it wakes",
-        "C": "The compiler yields the CPU voluntarily",
-        "D": "The kernel detects interactive programs by name"
+        "B": "The compiler yields the CPU voluntarily",
+        "C": "The kernel detects interactive programs by name",
+        "D": "The shell blocks on input"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "Interactive responsiveness falls out of the fairness rule rather than being a special case: whoever has used the least gets picked first."
+      "explanation": "It accumulates almost no run time and is near the front of the queue whenever it wakes. Interactive responsiveness falls out of the fairness rule rather than being a special case: whoever has used the least gets picked first."
     },
     {
       "id": "cp-2",
       "prompt": "Two CPU-bound processes share one core, one at nice 0 and one at nice 19. Roughly what share does the nice 19 process get?",
       "choices": {
-        "A": "About half",
-        "B": "About a percent or two — measured at roughly 75 to 1",
-        "C": "About a tenth",
-        "D": "None at all — it is never scheduled"
+        "A": "None at all — it is never scheduled",
+        "B": "About half",
+        "C": "About a percent or two",
+        "D": "About a tenth"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "Each nice step is about a 1.25x weight change, so nineteen steps is roughly 1.25^19, near 73. It still runs; it just gets very little."
+      "explanation": "Measured at roughly 75 to 1. Each nice step is about a 1.25x weight change, so nineteen steps is roughly 1.25^19, near 73. It still runs; it just gets very little."
     },
     {
       "id": "cp-3",
       "prompt": "You compare nice 0 with nice 19 on an idle 10-core machine and see no difference. Why?",
       "choices": {
-        "A": "nice does not work on modern kernels",
-        "B": "With free cores there is no contention, so both simply run — priority only expresses itself when threads compete for the same core",
-        "C": "You need root to use nice",
-        "D": "The processes were too short-lived"
+        "A": "You need root to use nice",
+        "B": "nice does not work on modern kernels",
+        "C": "The processes were too short-lived",
+        "D": "With free cores there is no contention"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "This exact mistake produced meaningless numbers when this lesson's measurements were first taken. Pin both to one core, then measure."
+      "explanation": "Both simply run — priority only expresses itself when threads compete for the same core. This exact mistake produced meaningless numbers when this lesson's measurements were first taken. Pin both to one core, then measure."
     },
     {
       "id": "cp-4",

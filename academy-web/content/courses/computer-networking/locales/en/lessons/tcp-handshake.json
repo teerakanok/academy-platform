@@ -177,41 +177,41 @@
       "id": "cp-1",
       "prompt": "A server shows hundreds of connections in CLOSE_WAIT, and the number keeps rising. Where is the problem?",
       "choices": {
-        "A": "The kernel needs tuning",
-        "B": "In the server program — the peer closed, it was told, and it never called close()",
+        "A": "In the server program",
+        "B": "The kernel needs tuning",
         "C": "The clients are disconnecting badly",
         "D": "The network is dropping packets"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "CLOSE_WAIT means the local side has been informed and has not responded by closing. Each one holds a descriptor, so the count only rises until the program runs out."
+      "explanation": "The peer closed, it was told, and it never called close() CLOSE_WAIT means the local side has been informed and has not responded by closing. Each one holds a descriptor, so the count only rises until the program runs out."
     },
     {
       "id": "cp-2",
       "prompt": "Connecting to one address is refused instantly; connecting to another times out after 30 seconds. What does the difference tell you?",
       "choices": {
-        "A": "The second machine is slower",
-        "B": "The refusal reached the machine and got an answer; the timeout means nothing that would reply was reached, which points at filtering",
-        "C": "Both mean the service is down",
-        "D": "The second address is invalid"
+        "A": "The second address is invalid",
+        "B": "Both mean the service is down",
+        "C": "The refusal reached the machine and got an answer",
+        "D": "The second machine is slower"
       },
       "correct": [
-        "B"
+        "C"
       ],
-      "explanation": "A refusal is a fast honest answer and proves reachability. A timeout proves only silence, which is what a firewall configured to drop rather than reject produces."
+      "explanation": "The timeout means nothing that would reply was reached, which points at filtering A refusal is a fast honest answer and proves reachability. A timeout proves only silence, which is what a firewall configured to drop rather than reject produces."
     },
     {
       "id": "cp-3",
       "prompt": "Why does establishing a TCP connection cost a full round trip before any data moves?",
       "choices": {
-        "A": "The kernel must allocate buffers",
-        "B": "Three messages must cross before either side may send data",
-        "C": "DNS must be consulted",
+        "A": "Three messages must cross before either side may send data",
+        "B": "DNS must be consulted",
+        "C": "The kernel must allocate buffers",
         "D": "Encryption is negotiated"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "On a link with meaningful latency this is paid before a single useful byte. It is the reason connection reuse and keep-alive make such a visible difference."
     },
@@ -219,10 +219,10 @@
       "id": "cp-4",
       "prompt": "Should you configure the system to eliminate TIME_WAIT?",
       "choices": {
-        "A": "Yes — it wastes resources",
+        "A": "Yes, on servers only",
         "B": "No — it prevents delayed packets from an old connection being delivered to a new one on the same address and port",
-        "C": "Yes, on servers only",
-        "D": "It cannot be changed"
+        "C": "It cannot be changed",
+        "D": "Yes — it wastes resources"
       },
       "correct": [
         "B"

@@ -62,27 +62,27 @@
       "id": "cp-1",
       "prompt": "Why is a lab embedded when an article is not?",
       "choices": {
-        "A": "Labs are smaller files",
-        "B": "A lab is somewhere the learner works, and completing it has to count towards progress — an article is something they read, which is better as native page content",
+        "A": "Articles are not part of courses",
+        "B": "Labs are smaller files",
         "C": "Labs cannot be linked to",
-        "D": "Articles are not part of courses"
+        "D": "A lab is somewhere the learner works, and completing it has to count towards progress"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "The split is doing versus reading. Anything interactive that feeds progress stays inside; anything to read becomes part of the page itself."
+      "explanation": "An article is something they read, which is better as native page content. The split is doing versus reading. Anything interactive that feeds progress stays inside; anything to read becomes part of the page itself."
     },
     {
       "id": "cp-2",
       "prompt": "What should happen when the learner leaves full screen?",
       "choices": {
-        "A": "They return to the course map",
-        "B": "The lesson restarts",
-        "C": "They land back in the lesson at the same place",
-        "D": "The lab resets"
+        "A": "The lab resets",
+        "B": "They return to the course map",
+        "C": "The lesson restarts",
+        "D": "They land back in the lesson at the same place"
       },
       "correct": [
-        "C"
+        "D"
       ],
       "explanation": "Losing your place is the thing that actually breaks flow. Expanding and collapsing must never cost the learner their position."
     },
@@ -90,13 +90,13 @@
       "id": "cp-3",
       "prompt": "A lab takes two minutes. Which starting size is right?",
       "choices": {
-        "A": "Full screen, so it is consistent with every other lab",
-        "B": "Inline in the reading, with the option to open it bigger if the learner wants",
-        "C": "Inline only, with no way to make it bigger",
-        "D": "It should not be a lab at all"
+        "A": "Inline in the reading, with the option to open it bigger if the learner wants",
+        "B": "Full screen, so it is consistent with every other lab",
+        "C": "It should not be a lab at all",
+        "D": "Inline only, with no way to make it bigger"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "Making someone enter a separate environment for two minutes of work is why short exercises get skipped. Starting inline removes that cost; keeping the expand control means a small screen or an awkward task is never a dead end."
     },
@@ -116,7 +116,14 @@
           "dns1": "",
           "applied": false
         },
-        "requiredFields": { "dhcp": [], "static": ["ipv4", "subnet", "gateway"] },
+        "requiredFields": {
+          "dhcp": [],
+          "static": [
+            "ipv4",
+            "subnet",
+            "gateway"
+          ]
+        },
         "requirements": [
           {
             "id": "r-mode",

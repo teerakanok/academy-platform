@@ -220,13 +220,13 @@
       "id": "cp-1",
       "prompt": "Your server dies when a client disconnects mid-response. What is missing?",
       "choices": {
-        "A": "A timeout",
-        "B": "signal(SIGPIPE, SIG_IGN) — writing to a closed connection raises a signal whose default is to terminate",
-        "C": "SO_REUSEADDR",
-        "D": "A larger backlog"
+        "A": "signal(SIGPIPE, SIG_IGN) — writing to a closed connection raises a signal whose default is to terminate",
+        "B": "SO_REUSEADDR",
+        "C": "A larger backlog",
+        "D": "A timeout"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "With it ignored, the write returns -1 with EPIPE and you handle one connection failing. Without it, one client's timing ends the whole process."
     },
@@ -234,13 +234,13 @@
       "id": "cp-2",
       "prompt": "A read fails with EINTR. What should the code do?",
       "choices": {
-        "A": "Close the connection and log an error",
-        "B": "Retry the call — a signal interrupted it and nothing is wrong",
-        "C": "Wait for readiness first",
-        "D": "Reconnect"
+        "A": "Retry the call — a signal interrupted it and nothing is wrong",
+        "B": "Reconnect",
+        "C": "Close the connection and log an error",
+        "D": "Wait for readiness first"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "EINTR and EAGAIN are the two values that are not failures. Treating either as an error produces a program that misbehaves under load, when both become common."
     },
@@ -248,13 +248,13 @@
       "id": "cp-3",
       "prompt": "Why does a retry loop need random jitter?",
       "choices": {
-        "A": "To avoid predictable traffic patterns",
-        "B": "Without it, every client that failed at the same moment retries at the same moment, hitting a struggling service with synchronised waves",
+        "A": "Without it, every client that failed at the same moment retries at the same moment, hitting a struggling service with synchronised waves",
+        "B": "To avoid predictable traffic patterns",
         "C": "To comply with the protocol",
         "D": "To make the delays shorter on average"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "Backoff alone spreads retries in time but not across clients. The randomness is what desynchronises them, and it is the difference between recovery and an amplified outage."
     },
@@ -262,13 +262,13 @@
       "id": "cp-4",
       "prompt": "A peer accepts your connection and then never responds. What does your program see?",
       "choices": {
-        "A": "ECONNRESET",
-        "B": "Nothing — it waits indefinitely unless you set a timeout",
+        "A": "read returns 0",
+        "B": "ECONNRESET",
         "C": "EPIPE",
-        "D": "read returns 0"
+        "D": "Nothing — it waits indefinitely unless you set a timeout"
       },
       "correct": [
-        "B"
+        "D"
       ],
       "explanation": "Silence is the failure with no error. A closed connection is reported; a silent one is not, which is why every operation needs a bound and why long-lived connections send keepalives."
     }

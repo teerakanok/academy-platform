@@ -47,13 +47,37 @@
     },
     {
       "kind": "table",
-      "headers": ["Content", "Where it lives", "What happens on click"],
+      "headers": [
+        "Content",
+        "Where it lives",
+        "What happens on click"
+      ],
       "rows": [
-        ["Article", "In the page", "Nothing — you are already reading it"],
-        ["Diagram", "In the page", "Expands full screen"],
-        ["Handout", "A file", "Opens in a new tab"],
-        ["Someone else's page", "Their site", "Opens in a new tab, labelled"],
-        ["Lab", "Embedded panel", "Expands full screen"]
+        [
+          "Article",
+          "In the page",
+          "Nothing — you are already reading it"
+        ],
+        [
+          "Diagram",
+          "In the page",
+          "Expands full screen"
+        ],
+        [
+          "Handout",
+          "A file",
+          "Opens in a new tab"
+        ],
+        [
+          "Someone else's page",
+          "Their site",
+          "Opens in a new tab, labelled"
+        ],
+        [
+          "Lab",
+          "Embedded panel",
+          "Expands full screen"
+        ]
       ]
     }
   ],
@@ -68,24 +92,28 @@
       "id": "cp-1",
       "prompt": "Why is a PDF not embedded as the lesson body?",
       "choices": {
-        "A": "PDFs cannot be displayed in browsers",
-        "B": "Its layout is fixed, so it will not reflow on a small screen, and reading it in a scrolling box puts a scrollbar inside a scrollbar",
-        "C": "PDFs are always too large to load",
+        "A": "Its layout is fixed",
+        "B": "PDFs are always too large to load",
+        "C": "PDFs cannot be displayed in browsers",
         "D": "Browsers block PDF files by default"
       },
-      "correct": ["B"],
-      "explanation": "The problem is fixed layout. The browser's own viewer, in its own tab, handles zoom and search far better than a box inside our page."
+      "correct": [
+        "A"
+      ],
+      "explanation": "It will not reflow on a small screen, and reading it in a scrolling box puts a scrollbar inside a scrollbar. The problem is fixed layout. The browser's own viewer, in its own tab, handles zoom and search far better than a box inside our page."
     },
     {
       "id": "cp-2",
       "prompt": "What is the main reason external pages are linked rather than framed?",
       "choices": {
-        "A": "Most sites block being framed, and framing makes their content look like ours",
-        "B": "Links are faster to write",
-        "C": "Frames cost more to host",
-        "D": "External pages are always untrustworthy"
+        "A": "External pages are always untrustworthy",
+        "B": "Frames cost more to host",
+        "C": "Links are faster to write",
+        "D": "Most sites block being framed, and framing makes their content look like ours"
       },
-      "correct": ["A"],
+      "correct": [
+        "D"
+      ],
       "explanation": "Both halves matter: it frequently does not work at all, and when it does it misrepresents whose material the reader is looking at."
     }
   ]

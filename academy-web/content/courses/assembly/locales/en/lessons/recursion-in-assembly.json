@@ -295,10 +295,10 @@
       "id": "cp-1",
       "prompt": "In the -O0 factorial, why is n stored to the frame before the recursive call and reloaded after it?",
       "choices": {
-        "A": "To make debugging easier",
+        "A": "To satisfy the stack canary",
         "B": "The call may destroy caller-saved registers and rdi will hold a different value inside the callee, but n is needed after the call returns",
-        "C": "Because n is a parameter",
-        "D": "To satisfy the stack canary"
+        "C": "To make debugging easier",
+        "D": "Because n is a parameter"
       },
       "correct": [
         "B"
@@ -310,40 +310,40 @@
       "prompt": "Frames measure 32 bytes and ulimit -s reports 8176 KB. What maximum recursion depth do you predict, and what was measured?",
       "choices": {
         "A": "About 8,000; measured 8,176",
-        "B": "About 261,632 predicted; 261,448 measured — the shortfall is the frames already on the stack",
+        "B": "It cannot be predicted",
         "C": "About 32,000",
-        "D": "It cannot be predicted"
+        "D": "About 261,632 predicted"
       },
       "correct": [
-        "B"
+        "D"
       ],
-      "explanation": "Two independent measurements and one division, agreeing to within 0.07%. That is what turns 'recursion uses stack' into a quantity you can design with."
+      "explanation": "261,448 measured — the shortfall is the frames already on the stack. Two independent measurements and one division, agreeing to within 0.07%. That is what turns 'recursion uses stack' into a quantity you can design with."
     },
     {
       "id": "cp-3",
       "prompt": "A tail-recursive function compiled at -O2 contains no call instruction. What happened?",
       "choices": {
-        "A": "The function was inlined into its caller",
-        "B": "The recursion became a loop: a call in tail position needs no new frame, so the compiler turned it into a backward jump",
+        "A": "The recursion became a loop",
+        "B": "The function was inlined into its caller",
         "C": "The compiler removed the function",
         "D": "The recursion moved to the heap"
       },
       "correct": [
-        "B"
+        "A"
       ],
-      "explanation": "In the measured example the ordinary non-tail factorial was also turned into a loop, and unrolled eightfold. Recursion in the source says nothing about stack depth in the binary."
+      "explanation": "A call in tail position needs no new frame, so the compiler turned it into a backward jump. In the measured example the ordinary non-tail factorial was also turned into a loop, and unrolled eightfold. Recursion in the source says nothing about stack depth in the binary."
     },
     {
       "id": "cp-4",
       "prompt": "A recursive program works, then overflows the stack after someone adds a debug print. Why is that plausible?",
       "choices": {
-        "A": "The print uses too much stack",
-        "B": "The print can prevent tail-call elimination, restoring the per-call frame growth that had been optimised away",
-        "C": "printf is recursive",
-        "D": "It is not plausible; the print is unrelated"
+        "A": "The print can prevent tail-call elimination, restoring the per-call frame growth that had been optimised away",
+        "B": "printf is recursive",
+        "C": "It is not plausible; the print is unrelated",
+        "D": "The print uses too much stack"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "explanation": "Taking a local's address or adding work after the recursive call both remove the tail position. This is the first thing to check when a recursive program behaves differently between optimisation levels."
     }
