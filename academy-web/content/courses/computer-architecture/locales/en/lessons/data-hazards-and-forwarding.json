@@ -137,7 +137,12 @@
       "kind": "try",
       "title": "Measure your own machine",
       "steps": [
-        "Write a loop that adds 1 to a single variable 400 million times, and time it",
+        "Write a loop that adds 1 to a single variable 400 million times, and time it. The course never showed how to time C code, so here it is:",
+        "    #include <time.h>",
+        "    static double now(void) { struct timespec t; clock_gettime(CLOCK_MONOTONIC, &t);",
+        "                              return t.tv_sec + t.tv_nsec / 1e9; }",
+        "    double t0 = now();  /* ... the loop ... */  double elapsed = now() - t0;",
+        "Use CLOCK_MONOTONIC, not time() — it does not jump when the system clock is adjusted",
         "Write a second loop with four separate variables, 100 million iterations each",
         "Compile at -O1 or higher and check the timings",
         "If either time is 0.000 s, the compiler deleted the loop — verify with: cc -O2 -S -o - prog.c | grep -c add",

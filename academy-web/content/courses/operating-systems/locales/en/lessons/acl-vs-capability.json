@@ -139,6 +139,8 @@
       "kind": "try",
       "title": "Read and change both kinds",
       "steps": [
+        "This exercise needs root and a second user account. If you do not have both on your own machine, run the whole thing in a throwaway container where you are root and can create users: docker run --rm -it debian:12-slim bash",
+        "Create the second user first: useradd -m tester   (on a normal machine: sudo useradd -m tester)",
         "Create a file readable only by its owner, then: setfacl -m u:<someuser>:rw <file>",
         "Run getfacl on it and identify the named entry and the mask",
         "Run ls -l and find the plus sign — note how little the listing tells you",

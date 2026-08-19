@@ -160,7 +160,9 @@
         "Run it with a file: ./copy < data.txt",
         "Run it in a pipeline: cat data.txt | ./copy | wc -c",
         "Run it interactively and end with Ctrl-D — that is what makes read return 0",
-        "Now run it as a network endpoint: nc -l 9000 < /dev/null    in one terminal and connect with nc localhost 9000",
+        "Now point your own program at a socket instead of a file. In one terminal start a listener that just discards what it receives: nc -l 9000 > /dev/null",
+        "In another terminal, feed your program's output into it: ./copy < bigfile | nc localhost 9000",
+        "The point is that ./copy did not change at all — the same read and write calls work on a socket, because both are file descriptors",
         "Run: ls -l /proc/self/fd     in a shell and identify what each descriptor points at",
         "For a running server: ls -l /proc/<pid>/fd | head    and count its open sockets",
         "Run: ss -tnp | grep <pid>    and match the sockets against the descriptors"

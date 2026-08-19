@@ -161,7 +161,8 @@
       "kind": "try",
       "title": "Convert, then measure",
       "steps": [
-        "Take the producer-consumer queue from the operating systems capstone and change the item type to int",
+        "Start from the bounded queue printed above in this lesson — it is complete and self-contained, so you do not need anything from another course. Change its item type to int (the accepted socket)",
+        "If you have not met pthread_cond_wait before: it atomically releases the mutex and sleeps, then re-acquires the mutex before returning, which is why the wait always sits inside a while loop and never an if",
         "Create a fixed number of workers at startup; have the accept loop put descriptors into the queue",
         "Verify correctness first: many clients, all served, no descriptors leaked",
         "Set the pool to 1 and measure how long 100 sequential requests take",

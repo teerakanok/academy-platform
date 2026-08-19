@@ -161,7 +161,9 @@
         "From another terminal: kill <pid>        (that is SIGTERM — same clean path)",
         "Now: kill -9 <pid>                       (no clean path — it just stops)",
         "Add signal(SIGKILL, SIG_IGN) to the program and print the return value — confirm it fails",
-        "Run: ./yourprog | head -1                (SIGPIPE ends it once head is done)",
+        "Make the program print a COMPLETE line each second — printf(\".\\n\") followed by fflush(stdout) — otherwise head never receives a line and never closes the pipe",
+        "Run: ./yourprog | head -1   then check what killed it: echo ${PIPESTATUS[0]}",
+        "Verified: the status is 141, which is 128 + 13, and 13 is SIGPIPE",
         "Add signal(SIGPIPE, SIG_IGN) and check write's return value and errno instead — confirm EPIPE",
         "Run: kill -l | head -20                  (every signal this system defines)"
       ],

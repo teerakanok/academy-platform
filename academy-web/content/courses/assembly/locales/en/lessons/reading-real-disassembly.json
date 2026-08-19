@@ -185,11 +185,12 @@
     {
       "kind": "list",
       "items": [
-        "Write three small functions of your own without showing them to a partner",
-        "Compile each at -O1, strip the binary, and exchange disassembly with someone else",
-        "Reconstruct their functions using the checklist, and have them reconstruct yours",
-        "Compare each reconstruction against the original and record exactly what was recoverable",
-        "For every difference, decide whether it was unrecoverable in principle or a mistake in method"
+        "Write three small functions of your own, compile each at -O1, strip the binaries, and put the source somewhere you will not look at it",
+        "Wait a day. Working from the stripped disassembly alone, reconstruct all three using the checklist above",
+        "If you have someone to work with, swap binaries instead — but this course assumes you are alone, and waiting a day is a surprisingly good substitute for not knowing the answer",
+        "Compare each reconstruction against your original and record exactly what was recoverable",
+        "For every difference, decide whether it was unrecoverable in principle or a mistake in method",
+        "For a harder version with no source at all, take any small binary from /usr/bin and reconstruct one of its functions"
       ]
     },
     {
