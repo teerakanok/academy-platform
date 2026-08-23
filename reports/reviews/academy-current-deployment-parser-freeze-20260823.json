@@ -1,0 +1,16 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/scripts/current-deployment.mjs",
+      "sha256": "27d57f9dfa99f06cc8266bd9fce11b247cbdf7f9a673de42ece32f6385e797d8",
+      "bytes": 7904
+    },
+    {
+      "path": "academy-web/scripts/current-deployment.test.mjs",
+      "sha256": "998d5bd3448689fa7ae13a9318cd7cd7f458e09165201964d377e6c1c68f04ab",
+      "bytes": 5758
+    }
+  ]
+}

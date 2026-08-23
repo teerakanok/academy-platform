@@ -3,6 +3,18 @@
 > Closed items only, with outcome + evidence + residual risk. Newest first.
 > Provider-neutral. See `active_plan.md` for open work.
 
+## 2026-08-23 - Strict current-deployment parser closed locally
+
+- Added a dependency-free operations parser that selects the newest Wrangler deployment by strict
+  timestamp rather than list position and emits only the allowlisted deployment/version projection.
+- Regression-led remediation rejects RFC3339 `-00:00`, unsupported `:60`, raw and escaped-equivalent
+  duplicate JSON members before collapse, and preserves literal years `0001` through `0099`.
+- Focused `10/10`, full unit `2,044/2,044`, lint/type checks, exact two-file freeze, independent
+  closure review, and Sol final pass `C0/H0/M0`.
+- No Cloudflare, traffic, Identity/OAuth, DNS, Pool A, credential, or protected vault mutation is
+  part of this checkpoint. Evidence:
+  `reports/reviews/academy-current-deployment-parser-local-checkpoint-20260823.md`.
+
 ## 2026-08-23 - Current production-admission candidate prepared without promotion
 
 - Bound candidate `14507463b7a7333e3797de65a7a0bee12ca2c929` to a clean isolated Node 24
