@@ -8,13 +8,24 @@
   "project": "academy-platform",
   "objective": "Continue the source-bound Academy production-admission candidate: independently remediate and review the strict current-deployment parser, then perform only the no-traffic candidate operation after every gate passes.",
   "state": "ready",
-  "repo": {"remote": "github.com/teerakanok/academy-platform", "branch": "main", "base_head": "eca2ee72c26e5902d22469f552fc329adaae73b0"},
+  "repo": {"remote": "github.com/teerakanok/academy-platform", "branch": "main", "base_head": "1ad8ade00bcb49ecd1ffe3fc20f25d02fc528c0c"},
   "delivery": "local",
   "worktree": {
     "mode": "allowlisted",
     "entries": [
       {"status": " M", "path": "reports/vault/2026-08-19-academy-self-study-systems-track.json", "owner": "other-session"},
-      {"status": "??", "path": "academy-web/artifacts/production-gap-20260822/", "owner": "continuation"},
+      {"status": "??", "path": "academy-web/artifacts/production-gap-20260822/baseline/course-detail-desktop.png", "owner": "continuation"},
+      {"status": "??", "path": "academy-web/artifacts/production-gap-20260822/baseline/course-detail-mobile.png", "owner": "continuation"},
+      {"status": "??", "path": "academy-web/artifacts/production-gap-20260822/baseline/courses-desktop.png", "owner": "continuation"},
+      {"status": "??", "path": "academy-web/artifacts/production-gap-20260822/baseline/courses-mobile.png", "owner": "continuation"},
+      {"status": "??", "path": "academy-web/artifacts/production-gap-20260822/baseline/home-desktop.png", "owner": "continuation"},
+      {"status": "??", "path": "academy-web/artifacts/production-gap-20260822/baseline/home-mobile.png", "owner": "continuation"},
+      {"status": "??", "path": "academy-web/artifacts/production-gap-20260822/baseline/sign-in-desktop.png", "owner": "continuation"},
+      {"status": "??", "path": "academy-web/artifacts/production-gap-20260822/baseline/sign-in-mobile.png", "owner": "continuation"},
+      {"status": "??", "path": "academy-web/artifacts/production-gap-20260822/final/courses-discovery-desktop.png", "owner": "continuation"},
+      {"status": "??", "path": "academy-web/artifacts/production-gap-20260822/final/courses-filtered-mobile.png", "owner": "continuation"},
+      {"status": "??", "path": "academy-web/artifacts/production-gap-20260822/final/courses-no-results-desktop.png", "owner": "continuation"},
+      {"status": "??", "path": "academy-web/artifacts/production-gap-20260822/final/courses-thai-mobile.png", "owner": "continuation"},
       {"status": "??", "path": "academy-web/scripts/current-deployment.mjs", "owner": "continuation"},
       {"status": "??", "path": "academy-web/scripts/current-deployment.test.mjs", "owner": "continuation"},
       {"status": "??", "path": "reports/reviews/academy-current-deployment-parser-freeze-20260823.json", "owner": "continuation"},
@@ -114,7 +125,7 @@ Allowed scope:
 ## Repository State
 - State: ready
 - Branch: main
-- Baseline: eca2ee72c26e5902d22469f552fc329adaae73b0
+- Baseline: 1ad8ade00bcb49ecd1ffe3fc20f25d02fc528c0c
 - Delivery: local
 - Baseline equals `origin/main`; exact continuation and protected dirt are recorded below.
 
@@ -140,7 +151,18 @@ Allowed scope:
 Expected worktree: exact allowlisted entries in packet metadata.
 
 - `M reports/vault/2026-08-19-academy-self-study-systems-track.json` - other-session; protected.
-- `?? academy-web/artifacts/production-gap-20260822/` - continuation.
+- `?? academy-web/artifacts/production-gap-20260822/baseline/course-detail-desktop.png` - continuation.
+- `?? academy-web/artifacts/production-gap-20260822/baseline/course-detail-mobile.png` - continuation.
+- `?? academy-web/artifacts/production-gap-20260822/baseline/courses-desktop.png` - continuation.
+- `?? academy-web/artifacts/production-gap-20260822/baseline/courses-mobile.png` - continuation.
+- `?? academy-web/artifacts/production-gap-20260822/baseline/home-desktop.png` - continuation.
+- `?? academy-web/artifacts/production-gap-20260822/baseline/home-mobile.png` - continuation.
+- `?? academy-web/artifacts/production-gap-20260822/baseline/sign-in-desktop.png` - continuation.
+- `?? academy-web/artifacts/production-gap-20260822/baseline/sign-in-mobile.png` - continuation.
+- `?? academy-web/artifacts/production-gap-20260822/final/courses-discovery-desktop.png` - continuation.
+- `?? academy-web/artifacts/production-gap-20260822/final/courses-filtered-mobile.png` - continuation.
+- `?? academy-web/artifacts/production-gap-20260822/final/courses-no-results-desktop.png` - continuation.
+- `?? academy-web/artifacts/production-gap-20260822/final/courses-thai-mobile.png` - continuation.
 - `?? academy-web/scripts/current-deployment.mjs` - continuation.
 - `?? academy-web/scripts/current-deployment.test.mjs` - continuation.
 - `?? reports/reviews/academy-current-deployment-parser-freeze-20260823.json` - continuation.
