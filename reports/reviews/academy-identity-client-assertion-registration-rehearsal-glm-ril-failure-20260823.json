@@ -1,0 +1,31 @@
+{
+  "schema": "academy.identity-registration-rehearsal.ril.v1",
+  "status": "FAIL",
+  "verdict": "FAIL",
+  "findings": [
+    {
+      "severity": "medium",
+      "message": "The active plan grouped timestamp refusal with authenticator assertion checks even though the checkpoint proves millisecond activatedAt precision only in the registration-sequence validator."
+    }
+  ],
+  "work_order_metadata": {
+    "schema": "model-team.ril.v1",
+    "work_kind": "bounded_code",
+    "role": "implementation_reviewer",
+    "source_sha256": "db1b1adf19a943ad91dde61b334935240b89675d40ba755f15a2153d2fb472dc"
+  },
+  "reviewed_source_sha256": "db1b1adf19a943ad91dde61b334935240b89675d40ba755f15a2153d2fb472dc",
+  "run_id": "run-3ksTbh",
+  "child_run_id": "run-39ae734b739489e18b2b7da0fa8b9ba4",
+  "provider_result_valid": true,
+  "review_required": true,
+  "provider_started_at": "2026-08-22T22:48:11.583Z",
+  "first_activity_at": "2026-08-22T22:48:11.686Z",
+  "result_validated_at": "2026-08-22T22:53:04.431Z",
+  "receipt_persisted_at": "2026-08-22T22:53:04.620Z",
+  "duration_ms": 292848,
+  "result_sha256": "dfb46223b83677bed9cf548222819457ce7126e4fc3bd38d2a11a919ca4f48ce",
+  "worker_status_sha256": "699b998fd7c14a8396967474511c9785a14e0b4337032178408d559eb292d47d",
+  "prompt_sha256": "275d5d890605212bf095d90cbbea9f481190465923f7b4d38fdf7236256b98e9",
+  "manifest_sha256": "62f8467c22b0986cc8e5e34ec84f180472c8f6005a746ac3accef37122e7425b"
+}

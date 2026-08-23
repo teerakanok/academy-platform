@@ -41,6 +41,13 @@ export interface UiStrings {
     lessons: (n: number) => string
     checkpoints: (n: number) => string
     level: Record<'beginner' | 'intermediate' | 'advanced', string>
+    searchLabel: string
+    searchPlaceholder: string
+    levelFilter: { legend: string; all: string }
+    resultCount: (count: number) => string
+    noResultsHeading: string
+    noResultsBody: string
+    clearFilters: string
     emptyHeading: string
     emptyBody: string
     updates: string
@@ -89,6 +96,13 @@ const en: UiStrings = {
     lessons: (n) => `${n} lessons`,
     checkpoints: (n) => `${n} required checkpoint${n === 1 ? '' : 's'}`,
     level: { beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced' },
+    searchLabel: 'Search courses',
+    searchPlaceholder: 'Search by title or short description',
+    levelFilter: { legend: 'Level', all: 'All levels' },
+    resultCount: (count) => `${count} ${count === 1 ? 'course' : 'courses'}`,
+    noResultsHeading: 'No matching courses',
+    noResultsBody: 'Try another search term or choose a different level.',
+    clearFilters: 'Clear search and level filters',
     emptyHeading: 'Course previews are being prepared',
     emptyBody: 'There are no public course previews at the moment. Get launch updates when the next route is ready.',
     updates: 'Get launch updates',
@@ -143,6 +157,13 @@ const th: UiStrings = {
     lessons: (n) => `${n} บท`,
     checkpoints: (n) => `${n} ด่านบังคับ`,
     level: { beginner: 'เริ่มต้น', intermediate: 'ระดับกลาง', advanced: 'ขั้นสูง' },
+    searchLabel: 'ค้นหาคอร์ส',
+    searchPlaceholder: 'ค้นหาด้วยชื่อหรือคำอธิบายสั้น',
+    levelFilter: { legend: 'ระดับ', all: 'ทุกระดับ' },
+    resultCount: (count) => `พบ ${count} คอร์ส`,
+    noResultsHeading: 'ไม่พบคอร์สที่ตรงกับเงื่อนไข',
+    noResultsBody: 'ลองใช้คำค้นอื่น หรือเปลี่ยนระดับคอร์ส',
+    clearFilters: 'ล้างการค้นหาและตัวกรองระดับ',
     emptyHeading: 'กำลังเตรียมตัวอย่างคอร์ส',
     emptyBody: 'ตอนนี้ยังไม่มีตัวอย่างคอร์สที่เปิดให้ดู รับข่าวเมื่อเส้นทางถัดไปพร้อมได้',
     updates: 'รับข่าวเมื่อเปิดให้เรียน',

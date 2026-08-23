@@ -1,0 +1,40 @@
+{
+  "schema": "academy.local-checkpoint-freeze.v1",
+  "checkpoint": "academy-learner-journey-observability-20260823",
+  "bundle_sha256": "b2d0a8b54536724a3b1b21531706c792006f6746ae3b4071952319e23b377fe5",
+  "bundle_algorithm": "For source then test, SHA-256(path UTF-8 + NUL + exact bytes + NUL)",
+  "files": [
+    { "path": "academy-web/src/lib/observability/learner-journey.ts", "sha256": "848d01ce03501e0f5e751f55194b302e0d62df89878414c47ee74c58325225c7" },
+    { "path": "academy-web/tests/unit/learner-journey-observability.test.ts", "sha256": "b10df9463fbb06dd8a2cf6047ed48597031244a3ac95d46b10347aa3ec2305ad" },
+    { "path": "reports/reviews/academy-learner-journey-observability-glm-author-prompt-20260822.txt", "sha256": "f2f870b77c45d27d15881c7678492eeb44e1d4c9dda189d1b8cd0ff875b088b0" },
+    { "path": "reports/reviews/academy-learner-journey-observability-glm-remediation-prompt-20260823.txt", "sha256": "72235d49d3e765f77ed6af35e9a2b6a99decb615068dd44cfecb98d6f5fdb3ca" },
+    { "path": "reports/reviews/academy-learner-journey-observability-glm-test-remediation-prompt-20260823.txt", "sha256": "ebf10c06527c42ef597033b860ead9a88277660e88e2dde0d842cf244d9bee2d" },
+    { "path": "reports/reviews/academy-learner-journey-observability-glm-readiness-remediation-prompt-20260823.txt", "sha256": "074a295678c36af29aa104a0bba701345e476b255440bf293b4b492ad6288e81" },
+    { "path": "reports/reviews/academy-learner-journey-observability-glm-locale-remediation-prompt-20260823.txt", "sha256": "080c2ddd50e10910c58b6921566bd8d426a6f625a8fe12c3183d355e1641c2e5" },
+    { "path": "reports/reviews/academy-learner-journey-observability-glm-locale-decoupling-prompt-20260823.txt", "sha256": "247f1b8525f3a01b8ab5a9d2606f24c1e03f6134091b8f08bca2bb2659ce14db" },
+    { "path": "reports/reviews/academy-learner-journey-observability-glm-ril-prompt-20260823.txt", "sha256": "264b6fe27199612076b4f4cd90205b3b143b23c988f27c636208b917092f33ac" },
+    { "path": "reports/reviews/academy-learner-journey-observability-glm-ril-final-20260823.json", "sha256": "fea5783773300c853956294590fcba17ede7b77724d5742e03b8da6d0c1d67af" },
+    { "path": "reports/reviews/academy-learner-journey-observability-provider-call-log-20260823.json", "sha256": "ece6fe0bf7bd332585268d46cda7921a21d86b10fd4aa59260542338ccbcd278" },
+    { "path": "reports/reviews/academy-learner-journey-observability-local-checkpoint-20260823.md", "sha256": "58fff8a34e4169ca66567de5b683f0b4c7789bb35d0e0fc151d06ae606a3fd5b" }
+  ],
+  "verification": {
+    "focused": { "passed": 14, "total": 14 },
+    "related": { "passed": 20, "total": 20 },
+    "fullUnit": { "filesPassed": 128, "filesTotal": 128, "passed": 1991, "total": 1991 },
+    "observabilityPillars": { "locallyEvidenced": 2, "total": 5 },
+    "canonicalIdentityConformance": { "proven": 16, "total": 23 },
+    "eslint": "pass",
+    "typescript": "pass",
+    "independentReview": { "verdict": "PASS", "findings": [] }
+  },
+  "releaseBoundary": {
+    "enabled": false,
+    "runtimeWired": false,
+    "releaseApproval": false,
+    "productionEvidence": false,
+    "productionReady": false,
+    "telemetryEmission": false,
+    "alertRouteMutation": false,
+    "productionMutation": false
+  }
+}

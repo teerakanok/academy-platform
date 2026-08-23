@@ -76,7 +76,7 @@ export function CourseCover({
     <div
       // ไม่ใส่ flex ตรงนี้: flex item มี min-width:auto เป็นค่าตั้งต้น SVG จึงไม่ยอมหด
       // ต่ำกว่าขนาดเนื้อหาตัวเอง แล้วดันการ์ดกว้างเกินจอมือถือ (gate จับได้)
-      className={`cover-wash relative aspect-[16/5] overflow-hidden ${className}`}
+      className={`cover-wash relative aspect-[16/5] min-w-0 w-full overflow-hidden ${className}`}
       aria-hidden="true"
     >
       {/* สองโซนที่ไม่ทับกัน: ขวา = ลายบอกหัวข้อ (คอร์สนี้เรื่องอะไร) ·
@@ -88,7 +88,7 @@ export function CourseCover({
       <svg
         viewBox={`${viewX} ${viewY} ${viewW} ${viewH}`}
         preserveAspectRatio="xMidYMid meet"
-        className="relative block h-full w-[70%] min-w-0"
+        className="relative block h-full w-[70%] min-w-0 max-w-full"
       >
         {layout.edges.map((edge) => {
           const from = toCover(edge.fromX, edge.fromY)

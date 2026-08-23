@@ -1,0 +1,17 @@
+Strict read-only implementation RIL. Review only these two Academy files; do not edit:
+- academy-web/src/lib/observability/learner-journey-slo.ts
+- academy-web/tests/unit/learner-journey-slo.test.ts
+
+The bound source digest covers path + NUL + exact bytes + NUL for source then test.
+
+Decide whether the implementation has any Critical, High, or Medium defect in:
+- exact policy/aggregate validation and six canonical checkpoints;
+- integer ceiling math for error-budget basis points and burn-rate milli;
+- threshold and overall priority: critical > warning > no_data > healthy;
+- count bounds, overflow safety, expected-denial budget use, canonical output, deep freezing;
+- privacy/local-only scope with no identifiers, telemetry, network, storage, runtime, or production wiring;
+- tests materially proving boundaries without false expectations.
+
+Controller evidence: focused 11/11, related 31/31, full unit 129 files / 2,002 tests, ESLint and TypeScript clean. This is local policy code, not deployed SLO or alert evidence.
+
+Return only one JSON object with exactly four top-level keys: `work_order_metadata`, `verdict`, `summary`, `findings`. Copy metadata exactly. `verdict` is `PASS` or `FAIL`. `findings` is an array of objects containing only `severity`, `message`, and optional safe relative `path`. PASS requires no Critical/High/Medium finding. No markdown or prose outside JSON.

@@ -1,0 +1,14 @@
+{
+  "schema": "academy.provider-failure-evidence.v1",
+  "call_id": "glm-ril-1",
+  "contract": "model-team.ril.v1",
+  "reviewed_source_sha256": "88ea5408426a65c9cec5768e6f6108cc2e47218ec3c62c1ab96373c459f8c7d2",
+  "provider_started_at": "2026-08-22T14:54:39.991Z",
+  "first_activity_at": "2026-08-22T14:54:40.092Z",
+  "failed_at": "2026-08-22T15:01:13.378Z",
+  "outer_error_code": "E_CHILD",
+  "child_error_code": "E_PROVIDER_RESULT_SCHEMA",
+  "valid_verdict": false,
+  "checkpoint_approval": false,
+  "recovery": "Retry the unchanged strict RIL prompt against the same source digest. Any source change requires a new digest and manifest."
+}

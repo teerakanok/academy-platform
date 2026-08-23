@@ -1,0 +1,18 @@
+Remediate the focused-test and TypeScript defects in the current Academy course-discovery patch. Work only in the projected repository and change only academy-web/tests/unit/public-course-catalog.test.ts.
+
+Observed deterministic evidence:
+- Vitest: 3 passed, 6 failed. Every new filter test throws because filterPublicCourseCatalog accepts one object argument but the tests incorrectly pass courses as a positional first argument and the options as a second argument.
+- TypeScript TS2554 reports Expected 1 arguments, but got 2 for every new filter call.
+- TypeScript TS2322 reports the conditional availableLocales expression produces string[] instead of Locale[].
+
+Required remediation:
+1. Update every filterPublicCourseCatalog invocation to pass exactly one object with courses, locale, query, and level.
+2. Construct availableLocales with the correct Locale[] type without weakening production types or using unsafe casts.
+3. Preserve all intended assertions and coverage: active-locale title/subtitle search, normalization, default-locale fallback, level filtering, combined filtering, order preservation, and no matches.
+4. Do not modify production implementation, i18n, or E2E code in this remediation.
+
+Acceptance commands the controller will run:
+- npm run test:unit -- tests/unit/public-course-catalog.test.ts
+- npm run lint
+
+Return a concise summary and do not claim independent review or visual approval.

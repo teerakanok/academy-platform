@@ -1,0 +1,60 @@
+{
+  "schema": "academy-canonical-domain-visual-review/v1",
+  "reviewedAt": "2026-08-23T07:41:18Z",
+  "reviewerRole": "independent-visual-critic",
+  "sourceFreeze": {
+    "command": "node ../../../scripts/checkpoint-freeze-manifest.mjs digest --root . artifacts/reviews/academy-canonical-domain-20260823/authenticated-callback.png artifacts/reviews/academy-canonical-domain-20260823/authenticated-courses.png artifacts/reviews/academy-canonical-domain-20260823/authenticated-root.png",
+    "fileCount": 3,
+    "sourceSha256": "b91942ec6bbc5b9eaf4d2467b6a1751b00a8482ebd8999de031c887cad1fc50d"
+  },
+  "verdict": "PASS",
+  "findingCounts": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "frames": [
+    {
+      "path": "artifacts/reviews/academy-canonical-domain-20260823/authenticated-root.png",
+      "sha256": "3b8c15a35cb82c3223413f164db67ff1c426d2dc6f9795a38867c770dbb71818",
+      "dimensions": "1302x768",
+      "result": "Academy landing page visibly renders after Access with no observed overlap, overflow, unintended truncation, or compositing artifact."
+    },
+    {
+      "path": "artifacts/reviews/academy-canonical-domain-20260823/authenticated-courses.png",
+      "sha256": "2a21aa0955542da2137283c13dc59da9d2bda90ec465231c5c925d27bb15c2e6",
+      "dimensions": "1302x768",
+      "result": "Course-preview page visibly renders after Access with legible search/filter controls and cards; no observed collision, clipping, truncation, or screenshot artifact."
+    },
+    {
+      "path": "artifacts/reviews/academy-canonical-domain-20260823/authenticated-callback.png",
+      "sha256": "68871f9f11b598fce06307a84c7ad37022dd50b5fd4fd78df9b3085eee340e22",
+      "dimensions": "1302x768",
+      "result": "Exact no-query callback route visibly renders the expected raw JSON validation response; it evidences endpoint response, not Worker provenance or OAuth acceptance."
+    }
+  ],
+  "sensitiveContentCheck": {
+    "secretOrOtpVisible": false,
+    "tokenVisible": false,
+    "emailAddressVisible": false,
+    "callbackParameterOrCookieVisible": false,
+    "identifiablePiiVisible": false
+  },
+  "coverage": {
+    "covered": [
+      "post-Access landing page at 1302x768",
+      "post-Access course-preview page at 1302x768",
+      "post-Access no-parameter callback validation at 1302x768"
+    ],
+    "uncovered": [
+      "Access identity or policy enforcement internals",
+      "Worker runtime provenance",
+      "real OAuth code/state acceptance",
+      "sign-in, search, and filter interaction",
+      "lower-page content, loading, and error states",
+      "other viewport sizes"
+    ]
+  },
+  "scopeBoundary": "This review does not claim Identity acceptance, production admission, or a successful OAuth callback."
+}

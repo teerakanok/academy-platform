@@ -1,0 +1,13 @@
+Independently review the current Academy public course-discovery implementation as an implementation_reviewer. This is strict read-only RIL: do not edit files. The reviewed source digest is the SHA-256 of the exact current unified diff for the four implementation/test files and is bound in work_order_metadata.
+
+Review for user-visible and contract defects, especially:
+- filtering correctness across active-locale title/subtitle, default-locale fallback, case/whitespace handling, level composition, and stable order;
+- React state and locale transitions, empty catalog versus no filtered results, link/route continuity, and unintended regressions;
+- semantic HTML, keyboard and screen-reader behavior, live result announcements, focus visibility, control labeling, and no-results recovery;
+- responsive layout risks, text overflow, stable controls, and use of existing design tokens;
+- test quality, false positives, missing meaningful cases, or implementation/test mismatch;
+- security/privacy boundary: no new persistence, auth, database, network, runtime, deployment, or production enablement.
+
+Deterministic controller evidence already obtained: focused unit 9/9; lint/typecheck exit 0 (three unrelated pre-existing warnings); production build pass; focused desktop/mobile discovery E2E 3/3; full public production-build suite 49 passed, 1 intentional desktop skip, 0 failed, including desktop/mobile Axe coverage.
+
+Return only the strict implementation-RIL JSON object required by the contract: work_order_metadata, verdict, summary, findings. Each finding must contain severity and message, with an optional safe relative path. PASS requires zero Critical, High, or Medium findings. Do not report aesthetic observations that require screenshot inspection; Terra owns visual review.

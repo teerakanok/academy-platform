@@ -1,0 +1,59 @@
+{
+  "schema": "academy.provider-call-log.v1",
+  "checkpoint": "academy-identity-runtime-route-l1-closure-20260822",
+  "working_semantics": "A call is working only after provider_started and first_activity. A successful author call additionally requires valid scoped output, an allowed patch, and controller verification. A successful reviewer call requires a valid strict RIL PASS with no Critical, High, or Medium finding.",
+  "calls": [
+    {
+      "id": "glm-author-1",
+      "purpose": "bounded route-level test author",
+      "provider": "GLM external sensitive worker",
+      "model": "adapter-bound GLM model; route does not expose a model ID",
+      "reasoning_effort": "provider policy default; adapter accepts no explicit effort",
+      "prompt_path": "reports/reviews/academy-identity-runtime-route-l1-glm-author-prompt-20260822.txt",
+      "exact_prompt_sha256": "5121e2452de0513f377e5404b9ea4d7f59c015ddd93d79aa20f93a4f9bcaf737",
+      "controller_dispatched_at": "2026-08-22T16:38:00Z",
+      "provider_started_at": "2026-08-22T16:39:02.012Z",
+      "first_activity_at": "2026-08-22T16:39:02.317Z",
+      "finished_at": "2026-08-22T16:42:02.483Z",
+      "working": true,
+      "success": false,
+      "status": "controller_verification_failed",
+      "result": "Valid one-file patch run-icrMWq, patch_sha256 4fc49fc860caa9c40937aff4e564b177bc08982513e9d382bae2614a953efb52. Behavior 4/4 and related 39/39 passed; TypeScript failed with 8 TS2339 mock-typing errors, so author success remains false pending remediation."
+    },
+    {
+      "id": "glm-remediation-1",
+      "purpose": "repair route-test mock typing without changing behavior",
+      "provider": "GLM external sensitive worker",
+      "model": "adapter-bound GLM model; route does not expose a model ID",
+      "reasoning_effort": "provider policy default; adapter accepts no explicit effort",
+      "prompt_path": "reports/reviews/academy-identity-runtime-route-l1-glm-remediation-prompt-20260822.txt",
+      "exact_prompt_sha256": "b9138220bc1c3235c01f6c4f63d291a43226bf985218b3a0bae18da049bd7811",
+      "controller_dispatched_at": "2026-08-22T16:43:17Z",
+      "provider_started_at": "2026-08-22T16:44:14.200Z",
+      "first_activity_at": "2026-08-22T16:44:14.401Z",
+      "finished_at": "2026-08-22T16:45:26.542Z",
+      "working": true,
+      "success": true,
+      "status": "accepted_by_controller",
+      "result": "Valid one-file patch run-od5dqq, patch_sha256 c1c94ccaa05573c8e3247899ffc0bff312fc5e2af3972c2569f399ba12671ad8. Focused 4/4, related 39/39, scoped ESLint, TypeScript, and diff check passed."
+    },
+    {
+      "id": "glm-ril-1",
+      "purpose": "distinct strict implementation review",
+      "provider": "GLM external sensitive worker",
+      "model": "adapter-bound GLM model; route does not expose a model ID",
+      "reasoning_effort": "provider policy default; adapter accepts no explicit effort",
+      "prompt_path": "reports/reviews/academy-identity-runtime-route-l1-glm-ril-prompt-20260822.txt",
+      "exact_prompt_sha256": "1f7c6c07d449898c1fb53c8b492d5bfb77fa67f536af0e044205cd4b7938aa1c",
+      "source_sha256": "08f37f796fac176f71bb0bccee6df2c7c2575bcb64734ebff8aad223662eb2c5",
+      "controller_dispatched_at": "2026-08-22T16:46:10Z",
+      "provider_started_at": "2026-08-22T16:47:16.542Z",
+      "first_activity_at": "2026-08-22T16:47:16.643Z",
+      "finished_at": "2026-08-22T16:49:30.374Z",
+      "working": true,
+      "success": true,
+      "status": "strict_pass",
+      "result": "Valid strict RIL PASS with findings []; run_id run-1do3E8; result_sha256 5adadedb44bb10455a7c86c523f9219978fd29cacb6ad5021af6fcab31b1a2e9; reviewed_source_sha256 exact match."
+    }
+  ]
+}

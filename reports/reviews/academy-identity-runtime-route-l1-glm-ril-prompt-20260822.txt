@@ -1,0 +1,15 @@
+Independently review Academy's new direct route-level Identity runtime tests as the implementation_reviewer. This is strict read-only RIL: do not edit files. The bound source_sha256 is the SHA-256 of the exact bytes of academy-web/tests/unit/identity-runtime-routes.test.ts.
+
+Review the new test against the real POST `/api/auth/identity/start` and GET `/auth/callback` routes, the registry seam, and the runtime-browser-flow result contract. Determine whether it genuinely closes the accepted nonblocking L1 before future registry wiring.
+
+Check specifically:
+- the mock topology actually reaches the future enabled route branches and does not accidentally enter the local fixture or disabled fallback;
+- exact Request identity, allowed status, absolute/relative redirect target handling, JSON errors, absent redirect on errors, and multiple ordered Set-Cookie propagation are meaningfully asserted;
+- `Headers.getSetCookie()` proves distinct response headers rather than only a combined string;
+- mock isolation/reset and `IdentityAdapterUnavailableError instanceof` compatibility are sound;
+- tests do not mutate env, registry flags, runtime wiring, policy, network, database, filesystem, deployment, or production state;
+- false positives, implementation-coupled assertions, unsafe typing, missing material branch coverage, or contradictions with the runtime result union.
+
+Controller evidence on Node 24.18.0: focused 4/4 passed; related route/runtime/registry/local-browser regression 39/39 passed; scoped ESLint clean; `tsc --noEmit` zero errors; diff check clean. Canonical conformance remains 16/23, `productionReady=false`, and `noProductionMutation=true`.
+
+Return only the exact strict implementation-RIL JSON object required by the contract: work_order_metadata, verdict, summary, findings. Findings use severity and message with optional safe relative path. PASS requires no Critical, High, or Medium finding. Do not claim deployment or production readiness.

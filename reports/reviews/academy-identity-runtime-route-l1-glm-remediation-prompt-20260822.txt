@@ -1,0 +1,21 @@
+Remediate the TypeScript mock-typing defect in Academy's new route-level Identity test. Work only in the sanitized projected repository and change only academy-web/tests/unit/identity-runtime-routes.test.ts. Do not edit production code or any existing file.
+
+Observed controller evidence on Node 24.18.0:
+- Focused route test behavior passes 4/4.
+- Related route/runtime regression passes 39/39.
+- Scoped ESLint is clean.
+- `tsc --noEmit` fails with 8 TS2339 errors because `routeMocks.browserFlow` is annotated as `AcademyIdentityRuntimeBrowserFlow`, which erases Vitest mock methods such as `mockResolvedValueOnce` and `.mock` from its `start` and `complete` properties.
+
+Required remediation:
+1. Preserve separately typed Vitest mock functions for start and complete so tests retain mock APIs while the object supplied by `getIdentityRuntimeBrowserFlow` remains assignable to `AcademyIdentityRuntimeBrowserFlow`.
+2. Update test references to those explicit mocks as needed.
+3. Preserve all four behavioral assertions exactly: Request object identity, status, Location, JSON body, and ordered distinct Set-Cookie propagation through `Headers.getSetCookie()`.
+4. Do not use `any`, unsafe casts, `@ts-ignore`, disable rules, change runtime behavior, or widen scope.
+
+Controller acceptance on Node 24.18.0:
+- npm run test:unit -- tests/unit/identity-runtime-routes.test.ts
+- npm run test:unit -- tests/unit/identity-runtime-routes.test.ts tests/unit/identity-runtime-browser-flow.test.ts tests/unit/identity-runtime-completion.test.ts tests/unit/auth-callback-route.test.ts tests/unit/identity-registry.test.ts tests/unit/identity-local-browser-flow.test.ts
+- npx eslint tests/unit/identity-runtime-routes.test.ts
+- npx tsc --noEmit
+
+Return a concise summary only; do not claim review or production readiness.

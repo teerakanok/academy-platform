@@ -66,17 +66,17 @@ export default function HomePage() {
           <h2 id="catalog-heading" className="mb-5 font-display text-2xl font-semibold text-cs-text">
             Course previews
           </h2>
-          <ul className="grid gap-4 md:grid-cols-2">
+          <ul className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2">
             {courses.map((course) => (
-              <li key={course.structure.slug}>
+              <li className="min-w-0" key={course.structure.slug}>
                 <Link
                   href={`/courses/${course.structure.slug}/${course.structure.defaultLocale}`}
-                  className="card-feature card-interactive group block h-full overflow-hidden"
+                  className="card-feature card-interactive group block h-full w-full overflow-hidden"
                 >
                   {/* คอร์สเดียวกันต้องหน้าตาเหมือนกันทุกที่ที่ปรากฏ */}
                   <CourseCover
                     structure={course.structure}
-                    className="h-32 border-b border-cs-border transition-transform duration-300 group-hover:scale-[1.03] md:h-[152px]"
+                    className="h-32 w-full border-b border-cs-border transition-transform duration-300 group-hover:scale-[1.03] md:h-[152px]"
                   />
                   <div className="p-6">
                     <span className="font-mono text-[11px] uppercase tracking-wide text-cs-accent">

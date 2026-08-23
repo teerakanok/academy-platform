@@ -1,0 +1,58 @@
+{
+  "schema": "academy.provider-call-log.v1",
+  "checkpoint": "academy-production-admission-evidence-contract-20260823",
+  "calls": [
+    {
+      "id": "bounded-author-1",
+      "role": "implementation_author",
+      "route": "sensitive_external_worker",
+      "provider_started_at": "2026-08-22T23:50:08.467Z",
+      "first_activity_at": "2026-08-22T23:50:08.569Z",
+      "finished_at": "2026-08-22T23:57:57.046Z",
+      "prompt_sha256": "9df84db621068f89edfeb6204d682314bf3c48a167a3f687698a26c23c0ac984",
+      "result": "E_WRITE_SCOPE",
+      "released_patch": false
+    },
+    {
+      "id": "bounded-author-2-reslice",
+      "role": "implementation_author",
+      "route": "sensitive_external_worker",
+      "provider_started_at": "2026-08-22T23:58:36.007Z",
+      "first_activity_at": "2026-08-22T23:58:36.108Z",
+      "finished_at": "2026-08-23T00:05:15.387Z",
+      "prompt_sha256": "8edf338e5b7d847b051fca2c5720473d7e79b9fcddd2b2bac6cfd804893611c0",
+      "result": "E_WRITE_SCOPE",
+      "released_patch": false
+    },
+    {
+      "id": "direct-author-after-reslice",
+      "role": "implementation_author",
+      "route": "direct_glm_disposable_projection",
+      "thread_id": "01a02bf0-445e-7061-b417-047d807c0a1e",
+      "provider_started_at": null,
+      "first_activity_at": null,
+      "finished_at": null,
+      "timestamp_provenance": "direct launcher emitted no durable timestamps",
+      "prompt_sha256": "e2dc879167761ac5c2ec929349f49ec523850b674b2643514ea7c88e74164b59",
+      "result": "controller_terminated_unbounded_home_scan",
+      "released_patch": false
+    },
+    {
+      "id": "strict-ril-1",
+      "role": "implementation_reviewer",
+      "route": "sensitive_external_worker",
+      "run_id": "run-BYY6LN",
+      "child_run_id": "run-f54a5d33575744a2ef96b582c35beeb2",
+      "provider_started_at": "2026-08-23T00:17:55.939Z",
+      "first_activity_at": "2026-08-23T00:17:56.042Z",
+      "finished_at": "2026-08-23T00:20:19.458Z",
+      "prompt_sha256": "ed04917d6125456bdd927890ba1f9905c32c97adde9172fa0ab5e79fc0a39a24",
+      "result_sha256": "3ae49727ae27e502a7487dc41e399b910d3343c2043251be956ee4db7b754e6b",
+      "result": "PASS",
+      "findings": []
+    }
+  ],
+  "provider_calls": 4,
+  "released_author_patches": 0,
+  "controller_fallback_reason": "Both bounded workers violated the exact write scope; the serial direct attempt was stopped when it widened into a home-directory dependency scan. The controller integrated the bounded draft, corrected the array-key defect, and added a TDD-proven cross-artifact uniqueness boundary before independent review."
+}

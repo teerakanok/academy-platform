@@ -1,0 +1,27 @@
+{
+  "schema": "academy.learner-journey-slo.ril.v1",
+  "status": "PASS",
+  "verdict": "PASS",
+  "findings": [],
+  "work_order_metadata": {
+    "schema": "model-team.ril.v1",
+    "work_kind": "bounded_code",
+    "role": "implementation_reviewer",
+    "source_sha256": "23bcb4c81fe9ba4d4f6efcb3672fac4f5468c5e563479ed06d7395b116b7fab5"
+  },
+  "reviewed_source_sha256": "23bcb4c81fe9ba4d4f6efcb3672fac4f5468c5e563479ed06d7395b116b7fab5",
+  "run_id": "run-p2NLQ2",
+  "child_run_id": "run-1dd9369d99a6585dc3fd00ffdbecc648",
+  "provider_result_valid": true,
+  "review_required": false,
+  "provider_started_at": "2026-08-22T18:22:18.851Z",
+  "first_activity_at": "2026-08-22T18:22:19.160Z",
+  "result_validated_at": "2026-08-22T18:24:08.288Z",
+  "receipt_persisted_at": "2026-08-22T18:24:08.462Z",
+  "result_sha256": "48017aa3944a869baa73db77917f0a2f713e776db02a93e9f7763acdfd89a8de",
+  "worker_receipt_sha256": "c14902db82a5a6cb37dc760189cc36a39187117f9e31f3ca7eb79ebe9e517e88",
+  "worker_status_sha256": "9ca3122ecb09fa8a6ce593ae74f15ad2c70a904c6a84a84d294b50492cdfabc3",
+  "prompt_sha256": "ff1186b7d7ce7b289acfa21856f3435b858cc90f7542cad4d491c2d6bb3c7f2b",
+  "manifest_sha256": "1304ff982149fef782616cb863ba2f0ad45825f7eb0ffcd728f8ccc65726b206",
+  "summary": "The implementation validates strict policy and aggregate shapes, emits all six canonical checkpoints, applies integer ceiling arithmetic safely within bounded counts, prioritizes statuses correctly, counts expected denials in the error budget, returns deeply frozen canonical projections, and remains local-only. Tests substantively cover arithmetic boundaries, thresholds, ordering, shape rejection, count limits, isolation, and local-only scope."
+}

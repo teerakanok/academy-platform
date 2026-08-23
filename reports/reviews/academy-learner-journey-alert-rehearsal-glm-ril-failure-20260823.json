@@ -1,0 +1,16 @@
+{
+  "schema": "academy.alert-rehearsal.ril-failure.v1",
+  "status": "REVIEW_BLOCKED",
+  "error_code": "E_PROVIDER_RESULT_SCHEMA",
+  "provider_started_at": "2026-08-22T19:03:41.423Z",
+  "first_activity_at": "2026-08-22T19:03:41.524Z",
+  "provider_failed_at": "2026-08-22T19:05:29.843Z",
+  "outer_failed_at": "2026-08-22T19:05:29.857Z",
+  "source_sha256": "d5d0fc605134bf1342d82308422ad049bb1ed0772f48f53c2e8a7b761a7cbf99",
+  "prompt_sha256": "7746748250de35b2460a3d5a097af7a5309410a15762bb6c96d552986ac9b14e",
+  "manifest_sha256": "98b967647fbf19e9dbd39821491c9b5281532c8b2f91a24499aad903d0184d82",
+  "status_sha256": "0845b7c88df54bd7d1cd29d0a81b49830205d007ee596fb1eb52f95b09870480",
+  "verdict_available": false,
+  "review_receipt_available": false,
+  "retry_disposition": "No unchanged retry. Attempt 1 already used efficiency_protocol_v1, the smallest complete two-file source slice, and the exact four-key RIL response contract."
+}

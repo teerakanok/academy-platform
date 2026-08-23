@@ -1,0 +1,20 @@
+Independently review Academy's local learner-journey SLO/error-budget evaluator and tests as the implementation_reviewer. This is strict read-only RIL: do not edit files.
+
+The bound source_sha256 is a deterministic two-file bundle digest. In this exact order for each file, SHA-256 was updated with UTF-8 relative path bytes, one NUL, exact file bytes, then one NUL:
+1. academy-web/src/lib/observability/learner-journey-slo.ts
+2. academy-web/tests/unit/learner-journey-slo.test.ts
+
+Check specifically:
+- policy bounds and exact-key/accessor/prototype/symbol rejection;
+- dense six-record aggregate enforcement, duplicate/missing/sparse/extra rejection, safe counts and safe sums;
+- canonical checkpoint reuse/order and no identifier-bearing or arbitrary metadata fields;
+- mathematical correctness of ceiling budget-consumed basis points and burn-rate milli, including 0x, 1x, warning, critical, non-divisible and maximum-count cases;
+- expected denials and failures both consume budget while raw counts remain truthful;
+- below-minimum evidence yields no_data/null metrics and overall ordering critical > warning > no_data > healthy;
+- BigInt compatibility with the project target, overflow conversion safety, and no JSON-unsafe BigInt escape;
+- deep immutability/caller isolation, unsafe typing, false-positive tests, or missing material boundary;
+- absence of telemetry emission, alert destinations, timers, network, env, storage, database, Identity/runtime/release/production wiring.
+
+Controller evidence on Node 24.18.0: TDD missing-module RED observed; initial author focused 8/11 with 10 TypeScript errors; remediations closed BigInt target, helper/default, arithmetic expectation, equivalence assertion and critical-fixture defects. Final focused 11/11, related 31/31, scoped ESLint clean, tsc --noEmit zero errors, diff/source checks clean. No UI or production mutation.
+
+Return only the exact strict implementation-RIL JSON object required by the contract: work_order_metadata, verdict, summary, findings. Findings use severity and message with optional safe relative path. PASS requires no Critical, High, or Medium finding. Do not claim live SLO evidence, deployed alerts, operator proof, release, or production readiness.

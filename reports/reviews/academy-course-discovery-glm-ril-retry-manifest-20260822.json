@@ -1,0 +1,33 @@
+{
+  "schema": "model-team.sensitive-scope.v1",
+  "read_files": [
+    "academy-web/src/components/course/PublicCourseCatalog.tsx",
+    "academy-web/src/lib/i18n/ui.ts",
+    "academy-web/src/lib/content/course-types.ts",
+    "academy-web/tests/unit/public-course-catalog.test.ts",
+    "academy-web/e2e/course-experience.spec.ts",
+    "academy-web/src/app/globals.css",
+    "academy-web/playwright.public.config.ts"
+  ],
+  "write_paths": [
+    "academy-web/src/components/course/PublicCourseCatalog.tsx",
+    "academy-web/src/lib/i18n/ui.ts",
+    "academy-web/tests/unit/public-course-catalog.test.ts",
+    "academy-web/e2e/course-experience.spec.ts"
+  ],
+  "work_order": {
+    "mode": "review",
+    "contract": "ril",
+    "metadata": {
+      "schema": "model-team.ril.v1",
+      "work_kind": "bounded_code",
+      "role": "implementation_reviewer",
+      "source_sha256": "88ea5408426a65c9cec5768e6f6108cc2e47218ec3c62c1ab96373c459f8c7d2"
+    },
+    "prompt": "Independently review the current Academy public course-discovery implementation as an implementation_reviewer. This is strict read-only RIL: do not edit files. The reviewed source digest is the SHA-256 of the exact current unified diff for the four implementation/test files and is bound in work_order_metadata.\n\nReview for user-visible and contract defects, especially:\n- filtering correctness across active-locale title/subtitle, default-locale fallback, case/whitespace handling, level composition, and stable order;\n- React state and locale transitions, empty catalog versus no filtered results, link/route continuity, and unintended regressions;\n- semantic HTML, keyboard and screen-reader behavior, live result announcements, focus visibility, control labeling, and no-results recovery;\n- responsive layout risks, text overflow, stable controls, and use of existing design tokens;\n- test quality, false positives, missing meaningful cases, or implementation/test mismatch;\n- security/privacy boundary: no new persistence, auth, database, network, runtime, deployment, or production enablement.\n\nDeterministic controller evidence already obtained: focused unit 9/9; lint/typecheck exit 0 (three unrelated pre-existing warnings); production build pass; focused desktop/mobile discovery E2E 3/3; full public production-build suite 49 passed, 1 intentional desktop skip, 0 failed, including desktop/mobile Axe coverage.\n\nReturn only the strict implementation-RIL JSON object required by the contract: work_order_metadata, verdict, summary, findings. Each finding must contain severity and message, with an optional safe relative path. PASS requires zero Critical, High, or Medium findings. Do not report aesthetic observations that require screenshot inspection; Terra owns visual review."
+  },
+  "resource_limits": {
+    "max_file_bytes": 1048576,
+    "max_total_bytes": 8388608
+  }
+}

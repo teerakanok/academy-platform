@@ -1,0 +1,11 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/wrangler.jsonc",
+      "sha256": "587d21b4720980b18f2573b9ae3f3a45595aade0ac4f2504ed7564841cacdc53",
+      "bytes": 1304
+    }
+  ]
+}

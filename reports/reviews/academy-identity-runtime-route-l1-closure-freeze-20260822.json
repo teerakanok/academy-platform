@@ -1,0 +1,60 @@
+{
+  "schema": "academy.local-checkpoint-freeze.v1",
+  "checkpoint": "academy-identity-runtime-route-l1-closure-20260822",
+  "frozen_at": "2026-08-22T16:52:00Z",
+  "files": [
+    {
+      "path": "academy-web/src/app/(site)/api/auth/identity/start/route.ts",
+      "sha256": "f09f66172941b450ad792206d3a2d514e1faff519c2ab667d212aaf722fd26aa"
+    },
+    {
+      "path": "academy-web/src/app/(site)/auth/callback/route.ts",
+      "sha256": "5790fb640a4d0cca70b12aafee4633f7a942efce92ecce86f4ff4452e5401efd"
+    },
+    {
+      "path": "academy-web/src/lib/identity/registry.ts",
+      "sha256": "48796a0b8a9f077d0919f90c2c7a6cb04f854474b1682b8b2d7faee963b916e8"
+    },
+    {
+      "path": "academy-web/src/lib/identity/runtime-browser-flow.ts",
+      "sha256": "057963c731cee0ad3a9a3847af0f724d67415bd43d5f208748c720f9dcd20668"
+    },
+    {
+      "path": "academy-web/tests/unit/identity-runtime-routes.test.ts",
+      "sha256": "08f37f796fac176f71bb0bccee6df2c7c2575bcb64734ebff8aad223662eb2c5"
+    },
+    {
+      "path": "reports/reviews/academy-identity-runtime-route-l1-glm-ril-prompt-20260822.txt",
+      "sha256": "1f7c6c07d449898c1fb53c8b492d5bfb77fa67f536af0e044205cd4b7938aa1c"
+    },
+    {
+      "path": "reports/reviews/academy-identity-runtime-route-l1-glm-ril-final-20260822.json",
+      "sha256": "ed7c36b59ecc4a30d461828812ece8341b41ca705e0559fcefc42e9abc3473e4"
+    },
+    {
+      "path": "reports/reviews/academy-identity-runtime-route-l1-provider-call-log-20260822.json",
+      "sha256": "2a1f870c6262675a88106c5e8ff2979bd6cdfdd7e853d18827690f50137e0991"
+    },
+    {
+      "path": "reports/reviews/academy-identity-runtime-route-l1-closure-local-checkpoint-20260822.md",
+      "sha256": "5687c3a910b63625ac5e4a8b49cf5c9c5a36f07b2b24728400d38c63b1757592"
+    }
+  ],
+  "verification": {
+    "focused": { "passed": 4, "total": 4 },
+    "related": { "passed": 39, "total": 39 },
+    "identity": { "passed": 638, "total": 638 },
+    "canonicalIdentityConformance": { "proven": 16, "total": 23 },
+    "eslint": "pass",
+    "typescript": "pass",
+    "independentReview": { "verdict": "PASS", "findings": [] }
+  },
+  "releaseBoundary": {
+    "enabled": false,
+    "runtimeWired": false,
+    "releaseApproval": false,
+    "productionEvidence": false,
+    "productionReady": false,
+    "productionMutation": false
+  }
+}

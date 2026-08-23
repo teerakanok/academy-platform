@@ -1,0 +1,27 @@
+{
+  "schema": "academy.alert-rehearsal.ril.v1",
+  "status": "PASS",
+  "verdict": "PASS",
+  "findings": [],
+  "work_order_metadata": {
+    "schema": "model-team.ril.v1",
+    "work_kind": "bounded_code",
+    "role": "implementation_reviewer",
+    "source_sha256": "d5d0fc605134bf1342d82308422ad049bb1ed0772f48f53c2e8a7b761a7cbf99"
+  },
+  "reviewed_source_sha256": "d5d0fc605134bf1342d82308422ad049bb1ed0772f48f53c2e8a7b761a7cbf99",
+  "run_id": "run-lAeb2X",
+  "child_run_id": "run-47305583fde13e589be04fbc1cfa743a",
+  "provider_result_valid": true,
+  "review_required": false,
+  "provider_started_at": "2026-08-22T20:00:26.416Z",
+  "first_activity_at": "2026-08-22T20:00:26.518Z",
+  "result_validated_at": "2026-08-22T20:01:56.317Z",
+  "receipt_persisted_at": "2026-08-22T20:01:56.507Z",
+  "result_sha256": "e6fe4fd055f14364fdc648308745249081e255b7d0a75df439092e1bae35c235",
+  "worker_receipt_sha256": "b7b628a287de7f70f6149e688ba76fb184312d9b65d8b1e41bdcb3171f9daaa7",
+  "worker_status_sha256": "ebedc984ea7b22b0336acba750b9fbb271ccd3dd36d363087f2587d4633d7ef5",
+  "prompt_sha256": "7746748250de35b2460a3d5a097af7a5309410a15762bb6c96d552986ac9b14e",
+  "manifest_sha256": "98b967647fbf19e9dbd39821491c9b5281532c8b2f91a24499aad903d0184d82",
+  "summary": "The bound implementation and tests correctly cover status routing, inclusive escalation timing, window-based dedupe, terminal retry outcomes, rollback semantics, strict canonical validation, redaction, deep freezing, and local-only pure execution. No Critical, High, or Medium defect remains in the reviewed files."
+}

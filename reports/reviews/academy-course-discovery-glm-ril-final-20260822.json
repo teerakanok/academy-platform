@@ -1,0 +1,17 @@
+{
+  "schema": "academy.course-discovery-implementation-review.v1",
+  "sourceSha256": "66c39687910028549ac49eec9127f240b9194f05cd38a211fe4412125e9e7656",
+  "providerRunId": "run-PCLrXJ",
+  "resultSha256": "899fc374af9eb9569142b3821abbbac739f2fd4442be6e13f665d89cd6bfc1d0",
+  "verdict": "PASS",
+  "findings": [],
+  "deterministicEvidence": {
+    "focusedUnit": "9/9 passed",
+    "lintAndTypecheck": "exit 0; three unrelated existing warnings",
+    "productionBuild": "65 pages",
+    "focusedPublicBrowser": "3 passed; one intentional desktop layout skip",
+    "fullPublicBrowser": "49 passed; one intentional desktop layout skip; zero failed"
+  },
+  "productionAuthority": "NONE",
+  "releaseApproval": false
+}

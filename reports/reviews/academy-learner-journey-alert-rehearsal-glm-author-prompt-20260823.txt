@@ -1,0 +1,17 @@
+Implement one pure, local-only Academy learner-journey alert-route rehearsal in exactly two new files:
+- academy-web/src/lib/observability/learner-journey-alert-rehearsal.ts
+- academy-web/tests/unit/learner-journey-alert-rehearsal.test.ts
+
+Use the existing learner-journey-slo types as input. Do not edit any existing file. No network, fetch, storage, timer, environment, secret, runtime import, UI, deploy, or production wiring.
+
+Contract requirements:
+- strict exact-key plain-data validation for a disabled rehearsal policy, prior state, and delivery outcomes;
+- policy must keep enabled=false and define two operator-owned symbolic routes, bounded dedupe window, bounded retry count, and critical escalation delay;
+- healthy emits no alert; no_data emits a warning data-gap candidate; warning emits warning; critical emits primary critical and a distinct escalation candidate only after the delay;
+- deterministic fingerprint/deduplication using checkpoint/status/window bucket, with no learner identifiers or raw messages;
+- delivery is only projected, never executed; outcomes are success or retryable_failure; retry is bounded and exhausted failures become terminal;
+- rollback returns the exact prior frozen state without resurrecting acknowledged/delivered work;
+- outputs are canonical and deeply frozen; reject extra/accessor/symbol/prototype-polluted inputs and unsafe integers;
+- tests must materially prove routing, dedupe, escalation boundary, bounded retries, redaction/no identifiers, rollback, strict validation, deep freeze, and static no-runtime/no-network scope.
+
+Return a unified diff only. Keep implementation compact and TypeScript/ESLint clean.

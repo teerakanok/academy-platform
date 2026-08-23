@@ -54,7 +54,7 @@ export function LanguageToggle() {
 
   return (
     <div
-      className="flex items-center rounded-control border border-cs-border p-0.5"
+      className="inline-flex items-center rounded-control border border-cs-border p-0.5"
       role="group"
       aria-label={t.language.label}
       data-testid="language-toggle"

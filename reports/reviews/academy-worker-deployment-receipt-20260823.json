@@ -1,0 +1,101 @@
+{
+  "schema": "academy-worker-deployment-receipt/v1",
+  "capturedAt": "2026-08-23T06:34:26Z",
+  "worker": "cyberskills-academy",
+  "scope": "preview-worker-only-noncanonical",
+  "authorization": {
+    "founderAuthorized": true,
+    "executorRole": "ops_executor",
+    "reviewerRole": "academy-controller",
+    "operationClass": "deployment or externally visible irreversible actions"
+  },
+  "candidate": {
+    "baseGitRevision": "e933a34c126b6a6fd6008951952d0c62796df2a4",
+    "trackedUnifiedDiffSha256": "475308f50705a0a8c92393e53bd0e8bb46d58922b4e85d26f7fce81acfe1bd84",
+    "untrackedManifestSha256": "2f57efe306a92bb01d6c0ce75f0c7247b83c436cbe6a3f124b2453d0a535b8c2",
+    "untrackedFileCount": 87,
+    "waitlistFreeze": {
+      "path": "reports/reviews/academy-waitlist-client-validation-freeze-20260823.json",
+      "manifestBytesSha256": "f004ad8f5aae218fdf949e1eb631e32e857ab8d52dae378e320a5ccf5890c3e0",
+      "verifiedFileCount": 8
+    },
+    "productionAdmissionFreeze": {
+      "path": "reports/reviews/academy-production-admission-evidence-contract-freeze-20260823.json",
+      "verifiedFileCount": 2
+    },
+    "openNextBundleTreeSha256": "10027c1328881451a808675de4f30952562de1505dbc252603e09806d54af26b"
+  },
+  "preflight": {
+    "sourceHashRecomputations": 3,
+    "stableAcrossRecomputations": true,
+    "gitDiffCheckPassed": true,
+    "waitlistFreezeVerified": true,
+    "productionAdmissionFreezeVerified": true,
+    "buildPassed": true,
+    "strictDryRunPassed": true,
+    "bundleHashStableBeforeUpload": true,
+    "preserveVars": true,
+    "autoconfig": false,
+    "strict": true
+  },
+  "baseline": {
+    "deploymentId": "21d65d6a-78f4-4a05-9887-026225994398",
+    "versionId": "b85b7a6d-ceaa-4708-81fd-0d8096462251",
+    "trafficPercentage": 100,
+    "bindings": [
+      { "name": "ACADEMY_DATA_API_JWT_SECRET", "type": "secret_text" },
+      { "name": "ACADEMY_DATA_API_URL", "type": "secret_text" },
+      { "name": "ASSETS", "type": "assets" },
+      { "name": "COURSE_MEDIA", "type": "r2_bucket" },
+      { "name": "EDGE_RATE_LIMITER", "type": "durable_object_namespace" },
+      { "name": "MEDIA_SIGNING_SECRET", "type": "secret_text" },
+      { "name": "NEXT_PUBLIC_SEARCH_INDEXING", "type": "plain_text" },
+      { "name": "RATE_LIMIT_KEY_SECRET", "type": "secret_text" }
+    ]
+  },
+  "deploy": {
+    "attempted": true,
+    "commandProfile": "wrangler-deploy-autoconfig-false-keep-vars-strict",
+    "assetUploadObserved": true,
+    "uploadedAssetCount": 38,
+    "workerVersionCreated": false,
+    "deploymentCreated": false,
+    "outcome": "rejected-before-version-creation",
+    "error": {
+      "provider": "cloudflare-workers",
+      "code": 10027,
+      "classification": "worker-size-exceeds-current-plan-limit",
+      "configuredLimitMiB": 3
+    },
+    "newVersionId": null
+  },
+  "postAttempt": {
+    "deploymentId": "21d65d6a-78f4-4a05-9887-026225994398",
+    "versionId": "b85b7a6d-ceaa-4708-81fd-0d8096462251",
+    "trafficPercentage": 100,
+    "baselineUnchanged": true,
+    "bindingInventoryUnchanged": true,
+    "probes": [
+      { "path": "/", "httpStatus": 200, "tlsVerifyResult": 0 },
+      { "path": "/courses", "httpStatus": 200, "tlsVerifyResult": 0 },
+      { "path": "/auth/callback", "httpStatus": 400, "tlsVerifyResult": 0 }
+    ]
+  },
+  "rollback": {
+    "required": false,
+    "attempted": false,
+    "targetVersionId": "b85b7a6d-ceaa-4708-81fd-0d8096462251",
+    "outcome": "not-required-baseline-version-and-traffic-unchanged"
+  },
+  "exclusions": {
+    "canonicalDomainEvidence": false,
+    "customDomainMutation": false,
+    "accessMutation": false,
+    "dnsMutation": false,
+    "secretOrVarMutation": false,
+    "databaseOrRegistryMutation": false,
+    "identityAcceptanceClaim": false,
+    "productionAdmissionClaim": false,
+    "commitOrPush": false
+  }
+}

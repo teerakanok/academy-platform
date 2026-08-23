@@ -1,0 +1,39 @@
+{
+  "schema": "academy-worker-deployment-controller-review/v1",
+  "capturedAt": "2026-08-23T06:57:34Z",
+  "reviewedReceipt": {
+    "path": "reports/reviews/academy-worker-minified-deployment-receipt-20260823.json",
+    "sha256": "ed833f7923d65f21d7594bce6277fa01615c49f7197c3c49c4682a84694c93ca"
+  },
+  "candidateAtDeploy": {
+    "baseGitRevision": "e933a34c126b6a6fd6008951952d0c62796df2a4",
+    "trackedUnifiedDiffSha256": "9f67c22a728e8d7f09de9dc0f19d0b4fe58a136616401b995df951d0f799d3fe",
+    "untrackedManifestSha256": "6f489fae8230af1f22f8dc7831f497b9fb402ad48120c5e052bdc3d15230232d",
+    "untrackedFileCountBeforeReceipt": 89,
+    "minifyFreezeManifestSha256": "e7add96cc4f618a14583acd41b9ccba7b89a3eccbe3b99d274e59de22a4fe842",
+    "openNextBundleTreeSha256": "c7ba769757613c3918fdec8b40a13c00a3df660425f4834399678aa037c31aad"
+  },
+  "independentChecks": {
+    "receiptContract": "pass",
+    "deployment": {
+      "deploymentId": "ef66dfc4-92dc-4b9f-bc63-708c30e1cff1",
+      "versionId": "c8b36c74-e76a-412b-9a63-3702cb838e07",
+      "trafficPercentage": 100,
+      "bindingsPreserved": true,
+      "bindingCount": 8
+    },
+    "httpsProbes": [
+      { "path": "/", "httpStatus": 200, "tlsVerifyResult": 0 },
+      { "path": "/courses", "httpStatus": 200, "tlsVerifyResult": 0 },
+      { "path": "/auth/callback", "httpStatus": 400, "tlsVerifyResult": 0, "expectedMissingParameters": true }
+    ]
+  },
+  "verdict": "preview_deployment_evidence_verified",
+  "exclusions": {
+    "canonicalDomainEvidence": false,
+    "customDomainMutation": false,
+    "accessMutation": false,
+    "identityAcceptanceClaim": false,
+    "productionAdmissionClaim": false
+  }
+}

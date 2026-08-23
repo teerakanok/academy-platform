@@ -1,0 +1,56 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/scripts/generate-identity-control-conformance.mjs",
+      "sha256": "9c0bfbe8e16c5e444dea16208388879f0e74ad663a9396f45ed1340d31927c1d",
+      "bytes": 29259
+    },
+    {
+      "path": "academy-web/scripts/generate-identity-control-conformance.test.mjs",
+      "sha256": "88de3a769504b9214a469bbb2d941d43c0fe55561bf877d9399310ac33c3239e",
+      "bytes": 15911
+    },
+    {
+      "path": "academy-web/src/lib/identity/client-assertion-registration-rehearsal.ts",
+      "sha256": "32c4ddc13be774f42d30e11cc6e450363b66e58ab81b1c9277450f7796231f25",
+      "bytes": 20118
+    },
+    {
+      "path": "academy-web/src/lib/identity/consumer-policy.ts",
+      "sha256": "d1e01ee65093c7774d23a8dc87b658b6957783b7afd20554f014500a701f238a",
+      "bytes": 3690
+    },
+    {
+      "path": "academy-web/tests/unit/identity-client-assertion-conformance.test.ts",
+      "sha256": "aa8ab65908beaae1a755bc7f12f7c8d76676dca72b59abb19407d43a3e7421e2",
+      "bytes": 8123
+    },
+    {
+      "path": "academy-web/tests/unit/identity-client-assertion-registration-rehearsal.test.ts",
+      "sha256": "8d4881abdf78223cce59a1fccac0f9e997c340bb0113e7c1991e69e1efccc763",
+      "bytes": 9719
+    },
+    {
+      "path": "academy-web/tests/unit/identity-consumer-policy.test.ts",
+      "sha256": "1b68bd92ee8aab33e8c0569906fde4ac91de892844e017e08be3f1ec94a503fc",
+      "bytes": 3448
+    },
+    {
+      "path": "plans/active_plan.md",
+      "sha256": "be9ad334e0a4b9427ac887770e697c34660ddac6bbb9506410f23d56ac87c81a",
+      "bytes": 245891
+    },
+    {
+      "path": "reports/conformance/identity-control/academy-identity-control-conformance.json",
+      "sha256": "00454a524ef914d177d8a91f8d0bf133d5e58fcb760be7b714c0aa928569d15b",
+      "bytes": 176688
+    },
+    {
+      "path": "reports/reviews/academy-identity-client-assertion-registration-rehearsal-local-checkpoint-20260820.md",
+      "sha256": "206c9fb6dba3cfd229fd7ab4b50393cbf5a9f3dac6f057043852a25b61700179",
+      "bytes": 5647
+    }
+  ]
+}

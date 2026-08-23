@@ -14,6 +14,10 @@ export interface BoundedResponseOptions {
 
 export type StrictJsonResult = { ok: true; value: unknown } | { ok: false }
 
+export type BoundedResponseTextResult =
+  | { ok: true; text: string }
+  | { ok: false; transportFailure: boolean }
+
 type BoundedResponsePlan = {
   maxBytes: number
   signal: CapturedAbortSignal | undefined
@@ -227,10 +231,18 @@ export async function readBoundedResponseText(
   response: Response,
   options: BoundedResponseOptions,
 ): Promise<string | null> {
+  const result = await readBoundedResponseTextWithOutcome(response, options)
+  return result.ok ? result.text : null
+}
+
+export async function readBoundedResponseTextWithOutcome(
+  response: Response,
+  options: BoundedResponseOptions,
+): Promise<BoundedResponseTextResult> {
   const plan = snapshotBoundedResponseOptions(options)
   if (!plan) {
     cancelResponseBody(response)
-    return null
+    return { ok: false, transportFailure: false }
   }
   return readBoundedResponseTextWithPlan(response, plan)
 }
@@ -238,18 +250,18 @@ export async function readBoundedResponseText(
 async function readBoundedResponseTextWithPlan(
   response: Response,
   plan: BoundedResponsePlan,
-): Promise<string | null> {
+): Promise<BoundedResponseTextResult> {
   const deadline = createResponseDeadline(plan)
   if (!deadline) {
     cancelResponseBody(response)
-    return null
+    return { ok: false, transportFailure: true }
   }
   try {
     if (deadline.signal.aborted || !declaredBodyFits(response, plan.maxBytes)) {
       cancelResponseBody(response, deadline.signal.reason)
-      return null
+      return { ok: false, transportFailure: deadline.signal.aborted }
     }
-    if (!response.body) return ''
+    if (!response.body) return { ok: true, text: '' }
 
     let bytes: Uint8Array
     let readBuffer: Uint8Array
@@ -258,7 +270,7 @@ async function readBoundedResponseTextWithPlan(
       readBuffer = new Uint8Array(Math.min(bytes.byteLength, MAX_BYOB_READ_BYTES))
     } catch {
       cancelResponseBody(response)
-      return null
+      return { ok: false, transportFailure: true }
     }
 
     let reader: ReadableStreamBYOBReader
@@ -266,7 +278,7 @@ async function readBoundedResponseTextWithPlan(
       reader = response.body.getReader({ mode: 'byob' })
     } catch {
       cancelResponseBody(response)
-      return null
+      return { ok: false, transportFailure: true }
     }
 
     let byteLength = 0
@@ -275,7 +287,7 @@ async function readBoundedResponseTextWithPlan(
       while (true) {
         if (readCount >= MAX_RESPONSE_READS) {
           cancelReader(reader, new RangeError('Response body was too fragmented'))
-          return null
+          return { ok: false, transportFailure: false }
         }
         readCount += 1
         const remaining = bytes.byteLength - byteLength
@@ -291,19 +303,19 @@ async function readBoundedResponseTextWithPlan(
         if (value?.byteLength) {
           if (value.byteLength > remaining) {
             cancelReader(reader, new RangeError('Response body exceeded the read bound'))
-            return null
+            return { ok: false, transportFailure: false }
           }
           bytes.set(value, byteLength)
           byteLength += value.byteLength
         }
         if (byteLength > plan.maxBytes) {
           cancelReader(reader, new RangeError('Response body exceeded the read bound'))
-          return null
+          return { ok: false, transportFailure: false }
         }
         if (done) break
         if (!value?.byteLength) {
           cancelReader(reader, new RangeError('Response body made no progress'))
-          return null
+          return { ok: false, transportFailure: true }
         }
         try {
           readBuffer = new Uint8Array(
@@ -313,12 +325,12 @@ async function readBoundedResponseTextWithPlan(
           )
         } catch {
           cancelReader(reader, new RangeError('Response read buffer was invalid'))
-          return null
+          return { ok: false, transportFailure: true }
         }
       }
     } catch (error) {
       cancelReader(reader, error)
-      return null
+      return { ok: false, transportFailure: true }
     } finally {
       try {
         reader.releaseLock()
@@ -328,11 +340,12 @@ async function readBoundedResponseTextWithPlan(
     }
 
     try {
-      return new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(
+      const text = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(
         bytes.subarray(0, byteLength),
       )
+      return { ok: true, text }
     } catch {
-      return null
+      return { ok: false, transportFailure: false }
     }
   } finally {
     deadline.cleanup()
@@ -505,5 +518,7 @@ export async function readStrictJsonResponse(
     return { ok: false }
   }
   const text = await readBoundedResponseTextWithPlan(response, plan)
-  return text === null ? { ok: false } : parseStrictJsonText(text, plan.maxBytes, plan.maxDepth)
+  return text.ok
+    ? parseStrictJsonText(text.text, plan.maxBytes, plan.maxDepth)
+    : { ok: false }
 }

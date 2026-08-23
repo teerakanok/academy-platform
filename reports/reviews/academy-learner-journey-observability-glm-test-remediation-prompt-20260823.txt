@@ -1,0 +1,15 @@
+Remediate the two controller-verified static-analysis defects in Academy's learner-journey observability test. Work only in the sanitized projected repository. Edit exactly academy-web/tests/unit/learner-journey-observability.test.ts and nothing else. Do not weaken, remove, skip, or change the meaning of any of the 13 tests.
+
+Observed Node 24.18.0 evidence after the source remediation:
+- focused 13/13 passes;
+- related 19/19 passes;
+- ESLint reports one warning at line 99 because the destructured `checkpoint` loop binding is unused;
+- `tsc --noEmit` reports TS2322 at line 137 because the intentionally invalid runtime fixture assigns `outcome: 'unexpected'` into a statically valid `MutableLearnerJourneyEvent[]`.
+
+Required remediation:
+1. Remove the unused binding while preserving the exhaustive six-alert comparison.
+2. Express the malformed runtime evidence as `unknown` or another type-safe negative fixture so TypeScript remains strict and the runtime validator still receives and rejects `outcome: 'unexpected'`.
+3. No any, unsafe casts, ts-ignore, disables, source-contract changes, or reduced assertions.
+
+Acceptance: focused 13/13, related 19/19, scoped ESLint clean, tsc --noEmit zero errors, exact one-file diff.
+Return the exact advisory edit JSON requested by the worker. Do not claim independent review or production readiness.

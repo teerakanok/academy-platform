@@ -1,0 +1,17 @@
+Act as the independent visual specialist for Academy's course-discovery checkpoint. This is read-only visual review; do not edit files or run a server.
+
+Inspect these exact production-build screenshots with the image viewing tool:
+- /Users/teerakanok/Dev/cyberskills-director/products/cyberskills/academy-platform/academy-web/artifacts/production-gap-20260822/final/courses-discovery-desktop.png
+- /Users/teerakanok/Dev/cyberskills-director/products/cyberskills/academy-platform/academy-web/artifacts/production-gap-20260822/final/courses-no-results-desktop.png
+- /Users/teerakanok/Dev/cyberskills-director/products/cyberskills/academy-platform/academy-web/artifacts/production-gap-20260822/final/courses-filtered-mobile.png
+- /Users/teerakanok/Dev/cyberskills-director/products/cyberskills/academy-platform/academy-web/artifacts/production-gap-20260822/final/courses-thai-mobile.png
+
+Evaluate commercial-grade visual quality at desktop 1280x900 and Pixel 7: hierarchy, scanability, spacing/rhythm, control affordance and selected state, mobile wrapping, Thai and English text fit, no-results recovery, brand/design-system consistency, responsive overflow/overlap, and whether any element looks broken or unfinished. Treat full-page screenshot height as evidence of the page, not the viewport. Do not assess code, security, deployment, or claims not visible in the images.
+
+Return exactly:
+VERDICT: PASS or FAIL
+FINDINGS:
+- severity (Critical/High/Medium/Low): concise evidence tied to a named screenshot
+SUMMARY: one concise paragraph
+
+PASS requires no unresolved Critical, High, or Medium visual finding. Low findings may remain only if clearly non-blocking.

@@ -333,6 +333,112 @@ test.describe('public-to-learner course transition', () => {
     await expect(page.getByRole('heading', { level: 1 })).toContainText('พื้นฐานระบบปฏิบัติการ')
   })
 
+  test('catalog visitors can search and filter courses from accessible controls', async ({ page }) => {
+    await page.goto(`${CATALOG_PATH}?lang=en`)
+    const filters = page.getByRole('region', { name: 'Search courses' })
+    const search = filters.getByLabel('Search courses')
+    const allLevels = filters.getByRole('radio', { name: 'All levels' })
+    const beginner = filters.getByRole('radio', { name: 'Beginner' })
+    const intermediate = filters.getByRole('radio', { name: 'Intermediate' })
+    const intermediateControl = filters.getByText('Intermediate', { exact: true })
+    const resultCount = filters.getByRole('status')
+    const card = page.getByTestId('catalogue-card-basic-os-linux')
+
+    await expect(allLevels).toBeChecked()
+    await allLevels.focus()
+    await page.keyboard.press('ArrowDown')
+    await expect(beginner).toBeChecked()
+    await search.fill('  Linux  ')
+    await expect(resultCount).toHaveText('1 course')
+    await expect(card).toBeVisible()
+
+    await intermediateControl.click()
+    await expect(intermediate).toBeChecked()
+    await expect(resultCount).toHaveText('0 courses')
+    await expect(card).toBeHidden()
+    await expect(page.getByRole('heading', { name: 'No matching courses' })).toBeVisible()
+    await page.getByRole('button', { name: 'Clear search and level filters' }).click()
+
+    await expect(search).toHaveValue('')
+    await expect(allLevels).toBeChecked()
+    await expect(card).toBeVisible()
+    await expect(resultCount).not.toHaveText('0 courses')
+  })
+
+  test('catalog controls remain usable and stable on responsive layouts', async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'The layout check is specific to the mobile profile')
+    await page.setViewportSize({ width: 412, height: 892 })
+    await page.goto(`${CATALOG_PATH}?lang=en`)
+    const filters = page.getByRole('region', { name: 'Search courses' })
+    const levelControlGroup = page.getByTestId('level-filter-controls')
+    const levelControls = levelControlGroup.locator('label')
+    const levelControlButtons = levelControls.locator('span')
+    const languageToggleSlot = page.getByTestId('catalog-language-toggle-slot')
+    const languageToggle = languageToggleSlot.getByTestId('language-toggle')
+
+    await expect(filters.getByLabel('Search courses')).toBeVisible()
+    await expect(filters.getByRole('radio', { name: 'All levels' })).toBeVisible()
+    await expect(filters.getByRole('radio', { name: 'Beginner' })).toBeVisible()
+    await expect(levelControls).toHaveCount(4)
+
+    const mobileLevelBoxes = await levelControls.evaluateAll((controls) =>
+      controls.map((control) => {
+        const box = control.getBoundingClientRect()
+        return { x: box.x, y: box.y, width: box.width }
+      }),
+    )
+    const [allLevels, beginner, intermediate, advanced] = mobileLevelBoxes
+    expect(await levelControlGroup.evaluate((element) => getComputedStyle(element).display)).toBe('grid')
+    expect(Math.max(...mobileLevelBoxes.map((box) => box.width)) - Math.min(...mobileLevelBoxes.map((box) => box.width))).toBeLessThanOrEqual(1)
+    const mobileLevelButtonBoxes = await levelControlButtons.evaluateAll((buttons) =>
+      buttons.map((button) => button.getBoundingClientRect().width),
+    )
+    expect(Math.max(...mobileLevelButtonBoxes) - Math.min(...mobileLevelButtonBoxes)).toBeLessThanOrEqual(1)
+    expect(mobileLevelBoxes.every((box, index) => Math.abs(box.width - mobileLevelButtonBoxes[index]) <= 1)).toBe(true)
+    expect(beginner.y - allLevels.y).toBeLessThanOrEqual(1)
+    expect(intermediate.x - allLevels.x).toBeLessThanOrEqual(1)
+    expect(intermediate.y - allLevels.y).toBeGreaterThan(1)
+    expect(advanced.x - beginner.x).toBeLessThanOrEqual(1)
+    expect(advanced.y - intermediate.y).toBeLessThanOrEqual(1)
+
+    await expect(languageToggle).toBeVisible()
+    expect(await languageToggle.evaluate((element) => getComputedStyle(element).display)).toBe('inline-flex')
+    const languageToggleSlotBox = await languageToggleSlot.boundingBox()
+    const languageToggleButtonBox = await languageToggle.boundingBox()
+    expect(languageToggleButtonBox?.width ?? 0).toBeLessThan((languageToggleSlotBox?.width ?? 0) - 20)
+    expect((languageToggleButtonBox?.x ?? 0) + (languageToggleButtonBox?.width ?? 0)).toBeLessThan(
+      (languageToggleSlotBox?.x ?? 0) + (languageToggleSlotBox?.width ?? 0) - 20,
+    )
+
+    await filters.getByLabel('Search courses').fill('Linux')
+    await filters.getByText('Beginner', { exact: true }).click()
+    await expect(filters.getByRole('radio', { name: 'Beginner' })).toBeChecked()
+    await expect(page.getByTestId('catalogue-card-basic-os-linux')).toBeVisible()
+    await expect(filters.getByRole('status')).toHaveText('1 course')
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+
+    await page.setViewportSize({ width: 700, height: 840 })
+    const compactLevelBoxes = await levelControls.evaluateAll((controls) =>
+      controls.map((control) => {
+        const box = control.getBoundingClientRect()
+        return { x: box.x, y: box.y }
+      }),
+    )
+    expect(await levelControlGroup.evaluate((element) => getComputedStyle(element).display)).toBe('flex')
+    expect(Math.max(...compactLevelBoxes.map((box) => box.y)) - Math.min(...compactLevelBoxes.map((box) => box.y))).toBeLessThanOrEqual(1)
+
+    await page.setViewportSize({ width: 412, height: 892 })
+    await page.goto(`${CATALOG_PATH}?lang=th`)
+    await expect(levelControls).toHaveCount(4)
+    expect(await levelControlGroup.evaluate((element) => getComputedStyle(element).display)).toBe('grid')
+    expect(
+      await levelControls.evaluateAll((controls) =>
+        Math.max(...controls.map((control) => control.scrollWidth - control.clientWidth)),
+      ),
+    ).toBeLessThanOrEqual(1)
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+  })
+
   test('the catalog language control preserves query and anchor state', async ({ page }) => {
     await page.goto(`${CATALOG_PATH}?lang=th&utm_source=locale-test#main`)
     await page.locator('[data-testid="lang-en"]:visible').first().click()

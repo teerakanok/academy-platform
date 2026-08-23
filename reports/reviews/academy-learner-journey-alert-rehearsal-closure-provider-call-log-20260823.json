@@ -1,0 +1,30 @@
+{
+  "schema": "academy.provider-call-closure.v1",
+  "checkpoint": "learner-journey-alert-route-local-rehearsal",
+  "prior_call_log": "reports/reviews/academy-learner-journey-alert-rehearsal-provider-call-log-20260823.json",
+  "prior_calls": 3,
+  "closure_call": {
+    "attempt_id": "academy-learner-alert-rehearsal-glm-ril-review-2",
+    "parent_attempt_id": "academy-learner-alert-rehearsal-glm-ril-review-1",
+    "role": "review",
+    "provider": "z.ai",
+    "model": "glm-5.3",
+    "effort": null,
+    "route": "sensitive_external_worker",
+    "prompt_path": "reports/reviews/academy-learner-journey-alert-rehearsal-glm-ril-prompt-20260823.txt",
+    "prompt_sha256": "7746748250de35b2460a3d5a097af7a5309410a15762bb6c96d552986ac9b14e",
+    "provider_started_at": "2026-08-22T20:00:26.416Z",
+    "first_activity_at": "2026-08-22T20:00:26.518Z",
+    "provider_finished_at": "2026-08-22T20:01:56.507Z",
+    "duration_ms": 90091,
+    "run_id": "run-lAeb2X",
+    "working": true,
+    "success": true,
+    "outcome": "usable_result",
+    "verdict": "PASS",
+    "findings": []
+  },
+  "all_provider_calls": 4,
+  "observer_reconciled_calls": "4/4",
+  "observer_audit": "ok"
+}

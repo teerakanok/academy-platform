@@ -1,0 +1,46 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/e2e/public-a11y.spec.ts",
+      "sha256": "5320d26fbf7faa8c6224246b8ff87c38b5aa664d051dd07f41230c2bed848964",
+      "bytes": 14510
+    },
+    {
+      "path": "academy-web/src/app/(site)/page.tsx",
+      "sha256": "2a81b2728cbcec38dfe90b8c0038c8c2841170bfceab308fc7c9bb36bbfbc77f",
+      "bytes": 5502
+    },
+    {
+      "path": "academy-web/src/components/WaitlistForm.tsx",
+      "sha256": "c3eb60423a429284f65e5c87b7e35e12b68626d9905247e357196209560f0f75",
+      "bytes": 7207
+    },
+    {
+      "path": "academy-web/src/components/course/CourseCover.tsx",
+      "sha256": "90fdb88b65107d17a01c84ac0e8c26899d89e3c07cfa3a5d7372035941a9f570",
+      "bytes": 8901
+    },
+    {
+      "path": "academy-web/src/lib/http/exact-ok-response.ts",
+      "sha256": "4f86f3b46797ca9230845a219b2ef303694471a915394f9dff4339c5cb1da314",
+      "bytes": 1543
+    },
+    {
+      "path": "academy-web/src/lib/http/strict-json-response.ts",
+      "sha256": "bf5d91e13595749130025c56e7d7e9733215a42599fb7d5d5d0c1a79373cf684",
+      "bytes": 16368
+    },
+    {
+      "path": "academy-web/src/lib/waitlist-client.ts",
+      "sha256": "f1704b3664b4646ec542438463648cbaff7a154c3b867df0c673a8fbf368a628",
+      "bytes": 1526
+    },
+    {
+      "path": "academy-web/tests/unit/waitlist-client.test.ts",
+      "sha256": "6cb286e1f82c3d2747fd9f4d3f9154644a5d2758a3fcde3a404a758313de4911",
+      "bytes": 12825
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "schema": "identity-control-academy-production-blocker-receipt-submission/v1",
+  "blockerId": "canonical-domain-deployment-evidence",
+  "submissionState": "submitted-for-independent-review",
+  "blockerStatus": "open",
+  "productionAuthority": "NONE",
+  "releaseApproval": false,
+  "requestedOperations": [],
+  "accountableOwners": ["academy"],
+  "acceptanceOwners": ["identity-control"],
+  "sourceRevision": "e933a34c126b6a6fd6008951952d0c62796df2a4",
+  "evidence": [
+    {
+      "requirement": "Academy deployment receipt binding the canonical domain, source revision, and artifact digests",
+      "path": "reports/reviews/academy-canonical-domain-deployment-receipt-20260823.json",
+      "sha256": "c906bb257d97d9dc5c5f25a42e241215f3b61224e26c7aa39f0af042adf73041",
+      "classification": "submitted-source-bound-evidence"
+    },
+    {
+      "requirement": "HTTPS callback probe receipt for the exact registered URI",
+      "path": "reports/reviews/academy-canonical-domain-callback-probe-receipt-20260823.json",
+      "sha256": "4dad9204cfaf7475e6194e0088964fc9801741d122241c906c2804efc36be405",
+      "classification": "submitted-source-bound-evidence"
+    }
+  ],
+  "acceptanceState": "pending-identity-control-review",
+  "acceptedBy": [],
+  "acceptedAt": null,
+  "rejectionReasons": []
+}

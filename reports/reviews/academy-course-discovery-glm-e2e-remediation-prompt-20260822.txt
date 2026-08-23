@@ -1,0 +1,14 @@
+Remediate only the Playwright interaction defect in the current Academy course-discovery E2E tests. Work only in the projected repository and change only academy-web/e2e/course-experience.spec.ts.
+
+Observed production-build evidence:
+- The public suite completed 46 passed, 1 skipped, 3 failed.
+- All three failures time out because locator.check() targets the visually hidden sr-only radio input. Its visible label correctly intercepts pointer events, as intended by the segmented-control markup.
+- Desktop and mobile Axe checks for the catalog and all other public pages passed.
+
+Required remediation:
+1. In the two new catalog-discovery tests, activate Intermediate and Beginner through their visible user-facing label/control text inside the named Search courses region, rather than calling check() on the hidden input or using force.
+2. Keep the radio locators for checked-state and accessibility assertions.
+3. Preserve the keyboard ArrowDown assertion, search/result/no-results/clear assertions, and mobile overflow assertion.
+4. Use stable accessible/user-visible locators. Do not add waits, force clicks, implementation changes, or unrelated edits.
+
+The controller will run the focused new Playwright tests on desktop and Pixel 7, then the full public suite. Return a concise summary and do not claim independent review or visual approval.

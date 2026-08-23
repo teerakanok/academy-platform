@@ -1,0 +1,40 @@
+{
+  "schema": "academy.checkpoint-freeze.v1",
+  "checkpoint": "learner-journey-alert-route-local-rehearsal",
+  "status": "VERIFIED",
+  "file_count": 7,
+  "source_bundle_sha256": "d5d0fc605134bf1342d82308422ad049bb1ed0772f48f53c2e8a7b761a7cbf99",
+  "files": [
+    { "path": "academy-web/src/lib/observability/learner-journey-alert-rehearsal.ts", "sha256": "cd47a0c0c822d06c9561be18449dfc746b3c62acc449eee1a1d3d4b4443e0902" },
+    { "path": "academy-web/tests/unit/learner-journey-alert-rehearsal.test.ts", "sha256": "fcc9b619617ae97ad9e9724bd9daf72a8cf23d6d2543e2b551af4719e8e4bae5" },
+    { "path": "reports/reviews/academy-learner-journey-alert-rehearsal-glm-ril-prompt-20260823.txt", "sha256": "7746748250de35b2460a3d5a097af7a5309410a15762bb6c96d552986ac9b14e" },
+    { "path": "reports/reviews/academy-learner-journey-alert-rehearsal-glm-ril-final-20260823.json", "sha256": "a088d6186125168d0994e30e773f8f9647c0bb1d927aef97b45ccf49ed65a194" },
+    { "path": "reports/reviews/academy-learner-journey-alert-rehearsal-closure-provider-call-log-20260823.json", "sha256": "ad9dc9172ece25f071d7ceed4a873ea287770990487da07529bfc984eda68b8b" },
+    { "path": "reports/reviews/academy-learner-journey-alert-rehearsal-closure-local-checkpoint-20260823.md", "sha256": "64cf609bfc7a72986eeb17842549af6e3d4906c589e577e3962719c0e991ad44" },
+    { "path": "reports/reviews/academy-learner-journey-alert-rehearsal-candidate-freeze-20260823.json", "sha256": "a4260cc8b13ae9bef6f91746294662c650b0c1e16b524ff1e3167a95d5537eed" }
+  ],
+  "verification": {
+    "focused": "10/10",
+    "related": "41/41",
+    "full_unit": "2012/2012",
+    "full_unit_files": "130/130",
+    "eslint": "PASS",
+    "typescript": "PASS",
+    "diff_check": "PASS",
+    "runtime_scope_scan": "PASS",
+    "independent_ril": "PASS",
+    "critical_high_medium_findings": 0,
+    "observer_reconciled_calls": "4/4",
+    "observer_audit": "PASS"
+  },
+  "readiness": {
+    "accepted_local_observability_pillars": "5/5",
+    "production_admission": "0/1",
+    "runtime_wired": false,
+    "release_approval": false,
+    "production_evidence": false,
+    "deployment_performed": false,
+    "network_mutation_performed": false,
+    "secrets_accessed": false
+  }
+}

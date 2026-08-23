@@ -1,0 +1,16 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/src/lib/identity/production-admission-evidence.ts",
+      "sha256": "432f8e112831b18e8137e10a75936f700e611421a08b7922b5b896dad895c36e",
+      "bytes": 7227
+    },
+    {
+      "path": "academy-web/tests/unit/production-admission-evidence.test.ts",
+      "sha256": "b32950aa72f98568dc639386f189d88b02d84e39792dc355399033177e0090aa",
+      "bytes": 6524
+    }
+  ]
+}

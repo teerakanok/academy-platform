@@ -1,0 +1,36 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "plans/active_plan.md",
+      "sha256": "8dc26031ed52ebce71276b575c73c768a64252c49142d9aec89cbb760d9ce4cc",
+      "bytes": 248672
+    },
+    {
+      "path": "plans/completed_log.md",
+      "sha256": "0eacac22c95eee4f9ab3dc938061c3125d6b51c71606ee23dc2212df726f8665",
+      "bytes": 167057
+    },
+    {
+      "path": "reports/reviews/academy-canonical-domain-callback-probe-receipt-20260823.json",
+      "sha256": "4dad9204cfaf7475e6194e0088964fc9801741d122241c906c2804efc36be405",
+      "bytes": 2372
+    },
+    {
+      "path": "reports/reviews/academy-canonical-domain-deployment-evidence-submission-20260823.json",
+      "sha256": "84d56587c466c1cb337e6b2c8b4e3fbe075d24a8b4ea299c4fe6d58b3c9d4a52",
+      "bytes": 1298
+    },
+    {
+      "path": "reports/reviews/academy-canonical-domain-deployment-receipt-20260823.json",
+      "sha256": "c906bb257d97d9dc5c5f25a42e241215f3b61224e26c7aa39f0af042adf73041",
+      "bytes": 7943
+    },
+    {
+      "path": "reports/reviews/academy-canonical-domain-visual-review-20260823.json",
+      "sha256": "e52d044302b33b18ac9625d54d096620ffa12b1f954800cc2e7bc4e1027c1083",
+      "bytes": 2750
+    }
+  ]
+}

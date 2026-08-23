@@ -1,0 +1,96 @@
+{
+  "schema": "academy-worker-deployment-receipt/v1",
+  "capturedAt": "2026-08-23T06:55:17Z",
+  "authorization": {
+    "executorRole": "ops_executor",
+    "reviewerRole": "controller",
+    "operationClass": "deployment or externally visible irreversible actions",
+    "status": "allowed"
+  },
+  "scope": {
+    "worker": "cyberskills-academy",
+    "deploymentUrl": "https://cyberskills-academy.songpon-te.workers.dev",
+    "previewOnly": true,
+    "minified": true,
+    "preserveVars": true,
+    "autoconfig": false,
+    "strict": true
+  },
+  "candidate": {
+    "baseGitRevision": "e933a34c126b6a6fd6008951952d0c62796df2a4",
+    "trackedUnifiedDiffSha256": "9f67c22a728e8d7f09de9dc0f19d0b4fe58a136616401b995df951d0f799d3fe",
+    "untrackedManifestSha256": "6f489fae8230af1f22f8dc7831f497b9fb402ad48120c5e052bdc3d15230232d",
+    "untrackedFileCountBeforeReceipt": 89,
+    "minifyFreeze": {
+      "path": "reports/reviews/academy-worker-minify-freeze-20260823.json",
+      "manifestBytesSha256": "e7add96cc4f618a14583acd41b9ccba7b89a3eccbe3b99d274e59de22a4fe842",
+      "verifiedFileCount": 1
+    },
+    "waitlistFreeze": {
+      "path": "reports/reviews/academy-waitlist-client-validation-freeze-20260823.json",
+      "verifiedFileCount": 8
+    },
+    "productionAdmissionFreeze": {
+      "path": "reports/reviews/academy-production-admission-evidence-contract-freeze-20260823.json",
+      "verifiedFileCount": 2
+    },
+    "openNextBundleTreeSha256": "c7ba769757613c3918fdec8b40a13c00a3df660425f4834399678aa037c31aad"
+  },
+  "preflight": {
+    "sourceHashesMatched": true,
+    "freezeManifestsVerified": true,
+    "gitDiffCheckPassed": true,
+    "bundleHashMatched": true,
+    "strictDryRunPassed": true,
+    "dryRunTotalUploadKiB": 12529.77,
+    "dryRunGzipKiB": 2907.86
+  },
+  "baseline": {
+    "deploymentId": "21d65d6a-78f4-4a05-9887-026225994398",
+    "versionId": "b85b7a6d-ceaa-4708-81fd-0d8096462251",
+    "trafficPercentage": 100,
+    "bindingCount": 8
+  },
+  "deployment": {
+    "outcome": "deployed",
+    "deploymentId": "ef66dfc4-92dc-4b9f-bc63-708c30e1cff1",
+    "versionId": "c8b36c74-e76a-412b-9a63-3702cb838e07",
+    "trafficPercentage": 100,
+    "workerStartupTimeMs": 24,
+    "bindingCount": 8,
+    "bindingsPreserved": true,
+    "bindings": [
+      { "name": "ACADEMY_DATA_API_JWT_SECRET", "type": "secret_text" },
+      { "name": "ACADEMY_DATA_API_URL", "type": "secret_text" },
+      { "name": "ASSETS", "type": "assets" },
+      { "name": "COURSE_MEDIA", "type": "r2_bucket" },
+      { "name": "EDGE_RATE_LIMITER", "type": "durable_object_namespace" },
+      { "name": "MEDIA_SIGNING_SECRET", "type": "secret_text" },
+      { "name": "NEXT_PUBLIC_SEARCH_INDEXING", "type": "plain_text" },
+      { "name": "RATE_LIMIT_KEY_SECRET", "type": "secret_text" }
+    ]
+  },
+  "probes": [
+    { "path": "/", "httpStatus": 200, "tlsVerifyResult": 0 },
+    { "path": "/courses", "httpStatus": 200, "tlsVerifyResult": 0 },
+    { "path": "/auth/callback", "httpStatus": 400, "tlsVerifyResult": 0, "expectedMissingParameters": true }
+  ],
+  "rollback": {
+    "required": false,
+    "attempted": false,
+    "baselineVersionId": "b85b7a6d-ceaa-4708-81fd-0d8096462251",
+    "triggerConditions": "deploy failure, binding drift, traffic drift, TLS failure, or unexpected probe status"
+  },
+  "exclusions": {
+    "customDomainMutation": false,
+    "accessMutation": false,
+    "dnsMutation": false,
+    "secretOrVarMutation": false,
+    "databaseMutation": false,
+    "registryMutation": false,
+    "canonicalDomainEvidence": false,
+    "identityAcceptanceClaim": false,
+    "productionAdmissionClaim": false,
+    "commitOrPush": false
+  }
+}

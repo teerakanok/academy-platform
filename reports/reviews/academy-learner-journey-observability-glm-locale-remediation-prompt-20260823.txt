@@ -1,0 +1,15 @@
+Remediate Academy's controller-verified observability locale integration mismatch using TDD. Work only in the sanitized projected repository. Edit exactly these two files and nothing else:
+- academy-web/src/lib/observability/learner-journey.ts
+- academy-web/tests/unit/learner-journey-observability.test.ts
+
+Verified mismatch: Academy's canonical UI and course locale codes are `en | th` (`UI_LOCALES` and content `Locale`), while the new event contract currently permits `en-US | th-TH`. That forces unnecessary translation and would reject direct caller values.
+
+Required remediation:
+1. Change the event locale taxonomy to the canonical bounded codes `en` and `th`.
+2. Update fixtures and boundary assertions accordingly.
+3. Add a source-bound assertion that `LEARNER_JOURNEY_LOCALES` equals `UI_LOCALES`, importing the canonical constant rather than duplicating only literals in the test.
+4. Preserve all 14 existing behavioral cases and every strict validation, readiness, alert, immutability, privacy, and local-only boundary.
+5. No any, unsafe cast, ts-ignore, disables, new dependency, UI source edits, logging, network, environment, storage, database, runtime wiring, flags, or unrelated changes.
+
+Acceptance on Node 24.18.0: focused remains 14/14 or increases only for a clear new case; related safe-log and Identity route total reflects that count; scoped ESLint clean; tsc --noEmit zero errors; exact two-file diff.
+Return the exact advisory edit JSON requested by the worker. Do not claim independent review or production readiness.

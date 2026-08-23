@@ -2,9 +2,60 @@
 
 > Open work only. Move closed items to `completed_log.md` with evidence.
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
-> **Last updated:** 2026-08-16
+> **Last updated:** 2026-08-23
+
+**Canonical-domain and authenticated callback evidence (valid submission; canonical acceptance record pending, 2026-08-23):**
+The deployed `cyberskills-academy` Worker now has source-bound canonical-domain evidence for
+`academy.cyberskills.co.th`: DNS and unauthenticated requests reach the Cloudflare Access gate,
+and an owner-authorized Access session rendered `/`, `/courses` (eight previews), and the exact
+no-parameter `/auth/callback` Worker validation response. The two required evidence artifacts are
+an independently validated submission, but the current Identity Control guard requires a separate
+reviewed canonical acceptance record before it may count an accepted receipt. This does not claim a
+real OAuth `code`/`state` acceptance, Identity acceptance, or production admission.
+Canonical-domain evidence collection is `2/2`; receipt acceptance remains `0/1` for this blocker,
+production admission remains `0/1`, and Identity conformance remains `16/23` (`69.6%`). Evidence:
+`reports/reviews/academy-canonical-domain-deployment-receipt-20260823.json`,
+`reports/reviews/academy-canonical-domain-callback-probe-receipt-20260823.json`, and
+`reports/reviews/academy-canonical-domain-deployment-evidence-submission-20260823.json`.
+
+**Public waitlist/browser quality checkpoint (closed locally, 2026-08-23):** malformed and
+over-320-character email now stops before network; valid email normalization, adjacent accessible
+email/consent errors, exact response-envelope handling, transport/body-read failure handling, and
+Pixel 7 responsive course-preview geometry are verified. Full unit `2,044/2,044`, public Chromium
+`59 passed / 1 intentional skip / 0 failed`, build `65/65`, independent implementation review,
+Terra visual review, and Sol final all pass `C0/H0/M0/L0`. Production admission remains `0/1` and
+Identity conformance remains `16/23`; the external production-artifact operation below is unchanged.
+Evidence: `reports/reviews/academy-waitlist-client-validation-local-checkpoint-20260823.md`.
 
 ## Current execution lane — activate identity without widening Pool A access
+
+**Production-admission evidence boundary (accepted local checkpoint, 2026-08-23):**
+Academy now has a strict local contract that binds eight required release artifacts to one candidate
+and returns at most `admissible_for_authorized_operation`. Focused 29/29 and related Identity 76/76
+pass; exact freeze and independent code/security review pass at `C0/H0/M0`. Production admission
+remains 0/1 and Identity conformance remains 16/23. The next open step is the separately authorized
+operation that supplies and verifies the real source, migrations, runtime projection, visual index,
+named operator receipt, deployed smoke, rollback rehearsal, and freeze manifest. Evidence:
+`reports/reviews/academy-production-admission-evidence-contract-local-checkpoint-20260823.md`.
+
+**Client-assertion registration/rotation local rehearsal (accepted local checkpoint, 2026-08-23):**
+Academy now has one local-only rehearsal boundary that generates ephemeral P-256 keys in memory,
+derives collision-resistant key IDs from their public material, and drives Identity Control's
+committed `ClientControlRegistry` through active -> overlap+active -> retired+active. Its strict
+fixture validator binds the exact f0e1cc5 producer bootstrap fields, six-field public JWK
+(`crv,key_ops,kty,use,x,y`), `publicKeyReference`, millisecond activation time, runtime map, and
+freeze metadata. Assertions run through Identity's committed authenticator and prove active/overlap
+acceptance plus retired, unknown, tampered, wrong-client, wrong-audience, and key-material refusal.
+Separate validator negatives prove reference, activation-time precision, private-material, and
+transition refusal. The existing 23-scenario conformance ledger remains the sole
+ledger. Its declaration now points to this current ten-file checkpoint; tests prove the stale
+2026-08-14 declaration fails while the refreshed manifest passes. All production flags remain
+false. Independent local review closed at `C0/H0/M0/L0` after correcting one overstated evidence
+claim. Real key custody, released-runtime rehearsal, canonical conformance `--write/current`, and
+production authorization remain external gates. The JSON regeneration
+must wait for the other session's protected dirty vault file to clear because the canonical receipt
+collector enumerates the full worktree. Evidence:
+`reports/reviews/academy-identity-client-assertion-registration-rehearsal-local-checkpoint-20260820.md`.
 
 **Identity conformance rebind หลังรีวิวข้าม repo (2026-08-15):** ลานตรวจอิสระข้าม repo
 (read-only ทั้ง Academy `86e94eb` และ Identity Control `fdcaf30`) สรุปว่าไม่พบ contract gap

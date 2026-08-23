@@ -1,4 +1,4 @@
-import { webcrypto } from 'node:crypto'
+import { createHash, webcrypto } from 'node:crypto'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   createIdentityClientAssertionJtiSource,
@@ -10,6 +10,10 @@ import {
 import {
   createIdentityClientAssertionWebCryptoSigner,
 } from '@/lib/identity/client-assertion-webcrypto-signer'
+import {
+  runAcademyClientAssertionRegistrationRehearsal,
+  type AcademyClientAssertionRehearsalRegistry,
+} from '@/lib/identity/client-assertion-registration-rehearsal'
 
 const CLIENT_ID = 'academy-web'
 const PURPOSE = 'code_exchange' as const
@@ -78,7 +82,124 @@ describe('Academy Identity client-assertion conformance', () => {
     })).rejects.toBeInstanceOf(IdentityClientAssertionProviderFailure)
     expect(randomUUID).toHaveBeenCalledTimes(2)
   })
+
+  it('rehearses active/overlap registration against the exact producer verifier', async () => {
+    const { Authenticator, ClientControlRegistry } = await loadIdentityControlContracts()
+    const result = await runAcademyClientAssertionRegistrationRehearsal({
+      createControlRegistry: () => new ClientControlRegistry(),
+      createAuthenticator: (registry) => identityControlAuthenticator(registry, Authenticator),
+    })
+
+    expect(result.checks).toEqual({
+      activeAccepted: true,
+      overlapAccepted: true,
+      retiredRefused: true,
+      unknownRefused: true,
+      tamperedRefused: true,
+      wrongClientRefused: true,
+      wrongAudienceRefused: true,
+      keyMaterialMismatchRefused: true,
+    })
+    expect(result).toMatchObject({
+      mode: 'local-ephemeral',
+      enabled: false,
+      runtimeWired: false,
+      releaseApproval: false,
+      productionEvidence: false,
+      passed: true,
+    })
+    expect(JSON.stringify(result)).not.toMatch(/"d"\s*:|privateJwk|PRIVATE KEY|BEGIN EC/i)
+  })
 })
+
+function identityControlAuthenticator(
+  registry: AcademyClientAssertionRehearsalRegistry,
+  Authenticator: IdentityControlAuthenticatorConstructor,
+) {
+  const keyResolver = {
+    async resolve(clientId: string, keyId: string) {
+      const key = registry.keys.find((candidate) => (
+        candidate.clientId === clientId
+        && candidate.keyId === keyId
+        && (candidate.state === 'active' || candidate.state === 'overlap')
+      ))
+      return key
+        ? { keyId: key.keyId, algorithm: key.algorithm, publicJwk: structuredClone(key.publicJwk) }
+        : null
+    },
+  }
+  const reservations = new Set<string>()
+  const replayStore = {
+    async reserve(_clientId: string, digest: string) {
+      if (reservations.has(digest)) return false
+      reservations.add(digest)
+      return true
+    },
+  }
+  return new Authenticator({
+    audience: registry.audience,
+    keyResolver,
+    replayStore,
+    now: () => new Date(registry.nowSeconds * 1_000),
+    sha256: (value) => createHash('sha256').update(value).digest('base64url'),
+    clockSkewSeconds: 30,
+    maxLifetimeSeconds: 120,
+  })
+}
+
+type IdentityControlAuthenticatorConstructor = new (options: {
+  audience: string
+  keyResolver: {
+    resolve(clientId: string, keyId: string): Promise<unknown>
+  }
+  replayStore: {
+    reserve(clientId: string, digest: string, expiresAt: Date): Promise<boolean>
+  }
+  now(): Date
+  sha256(value: string): string
+  clockSkewSeconds: number
+  maxLifetimeSeconds: number
+}) => {
+  authenticate(clientId: string, assertion: string): Promise<boolean>
+}
+
+type IdentityControlRegistryConstructor = new () => {
+  register(clientId: string, key: IdentityControlKey): void
+  rotate(clientId: string, key: IdentityControlKey): void
+  retire(clientId: string, keyId: string): void
+  snapshot(clientId: string): { keys: Array<IdentityControlKey & {
+    state: 'active' | 'overlap' | 'retired'
+  }> }
+}
+
+type IdentityControlKey = {
+  keyId: string
+  algorithm: 'ES256'
+  publicKeyReference: string
+}
+
+async function loadIdentityControlContracts(): Promise<{
+  Authenticator: IdentityControlAuthenticatorConstructor
+  ClientControlRegistry: IdentityControlRegistryConstructor
+}> {
+  const authenticatorPath = '../../../../identity-control/packages/core/src/client-assertion'
+  const controlPath = '../../../../identity-control/packages/core/src/client-control'
+  const [authenticator, control]: unknown[] = await Promise.all([
+    import(authenticatorPath), import(controlPath),
+  ])
+  if (!authenticator || typeof authenticator !== 'object'
+    || !('Es256ClientAssertionAuthenticator' in authenticator)
+    || typeof authenticator.Es256ClientAssertionAuthenticator !== 'function'
+    || !control || typeof control !== 'object'
+    || !('ClientControlRegistry' in control)
+    || typeof control.ClientControlRegistry !== 'function') {
+    throw new Error('Identity Control rehearsal contracts are unavailable')
+  }
+  return {
+    Authenticator: authenticator.Es256ClientAssertionAuthenticator as IdentityControlAuthenticatorConstructor,
+    ClientControlRegistry: control.ClientControlRegistry as IdentityControlRegistryConstructor,
+  }
+}
 
 async function expectAssertion(
   compactJws: string,

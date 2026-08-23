@@ -1,0 +1,8 @@
+Remediate the remaining Academy SLO test-fixture arithmetic defect. Work only in the sanitized projected repository. Edit exactly academy-web/tests/unit/learner-journey-slo.test.ts and nothing else. Do not edit the evaluator.
+
+Observed after prior remediation: focused 10/11 passes. The remaining overall-priority case expects critical but its `criticalCounts` are 8 failures out of 400 at a 99% target. A 1% allowed error budget makes 2% observed errors exactly 2x burn, which is warning under warning=2,000 and critical=4,000 milli.
+
+Required fix: make only that `criticalCounts` fixture represent exactly 4x burn while preserving 400 observations, for example 384 successes and 16 failures. Keep expectedDenials zero. Preserve every test and assertion, especially critical > warning > no_data > healthy ordering. No source changes, any/casts/disables, or unrelated edits.
+
+Acceptance: focused 11/11; related total 31/31; scoped ESLint clean; tsc --noEmit zero errors; exact one-test-file diff.
+Return the exact advisory edit JSON requested by the worker. Do not claim independent review or production readiness.

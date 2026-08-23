@@ -1,0 +1,180 @@
+{
+  "schema": "academy-canonical-domain-deployment-receipt/v1",
+  "capturedAt": "2026-08-23T07:02:56Z",
+  "updatedAt": "2026-08-23T07:43:18Z",
+  "scope": {
+    "worker": "cyberskills-academy",
+    "canonicalDomain": "academy.cyberskills.co.th",
+    "registeredCallbackUri": "https://academy.cyberskills.co.th/auth/callback",
+    "productionAuthority": "NONE",
+    "releaseApproval": false,
+    "identityClientEnabled": false
+  },
+  "candidateAtDeployment": {
+    "baseGitRevision": "e933a34c126b6a6fd6008951952d0c62796df2a4",
+    "trackedUnifiedDiffSha256": "9f67c22a728e8d7f09de9dc0f19d0b4fe58a136616401b995df951d0f799d3fe",
+    "untrackedManifestSha256": "6f489fae8230af1f22f8dc7831f497b9fb402ad48120c5e052bdc3d15230232d",
+    "untrackedFileCountBeforeReceipt": 89,
+    "openNextBundleTreeSha256": "c7ba769757613c3918fdec8b40a13c00a3df660425f4834399678aa037c31aad"
+  },
+  "sourceBoundArtifacts": [
+    {
+      "path": "reports/reviews/academy-worker-minified-deployment-receipt-20260823.json",
+      "sha256": "ed833f7923d65f21d7594bce6277fa01615c49f7197c3c49c4682a84694c93ca",
+      "classification": "ops-executor-deployment-receipt"
+    },
+    {
+      "path": "reports/reviews/academy-worker-minified-deployment-controller-review-20260823.json",
+      "sha256": "fada2aedba426ce685a9a29354421cb8d56b201ffce5ab18017f51eaade9f7f6",
+      "classification": "independent-controller-review"
+    },
+    {
+      "path": "reports/reviews/academy-worker-minify-freeze-20260823.json",
+      "sha256": "e7add96cc4f618a14583acd41b9ccba7b89a3eccbe3b99d274e59de22a4fe842",
+      "classification": "verified-freeze-manifest"
+    },
+    {
+      "path": "reports/reviews/academy-waitlist-client-validation-freeze-20260823.json",
+      "sha256": "f004ad8f5aae218fdf949e1eb631e32e857ab8d52dae378e320a5ccf5890c3e0",
+      "classification": "verified-freeze-manifest"
+    },
+    {
+      "path": "reports/reviews/academy-production-admission-evidence-contract-freeze-20260823.json",
+      "sha256": "78008fd6e5c26b32af46e338bd5128f8da08162c5435f0e75be82cd11f09b33b",
+      "classification": "verified-freeze-manifest"
+    }
+  ],
+  "deployedWorker": {
+    "deploymentId": "ef66dfc4-92dc-4b9f-bc63-708c30e1cff1",
+    "versionId": "c8b36c74-e76a-412b-9a63-3702cb838e07",
+    "trafficPercentage": 100,
+    "bindingsPreserved": true,
+    "bindingCount": 8,
+    "workerStartupTimeMs": 24
+  },
+  "reportedControlPlaneBinding": {
+    "reportedBy": "director-root",
+    "cloudflareAccessApplicationId": "72f37caa-6573-4898-8bd1-b4aaaba741cc",
+    "cloudflareAccessPolicyId": "d5aa4dcf-f77c-4b63-b14f-5c2dc909fff2",
+    "cloudflareWorkersDomainId": "66178dd8e6851ce25fe893959be4c1b630afd3dd",
+    "workersDomainTarget": "cyberskills-academy",
+    "mutationOwner": "director-root",
+    "independentlyQueriedHere": false
+  },
+  "independentPublicChecks": {
+    "dns": {
+      "method": "dig +short against local resolver, 1.1.1.1, and 8.8.8.8",
+      "resolvers": [
+        {
+          "resolver": "local",
+          "aRecords": ["104.21.38.226", "172.67.140.60"],
+          "aaaaRecords": ["2606:4700:3030::6815:26e2", "2606:4700:3033::ac43:8c3c"]
+        },
+        {
+          "resolver": "1.1.1.1",
+          "aRecords": ["104.21.38.226", "172.67.140.60"],
+          "aaaaRecords": ["2606:4700:3030::6815:26e2", "2606:4700:3033::ac43:8c3c"]
+        },
+        {
+          "resolver": "8.8.8.8",
+          "aRecords": ["104.21.38.226", "172.67.140.60"],
+          "aaaaRecords": ["2606:4700:3030::6815:26e2", "2606:4700:3033::ac43:8c3c"]
+        }
+      ],
+      "consistentAcrossResolvers": true
+    },
+    "unauthenticatedHttps": {
+      "method": "curl HTTPS with TLS verification, redirects disabled, and redirect query values excluded from capture",
+      "tlsVerifyResult": 0,
+      "expectedAccessLoginOrigin": "https://dry-grass-c390.cloudflareaccess.com",
+      "expectedAccessLoginPath": "/cdn-cgi/access/login/academy.cyberskills.co.th",
+      "probes": [
+        { "path": "/", "httpStatus": 302, "accessGateObserved": true },
+        { "path": "/courses", "httpStatus": 302, "accessGateObserved": true },
+        { "path": "/auth/callback", "httpStatus": 302, "accessGateObserved": true }
+      ]
+    }
+  },
+  "authenticatedAccessEvidence": {
+    "capturedAt": "2026-08-23T07:28:34Z",
+    "method": "owner-authorized Chrome session authenticated through Cloudflare Access",
+    "accountIdentifierCaptured": false,
+    "otpOrSecretCaptured": false,
+    "screenshots": [
+      {
+        "path": "artifacts/reviews/academy-canonical-domain-20260823/authenticated-root.png",
+        "sha256": "3b8c15a35cb82c3223413f164db67ff1c426d2dc6f9795a38867c770dbb71818",
+        "dimensions": "1302x768",
+        "observedRoute": "/",
+        "observedResult": "Academy landing page rendered after Access"
+      },
+      {
+        "path": "artifacts/reviews/academy-canonical-domain-20260823/authenticated-courses.png",
+        "sha256": "2a21aa0955542da2137283c13dc59da9d2bda90ec465231c5c925d27bb15c2e6",
+        "dimensions": "1302x768",
+        "observedRoute": "/courses",
+        "observedResult": "Course preview page rendered after Access with 8 courses"
+      },
+      {
+        "path": "artifacts/reviews/academy-canonical-domain-20260823/authenticated-callback.png",
+        "sha256": "68871f9f11b598fce06307a84c7ad37022dd50b5fd4fd78df9b3085eee340e22",
+        "dimensions": "1302x768",
+        "observedRoute": "/auth/callback",
+        "observedResult": "Worker JSON validation response rendered after Access"
+      }
+    ],
+    "visualReview": {
+      "path": "reports/reviews/academy-canonical-domain-visual-review-20260823.json",
+      "sha256": "e52d044302b33b18ac9625d54d096620ffa12b1f954800cc2e7bc4e1027c1083",
+      "verdict": "PASS",
+      "findingCounts": "C0/H0/M0/L0"
+    }
+  },
+  "callbackEvidence": {
+    "unauthenticatedCanonicalCallback": {
+      "status": "protected-by-access",
+      "httpStatus": 302,
+      "tlsVerifyResult": 0,
+      "meaning": "Cloudflare Access intercepts the exact registered callback URI before the Worker receives an unauthenticated request."
+    },
+    "authenticatedApplicationCallback": {
+      "status": "verified-access-reachability",
+      "method": "owner-authorized Chrome session authenticated through Cloudflare Access",
+      "capturedAt": "2026-08-23T07:28:34Z",
+      "reportedHttpStatus": 400,
+      "expectedNoParameterResponse": 400,
+      "observedBody": {
+        "ok": false,
+        "error": "callback ต้องมี code และ state แบบ opaque ที่ถูกต้อง"
+      },
+      "evidencePath": "reports/reviews/academy-canonical-domain-callback-probe-receipt-20260823.json",
+      "realIdentityAuthorizationCallback": "Not attempted: Identity Control records academy-web as enabled=false, so no real authorization code/state callback may be claimed."
+    }
+  },
+  "identityIntake": {
+    "blockerId": "canonical-domain-deployment-evidence",
+    "requiredEvidence": [
+      {
+        "requirement": "Academy deployment receipt binding the canonical domain, source revision, and artifact digests",
+        "status": "available-in-this-receipt"
+      },
+      {
+        "requirement": "HTTPS callback probe receipt for the exact registered URI",
+        "status": "available-in-callback-probe-receipt"
+      }
+    ],
+    "submissionState": "submitted-for-independent-review",
+    "submissionArtifactPath": "reports/reviews/academy-canonical-domain-deployment-evidence-submission-20260823.json",
+    "acceptanceState": "pending-identity-control-review",
+    "reason": "Both required Academy evidence artifacts are submitted for independent Identity Control review; acceptance is not claimed."
+  },
+  "exclusions": {
+    "identityAcceptanceClaim": false,
+    "productionAdmissionClaim": false,
+    "identityClientEnablement": false,
+    "credentialOrSecretCapture": false,
+    "accessOrDomainMutation": false,
+    "databaseMutation": false,
+    "commitOrPush": false
+  }
+}

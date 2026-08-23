@@ -1,0 +1,73 @@
+{
+  "schema": "academy.checkpoint-freeze.v1",
+  "checkpoint": "learner-journey-slo-error-budget-local-contract",
+  "status": "VERIFIED",
+  "file_count": 10,
+  "source_bundle_sha256": "23bcb4c81fe9ba4d4f6efcb3672fac4f5468c5e563479ed06d7395b116b7fab5",
+  "files": [
+    {
+      "path": "academy-web/src/lib/observability/learner-journey-slo.ts",
+      "sha256": "e82a2cb72d255b3c01a2461178d58610c10da4c9d40dbb8f98b4de1edd6ddfb6"
+    },
+    {
+      "path": "academy-web/tests/unit/learner-journey-slo.test.ts",
+      "sha256": "716ec5941fbcad8012d935c9e1f0ebd9bae53bddec7a647d3e1303228db94de3"
+    },
+    {
+      "path": "reports/reviews/academy-learner-journey-slo-glm-author-prompt-20260823.txt",
+      "sha256": "088808fa26d8eed6e316d89db3b6a62cd56713a84f73fd139a83858d158d7b42"
+    },
+    {
+      "path": "reports/reviews/academy-learner-journey-slo-glm-remediation-prompt-20260823.txt",
+      "sha256": "58e5b52d4ee01e169b5e523b5053498a4309a9fc7496fb7ce68f10ef3160159b"
+    },
+    {
+      "path": "reports/reviews/academy-learner-journey-slo-glm-test-remediation-prompt-20260823.txt",
+      "sha256": "3c393c0d25f4b0b0c1cd3242769aeed7ce1b47c179434333c50dd03caeec0066"
+    },
+    {
+      "path": "reports/reviews/academy-learner-journey-slo-glm-ril-prompt-20260823.txt",
+      "sha256": "a63342c12c522cd8b7c07c26d481eee3bdbbaf517880a6a46b13c69dec9fc9d9"
+    },
+    {
+      "path": "reports/reviews/academy-learner-journey-slo-glm-ril-resliced-prompt-20260823.txt",
+      "sha256": "ff1186b7d7ce7b289acfa21856f3435b858cc90f7542cad4d491c2d6bb3c7f2b"
+    },
+    {
+      "path": "reports/reviews/academy-learner-journey-slo-glm-ril-final-20260823.json",
+      "sha256": "fde41ec834dbdfa881d4a7b68b2fa6602b4e0d9f0f123f235fcaacecb37c3312"
+    },
+    {
+      "path": "reports/reviews/academy-learner-journey-slo-provider-call-log-20260823.json",
+      "sha256": "1ff457b4ffcb1f72fd37ba01d11ee03c31b3b2f89a6551ce378992dd4ba582b9"
+    },
+    {
+      "path": "reports/reviews/academy-learner-journey-slo-local-checkpoint-20260823.md",
+      "sha256": "95eae37e38b818d19fcd2db6265e651bbc4ec13cd1fe6c8e1502552da0247d12"
+    }
+  ],
+  "verification": {
+    "focused": "11/11",
+    "related": "31/31",
+    "full_unit": "2002/2002",
+    "full_unit_files": "129/129",
+    "eslint": "PASS",
+    "typescript": "PASS",
+    "diff_check": "PASS",
+    "runtime_scope_scan": "PASS",
+    "independent_ril": "PASS",
+    "critical_high_medium_findings": 0,
+    "observer_reconciled_calls": "6/6",
+    "observer_audit": "PASS"
+  },
+  "readiness": {
+    "local_observability_pillars": "4/5",
+    "production_admission": "0/1",
+    "runtime_wired": false,
+    "release_approval": false,
+    "production_evidence": false,
+    "deployment_performed": false,
+    "network_mutation_performed": false,
+    "secrets_accessed": false
+  }
+}

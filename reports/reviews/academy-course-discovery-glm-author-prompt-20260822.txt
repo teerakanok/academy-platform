@@ -1,0 +1,26 @@
+You are the bounded implementation author for Academy's public course-discovery checkpoint. Work only in the projected repository and only change the allowed write paths. Implement test-first and leave the slice production-quality.
+
+Objective: add accessible, localized client-side course discovery to PublicCourseCatalog without changing routing, server data, authentication, persistence, deployment, or production state.
+
+Required behavior:
+1. Add a pure exported filtering function that composes a case-insensitive, trim-tolerant query against the active-locale course title and subtitle with a level filter: all, beginner, intermediate, advanced. Preserve input order and fall back to the course default-locale copy exactly as rendering already does.
+2. Add component state and controls above the catalog grid: a visible search label/input and a compact semantic level option set. Use existing Academy tokens/classes and existing control radius; do not add dependencies, hand-written SVG, gradients, decorative cards, or nested cards.
+3. Add localized English and natural Thai strings for search label/placeholder, level-filter legend/all option, result count, no-results heading/body, clear-filters action. Keep English free of Thai text.
+4. Accessibility: field semantics must be correct, level choices keyboard-operable and expose selection, result count must be a polite status, and no-results recovery must be an ordinary command. Do not rely on placeholder as the label.
+5. Keep the current empty-catalog state, locale canonicalization, links, course card markup/test IDs, and public-to-learner behavior intact.
+6. Add focused Vitest coverage before implementation for the pure filter: locale-specific search, case/whitespace normalization, default-locale fallback, level filtering, combined filters, order preservation, and no matches. Preserve existing locale-navigation tests.
+7. Add Playwright coverage in course-experience.spec.ts that proves search + level filtering, result status/no-results recovery, and a usable mobile layout using stable accessible locators. Do not use arbitrary sleeps for the new tests.
+
+Files allowed to change:
+- academy-web/src/components/course/PublicCourseCatalog.tsx
+- academy-web/src/lib/i18n/ui.ts
+- academy-web/tests/unit/public-course-catalog.test.ts
+- academy-web/e2e/course-experience.spec.ts
+
+Acceptance commands the controller will run after applying the patch:
+- npm run test:unit -- tests/unit/public-course-catalog.test.ts
+- npm run lint
+- npm run build
+- npm run test:e2e:public
+
+Return a concise implementation summary. Do not claim deployment, production readiness, visual approval, or independent review.

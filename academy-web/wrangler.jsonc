@@ -3,6 +3,7 @@
   // entry ของหน้าร้าน Academy; retention scheduler มี Worker/credential แยกต่างหาก
   "main": "worker.ts",
   "name": "cyberskills-academy",
+  "minify": true,
   "compatibility_date": "2025-03-25",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },

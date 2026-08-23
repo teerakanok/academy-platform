@@ -1,0 +1,20 @@
+Remediate the validated evidence-array defect in Academy's new local learner-journey observability contract. Work only in the sanitized projected repository. Edit exactly academy-web/src/lib/observability/learner-journey.ts and nothing else. Do not weaken or edit the test.
+
+Observed controller evidence on Node 24.18.0:
+- The focused test has 13 cases: 9 pass and 4 valid-array cases fail with `invalid_learner_journey_event` in `validateEvidenceArray`.
+- Root cause: `Reflect.ownKeys(input)` for an ordinary Array includes its required non-enumerable `length` property, so comparing its length directly with `input.length` rejects every dense ordinary evidence array.
+- The initial TDD RED was proven before source integration by the expected missing-module failure.
+
+Required remediation:
+1. Accept dense ordinary arrays containing only indexed enumerable own data properties plus the standard non-enumerable own `length` data property.
+2. Continue rejecting sparse arrays, enumerable or symbol extras, accessors, changed prototypes, and non-arrays.
+3. Preserve strict validation of every event, duplicates, synthetic marker, immutable outputs, taxonomy, alert ownership/severity, and all privacy/local-only boundaries.
+4. Do not use any, unsafe casts, ts-ignore, disables, external dependencies, logging, network, environment, storage, database, runtime wiring, or production flags.
+
+Controller acceptance on Node 24.18.0:
+- focused 13/13
+- related safe-log and Identity runtime-route tests pass
+- scoped ESLint and tsc --noEmit pass
+- diff remains within the one source file
+
+Return the exact advisory edit JSON requested by the worker. Do not claim independent review, deployed observability, SLO completion, runtime wiring, or production readiness.

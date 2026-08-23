@@ -1,8 +1,8 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { hasExactOkJsonResponse } from '@/lib/http/exact-ok-response'
-import { submitWaitlistRequest } from '@/lib/waitlist-client'
+import { readExactOkJsonResponse } from '@/lib/http/exact-ok-response'
+import { normalizeWaitlistEmail, submitWaitlistRequest } from '@/lib/waitlist-client'
 
 const REQUEST = {
   email: 'learner@example.com',
@@ -18,6 +18,11 @@ function jsonResponse(body: string, status = 200): Response {
     status,
     headers: { 'content-type': 'application/json; charset=utf-8' },
   })
+}
+
+function boundaryEmail(length: number): string {
+  const domain = `${'a'.repeat(63)}.exampl`
+  return `${'a'.repeat(length - domain.length - 1)}@${domain}`
 }
 
 function byteStream(source: UnderlyingByteSource): ReadableStream<Uint8Array> {
@@ -91,7 +96,7 @@ describe('shared exact-ok response reader', () => {
       headers: { 'content-type': 'application/json' },
     })
 
-    await expect(hasExactOkJsonResponse(response)).resolves.toBe(false)
+    await expect(readExactOkJsonResponse(response)).resolves.toEqual({ status: 'invalid-envelope' })
     expect(activity).toEqual({ cancels: 1, defaultReads: 0, largestByobRequest: 129 })
   })
 
@@ -114,7 +119,7 @@ describe('shared exact-ok response reader', () => {
       headers: { 'content-type': 'application/json' },
     })
 
-    const validation = hasExactOkJsonResponse(response, { timeoutMs: 50 })
+    const validation = readExactOkJsonResponse(response, { timeoutMs: 50 })
     const outcome = Promise.race([
       validation,
       new Promise<'stalled'>((resolve) => setTimeout(() => resolve('stalled'), 75)),
@@ -124,7 +129,7 @@ describe('shared exact-ok response reader', () => {
     const result = await outcome
     if (result === 'stalled') streamController?.error(new Error('test cleanup'))
 
-    expect(result).toBe(false)
+    expect(result).toEqual({ status: 'read-error' })
     expect(cancelled).toBe(true)
     vi.useRealTimers()
   })
@@ -148,7 +153,7 @@ describe('shared exact-ok response reader', () => {
     })
     const abortController = new AbortController()
 
-    const validation = hasExactOkJsonResponse(response, {
+    const validation = readExactOkJsonResponse(response, {
       signal: abortController.signal,
       timeoutMs: 1_000,
     })
@@ -159,7 +164,7 @@ describe('shared exact-ok response reader', () => {
     ])
     if (result === 'stalled') streamController?.error(new Error('test cleanup'))
 
-    expect(result).toBe(false)
+    expect(result).toEqual({ status: 'read-error' })
     expect(cancelled).toBe(true)
   })
 
@@ -175,7 +180,7 @@ describe('shared exact-ok response reader', () => {
       headers: { 'content-type': 'application/json' },
     })
 
-    await expect(hasExactOkJsonResponse(response)).resolves.toBe(false)
+    await expect(readExactOkJsonResponse(response)).resolves.toEqual({ status: 'read-error' })
   })
 
   it('fails closed for invalid UTF-8 bytes', async () => {
@@ -184,11 +189,21 @@ describe('shared exact-ok response reader', () => {
       headers: { 'content-type': 'application/json' },
     })
 
-    await expect(hasExactOkJsonResponse(response)).resolves.toBe(false)
+    await expect(readExactOkJsonResponse(response)).resolves.toEqual({ status: 'invalid-envelope' })
   })
 })
 
 describe('waitlist client response boundary', () => {
+  it('normalizes a valid email while rejecting empty and malformed values', () => {
+    expect(normalizeWaitlistEmail('  learner@example.com \n')).toBe('learner@example.com')
+    expect(normalizeWaitlistEmail(boundaryEmail(320))).toBe(boundaryEmail(320))
+    expect(normalizeWaitlistEmail(boundaryEmail(321))).toBeNull()
+    expect(normalizeWaitlistEmail('')).toBeNull()
+    expect(normalizeWaitlistEmail('not-an-email')).toBeNull()
+    expect(normalizeWaitlistEmail('learner@example')).toBeNull()
+    expect(normalizeWaitlistEmail('learner @example.com')).toBeNull()
+  })
+
   it('accepts the exact success response and preserves the request contract', async () => {
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse('{"ok":true}'))
     vi.stubGlobal('fetch', fetchMock)
@@ -199,6 +214,16 @@ describe('waitlist client response boundary', () => {
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(REQUEST),
     })
+  })
+
+  it('rejects an overlong email without dispatching a request', async () => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(submitWaitlistRequest({ ...REQUEST, email: boundaryEmail(321) })).resolves.toEqual({
+      status: 'rejected',
+    })
+    expect(fetchMock).not.toHaveBeenCalled()
   })
 
   it('accepts JSON whitespace around the sole success member', async () => {
@@ -311,13 +336,30 @@ describe('waitlist client response boundary', () => {
 
     await expect(submitWaitlistRequest(REQUEST)).resolves.toEqual({ status: 'network-error' })
   })
+
+  it('classifies a resolved-response body stream failure as a network failure', async () => {
+    const stream = byteStream({
+      type: 'bytes',
+      pull(controller) {
+        controller.error(new Error('read failed'))
+      },
+    })
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(stream, { status: 200, headers: { 'content-type': 'application/json' } }),
+      ),
+    )
+
+    await expect(submitWaitlistRequest(REQUEST)).resolves.toEqual({ status: 'network-error' })
+  })
 })
 
 describe('waitlist form consumer wiring', () => {
   it('delegates the request and response decision to the validated helper', () => {
     const source = readFileSync(join(process.cwd(), 'src/components/WaitlistForm.tsx'), 'utf8')
 
-    expect(source).toContain("import { submitWaitlistRequest } from '@/lib/waitlist-client'")
+    expect(source).toMatch(/import \{[^}]*submitWaitlistRequest[^}]*\} from '@\/lib\/waitlist-client'/)
     expect(source).toContain('await submitWaitlistRequest({')
     expect(source).not.toContain("fetch('/api/leads'")
     expect(source).not.toContain('response.json()')

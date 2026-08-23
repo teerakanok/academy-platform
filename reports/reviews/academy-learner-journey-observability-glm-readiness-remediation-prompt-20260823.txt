@@ -1,0 +1,14 @@
+Remediate Academy's controller-identified synthetic-readiness semantic defect using TDD. Work only in the sanitized projected repository. Edit exactly these two files and nothing else:
+- academy-web/src/lib/observability/learner-journey.ts
+- academy-web/tests/unit/learner-journey-observability.test.ts
+
+Verified defect: `assessSyntheticLearnerJourneyReadiness` currently sets ready true when six unique valid synthetic events exist and none has outcome `failure`. A complete journey containing `expected_denial` therefore incorrectly becomes ready, contradicting the explicit contract that readiness is true only when all six checkpoints exist and every outcome is `success`.
+
+Required TDD remediation:
+1. Add one focused regression case containing all six unique synthetic checkpoints with exactly one `expected_denial`/`expected_denial` event. Assert deterministic degraded output, no missing checkpoints, no failed checkpoints, and no alerts. This represents complete but not successful evidence.
+2. Change the readiness predicate so ready is true only when all six checkpoints exist exactly once and every validated event outcome is success.
+3. Preserve expected-denial no-alert behavior, failure classification, strict evidence validation, ordering, immutability, privacy field allowlist, and local-only boundaries.
+4. No any, unsafe cast, ts-ignore, disables, new dependency, logging, network, environment, storage, database, runtime wiring, flags, or unrelated edits.
+
+Acceptance on Node 24.18.0: focused 14/14, related safe-log and Identity runtime route 20/20, scoped ESLint clean, tsc --noEmit zero errors, exact two-file diff.
+Return the exact advisory edit JSON requested by the worker. Do not claim independent review or production readiness.

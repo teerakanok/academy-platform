@@ -1,0 +1,18 @@
+Remediate Academy's controller-verified SLO author defects. Work only in the sanitized projected repository. Edit exactly these two files and nothing else:
+- academy-web/src/lib/observability/learner-journey-slo.ts
+- academy-web/tests/unit/learner-journey-slo.test.ts
+
+Observed Node 24.18.0 evidence after TDD source integration:
+- focused: 8/11 pass, 3 fail;
+- scoped ESLint has no reported error;
+- tsc --noEmit has 10 errors.
+
+Verified defects and required remediation:
+1. BigInt literals (`...n`) are not supported by the project's TypeScript target. Preserve exact integer arithmetic using `BigInt(number)` constants/comparisons instead of BigInt literal syntax; do not replace with floating point.
+2. The first test correctly computes learner_enrollment burnRateMilli 33,334 against critical threshold 4,000, but incorrectly expects healthy. Expect critical and preserve the overall critical result.
+3. The expected-denial equivalence test incorrectly compares whole checkpoint objects, whose expectedDenials/failures fields should differ. Compare the budget-consumed, burn-rate, and status projections only, while still asserting the raw counts remain truthful.
+4. Several tests pass partial count overrides such as `{ successes: 100 }`, but `createAggregate` does not merge zero defaults. Make the helper accept partial counts and materialize all three numeric fields with defaults before overrides. This must remove TS2739/TS2741 and make the overall-status test valid; do not weaken the production aggregate schema.
+5. Preserve all 11 tests and every strict policy/aggregate validation, safe bounds, expected-denial budget consumption, no_data ordering, canonical output, deep freezing, and local-only privacy boundary. No any, unsafe casts, ts-ignore, disables, dependencies, logging/network/env/storage/runtime/production wiring, or unrelated edits.
+
+Acceptance: focused 11/11; related learner-journey observability, safe-log, and Identity runtime routes 31/31; scoped ESLint clean; tsc --noEmit zero errors; exact two-file diff.
+Return the exact advisory edit JSON requested by the worker. Do not claim independent review, live observability, deployed alerts, or production readiness.

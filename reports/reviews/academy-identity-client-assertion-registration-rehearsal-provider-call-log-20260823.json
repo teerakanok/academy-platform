@@ -1,0 +1,65 @@
+{
+  "schema": "academy.provider-call-log.v1",
+  "checkpoint": "identity-client-assertion-registration-rehearsal",
+  "efficiency_protocol": "efficiency_protocol_v1",
+  "pre_provider_events": [
+    {
+      "classification": "E_MANIFEST",
+      "provider_started": false,
+      "cause": "read-only scope initially supplied an empty write_paths list rejected by the wrapper schema"
+    },
+    {
+      "classification": "E_SOURCE_FILE",
+      "provider_started": false,
+      "cause": "canonical conformance JSON was rejected by the content-safety scanner and removed from the semantic review projection"
+    }
+  ],
+  "calls": [
+    {
+      "attempt_id": "academy-identity-registration-ril-review-1",
+      "role": "review",
+      "provider": "z.ai",
+      "model": "glm-5.3",
+      "model_provenance": "adapter_bound_requested",
+      "effort": null,
+      "effort_provenance": "not_reported",
+      "route": "sensitive_external_worker",
+      "prompt_sha256": "275d5d890605212bf095d90cbbea9f481190465923f7b4d38fdf7236256b98e9",
+      "provider_started_at": "2026-08-22T22:48:11.583Z",
+      "first_activity_at": "2026-08-22T22:48:11.686Z",
+      "provider_finished_at": "2026-08-22T22:53:04.431Z",
+      "duration_ms": 292848,
+      "run_id": "run-3ksTbh",
+      "working": true,
+      "success": true,
+      "outcome": "usable_no_go_review",
+      "verdict": "FAIL",
+      "findings": ["M-01"]
+    },
+    {
+      "attempt_id": "academy-identity-registration-ril-review-2",
+      "parent_attempt_id": "academy-identity-registration-ril-review-1",
+      "role": "review",
+      "provider": "z.ai",
+      "model": "glm-5.3",
+      "model_provenance": "adapter_bound_requested",
+      "effort": null,
+      "effort_provenance": "not_reported",
+      "route": "sensitive_external_worker",
+      "prompt_sha256": "949447f38fd320286af97bf1b50375fba4c2a028dbadb3d4a0c5a00b3d61b0e0",
+      "provider_started_at": "2026-08-22T22:54:57.661Z",
+      "first_activity_at": "2026-08-22T22:54:57.762Z",
+      "provider_finished_at": "2026-08-22T22:56:44.991Z",
+      "duration_ms": 107330,
+      "run_id": "run-EQUnFm",
+      "working": true,
+      "success": true,
+      "outcome": "usable_result",
+      "verdict": "PASS",
+      "findings": []
+    }
+  ],
+  "provider_calls": 2,
+  "observer_reconciled_calls": "2/2",
+  "observer_audit": "ok"
+}

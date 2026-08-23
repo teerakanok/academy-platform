@@ -1,0 +1,58 @@
+{
+  "schema": "academy-canonical-domain-callback-probe-receipt/v1",
+  "capturedAt": "2026-08-23T07:28:34Z",
+  "scope": {
+    "canonicalDomain": "academy.cyberskills.co.th",
+    "registeredCallbackUri": "https://academy.cyberskills.co.th/auth/callback",
+    "productionAuthority": "NONE",
+    "releaseApproval": false,
+    "identityClientEnabled": false
+  },
+  "probe": {
+    "method": "owner-authorized Chrome session authenticated through Cloudflare Access",
+    "accountIdentifierCaptured": false,
+    "otpOrSecretCaptured": false,
+    "exactPath": "/auth/callback",
+    "reportedHttpStatus": 400,
+    "expectedNoParameterResponse": 400,
+    "observedBody": {
+      "ok": false,
+      "error": "callback ต้องมี code และ state แบบ opaque ที่ถูกต้อง"
+    },
+    "meaning": "The authenticated request reached the Academy Worker and exercised its no-parameter callback validation."
+  },
+  "sourceBoundScreenshots": [
+    {
+      "path": "artifacts/reviews/academy-canonical-domain-20260823/authenticated-root.png",
+      "sha256": "3b8c15a35cb82c3223413f164db67ff1c426d2dc6f9795a38867c770dbb71818",
+      "dimensions": "1302x768",
+      "purpose": "post-Access root route evidence"
+    },
+    {
+      "path": "artifacts/reviews/academy-canonical-domain-20260823/authenticated-courses.png",
+      "sha256": "2a21aa0955542da2137283c13dc59da9d2bda90ec465231c5c925d27bb15c2e6",
+      "dimensions": "1302x768",
+      "purpose": "post-Access courses route evidence"
+    },
+    {
+      "path": "artifacts/reviews/academy-canonical-domain-20260823/authenticated-callback.png",
+      "sha256": "68871f9f11b598fce06307a84c7ad37022dd50b5fd4fd78df9b3085eee340e22",
+      "dimensions": "1302x768",
+      "purpose": "post-Access exact callback route evidence"
+    }
+  ],
+  "boundDeployment": {
+    "baseGitRevision": "e933a34c126b6a6fd6008951952d0c62796df2a4",
+    "deploymentId": "ef66dfc4-92dc-4b9f-bc63-708c30e1cff1",
+    "versionId": "c8b36c74-e76a-412b-9a63-3702cb838e07",
+    "canonicalDeploymentReceiptPath": "reports/reviews/academy-canonical-domain-deployment-receipt-20260823.json"
+  },
+  "exclusions": {
+    "realOAuthCodeStateAcceptance": false,
+    "identityAcceptanceClaim": false,
+    "productionAdmissionClaim": false,
+    "credentialOrSecretCapture": false,
+    "accessOrDomainMutation": false,
+    "commitOrPush": false
+  }
+}

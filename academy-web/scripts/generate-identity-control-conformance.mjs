@@ -17,8 +17,8 @@ const scriptDirectory = dirname(fileURLToPath(import.meta.url))
 const academyRoot = resolve(scriptDirectory, '..', '..')
 const identityRoot = resolve(academyRoot, '..', 'identity-control')
 
-export const ACADEMY_SOURCE_REVISION = '6de80c2f066d7c32866434d4b6afdaf0b217c9ca'
-export const IDENTITY_SOURCE_REVISION = 'fdcaf30bfb9b3644c43dcabb192d99820d52a336'
+export const ACADEMY_SOURCE_REVISION = '77ec9b572a10e12906139e5ba7c24b04d3dfb4d2'
+export const IDENTITY_SOURCE_REVISION = 'f0e1cc5dd89271ca2a1a78fd4b3c7b825bf61c1e'
 
 const reportPath = 'reports/conformance/identity-control/academy-identity-control-conformance.json'
 const evidencePath = 'reports/conformance/identity-control/academy-identity-local-evidence.json'
@@ -27,20 +27,18 @@ const unprovenPath = 'reports/conformance/identity-control/academy-identity-unpr
 export const CHECKPOINT_FREEZE_DECLARATION = Object.freeze({
   schema: 'checkpoint-freeze-manifest.v1',
   role: 'identity-consumer-conformance-checkpoint',
-  path: 'reports/reviews/academy-identity-control-contract-rebind-freeze-20260814.json',
+  path: 'reports/reviews/academy-identity-client-assertion-registration-rehearsal-freeze-20260820.json',
   contentPaths: Object.freeze([
     'academy-web/scripts/generate-identity-control-conformance.mjs',
     'academy-web/scripts/generate-identity-control-conformance.test.mjs',
+    'academy-web/src/lib/identity/client-assertion-registration-rehearsal.ts',
     'academy-web/src/lib/identity/consumer-policy.ts',
+    'academy-web/tests/unit/identity-client-assertion-conformance.test.ts',
+    'academy-web/tests/unit/identity-client-assertion-registration-rehearsal.test.ts',
     'academy-web/tests/unit/identity-consumer-policy.test.ts',
     'plans/active_plan.md',
-    'plans/completed_log.md',
     reportPath,
-    evidencePath,
-    unprovenPath,
-    'reports/reviews/academy-identity-control-contract-rebind-local-checkpoint-20260814.md',
-    'reports/reviews/academy-identity-lifecycle-principal-contract-freeze-20260812.json',
-    'reports/reviews/academy-identity-lifecycle-principal-contract-local-checkpoint-2026-08-12.md',
+    'reports/reviews/academy-identity-client-assertion-registration-rehearsal-local-checkpoint-20260820.md',
   ]),
 })
 
@@ -125,7 +123,7 @@ const expectedEvidenceDigests = new Map([
   ],
   [
     'academy-web/tests/unit/identity-client-assertion-conformance.test.ts',
-    '241540492ecc9234356298cec111b89332b6b8b96bccb3c9c0a2dd57e56ef42e',
+    'aa8ab65908beaae1a755bc7f12f7c8d76676dca72b59abb19407d43a3e7421e2',
   ],
   [
     'reports/reviews/academy-identity-client-assertion-provider-local-checkpoint-2026-08-11.md',
@@ -406,6 +404,7 @@ function buildEvidence(observedEvidenceDigests, observedIdentityEvidenceDigests)
     registryEnabled: false,
     releaseApproval: false,
     runtimeWired: false,
+    productionEvidence: false,
     retainedLocalEvidence: {
       scenarios: [...retainedScenarioIds],
       testArtifact: artifactReference(
@@ -445,6 +444,8 @@ function buildUnproven() {
     ),
     registryEnabled: false,
     releaseApproval: false,
+    runtimeWired: false,
+    productionEvidence: false,
     productionMutation: false,
   }
 }

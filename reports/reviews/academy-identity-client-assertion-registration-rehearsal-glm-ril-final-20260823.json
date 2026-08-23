@@ -1,0 +1,27 @@
+{
+  "schema": "academy.identity-registration-rehearsal.ril.v1",
+  "status": "PASS",
+  "verdict": "PASS",
+  "findings": [],
+  "work_order_metadata": {
+    "schema": "model-team.ril.v1",
+    "work_kind": "bounded_code",
+    "role": "implementation_reviewer",
+    "source_sha256": "98589c774060b1725491dcafe6b5ae1ac87f3bd82efb8002ba6442261bcde7c5"
+  },
+  "reviewed_source_sha256": "98589c774060b1725491dcafe6b5ae1ac87f3bd82efb8002ba6442261bcde7c5",
+  "run_id": "run-EQUnFm",
+  "child_run_id": "run-5db37bad7f9295ae826a0cfd2e49f33f",
+  "provider_result_valid": true,
+  "review_required": false,
+  "provider_started_at": "2026-08-22T22:54:57.661Z",
+  "first_activity_at": "2026-08-22T22:54:57.762Z",
+  "result_validated_at": "2026-08-22T22:56:44.991Z",
+  "receipt_persisted_at": "2026-08-22T22:56:45.165Z",
+  "duration_ms": 107330,
+  "result_sha256": "b2ae21c136ae50580bdbc6ff40ed5ef028c7c29a69bf96e27641a7db1a49ddaa",
+  "worker_status_sha256": "c394883844621c3ca646d318cdd3d7ad4943c0879ad69db4ccbff3b52ebc6b45",
+  "prompt_sha256": "949447f38fd320286af97bf1b50375fba4c2a028dbadb3d4a0c5a00b3d61b0e0",
+  "manifest_sha256": "81f1737f98d039c243f0e006c3fa5bcd2886d371421c98d6f27cde7c93c06c14",
+  "summary": "M-01 is closed. The corrected claim separates authenticator assertion checks from registration-sequence validator checks, and no Critical, High, or Medium finding remains."
+}

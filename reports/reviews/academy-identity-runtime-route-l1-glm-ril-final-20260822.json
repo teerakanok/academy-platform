@@ -1,0 +1,24 @@
+{
+  "work_order_metadata": {
+    "schema": "model-team.ril.v1",
+    "work_kind": "bounded_code",
+    "role": "implementation_reviewer",
+    "source_sha256": "08f37f796fac176f71bb0bccee6df2c7c2575bcb64734ebff8aad223662eb2c5"
+  },
+  "verdict": "PASS",
+  "summary": "The direct tests exercise the real start and callback handlers through the enabled registry-flow seam, avoid fixture and disabled paths, and meaningfully verify exact Request identity, allowed statuses, absolute and relative redirects, JSON errors without redirects, ordered distinct Set-Cookie headers, mock isolation, and compatible registry error-class identity without mutating runtime or production state.",
+  "findings": [],
+  "receipt": {
+    "run_id": "run-1do3E8",
+    "child_run_id": "run-373e81eb0d41512696dbc3e9a44de088",
+    "provider_started_at": "2026-08-22T16:47:16.542Z",
+    "first_activity_at": "2026-08-22T16:47:16.643Z",
+    "result_validated_at": "2026-08-22T16:49:30.373Z",
+    "receipt_persisted_at": "2026-08-22T16:49:30.374Z",
+    "outer_review_validated_at": "2026-08-22T16:49:30.529Z",
+    "outer_receipt_persisted_at": "2026-08-22T16:49:30.530Z",
+    "result_sha256": "5adadedb44bb10455a7c86c523f9219978fd29cacb6ad5021af6fcab31b1a2e9",
+    "manifest_sha256": "dea9cfcc5d5700c147dec7cce90eb0f0234a2b35aadc3f4b334a7320915ef234",
+    "work_order_sha256": "35aee45209c60ba52c6875e37778f9f252c289424018980fc941bc5e0a8c879a"
+  }
+}

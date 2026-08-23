@@ -1,0 +1,18 @@
+Independently review Academy's new local learner-journey observability contract and tests as the implementation_reviewer. This is strict read-only RIL: do not edit files.
+
+The bound source_sha256 is a deterministic two-file bundle digest. In this exact order for each file, SHA-256 was updated with UTF-8 relative path bytes, one NUL byte, exact file bytes, then one NUL byte:
+1. academy-web/src/lib/observability/learner-journey.ts
+2. academy-web/tests/unit/learner-journey-observability.test.ts
+
+Review whether this checkpoint safely establishes a provider-neutral local contract without claiming deployed observability. Check specifically:
+- exhaustive six-checkpoint taxonomy and canonical Academy `en | th` locale compatibility;
+- exact-key/runtime validation against accessors, prototypes, symbols/extras, sparse arrays, duplicates, malformed events, and mutable caller inputs;
+- no path for arbitrary metadata or user/account/session/correlation identifiers, email, Identity subject, code/state/nonce, cookie/token, raw URL/query, stack, or raw error text;
+- outcome/status consistency and all-success-only readiness, including complete expected-denial evidence remaining degraded without false alerts;
+- stable checkpoint ordering, missing/failed reporting, failure-only alert classification, exact Identity-vs-Academy ownership, and immutable result isolation;
+- source-bound local-only proof and whether regex assertions create material false confidence or miss an actual network/logger/env/storage/runtime seam;
+- unsafe typing, dependency/circular coupling, false positives, missing material tests, or mismatch with existing Academy locale conventions.
+
+Controller evidence on Node 24.18.0: TDD missing-module RED observed; initial source had valid-array bug; remediations closed that bug, static-analysis defects, expected-denial readiness bug, canonical-locale mismatch, and mutable UI taxonomy coupling. Final focused 14/14 passed; related safe-log and Identity route 20/20 passed; scoped ESLint clean; tsc --noEmit zero errors; diff-check and forbidden-field source scans clean. No UI/runtime/registry/policy/flags/network/database/deploy/production changes.
+
+Return only the exact strict implementation-RIL JSON object required by the contract: work_order_metadata, verdict, summary, findings. Findings use severity and message with optional safe relative path. PASS requires no Critical, High, or Medium finding. Do not claim SLO completion, live telemetry, deployed alerts, runtime wiring, release, or production readiness.

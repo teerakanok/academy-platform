@@ -1,0 +1,43 @@
+{
+  "schema": "academy.checkpoint-freeze.v1",
+  "checkpoint": "learner-journey-alert-route-local-rehearsal",
+  "status": "REVIEW_BLOCKED",
+  "file_count": 9,
+  "source_bundle_sha256": "d5d0fc605134bf1342d82308422ad049bb1ed0772f48f53c2e8a7b761a7cbf99",
+  "files": [
+    { "path": "academy-web/src/lib/observability/learner-journey-alert-rehearsal.ts", "sha256": "cd47a0c0c822d06c9561be18449dfc746b3c62acc449eee1a1d3d4b4443e0902" },
+    { "path": "academy-web/tests/unit/learner-journey-alert-rehearsal.test.ts", "sha256": "fcc9b619617ae97ad9e9724bd9daf72a8cf23d6d2543e2b551af4719e8e4bae5" },
+    { "path": "reports/reviews/academy-learner-journey-alert-rehearsal-glm-author-prompt-20260823.txt", "sha256": "f64fd6111652e72651ee8bafcceb8fbf09af1a8dcdee312fe835ac93c4bc47a0" },
+    { "path": "reports/reviews/academy-learner-journey-alert-rehearsal-glm-author-provider-prompt-20260823.txt", "sha256": "88596b17aff3892967f2c60f70683d9938d52943b161566329c363da01a0ad84" },
+    { "path": "reports/reviews/academy-learner-journey-alert-rehearsal-glm-author-retry-prompt-20260823.txt", "sha256": "32a2576ba0d21f3ec021d1288be9ad5ea1c0477c73e53caf22597c0403b88bc8" },
+    { "path": "reports/reviews/academy-learner-journey-alert-rehearsal-glm-ril-prompt-20260823.txt", "sha256": "7746748250de35b2460a3d5a097af7a5309410a15762bb6c96d552986ac9b14e" },
+    { "path": "reports/reviews/academy-learner-journey-alert-rehearsal-glm-ril-failure-20260823.json", "sha256": "584f2c337bf3a34aaadb97817eda5568bab97b686676c4ceceb2b84204b816dc" },
+    { "path": "reports/reviews/academy-learner-journey-alert-rehearsal-provider-call-log-20260823.json", "sha256": "e4419d936a0ee4911e862326405bbdab3fbf1b29ec3854dafe50350cd12f189a" },
+    { "path": "reports/reviews/academy-learner-journey-alert-rehearsal-local-checkpoint-20260823.md", "sha256": "1e8fa2f4f7200f82c1604ecf3df2f1911d92dfcab15253dcce1a0680c510b842" }
+  ],
+  "verification": {
+    "tdd_red": "PASS",
+    "focused": "10/10",
+    "related": "41/41",
+    "full_unit": "2012/2012",
+    "full_unit_files": "130/130",
+    "eslint": "PASS",
+    "typescript": "PASS",
+    "diff_check": "PASS",
+    "runtime_scope_scan": "PASS",
+    "independent_ril": "BLOCKED_E_PROVIDER_RESULT_SCHEMA",
+    "observer_reconciled_calls": "3/3",
+    "observer_audit": "PASS"
+  },
+  "readiness": {
+    "accepted_local_observability_pillars": "4/5",
+    "alert_checkpoint_gates": "3/5",
+    "production_admission": "0/1",
+    "runtime_wired": false,
+    "release_approval": false,
+    "production_evidence": false,
+    "deployment_performed": false,
+    "network_mutation_performed": false,
+    "secrets_accessed": false
+  }
+}

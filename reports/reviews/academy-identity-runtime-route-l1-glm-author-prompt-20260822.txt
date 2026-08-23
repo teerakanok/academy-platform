@@ -1,0 +1,20 @@
+You are the bounded implementation author for Academy's Identity runtime route L1 closure. Work only in the sanitized projected repository and create only academy-web/tests/unit/identity-runtime-routes.test.ts. Do not edit route source, registry, policy, conformance, plans, existing tests, or any other file.
+
+Objective: add direct route-level tests for the future enabled Identity browser-flow branches while the real registry remains disabled. Test the real exported POST `/api/auth/identity/start` and GET `/auth/callback` handlers with the registry seam mocked; do not instantiate or wire a production runtime.
+
+Required TDD contract:
+1. Use Vitest module mocks before importing the route handlers. Force `identityControlLocalFixtureAllowedForRequest` false and supply a mocked `getIdentityRuntimeBrowserFlow`. Preserve a mock `IdentityAdapterUnavailableError` class compatible with each route's `instanceof` check.
+2. Prove the enabled POST redirect branch passes the exact Request object to `flow.start`, preserves the flow's HTTP status and exact absolute Location target, and propagates every Set-Cookie value as distinct response headers. Use `Headers.getSetCookie()` so multiplicity and order are asserted, not a comma-joined string.
+3. Prove the enabled POST error branch preserves a representative allowed error status and JSON error body and does not redirect.
+4. Prove the enabled GET redirect branch passes the exact Request object to `flow.complete`, resolves a relative return location against the Academy request origin, preserves the HTTP status, and propagates at least two distinct Set-Cookie values in order (session plus browser-binding expiry shape).
+5. Prove the enabled GET error branch preserves status/body and propagates multiple Set-Cookie values in order without a Location header.
+6. Reset all mocks between cases. Use stable synthetic domains and non-secret cookie fixtures. Do not set environment flags, touch network/database/filesystem, use unsafe casts, use arbitrary waits, or weaken types.
+7. Keep the test narrowly route-level. Existing flow internals and disabled-registry behavior are covered elsewhere and must not be duplicated.
+
+Controller acceptance commands, using Node 24.18.0:
+- npm run test:unit -- tests/unit/identity-runtime-routes.test.ts
+- npm run test:unit -- tests/unit/identity-runtime-routes.test.ts tests/unit/identity-runtime-browser-flow.test.ts tests/unit/identity-runtime-completion.test.ts tests/unit/auth-callback-route.test.ts
+- npx eslint tests/unit/identity-runtime-routes.test.ts
+- npx tsc --noEmit
+
+Return a concise summary only. Do not claim independent review, runtime wiring, deployment, or production readiness.

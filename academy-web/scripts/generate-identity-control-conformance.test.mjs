@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { describe, test } from 'node:test'
+import { verifyFreezeManifest } from '../../../../../scripts/checkpoint-freeze-manifest.mjs'
 import {
   ACADEMY_SOURCE_REVISION,
   CHECKPOINT_FREEZE_DECLARATION,
@@ -9,6 +10,7 @@ import {
   NOT_PROVEN_SCENARIO_IDS,
   PROFILE_ACTIVATION_SCENARIO_IDS,
   buildGeneratedArtifacts,
+  generatorPaths,
   renderCanonicalJson,
 } from './generate-identity-control-conformance.mjs'
 
@@ -86,7 +88,7 @@ const expectedEvidenceDigests = new Map([
   ],
   [
     'academy-web/tests/unit/identity-client-assertion-conformance.test.ts',
-    '241540492ecc9234356298cec111b89332b6b8b96bccb3c9c0a2dd57e56ef42e',
+    'aa8ab65908beaae1a755bc7f12f7c8d76676dca72b59abb19407d43a3e7421e2',
   ],
   [
     'reports/reviews/academy-identity-client-assertion-provider-local-checkpoint-2026-08-11.md',
@@ -159,26 +161,38 @@ function build() {
 }
 
 describe('Academy Identity Control conformance generator', () => {
-  test('declares the exact bytewise-sorted twelve-file checkpoint content set', () => {
+  test('declares the exact current bytewise-sorted checkpoint content set', () => {
     assert.deepEqual(CHECKPOINT_FREEZE_DECLARATION, {
       schema: 'checkpoint-freeze-manifest.v1',
       role: 'identity-consumer-conformance-checkpoint',
-      path: 'reports/reviews/academy-identity-control-contract-rebind-freeze-20260814.json',
+      path: 'reports/reviews/academy-identity-client-assertion-registration-rehearsal-freeze-20260820.json',
       contentPaths: [
         'academy-web/scripts/generate-identity-control-conformance.mjs',
         'academy-web/scripts/generate-identity-control-conformance.test.mjs',
+        'academy-web/src/lib/identity/client-assertion-registration-rehearsal.ts',
         'academy-web/src/lib/identity/consumer-policy.ts',
+        'academy-web/tests/unit/identity-client-assertion-conformance.test.ts',
+        'academy-web/tests/unit/identity-client-assertion-registration-rehearsal.test.ts',
         'academy-web/tests/unit/identity-consumer-policy.test.ts',
         'plans/active_plan.md',
-        'plans/completed_log.md',
         'reports/conformance/identity-control/academy-identity-control-conformance.json',
-        'reports/conformance/identity-control/academy-identity-local-evidence.json',
-        'reports/conformance/identity-control/academy-identity-unproven-scenarios.json',
-        'reports/reviews/academy-identity-control-contract-rebind-local-checkpoint-20260814.md',
-        'reports/reviews/academy-identity-lifecycle-principal-contract-freeze-20260812.json',
-        'reports/reviews/academy-identity-lifecycle-principal-contract-local-checkpoint-2026-08-12.md',
+        'reports/reviews/academy-identity-client-assertion-registration-rehearsal-local-checkpoint-20260820.md',
       ],
     })
+  })
+
+  test('rejects the stale checkpoint and verifies the refreshed declaration', async () => {
+    await assert.rejects(
+      verifyFreezeManifest({
+        root: generatorPaths.academyRoot,
+        manifestPath: 'reports/reviews/academy-identity-control-contract-rebind-freeze-20260814.json',
+      }),
+      /manifest_mismatch/,
+    )
+    assert.equal(await verifyFreezeManifest({
+      root: generatorPaths.academyRoot,
+      manifestPath: CHECKPOINT_FREEZE_DECLARATION.path,
+    }), CHECKPOINT_FREEZE_DECLARATION.contentPaths.length)
   })
 
   test('promotes client assertion, lifecycle, and profile activation while retaining seven explicit gaps', () => {
@@ -187,11 +201,13 @@ describe('Academy Identity Control conformance generator', () => {
 
     assert.equal(report.sourceRevision, ACADEMY_SOURCE_REVISION)
     assert.equal(report.identityControl.sourceRevision, IDENTITY_SOURCE_REVISION)
-    assert.equal(ACADEMY_SOURCE_REVISION, '6de80c2f066d7c32866434d4b6afdaf0b217c9ca')
-    assert.equal(IDENTITY_SOURCE_REVISION, 'fdcaf30bfb9b3644c43dcabb192d99820d52a336')
+    assert.equal(ACADEMY_SOURCE_REVISION, '77ec9b572a10e12906139e5ba7c24b04d3dfb4d2')
+    assert.equal(IDENTITY_SOURCE_REVISION, 'f0e1cc5dd89271ca2a1a78fd4b3c7b825bf61c1e')
     assert.equal(report.registryState.enabled, false)
     assert.equal(report.scope.releaseApproval, false)
     assert.equal(report.scope.runtimeWired, false)
+    assert.equal(report.scope.productionEvidence, false)
+    assert.equal(evidence.productionEvidence, false)
     assert.deepEqual(report.checkpointFreezeManifest, CHECKPOINT_FREEZE_DECLARATION)
     assert.deepEqual(report.summary, {
       trackedScenarioCount: 23,
@@ -217,7 +233,7 @@ describe('Academy Identity Control conformance generator', () => {
         evidenceType: 'test',
         testSource: {
           path: 'academy-web/tests/unit/identity-client-assertion-conformance.test.ts',
-          sha256: '241540492ecc9234356298cec111b89332b6b8b96bccb3c9c0a2dd57e56ef42e',
+          sha256: 'aa8ab65908beaae1a755bc7f12f7c8d76676dca72b59abb19407d43a3e7421e2',
         },
         producerEvidence: [
           {
@@ -326,12 +342,15 @@ describe('Academy Identity Control conformance generator', () => {
     assert.equal(evidence.registryEnabled, false)
     assert.equal(evidence.releaseApproval, false)
     assert.equal(evidence.runtimeWired, false)
+    assert.equal(evidence.productionEvidence, false)
     assert.equal(report.registryState.enabled, false)
     assert.equal(report.scope.releaseApproval, false)
     assert.equal(report.scope.runtimeWired, false)
+    assert.equal(report.scope.productionEvidence, false)
     assert.doesNotMatch(rendered, /"enabled": true/)
     assert.doesNotMatch(rendered, /"releaseApproval": true/)
     assert.doesNotMatch(rendered, /"runtimeWired": true/)
+    assert.doesNotMatch(rendered, /"productionEvidence": true/)
   })
 
   test('promotes the reviewed profile-only activation boundary without granting runtime authority', () => {

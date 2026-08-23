@@ -1,0 +1,12 @@
+Remediate Academy's controller-identified observability locale coupling. Work only in the sanitized projected repository. Edit exactly academy-web/src/lib/observability/learner-journey.ts and nothing else. Do not edit or weaken the tests.
+
+Observed state: the locale remediation correctly moved values to `en | th`, and focused 14/14 passes, but it implemented `LEARNER_JOURNEY_LOCALES = UI_LOCALES`. `UI_LOCALES` is exported as a mutable `UiLocale[]`, so this aliases mutable UI state into the validation taxonomy and makes the pure observability module depend on the large UI-copy module.
+
+Required remediation:
+1. Remove the import from `@/lib/i18n/ui` in the observability source.
+2. Define `LEARNER_JOURNEY_LOCALES` locally as the readonly literal tuple `['en', 'th'] as const`.
+3. Preserve the existing test import/assertion that independently verifies equality to canonical `UI_LOCALES`; do not edit tests.
+4. Preserve all event, validation, readiness, alert, privacy, and local-only behavior. No any, casts, disables, new dependency, logging, network, environment, storage, runtime wiring, flags, or unrelated changes.
+
+Acceptance: focused 14/14, related 20/20, scoped ESLint clean, tsc --noEmit zero errors, exact one source-file diff.
+Return the exact advisory edit JSON requested by the worker. Do not claim independent review or production readiness.

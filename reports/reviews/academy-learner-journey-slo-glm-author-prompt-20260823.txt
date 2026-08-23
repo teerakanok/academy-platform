@@ -1,0 +1,22 @@
+You are the bounded implementation author for Academy's local learner-journey SLO and error-budget checkpoint. Work only in the sanitized projected repository. Create exactly these two files and edit nothing else:
+- academy-web/src/lib/observability/learner-journey-slo.ts
+- academy-web/tests/unit/learner-journey-slo.test.ts
+
+Objective: implement a provider-neutral, deterministic local SLO/error-budget evaluator over aggregate synthetic journey counts. This is policy/evaluation code only: no telemetry emission, alert destinations, timers, environment, network, database, filesystem, Identity/runtime wiring, deploy, or production flags.
+
+Required contract:
+1. Reuse the canonical six `LEARNER_JOURNEY_CHECKPOINTS` and its type from learner-journey.ts. Define a strict exact-key SLO policy with schema version, objective-window seconds, target-success basis points, minimum observations, warning burn-rate milli, and critical burn-rate milli. Validate a plain own-data object with no accessors/prototype/extras. Use safe integer bounds: objective window from one day through 30 days, target 9000..9999 basis points, minimum observations 1..1,000,000, warning >=1000 milli, critical > warning and <=100,000 milli.
+2. Define strict aggregate input as a dense ordinary array containing exactly one record for each of the six checkpoints. Each record has only checkpoint, successes, expectedDenials, and failures; all counts are safe nonnegative integers <=1,000,000 and their safe sum must not exceed 1,000,000. Reject duplicates, missing records, sparse/accessor/symbol/extra properties, changed prototypes, and reordered output ambiguity. Inputs contain no identifiers, locale, timestamp, URL, metadata, or raw errors.
+3. Evaluate every checkpoint in canonical order. Total observations are all three outcomes. Only successes satisfy the objective; expected denials and failures both consume error budget. Below minimum observations yields `no_data`, null budget/burn metrics, and does not silently become healthy. Otherwise calculate budget-consumed basis points and burn-rate milli with integer arithmetic and ceiling semantics; 10,000 budget-consumed basis points means 100% of the allowed error budget, and 1,000 burn-rate milli means 1x budget burn. Avoid floating point and overflow (BigInt internally is acceptable, JSON-unsafe values must not escape).
+4. Classify each checkpoint deterministically as healthy when burn < warning, warning when burn >= warning and < critical, critical when burn >= critical. Overall status is critical > warning > no_data > healthy, so missing evidence cannot produce healthy. Return policy snapshot, six frozen checkpoint results, and frozen overall summary, isolated from caller mutation.
+5. Tests must prove exact arithmetic at 0x, 1x, warning boundary, critical boundary, and non-divisible ceiling; expected denials consume budget; minimum-observation/no-data behavior; canonical ordering; all six aggregate requirement; duplicate/missing/sparse/accessor/prototype/extra/symbol rejection; count/sum/policy integer boundaries; caller mutation isolation and deep freezing; source-bound absence of identifiers, logging, network, env, storage, database, timers, runtime/release/production wiring.
+6. Use strict TypeScript, no any, unsafe casts, ts-ignore, disables, external dependencies, or UI changes. Match the existing observability module's style without modifying it.
+
+Controller acceptance on Node 24.18.0:
+- focused SLO test passes;
+- related learner-journey observability + safe-log + Identity runtime-route tests pass;
+- scoped ESLint passes;
+- tsc --noEmit passes;
+- source/diff checks prove exact two-file local-only scope.
+
+Return the exact advisory edit JSON requested by the worker. Do not claim independent review, live telemetry, deployed alerting, operator proof, release, or production readiness.

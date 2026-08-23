@@ -1,0 +1,23 @@
+You are the bounded implementation author for Academy's local learner-journey observability checkpoint. Work only in the sanitized projected repository. Create exactly these two files and edit nothing else:
+- academy-web/src/lib/observability/learner-journey.ts
+- academy-web/tests/unit/learner-journey-observability.test.ts
+
+Objective: implement a provider-neutral, privacy-safe event contract plus deterministic synthetic-readiness assessment for the public learner and future Identity journey. This is local code only: it must not log, send telemetry, read environment variables, call network/database/filesystem APIs, wire Identity, or enable any runtime/release/production flag.
+
+Required contract:
+1. Define an exhaustive low-cardinality taxonomy covering these journey checkpoints: public catalog availability, sign-in availability, Identity authorization start, Identity callback completion, learner enrollment completion, and learner progress persistence.
+2. Events must expose only fixed allowlisted dimensions useful for operations: schema version, checkpoint, outcome, status class, latency bucket, locale, synthetic marker, and exact RFC3339 occurred-at timestamp. Do not accept or expose arbitrary metadata, URL, route, query, user/account/session/correlation identifiers, email, Identity subject, authorization code/state/nonce, cookie, token, stack, or raw error text.
+3. Validate all runtime input strictly and fail closed. Require exact own enumerable data keys, reject accessors/prototypes/sparse structures where applicable, validate timestamp canonicality, and use only bounded enums. Return a fresh immutable or safely cloned projection so later caller mutation cannot alter it.
+4. Define deterministic alert classification for a validated event. Successful events and expected denials do not alert. Failures map to an explicit severity and owner: Identity authorization/callback failures belong to identity operations; catalog/sign-in/enrollment/progress failures belong to Academy product operations. Make the mapping exhaustive and low-cardinality.
+5. Define a deterministic synthetic readiness assessor over validated synthetic events. Require exactly one event for each of the six checkpoints, reject duplicates/non-synthetic/invalid events, and return a stable result containing ready/degraded, missing checkpoints, failed checkpoints, and the resulting alerts. Readiness is true only when all six exist and have outcome success. Do not hide malformed evidence as missing.
+6. Tests must cover one complete ready journey, missing and failed checkpoints with exact alert owner/severity, duplicate rejection, non-synthetic rejection, invalid/extra/sensitive fields rejection, timestamp and enum boundaries, immutability/caller mutation isolation, and source-bound proof that the module has no console/logger/fetch/process.env/storage/database/runtime wiring.
+7. Use strict TypeScript without any, unsafe casts, ts-ignore, disables, external dependencies, or customer-facing UI changes. Match existing project style.
+
+Controller acceptance on Node 24.18.0:
+- focused Vitest file passes
+- related safe-log and Identity runtime route tests pass
+- scoped ESLint passes
+- tsc --noEmit passes
+- source scan proves no network/logger/env/runtime wiring and no identifier-bearing fields
+
+Return the exact advisory edit JSON requested by the worker. Do not claim independent review, deployed observability, SLO completion, runtime wiring, or production readiness.

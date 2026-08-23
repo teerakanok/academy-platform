@@ -3,6 +3,77 @@
 > Closed items only, with outcome + evidence + residual risk. Newest first.
 > Provider-neutral. See `active_plan.md` for open work.
 
+## 2026-08-23 - Canonical-domain and authenticated callback evidence collected
+
+- The deployed `cyberskills-academy` Worker has source-bound evidence for the canonical
+  `academy.cyberskills.co.th` domain. Public DNS resolves through Cloudflare and unauthenticated
+  `/`, `/courses`, and `/auth/callback` requests are intercepted by Cloudflare Access.
+- An owner-authorized Access session rendered the Academy landing page, eight-course preview page,
+  and exact no-parameter callback validation response. The callback screenshot contains only the
+  expected `ok:false` JSON; no account identifier, OTP, token, callback parameter, cookie, or
+  identifiable PII is retained in the three window-scoped screenshots.
+- The two required evidence artifacts validate against the Identity Control submission contract.
+  Independent intake returned a valid pending submission; the current guard requires a separate
+  reviewed canonical acceptance record before it can count an accepted receipt. This records
+  callback reachability only: real OAuth `code`/`state` acceptance, Identity acceptance, client
+  enablement, production admission, and release approval remain unclaimed.
+- Readiness: canonical-domain evidence collection `2/2`; acceptance for this blocker `0/1`
+  pending its canonical acceptance record; production admission `0/1`; Identity conformance
+  `16/23` (`69.6%`).
+- Evidence: `reports/reviews/academy-canonical-domain-deployment-receipt-20260823.json`,
+  `reports/reviews/academy-canonical-domain-callback-probe-receipt-20260823.json`,
+  `reports/reviews/academy-canonical-domain-deployment-evidence-submission-20260823.json`, and
+  `reports/reviews/academy-canonical-domain-visual-review-20260823.json`.
+
+## 2026-08-23 - Public waitlist client validation and responsive quality closed locally
+
+- Invalid or overlong email is rejected before network; valid input is normalized, field and
+  consent errors are adjacent/focusable, and accepted, rejected-envelope, timeout/abort, and
+  response-body transport outcomes remain distinct.
+- The public course preview retains two desktop columns and fits the agreed Pixel 7 viewport
+  without horizontal overflow.
+- Verification passes focused `51/51`, full unit `2,044/2,044`, TypeScript, scoped ESLint, build
+  `65/65`, public Chromium `59 passed / 1 intentional skip / 0 failed`, real byte-stream `2/2`,
+  independent implementation review, Terra visual review, and Sol final `C0/H0/M0/L0`.
+- Production admission remains `0/1`; Identity conformance remains `16/23`. Evidence:
+  `reports/reviews/academy-waitlist-client-validation-local-checkpoint-20260823.md`.
+
+## 2026-08-23 - Production-admission evidence contract closed locally
+
+- Added a strict, unwired evaluator that binds eight release artifacts to one candidate and returns
+  at most `admissible_for_authorized_operation`; real artifact verification and authorization stay
+  with the future production operation.
+- TDD RED caught cross-layer artifact reuse. Focused 29/29, related Identity 76/76, full unit
+  2,041/2,041, TypeScript, scoped ESLint, diff, scope scan, exact freeze, and independent
+  `C0/H0/M0` review pass.
+- Production admission remains 0/1 and Identity conformance remains 16/23. The open external gate
+  is an owner-authorized operation with the eight real, verified artifacts.
+- Evidence: `reports/reviews/academy-production-admission-evidence-contract-local-checkpoint-20260823.md`.
+
+## 2026-08-23 - Learner-journey alert-route rehearsal closed locally
+
+- Added a disabled pure alert projection with symbolic primary/escalation routes, deterministic
+  deduplication, bounded retry outcomes, terminal states, rollback, redaction, strict validation,
+  and deep-frozen output. No network, storage, runtime, secret, deploy, or production wiring exists.
+- TDD and closure pass focused `10/10`, related `41/41`, full unit `2,012/2,012`, TypeScript,
+  scoped ESLint, diff, static scope, and independent strict RIL with no findings.
+- Local observability evidence is now `5/5`; production admission remains `0/1` until live
+  operator-owned delivery, rollback, deployment, and release evidence exist.
+- Evidence: `reports/reviews/academy-learner-journey-alert-rehearsal-closure-local-checkpoint-20260823.md`.
+
+## 2026-08-23 - Learner-journey SLO and error-budget contract closed locally
+
+- Added an unwired, local-only evaluator for the six canonical learner checkpoints with strict
+  policy/aggregate validation, integer ceiling arithmetic, bounded counts, status priority, and
+  deeply frozen canonical output. No telemetry, network, storage, runtime, deploy, or production
+  route was added.
+- TDD and closure verification pass focused `11/11`, related `31/31`, full unit `2,002/2,002`,
+  TypeScript, scoped ESLint, diff, and scope scans. Independent strict RIL passed with no findings.
+- Observability evidence advances from `2/5` to `4/5`: privacy-safe events, synthetic readiness,
+  consolidated SLO, and error-budget policy are accepted locally. Alert-route rehearsal remains
+  open; production admission remains `0/1` because no live operator or deployed evidence exists.
+- Evidence: `reports/reviews/academy-learner-journey-slo-local-checkpoint-20260823.md`.
+
 ## 2026-08-14 - Signed-result runtime composition prepared locally
 
 - Added a least-capability result-verifier port and composed it into the production-disabled

@@ -1,0 +1,76 @@
+{
+  "schema": "academy.provider-call-log.v1",
+  "checkpoint": "learner-journey-alert-route-local-rehearsal",
+  "efficiency_protocol": "efficiency_protocol_v1",
+  "pre_provider_events": [
+    { "classification": "E_MANIFEST", "provider_started": false, "cause": "unsupported deterministic_verifier manifest key" },
+    { "classification": "tool_policy_rejection", "provider_started": false, "cause": "disallowed cleanup command before process launch" }
+  ],
+  "calls": [
+    {
+      "attempt_id": "academy-learner-alert-rehearsal-glm-author-1",
+      "role": "author",
+      "provider": "z.ai",
+      "model": "glm-5.3",
+      "effort": null,
+      "prompt_path": "reports/reviews/academy-learner-journey-alert-rehearsal-glm-author-provider-prompt-20260823.txt",
+      "prompt_sha256": "88596b17aff3892967f2c60f70683d9938d52943b161566329c363da01a0ad84",
+      "provider_started_at": "2026-08-22T18:31:02.423Z",
+      "first_activity_at": "2026-08-22T18:31:02.524Z",
+      "provider_finished_at": "2026-08-22T18:46:02.669Z",
+      "working": false,
+      "success": null,
+      "outcome": "provider_timeout",
+      "failure_code": "E_TIMEOUT",
+      "duration_ms": 900246
+    },
+    {
+      "attempt_id": "academy-learner-alert-rehearsal-glm-author-2",
+      "role": "author",
+      "provider": "z.ai",
+      "model": "glm-5.3",
+      "effort": null,
+      "prompt_path": "reports/reviews/academy-learner-journey-alert-rehearsal-glm-author-retry-prompt-20260823.txt",
+      "prompt_sha256": "32a2576ba0d21f3ec021d1288be9ad5ea1c0477c73e53caf22597c0403b88bc8",
+      "provider_started_at": "2026-08-22T18:47:58.908Z",
+      "first_activity_at": "2026-08-22T18:47:59.010Z",
+      "provider_finished_at": "2026-08-22T19:00:38.608Z",
+      "run_id": "run-KR9WPh",
+      "working": true,
+      "success": true,
+      "outcome": "usable_result",
+      "duration_ms": 759700,
+      "patch_sha256": "cbd2d534052c7688420c7a5b3c56e1d62971692cb5531a0e092e33ade6f30c5b"
+    },
+    {
+      "attempt_id": "academy-learner-alert-rehearsal-glm-ril-review-1",
+      "role": "review",
+      "provider": "z.ai",
+      "model": "glm-5.3",
+      "effort": null,
+      "prompt_path": "reports/reviews/academy-learner-journey-alert-rehearsal-glm-ril-prompt-20260823.txt",
+      "prompt_sha256": "7746748250de35b2460a3d5a097af7a5309410a15762bb6c96d552986ac9b14e",
+      "provider_started_at": "2026-08-22T19:03:41.423Z",
+      "first_activity_at": "2026-08-22T19:03:41.524Z",
+      "provider_finished_at": "2026-08-22T19:05:29.857Z",
+      "working": true,
+      "success": false,
+      "outcome": "child_receipt_unusable",
+      "failure_code": "E_PROVIDER_RESULT_SCHEMA",
+      "duration_ms": 108434
+    }
+  ],
+  "efficiency_comparison": {
+    "author_attempts": 2,
+    "first_attempt_result": "timeout",
+    "protocol_attempt_result": "usable_patch",
+    "protocol_author_duration_ms": 759700,
+    "ril_attempts": 1,
+    "ril_result": "schema_error"
+  },
+  "observer": {
+    "ledger": "artifacts/.private-model-team/model-call-observer-20260822/calls.jsonl",
+    "reconciled_calls": "3/3",
+    "audit_status": "ok"
+  }
+}
