@@ -4,6 +4,16 @@
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
 > **Last updated:** 2026-08-23
 
+**No-traffic current-source candidate uploaded (2026-08-23):** Exact source revision
+`be72bd4978b616bcd8d782dfc80106ab27780f67` is now Cloudflare Worker Version
+`61fd7863-1152-49c3-acd3-bc4fd27db64e`. The bounded operation used the reviewed strict deployment
+parser and proved the current deployment projection byte-identical before/after; the new version is
+not in that deployment and receives `0%` production traffic. This supplies candidate-version
+evidence only: no deployed-current-candidate smoke, operator receipt, rollback rehearsal, real OAuth
+`code`/`state` acceptance, Identity enablement, or production authority was created. Production
+admission remains `0/1`; Identity conformance remains `16/23` (`69.6%`). Evidence:
+`reports/reviews/academy-no-traffic-candidate-upload-receipt-20260823.json`.
+
 **Canonical-domain and authenticated callback evidence (valid submission; canonical acceptance record pending, 2026-08-23):**
 The deployed `cyberskills-academy` Worker now has source-bound canonical-domain evidence for
 `academy.cyberskills.co.th`: DNS and unauthenticated requests reach the Cloudflare Access gate,

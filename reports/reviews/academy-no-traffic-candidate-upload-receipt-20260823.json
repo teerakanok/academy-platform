@@ -1,0 +1,134 @@
+{
+  "schema": "academy-no-traffic-candidate-upload-receipt.v1",
+  "capturedAt": "2026-08-23T16:06:49Z",
+  "outcome": "uploaded_candidate_version_without_deployment",
+  "workOrder": {
+    "schema": "academy-no-traffic-upload-work-order.v1",
+    "sha256": "ba0607b93bad71bae28a93eabad5b3e00a92bc69768e4051df3863dfca47a943",
+    "bytes": 3493
+  },
+  "target": {
+    "provider": "Cloudflare Workers",
+    "workerName": "cyberskills-academy",
+    "operation": "wrangler versions upload"
+  },
+  "source": {
+    "revision": "be72bd4978b616bcd8d782dfc80106ab27780f67",
+    "originMainRevision": "be72bd4978b616bcd8d782dfc80106ab27780f67",
+    "gitTreeObjectId": "af65e1b3999cb719437218b6ac1b93f6d1129f06",
+    "gitTreeListingSha256": "924996c6b0b4a2834af372b0d4e3a4819aaf2ab702fac57be6d521b19f5f4b2c",
+    "gitArchiveSha256": "bf3055eaaedf4b2940e694ac8307791968f1d88a83cf99d02336a02f050bb22d",
+    "packageLockSha256": "3d5385398d9d6d021048cfae70924babee29a03c128333e57a4cac6914ac882b",
+    "detachedDisposableWorktree": true,
+    "trackedWorktreeCleanAfterBuildAndUpload": true,
+    "ignoredLocalEnvFilesPresent": false
+  },
+  "toolchain": {
+    "node": "24.18.0",
+    "wrangler": "4.120.0",
+    "lockfileVersion": 3
+  },
+  "localPreparation": {
+    "install": {
+      "command": "npm ci",
+      "exitCode": 0,
+      "elapsedMs": 16675,
+      "stdoutAndStderrSha256": "92c85b0414f51c0eefe053e911cc9acdaf66116721d2c2f9a07de3f7510422be"
+    },
+    "build": {
+      "command": "npm run build:cf",
+      "exitCode": 0,
+      "elapsedMs": 61684,
+      "stdoutSha256": "a5eaeb90bea6a47434da8df270bd10bf1a6742008ee545ad8c92d1963020965b",
+      "stderrSha256": "d98b4f900f1b0d6ff5eac172ac04b74720439040e7a7a3b9c89d9de85de42587"
+    }
+  },
+  "upload": {
+    "command": "./node_modules/.bin/wrangler versions upload --keep-vars --strict --experimental-provision=false --experimental-auto-create=false --install-skills=false",
+    "attemptCount": 1,
+    "exitCode": 0,
+    "elapsedMs": 19239,
+    "timedOut": false,
+    "authOrLoginFlowDetected": false,
+    "exactlyOneAttributableNewVersion": true,
+    "uploadOutputIdentifiesNewVersion": true,
+    "version": {
+      "id": "61fd7863-1152-49c3-acd3-bc4fd27db64e",
+      "createdOn": "2026-08-23T16:04:30.360436Z",
+      "source": "wrangler"
+    }
+  },
+  "deploymentVerification": {
+    "parser": "academy-web/scripts/current-deployment.mjs",
+    "beforeProjectionSha256": "e079c0af3b43d909c47573537738df83226a99f715cfe15d2a6300d6d80f76a7",
+    "afterProjectionSha256": "e079c0af3b43d909c47573537738df83226a99f715cfe15d2a6300d6d80f76a7",
+    "projectionsByteIdentical": true,
+    "currentDeployment": {
+      "id": "ef66dfc4-92dc-4b9f-bc63-708c30e1cff1",
+      "createdOn": "2026-08-23T06:54:35.205192Z",
+      "versions": [
+        {
+          "id": "c8b36c74-e76a-412b-9a63-3702cb838e07",
+          "percentage": 100
+        }
+      ]
+    },
+    "uploadedVersionPresentInCurrentDeployment": false,
+    "uploadedVersionProductionTrafficPercentage": 0
+  },
+  "privateEvidence": {
+    "root": "/private/tmp/academy-production-admission-upload-20260823/no-traffic-upload",
+    "allProviderOutputFilesMode0600": true,
+    "rawProviderOutputPublished": false,
+    "files": [
+      {
+        "name": "deployments-before.raw.json",
+        "sha256": "ee8bd6ef2a3fe85b89a9d97ba3163d40687b2615606f76f172bc29247f3720c6"
+      },
+      {
+        "name": "deployments-after.raw.json",
+        "sha256": "ee8bd6ef2a3fe85b89a9d97ba3163d40687b2615606f76f172bc29247f3720c6"
+      },
+      {
+        "name": "versions-before.raw.json",
+        "sha256": "0060d04435d26a7975d3885184a9d4196852da4093c57e3273d16b55ba328d17"
+      },
+      {
+        "name": "versions-after.raw.json",
+        "sha256": "78550e502a188799288cd4084f6d881a7c15b9f6b1e9ff47d0023fddf3bdbe94"
+      },
+      {
+        "name": "upload.stdout.log",
+        "sha256": "5a4c41a7ac879f78e555bf50da4bb4c5f7fc666f8cb3018a8d85dd6e5146225d"
+      },
+      {
+        "name": "upload.stderr.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  },
+  "scope": {
+    "remoteMutationCount": 1,
+    "candidateOnly": true,
+    "servedByCurrentDeployment": false,
+    "productionAdmissionClaim": false,
+    "releaseApprovalClaim": false,
+    "trafficMutation": false,
+    "deploymentMutation": false,
+    "identityOrOAuthMutation": false,
+    "dnsMutation": false,
+    "poolAMutation": false,
+    "secretMutation": false,
+    "variableMutation": false,
+    "protectedVaultMutation": false,
+    "billingMutation": false,
+    "accessControlMutation": false
+  },
+  "executionSafety": {
+    "boundedForegroundCommands": true,
+    "providerLoginInitiated": false,
+    "credentialRequested": false,
+    "blindRetryPerformed": false,
+    "targetedProviderProcessesRemaining": false
+  }
+}

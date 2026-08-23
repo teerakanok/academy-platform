@@ -3,6 +3,20 @@
 > Closed items only, with outcome + evidence + residual risk. Newest first.
 > Provider-neutral. See `active_plan.md` for open work.
 
+## 2026-08-23 - Current source uploaded as an unserved Worker Version
+
+- Built exact pushed source `be72bd4978b616bcd8d782dfc80106ab27780f67` under the supported Node
+  24 runtime and uploaded one Worker Version: `61fd7863-1152-49c3-acd3-bc4fd27db64e`.
+- The operation made one candidate-only remote mutation. The strict parser proved current deployment
+  projections byte-identical before/after, and the new version is absent from the deployment with
+  `0%` production traffic.
+- Sol receipt audit rebound the source, six private evidence hashes/modes, upload result, and all
+  negative scope flags. No login, blind retry, traffic/deployment, variable/secret, Identity/OAuth,
+  DNS, Pool A, Access, billing, or protected-vault mutation occurred.
+- This is version evidence, not production admission. Admission remains `0/1`; Identity conformance
+  remains `16/23` (`69.6%`). Evidence:
+  `reports/reviews/academy-no-traffic-candidate-upload-receipt-20260823.json`.
+
 ## 2026-08-23 - Strict current-deployment parser closed locally
 
 - Added a dependency-free operations parser that selects the newest Wrangler deployment by strict
