@@ -1,0 +1,52 @@
+{
+  "schema": "academy-production-admission-candidate.ril/v1",
+  "reviewedAt": "2026-08-23T14:08:34Z",
+  "reviewerRole": "independent-implementation-reviewer",
+  "reviewScope": {
+    "path": "reports/reviews/academy-production-admission-candidate-ril-freeze-20260823.json",
+    "fileCount": 17,
+    "sourceSha256": "1194a9a8b8f8b047fe9a002f68b95f52c36ed3573519c65c47c7f9b3b936fa95",
+    "manifestBytesSha256": "1194a9a8b8f8b047fe9a002f68b95f52c36ed3573519c65c47c7f9b3b936fa95"
+  },
+  "providerEvidence": {
+    "runtime": "glm",
+    "observedModel": "glm-5.3",
+    "observedEffort": null,
+    "providerResultSha256": "78ed233ce0a3a16c783853591efdf9fa79026e38333861d2292f5a989ecc843a",
+    "sourceMutatedDuringReview": false
+  },
+  "verdict": "PASS",
+  "findingCounts": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "info": 4
+  },
+  "summary": "The strict evaluator, candidate preparation receipts, hash bindings, dry-run, visual provenance, and baseline-only smoke/rollback distinctions are internally consistent. No Critical, High, or Medium defect invalidates the evidence, and all unavailable production facts remain explicitly non-claiming.",
+  "findings": [
+    {
+      "severity": "info",
+      "message": "The eight-gate evaluator is fail-closed and snapshot-isolated, including exact schemas, ordering, candidate matching, path safety, digest validation, migration ordering, and non-admission behavior."
+    },
+    {
+      "severity": "info",
+      "message": "Candidate source and migration records cross-check with the frozen artifacts; runtime projection omits secret values and records dry-run behavior without traffic, binding, or secret mutation."
+    },
+    {
+      "severity": "info",
+      "message": "Deployed smoke is explicitly baseline-only and rollback is explicitly preflight-only; pending operator acknowledgement, candidate deployment, rollback rehearsal, OAuth acceptance, Identity acceptance, release approval, and admission are accurately recorded as unproven."
+    },
+    {
+      "severity": "info",
+      "message": "The existing JPEG-byte/.png-path discrepancy is disclosed; the visual claims are limited to path, hash, dimensions, and visible content rather than PNG encoding."
+    }
+  ],
+  "scopeBoundary": {
+    "productionAdmissionClaim": false,
+    "identityAcceptanceClaim": false,
+    "realOAuthCodeStateAcceptanceClaim": false,
+    "productionMutation": false,
+    "secretDisclosure": false
+  }
+}

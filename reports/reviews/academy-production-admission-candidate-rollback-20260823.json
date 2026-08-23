@@ -1,0 +1,33 @@
+{
+  "schema": "academy-production-admission-candidate-rollback-preflight/v1",
+  "candidateId": "academy-production-admission-20260823-14507463",
+  "capturedAt": "2026-08-23T13:52:18Z",
+  "status": "preflight-only-not-rehearsed",
+  "readOnlyVerification": {
+    "command": "wrangler versions list --name cyberskills-academy --json",
+    "result": "passed",
+    "timedOut": false,
+    "processClean": true,
+    "currentVersionPresent": "c8b36c74-e76a-412b-9a63-3702cb838e07",
+    "rollbackVersionPresent": "b85b7a6d-ceaa-4708-81fd-0d8096462251"
+  },
+  "recoveryPlan": {
+    "currentDeploymentId": "ef66dfc4-92dc-4b9f-bc63-708c30e1cff1",
+    "currentVersionId": "c8b36c74-e76a-412b-9a63-3702cb838e07",
+    "rollbackTargetVersionId": "b85b7a6d-ceaa-4708-81fd-0d8096462251",
+    "triggerConditions": ["deployment failure", "binding drift", "traffic drift", "TLS failure", "unexpected probe status"],
+    "requiresAuthorizedOperator": true
+  },
+  "candidateBinding": {
+    "candidateDeployed": false,
+    "rollbackExerciseWouldChangeLiveTraffic": true,
+    "rehearsalExecuted": false,
+    "rehearsalCountsAsAcceptedGate": false
+  },
+  "scopeBoundary": {
+    "versionCreated": false,
+    "trafficMutated": false,
+    "rollbackExecuted": false,
+    "operatorAcknowledgementClaimed": false
+  }
+}

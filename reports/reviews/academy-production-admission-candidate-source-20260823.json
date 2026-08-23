@@ -1,0 +1,35 @@
+{
+  "schema": "academy-production-admission-candidate-source/v1",
+  "candidateId": "academy-production-admission-20260823-14507463",
+  "capturedAt": "2026-08-23T13:52:18Z",
+  "status": "prepared",
+  "source": {
+    "gitRevision": "14507463b7a7333e3797de65a7a0bee12ca2c929",
+    "repositoryTreeObject": "778f72685ae2522fa49369e97da055a9d79b3c3a",
+    "repositoryTrackedListingSha256": "222a475f01bbd38b3fb6109d962d6ff5ec0e3757a8cf581cc516d4f0cd4c1c56",
+    "academyWebTreeObject": "69b5d20fff49f9510bce08709bf4f2e4a852a544",
+    "academyWebTrackedListingSha256": "b6236893dbdc6f4d8c449a7f2e58f495011c4307fe48a4c2fb1a0f6869de7453",
+    "isolatedWorktree": true,
+    "isolatedWorktreeTrackedChanges": false
+  },
+  "verification": {
+    "nodeVersion": "v24.18.0",
+    "focusedAdmissionEvaluator": {
+      "command": "cd academy-web && npx vitest run --project unit tests/unit/production-admission-evidence.test.ts",
+      "result": "passed",
+      "testsPassed": 29,
+      "testsFailed": 0
+    },
+    "cloudflareBuild": {
+      "command": "cd academy-web && npm run build:cf",
+      "result": "passed",
+      "renderedRoutes": 65,
+      "sourceWorktree": "isolated-detached-candidate"
+    }
+  },
+  "scopeBoundary": {
+    "mainWorktreeUsedForCandidateSource": false,
+    "unrelatedDirtyWorktreeContentIncluded": false,
+    "runtimeOrProductionMutation": false
+  }
+}

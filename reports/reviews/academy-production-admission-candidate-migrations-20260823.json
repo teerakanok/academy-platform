@@ -1,0 +1,47 @@
+{
+  "schema": "academy-production-admission-candidate-migrations/v1",
+  "candidateId": "academy-production-admission-20260823-14507463",
+  "capturedAt": "2026-08-23T13:52:18Z",
+  "status": "prepared",
+  "sourceRevision": "14507463b7a7333e3797de65a7a0bee12ca2c929",
+  "migrationDirectory": "academy-web/supabase/migrations",
+  "migrationTrackedListingSha256": "ddb66985ab4d3c5ea8f3801eb497bad4d7d84d1648ad6b39bae14f7c09d459d0",
+  "entries": [
+    { "migrationId": "0001_academy_schema", "artifactPath": "academy-web/supabase/migrations/0001_academy_schema.sql", "artifactSha256": "4c66672568407e4aa2df7df7d37c8ed4dc3c6c5a8581239eff7a88cb1b5b7438", "bytes": 3698 },
+    { "migrationId": "0002_accounts_and_progress", "artifactPath": "academy-web/supabase/migrations/0002_accounts_and_progress.sql", "artifactSha256": "fd03392b101e5fbc515d74798cfbb0a42a3bbd92afb26b62644c44556ed3b053", "bytes": 6307 },
+    { "migrationId": "0003_record_node_progress", "artifactPath": "academy-web/supabase/migrations/0003_record_node_progress.sql", "artifactSha256": "036337330b7f364669046640baafd75b22a105f78c1ac73b6059fdaa1bf5c3e1", "bytes": 3964 },
+    { "migrationId": "0004_activation_and_entitlement", "artifactPath": "academy-web/supabase/migrations/0004_activation_and_entitlement.sql", "artifactSha256": "209b856ff1041c436db751082807110670cd28f1abecff385ed76b312153bd7a", "bytes": 5076 },
+    { "migrationId": "0005_attempt", "artifactPath": "academy-web/supabase/migrations/0005_attempt.sql", "artifactSha256": "c663ec2b5663f6f2d34760b20c3bed3276656159cebdf7c01af29714d88176b5", "bytes": 10502 },
+    { "migrationId": "0006_simulation_evidence", "artifactPath": "academy-web/supabase/migrations/0006_simulation_evidence.sql", "artifactSha256": "4fabc18161e6d60552bc6e26450f14a526be1a674630cb6b7564e57570b6fe4b", "bytes": 4110 },
+    { "migrationId": "0007_evidence_never_regresses", "artifactPath": "academy-web/supabase/migrations/0007_evidence_never_regresses.sql", "artifactSha256": "96c33a178ee2f3e3aa88f884fafecd105ed3ac9b3056f1c81ca2060c54962dfc", "bytes": 5552 },
+    { "migrationId": "0008_passing_attempt", "artifactPath": "academy-web/supabase/migrations/0008_passing_attempt.sql", "artifactSha256": "b320481ee91f32f2d3da4747c49d5c8b5326846707c80ab89d0edfdcfe73ad18", "bytes": 7134 },
+    { "migrationId": "0009_attempt_finalize", "artifactPath": "academy-web/supabase/migrations/0009_attempt_finalize.sql", "artifactSha256": "ea0526ab65c84f9b0daf8f7a481f1789614d10cc5f3a7683e13a2269c3f4ab88", "bytes": 9232 },
+    { "migrationId": "0010_reuse_active_attempt", "artifactPath": "academy-web/supabase/migrations/0010_reuse_active_attempt.sql", "artifactSha256": "28f5136cf075cf575343932337e4748e9138c44dcd73e2915db046702dd302d2", "bytes": 6584 },
+    { "migrationId": "0011_attempt_retention", "artifactPath": "academy-web/supabase/migrations/0011_attempt_retention.sql", "artifactSha256": "6415fe9bdb4821d8b8427b3e5716201e2a6d393c01ac96b35c67f475cf5f70cf", "bytes": 4797 },
+    { "migrationId": "0012_attempt_integrity_fixes", "artifactPath": "academy-web/supabase/migrations/0012_attempt_integrity_fixes.sql", "artifactSha256": "f19975f5181e4346f154e4bd0d8edeff46fbf8517bab6237f9e7ad983f907b02", "bytes": 11399 },
+    { "migrationId": "0013_integrity_batch", "artifactPath": "academy-web/supabase/migrations/0013_integrity_batch.sql", "artifactSha256": "3af60f3cb06baf484b2eb01ac10e6be3c8389ae3f69801d99f55251cdf8dab63", "bytes": 16826 },
+    { "migrationId": "0014_simulation_readiness", "artifactPath": "academy-web/supabase/migrations/0014_simulation_readiness.sql", "artifactSha256": "053f557c82d9e165606424d9db8791aa684c29063b6aa891dee592b2e333e024", "bytes": 1510 },
+    { "migrationId": "0015_idempotent_progress_reset", "artifactPath": "academy-web/supabase/migrations/0015_idempotent_progress_reset.sql", "artifactSha256": "890b6d46e96e6df5ad155a2e36a77f4172b90964c42e33cd4bc162f21c81abec", "bytes": 4530 },
+    { "migrationId": "0016_consent_events_v2", "artifactPath": "academy-web/supabase/migrations/0016_consent_events_v2.sql", "artifactSha256": "f3436264abdcf5868d8b3e397cc937c95cb8cf5635b987f583f4e5395b7205cd", "bytes": 2842 },
+    { "migrationId": "0017_privacy_retention_and_appeals", "artifactPath": "academy-web/supabase/migrations/0017_privacy_retention_and_appeals.sql", "artifactSha256": "845539c985955714951b3d8053e93f64deeb686a076a5ac43b0483fb46fd7533", "bytes": 18502 },
+    { "migrationId": "0018_staff_authorization", "artifactPath": "academy-web/supabase/migrations/0018_staff_authorization.sql", "artifactSha256": "d5cf794ff6a3c796fb7577e4bac92d987a2722ff64b8899721e92712b40f0aa7", "bytes": 9455 },
+    { "migrationId": "0019_dedicated_runtime_api", "artifactPath": "academy-web/supabase/migrations/0019_dedicated_runtime_api.sql", "artifactSha256": "725edc351e8b62c2a3d5df56c9e014cf7b4ea86c7eadcc59302a5876ec76afac", "bytes": 4132 },
+    { "migrationId": "0020_dedicated_retention_api", "artifactPath": "academy-web/supabase/migrations/0020_dedicated_retention_api.sql", "artifactSha256": "8ed7065bf25906746fb31b52ab022f5c3c4f03151d31b8d8787f6981dcf96256", "bytes": 5207 },
+    { "migrationId": "0021_unlink_email_derived_lead_ownership", "artifactPath": "academy-web/supabase/migrations/0021_unlink_email_derived_lead_ownership.sql", "artifactSha256": "add7fb419f608925afe2e87c78d6d6297153a12a4f34be793921abdbeced4805", "bytes": 574 },
+    { "migrationId": "0022_identity_lifecycle_projection", "artifactPath": "academy-web/supabase/migrations/0022_identity_lifecycle_projection.sql", "artifactSha256": "df3e746d5c3863a626c93993730ffec0c805a9d4b63f32883745592037edd8e0", "bytes": 19625 },
+    { "migrationId": "0023_identity_lifecycle_pull_lease", "artifactPath": "academy-web/supabase/migrations/0023_identity_lifecycle_pull_lease.sql", "artifactSha256": "eff6bf92af29569cfac15201184a17f5cc201d8092a783866a0d973c3087f5c1", "bytes": 9094 },
+    { "migrationId": "0024_identity_profile_activation", "artifactPath": "academy-web/supabase/migrations/0024_identity_profile_activation.sql", "artifactSha256": "f0322b64ab270dec8d73e663f0cc2017c0c91df0a558488bb70aa32232fa7cab", "bytes": 2372 },
+    { "migrationId": "0025_identity_authorization_transaction", "artifactPath": "academy-web/supabase/migrations/0025_identity_authorization_transaction.sql", "artifactSha256": "14934b499d3cb1a27751c8e3552577b0aa5c55bd8c649e5f67187cea1155e94d", "bytes": 9959 },
+    { "migrationId": "0026_identity_lifecycle_principal_contract", "artifactPath": "academy-web/supabase/migrations/0026_identity_lifecycle_principal_contract.sql", "artifactSha256": "5739f1257fa5a18419b8296236dc17f04d21e11ee491da1e85cca90d2f4beaf4", "bytes": 2445 },
+    { "migrationId": "0027_identity_session_store", "artifactPath": "academy-web/supabase/migrations/0027_identity_session_store.sql", "artifactSha256": "48d916aa5ae8cac47c800d116ae1c9780580940788f4804c2208fc9f52583fe0", "bytes": 7801 }
+  ],
+  "verification": {
+    "ordered": true,
+    "count": 27,
+    "command": "git ls-tree -r -z 14507463b7a7333e3797de65a7a0bee12ca2c929 -- academy-web/supabase/migrations | shasum -a 256"
+  },
+  "scopeBoundary": {
+    "migrationExecution": false,
+    "databaseMutation": false
+  }
+}

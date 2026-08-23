@@ -1,0 +1,67 @@
+{
+  "schema": "academy-production-admission-candidate-runtime/v1",
+  "candidateId": "academy-production-admission-20260823-14507463",
+  "capturedAt": "2026-08-23T13:52:18Z",
+  "status": "prepared-not-deployed",
+  "candidateSourceRevision": "14507463b7a7333e3797de65a7a0bee12ca2c929",
+  "runtimeConfigProjection": {
+    "path": "academy-web/wrangler.jsonc",
+    "sha256": "587d21b4720980b18f2573b9ae3f3a45595aade0ac4f2504ed7564841cacdc53",
+    "workerName": "cyberskills-academy",
+    "minify": true,
+    "compatibilityDate": "2025-03-25",
+    "compatibilityFlags": ["nodejs_compat", "global_fetch_strictly_public"],
+    "assetBinding": "ASSETS",
+    "durableObjectBinding": "EDGE_RATE_LIMITER",
+    "r2Binding": "COURSE_MEDIA",
+    "publicSearchIndexing": "off",
+    "secretValuesRead": false
+  },
+  "candidateBuild": {
+    "nodeVersion": "v24.18.0",
+    "command": "cd academy-web && npm run build:cf",
+    "result": "passed",
+    "renderedRoutes": 65,
+    "openNextTreeSha256": "f39cd58e4d41f22a8a854dbedb40cbba3534583d2f53aed7f3a21afff2ab4d8d",
+    "openNextFileCount": 1931,
+    "openNextTotalBytes": 54502318,
+    "workerEntrypointBytes": 2278,
+    "workerEntrypointGzipBytes": 732
+  },
+  "strictDryRun": {
+    "command": "wrangler deploy --dry-run --autoconfig=false --keep-vars",
+    "result": "passed",
+    "timedOut": false,
+    "processClean": true,
+    "totalUploadKiB": 12495.32,
+    "gzipKiB": 2905.1,
+    "planLimitRejected": false,
+    "stdoutSha256": "a7ea5d0ff71d3885fd86fa3572c88fc36afe79d76cc12953df31b4b54a9976ab",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "readOnlyRemoteInventory": {
+    "command": "wrangler deployments list --name cyberskills-academy --json; wrangler versions list --name cyberskills-academy --json",
+    "result": "passed",
+    "timedOut": false,
+    "processClean": true,
+    "currentDeploymentId": "ef66dfc4-92dc-4b9f-bc63-708c30e1cff1",
+    "currentVersionId": "c8b36c74-e76a-412b-9a63-3702cb838e07",
+    "currentTrafficPercentage": 100,
+    "rollbackVersionPresent": "b85b7a6d-ceaa-4708-81fd-0d8096462251",
+    "bindingsObservedByPriorReceipt": 8
+  },
+  "candidateDeploymentBinding": {
+    "candidateDeployed": false,
+    "deployedRuntimeSourceRevision": "e933a34c126b6a6fd6008951952d0c62796df2a4",
+    "sourceRevisionMatchesCandidate": false,
+    "baselineReceiptPath": "reports/reviews/academy-worker-minified-deployment-receipt-20260823.json",
+    "baselineReceiptSha256": "ed833f7923d65f21d7594bce6277fa01615c49f7197c3c49c4682a84694c93ca"
+  },
+  "scopeBoundary": {
+    "versionCreated": false,
+    "trafficMutated": false,
+    "bindingMutated": false,
+    "secretOrVariableValueRead": false,
+    "customDomainOrAccessMutated": false
+  }
+}

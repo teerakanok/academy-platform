@@ -1,0 +1,71 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "plans/active_plan.md",
+      "sha256": "1da8a72363170c5428bcc62977b7afbd8b7613796c467ded7198c8d303251c53",
+      "bytes": 249481
+    },
+    {
+      "path": "plans/completed_log.md",
+      "sha256": "974743d1b54f7c120c267a377dab04dc4dad1211e983777a19c779bae5eeee81",
+      "bytes": 168663
+    },
+    {
+      "path": "reports/reviews/academy-production-admission-candidate-freeze-20260823.json",
+      "sha256": "c065afb6e35c5df6c4bc786e941141bee8d13c6a8bbeb55e288c83b0d76c2524",
+      "bytes": 9445
+    },
+    {
+      "path": "reports/reviews/academy-production-admission-candidate-glm-ril-final-20260823.json",
+      "sha256": "69d4b56e1c7897275d7f043f4d5012008a455f67a5eeb48561eab4d393b0adab",
+      "bytes": 2460
+    },
+    {
+      "path": "reports/reviews/academy-production-admission-candidate-migrations-20260823.json",
+      "sha256": "3d4005aa6a0c55d6ceb38c6b5c0b4dda25a08d996ab9b79a86ce01612333b053",
+      "bytes": 7176
+    },
+    {
+      "path": "reports/reviews/academy-production-admission-candidate-preparation-20260823.json",
+      "sha256": "2f98ea560a491c8fde604a1d4f891a317acf578ddf3dec0f7a55c26e1bb46f19",
+      "bytes": 3948
+    },
+    {
+      "path": "reports/reviews/academy-production-admission-candidate-preparation-freeze-20260823.json",
+      "sha256": "3502527f256acb81f591d151fda820e177e3ed73d07fde2ce41affd230b4870c",
+      "bytes": 672
+    },
+    {
+      "path": "reports/reviews/academy-production-admission-candidate-ril-freeze-20260823.json",
+      "sha256": "1194a9a8b8f8b047fe9a002f68b95f52c36ed3573519c65c47c7f9b3b936fa95",
+      "bytes": 3541
+    },
+    {
+      "path": "reports/reviews/academy-production-admission-candidate-rollback-20260823.json",
+      "sha256": "7506d61428e14f3e4bf073723c2b2edd32bfc2a63237a53eadf87677b0f7ff2c",
+      "bytes": 1287
+    },
+    {
+      "path": "reports/reviews/academy-production-admission-candidate-runtime-20260823.json",
+      "sha256": "40ec3ed7d02273ff39c000cd26f0c1b8f07e5e403b90f9ff48fbd4ed002d5d93",
+      "bytes": 2741
+    },
+    {
+      "path": "reports/reviews/academy-production-admission-candidate-smoke-20260823.json",
+      "sha256": "49d19221bab94fb7e85b45760e26e2a9ea8650e45e311b0b8919bee3cf3165eb",
+      "bytes": 1922
+    },
+    {
+      "path": "reports/reviews/academy-production-admission-candidate-source-20260823.json",
+      "sha256": "4fbb104020da554528f3360baf93e3bd47ffb4e2649be3444471845a4b49a1e6",
+      "bytes": 1361
+    },
+    {
+      "path": "reports/reviews/academy-production-admission-candidate-visual-20260823.json",
+      "sha256": "cc5ff9ed3f80fe372eb9a4cc43de49864bea65e51627ecabdced08c09a2c0772",
+      "bytes": 2314
+    }
+  ]
+}

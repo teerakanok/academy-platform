@@ -1,0 +1,42 @@
+{
+  "schema": "academy-production-admission-candidate-deployed-smoke/v1",
+  "candidateId": "academy-production-admission-20260823-14507463",
+  "capturedAt": "2026-08-23T13:52:18Z",
+  "status": "baseline-observed-not-candidate-bound",
+  "candidateSourceRevision": "14507463b7a7333e3797de65a7a0bee12ca2c929",
+  "observedDeployment": {
+    "deploymentId": "ef66dfc4-92dc-4b9f-bc63-708c30e1cff1",
+    "versionId": "c8b36c74-e76a-412b-9a63-3702cb838e07",
+    "sourceRevision": "e933a34c126b6a6fd6008951952d0c62796df2a4",
+    "sourceRevisionMatchesCandidate": false
+  },
+  "probes": {
+    "canonicalUnauthenticated": [
+      { "path": "/", "httpStatus": 302, "tlsVerifyResult": 0, "accessGateObserved": true },
+      { "path": "/courses", "httpStatus": 302, "tlsVerifyResult": 0, "accessGateObserved": true },
+      { "path": "/auth/callback", "httpStatus": 302, "tlsVerifyResult": 0, "accessGateObserved": true }
+    ],
+    "workerPreview": [
+      { "path": "/", "httpStatus": 200, "tlsVerifyResult": 0, "responseBytes": 181862 },
+      { "path": "/courses", "httpStatus": 200, "tlsVerifyResult": 0, "responseBytes": 108067 },
+      {
+        "path": "/auth/callback",
+        "httpStatus": 400,
+        "tlsVerifyResult": 0,
+        "responseBytes": 119,
+        "responseSha256": "a381e4c3238fe2761f677c0cb6ef9060ecd5f77687e26b6b48a43b0d1318e225",
+        "exactNoParameterValidationMatched": true
+      }
+    ]
+  },
+  "meaning": {
+    "canonicalUnauthenticated": "Cloudflare Access protects the canonical routes before an unauthenticated request reaches the Worker.",
+    "workerPreview": "The existing deployed Worker renders root and courses and performs the exact no-parameter callback validation.",
+    "realOAuthCodeStateAcceptance": "not attempted and not claimed"
+  },
+  "scopeBoundary": {
+    "authenticatedBrowserSessionUsed": false,
+    "productionMutation": false,
+    "candidateDeploymentEvidence": false
+  }
+}

@@ -38,6 +38,16 @@ operation that supplies and verifies the real source, migrations, runtime projec
 named operator receipt, deployed smoke, rollback rehearsal, and freeze manifest. Evidence:
 `reports/reviews/academy-production-admission-evidence-contract-local-checkpoint-20260823.md`.
 
+**Current-candidate preparation (2026-08-23):** Candidate
+`14507463b7a7333e3797de65a7a0bee12ca2c929` has an isolated Node 24 build, a strict no-traffic
+Cloudflare dry-run, source and ordered migration inventories, a sanitized runtime projection, and a
+rechecked canonical visual index. The existing deployed Worker is deliberately recorded only as a
+baseline because it binds `e933a34c126b6a6fd6008951952d0c62796df2a4`, not this candidate. The
+available rollback version is likewise a read-only preflight, not a traffic-changing rehearsal.
+Operator acknowledgement/receipt and real OAuth `code`/`state` acceptance remain open. This is a
+truthful preparation record, not an accepted packet or production admission. Evidence:
+`reports/reviews/academy-production-admission-candidate-preparation-20260823.json`.
+
 **Client-assertion registration/rotation local rehearsal (accepted local checkpoint, 2026-08-23):**
 Academy now has one local-only rehearsal boundary that generates ephemeral P-256 keys in memory,
 derives collision-resistant key IDs from their public material, and drives Identity Control's

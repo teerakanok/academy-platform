@@ -1,0 +1,91 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/src/lib/identity/production-admission-evidence.ts",
+      "sha256": "432f8e112831b18e8137e10a75936f700e611421a08b7922b5b896dad895c36e",
+      "bytes": 7227
+    },
+    {
+      "path": "academy-web/tests/unit/production-admission-evidence.test.ts",
+      "sha256": "b32950aa72f98568dc639386f189d88b02d84e39792dc355399033177e0090aa",
+      "bytes": 6524
+    },
+    {
+      "path": "academy-web/wrangler.jsonc",
+      "sha256": "587d21b4720980b18f2573b9ae3f3a45595aade0ac4f2504ed7564841cacdc53",
+      "bytes": 1304
+    },
+    {
+      "path": "plans/active_plan.md",
+      "sha256": "1da8a72363170c5428bcc62977b7afbd8b7613796c467ded7198c8d303251c53",
+      "bytes": 249481
+    },
+    {
+      "path": "reports/reviews/academy-canonical-domain-callback-probe-receipt-20260823.json",
+      "sha256": "4dad9204cfaf7475e6194e0088964fc9801741d122241c906c2804efc36be405",
+      "bytes": 2372
+    },
+    {
+      "path": "reports/reviews/academy-canonical-domain-deployment-receipt-20260823.json",
+      "sha256": "c906bb257d97d9dc5c5f25a42e241215f3b61224e26c7aa39f0af042adf73041",
+      "bytes": 7943
+    },
+    {
+      "path": "reports/reviews/academy-canonical-domain-visual-review-20260823.json",
+      "sha256": "e52d044302b33b18ac9625d54d096620ffa12b1f954800cc2e7bc4e1027c1083",
+      "bytes": 2750
+    },
+    {
+      "path": "reports/reviews/academy-production-admission-candidate-freeze-20260823.json",
+      "sha256": "c065afb6e35c5df6c4bc786e941141bee8d13c6a8bbeb55e288c83b0d76c2524",
+      "bytes": 9445
+    },
+    {
+      "path": "reports/reviews/academy-production-admission-candidate-migrations-20260823.json",
+      "sha256": "3d4005aa6a0c55d6ceb38c6b5c0b4dda25a08d996ab9b79a86ce01612333b053",
+      "bytes": 7176
+    },
+    {
+      "path": "reports/reviews/academy-production-admission-candidate-preparation-20260823.json",
+      "sha256": "2f98ea560a491c8fde604a1d4f891a317acf578ddf3dec0f7a55c26e1bb46f19",
+      "bytes": 3948
+    },
+    {
+      "path": "reports/reviews/academy-production-admission-candidate-preparation-freeze-20260823.json",
+      "sha256": "3502527f256acb81f591d151fda820e177e3ed73d07fde2ce41affd230b4870c",
+      "bytes": 672
+    },
+    {
+      "path": "reports/reviews/academy-production-admission-candidate-rollback-20260823.json",
+      "sha256": "7506d61428e14f3e4bf073723c2b2edd32bfc2a63237a53eadf87677b0f7ff2c",
+      "bytes": 1287
+    },
+    {
+      "path": "reports/reviews/academy-production-admission-candidate-runtime-20260823.json",
+      "sha256": "40ec3ed7d02273ff39c000cd26f0c1b8f07e5e403b90f9ff48fbd4ed002d5d93",
+      "bytes": 2741
+    },
+    {
+      "path": "reports/reviews/academy-production-admission-candidate-smoke-20260823.json",
+      "sha256": "49d19221bab94fb7e85b45760e26e2a9ea8650e45e311b0b8919bee3cf3165eb",
+      "bytes": 1922
+    },
+    {
+      "path": "reports/reviews/academy-production-admission-candidate-source-20260823.json",
+      "sha256": "4fbb104020da554528f3360baf93e3bd47ffb4e2649be3444471845a4b49a1e6",
+      "bytes": 1361
+    },
+    {
+      "path": "reports/reviews/academy-production-admission-candidate-visual-20260823.json",
+      "sha256": "cc5ff9ed3f80fe372eb9a4cc43de49864bea65e51627ecabdced08c09a2c0772",
+      "bytes": 2314
+    },
+    {
+      "path": "reports/reviews/academy-worker-minified-deployment-receipt-20260823.json",
+      "sha256": "ed833f7923d65f21d7594bce6277fa01615c49f7197c3c49c4682a84694c93ca",
+      "bytes": 3642
+    }
+  ]
+}

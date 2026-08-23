@@ -1,0 +1,52 @@
+{
+  "schema": "academy-production-admission-candidate-visual-index/v1",
+  "candidateId": "academy-production-admission-20260823-14507463",
+  "capturedAt": "2026-08-23T13:52:18Z",
+  "status": "prepared",
+  "sourceRevision": "14507463b7a7333e3797de65a7a0bee12ca2c929",
+  "independentVisualReview": {
+    "path": "reports/reviews/academy-canonical-domain-visual-review-20260823.json",
+    "sha256": "e52d044302b33b18ac9625d54d096620ffa12b1f954800cc2e7bc4e1027c1083",
+    "verdict": "PASS",
+    "findingCounts": { "critical": 0, "high": 0, "medium": 0, "low": 0 }
+  },
+  "frames": [
+    {
+      "path": "artifacts/reviews/academy-canonical-domain-20260823/authenticated-root.png",
+      "sha256": "3b8c15a35cb82c3223413f164db67ff1c426d2dc6f9795a38867c770dbb71818",
+      "dimensions": "1302x768",
+      "contentType": "image/jpeg",
+      "filenameExtensionMatchesContentType": false,
+      "observedRoute": "/",
+      "observedResult": "Academy landing page rendered after Access."
+    },
+    {
+      "path": "artifacts/reviews/academy-canonical-domain-20260823/authenticated-courses.png",
+      "sha256": "2a21aa0955542da2137283c13dc59da9d2bda90ec465231c5c925d27bb15c2e6",
+      "dimensions": "1302x768",
+      "contentType": "image/jpeg",
+      "filenameExtensionMatchesContentType": false,
+      "observedRoute": "/courses",
+      "observedResult": "Course-preview page rendered after Access with eight courses."
+    },
+    {
+      "path": "artifacts/reviews/academy-canonical-domain-20260823/authenticated-callback.png",
+      "sha256": "68871f9f11b598fce06307a84c7ad37022dd50b5fd4fd78df9b3085eee340e22",
+      "dimensions": "1302x768",
+      "contentType": "image/jpeg",
+      "filenameExtensionMatchesContentType": false,
+      "observedRoute": "/auth/callback",
+      "observedResult": "No-parameter callback validation response rendered after Access."
+    }
+  ],
+  "controllerRenderInspection": {
+    "performed": true,
+    "result": "All three frames reopened individually; the visible route claims match the indexed prior review and no secret, OTP, email address, token, cookie, or callback parameter is visible."
+  },
+  "coverageBoundary": {
+    "realOAuthCodeStateAcceptance": false,
+    "otherViewportSizes": false,
+    "interactiveSignInSearchOrFilter": false,
+    "workerRuntimeProvenance": false
+  }
+}

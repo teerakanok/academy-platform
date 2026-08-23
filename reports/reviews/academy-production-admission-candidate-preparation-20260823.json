@@ -1,0 +1,82 @@
+{
+  "schema": "academy-production-admission-candidate-preparation/v1",
+  "candidateId": "academy-production-admission-20260823-14507463",
+  "capturedAt": "2026-08-23T13:52:18Z",
+  "purpose": "truthful pre-admission evidence preparation; not an accepted production-admission packet",
+  "candidate": {
+    "sourceRevision": "14507463b7a7333e3797de65a7a0bee12ca2c929",
+    "academyWebTrackedListingSha256": "b6236893dbdc6f4d8c449a7f2e58f495011c4307fe48a4c2fb1a0f6869de7453",
+    "sourceWorktree": "isolated-detached-candidate"
+  },
+  "artifacts": {
+    "sourceRevision": {
+      "status": "candidate-bound-prepared",
+      "path": "reports/reviews/academy-production-admission-candidate-source-20260823.json",
+      "sha256": "4fbb104020da554528f3360baf93e3bd47ffb4e2649be3444471845a4b49a1e6"
+    },
+    "migrationInventory": {
+      "status": "candidate-bound-prepared",
+      "path": "reports/reviews/academy-production-admission-candidate-migrations-20260823.json",
+      "sha256": "3d4005aa6a0c55d6ceb38c6b5c0b4dda25a08d996ab9b79a86ce01612333b053"
+    },
+    "runtimeConfigProjection": {
+      "status": "candidate-bound-prepared-not-deployed",
+      "path": "reports/reviews/academy-production-admission-candidate-runtime-20260823.json",
+      "sha256": "40ec3ed7d02273ff39c000cd26f0c1b8f07e5e403b90f9ff48fbd4ed002d5d93"
+    },
+    "visualEvidenceIndex": {
+      "status": "candidate-bound-prepared",
+      "path": "reports/reviews/academy-production-admission-candidate-visual-20260823.json",
+      "sha256": "cc5ff9ed3f80fe372eb9a4cc43de49864bea65e51627ecabdced08c09a2c0772"
+    },
+    "operatorAuthorizationReceipt": {
+      "status": "blocked-no-acknowledgement-or-rehearsal-receipt",
+      "canonicalOwner": "Identity Control",
+      "canonicalDesignationPath": "config/academy-kill-switch-operator-designation.v1.json",
+      "acknowledgements": "0/2",
+      "rehearsal": "0/1",
+      "acceptedReceipts": "0/5",
+      "productionAuthority": "NONE"
+    },
+    "deployedSmokeResult": {
+      "status": "baseline-observed-not-candidate-bound",
+      "path": "reports/reviews/academy-production-admission-candidate-smoke-20260823.json",
+      "sha256": "49d19221bab94fb7e85b45760e26e2a9ea8650e45e311b0b8919bee3cf3165eb",
+      "reason": "The current deployed Worker was built from e933a34c126b6a6fd6008951952d0c62796df2a4, not this candidate."
+    },
+    "rollbackRehearsal": {
+      "status": "preflight-only-not-rehearsed",
+      "path": "reports/reviews/academy-production-admission-candidate-rollback-20260823.json",
+      "sha256": "7506d61428e14f3e4bf073723c2b2edd32bfc2a63237a53eadf87677b0f7ff2c",
+      "reason": "Traffic-changing rollback was intentionally not exercised without the required operator receipt."
+    },
+    "freezeManifest": {
+      "status": "candidate-bound-prepared",
+      "path": "reports/reviews/academy-production-admission-candidate-freeze-20260823.json",
+      "sha256": "c065afb6e35c5df6c4bc786e941141bee8d13c6a8bbeb55e288c83b0d76c2524",
+      "fileCount": 47
+    }
+  },
+  "strictContractState": {
+    "acceptedGates": 0,
+    "totalGates": 8,
+    "packetSubmittedToEvaluator": false,
+    "admissionStatus": "not-admissible",
+    "productionAdmissionClaim": false,
+    "releaseApproval": false,
+    "productionAuthority": "NONE"
+  },
+  "externalBlockers": [
+    "Named operator acknowledgement and a real operator receipt are pending in Identity Control.",
+    "A current-candidate deployment and corresponding deployed smoke evidence do not exist.",
+    "A traffic-changing rollback rehearsal has not been authorized or performed.",
+    "Real OAuth code/state acceptance is not attempted or claimable while the Identity client remains disabled and runtime wiring remains false."
+  ],
+  "scopeBoundary": {
+    "deploymentOrTrafficMutation": false,
+    "databaseMigrationExecution": false,
+    "secretReadOrWritten": false,
+    "accessOrDomainMutation": false,
+    "authenticatedBrowserSessionUsed": false
+  }
+}

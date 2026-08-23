@@ -3,6 +3,26 @@
 > Closed items only, with outcome + evidence + residual risk. Newest first.
 > Provider-neutral. See `active_plan.md` for open work.
 
+## 2026-08-23 - Current production-admission candidate prepared without promotion
+
+- Bound candidate `14507463b7a7333e3797de65a7a0bee12ca2c929` to a clean isolated Node 24
+  Cloudflare build, a 27-file ordered migration inventory, a sanitized runtime projection, and the
+  existing independently reviewed canonical visual index. Strict dry-run passed at `12,495.32 KiB`
+  total upload and `2,905.10 KiB` gzip without creating a Worker version or changing traffic.
+- Read-only inventory confirmed the current Worker version and a rollback target. The current
+  deployed smoke is explicitly a baseline only because it has source
+  `e933a34c126b6a6fd6008951952d0c62796df2a4`, not this candidate. No rollback traffic change was
+  made; the receipt is a preflight, not a rehearsal.
+- Independent frozen RIL passed `C0/H0/M0/L0`. It found the evidence and non-claiming boundaries
+  consistent, including transparent treatment of the existing JPEG-byte image files under `.png`
+  paths. No deployment, migration, database, secret, Access, domain, or traffic mutation occurred.
+- Strict production admission remains `0/1`: operator acknowledgement/receipt, a deployed current
+  candidate with matching smoke, a real rollback rehearsal, and real OAuth `code`/`state` acceptance
+  remain unproven. Identity conformance remains `16/23` (`69.6%`).
+- Evidence: `reports/reviews/academy-production-admission-candidate-preparation-20260823.json`,
+  `reports/reviews/academy-production-admission-candidate-freeze-20260823.json`, and
+  `reports/reviews/academy-production-admission-candidate-glm-ril-final-20260823.json`.
+
 ## 2026-08-23 - Canonical-domain and authenticated callback evidence collected
 
 - The deployed `cyberskills-academy` Worker has source-bound evidence for the canonical

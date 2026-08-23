@@ -1,0 +1,21 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "plans/active_plan.md",
+      "sha256": "1da8a72363170c5428bcc62977b7afbd8b7613796c467ded7198c8d303251c53",
+      "bytes": 249481
+    },
+    {
+      "path": "reports/reviews/academy-production-admission-candidate-freeze-20260823.json",
+      "sha256": "c065afb6e35c5df6c4bc786e941141bee8d13c6a8bbeb55e288c83b0d76c2524",
+      "bytes": 9445
+    },
+    {
+      "path": "reports/reviews/academy-production-admission-candidate-preparation-20260823.json",
+      "sha256": "2f98ea560a491c8fde604a1d4f891a317acf578ddf3dec0f7a55c26e1bb46f19",
+      "bytes": 3948
+    }
+  ]
+}
