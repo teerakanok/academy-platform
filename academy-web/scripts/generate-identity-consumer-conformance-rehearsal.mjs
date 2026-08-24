@@ -143,9 +143,12 @@ function write(relativePath, value) {
 }
 
 function main(argv) {
-  if (argv.length !== 1 || argv[0] !== '--write') {
-    throw new Error('usage: generate-identity-consumer-conformance-rehearsal.mjs --write')
+  if (argv.length !== 5 || argv[0] !== '--write' || argv[1] !== '--identity-root' || argv[3] !== '--identity-source') {
+    throw new Error('usage: generate-identity-consumer-conformance-rehearsal.mjs --write --identity-root PATH --identity-source SHA')
   }
+  const identityRoot = resolve(argv[2])
+  const identitySource = argv[4]
+  if (!/^[a-f0-9]{40}$/.test(identitySource)) throw new Error('identity source must be a full SHA-1')
   const sourceRevision = gitHead()
   const { receipt, report } = buildRehearsalArtifacts({
     sourceRevision,
@@ -155,6 +158,21 @@ function main(argv) {
     retainedArtifactSha256: sha256(readRegularFile(RETAINED_ARTIFACT)),
   })
   write(RECEIPT_PATH, receipt)
+  write(REPORT_PATH, report)
+  const intake = JSON.parse(execFileSync(process.execPath, [
+    join(identityRoot, 'scripts', 'intake-consumer-conformance.mjs'),
+    '--consumer-root', academyRoot,
+    '--report', join(academyRoot, REPORT_PATH),
+    '--identity-root', identityRoot,
+    '--identity-source', identitySource,
+    '--print-local-receipts',
+  ], { cwd: identityRoot, encoding: 'utf8' }))
+  report.localWorkingTreeReceipt = intake.localWorkingTreeReceipt
+  report.identityControl = {
+    sourceRevision: identitySource,
+    contractArtifacts: intake.identityControlLocalArtifactReceipt.artifactFileSha256,
+    localArtifactReceipt: intake.identityControlLocalArtifactReceipt,
+  }
   write(REPORT_PATH, report)
   process.stdout.write(`${JSON.stringify({ status: 'written', sourceRevision, scenarios: 23 })}\n`)
 }
