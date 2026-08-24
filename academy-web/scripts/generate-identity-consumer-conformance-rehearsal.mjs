@@ -10,7 +10,7 @@ const scriptDirectory = dirname(fileURLToPath(import.meta.url))
 const academyRoot = resolve(scriptDirectory, '..', '..')
 
 export const REPORT_PATH = 'reports/conformance/identity-control/academy-identity-control-conformance.json'
-export const RECEIPT_PATH = 'reports/conformance/identity-control/academy-consumer-conformance-rehearsal.json'
+export const RECEIPT_PATH = 'reports/conformance/identity-control/consumer-conformance-rehearsal/receipt.json'
 
 export const ALL_SCENARIO_IDS = Object.freeze([
   'authorization.exact-registered-redirect',
