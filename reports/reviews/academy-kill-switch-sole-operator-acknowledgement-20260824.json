@@ -1,0 +1,30 @@
+{
+  "schema": "academy-kill-switch-sole-operator-acknowledgement/v1",
+  "acknowledgement": {
+    "operatorId": "academy-sole-songpon-teerakanok",
+    "displayName": "Asst. Prof. Dr. Songpon Teerakanok",
+    "role": "sole-operator",
+    "responsibilities": [
+      "kill-switch-disable-decision",
+      "disabled-state-verification",
+      "recovery-decision-and-execution",
+      "escalation-ownership"
+    ],
+    "singleOperatorRiskAccepted": true,
+    "provenance": "owner_session_attestation_with_discord_reference",
+    "statementSha256": "628abfbe056c5dea5dbf21ac99afcc068afc4e527d062cb437c8395a7854999b",
+    "discordReference": {
+      "url": "https://discord.com/channels/1509152772635885608/1509154261504753775/1541330282169503824",
+      "guildId": "1509152772635885608",
+      "channelId": "1509154261504753775",
+      "messageId": "1541330282169503824",
+      "derivedTimestamp": "2026-08-24T06:16:15.801Z",
+      "ownerSupplied": true,
+      "discordAuthorContentIndependentlyFetched": false,
+      "remoteVerified": false
+    },
+    "status": "acknowledged",
+    "acknowledgedBy": "Songpon Teerakanok",
+    "acknowledgedAt": "2026-08-24T06:16:15.801Z"
+  }
+}

@@ -4,18 +4,19 @@
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
 > **Last updated:** 2026-08-23
 
-**Named kill-switch operator evidence prepared; acknowledgements pending (2026-08-24):**
-Academy now has a source-bound public designation for primary operator Songpon Teerakanok,
-backup operator Araya, Discord route `product-academy`, and email route
+**Sole kill-switch operator evidence submitted for Identity review (2026-08-24):**
+Academy now has a source-bound public sole-operator designation for Songpon Teerakanok,
+Discord route `product-academy`, and email route
 `contact@cyberskills.co.th`. A deterministic isolated rehearsal starts and ends disabled with
 traffic/network/production operations `0`, runtime mutation `false`, and authority `NONE`.
-No committed acknowledgement from either operator exists, so both packet entries remain explicitly
-pending and Identity review is ineligible. Focused tests pass `4/4`, full unit passes
-`2,046/2,046`, lint/type checks and secret scan pass, the five-file freeze verifies, and independent
-review closes at `C0/H0/M0/L0`. Canonical readiness remains receipts `3/5`, blockers `3/6`, ordered
+The exact owner-session attestation binds all disable, verification, recovery, escalation, and
+single-operator risk responsibilities; Discord author/content remain explicitly unfetched and
+remotely unverified. Focused tests pass `4/4`, full unit passes `2,046/2,046`, lint/type checks and
+secret scan pass, the seven-file freeze verifies, and independent review closes at `C0/H0/M0/L0`.
+Canonical readiness remains receipts `3/5`, blockers `3/6`, ordered
 `5/8` (`62.5%`), conformance `16/23`, authority `NONE`, and operations `0`. Exact next action:
-Songpon Teerakanok and Araya each commit the exact acknowledgement packet entry, then Academy
-regenerates this submission for Identity actual-root review. Evidence:
+Identity Control independently validates the pushed Academy actual root and accepts or rejects
+this submission. Evidence:
 `reports/reviews/academy-kill-switch-operator-evidence-local-checkpoint-20260824.md`.
 
 **Public-only client-key registration/rotation evidence submitted locally (2026-08-24):**

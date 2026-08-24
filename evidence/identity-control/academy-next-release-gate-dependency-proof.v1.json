@@ -1,14 +1,14 @@
 {
   "schema": "identity-control-academy-next-release-gate-dependency-proof/v1",
-  "revision": 3,
+  "revision": 4,
   "status": "blocked-external-dependency-proof",
   "selectedGate": {
     "blockerId": "named-kill-switch-operator",
     "alternativeBlockerId": "consumer-conformance-rehearsal",
-    "selectionReason": "Canonical-domain, disabled lifecycle, and public-only source-bound client-key registration and rotation rehearsal evidence are accepted. The named kill-switch operator gate is the next dependency-closed local blocker; consumer conformance remains 16/23 and separate production authorization remains authority-gated and last."
+    "selectionReason": "Canonical-domain, disabled lifecycle, and public-only source-bound client-key registration and rotation rehearsal evidence are accepted. The owner-designated sole-operator policy names Asst. Prof. Dr. Songpon Teerakanok without a backup; Academy acknowledgement and bounded disabled-state recovery rehearsal evidence remain the next dependency-closed blocker inputs."
   },
   "sourceRevisions": {
-    "identityControl": "7c39ec586e823b696d56ff84e234979a155d6a8d",
+    "identityControl": "478758f288e827346c11b4cb2f36c6d39331be54",
     "academyCurrent": "df01bc3f93f4b1b4631433767d64ae8f37e1c1c0",
     "academyConformanceReport": "6de80c2f066d7c32866434d4b6afdaf0b217c9ca",
     "identityControlConformanceReport": "fdcaf30bfb9b3644c43dcabb192d99820d52a336"
@@ -31,13 +31,13 @@
     },
     {
       "path": "config/academy-production-authorization-material.v1.json",
-      "sha256": "eea9fdb05198629fc5c9a74a817d105567c1ad3f12b720370f14cb717ff29b4e",
-      "bytes": 5901
+      "sha256": "cd3faf1650c24a93ac4514c4c1aa1e51b33892f220d7c033c342e9ddac76a431",
+      "bytes": 6067
     },
     {
       "path": "config/academy-production-blocker-receipt-submission-contract.v1.json",
-      "sha256": "3cda4c9ad0db04ecd63dc2734ad97bcee84f6d431f67c2d35dd10b4e3fd66836",
-      "bytes": 4426
+      "sha256": "88fc1ec2ce1c86b63edd515d3bc66974b3dae2a82cd02382a09fdddccb4c825f",
+      "bytes": 4826
     },
     {
       "path": "config/academy-canonical-domain-deployment-evidence-acceptance.v1.json",
@@ -58,6 +58,11 @@
       "path": "config/academy-client-public-key-registration-rehearsal-acceptance.v1.json",
       "sha256": "d8cebb200ddde7c8d96636cd377018a7f847e33933886c2527509eca8bad81b1",
       "bytes": 3748
+    },
+    {
+      "path": "config/academy-kill-switch-sole-operator-policy.v1.json",
+      "sha256": "e3b1a14e134596bd3eb3071f7fc6f0130bba9f599dfbbb5370f08c3bc5117a4d",
+      "bytes": 1875
     }
   ],
   "academyEvidence": [
@@ -182,8 +187,8 @@
       "closureEligible": true
     },
     "killSwitchGate": {
-      "namedPrimaryAndBackupOperators": { "accepted": 0, "total": 1 },
-      "operatorAcknowledgements": { "accepted": 0, "total": 1 },
+      "soleOperatorDesignation": { "accepted": 1, "total": 1 },
+      "operatorAcknowledgement": { "accepted": 0, "total": 1 },
       "boundedDisabledRecoveryRehearsal": { "accepted": 0, "total": 1 },
       "closureEligible": false
     }
@@ -216,9 +221,9 @@
       "identity-control"
     ],
     "requiredEvidence": [
-      "Academy commits a source-bound designation for named primary and backup kill-switch operators, including an escalation route, without enabling the client or lifecycle traffic.",
-      "Both named operators commit explicit acknowledgement evidence for their disable and recovery responsibilities.",
-      "Academy commits a bounded disabled-state disable-and-recovery rehearsal receipt; Identity Control independently verifies the exact evidence from a clean Academy root before closing the blocker."
+      "Academy submits provenance owner_session_attestation_with_discord_reference with the exact pinned statement hash, Discord URL components, derived timestamp, non-fetch/non-verification flags, and implementation/handoff ancestry plus source digests.",
+      "Songpon commits exactly one acknowledgement covering all four responsibilities; any backup, Araya, second operator, or two-ack requirement is invalid.",
+      "Academy commits a bounded disabled-state disable-and-recovery rehearsal receipt; Identity Control independently verifies the exact evidence from a clean Academy root before accepting a receipt or changing counters."
     ]
   },
   "acceptanceBoundary": {

@@ -3,17 +3,18 @@
 > Closed items only, with outcome + evidence + residual risk. Newest first.
 > Provider-neutral. See `active_plan.md` for open work.
 
-## 2026-08-24 - Kill-switch designation and disabled rehearsal prepared locally
+## 2026-08-24 - Sole kill-switch designation and disabled rehearsal submitted locally
 
-- Bound Songpon Teerakanok and Araya to exact primary/backup responsibilities and committed public
+- Bound Songpon Teerakanok as sole operator for disable decision, disabled-state verification,
+  recovery, escalation ownership, and accepted single-operator risk, using committed public
   Discord/email escalation routes without storing a webhook URL, credential, or secret.
 - Captured an isolated idempotent disable and disabled-baseline recovery rehearsal with no runtime
   mutation, network request, production operation, traffic, registry authority, or release authority.
-- Kept both absent human acknowledgements explicitly pending/null; the generator accepts only exact,
-  attributable statements and rejects responsibility tampering.
-- Focused `4/4`, full unit `2,046/2,046`, lint/type checks, secret scan, five-file freeze, and final
-  independent review `C0/H0/M0/L0` pass. Identity acceptance remains blocked on exact Songpon and
-  Araya acknowledgements, so counters stay `3/5`, `3/6`, and `5/8` (`62.5%`).
+- Bound the exact owner-session attestation provenance and Discord reference while recording that
+  Discord author/content were not independently fetched or remotely verified.
+- Focused `4/4`, full unit `2,046/2,046`, lint/type checks, secret scan, seven-file freeze, and final
+  independent review `C0/H0/M0/L0` pass. Identity actual-root acceptance remains open, so counters
+  stay `3/5`, `3/6`, and `5/8` (`62.5%`).
 
 ## 2026-08-24 - Public-only client-key evidence submission closed locally
 

@@ -1,18 +1,35 @@
 {
-  "schema": "academy-kill-switch-operator-evidence-submission/v1",
+  "schema": "academy-kill-switch-sole-operator-evidence-submission/v1",
   "revision": 1,
-  "submissionState": "awaiting-operator-acknowledgements",
+  "submissionState": "submitted-for-independent-review",
   "blockerId": "named-kill-switch-operator",
   "blockerStatus": "open",
   "preparationOnly": true,
   "sourceBindings": {
     "academyBaseRevision": "df01bc3f93f4b1b4631433767d64ae8f37e1c1c0",
-    "identityHandoffRevision": "478758f288e827346c11b4cb2f36c6d39331be54",
+    "identityImplementationRevision": "b26974f3a38c33dabc78651875a3885d32dbf264",
+    "identityHandoffRevision": "901a177a9cd560f1953890fd92b2a3db82bd3488",
+    "identityRevisionAncestry": {
+      "ancestor": "b26974f3a38c33dabc78651875a3885d32dbf264",
+      "descendant": "901a177a9cd560f1953890fd92b2a3db82bd3488",
+      "relationship": "implementation-ancestor-of-handoff",
+      "verifiedFromCleanIdentityRoot": true
+    },
     "directorRouteSourceRevision": "872557e15b4a46b3f5c3c41c412d2ecd7437b09f",
     "identityNextGateProof": {
       "path": "evidence/identity-control/academy-next-release-gate-dependency-proof.v1.json",
-      "bytes": 8969,
-      "sha256": "81b0d14046ad00d7588293ea1adaa50b77237b54aa9a4d38c5938a13c1780c5f"
+      "bytes": 9326,
+      "sha256": "8d3642afaeb2f60fe5739afc53eb9f10c22956c8ea4450734441f9d6a44a4f2e"
+    },
+    "identitySoleOperatorPolicy": {
+      "path": "evidence/identity-control/academy-kill-switch-sole-operator-policy.v1.json",
+      "bytes": 1875,
+      "sha256": "e3b1a14e134596bd3eb3071f7fc6f0130bba9f599dfbbb5370f08c3bc5117a4d"
+    },
+    "identityOwnerSessionAttestationCheckpoint": {
+      "path": "evidence/identity-control/academy-owner-session-attestation-policy-local-checkpoint-20260824.md",
+      "bytes": 1123,
+      "sha256": "fa174cbd9ffcacfaac664fc02bac6ac279f548bb9618d67b37f709d1c96c0046"
     },
     "academyDiscordRouteRegistry": {
       "path": "config/owner-update-routes.json",
@@ -26,21 +43,20 @@
     }
   },
   "designation": {
-    "source": "owner-approved-designation-2026-08-24",
-    "operators": [
-      {
-        "operatorId": "academy-primary-songpon-teerakanok",
-        "name": "Songpon Teerakanok",
-        "role": "primary",
-        "responsibility": "Own the Academy kill-switch disable decision, confirm the disabled state, and coordinate recovery to the verified disabled baseline."
-      },
-      {
-        "operatorId": "academy-backup-araya",
-        "name": "Araya",
-        "role": "backup",
-        "responsibility": "Assume the Academy kill-switch disable and disabled-baseline recovery duties when the primary operator is unavailable."
-      }
-    ],
+    "source": "identity-control-owner-designated-sole-operator-policy/v1",
+    "operator": {
+      "operatorId": "academy-sole-songpon-teerakanok",
+      "displayName": "Asst. Prof. Dr. Songpon Teerakanok",
+      "acknowledgedBy": "Songpon Teerakanok",
+      "role": "sole-operator",
+      "responsibilities": [
+        "kill-switch-disable-decision",
+        "disabled-state-verification",
+        "recovery-decision-and-execution",
+        "escalation-ownership"
+      ],
+      "singleOperatorRiskAccepted": true
+    },
     "escalationRoutes": [
       {
         "kind": "discord",
@@ -56,31 +72,34 @@
   },
   "acknowledgementPacket": {
     "executableWith": "node academy-web/scripts/capture-kill-switch-operator-evidence.mjs --acknowledgement-file <committed-json-path>",
-    "acknowledgements": [
-      {
-        "operatorId": "academy-primary-songpon-teerakanok",
-        "name": "Songpon Teerakanok",
-        "role": "primary",
-        "responsibility": "Own the Academy kill-switch disable decision, confirm the disabled state, and coordinate recovery to the verified disabled baseline.",
-        "statementSha256": "539edb53ef7b089b56c7281aae00008b37cf3be404aef7338b3926f520ebe5b8",
-        "status": "pending-human-acknowledgement",
-        "acknowledgedBy": null,
-        "acknowledgedAt": null,
-        "evidenceRef": null
+    "acknowledgement": {
+      "operatorId": "academy-sole-songpon-teerakanok",
+      "displayName": "Asst. Prof. Dr. Songpon Teerakanok",
+      "role": "sole-operator",
+      "responsibilities": [
+        "kill-switch-disable-decision",
+        "disabled-state-verification",
+        "recovery-decision-and-execution",
+        "escalation-ownership"
+      ],
+      "singleOperatorRiskAccepted": true,
+      "provenance": "owner_session_attestation_with_discord_reference",
+      "statementSha256": "628abfbe056c5dea5dbf21ac99afcc068afc4e527d062cb437c8395a7854999b",
+      "discordReference": {
+        "url": "https://discord.com/channels/1509152772635885608/1509154261504753775/1541330282169503824",
+        "guildId": "1509152772635885608",
+        "channelId": "1509154261504753775",
+        "messageId": "1541330282169503824",
+        "derivedTimestamp": "2026-08-24T06:16:15.801Z",
+        "ownerSupplied": true,
+        "discordAuthorContentIndependentlyFetched": false,
+        "remoteVerified": false
       },
-      {
-        "operatorId": "academy-backup-araya",
-        "name": "Araya",
-        "role": "backup",
-        "responsibility": "Assume the Academy kill-switch disable and disabled-baseline recovery duties when the primary operator is unavailable.",
-        "statementSha256": "34f8cb28eb5159a0bf96fdbda3285b8ecc78fb93275a538fc93d0c53fe563145",
-        "status": "pending-human-acknowledgement",
-        "acknowledgedBy": null,
-        "acknowledgedAt": null,
-        "evidenceRef": null
-      }
-    ],
-    "complete": false
+      "status": "acknowledged",
+      "acknowledgedBy": "Songpon Teerakanok",
+      "acknowledgedAt": "2026-08-24T06:16:15.801Z"
+    },
+    "complete": true
   },
   "rehearsal": {
     "schema": "academy-kill-switch-disabled-recovery-rehearsal/v1",
@@ -127,11 +146,8 @@
     "passed": true
   },
   "acceptance": {
-    "eligibleForIndependentIdentityReview": false,
-    "blockingConditions": [
-      "Songpon Teerakanok acknowledgement",
-      "Araya acknowledgement"
-    ]
+    "eligibleForIndependentIdentityReview": true,
+    "blockingConditions": []
   },
   "boundary": {
     "productionReadiness": false,

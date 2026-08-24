@@ -1,0 +1,55 @@
+{
+  "schema": "identity-control-academy-kill-switch-sole-operator-policy/v1",
+  "revision": 1,
+  "status": "owner-designated-preparation-only",
+  "preparationOnly": true,
+  "executable": false,
+  "productionAuthority": "NONE",
+  "releaseApproval": false,
+  "academyWebEnabled": false,
+  "lifecycleTrafficEnabled": false,
+  "requestedOperations": [],
+  "operator": {
+    "displayName": "Asst. Prof. Dr. Songpon Teerakanok",
+    "roles": [
+      "kill-switch-disable-decision",
+      "disabled-state-verification",
+      "recovery-decision-and-execution",
+      "escalation-ownership"
+    ]
+  },
+  "acknowledgementRequirement": {
+    "required": 1,
+    "accepted": 0,
+    "allowedProvenance": "owner_session_attestation_with_discord_reference",
+    "canonicalStatementSha256": "628abfbe056c5dea5dbf21ac99afcc068afc4e527d062cb437c8395a7854999b",
+    "discordReference": {
+      "url": "https://discord.com/channels/1509152772635885608/1509154261504753775/1541330282169503824",
+      "guildId": "1509152772635885608",
+      "channelId": "1509154261504753775",
+      "messageId": "1541330282169503824",
+      "derivedTimestamp": "2026-08-24T06:16:15.801Z",
+      "ownerSupplied": true,
+      "discordAuthorContentIndependentlyFetched": false,
+      "remoteVerified": false
+    }
+  },
+  "operationalRiskDecision": {
+    "singleOperatorRiskAccepted": true,
+    "futureReplacementOperator": null,
+    "replacementTrigger": "after-hiring-and-explicit-owner-designation"
+  },
+  "blockerState": {
+    "blockerId": "named-kill-switch-operator",
+    "status": "open",
+    "boundedDisabledRecoveryRehearsalAccepted": false
+  },
+  "acceptanceBoundary": {
+    "designationRecorded": true,
+    "operatorAcknowledgementAccepted": false,
+    "rehearsalReceiptAccepted": false,
+    "productionReceiptAccepted": false,
+    "productionBlockerClosed": false,
+    "productionReadiness": false
+  }
+}

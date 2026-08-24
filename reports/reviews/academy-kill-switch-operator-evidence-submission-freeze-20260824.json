@@ -4,28 +4,38 @@
   "files": [
     {
       "path": "academy-web/scripts/capture-kill-switch-operator-evidence.mjs",
-      "sha256": "a9ae1641571bd4f80fa539731de2fd00c35ad2ead0183a592868e98aba176b96",
-      "bytes": 9928
+      "sha256": "e5b026ce68db49552c34c31c73c8e737ded517fde49a518c01173ebcfef59dd7",
+      "bytes": 14403
     },
     {
       "path": "academy-web/scripts/capture-kill-switch-operator-evidence.test.mjs",
-      "sha256": "0bec07a637c39f9db8c78bccd8147ff88bcc082ae519823c8cb252867f577e78",
-      "bytes": 3666
+      "sha256": "18430fa3f01b16fb3cf784027f018587f4eaa1f27bfcd45a8bc2b581b42433e7",
+      "bytes": 5140
+    },
+    {
+      "path": "evidence/identity-control/academy-kill-switch-sole-operator-policy.v1.json",
+      "sha256": "e3b1a14e134596bd3eb3071f7fc6f0130bba9f599dfbbb5370f08c3bc5117a4d",
+      "bytes": 1875
     },
     {
       "path": "evidence/identity-control/academy-next-release-gate-dependency-proof.v1.json",
-      "sha256": "81b0d14046ad00d7588293ea1adaa50b77237b54aa9a4d38c5938a13c1780c5f",
-      "bytes": 8969
+      "sha256": "8d3642afaeb2f60fe5739afc53eb9f10c22956c8ea4450734441f9d6a44a4f2e",
+      "bytes": 9326
     },
     {
-      "path": "reports/reviews/academy-kill-switch-operator-acknowledgements-pending-20260824.json",
-      "sha256": "2a0b7aac3ae4c92fdee67145942800fb2fef3d1805a33e578dfd2394ff960b01",
-      "bytes": 1093
+      "path": "evidence/identity-control/academy-owner-session-attestation-policy-local-checkpoint-20260824.md",
+      "sha256": "fa174cbd9ffcacfaac664fc02bac6ac279f548bb9618d67b37f709d1c96c0046",
+      "bytes": 1123
     },
     {
       "path": "reports/reviews/academy-kill-switch-operator-evidence-submission-20260824.json",
-      "sha256": "2cd8d31bcf2420e32a5431d80a21e8c59583c8a5e196a063b16a556f05199f04",
-      "bytes": 4977
+      "sha256": "6e276256eda84aa4dbaf806277c99e30da097a6c1aa174fae524201bcfcd0dc1",
+      "bytes": 5725
+    },
+    {
+      "path": "reports/reviews/academy-kill-switch-sole-operator-acknowledgement-20260824.json",
+      "sha256": "365801c70e04645821de49fdd7fddab4976b4b4eea49842aeb2e55582cc30618",
+      "bytes": 1172
     }
   ]
 }
