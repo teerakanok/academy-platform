@@ -1,6 +1,6 @@
 {
   "schema": "academy-identity-consumer-conformance-rehearsal/v1",
-  "sourceRevision": "7d1af86558a03fc0e8cbb09fe1a1a796cf38a603",
+  "sourceRevision": "a6194e1f2534e71b336e3cb068e2229e469f06f8",
   "exactScenarioIds": [
     "authorization.exact-registered-redirect",
     "authorization.state-binding-mismatch",
@@ -14,7 +14,7 @@
   "focusedArtifacts": [
     {
       "path": "academy-web/tests/unit/identity-runtime-browser-flow.test.ts",
-      "sha256": "d176ccb078be558a4635a548115e5b4772a15e3677b92fec409a68ed2b52d24a"
+      "sha256": "afbfcaa0abfd012a1e079b1442b15be2e304a0d91002805e91b0e8b239f971e6"
     },
     {
       "path": "academy-web/tests/unit/identity-transaction.test.ts",

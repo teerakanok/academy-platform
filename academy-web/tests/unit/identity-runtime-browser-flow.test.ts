@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+
 import { describe, expect, it, vi } from 'vitest'
 
 import {
@@ -18,6 +20,25 @@ const ACCOUNT_ID = '123e4567-e89b-42d3-a456-426614174000'
 const SESSION_ID = 's'.repeat(43)
 
 describe('Academy Identity runtime browser flow', () => {
+  it('publishes a conformance receipt with an empty untracked manifest', () => {
+    const report = JSON.parse(readFileSync(new URL(
+      '../../../reports/conformance/identity-control/academy-identity-control-conformance.json',
+      import.meta.url,
+    ), 'utf8')) as {
+      localWorkingTreeReceipt?: {
+        untrackedEntryCount?: unknown
+        untrackedStateSha256?: unknown
+        untrackedFileSha256?: unknown
+      }
+    }
+
+    expect(report.localWorkingTreeReceipt?.untrackedEntryCount).toBe(0)
+    expect(report.localWorkingTreeReceipt?.untrackedStateSha256).toBe(
+      '64d07385b423b51c63e41b4e86bebe20ac3264d361739346c7d4dc5503186928',
+    )
+    expect(report.localWorkingTreeReceipt?.untrackedFileSha256).toEqual([])
+  })
+
   it('rejects an unregistered redirect before writing a transaction or calling authorization', async () => {
     const fixture = createFixture({
       registration: {
