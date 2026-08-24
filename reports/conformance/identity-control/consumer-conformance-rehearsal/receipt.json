@@ -1,0 +1,40 @@
+{
+  "schema": "academy-identity-consumer-conformance-rehearsal/v1",
+  "sourceRevision": "7d1af86558a03fc0e8cbb09fe1a1a796cf38a603",
+  "exactScenarioIds": [
+    "authorization.exact-registered-redirect",
+    "authorization.state-binding-mismatch",
+    "callback.login-csrf",
+    "callback.origin-fetch-metadata",
+    "exchange.code-replay-expiry",
+    "exchange.result-key-rotation",
+    "academy.canonical-founder-bootstrap"
+  ],
+  "focusedCommand": "npm:test:unit:identity-consumer-conformance",
+  "focusedArtifacts": [
+    {
+      "path": "academy-web/tests/unit/identity-runtime-browser-flow.test.ts",
+      "sha256": "d176ccb078be558a4635a548115e5b4772a15e3677b92fec409a68ed2b52d24a"
+    },
+    {
+      "path": "academy-web/tests/unit/identity-transaction.test.ts",
+      "sha256": "1cfa5e6912123a088d1d047e8bce569a1f890aa0791d20c58c048cbc6ab41487"
+    },
+    {
+      "path": "academy-web/tests/unit/identity-result-key-set-importer.test.ts",
+      "sha256": "b9f99cffaf024680f2fe3e0cd5db2a087544555c0fdc4d8b95b42a7e4253def0"
+    }
+  ],
+  "registry": {
+    "enabled": false
+  },
+  "authority": "NONE",
+  "traffic": 0,
+  "productionOperations": 0,
+  "runtimeMutation": false,
+  "result": {
+    "trackedScenarioCount": 23,
+    "passedScenarioCount": 23,
+    "failedScenarioCount": 0
+  }
+}
