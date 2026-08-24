@@ -1,0 +1,27 @@
+{
+  "schema": "academy-kill-switch-operator-acknowledgements/v1",
+  "acknowledgements": [
+    {
+      "operatorId": "academy-primary-songpon-teerakanok",
+      "name": "Songpon Teerakanok",
+      "role": "primary",
+      "responsibility": "Own the Academy kill-switch disable decision, confirm the disabled state, and coordinate recovery to the verified disabled baseline.",
+      "statementSha256": "539edb53ef7b089b56c7281aae00008b37cf3be404aef7338b3926f520ebe5b8",
+      "status": "pending-human-acknowledgement",
+      "acknowledgedBy": null,
+      "acknowledgedAt": null,
+      "evidenceRef": null
+    },
+    {
+      "operatorId": "academy-backup-araya",
+      "name": "Araya",
+      "role": "backup",
+      "responsibility": "Assume the Academy kill-switch disable and disabled-baseline recovery duties when the primary operator is unavailable.",
+      "statementSha256": "34f8cb28eb5159a0bf96fdbda3285b8ecc78fb93275a538fc93d0c53fe563145",
+      "status": "pending-human-acknowledgement",
+      "acknowledgedBy": null,
+      "acknowledgedAt": null,
+      "evidenceRef": null
+    }
+  ]
+}

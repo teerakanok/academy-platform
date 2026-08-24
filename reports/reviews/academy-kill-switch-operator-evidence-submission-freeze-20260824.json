@@ -1,0 +1,31 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/scripts/capture-kill-switch-operator-evidence.mjs",
+      "sha256": "a9ae1641571bd4f80fa539731de2fd00c35ad2ead0183a592868e98aba176b96",
+      "bytes": 9928
+    },
+    {
+      "path": "academy-web/scripts/capture-kill-switch-operator-evidence.test.mjs",
+      "sha256": "0bec07a637c39f9db8c78bccd8147ff88bcc082ae519823c8cb252867f577e78",
+      "bytes": 3666
+    },
+    {
+      "path": "evidence/identity-control/academy-next-release-gate-dependency-proof.v1.json",
+      "sha256": "81b0d14046ad00d7588293ea1adaa50b77237b54aa9a4d38c5938a13c1780c5f",
+      "bytes": 8969
+    },
+    {
+      "path": "reports/reviews/academy-kill-switch-operator-acknowledgements-pending-20260824.json",
+      "sha256": "2a0b7aac3ae4c92fdee67145942800fb2fef3d1805a33e578dfd2394ff960b01",
+      "bytes": 1093
+    },
+    {
+      "path": "reports/reviews/academy-kill-switch-operator-evidence-submission-20260824.json",
+      "sha256": "2cd8d31bcf2420e32a5431d80a21e8c59583c8a5e196a063b16a556f05199f04",
+      "bytes": 4977
+    }
+  ]
+}

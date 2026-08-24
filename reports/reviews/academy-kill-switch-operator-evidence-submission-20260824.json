@@ -1,0 +1,147 @@
+{
+  "schema": "academy-kill-switch-operator-evidence-submission/v1",
+  "revision": 1,
+  "submissionState": "awaiting-operator-acknowledgements",
+  "blockerId": "named-kill-switch-operator",
+  "blockerStatus": "open",
+  "preparationOnly": true,
+  "sourceBindings": {
+    "academyBaseRevision": "df01bc3f93f4b1b4631433767d64ae8f37e1c1c0",
+    "identityHandoffRevision": "478758f288e827346c11b4cb2f36c6d39331be54",
+    "directorRouteSourceRevision": "872557e15b4a46b3f5c3c41c412d2ecd7437b09f",
+    "identityNextGateProof": {
+      "path": "evidence/identity-control/academy-next-release-gate-dependency-proof.v1.json",
+      "bytes": 8969,
+      "sha256": "81b0d14046ad00d7588293ea1adaa50b77237b54aa9a4d38c5938a13c1780c5f"
+    },
+    "academyDiscordRouteRegistry": {
+      "path": "config/owner-update-routes.json",
+      "bytes": 5249,
+      "sha256": "1a9e8517465f7bb08cce644da6dab66981cf12ef5e68c387c7c2d9b07b1ed4a6"
+    },
+    "academyEscalationEmailSource": {
+      "path": "academy-web/src/lib/i18n/privacy.ts",
+      "bytes": 19543,
+      "sha256": "844a17add89511fddf047bf0eb42300499f80503eacb6767441be6bb8bd873fb"
+    }
+  },
+  "designation": {
+    "source": "owner-approved-designation-2026-08-24",
+    "operators": [
+      {
+        "operatorId": "academy-primary-songpon-teerakanok",
+        "name": "Songpon Teerakanok",
+        "role": "primary",
+        "responsibility": "Own the Academy kill-switch disable decision, confirm the disabled state, and coordinate recovery to the verified disabled baseline."
+      },
+      {
+        "operatorId": "academy-backup-araya",
+        "name": "Araya",
+        "role": "backup",
+        "responsibility": "Assume the Academy kill-switch disable and disabled-baseline recovery duties when the primary operator is unavailable."
+      }
+    ],
+    "escalationRoutes": [
+      {
+        "kind": "discord",
+        "routeId": "academy",
+        "channelLabel": "product-academy",
+        "channelId": "1509154261504753775"
+      },
+      {
+        "kind": "email",
+        "address": "contact@cyberskills.co.th"
+      }
+    ]
+  },
+  "acknowledgementPacket": {
+    "executableWith": "node academy-web/scripts/capture-kill-switch-operator-evidence.mjs --acknowledgement-file <committed-json-path>",
+    "acknowledgements": [
+      {
+        "operatorId": "academy-primary-songpon-teerakanok",
+        "name": "Songpon Teerakanok",
+        "role": "primary",
+        "responsibility": "Own the Academy kill-switch disable decision, confirm the disabled state, and coordinate recovery to the verified disabled baseline.",
+        "statementSha256": "539edb53ef7b089b56c7281aae00008b37cf3be404aef7338b3926f520ebe5b8",
+        "status": "pending-human-acknowledgement",
+        "acknowledgedBy": null,
+        "acknowledgedAt": null,
+        "evidenceRef": null
+      },
+      {
+        "operatorId": "academy-backup-araya",
+        "name": "Araya",
+        "role": "backup",
+        "responsibility": "Assume the Academy kill-switch disable and disabled-baseline recovery duties when the primary operator is unavailable.",
+        "statementSha256": "34f8cb28eb5159a0bf96fdbda3285b8ecc78fb93275a538fc93d0c53fe563145",
+        "status": "pending-human-acknowledgement",
+        "acknowledgedBy": null,
+        "acknowledgedAt": null,
+        "evidenceRef": null
+      }
+    ],
+    "complete": false
+  },
+  "rehearsal": {
+    "schema": "academy-kill-switch-disabled-recovery-rehearsal/v1",
+    "mode": "isolated-in-memory",
+    "stateTransitions": [
+      {
+        "phase": "precheck",
+        "state": {
+          "clientEnabled": false,
+          "lifecycleEnabled": false,
+          "trafficCount": 0,
+          "productionAuthority": "NONE"
+        }
+      },
+      {
+        "phase": "disable-confirmed",
+        "state": {
+          "clientEnabled": false,
+          "lifecycleEnabled": false,
+          "trafficCount": 0,
+          "productionAuthority": "NONE"
+        }
+      },
+      {
+        "phase": "disabled-baseline-recovered",
+        "state": {
+          "clientEnabled": false,
+          "lifecycleEnabled": false,
+          "trafficCount": 0,
+          "productionAuthority": "NONE"
+        }
+      }
+    ],
+    "checks": {
+      "startedDisabled": true,
+      "disableWasIdempotent": true,
+      "recoveryRestoredDisabledBaseline": true,
+      "trafficRemainedZero": true,
+      "authorityRemainedNone": true
+    },
+    "runtimeMutation": false,
+    "networkRequests": 0,
+    "productionOperations": 0,
+    "passed": true
+  },
+  "acceptance": {
+    "eligibleForIndependentIdentityReview": false,
+    "blockingConditions": [
+      "Songpon Teerakanok acknowledgement",
+      "Araya acknowledgement"
+    ]
+  },
+  "boundary": {
+    "productionReadiness": false,
+    "releaseApproval": false,
+    "productionAuthority": "NONE",
+    "registryMutationAuthority": "NONE",
+    "runtimeWired": false,
+    "trafficEnabled": false,
+    "networkRequests": 0,
+    "productionOperations": 0,
+    "requestedOperations": []
+  }
+}
