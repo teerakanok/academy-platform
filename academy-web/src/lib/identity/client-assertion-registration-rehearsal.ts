@@ -187,6 +187,144 @@ export async function runAcademyClientAssertionRegistrationRehearsal(
   }
 }
 
+export type AcademyClientAssertionRegistrationRehearsalResult = Awaited<
+  ReturnType<typeof runAcademyClientAssertionRegistrationRehearsal>
+>
+
+const EVIDENCE_SOURCE = Object.freeze({
+  academyRevision: '0d44d22b311af64078cf6d9dda9fc3f4713c3918',
+  identityRevision: 'bf663fa72003fd12fccc90a8ff93b37e29732f6d',
+  identityRuntimeContracts: Object.freeze([
+    Object.freeze({
+      path: 'packages/core/src/client-assertion.ts',
+      sha256: '6cc0f77cae9782420883802fc3a92f181773fa22d298ec9b9998dc3718f8fff6',
+      bytes: 5938,
+    }),
+    Object.freeze({
+      path: 'packages/core/src/client-control.ts',
+      sha256: '5c3544a6b8056f95021f0dc871ca465d16235cad482984646b3b5b3a9455063c',
+      bytes: 2363,
+    }),
+  ]),
+  receiptContract: Object.freeze({
+    path: 'evidence/identity-control/academy-production-blocker-receipt-submission-contract.v1.json',
+    sha256: '3cda4c9ad0db04ecd63dc2734ad97bcee84f6d431f67c2d35dd10b4e3fd66836',
+    bytes: 4426,
+  }),
+  rehearsalFreeze: Object.freeze({
+    path: 'reports/reviews/academy-identity-client-assertion-registration-rehearsal-closure-freeze-20260823.json',
+    sha256: '772ebecd76d3fc6bf65eba8387810ebaa427741c341416cb4a5f80e8b9b7e691',
+    bytes: 3276,
+  }),
+})
+
+export async function createAcademyClientKeyRegistrationEvidenceSubmission(
+  result: AcademyClientAssertionRegistrationRehearsalResult,
+) {
+  if (!result || result.schema !== 'academy-client-assertion-registration-rehearsal/v1'
+    || result.mode !== 'local-ephemeral' || result.enabled !== false
+    || result.runtimeWired !== false || result.releaseApproval !== false
+    || result.productionEvidence !== false || result.passed !== true) {
+    throw new Error('Client-key evidence requires one passing disabled local rehearsal')
+  }
+  await validateAcademyClientAssertionRegistrationSequence(result.sequence)
+  if (!Array.isArray(result.registrations) || result.registrations.length !== 2) {
+    throw new Error('Client-key evidence requires exactly two public registration records')
+  }
+  const rehearsedRegistrations = [
+    result.sequence.snapshots[0]?.registrations[0],
+    result.sequence.snapshots[1]?.registrations[1],
+  ]
+  const registrations = await Promise.all(result.registrations.map(async (registration, index) => {
+    exactKeys(registration, [
+      'activatedAt', 'algorithm', 'clientId', 'keyId', 'publicJwkSha256', 'publicKeyReference',
+    ], 'evidence registration')
+    const rehearsed = rehearsedRegistrations[index]
+    if (registration.clientId !== CLIENT_ID || registration.algorithm !== 'ES256'
+      || !/^[a-f0-9]{64}$/.test(registration.publicJwkSha256)
+      || registration.keyId !== `academy-${registration.publicJwkSha256.slice(0, 40)}`
+      || registration.publicKeyReference !== publicKeyReference(registration.keyId)
+      || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(registration.activatedAt)
+      || !Number.isFinite(Date.parse(registration.activatedAt))
+      || !rehearsed
+      || registration.keyId !== rehearsed.keyId
+      || registration.algorithm !== rehearsed.algorithm
+      || registration.publicKeyReference !== rehearsed.publicKeyReference
+      || registration.activatedAt !== rehearsed.activatedAt
+      || registration.publicJwkSha256 !== await digestCanonical(rehearsed.publicJwk)) {
+      throw new Error('Client-key evidence public registration binding mismatch')
+    }
+    return Object.freeze({ ...registration })
+  }))
+  if (Date.parse(registrations[1]!.activatedAt) <= Date.parse(registrations[0]!.activatedAt)) {
+    throw new Error('Client-key evidence activation order mismatch')
+  }
+  const phases = result.sequence.snapshots.map(({ phase, registrations: keys }) => ({
+    phase,
+    states: keys.map(({ state }) => state),
+    keyIds: keys.map(({ keyId }) => keyId),
+  }))
+  if (JSON.stringify(phases.map(({ phase, states }) => ({ phase, states }))) !== JSON.stringify([
+    { phase: 'active', states: ['active'] },
+    { phase: 'overlap', states: ['overlap', 'active'] },
+    { phase: 'retired', states: ['retired', 'active'] },
+  ])) {
+    throw new Error('Client-key evidence rotation phase mismatch')
+  }
+  const expectedChecks = {
+    activeAccepted: true,
+    overlapAccepted: true,
+    retiredRefused: true,
+    unknownRefused: true,
+    tamperedRefused: true,
+    wrongClientRefused: true,
+    wrongAudienceRefused: true,
+    keyMaterialMismatchRefused: true,
+  }
+  if (JSON.stringify(result.checks) !== JSON.stringify(expectedChecks)) {
+    throw new Error('Client-key evidence rehearsal checks mismatch')
+  }
+  const submission = {
+    schema: 'academy-client-public-key-registration-evidence-submission/v1' as const,
+    revision: 1 as const,
+    submissionState: 'submitted-for-independent-review' as const,
+    blockerId: 'client-public-key-registration-and-rotation-rehearsal' as const,
+    blockerStatus: 'open' as const,
+    preparationOnly: true as const,
+    sourceBindings: EVIDENCE_SOURCE,
+    evidence: [
+      {
+        requirement: 'Reviewed public-key reference digest, algorithm, key identifier, and activation metadata',
+        registrations,
+      },
+      {
+        requirement: 'Isolated active-overlap-retired rotation rehearsal receipt',
+        rehearsal: {
+          mode: result.mode,
+          phases,
+          checks: Object.freeze({ ...result.checks }),
+          passed: true as const,
+        },
+      },
+    ],
+    boundary: {
+      productionReadiness: false as const,
+      releaseApproval: false as const,
+      productionAuthority: 'NONE' as const,
+      registryMutationAuthority: 'NONE' as const,
+      runtimeWired: false as const,
+      trafficEnabled: false as const,
+      privateKeyPersisted: false as const,
+      requestedOperations: Object.freeze([]),
+    },
+  }
+  const rendered = JSON.stringify(submission)
+  if (/\"d\"\s*:|privateJwk|PRIVATE KEY|BEGIN EC/i.test(rendered)) {
+    throw new Error('Client-key evidence contains private key material')
+  }
+  return Object.freeze(submission)
+}
+
 export async function validateAcademyClientAssertionRegistrationSequence(
   sequence: AcademyClientAssertionRegistrationSequence,
 ): Promise<void> {

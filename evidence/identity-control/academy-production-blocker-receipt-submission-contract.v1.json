@@ -1,0 +1,135 @@
+{
+  "schema": "identity-control-academy-production-blocker-receipt-submission-contract/v1",
+  "revision": 1,
+  "status": "preparation-only-non-executable",
+  "preparationOnly": true,
+  "executable": false,
+  "productionReadiness": false,
+  "releaseApproval": false,
+  "productionAuthority": "NONE",
+  "academyWebEnabled": false,
+  "lifecycleTrafficEnabled": false,
+  "requestedOperations": [],
+  "sourceBindings": [
+    {
+      "path": "config/academy-production-authorization-material.v1.json",
+      "sha256": "eea9fdb05198629fc5c9a74a817d105567c1ad3f12b720370f14cb717ff29b4e",
+      "classification": "canonical-source-no-authority"
+    },
+    {
+      "path": "config/academy-release-evidence-intake-checklist.v1.json",
+      "sha256": "5e36568a056c668f9f4372924c2e6bc0a52823f5b168334fdf5ab9fea4c349e5",
+      "classification": "canonical-source-no-authority"
+    }
+  ],
+  "productionBlockers": {
+    "closed": 0,
+    "total": 6
+  },
+  "receiptAcceptance": {
+    "accepted": 0,
+    "total": 5
+  },
+  "contractCoverage": {
+    "covered": 5,
+    "total": 5
+  },
+  "receiptProfiles": [
+    {
+      "blockerId": "canonical-domain-deployment-evidence",
+      "accountableOwners": [
+        "academy"
+      ],
+      "acceptanceOwners": [
+        "identity-control"
+      ],
+      "evidenceRequired": [
+        "Academy deployment receipt binding the canonical domain, source revision, and artifact digests",
+        "HTTPS callback probe receipt for the exact registered URI"
+      ],
+      "receiptSchema": {
+        "version": "v1",
+        "submissionState": "submitted-for-independent-review",
+        "blockerStatus": "open",
+        "evidenceMode": "exactly-one-source-bound-entry-per-evidence-required-in-canonical-order"
+      }
+    },
+    {
+      "blockerId": "client-public-key-registration-and-rotation-rehearsal",
+      "accountableOwners": [
+        "academy-runtime"
+      ],
+      "acceptanceOwners": [
+        "identity-control"
+      ],
+      "evidenceRequired": [
+        "Reviewed public-key reference digest, algorithm, key identifier, and activation metadata",
+        "Isolated active-overlap-retired rotation rehearsal receipt"
+      ],
+      "receiptSchema": {
+        "version": "v1",
+        "submissionState": "submitted-for-independent-review",
+        "blockerStatus": "open",
+        "evidenceMode": "exactly-one-source-bound-entry-per-evidence-required-in-canonical-order"
+      }
+    },
+    {
+      "blockerId": "lifecycle-publisher-endpoint-and-audience",
+      "accountableOwners": [
+        "identity-control",
+        "academy-runtime"
+      ],
+      "acceptanceOwners": [
+        "identity-control"
+      ],
+      "evidenceRequired": [
+        "Exact HTTPS publisher endpoint plus client-assertion and event audience specification",
+        "Authenticated-pull consumer rehearsal receipt bound to the accepted values"
+      ],
+      "receiptSchema": {
+        "version": "v1",
+        "submissionState": "submitted-for-independent-review",
+        "blockerStatus": "open",
+        "evidenceMode": "exactly-one-source-bound-entry-per-evidence-required-in-canonical-order"
+      }
+    },
+    {
+      "blockerId": "named-kill-switch-operator",
+      "accountableOwners": [
+        "academy"
+      ],
+      "acceptanceOwners": [
+        "identity-control"
+      ],
+      "evidenceRequired": [
+        "Named primary and backup Academy kill-switch operators with escalation route",
+        "Bounded disable-and-recovery rehearsal receipt with acknowledgement evidence"
+      ],
+      "receiptSchema": {
+        "version": "v1",
+        "submissionState": "submitted-for-independent-review",
+        "blockerStatus": "open",
+        "evidenceMode": "exactly-one-source-bound-entry-per-evidence-required-in-canonical-order"
+      }
+    },
+    {
+      "blockerId": "consumer-conformance-rehearsal",
+      "accountableOwners": [
+        "academy"
+      ],
+      "acceptanceOwners": [
+        "identity-control"
+      ],
+      "evidenceRequired": [
+        "Academy product-local all-scenario conformance report with source revision and artifact digests",
+        "Checkpoint freeze manifest and Identity Control intake receipt"
+      ],
+      "receiptSchema": {
+        "version": "v1",
+        "submissionState": "submitted-for-independent-review",
+        "blockerStatus": "open",
+        "evidenceMode": "exactly-one-source-bound-entry-per-evidence-required-in-canonical-order"
+      }
+    }
+  ]
+}

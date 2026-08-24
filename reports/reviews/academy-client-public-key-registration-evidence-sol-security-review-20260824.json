@@ -1,0 +1,19 @@
+{
+  "schema": "academy-sol-security-review/v1",
+  "sourceSha256": "25aedc8d647adf60c3746e645b3ebbd02e51ac4e88b583fbfa73db854d271b07",
+  "freezePath": "reports/reviews/academy-client-public-key-registration-evidence-submission-freeze-20260824.json",
+  "verdict": "PASS",
+  "findings": { "critical": 0, "high": 0, "medium": 0, "low": 0 },
+  "reviewHistory": [
+    {
+      "verdict": "FAIL",
+      "findings": { "critical": 0, "high": 0, "medium": 1, "low": 0 },
+      "summary": "Registration evidence was internally consistent but not exact-bound to the rehearsed sequence."
+    },
+    {
+      "verdict": "PASS",
+      "findings": { "critical": 0, "high": 0, "medium": 0, "low": 0 },
+      "summary": "Both registration records are exact-compared to the validated rehearsal sequence and their public-JWK digests are recomputed; coherent substitution is rejected."
+    }
+  ]
+}

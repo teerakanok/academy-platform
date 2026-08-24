@@ -1,0 +1,117 @@
+{
+  "schema": "academy-client-public-key-registration-evidence-submission/v1",
+  "revision": 1,
+  "submissionState": "submitted-for-independent-review",
+  "blockerId": "client-public-key-registration-and-rotation-rehearsal",
+  "blockerStatus": "open",
+  "preparationOnly": true,
+  "sourceBindings": {
+    "academyRevision": "0d44d22b311af64078cf6d9dda9fc3f4713c3918",
+    "identityRevision": "bf663fa72003fd12fccc90a8ff93b37e29732f6d",
+    "identityRuntimeContracts": [
+      {
+        "path": "packages/core/src/client-assertion.ts",
+        "sha256": "6cc0f77cae9782420883802fc3a92f181773fa22d298ec9b9998dc3718f8fff6",
+        "bytes": 5938
+      },
+      {
+        "path": "packages/core/src/client-control.ts",
+        "sha256": "5c3544a6b8056f95021f0dc871ca465d16235cad482984646b3b5b3a9455063c",
+        "bytes": 2363
+      }
+    ],
+    "receiptContract": {
+      "path": "evidence/identity-control/academy-production-blocker-receipt-submission-contract.v1.json",
+      "sha256": "3cda4c9ad0db04ecd63dc2734ad97bcee84f6d431f67c2d35dd10b4e3fd66836",
+      "bytes": 4426
+    },
+    "rehearsalFreeze": {
+      "path": "reports/reviews/academy-identity-client-assertion-registration-rehearsal-closure-freeze-20260823.json",
+      "sha256": "772ebecd76d3fc6bf65eba8387810ebaa427741c341416cb4a5f80e8b9b7e691",
+      "bytes": 3276
+    }
+  },
+  "evidence": [
+    {
+      "requirement": "Reviewed public-key reference digest, algorithm, key identifier, and activation metadata",
+      "registrations": [
+        {
+          "clientId": "academy-web",
+          "keyId": "academy-8ec21f68801ffaeaeeb619194e70afac800386ee",
+          "algorithm": "ES256",
+          "publicKeyReference": "config://client-keys/academy-web/academy-8ec21f68801ffaeaeeb619194e70afac800386ee",
+          "activatedAt": "2026-08-20T00:00:00.000Z",
+          "publicJwkSha256": "8ec21f68801ffaeaeeb619194e70afac800386ee571fbe1f37b1e6debda7ceb2"
+        },
+        {
+          "clientId": "academy-web",
+          "keyId": "academy-cef237c6fb6c26397855e27414142f50fd37d5c7",
+          "algorithm": "ES256",
+          "publicKeyReference": "config://client-keys/academy-web/academy-cef237c6fb6c26397855e27414142f50fd37d5c7",
+          "activatedAt": "2026-08-20T00:05:00.000Z",
+          "publicJwkSha256": "cef237c6fb6c26397855e27414142f50fd37d5c77d8d7b7a776821c2bffa32f9"
+        }
+      ]
+    },
+    {
+      "requirement": "Isolated active-overlap-retired rotation rehearsal receipt",
+      "rehearsal": {
+        "mode": "local-ephemeral",
+        "phases": [
+          {
+            "phase": "active",
+            "states": [
+              "active"
+            ],
+            "keyIds": [
+              "academy-8ec21f68801ffaeaeeb619194e70afac800386ee"
+            ]
+          },
+          {
+            "phase": "overlap",
+            "states": [
+              "overlap",
+              "active"
+            ],
+            "keyIds": [
+              "academy-8ec21f68801ffaeaeeb619194e70afac800386ee",
+              "academy-cef237c6fb6c26397855e27414142f50fd37d5c7"
+            ]
+          },
+          {
+            "phase": "retired",
+            "states": [
+              "retired",
+              "active"
+            ],
+            "keyIds": [
+              "academy-8ec21f68801ffaeaeeb619194e70afac800386ee",
+              "academy-cef237c6fb6c26397855e27414142f50fd37d5c7"
+            ]
+          }
+        ],
+        "checks": {
+          "activeAccepted": true,
+          "overlapAccepted": true,
+          "retiredRefused": true,
+          "unknownRefused": true,
+          "tamperedRefused": true,
+          "wrongClientRefused": true,
+          "wrongAudienceRefused": true,
+          "keyMaterialMismatchRefused": true
+        },
+        "passed": true
+      }
+    }
+  ],
+  "boundary": {
+    "productionReadiness": false,
+    "releaseApproval": false,
+    "productionAuthority": "NONE",
+    "registryMutationAuthority": "NONE",
+    "runtimeWired": false,
+    "trafficEnabled": false,
+    "privateKeyPersisted": false,
+    "requestedOperations": []
+  }
+}

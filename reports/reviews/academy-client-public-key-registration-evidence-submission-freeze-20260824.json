@@ -1,0 +1,36 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/scripts/capture-client-key-registration-evidence.ts",
+      "sha256": "74040a435673fded6335317d4fcdb631366fddeee55c7eb223c528e8c80fdceb",
+      "bytes": 3033
+    },
+    {
+      "path": "academy-web/src/lib/identity/client-assertion-registration-rehearsal.ts",
+      "sha256": "4ef35c2ff4017e480826753b0a692d21f63b236ff95d92f72898c7c932c22042",
+      "bytes": 26072
+    },
+    {
+      "path": "academy-web/tests/unit/identity-client-assertion-registration-rehearsal.test.ts",
+      "sha256": "b89d419b26976e151c28bc6510765118e9ce5d646fe2d82be317d94aac742955",
+      "bytes": 13683
+    },
+    {
+      "path": "evidence/identity-control/academy-production-blocker-receipt-submission-contract.v1.json",
+      "sha256": "3cda4c9ad0db04ecd63dc2734ad97bcee84f6d431f67c2d35dd10b4e3fd66836",
+      "bytes": 4426
+    },
+    {
+      "path": "reports/reviews/academy-client-public-key-registration-evidence-submission-20260824.json",
+      "sha256": "8697d4d9c83e71bcfddc1b65b29e495619d497278e1e8e0f8186a201b98646ee",
+      "bytes": 4039
+    },
+    {
+      "path": "reports/reviews/academy-identity-client-assertion-registration-rehearsal-closure-freeze-20260823.json",
+      "sha256": "772ebecd76d3fc6bf65eba8387810ebaa427741c341416cb4a5f80e8b9b7e691",
+      "bytes": 3276
+    }
+  ]
+}

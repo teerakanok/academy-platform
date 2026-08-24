@@ -3,6 +3,20 @@
 > Closed items only, with outcome + evidence + residual risk. Newest first.
 > Provider-neutral. See `active_plan.md` for open work.
 
+## 2026-08-24 - Public-only client-key evidence submission closed locally
+
+- Captured exactly two public-only ES256 registration records from the existing local-ephemeral
+  active-overlap-retired rehearsal. Each key ID is derived from its public-JWK SHA-256 digest and
+  each reference binds the exact key ID.
+- Persisted no JWK coordinates, private JWK member, private key, credential, secret, runtime value,
+  or live registry mutation. All production, release, runtime, traffic, and authority fields remain
+  false or NONE.
+- Focused builder/rehearsal tests pass 10/10; lint and all configured TypeScript checks pass; the
+  exact six-file freeze and secret-shape scan pass.
+- Submission remains open for independent Identity actual-root review, so canonical readiness stays
+  receipts 2/5, blockers 2/6, ordered 4/8 (50.0%), conformance 16/23, authority NONE, operations 0.
+
+
 ## 2026-08-24 - Identity lifecycle acceptance ingested and next no-traffic gate selected
 
 - Verified Identity Control implementation `d4ccd79f3cd2b54b6d3d86832d1795dfd4511e0d`

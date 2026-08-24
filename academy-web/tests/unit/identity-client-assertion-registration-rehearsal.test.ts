@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { describe, expect, it } from 'vitest'
 
 import {
+  createAcademyClientKeyRegistrationEvidenceSubmission,
   runAcademyClientAssertionRegistrationRehearsal,
   validateAcademyClientAssertionRegistrationSequence,
   type AcademyClientAssertionRegistrationSequence,
@@ -137,6 +138,89 @@ describe('Academy client-assertion public-key registration rehearsal', () => {
     const invalid = structuredClone(result.sequence)
     mutate(invalid)
     await expect(validateAcademyClientAssertionRegistrationSequence(invalid)).rejects.toThrow()
+  })
+
+  it('builds a public-only source-bound submission with exact registration metadata', async () => {
+    const { Authenticator, ClientControlRegistry } = await loadIdentityControlContracts()
+    const result = await runAcademyClientAssertionRegistrationRehearsal({
+      createControlRegistry: () => new ClientControlRegistry(),
+      createAuthenticator: (registry) => identityControlAuthenticator(registry, Authenticator),
+    })
+    const submission = await createAcademyClientKeyRegistrationEvidenceSubmission(result)
+
+    expect(submission).toMatchObject({
+      schema: 'academy-client-public-key-registration-evidence-submission/v1',
+      submissionState: 'submitted-for-independent-review',
+      blockerId: 'client-public-key-registration-and-rotation-rehearsal',
+      blockerStatus: 'open',
+      preparationOnly: true,
+      boundary: {
+        productionReadiness: false,
+        releaseApproval: false,
+        productionAuthority: 'NONE',
+        registryMutationAuthority: 'NONE',
+        runtimeWired: false,
+        trafficEnabled: false,
+        privateKeyPersisted: false,
+        requestedOperations: [],
+      },
+    })
+    const registrationEvidence = submission.evidence[0]
+    const rehearsalEvidence = submission.evidence[1]
+    if (!registrationEvidence || !('registrations' in registrationEvidence)
+      || !Array.isArray(registrationEvidence.registrations)
+      || !rehearsalEvidence || !('rehearsal' in rehearsalEvidence)
+      || !rehearsalEvidence.rehearsal) {
+      throw new Error('Evidence order drifted')
+    }
+    const registrations = registrationEvidence.registrations
+    expect(registrations).toHaveLength(2)
+    for (const registration of registrations) {
+      expect(registration.algorithm).toBe('ES256')
+      expect(registration.keyId).toBe(`academy-${registration.publicJwkSha256.slice(0, 40)}`)
+      expect(registration.publicKeyReference).toBe(
+        `config://client-keys/academy-web/${registration.keyId}`,
+      )
+    }
+    expect(rehearsalEvidence.rehearsal.phases.map(({ phase, states }) => ({ phase, states }))).toEqual([
+      { phase: 'active', states: ['active'] },
+      { phase: 'overlap', states: ['overlap', 'active'] },
+      { phase: 'retired', states: ['retired', 'active'] },
+    ])
+    expect(JSON.stringify(submission)).not.toMatch(/\"d\"\s*:|privateJwk|PRIVATE KEY|BEGIN EC/i)
+  })
+
+  it('rejects drifted public digest and every enabled production boundary', async () => {
+    const { Authenticator, ClientControlRegistry } = await loadIdentityControlContracts()
+    const result = await runAcademyClientAssertionRegistrationRehearsal({
+      createControlRegistry: () => new ClientControlRegistry(),
+      createAuthenticator: (registry) => identityControlAuthenticator(registry, Authenticator),
+    })
+    const drifted = structuredClone(result)
+    drifted.registrations[0]!.publicJwkSha256 = '0'.repeat(64)
+    await expect(createAcademyClientKeyRegistrationEvidenceSubmission(drifted)).rejects.toThrow(
+      /public registration binding/i,
+    )
+
+    const substituted = structuredClone(result)
+    const replacementDigest = 'a'.repeat(64)
+    substituted.registrations[0] = {
+      ...substituted.registrations[0]!,
+      keyId: `academy-${replacementDigest.slice(0, 40)}`,
+      publicKeyReference: `config://client-keys/academy-web/academy-${replacementDigest.slice(0, 40)}`,
+      publicJwkSha256: replacementDigest,
+    }
+    await expect(createAcademyClientKeyRegistrationEvidenceSubmission(substituted)).rejects.toThrow(
+      /public registration binding/i,
+    )
+
+    for (const field of ['enabled', 'runtimeWired', 'releaseApproval', 'productionEvidence'] as const) {
+      const widened = structuredClone(result)
+      Reflect.set(widened, field, true)
+      await expect(createAcademyClientKeyRegistrationEvidenceSubmission(widened)).rejects.toThrow(
+        /passing disabled local rehearsal/i,
+      )
+    }
   })
 })
 

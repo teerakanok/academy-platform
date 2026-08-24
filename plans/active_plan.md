@@ -4,6 +4,22 @@
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
 > **Last updated:** 2026-08-23
 
+**Public-only client-key registration/rotation evidence submitted locally (2026-08-24):**
+Academy now captures one source-bound, local-ephemeral receipt from the reviewed registration
+rehearsal. The receipt persists only `ES256`, derived key IDs, exact public-key references,
+millisecond activation metadata, SHA-256 digests of public JWKs, active -> overlap+active ->
+retired+active phase evidence, and eight boolean acceptance/refusal checks. It contains no public
+JWK coordinates, private JWK member, private key, credential, or secret. The capture is bound to
+Academy `0d44d22`, Identity `bf663fa`, the committed Identity receipt profile, and the prior
+Academy rehearsal freeze. Focused tests pass `10/10`; full unit passes `2,046/2,046`; lint and all
+configured TypeScript checks pass; the six-file freeze and secret-shape scan pass. Independent Sol
+security review found one Medium spoofable-binding gap; exact sequence comparison, public-JWK
+digest recomputation, and a coherent-substitution regression closed it at final `C0/H0/M0/L0`.
+This remains submitted for independent
+Identity review with blocker status open. Canonical readiness therefore remains receipts `2/5`,
+blockers `2/6`, ordered `4/8` (`50.0%`), conformance `16/23`, authority `NONE`, and operations `0`.
+Evidence: `reports/reviews/academy-client-public-key-registration-evidence-submission-20260824.json`.
+
 **Lifecycle disabled-rehearsal acceptance ingested (2026-08-24):** Identity Control
 independently reproduced Academy evidence root `b3a2010` and accepted only the disabled
 authenticated-pull rehearsal at implementation `d4ccd79` and handoff/origin `bf663fa`.
