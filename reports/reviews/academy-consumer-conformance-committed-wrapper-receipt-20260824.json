@@ -1,0 +1,222 @@
+{
+  "schema": "identity-committed-consumer-conformance-intake/v1",
+  "consumerEvidence": "36f8635429a4df7f29bcb2f0e5c1dc6eb02faf27",
+  "consumerSourceRevision": "a6194e1f2534e71b336e3cb068e2229e469f06f8",
+  "reportPath": "reports/conformance/identity-control/academy-identity-control-conformance.json",
+  "evidencePathCount": 3,
+  "sourceRepositoryUnchanged": true,
+  "intake": {
+    "schema": "identity-consumer-conformance-intake/v1",
+    "clientId": "academy-web",
+    "registryRevision": 1,
+    "identityControlSourceRevision": "57aec0a65df932b415b5b2a77a85689a6d9eee9a",
+    "consumerSourceRevision": "a6194e1f2534e71b336e3cb068e2229e469f06f8",
+    "reportPath": "reports/conformance/identity-control/academy-identity-control-conformance.json",
+    "reportSha256": "c8dcb6dac0b56114fea3b53e6548e9ff9691e2c15c4fe5c725cfb62b918ba0eb",
+    "verifiedScenarioCount": 23,
+    "passedScenarioCount": 23,
+    "unprovenScenarioCount": 0,
+    "verifiedArtifacts": [
+      {
+        "scenarioId": "authorization.exact-registered-redirect",
+        "result": "pass",
+        "artifactPath": "academy-web/tests/unit/identity-runtime-browser-flow.test.ts",
+        "artifactSha256": "afbfcaa0abfd012a1e079b1442b15be2e304a0d91002805e91b0e8b239f971e6"
+      },
+      {
+        "scenarioId": "authorization.state-binding-mismatch",
+        "result": "pass",
+        "artifactPath": "academy-web/tests/unit/identity-runtime-browser-flow.test.ts",
+        "artifactSha256": "afbfcaa0abfd012a1e079b1442b15be2e304a0d91002805e91b0e8b239f971e6"
+      },
+      {
+        "scenarioId": "authorization.state-expiry-replay",
+        "result": "pass",
+        "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
+        "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
+      },
+      {
+        "scenarioId": "callback.code-and-state-only",
+        "result": "pass",
+        "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
+        "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
+      },
+      {
+        "scenarioId": "callback.server-held-intent",
+        "result": "pass",
+        "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
+        "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
+      },
+      {
+        "scenarioId": "callback.login-csrf",
+        "result": "pass",
+        "artifactPath": "academy-web/tests/unit/identity-runtime-browser-flow.test.ts",
+        "artifactSha256": "afbfcaa0abfd012a1e079b1442b15be2e304a0d91002805e91b0e8b239f971e6"
+      },
+      {
+        "scenarioId": "callback.origin-fetch-metadata",
+        "result": "pass",
+        "artifactPath": "academy-web/tests/unit/identity-runtime-browser-flow.test.ts",
+        "artifactSha256": "afbfcaa0abfd012a1e079b1442b15be2e304a0d91002805e91b0e8b239f971e6"
+      },
+      {
+        "scenarioId": "exchange.pkce-s256",
+        "result": "pass",
+        "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
+        "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
+      },
+      {
+        "scenarioId": "exchange.client-assertion",
+        "result": "pass",
+        "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
+        "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
+      },
+      {
+        "scenarioId": "exchange.result-binding",
+        "result": "pass",
+        "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
+        "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
+      },
+      {
+        "scenarioId": "exchange.code-replay-expiry",
+        "result": "pass",
+        "artifactPath": "academy-web/tests/unit/identity-transaction.test.ts",
+        "artifactSha256": "1cfa5e6912123a088d1d047e8bce569a1f890aa0791d20c58c048cbc6ab41487"
+      },
+      {
+        "scenarioId": "exchange.result-key-rotation",
+        "result": "pass",
+        "artifactPath": "academy-web/tests/unit/identity-result-key-set-importer.test.ts",
+        "artifactSha256": "b9f99cffaf024680f2fe3e0cd5db2a087544555c0fdc4d8b95b42a7e4253def0"
+      },
+      {
+        "scenarioId": "session.host-scoped",
+        "result": "pass",
+        "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
+        "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
+      },
+      {
+        "scenarioId": "activation.grants-zero-product-access",
+        "result": "pass",
+        "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
+        "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
+      },
+      {
+        "scenarioId": "lifecycle.envelope-cryptographic-verification",
+        "result": "pass",
+        "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
+        "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
+      },
+      {
+        "scenarioId": "lifecycle.duplicate-stale",
+        "result": "pass",
+        "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
+        "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
+      },
+      {
+        "scenarioId": "lifecycle.gap-conflict",
+        "result": "pass",
+        "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
+        "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
+      },
+      {
+        "scenarioId": "lifecycle.config-revision-change",
+        "result": "pass",
+        "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
+        "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
+      },
+      {
+        "scenarioId": "lifecycle.cursor-after-commit",
+        "result": "pass",
+        "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
+        "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
+      },
+      {
+        "scenarioId": "outage.fail-closed",
+        "result": "pass",
+        "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
+        "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
+      },
+      {
+        "scenarioId": "academy.activation-profile-only",
+        "result": "pass",
+        "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
+        "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
+      },
+      {
+        "scenarioId": "academy.course-entitlement",
+        "result": "pass",
+        "artifactPath": "reports/conformance/identity-control/academy-identity-unit-conformance.txt",
+        "artifactSha256": "2f3e45ba63c978a6f730873ca6c0aa619064a9d0d6145594fee9cfe668051fc1"
+      },
+      {
+        "scenarioId": "academy.canonical-founder-bootstrap",
+        "result": "pass",
+        "artifactPath": "academy-web/tests/unit/identity-runtime-browser-flow.test.ts",
+        "artifactSha256": "afbfcaa0abfd012a1e079b1442b15be2e304a0d91002805e91b0e8b239f971e6"
+      }
+    ],
+    "localWorkingTreeReceipt": {
+      "schema": "identity-consumer-local-receipt/v2",
+      "mode": "local-git-state",
+      "head": "a6194e1f2534e71b336e3cb068e2229e469f06f8",
+      "excludedPaths": [
+        "reports/conformance/identity-control/academy-identity-control-conformance.json"
+      ],
+      "indexStateSha256": "25e9b1fdba33e09efb77d6f7c7db7e3e287984d19946340005ef83ba318072d5",
+      "indexEntryCount": 1234,
+      "trackedWorktreeStateSha256": "32416b8355e510cee105c8dbcc6f8c890208c4186a8e04c39506179426f5411a",
+      "trackedWorktreeEntryCount": 1234,
+      "untrackedStateSha256": "64d07385b423b51c63e41b4e86bebe20ac3264d361739346c7d4dc5503186928",
+      "untrackedEntryCount": 0,
+      "untrackedFileSha256": []
+    },
+    "producerLocalArtifactReceipt": {
+      "schema": "identity-control-producer-local-receipt/v1",
+      "mode": "local-git-artifact-state",
+      "head": "57aec0a65df932b415b5b2a77a85689a6d9eee9a",
+      "scope": [
+        "config/consumer-registry-v1.approved.json",
+        "docs/integration/consumer-registry-v1.md",
+        "docs/integration/consumer-conformance-kit.md",
+        "docs/integration/lifecycle-pull-consumer-contract.md",
+        "packages/contracts/src/index.ts",
+        "packages/testing/src/index.ts"
+      ],
+      "headStateSha256": "c4beed1f155e56d2358321a5197d261e4f48b2eebcf43a4c61f288ec4d61262e",
+      "headEntryCount": 6,
+      "indexStateSha256": "2b05fd2b38516afe7aa19f0eeea2fb97dae7efd2b00e21620090e0668673ff44",
+      "indexEntryCount": 6,
+      "worktreeStateSha256": "20e5aa6478f864ef432857da57f4733aa413ea80237e79bd4370dfc5b665be36",
+      "worktreeEntryCount": 6,
+      "artifactFileSha256": [
+        {
+          "path": "config/consumer-registry-v1.approved.json",
+          "sha256": "572d230a9f84c219e5b82eeb84dd1350bd8a319e180f2208f45db3abc03d1875"
+        },
+        {
+          "path": "docs/integration/consumer-registry-v1.md",
+          "sha256": "d880b0e2a8000f6898b76b91ee47ab18b886ac8e2f413f214448a8a2bed575a4"
+        },
+        {
+          "path": "docs/integration/consumer-conformance-kit.md",
+          "sha256": "203b1e43e8ea9e3b651029f9fb78d8f911b7f7c17942a11c9a1d1931268ed7d6"
+        },
+        {
+          "path": "docs/integration/lifecycle-pull-consumer-contract.md",
+          "sha256": "ba7ca71fd5ab845821f6dc9cfc09bc612bef1ed12914331e4ad4e65a0ce6f17c"
+        },
+        {
+          "path": "packages/contracts/src/index.ts",
+          "sha256": "e3f22d7bb02f255c01d3552022b874202df849cf31410ebff98fac7460f5799f"
+        },
+        {
+          "path": "packages/testing/src/index.ts",
+          "sha256": "d12f81616596dc37a9f62ae16e37873c08efabc222427f4b82ced187c0b6a51d"
+        }
+      ]
+    },
+    "releaseApproval": false,
+    "note": "Local artifact intake is evidence verification only; it does not enable the disabled client or approve production release."
+  }
+}
