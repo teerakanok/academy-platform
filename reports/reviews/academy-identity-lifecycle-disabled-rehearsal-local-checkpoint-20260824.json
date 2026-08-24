@@ -1,0 +1,37 @@
+{
+  "schema": "academy-source-bound-disabled-lifecycle-rehearsal-evidence/v1",
+  "academySourceRevision": "be72bd4978b616bcd8d782dfc80106ab27780f67",
+  "identityControlSourceRevision": "d95efebd518c83f711767947ced6c69b14c05881",
+  "intakeFixture": {
+    "path": "evidence/identity-lifecycle-disabled-rehearsal-intake-contract.v1.json",
+    "sha256": "f67381f6dfb9f6314322b0b78d028b340664bd133b64d7ba133bd938fd8d9b66"
+  },
+  "selectedValues": {
+    "publisherEndpoint": "https://identity-control.internal/v1/lifecycle/events/pull",
+    "clientAssertionAudience": "https://identity-control.internal/v1/lifecycle/events/pull",
+    "eventAudience": "https://academy.cyberskills.co.th/lifecycle/events"
+  },
+  "acceptanceBoundary": {
+    "registryRemainsDisabled": true,
+    "registryLifecycleValuesRemainNull": true,
+    "lifecycleTrafficEnabled": false,
+    "productionAuthorityClaimed": false,
+    "releaseApproval": false
+  },
+  "advisoryResult": {
+    "status": "PENDING_ACADEMY_SUBMISSION",
+    "summary": "Academy remains disabled; this local rehearsal is not an Identity acceptance, blocker closure, production admission, release approval, or production authority claim.",
+    "findings": [
+      "receipts 1/5",
+      "blockers 1/6",
+      "ordered 3/8",
+      "authority NONE",
+      "operations 0"
+    ],
+    "changed_files": [
+      "academy-web/scripts/identity-lifecycle-disabled-rehearsal.mjs",
+      "academy-web/scripts/identity-lifecycle-disabled-rehearsal.test.mjs",
+      "reports/reviews/academy-identity-lifecycle-disabled-rehearsal-local-checkpoint-20260824.json"
+    ]
+  }
+}

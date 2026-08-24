@@ -14,16 +14,25 @@ evidence only: no deployed-current-candidate smoke, operator receipt, rollback r
 admission remains `0/1`; Identity conformance remains `16/23` (`69.6%`). Evidence:
 `reports/reviews/academy-no-traffic-candidate-upload-receipt-20260823.json`.
 
-**Canonical-domain and authenticated callback evidence (valid submission; canonical acceptance record pending, 2026-08-23):**
+**Lifecycle endpoint/audience disabled rehearsal submitted locally (2026-08-24):**
+Academy now binds the exact Identity-selected publisher endpoint, client-assertion audience, and
+event audience to one source-bound rehearsal while the runtime consumer policy remains disabled
+with all three lifecycle values `null`. Focused Node `3/3`, related scripts `13/13`, full unit
+`2,044/2,044`, lint/type checks, and the four-file freeze pass. This is an Academy submission
+checkpoint only: Identity actual-root acceptance and blocker closure remain open. Ordered readiness
+stays `3/8` (`37.5%`), receipts `1/5`, closed blockers `1/6`, and Identity conformance
+`16/23` (`69.6%`). Evidence:
+`reports/reviews/academy-identity-lifecycle-disabled-rehearsal-local-checkpoint-20260824.json`.
+
+**Canonical-domain and authenticated callback evidence (accepted by Identity Control, 2026-08-23):**
 The deployed `cyberskills-academy` Worker now has source-bound canonical-domain evidence for
 `academy.cyberskills.co.th`: DNS and unauthenticated requests reach the Cloudflare Access gate,
 and an owner-authorized Access session rendered `/`, `/courses` (eight previews), and the exact
-no-parameter `/auth/callback` Worker validation response. The two required evidence artifacts are
-an independently validated submission, but the current Identity Control guard requires a separate
-reviewed canonical acceptance record before it may count an accepted receipt. This does not claim a
-real OAuth `code`/`state` acceptance, Identity acceptance, or production admission.
-Canonical-domain evidence collection is `2/2`; receipt acceptance remains `0/1` for this blocker,
-production admission remains `0/1`, and Identity conformance remains `16/23` (`69.6%`). Evidence:
+no-parameter `/auth/callback` Worker validation response. Identity Control independently accepted
+the exact two-artifact submission at `990df31`, closing only the canonical-domain blocker and
+advancing accepted production receipts to `1/5`. This does not claim a real OAuth `code`/`state`
+acceptance, production admission, or release authority. Closed blockers are `1/6`, ordered
+readiness is `3/8`, and Identity conformance remains `16/23` (`69.6%`). Evidence:
 `reports/reviews/academy-canonical-domain-deployment-receipt-20260823.json`,
 `reports/reviews/academy-canonical-domain-callback-probe-receipt-20260823.json`, and
 `reports/reviews/academy-canonical-domain-deployment-evidence-submission-20260823.json`.

@@ -1,0 +1,105 @@
+{
+  "schema": "identity-control-academy-lifecycle-disabled-rehearsal-intake-contract/v1",
+  "revision": 1,
+  "status": "pending-academy-disabled-rehearsal-submission",
+  "identityBaseRevision": "5b4c3a0bb6984be6d6613631d0cf2c98069c84a2",
+  "academyBaseRevision": "be72bd4978b616bcd8d782dfc80106ab27780f67",
+  "dependencyProof": {
+    "path": "config/academy-next-release-gate-dependency-proof.v1.json",
+    "sha256": "eb3f1fe17b1e543329bef7e032b0f87f6f0f4be5f6e9ba5edcc3fcf400c21431",
+    "bytes": 6397
+  },
+  "selectedValues": {
+    "publisherEndpoint": "https://identity-control.internal/v1/lifecycle/events/pull",
+    "clientAssertionAudience": "https://identity-control.internal/v1/lifecycle/events/pull",
+    "eventAudience": "https://academy.cyberskills.co.th/lifecycle/events"
+  },
+  "academySourceBindings": [
+    {
+      "path": "academy-web/src/lib/identity/consumer-policy.ts",
+      "sha256": "d1e01ee65093c7774d23a8dc87b658b6957783b7afd20554f014500a701f238a",
+      "bytes": 3690
+    },
+    {
+      "path": "academy-web/tests/unit/identity-consumer-policy.test.ts",
+      "sha256": "1b68bd92ee8aab33e8c0569906fde4ac91de892844e017e08be3f1ec94a503fc",
+      "bytes": 3448
+    },
+    {
+      "path": "academy-web/src/lib/identity/lifecycle-pull-transport.ts",
+      "sha256": "cbf8f2351bd1a6cddabeab0284ef41ae04773cd05342eeb38b79875e96e7d09c",
+      "bytes": 2609
+    },
+    {
+      "path": "academy-web/tests/unit/identity-lifecycle-pull-transport.test.ts",
+      "sha256": "9c5008fcf813464c633562728e798e68573af11b89c5ca2a98f609d9a444c96c",
+      "bytes": 8935
+    },
+    {
+      "path": "reports/conformance/identity-control/academy-identity-control-conformance.json",
+      "sha256": "00454a524ef914d177d8a91f8d0bf133d5e58fcb760be7b714c0aa928569d15b",
+      "bytes": 176688
+    },
+    {
+      "path": "reports/conformance/identity-control/academy-identity-unproven-scenarios.json",
+      "sha256": "b65c9e4a95337a46a72f34e9f6b99ae5689681e7c7875452f1a6367f2d164f3f",
+      "bytes": 1393
+    },
+    {
+      "path": "reports/reviews/academy-identity-lifecycle-pull-transport-local-checkpoint-2026-08-11.md",
+      "sha256": "a52c150944b117034b2d5f6786bb3927ac0906afbfef2289cf2b26db3e7607e2",
+      "bytes": 5641
+    }
+  ],
+  "futureAcademySubmission": {
+    "requiredSourceRevision": "be72bd4978b616bcd8d782dfc80106ab27780f67",
+    "identityContract": {
+      "path": "config/academy-lifecycle-disabled-rehearsal-intake-contract.v1.json",
+      "schema": "identity-control-academy-lifecycle-disabled-rehearsal-intake-contract/v1",
+      "revision": 1
+    },
+    "selectedValues": {
+      "publisherEndpoint": "https://identity-control.internal/v1/lifecycle/events/pull",
+      "clientAssertionAudience": "https://identity-control.internal/v1/lifecycle/events/pull",
+      "eventAudience": "https://academy.cyberskills.co.th/lifecycle/events"
+    },
+    "evidence": [
+      {
+        "requirement": "Exact endpoint and audience specification",
+        "classification": "academy-source-bound-disabled-rehearsal-evidence"
+      },
+      {
+        "requirement": "Authenticated-pull disabled rehearsal receipt",
+        "classification": "academy-source-bound-disabled-rehearsal-evidence"
+      }
+    ]
+  },
+  "acceptanceBoundary": {
+    "academyBindingPending": true,
+    "registryRemainsDisabled": true,
+    "registryLifecycleValuesRemainNull": true,
+    "endpointRoutabilityClaimed": false,
+    "productionAuthorityClaimed": false,
+    "fixtureOnlyEvidenceAccepted": false,
+    "productionReceiptAccepted": false,
+    "productionBlockerClosed": false,
+    "lifecycleTrafficEnabled": false,
+    "releaseApproval": false
+  },
+  "advisoryResult": {
+    "status": "PENDING_ACADEMY_SUBMISSION",
+    "summary": "Academy remains disabled with null lifecycle registry values; the selected intake values require a source-bound Academy submission and no production authority.",
+    "findings": [
+      "receipts 1/5",
+      "blockers 1/6",
+      "ordered 3/8",
+      "authority NONE",
+      "operations 0"
+    ],
+    "changed_files": [
+      "config/academy-lifecycle-disabled-rehearsal-intake-contract.v1.json",
+      "scripts/validate-academy-lifecycle-disabled-rehearsal-intake.mjs",
+      "scripts/validate-academy-lifecycle-disabled-rehearsal-intake.test.mjs"
+    ]
+  }
+}

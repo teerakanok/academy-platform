@@ -1,0 +1,26 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "academy-web/scripts/identity-lifecycle-disabled-rehearsal.mjs",
+      "sha256": "0c5fdbf52fea3eccc021ae3e6a440ae67c324f0a9c8434735d3a85fe87d7372e",
+      "bytes": 7962
+    },
+    {
+      "path": "academy-web/scripts/identity-lifecycle-disabled-rehearsal.test.mjs",
+      "sha256": "94fc376d4ca55346bebe4aafa18d32222056ff0531642490cac920e8f81df908",
+      "bytes": 6746
+    },
+    {
+      "path": "evidence/identity-lifecycle-disabled-rehearsal-intake-contract.v1.json",
+      "sha256": "f67381f6dfb9f6314322b0b78d028b340664bd133b64d7ba133bd938fd8d9b66",
+      "bytes": 4278
+    },
+    {
+      "path": "reports/reviews/academy-identity-lifecycle-disabled-rehearsal-local-checkpoint-20260824.json",
+      "sha256": "c86b10ceb038c67ed070c54d0df777b9b29c85c3db0ad68d19c4fcec191e9e80",
+      "bytes": 1594
+    }
+  ]
+}

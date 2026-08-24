@@ -3,6 +3,20 @@
 > Closed items only, with outcome + evidence + residual risk. Newest first.
 > Provider-neutral. See `active_plan.md` for open work.
 
+## 2026-08-24 - Lifecycle endpoint/audience disabled rehearsal closed locally
+
+- Bound the exact Identity-selected publisher endpoint, client-assertion audience, and Academy
+  event audience to source `be72bd4978b616bcd8d782dfc80106ab27780f67` and Identity intake
+  `d95efebd518c83f711767947ced6c69b14c05881`.
+- Added a dependency-free, duplicate-safe specification validator and inert authenticated-pull
+  rehearsal. Tests prove exact injected calls, zero global `fetch`, and refusal before port access
+  for duplicate, surplus, malformed, or drifted input.
+- Focused Node `3/3`, related scripts `13/13`, full unit `2,044/2,044`, lint/type checks, exact
+  fixture validation, and the four-file freeze pass. The bounded GLM call ended at classified
+  capacity; the unchanged Terra-high fallback supplied the reviewed patch and machine receipt.
+- This checkpoint submits local evidence only. Identity actual-root acceptance and blocker closure
+  remain open; readiness stays `3/8`, receipts `1/5`, blockers `1/6`, and conformance `16/23`.
+
 ## 2026-08-23 - Current source uploaded as an unserved Worker Version
 
 - Built exact pushed source `be72bd4978b616bcd8d782dfc80106ab27780f67` under the supported Node
