@@ -21,6 +21,12 @@ const NOT_YET_ENABLED = [
   'result-key-set-cache',
   'result-key-set-importer',
 ] as const
+const PRODUCTION_COMPOSITION_ENABLED = [
+  'client-assertion-jti-source',
+  'client-assertion-provider',
+  'client-assertion-webcrypto-signer',
+  'result-key-set-importer',
+] as const
 
 const SKIPPED_DIRECTORIES = new Set(['node_modules', '.next', '.open-next', '.wrangler', '.git'])
 /**
@@ -326,10 +332,12 @@ describe('การกระจาย verification key ของ Identity ยั
   const entrypoints = productionEntrypoints()
   const { files: reachable } = reachableFrom(entrypoints)
   const localRuntimePath = canonical(join(IDENTITY_LIB, 'local-runtime.ts'))
+  const productionCompositionPath = canonical(join(IDENTITY_LIB, 'production-runtime.ts'))
   const {
     files: productionReachable,
     computed: productionComputed,
-  } = reachableFrom(entrypoints, new Set([localRuntimePath]))
+  } = reachableFrom(entrypoints, new Set([localRuntimePath, productionCompositionPath]))
+  const { files: productionCompositionReachable } = reachableFrom([productionCompositionPath])
   const gatedPaths = NOT_YET_ENABLED.map((name) => canonical(join(IDENTITY_LIB, `${name}.ts`)))
 
   it.each(NOT_YET_ENABLED)('%s ยังมีอยู่จริง ด่านนี้จึงไม่ได้เฝ้าของที่หายไปแล้ว', (name) => {
@@ -343,12 +351,14 @@ describe('การกระจาย verification key ของ Identity ยั
     expect(reachable.has(localRuntimePath)).toBe(true)
   })
 
-  it('result-key distribution เปิดเฉพาะชั้น explicit local fixture', () => {
+  it('result-key distribution เปิดได้เฉพาะ local fixture หรือ production composition ที่ review แล้ว', () => {
     for (const name of ['result-key-set-cache', 'result-key-set-importer']) {
       const path = canonical(join(IDENTITY_LIB, `${name}.ts`))
       expect(reachable.has(path), `${name} ต้องถูกเรียกจาก local fixture`).toBe(true)
-      expect(productionReachable.has(path), `${name} ห้ามถูกต่อนอก local fixture`).toBe(false)
+      expect(productionReachable.has(path), `${name} ห้ามถูกต่อนอก entry ที่ review แล้ว`).toBe(false)
     }
+    expect(productionCompositionReachable.has(canonical(join(IDENTITY_LIB, 'result-key-set-importer.ts')))).toBe(true)
+    expect(productionCompositionReachable.has(canonical(join(IDENTITY_LIB, 'result-key-set-cache.ts')))).toBe(false)
   })
 
   it('ทางเข้าครอบทุก wrangler worker ที่ deploy จริง ไม่ใช่แค่ตัวหลัก', () => {
@@ -394,6 +404,13 @@ describe('การกระจาย verification key ของ Identity ยั
       'local fixture เป็นข้อยกเว้นเดียว และต้องหยุดที่ local-runtime เท่านั้น',
       'การเปิดจริงต้องผ่าน registry/release ที่รีวิวเป็นเรื่องของมันเอง',
     ].join(' · ')).toEqual([])
+  })
+
+  it('production composition เข้าถึงได้เฉพาะ module ที่อนุมัติและไม่มี entry อื่นลัดเข้าไป', () => {
+    for (const name of PRODUCTION_COMPOSITION_ENABLED) {
+      expect(productionCompositionReachable.has(canonical(join(IDENTITY_LIB, `${name}.ts`))), name).toBe(true)
+    }
+    expect(productionReachable.has(productionCompositionPath)).toBe(true)
   })
 
   it('โมดูลเหล่านี้ไม่เปิด route ไม่ยิงเน็ต และไม่อ่าน environment เอง', () => {

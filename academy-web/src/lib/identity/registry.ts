@@ -1,4 +1,5 @@
 import { FakeIdentityAdapter } from './fake-adapter'
+import { createAcademyIdentityProductionRuntimeBrowserFlow } from './production-runtime'
 import type { IdentityAdapter } from './adapter'
 import type { AcademyIdentityRuntimeBrowserFlow } from './runtime-browser-flow'
 
@@ -26,13 +27,15 @@ export function getIdentityAdapter(): IdentityAdapter | null {
 }
 
 /**
- * Least-capability route seam for the future approved runtime composition.
- * Current registry bytes intentionally provide no production capabilities.
+ * The server-only production composition is the sole permitted path to the
+ * released Identity Control runtime. An incomplete projection remains inert.
  */
 export function getIdentityRuntimeBrowserFlow(): AcademyIdentityRuntimeBrowserFlow | null {
   const mode = process.env.IDENTITY_ADAPTER?.trim()
   if (!mode || mode === 'none' || mode === 'fake') return null
   if (mode === 'identity-control') {
+    const runtime = createAcademyIdentityProductionRuntimeBrowserFlow()
+    if (runtime) return runtime
     throw new IdentityAdapterUnavailableError('Identity Control runtime ยังไม่ได้รับ release authorization สำหรับ Academy')
   }
   throw new Error(`ไม่รู้จัก IDENTITY_ADAPTER=${mode}`)
