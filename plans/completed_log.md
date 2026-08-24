@@ -3,6 +3,19 @@
 > Closed items only, with outcome + evidence + residual risk. Newest first.
 > Provider-neutral. See `active_plan.md` for open work.
 
+## 2026-08-24 - Identity lifecycle acceptance ingested and next no-traffic gate selected
+
+- Verified Identity Control implementation `d4ccd79f3cd2b54b6d3d86832d1795dfd4511e0d`
+  and handoff/origin `bf663fa72003fd12fccc90a8ff93b37e29732f6d` from a clean detached root.
+- The canonical actual-root validator accepted Academy evidence root
+  `b3a201073fa68bcc7c8fdbdf366b455695b9c996` and advanced only the lifecycle receipt/blocker.
+- Canonical readiness is now receipts 2/5, blockers 2/6, ordered 4/8 (50.0%), conformance
+  16/23, authority NONE, and operations 0.
+- Retained the exact acceptance and freeze in Academy and selected the reviewed public-key
+  registration/rotation evidence submission as the next local no-traffic gate.
+- No endpoint, credential, key custody, registry, runtime, traffic, deployment, database, or
+  release operation occurred.
+
 ## 2026-08-24 - Lifecycle endpoint/audience disabled rehearsal closed locally
 
 - Bound the exact Identity-selected publisher endpoint, client-assertion audience, and Academy

@@ -1,0 +1,31 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "evidence/identity-control/academy-lifecycle-disabled-rehearsal-acceptance-freeze-20260824.json",
+      "sha256": "7eddba2a2e645aa6f74433989633dc33e9c593cbb6f7672ab46372b34b0b3a96",
+      "bytes": 1471
+    },
+    {
+      "path": "evidence/identity-control/academy-lifecycle-disabled-rehearsal-acceptance.v1.json",
+      "sha256": "ec6393951df05d80c0c736deb956957aec686ba9821027234ab66486e3f331c6",
+      "bytes": 2998
+    },
+    {
+      "path": "plans/active_plan.md",
+      "sha256": "d089bab491d88fe49b9cff40af885412a54af78bbd534900bb4f68d09b2f338e",
+      "bytes": 252023
+    },
+    {
+      "path": "plans/completed_log.md",
+      "sha256": "64d5af07dbafd1339bf239320429ab7771f1eb90f2d1083583adb0df9631b068",
+      "bytes": 172349
+    },
+    {
+      "path": "reports/reviews/academy-identity-lifecycle-acceptance-intake-20260824.json",
+      "sha256": "255bcac7fbfbcc3a3f7797aaf31e15ad3f08858759c9d2e7305cc5a1087f655d",
+      "bytes": 1840
+    }
+  ]
+}

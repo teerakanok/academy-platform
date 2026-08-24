@@ -1,0 +1,37 @@
+{
+  "schema": "academy-identity-lifecycle-acceptance-intake/v1",
+  "status": "accepted-cross-repo-evidence-ingested",
+  "source": {
+    "identityImplementationRevision": "d4ccd79f3cd2b54b6d3d86832d1795dfd4511e0d",
+    "identityHandoffRevision": "bf663fa72003fd12fccc90a8ff93b37e29732f6d",
+    "academyEvidenceRootRevision": "b3a201073fa68bcc7c8fdbdf366b455695b9c996"
+  },
+  "evidence": [
+    { "path": "evidence/identity-control/academy-lifecycle-disabled-rehearsal-acceptance.v1.json", "sha256": "ec6393951df05d80c0c736deb956957aec686ba9821027234ab66486e3f331c6", "bytes": 2998 },
+    { "path": "evidence/identity-control/academy-lifecycle-disabled-rehearsal-acceptance-freeze-20260824.json", "sha256": "7eddba2a2e645aa6f74433989633dc33e9c593cbb6f7672ab46372b34b0b3a96", "bytes": 1471 }
+  ],
+  "verification": {
+    "actualRootValidator": "passed",
+    "acceptedReceipts": { "accepted": 2, "total": 5 },
+    "productionBlockers": { "closed": 2, "total": 6 },
+    "orderedReleaseEvidence": { "completed": 4, "total": 8, "percentage": "50.0%", "gate4": "ACTIVE" },
+    "identityConformance": { "proven": 16, "total": 23, "percentage": "69.6%" }
+  },
+  "nextGate": {
+    "blockerId": "client-public-key-registration-and-rotation-rehearsal",
+    "selection": "next-local-no-traffic-evidence-submission",
+    "basis": [
+      "The lifecycle blocker is closed by exact Identity actual-root acceptance.",
+      "Academy already has an independently reviewed local active-overlap-retired rehearsal.",
+      "The canonical receipt contract still requires reviewed public-key metadata and the isolated rotation rehearsal receipt."
+    ]
+  },
+  "boundary": {
+    "productionReadiness": false,
+    "releaseApproval": false,
+    "productionAuthority": "NONE",
+    "runtimeWired": false,
+    "trafficEnabled": false,
+    "requestedOperations": []
+  }
+}

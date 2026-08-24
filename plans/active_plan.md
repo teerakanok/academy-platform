@@ -4,6 +4,19 @@
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
 > **Last updated:** 2026-08-23
 
+**Lifecycle disabled-rehearsal acceptance ingested (2026-08-24):** Identity Control
+independently reproduced Academy evidence root `b3a2010` and accepted only the disabled
+authenticated-pull rehearsal at implementation `d4ccd79` and handoff/origin `bf663fa`.
+The clean actual-root validator reports receipts `2/5`, closed blockers `2/6`, and ordered
+readiness `4/8` (`50.0%`) while authority remains `NONE`, operations remain `0`, and Identity
+conformance remains `16/23` (`69.6%`). The exact acceptance and its freeze are retained as
+byte-identical Academy evidence. The next local no-traffic production gate is the
+`client-public-key-registration-and-rotation-rehearsal` evidence submission: bind the existing
+independently reviewed active -> overlap+active -> retired+active rehearsal to reviewed public-key
+reference digest, algorithm, key identifier, and activation metadata for Identity actual-root
+review. This selection grants no registration, key custody, runtime, traffic, or release authority.
+Evidence: `reports/reviews/academy-identity-lifecycle-acceptance-intake-20260824.json`.
+
 **No-traffic current-source candidate uploaded (2026-08-23):** Exact source revision
 `be72bd4978b616bcd8d782dfc80106ab27780f67` is now Cloudflare Worker Version
 `61fd7863-1152-49c3-acd3-bc4fd27db64e`. The bounded operation used the reviewed strict deployment
@@ -18,9 +31,9 @@ admission remains `0/1`; Identity conformance remains `16/23` (`69.6%`). Evidenc
 Academy now binds the exact Identity-selected publisher endpoint, client-assertion audience, and
 event audience to one source-bound rehearsal while the runtime consumer policy remains disabled
 with all three lifecycle values `null`. Focused Node `3/3`, related scripts `13/13`, full unit
-`2,044/2,044`, lint/type checks, and the four-file freeze pass. This is an Academy submission
-checkpoint only: Identity actual-root acceptance and blocker closure remain open. Ordered readiness
-stays `3/8` (`37.5%`), receipts `1/5`, closed blockers `1/6`, and Identity conformance
+`2,044/2,044`, lint/type checks, and the four-file freeze pass. This local submission was later
+accepted by Identity Control as recorded above; its original checkpoint metrics were ordered
+readiness `3/8` (`37.5%`), receipts `1/5`, closed blockers `1/6`, and Identity conformance
 `16/23` (`69.6%`). Evidence:
 `reports/reviews/academy-identity-lifecycle-disabled-rehearsal-local-checkpoint-20260824.json`.
 

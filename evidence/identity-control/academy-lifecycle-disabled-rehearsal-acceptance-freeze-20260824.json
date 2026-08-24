@@ -1,0 +1,41 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "config/academy-lifecycle-disabled-rehearsal-acceptance.v1.json",
+      "sha256": "ec6393951df05d80c0c736deb956957aec686ba9821027234ab66486e3f331c6",
+      "bytes": 2998
+    },
+    {
+      "path": "scripts/evaluate-academy-release-admission.mjs",
+      "sha256": "69e2ec44ace79d7087ba2fe0cbc9928ad782be29c489de27b3e6a77595d38aeb",
+      "bytes": 5236
+    },
+    {
+      "path": "scripts/evaluate-academy-release-admission.test.mjs",
+      "sha256": "c714837bfec60c19515c50498dc625823d98e8b7f83b31e036208c138cac91eb",
+      "bytes": 2643
+    },
+    {
+      "path": "scripts/validate-academy-lifecycle-disabled-rehearsal-acceptance.mjs",
+      "sha256": "514e9c880607d6d24872d3341cedb6da2cf98789a4bb6ab5eed697e458701f47",
+      "bytes": 11002
+    },
+    {
+      "path": "scripts/validate-academy-lifecycle-disabled-rehearsal-acceptance.test.mjs",
+      "sha256": "9cb559b102bce468ccd693214981e1b7cd43f6dfa36cd34fadf1bc6997cb6b26",
+      "bytes": 5808
+    },
+    {
+      "path": "scripts/validate-academy-lifecycle-disabled-rehearsal-intake.mjs",
+      "sha256": "622384bd570b38b9bcb4465f9be05781733efcbb3a78701038a355c82f60fea3",
+      "bytes": 10990
+    },
+    {
+      "path": "scripts/validate-academy-lifecycle-disabled-rehearsal-intake.test.mjs",
+      "sha256": "a2114d2435f05fa17b71c5bf5dee7a16a18429748da33850e0f0bf9713acb365",
+      "bytes": 11876
+    }
+  ]
+}
