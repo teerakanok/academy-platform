@@ -1,0 +1,263 @@
+{
+  "schema": "academy-identity-production-activation-blocked-readiness/v1",
+  "capturedAt": "2026-08-25T16:18:35Z",
+  "status": "BLOCKED_IDENTITY_R6_FAIL_STOPPED_NO_RETRY",
+  "decision": "NO_PRODUCTION_MUTATION",
+  "predecessorReadiness": {
+    "path": "/private/tmp/academy-identity-activation-readiness-20260825T022004Z.json",
+    "capturedAt": "2026-08-25T02:20:04Z",
+    "bytes": 20773,
+    "sha256": "cee98d3ec71202d0f9ec5057822e5474d6db8c39fec8d7e28e7be0640a6f2e77",
+    "status": "BLOCKED_AWAITING_IDENTITY_MATCH"
+  },
+  "scope": {
+    "role": "academy_ops_executor",
+    "product": "CyberSkills Academy",
+    "targetPool": "Pool A",
+    "targetDatabase": "postgres",
+    "targetSchema": "academy",
+    "workerName": "cyberskills-academy",
+    "callbackUri": "https://academy.cyberskills.co.th/auth/callback"
+  },
+  "identityDependency": {
+    "requiredStatus": "MATCH",
+    "observedStatus": "FAIL_STOPPED_NO_RETRY",
+    "canonicalRunnerInvocations": 1,
+    "claimAcquired": 1,
+    "outerContainerLaunches": 0,
+    "restoreAttempts": 0,
+    "productionDatabaseMutations": 0,
+    "academyMutations": 0,
+    "productionFingerprintUnchanged": true,
+    "matchArtifactIssued": false,
+    "releaseInputsDerived": false,
+    "trackedFailureReceipt": "reports/sessions/poola-stage-diagnostic-r6-production-postclaim-fail-receipt-20260825.json",
+    "trackedFailureReceiptSha256": "284d4e79c4065d40031e5998a4f71d8df2b17410e226168b4085fb2bc9218bce",
+    "trackedFailureReceiptCommit": "389c8614e0cc34f6874a7e78e5f96fcb24e7257c",
+    "trackedFailureReceiptRemoteRef": "refs/heads/fix/identity-r4-diagnostic-schema-20260825",
+    "receiptState": "INDEPENDENTLY_VERIFIED_PUSHED"
+  },
+  "source": {
+    "branch": "feat/academy-production-identity-composition-20260825",
+    "localHead": "97a7f05acfabe6c3f78e69c3d98b18007fa506aa",
+    "remoteHead": "97a7f05acfabe6c3f78e69c3d98b18007fa506aa",
+    "worktreeCleanBeforeReceipt": true,
+    "activationCandidateRevision": "309d0e6e7439bd86b3d61d9e791c23f1a4fbf06f",
+    "candidateIsAncestorOfHead": true,
+    "candidatePushed": true,
+    "candidateTreeObjectId": "f3987c051cbdb100db0a3c7ec07eef10e3900386",
+    "candidateTreeListingSha256": "f7e60cfd67006e74db50b462b81fb7e6771d4d20fb02f0e7a0daf53880a10c24",
+    "candidateGitArchiveSha256": "7e829ebd478f41bd97a8e37cbe154d73c0d67ae39051a2e5ad782d82a02781d9",
+    "postCandidateAcademyDelta": [
+      "academy-web/scripts/identity-production-activation-preflight.mjs",
+      "academy-web/scripts/identity-production-activation-preflight.test.mjs"
+    ]
+  },
+  "candidateArtifacts": {
+    "productionRuntimeSha256": "e64f050c1bae3c0379e51eea462f9ff536b081f7c6589425a343d3180ce6e4de",
+    "registrySha256": "09e0d9dfa2447b51094e21f1ae398169f50be63cec92795b045b62bd62aeb7bf",
+    "preflightValidatorSha256": "3c4882984acc5e166d2e80eaa0aac3959a50c0e0a7a9dc69b4a2a41097af2211",
+    "preflightValidatorTestSha256": "b94541703427b0359ce47e3ffe7573ce240e63eedcf44d3f88457bf06dccd30f",
+    "openNextTreeSha256": "068f628e522085ebf81f4e2e2133c205870f66eb26343b7276b83dbe07a010d6",
+    "openNextFileCount": 1932,
+    "openNextDiskKiB": 57960,
+    "workerEntrypointSha256": "d05223bf4d44c84108a102ab62aa3bc9c5568f0c3ac2064c37be5cc65c64bc45",
+    "workerEntrypointBytes": 2278,
+    "strictDryRun": {
+      "wranglerVersion": "4.120.0",
+      "result": "PASS",
+      "totalUploadKiB": 12534.47,
+      "gzipKiB": 2913.19,
+      "versionCreated": false,
+      "trafficChanged": false
+    }
+  },
+  "verification": {
+    "activationPreflight": {
+      "status": "PASS",
+      "passed": 6,
+      "failed": 0
+    },
+    "productionRuntimeFocused": {
+      "status": "PASS",
+      "filesPassed": 3,
+      "testsPassed": 25,
+      "failed": 0
+    },
+    "identityStoreFocused": {
+      "status": "PASS",
+      "filesPassed": 5,
+      "testsPassed": 87,
+      "failed": 0
+    },
+    "disposablePostgresLifecycle": {
+      "status": "PASS",
+      "testsPassed": 28,
+      "failed": 0,
+      "image": "postgres@sha256:aadf2c0696f5ef357aa7a68da995137f0cf17bad0bf6e1f17de06ae5c769b302",
+      "architecture": "arm64",
+      "cleanupVerified": true
+    },
+    "cloudflareBuild": {
+      "status": "PASS",
+      "renderedRoutes": 65
+    },
+    "lintAndTypecheck": {
+      "status": "PASS",
+      "errors": 0,
+      "warnings": 3
+    },
+    "finalReadOnlyDriftCheck": {
+      "capturedAt": "2026-08-25T16:18:35Z",
+      "sourceHeadMatchesRemote": true,
+      "academyIdentityTableCount": 0,
+      "academyIdentityFunctionCount": 0,
+      "cloudflareDeploymentUnchanged": true,
+      "credentialBundleStillAbsent": true,
+      "matchArtifactStillAbsent": true,
+      "providerProcessesRemaining": 0,
+      "ownedDisposableContainersRemaining": 0
+    }
+  },
+  "migrations": {
+    "inspectionMode": "read_only_pg_catalog_and_count_only",
+    "defaultTransactionReadOnly": true,
+    "statementTimeoutSeconds": 5,
+    "migrationLedgerEntries": [],
+    "academySchemaExists": true,
+    "leadRowCount": 0,
+    "leadRowsWithUserId": 0,
+    "orderedPending": [
+      {
+        "id": "0021_unlink_email_derived_lead_ownership",
+        "sha256": "add7fb419f608925afe2e87c78d6d6297153a12a4f34be793921abdbeced4805",
+        "status": "PENDING_BY_RELEASE_HISTORY_APPLICATION_INDETERMINATE"
+      },
+      {
+        "id": "0022_identity_lifecycle_projection",
+        "sha256": "df3e746d5c3863a626c93993730ffec0c805a9d4b63f32883745592037edd8e0",
+        "status": "UNAPPLIED"
+      },
+      {
+        "id": "0023_identity_lifecycle_pull_lease",
+        "sha256": "eff6bf92af29569cfac15201184a17f5cc201d8092a783866a0d973c3087f5c1",
+        "status": "UNAPPLIED"
+      },
+      {
+        "id": "0024_identity_profile_activation",
+        "sha256": "f0322b64ab270dec8d73e663f0cc2017c0c91df0a558488bb70aa32232fa7cab",
+        "status": "UNAPPLIED"
+      },
+      {
+        "id": "0025_identity_authorization_transaction",
+        "sha256": "14934b499d3cb1a27751c8e3552577b0aa5c55bd8c649e5f67187cea1155e94d",
+        "status": "UNAPPLIED"
+      },
+      {
+        "id": "0026_identity_lifecycle_principal_contract",
+        "sha256": "5739f1257fa5a18419b8296236dc17f04d21e11ee491da1e85cca90d2f4beaf4",
+        "status": "UNAPPLIED"
+      },
+      {
+        "id": "0027_identity_session_store",
+        "sha256": "48d916aa5ae8cac47c800d116ae1c9780580940788f4804c2208fc9f52583fe0",
+        "status": "UNAPPLIED"
+      }
+    ],
+    "productionMutation": false
+  },
+  "backupAndRollback": {
+    "latestAcademyScopedDump": {
+      "path": "/root/academy-db-backups/20260805T173744Z-retention-api/academy-schema.dump",
+      "bytes": 112047,
+      "sha256": "3141e96f870e1247f0f2063786b0e17439968b626fc952c1821e98848a1187e4",
+      "restoreListLines": 197,
+      "fileMode": "0644",
+      "acceptableForActivation": false
+    },
+    "freshMode0600DumpCreated": false,
+    "isolatedRestoreExecuted": false,
+    "pgDumpVersion": "17.10",
+    "pgRestoreVersion": "17.10",
+    "filesystemFreeKiB": 162773908,
+    "workerRollbackVersionId": "c8b36c74-e76a-412b-9a63-3702cb838e07",
+    "rollbackVersionCurrentlyServing": true
+  },
+  "cloudflare": {
+    "currentDeploymentId": "ef66dfc4-92dc-4b9f-bc63-708c30e1cff1",
+    "currentVersionId": "c8b36c74-e76a-412b-9a63-3702cb838e07",
+    "currentTrafficPercentage": 100,
+    "candidateVersionCreated": false,
+    "requiredIdentityConfigurationNames": [
+      "IDENTITY_ADAPTER",
+      "IDENTITY_RUNTIME_ENABLED",
+      "IDENTITY_RUNTIME_WIRED",
+      "IDENTITY_RELEASE_APPROVAL",
+      "IDENTITY_CODE_EXCHANGE_TIMEOUT_MS",
+      "IDENTITY_CLIENT_ASSERTION_KEY_ID",
+      "IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK",
+      "IDENTITY_RESULT_KEY_SET_DOCUMENT"
+    ],
+    "presentRequiredIdentityConfigurationNames": [],
+    "secretValuesRead": false,
+    "providerProcessesRemaining": 0
+  },
+  "credentialBundle": {
+    "expectedPath": "/private/tmp/academy-identity-production-version-secrets.json",
+    "present": false,
+    "matchArtifactExpectedPath": "/private/tmp/identity-academy-production-match.json",
+    "matchArtifactPresent": false,
+    "localRequiredEnvironmentNamesPresent": [],
+    "secretValuesRead": false
+  },
+  "executionSafety": {
+    "academyDatabaseWrites": 0,
+    "academyBackupsCreated": 0,
+    "academyRestoreOperations": 0,
+    "cloudflareMutations": 0,
+    "deploymentsCreated": 0,
+    "versionsCreated": 0,
+    "configurationMutations": 0,
+    "authenticatedProductionProbes": 0,
+    "releaseInputsDerived": 0,
+    "ownedDisposableContainersRemaining": 0
+  },
+  "blockers": [
+    {
+      "id": "B1_IDENTITY_R6_TERMINAL_FAILURE",
+      "hard": true,
+      "detail": "canonical Identity r6 stopped terminally and issued no MATCH artifact"
+    },
+    {
+      "id": "B2_FRESH_ROLLBACK_POINT_NOT_CREATED",
+      "hard": true,
+      "detail": "fresh mode-0600 Academy dump and isolated restore are intentionally gated after verified MATCH"
+    },
+    {
+      "id": "B3_MIGRATIONS_PENDING",
+      "hard": true,
+      "detail": "0021-0027 remain unapplied in Pool A postgres schema academy"
+    },
+    {
+      "id": "B4_EXACT_CONFIGURED_CANDIDATE_ABSENT",
+      "hard": true,
+      "detail": "no candidate Worker version or required Identity configuration names were created"
+    },
+    {
+      "id": "B5_AUTHENTICATED_P1_P7_PENDING",
+      "hard": true,
+      "detail": "authenticated production acceptance is gated after successful activation"
+    }
+  ],
+  "resumeTrigger": "A newly authorized canonical Identity production run must produce an independently verified mode-0600 MATCH artifact and SHA-256 plus the exact protected Academy version-configuration bundle. The terminal r6 failure is not a resume trigger.",
+  "firstPermittedMutationAfterResume": "Create a fresh Academy-scoped custom-format dump in a mode-0700 directory with a mode-0600 file, validate its digest and restore list, and prove an isolated restore before applying migrations.",
+  "orderedActivationAfterResume": [
+    "verify exact Identity MATCH receipt and digest without printing contents",
+    "create fresh Academy schema backup and isolated restore proof",
+    "recheck catalog and apply hash-pinned migrations 0021-0027 in one transaction",
+    "upload and configure the exact candidate without traffic and inventory only configuration names",
+    "issue the non-authorizing preflight receipt and obtain controller release",
+    "deploy the exact candidate at 100 percent while retaining Worker rollback c8b36c74-e76a-412b-9a63-3702cb838e07",
+    "execute authenticated acceptance P1-P7 and count-only residue checks"
+  ]
+}
