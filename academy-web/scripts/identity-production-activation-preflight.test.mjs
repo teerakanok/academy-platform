@@ -13,7 +13,7 @@ import {
   parseIdentityProductionActivationPreflight,
 } from './identity-production-activation-preflight.mjs'
 
-const SOURCE = '309d0e6e7439bd86b3d61d9e791c23f1a4fbf06f'
+const SOURCE = 'fa7bca732aefa58ab7fc2c784676a113b873466b'
 const DIGEST = 'b'.repeat(64)
 const UUIDS = Object.freeze({
   candidate: '11111111-1111-4111-8111-111111111111',

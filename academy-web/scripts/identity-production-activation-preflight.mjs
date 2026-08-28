@@ -12,7 +12,7 @@ const CALLBACK_URI = 'https://academy.cyberskills.co.th/auth/callback'
 const WORKER_NAME = 'cyberskills-academy'
 
 /** The exact pushed Academy source authorized for this bounded activation preparation. */
-export const ACADEMY_IDENTITY_ACTIVATION_CANDIDATE_REVISION = '309d0e6e7439bd86b3d61d9e791c23f1a4fbf06f'
+export const ACADEMY_IDENTITY_ACTIVATION_CANDIDATE_REVISION = 'fa7bca732aefa58ab7fc2c784676a113b873466b'
 
 export const IDENTITY_PRODUCTION_ACTIVATION_CONFIG_NAMES = Object.freeze([
   'IDENTITY_ADAPTER',
