@@ -1,0 +1,31 @@
+{
+  "schema": "academy-production-live-visual-evidence/v1",
+  "capturedAt": "2026-08-28T07:46:49Z",
+  "sourceRevision": "fa7bca732aefa58ab7fc2c784676a113b873466b",
+  "deploymentId": "3c3e59c3-2d65-41a3-b01a-7df5a20a03c3",
+  "versionId": "6d6725ac-5e69-4641-8ada-509e7f55c62b",
+  "trafficPercentage": 100,
+  "observations": [
+    {
+      "url": "https://academy.cyberskills.co.th/",
+      "status": 302,
+      "boundary": "cloudflare-access-login"
+    },
+    {
+      "url": "https://academy.cyberskills.co.th/auth/callback?code=smoke&state=smoke",
+      "status": 302,
+      "boundary": "cloudflare-access-login"
+    },
+    {
+      "url": "https://academy.cyberskills.co.th/robots.txt",
+      "status": 200,
+      "boundary": "public-static"
+    }
+  ],
+  "renderEvidence": {
+    "status": "ACCESS_BOUNDARY_OBSERVED_NO_AUTHENTICATED_SCREENSHOT",
+    "priorCanonicalVisualReview": "reports/reviews/academy-canonical-domain-visual-review-20260823.json",
+    "priorCanonicalVisualReviewSha256": "e52d044302b33b18ac9625d54d096620ffa12b1f954800cc2e7bc4e1027c1083",
+    "releaseBuildRenderedRoutes": 65
+  }
+}

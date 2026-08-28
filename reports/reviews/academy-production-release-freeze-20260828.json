@@ -1,0 +1,55 @@
+{
+  "schema": "academy-production-release-freeze/v1",
+  "capturedAt": "2026-08-28T07:46:49Z",
+  "status": "SOURCE_AND_DATABASE_LIVE_IDENTITY_RUNTIME_BLOCKED",
+  "source": {
+    "releaseRevision": "fa7bca732aefa58ab7fc2c784676a113b873466b",
+    "controlRevision": "f497a602afb2da296ba9d826b12a1a16e6787c8a",
+    "branch": "feat/academy-production-complete-20260828",
+    "pushed": true
+  },
+  "database": {
+    "backupPath": "/root/academy-db-backups/20260828T041500Z-identity-activation/academy-schema.dump",
+    "backupSha256": "a68aa12a0eed84e3d70142526ca34c786af45bdd367ba0ab18cf1b8bf2bc0f08",
+    "isolatedRestore": "PASS",
+    "migrations": ["0021", "0022", "0023", "0024", "0025", "0026", "0027"],
+    "application": "SINGLE_TRANSACTION_PASS",
+    "postcheck": "PASS"
+  },
+  "deployment": {
+    "workerName": "cyberskills-academy",
+    "deploymentId": "3c3e59c3-2d65-41a3-b01a-7df5a20a03c3",
+    "versionNumber": 22,
+    "versionId": "6d6725ac-5e69-4641-8ada-509e7f55c62b",
+    "trafficPercentage": 100,
+    "identityRuntimeEnabled": false
+  },
+  "assertionKey": {
+    "clientId": "academy-web",
+    "keyId": "academy-prod-2026-08",
+    "publicKeyReference": "config://client-keys/academy-web/academy-prod-2026-08",
+    "publicArtifactPath": "/private/tmp/academy-prod-identity-public-receipt.json",
+    "publicArtifactSha256": "b86b6e58fdd313238c2ec8805099164b89121dd01377f5561bc47c624c6502bc",
+    "publicJwkSha256": "8b7a176b27ac5ffc7eb65fbe9d1b0724b1e1b24e91d8cbb93abbb3ae30f6f5c4",
+    "custodyVersionId": "9c11bb1c-fea3-4e42-ac6f-14d2c5aff215",
+    "inheritedByReleaseVersion": true,
+    "privateMaterialPersistedInArtifact": false
+  },
+  "rollback": {
+    "targetVersionId": "9c11bb1c-fea3-4e42-ac6f-14d2c5aff215",
+    "rehearsalDeploymentId": "afa40c12-000f-43e4-b774-b0e482109f2b",
+    "rehearsalSmoke": { "root": 302, "robots": 200 },
+    "restored": true,
+    "restoredDeploymentId": "3c3e59c3-2d65-41a3-b01a-7df5a20a03c3",
+    "restoredSmoke": { "root": 302, "robots": 200 }
+  },
+  "blockedActivationInputs": [
+    "Identity live registry import is restricted to Saturday 03:00-06:00 ICT",
+    "Identity result-signing private-key off-host custody and protected result-key-set are not ready"
+  ],
+  "independentReview": {
+    "glm53Flash": "REVIEWER_UNAVAILABLE_TIMEOUT_NO_ADMISSIBLE_OUTPUT",
+    "claudeFable5Max": "REVIEWER_UNAVAILABLE_ZERO_OUTPUT",
+    "passClaimed": false
+  }
+}
