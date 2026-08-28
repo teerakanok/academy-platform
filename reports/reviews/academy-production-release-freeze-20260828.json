@@ -48,8 +48,20 @@
     "Identity result-signing private-key off-host custody and protected result-key-set are not ready"
   ],
   "independentReview": {
-    "glm53Flash": "REVIEWER_UNAVAILABLE_TIMEOUT_NO_ADMISSIBLE_OUTPUT",
-    "claudeFable5Max": "REVIEWER_UNAVAILABLE_ZERO_OUTPUT",
-    "passClaimed": false
+    "glm53Flash": {
+      "status": "PASS",
+      "findings": 0,
+      "runId": "run-7bf8c4a7155611950f4218425e456123",
+      "frozenSourceSha256": "49c4b2e1c316b066e3fa01ecda68d538125153b0f1990a7ca57d53ae643349c9",
+      "resultSha256": "5172b69a8d49454aaa61560754070965358d130483b1e73fdf79e20fd5c53dd3",
+      "observedModel": "glm-5.3-flash",
+      "reasoningEffort": "max"
+    },
+    "claudeFable5Max": {
+      "status": "REVIEWER_UNAVAILABLE_TIMEOUT_NO_JSON",
+      "deadlineSeconds": 300,
+      "maxTurns": 10,
+      "passClaimed": false
+    }
   }
 }
