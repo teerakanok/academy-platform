@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { spawn } from 'node:child_process'
 import { chmod, mkdtemp, readFile, realpath, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
@@ -313,4 +314,42 @@ test('real runner invokes the verify hook immediately before spawn', async t => 
   await assert.rejects(runWranglerJson({ executable: fixture.path, cwd: fixture.root, deadlineMs: Date.now() + 2_000,
     verify: async () => { order.push('verify-failed'); throw new Error('drifted') } }))
   assert.deepEqual(order, ['verify', 'verify-failed'])
+})
+
+test('full helper process drives fake Wrangler upload, list, activate and rollback without response injection', async t => {
+  const root = await realpath(await mkdtemp(join(tmpdir(), 'academy-helper-cli-')))
+  t.after(() => rm(root, { recursive:true, force:true }))
+  const statePath = join(root, 'provider-state.json')
+  const wranglerPath = join(root, 'fake-wrangler.mjs')
+  const harnessPath = join(root, 'helper-harness.mjs')
+  await writeFile(statePath, JSON.stringify({ deployment, version, serial:0, versions:[{id:version,tag:'',message:''}] }), { mode:0o600 })
+  await writeFile(wranglerPath, `#!/usr/bin/env node
+import {readFileSync,writeFileSync} from 'node:fs'
+const path=${JSON.stringify(statePath)}, args=process.argv.slice(2), state=JSON.parse(readFileSync(path,'utf8'))
+const save=()=>writeFileSync(path,JSON.stringify(state))
+if(args[0]==='--version') process.stdout.write('4.120.0\\n')
+else if(args[0]==='deployments'&&args[1]==='list') process.stdout.write(JSON.stringify([{id:state.deployment,created_on:'2026-08-29T10:00:00Z',versions:[{version_id:state.version,percentage:100}]}]))
+else if(args[0]==='versions'&&args[1]==='list') process.stdout.write(JSON.stringify(state.versions.map((v,i)=>({id:v.id,metadata:{created_on:'2026-08-29T10:0'+i+':00Z'},annotations:{'workers/tag':v.tag,'workers/message':v.message}}))))
+else if(args[0]==='versions'&&args[1]==='upload'){const tag=args[args.indexOf('--tag')+1],message=args[args.indexOf('--message')+1];state.versions.push({id:${JSON.stringify(candidate)},tag,message});save();process.stdout.write('uploaded\\n')}
+else if(args[0]==='versions'&&args[1]==='deploy'){state.serial++;state.version=args[2].split('@')[0];state.deployment=['${activated}','55555555-5555-4555-8555-555555555555'][state.serial-1];save();process.stdout.write('deployed\\n')}
+else process.exit(2)
+`, { mode:0o700 })
+  const helperUrl = new URL('./academy-production-cloudflare-helper.mjs', import.meta.url).href
+  await writeFile(harnessPath, `import {executeAcademyCloudflareHelper} from ${JSON.stringify(helperUrl)}
+const root=${JSON.stringify(root)}, validUntil=Date.parse('2026-08-29T12:00:00Z')
+executeAcademyCloudflareHelper(JSON.parse(process.argv[2]),{clock:()=>Date.parse('2026-08-29T11:00:00Z'),env:{},release:{root,nodeExecutable:process.execPath,wranglerEntrypoint:${JSON.stringify(wranglerPath)},manifest:{releaseRevision:${JSON.stringify(R)}}},revalidate:async()=>{}}).then(v=>process.stdout.write(JSON.stringify(v)+'\\n')).catch(()=>process.exit(1))
+`, { mode:0o600 })
+  const invoke = args => new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, [harnessPath, JSON.stringify(args)], { cwd:root, stdio:['ignore','pipe','pipe'] })
+    const stdout=[]; child.stdout.on('data', chunk=>stdout.push(chunk)); child.once('error',reject)
+    child.once('close', code=>code===0 ? resolve(JSON.parse(Buffer.concat(stdout))) : reject(new Error('helper process failed')))
+  })
+  const uploaded = await invoke([...common,'--operation','upload','--source',R,'--traffic','0'])
+  assert.equal(uploaded.versionId, candidate)
+  const promoted = await invoke([...common,'--operation','activate','--expected-deployment',deployment,'--expected-version',version,'--candidate',candidate,'--traffic','100'])
+  assert.equal(promoted.deploymentId, activated); assert.equal(promoted.semantics.residualRace, true)
+  const rolledBack = await invoke([...common,'--operation','rollback','--expected-deployment',activated,'--expected-version',candidate,'--target',version,'--prior',deployment])
+  assert.equal(rolledBack.restoredVersionId, version); assert.equal(rolledBack.semantics.atomicProviderCas, false)
+  const finalState = JSON.parse(await readFile(statePath,'utf8'))
+  assert.equal(finalState.version, version); assert.equal(finalState.versions.length, 2)
 })
