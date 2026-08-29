@@ -47,8 +47,11 @@ function validatePlan(plan) {
 }
 
 function validatePorts(ports) {
-  const names = ['inspectRecovery','discoverCurrent','backupRestore','applyMigrations','uploadCandidate','activateTraffic','smokeP1P7','rollbackTraffic','checkResidue']
-  if (!exact(ports, names) || names.some((name) => typeof ports[name] !== 'function')) throw new AcademyActivationControllerError()
+  const names = ['authority','inspectRecovery','discoverCurrent','backupRestore','applyMigrations','uploadCandidate','activateTraffic','smokeP1P7','rollbackTraffic','checkResidue']
+  if (!exact(ports, names) || !exact(ports.authority, ['authorityId','releaseRevision','identityReadinessSha256','validUntil'])
+    || !UUID.test(ports.authority.authorityId) || !/^[a-f0-9]{40}$/.test(ports.authority.releaseRevision)
+    || !SHA256.test(ports.authority.identityReadinessSha256) || !Number.isFinite(Date.parse(ports.authority.validUntil))
+    || names.slice(1).some((name) => typeof ports[name] !== 'function')) throw new AcademyActivationControllerError()
   return ports
 }
 
@@ -111,6 +114,9 @@ export async function runAcademyProductionActivation({ plan: input, ports: input
   const plan = validatePlan(input)
   const ports = validatePorts(inputPorts)
   const identity = intakeIdentityLiveReadiness(await readProtectedIdentityLiveReadiness(plan.identityReadinessPath), observedAt)
+  if (ports.authority.releaseRevision !== plan.academy.releaseRevision
+    || ports.authority.identityReadinessSha256 !== identity.receiptSha256
+    || observedAt.getTime() >= Date.parse(ports.authority.validUntil)) throw new AcademyActivationControllerError()
   const journalPath = resolve(inputJournalPath ?? `${plan.identityReadinessPath}.academy-activation-journal`)
   const receiptPath = resolve(inputReceiptPath ?? `${journalPath}.receipt`)
   let baseRecoveryReceipt = null
