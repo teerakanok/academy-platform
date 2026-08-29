@@ -34,16 +34,21 @@ test('runner kills and reaps output overflow, hang, and signal exits', async t =
     const pidPath = join(tmpdir(), `academy-hang-${phase}-${process.pid}.pid`)
     t.after(() => rm(pidPath, { force: true }))
     const hang = await script(t, `echo $$ > '${pidPath}'; trap '' TERM; while :; do sleep 1; done`)
-    const execution = runExecutable({ executable: hang, args: [], validUntilMs: Date.now() + 1_500 })
+    let executionClock = Date.now()
+    const validUntilMs = executionClock + 5_000
+    let forcedAt = null
+    const clock = () => forcedAt === null ? executionClock : validUntilMs - 1_000 + Date.now() - forcedAt
+    const execution = runExecutable({ executable: hang, args: [], validUntilMs, clock })
     const completion = execution.then(() => null, error => error)
     let pid
-    const readyDeadline = Date.now() + 1_000
+    const readyDeadline = Date.now() + 5_000
     while (Date.now() < readyDeadline) {
       try { pid = Number((await readFile(pidPath, 'utf8')).trim()); break }
       catch (error) { if (error.code !== 'ENOENT') throw error }
       await new Promise(resolvePromise => setTimeout(resolvePromise, 10))
     }
     assert.ok(Number.isSafeInteger(pid) && pid > 1)
+    forcedAt = Date.now()
     assert.ok(await completion instanceof Error)
     assert.throws(() => process.kill(pid, 0), { code: 'ESRCH' })
   }
