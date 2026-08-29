@@ -3,12 +3,17 @@
 import { spawn } from 'node:child_process'
 
 import { parseCurrentDeploymentJson } from './current-deployment.mjs'
+import { verifyAcademyRelease } from './academy-release-manifest.mjs'
 
 const SHA = /^[a-f0-9]{64}$/
 const REVISION = /^[a-f0-9]{40}$/
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
 const ISO_SECOND = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/
 const WORKER = 'cyberskills-academy'
+// Fixed installed-release root; ambient env executable/release-root trust was
+// removed from the live path — everything resolves inside this release and is
+// digest-verified before any provider execution.
+export const ACADEMY_INSTALLED_RELEASE_ROOT = '/opt/academy/release'
 
 const fail = () => { throw new Error('Academy production helper failed') }
 const exact = (value, keys) => value && typeof value === 'object' && !Array.isArray(value)
@@ -37,11 +42,12 @@ function common(values, now) {
   return { validUntilMs: Date.parse(validUntil) }
 }
 
-export async function runWranglerJson({ executable, cwd, deadlineMs, clock = () => Date.now() }) {
-  if (typeof executable !== 'string' || !executable.startsWith('/') || typeof cwd !== 'string' || !cwd.startsWith('/')) fail()
+export async function runWranglerJson({ executable, args = ['deployments', 'list', '--name', WORKER, '--json'], cwd, deadlineMs, clock = () => Date.now() }) {
+  if (typeof executable !== 'string' || !executable.startsWith('/') || typeof cwd !== 'string' || !cwd.startsWith('/')
+    || !Array.isArray(args) || args.some(argument => typeof argument !== 'string')) fail()
   const remaining = deadlineMs - clock()
   if (!Number.isFinite(deadlineMs) || remaining < 100) fail()
-  const child = spawn(executable, ['deployments', 'list', '--name', WORKER, '--json'], {
+  const child = spawn(executable, args, {
     cwd, detached: true, stdio: ['ignore', 'pipe', 'ignore'],
     env: { HOME: '/root', LANG: 'C', LC_ALL: 'C', PATH: '/usr/bin:/bin' },
   })
@@ -96,7 +102,17 @@ export async function executeAcademyCloudflareHelper(args, options = {}) {
     ? ['--authority','--release','--readiness','--valid-until','--operation','--mode','--journal']
     : ['--authority','--release','--readiness','--valid-until','--operation','--deployment','--version']
   if (!allowed || !exact(Object.fromEntries(Object.entries(values)), allowed)) fail()
-  const run = options.run ?? (() => runWranglerJson({ executable: options.wranglerExecutable, cwd: options.cwd, deadlineMs: validUntilMs, clock }))
+  const resolveRun = async () => {
+    if (options.run) return options.run
+    const release = options.release ?? await verifyAcademyRelease({
+      root: options.releaseRoot ?? ACADEMY_INSTALLED_RELEASE_ROOT, fs: options.fs, processLike: options.processLike,
+    })
+    const runner = options.runWrangler ?? runWranglerJson
+    return () => runner({ executable: release.nodeExecutable,
+      args: [release.wranglerEntrypoint, 'deployments', 'list', '--name', WORKER, '--json'],
+      cwd: release.root, deadlineMs: validUntilMs, clock })
+  }
+  const run = await resolveRun()
   const source = await run()
   const current = currentFrom(source)
   if (operation === 'inspect') {
@@ -110,10 +126,7 @@ export async function executeAcademyCloudflareHelper(args, options = {}) {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  executeAcademyCloudflareHelper(process.argv.slice(2), {
-    wranglerExecutable: process.env.ACADEMY_PINNED_WRANGLER,
-    cwd: process.env.ACADEMY_RELEASE_ROOT,
-  }).then(value => process.stdout.write(`${JSON.stringify(value)}\n`)).catch(() => {
+  executeAcademyCloudflareHelper(process.argv.slice(2)).then(value => process.stdout.write(`${JSON.stringify(value)}\n`)).catch(() => {
     process.stderr.write('Academy production helper failed\n')
     process.exitCode = 1
   })

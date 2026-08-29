@@ -4,7 +4,9 @@ import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import test from 'node:test'
 
-import { executeAcademyCloudflareHelper, runWranglerJson } from './academy-production-cloudflare-helper.mjs'
+import { executeAcademyCloudflareHelper, runWranglerJson, ACADEMY_INSTALLED_RELEASE_ROOT } from './academy-production-cloudflare-helper.mjs'
+import { createAcademyReleaseFakeFilesystem } from './academy-release-fs-fake.mjs'
+import { renderAcademyRelease } from './academy-release-render.mjs'
 
 const D = 'a'.repeat(64)
 const R = 'b'.repeat(40)
@@ -107,4 +109,58 @@ test('real runner rejects oversized output and duplicate JSON', async t => {
   const duplicate = await executable(t, `printf '%s' '[{"id":"${deployment}","id":"${deployment}","created_on":"2026-08-29T10:00:00Z","versions":[{"version_id":"${version}","percentage":100}]}]'`)
   const raw = await runWranglerJson({ executable: duplicate.path, cwd: duplicate.root, deadlineMs: Date.now() + 2_000 })
   await assert.rejects(executeAcademyCloudflareHelper([...common,'--operation','inspect','--mode','discover-current','--journal',''], { ...options, run: async () => raw }))
+})
+
+const pinnedOptions = { ...options }
+delete pinnedOptions.run
+
+async function pinnedReleaseEnvironment(tamper) {
+  const env = createAcademyReleaseFakeFilesystem()
+  await env.fs.mkdir('/source', { mode: 0o755, recursive: true })
+  await env.fs.writeFileDirect('/source/node', Buffer.from('#!/fake/node\n'), 0o755)
+  await env.fs.writeFileDirect('/source/wrangler', Buffer.from('// wrangler entrypoint\n'), 0o755)
+  await env.fs.writeFileDirect('/source/helper.mjs', Buffer.from('// helper source\n'), 0o500)
+  const { root } = await renderAcademyRelease({ spec: {
+    releaseRevision: R,
+    node: { sourcePath: '/source/node', mode: 0o755 },
+    wrangler: { sourcePath: '/source/wrangler', mode: 0o755 },
+    helpers: [{ sourcePath: '/source/helper.mjs', path: 'helpers/academy-production-cloudflare-helper.mjs', mode: 0o500 }],
+  }, stagingRoot: '/opt/academy/release', fs: env.fs, processLike: env.processLike })
+  if (tamper) await tamper(env, root)
+  return { env, root }
+}
+
+test('live path executes only the pinned release node and wrangler entrypoint', async () => {
+  const { env, root } = await pinnedReleaseEnvironment()
+  let observed
+  const runWrangler = async invocation => { observed = invocation; return JSON.stringify(provider) }
+  const value = await executeAcademyCloudflareHelper([...common,'--operation','inspect','--mode','discover-current','--journal',''],
+    { ...pinnedOptions, fs: env.fs, processLike: env.processLike, releaseRoot: root, runWrangler })
+  assert.deepEqual(value, { deployments: provider })
+  assert.equal(observed.executable, `${root}/node/bin/node`)
+  assert.deepEqual(observed.args, [`${root}/wrangler/bin/wrangler`, 'deployments', 'list', '--name', 'cyberskills-academy', '--json'])
+  assert.equal(observed.cwd, root)
+})
+
+test('helper refuses drifted release digests before provider execution', async () => {
+  const { env, root } = await pinnedReleaseEnvironment(async (environment, releaseRoot) => {
+    await environment.fs.writeFileDirect(`${releaseRoot}/wrangler/bin/wrangler`, Buffer.from('tampered\n'), 0o755)
+  })
+  let calls = 0
+  const runWrangler = async () => { calls += 1 }
+  await assert.rejects(executeAcademyCloudflareHelper([...common,'--operation','inspect','--mode','discover-current','--journal',''],
+    { ...pinnedOptions, fs: env.fs, processLike: env.processLike, releaseRoot: root, runWrangler }))
+  assert.equal(calls, 0)
+})
+
+test('helper refuses to run outside a pinned installed release', async () => {
+  const env = createAcademyReleaseFakeFilesystem()
+  await env.fs.mkdir('/not-a-release', { mode: 0o755, recursive: true })
+  let calls = 0
+  const runWrangler = async () => { calls += 1 }
+  await assert.rejects(executeAcademyCloudflareHelper([...common,'--operation','inspect','--mode','discover-current','--journal',''],
+    { ...pinnedOptions, fs: env.fs, processLike: env.processLike, releaseRoot: '/not-a-release', runWrangler }))
+  await assert.rejects(executeAcademyCloudflareHelper([...common,'--operation','inspect','--mode','discover-current','--journal',''],
+    { ...pinnedOptions, fs: env.fs, processLike: env.processLike, releaseRoot: ACADEMY_INSTALLED_RELEASE_ROOT, runWrangler }))
+  assert.equal(calls, 0)
 })
