@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-import { createHash } from 'node:crypto'
 import { spawn } from 'node:child_process'
 
 import { parseCurrentDeploymentJson } from './current-deployment.mjs'
@@ -48,26 +47,40 @@ export async function runWranglerJson({ executable, cwd, deadlineMs, clock = () 
   })
   const chunks = []
   let bytes = 0
-  child.stdout.on('data', chunk => { bytes += chunk.length; if (bytes <= 1024 * 1024) chunks.push(chunk) })
-  const exit = new Promise(resolve => { child.once('error', () => resolve(null)); child.once('exit', (status, signal) => resolve({ status, signal })) })
-  let result = await Promise.race([
-    exit,
-    new Promise(resolve => setTimeout(() => resolve(null), Math.min(remaining, 5_000))),
-  ])
-  if (!result || result.status !== 0 || result.signal || bytes > 1024 * 1024) {
-    if (Number.isSafeInteger(child.pid)) { try { process.kill(-child.pid, 'SIGKILL') } catch {} }
-    result = await Promise.race([exit, new Promise(resolve => setTimeout(() => resolve(null), 1_000))])
-    if (!result) fail()
+  let overflow = false
+  child.stdout.on('data', chunk => { bytes += chunk.length; if (bytes > 1024 * 1024) overflow = true; else chunks.push(chunk) })
+  const close = new Promise(resolve => {
+    child.once('error', () => resolve(null))
+    child.once('close', (status, signal) => resolve({ status, signal }))
+  })
+  let timer
+  const timeout = new Promise(resolve => { timer = setTimeout(() => resolve(null), Math.min(remaining, 5_000)) })
+  let result = await Promise.race([close, timeout])
+  clearTimeout(timer)
+  if (!result || result.status !== 0 || result.signal || overflow) {
+    if (Number.isSafeInteger(child.pid)) {
+      try { process.kill(-child.pid, 'SIGKILL') } catch (error) { if (error?.code !== 'ESRCH') fail() }
+    }
+    result = await Promise.race([close, new Promise(resolve => setTimeout(() => resolve(null), 1_000))])
+    if (!result || (Number.isSafeInteger(child.pid) && groupAlive(child.pid))) fail()
     fail()
   }
-  try { return JSON.parse(Buffer.concat(chunks).toString('utf8')) } catch { fail() }
+  if (Number.isSafeInteger(child.pid) && groupAlive(child.pid)) fail()
+  return Buffer.concat(chunks).toString('utf8')
 }
 
-function currentFrom(value) {
-  const deployments = Array.isArray(value) ? value : value?.deployments
-  const current = parseCurrentDeploymentJson(JSON.stringify(deployments))
+function groupAlive(pid) {
+  try { process.kill(-pid, 0); return true } catch (error) {
+    if (error?.code === 'ESRCH') return false
+    fail()
+  }
+}
+
+function currentFrom(source) {
+  if (typeof source !== 'string' || Buffer.byteLength(source) > 1024 * 1024) fail()
+  const current = parseCurrentDeploymentJson(source)
   if (current.versions.length !== 1 || current.versions[0].percentage !== 100) fail()
-  return { deployments, deploymentId: current.id, versionId: current.versions[0].id }
+  return { deploymentId: current.id, versionId: current.versions[0].id }
 }
 
 export async function executeAcademyCloudflareHelper(args, options = {}) {
@@ -80,16 +93,16 @@ export async function executeAcademyCloudflareHelper(args, options = {}) {
     : ['--authority','--release','--readiness','--valid-until','--operation','--deployment','--version']
   if (!allowed || !exact(Object.fromEntries(Object.entries(values)), allowed)) fail()
   const run = options.run ?? (() => runWranglerJson({ executable: options.wranglerExecutable, cwd: options.cwd, deadlineMs: validUntilMs, clock }))
-  const current = currentFrom(await run())
+  const source = await run()
+  const current = currentFrom(source)
   if (operation === 'inspect') {
-    if (values['--mode'] === 'discover-current' && values['--journal'] === '') return { deployments: current.deployments }
+    if (values['--mode'] === 'discover-current' && values['--journal'] === '') return { deployments: JSON.parse(source) }
     // A journal digest alone cannot prove provider cleanup. Reconciliation remains fail-closed.
     fail()
   }
-  if (operation !== 'residue' || !UUID.test(values['--deployment']) || !UUID.test(values['--version'])
-    || current.deploymentId !== values['--deployment'] || current.versionId !== values['--version']) fail()
-  const receipt = { status: 'PASS', deploymentId: current.deploymentId, versionId: current.versionId }
-  return { ...receipt, receiptSha256: createHash('sha256').update(`${JSON.stringify(receipt)}\n`).digest('hex') }
+  // Deployments do not enumerate uploaded zero-traffic versions. Until a pinned
+  // versions inventory is part of this helper, it cannot prove residue absence.
+  fail()
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
