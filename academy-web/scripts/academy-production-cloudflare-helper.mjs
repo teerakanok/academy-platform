@@ -49,12 +49,15 @@ export async function runWranglerJson({ executable, cwd, deadlineMs, clock = () 
   const chunks = []
   let bytes = 0
   child.stdout.on('data', chunk => { bytes += chunk.length; if (bytes <= 1024 * 1024) chunks.push(chunk) })
-  const result = await Promise.race([
-    new Promise(resolve => { child.once('error', () => resolve(null)); child.once('exit', (status, signal) => resolve({ status, signal })) }),
+  const exit = new Promise(resolve => { child.once('error', () => resolve(null)); child.once('exit', (status, signal) => resolve({ status, signal })) })
+  let result = await Promise.race([
+    exit,
     new Promise(resolve => setTimeout(() => resolve(null), Math.min(remaining, 5_000))),
   ])
   if (!result || result.status !== 0 || result.signal || bytes > 1024 * 1024) {
     if (Number.isSafeInteger(child.pid)) { try { process.kill(-child.pid, 'SIGKILL') } catch {} }
+    result = await Promise.race([exit, new Promise(resolve => setTimeout(() => resolve(null), 1_000))])
+    if (!result) fail()
     fail()
   }
   try { return JSON.parse(Buffer.concat(chunks).toString('utf8')) } catch { fail() }
