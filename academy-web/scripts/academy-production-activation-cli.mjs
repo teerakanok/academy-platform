@@ -6,7 +6,7 @@ import { dirname, resolve } from 'node:path'
 
 import { createAcademyProductionLivePorts } from './academy-production-live-ports.mjs'
 import { intakeIdentityLiveReadiness, readProtectedIdentityLiveReadiness } from './identity-live-readiness-intake.mjs'
-import { ACTIVATION_RELEASE, runAcademyProductionActivation, writeControllerReceipt } from './identity-production-activation-controller.mjs'
+import { ACTIVATION_RELEASE, publishRetainedAcademyActivation, runAcademyProductionActivation, writeControllerReceipt } from './identity-production-activation-controller.mjs'
 
 const fail = () => { throw new Error('Academy production activation failed') }
 
@@ -110,6 +110,8 @@ export async function main(args, options = {}) {
   if (release !== ACTIVATION_RELEASE) fail()
   const observedAt = options.observedAt ?? new Date()
   const plan = await readProtected(planPath)
+  const terminal = await publishRetainedAcademyActivation({ plan, journalPath: resolve(journalPath), receiptPath: resolve(receiptPath) })
+  if (terminal) return terminal.status
   const readiness = intakeIdentityLiveReadiness(await readProtectedIdentityLiveReadiness(plan.identityReadinessPath), observedAt)
   const ports = await createAcademyProductionLivePorts({
     authorityPath,

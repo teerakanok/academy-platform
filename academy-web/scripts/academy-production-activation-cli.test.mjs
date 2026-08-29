@@ -29,22 +29,24 @@ test('runner kills and reaps output overflow, hang, and signal exits', async t =
   const overflow = await script(t, "dd if=/dev/zero bs=1048577 count=1 2>/dev/null | tr '\\000' x; sleep 30")
   await assert.rejects(runExecutable({ executable: overflow, args: [], validUntilMs: Date.now() + 2_000 }))
 
-  const pidPath = join(tmpdir(), `academy-hang-${process.pid}.pid`)
-  t.after(() => rm(pidPath, { force: true }))
-  const hang = await script(t, `echo $$ > '${pidPath}'; trap '' TERM; while :; do sleep 1; done`)
-  const execution = runExecutable({ executable: hang, args: [], validUntilMs: Date.now() + 1_500 })
-  const completion = execution.then(() => null, error => error)
   const { readFile } = await import('node:fs/promises')
-  let pid
-  const readyDeadline = Date.now() + 1_000
-  while (Date.now() < readyDeadline) {
-    try { pid = Number((await readFile(pidPath, 'utf8')).trim()); break }
-    catch (error) { if (error.code !== 'ENOENT') throw error }
-    await new Promise(resolvePromise => setTimeout(resolvePromise, 10))
+  for (const phase of ['rollback-discovery','rollback','rollback-residue']) {
+    const pidPath = join(tmpdir(), `academy-hang-${phase}-${process.pid}.pid`)
+    t.after(() => rm(pidPath, { force: true }))
+    const hang = await script(t, `echo $$ > '${pidPath}'; trap '' TERM; while :; do sleep 1; done`)
+    const execution = runExecutable({ executable: hang, args: [], validUntilMs: Date.now() + 1_500 })
+    const completion = execution.then(() => null, error => error)
+    let pid
+    const readyDeadline = Date.now() + 1_000
+    while (Date.now() < readyDeadline) {
+      try { pid = Number((await readFile(pidPath, 'utf8')).trim()); break }
+      catch (error) { if (error.code !== 'ENOENT') throw error }
+      await new Promise(resolvePromise => setTimeout(resolvePromise, 10))
+    }
+    assert.ok(Number.isSafeInteger(pid) && pid > 1)
+    assert.ok(await completion instanceof Error)
+    assert.throws(() => process.kill(pid, 0), { code: 'ESRCH' })
   }
-  assert.ok(Number.isSafeInteger(pid) && pid > 1)
-  assert.ok(await completion instanceof Error)
-  assert.throws(() => process.kill(pid, 0), { code: 'ESRCH' })
 
   const signaled = await script(t, 'kill -TERM $$')
   await assert.rejects(runExecutable({ executable: signaled, args: [], validUntilMs: Date.now() + 2_000 }))
@@ -92,6 +94,17 @@ test('CLI restart publishes a retained terminal journal before provider discover
   const ports = await createAcademyProductionLivePorts({authorityPath,run:fakeRun,expected:{releaseRevision:revision,identityReadinessSha256:readinessSha256},clock:()=>nowDate.getTime(),expectedExecutableUid:process.getuid()})
   await runAcademyProductionActivation({plan,ports,release:ACTIVATION_RELEASE,observedAt:nowDate,journalPath,receiptPath})
   const callsBeforeRestart = calls
+  const terminalJournal = JSON.parse(await readFile(journalPath, 'utf8'))
+  const nonterminalJournal = { ...terminalJournal, phase:'active', operation:'traffic-activation', state:'attempting', finalReceipt:null, finalReceiptSha256:null }
+  await writeFile(journalPath, `${JSON.stringify(nonterminalJournal)}\n`, { mode: 0o600 })
+  const expiredReadiness = { ...readiness, expiresAt:'2026-08-29T03:09:59.000Z' }
+  await writeFile(readinessPath, `${JSON.stringify(expiredReadiness)}\n`, { mode: 0o600 })
+  await assert.rejects(main([planPath,authorityPath,journalPath,receiptPath,ACTIVATION_RELEASE],{observedAt:nowDate,clock:()=>nowDate.getTime(),run:fakeRun,expectedExecutableUid:process.getuid()}))
+  assert.equal(JSON.parse(await readFile(journalPath, 'utf8')).phase, 'active', 'nonterminal journal must remain fresh-authority gated')
+  await writeFile(journalPath, `${JSON.stringify(terminalJournal)}\n`, { mode: 0o600 })
+  const expiredAuthority = { ...authority, validUntil:'2026-08-29T03:09:59Z' }
+  await writeFile(authorityPath, `${JSON.stringify(expiredAuthority)}\n`, { mode: 0o600 })
+  await rm(operations.inspectRecovery.executable)
   const status = await main([planPath,authorityPath,journalPath,receiptPath,ACTIVATION_RELEASE],{observedAt:nowDate,clock:()=>nowDate.getTime(),run:fakeRun,expectedExecutableUid:process.getuid()})
   assert.equal(status, 'ACTIVATED')
   assert.equal(calls, callsBeforeRestart, 'terminal recovery must publish before provider discovery')

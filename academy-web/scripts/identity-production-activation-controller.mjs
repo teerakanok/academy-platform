@@ -110,20 +110,47 @@ function expect(value, keys, predicate) {
   return value
 }
 
+async function publishTerminalForPlan(plan, journalPath, receiptPath) {
+  const journal = await readJournal(journalPath)
+  if (journal?.phase !== 'activated') return null
+  const receipt = journal.finalReceipt
+  if (journal.sourceRevision !== plan.academy.releaseRevision
+    || receipt?.schema !== 'academy-production-activation-controller-receipt/v1'
+    || receipt.status !== 'ACTIVATED' || receipt.productionMutation !== true
+    || receipt.sourceRevision !== plan.academy.releaseRevision
+    || receipt.identityReadinessSha256 !== journal.identityReadinessSha256
+    || receipt.currentServing?.deploymentId !== journal.currentDeploymentId
+    || receipt.currentServing?.versionId !== journal.currentVersionId) throw new AcademyActivationControllerError()
+  await writeControllerReceipt(receiptPath, receipt, { journalPath })
+  return Object.freeze(receipt)
+}
+
+export async function publishRetainedAcademyActivation({ plan: input, journalPath: inputJournalPath, receiptPath: inputReceiptPath }) {
+  const plan = validatePlan(input)
+  const journalPath = resolve(inputJournalPath ?? `${plan.identityReadinessPath}.academy-activation-journal`)
+  const receiptPath = resolve(inputReceiptPath ?? `${journalPath}.receipt`)
+  return publishTerminalForPlan(plan, journalPath, receiptPath)
+}
+
 export async function runAcademyProductionActivation({ plan: input, ports: inputPorts, release, observedAt = new Date(), journalPath: inputJournalPath, receiptPath: inputReceiptPath }) {
   const plan = validatePlan(input)
+  const journalPath = resolve(inputJournalPath ?? `${plan.identityReadinessPath}.academy-activation-journal`)
+  const receiptPath = resolve(inputReceiptPath ?? `${journalPath}.receipt`)
+  if (release === ACTIVATION_RELEASE) {
+    const terminal = await publishTerminalForPlan(plan, journalPath, receiptPath)
+    if (terminal) return terminal
+  }
   const ports = validatePorts(inputPorts)
   const identity = intakeIdentityLiveReadiness(await readProtectedIdentityLiveReadiness(plan.identityReadinessPath), observedAt)
   if (ports.authority.releaseRevision !== plan.academy.releaseRevision
     || ports.authority.identityReadinessSha256 !== identity.receiptSha256
     || observedAt.getTime() >= Date.parse(ports.authority.validUntil)) throw new AcademyActivationControllerError()
-  const journalPath = resolve(inputJournalPath ?? `${plan.identityReadinessPath}.academy-activation-journal`)
-  const receiptPath = resolve(inputReceiptPath ?? `${journalPath}.receipt`)
   let baseRecoveryReceipt = null
   const previousJournal = release === ACTIVATION_RELEASE ? await readJournal(journalPath) : null
   if (previousJournal?.phase === 'activated') {
-    await writeControllerReceipt(receiptPath, previousJournal.finalReceipt, { journalPath })
-    return Object.freeze(previousJournal.finalReceipt)
+    const terminal = await publishTerminalForPlan(plan, journalPath, receiptPath)
+    if (terminal) return terminal
+    throw new AcademyActivationControllerError()
   }
   if (previousJournal) {
     const journalSha256 = createHash('sha256').update(`${JSON.stringify(previousJournal)}\n`).digest('hex')

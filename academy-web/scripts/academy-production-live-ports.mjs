@@ -142,8 +142,9 @@ export async function createAcademyProductionLivePorts({ authorityPath, run, exp
   const invoke = async (name, bindings = {}, options = {}) => {
     const now = clock()
     const validUntilMs = Date.parse(authority.validUntil)
-    const invocationDeadline = options.recovery === true ? validUntilMs : validUntilMs - LIVE_RECOVERY_RESERVE_MS
-    if (!Number.isFinite(now) || now >= invocationDeadline || invocationDeadline - now < 100) fail()
+    const phaseDeadline = options.recovery === true ? validUntilMs : validUntilMs - LIVE_RECOVERY_RESERVE_MS
+    const invocationDeadline = Math.min(phaseDeadline, now + LIVE_HELPER_BUDGET_MS)
+    if (!Number.isFinite(now) || now >= phaseDeadline || invocationDeadline - now < 100) fail()
     const spec = authority.operations[name]
     await verifyExecutable(spec, expectedExecutableUid)
     const allBindings = { ...bindings, AUTHORITY_ID: authority.authorityId, RELEASE_REVISION: authority.releaseRevision,
