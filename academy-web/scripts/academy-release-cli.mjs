@@ -12,6 +12,7 @@ import { renderAcademyRelease } from './academy-release-render.mjs'
 const SHA256 = /^[a-f0-9]{64}$/
 const REVISION = /^[a-f0-9]{40}$/
 const PACKAGE_SCHEMA = 'academy-release-package-input/v1'
+const REQUIRED_APPLICATION_FILES = Object.freeze(['application/worker.js','application/wrangler.jsonc'])
 
 async function protectedJson(path, fs, processLike) {
   if (typeof path !== 'string' || resolve(path) !== path) failAcademyRelease()
@@ -56,6 +57,10 @@ export async function readAcademyReleasePackageInput({ path, fs = filesystem, pr
       || ![0o400,0o444,0o500,0o555].includes(helper.mode))) failAcademyRelease()
   if (new Set(value.helpers.map(helper => helper.path)).size !== value.helpers.length
     || new Set(value.helpers.map(helper => helper.sourcePath)).size !== value.helpers.length) failAcademyRelease()
+  for (const path of REQUIRED_APPLICATION_FILES) {
+    const file = value.helpers.find(helper => helper.path === path)
+    if (!file || file.mode !== 0o444) failAcademyRelease()
+  }
   await verifyReviewedSource(value.nodeSource, 'file', fs, processLike)
   await verifyReviewedSource(value.wranglerDirectory, 'directory', fs, processLike)
   for (const helper of value.helpers) await verifyReviewedSource(helper.sourcePath, 'file', fs, processLike)

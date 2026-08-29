@@ -12,6 +12,7 @@ import { installAcademyRelease } from './academy-release-install.mjs'
 
 const D = 'a'.repeat(64)
 const R = 'b'.repeat(40)
+const CONFIG_NAMES = ['IDENTITY_ADAPTER','IDENTITY_RUNTIME_ENABLED','IDENTITY_RUNTIME_WIRED','IDENTITY_RELEASE_APPROVAL','IDENTITY_CODE_EXCHANGE_TIMEOUT_MS','IDENTITY_CLIENT_ASSERTION_KEY_ID','IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK','IDENTITY_RESULT_KEY_SET_DOCUMENT']
 const deployment = '11111111-1111-4111-8111-111111111111'
 const version = '22222222-2222-4222-8222-222222222222'
 const common = ['--authority','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','--release',R,'--readiness',D,'--valid-until','2026-08-29T12:00:00Z']
@@ -38,6 +39,18 @@ test('reconcile remains fail-closed without provider recovery evidence', async (
 test('residue fails closed until zero-traffic versions are inventoried', async () => {
   const args = [...common,'--operation','residue','--deployment',deployment,'--version',version]
   await assert.rejects(executeAcademyCloudflareHelper(args, options))
+})
+
+test('residue binds an exact count-only version inventory', async () => {
+  const args = [...common,'--operation','residue','--deployment',deployment,'--version',version]
+  const run = async request => request
+    ? JSON.stringify([{id:version,metadata:{created_on:'2026-08-29T10:00:00Z'},annotations:{}},
+      {id:'33333333-3333-4333-8333-333333333333',metadata:{created_on:'2026-08-29T10:01:00Z'},annotations:{}}])
+    : JSON.stringify(provider)
+  const value = await executeAcademyCloudflareHelper(args, { ...options, run })
+  assert.equal(value.versionCount, 2)
+  assert.equal(value.nonServingVersionCount, 1)
+  assert.match(value.inventorySha256, /^[a-f0-9]{64}$/)
 })
 
 test('duplicate provider JSON is rejected before member collapse', async () => {
@@ -125,20 +138,30 @@ test('real runner rejects oversized output and duplicate JSON', async t => {
 const pinnedOptions = { ...options }
 delete pinnedOptions.run
 
-async function pinnedReleaseEnvironment(tamper) {
+async function pinnedReleaseEnvironment(tamper, includeApplication = true) {
   const env = createAcademyReleaseFakeFilesystem()
   await env.fs.mkdir('/source/wrangler/bin', { mode: 0o755, recursive: true })
   await env.fs.writeFileDirect('/source/node', Buffer.from('#!/fake/node\n'), 0o755)
   await env.fs.writeFileDirect('/source/wrangler/bin/wrangler', Buffer.from('// wrangler entrypoint\n'), 0o755)
   await env.fs.writeFileDirect('/source/wrangler/package.json', Buffer.from('{}'), 0o644)
   await env.fs.writeFileDirect('/source/helper.mjs', Buffer.from('// helper source\n'), 0o500)
+  await env.fs.writeFileDirect('/source/worker.js', Buffer.from('// immutable worker bundle\n'), 0o444)
+  await env.fs.writeFileDirect('/source/wrangler.jsonc', Buffer.from('{"main":"worker.js"}\n'), 0o444)
+  const applicationHelpers = includeApplication ? [
+    { sourcePath: '/source/worker.js', path: 'application/worker.js', mode: 0o444 },
+    { sourcePath: '/source/wrangler.jsonc', path: 'application/wrangler.jsonc', mode: 0o444 },
+  ] : []
   const { root, manifest } = await renderAcademyRelease({ spec: {
     releaseRevision: R,
     node: { sourcePath: '/source/node' },
     wrangler: { sourceDirectory: '/source/wrangler', entrypoint: 'bin/wrangler' },
-    helpers: [{ sourcePath: '/source/helper.mjs', path: 'helpers/academy-production-cloudflare-helper.mjs', mode: 0o500 }],
+    helpers: [
+      { sourcePath: '/source/helper.mjs', path: 'helpers/academy-production-cloudflare-helper.mjs', mode: 0o500 },
+      ...applicationHelpers,
+    ],
   }, stagingRoot: '/staging/release', fs: env.fs, processLike: env.processLike })
   await env.fs.mkdir('/opt/academy', { mode: 0o755, recursive: true })
+  await env.fs.mkdir('/var/lib/academy/wrangler', { mode: 0o700, recursive: true })
   await installAcademyRelease({ sourceRoot: root, installRoot: '/opt/academy',
     expectedReleaseSha256: manifest.releaseSha256, expectedReleaseRevision: R,
     now: new Date('2026-08-29T10:00:00.000Z'), fs: env.fs, processLike: env.processLike })
@@ -155,13 +178,14 @@ const versionInventory = (id, tag = '', message = '') => JSON.stringify([{ id, m
 test('candidate upload pins Wrangler and verifies exact provider annotations at zero traffic', async () => {
   const tag = `release-${R.slice(0,12)}`
   const config = 'd804036979c67055505c31f26fa78fcaed34a226d48d62d2329d598cf0d48e2c'
-  const message = `source=${R};config=${config}`
+  const message = `s=${R.slice(0,12)};c=${config.slice(0,12)}`
   const calls = []
   const run = async args => {
     calls.push(args ?? ['deployments'])
     if (!args) return JSON.stringify(provider)
     if (args[0] === '--version') return '4.120.0\n'
     if (args[0] === 'versions' && args[1] === 'upload') return 'uploaded\n'
+    if (args[0] === 'versions' && args[1] === 'view') return JSON.stringify({id:candidate,resources:{bindings:CONFIG_NAMES.map(name=>({name,type:'secret_text'}))}})
     const listCount = calls.filter(call => call?.[1] === 'list').length
     return listCount === 1 ? versionInventory(version) : JSON.stringify([
       ...JSON.parse(versionInventory(version)), ...JSON.parse(versionInventory(candidate, tag, message))])
@@ -171,6 +195,38 @@ test('candidate upload pins Wrangler and verifies exact provider annotations at 
   assert.equal(value.trafficPercentage, 0)
   assert.ok(calls.some(call => call?.includes('--strict') && call.includes('--keep-vars')))
   assert.equal(JSON.stringify(value).includes(message), false)
+  assert.ok(calls.some(call => call?.[0] === 'versions' && call[1] === 'view' && call[2] === candidate))
+})
+
+test('live upload requires release-bound worker and config and uses a separate writable cwd', async () => {
+  const { env, root } = await pinnedReleaseEnvironment()
+  const calls = []
+  const tag = `release-${R.slice(0,12)}`
+  const message = 's=bbbbbbbbbbbb;c=d804036979c6'
+  let lists = 0
+  const runWrangler = async invocation => {
+    calls.push(invocation)
+    const args = invocation.args.slice(1)
+    if (args[0] === 'deployments') return JSON.stringify(provider)
+    if (args[0] === '--version') return '4.120.0\n'
+    if (args[0] === 'versions' && args[1] === 'upload') return 'uploaded\n'
+    if (args[0] === 'versions' && args[1] === 'view') return JSON.stringify({id:candidate,resources:{bindings:CONFIG_NAMES.map(name=>({name,type:'secret_text'}))}})
+    if (args[0] === 'versions' && args[1] === 'list') return lists++ === 0 ? versionInventory(version)
+      : JSON.stringify([...JSON.parse(versionInventory(version)),...JSON.parse(versionInventory(candidate,tag,message))])
+    throw new Error('unexpected invocation')
+  }
+  const value = await executeAcademyCloudflareHelper([...common,'--operation','upload','--source',R,'--traffic','0'],
+    { ...pinnedOptions, fs:env.fs, processLike:env.processLike, installRoot:'/opt/academy', runWrangler })
+  assert.equal(value.versionId,candidate)
+  const upload = calls.find(call=>call.args.includes('upload'))
+  assert.equal(upload.cwd,'/var/lib/academy/wrangler')
+  assert.ok(upload.args.includes(`${root}/application/worker.js`))
+  assert.ok(upload.args.includes(`${root}/application/wrangler.jsonc`))
+
+  const missing = await pinnedReleaseEnvironment(undefined,false)
+  let providerCalls=0
+  await assert.rejects(executeAcademyCloudflareHelper(inspectArgs,{...pinnedOptions,fs:missing.env.fs,processLike:missing.env.processLike,installRoot:'/opt/academy',runWrangler:async()=>{providerCalls+=1}}))
+  assert.equal(providerCalls,0)
 })
 
 test('candidate upload rejects wrong Wrangler version and duplicate version JSON before mutation', async () => {
@@ -189,6 +245,7 @@ test('candidate upload rejects wrong Wrangler version and duplicate version JSON
     return `[{"id":"${version}","id":"${candidate}","metadata":{"created_on":"2026-08-29T10:01:00Z"},"annotations":{}}]`
   }
   await assert.rejects(executeAcademyCloudflareHelper([...common,'--operation','upload','--source',R,'--traffic','0'], { ...options, run:duplicate }))
+  await assert.rejects(executeAcademyCloudflareHelper([...common,'--operation','upload','--source','c'.repeat(40),'--traffic','0'], { ...options, run:wrong }))
 })
 
 test('activation and rollback use optimistic exact pre/post conditions and disclose residual race', async () => {
@@ -215,11 +272,12 @@ test('protected secret staging sends values only through stdin contract and retu
   const root = await mkdtemp(join(tmpdir(), 'academy-secret-stage-')); t.after(() => rm(root,{recursive:true,force:true}))
   const path = join(await realpath(root),'bundle.json'); await writeFile(path, '{"ALPHA":"private-one","BETA":"private-two"}', { mode:0o600 })
   let extra
-  const run = async (args, options) => { if (!args) return JSON.stringify(provider); extra = options; return '' }
+  const run = async (args, options) => { if (!args) return JSON.stringify(provider); extra = { ...options, args }; return '' }
   const value = await executeAcademyCloudflareHelper([...common,'--operation','secrets','--secrets-file',path,'--tag','release-test'], { ...options, run })
   assert.deepEqual(value.secretNames, ['ALPHA','BETA'])
   assert.equal(JSON.stringify(value).includes('private-'), false)
   assert.match(extra.stdin, /private-one/)
+  assert.equal(extra.args?.includes('-'), false)
 })
 
 test('live path resolves the pointer release and executes only pinned node and wrangler entrypoint', async () => {
@@ -231,7 +289,7 @@ test('live path resolves the pointer release and executes only pinned node and w
   assert.deepEqual(value, { deployments: provider })
   assert.equal(observed.executable, `${root}/node/bin/node`)
   assert.deepEqual(observed.args, [`${root}/wrangler/bin/wrangler`, 'deployments', 'list', '--name', 'cyberskills-academy', '--json'])
-  assert.equal(observed.cwd, root)
+  assert.equal(observed.cwd, '/var/lib/academy/wrangler')
   // The runner receives a revalidation hook that must succeed pre-spawn.
   assert.equal(typeof observed.verify, 'function')
   await observed.verify()
@@ -330,6 +388,7 @@ const save=()=>writeFileSync(path,JSON.stringify(state))
 if(args[0]==='--version') process.stdout.write('4.120.0\\n')
 else if(args[0]==='deployments'&&args[1]==='list') process.stdout.write(JSON.stringify([{id:state.deployment,created_on:'2026-08-29T10:00:00Z',versions:[{version_id:state.version,percentage:100}]}]))
 else if(args[0]==='versions'&&args[1]==='list') process.stdout.write(JSON.stringify(state.versions.map((v,i)=>({id:v.id,metadata:{created_on:'2026-08-29T10:0'+i+':00Z'},annotations:{'workers/tag':v.tag,'workers/message':v.message}}))))
+else if(args[0]==='versions'&&args[1]==='view') process.stdout.write(JSON.stringify({id:args[2],resources:{bindings:${JSON.stringify(CONFIG_NAMES)}.map(name=>({name,type:'secret_text'}))}}))
 else if(args[0]==='versions'&&args[1]==='upload'){const tag=args[args.indexOf('--tag')+1],message=args[args.indexOf('--message')+1];state.versions.push({id:${JSON.stringify(candidate)},tag,message});save();process.stdout.write('uploaded\\n')}
 else if(args[0]==='versions'&&args[1]==='deploy'){state.serial++;state.version=args[2].split('@')[0];state.deployment=['${activated}','55555555-5555-4555-8555-555555555555'][state.serial-1];save();process.stdout.write('deployed\\n')}
 else process.exit(2)
@@ -337,7 +396,7 @@ else process.exit(2)
   const helperUrl = new URL('./academy-production-cloudflare-helper.mjs', import.meta.url).href
   await writeFile(harnessPath, `import {executeAcademyCloudflareHelper} from ${JSON.stringify(helperUrl)}
 const root=${JSON.stringify(root)}, validUntil=Date.parse('2026-08-29T12:00:00Z')
-executeAcademyCloudflareHelper(JSON.parse(process.argv[2]),{clock:()=>Date.parse('2026-08-29T11:00:00Z'),env:{},release:{root,nodeExecutable:process.execPath,wranglerEntrypoint:${JSON.stringify(wranglerPath)},manifest:{releaseRevision:${JSON.stringify(R)}}},revalidate:async()=>{}}).then(v=>process.stdout.write(JSON.stringify(v)+'\\n')).catch(()=>process.exit(1))
+executeAcademyCloudflareHelper(JSON.parse(process.argv[2]),{clock:()=>Date.parse('2026-08-29T11:00:00Z'),env:{},workRoot:root,release:{root,nodeExecutable:process.execPath,wranglerEntrypoint:${JSON.stringify(wranglerPath)},manifest:{releaseRevision:${JSON.stringify(R)},entries:[{path:'application/worker.js'},{path:'application/wrangler.jsonc'}]}},revalidate:async()=>{}}).then(v=>process.stdout.write(JSON.stringify(v)+'\\n')).catch(()=>process.exit(1))
 `, { mode:0o600 })
   const invoke = args => new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [harnessPath, JSON.stringify(args)], { cwd:root, stdio:['ignore','pipe','pipe'] })

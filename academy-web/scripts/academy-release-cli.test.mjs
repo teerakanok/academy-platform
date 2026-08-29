@@ -19,13 +19,17 @@ async function fixture(t) {
   await writeFile(join(sources, 'wrangler', 'bin', 'wrangler'), '#!/usr/bin/env node\n', { mode: 0o500 })
   await writeFile(join(sources, 'wrangler', 'package.json'), '{}\n', { mode: 0o400 })
   await writeFile(join(sources, 'helper.mjs'), 'export {}\n', { mode: 0o400 })
+  await writeFile(join(sources, 'worker.js'), '// immutable worker bundle\n', { mode: 0o400 })
+  await writeFile(join(sources, 'wrangler.jsonc'), '{"main":"worker.js"}\n', { mode: 0o400 })
   await chmod(join(sources, 'wrangler', 'bin'), 0o500)
   await chmod(join(sources, 'wrangler'), 0o500)
   await chmod(sources, 0o500)
   const packagePath = join(root, 'package.json')
   const packageInput = { schema:'academy-release-package-input/v1', releaseRevision:REVISION,
     nodeSource:join(sources,'node'), wranglerDirectory:join(sources,'wrangler'), wranglerEntrypoint:'bin/wrangler',
-    helpers:[{sourcePath:join(sources,'helper.mjs'),path:'helpers/helper.mjs',mode:0o400}] }
+    helpers:[{sourcePath:join(sources,'helper.mjs'),path:'helpers/helper.mjs',mode:0o400},
+      {sourcePath:join(sources,'worker.js'),path:'application/worker.js',mode:0o444},
+      {sourcePath:join(sources,'wrangler.jsonc'),path:'application/wrangler.jsonc',mode:0o444}] }
   await writeFile(packagePath, `${JSON.stringify(packageInput)}\n`, { mode: 0o600 })
   return { root, packagePath }
 }
@@ -63,6 +67,11 @@ test('CLI rejects digest drift, noncanonical package JSON, writable sources and 
   const canonical = await readFile(value.packagePath, 'utf8')
   await writeFile(value.packagePath, ` ${canonical}`, { mode: 0o600 })
   await assert.rejects(run(['render', value.packagePath, join(value.root, 'bad-json')]))
+  await writeFile(value.packagePath, canonical, { mode: 0o600 })
+  const missingApplication = JSON.parse(canonical)
+  missingApplication.helpers = missingApplication.helpers.filter(helper => helper.path !== 'application/worker.js')
+  await writeFile(value.packagePath, `${JSON.stringify(missingApplication)}\n`, { mode: 0o600 })
+  await assert.rejects(run(['render', value.packagePath, join(value.root, 'missing-application')]))
   await writeFile(value.packagePath, canonical, { mode: 0o600 })
   await chmod(join(value.root, 'sources'), 0o700)
   await chmod(join(value.root, 'sources', 'node'), 0o700)

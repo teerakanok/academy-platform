@@ -95,9 +95,9 @@ async function readJournal(path) {
       || (value.candidateVersionId !== null && !UUID.test(value.candidateVersionId))
       || (value.activeDeploymentId !== null && !UUID.test(value.activeDeploymentId)) || !UUID.test(value.rollbackTargetVersionId)
       || !['none','backup-restore','migrations-0021-0027','candidate-upload','traffic-activation','terminal'].includes(value.operation)
-      || !['active','activated'].includes(value.phase) || !['ready','attempting','confirmed'].includes(value.state)
+      || !['active','activated','failed'].includes(value.phase) || !['ready','attempting','confirmed'].includes(value.state)
       || (value.phase === 'active' && (value.finalReceipt !== null || value.finalReceiptSha256 !== null))
-      || (value.phase === 'activated' && (!value.finalReceipt || !SHA256.test(value.finalReceiptSha256)
+      || (value.phase !== 'active' && (!value.finalReceipt || !SHA256.test(value.finalReceiptSha256)
         || createHash('sha256').update(`${JSON.stringify(value.finalReceipt)}\n`).digest('hex') !== value.finalReceiptSha256))) throw new Error()
     return value
   } catch (error) { if (error.code === 'ENOENT') return null; throw error }
@@ -251,8 +251,11 @@ export async function runAcademyProductionActivation({ plan: input, ports: input
         && value.configuredNamesSha256 === CONFIG_SHA256 && JSON.stringify(value.checks) === JSON.stringify(CHECKS))
     base.steps.push({ name: 'authenticated-p1-p7', status: 'PASS', receiptSha256: smoke.receiptSha256 })
     const residue = expect(await ports.checkResidue({ expectedDeploymentId: activeDeploymentId, expectedVersionId: candidate.versionId }),
-      ['status','deploymentId','versionId','receiptSha256'], value => value.status === 'PASS'
-        && value.deploymentId === activeDeploymentId && value.versionId === candidate.versionId)
+      ['status','deploymentId','versionId','versionCount','nonServingVersionCount','inventorySha256','receiptSha256'], value => value.status === 'PASS'
+        && value.deploymentId === activeDeploymentId && value.versionId === candidate.versionId
+        && Number.isSafeInteger(value.versionCount) && value.versionCount >= 1
+        && Number.isSafeInteger(value.nonServingVersionCount) && value.nonServingVersionCount >= 0
+        && value.nonServingVersionCount < value.versionCount && SHA256.test(value.inventorySha256))
     base.steps.push({ name: 'residue-check', status: 'PASS', receiptSha256: residue.receiptSha256 })
     base.status = 'ACTIVATED'; base.productionMutation = true
     const finalReceipt = JSON.parse(JSON.stringify(base))
@@ -280,8 +283,11 @@ export async function runAcademyProductionActivation({ plan: input, ports: input
             && value.semantics.concurrencyControl === 'optimistic-precondition-and-postcondition'
             && value.semantics.atomicProviderCas === false && value.semantics.residualRace === true)
         const residue = expect(await ports.checkResidue({ expectedDeploymentId: rollback.deploymentId, expectedVersionId: current.versionId, recovery: true }),
-          ['status','deploymentId','versionId','receiptSha256'], value => value.status === 'PASS'
-            && value.deploymentId === rollback.deploymentId && value.versionId === current.versionId)
+          ['status','deploymentId','versionId','versionCount','nonServingVersionCount','inventorySha256','receiptSha256'], value => value.status === 'PASS'
+            && value.deploymentId === rollback.deploymentId && value.versionId === current.versionId
+            && Number.isSafeInteger(value.versionCount) && value.versionCount >= 1
+            && Number.isSafeInteger(value.nonServingVersionCount) && value.nonServingVersionCount >= 0
+            && value.nonServingVersionCount < value.versionCount && SHA256.test(value.inventorySha256))
         base.mutationLedger.trafficActivation = 'rolled_back'
         base.steps.push({ name: 'rollback', status: 'PASS', receiptSha256: rollback.receiptSha256 })
         base.steps.push({ name: 'residue-check', status: 'PASS', receiptSha256: residue.receiptSha256 })
@@ -294,8 +300,19 @@ export async function runAcademyProductionActivation({ plan: input, ports: input
     if (base.mutationLedger.trafficActivation === 'rollback_uncertain') base.status = 'FAILED_ROLLBACK_UNCERTAIN_RECOVERY_REQUIRED'
     else if (base.mutationLedger.trafficActivation === 'rolled_back') base.status = 'FAILED_TRAFFIC_ROLLED_BACK_RECOVERY_REQUIRED'
     else base.status = base.productionMutation ? 'FAILED_RECOVERY_REQUIRED' : 'FAILED_PRE_MUTATION'
+    const finalReceipt = JSON.parse(JSON.stringify(base))
+    const finalReceiptSha256 = createHash('sha256').update(`${JSON.stringify(finalReceipt)}\n`).digest('hex')
+    await advance('terminal', 'confirmed', { phase: 'failed', finalReceipt, finalReceiptSha256 })
     throw new AcademyActivationControllerError(Object.freeze(base))
   }
+}
+
+export async function writeControllerFailureReceipt(path, receipt, options = {}) {
+  const journal = await readJournal(resolve(options.journalPath))
+  const digest = createHash('sha256').update(`${JSON.stringify(receipt)}\n`).digest('hex')
+  if (journal?.phase !== 'failed' || journal.finalReceiptSha256 !== digest
+    || JSON.stringify(journal.finalReceipt) !== JSON.stringify(receipt)) throw new AcademyActivationControllerError()
+  return writeControllerReceipt(path, receipt)
 }
 
 export async function writeControllerReceipt(path, receipt, options = {}) {

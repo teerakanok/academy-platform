@@ -60,11 +60,17 @@ async function materialize(root, revision, { wranglerBody = WRANGLER_FIXTURE } =
   await writeFile(join(sources, 'wrangler', 'bin', 'wrangler.js'), wranglerBody, { mode: 0o644 })
   await writeFile(join(sources, 'wrangler', 'package.json'), JSON.stringify({ name: 'wrangler-fixture', version: WRANGLER_VERSION }), { mode: 0o644 })
   await writeFile(join(sources, 'helper.mjs'), '// helper source\n', { mode: 0o500 })
+  await writeFile(join(sources, 'worker.js'), '// immutable worker bundle\n', { mode: 0o444 })
+  await writeFile(join(sources, 'wrangler.jsonc'), '{"main":"worker.js"}\n', { mode: 0o444 })
   const { root: staged, manifest } = await renderAcademyRelease({ spec: {
     releaseRevision: revision,
     node: { sourcePath: process.execPath },
     wrangler: { sourceDirectory: join(sources, 'wrangler'), entrypoint: 'bin/wrangler.js' },
-    helpers: [{ sourcePath: join(sources, 'helper.mjs'), path: 'helpers/academy-production-cloudflare-helper.mjs', mode: 0o500 }],
+    helpers: [
+      { sourcePath: join(sources, 'helper.mjs'), path: 'helpers/academy-production-cloudflare-helper.mjs', mode: 0o500 },
+      { sourcePath: join(sources, 'worker.js'), path: 'application/worker.js', mode: 0o444 },
+      { sourcePath: join(sources, 'wrangler.jsonc'), path: 'application/wrangler.jsonc', mode: 0o444 },
+    ],
   }, stagingRoot: join(root, 'staging', revision) })
   return { staged, manifest }
 }
@@ -78,6 +84,7 @@ async function install(root, source, overrides = {}) {
 test('real install publishes through the pointer and runs the pinned node + wrangler --version', async t => {
   const root = await tempRoot(t)
   const source = await materialize(root, REVISION_A)
+  await mkdir(join(root,'wrangler-work'),{mode:0o700})
   const result = await install(root, source)
   assert.equal(result.status, 'INSTALLED')
   const { release } = await resolveAcademyCurrentRelease({ installRoot: join(root, 'install') })
@@ -91,7 +98,7 @@ test('real install publishes through the pointer and runs the pinned node + wran
     ['--authority','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','--release',REVISION_A,
       '--readiness','a'.repeat(64),'--valid-until','2999-01-01T00:00:00Z',
       '--operation','inspect','--mode','discover-current','--journal',''],
-    { clock: () => Date.parse('2026-08-29T11:00:00Z'), installRoot: join(root, 'install') })
+    { clock: () => Date.parse('2026-08-29T11:00:00Z'), installRoot: join(root, 'install'), workRoot:join(root,'wrangler-work') })
   assert.deepEqual(value, { deployments: JSON.parse(provider) })
 })
 

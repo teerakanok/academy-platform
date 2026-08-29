@@ -50,7 +50,16 @@ test('runner kills and reaps output overflow, hang, and signal exits', async t =
     assert.ok(Number.isSafeInteger(pid) && pid > 1)
     forcedAt = Date.now()
     assert.ok(await completion instanceof Error)
-    assert.throws(() => process.kill(pid, 0), { code: 'ESRCH' })
+    const reapDeadline = Date.now() + 1_000
+    let reaped = false
+    while (Date.now() < reapDeadline) {
+      try { process.kill(pid, 0) } catch (error) {
+        if (error.code === 'ESRCH') { reaped = true; break }
+        throw error
+      }
+      await new Promise(resolvePromise => setTimeout(resolvePromise, 10))
+    }
+    assert.equal(reaped, true)
   }
 
   const signaled = await script(t, 'kill -TERM $$')
@@ -94,7 +103,7 @@ test('CLI restart publishes a retained terminal journal before provider discover
       : call.operation === 'uploadCandidate' ? {status:'PASS',workerName:'cyberskills-academy',versionId:ids.candidate,sourceRevision:revision,trafficPercentage:0,configuredNamesSha256:configSha256,receiptSha256:D}
       : call.operation === 'activateTraffic' ? {status:'PASS',previousDeploymentId:ids.currentDeployment,previousVersionId:ids.currentVersion,deploymentId:ids.active,activeVersionId:ids.candidate,trafficPercentage:100,semantics:optimisticSemantics,receiptSha256:D}
       : call.operation === 'smokeP1P7' ? {status:'PASS',deploymentId:ids.active,versionId:ids.candidate,configuredNamesSha256:configSha256,checks:['P1','P2','P3','P4','P5','P6','P7'],receiptSha256:D}
-      : {status:'PASS',deploymentId:ids.active,versionId:ids.candidate,receiptSha256:D}
+      : {status:'PASS',deploymentId:ids.active,versionId:ids.candidate,versionCount:2,nonServingVersionCount:1,inventorySha256:D,receiptSha256:D}
     return { status: 0, stdout: JSON.stringify(output) }
   }
   const ports = await createAcademyProductionLivePorts({authorityPath,run:fakeRun,expected:{releaseRevision:revision,identityReadinessSha256:readinessSha256},clock:()=>nowDate.getTime(),expectedExecutableUid:process.getuid()})

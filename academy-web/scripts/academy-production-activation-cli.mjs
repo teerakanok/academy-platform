@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process'
+import { createHash } from 'node:crypto'
 import { constants } from 'node:fs'
 import { access, open, realpath, stat } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 
 import { createAcademyProductionLivePorts } from './academy-production-live-ports.mjs'
 import { intakeIdentityLiveReadiness, readProtectedIdentityLiveReadiness } from './identity-live-readiness-intake.mjs'
-import { ACTIVATION_RELEASE, publishRetainedAcademyActivation, runAcademyProductionActivation, writeControllerReceipt } from './identity-production-activation-controller.mjs'
+import { AcademyActivationControllerError, ACTIVATION_RELEASE, publishRetainedAcademyActivation, runAcademyProductionActivation, writeControllerFailureReceipt, writeControllerReceipt } from './identity-production-activation-controller.mjs'
 
 const fail = () => { throw new Error('Academy production activation failed') }
 
@@ -47,6 +48,13 @@ function groupAlive(pid) {
   }
 }
 
+function processAlive(pid) {
+  try { process.kill(pid, 0); return true } catch (error) {
+    if (error?.code === 'ESRCH') return false
+    fail()
+  }
+}
+
 async function waitGroup(pid, deadlineMs, clock) {
   while (clock() < deadlineMs) {
     if (!groupAlive(pid)) return true
@@ -55,14 +63,23 @@ async function waitGroup(pid, deadlineMs, clock) {
   return !groupAlive(pid)
 }
 
+async function waitProcess(pid, deadlineMs, clock) {
+  while (clock() < deadlineMs) {
+    if (!processAlive(pid)) return true
+    await new Promise(resolvePromise => setTimeout(resolvePromise, 10))
+  }
+  return !processAlive(pid)
+}
+
 async function terminateGroup(pid, deadlineMs, clock) {
-  if (!Number.isSafeInteger(pid) || pid < 2 || !groupAlive(pid)) return
+  if (!Number.isSafeInteger(pid) || pid < 2) return
+  if (!groupAlive(pid)) { if (!(await waitProcess(pid, deadlineMs, clock))) fail(); return }
   try { process.kill(-pid, 'SIGTERM') } catch (error) { if (error?.code !== 'ESRCH') fail() }
   const remaining = deadlineMs - clock()
   const termDeadline = Math.min(deadlineMs, clock() + Math.max(20, Math.floor(remaining / 2)))
-  if (await waitGroup(pid, termDeadline, clock)) return
+  if (await waitGroup(pid, termDeadline, clock)) { if (!(await waitProcess(pid, deadlineMs, clock))) fail(); return }
   try { process.kill(-pid, 'SIGKILL') } catch (error) { if (error?.code !== 'ESRCH') fail() }
-  if (!(await waitGroup(pid, deadlineMs, clock))) fail()
+  if (!(await waitGroup(pid, deadlineMs, clock)) || !(await waitProcess(pid, deadlineMs, clock))) fail()
 }
 
 export async function runExecutable({ executable, args, validUntilMs, clock = () => Date.now() }) {
@@ -120,8 +137,18 @@ export async function main(args, options = {}) {
     clock: options.clock ?? (() => Date.now()),
     expectedExecutableUid: options.expectedExecutableUid ?? 0,
   })
-  const receipt = await runAcademyProductionActivation({ plan, ports, release, observedAt,
-    journalPath: resolve(journalPath), receiptPath: resolve(receiptPath) })
+  let receipt
+  try {
+    receipt = await runAcademyProductionActivation({ plan, ports, release, observedAt,
+      journalPath: resolve(journalPath), receiptPath: resolve(receiptPath) })
+  } catch (error) {
+    if (error instanceof AcademyActivationControllerError && error.receipt) {
+      const digest = createHash('sha256').update(`${JSON.stringify(error.receipt)}\n`).digest('hex')
+      await writeControllerFailureReceipt(`${resolve(receiptPath)}.failed-${digest.slice(0,16)}`, error.receipt,
+        { journalPath: resolve(journalPath) })
+    }
+    throw error
+  }
   try {
     await access(resolve(journalPath))
     await writeControllerReceipt(resolve(receiptPath), receipt, { journalPath: resolve(journalPath) })

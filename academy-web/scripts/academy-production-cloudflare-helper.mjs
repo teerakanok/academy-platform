@@ -3,7 +3,7 @@
 import { spawn } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { constants } from 'node:fs'
-import { open, realpath } from 'node:fs/promises'
+import { open, realpath, stat } from 'node:fs/promises'
 
 import { assertNoDuplicateJsonMembers, parseCurrentDeploymentJson } from './current-deployment.mjs'
 import { verifyAcademyRelease } from './academy-release-manifest.mjs'
@@ -15,6 +15,9 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-
 const ISO_SECOND = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/
 const WORKER = 'cyberskills-academy'
 const WRANGLER_VERSION = '4.120.0'
+const APPLICATION_ENTRY = 'application/worker.js'
+const APPLICATION_CONFIG = 'application/wrangler.jsonc'
+const DEFAULT_WORK_ROOT = '/var/lib/academy/wrangler'
 const CONFIG_NAMES = ['IDENTITY_ADAPTER','IDENTITY_RUNTIME_ENABLED','IDENTITY_RUNTIME_WIRED','IDENTITY_RELEASE_APPROVAL','IDENTITY_CODE_EXCHANGE_TIMEOUT_MS','IDENTITY_CLIENT_ASSERTION_KEY_ID','IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK','IDENTITY_RESULT_KEY_SET_DOCUMENT']
 const CONFIG_SHA = createHash('sha256').update(`${JSON.stringify(CONFIG_NAMES)}\n`).digest('hex')
 // Fixed installed-release root; the live release is resolved exclusively
@@ -128,6 +131,17 @@ function versionsFrom(source) {
   })
 }
 
+function configuredNamesFrom(source, expectedVersionId) {
+  const value = duplicateSafe(source)
+  if (!value || typeof value !== 'object' || Array.isArray(value) || value.id !== expectedVersionId
+    || !value.resources || typeof value.resources !== 'object' || !Array.isArray(value.resources.bindings)
+    || value.resources.bindings.length > 256) fail()
+  const names = value.resources.bindings.map(binding => binding?.name)
+    .filter(name => typeof name === 'string' && /^[A-Z][A-Z0-9_]{1,127}$/.test(name))
+  if (new Set(names).size !== names.length || CONFIG_NAMES.some(name => !names.includes(name))) fail()
+  return names.sort()
+}
+
 const receipt = body => ({ ...body, receiptSha256: createHash('sha256').update(`${JSON.stringify(body)}\n`).digest('hex') })
 
 export async function readProtectedSecretBundle(path) {
@@ -168,6 +182,14 @@ export async function executeAcademyCloudflareHelper(args, options = {}) {
       fs: options.fs, processLike: options.processLike,
     })).release
     if (release.manifest.releaseRevision !== values['--release']) fail()
+    const releasePaths = new Set(release.manifest.entries?.map(entry => entry.path))
+    if (!releasePaths.has(APPLICATION_ENTRY) || !releasePaths.has(APPLICATION_CONFIG)) fail()
+    const workRoot = options.workRoot ?? DEFAULT_WORK_ROOT
+    const runtimeFs = options.fs ?? { realpath, stat }
+    if (await runtimeFs.realpath(workRoot) !== workRoot) fail()
+    const workMetadata = await runtimeFs.stat(workRoot)
+    const expectedUid = options.processLike?.getuid() ?? process.getuid()
+    if (!workMetadata.isDirectory() || workMetadata.uid !== expectedUid || workMetadata.mode & 0o077) fail()
     const runner = options.runWrangler ?? runWranglerJson
     const revalidate = options.revalidate ?? (async () => {
       if (options.release !== undefined) {
@@ -180,11 +202,14 @@ export async function executeAcademyCloudflareHelper(args, options = {}) {
         || current.release.manifest.releaseRevision !== release.manifest.releaseRevision) fail()
     })
     const invoke = (args, extra = {}) => runner({ executable: release.nodeExecutable,
-      args: [release.wranglerEntrypoint, ...args], cwd: release.root, deadlineMs: validUntilMs, clock, verify: revalidate, ...extra })
-    return Object.assign(() => invoke(['deployments','list','--name',WORKER,'--json']), { invoke })
+      args: [release.wranglerEntrypoint, ...args], cwd: workRoot, deadlineMs: validUntilMs, clock, verify: revalidate, ...extra })
+    return Object.assign(() => invoke(['deployments','list','--name',WORKER,'--json']), { invoke,
+      applicationEntry:`${release.root}/${APPLICATION_ENTRY}`, applicationConfig:`${release.root}/${APPLICATION_CONFIG}` })
   }
   const run = await resolveRun()
   const invoke = run.invoke ?? (async (args, extra) => options.run(args, extra))
+  const applicationEntry = run.applicationEntry ?? '/injected/application/worker.js'
+  const applicationConfig = run.applicationConfig ?? '/injected/application/wrangler.jsonc'
   const source = await run()
   const current = currentFrom(source)
   if (operation === 'inspect') {
@@ -194,23 +219,28 @@ export async function executeAcademyCloudflareHelper(args, options = {}) {
   }
   if (operation === 'residue') {
     if (current.deploymentId !== values['--deployment'] || current.versionId !== values['--version']) fail()
-    versionsFrom(await invoke(['versions','list','--name',WORKER,'--json']))
-    return receipt({ status:'PASS', deploymentId:current.deploymentId, versionId:current.versionId })
+    const inventory = versionsFrom(await invoke(['versions','list','--name',WORKER,'--json']))
+    if (!inventory.some(item => item.id === current.versionId)) fail()
+    const inventorySha256 = createHash('sha256').update(`${JSON.stringify(inventory)}\n`).digest('hex')
+    return receipt({ status:'PASS', deploymentId:current.deploymentId, versionId:current.versionId,
+      versionCount:inventory.length, nonServingVersionCount:inventory.filter(item => item.id !== current.versionId).length, inventorySha256 })
   }
   if (operation === 'upload') {
-    if (!REVISION.test(values['--source']) || values['--traffic'] !== '0') fail()
-    const tag = `release-${values['--source'].slice(0,12)}`; const message = `source=${values['--source']};config=${CONFIG_SHA}`
+    if (!REVISION.test(values['--source']) || values['--source'] !== values['--release'] || values['--traffic'] !== '0') fail()
+    const tag = `release-${values['--source'].slice(0,12)}`; const message = `s=${values['--source'].slice(0,12)};c=${CONFIG_SHA.slice(0,12)}`
     const before = versionsFrom(await invoke(['versions','list','--name',WORKER,'--json']))
     if ((await invoke(['--version'])).trim() !== WRANGLER_VERSION) fail()
-    await invoke(['versions','upload','--name',WORKER,'--tag',tag,'--message',message,'--keep-vars','--strict','--install-skills=false'])
+    await invoke(['versions','upload',applicationEntry,'--config',applicationConfig,
+      '--name',WORKER,'--tag',tag,'--message',message,'--keep-vars','--strict','--install-skills=false'])
     const after = versionsFrom(await invoke(['versions','list','--name',WORKER,'--json']))
     const prior = new Set(before.map(item => item.id)); const added = after.filter(item => !prior.has(item.id))
     if (added.length !== 1 || added[0].tag !== tag || added[0].message !== message) fail()
+    configuredNamesFrom(await invoke(['versions','view',added[0].id,'--name',WORKER,'--json']), added[0].id)
     return receipt({ status:'PASS', workerName:WORKER, versionId:added[0].id, sourceRevision:values['--source'], trafficPercentage:0, configuredNamesSha256:CONFIG_SHA })
   }
   if (operation === 'secrets') {
     const bundle = await readProtectedSecretBundle(values['--secrets-file'])
-    await invoke(['versions','secret','bulk','-','--name',WORKER,'--tag',values['--tag']], { stdin: bundle })
+    await invoke(['versions','secret','bulk','--name',WORKER,'--tag',values['--tag']], { stdin: bundle })
     return receipt({ status:'PASS', workerName:WORKER, secretNames:Object.keys(duplicateSafe(bundle)).sort() })
   }
   if (operation === 'activate' || operation === 'rollback') {

@@ -10,9 +10,19 @@ const REVISION = /^[a-f0-9]{40}$/
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
 const OPS = ['inspectRecovery','backupRestore','applyMigrations','uploadCandidate','activateTraffic','smokeP1P7','rollbackTraffic','checkResidue']
 const COMMON_BINDINGS = ['AUTHORITY_ID','RELEASE_REVISION','IDENTITY_READINESS_SHA256','VALID_UNTIL']
-export const LIVE_HELPER_BUDGET_MS = 5_000
-export const LIVE_RECOVERY_RESERVE_MS = 3 * LIVE_HELPER_BUDGET_MS
-const ACTIVATION_MINIMUM_MS = LIVE_RECOVERY_RESERVE_MS + 4 * LIVE_HELPER_BUDGET_MS
+export const LIVE_OPERATION_BUDGET_MS = Object.freeze({
+  inspectRecovery: 60_000,
+  backupRestore: 10 * 60_000,
+  applyMigrations: 10 * 60_000,
+  uploadCandidate: 10 * 60_000,
+  activateTraffic: 2 * 60_000,
+  smokeP1P7: 3 * 60_000,
+  rollbackTraffic: 2 * 60_000,
+  checkResidue: 60_000,
+})
+export const LIVE_RECOVERY_RESERVE_MS = LIVE_OPERATION_BUDGET_MS.rollbackTraffic + LIVE_OPERATION_BUDGET_MS.checkResidue
+const ACTIVATION_MINIMUM_MS = LIVE_RECOVERY_RESERVE_MS
+  + LIVE_OPERATION_BUDGET_MS.activateTraffic + LIVE_OPERATION_BUDGET_MS.smokeP1P7
 const OP_BINDINGS = {
   inspectRecovery: ['MODE','JOURNAL_SHA256'], backupRestore: ['IDENTITY_RESTORE_SHA256'],
   applyMigrations: ['ORDERED_MIGRATIONS'], uploadCandidate: ['SOURCE_REVISION','TRAFFIC'],
@@ -143,7 +153,7 @@ export async function createAcademyProductionLivePorts({ authorityPath, run, exp
     const now = clock()
     const validUntilMs = Date.parse(authority.validUntil)
     const phaseDeadline = options.recovery === true ? validUntilMs : validUntilMs - LIVE_RECOVERY_RESERVE_MS
-    const invocationDeadline = Math.min(phaseDeadline, now + LIVE_HELPER_BUDGET_MS)
+    const invocationDeadline = Math.min(phaseDeadline, now + LIVE_OPERATION_BUDGET_MS[name])
     if (!Number.isFinite(now) || now >= phaseDeadline || invocationDeadline - now < 100) fail()
     const spec = authority.operations[name]
     await verifyExecutable(spec, expectedExecutableUid)
