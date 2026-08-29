@@ -88,9 +88,10 @@ async function readJournal(path) {
     handle = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW)
     const metadata = await handle.stat(); if (!metadata.isFile() || metadata.nlink !== 1 || metadata.mode & 0o077 || metadata.uid !== process.getuid()) throw new Error()
     const value = JSON.parse(await handle.readFile('utf8'))
-    if (!exact(value, ['schema','phase','operation','state','identityReadinessSha256','sourceRevision','currentDeploymentId','currentVersionId','candidateVersionId','activeDeploymentId','rollbackTargetVersionId','finalReceipt','finalReceiptSha256'])
+    if (!exact(value, ['schema','phase','operation','state','identityReadinessSha256','sourceRevision','planSha256','currentDeploymentId','currentVersionId','candidateVersionId','activeDeploymentId','rollbackTargetVersionId','finalReceipt','finalReceiptSha256'])
       || value.schema !== 'academy-production-activation-journal/v1' || !SHA256.test(value.identityReadinessSha256)
-      || !/^[a-f0-9]{40}$/.test(value.sourceRevision) || !UUID.test(value.currentDeploymentId) || !UUID.test(value.currentVersionId)
+      || !/^[a-f0-9]{40}$/.test(value.sourceRevision) || !SHA256.test(value.planSha256)
+      || !UUID.test(value.currentDeploymentId) || !UUID.test(value.currentVersionId)
       || (value.candidateVersionId !== null && !UUID.test(value.candidateVersionId))
       || (value.activeDeploymentId !== null && !UUID.test(value.activeDeploymentId)) || !UUID.test(value.rollbackTargetVersionId)
       || !['none','backup-restore','migrations-0021-0027','candidate-upload','traffic-activation','terminal'].includes(value.operation)
@@ -114,10 +115,13 @@ async function publishTerminalForPlan(plan, journalPath, receiptPath) {
   const journal = await readJournal(journalPath)
   if (journal?.phase !== 'activated') return null
   const receipt = journal.finalReceipt
+  const planSha256 = createHash('sha256').update(`${JSON.stringify(plan)}\n`).digest('hex')
   if (journal.sourceRevision !== plan.academy.releaseRevision
+    || journal.planSha256 !== planSha256
     || receipt?.schema !== 'academy-production-activation-controller-receipt/v1'
     || receipt.status !== 'ACTIVATED' || receipt.productionMutation !== true
     || receipt.sourceRevision !== plan.academy.releaseRevision
+    || receipt.planSha256 !== planSha256
     || receipt.identityReadinessSha256 !== journal.identityReadinessSha256
     || receipt.currentServing?.deploymentId !== journal.currentDeploymentId
     || receipt.currentServing?.versionId !== journal.currentVersionId) throw new AcademyActivationControllerError()
@@ -168,6 +172,7 @@ export async function runAcademyProductionActivation({ plan: input, ports: input
     commandIntent: release === ACTIVATION_RELEASE ? 'release_requested' : 'dry_run',
     identityReadinessSha256: identity.receiptSha256,
     sourceRevision: plan.academy.sourceRevision,
+    planSha256: createHash('sha256').update(`${JSON.stringify(plan)}\n`).digest('hex'),
     currentServing: { deploymentId: current.deploymentId, versionId: current.versionId },
     steps: [], status: 'DRY_RUN', productionMutation: false,
     mutationLedger: { backupRestore: 'not_started', migrations: 'not_started', candidateUpload: 'not_started', trafficActivation: 'not_started' },
@@ -179,7 +184,7 @@ export async function runAcademyProductionActivation({ plan: input, ports: input
     return Object.freeze(base)
   }
 
-  const journal = { schema: 'academy-production-activation-journal/v1', phase: 'active', operation: 'none', state: 'ready', identityReadinessSha256: identity.receiptSha256, sourceRevision: plan.academy.sourceRevision, currentDeploymentId: current.deploymentId, currentVersionId: current.versionId, candidateVersionId: null, activeDeploymentId: null, rollbackTargetVersionId: current.versionId, finalReceipt: null, finalReceiptSha256: null }
+  const journal = { schema: 'academy-production-activation-journal/v1', phase: 'active', operation: 'none', state: 'ready', identityReadinessSha256: identity.receiptSha256, sourceRevision: plan.academy.sourceRevision, planSha256: base.planSha256, currentDeploymentId: current.deploymentId, currentVersionId: current.versionId, candidateVersionId: null, activeDeploymentId: null, rollbackTargetVersionId: current.versionId, finalReceipt: null, finalReceiptSha256: null }
   await writeJournal(journalPath, journal, true)
   const advance = async (operation, state, extra = {}) => { Object.assign(journal, extra, { operation, state }); await writeJournal(journalPath, journal) }
 
