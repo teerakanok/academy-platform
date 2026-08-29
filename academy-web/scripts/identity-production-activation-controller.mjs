@@ -241,7 +241,7 @@ export async function runAcademyProductionActivation({ plan: input, ports: input
           ['status','observedActiveDeploymentId','observedActiveVersionId','deploymentId','restoredVersionId','receiptSha256'], value => value.status === 'ROLLED_BACK'
             && value.observedActiveDeploymentId === activeDeploymentId && value.observedActiveVersionId === candidate?.versionId
             && UUID.test(value.deploymentId) && value.restoredVersionId === current.versionId)
-        const residue = expect(await ports.checkResidue({ expectedDeploymentId: rollback.deploymentId, expectedVersionId: current.versionId }),
+        const residue = expect(await ports.checkResidue({ expectedDeploymentId: rollback.deploymentId, expectedVersionId: current.versionId, recovery: true }),
           ['status','deploymentId','versionId','receiptSha256'], value => value.status === 'PASS'
             && value.deploymentId === rollback.deploymentId && value.versionId === current.versionId)
         base.mutationLedger.trafficActivation = 'rolled_back'

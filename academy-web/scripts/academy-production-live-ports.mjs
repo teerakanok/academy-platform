@@ -10,6 +10,9 @@ const REVISION = /^[a-f0-9]{40}$/
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
 const OPS = ['inspectRecovery','backupRestore','applyMigrations','uploadCandidate','activateTraffic','smokeP1P7','rollbackTraffic','checkResidue']
 const COMMON_BINDINGS = ['AUTHORITY_ID','RELEASE_REVISION','IDENTITY_READINESS_SHA256','VALID_UNTIL']
+export const LIVE_HELPER_BUDGET_MS = 5_000
+export const LIVE_RECOVERY_RESERVE_MS = 3 * LIVE_HELPER_BUDGET_MS
+const ACTIVATION_MINIMUM_MS = LIVE_RECOVERY_RESERVE_MS + 4 * LIVE_HELPER_BUDGET_MS
 const OP_BINDINGS = {
   inspectRecovery: ['MODE','JOURNAL_SHA256'], backupRestore: ['IDENTITY_RESTORE_SHA256'],
   applyMigrations: ['ORDERED_MIGRATIONS'], uploadCandidate: ['SOURCE_REVISION','TRAFFIC'],
@@ -32,6 +35,20 @@ async function stableParent(path) {
     const metadata = await stat(cursor)
     const stickyRoot = metadata.uid === 0 && Boolean(metadata.mode & 0o1000)
     if (!metadata.isDirectory() || (metadata.uid !== process.getuid() && metadata.uid !== 0)
+      || ((metadata.mode & 0o022) && !stickyRoot)) fail()
+    const next = dirname(cursor)
+    if (next === cursor) return
+    cursor = next
+  }
+}
+
+async function stableExecutableParent(path, expectedUid) {
+  let cursor = dirname(resolve(path))
+  while (true) {
+    if (await realpath(cursor) !== cursor) fail()
+    const metadata = await stat(cursor)
+    const stickyRoot = metadata.uid === 0 && Boolean(metadata.mode & 0o1000)
+    if (!metadata.isDirectory() || (metadata.uid !== expectedUid && metadata.uid !== 0)
       || ((metadata.mode & 0o022) && !stickyRoot)) fail()
     const next = dirname(cursor)
     if (next === cursor) return
@@ -90,14 +107,14 @@ function validateAuthority(authority, now, expected) {
   return authority
 }
 
-async function verifyExecutable(spec) {
-  await stableParent(spec.executable)
+async function verifyExecutable(spec, expectedUid) {
+  await stableExecutableParent(spec.executable, expectedUid)
   if (await realpath(spec.executable) !== spec.executable) fail()
   const handle = await open(spec.executable, constants.O_RDONLY | constants.O_NOFOLLOW)
   try {
     const metadata = await handle.stat()
     if (!metadata.isFile() || metadata.nlink !== 1 || !(metadata.mode & 0o111) || (metadata.mode & 0o022)
-      || (metadata.uid !== process.getuid() && metadata.uid !== 0) || metadata.size < 1 || metadata.size > 64 * 1024 * 1024) fail()
+      || metadata.uid !== expectedUid || metadata.size < 1 || metadata.size > 64 * 1024 * 1024) fail()
     const hash = createHash('sha256')
     for await (const chunk of handle.createReadStream()) hash.update(chunk)
     if (hash.digest('hex') !== spec.sha256) fail()
@@ -114,40 +131,43 @@ function substitute(args, bindings) {
   })
 }
 
-export async function createAcademyProductionLivePorts({ authorityPath, run, expected, clock = () => Date.now() }) {
+export async function createAcademyProductionLivePorts({ authorityPath, run, expected, clock = () => Date.now(), expectedExecutableUid = 0 }) {
   if (typeof run !== 'function' || !exact(expected, ['releaseRevision','identityReadinessSha256'])
-    || !REVISION.test(expected.releaseRevision) || !SHA.test(expected.identityReadinessSha256)) fail()
+    || !REVISION.test(expected.releaseRevision) || !SHA.test(expected.identityReadinessSha256)
+    || !Number.isSafeInteger(expectedExecutableUid) || expectedExecutableUid < 0) fail()
   const authority = validateAuthority(await protectedJson(authorityPath), clock(), expected)
-  for (const spec of Object.values(authority.operations)) await verifyExecutable(spec)
+  for (const spec of Object.values(authority.operations)) await verifyExecutable(spec, expectedExecutableUid)
   const authorityBinding = Object.freeze({ authorityId: authority.authorityId, releaseRevision: authority.releaseRevision,
     identityReadinessSha256: authority.identityReadinessSha256, validUntil: authority.validUntil })
-  const invoke = async (name, bindings = {}) => {
+  const invoke = async (name, bindings = {}, options = {}) => {
     const now = clock()
     const validUntilMs = Date.parse(authority.validUntil)
-    if (!Number.isFinite(now) || now >= validUntilMs || validUntilMs - now < 100) fail()
+    const invocationDeadline = options.recovery === true ? validUntilMs : validUntilMs - LIVE_RECOVERY_RESERVE_MS
+    if (!Number.isFinite(now) || now >= invocationDeadline || invocationDeadline - now < 100) fail()
     const spec = authority.operations[name]
-    await verifyExecutable(spec)
+    await verifyExecutable(spec, expectedExecutableUid)
     const allBindings = { ...bindings, AUTHORITY_ID: authority.authorityId, RELEASE_REVISION: authority.releaseRevision,
       IDENTITY_READINESS_SHA256: authority.identityReadinessSha256, VALID_UNTIL: authority.validUntil }
-    const result = await run({ operation: name, executable: spec.executable, args: substitute(spec.args, allBindings), validUntilMs, clock })
-    if (clock() >= validUntilMs || !exact(result, ['status','stdout']) || result.status !== 0
+    const result = await run({ operation: name, executable: spec.executable, args: substitute(spec.args, allBindings), validUntilMs: invocationDeadline, clock })
+    if (clock() >= invocationDeadline || !exact(result, ['status','stdout']) || result.status !== 0
       || typeof result.stdout !== 'string' || Buffer.byteLength(result.stdout) > 1024 * 1024) fail()
     try { return JSON.parse(result.stdout) } catch { fail() }
   }
-  const discoverCurrent = async () => {
-    const value = await invoke('inspectRecovery', { MODE: 'discover-current', JOURNAL_SHA256: '' })
+  const discoverCurrent = async (recovery = false) => {
+    const value = await invoke('inspectRecovery', { MODE: 'discover-current', JOURNAL_SHA256: '' }, { recovery })
     const current = parseCurrentDeploymentJson(JSON.stringify(value.deployments))
     if (current.versions.length !== 1 || current.versions[0].percentage !== 100) fail()
     return { deploymentId: current.id, versionId: current.versions[0].id }
   }
   return Object.freeze({
     authority: authorityBinding,
-    inspectRecovery: input => invoke('inspectRecovery', { MODE: 'reconcile', JOURNAL_SHA256: input.journalSha256 }),
+    inspectRecovery: input => invoke('inspectRecovery', { MODE: 'reconcile', JOURNAL_SHA256: input.journalSha256 }, { recovery: true }),
     discoverCurrent,
     backupRestore: input => invoke('backupRestore', { IDENTITY_RESTORE_SHA256: input.identityRestoreReceiptSha256 }),
     applyMigrations: input => invoke('applyMigrations', { ORDERED_MIGRATIONS: input.ordered.join(',') }),
     uploadCandidate: input => invoke('uploadCandidate', { SOURCE_REVISION: input.sourceRevision, TRAFFIC: String(input.traffic) }),
     activateTraffic: async input => {
+      if (Date.parse(authority.validUntil) - clock() < ACTIVATION_MINIMUM_MS) fail()
       const before = await discoverCurrent()
       if (before.deploymentId !== input.expectedCurrentDeploymentId || before.versionId !== input.expectedCurrentVersionId) fail()
       return invoke('activateTraffic', { EXPECTED_DEPLOYMENT_ID: before.deploymentId, EXPECTED_VERSION_ID: before.versionId,
@@ -155,11 +175,11 @@ export async function createAcademyProductionLivePorts({ authorityPath, run, exp
     },
     smokeP1P7: input => invoke('smokeP1P7', { DEPLOYMENT_ID: input.deploymentId, VERSION_ID: input.versionId, CONFIG_SHA256: input.configuredNamesSha256 }),
     rollbackTraffic: async input => {
-      const before = await discoverCurrent()
+      const before = await discoverCurrent(true)
       if (before.deploymentId !== input.expectedActiveDeploymentId || before.versionId !== input.expectedActiveVersionId) fail()
       return invoke('rollbackTraffic', { EXPECTED_DEPLOYMENT_ID: before.deploymentId, EXPECTED_VERSION_ID: before.versionId,
-        TARGET_VERSION_ID: input.targetVersionId, PRIOR_DEPLOYMENT_ID: input.priorDeploymentId })
+        TARGET_VERSION_ID: input.targetVersionId, PRIOR_DEPLOYMENT_ID: input.priorDeploymentId }, { recovery: true })
     },
-    checkResidue: input => invoke('checkResidue', { DEPLOYMENT_ID: input.expectedDeploymentId, VERSION_ID: input.expectedVersionId }),
+    checkResidue: input => invoke('checkResidue', { DEPLOYMENT_ID: input.expectedDeploymentId, VERSION_ID: input.expectedVersionId }, { recovery: input.recovery === true }),
   })
 }

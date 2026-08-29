@@ -116,6 +116,7 @@ export async function main(args, options = {}) {
     run: options.run ?? runExecutable,
     expected: { releaseRevision: plan.academy?.releaseRevision, identityReadinessSha256: readiness.receiptSha256 },
     clock: options.clock ?? (() => Date.now()),
+    expectedExecutableUid: options.expectedExecutableUid ?? 0,
   })
   const receipt = await runAcademyProductionActivation({ plan, ports, release, observedAt,
     journalPath: resolve(journalPath), receiptPath: resolve(receiptPath) })
