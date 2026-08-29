@@ -256,7 +256,9 @@ export async function runAcademyProductionActivation({ plan: input, ports: input
         && Number.isSafeInteger(value.versionCount) && value.versionCount >= 1
         && Number.isSafeInteger(value.nonServingVersionCount) && value.nonServingVersionCount >= 0
         && value.nonServingVersionCount < value.versionCount && SHA256.test(value.inventorySha256))
-    base.steps.push({ name: 'residue-check', status: 'PASS', receiptSha256: residue.receiptSha256 })
+    base.steps.push({ name: 'residue-check', status: 'PASS', receiptSha256: residue.receiptSha256,
+      evidence: { versionCount: residue.versionCount, nonServingVersionCount: residue.nonServingVersionCount,
+        inventorySha256: residue.inventorySha256 } })
     base.status = 'ACTIVATED'; base.productionMutation = true
     const finalReceipt = JSON.parse(JSON.stringify(base))
     const finalReceiptSha256 = createHash('sha256').update(`${JSON.stringify(finalReceipt)}\n`).digest('hex')
@@ -290,7 +292,9 @@ export async function runAcademyProductionActivation({ plan: input, ports: input
             && value.nonServingVersionCount < value.versionCount && SHA256.test(value.inventorySha256))
         base.mutationLedger.trafficActivation = 'rolled_back'
         base.steps.push({ name: 'rollback', status: 'PASS', receiptSha256: rollback.receiptSha256 })
-        base.steps.push({ name: 'residue-check', status: 'PASS', receiptSha256: residue.receiptSha256 })
+        base.steps.push({ name: 'residue-check', status: 'PASS', receiptSha256: residue.receiptSha256,
+          evidence: { versionCount: residue.versionCount, nonServingVersionCount: residue.nonServingVersionCount,
+            inventorySha256: residue.inventorySha256 } })
       } catch {
         base.mutationLedger.trafficActivation = 'rollback_uncertain'
         base.steps.push({ name: 'rollback', status: 'UNCERTAIN' })
