@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { chmod, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { chmod, mkdtemp, readFile, realpath, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import test from 'node:test'
@@ -146,6 +146,80 @@ async function pinnedReleaseEnvironment(tamper) {
 }
 
 const inspectArgs = [...common,'--operation','inspect','--mode','discover-current','--journal','']
+
+const candidate = '33333333-3333-4333-8333-333333333333'
+const activated = '44444444-4444-4444-8444-444444444444'
+const versionInventory = (id, tag = '', message = '') => JSON.stringify([{ id, metadata:{ created_on:'2026-08-29T10:01:00Z' }, annotations:{ 'workers/tag':tag, 'workers/message':message } }])
+
+test('candidate upload pins Wrangler and verifies exact provider annotations at zero traffic', async () => {
+  const tag = `release-${R.slice(0,12)}`
+  const config = 'd804036979c67055505c31f26fa78fcaed34a226d48d62d2329d598cf0d48e2c'
+  const message = `source=${R};config=${config}`
+  const calls = []
+  const run = async args => {
+    calls.push(args ?? ['deployments'])
+    if (!args) return JSON.stringify(provider)
+    if (args[0] === '--version') return '4.120.0\n'
+    if (args[0] === 'versions' && args[1] === 'upload') return 'uploaded\n'
+    const listCount = calls.filter(call => call?.[1] === 'list').length
+    return listCount === 1 ? versionInventory(version) : JSON.stringify([
+      ...JSON.parse(versionInventory(version)), ...JSON.parse(versionInventory(candidate, tag, message))])
+  }
+  const value = await executeAcademyCloudflareHelper([...common,'--operation','upload','--source',R,'--traffic','0'], { ...options, run })
+  assert.equal(value.versionId, candidate)
+  assert.equal(value.trafficPercentage, 0)
+  assert.ok(calls.some(call => call?.includes('--strict') && call.includes('--keep-vars')))
+  assert.equal(JSON.stringify(value).includes(message), false)
+})
+
+test('candidate upload rejects wrong Wrangler version and duplicate version JSON before mutation', async () => {
+  let uploads = 0
+  const wrong = async args => {
+    if (!args) return JSON.stringify(provider)
+    if (args[0] === '--version') return '4.121.0\n'
+    if (args[1] === 'upload') uploads += 1
+    return versionInventory(version)
+  }
+  await assert.rejects(executeAcademyCloudflareHelper([...common,'--operation','upload','--source',R,'--traffic','0'], { ...options, run:wrong }))
+  assert.equal(uploads, 0)
+  const duplicate = async args => {
+    if (!args) return JSON.stringify(provider)
+    if (args[0] === '--version') return '4.120.0\n'
+    return `[{"id":"${version}","id":"${candidate}","metadata":{"created_on":"2026-08-29T10:01:00Z"},"annotations":{}}]`
+  }
+  await assert.rejects(executeAcademyCloudflareHelper([...common,'--operation','upload','--source',R,'--traffic','0'], { ...options, run:duplicate }))
+})
+
+test('activation and rollback use optimistic exact pre/post conditions and disclose residual race', async () => {
+  const nextProvider = [{ id: activated, created_on:'2026-08-29T10:02:00Z', versions:[{version_id:candidate,percentage:100}] }]
+  let listings = 0; const calls = []
+  const run = async args => { calls.push(args); if (!args || args[1] === 'list') return JSON.stringify(listings++ === 0 ? provider : nextProvider); return '' }
+  const value = await executeAcademyCloudflareHelper([...common,'--operation','activate','--expected-deployment',deployment,'--expected-version',version,'--candidate',candidate,'--traffic','100'], { ...options, run })
+  assert.equal(value.activeVersionId, candidate)
+  assert.deepEqual(value.semantics, { concurrencyControl:'optimistic-precondition-and-postcondition', atomicProviderCas:false, residualRace:true })
+  assert.ok(calls.some(call => call?.[0] === 'versions' && call[1] === 'deploy' && call[2] === `${candidate}@100`))
+})
+
+test('rollback verifies exact serving target after optimistic transition', async () => {
+  const rollbackDeployment = '55555555-5555-4555-8555-555555555555'
+  const activeProvider = [{ id:activated, created_on:'2026-08-29T10:02:00Z', versions:[{version_id:candidate,percentage:100}] }]
+  const restoredProvider = [{ id:rollbackDeployment, created_on:'2026-08-29T10:03:00Z', versions:[{version_id:version,percentage:100}] }]
+  let listings = 0
+  const run = async args => (!args || args[1] === 'list') ? JSON.stringify(listings++ === 0 ? activeProvider : restoredProvider) : ''
+  const value = await executeAcademyCloudflareHelper([...common,'--operation','rollback','--expected-deployment',activated,'--expected-version',candidate,'--target',version,'--prior',deployment], { ...options, run })
+  assert.equal(value.status, 'ROLLED_BACK'); assert.equal(value.restoredVersionId, version); assert.equal(value.semantics.residualRace, true)
+})
+
+test('protected secret staging sends values only through stdin contract and returns names only', async t => {
+  const root = await mkdtemp(join(tmpdir(), 'academy-secret-stage-')); t.after(() => rm(root,{recursive:true,force:true}))
+  const path = join(await realpath(root),'bundle.json'); await writeFile(path, '{"ALPHA":"private-one","BETA":"private-two"}', { mode:0o600 })
+  let extra
+  const run = async (args, options) => { if (!args) return JSON.stringify(provider); extra = options; return '' }
+  const value = await executeAcademyCloudflareHelper([...common,'--operation','secrets','--secrets-file',path,'--tag','release-test'], { ...options, run })
+  assert.deepEqual(value.secretNames, ['ALPHA','BETA'])
+  assert.equal(JSON.stringify(value).includes('private-'), false)
+  assert.match(extra.stdin, /private-one/)
+})
 
 test('live path resolves the pointer release and executes only pinned node and wrangler entrypoint', async () => {
   const { env, root } = await pinnedReleaseEnvironment()

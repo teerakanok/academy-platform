@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 
 import { spawn } from 'node:child_process'
+import { createHash } from 'node:crypto'
+import { constants } from 'node:fs'
+import { open, realpath } from 'node:fs/promises'
 
-import { parseCurrentDeploymentJson } from './current-deployment.mjs'
+import { assertNoDuplicateJsonMembers, parseCurrentDeploymentJson } from './current-deployment.mjs'
 import { verifyAcademyRelease } from './academy-release-manifest.mjs'
 import { resolveAcademyCurrentRelease } from './academy-release-pointer.mjs'
 
@@ -11,6 +14,9 @@ const REVISION = /^[a-f0-9]{40}$/
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
 const ISO_SECOND = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/
 const WORKER = 'cyberskills-academy'
+const WRANGLER_VERSION = '4.120.0'
+const CONFIG_NAMES = ['IDENTITY_ADAPTER','IDENTITY_RUNTIME_ENABLED','IDENTITY_RUNTIME_WIRED','IDENTITY_RELEASE_APPROVAL','IDENTITY_CODE_EXCHANGE_TIMEOUT_MS','IDENTITY_CLIENT_ASSERTION_KEY_ID','IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK','IDENTITY_RESULT_KEY_SET_DOCUMENT']
+const CONFIG_SHA = createHash('sha256').update(`${JSON.stringify(CONFIG_NAMES)}\n`).digest('hex')
 // Fixed installed-release root; the live release is resolved exclusively
 // through the protected current pointer (never a symlink) to
 // /opt/academy/releases/<releaseSha256> and fully verified before — and again
@@ -26,7 +32,7 @@ const exact = (value, keys) => value && typeof value === 'object' && !Array.isAr
   && Reflect.ownKeys(value).every((key, index) => key === keys[index])
 
 function parseFlags(args) {
-  if (!Array.isArray(args) || args.length < 12 || args.length > 24 || args.length % 2 !== 0) fail()
+  if (!Array.isArray(args) || args.length < 12 || args.length > 32 || args.length % 2 !== 0) fail()
   const values = Object.create(null)
   for (let index = 0; index < args.length; index += 2) {
     const name = args[index]
@@ -46,7 +52,7 @@ function common(values, now) {
   return { validUntilMs: Date.parse(validUntil) }
 }
 
-export async function runWranglerJson({ executable, args = ['deployments', 'list', '--name', WORKER, '--json'], cwd, deadlineMs, clock = () => Date.now(), verify }) {
+export async function runWranglerJson({ executable, args = ['deployments', 'list', '--name', WORKER, '--json'], cwd, deadlineMs, clock = () => Date.now(), verify, stdin }) {
   if (typeof executable !== 'string' || !executable.startsWith('/') || typeof cwd !== 'string' || !cwd.startsWith('/')
     || !Array.isArray(args) || args.some(argument => typeof argument !== 'string')) fail()
   const remaining = deadlineMs - clock()
@@ -58,9 +64,10 @@ export async function runWranglerJson({ executable, args = ['deployments', 'list
     await verify()
   }
   const child = spawn(executable, args, {
-    cwd, detached: true, stdio: ['ignore', 'pipe', 'ignore'],
+    cwd, detached: true, stdio: [stdin === undefined ? 'ignore' : 'pipe', 'pipe', 'ignore'],
     env: { HOME: '/root', LANG: 'C', LC_ALL: 'C', PATH: '/usr/bin:/bin' },
   })
+  if (stdin !== undefined) { child.stdin.end(stdin) }
   const chunks = []
   let bytes = 0
   let overflow = false
@@ -103,6 +110,39 @@ function currentFrom(source) {
   return { deploymentId: current.id, versionId: current.versions[0].id }
 }
 
+function duplicateSafe(source) {
+  if (typeof source !== 'string' || Buffer.byteLength(source) > 1024 * 1024) fail()
+  try { assertNoDuplicateJsonMembers(source); return JSON.parse(source) } catch { fail() }
+}
+
+function versionsFrom(source) {
+  const values = duplicateSafe(source)
+  if (!Array.isArray(values) || values.length > 100) fail()
+  return values.map(value => {
+    const id = value?.id
+    const createdOn = value?.metadata?.created_on
+    const tag = value?.annotations?.['workers/tag'] ?? ''
+    const message = value?.annotations?.['workers/message'] ?? ''
+    if (!UUID.test(id) || typeof createdOn !== 'string' || typeof tag !== 'string' || typeof message !== 'string') fail()
+    return { id, createdOn, tag, message }
+  })
+}
+
+const receipt = body => ({ ...body, receiptSha256: createHash('sha256').update(`${JSON.stringify(body)}\n`).digest('hex') })
+
+export async function readProtectedSecretBundle(path) {
+  if (typeof path !== 'string' || !path.startsWith('/') || await realpath(path) !== path) fail()
+  const handle = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW)
+  try {
+    const metadata = await handle.stat()
+    if (!metadata.isFile() || metadata.nlink !== 1 || metadata.uid !== process.getuid() || metadata.mode & 0o077 || metadata.size < 3 || metadata.size > 64 * 1024) fail()
+    const source = await handle.readFile('utf8'); const value = duplicateSafe(source)
+    if (!value || typeof value !== 'object' || Array.isArray(value) || Object.keys(value).length < 1
+      || Object.entries(value).some(([key, secret]) => !/^[A-Z][A-Z0-9_]{1,127}$/.test(key) || typeof secret !== 'string' || !secret)) fail()
+    return source
+  } finally { await handle.close() }
+}
+
 export async function executeAcademyCloudflareHelper(args, options = {}) {
   const environment = options.env ?? process.env
   if (LEGACY_AMBIENT_ENV_INPUTS.some(name => environment[name] !== undefined)) fail()
@@ -110,9 +150,12 @@ export async function executeAcademyCloudflareHelper(args, options = {}) {
   const clock = options.clock ?? (() => Date.now())
   const { validUntilMs } = common(values, clock())
   const operation = values['--operation']
-  const allowed = operation === 'inspect'
-    ? ['--authority','--release','--readiness','--valid-until','--operation','--mode','--journal']
-    : ['--authority','--release','--readiness','--valid-until','--operation','--deployment','--version']
+  const operationFlags = {
+    inspect: ['--mode','--journal'], residue: ['--deployment','--version'],
+    upload: ['--source','--traffic'], activate: ['--expected-deployment','--expected-version','--candidate','--traffic'],
+    rollback: ['--expected-deployment','--expected-version','--target','--prior'], secrets: ['--secrets-file','--tag'],
+  }
+  const allowed = operationFlags[operation] && ['--authority','--release','--readiness','--valid-until','--operation',...operationFlags[operation]]
   if (!allowed || !exact(Object.fromEntries(Object.entries(values)), allowed)) fail()
   const resolveRun = async () => {
     if (options.run) return options.run
@@ -136,11 +179,12 @@ export async function executeAcademyCloudflareHelper(args, options = {}) {
         || current.release.manifest.releaseSha256 !== release.manifest.releaseSha256
         || current.release.manifest.releaseRevision !== release.manifest.releaseRevision) fail()
     })
-    return () => runner({ executable: release.nodeExecutable,
-      args: [release.wranglerEntrypoint, 'deployments', 'list', '--name', WORKER, '--json'],
-      cwd: release.root, deadlineMs: validUntilMs, clock, verify: revalidate })
+    const invoke = (args, extra = {}) => runner({ executable: release.nodeExecutable,
+      args: [release.wranglerEntrypoint, ...args], cwd: release.root, deadlineMs: validUntilMs, clock, verify: revalidate, ...extra })
+    return Object.assign(() => invoke(['deployments','list','--name',WORKER,'--json']), { invoke })
   }
   const run = await resolveRun()
+  const invoke = run.invoke ?? (async (args, extra) => options.run(args, extra))
   const source = await run()
   const current = currentFrom(source)
   if (operation === 'inspect') {
@@ -148,8 +192,41 @@ export async function executeAcademyCloudflareHelper(args, options = {}) {
     // A journal digest alone cannot prove provider cleanup. Reconciliation remains fail-closed.
     fail()
   }
-  // Deployments do not enumerate uploaded zero-traffic versions. Until a pinned
-  // versions inventory is part of this helper, it cannot prove residue absence.
+  if (operation === 'residue') {
+    if (current.deploymentId !== values['--deployment'] || current.versionId !== values['--version']) fail()
+    versionsFrom(await invoke(['versions','list','--name',WORKER,'--json']))
+    return receipt({ status:'PASS', deploymentId:current.deploymentId, versionId:current.versionId })
+  }
+  if (operation === 'upload') {
+    if (!REVISION.test(values['--source']) || values['--traffic'] !== '0') fail()
+    const tag = `release-${values['--source'].slice(0,12)}`; const message = `source=${values['--source']};config=${CONFIG_SHA}`
+    const before = versionsFrom(await invoke(['versions','list','--name',WORKER,'--json']))
+    if ((await invoke(['--version'])).trim() !== WRANGLER_VERSION) fail()
+    await invoke(['versions','upload','--name',WORKER,'--tag',tag,'--message',message,'--keep-vars','--strict','--install-skills=false'])
+    const after = versionsFrom(await invoke(['versions','list','--name',WORKER,'--json']))
+    const prior = new Set(before.map(item => item.id)); const added = after.filter(item => !prior.has(item.id))
+    if (added.length !== 1 || added[0].tag !== tag || added[0].message !== message) fail()
+    return receipt({ status:'PASS', workerName:WORKER, versionId:added[0].id, sourceRevision:values['--source'], trafficPercentage:0, configuredNamesSha256:CONFIG_SHA })
+  }
+  if (operation === 'secrets') {
+    const bundle = await readProtectedSecretBundle(values['--secrets-file'])
+    await invoke(['versions','secret','bulk','-','--name',WORKER,'--tag',values['--tag']], { stdin: bundle })
+    return receipt({ status:'PASS', workerName:WORKER, secretNames:Object.keys(duplicateSafe(bundle)).sort() })
+  }
+  if (operation === 'activate' || operation === 'rollback') {
+    const expectedDeployment = values['--expected-deployment']; const expectedVersion = values['--expected-version']
+    const target = operation === 'activate' ? values['--candidate'] : values['--target']
+    if (!UUID.test(expectedDeployment) || !UUID.test(expectedVersion) || !UUID.test(target)
+      || (operation === 'activate' && values['--traffic'] !== '100') || (operation === 'rollback' && !UUID.test(values['--prior']))) fail()
+    if (current.deploymentId !== expectedDeployment || current.versionId !== expectedVersion) fail()
+    await invoke(['versions','deploy',`${target}@100`,'--name',WORKER,'--message',`${operation};expected=${expectedDeployment}`,'--yes'])
+    const after = currentFrom(await run())
+    if (after.versionId !== target || after.deploymentId === expectedDeployment) fail()
+    const semantics = { concurrencyControl:'optimistic-precondition-and-postcondition', atomicProviderCas:false, residualRace:true }
+    return operation === 'activate'
+      ? receipt({ status:'PASS', previousDeploymentId:expectedDeployment, previousVersionId:expectedVersion, deploymentId:after.deploymentId, activeVersionId:target, trafficPercentage:100, semantics })
+      : receipt({ status:'ROLLED_BACK', observedActiveDeploymentId:expectedDeployment, observedActiveVersionId:expectedVersion, deploymentId:after.deploymentId, restoredVersionId:target, semantics })
+  }
   fail()
 }
 

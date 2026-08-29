@@ -235,9 +235,12 @@ export async function runAcademyProductionActivation({ plan: input, ports: input
     base.mutationLedger.trafficActivation = 'attempted'
     await advance('traffic-activation', 'attempting', { candidateVersionId: candidate.versionId })
     const activation = expect(await ports.activateTraffic({ candidateVersionId: candidate.versionId, expectedCurrentDeploymentId: current.deploymentId, expectedCurrentVersionId: current.versionId, traffic: 100 }),
-      ['status','previousDeploymentId','previousVersionId','deploymentId','activeVersionId','trafficPercentage','receiptSha256'], value => value.status === 'PASS'
+      ['status','previousDeploymentId','previousVersionId','deploymentId','activeVersionId','trafficPercentage','semantics','receiptSha256'], value => value.status === 'PASS'
         && value.previousDeploymentId === current.deploymentId && value.previousVersionId === current.versionId
-        && UUID.test(value.deploymentId) && value.activeVersionId === candidate.versionId && value.trafficPercentage === 100)
+        && UUID.test(value.deploymentId) && value.activeVersionId === candidate.versionId && value.trafficPercentage === 100
+        && exact(value.semantics, ['concurrencyControl','atomicProviderCas','residualRace'])
+        && value.semantics.concurrencyControl === 'optimistic-precondition-and-postcondition'
+        && value.semantics.atomicProviderCas === false && value.semantics.residualRace === true)
     activeDeploymentId = activation.deploymentId
     base.mutationLedger.trafficActivation = 'confirmed'
     await advance('traffic-activation', 'confirmed', { activeDeploymentId })
@@ -270,9 +273,12 @@ export async function runAcademyProductionActivation({ plan: input, ports: input
         base.steps.push({ name: 'rollback', status: 'UNCERTAIN' })
       } else try {
         const rollback = expect(await ports.rollbackTraffic({ expectedActiveDeploymentId: activeDeploymentId, expectedActiveVersionId: candidate?.versionId, priorDeploymentId: current.deploymentId, targetVersionId: current.versionId }),
-          ['status','observedActiveDeploymentId','observedActiveVersionId','deploymentId','restoredVersionId','receiptSha256'], value => value.status === 'ROLLED_BACK'
+          ['status','observedActiveDeploymentId','observedActiveVersionId','deploymentId','restoredVersionId','semantics','receiptSha256'], value => value.status === 'ROLLED_BACK'
             && value.observedActiveDeploymentId === activeDeploymentId && value.observedActiveVersionId === candidate?.versionId
-            && UUID.test(value.deploymentId) && value.restoredVersionId === current.versionId)
+            && UUID.test(value.deploymentId) && value.restoredVersionId === current.versionId
+            && exact(value.semantics, ['concurrencyControl','atomicProviderCas','residualRace'])
+            && value.semantics.concurrencyControl === 'optimistic-precondition-and-postcondition'
+            && value.semantics.atomicProviderCas === false && value.semantics.residualRace === true)
         const residue = expect(await ports.checkResidue({ expectedDeploymentId: rollback.deploymentId, expectedVersionId: current.versionId, recovery: true }),
           ['status','deploymentId','versionId','receiptSha256'], value => value.status === 'PASS'
             && value.deploymentId === rollback.deploymentId && value.versionId === current.versionId)
