@@ -84,6 +84,7 @@ test('CLI restart publishes a retained terminal journal before provider discover
   await writeFile(authorityPath, `${JSON.stringify(authority)}\n`, { mode: 0o600 })
   const ids = { currentDeployment:'11111111-1111-4111-8111-111111111111', currentVersion:'22222222-2222-4222-8222-222222222222', candidate:'33333333-3333-4333-8333-333333333333', active:'44444444-4444-4444-8444-444444444444' }
   const configSha256 = createHash('sha256').update(`${JSON.stringify(IDENTITY_PRODUCTION_ACTIVATION_CONFIG_NAMES)}\n`).digest('hex')
+  const optimisticSemantics = { concurrencyControl:'optimistic-precondition-and-postcondition', atomicProviderCas:false, residualRace:true }
   let calls = 0
   const fakeRun = async call => {
     calls += 1
@@ -91,7 +92,7 @@ test('CLI restart publishes a retained terminal journal before provider discover
       : call.operation === 'backupRestore' ? {status:'MATCH',operation:'academy-backup-restore',identityRestoreReceiptSha256:D,receiptSha256:D}
       : call.operation === 'applyMigrations' ? {status:'PASS',operation:'academy-migrations-0021-0027',ordered:['0021','0022','0023','0024','0025','0026','0027'],receiptSha256:D}
       : call.operation === 'uploadCandidate' ? {status:'PASS',workerName:'cyberskills-academy',versionId:ids.candidate,sourceRevision:revision,trafficPercentage:0,configuredNamesSha256:configSha256,receiptSha256:D}
-      : call.operation === 'activateTraffic' ? {status:'PASS',previousDeploymentId:ids.currentDeployment,previousVersionId:ids.currentVersion,deploymentId:ids.active,activeVersionId:ids.candidate,trafficPercentage:100,receiptSha256:D}
+      : call.operation === 'activateTraffic' ? {status:'PASS',previousDeploymentId:ids.currentDeployment,previousVersionId:ids.currentVersion,deploymentId:ids.active,activeVersionId:ids.candidate,trafficPercentage:100,semantics:optimisticSemantics,receiptSha256:D}
       : call.operation === 'smokeP1P7' ? {status:'PASS',deploymentId:ids.active,versionId:ids.candidate,configuredNamesSha256:configSha256,checks:['P1','P2','P3','P4','P5','P6','P7'],receiptSha256:D}
       : {status:'PASS',deploymentId:ids.active,versionId:ids.candidate,receiptSha256:D}
     return { status: 0, stdout: JSON.stringify(output) }
