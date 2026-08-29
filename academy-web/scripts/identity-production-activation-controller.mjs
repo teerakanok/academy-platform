@@ -81,16 +81,20 @@ async function writeJournal(path, value, initial = false) {
 async function readJournal(path) {
   let handle
   try {
+    await assertStableParent(path)
     handle = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW)
     const metadata = await handle.stat(); if (!metadata.isFile() || metadata.nlink !== 1 || metadata.mode & 0o077 || metadata.uid !== process.getuid()) throw new Error()
     const value = JSON.parse(await handle.readFile('utf8'))
-    if (!exact(value, ['schema','operation','state','identityReadinessSha256','sourceRevision','currentDeploymentId','currentVersionId','candidateVersionId','activeDeploymentId','rollbackTargetVersionId'])
+    if (!exact(value, ['schema','phase','operation','state','identityReadinessSha256','sourceRevision','currentDeploymentId','currentVersionId','candidateVersionId','activeDeploymentId','rollbackTargetVersionId','finalReceipt','finalReceiptSha256'])
       || value.schema !== 'academy-production-activation-journal/v1' || !SHA256.test(value.identityReadinessSha256)
       || !/^[a-f0-9]{40}$/.test(value.sourceRevision) || !UUID.test(value.currentDeploymentId) || !UUID.test(value.currentVersionId)
       || (value.candidateVersionId !== null && !UUID.test(value.candidateVersionId))
       || (value.activeDeploymentId !== null && !UUID.test(value.activeDeploymentId)) || !UUID.test(value.rollbackTargetVersionId)
-      || !['none','backup-restore','migrations-0021-0027','candidate-upload','traffic-activation'].includes(value.operation)
-      || !['ready','attempting','confirmed'].includes(value.state)) throw new Error()
+      || !['none','backup-restore','migrations-0021-0027','candidate-upload','traffic-activation','terminal'].includes(value.operation)
+      || !['active','activated'].includes(value.phase) || !['ready','attempting','confirmed'].includes(value.state)
+      || (value.phase === 'active' && (value.finalReceipt !== null || value.finalReceiptSha256 !== null))
+      || (value.phase === 'activated' && (!value.finalReceipt || !SHA256.test(value.finalReceiptSha256)
+        || createHash('sha256').update(`${JSON.stringify(value.finalReceipt)}\n`).digest('hex') !== value.finalReceiptSha256))) throw new Error()
     return value
   } catch (error) { if (error.code === 'ENOENT') return null; throw error }
   finally { await handle?.close() }
@@ -103,10 +107,24 @@ function expect(value, keys, predicate) {
   return value
 }
 
-export async function runAcademyProductionActivation({ plan: input, ports: inputPorts, release, observedAt = new Date(), journalPath: inputJournalPath }) {
+export async function runAcademyProductionActivation({ plan: input, ports: inputPorts, release, observedAt = new Date(), journalPath: inputJournalPath, receiptPath: inputReceiptPath }) {
   const plan = validatePlan(input)
   const ports = validatePorts(inputPorts)
   const identity = intakeIdentityLiveReadiness(await readProtectedIdentityLiveReadiness(plan.identityReadinessPath), observedAt)
+  const journalPath = resolve(inputJournalPath ?? `${plan.identityReadinessPath}.academy-activation-journal`)
+  const receiptPath = resolve(inputReceiptPath ?? `${journalPath}.receipt`)
+  let baseRecoveryReceipt = null
+  const previousJournal = release === ACTIVATION_RELEASE ? await readJournal(journalPath) : null
+  if (previousJournal?.phase === 'activated') {
+    await writeControllerReceipt(receiptPath, previousJournal.finalReceipt, { journalPath })
+    return Object.freeze(previousJournal.finalReceipt)
+  }
+  if (previousJournal) {
+    const journalSha256 = createHash('sha256').update(`${JSON.stringify(previousJournal)}\n`).digest('hex')
+    const recovered = expect(await ports.inspectRecovery({ journal: previousJournal, journalSha256 }), ['status','journalSha256','outcome','receiptSha256'], value => value.status === 'RECOVERED' && value.journalSha256 === journalSha256 && value.outcome === 'CLEAN')
+    await rm(journalPath); await syncParent(journalPath)
+    baseRecoveryReceipt = recovered.receiptSha256
+  }
   const current = await ports.discoverCurrent({ workerName: plan.workerName })
   if (!exact(current, ['deploymentId','versionId']) || !UUID.test(current.deploymentId) || !UUID.test(current.versionId)) {
     throw new AcademyActivationControllerError()
@@ -122,25 +140,19 @@ export async function runAcademyProductionActivation({ plan: input, ports: input
     mutationLedger: { backupRestore: 'not_started', migrations: 'not_started', candidateUpload: 'not_started', trafficActivation: 'not_started' },
   }
   base.steps.push({ name: 'identity-readiness', status: 'PASS' }, { name: 'current-serving', status: 'PASS' })
+  if (baseRecoveryReceipt) base.steps.splice(1, 0, { name: 'prior-recovery', status: 'PASS', receiptSha256: baseRecoveryReceipt })
   if (release !== ACTIVATION_RELEASE) {
     for (const name of ACTIVATION_STEPS.slice(2)) base.steps.push({ name, status: 'PLANNED' })
     return Object.freeze(base)
   }
 
-  const journalPath = resolve(inputJournalPath ?? `${plan.identityReadinessPath}.academy-activation-journal`)
-  const previousJournal = await readJournal(journalPath)
-  if (previousJournal) {
-    const journalSha256 = createHash('sha256').update(`${JSON.stringify(previousJournal)}\n`).digest('hex')
-    const recovered = expect(await ports.inspectRecovery({ journal: previousJournal, journalSha256 }), ['status','journalSha256','outcome','receiptSha256'], value => value.status === 'RECOVERED' && value.journalSha256 === journalSha256 && value.outcome === 'CLEAN')
-    base.steps.push({ name: 'prior-recovery', status: 'PASS', receiptSha256: recovered.receiptSha256 })
-    await rm(journalPath); await syncParent(journalPath)
-  }
-  const journal = { schema: 'academy-production-activation-journal/v1', operation: 'none', state: 'ready', identityReadinessSha256: identity.receiptSha256, sourceRevision: plan.academy.sourceRevision, currentDeploymentId: current.deploymentId, currentVersionId: current.versionId, candidateVersionId: null, activeDeploymentId: null, rollbackTargetVersionId: current.versionId }
+  const journal = { schema: 'academy-production-activation-journal/v1', phase: 'active', operation: 'none', state: 'ready', identityReadinessSha256: identity.receiptSha256, sourceRevision: plan.academy.sourceRevision, currentDeploymentId: current.deploymentId, currentVersionId: current.versionId, candidateVersionId: null, activeDeploymentId: null, rollbackTargetVersionId: current.versionId, finalReceipt: null, finalReceiptSha256: null }
   await writeJournal(journalPath, journal, true)
   const advance = async (operation, state, extra = {}) => { Object.assign(journal, extra, { operation, state }); await writeJournal(journalPath, journal) }
 
   let candidate = null
   let activeDeploymentId = null
+  let activationVerified = false
   try {
     base.mutationLedger.backupRestore = 'attempting'
     await advance('backup-restore', 'attempting')
@@ -201,10 +213,18 @@ export async function runAcademyProductionActivation({ plan: input, ports: input
       ['status','deploymentId','versionId','receiptSha256'], value => value.status === 'PASS'
         && value.deploymentId === activeDeploymentId && value.versionId === candidate.versionId)
     base.steps.push({ name: 'residue-check', status: 'PASS', receiptSha256: residue.receiptSha256 })
-    await rm(journalPath); await syncParent(journalPath)
     base.status = 'ACTIVATED'; base.productionMutation = true
+    const finalReceipt = JSON.parse(JSON.stringify(base))
+    const finalReceiptSha256 = createHash('sha256').update(`${JSON.stringify(finalReceipt)}\n`).digest('hex')
+    activationVerified = true
+    await advance('terminal', 'confirmed', { phase: 'activated', finalReceipt, finalReceiptSha256 })
     return Object.freeze(base)
   } catch {
+    if (activationVerified) {
+      base.status = 'FAILED_ACTIVATION_RECEIPT_UNCERTAIN_RECOVERY_REQUIRED'
+      base.productionMutation = true
+      throw new AcademyActivationControllerError(Object.freeze(base))
+    }
     for (const key of ['backupRestore','migrations','candidateUpload']) if (base.mutationLedger[key] === 'attempting') base.mutationLedger[key] = 'unknown'
     if (base.mutationLedger.trafficActivation !== 'not_started') {
       if (!activeDeploymentId) {
@@ -234,12 +254,31 @@ export async function runAcademyProductionActivation({ plan: input, ports: input
   }
 }
 
-export async function writeControllerReceipt(path, receipt) {
+export async function writeControllerReceipt(path, receipt, options = {}) {
   const target = resolve(path)
   try { await assertStableParent(target) } catch { throw new AcademyActivationControllerError() }
+  let terminalJournal = null
+  if (options.journalPath) {
+    try {
+      terminalJournal = await readJournal(options.journalPath)
+      const digest = createHash('sha256').update(`${JSON.stringify(receipt)}\n`).digest('hex')
+      if (terminalJournal?.phase !== 'activated' || terminalJournal.finalReceiptSha256 !== digest
+        || JSON.stringify(terminalJournal.finalReceipt) !== JSON.stringify(receipt)) throw new Error()
+    } catch { throw new AcademyActivationControllerError() }
+  }
   const temporary = `${target}.tmp-${process.pid}`
   const handle = await open(temporary, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, 0o600)
   try { await handle.writeFile(`${JSON.stringify(receipt)}\n`); await handle.sync() } finally { await handle.close() }
-  try { await link(temporary, target); await syncParent(target); await rm(temporary); await syncParent(target); const metadata = await stat(target); if (metadata.mode & 0o077) throw new Error() }
-  catch { await rm(temporary, { force: true }); throw new AcademyActivationControllerError() }
+  try {
+    try { await link(temporary, target) }
+    catch (error) { if (error.code !== 'EEXIST' || await readFileSecure(target) !== `${JSON.stringify(receipt)}\n`) throw error }
+    await syncParent(target); await rm(temporary); await syncParent(target)
+    const metadata = await stat(target); if (metadata.mode & 0o077) throw new Error()
+    if (options.journalPath) {
+      try { await rm(options.journalPath); await syncParent(options.journalPath) }
+      catch (error) { if (!await readJournal(options.journalPath)) await writeJournal(options.journalPath, terminalJournal, true); throw error }
+    }
+  } catch { await rm(temporary, { force: true }); throw new AcademyActivationControllerError() }
 }
+
+async function readFileSecure(path) { const handle = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW); try { return await handle.readFile('utf8') } finally { await handle.close() } }
