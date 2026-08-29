@@ -16,7 +16,7 @@ function requiredString(value, name) {
   }
 }
 
-function assertNoDuplicateJsonMembers(json) {
+export function assertNoDuplicateJsonMembers(json) {
   let index = 0
 
   function skipWhitespace() {
