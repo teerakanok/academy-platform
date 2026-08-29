@@ -14,6 +14,9 @@ import {
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
 const SHA256 = /^[a-f0-9]{64}$/
+const MIGRATIONS = Object.freeze(['0021','0022','0023','0024','0025','0026','0027'])
+const CHECKS = Object.freeze(['P1','P2','P3','P4','P5','P6','P7'])
+const CONFIG_SHA256 = createHash('sha256').update(`${JSON.stringify(IDENTITY_PRODUCTION_ACTIVATION_CONFIG_NAMES)}\n`).digest('hex')
 export const ACTIVATION_RELEASE = 'ACADEMY_PRODUCTION_ACTIVATION_RELEASE_V1'
 export const ACTIVATION_STEPS = Object.freeze([
   'identity-readiness', 'current-serving', 'backup-restore', 'migrations-0021-0027',
@@ -49,9 +52,11 @@ function validatePorts(ports) {
   return ports
 }
 
-function pass(value, expected) {
-  if (!exact(value, ['status','receiptSha256']) || value.status !== expected || !SHA256.test(value.receiptSha256)) throw new Error()
-  return value.receiptSha256
+const mutationOccurred = ledger => Object.values(ledger).some(value => value !== 'not_started')
+
+function expect(value, keys, predicate) {
+  if (!exact(value, keys) || !predicate(value) || !SHA256.test(value.receiptSha256)) throw new Error()
+  return value
 }
 
 export async function runAcademyProductionActivation({ plan: input, ports: inputPorts, release, observedAt = new Date() }) {
@@ -65,10 +70,12 @@ export async function runAcademyProductionActivation({ plan: input, ports: input
   const base = {
     schema: 'academy-production-activation-controller-receipt/v1',
     mode: release === ACTIVATION_RELEASE ? 'release' : 'dry-run',
+    commandIntent: release === ACTIVATION_RELEASE ? 'release_requested' : 'dry_run',
     identityReadinessSha256: identity.receiptSha256,
     sourceRevision: plan.academy.sourceRevision,
     currentServing: { deploymentId: current.deploymentId, versionId: current.versionId },
     steps: [], status: 'DRY_RUN', productionMutation: false,
+    mutationLedger: { backupRestore: 'not_started', migrations: 'not_started', candidateUpload: 'not_started', trafficActivation: 'not_started' },
   }
   base.steps.push({ name: 'identity-readiness', status: 'PASS' }, { name: 'current-serving', status: 'PASS' })
   if (release !== ACTIVATION_RELEASE) {
@@ -76,17 +83,27 @@ export async function runAcademyProductionActivation({ plan: input, ports: input
     return Object.freeze(base)
   }
 
-  let trafficAttempted = false
-  let rollbackSha256 = null
+  let candidate = null
+  let activeDeploymentId = null
   try {
-    base.steps.push({ name: 'backup-restore', status: 'PASS', receiptSha256: pass(await ports.backupRestore(), 'PASS') })
-    base.steps.push({ name: 'migrations-0021-0027', status: 'PASS', receiptSha256: pass(await ports.applyMigrations({ ordered: ['0021','0022','0023','0024','0025','0026','0027'] }), 'PASS') })
-    const candidate = await ports.uploadCandidate({
+    const backup = expect(await ports.backupRestore({ identityRestoreReceiptSha256: plan.identityRestore.receiptSha256 }),
+      ['status','operation','identityRestoreReceiptSha256','receiptSha256'], value => value.status === 'MATCH'
+        && value.operation === 'academy-backup-restore' && value.identityRestoreReceiptSha256 === plan.identityRestore.receiptSha256)
+    base.mutationLedger.backupRestore = 'confirmed'
+    base.steps.push({ name: 'backup-restore', status: 'PASS', receiptSha256: backup.receiptSha256 })
+    const migrations = expect(await ports.applyMigrations({ ordered: [...MIGRATIONS] }),
+      ['status','operation','ordered','receiptSha256'], value => value.status === 'PASS'
+        && value.operation === 'academy-migrations-0021-0027' && JSON.stringify(value.ordered) === JSON.stringify(MIGRATIONS))
+    base.mutationLedger.migrations = 'confirmed'
+    base.steps.push({ name: 'migrations-0021-0027', status: 'PASS', receiptSha256: migrations.receiptSha256 })
+    candidate = await ports.uploadCandidate({
       workerName: plan.workerName, sourceRevision: plan.academy.sourceRevision,
       configuredNames: [...IDENTITY_PRODUCTION_ACTIVATION_CONFIG_NAMES], traffic: 0,
     })
-    if (!exact(candidate, ['versionId','receiptSha256']) || !UUID.test(candidate.versionId)
-      || candidate.versionId === current.versionId || !SHA256.test(candidate.receiptSha256)) throw new Error()
+    expect(candidate, ['status','workerName','versionId','sourceRevision','trafficPercentage','configuredNamesSha256','receiptSha256'], value => value.status === 'PASS'
+      && value.workerName === plan.workerName && UUID.test(value.versionId) && value.versionId !== current.versionId
+      && value.sourceRevision === plan.academy.sourceRevision && value.trafficPercentage === 0 && value.configuredNamesSha256 === CONFIG_SHA256)
+    base.mutationLedger.candidateUpload = 'confirmed'
     base.steps.push({ name: 'candidate-upload', status: 'PASS', receiptSha256: candidate.receiptSha256 })
     const preflight = buildIdentityProductionActivationReceipt({
       schema: 'academy-identity-production-activation-preflight/v1', academy: plan.academy,
@@ -100,22 +117,50 @@ export async function runAcademyProductionActivation({ plan: input, ports: input
     })
     const preflightSha256 = createHash('sha256').update(`${JSON.stringify(preflight)}\n`).digest('hex')
     base.steps.push({ name: 'activation-preflight', status: 'PASS', receiptSha256: preflightSha256 })
-    trafficAttempted = true
-    base.steps.push({ name: 'traffic-activation', status: 'PASS', receiptSha256: pass(await ports.activateTraffic({ candidateVersionId: candidate.versionId, expectedCurrentVersionId: current.versionId, traffic: 100 }), 'PASS') })
-    base.steps.push({ name: 'authenticated-p1-p7', status: 'PASS', receiptSha256: pass(await ports.smokeP1P7(), 'PASS') })
-    base.steps.push({ name: 'residue-check', status: 'PASS', receiptSha256: pass(await ports.checkResidue({ expectedVersionId: candidate.versionId }), 'PASS') })
+    base.mutationLedger.trafficActivation = 'attempted'
+    const activation = expect(await ports.activateTraffic({ candidateVersionId: candidate.versionId, expectedCurrentDeploymentId: current.deploymentId, expectedCurrentVersionId: current.versionId, traffic: 100 }),
+      ['status','previousDeploymentId','previousVersionId','deploymentId','activeVersionId','trafficPercentage','receiptSha256'], value => value.status === 'PASS'
+        && value.previousDeploymentId === current.deploymentId && value.previousVersionId === current.versionId
+        && UUID.test(value.deploymentId) && value.activeVersionId === candidate.versionId && value.trafficPercentage === 100)
+    activeDeploymentId = activation.deploymentId
+    base.mutationLedger.trafficActivation = 'confirmed'
+    base.steps.push({ name: 'traffic-activation', status: 'PASS', receiptSha256: activation.receiptSha256 })
+    const smoke = expect(await ports.smokeP1P7({ deploymentId: activeDeploymentId, versionId: candidate.versionId, configuredNamesSha256: CONFIG_SHA256 }),
+      ['status','deploymentId','versionId','configuredNamesSha256','checks','receiptSha256'], value => value.status === 'PASS'
+        && value.deploymentId === activeDeploymentId && value.versionId === candidate.versionId
+        && value.configuredNamesSha256 === CONFIG_SHA256 && JSON.stringify(value.checks) === JSON.stringify(CHECKS))
+    base.steps.push({ name: 'authenticated-p1-p7', status: 'PASS', receiptSha256: smoke.receiptSha256 })
+    const residue = expect(await ports.checkResidue({ expectedDeploymentId: activeDeploymentId, expectedVersionId: candidate.versionId }),
+      ['status','deploymentId','versionId','receiptSha256'], value => value.status === 'PASS'
+        && value.deploymentId === activeDeploymentId && value.versionId === candidate.versionId)
+    base.steps.push({ name: 'residue-check', status: 'PASS', receiptSha256: residue.receiptSha256 })
     base.status = 'ACTIVATED'; base.productionMutation = true
     return Object.freeze(base)
   } catch {
-    if (trafficAttempted) {
-      try {
-        rollbackSha256 = pass(await ports.rollbackTraffic({ targetVersionId: current.versionId }), 'ROLLED_BACK')
-        base.steps.push({ name: 'rollback', status: 'PASS', receiptSha256: rollbackSha256 })
-        base.steps.push({ name: 'residue-check', status: 'PASS', receiptSha256: pass(await ports.checkResidue({ expectedVersionId: current.versionId }), 'PASS') })
-      } catch { base.steps.push({ name: 'rollback', status: 'UNCERTAIN' }) }
+    if (base.mutationLedger.trafficActivation !== 'not_started') {
+      if (!activeDeploymentId) {
+        base.mutationLedger.trafficActivation = 'rollback_uncertain'
+        base.steps.push({ name: 'rollback', status: 'UNCERTAIN' })
+      } else try {
+        const rollback = expect(await ports.rollbackTraffic({ expectedActiveDeploymentId: activeDeploymentId, expectedActiveVersionId: candidate?.versionId, priorDeploymentId: current.deploymentId, targetVersionId: current.versionId }),
+          ['status','observedActiveDeploymentId','observedActiveVersionId','deploymentId','restoredVersionId','receiptSha256'], value => value.status === 'ROLLED_BACK'
+            && value.observedActiveDeploymentId === activeDeploymentId && value.observedActiveVersionId === candidate?.versionId
+            && UUID.test(value.deploymentId) && value.restoredVersionId === current.versionId)
+        const residue = expect(await ports.checkResidue({ expectedDeploymentId: rollback.deploymentId, expectedVersionId: current.versionId }),
+          ['status','deploymentId','versionId','receiptSha256'], value => value.status === 'PASS'
+            && value.deploymentId === rollback.deploymentId && value.versionId === current.versionId)
+        base.mutationLedger.trafficActivation = 'rolled_back'
+        base.steps.push({ name: 'rollback', status: 'PASS', receiptSha256: rollback.receiptSha256 })
+        base.steps.push({ name: 'residue-check', status: 'PASS', receiptSha256: residue.receiptSha256 })
+      } catch {
+        base.mutationLedger.trafficActivation = 'rollback_uncertain'
+        base.steps.push({ name: 'rollback', status: 'UNCERTAIN' })
+      }
     }
-    base.status = rollbackSha256 ? 'FAILED_ROLLED_BACK' : trafficAttempted ? 'FAILED_ROLLBACK_UNCERTAIN' : 'FAILED_PRE_TRAFFIC'
-    base.productionMutation = trafficAttempted
+    base.productionMutation = mutationOccurred(base.mutationLedger)
+    if (base.mutationLedger.trafficActivation === 'rollback_uncertain') base.status = 'FAILED_ROLLBACK_UNCERTAIN_RECOVERY_REQUIRED'
+    else if (base.mutationLedger.trafficActivation === 'rolled_back') base.status = 'FAILED_TRAFFIC_ROLLED_BACK_RECOVERY_REQUIRED'
+    else base.status = base.productionMutation ? 'FAILED_RECOVERY_REQUIRED' : 'FAILED_PRE_MUTATION'
     throw new AcademyActivationControllerError(Object.freeze(base))
   }
 }
