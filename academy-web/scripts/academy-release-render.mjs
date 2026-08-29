@@ -20,9 +20,11 @@ import {
   ACADEMY_RELEASE_MANIFEST_SCHEMA,
   assertAcademyStableAncestry,
   computeAcademyReleaseSha256,
+  compareAcademyReleasePaths,
   exact,
   failAcademyRelease,
   isAcademyReleasePath,
+  isAcademyReleaseSegment,
   syncAcademyDirectory,
 } from './academy-release-manifest.mjs'
 
@@ -63,10 +65,10 @@ async function recordedFileMetadata(destination, fs) {
 async function inventoryAcademyWranglerDirectory(sourceDirectory, fs) {
   const files = []
   const visit = async (directory, prefix) => {
-    const names = (await fs.readdir(directory)).sort()
+    const names = await fs.readdir(directory)
     if (names.length === 0) failAcademyRelease()
     for (const name of names) {
-      if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(name)) failAcademyRelease()
+      if (!isAcademyReleaseSegment(name)) failAcademyRelease()
       const full = join(directory, name)
       const metadata = await fs.lstat(full)
       if (metadata.isSymbolicLink()) failAcademyRelease()
@@ -77,7 +79,7 @@ async function inventoryAcademyWranglerDirectory(sourceDirectory, fs) {
     }
   }
   await visit(resolve(sourceDirectory), '')
-  return files
+  return files.sort((left, right) => compareAcademyReleasePaths(left.relative, right.relative))
 }
 
 export async function renderAcademyRelease({ spec, stagingRoot, fs = filesystem, processLike = process }) {
@@ -127,7 +129,7 @@ export async function renderAcademyRelease({ spec, stagingRoot, fs = filesystem,
     await place(helper.path, helper.sourcePath, fileMode(helper.mode))
   }
 
-  entries.sort((a, b) => (a.path < b.path ? -1 : 1))
+  entries.sort((a, b) => compareAcademyReleasePaths(a.path, b.path))
   // Freeze staged subdirectories to their final non-writable mode and record
   // actual ownership so setgid inheritance is captured, not assumed.
   const directoryRecords = []
@@ -139,7 +141,7 @@ export async function renderAcademyRelease({ spec, stagingRoot, fs = filesystem,
       uid: metadata.uid, gid: metadata.gid })
   }
   if (!directoryRecords.every(record => ACADEMY_RELEASE_DIRECTORY_MODES.includes(record.mode))) failAcademyRelease()
-  directoryRecords.sort((a, b) => (a.path < b.path ? -1 : 1))
+  directoryRecords.sort((a, b) => compareAcademyReleasePaths(a.path, b.path))
 
   const manifest = { schema: ACADEMY_RELEASE_MANIFEST_SCHEMA, releaseRevision: spec.releaseRevision,
     releaseSha256: '', executables: { node: ACADEMY_RELEASE_NODE_PATH, wrangler: entrypointRelative },

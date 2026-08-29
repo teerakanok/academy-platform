@@ -4,7 +4,7 @@ import test from 'node:test'
 import { createAcademyReleaseFakeFilesystem } from './academy-release-fs-fake.mjs'
 import { renderAcademyRelease } from './academy-release-render.mjs'
 import { installAcademyRelease } from './academy-release-install.mjs'
-import { verifyAcademyRelease } from './academy-release-manifest.mjs'
+import { isAcademyReleasePath, verifyAcademyRelease } from './academy-release-manifest.mjs'
 import {
   readAcademyReleasePointer,
   resolveAcademyCurrentRelease,
@@ -107,6 +107,43 @@ test('renderer rejects a wrangler source with a symlink or empty inventory', asy
     wrangler: { sourceDirectory: '/source-empty/wrangler', entrypoint: 'bin/wrangler' },
     helpers: [{ sourcePath: '/source-empty/helper.mjs', path: 'helpers/helper.mjs', mode: 0o500 }],
   }, stagingRoot: '/staging-empty', fs: env.fs, processLike: env.processLike }))
+})
+
+test('release paths accept real package segments and reject traversal or unsafe names', () => {
+  assert.equal(isAcademyReleasePath('node_modules/@cloudflare/workers-shared/dist/index.js'), true)
+  assert.equal(isAcademyReleasePath('node_modules/.bin/wrangler'), true)
+  const unsafe = ['', 'lib//index.js', './lib/index.js', '../lib/index.js',
+    'lib/../lib/index.js', 'lib\\index.js', 'lib\u0007index.js', 'lib:index.js',
+    'lib*.js', '.hidden/lib.js', '@/index.js']
+  for (const path of unsafe) assert.equal(isAcademyReleasePath(path), false, path)
+})
+
+test('canonical inventory handles siblings that sort differently from traversal', async () => {
+  const env = await environment()
+  await env.fs.mkdir('/source/wrangler/lib', { recursive: true })
+  await env.fs.mkdir('/source/wrangler/wrangler-dist/cli', { recursive: true })
+  await env.fs.writeFileDirect('/source/wrangler/lib-x.js', Buffer.from('sibling x\n'), 0o444)
+  await env.fs.writeFileDirect('/source/wrangler/lib/index.js', Buffer.from('lib index\n'), 0o444)
+  await env.fs.writeFileDirect('/source/wrangler/wrangler-dist/cli.js', Buffer.from('cli entry\n'), 0o444)
+  await env.fs.writeFileDirect('/source/wrangler/wrangler-dist/cli/index.js', Buffer.from('cli module\n'), 0o444)
+  await env.fs.mkdir('/source/wrangler/node_modules/@cloudflare/workers-shared/dist', { recursive: true })
+  await env.fs.writeFileDirect('/source/wrangler/node_modules/@cloudflare/workers-shared/dist/index.js',
+    Buffer.from('scoped dependency\n'), 0o444)
+  await env.fs.mkdir('/source/wrangler/node_modules/.bin', { recursive: true })
+  await env.fs.writeFileDirect('/source/wrangler/node_modules/.bin/wrangler', WRANGLER_ENTRY, 0o755)
+  const { manifest, root } = await renderAcademyRelease({ spec: spec(REVISION_A),
+    stagingRoot: `/staging/${REVISION_A}`, fs: env.fs, processLike: env.processLike })
+  assert.deepEqual(manifest.entries.filter(entry => entry.path.startsWith('wrangler/')).map(entry => entry.path), [
+    'wrangler/bin/wrangler',
+    'wrangler/lib-x.js',
+    'wrangler/lib/index.js',
+    'wrangler/node_modules/.bin/wrangler',
+    'wrangler/node_modules/@cloudflare/workers-shared/dist/index.js',
+    'wrangler/package.json',
+    'wrangler/wrangler-dist/cli.js',
+    'wrangler/wrangler-dist/cli/index.js',
+  ])
+  await assert.doesNotReject(verifyAcademyRelease({ root, fs: env.fs, processLike: env.processLike }))
 })
 
 test('fresh install publishes an immutable verified release and switches the current pointer', async () => {

@@ -19,7 +19,7 @@ export const ACADEMY_RELEASE_EXECUTABLE_MODE = 0o555
 
 const SHA256 = /^[a-f0-9]{64}$/
 const REVISION = /^[a-f0-9]{40}$/
-const SEGMENT = /^[A-Za-z0-9][A-Za-z0-9._-]*$/
+const SEGMENT = /^(?:\.bin|@[A-Za-z0-9][A-Za-z0-9._-]*|[A-Za-z0-9][A-Za-z0-9._-]*)$/
 
 export const failAcademyRelease = () => { throw new Error('Academy release verification failed') }
 
@@ -28,11 +28,17 @@ export const exact = (value, keys) => value && typeof value === 'object' && !Arr
   && Reflect.ownKeys(value).length === keys.length
   && Reflect.ownKeys(value).every((key, index) => key === keys[index])
 
+export const compareAcademyReleasePaths = (left, right) =>
+  left < right ? -1 : left > right ? 1 : 0
+
+export function isAcademyReleaseSegment(value) {
+  return typeof value === 'string' && value.length <= 256 && SEGMENT.test(value)
+}
+
 export function isAcademyReleasePath(value) {
-  if (typeof value !== 'string' || !value || value.length > 256 || value.includes('\0')) return false
+  if (typeof value !== 'string' || !value || value.length > 256 || value.includes('\\')) return false
   const segments = value.split('/')
-  return segments.length > 0 && segments.length <= 16
-    && segments.every(segment => SEGMENT.test(segment) && segment !== '.' && segment !== '..')
+  return segments.length <= 16 && segments.every(isAcademyReleaseSegment)
 }
 
 export function computeAcademyReleaseSha256(manifest) {
@@ -123,8 +129,8 @@ async function walkAcademyReleaseTree(root, fs) {
   const files = []
   const directories = []
   const visit = async (directory, prefix) => {
-    for (const name of (await fs.readdir(directory)).sort()) {
-      if (!SEGMENT.test(name)) failAcademyRelease()
+    for (const name of await fs.readdir(directory)) {
+      if (!isAcademyReleaseSegment(name)) failAcademyRelease()
       const full = `${directory}/${name}`
       const relative = prefix ? `${prefix}/${name}` : name
       const metadata = await fs.lstat(full)
@@ -139,6 +145,8 @@ async function walkAcademyReleaseTree(root, fs) {
     }
   }
   await visit(root, '')
+  files.sort(compareAcademyReleasePaths)
+  directories.sort((left, right) => compareAcademyReleasePaths(left.path, right.path))
   return { files, directories }
 }
 
@@ -156,7 +164,8 @@ export async function verifyAcademyRelease({ root, fs = filesystem, processLike 
   if (selfMetadata.isSymbolicLink() || !selfMetadata.isFile() || selfMetadata.nlink !== 1
     || (selfMetadata.mode & 0o777) !== 0o444 || selfMetadata.uid !== uid || selfMetadata.gid !== gid) failAcademyRelease()
   const { files: present, directories: presentDirectories } = await walkAcademyReleaseTree(releaseRoot, fs)
-  const expectedFiles = [...manifest.entries.map(entry => entry.path), ACADEMY_RELEASE_MANIFEST_NAME].sort()
+  const expectedFiles = [...manifest.entries.map(entry => entry.path), ACADEMY_RELEASE_MANIFEST_NAME]
+    .sort(compareAcademyReleasePaths)
   if (JSON.stringify(present) !== JSON.stringify(expectedFiles)) failAcademyRelease()
   const expectedDirectories = manifest.directories
     .map(directory => ({ path: directory.path, mode: directory.mode, uid: directory.uid, gid: directory.gid }))
