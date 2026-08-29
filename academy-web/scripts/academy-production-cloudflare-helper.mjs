@@ -4,16 +4,20 @@ import { spawn } from 'node:child_process'
 
 import { parseCurrentDeploymentJson } from './current-deployment.mjs'
 import { verifyAcademyRelease } from './academy-release-manifest.mjs'
+import { resolveAcademyCurrentRelease } from './academy-release-pointer.mjs'
 
 const SHA = /^[a-f0-9]{64}$/
 const REVISION = /^[a-f0-9]{40}$/
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
 const ISO_SECOND = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/
 const WORKER = 'cyberskills-academy'
-// Fixed installed-release root; ambient env executable/release-root trust was
-// removed from the live path — everything resolves inside this release and is
-// digest-verified before any provider execution.
-export const ACADEMY_INSTALLED_RELEASE_ROOT = '/opt/academy/release'
+// Fixed installed-release root; the live release is resolved exclusively
+// through the protected current pointer (never a symlink) to
+// /opt/academy/releases/<releaseSha256> and fully verified before — and again
+// immediately before — any provider execution. Legacy ambient env executable /
+// release-root inputs are rejected explicitly, never silently ignored.
+export const ACADEMY_INSTALLED_RELEASE_ROOT = '/opt/academy'
+const LEGACY_AMBIENT_ENV_INPUTS = ['ACADEMY_PINNED_WRANGLER', 'ACADEMY_RELEASE_ROOT']
 
 const fail = () => { throw new Error('Academy production helper failed') }
 const exact = (value, keys) => value && typeof value === 'object' && !Array.isArray(value)
@@ -42,11 +46,17 @@ function common(values, now) {
   return { validUntilMs: Date.parse(validUntil) }
 }
 
-export async function runWranglerJson({ executable, args = ['deployments', 'list', '--name', WORKER, '--json'], cwd, deadlineMs, clock = () => Date.now() }) {
+export async function runWranglerJson({ executable, args = ['deployments', 'list', '--name', WORKER, '--json'], cwd, deadlineMs, clock = () => Date.now(), verify }) {
   if (typeof executable !== 'string' || !executable.startsWith('/') || typeof cwd !== 'string' || !cwd.startsWith('/')
     || !Array.isArray(args) || args.some(argument => typeof argument !== 'string')) fail()
   const remaining = deadlineMs - clock()
   if (!Number.isFinite(deadlineMs) || remaining < 100) fail()
+  // Close the verify-to-spawn window: the release is revalidated (pointer,
+  // manifest, full tree digests) immediately before the pinned process starts.
+  if (verify !== undefined) {
+    if (typeof verify !== 'function') fail()
+    await verify()
+  }
   const child = spawn(executable, args, {
     cwd, detached: true, stdio: ['ignore', 'pipe', 'ignore'],
     env: { HOME: '/root', LANG: 'C', LC_ALL: 'C', PATH: '/usr/bin:/bin' },
@@ -94,6 +104,8 @@ function currentFrom(source) {
 }
 
 export async function executeAcademyCloudflareHelper(args, options = {}) {
+  const environment = options.env ?? process.env
+  if (LEGACY_AMBIENT_ENV_INPUTS.some(name => environment[name] !== undefined)) fail()
   const values = parseFlags(args)
   const clock = options.clock ?? (() => Date.now())
   const { validUntilMs } = common(values, clock())
@@ -104,13 +116,29 @@ export async function executeAcademyCloudflareHelper(args, options = {}) {
   if (!allowed || !exact(Object.fromEntries(Object.entries(values)), allowed)) fail()
   const resolveRun = async () => {
     if (options.run) return options.run
-    const release = options.release ?? await verifyAcademyRelease({
-      root: options.releaseRoot ?? ACADEMY_INSTALLED_RELEASE_ROOT, fs: options.fs, processLike: options.processLike,
-    })
+    // External binding: --release is the operator-reviewed revision and must
+    // equal both the current pointer revision and the verified manifest
+    // revision; the pointer digest must equal the manifest releaseSha256.
+    const installRoot = options.installRoot ?? ACADEMY_INSTALLED_RELEASE_ROOT
+    const release = options.release ?? (await resolveAcademyCurrentRelease({
+      installRoot,
+      fs: options.fs, processLike: options.processLike,
+    })).release
+    if (release.manifest.releaseRevision !== values['--release']) fail()
     const runner = options.runWrangler ?? runWranglerJson
+    const revalidate = options.revalidate ?? (async () => {
+      if (options.release !== undefined) {
+        await verifyAcademyRelease({ root: release.root, fs: options.fs, processLike: options.processLike })
+        return
+      }
+      const current = await resolveAcademyCurrentRelease({ installRoot, fs: options.fs, processLike: options.processLike })
+      if (current.release.root !== release.root
+        || current.release.manifest.releaseSha256 !== release.manifest.releaseSha256
+        || current.release.manifest.releaseRevision !== release.manifest.releaseRevision) fail()
+    })
     return () => runner({ executable: release.nodeExecutable,
       args: [release.wranglerEntrypoint, 'deployments', 'list', '--name', WORKER, '--json'],
-      cwd: release.root, deadlineMs: validUntilMs, clock })
+      cwd: release.root, deadlineMs: validUntilMs, clock, verify: revalidate })
   }
   const run = await resolveRun()
   const source = await run()

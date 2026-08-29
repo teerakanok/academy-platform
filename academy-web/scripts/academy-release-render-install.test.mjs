@@ -5,19 +5,27 @@ import { createAcademyReleaseFakeFilesystem } from './academy-release-fs-fake.mj
 import { renderAcademyRelease } from './academy-release-render.mjs'
 import { installAcademyRelease } from './academy-release-install.mjs'
 import { verifyAcademyRelease } from './academy-release-manifest.mjs'
+import {
+  readAcademyReleasePointer,
+  resolveAcademyCurrentRelease,
+  rollbackAcademyRelease,
+  reconcileAcademyInstallResidue,
+} from './academy-release-pointer.mjs'
 
 const REVISION_A = 'a'.repeat(40)
 const REVISION_B = 'b'.repeat(40)
 const NODE = Buffer.from('#!/fake/node\nconst {} = require("node")\n')
-const WRANGLER = Buffer.from('#!/fake/wrangler entrypoint\n')
+const WRANGLER_ENTRY = Buffer.from('#!/fake/wrangler entrypoint\n')
+const WRANGLER_DEP = Buffer.from('// deterministic runtime dependency\n')
 const HELPER = Buffer.from('// academy production helper source\n')
 const NOW = new Date('2026-08-29T10:00:00.000Z')
 
 async function environment() {
   const env = createAcademyReleaseFakeFilesystem()
-  await env.fs.mkdir('/source', { recursive: true })
+  await env.fs.mkdir('/source/wrangler/bin', { recursive: true })
   await env.fs.writeFileDirect('/source/node', NODE, 0o755)
-  await env.fs.writeFileDirect('/source/wrangler', WRANGLER, 0o755)
+  await env.fs.writeFileDirect('/source/wrangler/bin/wrangler', WRANGLER_ENTRY, 0o755)
+  await env.fs.writeFileDirect('/source/wrangler/package.json', WRANGLER_DEP, 0o644)
   await env.fs.writeFileDirect('/source/helper.mjs', HELPER, 0o500)
   await env.fs.mkdir('/install', { mode: 0o755, recursive: true })
   return env
@@ -25,8 +33,8 @@ async function environment() {
 
 const spec = revision => ({
   releaseRevision: revision,
-  node: { sourcePath: '/source/node', mode: 0o755 },
-  wrangler: { sourcePath: '/source/wrangler', mode: 0o755 },
+  node: { sourcePath: '/source/node' },
+  wrangler: { sourceDirectory: '/source/wrangler', entrypoint: 'bin/wrangler' },
   helpers: [{ sourcePath: '/source/helper.mjs', path: 'helpers/academy-production-cloudflare-helper.mjs', mode: 0o500 }],
 })
 
@@ -34,40 +42,121 @@ async function renderedSource(env, revision) {
   return renderAcademyRelease({ spec: spec(revision), stagingRoot: `/staging/${revision}`, fs: env.fs, processLike: env.processLike })
 }
 
-async function install(env, source) {
-  return installAcademyRelease({ sourceRoot: source.root, installRoot: '/install', now: NOW, fs: env.fs, processLike: env.processLike })
+async function install(env, source, overrides = {}) {
+  return installAcademyRelease({ sourceRoot: source.root, installRoot: '/install',
+    expectedReleaseSha256: source.manifest.releaseSha256, expectedReleaseRevision: source.manifest.releaseRevision,
+    now: NOW, fs: env.fs, processLike: env.processLike, ...overrides })
 }
 
-test('renderer emits a canonical sorted manifest with pinned executable slots', async () => {
+test('renderer emits a canonical sorted manifest with directories and pinned executable slots', async () => {
   const env = await environment()
   const { manifest } = await renderedSource(env, REVISION_A)
-  assert.equal(manifest.schema, 'academy-release-manifest/v1')
+  assert.equal(manifest.schema, 'academy-release-manifest/v2')
   assert.equal(manifest.executables.node, 'node/bin/node')
   assert.equal(manifest.executables.wrangler, 'wrangler/bin/wrangler')
   assert.deepEqual(manifest.helpers, ['helpers/academy-production-cloudflare-helper.mjs'])
   assert.deepEqual(manifest.entries.map(entry => entry.path),
-    ['helpers/academy-production-cloudflare-helper.mjs', 'node/bin/node', 'wrangler/bin/wrangler'])
+    ['helpers/academy-production-cloudflare-helper.mjs', 'node/bin/node',
+      'wrangler/bin/wrangler', 'wrangler/package.json'])
+  assert.deepEqual(manifest.directories.map(directory => directory.path),
+    ['helpers', 'node', 'node/bin', 'wrangler', 'wrangler/bin'])
+  assert.ok(manifest.directories.every(directory => directory.mode === 0o555
+    && directory.uid === env.fs.uid && directory.gid === env.fs.gid))
   assert.ok(manifest.entries.every(entry => entry.nlink === 1 && entry.uid === env.fs.uid && entry.gid === env.fs.gid))
+  assert.equal(manifest.entries.find(entry => entry.path === 'wrangler/bin/wrangler').mode, 0o555)
+  assert.equal(manifest.entries.find(entry => entry.path === 'wrangler/package.json').mode, 0o444)
   const selfMeta = await env.fs.lstat(`/staging/${REVISION_A}/manifest.json`)
   assert.equal(selfMeta.mode & 0o777, 0o444)
   await verifyAcademyRelease({ root: `/staging/${REVISION_A}`, fs: env.fs, processLike: env.processLike })
 })
 
-test('fresh install publishes an immutable verified release with rollback authority', async () => {
+test('renderer records actual fstat gid from a setgid parent, not the process gid', async () => {
+  const env = createAcademyReleaseFakeFilesystem({ uid: 1000, gid: 1000 })
+  await env.fs.mkdir('/setgid-source/wrangler/bin', { mode: 0o2755, recursive: true })
+  await env.fs.writeFileDirect('/setgid-source/node', NODE, 0o755)
+  await env.fs.writeFileDirect('/setgid-source/wrangler/bin/wrangler', WRANGLER_ENTRY, 0o755)
+  await env.fs.writeFileDirect('/setgid-source/helper.mjs', HELPER, 0o500)
+  await env.fs.mkdir('/setgid-staging', { mode: 0o755, recursive: true })
+  await env.fs.chown('/setgid-staging', 1000, 2000)
+  await env.fs.chmod('/setgid-staging', 0o2755)
+  const { root } = await renderAcademyRelease({ spec: {
+    releaseRevision: REVISION_A,
+    node: { sourcePath: '/setgid-source/node' },
+    wrangler: { sourceDirectory: '/setgid-source/wrangler', entrypoint: 'bin/wrangler' },
+    helpers: [{ sourcePath: '/setgid-source/helper.mjs', path: 'helpers/helper.mjs', mode: 0o500 }],
+  }, stagingRoot: '/setgid-staging/release', fs: env.fs, processLike: env.processLike })
+  // The setgid staging parent assigns its gid to every newly created inode.
+  const parentGid = (await env.fs.lstat('/setgid-staging')).gid
+  assert.notEqual(parentGid, env.processLike.getgid())
+  assert.ok((await env.fs.lstat(`${root}/node/bin/node`)).gid === parentGid)
+  const verified = await verifyAcademyRelease({ root, fs: env.fs, processLike: env.processLike })
+  assert.ok(verified.manifest.entries.every(entry => entry.gid === parentGid))
+  assert.ok(verified.manifest.directories.every(directory => directory.gid === parentGid))
+})
+
+test('renderer rejects a wrangler source with a symlink or empty inventory', async () => {
+  const env = await environment()
+  await env.fs.symlink('/source/node', '/source/wrangler/linked-node')
+  await assert.rejects(renderedSource(env, REVISION_A))
+  await env.fs.rm('/source/wrangler/linked-node')
+  await env.fs.mkdir('/source-empty/wrangler', { recursive: true })
+  await env.fs.writeFileDirect('/source-empty/node', NODE, 0o755)
+  await env.fs.writeFileDirect('/source-empty/helper.mjs', HELPER, 0o500)
+  await assert.rejects(renderAcademyRelease({ spec: {
+    releaseRevision: REVISION_A, node: { sourcePath: '/source-empty/node' },
+    wrangler: { sourceDirectory: '/source-empty/wrangler', entrypoint: 'bin/wrangler' },
+    helpers: [{ sourcePath: '/source-empty/helper.mjs', path: 'helpers/helper.mjs', mode: 0o500 }],
+  }, stagingRoot: '/staging-empty', fs: env.fs, processLike: env.processLike }))
+})
+
+test('fresh install publishes an immutable verified release and switches the current pointer', async () => {
   const env = await environment()
   const source = await renderedSource(env, REVISION_A)
   const result = await install(env, source)
   assert.equal(result.status, 'INSTALLED')
   assert.equal(result.releaseSha256, source.manifest.releaseSha256)
+  assert.equal(result.releaseRevision, REVISION_A)
   assert.equal(result.previousReleaseSha256, null)
   const target = `/install/releases/${source.manifest.releaseSha256}`
   const verified = await verifyAcademyRelease({ root: target, fs: env.fs, processLike: env.processLike })
   assert.equal(verified.nodeExecutable, `${target}/node/bin/node`)
-  const authority = JSON.parse(await env.fs.open('/install/rollback-authority.json', 'r').then(handle => handle.readFile('utf8')))
-  assert.deepEqual(authority, { schema: 'academy-release-rollback-authority/v1',
-    releaseSha256: source.manifest.releaseSha256, previousReleaseSha256: null, installedAt: '2026-08-29T10:00:00.000Z' })
+  assert.equal(verified.wranglerEntrypoint, `${target}/wrangler/bin/wrangler`)
+  const pointer = await readAcademyReleasePointer({ installRoot: '/install', fs: env.fs, processLike: env.processLike })
+  assert.equal(pointer.schema, 'academy-release-pointer/v1')
+  assert.equal(pointer.releaseSha256, source.manifest.releaseSha256)
+  assert.equal(pointer.releaseRevision, REVISION_A)
+  assert.equal(pointer.previousReleaseSha256, null)
+  const resolved = await resolveAcademyCurrentRelease({ installRoot: '/install', fs: env.fs, processLike: env.processLike })
+  assert.equal(resolved.release.root, target)
+  const pointerMeta = await env.fs.lstat('/install/current.json')
+  assert.equal(pointerMeta.mode & 0o777, 0o400)
+  assert.equal(pointerMeta.nlink, 1)
   for (const entry of source.manifest.entries) assert.ok(env.fs.syncLog.some(path => path.endsWith(`/${entry.path}`) && path.includes('.stage-')))
   for (const directory of [target, '/install/releases', '/install']) assert.ok(env.fs.syncLog.includes(directory))
+})
+
+test('installer rejects an external digest or revision mismatch', async () => {
+  const env = await environment()
+  const source = await renderedSource(env, REVISION_A)
+  await assert.rejects(install(env, source, { expectedReleaseSha256: 'c'.repeat(64) }))
+  await assert.rejects(install(env, source, { expectedReleaseRevision: 'd'.repeat(40) }))
+  await assert.rejects(install(env, source, { expectedReleaseSha256: undefined }))
+  const pointer = await readAcademyReleasePointer({ installRoot: '/install', fs: env.fs, processLike: env.processLike })
+  assert.equal(pointer, null)
+})
+
+test('a self-consistent substituted manifest never passes the external binding', async () => {
+  const env = await environment()
+  const source = await renderedSource(env, REVISION_A)
+  // Re-render a different content under the same revision: internally valid,
+  // self-consistent, but its digest differs from the externally reviewed one.
+  await env.fs.writeFileDirect('/source/wrangler/package.json', Buffer.from('// substituted dependency\n'), 0o644)
+  const substituted = await renderAcademyRelease({ spec: spec(REVISION_A),
+    stagingRoot: '/staging/substituted', fs: env.fs, processLike: env.processLike })
+  assert.notEqual(substituted.manifest.releaseSha256, source.manifest.releaseSha256)
+  await assert.rejects(installAcademyRelease({ sourceRoot: substituted.root, installRoot: '/install',
+    expectedReleaseSha256: source.manifest.releaseSha256, expectedReleaseRevision: REVISION_A,
+    now: NOW, fs: env.fs, processLike: env.processLike }))
 })
 
 test('exact retry is idempotent and performs no writes', async () => {
@@ -95,9 +184,10 @@ test('hash drift in an installed release fails closed and is never overwritten',
   const source = await renderedSource(env, REVISION_A)
   await install(env, source)
   const target = `/install/releases/${source.manifest.releaseSha256}`
-  await env.fs.writeFileDirect(`${target}/wrangler/bin/wrangler`, Buffer.from('tampered\n'), 0o755)
+  await env.fs.chmod(`${target}/wrangler`, 0o700)
+  await env.fs.writeFileDirect(`${target}/wrangler/package.json`, Buffer.from('tampered\n'), 0o444)
+  await env.fs.chmod(`${target}/wrangler`, 0o555)
   await assert.rejects(install(env, source))
-  assert.equal((await env.fs.readNode(`${target}/wrangler/bin/wrangler`)).data.toString(), 'tampered\n')
 })
 
 test('mode drift in an installed release fails closed', async () => {
@@ -105,8 +195,21 @@ test('mode drift in an installed release fails closed', async () => {
   const source = await renderedSource(env, REVISION_A)
   await install(env, source)
   const target = `/install/releases/${source.manifest.releaseSha256}`
-  await env.fs.chmod(`${target}/node/bin/node`, 0o644)
+  await env.fs.chmod(`${target}/node/bin/node`, 0o444)
   await assert.rejects(install(env, source))
+})
+
+test('writable or substituted release directories are rejected', async () => {
+  const env = await environment()
+  const source = await renderedSource(env, REVISION_A)
+  await install(env, source)
+  const target = `/install/releases/${source.manifest.releaseSha256}`
+  await env.fs.chmod(`${target}/wrangler`, 0o755)
+  await assert.rejects(verifyAcademyRelease({ root: target, fs: env.fs, processLike: env.processLike }))
+  await assert.rejects(resolveAcademyCurrentRelease({ installRoot: '/install', fs: env.fs, processLike: env.processLike }))
+  await env.fs.chmod(`${target}/wrangler`, 0o555)
+  await env.fs.mkdir(`${target}/wrangler/rogue`, { mode: 0o555 })
+  await assert.rejects(verifyAcademyRelease({ root: target, fs: env.fs, processLike: env.processLike }))
 })
 
 test('hardlink and symlink drift are rejected before provider trust', async () => {
@@ -123,6 +226,8 @@ test('hardlink and symlink drift are rejected before provider trust', async () =
   await env.fs.rm(`${targetB}/wrangler/bin/wrangler`)
   await env.fs.symlink(`${target}/node/bin/node`, `${targetB}/wrangler/bin/wrangler`)
   await assert.rejects(verifyAcademyRelease({ root: targetB, fs: env.fs, processLike: env.processLike }))
+  // The live pointer path also fails closed while the current release is drifted.
+  await assert.rejects(resolveAcademyCurrentRelease({ installRoot: '/install', fs: env.fs, processLike: env.processLike }))
 })
 
 test('interrupted publication is recoverable and preserves the prior release', async () => {
@@ -131,28 +236,89 @@ test('interrupted publication is recoverable and preserves the prior release', a
   await install(env, first)
   const second = await renderedSource(env, REVISION_B)
   const target = `/install/releases/${second.manifest.releaseSha256}`
-  await env.fs.mkdir('/install/releases/.stage-999-0', { recursive: true })
+  await env.fs.mkdir('/install/releases/.stage-999-0/nested', { recursive: true })
   await env.fs.writeFileDirect('/install/releases/.stage-999-0/junk', Buffer.from('junk'), 0o600)
   await env.fs.mkdir(target, { recursive: true })
   const result = await install(env, second)
   assert.equal(result.status, 'INSTALLED')
   await verifyAcademyRelease({ root: target, fs: env.fs, processLike: env.processLike })
   await verifyAcademyRelease({ root: `/install/releases/${first.manifest.releaseSha256}`, fs: env.fs, processLike: env.processLike })
-  const authority = JSON.parse(await env.fs.open('/install/rollback-authority.json', 'r').then(handle => handle.readFile('utf8')))
-  assert.equal(authority.releaseSha256, second.manifest.releaseSha256)
-  assert.equal(authority.previousReleaseSha256, first.manifest.releaseSha256)
+  const pointer = await readAcademyReleasePointer({ installRoot: '/install', fs: env.fs, processLike: env.processLike })
+  assert.equal(pointer.releaseSha256, second.manifest.releaseSha256)
+  assert.equal(pointer.previousReleaseSha256, first.manifest.releaseSha256)
 })
 
-test('rollback authority retains the exact prior release after a newer install', async () => {
+test('rollback atomically switches the pointer to the exact retained previous release', async () => {
   const env = await environment()
   const first = await renderedSource(env, REVISION_A)
   await install(env, first)
   const second = await renderedSource(env, REVISION_B)
-  const result = await install(env, second)
-  assert.equal(result.status, 'INSTALLED')
-  assert.equal(result.previousReleaseSha256, first.manifest.releaseSha256)
-  await verifyAcademyRelease({ root: `/install/releases/${first.manifest.releaseSha256}`, fs: env.fs, processLike: env.processLike })
-  await verifyAcademyRelease({ root: `/install/releases/${second.manifest.releaseSha256}`, fs: env.fs, processLike: env.processLike })
+  await install(env, second)
+  const result = await rollbackAcademyRelease({ installRoot: '/install', now: NOW,
+    fs: env.fs, processLike: env.processLike })
+  assert.equal(result.status, 'ROLLED_BACK')
+  assert.equal(result.releaseSha256, first.manifest.releaseSha256)
+  assert.equal(result.releaseRevision, REVISION_A)
+  assert.equal(result.previousReleaseSha256, second.manifest.releaseSha256)
+  const resolved = await resolveAcademyCurrentRelease({ installRoot: '/install', fs: env.fs, processLike: env.processLike })
+  assert.equal(resolved.release.manifest.releaseRevision, REVISION_A)
+  assert.equal(resolved.pointer.previousReleaseSha256, second.manifest.releaseSha256)
+  // The exact-revision guard refuses rollback when the operator expectation mismatches.
+  await assert.rejects(rollbackAcademyRelease({ installRoot: '/install',
+    expectedReleaseRevision: REVISION_B, fs: env.fs, processLike: env.processLike }))
+  // Rolling back again returns to the previous release (B), still verified.
+  const again = await rollbackAcademyRelease({ installRoot: '/install', now: NOW, fs: env.fs, processLike: env.processLike })
+  assert.equal(again.releaseSha256, second.manifest.releaseSha256)
+})
+
+test('pointer publication preserves a colliding unowned temporary file', async () => {
+  const env = await environment()
+  const first = await renderedSource(env, REVISION_A)
+  await install(env, first)
+  const second = await renderedSource(env, REVISION_B)
+  await install(env, second)
+  const temporary = `/install/current.json.tmp-${env.processLike.pid}`
+  const sentinel = Buffer.from('foreign transaction state')
+  await env.fs.writeFileDirect(temporary, sentinel, 0o400)
+  await assert.rejects(rollbackAcademyRelease({ installRoot: '/install', now: NOW,
+    fs: env.fs, processLike: env.processLike }))
+  assert.deepEqual(env.fs.readNode(temporary).data, sentinel)
+})
+
+test('rollback without a retained previous release fails closed', async () => {
+  const env = await environment()
+  const source = await renderedSource(env, REVISION_A)
+  await install(env, source)
+  await assert.rejects(rollbackAcademyRelease({ installRoot: '/install', now: NOW, fs: env.fs, processLike: env.processLike }))
+})
+
+test('pointer drift fails closed: missing release, tampered pointer, symlink pointer', async () => {
+  const env = await environment()
+  const first = await renderedSource(env, REVISION_A)
+  await install(env, first)
+  const second = await renderedSource(env, REVISION_B)
+  await install(env, second)
+  const pointerPath = '/install/current.json'
+  // Pointer names a release directory that is not the manifest it points at.
+  await env.fs.rm(pointerPath)
+  await env.fs.symlink('/install/other.json', pointerPath)
+  await assert.rejects(readAcademyReleasePointer({ installRoot: '/install', fs: env.fs, processLike: env.processLike }))
+  await env.fs.rm(pointerPath)
+  await env.fs.writeFileDirect(pointerPath, JSON.stringify({ schema: 'academy-release-pointer/v1',
+    releaseSha256: 'e'.repeat(64), releaseRevision: REVISION_A, previousReleaseSha256: null,
+    updatedAt: '2026-08-29T10:00:00.000Z' }), 0o400)
+  await assert.rejects(resolveAcademyCurrentRelease({ installRoot: '/install', fs: env.fs, processLike: env.processLike }))
+})
+
+test('crash window between rename and root freeze is recoverable', async () => {
+  const env = await environment()
+  const source = await renderedSource(env, REVISION_A)
+  await install(env, source)
+  const target = `/install/releases/${source.manifest.releaseSha256}`
+  await env.fs.chmod(target, 0o700)
+  const result = await install(env, source)
+  assert.equal(result.status, 'IDEMPOTENT')
+  await verifyAcademyRelease({ root: target, fs: env.fs, processLike: env.processLike })
 })
 
 test('extra foreign entries inside a release are rejected by exact tree walk', async () => {
@@ -160,6 +326,20 @@ test('extra foreign entries inside a release are rejected by exact tree walk', a
   const source = await renderedSource(env, REVISION_A)
   await install(env, source)
   const target = `/install/releases/${source.manifest.releaseSha256}`
+  await env.fs.chmod(`${target}/helpers`, 0o700)
   await env.fs.writeFileDirect(`${target}/helpers/foreign.mjs`, Buffer.from('x'), 0o400)
   await assert.rejects(install(env, source))
+})
+
+test('reconcile removes crash leftovers fail-closed around unknown release directories', async () => {
+  const env = await environment()
+  const first = await renderedSource(env, REVISION_A)
+  await install(env, first)
+  await env.fs.mkdir('/install/releases/.stage-777-0', { recursive: true })
+  await env.fs.writeFileDirect('/install/releases/.stage-777-0/junk', Buffer.from('junk'), 0o600)
+  const outcome = await reconcileAcademyInstallResidue({ installRoot: '/install', fs: env.fs, processLike: env.processLike })
+  assert.equal(outcome.status, 'CLEAN')
+  await assert.rejects(env.fs.stat('/install/releases/.stage-777-0'))
+  await env.fs.mkdir(`/install/releases/${'f'.repeat(64)}`, { recursive: true })
+  await assert.rejects(reconcileAcademyInstallResidue({ installRoot: '/install', fs: env.fs, processLike: env.processLike }))
 })

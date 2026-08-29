@@ -99,6 +99,8 @@ export function createAcademyReleaseFakeFilesystem({ uid = 1000, gid = 1000 } = 
     }
   }
 
+  const inheritedGid = parent => (parent.mode & 0o2000) ? parent.gid : gid
+
   const fs = {
     syncLog, writeLog, uid, gid,
     async open(path, flags = constants.O_RDONLY, mode = 0o666) {
@@ -113,7 +115,7 @@ export function createAcademyReleaseFakeFilesystem({ uid = 1000, gid = 1000 } = 
           return openHandle(path, node)
         }
         if (!writing) throw codeError('ENOENT')
-        const node = createNode('file', mode & 0o777, uid, gid, { data: Buffer.alloc(0) })
+        const node = createNode('file', mode & 0o777, uid, inheritedGid(parent), { data: Buffer.alloc(0) })
         parent.entries.set(name, node)
         writeLog.push(normalize(path))
         return openHandle(path, node)
@@ -146,7 +148,10 @@ export function createAcademyReleaseFakeFilesystem({ uid = 1000, gid = 1000 } = 
           if (final && !recursive) throw codeError('EEXIST')
         } else {
           if (!final && !recursive) throw codeError('ENOENT')
-          next = createNode('dir', directoryMode, uid, gid, { entries: new Map() })
+          // POSIX: a directory created inside a setgid directory inherits both
+          // the parent group and the setgid bit itself (Linux semantics).
+          const setgidParent = Boolean(node.mode & 0o2000)
+          next = createNode('dir', setgidParent ? directoryMode | 0o2000 : directoryMode, uid, inheritedGid(node), { entries: new Map() })
           node.entries.set(segments[index], next)
         }
         node = next
@@ -189,6 +194,11 @@ export function createAcademyReleaseFakeFilesystem({ uid = 1000, gid = 1000 } = 
     async chmod(path, permissions) {
       const { node } = lookup(path, { followFinal: false })
       node.mode = (node.mode & ~0o7777) | (permissions & 0o7777)
+    },
+    async chown(path, uid, gid) {
+      const { node } = lookup(path, { followFinal: false })
+      if (Number.isSafeInteger(uid)) node.uid = uid
+      if (Number.isSafeInteger(gid)) node.gid = gid
     },
     async link(from, to) {
       const node = lookup(from, { followFinal: false }).node
