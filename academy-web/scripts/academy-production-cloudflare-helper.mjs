@@ -57,7 +57,7 @@ export async function runWranglerJson({ executable, cwd, deadlineMs, clock = () 
   const timeout = new Promise(resolve => { timer = setTimeout(() => resolve(null), Math.min(remaining, 5_000)) })
   let result = await Promise.race([close, timeout])
   clearTimeout(timer)
-  if (!result || result.status !== 0 || result.signal || overflow) {
+  const cleanupFailedGroup = async () => {
     if (Number.isSafeInteger(child.pid)) {
       try { process.kill(-child.pid, 'SIGKILL') } catch (error) { if (error?.code !== 'ESRCH') fail() }
     }
@@ -65,7 +65,11 @@ export async function runWranglerJson({ executable, cwd, deadlineMs, clock = () 
     if (!result || (Number.isSafeInteger(child.pid) && groupAlive(child.pid))) fail()
     fail()
   }
-  if (Number.isSafeInteger(child.pid) && groupAlive(child.pid)) fail()
+  if (!result || result.status !== 0 || result.signal || overflow) await cleanupFailedGroup()
+  if (Number.isSafeInteger(child.pid) && groupAlive(child.pid)) {
+    result = { status: 0, signal: null }
+    await cleanupFailedGroup()
+  }
   return Buffer.concat(chunks).toString('utf8')
 }
 

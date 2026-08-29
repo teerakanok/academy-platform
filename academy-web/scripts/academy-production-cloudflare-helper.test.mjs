@@ -72,6 +72,35 @@ test('real runner kills and reaps a timed out process group with descendants', a
   assert.throws(() => process.kill(pid, 0), { code: 'ESRCH' })
 })
 
+test('real runner kills and reaps descendants after successful leader exit', async t => {
+  const pidPath = join(tmpdir(), `academy-helper-success-descendant-${process.pid}.pid`)
+  t.after(() => rm(pidPath, { force: true }))
+  const fixture = await executable(t, `sleep 30 </dev/null >/dev/null 2>&1 & echo $! > '${pidPath}'; printf '%s' '${JSON.stringify(provider)}'; exit 0`)
+  const execution = runWranglerJson({ executable: fixture.path, cwd: fixture.root, deadlineMs: Date.now() + 2_000 })
+  let helperFailure
+  execution.catch(error => { helperFailure = error })
+  let pid
+  const readyDeadline = Date.now() + 1_000
+  while (Date.now() < readyDeadline) {
+    try { pid = Number((await readFile(pidPath, 'utf8')).trim()); break }
+    catch (error) { if (error.code !== 'ENOENT') throw error }
+    await new Promise(resolve => setTimeout(resolve, 10))
+  }
+  assert.ok(Number.isSafeInteger(pid) && pid > 1)
+  await execution.catch(() => {})
+  assert.ok(helperFailure instanceof Error)
+  let gone = false
+  const goneDeadline = Date.now() + 1_000
+  while (Date.now() < goneDeadline) {
+    try { process.kill(pid, 0) } catch (error) {
+      if (error.code === 'ESRCH') { gone = true; break }
+      throw error
+    }
+    await new Promise(resolve => setTimeout(resolve, 10))
+  }
+  assert.equal(gone, true)
+})
+
 test('real runner rejects oversized output and duplicate JSON', async t => {
   const oversized = await executable(t, `dd if=/dev/zero bs=1048577 count=1 2>/dev/null | tr '\\000' x`)
   await assert.rejects(runWranglerJson({ executable: oversized.path, cwd: oversized.root, deadlineMs: Date.now() + 2_000 }))
