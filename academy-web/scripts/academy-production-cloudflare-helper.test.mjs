@@ -161,7 +161,7 @@ async function pinnedReleaseEnvironment(tamper, includeApplication = true) {
     ],
   }, stagingRoot: '/staging/release', fs: env.fs, processLike: env.processLike })
   await env.fs.mkdir('/opt/academy', { mode: 0o755, recursive: true })
-  await env.fs.mkdir('/var/lib/academy/wrangler', { mode: 0o700, recursive: true })
+  await env.fs.mkdir('/private/var/lib/academy/wrangler', { mode: 0o700, recursive: true })
   await installAcademyRelease({ sourceRoot: root, installRoot: '/opt/academy',
     expectedReleaseSha256: manifest.releaseSha256, expectedReleaseRevision: R,
     now: new Date('2026-08-29T10:00:00.000Z'), fs: env.fs, processLike: env.processLike })
@@ -219,7 +219,7 @@ test('live upload requires release-bound worker and config and uses a separate w
     { ...pinnedOptions, fs:env.fs, processLike:env.processLike, installRoot:'/opt/academy', runWrangler })
   assert.equal(value.versionId,candidate)
   const upload = calls.find(call=>call.args.includes('upload'))
-  assert.equal(upload.cwd,'/var/lib/academy/wrangler')
+  assert.equal(upload.cwd,'/private/var/lib/academy/wrangler')
   assert.ok(upload.args.includes(`${root}/application/worker.js`))
   assert.ok(upload.args.includes(`${root}/application/wrangler.jsonc`))
 
@@ -289,7 +289,7 @@ test('live path resolves the pointer release and executes only pinned node and w
   assert.deepEqual(value, { deployments: provider })
   assert.equal(observed.executable, `${root}/node/bin/node`)
   assert.deepEqual(observed.args, [`${root}/wrangler/bin/wrangler`, 'deployments', 'list', '--name', 'cyberskills-academy', '--json'])
-  assert.equal(observed.cwd, '/var/lib/academy/wrangler')
+  assert.equal(observed.cwd, '/private/var/lib/academy/wrangler')
   // The runner receives a revalidation hook that must succeed pre-spawn.
   assert.equal(typeof observed.verify, 'function')
   await observed.verify()

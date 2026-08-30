@@ -17,7 +17,7 @@ const WORKER = 'cyberskills-academy'
 const WRANGLER_VERSION = '4.120.0'
 const APPLICATION_ENTRY = 'application/worker.js'
 const APPLICATION_CONFIG = 'application/wrangler.jsonc'
-const DEFAULT_WORK_ROOT = '/var/lib/academy/wrangler'
+const DEFAULT_WORK_ROOT = '/private/var/lib/academy/wrangler'
 const CONFIG_NAMES = ['IDENTITY_ADAPTER','IDENTITY_RUNTIME_ENABLED','IDENTITY_RUNTIME_WIRED','IDENTITY_RELEASE_APPROVAL','IDENTITY_CODE_EXCHANGE_TIMEOUT_MS','IDENTITY_CLIENT_ASSERTION_KEY_ID','IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK','IDENTITY_RESULT_KEY_SET_DOCUMENT']
 const CONFIG_SHA = createHash('sha256').update(`${JSON.stringify(CONFIG_NAMES)}\n`).digest('hex')
 // Fixed installed-release root; the live release is resolved exclusively
@@ -68,7 +68,7 @@ export async function runWranglerJson({ executable, args = ['deployments', 'list
   }
   const child = spawn(executable, args, {
     cwd, detached: true, stdio: [stdin === undefined ? 'ignore' : 'pipe', 'pipe', 'ignore'],
-    env: { HOME: '/root', LANG: 'C', LC_ALL: 'C', PATH: '/usr/bin:/bin' },
+    env: { HOME: '/private/var/root', LANG: 'C', LC_ALL: 'C', PATH: '/usr/bin:/bin' },
   })
   if (stdin !== undefined) { child.stdin.end(stdin) }
   const chunks = []
