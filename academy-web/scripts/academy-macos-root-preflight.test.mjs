@@ -3,12 +3,12 @@ import test from 'node:test'
 import { EventEmitter } from 'node:events'
 import { createHash } from 'node:crypto'
 import { constants } from 'node:fs'
-import { access, mkdtemp, readFile, rm } from 'node:fs/promises'
-import { spawnSync } from 'node:child_process'
+import { access, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises'
+import { spawn, spawnSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { main, verifyWorker } from './academy-macos-root-preflight.mjs'
+import { BOUND_WORKER_EXECUTOR, main, verifyWorker } from './academy-macos-root-preflight.mjs'
 
 test('full remaining preflight has exactly one elevation prompt', async () => {
   const calls = []
@@ -28,6 +28,26 @@ test('launcher binds exact worker bytes and repository contains one elevation si
   await verifyWorker()
   const launcher = await readFile(new URL('./academy-macos-root-preflight.mjs', import.meta.url), 'utf8')
   assert.equal(launcher.match(/with administrator privileges/g)?.length, 1)
+})
+
+test('bound worker executor rejects symlink and path swap while retaining the executed inode', async t => {
+  const root = await mkdtemp(join(tmpdir(), 'academy-bound-worker-'))
+  t.after(() => rm(root, { recursive:true, force:true }))
+  const worker = join(root, 'worker'), replacement = join(root, 'replacement'), marker = join(root, 'marker')
+  const bytes = Buffer.from(`#!/bin/zsh\n/bin/sleep 0.15\n/bin/echo PASS > ${JSON.stringify(marker)}\n`)
+  const digest = createHash('sha256').update(bytes).digest('hex')
+  await writeFile(worker, bytes, { mode:0o500 })
+  const run = path => spawnSync(process.execPath, ['-e', BOUND_WORKER_EXECUTOR, path, digest,
+    String(process.getuid()), String(process.getgid()), String(0o500)], { encoding:'utf8' })
+  const linked = join(root, 'linked')
+  await symlink(worker, linked)
+  assert.notEqual(run(linked).status, 0)
+  await writeFile(replacement, bytes, { mode:0o500 })
+  const swapper = spawn('/bin/zsh', ['-c', '/bin/sleep 0.05; /bin/mv "$1" "$2"', 'swap', replacement, worker])
+  const swapped = run(worker)
+  await new Promise(resolve => swapper.once('close', resolve))
+  assert.notEqual(swapped.status, 0)
+  assert.equal(await readFile(marker, 'utf8'), 'PASS\n')
 })
 
 test('worker binds executable inputs and preserves foreign root state', async () => {
@@ -58,7 +78,7 @@ test('empty PATH utility oracle resolves every root command and reaches one mock
   const workerUrl = new URL('./academy-macos-root-preflight-worker.sh', import.meta.url)
   const worker = await readFile(workerUrl, 'utf8')
   const utilities = ['/usr/bin/id','/usr/bin/stat','/bin/cat','/bin/rm','/usr/bin/install','/bin/chmod',
-    '/bin/cp','/usr/sbin/chown','/usr/bin/find','/usr/bin/shasum','/usr/bin/awk','/bin/ln','/bin/mv']
+    '/bin/cp','/usr/sbin/chown','/usr/bin/find','/usr/bin/shasum','/usr/bin/awk','/bin/ln']
   for (const utility of utilities) await access(utility, constants.X_OK)
   const syntax = spawnSync('/bin/zsh', ['-n', workerUrl.pathname], { env: { PATH: '' }, encoding: 'utf8' })
   assert.equal(syntax.status, 0, syntax.stderr)
@@ -88,7 +108,7 @@ test('recovery package binding and sanitized terminal phases are exact', async (
   assert.match(worker, /terminal_ready=false/)
   assert.match(worker, /if \$terminal_ready; then/)
   assert.ok(worker.indexOf('terminal_ready=true') > worker.indexOf("academy-root-preflight/7dca6452\\n"))
-  const observationIndex = worker.indexOf('academy-macos-release-recovery.mjs" "$observation_tmp"')
+  const observationIndex = worker.indexOf('academy-macos-release-recovery.mjs" "$observation"')
   const cleanupIndex = worker.indexOf('phase=CLEANUP_STAGE')
   assert.ok(observationIndex >= 0 && cleanupIndex > observationIndex)
   assert.ok(worker.indexOf('phase=CLEANUP_STAGE') < worker.indexOf('/bin/rm -rf "$stage"'))

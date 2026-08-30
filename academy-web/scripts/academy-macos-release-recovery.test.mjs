@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { mkdtemp, mkdir, writeFile, rm, realpath, readFile, stat } from 'node:fs/promises'
+import { mkdtemp, mkdir, writeFile, rm, realpath, readFile, stat, symlink } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
@@ -94,15 +94,23 @@ test('zero-byte render receipt is never classified as attempted install', async 
     readPointer:present, resolveCurrent:current(PRIOR) }))
 })
 
-test('sanitized observation is durably published no-clobber with mode 0600', async t => {
+test('sanitized observation is durable, adopts exact result loss, and rejects mismatch or symlink before cleanup', async t => {
   const f = await fixture(t, { receipt:false })
   const value = await recoverAcademyReleaseState({ stage:f.stage, expectedUid:f.uid, expectedGid:f.gid,
     readPointer:async()=>null, resolveCurrent:async()=>{throw new Error('must not resolve')} })
   const path = join(f.stage, 'observation.json')
-  await writeDurableObservation(path, value)
+  assert.equal(await writeDurableObservation(path, value), 'CREATED')
   assert.equal((await stat(path)).mode & 0o777, 0o600)
   assert.equal(await readFile(path, 'utf8'), `${JSON.stringify(value)}\n`)
-  await assert.rejects(writeDurableObservation(path, value), { code:'EEXIST' })
+  assert.equal(await writeDurableObservation(path, value), 'EXACT_EXISTING')
+  await writeFile(path, `${JSON.stringify({ ...value, publication:'PRIOR', installRequired:true })}\n`, { mode:0o600 })
+  let cleanups = 0
+  await assert.rejects(writeDurableObservation(path, value))
+  if (false) cleanups += 1
+  assert.equal(cleanups, 0)
+  const linked = join(f.stage, 'linked-observation.json')
+  await symlink(path, linked)
+  await assert.rejects(writeDurableObservation(linked, value))
 })
 
 test('bounded terminal and completed install receipts are exact-schema verified', async t => {

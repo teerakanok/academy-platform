@@ -110,13 +110,36 @@ export async function observeAcademyReleaseState({ stage = CURRENT_STAGE, instal
 export const recoverAcademyReleaseState = observeAcademyReleaseState
 
 export async function writeDurableObservation(path, value) {
-  const handle = await open(path, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, 0o600)
+  const bytes = Buffer.from(`${JSON.stringify(value)}\n`, 'utf8')
+  let handle
   try {
-    await handle.writeFile(`${JSON.stringify(value)}\n`, 'utf8')
+    handle = await open(path, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, 0o600)
+  } catch (error) {
+    if (error?.code !== 'EEXIST') throw error
+    const existing = await protectedText(path, {
+      modes: [0o600], expectedUid: process.getuid(), expectedGid: process.getgid(), max: 1024 * 1024,
+    })
+    if (existing !== bytes.toString('utf8')) fail()
+    return 'EXACT_EXISTING'
+  }
+  try {
+    await handle.chmod(0o600)
+    await handle.writeFile(bytes)
     await handle.sync()
+    const inside = await handle.stat({ bigint:true }), named = await lstat(path, { bigint:true })
+    const same = (left, right) => ['dev','ino','size','uid','gid','mode','nlink','mtimeNs','ctimeNs']
+      .every(key => left[key] === right[key])
+    if (!inside.isFile() || inside.nlink !== 1n || inside.uid !== BigInt(process.getuid())
+      || inside.gid !== BigInt(process.getgid()) || Number(inside.mode & 0o777n) !== 0o600
+      || inside.size !== BigInt(bytes.length) || !same(inside, named)) fail()
   } finally { await handle.close() }
   const directory = await open(dirname(path), constants.O_RDONLY | constants.O_NOFOLLOW)
   try { await directory.sync() } finally { await directory.close() }
+  const accepted = await protectedText(path, {
+    modes: [0o600], expectedUid: process.getuid(), expectedGid: process.getgid(), max: 1024 * 1024,
+  })
+  if (accepted !== bytes.toString('utf8')) fail()
+  return 'CREATED'
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) observeAcademyReleaseState()
