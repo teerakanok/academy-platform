@@ -4,8 +4,8 @@ import { readFile } from 'node:fs/promises'
 import { spawn } from 'node:child_process'
 
 const WORKER = '/private/tmp/academy-activation-prep-ws-fe01de7a/academy-web/scripts/academy-macos-root-preflight-worker.sh'
-const ROOT_COPY = '/private/var/root/academy-macos-root-preflight-worker-a64c2afdcbfb68d7.sh'
-const EXPECTED_WORKER_SHA256 = 'a64c2afdcbfb68d78423af1233accbe3aed8b347d21da588aef69a55dbdb705c'
+const ROOT_COPY = '/private/var/root/academy-macos-root-preflight-worker-7dca64525be1e898.sh'
+const EXPECTED_WORKER_SHA256 = '7dca64525be1e89875acfd84999369c93d26698d1602682a02a586ae28908455'
 const fail = () => { throw new Error('ACADEMY_MACOS_ROOT_PREFLIGHT_REJECTED') }
 
 export async function verifyWorker() {

@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { EventEmitter } from 'node:events'
-import { readFile } from 'node:fs/promises'
+import { constants } from 'node:fs'
+import { access, readFile } from 'node:fs/promises'
+import { spawnSync } from 'node:child_process'
 
 import { main, verifyWorker } from './academy-macos-root-preflight.mjs'
 
@@ -47,4 +49,20 @@ test('worker binds executable inputs and preserves foreign root state', async ()
     '5739f1257fa5a18419b8296236dc17f04d21e11ee491da1e85cca90d2f4beaf4',
     '48d916aa5ae8cac47c800d116ae1c9780580940788f4804c2208fc9f52583fe0',
   ]) assert.match(worker, new RegExp(digest))
+})
+
+test('empty PATH utility oracle resolves every root command and reaches one mocked OAuth boundary', async () => {
+  const workerUrl = new URL('./academy-macos-root-preflight-worker.sh', import.meta.url)
+  const worker = await readFile(workerUrl, 'utf8')
+  const utilities = ['/usr/bin/id','/usr/bin/stat','/bin/cat','/bin/rm','/usr/bin/install','/bin/chmod',
+    '/bin/cp','/usr/sbin/chown','/usr/bin/find','/usr/bin/shasum','/usr/bin/awk','/bin/ln']
+  for (const utility of utilities) await access(utility, constants.X_OK)
+  const syntax = spawnSync('/bin/zsh', ['-n', workerUrl.pathname], { env: { PATH: '' }, encoding: 'utf8' })
+  assert.equal(syntax.status, 0, syntax.stderr)
+  for (const bare of ['id','stat','cat','rm','install','chmod','cp','chown','find','shasum','awk','ln','jq']) {
+    assert.doesNotMatch(worker, new RegExp(`^\\s*${bare}(?=\\s)`, 'm'))
+  }
+  assert.equal((worker.match(/wrangler\.js" login/g) ?? []).length, 1)
+  assert.equal((worker.match(/wrangler\.js" whoami/g) ?? []).length, 1)
+  assert.ok(worker.indexOf('verify_root_file "$stage/source/node"') < worker.indexOf('wrangler.js" login'))
 })
