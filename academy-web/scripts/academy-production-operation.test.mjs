@@ -3,6 +3,7 @@ import { chmod, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { createHash } from "node:crypto";
 import { executeAcademyProductionOperation } from "./academy-production-operation.mjs";
+import { IDENTITY_SYNTHETIC_AUTHORITY } from "./academy-production-p1-p7-runner.mjs";
 import { renderOperationManifest } from "./render-academy-production-operation-manifest.mjs";
 import {
   installAcademyProductionOperations,
@@ -93,7 +94,18 @@ const common = [
         deploymentId: I,
         versionId: I,
         configuredNamesSha256: D,
+        authorityId: A,
+        releaseRevision: R,
+        identityReadinessSha256: D,
+        validUntil: U,
         checks: ["P1", "P2", "P3", "P4", "P5", "P6", "P7"],
+        cleanup: {
+          status: "ABSENT",
+          academyReceiptSha256: D,
+          identityReceiptSha256: D,
+        },
+        receiptSha256: D,
+        identitySyntheticAuthority: IDENTITY_SYNTHETIC_AUTHORITY,
       }),
     });
     assert.equal(out.status, "PASS");
@@ -114,7 +126,7 @@ const common = [
 }
 {
   const manifest = await renderOperationManifest({});
-  assert.equal(manifest.entries.length, 6);
+  assert.equal(manifest.entries.length, 9);
   assert.ok(
     manifest.entries.every(
       (x) =>

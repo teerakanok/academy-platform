@@ -5,6 +5,9 @@ import { resolve } from "node:path";
 
 const FILES = [
   "academy-production-operation.mjs",
+  "academy-production-p1-p7-runner.mjs",
+  "academy-production-p1-p7-ssh.mjs",
+  "academy-production-p1-p7-host.mjs",
   "academy-production-operation-install.mjs",
   "academy-poola-production-producer.mjs",
   "academy-production-cloudflare-helper.mjs",
@@ -27,6 +30,8 @@ export async function renderOperationManifest({
       sha256: createHash("sha256").update(bytes).digest("hex"),
       mode: [
         "academy-production-operation.mjs",
+        "academy-production-p1-p7-runner.mjs",
+        "academy-production-p1-p7-host.mjs",
         "academy-production-operation-install.mjs",
         "academy-poola-production-producer.mjs",
       ].includes(name)

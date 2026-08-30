@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 import { createHash } from "node:crypto";
+import { spawn } from "node:child_process";
 import { constants } from "node:fs";
 import { open, realpath } from "node:fs/promises";
 import { resolve } from "node:path";
+import { IDENTITY_SYNTHETIC_AUTHORITY } from "./academy-production-p1-p7-runner.mjs";
 
 import { executeAcademyCloudflareHelper } from "./academy-production-cloudflare-helper.mjs";
 import { executeAcademyDatabaseOperation } from "./academy-production-database-adapter.mjs";
@@ -20,6 +22,34 @@ const receipt = (body) => ({
     .update(`${JSON.stringify(body)}\n`)
     .digest("hex"),
 });
+function runProtectedHook({ executable, args }) {
+  return new Promise((resolvePromise, reject) => {
+    const child = spawn(executable, args, {
+      stdio: ["ignore", "pipe", "ignore"],
+      env: {
+        HOME: process.env.HOME,
+        LANG: "C",
+        LC_ALL: "C",
+        PATH: "/usr/bin:/bin",
+      },
+      shell: false,
+    });
+    let output = "";
+    child.stdout.on("data", (chunk) => {
+      output += chunk;
+      if (output.length > 1024 * 1024) child.kill("SIGKILL");
+    });
+    child.once("error", reject);
+    child.once("close", (status) => {
+      if (status !== 0) return reject(Error("HOOK_FAILED"));
+      try {
+        resolvePromise(JSON.parse(output));
+      } catch {
+        reject(Error("HOOK_INVALID"));
+      }
+    });
+  });
+}
 
 function flags(args) {
   if (args.length % 2) fail();
@@ -69,7 +99,7 @@ export async function executeAcademyProductionOperation(
   {
     database = executeAcademyDatabaseOperation,
     cloudflare = executeAcademyCloudflareHelper,
-    runHook,
+    runHook = runProtectedHook,
   } = {},
 ) {
   const v = flags(args);
@@ -170,32 +200,47 @@ export async function executeAcademyProductionOperation(
       !SHA.test(v["--config"])
     )
       fail();
-    const value = await runHook({
-      executable: v["--hook"],
-      args: [
-        "--authority",
-        shared.authorityId,
-        "--release",
-        shared.releaseRevision,
-        "--readiness",
-        shared.identityReadinessSha256,
-        "--valid-until",
-        shared.validUntil,
-        "--deployment",
-        v["--deployment"],
-        "--version",
-        v["--version"],
-        "--config",
-        v["--config"],
-      ],
-    });
+    let value;
+    try {
+      value = await runHook({
+        executable: v["--hook"],
+        args: [
+          "--authority",
+          shared.authorityId,
+          "--release",
+          shared.releaseRevision,
+          "--readiness",
+          shared.identityReadinessSha256,
+          "--valid-until",
+          shared.validUntil,
+          "--deployment",
+          v["--deployment"],
+          "--version",
+          v["--version"],
+          "--config",
+          v["--config"],
+        ],
+      });
+    } catch {
+      fail();
+    }
     if (
       JSON.stringify(value?.checks) !==
         JSON.stringify(["P1", "P2", "P3", "P4", "P5", "P6", "P7"]) ||
       value.status !== "PASS" ||
       value.deploymentId !== v["--deployment"] ||
       value.versionId !== v["--version"] ||
-      value.configuredNamesSha256 !== v["--config"]
+      value.configuredNamesSha256 !== v["--config"] ||
+      value.authorityId !== shared.authorityId ||
+      value.releaseRevision !== shared.releaseRevision ||
+      value.identityReadinessSha256 !== shared.identityReadinessSha256 ||
+      value.validUntil !== shared.validUntil ||
+      value.cleanup?.status !== "ABSENT" ||
+      !SHA.test(value.cleanup.academyReceiptSha256) ||
+      !SHA.test(value.cleanup.identityReceiptSha256) ||
+      !SHA.test(value.receiptSha256) ||
+      JSON.stringify(value.identitySyntheticAuthority) !==
+        JSON.stringify(IDENTITY_SYNTHETIC_AUTHORITY)
     )
       fail();
     return receipt({
@@ -204,6 +249,9 @@ export async function executeAcademyProductionOperation(
       versionId: value.versionId,
       configuredNamesSha256: value.configuredNamesSha256,
       checks: value.checks,
+      cleanup: value.cleanup,
+      runnerReceiptSha256: value.receiptSha256,
+      identitySyntheticAuthority: value.identitySyntheticAuthority,
     });
   }
   fail();
