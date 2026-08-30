@@ -5,6 +5,7 @@ import { constants as fsConstants } from 'node:fs'
 import { lstat, open, realpath } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { verifyIdentityProductionAuthority } from './verify-identity-production-authority.mjs'
 
 const SHA1 = /^[a-f0-9]{40}$/
 const SHA256 = /^[a-f0-9]{64}$/
@@ -16,6 +17,7 @@ const EXPECTED_ACTIVE_KEYS = ['academy-prod-2026-08', 'identity-result-prod-2026
 const RESULT_ISSUER = 'https://accounts.cyberskills.co.th/v1/code/results'
 const MAX_AGE_MS = 15 * 60 * 1000
 const FUTURE_SKEW_MS = 60 * 1000
+const EXPECTED_AUTHORITY = '95e3deb74b21077320e5001277524c07261732aa9096dbcd8d24ff7bfa82a74b'
 const EXPECTED_ARTIFACTS = Object.freeze({
   accountCenter: Object.freeze({ bytes: 266240, path: 'ac.tar', sha256: '3227c635dbc9235d1861f133615ed2b761351df50f7c3b93c924b088524759f8' }),
   api: Object.freeze({ bytes: 10137600, path: 'api.tar', sha256: 'f80cd4a87d451c5ec36e90d7d2e7db76a62f6480b78a3a3bcfd0dce91b4926e1' }),
@@ -28,9 +30,9 @@ export class IdentityLiveReadinessIntakeError extends Error {
   }
 }
 
-export function intakeIdentityLiveReadiness(source, observedAt = new Date()) {
+export function intakeIdentityLiveReadiness(source, observedAt = new Date(), authoritySha256) {
   try {
-    if (typeof source !== 'string' || !(observedAt instanceof Date) || !Number.isFinite(observedAt.valueOf())) fail()
+    if (typeof source !== 'string' || !(observedAt instanceof Date) || !Number.isFinite(observedAt.valueOf()) || authoritySha256 !== EXPECTED_AUTHORITY) fail()
     const receiptSha256 = createHash('sha256').update(source).digest('hex')
     const value = parseDuplicateSafeJson(source)
     if (source !== `${JSON.stringify(value)}\n`) fail()
@@ -216,7 +218,8 @@ function parseDuplicateSafeJson(source) {
 
 async function main() {
   if (process.argv.length !== 3) fail()
-  const receipt = intakeIdentityLiveReadiness(await readProtectedIdentityLiveReadiness(process.argv[2]))
+  const authority = await verifyIdentityProductionAuthority()
+  const receipt = intakeIdentityLiveReadiness(await readProtectedIdentityLiveReadiness(process.argv[2]), new Date(), authority.sha256)
   process.stdout.write(`${JSON.stringify(receipt)}\n`)
 }
 

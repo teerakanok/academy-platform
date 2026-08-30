@@ -8,6 +8,7 @@ import { dirname, resolve } from 'node:path'
 import { createAcademyProductionLivePorts } from './academy-production-live-ports.mjs'
 import { intakeIdentityLiveReadiness, readProtectedIdentityLiveReadiness } from './identity-live-readiness-intake.mjs'
 import { AcademyActivationControllerError, ACTIVATION_RELEASE, publishRetainedAcademyActivation, runAcademyProductionActivation, writeControllerFailureReceipt, writeControllerReceipt } from './identity-production-activation-controller.mjs'
+import { verifyIdentityProductionAuthority } from './verify-identity-production-authority.mjs'
 
 const fail = () => { throw new Error('Academy production activation failed') }
 
@@ -129,7 +130,8 @@ export async function main(args, options = {}) {
   const plan = await readProtected(planPath)
   const terminal = await publishRetainedAcademyActivation({ plan, journalPath: resolve(journalPath), receiptPath: resolve(receiptPath) })
   if (terminal) return terminal.status
-  const readiness = intakeIdentityLiveReadiness(await readProtectedIdentityLiveReadiness(plan.identityReadinessPath), observedAt)
+  const authority = await verifyIdentityProductionAuthority(observedAt)
+  const readiness = intakeIdentityLiveReadiness(await readProtectedIdentityLiveReadiness(plan.identityReadinessPath), observedAt, authority.sha256)
   const ports = await createAcademyProductionLivePorts({
     authorityPath,
     run: options.run ?? runExecutable,
@@ -140,7 +142,7 @@ export async function main(args, options = {}) {
   let receipt
   try {
     receipt = await runAcademyProductionActivation({ plan, ports, release, observedAt,
-      journalPath: resolve(journalPath), receiptPath: resolve(receiptPath) })
+    authoritySha256: authority.sha256, journalPath: resolve(journalPath), receiptPath: resolve(receiptPath) })
   } catch (error) {
     if (error instanceof AcademyActivationControllerError && error.receipt) {
       const digest = createHash('sha256').update(`${JSON.stringify(error.receipt)}\n`).digest('hex')

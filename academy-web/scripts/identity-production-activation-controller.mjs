@@ -136,7 +136,7 @@ export async function publishRetainedAcademyActivation({ plan: input, journalPat
   return publishTerminalForPlan(plan, journalPath, receiptPath)
 }
 
-export async function runAcademyProductionActivation({ plan: input, ports: inputPorts, release, observedAt = new Date(), journalPath: inputJournalPath, receiptPath: inputReceiptPath }) {
+export async function runAcademyProductionActivation({ plan: input, ports: inputPorts, release, observedAt = new Date(), authoritySha256, journalPath: inputJournalPath, receiptPath: inputReceiptPath }) {
   const plan = validatePlan(input)
   const journalPath = resolve(inputJournalPath ?? `${plan.identityReadinessPath}.academy-activation-journal`)
   const receiptPath = resolve(inputReceiptPath ?? `${journalPath}.receipt`)
@@ -145,7 +145,7 @@ export async function runAcademyProductionActivation({ plan: input, ports: input
     if (terminal) return terminal
   }
   const ports = validatePorts(inputPorts)
-  const identity = intakeIdentityLiveReadiness(await readProtectedIdentityLiveReadiness(plan.identityReadinessPath), observedAt)
+  const identity = intakeIdentityLiveReadiness(await readProtectedIdentityLiveReadiness(plan.identityReadinessPath), observedAt, authoritySha256)
   if (ports.authority.releaseRevision !== plan.academy.releaseRevision
     || ports.authority.identityReadinessSha256 !== identity.receiptSha256
     || observedAt.getTime() >= Date.parse(ports.authority.validUntil)) throw new AcademyActivationControllerError()
