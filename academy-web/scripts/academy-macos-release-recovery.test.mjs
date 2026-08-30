@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { mkdtemp, mkdir, writeFile, rm, realpath, readFile, stat, symlink } from 'node:fs/promises'
+import { chmod, mkdtemp, mkdir, writeFile, rm, realpath, readFile, stat, symlink } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
@@ -158,6 +158,64 @@ test('observation boundary performs zero cleanup and install for mismatch, symli
     }
     await assert.rejects(harness({ ...base, receipts:[{name:'foreign'}] }))
     assert.deepEqual({cleanupCalls,installCalls},{cleanupCalls:0,installCalls:0})
+  }
+})
+
+test('executable worker decision boundary blocks hostile observations before cleanup and install', async t => {
+  const f = await fixture(t, { receipt:false })
+  const worker = await readFile(new URL('./academy-macos-root-preflight-worker.sh', import.meta.url), 'utf8')
+  const decision = `IFS=$'\\t' read -r observation_selected install_required <<< "$observation_result"
+[[ "$observation_selected" == "$observation" || "$observation_selected" == "$observation.candidate.v1.json" ]]
+[[ -f "$observation_selected" && ! -L "$observation_selected" ]]
+[[ "$install_required" == true || "$install_required" == false ]]`
+  assert.match(worker, /IFS=\$'\\t' read -r observation_selected install_required/)
+  assert.ok(worker.indexOf('observation_result="$') < worker.indexOf('phase=CLEANUP_STAGE'))
+  assert.ok(worker.indexOf('phase=CLEANUP_STAGE') < worker.indexOf('academy-release-cli.mjs" install'))
+  const observer = join(f.stage, 'observer.mjs')
+  await writeFile(observer, `import {readFile} from 'node:fs/promises';
+import {publishObservationChain} from ${JSON.stringify(new URL('./academy-macos-release-recovery.mjs', import.meta.url).href)};
+try { const current=JSON.parse(await readFile(process.argv[2],'utf8')); const result=await publishObservationChain(process.argv[3],current); process.stdout.write(result.path+'\\t'+(result.observation.installRequired?'true':'false')+'\\n') } catch { process.exitCode=1 }
+`, { mode:0o500 })
+  await chmod(observer, 0o500)
+  const run = (name, current, prepare) => {
+    const root = join(f.stage, name), observation = join(root, 'observation.json')
+    const currentPath = join(root, 'current.json'), cleanup = join(root, 'cleanup.marker'), install = join(root, 'install.marker')
+    return { root, observation, currentPath, cleanup, install, current, prepare }
+  }
+  const base = { schema:'academy-macos-release-observation/v1', status:'OBSERVED', protectedStage:'OWNED', receipts:[] }
+  const cases = [
+    run('prior', { ...base, publication:'PRIOR', installRequired:true }),
+    run('absent', { ...base, publication:'ABSENT', installRequired:true }),
+    run('candidate', { ...base, publication:'CANDIDATE', installRequired:false }),
+    run('mismatch', { ...base, publication:'PRIOR', installRequired:true }, async path => {
+      await writeFile(path, `${JSON.stringify({ ...base, publication:'ABSENT', installRequired:true })}\n`, {mode:0o600})
+    }),
+    run('noncanonical', { ...base, publication:'PRIOR', installRequired:true }, async path => {
+      await writeFile(path, `${JSON.stringify({ ...base, publication:'PRIOR', installRequired:true }, null, 2)}\n`, {mode:0o600})
+    }),
+    run('foreign', { ...base, publication:'PRIOR', installRequired:true }, async path => writeFile(path, '{}\n', {mode:0o600})),
+    run('symlink', { ...base, publication:'PRIOR', installRequired:true }, async path => {
+      const target = `${path}.target`; await writeFile(target, `${JSON.stringify({ ...base, publication:'PRIOR', installRequired:true })}\n`, {mode:0o600}); await symlink(target,path)
+    }),
+  ]
+  for (const item of cases) {
+    await mkdir(item.root, { mode:0o700 })
+    await writeFile(item.currentPath, `${JSON.stringify(item.current)}\n`, {mode:0o600})
+    await item.prepare?.(item.observation)
+    const script = `set -euo pipefail
+observation=$1
+observation_result="$($2 $3 $4 "$observation")"
+${decision}
+: > $5
+if [[ "$install_required" == true ]]; then : > $6; fi
+`
+    const result = spawnSync('/bin/zsh', ['-c', script, 'worker-boundary', item.observation,
+      process.execPath, observer, item.currentPath, item.cleanup, item.install], { encoding:'utf8' })
+    const hostile = ['mismatch','noncanonical','foreign','symlink'].includes(item.root.split('/').at(-1))
+    assert.equal(result.status === 0, !hostile, `${item.root}: ${result.stderr}`)
+    await (hostile ? assert.rejects(stat(item.cleanup)) : stat(item.cleanup))
+    const expectsInstall = ['prior','absent'].includes(item.root.split('/').at(-1))
+    await (expectsInstall ? stat(item.install) : assert.rejects(stat(item.install)))
   }
 })
 
