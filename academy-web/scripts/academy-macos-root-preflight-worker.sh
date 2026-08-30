@@ -14,15 +14,16 @@ revision=fa7bca732aefa58ab7fc2c784676a113b873466b
 release_sha=84e855c0d11016ceeaed7e40c42ff10d70db8690907d883b7134c1536b135a46
 phase=BOOTSTRAP
 publication=UNKNOWN
+reason=UNCLASSIFIED
 terminal_ready=false
 TRAPZERR() {
   local exit_code=$?
   set +e
   if $terminal_ready; then
-    printf '{"schema":"academy-macos-root-preflight-terminal/v1","status":"FAILED","phase":"%s","publication":"%s"}\n' "$phase" "$publication" > "$stage/terminal.json"
+    printf '{"schema":"academy-macos-root-preflight-terminal/v1","status":"FAILED","phase":"%s","publication":"%s","reason":"%s"}\n' "$phase" "$publication" "$reason" > "$stage/terminal.json"
     /bin/chmod 600 "$stage/terminal.json"
   fi
-  printf 'ACADEMY_SINGLE_PROMPT_PREFLIGHT_FAILED phase=%s publication=%s\n' "$phase" "$publication" >&2
+  printf 'ACADEMY_SINGLE_PROMPT_PREFLIGHT_FAILED phase=%s publication=%s reason=%s\n' "$phase" "$publication" "$reason" >&2
   exit "$exit_code"
 }
 
@@ -35,8 +36,9 @@ verify_observer_file() {
   [[ -f "$path" && ! -L "$path" && "$(/usr/bin/stat -f '%Su:%Sg:%Lp:%l' "$path")" == 'root:wheel:400:1' ]]
   [[ "$(/usr/bin/shasum -a 256 "$path" | /usr/bin/awk '{print $1}')" == "$expected" ]]
 }
-verify_observer_file "$observer/academy-macos-release-recovery.mjs" 454b4b1be0c08033ae3562dca167d42ffe2d5903f3856d394232e095d31473a1
+verify_observer_file "$observer/academy-macos-release-recovery.mjs" 844d92b9734a18fac1d14c842c25c2ff814b2d7a5840a14690bab3ee517a3d41
 verify_observer_file "$observer/academy-release-pointer.mjs" 7cac358f35e6446e314e5cc9f884c9770b3395dcf9394221d6f61c569385fcee
+verify_observer_file "$observer/academy-release-manifest.mjs" 803f50c7f33ef22f9d199ee8b4e7dfe3810c33861999a8c2109880f62ab4eaec
 observation_result="$("$observer/node" "$observer/academy-macos-release-recovery.mjs" "$observation")"
 IFS=$'\t' read -r observation_selected install_required <<< "$observation_result"
 [[ "$observation_selected" == "$observation" || "$observation_selected" == "$observation.candidate.v1.json" ]]
@@ -70,12 +72,12 @@ verify_root_file() {
   [[ "$(/usr/bin/shasum -a 256 "$path" | /usr/bin/awk '{print $1}')" == "$expected" ]]
 }
 verify_root_file "$stage/source/node" 500 9bc64e922cba152eedf55cd4528ac0b5b7e0f4cd9d671d77bb0830c9796ea188
-verify_root_file "$stage/tooling/academy-release-cli.mjs" 500 beed64ebfadd84e5a09fc79a6aca30d58290ef0fd691a30a15ea8035725139c4
-verify_root_file "$stage/tooling/academy-release-install.mjs" 400 c0e653f1db0bac03ea5049ee4901a088a1f039553415d70b65411a5d6c7feca6
-verify_root_file "$stage/tooling/academy-release-manifest.mjs" 400 1fe1b055d517780cfac4c43d3e0bce0af455a0ba15b643cde0559e01287be35e
+verify_root_file "$stage/tooling/academy-release-cli.mjs" 500 6e91274bb01f78446c6bbf91dd76cc84d4e44765c7ef6122fe8171d6de46099c
+verify_root_file "$stage/tooling/academy-release-install.mjs" 400 6901ab66963699498d002651f371d4fad81a7b03ed126b6d14978c6e3abd8da3
+verify_root_file "$stage/tooling/academy-release-manifest.mjs" 400 803f50c7f33ef22f9d199ee8b4e7dfe3810c33861999a8c2109880f62ab4eaec
 verify_root_file "$stage/tooling/academy-release-pointer.mjs" 400 7cac358f35e6446e314e5cc9f884c9770b3395dcf9394221d6f61c569385fcee
 verify_root_file "$stage/tooling/academy-release-render.mjs" 400 03f97f824f0c4ec3476852e85dd821dabaf45562b0049b18a06c5772bb049dde
-verify_root_file "$stage/tooling/academy-macos-release-recovery.mjs" 400 454b4b1be0c08033ae3562dca167d42ffe2d5903f3856d394232e095d31473a1
+verify_root_file "$stage/tooling/academy-macos-release-recovery.mjs" 400 844d92b9734a18fac1d14c842c25c2ff814b2d7a5840a14690bab3ee517a3d41
 phase=PREPARE_PACKAGE
 "$stage/source/node" -e 'const fs=require("fs"),old=process.argv[1],next=process.argv[2],input=process.argv[3],output=process.argv[4];const walk=v=>typeof v==="string"?v.split(old).join(next):Array.isArray(v)?v.map(walk):v&&typeof v==="object"?Object.fromEntries(Object.entries(v).map(([k,x])=>[k,walk(x)])):v;fs.writeFileSync(output,JSON.stringify(walk(JSON.parse(fs.readFileSync(input,"utf8"))))+"\n",{mode:0o600,flag:"wx"})' "$source" "$stage/source" "$input" "$stage/package.json"
 /usr/sbin/chown root:wheel "$stage/package.json"
@@ -91,6 +93,9 @@ if [[ "$install_required" == true ]]; then
   "$stage/source/node" -e 'const fs=require("fs"),v=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));if(v.status!=="RENDERED"||v.releaseRevision!==process.argv[2]||v.releaseSha256!==process.argv[3])process.exit(1)' "$stage/render-result.json" "$revision" "$release_sha"
   phase=INSTALL_RELEASE
   publication=UNKNOWN
+  reason=DIAGNOSTIC_FAILED
+  "$stage/source/node" "$stage/tooling/academy-release-cli.mjs" diagnose-install "$stage/rendered" /opt/academy "$release_sha" "$revision" > "$stage/install-diagnostic.json"
+  reason="$("$stage/source/node" -e 'const fs=require("fs"),v=JSON.parse(fs.readFileSync(process.argv[1],"utf8")),ok=new Set(["EXACT_CANDIDATE","CRASH_WINDOW_0700","FOREIGN_TARGET","FOREIGN_STAGE","OWNED_STAGE_RECOVERABLE","TARGET_ABSENT"]);if(v.schema!=="academy-release-install-diagnostic/v1"||v.status!=="INSPECTED"||!ok.has(v.reason))process.exit(1);process.stdout.write(v.reason)' "$stage/install-diagnostic.json")"
   "$stage/source/node" "$stage/tooling/academy-release-cli.mjs" install "$stage/rendered" /opt/academy "$release_sha" "$revision" > "$stage/install-result.json"
 fi
 phase=VERIFY_RELEASE

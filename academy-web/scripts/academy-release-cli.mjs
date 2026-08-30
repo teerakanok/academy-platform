@@ -4,7 +4,7 @@ import { constants } from 'node:fs'
 import { promises as filesystem } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 
-import { installAcademyRelease } from './academy-release-install.mjs'
+import { diagnoseAcademyInstall, installAcademyRelease } from './academy-release-install.mjs'
 import { assertAcademyStableAncestry, exact, failAcademyRelease } from './academy-release-manifest.mjs'
 import { reconcileAcademyInstallResidue, resolveAcademyCurrentRelease, rollbackAcademyRelease } from './academy-release-pointer.mjs'
 import { renderAcademyRelease } from './academy-release-render.mjs'
@@ -79,16 +79,17 @@ export async function main(args, options = {}) {
   if ((options.requireRoot ?? true) && processLike.getuid() !== 0) failAcademyRelease()
   const command = args[0]
   const absoluteArguments = command === 'render' ? args.slice(1, 3)
-    : ['install','verify','reconcile','rollback'].includes(command) ? args.slice(1, command === 'install' ? 3 : 2) : []
+    : ['install','diagnose-install','verify','reconcile','rollback'].includes(command)
+      ? args.slice(1, ['install','diagnose-install'].includes(command) ? 3 : 2) : []
   if (absoluteArguments.some(path => typeof path !== 'string' || resolve(path) !== path)) failAcademyRelease()
   let result
   if (command === 'render' && args.length === 3) {
     const spec = await readAcademyReleasePackageInput({ path: args[1], fs, processLike })
     const rendered = await renderAcademyRelease({ spec, stagingRoot: args[2], fs, processLike })
     result = { status: 'RENDERED', releaseSha256: rendered.manifest.releaseSha256, releaseRevision: rendered.manifest.releaseRevision }
-  } else if (command === 'install' && args.length === 5) {
+  } else if (['install','diagnose-install'].includes(command) && args.length === 5) {
     expected(args[3], args[4])
-    result = await installAcademyRelease({ sourceRoot: args[1], installRoot: args[2],
+    result = await (command === 'install' ? installAcademyRelease : diagnoseAcademyInstall)({ sourceRoot: args[1], installRoot: args[2],
       expectedReleaseSha256: args[3], expectedReleaseRevision: args[4], fs, processLike })
   } else if (['verify','reconcile'].includes(command) && args.length === 4) {
     expected(args[2], args[3])

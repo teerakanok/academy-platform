@@ -3,7 +3,7 @@ import test from 'node:test'
 
 import { createAcademyReleaseFakeFilesystem } from './academy-release-fs-fake.mjs'
 import { renderAcademyRelease } from './academy-release-render.mjs'
-import { installAcademyRelease } from './academy-release-install.mjs'
+import { diagnoseAcademyInstall, installAcademyRelease } from './academy-release-install.mjs'
 import { isAcademyReleasePath, verifyAcademyRelease } from './academy-release-manifest.mjs'
 import {
   readAcademyReleasePointer,
@@ -174,6 +174,41 @@ test('fresh install publishes an immutable verified release and switches the cur
   for (const directory of [target, '/install/releases', '/install']) assert.ok(env.fs.syncLog.includes(directory))
 })
 
+test('install diagnostic distinguishes exact candidate, verified crash window, and foreign target', async () => {
+  const env=await environment(), source=await renderedSource(env,REVISION_A)
+  const diagnose=()=>diagnoseAcademyInstall({sourceRoot:source.root,installRoot:'/install',
+    expectedReleaseSha256:source.manifest.releaseSha256,expectedReleaseRevision:REVISION_A,
+    fs:env.fs,processLike:env.processLike})
+  assert.equal((await diagnose()).reason,'TARGET_ABSENT')
+  await install(env,source)
+  assert.equal((await diagnose()).reason,'EXACT_CANDIDATE')
+  const target=`/install/releases/${source.manifest.releaseSha256}`
+  await env.fs.chmod(target,0o700)
+  assert.equal((await diagnose()).reason,'CRASH_WINDOW_0700')
+  await env.fs.writeFileDirect(`${target}/foreign`,Buffer.from('foreign'),0o444)
+  assert.equal((await diagnose()).reason,'FOREIGN_TARGET')
+})
+
+test('installer removes only an exact candidate-bound owned stage residue', async () => {
+  const env=await environment(), source=await renderedSource(env,REVISION_A)
+  const releases='/install/releases', owned=`${releases}/.stage-owned`, foreign=`${releases}/.stage-foreign`
+  await env.fs.mkdir(owned,{recursive:true,mode:0o700})
+  await env.fs.writeFileDirect(`${owned}/.academy-install-owned`,Buffer.from(`${JSON.stringify({
+    schema:'academy-release-install-stage/v1',releaseSha256:source.manifest.releaseSha256,releaseRevision:REVISION_A,
+  })}\n`),0o400)
+  assert.equal((await diagnoseAcademyInstall({sourceRoot:source.root,installRoot:'/install',
+    expectedReleaseSha256:source.manifest.releaseSha256,expectedReleaseRevision:REVISION_A,
+    fs:env.fs,processLike:env.processLike})).reason,'OWNED_STAGE_RECOVERABLE')
+  await install(env,source)
+  await assert.rejects(env.fs.lstat(owned))
+  const next=await environment(), nextSource=await renderedSource(next,REVISION_A)
+  await next.fs.mkdir(foreign,{recursive:true,mode:0o700})
+  await next.fs.writeFileDirect(`${foreign}/unowned`,Buffer.from('retain'),0o400)
+  await assert.rejects(install(next,nextSource))
+  const retained=await next.fs.open(`${foreign}/unowned`,0)
+  try { assert.equal((await retained.readFile()).toString(),'retain') } finally { await retained.close() }
+})
+
 test('installer rejects an external digest or revision mismatch', async () => {
   const env = await environment()
   const source = await renderedSource(env, REVISION_A)
@@ -277,6 +312,9 @@ test('interrupted publication is recoverable and preserves the prior release', a
   const target = `/install/releases/${second.manifest.releaseSha256}`
   await env.fs.mkdir('/install/releases/.stage-999-0/nested', { recursive: true })
   await env.fs.writeFileDirect('/install/releases/.stage-999-0/junk', Buffer.from('junk'), 0o600)
+  await env.fs.writeFileDirect('/install/releases/.stage-999-0/.academy-install-owned',Buffer.from(`${JSON.stringify({
+    schema:'academy-release-install-stage/v1',releaseSha256:second.manifest.releaseSha256,releaseRevision:REVISION_B,
+  })}\n`),0o400)
   await env.fs.mkdir(target, { recursive: true })
   const result = await install(env, second)
   assert.equal(result.status, 'INSTALLED')

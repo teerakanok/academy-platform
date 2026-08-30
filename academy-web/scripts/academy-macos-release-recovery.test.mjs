@@ -225,13 +225,13 @@ test('bounded terminal and completed install receipts are exact-schema verified'
     status:'INSTALLED', releaseSha256:CANDIDATE, releaseRevision:REVISION, previousReleaseSha256:PRIOR,
   })}\n`, { mode:0o600 })
   await writeFile(join(f.stage, 'terminal.json'), `${JSON.stringify({
-    schema:'academy-macos-root-preflight-terminal/v1', status:'FAILED', phase:'VERIFY_RELEASE', publication:'UNKNOWN',
+    schema:'academy-macos-root-preflight-terminal/v1', status:'FAILED', phase:'VERIFY_RELEASE', publication:'UNKNOWN', reason:'UNCLASSIFIED',
   })}\n`, { mode:0o600 })
   const value = await recoverAcademyReleaseState({ stage:f.stage, expectedUid:f.uid, expectedGid:f.gid,
     readPointer:present, resolveCurrent:current(CANDIDATE) })
   assert.deepEqual(value.receipts.slice(1), [
     {name:'install',status:'INSTALLED',releaseSha256:CANDIDATE},
-    {name:'terminal',status:'FAILED',phase:'VERIFY_RELEASE',publication:'UNKNOWN'},
+    {name:'terminal',status:'FAILED',phase:'VERIFY_RELEASE',publication:'UNKNOWN',reason:'UNCLASSIFIED'},
   ])
   await writeFile(join(f.stage, 'install-result.json'), `${JSON.stringify({
     status:'INSTALLED', releaseSha256:CANDIDATE, releaseRevision:REVISION, previousReleaseSha256:PRIOR, extra:true,

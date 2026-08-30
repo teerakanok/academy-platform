@@ -62,14 +62,56 @@ async function inspectExistingTarget(target, manifest, fs, processLike) {
   if (!metadata.isDirectory()) failAcademyRelease()
   const children = await fs.readdir(target)
   if (children.length === 0) return 'placeholder'
-  // Crash-window recovery: a publication interrupted between rename and the
-  // final root freeze leaves the exact release at mode 0700. Refreeze and
-  // verify; anything else that fails verification stays foreign.
-  if ((metadata.mode & 0o777) === 0o700) await fs.chmod(target, 0o555)
-  try { await verifyAcademyRelease({ root: target, fs, processLike }) } catch { return 'foreign' }
+  // Verify the entire crash-window tree before changing its root mode.
+  const crashWindow = (metadata.mode & 0o777) === 0o700
+  try { await verifyAcademyRelease({ root: target, fs, processLike,
+    ...(crashWindow ? { acceptedRootModes:[0o700] } : {}) }) } catch { return 'foreign' }
   const installed = await readAcademyReleaseJson(join(target, ACADEMY_RELEASE_MANIFEST_NAME), fs)
   if (installed.releaseSha256 !== manifest.releaseSha256) failAcademyRelease()
-  return 'verified'
+  return crashWindow ? 'crash-window' : 'verified'
+}
+
+const stageMarker = manifest => `${JSON.stringify({ schema:'academy-release-install-stage/v1',
+  releaseSha256:manifest.releaseSha256, releaseRevision:manifest.releaseRevision })}\n`
+
+async function inspectStages(releases, manifest, fs, processLike, remove = false) {
+  let owned = 0, foreign = 0
+  let names
+  try { names=await fs.readdir(releases) } catch (error) {
+    if (error.code === 'ENOENT') return {owned,foreign}
+    throw error
+  }
+  for (const name of names) {
+    if (!name.startsWith('.stage-')) continue
+    const stage=join(releases,name), marker=join(stage,'.academy-install-owned')
+    try {
+      const metadata=await fs.lstat(marker)
+      const handle=await fs.open(marker,constants.O_RDONLY|constants.O_NOFOLLOW)
+      let markerBytes
+      try { markerBytes=await handle.readFile('utf8') } finally { await handle.close() }
+      if (!metadata.isFile() || metadata.isSymbolicLink() || metadata.nlink !== 1
+        || metadata.uid !== processLike.getuid() || (metadata.mode & 0o777) !== 0o400
+        || markerBytes.toString() !== stageMarker(manifest)) { foreign++; continue }
+      if (remove) await forceRemoveAcademyTree(stage,fs)
+      owned++
+    } catch { foreign++ }
+  }
+  return {owned,foreign}
+}
+
+export async function diagnoseAcademyInstall({ sourceRoot, installRoot, expectedReleaseSha256,
+  expectedReleaseRevision, fs = filesystem, processLike = process }) {
+  const source=await verifyAcademyRelease({root:sourceRoot,fs,processLike}), manifest=source.manifest
+  if (manifest.releaseSha256 !== expectedReleaseSha256 || manifest.releaseRevision !== expectedReleaseRevision) failAcademyRelease()
+  const root=resolve(installRoot)
+  await assertAcademyStableAncestry(root,fs,processLike)
+  const releases=academyReleaseDirectory(root), target=join(releases,manifest.releaseSha256)
+  const targetState=await inspectExistingTarget(target,manifest,fs,processLike)
+  const residues=await inspectStages(releases,manifest,fs,processLike)
+  const reason=targetState==='verified'?'EXACT_CANDIDATE':targetState==='crash-window'?'CRASH_WINDOW_0700'
+    :targetState==='foreign'?'FOREIGN_TARGET':residues.foreign?'FOREIGN_STAGE'
+      :residues.owned?'OWNED_STAGE_RECOVERABLE':'TARGET_ABSENT'
+  return Object.freeze({schema:'academy-release-install-diagnostic/v1',status:'INSPECTED',reason})
 }
 
 export async function installAcademyRelease({ sourceRoot, installRoot, expectedReleaseSha256, expectedReleaseRevision,
@@ -95,6 +137,11 @@ export async function installAcademyRelease({ sourceRoot, installRoot, expectedR
 
   let state = await inspectExistingTarget(target, manifest, fs, processLike)
   if (state === 'foreign') failAcademyRelease()
+  if (state === 'crash-window') {
+    await fs.chmod(target,0o555)
+    await verifyAcademyRelease({root:target,fs,processLike})
+    state='verified'
+  }
   if (state === 'placeholder') {
     await fs.rmdir(target)
     await syncAcademyDirectory(releases, fs)
@@ -102,10 +149,15 @@ export async function installAcademyRelease({ sourceRoot, installRoot, expectedR
     if (state !== 'absent') failAcademyRelease()
   }
   if (state === 'absent') {
+    const residues=await inspectStages(releases,manifest,fs,processLike,true)
+    if (residues.foreign) failAcademyRelease()
     const stage = join(releases, `.stage-${processLike.pid}-${stageSequence++}`)
     await fs.mkdir(stage, { mode: 0o700 })
     const stagedDirectories = new Set()
     try {
+      const marker=await fs.open(join(stage,'.academy-install-owned'),
+        constants.O_WRONLY|constants.O_CREAT|constants.O_EXCL|constants.O_NOFOLLOW,0o400)
+      try { await marker.writeFile(stageMarker(manifest)); await marker.sync() } finally { await marker.close() }
       for (const entry of manifest.entries) {
         await fs.mkdir(dirname(join(stage, entry.path)), { mode: 0o700, recursive: true })
         for (let cursor = dirname(join(stage, entry.path)); cursor.startsWith(stage) && cursor !== stage && !stagedDirectories.has(cursor); cursor = dirname(cursor)) stagedDirectories.add(cursor)
@@ -124,6 +176,7 @@ export async function installAcademyRelease({ sourceRoot, installRoot, expectedR
       // Freeze for verification, then unfreeze for the rename. Publish directly
       // to the previously absent digest path: a concurrent completed winner is
       // non-empty and cannot be replaced by a directory rename.
+      await fs.rm(join(stage,'.academy-install-owned'))
       await fs.chmod(stage, 0o555)
       await verifyAcademyRelease({ root: stage, fs, processLike })
       await fs.chmod(stage, 0o700)

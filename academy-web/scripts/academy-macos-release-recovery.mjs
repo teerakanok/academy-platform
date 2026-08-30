@@ -92,9 +92,11 @@ async function stageEvidence(stage, expectedUid, expectedGid) {
     if (value.status === 'PASS') {
       if (keys !== 'cloudflare,phase,publication,schema,status' || value.phase !== 'COMPLETE'
         || value.publication !== 'CANDIDATE' || value.cloudflare !== 'AUTHENTICATED') fail()
-    } else if (keys !== 'phase,publication,schema,status' || typeof value.phase !== 'string'
-      || value.phase.length < 1 || value.phase.length > 64 || !/^[A-Z_]+$/.test(value.phase)) fail()
-    receipts.push({ name:'terminal', status:value.status, phase:value.phase, publication:value.publication })
+    } else if (keys !== 'phase,publication,reason,schema,status' || typeof value.phase !== 'string'
+      || value.phase.length < 1 || value.phase.length > 64 || !/^[A-Z_]+$/.test(value.phase)
+      || typeof value.reason !== 'string' || !/^[A-Z0-9_]{1,64}$/.test(value.reason)) fail()
+    receipts.push({ name:'terminal', status:value.status, phase:value.phase,
+      publication:value.publication, ...(value.status==='FAILED'?{reason:value.reason}:{}) })
   }
   return { stage: 'OWNED', receipts }
 }

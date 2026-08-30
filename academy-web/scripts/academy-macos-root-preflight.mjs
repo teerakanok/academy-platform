@@ -4,17 +4,17 @@ import { readFile } from 'node:fs/promises'
 import { spawn } from 'node:child_process'
 
 const WORKER = '/private/tmp/academy-result-loss-remediation/academy-web/scripts/academy-macos-root-preflight-worker.sh'
-const ROOT_COPY = '/private/var/root/academy-macos-root-preflight-worker-ca2f9e0ac2e2374d.sh'
-const EXPECTED_WORKER_SHA256 = 'ca2f9e0ac2e2374d28b976329e84464f020fc2ed42affbfdec89e249fa57d8f2'
+const ROOT_COPY = '/private/var/root/academy-macos-root-preflight-worker-a4dd803fc27eb0bf.sh'
+const EXPECTED_WORKER_SHA256 = 'a4dd803fc27eb0bf61cb69e6705d2a80cab07e1e57441a13947bcbb39e24fc84'
 const OBSERVER = '/private/var/root/academy-release-observer-7dca6452'
 const RECOVERY = `${WORKER.slice(0, WORKER.lastIndexOf('/'))}/academy-macos-release-recovery.mjs`
 const POINTER = `${WORKER.slice(0, WORKER.lastIndexOf('/'))}/academy-release-pointer.mjs`
 const MANIFEST = `${WORKER.slice(0, WORKER.lastIndexOf('/'))}/academy-release-manifest.mjs`
 const EXECUTOR = `${WORKER.slice(0, WORKER.lastIndexOf('/'))}/academy-bound-worker-executor.cjs`
 const NODE = '/private/tmp/academy-release-sources-fa7/node'
-const EXPECTED_RECOVERY_SHA256 = '454b4b1be0c08033ae3562dca167d42ffe2d5903f3856d394232e095d31473a1'
+const EXPECTED_RECOVERY_SHA256 = '844d92b9734a18fac1d14c842c25c2ff814b2d7a5840a14690bab3ee517a3d41'
 const EXPECTED_POINTER_SHA256 = '7cac358f35e6446e314e5cc9f884c9770b3395dcf9394221d6f61c569385fcee'
-const EXPECTED_MANIFEST_SHA256 = '1fe1b055d517780cfac4c43d3e0bce0af455a0ba15b643cde0559e01287be35e'
+const EXPECTED_MANIFEST_SHA256 = '803f50c7f33ef22f9d199ee8b4e7dfe3810c33861999a8c2109880f62ab4eaec'
 const EXPECTED_EXECUTOR_SHA256 = 'd30d89ee73f514970b75314a4e11748b0b7d2ce67b931cac79b13c316e6405dd'
 const EXPECTED_NODE_SHA256 = '9bc64e922cba152eedf55cd4528ac0b5b7e0f4cd9d671d77bb0830c9796ea188'
 const fail = () => { throw new Error('ACADEMY_MACOS_ROOT_PREFLIGHT_REJECTED') }

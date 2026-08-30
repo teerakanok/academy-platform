@@ -150,7 +150,8 @@ async function walkAcademyReleaseTree(root, fs) {
   return { files, directories }
 }
 
-export async function verifyAcademyRelease({ root, fs = filesystem, processLike = process }) {
+export async function verifyAcademyRelease({ root, fs = filesystem, processLike = process,
+  acceptedRootModes = ACADEMY_RELEASE_DIRECTORY_MODES }) {
   if (typeof root !== 'string' || !root.startsWith('/') || root.includes('\0')) failAcademyRelease()
   const releaseRoot = resolve(root)
   const manifestPath = join(releaseRoot, ACADEMY_RELEASE_MANIFEST_NAME)
@@ -158,7 +159,8 @@ export async function verifyAcademyRelease({ root, fs = filesystem, processLike 
   if (await fs.realpath(releaseRoot) !== releaseRoot) failAcademyRelease()
   const releaseRootMetadata = await fs.lstat(releaseRoot)
   if (releaseRootMetadata.isSymbolicLink() || !releaseRootMetadata.isDirectory()
-    || !ACADEMY_RELEASE_DIRECTORY_MODES.includes(releaseRootMetadata.mode & 0o777)) failAcademyRelease()
+    || !Array.isArray(acceptedRootModes) || acceptedRootModes.length < 1
+    || !acceptedRootModes.includes(releaseRootMetadata.mode & 0o777)) failAcademyRelease()
   const { manifest, uid, gid } = validateAcademyReleaseManifest(await readAcademyReleaseJson(manifestPath, fs))
   const selfMetadata = await fs.lstat(manifestPath)
   if (selfMetadata.isSymbolicLink() || !selfMetadata.isFile() || selfMetadata.nlink !== 1

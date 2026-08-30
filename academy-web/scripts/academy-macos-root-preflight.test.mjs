@@ -167,11 +167,11 @@ test('real zsh error trap emits a bounded structured terminal receipt', async t 
   const end = worker.indexOf('\n}\n\nphase=OBSERVE_RELEASE', start) + 2
   assert.ok(start >= 0 && end > start)
   const trapFunction = worker.slice(start, end)
-  const result = spawnSync('/bin/zsh', ['-c', `stage=$1; phase=TEST_PHASE; publication=UNKNOWN; terminal_ready=true\n${trapFunction}\nfalse`, 'oracle', stage],
+  const result = spawnSync('/bin/zsh', ['-c', `stage=$1; phase=TEST_PHASE; publication=UNKNOWN; reason=UNCLASSIFIED; terminal_ready=true\n${trapFunction}\nfalse`, 'oracle', stage],
     { env:{ PATH:'' }, encoding:'utf8' })
   assert.equal(result.status, 1)
-  assert.equal(result.stderr, 'ACADEMY_SINGLE_PROMPT_PREFLIGHT_FAILED phase=TEST_PHASE publication=UNKNOWN\n')
+  assert.equal(result.stderr, 'ACADEMY_SINGLE_PROMPT_PREFLIGHT_FAILED phase=TEST_PHASE publication=UNKNOWN reason=UNCLASSIFIED\n')
   assert.deepEqual(JSON.parse(await readFile(join(stage, 'terminal.json'), 'utf8')), {
-    schema:'academy-macos-root-preflight-terminal/v1', status:'FAILED', phase:'TEST_PHASE', publication:'UNKNOWN',
+    schema:'academy-macos-root-preflight-terminal/v1', status:'FAILED', phase:'TEST_PHASE', publication:'UNKNOWN', reason:'UNCLASSIFIED',
   })
 })
