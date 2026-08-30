@@ -211,6 +211,59 @@ test('renderer records actual fstat gid from a setgid parent, not the process gi
   assert.ok(verified.manifest.directories.every(directory => directory.gid === parentGid))
 })
 
+test('wrangler source execute bits preserve native files and ordinary dependencies', async () => {
+  const env = await environment()
+  const nativeExecutable = Buffer.from('#!/fake/esbuild\n')
+  const executableData = Buffer.from('{"executable":"because-mode-says-so"}\n')
+  const ordinaryDependency = Buffer.from('// ordinary dependency\n')
+  const ordinaryNativeName = Buffer.from('// mode, not filename, controls rendering\n')
+  await env.fs.mkdir('/source/node_modules/@esbuild/darwin-arm64/bin', { recursive: true })
+  await env.fs.mkdir('/source/node_modules/fake-package', { recursive: true })
+  await env.fs.writeFileDirect(
+    '/source/node_modules/@esbuild/darwin-arm64/bin/esbuild', nativeExecutable, 0o755)
+  await env.fs.writeFileDirect(
+    '/source/node_modules/fake-package/native-data', executableData, 0o700)
+  await env.fs.writeFileDirect(
+    '/source/node_modules/@esbuild/darwin-arm64/package.json', ordinaryDependency, 0o644)
+  await env.fs.writeFileDirect(
+    '/source/node_modules/workerd', ordinaryNativeName, 0o644)
+
+  const { manifest, root } = await renderedSource(env, REVISION_A)
+  const nativePath = 'wrangler/node_modules/@esbuild/darwin-arm64/bin/esbuild'
+  assert.equal(manifest.entries.find(entry => entry.path === nativePath).mode, 0o555)
+  assert.equal(
+    manifest.entries.find(entry =>
+      entry.path === 'wrangler/node_modules/fake-package/native-data').mode, 0o555)
+  assert.equal(
+    manifest.entries.find(entry =>
+      entry.path === 'wrangler/node_modules/@esbuild/darwin-arm64/package.json').mode, 0o444)
+  assert.equal(
+    manifest.entries.find(entry =>
+      entry.path === 'wrangler/node_modules/workerd').mode, 0o444)
+  assert.equal((await env.fs.lstat(`${root}/${nativePath}`)).mode & 0o777, 0o555)
+  await verifyAcademyRelease({ root, fs: env.fs, processLike: env.processLike })
+
+  await installAcademyRelease({
+    sourceRoot: root,
+    installRoot: '/install',
+    expectedReleaseSha256: manifest.releaseSha256,
+    expectedReleaseRevision: manifest.releaseRevision,
+    now: NOW,
+    fs: env.fs,
+    processLike: env.processLike,
+  })
+  const installed = `/install/releases/${manifest.releaseSha256}`
+  await verifyAcademyRelease({ root: installed, fs: env.fs, processLike: env.processLike })
+  assert.equal((await env.fs.lstat(`${installed}/${nativePath}`)).mode & 0o777, 0o555)
+  assert.equal((await env.fs.lstat(`${installed}/wrangler/node_modules/workerd`)).mode & 0o777, 0o444)
+})
+
+test('renderer rejects a non-executable Wrangler entrypoint', async () => {
+  const env = await environment()
+  await env.fs.chmod('/source/node_modules/wrangler/bin/wrangler.js', 0o644)
+  await assert.rejects(renderedSource(env, REVISION_A))
+})
+
 test('renderer rejects a wrangler source with a symlink or empty inventory', async () => {
   const env = await environment()
   await env.fs.symlink('/source/node', '/source/node_modules/linked-node')

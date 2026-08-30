@@ -79,7 +79,8 @@ async function inventoryAcademyDirectory(sourceDirectory, fs) {
       if (metadata.isDirectory()) { await visit(full, prefix ? `${prefix}/${name}` : name); continue }
       if (!metadata.isFile()) failAcademyRelease()
       if (metadata.size > 512 * 1024 * 1024) failAcademyRelease()
-      files.push({ relative: prefix ? `${prefix}/${name}` : name, absolute: full })
+      files.push({ relative: prefix ? `${prefix}/${name}` : name, absolute: full,
+        sourceMode: metadata.mode & 0o777 })
     }
   }
   await visit(resolve(sourceDirectory), '')
@@ -215,9 +216,10 @@ export async function renderAcademyRelease({ spec, stagingRoot, fs = filesystem,
 
   const wranglerFiles = await inventoryAcademyDirectory(spec.wrangler.sourceDirectory, fs)
   const entrypointRelative = `${ACADEMY_RELEASE_WRANGLER_MODULE_ROOT}/${spec.wrangler.entrypoint}`
-  if (!wranglerFiles.some(file => file.relative === spec.wrangler.entrypoint)) failAcademyRelease()
+  const entrypoint = wranglerFiles.find(file => file.relative === spec.wrangler.entrypoint)
+  if (!entrypoint || !(entrypoint.sourceMode & 0o111)) failAcademyRelease()
   for (const file of wranglerFiles) {
-    const permissions = file.relative === spec.wrangler.entrypoint ? ACADEMY_RELEASE_EXECUTABLE_MODE : 0o444
+    const permissions = file.sourceMode & 0o111 ? ACADEMY_RELEASE_EXECUTABLE_MODE : 0o444
     await place(`${ACADEMY_RELEASE_WRANGLER_MODULE_ROOT}/${file.relative}`, file.absolute, permissions)
   }
 
