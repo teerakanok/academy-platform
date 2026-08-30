@@ -31,6 +31,8 @@ import {
 export const ACADEMY_RELEASE_NODE_PATH = 'node/bin/node'
 export const ACADEMY_RELEASE_WRANGLER_PREFIX = 'wrangler'
 export const ACADEMY_RELEASE_DIRECTORY_MODE = 0o555
+export const ACADEMY_RELEASE_APPLICATION_PREFIX = 'application'
+export const ACADEMY_RELEASE_APPLICATION_CONFIG = 'application/wrangler.jsonc'
 
 const fileMode = value => ACADEMY_RELEASE_FILE_MODES.includes(value) ? value : failAcademyRelease()
 
@@ -62,7 +64,7 @@ async function recordedFileMetadata(destination, fs) {
 
 // Exact reviewed inventory of the Wrangler distribution directory: deterministic
 // sorted walk, no symlinks, no special files, no empty directories.
-async function inventoryAcademyWranglerDirectory(sourceDirectory, fs) {
+async function inventoryAcademyDirectory(sourceDirectory, fs) {
   const files = []
   const visit = async (directory, prefix) => {
     const names = await fs.readdir(directory)
@@ -82,11 +84,97 @@ async function inventoryAcademyWranglerDirectory(sourceDirectory, fs) {
   return files.sort((left, right) => compareAcademyReleasePaths(left.relative, right.relative))
 }
 
+function parseAcademyApplicationConfig(source) {
+  let canonical = ''
+  let quotedBy = null
+  for (let index = 0; index < source.length; index += 1) {
+    const character = source[index]
+    if (quotedBy !== null) {
+      if (character === '\\') { canonical += source.slice(index, index + 2); index += 1; continue }
+      if (character === quotedBy) quotedBy = null
+      canonical += character
+      continue
+    }
+    if (character === '"' || character === "'") { quotedBy = character; canonical += character; continue }
+    if (character === '/' && source[index + 1] === '/') { while (index < source.length && source[index] !== '\n') index += 1; canonical += '\n'; continue }
+    if (character === '/' && source[index + 1] === '*') {
+      const end = source.indexOf('*/', index + 2)
+      if (end < 0) failAcademyRelease()
+      index = end + 1
+      continue
+    }
+    canonical += character
+  }
+  if (quotedBy !== null) failAcademyRelease()
+  try { return JSON.parse(canonical) } catch { return failAcademyRelease() }
+}
+
+function referencedAcademyModules(source) {
+  const modules = []
+  for (const pattern of [
+    /\bfrom\s*(['"])([^'"\n]+)\1/g,
+    /\bimport\s*\(\s*(['"])([^'"\n]+)\1\s*\)/g,
+    /\brequire\s*\(\s*(['"])([^'"\n]+)\1\s*\)/g,
+  ]) {
+    for (const match of source.matchAll(pattern)) modules.push(match[2])
+  }
+  return modules
+}
+
+function resolveAcademyApplicationModule(applicationPath, moduleSpecifier, applicationFiles) {
+  if (typeof moduleSpecifier !== 'string' || moduleSpecifier.startsWith('/')
+    || moduleSpecifier.startsWith('\\') || moduleSpecifier.includes('\\') || moduleSpecifier.includes('\0')) failAcademyRelease()
+  if (moduleSpecifier.startsWith('./') || moduleSpecifier.startsWith('../')) {
+    const segments = []
+    for (const segment of `${dirname(applicationPath)}/${moduleSpecifier}`.split('/')) {
+      if (segment === '' || segment === '.') continue
+      if (segment === '..') { if (segments.length === 0) failAcademyRelease(); segments.pop(); continue }
+      segments.push(segment)
+    }
+    const base = segments.join('/')
+    const suffixes = ['', '.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs',
+      '/index.ts', '/index.tsx', '/index.js', '/index.jsx', '/index.mjs', '/index.cjs']
+    const resolved = suffixes.map(suffix => `${base}${suffix}`).find(path => applicationFiles.has(path))
+    if (resolved === undefined) failAcademyRelease()
+    return resolved
+  }
+  const slash = moduleSpecifier.indexOf('/')
+  const packageName = moduleSpecifier.startsWith('@') && slash > 0
+    ? moduleSpecifier.slice(0, moduleSpecifier.indexOf('/', slash + 1))
+    : slash > 0 ? moduleSpecifier.slice(0, slash) : moduleSpecifier
+  return applicationFiles.has(`node_modules/${packageName}/package.json`) ? null : failAcademyRelease()
+}
+
+async function verifyAcademyApplicationTree(sourceDirectory, files, fs) {
+  const names = new Set(files.map(file => file.relative))
+  const configPath = 'wrangler.jsonc'
+  const config = names.has(configPath) ? parseAcademyApplicationConfig(
+    (await readAcademyReleaseSource(resolve(sourceDirectory, 'wrangler.jsonc'), fs)).toString('utf8')) : failAcademyRelease()
+  if (!config || typeof config !== 'object' || Array.isArray(config)
+    || !isAcademyReleasePath(config.main) || config.main.includes('..')
+    || typeof config.assets?.directory !== 'string' || !isAcademyReleasePath(config.assets.directory)
+    || config.assets.directory.includes('..')) failAcademyRelease()
+  const main = config.main
+  const assets = config.assets.directory
+  if (!names.has(main) || ![...names].some(path => path.startsWith(`${assets}/`))) failAcademyRelease()
+  const visited = new Set([main])
+  for (const path of visited) {
+    const file = files.find(item => item.relative === path)
+    if (!file || !/\.(?:cts|cjs|js|mjs|mts|jsx|ts|tsx)$/.test(path)) continue
+    const source = (await readAcademyReleaseSource(file.absolute, fs)).toString('utf8')
+    for (const moduleSpecifier of referencedAcademyModules(source)) {
+      const modulePath = resolveAcademyApplicationModule(path, moduleSpecifier, names)
+      if (modulePath !== null) visited.add(modulePath)
+    }
+  }
+}
+
 export async function renderAcademyRelease({ spec, stagingRoot, fs = filesystem, processLike = process }) {
-  if (!exact(spec, ['releaseRevision','node','wrangler','helpers'])
+  if (!exact(spec, ['releaseRevision','node','wrangler','application','helpers'])
     || !/^[a-f0-9]{40}$/.test(spec.releaseRevision)
     || !exact(spec.node, ['sourcePath'])
     || !exact(spec.wrangler, ['sourceDirectory','entrypoint'])
+    || !exact(spec.application, ['sourceDirectory'])
     || !Array.isArray(spec.helpers) || spec.helpers.length < 1
     || spec.helpers.some(helper => !exact(helper, ['sourcePath','path','mode']))) failAcademyRelease()
   if (!isAcademyReleasePath(spec.wrangler.entrypoint) || spec.wrangler.entrypoint.includes('..')) failAcademyRelease()
@@ -114,7 +202,13 @@ export async function renderAcademyRelease({ spec, stagingRoot, fs = filesystem,
 
   await place(ACADEMY_RELEASE_NODE_PATH, spec.node.sourcePath, ACADEMY_RELEASE_EXECUTABLE_MODE)
 
-  const wranglerFiles = await inventoryAcademyWranglerDirectory(spec.wrangler.sourceDirectory, fs)
+  const applicationFiles = await inventoryAcademyDirectory(spec.application.sourceDirectory, fs)
+  await verifyAcademyApplicationTree(spec.application.sourceDirectory, applicationFiles, fs)
+  for (const file of applicationFiles) {
+    await place(`${ACADEMY_RELEASE_APPLICATION_PREFIX}/${file.relative}`, file.absolute, 0o444)
+  }
+
+  const wranglerFiles = await inventoryAcademyDirectory(spec.wrangler.sourceDirectory, fs)
   const entrypointRelative = `${ACADEMY_RELEASE_WRANGLER_PREFIX}/${spec.wrangler.entrypoint}`
   if (!wranglerFiles.some(file => file.relative === spec.wrangler.entrypoint)) failAcademyRelease()
   for (const file of wranglerFiles) {

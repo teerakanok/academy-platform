@@ -11,8 +11,7 @@ import { renderAcademyRelease } from './academy-release-render.mjs'
 
 const SHA256 = /^[a-f0-9]{64}$/
 const REVISION = /^[a-f0-9]{40}$/
-const PACKAGE_SCHEMA = 'academy-release-package-input/v1'
-const REQUIRED_APPLICATION_FILES = Object.freeze(['application/worker.js','application/wrangler.jsonc'])
+const PACKAGE_SCHEMA = 'academy-release-package-input/v2'
 
 async function protectedJson(path, fs, processLike) {
   if (typeof path !== 'string' || resolve(path) !== path) failAcademyRelease()
@@ -48,24 +47,23 @@ async function verifyReviewedSource(path, type, fs, processLike) {
 
 export async function readAcademyReleasePackageInput({ path, fs = filesystem, processLike = process }) {
   const value = await protectedJson(path, fs, processLike)
-  if (!exact(value, ['schema','releaseRevision','nodeSource','wranglerDirectory','wranglerEntrypoint','helpers'])
+  if (!exact(value, ['schema','releaseRevision','nodeSource','wranglerDirectory','wranglerEntrypoint','applicationDirectory','helpers'])
     || value.schema !== PACKAGE_SCHEMA || !REVISION.test(value.releaseRevision)
     || typeof value.nodeSource !== 'string' || typeof value.wranglerDirectory !== 'string'
-    || typeof value.wranglerEntrypoint !== 'string' || !Array.isArray(value.helpers) || value.helpers.length < 1
+    || typeof value.wranglerEntrypoint !== 'string' || typeof value.applicationDirectory !== 'string'
+    || !Array.isArray(value.helpers) || value.helpers.length < 1
     || value.helpers.some(helper => !exact(helper, ['sourcePath','path','mode'])
       || typeof helper.sourcePath !== 'string' || typeof helper.path !== 'string'
       || ![0o400,0o444,0o500,0o555].includes(helper.mode))) failAcademyRelease()
   if (new Set(value.helpers.map(helper => helper.path)).size !== value.helpers.length
     || new Set(value.helpers.map(helper => helper.sourcePath)).size !== value.helpers.length) failAcademyRelease()
-  for (const path of REQUIRED_APPLICATION_FILES) {
-    const file = value.helpers.find(helper => helper.path === path)
-    if (!file || file.mode !== 0o444) failAcademyRelease()
-  }
   await verifyReviewedSource(value.nodeSource, 'file', fs, processLike)
   await verifyReviewedSource(value.wranglerDirectory, 'directory', fs, processLike)
+  await verifyReviewedSource(value.applicationDirectory, 'directory', fs, processLike)
   for (const helper of value.helpers) await verifyReviewedSource(helper.sourcePath, 'file', fs, processLike)
   return Object.freeze({ releaseRevision: value.releaseRevision, node: { sourcePath: value.nodeSource },
     wrangler: { sourceDirectory: value.wranglerDirectory, entrypoint: value.wranglerEntrypoint },
+    application: { sourceDirectory: value.applicationDirectory },
     helpers: value.helpers.map(helper => ({ ...helper })) })
 }
 

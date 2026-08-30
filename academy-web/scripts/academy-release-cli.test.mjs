@@ -19,17 +19,23 @@ async function fixture(t) {
   await writeFile(join(sources, 'wrangler', 'bin', 'wrangler'), '#!/usr/bin/env node\n', { mode: 0o500 })
   await writeFile(join(sources, 'wrangler', 'package.json'), '{}\n', { mode: 0o400 })
   await writeFile(join(sources, 'helper.mjs'), 'export {}\n', { mode: 0o400 })
-  await writeFile(join(sources, 'worker.js'), '// immutable worker bundle\n', { mode: 0o400 })
-  await writeFile(join(sources, 'wrangler.jsonc'), '{"main":"worker.js"}\n', { mode: 0o400 })
+  await mkdir(join(sources, 'application', '.open-next', 'assets'), { recursive: true, mode: 0o700 })
+  await writeFile(join(sources, 'application', 'worker.js'), 'import "./chunk.js"\nexport { handler } from "./chunk.js"\n', { mode: 0o400 })
+  await writeFile(join(sources, 'application', 'chunk.js'), 'export const handler = () => "academy"\n', { mode: 0o400 })
+  await writeFile(join(sources, 'application', 'wrangler.jsonc'),
+    '{"main":"worker.js","assets":{"directory":".open-next/assets","binding":"ASSETS"}}\n', { mode: 0o400 })
+  await writeFile(join(sources, 'application', '.open-next', 'assets', 'asset.svg'), '<svg/>\n', { mode: 0o400 })
+  await chmod(join(sources, 'application', '.open-next', 'assets'), 0o500)
+  await chmod(join(sources, 'application', '.open-next'), 0o500)
+  await chmod(join(sources, 'application'), 0o500)
   await chmod(join(sources, 'wrangler', 'bin'), 0o500)
   await chmod(join(sources, 'wrangler'), 0o500)
   await chmod(sources, 0o500)
   const packagePath = join(root, 'package.json')
-  const packageInput = { schema:'academy-release-package-input/v1', releaseRevision:REVISION,
+  const packageInput = { schema:'academy-release-package-input/v2', releaseRevision:REVISION,
     nodeSource:join(sources,'node'), wranglerDirectory:join(sources,'wrangler'), wranglerEntrypoint:'bin/wrangler',
-    helpers:[{sourcePath:join(sources,'helper.mjs'),path:'helpers/helper.mjs',mode:0o400},
-      {sourcePath:join(sources,'worker.js'),path:'application/worker.js',mode:0o444},
-      {sourcePath:join(sources,'wrangler.jsonc'),path:'application/wrangler.jsonc',mode:0o444}] }
+    applicationDirectory:join(sources,'application'),
+    helpers:[{sourcePath:join(sources,'helper.mjs'),path:'helpers/helper.mjs',mode:0o400}] }
   await writeFile(packagePath, `${JSON.stringify(packageInput)}\n`, { mode: 0o600 })
   return { root, packagePath }
 }
@@ -69,7 +75,7 @@ test('CLI rejects digest drift, noncanonical package JSON, writable sources and 
   await assert.rejects(run(['render', value.packagePath, join(value.root, 'bad-json')]))
   await writeFile(value.packagePath, canonical, { mode: 0o600 })
   const missingApplication = JSON.parse(canonical)
-  missingApplication.helpers = missingApplication.helpers.filter(helper => helper.path !== 'application/worker.js')
+  delete missingApplication.applicationDirectory
   await writeFile(value.packagePath, `${JSON.stringify(missingApplication)}\n`, { mode: 0o600 })
   await assert.rejects(run(['render', value.packagePath, join(value.root, 'missing-application')]))
   await writeFile(value.packagePath, canonical, { mode: 0o600 })

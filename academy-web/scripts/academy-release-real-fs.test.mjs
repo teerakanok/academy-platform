@@ -8,7 +8,7 @@ import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
 import { chmod, mkdir, mkdtemp, readFile, realpath, rm, stat, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import test from 'node:test'
 
 import { renderAcademyRelease } from './academy-release-render.mjs'
@@ -44,6 +44,27 @@ const WRANGLER_FIXTURE = [
   '',
 ].join('\n')
 
+const WRANGLER_DRY_RUN_FIXTURE = [
+  "import { existsSync, readFileSync, readdirSync } from 'node:fs'",
+  "import { dirname, join } from 'node:path'",
+  "const args = process.argv.slice(2)",
+  `if (args.includes('--version')) { console.log('${WRANGLER_VERSION}'); process.exit(0) }`,
+  "if (args[0] !== 'versions' || args[1] !== 'upload' || !args.includes('--dry-run')) throw new Error('non-dry-run')",
+  "if (args[2] !== '--config') throw new Error('entrypoint must come from config')",
+  "const config = JSON.parse(readFileSync(args[args.indexOf('--config') + 1], 'utf8'))",
+  "const applicationRoot = dirname(args[args.indexOf('--config') + 1])",
+  "const entrypoint = join(applicationRoot, config.main)",
+  "const source = readFileSync(entrypoint, 'utf8')",
+  "for (const match of source.matchAll(/from\\s*['\"]([^'\"]+)['\"]/g)) {",
+  "  if (!match[1].startsWith('./')) throw new Error(`unbundled import: ${match[1]}`)",
+  "  const imported = join(applicationRoot, config.main, '..', match[1])",
+  "  if (!existsSync(imported)) throw new Error(`missing import: ${match[1]}`)",
+  '}',
+  "const assets = join(applicationRoot, config.assets.directory)",
+  "if (!existsSync(assets) || readdirSync(assets).length === 0) throw new Error('missing assets')",
+  "console.log('dry-run ok')",
+].join('\n')
+
 async function tempRoot(t) {
   const raw = await mkdtemp(join(tmpdir(), 'academy-release-real-'))
   const root = await realpath(raw)
@@ -60,16 +81,19 @@ async function materialize(root, revision, { wranglerBody = WRANGLER_FIXTURE } =
   await writeFile(join(sources, 'wrangler', 'bin', 'wrangler.js'), wranglerBody, { mode: 0o644 })
   await writeFile(join(sources, 'wrangler', 'package.json'), JSON.stringify({ name: 'wrangler-fixture', version: WRANGLER_VERSION }), { mode: 0o644 })
   await writeFile(join(sources, 'helper.mjs'), '// helper source\n', { mode: 0o500 })
-  await writeFile(join(sources, 'worker.js'), '// immutable worker bundle\n', { mode: 0o444 })
-  await writeFile(join(sources, 'wrangler.jsonc'), '{"main":"worker.js"}\n', { mode: 0o444 })
+  await mkdir(join(sources, 'application', '.open-next', 'assets'), { recursive: true, mode: 0o755 })
+  await writeFile(join(sources, 'application', 'worker.js'), 'import "./chunk.js"\nexport { handler } from "./chunk.js"\n', { mode: 0o444 })
+  await writeFile(join(sources, 'application', 'chunk.js'), 'export const handler = () => "academy"\n', { mode: 0o444 })
+  await writeFile(join(sources, 'application', 'wrangler.jsonc'),
+    '{"main":"worker.js","assets":{"directory":".open-next/assets","binding":"ASSETS"}}\n', { mode: 0o444 })
+  await writeFile(join(sources, 'application', '.open-next', 'assets', 'asset.svg'), '<svg/>\n', { mode: 0o444 })
   const { root: staged, manifest } = await renderAcademyRelease({ spec: {
     releaseRevision: revision,
     node: { sourcePath: process.execPath },
     wrangler: { sourceDirectory: join(sources, 'wrangler'), entrypoint: 'bin/wrangler.js' },
+    application: { sourceDirectory: join(sources, 'application') },
     helpers: [
       { sourcePath: join(sources, 'helper.mjs'), path: 'helpers/academy-production-cloudflare-helper.mjs', mode: 0o500 },
-      { sourcePath: join(sources, 'worker.js'), path: 'application/worker.js', mode: 0o444 },
-      { sourcePath: join(sources, 'wrangler.jsonc'), path: 'application/wrangler.jsonc', mode: 0o444 },
     ],
   }, stagingRoot: join(root, 'staging', revision) })
   return { staged, manifest }
@@ -167,6 +191,20 @@ test('real directory drift: writable release directories are rejected until repa
   await verifyAcademyRelease({ root: target })
 })
 
+test('canonical application passes dry-run from an unrelated cwd', async t => {
+  const root = await tempRoot(t)
+  const source = await materialize(root, REVISION_A, { wranglerBody: WRANGLER_DRY_RUN_FIXTURE })
+  await install(root, source)
+  const { release } = await resolveAcademyCurrentRelease({ installRoot: join(root, 'install') })
+  const config = join(release.root, 'application', 'wrangler.jsonc')
+  const work = join(root, 'unrelated-work')
+  await mkdir(work, { mode: 0o700 })
+  const dryRun = spawnSync(release.nodeExecutable, [release.wranglerEntrypoint,
+    'versions', 'upload', '--config', config, '--dry-run'], { cwd: work, encoding: 'utf8' })
+  assert.equal(dryRun.status, 0, dryRun.stderr)
+  assert.equal(dryRun.stdout.trim(), 'dry-run ok')
+})
+
 test('real setgid parent: recorded gid follows the actual fstat, not the process gid', async t => {
   if (process.getuid() !== 0) {
     t.skip('creating a setgid directory requires root (live POSIX input)')
@@ -180,6 +218,7 @@ test('real setgid parent: recorded gid follows the actual fstat, not the process
     releaseRevision: REVISION_A,
     node: { sourcePath: process.execPath },
     wrangler: { sourceDirectory: join(root, 'sources', REVISION_A, 'wrangler'), entrypoint: 'bin/wrangler.js' },
+    application: { sourceDirectory: join(root, 'sources', REVISION_A, 'application') },
     helpers: [{ sourcePath: join(root, 'sources', REVISION_A, 'helper.mjs'), path: 'helpers/h.mjs', mode: 0o500 }],
   }, stagingRoot: join(setgidRoot, 'release') })
   const release = await verifyAcademyRelease({ root: join(setgidRoot, 'release') })

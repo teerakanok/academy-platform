@@ -18,6 +18,10 @@ const NODE = Buffer.from('#!/fake/node\nconst {} = require("node")\n')
 const WRANGLER_ENTRY = Buffer.from('#!/fake/wrangler entrypoint\n')
 const WRANGLER_DEP = Buffer.from('// deterministic runtime dependency\n')
 const HELPER = Buffer.from('// academy production helper source\n')
+const APPLICATION_ENTRY = Buffer.from('import "./chunk.js"\nexport { handler } from "./chunk.js"\n')
+const APPLICATION_CHUNK = Buffer.from('export const handler = () => "academy"\n')
+const APPLICATION_CONFIG = Buffer.from('{"main":"worker.js","assets":{"directory":".open-next/assets","binding":"ASSETS"}}\n')
+const APPLICATION_ASSET = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"/>\n')
 const NOW = new Date('2026-08-29T10:00:00.000Z')
 
 async function environment() {
@@ -27,6 +31,11 @@ async function environment() {
   await env.fs.writeFileDirect('/source/wrangler/bin/wrangler', WRANGLER_ENTRY, 0o755)
   await env.fs.writeFileDirect('/source/wrangler/package.json', WRANGLER_DEP, 0o644)
   await env.fs.writeFileDirect('/source/helper.mjs', HELPER, 0o500)
+  await env.fs.mkdir('/source/application/.open-next/assets', { recursive: true })
+  await env.fs.writeFileDirect('/source/application/worker.js', APPLICATION_ENTRY, 0o444)
+  await env.fs.writeFileDirect('/source/application/chunk.js', APPLICATION_CHUNK, 0o444)
+  await env.fs.writeFileDirect('/source/application/wrangler.jsonc', APPLICATION_CONFIG, 0o444)
+  await env.fs.writeFileDirect('/source/application/.open-next/assets/asset.svg', APPLICATION_ASSET, 0o444)
   await env.fs.mkdir('/install', { mode: 0o755, recursive: true })
   return env
 }
@@ -35,6 +44,7 @@ const spec = revision => ({
   releaseRevision: revision,
   node: { sourcePath: '/source/node' },
   wrangler: { sourceDirectory: '/source/wrangler', entrypoint: 'bin/wrangler' },
+  application: { sourceDirectory: '/source/application' },
   helpers: [{ sourcePath: '/source/helper.mjs', path: 'helpers/academy-production-cloudflare-helper.mjs', mode: 0o500 }],
 })
 
@@ -56,10 +66,13 @@ test('renderer emits a canonical sorted manifest with directories and pinned exe
   assert.equal(manifest.executables.wrangler, 'wrangler/bin/wrangler')
   assert.deepEqual(manifest.helpers, ['helpers/academy-production-cloudflare-helper.mjs'])
   assert.deepEqual(manifest.entries.map(entry => entry.path),
-    ['helpers/academy-production-cloudflare-helper.mjs', 'node/bin/node',
+    ['application/.open-next/assets/asset.svg', 'application/chunk.js',
+      'application/worker.js', 'application/wrangler.jsonc',
+      'helpers/academy-production-cloudflare-helper.mjs', 'node/bin/node',
       'wrangler/bin/wrangler', 'wrangler/package.json'])
   assert.deepEqual(manifest.directories.map(directory => directory.path),
-    ['helpers', 'node', 'node/bin', 'wrangler', 'wrangler/bin'])
+    ['application', 'application/.open-next', 'application/.open-next/assets', 'helpers',
+      'node', 'node/bin', 'wrangler', 'wrangler/bin'])
   assert.ok(manifest.directories.every(directory => directory.mode === 0o555
     && directory.uid === env.fs.uid && directory.gid === env.fs.gid))
   assert.ok(manifest.entries.every(entry => entry.nlink === 1 && entry.uid === env.fs.uid && entry.gid === env.fs.gid))
@@ -70,12 +83,31 @@ test('renderer emits a canonical sorted manifest with directories and pinned exe
   await verifyAcademyRelease({ root: `/staging/${REVISION_A}`, fs: env.fs, processLike: env.processLike })
 })
 
+test('renderer fails closed without canonical entrypoint, imports or assets', async () => {
+  const env = await environment()
+  const render = () => renderedSource(env, REVISION_A)
+  await env.fs.rm('/source/application/chunk.js')
+  await assert.rejects(render)
+  await env.fs.writeFileDirect('/source/application/chunk.js', APPLICATION_CHUNK, 0o444)
+  await env.fs.rm('/source/application/.open-next/assets/asset.svg')
+  await assert.rejects(render)
+  await env.fs.writeFileDirect('/source/application/.open-next/assets/asset.svg', APPLICATION_ASSET, 0o444)
+  await env.fs.writeFileDirect('/source/application/wrangler.jsonc',
+    Buffer.from('{"main":"missing.js","assets":{"directory":".open-next/assets","binding":"ASSETS"}}\n'), 0o444)
+  await assert.rejects(render)
+})
+
 test('renderer records actual fstat gid from a setgid parent, not the process gid', async () => {
   const env = createAcademyReleaseFakeFilesystem({ uid: 1000, gid: 1000 })
   await env.fs.mkdir('/setgid-source/wrangler/bin', { mode: 0o2755, recursive: true })
   await env.fs.writeFileDirect('/setgid-source/node', NODE, 0o755)
   await env.fs.writeFileDirect('/setgid-source/wrangler/bin/wrangler', WRANGLER_ENTRY, 0o755)
   await env.fs.writeFileDirect('/setgid-source/helper.mjs', HELPER, 0o500)
+  await env.fs.mkdir('/setgid-source/application/.open-next/assets', { recursive: true })
+  await env.fs.writeFileDirect('/setgid-source/application/worker.js', APPLICATION_ENTRY, 0o444)
+  await env.fs.writeFileDirect('/setgid-source/application/chunk.js', APPLICATION_CHUNK, 0o444)
+  await env.fs.writeFileDirect('/setgid-source/application/wrangler.jsonc', APPLICATION_CONFIG, 0o444)
+  await env.fs.writeFileDirect('/setgid-source/application/.open-next/assets/asset.svg', APPLICATION_ASSET, 0o444)
   await env.fs.mkdir('/setgid-staging', { mode: 0o755, recursive: true })
   await env.fs.chown('/setgid-staging', 1000, 2000)
   await env.fs.chmod('/setgid-staging', 0o2755)
@@ -83,6 +115,7 @@ test('renderer records actual fstat gid from a setgid parent, not the process gi
     releaseRevision: REVISION_A,
     node: { sourcePath: '/setgid-source/node' },
     wrangler: { sourceDirectory: '/setgid-source/wrangler', entrypoint: 'bin/wrangler' },
+    application: { sourceDirectory: '/setgid-source/application' },
     helpers: [{ sourcePath: '/setgid-source/helper.mjs', path: 'helpers/helper.mjs', mode: 0o500 }],
   }, stagingRoot: '/setgid-staging/release', fs: env.fs, processLike: env.processLike })
   // The setgid staging parent assigns its gid to every newly created inode.
@@ -102,9 +135,15 @@ test('renderer rejects a wrangler source with a symlink or empty inventory', asy
   await env.fs.mkdir('/source-empty/wrangler', { recursive: true })
   await env.fs.writeFileDirect('/source-empty/node', NODE, 0o755)
   await env.fs.writeFileDirect('/source-empty/helper.mjs', HELPER, 0o500)
+  await env.fs.mkdir('/source-empty/application/.open-next/assets', { recursive: true })
+  await env.fs.writeFileDirect('/source-empty/application/worker.js', APPLICATION_ENTRY, 0o444)
+  await env.fs.writeFileDirect('/source-empty/application/chunk.js', APPLICATION_CHUNK, 0o444)
+  await env.fs.writeFileDirect('/source-empty/application/wrangler.jsonc', APPLICATION_CONFIG, 0o444)
+  await env.fs.writeFileDirect('/source-empty/application/.open-next/assets/asset.svg', APPLICATION_ASSET, 0o444)
   await assert.rejects(renderAcademyRelease({ spec: {
     releaseRevision: REVISION_A, node: { sourcePath: '/source-empty/node' },
     wrangler: { sourceDirectory: '/source-empty/wrangler', entrypoint: 'bin/wrangler' },
+    application: { sourceDirectory: '/source-empty/application' },
     helpers: [{ sourcePath: '/source-empty/helper.mjs', path: 'helpers/helper.mjs', mode: 0o500 }],
   }, stagingRoot: '/staging-empty', fs: env.fs, processLike: env.processLike }))
 })

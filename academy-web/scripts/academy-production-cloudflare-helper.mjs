@@ -15,10 +15,10 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-
 const ISO_SECOND = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/
 const WORKER = 'cyberskills-academy'
 const WRANGLER_VERSION = '4.120.0'
-const APPLICATION_ENTRY = 'application/worker.js'
 const APPLICATION_CONFIG = 'application/wrangler.jsonc'
 const DEFAULT_WORK_ROOT = '/private/var/lib/academy/wrangler'
-const CONFIG_NAMES = ['IDENTITY_ADAPTER','IDENTITY_RUNTIME_ENABLED','IDENTITY_RUNTIME_WIRED','IDENTITY_RELEASE_APPROVAL','IDENTITY_CODE_EXCHANGE_TIMEOUT_MS','IDENTITY_CLIENT_ASSERTION_KEY_ID','IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK','IDENTITY_RESULT_KEY_SET_DOCUMENT']
+const IDENTITY_CONFIG_NAMES = ['IDENTITY_ADAPTER','IDENTITY_RUNTIME_ENABLED','IDENTITY_RUNTIME_WIRED','IDENTITY_RELEASE_APPROVAL','IDENTITY_CODE_EXCHANGE_TIMEOUT_MS','IDENTITY_CLIENT_ASSERTION_KEY_ID','IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK','IDENTITY_RESULT_KEY_SET_DOCUMENT']
+const CONFIG_NAMES = [...IDENTITY_CONFIG_NAMES,'ASSETS','COURSE_MEDIA','EDGE_RATE_LIMITER','NEXT_PUBLIC_SEARCH_INDEXING']
 const CONFIG_SHA = createHash('sha256').update(`${JSON.stringify(CONFIG_NAMES)}\n`).digest('hex')
 // Fixed installed-release root; the live release is resolved exclusively
 // through the protected current pointer (never a symlink) to
@@ -182,8 +182,7 @@ export async function executeAcademyCloudflareHelper(args, options = {}) {
       fs: options.fs, processLike: options.processLike,
     })).release
     if (release.manifest.releaseRevision !== values['--release']) fail()
-    const releasePaths = new Set(release.manifest.entries?.map(entry => entry.path))
-    if (!releasePaths.has(APPLICATION_ENTRY) || !releasePaths.has(APPLICATION_CONFIG)) fail()
+    if (!release.manifest.entries?.some(entry => entry.path === APPLICATION_CONFIG)) fail()
     const workRoot = options.workRoot ?? DEFAULT_WORK_ROOT
     const runtimeFs = options.fs ?? { realpath, stat }
     if (await runtimeFs.realpath(workRoot) !== workRoot) fail()
@@ -203,12 +202,12 @@ export async function executeAcademyCloudflareHelper(args, options = {}) {
     })
     const invoke = (args, extra = {}) => runner({ executable: release.nodeExecutable,
       args: [release.wranglerEntrypoint, ...args], cwd: workRoot, deadlineMs: validUntilMs, clock, verify: revalidate, ...extra })
+    await revalidate()
     return Object.assign(() => invoke(['deployments','list','--name',WORKER,'--json']), { invoke,
-      applicationEntry:`${release.root}/${APPLICATION_ENTRY}`, applicationConfig:`${release.root}/${APPLICATION_CONFIG}` })
+      applicationConfig:`${release.root}/${APPLICATION_CONFIG}` })
   }
   const run = await resolveRun()
   const invoke = run.invoke ?? (async (args, extra) => options.run(args, extra))
-  const applicationEntry = run.applicationEntry ?? '/injected/application/worker.js'
   const applicationConfig = run.applicationConfig ?? '/injected/application/wrangler.jsonc'
   const source = await run()
   const current = currentFrom(source)
@@ -230,7 +229,7 @@ export async function executeAcademyCloudflareHelper(args, options = {}) {
     const tag = `release-${values['--source'].slice(0,12)}`; const message = `s=${values['--source'].slice(0,12)};c=${CONFIG_SHA.slice(0,12)}`
     const before = versionsFrom(await invoke(['versions','list','--name',WORKER,'--json']))
     if ((await invoke(['--version'])).trim() !== WRANGLER_VERSION) fail()
-    await invoke(['versions','upload',applicationEntry,'--config',applicationConfig,
+    await invoke(['versions','upload','--config',applicationConfig,
       '--name',WORKER,'--tag',tag,'--message',message,'--keep-vars','--strict','--install-skills=false'])
     const after = versionsFrom(await invoke(['versions','list','--name',WORKER,'--json']))
     const prior = new Set(before.map(item => item.id)); const added = after.filter(item => !prior.has(item.id))

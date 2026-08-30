@@ -12,7 +12,7 @@ import { installAcademyRelease } from './academy-release-install.mjs'
 
 const D = 'a'.repeat(64)
 const R = 'b'.repeat(40)
-const CONFIG_NAMES = ['IDENTITY_ADAPTER','IDENTITY_RUNTIME_ENABLED','IDENTITY_RUNTIME_WIRED','IDENTITY_RELEASE_APPROVAL','IDENTITY_CODE_EXCHANGE_TIMEOUT_MS','IDENTITY_CLIENT_ASSERTION_KEY_ID','IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK','IDENTITY_RESULT_KEY_SET_DOCUMENT']
+const CONFIG_NAMES = ['IDENTITY_ADAPTER','IDENTITY_RUNTIME_ENABLED','IDENTITY_RUNTIME_WIRED','IDENTITY_RELEASE_APPROVAL','IDENTITY_CODE_EXCHANGE_TIMEOUT_MS','IDENTITY_CLIENT_ASSERTION_KEY_ID','IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK','IDENTITY_RESULT_KEY_SET_DOCUMENT','ASSETS','COURSE_MEDIA','EDGE_RATE_LIMITER','NEXT_PUBLIC_SEARCH_INDEXING']
 const deployment = '11111111-1111-4111-8111-111111111111'
 const version = '22222222-2222-4222-8222-222222222222'
 const common = ['--authority','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','--release',R,'--readiness',D,'--valid-until','2026-08-29T12:00:00Z']
@@ -145,19 +145,19 @@ async function pinnedReleaseEnvironment(tamper, includeApplication = true) {
   await env.fs.writeFileDirect('/source/wrangler/bin/wrangler', Buffer.from('// wrangler entrypoint\n'), 0o755)
   await env.fs.writeFileDirect('/source/wrangler/package.json', Buffer.from('{}'), 0o644)
   await env.fs.writeFileDirect('/source/helper.mjs', Buffer.from('// helper source\n'), 0o500)
-  await env.fs.writeFileDirect('/source/worker.js', Buffer.from('// immutable worker bundle\n'), 0o444)
-  await env.fs.writeFileDirect('/source/wrangler.jsonc', Buffer.from('{"main":"worker.js"}\n'), 0o444)
-  const applicationHelpers = includeApplication ? [
-    { sourcePath: '/source/worker.js', path: 'application/worker.js', mode: 0o444 },
-    { sourcePath: '/source/wrangler.jsonc', path: 'application/wrangler.jsonc', mode: 0o444 },
-  ] : []
+  await env.fs.mkdir('/source/application/.open-next/assets', { recursive: true })
+  await env.fs.writeFileDirect('/source/application/worker.js', Buffer.from('import "./chunk.js"\nexport { handler } from "./chunk.js"\n'), 0o444)
+  await env.fs.writeFileDirect('/source/application/chunk.js', Buffer.from('export const handler = () => "academy"\n'), 0o444)
+  await env.fs.writeFileDirect('/source/application/wrangler.jsonc',
+    Buffer.from('{"main":"worker.js","assets":{"directory":".open-next/assets","binding":"ASSETS"}}\n'), 0o444)
+  await env.fs.writeFileDirect('/source/application/.open-next/assets/asset.svg', Buffer.from('<svg/>\n'), 0o444)
   const { root, manifest } = await renderAcademyRelease({ spec: {
     releaseRevision: R,
     node: { sourcePath: '/source/node' },
     wrangler: { sourceDirectory: '/source/wrangler', entrypoint: 'bin/wrangler' },
+    application: { sourceDirectory: '/source/application' },
     helpers: [
       { sourcePath: '/source/helper.mjs', path: 'helpers/academy-production-cloudflare-helper.mjs', mode: 0o500 },
-      ...applicationHelpers,
     ],
   }, stagingRoot: '/staging/release', fs: env.fs, processLike: env.processLike })
   await env.fs.mkdir('/opt/academy', { mode: 0o755, recursive: true })
@@ -177,7 +177,7 @@ const versionInventory = (id, tag = '', message = '') => JSON.stringify([{ id, m
 
 test('candidate upload pins Wrangler and verifies exact provider annotations at zero traffic', async () => {
   const tag = `release-${R.slice(0,12)}`
-  const config = 'd804036979c67055505c31f26fa78fcaed34a226d48d62d2329d598cf0d48e2c'
+  const config = 'd901061aa65ea867e0cc505a1eca044204a04a5b75b16bba46edca0723baa8c8'
   const message = `s=${R.slice(0,12)};c=${config.slice(0,12)}`
   const calls = []
   const run = async args => {
@@ -202,7 +202,7 @@ test('live upload requires release-bound worker and config and uses a separate w
   const { env, root } = await pinnedReleaseEnvironment()
   const calls = []
   const tag = `release-${R.slice(0,12)}`
-  const message = 's=bbbbbbbbbbbb;c=d804036979c6'
+  const message = 's=bbbbbbbbbbbb;c=d901061aa65e'
   let lists = 0
   const runWrangler = async invocation => {
     calls.push(invocation)
@@ -220,12 +220,15 @@ test('live upload requires release-bound worker and config and uses a separate w
   assert.equal(value.versionId,candidate)
   const upload = calls.find(call=>call.args.includes('upload'))
   assert.equal(upload.cwd,'/private/var/lib/academy/wrangler')
-  assert.ok(upload.args.includes(`${root}/application/worker.js`))
+  assert.equal(upload.args.includes(`${root}/application/worker.js`), false)
   assert.ok(upload.args.includes(`${root}/application/wrangler.jsonc`))
 
   const missing = await pinnedReleaseEnvironment(undefined,false)
   let providerCalls=0
-  await assert.rejects(executeAcademyCloudflareHelper(inspectArgs,{...pinnedOptions,fs:missing.env.fs,processLike:missing.env.processLike,installRoot:'/opt/academy',runWrangler:async()=>{providerCalls+=1}}))
+  await assert.rejects(executeAcademyCloudflareHelper(inspectArgs,{...pinnedOptions,
+    release:{root:missing.root,nodeExecutable:missing.env.fs.readNode('/source/node') ? '/source/node' : '/source/node',
+      wranglerEntrypoint:'/source/wrangler/bin/wrangler',manifest:{releaseRevision:R,entries:[]}},
+    workRoot:'/private/var/lib/academy/wrangler',runWrangler:async()=>{providerCalls+=1}}))
   assert.equal(providerCalls,0)
 })
 
@@ -343,6 +346,7 @@ test('pre-spawn revalidation rejects a pointer switch even when the revision is 
     releaseRevision: R,
     node: { sourcePath: '/source/node' },
     wrangler: { sourceDirectory: '/source/wrangler', entrypoint: 'bin/wrangler' },
+    application: { sourceDirectory: '/source/application' },
     helpers: [{ sourcePath: '/source/helper.mjs', path: 'helpers/academy-production-cloudflare-helper.mjs', mode: 0o500 }],
   }, stagingRoot: '/staging/replacement', fs: env.fs, processLike: env.processLike })
   await installAcademyRelease({ sourceRoot: replacement.root, installRoot: '/opt/academy',
@@ -396,7 +400,7 @@ else process.exit(2)
   const helperUrl = new URL('./academy-production-cloudflare-helper.mjs', import.meta.url).href
   await writeFile(harnessPath, `import {executeAcademyCloudflareHelper} from ${JSON.stringify(helperUrl)}
 const root=${JSON.stringify(root)}, validUntil=Date.parse('2026-08-29T12:00:00Z')
-executeAcademyCloudflareHelper(JSON.parse(process.argv[2]),{clock:()=>Date.parse('2026-08-29T11:00:00Z'),env:{},workRoot:root,release:{root,nodeExecutable:process.execPath,wranglerEntrypoint:${JSON.stringify(wranglerPath)},manifest:{releaseRevision:${JSON.stringify(R)},entries:[{path:'application/worker.js'},{path:'application/wrangler.jsonc'}]}},revalidate:async()=>{}}).then(v=>process.stdout.write(JSON.stringify(v)+'\\n')).catch(()=>process.exit(1))
+executeAcademyCloudflareHelper(JSON.parse(process.argv[2]),{clock:()=>Date.parse('2026-08-29T11:00:00Z'),env:{},workRoot:root,release:{root,nodeExecutable:process.execPath,wranglerEntrypoint:${JSON.stringify(wranglerPath)},manifest:{releaseRevision:${JSON.stringify(R)},entries:[{path:'application/wrangler.jsonc'}]}},revalidate:async()=>{}}).then(v=>process.stdout.write(JSON.stringify(v)+'\\n')).catch(()=>process.exit(1))
 `, { mode:0o600 })
   const invoke = args => new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [harnessPath, JSON.stringify(args)], { cwd:root, stdio:['ignore','pipe','pipe'] })

@@ -19,7 +19,7 @@ export const ACADEMY_RELEASE_EXECUTABLE_MODE = 0o555
 
 const SHA256 = /^[a-f0-9]{64}$/
 const REVISION = /^[a-f0-9]{40}$/
-const SEGMENT = /^(?:\.bin|@[A-Za-z0-9][A-Za-z0-9._-]*|[A-Za-z0-9_][A-Za-z0-9._-]*)$/
+const SEGMENT = /^(?:\.bin|\.open-next|@[A-Za-z0-9][A-Za-z0-9._-]*|[A-Za-z0-9_][A-Za-z0-9._-]*)$/
 
 export const failAcademyRelease = () => { throw new Error('Academy release verification failed') }
 
