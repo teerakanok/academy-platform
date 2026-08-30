@@ -55,7 +55,7 @@ verify_root_file "$stage/tooling/academy-release-install.mjs" 400 c0e653f1db0bac
 verify_root_file "$stage/tooling/academy-release-manifest.mjs" 400 1fe1b055d517780cfac4c43d3e0bce0af455a0ba15b643cde0559e01287be35e
 verify_root_file "$stage/tooling/academy-release-pointer.mjs" 400 7cac358f35e6446e314e5cc9f884c9770b3395dcf9394221d6f61c569385fcee
 verify_root_file "$stage/tooling/academy-release-render.mjs" 400 03f97f824f0c4ec3476852e85dd821dabaf45562b0049b18a06c5772bb049dde
-verify_root_file "$stage/tooling/academy-macos-release-recovery.mjs" 400 8173821df42bef4566c57997e2362fa2bf047f3b90a7a9bb34911fae5f2c28e5
+verify_root_file "$stage/tooling/academy-macos-release-recovery.mjs" 400 035c8efd3a8f290d4fda199a7136f9be13e1b484c7be23f3f19f21764c7224d9
 phase=RECONCILE_RELEASE
 "$stage/source/node" "$stage/tooling/academy-macos-release-recovery.mjs" > "$stage/recovery-result.json"
 /bin/chmod 600 "$stage/recovery-result.json"

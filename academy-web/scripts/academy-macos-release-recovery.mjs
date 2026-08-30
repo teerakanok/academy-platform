@@ -11,16 +11,22 @@ const INSTALL_ROOT = '/opt/academy'
 const OLD_STAGE = '/private/var/root/academy-release-stage-d6e517e3'
 const fail = () => { throw new Error('ACADEMY_RELEASE_RECOVERY_REJECTED') }
 
-async function protectedText(path, { modes, expectedUid, expectedGid, max = 1024 * 1024 }) {
+async function protectedText(path, { modes, expectedUid, expectedGid, allowEmpty = false, max = 1024 * 1024 }) {
   if (await realpath(path) !== path) fail()
-  const before = await lstat(path)
+  const before = await lstat(path, { bigint:true })
   const handle = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW)
   try {
-    const metadata = await handle.stat()
-    if (!metadata.isFile() || metadata.nlink !== 1 || metadata.uid !== expectedUid || metadata.gid !== expectedGid
-      || !modes.includes(metadata.mode & 0o777) || metadata.size < 1 || metadata.size > max
-      || before.dev !== metadata.dev || before.ino !== metadata.ino) fail()
-    return await handle.readFile('utf8')
+    const metadata = await handle.stat({ bigint:true })
+    const same = (left, right) => ['dev','ino','size','uid','gid','mode','nlink','mtimeNs','ctimeNs']
+      .every(key => left[key] === right[key])
+    if (!metadata.isFile() || metadata.nlink !== 1n || metadata.uid !== BigInt(expectedUid) || metadata.gid !== BigInt(expectedGid)
+      || !modes.includes(Number(metadata.mode & 0o777n)) || metadata.size < (allowEmpty ? 0n : 1n)
+      || metadata.size > BigInt(max) || !same(before, metadata)) fail()
+    const source = await handle.readFile('utf8')
+    const after = await handle.stat({ bigint:true })
+    const pathAfter = await lstat(path, { bigint:true })
+    if (!same(metadata, after) || !same(after, pathAfter) || BigInt(Buffer.byteLength(source)) !== metadata.size) fail()
+    return source
   } finally { await handle.close() }
 }
 
@@ -35,8 +41,16 @@ async function oldEvidence(oldStage, expectedUid, expectedGid) {
   const receipts = []
   for (const [name, expectedStatus] of [['render-result.json','RENDERED'],['install-result.json',null],['verify-result.json','VERIFIED']]) {
     let source
-    try { source = await protectedText(`${oldStage}/${name}`, { modes: [0o600,0o644], expectedUid, expectedGid }) }
+    try { source = await protectedText(`${oldStage}/${name}`, {
+      modes: [0o600,0o644], expectedUid, expectedGid, allowEmpty: name === 'install-result.json',
+    }) }
     catch (error) { if (error?.code === 'ENOENT') continue; throw error }
+    if (source === '') {
+      if (name !== 'install-result.json') fail()
+      receipts.push({ name:'install', status:'ATTEMPTED_UNKNOWN', bytes:0,
+        sha256:'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855' })
+      continue
+    }
     let value
     try { value = JSON.parse(source) } catch { fail() }
     if (source !== `${JSON.stringify(value)}\n` || typeof value !== 'object' || Array.isArray(value)) fail()

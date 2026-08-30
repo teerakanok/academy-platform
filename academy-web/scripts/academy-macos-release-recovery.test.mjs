@@ -3,6 +3,7 @@ import test from 'node:test'
 import { mkdtemp, mkdir, writeFile, rm, realpath } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { spawnSync } from 'node:child_process'
 
 import { recoverAcademyReleaseState } from './academy-macos-release-recovery.mjs'
 
@@ -61,6 +62,29 @@ test('foreign publication and malformed protected receipt fail before reconcile'
     readPointer:present, resolveCurrent:current('a'.repeat(64)), reconcile:async()=>{reconciles+=1} }))
   assert.equal(reconciles, 0)
   await writeFile(join(f.stage, 'render-result.json'), '{}\n', { mode:0o600 })
+  await assert.rejects(recoverAcademyReleaseState({ oldStage:f.stage, expectedUid:f.uid, expectedGid:f.gid,
+    readPointer:present, resolveCurrent:current(PRIOR), reconcile:async()=>{reconciles+=1} }))
+  assert.equal(reconciles, 0)
+})
+
+test('real shell redirection loss is ATTEMPTED_UNKNOWN and pointer remains sole publication authority', async t => {
+  const f = await fixture(t)
+  const receipt = join(f.stage, 'install-result.json')
+  const shell = spawnSync('/bin/zsh', ['-c', 'false > "$1"', 'oracle', receipt], { encoding:'utf8' })
+  assert.equal(shell.status, 1)
+  const value = await recoverAcademyReleaseState({ oldStage:f.stage, expectedUid:f.uid, expectedGid:f.gid,
+    readPointer:present, resolveCurrent:current(CANDIDATE), reconcile:async()=>{} })
+  assert.deepEqual(value.receipts[1], { name:'install', status:'ATTEMPTED_UNKNOWN', bytes:0,
+    sha256:'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855' })
+  assert.equal(value.publicationBefore, 'CANDIDATE')
+  assert.equal(value.publicationAfter, 'CANDIDATE')
+  assert.equal(value.installRequired, false)
+})
+
+test('zero-byte render receipt is never classified as attempted install', async t => {
+  const f = await fixture(t)
+  await writeFile(join(f.stage, 'render-result.json'), '')
+  let reconciles = 0
   await assert.rejects(recoverAcademyReleaseState({ oldStage:f.stage, expectedUid:f.uid, expectedGid:f.gid,
     readPointer:present, resolveCurrent:current(PRIOR), reconcile:async()=>{reconciles+=1} }))
   assert.equal(reconciles, 0)
