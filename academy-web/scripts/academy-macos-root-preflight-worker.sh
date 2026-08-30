@@ -35,11 +35,13 @@ verify_observer_file() {
   [[ -f "$path" && ! -L "$path" && "$(/usr/bin/stat -f '%Su:%Sg:%Lp:%l' "$path")" == 'root:wheel:400:1' ]]
   [[ "$(/usr/bin/shasum -a 256 "$path" | /usr/bin/awk '{print $1}')" == "$expected" ]]
 }
-verify_observer_file "$observer/academy-macos-release-recovery.mjs" 265a1b500cd09a0c92316b188e57257de5375afa59b6a3d3f8e4e4452698176d
+verify_observer_file "$observer/academy-macos-release-recovery.mjs" 454b4b1be0c08033ae3562dca167d42ffe2d5903f3856d394232e095d31473a1
 verify_observer_file "$observer/academy-release-pointer.mjs" 7cac358f35e6446e314e5cc9f884c9770b3395dcf9394221d6f61c569385fcee
-"$observer/node" "$observer/academy-macos-release-recovery.mjs" "$observation"
-[[ -f "$observation" && ! -L "$observation" && "$(/usr/bin/stat -f '%Su:%Sg:%Lp:%l' "$observation")" == 'root:wheel:600:1' ]]
-install_required="$("$observer/node" -e 'const fs=require("fs"),v=JSON.parse(fs.readFileSync(process.argv[1],"utf8"));const keys=Object.keys(v).sort().join(",");if(keys!=="installRequired,protectedStage,publication,receipts,schema,status"||v.schema!=="academy-macos-release-observation/v1"||v.status!=="OBSERVED"||!["ABSENT","PRIOR","CANDIDATE"].includes(v.publication)||v.installRequired!==(v.publication!=="CANDIDATE"))process.exit(1);process.stdout.write(v.installRequired?"true":"false")' "$observation")"
+observation_result="$("$observer/node" "$observer/academy-macos-release-recovery.mjs" "$observation")"
+IFS=$'\t' read -r observation_selected install_required <<< "$observation_result"
+[[ "$observation_selected" == "$observation" || "$observation_selected" == "$observation.candidate.v1.json" ]]
+[[ -f "$observation_selected" && ! -L "$observation_selected" && "$(/usr/bin/stat -f '%Su:%Sg:%Lp:%l' "$observation_selected")" == 'root:wheel:600:1' ]]
+[[ "$install_required" == true || "$install_required" == false ]]
 
 phase=CLEANUP_STAGE
 if [[ -e "$stage" || -L "$stage" ]]; then
@@ -73,7 +75,7 @@ verify_root_file "$stage/tooling/academy-release-install.mjs" 400 c0e653f1db0bac
 verify_root_file "$stage/tooling/academy-release-manifest.mjs" 400 1fe1b055d517780cfac4c43d3e0bce0af455a0ba15b643cde0559e01287be35e
 verify_root_file "$stage/tooling/academy-release-pointer.mjs" 400 7cac358f35e6446e314e5cc9f884c9770b3395dcf9394221d6f61c569385fcee
 verify_root_file "$stage/tooling/academy-release-render.mjs" 400 03f97f824f0c4ec3476852e85dd821dabaf45562b0049b18a06c5772bb049dde
-verify_root_file "$stage/tooling/academy-macos-release-recovery.mjs" 400 265a1b500cd09a0c92316b188e57257de5375afa59b6a3d3f8e4e4452698176d
+verify_root_file "$stage/tooling/academy-macos-release-recovery.mjs" 400 454b4b1be0c08033ae3562dca167d42ffe2d5903f3856d394232e095d31473a1
 phase=PREPARE_PACKAGE
 "$stage/source/node" -e 'const fs=require("fs"),old=process.argv[1],next=process.argv[2],input=process.argv[3],output=process.argv[4];const walk=v=>typeof v==="string"?v.split(old).join(next):Array.isArray(v)?v.map(walk):v&&typeof v==="object"?Object.fromEntries(Object.entries(v).map(([k,x])=>[k,walk(x)])):v;fs.writeFileSync(output,JSON.stringify(walk(JSON.parse(fs.readFileSync(input,"utf8"))))+"\n",{mode:0o600,flag:"wx"})' "$source" "$stage/source" "$input" "$stage/package.json"
 /usr/sbin/chown root:wheel "$stage/package.json"

@@ -4,13 +4,13 @@ import { readFile } from 'node:fs/promises'
 import { spawn } from 'node:child_process'
 
 const WORKER = '/private/tmp/academy-result-loss-remediation/academy-web/scripts/academy-macos-root-preflight-worker.sh'
-const ROOT_COPY = '/private/var/root/academy-macos-root-preflight-worker-4795eebe6c951d9e.sh'
-const EXPECTED_WORKER_SHA256 = '4795eebe6c951d9e0260f76ffcb8bbcf1f4e13f49710e8d151621aa143df3bcd'
+const ROOT_COPY = '/private/var/root/academy-macos-root-preflight-worker-ca2f9e0ac2e2374d.sh'
+const EXPECTED_WORKER_SHA256 = 'ca2f9e0ac2e2374d28b976329e84464f020fc2ed42affbfdec89e249fa57d8f2'
 const OBSERVER = '/private/var/root/academy-release-observer-7dca6452'
 const RECOVERY = `${WORKER.slice(0, WORKER.lastIndexOf('/'))}/academy-macos-release-recovery.mjs`
 const POINTER = `${WORKER.slice(0, WORKER.lastIndexOf('/'))}/academy-release-pointer.mjs`
 const NODE = '/private/tmp/academy-release-sources-fa7/node'
-const EXPECTED_RECOVERY_SHA256 = '265a1b500cd09a0c92316b188e57257de5375afa59b6a3d3f8e4e4452698176d'
+const EXPECTED_RECOVERY_SHA256 = '454b4b1be0c08033ae3562dca167d42ffe2d5903f3856d394232e095d31473a1'
 const EXPECTED_POINTER_SHA256 = '7cac358f35e6446e314e5cc9f884c9770b3395dcf9394221d6f61c569385fcee'
 const EXPECTED_NODE_SHA256 = '9bc64e922cba152eedf55cd4528ac0b5b7e0f4cd9d671d77bb0830c9796ea188'
 const fail = () => { throw new Error('ACADEMY_MACOS_ROOT_PREFLIGHT_REJECTED') }

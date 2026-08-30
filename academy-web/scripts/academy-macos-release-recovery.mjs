@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { createHash } from 'node:crypto'
 import { constants } from 'node:fs'
 import { open, lstat, realpath } from 'node:fs/promises'
 import { dirname } from 'node:path'
@@ -11,6 +12,18 @@ const REVISION = 'fa7bca732aefa58ab7fc2c784676a113b873466b'
 const INSTALL_ROOT = '/opt/academy'
 const CURRENT_STAGE = '/private/var/root/academy-release-recovery-7dca6452'
 const fail = () => { throw new Error('ACADEMY_RELEASE_RECOVERY_REJECTED') }
+const observationBytes = value => Buffer.from(`${JSON.stringify(value)}\n`, 'utf8')
+const observationSha256 = value => createHash('sha256').update(observationBytes(value)).digest('hex')
+
+function validateObservation(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)
+    || Object.keys(value).sort().join(',') !== 'installRequired,protectedStage,publication,receipts,schema,status'
+    || value.schema !== 'academy-macos-release-observation/v1' || value.status !== 'OBSERVED'
+    || !['ABSENT','PRIOR','CANDIDATE'].includes(value.publication)
+    || value.installRequired !== (value.publication !== 'CANDIDATE')
+    || !['ABSENT','OWNED'].includes(value.protectedStage) || !Array.isArray(value.receipts)) fail()
+  return value
+}
 
 async function protectedText(path, { modes, expectedUid, expectedGid, allowEmpty = false, max = 1024 * 1024 }) {
   if (await realpath(path) !== path) fail()
@@ -109,18 +122,13 @@ export async function observeAcademyReleaseState({ stage = CURRENT_STAGE, instal
 
 export const recoverAcademyReleaseState = observeAcademyReleaseState
 
-export async function writeDurableObservation(path, value) {
-  const bytes = Buffer.from(`${JSON.stringify(value)}\n`, 'utf8')
+async function publishExactBytes(path, bytes) {
   let handle
   try {
     handle = await open(path, constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, 0o600)
   } catch (error) {
     if (error?.code !== 'EEXIST') throw error
-    const existing = await protectedText(path, {
-      modes: [0o600], expectedUid: process.getuid(), expectedGid: process.getgid(), max: 1024 * 1024,
-    })
-    if (existing !== bytes.toString('utf8')) fail()
-    return 'EXACT_EXISTING'
+    throw error
   }
   try {
     await handle.chmod(0o600)
@@ -142,9 +150,69 @@ export async function writeDurableObservation(path, value) {
   return 'CREATED'
 }
 
+export async function writeDurableObservation(path, value) {
+  validateObservation(value)
+  const bytes = observationBytes(value)
+  try { return await publishExactBytes(path, bytes) } catch (error) {
+    if (error?.code !== 'EEXIST') throw error
+    const existing = await protectedText(path, {
+      modes: [0o600], expectedUid: process.getuid(), expectedGid: process.getgid(), max: 1024 * 1024,
+    })
+    if (existing !== bytes.toString('utf8')) fail()
+    return 'EXACT_EXISTING'
+  }
+}
+
+export async function publishObservationChain(path, current) {
+  validateObservation(current)
+  try {
+    const status = await writeDurableObservation(path, current)
+    return Object.freeze({ status, path, observation:current })
+  } catch {
+    let predecessor, predecessorSource
+    try {
+      predecessorSource = await protectedText(path, {
+      modes:[0o600], expectedUid:process.getuid(), expectedGid:process.getgid(), max:1024 * 1024,
+      })
+      predecessor = validateObservation(JSON.parse(predecessorSource))
+      if (predecessorSource !== observationBytes(predecessor).toString('utf8')) fail()
+    } catch { fail() }
+    if (predecessor.publication === 'CANDIDATE' && current.publication === 'CANDIDATE') {
+      return Object.freeze({ status:'TERMINAL_EXACT_EXISTING', path, observation:predecessor })
+    }
+    if (!['ABSENT','PRIOR'].includes(predecessor.publication) || current.publication !== 'CANDIDATE') fail()
+    const successorPath = `${path}.candidate.v1.json`, successor = Object.freeze({
+      schema:'academy-macos-release-observation-successor/v1', status:'OBSERVED',
+      predecessorSha256:observationSha256(predecessor), observation:current,
+    })
+    const successorBytes = Buffer.from(`${JSON.stringify(successor)}\n`, 'utf8')
+    try {
+      await publishExactBytes(successorPath, successorBytes)
+      return Object.freeze({ status:'SUCCESSOR_CREATED', path:successorPath, observation:current })
+    } catch (error) {
+      if (error?.code !== 'EEXIST') throw error
+      let existing, existingSource
+      try {
+        existingSource = await protectedText(successorPath, {
+        modes:[0o600], expectedUid:process.getuid(), expectedGid:process.getgid(), max:1024 * 1024,
+        })
+        existing = JSON.parse(existingSource)
+        if (existingSource !== `${JSON.stringify(existing)}\n`) fail()
+      } catch { fail() }
+      if (!existing || Object.keys(existing).sort().join(',') !== 'observation,predecessorSha256,schema,status'
+        || existing.schema !== 'academy-macos-release-observation-successor/v1' || existing.status !== 'OBSERVED'
+        || existing.predecessorSha256 !== observationSha256(predecessor)) fail()
+      const accepted = validateObservation(existing.observation)
+      if (accepted.publication !== 'CANDIDATE' || current.publication !== 'CANDIDATE') fail()
+      return Object.freeze({ status:'SUCCESSOR_EXACT_EXISTING', path:successorPath, observation:accepted })
+    }
+  }
+}
+
 if (import.meta.url === `file://${process.argv[1]}`) observeAcademyReleaseState()
   .then(async value => {
     if (process.argv.length !== 3) fail()
-    await writeDurableObservation(process.argv[2], value)
+    const published = await publishObservationChain(process.argv[2], value)
+    process.stdout.write(`${published.path}\t${published.observation.installRequired ? 'true' : 'false'}\n`)
   })
   .catch(() => { process.stderr.write('ACADEMY_RELEASE_RECOVERY_REJECTED\n'); process.exitCode = 1 })

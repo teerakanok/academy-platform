@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
 
-import { recoverAcademyReleaseState, writeDurableObservation } from './academy-macos-release-recovery.mjs'
+import { publishObservationChain, recoverAcademyReleaseState, writeDurableObservation } from './academy-macos-release-recovery.mjs'
 
 const PRIOR = 'b64a361440e0369585f0e948f55d4a0325d755f626fe04596fd6d6d2a9c18103'
 const CANDIDATE = '84e855c0d11016ceeaed7e40c42ff10d70db8690907d883b7134c1536b135a46'
@@ -104,13 +104,61 @@ test('sanitized observation is durable, adopts exact result loss, and rejects mi
   assert.equal(await readFile(path, 'utf8'), `${JSON.stringify(value)}\n`)
   assert.equal(await writeDurableObservation(path, value), 'EXACT_EXISTING')
   await writeFile(path, `${JSON.stringify({ ...value, publication:'PRIOR', installRequired:true })}\n`, { mode:0o600 })
-  let cleanups = 0
   await assert.rejects(writeDurableObservation(path, value))
-  if (false) cleanups += 1
-  assert.equal(cleanups, 0)
   const linked = join(f.stage, 'linked-observation.json')
   await symlink(path, linked)
   await assert.rejects(writeDurableObservation(linked, value))
+})
+
+test('immutable observation chain converges from PRIOR or ABSENT to CANDIDATE and adopts its successor on retry', async t => {
+  const f = await fixture(t, { receipt:false })
+  const prior = { schema:'academy-macos-release-observation/v1', status:'OBSERVED', protectedStage:'OWNED',
+    receipts:[], publication:'PRIOR', installRequired:true }
+  for (const publication of ['PRIOR','ABSENT']) {
+    const path = join(f.stage, `chain-${publication}.json`)
+    const predecessor = { ...prior, publication, installRequired:true }
+    const candidate = { ...predecessor, publication:'CANDIDATE', installRequired:false }
+    assert.equal((await publishObservationChain(path, predecessor)).status, 'CREATED')
+    const successor = await publishObservationChain(path, candidate)
+    assert.equal(successor.status, 'SUCCESSOR_CREATED')
+    assert.equal(successor.path, `${path}.candidate.v1.json`)
+    const changedCandidate = { ...candidate, receipts:[{name:'terminal',status:'PASS',phase:'COMPLETE',publication:'CANDIDATE'}] }
+    const adopted = await publishObservationChain(path, changedCandidate)
+    assert.equal(adopted.status, 'SUCCESSOR_EXACT_EXISTING')
+    assert.deepEqual(adopted.observation, candidate)
+    assert.deepEqual(JSON.parse(await readFile(path, 'utf8')), predecessor)
+  }
+})
+
+test('immutable initial CANDIDATE remains terminal across changed retry evidence', async t => {
+  const f = await fixture(t, { receipt:false }), path = join(f.stage, 'terminal-candidate.json')
+  const candidate = { schema:'academy-macos-release-observation/v1', status:'OBSERVED', protectedStage:'OWNED',
+    receipts:[], publication:'CANDIDATE', installRequired:false }
+  assert.equal((await publishObservationChain(path, candidate)).status, 'CREATED')
+  const adopted = await publishObservationChain(path, { ...candidate, receipts:[{name:'changed'}] })
+  assert.equal(adopted.status, 'TERMINAL_EXACT_EXISTING')
+  assert.deepEqual(adopted.observation, candidate)
+})
+
+test('observation boundary performs zero cleanup and install for mismatch, symlink, and foreign state', async t => {
+  const base = { schema:'academy-macos-release-observation/v1', status:'OBSERVED', protectedStage:'OWNED',
+    receipts:[], publication:'PRIOR', installRequired:true }
+  for (const kind of ['mismatch','symlink','foreign']) {
+    const f = await fixture(t, { receipt:false }), path = join(f.stage, `${kind}.json`)
+    if (kind === 'mismatch') await writeDurableObservation(path, base)
+    if (kind === 'symlink') {
+      const target = join(f.stage, 'target.json'); await writeFile(target, `${JSON.stringify(base)}\n`, {mode:0o600}); await symlink(target,path)
+    }
+    if (kind === 'foreign') await writeFile(path, '{}\n', {mode:0o600})
+    let cleanupCalls = 0, installCalls = 0
+    const harness = async current => {
+      const published = await publishObservationChain(path, current)
+      cleanupCalls += 1
+      if (published.observation.installRequired) installCalls += 1
+    }
+    await assert.rejects(harness({ ...base, receipts:[{name:'foreign'}] }))
+    assert.deepEqual({cleanupCalls,installCalls},{cleanupCalls:0,installCalls:0})
+  }
 })
 
 test('bounded terminal and completed install receipts are exact-schema verified', async t => {
