@@ -112,6 +112,8 @@ test('renderer rejects a wrangler source with a symlink or empty inventory', asy
 test('release paths accept real package segments and reject traversal or unsafe names', () => {
   assert.equal(isAcademyReleasePath('node_modules/@cloudflare/workers-shared/dist/index.js'), true)
   assert.equal(isAcademyReleasePath('node_modules/.bin/wrangler'), true)
+  assert.equal(isAcademyReleasePath('node_modules/unenv/dist/runtime/_internal/_shared.mjs'), true)
+  assert.equal(isAcademyReleasePath('node_modules/wrangler/templates/__tests__/fixture.js'), true)
   const unsafe = ['', 'lib//index.js', './lib/index.js', '../lib/index.js',
     'lib/../lib/index.js', 'lib\\index.js', 'lib\u0007index.js', 'lib:index.js',
     'lib*.js', '.hidden/lib.js', '@/index.js']
