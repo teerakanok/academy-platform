@@ -23,13 +23,14 @@ const APPLICATION_CHUNK = Buffer.from('export const handler = () => "academy"\n'
 const APPLICATION_CONFIG = Buffer.from('{"main":"worker.js","assets":{"directory":".open-next/assets","binding":"ASSETS"}}\n')
 const APPLICATION_ASSET = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"/>\n')
 const NOW = new Date('2026-08-29T10:00:00.000Z')
+const WRANGLER_ENTRYPOINT = 'wrangler/bin/wrangler.js'
 
 async function environment() {
   const env = createAcademyReleaseFakeFilesystem()
-  await env.fs.mkdir('/source/wrangler/bin', { recursive: true })
+  await env.fs.mkdir('/source/node_modules/wrangler/bin', { recursive: true })
   await env.fs.writeFileDirect('/source/node', NODE, 0o755)
-  await env.fs.writeFileDirect('/source/wrangler/bin/wrangler', WRANGLER_ENTRY, 0o755)
-  await env.fs.writeFileDirect('/source/wrangler/package.json', WRANGLER_DEP, 0o644)
+  await env.fs.writeFileDirect('/source/node_modules/wrangler/bin/wrangler.js', WRANGLER_ENTRY, 0o755)
+  await env.fs.writeFileDirect('/source/node_modules/wrangler/package.json', WRANGLER_DEP, 0o644)
   await env.fs.writeFileDirect('/source/helper.mjs', HELPER, 0o500)
   await env.fs.mkdir('/source/application/.open-next/assets', { recursive: true })
   await env.fs.writeFileDirect('/source/application/worker.js', APPLICATION_ENTRY, 0o444)
@@ -42,10 +43,10 @@ async function environment() {
 
 async function openNextEnvironment(options = {}) {
   const env = createAcademyReleaseFakeFilesystem()
-  await env.fs.mkdir('/source/wrangler/bin', { recursive: true })
+  await env.fs.mkdir('/source/node_modules/wrangler/bin', { recursive: true })
   await env.fs.writeFileDirect('/source/node', NODE, 0o755)
-  await env.fs.writeFileDirect('/source/wrangler/bin/wrangler', WRANGLER_ENTRY, 0o755)
-  await env.fs.writeFileDirect('/source/wrangler/package.json', WRANGLER_DEP, 0o644)
+  await env.fs.writeFileDirect('/source/node_modules/wrangler/bin/wrangler.js', WRANGLER_ENTRY, 0o755)
+  await env.fs.writeFileDirect('/source/node_modules/wrangler/package.json', WRANGLER_DEP, 0o644)
   await env.fs.writeFileDirect('/source/helper.mjs', HELPER, 0o500)
   await env.fs.mkdir('/source/application/.open-next/assets', { recursive: true })
   await env.fs.writeFileDirect('/source/application/worker.js', Buffer.from(
@@ -74,7 +75,7 @@ async function openNextEnvironment(options = {}) {
 const spec = revision => ({
   releaseRevision: revision,
   node: { sourcePath: '/source/node' },
-  wrangler: { sourceDirectory: '/source/wrangler', entrypoint: 'bin/wrangler' },
+  wrangler: { sourceDirectory: '/source/node_modules', entrypoint: WRANGLER_ENTRYPOINT },
   application: { sourceDirectory: '/source/application' },
   helpers: [{ sourcePath: '/source/helper.mjs', path: 'helpers/academy-production-cloudflare-helper.mjs', mode: 0o500 }],
 })
@@ -94,21 +95,25 @@ test('renderer emits a canonical sorted manifest with directories and pinned exe
   const { manifest } = await renderedSource(env, REVISION_A)
   assert.equal(manifest.schema, 'academy-release-manifest/v2')
   assert.equal(manifest.executables.node, 'node/bin/node')
-  assert.equal(manifest.executables.wrangler, 'wrangler/bin/wrangler')
+  assert.equal(manifest.executables.wrangler, 'wrangler/node_modules/wrangler/bin/wrangler.js')
   assert.deepEqual(manifest.helpers, ['helpers/academy-production-cloudflare-helper.mjs'])
   assert.deepEqual(manifest.entries.map(entry => entry.path),
     ['application/.open-next/assets/asset.svg', 'application/chunk.js',
       'application/worker.js', 'application/wrangler.jsonc',
       'helpers/academy-production-cloudflare-helper.mjs', 'node/bin/node',
-      'wrangler/bin/wrangler', 'wrangler/package.json'])
+      'wrangler/node_modules/wrangler/bin/wrangler.js',
+      'wrangler/node_modules/wrangler/package.json'])
   assert.deepEqual(manifest.directories.map(directory => directory.path),
     ['application', 'application/.open-next', 'application/.open-next/assets', 'helpers',
-      'node', 'node/bin', 'wrangler', 'wrangler/bin'])
+      'node', 'node/bin', 'wrangler', 'wrangler/node_modules', 'wrangler/node_modules/wrangler',
+      'wrangler/node_modules/wrangler/bin'])
   assert.ok(manifest.directories.every(directory => directory.mode === 0o555
     && directory.uid === env.fs.uid && directory.gid === env.fs.gid))
   assert.ok(manifest.entries.every(entry => entry.nlink === 1 && entry.uid === env.fs.uid && entry.gid === env.fs.gid))
-  assert.equal(manifest.entries.find(entry => entry.path === 'wrangler/bin/wrangler').mode, 0o555)
-  assert.equal(manifest.entries.find(entry => entry.path === 'wrangler/package.json').mode, 0o444)
+  assert.equal(manifest.entries.find(entry => entry.path ===
+    'wrangler/node_modules/wrangler/bin/wrangler.js').mode, 0o555)
+  assert.equal(manifest.entries.find(entry => entry.path ===
+    'wrangler/node_modules/wrangler/package.json').mode, 0o444)
   const selfMeta = await env.fs.lstat(`/staging/${REVISION_A}/manifest.json`)
   assert.equal(selfMeta.mode & 0o777, 0o444)
   await verifyAcademyRelease({ root: `/staging/${REVISION_A}`, fs: env.fs, processLike: env.processLike })
@@ -178,9 +183,9 @@ test('renderer rejects non-allowlisted platform and missing imports', async () =
 
 test('renderer records actual fstat gid from a setgid parent, not the process gid', async () => {
   const env = createAcademyReleaseFakeFilesystem({ uid: 1000, gid: 1000 })
-  await env.fs.mkdir('/setgid-source/wrangler/bin', { mode: 0o2755, recursive: true })
+  await env.fs.mkdir('/setgid-source/node_modules/wrangler/bin', { mode: 0o2755, recursive: true })
   await env.fs.writeFileDirect('/setgid-source/node', NODE, 0o755)
-  await env.fs.writeFileDirect('/setgid-source/wrangler/bin/wrangler', WRANGLER_ENTRY, 0o755)
+  await env.fs.writeFileDirect('/setgid-source/node_modules/wrangler/bin/wrangler.js', WRANGLER_ENTRY, 0o755)
   await env.fs.writeFileDirect('/setgid-source/helper.mjs', HELPER, 0o500)
   await env.fs.mkdir('/setgid-source/application/.open-next/assets', { recursive: true })
   await env.fs.writeFileDirect('/setgid-source/application/worker.js', APPLICATION_ENTRY, 0o444)
@@ -193,7 +198,7 @@ test('renderer records actual fstat gid from a setgid parent, not the process gi
   const { root } = await renderAcademyRelease({ spec: {
     releaseRevision: REVISION_A,
     node: { sourcePath: '/setgid-source/node' },
-    wrangler: { sourceDirectory: '/setgid-source/wrangler', entrypoint: 'bin/wrangler' },
+    wrangler: { sourceDirectory: '/setgid-source/node_modules', entrypoint: WRANGLER_ENTRYPOINT },
     application: { sourceDirectory: '/setgid-source/application' },
     helpers: [{ sourcePath: '/setgid-source/helper.mjs', path: 'helpers/helper.mjs', mode: 0o500 }],
   }, stagingRoot: '/setgid-staging/release', fs: env.fs, processLike: env.processLike })
@@ -208,10 +213,10 @@ test('renderer records actual fstat gid from a setgid parent, not the process gi
 
 test('renderer rejects a wrangler source with a symlink or empty inventory', async () => {
   const env = await environment()
-  await env.fs.symlink('/source/node', '/source/wrangler/linked-node')
+  await env.fs.symlink('/source/node', '/source/node_modules/linked-node')
   await assert.rejects(renderedSource(env, REVISION_A))
-  await env.fs.rm('/source/wrangler/linked-node')
-  await env.fs.mkdir('/source-empty/wrangler', { recursive: true })
+  await env.fs.rm('/source/node_modules/linked-node')
+  await env.fs.mkdir('/source-empty/node_modules', { recursive: true })
   await env.fs.writeFileDirect('/source-empty/node', NODE, 0o755)
   await env.fs.writeFileDirect('/source-empty/helper.mjs', HELPER, 0o500)
   await env.fs.mkdir('/source-empty/application/.open-next/assets', { recursive: true })
@@ -221,7 +226,7 @@ test('renderer rejects a wrangler source with a symlink or empty inventory', asy
   await env.fs.writeFileDirect('/source-empty/application/.open-next/assets/asset.svg', APPLICATION_ASSET, 0o444)
   await assert.rejects(renderAcademyRelease({ spec: {
     releaseRevision: REVISION_A, node: { sourcePath: '/source-empty/node' },
-    wrangler: { sourceDirectory: '/source-empty/wrangler', entrypoint: 'bin/wrangler' },
+    wrangler: { sourceDirectory: '/source-empty/node_modules', entrypoint: WRANGLER_ENTRYPOINT },
     application: { sourceDirectory: '/source-empty/application' },
     helpers: [{ sourcePath: '/source-empty/helper.mjs', path: 'helpers/helper.mjs', mode: 0o500 }],
   }, stagingRoot: '/staging-empty', fs: env.fs, processLike: env.processLike }))
@@ -247,30 +252,46 @@ test('release paths accept real package segments and reject traversal or unsafe 
 
 test('canonical inventory handles siblings that sort differently from traversal', async () => {
   const env = await environment()
-  await env.fs.mkdir('/source/wrangler/lib', { recursive: true })
-  await env.fs.mkdir('/source/wrangler/wrangler-dist/cli', { recursive: true })
-  await env.fs.writeFileDirect('/source/wrangler/lib-x.js', Buffer.from('sibling x\n'), 0o444)
-  await env.fs.writeFileDirect('/source/wrangler/lib/index.js', Buffer.from('lib index\n'), 0o444)
-  await env.fs.writeFileDirect('/source/wrangler/wrangler-dist/cli.js', Buffer.from('cli entry\n'), 0o444)
-  await env.fs.writeFileDirect('/source/wrangler/wrangler-dist/cli/index.js', Buffer.from('cli module\n'), 0o444)
-  await env.fs.mkdir('/source/wrangler/node_modules/@cloudflare/workers-shared/dist', { recursive: true })
-  await env.fs.writeFileDirect('/source/wrangler/node_modules/@cloudflare/workers-shared/dist/index.js',
+  await env.fs.mkdir('/source/node_modules/lib', { recursive: true })
+  await env.fs.mkdir('/source/node_modules/wrangler-dist/cli', { recursive: true })
+  await env.fs.writeFileDirect('/source/node_modules/lib-x.js', Buffer.from('sibling x\n'), 0o444)
+  await env.fs.writeFileDirect('/source/node_modules/lib/index.js', Buffer.from('lib index\n'), 0o444)
+  await env.fs.writeFileDirect('/source/node_modules/wrangler-dist/cli.js', Buffer.from('cli entry\n'), 0o444)
+  await env.fs.writeFileDirect('/source/node_modules/wrangler-dist/cli/index.js', Buffer.from('cli module\n'), 0o444)
+  await env.fs.mkdir('/source/node_modules/node_modules/@cloudflare/workers-shared/dist', { recursive: true })
+  await env.fs.writeFileDirect('/source/node_modules/node_modules/@cloudflare/workers-shared/dist/index.js',
     Buffer.from('scoped dependency\n'), 0o444)
-  await env.fs.mkdir('/source/wrangler/node_modules/.bin', { recursive: true })
-  await env.fs.writeFileDirect('/source/wrangler/node_modules/.bin/wrangler', WRANGLER_ENTRY, 0o755)
+  await env.fs.mkdir('/source/node_modules/node_modules/.bin', { recursive: true })
+  await env.fs.writeFileDirect('/source/node_modules/node_modules/.bin/wrangler', WRANGLER_ENTRY, 0o755)
   const { manifest, root } = await renderAcademyRelease({ spec: spec(REVISION_A),
     stagingRoot: `/staging/${REVISION_A}`, fs: env.fs, processLike: env.processLike })
   assert.deepEqual(manifest.entries.filter(entry => entry.path.startsWith('wrangler/')).map(entry => entry.path), [
-    'wrangler/bin/wrangler',
-    'wrangler/lib-x.js',
-    'wrangler/lib/index.js',
-    'wrangler/node_modules/.bin/wrangler',
-    'wrangler/node_modules/@cloudflare/workers-shared/dist/index.js',
-    'wrangler/package.json',
-    'wrangler/wrangler-dist/cli.js',
-    'wrangler/wrangler-dist/cli/index.js',
+    'wrangler/node_modules/lib-x.js',
+    'wrangler/node_modules/lib/index.js',
+    'wrangler/node_modules/node_modules/.bin/wrangler',
+    'wrangler/node_modules/node_modules/@cloudflare/workers-shared/dist/index.js',
+    'wrangler/node_modules/wrangler-dist/cli.js',
+    'wrangler/node_modules/wrangler-dist/cli/index.js',
+    'wrangler/node_modules/wrangler/bin/wrangler.js',
+    'wrangler/node_modules/wrangler/package.json',
   ])
   await assert.doesNotReject(verifyAcademyRelease({ root, fs: env.fs, processLike: env.processLike }))
+})
+
+test('pinned wrangler keeps its entrypoint adjacent to sibling dependencies', async () => {
+  const env = await environment()
+  await env.fs.mkdir('/source/node_modules/esbuild/lib', { recursive: true })
+  await env.fs.writeFileDirect('/source/node_modules/esbuild/package.json',
+    Buffer.from('{"name":"esbuild"}\n'), 0o444)
+  await env.fs.writeFileDirect('/source/node_modules/esbuild/lib/main.js',
+    Buffer.from('module.exports = "sibling dependency"\n'), 0o444)
+  const { manifest } = await renderedSource(env, REVISION_A)
+  assert.deepEqual(manifest.entries.filter(entry => entry.path.startsWith('wrangler/')).map(entry => entry.path), [
+    'wrangler/node_modules/esbuild/lib/main.js',
+    'wrangler/node_modules/esbuild/package.json',
+    'wrangler/node_modules/wrangler/bin/wrangler.js',
+    'wrangler/node_modules/wrangler/package.json',
+  ])
 })
 
 test('fresh install publishes an immutable verified release and switches the current pointer', async () => {
@@ -284,7 +305,8 @@ test('fresh install publishes an immutable verified release and switches the cur
   const target = `/install/releases/${source.manifest.releaseSha256}`
   const verified = await verifyAcademyRelease({ root: target, fs: env.fs, processLike: env.processLike })
   assert.equal(verified.nodeExecutable, `${target}/node/bin/node`)
-  assert.equal(verified.wranglerEntrypoint, `${target}/wrangler/bin/wrangler`)
+  assert.equal(verified.wranglerEntrypoint,
+    `${target}/wrangler/node_modules/wrangler/bin/wrangler.js`)
   const pointer = await readAcademyReleasePointer({ installRoot: '/install', fs: env.fs, processLike: env.processLike })
   assert.equal(pointer.schema, 'academy-release-pointer/v1')
   assert.equal(pointer.releaseSha256, source.manifest.releaseSha256)
@@ -373,7 +395,7 @@ test('a self-consistent substituted manifest never passes the external binding',
   const source = await renderedSource(env, REVISION_A)
   // Re-render a different content under the same revision: internally valid,
   // self-consistent, but its digest differs from the externally reviewed one.
-  await env.fs.writeFileDirect('/source/wrangler/package.json', Buffer.from('// substituted dependency\n'), 0o644)
+  await env.fs.writeFileDirect('/source/node_modules/wrangler/package.json', Buffer.from('// substituted dependency\n'), 0o644)
   const substituted = await renderAcademyRelease({ spec: spec(REVISION_A),
     stagingRoot: '/staging/substituted', fs: env.fs, processLike: env.processLike })
   assert.notEqual(substituted.manifest.releaseSha256, source.manifest.releaseSha256)
@@ -408,7 +430,7 @@ test('hash drift in an installed release fails closed and is never overwritten',
   await install(env, source)
   const target = `/install/releases/${source.manifest.releaseSha256}`
   await env.fs.chmod(`${target}/wrangler`, 0o700)
-  await env.fs.writeFileDirect(`${target}/wrangler/package.json`, Buffer.from('tampered\n'), 0o444)
+  await env.fs.writeFileDirect(`${target}/wrangler/node_modules/wrangler/package.json`, Buffer.from('tampered\n'), 0o444)
   await env.fs.chmod(`${target}/wrangler`, 0o555)
   await assert.rejects(install(env, source))
 })
@@ -446,8 +468,9 @@ test('hardlink and symlink drift are rejected before provider trust', async () =
   await assert.rejects(verifyAcademyRelease({ root: target, fs: env.fs, processLike: env.processLike }))
   await env.fs.rm('/install/extra-node')
   const targetB = `/install/releases/${second.manifest.releaseSha256}`
-  await env.fs.rm(`${targetB}/wrangler/bin/wrangler`)
-  await env.fs.symlink(`${target}/node/bin/node`, `${targetB}/wrangler/bin/wrangler`)
+  const executable = `${targetB}/wrangler/node_modules/wrangler/bin/wrangler.js`
+  await env.fs.rm(executable)
+  await env.fs.symlink(`${target}/node/bin/node`, executable)
   await assert.rejects(verifyAcademyRelease({ root: targetB, fs: env.fs, processLike: env.processLike }))
   // The live pointer path also fails closed while the current release is drifted.
   await assert.rejects(resolveAcademyCurrentRelease({ installRoot: '/install', fs: env.fs, processLike: env.processLike }))

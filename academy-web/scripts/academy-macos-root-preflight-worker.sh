@@ -164,8 +164,9 @@ else
   whoami_tmp="$stage/whoami.tmp"
   trap '/bin/rm -f "$whoami_tmp"' EXIT
   set -o noclobber
-  HOME=/private/var/root LANG=C LC_ALL=C PATH=/usr/bin:/bin "$release/node" "$release/wrangler/bin/wrangler.js" login >/dev/null 2>&1
-  HOME=/private/var/root LANG=C LC_ALL=C PATH=/usr/bin:/bin "$release/node" "$release/wrangler/bin/wrangler.js" whoami > "$whoami_tmp" 2>/dev/null
+  wrangler="$release/wrangler/node_modules/wrangler/bin/wrangler.js"
+  HOME=/private/var/root LANG=C LC_ALL=C PATH=/usr/bin:/bin "$release/node" "$wrangler" login >/dev/null 2>&1
+  HOME=/private/var/root LANG=C LC_ALL=C PATH=/usr/bin:/bin "$release/node" "$wrangler" whoami > "$whoami_tmp" 2>/dev/null
   [[ -f "$whoami_tmp" && ! -L "$whoami_tmp" ]]
   local_size="$(/usr/bin/stat -f '%z' "$whoami_tmp")"
   [[ "$local_size" -gt 0 && "$local_size" -le 65536 ]]

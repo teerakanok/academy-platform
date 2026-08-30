@@ -14,10 +14,11 @@ async function fixture(t) {
   const root = await realpath(await mkdtemp(join(tmpdir(), 'academy-release-cli-')))
   t.after(async () => { await forceRemoveAcademyTree(root); await rm(root, { recursive: true, force: true }) })
   const sources = join(root, 'sources')
-  await mkdir(join(sources, 'wrangler', 'bin'), { recursive: true, mode: 0o700 })
+  await mkdir(join(sources, 'node_modules', 'wrangler', 'bin'), { recursive: true, mode: 0o700 })
   await writeFile(join(sources, 'node'), '#!/bin/sh\n', { mode: 0o500 })
-  await writeFile(join(sources, 'wrangler', 'bin', 'wrangler'), '#!/usr/bin/env node\n', { mode: 0o500 })
-  await writeFile(join(sources, 'wrangler', 'package.json'), '{}\n', { mode: 0o400 })
+  await writeFile(join(sources, 'node_modules', 'wrangler', 'bin', 'wrangler.js'),
+    '#!/usr/bin/env node\n', { mode: 0o500 })
+  await writeFile(join(sources, 'node_modules', 'wrangler', 'package.json'), '{}\n', { mode: 0o400 })
   await writeFile(join(sources, 'helper.mjs'), 'export {}\n', { mode: 0o400 })
   await mkdir(join(sources, 'application', '.open-next', 'assets'), { recursive: true, mode: 0o700 })
   await writeFile(join(sources, 'application', 'worker.js'), 'import "./chunk.js"\nexport { handler } from "./chunk.js"\n', { mode: 0o400 })
@@ -28,12 +29,13 @@ async function fixture(t) {
   await chmod(join(sources, 'application', '.open-next', 'assets'), 0o500)
   await chmod(join(sources, 'application', '.open-next'), 0o500)
   await chmod(join(sources, 'application'), 0o500)
-  await chmod(join(sources, 'wrangler', 'bin'), 0o500)
-  await chmod(join(sources, 'wrangler'), 0o500)
+  await chmod(join(sources, 'node_modules', 'wrangler', 'bin'), 0o500)
+  await chmod(join(sources, 'node_modules', 'wrangler'), 0o500)
+  await chmod(join(sources, 'node_modules'), 0o500)
   await chmod(sources, 0o500)
   const packagePath = join(root, 'package.json')
   const packageInput = { schema:'academy-release-package-input/v2', releaseRevision:REVISION,
-    nodeSource:join(sources,'node'), wranglerDirectory:join(sources,'wrangler'), wranglerEntrypoint:'bin/wrangler',
+    nodeSource:join(sources,'node'), wranglerDirectory:join(sources,'node_modules'), wranglerEntrypoint:'wrangler/bin/wrangler.js',
     applicationDirectory:join(sources,'application'),
     helpers:[{sourcePath:join(sources,'helper.mjs'),path:'helpers/helper.mjs',mode:0o400}] }
   await writeFile(packagePath, `${JSON.stringify(packageInput)}\n`, { mode: 0o600 })
@@ -51,11 +53,11 @@ test('real filesystem CLI renders, installs, verifies, reconciles and rolls back
   assert.equal((await run(['verify', join(first.root, 'install'), renderedA.releaseSha256, REVISION])).status, 'VERIFIED')
 
   await chmod(join(first.root, 'sources'), 0o700)
-  await chmod(join(first.root, 'sources', 'wrangler'), 0o700)
-  await chmod(join(first.root, 'sources', 'wrangler', 'package.json'), 0o600)
-  await writeFile(join(first.root, 'sources', 'wrangler', 'package.json'), '{"version":"2"}\n', { mode: 0o400 })
-  await chmod(join(first.root, 'sources', 'wrangler', 'package.json'), 0o400)
-  await chmod(join(first.root, 'sources', 'wrangler'), 0o500)
+  await chmod(join(first.root, 'sources', 'node_modules', 'wrangler'), 0o700)
+  await chmod(join(first.root, 'sources', 'node_modules', 'wrangler', 'package.json'), 0o600)
+  await writeFile(join(first.root, 'sources', 'node_modules', 'wrangler', 'package.json'), '{"version":"2"}\n', { mode: 0o400 })
+  await chmod(join(first.root, 'sources', 'node_modules', 'wrangler', 'package.json'), 0o400)
+  await chmod(join(first.root, 'sources', 'node_modules', 'wrangler'), 0o500)
   await chmod(join(first.root, 'sources'), 0o500)
   const renderedB = await run(['render', first.packagePath, join(first.root, 'render-b')])
   await run(['install', join(first.root, 'render-b'), join(first.root, 'install'), renderedB.releaseSha256, REVISION])

@@ -140,10 +140,11 @@ delete pinnedOptions.run
 
 async function pinnedReleaseEnvironment(tamper, includeApplication = true) {
   const env = createAcademyReleaseFakeFilesystem()
-  await env.fs.mkdir('/source/wrangler/bin', { mode: 0o755, recursive: true })
+  await env.fs.mkdir('/source/node_modules/wrangler/bin', { mode: 0o755, recursive: true })
   await env.fs.writeFileDirect('/source/node', Buffer.from('#!/fake/node\n'), 0o755)
-  await env.fs.writeFileDirect('/source/wrangler/bin/wrangler', Buffer.from('// wrangler entrypoint\n'), 0o755)
-  await env.fs.writeFileDirect('/source/wrangler/package.json', Buffer.from('{}'), 0o644)
+  await env.fs.writeFileDirect('/source/node_modules/wrangler/bin/wrangler.js',
+    Buffer.from('// wrangler entrypoint\n'), 0o755)
+  await env.fs.writeFileDirect('/source/node_modules/wrangler/package.json', Buffer.from('{}'), 0o644)
   await env.fs.writeFileDirect('/source/helper.mjs', Buffer.from('// helper source\n'), 0o500)
   await env.fs.mkdir('/source/application/.open-next/assets', { recursive: true })
   await env.fs.writeFileDirect('/source/application/worker.js', Buffer.from('import "./chunk.js"\nexport { handler } from "./chunk.js"\n'), 0o444)
@@ -154,7 +155,7 @@ async function pinnedReleaseEnvironment(tamper, includeApplication = true) {
   const { root, manifest } = await renderAcademyRelease({ spec: {
     releaseRevision: R,
     node: { sourcePath: '/source/node' },
-    wrangler: { sourceDirectory: '/source/wrangler', entrypoint: 'bin/wrangler' },
+    wrangler: { sourceDirectory: '/source/node_modules', entrypoint: 'wrangler/bin/wrangler.js' },
     application: { sourceDirectory: '/source/application' },
     helpers: [
       { sourcePath: '/source/helper.mjs', path: 'helpers/academy-production-cloudflare-helper.mjs', mode: 0o500 },
@@ -227,7 +228,7 @@ test('live upload requires release-bound worker and config and uses a separate w
   let providerCalls=0
   await assert.rejects(executeAcademyCloudflareHelper(inspectArgs,{...pinnedOptions,
     release:{root:missing.root,nodeExecutable:missing.env.fs.readNode('/source/node') ? '/source/node' : '/source/node',
-      wranglerEntrypoint:'/source/wrangler/bin/wrangler',manifest:{releaseRevision:R,entries:[]}},
+      wranglerEntrypoint:'/source/node_modules/wrangler/bin/wrangler.js',manifest:{releaseRevision:R,entries:[]}},
     workRoot:'/private/var/lib/academy/wrangler',runWrangler:async()=>{providerCalls+=1}}))
   assert.equal(providerCalls,0)
 })
@@ -291,7 +292,10 @@ test('live path resolves the pointer release and executes only pinned node and w
     { ...pinnedOptions, fs: env.fs, processLike: env.processLike, installRoot: '/opt/academy', runWrangler })
   assert.deepEqual(value, { deployments: provider })
   assert.equal(observed.executable, `${root}/node/bin/node`)
-  assert.deepEqual(observed.args, [`${root}/wrangler/bin/wrangler`, 'deployments', 'list', '--name', 'cyberskills-academy', '--json'])
+  assert.deepEqual(observed.args, [
+    `${root}/wrangler/node_modules/wrangler/bin/wrangler.js`,
+    'deployments', 'list', '--name', 'cyberskills-academy', '--json',
+  ])
   assert.equal(observed.cwd, '/private/var/lib/academy/wrangler')
   // The runner receives a revalidation hook that must succeed pre-spawn.
   assert.equal(typeof observed.verify, 'function')
@@ -312,7 +316,8 @@ test('helper binds --release to the pointer and manifest revision', async () => 
 test('helper refuses drifted release digests before provider execution', async () => {
   const { env, root } = await pinnedReleaseEnvironment(async (environment, releaseRoot) => {
     await environment.fs.chmod(`${releaseRoot}/wrangler`, 0o700)
-    await environment.fs.writeFileDirect(`${releaseRoot}/wrangler/package.json`, Buffer.from('tampered\n'), 0o444)
+    await environment.fs.writeFileDirect(`${releaseRoot}/wrangler/node_modules/wrangler/package.json`,
+      Buffer.from('tampered\n'), 0o444)
     await environment.fs.chmod(`${releaseRoot}/wrangler`, 0o555)
   })
   let calls = 0
@@ -330,7 +335,8 @@ test('pre-spawn revalidation closes the verify-to-spawn window', async () => {
     { ...pinnedOptions, fs: env.fs, processLike: env.processLike, installRoot: '/opt/academy', runWrangler })
   // Simulate drift after planning but before spawn: revalidation must fail.
   await env.fs.chmod(`${root}/wrangler`, 0o700)
-  await env.fs.writeFileDirect(`${root}/wrangler/package.json`, Buffer.from('substituted\n'), 0o444)
+  await env.fs.writeFileDirect(`${root}/wrangler/node_modules/wrangler/package.json`,
+    Buffer.from('substituted\n'), 0o444)
   await env.fs.chmod(`${root}/wrangler`, 0o555)
   await assert.rejects(observed.verify())
 })
@@ -341,11 +347,11 @@ test('pre-spawn revalidation rejects a pointer switch even when the revision is 
   await executeAcademyCloudflareHelper(inspectArgs,
     { ...pinnedOptions, fs: env.fs, processLike: env.processLike, installRoot: '/opt/academy',
       runWrangler: async invocation => { observed = invocation; return JSON.stringify(provider) } })
-  await env.fs.writeFileDirect('/source/wrangler/package.json', Buffer.from('{"changed":true}'), 0o644)
+  await env.fs.writeFileDirect('/source/node_modules/wrangler/package.json', Buffer.from('{"changed":true}'), 0o644)
   const replacement = await renderAcademyRelease({ spec: {
     releaseRevision: R,
     node: { sourcePath: '/source/node' },
-    wrangler: { sourceDirectory: '/source/wrangler', entrypoint: 'bin/wrangler' },
+    wrangler: { sourceDirectory: '/source/node_modules', entrypoint: 'wrangler/bin/wrangler.js' },
     application: { sourceDirectory: '/source/application' },
     helpers: [{ sourcePath: '/source/helper.mjs', path: 'helpers/academy-production-cloudflare-helper.mjs', mode: 0o500 }],
   }, stagingRoot: '/staging/replacement', fs: env.fs, processLike: env.processLike })

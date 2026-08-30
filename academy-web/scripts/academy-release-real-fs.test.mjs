@@ -76,10 +76,12 @@ async function tempRoot(t) {
 
 async function materialize(root, revision, { wranglerBody = WRANGLER_FIXTURE } = {}) {
   const sources = join(root, 'sources', revision)
-  await mkdir(join(sources, 'wrangler', 'bin'), { recursive: true, mode: 0o755 })
+  await mkdir(join(sources, 'node_modules', 'wrangler', 'bin'), { recursive: true, mode: 0o755 })
   await writeFile(join(sources, 'node'), '#!/bin/sh\n# stand-in; replaced by real node below\n', { mode: 0o755 })
-  await writeFile(join(sources, 'wrangler', 'bin', 'wrangler.js'), wranglerBody, { mode: 0o644 })
-  await writeFile(join(sources, 'wrangler', 'package.json'), JSON.stringify({ name: 'wrangler-fixture', version: WRANGLER_VERSION }), { mode: 0o644 })
+  await writeFile(join(sources, 'node_modules', 'wrangler', 'bin', 'wrangler.js'),
+    wranglerBody, { mode: 0o644 })
+  await writeFile(join(sources, 'node_modules', 'wrangler', 'package.json'),
+    JSON.stringify({ name: 'wrangler-fixture', version: WRANGLER_VERSION }), { mode: 0o644 })
   await writeFile(join(sources, 'helper.mjs'), '// helper source\n', { mode: 0o500 })
   await mkdir(join(sources, 'application', '.open-next', 'assets'), { recursive: true, mode: 0o755 })
   await writeFile(join(sources, 'application', 'worker.js'), 'import "./chunk.js"\nexport { handler } from "./chunk.js"\n', { mode: 0o444 })
@@ -90,7 +92,7 @@ async function materialize(root, revision, { wranglerBody = WRANGLER_FIXTURE } =
   const { root: staged, manifest } = await renderAcademyRelease({ spec: {
     releaseRevision: revision,
     node: { sourcePath: process.execPath },
-    wrangler: { sourceDirectory: join(sources, 'wrangler'), entrypoint: 'bin/wrangler.js' },
+    wrangler: { sourceDirectory: join(sources, 'node_modules'), entrypoint: 'wrangler/bin/wrangler.js' },
     application: { sourceDirectory: join(sources, 'application') },
     helpers: [
       { sourcePath: join(sources, 'helper.mjs'), path: 'helpers/academy-production-cloudflare-helper.mjs', mode: 0o500 },
@@ -217,7 +219,10 @@ test('real setgid parent: recorded gid follows the actual fstat, not the process
   const { manifest } = await renderAcademyRelease({ spec: {
     releaseRevision: REVISION_A,
     node: { sourcePath: process.execPath },
-    wrangler: { sourceDirectory: join(root, 'sources', REVISION_A, 'wrangler'), entrypoint: 'bin/wrangler.js' },
+    wrangler: {
+      sourceDirectory: join(root, 'sources', REVISION_A, 'node_modules'),
+      entrypoint: 'wrangler/bin/wrangler.js',
+    },
     application: { sourceDirectory: join(root, 'sources', REVISION_A, 'application') },
     helpers: [{ sourcePath: join(root, 'sources', REVISION_A, 'helper.mjs'), path: 'helpers/h.mjs', mode: 0o500 }],
   }, stagingRoot: join(setgidRoot, 'release') })

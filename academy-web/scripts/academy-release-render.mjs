@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Offline release renderer: materializes a reviewable immutable release from
 // pinned sources — the reviewed Node executable, a full reviewed Wrangler
-// distribution directory (entrypoint plus dependencies/runtime files, exact
+// node_modules directory (entrypoint plus dependencies/runtime files, exact
 // inventory), and helper sources — and writes the exact manifest. File and
 // directory owner/mode records come from the real post-write fstat, never from
 // process assumptions, so setgid-parent inheritance is captured faithfully.
@@ -30,7 +30,7 @@ import {
 } from './academy-release-manifest.mjs'
 
 export const ACADEMY_RELEASE_NODE_PATH = 'node/bin/node'
-export const ACADEMY_RELEASE_WRANGLER_PREFIX = 'wrangler'
+export const ACADEMY_RELEASE_WRANGLER_MODULE_ROOT = 'wrangler/node_modules'
 export const ACADEMY_RELEASE_DIRECTORY_MODE = 0o555
 export const ACADEMY_RELEASE_APPLICATION_PREFIX = 'application'
 export const ACADEMY_RELEASE_APPLICATION_CONFIG = 'application/wrangler.jsonc'
@@ -214,11 +214,11 @@ export async function renderAcademyRelease({ spec, stagingRoot, fs = filesystem,
   }
 
   const wranglerFiles = await inventoryAcademyDirectory(spec.wrangler.sourceDirectory, fs)
-  const entrypointRelative = `${ACADEMY_RELEASE_WRANGLER_PREFIX}/${spec.wrangler.entrypoint}`
+  const entrypointRelative = `${ACADEMY_RELEASE_WRANGLER_MODULE_ROOT}/${spec.wrangler.entrypoint}`
   if (!wranglerFiles.some(file => file.relative === spec.wrangler.entrypoint)) failAcademyRelease()
   for (const file of wranglerFiles) {
     const permissions = file.relative === spec.wrangler.entrypoint ? ACADEMY_RELEASE_EXECUTABLE_MODE : 0o444
-    await place(`${ACADEMY_RELEASE_WRANGLER_PREFIX}/${file.relative}`, file.absolute, permissions)
+    await place(`${ACADEMY_RELEASE_WRANGLER_MODULE_ROOT}/${file.relative}`, file.absolute, permissions)
   }
 
   const helpers = []
