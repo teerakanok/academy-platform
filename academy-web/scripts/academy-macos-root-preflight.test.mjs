@@ -58,11 +58,11 @@ test('empty PATH utility oracle resolves every root command and reaches one mock
   const workerUrl = new URL('./academy-macos-root-preflight-worker.sh', import.meta.url)
   const worker = await readFile(workerUrl, 'utf8')
   const utilities = ['/usr/bin/id','/usr/bin/stat','/bin/cat','/bin/rm','/usr/bin/install','/bin/chmod',
-    '/bin/cp','/usr/sbin/chown','/usr/bin/find','/usr/bin/shasum','/usr/bin/awk','/bin/ln']
+    '/bin/cp','/usr/sbin/chown','/usr/bin/find','/usr/bin/shasum','/usr/bin/awk','/bin/ln','/bin/mv']
   for (const utility of utilities) await access(utility, constants.X_OK)
   const syntax = spawnSync('/bin/zsh', ['-n', workerUrl.pathname], { env: { PATH: '' }, encoding: 'utf8' })
   assert.equal(syntax.status, 0, syntax.stderr)
-  for (const bare of ['id','stat','cat','rm','install','chmod','cp','chown','find','shasum','awk','ln','jq']) {
+  for (const bare of ['id','stat','cat','rm','install','chmod','cp','chown','find','shasum','awk','ln','mv','jq']) {
     assert.doesNotMatch(worker, new RegExp(`^\\s*${bare}(?=\\s)`, 'm'))
   }
   assert.equal((worker.match(/wrangler\.js" login/g) ?? []).length, 1)
@@ -80,7 +80,7 @@ test('recovery package binding and sanitized terminal phases are exact', async (
       : value && typeof value === 'object' ? Object.fromEntries(Object.entries(value).map(([key,item]) => [key,walk(item)])) : value
   const digest = createHash('sha256').update(`${JSON.stringify(walk(input))}\n`).digest('hex')
   assert.equal(digest, '39767520f14a070d4a840cdb178789efe6d9e37060725ad6f6a3f9f81d27ab3a')
-  for (const phase of ['RECONCILE_RELEASE','PREPARE_PACKAGE','RENDER_RELEASE','INSTALL_RELEASE','VERIFY_RELEASE','REOBSERVE_RELEASE','STAGE_DATABASE','AUTHENTICATE_CLOUDFLARE','COMPLETE']) {
+  for (const phase of ['OBSERVE_RELEASE','CLEANUP_STAGE','PREPARE_PACKAGE','RENDER_RELEASE','INSTALL_RELEASE','VERIFY_RELEASE','REOBSERVE_RELEASE','STAGE_DATABASE','AUTHENTICATE_CLOUDFLARE','COMPLETE']) {
     assert.match(worker, new RegExp(`phase=${phase}`))
   }
   assert.equal(worker.includes('"path"'), false)
@@ -88,7 +88,12 @@ test('recovery package binding and sanitized terminal phases are exact', async (
   assert.match(worker, /terminal_ready=false/)
   assert.match(worker, /if \$terminal_ready; then/)
   assert.ok(worker.indexOf('terminal_ready=true') > worker.indexOf("academy-root-preflight/7dca6452\\n"))
-  assert.ok(worker.indexOf('publication=UNKNOWN\n"$stage/source/node" "$stage/tooling/academy-release-cli.mjs" install') > 0)
+  const observationIndex = worker.indexOf('academy-macos-release-recovery.mjs" "$observation_tmp"')
+  const cleanupIndex = worker.indexOf('phase=CLEANUP_STAGE')
+  assert.ok(observationIndex >= 0 && cleanupIndex > observationIndex)
+  assert.ok(worker.indexOf('phase=CLEANUP_STAGE') < worker.indexOf('/bin/rm -rf "$stage"'))
+  assert.match(worker, /if \[\[ "\$install_required" == true \]\]; then/)
+  assert.equal((worker.match(/academy-release-cli\.mjs" install/g) ?? []).length, 1)
   assert.ok(worker.indexOf('phase=REOBSERVE_RELEASE') < worker.lastIndexOf('publication="$('))
 })
 
@@ -97,7 +102,7 @@ test('real zsh error trap emits a bounded structured terminal receipt', async t 
   t.after(() => rm(stage, { recursive:true, force:true }))
   const worker = await readFile(new URL('./academy-macos-root-preflight-worker.sh', import.meta.url), 'utf8')
   const start = worker.indexOf('TRAPZERR() {')
-  const end = worker.indexOf('\n}\n\nif [[ -e "$stage"', start) + 2
+  const end = worker.indexOf('\n}\n\nphase=OBSERVE_RELEASE', start) + 2
   assert.ok(start >= 0 && end > start)
   const trapFunction = worker.slice(start, end)
   const result = spawnSync('/bin/zsh', ['-c', `stage=$1; phase=TEST_PHASE; publication=UNKNOWN; terminal_ready=true\n${trapFunction}\nfalse`, 'oracle', stage],
