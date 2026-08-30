@@ -1,9 +1,12 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { EventEmitter } from 'node:events'
+import { createHash } from 'node:crypto'
 import { constants } from 'node:fs'
-import { access, readFile } from 'node:fs/promises'
+import { access, mkdtemp, readFile, rm } from 'node:fs/promises'
 import { spawnSync } from 'node:child_process'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 
 import { main, verifyWorker } from './academy-macos-root-preflight.mjs'
 
@@ -30,7 +33,7 @@ test('launcher binds exact worker bytes and repository contains one elevation si
 test('worker binds executable inputs and preserves foreign root state', async () => {
   const worker = await readFile(new URL('./academy-macos-root-preflight-worker.sh', import.meta.url), 'utf8')
   assert.match(worker, /verify_root_file "\$stage\/source\/node" 500 [a-f0-9]{64}/)
-  assert.equal((worker.match(/verify_root_file "\$stage\/tooling\//g) ?? []).length, 5)
+  assert.equal((worker.match(/verify_root_file "\$stage\/tooling\//g) ?? []).length, 6)
   assert.equal(worker.includes('academy-release-*.mjs'), false)
   assert.equal(worker.includes('"$db_source"/migrations/*.sql'), false)
   assert.match(worker, /\.academy-owned/)
@@ -65,4 +68,43 @@ test('empty PATH utility oracle resolves every root command and reaches one mock
   assert.equal((worker.match(/wrangler\.js" login/g) ?? []).length, 1)
   assert.equal((worker.match(/wrangler\.js" whoami/g) ?? []).length, 1)
   assert.ok(worker.indexOf('verify_root_file "$stage/source/node"') < worker.indexOf('wrangler.js" login'))
+})
+
+test('recovery package binding and sanitized terminal phases are exact', async () => {
+  const worker = await readFile(new URL('./academy-macos-root-preflight-worker.sh', import.meta.url), 'utf8')
+  const input = JSON.parse(await readFile('/private/tmp/academy-release-package-fa7.json', 'utf8'))
+  const old = '/private/tmp/academy-release-sources-fa7'
+  const next = '/private/var/root/academy-release-recovery-7dca6452/source'
+  const walk = value => typeof value === 'string' ? value.split(old).join(next)
+    : Array.isArray(value) ? value.map(walk)
+      : value && typeof value === 'object' ? Object.fromEntries(Object.entries(value).map(([key,item]) => [key,walk(item)])) : value
+  const digest = createHash('sha256').update(`${JSON.stringify(walk(input))}\n`).digest('hex')
+  assert.equal(digest, '39767520f14a070d4a840cdb178789efe6d9e37060725ad6f6a3f9f81d27ab3a')
+  for (const phase of ['RECONCILE_RELEASE','PREPARE_PACKAGE','RENDER_RELEASE','INSTALL_RELEASE','VERIFY_RELEASE','REOBSERVE_RELEASE','STAGE_DATABASE','AUTHENTICATE_CLOUDFLARE','COMPLETE']) {
+    assert.match(worker, new RegExp(`phase=${phase}`))
+  }
+  assert.equal(worker.includes('"path"'), false)
+  assert.equal(worker.includes('"error"'), false)
+  assert.match(worker, /terminal_ready=false/)
+  assert.match(worker, /if \$terminal_ready; then/)
+  assert.ok(worker.indexOf('terminal_ready=true') > worker.indexOf("academy-root-preflight/7dca6452\\n"))
+  assert.ok(worker.indexOf('publication=UNKNOWN\n"$stage/source/node" "$stage/tooling/academy-release-cli.mjs" install') > 0)
+  assert.ok(worker.indexOf('phase=REOBSERVE_RELEASE') < worker.lastIndexOf('publication="$('))
+})
+
+test('real zsh error trap emits a bounded structured terminal receipt', async t => {
+  const stage = await mkdtemp(join(tmpdir(), 'academy-trap-'))
+  t.after(() => rm(stage, { recursive:true, force:true }))
+  const worker = await readFile(new URL('./academy-macos-root-preflight-worker.sh', import.meta.url), 'utf8')
+  const start = worker.indexOf('TRAPZERR() {')
+  const end = worker.indexOf('\n}\n\nif [[ -e "$stage"', start) + 2
+  assert.ok(start >= 0 && end > start)
+  const trapFunction = worker.slice(start, end)
+  const result = spawnSync('/bin/zsh', ['-c', `stage=$1; phase=TEST_PHASE; publication=UNKNOWN; terminal_ready=true\n${trapFunction}\nfalse`, 'oracle', stage],
+    { env:{ PATH:'' }, encoding:'utf8' })
+  assert.equal(result.status, 1)
+  assert.equal(result.stderr, 'ACADEMY_SINGLE_PROMPT_PREFLIGHT_FAILED phase=TEST_PHASE publication=UNKNOWN\n')
+  assert.deepEqual(JSON.parse(await readFile(join(stage, 'terminal.json'), 'utf8')), {
+    schema:'academy-macos-root-preflight-terminal/v1', status:'FAILED', phase:'TEST_PHASE', publication:'UNKNOWN',
+  })
 })
