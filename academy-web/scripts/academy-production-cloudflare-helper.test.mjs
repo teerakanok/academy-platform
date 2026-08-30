@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { spawn } from 'node:child_process'
-import { chmod, mkdtemp, readFile, realpath, rm, writeFile } from 'node:fs/promises'
+import { chmod, mkdir, mkdtemp, readFile, realpath, rm, symlink, writeFile } from 'node:fs/promises'
+import { createHash } from 'node:crypto'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import test from 'node:test'
@@ -147,10 +148,15 @@ async function pinnedReleaseEnvironment(tamper, includeApplication = true) {
   await env.fs.writeFileDirect('/source/node_modules/wrangler/package.json', Buffer.from('{}'), 0o644)
   await env.fs.writeFileDirect('/source/helper.mjs', Buffer.from('// helper source\n'), 0o500)
   await env.fs.mkdir('/source/application/.open-next/assets', { recursive: true })
+  await env.fs.mkdir('/source/application/src', { recursive: true })
+  await env.fs.mkdir('/source/application/worker', { recursive: true })
+  await env.fs.writeFileDirect('/source/application/src/entry.js', Buffer.from('export {}\n'), 0o444)
+  await env.fs.writeFileDirect('/source/application/worker/object.js', Buffer.from('export {}\n'), 0o444)
   await env.fs.writeFileDirect('/source/application/worker.js', Buffer.from('import "./chunk.js"\nexport { handler } from "./chunk.js"\n'), 0o444)
+  await env.fs.writeFileDirect('/source/application/worker.ts', Buffer.from('export { handler } from "./worker.js"\n'), 0o444)
   await env.fs.writeFileDirect('/source/application/chunk.js', Buffer.from('export const handler = () => "academy"\n'), 0o444)
   await env.fs.writeFileDirect('/source/application/wrangler.jsonc',
-    Buffer.from('{"main":"worker.js","assets":{"directory":".open-next/assets","binding":"ASSETS"}}\n'), 0o444)
+    Buffer.from('{"main":"worker.ts","assets":{"directory":".open-next/assets","binding":"ASSETS"}}\n'), 0o444)
   await env.fs.writeFileDirect('/source/application/.open-next/assets/asset.svg', Buffer.from('<svg/>\n'), 0o444)
   const { root, manifest } = await renderAcademyRelease({ spec: {
     releaseRevision: R,
@@ -178,6 +184,7 @@ const versionInventory = (id, tag = '', message = '') => JSON.stringify([{ id, m
 
 test('candidate upload pins Wrangler and verifies exact provider annotations at zero traffic', async () => {
   const tag = `release-${R.slice(0,12)}`
+  const uploadMessage = 's=bbbbbbbbbbbb;c=d901061aa65e'
   const config = 'd901061aa65ea867e0cc505a1eca044204a04a5b75b16bba46edca0723baa8c8'
   const message = `s=${R.slice(0,12)};c=${config.slice(0,12)}`
   const calls = []
@@ -220,9 +227,11 @@ test('live upload requires release-bound worker and config and uses a separate w
     { ...pinnedOptions, fs:env.fs, processLike:env.processLike, installRoot:'/opt/academy', runWrangler })
   assert.equal(value.versionId,candidate)
   const upload = calls.find(call=>call.args.includes('upload'))
-  assert.equal(upload.cwd,'/private/var/lib/academy/wrangler')
+  const workspace = `/private/var/lib/academy/wrangler/application-${common[1]}`
+  assert.equal(upload.cwd,workspace)
   assert.equal(upload.args.includes(`${root}/application/worker.js`), false)
-  assert.ok(upload.args.includes(`${root}/application/wrangler.jsonc`))
+  assert.equal(upload.args.includes(`${root}/application/worker.ts`), false)
+  assert.ok(upload.args.includes(`${workspace}/application/wrangler.jsonc`))
 
   const missing = await pinnedReleaseEnvironment(undefined,false)
   let providerCalls=0
@@ -287,19 +296,128 @@ test('protected secret staging sends values only through stdin contract and retu
 test('live path resolves the pointer release and executes only pinned node and wrangler entrypoint', async () => {
   const { env, root } = await pinnedReleaseEnvironment()
   let observed
-  const runWrangler = async invocation => { observed = invocation; return JSON.stringify(provider) }
+  let workspaceDuringProviderCall
+  const runWrangler = async invocation => {
+    observed = invocation
+    await invocation.verify()
+    workspaceDuringProviderCall = await env.fs.lstat(`/private/var/lib/academy/wrangler/application-${common[1]}`)
+      .then(() => true, () => false)
+    return JSON.stringify(provider)
+  }
   const value = await executeAcademyCloudflareHelper(inspectArgs,
     { ...pinnedOptions, fs: env.fs, processLike: env.processLike, installRoot: '/opt/academy', runWrangler })
   assert.deepEqual(value, { deployments: provider })
+  const workspace = `/private/var/lib/academy/wrangler/application-${common[1]}`
   assert.equal(observed.executable, `${root}/node/bin/node`)
   assert.deepEqual(observed.args, [
     `${root}/wrangler/node_modules/wrangler/bin/wrangler.js`,
     'deployments', 'list', '--name', 'cyberskills-academy', '--json',
   ])
-  assert.equal(observed.cwd, '/private/var/lib/academy/wrangler')
+  assert.equal(observed.cwd, workspace)
   // The runner receives a revalidation hook that must succeed pre-spawn.
   assert.equal(typeof observed.verify, 'function')
-  await observed.verify()
+  assert.equal(workspaceDuringProviderCall, true)
+})
+
+test('successful projected invocation uses copied config and exact release links, then cleans', async () => {
+  const { env, root } = await pinnedReleaseEnvironment()
+  const observedList = []
+  let lists = 0
+  const tag = `release-${R.slice(0,12)}`
+  const uploadMessage = 's=bbbbbbbbbbbb;c=d901061aa65e'
+  const versionInventory = (id, versionTag = '', message = '') => JSON.stringify([{
+    id, metadata: { created_on: '2026-08-29T10:01:00Z' },
+    annotations: { 'workers/tag': versionTag, 'workers/message': message },
+  }])
+  const runWrangler = async invocation => {
+    observedList.push(invocation)
+    await invocation.verify()
+    const args = invocation.args.slice(1)
+    if (args[0] === 'deployments') return JSON.stringify(provider)
+    if (args[0] === '--version') return '4.120.0\n'
+    if (args[0] === 'versions' && args[1] === 'upload') return 'uploaded\n'
+    if (args[0] === 'versions' && args[1] === 'view') return JSON.stringify({
+      id: candidate, resources: { bindings: CONFIG_NAMES.map(name => ({ name, type: 'secret_text' })) },
+    })
+    if (args[0] === 'versions' && args[1] === 'list') {
+      lists += 1
+      return lists === 1 ? versionInventory(version) : JSON.stringify([
+        ...JSON.parse(versionInventory(version)), ...JSON.parse(versionInventory(candidate, tag, uploadMessage)),
+      ])
+    }
+    throw new Error('unexpected provider invocation')
+  }
+  await executeAcademyCloudflareHelper([...common,'--operation','upload','--source',R,'--traffic','0'],
+    { ...pinnedOptions, fs: env.fs, processLike: env.processLike, installRoot: '/opt/academy', runWrangler })
+  const workspace = `/private/var/lib/academy/wrangler/application-${common[1]}`
+  const application = `${workspace}/application`
+  const observed = observedList.find(call => call.args.includes('versions upload') || call.args.includes('upload'))
+  assert.equal(observed.cwd, workspace)
+  assert.deepEqual(observed.args.slice(0, 2), [
+    `${root}/wrangler/node_modules/wrangler/bin/wrangler.js`,
+    'versions',
+  ])
+  assert.ok(observed.args.includes(`${application}/wrangler.jsonc`))
+  assert.equal(observed.args.includes(`${root}/application/wrangler.jsonc`), false)
+  assert.equal(await env.fs.lstat(workspace).then(() => true, () => false), false)
+})
+
+test('projected config and target drift are rejected before provider calls', async () => {
+  for (const tamperConfig of [true, false]) {
+    const { env } = await pinnedReleaseEnvironment()
+    await env.fs.mkdir('/foreign', { mode: 0o700 })
+    await env.fs.writeFileDirect('/foreign/config.jsonc', Buffer.from('{"main":"evil.js"}\n'), 0o600)
+    await env.fs.mkdir('/private/var/lib/academy/wrangler/foreign-target', { mode: 0o700 })
+    await env.fs.writeFileDirect('/private/var/lib/academy/wrangler/foreign-target/evil.js',
+      Buffer.from('export {}\n'), 0o600)
+    let stage = 0
+    const revalidate = async () => {
+      stage += 1
+      if (stage !== 2) return
+      const workspace = `/private/var/lib/academy/wrangler/application-${common[1]}`
+      const application = `${workspace}/application`
+      if (tamperConfig) {
+        await env.fs.rm(`${application}/wrangler.jsonc`)
+        await env.fs.writeFileDirect(`${application}/wrangler.jsonc`, Buffer.from('{"main":"evil.js"}\n'), 0o600)
+      } else {
+        await env.fs.rm(`${application}/worker.ts`)
+        await env.fs.symlink('/private/var/lib/academy/wrangler/foreign-target', `${application}/worker.ts`)
+      }
+    }
+    let providerCalls = 0
+    await assert.rejects(executeAcademyCloudflareHelper(inspectArgs,
+      { ...pinnedOptions, fs: env.fs, processLike: env.processLike, installRoot: '/opt/academy',
+        release: undefined, revalidate,
+        runWrangler: async invocation => { await invocation.verify(); providerCalls += 1 } }))
+    assert.equal(providerCalls, 0)
+  assert.equal(await env.fs.digestOf('/foreign/config.jsonc'),
+    'bb450872ea93c37853bf39bb686417c7eb34d66d8f1bdf6ebbfc29571beac528')
+  }
+})
+
+test('foreign operation residue is preserved and rejected without cleanup', async () => {
+  const { env } = await pinnedReleaseEnvironment()
+  const workspace = `/private/var/lib/academy/wrangler/application-${common[1]}`
+  await env.fs.mkdir(workspace, { mode: 0o700 })
+  await env.fs.writeFileDirect(`${workspace}/operator-owned.json`, Buffer.from('preserve\\n'), 0o600)
+  let providerCalls = 0
+  await assert.rejects(executeAcademyCloudflareHelper(inspectArgs,
+    { ...pinnedOptions, fs: env.fs, processLike: env.processLike, installRoot: '/opt/academy',
+      runWrangler: async () => { providerCalls += 1 } }))
+  assert.equal(providerCalls, 0)
+  assert.equal(await env.fs.lstat(`${workspace}/operator-owned.json`).then(() => true, () => false), true)
+})
+
+test('operation failure preserves unrelated residue and removes only exact workspace', async () => {
+  const { env } = await pinnedReleaseEnvironment()
+  const workRoot = '/private/var/lib/academy/wrangler'
+  await env.fs.mkdir(`${workRoot}/unrelated`, { mode: 0o700 })
+  await env.fs.writeFileDirect(`${workRoot}/unrelated/evidence.json`, Buffer.from('keep\\n'), 0o600)
+  await assert.rejects(executeAcademyCloudflareHelper(inspectArgs,
+    { ...pinnedOptions, fs: env.fs, processLike: env.processLike, installRoot: '/opt/academy',
+      runWrangler: async () => { throw new Error('provider failed') } }))
+  assert.equal(await env.fs.lstat(`${workRoot}/unrelated/evidence.json`).then(() => true, () => false), true)
+  assert.equal(await env.fs.lstat(`${workRoot}/application-${common[1]}`).then(() => true, () => false), false)
 })
 
 test('helper binds --release to the pointer and manifest revision', async () => {
@@ -403,15 +521,38 @@ else if(args[0]==='versions'&&args[1]==='upload'){const tag=args[args.indexOf('-
 else if(args[0]==='versions'&&args[1]==='deploy'){state.serial++;state.version=args[2].split('@')[0];state.deployment=['${activated}','55555555-5555-4555-8555-555555555555'][state.serial-1];save();process.stdout.write('deployed\\n')}
 else process.exit(2)
 `, { mode:0o700 })
+  const application = join(root, 'application')
+  const applicationConfigBytes = Buffer.from('{"main":"worker.ts","assets":{"directory":".open-next/assets","binding":"ASSETS"}}\n')
+  const applicationWorkerBytes = Buffer.from('export {}\n')
+  await mkdir(join(application, '.open-next', 'assets'), { recursive: true, mode: 0o700 })
+  await mkdir(join(application, 'src'), { recursive: true, mode: 0o700 })
+  await mkdir(join(application, 'worker'), { recursive: true, mode: 0o700 })
+  await writeFile(join(application, 'wrangler.jsonc'), applicationConfigBytes, { mode: 0o600 })
+  await writeFile(join(application, 'worker.ts'), applicationWorkerBytes, { mode: 0o600 })
+  const uid = process.getuid(); const gid = process.getgid()
+  const entry = (path, bytes) => ({ path, sha256: createHash('sha256').update(bytes).digest('hex'),
+    size: bytes.length, mode: 0o444, uid, gid, nlink: 1 })
+  const directory = path => ({ path, mode: 0o500, uid, gid })
+  const manifest = {
+    releaseRevision: R,
+    entries: [
+      entry('application/wrangler.jsonc', applicationConfigBytes),
+      entry('application/worker.ts', applicationWorkerBytes),
+    ],
+    directories: [
+      directory('application/.open-next'), directory('application/src'), directory('application/worker'),
+    ],
+  }
   const helperUrl = new URL('./academy-production-cloudflare-helper.mjs', import.meta.url).href
   await writeFile(harnessPath, `import {executeAcademyCloudflareHelper} from ${JSON.stringify(helperUrl)}
 const root=${JSON.stringify(root)}, validUntil=Date.parse('2026-08-29T12:00:00Z')
-executeAcademyCloudflareHelper(JSON.parse(process.argv[2]),{clock:()=>Date.parse('2026-08-29T11:00:00Z'),env:{},workRoot:root,release:{root,nodeExecutable:process.execPath,wranglerEntrypoint:${JSON.stringify(wranglerPath)},manifest:{releaseRevision:${JSON.stringify(R)},entries:[{path:'application/wrangler.jsonc'}]}},revalidate:async()=>{}}).then(v=>process.stdout.write(JSON.stringify(v)+'\\n')).catch(()=>process.exit(1))
+executeAcademyCloudflareHelper(JSON.parse(process.argv[2]),{clock:()=>Date.parse('2026-08-29T11:00:00Z'),env:{},workRoot:root,release:{root,uid:${uid},gid:${gid},nodeExecutable:process.execPath,wranglerEntrypoint:${JSON.stringify(wranglerPath)},manifest:${JSON.stringify(manifest)}},revalidate:async()=>{}}).then(v=>process.stdout.write(JSON.stringify(v)+'\\n')).catch(()=>process.exit(1))
 `, { mode:0o600 })
   const invoke = args => new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [harnessPath, JSON.stringify(args)], { cwd:root, stdio:['ignore','pipe','pipe'] })
     const stdout=[]; child.stdout.on('data', chunk=>stdout.push(chunk)); child.once('error',reject)
-    child.once('close', code=>code===0 ? resolve(JSON.parse(Buffer.concat(stdout))) : reject(new Error('helper process failed')))
+    const stderr=[]; child.stderr.on('data', chunk=>stderr.push(chunk))
+    child.once('close', code=>code===0 ? resolve(JSON.parse(Buffer.concat(stdout))) : reject(new Error(Buffer.concat(stderr).toString('utf8'))))
   })
   const uploaded = await invoke([...common,'--operation','upload','--source',R,'--traffic','0'])
   assert.equal(uploaded.versionId, candidate)
