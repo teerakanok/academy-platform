@@ -2,21 +2,32 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { EventEmitter } from 'node:events'
 import { createHash } from 'node:crypto'
-import { constants } from 'node:fs'
+import { constants, statSync } from 'node:fs'
 import { access, chmod, copyFile, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises'
 import { spawn, spawnSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { OBSERVER_ASSETS, boundWorkerInvocation, main, verifyWorker } from './academy-macos-root-preflight.mjs'
+import { OBSERVER_ASSETS, boundWorkerInvocation, main, parseDiagnosticEnvelope, verifyWorker } from './academy-macos-root-preflight.mjs'
+
+const mockOsascript = ({ status=0, stdout='ACADEMY_ROOT_PREFLIGHT_RESULT status=PASS\n', stderr='' } = {}) =>
+  (executable,args,options) => {
+    const child = new EventEmitter()
+    child.stdout = new EventEmitter(); child.stderr = new EventEmitter()
+    child.stdout.setEncoding = () => {}; child.stderr.setEncoding = () => {}
+    queueMicrotask(() => {
+      if (stdout) child.stdout.emit('data',stdout)
+      if (stderr) child.stderr.emit('data',stderr)
+      child.emit('close',status)
+    })
+    return child
+  }
 
 test('full remaining preflight has exactly one elevation prompt', async () => {
   const calls = []
   await main({ spawnProcess(executable, args, options) {
     calls.push({ executable, args, options })
-    const child = new EventEmitter()
-    queueMicrotask(() => child.emit('close', 0))
-    return child
+    return mockOsascript()(executable,args,options)
   } })
   assert.equal(calls.length, 1)
   assert.equal(calls[0].executable, '/usr/bin/osascript')
@@ -24,7 +35,27 @@ test('full remaining preflight has exactly one elevation prompt', async () => {
   assert.equal(calls[0].args.join(' ').includes('sudo'), false)
   assert.doesNotMatch(calls[0].args.join(' '), /\/node' -e/)
   assert.match(calls[0].args.join(' '), /academy-bound-worker-executor\.cjs/)
-  assert.match(calls[0].args.join(' '), /d30d89ee73f514970b75314a4e11748b0b7d2ce67b931cac79b13c316e6405dd/)
+  assert.match(calls[0].args.join(' '), /07ed27c084efc6767b010a33a2b80522161bf85b1298d5606fceb8616cf4ab2e/)
+})
+
+test('launcher separates authorization cancellation from bounded privileged failures', async () => {
+  await assert.rejects(main({spawnProcess:mockOsascript({status:1,stderr:'user canceled and secret detail'})}),
+    /^Error: AUTHORIZATION_NOT_COMPLETED$/)
+  for (const reason of ['ROOT_BOOTSTRAP_REJECTED','EXECUTOR_BINDING_REJECTED','EXECUTOR_SPAWN_REJECTED','EXECUTOR_POSTCHECK_REJECTED']) {
+    await assert.rejects(main({spawnProcess:mockOsascript({stdout:`ACADEMY_ROOT_PREFLIGHT_RESULT status=FAILED reason=${reason}\n`})}),
+      new RegExp(`${reason}$`))
+  }
+})
+
+test('launcher relays only exact whitelisted worker fields and suppresses raw output', async () => {
+  const line='ACADEMY_ROOT_PREFLIGHT_RESULT status=FAILED reason=WORKER_REJECTED phase=INSTALL_RELEASE publication=UNKNOWN worker_reason=FOREIGN_STAGE\n'
+  await assert.rejects(main({spawnProcess:mockOsascript({stdout:line,stderr:'password=do-not-relay'})}),
+    /^Error: WORKER_REJECTED phase=INSTALL_RELEASE publication=UNKNOWN reason=FOREIGN_STAGE$/)
+  for (const output of ['secret\n',`${line}secret\n`,line.replace('FOREIGN_STAGE','SECRET_VALUE')]) {
+    await assert.rejects(main({spawnProcess:mockOsascript({stdout:output,stderr:'another secret'})}),
+      /^Error: ROOT_BOOTSTRAP_REJECTED$/)
+  }
+  assert.equal(parseDiagnosticEnvelope('ACADEMY_ROOT_PREFLIGHT_RESULT status=PASS\n')?.status,'PASS')
 })
 
 test('launcher binds exact worker bytes and repository contains one elevation site', async () => {
@@ -63,17 +94,88 @@ test('bound worker executor rejects symlink and path swap while retaining the ex
   const digest = createHash('sha256').update(bytes).digest('hex')
   await writeFile(worker, bytes, { mode:0o500 })
   const executor = new URL('./academy-bound-worker-executor.cjs', import.meta.url).pathname
+  const identity=statSync(worker)
   const run = path => spawnSync(process.execPath, [executor, path, digest,
-    String(process.getuid()), String(process.getgid()), String(0o500)], { encoding:'utf8' })
+    String(identity.uid), String(identity.gid), String(0o500),join(root,'terminal.json')], { encoding:'utf8' })
   const linked = join(root, 'linked')
   await symlink(worker, linked)
-  assert.notEqual(run(linked).status, 0)
+  assert.equal(run(linked).stdout,'ACADEMY_ROOT_PREFLIGHT_RESULT status=FAILED reason=EXECUTOR_BINDING_REJECTED\n')
   await writeFile(replacement, bytes, { mode:0o500 })
   const swapper = spawn('/bin/zsh', ['-c', 'while [[ ! -f "$3" ]]; do /bin/sleep 0.01; done; /bin/mv "$1" "$2"', 'swap', replacement, worker, started])
   const swapped = run(worker)
+  if (!await access(started).then(()=>true,()=>false)) swapper.kill('SIGTERM')
   await new Promise(resolve => swapper.once('close', resolve))
-  assert.notEqual(swapped.status, 0)
-  assert.equal(await readFile(marker, 'utf8'), 'PASS\n')
+  assert.match(swapped.stdout,/reason=EXECUTOR_(?:BINDING|POSTCHECK)_REJECTED/)
+  if (swapped.stdout.includes('POSTCHECK')) assert.equal(await readFile(marker, 'utf8'), 'PASS\n')
+})
+
+test('executor classifies spawn failure without relaying exception detail', async t => {
+  const root=await mkdtemp(join(tmpdir(),'academy-executor-spawn-'))
+  t.after(()=>rm(root,{recursive:true,force:true}))
+  const worker=join(root,'worker'), preload=join(root,'preload.cjs')
+  const bytes=Buffer.from('#!/bin/zsh\n')
+  await writeFile(worker,bytes,{mode:0o500})
+  const identity=statSync(worker)
+  await writeFile(preload,`const cp=require('child_process'),{EventEmitter}=require('events');cp.spawn=()=>{const child=new EventEmitter();child.stdout=new EventEmitter();child.stderr=new EventEmitter();child.stdout.setEncoding=()=>{};child.stderr.setEncoding=()=>{};queueMicrotask(()=>child.emit('error',new Error('secret spawn detail')));return child}`)
+  const executed=spawnSync(process.execPath,[new URL('./academy-bound-worker-executor.cjs',import.meta.url).pathname,
+    worker,createHash('sha256').update(bytes).digest('hex'),String(identity.uid),String(identity.gid),String(0o500),join(root,'terminal.json')],
+    {encoding:'utf8',env:{...process.env,NODE_OPTIONS:`--require=${preload}`}})
+  assert.equal(executed.stdout,'ACADEMY_ROOT_PREFLIGHT_RESULT status=FAILED reason=EXECUTOR_SPAWN_REJECTED\n')
+  assert.equal(executed.stderr,'')
+})
+
+test('executor classifies a post-execution worker identity change', async t => {
+  const root=await mkdtemp(join(tmpdir(),'academy-executor-postcheck-'))
+  t.after(()=>rm(root,{recursive:true,force:true}))
+  const worker=join(root,'worker'), preload=join(root,'preload.cjs')
+  const bytes=Buffer.from('#!/bin/zsh\nprint "ACADEMY_SINGLE_PROMPT_PREFLIGHT_PASS"\n')
+  await writeFile(worker,bytes,{mode:0o500})
+  const identity=statSync(worker)
+  await writeFile(preload,`const fs=require('fs'),original=fs.lstatSync;let seen=0;fs.lstatSync=function(path,options){const value=original.call(this,path,options);if(path===process.env.ACADEMY_TEST_WORKER&&++seen===2)value.ino+=1n;return value}`)
+  const executed=spawnSync(process.execPath,[new URL('./academy-bound-worker-executor.cjs',import.meta.url).pathname,
+    worker,createHash('sha256').update(bytes).digest('hex'),String(identity.uid),String(identity.gid),String(0o500),join(root,'terminal.json')],
+    {encoding:'utf8',env:{...process.env,NODE_OPTIONS:`--require=${preload}`,ACADEMY_TEST_WORKER:worker}})
+  assert.equal(executed.stdout,'ACADEMY_ROOT_PREFLIGHT_RESULT status=FAILED reason=EXECUTOR_POSTCHECK_REJECTED\n')
+  assert.equal(executed.stderr,'')
+})
+
+test('executor accepts only a fresh exact terminal receipt and suppresses malicious stderr', async t => {
+  const root=await mkdtemp(join(tmpdir(),'academy-executor-receipt-'))
+  t.after(()=>rm(root,{recursive:true,force:true}))
+  const executor=new URL('./academy-bound-worker-executor.cjs',import.meta.url).pathname
+  const terminal=join(root,'terminal.json'), worker=join(root,'worker')
+  const stale={schema:'academy-macos-root-preflight-terminal/v1',status:'FAILED',phase:'INSTALL_RELEASE',publication:'UNKNOWN',reason:'FOREIGN_STAGE'}
+  await writeFile(terminal,`${JSON.stringify(stale)}\n`,{mode:0o600})
+  const run = async bytes => {
+    await chmod(worker,0o700).catch(()=>{})
+    await writeFile(worker,bytes,{mode:0o500})
+    await chmod(worker,0o500)
+    const identity=statSync(worker)
+    return spawnSync(process.execPath,[executor,worker,createHash('sha256').update(bytes).digest('hex'),
+      String(identity.uid),String(identity.gid),String(0o500),terminal],{encoding:'utf8'})
+  }
+  const staleResult=await run(Buffer.from('#!/bin/zsh\nprint -u2 "token=secret"\nexit 1\n'))
+  assert.equal(staleResult.stdout,'ACADEMY_ROOT_PREFLIGHT_RESULT status=FAILED reason=EXECUTOR_POSTCHECK_REJECTED\n')
+  assert.equal(staleResult.stderr,'')
+
+  const fresh={...stale,phase:'VERIFY_RELEASE',reason:'UNCLASSIFIED'}
+  const script=`#!/bin/zsh\nprint -r -- '${JSON.stringify(fresh)}' > '${terminal}'\n/bin/chmod 600 '${terminal}'\nprint -u2 'untrusted raw detail'\nexit 1\n`
+  const freshResult=await run(Buffer.from(script))
+  assert.equal(freshResult.stdout,'ACADEMY_ROOT_PREFLIGHT_RESULT status=FAILED reason=WORKER_REJECTED phase=VERIFY_RELEASE publication=UNKNOWN worker_reason=UNCLASSIFIED\n')
+  assert.equal(freshResult.stderr,'')
+})
+
+test('executor relays one exact bounded worker reason without raw stderr', async t => {
+  const root=await mkdtemp(join(tmpdir(),'academy-executor-bounded-'))
+  t.after(()=>rm(root,{recursive:true,force:true}))
+  const worker=join(root,'worker'), terminal=join(root,'terminal.json')
+  const bytes=Buffer.from('#!/bin/zsh\nprint -u2 "raw secret"\nprint -u2 "ACADEMY_SINGLE_PROMPT_PREFLIGHT_FAILED phase=OBSERVE_RELEASE publication=UNKNOWN reason=UNCLASSIFIED"\nexit 1\n')
+  await writeFile(worker,bytes,{mode:0o500})
+  const identity=statSync(worker)
+  const result=spawnSync(process.execPath,[new URL('./academy-bound-worker-executor.cjs',import.meta.url).pathname,
+    worker,createHash('sha256').update(bytes).digest('hex'),String(identity.uid),String(identity.gid),String(0o500),terminal],{encoding:'utf8'})
+  assert.equal(result.stdout,'ACADEMY_ROOT_PREFLIGHT_RESULT status=FAILED reason=WORKER_REJECTED phase=OBSERVE_RELEASE publication=UNKNOWN worker_reason=UNCLASSIFIED\n')
+  assert.equal(result.stderr,'')
 })
 
 test('generated executor invocation survives hostile shell characters and reaches worker boundary', async t => {
@@ -83,10 +185,11 @@ test('generated executor invocation survives hostile shell characters and reache
   const quotedMarker = `'${marker.replaceAll("'", `'"'"'`)}'`
   const bytes = Buffer.from(`#!/bin/zsh\n/bin/echo reached > ${quotedMarker}\n`)
   await writeFile(worker, bytes, { mode:0o500 })
+  const identity=statSync(worker)
   const command = boundWorkerInvocation({ node:'/private/tmp/academy-release-sources-fa7/node',
     executor:new URL('./academy-bound-worker-executor.cjs', import.meta.url).pathname,
     worker, digest:createHash('sha256').update(bytes).digest('hex'),
-    uid:process.getuid(), gid:process.getgid(), mode:0o500 })
+    uid:identity.uid, gid:identity.gid, mode:0o500 })
   const result = spawnSync('/bin/zsh', ['-c', command], { encoding:'utf8' })
   assert.equal(result.status, 0, result.stderr)
   assert.equal(await readFile(marker, 'utf8'), 'reached\n')

@@ -4,7 +4,7 @@ set -euo pipefail
 umask 077
 
 stage=/private/var/root/academy-release-recovery-7dca6452
-observer=/private/var/root/academy-release-observer-7dca6452
+observer=/private/var/root/academy-release-observer-07ed27c0
 observation=/private/var/root/academy-release-observation-7dca6452.json
 source=/private/tmp/academy-release-sources-fa7
 input=/private/tmp/academy-release-package-fa7.json
