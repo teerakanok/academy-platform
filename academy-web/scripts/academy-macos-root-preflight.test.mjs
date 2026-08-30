@@ -3,12 +3,12 @@ import test from 'node:test'
 import { EventEmitter } from 'node:events'
 import { createHash } from 'node:crypto'
 import { constants } from 'node:fs'
-import { access, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises'
+import { access, chmod, copyFile, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises'
 import { spawn, spawnSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { boundWorkerInvocation, main, verifyWorker } from './academy-macos-root-preflight.mjs'
+import { OBSERVER_ASSETS, boundWorkerInvocation, main, verifyWorker } from './academy-macos-root-preflight.mjs'
 
 test('full remaining preflight has exactly one elevation prompt', async () => {
   const calls = []
@@ -31,6 +31,28 @@ test('launcher binds exact worker bytes and repository contains one elevation si
   await verifyWorker()
   const launcher = await readFile(new URL('./academy-macos-root-preflight.mjs', import.meta.url), 'utf8')
   assert.equal(launcher.match(/with administrator privileges/g)?.length, 1)
+})
+
+test('generated observer assets execute the actual recovery observation import graph', async t => {
+  const root = await mkdtemp(join(tmpdir(), 'academy-root-observer-'))
+  t.after(() => rm(root, {recursive:true,force:true}))
+  for (const asset of OBSERVER_ASSETS) {
+    const target=join(root,asset.name)
+    await copyFile(asset.source,target)
+    await chmod(target,asset.mode)
+    assert.equal(createHash('sha256').update(await readFile(target)).digest('hex'),asset.sha256)
+  }
+  const recovery=join(root,'academy-macos-release-recovery.mjs')
+  const source=`import {observeAcademyReleaseState} from ${JSON.stringify(`file://${recovery}`)};
+const value=await observeAcademyReleaseState({stage:${JSON.stringify(join(root,'absent-stage'))},readPointer:async()=>null,resolveCurrent:async()=>{throw new Error('unexpected')}});
+if(value.publication!=='ABSENT'||value.installRequired!==true)process.exit(1)`
+  const executed=spawnSync(join(root,'node'),['--input-type=module','-e',source],{encoding:'utf8'})
+  assert.equal(executed.status,0,executed.stderr)
+
+  await rm(join(root,'academy-release-manifest.mjs'))
+  const missing=spawnSync(join(root,'node'),['--input-type=module','-e',source],{encoding:'utf8'})
+  assert.notEqual(missing.status,0)
+  assert.equal(await access(join(root,'academy-release-pointer.mjs')).then(()=>true,()=>false),true)
 })
 
 test('bound worker executor rejects symlink and path swap while retaining the executed inode', async t => {
