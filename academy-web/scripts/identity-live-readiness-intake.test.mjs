@@ -12,13 +12,13 @@ const D = 'a'.repeat(64)
 function valid() {
   return {
     schema: 'identity-control-live-readiness/v1', observedAt: '2026-08-29T03:05:01.000Z',
-    releaseSha: '4acde50e93285e86171fa4713d4d1c390258c16e',
+    releaseSha: '2951f5dc4433f4a20a7b7da3bde9110ae907531c',
     runtimeSha256: 'f96a89c5c275fb6e80606f54323d26c8e5d98697b12d2bee917046dea3c61e4d',
-    freezeSha256: 'aa45a35f3e2d0bf171c6129aef2390a94ab91acf34137bb34685dce4273d5dca',
+    freezeSha256: 'ef86b70e426bc8fd8bda4a9d85e502f10bb22539bb8ad9832a01989450671683',
     keySetSha256: 'd6b557027823437a5fe6378fc26bbd8dffad2d8c58a77c2bcf3583f1350e8e35',
     artifacts: {
       accountCenter: { bytes: 266240, path: 'ac.tar', sha256: '3227c635dbc9235d1861f133615ed2b761351df50f7c3b93c924b088524759f8' },
-      api: { bytes: 10127360, path: 'api.tar', sha256: '6e1e9e5b140a977d3799c8677649236a25f76d05bad71de288f6d7eeff4f469c' },
+      api: { bytes: 10137600, path: 'api.tar', sha256: 'f80cd4a87d451c5ec36e90d7d2e7db76a62f6480b78a3a3bcfd0dce91b4926e1' },
     },
     activeKeyIds: ['academy-prod-2026-08','identity-result-prod-2026-08'], overlapKeyIds: [],
     registry: {
@@ -26,7 +26,7 @@ function valid() {
       resultSigning: { keyId: 'identity-result-prod-2026-08', issuer: 'https://accounts.cyberskills.co.th/v1/code/results', revision: 1, state: 'active' },
     },
     production: { mutationStatus: 'COMPLETE', mutationCounters: { bootstrapClientsAdopted: 1, bootstrapClientsCreated: 0, caddyReloads: 1, migrationsApplied: 1, releasesActivated: 1, servicesStarted: 1 } },
-    evidence: { freezeSha256: 'aa45a35f3e2d0bf171c6129aef2390a94ab91acf34137bb34685dce4273d5dca', runtimeSha256: 'f96a89c5c275fb6e80606f54323d26c8e5d98697b12d2bee917046dea3c61e4d', keySetSha256: 'd6b557027823437a5fe6378fc26bbd8dffad2d8c58a77c2bcf3583f1350e8e35', deploymentModeSha256: D, preflightGoSha256: D, deployReceiptsSha256: D, verifyReceiptsSha256: D, registrySha256: D, healthSha256: D, independentReviewSha256: D },
+    evidence: { freezeSha256: 'ef86b70e426bc8fd8bda4a9d85e502f10bb22539bb8ad9832a01989450671683', runtimeSha256: 'f96a89c5c275fb6e80606f54323d26c8e5d98697b12d2bee917046dea3c61e4d', keySetSha256: 'd6b557027823437a5fe6378fc26bbd8dffad2d8c58a77c2bcf3583f1350e8e35', deploymentModeSha256: D, preflightGoSha256: D, deployReceiptsSha256: D, verifyReceiptsSha256: D, registrySha256: D, healthSha256: D, independentReviewSha256: D },
     readiness: { deploy: 'GO', verify: 'GO', registry: 'ACTIVE', localReadyStatus: 200, publicReadyStatus: 403, publicReadyBlocked: true },
     capturedAt: '2026-08-29T03:05:00.000Z', expiresAt: '2026-08-29T03:20:00.000Z',
     independentReview: { verdict: 'PASS', reviewer: 'independent-reviewer', counts: { critical: 0, high: 0, medium: 0, low: 0 } },
@@ -85,6 +85,25 @@ describe('Identity live readiness intake', () => {
     for (const mutate of mutations) {
       const value = valid(); mutate(value)
       assert.throws(() => intakeIdentityLiveReadiness(wire(value), NOW), IdentityLiveReadinessIntakeError)
+    }
+  })
+
+  test('rejects the prior release and every mixed old/new artifact bundle', () => {
+    const old = valid()
+    old.releaseSha = '4acde50e93285e86171fa4713d4d1c390258c16e'
+    old.freezeSha256 = 'aa45a35f3e2d0bf171c6129aef2390a94ab91acf34137bb34685dce4273d5dca'
+    old.evidence.freezeSha256 = old.freezeSha256
+    old.artifacts.api = { bytes: 10127360, path: 'api.tar', sha256: '6e1e9e5b140a977d3799c8677649236a25f76d05bad71de288f6d7eeff4f469c' }
+
+    const mutations = [
+      (value) => { value.releaseSha = old.releaseSha },
+      (value) => { value.freezeSha256 = old.freezeSha256; value.evidence.freezeSha256 = old.freezeSha256 },
+      (value) => { value.artifacts.api = old.artifacts.api },
+    ]
+    assert.throws(() => intakeIdentityLiveReadiness(wire(old), NOW), IdentityLiveReadinessIntakeError)
+    for (const mutate of mutations) {
+      const mixed = valid(); mutate(mixed)
+      assert.throws(() => intakeIdentityLiveReadiness(wire(mixed), NOW), IdentityLiveReadinessIntakeError)
     }
   })
 

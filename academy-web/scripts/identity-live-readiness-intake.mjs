@@ -8,9 +8,9 @@ import { pathToFileURL } from 'node:url'
 
 const SHA1 = /^[a-f0-9]{40}$/
 const SHA256 = /^[a-f0-9]{64}$/
-const EXPECTED_RELEASE = '4acde50e93285e86171fa4713d4d1c390258c16e'
+const EXPECTED_RELEASE = '2951f5dc4433f4a20a7b7da3bde9110ae907531c'
 const EXPECTED_RUNTIME = 'f96a89c5c275fb6e80606f54323d26c8e5d98697b12d2bee917046dea3c61e4d'
-const EXPECTED_FREEZE = 'aa45a35f3e2d0bf171c6129aef2390a94ab91acf34137bb34685dce4273d5dca'
+const EXPECTED_FREEZE = 'ef86b70e426bc8fd8bda4a9d85e502f10bb22539bb8ad9832a01989450671683'
 const EXPECTED_KEY_SET = 'd6b557027823437a5fe6378fc26bbd8dffad2d8c58a77c2bcf3583f1350e8e35'
 const EXPECTED_ACTIVE_KEYS = ['academy-prod-2026-08', 'identity-result-prod-2026-08']
 const RESULT_ISSUER = 'https://accounts.cyberskills.co.th/v1/code/results'
@@ -18,7 +18,7 @@ const MAX_AGE_MS = 15 * 60 * 1000
 const FUTURE_SKEW_MS = 60 * 1000
 const EXPECTED_ARTIFACTS = Object.freeze({
   accountCenter: Object.freeze({ bytes: 266240, path: 'ac.tar', sha256: '3227c635dbc9235d1861f133615ed2b761351df50f7c3b93c924b088524759f8' }),
-  api: Object.freeze({ bytes: 10127360, path: 'api.tar', sha256: '6e1e9e5b140a977d3799c8677649236a25f76d05bad71de288f6d7eeff4f469c' }),
+  api: Object.freeze({ bytes: 10137600, path: 'api.tar', sha256: 'f80cd4a87d451c5ec36e90d7d2e7db76a62f6480b78a3a3bcfd0dce91b4926e1' }),
 })
 
 export class IdentityLiveReadinessIntakeError extends Error {
