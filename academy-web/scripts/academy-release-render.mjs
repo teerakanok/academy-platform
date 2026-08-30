@@ -10,6 +10,7 @@
 import { createHash } from 'node:crypto'
 import { constants } from 'node:fs'
 import { promises as filesystem } from 'node:fs'
+import { isBuiltin } from 'node:module'
 import { dirname, join, relative, resolve } from 'node:path'
 
 import {
@@ -126,6 +127,7 @@ function resolveAcademyApplicationModule(applicationPath, moduleSpecifier, appli
   if (typeof moduleSpecifier !== 'string' || moduleSpecifier.startsWith('/')
     || moduleSpecifier.startsWith('\\') || moduleSpecifier.includes('\\') || moduleSpecifier.includes('\0')) failAcademyRelease()
   if (ACADEMY_APPLICATION_PLATFORM_BUILTINS.has(moduleSpecifier)) return null
+  if (isBuiltin(moduleSpecifier)) return null
   if (moduleSpecifier.startsWith('./') || moduleSpecifier.startsWith('../')) {
     const segments = []
     for (const segment of `${dirname(applicationPath)}/${moduleSpecifier}`.split('/')) {
@@ -161,6 +163,7 @@ async function verifyAcademyApplicationTree(sourceDirectory, files, fs) {
   if (!names.has(main) || ![...names].some(path => path.startsWith(`${assets}/`))) failAcademyRelease()
   const visited = new Set([main])
   for (const path of visited) {
+    if (path.startsWith('.open-next/')) continue
     const file = files.find(item => item.relative === path)
     if (!file || !/\.(?:cts|cjs|js|mjs|mts|jsx|ts|tsx)$/.test(path)) continue
     const source = (await readAcademyReleaseSource(file.absolute, fs)).toString('utf8')

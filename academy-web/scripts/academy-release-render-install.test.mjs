@@ -40,6 +40,37 @@ async function environment() {
   return env
 }
 
+async function openNextEnvironment(options = {}) {
+  const env = createAcademyReleaseFakeFilesystem()
+  await env.fs.mkdir('/source/wrangler/bin', { recursive: true })
+  await env.fs.writeFileDirect('/source/node', NODE, 0o755)
+  await env.fs.writeFileDirect('/source/wrangler/bin/wrangler', WRANGLER_ENTRY, 0o755)
+  await env.fs.writeFileDirect('/source/wrangler/package.json', WRANGLER_DEP, 0o644)
+  await env.fs.writeFileDirect('/source/helper.mjs', HELPER, 0o500)
+  await env.fs.mkdir('/source/application/.open-next/assets', { recursive: true })
+  await env.fs.writeFileDirect('/source/application/worker.js', Buffer.from(
+    'import "./.open-next/worker.js"\nexport { handler } from "./.open-next/worker.js"\n'), 0o444)
+  if (!options.missingOpenNextEntry) {
+    await env.fs.writeFileDirect('/source/application/.open-next/worker.js', Buffer.from([
+      'const deceptiveSource = [',
+      '  `import "./missing.js"`,',
+      '  `import("./missing.js")`,',
+      '  `require("./missing.js")`,',
+      '  `from "missing-package"`,',
+      '  `from "node:fake"`,',
+      '  `from "cloudflare:workers/subpath"`',
+      ']',
+      'import "node:fs"',
+      'import { DurableObject } from "cloudflare:workers"',
+      'export const handler = () => "academy"',
+    ].join('\n') + '\n'), 0o444)
+  }
+  await env.fs.writeFileDirect('/source/application/wrangler.jsonc', APPLICATION_CONFIG, 0o444)
+  await env.fs.writeFileDirect('/source/application/.open-next/assets/asset.svg', APPLICATION_ASSET, 0o444)
+  await env.fs.mkdir('/install', { mode: 0o755, recursive: true })
+  return env
+}
+
 const spec = revision => ({
   releaseRevision: revision,
   node: { sourcePath: '/source/node' },
@@ -83,6 +114,25 @@ test('renderer emits a canonical sorted manifest with directories and pinned exe
   await verifyAcademyRelease({ root: `/staging/${REVISION_A}`, fs: env.fs, processLike: env.processLike })
 })
 
+test('renderer accepts inventoried OpenNext output without parsing generated source', async () => {
+  const env = await openNextEnvironment()
+  const { manifest } = await renderedSource(env, REVISION_A)
+  assert.ok(manifest.entries.some(entry => entry.path === 'application/.open-next/worker.js'))
+})
+
+test('renderer rejects a missing imported OpenNext entry', async () => {
+  const env = await openNextEnvironment({ missingOpenNextEntry: true })
+  await assert.rejects(renderedSource(env, REVISION_A))
+})
+
+test('renderer rejects a missing authored relative import', async () => {
+  const env = await openNextEnvironment()
+  await env.fs.rm('/source/application/.open-next/worker.js')
+  await env.fs.writeFileDirect('/source/application/worker.js', Buffer.from(
+    'import "./chunk.js"\nexport { handler } from "./chunk.js"\n'), 0o444)
+  await assert.rejects(renderedSource(env, REVISION_A))
+})
+
 test('renderer fails closed without canonical entrypoint, imports or assets', async () => {
   const env = await environment()
   const render = () => renderedSource(env, REVISION_A)
@@ -100,7 +150,8 @@ test('renderer fails closed without canonical entrypoint, imports or assets', as
 test('renderer accepts the exact Cloudflare Workers platform builtin', async () => {
   const env = await environment()
   await env.fs.writeFileDirect('/source/application/worker.js', Buffer.from(
-    'import { DurableObject } from "cloudflare:workers"\n'
+    'import { deepEqual } from "node:assert"\n'
+    + 'import { DurableObject } from "cloudflare:workers"\n'
     + 'import "./chunk.js"\nexport { handler } from "./chunk.js"\n'), 0o444)
   const { manifest } = await renderedSource(env, REVISION_B)
   assert.ok(manifest.entries.some(entry => entry.path === 'application/worker.js'))
@@ -110,6 +161,7 @@ test('renderer rejects non-allowlisted platform and missing imports', async () =
   const env = await environment()
   const render = () => renderedSource(env, REVISION_B)
   for (const moduleSpecifier of [
+    'node:fake',
     'cloudflare:worker',
     'cloudflare:workers/subpath',
     'cloudflare:workers?query',
