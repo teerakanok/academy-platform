@@ -1,5 +1,6 @@
 import { legacyDirectOtpFixtureAllowedForHost } from './legacy-direct-otp'
 import { identityControlLocalFixtureAllowedForHost } from '@/lib/identity/local-fixture'
+import { projectAcademyIdentityProductionRuntimeConfig } from '@/lib/identity/production-runtime'
 
 // ระบบบัญชีเปิดใช้งานได้จริงหรือยัง
 //
@@ -17,4 +18,12 @@ export function accountsEnabled(requestHost: string): boolean {
   // Supabase เดิมมีไว้ให้ local E2E fixture เท่านั้นและต้องเปิดแบบ explicit.
   return identityControlLocalFixtureAllowedForHost(requestHost)
     || legacyDirectOtpFixtureAllowedForHost(requestHost)
+    || productionIdentityControlAvailable()
+}
+
+export function productionIdentityControlAvailable(
+  environment: Record<string, string | undefined> = process.env,
+): boolean {
+  return environment.IDENTITY_ADAPTER?.trim() === 'identity-control'
+    && projectAcademyIdentityProductionRuntimeConfig(environment) !== null
 }

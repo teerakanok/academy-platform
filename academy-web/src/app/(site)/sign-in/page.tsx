@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { headers } from 'next/headers'
 import React from 'react'
 import { SignInForm } from '@/components/auth/SignInForm'
-import { accountsEnabled } from '@/lib/auth/enabled'
+import { accountsEnabled, productionIdentityControlAvailable } from '@/lib/auth/enabled'
 import { safeNextPath } from '@/lib/auth/route-client'
 import { identityControlLocalFixtureAllowedForHost } from '@/lib/identity/local-fixture'
 import { privatePage } from '@/lib/seo'
@@ -28,6 +28,7 @@ export default async function SignInPage({
   const requestHost = requestHeaders.get('host') ?? ''
   const accountAccessOpen = accountsEnabled(requestHost)
   const localIdentityControl = identityControlLocalFixtureAllowedForHost(requestHost)
+  const identityControl = localIdentityControl || productionIdentityControlAvailable()
 
   return (
     <div className="mx-auto max-w-lg px-6 py-16">
@@ -59,7 +60,7 @@ export default async function SignInPage({
       </div>
 
       {accountAccessOpen ? (
-        <SignInForm next={target} identityControl={localIdentityControl} />
+        <SignInForm next={target} identityControl={identityControl} />
       ) : (
         <div className="card-feature p-6 sm:p-8" data-testid="accounts-not-open">
           <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-cs-accent">Preview</p>
