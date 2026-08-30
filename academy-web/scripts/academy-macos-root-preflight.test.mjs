@@ -8,7 +8,7 @@ import { spawn, spawnSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { BOUND_WORKER_EXECUTOR, main, verifyWorker } from './academy-macos-root-preflight.mjs'
+import { boundWorkerInvocation, main, verifyWorker } from './academy-macos-root-preflight.mjs'
 
 test('full remaining preflight has exactly one elevation prompt', async () => {
   const calls = []
@@ -22,6 +22,9 @@ test('full remaining preflight has exactly one elevation prompt', async () => {
   assert.equal(calls[0].executable, '/usr/bin/osascript')
   assert.equal(calls[0].args.filter(value => value.includes('with administrator privileges')).length, 1)
   assert.equal(calls[0].args.join(' ').includes('sudo'), false)
+  assert.doesNotMatch(calls[0].args.join(' '), /\/node' -e/)
+  assert.match(calls[0].args.join(' '), /academy-bound-worker-executor\.cjs/)
+  assert.match(calls[0].args.join(' '), /d30d89ee73f514970b75314a4e11748b0b7d2ce67b931cac79b13c316e6405dd/)
 })
 
 test('launcher binds exact worker bytes and repository contains one elevation site', async () => {
@@ -33,21 +36,38 @@ test('launcher binds exact worker bytes and repository contains one elevation si
 test('bound worker executor rejects symlink and path swap while retaining the executed inode', async t => {
   const root = await mkdtemp(join(tmpdir(), 'academy-bound-worker-'))
   t.after(() => rm(root, { recursive:true, force:true }))
-  const worker = join(root, 'worker'), replacement = join(root, 'replacement'), marker = join(root, 'marker')
-  const bytes = Buffer.from(`#!/bin/zsh\n/bin/sleep 0.15\n/bin/echo PASS > ${JSON.stringify(marker)}\n`)
+  const worker = join(root, 'worker'), replacement = join(root, 'replacement'), marker = join(root, 'marker'), started = join(root, 'started')
+  const bytes = Buffer.from(`#!/bin/zsh\n/bin/echo START > ${JSON.stringify(started)}\n/bin/sleep 0.15\n/bin/echo PASS > ${JSON.stringify(marker)}\n`)
   const digest = createHash('sha256').update(bytes).digest('hex')
   await writeFile(worker, bytes, { mode:0o500 })
-  const run = path => spawnSync(process.execPath, ['-e', BOUND_WORKER_EXECUTOR, path, digest,
+  const executor = new URL('./academy-bound-worker-executor.cjs', import.meta.url).pathname
+  const run = path => spawnSync(process.execPath, [executor, path, digest,
     String(process.getuid()), String(process.getgid()), String(0o500)], { encoding:'utf8' })
   const linked = join(root, 'linked')
   await symlink(worker, linked)
   assert.notEqual(run(linked).status, 0)
   await writeFile(replacement, bytes, { mode:0o500 })
-  const swapper = spawn('/bin/zsh', ['-c', '/bin/sleep 0.05; /bin/mv "$1" "$2"', 'swap', replacement, worker])
+  const swapper = spawn('/bin/zsh', ['-c', 'while [[ ! -f "$3" ]]; do /bin/sleep 0.01; done; /bin/mv "$1" "$2"', 'swap', replacement, worker, started])
   const swapped = run(worker)
   await new Promise(resolve => swapper.once('close', resolve))
   assert.notEqual(swapped.status, 0)
   assert.equal(await readFile(marker, 'utf8'), 'PASS\n')
+})
+
+test('generated executor invocation survives hostile shell characters and reaches worker boundary', async t => {
+  const root = await mkdtemp(join(tmpdir(), "academy-invoke-'\n"))
+  t.after(() => rm(root, { recursive:true, force:true }))
+  const marker = join(root, 'worker-reached'), worker = join(root, "worker-'\n.sh")
+  const quotedMarker = `'${marker.replaceAll("'", `'"'"'`)}'`
+  const bytes = Buffer.from(`#!/bin/zsh\n/bin/echo reached > ${quotedMarker}\n`)
+  await writeFile(worker, bytes, { mode:0o500 })
+  const command = boundWorkerInvocation({ node:'/private/tmp/academy-release-sources-fa7/node',
+    executor:new URL('./academy-bound-worker-executor.cjs', import.meta.url).pathname,
+    worker, digest:createHash('sha256').update(bytes).digest('hex'),
+    uid:process.getuid(), gid:process.getgid(), mode:0o500 })
+  const result = spawnSync('/bin/zsh', ['-c', command], { encoding:'utf8' })
+  assert.equal(result.status, 0, result.stderr)
+  assert.equal(await readFile(marker, 'utf8'), 'reached\n')
 })
 
 test('worker binds executable inputs and preserves foreign root state', async () => {
