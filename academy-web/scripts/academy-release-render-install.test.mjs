@@ -209,6 +209,30 @@ test('installer removes only an exact candidate-bound owned stage residue', asyn
   try { assert.equal((await retained.readFile()).toString(),'retain') } finally { await retained.close() }
 })
 
+test('empty exact-candidate directory is foreign and remains byte-for-byte absent of installer writes', async () => {
+  const env=await environment(), source=await renderedSource(env,REVISION_A)
+  const target=`/install/releases/${source.manifest.releaseSha256}`
+  await env.fs.mkdir(target,{recursive:true,mode:0o700})
+  assert.equal((await diagnoseAcademyInstall({sourceRoot:source.root,installRoot:'/install',
+    expectedReleaseSha256:source.manifest.releaseSha256,expectedReleaseRevision:REVISION_A,
+    fs:env.fs,processLike:env.processLike})).reason,'FOREIGN_TARGET')
+  await assert.rejects(install(env,source))
+  assert.deepEqual(await env.fs.readdir(target),[])
+})
+
+for (const order of ['owned-first','foreign-first']) test(`mixed stage residues ${order} preserve both`,async()=>{
+  const env=await environment(),source=await renderedSource(env,REVISION_A),releases='/install/releases'
+  const owned=`${releases}/.stage-owned`,foreign=`${releases}/.stage-foreign`
+  for(const path of order==='owned-first'?[owned,foreign]:[foreign,owned]) await env.fs.mkdir(path,{recursive:true,mode:0o700})
+  await env.fs.writeFileDirect(`${owned}/.academy-install-owned`,Buffer.from(`${JSON.stringify({
+    schema:'academy-release-install-stage/v1',releaseSha256:source.manifest.releaseSha256,releaseRevision:REVISION_A,
+  })}\n`),0o400)
+  await env.fs.writeFileDirect(`${foreign}/foreign`,Buffer.from('retain'),0o400)
+  await assert.rejects(install(env,source))
+  assert.ok((await env.fs.readdir(owned)).includes('.academy-install-owned'))
+  assert.deepEqual(await env.fs.readdir(foreign),['foreign'])
+})
+
 test('installer rejects an external digest or revision mismatch', async () => {
   const env = await environment()
   const source = await renderedSource(env, REVISION_A)
@@ -309,16 +333,14 @@ test('interrupted publication is recoverable and preserves the prior release', a
   const first = await renderedSource(env, REVISION_A)
   await install(env, first)
   const second = await renderedSource(env, REVISION_B)
-  const target = `/install/releases/${second.manifest.releaseSha256}`
   await env.fs.mkdir('/install/releases/.stage-999-0/nested', { recursive: true })
   await env.fs.writeFileDirect('/install/releases/.stage-999-0/junk', Buffer.from('junk'), 0o600)
   await env.fs.writeFileDirect('/install/releases/.stage-999-0/.academy-install-owned',Buffer.from(`${JSON.stringify({
     schema:'academy-release-install-stage/v1',releaseSha256:second.manifest.releaseSha256,releaseRevision:REVISION_B,
   })}\n`),0o400)
-  await env.fs.mkdir(target, { recursive: true })
   const result = await install(env, second)
   assert.equal(result.status, 'INSTALLED')
-  await verifyAcademyRelease({ root: target, fs: env.fs, processLike: env.processLike })
+  await verifyAcademyRelease({ root: `/install/releases/${second.manifest.releaseSha256}`, fs: env.fs, processLike: env.processLike })
   await verifyAcademyRelease({ root: `/install/releases/${first.manifest.releaseSha256}`, fs: env.fs, processLike: env.processLike })
   const pointer = await readAcademyReleasePointer({ installRoot: '/install', fs: env.fs, processLike: env.processLike })
   assert.equal(pointer.releaseSha256, second.manifest.releaseSha256)

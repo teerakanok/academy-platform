@@ -61,7 +61,7 @@ async function inspectExistingTarget(target, manifest, fs, processLike) {
   }
   if (!metadata.isDirectory()) failAcademyRelease()
   const children = await fs.readdir(target)
-  if (children.length === 0) return 'placeholder'
+  if (children.length === 0) return 'foreign'
   // Verify the entire crash-window tree before changing its root mode.
   const crashWindow = (metadata.mode & 0o777) === 0o700
   try { await verifyAcademyRelease({ root: target, fs, processLike,
@@ -75,10 +75,11 @@ const stageMarker = manifest => `${JSON.stringify({ schema:'academy-release-inst
   releaseSha256:manifest.releaseSha256, releaseRevision:manifest.releaseRevision })}\n`
 
 async function inspectStages(releases, manifest, fs, processLike, remove = false) {
-  let owned = 0, foreign = 0
+  const ownedPaths=[]
+  let foreign = 0
   let names
   try { names=await fs.readdir(releases) } catch (error) {
-    if (error.code === 'ENOENT') return {owned,foreign}
+    if (error.code === 'ENOENT') return {owned:0,foreign}
     throw error
   }
   for (const name of names) {
@@ -92,11 +93,11 @@ async function inspectStages(releases, manifest, fs, processLike, remove = false
       if (!metadata.isFile() || metadata.isSymbolicLink() || metadata.nlink !== 1
         || metadata.uid !== processLike.getuid() || (metadata.mode & 0o777) !== 0o400
         || markerBytes.toString() !== stageMarker(manifest)) { foreign++; continue }
-      if (remove) await forceRemoveAcademyTree(stage,fs)
-      owned++
+      ownedPaths.push(stage)
     } catch { foreign++ }
   }
-  return {owned,foreign}
+  if (remove && foreign === 0) for (const stage of ownedPaths) await forceRemoveAcademyTree(stage,fs)
+  return {owned:ownedPaths.length,foreign}
 }
 
 export async function diagnoseAcademyInstall({ sourceRoot, installRoot, expectedReleaseSha256,
@@ -141,12 +142,6 @@ export async function installAcademyRelease({ sourceRoot, installRoot, expectedR
     await fs.chmod(target,0o555)
     await verifyAcademyRelease({root:target,fs,processLike})
     state='verified'
-  }
-  if (state === 'placeholder') {
-    await fs.rmdir(target)
-    await syncAcademyDirectory(releases, fs)
-    state = await inspectExistingTarget(target, manifest, fs, processLike)
-    if (state !== 'absent') failAcademyRelease()
   }
   if (state === 'absent') {
     const residues=await inspectStages(releases,manifest,fs,processLike,true)

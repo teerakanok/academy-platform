@@ -4,8 +4,8 @@ import { readFile } from 'node:fs/promises'
 import { spawn } from 'node:child_process'
 
 const WORKER = '/private/tmp/academy-result-loss-remediation/academy-web/scripts/academy-macos-root-preflight-worker.sh'
-const ROOT_COPY = '/private/var/root/academy-macos-root-preflight-worker-a4dd803fc27eb0bf.sh'
-const EXPECTED_WORKER_SHA256 = 'a4dd803fc27eb0bf61cb69e6705d2a80cab07e1e57441a13947bcbb39e24fc84'
+const ROOT_COPY = '/private/var/root/academy-macos-root-preflight-worker-1b0bd5170591b009.sh'
+const EXPECTED_WORKER_SHA256 = '1b0bd5170591b0093418c985d7ebd3e35e310dd8c7502c71ade1bfb7153943d8'
 const OBSERVER = '/private/var/root/academy-release-observer-7dca6452'
 const RECOVERY = `${WORKER.slice(0, WORKER.lastIndexOf('/'))}/academy-macos-release-recovery.mjs`
 const POINTER = `${WORKER.slice(0, WORKER.lastIndexOf('/'))}/academy-release-pointer.mjs`

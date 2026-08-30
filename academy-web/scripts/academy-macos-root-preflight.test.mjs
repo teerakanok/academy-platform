@@ -156,6 +156,8 @@ test('recovery package binding and sanitized terminal phases are exact', async (
   assert.ok(worker.indexOf('phase=CLEANUP_STAGE') < worker.indexOf('/bin/rm -rf "$stage"'))
   assert.match(worker, /if \[\[ "\$install_required" == true \]\]; then/)
   assert.equal((worker.match(/academy-release-cli\.mjs" install/g) ?? []).length, 1)
+  assert.match(worker, /\[\[ "\$reason" != FOREIGN_TARGET && "\$reason" != FOREIGN_STAGE \]\]/)
+  assert.ok(worker.indexOf('$reason" != FOREIGN_TARGET') < worker.indexOf('academy-release-cli.mjs" install'))
   assert.ok(worker.indexOf('phase=REOBSERVE_RELEASE') < worker.lastIndexOf('publication="$('))
 })
 

@@ -73,7 +73,7 @@ verify_root_file() {
 }
 verify_root_file "$stage/source/node" 500 9bc64e922cba152eedf55cd4528ac0b5b7e0f4cd9d671d77bb0830c9796ea188
 verify_root_file "$stage/tooling/academy-release-cli.mjs" 500 6e91274bb01f78446c6bbf91dd76cc84d4e44765c7ef6122fe8171d6de46099c
-verify_root_file "$stage/tooling/academy-release-install.mjs" 400 6901ab66963699498d002651f371d4fad81a7b03ed126b6d14978c6e3abd8da3
+verify_root_file "$stage/tooling/academy-release-install.mjs" 400 4ec50af32ac10a26bc5bad2782a5f6faf3da7df3cabc87765007fa240a98eb72
 verify_root_file "$stage/tooling/academy-release-manifest.mjs" 400 803f50c7f33ef22f9d199ee8b4e7dfe3810c33861999a8c2109880f62ab4eaec
 verify_root_file "$stage/tooling/academy-release-pointer.mjs" 400 7cac358f35e6446e314e5cc9f884c9770b3395dcf9394221d6f61c569385fcee
 verify_root_file "$stage/tooling/academy-release-render.mjs" 400 03f97f824f0c4ec3476852e85dd821dabaf45562b0049b18a06c5772bb049dde
@@ -96,6 +96,7 @@ if [[ "$install_required" == true ]]; then
   reason=DIAGNOSTIC_FAILED
   "$stage/source/node" "$stage/tooling/academy-release-cli.mjs" diagnose-install "$stage/rendered" /opt/academy "$release_sha" "$revision" > "$stage/install-diagnostic.json"
   reason="$("$stage/source/node" -e 'const fs=require("fs"),v=JSON.parse(fs.readFileSync(process.argv[1],"utf8")),ok=new Set(["EXACT_CANDIDATE","CRASH_WINDOW_0700","FOREIGN_TARGET","FOREIGN_STAGE","OWNED_STAGE_RECOVERABLE","TARGET_ABSENT"]);if(v.schema!=="academy-release-install-diagnostic/v1"||v.status!=="INSPECTED"||!ok.has(v.reason))process.exit(1);process.stdout.write(v.reason)' "$stage/install-diagnostic.json")"
+  [[ "$reason" != FOREIGN_TARGET && "$reason" != FOREIGN_STAGE ]]
   "$stage/source/node" "$stage/tooling/academy-release-cli.mjs" install "$stage/rendered" /opt/academy "$release_sha" "$revision" > "$stage/install-result.json"
 fi
 phase=VERIFY_RELEASE
