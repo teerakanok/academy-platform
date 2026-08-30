@@ -97,6 +97,33 @@ test('renderer fails closed without canonical entrypoint, imports or assets', as
   await assert.rejects(render)
 })
 
+test('renderer accepts the exact Cloudflare Workers platform builtin', async () => {
+  const env = await environment()
+  await env.fs.writeFileDirect('/source/application/worker.js', Buffer.from(
+    'import { DurableObject } from "cloudflare:workers"\n'
+    + 'import "./chunk.js"\nexport { handler } from "./chunk.js"\n'), 0o444)
+  const { manifest } = await renderedSource(env, REVISION_B)
+  assert.ok(manifest.entries.some(entry => entry.path === 'application/worker.js'))
+})
+
+test('renderer rejects non-allowlisted platform and missing imports', async () => {
+  const env = await environment()
+  const render = () => renderedSource(env, REVISION_B)
+  for (const moduleSpecifier of [
+    'cloudflare:worker',
+    'cloudflare:workers/subpath',
+    'cloudflare:workers?query',
+    'https://example.invalid/worker',
+    'missing-academy-package',
+  ]) {
+    await env.fs.writeFileDirect('/source/application/worker.js', Buffer.from(
+      `import academyModule from "${moduleSpecifier}"\n`
+      + 'export { handler } from "./chunk.js"\n'), 0o444)
+    await assert.rejects(render)
+    await env.fs.rm(`/staging/${REVISION_B}`, { recursive: true, force: true })
+  }
+})
+
 test('renderer records actual fstat gid from a setgid parent, not the process gid', async () => {
   const env = createAcademyReleaseFakeFilesystem({ uid: 1000, gid: 1000 })
   await env.fs.mkdir('/setgid-source/wrangler/bin', { mode: 0o2755, recursive: true })

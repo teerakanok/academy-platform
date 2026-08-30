@@ -33,6 +33,7 @@ export const ACADEMY_RELEASE_WRANGLER_PREFIX = 'wrangler'
 export const ACADEMY_RELEASE_DIRECTORY_MODE = 0o555
 export const ACADEMY_RELEASE_APPLICATION_PREFIX = 'application'
 export const ACADEMY_RELEASE_APPLICATION_CONFIG = 'application/wrangler.jsonc'
+const ACADEMY_APPLICATION_PLATFORM_BUILTINS = new Set(['cloudflare:workers'])
 
 const fileMode = value => ACADEMY_RELEASE_FILE_MODES.includes(value) ? value : failAcademyRelease()
 
@@ -124,6 +125,7 @@ function referencedAcademyModules(source) {
 function resolveAcademyApplicationModule(applicationPath, moduleSpecifier, applicationFiles) {
   if (typeof moduleSpecifier !== 'string' || moduleSpecifier.startsWith('/')
     || moduleSpecifier.startsWith('\\') || moduleSpecifier.includes('\\') || moduleSpecifier.includes('\0')) failAcademyRelease()
+  if (ACADEMY_APPLICATION_PLATFORM_BUILTINS.has(moduleSpecifier)) return null
   if (moduleSpecifier.startsWith('./') || moduleSpecifier.startsWith('../')) {
     const segments = []
     for (const segment of `${dirname(applicationPath)}/${moduleSpecifier}`.split('/')) {
