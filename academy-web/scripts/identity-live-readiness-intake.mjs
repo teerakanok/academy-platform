@@ -69,7 +69,9 @@ export function intakeIdentityLiveReadiness(source, observedAt = new Date(), aut
     if (Object.values(value.evidence).some((entry) => typeof entry !== 'string' || !SHA256.test(entry))
       || value.evidence.freezeSha256 !== value.freezeSha256
       || value.evidence.runtimeSha256 !== value.runtimeSha256
-      || value.evidence.keySetSha256 !== value.keySetSha256) fail()
+      || value.evidence.keySetSha256 !== value.keySetSha256
+      || value.evidence.deployReceiptsSha256 !== expected.receipts.deploySha256
+      || value.evidence.preflightGoSha256 !== expected.receipts.preflightGoSha256) fail()
 
     exact(value.readiness, ['deploy','verify','registry','localReadyStatus','publicReadyStatus','publicReadyBlocked'])
     if (value.readiness.deploy !== 'GO' || value.readiness.verify !== 'GO' || value.readiness.registry !== 'ACTIVE'

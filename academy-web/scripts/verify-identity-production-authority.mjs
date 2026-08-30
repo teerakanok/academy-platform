@@ -13,8 +13,8 @@ const SSH_KEYGEN = '/usr/bin/ssh-keygen'
 const IDENTITY = 'academy-production-authority'
 const NAMESPACE = 'cyberskills-academy-identity-authority-v1'
 const SIGNERS_SHA256 = '3121e888fc152ade56f15b5d5afcc27c5f4206bdde49530bf1a8a871ec17ec1b'
-const SIGNATURE_SHA256 = 'b9a141bca8a76c7e4645af6772ba5626ed45efa4b93ba12f950ee13118cf6732'
-export const IDENTITY_PRODUCTION_AUTHORITY_SHA256 = 'd431ff061511807e8b433813fa02600a5f00825ccda24c93e7e62468822eeed9'
+const SIGNATURE_SHA256 = 'cff1d817db5efded3d3ec191f69d9d5d01947a5b03085dbce97257b834bf9b80'
+export const IDENTITY_PRODUCTION_AUTHORITY_SHA256 = '0f681a2ad7be38da537b16534b061c40c42561041b8735ca77687595369f8f6c'
 
 export class IdentityProductionAuthorityError extends Error {
   constructor() { super('Identity production authority rejected'); this.name = 'IdentityProductionAuthorityError' }
@@ -44,7 +44,7 @@ export function parseIdentityProductionAuthority(source, observedAt = new Date()
       || value.inputs.runtime.keySetJsonPointer !== '/authorization/resultSigning/verificationKeySet'
       || !sha256(value.inputs.runtime.canonicalProjectionSha256) || !sha256(value.inputs.runtime.keySetReadinessFileSha256)
       || !exact(value.artifacts, ['directory','api','accountCenter']) || !value.artifacts.directory.startsWith('/root/.identity-control-artifacts-')
-      || !exact(value.receipts, ['deploy','preflight']) || !file(value.receipts.deploy) || !file(value.receipts.preflight)
+      || !exact(value.receipts, ['deploy','preflightGo']) || !file(value.receipts.deploy) || !file(value.receipts.preflightGo)
       || !exact(value.registry, ['activeKeyIds','overlapKeyIds','academyClient','resultSigning'])
       || JSON.stringify(value.registry.activeKeyIds) !== JSON.stringify(['academy-prod-2026-08','identity-result-prod-2026-08'])
       || JSON.stringify(value.registry.overlapKeyIds) !== '[]'
@@ -71,7 +71,7 @@ export function parseIdentityProductionAuthority(source, observedAt = new Date()
       freezeSha256: value.inputs.freeze.sha256, keySetSha256: value.inputs.runtime.keySetReadinessFileSha256,
       keySetProjection: Object.freeze({ pointer: value.inputs.runtime.keySetJsonPointer, sha256: value.inputs.runtime.canonicalProjectionSha256 }),
       artifacts: Object.freeze({ accountCenter: Object.freeze({ bytes: value.artifacts.accountCenter.bytes, path: value.artifacts.accountCenter.path, sha256: value.artifacts.accountCenter.sha256 }), api: Object.freeze({ bytes: value.artifacts.api.bytes, path: value.artifacts.api.path, sha256: value.artifacts.api.sha256 }) }),
-      registry: Object.freeze(structuredClone(value.registry)), receipts: Object.freeze({ deploySha256: value.receipts.deploy.sha256, preflightSha256: value.receipts.preflight.sha256 }),
+      registry: Object.freeze(structuredClone(value.registry)), receipts: Object.freeze({ deploySha256: value.receipts.deploy.sha256, preflightGoSha256: value.receipts.preflightGo.sha256 }),
       extraction: Object.freeze({ apiSha256: value.artifacts.api.extractedManifestSha256, accountCenterSha256: value.artifacts.accountCenter.extractedManifestSha256 }) })
   } catch (error) { if (error instanceof IdentityProductionAuthorityError) throw error; throw new IdentityProductionAuthorityError() }
 }

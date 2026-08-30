@@ -142,7 +142,7 @@ export async function main(args, options = {}) {
   let receipt
   try {
     receipt = await runAcademyProductionActivation({ plan, ports, release, observedAt,
-    authority, journalPath: resolve(journalPath), receiptPath: resolve(receiptPath) })
+    journalPath: resolve(journalPath), receiptPath: resolve(receiptPath) })
   } catch (error) {
     if (error instanceof AcademyActivationControllerError && error.receipt) {
       const digest = createHash('sha256').update(`${JSON.stringify(error.receipt)}\n`).digest('hex')

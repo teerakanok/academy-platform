@@ -16,7 +16,7 @@ const NOW = new Date('2026-08-29T03:10:00.000Z')
 
 test('verifies the byte-exact pinned authority with absolute ssh-keygen boundary', async () => {
   const authority = await verifyIdentityProductionAuthority(NOW)
-  assert.equal(authority.sha256, 'd431ff061511807e8b433813fa02600a5f00825ccda24c93e7e62468822eeed9')
+  assert.equal(authority.sha256, '0f681a2ad7be38da537b16534b061c40c42561041b8735ca77687595369f8f6c')
   assert.equal(authority.expected.releaseSha, '2951f5dc4433f4a20a7b7da3bde9110ae907531c')
   assert.equal(Object.isFrozen(authority.expected.registry.academyClient), true)
   await assert.rejects(verifyIdentityProductionAuthority(new Date('2026-09-05T03:00:00.000Z')), IdentityProductionAuthorityError)
@@ -31,7 +31,7 @@ test('semantic verifier owns pointer, projection, artifact, extraction, receipt,
     value => { value.artifacts.api.path = 'other.tar' },
     value => { value.artifacts.api.extractedPath = '/tmp/api' },
     value => { value.artifacts.api.extractedManifestSha256 = 'bad' },
-    value => { value.receipts.deploy.nlink = 2 },
+    value => { value.receipts.preflightGo.nlink = 2 },
     value => { value.registry.activeKeyIds.reverse() },
     value => { value.registry.academyClient = { ...value.registry.academyClient, enabled: false } },
   ]

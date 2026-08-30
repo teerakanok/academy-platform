@@ -29,7 +29,7 @@ function valid() {
       resultSigning: { keyId: 'identity-result-prod-2026-08', issuer: 'https://accounts.cyberskills.co.th/v1/code/results', revision: 1, state: 'active' },
     },
     production: { mutationStatus: 'COMPLETE', mutationCounters: { bootstrapClientsAdopted: 1, bootstrapClientsCreated: 0, caddyReloads: 1, migrationsApplied: 1, releasesActivated: 1, servicesStarted: 1 } },
-    evidence: { freezeSha256: 'ef86b70e426bc8fd8bda4a9d85e502f10bb22539bb8ad9832a01989450671683', runtimeSha256: 'f96a89c5c275fb6e80606f54323d26c8e5d98697b12d2bee917046dea3c61e4d', keySetSha256: 'd6b557027823437a5fe6378fc26bbd8dffad2d8c58a77c2bcf3583f1350e8e35', deploymentModeSha256: D, preflightGoSha256: D, deployReceiptsSha256: D, verifyReceiptsSha256: D, registrySha256: D, healthSha256: D, independentReviewSha256: D },
+    evidence: { freezeSha256: 'ef86b70e426bc8fd8bda4a9d85e502f10bb22539bb8ad9832a01989450671683', runtimeSha256: 'f96a89c5c275fb6e80606f54323d26c8e5d98697b12d2bee917046dea3c61e4d', keySetSha256: 'd6b557027823437a5fe6378fc26bbd8dffad2d8c58a77c2bcf3583f1350e8e35', deploymentModeSha256: D, preflightGoSha256: '7c1c4c2f67a38ef4c89516390d731f0c069e9c4e880ead0ed47653b23888cd13', deployReceiptsSha256: '62200ac739af2c17bf7b7d51a1e7154ab8c001c23ace7d7fd4f8cfdcea9b6ff3', verifyReceiptsSha256: D, registrySha256: D, healthSha256: D, independentReviewSha256: D },
     readiness: { deploy: 'GO', verify: 'GO', registry: 'ACTIVE', localReadyStatus: 200, publicReadyStatus: 403, publicReadyBlocked: true },
     capturedAt: '2026-08-29T03:05:00.000Z', expiresAt: '2026-08-29T03:20:00.000Z',
     independentReview: { verdict: 'PASS', reviewer: 'independent-reviewer', counts: { critical: 0, high: 0, medium: 0, low: 0 } },
@@ -82,6 +82,7 @@ describe('Identity live readiness intake', () => {
       (v) => { v.artifacts.api.sha256 = D }, (v) => { v.registry.academyClient.enabled = false }, (v) => { v.registry.academyClient.reference = 'config://client-keys/academy-web/other' },
       (v) => { v.registry.resultSigning.state = 'overlap' }, (v) => { v.production.mutationCounters.releasesActivated = 0 },
       (v) => { v.evidence.runtimeSha256 = D }, (v) => { v.readiness.registry = 'PENDING' },
+      (v) => { v.evidence.deployReceiptsSha256 = D }, (v) => { v.evidence.preflightGoSha256 = D },
       (v) => { v.readiness.localReadyStatus = 503 }, (v) => { v.readiness.publicReadyStatus = 200 },
       (v) => { v.independentReview.verdict = 'PENDING' }, (v) => { v.independentReview.counts.medium = 1 },
     ]

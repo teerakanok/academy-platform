@@ -6,6 +6,7 @@ import { link, open, realpath, rename, rm, stat } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 
 import { intakeIdentityLiveReadiness, readProtectedIdentityLiveReadiness } from './identity-live-readiness-intake.mjs'
+import { verifyIdentityProductionAuthority } from './verify-identity-production-authority.mjs'
 import {
   ACADEMY_IDENTITY_ACTIVATION_CANDIDATE_REVISION,
   buildIdentityProductionActivationReceipt,
@@ -136,7 +137,7 @@ export async function publishRetainedAcademyActivation({ plan: input, journalPat
   return publishTerminalForPlan(plan, journalPath, receiptPath)
 }
 
-export async function runAcademyProductionActivation({ plan: input, ports: inputPorts, release, observedAt = new Date(), authority, journalPath: inputJournalPath, receiptPath: inputReceiptPath }) {
+export async function runAcademyProductionActivation({ plan: input, ports: inputPorts, release, observedAt = new Date(), journalPath: inputJournalPath, receiptPath: inputReceiptPath }) {
   const plan = validatePlan(input)
   const journalPath = resolve(inputJournalPath ?? `${plan.identityReadinessPath}.academy-activation-journal`)
   const receiptPath = resolve(inputReceiptPath ?? `${journalPath}.receipt`)
@@ -145,6 +146,7 @@ export async function runAcademyProductionActivation({ plan: input, ports: input
     if (terminal) return terminal
   }
   const ports = validatePorts(inputPorts)
+  const authority = await verifyIdentityProductionAuthority(observedAt)
   const identity = intakeIdentityLiveReadiness(await readProtectedIdentityLiveReadiness(plan.identityReadinessPath), observedAt, authority)
   if (ports.authority.releaseRevision !== plan.academy.releaseRevision
     || ports.authority.identityReadinessSha256 !== identity.receiptSha256
