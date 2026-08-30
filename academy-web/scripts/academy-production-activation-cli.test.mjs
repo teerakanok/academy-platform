@@ -9,8 +9,9 @@ import { main, runExecutable } from './academy-production-activation-cli.mjs'
 import { createAcademyProductionLivePorts } from './academy-production-live-ports.mjs'
 import { ACTIVATION_RELEASE, runAcademyProductionActivation } from './identity-production-activation-controller.mjs'
 import { IDENTITY_PRODUCTION_ACTIVATION_CONFIG_NAMES } from './identity-production-activation-preflight.mjs'
+import { verifyIdentityProductionAuthority } from './verify-identity-production-authority.mjs'
+const AUTHORITY = await verifyIdentityProductionAuthority(new Date('2026-08-29T03:10:00.000Z'))
 
-const AUTH = '95e3deb74b21077320e5001277524c07261732aa9096dbcd8d24ff7bfa82a74b'
 
 async function script(t, body) {
   const root = await mkdtemp(join(tmpdir(), 'academy-cli-runner-'))
@@ -109,7 +110,7 @@ test('CLI restart publishes a retained terminal journal before provider discover
     return { status: 0, stdout: JSON.stringify(output) }
   }
   const ports = await createAcademyProductionLivePorts({authorityPath,run:fakeRun,expected:{releaseRevision:revision,identityReadinessSha256:readinessSha256},clock:()=>nowDate.getTime(),expectedExecutableUid:process.getuid()})
-  await runAcademyProductionActivation({authoritySha256:AUTH,plan,ports,release:ACTIVATION_RELEASE,observedAt:nowDate,journalPath,receiptPath})
+  await runAcademyProductionActivation({authority:AUTHORITY,plan,ports,release:ACTIVATION_RELEASE,observedAt:nowDate,journalPath,receiptPath})
   const callsBeforeRestart = calls
   const terminalJournal = JSON.parse(await readFile(journalPath, 'utf8'))
   const nonterminalJournal = { ...terminalJournal, phase:'active', operation:'traffic-activation', state:'attempting', finalReceipt:null, finalReceiptSha256:null }

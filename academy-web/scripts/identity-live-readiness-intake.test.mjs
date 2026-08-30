@@ -5,10 +5,12 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 import { IdentityLiveReadinessIntakeError, intakeIdentityLiveReadiness, readProtectedIdentityLiveReadiness } from './identity-live-readiness-intake.mjs'
+import { verifyIdentityProductionAuthority } from './verify-identity-production-authority.mjs'
 
 const NOW = new Date('2026-08-29T03:10:00.000Z')
 const D = 'a'.repeat(64)
-const AUTH = '95e3deb74b21077320e5001277524c07261732aa9096dbcd8d24ff7bfa82a74b'
+const AUTHORITY = await verifyIdentityProductionAuthority(NOW)
+
 
 function valid() {
   return {
@@ -38,7 +40,7 @@ const wire = (value) => `${JSON.stringify(value)}\n`
 
 describe('Identity live readiness intake', () => {
   test('accepts the exact fresh producer receipt and returns a frozen redacted gate', () => {
-    const result = intakeIdentityLiveReadiness(wire(valid()), NOW, AUTH)
+    const result = intakeIdentityLiveReadiness(wire(valid()), NOW, AUTHORITY)
     assert.equal(result.status, 'IDENTITY_LIVE_READY')
     assert.equal(result.registry, 'ACTIVE')
     assert.equal(result.resultSigning, 'ACTIVE')
@@ -56,7 +58,7 @@ describe('Identity live readiness intake', () => {
     const expired = valid(); expired.expiresAt = '2026-08-29T03:09:59.000Z'
     const inverted = valid(); inverted.expiresAt = '2026-08-29T03:04:59.000Z'
     for (const source of ['{"schema":"identity-control-live-readiness/v1","schema":"shadow"}', wire(surplus), wire(reordered), wire(stale), wire(future), wire(expired), wire(inverted)]) {
-      assert.throws(() => intakeIdentityLiveReadiness(source, NOW, AUTH), IdentityLiveReadinessIntakeError)
+      assert.throws(() => intakeIdentityLiveReadiness(source, NOW, AUTHORITY), IdentityLiveReadinessIntakeError)
     }
   })
 
@@ -70,7 +72,7 @@ describe('Identity live readiness intake', () => {
       canonical.replace('{', '{ '),
       canonical.replace(',', ', '),
       canonical.replace(':', ': '),
-    ]) assert.throws(() => intakeIdentityLiveReadiness(source, NOW, AUTH), IdentityLiveReadinessIntakeError)
+    ]) assert.throws(() => intakeIdentityLiveReadiness(source, NOW, AUTHORITY), IdentityLiveReadinessIntakeError)
   })
 
   test('rejects every authority, digest, registry, signing, health, and review substitution', () => {
@@ -85,7 +87,7 @@ describe('Identity live readiness intake', () => {
     ]
     for (const mutate of mutations) {
       const value = valid(); mutate(value)
-      assert.throws(() => intakeIdentityLiveReadiness(wire(value), NOW, AUTH), IdentityLiveReadinessIntakeError)
+      assert.throws(() => intakeIdentityLiveReadiness(wire(value), NOW, AUTHORITY), IdentityLiveReadinessIntakeError)
     }
   })
 
@@ -101,11 +103,22 @@ describe('Identity live readiness intake', () => {
       (value) => { value.freezeSha256 = old.freezeSha256; value.evidence.freezeSha256 = old.freezeSha256 },
       (value) => { value.artifacts.api = old.artifacts.api },
     ]
-    assert.throws(() => intakeIdentityLiveReadiness(wire(old), NOW, AUTH), IdentityLiveReadinessIntakeError)
+    assert.throws(() => intakeIdentityLiveReadiness(wire(old), NOW, AUTHORITY), IdentityLiveReadinessIntakeError)
     for (const mutate of mutations) {
       const mixed = valid(); mutate(mixed)
-      assert.throws(() => intakeIdentityLiveReadiness(wire(mixed), NOW, AUTH), IdentityLiveReadinessIntakeError)
+      assert.throws(() => intakeIdentityLiveReadiness(wire(mixed), NOW, AUTHORITY), IdentityLiveReadinessIntakeError)
     }
+  })
+
+  test('rejects authority hash drift and an expected object not derived from signed source', () => {
+    const badHash = Object.freeze({ ...AUTHORITY, sha256: D })
+    assert.throws(() => intakeIdentityLiveReadiness(wire(valid()), NOW, badHash), IdentityLiveReadinessIntakeError)
+    const expected = structuredClone(AUTHORITY.expected)
+    expected.artifacts.api.bytes += 1
+    const freeze = value => { if (value && typeof value === 'object') { for (const child of Object.values(value)) freeze(child); Object.freeze(value) } }
+    freeze(expected)
+    const detached = Object.freeze({ ...AUTHORITY, expected })
+    assert.throws(() => intakeIdentityLiveReadiness(wire(valid()), NOW, detached), IdentityLiveReadinessIntakeError)
   })
 
   test('reads only one caller-owned mode-0600 regular file with one link', async () => {

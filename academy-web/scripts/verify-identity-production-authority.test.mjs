@@ -6,7 +6,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import test from 'node:test'
 
-import { IdentityProductionAuthorityError, verifyIdentityProductionAuthority } from './verify-identity-production-authority.mjs'
+import { IdentityProductionAuthorityError, parseIdentityProductionAuthority, verifyIdentityProductionAuthority } from './verify-identity-production-authority.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const RECORD = resolve(HERE, '../config/identity-production-authority-2951f5d.json')
@@ -16,8 +16,29 @@ const NOW = new Date('2026-08-29T03:10:00.000Z')
 
 test('verifies the byte-exact pinned authority with absolute ssh-keygen boundary', async () => {
   const authority = await verifyIdentityProductionAuthority(NOW)
-  assert.deepEqual(authority, { sha256: '95e3deb74b21077320e5001277524c07261732aa9096dbcd8d24ff7bfa82a74b', releaseSha: '2951f5dc4433f4a20a7b7da3bde9110ae907531c' })
+  assert.equal(authority.sha256, 'd431ff061511807e8b433813fa02600a5f00825ccda24c93e7e62468822eeed9')
+  assert.equal(authority.expected.releaseSha, '2951f5dc4433f4a20a7b7da3bde9110ae907531c')
+  assert.equal(Object.isFrozen(authority.expected.registry.academyClient), true)
   await assert.rejects(verifyIdentityProductionAuthority(new Date('2026-09-05T03:00:00.000Z')), IdentityProductionAuthorityError)
+})
+
+test('semantic verifier owns pointer, projection, artifact, extraction, receipt, and registry relationships', async () => {
+  const original = JSON.parse(await readFile(RECORD, 'utf8'))
+  const mutations = [
+    value => { value.inputs.runtime.keySetJsonPointer = '/authorization/resultSigning/keyId' },
+    value => { value.inputs.runtime.canonicalProjectionSha256 = 'bad' },
+    value => { value.inputs.runtime.keySetReadinessFileSha256 = 'bad' },
+    value => { value.artifacts.api.path = 'other.tar' },
+    value => { value.artifacts.api.extractedPath = '/tmp/api' },
+    value => { value.artifacts.api.extractedManifestSha256 = 'bad' },
+    value => { value.receipts.deploy.nlink = 2 },
+    value => { value.registry.activeKeyIds.reverse() },
+    value => { value.registry.academyClient = { ...value.registry.academyClient, enabled: false } },
+  ]
+  for (const mutate of mutations) {
+    const value = structuredClone(original); mutate(value)
+    assert.throws(() => parseIdentityProductionAuthority(`${JSON.stringify(value)}\n`, NOW), IdentityProductionAuthorityError)
+  }
 })
 
 test('signature refuses forged identity and namespace', async () => {

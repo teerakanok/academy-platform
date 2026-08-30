@@ -5,23 +5,13 @@ import { constants as fsConstants } from 'node:fs'
 import { lstat, open, realpath } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { verifyIdentityProductionAuthority } from './verify-identity-production-authority.mjs'
+import { parseIdentityProductionAuthority, verifyIdentityProductionAuthority } from './verify-identity-production-authority.mjs'
 
 const SHA1 = /^[a-f0-9]{40}$/
 const SHA256 = /^[a-f0-9]{64}$/
-const EXPECTED_RELEASE = '2951f5dc4433f4a20a7b7da3bde9110ae907531c'
-const EXPECTED_RUNTIME = 'f96a89c5c275fb6e80606f54323d26c8e5d98697b12d2bee917046dea3c61e4d'
-const EXPECTED_FREEZE = 'ef86b70e426bc8fd8bda4a9d85e502f10bb22539bb8ad9832a01989450671683'
-const EXPECTED_KEY_SET = 'd6b557027823437a5fe6378fc26bbd8dffad2d8c58a77c2bcf3583f1350e8e35'
-const EXPECTED_ACTIVE_KEYS = ['academy-prod-2026-08', 'identity-result-prod-2026-08']
 const RESULT_ISSUER = 'https://accounts.cyberskills.co.th/v1/code/results'
 const MAX_AGE_MS = 15 * 60 * 1000
 const FUTURE_SKEW_MS = 60 * 1000
-const EXPECTED_AUTHORITY = '95e3deb74b21077320e5001277524c07261732aa9096dbcd8d24ff7bfa82a74b'
-const EXPECTED_ARTIFACTS = Object.freeze({
-  accountCenter: Object.freeze({ bytes: 266240, path: 'ac.tar', sha256: '3227c635dbc9235d1861f133615ed2b761351df50f7c3b93c924b088524759f8' }),
-  api: Object.freeze({ bytes: 10137600, path: 'api.tar', sha256: 'f80cd4a87d451c5ec36e90d7d2e7db76a62f6480b78a3a3bcfd0dce91b4926e1' }),
-})
 
 export class IdentityLiveReadinessIntakeError extends Error {
   constructor() {
@@ -30,26 +20,31 @@ export class IdentityLiveReadinessIntakeError extends Error {
   }
 }
 
-export function intakeIdentityLiveReadiness(source, observedAt = new Date(), authoritySha256) {
+export function intakeIdentityLiveReadiness(source, observedAt = new Date(), authority) {
   try {
-    if (typeof source !== 'string' || !(observedAt instanceof Date) || !Number.isFinite(observedAt.valueOf()) || authoritySha256 !== EXPECTED_AUTHORITY) fail()
+    if (typeof source !== 'string' || !(observedAt instanceof Date) || !Number.isFinite(observedAt.valueOf())
+      || !authority || !SHA256.test(authority.sha256) || typeof authority.source !== 'string'
+      || createHash('sha256').update(authority.source).digest('hex') !== authority.sha256
+      || !authority.expected || !Object.isFrozen(authority) || !Object.isFrozen(authority.expected)) fail()
+    const expected = authority.expected
+    if (JSON.stringify(expected) !== JSON.stringify(parseIdentityProductionAuthority(authority.source, observedAt))) fail()
     const receiptSha256 = createHash('sha256').update(source).digest('hex')
     const value = parseDuplicateSafeJson(source)
     if (source !== `${JSON.stringify(value)}\n`) fail()
     exact(value, ['schema','observedAt','releaseSha','runtimeSha256','freezeSha256','keySetSha256','artifacts','activeKeyIds','overlapKeyIds','registry','production','evidence','readiness','capturedAt','expiresAt','independentReview'])
     if (value.schema !== 'identity-control-live-readiness/v1'
-      || value.releaseSha !== EXPECTED_RELEASE || !SHA1.test(value.releaseSha)
-      || value.runtimeSha256 !== EXPECTED_RUNTIME || value.freezeSha256 !== EXPECTED_FREEZE
-      || value.keySetSha256 !== EXPECTED_KEY_SET) fail()
+      || value.releaseSha !== expected.releaseSha || !SHA1.test(value.releaseSha)
+      || value.runtimeSha256 !== expected.runtimeSha256 || value.freezeSha256 !== expected.freezeSha256
+      || value.keySetSha256 !== expected.keySetSha256) fail()
 
     exact(value.artifacts, ['accountCenter','api'])
     for (const name of ['accountCenter', 'api']) {
       exact(value.artifacts[name], ['bytes','path','sha256'])
-      const expected = EXPECTED_ARTIFACTS[name]
-      if (value.artifacts[name].bytes !== expected.bytes || value.artifacts[name].path !== expected.path
-        || value.artifacts[name].sha256 !== expected.sha256) fail()
+      const artifact = expected.artifacts[name]
+      if (value.artifacts[name].bytes !== artifact.bytes || value.artifacts[name].path !== artifact.path
+        || value.artifacts[name].sha256 !== artifact.sha256) fail()
     }
-    if (!sameExactArray(value.activeKeyIds, EXPECTED_ACTIVE_KEYS) || !sameExactArray(value.overlapKeyIds, [])) fail()
+    if (!sameExactArray(value.activeKeyIds, expected.registry.activeKeyIds) || !sameExactArray(value.overlapKeyIds, expected.registry.overlapKeyIds)) fail()
 
     exact(value.registry, ['academyClient','resultSigning'])
     exact(value.registry.academyClient, ['clientId','serviceId','enabled','keyId','reference'])
@@ -57,10 +52,9 @@ export function intakeIdentityLiveReadiness(source, observedAt = new Date(), aut
     const client = value.registry.academyClient
     const signing = value.registry.resultSigning
     if (client.clientId !== 'academy-web' || client.serviceId !== 'academy' || client.enabled !== true
-      || client.keyId !== EXPECTED_ACTIVE_KEYS[0]
-      || client.reference !== 'config://client-keys/academy-web/academy-prod-2026-08'
-      || signing.keyId !== EXPECTED_ACTIVE_KEYS[1] || signing.issuer !== RESULT_ISSUER
-      || signing.revision !== 1 || signing.state !== 'active') fail()
+      || JSON.stringify(client) !== JSON.stringify(expected.registry.academyClient)
+      || JSON.stringify(signing) !== JSON.stringify(expected.registry.resultSigning)
+      || signing.issuer !== RESULT_ISSUER) fail()
 
     exact(value.production, ['mutationStatus','mutationCounters'])
     exact(value.production.mutationCounters, ['bootstrapClientsAdopted','bootstrapClientsCreated','caddyReloads','migrationsApplied','releasesActivated','servicesStarted'])
@@ -219,7 +213,7 @@ function parseDuplicateSafeJson(source) {
 async function main() {
   if (process.argv.length !== 3) fail()
   const authority = await verifyIdentityProductionAuthority()
-  const receipt = intakeIdentityLiveReadiness(await readProtectedIdentityLiveReadiness(process.argv[2]), new Date(), authority.sha256)
+  const receipt = intakeIdentityLiveReadiness(await readProtectedIdentityLiveReadiness(process.argv[2]), new Date(), authority)
   process.stdout.write(`${JSON.stringify(receipt)}\n`)
 }
 

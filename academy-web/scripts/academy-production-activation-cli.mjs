@@ -131,7 +131,7 @@ export async function main(args, options = {}) {
   const terminal = await publishRetainedAcademyActivation({ plan, journalPath: resolve(journalPath), receiptPath: resolve(receiptPath) })
   if (terminal) return terminal.status
   const authority = await verifyIdentityProductionAuthority(observedAt)
-  const readiness = intakeIdentityLiveReadiness(await readProtectedIdentityLiveReadiness(plan.identityReadinessPath), observedAt, authority.sha256)
+  const readiness = intakeIdentityLiveReadiness(await readProtectedIdentityLiveReadiness(plan.identityReadinessPath), observedAt, authority)
   const ports = await createAcademyProductionLivePorts({
     authorityPath,
     run: options.run ?? runExecutable,
@@ -142,7 +142,7 @@ export async function main(args, options = {}) {
   let receipt
   try {
     receipt = await runAcademyProductionActivation({ plan, ports, release, observedAt,
-    authoritySha256: authority.sha256, journalPath: resolve(journalPath), receiptPath: resolve(receiptPath) })
+    authority, journalPath: resolve(journalPath), receiptPath: resolve(receiptPath) })
   } catch (error) {
     if (error instanceof AcademyActivationControllerError && error.receipt) {
       const digest = createHash('sha256').update(`${JSON.stringify(error.receipt)}\n`).digest('hex')
