@@ -3,11 +3,9 @@
 import { spawn } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { constants } from 'node:fs'
-import { open, readFile } from 'node:fs/promises'
-import { dirname, join } from 'node:path'
+import { open } from 'node:fs/promises'
+import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
-
-import { readAcademyReleasePackageInput } from './academy-release-cli.mjs'
 
 export const EXPECTED_RELEASE_SHA256 = 'fda0394cee9da9b2d1c37d2aa6e6185efc6bc54d072d21bab5e3771c3f7c8f25'
 export const EXPECTED_RELEASE_REVISION = '7de1cbfbd9e3606f44379ad0322b75109f10e583'
@@ -18,9 +16,17 @@ export const ROOT_TOOLING = '/private/var/root/academy-immutable-installer-7de1c
 const DIRECTORY = dirname(fileURLToPath(import.meta.url))
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex')
 const quote = value => `'${String(value).replaceAll("'", `'"'"'`)}'`
+const exact = (value, keys) => value && typeof value === 'object' && !Array.isArray(value)
+  && Object.keys(value).sort().join('\0') === [...keys].sort().join('\0')
+export const isReviewedSourcePath = path => {
+  if (typeof path !== 'string' || resolve(path) !== path) return false
+  const fromRoot = relative(SOURCES_SOURCE, path)
+  return fromRoot === '' || (fromRoot !== '..' && !fromRoot.startsWith(`..${sep}`)
+    && !isAbsolute(fromRoot))
+}
 
 export const PINNED_ASSETS = Object.freeze([
-  Object.freeze({ source: join(DIRECTORY, 'academy-macos-immutable-release-worker.sh'), name: 'worker.sh', mode: 0o500, sha256: '3b0d537d139faaffbe14d7d6d24db0ed8f88f6cb286a96cd29007ed0e5d923b0' }),
+  Object.freeze({ source: join(DIRECTORY, 'academy-macos-immutable-release-worker.sh'), name: 'worker.sh', mode: 0o500, sha256: 'ddd8c076927d955beaef67e97c1ddf2b134e5a219191f1f531b2da125e30a126' }),
   Object.freeze({ source: join(DIRECTORY, 'academy-release-cli.mjs'), name: 'academy-release-cli.mjs', mode: 0o400, sha256: 'ef405f7b9df4a8ba7ed45d232c347019b09ea4bc344a6cb86070706c811b9d9d' }),
   Object.freeze({ source: join(DIRECTORY, 'academy-release-render.mjs'), name: 'academy-release-render.mjs', mode: 0o400, sha256: '87d5ae93247db5a3ec374c0207d197483451b7e88db2bebcade2f89ba6dfccfc' }),
   Object.freeze({ source: join(DIRECTORY, 'academy-release-install.mjs'), name: 'academy-release-install.mjs', mode: 0o400, sha256: '4ec50af32ac10a26bc5bad2782a5f6faf3da7df3cabc87765007fa240a98eb72' }),
@@ -42,12 +48,38 @@ async function exactRegularFile(path, expectedSha256) {
 
 export async function collectInputs() {
   for (const asset of PINNED_ASSETS) await exactRegularFile(asset.source, asset.sha256)
-  const packageBytes = await readFile(PACKAGE_SOURCE)
-  const input = await readAcademyReleasePackageInput({ path: PACKAGE_SOURCE })
-  if (input.releaseRevision !== EXPECTED_RELEASE_REVISION) throw new Error('ACADEMY_IMMUTABLE_INSTALLER_REJECTED')
-  const paths = [input.node.sourcePath, input.wrangler.sourceDirectory,
-    input.application.sourceDirectory, ...input.helpers.map(helper => helper.sourcePath)]
-  if (paths.some(path => path !== SOURCES_SOURCE && !path.startsWith(`${SOURCES_SOURCE}/`))) {
+  const handle = await open(PACKAGE_SOURCE, constants.O_RDONLY | constants.O_NOFOLLOW)
+  let packageBytes
+  let input
+  try {
+    const before = await handle.stat()
+    if (!before.isFile() || before.nlink !== 1 || before.uid !== process.getuid()
+      || (before.mode & 0o077) || before.size < 2 || before.size > 1024 * 1024) {
+      throw new Error('ACADEMY_IMMUTABLE_INSTALLER_REJECTED')
+    }
+    packageBytes = await handle.readFile()
+    const after = await handle.stat()
+    if (before.dev !== after.dev || before.ino !== after.ino || before.size !== after.size
+      || before.mtimeMs !== after.mtimeMs || packageBytes.length !== before.size) {
+      throw new Error('ACADEMY_IMMUTABLE_INSTALLER_REJECTED')
+    }
+    input = JSON.parse(packageBytes.toString('utf8'))
+  } finally { await handle.close() }
+  if (!exact(input, ['schema','releaseRevision','nodeSource','wranglerDirectory','wranglerEntrypoint','applicationDirectory','helpers'])
+    || input.schema !== 'academy-release-package-input/v2'
+    || input.releaseRevision !== EXPECTED_RELEASE_REVISION
+    || typeof input.nodeSource !== 'string' || typeof input.wranglerDirectory !== 'string'
+    || typeof input.wranglerEntrypoint !== 'string' || typeof input.applicationDirectory !== 'string'
+    || !Array.isArray(input.helpers) || input.helpers.length < 1
+    || input.helpers.some(helper => !exact(helper, ['sourcePath','path','mode'])
+      || typeof helper.sourcePath !== 'string' || typeof helper.path !== 'string'
+      || ![0o400,0o444,0o500,0o555].includes(helper.mode))
+    || packageBytes.toString('utf8') !== `${JSON.stringify(input)}\n`) {
+    throw new Error('ACADEMY_IMMUTABLE_INSTALLER_REJECTED')
+  }
+  const paths = [input.nodeSource, input.wranglerDirectory,
+    input.applicationDirectory, ...input.helpers.map(helper => helper.sourcePath)]
+  if (paths.some(path => !isReviewedSourcePath(path))) {
     throw new Error('ACADEMY_IMMUTABLE_INSTALLER_REJECTED')
   }
   return Object.freeze({ packageSha256: sha256(packageBytes) })

@@ -8,9 +8,18 @@ import {
   EXPECTED_RELEASE_SHA256,
   PINNED_ASSETS,
   buildRootCommand,
+  isReviewedSourcePath,
   main,
   parseEnvelope,
 } from './academy-macos-immutable-release-installer.mjs'
+
+test('reviewed source containment rejects traversal and textual-prefix siblings', () => {
+  assert.equal(isReviewedSourcePath('/Users/teerakanok/.local/state/cyberskills/academy-release-930f/sources'), true)
+  assert.equal(isReviewedSourcePath('/Users/teerakanok/.local/state/cyberskills/academy-release-930f/sources/application/worker.ts'), true)
+  assert.equal(isReviewedSourcePath('/Users/teerakanok/.local/state/cyberskills/academy-release-930f/sources/../outside'), false)
+  assert.equal(isReviewedSourcePath('/Users/teerakanok/.local/state/cyberskills/academy-release-930f/sources-foreign/node'), false)
+  assert.equal(isReviewedSourcePath('relative/source'), false)
+})
 
 test('installer pins the reviewed release and every root executable input', async () => {
   assert.equal(EXPECTED_RELEASE_REVISION, '7de1cbfbd9e3606f44379ad0322b75109f10e583')

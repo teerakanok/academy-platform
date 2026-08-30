@@ -20,24 +20,33 @@ envelope() {
 }
 
 cleanup() {
-  if test -n "$STAGE" && test -d "$STAGE" && test ! -L "$STAGE"; then
-    /bin/chmod -R u+w "$STAGE" 2>/dev/null || true
-    /bin/rm -rf "$STAGE" 2>/dev/null || true
-  fi
+  test -z "$STAGE" && return 0
+  test -d "$STAGE" && test ! -L "$STAGE" || return 1
+  /bin/chmod -R u+w "$STAGE" 2>/dev/null || return 1
+  /bin/rm -rf "$STAGE" 2>/dev/null || return 1
+  test ! -e "$STAGE" && test ! -L "$STAGE"
 }
 
 finish() {
   exit_status=$?
   trap - EXIT HUP INT TERM
-  cleanup
-  if $SUCCESS && test "$exit_status" -eq 0; then
+  cleanup_status=0
+  cleanup || cleanup_status=$?
+  if $SUCCESS && test "$exit_status" -eq 0 && test "$cleanup_status" -eq 0; then
     envelope PASS COMPLETE
   else
+    test "$cleanup_status" -eq 0 || FAIL_REASON=CLEANUP_FAILED
     envelope FAILED "$FAIL_REASON"
   fi
   exit 0
 }
-trap finish EXIT HUP INT TERM
+interrupted() {
+  SUCCESS=false
+  FAIL_REASON=INTERRUPTED
+  exit 1
+}
+trap finish EXIT
+trap interrupted HUP INT TERM
 
 file_sha256() {
   /usr/bin/shasum -a 256 "$1" | /usr/bin/awk '{print $1}'
@@ -127,4 +136,14 @@ NODE_SCRIPT
 "$NODE" "$CLI" verify "$INSTALL_ROOT" "$EXPECTED_RELEASE_SHA256" \
   "$EXPECTED_RELEASE_REVISION" > "$STAGE/verify-result.json"
 /bin/chmod 600 "$STAGE/verify-result.json"
+"$NODE" - "$STAGE/verify-result.json" "$EXPECTED_RELEASE_SHA256" "$EXPECTED_RELEASE_REVISION" <<'NODE_SCRIPT'
+const fs = require('node:fs')
+const [path, expectedSha, expectedRevision] = process.argv.slice(2)
+const value = JSON.parse(fs.readFileSync(path, 'utf8'))
+const keys = Object.keys(value).sort().join(',')
+if (keys !== 'releaseRevision,releaseSha256,status'
+  || value.status !== 'VERIFIED'
+  || value.releaseSha256 !== expectedSha
+  || value.releaseRevision !== expectedRevision) process.exit(1)
+NODE_SCRIPT
 SUCCESS=true
