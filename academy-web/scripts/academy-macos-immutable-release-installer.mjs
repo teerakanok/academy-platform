@@ -11,7 +11,8 @@ export const EXPECTED_RELEASE_SHA256 = 'fda0394cee9da9b2d1c37d2aa6e6185efc6bc54d
 export const EXPECTED_RELEASE_REVISION = '7de1cbfbd9e3606f44379ad0322b75109f10e583'
 export const PACKAGE_SOURCE = '/Users/teerakanok/.local/state/cyberskills/academy-release-930f/package.json'
 export const SOURCES_SOURCE = '/Users/teerakanok/.local/state/cyberskills/academy-release-930f/sources'
-export const ROOT_TOOLING = '/private/var/root/academy-immutable-installer-7de1cbf'
+export const ROOT_TOOLING = '/private/var/root/academy-immutable-installer-22aff0e'
+const ROOT_TOOLING_MARKER = 'academy-immutable-installer/22aff0e'
 
 const DIRECTORY = dirname(fileURLToPath(import.meta.url))
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex')
@@ -108,10 +109,10 @@ export function buildRootCommand({ packageSha256 }) {
     'set -eu',
     `if /usr/bin/test -e ${quote(ROOT_TOOLING)} || /usr/bin/test -L ${quote(ROOT_TOOLING)}; then`,
     `  /usr/bin/test -d ${quote(ROOT_TOOLING)} && /usr/bin/test ! -L ${quote(ROOT_TOOLING)} && /usr/bin/test "$(/usr/bin/stat -f '%Su:%Sg:%Lp' ${quote(ROOT_TOOLING)})" = 'root:wheel:700'`,
-    `  /usr/bin/test -f ${quote(marker)} && /usr/bin/test "$(/bin/cat ${quote(marker)})" = 'academy-immutable-installer/7de1cbf'`,
+    `  /usr/bin/test -f ${quote(marker)} && /usr/bin/test "$(/bin/cat ${quote(marker)})" = ${quote(ROOT_TOOLING_MARKER)}`,
     'else',
     `  /usr/bin/install -d -o root -g wheel -m 700 ${quote(ROOT_TOOLING)}`,
-    `  /usr/bin/printf 'academy-immutable-installer/7de1cbf\\n' > ${quote(marker)}`,
+    `  /usr/bin/printf '%s\\n' ${quote(ROOT_TOOLING_MARKER)} > ${quote(marker)}`,
     `  /usr/bin/chown root:wheel ${quote(marker)} && /bin/chmod 400 ${quote(marker)}`,
     'fi',
     ...PINNED_ASSETS.map(ensureAsset),
