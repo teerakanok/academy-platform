@@ -7,6 +7,7 @@ import {
   EXPECTED_RELEASE_REVISION,
   EXPECTED_RELEASE_SHA256,
   PINNED_ASSETS,
+  ROOT_TOOLING,
   buildRootCommand,
   isReviewedSourcePath,
   main,
@@ -32,8 +33,15 @@ test('installer pins the reviewed release and every root executable input', asyn
 
 test('root command rehashes copied tooling and performs no DB, Cloudflare, or secret operation', () => {
   const command = buildRootCommand({ packageSha256: 'a'.repeat(64) })
+  const toolingId = createHash('sha256').update(PINNED_ASSETS
+    .map(asset => `${asset.name}:${asset.mode.toString(8)}:${asset.sha256}`)
+    .join('\n')).digest('hex').slice(0, 16)
+  assert.equal(ROOT_TOOLING, `/private/var/root/academy-immutable-installer-${toolingId}`)
   assert.match(command, /academy-release-cli\.mjs/)
   assert.match(command, /fda0394cee9da9b2d1c37d2aa6e6185efc6bc54d072d21bab5e3771c3f7c8f25/)
+  assert.match(command, /\/usr\/sbin\/chown root:wheel/)
+  assert.match(command, /root:wheel:400:1/)
+  assert.doesNotMatch(command, /\/usr\/bin\/chown/)
   assert.match(command, /ROOT_BOOTSTRAP_REJECTED/)
   assert.doesNotMatch(command, /wrangler|cloudflare|DATABASE|secret|sudo/iu)
 })

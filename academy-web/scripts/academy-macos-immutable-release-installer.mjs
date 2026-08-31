@@ -11,8 +11,6 @@ export const EXPECTED_RELEASE_SHA256 = 'fda0394cee9da9b2d1c37d2aa6e6185efc6bc54d
 export const EXPECTED_RELEASE_REVISION = '7de1cbfbd9e3606f44379ad0322b75109f10e583'
 export const PACKAGE_SOURCE = '/Users/teerakanok/.local/state/cyberskills/academy-release-930f/package.json'
 export const SOURCES_SOURCE = '/Users/teerakanok/.local/state/cyberskills/academy-release-930f/sources'
-export const ROOT_TOOLING = '/private/var/root/academy-immutable-installer-22aff0e'
-const ROOT_TOOLING_MARKER = 'academy-immutable-installer/22aff0e'
 
 const DIRECTORY = dirname(fileURLToPath(import.meta.url))
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex')
@@ -35,6 +33,11 @@ export const PINNED_ASSETS = Object.freeze([
   Object.freeze({ source: join(DIRECTORY, 'academy-release-pointer.mjs'), name: 'academy-release-pointer.mjs', mode: 0o400, sha256: '7cac358f35e6446e314e5cc9f884c9770b3395dcf9394221d6f61c569385fcee' }),
   Object.freeze({ source: join(SOURCES_SOURCE, 'node'), name: 'node', mode: 0o500, sha256: '9bc64e922cba152eedf55cd4528ac0b5b7e0f4cd9d671d77bb0830c9796ea188' }),
 ])
+const ROOT_TOOLING_ID = sha256(Buffer.from(PINNED_ASSETS
+  .map(asset => `${asset.name}:${asset.mode.toString(8)}:${asset.sha256}`)
+  .join('\n'))).slice(0, 16)
+export const ROOT_TOOLING = `/private/var/root/academy-immutable-installer-${ROOT_TOOLING_ID}`
+const ROOT_TOOLING_MARKER = `academy-immutable-installer/${ROOT_TOOLING_ID}`
 
 async function exactRegularFile(path, expectedSha256) {
   const handle = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW)
@@ -109,11 +112,11 @@ export function buildRootCommand({ packageSha256 }) {
     'set -eu',
     `if /usr/bin/test -e ${quote(ROOT_TOOLING)} || /usr/bin/test -L ${quote(ROOT_TOOLING)}; then`,
     `  /usr/bin/test -d ${quote(ROOT_TOOLING)} && /usr/bin/test ! -L ${quote(ROOT_TOOLING)} && /usr/bin/test "$(/usr/bin/stat -f '%Su:%Sg:%Lp' ${quote(ROOT_TOOLING)})" = 'root:wheel:700'`,
-    `  /usr/bin/test -f ${quote(marker)} && /usr/bin/test "$(/bin/cat ${quote(marker)})" = ${quote(ROOT_TOOLING_MARKER)}`,
+    `  /usr/bin/test -f ${quote(marker)} && /usr/bin/test ! -L ${quote(marker)} && /usr/bin/test "$(/usr/bin/stat -f '%Su:%Sg:%Lp:%l' ${quote(marker)})" = 'root:wheel:400:1' && /usr/bin/test "$(/bin/cat ${quote(marker)})" = ${quote(ROOT_TOOLING_MARKER)}`,
     'else',
     `  /usr/bin/install -d -o root -g wheel -m 700 ${quote(ROOT_TOOLING)}`,
     `  /usr/bin/printf '%s\\n' ${quote(ROOT_TOOLING_MARKER)} > ${quote(marker)}`,
-    `  /usr/bin/chown root:wheel ${quote(marker)} && /bin/chmod 400 ${quote(marker)}`,
+    `  /usr/sbin/chown root:wheel ${quote(marker)} && /bin/chmod 400 ${quote(marker)}`,
     'fi',
     ...PINNED_ASSETS.map(ensureAsset),
     `/usr/bin/test "$(/usr/bin/find ${quote(ROOT_TOOLING)} -mindepth 1 -maxdepth 1 -print | /usr/bin/wc -l | /usr/bin/tr -d ' ')" = ${quote(String(PINNED_ASSETS.length + 1))}`,
