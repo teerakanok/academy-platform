@@ -18,6 +18,10 @@ For every Academy session:
 4. Read local `principles/` and `skills/` only when the task matches a project-specific addition.
 5. For cross-product work, read `../../../ecosystem/ECOSYSTEM.md`.
 
+For a live learner canary, production UX/UI walkthrough, or post-release learner
+acceptance check, load `skills/academy-production-playtest/SKILL.md`. Its authority,
+privacy, evidence, and cleanup gates are mandatory; local fixtures are not production proof.
+
 Provider-specific folders or files may point here, but this file and local project governance are the canonical source.
 
 ## Founder Updates
