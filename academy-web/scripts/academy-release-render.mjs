@@ -51,7 +51,14 @@ async function readAcademyReleaseSource(sourcePath, fs) {
 async function writeAcademyReleaseFile(destination, bytes, permissions, fs) {
   const handle = await fs.open(destination,
     constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, permissions)
-  try { await handle.writeFile(bytes); await handle.sync() } finally { await handle.close() }
+  try {
+    await handle.writeFile(bytes)
+    await handle.sync()
+  } finally { await handle.close() }
+  await fs.chmod(destination, permissions)
+  const metadata = await fs.lstat(destination)
+  if (!metadata.isFile() || metadata.isSymbolicLink() || metadata.nlink !== 1
+    || (metadata.mode & 0o777) !== permissions) failAcademyRelease()
 }
 
 // Actual post-write metadata: on a setgid parent the kernel assigns the

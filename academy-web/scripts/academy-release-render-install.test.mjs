@@ -1,10 +1,16 @@
 import assert from 'node:assert/strict'
+import { constants } from 'node:fs'
 import test from 'node:test'
 
 import { createAcademyReleaseFakeFilesystem } from './academy-release-fs-fake.mjs'
 import { renderAcademyRelease } from './academy-release-render.mjs'
 import { diagnoseAcademyInstall, installAcademyRelease } from './academy-release-install.mjs'
-import { isAcademyReleasePath, verifyAcademyRelease } from './academy-release-manifest.mjs'
+import {
+  ACADEMY_RELEASE_PREDECESSOR_MANIFEST_SCHEMA,
+  computeAcademyReleaseSha256,
+  isAcademyReleasePath,
+  verifyAcademyRelease,
+} from './academy-release-manifest.mjs'
 import {
   readAcademyReleasePointer,
   resolveAcademyCurrentRelease,
@@ -25,8 +31,8 @@ const APPLICATION_ASSET = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"/>
 const NOW = new Date('2026-08-29T10:00:00.000Z')
 const WRANGLER_ENTRYPOINT = 'wrangler/bin/wrangler.js'
 
-async function environment() {
-  const env = createAcademyReleaseFakeFilesystem()
+async function environment({ uid = 1000, gid = 1000 } = {}) {
+  const env = createAcademyReleaseFakeFilesystem({ uid, gid })
   await env.fs.mkdir('/source/node_modules/wrangler/bin', { recursive: true })
   await env.fs.writeFileDirect('/source/node', NODE, 0o755)
   await env.fs.writeFileDirect('/source/node_modules/wrangler/bin/wrangler.js', WRANGLER_ENTRY, 0o755)
@@ -90,10 +96,181 @@ async function install(env, source, overrides = {}) {
     now: NOW, fs: env.fs, processLike: env.processLike, ...overrides })
 }
 
+const SOURCE_UID = 1000
+const SOURCE_GID = 2000
+const TARGET_UID = 0
+const TARGET_GID = 100
+
+async function readFileBytes(path, fs) {
+  const handle = await fs.open(path, constants.O_RDONLY | constants.O_NOFOLLOW)
+  try { return await handle.readFile() } finally { await handle.close() }
+}
+
+async function v2Predecessor(env, source) {
+  const manifest = { ...source.manifest, schema: ACADEMY_RELEASE_PREDECESSOR_MANIFEST_SCHEMA }
+  manifest.releaseSha256 = computeAcademyReleaseSha256(manifest)
+  const root = `/install/releases/${manifest.releaseSha256}`
+  await env.fs.mkdir(root, { recursive: true, mode: 0o700 })
+  await cloneRenderedSource(env, source, env, root)
+  await env.fs.rm(`${root}/manifest.json`)
+  await env.fs.writeFileDirect(`${root}/manifest.json`,
+    Buffer.from(`${JSON.stringify(manifest)}\n`), 0o444)
+  await env.fs.chown(root, manifest.entries[0].uid, manifest.entries[0].gid)
+  await env.fs.writeFileDirect('/install/current.json', Buffer.from(`${JSON.stringify({
+    schema: 'academy-release-pointer/v1', releaseSha256: manifest.releaseSha256,
+    releaseRevision: source.manifest.releaseRevision, previousReleaseSha256: null,
+    updatedAt: NOW.toISOString(),
+  })}\n`), 0o400)
+  return manifest
+}
+
+async function predecessorSnapshot(env, manifest) {
+  const root = `/install/releases/${manifest.releaseSha256}`
+  const files = [`${root}/manifest.json`,
+    ...manifest.entries.map(entry => `${root}/${entry.path}`)]
+  const directories = [root,
+    ...manifest.directories.map(directory => `${root}/${directory.path}`)]
+  return JSON.stringify({
+    manifest: await readFileBytes(`${root}/manifest.json`, env.fs),
+    files: await Promise.all(files.map(async path => ({
+      path, data: await readFileBytes(path, env.fs), stat: await env.fs.lstat(path) }))),
+    directories: await Promise.all(directories.map(async path => ({
+      path, stat: await env.fs.lstat(path) }))),
+  })
+}
+
+async function cloneRenderedSource(sourceEnvironment, source, targetEnvironment, targetRoot) {
+  const manifestBytes = await (await sourceEnvironment.fs.open(`${source.root}/manifest.json`)).readFile()
+  for (const directory of source.manifest.directories) {
+    await targetEnvironment.fs.mkdir(`${targetRoot}/${directory.path}`, { recursive: true, mode: 0o700 })
+    await targetEnvironment.fs.chmod(`${targetRoot}/${directory.path}`, directory.mode)
+  }
+  for (const entry of source.manifest.entries) {
+    const bytes = await (await sourceEnvironment.fs.open(`${source.root}/${entry.path}`)).readFile()
+    await targetEnvironment.fs.writeFileDirect(`${targetRoot}/${entry.path}`, bytes, entry.mode)
+    await targetEnvironment.fs.chown(`${targetRoot}/${entry.path}`, entry.uid, entry.gid)
+  }
+  await targetEnvironment.fs.writeFileDirect(`${targetRoot}/manifest.json`, manifestBytes, 0o444)
+  await targetEnvironment.fs.chown(`${targetRoot}/manifest.json`, SOURCE_UID, SOURCE_GID)
+  for (const directory of source.manifest.directories) {
+    await targetEnvironment.fs.chown(`${targetRoot}/${directory.path}`, directory.uid, directory.gid)
+  }
+  await targetEnvironment.fs.chown(targetRoot, SOURCE_UID, SOURCE_GID)
+  await targetEnvironment.fs.chmod(targetRoot, 0o555)
+  return { root: targetRoot, manifest: source.manifest }
+}
+
+const ownershipIndependentProjection = manifest => JSON.stringify({
+  schema: manifest.schema, releaseRevision: manifest.releaseRevision,
+  executables: manifest.executables, helpers: manifest.helpers,
+  directories: manifest.directories.map(({ path, mode }) => ({ path, mode })),
+  entries: manifest.entries.map(({ path, sha256, size, mode, nlink }) =>
+    ({ path, sha256, size, mode, nlink })),
+})
+
+test('release identity is stable while source fstat ownership changes', async () => {
+  const first = await environment({ uid: SOURCE_UID, gid: SOURCE_GID })
+  const second = await environment({ uid: 3000, gid: 4000 })
+  const firstSource = await renderedSource(first, REVISION_A)
+  const secondSource = await renderedSource(second, REVISION_A)
+  assert.equal(firstSource.manifest.releaseSha256, secondSource.manifest.releaseSha256)
+  assert.equal(ownershipIndependentProjection(firstSource.manifest),
+    ownershipIndependentProjection(secondSource.manifest))
+  assert.equal(computeAcademyReleaseSha256(secondSource.manifest),
+    firstSource.manifest.releaseSha256)
+  assert.notEqual(firstSource.manifest.entries[0].uid, secondSource.manifest.entries[0].uid)
+  assert.notEqual(firstSource.manifest.directories[0].gid, secondSource.manifest.directories[0].gid)
+})
+
+test('installer strictly verifies source and rebinds target fstat ownership', async () => {
+  const sourceEnvironment = await environment({ uid: SOURCE_UID, gid: SOURCE_GID })
+  const targetEnvironment = await environment({ uid: TARGET_UID, gid: TARGET_GID })
+  const source = await renderedSource(sourceEnvironment, REVISION_A)
+  const reviewed = await cloneRenderedSource(sourceEnvironment, source,
+    targetEnvironment, '/reviewed-release')
+  await verifyAcademyRelease({ root: reviewed.root, fs: targetEnvironment.fs,
+    processLike: sourceEnvironment.processLike })
+  const result = await installAcademyRelease({ sourceRoot: reviewed.root, installRoot: '/install',
+    expectedReleaseSha256: source.manifest.releaseSha256, expectedReleaseRevision: REVISION_A,
+    now: NOW, fs: targetEnvironment.fs, processLike: targetEnvironment.processLike })
+  assert.equal(result.status, 'INSTALLED')
+  const target = `/install/releases/${source.manifest.releaseSha256}`
+  const installed = await verifyAcademyRelease({ root: target,
+    fs: targetEnvironment.fs, processLike: targetEnvironment.processLike })
+  assert.equal(installed.uid, TARGET_UID)
+  assert.equal(installed.gid, TARGET_GID)
+  assert.equal(installed.manifest.releaseSha256, source.manifest.releaseSha256)
+  assert.equal(ownershipIndependentProjection(installed.manifest),
+    ownershipIndependentProjection(source.manifest))
+  assert.ok(installed.manifest.entries.every(entry => entry.uid === TARGET_UID && entry.gid === TARGET_GID))
+  assert.ok(installed.manifest.directories.every(directory =>
+    directory.uid === TARGET_UID && directory.gid === TARGET_GID))
+})
+
+test('setgid install target derives and rebinds its actual inherited gid', async () => {
+  const sourceEnvironment = await environment({ uid: SOURCE_UID, gid: SOURCE_GID })
+  const targetEnvironment = await environment({ uid: TARGET_UID, gid: 6000 })
+  const source = await renderedSource(sourceEnvironment, REVISION_A)
+  const reviewed = await cloneRenderedSource(sourceEnvironment, source,
+    targetEnvironment, '/reviewed-release')
+  await targetEnvironment.fs.chown('/install', TARGET_UID, TARGET_GID)
+  await targetEnvironment.fs.chmod('/install', 0o2750)
+  await installAcademyRelease({ sourceRoot: reviewed.root, installRoot: '/install',
+    expectedReleaseSha256: source.manifest.releaseSha256, expectedReleaseRevision: REVISION_A,
+    now: NOW, fs: targetEnvironment.fs, processLike: targetEnvironment.processLike })
+  const target = `/install/releases/${source.manifest.releaseSha256}`
+  const installed = await verifyAcademyRelease({ root: target,
+    fs: targetEnvironment.fs, processLike: targetEnvironment.processLike })
+  const releases = await targetEnvironment.fs.lstat('/install/releases')
+  assert.equal(installed.uid, TARGET_UID)
+  assert.equal((releases.mode & 0o777), 0o755)
+  assert.equal(installed.gid, releases.gid)
+  assert.ok(installed.manifest.entries.every(entry => entry.gid === releases.gid))
+  assert.ok(installed.manifest.directories.every(directory => directory.gid === releases.gid))
+})
+
+test('different-ownership releases retain tamper rejection and immutable rollback', async () => {
+  const sourceEnvironment = await environment({ uid: SOURCE_UID, gid: SOURCE_GID })
+  const targetEnvironment = await environment({ uid: TARGET_UID, gid: TARGET_GID })
+  const first = await renderedSource(sourceEnvironment, REVISION_A)
+  const second = await renderedSource(sourceEnvironment, REVISION_B)
+  const reviewedFirst = await cloneRenderedSource(sourceEnvironment, first,
+    targetEnvironment, '/reviewed-first')
+  await installAcademyRelease({ sourceRoot: reviewedFirst.root, installRoot: '/install',
+    expectedReleaseSha256: first.manifest.releaseSha256, expectedReleaseRevision: REVISION_A,
+    now: NOW, fs: targetEnvironment.fs, processLike: targetEnvironment.processLike })
+  const firstTarget = `/install/releases/${first.manifest.releaseSha256}`
+  const tamperedPath = `${firstTarget}/wrangler/node_modules/wrangler/package.json`
+  const originalBytes = await (await targetEnvironment.fs.open(tamperedPath)).readFile()
+  await targetEnvironment.fs.chmod(`${firstTarget}/wrangler`, 0o700)
+  await targetEnvironment.fs.writeFileDirect(tamperedPath, Buffer.from('tampered\n'), 0o444)
+  await targetEnvironment.fs.chown(tamperedPath, TARGET_UID, TARGET_GID)
+  await targetEnvironment.fs.chmod(`${firstTarget}/wrangler`, 0o555)
+  await assert.rejects(installAcademyRelease({ sourceRoot: reviewedFirst.root, installRoot: '/install',
+    expectedReleaseSha256: first.manifest.releaseSha256, expectedReleaseRevision: REVISION_A,
+    now: NOW, fs: targetEnvironment.fs, processLike: targetEnvironment.processLike }))
+  await targetEnvironment.fs.chmod(`${firstTarget}/wrangler`, 0o700)
+  await targetEnvironment.fs.writeFileDirect(tamperedPath, originalBytes, 0o444)
+  await targetEnvironment.fs.chown(tamperedPath, TARGET_UID, TARGET_GID)
+  await targetEnvironment.fs.chmod(`${firstTarget}/wrangler`, 0o555)
+  const reviewedSecond = await cloneRenderedSource(sourceEnvironment, second,
+    targetEnvironment, '/reviewed-second')
+  await installAcademyRelease({ sourceRoot: reviewedSecond.root, installRoot: '/install',
+    expectedReleaseSha256: second.manifest.releaseSha256, expectedReleaseRevision: REVISION_B,
+    now: NOW, fs: targetEnvironment.fs, processLike: targetEnvironment.processLike })
+  const rolled = await rollbackAcademyRelease({ installRoot: '/install', now: NOW,
+    fs: targetEnvironment.fs, processLike: targetEnvironment.processLike })
+  assert.equal(rolled.releaseSha256, first.manifest.releaseSha256)
+  await verifyAcademyRelease({ root: firstTarget, fs: targetEnvironment.fs,
+    processLike: targetEnvironment.processLike })
+  await verifyAcademyRelease({ root: `/install/releases/${second.manifest.releaseSha256}`,
+    fs: targetEnvironment.fs, processLike: targetEnvironment.processLike })
+})
+
 test('renderer emits a canonical sorted manifest with directories and pinned executable slots', async () => {
   const env = await environment()
   const { manifest } = await renderedSource(env, REVISION_A)
-  assert.equal(manifest.schema, 'academy-release-manifest/v2')
+  assert.equal(manifest.schema, 'academy-release-manifest/v3')
   assert.equal(manifest.executables.node, 'node/bin/node')
   assert.equal(manifest.executables.wrangler, 'wrangler/node_modules/wrangler/bin/wrangler.js')
   assert.deepEqual(manifest.helpers, ['helpers/academy-production-cloudflare-helper.mjs'])
@@ -391,7 +568,7 @@ test('install diagnostic distinguishes exact candidate, verified crash window, a
 
 test('installer removes only an exact candidate-bound owned stage residue', async () => {
   const env=await environment(), source=await renderedSource(env,REVISION_A)
-  const releases='/install/releases', owned=`${releases}/.stage-owned`, foreign=`${releases}/.stage-foreign`
+  const releases='/install/releases', owned=`${releases}/.stage-${source.manifest.releaseSha256}-owned`, foreign=`${releases}/.stage-foreign`
   await env.fs.mkdir(owned,{recursive:true,mode:0o700})
   await env.fs.writeFileDirect(`${owned}/.academy-install-owned`,Buffer.from(`${JSON.stringify({
     schema:'academy-release-install-stage/v1',releaseSha256:source.manifest.releaseSha256,releaseRevision:REVISION_A,
@@ -422,7 +599,7 @@ test('empty exact-candidate directory is foreign and remains byte-for-byte absen
 
 for (const order of ['owned-first','foreign-first']) test(`mixed stage residues ${order} preserve both`,async()=>{
   const env=await environment(),source=await renderedSource(env,REVISION_A),releases='/install/releases'
-  const owned=`${releases}/.stage-owned`,foreign=`${releases}/.stage-foreign`
+  const owned=`${releases}/.stage-${source.manifest.releaseSha256}-owned`,foreign=`${releases}/.stage-foreign`
   for(const path of order==='owned-first'?[owned,foreign]:[foreign,owned]) await env.fs.mkdir(path,{recursive:true,mode:0o700})
   await env.fs.writeFileDirect(`${owned}/.academy-install-owned`,Buffer.from(`${JSON.stringify({
     schema:'academy-release-install-stage/v1',releaseSha256:source.manifest.releaseSha256,releaseRevision:REVISION_A,
@@ -534,9 +711,9 @@ test('interrupted publication is recoverable and preserves the prior release', a
   const first = await renderedSource(env, REVISION_A)
   await install(env, first)
   const second = await renderedSource(env, REVISION_B)
-  await env.fs.mkdir('/install/releases/.stage-999-0/nested', { recursive: true })
-  await env.fs.writeFileDirect('/install/releases/.stage-999-0/junk', Buffer.from('junk'), 0o600)
-  await env.fs.writeFileDirect('/install/releases/.stage-999-0/.academy-install-owned',Buffer.from(`${JSON.stringify({
+  await env.fs.mkdir(`/install/releases/.stage-${second.manifest.releaseSha256}-999-0/nested`, { recursive: true })
+  await env.fs.writeFileDirect(`/install/releases/.stage-${second.manifest.releaseSha256}-999-0/junk`, Buffer.from('junk'), 0o600)
+  await env.fs.writeFileDirect(`/install/releases/.stage-${second.manifest.releaseSha256}-999-0/.academy-install-owned`,Buffer.from(`${JSON.stringify({
     schema:'academy-release-install-stage/v1',releaseSha256:second.manifest.releaseSha256,releaseRevision:REVISION_B,
   })}\n`),0o400)
   const result = await install(env, second)
@@ -546,6 +723,140 @@ test('interrupted publication is recoverable and preserves the prior release', a
   const pointer = await readAcademyReleasePointer({ installRoot: '/install', fs: env.fs, processLike: env.processLike })
   assert.equal(pointer.releaseSha256, second.manifest.releaseSha256)
   assert.equal(pointer.previousReleaseSha256, first.manifest.releaseSha256)
+})
+
+test('v3 install accepts an exact v2 predecessor and preserves rollback continuity', async () => {
+  const env = await environment()
+  const first = await renderedSource(env, REVISION_A)
+  const predecessor = await v2Predecessor(env, first)
+  const root = `/install/releases/${predecessor.releaseSha256}`
+  await verifyAcademyRelease({ root, fs: env.fs, processLike: env.processLike })
+  const before = await predecessorSnapshot(env, predecessor)
+  const second = await renderedSource(env, REVISION_B)
+  const installed = await install(env, second)
+  assert.equal(installed.status, 'INSTALLED')
+  const pointer = await readAcademyReleasePointer({ installRoot: '/install',
+    fs: env.fs, processLike: env.processLike })
+  assert.equal(pointer.releaseSha256, second.manifest.releaseSha256)
+  assert.equal(pointer.previousReleaseSha256, predecessor.releaseSha256)
+  assert.deepEqual(await predecessorSnapshot(env, predecessor), before)
+  const rolled = await rollbackAcademyRelease({ installRoot: '/install', now: NOW,
+    fs: env.fs, processLike: env.processLike })
+  assert.equal(rolled.releaseSha256, predecessor.releaseSha256)
+  assert.equal(rolled.releaseRevision, REVISION_A)
+  const resolved = await resolveAcademyCurrentRelease({ installRoot: '/install',
+    fs: env.fs, processLike: env.processLike })
+  assert.equal(resolved.release.manifest.schema, ACADEMY_RELEASE_PREDECESSOR_MANIFEST_SCHEMA)
+})
+
+test('v3 install rejects drifted v2 digest, ownership, tree, and incompatible predecessor', async () => {
+  const prepare = async mutate => {
+    const env = await environment()
+    const first = await renderedSource(env, REVISION_A)
+    const predecessor = await v2Predecessor(env, first)
+    const predecessorPath = `/install/releases/${predecessor.releaseSha256}/manifest.json`
+    await mutate(env, predecessor)
+    await env.fs.writeFileDirect(predecessorPath,
+      Buffer.from(`${JSON.stringify(predecessor)}\n`), 0o444)
+    const second = await renderedSource(env, REVISION_B)
+    return { env, second }
+  }
+  const changeIdentity = (manifest, uid, gid) => {
+    manifest.entries = manifest.entries.map(entry => ({ ...entry, uid, gid }))
+    manifest.directories = manifest.directories.map(directory => ({ ...directory, uid, gid }))
+    manifest.releaseSha256 = computeAcademyReleaseSha256(manifest)
+  }
+  const digest = await prepare((env, manifest) => { manifest.releaseSha256 = 'e'.repeat(64) })
+  await assert.rejects(install(digest.env, digest.second))
+  const uid = await prepare((env, manifest) => changeIdentity(manifest, 3000, manifest.entries[0].gid))
+  await assert.rejects(install(uid.env, uid.second))
+  const gid = await prepare((env, manifest) => changeIdentity(manifest, manifest.entries[0].uid, 4000))
+  await assert.rejects(install(gid.env, gid.second))
+  const tree = await prepare(async env => {
+    const target = `/install/releases/${(await readAcademyReleasePointer({ installRoot: '/install',
+      fs: env.fs, processLike: env.processLike })).releaseSha256}`
+    await env.fs.writeFileDirect(`${target}/foreign`, Buffer.from('foreign'), 0o400)
+  })
+  await assert.rejects(install(tree.env, tree.second))
+  const incompatible = await prepare(async env => {
+    await env.fs.rm('/install/current.json')
+    await env.fs.writeFileDirect('/install/current.json', Buffer.from(`${JSON.stringify({
+      schema: 'academy-release-pointer/v1', releaseSha256: 'f'.repeat(64),
+      releaseRevision: REVISION_A, previousReleaseSha256: null, updatedAt: NOW.toISOString(),
+    })}\n`), 0o400)
+  })
+  await assert.rejects(install(incompatible.env, incompatible.second))
+})
+
+test('stage marker is corrected and rechecked under restrictive umask', async () => {
+  const env = await environment()
+  const source = await renderedSource(env, REVISION_A)
+  const open = (path, flags, mode = 0o666) => env.fs.open(path, flags,
+    (flags & constants.O_CREAT) ? mode & ~0o777 : mode)
+  await assert.doesNotReject(installAcademyRelease({ sourceRoot: source.root, installRoot: '/install',
+    expectedReleaseSha256: source.manifest.releaseSha256, expectedReleaseRevision: REVISION_A,
+    now: NOW, fs: { ...env.fs, open }, processLike: env.processLike }))
+  const target = `/install/releases/${source.manifest.releaseSha256}`
+  await verifyAcademyRelease({ root: target, fs: env.fs, processLike: env.processLike })
+})
+
+test('releases directory is corrected to 0755 under restrictive umask', async () => {
+  const env = await environment()
+  const source = await renderedSource(env, REVISION_A)
+  const mkdir = (path, options = {}) => env.fs.mkdir(path, {
+    ...options,
+    mode: typeof options.mode === 'number' ? options.mode & ~0o077 : options.mode,
+  })
+  await assert.doesNotReject(installAcademyRelease({ sourceRoot: source.root, installRoot: '/install',
+    expectedReleaseSha256: source.manifest.releaseSha256, expectedReleaseRevision: REVISION_A,
+    now: NOW, fs: { ...env.fs, mkdir }, processLike: env.processLike }))
+  assert.equal((await env.fs.lstat('/install/releases')).mode & 0o777, 0o755)
+})
+
+test('unmarked exact stage residue is recovered after pre-rename crash window', async () => {
+  const env = await environment({ uid: SOURCE_UID, gid: SOURCE_GID })
+  const source = await renderedSource(env, REVISION_A)
+  const releaseStage = `/install/releases/.stage-${source.manifest.releaseSha256}-${env.processLike.pid}-0`
+  await env.fs.mkdir(releaseStage, { recursive: true, mode: 0o700 })
+  const clone = await cloneRenderedSource(env, source, env, releaseStage)
+  await env.fs.chmod(releaseStage, 0o555)
+  await env.fs.rm(`${releaseStage}/.academy-install-owned`, { force: true }).catch(() => {})
+  await verifyAcademyRelease({ root: clone.root, fs: env.fs, processLike: env.processLike })
+  const stageEntries = await env.fs.readdir(releaseStage)
+  assert.ok(stageEntries.includes('manifest.json'))
+  assert.ok(!stageEntries.includes('.academy-install-owned'))
+  assert.equal((await diagnoseAcademyInstall({ sourceRoot: source.root, installRoot: '/install',
+    expectedReleaseSha256: source.manifest.releaseSha256, expectedReleaseRevision: REVISION_A,
+    fs: env.fs, processLike: env.processLike })).reason, 'OWNED_STAGE_RECOVERABLE')
+  const result = await install(env, source)
+  assert.equal(result.status, 'INSTALLED')
+  await assert.rejects(env.fs.lstat(releaseStage))
+})
+
+test('concurrent verified winner cleans its exact unmarked stage residue', async () => {
+  const env = await environment()
+  const source = await renderedSource(env, REVISION_A)
+  const releaseStage = `/install/releases/.stage-${source.manifest.releaseSha256}-${env.processLike.pid}-0`
+  let conflictInjected = false
+  const fs = {
+    ...env.fs,
+    rename: async (from, to) => {
+      if (from === releaseStage && to === `/install/releases/${source.manifest.releaseSha256}` && !conflictInjected) {
+        conflictInjected = true
+        await env.fs.rename(from, to)
+        const error = new Error('ENOTEMPTY')
+        error.code = 'ENOTEMPTY'
+        throw error
+      }
+      return env.fs.rename(from, to)
+    },
+  }
+  const result = await installAcademyRelease({ sourceRoot: source.root, installRoot: '/install',
+    expectedReleaseSha256: source.manifest.releaseSha256, expectedReleaseRevision: REVISION_A,
+    now: NOW, fs, processLike: env.processLike })
+  assert.equal(result.status, 'INSTALLED')
+  await assert.rejects(env.fs.lstat(releaseStage))
+  await verifyAcademyRelease({ root: `/install/releases/${source.manifest.releaseSha256}`, fs: env.fs, processLike: env.processLike })
 })
 
 test('rollback atomically switches the pointer to the exact retained previous release', async () => {

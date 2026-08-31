@@ -76,6 +76,12 @@ async function executable(t, body) {
   return { root, path }
 }
 
+async function listAuthorityWorkspaces(env) {
+  return (await env.fs.readdir('/private/var/lib/academy/wrangler'))
+    .filter(entry => entry.startsWith(`application-${common[1]}-`))
+    .sort()
+}
+
 test('real runner returns raw JSON and drains quick success', async t => {
   const fixture = await executable(t, `printf '%s' '${JSON.stringify(provider)}'`)
   assert.equal(await runWranglerJson({ executable: fixture.path, cwd: fixture.root, deadlineMs: Date.now() + 2_000 }), JSON.stringify(provider))
@@ -99,13 +105,11 @@ test('real runner kills and reaps a timed out process group with descendants', a
   assert.throws(() => process.kill(pid, 0), { code: 'ESRCH' })
 })
 
-test('real runner kills and reaps descendants after successful leader exit', async t => {
+test('real runner kills and reaps descendants after successful leader exit without failing the command', async t => {
   const pidPath = join(tmpdir(), `academy-helper-success-descendant-${process.pid}.pid`)
   t.after(() => rm(pidPath, { force: true }))
   const fixture = await executable(t, `sleep 30 </dev/null >/dev/null 2>&1 & echo $! > '${pidPath}'; printf '%s' '${JSON.stringify(provider)}'; exit 0`)
   const execution = runWranglerJson({ executable: fixture.path, cwd: fixture.root, deadlineMs: Date.now() + 2_000 })
-  let helperFailure
-  execution.catch(error => { helperFailure = error })
   let pid
   const readyDeadline = Date.now() + 2_500
   while (Date.now() < readyDeadline) {
@@ -114,8 +118,7 @@ test('real runner kills and reaps descendants after successful leader exit', asy
     await new Promise(resolve => setTimeout(resolve, 10))
   }
   assert.ok(Number.isSafeInteger(pid) && pid > 1)
-  await execution.catch(() => {})
-  assert.ok(helperFailure instanceof Error)
+  assert.equal(await execution, JSON.stringify(provider))
   let gone = false
   const goneDeadline = Date.now() + 1_000
   while (Date.now() < goneDeadline) {
@@ -201,7 +204,7 @@ test('candidate upload pins Wrangler and verifies exact provider annotations at 
   const value = await executeAcademyCloudflareHelper([...common,'--operation','upload','--source',R,'--traffic','0'], { ...options, run })
   assert.equal(value.versionId, candidate)
   assert.equal(value.trafficPercentage, 0)
-  assert.ok(calls.some(call => call?.includes('--strict') && call.includes('--keep-vars')))
+  assert.ok(calls.some(call => Array.isArray(call) && call.includes('--strict') && call.includes('--keep-vars')))
   assert.equal(JSON.stringify(value).includes(message), false)
   assert.ok(calls.some(call => call?.[0] === 'versions' && call[1] === 'view' && call[2] === candidate))
 })
@@ -227,7 +230,8 @@ test('live upload requires release-bound worker and config and uses a separate w
     { ...pinnedOptions, fs:env.fs, processLike:env.processLike, installRoot:'/opt/academy', runWrangler })
   assert.equal(value.versionId,candidate)
   const upload = calls.find(call=>call.args.includes('upload'))
-  const workspace = `/private/var/lib/academy/wrangler/application-${common[1]}`
+  const workspace = upload.cwd
+  assert.match(workspace, new RegExp(`/private/var/lib/academy/wrangler/application-${common[1]}-[a-f0-9]{12}$`))
   assert.equal(upload.cwd,workspace)
   assert.equal(upload.args.includes(`${root}/application/worker.js`), false)
   assert.equal(upload.args.includes(`${root}/application/worker.ts`), false)
@@ -300,14 +304,13 @@ test('live path resolves the pointer release and executes only pinned node and w
   const runWrangler = async invocation => {
     observed = invocation
     await invocation.verify()
-    workspaceDuringProviderCall = await env.fs.lstat(`/private/var/lib/academy/wrangler/application-${common[1]}`)
-      .then(() => true, () => false)
+    workspaceDuringProviderCall = (await listAuthorityWorkspaces(env)).length === 1
     return JSON.stringify(provider)
   }
   const value = await executeAcademyCloudflareHelper(inspectArgs,
     { ...pinnedOptions, fs: env.fs, processLike: env.processLike, installRoot: '/opt/academy', runWrangler })
   assert.deepEqual(value, { deployments: provider })
-  const workspace = `/private/var/lib/academy/wrangler/application-${common[1]}`
+  const workspace = observed.cwd
   assert.equal(observed.executable, `${root}/node/bin/node`)
   assert.deepEqual(observed.args, [
     `${root}/wrangler/node_modules/wrangler/bin/wrangler.js`,
@@ -349,7 +352,7 @@ test('successful projected invocation uses copied config and exact release links
   }
   await executeAcademyCloudflareHelper([...common,'--operation','upload','--source',R,'--traffic','0'],
     { ...pinnedOptions, fs: env.fs, processLike: env.processLike, installRoot: '/opt/academy', runWrangler })
-  const workspace = `/private/var/lib/academy/wrangler/application-${common[1]}`
+  const workspace = observedList.find(call => call.args.includes('upload')).cwd
   const application = `${workspace}/application`
   const observed = observedList.find(call => call.args.includes('versions upload') || call.args.includes('upload'))
   assert.equal(observed.cwd, workspace)
@@ -360,6 +363,176 @@ test('successful projected invocation uses copied config and exact release links
   assert.ok(observed.args.includes(`${application}/wrangler.jsonc`))
   assert.equal(observed.args.includes(`${root}/application/wrangler.jsonc`), false)
   assert.equal(await env.fs.lstat(workspace).then(() => true, () => false), false)
+})
+
+test('multi-call upload recreates exact workspace after Wrangler residue in the shared cwd', async () => {
+  const { env } = await pinnedReleaseEnvironment()
+  const tag = `release-${R.slice(0,12)}`
+  const uploadMessage = 's=bbbbbbbbbbbb;c=d901061aa65e'
+  let lists = 0
+  let firstWorkspace
+  const runWrangler = async invocation => {
+    await invocation.verify()
+    const args = invocation.args.slice(1)
+    if (args[0] === 'deployments') {
+      firstWorkspace = invocation.cwd
+      await env.fs.writeFileDirect(`${firstWorkspace}/provider-cache.json`, Buffer.from('residue\n'), 0o600)
+      return JSON.stringify(provider)
+    }
+    if (args[0] === '--version') return '4.120.0\n'
+    if (args[0] === 'versions' && args[1] === 'upload') return 'uploaded\n'
+    if (args[0] === 'versions' && args[1] === 'view') return JSON.stringify({
+      id: candidate, resources: { bindings: CONFIG_NAMES.map(name => ({ name, type: 'secret_text' })) },
+    })
+    if (args[0] === 'versions' && args[1] === 'list') {
+      lists += 1
+      return lists === 1 ? versionInventory(version) : JSON.stringify([
+        ...JSON.parse(versionInventory(version)), ...JSON.parse(versionInventory(candidate, tag, uploadMessage)),
+      ])
+    }
+    throw new Error('unexpected provider invocation')
+  }
+  const value = await executeAcademyCloudflareHelper([...common,'--operation','upload','--source',R,'--traffic','0'],
+    { ...pinnedOptions, fs: env.fs, processLike: env.processLike, installRoot: '/opt/academy', runWrangler })
+  assert.equal(value.versionId, candidate)
+  assert.equal(await env.fs.lstat(`${firstWorkspace}/provider-cache.json`).then(() => true, () => false), false)
+  assert.equal(await env.fs.lstat(firstWorkspace).then(() => true, () => false), false)
+})
+
+test('upload reconciles delayed provider visibility after successful mutation', async () => {
+  const { env } = await pinnedReleaseEnvironment()
+  const tag = `release-${R.slice(0,12)}`
+  const uploadMessage = 's=bbbbbbbbbbbb;c=d901061aa65e'
+  let lists = 0
+  let now = Date.parse('2026-08-29T11:00:00Z')
+  const runWrangler = async invocation => {
+    await invocation.verify()
+    const args = invocation.args.slice(1)
+    if (args[0] === 'deployments') return JSON.stringify(provider)
+    if (args[0] === '--version') return '4.120.0\n'
+    if (args[0] === 'versions' && args[1] === 'upload') return 'uploaded\n'
+    if (args[0] === 'versions' && args[1] === 'view') return JSON.stringify({
+      id: candidate, resources: { bindings: CONFIG_NAMES.map(name => ({ name, type: 'secret_text' })) },
+    })
+    if (args[0] === 'versions' && args[1] === 'list') {
+      lists += 1
+      if (lists < 4) return versionInventory(version)
+      return JSON.stringify([
+        ...JSON.parse(versionInventory(version)),
+        ...JSON.parse(versionInventory(candidate, tag, uploadMessage)),
+      ])
+    }
+    throw new Error('unexpected provider invocation')
+  }
+  const value = await executeAcademyCloudflareHelper([...common,'--operation','upload','--source',R,'--traffic','0'], {
+    ...pinnedOptions,
+    fs: env.fs,
+    processLike: env.processLike,
+    installRoot: '/opt/academy',
+    clock: () => now,
+    delay: async ms => { now += ms },
+    runWrangler,
+  })
+  assert.equal(value.versionId, candidate)
+  assert.equal(lists, 4)
+})
+
+test('upload fails closed when matching version remains ambiguous after mutation', async () => {
+  const { env } = await pinnedReleaseEnvironment()
+  const tag = `release-${R.slice(0,12)}`
+  const uploadMessage = 's=bbbbbbbbbbbb;c=d901061aa65e'
+  const priorCandidate = '77777777-7777-4777-8777-777777777777'
+  let now = Date.parse('2026-08-29T11:00:00Z')
+  const inventory = JSON.stringify([
+    ...JSON.parse(versionInventory(version)),
+    ...JSON.parse(versionInventory(priorCandidate, tag, uploadMessage)),
+  ])
+  const runWrangler = async invocation => {
+    await invocation.verify()
+    const args = invocation.args.slice(1)
+    if (args[0] === 'deployments') return JSON.stringify(provider)
+    if (args[0] === '--version') return '4.120.0\n'
+    if (args[0] === 'versions' && args[1] === 'upload') return 'uploaded\n'
+    if (args[0] === 'versions' && args[1] === 'list') return inventory
+    throw new Error('unexpected provider invocation')
+  }
+  await assert.rejects(executeAcademyCloudflareHelper([...common,'--operation','upload','--source',R,'--traffic','0'], {
+    ...pinnedOptions,
+    fs: env.fs,
+    processLike: env.processLike,
+    installRoot: '/opt/academy',
+    clock: () => now,
+    delay: async ms => { now += ms },
+    runWrangler,
+  }))
+})
+
+test('upload reconciles exact unique candidate when provider mutates then exits nonzero', async () => {
+  const { env } = await pinnedReleaseEnvironment()
+  const tag = `release-${R.slice(0,12)}`
+  const uploadMessage = 's=bbbbbbbbbbbb;c=d901061aa65e'
+  let lists = 0
+  const runWrangler = async invocation => {
+    await invocation.verify()
+    const args = invocation.args.slice(1)
+    if (args[0] === 'deployments') return JSON.stringify(provider)
+    if (args[0] === '--version') return '4.120.0\n'
+    if (args[0] === 'versions' && args[1] === 'upload') throw new Error('wrangler exited nonzero after mutation')
+    if (args[0] === 'versions' && args[1] === 'view') return JSON.stringify({
+      id: candidate, resources: { bindings: CONFIG_NAMES.map(name => ({ name, type: 'secret_text' })) },
+    })
+    if (args[0] === 'versions' && args[1] === 'list') {
+      lists += 1
+      return lists === 1 ? versionInventory(version) : JSON.stringify([
+        ...JSON.parse(versionInventory(version)),
+        ...JSON.parse(versionInventory(candidate, tag, uploadMessage)),
+      ])
+    }
+    throw new Error('unexpected provider invocation')
+  }
+  const value = await executeAcademyCloudflareHelper([...common,'--operation','upload','--source',R,'--traffic','0'], {
+    ...pinnedOptions,
+    fs: env.fs,
+    processLike: env.processLike,
+    installRoot: '/opt/academy',
+    runWrangler,
+  })
+  assert.equal(value.versionId, candidate)
+  assert.equal(lists, 2)
+})
+
+test('upload retry reuses one exact pre-existing candidate and skips second mutation', async () => {
+  const { env } = await pinnedReleaseEnvironment()
+  const tag = `release-${R.slice(0,12)}`
+  const uploadMessage = 's=bbbbbbbbbbbb;c=d901061aa65e'
+  let uploadCalls = 0
+  let viewCalls = 0
+  const runWrangler = async invocation => {
+    await invocation.verify()
+    const args = invocation.args.slice(1)
+    if (args[0] === 'deployments') return JSON.stringify(provider)
+    if (args[0] === '--version') return '4.120.0\n'
+    if (args[0] === 'versions' && args[1] === 'upload') { uploadCalls += 1; return 'uploaded\n' }
+    if (args[0] === 'versions' && args[1] === 'view') {
+      viewCalls += 1
+      return JSON.stringify({ id: candidate, resources: { bindings: CONFIG_NAMES.map(name => ({ name, type: 'secret_text' })) } })
+    }
+    if (args[0] === 'versions' && args[1] === 'list') return JSON.stringify([
+      ...JSON.parse(versionInventory(version)),
+      ...JSON.parse(versionInventory(candidate, tag, uploadMessage)),
+    ])
+    throw new Error('unexpected provider invocation')
+  }
+  const value = await executeAcademyCloudflareHelper([...common,'--operation','upload','--source',R,'--traffic','0'], {
+    ...pinnedOptions,
+    fs: env.fs,
+    processLike: env.processLike,
+    installRoot: '/opt/academy',
+    runWrangler,
+  })
+  assert.equal(value.versionId, candidate)
+  assert.equal(uploadCalls, 0)
+  assert.equal(viewCalls, 1)
 })
 
 test('projected config and target drift are rejected before provider calls', async () => {
@@ -374,8 +547,10 @@ test('projected config and target drift are rejected before provider calls', asy
     const revalidate = async () => {
       stage += 1
       if (stage !== 2) return
-      const workspace = `/private/var/lib/academy/wrangler/application-${common[1]}`
-      const application = `${workspace}/application`
+      const [workspace] = await listAuthorityWorkspaces(env)
+      if (!workspace) throw new Error('workspace missing')
+      const absoluteWorkspace = `/private/var/lib/academy/wrangler/${workspace}`
+      const application = `${absoluteWorkspace}/application`
       if (tamperConfig) {
         await env.fs.rm(`${application}/wrangler.jsonc`)
         await env.fs.writeFileDirect(`${application}/wrangler.jsonc`, Buffer.from('{"main":"evil.js"}\n'), 0o600)
@@ -395,16 +570,17 @@ test('projected config and target drift are rejected before provider calls', asy
   }
 })
 
-test('foreign operation residue is preserved and rejected without cleanup', async () => {
+test('foreign sibling residue is preserved and does not block isolated helper workspaces', async () => {
   const { env } = await pinnedReleaseEnvironment()
-  const workspace = `/private/var/lib/academy/wrangler/application-${common[1]}`
+  const workspace = `/private/var/lib/academy/wrangler/application-${common[1]}-foreign`
   await env.fs.mkdir(workspace, { mode: 0o700 })
   await env.fs.writeFileDirect(`${workspace}/operator-owned.json`, Buffer.from('preserve\\n'), 0o600)
   let providerCalls = 0
-  await assert.rejects(executeAcademyCloudflareHelper(inspectArgs,
+  const value = await executeAcademyCloudflareHelper(inspectArgs,
     { ...pinnedOptions, fs: env.fs, processLike: env.processLike, installRoot: '/opt/academy',
-      runWrangler: async () => { providerCalls += 1 } }))
-  assert.equal(providerCalls, 0)
+      runWrangler: async () => { providerCalls += 1; return JSON.stringify(provider) } })
+  assert.equal(providerCalls, 1)
+  assert.deepEqual(value, { deployments: provider })
   assert.equal(await env.fs.lstat(`${workspace}/operator-owned.json`).then(() => true, () => false), true)
 })
 

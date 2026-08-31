@@ -9,6 +9,7 @@ prove-it labs และระบบแต้ม lab
 1. `AGENTS.md` — canonical context (provider-neutral)
 2. `plans/active_plan.md` — สถานะปัจจุบัน, นิยาม product + โมเดลราคา, Phase 0 lanes
 3. `plans/completed_log.md` — decision ที่ปิดแล้ว + เหตุผล + evidence
+4. `docs/maintenance/README.md` — maintenance, secret inventory, backup/restore, rollback
 
 ## สถานะ (2026-07-31)
 

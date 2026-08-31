@@ -16,7 +16,8 @@ For every Academy session:
 2. Read this file.
 3. Read `plans/active_plan.md` and `plans/completed_log.md`.
 4. Read local `principles/` and `skills/` only when the task matches a project-specific addition.
-5. For cross-product work, read `../../../ecosystem/ECOSYSTEM.md`.
+5. For operations, incident response, backup, restore, rollback, or secret inventory work, read `docs/maintenance/README.md`.
+6. For cross-product work, read `../../../ecosystem/ECOSYSTEM.md`.
 
 Provider-specific folders or files may point here, but this file and local project governance are the canonical source.
 
@@ -39,6 +40,7 @@ alone. A route failure is a stop; never fall back to `director`.
 - `artifacts/` - generated evidence for Academy work, such as exports, screenshots, traces, and raw validation outputs.
 - `context/` - durable source-of-truth context that is not a plan, report, or artifact.
 - `docs/` - product, engineering, and user-facing documentation.
+- `docs/maintenance/` - Academy maintenance index, inventory, secret registry, and recovery runbooks.
 
 Local governance must complement director standards, stay provider-neutral, and remain additive unless the task explicitly approves broader cleanup.
 

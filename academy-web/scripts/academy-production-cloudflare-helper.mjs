@@ -83,22 +83,27 @@ export async function runWranglerJson({ executable, args = ['deployments', 'list
     child.once('close', (status, signal) => resolve({ status, signal }))
   })
   let timer
-  const timeout = new Promise(resolve => { timer = setTimeout(() => resolve(null), Math.min(remaining, 5_000)) })
+  const timeout = new Promise(resolve => { timer = setTimeout(() => resolve(null), Math.min(remaining, 30_000)) })
   let result = await Promise.race([close, timeout])
   clearTimeout(timer)
-  const cleanupFailedGroup = async () => {
-    if (Number.isSafeInteger(child.pid)) {
-      try { process.kill(-child.pid, 'SIGKILL') } catch (error) { if (error?.code !== 'ESRCH') fail() }
+  const cleanupGroup = async () => {
+    if (!Number.isSafeInteger(child.pid)) return true
+    try { process.kill(-child.pid, 'SIGKILL') } catch (error) {
+      if (error?.code === 'ESRCH') return true
+      fail()
     }
-    result = await Promise.race([close, new Promise(resolve => setTimeout(() => resolve(null), 1_000))])
-    if (!result || (Number.isSafeInteger(child.pid) && groupAlive(child.pid))) fail()
+    const stopWaitingAt = clock() + 1_000
+    while (clock() < stopWaitingAt) {
+      result = await Promise.race([close, new Promise(resolve => setTimeout(() => resolve(null), 50))])
+      if (result) return true
+    }
+    return false
+  }
+  if (!result || result.status !== 0 || result.signal || overflow) {
+    await cleanupGroup()
     fail()
   }
-  if (!result || result.status !== 0 || result.signal || overflow) await cleanupFailedGroup()
-  if (Number.isSafeInteger(child.pid) && groupAlive(child.pid)) {
-    result = { status: 0, signal: null }
-    await cleanupFailedGroup()
-  }
+  if (Number.isSafeInteger(child.pid) && groupAlive(child.pid) && !await cleanupGroup()) fail()
   return Buffer.concat(chunks).toString('utf8')
 }
 
@@ -131,6 +136,50 @@ function versionsFrom(source) {
     const message = value?.annotations?.['workers/message'] ?? ''
     if (!UUID.test(id) || typeof createdOn !== 'string' || typeof tag !== 'string' || typeof message !== 'string') fail()
     return { id, createdOn, tag, message }
+  })
+}
+
+function exactUploadMatches(inventory, tag, message) {
+  if (!Array.isArray(inventory) || typeof tag !== 'string' || typeof message !== 'string') fail()
+  return inventory.filter(item => item.tag === tag && item.message === message)
+}
+
+async function verifiedUploadedVersion({ candidate, invoke }) {
+  if (!candidate || typeof candidate !== 'object' || typeof invoke !== 'function' || !UUID.test(candidate.id)) fail()
+  configuredNamesFrom(await invoke(['versions','view',candidate.id,'--name',WORKER,'--json']), candidate.id)
+  return candidate
+}
+
+async function reconcileUploadedVersion({ before, invoke, tag, message, validUntilMs, clock, delay = ms => new Promise(resolve => setTimeout(resolve, ms)) }) {
+  if (!Array.isArray(before) || typeof invoke !== 'function' || typeof tag !== 'string'
+    || typeof message !== 'string' || !Number.isFinite(validUntilMs) || typeof clock !== 'function'
+    || typeof delay !== 'function') fail()
+  const priorIds = new Set(before.map(item => item.id))
+  const beforeMatches = exactUploadMatches(before, tag, message)
+  const stopAt = Math.min(validUntilMs, clock() + 2_000)
+  let inventory = before
+  for (;;) {
+    inventory = versionsFrom(await invoke(['versions','list','--name',WORKER,'--json']))
+    const matches = exactUploadMatches(inventory, tag, message)
+    const added = matches.filter(item => !priorIds.has(item.id))
+    if (added.length === 1) return added[0]
+    if (added.length > 1) fail()
+    if (beforeMatches.length === 0 && matches.length === 1) return matches[0]
+    const remaining = stopAt - clock()
+    if (remaining < 200) fail()
+    await delay(Math.min(remaining - 100, 250))
+  }
+}
+
+async function resolveUploadVersion({ before, invoke, tag, message, validUntilMs, clock, delay }) {
+  if (!Array.isArray(before) || typeof invoke !== 'function' || typeof tag !== 'string'
+    || typeof message !== 'string' || !Number.isFinite(validUntilMs) || typeof clock !== 'function') fail()
+  const existing = exactUploadMatches(before, tag, message)
+  if (existing.length === 1) return verifiedUploadedVersion({ candidate: existing[0], invoke })
+  if (existing.length > 1) fail()
+  return verifiedUploadedVersion({
+    candidate: await reconcileUploadedVersion({ before, invoke, tag, message, validUntilMs, clock, delay }),
+    invoke,
   })
 }
 
@@ -273,14 +322,8 @@ export async function executeAcademyCloudflareHelper(args, options = {}) {
         || current.release.manifest.releaseRevision !== release.manifest.releaseRevision) fail()
     })
     await revalidate()
-    const workspace = `${workRoot}/application-${values['--authority']}`
-    const applicationDirectory = `${workspace}/${APPLICATION_DIRECTORY}`
-    const projectedConfigPath = `${applicationDirectory}/wrangler.jsonc`
     let cleanup
-    let workspaceCreated = false
     try {
-      await runtimeFs.mkdir(workspace, { mode: 0o700 })
-      workspaceCreated = true
       const configEntry = release.manifest.entries.find(entry => entry.path === APPLICATION_CONFIG)
       const sourceHandle = await runtimeFs.open(`${release.root}/${APPLICATION_CONFIG}`,
         constants.O_RDONLY | constants.O_NOFOLLOW)
@@ -293,42 +336,61 @@ export async function executeAcademyCloudflareHelper(args, options = {}) {
           || configMetadata.size !== configEntry.size || configBytes.length !== configEntry.size
           || createHash('sha256').update(configBytes).digest('hex') !== configEntry.sha256) fail()
       } finally { await sourceHandle.close() }
-      await runtimeFs.mkdir(applicationDirectory, { mode: 0o700 })
-      const configHandle = await runtimeFs.open(projectedConfigPath,
-        constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL, 0o600)
-      try {
-        await configHandle.writeFile(configBytes)
-        await configHandle.sync()
-      } finally { await configHandle.close() }
-      for (const relativePath of APPLICATION_LINKS) {
-        const manifestEntry = release.manifest.entries.find(entry => entry.path === `application/${relativePath}`)
-        const manifestDirectory = release.manifest.directories?.find(directory => directory.path === `application/${relativePath}`)
-        if ((manifestDirectory === undefined) === (manifestEntry === undefined)) fail()
-        await runtimeFs.symlink(`${release.root}/application/${relativePath}`,
-          `${applicationDirectory}/${relativePath}`)
+      let invocationIndex = 0
+      const invoke = async (args, extra = {}) => {
+        const workspaceTag = createHash('sha256')
+          .update(`${values['--authority']}\n${clock()}\n${++invocationIndex}\n`)
+          .digest('hex')
+          .slice(0, 12)
+        const workspace = `${workRoot}/application-${values['--authority']}-${workspaceTag}`
+        const applicationDirectory = `${workspace}/${APPLICATION_DIRECTORY}`
+        const projectedConfigPath = `${applicationDirectory}/wrangler.jsonc`
+        const verifyWorkspace = () => verifyProjection({
+          workspace, applicationDirectory, configPath: projectedConfigPath, configBytes,
+          configDigest: configEntry.sha256, releaseRoot: release.root, manifest: release.manifest,
+          runtimeFs, expectedUid, expectedGid,
+        })
+        const prepareWorkspace = async () => {
+          await runtimeFs.mkdir(workspace, { mode: 0o700 })
+          await runtimeFs.mkdir(applicationDirectory, { mode: 0o700 })
+          const configHandle = await runtimeFs.open(projectedConfigPath,
+            constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL, 0o600)
+          try {
+            await configHandle.writeFile(configBytes)
+            await configHandle.sync()
+          } finally { await configHandle.close() }
+          for (const relativePath of APPLICATION_LINKS) {
+            const manifestEntry = release.manifest.entries.find(entry => entry.path === `application/${relativePath}`)
+            const manifestDirectory = release.manifest.directories?.find(directory => directory.path === `application/${relativePath}`)
+            if ((manifestDirectory === undefined) === (manifestEntry === undefined)) fail()
+            await runtimeFs.symlink(`${release.root}/application/${relativePath}`,
+              `${applicationDirectory}/${relativePath}`)
+          }
+        }
+        const removeWorkspace = () => removeOperationWorkspace(workspace, runtimeFs, expectedUid, expectedGid)
+        cleanup = removeWorkspace
+        try {
+          await prepareWorkspace()
+          await verifyWorkspace()
+          const resolvedArgs = typeof args === 'function' ? args(projectedConfigPath) : args
+          return await runner({ executable: release.nodeExecutable,
+            args: [release.wranglerEntrypoint, ...resolvedArgs], cwd: workspace,
+            deadlineMs: validUntilMs, clock,
+            verify: async () => { await revalidate(); await verifyWorkspace() }, ...extra })
+        } finally {
+          await removeWorkspace().catch(() => {})
+        }
       }
-      const verifyWorkspace = () => verifyProjection({
-        workspace, applicationDirectory, configPath: projectedConfigPath, configBytes,
-        configDigest: configEntry.sha256, releaseRoot: release.root, manifest: release.manifest,
-        runtimeFs, expectedUid, expectedGid,
-      })
-      await verifyWorkspace()
-      cleanup = () => removeOperationWorkspace(workspace, runtimeFs, expectedUid, expectedGid)
-      const invoke = (args, extra = {}) => runner({ executable: release.nodeExecutable,
-        args: [release.wranglerEntrypoint, ...args], cwd: workspace,
-        deadlineMs: validUntilMs, clock,
-        verify: async () => { await revalidate(); await verifyWorkspace() }, ...extra })
-      return Object.assign(() => invoke(['deployments','list','--name',WORKER,'--json']), {
-        invoke, applicationConfig: projectedConfigPath, cleanup })
+      return Object.assign(() => invoke(['deployments','list','--name',WORKER,'--json']), { invoke, cleanup: () => cleanup?.() })
     } catch (error) {
-      if (workspaceCreated) await removeOperationWorkspace(workspace, runtimeFs, expectedUid, expectedGid)
+      await cleanup?.().catch(() => {})
       throw error
     }
   }
   const run = await resolveRun()
   try {
-    const invoke = run.invoke ?? (async (args, extra) => options.run(args, extra))
-    const applicationConfig = run.applicationConfig ?? '/injected/application/wrangler.jsonc'
+    const invoke = run.invoke ?? (async (args, extra) =>
+      options.run(typeof args === 'function' ? args('/injected/application/wrangler.jsonc') : args, extra))
     const source = await run()
   const current = currentFrom(source)
     if (operation === 'inspect') {
@@ -348,14 +410,26 @@ export async function executeAcademyCloudflareHelper(args, options = {}) {
       if (!REVISION.test(values['--source']) || values['--source'] !== values['--release'] || values['--traffic'] !== '0') fail()
       const tag = `release-${values['--source'].slice(0,12)}`; const message = `s=${values['--source'].slice(0,12)};c=${CONFIG_SHA.slice(0,12)}`
       const before = versionsFrom(await invoke(['versions','list','--name',WORKER,'--json']))
+      const existing = exactUploadMatches(before, tag, message)
+      if (existing.length > 1) fail()
       if ((await invoke(['--version'])).trim() !== WRANGLER_VERSION) fail()
-      await invoke(['versions','upload','--config',applicationConfig,
-        '--name',WORKER,'--tag',tag,'--message',message,'--keep-vars','--strict','--install-skills=false'])
-      const after = versionsFrom(await invoke(['versions','list','--name',WORKER,'--json']))
-      const prior = new Set(before.map(item => item.id)); const added = after.filter(item => !prior.has(item.id))
-      if (added.length !== 1 || added[0].tag !== tag || added[0].message !== message) fail()
-      configuredNamesFrom(await invoke(['versions','view',added[0].id,'--name',WORKER,'--json']), added[0].id)
-      return receipt({ status:'PASS', workerName:WORKER, versionId:added[0].id, sourceRevision:values['--source'], trafficPercentage:0, configuredNamesSha256:CONFIG_SHA })
+      let uploaded
+      if (existing.length === 1) {
+        uploaded = await verifiedUploadedVersion({ candidate: existing[0], invoke })
+      } else {
+        try {
+          await invoke(configPath => ['versions','upload','--config',configPath,
+            '--name',WORKER,'--tag',tag,'--message',message,'--keep-vars','--strict','--install-skills=false'])
+        } catch {
+          uploaded = await resolveUploadVersion({
+            before, invoke, tag, message, validUntilMs, clock, delay: options.delay,
+          })
+        }
+        uploaded ??= await resolveUploadVersion({
+          before, invoke, tag, message, validUntilMs, clock, delay: options.delay,
+        })
+      }
+      return receipt({ status:'PASS', workerName:WORKER, versionId:uploaded.id, sourceRevision:values['--source'], trafficPercentage:0, configuredNamesSha256:CONFIG_SHA })
     }
     if (operation === 'secrets') {
       const bundle = await readProtectedSecretBundle(values['--secrets-file'])

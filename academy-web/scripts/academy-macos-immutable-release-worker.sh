@@ -64,8 +64,14 @@ test "$(/usr/bin/stat -f '%Su:%Sg:%Lp' "$STAGE")" = 'root:wheel:700'
 
 /bin/cp -pR "$SOURCES_SOURCE" "$STAGE/sources"
 /usr/sbin/chown -R root:wheel "$STAGE/sources"
-/usr/bin/find "$STAGE/sources" -type d -exec /bin/chmod a-w {} +
-/usr/bin/find "$STAGE/sources" -type f -exec /bin/chmod a-w {} +
+/usr/bin/find "$STAGE/sources" -type d -exec /bin/chmod a+rx,a-w {} +
+/usr/bin/find "$STAGE/sources" -type f -exec /bin/chmod a+rX,a-w {} +
+/bin/mkdir -p "$STAGE/sources/helpers"
+for helper in academy-production-cloudflare-helper.mjs academy-release-manifest.mjs academy-release-pointer.mjs current-deployment.mjs; do
+  /bin/cp -p "$TOOLING_ROOT/$helper" "$STAGE/sources/helpers/$helper"
+  /usr/sbin/chown root:wheel "$STAGE/sources/helpers/$helper"
+  /bin/chmod 500 "$STAGE/sources/helpers/$helper"
+done
 test -z "$(/usr/bin/find "$STAGE/sources" -type l -print -quit)"
 
 /bin/cp -p "$PACKAGE_SOURCE" "$STAGE/package-input.json"

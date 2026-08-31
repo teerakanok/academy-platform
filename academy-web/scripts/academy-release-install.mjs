@@ -1,13 +1,11 @@
 #!/usr/bin/env node
-// Immutable release installer: copies a verified release into protected
-// staging under the install root, fsyncs every staged subdirectory and the
-// full publication/pointer ancestry, then publishes with atomic no-clobber
-// semantics keyed by the release sha and atomically switches the protected
-// current pointer — the single publication contract the live helper reads. The
-// operator must supply the externally reviewed expected release digest and
-// revision; a self-consistent substituted manifest that does not match the
-// external binding never passes. A prior immutable release is never
-// overwritten; rollback is actionable by atomically switching the pointer.
+// Immutable release installer: verifies the reviewed source exactly, copies its
+// ownership-independent release identity into protected staging under the
+// install root, derives the installed manifest owner from actual fstat values,
+// and verifies the staged tree before publication. Publication is atomic and
+// no-clobber, keyed by release digest; the current pointer switches atomically
+// and prior releases remain immutable for rollback. The operator-supplied
+// external digest still prevents a self-consistent substituted release.
 
 import { createHash } from 'node:crypto'
 import { constants } from 'node:fs'
@@ -17,9 +15,11 @@ import { dirname, join, relative, resolve } from 'node:path'
 import {
   ACADEMY_RELEASE_MANIFEST_NAME,
   assertAcademyStableAncestry,
+  computeAcademyReleaseSha256,
   failAcademyRelease,
   readAcademyReleaseJson,
   syncAcademyDirectory,
+  validateAcademyReleaseManifest,
   verifyAcademyRelease,
 } from './academy-release-manifest.mjs'
 import {
@@ -34,6 +34,9 @@ const SHA256 = /^[a-f0-9]{64}$/
 const REVISION = /^[a-f0-9]{40}$/
 
 let stageSequence = 0
+
+const stageDirectoryName = (manifest, processLike) =>
+  `.stage-${manifest.releaseSha256}-${processLike.pid}-${stageSequence++}`
 
 async function copyEntry(sourceRoot, stage, entry, fs) {
   const source = join(sourceRoot, entry.path)
@@ -50,7 +53,52 @@ async function copyEntry(sourceRoot, stage, entry, fs) {
   const destination = join(stage, entry.path)
   const writer = await fs.open(destination,
     constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, entry.mode)
-  try { await writer.writeFile(bytes); await writer.sync() } finally { await writer.close() }
+  try {
+    await writer.writeFile(bytes)
+    await fs.chmod(destination, entry.mode)
+    await writer.sync()
+  } finally { await writer.close() }
+}
+
+async function rebindAcademyReleaseManifest(sourceRoot, manifest, fs) {
+  const directoryRecords = []
+  const entryRecords = []
+  let identity
+  const bindIdentity = metadata => {
+    if (!Number.isSafeInteger(metadata.uid) || metadata.uid < 0
+      || !Number.isSafeInteger(metadata.gid) || metadata.gid < 0) failAcademyRelease()
+    identity ??= { uid: metadata.uid, gid: metadata.gid }
+    if (metadata.uid !== identity.uid || metadata.gid !== identity.gid) failAcademyRelease()
+  }
+  bindIdentity(await fs.lstat(sourceRoot))
+  for (const directory of manifest.directories) {
+    const metadata = await fs.lstat(join(sourceRoot, directory.path))
+    if (!metadata.isDirectory() || (metadata.mode & 0o777) !== directory.mode) failAcademyRelease()
+    bindIdentity(metadata)
+    directoryRecords.push({ path: directory.path, mode: directory.mode,
+      uid: metadata.uid, gid: metadata.gid })
+  }
+  for (const entry of manifest.entries) {
+    const path = join(sourceRoot, entry.path)
+    const metadata = await fs.lstat(path)
+    if (!metadata.isFile() || metadata.nlink !== entry.nlink
+      || (metadata.mode & 0o777) !== entry.mode || metadata.size !== entry.size) failAcademyRelease()
+    bindIdentity(metadata)
+    const handle = await fs.open(path, constants.O_RDONLY | constants.O_NOFOLLOW)
+    let bytes
+    try { bytes = await handle.readFile() } finally { await handle.close() }
+    if (bytes.length !== entry.size
+      || createHash('sha256').update(bytes).digest('hex') !== entry.sha256) failAcademyRelease()
+    entryRecords.push({ path: entry.path, sha256: entry.sha256, size: entry.size,
+      mode: entry.mode, uid: metadata.uid, gid: metadata.gid, nlink: entry.nlink })
+  }
+  const rebound = { ...manifest,
+    directories: directoryRecords,
+    entries: entryRecords,
+  }
+  if (computeAcademyReleaseSha256(rebound) !== manifest.releaseSha256) failAcademyRelease()
+  validateAcademyReleaseManifest(rebound)
+  return rebound
 }
 
 async function inspectExistingTarget(target, manifest, fs, processLike) {
@@ -74,6 +122,35 @@ async function inspectExistingTarget(target, manifest, fs, processLike) {
 const stageMarker = manifest => `${JSON.stringify({ schema:'academy-release-install-stage/v1',
   releaseSha256:manifest.releaseSha256, releaseRevision:manifest.releaseRevision })}\n`
 
+async function verifyStageMarker(path, manifest, fs, processLike) {
+  const metadata = await fs.lstat(path)
+  const handle = await fs.open(path, constants.O_RDONLY|constants.O_NOFOLLOW)
+  let markerBytes
+  try { markerBytes = await handle.readFile('utf8') } finally { await handle.close() }
+  if (!metadata.isFile() || metadata.isSymbolicLink() || metadata.nlink !== 1
+    || metadata.uid !== processLike.getuid() || (metadata.mode & 0o777) !== 0o400
+    || markerBytes !== stageMarker(manifest)) failAcademyRelease()
+}
+
+async function exactOwnedStage(stage, manifest, fs, processLike) {
+  const stageMetadata = await fs.lstat(stage)
+  if (!stageMetadata.isDirectory() || stageMetadata.isSymbolicLink()
+    || ![0o555, 0o700].includes(stageMetadata.mode & 0o777)
+    || stageMetadata.uid !== processLike.getuid()) failAcademyRelease()
+  const verified = await verifyAcademyRelease({ root: stage, fs, processLike,
+    acceptedRootModes: [0o555, 0o700] })
+  if (verified.manifest.releaseSha256 !== manifest.releaseSha256
+    || verified.manifest.releaseRevision !== manifest.releaseRevision) failAcademyRelease()
+}
+
+async function ensureReleaseDirectory(path, fs, processLike) {
+  await fs.mkdir(path, { mode: 0o755, recursive: true })
+  await fs.chmod(path, 0o755)
+  const metadata = await fs.stat(path)
+  if (!metadata.isDirectory() || metadata.uid !== processLike.getuid()
+    || (metadata.mode & 0o777) !== 0o755) failAcademyRelease()
+}
+
 async function inspectStages(releases, manifest, fs, processLike, remove = false) {
   const ownedPaths=[]
   let foreign = 0
@@ -86,13 +163,14 @@ async function inspectStages(releases, manifest, fs, processLike, remove = false
     if (!name.startsWith('.stage-')) continue
     const stage=join(releases,name), marker=join(stage,'.academy-install-owned')
     try {
-      const metadata=await fs.lstat(marker)
-      const handle=await fs.open(marker,constants.O_RDONLY|constants.O_NOFOLLOW)
-      let markerBytes
-      try { markerBytes=await handle.readFile('utf8') } finally { await handle.close() }
-      if (!metadata.isFile() || metadata.isSymbolicLink() || metadata.nlink !== 1
-        || metadata.uid !== processLike.getuid() || (metadata.mode & 0o777) !== 0o400
-        || markerBytes.toString() !== stageMarker(manifest)) { foreign++; continue }
+      try {
+        await verifyStageMarker(marker, manifest, fs, processLike)
+        ownedPaths.push(stage)
+        continue
+      } catch (error) {
+        if (!name.startsWith(`.stage-${manifest.releaseSha256}-`)) throw error
+      }
+      await exactOwnedStage(stage, manifest, fs, processLike)
       ownedPaths.push(stage)
     } catch { foreign++ }
   }
@@ -133,8 +211,16 @@ export async function installAcademyRelease({ sourceRoot, installRoot, expectedR
   const rootMetadata = await fs.stat(root)
   if (!rootMetadata.isDirectory() || rootMetadata.uid !== processLike.getuid()) failAcademyRelease()
   const releases = academyReleaseDirectory(root)
-  await fs.mkdir(releases, { mode: 0o755, recursive: true })
+  await ensureReleaseDirectory(releases, fs, processLike)
   const target = join(releases, manifest.releaseSha256)
+  const prior = await readAcademyReleasePointer({ installRoot: root, fs, processLike })
+  if (prior !== null && prior.releaseSha256 !== manifest.releaseSha256) {
+    const predecessor = await verifyAcademyRelease({
+      root: join(releases, prior.releaseSha256), fs, processLike,
+    })
+    if (predecessor.manifest.releaseSha256 !== prior.releaseSha256
+      || predecessor.manifest.releaseRevision !== prior.releaseRevision) failAcademyRelease()
+  }
 
   let state = await inspectExistingTarget(target, manifest, fs, processLike)
   if (state === 'foreign') failAcademyRelease()
@@ -146,13 +232,19 @@ export async function installAcademyRelease({ sourceRoot, installRoot, expectedR
   if (state === 'absent') {
     const residues=await inspectStages(releases,manifest,fs,processLike,true)
     if (residues.foreign) failAcademyRelease()
-    const stage = join(releases, `.stage-${processLike.pid}-${stageSequence++}`)
+    const stage = join(releases, stageDirectoryName(manifest, processLike))
+    const releasesMetadata = await fs.stat(releases)
     await fs.mkdir(stage, { mode: 0o700 })
+    await fs.chown(stage, processLike.getuid(), releasesMetadata.gid)
+    await fs.chmod(stage, 0o2700)
     const stagedDirectories = new Set()
     try {
       const marker=await fs.open(join(stage,'.academy-install-owned'),
         constants.O_WRONLY|constants.O_CREAT|constants.O_EXCL|constants.O_NOFOLLOW,0o400)
       try { await marker.writeFile(stageMarker(manifest)); await marker.sync() } finally { await marker.close() }
+      const markerPath=join(stage,'.academy-install-owned')
+      await fs.chmod(markerPath,0o400)
+      await verifyStageMarker(markerPath,manifest,fs,processLike)
       for (const entry of manifest.entries) {
         await fs.mkdir(dirname(join(stage, entry.path)), { mode: 0o700, recursive: true })
         for (let cursor = dirname(join(stage, entry.path)); cursor.startsWith(stage) && cursor !== stage && !stagedDirectories.has(cursor); cursor = dirname(cursor)) stagedDirectories.add(cursor)
@@ -165,9 +257,14 @@ export async function installAcademyRelease({ sourceRoot, installRoot, expectedR
         await fs.chmod(directory, record.mode)
         await syncAcademyDirectory(directory, fs)
       }
+      const stagedManifest = await rebindAcademyReleaseManifest(stage, manifest, fs)
       const handle = await fs.open(join(stage, ACADEMY_RELEASE_MANIFEST_NAME),
         constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, 0o444)
-      try { await handle.writeFile(`${JSON.stringify(manifest)}\n`); await handle.sync() } finally { await handle.close() }
+      try {
+        await handle.writeFile(`${JSON.stringify(stagedManifest)}\n`)
+        await fs.chmod(join(stage, ACADEMY_RELEASE_MANIFEST_NAME), 0o444)
+        await handle.sync()
+      } finally { await handle.close() }
       // Freeze for verification, then unfreeze for the rename. Publish directly
       // to the previously absent digest path: a concurrent completed winner is
       // non-empty and cannot be replaced by a directory rename.
@@ -179,6 +276,7 @@ export async function installAcademyRelease({ sourceRoot, installRoot, expectedR
       catch (error) {
         state = await inspectExistingTarget(target, manifest, fs, processLike)
         if (!['EEXIST','ENOTEMPTY'].includes(error.code) || state !== 'verified') throw error
+        await inspectStages(releases, manifest, fs, processLike, true)
       }
       await fs.chmod(target, 0o555)
       await syncAcademyDirectory(target, fs)
@@ -190,7 +288,6 @@ export async function installAcademyRelease({ sourceRoot, installRoot, expectedR
     }
   }
 
-  const prior = await readAcademyReleasePointer({ installRoot: root, fs, processLike })
   let status = 'IDEMPOTENT'
   if (prior?.releaseSha256 !== manifest.releaseSha256) {
     await writeAcademyReleasePointer({ installRoot: root, fs, processLike, pointer: {

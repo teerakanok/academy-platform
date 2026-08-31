@@ -7,7 +7,7 @@ import { open } from 'node:fs/promises'
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-export const EXPECTED_RELEASE_SHA256 = 'fda0394cee9da9b2d1c37d2aa6e6185efc6bc54d072d21bab5e3771c3f7c8f25'
+export const EXPECTED_RELEASE_SHA256 = '0b565884bf04b839aba61e4b8887021dd363e2f1a3f78fb04ba5c6e1e648897d'
 export const EXPECTED_RELEASE_REVISION = '7de1cbfbd9e3606f44379ad0322b75109f10e583'
 export const PACKAGE_SOURCE = '/Users/teerakanok/.local/state/cyberskills/academy-release-930f/package.json'
 export const SOURCES_SOURCE = '/Users/teerakanok/.local/state/cyberskills/academy-release-930f/sources'
@@ -25,13 +25,21 @@ export const isReviewedSourcePath = path => {
 }
 
 export const PINNED_ASSETS = Object.freeze([
-  Object.freeze({ source: join(DIRECTORY, 'academy-macos-immutable-release-worker.sh'), name: 'worker.sh', mode: 0o500, sha256: '7d429ed3daa95a912563e602532aca531ffcaf256ef8e9f7f953907243a918c2' }),
+  Object.freeze({ source: join(DIRECTORY, 'academy-macos-immutable-release-worker.sh'), name: 'worker.sh', mode: 0o500, sha256: '18af78f8d8ada40fbdb1dd06b13ddd186ed753f2dd49640ed99ee73f9eb064ea' }),
+  Object.freeze({ source: join(DIRECTORY, 'academy-production-cloudflare-helper.mjs'), name: 'academy-production-cloudflare-helper.mjs', mode: 0o400, sha256: '5c87ca9a56ed11c9f16c9912ec214d88b2395d583cb6930ed3e21370aeb59ec6' }),
   Object.freeze({ source: join(DIRECTORY, 'academy-release-cli.mjs'), name: 'academy-release-cli.mjs', mode: 0o400, sha256: 'ef405f7b9df4a8ba7ed45d232c347019b09ea4bc344a6cb86070706c811b9d9d' }),
-  Object.freeze({ source: join(DIRECTORY, 'academy-release-render.mjs'), name: 'academy-release-render.mjs', mode: 0o400, sha256: '87d5ae93247db5a3ec374c0207d197483451b7e88db2bebcade2f89ba6dfccfc' }),
-  Object.freeze({ source: join(DIRECTORY, 'academy-release-install.mjs'), name: 'academy-release-install.mjs', mode: 0o400, sha256: '4ec50af32ac10a26bc5bad2782a5f6faf3da7df3cabc87765007fa240a98eb72' }),
-  Object.freeze({ source: join(DIRECTORY, 'academy-release-manifest.mjs'), name: 'academy-release-manifest.mjs', mode: 0o400, sha256: '945460b4c88f413d47dff021f2222907bd6537e84d9cf80414f10ce38a45fadb' }),
+  Object.freeze({ source: join(DIRECTORY, 'academy-release-render.mjs'), name: 'academy-release-render.mjs', mode: 0o400, sha256: '4b9560748dac8e82afd7719f8a55dca140078293e1b8ec9be453c479eb4a020a' }),
+  Object.freeze({ source: join(DIRECTORY, 'academy-release-install.mjs'), name: 'academy-release-install.mjs', mode: 0o400, sha256: '0505358687fe35ba97789b5700801c27b3405ff5ad66a960c899d646f922e8cf' }),
+  Object.freeze({ source: join(DIRECTORY, 'academy-release-manifest.mjs'), name: 'academy-release-manifest.mjs', mode: 0o400, sha256: 'e63128223ff20ef86f6ca1108845848523e7b25f46293cfab39ea66e25d37413' }),
   Object.freeze({ source: join(DIRECTORY, 'academy-release-pointer.mjs'), name: 'academy-release-pointer.mjs', mode: 0o400, sha256: '7cac358f35e6446e314e5cc9f884c9770b3395dcf9394221d6f61c569385fcee' }),
+  Object.freeze({ source: join(DIRECTORY, 'current-deployment.mjs'), name: 'current-deployment.mjs', mode: 0o400, sha256: '362dc1a8957f95b158ad3954c71f856f79882a880f7659f9e55c63888e80d98a' }),
   Object.freeze({ source: join(SOURCES_SOURCE, 'node'), name: 'node', mode: 0o500, sha256: '9bc64e922cba152eedf55cd4528ac0b5b7e0f4cd9d671d77bb0830c9796ea188' }),
+])
+export const PINNED_HELPER_CLOSURE = Object.freeze([
+  'academy-production-cloudflare-helper.mjs',
+  'academy-release-manifest.mjs',
+  'academy-release-pointer.mjs',
+  'current-deployment.mjs',
 ])
 const ROOT_BOOTSTRAP_SCHEMA = 'academy-root-bootstrap/v2'
 const ROOT_TOOLING_ID = sha256(Buffer.from([ROOT_BOOTSTRAP_SCHEMA, ...PINNED_ASSETS

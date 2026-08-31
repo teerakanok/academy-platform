@@ -1,17 +1,18 @@
 #!/usr/bin/env node
-// Immutable release manifest v2: exact file inventory (sha256, mode, uid, gid,
-// nlink recorded from the real post-write fstat, never assumed from the
-// process) plus an exact directory inventory (owner/mode). Directories must be
-// non-writable. Every release consumer (installer, helpers) verifies the full
-// tree — including foreign entries and substituted directories — before
-// trusting anything inside the release.
+// Immutable release manifest v3: an ownership-independent release digest over
+// content, size, mode, path, and hardlink count; exact file uid/gid and exact
+// directory owner/mode records from real fstat values. This permits reviewed
+// source ownership to differ from a privileged installation target without
+// weakening full-tree verification. Every release consumer verifies the whole
+// tree — including foreign entries and substituted directories — first.
 
 import { createHash } from 'node:crypto'
 import { constants } from 'node:fs'
 import { promises as filesystem } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 
-export const ACADEMY_RELEASE_MANIFEST_SCHEMA = 'academy-release-manifest/v2'
+export const ACADEMY_RELEASE_MANIFEST_SCHEMA = 'academy-release-manifest/v3'
+export const ACADEMY_RELEASE_PREDECESSOR_MANIFEST_SCHEMA = 'academy-release-manifest/v2'
 export const ACADEMY_RELEASE_MANIFEST_NAME = 'manifest.json'
 export const ACADEMY_RELEASE_FILE_MODES = Object.freeze([0o400, 0o444, 0o500, 0o555])
 export const ACADEMY_RELEASE_DIRECTORY_MODES = Object.freeze([0o500, 0o555])
@@ -42,16 +43,23 @@ export function isAcademyReleasePath(value) {
 }
 
 export function computeAcademyReleaseSha256(manifest) {
-  return createHash('sha256').update(`${JSON.stringify({
+  const projection = manifest.schema === ACADEMY_RELEASE_MANIFEST_SCHEMA ? {
+    schema: manifest.schema, releaseRevision: manifest.releaseRevision,
+    executables: manifest.executables, helpers: manifest.helpers,
+    directories: manifest.directories.map(({ path, mode }) => ({ path, mode })),
+    entries: manifest.entries.map(({ path, sha256, size, mode, nlink }) =>
+      ({ path, sha256, size, mode, nlink })),
+  } : {
     schema: manifest.schema, releaseRevision: manifest.releaseRevision,
     executables: manifest.executables, helpers: manifest.helpers,
     directories: manifest.directories, entries: manifest.entries,
-  })}\n`).digest('hex')
+  }
+  return createHash('sha256').update(`${JSON.stringify(projection)}\n`).digest('hex')
 }
 
 export function validateAcademyReleaseManifest(manifest) {
   if (!exact(manifest, ['schema','releaseRevision','releaseSha256','executables','helpers','directories','entries'])
-    || manifest.schema !== ACADEMY_RELEASE_MANIFEST_SCHEMA
+    || ![ACADEMY_RELEASE_MANIFEST_SCHEMA, ACADEMY_RELEASE_PREDECESSOR_MANIFEST_SCHEMA].includes(manifest.schema)
     || !REVISION.test(manifest.releaseRevision) || !SHA256.test(manifest.releaseSha256)
     || !exact(manifest.executables, ['node','wrangler'])
     || !isAcademyReleasePath(manifest.executables.node) || !isAcademyReleasePath(manifest.executables.wrangler)
@@ -94,13 +102,15 @@ export function validateAcademyReleaseManifest(manifest) {
   return { manifest, uid, gid }
 }
 
-export async function assertAcademyStableAncestry(path, fs = filesystem, processLike = process) {
+export async function assertAcademyStableAncestry(path, fs = filesystem, processLike = process,
+  additionalTrustedUids = []) {
+  const trustedUids = new Set([processLike.getuid(), 0, ...additionalTrustedUids])
   let cursor = dirname(resolve(path))
   while (true) {
     if (await fs.realpath(cursor) !== cursor) failAcademyRelease()
     const metadata = await fs.stat(cursor)
     const stickyRoot = metadata.uid === 0 && Boolean(metadata.mode & 0o1000)
-    if (!metadata.isDirectory() || (metadata.uid !== processLike.getuid() && metadata.uid !== 0)
+    if (!metadata.isDirectory() || !trustedUids.has(metadata.uid)
       || ((metadata.mode & 0o022) && !stickyRoot)) failAcademyRelease()
     const next = dirname(cursor)
     if (next === cursor) return
@@ -155,13 +165,15 @@ export async function verifyAcademyRelease({ root, fs = filesystem, processLike 
   if (typeof root !== 'string' || !root.startsWith('/') || root.includes('\0')) failAcademyRelease()
   const releaseRoot = resolve(root)
   const manifestPath = join(releaseRoot, ACADEMY_RELEASE_MANIFEST_NAME)
-  await assertAcademyStableAncestry(releaseRoot, fs, processLike)
+  const candidate = await readAcademyReleaseJson(manifestPath, fs)
+  const { manifest, uid, gid } = validateAcademyReleaseManifest(candidate)
+  await assertAcademyStableAncestry(releaseRoot, fs, processLike, [uid])
   if (await fs.realpath(releaseRoot) !== releaseRoot) failAcademyRelease()
   const releaseRootMetadata = await fs.lstat(releaseRoot)
   if (releaseRootMetadata.isSymbolicLink() || !releaseRootMetadata.isDirectory()
     || !Array.isArray(acceptedRootModes) || acceptedRootModes.length < 1
-    || !acceptedRootModes.includes(releaseRootMetadata.mode & 0o777)) failAcademyRelease()
-  const { manifest, uid, gid } = validateAcademyReleaseManifest(await readAcademyReleaseJson(manifestPath, fs))
+    || !acceptedRootModes.includes(releaseRootMetadata.mode & 0o777)
+    || releaseRootMetadata.uid !== uid || releaseRootMetadata.gid !== gid) failAcademyRelease()
   const selfMetadata = await fs.lstat(manifestPath)
   if (selfMetadata.isSymbolicLink() || !selfMetadata.isFile() || selfMetadata.nlink !== 1
     || (selfMetadata.mode & 0o777) !== 0o444 || selfMetadata.uid !== uid || selfMetadata.gid !== gid) failAcademyRelease()
