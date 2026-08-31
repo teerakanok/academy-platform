@@ -25,7 +25,7 @@ export const isReviewedSourcePath = path => {
 }
 
 export const PINNED_ASSETS = Object.freeze([
-  Object.freeze({ source: join(DIRECTORY, 'academy-macos-immutable-release-worker.sh'), name: 'worker.sh', mode: 0o500, sha256: 'ddd8c076927d955beaef67e97c1ddf2b134e5a219191f1f531b2da125e30a126' }),
+  Object.freeze({ source: join(DIRECTORY, 'academy-macos-immutable-release-worker.sh'), name: 'worker.sh', mode: 0o500, sha256: '7d429ed3daa95a912563e602532aca531ffcaf256ef8e9f7f953907243a918c2' }),
   Object.freeze({ source: join(DIRECTORY, 'academy-release-cli.mjs'), name: 'academy-release-cli.mjs', mode: 0o400, sha256: 'ef405f7b9df4a8ba7ed45d232c347019b09ea4bc344a6cb86070706c811b9d9d' }),
   Object.freeze({ source: join(DIRECTORY, 'academy-release-render.mjs'), name: 'academy-release-render.mjs', mode: 0o400, sha256: '87d5ae93247db5a3ec374c0207d197483451b7e88db2bebcade2f89ba6dfccfc' }),
   Object.freeze({ source: join(DIRECTORY, 'academy-release-install.mjs'), name: 'academy-release-install.mjs', mode: 0o400, sha256: '4ec50af32ac10a26bc5bad2782a5f6faf3da7df3cabc87765007fa240a98eb72' }),

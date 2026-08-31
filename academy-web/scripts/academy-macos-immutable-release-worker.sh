@@ -97,6 +97,7 @@ NODE_SCRIPT
 /usr/sbin/chown root:wheel "$STAGE/package.json"
 /bin/chmod 600 "$STAGE/package.json"
 
+FAIL_REASON=RENDER_REJECTED
 EXPECTED_RELEASE_REVISION=$EXPECTED_RELEASE_REVISION \
   "$NODE" "$CLI" render "$STAGE/package.json" "$STAGE/rendered" > "$STAGE/render-result.json"
 /bin/chmod 600 "$STAGE/render-result.json"
@@ -107,6 +108,7 @@ const value = JSON.parse(fs.readFileSync(path, 'utf8'))
 if (value.status !== 'RENDERED' || value.releaseSha256 !== expectedSha || value.releaseRevision !== expectedRevision) process.exit(1)
 NODE_SCRIPT
 
+FAIL_REASON=DIAGNOSIS_REJECTED
 "$NODE" "$CLI" diagnose-install "$STAGE/rendered" "$INSTALL_ROOT" \
   "$EXPECTED_RELEASE_SHA256" "$EXPECTED_RELEASE_REVISION" > "$STAGE/diagnostic.json"
 /bin/chmod 600 "$STAGE/diagnostic.json"
@@ -124,6 +126,7 @@ NODE_SCRIPT
 }
 test -n "$diagnostic_reason"
 
+FAIL_REASON=INSTALL_REJECTED
 "$NODE" "$CLI" install "$STAGE/rendered" "$INSTALL_ROOT" \
   "$EXPECTED_RELEASE_SHA256" "$EXPECTED_RELEASE_REVISION" > "$STAGE/install-result.json"
 /bin/chmod 600 "$STAGE/install-result.json"
@@ -133,6 +136,7 @@ const value = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'))
 if (!['INSTALLED', 'IDEMPOTENT'].includes(value.status)) process.exit(1)
 NODE_SCRIPT
 
+FAIL_REASON=VERIFY_REJECTED
 "$NODE" "$CLI" verify "$INSTALL_ROOT" "$EXPECTED_RELEASE_SHA256" \
   "$EXPECTED_RELEASE_REVISION" > "$STAGE/verify-result.json"
 /bin/chmod 600 "$STAGE/verify-result.json"
@@ -147,3 +151,4 @@ if (keys !== 'releaseRevision,releaseSha256,status'
   || value.releaseRevision !== expectedRevision) process.exit(1)
 NODE_SCRIPT
 SUCCESS=true
+FAIL_REASON=COMPLETE

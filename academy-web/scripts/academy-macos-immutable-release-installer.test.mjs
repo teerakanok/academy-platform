@@ -90,5 +90,8 @@ test('root worker binds render, diagnosis, install, verify and preserves executa
   assert.ok(worker.indexOf('"$CLI" install') < worker.indexOf('"$CLI" verify'))
   assert.match(worker, /find "\$STAGE\/sources" -type f -exec \/bin\/chmod a-w/)
   assert.match(worker, /FOREIGN_STATE_REJECTED/)
+  for (const reason of ['RENDER_REJECTED', 'DIAGNOSIS_REJECTED', 'INSTALL_REJECTED', 'VERIFY_REJECTED']) {
+    assert.match(worker, new RegExp(`FAIL_REASON=${reason}`))
+  }
   assert.doesNotMatch(worker, /wrangler|cloudflare|DATABASE|secret/iu)
 })
