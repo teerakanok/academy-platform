@@ -33,8 +33,9 @@ export const PINNED_ASSETS = Object.freeze([
   Object.freeze({ source: join(DIRECTORY, 'academy-release-pointer.mjs'), name: 'academy-release-pointer.mjs', mode: 0o400, sha256: '7cac358f35e6446e314e5cc9f884c9770b3395dcf9394221d6f61c569385fcee' }),
   Object.freeze({ source: join(SOURCES_SOURCE, 'node'), name: 'node', mode: 0o500, sha256: '9bc64e922cba152eedf55cd4528ac0b5b7e0f4cd9d671d77bb0830c9796ea188' }),
 ])
-const ROOT_TOOLING_ID = sha256(Buffer.from(PINNED_ASSETS
-  .map(asset => `${asset.name}:${asset.mode.toString(8)}:${asset.sha256}`)
+const ROOT_BOOTSTRAP_SCHEMA = 'academy-root-bootstrap/v2'
+const ROOT_TOOLING_ID = sha256(Buffer.from([ROOT_BOOTSTRAP_SCHEMA, ...PINNED_ASSETS
+  .map(asset => `${asset.name}:${asset.mode.toString(8)}:${asset.sha256}`)]
   .join('\n'))).slice(0, 16)
 export const ROOT_TOOLING = `/private/var/root/academy-immutable-installer-${ROOT_TOOLING_ID}`
 const ROOT_TOOLING_MARKER = `academy-immutable-installer/${ROOT_TOOLING_ID}`
@@ -93,39 +94,43 @@ const envelope = (status, reason) => JSON.stringify({
   schema: 'academy-macos-immutable-release-envelope/v1', status, reason,
 })
 
+export function wrapRootBootstrap(bootstrap) {
+  if (typeof bootstrap !== 'string' || !bootstrap) throw new Error('ACADEMY_IMMUTABLE_INSTALLER_REJECTED')
+  return `if /bin/sh -c ${quote(`set -eu\n${bootstrap}`)}; then :; else /usr/bin/printf '%s\\n' ${quote(envelope('FAILED', 'ROOT_BOOTSTRAP_REJECTED'))}; fi`
+}
+
 export function buildRootCommand({ packageSha256 }) {
   const marker = `${ROOT_TOOLING}/.academy-owned`
   const exactAsset = asset => [
-    `/usr/bin/test -f ${quote(`${ROOT_TOOLING}/${asset.name}`)}`,
-    `/usr/bin/test ! -L ${quote(`${ROOT_TOOLING}/${asset.name}`)}`,
-    `/usr/bin/test "$(/usr/bin/stat -f '%Su:%Sg:%Lp:%l' ${quote(`${ROOT_TOOLING}/${asset.name}`)})" = ${quote(`root:wheel:${asset.mode.toString(8)}:1`)}`,
-    `/usr/bin/test "$(/usr/bin/shasum -a 256 ${quote(`${ROOT_TOOLING}/${asset.name}`)} | /usr/bin/awk '{print $1}')" = ${quote(asset.sha256)}`,
+    `/bin/test -f ${quote(`${ROOT_TOOLING}/${asset.name}`)}`,
+    `/bin/test ! -L ${quote(`${ROOT_TOOLING}/${asset.name}`)}`,
+    `/bin/test "$(/usr/bin/stat -f '%Su:%Sg:%Lp:%l' ${quote(`${ROOT_TOOLING}/${asset.name}`)})" = ${quote(`root:wheel:${asset.mode.toString(8)}:1`)}`,
+    `/bin/test "$(/usr/bin/shasum -a 256 ${quote(`${ROOT_TOOLING}/${asset.name}`)} | /usr/bin/awk '{print $1}')" = ${quote(asset.sha256)}`,
   ].join(' && ')
   const installAsset = asset => [
     `/usr/bin/install -o root -g wheel -m ${asset.mode.toString(8)} ${quote(asset.source)} ${quote(`${ROOT_TOOLING}/${asset.name}.new`)}`,
-    `/usr/bin/test "$(/usr/bin/shasum -a 256 ${quote(`${ROOT_TOOLING}/${asset.name}.new`)} | /usr/bin/awk '{print $1}')" = ${quote(asset.sha256)}`,
+    `/bin/test "$(/usr/bin/shasum -a 256 ${quote(`${ROOT_TOOLING}/${asset.name}.new`)} | /usr/bin/awk '{print $1}')" = ${quote(asset.sha256)}`,
     `/bin/mv ${quote(`${ROOT_TOOLING}/${asset.name}.new`)} ${quote(`${ROOT_TOOLING}/${asset.name}`)}`,
     exactAsset(asset),
   ].join(' && ')
-  const ensureAsset = asset => `if /usr/bin/test -e ${quote(`${ROOT_TOOLING}/${asset.name}`)} || /usr/bin/test -L ${quote(`${ROOT_TOOLING}/${asset.name}`)}; then ${exactAsset(asset)}; else ${installAsset(asset)}; fi`
+  const ensureAsset = asset => `if /bin/test -e ${quote(`${ROOT_TOOLING}/${asset.name}`)} || /bin/test -L ${quote(`${ROOT_TOOLING}/${asset.name}`)}; then ${exactAsset(asset)}; else ${installAsset(asset)}; fi`
   const bootstrap = [
-    'set -eu',
-    `if /usr/bin/test -e ${quote(ROOT_TOOLING)} || /usr/bin/test -L ${quote(ROOT_TOOLING)}; then`,
-    `  /usr/bin/test -d ${quote(ROOT_TOOLING)} && /usr/bin/test ! -L ${quote(ROOT_TOOLING)} && /usr/bin/test "$(/usr/bin/stat -f '%Su:%Sg:%Lp' ${quote(ROOT_TOOLING)})" = 'root:wheel:700'`,
-    `  /usr/bin/test -f ${quote(marker)} && /usr/bin/test ! -L ${quote(marker)} && /usr/bin/test "$(/usr/bin/stat -f '%Su:%Sg:%Lp:%l' ${quote(marker)})" = 'root:wheel:400:1' && /usr/bin/test "$(/bin/cat ${quote(marker)})" = ${quote(ROOT_TOOLING_MARKER)}`,
+    `if /bin/test -e ${quote(ROOT_TOOLING)} || /bin/test -L ${quote(ROOT_TOOLING)}; then`,
+    `  /bin/test -d ${quote(ROOT_TOOLING)} && /bin/test ! -L ${quote(ROOT_TOOLING)} && /bin/test "$(/usr/bin/stat -f '%Su:%Sg:%Lp' ${quote(ROOT_TOOLING)})" = 'root:wheel:700'`,
+    `  /bin/test -f ${quote(marker)} && /bin/test ! -L ${quote(marker)} && /bin/test "$(/usr/bin/stat -f '%Su:%Sg:%Lp:%l' ${quote(marker)})" = 'root:wheel:400:1' && /bin/test "$(/bin/cat ${quote(marker)})" = ${quote(ROOT_TOOLING_MARKER)}`,
     'else',
     `  /usr/bin/install -d -o root -g wheel -m 700 ${quote(ROOT_TOOLING)}`,
     `  /usr/bin/printf '%s\\n' ${quote(ROOT_TOOLING_MARKER)} > ${quote(marker)}`,
     `  /usr/sbin/chown root:wheel ${quote(marker)} && /bin/chmod 400 ${quote(marker)}`,
     'fi',
     ...PINNED_ASSETS.map(ensureAsset),
-    `/usr/bin/test "$(/usr/bin/find ${quote(ROOT_TOOLING)} -mindepth 1 -maxdepth 1 -print | /usr/bin/wc -l | /usr/bin/tr -d ' ')" = ${quote(String(PINNED_ASSETS.length + 1))}`,
+    `/bin/test "$(/usr/bin/find ${quote(ROOT_TOOLING)} -mindepth 1 -maxdepth 1 -print | /usr/bin/wc -l | /usr/bin/tr -d ' ')" = ${quote(String(PINNED_ASSETS.length + 1))}`,
     `EXPECTED_RELEASE_REVISION=${quote(EXPECTED_RELEASE_REVISION)} /bin/sh ${quote(`${ROOT_TOOLING}/worker.sh`)} ${[
       PACKAGE_SOURCE, SOURCES_SOURCE, packageSha256, EXPECTED_RELEASE_SHA256,
       EXPECTED_RELEASE_REVISION, ROOT_TOOLING,
     ].map(quote).join(' ')}`,
   ].join('\n')
-  return `if ( ${bootstrap} ); then :; else /usr/bin/printf '%s\\n' ${quote(envelope('FAILED', 'ROOT_BOOTSTRAP_REJECTED'))}; fi`
+  return wrapRootBootstrap(bootstrap)
 }
 
 export function parseEnvelope(output) {

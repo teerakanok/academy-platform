@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import test from 'node:test'
@@ -12,6 +13,7 @@ import {
   isReviewedSourcePath,
   main,
   parseEnvelope,
+  wrapRootBootstrap,
 } from './academy-macos-immutable-release-installer.mjs'
 
 test('reviewed source containment rejects traversal and textual-prefix siblings', () => {
@@ -33,17 +35,31 @@ test('installer pins the reviewed release and every root executable input', asyn
 
 test('root command rehashes copied tooling and performs no DB, Cloudflare, or secret operation', () => {
   const command = buildRootCommand({ packageSha256: 'a'.repeat(64) })
-  const toolingId = createHash('sha256').update(PINNED_ASSETS
-    .map(asset => `${asset.name}:${asset.mode.toString(8)}:${asset.sha256}`)
+  const toolingId = createHash('sha256').update(['academy-root-bootstrap/v2', ...PINNED_ASSETS
+    .map(asset => `${asset.name}:${asset.mode.toString(8)}:${asset.sha256}`)]
     .join('\n')).digest('hex').slice(0, 16)
   assert.equal(ROOT_TOOLING, `/private/var/root/academy-immutable-installer-${toolingId}`)
   assert.match(command, /academy-release-cli\.mjs/)
   assert.match(command, /fda0394cee9da9b2d1c37d2aa6e6185efc6bc54d072d21bab5e3771c3f7c8f25/)
   assert.match(command, /\/usr\/sbin\/chown root:wheel/)
   assert.match(command, /root:wheel:400:1/)
+  assert.match(command, /\/bin\/test/)
   assert.doesNotMatch(command, /\/usr\/bin\/chown/)
+  assert.doesNotMatch(command, /\/usr\/bin\/test/)
   assert.match(command, /ROOT_BOOTSTRAP_REJECTED/)
   assert.doesNotMatch(command, /wrangler|cloudflare|DATABASE|secret|sudo/iu)
+})
+
+test('root bootstrap aborts on the first failed command outside conditional errexit semantics', () => {
+  const command = wrapRootBootstrap("/usr/bin/false\n/usr/bin/printf 'UNREACHABLE\\n'")
+  const result = spawnSync('/bin/sh', ['-c', command], { encoding: 'utf8' })
+  assert.equal(result.status, 0)
+  assert.equal(result.stdout, `${JSON.stringify({
+    schema: 'academy-macos-immutable-release-envelope/v1',
+    status: 'FAILED',
+    reason: 'ROOT_BOOTSTRAP_REJECTED',
+  })}\n`)
+  assert.doesNotMatch(result.stdout, /UNREACHABLE/)
 })
 
 test('launcher asks once and accepts only one sanitized envelope', async () => {
