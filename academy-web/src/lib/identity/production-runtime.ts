@@ -13,7 +13,10 @@ import { AcademyPostgresIdentityTransactionStore } from './postgres-transaction-
 import { AcademyIdentityProfileActivationStore } from './profile-activation-store'
 import { importIdentityResultKeySet } from './result-key-set-importer'
 import { createAcademyIdentityRuntimeBrowserFlow, type AcademyIdentityRuntimeBrowserFlow } from './runtime-browser-flow'
-import { AcademyPostgresIdentitySessionStore } from './postgres-session-store'
+import {
+  AcademyPostgresIdentitySessionStore,
+  type IdentityDurableSessionPort,
+} from './postgres-session-store'
 
 const ACCOUNT_CENTER_ORIGIN = 'https://accounts.cyberskills.co.th'
 const CODE_EXCHANGE_ENDPOINT = 'https://accounts.cyberskills.co.th/v1/code/exchange'
@@ -119,6 +122,23 @@ export function createAcademyIdentityProductionRuntimeBrowserFlow(
       sessionStore,
       transactionStore,
     })
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Read/revoke capability for the opaque Academy session created by the released
+ * Identity Control flow. The same complete production admission gate applies,
+ * so a partial or killed runtime never becomes an authentication path.
+ */
+export function createAcademyIdentityProductionSessionStore(
+  options: AcademyIdentityProductionRuntimeOptions = {},
+): Pick<IdentityDurableSessionPort, 'get' | 'revoke'> | null {
+  try {
+    if (!projectAcademyIdentityProductionRuntimeConfig(options.environment ?? process.env)) return null
+    const db = (options.dependencies?.academyDb ?? academyDb)()
+    return new AcademyPostgresIdentitySessionStore(db)
   } catch {
     return null
   }

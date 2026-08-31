@@ -5,6 +5,8 @@ import { legacyDirectOtpFixtureAllowedForRequest } from '@/lib/auth/legacy-direc
 import { identityControlLocalFixtureAllowedForRequest } from '@/lib/identity/local-fixture'
 import { revokeLocalAcademySession } from '@/lib/identity/local-runtime'
 import { expireAcademySessionCookie } from '@/lib/identity/session-store'
+import { parseAcademySessionCookie } from '@/lib/identity/session-store'
+import { createAcademyIdentityProductionSessionStore } from '@/lib/identity/production-runtime'
 import { safeErrorMessage } from '@/lib/safe-log'
 
 export const runtime = 'nodejs'
@@ -26,7 +28,22 @@ export async function POST(request: Request) {
     return response
   }
   if (!legacyDirectOtpFixtureAllowedForRequest(request)) {
-    return NextResponse.json({ ok: false, error: 'ไม่มี Academy session สำหรับสภาพแวดล้อมนี้' }, { status: 503 })
+    const mutation = validateMutationRequest(request)
+    if (!mutation.ok) {
+      return NextResponse.json({ ok: false, error: mutation.error }, { status: mutation.status })
+    }
+    const sessionId = parseAcademySessionCookie(request.headers.get('cookie'))
+    const sessionStore = createAcademyIdentityProductionSessionStore()
+    let revocation: 'confirmed' | 'not-confirmed' = 'confirmed'
+    try {
+      if (!sessionId || !sessionStore) revocation = 'not-confirmed'
+      else await sessionStore.revoke(sessionId)
+    } catch {
+      revocation = 'not-confirmed'
+    }
+    const response = NextResponse.json({ ok: true, scope: 'local', revocation })
+    response.headers.append('set-cookie', expireAcademySessionCookie())
+    return response
   }
   const mutation = validateMutationRequest(request)
   if (!mutation.ok) {

@@ -63,8 +63,8 @@ export class AcademyIdentityRuntimeBrowserFlowUnavailableError extends Error {
 }
 
 /**
- * Production-disabled browser orchestration. Endpoint, key, audience, durable
- * storage, and release authority all remain injected by a future composition.
+ * Injected browser orchestration. Production endpoint, key, audience, durable
+ * storage, and release authority are supplied by the released composition.
  */
 export function createAcademyIdentityRuntimeBrowserFlow(
   optionsValue: unknown,

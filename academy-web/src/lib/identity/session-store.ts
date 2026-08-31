@@ -61,7 +61,7 @@ function isStoredSession(value: unknown): value is StoredIdentitySession {
   )
 }
 
-/** Local-only durable session preparation; deliberately not wired into auth/session.ts. */
+/** Local-test durable session preparation; production uses the reviewed Postgres RPC adapter. */
 export class FileIdentitySessionStore {
   private readonly now: () => number
   private readonly ttlMs: number
@@ -200,7 +200,7 @@ export function expireAcademySessionCookie({ secure = true }: { secure?: boolean
   ].join('; ')
 }
 
-/** Local-only raw-header parser; normalization must not discard duplicate names first. */
+/** Raw-header parser; normalization must not discard duplicate names first. */
 export function parseAcademySessionCookie(cookieHeader: string | null | undefined): string | null {
   if (!cookieHeader) return null
 

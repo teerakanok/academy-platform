@@ -1,17 +1,14 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies, headers } from 'next/headers'
 import { findOrCreateUser, type AcademyUser } from '@/lib/account/users'
+import { createAcademyIdentityProductionSessionStore } from '@/lib/identity/production-runtime'
+import type { IdentityDurableSessionPort } from '@/lib/identity/postgres-session-store'
+import { parseAcademySessionCookie } from '@/lib/identity/session-store'
 import { authCookieOptions, isSecureServerContext } from './cookie-policy'
 import { legacyDirectOtpFixtureEnabled } from './legacy-direct-otp'
 
-// Session ของผู้เรียน — ใช้ issuer กลางของ ecosystem (GoTrue) ตาม ADR single-account
-//
-// ทำไมเลือกแบบ cookie/SSR (แบบ STAR) ไม่ใช่ BFF (แบบ Crux):
-//   · Academy เป็นเว็บอ่านเป็นหลัก ไม่ได้มี control plane ที่ต้องถือ session แบบ opaque
-//   · เราเพิ่งเปิด asymmetric JWT บน Pool A ซึ่งทำให้ verify ในเครื่องได้ — ประโยชน์
-//     ตรงนั้นจะหายไปทันทีถ้าเอา BFF มาคั่นแล้วยิงถาม issuer ทุก request
-//   · cookie ถูกเขียนโดย server เท่านั้น (HttpOnly ผ่าน @supabase/ssr) browser ไม่ถือ
-//     token ไว้ใน JS
+// Production learners use Identity Control's HttpOnly opaque Academy session.
+// The GoTrue client below remains only for the explicitly gated local fixture.
 //
 // ⚠️ ตัวแปรเหล่านี้เป็น NEXT_PUBLIC_ โดยเจตนา ต่างจาก SUPABASE_SERVICE_ROLE_KEY:
 //    anon key ออกแบบมาให้เปิดเผยได้ และ RLS ของเราคือ default deny อยู่แล้ว
@@ -55,6 +52,31 @@ export interface SessionUser {
   email: string
 }
 
+type IdentityAccountResolver = typeof findOrCreateUser
+
+export async function resolveIdentitySessionUser({
+  sessionId,
+  sessionStore,
+  resolveAccount = findOrCreateUser,
+}: {
+  sessionId: string
+  sessionStore: Pick<IdentityDurableSessionPort, 'get'>
+  resolveAccount?: IdentityAccountResolver
+}): Promise<SessionUser | null> {
+  try {
+    const claims = await sessionStore.get(sessionId)
+    if (!claims) return null
+    const account = await resolveAccount({
+      issuer: claims.issuer,
+      subject: claims.subject,
+      email: claims.verifiedEmail,
+    })
+    return { account, email: claims.verifiedEmail }
+  } catch {
+    return null
+  }
+}
+
 /**
  * ผู้ใช้ปัจจุบัน หรือ null ถ้ายังไม่ล็อกอิน
  *
@@ -66,8 +88,15 @@ export interface SessionUser {
  * คือใบที่อ้างถึงคนที่เราไม่รู้ว่ามีตัวตนจริงไหม
  */
 export async function currentUser(): Promise<SessionUser | null> {
-  // Direct GoTrue sessions are never an Academy production identity path. The
-  // future Account Center adapter creates an Academy-owned session instead.
+  const requestHeaders = await headers()
+  const sessionId = parseAcademySessionCookie(requestHeaders.get('cookie'))
+  if (sessionId) {
+    const sessionStore = createAcademyIdentityProductionSessionStore()
+    if (!sessionStore) return null
+    return resolveIdentitySessionUser({ sessionId, sessionStore })
+  }
+
+  // Direct GoTrue sessions are retained only for the explicit local fixture.
   if (!legacyDirectOtpFixtureEnabled()) return null
   const supabase = await authClient()
   const { data, error } = await supabase.auth.getUser()

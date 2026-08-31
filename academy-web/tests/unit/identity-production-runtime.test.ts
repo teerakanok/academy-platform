@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   createAcademyIdentityProductionAuthorizationPort,
   createAcademyIdentityProductionRuntimeBrowserFlow,
+  createAcademyIdentityProductionSessionStore,
   projectAcademyIdentityProductionRuntimeConfig,
 } from '@/lib/identity/production-runtime'
 
@@ -127,6 +128,24 @@ describe('Academy production Identity Control composition', () => {
     expect(deps.fetch).not.toHaveBeenCalled()
     expect(deps.createSigner).not.toHaveBeenCalled()
     expect(deps.importKeySet).not.toHaveBeenCalled()
+  })
+
+  it('exposes the durable session capability only behind the complete production admission gate', () => {
+    const deps = dependencies()
+
+    expect(createAcademyIdentityProductionSessionStore({
+      environment: enabledEnvironment({ IDENTITY_RELEASE_APPROVAL: 'false' }),
+      dependencies: deps,
+    })).toBeNull()
+    expect(deps.academyDb).not.toHaveBeenCalled()
+
+    const store = createAcademyIdentityProductionSessionStore({
+      environment: enabledEnvironment(),
+      dependencies: deps,
+    })
+    expect(store).not.toBeNull()
+    expect(store).toEqual(expect.objectContaining({ get: expect.any(Function), revoke: expect.any(Function) }))
+    expect(deps.academyDb).toHaveBeenCalledTimes(1)
   })
 
   it('rejects malformed, surplus, or mismatched authorization requests without reflecting their values', () => {
