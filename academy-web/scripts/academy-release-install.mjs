@@ -1,13 +1,11 @@
 #!/usr/bin/env node
-// Immutable release installer: copies a verified release into protected
-// staging under the install root, fsyncs every staged subdirectory and the
-// full publication/pointer ancestry, then publishes with atomic no-clobber
-// semantics keyed by the release sha and atomically switches the protected
-// current pointer — the single publication contract the live helper reads. The
-// operator must supply the externally reviewed expected release digest and
-// revision; a self-consistent substituted manifest that does not match the
-// external binding never passes. A prior immutable release is never
-// overwritten; rollback is actionable by atomically switching the pointer.
+// Immutable release installer: verifies the reviewed source exactly, copies its
+// ownership-independent release identity into protected staging under the
+// install root, derives the installed manifest owner from actual fstat values,
+// and verifies the staged tree before publication. Publication is atomic and
+// no-clobber, keyed by release digest; the current pointer switches atomically
+// and prior releases remain immutable for rollback. The operator-supplied
+// external digest still prevents a self-consistent substituted release.
 
 import { createHash } from 'node:crypto'
 import { constants } from 'node:fs'
@@ -17,9 +15,11 @@ import { dirname, join, relative, resolve } from 'node:path'
 import {
   ACADEMY_RELEASE_MANIFEST_NAME,
   assertAcademyStableAncestry,
+  computeAcademyReleaseSha256,
   failAcademyRelease,
   readAcademyReleaseJson,
   syncAcademyDirectory,
+  validateAcademyReleaseManifest,
   verifyAcademyRelease,
 } from './academy-release-manifest.mjs'
 import {
@@ -50,7 +50,52 @@ async function copyEntry(sourceRoot, stage, entry, fs) {
   const destination = join(stage, entry.path)
   const writer = await fs.open(destination,
     constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, entry.mode)
-  try { await writer.writeFile(bytes); await writer.sync() } finally { await writer.close() }
+  try {
+    await writer.writeFile(bytes)
+    await fs.chmod(destination, entry.mode)
+    await writer.sync()
+  } finally { await writer.close() }
+}
+
+async function rebindAcademyReleaseManifest(sourceRoot, manifest, fs) {
+  const directoryRecords = []
+  const entryRecords = []
+  let identity
+  const bindIdentity = metadata => {
+    if (!Number.isSafeInteger(metadata.uid) || metadata.uid < 0
+      || !Number.isSafeInteger(metadata.gid) || metadata.gid < 0) failAcademyRelease()
+    identity ??= { uid: metadata.uid, gid: metadata.gid }
+    if (metadata.uid !== identity.uid || metadata.gid !== identity.gid) failAcademyRelease()
+  }
+  bindIdentity(await fs.lstat(sourceRoot))
+  for (const directory of manifest.directories) {
+    const metadata = await fs.lstat(join(sourceRoot, directory.path))
+    if (!metadata.isDirectory() || (metadata.mode & 0o777) !== directory.mode) failAcademyRelease()
+    bindIdentity(metadata)
+    directoryRecords.push({ path: directory.path, mode: directory.mode,
+      uid: metadata.uid, gid: metadata.gid })
+  }
+  for (const entry of manifest.entries) {
+    const path = join(sourceRoot, entry.path)
+    const metadata = await fs.lstat(path)
+    if (!metadata.isFile() || metadata.nlink !== entry.nlink
+      || (metadata.mode & 0o777) !== entry.mode || metadata.size !== entry.size) failAcademyRelease()
+    bindIdentity(metadata)
+    const handle = await fs.open(path, constants.O_RDONLY | constants.O_NOFOLLOW)
+    let bytes
+    try { bytes = await handle.readFile() } finally { await handle.close() }
+    if (bytes.length !== entry.size
+      || createHash('sha256').update(bytes).digest('hex') !== entry.sha256) failAcademyRelease()
+    entryRecords.push({ path: entry.path, sha256: entry.sha256, size: entry.size,
+      mode: entry.mode, uid: metadata.uid, gid: metadata.gid, nlink: entry.nlink })
+  }
+  const rebound = { ...manifest,
+    directories: directoryRecords,
+    entries: entryRecords,
+  }
+  if (computeAcademyReleaseSha256(rebound) !== manifest.releaseSha256) failAcademyRelease()
+  validateAcademyReleaseManifest(rebound)
+  return rebound
 }
 
 async function inspectExistingTarget(target, manifest, fs, processLike) {
@@ -165,9 +210,14 @@ export async function installAcademyRelease({ sourceRoot, installRoot, expectedR
         await fs.chmod(directory, record.mode)
         await syncAcademyDirectory(directory, fs)
       }
+      const stagedManifest = await rebindAcademyReleaseManifest(stage, manifest, fs)
       const handle = await fs.open(join(stage, ACADEMY_RELEASE_MANIFEST_NAME),
         constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW, 0o444)
-      try { await handle.writeFile(`${JSON.stringify(manifest)}\n`); await handle.sync() } finally { await handle.close() }
+      try {
+        await handle.writeFile(`${JSON.stringify(stagedManifest)}\n`)
+        await fs.chmod(join(stage, ACADEMY_RELEASE_MANIFEST_NAME), 0o444)
+        await handle.sync()
+      } finally { await handle.close() }
       // Freeze for verification, then unfreeze for the rename. Publish directly
       // to the previously absent digest path: a concurrent completed winner is
       // non-empty and cannot be replaced by a directory rename.

@@ -80,6 +80,7 @@ async function materialize(root, revision, { wranglerBody = WRANGLER_FIXTURE } =
   await writeFile(join(sources, 'node'), '#!/bin/sh\n# stand-in; replaced by real node below\n', { mode: 0o755 })
   await writeFile(join(sources, 'node_modules', 'wrangler', 'bin', 'wrangler.js'),
     wranglerBody, { mode: 0o644 })
+  await chmod(join(sources, 'node_modules', 'wrangler', 'bin', 'wrangler.js'), 0o755)
   await writeFile(join(sources, 'node_modules', 'wrangler', 'package.json'),
     JSON.stringify({ name: 'wrangler-fixture', version: WRANGLER_VERSION }), { mode: 0o644 })
   await writeFile(join(sources, 'helper.mjs'), '// helper source\n', { mode: 0o500 })
@@ -88,6 +89,9 @@ async function materialize(root, revision, { wranglerBody = WRANGLER_FIXTURE } =
   await writeFile(join(sources, 'application', 'chunk.js'), 'export const handler = () => "academy"\n', { mode: 0o444 })
   await writeFile(join(sources, 'application', 'wrangler.jsonc'),
     '{"main":"worker.js","assets":{"directory":".open-next/assets","binding":"ASSETS"}}\n', { mode: 0o444 })
+  await writeFile(join(sources, 'application', 'src'), '// projection fixture\n', { mode: 0o444 })
+  await writeFile(join(sources, 'application', 'worker'), '// projection fixture\n', { mode: 0o444 })
+  await writeFile(join(sources, 'application', 'worker.ts'), '// projection fixture\n', { mode: 0o444 })
   await writeFile(join(sources, 'application', '.open-next', 'assets', 'asset.svg'), '<svg/>\n', { mode: 0o444 })
   const { root: staged, manifest } = await renderAcademyRelease({ spec: {
     releaseRevision: revision,
