@@ -52,6 +52,27 @@ Stop immediately on cross-account data, answer leakage, unsafe redirect, exposed
 credential, destructive behavior, or an unexpected production mutation. Preserve
 sanitized evidence and report the boundary without probing wider.
 
+### Browser evidence safety
+
+Treat browser accessibility trees, screenshots, address bars, DevTools, and
+provider dashboards as credential-bearing until proven otherwise. Authentication
+redirect URLs can contain short-lived tokens and dashboards can expose account or
+learner identifiers even when the visible task is read-only.
+
+Before emitting browser state into a tool transcript or evidence record:
+
+1. Keep the full state inside the browser-control runtime; do not print it.
+2. Extract only an explicit allowlist of fields needed for the claim, such as
+   method, sanitized host/path, status, outcome, CPU time, and wall time.
+3. Drop URL query strings, address-bar lines, headers, cookies, identity fields,
+   location/network metadata, and opaque values before output.
+4. Return booleans, counts, or redacted comparisons when a raw identifier is not
+   necessary. Never rely on a broad denylist as the primary control.
+
+If the first inspection unexpectedly reveals credential-bearing state, stop broad
+output immediately, continue only with allowlist extraction, and do not persist or
+repeat the exposed value.
+
 ## Cleanup And Evidence
 
 Delete or disable only the exact session-owned canary resources. Verify cleanup
