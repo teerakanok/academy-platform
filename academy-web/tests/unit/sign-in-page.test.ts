@@ -1,8 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 
-const { headers, signInForm } = vi.hoisted(() => ({
+const { headers, identityControlSignInForm, signInForm } = vi.hoisted(() => ({
   headers: vi.fn(),
+  identityControlSignInForm: vi.fn(() => 'identity-control-sign-in-form'),
   signInForm: vi.fn(() => 'enabled-sign-in-form'),
 }))
 
@@ -14,9 +15,14 @@ vi.mock('@/components/auth/SignInForm', () => ({
   SignInForm: signInForm,
 }))
 
+vi.mock('@/components/auth/IdentityControlSignInForm', () => ({
+  IdentityControlSignInForm: identityControlSignInForm,
+}))
+
 afterEach(() => vi.unstubAllEnvs())
 
 beforeEach(() => {
+  identityControlSignInForm.mockClear()
   signInForm.mockClear()
 })
 
@@ -96,9 +102,10 @@ describe('closed sign-in state', () => {
     expect(page).toContain('enabled-sign-in-form')
     expect(page).toContain('By continuing you agree to how we handle your data.')
     expect(signInForm).toHaveBeenCalledWith(
-      expect.objectContaining({ identityControl: false }),
+      { next: '/dashboard' },
       expect.anything(),
     )
+    expect(identityControlSignInForm).not.toHaveBeenCalled()
   })
 
   it('opens the Identity Control mode with fully admitted production configuration', async () => {
@@ -106,12 +113,10 @@ describe('closed sign-in state', () => {
 
     const page = await renderSignInPage('academy.cyberskills.co.th')
 
-    expect(page).toContain('enabled-sign-in-form')
+    expect(page).toContain('identity-control-sign-in-form')
     expect(page).not.toContain('Accounts are not open yet')
-    expect(signInForm).toHaveBeenCalledWith(
-      expect.objectContaining({ identityControl: true }),
-      expect.anything(),
-    )
+    expect(identityControlSignInForm).toHaveBeenCalledWith({ next: '/dashboard' }, expect.anything())
+    expect(signInForm).not.toHaveBeenCalled()
   })
 
   it('keeps incomplete production configuration closed', async () => {
@@ -139,11 +144,9 @@ describe('closed sign-in state', () => {
 
     const page = await renderSignInPage()
 
-    expect(page).toContain('enabled-sign-in-form')
-    expect(signInForm).toHaveBeenCalledWith(
-      expect.objectContaining({ identityControl: true }),
-      expect.anything(),
-    )
+    expect(page).toContain('identity-control-sign-in-form')
+    expect(identityControlSignInForm).toHaveBeenCalledWith({ next: '/dashboard' }, expect.anything())
+    expect(signInForm).not.toHaveBeenCalled()
   })
 
   it('does not show the legacy OTP form on a public Academy host even with a copied local fixture config', async () => {

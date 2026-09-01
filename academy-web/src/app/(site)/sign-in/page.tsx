@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { headers } from 'next/headers'
 import React from 'react'
+import { IdentityControlSignInForm } from '@/components/auth/IdentityControlSignInForm'
 import { SignInForm } from '@/components/auth/SignInForm'
 import { accountsEnabled, productionIdentityControlAvailable } from '@/lib/auth/enabled'
 import { safeNextPath } from '@/lib/auth/route-client'
@@ -60,7 +61,7 @@ export default async function SignInPage({
       </div>
 
       {accountAccessOpen ? (
-        <SignInForm next={target} identityControl={identityControl} />
+        identityControl ? <IdentityControlSignInForm next={target} /> : <SignInForm next={target} />
       ) : (
         <div className="card-feature p-6 sm:p-8" data-testid="accounts-not-open">
           <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-cs-accent">Preview</p>
