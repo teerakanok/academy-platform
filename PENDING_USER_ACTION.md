@@ -4,19 +4,19 @@
 > หรือหลักฐานจาก external system. งานที่ทำและตรวจจบแล้วไม่อยู่ในรายการนี้.
 > สถานะ code และ release gates ล่าสุดอยู่ใน `plans/active_plan.md`.
 
-## 1) Activate Account Runtime And Bootstrap The First Owner
+## 1) Complete The Authenticated Production Journey And Bootstrap The First Owner
 
 Academy runtime data boundary ทำงานแล้วโดยใช้ dedicated Academy credential;
 Worker ไม่มีและห้ามเพิ่ม shared Pool A `SUPABASE_SERVICE_ROLE_KEY`.
 
-- Gate 3 policy ของ Identity Control ได้รับอนุมัติแล้ว แต่กำลังอยู่ระหว่างจัดทำ
-  reviewed production change records. การอนุมัตินั้นไม่อนุญาต production mutation,
-  endpoint, registry, credential หรือ deployment; Academy จึงยังห้ามเปิด sign-in หรือ
-  ผูก endpoint production เอง.
-- ยืนยัน configuration ของ single-account runtime ก่อนเปิด build ที่มี
-  `NEXT_PUBLIC_SUPABASE_*`; deployment ต้องพิสูจน์ว่า sign-in ใช้ issuer ที่อนุมัติ
-  และ session cookie เป็น HTTPS จริง.
-- หลัง runtime พร้อม founder ต้อง sign in หนึ่งครั้งด้วย identity จริง เพื่อสร้าง
+- signed Identity authority ยืนยันว่า Academy client เปิดใช้งานและ result signer active;
+  Worker version ปัจจุบันรับ traffic `100%`, ผูก production Identity bindings ครบ และ
+  หน้า sign-in แสดง Account Center handoff แล้ว.
+- full authenticated journey ยังต้องใช้ browser session ที่ผ่าน Cloudflare Access อยู่แล้ว
+  และ existing disposable canary ที่ owner อนุมัติ ห้ามส่ง credential value ในเอกสารหรือ
+  chat. รอบ playtest ล่าสุดหยุดก่อน submit handoff จึงยังไม่ยืนยัน callback result,
+  enrollment, lesson progress, assessment, completion หรือ sign-out บน production.
+- หลัง full authenticated journey ผ่าน founder ต้อง sign in หนึ่งครั้งด้วย identity จริง เพื่อสร้าง
   `academy.users` จาก `(issuer, subject)`.
 - จากนั้นรัน `scripts/manage-staff-role.mjs` แบบ dry-run แล้ว apply ตาม
   staff-bootstrap contract. ห้ามใช้ email หรือ UUID ที่สร้างขึ้นแทน identity.
@@ -25,10 +25,13 @@ Worker ไม่มีและห้ามเพิ่ม shared Pool A `SUPABA
 runtime deployment อยู่ใน
 [`reports/sessions/academy-dedicated-data-api-2026-08-05.md`](reports/sessions/academy-dedicated-data-api-2026-08-05.md).
 
-## 2) Decide Exposure: Custom Domain And Zero Trust
+## 2) Keep The Current Exposure Decision Explicit
 
-- ตัดสินใจว่าจะผูก `academy.cyberskills.co.th` กับ Worker และเปิด exposure ระดับใด.
-- ถ้ายังเป็น preview/internal ให้กำหนด Zero Trust Access allowlist ที่ชัดเจนก่อน.
+- `academy.cyberskills.co.th` ผูกกับ Worker แล้ว และ Cloudflare Access ป้องกัน canonical
+  routes อยู่; unauthenticated probes ของ `/`, `/courses` และ `/auth/callback` ถูก redirect
+  ไป Access gate.
+- สถานะนี้ยังเป็น preview/internal. การเปิด public launch ต้องมี authorization แยกและ
+  ต้องทบทวน Zero Trust policy ก่อนเปลี่ยน exposure.
 - ห้ามถือว่าการ deploy Worker preview เท่ากับอนุมัติ public launch.
 
 ## 3) Complete Legal And Restricted-Case Gates
@@ -37,7 +40,7 @@ runtime deployment อยู่ใน
 - กำหนด owner/access ของ restricted case system ก่อนเปิดช่องทาง privacy request หรือ
   appeal ให้ผู้เรียน.
 
-## 4) Verify Deployed Privacy And Media Flow After Account Runtime Opens
+## 4) Verify Deployed Privacy And Media Flow With An Approved Session
 
 source และ Worker version ปัจจุบัน deploy แล้ว แต่ proof ต่อไปต้องใช้ session จริง:
 

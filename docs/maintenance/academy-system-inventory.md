@@ -8,9 +8,9 @@ Status date: `2026-09-01`
 | --- | --- | --- |
 | Canonical domain | `https://academy.cyberskills.co.th` | behind Cloudflare Access; unauthenticated requests return Access gate `302` |
 | Raw worker endpoint | `https://cyberskills-academy.songpon-te.workers.dev` | reachable; current read-only probe returned `200` |
-| Active deployment | `03da9d32-9c4f-4144-bf7e-15cfd7f1b1e9` | read-only deployment inventory |
-| Active version | `45608684-9bc0-4745-8694-ae01ff8877d2` | read-only deployment inventory |
-| Residue check | `PASS` | current no-traffic residue verification passed |
+| Active deployment | `a8bfde71-9b63-4d8f-934c-b5f7eee9c6a9` | read-only deployment inventory; created `2026-09-01T02:04:33.709308Z` |
+| Active version | `81f0abca-25ab-4d30-bd51-87702718b039` | `100%` traffic; version `25`; tag `release-4c7361cd8751` |
+| Residue check | `PASS` | 10 versions inventoried; 9 non-serving versions retained because rollback ownership is not yet unambiguous |
 
 ## Managed components
 

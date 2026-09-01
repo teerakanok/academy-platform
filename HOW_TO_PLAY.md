@@ -65,12 +65,15 @@ cd products/cyberskills/academy-platform/academy-web
 - **lab ของจริง** — ตอนนี้เป็นโครงว่าง ตัว lab plane มาใน M4
 - **ใบรับรองที่ออกได้จริง** — กติกาว่าใครมีสิทธิ์ทำแล้ว แต่ยังไม่ได้ออกเป็นเอกสาร
   (ต้องมีชื่อจริง + หน้า verify ก่อน)
-- **deploy ขึ้น Cloudflare แล้ว** แต่เป็นหน้าร้านอย่างเดียว:
+- **deploy ขึ้น Cloudflare แล้ว:**
   https://cyberskills-academy.songpon-te.workers.dev
-  ระบบบัญชีปิดอยู่ (prod ยังไม่มี schema `academy` และรอ session identity เคาะ)
-  หน้า sign-in จึงขึ้นว่า "ยังไม่เปิด" แทนที่จะโชว์ฟอร์มที่กดแล้วพัง
-  ⚠️ deploy ต้องใช้ `npm run deploy:cf` เท่านั้น — build ตรงๆ จะพา env ของเครื่อง
-  dev ติดไปด้วย (เคยพลาดมาแล้ว บันทึกไว้ใน src/lib/auth/enabled.ts)
+  production sign-in แสดง Account Center handoff แล้ว และ canonical domain
+  `https://academy.cyberskills.co.th` อยู่หลัง Cloudflare Access. ห้ามใช้อีเมลสมมติหรือ
+  ขอรหัสใหม่บน production; full journey ต้องใช้ existing Access session และ canary ที่
+  owner อนุมัติไว้แล้ว.
+  production deploy/rollback ต้องทำตาม `docs/maintenance/academy-operations-runbook.md`
+  และใช้ pinned immutable release helper เท่านั้น; `npm run deploy:cf` ไม่ใช่ production
+  operator path.
 
 ## ถ้าอะไรพัง
 
