@@ -126,7 +126,8 @@ const common = [
 }
 {
   const manifest = await renderOperationManifest({});
-  assert.equal(manifest.entries.length, 9);
+  assert.equal(manifest.entries.length, 10);
+  assert.ok(manifest.entries.some((entry) => entry.name === "identity-production-activation-preflight.mjs"));
   assert.ok(
     manifest.entries.every(
       (x) =>

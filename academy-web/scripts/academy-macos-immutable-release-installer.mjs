@@ -7,10 +7,10 @@ import { open } from 'node:fs/promises'
 import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-export const EXPECTED_RELEASE_SHA256 = '0b565884bf04b839aba61e4b8887021dd363e2f1a3f78fb04ba5c6e1e648897d'
-export const EXPECTED_RELEASE_REVISION = '7de1cbfbd9e3606f44379ad0322b75109f10e583'
-export const PACKAGE_SOURCE = '/Users/teerakanok/.local/state/cyberskills/academy-release-930f/package.json'
-export const SOURCES_SOURCE = '/Users/teerakanok/.local/state/cyberskills/academy-release-930f/sources'
+export const EXPECTED_RELEASE_SHA256 = '2537eb1343aaea5f33dbf6c9abcbd34a10bf78a54d16674fcf0491b305481588'
+export const EXPECTED_RELEASE_REVISION = '4c7361cd875167485ba36b256c90478dfbff8185'
+export const PACKAGE_SOURCE = '/Users/teerakanok/.local/state/cyberskills/academy-release-4c7361c-r2/package.json'
+export const SOURCES_SOURCE = '/Users/teerakanok/.local/state/cyberskills/academy-release-4c7361c-r2/sources'
 
 const DIRECTORY = dirname(fileURLToPath(import.meta.url))
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex')
@@ -25,8 +25,9 @@ export const isReviewedSourcePath = path => {
 }
 
 export const PINNED_ASSETS = Object.freeze([
-  Object.freeze({ source: join(DIRECTORY, 'academy-macos-immutable-release-worker.sh'), name: 'worker.sh', mode: 0o500, sha256: '18af78f8d8ada40fbdb1dd06b13ddd186ed753f2dd49640ed99ee73f9eb064ea' }),
-  Object.freeze({ source: join(DIRECTORY, 'academy-production-cloudflare-helper.mjs'), name: 'academy-production-cloudflare-helper.mjs', mode: 0o400, sha256: '5c87ca9a56ed11c9f16c9912ec214d88b2395d583cb6930ed3e21370aeb59ec6' }),
+  Object.freeze({ source: join(DIRECTORY, 'academy-macos-immutable-release-worker.sh'), name: 'worker.sh', mode: 0o500, sha256: '15e8588812b901a03ce5cd1e2f2d12ca4bea3cc6089792f280bce7f698f9edc2' }),
+  Object.freeze({ source: join(DIRECTORY, 'academy-production-cloudflare-helper.mjs'), name: 'academy-production-cloudflare-helper.mjs', mode: 0o400, sha256: 'db5656d66f1cd01aa313625d97774023ccb8bde299785279c2f9bc687f24dd2b' }),
+  Object.freeze({ source: join(DIRECTORY, 'identity-production-activation-preflight.mjs'), name: 'identity-production-activation-preflight.mjs', mode: 0o400, sha256: 'e30ddf6a98614e642a698be8f0239a2431622f0d115a3bd70ad11b08c443feb6' }),
   Object.freeze({ source: join(DIRECTORY, 'academy-release-cli.mjs'), name: 'academy-release-cli.mjs', mode: 0o400, sha256: 'ef405f7b9df4a8ba7ed45d232c347019b09ea4bc344a6cb86070706c811b9d9d' }),
   Object.freeze({ source: join(DIRECTORY, 'academy-release-render.mjs'), name: 'academy-release-render.mjs', mode: 0o400, sha256: '4b9560748dac8e82afd7719f8a55dca140078293e1b8ec9be453c479eb4a020a' }),
   Object.freeze({ source: join(DIRECTORY, 'academy-release-install.mjs'), name: 'academy-release-install.mjs', mode: 0o400, sha256: '0505358687fe35ba97789b5700801c27b3405ff5ad66a960c899d646f922e8cf' }),
@@ -37,6 +38,7 @@ export const PINNED_ASSETS = Object.freeze([
 ])
 export const PINNED_HELPER_CLOSURE = Object.freeze([
   'academy-production-cloudflare-helper.mjs',
+  'identity-production-activation-preflight.mjs',
   'academy-release-manifest.mjs',
   'academy-release-pointer.mjs',
   'current-deployment.mjs',

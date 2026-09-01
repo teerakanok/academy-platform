@@ -24,16 +24,16 @@ import { main as runReleaseCommand } from './academy-release-cli.mjs'
 import { installAcademyRelease } from './academy-release-install.mjs'
 
 test('reviewed source containment rejects traversal and textual-prefix siblings', () => {
-  assert.equal(isReviewedSourcePath('/Users/teerakanok/.local/state/cyberskills/academy-release-930f/sources'), true)
-  assert.equal(isReviewedSourcePath('/Users/teerakanok/.local/state/cyberskills/academy-release-930f/sources/application/worker.ts'), true)
-  assert.equal(isReviewedSourcePath('/Users/teerakanok/.local/state/cyberskills/academy-release-930f/sources/../outside'), false)
-  assert.equal(isReviewedSourcePath('/Users/teerakanok/.local/state/cyberskills/academy-release-930f/sources-foreign/node'), false)
+  assert.equal(isReviewedSourcePath(`${SOURCES_SOURCE}`), true)
+  assert.equal(isReviewedSourcePath(`${SOURCES_SOURCE}/application/worker.ts`), true)
+  assert.equal(isReviewedSourcePath(`${SOURCES_SOURCE}/../outside`), false)
+  assert.equal(isReviewedSourcePath(`${SOURCES_SOURCE}-foreign/node`), false)
   assert.equal(isReviewedSourcePath('relative/source'), false)
 })
 
 test('installer pins the reviewed release and every root executable input', async () => {
-  assert.equal(EXPECTED_RELEASE_REVISION, '7de1cbfbd9e3606f44379ad0322b75109f10e583')
-  assert.equal(EXPECTED_RELEASE_SHA256, '0b565884bf04b839aba61e4b8887021dd363e2f1a3f78fb04ba5c6e1e648897d')
+  assert.equal(EXPECTED_RELEASE_REVISION, '4c7361cd875167485ba36b256c90478dfbff8185')
+  assert.equal(EXPECTED_RELEASE_SHA256, '2537eb1343aaea5f33dbf6c9abcbd34a10bf78a54d16674fcf0491b305481588')
   for (const asset of PINNED_ASSETS) {
     const digest = createHash('sha256').update(await readFile(asset.source)).digest('hex')
     assert.equal(digest, asset.sha256, asset.name)
@@ -123,7 +123,7 @@ test('root command rehashes copied tooling and performs no DB, Cloudflare, or se
     .join('\n')).digest('hex').slice(0, 16)
   assert.equal(ROOT_TOOLING, `/private/var/root/academy-immutable-installer-${toolingId}`)
   assert.match(command, /academy-release-cli\.mjs/)
-  assert.match(command, /0b565884bf04b839aba61e4b8887021dd363e2f1a3f78fb04ba5c6e1e648897d/)
+  assert.match(command, new RegExp(EXPECTED_RELEASE_SHA256))
   assert.match(command, /\/usr\/sbin\/chown root:wheel/)
   assert.match(command, /root:wheel:400:1/)
   assert.match(command, /\/bin\/test/)
@@ -173,7 +173,7 @@ test('root worker binds render, diagnosis, install, verify and preserves executa
   assert.ok(worker.indexOf('"$CLI" install') < worker.indexOf('"$CLI" verify'))
   assert.match(worker, /find "\$STAGE\/sources" -type d -exec \/bin\/chmod a\+rx,a-w/)
   assert.match(worker, /find "\$STAGE\/sources" -type f -exec \/bin\/chmod a\+rX,a-w/)
-  assert.match(worker, /for helper in academy-production-cloudflare-helper\.mjs academy-release-manifest\.mjs academy-release-pointer\.mjs current-deployment\.mjs; do/)
+  assert.match(worker, /for helper in academy-production-cloudflare-helper\.mjs identity-production-activation-preflight\.mjs academy-release-manifest\.mjs academy-release-pointer\.mjs current-deployment\.mjs; do/)
   assert.match(worker, /\/bin\/cp -p "\$TOOLING_ROOT\/\$helper" "\$STAGE\/sources\/helpers\/\$helper"/)
   assert.match(worker, /FOREIGN_STATE_REJECTED/)
   for (const reason of ['RENDER_REJECTED', 'DIAGNOSIS_REJECTED', 'INSTALL_REJECTED', 'VERIFY_REJECTED']) {

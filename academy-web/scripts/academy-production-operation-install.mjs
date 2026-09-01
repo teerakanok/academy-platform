@@ -110,7 +110,7 @@ function validateManifest(manifest, installRoot) {
   if (
     manifest?.schema !== "academy-production-operation-install-manifest/v1" ||
     !Array.isArray(manifest.entries) ||
-    manifest.entries.length !== 9
+    manifest.entries.length !== 10
   )
     fail();
   const names = new Set();

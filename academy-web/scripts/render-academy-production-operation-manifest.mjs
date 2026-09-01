@@ -11,6 +11,7 @@ const FILES = [
   "academy-production-operation-install.mjs",
   "academy-poola-production-producer.mjs",
   "academy-production-cloudflare-helper.mjs",
+  "identity-production-activation-preflight.mjs",
   "academy-production-database-adapter.mjs",
   "current-deployment.mjs",
 ];
