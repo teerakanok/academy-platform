@@ -8,6 +8,7 @@ import { lstat, mkdir, open, readdir, readFile, realpath, rm, stat, symlink } fr
 import { assertNoDuplicateJsonMembers, parseCurrentDeploymentJson } from './current-deployment.mjs'
 import { verifyAcademyRelease } from './academy-release-manifest.mjs'
 import { resolveAcademyCurrentRelease } from './academy-release-pointer.mjs'
+import { IDENTITY_PRODUCTION_ACTIVATION_CONFIG_NAMES } from './identity-production-activation-preflight.mjs'
 
 const SHA = /^[a-f0-9]{64}$/
 const REVISION = /^[a-f0-9]{40}$/
@@ -190,7 +191,8 @@ function configuredNamesFrom(source, expectedVersionId) {
     || value.resources.bindings.length > 256) fail()
   const names = value.resources.bindings.map(binding => binding?.name)
     .filter(name => typeof name === 'string' && /^[A-Z][A-Z0-9_]{1,127}$/.test(name))
-  if (new Set(names).size !== names.length || CONFIG_NAMES.some(name => !names.includes(name))) fail()
+  if (new Set(names).size !== names.length || CONFIG_NAMES.some(name => !names.includes(name))
+    || IDENTITY_PRODUCTION_ACTIVATION_CONFIG_NAMES.some(name => !names.includes(name))) fail()
   return names.sort()
 }
 
@@ -276,6 +278,17 @@ export async function readProtectedSecretBundle(path) {
   } finally { await handle.close() }
 }
 
+async function protectedSecretBundleIdentity(path) {
+  if (typeof path !== 'string' || !path.startsWith('/') || await realpath(path) !== path) fail()
+  const handle = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW)
+  try {
+    const metadata = await handle.stat()
+    if (!metadata.isFile() || metadata.nlink !== 1 || metadata.uid !== process.getuid()
+      || metadata.mode & 0o077 || metadata.size < 3 || metadata.size > 64 * 1024) fail()
+    return createHash('sha256').update(await handle.readFile()).digest('hex')
+  } finally { await handle.close() }
+}
+
 export async function executeAcademyCloudflareHelper(args, options = {}) {
   const environment = options.env ?? process.env
   if (LEGACY_AMBIENT_ENV_INPUTS.some(name => environment[name] !== undefined)) fail()
@@ -285,7 +298,7 @@ export async function executeAcademyCloudflareHelper(args, options = {}) {
   const operation = values['--operation']
   const operationFlags = {
     inspect: ['--mode','--journal'], residue: ['--deployment','--version'],
-    upload: ['--source','--traffic'], activate: ['--expected-deployment','--expected-version','--candidate','--traffic'],
+    upload: ['--source','--traffic','--secrets-file'], activate: ['--expected-deployment','--expected-version','--candidate','--traffic'],
     rollback: ['--expected-deployment','--expected-version','--target','--prior'], secrets: ['--secrets-file','--tag'],
   }
   const allowed = operationFlags[operation] && ['--authority','--release','--readiness','--valid-until','--operation',...operationFlags[operation]]
@@ -387,6 +400,9 @@ export async function executeAcademyCloudflareHelper(args, options = {}) {
       throw error
     }
   }
+  const uploadBundleSha256 = operation === 'upload'
+    ? await protectedSecretBundleIdentity(values['--secrets-file'])
+    : null
   const run = await resolveRun()
   try {
     const invoke = run.invoke ?? (async (args, extra) =>
@@ -408,7 +424,8 @@ export async function executeAcademyCloudflareHelper(args, options = {}) {
     }
     if (operation === 'upload') {
       if (!REVISION.test(values['--source']) || values['--source'] !== values['--release'] || values['--traffic'] !== '0') fail()
-      const tag = `release-${values['--source'].slice(0,12)}`; const message = `s=${values['--source'].slice(0,12)};c=${CONFIG_SHA.slice(0,12)}`
+      const tag = `release-${values['--source'].slice(0,12)}`
+      const message = `s=${values['--source']};c=${CONFIG_SHA.slice(0,12)};b=${uploadBundleSha256}`
       const before = versionsFrom(await invoke(['versions','list','--name',WORKER,'--json']))
       const existing = exactUploadMatches(before, tag, message)
       if (existing.length > 1) fail()
@@ -419,7 +436,8 @@ export async function executeAcademyCloudflareHelper(args, options = {}) {
       } else {
         try {
           await invoke(configPath => ['versions','upload','--config',configPath,
-            '--name',WORKER,'--tag',tag,'--message',message,'--keep-vars','--strict','--install-skills=false'])
+            '--name',WORKER,'--tag',tag,'--message',message,'--secrets-file',values['--secrets-file'],
+            '--keep-vars','--strict','--install-skills=false'])
         } catch {
           uploaded = await resolveUploadVersion({
             before, invoke, tag, message, validUntilMs, clock, delay: options.delay,

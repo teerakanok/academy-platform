@@ -4,9 +4,10 @@ import { chmod, mkdir, mkdtemp, readFile, realpath, rm, symlink, writeFile } fro
 import { createHash } from 'node:crypto'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
-import test from 'node:test'
+import test, { after } from 'node:test'
 
 import { executeAcademyCloudflareHelper, runWranglerJson, ACADEMY_INSTALLED_RELEASE_ROOT } from './academy-production-cloudflare-helper.mjs'
+import { IDENTITY_PRODUCTION_ACTIVATION_CONFIG_NAMES } from './identity-production-activation-preflight.mjs'
 import { createAcademyReleaseFakeFilesystem } from './academy-release-fs-fake.mjs'
 import { renderAcademyRelease } from './academy-release-render.mjs'
 import { installAcademyRelease } from './academy-release-install.mjs'
@@ -19,6 +20,16 @@ const version = '22222222-2222-4222-8222-222222222222'
 const common = ['--authority','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','--release',R,'--readiness',D,'--valid-until','2026-08-29T12:00:00Z']
 const provider = [{ id: deployment, created_on: '2026-08-29T10:00:00Z', versions: [{ version_id: version, percentage: 100 }] }]
 const options = { clock: () => Date.parse('2026-08-29T11:00:00Z'), run: async () => JSON.stringify(provider) }
+const bundleRoot = await mkdtemp(join(tmpdir(), 'academy-protected-bundle-'))
+const bundlePath = join(bundleRoot, 'bundle.json')
+const protectedBundleValue = 'private-test-secret-value'
+await writeFile(bundlePath, JSON.stringify({ ACADEMY_TEST_SECRET: protectedBundleValue }), { mode: 0o600 })
+const protectedBundlePath = await realpath(bundlePath)
+const bundleSha256 = createHash('sha256').update(await readFile(protectedBundlePath)).digest('hex')
+const uploadMessage = `s=${R};c=d901061aa65e;b=${bundleSha256}`
+const legacyUploadMessage = 's=bbbbbbbbbbbb;c=d901061aa65e'
+const upload = [...common, '--operation', 'upload', '--source', R, '--traffic', '0', '--secrets-file', protectedBundlePath]
+after(() => rm(bundleRoot, { recursive: true, force: true }))
 
 test('legacy ambient env inputs are rejected explicitly, never silently ignored', async () => {
   for (const name of ['ACADEMY_PINNED_WRANGLER', 'ACADEMY_RELEASE_ROOT']) {
@@ -187,9 +198,6 @@ const versionInventory = (id, tag = '', message = '') => JSON.stringify([{ id, m
 
 test('candidate upload pins Wrangler and verifies exact provider annotations at zero traffic', async () => {
   const tag = `release-${R.slice(0,12)}`
-  const uploadMessage = 's=bbbbbbbbbbbb;c=d901061aa65e'
-  const config = 'd901061aa65ea867e0cc505a1eca044204a04a5b75b16bba46edca0723baa8c8'
-  const message = `s=${R.slice(0,12)};c=${config.slice(0,12)}`
   const calls = []
   const run = async args => {
     calls.push(args ?? ['deployments'])
@@ -199,21 +207,103 @@ test('candidate upload pins Wrangler and verifies exact provider annotations at 
     if (args[0] === 'versions' && args[1] === 'view') return JSON.stringify({id:candidate,resources:{bindings:CONFIG_NAMES.map(name=>({name,type:'secret_text'}))}})
     const listCount = calls.filter(call => call?.[1] === 'list').length
     return listCount === 1 ? versionInventory(version) : JSON.stringify([
-      ...JSON.parse(versionInventory(version)), ...JSON.parse(versionInventory(candidate, tag, message))])
+      ...JSON.parse(versionInventory(version)), ...JSON.parse(versionInventory(candidate, tag, uploadMessage))])
   }
-  const value = await executeAcademyCloudflareHelper([...common,'--operation','upload','--source',R,'--traffic','0'], { ...options, run })
+  const value = await executeAcademyCloudflareHelper(upload, { ...options, run })
   assert.equal(value.versionId, candidate)
   assert.equal(value.trafficPercentage, 0)
-  assert.ok(calls.some(call => Array.isArray(call) && call.includes('--strict') && call.includes('--keep-vars')))
-  assert.equal(JSON.stringify(value).includes(message), false)
+  const uploadCall = calls.find(call => call?.[0] === 'versions' && call?.[1] === 'upload')
+  assert.ok(uploadCall.includes('--strict') && uploadCall.includes('--keep-vars'))
+  assert.equal(uploadCall[uploadCall.indexOf('--secrets-file') + 1], protectedBundlePath)
+  assert.equal(uploadCall[uploadCall.indexOf('--message') + 1], uploadMessage)
+  assert.equal(JSON.stringify(value).includes(uploadMessage), false)
   assert.ok(calls.some(call => call?.[0] === 'versions' && call[1] === 'view' && call[2] === candidate))
+})
+
+test('upload rejects unprotected secret bundles before provider execution', async () => {
+  let calls = 0
+  const run = async () => { calls += 1; return JSON.stringify(provider) }
+  const link = `${protectedBundlePath}-link`
+  await symlink(protectedBundlePath, link)
+  await assert.rejects(executeAcademyCloudflareHelper([...upload.slice(0, -1), link], { ...options, run }))
+  await rm(link)
+  await chmod(protectedBundlePath, 0o644)
+  await assert.rejects(executeAcademyCloudflareHelper(upload, { ...options, run }))
+  await chmod(protectedBundlePath, 0o600)
+  await assert.rejects(executeAcademyCloudflareHelper([...upload.slice(0, -1), `${protectedBundlePath}-missing`], { ...options, run }))
+  assert.equal(calls, 0)
+})
+
+test('upload rejects an old incomplete candidate and verifies complete Identity bindings', async () => {
+  const oldCandidate = '77777777-7777-4777-8777-777777777777'
+  let lists = 0
+  const oldInventory = JSON.parse(versionInventory(oldCandidate, `release-${R.slice(0,12)}`, legacyUploadMessage)).at(0)
+  const newInventory = JSON.parse(versionInventory(candidate, `release-${R.slice(0,12)}`, uploadMessage)).at(0)
+  const run = async args => {
+    if (!args) return JSON.stringify(provider)
+    if (args[0] === '--version') return '4.120.0\n'
+    if (args[0] === 'versions' && args[1] === 'upload') return 'uploaded\n'
+    if (args[0] === 'versions' && args[1] === 'view') return JSON.stringify({
+      id: candidate, resources: { bindings: CONFIG_NAMES.map(name => ({ name, type: 'secret_text' })) },
+    })
+    if (args[0] === 'versions' && args[1] === 'list') {
+      lists += 1
+      return JSON.stringify(lists === 1 ? [...JSON.parse(versionInventory(version)), oldInventory]
+        : [...JSON.parse(versionInventory(version)), oldInventory, newInventory])
+    }
+    throw new Error('unexpected provider invocation')
+  }
+  const value = await executeAcademyCloudflareHelper(upload, { ...options, run })
+  assert.equal(value.versionId, candidate)
+})
+
+test('upload fails closed if a production Identity binding is absent', async () => {
+  const missing = IDENTITY_PRODUCTION_ACTIVATION_CONFIG_NAMES.at(-1)
+  const bindings = CONFIG_NAMES.filter(name => name !== missing).map(name => ({ name, type: 'secret_text' }))
+  let lists = 0
+  const run = async args => {
+    if (!args) return JSON.stringify(provider)
+    if (args[0] === '--version') return '4.120.0\n'
+    if (args[0] === 'versions' && args[1] === 'upload') return 'uploaded\n'
+    if (args[0] === 'versions' && args[1] === 'view') return JSON.stringify({ id: candidate, resources: { bindings } })
+    if (args[0] === 'versions' && args[1] === 'list') {
+      lists += 1
+      return JSON.stringify(lists === 1 ? JSON.parse(versionInventory(version))
+        : [...JSON.parse(versionInventory(version)), ...JSON.parse(versionInventory(candidate, `release-${R.slice(0,12)}`, uploadMessage))])
+    }
+    throw new Error('unexpected provider invocation')
+  }
+  await assert.rejects(executeAcademyCloudflareHelper(upload, { ...options, run }))
+})
+
+test('upload invocation and receipt do not contain protected bundle values', async () => {
+  let lists = 0
+  const calls = []
+  const run = async args => {
+    calls.push(args)
+    if (!args) return JSON.stringify(provider)
+    if (args[0] === '--version') return '4.120.0\n'
+    if (args[0] === 'versions' && args[1] === 'upload') return 'uploaded\n'
+    if (args[0] === 'versions' && args[1] === 'view') return JSON.stringify({
+      id: candidate, resources: { bindings: CONFIG_NAMES.map(name => ({ name, type: 'secret_text' })) },
+    })
+    if (args[0] === 'versions' && args[1] === 'list') {
+      lists += 1
+      return JSON.stringify(lists === 1 ? JSON.parse(versionInventory(version))
+        : [...JSON.parse(versionInventory(version)), ...JSON.parse(versionInventory(candidate, `release-${R.slice(0,12)}`, uploadMessage))])
+    }
+    throw new Error('unexpected provider invocation')
+  }
+  const value = await executeAcademyCloudflareHelper(upload, { ...options, run })
+  assert.equal(JSON.stringify([calls, value]).includes(protectedBundleValue), false)
+  assert.equal(value.versionId, candidate)
 })
 
 test('live upload requires release-bound worker and config and uses a separate writable cwd', async () => {
   const { env, root } = await pinnedReleaseEnvironment()
   const calls = []
   const tag = `release-${R.slice(0,12)}`
-  const message = 's=bbbbbbbbbbbb;c=d901061aa65e'
+  const message = uploadMessage
   let lists = 0
   const runWrangler = async invocation => {
     calls.push(invocation)
@@ -226,16 +316,16 @@ test('live upload requires release-bound worker and config and uses a separate w
       : JSON.stringify([...JSON.parse(versionInventory(version)),...JSON.parse(versionInventory(candidate,tag,message))])
     throw new Error('unexpected invocation')
   }
-  const value = await executeAcademyCloudflareHelper([...common,'--operation','upload','--source',R,'--traffic','0'],
+  const value = await executeAcademyCloudflareHelper(upload,
     { ...pinnedOptions, fs:env.fs, processLike:env.processLike, installRoot:'/opt/academy', runWrangler })
   assert.equal(value.versionId,candidate)
-  const upload = calls.find(call=>call.args.includes('upload'))
-  const workspace = upload.cwd
+  const uploadCall = calls.find(call=>call.args.includes('upload'))
+  const workspace = uploadCall.cwd
   assert.match(workspace, new RegExp(`/private/var/lib/academy/wrangler/application-${common[1]}-[a-f0-9]{12}$`))
-  assert.equal(upload.cwd,workspace)
-  assert.equal(upload.args.includes(`${root}/application/worker.js`), false)
-  assert.equal(upload.args.includes(`${root}/application/worker.ts`), false)
-  assert.ok(upload.args.includes(`${workspace}/application/wrangler.jsonc`))
+  assert.equal(uploadCall.cwd,workspace)
+  assert.equal(uploadCall.args.includes(`${root}/application/worker.js`), false)
+  assert.equal(uploadCall.args.includes(`${root}/application/worker.ts`), false)
+  assert.ok(uploadCall.args.includes(`${workspace}/application/wrangler.jsonc`))
 
   const missing = await pinnedReleaseEnvironment(undefined,false)
   let providerCalls=0
@@ -254,15 +344,15 @@ test('candidate upload rejects wrong Wrangler version and duplicate version JSON
     if (args[1] === 'upload') uploads += 1
     return versionInventory(version)
   }
-  await assert.rejects(executeAcademyCloudflareHelper([...common,'--operation','upload','--source',R,'--traffic','0'], { ...options, run:wrong }))
+  await assert.rejects(executeAcademyCloudflareHelper(upload, { ...options, run:wrong }))
   assert.equal(uploads, 0)
   const duplicate = async args => {
     if (!args) return JSON.stringify(provider)
     if (args[0] === '--version') return '4.120.0\n'
     return `[{"id":"${version}","id":"${candidate}","metadata":{"created_on":"2026-08-29T10:01:00Z"},"annotations":{}}]`
   }
-  await assert.rejects(executeAcademyCloudflareHelper([...common,'--operation','upload','--source',R,'--traffic','0'], { ...options, run:duplicate }))
-  await assert.rejects(executeAcademyCloudflareHelper([...common,'--operation','upload','--source','c'.repeat(40),'--traffic','0'], { ...options, run:wrong }))
+  await assert.rejects(executeAcademyCloudflareHelper(upload, { ...options, run:duplicate }))
+  await assert.rejects(executeAcademyCloudflareHelper([...common,'--operation','upload','--source','c'.repeat(40),'--traffic','0','--secrets-file',protectedBundlePath], { ...options, run:wrong }))
 })
 
 test('activation and rollback use optimistic exact pre/post conditions and disclose residual race', async () => {
@@ -327,7 +417,6 @@ test('successful projected invocation uses copied config and exact release links
   const observedList = []
   let lists = 0
   const tag = `release-${R.slice(0,12)}`
-  const uploadMessage = 's=bbbbbbbbbbbb;c=d901061aa65e'
   const versionInventory = (id, versionTag = '', message = '') => JSON.stringify([{
     id, metadata: { created_on: '2026-08-29T10:01:00Z' },
     annotations: { 'workers/tag': versionTag, 'workers/message': message },
@@ -350,7 +439,7 @@ test('successful projected invocation uses copied config and exact release links
     }
     throw new Error('unexpected provider invocation')
   }
-  await executeAcademyCloudflareHelper([...common,'--operation','upload','--source',R,'--traffic','0'],
+  await executeAcademyCloudflareHelper(upload,
     { ...pinnedOptions, fs: env.fs, processLike: env.processLike, installRoot: '/opt/academy', runWrangler })
   const workspace = observedList.find(call => call.args.includes('upload')).cwd
   const application = `${workspace}/application`
@@ -368,7 +457,6 @@ test('successful projected invocation uses copied config and exact release links
 test('multi-call upload recreates exact workspace after Wrangler residue in the shared cwd', async () => {
   const { env } = await pinnedReleaseEnvironment()
   const tag = `release-${R.slice(0,12)}`
-  const uploadMessage = 's=bbbbbbbbbbbb;c=d901061aa65e'
   let lists = 0
   let firstWorkspace
   const runWrangler = async invocation => {
@@ -392,7 +480,7 @@ test('multi-call upload recreates exact workspace after Wrangler residue in the 
     }
     throw new Error('unexpected provider invocation')
   }
-  const value = await executeAcademyCloudflareHelper([...common,'--operation','upload','--source',R,'--traffic','0'],
+  const value = await executeAcademyCloudflareHelper(upload,
     { ...pinnedOptions, fs: env.fs, processLike: env.processLike, installRoot: '/opt/academy', runWrangler })
   assert.equal(value.versionId, candidate)
   assert.equal(await env.fs.lstat(`${firstWorkspace}/provider-cache.json`).then(() => true, () => false), false)
@@ -402,7 +490,6 @@ test('multi-call upload recreates exact workspace after Wrangler residue in the 
 test('upload reconciles delayed provider visibility after successful mutation', async () => {
   const { env } = await pinnedReleaseEnvironment()
   const tag = `release-${R.slice(0,12)}`
-  const uploadMessage = 's=bbbbbbbbbbbb;c=d901061aa65e'
   let lists = 0
   let now = Date.parse('2026-08-29T11:00:00Z')
   const runWrangler = async invocation => {
@@ -424,7 +511,7 @@ test('upload reconciles delayed provider visibility after successful mutation', 
     }
     throw new Error('unexpected provider invocation')
   }
-  const value = await executeAcademyCloudflareHelper([...common,'--operation','upload','--source',R,'--traffic','0'], {
+  const value = await executeAcademyCloudflareHelper(upload, {
     ...pinnedOptions,
     fs: env.fs,
     processLike: env.processLike,
@@ -440,7 +527,6 @@ test('upload reconciles delayed provider visibility after successful mutation', 
 test('upload fails closed when matching version remains ambiguous after mutation', async () => {
   const { env } = await pinnedReleaseEnvironment()
   const tag = `release-${R.slice(0,12)}`
-  const uploadMessage = 's=bbbbbbbbbbbb;c=d901061aa65e'
   const priorCandidate = '77777777-7777-4777-8777-777777777777'
   let now = Date.parse('2026-08-29T11:00:00Z')
   const inventory = JSON.stringify([
@@ -456,7 +542,7 @@ test('upload fails closed when matching version remains ambiguous after mutation
     if (args[0] === 'versions' && args[1] === 'list') return inventory
     throw new Error('unexpected provider invocation')
   }
-  await assert.rejects(executeAcademyCloudflareHelper([...common,'--operation','upload','--source',R,'--traffic','0'], {
+  await assert.rejects(executeAcademyCloudflareHelper(upload, {
     ...pinnedOptions,
     fs: env.fs,
     processLike: env.processLike,
@@ -470,7 +556,6 @@ test('upload fails closed when matching version remains ambiguous after mutation
 test('upload reconciles exact unique candidate when provider mutates then exits nonzero', async () => {
   const { env } = await pinnedReleaseEnvironment()
   const tag = `release-${R.slice(0,12)}`
-  const uploadMessage = 's=bbbbbbbbbbbb;c=d901061aa65e'
   let lists = 0
   const runWrangler = async invocation => {
     await invocation.verify()
@@ -490,7 +575,7 @@ test('upload reconciles exact unique candidate when provider mutates then exits 
     }
     throw new Error('unexpected provider invocation')
   }
-  const value = await executeAcademyCloudflareHelper([...common,'--operation','upload','--source',R,'--traffic','0'], {
+  const value = await executeAcademyCloudflareHelper(upload, {
     ...pinnedOptions,
     fs: env.fs,
     processLike: env.processLike,
@@ -504,7 +589,6 @@ test('upload reconciles exact unique candidate when provider mutates then exits 
 test('upload retry reuses one exact pre-existing candidate and skips second mutation', async () => {
   const { env } = await pinnedReleaseEnvironment()
   const tag = `release-${R.slice(0,12)}`
-  const uploadMessage = 's=bbbbbbbbbbbb;c=d901061aa65e'
   let uploadCalls = 0
   let viewCalls = 0
   const runWrangler = async invocation => {
@@ -523,7 +607,7 @@ test('upload retry reuses one exact pre-existing candidate and skips second muta
     ])
     throw new Error('unexpected provider invocation')
   }
-  const value = await executeAcademyCloudflareHelper([...common,'--operation','upload','--source',R,'--traffic','0'], {
+  const value = await executeAcademyCloudflareHelper(upload, {
     ...pinnedOptions,
     fs: env.fs,
     processLike: env.processLike,
@@ -730,7 +814,7 @@ executeAcademyCloudflareHelper(JSON.parse(process.argv[2]),{clock:()=>Date.parse
     const stderr=[]; child.stderr.on('data', chunk=>stderr.push(chunk))
     child.once('close', code=>code===0 ? resolve(JSON.parse(Buffer.concat(stdout))) : reject(new Error(Buffer.concat(stderr).toString('utf8'))))
   })
-  const uploaded = await invoke([...common,'--operation','upload','--source',R,'--traffic','0'])
+  const uploaded = await invoke(upload)
   assert.equal(uploaded.versionId, candidate)
   const promoted = await invoke([...common,'--operation','activate','--expected-deployment',deployment,'--expected-version',version,'--candidate',candidate,'--traffic','100'])
   assert.equal(promoted.deploymentId, activated); assert.equal(promoted.semantics.residualRace, true)
