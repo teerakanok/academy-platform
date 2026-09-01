@@ -4,7 +4,7 @@ const database = vi.hoisted(() => ({ academyDb: vi.fn() }))
 
 vi.mock('@/lib/db/server', () => ({ academyDb: database.academyDb }))
 
-const { POST: startRoute } = await import('@/app/(site)/api/auth/identity/start/route')
+const { GET: startNavigationRoute, POST: startRoute } = await import('@/app/(site)/api/auth/identity/start/route')
 const { GET: callbackRoute } = await import('@/app/(site)/auth/callback/route')
 
 const RESULT_KEY_SET_DOCUMENT = JSON.stringify({
@@ -116,5 +116,41 @@ describe('production Identity routes use the real registry composition', () => {
       error: 'ยังไม่ได้เชื่อมต่อ Identity Control สำหรับสภาพแวดล้อมนี้',
     })
     expect(database.academyDb).toHaveBeenCalledTimes(2)
+  })
+
+  it('starts an admitted navigation with the production transaction and cookie contract', async () => {
+    const navigation = await startNavigationRoute(new Request(
+      'https://academy.cyberskills.co.th/api/auth/identity/start?next=%2Fdashboard',
+      {
+        headers: {
+          'sec-fetch-site': 'same-origin',
+          'sec-fetch-mode': 'navigate',
+          'sec-fetch-dest': 'document',
+          'sec-fetch-user': '?1',
+        },
+      },
+    ))
+
+    expect(navigation.status).toBe(303)
+    expect(navigation.headers.get('cache-control')).toBe('no-store')
+    const authorizationUrl = new URL(navigation.headers.get('location') ?? '')
+    expect(authorizationUrl.origin).toBe('https://accounts.cyberskills.co.th')
+    expect(authorizationUrl.pathname).toBe('/sign-in')
+    expect([...authorizationUrl.searchParams.keys()]).toEqual([
+      'client_id', 'redirect_uri', 'state', 'nonce', 'code_challenge', 'code_challenge_method', 'service_id',
+    ])
+    expect(transaction).toMatchObject({
+      state: expect.stringMatching(/^[A-Za-z0-9_-]{16,160}$/),
+      codeVerifier: expect.stringMatching(/^[A-Za-z0-9_-]{64}$/),
+      nonce: expect.stringMatching(/^[A-Za-z0-9_-]{16,160}$/),
+      browserBindingDigest: expect.stringMatching(/^[A-Za-z0-9_-]{43}$/),
+      returnPath: '/dashboard',
+    })
+    const cookie = navigation.headers.getSetCookie()
+    expect(cookie).toHaveLength(1)
+    expect(cookie[0]!.split('; ').slice(1)).toEqual([
+      'Path=/auth/callback', 'HttpOnly', 'Secure', 'SameSite=Lax', 'Max-Age=300',
+    ])
+    expect(database.academyDb).toHaveBeenCalledTimes(1)
   })
 })

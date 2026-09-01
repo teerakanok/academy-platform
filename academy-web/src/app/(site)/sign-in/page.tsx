@@ -61,7 +61,12 @@ export default async function SignInPage({
       </div>
 
       {accountAccessOpen ? (
-        identityControl ? <IdentityControlSignInForm next={target} /> : <SignInForm next={target} />
+        identityControl ? (
+          <IdentityControlSignInForm
+            next={target}
+            transport={localIdentityControl ? 'form' : 'navigation'}
+          />
+        ) : <SignInForm next={target} />
       ) : (
         <div className="card-feature p-6 sm:p-8" data-testid="accounts-not-open">
           <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-cs-accent">Preview</p>

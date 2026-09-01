@@ -115,7 +115,10 @@ describe('closed sign-in state', () => {
 
     expect(page).toContain('identity-control-sign-in-form')
     expect(page).not.toContain('Accounts are not open yet')
-    expect(identityControlSignInForm).toHaveBeenCalledWith({ next: '/dashboard' }, expect.anything())
+    expect(identityControlSignInForm).toHaveBeenCalledWith(
+      { next: '/dashboard', transport: 'navigation' },
+      expect.anything(),
+    )
     expect(signInForm).not.toHaveBeenCalled()
   })
 
@@ -145,7 +148,10 @@ describe('closed sign-in state', () => {
     const page = await renderSignInPage()
 
     expect(page).toContain('identity-control-sign-in-form')
-    expect(identityControlSignInForm).toHaveBeenCalledWith({ next: '/dashboard' }, expect.anything())
+    expect(identityControlSignInForm).toHaveBeenCalledWith(
+      { next: '/dashboard', transport: 'form' },
+      expect.anything(),
+    )
     expect(signInForm).not.toHaveBeenCalled()
   })
 

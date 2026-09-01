@@ -13,15 +13,18 @@ const routeMocks = vi.hoisted(() => {
   }
 
   const startMock = vi.fn<AcademyIdentityRuntimeBrowserFlow['start']>()
+  const startNavigationMock = vi.fn<AcademyIdentityRuntimeBrowserFlow['startNavigation']>()
   const completeMock = vi.fn<AcademyIdentityRuntimeBrowserFlow['complete']>()
   const browserFlow: AcademyIdentityRuntimeBrowserFlow = {
     start: startMock,
+    startNavigation: startNavigationMock,
     complete: completeMock,
   }
 
   return {
     browserFlow,
     startMock,
+    startNavigationMock,
     completeMock,
     getIdentityRuntimeBrowserFlow: vi.fn<() => AcademyIdentityRuntimeBrowserFlow | null>(),
     identityControlLocalFixtureAllowedForRequest: vi.fn<(request: Request) => boolean>(),
@@ -39,7 +42,7 @@ vi.mock('@/lib/identity/registry', () => ({
   getIdentityRuntimeBrowserFlow: routeMocks.getIdentityRuntimeBrowserFlow,
 }))
 
-const { POST: startRoute } = await import('@/app/(site)/api/auth/identity/start/route')
+const { GET: startNavigationRoute, POST: startRoute } = await import('@/app/(site)/api/auth/identity/start/route')
 const { GET: callbackRoute } = await import('@/app/(site)/auth/callback/route')
 
 const academyOrigin = 'https://academy.tests.example'
@@ -76,6 +79,79 @@ describe('Identity runtime browser-flow routes', () => {
     expect(response.status).toBe(303)
     expect(response.headers.get('location')).toBe(identityAuthorizationUrl)
     expect(response.headers.getSetCookie()).toEqual([sessionCookie, browserBindingExpiryCookie])
+  })
+
+  it('delegates production navigation GET to startNavigation with no-store semantics', async () => {
+    const request = new Request(`${academyOrigin}/api/auth/identity/start?next=%2Fdashboard`, { method: 'GET' })
+    routeMocks.startNavigationMock.mockResolvedValueOnce({
+      kind: 'redirect',
+      status: 303,
+      location: identityAuthorizationUrl,
+      cookies: [sessionCookie, browserBindingExpiryCookie],
+    })
+
+    const response = await startNavigationRoute(request)
+
+    expect(routeMocks.startNavigationMock).toHaveBeenCalledTimes(1)
+    expect(routeMocks.startNavigationMock.mock.calls[0][0]).toBe(request)
+    expect(response.status).toBe(303)
+    expect(response.headers.get('location')).toBe(identityAuthorizationUrl)
+    expect(response.headers.get('cache-control')).toBe('no-store')
+    expect(response.headers.getSetCookie()).toEqual([sessionCookie, browserBindingExpiryCookie])
+  })
+
+  it('fails local fixture navigation GET closed before obtaining the runtime flow', async () => {
+    const request = new Request(`${academyOrigin}/api/auth/identity/start?next=%2Fdashboard`, { method: 'GET' })
+    routeMocks.identityControlLocalFixtureAllowedForRequest.mockReturnValueOnce(true)
+
+    const response = await startNavigationRoute(request)
+
+    expect(response.status).toBe(405)
+    expect(response.headers.get('cache-control')).toBe('no-store')
+    expect(response.headers.get('allow')).toBeNull()
+    expect(routeMocks.getIdentityRuntimeBrowserFlow).not.toHaveBeenCalled()
+    expect(routeMocks.startNavigationMock).not.toHaveBeenCalled()
+  })
+
+  it('returns an uncached 404 when production navigation is disabled', async () => {
+    const request = new Request(`${academyOrigin}/api/auth/identity/start?next=%2Fdashboard`)
+    routeMocks.getIdentityRuntimeBrowserFlow.mockReturnValueOnce(null)
+
+    const response = await startNavigationRoute(request)
+
+    expect(response.status).toBe(404)
+    expect(response.headers.get('cache-control')).toBe('no-store')
+    expect(routeMocks.startNavigationMock).not.toHaveBeenCalled()
+  })
+
+  it('returns an uncached production navigation error without redirecting', async () => {
+    const request = new Request(`${academyOrigin}/api/auth/identity/start?next=%2Fdashboard`)
+    routeMocks.startNavigationMock.mockResolvedValueOnce({
+      kind: 'error',
+      status: 403,
+      error: 'route_navigation_denied',
+      cookies: [],
+    })
+
+    const response = await startNavigationRoute(request)
+
+    expect(response.status).toBe(403)
+    expect(response.headers.get('cache-control')).toBe('no-store')
+    expect(response.headers.get('location')).toBeNull()
+    await expect(response.json()).resolves.toEqual({ ok: false, error: 'route_navigation_denied' })
+  })
+
+  it('returns an uncached 503 when the production navigation adapter is unavailable', async () => {
+    const request = new Request(`${academyOrigin}/api/auth/identity/start?next=%2Fdashboard`)
+    routeMocks.getIdentityRuntimeBrowserFlow.mockImplementationOnce(() => {
+      throw new routeMocks.IdentityAdapterUnavailableError('unavailable')
+    })
+
+    const response = await startNavigationRoute(request)
+
+    expect(response.status).toBe(503)
+    expect(response.headers.get('cache-control')).toBe('no-store')
+    expect(response.headers.get('location')).toBeNull()
   })
 
   it('returns the enabled start error result without redirecting', async () => {

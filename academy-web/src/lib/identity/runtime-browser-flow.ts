@@ -49,6 +49,7 @@ export type AcademyIdentityRuntimeBrowserFlowResult =
 
 export type AcademyIdentityRuntimeBrowserFlow = {
   start(request: Request): Promise<AcademyIdentityRuntimeBrowserFlowResult>
+  startNavigation(request: Request): Promise<AcademyIdentityRuntimeBrowserFlowResult>
   complete(request: Request): Promise<AcademyIdentityRuntimeBrowserFlowResult>
 }
 
@@ -96,6 +97,27 @@ export function createAcademyIdentityRuntimeBrowserFlow(
         throw new AcademyIdentityRuntimeBrowserFlowUnavailableError()
       },
     }
+    const authorize = async (rawNext: string): Promise<AcademyIdentityRuntimeBrowserFlowResult> => {
+      try {
+        const started = await beginIdentityAuthorization(
+          startStore,
+          registration,
+          safeNextPath(rawNext),
+        )
+        const authorization = snapshotExactDataRecord(
+          await startAuthorization(started.request),
+          AUTHORIZATION_RESULT_KEYS,
+        )
+        if (!isCanonicalAuthorizationUrl(authorization.authorizeUrl)) {
+          throw new Error(START_FAILURE)
+        }
+        return redirectResult(authorization.authorizeUrl, [
+          browserBindingCookie(started.state, started.browserBinding),
+        ])
+      } catch {
+        return errorResult(503, START_FAILURE)
+      }
+    }
 
     return Object.freeze({
       async start(request: Request): Promise<AcademyIdentityRuntimeBrowserFlowResult> {
@@ -112,22 +134,38 @@ export function createAcademyIdentityRuntimeBrowserFlow(
           if (typeof rawNext !== 'string') {
             return errorResult(400, 'คำขอเข้าสู่ระบบไม่ถูกต้อง')
           }
+          return await authorize(rawNext)
+        } catch {
+          return errorResult(503, START_FAILURE)
+        }
+      },
 
-          const started = await beginIdentityAuthorization(
-            startStore,
-            registration,
-            safeNextPath(rawNext),
-          )
-          const authorization = snapshotExactDataRecord(
-            await startAuthorization(started.request),
-            AUTHORIZATION_RESULT_KEYS,
-          )
-          if (!isCanonicalAuthorizationUrl(authorization.authorizeUrl)) {
-            throw new Error(START_FAILURE)
+      async startNavigation(request: Request): Promise<AcademyIdentityRuntimeBrowserFlowResult> {
+        try {
+          if (!(request instanceof Request) || request.method !== 'GET') {
+            return errorResult(403, START_FAILURE)
           }
-          return redirectResult(authorization.authorizeUrl, [
-            browserBindingCookie(started.state, started.browserBinding),
-          ])
+          const headers = request.headers
+          if (
+            headers.get('sec-fetch-site') !== 'same-origin'
+            || headers.get('sec-fetch-mode') !== 'navigate'
+            || headers.get('sec-fetch-dest') !== 'document'
+            || headers.get('sec-fetch-user') !== '?1'
+            || headers.get('sec-purpose')?.toLowerCase().includes('prefetch')
+            || headers.get('purpose')?.toLowerCase().includes('prefetch')
+          ) {
+            return errorResult(403, START_FAILURE)
+          }
+
+          const query = new URL(request.url).searchParams
+          if ([...query.keys()].length !== 1 || query.getAll('next').length !== 1) {
+            return errorResult(400, 'คำขอเข้าสู่ระบบไม่ถูกต้อง')
+          }
+          const rawNext = query.get('next')
+          if (typeof rawNext !== 'string') {
+            return errorResult(400, 'คำขอเข้าสู่ระบบไม่ถูกต้อง')
+          }
+          return await authorize(rawNext)
         } catch {
           return errorResult(503, START_FAILURE)
         }

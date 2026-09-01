@@ -12,6 +12,37 @@ import { beginIdentityAuthorization } from '@/lib/identity/transaction'
 
 export const runtime = 'nodejs'
 
+const NO_STORE_HEADERS = { 'cache-control': 'no-store' }
+
+export async function GET(request: Request) {
+  if (identityControlLocalFixtureAllowedForRequest(request)) {
+    return new NextResponse(null, { status: 405, headers: NO_STORE_HEADERS })
+  }
+  try {
+    const browserFlow = getIdentityRuntimeBrowserFlow()
+    if (!browserFlow) return new NextResponse(null, { status: 404, headers: NO_STORE_HEADERS })
+    const result = await browserFlow.startNavigation(request)
+    if (result.kind === 'error') {
+      return NextResponse.json(
+        { ok: false, error: result.error },
+        { status: result.status, headers: NO_STORE_HEADERS },
+      )
+    }
+    const response = NextResponse.redirect(new URL(result.location, request.url), result.status)
+    for (const cookie of result.cookies) response.headers.append('set-cookie', cookie)
+    response.headers.set('cache-control', 'no-store')
+    return response
+  } catch (error) {
+    if (error instanceof IdentityAdapterUnavailableError) {
+      return NextResponse.json(
+        { ok: false, error: 'ยังไม่ได้เชื่อมต่อ Identity Control สำหรับสภาพแวดล้อมนี้' },
+        { status: 503, headers: NO_STORE_HEADERS },
+      )
+    }
+    throw error
+  }
+}
+
 export async function POST(request: Request) {
   if (!identityControlLocalFixtureAllowedForRequest(request)) {
     try {
