@@ -1,0 +1,68 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_base.css">
+<style>
+.lesson{max-width:960px}
+h1{font-family:'Fraunces',Georgia,serif;font-size:24px;color:var(--text);font-weight:600;margin:6px 0 14px}
+p.lead{margin-bottom:16px;max-width:72ch}
+p.lead b{color:var(--text)}
+.act{margin:20px 0 10px;overflow:hidden}
+.acthead{display:flex;align-items:center;gap:10px;padding:13px 18px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#FFFFFF, #F7FAFC)}
+.acthead h3{font-family:'Fraunces',Georgia,serif;font-size:16.5px;color:var(--text);font-weight:600}
+.actbody{padding:16px 18px;display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
+.ticket{display:flex;gap:10px;background:var(--amberdim);border:1px solid var(--amberborder);border-radius:12px;padding:10px 12px;font-size:12.5px;color:var(--amber);margin-bottom:12px;grid-column:1 / -1}
+.fs{background:var(--sunken);border-radius:12px;padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.85;color:var(--text)}
+.fs .hdr{color:var(--faint);font-size:11px;margin-bottom:4px}
+.bad{color:var(--err);font-weight:700}
+.cmdline{margin-top:12px;background:var(--term-bg);border-radius:10px;padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--term-text)}
+.cmdline .p{color:#5FB2E8}
+.caret{border-right:7px solid #38BDF8;&nbsp;}
+.reqcard h4{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);font-weight:700;margin-bottom:8px}
+.req{display:flex;gap:9px;align-items:flex-start;padding:8px 10px;border-radius:10px;font-size:13px;margin-bottom:4px}
+.req.met{background:var(--accent2dim);color:var(--body)}
+.req.unmet{background:var(--surface2);color:var(--muted);outline:1px dashed var(--border2)}
+.req .m{font-weight:700;margin-top:0}
+.req.met .m{color:var(--ok)}
+.req.unmet .m{color:var(--faint)}
+.actfoot{display:flex;align-items:center;gap:8px;padding:12px 18px;border-top:1px solid var(--surface2);background:#FBFDFE}
+.actfoot .grow{flex:1}
+.prognote{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--faint)}
+</style></head><body><div class="frame"><div class="lesson">
+  <span class="crumbs"><b>Basic OS &amp; Linux</b> › Permissions › <b>Activity</b></span>
+  <h1>Read a permission string — then make it say what you mean</h1>
+  <p class="lead">Every file answers three questions: <b>who owns it, which group it belongs to, and what each of them may do</b>. The nine characters answer the last question — three triads for user, group, and everyone else. Now read them fast enough to act on them: the app tree below ships broken on purpose.</p>
+
+  <div class="card act">
+    <div class="acthead">
+      <span class="chip accent">Activity · simulation</span>
+      <h3>Repair the nightly backup</h3>
+      <span style="flex:1"></span>
+      <span class="chip plain">practice mode · hints on</span>
+      <span class="btn ghost" style="padding:4px 10px">⤢ Expand</span>
+    </div>
+    <div class="actbody">
+      <div class="ticket"><span>⚑</span><span><b>Ticket:</b> the backups are readable by everyone on this host, and the nightly script can be rewritten by any user. Make <span class="mono">backup.key</span> owner-only, stop the script from being world-writable, keep <span class="mono">shared/</span> writable by its group.</span></div>
+      <div class="fs">
+        <div class="hdr">simulated host — changes apply instantly, nothing real is touched</div>
+-rw-r--r--  1 backup backup   642 <span class="bad">backup.key</span><br>
+-rwxrwxrwx  1 backup backup  1903 <span class="bad">nightly-backup.sh</span><br>
+drwxrwxr-x  2 backup ops     4096 shared/<br>
+-rw-r-----  1 backup ops     512 report.txt
+      </div>
+      <div class="reqcard">
+        <h4>Requirements — live</h4>
+        <div class="req met"><span class="m">✓</span><span><span class="mono" style="font-size:12px">backup.key</span> is readable by its owner only (mode 600)</span></div>
+        <div class="req met"><span class="m">✓</span><span><span class="mono" style="font-size:12px">nightly-backup.sh</span> is not writable by others</span></div>
+        <div class="req unmet"><span class="m">○</span><span><span class="mono" style="font-size:12px">shared/</span> stays writable by group <span class="mono" style="font-size:12px">ops</span></span></div>
+        <div class="cmdline"><span class="p">learner@sim:~$</span> chmod 600 backup.key<span style="border-right:7px solid #38BDF8">&nbsp;</span></div>
+      </div>
+    </div>
+    <div class="actfoot">
+      <span class="btn primary">Run check</span>
+      <span class="btn">Reveal a hint</span>
+      <span class="grow"></span>
+      <span class="prognote">✓ counts toward lesson progress · mode values randomize each attempt</span>
+    </div>
+  </div>
+</div></div></body></html>

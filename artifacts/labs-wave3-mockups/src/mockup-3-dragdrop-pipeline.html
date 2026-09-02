@@ -1,0 +1,77 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_base.css">
+<style>
+.goal{padding:16px 20px;display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.goal h2{font-family:'Fraunces',Georgia,serif;font-size:19px;color:var(--text);font-weight:600}
+.goal .q{font-size:13px;color:var(--muted)}
+.goal .grow{flex:1}
+.board{padding:18px 20px 20px}
+.sect{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);font-weight:700;margin-bottom:9px}
+.slots{display:flex;gap:10px;margin-bottom:18px;align-items:center}
+.slot{flex:1;min-height:64px;border:1.5px dashed var(--border2);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:11.5px}
+.slot.filled{border-style:solid;border-color:var(--accentborder);background:var(--accent2dim)}
+.pipe{color:var(--faint);font-size:18px;font-family:'JetBrains Mono',monospace}
+.pcard{padding:9px 13px;border-radius:10px;background:var(--surface);border:1px solid var(--accentborder);font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);white-space:nowrap}
+.pcard .ix{color:var(--faint);font-size:10px;display:block}
+.palette{display:flex;gap:10px;flex-wrap:wrap}
+.pal .pcard{border-color:var(--border);background:var(--surface2);cursor:grab}
+.pal .pcard.used{opacity:.35}
+.pal .pcard.drag{box-shadow:var(--shadow-lift);background:var(--surface);border-color:var(--accent);transform:rotate(-1.5deg) translateY(-4px)}
+.result{margin-top:18px;display:grid;grid-template-columns:1fr 300px;gap:14px}
+.out{background:var(--term-bg);border-radius:12px;padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.8;color:var(--term-text)}
+.out .hdr{color:var(--term-muted);font-size:11px;margin-bottom:4px}
+.verdict{display:flex;flex-direction:column;gap:6px}
+.verdict .req{font-size:12.5px}
+.hand{position:absolute}
+</style></head><body><div class="frame" style="position:relative">
+  <div class="card goal">
+    <div>
+      <h2>Pipeline builder</h2>
+      <p class="q">Assemble the stages that answer: <b style="color:var(--text)">top 3 source IPs by failed login attempts</b></p>
+    </div>
+    <span class="grow"></span>
+    <span class="chip plain mono">fixture · auth.log · 512 lines</span>
+    <span class="chip accent">order puzzle</span>
+  </div>
+
+  <div class="card board">
+    <p class="sect">Your pipeline — drag stages into order</p>
+    <div class="slots">
+      <div class="slot filled"><span class="pcard"><span class="ix">1</span>grep 'Failed password'</span></div>
+      <span class="pipe">→</span>
+      <div class="slot filled"><span class="pcard"><span class="ix">2</span>awk '{print $(NF-3)}'</span></div>
+      <span class="pipe">→</span>
+      <div class="slot"></div>
+      <span class="pipe">→</span>
+      <div class="slot filled"><span class="pcard"><span class="ix">4</span>head -3</span></div>
+      <span class="pipe">→</span>
+      <div class="slot" style="max-width:74px">run ▶</div>
+    </div>
+
+    <p class="sect">Available stages</p>
+    <div class="palette pal">
+      <span class="pcard used">sort</span>
+      <span class="pcard">sort -rn</span>
+      <span class="pcard used">uniq -c</span>
+      <span class="pcard">wc -l</span>
+      <span class="pcard">tail -3</span>
+      <span class="pcard">cut -d' ' -f1</span>
+    </div>
+
+    <div class="result">
+      <div class="out">
+        <div class="hdr">$ run — output on fixture</div>
+      142 203.0.113.40<br>
+       97 198.51.100.23<br>
+       61 192.0.2.140
+      </div>
+      <div class="verdict">
+        <div class="req met" style="background:var(--accent2dim);border-radius:10px;padding:8px 10px"><span class="okmark">✓</span><span>Output matches the expected answer</span></div>
+        <div class="req met" style="background:var(--accent2dim);border-radius:10px;padding:8px 10px"><span class="okmark">✓</span><span>Used 5 stages or fewer</span></div>
+        <div class="req" style="background:var(--surface2);border-radius:10px;padding:8px 10px;color:var(--muted)"><span style="color:var(--faint)">○</span><span>Second question unlocks: <i>which hour had the most attempts?</i></span></div>
+      </div>
+    </div>
+  </div>
+</div></body></html>

@@ -1,0 +1,88 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_base.css">
+<style>
+.head{display:flex;align-items:center;gap:12px;padding:15px 20px;margin-bottom:14px}
+.head h2{font-family:'Fraunces',Georgia,serif;font-size:19px;color:var(--text);font-weight:600}
+.head .grow{flex:1}
+.stage{display:grid;grid-template-columns:1.5fr 330px;gap:14px}
+.viewer{background:var(--surface);border-radius:16px;box-shadow:var(--shadow-card);border:1px solid var(--border);padding:18px;display:flex;flex-direction:column;gap:14px}
+.hop{position:relative}
+.node{position:absolute;width:150px;padding:10px 12px;border-radius:12px;font-size:11.5px}
+.node .nm{font-weight:700;color:var(--text);font-size:12.5px;margin-bottom:3px}
+.node .ln{font-family:'JetBrains Mono',monospace;color:var(--muted);font-size:10.5px;line-height:1.6}
+.node.host{left:0;top:24px;background:var(--accent2dim);border:1px solid var(--accent2border)}
+.node.router{left:50%;transform:translateX(-50%);top:64px;background:var(--surface2);border:1px solid var(--border2)}
+.node.server{right:0;top:24px;background:var(--surface2);border:1px solid var(--border2)}
+.node.hot{outline:2px solid var(--accentfill);outline-offset:2px}
+.link{position:absolute;height:2px;background:var(--border2)}
+.link.l1{left:150px;right:calc(50% + 75px - 20px);top:74px;width:auto}
+.link.l2{left:calc(50% + 75px - 20px);right:150px;top:74px;width:auto}
+.link .cap{position:absolute;top:-30px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--accentborder);border-radius:8px;padding:3px 9px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent);white-space:nowrap}
+.link.hot{background:var(--accentfill)}
+.framecard{background:var(--sunken);border-radius:12px;padding:11px 13px;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.75;color:var(--body)}
+.framecard .hdr{font-family:'Inter',sans-serif;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);font-weight:700;margin-bottom:5px}
+.chg{background:var(--accentdim);border-radius:5px;padding:0 4px;color:var(--accent);font-weight:600}
+.same{color:var(--faint)}
+.scrub{display:flex;align-items:center;gap:10px;justify-content:center;padding-top:2px}
+.dot2{width:34px;height:7px;border-radius:99px;background:var(--border)}
+.dot2.done{background:var(--accentfill)}
+.dot2.now{background:var(--accent);box-shadow:0 0 0 4px var(--accentdim)}
+.narr{display:flex;flex-direction:column;gap:0;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-card);padding:16px}
+.narr h4{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);font-weight:700;margin-bottom:10px}
+.st{display:flex;gap:10px;padding:9px 10px;border-radius:10px;font-size:12.5px;color:var(--muted)}
+.st.done{color:var(--body)}
+.st.now{background:var(--accentdim);outline:1px solid var(--accentborder);color:var(--text)}
+.st .n{width:20px;height:20px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;border:1.5px solid var(--border2);color:var(--faint)}
+.st.done .n{background:var(--accent2dim);border-color:transparent;color:var(--accent)}
+.st.now .n{background:var(--accentfill);border-color:transparent;color:var(--onaccent)}
+.cta{margin-top:14px;display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,var(--accentdim),transparent);border:1px solid var(--accentborder);border-radius:14px;padding:13px 15px}
+.cta p{font-size:12.5px;color:var(--body)}
+.cta b{color:var(--text)}
+</style></head><body><div class="frame">
+  <div class="card head">
+    <div><h2>A packet's journey — hop by hop</h2>
+    <p style="font-size:12.5px;color:var(--muted)">Watch the frame get rebuilt at every hop, then build one yourself</p></div>
+    <span class="grow"></span>
+    <span class="btn ghost">‹ Prev</span>
+    <span class="chip accent">step 3 / 6</span>
+    <span class="btn ghost">Next ›</span>
+    <span class="btn" style="padding:7px 12px">▶ Auto 0.8s</span>
+  </div>
+
+  <div class="stage">
+    <div class="viewer">
+      <div class="hop" style="height:190px">
+        <div class="node host hot"><div class="nm">Your laptop</div><div class="ln">eth0 · MAC aa:20:…:11<br>IP 192.168.1.5</div></div>
+        <div class="link l1 hot"><span class="cap">hop 1 — frame rebuilt here ▸</span></div>
+        <div class="node router"><div class="nm">Home router</div><div class="ln">lan · MAC b8:27:…:04<br>wan · MAC b8:27:…:05</div></div>
+        <div class="link l2"><span class="cap" style="top:auto;bottom:-30px">hop 2</span></div>
+        <div class="node server"><div class="nm">Web server</div><div class="ln">MAC cc:44:…:82<br>IP 203.0.113.10</div></div>
+      </div>
+      <div class="framecard">
+        <div class="hdr">The frame on hop 1 — what changed, what stayed</div>
+        [ dst <span class="chg">b8:27:…:04</span> · src <span class="chg">aa:20:…:11</span> ] ← MACs describe <b>this hop only</b><br>
+        [ src IP <span class="same">192.168.1.5</span> · dst IP <span class="same">203.0.113.10</span> ] ← IPs describe <b>the whole journey</b><br>
+        payload: GET /index.html HTTP/1.1&nbsp;&nbsp;<span class="same">— untouched end to end</span>
+      </div>
+      <div class="scrub">
+        <span class="dot2 done"></span><span class="dot2 done"></span><span class="dot2 now"></span><span class="dot2"></span><span class="dot2"></span><span class="dot2"></span>
+      </div>
+    </div>
+
+    <div class="narr">
+      <h4>Narration</h4>
+      <div class="st done"><span class="n">✓</span><span>Your laptop writes the destination it can actually reach: <b>the router</b>, not the server</span></div>
+      <div class="st done"><span class="n">✓</span><span>ARP answers "who has the router's MAC?" before anything is sent</span></div>
+      <div class="st now"><span class="n">3</span><span><b>The router receives the frame — and throws it away.</b> The IP header survives untouched; a brand-new frame is built for hop 2 with the router's <i>wan</i> MAC as source. Same payload, new envelope.</span></div>
+      <div class="st"><span class="n">4</span><span>At the server, only the frame for its own MAC is read</span></div>
+      <div class="st"><span class="n">5</span><span>The reply reverses the journey — IPs swap, MACs rebuild again</span></div>
+      <div class="st"><span class="n">6</span><span>Why this matters: NAT, ARP spoofing, and "the IP is right but nobody's home"</span></div>
+      <div class="cta">
+        <span class="btn primary" style="padding:8px 14px">Build one yourself →</span>
+        <p><b>Packet builder puzzle</b> opens when you finish watching — assemble the frame for hop 2</p>
+      </div>
+    </div>
+  </div>
+</div></body></html>

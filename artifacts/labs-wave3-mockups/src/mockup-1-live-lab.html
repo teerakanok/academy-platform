@@ -1,0 +1,90 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_base.css">
+<style>
+.topbar{display:flex;align-items:center;gap:14px;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow-card);margin-bottom:14px}
+.topbar .grow{flex:1}
+.credit{background:var(--accentfill);color:var(--onaccent);border-color:transparent}
+.timer{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--muted)}
+.cockpit{display:grid;grid-template-columns:1.55fr 400px;gap:14px;align-items:stretch}
+.term{background:var(--term-bg);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-lift);display:flex;flex-direction:column;border:1px solid #1D2C3A}
+.termbar{display:flex;align-items:center;gap:8px;background:var(--term-surface);padding:9px 14px;border-bottom:1px solid #1D2C3A}
+.dot{width:10px;height:10px;border-radius:50%}
+.termbar .title{flex:1;text-align:center;font-size:11.5px;color:var(--term-muted);font-family:'JetBrains Mono',monospace}
+.termbody{padding:16px 18px;font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.72;color:var(--term-text);flex:1}
+.prompt{color:#5FB2E8}
+.err{color:#F87171}
+.dim{color:var(--term-muted)}
+.okk{color:#4ADE80}
+.mission{padding:18px 18px 16px;display:flex;flex-direction:column;gap:12px}
+.mission h2{font-family:'Fraunces',Georgia,serif;font-size:19px;color:var(--text);font-weight:600}
+.obj{font-size:13px;color:var(--body)}
+.steps{display:flex;flex-direction:column;gap:2px}
+.step{display:flex;gap:10px;padding:9px 10px;border-radius:10px;align-items:flex-start}
+.step.done{background:var(--accent2dim)}
+.step.now{background:var(--accentdim);outline:1px solid var(--accentborder)}
+.mark{width:20px;height:20px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-top:1px}
+.step.done .mark{background:var(--accentfill);color:var(--onaccent)}
+.step.now .mark{border:2px dashed var(--accent);color:var(--accent)}
+.step.todo .mark{border:1.5px solid var(--border2);color:var(--faint)}
+.step p{font-size:13px;color:var(--body)}
+.step .sub{font-size:11.5px;color:var(--faint)}
+.verify-note{display:flex;gap:9px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--muted);align-items:flex-start}
+.missionfoot{margin-top:auto;display:flex;flex-direction:column;gap:8px}
+.destroy{font-size:11.5px;color:var(--faint);display:flex;gap:7px;align-items:center}
+</style></head><body><div class="frame">
+  <div class="topbar">
+    <span class="crumbs"><b>C and Low-Level</b> › Finding memory bugs › <b>Lab</b></span>
+    <span class="chip accent">● Live lab · connected</span>
+    <span class="grow"></span>
+    <span class="chip credit">⚡ 1 lab credit</span>
+    <span class="timer">12:34</span>
+    <span style="font-size:12px;color:var(--faint)"><span class="kbd">Esc</span> back to lesson</span>
+  </div>
+
+  <div class="cockpit">
+    <div class="term">
+      <div class="termbar">
+        <span class="dot" style="background:#E06C5A"></span><span class="dot" style="background:#E0B24D"></span><span class="dot" style="background:#57BE7A"></span>
+        <span class="title">learner@lab-7f3a · ephemeral Linux · CYBERSKILLS lab plane</span>
+        <span class="chip plain" style="font-size:10.5px">destroyed on exit</span>
+      </div>
+      <div class="termbody">
+<div><span class="prompt">learner@lab-7f3a:~/hunt$</span> gcc -fsanitize=address,undefined -g hunt.c -o hunt</div>
+<div><span class="prompt">learner@lab-7f3a:~/hunt$</span> ./hunt inputs/ticket-001.txt</div>
+<div class="err">==4187==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x60200000eff4</div>
+<div class="err">==4187==READ of size 1 at 0x60200000eff4 thread T0</div>
+<div class="dim">    #0 0x10e9d2 in count_seats hunt.c:27</div>
+<div class="dim">    #1 0x10ea44 in main hunt.c:58</div>
+<div class="dim">    #2 0x7fff8 in start (+0x8a)</div>
+<div>&nbsp;</div>
+<div><span class="dim">0x60200000eff4 is located 4 bytes after 60-byte region [0x60200000efb0,0x60200000efec)</div>
+<div><span class="dim">allocated by thread T0 here:</span></div>
+<div class="dim">    #0 0x10d2a8 in malloc (+0x74)</div>
+<div class="dim">    #1 0x10e9b1 in count_seats hunt.c:19</div>
+<div>&nbsp;</div>
+<div><span class="prompt">learner@lab-7f3a:~/hunt$</span> <span style="border-right:7px solid #38BDF8">&nbsp;</span></div>
+      </div>
+    </div>
+
+    <div class="card mission">
+      <h2>Sanitizer Hunt</h2>
+      <p class="obj">Four bugs are planted in <span class="mono" style="font-size:12px">hunt.c</span>. Build with sanitizers, read every report at its three locations, fix, and leave the build clean.</p>
+      <div class="steps">
+        <div class="step done"><span class="mark">✓</span><div><p>Get the source and build with <span class="mono" style="font-size:12px">-fsanitize=address,undefined</span></p><p class="sub">verified — binary runs under ASan</p></div></div>
+        <div class="step now"><span class="mark">2</span><div><p>Classify the first report: bug type + the three locations</p><p class="sub">auto-checks when you run <span class="mono" style="font-size:11.5px">./verify classify</span></p></div></div>
+        <div class="step todo"><span class="mark">3</span><div><p>Fix the bug — the report must not come back</p></div></div>
+        <div class="step todo"><span class="mark">4</span><div><p>Re-run clean: exit 0, zero reports, hidden tests pass</p></div></div>
+      </div>
+      <div class="verify-note"><span>🛈</span><span>Checks run <b>inside your machine</b> against the final state — how you got there is your business. Hints are hidden in assessed mode.</span></div>
+      <div class="missionfoot">
+        <div style="display:flex;gap:8px">
+          <span class="btn primary" style="flex:1;justify-content:center">Run mission checks</span>
+          <span class="btn">Reset machine</span>
+        </div>
+        <p class="destroy">⚡ Real Linux on CYBERSKILLS cloud (GCP) · session-only · destroyed when you leave</p>
+      </div>
+    </div>
+  </div>
+</div></body></html>

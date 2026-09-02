@@ -1,0 +1,29 @@
+:root{
+  --bg:#F3F7FA; --surface:#FFFFFF; --surface2:#EBF1F6; --sunken:#E4ECF3;
+  --border:#D4DEE8; --border2:#B0C0D0; --text:#0E1C28; --body:#2A3C4C;
+  --muted:#586A7C; --faint:#687888; --accent:#0A6C9E; --accentfill:#38BDF8;
+  --onaccent:#06121C; --accentdim:rgba(56,189,248,.12); --accentborder:rgba(10,108,158,.28);
+  --accent2dim:rgba(10,108,158,.08); --accent2border:rgba(10,108,158,.4);
+  --amber:#A6480A; --amberdim:rgba(166,72,10,.1); --amberborder:rgba(166,72,10,.3);
+  --ok:#0A6C9E; --err:#B42318;
+  --shadow-card:0 1px 3px rgba(12,32,48,.06),0 8px 24px -12px rgba(12,32,48,.12);
+  --shadow-lift:0 2px 6px rgba(12,32,48,.08),0 16px 36px -16px rgba(12,32,48,.18);
+  --term-bg:#0B141C; --term-surface:#121E29; --term-text:#D7E5F0; --term-muted:#7E93A6;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--body);font-family:'Inter',system-ui,sans-serif;font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.frame{width:1240px;padding:28px 32px 32px}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+.serif{font-family:'Fraunces',Georgia,serif}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-card)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:600}
+.chip.accent{background:var(--accentdim);color:var(--accent);border:1px solid var(--accentborder)}
+.chip.amber{background:var(--amberdim);color:var(--amber);border:1px solid var(--amberborder)}
+.chip.plain{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:12px;font-weight:600;font-size:13.5px;border:1px solid var(--border);background:var(--surface);color:var(--body);cursor:pointer}
+.btn.primary{background:var(--accentfill);color:var(--onaccent);border-color:transparent}
+.btn.ghost{border-color:transparent;color:var(--muted)}
+.kbd{font-family:'JetBrains Mono',monospace;font-size:11px;padding:1px 6px;border:1px solid var(--border2);border-bottom-width:2px;border-radius:5px;background:var(--surface2);color:var(--muted)}
+.crumbs{font-size:12.5px;color:var(--faint)}
+.crumbs b{color:var(--muted);font-weight:600}
+.okmark{color:var(--ok);font-weight:700}
