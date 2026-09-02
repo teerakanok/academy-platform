@@ -3,6 +3,35 @@
 > Closed items only, with outcome + evidence + residual risk. Newest first.
 > Provider-neutral. See `active_plan.md` for open work.
 
+## 2026-09-03 - OTP ambiguity recovery and resident-key diagnostic prepared
+
+- Activated shared Identity source `60920c9cc08bae2befc22f5c8ddbce5f678fefe9`
+  with exact `5,000 ms` regular, `10,000 ms` OTP-start, and `15,000 ms`
+  Account Center outer deadlines. Post-dispatch transport uncertainty is now an
+  explicit recoverable `ambiguous` state: no automatic resend, bounded original-
+  code verification, one-time finalization, expiry/replay protection, and a
+  retained database constraint that also prevents an older runtime from
+  resending after rollback.
+- Activated code-only new/existing-user mail templates and a server-owned Account
+  Center return. Templates contain the one-time code but no confirmation URL,
+  backend host, token hash, product callback, or recipient. The two fresh
+  Turnstile stages and server-side GoTrue CAPTCHA gate remain intact.
+- Revoked the previously exposed single confirmation token once under the
+  independently reviewed serializable transaction. The token and matching
+  legacy fields are absent; user, identity, session, and refresh invariants were
+  unchanged. Compromised material was not restored.
+- Recorded bounded absence of durable client-assertion private-key custody at
+  `reports/reviews/academy-identity-client-assertion-custody-recovery-20260903.json`.
+  The active Worker still has the secret binding, but no export or working-key
+  conclusion is possible from metadata alone.
+- Prepared and independently reviewed the in-place resident-key diagnostic at
+  `eb99d9d58f2fe59a0998f2d5dc07842aca0b839d`. Controller and Worker tests pass
+  `25/25`; one attempted production transaction stopped before upload because
+  the Cloudflare Access operator session was unavailable. No candidate, traffic
+  change, Identity request, key rotation, or production-code deploy occurred.
+- Residual risk: client-assertion admission remains unclassified, so production
+  callback/session creation and the authenticated Academy playtest remain open.
+
 ## 2026-08-24 - Sole kill-switch designation and disabled rehearsal submitted locally
 
 - Bound Songpon Teerakanok as sole operator for disable decision, disabled-state verification,

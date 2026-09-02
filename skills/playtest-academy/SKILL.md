@@ -19,6 +19,10 @@ Before opening the product, establish:
 - who owns canary cleanup and when it must happen.
 - whether the owner is present for any real email/code step and the exact
   one-send retry boundary.
+- for a production Identity journey, whether the latest handoff proves Academy
+  client-assertion admission. A configured secret binding or vault item name is
+  not proof that the resident key imports, matches, signs, or is accepted. Stop
+  before a real send while that boundary is unclassified.
 
 Use an existing approved canary when one is reachable. Create a new canary only
 when the requested journey requires it and current authority covers creation and
@@ -44,7 +48,9 @@ controls and copy as a new learner:
    Account Center, prove authorization and OTP submission use distinct fresh
    bot challenges. The owner enters the identity and one-time code; do not read,
    type, screenshot, or echo either value. Do not initiate a real send while the
-   owner is absent.
+   owner is absent. The production email must be code-only: do not capture the
+   inbox, code, recipient, confirmation URL, backend host, or token-bearing link
+   as playtest evidence.
 3. Confirm the learner reaches an honest account state. Do not manufacture an
    enrollment unless the playtest authority and cleanup plan cover it.
 4. For an authorized enrolled canary, enter a course, consume one representative
@@ -55,7 +61,12 @@ controls and copy as a new learner:
 
 After a real send, correlate only sanitized request/provider categories and
 counts before allowing any retry. A browser success message alone does not prove
-provider acceptance or delivery.
+provider acceptance or delivery. A transport timeout or lost response after the
+provider request may be the explicit recoverable `ambiguous` state; it is not
+proof that no message was sent. Never resend an ambiguous challenge. Let the
+owner verify its original code once within the remaining TTL and attempt budget,
+then require one-time finalization; expiry, replay, or exhausted attempts stop
+the run.
 
 Observe user-visible copy, dead ends, focus, keyboard use, responsive geometry,
 console errors, failed requests, and unexpected cross-account data. Do not inspect

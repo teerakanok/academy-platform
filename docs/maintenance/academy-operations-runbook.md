@@ -1,6 +1,6 @@
 # Academy Operations Runbook
 
-Status date: `2026-09-02`
+Status date: `2026-09-03`
 
 ## 1. Before any production change
 
@@ -29,6 +29,9 @@ Use these read-only checks after deploy, rollback, or incident recovery:
 | private media checks | invalid/tampered access denied before R2 read |
 | identity callback path | exact callback path still reachable through Access gating rules |
 | Account Center | root and `/health` return `200`; active Identity revision matches the approved immutable release |
+| Identity request deadlines | regular `5,000 ms`, OTP start `10,000 ms`, Account Center outer `15,000 ms` |
+| ambiguous OTP dispatch | no automatic resend; the original challenge remains bounded by TTL/attempts and can finalize only once |
+| Academy client assertion | in-place import, registered fingerprint, local sign/verify, and Identity admission all pass; binding presence alone is insufficient |
 | direct OTP without CAPTCHA | exact pinned-image denial before provider invocation and user creation; never accept a generic `500` as proof |
 
 ## 3. Runtime rollback surfaces
@@ -152,6 +155,14 @@ Restore verification should prove:
 - Confirm shared Identity Control status and Academy callback/runtime config.
 - Split the trace into Academy authorization start, Account Center transaction,
   fresh OTP challenge, GoTrue admission, provider acceptance, and delivery.
+- A GoTrue start transport timeout or unreadable successful response after the
+  request may be `ambiguous`, not a definitive send failure. Do not resend. Keep
+  the same challenge eligible for one owner-entered verification within its TTL
+  and bounded attempt budget; valid verification finalizes it once, while
+  expiry, replay, or exhausted attempts fail closed.
+- Treat HTTP/provider rejection with an observed response as definitive. Do not
+  reclassify explicit `4xx`/`5xx`, CAPTCHA failure, rate limiting, or blocked
+  policy as ambiguous.
 - Observe only status/category/count fields. Do not print recipient, challenge,
   one-time code, cookies, callback query, provider payload, or secret values.
 - Do not ask the owner to retry until Account Center health, exact active
@@ -160,6 +171,44 @@ Restore verification should prove:
 - Permit exactly one real send while the owner is present, then classify the
   provider outcome before any further retry.
 - Do not create accounts by email-join or local bypass on production.
+
+### 5.6 Academy client assertion unavailable
+
+Use this branch when OTP verification is valid but Academy callback/session
+creation reports that Identity Control is not connected.
+
+1. Stop the flow. Do not resend, reuse the code, rotate the key, or substitute a
+   new credential.
+2. Confirm only the Worker binding name/type and current deployment/version.
+   Never print raw Wrangler deployment/version output; project it locally to the
+   exact allowlisted identifiers, counts, booleans, and hashes required by the
+   claim.
+3. Read
+   [`../../reports/reviews/academy-identity-client-assertion-custody-recovery-20260903.json`](../../reports/reviews/academy-identity-client-assertion-custody-recovery-20260903.json).
+   Its result is bounded custody absence, not proof that the resident binding is
+   broken.
+4. With one current Cloudflare Access operator session, run only the independently
+   reviewed candidate diagnostic from source
+   `eb99d9d58f2fe59a0998f2d5dc07842aca0b839d`. It must rebaseline current
+   deployment/version/config, inherit the existing secret without export, add a
+   candidate-only one-time nonce, create an exact `100/0` split, make one
+   nonce-bound version-override request, and restore current-only traffic on
+   every outcome or signal.
+5. Accept only its fixed classification. On import/fingerprint/sign/admission
+   failure, design the smallest correction for that exact stage. A successful
+   `code_not_found` admission classification proves the existing assertion was
+   authenticated and the synthetic code was rejected; it does not create a
+   session or send mail.
+6. Re-prove canonical Access `302`, raw Worker health, exact active deployment,
+   current-only traffic, and candidate detachment before proceeding. The current
+   Cloudflare API cannot delete one immutable inactive Worker Version; retain and
+   inventory the reviewed owned candidate as inactive/non-selectable rather than
+   claiming physical deletion.
+
+Current incident state: the reviewed diagnostic controller and Worker tests pass
+`25/25`, but the only production attempt stopped before candidate upload or
+Identity request because the Access operator session was unavailable. Production
+remained unchanged and no active-key classification exists yet.
 
 ## 6. Minimum post-incident record
 

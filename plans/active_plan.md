@@ -2,24 +2,42 @@
 
 > Open work only. Move closed items to `completed_log.md` with evidence.
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
-> **Last updated:** 2026-09-02
+> **Last updated:** 2026-09-03
 
-**Current production-readiness checkpoint (2026-09-02):** Academy Worker
-deployment `20f58559-daa8-4b77-81f7-7885686c1a14` serves version
-`bd4aea53-9137-4d49-a5f4-3a74be959736` at `100%` with tag
-`release-646206ed7cdd` and a `500 ms` CPU limit. The shared Identity release
-`8db80f2c98d7d3adfcda9f8a738c810688615666` is active with two distinct
-Turnstile proofs, server-enforced GoTrue CAPTCHA, and the approved Google
-Workspace relay. Account Center root/health and the raw Academy Worker return
-`200`; canonical Academy root, courses, and callback return the expected
-Cloudflare Access `302`. A controlled direct OTP request without CAPTCHA is
-rejected before provider invocation and user creation. The remaining
-customer-critical gate is one owner-present canary walkthrough: send one code,
-complete callback, open entitled `setup-and-environment`, prove progress after
-reload at desktop and `412x915`, sign out, and independently verify cleanup of
-only session-created progress. No real post-activation code request has been
-sent while the owner is away. Historical readiness statements below remain
-dated evidence and do not override this checkpoint.
+**Current production-readiness checkpoint (2026-09-03):** The last directly
+revalidated Academy Worker baseline remains deployment
+`20f58559-daa8-4b77-81f7-7885686c1a14`, version
+`bd4aea53-9137-4d49-a5f4-3a74be959736` at `100%`, tag
+`release-646206ed7cdd`, with a `500 ms` CPU limit. Shared Identity release
+`60920c9cc08bae2befc22f5c8ddbce5f678fefe9` is active with exact GoTrue
+timeouts `5,000 ms` for regular calls and `10,000 ms` for OTP start, below the
+Account Center outer deadline of `15,000 ms`. Its retained migration records a
+post-dispatch timeout or response loss as recoverable `ambiguous`, forbids an
+automatic resend, and permits the original code to be verified once within the
+bounded challenge lifetime. Code-only mail templates, a server-owned Account
+Center return, two distinct fresh Turnstile proofs, server-enforced GoTrue
+CAPTCHA, and the approved relay remain active.
+
+Academy is **not production-ready**. The latest owner-present canary reached
+code verification, then stopped before callback/session creation because the
+Academy client assertion could not be admitted by Identity Control. The Worker
+still has the named private-JWK secret binding, but durable off-host custody was
+not recovered and the resident value has not been classified as matching,
+malformed, or rejected. Binding presence is not proof of a working key. The
+reviewed diagnostic at source `eb99d9d58f2fe59a0998f2d5dc07842aca0b839d`
+can classify import, registered public fingerprint, local signing, and Identity
+admission without exporting the key. Its only attempted run stopped before
+candidate upload or provider request because the Cloudflare Access operator
+session was unavailable; production deployment and traffic remained unchanged.
+
+Next gate: when the owner is present, renew exactly one bounded Cloudflare
+Access session and run the reviewed diagnostic once. Do not rotate the key or
+send another OTP before that classification. After the smallest evidence-backed
+correction and production postchecks, complete the canary walkthrough through
+callback, dashboard/catalog, entitled `setup-and-environment`, progress reload,
+desktop and `412x915`, sign-out, and independent cleanup of only
+session-created progress. Historical readiness statements below remain dated
+evidence and do not override this checkpoint.
 
 **Sole kill-switch operator evidence submitted for Identity review (2026-08-24):**
 Academy now has a source-bound public sole-operator designation for Songpon Teerakanok,

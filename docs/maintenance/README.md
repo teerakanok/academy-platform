@@ -10,7 +10,9 @@ backup verification, restore rehearsal, rollback, or secret-handling change.
 1. [`academy-system-inventory.md`](./academy-system-inventory.md)
 2. [`academy-secret-registry.md`](./academy-secret-registry.md)
 3. [`academy-operations-runbook.md`](./academy-operations-runbook.md)
-4. Supporting boundary docs:
+4. Current production checkpoint:
+   [`../../reports/sessions/academy-production-readiness-2026-09-03.md`](../../reports/sessions/academy-production-readiness-2026-09-03.md)
+5. Supporting boundary docs:
    - [`../academy-data-api.md`](../academy-data-api.md)
    - [`../../academy-web/docs/private-media-delivery.md`](../../academy-web/docs/private-media-delivery.md)
    - [`../../academy-web/docs/academy-retention-scheduler.md`](../../academy-web/docs/academy-retention-scheduler.md)

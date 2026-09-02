@@ -4,31 +4,38 @@
 > หรือหลักฐานจาก external system. งานที่ทำและตรวจจบแล้วไม่อยู่ในรายการนี้.
 > สถานะ code และ release gates ล่าสุดอยู่ใน `plans/active_plan.md`.
 
-## 1) Complete The Authenticated Production Journey And Bootstrap The First Owner
+## 1) Classify Academy Client Assertion Before Any New OTP
 
 Academy runtime data boundary ทำงานแล้วโดยใช้ dedicated Academy credential;
 Worker ไม่มีและห้ามเพิ่ม shared Pool A `SUPABASE_SERVICE_ROLE_KEY`.
 
-- signed Identity authority ยืนยันว่า Academy client เปิดใช้งานและ result signer active;
-  Academy Worker version `bd4aea53-9137-4d49-a5f4-3a74be959736` รับ traffic `100%`
-  และผูก production Identity bindings ครบ.
-- shared Identity release `8db80f2c98d7d3adfcda9f8a738c810688615666` active แล้ว โดย
-  Account Center บังคับ Turnstile คนละ challenge สำหรับ authorization และการส่งรหัส,
-  GoTrue `v2.186.0` บังคับ CAPTCHA ฝั่ง server และ Google Workspace relay ผ่าน
-  TLS/envelope admission โดยไม่ส่งข้อความทดสอบ. Direct request ที่ไม่มี challenge ถูก
-  ปฏิเสธก่อนเรียก mail provider และไม่สร้าง user.
-- full authenticated journey ยังต้องใช้ browser session ที่ผ่าน Cloudflare Access อยู่แล้ว
-  และ existing disposable canary ที่ owner อนุมัติ ห้ามส่ง credential value ในเอกสารหรือ
-  chat. ยังไม่มีการส่งรหัสหลัง activation เพราะ owner ไม่อยู่หน้าจอ; callback result,
-  enrollment, lesson progress, assessment, completion และ sign-out จึงยังไม่ผ่าน
-  production playtest.
-- next action มีเพียงหนึ่งครั้ง: เมื่อ owner อยู่หน้าจอ ให้เปิด canonical Account Center,
-  กรอก identity ใน browser, ทำ fresh Turnstile และกดส่งรหัสครั้งเดียว แล้วตรวจ provider
-  outcome แบบ sanitized ก่อนเดิน journey ต่อ. ห้าม agent อ่านหรือกรอก email/รหัสแทน.
-- หลัง full authenticated journey ผ่าน founder ต้อง sign in หนึ่งครั้งด้วย identity จริง เพื่อสร้าง
-  `academy.users` จาก `(issuer, subject)`.
-- จากนั้นรัน `scripts/manage-staff-role.mjs` แบบ dry-run แล้ว apply ตาม
-  staff-bootstrap contract. ห้ามใช้ email หรือ UUID ที่สร้างขึ้นแทน identity.
+- Academy Worker deployment `20f58559-daa8-4b77-81f7-7885686c1a14` / version
+  `bd4aea53-9137-4d49-a5f4-3a74be959736` ยังเป็น last revalidated baseline ที่
+  `100%`. Shared Identity release
+  `60920c9cc08bae2befc22f5c8ddbce5f678fefe9` เปิด OTP ambiguity recovery,
+  code-only mail template, two fresh Turnstile stages และ server-side CAPTCHA แล้ว.
+- owner-present canary ล่าสุดไปถึง code verification แต่ callback/session ไม่ถูกสร้าง
+  เพราะ Academy client assertion ยังไม่ผ่าน Identity admission. รหัสไม่ถูก consume ใน
+  flow นั้น และไม่มีสิทธิ์ resend/reuse ต่อจากหลักฐานนี้.
+- Cloudflare Worker ยังมี binding ชื่อ `IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK` แบบ
+  `secret_text` แต่ binding presence ไม่พิสูจน์ว่า key ใช้งานได้. Durable Bitwarden
+  inventory item ชื่อ `Academy - Identity Client Assertion Private JWK` มีอยู่แต่ owner
+  ตรวจแล้วไม่พบ JWK value; ห้ามใส่ value ใน chat/doc/screenshot.
+- next action เดียวเมื่อ owner พร้อม: ต่ออายุ Cloudflare Access operator session หนึ่งครั้ง
+  แล้วให้ controller รัน independently reviewed in-place diagnostic หนึ่งครั้ง. ห้ามส่ง OTP,
+  rotate key, หรือสร้าง credential ใหม่ก่อน diagnostic แยกผล import, public fingerprint,
+  local sign/verify และ Identity admission ได้.
+
+หลัง diagnostic และ smallest evidence-backed fix ผ่าน production postchecks แล้ว จึงกลับมา
+ทำ authenticated journey ด้วย existing approved canary: ส่งรหัสหนึ่งครั้ง, callback,
+dashboard/catalog, entitled `setup-and-environment`, progress หลัง reload, viewport
+`412x915`, sign-out และ independent cleanup เฉพาะ progress ที่ session สร้าง. Owner กรอก
+identity/รหัสใน browser เอง; agent ห้ามอ่านหรือกรอกแทน.
+
+เมื่อ full journey ผ่าน founder ต้อง sign in หนึ่งครั้งด้วย identity จริงเพื่อสร้าง
+`academy.users` จาก `(issuer, subject)`. จากนั้นรัน `scripts/manage-staff-role.mjs` แบบ
+dry-run แล้ว apply ตาม staff-bootstrap contract; ห้ามใช้ email หรือ UUID ที่สร้างขึ้นแทน
+identity.
 
 **หลักฐานปัจจุบัน:** dedicated data API, least-privilege `academy_runtime` และ Worker
 runtime deployment อยู่ใน

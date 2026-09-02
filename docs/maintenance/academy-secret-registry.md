@@ -1,6 +1,6 @@
 # Academy Secret Registry
 
-Status date: `2026-09-01`
+Status date: `2026-09-03`
 
 This registry records what must be kept, where it belongs, and the stable record
 name when durable vault storage applies. It must never store secret values.
@@ -24,7 +24,7 @@ name when durable vault storage applies. It must never store secret values.
 | retention DB authenticator password | retention PostgREST login | Bitwarden + host-local env | `Academy - Retention API DB Authenticator` | separate from runtime authenticator |
 | `MEDIA_SIGNING_SECRET` | Academy web Worker media grant signing | Bitwarden + Cloudflare Worker secret | `Academy - Media Signing Secret` | minimum 32 bytes |
 | `RATE_LIMIT_KEY_SECRET` | Academy web Worker edge abuse marker | Bitwarden + Cloudflare Worker secret | `Academy - Rate Limit Key Secret` | rotate on abuse marker compromise |
-| `IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK` | Academy identity runtime client assertion | Bitwarden only + staged protected input during deployment | `Academy - Identity Client Assertion Private JWK` | do not put in plain env files |
+| `IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK` | Academy identity runtime client assertion | Bitwarden only + staged protected input during deployment | `Academy - Identity Client Assertion Private JWK` | inventory item exists, but owner inspection found no private JWK value; do not put in plain env files |
 | `IDENTITY_RESULT_KEY_SET_DOCUMENT` | Academy identity runtime result verification | protected public runtime config inventory; optionally record provenance in Bitwarden or controlled doc store | `Academy - Identity Result Key Set Document` | deployment input and config inventory item, but not an owner-held secret value |
 | Cloudflare OAuth / Wrangler operator session | deployment and production read/write tooling | operator runtime session on the active machine; recovery notes may reference Bitwarden records for underlying operator accounts, but the OAuth session itself is not a durable Bitwarden secret | `Academy - Cloudflare Operator Access` | runtime session only; re-auth instead of trying to restore a session blob |
 | Pool A superuser / privileged DB access | migrations, restore, privileged SQL | owner vault only | `Pool A - Privileged DB Access` | shared infra, cross-product blast radius |
@@ -50,6 +50,28 @@ These are not secrets and may be written in docs:
 - Shared credentials are marked clearly as shared, not Academy-only.
 - Records distinguish runtime secret, operator credential, and recovery secret.
 - Records for rotated values keep rotation date and replacement procedure.
+
+## Current client-assertion custody status
+
+As of `2026-09-03`, the no-secret Bitwarden inventory name is exactly
+`Academy - Identity Client Assertion Private JWK`. Owner inspection found the
+item but no private JWK value. The application store remains encrypted and was
+not decrypted by an agent; attachment/custom-field absence is therefore not
+claimed as exhaustive.
+
+The bounded filename, fingerprint, local history, approved backup, Pool A, and
+cloud inventory found zero recoverable private-key candidates. Cloudflare still
+reports one active Worker `secret_text` binding with the expected binding name,
+but the provider does not expose its value through a supported interface.
+Binding presence does not prove a usable key. Full evidence and explicit search
+limits are recorded in
+[`../../reports/reviews/academy-identity-client-assertion-custody-recovery-20260903.json`](../../reports/reviews/academy-identity-client-assertion-custody-recovery-20260903.json).
+
+Do not rotate on custody absence alone. First run the independently reviewed
+resident-key diagnostic, which uses the bound value in place and emits only a
+fixed import/fingerprint/sign/admission classification. Rotation requires proof
+that the resident key is unavailable, malformed, mismatched, or rejected, plus
+the applicable live-operation authority and independent review.
 
 ## Rotation policy
 

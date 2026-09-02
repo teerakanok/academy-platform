@@ -1,6 +1,6 @@
 # Academy System Inventory
 
-Status date: `2026-09-02`
+Status date: `2026-09-03`
 
 ## Current production snapshot
 
@@ -11,7 +11,8 @@ Status date: `2026-09-02`
 | Active deployment | `20f58559-daa8-4b77-81f7-7885686c1a14` | read-only deployment inventory; created `2026-09-02T02:30:39.823497Z` |
 | Active version | `bd4aea53-9137-4d49-a5f4-3a74be959736` | `100%` traffic; version `28`; tag `release-646206ed7cdd`; CPU limit `500 ms` |
 | Residue check | `PASS` | 10 versions inventoried; 9 non-serving versions retained because rollback ownership is not yet unambiguous |
-| Shared Identity runtime | `8db80f2c98d7d3adfcda9f8a738c810688615666` | Account Center and control API immutable artifacts active; exact GoTrue `v2.186.0` image healthy with server-enforced CAPTCHA and Google Workspace relay |
+| Shared Identity runtime | `60920c9cc08bae2befc22f5c8ddbce5f678fefe9` | Account Center/control API immutable release active; exact GoTrue `v2.186.0`, OTP ambiguity recovery, code-only templates, server-enforced CAPTCHA, and Google Workspace relay |
+| Academy client-assertion diagnostic | source `eb99d9d58f2fe59a0998f2d5dc07842aca0b839d`; not deployed | independently reviewed candidate-only diagnostic; the only attempted run stopped before upload because the Access operator session was unavailable |
 
 ## Managed components
 
@@ -65,6 +66,16 @@ Status date: `2026-09-02`
   must not invent, merge, or repair learner identity independently.
 - Production sign-in uses two distinct, fresh Turnstile challenges. The second
   proof is call-local to the OTP request and is never persisted or reused.
+- Shared Identity uses exact request deadlines: `5,000 ms` for ordinary GoTrue
+  requests, `10,000 ms` for OTP start, and `15,000 ms` at the Account Center
+  boundary. A post-dispatch transport timeout or lost response is retained as
+  recoverable `ambiguous`; it must not trigger an automatic resend. The original
+  code can be verified once within the challenge TTL, subject to bounded attempts,
+  expiry, and replay refusal.
+- Academy's identity client-assertion Worker binding exists as `secret_text`, but
+  provider metadata cannot prove that its resident value imports, matches the
+  registered public fingerprint, signs correctly, or is admitted by Identity.
+  Do not call this binding healthy until the reviewed in-place diagnostic passes.
 - For pinned GoTrue `v2.186.0`, a direct OTP request with no CAPTCHA proof fails
   as exact HTTP `500` / `unexpected_failure` before provider invocation. Treat
   only that exact image-bound response, with user count unchanged, as the
@@ -76,8 +87,14 @@ Status date: `2026-09-02`
   backup system is not yet recorded in this repo.
 - End-to-end restore of Academy R2 media objects from a product-specific backup
   copy is not yet recorded here.
-- Identity dependency recovery still depends on the shared Identity Control
-  maintenance guide and owner-held secrets inventory.
+- Durable off-host custody for `IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK` has not
+  been recovered. The bounded custody receipt is
+  `reports/reviews/academy-identity-client-assertion-custody-recovery-20260903.json`;
+  the only provider-resident candidate is not exportable through a supported
+  interface.
+- Client-assertion admission remains unclassified. Renew one bounded Cloudflare
+  Access operator session, then run the independently reviewed candidate-only
+  diagnostic exactly once before any rotation or OTP retry.
 - The authenticated Academy callback, entitled lesson, progress persistence,
   responsive `412x915` view, sign-out, and session-owned progress cleanup still
   require one owner-present production canary walkthrough.
