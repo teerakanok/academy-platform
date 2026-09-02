@@ -1,6 +1,6 @@
 # Browser State Requires Allowlist Extraction
 
-- Date: 2026-09-01
+- Date: 2026-09-01; tightened 2026-09-02 after a checkout-state recurrence.
 - Scope: Academy production playtests and provider-dashboard diagnostics.
 - Root cause: A full browser accessibility tree was treated as ordinary UI text.
   During an authentication redirect it included a credential-bearing URL, and a
@@ -14,6 +14,10 @@
   browser state inside the control runtime and emitting only an explicit allowlist
   of claim-required fields. Query strings, address-bar lines, headers, cookies,
   identity fields, location/network metadata, and opaque values are excluded.
+  Billing evidence is further constrained to product, price, terms, selected
+  add-on state, and payment-method presence as a boolean; card brand, masked
+  digits, billing contact/address, tax identifiers, and payment labels are never
+  emitted.
 - Verification: Review the skill's Browser evidence safety checklist and confirm
   it requires allowlist extraction before output. A deterministic repository hook
   cannot intercept third-party browser-control transcripts, so the reusable skill

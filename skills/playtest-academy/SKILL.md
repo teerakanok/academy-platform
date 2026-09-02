@@ -68,6 +68,10 @@ Before emitting browser state into a tool transcript or evidence record:
    location/network metadata, and opaque values before output.
 4. Return booleans, counts, or redacted comparisons when a raw identifier is not
    necessary. Never rely on a broad denylist as the primary control.
+5. For billing or checkout screens, allowlist only the product, base amount,
+   recurring or usage terms, whether an add-on is selected, and a boolean that a
+   payment method is present. Never emit card brand, masked digits, billing
+   contact or address, tax identifier, or payment-method labels.
 
 If the first inspection unexpectedly reveals credential-bearing state, stop broad
 output immediately, continue only with allowlist extraction, and do not persist or
