@@ -17,6 +17,8 @@ Before opening the product, establish:
 - the journey boundary (public-only, sign-in, enrollment, lesson, assessment,
   completion, or certificate);
 - who owns canary cleanup and when it must happen.
+- whether the owner is present for any real email/code step and the exact
+  one-send retry boundary.
 
 Use an existing approved canary when one is reachable. Create a new canary only
 when the requested journey requires it and current authority covers creation and
@@ -28,13 +30,21 @@ screenshots, traces, reports, or the repository.
 
 ## Walkthrough
 
-Use a clean browser context with no inherited Academy state. Start from the
-canonical public entry point without reading implementation details that would
-teach the expected UI. Follow only visible controls and copy as a new learner:
+Use a clean browser context with no inherited Academy state. When production
+Cloudflare Access requires an explicitly approved existing browser session,
+reuse only that Access session and treat any Academy application state as
+unknown until visible UI proves otherwise; never inspect browser storage or
+cookies. Start from the canonical public entry point without reading
+implementation details that would teach the expected UI. Follow only visible
+controls and copy as a new learner:
 
 1. Confirm the public entry point, course discovery, language, and responsive
    layout at one desktop and one mobile viewport.
-2. Follow sign-in through the real identity boundary when it is in scope.
+2. Follow sign-in through the real identity boundary when it is in scope. For
+   Account Center, prove authorization and OTP submission use distinct fresh
+   bot challenges. The owner enters the identity and one-time code; do not read,
+   type, screenshot, or echo either value. Do not initiate a real send while the
+   owner is absent.
 3. Confirm the learner reaches an honest account state. Do not manufacture an
    enrollment unless the playtest authority and cleanup plan cover it.
 4. For an authorized enrolled canary, enter a course, consume one representative
@@ -42,6 +52,10 @@ teach the expected UI. Follow only visible controls and copy as a new learner:
    progress is durable and belongs only to that account.
 5. Exercise the visible recovery or exit path relevant to the journey, such as
    sign-out, retry, resume, or navigation back to the course.
+
+After a real send, correlate only sanitized request/provider categories and
+counts before allowing any retry. A browser success message alone does not prove
+provider acceptance or delivery.
 
 Observe user-visible copy, dead ends, focus, keyboard use, responsive geometry,
 console errors, failed requests, and unexpected cross-account data. Do not inspect

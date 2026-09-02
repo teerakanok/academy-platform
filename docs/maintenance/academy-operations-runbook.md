@@ -1,6 +1,6 @@
 # Academy Operations Runbook
 
-Status date: `2026-09-01`
+Status date: `2026-09-02`
 
 ## 1. Before any production change
 
@@ -28,6 +28,8 @@ Use these read-only checks after deploy, rollback, or incident recovery:
 | retention route | retention API and cron worker still isolated from runtime Worker |
 | private media checks | invalid/tampered access denied before R2 read |
 | identity callback path | exact callback path still reachable through Access gating rules |
+| Account Center | root and `/health` return `200`; active Identity revision matches the approved immutable release |
+| direct OTP without CAPTCHA | exact pinned-image denial before provider invocation and user creation; never accept a generic `500` as proof |
 
 ## 3. Runtime rollback surfaces
 
@@ -113,7 +115,10 @@ Restore verification should prove:
 1. callback URI remains `https://academy.cyberskills.co.th/auth/callback`;
 2. result audience remains `https://academy.cyberskills.co.th`;
 3. client assertion input and result key set match the approved identity contract;
-4. Academy still resolves learner identity by stable `(issuer, subject)`.
+4. Academy still resolves learner identity by stable `(issuer, subject)`;
+5. authorization and OTP submission require two distinct fresh Turnstile proofs;
+6. OTP relay sender remains the approved root-domain sender and the protected
+   CAPTCHA secret remains only in canonical root-owned custody.
 
 ## 5. Incident categories
 
@@ -145,6 +150,15 @@ Restore verification should prove:
 ### 5.5 Identity sign-in broken
 
 - Confirm shared Identity Control status and Academy callback/runtime config.
+- Split the trace into Academy authorization start, Account Center transaction,
+  fresh OTP challenge, GoTrue admission, provider acceptance, and delivery.
+- Observe only status/category/count fields. Do not print recipient, challenge,
+  one-time code, cookies, callback query, provider payload, or secret values.
+- Do not ask the owner to retry until Account Center health, exact active
+  revision, SMTP TLS/envelope admission, server-side CAPTCHA enforcement, and
+  direct no-CAPTCHA rejection all pass.
+- Permit exactly one real send while the owner is present, then classify the
+  provider outcome before any further retry.
 - Do not create accounts by email-join or local bypass on production.
 
 ## 6. Minimum post-incident record

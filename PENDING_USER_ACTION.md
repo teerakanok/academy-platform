@@ -10,12 +10,21 @@ Academy runtime data boundary ทำงานแล้วโดยใช้ dedi
 Worker ไม่มีและห้ามเพิ่ม shared Pool A `SUPABASE_SERVICE_ROLE_KEY`.
 
 - signed Identity authority ยืนยันว่า Academy client เปิดใช้งานและ result signer active;
-  Worker version ปัจจุบันรับ traffic `100%`, ผูก production Identity bindings ครบ และ
-  หน้า sign-in แสดง Account Center handoff แล้ว.
+  Academy Worker version `bd4aea53-9137-4d49-a5f4-3a74be959736` รับ traffic `100%`
+  และผูก production Identity bindings ครบ.
+- shared Identity release `8db80f2c98d7d3adfcda9f8a738c810688615666` active แล้ว โดย
+  Account Center บังคับ Turnstile คนละ challenge สำหรับ authorization และการส่งรหัส,
+  GoTrue `v2.186.0` บังคับ CAPTCHA ฝั่ง server และ Google Workspace relay ผ่าน
+  TLS/envelope admission โดยไม่ส่งข้อความทดสอบ. Direct request ที่ไม่มี challenge ถูก
+  ปฏิเสธก่อนเรียก mail provider และไม่สร้าง user.
 - full authenticated journey ยังต้องใช้ browser session ที่ผ่าน Cloudflare Access อยู่แล้ว
   และ existing disposable canary ที่ owner อนุมัติ ห้ามส่ง credential value ในเอกสารหรือ
-  chat. รอบ playtest ล่าสุดหยุดก่อน submit handoff จึงยังไม่ยืนยัน callback result,
-  enrollment, lesson progress, assessment, completion หรือ sign-out บน production.
+  chat. ยังไม่มีการส่งรหัสหลัง activation เพราะ owner ไม่อยู่หน้าจอ; callback result,
+  enrollment, lesson progress, assessment, completion และ sign-out จึงยังไม่ผ่าน
+  production playtest.
+- next action มีเพียงหนึ่งครั้ง: เมื่อ owner อยู่หน้าจอ ให้เปิด canonical Account Center,
+  กรอก identity ใน browser, ทำ fresh Turnstile และกดส่งรหัสครั้งเดียว แล้วตรวจ provider
+  outcome แบบ sanitized ก่อนเดิน journey ต่อ. ห้าม agent อ่านหรือกรอก email/รหัสแทน.
 - หลัง full authenticated journey ผ่าน founder ต้อง sign in หนึ่งครั้งด้วย identity จริง เพื่อสร้าง
   `academy.users` จาก `(issuer, subject)`.
 - จากนั้นรัน `scripts/manage-staff-role.mjs` แบบ dry-run แล้ว apply ตาม

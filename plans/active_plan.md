@@ -2,7 +2,24 @@
 
 > Open work only. Move closed items to `completed_log.md` with evidence.
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
-> **Last updated:** 2026-08-23
+> **Last updated:** 2026-09-02
+
+**Current production-readiness checkpoint (2026-09-02):** Academy Worker
+deployment `20f58559-daa8-4b77-81f7-7885686c1a14` serves version
+`bd4aea53-9137-4d49-a5f4-3a74be959736` at `100%` with tag
+`release-646206ed7cdd` and a `500 ms` CPU limit. The shared Identity release
+`8db80f2c98d7d3adfcda9f8a738c810688615666` is active with two distinct
+Turnstile proofs, server-enforced GoTrue CAPTCHA, and the approved Google
+Workspace relay. Account Center root/health and the raw Academy Worker return
+`200`; canonical Academy root, courses, and callback return the expected
+Cloudflare Access `302`. A controlled direct OTP request without CAPTCHA is
+rejected before provider invocation and user creation. The remaining
+customer-critical gate is one owner-present canary walkthrough: send one code,
+complete callback, open entitled `setup-and-environment`, prove progress after
+reload at desktop and `412x915`, sign out, and independently verify cleanup of
+only session-created progress. No real post-activation code request has been
+sent while the owner is away. Historical readiness statements below remain
+dated evidence and do not override this checkpoint.
 
 **Sole kill-switch operator evidence submitted for Identity review (2026-08-24):**
 Academy now has a source-bound public sole-operator designation for Songpon Teerakanok,

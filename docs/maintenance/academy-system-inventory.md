@@ -1,6 +1,6 @@
 # Academy System Inventory
 
-Status date: `2026-09-01`
+Status date: `2026-09-02`
 
 ## Current production snapshot
 
@@ -8,9 +8,10 @@ Status date: `2026-09-01`
 | --- | --- | --- |
 | Canonical domain | `https://academy.cyberskills.co.th` | behind Cloudflare Access; unauthenticated requests return Access gate `302` |
 | Raw worker endpoint | `https://cyberskills-academy.songpon-te.workers.dev` | reachable; current read-only probe returned `200` |
-| Active deployment | `a8bfde71-9b63-4d8f-934c-b5f7eee9c6a9` | read-only deployment inventory; created `2026-09-01T02:04:33.709308Z` |
-| Active version | `81f0abca-25ab-4d30-bd51-87702718b039` | `100%` traffic; version `25`; tag `release-4c7361cd8751` |
+| Active deployment | `20f58559-daa8-4b77-81f7-7885686c1a14` | read-only deployment inventory; created `2026-09-02T02:30:39.823497Z` |
+| Active version | `bd4aea53-9137-4d49-a5f4-3a74be959736` | `100%` traffic; version `28`; tag `release-646206ed7cdd`; CPU limit `500 ms` |
 | Residue check | `PASS` | 10 versions inventoried; 9 non-serving versions retained because rollback ownership is not yet unambiguous |
+| Shared Identity runtime | `8db80f2c98d7d3adfcda9f8a738c810688615666` | Account Center and control API immutable artifacts active; exact GoTrue `v2.186.0` image healthy with server-enforced CAPTCHA and Google Workspace relay |
 
 ## Managed components
 
@@ -62,6 +63,12 @@ Status date: `2026-09-01`
   public `ASSETS`.
 - Identity runtime is coupled to the shared Identity Control contract; Academy
   must not invent, merge, or repair learner identity independently.
+- Production sign-in uses two distinct, fresh Turnstile challenges. The second
+  proof is call-local to the OTP request and is never persisted or reused.
+- For pinned GoTrue `v2.186.0`, a direct OTP request with no CAPTCHA proof fails
+  as exact HTTP `500` / `unexpected_failure` before provider invocation. Treat
+  only that exact image-bound response, with user count unchanged, as the
+  expected denial; other `500` responses are incidents.
 
 ## Known gaps still requiring future rehearsal
 
@@ -71,3 +78,6 @@ Status date: `2026-09-01`
   copy is not yet recorded here.
 - Identity dependency recovery still depends on the shared Identity Control
   maintenance guide and owner-held secrets inventory.
+- The authenticated Academy callback, entitled lesson, progress persistence,
+  responsive `412x915` view, sign-out, and session-owned progress cleanup still
+  require one owner-present production canary walkthrough.

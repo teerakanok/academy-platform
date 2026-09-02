@@ -69,8 +69,11 @@ cd products/cyberskills/academy-platform/academy-web
   https://cyberskills-academy.songpon-te.workers.dev
   production sign-in แสดง Account Center handoff แล้ว และ canonical domain
   `https://academy.cyberskills.co.th` อยู่หลัง Cloudflare Access. ห้ามใช้อีเมลสมมติหรือ
-  ขอรหัสใหม่บน production; full journey ต้องใช้ existing Access session และ canary ที่
-  owner อนุมัติไว้แล้ว.
+  ขอรหัสซ้ำบน production; full journey ต้องใช้ existing Access session และ canary ที่
+  owner อนุมัติไว้แล้ว. Account Center ใช้ Turnstile คนละ challenge สำหรับเริ่ม
+  authorization และส่งรหัส ห้าม reuse challenge เดิม. ให้ owner กรอก email และรหัสใน
+  browser เอง; ส่งรหัสครั้งเดียวเมื่อ owner อยู่หน้าจอ แล้วหยุดตรวจ provider outcome ก่อน
+  retry ใดๆ.
   production deploy/rollback ต้องทำตาม `docs/maintenance/academy-operations-runbook.md`
   และใช้ pinned immutable release helper เท่านั้น; `npm run deploy:cf` ไม่ใช่ production
   operator path.
