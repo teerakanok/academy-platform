@@ -191,21 +191,21 @@
       "id": "cp-1",
       "prompt": "DDR5-6400 has a clock of 3200 MHz and CL46. What is the first-word latency?",
       "choices": {
-        "A": "3.2 ns",
+        "A": "3.2 ns, the clock period",
         "B": "46 ns",
-        "C": "14.4 ns — 46 cycles at 3200 MHz",
+        "C": "14.4 ns",
         "D": "7.2 ns"
       },
       "correct": [
         "C"
       ],
-      "explanation": "CL divided by the clock in MHz, times 1000. The data rate 6400 MT/s is twice the clock because DDR transfers on both clock edges."
+      "explanation": "CL divided by the clock in MHz, times 1000. The data rate 6400 MT/s is twice the clock because DDR transfers on both clock edges. Here that is 46 cycles at 3200 MHz."
     },
     {
       "id": "cp-2",
       "prompt": "DDR4 modules commonly carry CL16-22 and DDR5 modules CL32-46. Has memory latency roughly doubled?",
       "choices": {
-        "A": "Yes, but bandwidth compensates",
+        "A": "Yes, but the extra bandwidth compensates for it",
         "B": "It cannot be determined",
         "C": "No — the cycles are about half as long",
         "D": "Yes, DDR5 is slower"
@@ -219,9 +219,9 @@
       "id": "cp-3",
       "prompt": "Peak transfer rate rose roughly 22x from DDR-400 to DDR5-8800 while latency stayed near 14 ns. Which code benefits most from the newer generation?",
       "choices": {
-        "A": "Code dominated by one cache miss on the critical path",
+        "A": "Code dominated by a lone cache miss on the critical path",
         "B": "All code benefits equally",
-        "C": "Streaming through large arrays and serving many independent requests at once",
+        "C": "Streaming large arrays with many independent requests",
         "D": "A linked-list traversal"
       },
       "correct": [

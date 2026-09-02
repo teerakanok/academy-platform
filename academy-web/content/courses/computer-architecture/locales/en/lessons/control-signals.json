@@ -175,7 +175,7 @@
       "prompt": "What distinguishes add from sub, given that they share every control signal in the table?",
       "choices": {
         "A": "A different opcode",
-        "B": "A prefix instruction",
+        "B": "A prefix instruction that modifies the one after it",
         "C": "funct7 — one input to the arithmetic unit",
         "D": "The register numbers"
       },

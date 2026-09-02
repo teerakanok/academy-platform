@@ -178,21 +178,21 @@
         "A": "qsort requires exactly -1, 0, or 1",
         "B": "It is slower",
         "C": "It does not compile",
-        "D": "The subtraction can overflow for large-magnitude values"
+        "D": "The subtraction can overflow"
       },
       "correct": [
         "D"
       ],
-      "explanation": "Is undefined and can produce the wrong sign — and therefore the wrong order. (x > y) - (x < y) produces the same three-way answer using only comparisons, so nothing can overflow."
+      "explanation": "For large-magnitude values the subtraction is undefined and can produce the wrong sign — and therefore the wrong order. (x > y) - (x < y) produces the same three-way answer using only comparisons, so nothing can overflow."
     },
     {
       "id": "cp-3",
       "prompt": "Why is a writable function pointer a security-relevant target?",
       "choices": {
         "A": "It slows down the program",
-        "B": "Function pointers cannot be checked for NULL",
+        "B": "Function pointers cannot be checked for NULL or validated in any way before the call",
         "C": "It causes memory leaks",
-        "D": "If an attacker can overwrite it"
+        "D": "Because an attacker who can overwrite it gains control of the next call through it"
       },
       "correct": [
         "D"
@@ -203,15 +203,15 @@
       "id": "cp-4",
       "prompt": "What does a dispatch table give you over a long switch statement?",
       "choices": {
-        "A": "Type safety for the arguments",
+        "A": "Type safety for the arguments of every handler",
         "B": "Automatic input validation",
-        "C": "Adding a case becomes adding a data row, and the set of handlers becomes inspectable data rather than control flow",
+        "C": "Adding a case becomes adding a data row",
         "D": "Faster execution in all cases"
       },
       "correct": [
         "C"
       ],
-      "explanation": "It is how shells, interpreters, and drivers organise entry points — the table is data you can read, extend, and mark const."
+      "explanation": "The set of handlers becomes inspectable data rather than control flow. It is how shells, interpreters, and drivers organise entry points — the table is data you can read, extend, and mark const."
     }
   ]
 }

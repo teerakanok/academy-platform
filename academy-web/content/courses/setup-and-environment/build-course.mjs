@@ -6,11 +6,11 @@ import { fileURLToPath } from 'node:url'
 const here = dirname(fileURLToPath(import.meta.url))
 
 const PLAN = [
-  ['choose-your-environment', 'lesson', [], 14, { environment: 4 }],
+  ['choose-your-environment', 'lesson', [], 18, { environment: 4 }],
   ['first-terminal-session', 'lesson', ['choose-your-environment'], 15, { environment: 2, terminal: 4 }],
   ['install-the-toolchain', 'lesson', ['first-terminal-session'], 16, { toolchain: 4 }],
-  ['github-account-and-first-push', 'lesson', ['install-the-toolchain'], 16, { toolchain: 2, collaboration: 4 }],
-  ['when-something-does-not-work', 'capstone', ['install-the-toolchain'], 17, { troubleshooting: 4, terminal: 2 }],
+  ['github-account-and-first-push', 'lesson', ['install-the-toolchain'], 20, { toolchain: 2, collaboration: 4 }],
+  ['when-something-does-not-work', 'capstone', ['install-the-toolchain', 'github-account-and-first-push'], 17, { troubleshooting: 4, terminal: 2 }],
 ]
 
 const written = new Set(

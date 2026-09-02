@@ -49,10 +49,10 @@
       "id": "cp-1",
       "prompt": "Why is an article rendered as part of the page instead of embedded in a frame?",
       "choices": {
-        "A": "Frames load faster",
-        "B": "So it shares the same typography and width as the rest of the lesson, with no visible seam and no window-inside-a-window on mobile",
-        "C": "Because frames cannot show text",
-        "D": "To avoid paying for hosting"
+        "A": "Its layout is fixed and never reflows",
+        "B": "So it shares the page's typography and width",
+        "C": "PDFs cannot be displayed in browsers at all",
+        "D": "To avoid paying a third party to host every article"
       },
       "correct": ["B"],
       "explanation": "A framed document brings its own fonts, width and scrollbar. Rendering it natively removes the seam and keeps it readable on small screens."

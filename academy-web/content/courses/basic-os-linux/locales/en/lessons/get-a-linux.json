@@ -102,7 +102,7 @@
       "id": "cp-2",
       "prompt": "Why is the macOS terminal not a perfect substitute for Linux in this course?",
       "choices": {
-        "A": "It is Unix-like and feels similar, but some commands and the package and permission behaviour differ from Linux",
+        "A": "Unix-like, but packages and permissions differ",
         "B": "It cannot run any of the commands in this course",
         "C": "It has no command line at all",
         "D": "It requires a paid licence"
@@ -110,7 +110,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "It will carry you through the early navigation lessons, then diverge exactly where the course gets specific — package management and some permission details."
+      "explanation": "It will carry you through the early navigation lessons, then diverge exactly where the course gets specific — package management and some permission details. Some commands differ too — it carries you through the early lessons, then diverges where the course gets specific."
     },
     {
       "id": "cp-3",

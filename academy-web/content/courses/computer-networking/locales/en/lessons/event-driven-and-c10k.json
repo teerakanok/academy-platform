@@ -216,14 +216,14 @@
       "prompt": "Your event loop truncates responses to slow clients but works for fast ones. What is missing?",
       "choices": {
         "A": "A second thread",
-        "B": "A larger read buffer",
+        "B": "A larger read buffer on each connection",
         "C": "More epoll events",
-        "D": "A per-connection output buffer plus writability interest"
+        "D": "A per-connection output buffer"
       },
       "correct": [
         "D"
       ],
-      "explanation": "A partial write must be finished when the socket can accept more. A slow client's socket buffer fills, write sends only part, and a loop that assumes completion drops the rest. It fails only for the slowest clients, which is what makes it hard to reproduce."
+      "explanation": "A partial write must be finished when the socket can accept more. A slow client's socket buffer fills, write sends only part, and a loop that assumes completion drops the rest. It fails only for the slowest clients, which is what makes it hard to reproduce. The buffer is finished off when the socket can accept more, so the loop must also watch for writability."
     },
     {
       "id": "cp-3",
@@ -243,15 +243,15 @@
       "id": "cp-4",
       "prompt": "What architecture do most large systems actually run?",
       "choices": {
-        "A": "A thread per connection with a large limit",
+        "A": "A thread per connection, with the limit raised as high as possible",
         "B": "A process per connection",
         "C": "A single global event loop",
-        "D": "One event loop per core for the connections, plus a thread pool for anything that would block"
+        "D": "An event loop plus a thread pool for blocking work"
       },
       "correct": [
         "D"
       ],
-      "explanation": "It combines all three designs from this module: loops stay responsive because they never block, and blocking work happens in the pool where blocking is allowed."
+      "explanation": "It combines all three designs from this module: loops stay responsive because they never block, and blocking work happens in the pool where blocking is allowed. Concretely: one loop per core for the connections, plus a thread pool for anything that would block."
     }
   ]
 }

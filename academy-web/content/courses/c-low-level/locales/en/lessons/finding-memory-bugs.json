@@ -208,52 +208,52 @@
       "id": "cp-1",
       "prompt": "What are the three locations in an AddressSanitizer use-after-free report?",
       "choices": {
-        "A": "The compiler, the linker, and the loader",
-        "B": "Where the invalid access happened, where the memory was freed, and where it was allocated",
+        "A": "The compiler, the linker, and the program loader",
+        "B": "Where it happened, was freed, and was allocated",
         "C": "Three separate threads",
         "D": "The stack, the heap, and the globals"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Those three lines usually contain the entire investigation. Read them in order and the fix is normally clear immediately."
+      "explanation": "The three locations are where the invalid access happened, where the memory was freed, and where it was allocated. Those three lines usually contain the entire investigation. Read them in order and the fix is normally clear immediately."
     },
     {
       "id": "cp-2",
       "prompt": "Why should a sanitizer build never be shipped to production?",
       "choices": {
-        "A": "It cannot be compiled with -O2",
+        "A": "It cannot be compiled with -O2 at all",
         "B": "It is illegal",
         "C": "It disables the standard library",
-        "D": "It roughly doubles runtime and memory use, and its checks are diagnostic aids rather than security boundaries"
+        "D": "It roughly doubles runtime and memory"
       },
       "correct": [
         "D"
       ],
-      "explanation": "Use sanitizers in development and CI. For production, use a clean warning-free build plus the platform's hardening options."
+      "explanation": "Its checks are diagnostic aids rather than security boundaries. Use sanitizers in development and CI. For production, use a clean warning-free build plus the platform's hardening options."
     },
     {
       "id": "cp-3",
       "prompt": "When is Valgrind the better choice over a sanitizer?",
       "choices": {
         "A": "Always — it is more accurate",
-        "B": "When the program is very large",
-        "C": "When you cannot rebuild the binary, or you need uninitialised-read detection that AddressSanitizer does not provide",
+        "B": "When the program is very large and slow to start",
+        "C": "When you cannot rebuild the binary",
         "D": "When you only care about leaks"
       },
       "correct": [
         "C"
       ],
-      "explanation": "It works on an existing binary and covers a case the address sanitizer does not, at the cost of running much more slowly."
+      "explanation": "Or when you need uninitialised-read detection that AddressSanitizer does not provide. It works on an existing binary and covers a case the address sanitizer does not, at the cost of running much more slowly."
     },
     {
       "id": "cp-4",
       "prompt": "Why put the sanitizer build in CI rather than running it when you suspect a problem?",
       "choices": {
-        "A": "A check that depends on someone remembering does not run",
+        "A": "A check that needs remembering does not run",
         "B": "It replaces the need for tests",
         "C": "CI machines have more memory",
-        "D": "It runs faster on CI machines"
+        "D": "It always runs faster on the CI machines themselves"
       },
       "correct": [
         "A"

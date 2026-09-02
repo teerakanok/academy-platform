@@ -183,7 +183,7 @@
         "A": "It fell by 10%",
         "B": "It is unchanged",
         "C": "It rose — 0.9 times 1.3 is 1.17",
-        "D": "It depends on the cache"
+        "D": "It depends on the cache and the memory hierarchy"
       },
       "correct": [
         "C"

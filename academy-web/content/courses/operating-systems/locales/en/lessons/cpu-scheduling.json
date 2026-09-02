@@ -79,7 +79,7 @@
       "kind": "callout",
       "tone": "info",
       "title": "Where those ratios come from",
-      "text": "Each step of nice multiplies a thread's weight by roughly 1.25. Ten steps is about 1.25^10, near 9.3; nineteen steps is about 1.25^19, near 73. The measured ratios of 10.6 and 75 sit right on those predictions. This is worth knowing because it means nice is not a mild hint: at nice 19 a background job gets a couple of percent of a contended core."
+      "text": "Each step of nice multiplies a thread's weight by roughly 1.25. Ten steps is about 1.25^10, near 9.3; nineteen steps is about 1.25^19, near 69 — and the kernel's own weight table puts nice 0 against nice 19 at 1024/15, about 68. The measured ratios of 10.6 and 75 land close to those predictions. This is worth knowing because it means nice is not a mild hint: at nice 19 a background job gets a couple of percent of a contended core."
     },
     {
       "kind": "callout",
@@ -137,7 +137,7 @@
         "Runnable threads far exceeding cores — check the load average against the core count",
         "Threads blocked on I/O, which no priority change will speed up",
         "Lock contention, which looks like poor CPU use rather than high CPU use",
-        "One process at a very low nice value being starved by everything else"
+        "One process at a very high nice value being starved by everything else"
       ]
     },
     {
@@ -198,7 +198,7 @@
       "correct": [
         "C"
       ],
-      "explanation": "Measured at roughly 75 to 1. Each nice step is about a 1.25x weight change, so nineteen steps is roughly 1.25^19, near 73. It still runs; it just gets very little."
+      "explanation": "Measured at roughly 75 to 1. Each nice step is about a 1.25x weight change, so nineteen steps is roughly 1.25^19, near 69 — the kernel's weight table itself puts nice 0 against nice 19 at 1024/15, about 68. It still runs; it just gets very little."
     },
     {
       "id": "cp-3",
@@ -219,14 +219,14 @@
       "prompt": "A service feels slow. Load average is 0.4 on an 8-core machine. What is the likely cause?",
       "choices": {
         "A": "It needs a better nice value",
-        "B": "It is waiting — on I/O or on a lock — because there is plenty of idle CPU",
-        "C": "Too few cores",
-        "D": "The scheduler policy is wrong"
+        "B": "It is waiting — on I/O or on a lock",
+        "C": "Too few cores for the volume of requests",
+        "D": "The scheduler policy is set wrong for this service"
       },
       "correct": [
         "B"
       ],
-      "explanation": "A load average far below the core count means the CPU is not the constraint. Changing priority cannot speed up something that is not running because it is blocked."
+      "explanation": "A load average far below the core count means there is plenty of idle CPU, so the CPU is not the constraint. Changing priority cannot speed up something that is not running because it is blocked."
     }
   ]
 }

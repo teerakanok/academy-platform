@@ -164,7 +164,7 @@
         "A": "Each instruction needs one kind of work",
         "B": "Memory becomes faster",
         "C": "It uses fewer transistors overall",
-        "D": "It removes the need for a cache"
+        "D": "It removes the need for a cache by keeping data in registers"
       },
       "correct": [
         "A"
@@ -190,28 +190,28 @@
       "prompt": "A byte holding 0xFF is loaded with lb into a 64-bit register. What is the register's value?",
       "choices": {
         "A": "255",
-        "B": "-1 — lb sign extends, filling the upper bits with copies of the sign bit",
-        "C": "0xFF00000000000000",
+        "B": "-1 — lb sign extends the byte",
+        "C": "0xFF00000000000000 — the byte value at the top",
         "D": "Undefined"
       },
       "correct": [
         "B"
       ],
-      "explanation": "lbu would give 255. This is exactly the signed-versus-unsigned char distinction from the C course, decided here by which load instruction the compiler emitted."
+      "explanation": "lbu would give 255. This is exactly the signed-versus-unsigned char distinction from the C course, decided here by which load instruction the compiler emitted. Sign extension fills the upper bits with copies of the sign bit."
     },
     {
       "id": "cp-4",
       "prompt": "Why does a struct with a char followed by an int contain three bytes of padding?",
       "choices": {
         "A": "Because char is really four bytes",
-        "B": "So the int begins at an aligned address and can be loaded with a single aligned access",
+        "B": "So the int sits at an aligned address",
         "C": "To reserve space for future fields",
-        "D": "To make sizeof a power of two"
+        "D": "To make sizeof a power of two, as hardware prefers"
       },
       "correct": [
         "B"
       ],
-      "explanation": "The C course measured the padding; this is the reason for it. Aligned access lets the hardware use simpler and faster memory circuitry."
+      "explanation": "The C course measured the padding; this is the reason for it. Aligned access lets the hardware use simpler and faster memory circuitry. An aligned int loads with a single aligned access."
     }
   ]
 }

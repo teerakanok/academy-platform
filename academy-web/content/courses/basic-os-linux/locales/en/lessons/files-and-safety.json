@@ -119,7 +119,7 @@
       "prompt": "You want to watch new lines appear in a log file as they are written. What do you use?",
       "choices": {
         "A": "tail -f logfile",
-        "B": "cat logfile",
+        "B": "cat logfile in a second terminal",
         "C": "head logfile",
         "D": "less logfile"
       },
@@ -133,14 +133,14 @@
       "prompt": "What is the habit that most reliably prevents deleting the wrong thing?",
       "choices": {
         "A": "Using rm without -r",
-        "B": "Running ls on the exact same path first and reading the output",
+        "B": "Run ls on that path first",
         "C": "Deleting only on weekdays",
         "D": "Running rm twice to be sure"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Look-then-act. Running ls with the identical path shows you precisely what the command will affect, before it is irreversible."
+      "explanation": "Look-then-act. Run ls on the exact same path and read the output — that shows you precisely what the command will affect, before it is irreversible."
     },
     {
       "id": "cp-3",
@@ -148,7 +148,7 @@
       "choices": {
         "A": "It is not — it is only an operations problem",
         "B": "Because it is always caused by an attacker",
-        "C": "Because availability is part of the security triad alongside confidentiality and integrity",
+        "C": "Because availability is part of the security triad",
         "D": "Because deleted files can be recovered by attackers"
       },
       "correct": [

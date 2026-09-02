@@ -194,9 +194,9 @@
       "id": "cp-1",
       "prompt": "What does the call instruction do?",
       "choices": {
-        "A": "Pushes the address of the following instruction onto the stack, then jumps to the target",
+        "A": "Pushes the next instruction's address, then jumps",
         "B": "Jumps to the target",
-        "C": "Saves all registers, then jumps",
+        "C": "Saves all the caller's registers, then jumps to it",
         "D": "Creates a stack frame"
       },
       "correct": [
@@ -209,9 +209,9 @@
       "prompt": "Measured frame addresses were 0x304869920, 0x3048698f0 and 0x3048698d0 going deeper. What does that show?",
       "choices": {
         "A": "Each frame is 32 bytes",
-        "B": "The stack grows toward lower addresses, so each nested call sits below its caller",
+        "B": "The stack grows toward lower addresses",
         "C": "The stack is fragmented",
-        "D": "Address randomisation is active"
+        "D": "Address randomisation is active on this system"
       },
       "correct": [
         "B"
@@ -222,15 +222,15 @@
       "id": "cp-3",
       "prompt": "A local array lives below rbp and the return address at rbp+8. Why does that matter for security?",
       "choices": {
-        "A": "It makes locals slower to access",
-        "B": "Writing past the end of the array walks upward into the saved rbp and the return address, and ret will jump to whatever is written there",
+        "A": "It makes locals slower to access than globals",
+        "B": "It can overwrite the return address above it",
         "C": "The array cannot be initialised",
-        "D": "It does not matter on 64-bit systems"
+        "D": "It does not matter on 64-bit systems any more"
       },
       "correct": [
         "B"
       ],
-      "explanation": "The stack buffer overflow exists because a code address is stored in the same writable memory as ordinary data. Canaries, non-executable stacks and randomisation are all responses to this arrangement."
+      "explanation": "The stack buffer overflow exists because a code address is stored in the same writable memory as ordinary data. Canaries, non-executable stacks and randomisation are all responses to this arrangement. Writing past the array walks upward into the saved rbp and the return address — ret then jumps to whatever was written there."
     },
     {
       "id": "cp-4",

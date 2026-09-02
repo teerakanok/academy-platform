@@ -197,7 +197,7 @@
       "id": "cp-2",
       "prompt": "Why was gets removed from the C standard?",
       "choices": {
-        "A": "It only worked on Windows",
+        "A": "It only worked on Windows and MS-DOS systems",
         "B": "It had no way to limit how much it read",
         "C": "It was replaced by scanf",
         "D": "It was too slow"
@@ -226,14 +226,14 @@
       "prompt": "Why should you use <stdint.h> types like uint32_t when the size matters?",
       "choices": {
         "A": "They are faster",
-        "B": "Because the standard only specifies minimum sizes",
+        "B": "The standard specifies only minimum sizes",
         "C": "They cannot overflow",
-        "D": "They are required by -Wall"
+        "D": "They are required by -Wall in every program"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Int can differ between platforms — explicit types keep the layout the same everywhere. Anything crossing a boundary — a file format, a network protocol, shared memory — needs a layout that does not depend on which machine compiled the code."
+      "explanation": "The standard only specifies minimum sizes, so int can differ between platforms — explicit types keep the layout the same everywhere. Anything crossing a boundary — a file format, a network protocol, shared memory — needs a layout that does not depend on which machine compiled the code."
     }
   ]
 }

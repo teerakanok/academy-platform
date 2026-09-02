@@ -2,7 +2,7 @@
   "nodeId": "setuid-and-its-risks",
   "locale": "en",
   "title": "setuid: the most dangerous bit on the filesystem",
-  "objective": "By the end of this course you can audit a system's setuid programs, explain three distinct ways they are attacked, and rewrite one to hold the least privilege that still does its job.",
+  "objective": "By the end of this lesson you can audit a system's setuid programs, explain three distinct ways they are attacked, and rewrite one to hold the least privilege that still does its job.",
   "blocks": [
     {
       "kind": "paragraph",
@@ -181,10 +181,10 @@
       "id": "cp-1",
       "prompt": "A setuid-root program calls system(\"grep ...\"). An attacker puts their own grep first in PATH. What do they achieve?",
       "choices": {
-        "A": "Their code executes inside the privileged program's flow",
+        "A": "Their code runs inside the privileged program",
         "B": "The program refuses to start",
         "C": "An immediate root shell in all cases",
-        "D": "Nothing — system uses absolute paths"
+        "D": "Nothing — system() itself uses absolute paths only"
       },
       "correct": [
         "A"
@@ -195,15 +195,15 @@
       "id": "cp-2",
       "prompt": "Why is access() followed by fopen() a security bug in a setuid program?",
       "choices": {
-        "A": "access is deprecated",
-        "B": "access ignores ACLs",
-        "C": "The check and the use are separate operations on a name, and the attacker can swap what that name refers to in between",
-        "D": "fopen cannot open files owned by root"
+        "A": "access is deprecated and should not be used",
+        "B": "access ignores ACLs on modern filesystems",
+        "C": "The check and the use are separate calls on one name",
+        "D": "fopen refuses to open files owned by root in this case"
       },
       "correct": [
         "C"
       ],
-      "explanation": "It is module three's race condition with privilege attached. The fix is not a smaller window — it is dropping privilege and performing one atomic operation."
+      "explanation": "The attacker can swap what that name refers to between the two calls — module three's race condition with privilege attached. The fix is not a smaller window — it is dropping privilege and performing one atomic operation."
     },
     {
       "id": "cp-3",
@@ -223,15 +223,15 @@
       "id": "cp-4",
       "prompt": "What is the first question to ask about a program that currently needs setuid root?",
       "choices": {
-        "A": "Can we make it faster",
-        "B": "Which single privileged ability does it actually need, and would a file capability grant just that",
-        "C": "Should it be written in a different language",
-        "D": "Can we hide it from users"
+        "A": "Can we make it faster with better algorithms",
+        "B": "Which single privileged ability does it need?",
+        "C": "Should it be rewritten in a memory-safe language",
+        "D": "Can we hide it from users by renaming it"
       },
       "correct": [
         "B"
       ],
-      "explanation": "That is the measured difference from the previous lesson: capability set 2000 instead of a80425fb. Same functionality, a fraction of the authority to lose."
+      "explanation": "A file capability can grant exactly that one ability, and nothing else. That is the measured difference from the previous lesson: capability set 2000 instead of a80425fb. Same functionality, a fraction of the authority to lose."
     }
   ]
 }

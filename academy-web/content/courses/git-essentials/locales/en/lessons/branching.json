@@ -187,7 +187,7 @@
         "A": "It refuses to delete a branch holding commits that are not merged anywhere",
         "B": "It refuses to delete the current branch only",
         "C": "It refuses to delete branches created today",
-        "D": "It refuses when the branch has been pushed"
+        "D": "It refuses when the branch has already been pushed to the shared remote server"
       },
       "correct": [
         "A"

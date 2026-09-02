@@ -137,10 +137,10 @@
       "id": "cp-1",
       "prompt": "A process shows 4 million minor faults and 12 major faults. What does that indicate?",
       "choices": {
-        "A": "It is thrashing",
-        "B": "Normal operation — minor faults are how memory is supplied, and major faults are rare after startup",
+        "A": "It is thrashing; memory pressure is collapsing the machine",
+        "B": "Normal operation for demand paging",
         "C": "A memory leak",
-        "D": "A serious memory problem"
+        "D": "A serious memory problem needing immediate action"
       },
       "correct": [
         "B"
@@ -151,9 +151,9 @@
       "id": "cp-2",
       "prompt": "A machine is slow. CPU is 15%, I/O wait is high, and vmstat shows sustained si/so. What is happening?",
       "choices": {
-        "A": "A network problem",
+        "A": "A network problem — the link is saturated",
         "B": "Too few cores",
-        "C": "Thrashing — the working set does not fit in RAM",
+        "C": "Thrashing — working set bigger than RAM",
         "D": "A deadlock"
       },
       "correct": [
@@ -167,8 +167,8 @@
       "choices": {
         "A": "The file is compressed",
         "B": "Only the first megabyte is executable",
-        "C": "It is loaded in the background after startup",
-        "D": "The kernel only maps it, and reads each page on the fault caused by first touching it"
+        "C": "It is loaded in the background after startup by a helper",
+        "D": "The kernel maps it lazily; first touch faults it in"
       },
       "correct": [
         "D"
@@ -179,7 +179,7 @@
       "id": "cp-4",
       "prompt": "A service disappeared with no error in its own logs. Where do you look first?",
       "choices": {
-        "A": "dmesg — the OOM killer records which process it chose and why",
+        "A": "dmesg — the OOM killer logs it there",
         "B": "Disk space",
         "C": "The application log again, more carefully",
         "D": "The scheduler"

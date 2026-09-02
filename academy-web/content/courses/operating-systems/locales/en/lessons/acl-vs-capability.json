@@ -184,23 +184,23 @@
       "id": "cp-2",
       "prompt": "You audit who can read a file using ls -l and see -rw-rw----+ root root. What have you missed?",
       "choices": {
-        "A": "The group is hidden",
-        "B": "Nothing",
-        "C": "The trailing plus means an ACL exists, and it may name users the listing does not show — run getfacl",
-        "D": "The file is a symlink"
+        "A": "The owning group is hidden from the listing",
+        "B": "Nothing — the listing shows every reader",
+        "C": "The trailing plus means an ACL is present",
+        "D": "The file is a symlink to somewhere else"
       },
       "correct": [
         "C"
       ],
-      "explanation": "Verified: after granting a named user read-write access, ls showed only a plus while getfacl showed the entry. Access reviews based on a directory listing miss exactly this."
+      "explanation": "That ACL may name users the listing does not show — run getfacl to see them. Verified: after granting a named user read-write access, ls showed only a plus while getfacl showed the entry. Access reviews based on a directory listing miss exactly this."
     },
     {
       "id": "cp-3",
       "prompt": "Why prefer a file capability over making a binary setuid root?",
       "choices": {
-        "A": "It grants one specific right instead of all of them",
-        "B": "It is faster",
-        "C": "Capabilities cannot be exploited",
+        "A": "It grants one right instead of all of them",
+        "B": "It runs faster because the check is cheaper",
+        "C": "Capabilities cannot be exploited at all",
         "D": "setuid does not work on modern kernels"
       },
       "correct": [
@@ -212,10 +212,10 @@
       "id": "cp-4",
       "prompt": "Why do capability-style tokens in distributed systems almost always have an expiry?",
       "choices": {
-        "A": "To reduce storage",
-        "B": "To comply with encryption standards",
-        "C": "Because a capability cannot be recalled from every holder",
-        "D": "Because they are stored with the object"
+        "A": "To reduce the storage the system needs",
+        "B": "To comply with current encryption standards",
+        "C": "Because a capability cannot be recalled",
+        "D": "Because they are stored with the object itself"
       },
       "correct": [
         "C"

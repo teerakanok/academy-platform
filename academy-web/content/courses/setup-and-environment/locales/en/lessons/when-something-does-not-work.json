@@ -162,7 +162,7 @@
         "A": "It is installed in a directory that is not listed in PATH",
         "B": "You need sudo to run it",
         "C": "The install failed silently",
-        "D": "The tool is incompatible with your shell"
+        "D": "The tool is incompatible with your particular shell and cannot run in it"
       },
       "correct": [
         "A"
@@ -174,20 +174,20 @@
       "prompt": "./script.sh says Permission denied. ls -l shows -rw-r--r-- and you own the file. What is wrong?",
       "choices": {
         "A": "The script has a syntax error",
-        "B": "There is no x bit, so it is not marked executable — chmod +x fixes it",
-        "C": "The file is owned by root",
+        "B": "There is no x bit, so it is not marked executable",
+        "C": "The file is secretly owned by root even though ls shows you as owner",
         "D": "You need sudo"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Distinguish it from cat /etc/shadow, which prints the same words because the file is deliberately not yours. chmod does not apply there."
+      "explanation": "chmod +x is the fix here. Distinguish it from cat /etc/shadow, which prints the same words because the file is deliberately not yours — chmod does not apply there."
     },
     {
       "id": "cp-3",
       "prompt": "Why does typing a program's name not run a program sitting in your current directory?",
       "choices": {
-        "A": "It does run; the error means something else",
+        "A": "It does run; the error message you saw must mean something else",
         "B": "Current directories are read-only",
         "C": "You must compile it first",
         "D": "The current directory is deliberately not on PATH"
@@ -195,14 +195,14 @@
       "correct": [
         "D"
       ],
-      "explanation": "That a file named ls dropped into a directory cannot hijack your next command. That is why you write ./name — the ./ says explicitly that you mean the file here, not something found on PATH."
+      "explanation": "This guarantees that a file named ls dropped into a directory cannot hijack your next command. That is why you write ./name — the ./ says explicitly that you mean the file here, not something found on PATH."
     },
     {
       "id": "cp-4",
       "prompt": "A lesson's command behaves differently on your machine and the lesson never mentions any platform difference. What should you conclude?",
       "choices": {
         "A": "Check uname -s and the tool version first",
-        "B": "The tool needs reinstalling",
+        "B": "The tool needs reinstalling, since it was built for another system",
         "C": "You made a mistake and should try again",
         "D": "Your platform is unsupported"
       },

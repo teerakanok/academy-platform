@@ -265,15 +265,15 @@
       "id": "cp-1",
       "prompt": "Why does a pipelined processor guess a branch direction instead of waiting?",
       "choices": {
-        "A": "Branches are rare enough not to matter",
+        "A": "Branches are rare enough that waiting for them is cheap",
         "B": "Guessing is more accurate",
         "C": "The compiler requires it",
-        "D": "The fetch stage needs an address cycles before the branch resolves, and every cycle it does not fetch leaves the pipeline empty"
+        "D": "Fetch needs the address before the branch resolves"
       },
       "correct": [
         "D"
       ],
-      "explanation": "About one instruction in five or six is a branch. Stopping at each one would give back most of what pipelining bought."
+      "explanation": "About one instruction in five or six is a branch. Stopping at each one would give back most of what pipelining bought. Every cycle spent not fetching leaves the pipeline empty."
     },
     {
       "id": "cp-2",

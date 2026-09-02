@@ -157,7 +157,7 @@
         "Make a file with a known mode: printf 'x\\n' > perm-lab.txt && chmod 640 perm-lab.txt",
         "Look at it: ls -l perm-lab.txt",
         "Before reading further, say out loud who can read it, who can write it, and who can do neither",
-        "Check yourself against the machine: stat -f '%Sp %Su %Sg' perm-lab.txt   (Linux: stat -c '%A %U %G' perm-lab.txt)",
+        "Check yourself against the machine: stat -c '%A %U %G' perm-lab.txt   (macOS: stat -f '%Sp %Su %Sg' perm-lab.txt)",
         "Now change one bit at a time and predict the string before each: chmod 644, then 600, then 755",
         "For each, write the three-character group for owner, group and others before running ls -l",
         "Finally: chmod 000 perm-lab.txt then try cat perm-lab.txt as yourself — explain the error you get",
@@ -199,7 +199,7 @@
         "A": "Owner: read only · group: write · others: execute",
         "B": "Everyone can read, write and execute",
         "C": "Owner: read/write · group: read · others: read",
-        "D": "Owner: read/write/execute · group: read/execute · others: nothing"
+        "D": "Owner rwx · group r-x · others none"
       },
       "correct": [
         "D"
@@ -225,14 +225,14 @@
       "prompt": "A colleague fixes a permission error by running chmod -R 777 on an application directory. What have they actually done?",
       "choices": {
         "A": "Nothing — 777 is the default",
-        "B": "Made every file readable, writable and executable by every user and process on the machine",
+        "B": "Every file rw and executable by all users",
         "C": "Given the files to root",
-        "D": "Restricted the directory to the owner"
+        "D": "Restricted the directory to the owner alone"
       },
       "correct": [
         "B"
       ],
-      "explanation": "777 grants everything to everyone. Any compromised low-privilege process on that host can now rewrite those files, and whatever runs them afterwards runs the attacker's code."
+      "explanation": "777 grants everything to everyone. Any compromised low-privilege process on that host can now rewrite those files, and whatever runs them afterwards runs the attacker's code. Readable, writable and executable — by every user and process on the machine."
     },
     {
       "id": "cp-4",
@@ -254,13 +254,13 @@
       "choices": {
         "A": "Because the file was owned by root",
         "B": "This cannot happen",
-        "C": "Because deleting an entry is controlled by write permission on the containing directory, not on the file",
-        "D": "Because deletion ignores permissions entirely"
+        "C": "Deleting is controlled by the directory's write bit",
+        "D": "Because deletion pays no attention to permissions at all"
       },
       "correct": [
         "C"
       ],
-      "explanation": "Removing a name from a directory is a change to the directory. Write permission there is enough — which is why directory permissions deserve as much attention as file permissions."
+      "explanation": "Removing a name from a directory is a change to the directory. Write permission there is enough — which is why directory permissions deserve as much attention as file permissions. Not by the file's own permissions — removing a name is a change to the containing directory."
     }
   ]
 }

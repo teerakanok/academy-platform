@@ -2,7 +2,7 @@
   "locale": "en",
   "title": "Git Essentials",
   "subtitle": "Keep a history you can trust, work on several things at once, and undo almost anything — including the mistakes that feel unrecoverable.",
-  "audience": "For anyone who writes or edits files for a living and has never used version control properly, or has been copying commands without knowing what they do. No prior Git experience needed. This course assumes a working Unix-like shell and, from the C course onwards, a C compiler and make. If you do not have those yet — or have never opened a terminal — the Setting Up course installs and verifies all of it first, and nothing here repeats that material.",
+  "audience": "For anyone who writes or edits files for a living and has never used version control properly, or has been copying commands without knowing what they do. No prior Git experience needed. This course assumes only a working Unix-like shell — nothing else. If you do not have one yet — or have never opened a terminal — the Setting Up course installs and verifies that first, and nothing here repeats that material.",
   "outcomes": [
     "Explain what a commit actually is, and read a history rather than guessing at it",
     "Work on several things at once with branches, and merge them without fear",

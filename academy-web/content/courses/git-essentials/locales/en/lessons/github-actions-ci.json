@@ -27,8 +27,8 @@
         "  test:",
         "    runs-on: ubuntu-latest",
         "    steps:",
-        "      - uses: actions/checkout@v4",
-        "      - uses: actions/setup-node@v4",
+        "      - uses: actions/checkout@v5",
+        "      - uses: actions/setup-node@v5",
         "        with:",
         "          node-version: '22'",
         "          cache: 'npm'",
@@ -41,7 +41,7 @@
       "kind": "callout",
       "tone": "info",
       "title": "The workflow is versioned like everything else",
-      "text": "It lives in the repository, so a change to how the project is tested arrives as a reviewable diff. That also means a branch can change its own checks — which is why the branch protection rule specifies which checks must pass, rather than trusting whatever the branch happens to define."
+      "text": "It lives in the repository, so a change to how the project is tested arrives as a reviewable diff. That also means a branch can change its own checks — which is why the branch protection rule specifies which checks must pass, rather than trusting whatever the branch happens to define. And action majors bump over time — check the action's marketplace page when you start a new workflow."
     },
     {
       "kind": "heading",
@@ -98,18 +98,26 @@
     },
     {
       "kind": "code",
-      "caption": "Two more checks worth having early",
+      "caption": "Two more steps worth having early (step level)",
       "lines": [
         "      # fail if the lockfile and manifest disagree",
         "      - run: npm ci",
         "",
         "      # scan for credentials that should never have been committed",
-        "      - uses: gitleaks/gitleaks-action@v2",
-        "",
-        "      # run the suite against several versions if you support several",
+        "      - uses: gitleaks/gitleaks-action@v2"
+      ]
+    },
+    {
+      "kind": "code",
+      "caption": "Job level: run the suite against several versions, if you support several",
+      "lines": [
+        "jobs:",
+        "  test:",
         "    strategy:",
         "      matrix:",
-        "        node-version: ['20', '22']"
+        "        node-version: ['20', '22']   # strategy: sits beside steps:, never inside it",
+        "    steps:",
+        "      # ...steps as above"
       ]
     },
     {
@@ -145,7 +153,8 @@
         "Push a commit that deliberately breaks the check (exit 1) and watch the pull request turn red",
         "Read the log: find the failing step and the exact command output",
         "Fix it, push again, and confirm the check turns green",
-        "Enable the branch protection rule requiring that check to pass before merging"
+        "Enable the branch protection rule requiring that check to pass before merging",
+        "No GitHub repository with admin access, or working offline? Skip the protection step, or run the workflow locally with act (a tool that runs workflow files on your own machine) — reading the YAML stands on its own"
       ],
       "expected": "A pull request that runs your checks by itself, fails visibly when the code is wrong, and cannot be merged until it passes. That is the point at which review stops depending on everyone remembering to run the tests."
     }
@@ -166,14 +175,14 @@
       "prompt": "Why does running the tests on a clean machine matter?",
       "choices": {
         "A": "It is required by Git",
-        "B": "Clean machines are faster",
+        "B": "Clean machines are faster, so the whole suite finishes sooner",
         "C": "It uses less disk space",
-        "D": "It proves the tests pass with exactly what the repository contains, rather than with whatever happens to exist on your machine"
+        "D": "It runs against what the repository contains, nothing else"
       },
       "correct": [
         "D"
       ],
-      "explanation": "It removes 'works on my machine' as an explanation, because the environment is defined by the repository and nothing else."
+      "explanation": "It removes 'works on my machine' as an explanation, because the environment is defined by the repository and nothing else. It therefore rules out whatever happens to exist on your machine."
     },
     {
       "id": "cp-2",
@@ -182,7 +191,7 @@
         "A": "Something exists on your machine that is not in the repository",
         "B": "The test is flaky by definition",
         "C": "CI is unreliable",
-        "D": "The workflow file is malformed"
+        "D": "The workflow file itself is malformed and silently skips the real tests"
       },
       "correct": [
         "A"
@@ -193,15 +202,15 @@
       "id": "cp-3",
       "prompt": "What makes a CI check an actual gate rather than decoration?",
       "choices": {
-        "A": "Running it on several operating systems",
-        "B": "Requiring it to pass before merging, and requiring the branch to be up to date so it runs against what will exist after the merge",
+        "A": "Running the suite on several different operating systems in parallel",
+        "B": "Requiring it to pass before merging, on an up-to-date branch",
         "C": "Running it on every push",
         "D": "Sending an email when it fails"
       },
       "correct": [
         "B"
       ],
-      "explanation": "A check nobody is required to satisfy changes nothing. Requiring it — against a current branch — is what makes it decisive."
+      "explanation": "A check nobody is required to satisfy changes nothing. Requiring it — against a current branch — is what makes it decisive. Up to date means it runs against what will exist after the merge."
     },
     {
       "id": "cp-4",

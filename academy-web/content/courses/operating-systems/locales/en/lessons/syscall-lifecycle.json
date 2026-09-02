@@ -141,22 +141,22 @@
       "choices": {
         "A": "Yes — the read failed and should be retried",
         "B": "No, but only for regular files",
-        "C": "No — read returns how many bytes it actually got",
-        "D": "Yes — the buffer was too large"
+        "C": "No — read returns how many bytes it got",
+        "D": "Yes — the buffer was too large for one read"
       },
       "correct": [
         "C"
       ],
-      "explanation": "Is normal and must always be checked. read returns the count it managed to supply. Code that assumes it always fills the buffer is a classic bug, especially on pipes and sockets — which you will meet again in the networking course."
+      "explanation": "A short read like this is normal and must always be checked. read returns the count it managed to supply. Code that assumes it always fills the buffer is a classic bug, especially on pipes and sockets — which you will meet again in the networking course."
     },
     {
       "id": "cp-2",
       "prompt": "Printing a 6-byte file took 43 system calls. Where did most of them go?",
       "choices": {
-        "A": "Writing to the terminal",
-        "B": "Process startup — mainly the dynamic linker finding and mapping the C library",
-        "C": "Reading the file in small pieces",
-        "D": "Permission checks on the file"
+        "A": "Writing to the terminal one byte at a time",
+        "B": "Process startup — the dynamic linker mapping the C library",
+        "C": "Reading the file in many small pieces instead of one block",
+        "D": "The kernel re-checking file permissions on every call"
       },
       "correct": [
         "B"
@@ -181,15 +181,15 @@
       "id": "cp-4",
       "prompt": "Why do measured syscall costs vary so much between machines, even at similar clock speeds?",
       "choices": {
-        "A": "Filesystem type",
-        "B": "Different C library versions",
-        "C": "Kernel version and enabled CPU speculative-execution mitigations change the cost of the crossing itself",
-        "D": "The amount of installed RAM"
+        "A": "The filesystem type of the files being read or written",
+        "B": "Different C library versions on each machine",
+        "C": "Kernel version and enabled CPU mitigations",
+        "D": "The amount of installed RAM in each machine"
       },
       "correct": [
         "C"
       ],
-      "explanation": "Mitigations for speculative-execution vulnerabilities added real work to every boundary crossing. This is a good example of a security decision with a directly measurable performance price — and of why you measure on the machine you actually deploy to."
+      "explanation": "Both the kernel version and its enabled speculative-execution mitigations change the cost of the crossing itself. Mitigations for speculative-execution vulnerabilities added real work to every boundary crossing. This is a good example of a security decision with a directly measurable performance price — and of why you measure on the machine you actually deploy to."
     }
   ]
 }

@@ -162,7 +162,7 @@
         "รัน: echo 'oops' >> notes.txt && git add notes.txt",
         "รัน: git restore --staged notes.txt (ออกจาก stage แต่การแก้ยังอยู่)",
         "รัน: git restore notes.txt",
-        "รัน: echo 'แก้จริงหนึ่งบรรทัด' >> notes.txt && git commit -am \"ข้อความผิด\"",
+        "รัน: echo 'แก้จริงหนึ่งบรรทัด' >> notes.txt && git commit -am \"ข้อความผิด\"   (ตัว -a stage การแก้ของไฟล์ที่ติดตามอยู่แล้วก่อนจึง commit — และระวังว่า -am ไม่ใช่ --amend)",
         "รัน: git commit --amend -m \"ข้อความที่ถูกต้อง\" && git log --oneline -3",
         "รัน: git revert --no-edit HEAD && git log --oneline -3"
       ],
@@ -199,15 +199,15 @@
       "id": "cp-2",
       "prompt": "git reset --soft HEAD~1 กับ git reset --hard HEAD~1 ต่างกันอย่างไร",
       "choices": {
-        "A": "--soft ใช้ได้กับ commit แรกเท่านั้น",
-        "B": "--soft เอา commit ออกแต่เก็บการเปลี่ยนแปลงไว้ใน stage ส่วน --hard เอา commit ออกและทิ้งการเปลี่ยนแปลงจากดิสก์ด้วย",
+        "A": "--soft ใช้ได้เฉพาะกับ commit แรกของ repository เท่านั้น ใช้กับตัวอื่นไม่ได้",
+        "B": "--soft เอา commit ออกแต่เก็บการเปลี่ยนแปลงไว้ใน stage",
         "C": "ไม่ต่างกัน --hard แค่เร็วกว่า",
         "D": "--hard เก็บสำรองไว้ให้อัตโนมัติ"
       },
       "correct": [
         "B"
       ],
-      "explanation": "ทั้งคู่ทิ้ง commit เหมือนกัน ความต่างอยู่ที่เนื้อหาจะไปไหน และ --hard คือตัวที่พาการแก้ที่ค้างอยู่ไปด้วย"
+      "explanation": "ทั้งคู่ทิ้ง commit เหมือนกัน ความต่างอยู่ที่เนื้อหาจะไปไหน และ --hard คือตัวที่พาการแก้ที่ค้างอยู่ไปด้วย ส่วน --hard เอา commit ออกและทิ้งการเปลี่ยนแปลงจากดิสก์ด้วย"
     },
     {
       "id": "cp-3",

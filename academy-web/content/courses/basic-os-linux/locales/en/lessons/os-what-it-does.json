@@ -87,7 +87,7 @@
       "items": [
         "A program crashing in user space kills that program",
         "A failure in kernel space can take down the whole machine",
-        "Moving from user space to kernel space without permission is what \"privilege escalation\" means"
+        "Privilege escalation means getting more authority than you were given — most often an ordinary user gaining root's authority, while still running in user space"
       ]
     },
     {
@@ -159,7 +159,7 @@
       "choices": {
         "A": "The set of applications installed on a machine",
         "B": "The firmware built into the motherboard",
-        "C": "The program that decides which other programs use the hardware, and on what terms",
+        "C": "The referee deciding which programs get hardware",
         "D": "The window manager and desktop you see on screen"
       },
       "correct": [
@@ -175,7 +175,7 @@
         "B": "Keeping each program's memory separate from the others",
         "C": "Turning a disk into named files and folders",
         "D": "Enforcing which user may read which file",
-        "E": "Writing the application's business logic"
+        "E": "Writing the business logic that belongs to the application"
       },
       "correct": [
         "A",
@@ -189,9 +189,9 @@
       "id": "cp-3",
       "prompt": "Why do kernel vulnerabilities get treated more urgently than most application bugs?",
       "choices": {
-        "A": "The kernel is the layer that enforces every access decision",
+        "A": "The kernel enforces every access decision",
         "B": "Kernel bugs are always easier to exploit",
-        "C": "Application bugs cannot lead to data loss",
+        "C": "Application bugs cannot lead to any data loss",
         "D": "Kernels are written in older languages"
       },
       "correct": [

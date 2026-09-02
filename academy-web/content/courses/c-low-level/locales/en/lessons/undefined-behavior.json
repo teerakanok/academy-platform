@@ -150,6 +150,7 @@
       "title": "See undefined behaviour appear and disappear",
       "steps": [
         "Create ub.c:  #include <stdio.h>  then  int main(void){ int a[5]; a[7] = 1; printf(\"%d\\n\", a[7]); return 0; }",
+        "Arrays formally arrive in a later lesson — type this in exactly as printed; the point here is what must never be true of any object you index",
         "Run: gcc -Wall -Wextra -O0 -g ub.c -o ub && ./ub          (it may print 1 and exit cleanly)",
         "Run: gcc -Wall -Wextra -O0 -g -fsanitize=address ub.c -o ub && ./ub    (now it is reported)",
         "Read the report: file, line, variable, and the kind of access",

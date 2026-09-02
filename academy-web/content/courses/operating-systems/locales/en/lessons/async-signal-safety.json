@@ -162,9 +162,9 @@
       "id": "cp-1",
       "prompt": "Why can printf inside a signal handler deadlock a process?",
       "choices": {
-        "A": "The handler can interrupt the main flow while it holds an internal lock that printf then waits for",
-        "B": "The kernel blocks output during signal handling",
-        "C": "printf is not thread-safe",
+        "A": "The handler interrupts code holding a lock printf needs",
+        "B": "The kernel blocks signal-time output to protect the process",
+        "C": "printf is not thread-safe across multiple threads",
         "D": "printf is slow and the handler times out"
       },
       "correct": [
@@ -190,24 +190,24 @@
       "id": "cp-3",
       "prompt": "A service stops responding. It is not crashed, uses no CPU, and there is nothing in the logs. Which of this lesson's failures fits best?",
       "choices": {
-        "A": "A missed SIGCHLD",
-        "B": "An unhandled SIGPIPE",
-        "C": "A handler that called an unsafe function and deadlocked on an internal lock",
-        "D": "A zombie child"
+        "A": "A missed SIGCHLD leaving children unreaped",
+        "B": "An unhandled SIGPIPE on a closed socket",
+        "C": "A handler deadlocked on an internal lock",
+        "D": "A zombie child holding the PID slot"
       },
       "correct": [
         "C"
       ],
-      "explanation": "That combination — alive, silent, zero CPU — is the signature. A crash would leave a message and an unhandled SIGPIPE would end the process, not freeze it."
+      "explanation": "The handler called an unsafe function and deadlocked on an internal lock; that combination — alive, silent, zero CPU — is the signature. A crash would leave a message and an unhandled SIGPIPE would end the process, not freeze it."
     },
     {
       "id": "cp-4",
       "prompt": "Why prefer signalfd in a modern server?",
       "choices": {
-        "A": "It is faster",
-        "B": "Signals arrive as ordinary readable events in the event loop",
-        "C": "It can catch SIGKILL",
-        "D": "It removes the need to install handlers for SIGCHLD"
+        "A": "It is faster than installing a handler",
+        "B": "Signals arrive as readable events in the event loop",
+        "C": "It can catch SIGKILL, which handlers cannot",
+        "D": "It removes the need to install handlers for SIGCHLD at all"
       },
       "correct": [
         "B"

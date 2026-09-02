@@ -108,37 +108,37 @@
       "id": "cp-1",
       "prompt": "cc --version prints a version, but a later lesson's build fails with a linker error. What did the version check not prove?",
       "choices": {
-        "A": "That the compiler is up to date",
+        "A": "That a compiler exists at all — which is all a version check needs to prove",
         "B": "That make is installed",
-        "C": "That the compiler can actually find its headers and linker and produce a working program",
+        "C": "That the compiler can produce a working program",
         "D": "That you have permission to compile"
       },
       "correct": [
         "C"
       ],
-      "explanation": "This is why the lesson has you compile and run a one-line program. A half-installed toolchain reports a version happily and fails at link time."
+      "explanation": "This is why the lesson has you compile and run a one-line program: a version number does not prove the compiler can find its headers and linker. A half-installed toolchain reports a version happily and fails at link time."
     },
     {
       "id": "cp-2",
       "prompt": "Why do these courses write cc rather than gcc or clang?",
       "choices": {
         "A": "cc is faster",
-        "B": "cc is the traditional name for the system's C compiler and points at whichever is installed",
+        "B": "cc is the traditional name for the system's C compiler",
         "C": "gcc is deprecated",
-        "D": "clang cannot compile C"
+        "D": "clang cannot compile plain C programs, only C++ and Objective-C"
       },
       "correct": [
         "B"
       ],
-      "explanation": "One command works on Linux and macOS. Where the two genuinely differ in a way that matters, the lesson says so rather than quietly assuming one."
+      "explanation": "cc points at whichever compiler is installed, so one command works on Linux and macOS. Where the two genuinely differ in a way that matters, the lesson says so rather than quietly assuming one."
     },
     {
       "id": "cp-3",
       "prompt": "What does sudo do?",
       "choices": {
-        "A": "Installs software",
+        "A": "Installs software by itself, without asking you anything first",
         "B": "Permanently gives your account administrator rights",
-        "C": "Runs one command as the root account after asking for your password",
+        "C": "Runs one command as root after asking for your password",
         "D": "Bypasses file permissions for the rest of the session"
       },
       "correct": [
@@ -151,14 +151,14 @@
       "prompt": "On a bare Debian container, what do git, cc and make report before you install anything?",
       "choices": {
         "A": "They are present but not on PATH",
-        "B": "command not found — a bare Debian ships none of the three",
+        "B": "command not found",
         "C": "Only git is present",
         "D": "Older versions than Ubuntu"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Verified: after one apt line the same container reports git 2.39.5, cc 12.2.0 and make 4.3."
+      "explanation": "A bare Debian ships none of the three. Verified: after one apt line the same container reports git 2.39.5, cc 12.2.0 and make 4.3."
     }
   ]
 }

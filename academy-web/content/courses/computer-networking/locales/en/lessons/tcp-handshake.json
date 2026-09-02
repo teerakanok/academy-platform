@@ -6,7 +6,7 @@
   "blocks": [
     {
       "kind": "paragraph",
-      "text": "connect() looks instantaneous. It is not — three messages cross the network before it returns, and a similar exchange happens at the end. Those states are visible on any running machine, and two of them are how you find a whole class of server bug."
+      "text": "connect() looks instantaneous. It is not — two messages cross the network before it returns, the third goes out at that same moment, and a similar exchange happens at the end. Those states are visible on any running machine, and two of them are how you find a whole class of server bug."
     },
     {
       "kind": "heading",
@@ -24,10 +24,12 @@
         "  |                                     |",
         "  | connect() returns              accept() returns",
         "",
-        "/* Three messages, so establishing a connection costs one full round trip",
-        "   before any data moves. On a 100 ms link that is 100 ms of latency you",
-        "   pay before sending a single byte — which is why connection reuse matters",
-        "   so much, and why the second curl in the first lesson was faster. */"
+        "/* Three messages in total — but only two cross before connect() returns:",
+        "   it returns the moment the SYN-ACK arrives, and the final ACK goes out",
+        "   right then, sometimes carrying the first data. Data still cannot move",
+        "   before one full round trip. On a 100 ms link that is 100 ms of latency",
+        "   you pay before sending a single byte — which is why connection reuse",
+        "   matters so much, and why the second curl in the first lesson was faster. */"
       ]
     },
     {

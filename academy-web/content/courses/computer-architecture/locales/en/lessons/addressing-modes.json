@@ -202,7 +202,7 @@
       "prompt": "Why does a[i] take three instructions on a reduced architecture and one on x86-64?",
       "choices": {
         "A": "The reduced version is a compiler bug",
-        "B": "Arrays are stored differently",
+        "B": "Arrays are stored differently — x86-64 packs the elements while RISC-V interleaves padding",
         "C": "x86-64 has faster memory",
         "D": "x86-64 has an addressing mode that scales an index and adds it during address generation"
       },
@@ -215,7 +215,7 @@
       "id": "cp-2",
       "prompt": "Why do branches encode an offset rather than an absolute address?",
       "choices": {
-        "A": "Offsets are smaller to encode",
+        "A": "Offsets execute faster than absolute addresses",
         "B": "To simplify the assembler",
         "C": "Absolute addresses are not supported",
         "D": "So the code works wherever it is loaded"
@@ -229,7 +229,7 @@
       "id": "cp-3",
       "prompt": "a[3] compiles to a single load while a[i] does not. Why?",
       "choices": {
-        "A": "Small indices are special-cased in hardware",
+        "A": "Small indices are special-cased in hardware, so only a[0] to a[7] get one instruction",
         "B": "The compiler computed 3 times the element size at compile time",
         "C": "a[3] is in a register",
         "D": "Constants are stored separately"

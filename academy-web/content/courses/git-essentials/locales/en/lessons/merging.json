@@ -76,7 +76,7 @@
       "kind": "code",
       "caption": "The check that prevents most bad merges",
       "lines": [
-        "git switch main && git pull        # today's state",
+        "git switch main && git pull        # today's state (pull = fetch + merge — properly introduced later in the course)",
         "git log --oneline main..feature    # commits that are about to arrive",
         "git diff main...feature            # the actual change, in full",
         "git merge feature",
@@ -167,15 +167,15 @@
       "id": "cp-2",
       "prompt": "When does Git produce a merge commit rather than a fast-forward?",
       "choices": {
-        "A": "Whenever more than one file changed",
-        "B": "When the receiving branch also gained commits since the other branch split off",
+        "A": "Whenever more than one file changed on either branch",
+        "B": "When the receiving branch has also moved on",
         "C": "Only if you pass --no-ff",
         "D": "Only when there is a conflict"
       },
       "correct": [
         "B"
       ],
-      "explanation": "If the receiving branch has not moved, the label can simply slide forward. If both moved, a commit with two parents is needed to join them."
+      "explanation": "If the receiving branch has not moved, the label can simply slide forward. If both moved, a commit with two parents is needed to join them. 'Moved on' means it gained commits since the other branch split off."
     },
     {
       "id": "cp-3",
@@ -195,15 +195,15 @@
       "id": "cp-4",
       "prompt": "What does git merge --squash feature do?",
       "choices": {
-        "A": "Brings the branch's changes in as a single uncommitted change, discarding its individual commits",
+        "A": "Brings the changes in as one uncommitted change",
         "B": "Compresses the repository",
         "C": "Merges without running hooks",
-        "D": "Deletes the feature branch after merging"
+        "D": "Deletes the feature branch after merging it into main"
       },
       "correct": [
         "A"
       ],
-      "explanation": "It is the option for a branch full of small messy commits whose individual steps are not worth keeping in the shared history."
+      "explanation": "It is the option for a branch full of small messy commits whose individual steps are not worth keeping in the shared history. The branch's individual commits are discarded; the combined change is staged, ready for one commit."
     }
   ]
 }

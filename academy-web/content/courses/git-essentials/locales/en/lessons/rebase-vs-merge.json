@@ -42,8 +42,8 @@
       "caption": "The everyday use",
       "lines": [
         "git switch feature/upload",
-        "git fetch origin",
-        "git rebase origin/main       # replay my commits on top of today's main",
+        "git fetch origin             # origin = the shared remote; fetch updates your snapshot of it (introduced later in the course)",
+        "git rebase origin/main       # origin/main = your snapshot of main there; replay my commits on top of today's main",
         "",
         "# resolve any conflict, then:",
         "git rebase --continue",
@@ -152,12 +152,12 @@
         "A": "Merges them and deletes the branch",
         "B": "Moves the existing commits to a new position",
         "C": "Compresses them into one commit automatically",
-        "D": "Creates new commits containing the same changes, with new identities, on top of the new base"
+        "D": "Creates new commits with the same changes"
       },
       "correct": [
         "D"
       ],
-      "explanation": "New commits with new ids. That is precisely why rebasing shared commits is a problem — everyone else still has the originals."
+      "explanation": "New commits with new ids. That is precisely why rebasing shared commits is a problem — everyone else still has the originals. The new commits sit on top of the new base, with new identities of their own."
     },
     {
       "id": "cp-2",
@@ -178,7 +178,7 @@
       "prompt": "You have eleven commits on a branch, three of which are 'fix typo'. What do you do before opening a pull request?",
       "choices": {
         "A": "git merge --squash into main directly",
-        "B": "Nothing — reviewers can ignore them",
+        "B": "Nothing — reviewers can simply ignore the noisy commits when reviewing",
         "C": "git rebase -i to squash them into commits that each do one thing",
         "D": "Delete the branch and start again"
       },
@@ -192,14 +192,14 @@
       "prompt": "Why prefer --force-with-lease over --force?",
       "choices": {
         "A": "It is faster",
-        "B": "It creates a backup branch automatically",
+        "B": "It creates a backup branch automatically before pushing",
         "C": "It works without authentication",
-        "D": "It refuses the push if the remote gained commits you have not seen"
+        "D": "It refuses if the remote moved since you last saw it"
       },
       "correct": [
         "D"
       ],
-      "explanation": "You cannot silently overwrite someone else's work. Plain --force overwrites whatever is there. --force-with-lease checks that the remote is still where you last saw it before replacing it."
+      "explanation": "You cannot silently overwrite someone else's work. Plain --force overwrites whatever is there. --force-with-lease checks that the remote is still where you last saw it before replacing it. 'Moved' means the remote gained commits you have not seen."
     }
   ]
 }

@@ -103,7 +103,7 @@
       "id": "cp-1",
       "prompt": "In `ps aux` output, which column matters most for a security question?",
       "choices": {
-        "A": "The USER column — which account the process is running as",
+        "A": "The USER column — who it runs as",
         "B": "The terminal it was launched from",
         "C": "The start time",
         "D": "The memory percentage"
@@ -111,14 +111,14 @@
       "correct": [
         "A"
       ],
-      "explanation": "What a process may do is determined by who it runs as. A process running as root can do anything root can do, so an unexpected root process is the thing to explain."
+      "explanation": "What a process may do is determined by who it runs as. A process running as root can do anything root can do, so an unexpected root process is the thing to explain. What a process may do is determined by who it runs as — an unexpected root process is the thing to explain."
     },
     {
       "id": "cp-2",
       "prompt": "You ran `sudo apt update` and no packages were installed. Why?",
       "choices": {
-        "A": "The machine is fully patched already",
-        "B": "apt update only refreshes the catalogue of available versions",
+        "A": "The machine is already fully patched anyway",
+        "B": "apt update only refreshes the catalogue",
         "C": "The repository was unreachable",
         "D": "You needed to reboot first"
       },
@@ -133,13 +133,13 @@
       "choices": {
         "A": "Because new versions are always faster",
         "B": "Because it replaces the need for permissions",
-        "C": "Because most successful intrusions exploit known vulnerabilities that already had patches available",
+        "C": "Most intrusions use known vulnerabilities",
         "D": "Because it satisfies auditors and nothing more"
       },
       "correct": [
         "C"
       ],
-      "explanation": "The common case is not a novel exploit against a current system — it is a known issue on a system nobody updated."
+      "explanation": "The common case is not a novel exploit against a current system — it is a known issue on a system nobody updated. Ones that already had patches available — the common case is not a novel exploit against a current system."
     }
   ]
 }

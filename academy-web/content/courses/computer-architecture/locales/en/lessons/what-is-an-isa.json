@@ -128,7 +128,7 @@
         "Write a one-line C function that adds two integers and compile it with: cc -S -O2 f.c -o -",
         "Read the assembly and identify the register names — they are ISA-defined",
         "Compile the same file with -O0 and compare how many instructions the same function takes",
-        "Run: cc -march=native -Q --help=target 2>/dev/null | head -20    (the features your chip reports)",
+        "Run: cc -march=native -Q --help=target 2>/dev/null | head -20    (the features your chip reports; GCC — with clang/macOS cc, use cc -march=native -### to see the chosen target)",
         "Read: sysctl -a 2>/dev/null | grep -iE 'cpu.*(brand|features)' | head -5    or on Linux: lscpu",
         "Write down which of the things listed there are ISA and which are implementation"
       ],
@@ -152,7 +152,7 @@
       "prompt": "Two processors implement the same ISA. One is three times faster. What must be identical?",
       "choices": {
         "A": "Their cache sizes",
-        "B": "Their pipeline depth",
+        "B": "Their pipeline depth in stages",
         "C": "The result of every program",
         "D": "Their clock speed"
       },
@@ -180,14 +180,14 @@
       "prompt": "What does dedicating a register to the constant zero buy?",
       "choices": {
         "A": "Simpler cache design",
-        "B": "Faster arithmetic",
+        "B": "Faster arithmetic, since zero is always in a register",
         "C": "More memory bandwidth",
-        "D": "Several operations"
+        "D": "Several operations become ordinary instructions"
       },
       "correct": [
         "D"
       ],
-      "explanation": "Comparison with zero, moving a value, discarding a result — become ordinary instructions instead of needing their own. One register spent removes the need for several special instructions, which keeps both the encoding and the decoder smaller. It is a representative trade for this whole course."
+      "explanation": "Comparison with zero, moving a value, discarding a result — become ordinary instructions instead of needing their own. One register spent removes the need for several special instructions, which keeps both the encoding and the decoder smaller. It is a representative trade for this whole course. So no special forms are needed for them."
     },
     {
       "id": "cp-4",
@@ -195,7 +195,7 @@
       "choices": {
         "A": "The size of the cache",
         "B": "The pipeline depth",
-        "C": "The clock speed",
+        "C": "The clock speed chosen for that chip model",
         "D": "The number of registers the ISA defines"
       },
       "correct": [

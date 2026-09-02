@@ -219,8 +219,8 @@
       "choices": {
         "A": "It defers the tag comparison",
         "B": "Nothing is deferred",
-        "C": "It defers the cache update; costs a stall",
-        "D": "It defers writing to the next level until the block is evicted"
+        "C": "It defers the cache update, paying a stall each time",
+        "D": "It defers writing to the next level until eviction"
       },
       "correct": [
         "D"
@@ -231,10 +231,10 @@
       "id": "cp-3",
       "prompt": "Four threads each increment their own counter and the program is 3.91x slower when the counters are adjacent. Is this a data race?",
       "choices": {
-        "A": "No — each thread owns its counter and both versions produce identical correct results",
+        "A": "No — each thread owns its counter and results match",
         "B": "No, it is a compiler bug",
         "C": "Yes, a lock is missing",
-        "D": "Yes, the counters are shared"
+        "D": "Yes, the counters are shared between the four threads"
       },
       "correct": [
         "A"
@@ -246,9 +246,9 @@
       "prompt": "Why does read-mostly shared data scale well across many cores?",
       "choices": {
         "A": "Reads are cached and writes are not",
-        "B": "The compiler duplicates read-only data",
+        "B": "The compiler duplicates read-only data into every thread",
         "C": "Reads do not use the cache line",
-        "D": "Any number of caches may hold the same block for reading simultaneously"
+        "D": "Any number of caches may hold the block for reading"
       },
       "correct": [
         "D"

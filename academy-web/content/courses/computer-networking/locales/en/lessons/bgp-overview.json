@@ -176,15 +176,15 @@
       "id": "cp-1",
       "prompt": "Why might traffic between two cities in the same country leave the country and come back?",
       "choices": {
-        "A": "Routing between networks follows policy and contracts rather than geography",
+        "A": "Routing between networks follows policy, not geography",
         "B": "Cables only run between countries",
         "C": "To balance load",
-        "D": "A misconfiguration, always"
+        "D": "It is always a misconfiguration by one of the operators involved"
       },
       "correct": [
         "A"
       ],
-      "explanation": "Inside a single network the goal is the shortest path. Between networks it is the path the operator's agreements and costs favour, which may be much longer physically."
+      "explanation": "Inside a single network the goal is the shortest path. Between networks it is the path the operator's agreements and costs favour, which may be much longer physically. The 'policy' is commercial: peering and transit agreements decide the path, not distance."
     },
     {
       "id": "cp-2",
@@ -206,13 +206,13 @@
       "choices": {
         "A": "It measures latency",
         "B": "It sets the packet's hop limit",
-        "C": "It prevents loops — a network that sees its own identifier in a path rejects the announcement",
+        "C": "It prevents loops",
         "D": "It authenticates the sender"
       },
       "correct": [
         "C"
       ],
-      "explanation": "Loop prevention is structural. Note what it does not do: it carries no proof that any network on it was entitled to announce the range."
+      "explanation": "Loop prevention is structural. Note what it does not do: it carries no proof that any network on it was entitled to announce the range. A network that sees its own identifier in a path rejects the announcement, which is what makes loop prevention structural."
     },
     {
       "id": "cp-4",

@@ -246,7 +246,7 @@
       }
     },
     {
-      "id": "bitwise-ops",
+      "id": "integer-representation",
       "kind": "lesson",
       "prerequisites": [
         "defensive-c"
@@ -254,19 +254,19 @@
       "estimatedMinutes": 18,
       "skillWeights": {
         "bits-numbers": 6,
-        "c-syntax": 2
+        "debugging": 2
       }
     },
     {
-      "id": "integer-representation",
+      "id": "bitwise-ops",
       "kind": "lesson",
       "prerequisites": [
-        "bitwise-ops"
+        "integer-representation"
       ],
       "estimatedMinutes": 18,
       "skillWeights": {
         "bits-numbers": 6,
-        "debugging": 2
+        "c-syntax": 2
       }
     },
     {

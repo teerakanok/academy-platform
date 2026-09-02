@@ -215,21 +215,21 @@
       "prompt": "You update a record. A colleague sees the new address and you still see the old one. Why?",
       "choices": {
         "A": "You need to restart your machine",
-        "B": "Your resolver cached the old answer and is still counting down its TTL",
+        "B": "Your resolver cached the old answer",
         "C": "The record propagates outward geographically",
         "D": "The change failed"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Verified: a caching resolver returned a TTL of 11 for a name whose configured value was 300. Until that countdown reaches zero, that resolver keeps serving what it has."
+      "explanation": "Verified: a caching resolver returned a TTL of 11 for a name whose configured value was 300. Until that countdown reaches zero, that resolver keeps serving what it has. It keeps serving that answer while the record's TTL counts down to zero."
     },
     {
       "id": "cp-2",
       "prompt": "dig returns NOERROR but the answer section is empty. What does that mean?",
       "choices": {
-        "A": "The resolver timed out",
-        "B": "The name exists, but has no record of the type you asked for",
+        "A": "The resolver timed out and returned a partial answer",
+        "B": "The name exists, but has no record of that type",
         "C": "The name does not exist",
         "D": "The domain is misconfigured"
       },
@@ -242,7 +242,7 @@
       "id": "cp-3",
       "prompt": "A lookup shows a query time of 3 ms. What does that tell you?",
       "choices": {
-        "A": "The answer almost certainly came from a cache",
+        "A": "Almost certainly from a cache",
         "B": "The name is invalid",
         "C": "The authoritative server is nearby",
         "D": "IPv6 was used"
@@ -257,7 +257,7 @@
       "prompt": "An application cannot connect and reports a network error. What is the first thing to check?",
       "choices": {
         "A": "Whether the name resolves at all",
-        "B": "The server's logs",
+        "B": "The application logs on the server machine",
         "C": "The firewall",
         "D": "The routing table"
       },

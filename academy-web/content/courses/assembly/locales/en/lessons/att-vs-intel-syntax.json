@@ -253,10 +253,10 @@
       "id": "cp-2",
       "prompt": "How do you identify AT&T syntax at a glance?",
       "choices": {
-        "A": "By the presence of dword ptr",
+        "A": "By the presence of dword ptr before the operand",
         "B": "By the square brackets",
         "C": "By the instruction names",
-        "D": "By the % on every register and the $ on every constant"
+        "D": "By the % on registers and $ on constants"
       },
       "correct": [
         "D"

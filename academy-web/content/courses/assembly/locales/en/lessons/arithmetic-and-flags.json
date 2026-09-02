@@ -51,7 +51,7 @@
       "kind": "callout",
       "tone": "info",
       "title": "Two overflow flags, because there are two kinds of overflow",
-      "text": "The same bit pattern is a different number depending on interpretation, so overflowing means different things. Adding 0xFFFFFFFF and 1 in 32 bits gives 0 with a carry out — unsigned overflow, CF set. As signed values that is -1 + 1 = 0, perfectly correct, OF clear. The hardware sets both flags on every arithmetic instruction and lets the reader choose which one applies. This is the C course's signed-versus-unsigned discussion appearing as two separate bits in silicon."
+      "text": "The same bit pattern is a different number depending on interpretation, so overflowing means different things. Adding 0xFFFFFFFF and 1 in 32 bits gives 0 with a carry out — unsigned overflow, CF set. As signed values that is -1 + 1 = 0, perfectly correct, OF clear. On the add/sub/cmp/neg family the hardware sets both flags on every result and lets the reader choose which one applies — but not every arithmetic instruction is in that family: mul/imul leave ZF, SF, AF and PF undefined, div reports nothing through flags, and inc/dec leave CF unchanged. This is the C course's signed-versus-unsigned discussion appearing as two separate bits in silicon."
     },
     {
       "kind": "heading",
@@ -226,7 +226,7 @@
   ],
   "cheatsheet": [
     "Four flags: ZF zero, SF sign, CF unsigned carry, OF signed overflow",
-    "Both CF and OF are set on every arithmetic instruction; the reader picks which applies",
+    "Both CF and OF are set by the add/sub/cmp/neg family; the reader picks which applies — mul/imul and div do not reliably report via flags",
     "cmp computes a subtraction and keeps only the flags",
     "test computes an AND and keeps only the flags; test r,r means 'is r zero?'",
     "Signed conditions use less/greater: l, le, g, ge",
@@ -241,7 +241,7 @@
       "id": "cp-1",
       "prompt": "Signed and unsigned less-than both compile to the same cmp. Where does the difference appear?",
       "choices": {
-        "A": "In the register widths",
+        "A": "In the register widths used for the comparison",
         "B": "In the operand order",
         "C": "In the condition that reads the flags",
         "D": "There is no difference"
@@ -256,21 +256,21 @@
       "prompt": "Why do compilers emit test edi, edi instead of cmp edi, 0?",
       "choices": {
         "A": "cmp cannot take zero",
-        "B": "Both answer the same question and test is shorter, needing no immediate operand",
+        "B": "test is shorter — it needs no immediate operand",
         "C": "test sets different flags",
-        "D": "It is required by the ABI"
+        "D": "It is required by the System V ABI for comparisons against zero"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Read test of a register with itself as 'is this zero?'. It appears constantly in real disassembly."
+      "explanation": "Both answer the same question here. Read test of a register with itself as 'is this zero?'. It appears constantly in real disassembly."
     },
     {
       "id": "cp-3",
       "prompt": "A ternary compiles to cmov, but adding a function call to one branch makes the cmov disappear. Why?",
       "choices": {
         "A": "Calls clobber the flags",
-        "B": "cmov cannot use the return value",
+        "B": "cmov cannot use the return value of a call as its source operand",
         "C": "cmov evaluates both sides and selects afterwards",
         "D": "The function is too large"
       },

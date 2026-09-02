@@ -251,7 +251,8 @@
       "id": "http-basics",
       "kind": "lesson",
       "prerequisites": [
-        "client-and-server"
+        "tcp-handshake",
+        "dns-and-resolution"
       ],
       "estimatedMinutes": 19,
       "skillWeights": {

@@ -122,15 +122,17 @@
         "",
         "/* goto exists. In modern C it has one accepted use: */",
         "int process(void) {",
+        "    int rc = -1;",
         "    char *buf = malloc(1024);",
         "    if (!buf) return -1;",
         "    FILE *f = fopen(\"data\", \"r\");",
         "    if (!f) goto cleanup_buf;         /* single exit path for cleanup */",
         "    /* ...work... */",
+        "    rc = 0;",
         "    fclose(f);",
         "cleanup_buf:",
         "    free(buf);",
-        "    return 0;",
+        "    return rc;",
         "}"
       ]
     },
@@ -204,27 +206,27 @@
       "choices": {
         "A": "Braces are required by the standard",
         "B": "It makes the file larger, which helps debugging",
-        "C": "Indentation means nothing to the compiler, so a second indented line silently runs unconditionally — a real vulnerability came from exactly this",
+        "C": "Indentation means nothing to the compiler",
         "D": "It compiles faster"
       },
       "correct": [
         "C"
       ],
-      "explanation": "The compiler reads structure, not layout. Braces make the two agree."
+      "explanation": "A second indented line therefore runs unconditionally — a real vulnerability came from exactly this. The compiler reads structure, not layout. Braces make the two agree."
     },
     {
       "id": "cp-3",
       "prompt": "A switch case has no break. What happens?",
       "choices": {
-        "A": "Execution continues into the next case — 'fall-through'",
+        "A": "Execution falls into the next case",
         "B": "It jumps to default",
-        "C": "It is a compile error",
+        "C": "It is a compile error unless a break is added",
         "D": "The switch ends"
       },
       "correct": [
         "A"
       ],
-      "explanation": "Sometimes that is what you want; when it is, add a comment so the next reader knows it was intended rather than forgotten."
+      "explanation": "This is called 'fall-through'. Sometimes that is what you want; when it is, add a comment so the next reader knows it was intended rather than forgotten."
     },
     {
       "id": "cp-4",
@@ -232,7 +234,7 @@
       "choices": {
         "A": "It is faster than returning",
         "B": "It is required by the standard",
-        "C": "It prevents undefined behaviour",
+        "C": "It prevents undefined behaviour in loops",
         "D": "C has no destructors or finally block"
       },
       "correct": [

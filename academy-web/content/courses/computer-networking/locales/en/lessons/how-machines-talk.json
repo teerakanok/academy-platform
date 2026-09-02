@@ -161,9 +161,9 @@
       "id": "cp-1",
       "prompt": "A program sends a port number without calling htons. What is the likely symptom?",
       "choices": {
-        "A": "Nothing, on modern hardware",
+        "A": "Nothing — modern hardware handles both byte orders",
         "B": "A compiler warning",
-        "C": "It connects to a different port than intended",
+        "C": "It connects to a different port",
         "D": "The connection is slower"
       },
       "correct": [
@@ -177,41 +177,41 @@
       "choices": {
         "A": "TCP cannot carry video",
         "B": "UDP encrypts by default",
-        "C": "A retransmitted frame arrives too late to display, and the delay it causes harms the current frame",
-        "D": "UDP is always faster"
+        "C": "Retransmitted data arrives too late to matter",
+        "D": "UDP is simply faster for every kind of application traffic"
       },
       "correct": [
         "C"
       ],
-      "explanation": "Reliability is only valuable if late data still has value. When it does not, retransmission spends bandwidth and adds delay for nothing."
+      "explanation": "Reliability is only valuable if late data still has value. When it does not, retransmission spends bandwidth and adds delay for nothing. The retransmitted frame cannot be displayed in time, and waiting for it delays the frame being shown now."
     },
     {
       "id": "cp-3",
       "prompt": "Why is the network allowed to drop packets rather than being built to never do so?",
       "choices": {
-        "A": "Guaranteeing delivery at every hop would be prohibitively expensive",
+        "A": "Delivery guarantees at every hop would cost too much",
         "B": "It is a bug that has not been fixed",
         "C": "Only wireless networks drop packets",
-        "D": "Packets are dropped only under attack"
+        "D": "Packets are dropped only when the network is under attack"
       },
       "correct": [
         "A"
       ],
-      "explanation": "The network is cheap and best-effort and the endpoints add reliability if they need it. This is the end-to-end principle: keep the middle simple and fast, and put the features that only some applications need at the edges."
+      "explanation": "The network is cheap and best-effort and the endpoints add reliability if they need it. This is the end-to-end principle: keep the middle simple and fast, and put the features that only some applications need at the edges. Guaranteeing delivery at every hop would be prohibitively expensive."
     },
     {
       "id": "cp-4",
-      "prompt": "You run the same curl twice and the second is noticeably faster. Which explanation is NOT plausible?",
+      "prompt": "You load the same page again in your browser and the second load is noticeably faster. Which explanation is NOT plausible?",
       "choices": {
         "A": "A TLS session was resumed",
         "B": "The route through the internet became shorter",
         "C": "The DNS answer was cached",
-        "D": "An existing connection was reused"
+        "D": "An existing connection from the first load was reused"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Routes do change, but not reliably between two commands seconds apart. Caching, session resumption and connection reuse are the everyday explanations — and all three are covered later in this course."
+      "explanation": "Routes do change, but not reliably between two page loads seconds apart. Caching, session resumption and connection reuse are the everyday explanations — and all three are covered later in this course."
     }
   ]
 }

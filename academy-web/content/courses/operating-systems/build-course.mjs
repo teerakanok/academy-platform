@@ -14,7 +14,7 @@ const PLAN = [
   ['syscall-lifecycle', 'capstone', ['syscall-mechanism'], 20, { 'kernel-interface': 4, processes: 2 }],
   // M2 โปรเซสและ signal
   ['fork-exec-wait', 'lesson', ['syscall-lifecycle'], 20, { processes: 4, 'kernel-interface': 2 }],
-  ['zombie-and-orphan', 'lesson', ['fork-exec-wait'], 16, { processes: 4 }],
+  ['zombie-and-orphan', 'lesson', ['fork-exec-wait', 'signals'], 16, { processes: 4 }],
   ['signals', 'lesson', ['fork-exec-wait'], 18, { processes: 3, 'kernel-interface': 2 }],
   ['async-signal-safety', 'lesson', ['signals'], 17, { processes: 3, 'os-security': 2 }],
   // M3 thread และการซิงก์
@@ -25,7 +25,7 @@ const PLAN = [
   ['semaphore-and-condvar', 'lesson', ['mutex'], 19, { synchronisation: 4 }],
   ['producer-consumer', 'capstone', ['semaphore-and-condvar'], 22, { synchronisation: 4, concurrency: 4 }],
   // M4 deadlock และ scheduling
-  ['deadlock', 'lesson', ['mutex'], 18, { synchronisation: 4, concurrency: 2 }],
+  ['deadlock', 'lesson', ['mutex', 'semaphore-and-condvar'], 18, { synchronisation: 4, concurrency: 2 }],
   ['cpu-scheduling', 'lesson', ['thread-vs-process'], 18, { processes: 3, concurrency: 2 }],
   // M5 virtual memory
   ['address-space', 'lesson', ['fork-exec-wait'], 18, { 'virtual-memory': 4 }],

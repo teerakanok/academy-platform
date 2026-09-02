@@ -83,7 +83,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "The reflog records commits. Work that was never committed — edits sitting in your working directory, or changes you staged but never committed have no reflog entry, so no reflog command finds them — though the blobs themselves survive in the object database and git fsck --lost-found can still recover them until gc runs. git restore, git checkout of a file, and reset --hard all discard that work permanently."
+      "text": "The reflog records commits. Work that was never committed — edits sitting in your working directory, or changes you staged but never committed — has no reflog entry, so no reflog command finds them. One narrow exception: changes you staged but never committed were written into the object database as blobs, and git fsck --lost-found can still recover those until gc runs. Unstaged edits leave nothing behind at all. git restore, git checkout of a file, and reset --hard all discard that work permanently."
     },
     {
       "kind": "callout",
@@ -192,7 +192,7 @@
       "prompt": "Which of these is genuinely unrecoverable?",
       "choices": {
         "A": "Uncommitted edits discarded with git restore",
-        "B": "A commit removed by reset --hard",
+        "B": "A commit removed by reset --hard, if it was recent",
         "C": "A branch deleted yesterday",
         "D": "Commits replaced by a rebase"
       },
@@ -205,15 +205,15 @@
       "id": "cp-4",
       "prompt": "You are about to attempt something risky in a repository. What is the cheapest insurance?",
       "choices": {
-        "A": "Push to the remote immediately",
-        "B": "Commit your current work first, even to a scruffy temporary branch",
+        "A": "Push to the remote immediately, before anything goes wrong",
+        "B": "Commit your work first, even to a scruffy branch",
         "C": "Copy the folder to your desktop",
         "D": "Run git gc"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Once it is a commit it is recoverable through the reflog no matter what happens next, and the history can always be tidied afterwards."
+      "explanation": "Once it is a commit it is recoverable through the reflog no matter what happens next, and the history can always be tidied afterwards. Even a scruffy temporary branch is enough: once it is a commit, it is recoverable."
     }
   ]
 }

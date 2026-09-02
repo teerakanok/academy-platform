@@ -188,7 +188,7 @@
         "A": "The clock changes between them",
         "B": "Throughput is an average",
         "C": "Five instructions are in progress at once",
-        "D": "One of them is measured wrongly"
+        "D": "One of them is measured wrongly, hence the mismatch"
       },
       "correct": [
         "C"
@@ -200,7 +200,7 @@
       "prompt": "Users complain that a service feels slow to respond. What will adding more worker threads achieve?",
       "choices": {
         "A": "It will make it worse",
-        "B": "It depends on the number of cores",
+        "B": "It depends on the number of cores and the queue depth",
         "C": "Little — each request still takes as long",
         "D": "It will fix the complaint"
       },
@@ -228,9 +228,9 @@
       "prompt": "What does a deadline add that neither latency nor throughput captures?",
       "choices": {
         "A": "A measure of cost",
-        "B": "A limit on parallelism",
+        "B": "A limit on parallelism that caps the flow of work",
         "C": "A queueing model",
-        "D": "That work completed after a certain moment can be worthless, even though it finished"
+        "D": "Work completed too late can be worthless"
       },
       "correct": [
         "D"

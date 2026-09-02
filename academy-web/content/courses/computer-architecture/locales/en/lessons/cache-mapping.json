@@ -243,7 +243,7 @@
         "A": "It aligned the data",
         "B": "It kept the number of pages identical",
         "C": "It reduced the data size",
-        "D": "It made the access sequential"
+        "D": "It made the access sequential, which prefetchers reward"
       },
       "correct": [
         "B"
@@ -254,10 +254,10 @@
       "id": "cp-4",
       "prompt": "A routine on a 1024x1024 float array is slow, and the same routine on a 1025-wide allocation is much faster. What happened?",
       "choices": {
-        "A": "The larger array fits in cache better",
+        "A": "The larger padded array fits in cache better despite using more memory",
         "B": "The compiler vectorised the odd size",
         "C": "Memory alignment improved",
-        "D": "The power-of-two row length made every row's column j land on the same few sets"
+        "D": "The power-of-two row length made column j land on the same few sets"
       },
       "correct": [
         "D"

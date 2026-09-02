@@ -67,6 +67,8 @@
         "",
         "/* Sending 5 bytes of 'hello' over TCP/IPv4/Ethernet:",
         "     14 + 20 + 20 + 5 = 59 bytes on the wire",
+        "   (real Ethernet pads every frame out to its 64-byte minimum, and that",
+        "   minimum includes the 4-byte FCS, so a frame this small leaves as 64)",
         "   The payload is 8% of it. Over IPv6 it is 14 + 40 + 20 + 5 = 79 bytes,",
         "   and the payload is 6%. */"
       ]
@@ -184,7 +186,7 @@
     "Link addresses a device on this segment (MAC); network addresses a machine anywhere (IP)",
     "Transport addresses a program (port); application is the only layer that knows what the bytes mean",
     "Measured header sizes: ethernet 14, IPv4 20, IPv6 40, TCP 20, UDP 8",
-    "Sending 5 bytes over TCP/IPv4/Ethernet puts 59 bytes on the wire",
+    "Sending 5 bytes over TCP/IPv4/Ethernet puts 59 bytes on the wire (Ethernet pads small frames to its 64-byte minimum, FCS included)",
     "Ethernet MTU is usually 1500, leaving 1460 bytes for TCP payload",
     "Small things working while large things hang points at an MTU problem",
     "Diagnose upward from the bottom layer and stop at the first that fails",
@@ -195,7 +197,7 @@
       "id": "cp-1",
       "prompt": "Your program sends 5 bytes over TCP on IPv4 Ethernet. Roughly how many bytes are on the wire?",
       "choices": {
-        "A": "About 59 — 14 ethernet, 20 IPv4, 20 TCP, 5 payload",
+        "A": "About 59",
         "B": "About 25",
         "C": "1500",
         "D": "5"
@@ -203,7 +205,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "Verified from the system headers. The payload is about 8% of the frame, which is why protocols batch small messages rather than sending each one on its own."
+      "explanation": "Verified from the system headers. The payload is about 8% of the frame, which is why protocols batch small messages rather than sending each one on its own. Counted as 14 ethernet + 20 IPv4 + 20 TCP + 5 payload."
     },
     {
       "id": "cp-2",
@@ -211,22 +213,22 @@
       "choices": {
         "A": "A DNS problem",
         "B": "A firewall blocking port 22",
-        "C": "An MTU problem — small packets pass while large ones are dropped somewhere on the path",
+        "C": "An MTU problem on the path",
         "D": "The server is out of memory"
       },
       "correct": [
         "C"
       ],
-      "explanation": "Port 22 is clearly open, since the session was established. The size-dependent behaviour is the signature: test with ping -M do at increasing sizes to find where it stops."
+      "explanation": "Port 22 is clearly open, since the session was established. The size-dependent behaviour is the signature: test with ping -M do at increasing sizes to find where it stops. Small packets pass while large ones are dropped somewhere along the way."
     },
     {
       "id": "cp-3",
       "prompt": "Why diagnose from the bottom layer upward rather than from the application down?",
       "choices": {
         "A": "It is only a convention",
-        "B": "Application tools are unreliable",
+        "B": "Application-level diagnostic tools are unreliable",
         "C": "Lower layers are faster to check",
-        "D": "A failure at a low layer surfaces as a confusing error at a high one"
+        "D": "A failure at a low layer surfaces at a high one"
       },
       "correct": [
         "D"

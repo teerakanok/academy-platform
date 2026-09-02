@@ -186,15 +186,15 @@
       "id": "cp-1",
       "prompt": "Your program sends a 1000-byte message over TCP. The receiver's first read returns 500 bytes. What happened?",
       "choices": {
-        "A": "The buffer was too small",
+        "A": "The receive buffer was too small for the message",
         "B": "The connection dropped",
-        "C": "Nothing wrong — TCP is a byte stream, so the rest may arrive on a later read",
+        "C": "Nothing wrong — TCP is a byte stream",
         "D": "The message was truncated"
       },
       "correct": [
         "C"
       ],
-      "explanation": "Order and completeness are guaranteed; boundaries are not. Loop until you have the number of bytes your protocol says to expect."
+      "explanation": "Order and completeness are guaranteed; boundaries are not. Loop until you have the number of bytes your protocol says to expect. The rest of the message may well arrive on a later read."
     },
     {
       "id": "cp-2",
@@ -215,8 +215,8 @@
       "prompt": "read() returns 0 on a socket. What does that mean?",
       "choices": {
         "A": "An error occurred",
-        "B": "The socket is non-blocking",
-        "C": "The other end closed its side of the connection",
+        "B": "The socket is set to non-blocking mode",
+        "C": "The other end closed the connection",
         "D": "No data is available yet"
       },
       "correct": [
@@ -230,13 +230,13 @@
       "choices": {
         "A": "Too many threads",
         "B": "A memory leak",
-        "C": "The clients are not disconnecting",
-        "D": "The parent is not closing the connection descriptor after forking"
+        "C": "The clients are not disconnecting after their requests",
+        "D": "The parent keeps the connection descriptor open"
       },
       "correct": [
         "D"
       ],
-      "explanation": "It stays open in both processes. The child inherits every open descriptor. Each side must close what it does not need, or the connection is never fully released and the count only rises."
+      "explanation": "It stays open in both processes. The child inherits every open descriptor. Each side must close what it does not need, or the connection is never fully released and the count only rises. Specifically, the parent should close its copy after forking, because the child holds its own."
     }
   ]
 }

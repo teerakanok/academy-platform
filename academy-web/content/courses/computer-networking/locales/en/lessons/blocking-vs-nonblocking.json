@@ -169,50 +169,50 @@
       "prompt": "A blocking read waits ten seconds for data. How much CPU does the thread use during that time?",
       "choices": {
         "A": "One core, spinning",
-        "B": "It depends on the timeout",
+        "B": "It depends on how long the timeout is set to",
         "C": "Half a core",
-        "D": "None — a blocked thread is not scheduled at all"
+        "D": "None — it is not scheduled"
       },
       "correct": [
         "D"
       ],
-      "explanation": "Blocking is cheap in CPU terms. What it costs is a thread, which has a memory and switching cost — and that is what limits how many connections this model can handle."
+      "explanation": "Blocking is cheap in CPU terms. What it costs is a thread, which has a memory and switching cost — and that is what limits how many connections this model can handle. A blocked thread is not scheduled at all; it uses no CPU while it waits."
     },
     {
       "id": "cp-2",
       "prompt": "read() on a non-blocking socket returns -1 with errno EAGAIN. What should your code do?",
       "choices": {
         "A": "Report a failure to the user",
-        "B": "Retry immediately in a loop",
-        "C": "Treat it as 'nothing available yet' and come back later",
+        "B": "Retry immediately in a tight loop until data arrives",
+        "C": "Treat it as 'nothing available yet'",
         "D": "Close the connection"
       },
       "correct": [
         "C"
       ],
-      "explanation": "It is not an error. It is the normal answer when there is no data. Retrying immediately in a loop is the busy-wait mistake; the correct next step is to wait for readiness, which the next lesson covers."
+      "explanation": "It is not an error. It is the normal answer when there is no data. Retrying immediately in a loop is the busy-wait mistake; the correct next step is to wait for readiness, which the next lesson covers. In other words: nothing is available yet, so come back later rather than treat it as failure."
     },
     {
       "id": "cp-3",
       "prompt": "Why is setting O_NONBLOCK with fcntl(fd, F_SETFL, O_NONBLOCK) wrong?",
       "choices": {
-        "A": "It replaces all the flags instead of adding one, clearing anything else that was set",
+        "A": "It replaces all the flags instead of adding one",
         "B": "It needs to be done before connect",
         "C": "It only works on files",
-        "D": "O_NONBLOCK cannot be set with fcntl"
+        "D": "O_NONBLOCK can never be set through the fcntl interface"
       },
       "correct": [
         "A"
       ],
-      "explanation": "Read the current flags with F_GETFL and OR the new one in. This is a small bug that produces confusing behaviour much later."
+      "explanation": "Read the current flags with F_GETFL and OR the new one in. This is a small bug that produces confusing behaviour much later. F_SETFL sets the whole flag word, so anything else that was set is cleared."
     },
     {
       "id": "cp-4",
       "prompt": "Your non-blocking server uses 100% of one core while idle. What is the most likely cause?",
       "choices": {
-        "A": "The kernel is misconfigured",
+        "A": "The kernel scheduler is misconfigured for this process",
         "B": "Too many connections",
-        "C": "It calls read in a tight loop instead of waiting for readiness",
+        "C": "It calls read in a tight loop",
         "D": "A memory leak"
       },
       "correct": [

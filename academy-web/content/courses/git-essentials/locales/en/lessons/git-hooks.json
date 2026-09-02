@@ -182,14 +182,14 @@
       "prompt": "Why can a pre-commit hook not be relied on to keep secrets out of a shared repository?",
       "choices": {
         "A": "Hooks run after the commit is created",
-        "B": "It can be skipped with --no-verify and does not exist in a fresh clone until someone installs it",
-        "C": "Hooks only run on the default branch",
+        "B": "It can be skipped with --no-verify, and fresh clones lack it",
+        "C": "Hooks only run on the default branch, never on feature branches",
         "D": "Hooks cannot read file contents"
       },
       "correct": [
         "B"
       ],
-      "explanation": "It is a local convenience, not a control. Anything that must not enter the shared branch has to be enforced where the contributor cannot bypass it."
+      "explanation": "It is a local convenience, not a control. Anything that must not enter the shared branch has to be enforced where the contributor cannot bypass it. In a fresh clone the hook does not even exist until someone installs it."
     },
     {
       "id": "cp-2",
@@ -198,12 +198,12 @@
         "A": "The hook is skipped automatically",
         "B": "People commit less often, which is fine",
         "C": "Git caches the result",
-        "D": "People start passing --no-verify, and the hook stops protecting anything"
+        "D": "People skip the hook with --no-verify"
       },
       "correct": [
         "D"
       ],
-      "explanation": "A check people route around is worse than no check, because it creates the belief that something is being checked. Move slow work to pre-push or CI."
+      "explanation": "A check people route around is worse than no check, because it creates the belief that something is being checked. Move slow work to pre-push or CI. Once skipping is routine, the hook stops protecting anything."
     },
     {
       "id": "cp-3",

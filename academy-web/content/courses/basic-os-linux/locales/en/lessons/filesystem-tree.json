@@ -21,7 +21,7 @@
     {
       "kind": "image",
       "src": "/media/diagrams/filesystem-tree.svg",
-      "alt": "A tree hanging off a single root directory. /etc holds configuration, /var/log holds things that grow and is where you look when something broke, /home/you holds your own files, /usr/bin holds the programs, and /tmp is scratch space wiped on reboot.",
+      "alt": "A tree hanging off a single root directory. /etc holds configuration, /var/log holds things that grow and is where you look when something broke, /home/you holds your own files, /usr/bin holds the programs, and /tmp is scratch space wiped on reboot or cleaned periodically, depending on the distribution.",
       "caption": "One tree, one root. Other disks hang off it as branches rather than getting a letter."
     },
     {
@@ -120,7 +120,7 @@
       "prompt": "What is the difference between /log and log ?",
       "choices": {
         "A": "/log is on another disk",
-        "B": "/log is absolute — a folder directly under the root of the tree. log is relative — a folder inside wherever you currently are",
+        "B": "/log is absolute, log is relative",
         "C": "No difference, the slash is optional",
         "D": "/log is a file and log is a folder"
       },
@@ -149,8 +149,8 @@
       "choices": {
         "A": "Whether the disk is full",
         "B": "Whether the machine has been restarted",
-        "C": "Whether the file has a .sh extension",
-        "D": "Whether the script uses relative paths that resolve differently depending on the working directory"
+        "C": "Whether the file has a .sh extension or not",
+        "D": "Whether the script uses relative paths"
       },
       "correct": [
         "D"

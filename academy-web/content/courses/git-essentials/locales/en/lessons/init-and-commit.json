@@ -150,20 +150,20 @@
       "prompt": "What is the staging area for?",
       "choices": {
         "A": "A cache that makes Git faster",
-        "B": "Choosing exactly which changes go into the next commit, instead of committing everything you touched",
+        "B": "Choosing which changes go into the next commit",
         "C": "A backup taken before committing",
         "D": "A queue of files waiting to upload to a server"
       },
       "correct": [
         "B"
       ],
-      "explanation": "It separates 'I changed this' from 'this belongs in this commit', which is what lets a history be made of coherent, single-purpose commits."
+      "explanation": "It separates 'I changed this' from 'this belongs in this commit', which is what lets a history be made of coherent, single-purpose commits. Without staging, you would simply commit everything you touched."
     },
     {
       "id": "cp-2",
       "prompt": "You delete the .git directory from a project folder. What happens?",
       "choices": {
-        "A": "The files remain but every commit, branch, and piece of history is gone",
+        "A": "The files remain but all history is gone",
         "B": "Nothing — it is a cache and Git rebuilds it",
         "C": "The files are deleted too",
         "D": "The project reverts to its first commit"
@@ -171,7 +171,7 @@
       "correct": [
         "A"
       ],
-      "explanation": ".git is the repository itself. Without it the folder is just files with no past — and no way to recover one locally."
+      "explanation": ".git is the repository itself. Without it the folder is just files with no past — and no way to recover one locally. Every commit, branch, and piece of history lived inside .git."
     },
     {
       "id": "cp-3",
@@ -193,7 +193,7 @@
       "choices": {
         "A": "It stages the files for you",
         "B": "git add . fails without it",
-        "C": "It makes the commit faster",
+        "C": "It makes the commit faster by skipping one step",
         "D": "It shows exactly what is about to be included"
       },
       "correct": [

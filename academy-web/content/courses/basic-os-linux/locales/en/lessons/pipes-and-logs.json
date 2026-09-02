@@ -10,7 +10,7 @@
     },
     {
       "kind": "heading",
-      "text": "Three streams and two operators"
+      "text": "Three streams and four operators"
     },
     {
       "kind": "paragraph",
@@ -95,6 +95,10 @@
     },
     {
       "kind": "paragraph",
+      "text": "The one piece of new machinery here is awk: in this pipeline it prints $(NF-3) — the fourth field counted from the end of each line, which in auth.log is the source IP address. awk gets its full treatment in the sed-and-awk lesson."
+    },
+    {
+      "kind": "paragraph",
       "text": "Each stage is simple and replaceable. If the log format differs on your system, you change one stage rather than looking for a different tool. Because each stage is replaceable, the same handful of commands keeps working across log formats and machines you have never seen."
     },
     {
@@ -174,7 +178,7 @@
       "id": "cp-1",
       "prompt": "What does the | symbol do?",
       "choices": {
-        "A": "Sends the output of the command on the left as the input of the command on the right",
+        "A": "Feeds left's output into right's input",
         "B": "Runs two commands at the same time independently",
         "C": "Comments out the rest of the line",
         "D": "Writes output to a file"
@@ -202,7 +206,7 @@
       "id": "cp-3",
       "prompt": "Which pipeline answers \"which values appear most often, highest first\"?",
       "choices": {
-        "A": "sort -rn | grep -c",
+        "A": "sort -rn | grep -c | uniq -u",
         "B": "sort | uniq -c | sort -rn",
         "C": "grep -v | head",
         "D": "uniq | wc -l"
@@ -216,7 +220,7 @@
       "id": "cp-4",
       "prompt": "On a Debian or Ubuntu machine, where do you look for failed login attempts?",
       "choices": {
-        "A": "/usr/bin/auth",
+        "A": "/var/log/syslog.auth",
         "B": "/var/log/auth.log",
         "C": "/tmp/logins",
         "D": "/etc/passwd"
@@ -233,12 +237,12 @@
         "A": "Pipelines do not require permissions",
         "B": "Purpose-built tools cannot read log files",
         "C": "Pipelines always run faster",
-        "D": "Each stage is simple and replaceable, so a change in the data means editing one stage rather than needing a different tool — and it works on any machine without installing anything"
+        "D": "Each stage is simple and replaceable"
       },
       "correct": [
         "D"
       ],
-      "explanation": "Composability and availability. The commands are already on the machine, and adapting the pipeline is a smaller change than adopting new software."
+      "explanation": "Composability and availability. The commands are already on the machine, and adapting the pipeline is a smaller change than adopting new software. A change in the data means editing one stage rather than adopting a different tool — and it works on any machine without installing anything."
     }
   ]
 }

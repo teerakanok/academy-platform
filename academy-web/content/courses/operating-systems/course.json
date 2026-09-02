@@ -91,7 +91,8 @@
       "id": "zombie-and-orphan",
       "kind": "lesson",
       "prerequisites": [
-        "fork-exec-wait"
+        "fork-exec-wait",
+        "signals"
       ],
       "estimatedMinutes": 16,
       "skillWeights": {
@@ -196,7 +197,8 @@
       "id": "deadlock",
       "kind": "lesson",
       "prerequisites": [
-        "mutex"
+        "mutex",
+        "semaphore-and-condvar"
       ],
       "estimatedMinutes": 18,
       "skillWeights": {

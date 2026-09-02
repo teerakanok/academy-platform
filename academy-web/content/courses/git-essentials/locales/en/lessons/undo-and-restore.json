@@ -162,7 +162,7 @@
         "Run: echo 'oops' >> notes.txt && git add notes.txt",
         "Run: git restore --staged notes.txt (unstaged, edit still there)",
         "Run: git restore notes.txt",
-        "Run: echo 'a real edit' >> notes.txt && git commit -am \"Wrong message\"",
+        "Run: echo 'a real edit' >> notes.txt && git commit -am \"Wrong message\"   (the -a stages modifications to already-tracked files before committing — and -am is not --amend)",
         "Run: git commit --amend -m \"Corrected message\" && git log --oneline -3",
         "Run: git revert --no-edit HEAD && git log --oneline -3"
       ],
@@ -214,7 +214,7 @@
       "prompt": "Which operation can Git genuinely not recover from?",
       "choices": {
         "A": "Discarding uncommitted changes with git restore",
-        "B": "A reverted commit",
+        "B": "A reverted commit, which is gone for good afterwards",
         "C": "An amended commit",
         "D": "Deleting a branch"
       },

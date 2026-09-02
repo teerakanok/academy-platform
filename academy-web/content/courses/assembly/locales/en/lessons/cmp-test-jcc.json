@@ -201,21 +201,21 @@
   "checkpoint": [
     {
       "id": "cp-1",
-      "prompt": "You see cmp edi, esi followed by jne. What did the source most likely say?",
+      "prompt": "You see cmp edi, esi followed by a forward jne. What did the source most likely say?",
       "choices": {
         "A": "Cannot be determined",
         "B": "if (a != b)",
-        "C": "if (a == b) — the compiler jumps past the body when the condition fails",
+        "C": "if (a == b)",
         "D": "while (a != b)"
       },
       "correct": [
         "C"
       ],
-      "explanation": "The jump tests the opposite. Read a conditional jump as 'skip the following block when...'. Almost every compiled if has this inversion."
+      "explanation": "The compiler jumps past the body when the source condition fails, so the jump tests the opposite. Read a conditional jump as 'skip the following block when...'. Almost every compiled if has this inversion."
     },
     {
       "id": "cp-2",
-      "prompt": "A function with two if statements compiles to sets, setg, sub and no jumps. What happened?",
+      "prompt": "A function with two if statements compiles to setCC instructions (sets, setg), a sub, and no jumps. What happened?",
       "choices": {
         "A": "The optimiser inlined a branch predictor",
         "B": "It used the set family",
@@ -233,20 +233,20 @@
       "choices": {
         "A": "ja checks the sign flag",
         "B": "It does not; that is a bug",
-        "C": "ja is the unsigned comparison, and a negative value read as unsigned is an enormous number",
+        "C": "ja is the unsigned condition",
         "D": "The compiler adds a separate check"
       },
       "correct": [
         "C"
       ],
-      "explanation": "It is above 7 too. One unsigned comparison replaces two signed ones. It appears in nearly every optimised bounds check — and getting it wrong is how a negative index passes a length test."
+      "explanation": "A negative value read as unsigned is an enormous number, so it is above 7 too. One unsigned comparison replaces two signed ones. It appears in nearly every optimised bounds check — and getting it wrong is how a negative index passes a length test."
     },
     {
       "id": "cp-4",
       "prompt": "A switch over eight consecutive cases compiles to two lea instructions and a cmov, with no table. Why?",
       "choices": {
         "A": "The case results formed an arithmetic progression",
-        "B": "The switch was on an enum",
+        "B": "The switch was on an enum, which never uses tables",
         "C": "Eight cases is below the table threshold",
         "D": "The compiler ran out of memory for the table"
       },

@@ -174,57 +174,57 @@
       "id": "cp-1",
       "prompt": "Which of the four conditions is the one usually removed in practice?",
       "choices": {
-        "A": "No preemption",
-        "B": "Hold and wait",
-        "C": "Mutual exclusion",
-        "D": "Circular wait — by defining and following a global lock order"
+        "A": "No preemption of held resources",
+        "B": "Hold and wait for a second resource",
+        "C": "Mutual exclusion of the shared data",
+        "D": "Circular wait"
       },
       "correct": [
         "D"
       ],
-      "explanation": "Mutual exclusion is usually the whole reason the lock exists. A consistent ordering rule is free at run time and easy to review, which is why it is the standard answer."
+      "explanation": "Mutual exclusion is usually the whole reason the lock exists. Removing circular wait — by defining and following a global lock order — is free at run time and easy to review, which is why it is the standard answer."
     },
     {
       "id": "cp-2",
       "prompt": "A service stops responding. It is alive, has no errors, and uses 0% CPU. What do you run first?",
       "choices": {
-        "A": "strace to see the system calls",
-        "B": "Check disk space",
-        "C": "gdb -p <pid> with 'thread apply all bt' to see where every thread is waiting",
-        "D": "Restart it"
+        "A": "strace to see which system calls it makes",
+        "B": "Check the free disk space first",
+        "C": "gdb -p <pid> with 'thread apply all bt'",
+        "D": "Restart it and see if it recovers"
       },
       "correct": [
         "C"
       ],
-      "explanation": "Zero CPU means nothing is executing, so a syscall trace shows nothing new. The backtrace shows the waits directly — and the cycle is usually visible immediately."
+      "explanation": "Zero CPU means nothing is executing, so a syscall trace shows nothing new. The backtrace shows where every thread is waiting — and the cycle is usually visible immediately."
     },
     {
       "id": "cp-3",
       "prompt": "Can a single thread deadlock itself with a single mutex?",
       "choices": {
         "A": "No — deadlock requires at least two threads",
-        "B": "Only on a single-core machine",
-        "C": "Only with recursive mutexes",
-        "D": "Yes — locking a non-recursive mutex it already holds makes it wait for itself"
+        "B": "Only on a single-core machine without preemption",
+        "C": "Only with recursive mutexes held twice",
+        "D": "Yes — relocking a mutex it already holds"
       },
       "correct": [
         "D"
       ],
-      "explanation": "The general condition is a wait that nothing can end. Two threads and two locks is the common shape, not a requirement."
+      "explanation": "Locking a non-recursive mutex the thread already holds makes it wait for itself. The general condition is a wait that nothing can end. Two threads and two locks is the common shape, not a requirement."
     },
     {
       "id": "cp-4",
       "prompt": "What does trylock-and-back-off give up compared with a lock ordering rule?",
       "choices": {
-        "A": "Nothing",
-        "B": "A guarantee — it becomes a retry loop that can repeat, instead of a structural impossibility",
-        "C": "Thread safety",
+        "A": "Nothing — it is strictly better",
+        "B": "A guarantee — it turns into retries",
+        "C": "Thread safety of the surrounding code",
         "D": "The ability to use condition variables"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Ordering makes the cycle impossible. Back-off makes it recoverable, at the cost of retries and, in the worst case, threads that keep retrying against each other."
+      "explanation": "Ordering makes the cycle structurally impossible; back-off replaces that with a retry loop that can repeat, at the cost of retries and, in the worst case, threads that keep retrying against each other."
     }
   ]
 }

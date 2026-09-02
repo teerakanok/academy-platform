@@ -98,7 +98,7 @@
     {
       "kind": "list",
       "items": [
-        "The same branch cannot be checked out in two worktrees at once — Git refuses, which prevents two directories fighting over one branch",
+        "The same branch cannot be checked out in two worktrees at once — Git refuses by default (--force can override it, at your own risk), which prevents two directories fighting over one branch",
         "Use --detach to inspect a commit or tag in a worktree without occupying a branch",
         "Files ignored by Git, such as local settings and installed dependencies, do not come with the new worktree — you may need to install them there",
         "Stashes are shared across worktrees, so a stash pushed in one appears in the list of another"
@@ -124,7 +124,7 @@
     "git worktree add -b <new-branch> <path> — create the branch at the same time",
     "git worktree list — every checkout attached to this repository",
     "Worktrees share one .git: a commit in one is instantly visible in the other",
-    "The same branch cannot be checked out twice; use --detach to inspect a commit or tag",
+    "The same branch cannot be checked out twice by default; use --detach to inspect a commit or tag",
     "Ignored files (local settings, dependencies) do not come along — install them again if needed",
     "git worktree remove <path> when the task is finished; git worktree prune after manual deletion",
     "One worktree per parallel task is what makes concurrent editing safe"
@@ -137,12 +137,12 @@
         "A": "A backup of the current branch",
         "B": "A second clone with its own copy of the history",
         "C": "A compressed archive of the working tree",
-        "D": "An additional working directory attached to the same repository, on a different branch"
+        "D": "A second working directory for one repository"
       },
       "correct": [
         "D"
       ],
-      "explanation": "One repository, several checkouts. They share .git, so there is no second history to keep synchronised."
+      "explanation": "One repository, several checkouts. They share .git, so there is no second history to keep synchronised. Typically on a different branch — one repository, several checkouts."
     },
     {
       "id": "cp-2",
@@ -163,14 +163,14 @@
       "prompt": "Why does Git refuse to check out the same branch in two worktrees?",
       "choices": {
         "A": "It would double the disk usage",
-        "B": "Two directories advancing one branch pointer would conflict with each other",
-        "C": "It does allow it, with a flag",
+        "B": "Two directories moving one branch pointer would clash",
+        "C": "It would corrupt the shared commit history for everyone",
         "D": "A licensing restriction"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Use --detach to inspect the same commit instead. A branch is a single pointer. Two checkouts moving it independently is a contradiction, so Git prevents it up front."
+      "explanation": "Use --detach to inspect the same commit instead. A branch is a single pointer. Two checkouts moving it independently is a contradiction, so Git prevents it up front. 'Clash' means two directories advancing one branch pointer would conflict."
     },
     {
       "id": "cp-4",

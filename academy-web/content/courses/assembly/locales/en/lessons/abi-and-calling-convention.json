@@ -76,7 +76,7 @@
     },
     {
       "kind": "heading",
-      "text": "Returning a structure: three mechanisms, chosen by size"
+      "text": "Returning a structure: three mechanisms, chosen by size and field class"
     },
     {
       "kind": "code",
@@ -101,7 +101,10 @@
         "      ...",
         "      ret                              ; returns the pointer it was given",
         "",
-        "/* Three different mechanisms decided purely by size. For the large struct",
+        "/* Three different mechanisms decided by size AND field class -- every",
+        "   struct here is all-integer. Integer structs of these sizes pack into",
+        "   registers; two-float structs of the same sizes travel in xmm instead.",
+        "   For the large struct",
         "   the caller allocated the space and passed its address as an invisible",
         "   first argument, which is why the function's own parameter arrived in rsi",
         "   instead of rdi. */"
@@ -242,7 +245,7 @@
     "The two classes are counted separately, not left to right across the signature",
     "Return: rax (and rdx), or xmm0 (and xmm1) for floating point",
     "Callee-saved: rbx, rbp, r12, r13, r14, r15",
-    "An 8-byte struct returns packed in rax; 16 bytes in rax and rdx",
+    "An 8-byte integer struct returns packed in rax; a 16-byte one in rax and rdx — float pairs of those sizes go via xmm",
     "A large struct is written through a hidden pointer in rdi, shifting every real argument right",
     "Variadic calls put the number of SSE registers used in al",
     "rsp must be 16-byte aligned at the call instruction",
@@ -266,7 +269,7 @@
     },
     {
       "id": "cp-2",
-      "prompt": "A function writes four values through rdi and returns rdi. What is it most likely doing?",
+      "prompt": "A function's first declared parameter arrives in rsi, not rdi. The function writes four values through rdi and returns rdi. What is it most likely doing?",
       "choices": {
         "A": "Returning a structure too large for registers",
         "B": "Implementing memcpy",
@@ -276,13 +279,13 @@
       "correct": [
         "A"
       ],
-      "explanation": "The caller allocated the space and passed its address as a hidden first argument. The tell is that rdi is returned in rax. It also means the function's first declared parameter arrived in rsi, so reading rdi as that parameter would misattribute every argument."
+      "explanation": "The caller allocated the result space and passed its address as a hidden first argument in rdi, which pushed the first real parameter into rsi — memcpy, by contrast, takes its destination as a genuine first parameter, which would arrive in rdi itself. The tell is that rdi is returned in rax, and reading rdi as the first declared parameter would misattribute every argument."
     },
     {
       "id": "cp-3",
       "prompt": "Why does a call to printf set al before the call?",
       "choices": {
-        "A": "It is the format string length",
+        "A": "It is the length of the format string, used to size an internal buffer",
         "B": "It marks the call as variadic to the linker",
         "C": "al holds the return value",
         "D": "al carries the number of SSE registers holding arguments"
@@ -297,14 +300,14 @@
       "prompt": "You see writes to [rsp - 8] in a function that never subtracts from rsp. What is happening?",
       "choices": {
         "A": "A bug in the compiler",
-        "B": "The red zone: a leaf function may use the 128 bytes below rsp without adjusting it, because nothing can overwrite them",
-        "C": "The write is to the caller's frame",
+        "B": "The red zone — leaf functions may use the 128 bytes below rsp",
+        "C": "The write lands in the caller's frame, in space the prologue reserved for it",
         "D": "The frame pointer was omitted"
       },
       "correct": [
         "B"
       ],
-      "explanation": "It saves two instructions in every leaf function. It does not exist in kernel code, where an interrupt could use that stack region at any moment."
+      "explanation": "Nothing can overwrite those bytes while a leaf function runs, so no sub rsp is needed and two instructions are saved in every leaf. It does not exist in kernel code, where an interrupt could use that stack region at any moment."
     }
   ]
 }

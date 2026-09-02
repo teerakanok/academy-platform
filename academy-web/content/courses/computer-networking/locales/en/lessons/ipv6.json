@@ -196,7 +196,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "Leading zeros drop and the single run of zero groups becomes a double colon. Option B uses two double colons, which is invalid because the length becomes ambiguous. Verified: A parses to the same address as the full form."
+      "explanation": "Leading zeros drop and the single run of zero groups becomes a double colon. Option C is the invalid one: it uses two double colons, so the length becomes ambiguous. Option B is a legal rendering — it drops the leading zeros and writes the zero groups out in full — and it is wrong only for its stated reason: the question asks for the shortened form, and B leaves the run of zeros unshortened. Verified: A parses to the same address as the full form."
     },
     {
       "id": "cp-2",
@@ -205,7 +205,7 @@
         "A": "Because a /64 holds over 18 quintillion addresses",
         "B": "Because IPv6 does not support subnetting",
         "C": "Because all addresses are link-local",
-        "D": "Because subnets are assigned automatically"
+        "D": "Because IPv6 subnets are assigned automatically by the router"
       },
       "correct": [
         "A"
@@ -231,14 +231,14 @@
       "prompt": "Your machine has no IPv6 internet connectivity, yet ip -6 addr shows an fe80:: address. Why?",
       "choices": {
         "A": "A misconfiguration",
-        "B": "Link-local addresses are generated automatically per interface and work on the local segment regardless of any connectivity",
+        "B": "They work on the local segment only",
         "C": "It is left over from a previous connection",
         "D": "It is a loopback address"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Every IPv6 interface has one, and neighbour discovery uses it. Its presence tells you nothing about whether you can reach the internet."
+      "explanation": "Every IPv6 interface has one, and neighbour discovery uses it. Its presence tells you nothing about whether you can reach the internet. Link-local addresses are generated automatically per interface and work regardless of any wider connectivity."
     }
   ]
 }

@@ -144,9 +144,10 @@
         "",
         "  next PC = PC + offset     /* a taken branch or jump */",
         "",
-        "/* The +4 is why instructions are 4 bytes and why the branch format",
-        "   could drop its lowest offset bit — the hardware only ever adds",
-        "   multiples of 4 to the program counter. */"
+        "/* The +4 is why instructions are 4 bytes. The branch format drops",
+        "   only bit 0 of its offset — offsets are multiples of 2, and bit 1 is",
+        "   still encoded. 4-byte alignment of targets is enforced by faulting",
+        "   on a misaligned branch, not by the encoding. */"
       ]
     },
     {
@@ -202,9 +203,9 @@
       "prompt": "In a single-cycle design, what sets the clock period?",
       "choices": {
         "A": "The fetch stage alone",
-        "B": "The slowest path — a load, which passes through all five stages including memory",
+        "B": "The slowest path — a load, through every stage",
         "C": "The number of registers",
-        "D": "The average instruction"
+        "D": "The average instruction, since most are not loads"
       },
       "correct": [
         "B"
@@ -218,7 +219,7 @@
         "A": "Each instruction is 4 bytes, and addresses count bytes",
         "B": "To speed up fetching",
         "C": "For alignment with the cache line",
-        "D": "To leave room for future instructions"
+        "D": "To leave room for future instructions with longer encodings"
       },
       "correct": [
         "A"
@@ -229,8 +230,8 @@
       "id": "cp-4",
       "prompt": "A branch's target is not known until the execute stage. Why does that cost nothing in a single-cycle design?",
       "choices": {
-        "A": "The whole instruction completes before the next one begins",
-        "B": "Branches skip the execute stage",
+        "A": "Each instruction finishes before the next one begins",
+        "B": "Branches skip the execute stage, resolving much earlier",
         "C": "Branches are predicted",
         "D": "The compiler resolves it"
       },

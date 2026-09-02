@@ -2,7 +2,7 @@
   "nodeId": "grpc-and-protobuf",
   "locale": "en",
   "title": "Schemas, code generation, and why they matter",
-  "objective": "By the end of this course you can explain what a schema-based protocol buys over hand-written parsing, evolve a schema without breaking existing callers, and say when this machinery is worth its cost.",
+  "objective": "By the end of this lesson you can explain what a schema-based protocol buys over hand-written parsing, evolve a schema without breaking existing callers, and say when this machinery is worth its cost.",
   "blocks": [
     {
       "kind": "paragraph",
@@ -169,6 +169,7 @@
       "kind": "try",
       "title": "Compare the two approaches on your own protocol",
       "steps": [
+        "Prerequisite: protoc and a gRPC code-generation plugin for your language. If they are not installed, this lesson still stands alone as reading — come back to the hands-on part once they are",
         "Write a schema describing the message your capstone server exchanges",
         "Generate code for it in the language of your choice and write a client against the generated stub",
         "Capture the traffic with tcpdump and compare its readability with your hand-written protocol",
@@ -212,42 +213,42 @@
       "prompt": "Field 2 was removed a year ago. A new field is added and given number 2. What goes wrong?",
       "choices": {
         "A": "Only streaming calls are affected",
-        "B": "An old sender's value for the removed field is parsed as the new field's type, silently and without error",
+        "B": "The old field's bytes are parsed as the new field",
         "C": "The generator rejects it",
-        "D": "Nothing — the old field is gone"
+        "D": "Nothing — the removed field no longer exists in the schema"
       },
       "correct": [
         "B"
       ],
-      "explanation": "The bytes are valid; they simply mean something else now. Reserving retired numbers is what makes the generator refuse this, and it is precisely the mistake a schema exists to prevent."
+      "explanation": "The bytes are valid; they simply mean something else now. Reserving retired numbers is what makes the generator refuse this, and it is precisely the mistake a schema exists to prevent. It happens silently and without any error."
     },
     {
       "id": "cp-3",
       "prompt": "Why can gRPC carry many concurrent calls over one connection without them queuing behind each other?",
       "choices": {
         "A": "It uses UDP",
-        "B": "It runs on HTTP/2, which multiplexes independent streams over one connection",
+        "B": "HTTP/2 multiplexes streams over one connection",
         "C": "Calls are batched by the client",
-        "D": "It opens a connection per call"
+        "D": "It opens a new connection for every call it makes"
       },
       "correct": [
         "B"
       ],
-      "explanation": "This is the HTTP/2 property from the HTTP lesson, applied. It also means one handshake serves many calls, which is the connection-reuse benefit measured there."
+      "explanation": "This is the HTTP/2 property from the HTTP lesson, applied. It also means one handshake serves many calls, which is the connection-reuse benefit measured there. gRPC runs on HTTP/2, which is what carries independent streams over a single connection."
     },
     {
       "id": "cp-4",
       "prompt": "When is plain HTTP with JSON the better choice?",
       "choices": {
         "A": "When performance does not matter",
-        "B": "Never — schemas are always better",
-        "C": "For public interfaces, browser clients, and small single-language systems, where readability and no build step outweigh the schema's benefits",
+        "B": "Never — a schema is always the more professional choice",
+        "C": "For public interfaces and small systems",
         "D": "Only for read-only interfaces"
       },
       "correct": [
         "C"
       ],
-      "explanation": "The measure is whether the contract has enough consumers to be worth formalising. A readable, curl-debuggable interface with no build step is a real advantage where those conditions do not hold."
+      "explanation": "The measure is whether the contract has enough consumers to be worth formalising. A readable, curl-debuggable interface with no build step is a real advantage where those conditions do not hold. Think public interfaces, browser clients and small single-language systems: readability and no build step outweigh the schema there."
     }
   ]
 }

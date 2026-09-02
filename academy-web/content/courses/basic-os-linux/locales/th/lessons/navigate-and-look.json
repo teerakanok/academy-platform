@@ -126,7 +126,7 @@
       "choices": {
         "A": "ls -lah",
         "B": "ls -R",
-        "C": "pwd -a",
+        "C": "pwd --all",
         "D": "ls"
       },
       "correct": [
@@ -152,7 +152,7 @@
       "id": "cp-3",
       "prompt": "มีคนถามว่าไฟล์ตั้งค่าไหนบนเซิร์ฟเวอร์เปลี่ยนแปลงล่าสุด คุณจะรันอะไร",
       "choices": {
-        "A": "ls -a /etc",
+        "A": "ls -la /etc /home",
         "B": "pwd /etc",
         "C": "cd /etc",
         "D": "ls -lt /etc"

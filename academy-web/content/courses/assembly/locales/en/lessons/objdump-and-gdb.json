@@ -152,6 +152,8 @@
         "  prog[0x100000341] <+1>:  movq   %rsp, %rbp",
         "  prog[0x100000344] <+4>:  leal   (%rdi,%rsi), %eax",
         "  prog[0x100000347] <+7>:  addl   %edx, %eax",
+        "  prog[0x100000349] <+9>:  popq   %rbp",
+        "  prog[0x10000034a] <+10>: retq",
         "",
         "/* The same six instructions from three tools. Note the offsets <+0>, <+1>,",
         "   <+4> -- both debuggers number instructions by their byte offset from the",
@@ -253,8 +255,8 @@
       "prompt": "A binary has been stripped. What can you still learn about it?",
       "choices": {
         "A": "Nothing useful",
-        "B": "Only the entry point",
-        "C": "All the code, all string constants, the names of dynamically imported functions, and the data layout readable from address arithmetic",
+        "B": "Only the entry point address, which stripping always preserves",
+        "C": "The code, the strings, the imports and the data layout",
         "D": "Only the strings"
       },
       "correct": [
@@ -267,28 +269,28 @@
       "prompt": "You are stopped inside an optimised function whose source line no longer corresponds to anything. Which command do you want?",
       "choices": {
         "A": "continue",
-        "B": "finish",
+        "B": "finish, to complete the current function",
         "C": "step, to follow the source",
-        "D": "stepi, which advances exactly one machine instruction"
+        "D": "stepi, one instruction at a time"
       },
       "correct": [
         "D"
       ],
-      "explanation": "step follows source lines and can walk an entire optimised loop in one keystroke. stepi is the command for debugging machine code rather than source."
+      "explanation": "stepi advances exactly one machine instruction. step follows source lines and can walk an entire optimised loop in one keystroke. stepi is the command for debugging machine code rather than source."
     },
     {
       "id": "cp-4",
       "prompt": "You have just stopped at the first instruction of a function. What does x/4xg $rsp show you?",
       "choices": {
         "A": "The instruction bytes",
-        "B": "The top four 8-byte stack values, the first of which is the return address pushed by call",
+        "B": "The top four 8-byte stack values",
         "C": "The argument registers",
-        "D": "The function's local variables"
+        "D": "The function's local variables, spilled by the prologue"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Reading that output against the frame layout is what turns a debugger into an inspection tool. x is hexadecimal and g means giant, eight bytes."
+      "explanation": "At the first instruction of a function the top value is the return address pushed by call. Reading that output against the frame layout is what turns a debugger into an inspection tool. x is hexadecimal and g means giant, eight bytes."
     }
   ]
 }

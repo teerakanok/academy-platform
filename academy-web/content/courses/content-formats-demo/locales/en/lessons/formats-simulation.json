@@ -165,10 +165,10 @@
       "id": "cp-1",
       "prompt": "A monitoring server polls twelve switches by IP address. What addressing does the monitoring server itself need?",
       "choices": {
-        "A": "Static, because the switches are configured to send traps back to a fixed address",
-        "B": "It does not matter",
-        "C": "DHCP, so it always gets a valid address",
-        "D": "DHCP with a long lease"
+        "A": "Static — switches expect replies at a fixed address",
+        "B": "It does not matter which mode the server uses",
+        "C": "DHCP, so it always gets a valid address on any network",
+        "D": "DHCP with a long lease, renewed before expiry"
       },
       "correct": [
         "A"
@@ -179,10 +179,10 @@
       "id": "cp-2",
       "prompt": "You set a laptop to a static address that works at the office. The user takes it home and has no network. Why?",
       "choices": {
-        "A": "The DNS cache needs clearing",
-        "B": "Home networks block static addresses",
-        "C": "The address, gateway and DNS all belong to the office network and mean nothing on the home one",
-        "D": "The laptop is broken"
+        "A": "The DNS cache needs clearing before anything works",
+        "B": "Home networks block static addresses by default",
+        "C": "Those values describe the office network, not this one",
+        "D": "The laptop is broken and needs its network card replaced"
       },
       "correct": [
         "C"
