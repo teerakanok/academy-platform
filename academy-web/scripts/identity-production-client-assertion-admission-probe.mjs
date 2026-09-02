@@ -7,7 +7,7 @@ import {
   verify,
   webcrypto,
 } from 'node:crypto'
-import { readFileSync } from 'node:fs'
+import { readSync } from 'node:fs'
 import { pathToFileURL } from 'node:url'
 
 export const EXPECTED_PUBLIC_JWK_SHA256 = '8b7a176b27ac5ffc7eb65fbe9d1b0724b1e1b24e91d8cbb93abbb3ae30f6f5c4'
@@ -166,7 +166,7 @@ async function main() {
     if (process.argv.length !== 3 || process.argv[2] !== '--admission-probe') {
       throw new AcademyIdentityAdmissionProbeError('USAGE')
     }
-    const privateJwkText = readFileSync(0, { encoding: 'utf8' })
+    const privateJwkText = readBoundedStdin(MAX_PRIVATE_JWK_BYTES)
     const result = await runAdmissionProbe({ privateJwkText })
     process.stdout.write('ACADEMY_IDENTITY_CUSTODY_KEYPAIR=PASS\n')
     process.stdout.write(`ACADEMY_IDENTITY_CUSTODY_PUBLIC_JWK_SHA256=${result.publicJwkSha256}\n`)
@@ -208,6 +208,20 @@ function parseCanonicalPrivateJwk(text) {
     throw new AcademyIdentityAdmissionProbeError('LOCAL_KEYPAIR')
   }
   return value
+}
+
+function readBoundedStdin(maximumBytes) {
+  const chunks = []
+  let total = 0
+  while (true) {
+    const buffer = Buffer.allocUnsafe(Math.min(1_024, maximumBytes + 1 - total))
+    const bytesRead = readSync(0, buffer, 0, buffer.byteLength, null)
+    if (bytesRead === 0) break
+    total += bytesRead
+    if (total > maximumBytes) throw new AcademyIdentityAdmissionProbeError('LOCAL_KEYPAIR')
+    chunks.push(buffer.subarray(0, bytesRead))
+  }
+  return Buffer.concat(chunks, total).toString('utf8')
 }
 
 function canonicalPublicJwk(privateJwk) {

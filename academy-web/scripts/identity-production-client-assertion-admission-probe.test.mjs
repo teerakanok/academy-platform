@@ -168,19 +168,23 @@ describe('Identity production client-assertion admission probe', () => {
   })
 
   it('emits only a fixed failure marker for rejected stdin', () => {
-    const rejected = 'this-is-not-a-private-jwk-secret-value'
-    const result = spawnSync(process.execPath, [
-      new URL('./identity-production-client-assertion-admission-probe.mjs', import.meta.url).pathname,
-      '--admission-probe',
-    ], {
-      encoding: 'utf8',
-      input: rejected,
-      env: {},
-    })
-    assert.equal(result.status, 1)
-    assert.equal(result.stdout, '')
-    assert.equal(result.stderr, 'ACADEMY_IDENTITY_ASSERTION_PROBE=FAIL_LOCAL_KEYPAIR\n')
-    assert.doesNotMatch(`${result.stdout}${result.stderr}`, new RegExp(rejected))
+    for (const rejected of [
+      'this-is-not-a-private-jwk-secret-value',
+      'Z'.repeat(4_097),
+    ]) {
+      const result = spawnSync(process.execPath, [
+        new URL('./identity-production-client-assertion-admission-probe.mjs', import.meta.url).pathname,
+        '--admission-probe',
+      ], {
+        encoding: 'utf8',
+        input: rejected,
+        env: {},
+      })
+      assert.equal(result.status, 1)
+      assert.equal(result.stdout, '')
+      assert.equal(result.stderr, 'ACADEMY_IDENTITY_ASSERTION_PROBE=FAIL_LOCAL_KEYPAIR\n')
+      assert.doesNotMatch(`${result.stdout}${result.stderr}`, new RegExp(rejected.slice(0, 32)))
+    }
   })
 })
 
