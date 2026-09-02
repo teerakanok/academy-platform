@@ -1,0 +1,109 @@
+{
+  "schema": "academy-identity-client-assertion-custody-recovery/v1",
+  "capturedAt": "2026-09-02T18:26:22Z",
+  "status": "DURABLE_OFF_HOST_CUSTODY_NOT_RECOVERED_ACTIVE_CLOUDFLARE_SECRET_ONLY",
+  "scope": {
+    "secretName": "IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK",
+    "expectedRecordName": "Academy - Identity Client Assertion Private JWK",
+    "clientId": "academy-web",
+    "keyId": "academy-prod-2026-08",
+    "expectedPublicJwkSha256": "8b7a176b27ac5ffc7eb65fbe9d1b0724b1e1b24e91d8cbb93abbb3ae30f6f5c4",
+    "privateValueObserved": false,
+    "privateValuePersisted": false
+  },
+  "sourceEvidence": {
+    "registrationReport": "/Users/teerakanok/Dev/identity-prod-codex-session/reports/reviews/academy-production-client-key-registration-20260828.md",
+    "releaseFreeze": "reports/reviews/academy-production-release-freeze-20260828.json",
+    "custodyOrigin": {
+      "provider": "Cloudflare Workers version secret",
+      "versionId": "9c11bb1c-fea3-4e42-ac6f-14d2c5aff215",
+      "privateMaterialPersistedInArtifact": false
+    },
+    "activeWorkerObservation": {
+      "observedAt": "2026-09-02T18:26:22Z",
+      "workerName": "cyberskills-academy",
+      "activeVersionId": "bd4aea53-9137-4d49-a5f4-3a74be959736",
+      "trafficPercentage": 100,
+      "bindingPresent": true,
+      "bindingType": "secret_text",
+      "bindingMetadataKeys": [
+        "name",
+        "type"
+      ],
+      "valueExported": false
+    }
+  },
+  "boundedSearchEvidence": {
+    "originalEphemeralPaths": [
+      {
+        "path": "/private/tmp/academy-prod-identity-private-jwk.json",
+        "presentLocal": false,
+        "presentPoolA": false,
+        "spotlightExactNameMatches": 0
+      },
+      {
+        "path": "/private/tmp/academy-identity-production-version-secrets.json",
+        "presentLocal": false,
+        "presentPoolA": false,
+        "spotlightExactNameMatches": 0
+      }
+    ],
+    "localCanonicalFingerprintScan": {
+      "roots": [
+        "/private/tmp",
+        "/Users/teerakanok/Dev",
+        "/Users/teerakanok/.local/state/cyberskills"
+      ],
+      "matchingCandidates": 0
+    },
+    "codexSessionHistoryScan": {
+      "largestSessionBytes": 699165991,
+      "jsonUnescapeDepths": 4,
+      "canonicalPrivateJwkOccurrences": 0,
+      "expectedPublicFingerprintMatches": 0,
+      "shellHistoryMatches": 0
+    },
+    "poolAInventory": {
+      "roots": [
+        "/root/identity-control-production-inputs",
+        "/root/identity-control-production-deploy",
+        "/root/identity-control-production-artifacts",
+        "/opt/academy"
+      ],
+      "exactSecretNameFiles": 0,
+      "canonicalPrivateJwkFiles": 0
+    },
+    "cloudAndBackupFilenameInventory": {
+      "cloudStorageProvidersPresent": 4,
+      "cloudStorageSensitiveFilenameMatches": 0,
+      "icloudMobileDocumentsPresent": true,
+      "icloudSensitiveFilenameMatches": 0,
+      "timeMachineDestinations": 0,
+      "timeMachineUserSnapshots": 0,
+      "iosLocalBackupRootPresent": false,
+      "trashExactNameMatches": 0,
+      "boundedCloudTreeWalk": "NO_MATCHES_BEFORE_60_SECOND_BOUND; NOT_USED_AS_EXHAUSTIVE_PROOF"
+    },
+    "bitwarden": {
+      "ownerObservedExpectedItemPresent": true,
+      "ownerObservedJwkValuePresent": false,
+      "applicationStoreEncrypted": true,
+      "applicationStoreDecryptedByAgent": false,
+      "attachmentAndCustomFieldMetadataProvenAbsent": false
+    }
+  },
+  "conclusion": {
+    "recoverablePrivateKeyCandidates": 0,
+    "providerResidentCandidateCount": 1,
+    "providerResidentCandidateExportableThroughSupportedInterface": false,
+    "durableOffHostCustodyProven": false,
+    "custodyAbsenceClass": "BOUNDED_ABSENCE_WITH_EXPLICIT_BITWARDEN_METADATA_RESIDUAL",
+    "rotationAuthorized": false,
+    "nextSafeDiscriminator": "Run an independently reviewed candidate-only Worker diagnostic that uses the existing secret in place and emits fixed markers for canonical import, public fingerprint match, local sign/verify, and Identity assertion admission."
+  },
+  "prohibitions": [
+    "Do not export or log the Worker secret.",
+    "Do not treat filename absence as proof that all encrypted vault fields are empty.",
+    "Do not rotate until in-place diagnostic evidence proves the active key is unavailable, malformed, mismatched, or rejected."
+  ]
+}
