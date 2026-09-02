@@ -9,6 +9,7 @@ import {
 } from '../../worker/identity-client-assertion-secret-diagnostic'
 
 const VERSION_ID = '11111111-1111-4111-8111-111111111111'
+const DIAGNOSTIC_NONCE = 'N'.repeat(43)
 const NOW = new Date('2026-09-03T00:00:00.000Z')
 const pair = generateKeyPairSync('ec', { namedCurve: 'P-256' })
 const exported = pair.privateKey.export({ format: 'jwk' })
@@ -174,6 +175,7 @@ describe('Worker-resident Identity client assertion secret diagnostic', () => {
     const valid = request()
     const environment = {
       IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK: 'protected-value-not-inspected-by-handler-test',
+      ACADEMY_IDENTITY_DIAGNOSTIC_NONCE: DIAGNOSTIC_NONCE,
       CF_VERSION_METADATA: { id: VERSION_ID },
     }
     const accepted = await worker.fetch(valid, environment, {})
@@ -184,6 +186,8 @@ describe('Worker-resident Identity client assertion secret diagnostic', () => {
     for (const rejected of [
       request({ url: `https://cyberskills-academy.example.workers.dev${IDENTITY_SECRET_DIAGNOSTIC.path}` }),
       request({ headers: { 'cf-access-jwt-assertion': '' } }),
+      request({ headers: { 'x-academy-diagnostic-nonce': '' } }),
+      request({ headers: { 'x-academy-diagnostic-nonce': 'M'.repeat(43) } }),
       request({ headers: { 'x-academy-diagnostic-version': '22222222-2222-4222-8222-222222222222' } }),
       request({ headers: { origin: 'https://example.invalid' } }),
       request({ headers: { 'sec-fetch-site': 'cross-site' } }),
@@ -210,7 +214,10 @@ describe('Worker-resident Identity client assertion secret diagnostic', () => {
       preview_urls: false,
       observability: { enabled: false },
       version_metadata: { binding: 'CF_VERSION_METADATA' },
-      secrets: { required: ['IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK'] },
+      secrets: { required: [
+        'IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK',
+        'ACADEMY_IDENTITY_DIAGNOSTIC_NONCE',
+      ] },
     })
     for (const forbidden of [
       'assets', 'd1_databases', 'durable_objects', 'hyperdrive', 'kv_namespaces',
@@ -244,6 +251,7 @@ function request(overrides: {
         'cf-access-jwt-assertion': 'eyJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJhY2FkZW15In0.c2lnbmF0dXJl',
         'x-academy-diagnostic-version': VERSION_ID,
         'x-academy-diagnostic-operation': IDENTITY_SECRET_DIAGNOSTIC.requestMarker,
+        'x-academy-diagnostic-nonce': DIAGNOSTIC_NONCE,
         ...overrides.headers,
       },
       body: overrides.body,

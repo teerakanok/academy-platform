@@ -35,6 +35,7 @@ export type IdentitySecretDiagnosticMarker =
 
 type DiagnosticEnvironment = {
   IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK?: string
+  ACADEMY_IDENTITY_DIAGNOSTIC_NONCE?: string
   CF_VERSION_METADATA?: {
     id?: string
   }
@@ -214,6 +215,10 @@ function requestAdmission(request: Request, environment: DiagnosticEnvironment):
       && VERSION_ID.test(versionId)
       && request.headers.get('x-academy-diagnostic-version') === versionId
       && request.headers.get('x-academy-diagnostic-operation') === DIAGNOSTIC_REQUEST_MARKER
+      && constantTimeOpaqueEqual(
+        request.headers.get('x-academy-diagnostic-nonce'),
+        environment.ACADEMY_IDENTITY_DIAGNOSTIC_NONCE,
+      )
       && request.headers.get('origin') === CANONICAL_ORIGIN
       && request.headers.get('sec-fetch-site') === 'same-origin'
       && typeof accessAssertion === 'string'
@@ -222,6 +227,16 @@ function requestAdmission(request: Request, environment: DiagnosticEnvironment):
   } catch {
     return false
   }
+}
+
+function constantTimeOpaqueEqual(left: string | null, right: string | undefined): boolean {
+  if (typeof left !== 'string' || typeof right !== 'string'
+    || !BASE64URL_32.test(left) || !BASE64URL_32.test(right)) return false
+  let difference = 0
+  for (let index = 0; index < left.length; index += 1) {
+    difference |= left.charCodeAt(index) ^ right.charCodeAt(index)
+  }
+  return difference === 0
 }
 
 function parseCanonicalPrivateJwk(text: string): DiagnosticPrivateJwk {
