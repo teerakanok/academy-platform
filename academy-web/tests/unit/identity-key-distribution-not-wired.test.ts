@@ -333,11 +333,21 @@ describe('การกระจาย verification key ของ Identity ยั
   const { files: reachable } = reachableFrom(entrypoints)
   const localRuntimePath = canonical(join(IDENTITY_LIB, 'local-runtime.ts'))
   const productionCompositionPath = canonical(join(IDENTITY_LIB, 'production-runtime.ts'))
+  const custodyDiagnosticPath = canonical(join(
+    ROOT,
+    'worker',
+    'identity-client-assertion-secret-diagnostic.ts',
+  ))
   const {
     files: productionReachable,
     computed: productionComputed,
-  } = reachableFrom(entrypoints, new Set([localRuntimePath, productionCompositionPath]))
+  } = reachableFrom(entrypoints, new Set([
+    localRuntimePath,
+    productionCompositionPath,
+    custodyDiagnosticPath,
+  ]))
   const { files: productionCompositionReachable } = reachableFrom([productionCompositionPath])
+  const { files: custodyDiagnosticReachable } = reachableFrom([custodyDiagnosticPath])
   const gatedPaths = NOT_YET_ENABLED.map((name) => canonical(join(IDENTITY_LIB, `${name}.ts`)))
 
   it.each(NOT_YET_ENABLED)('%s ยังมีอยู่จริง ด่านนี้จึงไม่ได้เฝ้าของที่หายไปแล้ว', (name) => {
@@ -411,6 +421,19 @@ describe('การกระจาย verification key ของ Identity ยั
       expect(productionCompositionReachable.has(canonical(join(IDENTITY_LIB, `${name}.ts`))), name).toBe(true)
     }
     expect(productionReachable.has(productionCompositionPath)).toBe(true)
+  })
+
+  it('custody diagnostic เป็น reviewed boundary แยกที่เข้าถึงเฉพาะ assertion signer', () => {
+    expect(reachable.has(custodyDiagnosticPath)).toBe(true)
+    expect(productionReachable.has(custodyDiagnosticPath)).toBe(true)
+    for (const name of ['client-assertion-provider', 'client-assertion-webcrypto-signer']) {
+      expect(custodyDiagnosticReachable.has(canonical(join(IDENTITY_LIB, `${name}.ts`))), name)
+        .toBe(true)
+    }
+    for (const name of ['result-key-set-cache', 'result-key-set-importer']) {
+      expect(custodyDiagnosticReachable.has(canonical(join(IDENTITY_LIB, `${name}.ts`))), name)
+        .toBe(false)
+    }
   })
 
   it('โมดูลเหล่านี้ไม่เปิด route ไม่ยิงเน็ต และไม่อ่าน environment เอง', () => {

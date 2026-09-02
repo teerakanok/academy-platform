@@ -5,9 +5,13 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "types": ["@cloudflare/workers-types"],
-    "lib": ["esnext"],
+    "lib": ["esnext", "webworker"],
     "noEmit": true
   },
-  "include": ["worker.ts", "types/open-next-worker.d.ts"],
+  "include": [
+    "worker.ts",
+    "worker/identity-client-assertion-secret-diagnostic.ts",
+    "types/open-next-worker.d.ts"
+  ],
   "exclude": []
 }
