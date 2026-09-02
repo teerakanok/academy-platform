@@ -6,6 +6,8 @@
   "minify": true,
   "compatibility_date": "2025-03-25",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  // ครอบ observed 480 ms outlier แต่ยังต่ำกว่า Paid default 30 s ถึง 60 เท่า
+  "limits": { "cpu_ms": 500 },
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
   "durable_objects": {
     "bindings": [{ "name": "EDGE_RATE_LIMITER", "class_name": "EdgeRateLimiter" }]
@@ -15,7 +17,15 @@
   "r2_buckets": [
     { "binding": "COURSE_MEDIA", "bucket_name": "cyberskills-academy-media" }
   ],
-  "observability": { "enabled": true },
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 0.1,
+      "invocation_logs": true
+    },
+    "traces": { "enabled": false }
+  },
   "vars": {
     // preview: ยังไม่เปิดให้ค้นเจอ และยังไม่เปิดระบบบัญชี
     // (ไม่มี NEXT_PUBLIC_SUPABASE_* = หน้า sign-in จะบอกตรงๆ ว่ายังไม่เปิด
