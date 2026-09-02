@@ -140,6 +140,7 @@ test('production adapter transmits nonce only over fd3 and executes exact split/
   const secretPayloads = []
   const accessToken = 'eyJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJhY2FkZW15In0.c2lnbmF0dXJl'
   let requestCount = 0
+  let accessOutput = null
   const root = new URL('..', import.meta.url).pathname.replace(/\/$/, '')
   const runProcess = async input => {
     const args = input.args
@@ -151,7 +152,10 @@ test('production adapter transmits nonce only over fd3 and executes exact split/
     if (args[0] === '--version' && input.executable.endsWith('cloudflared')) {
       return output('cloudflared version 2026.6.0 (built 2026-06-08T18:16:09Z)\n')
     }
-    if (args[0] === 'access') return output(`${accessToken}\n`)
+    if (args[0] === 'access') {
+      accessOutput = output(`${accessToken}\n`)
+      return accessOutput
+    }
     const wranglerArgs = args.slice(1)
     if (wranglerArgs[0] === '--version') return output('4.120.0\n')
     if (wranglerArgs[0] === 'deployments') return output(deploymentsJson(deployment))
@@ -234,6 +238,7 @@ test('production adapter transmits nonce only over fd3 and executes exact split/
     operationIdSource: () => OPERATION_ID,
   })
   assert.equal(result.marker, 'PASS_CODE_NOT_FOUND')
+  assert.ok(accessOutput.stdout.every(byte => byte === 0))
   assert.equal(requestCount, 1)
   assert.equal(secretPayloads.length, 1)
   assert.deepEqual(Object.keys(secretPayloads[0]), ['ACADEMY_IDENTITY_DIAGNOSTIC_NONCE'])
@@ -275,6 +280,29 @@ test('bounded process kills an overflowing process group before its deadline', a
   }), fixedFailure)
   assert.ok(Date.now() - startedAt < 4_000)
 })
+
+test('sensitive process output clears original chunks and leaves one caller-owned buffer', async () => {
+  const probe = processProbe('success')
+  const result = await probe.run()
+  assert.equal(result.stdout.toString('utf8'), 'sensitive-captured-output')
+  assert.ok(probe.chunk.every(byte => byte === 0))
+  result.stdout.fill(0)
+  assert.ok(result.stdout.every(byte => byte === 0))
+})
+
+for (const stream of ['stdout', 'fd3']) {
+  test(`${stream} stream error after split is caught, cleared, and restores baseline once`, async () => {
+    const probe = processProbe(stream)
+    const fixture = transactionFixture({ invokeResult: () => probe.run() })
+    await assert.rejects(runAcademyIdentityWorkerDiagnosticTransaction(fixture.options), fixedFailure)
+    assert.equal(probe.killCount, 1)
+    assert.ok(probe.chunk.every(byte => byte === 0))
+    assert.equal(fixture.calls.filter(call => call.name === 'invokeCandidateOnce').length, 1)
+    assert.equal(fixture.calls.filter(call => call.name === 'restoreBaseline').length, 1)
+    assert.deepEqual(fixture.state, baselineDeployment(IDS.restoredDeployment))
+    assert.equal(fixture.calls.at(-1)?.name, 'close')
+  })
+}
 
 test('production source and config bind the nonce before private-key access', async () => {
   const root = new URL('..', import.meta.url)
@@ -341,9 +369,8 @@ function transactionFixture(options = {}) {
       state = splitDeployment()
       return structuredClone(state)
     }),
-    invokeCandidateOnce: input => call('invokeCandidateOnce', input, () => {
-      return 'PASS_CODE_NOT_FOUND'
-    }),
+    invokeCandidateOnce: input => call('invokeCandidateOnce', input,
+      options.invokeResult ?? (() => 'PASS_CODE_NOT_FOUND')),
     restoreBaseline: input => call('restoreBaseline', input, () => {
       if (options.failRestore) throw new Error('restore failed')
       state = baselineDeployment(IDS.restoredDeployment)
@@ -398,6 +425,45 @@ function deploymentsJson(current) {
 
 function output(value) {
   return { status: 0, signal: null, stdout: Buffer.from(value) }
+}
+
+function processProbe(outcome) {
+  const child = new EventEmitter()
+  const stdout = new EventEmitter()
+  const fd3 = new EventEmitter()
+  const chunk = Buffer.from('sensitive-captured-output')
+  let killCount = 0
+  child.pid = 987_654_321
+  child.stdout = stdout
+  child.stdio = [null, stdout, null, fd3]
+  fd3.end = () => {}
+  const spawnPort = () => {
+    queueMicrotask(() => {
+      stdout.emit('data', chunk)
+      if (outcome === 'success') child.emit('close', 0, null)
+      else (outcome === 'stdout' ? stdout : fd3).emit('error', new Error('private stream failure'))
+    })
+    return child
+  }
+  const terminateGroup = () => {
+    killCount += 1
+    queueMicrotask(() => child.emit('close', null, 'SIGKILL'))
+  }
+  return {
+    chunk,
+    get killCount() { return killCount },
+    run: () => runBoundedProcess({
+      executable: process.execPath,
+      args: ['-e', ''],
+      cwd: new URL('..', import.meta.url).pathname.replace(/\/$/, ''),
+      deadlineMs: Date.now() + 5_000,
+      secretInput: outcome === 'fd3' ? Buffer.alloc(32, 1) : undefined,
+      sensitiveOutput: true,
+      spawnPort,
+      terminateGroup,
+      isGroupAlive: () => false,
+    }),
+  }
 }
 
 function accessRedirect(url) {

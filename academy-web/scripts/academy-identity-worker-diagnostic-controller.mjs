@@ -293,7 +293,10 @@ export function createAcademyIdentityWorkerDiagnosticProductionPorts(options = {
       sensitiveOutput,
       clock,
     })
-    if (!result || result.status !== 0 || result.signal || !Buffer.isBuffer(result.stdout)) fail()
+    if (!result || result.status !== 0 || result.signal || !Buffer.isBuffer(result.stdout)) {
+      if (sensitiveOutput && Buffer.isBuffer(result?.stdout)) result.stdout.fill(0)
+      fail()
+    }
     return result.stdout
   }
 
@@ -351,11 +354,14 @@ export function createAcademyIdentityWorkerDiagnosticProductionPorts(options = {
         deadline: Math.min(deadline, clock() + ACCESS_TIMEOUT_MS),
         sensitiveOutput: true,
       })
-      accessTokenBytes = Buffer.from(output)
-      output.fill(0)
-      const token = accessTokenBytes.toString('ascii').trim()
-      if (token.length > 8_192 || !ACCESS_TOKEN.test(token)) fail()
-      accessToken = token
+      try {
+        accessTokenBytes = Buffer.from(output)
+        const token = accessTokenBytes.toString('ascii').trim()
+        if (token.length > 8_192 || !ACCESS_TOKEN.test(token)) fail()
+        accessToken = token
+      } finally {
+        output.fill(0)
+      }
     },
     inspectDeployment,
     inspectVersion,
@@ -493,30 +499,36 @@ export async function computeAcademyIdentityWorkerDiagnosticSourceSha256(root = 
 }
 
 export async function runBoundedProcess({ executable, args, cwd, signal, deadlineMs,
-  secretInput, clock = () => Date.now() }) {
+  secretInput, sensitiveOutput = false, clock = () => Date.now(), spawnPort = spawn,
+  terminateGroup = killGroup, isGroupAlive = groupAlive }) {
   if (typeof executable !== 'string' || !executable.startsWith('/')
     || !Array.isArray(args) || args.some(argument => typeof argument !== 'string')
-    || typeof cwd !== 'string' || !cwd.startsWith('/') || !Number.isFinite(deadlineMs)) fail()
+    || typeof cwd !== 'string' || !cwd.startsWith('/') || !Number.isFinite(deadlineMs)
+    || typeof sensitiveOutput !== 'boolean' || typeof spawnPort !== 'function'
+    || typeof terminateGroup !== 'function' || typeof isGroupAlive !== 'function') fail()
   const remaining = deadlineMs - clock()
   if (remaining < 100) fail()
   const withSecret = Buffer.isBuffer(secretInput)
   const environment = { ...process.env, LANG: 'C', LC_ALL: 'C', NO_COLOR: '1' }
   delete environment.NODE_OPTIONS
   delete environment.NODE_PATH
-  const child = spawn(executable, args, {
+  const child = spawnPort(executable, args, {
     cwd,
     detached: true,
     stdio: withSecret ? ['ignore', 'pipe', 'ignore', 'pipe'] : ['ignore', 'pipe', 'ignore'],
     env: environment,
   })
   const chunks = []
+  const sensitiveChunks = []
   let size = 0
   let overflow = false
+  let streamFailed = false
   let terminationFailed = false
   const terminate = () => {
-    try { killGroup(child.pid) } catch { terminationFailed = true }
+    try { terminateGroup(child.pid) } catch { terminationFailed = true }
   }
   child.stdout.on('data', chunk => {
+    if (sensitiveOutput) sensitiveChunks.push(chunk)
     size += chunk.byteLength
     if (size > MAX_PROCESS_OUTPUT_BYTES) {
       if (!overflow) terminate()
@@ -524,11 +536,19 @@ export async function runBoundedProcess({ executable, args, cwd, signal, deadlin
     }
     else chunks.push(chunk)
   })
-  if (withSecret) child.stdio[3].end(secretInput)
+  const streamError = () => {
+    streamFailed = true
+    terminate()
+  }
+  child.stdout.on('error', streamError)
+  if (withSecret) child.stdio[3].on('error', streamError)
   const closed = new Promise(resolveClose => {
     child.once('error', () => resolveClose(null))
     child.once('close', (status, closeSignal) => resolveClose({ status, signal: closeSignal }))
   })
+  if (withSecret) {
+    try { child.stdio[3].end(secretInput) } catch { streamError() }
+  }
   let timedOut = false
   const timeout = setTimeout(() => {
     timedOut = true
@@ -536,16 +556,24 @@ export async function runBoundedProcess({ executable, args, cwd, signal, deadlin
   }, Math.min(remaining, COMMAND_TIMEOUT_MS))
   const abort = () => terminate()
   signal?.addEventListener('abort', abort, { once: true })
-  const result = await closed
-  clearTimeout(timeout)
-  signal?.removeEventListener('abort', abort)
-  if (groupAlive(child.pid)) {
-    terminate()
-    fail()
+  let stdout = null
+  try {
+    const result = await closed
+    clearTimeout(timeout)
+    signal?.removeEventListener('abort', abort)
+    const residualGroup = isGroupAlive(child.pid)
+    if (residualGroup) terminate()
+    if (!result || timedOut || signal?.aborted || overflow || streamFailed || residualGroup
+      || terminationFailed || result.status !== 0 || result.signal) fail()
+    stdout = Buffer.concat(chunks)
+    return { ...result, stdout }
+  } finally {
+    clearTimeout(timeout)
+    signal?.removeEventListener('abort', abort)
+    if (sensitiveOutput) {
+      for (const chunk of sensitiveChunks) chunk.fill(0)
+    }
   }
-  if (!result || timedOut || signal?.aborted || overflow || terminationFailed
-    || result.status !== 0 || result.signal) fail()
-  return { ...result, stdout: Buffer.concat(chunks) }
 }
 
 function killGroup(pid) {
