@@ -22,6 +22,39 @@ Status date: `2026-09-03`
 - Remaining: owner-present sign-in journey (see `PENDING_USER_ACTION.md` §1).
   Status stays `BLOCKED` until that journey passes.
 
+## Real-dependency audit (2026-09-04, after two "green in tests, dead on the runtime" incidents)
+
+Evidence classes: `live` = executed against the real dependency in production
+this session; `workerd` = executed on real workerd by `scripts/workerd-signer-check.mjs`
+(11/11); `pg` = real-Postgres integration test (`tests/integration`); `static-live` =
+call shape compared against the live database (function identity arguments, grants,
+`rolbypassrls`); `mocked` = unit tests only.
+
+| Path | Dependency call shape | Evidence |
+|---|---|---|
+| Edge rate limit | Durable Object `getByName().check()` | live (earlier 400x10 → 429 receipt) |
+| Sign-in start | PostgREST RPC `create_identity_authorization_transaction` via supabase-js + runtime JWT | live |
+| Callback claim/release | RPC `claim_…`, `release_…_claim` | live |
+| Client assertion | `crypto.subtle` ECDSA P-256 sign, 64-byte raw | live (Identity replay row) + workerd |
+| Code exchange fetch | `fetch` with `cache:'no-store', credentials:'omit', redirect:'manual'` | live (200/404) + workerd (init accepted; `'error'` proven to fail) |
+| Exchange body read | `ReadableStreamBYOBReader` bounded JSON | live (200 body parsed to the issuer check) |
+| Result verification | key-set import, ECDSA verify, `structuredClone` | workerd (Identity-shaped fixture); live pending owner OTP |
+| Exchange checkpoint/finalize | RPC `checkpoint_…`, `finalize_…` | pg + static-live |
+| Session create/read/revoke | RPC `create_identity_session`, `read_…`, `revoke_…`; cookie `academy_session` | read: live (bogus cookie → 307); create/revoke: pg + static-live |
+| Profile activation, `academy.users` upsert | RPC `sync_service_activation`; table `users` insert/update | pg + static-live (grants I/S/U, bypassrls) |
+| Entitlement | RPC `has_course_entitlement`; table `course_entitlement` | pg + static-live |
+| Progress write/read | RPC `record_node_progress`, `capture_progress_epoch`, `commit_node_progress`, `reset_course_progress`; table `node_progress` | pg + static-live |
+| Attempts | RPC `issue/consume/inspect/finalize_attempt`, `commit_attempt_result` | pg + static-live |
+| Private media | HMAC grant cookie, R2 `get(key, {range: Headers})`, streamed 200/206 | workerd (local R2) + live bucket read of a registry key (416-byte VTT) |
+| Leads/consent | RPC `record_lead_consent`, `withdraw_marketing_consent` | static-live |
+| JSON charset, notices | Worker response wrapper | live |
+
+All 27 RPC call sites match the live function identity arguments and `academy_runtime`
+has execute on each; every table the journey writes has the needed grants. Residual
+unknowns: real-R2 range semantics beyond the emulator, and the post-callback RPCs that
+only a real session can drive (they run live at the founder's next sign-in; every
+failure now logs its stage).
+
 ## Exact status
 
 Academy is `BLOCKED`, not production-ready. Public and runtime health remained
