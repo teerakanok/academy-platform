@@ -243,6 +243,34 @@ describe('AcademyPostgresIdentitySessionStore', () => {
     expect(duplicates.rpc).toHaveBeenCalledTimes(2)
   })
 
+  it('reuses only an exact stable session after a committed-create response is lost', async () => {
+    const stableId = 'I'.repeat(43)
+    const exact = client([
+      { data: { status: 'duplicate' }, error: null },
+      { data: { status: 'active', session: session(stableId) }, error: null },
+    ])
+    await expect(new AcademyPostgresIdentitySessionStore(exact).create(claims, stableId))
+      .resolves.toMatchObject({ id: stableId, claims })
+    expect(exact.rpc).toHaveBeenNthCalledWith(1, 'create_identity_session', expect.objectContaining({
+      p_session_id: stableId,
+    }))
+    expect(exact.rpc).toHaveBeenNthCalledWith(2, 'read_identity_session', {
+      p_session_id: stableId,
+    })
+
+    const mismatch = client([
+      { data: { status: 'duplicate' }, error: null },
+      {
+        data: {
+          status: 'active',
+          session: session(stableId, { subjectKey: encodeSubjectKey('other-principal') }),
+        },
+        error: null,
+      },
+    ])
+    await fixedFailure(() => new AcademyPostgresIdentitySessionStore(mismatch).create(claims, stableId))
+  })
+
   it('rejects surplus input and response before authority can widen', async () => {
     const inputClient = client({ data: { status: 'created', session: session() }, error: null })
     await fixedFailure(() => new AcademyPostgresIdentitySessionStore(inputClient).create({

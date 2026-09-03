@@ -2,7 +2,10 @@ import { safeNextPath } from '@/lib/auth/route-client'
 import { validateMutationRequest } from '@/lib/http/mutation-security'
 
 import type { AuthorizationRequest } from './adapter'
-import { createAcademyIdentityRuntimeCompletion } from './runtime-completion'
+import {
+  createAcademyIdentityRuntimeCompletion,
+  isRetryableAcademyIdentityRuntimeCompletionFailure,
+} from './runtime-completion'
 import { academySessionCookie } from './session-store'
 import {
   beginIdentityAuthorization,
@@ -189,11 +192,12 @@ export function createAcademyIdentityRuntimeBrowserFlow(
             academySessionCookie(completed.sessionId),
             expireBrowserBindingCookie(state),
           ])
-        } catch {
+        } catch (error) {
+          const preserveBinding = isRetryableAcademyIdentityRuntimeCompletionFailure(error)
           return errorResult(
             state === null ? 400 : 503,
             CALLBACK_FAILURE,
-            state === null ? [] : [expireBrowserBindingCookie(state)],
+            state === null || preserveBinding ? [] : [expireBrowserBindingCookie(state)],
           )
         }
       },

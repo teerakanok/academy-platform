@@ -87,12 +87,18 @@ export class AcademyPostgresIdentitySessionStore implements IdentityDurableSessi
     }
   }
 
-  async create(inputValue: IdentitySessionClaims): Promise<IdentitySessionReceipt> {
+  async create(
+    inputValue: IdentitySessionClaims,
+    stableIdValue?: string,
+  ): Promise<IdentitySessionReceipt> {
     const input = snapshotInput(inputValue)
-    if (!input) throw new IdentityPostgresSessionStoreFailure()
+    if (!input || (stableIdValue !== undefined && !SESSION_ID.test(stableIdValue))) {
+      throw new IdentityPostgresSessionStoreFailure()
+    }
 
-    for (let attempt = 0; attempt < MAX_CREATE_ATTEMPTS; attempt += 1) {
-      const sessionId = randomBytes(32).toString('base64url')
+    const maximumAttempts = stableIdValue === undefined ? MAX_CREATE_ATTEMPTS : 1
+    for (let attempt = 0; attempt < maximumAttempts; attempt += 1) {
+      const sessionId = stableIdValue ?? randomBytes(32).toString('base64url')
       const data = await this.callRpc('create_identity_session', {
         p_session_id: sessionId,
         p_issuer: input.issuer,
@@ -103,7 +109,12 @@ export class AcademyPostgresIdentitySessionStore implements IdentityDurableSessi
         p_ttl_seconds: this.ttlSeconds,
       })
       const duplicate = snapshotExactDataRecord(data, STATUS_KEYS)
-      if (duplicate?.status === 'duplicate') continue
+      if (duplicate?.status === 'duplicate') {
+        if (stableIdValue === undefined) continue
+        const existing = await this.readReceipt(sessionId)
+        if (existing && samePrincipal(existing.claims, input)) return existing
+        throw new IdentityPostgresSessionStoreFailure()
+      }
       const result = snapshotExactDataRecord(data, CREATE_KEYS)
       if (!result || result.status !== 'created') {
         throw new IdentityPostgresSessionStoreFailure()
@@ -119,14 +130,7 @@ export class AcademyPostgresIdentitySessionStore implements IdentityDurableSessi
 
   async get(id: string): Promise<IdentitySessionReceipt['claims'] | null> {
     if (!SESSION_ID.test(id)) return null
-    const data = await this.callRpc('read_identity_session', { p_session_id: id })
-    const status = snapshotExactDataRecord(data, STATUS_KEYS)
-    if (status?.status === 'unknown' || status?.status === 'expired') return null
-    const result = snapshotExactDataRecord(data, CREATE_KEYS)
-    if (!result || result.status !== 'active') throw new IdentityPostgresSessionStoreFailure()
-    const receipt = snapshotSession(result.session)
-    if (!receipt || receipt.id !== id) throw new IdentityPostgresSessionStoreFailure()
-    return receipt.claims
+    return (await this.readReceipt(id))?.claims ?? null
   }
 
   async revoke(id: string): Promise<void> {
@@ -147,6 +151,17 @@ export class AcademyPostgresIdentitySessionStore implements IdentityDurableSessi
     } catch {
       throw new IdentityPostgresSessionStoreFailure()
     }
+  }
+
+  private async readReceipt(id: string): Promise<IdentitySessionReceipt | null> {
+    const data = await this.callRpc('read_identity_session', { p_session_id: id })
+    const status = snapshotExactDataRecord(data, STATUS_KEYS)
+    if (status?.status === 'unknown' || status?.status === 'expired') return null
+    const result = snapshotExactDataRecord(data, CREATE_KEYS)
+    if (!result || result.status !== 'active') throw new IdentityPostgresSessionStoreFailure()
+    const receipt = snapshotSession(result.session)
+    if (!receipt || receipt.id !== id) throw new IdentityPostgresSessionStoreFailure()
+    return receipt
   }
 }
 

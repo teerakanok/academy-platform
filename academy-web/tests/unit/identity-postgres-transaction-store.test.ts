@@ -14,6 +14,8 @@ import {
 } from '@/lib/identity/transaction'
 
 const EXPIRES_AT = '2030-01-02T03:04:05.000Z'
+const SESSION_ID = 'S'.repeat(43)
+const ACCOUNT_ID = '123e4567-e89b-42d3-a456-426614174000'
 const client: LocalIdentityClient = {
   clientId: 'academy-web-local',
   redirectUri: 'http://localhost:3000/auth/callback',
@@ -50,6 +52,27 @@ function consumed(input: PendingIdentityTransactionInput) {
       client: { ...input.client },
       expiresAt: EXPIRES_AT,
     },
+  }
+}
+
+function exchangeResult(input: PendingIdentityTransactionInput) {
+  return {
+    issuer: input.client.expectedIssuer,
+    subject: 'principal-subject',
+    verifiedEmail: 'learner@example.com',
+    audience: input.client.audience,
+    serviceId: input.client.serviceId,
+    nonce: input.nonce,
+    activation: { status: 'active' as const, revision: 7 },
+  }
+}
+
+function claimed(input: PendingIdentityTransactionInput, result: unknown = null) {
+  return {
+    status: 'claimed',
+    sessionId: SESSION_ID,
+    exchangeResult: result,
+    transaction: consumed(input).transaction,
   }
 }
 
@@ -119,6 +142,144 @@ describe('AcademyPostgresIdentityTransactionStore', () => {
       expiresAt: Date.parse(EXPIRES_AT),
     })
     expect(result.client).not.toBe(input.client)
+  })
+
+  it('claims without consuming, then releases or finalizes only the exact local claim', async () => {
+    const { browserBinding, input } = fixture()
+    const exchanged = exchangeResult(input)
+    const rpc = vi.fn()
+      .mockResolvedValueOnce({ data: claimed(input), error: null })
+      .mockResolvedValueOnce({ data: { status: 'checkpointed' }, error: null })
+      .mockResolvedValueOnce({ data: { status: 'released' }, error: null })
+      .mockResolvedValueOnce({ data: claimed(input, exchanged), error: null })
+      .mockResolvedValueOnce({ data: { status: 'completed' }, error: null })
+    const store = new AcademyPostgresIdentityTransactionStore({ rpc })
+
+    const first = await store.claim(input.state, browserBinding)
+    expect(first.status).toBe('claimed')
+    if (first.status !== 'claimed') throw new Error('expected active claim')
+    expect(first.claimToken).toMatch(/^[A-Za-z0-9_-]{43}$/)
+    expect(first.sessionId).toBe(SESSION_ID)
+    expect(first.exchangeResult).toBeNull()
+    expect(first.transaction).toMatchObject({ state: input.state })
+    expect(rpc.mock.calls[0]?.[0]).toBe('claim_identity_authorization_transaction')
+    expect(rpc.mock.calls[0]?.[1]).toMatchObject({
+      p_state: input.state,
+      p_browser_binding_digest: input.browserBindingDigest,
+      p_claim_digest: expect.stringMatching(/^[A-Za-z0-9_-]{43}$/),
+      p_session_id: expect.stringMatching(/^[A-Za-z0-9_-]{43}$/),
+      p_lease_seconds: 30,
+    })
+
+    await store.checkpoint(first, exchanged)
+    expect(rpc.mock.calls[1]?.[0]).toBe('checkpoint_identity_authorization_exchange')
+    expect(rpc.mock.calls[1]?.[1]).toMatchObject({
+      p_state: input.state,
+      p_claim_digest: rpc.mock.calls[0]?.[1].p_claim_digest,
+      p_issuer: exchanged.issuer,
+      p_subject: exchanged.subject,
+      p_verified_email: exchanged.verifiedEmail,
+      p_activation_status: 'active',
+      p_activation_revision: 7,
+    })
+
+    await store.release(first, 'client_assertion')
+    expect(rpc.mock.calls[2]?.[0]).toBe('release_identity_authorization_transaction_claim')
+    expect(rpc.mock.calls[2]?.[1]).toMatchObject({
+      p_state: input.state,
+      p_claim_digest: rpc.mock.calls[0]?.[1].p_claim_digest,
+      p_failure_stage: 'client_assertion',
+    })
+
+    const second = await store.claim(input.state, browserBinding)
+    expect(second.status).toBe('claimed')
+    if (second.status !== 'claimed') throw new Error('expected resumed claim')
+    expect(second.exchangeResult).toEqual(exchanged)
+    await store.finalize(second, {
+      accountId: ACCOUNT_ID,
+      sessionId: SESSION_ID,
+      returnPath: input.returnPath,
+    })
+    expect(rpc.mock.calls[4]?.[0]).toBe('finalize_identity_authorization_transaction')
+    expect(rpc.mock.calls[4]?.[1]).toMatchObject({
+      p_state: input.state,
+      p_claim_digest: rpc.mock.calls[3]?.[1].p_claim_digest,
+      p_account_id: ACCOUNT_ID,
+      p_session_id: SESSION_ID,
+      p_subject_key: expect.stringMatching(/^[a-f0-9]+$/),
+    })
+  })
+
+  it('returns an exact completed receipt without exposing a new claim token', async () => {
+    const { browserBinding, input } = fixture()
+    const store = new AcademyPostgresIdentityTransactionStore(rpcClient({
+      data: {
+        status: 'completed',
+        receipt: { accountId: ACCOUNT_ID, sessionId: SESSION_ID, returnPath: '/dashboard' },
+      },
+      error: null,
+    }))
+
+    await expect(store.claim(input.state, browserBinding)).resolves.toEqual({
+      status: 'completed',
+      receipt: { accountId: ACCOUNT_ID, sessionId: SESSION_ID, returnPath: '/dashboard' },
+    })
+  })
+
+  it('retries only the idempotent verified-result checkpoint after response loss', async () => {
+    const { browserBinding, input } = fixture()
+    const rpc = vi.fn()
+      .mockResolvedValueOnce({ data: claimed(input), error: null })
+      .mockRejectedValueOnce(new Error('response lost'))
+      .mockResolvedValueOnce({ data: { status: 'checkpointed' }, error: null })
+    const store = new AcademyPostgresIdentityTransactionStore({ rpc })
+    const claim = await store.claim(input.state, browserBinding)
+    if (claim.status !== 'claimed') throw new Error('expected active claim')
+
+    await expect(store.checkpoint(claim, exchangeResult(input))).resolves.toBeUndefined()
+    expect(rpc.mock.calls.slice(1).map(([name]) => name)).toEqual([
+      'checkpoint_identity_authorization_exchange',
+      'checkpoint_identity_authorization_exchange',
+    ])
+    expect(rpc.mock.calls[1]?.[1]).toEqual(rpc.mock.calls[2]?.[1])
+  })
+
+  it.each([
+    ['unknown', 'unknown_state'],
+    ['expired', 'expired_state'],
+    ['browser_mismatch', 'browser_mismatch'],
+    ['in_progress', 'claim_in_progress'],
+    ['exhausted', 'claim_exhausted'],
+  ] as const)('maps claim status %s to fixed reason %s', async (status, reason) => {
+    const { browserBinding, input } = fixture()
+    const store = new AcademyPostgresIdentityTransactionStore(
+      rpcClient({ data: { status }, error: null }),
+    )
+
+    await expect(store.claim(input.state, browserBinding)).rejects.toMatchObject({ reason })
+  })
+
+  it('rejects malformed claim settlement and fixed-stage drift before mutation', async () => {
+    const { input } = fixture()
+    const rpc = vi.fn()
+    const store = new AcademyPostgresIdentityTransactionStore({ rpc })
+    const malformed = { status: 'claimed', claimToken: 'short', sessionId: SESSION_ID,
+      exchangeResult: null, transaction: { ...input, expiresAt: Date.parse(EXPIRES_AT) } }
+
+    await expect(store.release(malformed as never, 'code_exchange'))
+      .rejects.toBeInstanceOf(IdentityPostgresTransactionStoreFailure)
+    await expect(store.finalize(malformed as never, {
+      accountId: ACCOUNT_ID, sessionId: SESSION_ID, returnPath: '/dashboard',
+    }))
+      .rejects.toBeInstanceOf(IdentityPostgresTransactionStoreFailure)
+    await expect(store.release({
+      status: 'claimed',
+      claimToken: 'c'.repeat(43),
+      sessionId: SESSION_ID,
+      exchangeResult: null,
+      transaction: { ...input, expiresAt: Date.parse(EXPIRES_AT) },
+    }, 'other' as never)).rejects.toBeInstanceOf(IdentityPostgresTransactionStoreFailure)
+    expect(rpc).not.toHaveBeenCalled()
   })
 
   it.each([
@@ -269,5 +430,30 @@ describe('AcademyPostgresIdentityTransactionStore', () => {
     expect(migration).not.toMatch(/grant (?:select|insert|update|delete)[\s\S]*identity_authorization_transaction/i)
     expect(migration.match(/grant execute on function academy\.(?:create|consume)_identity_authorization_transaction/g))
       .toHaveLength(2)
+  })
+
+  it('keeps completion retry state behind bounded runtime-only state-machine RPCs', () => {
+    const migration = readFileSync(
+      join(process.cwd(), 'supabase/migrations/0028_identity_authorization_completion_lease.sql'),
+      'utf8',
+    )
+
+    expect(migration).toMatch(/attempt_count between 0 and 3/i)
+    expect(migration).toMatch(/p_lease_seconds not between 1 and 60/i)
+    expect(migration).toMatch(/for update/i)
+    expect(migration).toMatch(/claim_digest ~ '\^\[A-Za-z0-9_-\]\{43\}\$'/i)
+    expect(migration).toMatch(/last_failure_stage is null or last_failure_stage in/i)
+    expect(migration).toMatch(/create or replace function academy\.claim_identity_authorization_transaction/i)
+    expect(migration).toMatch(/create or replace function academy\.checkpoint_identity_authorization_exchange/i)
+    expect(migration).toMatch(/create or replace function academy\.release_identity_authorization_transaction_claim/i)
+    expect(migration).toMatch(/create or replace function academy\.finalize_identity_authorization_transaction/i)
+    expect(migration.match(/security definer/gi)).toHaveLength(5)
+    expect(migration.match(/grant execute on function academy\.(?:claim_identity_authorization_transaction|checkpoint_identity_authorization_exchange|release_identity_authorization_transaction_claim|finalize_identity_authorization_transaction)/g))
+      .toHaveLength(4)
+    expect(migration).toMatch(/result_issuer is null[\s\S]*result_activation_revision is null/i)
+    expect(migration).toMatch(/completed_account_id is not null[\s\S]*claim_digest is null/i)
+    expect(migration).toMatch(/status', 'completed'[\s\S]*sessionId/i)
+    expect(migration).toMatch(/attempt_count <> 0[\s\S]*status', 'unknown'[\s\S]*delete from academy\.identity_authorization_transaction/i)
+    expect(migration).not.toMatch(/grant (?:select|insert|update|delete)[\s\S]*identity_authorization_transaction/i)
   })
 })

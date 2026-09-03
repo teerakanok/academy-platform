@@ -26,6 +26,7 @@ const RESULT_KEY_SET_DOCUMENT = JSON.stringify({
 })
 
 let transaction: Record<string, unknown> | undefined
+let rpcCalls: string[] = []
 
 beforeEach(async () => {
   const keyPair = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify'])
@@ -46,8 +47,10 @@ beforeEach(async () => {
   vi.stubEnv('IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK', canonicalPrivateJwk)
   vi.stubEnv('IDENTITY_RESULT_KEY_SET_DOCUMENT', RESULT_KEY_SET_DOCUMENT)
   transaction = undefined
+  rpcCalls = []
   database.academyDb.mockReturnValue({
     rpc: vi.fn(async (name: string, parameters: Record<string, string>) => {
+      rpcCalls.push(name)
       if (name === 'create_identity_authorization_transaction') {
         transaction = {
           state: parameters.p_state,
@@ -67,8 +70,19 @@ beforeEach(async () => {
         }
         return { data: { status: 'created', expiresAt: '2030-01-02T03:04:05.000Z' }, error: null }
       }
-      if (name === 'consume_identity_authorization_transaction') {
-        return { data: { status: 'consumed', transaction }, error: null }
+      if (name === 'claim_identity_authorization_transaction') {
+        return {
+          data: {
+            status: 'claimed',
+            sessionId: 's'.repeat(43),
+            exchangeResult: null,
+            transaction,
+          },
+          error: null,
+        }
+      }
+      if (name === 'release_identity_authorization_transaction_claim') {
+        return { data: { status: 'released' }, error: null }
       }
       throw new Error(`unexpected RPC ${name}`)
     }),
@@ -115,6 +129,12 @@ describe('production Identity routes use the real registry composition', () => {
       ok: false,
       error: 'ยังไม่ได้เชื่อมต่อ Identity Control สำหรับสภาพแวดล้อมนี้',
     })
+    expect(callback.headers.getSetCookie()).toEqual([])
+    expect(rpcCalls).toEqual([
+      'create_identity_authorization_transaction',
+      'claim_identity_authorization_transaction',
+      'release_identity_authorization_transaction_claim',
+    ])
     expect(database.academyDb).toHaveBeenCalledTimes(2)
   })
 

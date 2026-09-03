@@ -59,6 +59,19 @@ describe('local durable identity session store', () => {
     })
   })
 
+  it('reuses a stable id only for the same principal and activation claims', () => {
+    withTempStore((path) => {
+      const stableId = 'S'.repeat(43)
+      const store = new FileIdentitySessionStore(path, { now: () => 1_000, ttlMs: 60_000 })
+      const first = store.create(claims, stableId)
+      const second = store.create(claims, stableId)
+
+      expect(first).toEqual(second)
+      expect(() => store.create({ ...claims, subject: 'other-principal' }, stableId))
+        .toThrow(/principal/)
+    })
+  })
+
   it('serializes and expires the host-only cookie with one deterministic attribute policy', () => {
     const sessionId = 'session_token_123456789012345678901234'
 

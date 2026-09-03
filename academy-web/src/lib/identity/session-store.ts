@@ -76,8 +76,14 @@ export class FileIdentitySessionStore {
     this.ttlMs = ttlMs
   }
 
-  create(input: IdentitySessionClaims): { id: string; claims: IdentitySessionClaims & { createdAt: number; expiresAt: number } } {
+  create(
+    input: IdentitySessionClaims,
+    stableId?: string,
+  ): { id: string; claims: IdentitySessionClaims & { createdAt: number; expiresAt: number } } {
     validateClaims(input)
+    if (stableId !== undefined && !SESSION_ID.test(stableId)) {
+      throw new IdentitySessionStoreError('identity session id ไม่ถูกต้อง')
+    }
     const createdAt = input.createdAt ?? this.now()
     const expiresAt = input.expiresAt ?? createdAt + this.ttlMs
     if (!Number.isSafeInteger(createdAt) || !Number.isSafeInteger(expiresAt) || expiresAt <= createdAt) {
@@ -85,8 +91,20 @@ export class FileIdentitySessionStore {
     }
     return withExclusiveFileStoreLock(this.filePath, () => {
       const sessions = this.read().filter((session) => session.claims.expiresAt > this.now())
+      if (stableId !== undefined) {
+        const existing = sessions.find((session) => session.id === stableId)
+        if (existing) {
+          if (!sameSessionClaims(existing.claims, input)) {
+            throw new IdentitySessionStoreError('identity session id ถูกใช้กับ principal คนละรายการ')
+          }
+          return {
+            id: existing.id,
+            claims: { ...existing.claims, activation: { ...existing.claims.activation } },
+          }
+        }
+      }
       const session = {
-        id: randomBytes(32).toString('base64url'),
+        id: stableId ?? randomBytes(32).toString('base64url'),
         claims: { ...input, createdAt, expiresAt },
       }
       sessions.push(session)
@@ -158,6 +176,17 @@ export class FileIdentitySessionStore {
       throw new IdentitySessionStoreError('identity session store เขียนข้อมูลไม่ได้')
     }
   }
+}
+
+function sameSessionClaims(
+  stored: StoredIdentitySession['claims'],
+  expected: IdentitySessionClaims,
+): boolean {
+  return stored.issuer === expected.issuer
+    && stored.subject === expected.subject
+    && stored.verifiedEmail === expected.verifiedEmail
+    && stored.activation.status === expected.activation.status
+    && stored.activation.revision === expected.activation.revision
 }
 
 function validateClaims(claims: IdentitySessionClaims): void {

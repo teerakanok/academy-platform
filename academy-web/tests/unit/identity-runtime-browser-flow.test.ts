@@ -6,7 +6,11 @@ import {
   AcademyIdentityRuntimeBrowserFlowUnavailableError,
   createAcademyIdentityRuntimeBrowserFlow,
 } from '@/lib/identity/runtime-browser-flow'
-import { InMemoryIdentityTransactionStore } from '@/lib/identity/transaction'
+import {
+  digestIdentityBrowserBinding,
+  IdentityTransactionError,
+  InMemoryIdentityTransactionStore,
+} from '@/lib/identity/transaction'
 
 const CLIENT = {
   clientId: 'academy-web',
@@ -150,12 +154,13 @@ describe('Academy Identity runtime browser flow', () => {
     const wrong = await fixture.flow.complete(callbackRequest(started, 'wrong_binding_1234567890'))
 
     expect(wrong).toMatchObject({ kind: 'error', status: 503 })
-    expect(fixture.calls).toEqual(['create', 'authorize', 'consume'])
+    expect(fixture.calls).toEqual(['create', 'authorize', 'claim'])
 
     const completed = await fixture.flow.complete(callbackRequest(started, started.binding))
     expect(completed).toMatchObject({ kind: 'redirect', location: '/dashboard' })
     expect(fixture.calls).toEqual([
-      'create', 'authorize', 'consume', 'consume', 'assertion', 'exchange', 'verify', 'activation', 'session',
+      'create', 'authorize', 'claim', 'claim', 'assertion', 'exchange', 'verify',
+      'checkpoint', 'activation', 'session', 'finalize',
     ])
   })
 
@@ -189,34 +194,41 @@ describe('Academy Identity runtime browser flow', () => {
 
     const beforeReplay = fixture.calls.slice()
     const replay = await fixture.flow.complete(callbackRequest(started, started.binding))
-    expect(replay).toMatchObject({ kind: 'error', status: 503 })
-    expect(fixture.calls).toEqual([...beforeReplay, 'consume'])
+    expect(replay).toMatchObject({ kind: 'redirect', status: 303, location: '/dashboard' })
+    expect(fixture.calls).toEqual([...beforeReplay, 'claim'])
   })
 
   it.each(['activation', 'session'] as const)(
-    'keeps a callback consumed after %s failure and permits only a fresh authorization recovery',
+    'retains the browser-bound callback after %s failure and finalizes it after one retry',
     async (failure) => {
       const fixture = createFixture({ failures: { [failure]: 1 } })
       const first = await start(fixture)
 
-      expect(await fixture.flow.complete(callbackRequest(first, first.binding))).toMatchObject({
+      const failed = await fixture.flow.complete(callbackRequest(first, first.binding))
+      expect(failed).toMatchObject({
         kind: 'error',
         status: 503,
+        cookies: [],
       })
-      const beforeReplay = fixture.calls.slice()
-      expect(await fixture.flow.complete(callbackRequest(first, first.binding))).toMatchObject({
-        kind: 'error',
-        status: 503,
-      })
-      expect(fixture.calls).toEqual([...beforeReplay, 'consume'])
-
-      const fresh = await start(fixture)
-      expect(await fixture.flow.complete(callbackRequest(fresh, fresh.binding))).toMatchObject({
+      const recovered = await fixture.flow.complete(callbackRequest(first, first.binding))
+      expect(recovered).toMatchObject({
         kind: 'redirect',
         location: '/dashboard',
       })
+      const replay = await fixture.flow.complete(callbackRequest(first, first.binding))
+      expect(replay).toMatchObject({ kind: 'redirect', status: 303, location: '/dashboard' })
     },
   )
+
+  it('preserves the binding cookie while another callback claim is still in progress', async () => {
+    const fixture = createFixture({ claimBusy: 1 })
+    const started = await start(fixture)
+
+    const busy = await fixture.flow.complete(callbackRequest(started, started.binding))
+    expect(busy).toMatchObject({ kind: 'error', status: 503, cookies: [] })
+    await expect(fixture.flow.complete(callbackRequest(started, started.binding)))
+      .resolves.toMatchObject({ kind: 'redirect', location: '/dashboard' })
+  })
 
   it('rejects disabled admission before reading downstream capabilities', () => {
     let capabilityReads = 0
@@ -246,19 +258,70 @@ describe('Academy Identity runtime browser flow', () => {
 function createFixture(overrides: {
   registration?: { client: typeof CLIENT; redirectUris: string[] }
   failures?: Partial<Record<'activation' | 'session', number>>
+  claimBusy?: number
 } = {}) {
   const calls: string[] = []
   const store = new InMemoryIdentityTransactionStore({ now: () => 1_000 })
   let activationFailures = overrides.failures?.activation ?? 0
   let sessionFailures = overrides.failures?.session ?? 0
+  let claimBusy = overrides.claimBusy ?? 0
+  const checkpointedResults = new Map<string, unknown>()
+  const completedReceipts = new Map<string, {
+    bindingDigest: string
+    receipt: { accountId: string; sessionId: string; returnPath: string }
+  }>()
   const transactionStore = {
     create(input: Parameters<typeof store.create>[0]) {
       calls.push('create')
       return store.create(input)
     },
-    consume(state: string, binding: string) {
-      calls.push('consume')
-      return store.consume(state, binding)
+    claim(state: string, binding: string) {
+      calls.push('claim')
+      if (claimBusy > 0) {
+        claimBusy -= 1
+        throw new IdentityTransactionError('busy', 'claim_in_progress')
+      }
+      const completed = completedReceipts.get(state)
+      if (completed) {
+        if (digestIdentityBrowserBinding(binding) !== completed.bindingDigest) {
+          throw new IdentityTransactionError('binding', 'browser_mismatch')
+        }
+        return { status: 'completed' as const, receipt: { ...completed.receipt } }
+      }
+      const transaction = store.consume(state, binding)
+      return {
+        status: 'claimed' as const,
+        claimToken: 'c'.repeat(43),
+        sessionId: SESSION_ID,
+        exchangeResult: checkpointedResults.get(state) ?? null,
+        transaction,
+      }
+    },
+    checkpoint(claim: { transaction: ReturnType<typeof store.consume> }, result: unknown) {
+      calls.push('checkpoint')
+      checkpointedResults.set(claim.transaction.state, result)
+    },
+    release(claim: { transaction: ReturnType<typeof store.consume> }, stage: string) {
+      calls.push(`release:${stage}`)
+      const transaction = claim.transaction
+      store.create({
+        state: transaction.state,
+        codeVerifier: transaction.codeVerifier,
+        nonce: transaction.nonce,
+        browserBindingDigest: transaction.browserBindingDigest,
+        client: transaction.client,
+        returnPath: transaction.returnPath,
+      })
+    },
+    finalize(
+      claim: { transaction: ReturnType<typeof store.consume> },
+      receipt: { accountId: string; sessionId: string; returnPath: string },
+    ) {
+      calls.push('finalize')
+      completedReceipts.set(claim.transaction.state, {
+        bindingDigest: claim.transaction.browserBindingDigest,
+        receipt: { ...receipt },
+      })
     },
   }
   const flow = createAcademyIdentityRuntimeBrowserFlow({
@@ -341,14 +404,14 @@ function createFixture(overrides: {
         subject: string
         verifiedEmail: string
         activation: { status: 'active'; revision: number }
-      }) {
+      }, stableId: string) {
         calls.push('session')
         if (sessionFailures > 0) {
           sessionFailures -= 1
           throw new Error('session fixture')
         }
         return {
-          id: SESSION_ID,
+          id: stableId,
           claims: { ...input, createdAt: 2_000, expiresAt: 3_000 },
         }
       },

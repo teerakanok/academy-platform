@@ -68,6 +68,57 @@ export interface IdentityTransactionStore {
   consume(state: string, browserBinding: string): PendingIdentityTransaction | PromiseLike<PendingIdentityTransaction>
 }
 
+export const IDENTITY_COMPLETION_FAILURE_STAGES = [
+  'client_binding',
+  'client_assertion',
+  'code_exchange',
+  'result_verification',
+  'result_checkpoint',
+  'profile_activation',
+  'session_creation',
+  'transaction_finalize',
+] as const
+
+export type IdentityCompletionFailureStage = (typeof IDENTITY_COMPLETION_FAILURE_STAGES)[number]
+
+export type IdentityCompletionReceipt = Readonly<{
+  accountId: string
+  sessionId: string
+  returnPath: string
+}>
+
+export type IdentityCompletionClaim = Readonly<{
+  status: 'claimed'
+  claimToken: string
+  sessionId: string
+  transaction: PendingIdentityTransaction
+  exchangeResult: ExchangeResult | null
+}> | Readonly<{
+  status: 'completed'
+  receipt: IdentityCompletionReceipt
+}>
+
+export type ActiveIdentityCompletionClaim = Extract<
+  IdentityCompletionClaim,
+  { status: 'claimed' }
+>
+
+export interface IdentityCompletionTransactionStore {
+  claim(state: string, browserBinding: string): IdentityCompletionClaim | PromiseLike<IdentityCompletionClaim>
+  checkpoint(
+    claim: ActiveIdentityCompletionClaim,
+    result: ExchangeResult,
+  ): void | PromiseLike<void>
+  release(
+    claim: ActiveIdentityCompletionClaim,
+    stage: IdentityCompletionFailureStage,
+  ): void | PromiseLike<void>
+  finalize(
+    claim: ActiveIdentityCompletionClaim,
+    receipt: IdentityCompletionReceipt,
+  ): void | PromiseLike<void>
+}
+
 export interface IdentityCallback {
   code: string
   state: string
@@ -76,7 +127,7 @@ export interface IdentityCallback {
 export class IdentityTransactionError extends Error {
   constructor(
     message: string,
-    readonly reason: 'unknown_state' | 'expired_state' | 'browser_mismatch' | 'invalid_callback' | 'audience_mismatch' | 'invalid_result',
+    readonly reason: 'unknown_state' | 'expired_state' | 'browser_mismatch' | 'claim_in_progress' | 'claim_exhausted' | 'invalid_callback' | 'audience_mismatch' | 'invalid_result',
   ) {
     super(message)
     this.name = 'IdentityTransactionError'
