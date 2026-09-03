@@ -372,3 +372,46 @@ describe('AcademyPostgresIdentitySessionStore', () => {
     expect(migration).not.toMatch(/course|entitlement/i)
   })
 })
+
+describe('supabase-js response envelope', () => {
+  it('accepts the real PostgrestResponse shape (data, error, count, status, statusText)', async () => {
+    const calls: Array<{ functionName: string }> = []
+    const stored = new Map<string, unknown>()
+    const rpcClient = {
+      rpc(functionName: string, parameters: Record<string, unknown>) {
+        calls.push({ functionName })
+        const now = new Date('2026-09-03T23:20:41.674Z')
+        const later = new Date('2026-09-04T23:20:41.674Z')
+        if (functionName === 'create_identity_session') {
+          // jsonb key order as PostgreSQL emits it (shorter keys first), not TS declaration order
+          stored.set(parameters.p_session_id as string, {
+            id: parameters.p_session_id,
+            claims: {
+              issuer: parameters.p_issuer,
+              createdAt: now.toISOString(),
+              expiresAt: later.toISOString(),
+              activation: { status: parameters.p_activation_status, revision: parameters.p_activation_revision },
+              subjectKey: parameters.p_subject_key,
+              verifiedEmail: parameters.p_verified_email,
+            },
+          })
+        }
+        const session = stored.get(parameters.p_session_id as string)
+        const data = functionName === 'revoke_identity_session'
+          ? { status: 'revoked' }
+          : { status: functionName === 'create_identity_session' ? 'created' : 'active', session }
+        return Promise.resolve({ data, error: null, count: null, status: 200, statusText: 'OK' })
+      },
+    }
+    const store = new AcademyPostgresIdentitySessionStore(rpcClient)
+    const stableId = 'A'.repeat(43)
+    const receipt = await store.create(claims, stableId)
+    expect(receipt.id).toBe(stableId)
+    expect(receipt.claims.subject).toBe(claims.subject)
+    await expect(store.get(stableId)).resolves.toMatchObject({ verifiedEmail: claims.verifiedEmail })
+    await expect(store.revoke(stableId)).resolves.toBeUndefined()
+    expect(calls.map((call) => call.functionName)).toEqual([
+      'create_identity_session', 'read_identity_session', 'revoke_identity_session',
+    ])
+  })
+})

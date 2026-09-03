@@ -145,7 +145,9 @@ export class AcademyPostgresIdentitySessionStore implements IdentityDurableSessi
   private async callRpc(functionName: string, parameters: Record<string, unknown>): Promise<unknown> {
     try {
       const response = await this.invokeRpc(functionName, parameters)
-      const envelope = snapshotExactDataRecord(response, ['data', 'error'] as const)
+      // supabase-js resolves { data, error, count, status, statusText }; only data/error are
+      // ours to judge. An exact two-key check here rejected every real response in production.
+      const envelope = snapshotRpcEnvelope(response)
       if (!envelope || envelope.error !== null) throw new Error(FAILURE_MESSAGE)
       return envelope.data
     } catch {
@@ -286,6 +288,19 @@ function snapshotOptionalExactDataRecord<const Keys extends readonly string[]>(
   } catch {
     return null
   }
+}
+
+function snapshotRpcEnvelope(value: unknown): { data: unknown; error: unknown } | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null
+  const prototype = Reflect.getPrototypeOf(value)
+  if (prototype !== Object.prototype && prototype !== null) return null
+  const envelope = Object.create(null) as { data: unknown; error: unknown }
+  for (const key of ['data', 'error'] as const) {
+    const descriptor = Reflect.getOwnPropertyDescriptor(value, key)
+    if (!descriptor || !descriptor.enumerable || !('value' in descriptor)) return null
+    envelope[key] = descriptor.value
+  }
+  return envelope
 }
 
 function snapshotExactDataRecord<const Keys extends readonly string[]>(
