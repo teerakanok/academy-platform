@@ -57,6 +57,7 @@ const REQUEST_TIMEOUT_MS = 30_000
 const REQUIRED_CHECKS = [
   'code-exchange-fetch-init-accepted-by-workerd',
   'cryptokey-introspection-shape',
+  'private-media-delivery-on-workerd-r2',
   'rejects-a-cryptokey',
   'rejects-a-parsed-object',
   'rejects-a-surplus-member',

@@ -14,8 +14,17 @@ import {
 import { CODE_EXCHANGE_FETCH_INIT } from '../../src/lib/identity/code-exchange-response-transport'
 import { createIdentityCodeExchangeResultVerifierPort } from '../../src/lib/identity/code-exchange-result-verifier-port'
 import { importIdentityResultKeySet } from '../../src/lib/identity/result-key-set-importer'
+import { issueMediaGrant } from '../../src/lib/media/grant'
+import { MEDIA_DELIVERY_COOKIE } from '../../src/lib/media/cookie'
+import { servePrivateMedia } from '../../src/lib/media/worker-delivery'
 
 type Check = { name: string, passed: boolean, detail: string }
+
+// Minimal structural view of the R2 binding used by the media check (no workers-types dependency).
+type HarnessBucket = Parameters<typeof servePrivateMedia>[1]['COURSE_MEDIA'] & {
+  put(key: string, value: Uint8Array, options?: { httpMetadata?: { contentType?: string } }): Promise<unknown>
+  delete(key: string): Promise<void>
+}
 
 const CLIENT_ID = 'academy-web'
 const PURPOSE = 'lifecycle_pull' as const
@@ -23,7 +32,7 @@ const KEY_ID = 'academy-lifecycle-2026-08'
 
 const handler = {
   // nonce มาทาง binding ไม่ใช่ทาง URL คำขอจากภายนอกจึงไม่มีอะไรให้ลอก
-  async fetch(_request: Request, env: { SIGNER_CHECK_NONCE?: string }): Promise<Response> {
+  async fetch(_request: Request, env: { SIGNER_CHECK_NONCE?: string; COURSE_MEDIA?: HarnessBucket }): Promise<Response> {
     const nonce = env?.SIGNER_CHECK_NONCE ?? ''
     const checks: Check[] = []
     const record = async (name: string, run: () => Promise<string>): Promise<void> => {
@@ -255,6 +264,57 @@ const handler = {
         throw new Error('verified result did not round-trip')
       }
       return 'importer + verifier accepted a 60 s ES256 result of the Identity shape on workerd'
+    })
+
+    await record('private-media-delivery-on-workerd-r2', async () => {
+      // Real R2 binding API (local emulation) + real HMAC grant + real streamed Response.
+      const bucket = env.COURSE_MEDIA
+      if (!bucket) throw new Error('COURSE_MEDIA binding missing from the harness config')
+      const key = 'basic-os-linux/os-what-it-does/lesson-demo.mp4' // registry id os-video-en
+      const bytes = new Uint8Array(1_000)
+      for (let index = 0; index < bytes.length; index += 1) bytes[index] = index % 251
+      await bucket.put(key, bytes, { httpMetadata: { contentType: 'video/mp4' } })
+      try {
+        const secret = 'workerd-check-media-secret-0123456789abcdef0123456789abcdef'
+        const token = await issueMediaGrant({
+          assetId: 'os-video-en',
+          courseSlug: 'basic-os-linux',
+          nodeId: 'os-what-it-does',
+          expiresAt: Math.floor(Date.now() / 1_000) + 60,
+        }, secret)
+        const mediaEnv = { MEDIA_SIGNING_SECRET: secret, COURSE_MEDIA: bucket }
+        const full = await servePrivateMedia(
+          new Request('https://academy.cyberskills.co.th/course-media/os-video-en', {
+            headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}` },
+          }),
+          mediaEnv,
+        )
+        if (!full || full.status !== 200) throw new Error(`full GET status ${full?.status}`)
+        const fullBytes = new Uint8Array(await full.arrayBuffer())
+        if (fullBytes.byteLength !== 1_000 || fullBytes[999] !== 999 % 251) throw new Error('full body mismatch')
+        const ranged = await servePrivateMedia(
+          new Request('https://academy.cyberskills.co.th/course-media/os-video-en', {
+            headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}`, range: 'bytes=100-199' },
+          }),
+          mediaEnv,
+        )
+        if (!ranged || ranged.status !== 206) throw new Error(`range GET status ${ranged?.status}`)
+        const contentRange = ranged.headers.get('content-range')
+        const rangedBytes = new Uint8Array(await ranged.arrayBuffer())
+        if (contentRange !== 'bytes 100-199/1000' || rangedBytes.byteLength !== 100 || rangedBytes[0] !== 100) {
+          throw new Error(`range mismatch: ${contentRange} ${rangedBytes.byteLength}`)
+        }
+        const denied = await servePrivateMedia(
+          new Request('https://academy.cyberskills.co.th/course-media/os-video-en', {
+            headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}x` },
+          }),
+          mediaEnv,
+        )
+        if (denied !== null) throw new Error('tampered grant was not refused')
+        return 'R2 get with Headers range, 200 full body, 206 bytes 100-199/1000, tampered grant refused'
+      } finally {
+        await bucket.delete(key)
+      }
     })
 
     const failed = checks.filter((check) => !check.passed)

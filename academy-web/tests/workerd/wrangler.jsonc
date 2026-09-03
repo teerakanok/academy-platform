@@ -6,5 +6,7 @@
   "name": "academy-identity-signer-workerd-check",
   "main": "signer-worker.ts",
   "compatibility_date": "2025-03-25",
-  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"]
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  // local R2 emulation only; lets the media delivery call shape run on workerd without a real bucket
+  "r2_buckets": [{ "binding": "COURSE_MEDIA", "bucket_name": "academy-workerd-check-media" }]
 }
