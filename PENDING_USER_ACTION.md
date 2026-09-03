@@ -6,26 +6,20 @@
 
 ## 1) Owner-Present Sign-In Journey On The Deployed Callback Fix
 
-Deployed 2026-09-04 00:51 (+07): Worker version `0a57d916-a448-42f3-a44d-20f694303665`
-(source `7d3cc6c`) at `100%`. Rollback = redeploy `1a211637-4468-45b3-8313-03935000b573@100`.
+Deployed 2026-09-04 01:00 (+07): Worker version `f4cc7530-ca7a-4270-a1e2-2342b85d8327`
+at `100%` = source `8c57a2e` + secret `IDENTITY_CODE_EXCHANGE_TIMEOUT_MS=5000`. Rollback ladder:
+`529cc4a1…@100` (same code, timeout 1000) → `0a57d916…@100` → `1a211637…@100`.
 
-Owner-present attempts so far (2026-09-03/04):
-1. First click on `/sign-in` failed at the navigation gate (Safari sends no `Sec-Fetch-User`)
-   → fixed in `aa0149d`.
-2. Second attempt reached Account Center, verified the code, returned to `/auth/callback`,
-   claimed the completion lease, built the client assertion, then **failed at
-   `code_exchange`** (the outbound `POST https://accounts.cyberskills.co.th/v1/code/exchange`;
-   recorded by the 0028 lease release as `last_failure_stage=code_exchange`, 17:12:49Z). The
-   browser still saw raw JSON; `7d3cc6c` now redirects every callback failure to
-   `/sign-in?notice=identity-unavailable` and logs two sanitized lines
-   (`[identity-callback] completion_failed stage=…`, `[identity-code-exchange] response
-   status=… no_store=… elapsed_ms=…`) so the next attempt is diagnosable from `wrangler tail`.
+Root cause of every failed callback so far (founder attempt 17:12Z and synthetic probes): the
+code-exchange fetch passed `redirect: 'error'`, which workerd rejects with a `TypeError` before
+any I/O — no Academy request ever reached Identity, so no OTP, key, or Identity-side rule was at
+fault. Fixed in `8c57a2e` (`redirect: 'manual'`; the strict 200/no-store check still refuses a
+redirect). Proven on the live Worker with a synthetic callback (real transaction, fake code):
+`[identity-code-exchange] response status=404 no_store=true elapsed_ms=188–363` — Identity
+accepted the client assertion (404 = unknown code). No key rotation is needed.
 
-Open question for the Identity lane: what `/v1/code/exchange` returned for client `academy-web`
-at 17:12:45–17:12:50Z (status, error category, latency), and whether Academy's exchange
-timeout secret (`IDENTITY_CODE_EXCHANGE_TIMEOUT_MS`, template `1000`) is long enough for the
-real exchange. DB migration `0028` is present in Pool A
-`academy`; `academy.users` is empty.
+Earlier owner-present findings: Safari sends no `Sec-Fetch-User` (fixed `aa0149d`); callback
+failures rendered raw JSON (fixed `7d3cc6c`, now `/sign-in?notice=identity-unavailable`).
 
 ต้องใช้ founder ทำเองใน browser (agent ห้ามอ่าน mailbox/กรอกรหัสแทน):
 

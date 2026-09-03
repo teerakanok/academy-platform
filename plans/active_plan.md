@@ -4,25 +4,19 @@
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
 > **Last updated:** 2026-09-03
 
-**Current production checkpoint (2026-09-04 00:51 +07):** Academy Worker
-`cyberskills-academy` now serves version `0a57d916-a448-42f3-a44d-20f694303665`
-at `100%`, source `7d3cc6c` = merge `b3d4180` (callback fix `71b41b4` + `main`
-content Wave 1+2 fixes) + Safari sign-in gate fix (`aa0149d`) + callback
-failures rendered on `/sign-in` with sanitized stage/exchange diagnostics
-(`7d3cc6c`). Rollback = `wrangler versions deploy 1a211637-4468-45b3-8313-03935000b573@100`.
-Latest owner-present attempt: start, Account Center, code verification,
-callback, lease claim and client assertion all succeeded; the outbound
-`/v1/code/exchange` call failed (`last_failure_stage=code_exchange`,
-2026-09-03 17:12:49Z). Identity-side status/latency for that call is the
-open fact; Academy's exchange timeout secret (template `1000 ms`) is the
-prime suspect if Identity reports a slow 200. The
-founder's first owner-present click on `/sign-in` returned a raw JSON 403: the
-navigation gate required `Sec-Fetch-User`, which WebKit never sends, so the
-request failed before any Identity or database work. The header is now
-optional, a failed navigation start 303s back to `/sign-in?notice=…`, and the
-Worker sets `charset=utf-8` on every JSON response. Rollback =
-`wrangler versions deploy 4ff2077a-fa56-4ea5-91f8-0b57981ee573@100` (previous
-version, tag `release-b3d4180fcf2d`). Evidence on the merged source:
+**Current production checkpoint (2026-09-04 01:00 +07):** Academy Worker
+`cyberskills-academy` serves version `f4cc7530-ca7a-4270-a1e2-2342b85d8327`
+at `100%` = source `8c57a2e` (merge `b3d4180` + Safari gate fix `aa0149d` +
+callback-notice/diagnostics `7d3cc6c` + exchange fetch fix `8c57a2e`) with
+secret `IDENTITY_CODE_EXCHANGE_TIMEOUT_MS` raised to `5000`. Rollback =
+`wrangler versions deploy 529cc4a1-0c62-4cdb-b277-8177b76dccdf@100`.
+Root cause of the failed callbacks: `fetch(..., { redirect: 'error' })` is
+rejected by workerd with a `TypeError` before any I/O, so the code exchange
+never reached Identity. Synthetic callbacks on the live Worker (real
+transaction, fake code) now log `[identity-code-exchange] response status=404
+no_store=true elapsed_ms≈190–360`, i.e. Identity admits the client assertion;
+no rotation needed. Remaining gate: one owner-present real sign-in.
+Evidence on the merged source:
 unit `2,121/2,121`, `tsc` (app + worker) exit `0`, OpenNext build exit `0`;
 eslint reports only the three pre-existing `no-require-imports` errors in
 `academy-bound-worker-executor.cjs`. Version secrets were inherited unchanged
