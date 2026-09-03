@@ -5,7 +5,8 @@
   "name": "cyberskills-academy",
   "minify": true,
   "compatibility_date": "2025-03-25",
-  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  // Date predates the default; Identity runtime reads text/secret bindings through process.env.
+  "compatibility_flags": ["nodejs_compat", "nodejs_compat_populate_process_env", "global_fetch_strictly_public"],
   // ครอบ observed 480 ms outlier แต่ยังต่ำกว่า Paid default 30 s ถึง 60 เท่า
   "limits": { "cpu_ms": 500 },
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
