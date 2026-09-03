@@ -6,5 +6,5 @@
   "name": "academy-identity-signer-workerd-check",
   "main": "signer-worker.ts",
   "compatibility_date": "2025-03-25",
-  "compatibility_flags": ["nodejs_compat", "nodejs_compat_populate_process_env", "global_fetch_strictly_public"]
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"]
 }

@@ -56,7 +56,6 @@ const REQUEST_TIMEOUT_MS = 30_000
  */
 const REQUIRED_CHECKS = [
   'cryptokey-introspection-shape',
-  'process-env-populates-bindings',
   'rejects-a-cryptokey',
   'rejects-a-parsed-object',
   'rejects-a-surplus-member',

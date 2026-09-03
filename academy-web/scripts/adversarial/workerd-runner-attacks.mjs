@@ -45,7 +45,6 @@ restoreOnExit(sandbox)
 
 const REQUIRED = [
   'cryptokey-introspection-shape',
-  'process-env-populates-bindings',
   'rejects-a-cryptokey',
   'rejects-a-parsed-object',
   'rejects-a-surplus-member',
@@ -221,8 +220,8 @@ sandbox.restore()
 
 sandbox.reopen()
 sandbox.modify(harnessConfig, `﻿${sandbox.original(harnessConfig).replace(
-  '"compatibility_flags": ["nodejs_compat", "nodejs_compat_populate_process_env", "global_fetch_strictly_public"]',
-  '"compatibility_flags": ["nodejs_compat", "nodejs_compat_populate_process_env", "global_fetch_strictly_public"],',
+  '"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"]',
+  '"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],',
 )}`)
 report('BOM และ trailing comma ที่ wrangler ยอมรับ ต้องไม่ทำให้เลนพัง', { fired: true, code: runRunner() }, false)
 sandbox.restore()

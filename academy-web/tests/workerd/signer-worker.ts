@@ -53,13 +53,6 @@ const handler = {
       return agent
     })
 
-    await record('process-env-populates-bindings', async () => {
-      if (!nonce || process.env.SIGNER_CHECK_NONCE !== nonce) {
-        throw new Error('binding not projected into process.env')
-      }
-      return 'the workerd text binding is available through process.env'
-    })
-
     // หลักฐานตรงๆ ว่าทำไม contract เดิมใช้ไม่ได้ที่นี่ — บันทึกเป็นข้อมูล
     // ไม่ใช่ข้อบังคับ เพราะ runtime อาจเปลี่ยนได้ ผลลัพธ์อยู่ในรายงาน
     await record('cryptokey-introspection-shape', async () => {
