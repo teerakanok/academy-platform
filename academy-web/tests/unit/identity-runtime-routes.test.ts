@@ -196,7 +196,7 @@ describe('Identity runtime browser-flow routes', () => {
     expect(response.headers.getSetCookie()).toEqual([sessionCookie, browserBindingExpiryCookie])
   })
 
-  it('returns an enabled callback error result with cookies and without redirecting', async () => {
+  it('sends an enabled callback error back to the sign-in page with the flow cookies', async () => {
     const request = new Request(`${academyOrigin}/auth/callback?code=opaque_code_654321&state=state_0987654321`)
     routeMocks.completeMock.mockResolvedValueOnce({
       kind: 'error',
@@ -209,9 +209,12 @@ describe('Identity runtime browser-flow routes', () => {
 
     expect(routeMocks.completeMock).toHaveBeenCalledTimes(1)
     expect(routeMocks.completeMock.mock.calls[0][0]).toBe(request)
-    expect(response.status).toBe(400)
-    expect(response.headers.get('location')).toBeNull()
-    await expect(response.json()).resolves.toEqual({ ok: false, error: 'route_callback_invalid' })
+    expect(response.status).toBe(303)
+    expect(response.headers.get('cache-control')).toBe('no-store')
+    const location = new URL(response.headers.get('location') ?? '')
+    expect(location.pathname).toBe('/sign-in')
+    expect(location.searchParams.get('notice')).toBe('identity-unavailable')
+    expect(response.headers.get('content-type') ?? '').not.toContain('application/json')
     expect(response.headers.getSetCookie()).toEqual([browserBindingExpiryCookie, sessionCookie])
   })
 })

@@ -105,7 +105,7 @@ export function createAcademyIdentityProductionRuntimeBrowserFlow(
           clientAssertionAudience: CODE_EXCHANGE_ENDPOINT,
           timeoutMs: config.timeoutMs,
         },
-        fetchPort: { fetch: dependencies.fetch },
+        fetchPort: { fetch: observedCodeExchangeFetch(dependencies.fetch) },
         responseReader: {
           read(response: Response) {
             return readStrictJsonResponse(response, {
@@ -141,6 +141,27 @@ export function createAcademyIdentityProductionSessionStore(
     return new AcademyPostgresIdentitySessionStore(db)
   } catch {
     return null
+  }
+}
+
+/**
+ * One sanitized line per outbound code exchange: status, cache directive, and elapsed
+ * time only. Never the body, headers, assertion, or code.
+ */
+function observedCodeExchangeFetch(fetchImpl: typeof fetch): typeof fetch {
+  return async (input, init) => {
+    const startedAt = Date.now()
+    try {
+      const response = await fetchImpl(input, init)
+      const noStore = /\bno-store\b/i.test(response.headers.get('cache-control') ?? '')
+      console.warn(`[identity-code-exchange] response status=${response.status} no_store=${noStore}`
+        + ` elapsed_ms=${Date.now() - startedAt}`)
+      return response
+    } catch (error) {
+      const name = error instanceof Error ? error.name : 'unknown'
+      console.warn(`[identity-code-exchange] fetch_failed error=${name} elapsed_ms=${Date.now() - startedAt}`)
+      throw error
+    }
   }
 }
 

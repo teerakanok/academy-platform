@@ -280,6 +280,7 @@ export function createAcademyIdentityRuntimeCompletion(optionsValue: unknown): {
           return receipt
         } catch (error) {
           if (activeClaim && !finalized) {
+            console.warn(`[identity-callback] completion_failed stage=${stage} released=true`)
             try {
               await release(activeClaim, stage)
             } catch {

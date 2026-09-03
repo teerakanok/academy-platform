@@ -27,13 +27,16 @@ describe('GET /auth/callback', () => {
     await expect(response.json()).resolves.toMatchObject({ ok: false })
   })
 
-  it('returns a bounded unavailable response when identity-control mode is enabled before runtime release', async () => {
+  it('sends the browser back to sign-in when identity-control mode is enabled before runtime release', async () => {
     vi.stubEnv('IDENTITY_ADAPTER', 'identity-control')
     const response = await GET(
       new Request('https://academy.cyberskills.co.th/auth/callback?code=aaaaaaaaaaaaaaaa&state=bbbbbbbbbbbbbbbb'),
     )
 
-    expect(response.status).toBe(503)
-    await expect(response.json()).resolves.toMatchObject({ ok: false, error: expect.stringMatching(/ยังไม่ได้เชื่อมต่อ/) })
+    expect(response.status).toBe(303)
+    expect(response.headers.get('cache-control')).toBe('no-store')
+    const location = new URL(response.headers.get('location') ?? '')
+    expect(location.pathname).toBe('/sign-in')
+    expect(location.searchParams.get('notice')).toBe('identity-unavailable')
   })
 })

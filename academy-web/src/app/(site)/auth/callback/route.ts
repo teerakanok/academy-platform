@@ -69,19 +69,16 @@ export async function GET(request: Request) {
     browserFlow = getIdentityRuntimeBrowserFlow()
   } catch (error) {
     if (error instanceof IdentityAdapterUnavailableError) {
-      return NextResponse.json(
-        { ok: false, error: 'ยังไม่ได้เชื่อมต่อ Identity Control สำหรับสภาพแวดล้อมนี้' },
-        { status: 503 },
-      )
+      return signInUnavailableRedirect(request)
     }
     throw error
   }
   if (browserFlow) {
     const result = await browserFlow.complete(request)
     if (result.kind === 'error') {
-      const response = NextResponse.json({ ok: false, error: result.error }, { status: result.status })
-      for (const cookie of result.cookies) response.headers.append('set-cookie', cookie)
-      return response
+      // The browser is navigating back from Account Center: render the failure on the
+      // sign-in page instead of a JSON body, but keep the cookie decisions of the flow.
+      return signInUnavailableRedirect(request, result.cookies)
     }
     const response = NextResponse.redirect(new URL(result.location, request.url), result.status)
     for (const cookie of result.cookies) response.headers.append('set-cookie', cookie)
@@ -102,4 +99,13 @@ export async function GET(request: Request) {
     { ok: false, error: 'ยังไม่ได้เชื่อมต่อ Identity Control สำหรับสภาพแวดล้อมนี้' },
     { status: 503 },
   )
+}
+
+function signInUnavailableRedirect(request: Request, cookies: readonly string[] = []) {
+  const response = NextResponse.redirect(
+    new URL('/sign-in?notice=identity-unavailable', request.url),
+    { status: 303, headers: { 'cache-control': 'no-store' } },
+  )
+  for (const cookie of cookies) response.headers.append('set-cookie', cookie)
+  return response
 }

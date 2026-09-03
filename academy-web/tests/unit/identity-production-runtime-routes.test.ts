@@ -124,11 +124,8 @@ describe('production Identity routes use the real registry composition', () => {
       { headers: { cookie: cookiePair } },
     ))
 
-    expect(callback.status).toBe(503)
-    await expect(callback.json()).resolves.toEqual({
-      ok: false,
-      error: 'ยังไม่ได้เชื่อมต่อ Identity Control สำหรับสภาพแวดล้อมนี้',
-    })
+    expect(callback.status).toBe(303)
+    expect(new URL(callback.headers.get('location') ?? '').searchParams.get('notice')).toBe('identity-unavailable')
     expect(callback.headers.getSetCookie()).toEqual([])
     expect(rpcCalls).toEqual([
       'create_identity_authorization_transaction',
