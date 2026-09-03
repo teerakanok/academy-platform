@@ -4,10 +4,18 @@
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
 > **Last updated:** 2026-09-03
 
-**Current production checkpoint (2026-09-03, late):** Academy Worker
-`cyberskills-academy` now serves version `1a211637-4468-45b3-8313-03935000b573`
-(tag `release-aa0149d`) at `100%`, source `aa0149d` = merge `b3d4180` (callback
-fix `71b41b4` + `main` content Wave 1+2 fixes) + Safari sign-in gate fix. The
+**Current production checkpoint (2026-09-04 00:51 +07):** Academy Worker
+`cyberskills-academy` now serves version `0a57d916-a448-42f3-a44d-20f694303665`
+at `100%`, source `7d3cc6c` = merge `b3d4180` (callback fix `71b41b4` + `main`
+content Wave 1+2 fixes) + Safari sign-in gate fix (`aa0149d`) + callback
+failures rendered on `/sign-in` with sanitized stage/exchange diagnostics
+(`7d3cc6c`). Rollback = `wrangler versions deploy 1a211637-4468-45b3-8313-03935000b573@100`.
+Latest owner-present attempt: start, Account Center, code verification,
+callback, lease claim and client assertion all succeeded; the outbound
+`/v1/code/exchange` call failed (`last_failure_stage=code_exchange`,
+2026-09-03 17:12:49Z). Identity-side status/latency for that call is the
+open fact; Academy's exchange timeout secret (template `1000 ms`) is the
+prime suspect if Identity reports a slow 200. The
 founder's first owner-present click on `/sign-in` returned a raw JSON 403: the
 navigation gate required `Sec-Fetch-User`, which WebKit never sends, so the
 request failed before any Identity or database work. The header is now

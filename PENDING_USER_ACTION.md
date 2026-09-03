@@ -6,13 +6,25 @@
 
 ## 1) Owner-Present Sign-In Journey On The Deployed Callback Fix
 
-Deployed 2026-09-03 (late): Worker version `1a211637-4468-45b3-8313-03935000b573`
-(tag `release-aa0149d`, source `aa0149d`) at `100%` = callback fix `71b41b4` + `main`
-content fixes + Safari sign-in gate fix. The founder's first click failed because the
-navigation gate required `Sec-Fetch-User`, which Safari never sends; the error was also
-shown as raw JSON. Both fixed. Rollback = redeploy
-`4ff2077a-fa56-4ea5-91f8-0b57981ee573@100` (or `bd4aea53…@100` for the pre-callback-fix
-baseline). DB migration `0028` is present in Pool A
+Deployed 2026-09-04 00:51 (+07): Worker version `0a57d916-a448-42f3-a44d-20f694303665`
+(source `7d3cc6c`) at `100%`. Rollback = redeploy `1a211637-4468-45b3-8313-03935000b573@100`.
+
+Owner-present attempts so far (2026-09-03/04):
+1. First click on `/sign-in` failed at the navigation gate (Safari sends no `Sec-Fetch-User`)
+   → fixed in `aa0149d`.
+2. Second attempt reached Account Center, verified the code, returned to `/auth/callback`,
+   claimed the completion lease, built the client assertion, then **failed at
+   `code_exchange`** (the outbound `POST https://accounts.cyberskills.co.th/v1/code/exchange`;
+   recorded by the 0028 lease release as `last_failure_stage=code_exchange`, 17:12:49Z). The
+   browser still saw raw JSON; `7d3cc6c` now redirects every callback failure to
+   `/sign-in?notice=identity-unavailable` and logs two sanitized lines
+   (`[identity-callback] completion_failed stage=…`, `[identity-code-exchange] response
+   status=… no_store=… elapsed_ms=…`) so the next attempt is diagnosable from `wrangler tail`.
+
+Open question for the Identity lane: what `/v1/code/exchange` returned for client `academy-web`
+at 17:12:45–17:12:50Z (status, error category, latency), and whether Academy's exchange
+timeout secret (`IDENTITY_CODE_EXCHANGE_TIMEOUT_MS`, template `1000`) is long enough for the
+real exchange. DB migration `0028` is present in Pool A
 `academy`; `academy.users` is empty.
 
 ต้องใช้ founder ทำเองใน browser (agent ห้ามอ่าน mailbox/กรอกรหัสแทน):
