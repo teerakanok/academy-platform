@@ -264,6 +264,7 @@ test('production adapter transmits nonce only over fd3 and executes exact split/
       return accessRedirect(url)
     }
     assert.equal(init.headers['cf-access-token'], accessToken)
+    assert.equal(init.headers.cookie, `CF_Authorization=${accessToken}`)
     assert.equal(init.headers['cloudflare-workers-version-overrides'], `cyberskills-academy="${IDS.candidateVersion}"`)
     assert.match(init.headers['x-academy-diagnostic-nonce'], /^[A-Za-z0-9_-]{43}$/)
     if (init.method === 'HEAD') {

@@ -878,6 +878,7 @@ async function publicHealth(path, { fetchPort, signal, deadline, clock }) {
 function diagnosticHeaders(accessToken, versionId, nonce) {
   return {
     'cf-access-token': accessToken,
+    cookie: `CF_Authorization=${accessToken}`,
     'cloudflare-workers-version-overrides': `${WORKER}="${versionId}"`,
     origin: CANONICAL_ORIGIN,
     'sec-fetch-site': 'same-origin',
