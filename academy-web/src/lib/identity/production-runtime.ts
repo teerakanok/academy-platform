@@ -264,8 +264,10 @@ function createLazyResultVerifier(
   let loading: Promise<ReturnType<typeof createIdentityCodeExchangeResultVerifierPort>> | undefined
   return Object.freeze({
     async verify(value: unknown, binding: Parameters<ReturnType<typeof createIdentityCodeExchangeResultVerifierPort>['verify']>[1]) {
+      let keySet: { keys: readonly { keyId: string; state: string }[] } | undefined
       loading ??= dependencies.importKeySet(config.resultKeySetDocument).then((imported) => {
         if (imported.keySet.issuer !== RESULT_ISSUER) throw new Error('invalid key set')
+        keySet = imported.keySet
         verifier = createIdentityCodeExchangeResultVerifierPort({
           clock: dependencies.now,
           clockSkewSeconds: 30,
@@ -274,9 +276,85 @@ function createLazyResultVerifier(
         })
         return verifier
       })
-      return (await loading).verify(value, binding)
+      let loaded: ReturnType<typeof createIdentityCodeExchangeResultVerifierPort>
+      try {
+        loaded = await loading
+      } catch (error) {
+        console.warn('[identity-result-verification] key_set_import_failed')
+        throw error
+      }
+      try {
+        return await loaded.verify(value, binding)
+      } catch (error) {
+        console.warn(`[identity-result-verification] rejected ${describeRejectedResult(value, binding, keySet, dependencies.now())}`)
+        throw error
+      }
     },
   })
+}
+
+/**
+ * Shape-only diagnostics for a rejected exchange result: key names, public identifiers
+ * (alg/typ/kid, key-set kids and states), match booleans, and time deltas. Never the
+ * subject, email, nonce, signature, or any claim value that is not a fixed identifier.
+ */
+function describeRejectedResult(
+  value: unknown,
+  binding: unknown,
+  keySet: { keys: readonly { keyId: string; state: string }[] } | undefined,
+  now: Date,
+): string {
+  try {
+    const parts: string[] = []
+    const record = value && typeof value === 'object' ? value as Record<string, unknown> : null
+    parts.push(`wire_keys=${record ? Object.keys(record).sort().join(',') : typeof value}`)
+    parts.push(`key_set=${keySet ? keySet.keys.map((key) => `${key.keyId}:${key.state}`).join(',') : 'unloaded'}`)
+    const signed = record?.signedResult
+    if (typeof signed !== 'string') return parts.join(' ')
+    const segments = signed.split('.')
+    parts.push(`jws_parts=${segments.length}`)
+    if (segments.length !== 3) return parts.join(' ')
+    const header = decodeSegment(segments[0]!)
+    const claims = decodeSegment(segments[1]!)
+    parts.push(`header_alg=${String(header?.alg)} header_typ=${String(header?.typ)} header_kid=${String(header?.kid)}`)
+    parts.push(`kid_known=${Boolean(keySet?.keys.some((key) => key.keyId === header?.kid))}`)
+    parts.push(`signature_bytes=${decodeBase64UrlLength(segments[2]!)}`)
+    if (!claims) return `${parts.join(' ')} claims=undecodable`
+    const expected = binding && typeof binding === 'object' ? binding as Record<string, unknown> : {}
+    parts.push(`claim_keys=${Object.keys(claims).sort().join(',')}`)
+    parts.push(`iss_match=${claims.iss === RESULT_ISSUER} aud_match=${claims.aud === expected.expectedAudience} client_match=${claims.clientId === expected.expectedClientId}`)
+    const nowSeconds = Math.floor(now.getTime() / 1_000)
+    parts.push(`iat_delta_s=${typeof claims.iat === 'number' ? claims.iat - nowSeconds : 'n/a'} exp_delta_s=${typeof claims.exp === 'number' ? claims.exp - nowSeconds : 'n/a'}`)
+    const result = claims.result && typeof claims.result === 'object' ? claims.result as Record<string, unknown> : null
+    if (!result) return `${parts.join(' ')} result=${typeof claims.result}`
+    parts.push(`result_keys=${Object.keys(result).sort().join(',')}`)
+    parts.push(`result_audience_match=${result.audience === expected.expectedAudience} result_service_match=${result.serviceId === expected.expectedServiceId} result_issuer_match=${result.issuer === expected.expectedPrincipalIssuer} nonce_match=${result.nonce === expected.expectedNonce}`)
+    const activation = result.activation && typeof result.activation === 'object' ? result.activation as Record<string, unknown> : null
+    parts.push(`activation_keys=${activation ? Object.keys(activation).sort().join(',') : typeof result.activation} activation_status=${String(activation?.status)} activation_revision_type=${typeof activation?.revision}`)
+    parts.push(`subject_type=${typeof result.subject} email_type=${typeof result.verifiedEmail}`)
+    return parts.join(' ')
+  } catch {
+    return 'undescribable'
+  }
+}
+
+function decodeSegment(segment: string): Record<string, unknown> | null {
+  try {
+    const padded = segment.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - segment.length % 4) % 4)
+    const parsed: unknown = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(padded), (c) => c.charCodeAt(0))))
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed as Record<string, unknown> : null
+  } catch {
+    return null
+  }
+}
+
+function decodeBase64UrlLength(segment: string): number | 'invalid' {
+  try {
+    const padded = segment.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - segment.length % 4) % 4)
+    return atob(padded).length
+  } catch {
+    return 'invalid'
+  }
 }
 
 function readConfiguration(environment: Record<string, string | undefined>): Record<(typeof CONFIG_KEYS)[number], string> | null {
