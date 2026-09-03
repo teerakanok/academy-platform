@@ -5,12 +5,16 @@
 > **Last updated:** 2026-09-03
 
 **Current production checkpoint (2026-09-03, late):** Academy Worker
-`cyberskills-academy` now serves version `4ff2077a-fa56-4ea5-91f8-0b57981ee573`
-(tag `release-b3d4180fcf2d`, deployment `259282a3-fc2e-4d8d-a1e1-2d58bae97770`)
-at `100%`, built from merge commit `b3d4180` = callback fix `71b41b4` ("make
-identity callback completion recoverable") + `main` content Wave 1+2 fixes.
-Rollback = `wrangler versions deploy bd4aea53-9137-4d49-a5f4-3a74be959736@100`
-(previous baseline, tag `release-646206ed7cdd`). Evidence on the merged source:
+`cyberskills-academy` now serves version `1a211637-4468-45b3-8313-03935000b573`
+(tag `release-aa0149d`) at `100%`, source `aa0149d` = merge `b3d4180` (callback
+fix `71b41b4` + `main` content Wave 1+2 fixes) + Safari sign-in gate fix. The
+founder's first owner-present click on `/sign-in` returned a raw JSON 403: the
+navigation gate required `Sec-Fetch-User`, which WebKit never sends, so the
+request failed before any Identity or database work. The header is now
+optional, a failed navigation start 303s back to `/sign-in?notice=…`, and the
+Worker sets `charset=utf-8` on every JSON response. Rollback =
+`wrangler versions deploy 4ff2077a-fa56-4ea5-91f8-0b57981ee573@100` (previous
+version, tag `release-b3d4180fcf2d`). Evidence on the merged source:
 unit `2,121/2,121`, `tsc` (app + worker) exit `0`, OpenNext build exit `0`;
 eslint reports only the three pre-existing `no-require-imports` errors in
 `academy-bound-worker-executor.cjs`. Version secrets were inherited unchanged

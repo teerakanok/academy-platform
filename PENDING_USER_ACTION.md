@@ -6,10 +6,13 @@
 
 ## 1) Owner-Present Sign-In Journey On The Deployed Callback Fix
 
-Deployed 2026-09-03 (late): Worker version `4ff2077a-fa56-4ea5-91f8-0b57981ee573`
-(tag `release-b3d4180fcf2d`) at `100%`, source merge `b3d4180` = callback fix
-`71b41b4` + `main` content fixes. Rollback = redeploy
-`bd4aea53-9137-4d49-a5f4-3a74be959736@100`. DB migration `0028` is present in Pool A
+Deployed 2026-09-03 (late): Worker version `1a211637-4468-45b3-8313-03935000b573`
+(tag `release-aa0149d`, source `aa0149d`) at `100%` = callback fix `71b41b4` + `main`
+content fixes + Safari sign-in gate fix. The founder's first click failed because the
+navigation gate required `Sec-Fetch-User`, which Safari never sends; the error was also
+shown as raw JSON. Both fixed. Rollback = redeploy
+`4ff2077a-fa56-4ea5-91f8-0b57981ee573@100` (or `bd4aea53…@100` for the pre-callback-fix
+baseline). DB migration `0028` is present in Pool A
 `academy`; `academy.users` is empty.
 
 ต้องใช้ founder ทำเองใน browser (agent ห้ามอ่าน mailbox/กรอกรหัสแทน):
