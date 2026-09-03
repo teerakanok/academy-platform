@@ -63,6 +63,7 @@
         "    long len = strtol(raw_len, &end, 10);",
         "",
         "    if (*end != '\\0')          return -1;   /* not a number at all */",
+        "    if (end == raw_len)        return -1;   /* no digits consumed — \"\" would pass the check above */",
         "    if (len < 0)               return -1;   /* negative length is nonsense */",
         "    if ((size_t)len > MAX_BODY) return -1;  /* and cap it */",
         "",
@@ -191,7 +192,7 @@
         "Rewrite it as int copy_name(char *out, size_t out_size, const char *in) using snprintf",
         "Call it with sizeof at the call site and confirm the overflow is gone",
         "Add guard clauses for NULL inputs and a zero-size buffer",
-        "Write a parse function using strtol with all three checks, and test it with \"-1\", \"abc\", and a huge number",
+        "Write a parse function using strtol with all four checks, and test it with \"-1\", \"abc\", \"\", and a huge number",
         "Add a comment stating who owns each pointer the function returns"
       ],
       "expected": "The same function twice: once as it is usually written and once where the caller cannot easily get it wrong. The second version is longer by a few lines and removes an entire category of defect from every future call site."
@@ -213,7 +214,7 @@
       "id": "cp-1",
       "prompt": "Why pass sizeof line rather than the literal 128 at a call site?",
       "choices": {
-        "A": "sizeof cannot drift out of step with the array",
+        "A": "sizeof cannot get out of step",
         "B": "The compiler requires it",
         "C": "It is faster",
         "D": "It avoids the need for a length parameter"
@@ -221,15 +222,15 @@
       "correct": [
         "A"
       ],
-      "explanation": "A repeated literal becomes wrong the day someone changes the declaration. Duplicated constants are how overflows get introduced long after the code was written and reviewed."
+      "explanation": "sizeof measures the array itself, so it cannot drift out of step with it. A repeated literal becomes wrong the day someone changes the declaration. Duplicated constants are how overflows get introduced long after the code was written and reviewed."
     },
     {
       "id": "cp-2",
       "prompt": "A length arrives from input as -1 and is stored in a size_t. What happens to your bounds check?",
       "choices": {
-        "A": "The program crashes at the conversion",
+        "A": "The program crashes during the conversion itself",
         "B": "It catches the negative value",
-        "C": "The conversion makes it an enormous positive number",
+        "C": "It becomes an enormous positive number",
         "D": "size_t rejects negative values"
       },
       "correct": [
@@ -241,7 +242,7 @@
       "id": "cp-3",
       "prompt": "What is the advantage of guard clauses at the top of a function?",
       "choices": {
-        "A": "All the preconditions and failure cases sit in one place, and the main body stays flat and free of nesting",
+        "A": "All the failure cases sit in one place",
         "B": "They prevent memory leaks automatically",
         "C": "They run faster",
         "D": "They replace the need for tests"
@@ -249,21 +250,21 @@
       "correct": [
         "A"
       ],
-      "explanation": "A reviewer can see the complete set of assumptions at a glance, which makes a missing check visible rather than buried."
+      "explanation": "All the preconditions sit in one place and the main body stays flat and free of nesting. A reviewer can see the complete set of assumptions at a glance, which makes a missing check visible rather than buried."
     },
     {
       "id": "cp-4",
       "prompt": "Why prefer const, static, and enum over runtime checks where possible?",
       "choices": {
         "A": "They improve performance measurably",
-        "B": "They turn a possible runtime defect into a compile error, or remove the possibility entirely",
+        "B": "They make it a compile-time error",
         "C": "They make the binary smaller",
         "D": "They are required by the standard"
       },
       "correct": [
         "B"
       ],
-      "explanation": "A check that cannot be skipped. A runtime check has to be written, kept, and executed. A compile-time impossibility needs none of those things."
+      "explanation": "They turn a possible runtime defect into a compile error — or remove the possibility entirely. A check that cannot be skipped. A runtime check has to be written, kept, and executed. A compile-time impossibility needs none of those things."
     }
   ]
 }

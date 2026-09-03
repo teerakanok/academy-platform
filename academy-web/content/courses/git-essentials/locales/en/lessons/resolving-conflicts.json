@@ -173,13 +173,13 @@
       "choices": {
         "A": "Delete the branch",
         "B": "Pick 'accept theirs' for every file and move on",
-        "C": "git merge --abort, then come back when you can ask the other author",
+        "C": "git merge --abort, then ask the author later",
         "D": "git reset --hard origin/main"
       },
       "correct": [
         "C"
       ],
-      "explanation": "Abort restores the exact state from before the merge. Guessing at a resolution silently discards someone's intent, which is worse than delaying."
+      "explanation": "Abort restores the exact state from before the merge. Guessing at a resolution silently discards someone's intent, which is worse than delaying. Go back once you can ask the other author."
     },
     {
       "id": "cp-3",
@@ -200,14 +200,14 @@
       "prompt": "What most reliably reduces how often conflicts happen?",
       "choices": {
         "A": "Committing less often",
-        "B": "Keeping branches short-lived and merging the shared branch into yours regularly",
+        "B": "Keeping branches short-lived and up to date",
         "C": "Using a graphical merge tool",
-        "D": "Turning off automatic formatting"
+        "D": "Turning off automatic formatting, which causes most conflicts"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Conflicts scale with divergence. A branch that stays close to the shared branch has little to conflict with; one that runs for a month accumulates the collision in advance."
+      "explanation": "Conflicts scale with divergence. A branch that stays close to the shared branch has little to conflict with; one that runs for a month accumulates the collision in advance. Up to date means merging the shared branch into yours regularly."
     }
   ]
 }

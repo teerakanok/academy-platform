@@ -9,7 +9,7 @@
     "th"
   ],
   "level": "beginner",
-  "estimatedMinutes": 78,
+  "estimatedMinutes": 86,
   "coverMotif": "terminal",
   "skills": [
     {
@@ -41,7 +41,7 @@
       "id": "choose-your-environment",
       "kind": "lesson",
       "prerequisites": [],
-      "estimatedMinutes": 14,
+      "estimatedMinutes": 18,
       "skillWeights": {
         "environment": 4
       }
@@ -75,7 +75,7 @@
       "prerequisites": [
         "install-the-toolchain"
       ],
-      "estimatedMinutes": 16,
+      "estimatedMinutes": 20,
       "skillWeights": {
         "toolchain": 2,
         "collaboration": 4
@@ -85,7 +85,8 @@
       "id": "when-something-does-not-work",
       "kind": "capstone",
       "prerequisites": [
-        "install-the-toolchain"
+        "install-the-toolchain",
+        "github-account-and-first-push"
       ],
       "estimatedMinutes": 17,
       "skillWeights": {

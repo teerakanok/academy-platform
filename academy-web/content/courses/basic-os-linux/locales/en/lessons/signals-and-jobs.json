@@ -48,7 +48,7 @@
         [
           "CONT (18)",
           "Resume a paused process",
-          "Yes — it can be caught, though the process resumes either way"
+          "No — the process always resumes; it can only also run a handler"
         ]
       ]
     },

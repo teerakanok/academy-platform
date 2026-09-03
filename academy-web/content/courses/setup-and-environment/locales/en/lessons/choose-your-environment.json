@@ -59,6 +59,11 @@
       "lines": [
         "  wsl --install",
         "",
+        "  # needs Windows 10 version 2004+ or Windows 11",
+        "  # on older builds: enable \"Virtual Machine Platform\" in",
+        "  # \"Turn Windows features on or off\", then install the WSL2",
+        "  # kernel update package by hand",
+        "",
         "  # then reboot, and Windows will finish the setup and ask you to",
         "  # choose a username and password for the Linux side",
         "",
@@ -148,7 +153,7 @@
     }
   ],
   "cheatsheet": [
-    "Windows: wsl --install in PowerShell as Administrator, then reboot",
+    "Windows: wsl --install in PowerShell as Administrator, then reboot — needs Windows 10 2004+ or Windows 11",
     "macOS: Terminal is already installed; uname -s prints Darwin",
     "Linux: you already have a shell",
     "Cloud browser shells reset — expect to reinstall tools and keep work in git",
@@ -163,7 +168,7 @@
       "prompt": "You are on Windows and want a Unix-like shell for this track. What does wsl --install give you?",
       "choices": {
         "A": "An emulator that translates Linux commands into Windows ones",
-        "B": "A remote Linux machine you connect to over the internet",
+        "B": "A remote Linux machine somewhere on the internet that you connect to each time",
         "C": "A real Linux kernel running inside Windows, with its own filesystem",
         "D": "A theme that makes Command Prompt look like Linux"
       },
@@ -184,13 +189,13 @@
       "correct": [
         "D"
       ],
-      "explanation": "The $ is the prompt the shell prints for you. Typing it back gives \"command not found: $\"."
+      "explanation": "The $ is the prompt the shell prints for you. Whether you use bash or zsh, typing it back just gets you \"command not found\"."
     },
     {
       "id": "cp-3",
       "prompt": "Why does this lesson warn about free browser-based cloud shells?",
       "choices": {
-        "A": "They cannot run compilers",
+        "A": "They cannot run a compiler or build anything, only shell commands",
         "B": "They require a credit card",
         "C": "Many reset after inactivity and keep only your home directory",
         "D": "They are slower than a local machine"
@@ -206,7 +211,7 @@
       "choices": {
         "A": "Your own macOS account",
         "B": "WSL's Windows side under /mnt/c",
-        "C": "A throwaway Docker container started with --rm",
+        "C": "A throwaway Docker container",
         "D": "A cloud browser shell"
       },
       "correct": [

@@ -149,7 +149,7 @@
       "choices": {
         "A": "It depends on the instruction",
         "B": "Five cycles — its latency is unchanged",
-        "C": "Five cycles divided by five",
+        "C": "Five cycles divided by five, one per stage",
         "D": "One cycle"
       },
       "correct": [

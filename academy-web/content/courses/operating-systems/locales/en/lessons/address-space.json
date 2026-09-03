@@ -201,43 +201,43 @@
       "id": "cp-2",
       "prompt": "A monitoring alert fires because a process shows 40 GB of virtual size on a 16 GB machine. What should you check?",
       "choices": {
-        "A": "Add swap immediately",
+        "A": "Add more swap to the machine immediately",
         "B": "The number is impossible and the tool is wrong",
-        "C": "Restart the process",
-        "D": "RSS — virtual size is reserved address space and costs no memory until touched"
+        "C": "Restart the process to clear the number",
+        "D": "RSS — virtual size is reserved address space"
       },
       "correct": [
         "D"
       ],
-      "explanation": "Verified: reserving 256 MB raised virtual size by 262 MB and resident memory by nothing at all. Reserving is free; residency is what consumes RAM."
+      "explanation": "Reserved address space costs no memory until it is touched. Verified: reserving 256 MB raised virtual size by 262 MB and resident memory by nothing at all. Reserving is free; residency is what consumes RAM."
     },
     {
       "id": "cp-3",
       "prompt": "Why does the C library appear as several separate map entries with different permissions?",
       "choices": {
-        "A": "One entry per thread",
-        "B": "Its code, constants and variables need different access rights, and the hardware enforces each region separately",
-        "C": "Because of address randomisation",
-        "D": "It was loaded several times"
+        "A": "One map entry exists for every thread in the process",
+        "B": "Its code, constants and data need different rights",
+        "C": "Because of address space layout randomisation",
+        "D": "The library was loaded several times over"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Code is executable but not writable, constants are read-only, and data is writable but not executable. Splitting them is what makes those guarantees enforceable."
+      "explanation": "Code is executable but not writable, constants are read-only, and data is writable but not executable. The hardware enforces each region separately — splitting them is what makes those guarantees enforceable."
     },
     {
       "id": "cp-4",
       "prompt": "You print a pointer twice, in two runs of the same program, and get different values. Why?",
       "choices": {
-        "A": "Address space layout randomisation places regions differently on every run, as a defence",
-        "B": "The heap grew",
+        "A": "Address space layout randomisation",
+        "B": "The heap grew between the two runs",
         "C": "Pointers are not stable within a run either",
-        "D": "The program has a bug"
+        "D": "The program has a bug in its pointer arithmetic"
       },
       "correct": [
         "A"
       ],
-      "explanation": "An attacker who can redirect execution needs to know what is at an address. Randomising the layout removes that knowledge cheaply."
+      "explanation": "Randomisation places the regions differently on every run, as a defence: an attacker who can redirect execution needs to know what is at an address. Randomising the layout removes that knowledge cheaply."
     }
   ]
 }

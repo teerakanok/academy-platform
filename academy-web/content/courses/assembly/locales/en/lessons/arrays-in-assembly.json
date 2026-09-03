@@ -208,10 +208,10 @@
       "id": "cp-1",
       "prompt": "You see mov eax, dword ptr [rdi + 8*rsi + 4]. What does it tell you about the data?",
       "choices": {
-        "A": "Only that it is an array",
+        "A": "Only that it is an array — nothing about the fields",
         "B": "The array has 8 elements",
         "C": "The index is multiplied by 4",
-        "D": "Elements are 8 bytes apart, the field starts 4 bytes into each element, and the field is 4 bytes wide"
+        "D": "8-byte stride; field 4 bytes into each element"
       },
       "correct": [
         "D"
@@ -224,7 +224,7 @@
       "choices": {
         "A": "8 and 12",
         "B": "12 and 16",
-        "C": "16 and 12 — the shift by 4 multiplies the index by 16 because the scale field cannot express it",
+        "C": "16 and 12",
         "D": "4 and 12"
       },
       "correct": [
@@ -236,9 +236,9 @@
       "id": "cp-3",
       "prompt": "A struct declares long a; int b; char c; — thirteen bytes of fields — but the stride is 16. Why?",
       "choices": {
-        "A": "The compiler reserved space for future fields",
+        "A": "The compiler reserved space for future fields it might add",
         "B": "Sixteen is the minimum struct size",
-        "C": "Padding: three bytes at the end keep the 8-byte field of the next element aligned",
+        "C": "Padding — to align the next element's 8-byte field",
         "D": "The char is stored as an int"
       },
       "correct": [

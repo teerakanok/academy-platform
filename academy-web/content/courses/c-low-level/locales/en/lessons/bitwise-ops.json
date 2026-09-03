@@ -193,10 +193,10 @@
       "id": "cp-1",
       "prompt": "How do you clear a single flag while leaving the others untouched?",
       "choices": {
-        "A": "x ^= FLAG",
+        "A": "x = x ^ FLAG",
         "B": "x |= FLAG",
         "C": "x &= ~FLAG",
-        "D": "x = FLAG"
+        "D": "x &= FLAG"
       },
       "correct": [
         "C"
@@ -221,22 +221,22 @@
       "id": "cp-3",
       "prompt": "Why should bit manipulation use unsigned types?",
       "choices": {
-        "A": "Signed types bring sign extension, implementation-defined right shift, and undefined overflow",
-        "B": "It is required by the standard",
+        "A": "Signed types bring sign extension and undefined cases",
+        "B": "It is required by the standard for historical reasons",
         "C": "Unsigned is faster",
         "D": "Signed types cannot be shifted at all"
       },
       "correct": [
         "A"
       ],
-      "explanation": "None of which you want when working with bit patterns. Unsigned arithmetic is fully defined and wraps predictably, which is exactly the behaviour bit work assumes."
+      "explanation": "Sign extension, implementation-defined right shift, and undefined overflow — none of which you want when working with bit patterns. Unsigned arithmetic is fully defined and wraps predictably, which is exactly the behaviour bit work assumes."
     },
     {
       "id": "cp-4",
       "prompt": "What does x & (x - 1) evaluating to zero tell you?",
       "choices": {
         "A": "x is negative",
-        "B": "x is greater than 1",
+        "B": "x is greater than 1 and not a power of two",
         "C": "x had at most one bit set",
         "D": "x is odd"
       },

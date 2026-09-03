@@ -159,8 +159,8 @@
         ],
         [
           "A call through a function pointer",
-          "No",
-          "The target is not known at compile time"
+          "Yes",
+          "It becomes an indirect jmp; an unknown target blocks inlining, not elimination"
         ],
         [
           "Any call in a function that took a local's address",
@@ -295,24 +295,24 @@
       "id": "cp-1",
       "prompt": "In the -O0 factorial, why is n stored to the frame before the recursive call and reloaded after it?",
       "choices": {
-        "A": "To satisfy the stack canary",
-        "B": "The call may destroy caller-saved registers and rdi will hold a different value inside the callee, but n is needed after the call returns",
+        "A": "To satisfy the stack canary guarding the return address",
+        "B": "n is needed after the call returns",
         "C": "To make debugging easier",
         "D": "Because n is a parameter"
       },
       "correct": [
         "B"
       ],
-      "explanation": "That store and load is the entire mechanism of recursion: the outer call's values live in memory the inner call cannot reach, because the inner call's frame is elsewhere."
+      "explanation": "The call may destroy caller-saved registers — rdi in particular will hold a different value inside the callee — so n is spilled to the frame before the call and reloaded after it. That store and load is the entire mechanism of recursion: the outer call's values live in memory the inner call cannot reach, because the inner call's frame is elsewhere."
     },
     {
       "id": "cp-2",
-      "prompt": "Frames measure 32 bytes and ulimit -s reports 8176 KB. What maximum recursion depth do you predict, and what was measured?",
+      "prompt": "Frames measure 32 bytes and ulimit -s reports 8176 KB. What maximum recursion depth do you predict?",
       "choices": {
         "A": "About 8,000; measured 8,176",
         "B": "It cannot be predicted",
         "C": "About 32,000",
-        "D": "About 261,632 predicted"
+        "D": "About 261,632"
       },
       "correct": [
         "D"
@@ -337,7 +337,7 @@
       "id": "cp-4",
       "prompt": "A recursive program works, then overflows the stack after someone adds a debug print. Why is that plausible?",
       "choices": {
-        "A": "The print can prevent tail-call elimination, restoring the per-call frame growth that had been optimised away",
+        "A": "The print destroys tail position",
         "B": "printf is recursive",
         "C": "It is not plausible; the print is unrelated",
         "D": "The print uses too much stack"
@@ -345,7 +345,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "Taking a local's address or adding work after the recursive call both remove the tail position. This is the first thing to check when a recursive program behaves differently between optimisation levels."
+      "explanation": "Tail-call elimination stops, and the per-call frame growth that had been optimised away returns. Taking a local's address or adding work after the recursive call both remove the tail position. This is the first thing to check when a recursive program behaves differently between optimisation levels."
     }
   ]
 }

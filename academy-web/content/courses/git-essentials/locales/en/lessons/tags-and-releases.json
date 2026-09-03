@@ -196,10 +196,10 @@
       "id": "cp-2",
       "prompt": "You created a tag and pushed your branch, but colleagues cannot see the tag. Why?",
       "choices": {
-        "A": "Only annotated tags are pushed",
+        "A": "Only annotated tags are pushed, lightweight ones stay local",
         "B": "They need to re-clone",
         "C": "Tags take time to propagate",
-        "D": "Tags do not travel with a normal push — they need git push origin <tag> or --tags"
+        "D": "Tags need git push origin <tag> or --tags to travel"
       },
       "correct": [
         "D"
@@ -213,19 +213,19 @@
         "A": "PATCH — it is only one function",
         "B": "MINOR — something was removed, not added",
         "C": "No bump; document it in the notes",
-        "D": "MAJOR — existing users' code will break, and the number is a compatibility promise"
+        "D": "MAJOR — existing users' code will break"
       },
       "correct": [
         "D"
       ],
-      "explanation": "The major number exists to signal exactly this. Shipping a breaking change as a patch is how version numbers stop being trustworthy."
+      "explanation": "The major number exists to signal exactly this. Shipping a breaking change as a patch is how version numbers stop being trustworthy. The number is a compatibility promise — that is why this is a MAJOR bump."
     },
     {
       "id": "cp-4",
       "prompt": "A customer reports a bug in v2.3.0, which shipped six weeks ago. What do you do first?",
       "choices": {
         "A": "Ask them to upgrade first",
-        "B": "Reproduce it on main, which is close enough",
+        "B": "Reproduce it on main first, which is close enough to the release tag",
         "C": "Search the log for likely commits",
         "D": "git switch --detach v2.3.0 and reproduce it on exactly that code"
       },

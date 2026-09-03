@@ -32,7 +32,7 @@
         [
           "RHEL / Rocky / Fedora",
           "dnf",
-          "The organisation wants vendor support and long support windows"
+          "The organisation wants vendor support and long support windows (Fedora: newest packages, short life)"
         ],
         [
           "Alpine",
@@ -121,9 +121,9 @@
       "id": "cp-2",
       "prompt": "Why is running a distribution past its end-of-support date risky?",
       "choices": {
-        "A": "Applications are deleted automatically",
+        "A": "Applications are deleted automatically at that point",
         "B": "The machine stops booting on that date",
-        "C": "Security updates stop arriving, and nothing visibly changes to warn you",
+        "C": "Security updates stop — with no visible warning",
         "D": "The filesystem becomes read-only"
       },
       "correct": [
@@ -136,7 +136,7 @@
       "prompt": "Which command shows which distribution and version a machine is running?",
       "choices": {
         "A": "cat /etc/os-release",
-        "B": "ls /version",
+        "B": "cat /etc/version && uname",
         "C": "whoami",
         "D": "df -h"
       },

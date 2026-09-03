@@ -167,12 +167,12 @@
         "A": "Both, in turn",
         "B": "Whichever has the lower metric",
         "C": "10.0.0.0/8, because it appears first",
-        "D": "10.5.0.0/16 — the longest matching prefix always wins"
+        "D": "10.5.0.0/16 — longest prefix wins"
       },
       "correct": [
         "D"
       ],
-      "explanation": "Specificity decides, not order. That is what makes it possible to add a narrow exception to a broad route without reordering anything."
+      "explanation": "Specificity decides, not order. That is what makes it possible to add a narrow exception to a broad route without reordering anything. The longest matching prefix always wins."
     },
     {
       "id": "cp-2",
@@ -180,13 +180,13 @@
       "choices": {
         "A": "The route changed mid-trace",
         "B": "Packets are being lost at hop 3",
-        "C": "Hop 3 is offline",
-        "D": "Hop 3 declined to send the reply traceroute needs"
+        "C": "Hop 3 is offline and dropping every packet",
+        "D": "Hop 3 declined to send the reply"
       },
       "correct": [
         "D"
       ],
-      "explanation": "Traffic is passing through it fine. Later hops replying proves packets traversed hop 3. Many routers deprioritise or block the messages traceroute depends on, which is a configuration choice rather than a fault."
+      "explanation": "Traffic is passing through it fine. Later hops replying proves packets traversed hop 3. Many routers deprioritise or block the messages traceroute depends on, which is a configuration choice rather than a fault. It declined to send the ICMP reply that traceroute depends on."
     },
     {
       "id": "cp-3",

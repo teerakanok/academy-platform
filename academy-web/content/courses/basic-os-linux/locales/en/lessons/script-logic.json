@@ -191,8 +191,8 @@
       "choices": {
         "A": "for cannot read files at all",
         "B": "for requires root",
-        "C": "while is faster on large files",
-        "D": "The for version splits on every space"
+        "C": "while is faster on very large files",
+        "D": "The for version splits on spaces"
       },
       "correct": [
         "D"
@@ -203,9 +203,9 @@
       "id": "cp-3",
       "prompt": "What does ${1:-/etc} mean?",
       "choices": {
-        "A": "Use the first argument, or /etc if no argument was given",
+        "A": "Use the first argument, defaulting to /etc",
         "B": "Require the first argument to be /etc",
-        "C": "Set the first argument permanently to /etc",
+        "C": "Set the first argument permanently to /etc always",
         "D": "Remove /etc from the first argument"
       },
       "correct": [
@@ -217,9 +217,9 @@
       "id": "cp-4",
       "prompt": "Why send error messages with >&2 ?",
       "choices": {
-        "A": "It writes them to the error stream",
+        "A": "Writes them to the error stream",
         "B": "It doubles the message",
-        "C": "It makes them appear in red",
+        "C": "It makes them appear in red text",
         "D": "It is required by bash"
       },
       "correct": [

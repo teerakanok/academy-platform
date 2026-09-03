@@ -201,7 +201,7 @@
     },
     {
       "id": "cp-2",
-      "prompt": "A client connects to port 8080 but reaches nothing, and the server is definitely listening. What is the first thing to check?",
+      "prompt": "In the client program you have just written, a connect to port 8080 reaches nothing, and the server is definitely listening. What is the first thing to check?",
       "choices": {
         "A": "The backlog",
         "B": "The firewall",

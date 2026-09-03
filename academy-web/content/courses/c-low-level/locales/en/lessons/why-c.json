@@ -37,7 +37,7 @@
         [
           "Data layout",
           "Abstracted away",
-          "Exactly the bytes you declared, in order"
+          "The bytes you declared, plus padding the compiler inserts"
         ],
         [
           "Runtime",

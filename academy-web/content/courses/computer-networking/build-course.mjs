@@ -31,7 +31,7 @@ const PLAN = [
   ['error-handling', 'lesson', ['client-and-server'], 18, { 'socket-programming': 4, troubleshooting: 3 }],
   // M6 โปรโตคอลชั้นบน
   ['dns-and-resolution', 'lesson', ['ip-addressing'], 18, { 'network-model': 3, troubleshooting: 3 }],
-  ['http-basics', 'lesson', ['client-and-server'], 19, { 'network-model': 3, 'network-security': 2 }],
+  ['http-basics', 'lesson', ['tcp-handshake', 'dns-and-resolution'], 19, { 'network-model': 3, 'network-security': 2 }],
   // M7 เซิร์ฟเวอร์รับหลายคน
   ['thread-per-connection', 'lesson', ['client-and-server'], 17, { 'server-design': 4 }],
   ['thread-pool', 'lesson', ['thread-per-connection'], 18, { 'server-design': 4 }],

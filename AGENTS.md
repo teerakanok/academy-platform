@@ -19,6 +19,10 @@ For every Academy session:
 5. For operations, incident response, backup, restore, rollback, or secret inventory work, read `docs/maintenance/README.md`.
 6. For cross-product work, read `../../../ecosystem/ECOSYSTEM.md`.
 
+For a live learner canary, production UX/UI walkthrough, or post-release learner
+acceptance check, load `skills/academy-production-playtest/SKILL.md`. Its authority,
+privacy, evidence, and cleanup gates are mandatory; local fixtures are not production proof.
+
 Provider-specific folders or files may point here, but this file and local project governance are the canonical source.
 
 ## Founder Updates

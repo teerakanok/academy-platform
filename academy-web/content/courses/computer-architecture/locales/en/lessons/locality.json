@@ -188,10 +188,10 @@
       "id": "cp-1",
       "prompt": "Why does a dependent pointer chase measure memory latency more honestly than a loop over an array?",
       "choices": {
-        "A": "Each access cannot begin until the previous one returns",
+        "A": "Each access waits for the previous one to return",
         "B": "Arrays are stored differently",
         "C": "It avoids the compiler",
-        "D": "It uses less memory"
+        "D": "It uses less memory, so it fits in cache more easily"
       },
       "correct": [
         "A"
@@ -202,8 +202,8 @@
       "id": "cp-2",
       "prompt": "The measurement was flat at 1.92 ns from 4 KB to 128 KB and then jumped to 7.61 ns at 256 KB. What does the flat region mean?",
       "choices": {
-        "A": "Every working set in that range fit entirely in one level of cache",
-        "B": "The measurement was not sensitive enough",
+        "A": "Each working set in that range fit in one cache level",
+        "B": "The measurement was not sensitive enough at those sizes",
         "C": "The compiler cached the values",
         "D": "Small buffers are faster to allocate"
       },

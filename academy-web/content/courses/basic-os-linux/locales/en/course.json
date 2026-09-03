@@ -2,7 +2,7 @@
   "locale": "en",
   "title": "Basic OS & Linux",
   "subtitle": "Understand what an operating system is actually doing, then drive Linux from the command line with confidence.",
-  "audience": "For anyone moving into IT or security who has used a computer for years but never looked underneath. No prior command-line experience needed. This course assumes a working Unix-like shell and, from the C course onwards, a C compiler and make. If you do not have those yet — or have never opened a terminal — the Setting Up course installs and verifies all of it first, and nothing here repeats that material.",
+  "audience": "For anyone moving into IT or security who has used a computer for years but never looked underneath. No command-line experience is assumed: if you have never opened a terminal, this course still starts at the beginning, and an early lesson sets up a Linux you can safely break. The Setting Up course helps but is not required, and no compiler or other toolchain is needed.",
   "outcomes": [
     "Explain what an operating system does, in plain language, without hand-waving",
     "Move around a Linux filesystem and read what a listing is telling you",

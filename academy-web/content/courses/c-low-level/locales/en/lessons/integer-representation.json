@@ -170,9 +170,9 @@
       "id": "cp-2",
       "prompt": "Why is -INT_MIN undefined behaviour?",
       "choices": {
-        "A": "Negation is not defined for signed types",
+        "A": "Negation is not defined for signed integer types",
         "B": "It is defined and equals INT_MAX",
-        "C": "The range is asymmetric — the positive counterpart of INT_MIN does not exist in the type",
+        "C": "The positive counterpart of INT_MIN is missing",
         "D": "It requires a cast"
       },
       "correct": [
@@ -184,7 +184,7 @@
       "id": "cp-3",
       "prompt": "How should you check that a + b will not overflow?",
       "choices": {
-        "A": "Test before adding, for example if (a > 0 && b > INT_MAX - a), or use __builtin_add_overflow",
+        "A": "Test before adding (a > 0 && b > INT_MAX - a)",
         "B": "Cast both to double first",
         "C": "Compute the sum and test whether it is smaller than a",
         "D": "Use an assert after the addition"
@@ -192,7 +192,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "Testing the result relies on the overflow having happened, which is undefined — so the compiler may remove the check entirely."
+      "explanation": "Testing the result relies on the overflow having happened, which is undefined — so the compiler may remove the check entirely. The other tool from the lesson — __builtin_add_overflow — solves the same problem without the pre-test."
     },
     {
       "id": "cp-4",

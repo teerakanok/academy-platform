@@ -207,8 +207,8 @@
       "choices": {
         "A": "They use fewer registers",
         "B": "They need no cache",
-        "C": "The next instruction's position is known without decoding this one",
-        "D": "They execute faster"
+        "C": "The next instruction's start is known without decoding",
+        "D": "They execute faster because each instruction does less work"
       },
       "correct": [
         "C"
@@ -233,10 +233,10 @@
       "id": "cp-3",
       "prompt": "You disassemble x86-64 code starting one byte too late. What do you see?",
       "choices": {
-        "A": "A completely different but still plausible-looking instruction stream",
+        "A": "A different but still plausible-looking instruction stream",
         "B": "An error",
         "C": "Nothing decodes",
-        "D": "The same instructions"
+        "D": "The same instructions, just encoded with different byte values"
       },
       "correct": [
         "A"
@@ -250,7 +250,7 @@
         "A": "It removes the need for a cache",
         "B": "Every computation happens between registers",
         "C": "It makes programs smaller",
-        "D": "It allows more registers"
+        "D": "It allows more registers to fit in the encoding"
       },
       "correct": [
         "B"

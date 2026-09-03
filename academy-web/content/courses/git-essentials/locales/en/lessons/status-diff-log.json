@@ -154,14 +154,14 @@
       "prompt": "In diff output, what does a line beginning with a single space mean?",
       "choices": {
         "A": "It was added",
-        "B": "It has a syntax error",
+        "B": "It has a syntax error that Git detected for you",
         "C": "It was deleted",
-        "D": "It is unchanged context, shown so you can see where the change sits"
+        "D": "It is unchanged context around the change"
       },
       "correct": [
         "D"
       ],
-      "explanation": "Only - and + lines are changes. Context lines are printed around them so the change is readable rather than floating."
+      "explanation": "Only - and + lines are changes. Context lines are printed around them so the change is readable rather than floating. It is printed so you can see where the change sits."
     },
     {
       "id": "cp-3",
@@ -170,7 +170,7 @@
         "A": "git init",
         "B": "git diff",
         "C": "git log --since='1 week ago' -- upload/",
-        "D": "git status"
+        "D": "git status, filtered to the uploads folder"
       },
       "correct": [
         "C"

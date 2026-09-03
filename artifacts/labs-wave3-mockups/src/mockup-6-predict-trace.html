@@ -1,0 +1,86 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_base.css">
+<style>
+.head{display:flex;align-items:center;gap:12px;padding:15px 20px;margin-bottom:14px}
+.head h2{font-family:'Fraunces',Georgia,serif;font-size:19px;color:var(--text);font-weight:600}
+.head .grow{flex:1}
+.stage{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;align-items:stretch}
+.code{background:var(--term-bg);border-radius:16px;box-shadow:var(--shadow-lift);border:1px solid #1D2C3A;overflow:hidden;display:flex;flex-direction:column}
+.codebar{display:flex;align-items:center;gap:8px;background:var(--term-surface);padding:9px 14px;border-bottom:1px solid #1D2C3A;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--term-muted)}
+.codebody{padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:2.0;color:var(--term-text);flex:1}
+.ln{display:flex;gap:14px}
+.ln .no{width:20px;text-align:right;color:#3E586D;user-select:none}
+.ln.past{color:#6E8CA3}
+.ln.cur{background:rgba(56,189,248,.13);border-left:3px solid #38BDF8;margin-left:-6px;padding-left:3px;color:#FFFFFF;font-weight:500}
+.regchip{margin-left:auto;font-size:10.5px;color:#5FB2E8;opacity:0}
+.ln.past .regchip{opacity:1}
+.panel{display:flex;flex-direction:column;gap:12px}
+.ask{padding:16px 18px}
+.ask h4{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);font-weight:700;margin-bottom:8px}
+.ask .q{font-size:14.5px;color:var(--text);font-weight:600;margin-bottom:12px}
+.ans{display:flex;align-items:center;gap:8px}
+.ans input{flex:1;font-family:'JetBrains Mono',monospace;font-size:14px;padding:10px 13px;border:1.5px solid var(--border2);border-radius:11px;background:var(--surface);color:var(--text);outline:none}
+.ans input:focus{border-color:var(--accent)}
+.reveal{padding:14px 18px;border-left:3px solid var(--accentfill)}
+.reveal h5{font-size:12px;color:var(--ok);font-weight:700;margin-bottom:6px}
+.reveal p{font-size:12.5px;color:var(--body)}
+.reveal .mono{font-size:12px}
+.score{display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:12.5px;color:var(--muted)}
+.score b{color:var(--accent)}
+.footnote{padding:12px 20px;border-top:1px solid var(--surface2);background:#FBFDFE;font-size:12px;color:var(--faint);display:flex;gap:16px;align-items:center;margin-top:2px}
+</style></head><body><div class="frame">
+  <div class="card head">
+    <div><h2>Predict, then reveal — the register file</h2>
+    <p style="font-size:12.5px;color:var(--muted)">Commit to an answer before the machine shows you. That's where the learning happens.</p></div>
+    <span class="grow"></span>
+    <span class="chip accent">predict-trace</span>
+    <span class="chip plain">attempt 2 — registers randomized</span>
+  </div>
+
+  <div class="stage">
+    <div class="code">
+      <div class="codebar"><span>snippet #7 — x86-64 · ATT</span><span style="flex:1"></span><span>step 3 of 6</span></div>
+      <div class="codebody">
+        <div class="ln past"><span class="no">1</span><span>movq  $0x1, %rbx</span><span class="regchip">rbx=0x1</span></div>
+        <div class="ln past"><span class="no">2</span><span>movl  $-1, %eax</span><span class="regchip">rax=0x00000000ffffffff</span></div>
+        <div class="ln cur"><span class="no">3</span><span>addq  %rbx, %rax</span></div>
+        <div class="ln"><span class="no">4</span><span>leaq  4(%rax), %rcx</span></div>
+        <div class="ln"><span class="no">5</span><span>shrq  $4, %rax</span></div>
+        <div class="ln"><span class="no">6</span><span>movl  %esi, %edx</span></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="card ask">
+        <h4>Your prediction — step 3</h4>
+        <p class="q">After line 3 executes, what is in <span class="mono" style="font-size:13px">%rax</span>?</p>
+        <div class="ans">
+          <span class="mono" style="color:var(--muted);font-size:13px">0x</span>
+          <input value="0000000100000000" spellcheck="false">
+          <span class="btn primary">Confirm</span>
+        </div>
+        <p style="font-size:11.5px;color:var(--faint);margin-top:9px">Hex, 64 bits. Wrong answers cost nothing — the reveal is the lesson.</p>
+      </div>
+
+      <div class="card reveal">
+        <h5>✓ Step 2 — you got this one (0x00000000ffffffff)</h5>
+        <p><span class="mono">movl</span> writes only 32 bits — and writing to a 32-bit register <b>zeroes the top half</b>. The <span class="mono">-1</span> never reaches the upper 32 bits. That zeroing is exactly what line 5's shift will exploit later.</p>
+      </div>
+
+      <div class="card score">
+        <span>Score this attempt&nbsp; <b>1 / 2</b> so far</span>
+        <span style="flex:1"></span>
+        <span class="btn ghost" style="padding:5px 10px">Skip to reveal</span>
+        <span class="btn" style="padding:7px 12px">↺ New randomization</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card footnote" style="margin-top:14px">
+    <span>🎲 Constants, registers, and the snippet reshuffle every attempt — sharing answers shares the method, not the key</span>
+    <span style="flex:1"></span>
+    <span>Assessed mode: hints off, one shot per step</span>
+  </div>
+</div></body></html>

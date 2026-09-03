@@ -172,15 +172,15 @@
       "id": "cp-2",
       "prompt": "Why separate a large rename from a small behaviour change?",
       "choices": {
-        "A": "Git handles renames faster in isolation",
+        "A": "Git handles renames faster when they are isolated in their own commit",
         "B": "Renames cannot be reverted",
-        "C": "Mixed together, the two lines that matter are invisible inside a forty-file diff",
+        "C": "The two lines that matter get lost in a forty-file diff",
         "D": "It is required by most platforms"
       },
       "correct": [
         "C"
       ],
-      "explanation": "The review is shallow. Reviewers skim mechanical changes and read logic changes. Combining them means the logic gets skimmed too."
+      "explanation": "The review is shallow. Reviewers skim mechanical changes and read logic changes. Combining them means the logic gets skimmed too. Mixed together, those two lines are exactly what a reviewer skims past."
     },
     {
       "id": "cp-3",
@@ -188,13 +188,13 @@
       "choices": {
         "A": "Splits a commit into two",
         "B": "Compares two branches",
-        "C": "Divides a branch into two branches",
-        "D": "Performs a binary search through history to find the commit that introduced a bug"
+        "C": "Divides one branch into two branches at a chosen commit",
+        "D": "Searches history for the commit that introduced a bug"
       },
       "correct": [
         "D"
       ],
-      "explanation": "You mark a good and a bad commit; it halves the range at each step. A thousand commits take about ten checks."
+      "explanation": "You mark a good and a bad commit; it halves the range at each step. A thousand commits take about ten checks. Halving the range at each step is what makes it a binary search."
     },
     {
       "id": "cp-4",

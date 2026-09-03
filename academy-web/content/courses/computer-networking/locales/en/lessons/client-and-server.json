@@ -236,7 +236,7 @@
       "id": "cp-1",
       "prompt": "You replace read_all with a single read() and test messages up to 64,000 bytes over loopback. Everything passes. What have you established?",
       "choices": {
-        "A": "Very little — loopback delivers each message in one piece",
+        "A": "Very little — messages arrive whole",
         "B": "The code is correct",
         "C": "That the server is fast enough",
         "D": "That 64,000 bytes is under the limit"
@@ -251,20 +251,20 @@
       "prompt": "Why must the server check the length before calling malloc?",
       "choices": {
         "A": "The length must be a multiple of four",
-        "B": "malloc is slow for large sizes",
-        "C": "The length came from the network and a client can claim any value, including one that exhausts memory",
+        "B": "malloc becomes slow for very large allocation sizes",
+        "C": "The length comes from an untrusted client",
         "D": "To keep the protocol portable"
       },
       "correct": [
         "C"
       ],
-      "explanation": "Four bytes from an untrusted source should never size an allocation unchecked. This is the C course's rule about hostile input, in its network form."
+      "explanation": "Four bytes from an untrusted source should never size an allocation unchecked. This is the C course's rule about hostile input, in its network form. A client can claim any value it likes, including one chosen to exhaust memory."
     },
     {
       "id": "cp-3",
       "prompt": "Your server stops accepting connections after running for a while, and ss shows many CLOSE_WAIT entries. What did you forget?",
       "choices": {
-        "A": "listen()'s backlog",
+        "A": "A listen() backlog value set too small for the load",
         "B": "htons on the port",
         "C": "close() on each accepted connection",
         "D": "SO_REUSEADDR"
@@ -279,7 +279,7 @@
       "prompt": "Why does a length prefix handle binary data better than a delimiter?",
       "choices": {
         "A": "A delimiter byte can also occur inside the data",
-        "B": "It uses fewer bytes",
+        "B": "It uses fewer bytes on the wire for small messages",
         "C": "Delimiters are not allowed in TCP",
         "D": "It is faster to parse"
       },

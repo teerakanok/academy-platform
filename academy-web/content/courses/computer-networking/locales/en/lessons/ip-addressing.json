@@ -78,7 +78,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "Three ranges are reserved for use inside private networks. They are not routed on the internet, so anyone may use them, and almost everyone does."
+      "text": "Three private ranges are reserved for use inside networks, plus the loopback range for this machine itself. The three private ranges are not routed on the internet, so anyone may use them, and almost everyone does; loopback never leaves the machine at all."
     },
     {
       "kind": "table",
@@ -191,21 +191,21 @@
       "id": "cp-2",
       "prompt": "A traceroute to a public server shows 10.x.x.x addresses at hops 3 and 4. What does that mean?",
       "choices": {
-        "A": "A misconfiguration on your machine",
+        "A": "A misconfiguration of the routing table on your machine",
         "B": "Your packets are looping locally",
         "C": "The trace is being spoofed",
-        "D": "Those are the provider's internal links, using private addressing inside their own network"
+        "D": "Those are the provider's internal links"
       },
       "correct": [
         "D"
       ],
-      "explanation": "Private ranges are unroutable from outside, but perfectly usable inside a provider's network. Seeing them mid-path is normal and tells you nothing is wrong."
+      "explanation": "Private ranges are unroutable from outside, but perfectly usable inside a provider's network. Seeing them mid-path is normal and tells you nothing is wrong. They use private addressing inside the provider's own network, which is perfectly normal."
     },
     {
       "id": "cp-3",
       "prompt": "What does a netmask actually do?",
       "choices": {
-        "A": "Marks which leading bits of the address identify the network rather than the host",
+        "A": "It marks the network bits",
         "B": "Encrypts the address",
         "C": "Selects which gateway to use",
         "D": "Limits how many machines may connect"
@@ -213,7 +213,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "It is a bit pattern of ones followed by zeros. AND it with the address and you have the network; the bits it leaves out are the host part."
+      "explanation": "It is a bit pattern of ones followed by zeros. AND it with the address and you have the network; the bits it leaves out are the host part. The network is identified by the leading bits of the address; the bits it leaves out are the host part."
     },
     {
       "id": "cp-4",
@@ -221,7 +221,7 @@
       "choices": {
         "A": "Each of the four parts is a single byte",
         "B": "It is reserved",
-        "C": "It belongs to a different network",
+        "C": "It belongs to a different network than the local one",
         "D": "It is a broadcast address"
       },
       "correct": [

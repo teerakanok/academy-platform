@@ -132,8 +132,8 @@
       "prompt": "What does the line #!/bin/bash at the top of a script do?",
       "choices": {
         "A": "It makes the file executable",
-        "B": "It tells the system which interpreter should run the file",
-        "C": "It is a comment and has no effect",
+        "B": "It names the interpreter that runs it",
+        "C": "It is only a comment and has no effect here",
         "D": "It imports bash functions"
       },
       "correct": [
@@ -147,19 +147,19 @@
       "choices": {
         "A": "There is no difference in bash",
         "B": "Quotes make the command run faster",
-        "C": "Unquoted variables are always empty",
-        "D": "Without quotes, a value containing spaces splits into multiple arguments"
+        "C": "Unquoted variables are always completely empty",
+        "D": "Values with spaces split into many arguments"
       },
       "correct": [
         "D"
       ],
-      "explanation": "The command acts on the wrong things. Word splitting happens before the command runs. A file named holiday photos.txt becomes two arguments, and the command does something you did not intend."
+      "explanation": "The command acts on the wrong things. Word splitting happens before the command runs. A file named holiday photos.txt becomes two arguments, and the command does something you did not intend. A file named holiday photos.txt becomes two arguments, and the command does something you did not intend."
     },
     {
       "id": "cp-3",
       "prompt": "A script finishes and echo $? prints 1. What does that mean?",
       "choices": {
-        "A": "It failed — any non-zero exit code signals failure",
+        "A": "It failed — non-zero exit codes mean failure",
         "B": "It succeeded and produced one line of output",
         "C": "It was interrupted by the user",
         "D": "It is still running"
@@ -173,7 +173,7 @@
       "id": "cp-4",
       "prompt": "Why must you type ./script.sh rather than just script.sh ?",
       "choices": {
-        "A": "Because the current directory is deliberately not in PATH",
+        "A": "The current directory is kept out of PATH",
         "B": "Because scripts must always have a path",
         "C": "Because bash requires two characters before a filename",
         "D": "Because the file is not executable otherwise"

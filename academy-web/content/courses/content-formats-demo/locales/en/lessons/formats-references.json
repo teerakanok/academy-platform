@@ -92,10 +92,10 @@
       "id": "cp-1",
       "prompt": "Why is a PDF not embedded as the lesson body?",
       "choices": {
-        "A": "Its layout is fixed",
-        "B": "PDFs are always too large to load",
+        "A": "Its layout is fixed, so it never reflows on small screens",
+        "B": "PDFs are always too large to load quickly",
         "C": "PDFs cannot be displayed in browsers",
-        "D": "Browsers block PDF files by default"
+        "D": "Browsers block PDF files from opening by default"
       },
       "correct": [
         "A"
@@ -106,10 +106,10 @@
       "id": "cp-2",
       "prompt": "What is the main reason external pages are linked rather than framed?",
       "choices": {
-        "A": "External pages are always untrustworthy",
-        "B": "Frames cost more to host",
-        "C": "Links are faster to write",
-        "D": "Most sites block being framed, and framing makes their content look like ours"
+        "A": "External pages are always untrustworthy, so none may appear here",
+        "B": "Frames cost more to host than serving our own pages",
+        "C": "Links are faster to write than any other option",
+        "D": "Most sites block framing — and framing blurs whose content it is"
       },
       "correct": [
         "D"

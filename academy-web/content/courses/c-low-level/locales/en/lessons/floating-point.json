@@ -99,8 +99,8 @@
       "kind": "code",
       "caption": "Infinity and not-a-number",
       "lines": [
-        "double inf = 1.0 / 0.0;      /* +infinity — not a crash */",
-        "double nan = 0.0 / 0.0;      /* NaN — 'not a number' */",
+        "double inf = 1.0 / 0.0;      /* +infinity on IEEE-754 systems (the default on every platform here) */",
+        "double nan = 0.0 / 0.0;      /* NaN on IEEE-754 systems — 'not a number' */",
         "",
         "printf(\"%s\\n\", nan == nan ? \"equal\" : \"NOT equal\");   /* NOT equal — NaN equals nothing */",
         "",
@@ -205,14 +205,14 @@
       "prompt": "Why is 0.1 + 0.2 not exactly 0.3?",
       "choices": {
         "A": "The processor is imprecise",
-        "B": "0.1 and 0.2 cannot be represented exactly in binary",
+        "B": "0.1 and 0.2 are not exact in binary",
         "C": "double is too small for these values",
         "D": "A bug in the compiler"
       },
       "correct": [
         "B"
       ],
-      "explanation": "The stored values are slightly off before the addition happens. Only fractions whose denominator is a power of two are exact. This is a property of the representation, identical in every language using the same hardware format."
+      "explanation": "They cannot be represented exactly in binary, so the stored values are slightly off before the addition happens. Only fractions whose denominator is a power of two are exact. This is a property of the representation, identical in every language using the same hardware format."
     },
     {
       "id": "cp-2",
@@ -221,12 +221,12 @@
         "A": "By printing both and comparing the strings",
         "B": "With ==",
         "C": "By casting both to int",
-        "D": "By checking that the difference is within a tolerance chosen for the scale of the values"
+        "D": "By comparing against a tolerance"
       },
       "correct": [
         "D"
       ],
-      "explanation": "A fixed epsilon that works near 1 is meaningless near a million, which is why a relative tolerance is usually the right choice."
+      "explanation": "The tolerance must be chosen for the scale of the values: a fixed epsilon that works near 1 is meaningless near a million, which is why a relative tolerance is usually the right choice."
     },
     {
       "id": "cp-3",
@@ -248,7 +248,7 @@
       "choices": {
         "A": "isnan(x) from <math.h>",
         "B": "x == 0",
-        "C": "x < 0 && x > 0",
+        "C": "x < 0 && x > 0 at the same time",
         "D": "x == NAN"
       },
       "correct": [

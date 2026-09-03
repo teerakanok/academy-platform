@@ -82,6 +82,7 @@
         "  $ printf '# first-repo\\n' > README.md",
         "  $ git add README.md",
         "  $ git commit -m \"first commit\"",
+        "  $ git branch -M main  # rename to main whatever init called it",
         "",
         "  $ git remote add origin git@github.com:yourname/first-repo.git",
         "  $ git push -u origin main",
@@ -91,6 +92,12 @@
         "   you have to merge two unrelated histories before you have learned what",
         "   either word means. */"
       ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "GitHub will ask for 2FA during signup — that is normal",
+      "text": "During signup GitHub will usually push you to set up two-factor authentication — a passkey, an authenticator app, or similar. That is normal, and worth doing. It also changes how you authenticate from git later: with 2FA on, your account password no longer works over HTTPS, so the token or SSH key routes above are what you will actually use."
     },
     {
       "kind": "try",
@@ -114,7 +121,7 @@
     "id_ed25519.pub is the half you paste into websites; the other never leaves your machine",
     "ssh -T git@github.com printing your name IS success, despite the \"no shell access\" wording",
     "Create the remote repository WITHOUT a README so the first push is not a merge",
-    "git remote add origin <url> then git push -u origin main",
+    "git branch -M main, then git remote add origin <url> and git push -u origin main",
     "Prove it worked by deleting the local copy and cloning it back"
   ],
   "checkpoint": [
@@ -136,15 +143,15 @@
       "id": "cp-2",
       "prompt": "ssh-keygen wrote id_ed25519 and id_ed25519.pub. Which do you paste into GitHub, and why does it matter?",
       "choices": {
-        "A": "id_ed25519.pub — the other file is the private half, and handing it over gives away the ability to act as you",
-        "B": "Neither; you upload the passphrase",
+        "A": "id_ed25519.pub — the other file is the private half",
+        "B": "Neither; you upload the passphrase you typed during key generation",
         "C": "id_ed25519, because it is the key",
         "D": "Either; they are interchangeable"
       },
       "correct": [
         "A"
       ],
-      "explanation": "The .pub half is meant to be public. The file with no extension never leaves your machine."
+      "explanation": "The .pub half is meant to be public; the file with no extension never leaves your machine, because handing it over gives away the ability to act as you."
     },
     {
       "id": "cp-3",
@@ -165,14 +172,14 @@
       "prompt": "You pushed and the file appears on the website. Why does the lesson still ask you to delete the local directory and clone it back?",
       "choices": {
         "A": "Because seeing a file on a page is not proof you can get it back",
-        "B": "To free disk space",
+        "B": "To free disk space, since git copies take up a lot of room on your machine",
         "C": "To test your internet connection",
         "D": "To practise rm"
       },
       "correct": [
         "A"
       ],
-      "explanation": "Recovering it is. The point of pushing is that the work survives the loss of your machine. Deleting and cloning is the smallest experiment that actually tests that claim."
+      "explanation": "Because being able to recover it is exactly what you have not proven yet. The point of pushing is that the work survives the loss of your machine, and deleting and cloning is the smallest experiment that actually tests that claim."
     }
   ]
 }

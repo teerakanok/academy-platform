@@ -199,14 +199,14 @@
       "prompt": "What does forbidding force pushes on a shared branch protect against?",
       "choices": {
         "A": "Merge conflicts",
-        "B": "History being rewritten under everyone who already has it, silently removing commits from the shared branch",
+        "B": "History being rewritten under everyone who has it",
         "C": "Large files being committed",
-        "D": "Slow clones"
+        "D": "Slow clones because the branch history is too long"
       },
       "correct": [
         "B"
       ],
-      "explanation": "It is the rule that keeps the shared history append-only, which is what makes everyone's copy trustworthy."
+      "explanation": "It is the rule that keeps the shared history append-only, which is what makes everyone's copy trustworthy. Rewriting means silently removing commits from the shared branch."
     }
   ]
 }

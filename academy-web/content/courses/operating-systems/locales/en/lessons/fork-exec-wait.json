@@ -146,7 +146,7 @@
         "A": "Because the kernel cannot allocate memory and load a file at the same time",
         "B": "exec is too slow to combine with process creation",
         "C": "For historical reasons with no practical benefit today",
-        "D": "The gap between them lets the child set up redirection, pipes, and credentials before the new program starts"
+        "D": "The gap lets the child set up redirection and pipes first"
       },
       "correct": [
         "D"
@@ -173,13 +173,13 @@
       "choices": {
         "A": "printf is not thread-safe",
         "B": "The file was opened twice",
-        "C": "fork copied the unflushed stdio buffer, and the child's exit() flushed its own copy",
-        "D": "The kernel duplicated the write"
+        "C": "The child flushed a copied buffer again",
+        "D": "The kernel duplicated the write behind your back"
       },
       "correct": [
         "C"
       ],
-      "explanation": "The buffer is ordinary process memory, so fork copies it. Flush before forking, and have children end with _exit(), which does not flush."
+      "explanation": "The buffer is ordinary process memory, so fork copies it. Flush before forking, and have children end with _exit(), which does not flush. fork copies the unflushed stdio buffer as ordinary memory, and the child's exit() flushes its own copy — flush before forking, and have children end with _exit()."
     },
     {
       "id": "cp-4",

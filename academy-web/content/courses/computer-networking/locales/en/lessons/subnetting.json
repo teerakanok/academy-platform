@@ -135,7 +135,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "That /30 at the end is worth noticing: four addresses, of which two are usable, which is exactly what a link between two routers needs. It is the smallest useful subnet, and you will see a lot of them in real networks."
+      "text": "That /30 at the end is worth noticing: four addresses, of which two are usable, which is exactly what a link between two routers needs. In the classic arithmetic it is the smallest subnet that can carry a link; the modern note is that /31 (RFC 3021) is standard for point-to-point router links on current routers — both addresses usable, with no network or broadcast address reserved — while /30 remains the portable answer that works everywhere. You will see a lot of both in real networks."
     },
     {
       "kind": "heading",
@@ -235,7 +235,7 @@
       "correct": [
         "C"
       ],
-      "explanation": "Two usable addresses is exactly two router interfaces. It is the smallest subnet that can carry a link, and real networks contain a great many of them."
+      "explanation": "Two usable addresses is exactly two router interfaces. In the classic arithmetic it is the smallest subnet that can carry a link — on current routers /31 (RFC 3021) is the standard for point-to-point links, but /30 remains the portable answer — and real networks contain a great many of them."
     }
   ]
 }

@@ -170,10 +170,10 @@
       "id": "cp-1",
       "prompt": "add x5,x6,x7 is followed immediately by sub x9,x5,x8. What is the problem in a pipelined processor?",
       "choices": {
-        "A": "Two instructions cannot use the arithmetic unit",
+        "A": "Two instructions need the arithmetic unit in the same cycle",
         "B": "The registers are the wrong size",
         "C": "There is no problem",
-        "D": "The sub reads the register file before the add has written its result there"
+        "D": "The sub reads the register before the add writes it"
       },
       "correct": [
         "D"
@@ -184,10 +184,10 @@
       "id": "cp-2",
       "prompt": "How does forwarding fix that without slowing anything down?",
       "choices": {
-        "A": "It delays the sub until the write completes",
+        "A": "It delays the sub until the register write completes",
         "B": "It reorders the two instructions",
         "C": "It duplicates the register file",
-        "D": "The result exists at the arithmetic unit's output a cycle before it is needed"
+        "D": "The result exists a cycle before it is needed"
       },
       "correct": [
         "D"
@@ -215,7 +215,7 @@
         "A": "Floating-point addition is slower",
         "B": "Floating-point addition is not associative",
         "C": "It does the same for both",
-        "D": "Floating-point registers are scarce"
+        "D": "Floating-point registers are too scarce to split"
       },
       "correct": [
         "B"

@@ -158,7 +158,7 @@
   ],
   "cheatsheet": [
     "Four stages: preprocess → compile → assemble → link",
-    "-E stops after preprocessing · -S after assembly · -c after the object file",
+    "-E stops after preprocessing · -S after producing assembly (before the assembler) · -c after the object file",
     "#include pastes a whole file in; #define is text replacement before compiling",
     "'expected ;' is the compiler · 'undefined reference' is the linker",
     "undefined reference = declared but nothing provides it: missing file or missing -l",
@@ -171,57 +171,57 @@
       "id": "cp-1",
       "prompt": "What does the preprocessor actually do with #include <stdio.h> ?",
       "choices": {
-        "A": "Links the standard library",
+        "A": "Links the standard library into your program",
         "B": "Loads a compiled module",
         "C": "Downloads the header if missing",
-        "D": "Pastes the entire contents of that header file into your source before compilation"
+        "D": "Pastes the header into your source"
       },
       "correct": [
         "D"
       ],
-      "explanation": "It is text substitution. That is why a short program can preprocess into tens of thousands of lines."
+      "explanation": "The entire contents of the header file are pasted in before compilation — it is text substitution. That is why a short program can preprocess into tens of thousands of lines."
     },
     {
       "id": "cp-2",
       "prompt": "You get 'undefined reference to sqrt'. Which stage failed and why?",
       "choices": {
         "A": "The compiler — a syntax error",
-        "B": "The linker — the declaration existed so it compiled, but no library or object file provided the function (here, missing -lm)",
+        "B": "The linker — the function was never provided",
         "C": "The preprocessor — a missing header",
-        "D": "The assembler — an invalid instruction"
+        "D": "The assembler — an invalid instruction was generated"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Declaration and definition are separate things in C. The header promised the function exists; the linker is the stage that has to find it."
+      "explanation": "The declaration existed so it compiled, but no library or object file provided the function — here, missing -lm. Declaration and definition are separate things in C. The header promised the function exists; the linker is the stage that has to find it."
     },
     {
       "id": "cp-3",
       "prompt": "What does gcc -c produce?",
       "choices": {
         "A": "Assembly text",
-        "B": "Preprocessed source",
+        "B": "Preprocessed source, ready for the compiler",
         "C": "An executable",
-        "D": "An object file: machine code with names that are not yet resolved"
+        "D": "An object file, not yet linked"
       },
       "correct": [
         "D"
       ],
-      "explanation": "-c compiles and assembles but does not link, which is how multi-file projects are built before being joined together."
+      "explanation": "-c compiles and assembles but does not link, so the result is machine code with names that are not yet resolved — how multi-file projects are built before being joined together."
     },
     {
       "id": "cp-4",
       "prompt": "Why compile with -O0 while learning?",
       "choices": {
         "A": "It is required for -Wall to work",
-        "B": "Optimisation rearranges and removes code, so a debugger shows lines out of order and variables that no longer exist",
-        "C": "It makes the program run faster",
+        "B": "The debugger no longer matches your source",
+        "C": "It makes the program run faster in every case",
         "D": "It reduces the executable size"
       },
       "correct": [
         "B"
       ],
-      "explanation": "You want the running program to match the source you are reading. Turn optimisation on when you are measuring performance, not while you are learning what the code does."
+      "explanation": "Optimisation rearranges and removes code, so the debugger shows lines executing out of order and variables that no longer exist. You want the running program to match the source you are reading. Turn optimisation on when you are measuring performance, not while you are learning what the code does."
     }
   ]
 }

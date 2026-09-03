@@ -176,14 +176,14 @@
       "prompt": "Why prefix review comments with blocking / question / suggestion / nit?",
       "choices": {
         "A": "Platforms require it",
-        "B": "So the author can tell what must change from what you merely prefer, instead of reading every comment as a demand",
+        "B": "So the author knows which comments are demands",
         "C": "It hides disagreements",
-        "D": "It makes reviews shorter"
+        "D": "It makes reviews shorter by cutting out the discussion"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Unlabelled comments force the author to guess your severity. That guessing is where most review friction comes from."
+      "explanation": "Unlabelled comments force the author to guess your severity. That guessing is where most review friction comes from. The labels separate what must change from what you merely prefer."
     },
     {
       "id": "cp-3",
@@ -203,7 +203,7 @@
       "id": "cp-4",
       "prompt": "Which comment is more likely to improve the code?",
       "choices": {
-        "A": "I would have done this differently",
+        "A": "I would have done this completely differently — rewrite it the way I would have written it",
         "B": "Please rewrite this properly",
         "C": "This function is confusing",
         "D": "I could not work out when the second branch runs — could you add a comment or split it?"

@@ -214,7 +214,7 @@
       "id": "cp-1",
       "prompt": "A threaded read benchmark gave 49.3, 70.0, 94.2 and 84.6 GB/s at 1, 2, 4 and 8 threads. What does the flattening indicate?",
       "choices": {
-        "A": "The threads are contending for a lock",
+        "A": "The threads are contending for a lock acquired on every access",
         "B": "The memory system saturated at around four threads",
         "C": "The cores are throttling",
         "D": "The buffer fits in cache"
@@ -242,7 +242,7 @@
       "id": "cp-3",
       "prompt": "A program allocates and initialises all its data in one thread at startup, then parallelises the work across NUMA nodes. What has it done?",
       "choices": {
-        "A": "Nothing; placement is decided at allocation",
+        "A": "Nothing; page placement is decided at allocation time and never changes",
         "B": "Improved locality",
         "C": "Reduced total memory use",
         "D": "Placed every physical page on the initialising thread's node"

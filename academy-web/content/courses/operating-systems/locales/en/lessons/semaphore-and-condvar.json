@@ -188,29 +188,29 @@
       "id": "cp-1",
       "prompt": "Why must pthread_cond_wait release the mutex and sleep as one indivisible step?",
       "choices": {
-        "A": "To let the compiler optimise the loop",
-        "B": "Because the mutex is recursive",
-        "C": "To avoid deadlock with the scheduler",
-        "D": "Otherwise a signal arriving between releasing and sleeping would be missed, and the thread would sleep forever"
+        "A": "To let the compiler optimise the wait loop better",
+        "B": "Because the mutex is recursive and re-entry is expensive",
+        "C": "To avoid a deadlock between the thread and the scheduler",
+        "D": "Otherwise a signal in that gap would be missed"
       },
       "correct": [
         "D"
       ],
-      "explanation": "That gap is exactly the race the atomic release-and-sleep exists to close. It is also why you must hold the mutex when you call it."
+      "explanation": "That gap — between releasing the mutex and going to sleep — is exactly the race the atomic release-and-sleep exists to close: a signal arriving there would be missed, and the thread would sleep forever. It is also why you must hold the mutex when you call it."
     },
     {
       "id": "cp-2",
       "prompt": "Three threads wait on a condition variable. The producer adds one item and calls broadcast. With if instead of while, what happens?",
       "choices": {
-        "A": "Two get an error",
+        "A": "Two of the threads get an error return",
         "B": "broadcast blocks until all three are served",
-        "C": "All three proceed as if an item were available, and the count goes negative",
+        "C": "All three proceed and the count goes negative",
         "D": "Only one proceeds; the others go back to sleep"
       },
       "correct": [
         "C"
       ],
-      "explanation": "Verified: the count reached -2 in exactly this experiment. Waking up means 'go and check', not 'the condition holds'."
+      "explanation": "Each one wakes and proceeds as if an item were available. Verified: the count reached -2 in exactly this experiment. Waking up means 'go and check', not 'the condition holds'."
     },
     {
       "id": "cp-3",
@@ -224,16 +224,16 @@
       "correct": [
         "B"
       ],
-      "explanation": "Is why the pattern re-checks a state variable. A semaphore would have remembered it by incrementing its count. This difference is usually what decides which one to use."
+      "explanation": "That is why the pattern re-checks a state variable. A semaphore would have remembered it by incrementing its count. This difference is usually what decides which one to use."
     },
     {
       "id": "cp-4",
       "prompt": "Your worker threads wait for (queue_not_empty). At shutdown the program hangs. Why?",
       "choices": {
         "A": "Nothing ever makes the wait condition true again",
-        "B": "The threads were detached",
-        "C": "The mutex was not released",
-        "D": "broadcast was called too early"
+        "B": "The threads were detached, so they ignore broadcasts",
+        "C": "The mutex was not released after the last signal",
+        "D": "broadcast was called too early, before the queue filled"
       },
       "correct": [
         "A"

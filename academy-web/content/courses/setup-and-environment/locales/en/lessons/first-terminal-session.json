@@ -110,7 +110,7 @@
         "A": "It succeeded — Unix tools stay quiet when there is nothing to report",
         "B": "The output went to another window",
         "C": "It is still running and has hung",
-        "D": "The command does not exist"
+        "D": "The command does not exist, so the shell silently ignored what you typed"
       },
       "correct": [
         "A"
@@ -121,7 +121,7 @@
       "id": "cp-2",
       "prompt": "\"gti: command not found\" — which part of the system produced this, and what does it mean?",
       "choices": {
-        "A": "The kernel denied access to the file",
+        "A": "The kernel denied access to a file called gti — a permission problem",
         "B": "The program refused the request",
         "C": "The file exists but is empty",
         "D": "The shell could not find a program by that name"
@@ -137,7 +137,7 @@
       "choices": {
         "A": "Which directory you are in, with pwd",
         "B": "Whether cat is installed",
-        "C": "Whether the file is corrupted",
+        "C": "Whether the file is corrupted, which is the usual cause of this error",
         "D": "Whether you have permission"
       },
       "correct": [
@@ -149,7 +149,7 @@
       "id": "cp-4",
       "prompt": "In WSL, where does your Windows C: drive appear?",
       "choices": {
-        "A": "At /mnt/c, because Unix has one tree and other disks attach inside it",
+        "A": "At /mnt/c",
         "B": "At ~/windows",
         "C": "At C:\\ , unchanged",
         "D": "It is not accessible from Linux"
@@ -157,7 +157,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "It works, but access across the boundary is slow and the permissions are faked, so keep coursework in the Linux home directory."
+      "explanation": "Unix has one tree and other disks attach inside it, which is why the answer is /mnt/c. It works, but access across the boundary is slow and the permissions are faked, so keep coursework in the Linux home directory."
     }
   ]
 }

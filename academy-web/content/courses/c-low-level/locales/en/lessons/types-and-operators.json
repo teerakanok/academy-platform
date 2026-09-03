@@ -72,7 +72,7 @@
       "lines": [
         "int big = 300;",
         "char small = big;              /* 300 does not fit in a byte */",
-        "printf(\"%d\\n\", small);        /* 44 — the low 8 bits of 300 */",
+        "printf(\"%d\\n\", small);        /* 44 on gcc/clang — the low 8 bits; converting to signed char is implementation-defined */",
         "",
         "unsigned char c = 255;",
         "c = c + 1;                     /* 0 — unsigned wraps, and this is defined */"

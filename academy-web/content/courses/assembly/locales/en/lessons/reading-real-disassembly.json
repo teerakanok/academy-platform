@@ -48,7 +48,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "Before reading any instruction in detail, find the structure. There is a backward jump at .L5 to .L2, so there is a loop, and .L2 to .L5 is the body. Two conditional jumps inside the body both go to .L5, which is where the counter is incremented — so both are 'skip to the next iteration'. There are two exits: .L6 reached by the loop finishing or by falling through, and .L7 reached before the loop even starts."
+      "text": "Before reading any instruction in detail, find the structure. The two conditional jumps inside the .L2 block — jne .L5 and je .L5 — target .L5, which sits at a lower address, so they are backward jumps, and a backward jump means a loop. The loop body spans .L5 through the two tests at .L2: the counter is incremented at .L5, and the two jumps back to it are both 'skip to the next iteration'. There are two exits: .L6 reached by the loop finishing or by falling through, and .L7 reached before the loop even starts."
     },
     {
       "kind": "heading",
@@ -268,27 +268,27 @@
       "choices": {
         "A": "4 and 8",
         "B": "12 and 16",
-        "C": "0 and 4 — undo the bias of 4 that was applied before the loop",
+        "C": "0 and 4",
         "D": "-4 and 0"
       },
       "correct": [
         "C"
       ],
-      "explanation": "The bias exists so both accesses use small displacements. Forgetting to undo it makes every recovered field offset wrong by exactly that constant."
+      "explanation": "Undo the bias of 4 that was applied before the loop. The bias exists so both accesses use small displacements, and forgetting to undo it makes every recovered field offset wrong by exactly that constant."
     },
     {
       "id": "cp-2",
       "prompt": "The loop is bounded by cmp rsi, rcx followed by je, and guarded at the top by test rsi, rsi followed by jle. What does that tell you about the count parameter?",
       "choices": {
-        "A": "It is signed — jle is the signed condition, so a negative count is handled by returning immediately",
+        "A": "Signed — jle is the signed condition",
         "B": "It is unsigned",
         "C": "It is a pointer",
-        "D": "Nothing about its type"
+        "D": "Nothing about its type can be recovered"
       },
       "correct": [
         "A"
       ],
-      "explanation": "Signedness is visible in the condition names, not the comparison. jle and jl are signed; jbe and jb are unsigned."
+      "explanation": "A negative count is handled by the guard test returning immediately. Signedness is visible in the condition names, not the comparison. jle and jl are signed; jbe and jb are unsigned."
     },
     {
       "id": "cp-3",
@@ -308,10 +308,10 @@
       "id": "cp-4",
       "prompt": "Why is 'account for every instruction' the step that must not be skipped?",
       "choices": {
-        "A": "To find dead code",
+        "A": "To find dead code the compiler failed to remove",
         "B": "To produce a complete report",
         "C": "To measure performance",
-        "D": "A reconstruction that explains most instructions is a guess"
+        "D": "Explaining most instructions is not enough"
       },
       "correct": [
         "D"

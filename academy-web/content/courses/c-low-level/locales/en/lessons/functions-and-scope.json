@@ -213,7 +213,7 @@
       "choices": {
         "A": "It becomes undefined",
         "B": "It depends on the compiler",
-        "C": "Nothing — C passes by value",
+        "C": "Nothing — C passes copies",
         "D": "It changes too"
       },
       "correct": [
@@ -226,8 +226,8 @@
       "prompt": "Why must you never return a pointer to a local variable?",
       "choices": {
         "A": "It leaks memory",
-        "B": "The local ceases to exist when the function returns",
-        "C": "Local variables cannot be addressed",
+        "B": "The local dies when the function returns",
+        "C": "Local variables cannot be addressed at all",
         "D": "It is a compile error"
       },
       "correct": [
@@ -239,8 +239,8 @@
       "id": "cp-3",
       "prompt": "What does static mean on a variable declared inside a function?",
       "choices": {
-        "A": "It is visible to other files",
-        "B": "It is initialised once and keeps its value between calls, instead of being recreated each time",
+        "A": "It is visible to other files through the linker",
+        "B": "It keeps its value between calls",
         "C": "It cannot be modified",
         "D": "It is stored on the stack"
       },
@@ -256,7 +256,7 @@
         "A": "Call exit() on failure",
         "B": "Throw an exception",
         "C": "Return the result and print errors to the screen",
-        "D": "Return a status value and write the real result through a pointer parameter"
+        "D": "Return status; write the result through a pointer"
       },
       "correct": [
         "D"

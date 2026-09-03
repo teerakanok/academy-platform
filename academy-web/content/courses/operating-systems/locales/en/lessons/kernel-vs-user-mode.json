@@ -142,10 +142,10 @@
       "id": "cp-2",
       "prompt": "Why is reading a file one byte at a time so much slower than reading it in 64KB blocks, even though the total bytes are identical?",
       "choices": {
-        "A": "Each read is a crossing into the kernel, and the per-crossing overhead dominates",
-        "B": "The disk reads single bytes more slowly",
-        "C": "Single-byte reads bypass the page cache",
-        "D": "The C library refuses to buffer small reads"
+        "A": "Each read crosses into the kernel, and that fixed overhead dominates",
+        "B": "The disk firmware reads single bytes more slowly than full blocks",
+        "C": "Single-byte reads bypass the page cache, always hitting the device",
+        "D": "The C library refuses to buffer small reads, so they go straight to disk"
       },
       "correct": [
         "A"
@@ -164,16 +164,16 @@
       "correct": [
         "D"
       ],
-      "explanation": "Finds no valid mapping and delivers a fatal signal. This is the user/kernel boundary enforcing itself. Option D describes exactly what memory protection exists to prevent."
+      "explanation": "Finds no valid mapping and delivers a fatal signal. This is the user/kernel boundary enforcing itself. Option C describes exactly what memory protection exists to prevent."
     },
     {
       "id": "cp-4",
       "prompt": "Why does Linux keep the number of system calls small and their behaviour stable for decades?",
       "choices": {
-        "A": "Adding them requires new hardware",
-        "B": "Each one must fit in a single register",
-        "C": "The CPU limits how many can exist",
-        "D": "Every compiled program depends on them, and a narrow, stable interface is both compatible and easier to secure"
+        "A": "Adding a new system call requires new hardware support in every CPU",
+        "B": "Each one must fit entirely inside a single CPU register",
+        "C": "The CPU enforces a hard limit on how many system calls can exist",
+        "D": "Every compiled program depends on them staying stable and narrow"
       },
       "correct": [
         "D"

@@ -151,21 +151,21 @@
       "id": "cp-1",
       "prompt": "Why does this architecture have exactly 32 registers?",
       "choices": {
-        "A": "A register field is 5 bits, and 5 bits can name 32 things — the count follows from the encoding",
-        "B": "32 was found to be optimal by measurement",
+        "A": "A register field is 5 bits, and 5 bits name 32 things",
+        "B": "32 was found to be optimal by measurement on real code",
         "C": "It matches the 32-bit word size",
         "D": "Compilers cannot use more"
       },
       "correct": [
         "A"
       ],
-      "explanation": "The instruction had to fit in 32 bits with three register fields plus the operation. Five bits each was what remained, and 2 to the fifth is 32."
+      "explanation": "The instruction had to fit in 32 bits with three register fields plus the operation. Five bits each was what remained, and 2 to the fifth is 32. The count follows from the encoding."
     },
     {
       "id": "cp-2",
       "prompt": "add and sub have the same opcode and the same funct3. How does the hardware tell them apart?",
       "choices": {
-        "A": "They are the same instruction",
+        "A": "They are the same instruction under two names",
         "B": "By funct7 — verified",
         "C": "By a prefix byte",
         "D": "By the register numbers"
@@ -194,8 +194,8 @@
       "prompt": "Why are register fields kept at the same bit positions in every instruction format?",
       "choices": {
         "A": "It is an accident of history",
-        "B": "To simplify the assembler",
-        "C": "So the hardware can begin reading the register file before decoding has finished",
+        "B": "To simplify the assembler, which needs only one pass",
+        "C": "So register reads can start before decode finishes",
         "D": "For human readability"
       },
       "correct": [

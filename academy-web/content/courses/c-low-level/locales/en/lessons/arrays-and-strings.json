@@ -185,55 +185,55 @@
       "choices": {
         "A": "To support two-dimensional arrays",
         "B": "For performance",
-        "C": "Because the array becomes a pointer when passed",
+        "C": "Because the array becomes a pointer",
         "D": "Because arrays cannot be passed at all"
       },
       "correct": [
         "C"
       ],
-      "explanation": "Sizeof inside the function measures the pointer, not the array. The size information is lost at the call. A signature with an array and no length is a bug waiting for the wrong input."
+      "explanation": "The array becomes a pointer when passed, so sizeof inside the function measures the pointer, not the array. The size information is lost at the call. A signature with an array and no length is a bug waiting for the wrong input."
     },
     {
       "id": "cp-2",
       "prompt": "char s[] = \"hi\"; What are sizeof s and strlen(s)?",
       "choices": {
         "A": "Both 3",
-        "B": "sizeof is 3 (including the terminator), strlen is 2 (up to it)",
+        "B": "sizeof is 3; strlen is 2",
         "C": "sizeof is 2, strlen is 3",
         "D": "Both 2"
       },
       "correct": [
         "B"
       ],
-      "explanation": "The terminating zero byte is part of the storage but not part of the length. Mixing the two up is a common source of off-by-one errors."
+      "explanation": "The terminating zero byte is part of the storage (so sizeof counts it) but not part of the length (strlen counts up to it). Mixing the two up is a common source of off-by-one errors."
     },
     {
       "id": "cp-3",
       "prompt": "Why is strncpy not simply the safe version of strcpy?",
       "choices": {
-        "A": "It was removed from the standard",
+        "A": "It was removed from the C standard years ago",
         "B": "It is slower",
-        "C": "If the source is as long as or longer than n, it does not write a terminator",
+        "C": "It may leave the result unterminated",
         "D": "It cannot be used with arrays"
       },
       "correct": [
         "C"
       ],
-      "explanation": "Leaving a string that never ends. It was designed for fixed-width records, not for safe copying. snprintf always terminates, which is why it is the recommendation."
+      "explanation": "If the source is as long as or longer than n, it does not write a terminator — leaving a string that never ends. It was designed for fixed-width records, not for safe copying. snprintf always terminates, which is why it is the recommendation."
     },
     {
       "id": "cp-4",
       "prompt": "What happens if a character array loses its terminating zero byte?",
       "choices": {
-        "A": "String functions keep reading past the end of the buffer into unrelated memory, printing or copying whatever is there",
-        "B": "Nothing — the length is stored separately",
+        "A": "String functions keep reading past the end of the buffer",
+        "B": "Nothing — the length is stored separately next to the buffer",
         "C": "The compiler adds one automatically",
         "D": "It becomes an empty string"
       },
       "correct": [
         "A"
       ],
-      "explanation": "The terminator is the only thing that marks the end. Without it, every string function runs off into memory that was never part of your data."
+      "explanation": "The terminator is the only thing that marks the end. Without it, every string function runs off into unrelated memory that was never part of your data, printing or copying whatever is there."
     }
   ]
 }

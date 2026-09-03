@@ -222,13 +222,13 @@
       "choices": {
         "A": "Network congestion",
         "B": "Downloading the body",
-        "C": "Setup — the name lookup, the connection handshake, and negotiating encryption",
-        "D": "Client-side rendering"
+        "C": "Setup — DNS, TCP and TLS",
+        "D": "Client-side rendering of the page"
       },
       "correct": [
         "C"
       ],
-      "explanation": "Measured: dns 2.5 ms, connect 41 ms, TLS 308 ms. Setup dominated, which is exactly why connection reuse and session resumption make such a visible difference."
+      "explanation": "Measured: dns 2.5 ms, connect 41 ms, TLS 308 ms. Setup dominated, which is exactly why connection reuse and session resumption make such a visible difference. That is: the name lookup, the connection handshake, and negotiating encryption."
     },
     {
       "id": "cp-2",
@@ -236,13 +236,13 @@
       "choices": {
         "A": "Only GET",
         "B": "All of them",
-        "C": "GET, PUT, DELETE and HEAD — repeating them produces the same end result; POST generally cannot be repeated safely",
+        "C": "GET, PUT, DELETE and HEAD",
         "D": "None — retrying is never safe"
       },
       "correct": [
         "C"
       ],
-      "explanation": "This is the retry rule from the error-handling lesson applied to HTTP. When a POST must be retried, the usual answer is a unique key per request that the server remembers."
+      "explanation": "This is the retry rule from the error-handling lesson applied to HTTP. When a POST must be retried, the usual answer is a unique key per request that the server remembers. Repeating them produces the same end result, which is why they are safe to retry; POST generally cannot be repeated safely."
     },
     {
       "id": "cp-3",
@@ -250,22 +250,22 @@
       "choices": {
         "A": "Encryption is skipped",
         "B": "The connection is faster the second time",
-        "C": "The session is resumed rather than negotiated from scratch",
+        "C": "The session is resumed",
         "D": "The certificate is cached"
       },
       "correct": [
         "C"
       ],
-      "explanation": "Measured: about 308 ms on the first request and about 50 ms on the second. This is one of the three effects the first lesson of this course pointed at without naming."
+      "explanation": "Measured: about 308 ms on the first request and about 50 ms on the second. This is one of the three effects the first lesson of this course pointed at without naming. Resumed rather than negotiated again from scratch."
     },
     {
       "id": "cp-4",
       "prompt": "Why does HTTP/3 use UDP when HTTP has always relied on TCP's reliability?",
       "choices": {
-        "A": "To avoid connection setup entirely",
+        "A": "So that the cost of connection setup is avoided entirely",
         "B": "TCP cannot carry encrypted traffic",
         "C": "UDP is faster in every case",
-        "D": "In TCP a lost packet stalls every request sharing the connection"
+        "D": "A lost packet stalls every request on a TCP connection"
       },
       "correct": [
         "D"

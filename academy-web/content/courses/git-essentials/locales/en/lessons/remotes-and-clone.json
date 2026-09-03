@@ -177,43 +177,43 @@
       "id": "cp-1",
       "prompt": "What is origin/main?",
       "choices": {
-        "A": "A live view of the server's main branch",
-        "B": "Your machine's note of where the server's main branch was the last time you fetched",
+        "A": "A live view of the server's main branch, always up to date",
+        "B": "Your local note of where the server's main branch was",
         "C": "The branch you are currently on",
         "D": "A backup of your local main"
       },
       "correct": [
         "B"
       ],
-      "explanation": "It only updates when you fetch or pull. Until then it can be as stale as your last conversation with the server."
+      "explanation": "It only updates when you fetch or pull. Until then it can be as stale as your last conversation with the server. 'Where it was' means as of your last fetch."
     },
     {
       "id": "cp-2",
       "prompt": "Why is git fetch considered safe to run at any time?",
       "choices": {
-        "A": "It downloads commits and updates remote-tracking branches without touching your working files or your branch",
+        "A": "It updates remote-tracking branches, never your work",
         "B": "It only reads the first commit",
         "C": "It requires no authentication",
-        "D": "It creates a backup before running"
+        "D": "It creates a full backup before running, so nothing can be lost"
       },
       "correct": [
         "A"
       ],
-      "explanation": "Fetch is the read-only half of pull. It changes what you know, not what you have."
+      "explanation": "Fetch is the read-only half of pull. It changes what you know, not what you have. It also downloads the new commits — but never touches your working files or your branch."
     },
     {
       "id": "cp-3",
       "prompt": "HTTPS prompts you for a password when pushing. What does it actually want?",
       "choices": {
         "A": "Your SSH private key",
-        "B": "Your account password",
+        "B": "Your account password, which is easier to rotate",
         "C": "The repository name",
-        "D": "A personal access token with the narrowest scope that works"
+        "D": "A personal access token with minimal scope"
       },
       "correct": [
         "D"
       ],
-      "explanation": "Major hosts stopped accepting account passwords for Git operations. A token is a credential — scope it tightly and never commit it."
+      "explanation": "Major hosts stopped accepting account passwords for Git operations. A token is a credential — scope it tightly and never commit it. 'Minimal' means the narrowest scope that still works."
     },
     {
       "id": "cp-4",

@@ -155,7 +155,7 @@
       "id": "cp-1",
       "prompt": "You print the bytes of 0x12345678 and see 78 56 34 12. What does that tell you?",
       "choices": {
-        "A": "The value was corrupted",
+        "A": "The value was corrupted on the way out",
         "B": "The machine is big-endian",
         "C": "The machine is little-endian",
         "D": "The integer is signed"
@@ -171,41 +171,41 @@
       "choices": {
         "A": "fwrite cannot handle structs",
         "B": "It is too slow",
-        "C": "The file will be too large",
-        "D": "It bakes in this machine's byte order and this compiler's padding, the padding may contain unrelated memory, and any change to the struct silently changes the format"
+        "C": "The file will be too large for other programs to read",
+        "D": "It bakes in this machine's byte order and padding"
       },
       "correct": [
         "D"
       ],
-      "explanation": "Anything crossing a boundary needs an explicit format. The padding-disclosure part is why this matters for security and not only for portability."
+      "explanation": "It bakes in this machine's byte order and this compiler's padding — the padding may contain unrelated memory, and any change to the struct silently changes the format. Anything crossing a boundary needs an explicit format. The padding-disclosure part is why this matters for security and not only for portability."
     },
     {
       "id": "cp-3",
       "prompt": "A header declares a payload length. What must you check?",
       "choices": {
         "A": "Nothing, if the header magic is correct",
-        "B": "That it is within your maximum AND not larger than the bytes actually received",
+        "B": "Your maximum AND the bytes actually received",
         "C": "Only the maximum — the sender knows its own length",
         "D": "Only that it is not zero"
       },
       "correct": [
         "B"
       ],
-      "explanation": "A declared length is a claim from the sender. Without comparing it to what you actually hold, the parser reads past the end of its buffer."
+      "explanation": "The declared length must be within your maximum and not larger than the bytes actually received. A declared length is a claim from the sender. Without comparing it to what you actually hold, the parser reads past the end of its buffer."
     },
     {
       "id": "cp-4",
       "prompt": "Why use memcpy instead of casting a byte pointer to uint32_t * ?",
       "choices": {
         "A": "Casting loses the value",
-        "B": "The cast may produce a misaligned access",
+        "B": "The cast may be misaligned",
         "C": "memcpy is faster",
         "D": "memcpy handles byte order too"
       },
       "correct": [
         "B"
       ],
-      "explanation": "Is undefined behaviour; memcpy is always permitted and compiles to the same thing when alignment allows. Alignment requirements are real on many architectures. memcpy expresses the intent without relying on the pointer being suitably aligned."
+      "explanation": "The misaligned access is undefined behaviour; memcpy is always permitted and compiles to the same thing when alignment allows. Alignment requirements are real on many architectures. memcpy expresses the intent without relying on the pointer being suitably aligned."
     }
   ]
 }

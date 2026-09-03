@@ -219,8 +219,8 @@
       "choices": {
         "A": "The high 7 bits",
         "B": "The middle 3 bits",
-        "C": "It must be looked up in a table of all instructions",
-        "D": "The low 7 bits — the opcode determines which layout the other 25 follow"
+        "C": "It must be looked up in a table of all possible instructions",
+        "D": "The low 7 bits — the opcode sets the layout of the rest"
       },
       "correct": [
         "D"

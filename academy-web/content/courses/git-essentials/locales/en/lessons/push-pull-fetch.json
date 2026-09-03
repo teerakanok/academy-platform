@@ -181,13 +181,13 @@
       "choices": {
         "A": "Pull only downloads tags",
         "B": "Fetch works offline",
-        "C": "Fetch downloads and updates your remote-tracking notes only",
-        "D": "None; pull is an alias"
+        "C": "Fetch updates your remote-tracking notes only",
+        "D": "None; pull is just a shorter alias for the same fetch"
       },
       "correct": [
         "C"
       ],
-      "explanation": "Pull does that and then integrates the work into your branch. Fetch changes what you know. Pull changes what you have — which is why fetch is always safe and pull can produce conflicts."
+      "explanation": "Pull does that and then integrates the work into your branch. Fetch changes what you know. Pull changes what you have — which is why fetch is always safe and pull can produce conflicts. Fetch does download the new commits — but it only ever updates your notes, not your branch."
     },
     {
       "id": "cp-3",
@@ -195,13 +195,13 @@
       "choices": {
         "A": "It skips the fetch step",
         "B": "It never produces conflicts",
-        "C": "It replays your unpushed commits on top of the incoming work, avoiding a history full of uninformative merge commits",
-        "D": "It is faster over the network"
+        "C": "It replays your unpushed commits on top of the incoming work",
+        "D": "It is faster over the network because it downloads less data each time"
       },
       "correct": [
         "C"
       ],
-      "explanation": "Your unpushed commits are unshared, so rebasing them is safe — and it keeps the shared history readable instead of filling it with automatic merges."
+      "explanation": "Your unpushed commits are unshared, so rebasing them is safe — and it keeps the shared history readable instead of filling it with automatic merges. That is what avoids a history full of uninformative merge commits."
     },
     {
       "id": "cp-4",

@@ -1,0 +1,69 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="_base.css">
+<style>
+.head{display:flex;align-items:center;gap:12px;padding:16px 20px;margin-bottom:14px}
+.head h2{font-family:'Fraunces',Georgia,serif;font-size:19px;color:var(--text);font-weight:600}
+.head .grow{flex:1}
+.board{padding:22px 24px;position:relative}
+.cols{display:grid;grid-template-columns:1fr 90px 1fr;gap:0;position:relative}
+.col{display:flex;flex-direction:column;gap:12px;z-index:2}
+.pill{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:11px 14px;font-size:13.5px;color:var(--body);box-shadow:var(--shadow-card);display:flex;align-items:center;gap:10px}
+.pill .sig{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--text)}
+.pill.matched{border-color:var(--accentborder);background:var(--accent2dim)}
+.pill.wrong{border-color:var(--amberborder);background:var(--amberdim);color:var(--amber)}
+.pill .n{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border2);color:var(--faint);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.pill.matched .n{background:var(--accentfill);border-color:transparent;color:var(--onaccent)}
+.pill.wrong .n{border-color:var(--amber);color:var(--amber)}
+svg.wires{position:absolute;inset:0;z-index:1;pointer-events:none}
+.foot{display:flex;align-items:center;gap:10px;padding:13px 20px;border-top:1px solid var(--surface2);background:#FBFDFE;font-size:12.5px;color:var(--muted)}
+.foot .grow{flex:1}
+.streak{font-weight:700;color:var(--accent)}
+</style></head><body><div class="frame">
+  <div class="card head">
+    <div>
+      <h2>Match the signal to what actually happens</h2>
+      <p style="font-size:12.5px;color:var(--muted)">Tap one from each side — wrong pairs tell you why they're wrong</p>
+    </div>
+    <span class="grow"></span>
+    <span class="chip accent">match pairs</span>
+    <span class="chip plain">3 / 5 matched</span>
+    <span class="chip plain">streak <span class="streak">×4</span></span>
+  </div>
+
+  <div class="card board">
+    <div class="cols">
+      <div class="col">
+        <div class="pill matched"><span class="n">✓</span><span class="sig">HUP (1)</span></div>
+        <div class="pill matched"><span class="n">✓</span><span class="sig">INT (2)</span></div>
+        <div class="pill wrong"><span class="n">!</span><span class="sig">KILL (9)</span></div>
+        <div class="pill"><span class="n">4</span><span class="sig">TERM (15)</span></div>
+        <div class="pill"><span class="n">5</span><span class="sig">CONT (18)</span></div>
+      </div>
+      <svg class="wires" viewBox="0 0 90 340" preserveAspectRatio="none">
+        <path d="M0 26 C 45 26, 45 152, 90 152" stroke="#0A6C9E" stroke-width="2" fill="none" opacity=".55"/>
+        <path d="M0 82 C 45 82, 45 208, 90 208" stroke="#0A6C9E" stroke-width="2" fill="none" opacity=".55"/>
+        <path d="M0 138 C 45 138, 45 96, 90 96" stroke="#A6480A" stroke-width="2" fill="none" stroke-dasharray="5 4"/>
+      </svg>
+      <div class="col">
+        <div class="pill"><span class="n">A</span><span>Cannot be caught or ignored — the kernel acts directly</span></div>
+        <div class="pill matched"><span class="n">✓</span><span>You asked nicely; the program may still clean up first</span></div>
+        <div class="pill matched"><span class="n">✓</span><span>What Ctrl-C sends; catchable if you install a handler</span></div>
+        <div class="pill"><span class="n">D</span><span>Lifts a stop; the process resumes no matter what</span></div>
+        <div class="pill"><span class="n">E</span><span>Hangup — the terminal you were attached to went away</span></div>
+      </div>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:9px;align-items:center;background:var(--amberdim);border:1px solid var(--amberborder);border-radius:12px;padding:10px 13px;font-size:12.5px;color:var(--amber)">
+      <span>✕</span><span><b>KILL (9)</b> was matched to "asks nicely" — that's <b>TERM</b>. KILL is the one no handler ever sees. Try the other side of the pair.</span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="foot" style="border:none;background:transparent">
+      <span>🔄 Pair order and left/right shuffle every attempt — answers can't be memorized by position</span>
+      <span class="grow"></span>
+      <span class="btn primary" style="padding:7px 14px">Next round</span>
+    </div>
+  </div>
+</div></body></html>

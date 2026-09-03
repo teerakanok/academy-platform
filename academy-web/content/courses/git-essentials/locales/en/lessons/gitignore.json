@@ -63,7 +63,7 @@
         ],
         [
           "**/temp",
-          "A directory named temp at any depth"
+          "A file or directory named temp at any depth"
         ],
         [
           "!keep.log",
@@ -133,7 +133,7 @@
         "Run: mkdir -p node_modules && touch node_modules/x.js app.log",
         "Run: git status              (neither appears — they are ignored)",
         "Run: git add .gitignore && git commit -m \"Ignore generated files\"",
-        "Run: echo 'token=abc123' > local.conf && git add -f local.conf && git commit -m \"Oops\"",
+        "Run: echo 'token=abc123' > local.conf && git add -f local.conf && git commit -m \"Oops\"   (the -f forces an add past an ignore rule — nothing ignores local.conf yet, so a plain git add would do the same here)",
         "Run: echo 'local.conf' >> .gitignore && git status   (still tracked — ignoring came too late)",
         "Run: git rm --cached local.conf && git commit -m \"Stop tracking the local config\"",
         "Run: git log -p --all -- local.conf | head -20       (the value is still in history)"
@@ -185,29 +185,29 @@
       "id": "cp-3",
       "prompt": "Why is committing a build output directory a bad idea?",
       "choices": {
-        "A": "Git cannot store binary files",
+        "A": "Git cannot store binary files at all, so they must stay out",
         "B": "It breaks git log",
         "C": "It contains secrets by definition",
-        "D": "It is rebuildable from source, changes on every build, causes constant conflicts, and is usually far larger than the project itself"
+        "D": "It is rebuildable from source and changes on every build"
       },
       "correct": [
         "D"
       ],
-      "explanation": "Generated output adds size and noise while adding no information the source does not already contain."
+      "explanation": "Generated output adds size and noise while adding no information the source does not already contain. It also causes constant conflicts and is usually far larger than the project itself."
     },
     {
       "id": "cp-4",
       "prompt": "What is the example-file convention for?",
       "choices": {
-        "A": "An encrypted version of the configuration",
-        "B": "A committed file that documents which configuration values are needed, with blank or fake values",
+        "A": "An encrypted version of the configuration that Git unlocks on demand",
+        "B": "A committed file that lists the needed values, with fake ones",
         "C": "A backup of the real configuration file",
         "D": "A file Git reads automatically at build time"
       },
       "correct": [
         "B"
       ],
-      "explanation": "The real one never enters the repository. It gives newcomers the shape of the configuration without ever putting a working credential into the history."
+      "explanation": "The real one never enters the repository. It gives newcomers the shape of the configuration without ever putting a working credential into the history. Blank or fake values are what make it safe to commit."
     }
   ]
 }

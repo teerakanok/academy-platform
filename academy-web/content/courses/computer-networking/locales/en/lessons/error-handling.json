@@ -89,7 +89,7 @@
         ],
         [
           "ETIMEDOUT — with backoff, a bounded number of times",
-          "EACCES — a permission problem that will not change"
+          "EDESTADDRREQ — send() without any destination ever set; your own bug"
         ],
         [
           "ECONNRESET — usually, if the operation is safe to repeat",
@@ -220,21 +220,21 @@
       "id": "cp-1",
       "prompt": "Your server dies when a client disconnects mid-response. What is missing?",
       "choices": {
-        "A": "signal(SIGPIPE, SIG_IGN) — writing to a closed connection raises a signal whose default is to terminate",
-        "B": "SO_REUSEADDR",
+        "A": "signal(SIGPIPE, SIG_IGN)",
+        "B": "SO_REUSEADDR, to release the port after each crash",
         "C": "A larger backlog",
         "D": "A timeout"
       },
       "correct": [
         "A"
       ],
-      "explanation": "With it ignored, the write returns -1 with EPIPE and you handle one connection failing. Without it, one client's timing ends the whole process."
+      "explanation": "With it ignored, the write returns -1 with EPIPE and you handle one connection failing. Without it, one client's timing ends the whole process. Writing to a closed connection raises SIGPIPE, whose default action terminates the process; ignoring it turns that into an EPIPE return instead."
     },
     {
       "id": "cp-2",
       "prompt": "A read fails with EINTR. What should the code do?",
       "choices": {
-        "A": "Retry the call — a signal interrupted it and nothing is wrong",
+        "A": "Retry the call",
         "B": "Reconnect",
         "C": "Close the connection and log an error",
         "D": "Wait for readiness first"
@@ -242,35 +242,35 @@
       "correct": [
         "A"
       ],
-      "explanation": "EINTR and EAGAIN are the two values that are not failures. Treating either as an error produces a program that misbehaves under load, when both become common."
+      "explanation": "EINTR and EAGAIN are the two values that are not failures. Treating either as an error produces a program that misbehaves under load, when both become common. A signal interrupted the call and nothing is wrong."
     },
     {
       "id": "cp-3",
       "prompt": "Why does a retry loop need random jitter?",
       "choices": {
-        "A": "Without it, every client that failed at the same moment retries at the same moment, hitting a struggling service with synchronised waves",
+        "A": "Without it, clients retry in synchronised waves",
         "B": "To avoid predictable traffic patterns",
         "C": "To comply with the protocol",
-        "D": "To make the delays shorter on average"
+        "D": "To make the average delay shorter than a fixed schedule"
       },
       "correct": [
         "A"
       ],
-      "explanation": "Backoff alone spreads retries in time but not across clients. The randomness is what desynchronises them, and it is the difference between recovery and an amplified outage."
+      "explanation": "Backoff alone spreads retries in time but not across clients. The randomness is what desynchronises them, and it is the difference between recovery and an amplified outage. Every client that failed at the same moment retries at the same moment, hitting a struggling service with wave after wave."
     },
     {
       "id": "cp-4",
       "prompt": "A peer accepts your connection and then never responds. What does your program see?",
       "choices": {
-        "A": "read returns 0",
+        "A": "read returns 0 straight away",
         "B": "ECONNRESET",
         "C": "EPIPE",
-        "D": "Nothing — it waits indefinitely unless you set a timeout"
+        "D": "Nothing — it just waits"
       },
       "correct": [
         "D"
       ],
-      "explanation": "Silence is the failure with no error. A closed connection is reported; a silent one is not, which is why every operation needs a bound and why long-lived connections send keepalives."
+      "explanation": "Silence is the failure with no error. A closed connection is reported; a silent one is not, which is why every operation needs a bound and why long-lived connections send keepalives. It waits indefinitely unless you set a timeout."
     }
   ]
 }

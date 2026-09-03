@@ -171,34 +171,34 @@
       "prompt": "Twelve devices at home share one public address. What distinguishes their connections at the router?",
       "choices": {
         "A": "Separate public addresses assigned dynamically",
-        "B": "A different outside port number for each connection, recorded in a mapping table",
+        "B": "A different outside port for each connection",
         "C": "Their MAC addresses",
         "D": "The order the connections were made"
       },
       "correct": [
         "B"
       ],
-      "explanation": "One address plus many ports is what makes the sharing possible. Each entry maps an outside port back to a specific inside address and port."
+      "explanation": "One address plus many ports is what makes the sharing possible. Each entry maps an outside port back to a specific inside address and port. The router's mapping table records which outside port belongs to which inside address and port."
     },
     {
       "id": "cp-2",
       "prompt": "Is it accurate to say NAT protects your network like a firewall?",
       "choices": {
         "A": "Only with IPv6",
-        "B": "Yes, for outbound traffic",
-        "C": "No — inbound traffic is dropped because the router does not know where to send it, and that side effect covers nothing else",
+        "B": "Yes, it also filters outbound traffic like a firewall",
+        "C": "No — it only blocks unsolicited inbound traffic",
         "D": "Yes — it blocks all attacks"
       },
       "correct": [
         "C"
       ],
-      "explanation": "It genuinely does block unsolicited inbound traffic, which is useful. But it does nothing about outbound traffic, traffic between inside machines, or anything once a mapping exists."
+      "explanation": "It genuinely does block unsolicited inbound traffic, which is useful. But it does nothing about outbound traffic, traffic between inside machines, or anything once a mapping exists. The router simply does not know where to send unsolicited inbound traffic, and that side effect covers nothing else."
     },
     {
       "id": "cp-3",
       "prompt": "A video call connects two users who are both behind home routers. How?",
       "choices": {
-        "A": "Both send outbound at the same moment, each creating a mapping the other's traffic can use",
+        "A": "Both sides send outbound at the same moment",
         "B": "The routers negotiate automatically",
         "C": "The call always goes through a central server",
         "D": "One of them must have a public address"
@@ -206,7 +206,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "With a relay server as the fallback. Every technique for traversing NAT works by making the connection outbound from each side's point of view. Relaying is the fallback when that fails, not the first choice, because it costs the provider bandwidth."
+      "explanation": "With a relay server as the fallback. Every technique for traversing NAT works by making the connection outbound from each side's point of view. Relaying is the fallback when that fails, not the first choice, because it costs the provider bandwidth. Each one's outbound packet creates a mapping the other's traffic can then use."
     },
     {
       "id": "cp-4",
@@ -215,7 +215,7 @@
         "A": "DNS",
         "B": "The cable",
         "C": "Whether your provider is using carrier-grade NAT",
-        "D": "The server's firewall only"
+        "D": "The server's firewall alone, and nothing on your side"
       },
       "correct": [
         "C"

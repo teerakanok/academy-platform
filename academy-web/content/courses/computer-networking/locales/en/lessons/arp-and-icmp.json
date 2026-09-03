@@ -165,9 +165,9 @@
         "Run: ping -c 2 <a public address>   under tcpdump -n icmp and identify the echo request and reply by type",
         "Run: traceroute -n 1.1.1.1   under the same capture and find the time-exceeded messages",
         "Run: nc -u -z <your own address> 9999   and look for a port-unreachable message",
-        "Run: ping -c 1 -M do -s 2000 1.1.1.1   and look for fragmentation-needed"
+        "Run: ping -c 1 -M do -s 2000 1.1.1.1   — the 2000-byte packet exceeds your interface's 1500-byte MTU with DF set, so it fails locally: ping reports 'Message too long' (EMSGSIZE) and nothing is sent. Interpret that local error — your own kernel refusing the send, not an ICMP reply. To actually capture type 3 code 4 you need a path MTU smaller than your interface MTU: repeat the command through a VPN or PPPoE tunnel and capture again"
       ],
-      "expected": "An ARP exchange you triggered yourself, a multicast address whose hardware address you computed and then confirmed, and captures showing echo, time-exceeded, port-unreachable and fragmentation-needed messages. Having seen all four ICMP messages by name is what makes the earlier lessons' failure signatures recognisable rather than theoretical."
+      "expected": "An ARP exchange you triggered yourself, a multicast address whose hardware address you computed and then confirmed, and captures showing echo, time-exceeded and port-unreachable messages. The oversized DF-set ping ends in a local 'Message too long' error — the packet never left your machine, so no ICMP reply can appear, and recognising that local failure is itself the exercise. Seeing a real fragmentation-needed message requires a path with a smaller MTU, such as a VPN or PPPoE tunnel, where the same command produces the type 3 code 4 reply on the wire."
     }
   ],
   "cheatsheet": [
@@ -202,43 +202,43 @@
       "id": "cp-2",
       "prompt": "Your ARP table contains 224.0.0.251 mapped to 01:00:5e:00:00:fb. How was that mapping obtained?",
       "choices": {
-        "A": "It was computed — multicast hardware addresses are 01:00:5e plus the low 23 bits of the IP",
-        "B": "From DHCP",
+        "A": "It was computed from the IP address",
+        "B": "From the DHCP server when it assigned the address",
         "C": "By an ARP query",
         "D": "It was configured manually"
       },
       "correct": [
         "A"
       ],
-      "explanation": "Verified against a live table for two different groups. Both ends can calculate the same answer, so no query is needed."
+      "explanation": "Verified against a live table for two different groups. Both ends can calculate the same answer, so no query is needed. Multicast hardware addresses are computed as 01:00:5e plus the low 23 bits of the IP address."
     },
     {
       "id": "cp-3",
       "prompt": "An administrator blocks all ICMP at the firewall. Users report that small web pages load but large downloads hang. Why?",
       "choices": {
-        "A": "Type 3 code 4 — fragmentation needed — is being blocked, so senders never learn their packets are too large",
-        "B": "The connection limit was reached",
+        "A": "ICMP destination-unreachable with code 4 is blocked",
+        "B": "The connection limit was reached and new transfers are refused",
         "C": "DNS is failing",
         "D": "The firewall is dropping TCP too"
       },
       "correct": [
         "A"
       ],
-      "explanation": "This is the layers lesson's MTU failure with a cause you can now name. Blocking echo requests is a defensible choice; blocking destination-unreachable is not."
+      "explanation": "This is the layers lesson's MTU failure with a cause you can now name. Blocking echo requests is a defensible choice; blocking destination-unreachable is not. Type 3 code 4 is fragmentation needed: without it, senders never learn their packets are too large."
     },
     {
       "id": "cp-4",
       "prompt": "How does traceroute discover the routers along a path?",
       "choices": {
-        "A": "It sends packets with hop limits of 1, 2, 3 and so on",
+        "A": "It sends packets with increasing hop limits",
         "B": "It reads the routing tables remotely",
         "C": "It uses DNS records for each hop",
-        "D": "It asks each router for its neighbours"
+        "D": "It asks each router to report its neighbours and next hops"
       },
       "correct": [
         "A"
       ],
-      "explanation": "Each router that discards one reports Time Exceeded, revealing its address. The path is mapped by deliberately sending packets that cannot arrive. A router configured not to send those replies appears as a star while still forwarding traffic normally."
+      "explanation": "Each router that discards one reports Time Exceeded, revealing its address. The path is mapped by deliberately sending packets that cannot arrive. A router configured not to send those replies appears as a star while still forwarding traffic normally. Concretely, it sends hop limits of 1, then 2, then 3, and so on."
     }
   ]
 }
