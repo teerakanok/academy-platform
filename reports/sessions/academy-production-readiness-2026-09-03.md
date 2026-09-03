@@ -40,7 +40,7 @@ call shape compared against the live database (function identity arguments, gran
 | Exchange body read | `ReadableStreamBYOBReader` bounded JSON | live (200 body parsed to the issuer check) |
 | Result verification | key-set import, ECDSA verify, `structuredClone` | workerd (Identity-shaped fixture); live pending owner OTP |
 | Exchange checkpoint/finalize | RPC `checkpoint_…`, `finalize_…` | pg + static-live |
-| Session create/read/revoke | RPC `create_identity_session`, `read_…`, `revoke_…`; cookie `academy_session` | read: live (bogus cookie → 307); create/revoke: pg + static-live |
+| Session create/read/revoke | RPC `create_identity_session`, `read_…`, `revoke_…`; cookie `academy_session` | was `mocked` in truth: the store rejected the real supabase-js envelope (`{data,error,count,status,statusText}`) — the bogus-cookie 307 could not distinguish that from an unknown session. Fixed `594dede`; regression test feeds the real envelope through create/get/revoke; live proof pending the owner sign-in |
 | Profile activation, `academy.users` upsert | RPC `sync_service_activation`; table `users` insert/update | pg + static-live (grants I/S/U, bypassrls) |
 | Entitlement | RPC `has_course_entitlement`; table `course_entitlement` | pg + static-live |
 | Progress write/read | RPC `record_node_progress`, `capture_progress_epoch`, `commit_node_progress`, `reset_course_progress`; table `node_progress` | pg + static-live |
