@@ -105,7 +105,7 @@ describe('Academy Identity code exchange response transport', () => {
     expect(receivedInit?.method).toBe('POST')
     expect(receivedInit?.cache).toBe('no-store')
     expect(receivedInit?.credentials).toBe('omit')
-    expect(receivedInit?.redirect).toBe('error')
+    expect(receivedInit?.redirect).toBe('manual')
     expect(receivedInit?.signal).toBeInstanceOf(AbortSignal)
     expect(receivedInit?.signal?.aborted).toBe(false)
     expect(new Headers(receivedInit?.headers).get('accept')).toBe('application/json')

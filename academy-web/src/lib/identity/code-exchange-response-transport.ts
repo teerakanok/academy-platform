@@ -109,7 +109,9 @@ async function executeFetch(input: {
       body: JSON.stringify(input.request),
       cache: 'no-store',
       credentials: 'omit',
-      redirect: 'error',
+      // workerd rejects redirect: 'error' with a TypeError before any I/O; 'manual' plus
+      // the strict 200 check below refuses a redirect exactly the same way.
+      redirect: 'manual',
       signal: controller.signal,
     }))
     void fetchPromise.then((lateResponse) => {
