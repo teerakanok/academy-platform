@@ -4,18 +4,21 @@
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
 > **Last updated:** 2026-09-03
 
-**Current production checkpoint (2026-09-04 01:00 +07):** Academy Worker
-`cyberskills-academy` serves version `f4cc7530-ca7a-4270-a1e2-2342b85d8327`
-at `100%` = source `8c57a2e` (merge `b3d4180` + Safari gate fix `aa0149d` +
-callback-notice/diagnostics `7d3cc6c` + exchange fetch fix `8c57a2e`) with
-secret `IDENTITY_CODE_EXCHANGE_TIMEOUT_MS` raised to `5000`. Rollback =
-`wrangler versions deploy 529cc4a1-0c62-4cdb-b277-8177b76dccdf@100`.
-Root cause of the failed callbacks: `fetch(..., { redirect: 'error' })` is
-rejected by workerd with a `TypeError` before any I/O, so the code exchange
-never reached Identity. Synthetic callbacks on the live Worker (real
-transaction, fake code) now log `[identity-code-exchange] response status=404
-no_store=true elapsed_ms≈190–360`, i.e. Identity admits the client assertion;
-no rotation needed. Remaining gate: one owner-present real sign-in.
+**Current production checkpoint (2026-09-04 01:3x +07):** Academy Worker
+`cyberskills-academy` serves version `bf36900f-cbba-4864-9cfd-2ef6b7cbde87`
+at `100%` = source `ca2effc` (merge `b3d4180` + `aa0149d` Safari gate +
+`7d3cc6c` callback notice/diagnostics + `8c57a2e` exchange fetch fix +
+`ca2effc` result-verification diagnostics) with secrets
+`IDENTITY_CODE_EXCHANGE_TIMEOUT_MS=5000` and `IDENTITY_RESULT_KEY_SET_DOCUMENT`
+re-pinned from the live result-keys document (kid
+`identity-result-prod-2026-08`, thumbprint `VLvOF…8LM`). Rollback =
+`wrangler versions deploy 313465d5-0e37-48e8-8ba4-b6c61cf3d9d0@100`.
+Proven on the real path: start → Account Center → OTP → callback → lease →
+client assertion → code exchange (`200`, 94 ms). Last owner attempt failed
+at `result_verification`; emitter/verifier shapes match and the verify path
+passes on workerd, so the stale key-set pin is the remaining explanation.
+Remaining gate: one owner-present real sign-in (fresh OTP; codes are
+single-use).
 Evidence on the merged source:
 unit `2,121/2,121`, `tsc` (app + worker) exit `0`, OpenNext build exit `0`;
 eslint reports only the three pre-existing `no-require-imports` errors in

@@ -6,17 +6,27 @@
 
 ## 1) Owner-Present Sign-In Journey On The Deployed Callback Fix
 
-Deployed 2026-09-04 01:00 (+07): Worker version `f4cc7530-ca7a-4270-a1e2-2342b85d8327`
-at `100%` = source `8c57a2e` + secret `IDENTITY_CODE_EXCHANGE_TIMEOUT_MS=5000`. Rollback ladder:
-`529cc4a1…@100` (same code, timeout 1000) → `0a57d916…@100` → `1a211637…@100`.
+Deployed 2026-09-04 01:3x (+07): Worker version `bf36900f-cbba-4864-9cfd-2ef6b7cbde87`
+at `100%` = source `ca2effc` + secrets `IDENTITY_CODE_EXCHANGE_TIMEOUT_MS=5000` and
+`IDENTITY_RESULT_KEY_SET_DOCUMENT` re-pinned from the live
+`https://accounts.cyberskills.co.th/v1/code/result-keys` (kid `identity-result-prod-2026-08`,
+RFC 7638 thumbprint `VLvOFDKfchk6oDaqNBh3w0B_ZiVo4dLQYaIJPnAx8LM`, revision 1). Rollback ladder:
+`313465d5…@100` (same secrets, no verification diagnostics) → `f4cc7530…@100` (old key-set pin) →
+`529cc4a1…@100`.
 
-Root cause of every failed callback so far (founder attempt 17:12Z and synthetic probes): the
-code-exchange fetch passed `redirect: 'error'`, which workerd rejects with a `TypeError` before
-any I/O — no Academy request ever reached Identity, so no OTP, key, or Identity-side rule was at
-fault. Fixed in `8c57a2e` (`redirect: 'manual'`; the strict 200/no-store check still refuses a
-redirect). Proven on the live Worker with a synthetic callback (real transaction, fake code):
-`[identity-code-exchange] response status=404 no_store=true elapsed_ms=188–363` — Identity
-accepted the client assertion (404 = unknown code). No key rotation is needed.
+Owner-present attempt 2026-09-03 18:03Z on `f4cc7530`: start, Account Center, code, callback,
+lease claim, client assertion and the code exchange all succeeded (Identity `200` in 94 ms, code
+consumed), then Academy failed at `result_verification`. Identity's emitter and Academy's
+verifier use the same envelope/header/claim/result/activation shape (checked source to source),
+and the whole verify path passes on real workerd with a self-signed fixture of that shape
+(`scripts/workerd-signer-check.mjs`, 10/10). The remaining explanation is the pinned result
+key-set secret, which is now the live document. If the next attempt still fails, the Worker logs
+`[identity-result-verification] rejected …` with key names, kid, match booleans and time deltas
+(never subject, email, nonce or signature) so the failing check is named without another guess.
+
+Earlier findings this session: the exchange fetch used `redirect: 'error'`, which workerd rejects
+with a `TypeError` before any I/O (fixed `8c57a2e`; proven by synthetic callbacks reaching
+Identity, `404` for a fake code = client assertion admitted; no rotation needed).
 
 Earlier owner-present findings: Safari sends no `Sec-Fetch-User` (fixed `aa0149d`); callback
 failures rendered raw JSON (fixed `7d3cc6c`, now `/sign-in?notice=identity-unavailable`).
