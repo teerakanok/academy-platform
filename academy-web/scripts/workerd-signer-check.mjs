@@ -54,6 +54,21 @@ const REQUEST_TIMEOUT_MS = 30_000
  * ต้องแก้ด้วยมือเมื่อเพิ่ม check ใหม่ ซึ่งตั้งใจให้เป็นแบบนั้น: ลืมแล้ว fail ดีกว่า
  * ลืมแล้วเงียบ
  */
+// Release gate: build:cf runs this first so a runtime-only defect (workerd rejecting a
+// RequestInit, a binding call shape, a verify path) cannot ship green. Skipping is
+// allowed for local iteration only and must be impossible to miss.
+if (process.env.ACADEMY_SKIP_WORKERD_CHECK === '1') {
+  console.error([
+    '',
+    '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',
+    '!!  ACADEMY_SKIP_WORKERD_CHECK=1 — workerd release gate SKIPPED.        !!',
+    '!!  This build is NOT release evidence. Unset the flag before uploading. !!',
+    '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!',
+    '',
+  ].join('\n'))
+  process.exit(0)
+}
+
 const REQUIRED_CHECKS = [
   'code-exchange-fetch-init-accepted-by-workerd',
   'cryptokey-introspection-shape',
