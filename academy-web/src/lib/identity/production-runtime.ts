@@ -21,7 +21,9 @@ import {
 const ACCOUNT_CENTER_ORIGIN = 'https://accounts.cyberskills.co.th'
 const CODE_EXCHANGE_ENDPOINT = 'https://accounts.cyberskills.co.th/v1/code/exchange'
 const RESULT_ISSUER = 'https://accounts.cyberskills.co.th/v1/code/results'
-const PRINCIPAL_ISSUER = 'https://accounts.cyberskills.co.th/auth/v1'
+// Canonical lifecycle principal issuer (ecosystem contract ID-01): the verified issuer
+// minted by Pool A GoTrue, which Identity echoes as result.issuer. Not the Account Center host.
+const PRINCIPAL_ISSUER = 'https://supabase.cyberskills.co.th/auth/v1'
 const CLIENT = Object.freeze({
   clientId: 'academy-web',
   redirectUri: 'https://academy.cyberskills.co.th/auth/callback',

@@ -49,15 +49,15 @@ failures rendered raw JSON (fixed `7d3cc6c`, now `/sign-in?notice=identity-unava
 resend รหัสซ้ำก่อนตรวจ Worker logs.
 
 **Staff bootstrap หลัง sign-in ครั้งแรก** (`academy.users` ต้องมี 1 แถวก่อน):
-issuer ของ Academy = `https://accounts.cyberskills.co.th/auth/v1`; subject = ค่า `subject`
+issuer ของ Academy = `https://supabase.cyberskills.co.th/auth/v1`; subject = ค่า `subject`
 ในแถว `academy.users` ของ founder (อ่านจาก DB host ด้วย `psql -d postgres`, พิมพ์เฉพาะ
 count/issuer). dry-run:
 
 ```bash
 DATABASE_URL='<operator connection, never printed>' node scripts/manage-staff-role.mjs \
   --enable --role owner \
-  --actor-issuer https://accounts.cyberskills.co.th/auth/v1 --actor-subject <founder-subject> \
-  --target-issuer https://accounts.cyberskills.co.th/auth/v1 --target-subject <founder-subject> \
+  --actor-issuer https://supabase.cyberskills.co.th/auth/v1 --actor-subject <founder-subject> \
+  --target-issuer https://supabase.cyberskills.co.th/auth/v1 --target-subject <founder-subject> \
   --reference 'staff-bootstrap founder 2026-09-03'
 ```
 

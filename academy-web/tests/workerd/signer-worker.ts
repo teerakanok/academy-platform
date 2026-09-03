@@ -230,7 +230,7 @@ const handler = {
         result: {
           activation: { revision: 1, status: 'active' },
           audience: 'https://academy.cyberskills.co.th',
-          issuer: 'https://accounts.cyberskills.co.th/auth/v1',
+          issuer: 'https://supabase.cyberskills.co.th/auth/v1',
           nonce: nonceValue,
           serviceId: 'academy',
           subject: '00000000-0000-4000-8000-000000000000',
@@ -248,7 +248,7 @@ const handler = {
         expectedAudience: 'https://academy.cyberskills.co.th',
         expectedClientId: 'academy-web',
         expectedNonce: nonceValue,
-        expectedPrincipalIssuer: 'https://accounts.cyberskills.co.th/auth/v1',
+        expectedPrincipalIssuer: 'https://supabase.cyberskills.co.th/auth/v1',
         expectedServiceId: 'academy',
       })
       if (verified.subject !== '00000000-0000-4000-8000-000000000000' || verified.activation.status !== 'active') {
