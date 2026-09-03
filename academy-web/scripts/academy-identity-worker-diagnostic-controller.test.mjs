@@ -130,6 +130,16 @@ test('candidate readiness failure never invokes the Identity diagnostic and rest
   assert.deepEqual(fixture.state, baselineDeployment(IDS.restoredDeployment))
 })
 
+test('post-split receipt EPIPE stops progression and restores once without a later receipt', async () => {
+  const fixture = transactionFixture({ failReceiptAt: 'SPLIT_VERIFIED' })
+  await assert.rejects(runAcademyIdentityWorkerDiagnosticTransaction(fixture.options), fixedFailure)
+  assert.equal(fixture.calls.some(call => call.name === 'awaitCandidateReady'), false)
+  assert.equal(fixture.calls.some(call => call.name === 'invokeCandidateOnce'), false)
+  assert.equal(fixture.calls.filter(call => call.name === 'restoreBaseline').length, 1)
+  assert.deepEqual(fixture.receipts, SUCCESS_RECEIPTS.slice(0, 4))
+  assert.deepEqual(fixture.state, baselineDeployment(IDS.restoredDeployment))
+})
+
 for (const signal of ['SIGHUP', 'SIGINT', 'SIGTERM']) {
   for (const [stage, occurrence = 1] of [
     ['deployZeroPercentCandidate'],
@@ -462,6 +472,7 @@ test('production bundle exports only the diagnostic handler and existing Durable
 function transactionFixture(options = {}) {
   const calls = []
   const receipts = []
+  let receiptOutputFailed = false
   const signalSource = new EventEmitter()
   let state = baselineDeployment()
   let observedNonce = null
@@ -532,7 +543,13 @@ function transactionFixture(options = {}) {
       expectedSource: options.expectedSource ?? SOURCE,
       nonceSource: () => Buffer.alloc(32, 9),
       operationIdSource: () => OPERATION_ID,
-      onReceipt: receipt => receipts.push(receipt),
+      onReceipt: receipt => {
+        if (receiptOutputFailed || receipt === options.failReceiptAt) {
+          receiptOutputFailed = true
+          throw Object.assign(new Error('simulated output failure'), { code: 'EPIPE' })
+        }
+        receipts.push(receipt)
+      },
     },
   }
 }

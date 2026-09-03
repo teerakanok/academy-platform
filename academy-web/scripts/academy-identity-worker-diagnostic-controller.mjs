@@ -2,7 +2,7 @@
 
 import { spawn } from 'node:child_process'
 import { createHash, randomBytes, randomUUID } from 'node:crypto'
-import { createReadStream } from 'node:fs'
+import { createReadStream, writeSync } from 'node:fs'
 import { readFile, realpath, stat } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -887,6 +887,12 @@ function diagnosticHeaders(accessToken, versionId, nonce) {
   }
 }
 
+function writeFixedStageReceipt(receipt) {
+  if (!FIXED_STAGE_RECEIPTS.has(receipt)) fail()
+  const line = `ACADEMY_IDENTITY_WORKER_DIAGNOSTIC_STAGE=${receipt}\n`
+  if (Buffer.byteLength(line) > 128 || writeSync(1, line) !== Buffer.byteLength(line)) fail()
+}
+
 async function boundedFetch(fetchPort, url, init, { signal, deadline, clock }) {
   if (typeof fetchPort !== 'function' || !Number.isFinite(deadline)) fail()
   const remaining = Math.min(REQUEST_TIMEOUT_MS, deadline - clock())
@@ -936,9 +942,7 @@ if (entrypoint === fileURLToPath(import.meta.url)) {
     runAcademyIdentityWorkerDiagnosticTransaction({
       expectedBaseline: { deploymentId: args[1], versionId: args[3] },
       expectedSource: { revision: args[5], sha256: args[7] },
-      onReceipt: receipt => process.stdout.write(
-        `ACADEMY_IDENTITY_WORKER_DIAGNOSTIC_STAGE=${receipt}\n`,
-      ),
+      onReceipt: writeFixedStageReceipt,
     }).then(result => {
       process.stdout.write(`ACADEMY_IDENTITY_WORKER_DIAGNOSTIC_TRANSACTION=${result.marker}\n`)
     }).catch(() => {
