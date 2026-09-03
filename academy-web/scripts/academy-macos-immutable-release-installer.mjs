@@ -7,8 +7,6 @@ import { open, readFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { readAcademyReleasePackageInput } from './academy-release-cli.mjs'
-
 export const EXPECTED_RELEASE_SHA256 = 'fda0394cee9da9b2d1c37d2aa6e6185efc6bc54d072d21bab5e3771c3f7c8f25'
 export const EXPECTED_RELEASE_REVISION = '7de1cbfbd9e3606f44379ad0322b75109f10e583'
 export const PACKAGE_SOURCE = '/Users/teerakanok/.local/state/cyberskills/academy-release-930f/package.json'
@@ -20,7 +18,7 @@ const sha256 = bytes => createHash('sha256').update(bytes).digest('hex')
 const quote = value => `'${String(value).replaceAll("'", `'"'"'`)}'`
 
 export const PINNED_ASSETS = Object.freeze([
-  Object.freeze({ source: join(DIRECTORY, 'academy-macos-immutable-release-worker.sh'), name: 'worker.sh', mode: 0o500, sha256: '3b0d537d139faaffbe14d7d6d24db0ed8f88f6cb286a96cd29007ed0e5d923b0' }),
+  Object.freeze({ source: join(DIRECTORY, 'academy-macos-immutable-release-worker.sh'), name: 'worker.sh', mode: 0o500, sha256: '6159095bd6ab41aceb890f2a6dcebf7e416e09758f10ee721ef855227b92de0e' }),
   Object.freeze({ source: join(DIRECTORY, 'academy-release-cli.mjs'), name: 'academy-release-cli.mjs', mode: 0o400, sha256: 'ef405f7b9df4a8ba7ed45d232c347019b09ea4bc344a6cb86070706c811b9d9d' }),
   Object.freeze({ source: join(DIRECTORY, 'academy-release-render.mjs'), name: 'academy-release-render.mjs', mode: 0o400, sha256: '87d5ae93247db5a3ec374c0207d197483451b7e88db2bebcade2f89ba6dfccfc' }),
   Object.freeze({ source: join(DIRECTORY, 'academy-release-install.mjs'), name: 'academy-release-install.mjs', mode: 0o400, sha256: '4ec50af32ac10a26bc5bad2782a5f6faf3da7df3cabc87765007fa240a98eb72' }),
@@ -40,17 +38,57 @@ async function exactRegularFile(path, expectedSha256) {
   } finally { await handle.close() }
 }
 
-export async function collectInputs() {
-  for (const asset of PINNED_ASSETS) await exactRegularFile(asset.source, asset.sha256)
-  const packageBytes = await readFile(PACKAGE_SOURCE)
-  const input = await readAcademyReleasePackageInput({ path: PACKAGE_SOURCE })
-  if (input.releaseRevision !== EXPECTED_RELEASE_REVISION) throw new Error('ACADEMY_IMMUTABLE_INSTALLER_REJECTED')
-  const paths = [input.node.sourcePath, input.wrangler.sourceDirectory,
-    input.application.sourceDirectory, ...input.helpers.map(helper => helper.sourcePath)]
-  if (paths.some(path => path !== SOURCES_SOURCE && !path.startsWith(`${SOURCES_SOURCE}/`))) {
+const REVISION = /^[a-f0-9]{40}$/
+
+function validatePackageSnapshot(bytes, sourcesPath) {
+  const source = bytes.toString('utf8')
+  if (bytes.length !== Buffer.byteLength(source) || source.length < 2 || source.length > 1024 * 1024) {
     throw new Error('ACADEMY_IMMUTABLE_INSTALLER_REJECTED')
   }
-  return Object.freeze({ packageSha256: sha256(packageBytes) })
+  const value = JSON.parse(source)
+  const exact = (item, keys) => item && typeof item === 'object' && !Array.isArray(item) &&
+    Object.keys(item).length === keys.length && keys.every(key => Object.hasOwn(item, key))
+  if (!exact(value, ['schema','releaseRevision','nodeSource','wranglerDirectory',
+    'wranglerEntrypoint','applicationDirectory','helpers']) ||
+    value.schema !== 'academy-release-package-input/v2' ||
+    value.releaseRevision !== EXPECTED_RELEASE_REVISION ||
+    !REVISION.test(value.releaseRevision) || typeof value.nodeSource !== 'string' ||
+    typeof value.wranglerDirectory !== 'string' || typeof value.wranglerEntrypoint !== 'string' ||
+    typeof value.applicationDirectory !== 'string' || !Array.isArray(value.helpers) ||
+    value.helpers.length < 1 || !value.helpers.every(helper => exact(helper, ['sourcePath','path','mode']) &&
+      typeof helper.sourcePath === 'string' && typeof helper.path === 'string' &&
+      [0o400,0o444,0o500,0o555].includes(helper.mode))) {
+    throw new Error('ACADEMY_IMMUTABLE_INSTALLER_REJECTED')
+  }
+  if (new Set(value.helpers.map(helper => helper.path)).size !== value.helpers.length ||
+    new Set(value.helpers.map(helper => helper.sourcePath)).size !== value.helpers.length) {
+    throw new Error('ACADEMY_IMMUTABLE_INSTALLER_REJECTED')
+  }
+  const paths = [value.nodeSource, value.wranglerDirectory, value.applicationDirectory,
+    ...value.helpers.map(helper => helper.sourcePath)]
+  if (paths.some(path => path !== sourcesPath && !path.startsWith(`${sourcesPath}/`))) {
+    throw new Error('ACADEMY_IMMUTABLE_INSTALLER_REJECTED')
+  }
+  return value
+}
+
+export async function collectPackageInput(packagePath = PACKAGE_SOURCE, sourcesPath = SOURCES_SOURCE) {
+  const handle = await open(packagePath, constants.O_RDONLY | constants.O_NOFOLLOW)
+  try {
+    const metadata = await handle.stat()
+    if (!metadata.isFile() || metadata.nlink !== 1 || metadata.size < 2 ||
+      metadata.size > 1024 * 1024 || (metadata.mode & 0o022)) {
+      throw new Error('ACADEMY_IMMUTABLE_INSTALLER_REJECTED')
+    }
+    const bytes = await handle.readFile()
+    validatePackageSnapshot(bytes, sourcesPath)
+    return Object.freeze({ packageSha256: sha256(bytes) })
+  } finally { await handle.close() }
+}
+
+export async function collectInputs() {
+  for (const asset of PINNED_ASSETS) await exactRegularFile(asset.source, asset.sha256)
+  return collectPackageInput()
 }
 
 const envelope = (status, reason) => JSON.stringify({
@@ -86,7 +124,7 @@ export function buildRootCommand({ packageSha256 }) {
     `/usr/bin/test "$(/usr/bin/find ${quote(ROOT_TOOLING)} -mindepth 1 -maxdepth 1 -print | /usr/bin/wc -l | /usr/bin/tr -d ' ')" = ${quote(String(PINNED_ASSETS.length + 1))}`,
     `EXPECTED_RELEASE_REVISION=${quote(EXPECTED_RELEASE_REVISION)} /bin/sh ${quote(`${ROOT_TOOLING}/worker.sh`)} ${[
       PACKAGE_SOURCE, SOURCES_SOURCE, packageSha256, EXPECTED_RELEASE_SHA256,
-      EXPECTED_RELEASE_REVISION, ROOT_TOOLING,
+      EXPECTED_RELEASE_REVISION, ROOT_TOOLING, '/opt/academy', '/private/var/root',
     ].map(quote).join(' ')}`,
   ].join('\n')
   return `if ( ${bootstrap} ); then :; else /usr/bin/printf '%s\\n' ${quote(envelope('FAILED', 'ROOT_BOOTSTRAP_REJECTED'))}; fi`
