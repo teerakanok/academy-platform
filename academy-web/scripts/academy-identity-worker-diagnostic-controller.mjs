@@ -35,6 +35,11 @@ const RECOVERY_RESERVE_MS = 60_000
 const COMMAND_TIMEOUT_MS = 30_000
 const ACCESS_TIMEOUT_MS = 10_000
 const REQUEST_TIMEOUT_MS = 10_000
+const READINESS_TIMEOUT_MS = 5_000
+const READINESS_DELAY_MS = 1_000
+const READINESS_ATTEMPTS = 5
+const READINESS_HEADER = 'x-academy-identity-diagnostic-ready'
+const READINESS_VALUE = 'v1'
 const FIXED_MARKERS = new Set([
   'PASS_CODE_NOT_FOUND',
   'FAIL_BINDING',
@@ -43,6 +48,18 @@ const FIXED_MARKERS = new Set([
   'FAIL_SIGN_VERIFY',
   'FAIL_ASSERTION',
   'FAIL_ADMISSION',
+])
+const FIXED_STAGE_RECEIPTS = new Set([
+  'SOURCE_VERIFIED',
+  'BASELINE_VERIFIED',
+  'ACCESS_READY',
+  'CANDIDATE_UPLOADED',
+  'SPLIT_VERIFIED',
+  'SPLIT_HEALTH_VERIFIED',
+  'CANDIDATE_READY',
+  'DIAGNOSTIC_MARKER_RECEIVED',
+  'BASELINE_RESTORED',
+  'POSTCHECKS_VERIFIED',
 ])
 const SIGNALS = ['SIGHUP', 'SIGINT', 'SIGTERM']
 const SOURCE_PATHS = Object.freeze([
@@ -77,11 +94,12 @@ export async function runAcademyIdentityWorkerDiagnosticTransaction(options = {}
   const nonceSource = options.nonceSource ?? (() => randomBytes(32))
   const operationIdSource = options.operationIdSource ?? randomUUID
   const signalSource = options.signalSource ?? process
+  const onReceipt = options.onReceipt ?? (() => {})
   const startedAt = clock()
   const deadlineMs = startedAt + TRANSACTION_TIMEOUT_MS
   const expectedBaseline = validateExpectedBaseline(options.expectedBaseline)
   const expectedSource = validateSource(options.expectedSource)
-  if (!Number.isSafeInteger(startedAt)) fail()
+  if (!Number.isSafeInteger(startedAt) || typeof onReceipt !== 'function') fail()
 
   let nonce = Buffer.from(nonceSource())
   const operationId = operationIdSource()
@@ -114,6 +132,13 @@ export async function runAcademyIdentityWorkerDiagnosticTransaction(options = {}
   let requestCount = 0
   let primaryFailure = null
   let recoveryFailure = null
+  const emittedReceipts = new Set()
+
+  const receipt = value => {
+    if (!FIXED_STAGE_RECEIPTS.has(value) || emittedReceipts.has(value)) fail()
+    onReceipt(value)
+    emittedReceipts.add(value)
+  }
 
   const guard = () => {
     if (receivedSignal || abortController.signal.aborted
@@ -129,6 +154,7 @@ export async function runAcademyIdentityWorkerDiagnosticTransaction(options = {}
   try {
     source = validateSource(await step((signal, deadline) => ports.verifySource({ signal, deadline })))
     if (source.revision !== expectedSource.revision || source.sha256 !== expectedSource.sha256) fail()
+    receipt('SOURCE_VERIFIED')
     baseline = validateSingleDeployment(await step((signal, deadline) => ports.inspectDeployment({ signal, deadline })))
     if (baseline.deploymentId !== expectedBaseline.deploymentId
       || baseline.versionId !== expectedBaseline.versionId) fail()
@@ -139,7 +165,9 @@ export async function runAcademyIdentityWorkerDiagnosticTransaction(options = {}
     })), baseline.versionId)
     if (!baselineVersion.bindings.some(binding => binding.name === ASSERTION_BINDING && binding.type === 'secret_text')) fail()
     baselineHealth = validateHealth(await step((signal, deadline) => ports.capturePublicHealth({ signal, deadline })))
+    receipt('BASELINE_VERIFIED')
     await step((signal, deadline) => ports.prepareAccess({ signal, deadline }))
+    receipt('ACCESS_READY')
 
     uploadAttempted = true
     candidate = validateCandidate(await step((signal, deadline) => ports.uploadCandidate({
@@ -156,6 +184,7 @@ export async function runAcademyIdentityWorkerDiagnosticTransaction(options = {}
       await step((signal, deadline) => ports.inspectDeployment({ signal, deadline })),
       baseline,
     )
+    receipt('CANDIDATE_UPLOADED')
 
     splitAttempted = true
     const split = validateSplitDeployment(await step((signal, deadline) => ports.deployZeroPercentCandidate({
@@ -171,8 +200,18 @@ export async function runAcademyIdentityWorkerDiagnosticTransaction(options = {}
       candidate,
       splitDeploymentId,
     )
+    receipt('SPLIT_VERIFIED')
     const splitHealth = validateHealth(await step((signal, deadline) => ports.capturePublicHealth({ signal, deadline })))
     if (!sameHealth(baselineHealth, splitHealth)) fail()
+    receipt('SPLIT_HEALTH_VERIFIED')
+
+    await step((signal, deadline) => ports.awaitCandidateReady({
+      candidate,
+      nonce,
+      signal,
+      deadline,
+    }))
+    receipt('CANDIDATE_READY')
 
     if (requestCount !== 0) fail()
     requestCount += 1
@@ -183,6 +222,7 @@ export async function runAcademyIdentityWorkerDiagnosticTransaction(options = {}
       deadline,
     }))
     if (!FIXED_MARKERS.has(marker) || requestCount !== 1) fail()
+    receipt('DIAGNOSTIC_MARKER_RECEIVED')
   } catch (error) {
     primaryFailure = error
   } finally {
@@ -210,6 +250,7 @@ export async function runAcademyIdentityWorkerDiagnosticTransaction(options = {}
           deadline: deadlineMs,
         }), baseline, splitDeploymentId)
         restoredDeploymentId = restored.deploymentId
+        receipt('BASELINE_RESTORED')
       }
     })
     await recover(async () => {
@@ -241,6 +282,9 @@ export async function runAcademyIdentityWorkerDiagnosticTransaction(options = {}
       }
     })
     await recover(() => ports.close())
+    if (baseline && candidate && splitAttempted && restoredDeploymentId && recoveryErrors.length === 0) {
+      await recover(() => receipt('POSTCHECKS_VERIFIED'))
+    }
     recoveryFailure = recoveryErrors.length > 0 ? new Error('recovery failed') : null
     nonce.fill(0)
     nonce = Buffer.alloc(0)
@@ -436,6 +480,34 @@ export function createAcademyIdentityWorkerDiagnosticProductionPorts(options = {
       ], { signal, deadline })
       return inspectDeployment({ signal, deadline })
     },
+    async awaitCandidateReady({ candidate, nonce, signal, deadline }) {
+      if (!accessToken || !ACCESS_TOKEN.test(accessToken)) fail()
+      const nonceText = nonce.toString('base64url')
+      if (!BASE64URL_32.test(nonceText)) fail()
+      for (let attempt = 1; attempt <= READINESS_ATTEMPTS; attempt += 1) {
+        let ready = false
+        try {
+          const response = await boundedFetch(fetchPort, DIAGNOSTIC_URL, {
+            method: 'HEAD',
+            redirect: 'manual',
+            headers: diagnosticHeaders(accessToken, candidate.versionId, nonceText),
+          }, { signal, deadline: Math.min(deadline, clock() + READINESS_TIMEOUT_MS), clock })
+          ready = response.url === DIAGNOSTIC_URL
+            && !response.redirected
+            && response.status === 204
+            && response.headers.get('cache-control') === 'no-store'
+            && response.headers.get(READINESS_HEADER) === READINESS_VALUE
+          await response.body?.cancel().catch(() => {})
+        } catch {
+          if (signal?.aborted) fail()
+        }
+        if (ready) return
+        if (attempt === READINESS_ATTEMPTS || clock() + READINESS_DELAY_MS >= deadline) fail()
+        await delay(READINESS_DELAY_MS)
+        if (signal?.aborted) fail()
+      }
+      fail()
+    },
     async invokeCandidateOnce({ candidate, nonce, signal, deadline }) {
       if (invocationCount !== 0 || !accessToken || !ACCESS_TOKEN.test(accessToken)) fail()
       invocationCount += 1
@@ -444,15 +516,7 @@ export function createAcademyIdentityWorkerDiagnosticProductionPorts(options = {
       const response = await boundedFetch(fetchPort, DIAGNOSTIC_URL, {
         method: 'POST',
         redirect: 'manual',
-        headers: {
-          'cf-access-token': accessToken,
-          'cloudflare-workers-version-overrides': `${WORKER}="${candidate.versionId}"`,
-          origin: CANONICAL_ORIGIN,
-          'sec-fetch-site': 'same-origin',
-          'x-academy-diagnostic-nonce': nonceText,
-          'x-academy-diagnostic-operation': DIAGNOSTIC_OPERATION,
-          'x-academy-diagnostic-version': candidate.versionId,
-        },
+        headers: diagnosticHeaders(accessToken, candidate.versionId, nonceText),
       }, { signal, deadline: Math.min(deadline, clock() + REQUEST_TIMEOUT_MS), clock })
       if (response.url !== DIAGNOSTIC_URL || response.redirected
         || response.headers.get('content-type')?.split(';', 1)[0]?.trim().toLowerCase() !== 'text/plain'
@@ -600,7 +664,8 @@ function groupAlive(pid) {
 function assertPorts(ports) {
   for (const name of [
     'verifySource', 'revalidateSource', 'prepareAccess', 'inspectDeployment', 'inspectVersion',
-    'capturePublicHealth', 'uploadCandidate', 'deployZeroPercentCandidate', 'invokeCandidateOnce',
+    'capturePublicHealth', 'uploadCandidate', 'deployZeroPercentCandidate', 'awaitCandidateReady',
+    'invokeCandidateOnce',
     'reconcileOwnedCandidate', 'restoreBaseline', 'verifyCandidateDetached', 'close',
   ]) if (typeof ports?.[name] !== 'function') fail()
 }
@@ -810,6 +875,18 @@ async function publicHealth(path, { fetchPort, signal, deadline, clock }) {
   return 'ACCESS_302'
 }
 
+function diagnosticHeaders(accessToken, versionId, nonce) {
+  return {
+    'cf-access-token': accessToken,
+    'cloudflare-workers-version-overrides': `${WORKER}="${versionId}"`,
+    origin: CANONICAL_ORIGIN,
+    'sec-fetch-site': 'same-origin',
+    'x-academy-diagnostic-nonce': nonce,
+    'x-academy-diagnostic-operation': DIAGNOSTIC_OPERATION,
+    'x-academy-diagnostic-version': versionId,
+  }
+}
+
 async function boundedFetch(fetchPort, url, init, { signal, deadline, clock }) {
   if (typeof fetchPort !== 'function' || !Number.isFinite(deadline)) fail()
   const remaining = Math.min(REQUEST_TIMEOUT_MS, deadline - clock())
@@ -859,6 +936,9 @@ if (entrypoint === fileURLToPath(import.meta.url)) {
     runAcademyIdentityWorkerDiagnosticTransaction({
       expectedBaseline: { deploymentId: args[1], versionId: args[3] },
       expectedSource: { revision: args[5], sha256: args[7] },
+      onReceipt: receipt => process.stdout.write(
+        `ACADEMY_IDENTITY_WORKER_DIAGNOSTIC_STAGE=${receipt}\n`,
+      ),
     }).then(result => {
       process.stdout.write(`ACADEMY_IDENTITY_WORKER_DIAGNOSTIC_TRANSACTION=${result.marker}\n`)
     }).catch(() => {

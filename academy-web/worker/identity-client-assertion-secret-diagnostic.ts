@@ -13,6 +13,8 @@ const EXPECTED_PUBLIC_JWK_SHA256 = '8b7a176b27ac5ffc7eb65fbe9d1b0724b1e1b24e91d8
 const MAX_PRIVATE_JWK_BYTES = 4_096
 const MAX_RESPONSE_BYTES = 512
 const ACCESS_ASSERTION_MAX_CHARACTERS = 8_192
+const READINESS_HEADER = 'x-academy-identity-diagnostic-ready'
+const READINESS_VALUE = 'v1'
 const VERSION_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 const BASE64URL_32 = /^[A-Za-z0-9_-]{43}$/
 const ACCESS_ASSERTION = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/
@@ -195,6 +197,15 @@ export function createIdentityClientAssertionSecretDiagnosticWorker(
     async fetch(request, environment) {
       const admitted = requestAdmission(request, environment)
       if (!admitted) return fixedResponse('DENIED', 404)
+      if (request.method === 'HEAD') {
+        return new Response(null, {
+          status: 204,
+          headers: {
+            'cache-control': 'no-store',
+            [READINESS_HEADER]: READINESS_VALUE,
+          },
+        })
+      }
       const marker = await runDiagnostic(environment.IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK)
       return fixedResponse(marker, marker === 'PASS_CODE_NOT_FOUND' ? 200 : 503)
     },
@@ -206,7 +217,7 @@ function requestAdmission(request: Request, environment: DiagnosticEnvironment):
     const url = new URL(request.url)
     const versionId = environment.CF_VERSION_METADATA?.id
     const accessAssertion = request.headers.get('cf-access-jwt-assertion')
-    return request.method === 'POST'
+    return (request.method === 'POST' || request.method === 'HEAD')
       && request.body === null
       && url.origin === CANONICAL_ORIGIN
       && url.pathname === DIAGNOSTIC_PATH

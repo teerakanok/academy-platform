@@ -36,6 +36,18 @@ const IDS = Object.freeze({
 const SOURCE = Object.freeze({ revision: 'a'.repeat(40), sha256: 'b'.repeat(64) })
 const OPERATION_ID = '66666666-6666-4666-8666-666666666666'
 const HEALTH = Object.freeze({ root: 'ACCESS_302', callback: 'ACCESS_302' })
+const SUCCESS_RECEIPTS = Object.freeze([
+  'SOURCE_VERIFIED',
+  'BASELINE_VERIFIED',
+  'ACCESS_READY',
+  'CANDIDATE_UPLOADED',
+  'SPLIT_VERIFIED',
+  'SPLIT_HEALTH_VERIFIED',
+  'CANDIDATE_READY',
+  'DIAGNOSTIC_MARKER_RECEIVED',
+  'BASELINE_RESTORED',
+  'POSTCHECKS_VERIFIED',
+])
 const BASELINE_VERSION = Object.freeze({
   versionId: IDS.baselineVersion,
   bindings: [
@@ -56,9 +68,10 @@ test('transaction admits exactly one request and restores the exact baseline', a
   assert.deepEqual(fixture.calls.map(call => call.name), [
     'verifySource', 'inspectDeployment', 'inspectVersion', 'capturePublicHealth', 'prepareAccess',
     'uploadCandidate', 'revalidateSource', 'inspectDeployment', 'deployZeroPercentCandidate',
-    'inspectDeployment', 'capturePublicHealth', 'invokeCandidateOnce', 'restoreBaseline',
+    'inspectDeployment', 'capturePublicHealth', 'awaitCandidateReady', 'invokeCandidateOnce', 'restoreBaseline',
     'inspectDeployment', 'capturePublicHealth', 'verifyCandidateDetached', 'close',
   ])
+  assert.deepEqual(fixture.receipts, SUCCESS_RECEIPTS)
   assert.equal(fixture.calls.filter(call => call.name === 'invokeCandidateOnce').length, 1)
   assert.equal(fixture.calls.filter(call => call.name === 'restoreBaseline').length, 1)
   assert.ok(fixture.observedNonce?.every(byte => byte === 0))
@@ -103,11 +116,26 @@ test('ambiguous request failure is never retried and restores baseline once', as
   assert.ok(fixture.observedNonce?.every(byte => byte === 0))
 })
 
+test('candidate readiness failure never invokes the Identity diagnostic and restores once', async () => {
+  const fixture = transactionFixture({ failStage: 'awaitCandidateReady' })
+  await assert.rejects(runAcademyIdentityWorkerDiagnosticTransaction(fixture.options), fixedFailure)
+  assert.equal(fixture.calls.filter(call => call.name === 'awaitCandidateReady').length, 1)
+  assert.equal(fixture.calls.some(call => call.name === 'invokeCandidateOnce'), false)
+  assert.equal(fixture.calls.filter(call => call.name === 'restoreBaseline').length, 1)
+  assert.deepEqual(fixture.receipts, [
+    ...SUCCESS_RECEIPTS.slice(0, 6),
+    'BASELINE_RESTORED',
+    'POSTCHECKS_VERIFIED',
+  ])
+  assert.deepEqual(fixture.state, baselineDeployment(IDS.restoredDeployment))
+})
+
 for (const signal of ['SIGHUP', 'SIGINT', 'SIGTERM']) {
   for (const [stage, occurrence = 1] of [
     ['deployZeroPercentCandidate'],
     ['inspectDeployment', 3],
     ['capturePublicHealth', 2],
+    ['awaitCandidateReady'],
     ['invokeCandidateOnce'],
   ]) {
     test(`${signal} at post-split ${stage} stops progression and serializes one restore`, async () => {
@@ -156,7 +184,8 @@ test('production adapter transmits nonce only over fd3 and executes exact split/
   const calls = []
   const secretPayloads = []
   const accessToken = 'eyJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJhY2FkZW15In0.c2lnbmF0dXJl'
-  let requestCount = 0
+  let readinessRequests = 0
+  let diagnosticRequests = 0
   let accessOutput = null
   const root = new URL('..', import.meta.url).pathname.replace(/\/$/, '')
   const runProcess = async input => {
@@ -224,11 +253,27 @@ test('production adapter transmits nonce only over fd3 and executes exact split/
     if (url !== 'https://academy.cyberskills.co.th/.well-known/academy-ops/identity-client-assertion-custody-v1') {
       return accessRedirect(url)
     }
-    requestCount += 1
-    assert.equal(init.method, 'POST')
     assert.equal(init.headers['cf-access-token'], accessToken)
     assert.equal(init.headers['cloudflare-workers-version-overrides'], `cyberskills-academy="${IDS.candidateVersion}"`)
     assert.match(init.headers['x-academy-diagnostic-nonce'], /^[A-Za-z0-9_-]{43}$/)
+    if (init.method === 'HEAD') {
+      readinessRequests += 1
+      assert.equal(init.body, undefined)
+      if (readinessRequests === 1) throw new Error('simulated readiness transport loss')
+      const result = readinessRequests < 3
+        ? new Response('baseline fallback', { status: 404 })
+        : new Response(null, {
+            status: 204,
+            headers: {
+              'cache-control': 'no-store',
+              'x-academy-identity-diagnostic-ready': 'v1',
+            },
+          })
+      Object.defineProperty(result, 'url', { value: url })
+      return result
+    }
+    diagnosticRequests += 1
+    assert.equal(init.method, 'POST')
     const result = new Response('ACADEMY_IDENTITY_WORKER_DIAGNOSTIC=PASS_CODE_NOT_FOUND\n', {
       status: 200,
       headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' },
@@ -256,7 +301,8 @@ test('production adapter transmits nonce only over fd3 and executes exact split/
   })
   assert.equal(result.marker, 'PASS_CODE_NOT_FOUND')
   assert.ok(accessOutput.stdout.every(byte => byte === 0))
-  assert.equal(requestCount, 1)
+  assert.equal(readinessRequests, 3)
+  assert.equal(diagnosticRequests, 1)
   assert.equal(secretPayloads.length, 1)
   assert.deepEqual(Object.keys(secretPayloads[0]), ['ACADEMY_IDENTITY_DIAGNOSTIC_NONCE'])
   assert.match(secretPayloads[0].ACADEMY_IDENTITY_DIAGNOSTIC_NONCE, /^[A-Za-z0-9_-]{43}$/)
@@ -279,7 +325,42 @@ test('production adapter transmits nonce only over fd3 and executes exact split/
     nonce: Buffer.alloc(32, 7),
     deadline: Date.now() + 1_000,
   }), fixedFailure)
-  assert.equal(requestCount, 1)
+  assert.equal(diagnosticRequests, 1)
+})
+
+test('production readiness retries only bodyless candidate probes and exhausts before POST', async () => {
+  const root = new URL('..', import.meta.url).pathname.replace(/\/$/, '')
+  const accessToken = 'eyJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJhY2FkZW15In0.c2lnbmF0dXJl'
+  let readinessRequests = 0
+  const ports = createAcademyIdentityWorkerDiagnosticProductionPorts({
+    root,
+    wrangler: `${root}/node_modules/wrangler/wrangler-dist/cli.js`,
+    cloudflared: '/opt/homebrew/Cellar/cloudflared/2026.6.0/bin/cloudflared',
+    node: process.execPath,
+    runProcess: async input => {
+      if (input.args[0] === '--version') {
+        return output('cloudflared version 2026.6.0 (built 2026-06-08T18:16:09Z)\n')
+      }
+      if (input.args[0] === 'access') return output(`${accessToken}\n`)
+      throw new Error('unexpected command')
+    },
+    fetchPort: async (url, init) => {
+      readinessRequests += 1
+      assert.equal(init.method, 'HEAD')
+      const response = new Response('baseline fallback', { status: 404 })
+      Object.defineProperty(response, 'url', { value: url })
+      return response
+    },
+    delay: async () => {},
+  })
+  await ports.prepareAccess({ deadline: Date.now() + 30_000 })
+  await assert.rejects(ports.awaitCandidateReady({
+    candidate: { versionId: IDS.candidateVersion },
+    nonce: Buffer.alloc(32, 7),
+    deadline: Date.now() + 30_000,
+  }), fixedFailure)
+  assert.equal(readinessRequests, 5)
+  await ports.close()
 })
 
 test('bounded process kills an overflowing process group before its deadline', async () => {
@@ -380,6 +461,7 @@ test('production bundle exports only the diagnostic handler and existing Durable
 
 function transactionFixture(options = {}) {
   const calls = []
+  const receipts = []
   const signalSource = new EventEmitter()
   let state = baselineDeployment()
   let observedNonce = null
@@ -425,6 +507,7 @@ function transactionFixture(options = {}) {
       state = splitDeployment()
       return structuredClone(state)
     }),
+    awaitCandidateReady: input => call('awaitCandidateReady', input),
     invokeCandidateOnce: input => call('invokeCandidateOnce', input,
       options.invokeResult ?? (() => 'PASS_CODE_NOT_FOUND')),
     restoreBaseline: input => call('restoreBaseline', input, () => {
@@ -437,6 +520,7 @@ function transactionFixture(options = {}) {
   }
   return {
     calls,
+    receipts,
     signalSource,
     get state() { return state },
     get observedNonce() { return observedNonce },
@@ -448,6 +532,7 @@ function transactionFixture(options = {}) {
       expectedSource: options.expectedSource ?? SOURCE,
       nonceSource: () => Buffer.alloc(32, 9),
       operationIdSource: () => OPERATION_ID,
+      onReceipt: receipt => receipts.push(receipt),
     },
   }
 }

@@ -201,6 +201,30 @@ describe('Worker-resident Identity client assertion secret diagnostic', () => {
     expect(run).toHaveBeenCalledTimes(1)
   })
 
+  it('uses a bodyless HEAD marker for candidate readiness without reading the JWK or calling Identity', async () => {
+    const run = vi.fn(async () => 'PASS_CODE_NOT_FOUND' as const)
+    const worker = createIdentityClientAssertionSecretDiagnosticWorker(run)
+    const environment = {
+      IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK: 'protected-value-not-inspected-by-handler-test',
+      ACADEMY_IDENTITY_DIAGNOSTIC_NONCE: DIAGNOSTIC_NONCE,
+      CF_VERSION_METADATA: { id: VERSION_ID },
+    }
+
+    const ready = await worker.fetch(request({ method: 'HEAD' }), environment, {})
+    expect(ready.status).toBe(204)
+    expect(ready.body).toBeNull()
+    expect(ready.headers.get('cache-control')).toBe('no-store')
+    expect(ready.headers.get('x-academy-identity-diagnostic-ready')).toBe('v1')
+    expect(run).not.toHaveBeenCalled()
+
+    const denied = await worker.fetch(request({
+      method: 'HEAD',
+      headers: { 'x-academy-diagnostic-nonce': 'M'.repeat(43) },
+    }), environment, {})
+    expect(denied.status).toBe(404)
+    expect(run).not.toHaveBeenCalled()
+  })
+
   it('keeps the candidate least-privilege, non-preview, non-observable, and secret-only', () => {
     const config = JSON.parse(readFileSync(new URL(
       '../../wrangler.identity-client-assertion-diagnostic.jsonc',
@@ -260,13 +284,14 @@ describe('Worker-resident Identity client assertion secret diagnostic', () => {
 
 function request(overrides: {
   url?: string
+  method?: 'GET' | 'HEAD' | 'POST'
   headers?: Record<string, string>
   body?: string
 } = {}): Request {
   return new Request(
     overrides.url ?? `https://academy.cyberskills.co.th${IDENTITY_SECRET_DIAGNOSTIC.path}`,
     {
-      method: 'POST',
+      method: overrides.method ?? 'POST',
       headers: {
         origin: 'https://academy.cyberskills.co.th',
         'sec-fetch-site': 'same-origin',
