@@ -11,6 +11,23 @@ import {
 
 const FAILURE_MESSAGE = 'Identity code exchange response transport failed'
 
+/**
+ * The exact RequestInit the production exchange uses. Exported so the workerd harness can
+ * prove the runtime accepts it: workerd rejects redirect: 'error' with a TypeError before any
+ * I/O, and Node-side unit tests cannot see that. 'manual' plus the strict 200 check refuses a
+ * redirect exactly the same way.
+ */
+export const CODE_EXCHANGE_FETCH_INIT = Object.freeze({
+  method: 'POST',
+  headers: Object.freeze({
+    accept: 'application/json',
+    'content-type': 'application/json',
+  }),
+  cache: 'no-store',
+  credentials: 'omit',
+  redirect: 'manual',
+} as const satisfies RequestInit)
+
 export type IdentityCodeExchangeFetchPort = {
   fetch(endpoint: string, init: RequestInit): Promise<Response>
 }
@@ -101,17 +118,8 @@ async function executeFetch(input: {
     timerArmed = true
 
     const fetchPromise = Promise.resolve(input.fetchMethod.call(input.fetchPort, input.endpoint, {
-      method: 'POST',
-      headers: {
-        accept: 'application/json',
-        'content-type': 'application/json',
-      },
+      ...CODE_EXCHANGE_FETCH_INIT,
       body: JSON.stringify(input.request),
-      cache: 'no-store',
-      credentials: 'omit',
-      // workerd rejects redirect: 'error' with a TypeError before any I/O; 'manual' plus
-      // the strict 200 check below refuses a redirect exactly the same way.
-      redirect: 'manual',
       signal: controller.signal,
     }))
     void fetchPromise.then((lateResponse) => {

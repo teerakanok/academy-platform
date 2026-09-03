@@ -11,6 +11,7 @@ import {
   createIdentityClientAssertionWebCryptoSigner,
   IdentityClientAssertionWebCryptoSignerFailure,
 } from '../../src/lib/identity/client-assertion-webcrypto-signer'
+import { CODE_EXCHANGE_FETCH_INIT } from '../../src/lib/identity/code-exchange-response-transport'
 
 type Check = { name: string, passed: boolean, detail: string }
 
@@ -178,6 +179,19 @@ const handler = {
         throw new Error('accepted')
       })
     }
+
+    await record('code-exchange-fetch-init-accepted-by-workerd', async () => {
+      // No network: constructing the Request is where workerd validates RequestInit.
+      const request = new Request('https://accounts.cyberskills.co.th/v1/code/exchange', {
+        ...CODE_EXCHANGE_FETCH_INIT,
+        body: '{}',
+        signal: new AbortController().signal,
+      })
+      if (request.method !== 'POST' || request.redirect !== 'manual') {
+        throw new Error(`unexpected request shape: ${request.method} ${request.redirect}`)
+      }
+      return 'workerd accepted the production code exchange RequestInit'
+    })
 
     const failed = checks.filter((check) => !check.passed)
     return Response.json({ ok: failed.length === 0, nonce, checks }, {
