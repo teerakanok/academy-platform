@@ -1,13 +1,30 @@
 import assert from 'node:assert/strict'
 import { EventEmitter } from 'node:events'
+import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import { test } from 'node:test'
 
+import { build } from 'esbuild'
+
 import {
   createAcademyIdentityWorkerDiagnosticProductionPorts,
+  computeAcademyIdentityWorkerDiagnosticSourceSha256,
   runBoundedProcess,
   runAcademyIdentityWorkerDiagnosticTransaction,
 } from './academy-identity-worker-diagnostic-controller.mjs'
+
+const PRODUCTION_SOURCE_PATHS = Object.freeze([
+  'worker/identity-client-assertion-secret-diagnostic-entry.ts',
+  'worker/identity-client-assertion-secret-diagnostic.ts',
+  'worker/edge-rate-limiter-do.ts',
+  'wrangler.identity-client-assertion-diagnostic.jsonc',
+  'src/lib/edge-rate-limit-policy.ts',
+  'src/lib/identity/client-assertion-provider.ts',
+  'src/lib/identity/client-assertion-webcrypto-signer.ts',
+  'scripts/current-deployment.mjs',
+  'scripts/academy-identity-worker-diagnostic-controller.mjs',
+  'package-lock.json',
+])
 
 const IDS = Object.freeze({
   baselineDeployment: '11111111-1111-4111-8111-111111111111',
@@ -320,6 +337,45 @@ test('production source and config bind the nonce before private-key access', as
   assert.match(controller, /'--secrets-file', '\/dev\/fd\/3'/)
   assert.match(controller, /delete environment\.NODE_OPTIONS[\s\S]+delete environment\.NODE_PATH/)
   assert.doesNotMatch(controller, /console\.|secretInput\.toString\(/)
+})
+
+test('source digest binds every diagnostic and Durable Object source byte', async () => {
+  const root = new URL('..', import.meta.url)
+  const expected = createHash('sha256')
+  for (const path of [...PRODUCTION_SOURCE_PATHS].sort()) {
+    expected.update(`${path}\0`)
+    expected.update(await readFile(new URL(path, root)))
+    expected.update('\0')
+  }
+  assert.equal(
+    await computeAcademyIdentityWorkerDiagnosticSourceSha256(root.pathname.replace(/\/$/, '')),
+    expected.digest('hex'),
+  )
+})
+
+test('production bundle exports only the diagnostic handler and existing Durable Object class', async () => {
+  const result = await build({
+    entryPoints: ['worker/identity-client-assertion-secret-diagnostic-entry.ts'],
+    bundle: true,
+    write: false,
+    platform: 'neutral',
+    format: 'esm',
+    external: ['cloudflare:workers'],
+    metafile: true,
+    logLevel: 'silent',
+  })
+  const output = Object.values(result.metafile.outputs)
+  assert.equal(output.length, 1)
+  assert.deepEqual(output[0].exports.sort(), ['EdgeRateLimiter', 'default'])
+  const bundledInputs = Object.keys(result.metafile.inputs).sort()
+  assert.deepEqual(bundledInputs, [
+    'src/lib/identity/client-assertion-provider.ts',
+    'src/lib/identity/client-assertion-webcrypto-signer.ts',
+    'worker/edge-rate-limiter-do.ts',
+    'worker/identity-client-assertion-secret-diagnostic-entry.ts',
+    'worker/identity-client-assertion-secret-diagnostic.ts',
+  ])
+  for (const path of bundledInputs) assert.ok(PRODUCTION_SOURCE_PATHS.includes(path))
 })
 
 function transactionFixture(options = {}) {

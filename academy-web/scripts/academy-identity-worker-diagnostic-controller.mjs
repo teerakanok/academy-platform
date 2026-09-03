@@ -46,8 +46,11 @@ const FIXED_MARKERS = new Set([
 ])
 const SIGNALS = ['SIGHUP', 'SIGINT', 'SIGTERM']
 const SOURCE_PATHS = Object.freeze([
+  'worker/identity-client-assertion-secret-diagnostic-entry.ts',
   'worker/identity-client-assertion-secret-diagnostic.ts',
+  'worker/edge-rate-limiter-do.ts',
   'wrangler.identity-client-assertion-diagnostic.jsonc',
+  'src/lib/edge-rate-limit-policy.ts',
   'src/lib/identity/client-assertion-provider.ts',
   'src/lib/identity/client-assertion-webcrypto-signer.ts',
   'scripts/current-deployment.mjs',

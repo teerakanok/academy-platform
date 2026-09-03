@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "main": "worker/identity-client-assertion-secret-diagnostic.ts",
+  "main": "worker/identity-client-assertion-secret-diagnostic-entry.ts",
   "name": "cyberskills-academy",
   "minify": true,
   "compatibility_date": "2025-03-25",

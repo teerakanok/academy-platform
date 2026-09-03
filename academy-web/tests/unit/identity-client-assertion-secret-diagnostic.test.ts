@@ -207,7 +207,7 @@ describe('Worker-resident Identity client assertion secret diagnostic', () => {
       import.meta.url,
     ), 'utf8'))
     expect(config).toMatchObject({
-      main: 'worker/identity-client-assertion-secret-diagnostic.ts',
+      main: 'worker/identity-client-assertion-secret-diagnostic-entry.ts',
       name: 'cyberskills-academy',
       compatibility_flags: ['global_fetch_strictly_public'],
       limits: { cpu_ms: 500 },
@@ -233,6 +233,28 @@ describe('Worker-resident Identity client assertion secret diagnostic', () => {
     expect(source).not.toMatch(/console\.|\.stack|error\.message|JSON\.stringify\(privateJwk|privateJwkText\}/)
     expect(source).toContain('ACADEMY_IDENTITY_WORKER_DIAGNOSTIC=${marker}')
     expect(source).toContain("'cache-control': 'no-store'")
+  })
+
+  it('preserves the existing Durable Object class export without adding a diagnostic binding', () => {
+    const entrypoint = readFileSync(new URL(
+      '../../worker/identity-client-assertion-secret-diagnostic-entry.ts',
+      import.meta.url,
+    ), 'utf8')
+    const durableObject = readFileSync(new URL(
+      '../../worker/edge-rate-limiter-do.ts',
+      import.meta.url,
+    ), 'utf8')
+    const config = JSON.parse(readFileSync(new URL(
+      '../../wrangler.identity-client-assertion-diagnostic.jsonc',
+      import.meta.url,
+    ), 'utf8'))
+
+    expect(entrypoint).toBe(
+      "export { EdgeRateLimiter } from './edge-rate-limiter-do'\n"
+      + "export { default } from './identity-client-assertion-secret-diagnostic'\n",
+    )
+    expect(durableObject).toMatch(/export class EdgeRateLimiter extends DurableObject/)
+    expect(config).not.toHaveProperty('durable_objects')
   })
 })
 
