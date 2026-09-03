@@ -12,6 +12,8 @@ import {
   IdentityClientAssertionWebCryptoSignerFailure,
 } from '../../src/lib/identity/client-assertion-webcrypto-signer'
 import { CODE_EXCHANGE_FETCH_INIT } from '../../src/lib/identity/code-exchange-response-transport'
+import { createIdentityCodeExchangeResultVerifierPort } from '../../src/lib/identity/code-exchange-result-verifier-port'
+import { importIdentityResultKeySet } from '../../src/lib/identity/result-key-set-importer'
 
 type Check = { name: string, passed: boolean, detail: string }
 
@@ -191,6 +193,68 @@ const handler = {
         throw new Error(`unexpected request shape: ${request.method} ${request.redirect}`)
       }
       return 'workerd accepted the production code exchange RequestInit'
+    })
+
+    await record('result-verification-accepts-identity-shape-on-workerd', async () => {
+      // Self-signed fixture in Identity release 60920c9's exact envelope/claim/result shape,
+      // verified through Academy's real importer + verifier port on workerd (no network).
+      const resultPair = await crypto.subtle.generateKey(
+        { name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify'],
+      ) as CryptoKeyPair
+      const pub = await crypto.subtle.exportKey('jwk', resultPair.publicKey)
+      const keySetDocument = JSON.stringify({
+        issuer: 'https://accounts.cyberskills.co.th/v1/code/results',
+        revision: 1,
+        keys: [{
+          algorithm: 'ES256',
+          keyId: 'identity-result-prod-2026-08',
+          publicJwk: { kty: 'EC', crv: 'P-256', x: pub.x, y: pub.y },
+          state: 'active',
+        }],
+        retiredKeyFingerprints: [],
+        retiredKeyIds: [],
+      })
+      const imported = await importIdentityResultKeySet(keySetDocument)
+      const now = new Date()
+      const nowSeconds = Math.floor(now.getTime() / 1_000)
+      const encode = (value: unknown) => btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(value))))
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+      const header = encode({ alg: 'ES256', kid: 'identity-result-prod-2026-08', typ: 'identity-code-exchange-result+jwt' })
+      const nonceValue = 'n'.repeat(43)
+      const claims = encode({
+        aud: 'https://academy.cyberskills.co.th',
+        clientId: 'academy-web',
+        exp: nowSeconds + 60,
+        iat: nowSeconds,
+        iss: 'https://accounts.cyberskills.co.th/v1/code/results',
+        result: {
+          activation: { revision: 1, status: 'active' },
+          audience: 'https://academy.cyberskills.co.th',
+          issuer: 'https://accounts.cyberskills.co.th/auth/v1',
+          nonce: nonceValue,
+          serviceId: 'academy',
+          subject: '00000000-0000-4000-8000-000000000000',
+          verifiedEmail: 'canary@example.test',
+        },
+      })
+      const signature = new Uint8Array(await crypto.subtle.sign(
+        { name: 'ECDSA', hash: 'SHA-256' }, resultPair.privateKey, new TextEncoder().encode(`${header}.${claims}`),
+      ))
+      const signedResult = `${header}.${claims}.${btoa(String.fromCharCode(...signature)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')}`
+      const verifier = createIdentityCodeExchangeResultVerifierPort({
+        clock: () => now, clockSkewSeconds: 30, keySet: imported.keySet, maximumLifetimeSeconds: 120,
+      })
+      const verified = await verifier.verify({ signedResult }, {
+        expectedAudience: 'https://academy.cyberskills.co.th',
+        expectedClientId: 'academy-web',
+        expectedNonce: nonceValue,
+        expectedPrincipalIssuer: 'https://accounts.cyberskills.co.th/auth/v1',
+        expectedServiceId: 'academy',
+      })
+      if (verified.subject !== '00000000-0000-4000-8000-000000000000' || verified.activation.status !== 'active') {
+        throw new Error('verified result did not round-trip')
+      }
+      return 'importer + verifier accepted a 60 s ES256 result of the Identity shape on workerd'
     })
 
     const failed = checks.filter((check) => !check.passed)

@@ -61,6 +61,7 @@ const REQUIRED_CHECKS = [
   'rejects-a-parsed-object',
   'rejects-a-surplus-member',
   'rejects-non-json',
+  'result-verification-accepts-identity-shape-on-workerd',
   'runtime-is-workerd',
   'signer-imports-non-extractable-sign-only',
   'signs-and-verifies',
