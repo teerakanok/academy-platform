@@ -4,18 +4,20 @@
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
 > **Last updated:** 2026-09-03
 
-**Current production checkpoint (2026-09-04 01:5x +07):** Academy Worker
-`cyberskills-academy` serves version `1c8cc388-3a9f-4e14-bfe6-39d5a9e651fd`
-at `100%` = source `157736d` (merge `b3d4180` + `aa0149d` Safari gate +
-`7d3cc6c` callback notice/diagnostics + `8c57a2e` exchange fetch fix +
-`ca2effc` result-verification diagnostics + `157736d` canonical principal
-issuer `https://supabase.cyberskills.co.th/auth/v1`), secrets
-`IDENTITY_CODE_EXCHANGE_TIMEOUT_MS=5000` and the live result key set pinned.
-Rollback = `wrangler versions deploy bf36900f-cbba-4864-9cfd-2ef6b7cbde87@100`.
-Proven on the real path: start → Account Center → OTP → callback → lease →
-client assertion → code exchange (`200`); result verification failed only on
-the expected principal issuer, now corrected to the ID-01 canonical value.
-Remaining gate: one owner-present real sign-in (fresh OTP), then
+**Current production checkpoint (2026-09-04 06:3x +07):** Academy Worker
+`cyberskills-academy` serves version `d4717406-58be-43b4-87bb-bc1be260ecdd`
+at `100%` = source `594dede` (adds the session-store RPC-envelope fix on top of
+`1c8cc388` = merge `b3d4180` + Safari gate `aa0149d` + callback notice/diagnostics
+`7d3cc6c` + exchange fetch fix `8c57a2e` + result-verification diagnostics `ca2effc`
++ canonical principal issuer `157736d`). Secrets `IDENTITY_CODE_EXCHANGE_TIMEOUT_MS=5000`
+and the live result key set pinned. Rollback =
+`wrangler versions deploy 1c8cc388-3a9f-4e14-bfe6-39d5a9e651fd@100`.
+The 2026-09-03 23:20Z owner attempt proved the whole chain through
+`create_identity_session` LIVE (exchange 200, verification passed, `academy.users`
+upsert ran, session inserted) and failed only because the store rejected the real
+supabase-js response envelope `{data,error,count,status,statusText}`. Now fixed and
+regression-tested. Remaining gate: one owner-present real sign-in to prove
+session_creation → finalize → dashboard end to end (fresh OTP), then
 `setup-and-environment` entitlement grant and staff bootstrap.
 Evidence on the merged source:
 unit `2,121/2,121`, `tsc` (app + worker) exit `0`, OpenNext build exit `0`;

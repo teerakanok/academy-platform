@@ -6,24 +6,29 @@
 
 ## 1) Owner-Present Sign-In Journey On The Deployed Callback Fix
 
-Deployed 2026-09-04 01:5x (+07): Worker version `1c8cc388-3a9f-4e14-bfe6-39d5a9e651fd`
-at `100%` = source `157736d`. Rollback ladder: `bf36900f…@100` (diagnostics, old issuer) →
-`313465d5…@100` → `f4cc7530…@100`.
+Deployed 2026-09-04 06:3x (+07): Worker version `d4717406-58be-43b4-87bb-bc1be260ecdd`
+at `100%` = source `594dede`. Rollback ladder: `1c8cc388…@100` (session-store bug) →
+`bf36900f…@100`.
 
-Root cause of the 2026-09-03 18:03Z `result_verification` failure: Academy expected
-`result.issuer = https://accounts.cyberskills.co.th/auth/v1`, but the canonical lifecycle
-principal issuer (ecosystem contract ID-01) is the verified issuer minted by Pool A GoTrue,
-`https://supabase.cyberskills.co.th/auth/v1`, which Identity echoes. Fixed in `157736d`
-(one constant; `academy.users` was empty so no data migration). Secrets
-`IDENTITY_CODE_EXCHANGE_TIMEOUT_MS=5000` and the live result key set
-(kid `identity-result-prod-2026-08`, thumbprint `VLvOF…8LM`) remain pinned. Everything before
-result verification is proven on the real path; the verify path is proven on workerd
-(`scripts/workerd-signer-check.mjs`, 10/10). If the next attempt still fails, the Worker logs
-`[identity-result-verification] rejected …` (key names, kid, match booleans, time deltas only).
+Owner-present attempt 2026-09-03 23:20Z (on `1c8cc388`) got furthest yet: start → Account
+Center → OTP → callback → code exchange (`200`, 219 ms) → result verification PASSED
+(`result_issuer` checkpointed as canonical `https://supabase.cyberskills.co.th/auth/v1`) →
+`academy.users` upsert ran (**founder account row now exists**) → `create_identity_session`
+inserted (session row exists) → then failed at `session_creation`. Root cause: the session
+store required the supabase-js RPC response to be exactly `{data,error}`, but supabase-js
+resolves `{data,error,count,status,statusText}`; the transaction store already tolerated the
+extra keys, the session store did not. Fixed in `594dede` (+ regression test using the real
+PostgrestResponse shape through create/get/revoke). This same bug also broke `currentUser()`
+and sign-out for any session. Residue: one `academy.identity_session` row from 23:20Z (24 h
+TTL, never handed to a browser) — retained, not deleted; the `academy.users` row is real
+founder data, untouched.
 
-Earlier findings this session: the exchange fetch used `redirect: 'error'`, which workerd rejects
-with a `TypeError` before any I/O (fixed `8c57a2e`; proven by synthetic callbacks reaching
-Identity, `404` for a fake code = client assertion admitted; no rotation needed).
+Prior fixes this session: `result.issuer` expected the Account Center host, corrected to the
+ID-01 canonical Pool A issuer `https://supabase.cyberskills.co.th/auth/v1` (`157736d`); the
+exchange fetch used `redirect:'error'` which workerd rejects before any I/O (`8c57a2e`); Safari
+sends no `Sec-Fetch-User` (`aa0149d`); callback failures rendered raw JSON (`7d3cc6c`). Secrets
+`IDENTITY_CODE_EXCHANGE_TIMEOUT_MS=5000` and the live result key set (kid
+`identity-result-prod-2026-08`) remain pinned.
 
 Earlier owner-present findings: Safari sends no `Sec-Fetch-User` (fixed `aa0149d`); callback
 failures rendered raw JSON (fixed `7d3cc6c`, now `/sign-in?notice=identity-unavailable`).
