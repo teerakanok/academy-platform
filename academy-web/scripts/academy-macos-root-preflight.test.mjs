@@ -165,6 +165,28 @@ test('executor accepts only a fresh exact terminal receipt and suppresses malici
   assert.equal(freshResult.stderr,'')
 })
 
+test('stale predecessor terminal does not erase one bounded early failure', async t => {
+  const root=await mkdtemp(join(tmpdir(),'academy-executor-stale-predecessor-'))
+  t.after(()=>rm(root,{recursive:true,force:true}))
+  const terminal=join(root,'terminal.json'), worker=join(root,'worker')
+  const stale={status:'FAILED',phase:'INSTALL_RELEASE',publication:'UNKNOWN',cloudflare:'NONE'}
+  await writeFile(terminal,`${JSON.stringify(stale)}\n`,{mode:0o600})
+  const bytes=Buffer.from(`#!/bin/zsh\nprint -u2 'raw predecessor detail'\nprint -u2 'ACADEMY_SINGLE_PROMPT_PREFLIGHT_FAILED phase=INSTALL_RELEASE publication=UNKNOWN reason=DIAGNOSTIC_FAILED'\nexit 1\n`)
+  await writeFile(worker,bytes,{mode:0o500})
+  const identity=statSync(worker)
+  const result=spawnSync(process.execPath,[
+    new URL('./academy-bound-worker-executor.cjs',import.meta.url).pathname,worker,
+    createHash('sha256').update(bytes).digest('hex'),String(identity.uid),String(identity.gid),
+    String(0o500),terminal,
+  ],{encoding:'utf8'})
+  const envelope=parseDiagnosticEnvelope(result.stdout)
+  assert.equal(result.status,0,result.stderr)
+  assert.equal(result.stderr,'')
+  assert.deepEqual(envelope,{status:'FAILED',reason:'WORKER_REJECTED',phase:'INSTALL_RELEASE',
+    publication:'UNKNOWN',workerReason:'DIAGNOSTIC_FAILED'})
+  assert.deepEqual(JSON.parse(await readFile(terminal,'utf8')),stale)
+})
+
 test('executor relays one exact bounded worker reason without raw stderr', async t => {
   const root=await mkdtemp(join(tmpdir(),'academy-executor-bounded-'))
   t.after(()=>rm(root,{recursive:true,force:true}))
