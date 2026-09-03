@@ -124,7 +124,7 @@ describe('Identity runtime browser-flow routes', () => {
     expect(routeMocks.startNavigationMock).not.toHaveBeenCalled()
   })
 
-  it('returns an uncached production navigation error without redirecting', async () => {
+  it('sends a production navigation error back to the sign-in page with an inline notice', async () => {
     const request = new Request(`${academyOrigin}/api/auth/identity/start?next=%2Fdashboard`)
     routeMocks.startNavigationMock.mockResolvedValueOnce({
       kind: 'error',
@@ -135,13 +135,17 @@ describe('Identity runtime browser-flow routes', () => {
 
     const response = await startNavigationRoute(request)
 
-    expect(response.status).toBe(403)
+    expect(response.status).toBe(303)
     expect(response.headers.get('cache-control')).toBe('no-store')
-    expect(response.headers.get('location')).toBeNull()
-    await expect(response.json()).resolves.toEqual({ ok: false, error: 'route_navigation_denied' })
+    const location = new URL(response.headers.get('location') ?? '')
+    expect(location.origin).toBe(academyOrigin)
+    expect(location.pathname).toBe('/sign-in')
+    expect(location.searchParams.get('notice')).toBe('identity-start-failed')
+    expect(location.searchParams.get('next')).toBe('/dashboard')
+    expect(response.headers.get('content-type') ?? '').not.toContain('application/json')
   })
 
-  it('returns an uncached 503 when the production navigation adapter is unavailable', async () => {
+  it('sends the navigation back to sign-in with identity-unavailable when the adapter is unavailable', async () => {
     const request = new Request(`${academyOrigin}/api/auth/identity/start?next=%2Fdashboard`)
     routeMocks.getIdentityRuntimeBrowserFlow.mockImplementationOnce(() => {
       throw new routeMocks.IdentityAdapterUnavailableError('unavailable')
@@ -149,9 +153,11 @@ describe('Identity runtime browser-flow routes', () => {
 
     const response = await startNavigationRoute(request)
 
-    expect(response.status).toBe(503)
+    expect(response.status).toBe(303)
     expect(response.headers.get('cache-control')).toBe('no-store')
-    expect(response.headers.get('location')).toBeNull()
+    const location = new URL(response.headers.get('location') ?? '')
+    expect(location.pathname).toBe('/sign-in')
+    expect(location.searchParams.get('notice')).toBe('identity-unavailable')
   })
 
   it('returns the enabled start error result without redirecting', async () => {

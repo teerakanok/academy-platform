@@ -23,10 +23,8 @@ export async function GET(request: Request) {
     if (!browserFlow) return new NextResponse(null, { status: 404, headers: NO_STORE_HEADERS })
     const result = await browserFlow.startNavigation(request)
     if (result.kind === 'error') {
-      return NextResponse.json(
-        { ok: false, error: result.error },
-        { status: result.status, headers: NO_STORE_HEADERS },
-      )
+      // The browser is navigating, so the failure must render on the sign-in page, not as JSON.
+      return signInNoticeRedirect(request, 'identity-start-failed')
     }
     const response = NextResponse.redirect(new URL(result.location, request.url), result.status)
     for (const cookie of result.cookies) response.headers.append('set-cookie', cookie)
@@ -34,13 +32,18 @@ export async function GET(request: Request) {
     return response
   } catch (error) {
     if (error instanceof IdentityAdapterUnavailableError) {
-      return NextResponse.json(
-        { ok: false, error: 'ยังไม่ได้เชื่อมต่อ Identity Control สำหรับสภาพแวดล้อมนี้' },
-        { status: 503, headers: NO_STORE_HEADERS },
-      )
+      return signInNoticeRedirect(request, 'identity-unavailable')
     }
     throw error
   }
+}
+
+function signInNoticeRedirect(request: Request, notice: 'identity-start-failed' | 'identity-unavailable') {
+  const target = new URL('/sign-in', request.url)
+  target.searchParams.set('notice', notice)
+  const next = safeNextPath(new URL(request.url).searchParams.get('next') ?? '')
+  if (next !== '/') target.searchParams.set('next', next)
+  return NextResponse.redirect(target, { status: 303, headers: NO_STORE_HEADERS })
 }
 
 export async function POST(request: Request) {

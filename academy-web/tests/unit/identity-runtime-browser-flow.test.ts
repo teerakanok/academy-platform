@@ -111,6 +111,22 @@ describe('Academy Identity runtime browser flow', () => {
     }
   })
 
+  it('admits a WebKit navigation that carries no Sec-Fetch-User header', async () => {
+    const fixture = createFixture()
+    const request = new Request('https://academy.cyberskills.co.th/api/auth/identity/start?next=%2Fdashboard', {
+      method: 'GET',
+      headers: {
+        host: 'academy.cyberskills.co.th',
+        'sec-fetch-site': 'same-origin',
+        'sec-fetch-mode': 'navigate',
+        'sec-fetch-dest': 'document',
+      },
+    })
+    const result = await fixture.flow.startNavigation(request)
+    expect(result.kind).toBe('redirect')
+    expect(fixture.calls).toEqual(['create', 'authorize'])
+  })
+
   it('uses the same durable authorization and cookie semantics as POST', async () => {
     const fixture = createFixture()
     const post = await fixture.flow.start(startRequest())

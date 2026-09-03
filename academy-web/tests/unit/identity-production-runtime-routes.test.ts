@@ -138,6 +138,22 @@ describe('production Identity routes use the real registry composition', () => {
     expect(database.academyDb).toHaveBeenCalledTimes(2)
   })
 
+  it('sends a rejected navigation back to the sign-in page instead of a JSON body', async () => {
+    const navigation = await startNavigationRoute(new Request(
+      'https://academy.cyberskills.co.th/api/auth/identity/start?next=%2Fdashboard',
+      { headers: { 'sec-fetch-site': 'cross-site', 'sec-fetch-mode': 'navigate', 'sec-fetch-dest': 'document' } },
+    ))
+
+    expect(navigation.status).toBe(303)
+    expect(navigation.headers.get('cache-control')).toBe('no-store')
+    const location = new URL(navigation.headers.get('location') ?? '')
+    expect(location.origin).toBe('https://academy.cyberskills.co.th')
+    expect(location.pathname).toBe('/sign-in')
+    expect(location.searchParams.get('notice')).toBe('identity-start-failed')
+    expect(location.searchParams.get('next')).toBe('/dashboard')
+    expect(navigation.headers.get('content-type') ?? '').not.toContain('application/json')
+  })
+
   it('starts an admitted navigation with the production transaction and cookie contract', async () => {
     const navigation = await startNavigationRoute(new Request(
       'https://academy.cyberskills.co.th/api/auth/identity/start?next=%2Fdashboard',

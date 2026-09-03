@@ -153,7 +153,8 @@ export function createAcademyIdentityRuntimeBrowserFlow(
             headers.get('sec-fetch-site') !== 'same-origin'
             || headers.get('sec-fetch-mode') !== 'navigate'
             || headers.get('sec-fetch-dest') !== 'document'
-            || headers.get('sec-fetch-user') !== '?1'
+            // WebKit/Safari never sends Sec-Fetch-User; only an explicit non-user value is rejected.
+            || (headers.has('sec-fetch-user') && headers.get('sec-fetch-user') !== '?1')
             || headers.get('sec-purpose')?.toLowerCase().includes('prefetch')
             || headers.get('purpose')?.toLowerCase().includes('prefetch')
           ) {

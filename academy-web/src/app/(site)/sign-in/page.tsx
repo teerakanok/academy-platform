@@ -43,6 +43,11 @@ export default async function SignInPage({
           Sign-in could not be completed. Please start again.
         </p>
       )}
+      {notice === 'identity-start-failed' && (
+        <p role="alert" className="mb-6 border-l-2 border-cs-amber py-2 pl-4 text-sm text-cs-body">
+          Sign-in could not be started right now. Please try again in a moment.
+        </p>
+      )}
       <div className="hero-bleed pb-6 text-center">
         <Image
           src="/brand/logo-academy.svg"

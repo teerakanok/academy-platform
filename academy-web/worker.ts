@@ -59,12 +59,21 @@ async function enforceEdgeRateLimit(request: Request, env: AcademyWorkerEnv): Pr
   return withEdgeRateLimitMarker(request, { secret: env.RATE_LIMIT_KEY_SECRET })
 }
 
+/** Thai JSON bodies render as mojibake when a browser navigates to them without a declared charset. */
+function withJsonCharset(response: Response): Response {
+  const contentType = response.headers.get('content-type')
+  if (!contentType || !/^application\/json\s*$/i.test(contentType)) return response
+  const fixed = new Response(response.body, response)
+  fixed.headers.set('content-type', 'application/json; charset=utf-8')
+  return fixed
+}
+
 export default {
   async fetch(request, env, ctx) {
     const protectedRequest = await enforceEdgeRateLimit(request, env)
     if (protectedRequest instanceof Response) return protectedRequest
 
     const media = await servePrivateMedia(protectedRequest, env)
-    return media ?? openNextHandler.fetch(protectedRequest, env, ctx)
+    return withJsonCharset(media ?? await openNextHandler.fetch(protectedRequest, env, ctx))
   },
 } satisfies ExportedHandler<AcademyWorkerEnv>
