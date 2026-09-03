@@ -201,6 +201,50 @@ describe('Worker-resident Identity client assertion secret diagnostic', () => {
     expect(run).toHaveBeenCalledTimes(1)
   })
 
+  it('admits a production-like zero-byte POST stream and denies every ambiguous or non-empty body', async () => {
+    const run = vi.fn(async () => 'PASS_CODE_NOT_FOUND' as const)
+    const worker = createIdentityClientAssertionSecretDiagnosticWorker(run)
+    const environment = {
+      IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK: 'protected-value-not-inspected-by-handler-test',
+      ACADEMY_IDENTITY_DIAGNOSTIC_NONCE: DIAGNOSTIC_NONCE,
+      CF_VERSION_METADATA: { id: VERSION_ID },
+    }
+
+    const accepted = await worker.fetch(requestWithStream(new ReadableStream({
+      start(controller) { controller.close() },
+    })), environment, {})
+    expect(accepted.status).toBe(200)
+    expect(run).toHaveBeenCalledTimes(1)
+
+    let canceledAfterByte = false
+    const bodies = [
+      requestWithStream(new ReadableStream({
+        start(controller) {
+          controller.enqueue(new Uint8Array())
+          controller.enqueue(new TextEncoder().encode('x'))
+        },
+        cancel() { canceledAfterByte = true },
+      })),
+      requestWithStream(new ReadableStream({
+        start(controller) { controller.enqueue(new Uint8Array(8_192)) },
+      })),
+      requestWithStream(new ReadableStream({
+        start(controller) { controller.error(new Error('hostile-body-read')) },
+      })),
+      requestWithStream(new ReadableStream({
+        pull(controller) { controller.enqueue(new Uint8Array()) },
+        cancel() { throw new Error('hostile-body-cancel') },
+      })),
+    ]
+    for (const bodyRequest of bodies) {
+      const denied = await worker.fetch(bodyRequest, environment, {})
+      expect(denied.status).toBe(404)
+      expect(await denied.text()).toBe('ACADEMY_IDENTITY_WORKER_DIAGNOSTIC=DENIED\n')
+    }
+    expect(canceledAfterByte).toBe(true)
+    expect(run).toHaveBeenCalledTimes(1)
+  })
+
   it('uses a bodyless HEAD marker for candidate readiness without reading the JWK or calling Identity', async () => {
     const run = vi.fn(async () => 'PASS_CODE_NOT_FOUND' as const)
     const worker = createIdentityClientAssertionSecretDiagnosticWorker(run)
@@ -303,6 +347,25 @@ function request(overrides: {
       },
       body: overrides.body,
     },
+  )
+}
+
+function requestWithStream(body: ReadableStream<Uint8Array>): Request {
+  return new Request(
+    `https://academy.cyberskills.co.th${IDENTITY_SECRET_DIAGNOSTIC.path}`,
+    {
+      method: 'POST',
+      headers: {
+        origin: 'https://academy.cyberskills.co.th',
+        'sec-fetch-site': 'same-origin',
+        'cf-access-jwt-assertion': 'eyJhbGciOiJFUzI1NiJ9.eyJhdWQiOiJhY2FkZW15In0.c2lnbmF0dXJl',
+        'x-academy-diagnostic-version': VERSION_ID,
+        'x-academy-diagnostic-operation': IDENTITY_SECRET_DIAGNOSTIC.requestMarker,
+        'x-academy-diagnostic-nonce': DIAGNOSTIC_NONCE,
+      },
+      body,
+      duplex: 'half',
+    } as RequestInit & { duplex: 'half' },
   )
 }
 

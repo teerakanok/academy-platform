@@ -420,7 +420,7 @@ test('production source and config bind the nonce before private-key access', as
     readFile(new URL('scripts/academy-identity-worker-diagnostic-controller.mjs', root), 'utf8'),
   ])
   assert.match(worker, /constantTimeOpaqueEqual\([\s\S]*ACADEMY_IDENTITY_DIAGNOSTIC_NONCE/)
-  assert.match(worker, /const admitted = requestAdmission\([\s\S]+if \(!admitted\)[\s\S]+await runDiagnostic\(/)
+  assert.match(worker, /const admitted = await requestAdmission\([\s\S]+if \(!admitted\)[\s\S]+await runDiagnostic\(/)
   assert.deepEqual(JSON.parse(config).secrets.required, [
     'IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK',
     'ACADEMY_IDENTITY_DIAGNOSTIC_NONCE',

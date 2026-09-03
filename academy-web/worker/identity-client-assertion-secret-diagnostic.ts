@@ -13,6 +13,7 @@ const EXPECTED_PUBLIC_JWK_SHA256 = '8b7a176b27ac5ffc7eb65fbe9d1b0724b1e1b24e91d8
 const MAX_PRIVATE_JWK_BYTES = 4_096
 const MAX_RESPONSE_BYTES = 512
 const ACCESS_ASSERTION_MAX_CHARACTERS = 8_192
+const MAX_EMPTY_BODY_READS = 4
 const READINESS_HEADER = 'x-academy-identity-diagnostic-ready'
 const READINESS_VALUE = 'v1'
 const VERSION_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
@@ -195,7 +196,7 @@ export function createIdentityClientAssertionSecretDiagnosticWorker(
 ): DiagnosticWorker {
   return {
     async fetch(request, environment) {
-      const admitted = requestAdmission(request, environment)
+      const admitted = await requestAdmission(request, environment)
       if (!admitted) return fixedResponse('DENIED', 404)
       if (request.method === 'HEAD') {
         return new Response(null, {
@@ -212,13 +213,12 @@ export function createIdentityClientAssertionSecretDiagnosticWorker(
   }
 }
 
-function requestAdmission(request: Request, environment: DiagnosticEnvironment): boolean {
+async function requestAdmission(request: Request, environment: DiagnosticEnvironment): Promise<boolean> {
   try {
     const url = new URL(request.url)
     const versionId = environment.CF_VERSION_METADATA?.id
     const accessAssertion = request.headers.get('cf-access-jwt-assertion')
-    return (request.method === 'POST' || request.method === 'HEAD')
-      && request.body === null
+    const metadataAdmitted = (request.method === 'POST' || request.method === 'HEAD')
       && url.origin === CANONICAL_ORIGIN
       && url.pathname === DIAGNOSTIC_PATH
       && url.search === ''
@@ -235,8 +235,38 @@ function requestAdmission(request: Request, environment: DiagnosticEnvironment):
       && typeof accessAssertion === 'string'
       && accessAssertion.length <= ACCESS_ASSERTION_MAX_CHARACTERS
       && ACCESS_ASSERTION.test(accessAssertion)
+    if (!metadataAdmitted) return false
+    if (request.method === 'HEAD') return request.body === null
+    return request.body === null || await consumeExactlyEmptyBody(request.body)
   } catch {
     return false
+  }
+}
+
+async function consumeExactlyEmptyBody(body: ReadableStream<Uint8Array>): Promise<boolean> {
+  const reader = body.getReader()
+  let completed = false
+  try {
+    for (let read = 0; read < MAX_EMPTY_BODY_READS; read += 1) {
+      const result = await reader.read()
+      if (result.done) {
+        completed = true
+        return true
+      }
+      if (!(result.value instanceof Uint8Array) || result.value.byteLength !== 0) return false
+    }
+    return false
+  } catch {
+    return false
+  } finally {
+    if (!completed) {
+      try {
+        await reader.cancel()
+      } catch {
+        // Cancellation uncertainty remains a denied request.
+      }
+    }
+    reader.releaseLock()
   }
 }
 
