@@ -4,40 +4,37 @@
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
 > **Last updated:** 2026-09-03
 
-**Current production-readiness checkpoint (2026-09-03):** The last directly
-revalidated Academy Worker baseline remains deployment
-`20f58559-daa8-4b77-81f7-7885686c1a14`, version
-`bd4aea53-9137-4d49-a5f4-3a74be959736` at `100%`, tag
-`release-646206ed7cdd`, with a `500 ms` CPU limit. Shared Identity release
-`60920c9cc08bae2befc22f5c8ddbce5f678fefe9` is active with exact GoTrue
-timeouts `5,000 ms` for regular calls and `10,000 ms` for OTP start, below the
-Account Center outer deadline of `15,000 ms`. Its retained migration records a
-post-dispatch timeout or response loss as recoverable `ambiguous`, forbids an
-automatic resend, and permits the original code to be verified once within the
-bounded challenge lifetime. Code-only mail templates, a server-owned Account
-Center return, two distinct fresh Turnstile proofs, server-enforced GoTrue
-CAPTCHA, and the approved relay remain active.
+**Current production checkpoint (2026-09-03, late):** Academy Worker
+`cyberskills-academy` now serves version `4ff2077a-fa56-4ea5-91f8-0b57981ee573`
+(tag `release-b3d4180fcf2d`, deployment `259282a3-fc2e-4d8d-a1e1-2d58bae97770`)
+at `100%`, built from merge commit `b3d4180` = callback fix `71b41b4` ("make
+identity callback completion recoverable") + `main` content Wave 1+2 fixes.
+Rollback = `wrangler versions deploy bd4aea53-9137-4d49-a5f4-3a74be959736@100`
+(previous baseline, tag `release-646206ed7cdd`). Evidence on the merged source:
+unit `2,121/2,121`, `tsc` (app + worker) exit `0`, OpenNext build exit `0`;
+eslint reports only the three pre-existing `no-require-imports` errors in
+`academy-bound-worker-executor.cjs`. Version secrets were inherited unchanged
+(13 names, no values read); the Worker also carries an inert
+`ACADEMY_IDENTITY_DIAGNOSTIC_NONCE` secret left by the diagnostic versions.
+Post-deploy: raw Worker `/`, `/courses`, `/sign-in` = `200`; `/auth/callback`
+without parameters = `400` from the wired browser flow (an unwired runtime would
+answer `503`); canonical `academy.cyberskills.co.th` `/`, `/courses`,
+`/auth/callback` = Cloudflare Access `302` (exposure unchanged). Pool A
+`academy` schema already contains migration `0028` (claim/checkpoint/release/
+finalize functions present, `academy_runtime` has execute); `academy.users` has
+`0` rows, so no account or staff role exists yet.
 
-Academy is **not production-ready**. The latest owner-present canary reached
-code verification, then stopped before callback/session creation because the
-Academy client assertion could not be admitted by Identity Control. The Worker
-still has the named private-JWK secret binding, but durable off-host custody was
-not recovered and the resident value has not been classified as matching,
-malformed, or rejected. Binding presence is not proof of a working key. The
-reviewed diagnostic at source `eb99d9d58f2fe59a0998f2d5dc07842aca0b839d`
-can classify import, registered public fingerprint, local signing, and Identity
-admission without exporting the key. Its only attempted run stopped before
-candidate upload or provider request because the Cloudflare Access operator
-session was unavailable; production deployment and traffic remained unchanged.
-
-Next gate: when the owner is present, renew exactly one bounded Cloudflare
-Access session and run the reviewed diagnostic once. Do not rotate the key or
-send another OTP before that classification. After the smallest evidence-backed
-correction and production postchecks, complete the canary walkthrough through
-callback, dashboard/catalog, entitled `setup-and-environment`, progress reload,
-desktop and `412x915`, sign-out, and independent cleanup of only
-session-created progress. Historical readiness statements below remain dated
-evidence and do not override this checkpoint.
+Earlier today the reviewed in-place diagnostic ran four times (versions tagged
+`academy-secret-diagnostic-*`, each split `100/0` then restored) and the
+operator reported that OTP send/verify and the resident client-assertion key
+work; the only remaining failure was callback/session creation, which `71b41b4`
+addresses and is now deployed. Not yet proven end to end: a real callback ->
+session -> dashboard journey. Next gate is owner-present: sign in once at
+`https://academy.cyberskills.co.th/sign-in` (Access, then Account Center email
+code), confirm dashboard/catalog, then grant `setup-and-environment`
+entitlement to that account through the audited path, check lesson, progress
+after reload, `412x915`, and sign-out. Historical readiness statements below
+remain dated evidence and do not override this checkpoint.
 
 **Sole kill-switch operator evidence submitted for Identity review (2026-08-24):**
 Academy now has a source-bound public sole-operator designation for Songpon Teerakanok,

@@ -2,6 +2,26 @@
 
 Status date: `2026-09-03`
 
+## Update (2026-09-03, late)
+
+- Callback fix `71b41b4` merged with `main` as `b3d4180` and deployed: Worker
+  version `4ff2077a-fa56-4ea5-91f8-0b57981ee573`, tag `release-b3d4180fcf2d`,
+  deployment `259282a3-fc2e-4d8d-a1e1-2d58bae97770`, `100%`. Previous version
+  `bd4aea53-9137-4d49-a5f4-3a74be959736` remains the rollback target.
+- Path used: `opennextjs-cloudflare build` -> `wrangler versions upload --keep-vars`
+  (`0%`) -> split deploy `100/0` -> smoke through the
+  `Cloudflare-Workers-Version-Overrides` header (`BUILD_ID` matched the local
+  build; `/` `200`, `/courses` `200`, `/auth/callback` `400`) -> `versions deploy
+  4ff2077a@100`. No macOS root installer, no secret was read or set.
+- Merged-source evidence: unit `2,121/2,121`; `tsc` app and worker exit `0`; build
+  exit `0`; eslint only the three known `.cjs` `no-require-imports` errors.
+- Pool A read-only check: `academy.identity_authorization_transaction` has the
+  `0028` lease columns and the four new functions with `academy_runtime` execute;
+  `pgrst_ddl_watch` event trigger exists, so the dedicated PostgREST reloaded its
+  schema. `academy.users` = `0`, `staff_role_assignment` = `0`.
+- Remaining: owner-present sign-in journey (see `PENDING_USER_ACTION.md` §1).
+  Status stays `BLOCKED` until that journey passes.
+
 ## Exact status
 
 Academy is `BLOCKED`, not production-ready. Public and runtime health remained

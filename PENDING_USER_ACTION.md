@@ -4,42 +4,47 @@
 > หรือหลักฐานจาก external system. งานที่ทำและตรวจจบแล้วไม่อยู่ในรายการนี้.
 > สถานะ code และ release gates ล่าสุดอยู่ใน `plans/active_plan.md`.
 
-## 1) Classify Academy Client Assertion Before Any New OTP
+## 1) Owner-Present Sign-In Journey On The Deployed Callback Fix
 
-Academy runtime data boundary ทำงานแล้วโดยใช้ dedicated Academy credential;
-Worker ไม่มีและห้ามเพิ่ม shared Pool A `SUPABASE_SERVICE_ROLE_KEY`.
+Deployed 2026-09-03 (late): Worker version `4ff2077a-fa56-4ea5-91f8-0b57981ee573`
+(tag `release-b3d4180fcf2d`) at `100%`, source merge `b3d4180` = callback fix
+`71b41b4` + `main` content fixes. Rollback = redeploy
+`bd4aea53-9137-4d49-a5f4-3a74be959736@100`. DB migration `0028` is present in Pool A
+`academy`; `academy.users` is empty.
 
-- Academy Worker deployment `20f58559-daa8-4b77-81f7-7885686c1a14` / version
-  `bd4aea53-9137-4d49-a5f4-3a74be959736` ยังเป็น last revalidated baseline ที่
-  `100%`. Shared Identity release
-  `60920c9cc08bae2befc22f5c8ddbce5f678fefe9` เปิด OTP ambiguity recovery,
-  code-only mail template, two fresh Turnstile stages และ server-side CAPTCHA แล้ว.
-- owner-present canary ล่าสุดไปถึง code verification แต่ callback/session ไม่ถูกสร้าง
-  เพราะ Academy client assertion ยังไม่ผ่าน Identity admission. รหัสไม่ถูก consume ใน
-  flow นั้น และไม่มีสิทธิ์ resend/reuse ต่อจากหลักฐานนี้.
-- Cloudflare Worker ยังมี binding ชื่อ `IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK` แบบ
-  `secret_text` แต่ binding presence ไม่พิสูจน์ว่า key ใช้งานได้. Durable Bitwarden
-  inventory item ชื่อ `Academy - Identity Client Assertion Private JWK` มีอยู่แต่ owner
-  ตรวจแล้วไม่พบ JWK value; ห้ามใส่ value ใน chat/doc/screenshot.
-- next action เดียวเมื่อ owner พร้อม: ต่ออายุ Cloudflare Access operator session หนึ่งครั้ง
-  แล้วให้ controller รัน independently reviewed in-place diagnostic หนึ่งครั้ง. ห้ามส่ง OTP,
-  rotate key, หรือสร้าง credential ใหม่ก่อน diagnostic แยกผล import, public fingerprint,
-  local sign/verify และ Identity admission ได้.
+ต้องใช้ founder ทำเองใน browser (agent ห้ามอ่าน mailbox/กรอกรหัสแทน):
 
-หลัง diagnostic และ smallest evidence-backed fix ผ่าน production postchecks แล้ว จึงกลับมา
-ทำ authenticated journey ด้วย existing approved canary: ส่งรหัสหนึ่งครั้ง, callback,
-dashboard/catalog, entitled `setup-and-environment`, progress หลัง reload, viewport
-`412x915`, sign-out และ independent cleanup เฉพาะ progress ที่ session สร้าง. Owner กรอก
-identity/รหัสใน browser เอง; agent ห้ามอ่านหรือกรอกแทน.
+1. เปิด `https://academy.cyberskills.co.th/sign-in` → ผ่าน Cloudflare Access (browser
+   login) → กด sign-in ด้วย CYBERSKILLS account → Account Center ส่งรหัสทาง email →
+   กรอกรหัส → ต้องกลับมาที่ Academy `/auth/callback` แล้ว redirect ไป dashboard โดยไม่เจอ
+   `sign-in?notice=identity-unavailable`.
+2. ตรวจ dashboard และ `/courses` แสดงผลด้วย account ที่ sign in แล้ว.
+3. คอร์ส `setup-and-environment` เป็น `syllabus-preview` — บทเรียนจะขึ้น not-entitled จนกว่า
+   จะมี `academy.course_entitlement` (`source='grant'`) ให้ account นั้น; ไม่มี UI/RPC ให้
+   grant เอง ต้องเป็น DB write ที่ founder อนุมัติหลัง sign-in ครั้งแรก (มี rollback ด้วย
+   `revoked_at`).
+4. หลัง entitlement: เปิดบทเรียน, ทำ progress หนึ่งขั้น, reload แล้ว progress ยังอยู่, ดูที่
+   viewport `412x915`, แล้ว sign-out.
 
-เมื่อ full journey ผ่าน founder ต้อง sign in หนึ่งครั้งด้วย identity จริงเพื่อสร้าง
-`academy.users` จาก `(issuer, subject)`. จากนั้นรัน `scripts/manage-staff-role.mjs` แบบ
-dry-run แล้ว apply ตาม staff-bootstrap contract; ห้ามใช้ email หรือ UUID ที่สร้างขึ้นแทน
-identity.
+ถ้าข้อ 1 ล้มเหลว ให้เก็บเฉพาะ path/status ที่เห็น (ไม่เอา query string) แล้วส่งกลับ; ห้าม
+resend รหัสซ้ำก่อนตรวจ Worker logs.
 
-**หลักฐานปัจจุบัน:** dedicated data API, least-privilege `academy_runtime` และ Worker
-runtime deployment อยู่ใน
-[`reports/sessions/academy-dedicated-data-api-2026-08-05.md`](reports/sessions/academy-dedicated-data-api-2026-08-05.md).
+**Staff bootstrap หลัง sign-in ครั้งแรก** (`academy.users` ต้องมี 1 แถวก่อน):
+issuer ของ Academy = `https://accounts.cyberskills.co.th/auth/v1`; subject = ค่า `subject`
+ในแถว `academy.users` ของ founder (อ่านจาก DB host ด้วย `psql -d postgres`, พิมพ์เฉพาะ
+count/issuer). dry-run:
+
+```bash
+DATABASE_URL='<operator connection, never printed>' node scripts/manage-staff-role.mjs \
+  --enable --role owner \
+  --actor-issuer https://accounts.cyberskills.co.th/auth/v1 --actor-subject <founder-subject> \
+  --target-issuer https://accounts.cyberskills.co.th/auth/v1 --target-subject <founder-subject> \
+  --reference 'staff-bootstrap founder 2026-09-03'
+```
+
+ต่อเมื่อ dry-run พิมพ์ `dry_run=true action=enable role=owner currently_active=false` จึงเพิ่ม
+`--apply` (migration `0018` อนุญาต first-owner bootstrap ที่ actor = target). ห้ามใช้ email
+หรือ UUID ที่สร้างขึ้นแทน identity.
 
 ## 2) Keep The Current Exposure Decision Explicit
 
