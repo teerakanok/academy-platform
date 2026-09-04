@@ -8,7 +8,6 @@ observer=/private/var/root/academy-release-observer-07ed27c0
 observation=/private/var/root/academy-release-observation-7dca6452.json
 source=/private/tmp/academy-release-sources-fa7
 input=/private/tmp/academy-release-package-fa7.json
-repo=/private/tmp/academy-result-loss-remediation/academy-web
 db_source=/private/tmp/academy-db-stage-065be09
 revision=fa7bca732aefa58ab7fc2c784676a113b873466b
 release_sha=84e855c0d11016ceeaed7e40c42ff10d70db8690907d883b7134c1536b135a46
@@ -38,7 +37,10 @@ verify_observer_file() {
 }
 verify_observer_file "$observer/academy-macos-release-recovery.mjs" 844d92b9734a18fac1d14c842c25c2ff814b2d7a5840a14690bab3ee517a3d41
 verify_observer_file "$observer/academy-release-pointer.mjs" 7cac358f35e6446e314e5cc9f884c9770b3395dcf9394221d6f61c569385fcee
-verify_observer_file "$observer/academy-release-manifest.mjs" 803f50c7f33ef22f9d199ee8b4e7dfe3810c33861999a8c2109880f62ab4eaec
+verify_observer_file "$observer/academy-release-manifest.mjs" e63128223ff20ef86f6ca1108845848523e7b25f46293cfab39ea66e25d37413
+verify_observer_file "$observer/academy-release-cli.mjs" ef405f7b9df4a8ba7ed45d232c347019b09ea4bc344a6cb86070706c811b9d9d
+verify_observer_file "$observer/academy-release-install.mjs" 0505358687fe35ba97789b5700801c27b3405ff5ad66a960c899d646f922e8cf
+verify_observer_file "$observer/academy-release-render.mjs" 4b9560748dac8e82afd7719f8a55dca140078293e1b8ec9be453c479eb4a020a
 observation_result="$("$observer/node" "$observer/academy-macos-release-recovery.mjs" "$observation")"
 IFS=$'\t' read -r observation_selected install_required <<< "$observation_result"
 [[ "$observation_selected" == "$observation" || "$observation_selected" == "$observation.candidate.v1.json" ]]
@@ -60,7 +62,7 @@ printf 'academy-root-preflight/7dca6452\n' > "$stage/.academy-owned"
 terminal_ready=true
 /bin/cp -R "$source"/. "$stage/source"/
 for name in academy-release-cli.mjs academy-release-install.mjs academy-release-manifest.mjs academy-release-pointer.mjs academy-release-render.mjs academy-macos-release-recovery.mjs; do
-  /bin/cp "$repo/scripts/$name" "$stage/tooling/$name"
+  /bin/cp "$observer/$name" "$stage/tooling/$name"
 done
 /usr/sbin/chown -R root:wheel "$stage"
 /usr/bin/find "$stage/source" "$stage/tooling" -type d -exec /bin/chmod 500 {} +
@@ -72,11 +74,11 @@ verify_root_file() {
   [[ "$(/usr/bin/shasum -a 256 "$path" | /usr/bin/awk '{print $1}')" == "$expected" ]]
 }
 verify_root_file "$stage/source/node" 500 9bc64e922cba152eedf55cd4528ac0b5b7e0f4cd9d671d77bb0830c9796ea188
-verify_root_file "$stage/tooling/academy-release-cli.mjs" 500 6e91274bb01f78446c6bbf91dd76cc84d4e44765c7ef6122fe8171d6de46099c
-verify_root_file "$stage/tooling/academy-release-install.mjs" 400 4ec50af32ac10a26bc5bad2782a5f6faf3da7df3cabc87765007fa240a98eb72
-verify_root_file "$stage/tooling/academy-release-manifest.mjs" 400 803f50c7f33ef22f9d199ee8b4e7dfe3810c33861999a8c2109880f62ab4eaec
+verify_root_file "$stage/tooling/academy-release-cli.mjs" 500 ef405f7b9df4a8ba7ed45d232c347019b09ea4bc344a6cb86070706c811b9d9d
+verify_root_file "$stage/tooling/academy-release-install.mjs" 400 0505358687fe35ba97789b5700801c27b3405ff5ad66a960c899d646f922e8cf
+verify_root_file "$stage/tooling/academy-release-manifest.mjs" 400 e63128223ff20ef86f6ca1108845848523e7b25f46293cfab39ea66e25d37413
 verify_root_file "$stage/tooling/academy-release-pointer.mjs" 400 7cac358f35e6446e314e5cc9f884c9770b3395dcf9394221d6f61c569385fcee
-verify_root_file "$stage/tooling/academy-release-render.mjs" 400 03f97f824f0c4ec3476852e85dd821dabaf45562b0049b18a06c5772bb049dde
+verify_root_file "$stage/tooling/academy-release-render.mjs" 400 4b9560748dac8e82afd7719f8a55dca140078293e1b8ec9be453c479eb4a020a
 verify_root_file "$stage/tooling/academy-macos-release-recovery.mjs" 400 844d92b9734a18fac1d14c842c25c2ff814b2d7a5840a14690bab3ee517a3d41
 phase=PREPARE_PACKAGE
 "$stage/source/node" -e 'const fs=require("fs"),old=process.argv[1],next=process.argv[2],input=process.argv[3],output=process.argv[4];const walk=v=>typeof v==="string"?v.split(old).join(next):Array.isArray(v)?v.map(walk):v&&typeof v==="object"?Object.fromEntries(Object.entries(v).map(([k,x])=>[k,walk(x)])):v;fs.writeFileSync(output,JSON.stringify(walk(JSON.parse(fs.readFileSync(input,"utf8"))))+"\n",{mode:0o600,flag:"wx"})' "$source" "$stage/source" "$input" "$stage/package.json"

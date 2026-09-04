@@ -3,18 +3,25 @@ import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import { spawn } from 'node:child_process'
 
-const WORKER = '/private/tmp/academy-result-loss-remediation/academy-web/scripts/academy-macos-root-preflight-worker.sh'
-const ROOT_COPY = '/private/var/root/academy-macos-root-preflight-worker-76b30e1a517c3fb5.sh'
-const EXPECTED_WORKER_SHA256 = '76b30e1a517c3fb52c0fe215e8fe17470f9113d42488b309ab98d7af199df403'
+const WORKER = new URL('./academy-macos-root-preflight-worker.sh', import.meta.url).pathname
+const ROOT_COPY = '/private/var/root/academy-macos-root-preflight-worker-5828f4b39d7c8f28.sh'
+const EXPECTED_WORKER_SHA256 = '5828f4b39d7c8f289a10119dd604d02cda3a489228a4a3950517c30b03cba51a'
 const OBSERVER = '/private/var/root/academy-release-observer-07ed27c0'
-const RECOVERY = `${WORKER.slice(0, WORKER.lastIndexOf('/'))}/academy-macos-release-recovery.mjs`
-const POINTER = `${WORKER.slice(0, WORKER.lastIndexOf('/'))}/academy-release-pointer.mjs`
-const MANIFEST = `${WORKER.slice(0, WORKER.lastIndexOf('/'))}/academy-release-manifest.mjs`
-const EXECUTOR = `${WORKER.slice(0, WORKER.lastIndexOf('/'))}/academy-bound-worker-executor.cjs`
+const SCRIPTS = WORKER.slice(0, WORKER.lastIndexOf('/'))
+const RECOVERY = `${SCRIPTS}/academy-macos-release-recovery.mjs`
+const POINTER = `${SCRIPTS}/academy-release-pointer.mjs`
+const MANIFEST = `${SCRIPTS}/academy-release-manifest.mjs`
+const CLI = `${SCRIPTS}/academy-release-cli.mjs`
+const INSTALL = `${SCRIPTS}/academy-release-install.mjs`
+const RENDER = `${SCRIPTS}/academy-release-render.mjs`
+const EXECUTOR = `${SCRIPTS}/academy-bound-worker-executor.cjs`
 const NODE = '/private/tmp/academy-release-sources-fa7/node'
 const EXPECTED_RECOVERY_SHA256 = '844d92b9734a18fac1d14c842c25c2ff814b2d7a5840a14690bab3ee517a3d41'
 const EXPECTED_POINTER_SHA256 = '7cac358f35e6446e314e5cc9f884c9770b3395dcf9394221d6f61c569385fcee'
-const EXPECTED_MANIFEST_SHA256 = '803f50c7f33ef22f9d199ee8b4e7dfe3810c33861999a8c2109880f62ab4eaec'
+const EXPECTED_MANIFEST_SHA256 = 'e63128223ff20ef86f6ca1108845848523e7b25f46293cfab39ea66e25d37413'
+const EXPECTED_CLI_SHA256 = 'ef405f7b9df4a8ba7ed45d232c347019b09ea4bc344a6cb86070706c811b9d9d'
+const EXPECTED_INSTALL_SHA256 = '0505358687fe35ba97789b5700801c27b3405ff5ad66a960c899d646f922e8cf'
+const EXPECTED_RENDER_SHA256 = '4b9560748dac8e82afd7719f8a55dca140078293e1b8ec9be453c479eb4a020a'
 const EXPECTED_EXECUTOR_SHA256 = '07ed27c084efc6767b010a33a2b80522161bf85b1298d5606fceb8616cf4ab2e'
 const EXPECTED_NODE_SHA256 = '9bc64e922cba152eedf55cd4528ac0b5b7e0f4cd9d671d77bb0830c9796ea188'
 const fail = reason => { throw new Error(reason ?? 'ACADEMY_MACOS_ROOT_PREFLIGHT_REJECTED') }
@@ -32,6 +39,9 @@ export const OBSERVER_ASSETS = Object.freeze([
   Object.freeze({ source:RECOVERY, name:'academy-macos-release-recovery.mjs', mode:400, sha256:EXPECTED_RECOVERY_SHA256 }),
   Object.freeze({ source:POINTER, name:'academy-release-pointer.mjs', mode:400, sha256:EXPECTED_POINTER_SHA256 }),
   Object.freeze({ source:MANIFEST, name:'academy-release-manifest.mjs', mode:400, sha256:EXPECTED_MANIFEST_SHA256 }),
+  Object.freeze({ source:CLI, name:'academy-release-cli.mjs', mode:400, sha256:EXPECTED_CLI_SHA256 }),
+  Object.freeze({ source:INSTALL, name:'academy-release-install.mjs', mode:400, sha256:EXPECTED_INSTALL_SHA256 }),
+  Object.freeze({ source:RENDER, name:'academy-release-render.mjs', mode:400, sha256:EXPECTED_RENDER_SHA256 }),
   Object.freeze({ source:EXECUTOR, name:'academy-bound-worker-executor.cjs', mode:400, sha256:EXPECTED_EXECUTOR_SHA256 }),
 ])
 
