@@ -26,7 +26,7 @@ Frozen tree: `/private/tmp/secrev-academy` (HEAD `02c712e`, read-only). Inputs: 
   production-runtime.ts:216-229    startAuthorization สร้าง authorize URL ในเครื่อง (ไม่ยิงออก) — outbound เกิดเฉพาะ callback
   ```
 - **Remediation:** เพิ่ม rule ใน `edge-rate-limit-policy.ts` สำหรับ `GET|POST /api/auth/identity/start` และ `GET /auth/callback` (ขยาย `edgeRateLimitRule` ให้รับ method ต่อ path; key = `cf-connecting-ip`; callback เข้มกว่า 10/min); ใน route ให้ fail closed เมื่อไม่มี marker ใน production แทน silent pass; ใน `create_identity_authorization_transaction` ปฏิเสธเมื่อ pending row ที่ยังไม่หมดอายุเกิน global ceiling; พิจารณา Turnstile บนปุ่ม sign-in start และ WAF rate-limit rule ที่ Cloudflare ก่อน public launch.
-- **Sources:** both (Fable #12/#16/#36a, GLM medium) · **Status:** OPEN
+- **Sources:** both (Fable #12/#16/#36a, GLM medium) · **Status:** CODE CHANGED — LOCAL GATES BLOCKED (independent review + deployment pending; npm tarball fetch ENOTFOUND)
 
 ### SEC-ACADEMY-002 · middleware ฝั่ง production ไม่รู้จัก Identity session: ทุก path ที่ไม่ public (รวม `/api/*`) ถูก 307 ไป `/sign-in` โดยไม่ดู cookie
 - **Severity:** MEDIUM (fail-closed; blocker ของ customer-critical flow + ไม่มี defense-in-depth) · **Verdict:** CONFIRMED
@@ -89,7 +89,7 @@ Frozen tree: `/private/tmp/secrev-academy` (HEAD `02c712e`, read-only). Inputs: 
   wrangler.jsonc:10                "limits": { "cpu_ms": 500 }
   ```
 - **Remediation:** ก่อน `formData()` ปฏิเสธถ้า `content-type` ไม่ใช่ `application/x-www-form-urlencoded` หรือ `content-length` หาย/เกิน ~2 KB; ดีกว่านั้นคือ `readBoundedBody(request, 2048)` แล้ว parse ด้วย `URLSearchParams` (ปฏิเสธ multipart ทั้งหมด); ทำเหมือนกันที่ route.ts:77; unit test ว่า body 1 MB ได้ 413 โดยไม่ถูกอ่านจนจบ.
-- **Sources:** Fable (#17) · **Status:** OPEN
+- **Sources:** Fable (#17) · **Status:** CODE CHANGED — LOCAL GATES BLOCKED (independent review + deployment pending; npm tarball fetch ENOTFOUND)
 
 ### SEC-ACADEMY-006 · capstone (certificate-bearing) brute-force ได้: answer space 256–1024 state, โจทย์ชุดเดิมทุก attempt, oracle ตอบแค่ pass/fail, quota 3/30 นาที; override `ATTEMPT_MAX_PER_WINDOW` ไม่มี production guard
 - **Severity:** MEDIUM · **Verdict:** CONFIRMED
@@ -418,11 +418,11 @@ Frozen tree: `/private/tmp/secrev-academy` (HEAD `02c712e`, read-only). Inputs: 
 | DIM-08 | Cryptography & data protection | HMAC-SHA256 grant + constant-time compare, CSPRNG session id, plaintext-at-rest, FNV fingerprint, erasure path (`users.ts` insert-on-read), privacy runbook, consent RPC | CHECKED | 2026-09-05 | SEC-ACADEMY-004/009/010/015/022/023 |
 | DIM-09 | Business-logic abuse | วัด answer space จาก 47 capstone lesson files, quota `issue_attempt` 0013, `roadmap.ts` skip semantics, oracle shape ใน progress route, env override | CHECKED | 2026-09-05 | SEC-ACADEMY-006 |
 | DIM-10 | Security test coverage & fail-open gates | middleware unit test env, integration `skipIf`, e2e `security-boundaries.spec.ts` (suspend/revoke/CSRF), `security-headers.test.ts` pin `'unsafe-inline'`, `edge-host-policy.test.ts` ใน fix | CHECKED | 2026-09-05 | SEC-ACADEMY-002(test)/013(test)/018 |
-| SEC-ACADEMY-001 | Rate limiting | เพิ่ม edge rule (method-aware) สำหรับ `/api/auth/identity/start` GET/POST และ `/auth/callback` GET; fail closed เมื่อไม่มี marker; pending-row ceiling ใน `create_identity_authorization_transaction`; Turnstile/WAF ก่อน public | OPEN | 2026-09-05 | ทั้งหมด |
+| SEC-ACADEMY-001 | Rate limiting | เพิ่ม edge rule (method-aware) สำหรับ `/api/auth/identity/start` GET/POST และ `/auth/callback` GET; fail closed เมื่อไม่มี marker; pending-row ceiling ใน `create_identity_authorization_transaction`; Turnstile/WAF ก่อน public | CODE FIXED — PENDING INDEPENDENT REVIEW | 2026-09-06 | independent review and production only; exact unit gate blocked pre-test by pinned `npm ci` network `ENOTFOUND`; DB ceiling not added because per-actor edge admission now precedes each transaction/exchange |
 | SEC-ACADEMY-002 | Auth gate wiring | production branch ใน middleware (syntactic prefilter, 401 JSON สำหรับ `/api/*`), `/api/auth/me` และ dashboard ผ่าน `currentUser()`, adversarial unit ครอบ forged/expired/revoked durable session | DEPLOYED; real-session pending | 2026-09-05 | production smoke ด้วย cookie จริงและ owner-present journey — ยังไม่ปิด production |
 | SEC-ACADEMY-003 | Session revocation / lifecycle | RPC `revoke_identity_sessions_for_principal` + index; wire lifecycle pull → `sync_service_activation` + revoke; manual kill-switch ใน runbook | OPEN | 2026-09-05 | ทั้งหมด (release blocker `lifecycle-publisher-endpoint-and-audience` ยังเปิด) |
 | SEC-ACADEMY-004 | Data protection (erasure) | find-only resolver บน request path; email อัปเดตเฉพาะจาก exchange/lifecycle; revoke sessions ก่อนลบ `users`; `account_id` cascade | OPEN | 2026-09-05 | ทั้งหมด |
-| SEC-ACADEMY-005 | Unbounded input | bounded form read (≤2 KB, urlencoded เท่านั้น) ใน `runtime-browser-flow.ts:132` และ `start/route.ts:77`; unit test 413 | OPEN | 2026-09-05 | ทั้งหมด |
+| SEC-ACADEMY-005 | Unbounded input | bounded form read (≤2 KB, urlencoded เท่านั้น) ใน `runtime-browser-flow.ts:132` และ `start/route.ts:77`; unit test 413 | CODE FIXED — PENDING INDEPENDENT REVIEW | 2026-09-06 | independent review and production only; exact unit gate blocked pre-test by pinned `npm ci` network `ENOTFOUND` |
 | SEC-ACADEMY-006 | Assessment integrity | bank ≥3× + sample/shuffle; backoff + daily cap ใน `issue_attempt`; alert; clamp `ATTEMPT_MAX_PER_WINDOW` ใน production; dwell time | OPEN | 2026-09-05 | ทั้งหมด |
 | SEC-ACADEMY-007 | Rate-limit path normalisation | normalise pathname ก่อน lookup; ปฏิเสธ variant ด้วย 404; production fail-closed แทน in-memory fallback; tests สำหรับ `/…/` และ encoded | OPEN | 2026-09-05 | ทั้งหมด (latent) |
 | SEC-ACADEMY-008 | Rate-limit key granularity | IPv6 /64 aggregation; per-target key (email hash); global per-route ceiling | OPEN | 2026-09-05 | ทั้งหมด |

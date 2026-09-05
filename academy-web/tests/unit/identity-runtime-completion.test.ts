@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { GET as callbackRoute } from '@/app/(site)/auth/callback/route'
 import { POST as startRoute } from '@/app/(site)/api/auth/identity/start/route'
+import { withEdgeRateLimitMarker } from '@/lib/edge-rate-limit-policy'
 import { APPROVED_ACADEMY_CONSUMER_REGISTRY_V1 } from '@/lib/identity/consumer-policy'
 import { resetIdentityAdapterForTest } from '@/lib/identity/registry'
 import {
@@ -316,15 +317,20 @@ describe('Academy Identity runtime completion seam', () => {
       'separate-production-authorization',
     )
     vi.stubEnv('ACADEMY_IDENTITY_CONTROL_LOCAL_FIXTURE', '')
+    const edgeKey = 'runtime-completion-edge-marker-test-key'
+    vi.stubEnv('RATE_LIMIT_KEY_SECRET', edgeKey)
 
-    const start = await startRoute(new Request('https://academy.example/api/auth/identity/start', {
-      method: 'POST',
-    }))
+    const start = await startRoute(await withEdgeRateLimitMarker(
+      new Request('https://academy.example/api/auth/identity/start', { method: 'POST' }),
+      { secret: edgeKey },
+    ))
     expect(start.status).toBe(404)
 
     vi.stubEnv('IDENTITY_ADAPTER', 'identity-control')
     resetIdentityAdapterForTest()
-    const callback = await callbackRoute(new Request(callbackUrl().toString()))
+    const callback = await callbackRoute(await withEdgeRateLimitMarker(
+      new Request(callbackUrl().toString()), { secret: edgeKey },
+    ))
     expect(callback.status).toBe(303)
     expect(new URL(callback.headers.get('location') ?? '').searchParams.get('notice')).toBe('identity-unavailable')
     expect(callback.headers.get('set-cookie')).toBeNull()

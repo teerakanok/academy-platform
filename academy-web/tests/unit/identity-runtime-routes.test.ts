@@ -3,6 +3,7 @@ import type {
   AcademyIdentityRuntimeBrowserFlow,
   AcademyIdentityRuntimeBrowserFlowResult,
 } from '@/lib/identity/runtime-browser-flow'
+import { withEdgeRateLimitMarker } from '@/lib/edge-rate-limit-policy'
 
 const routeMocks = vi.hoisted(() => {
   class IdentityAdapterUnavailableError extends Error {
@@ -51,15 +52,22 @@ const sessionCookie =
   'academy_session=opaque_session_value_123456; Path=/; HttpOnly; SameSite=Lax'
 const browserBindingExpiryCookie =
   'academy_identity_binding=; Path=/auth/callback; Max-Age=0; HttpOnly; SameSite=Lax'
+const rateLimitSecret = 'identity-route-mock-secret-32-bytes'
 
 beforeEach(() => {
+  vi.stubEnv('RATE_LIMIT_KEY_SECRET', rateLimitSecret)
   routeMocks.identityControlLocalFixtureAllowedForRequest.mockReturnValue(false)
   routeMocks.getIdentityRuntimeBrowserFlow.mockReturnValue(routeMocks.browserFlow)
 })
 
 afterEach(() => {
+  vi.unstubAllEnvs()
   vi.resetAllMocks()
 })
+
+async function admitted(request: Request): Promise<Request> {
+  return withEdgeRateLimitMarker(request, { secret: rateLimitSecret })
+}
 
 describe('Identity runtime browser-flow routes', () => {
   it('redirects an enabled start request using the exact request, flow status, target, and cookies', async () => {
@@ -72,10 +80,11 @@ describe('Identity runtime browser-flow routes', () => {
     }
     routeMocks.startMock.mockResolvedValueOnce(result)
 
-    const response = await startRoute(request)
+    const markedRequest = await admitted(request)
+    const response = await startRoute(markedRequest)
 
     expect(routeMocks.startMock).toHaveBeenCalledTimes(1)
-    expect(routeMocks.startMock.mock.calls[0][0]).toBe(request)
+    expect(routeMocks.startMock.mock.calls[0][0]).toBe(markedRequest)
     expect(response.status).toBe(303)
     expect(response.headers.get('location')).toBe(identityAuthorizationUrl)
     expect(response.headers.getSetCookie()).toEqual([sessionCookie, browserBindingExpiryCookie])
@@ -90,10 +99,11 @@ describe('Identity runtime browser-flow routes', () => {
       cookies: [sessionCookie, browserBindingExpiryCookie],
     })
 
-    const response = await startNavigationRoute(request)
+    const markedRequest = await admitted(request)
+    const response = await startNavigationRoute(markedRequest)
 
     expect(routeMocks.startNavigationMock).toHaveBeenCalledTimes(1)
-    expect(routeMocks.startNavigationMock.mock.calls[0][0]).toBe(request)
+    expect(routeMocks.startNavigationMock.mock.calls[0][0]).toBe(markedRequest)
     expect(response.status).toBe(303)
     expect(response.headers.get('location')).toBe(identityAuthorizationUrl)
     expect(response.headers.get('cache-control')).toBe('no-store')
@@ -104,7 +114,7 @@ describe('Identity runtime browser-flow routes', () => {
     const request = new Request(`${academyOrigin}/api/auth/identity/start?next=%2Fdashboard`, { method: 'GET' })
     routeMocks.identityControlLocalFixtureAllowedForRequest.mockReturnValueOnce(true)
 
-    const response = await startNavigationRoute(request)
+    const response = await startNavigationRoute(await admitted(request))
 
     expect(response.status).toBe(405)
     expect(response.headers.get('cache-control')).toBe('no-store')
@@ -117,7 +127,7 @@ describe('Identity runtime browser-flow routes', () => {
     const request = new Request(`${academyOrigin}/api/auth/identity/start?next=%2Fdashboard`)
     routeMocks.getIdentityRuntimeBrowserFlow.mockReturnValueOnce(null)
 
-    const response = await startNavigationRoute(request)
+    const response = await startNavigationRoute(await admitted(request))
 
     expect(response.status).toBe(404)
     expect(response.headers.get('cache-control')).toBe('no-store')
@@ -133,7 +143,7 @@ describe('Identity runtime browser-flow routes', () => {
       cookies: [],
     })
 
-    const response = await startNavigationRoute(request)
+    const response = await startNavigationRoute(await admitted(request))
 
     expect(response.status).toBe(303)
     expect(response.headers.get('cache-control')).toBe('no-store')
@@ -151,7 +161,7 @@ describe('Identity runtime browser-flow routes', () => {
       throw new routeMocks.IdentityAdapterUnavailableError('unavailable')
     })
 
-    const response = await startNavigationRoute(request)
+    const response = await startNavigationRoute(await admitted(request))
 
     expect(response.status).toBe(303)
     expect(response.headers.get('cache-control')).toBe('no-store')
@@ -169,10 +179,11 @@ describe('Identity runtime browser-flow routes', () => {
       cookies: [],
     })
 
-    const response = await startRoute(request)
+    const markedRequest = await admitted(request)
+    const response = await startRoute(markedRequest)
 
     expect(routeMocks.startMock).toHaveBeenCalledTimes(1)
-    expect(routeMocks.startMock.mock.calls[0][0]).toBe(request)
+    expect(routeMocks.startMock.mock.calls[0][0]).toBe(markedRequest)
     expect(response.status).toBe(403)
     expect(response.headers.get('location')).toBeNull()
     await expect(response.json()).resolves.toEqual({ ok: false, error: 'route_start_denied' })
@@ -187,10 +198,11 @@ describe('Identity runtime browser-flow routes', () => {
       cookies: [sessionCookie, browserBindingExpiryCookie],
     })
 
-    const response = await callbackRoute(request)
+    const markedRequest = await admitted(request)
+    const response = await callbackRoute(markedRequest)
 
     expect(routeMocks.completeMock).toHaveBeenCalledTimes(1)
-    expect(routeMocks.completeMock.mock.calls[0][0]).toBe(request)
+    expect(routeMocks.completeMock.mock.calls[0][0]).toBe(markedRequest)
     expect(response.status).toBe(303)
     expect(response.headers.get('location')).toBe(`${academyOrigin}/dashboard?return=%2Fcourses`)
     expect(response.headers.getSetCookie()).toEqual([sessionCookie, browserBindingExpiryCookie])
@@ -205,10 +217,11 @@ describe('Identity runtime browser-flow routes', () => {
       cookies: [browserBindingExpiryCookie, sessionCookie],
     })
 
-    const response = await callbackRoute(request)
+    const markedRequest = await admitted(request)
+    const response = await callbackRoute(markedRequest)
 
     expect(routeMocks.completeMock).toHaveBeenCalledTimes(1)
-    expect(routeMocks.completeMock.mock.calls[0][0]).toBe(request)
+    expect(routeMocks.completeMock.mock.calls[0][0]).toBe(markedRequest)
     expect(response.status).toBe(303)
     expect(response.headers.get('cache-control')).toBe('no-store')
     const location = new URL(response.headers.get('location') ?? '')

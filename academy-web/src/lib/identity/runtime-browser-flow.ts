@@ -1,5 +1,6 @@
 import { safeNextPath } from '@/lib/auth/route-client'
 import { validateMutationRequest } from '@/lib/http/mutation-security'
+import { readIdentityStartForm } from './start-form'
 
 import type { AuthorizationRequest } from './adapter'
 import {
@@ -45,7 +46,7 @@ export type AcademyIdentityRuntimeBrowserFlowResult =
     }
   | {
       kind: 'error'
-      status: 400 | 403 | 415 | 503
+      status: 400 | 403 | 413 | 415 | 503
       error: string
       cookies: readonly string[]
     }
@@ -129,15 +130,9 @@ export function createAcademyIdentityRuntimeBrowserFlow(
           const mutation = validateMutationRequest(request)
           if (!mutation.ok) return errorResult(mutation.status, mutation.error)
 
-          const form = await request.formData()
-          if ([...form.keys()].length !== 1 || form.getAll('next').length !== 1) {
-            return errorResult(400, 'คำขอเข้าสู่ระบบไม่ถูกต้อง')
-          }
-          const rawNext = form.get('next')
-          if (typeof rawNext !== 'string') {
-            return errorResult(400, 'คำขอเข้าสู่ระบบไม่ถูกต้อง')
-          }
-          return await authorize(rawNext)
+          const form = await readIdentityStartForm(request)
+          if (!form.ok) return errorResult(form.status, form.error)
+          return await authorize(form.next)
         } catch {
           return errorResult(503, START_FAILURE)
         }
@@ -282,7 +277,7 @@ function redirectResult(
 }
 
 function errorResult(
-  status: 400 | 403 | 415 | 503,
+  status: 400 | 403 | 413 | 415 | 503,
   error: string,
   cookies: readonly string[] = [],
 ): AcademyIdentityRuntimeBrowserFlowResult {

@@ -9,6 +9,7 @@ import {
   readLocalIdentityBrowserBinding,
 } from '@/lib/identity/local-runtime'
 import { completeSignedIdentityCallback } from '@/lib/identity/transaction'
+import { hasEdgeRateLimitMarker } from '@/lib/edge-rate-limit-policy'
 
 export const runtime = 'nodejs'
 
@@ -26,6 +27,9 @@ export const runtime = 'nodejs'
 // สำหรับ durable store/session ของ Academy.
 
 export async function GET(request: Request) {
+  if (!await hasEdgeRateLimitMarker(request, { secret: process.env.RATE_LIMIT_KEY_SECRET })) {
+    return new NextResponse(null, { status: 503, headers: { 'cache-control': 'no-store' } })
+  }
   const url = new URL(request.url)
 
   if (identityControlLocalFixtureAllowedForRequest(request)) {

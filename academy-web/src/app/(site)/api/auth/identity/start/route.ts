@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { safeNextPath } from '@/lib/auth/route-client'
+import { hasEdgeRateLimitMarker } from '@/lib/edge-rate-limit-policy'
 import { validateMutationRequest } from '@/lib/http/mutation-security'
 import { identityControlLocalFixtureAllowedForRequest } from '@/lib/identity/local-fixture'
 import { IdentityAdapterUnavailableError, getIdentityRuntimeBrowserFlow } from '@/lib/identity/registry'
@@ -9,12 +10,16 @@ import {
   localIdentityBrowserBindingCookie,
 } from '@/lib/identity/local-runtime'
 import { beginIdentityAuthorization } from '@/lib/identity/transaction'
+import { readIdentityStartForm } from '@/lib/identity/start-form'
 
 export const runtime = 'nodejs'
 
 const NO_STORE_HEADERS = { 'cache-control': 'no-store' }
 
 export async function GET(request: Request) {
+  if (!await hasEdgeRateLimitMarker(request, { secret: process.env.RATE_LIMIT_KEY_SECRET })) {
+    return new NextResponse(null, { status: 503, headers: NO_STORE_HEADERS })
+  }
   if (identityControlLocalFixtureAllowedForRequest(request)) {
     return new NextResponse(null, { status: 405, headers: NO_STORE_HEADERS })
   }
@@ -47,6 +52,9 @@ function signInNoticeRedirect(request: Request, notice: 'identity-start-failed' 
 }
 
 export async function POST(request: Request) {
+  if (!await hasEdgeRateLimitMarker(request, { secret: process.env.RATE_LIMIT_KEY_SECRET })) {
+    return new NextResponse(null, { status: 503, headers: NO_STORE_HEADERS })
+  }
   if (!identityControlLocalFixtureAllowedForRequest(request)) {
     try {
       const browserFlow = getIdentityRuntimeBrowserFlow()
@@ -74,16 +82,14 @@ export async function POST(request: Request) {
   }
 
   try {
-    const form = await request.formData()
-    if ([...form.keys()].length !== 1 || form.getAll('next').length !== 1) {
-      return NextResponse.json({ ok: false, error: 'คำขอเข้าสู่ระบบไม่ถูกต้อง' }, { status: 400 })
-    }
-    const rawNext = form.get('next')
-    if (typeof rawNext !== 'string') {
-      return NextResponse.json({ ok: false, error: 'คำขอเข้าสู่ระบบไม่ถูกต้อง' }, { status: 400 })
-    }
+    const form = await readIdentityStartForm(request)
+    if (!form.ok) return NextResponse.json({ ok: false, error: form.error }, { status: form.status })
     const local = createIdentityLocalRuntime(request)
-    const started = await beginIdentityAuthorization(local.transactionStore, local.registration, safeNextPath(rawNext))
+    const started = await beginIdentityAuthorization(
+      local.transactionStore,
+      local.registration,
+      safeNextPath(form.next),
+    )
     const response = NextResponse.redirect(localAccountCenterUrl(local.accountCenterOrigin, started.request), 303)
     response.headers.append('set-cookie', localIdentityBrowserBindingCookie(started.state, started.browserBinding))
     return response

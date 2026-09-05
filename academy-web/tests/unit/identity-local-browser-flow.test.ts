@@ -8,6 +8,7 @@ import { GET as readAccount } from '@/app/(site)/api/auth/me/route'
 import { POST as signOut } from '@/app/(site)/api/auth/sign-out/route'
 import { GET as readProgress } from '@/app/(site)/api/progress/route'
 import { createIdentityLocalRuntime, createLocalAcademySession } from '@/lib/identity/local-runtime'
+import { withEdgeRateLimitMarker } from '@/lib/edge-rate-limit-policy'
 
 const originalEnvironment = { ...process.env }
 const originalFetch = globalThis.fetch
@@ -109,6 +110,10 @@ async function signedLocalResultFixture(nonce: string) {
   }
 }
 
+async function admitted(request: Request): Promise<Request> {
+  return withEdgeRateLimitMarker(request, { secret: 'local-identity-browser-flow-secret-32b' })
+}
+
 describe('Academy local Identity Control browser flow', () => {
   let stateDirectory: string
 
@@ -122,6 +127,7 @@ describe('Academy local Identity Control browser flow', () => {
       ACADEMY_IDENTITY_CONTROL_LOCAL_ACCOUNT_CENTER_ORIGIN: 'http://localhost:5173',
       ACADEMY_IDENTITY_CONTROL_LOCAL_API_ORIGIN: 'http://localhost:8788',
       ACADEMY_IDENTITY_CONTROL_LOCAL_STATE_DIRECTORY: stateDirectory,
+      RATE_LIMIT_KEY_SECRET: 'local-identity-browser-flow-secret-32b',
     }
   })
 
@@ -133,7 +139,7 @@ describe('Academy local Identity Control browser flow', () => {
   })
 
   it('completes sign-in through Account Center and creates an Academy session with zero entitlement', async () => {
-    const started = await startAuthorization(new Request('http://localhost:3000/api/auth/identity/start', {
+    const started = await startAuthorization(await admitted(new Request('http://localhost:3000/api/auth/identity/start', {
       method: 'POST',
       headers: {
         'content-type': 'application/x-www-form-urlencoded',
@@ -142,7 +148,7 @@ describe('Academy local Identity Control browser flow', () => {
         'sec-fetch-site': 'same-origin',
       },
       body: new URLSearchParams({ next: '/dashboard' }),
-    }))
+    })))
     expect(started.status).toBe(303)
     const accountCenterUrl = new URL(started.headers.get('location')!)
     expect(accountCenterUrl.origin + accountCenterUrl.pathname).toBe('http://localhost:5173/sign-in')
@@ -178,10 +184,10 @@ describe('Academy local Identity Control browser flow', () => {
       return byteJsonResponse({ signedResult })
     }) as typeof fetch
 
-    const callback = await completeCallback(new Request(
+    const callback = await completeCallback(await admitted(new Request(
       `http://localhost:3000/auth/callback?code=code_reference_123456789&state=${state}`,
       { headers: { cookie: bindingCookie, host: 'localhost:3000' } },
-    ))
+    )))
     expect(callback.status).toBe(303)
     expect(callback.headers.get('location')).toBe('http://localhost:3000/dashboard')
     const sessionCookie = cookiePair(callback.headers.get('set-cookie')!, 'academy_session')
@@ -225,7 +231,7 @@ describe('Academy local Identity Control browser flow', () => {
   })
 
   it('refuses local runtime on a non-loopback request before creating state', async () => {
-    const response = await startAuthorization(new Request('https://academy.example/api/auth/identity/start', {
+    const response = await startAuthorization(await admitted(new Request('https://academy.example/api/auth/identity/start', {
       method: 'POST',
       headers: {
         'content-type': 'application/x-www-form-urlencoded',
@@ -234,7 +240,7 @@ describe('Academy local Identity Control browser flow', () => {
         'sec-fetch-site': 'same-origin',
       },
       body: new URLSearchParams({ next: '/dashboard' }),
-    }))
+    })))
     expect(response.status).toBe(404)
   })
 

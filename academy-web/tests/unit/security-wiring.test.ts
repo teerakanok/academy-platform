@@ -105,8 +105,17 @@ describe('security boundary wiring', () => {
     'src/app/api/leads/unsubscribe/route.ts',
     'src/app/api/auth/otp/route.ts',
     'src/app/api/auth/verify/route.ts',
+    'src/app/api/auth/identity/start/route.ts',
+    'src/app/auth/callback/route.ts',
   ])('%s เชื่อใจ edge marker ที่มีค่า exact เท่านั้น', (path) => {
     expect(source(path)).toContain('hasEdgeRateLimitMarker')
+  })
+
+  it('Identity start อ่าน form แบบมีขอบและจำกัด media type', () => {
+    expect(source('src/lib/identity/runtime-browser-flow.ts')).toContain('readIdentityStartForm')
+    expect(source('src/app/api/auth/identity/start/route.ts')).toContain('readIdentityStartForm')
+    expect(source('src/lib/identity/start-form.ts')).toContain('application/x-www-form-urlencoded')
+    expect(source('src/lib/identity/start-form.ts')).not.toContain('formData()')
   })
 
   it('unsubscribe bearer token อยู่ใน fragment เท่านั้น ไม่ผ่าน query เข้า server หรือ edge', () => {

@@ -1,0 +1,51 @@
+
+> academy-web@0.1.0 lint
+> eslint . && tsc --noEmit && tsc -p tsconfig.worker.json && tsc -p ops/academy-retention-worker/tsconfig.json
+
+
+/private/tmp/academy-security-glm-cde63a58/academy-web/scripts/academy-bound-worker-executor.cjs
+  1:12  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+  2:16  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+  3:12  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+/private/tmp/academy-security-glm-cde63a58/academy-web/scripts/academy-macos-root-preflight.test.mjs
+  14:4   warning  'executable' is defined but never used  @typescript-eslint/no-unused-vars
+  14:15  warning  'args' is defined but never used        @typescript-eslint/no-unused-vars
+  14:20  warning  'options' is defined but never used     @typescript-eslint/no-unused-vars
+
+/private/tmp/academy-security-glm-cde63a58/academy-web/scripts/academy-production-cloudflare-helper.test.mjs
+  156:49  warning  'includeApplication' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  695:16  warning  'root' is assigned a value but never used                @typescript-eslint/no-unused-vars
+
+/private/tmp/academy-security-glm-cde63a58/academy-web/scripts/academy-production-database-adapter.mjs
+  20:512  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+
+/private/tmp/academy-security-glm-cde63a58/academy-web/scripts/academy-production-database-adapter.test.mjs
+  124:39  warning  'i' is defined but never used  @typescript-eslint/no-unused-vars
+
+/private/tmp/academy-security-glm-cde63a58/academy-web/scripts/academy-release-cli.mjs
+  5:10  warning  'dirname' is defined but never used  @typescript-eslint/no-unused-vars
+
+/private/tmp/academy-security-glm-cde63a58/academy-web/scripts/academy-release-fs-fake.mjs
+  7:7  warning  'IFREG' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  8:7  warning  'IFDIR' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  9:7  warning  'IFLNK' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/private/tmp/academy-security-glm-cde63a58/academy-web/scripts/academy-release-real-fs.test.mjs
+  11:10  warning  'dirname' is defined but never used  @typescript-eslint/no-unused-vars
+
+/private/tmp/academy-security-glm-cde63a58/academy-web/scripts/calc.mjs
+  17:10  warning  'readFileSync' is defined but never used  @typescript-eslint/no-unused-vars
+
+/private/tmp/academy-security-glm-cde63a58/academy-web/scripts/dump-biased-mcqs.mjs
+  4:37  warning  'existsSync' is defined but never used  @typescript-eslint/no-unused-vars
+
+/private/tmp/academy-security-glm-cde63a58/academy-web/src/lib/content/registry.generated.ts
+  4:1  warning  Unused eslint-disable directive (no problems were reported)
+
+/private/tmp/academy-security-glm-cde63a58/academy-web/tests/factcheck/arithmetic-consistency.mjs
+  21:7  warning  'NUM' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+✖ 19 problems (3 errors, 16 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

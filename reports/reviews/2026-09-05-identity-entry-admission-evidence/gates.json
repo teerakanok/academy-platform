@@ -1,0 +1,118 @@
+{
+  "base": "7352934db6ad8c26ebb76766cf29cbf77d8f7183",
+  "source_sha256": {
+    "academy-web/docs/edge-rate-limit.md": "4df7ecde6bead6aef44d0dcf07824aceec6aa084554d0a7f5d99d36e083ac4f0",
+    "academy-web/src/app/(site)/api/auth/identity/start/route.ts": "353f7a59ee92781e5b38ce578d45c1e2e744df8b7d040244a0e91ce63a98c3fd",
+    "academy-web/src/app/(site)/auth/callback/route.ts": "72bdde85c5fe149445d2a2e9773626ba0a4dcca7d823df15498945ed3829038c",
+    "academy-web/src/lib/edge-rate-limit-enforcement.ts": "b6625d371b5d7405c26d0a310120ee900dcb8cfdc86dfc9b751d4b44abee8e06",
+    "academy-web/src/lib/edge-rate-limit-policy.ts": "ae568fe57309333a8517717db14f027e3eb6d8c1e21a73d6947a69a807aedd93",
+    "academy-web/src/lib/identity/runtime-browser-flow.ts": "4953fc7eeae4493575d375414b943053a0d1c2d6e51d8fa2be48e9f1fdca46aa",
+    "academy-web/src/lib/identity/start-form.ts": "d9e9995347bb68ba4b3776bd5e7ddb96fad8ff1245c85ba373b5f9951884f72d",
+    "academy-web/tests/unit/auth-callback-route.test.ts": "c973362339caf0256d6ac331d4af5c3ace898666098043dca26d78d4912a5a5f",
+    "academy-web/tests/unit/edge-rate-limit-policy.test.ts": "74717fe892230a139a9c5015e8f447b6f4a42cba2b675860c775fa34f47f6fdc",
+    "academy-web/tests/unit/identity-local-browser-flow.test.ts": "e478d89ed63e1c1b659c69be943800ae5f0ae12b1aaf7c8d3d1a27e87f017648",
+    "academy-web/tests/unit/identity-production-runtime-routes.test.ts": "813ff8b862766a5058e16dd9ddc1009c752c92287786408ba695db6131e9dafe",
+    "academy-web/tests/unit/identity-runtime-completion.test.ts": "43e48441de62456e09c863f3945c497eb5ea4899fd88a9ec143c88d48f60060c",
+    "academy-web/tests/unit/identity-runtime-routes.test.ts": "3a9737ec1373f524fa81e48a04d8d68039340890a698392e25c82d19fe22a7bb",
+    "academy-web/tests/unit/identity-security-admission.test.ts": "9f2aa1f453a6d220184d3ae8da5c63a83e0c1c14968a4a80bebcce2169fc6ab7",
+    "academy-web/tests/unit/security-wiring.test.ts": "c281e8c0d79cb6cd4af4aae42ddaf398a554251865959724f260be68716e687a",
+    "academy-web/worker.ts": "fbab8247ef050c085885e7c21fcb16041d116714bf932f1cd13a30c03a77c9a2"
+  },
+  "gates": [
+    {
+      "name": "unit",
+      "argv": [
+        "rtk",
+        "proxy",
+        "npx",
+        "vitest",
+        "run",
+        "--project",
+        "unit"
+      ],
+      "cwd": "/private/tmp/academy-security-glm-cde63a58/academy-web",
+      "exit": 0,
+      "log": "academy-security-unit.log",
+      "sha256": "8f5b51be2cbbfb413aa6042d78018a3de8a4a8faf29c0b0d25b9e83beb703469",
+      "utc": "2026-09-05T18:46:06.625760+00:00"
+    },
+    {
+      "name": "lint",
+      "argv": [
+        "rtk",
+        "proxy",
+        "npm",
+        "run",
+        "lint"
+      ],
+      "cwd": "/private/tmp/academy-security-glm-cde63a58/academy-web",
+      "exit": 1,
+      "log": "academy-security-lint.log",
+      "sha256": "72ea21b2181f07926f0d4ebfcd23b294b5667835ffa5c69471a8fde664507abb",
+      "utc": "2026-09-05T18:46:13.265145+00:00"
+    },
+    {
+      "name": "tsc-app",
+      "argv": [
+        "rtk",
+        "proxy",
+        "npx",
+        "tsc",
+        "--noEmit"
+      ],
+      "cwd": "/private/tmp/academy-security-glm-cde63a58/academy-web",
+      "exit": 0,
+      "log": "academy-security-tsc-app.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "utc": "2026-09-05T18:46:20.126759+00:00"
+    },
+    {
+      "name": "tsc-worker",
+      "argv": [
+        "rtk",
+        "proxy",
+        "npx",
+        "tsc",
+        "-p",
+        "tsconfig.worker.json"
+      ],
+      "cwd": "/private/tmp/academy-security-glm-cde63a58/academy-web",
+      "exit": 0,
+      "log": "academy-security-tsc-worker.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "utc": "2026-09-05T18:46:20.957444+00:00"
+    },
+    {
+      "name": "tsc-retention",
+      "argv": [
+        "rtk",
+        "proxy",
+        "npx",
+        "tsc",
+        "-p",
+        "ops/academy-retention-worker/tsconfig.json"
+      ],
+      "cwd": "/private/tmp/academy-security-glm-cde63a58/academy-web",
+      "exit": 0,
+      "log": "academy-security-tsc-retention.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "utc": "2026-09-05T18:46:21.663228+00:00"
+    },
+    {
+      "name": "build-cf",
+      "argv": [
+        "rtk",
+        "proxy",
+        "npm",
+        "run",
+        "build:cf"
+      ],
+      "cwd": "/private/tmp/academy-security-glm-cde63a58/academy-web",
+      "exit": 0,
+      "log": "academy-security-build-cf.log",
+      "sha256": "a47451c238828bf2359de5275e41b3ca04caf013f433e27ddc2be99103c12512",
+      "utc": "2026-09-05T18:47:18.550597+00:00"
+    }
+  ],
+  "lint_disposition": "Existing3errors16warnings; exact raw log retained, not PASS"
+}

@@ -2,12 +2,7 @@ import openNextHandler from './.open-next/worker.js'
 import { servePrivateMedia, type MediaWorkerEnv } from './src/lib/media/worker-delivery'
 import { EdgeRateLimiter } from './worker/edge-rate-limiter-do'
 import { isServedHost, unservedHostResponse, type HostPolicyEnv } from './src/lib/edge-host-policy'
-import {
-  edgeClientAddress,
-  edgeRateLimitObjectName,
-  edgeRateLimitRule,
-  withEdgeRateLimitMarker,
-} from './src/lib/edge-rate-limit-policy'
+import { enforceEdgeRateLimit } from './src/lib/edge-rate-limit-enforcement'
 
 export { EdgeRateLimiter }
 
@@ -19,45 +14,6 @@ export * from './.open-next/worker.js'
 interface AcademyWorkerEnv extends MediaWorkerEnv, HostPolicyEnv {
   EDGE_RATE_LIMITER?: DurableObjectNamespace<EdgeRateLimiter>
   RATE_LIMIT_KEY_SECRET?: string
-}
-
-async function enforceEdgeRateLimit(request: Request, env: AcademyWorkerEnv): Promise<Request | Response> {
-  const rule = edgeRateLimitRule(request)
-  if (!rule) return request
-
-  const clientAddress = edgeClientAddress(request)
-  if (!clientAddress || !env.EDGE_RATE_LIMITER || !env.RATE_LIMIT_KEY_SECRET) {
-    return new Response('ระบบยังไม่พร้อมใช้งานชั่วคราว', {
-      status: 503,
-      headers: { 'cache-control': 'no-store' },
-    })
-  }
-
-  try {
-    const objectName = await edgeRateLimitObjectName({
-      operation: rule.operation,
-      clientAddress,
-      secret: env.RATE_LIMIT_KEY_SECRET,
-    })
-    const decision = await env.EDGE_RATE_LIMITER.getByName(objectName).check(rule)
-    if (!decision.allowed) {
-      return new Response('ส่งคำขอถี่เกินไป โปรดลองใหม่ในอีกสักครู่', {
-        status: 429,
-        headers: {
-          'cache-control': 'no-store',
-          'retry-after': String(decision.retryAfterSeconds),
-        },
-      })
-    }
-  } catch {
-    // Rate protection must fail closed; do not log an actor identifier or secret.
-    return new Response('ระบบยังไม่พร้อมใช้งานชั่วคราว', {
-      status: 503,
-      headers: { 'cache-control': 'no-store' },
-    })
-  }
-
-  return withEdgeRateLimitMarker(request, { secret: env.RATE_LIMIT_KEY_SECRET })
 }
 
 /** Thai JSON bodies render as mojibake when a browser navigates to them without a declared charset. */

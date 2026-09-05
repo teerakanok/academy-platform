@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { withEdgeRateLimitMarker } from '@/lib/edge-rate-limit-policy'
+
 const database = vi.hoisted(() => ({ academyDb: vi.fn() }))
 
 vi.mock('@/lib/db/server', () => ({ academyDb: database.academyDb }))
@@ -27,6 +29,7 @@ const RESULT_KEY_SET_DOCUMENT = JSON.stringify({
 
 let transaction: Record<string, unknown> | undefined
 let rpcCalls: string[] = []
+const RATE_LIMIT_SECRET = 'identity-route-test-secret-32-bytes'
 
 beforeEach(async () => {
   const keyPair = await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify'])
@@ -39,6 +42,7 @@ beforeEach(async () => {
     d: privateJwk.d,
   })
   vi.stubEnv('IDENTITY_ADAPTER', 'identity-control')
+  vi.stubEnv('RATE_LIMIT_KEY_SECRET', RATE_LIMIT_SECRET)
   vi.stubEnv('IDENTITY_RUNTIME_ENABLED', 'true')
   vi.stubEnv('IDENTITY_RUNTIME_WIRED', 'true')
   vi.stubEnv('IDENTITY_RELEASE_APPROVAL', 'true')
@@ -93,6 +97,10 @@ beforeEach(async () => {
   })))
 })
 
+async function marked(request: Request): Promise<Request> {
+  return withEdgeRateLimitMarker(request, { secret: RATE_LIMIT_SECRET })
+}
+
 afterEach(() => {
   vi.unstubAllEnvs()
   vi.unstubAllGlobals()
@@ -101,7 +109,7 @@ afterEach(() => {
 
 describe('production Identity routes use the real registry composition', () => {
   it('starts through the registry and routes a callback into the same server-only composition', async () => {
-    const started = await startRoute(new Request('https://academy.cyberskills.co.th/api/auth/identity/start', {
+    const started = await startRoute(await marked(new Request('https://academy.cyberskills.co.th/api/auth/identity/start', {
       method: 'POST',
       headers: {
         origin: 'https://academy.cyberskills.co.th',
@@ -109,7 +117,7 @@ describe('production Identity routes use the real registry composition', () => {
         'content-type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({ next: '/dashboard' }),
-    }))
+    })))
 
     expect(started.status).toBe(303)
     const authorizationUrl = new URL(started.headers.get('location') ?? '')
@@ -119,10 +127,10 @@ describe('production Identity routes use the real registry composition', () => {
     const cookie = started.headers.getSetCookie()[0]!
     const cookiePair = cookie.split(';', 1)[0]!
 
-    const callback = await callbackRoute(new Request(
+    const callback = await callbackRoute(await marked(new Request(
       `https://academy.cyberskills.co.th/auth/callback?code=${'c'.repeat(24)}&state=${state}`,
       { headers: { cookie: cookiePair } },
-    ))
+    )))
 
     expect(callback.status).toBe(303)
     expect(new URL(callback.headers.get('location') ?? '').searchParams.get('notice')).toBe('identity-unavailable')
@@ -136,10 +144,10 @@ describe('production Identity routes use the real registry composition', () => {
   })
 
   it('sends a rejected navigation back to the sign-in page instead of a JSON body', async () => {
-    const navigation = await startNavigationRoute(new Request(
+    const navigation = await startNavigationRoute(await marked(new Request(
       'https://academy.cyberskills.co.th/api/auth/identity/start?next=%2Fdashboard',
       { headers: { 'sec-fetch-site': 'cross-site', 'sec-fetch-mode': 'navigate', 'sec-fetch-dest': 'document' } },
-    ))
+    )))
 
     expect(navigation.status).toBe(303)
     expect(navigation.headers.get('cache-control')).toBe('no-store')
@@ -152,7 +160,7 @@ describe('production Identity routes use the real registry composition', () => {
   })
 
   it('starts an admitted navigation with the production transaction and cookie contract', async () => {
-    const navigation = await startNavigationRoute(new Request(
+    const navigation = await startNavigationRoute(await marked(new Request(
       'https://academy.cyberskills.co.th/api/auth/identity/start?next=%2Fdashboard',
       {
         headers: {
@@ -162,7 +170,7 @@ describe('production Identity routes use the real registry composition', () => {
           'sec-fetch-user': '?1',
         },
       },
-    ))
+    )))
 
     expect(navigation.status).toBe(303)
     expect(navigation.headers.get('cache-control')).toBe('no-store')
