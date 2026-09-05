@@ -1,5 +1,1 @@
-{
-  "schema": "session-handoff-pointer/v1",
-  "path": "20260902T200753000Z-academy-identity-key-diagnostic-blocked.md",
-  "sha256": "088ef6b8466fe8c8ca45c5f1cd01654ac31a5e071a85e117f72400b2e051ed1d"
-}
+{"schema": "session-handoff-pointer/v1", "path": "20260905T090323000Z-session-close-academy.md", "sha256": "e97ab4beed7e7bf8e3f82def589e6ebbd8c430611cde95279497f88400b78297"}
