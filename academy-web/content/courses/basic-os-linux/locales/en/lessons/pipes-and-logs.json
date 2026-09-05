@@ -140,13 +140,13 @@
       "kind": "try",
       "title": "Answer a question with a pipeline",
       "steps": [
-        "Run: sudo grep -c 'sudo' /var/log/auth.log          (how many sudo events)",
-        "Run: sudo grep 'sudo' /var/log/auth.log | tail -5   (the most recent ones)",
+        "If /var/log/auth.log exists: sudo grep -c 'sudo' /var/log/auth.log",
+        "Otherwise on a systemd machine: sudo journalctl _COMM=sudo --no-pager | tail -5",
         "Run: ls /var/log | wc -l                            (how many log files exist)",
         "Run: sudo journalctl -n 20                          (last 20 system journal entries, if systemd)",
         "Build your own: pick any log and count how many lines mention a word you choose"
       ],
-      "expected": "Counts and recent entries from your own machine's authentication log, then a pipeline you assembled yourself. If your distribution stores authentication elsewhere, finding that out is part of the exercise."
+      "expected": "Counts or recent entries from the authentication source your system actually provides, then a pipeline you assembled yourself. Minimal Ubuntu/WSL systems may have only the systemd journal unless rsyslog is installed."
     },
     {
       "kind": "heading",

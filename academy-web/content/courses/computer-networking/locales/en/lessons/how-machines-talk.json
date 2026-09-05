@@ -139,8 +139,8 @@
         "Run: ss -s          (a summary — how many sockets are open right now, by type)",
         "Run: ping -c 3 1.1.1.1     and note the round-trip times and whether any packet was lost",
         "Run: ping -c 3 -s 1400 1.1.1.1   and compare — a larger packet, the same path",
-        "Run: curl -s -o /dev/null -w 'connect=%{time_connect}s total=%{time_total}s\\n' https://example.com",
-        "Run it again immediately and compare the two connect times",
+        "Run two transfers in one curl process so its connection cache can be reused: curl -s -o /dev/null -w 'first connect=%{time_connect}s total=%{time_total}s\\n' https://example.com --next -s -o /dev/null -w 'second connect=%{time_connect}s total=%{time_total}s\\n' https://example.com",
+        "Compare the two transfers and use curl -v to check whether the second reused a connection",
         "Explain the difference out loud — that gap is what the rest of this course is about"
       ],
       "expected": "A list of live connections you can now name the parts of, a round-trip time that puts a number on distance, and a second curl that is faster than the first. If you cannot yet explain why, that is the correct state to start this course in — the answer involves DNS caching, connection setup, and TLS, and you will meet all three."
@@ -201,7 +201,7 @@
     },
     {
       "id": "cp-4",
-      "prompt": "You load the same page again in your browser and the second load is noticeably faster. Which explanation is NOT plausible?",
+      "prompt": "You load the same page again and it is faster. Which option is a routing change rather than a cache or reuse mechanism?",
       "choices": {
         "A": "A TLS session was resumed",
         "B": "The route through the internet became shorter",
@@ -211,7 +211,7 @@
       "correct": [
         "B"
       ],
-      "explanation": "Routes do change, but not reliably between two page loads seconds apart. Caching, session resumption and connection reuse are the everyday explanations — and all three are covered later in this course."
+      "explanation": "A shorter route is possible after routing or CDN changes, but it is not a cache or reuse mechanism. DNS caching, TLS resumption and connection reuse are three distinct mechanisms covered later in this course."
     }
   ]
 }

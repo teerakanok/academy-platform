@@ -254,13 +254,13 @@
       "choices": {
         "A": "Because the file was owned by root",
         "B": "This cannot happen",
-        "C": "Deleting is controlled by the directory's write bit",
+        "C": "Deleting normally requires write and execute permission on the parent directory",
         "D": "Because deletion pays no attention to permissions at all"
       },
       "correct": [
         "C"
       ],
-      "explanation": "Removing a name from a directory is a change to the directory. Write permission there is enough — which is why directory permissions deserve as much attention as file permissions. Not by the file's own permissions — removing a name is a change to the containing directory."
+      "explanation": "Removing a name changes the containing directory. On Linux it normally requires write and execute (search) permission on that parent directory; write alone is insufficient when execute is absent. The file's own write bit does not control removal."
     }
   ]
 }

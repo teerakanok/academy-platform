@@ -116,13 +116,13 @@
     },
     {
       "kind": "paragraph",
-      "text": "Every one of those works by making the connection outbound from the perspective of the NAT. That is the general principle: if you cannot receive, connect outward and keep it open. It is why almost every remote-access product on the market is built around a persistent outbound connection rather than an inbound one."
+      "text": "Hole punching, relays and reverse tunnels create outbound state from behind the NAT. Port forwarding is different: it is an explicit inbound mapping configured on the NAT device. Remote-access designs commonly prefer persistent outbound connections when operators cannot configure that inbound mapping."
     },
     {
       "kind": "callout",
       "tone": "warning",
       "title": "Carrier-grade NAT: your provider does it too",
-      "text": "Many providers now put whole neighbourhoods behind shared public addresses because IPv4 addresses ran out. That means you may not have a public address at all — port forwarding on your own router will not help, because there is a second layer of translation above it that you do not control. If forwarding is configured correctly and still does not work, check whether your address is inside 100.64.0.0/10, the range reserved for exactly this."
+      "text": "Many providers put customers behind shared public addresses. To test for carrier-grade NAT, inspect the WAN or upstream address reported by your router and compare it with the public address seen by an external service. A WAN address in 100.64.0.0/10 is a strong CGNAT sign, but a private or other provider-controlled upstream address can also indicate another translation layer."
     },
     {
       "kind": "heading",
@@ -144,7 +144,7 @@
         "Find your private address: ip addr show   and note it",
         "Find the address the world sees: curl -s https://api.ipify.org ; echo",
         "Compare them — if they differ, everything you send is being translated",
-        "Check whether you are behind carrier-grade NAT: is your address inside 100.64.0.0/10?",
+        "Inspect your router's WAN/upstream address and compare it with the external public address; note whether the WAN address is in 100.64.0.0/10 or another non-public range",
         "Run: ss -tn state established | head    and note your local ports",
         "Open several connections at once (a few curl commands) and watch how many local ports are in use",
         "If you control a router, look at its NAT or connection-tracking table while doing this",
@@ -161,7 +161,7 @@
     "That inbound blocking is a side effect, not a security control — do not rely on it as one",
     "Port forwarding is a permanent manual mapping",
     "Hole punching, relays and reverse tunnels all work by making the connection outbound",
-    "Carrier-grade NAT puts you behind a second layer you do not control: check for 100.64.0.0/10",
+    "Detect CGNAT by comparing the router WAN/upstream address with the external public address; 100.64.0.0/10 is one strong sign",
     "Mappings are state and expire — long-lived connections need keepalives",
     "curl https://api.ipify.org shows the address the world sees"
   ],
@@ -220,7 +220,7 @@
       "correct": [
         "C"
       ],
-      "explanation": "Check for an address inside 100.64.0.0/10. A second layer of translation above your router cannot be configured from your side. That reserved range is the specific sign that you are behind one."
+      "explanation": "Inspect the router's WAN/upstream address and compare it with the public address an external service sees. A mismatch plus a WAN address in 100.64.0.0/10 or another non-public range indicates an upstream translation layer; the client device's LAN address alone cannot answer this."
     }
   ]
 }

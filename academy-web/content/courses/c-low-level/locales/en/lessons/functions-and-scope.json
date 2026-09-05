@@ -190,9 +190,9 @@
         "Write the broken() function that returns a local buffer; compile with -Wall and read the warning",
         "Run it anyway and see what it prints — then call another function before printing, and compare",
         "Rewrite it as caller_provides() and confirm the output is stable",
-        "Compile with -fsanitize=address and run the broken version again"
+        "With Clang, compile with -fsanitize=address -fsanitize-address-use-after-return=always and run the broken version again"
       ],
-      "expected": "A copy that does not affect the original, a pointer that does, a static counter that remembers, and a returned local buffer that appears to work until something else uses the stack. The sanitizer names the last one precisely: stack-use-after-return."
+      "expected": "A copy that does not affect the original, a pointer that does, a static counter that remembers, and a returned local buffer that appears to work until something else uses the stack. With the explicit Clang use-after-return mode, AddressSanitizer reports stack-use-after-return."
     }
   ],
   "cheatsheet": [

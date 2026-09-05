@@ -49,6 +49,7 @@
       "kind": "code",
       "caption": "Symbols: provided and required",
       "lines": [
+        "# Linux ELF output (macOS Mach-O normally prefixes C symbols with _)",
         "nm math_utils.o",
         "0000000000000000 T add          <- T = defined here, in the code section",
         "",
@@ -57,6 +58,7 @@
         "                 U printf",
         "0000000000000000 T main",
         "",
+        "# On macOS expect _add, _printf and _main instead.",
         "# The linker's whole job: find a T for every U."
       ]
     },

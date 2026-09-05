@@ -147,7 +147,7 @@
       "kind": "try",
       "title": "Cause each symptom, then diagnose it blind",
       "steps": [
-        "Write the is_admin example above and confirm the flag changes without being assigned",
+        "Compile the is_admin example with AddressSanitizer and confirm an out-of-bounds report; do not rely on a particular neighbouring variable changing",
         "Write the use-after-free example, run it plainly, then under -fsanitize=address",
         "Write a leak inside a loop and watch memory grow with: ./prog & then top or ps",
         "Write the uninitialised read and run it several times — note the value changing",

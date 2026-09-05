@@ -109,7 +109,7 @@
       "kind": "callout",
       "tone": "tip",
       "title": "This is the clearest evidence of what a stack frame is for",
-      "text": "A leaf function calls nothing, so nothing will overwrite its return address, so there is nothing to save — and therefore no frame. The frame in the first example exists entirely because of the call inside it. That is why a leaf function is measurably cheaper, and why compilers work hard to inline small functions: inlining turns a call into no call, and the frame disappears with it."
+      "text": "This particular trivial leaf needs no frame: it makes no call and has no spills, address-taken locals, variable-length objects or alignment work. Other leaf functions can still need a frame for those reasons. Inlining may remove call and frame overhead when the remaining function body no longer needs stack storage."
     },
     {
       "kind": "heading",

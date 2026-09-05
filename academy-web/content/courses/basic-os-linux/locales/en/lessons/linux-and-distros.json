@@ -73,7 +73,7 @@
       "kind": "callout",
       "tone": "info",
       "title": "The security consequence",
-      "text": "Because Linux runs most servers, most server-side attacks are Linux attacks. When you read an incident report about a compromised web server, you are reading about the system you are learning right now."
+      "text": "Linux is widely used on servers and is therefore a common target in server-side incidents. Market share alone does not tell us what proportion of successful attacks involve Linux, but learning this environment prepares you to investigate many real systems."
     },
     {
       "kind": "heading",

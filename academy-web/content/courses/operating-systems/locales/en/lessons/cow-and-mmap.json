@@ -159,11 +159,11 @@
   "checkpoint": [
     {
       "id": "cp-1",
-      "prompt": "A parent with a 4 GB heap forks. How much memory is copied at the moment of the fork?",
+      "prompt": "A parent with a 4 GB heap forks. How many of its user-data pages are copied at that moment?",
       "choices": {
         "A": "It depends on how much RAM is free",
         "B": "Half, on average, rounded to pages",
-        "C": "None — copy-on-write defers it",
+        "C": "No user-data pages; page tables and process metadata are still copied or created",
         "D": "The full 4 GB, immediately"
       },
       "correct": [

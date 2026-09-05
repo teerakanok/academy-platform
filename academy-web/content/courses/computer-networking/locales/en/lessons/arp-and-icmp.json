@@ -196,7 +196,7 @@
       "correct": [
         "C"
       ],
-      "explanation": "The next device on this wire. The IP address is the final destination and never changes. The hardware address is only ever the next hop, and is rewritten by every router along the way."
+      "explanation": "The hardware address names the next device on this link and is rewritten at each routed hop. The destination IP normally stays end to end when no address-translating middlebox is present; NAT/NAPT can rewrite IP addresses and ports."
     },
     {
       "id": "cp-2",

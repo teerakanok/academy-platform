@@ -146,8 +146,11 @@
       "kind": "code",
       "caption": "Three ways in, all producing the same information",
       "lines": [
+        "  uname -m; cc -v              # verify the target and compiler first",
+        "",
         "  # 1. Ask the compiler for assembly instead of an object file",
-        "  cc -O2 -S -masm=intel -o - prog.c",
+        "  cc -O2 -S -masm=intel -o - prog.c              # Linux/WSL x86-64",
+        "  cc -arch x86_64 -O2 -S -masm=intel -o - prog.c # macOS, including Apple Silicon",
         "",
         "  # 2. Disassemble a compiled binary",
         "  objdump -d --x86-asm-syntax=intel prog        # LLVM's objdump",
@@ -156,7 +159,9 @@
         "  # 3. Disassemble one function inside a debugger",
         "  gdb ./prog -batch -ex 'set disassembly-flavor intel' -ex 'disassemble main'",
         "",
-        "/* Option 1 shows what the compiler produced, with labels and directives.",
+        "/* This course reads x86-64. On another architecture, select an x86-64",
+        "   cross-target or container before comparing the output. Option 1 shows",
+        "   what the compiler produced, with labels and directives.",
         "   Option 2 shows what is actually in the file, with addresses and the",
         "   machine-code bytes. Use 1 while learning and 2 when the source is gone. */"
       ]

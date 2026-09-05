@@ -112,7 +112,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "The first time you connect, SSH records the server's identity in ~/.ssh/known_hosts. If that identity later changes, either the server was genuinely rebuilt, or something is sitting between you and it, decrypting everything you type. Do not delete the known_hosts entry to make the message go away. Confirm with whoever runs the server that it was rebuilt, then remove the entry deliberately."
+      "text": "The first time you connect, SSH records the server's identity in ~/.ssh/known_hosts. If that identity later changes, the presented identity no longer matches the one you trusted: the server may have been rebuilt or reassigned, its key may have rotated, or an intermediary may be impersonating it. SSH stops this new connection before an interactive session begins. Verify the new fingerprint through a separate trusted channel before changing known_hosts."
     },
     {
       "kind": "heading",
@@ -170,7 +170,7 @@
     "ssh user@host · ssh -p PORT · ssh host 'command' runs one command remotely",
     "ssh-keygen -t ed25519 creates a key pair · ssh-copy-id installs the public half",
     "Private key never leaves your machine and must be mode 600",
-    "Keys beat passwords: nothing reusable crosses the network and nothing can be guessed",
+    "Key authentication does not transmit the private key; disable password authentication separately to stop password guessing",
     "~/.ssh/config turns a long command into a short host alias",
     "scp for a single file · rsync -av for trees · always --dry-run first",
     "A trailing slash on an rsync source means 'the contents of', not the directory itself",
@@ -198,13 +198,13 @@
       "choices": {
         "A": "Keys expire automatically every day",
         "B": "Keys are shorter and easier to type",
-        "C": "Nothing reusable is sent across the network and there is nothing for an automated attack to guess",
+        "C": "The private key is not sent and key authentication does not expose a reusable password to guess",
         "D": "Passwords cannot be encrypted"
       },
       "correct": [
         "C"
       ],
-      "explanation": "The private key answers a challenge without being transmitted. Password guessing against the service simply has nothing to work with."
+      "explanation": "The private key answers a challenge without being transmitted. This makes the key-authentication route resistant to online password guessing; configure PasswordAuthentication no separately if the server must stop accepting password guesses altogether."
     },
     {
       "id": "cp-3",

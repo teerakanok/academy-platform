@@ -99,7 +99,7 @@
       "kind": "code",
       "caption": "merge หรือ rebase ตอนของมาถึง",
       "lines": [
-        "git pull                       # fetch แล้ว merge (ค่าตั้งต้น)",
+        "git pull --no-rebase           # fetch แล้วเลือก merge อย่างชัดเจน",
         "git pull --rebase              # fetch แล้วเล่น commit ของคุณซ้ำไว้ข้างบน",
         "",
         "git config --global pull.rebase true   # ตั้งให้ rebase เป็นค่าตั้งต้นของคุณ"
@@ -215,7 +215,7 @@
       "correct": [
         "B"
       ],
-      "explanation": "remote-tracking branch อัปเดตเฉพาะตอนคุณ fetch การอ่าน status โดยไม่ fetch คือการฟังรายงานของบทสนทนาที่อาจเก่าไปหลายชั่วโมง นำหน้า/ตามหลังวัดจากโน้ตล่าสุดที่จดไว้เรื่องเซิร์ฟเวอร์ ไม่ใช่จากตัวเซิร์ฟเวอร์เอง"
+      "explanation": "ahead/behind ใช้ remote-tracking ref ในเครื่อง ไม่ใช่มุมมองสดของเซิร์ฟเวอร์ fetch และ pull อัปเดตมัน ส่วน push ที่สำเร็จอาจอัปเดต tracking ref ที่เกี่ยวข้องด้วย ให้รัน fetch เมื่อต้องการเทียบกับการเปลี่ยนฝั่งเซิร์ฟเวอร์ล่าสุด"
     }
   ]
 }

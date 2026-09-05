@@ -123,6 +123,7 @@
       "kind": "try",
       "title": "ตั้งเวลาแล้วนั่งดูมันทำงาน",
       "steps": [
+        "ยืนยันว่าติดตั้งและเปิด cron แล้ว: command -v crontab; pgrep cron || pgrep crond บน Ubuntu/WSL ให้ติดตั้งด้วย sudo apt install cron และใช้ sudo service cron start เมื่อไม่มี systemd",
         "รัน: crontab -l                       (ดูว่ามีอะไรอยู่แล้ว — น่าจะยังไม่มี)",
         "รัน: crontab -e  แล้วเพิ่ม:  */2 * * * * /bin/date >> /tmp/cron-test.log 2>&1",
         "รอสองนาที แล้วรัน: cat /tmp/cron-test.log",
@@ -130,7 +131,7 @@
         "รัน: systemctl list-timers --all | head        (สิ่งที่ระบบตั้งเวลาไว้ให้ตัวเอง)",
         "รัน: ls -l /etc/cron.daily/                    (งานดูแลรายวันบนเครื่องนี้)"
       ],
-      "expected": "crontab ที่ว่างเปล่า จากนั้นไฟล์ log ที่ได้เวลาเพิ่มขึ้นทุกสองนาที แล้วการลบออกอย่างสะอาด สุดท้ายคืองานตามตารางของระบบเอง ซึ่งบนเครื่องส่วนใหญ่รวมถึงการหมุน log และการเก็บกวาดแพ็กเกจที่คุณไม่เคยตั้งเอง"
+      "expected": "cron daemon ที่ทำงานอยู่ crontab ที่เดิมว่าง จากนั้นไฟล์ log เพิ่ม timestamp ทุกสองนาที แล้วลบออกเรียบร้อย ขั้นตอน systemctl ใช้เฉพาะเมื่อมี systemd"
     }
   ],
   "cheatsheet": [

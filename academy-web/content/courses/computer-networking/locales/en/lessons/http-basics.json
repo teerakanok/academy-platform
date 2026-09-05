@@ -111,7 +111,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "The 4xx and 5xx split is the practical one: a 4xx will fail again identically, while a 5xx may succeed on a later attempt. That maps directly onto the retry rules from the error-handling lesson."
+      "text": "Do not blindly retry most 4xx responses unchanged, but handle the specific status, method and headers: 401 may succeed after authentication, 409 after resolving the conflict, and 429 after its Retry-After interval. Some 5xx responses may succeed later with bounded backoff."
     },
     {
       "kind": "heading",

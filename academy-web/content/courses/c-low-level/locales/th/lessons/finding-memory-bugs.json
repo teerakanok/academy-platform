@@ -114,7 +114,7 @@
       "rows": [
         [
           "address",
-          "การเข้าถึงนอกช่วงบน heap, stack และตัวแปร global; ใช้หลัง free; ใช้หลังคืนค่า; free ซ้ำ; การรั่ว"
+          "การเข้าถึงนอกช่วงบน heap, stack และตัวแปร global; ใช้หลัง free; free ซ้ำ ถ้าใช้ Clang ให้เพิ่ม -fsanitize-address-use-after-return=always เมื่อต้องการ instrument use-after-return แน่นอน ส่วนการตรวจ leak ขึ้นกับแพลตฟอร์มและการตั้งค่า runtime"
         ],
         [
           "undefined",
@@ -163,11 +163,11 @@
       "caption": "ขั้นตอน CI ที่ทำให้เรื่องนี้ซื่อตรง",
       "lines": [
         "# .github/workflows/test.yml",
-        "      - run: gcc -Wall -Wextra -Werror -O1 -g -fsanitize=address,undefined -o tests tests.c",
+        "      - run: gcc -Wall -Wextra -Werror -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=all -o tests tests.c",
         "      - run: ./tests",
         "",
-        "# รายงานของ sanitizer ทำให้ exit code ไม่เป็นศูนย์ การตรวจจึงล้มเหลว",
-        "# และ pull request ก็ merge ไม่ได้ — ซึ่งคือประเด็น"
+        "# -fno-sanitize-recover=all ทำให้ UBSan ที่ปกติกู้คืนได้หยุดด้วย exit code ไม่เป็นศูนย์",
+        "# ถ้าไม่มี flag นี้ UBSan อาจรายงานปัญหาแต่โปรแกรมยัง exit สำเร็จ"
       ]
     },
     {

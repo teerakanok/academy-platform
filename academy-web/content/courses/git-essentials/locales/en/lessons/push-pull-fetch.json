@@ -99,7 +99,7 @@
       "kind": "code",
       "caption": "Merge or rebase on arrival",
       "lines": [
-        "git pull                       # fetch, then merge (default)",
+        "git pull --no-rebase           # fetch, then explicitly merge",
         "git pull --rebase              # fetch, then replay your commits on top",
         "",
         "git config --global pull.rebase true   # make rebase the default for you"
@@ -215,7 +215,7 @@
       "correct": [
         "B"
       ],
-      "explanation": "Ahead/behind is measured against your last-known note of the server, not the server itself. Remote-tracking branches only update when you fetch. Reading status without fetching tells you about a conversation that may be hours old."
+      "explanation": "Ahead/behind uses local remote-tracking refs rather than a live server view. Fetch and pull update them, and a successful push may update the associated tracking ref too. Run fetch when you need a fresh comparison with other server-side changes."
     }
   ]
 }

@@ -114,7 +114,7 @@
       "rows": [
         [
           "address",
-          "Out-of-bounds on heap, stack and globals; use-after-free; use-after-return; double free; leaks"
+          "Out-of-bounds on heap, stack and globals; use-after-free; double free. With Clang, add -fsanitize-address-use-after-return=always for guaranteed use-after-return instrumentation; leak detection depends on platform and runtime configuration"
         ],
         [
           "undefined",
@@ -163,11 +163,11 @@
       "caption": "The CI step that keeps this honest",
       "lines": [
         "# .github/workflows/test.yml",
-        "      - run: gcc -Wall -Wextra -Werror -O1 -g -fsanitize=address,undefined -o tests tests.c",
+        "      - run: gcc -Wall -Wextra -Werror -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=all -o tests tests.c",
         "      - run: ./tests",
         "",
-        "# Any sanitizer report exits non-zero, so the check fails and the",
-        "# pull request cannot be merged — which is the point."
+        "# -fno-sanitize-recover=all makes recoverable UBSan findings terminate",
+        "# non-zero; without it, a UBSan diagnostic may still exit successfully."
       ]
     },
     {

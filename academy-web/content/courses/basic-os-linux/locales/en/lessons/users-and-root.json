@@ -33,11 +33,11 @@
     },
     {
       "kind": "heading",
-      "text": "root is UID 0, and UID 0 is not checked"
+      "text": "root is UID 0 and normal Unix permission checks treat it specially"
     },
     {
       "kind": "paragraph",
-      "text": "There is one special user: root, with UID 0. The permission checks we will study in the next lesson do not constrain root. Root can read any file, kill any process, change any setting, and delete anything — including the parts of the system that are keeping it running."
+      "text": "There is one special user: root, with UID 0. Traditional discretionary Unix permission checks broadly let UID 0 bypass file ownership and mode restrictions. Modern Linux can still constrain a root process through capabilities, SELinux or AppArmor, namespaces, mount policy and seccomp, so UID 0 is powerful but not outside every kernel control."
     },
     {
       "kind": "callout",
@@ -89,7 +89,7 @@
     "whoami = name · id = numeric ids and groups · groups = group names",
     "Groups grant permissions to a role instead of to a list of people",
     "The kernel works in UID/GID numbers; names come from /etc/passwd and /etc/group",
-    "root is UID 0 and is not subject to permission checks",
+    "root is UID 0 and normally bypasses Unix DAC checks; capabilities, LSMs and namespaces can still constrain it",
     "Use sudo to elevate one command instead of becoming root",
     "sudo gives an audit trail; a shared root password destroys accountability",
     "Least privilege: exactly the access needed, nothing spare"

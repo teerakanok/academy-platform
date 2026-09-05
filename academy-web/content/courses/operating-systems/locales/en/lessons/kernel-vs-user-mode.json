@@ -116,7 +116,7 @@
   "cheatsheet": [
     "The CPU runs in user mode or kernel mode — enforced in hardware, per instruction",
     "User mode: only your mapped memory, no devices, no privileged instructions",
-    "Kernel mode: all memory, all devices — a bug here can take the machine down",
+    "Kernel mode permits privileged control, but ordinary accesses still follow page mappings and protections such as SMEP/SMAP; kernel code can deliberately manage those mappings and devices",
     "root is a permission inside the kernel, NOT kernel mode",
     "A segfault is this boundary rejecting an unmapped address",
     "Crossing the boundary costs time — batch your I/O instead of byte-at-a-time",

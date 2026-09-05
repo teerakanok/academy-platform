@@ -70,7 +70,7 @@
       "kind": "callout",
       "tone": "tip",
       "title": "Why patching outranks almost everything else",
-      "text": "Most successful intrusions use a vulnerability that had a patch available. Not a novel technique — a known problem on an unpatched machine. Package updates are unglamorous, and they remove more real risk than most security tooling purchases."
+      "text": "Known vulnerabilities with available fixes remain a common and preventable intrusion path. Package updates remove those known weaknesses; they do not replace defenses against credential abuse, phishing, exposed services or novel vulnerabilities."
     },
     {
       "kind": "try",
@@ -96,7 +96,7 @@
     "command & runs in the background · jobs lists · fg brings back",
     "apt update refreshes the catalogue · apt upgrade actually installs",
     "Red Hat family: dnf check-update / dnf upgrade / dnf install",
-    "Most breaches use a known vulnerability that already had a patch"
+    "Package updates remove known vulnerabilities for which fixes are available"
   ],
   "checkpoint": [
     {
@@ -133,13 +133,13 @@
       "choices": {
         "A": "Because new versions are always faster",
         "B": "Because it replaces the need for permissions",
-        "C": "Most intrusions use known vulnerabilities",
+        "C": "It removes known vulnerabilities for which package updates are available",
         "D": "Because it satisfies auditors and nothing more"
       },
       "correct": [
         "C"
       ],
-      "explanation": "The common case is not a novel exploit against a current system — it is a known issue on a system nobody updated. Ones that already had patches available — the common case is not a novel exploit against a current system."
+      "explanation": "Package updates close known weaknesses for which maintainers have shipped fixes. That is a concrete risk reduction without making an unsupported claim about what causes most intrusions."
     }
   ]
 }

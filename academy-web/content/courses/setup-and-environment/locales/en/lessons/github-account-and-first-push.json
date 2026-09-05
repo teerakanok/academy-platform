@@ -97,7 +97,7 @@
       "kind": "callout",
       "tone": "tip",
       "title": "GitHub will ask for 2FA during signup — that is normal",
-      "text": "During signup GitHub will usually push you to set up two-factor authentication — a passkey, an authenticator app, or similar. That is normal, and worth doing. It also changes how you authenticate from git later: with 2FA on, your account password no longer works over HTTPS, so the token or SSH key routes above are what you will actually use."
+      "text": "During signup GitHub will usually push you to set up two-factor authentication — a passkey, an authenticator app, or similar. That is normal and worth doing. For Git operations over HTTPS, GitHub does not accept account passwords regardless of 2FA status; use a token, OAuth/credential manager, or the SSH route above."
     },
     {
       "kind": "try",
@@ -108,7 +108,7 @@
         "Create an empty repository on GitHub, with no README",
         "Follow the block above until git push succeeds",
         "Reload the repository page in your browser and confirm README.md is there",
-        "Now prove it is really off your machine: delete the local directory with rm -rf ~/coursework/first-repo, then git clone it back",
+        "Leave the repository first, then delete and restore it: cd ~/coursework && rm -rf first-repo; git clone <your-repository-url> first-repo",
         "Open the cloned README.md and confirm it is the file you wrote"
       ],
       "expected": "A file you wrote, deleted from your own disk, and got back from a server. That last pair of steps is the whole point of the lesson: until you have deleted the local copy and recovered it, you have not actually established that the work is somewhere else."

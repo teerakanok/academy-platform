@@ -146,8 +146,11 @@
       "kind": "code",
       "caption": "สามทางเข้า ให้ข้อมูลเดียวกัน",
       "lines": [
+        "  uname -m; cc -v              # ตรวจ target และ compiler ก่อน",
+        "",
         "  # 1. ขอภาษาแอสเซมบลีจากคอมไพเลอร์แทน object file",
-        "  cc -O2 -S -masm=intel -o - prog.c",
+        "  cc -O2 -S -masm=intel -o - prog.c              # Linux/WSL x86-64",
+        "  cc -arch x86_64 -O2 -S -masm=intel -o - prog.c # macOS รวมถึง Apple Silicon",
         "",
         "  # 2. ถอดรหัสไบนารีที่คอมไพล์แล้ว",
         "  objdump -d --x86-asm-syntax=intel prog        # objdump ของ LLVM",
@@ -156,7 +159,8 @@
         "  # 3. ถอดรหัสฟังก์ชันเดียวในตัวดีบัก",
         "  gdb ./prog -batch -ex 'set disassembly-flavor intel' -ex 'disassemble main'",
         "",
-        "/* ทางที่ 1 แสดงสิ่งที่คอมไพเลอร์ผลิต พร้อม label และ directive",
+        "/* คอร์สนี้อ่าน x86-64 ถ้าเครื่องใช้สถาปัตยกรรมอื่น ให้เลือก cross-target",
+        "   หรือ container แบบ x86-64 ก่อนเทียบผล ทางที่ 1 แสดงสิ่งที่คอมไพเลอร์ผลิต พร้อม label และ directive",
         "   ทางที่ 2 แสดงสิ่งที่อยู่ในไฟล์จริง พร้อมที่อยู่และไบต์ของภาษาเครื่อง",
         "   ใช้ทางที่ 1 ตอนเรียน และทางที่ 2 ตอนที่ไม่มีซอร์สแล้ว */"
       ]

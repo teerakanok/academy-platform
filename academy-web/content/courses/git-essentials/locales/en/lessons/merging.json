@@ -76,7 +76,7 @@
       "kind": "code",
       "caption": "The check that prevents most bad merges",
       "lines": [
-        "git switch main && git pull        # today's state (pull = fetch + merge — properly introduced later in the course)",
+        "git switch main && git pull --no-rebase  # explicitly fetch then merge",
         "git log --oneline main..feature    # commits that are about to arrive",
         "git diff main...feature            # the actual change, in full",
         "git merge feature",

@@ -123,6 +123,7 @@
       "kind": "try",
       "title": "Schedule something and watch it run",
       "steps": [
+        "Confirm cron is installed and running: command -v crontab; pgrep cron || pgrep crond. On Ubuntu/WSL install it with sudo apt install cron, then use sudo service cron start when systemd is unavailable",
         "Run: crontab -l                       (see what you already have — probably nothing)",
         "Run: crontab -e  and add:  */2 * * * * /bin/date >> /tmp/cron-test.log 2>&1",
         "Wait two minutes, then run: cat /tmp/cron-test.log",
@@ -130,7 +131,7 @@
         "Run: systemctl list-timers --all | head        (what the system schedules for itself)",
         "Run: ls -l /etc/cron.daily/                    (the daily maintenance jobs on this machine)"
       ],
-      "expected": "An empty crontab, then a log file gaining a timestamp every two minutes, then a clean removal. Finally, the system's own scheduled work — which on most machines includes log rotation and package cleanup you never set up yourself."
+      "expected": "A running cron daemon, an initially empty crontab, then a log file gaining a timestamp every two minutes, then a clean removal. systemctl steps apply only when systemd is available."
     }
   ],
   "cheatsheet": [

@@ -66,7 +66,7 @@
         "UDP header       :  8 bytes",
         "",
         "/* Sending 5 bytes of 'hello' over TCP/IPv4/Ethernet:",
-        "     14 + 20 + 20 + 5 = 59 bytes on the wire",
+        "     14 + 20 + 20 + 5 = 59 bytes before minimum-frame padding/FCS",
         "   (real Ethernet pads every frame out to its 64-byte minimum, and that",
         "   minimum includes the 4-byte FCS, so a frame this small leaves as 64)",
         "   The payload is 8% of it. Over IPv6 it is 14 + 40 + 20 + 5 = 79 bytes,",
@@ -186,7 +186,7 @@
     "Link addresses a device on this segment (MAC); network addresses a machine anywhere (IP)",
     "Transport addresses a program (port); application is the only layer that knows what the bytes mean",
     "Measured header sizes: ethernet 14, IPv4 20, IPv6 40, TCP 20, UDP 8",
-    "Sending 5 bytes over TCP/IPv4/Ethernet puts 59 bytes on the wire (Ethernet pads small frames to its 64-byte minimum, FCS included)",
+    "5 bytes plus Ethernet/IPv4/TCP headers total 59 bytes before padding/FCS; Ethernet transmits the 64-byte minimum frame",
     "Ethernet MTU is usually 1500, leaving 1460 bytes for TCP payload",
     "Small things working while large things hang points at an MTU problem",
     "Diagnose upward from the bottom layer and stop at the first that fails",
@@ -197,7 +197,7 @@
       "id": "cp-1",
       "prompt": "Your program sends 5 bytes over TCP on IPv4 Ethernet. Roughly how many bytes are on the wire?",
       "choices": {
-        "A": "About 59",
+        "A": "About 64",
         "B": "About 25",
         "C": "1500",
         "D": "5"
@@ -205,7 +205,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "Verified from the system headers. The payload is about 8% of the frame, which is why protocols batch small messages rather than sending each one on its own. Counted as 14 ethernet + 20 IPv4 + 20 TCP + 5 payload."
+      "explanation": "The fields total 59 bytes before minimum-frame padding and FCS accounting, but Ethernet puts at least a 64-byte frame on the wire from destination MAC through FCS. Preamble and inter-packet gap are additional physical-layer overhead."
     },
     {
       "id": "cp-2",

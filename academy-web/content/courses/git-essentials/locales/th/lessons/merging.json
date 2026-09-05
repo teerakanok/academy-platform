@@ -76,7 +76,7 @@
       "kind": "code",
       "caption": "การตรวจที่กัน merge พังได้เกือบทั้งหมด",
       "lines": [
-        "git switch main && git pull        # สถานะของวันนี้ (pull = fetch + merge — จะสอนอย่างเป็นทางการทีหลังในคอร์ส)",
+        "git switch main && git pull --no-rebase  # เลือก fetch แล้ว merge อย่างชัดเจน",
         "git log --oneline main..feature    # commit ที่กำลังจะเข้ามา",
         "git diff main...feature            # การเปลี่ยนแปลงจริง แบบเต็ม",
         "git merge feature",

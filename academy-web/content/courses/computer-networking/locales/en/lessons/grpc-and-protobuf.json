@@ -79,8 +79,8 @@
         ],
         [
           "Change a field's type",
-          "No",
-          "The bytes are interpreted differently"
+          "Sometimes — consult the compatibility rules",
+          "Some documented conversions share a wire type; a change to an incompatible wire type is unsafe"
         ],
         [
           "Renumber a field",

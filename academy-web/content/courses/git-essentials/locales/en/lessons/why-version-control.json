@@ -106,7 +106,7 @@
       "id": "cp-2",
       "prompt": "What does it mean that Git is distributed?",
       "choices": {
-        "A": "Every copy of the project contains the full history",
+        "A": "A normal full clone contains the reachable history; shallow or partial clones deliberately omit some history or objects",
         "B": "Each person gets a different part of the code",
         "C": "The files are split across several servers",
         "D": "Only the server keeps history"
@@ -114,7 +114,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "You can read it and commit offline. A clone is a complete copy of the history. The shared server is a coordination point, not the sole holder of the project."
+      "explanation": "A normal full clone can inspect reachable history and commit offline. Shallow and partial clones trade some local history or objects for a smaller transfer. The shared server is a coordination point rather than the only possible holder."
     },
     {
       "id": "cp-3",

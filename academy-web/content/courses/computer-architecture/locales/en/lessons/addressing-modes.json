@@ -186,7 +186,7 @@
     }
   ],
   "cheatsheet": [
-    "Reduced architectures offer four modes: register, immediate, base plus offset, PC-relative",
+    "Base RISC-V examples here use register, immediate, base-plus-offset and PC-relative forms; other RISC ISAs add modes such as aarch64 scaled-index and pre-index",
     "One memory mode covers pointer dereference, struct fields and stack locals",
     "The offset is the 12-bit immediate from the encoding lesson",
     "No scaled-index mode: a[i] needs a shift and an add first",

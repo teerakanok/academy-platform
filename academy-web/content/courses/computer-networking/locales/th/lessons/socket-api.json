@@ -83,7 +83,7 @@
         "",
         "/* สำหรับเซิร์ฟเวอร์ เลือกว่าจะฟังที่ไหน: */",
         "addr.sin_addr.s_addr = htonl(INADDR_ANY);        /* ทุกอินเทอร์เฟซ */",
-        "addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);   /* เครื่องนี้เท่านั้น */",
+        "addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);   /* เฉพาะเครื่องนี้ */",
         "",
         "/* สำหรับไคลเอนต์ แปลงที่อยู่จากข้อความ: */",
         "if (inet_pton(AF_INET, \"192.0.2.10\", &addr.sin_addr) != 1) {",

@@ -213,7 +213,7 @@
       "correct": [
         "B"
       ],
-      "explanation": "Once it is a commit it is recoverable through the reflog no matter what happens next, and the history can always be tidied afterwards. Even a scruffy temporary branch is enough: once it is a commit, it is recoverable."
+      "explanation": "A recent commit is usually recoverable through a reflog while its entry still exists and before unreachable objects are garbage-collected. A temporary branch also gives the commit a reachable name, which is safer than relying on reflog expiry windows."
     }
   ]
 }

@@ -102,7 +102,7 @@
       "kind": "callout",
       "tone": "warning",
       "title": "This is where signed and unsigned bugs become visible",
-      "text": "In C the bug is invisible: a < b looks the same whatever the types are. In the disassembly it is a different mnemonic — setl or jl for signed, setb or jb for unsigned. When you are analysing a binary and see an unsigned comparison where a length check should be signed, or the reverse, you have found the class of bug where a negative length passes a 'less than the buffer size' test by being read as an enormous positive number."
+      "text": "In C the bug is easy to miss: a < b looks the same whatever the types are. In the disassembly it is a different mnemonic — setl or jl for signed, setb or jb for unsigned. One dangerous sequence is a signed comparison that accepts a negative length, followed by an unsigned conversion when that length is passed to a copy or allocation routine. The conversion then turns the accepted negative value into a very large positive size. Keep the comparison and the later use separate when you reconstruct this bug from a binary."
     },
     {
       "kind": "heading",

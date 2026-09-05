@@ -185,7 +185,7 @@
       "correct": [
         "B"
       ],
-      "explanation": "It only updates when you fetch or pull. Until then it can be as stale as your last conversation with the server. 'Where it was' means as of your last fetch."
+      "explanation": "Fetch and pull update it, and a successful push may update the associated remote-tracking ref too. It remains a local note rather than a live server view, so it can be stale until the next communication."
     },
     {
       "id": "cp-2",

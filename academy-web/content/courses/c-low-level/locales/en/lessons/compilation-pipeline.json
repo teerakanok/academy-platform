@@ -214,7 +214,7 @@
       "prompt": "Why compile with -O0 while learning?",
       "choices": {
         "A": "It is required for -Wall to work",
-        "B": "The debugger no longer matches your source",
+        "B": "With -O0, the debugger more closely follows the source; optimisation may reorder or remove code",
         "C": "It makes the program run faster in every case",
         "D": "It reduces the executable size"
       },

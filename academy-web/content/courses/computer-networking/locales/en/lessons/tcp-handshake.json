@@ -145,7 +145,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "The difference between refused and timed out is the most useful diagnostic distinction here. A refusal proves the packet reached the machine and something rejected it — a fast, honest answer. A timeout proves nothing reached anything that would reply, which points at filtering rather than a missing service."
+      "text": "A prompt refusal proves that a reachable responder rejected the connection; that responder may be the destination host, a firewall, a load balancer or another middlebox. A timeout only shows that no reply arrived before the deadline, which is consistent with filtering, packet loss, routing failure or an unresponsive endpoint."
     },
     {
       "kind": "try",

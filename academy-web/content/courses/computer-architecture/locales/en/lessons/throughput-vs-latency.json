@@ -197,7 +197,7 @@
     },
     {
       "id": "cp-2",
-      "prompt": "Users complain that a service feels slow to respond. What will adding more worker threads achieve?",
+      "prompt": "With no queue, one CPU-bound request already using one core feels slow. What will adding more worker threads achieve for that request?",
       "choices": {
         "A": "It will make it worse",
         "B": "It depends on the number of cores and the queue depth",
@@ -207,7 +207,7 @@
       "correct": [
         "C"
       ],
-      "explanation": "That is a latency complaint and workers improve throughput. More workers serve more requests at once. If the complaint is that one request feels slow, the number that must change is the time that request takes."
+      "explanation": "With no queue to drain and one request using one core, extra workers do not shorten that request. Workers can reduce observed response time when requests are queued and spare cores let them run concurrently, so queue depth and saturation must be checked before applying this answer elsewhere."
     },
     {
       "id": "cp-3",

@@ -24,8 +24,12 @@
           "rdi, rsi, rdx, rcx, r8, r9 — in that order"
         ],
         [
-          "Floating-point arguments 1 to 8",
+          "float/double SSE arguments 1 to 8",
           "xmm0 through xmm7"
+        ],
+        [
+          "System V long double and other special classes",
+          "Classified separately; x87 long double arguments are passed in memory on the common x86-64 System V ABI"
         ],
         [
           "Further arguments",

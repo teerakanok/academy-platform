@@ -136,7 +136,7 @@
         "Write a size check with a signed length of -1 and watch it pass the bounds test",
         "Rewrite it to reject negatives at the boundary and confirm it now fails correctly"
       ],
-      "expected": "Signed overflow behaving differently at two optimisation levels and being named by the sanitizer, defined unsigned wrapping, and a bounds check that passes a negative length until you fix it. That last one is the shape behind a long list of real advisories."
+      "expected": "Signed-overflow output that may differ between optimisation levels, a deterministic UBSan diagnostic, defined unsigned wrapping, and a bounds check that passes a negative length until you fix it. Undefined behaviour permits different output but does not promise it."
     }
   ],
   "cheatsheet": [

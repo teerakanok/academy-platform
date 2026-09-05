@@ -184,7 +184,7 @@
       "id": "cp-4",
       "prompt": "What does git branch -d refuse to do, and why does that matter?",
       "choices": {
-        "A": "It refuses to delete a branch holding commits that are not merged anywhere",
+        "A": "It refuses when the branch is not fully merged into its configured upstream, or into HEAD when no upstream is configured",
         "B": "It refuses to delete the current branch only",
         "C": "It refuses to delete branches created today",
         "D": "It refuses when the branch has already been pushed to the shared remote server"
@@ -192,7 +192,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "You do not silently discard work. -d is the safe delete. -D overrides that check, which is why it should be a deliberate decision rather than a reflex."
+      "explanation": "The check is relative to the branch's configured upstream, or to current HEAD when there is no upstream; Git does not scan every ref. -D overrides that bounded check, so use it only after verifying reachability yourself."
     }
   ]
 }

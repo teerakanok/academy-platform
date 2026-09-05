@@ -122,8 +122,9 @@
         "",
         "/* This track states its platform wherever it matters: the compiler is",
         "   clang on macOS and gcc on Linux, macOS ships GNU Make 3.81 while Debian",
-        "   ships 4.3, and AddressSanitizer reports leaks on Linux and silently does",
-        "   not on macOS. When something behaves differently, check the platform",
+        "   ships 4.3. LeakSanitizer support depends on compiler, target and runtime",
+        "   options; test ASAN_OPTIONS=detect_leaks=1 and record the exact toolchain.",
+        "   When something behaves differently, check the platform",
         "   before you doubt the lesson — but if the lesson never mentions the",
         "   difference, that is a defect in the lesson and worth reporting. */"
       ]
@@ -134,7 +135,7 @@
       "steps": [
         "command not found: run a name that does not exist, then run which on it and echo $PATH",
         "Permission denied, case one: printf 'echo hi\\n' > s.sh then ./s.sh — read the error, run ls -l s.sh, fix with chmod +x, run it again",
-        "Permission denied, case two: cat /etc/shadow — confirm chmod does not apply here and say in one sentence why",
+        "Permission denied, case two: read /etc/shadow on Linux or /etc/master.passwd on macOS; confirm chmod does not apply and explain why",
         "No such file: cd / then cat s.sh — then fix it by returning to the right directory rather than by using a longer path",
         "Wrong platform: run uname -s, cc --version and make --version and write the three answers next to your notes from lesson three",
         "For each of the four, write the single command you would run FIRST next time",
@@ -181,7 +182,7 @@
       "correct": [
         "B"
       ],
-      "explanation": "chmod +x is the fix here. Distinguish it from cat /etc/shadow, which prints the same words because the file is deliberately not yours — chmod does not apply there."
+      "explanation": "chmod +x fixes your own script. Distinguish it from reading /etc/shadow on Linux or /etc/master.passwd on macOS: the protected system file is not yours to chmod."
     },
     {
       "id": "cp-3",

@@ -131,15 +131,15 @@
       "items": [
         "Use a list when you need to answer 'who can reach this?' and to revoke quickly — files, buckets, database rows",
         "Use a capability when you want to hand out narrow, delegable authority — descriptors, scoped tokens, per-process rights",
-        "Revocation is the deciding factor more often than anything else: lists revoke cleanly, capabilities do not",
-        "Which is why capabilities in distributed systems get expiry times: you cannot recall them, so you make them stop working"
+        "Revocation is often decisive: ACL entries revoke centrally, while unmediated bearer capabilities are hard to recall after delegation",
+        "Mediated or indirect capability systems can be revocable; short-lived bearer tokens limit exposure when direct recall is impractical"
       ]
     },
     {
       "kind": "try",
       "title": "Read and change both kinds",
       "steps": [
-        "This exercise needs root and a second user account. If you do not have both on your own machine, run the whole thing in a throwaway container where you are root and can create users: docker run --rm -it debian:12-slim bash",
+        "This exercise needs Docker permission, an image download, root inside the container and a second account. Start with docker run --rm -it debian:12-slim bash; then run apt-get update && apt-get install -y build-essential acl libcap2-bin",
         "Create the second user first: useradd -m tester   (on a normal machine: sudo useradd -m tester)",
         "Create a file readable only by its owner, then: setfacl -m u:<someuser>:rw <file>",
         "Run getfacl on it and identify the named entry and the mask",
@@ -163,7 +163,7 @@
     "Linux capabilities split root into individually grantable rights",
     "Measured: setuid root gave CapEff a80425fb; one file capability gave 2000",
     "Verified: ping now uses cap_net_raw=ep and is not setuid",
-    "Capabilities in distributed systems expire, because they cannot be recalled"
+    "Unmediated bearer capabilities commonly expire because direct recall after delegation is impractical; mediated designs can support revocation"
   ],
   "checkpoint": [
     {
@@ -214,13 +214,13 @@
       "choices": {
         "A": "To reduce the storage the system needs",
         "B": "To comply with current encryption standards",
-        "C": "Because a capability cannot be recalled",
+        "C": "Because an unmediated bearer capability is impractical to recall from every holder",
         "D": "Because they are stored with the object itself"
       },
       "correct": [
         "C"
       ],
-      "explanation": "Time-limiting it is the practical substitute for revocation. Revocation is the weak point of the capability model. If you cannot take it back, the next best thing is to make sure it stops working on its own."
+      "explanation": "Expiry limits the exposure of an unmediated bearer token that may have been copied or delegated. This is not universal: mediated capability systems can revoke a grant through indirection, and Linux file capabilities can be removed."
     }
   ]
 }
