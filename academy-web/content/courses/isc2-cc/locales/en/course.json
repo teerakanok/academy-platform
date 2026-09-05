@@ -4,19 +4,19 @@
   "subtitle": "An entry-level security certification, taught from zero — no work experience assumed",
   "audience": "For self-paced learners preparing for the ISC2 CC exam on the 2026-09 outline, with no prior security job required. Five modules follow the five exam domains, each with a guided lab and a closing practice lesson, and every lesson exists in English and Thai with identical checkpoint answers. Labs are defensive only and run on your own computer, a free sandbox or a simulated surface.",
   "outcomes": [
-    "Apply the security principles the exam tests: CIA, authentication and authorisation, risk, controls, ethics and governance basics (Domain 1, 24%)",
-    "Explain business continuity, disaster recovery and incident response concepts and how they fit together (Domain 2, 17.3%)",
-    "Describe access control concepts — physical and logical — and the identity lifecycle (Domain 3, 20%)",
-    "Recognise network and cloud security fundamentals: threats, infrastructure, secure design and cloud service models (Domain 4, 21.3%)",
-    "Carry out security operations: data security, hardening, best practices and awareness (Domain 5, 17.3%)",
-    "Review the whole outline in the capstone and plan your exam day"
+    "Apply the security principles the exam tests: the CIA triad, authentication and authorisation, risk management, security controls, the ISC2 code of ethics and governance basics (Domain 1, 24%)",
+    "Explain security governance: policies, procedures, standards and regulations, business continuity and disaster recovery concepts, and how an incident response plan fits with them (Domain 2, 17.3%)",
+    "Describe identity and access management: physical and logical access controls, least privilege and segregation of duties, and the identity lifecycle (Domain 3, 20%)",
+    "Recognise networking and cloud security concepts: IP, ports and protocols, common network threats, secure network design and cloud service models (Domain 4, 21.3%)",
+    "Carry out security operations and incident response: data handling and encryption basics, system hardening and configuration management, incident detection and response steps, and security awareness (Domain 5, 17.3%)",
+    "Review the whole outline in the capstone and plan your exam day (CAT format, 2 hours, 100–125 items, passing 700/1000)"
   ],
   "skillLabels": {
     "security-principles": "Security principles",
-    "governance": "Governance, BC/DR and incident response",
-    "iam": "Access control and identity",
+    "governance": "Security governance (BC/DR, incident response plan)",
+    "iam": "Identity and access management",
     "network-cloud": "Network and cloud security",
-    "sec-ops": "Security operations"
+    "sec-ops": "Security operations and incident response"
   },
   "nodeTitles": {
     "cia-and-aaa": "Security Goals: CIA, Non-Repudiation, and AAA",

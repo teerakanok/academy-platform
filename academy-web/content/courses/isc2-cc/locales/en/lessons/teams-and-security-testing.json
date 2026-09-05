@@ -115,7 +115,7 @@
       "id": "cp-2",
       "prompt": "A tester follows an employee through a controlled door without badging in. This physical pen test technique is called:",
       "choices": {
-        "A": "Tailgating (piggybacking)",
+        "A": "Tailgating",
         "B": "Pretexting",
         "C": "Spear phishing",
         "D": "Elevation of privilege"
@@ -123,7 +123,7 @@
       "correct": [
         "A"
       ],
-      "explanation": "Slipping through a secure door behind an authorized person is tailgating. Pretexting is inventing a story to gain cooperation; the door scenario relies on presence, not conversation."
+      "explanation": "Slipping through a secure door behind an authorized person is tailgating. Pretexting is inventing a story to gain cooperation; the door scenario relies on presence, not conversation. Some sources reserve piggybacking for the case where the authorized person knowingly holds the door; here the tester simply slips through, so tailgating is the exact term."
     }
   ]
 }

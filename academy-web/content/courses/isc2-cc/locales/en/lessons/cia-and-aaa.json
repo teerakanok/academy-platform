@@ -43,7 +43,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "One event can break more than one leg. Ransomware reads your files (confidentiality), encrypts them so they cannot be trusted or used (integrity and availability), and may threaten publication. That is why ransomware is treated as a top-tier threat: it hits the whole triad at once."
+      "text": "One event can break more than one leg. Ransomware encrypts your files so they cannot be trusted or used (integrity and availability), and data-stealing variants first read and exfiltrate them, then threaten publication (confidentiality). Locker-style variants mainly hit availability. That is why ransomware is treated as a top-tier threat: a single incident can hit the whole triad at once."
     },
     {
       "kind": "paragraph",

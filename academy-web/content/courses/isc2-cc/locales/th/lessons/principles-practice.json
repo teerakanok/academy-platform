@@ -76,7 +76,7 @@
         "เติมหมวดของแต่ละข้อ: administrative, technical หรือ physical",
         "เลือก control เดียวที่ยังมีค่าแม้ preventive ทุกตัวจะล้มเหลว และบอกเหตุผล"
       ],
-      "expected": "C1 preventive technical; C2 detective physical; C3 detective technical; C4 preventive administrative; C5 corrective technical; C6 detective technical; C7 preventive technical; C8 corrective administrative ข้อที่ยังมีค่า: C5 — backup และการ restore คือเส้นสุดท้ายที่พาธุรกิจกลับมาเมื่อการป้องกันและการตรวจจับล้มเหลวทั้งคู่ C7 เป็นข้อถกเถียงได้: มันป้องกันการเดา password ต่อ แต่การแจ้งเตือนจากมันเลี้ยงการตรวจจับ ให้ตัดสินจากหน้าที่แรกก่อน"
+      "expected": "C1 preventive technical; C2 detective physical; C3 preventive technical; C4 preventive administrative; C5 corrective technical; C6 detective technical; C7 preventive technical; C8 corrective administrative C3 เป็น preventive เพราะการตรวจ hash เป็นด่านก่อนติดตั้ง: ถ้าค่าไม่ตรง การติดตั้งหยุดก่อนที่อะไรจะรัน มันจะเป็น detective ก็ต่อเมื่อแค่รายงานความไม่ตรงหลังไฟล์ถูกติดตั้งไปแล้ว ข้อที่ยังมีค่า: C5 — backup และการ restore คือเส้นสุดท้ายที่พาธุรกิจกลับมาเมื่อการป้องกันและการตรวจจับล้มเหลวทั้งคู่ C7 เป็นข้อถกเถียงได้: มันป้องกันการเดา password ต่อ แต่การแจ้งเตือนจากมันเลี้ยงการตรวจจับ ให้ตัดสินจากหน้าที่แรกก่อน"
     },
     {
       "kind": "heading",

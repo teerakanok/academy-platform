@@ -2,14 +2,14 @@
   "locale": "en",
   "title": "CompTIA Security+ (SY0-701)",
   "subtitle": "Exam-prep for your first security certification, built around how the exam actually asks",
-  "audience": "For learners with basic IT or networking exposure who are aiming for their first security certification. Every lesson exists in English and Thai under the same structure, each of the five exam domains ends with a hands-on practice lesson, and the capstone rehearses exam-day strategy. All labs are defensive and run on your own computer or a free sandbox; nothing targets third-party systems.",
+  "audience": "For learners with basic IT or networking exposure who are aiming for their first security certification. Every lesson exists in English and Thai under the same structure, each of the five exam domains ends with a hands-on practice lesson, and the capstone rehearses exam-day strategy. Every lab is defensive and nothing targets third-party systems: the five guided labs are ready now and run on your own computer or a free sandbox, and seven further interactive labs are designed but marked coming-soon until their platform surfaces ship.",
   "outcomes": [
     "Explain the general security concepts the exam builds on: controls, the CIA triad, zero trust, cryptography and change management (Domain 1, 12%)",
     "Recognise threat actors, attack types and vulnerabilities, and choose the mitigation the exam expects (Domain 2, 22%)",
     "Compare security architectures — cloud, on-premises, network and data protection designs — and pick the resilient option (Domain 3, 18%)",
     "Carry out security operations: hardening, identity and access, monitoring, incident response and log analysis (Domain 4, 28%)",
     "Apply governance, risk, compliance and audit concepts to a security program (Domain 5, 20%)",
-    "Sit a 35-question practice exam and walk into SY0-701 with a time plan and a strategy for the performance-based questions"
+    "Sit the 35-question paper practice exam that ships with the course unit and walk into SY0-701 with a time plan and a strategy for the performance-based questions"
   ],
   "skillLabels": {
     "general-concepts": "General security concepts",

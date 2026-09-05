@@ -91,11 +91,11 @@
       "kind": "try",
       "title": "Upgrade path drill",
       "steps": [
-        "A company uses SMS codes and an executive complains about prompt spam at 2 a.m. Name the attack and the two fastest improvements.",
+        "A company uses push approvals for MFA and an executive complains about a flood of approval prompts at 2 a.m. Name the attack and the two fastest improvements.",
         "Rank these for a new rollout: SMS, authenticator app, passkey, push with number-matching.",
         "Write the risk-based rule you would add for logins from new countries."
       ],
-      "expected": "Attack: MFA fatigue/push bombing is not the SMS case here; prompt spam implies push is in use somewhere, but with SMS the parallel risk is SIM swap; improvements: move to authenticator app or passkey and enable number-matching where push remains. Ranking: passkey, push with number-matching, authenticator app, SMS. Rule: new-country logins require step-up (stronger factor) or temporary block pending review."
+      "expected": "Attack: MFA fatigue (push bombing) — the attacker already holds the password and is flooding push prompts. Improvements: turn on number-matching where push remains, and move privileged users to phishing-resistant passkeys or hardware keys (an authenticator app is an acceptable interim). Ranking: passkey first; authenticator app and push with number-matching sit together in the middle — number-matching removes fatigue but neither resists real-time phishing, and the exam's simplified order puts the app code above push; SMS last. Rule: new-country logins require step-up (stronger factor) or temporary block pending review."
     },
     {
       "kind": "lab",

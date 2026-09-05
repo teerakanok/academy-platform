@@ -159,13 +159,13 @@
       "choices": {
         "A": "It makes applications run faster",
         "B": "It removes the need for firewalls",
-        "C": "Evidence survives even if the attacker gains admin access on the source machine",
+        "C": "Log entries already forwarded are out of reach of an attacker who later gains admin on the source machine",
         "D": "It encrypts all applications automatically"
       },
       "correct": [
         "C"
       ],
-      "explanation": "A common attacker action is clearing local logs. Central, near-real-time forwarding preserves the evidence trail independently of the compromised host."
+      "explanation": "A common attacker action is clearing local logs. Near-real-time forwarding puts already-shipped entries beyond the compromised host's reach — provided the forwarding channel and the collector are themselves protected and trustworthy; nothing is guaranteed if the collector or its credentials are also compromised."
     }
   ]
 }

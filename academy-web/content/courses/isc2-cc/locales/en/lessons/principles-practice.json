@@ -76,7 +76,7 @@
         "Add the category for each: administrative, technical, or physical.",
         "Pick the one control that would still matter if every preventive control failed, and say why."
       ],
-      "expected": "C1 preventive technical; C2 detective physical; C3 detective technical; C4 preventive administrative; C5 corrective technical; C6 detective technical; C7 preventive technical; C8 corrective administrative. The one that still matters: C5 — backups and restore are the last line that brings the business back after prevention and detection both fail. C7 earns debate: it prevents continued guessing but the alert on it feeds detection; grade the primary job first."
+      "expected": "C1 preventive technical; C2 detective physical; C3 preventive technical; C4 preventive administrative; C5 corrective technical; C6 detective technical; C7 preventive technical; C8 corrective administrative. C3 is preventive because the hash check is an installation gate: a mismatch stops the install before anything runs; it would only be detective if the mismatch were merely reported after the file was already installed. The one that still matters: C5 — backups and restore are the last line that brings the business back after prevention and detection both fail. C7 earns debate: it prevents continued guessing but the alert on it feeds detection; grade the primary job first."
     },
     {
       "kind": "heading",

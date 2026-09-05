@@ -110,7 +110,7 @@
     },
     {
       "id": "cp-2",
-      "prompt": "With SSO deployed, disabling one account in the identity provider cuts off a departing employee from all connected applications. This illustrates SSO's main:",
+      "prompt": "With SSO deployed, disabling one account in the identity provider blocks a departing employee from signing in to every application that relies on that provider. This illustrates SSO's main:",
       "choices": {
         "A": "Weakness, because accounts are duplicated",
         "B": "Incompatibility with federation",
@@ -120,7 +120,7 @@
       "correct": [
         "C"
       ],
-      "explanation": "Centralizing authentication makes onboarding and especially offboarding a single action. The flip side, a high-value master credential, is why the SSO account needs the strongest MFA."
+      "explanation": "Centralizing authentication makes onboarding and especially offboarding a single action for new sign-ins. It is not automatic for everything: existing sessions and refresh tokens must be revoked, and API keys, service accounts and app-local accounts outside the provider still need their own cleanup. The flip side, a high-value master credential, is why the SSO account needs the strongest MFA."
     }
   ]
 }

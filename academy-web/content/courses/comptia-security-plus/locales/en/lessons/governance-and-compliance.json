@@ -62,10 +62,10 @@
     {
       "kind": "list",
       "items": [
-        "NIST Cybersecurity Framework (CSF): voluntary, risk-based, free to use. Its six functions are Govern, Identify, Protect, Detect, Respond, and Recover.",
+        "NIST Cybersecurity Framework (CSF) 2.0: voluntary, risk-based, free to use. Its six functions are Govern, Identify, Protect, Detect, Respond, and Recover; Govern was added in CSF 2.0 (2024), so older material lists only the five functions of CSF 1.1.",
         "ISO 27001: an auditable standard for an information security management system (ISMS). Organizations can be certified against it.",
         "PCI DSS: required for organizations that store, process, or transmit payment card data.",
-        "GDPR: European Union privacy law covering personal data of EU residents, including breach notification duties.",
+        "GDPR: European Union privacy law covering personal data of people in the EU/EEA (not only residents), binding any organisation that processes it, including breach notification duties.",
         "SOC 2: an audit report format for service organizations covering trust criteria such as security and availability."
       ]
     },
@@ -101,7 +101,7 @@
   "cheatsheet": [
     "Policy hierarchy: policy (what and why) > standard (measurable requirement) > procedure (step by step) > guideline (recommended, not mandatory).",
     "GRC: governance decides accountability, risk decides what could go wrong, compliance checks the rules are followed.",
-    "NIST CSF six functions: Govern, Identify, Protect, Detect, Respond, Recover.",
+    "NIST CSF 2.0 six functions: Govern (new in 2.0), Identify, Protect, Detect, Respond, Recover.",
     "PCI DSS for card data, GDPR for EU personal data, ISO 27001 for a certifiable ISMS, SOC 2 for service organization audit reports.",
     "Classification levels such as public, internal, confidential, restricted drive handling rules."
   ],

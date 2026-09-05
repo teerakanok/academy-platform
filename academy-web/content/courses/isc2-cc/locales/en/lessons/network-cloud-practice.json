@@ -25,14 +25,14 @@
       "challenge": {
         "id": "dmz-web-server",
         "title": "The DMZ web server",
-        "brief": "You administer the public web server in the DMZ. External clients are told to reach it at its published address 192.168.20.15 on the 192.168.20.0/24 segment. The segment router at 192.168.20.1 forwards traffic to other networks and also serves DNS for this segment. This morning someone left the interface on DHCP; the lease has already changed once and the site dropped off the client allow-list. Configure the interface so the service stays reachable and stays that way.",
+        "brief": "You administer the public web server in the DMZ. External clients are told to reach it at its published public address 203.0.113.15 on the DMZ segment 203.0.113.0/24. The segment router at 203.0.113.1 forwards traffic to other networks and also serves DNS for this segment. This morning someone left the interface on DHCP; the lease has already changed once and the site dropped off the client allow-list. Configure the interface so the service stays reachable and stays that way.",
         "surface": "network-interface",
         "initial": {
           "addressMode": "dhcp",
-          "ipv4": "192.168.20.87",
+          "ipv4": "203.0.113.87",
           "subnet": "255.255.255.0",
-          "gateway": "192.168.20.1",
-          "dns1": "192.168.20.1",
+          "gateway": "203.0.113.1",
+          "dns1": "203.0.113.1",
           "applied": true
         },
         "requiredFields": {
@@ -57,11 +57,11 @@
             "label": "The server must answer on the exact address the clients were told to use",
             "field": "ipv4",
             "operator": "equals",
-            "value": "192.168.20.15"
+            "value": "203.0.113.15"
           },
           {
             "id": "req-subnet",
-            "label": "The server must reach every other host on 192.168.20.0/24 directly, without the router",
+            "label": "The server must reach every other host on 203.0.113.0/24 directly, without the router",
             "field": "subnet",
             "operator": "equals",
             "value": "255.255.255.0"
@@ -71,14 +71,14 @@
             "label": "Traffic headed beyond this segment must be handed to the segment router named in the brief",
             "field": "gateway",
             "operator": "equals",
-            "value": "192.168.20.1"
+            "value": "203.0.113.1"
           },
           {
             "id": "req-dns",
             "label": "Name lookups must go to the resolver the brief names for this segment",
             "field": "dns1",
             "operator": "equals",
-            "value": "192.168.20.1"
+            "value": "203.0.113.1"
           },
           {
             "id": "req-applied",
@@ -88,7 +88,7 @@
           }
         ],
         "hints": [
-          "The /24 at the end of 192.168.20.0/24 is the mask written in shorthand: 24 network bits. Written as four octets it is the mask most office networks use.",
+          "The /24 at the end of 203.0.113.0/24 is the mask written in shorthand: 24 network bits. Written as four octets it is the mask most office networks use.",
           "The router and the resolver are the same host here, and the brief names it: it holds the first usable address on the segment.",
           "Nothing counts until it is applied — the requirements read the live interface, so use the apply control before checking them."
         ],

@@ -26,7 +26,7 @@
       "rows": [
         [
           "Key",
-          "shared secret key หนึ่งดอก",
+          "shared secret key ตัวเดียว",
           "public key บวก private key"
         ],
         [
@@ -60,7 +60,7 @@
         "MD5 ให้ digest ยาว 128 บิต และถือว่าแตกแล้วในเชิงความมั่นคงปลอดภัย",
         "ตระกูล SHA-2 (SHA-256, SHA-512) เป็นทางเลือกมาตรฐานที่ใช้กันทั่วไป",
         "salting เติมข้อมูลสุ่มก่อน hash เพื่อให้ password เหมือนกันให้ผล hash ต่างกัน",
-        "digital signature ทำโดย hash ข้อความ แล้วเข้ารหัส digest ด้วย private key ของผู้ส่ง ได้ทั้ง integrity และ non-repudiation"
+        "digital signature ทำโดย hash ข้อความ แล้ว sign digest ด้วย private key ของผู้ส่ง และ verify ด้วย public key ที่คู่กัน ได้ทั้ง integrity และ non-repudiation กรณี RSA มักอธิบายขั้น sign ว่าเป็นการเข้ารหัส digest แต่ ECDSA และ EdDSA ใช้ signing operation ของตัวเอง จึงควรจำเป็น sign-and-verify ไม่ใช่ encrypt"
       ]
     },
     {
@@ -127,9 +127,9 @@
     }
   ],
   "cheatsheet": [
-    "symmetric = shared key ดอกเดียว เร็ว เหมาะกับข้อมูลจำนวนมาก asymmetric = public บวก private key ช้ากว่า เหมาะกับ key exchange และ signature",
+    "symmetric = shared key ตัวเดียว เร็ว เหมาะกับข้อมูลจำนวนมาก asymmetric = public บวก private key ช้ากว่า เหมาะกับ key exchange และ signature",
     "hash = digest ทางเดียวสำหรับ integrity เก็บ password ต้อง salt ก่อน hash, MD5 แตกแล้ว SHA-256 เป็นทางเลือกปกติ",
-    "digital signature = hash ที่เข้ารหัสด้วย private key ของผู้ส่ง = integrity บวก non-repudiation",
+    "digital signature = hash ที่ sign ด้วย private key ของผู้ส่ง และ verify ด้วย public key = integrity บวก non-repudiation",
     "PKI: CA เซ็น certificate ผูก identity กับ public key อุปกรณ์ตรวจ chain of trust",
     "การโจมตีเชิงแนวคิด: collision, birthday, downgrade, replay"
   ],

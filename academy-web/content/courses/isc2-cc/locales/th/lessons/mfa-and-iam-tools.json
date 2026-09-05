@@ -91,11 +91,11 @@
       "kind": "try",
       "title": "ซ้อมเส้นทางอัปเกรด",
       "steps": [
-        "บริษัทหนึ่งใช้รหัส SMS และผู้บริหารบ่นเรื่องการแจ้งเตือนถล่มตอนตีสอง ตั้งชื่อการโจมตีและสองการปรับปรุงที่เร็วที่สุด",
+        "บริษัทหนึ่งใช้ push ยืนยันเป็น MFA และผู้บริหารบ่นว่าถูกแจ้งเตือนขอยืนยันถล่มตอนตีสอง ตั้งชื่อการโจมตีและสองการปรับปรุงที่เร็วที่สุด",
         "เรียงความแน่นหนาสำหรับ rollout ใหม่: SMS, authenticator app, passkey, push พร้อม number-matching",
         "เขียนกฎ risk-based ที่จะเพิ่มสำหรับการ login จากประเทศใหม่"
       ],
-      "expected": "การโจมตี: กรณี SMS แรงขนานคือ SIM swap ส่วนการแจ้งเตือนถล่มสื่อถึง push ที่ใช้อยู่แห่งหนึ่ง ซึ่งคือ MFA fatigue การปรับปรุง: ย้ายไป authenticator app หรือ passkey และเปิด number-matching ที่ยังใช้ push ลำดับ: passkey, push พร้อม number-matching, authenticator app, SMS กฎ: login จากประเทศใหม่ต้อง step-up (factor ที่แข็งขึ้น) หรือบล็อกชั่วคราวรอตรวจสอบ"
+      "expected": "การโจมตี: MFA fatigue (push bombing) — ผู้โจมตีมี password อยู่แล้วและกำลังถล่ม push ให้กดยืนยัน การปรับปรุง: เปิด number-matching ในจุดที่ยังใช้ push และย้ายผู้ใช้สิทธิ์สูงไป passkey หรือ hardware key ที่ต้าน phishing (authenticator app เป็นทางผ่านที่ยอมรับได้) ลำดับ: passkey มาก่อน; authenticator app กับ push พร้อม number-matching อยู่กลางด้วยกัน — number-matching ตัด fatigue ได้แต่ทั้งคู่ยังไม่ต้าน phishing แบบเรียลไทม์ และลำดับอย่างง่ายของข้อสอบวางรหัสแอปไว้เหนือ push; SMS ท้ายสุด กฎ: login จากประเทศใหม่ต้อง step-up (factor ที่แข็งขึ้น) หรือบล็อกชั่วคราวรอตรวจสอบ"
     },
     {
       "kind": "lab",

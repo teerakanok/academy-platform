@@ -4,19 +4,19 @@
   "subtitle": "ใบรับรองด้านความปลอดภัยระดับเริ่มต้น สอนตั้งแต่ศูนย์ ไม่ต้องมีประสบการณ์ทำงาน",
   "audience": "สำหรับผู้เรียนแบบ self-paced ที่เตรียมสอบ ISC2 CC ตามหลักสูตร 2026-09 โดยไม่ต้องเคยทำงานด้านความปลอดภัยมาก่อน ห้าโมดูลเรียงตามห้าโดเมนของข้อสอบ แต่ละโมดูลมีแล็บแบบมีผู้นำทางและบทฝึกปิดท้าย ทุกบทมีทั้งภาษาอังกฤษและภาษาไทยพร้อมเฉลย checkpoint ที่ตรงกัน แล็บเป็นเชิงป้องกันเท่านั้นและรันบนเครื่องของคุณเอง sandbox ฟรี หรือ surface จำลอง",
   "outcomes": [
-    "นำหลักการความปลอดภัยที่ข้อสอบวัดไปใช้: CIA, authentication และ authorisation, ความเสี่ยง, controls, จริยธรรม และพื้นฐาน governance (Domain 1, 24%)",
-    "อธิบายแนวคิด business continuity, disaster recovery และ incident response และความสัมพันธ์ระหว่างกัน (Domain 2, 17.3%)",
-    "อธิบายแนวคิด access control ทั้งทางกายภาพและทางตรรกะ และวงจรชีวิตของ identity (Domain 3, 20%)",
-    "จำแนกพื้นฐานความปลอดภัยของ network และ cloud: ภัยคุกคาม โครงสร้างพื้นฐาน การออกแบบที่ปลอดภัย และ service model ของ cloud (Domain 4, 21.3%)",
-    "ปฏิบัติงาน security operations: ความปลอดภัยของข้อมูล hardening แนวปฏิบัติที่ดี และการสร้างความตระหนัก (Domain 5, 17.3%)",
-    "ทบทวนทั้งหลักสูตรใน capstone และวางแผนวันสอบ"
+    "นำหลักการความปลอดภัยที่ข้อสอบวัดไปใช้: CIA triad, authentication และ authorisation, การจัดการความเสี่ยง, security controls, จรรยาบรรณของ ISC2 และพื้นฐาน governance (Domain 1, 24%)",
+    "อธิบาย security governance: policies, procedures, standards และ regulations, แนวคิด business continuity และ disaster recovery, และแผน incident response เชื่อมโยงกับสิ่งเหล่านี้อย่างไร (Domain 2, 17.3%)",
+    "อธิบาย identity and access management: การควบคุมการเข้าถึงทางกายภาพและทางตรรกะ, least privilege และ segregation of duties, และวงจรชีวิตของ identity (Domain 3, 20%)",
+    "จำแนกแนวคิดความปลอดภัยของ network และ cloud: IP, ports และ protocols, ภัยคุกคามทางเครือข่ายที่พบบ่อย, การออกแบบเครือข่ายที่ปลอดภัย และ service model ของ cloud (Domain 4, 21.3%)",
+    "ปฏิบัติงาน security operations และ incident response: พื้นฐานการจัดการข้อมูลและการเข้ารหัส, system hardening และ configuration management, ขั้นตอนตรวจจับและตอบสนองเหตุการณ์ และการสร้างความตระหนัก (Domain 5, 17.3%)",
+    "ทบทวนทั้งหลักสูตรใน capstone และวางแผนวันสอบ (รูปแบบ CAT, 2 ชั่วโมง, 100–125 ข้อ, ผ่านที่ 700/1000)"
   ],
   "skillLabels": {
     "security-principles": "หลักการความปลอดภัย",
-    "governance": "Governance, BC/DR และ incident response",
-    "iam": "Access control และ identity",
+    "governance": "Security governance (BC/DR, แผน incident response)",
+    "iam": "Identity and access management",
     "network-cloud": "ความปลอดภัยของ network และ cloud",
-    "sec-ops": "ปฏิบัติการด้านความปลอดภัย"
+    "sec-ops": "Security operations และ incident response"
   },
   "nodeTitles": {
     "cia-and-aaa": "เป้าหมายของ Security: CIA, Non-Repudiation และ AAA",

@@ -60,7 +60,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "The firewall row of that table carries a habit the exam keeps retesting: rules are read top-down, the first matching rule wins, and whatever no rule claims falls through to an implicit deny at the bottom. That fall-through is why the safe posture is default deny — permit exactly what the policy names, then let the implicit deny take everything else. It is also why specific rules sit above general ones: when an admin-subnet exception and an everyone-else deny cover the same destination and port, the broader row on top quietly swallows the exception beneath it. Rule order is part of the configuration, not formatting, and the Firewall Rules PBQ lab below grades that order directly."
+      "text": "The firewall row of that table carries a habit the exam keeps retesting: rules are read top-down, the first matching rule wins, and on most firewalls and ACLs whatever no rule claims falls through to an implicit deny at the bottom — where a product defaults to permit instead, you add an explicit final deny rule yourself. That fall-through is why the safe posture is default deny — permit exactly what the policy names, then let the implicit deny take everything else. It is also why specific rules sit above general ones: when an admin-subnet exception and an everyone-else deny cover the same destination and port, the broader row on top quietly swallows the exception beneath it. Rule order is part of the configuration, not formatting, and the Firewall Rules PBQ lab below grades that order directly."
     },
     {
       "kind": "paragraph",
@@ -73,7 +73,7 @@
     {
       "kind": "list",
       "items": [
-        "VPN: an encrypted tunnel. Site-to-site joins offices; remote access joins a user; TLS VPNs serve applications through a browser, IPsec tunnels join networks.",
+        "VPN: an encrypted tunnel. Site-to-site joins offices; remote access joins a user; TLS VPNs commonly give browser or per-application access and IPsec is the usual choice for joining whole networks, but either protocol can run in either mode, so classify by what the tunnel connects.",
         "SDN (software-defined networking): a controller programs switches and routers centrally, enabling fast microsegmentation.",
         "DNS filtering: resolves known-bad domains into nothing, cheap protection at the resolver.",
         "NAC (network access control): checks device health before granting network access.",
@@ -159,7 +159,7 @@
     }
   ],
   "cheatsheet": [
-    "Firewall rules read top-down: the first matching rule wins, so specific rules sit above general ones and the implicit deny catches the rest — default deny is the posture.",
+    "Firewall rules read top-down: the first matching rule wins, so specific rules sit above general ones and the implicit deny (or an explicit final deny rule) catches the rest — default deny is the posture.",
     "IDS watches a copy and alerts; IPS sits inline and blocks, so its false positives stop traffic.",
     "Proxy filters web traffic; WAF shields web apps; DNS filtering kills bad domains at resolution.",
     "VPN forms: site-to-site joins networks, remote access joins a user; TLS serves apps, IPsec joins networks.",

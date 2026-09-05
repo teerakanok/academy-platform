@@ -110,7 +110,7 @@
     },
     {
       "id": "cp-2",
-      "prompt": "เมื่อมี SSO การปิดบัญชีเดียวใน identity provider ตัดการเข้าถึงของพนักงานที่ลาออกจากทุก application ที่เชื่อมต่อ นี่แสดง SSO ในด้านใดเป็นหลัก?",
+      "prompt": "เมื่อมี SSO การปิดบัญชีเดียวใน identity provider กันพนักงานที่ลาออกไม่ให้ login เข้าทุก application ที่พึ่ง provider นั้น นี่แสดง SSO ในด้านใดเป็นหลัก?",
       "choices": {
         "A": "จุดอ่อน เพราะบัญชีถูกทำซ้ำ",
         "B": "ความไม่เข้ากันกับ federation",
@@ -120,7 +120,7 @@
       "correct": [
         "C"
       ],
-      "explanation": "การรวมศูนย์ authentication ทำให้ onboarding และโดยเฉพาะ offboarding เป็นการกระทำเดียว ด้านกลับคือ credential แม่มูลค่าสูง ซึ่งเป็นเหตุผลว่าทำไมบัญชี SSO ต้องมี MFA ที่แน่นสุด"
+      "explanation": "การรวมศูนย์ authentication ทำให้ onboarding และโดยเฉพาะ offboarding เป็นการกระทำเดียวสำหรับการ login ใหม่ แต่ไม่ได้ครอบคลุมทุกอย่างอัตโนมัติ: session และ refresh token ที่ยังอยู่ต้องถูกเพิกถอน ส่วน API key, service account และบัญชีในแอปที่อยู่นอก provider ยังต้องเก็บกวาดแยก ด้านกลับคือ credential แม่มูลค่าสูง ซึ่งเป็นเหตุผลว่าทำไมบัญชี SSO ต้องมี MFA ที่แน่นสุด"
     }
   ]
 }

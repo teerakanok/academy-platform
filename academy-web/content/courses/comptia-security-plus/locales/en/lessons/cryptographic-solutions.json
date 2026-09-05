@@ -60,7 +60,7 @@
         "MD5 produces a 128-bit digest and is considered broken for security purposes.",
         "SHA-2 family (SHA-256, SHA-512) is the current common choice.",
         "Salting adds random data before hashing so identical passwords hash differently.",
-        "A digital signature hashes the message, then encrypts the digest with the sender's private key, giving integrity plus non-repudiation."
+        "A digital signature hashes the message, then signs the digest with the sender's private key and is verified with the matching public key, giving integrity plus non-repudiation. With RSA this signing step is often described as encrypting the digest; ECDSA and EdDSA use their own signing operation, so learn it as sign-and-verify, not encrypt."
       ]
     },
     {
@@ -129,7 +129,7 @@
   "cheatsheet": [
     "Symmetric = one shared key, fast, bulk data. Asymmetric = public plus private key, slow, key exchange and signatures.",
     "Hash = one-way digest for integrity. Salt before hashing passwords. MD5 is broken; SHA-256 is the normal choice.",
-    "Digital signature = hash encrypted with the sender's private key = integrity plus non-repudiation.",
+    "Digital signature = hash signed with the sender's private key, verified with the public key = integrity plus non-repudiation.",
     "PKI: CA signs certificate binding identity to public key; devices verify the chain of trust.",
     "Concept attacks: collision, birthday, downgrade, replay."
   ],

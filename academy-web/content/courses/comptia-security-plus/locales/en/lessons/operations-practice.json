@@ -62,7 +62,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "The pairing is the lesson. Single lines get opinions; pairs get evidence. A 4624 is a success story until you notice it belongs to an account that did not exist two minutes earlier, arriving from an address your network does not own. Note that 203.0.113.x is a documentation-only range used in training material precisely because it can never belong to a real host."
+      "text": "The pairing is the lesson. Single lines get opinions; pairs get evidence. A 4624 is a success story until you notice it belongs to an account that did not exist two minutes earlier, arriving from an address your network does not own. Note that 203.0.113.x is a documentation-only range (TEST-NET-3) used in training material precisely because it is never routed on the public Internet and so cannot belong to a real Internet host."
     },
     {
       "kind": "heading",

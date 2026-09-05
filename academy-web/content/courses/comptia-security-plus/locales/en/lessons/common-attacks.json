@@ -10,7 +10,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "Most breaches begin with a person, then a computer. Social engineering works because it exploits helpfulness, urgency, authority, and fear. Phishing is the email form; spear phishing targets a named person; whaling targets executives; smishing uses SMS; vishing uses voice calls. The defense trio is training, reporting, and technical filtering."
+      "text": "In many breach reports the attack begins with a person before it reaches a computer. Social engineering works because it exploits helpfulness, urgency, authority, and fear. Phishing is the email form; spear phishing targets a named person; whaling targets executives; smishing uses SMS; vishing uses voice calls. The defense trio is training, reporting, and technical filtering."
     },
     {
       "kind": "heading",
@@ -28,7 +28,7 @@
     },
     {
       "kind": "paragraph",
-      "text": "Notice the logic, because the exam tests the logic. Spraying avoids lockouts by spreading attempts. Stuffing works because people reuse passwords. Every credential attack is answered by unique passwords, MFA, or both."
+      "text": "Notice the logic, because the exam tests the logic. Spraying avoids lockouts by spreading attempts. Stuffing works because people reuse passwords. Guessing, spraying, and stuffing are all answered by unique passwords, MFA, or both. Keylogging steals whatever you type, so its answer is endpoint anti-malware plus phishing-resistant MFA such as FIDO2 keys, not a stronger password."
     },
     {
       "kind": "heading",
