@@ -1,0 +1,140 @@
+{
+  "nodeId": "event-triage",
+  "locale": "en",
+  "title": "Event Triage: From Alert to Decision",
+  "objective": "By the end of this lesson you can run the triage steps (validate, scope, prioritize, escalate or close) and classify incident severity like an analyst.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Triage is a sorting discipline"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Event triage is the process of taking raw alerts and deciding, quickly and consistently, what each one is, how bad it is, and who must act. The word comes from medicine: with more patients than time, sort by urgency and treat in order. A triage process turns an alert queue into decisions."
+    },
+    {
+      "kind": "heading",
+      "text": "The four moves"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Validate: is the alert real? Check the underlying logs; many alerts are misconfigurations, benign processes, or duplicates.",
+        "Scope: if real, how far does it reach? Which accounts, hosts, and data are involved; is it one machine or fifty?",
+        "Prioritize: assign severity from impact (what is at risk) and urgency (how fast it is developing).",
+        "Escalate or close: hand confirmed incidents to responders with context, or document the false positive and feed the lesson back to detection tuning."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The documentation habit matters as much as the speed: every decision records what was seen, what was concluded, and why. That record is what post-incident review (later lesson) and detection tuning depend on."
+    },
+    {
+      "kind": "heading",
+      "text": "Severity: impact times urgency"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Severity",
+        "Typical meaning",
+        "Example"
+      ],
+      "rows": [
+        [
+          "Critical",
+          "Active compromise of key systems or data, or imminent major loss",
+          "Ransomware encrypting servers; domain admin account compromised"
+        ],
+        [
+          "High",
+          "Confirmed malicious activity, contained blast radius, sensitive targets",
+          "Phishing credentials used; malware on one workstation"
+        ],
+        [
+          "Medium",
+          "Suspicious activity needing investigation, no confirmed loss",
+          "Impossible-travel login blocked; repeated failures then success"
+        ],
+        [
+          "Low",
+          "Policy violation or informational with security value",
+          "Personal cloud sync detected on an office machine"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Severity is not just technical: the same technical event is higher severity on a crown-jewel system than on a test box. Asset value and data sensitivity enter the score, which links triage back to risk thinking from Domain 1."
+    },
+    {
+      "kind": "heading",
+      "text": "Escalation paths"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Escalation has two flavors, and exams test the difference. Functional escalation brings in more skill: call the network team, the forensics specialist, the vendor. Hierarchical escalation brings in more authority: notify the manager, the CISO, and where personal data is involved, whoever owns regulatory notification decisions. Incidents needing spending decisions, public statements, or legal judgment always require hierarchical escalation."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Scenario gives you an alert and asks the first step: validate before escalating. Scenario asks severity: weigh impact and urgency with asset value. Scenario involves legal exposure or public statements: hierarchical escalation, not just technical help."
+    },
+    {
+      "kind": "try",
+      "title": "Triage three alerts",
+      "steps": [
+        "Triage each: (1) IDS alert for known malware signature on a test VM; (2) 200 failed logins then a success on the finance server, then a new admin account created; (3) one user reports a phishing email sitting unread in their inbox.",
+        "For each: validate, scope, severity, and next action.",
+        "Say which one needs hierarchical escalation and why."
+      ],
+      "expected": "1: likely real; scope one test VM; medium (contain and reimage); functional escalation only. 2: high to critical; scope credentials and servers touched; immediate containment and both functional and hierarchical escalation. 3: potential, unconfirmed; scope who else received it; low to medium; hunt for other recipients and block the sender. Number 2 needs authority because account creation on finance systems implies breach handling and possibly notification duties."
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Phishing Triage Drill",
+      "description": "Triage a sanitized sample phishing email using inline header evidence, apply the triage steps, and write the incident note. Full guide: labs/phishing-triage-drill.en.md.",
+      "estimatedMinutes": 25,
+      "status": "ready",
+      "scale": "full"
+    }
+  ],
+  "cheatsheet": [
+    "Triage moves: validate, scope, prioritize (impact x urgency), escalate or close with documentation.",
+    "Severity bands: critical (active major compromise), high (confirmed contained), medium (suspicious), low (policy/informational).",
+    "Severity weighs asset value: the same event scores higher on crown jewels.",
+    "Functional escalation adds skills; hierarchical escalation adds authority (spending, legal, notification, public statements).",
+    "Close with a reason: documented false positives feed detection tuning."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A SIEM alert fires, but the analyst finds the triggering 'attack' was an approved vulnerability scan. What is the correct triage outcome?",
+      "choices": {
+        "A": "Escalate to the CISO immediately",
+        "B": "Reimage the scanning machine",
+        "C": "Ignore it silently",
+        "D": "Close as a documented false positive and tune the rule to exclude scheduled scans"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Validated benign events are closed with a documented reason, and the detection rule is tuned so approved scans no longer generate noise. Silent ignoring is exactly the habit triage exists to prevent."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "An incident may expose customer personal data and could require a regulatory notification decision. Beyond calling technical specialists, the team must perform:",
+      "choices": {
+        "A": "Functional escalation only",
+        "B": "Hierarchical escalation to management, who own notification and legal decisions",
+        "C": "No escalation until systems are restored",
+        "D": "A public press release from the analysts"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Decisions about regulatory notification, legal exposure, and public statements belong to management authority, so hierarchical escalation is mandatory alongside the technical response."
+    }
+  ]
+}

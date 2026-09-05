@@ -1,0 +1,121 @@
+{
+  "nodeId": "architecture-models",
+  "locale": "th",
+  "title": "แบบจำลองสถาปัตยกรรมความมั่นคงปลอดภัย",
+  "objective": "เมื่อจบบทเรียนนี้ ผู้เรียนจะอธิบาย defense in depth, zero trust, secure-by-design และ shared responsibility ได้ และเลือกแบบจำลองที่สถานการณ์กำลังอธิบายได้",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Defense in depth: ความปลอดภัยหลายชั้น"
+    },
+    {
+      "kind": "paragraph",
+      "text": "defense in depth ซ้อน control หลายชั้นจนเมื่อชั้นหนึ่งล้ม ยังมีชั้นอื่นยืนอยู่: firewall ขอบเขต, gateway ของ segment, firewall บนเครื่อง, การตรวจสอบที่แอปพลิเคชัน, encryption และ backup วลีที่ต้องเจอบนข้อสอบคือ: ไม่มี control ตัวเดียวที่น่าเชื่อถือจะจับทุกอย่างได้"
+    },
+    {
+      "kind": "heading",
+      "text": "Zero trust"
+    },
+    {
+      "kind": "paragraph",
+      "text": "zero trust ตัดความคิดเรื่องเครือข่ายภายในที่เชื่อถือได้ทิ้งไป ทุก request ต้องถูก authenticate, authorize และ encrypt ไม่ว่าจะมาจากไหน หลักการหลักสามข้อ: verify explicitly (identity ที่แข็งแรง สุขภาพอุปกรณ์), least-privilege access (พอดีเท่าที่งานต้องใช้ เมื่อจำเป็นเท่านั้น) และ assume breach (แบ่งเขต เข้ารหัส เฝ้าระวังภายใน)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Microsegmentation: ตัดเครือข่ายภายในเป็นโซนเล็ก ๆ เพื่อให้เครื่องที่ถูกบุกไปถึงอะไรได้น้อยมาก",
+        "Implicit deny: ปฏิเสธการเข้าถึงเสมอ เว้นแต่จะมีกฎอนุญาต",
+        "Continuous verification: session ถูกตรวจซ้ำ โดยมีสถานะอุปกรณ์เป็นส่วนหนึ่งของการตัดสินใจ",
+        "Identity คือขอบเขตใหม่: ใครและอะไรขอเข้าถึง สำคัญกว่าเครื่องนั้นอยู่ที่ไหน"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Secure-by-design และ shared responsibility"
+    },
+    {
+      "kind": "paragraph",
+      "text": "secure-by-design สร้างความปลอดภัยไว้ใน requirement ตั้งแต่วันแรก: threat modeling, ค่าเริ่มต้นแบบ least privilege, fail-safe defaults และคงความปลอดภัยให้เรียบง่ายพอที่จะตรวจสอบได้ ต่างจากการเอา control มาแปะทีหลังส่งมอบ shared responsibility ขีดเส้นแบ่งว่า provider ดูแลอะไร ลูกค้าดูแลอะไร บนคลาวด์ ลูกค้ายังคงรับผิดชอบเรื่อง data classification, identity และการตัดสินใจเรื่องสิทธิ์เข้าถึงเสมอ"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "แบบจำลอง",
+        "แนวคิดหนึ่งบรรทัด",
+        "วลีที่เป็นสัญญาณบนข้อสอบ"
+      ],
+      "rows": [
+        [
+          "Defense in depth",
+          "หลายชั้น ไม่เชื่อตัวเดียว",
+          "'control หลายชั้นที่ซ้อนทับกัน'"
+        ],
+        [
+          "Zero trust",
+          "ตรวจทุก request สมมติว่ารั่วแล้ว",
+          "'never trust, always verify'"
+        ],
+        [
+          "Least privilege",
+          "สิทธิ์น้อยที่สุดเท่าที่จำเป็น ชั่วคราว",
+          "'เฉพาะสิทธิ์ที่งานต้องใช้'"
+        ],
+        [
+          "Segmentation",
+          "โซนที่มีประตูคั่น",
+          "'จำกัด lateral movement'"
+        ],
+        [
+          "Secure-by-design",
+          "ความปลอดภัยอยู่ใน requirement ตั้งแต่ต้นจนจบ",
+          "'ตั้งแต่เริ่มโปรเจกต์'"
+        ],
+        [
+          "Shared responsibility",
+          "provider และลูกค้าแบ่งรับผิดชอบ",
+          "'ใครแพตช์อะไรบนคลาวด์'"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "บนข้อสอบ",
+      "text": "สถานการณ์ zero trust จะพูดถึงการตรวจสุขภาพอุปกรณ์ การอนุญาตต่อ request หรือ microsegmentation คำถามเรื่อง segmentation เน้นจำกัดขอบเขตความเสียหาย เมื่อข้อสอบบอกว่าการออกแบบเดิมตั้งสมมติฐานว่าเครือข่ายภายในปลอดภัย ทางแก้คือคิดแบบ zero trust"
+    },
+    {
+      "kind": "try",
+      "title": "ออกแบบเครือข่ายสำนักงานใหม่บนกระดาษ",
+      "steps": [
+        "เริ่มจากเครือข่ายแบนราบ: subnet เดียวมีแล็ปท็อป HR, file server และปรินเตอร์ เรียกถึงกันได้ทุกเครื่อง",
+        "วาด segmentation ที่แยกสามกลุ่มนี้ออกจากกันด้วย gateway",
+        "เพิ่มกฎ zero trust: ที่ gateway ต้องตรวจอะไรบ้างในแต่ละ request",
+        "เพิ่มชั้นป้องกันอีกชั้นหนึ่งของ defense in depth ที่ไม่เกี่ยวกับเครือข่ายเลย"
+      ],
+      "expected": "ได้สามโซนพร้อม gateway ที่อนุญาตเฉพาะ flow ที่จำเป็น gateway ตรวจ identity สุขภาพอุปกรณ์ และสิทธิ์ต่อ request ชั้นเสริมอาจเป็นการเข้ารหัสดิสก์ของ file server หรือ offline backup ซึ่งไม่ขึ้นกับเครือข่าย"
+    }
+  ],
+  "cheatsheet": [
+    "Defense in depth: ซ้อนหลายชั้นเพื่อให้รอดจากความล้มเหลวหนึ่งชั้น",
+    "Zero trust: verify explicitly, least privilege, assume breach โดย identity เข้าแทนตำแหน่งบนเครือข่าย",
+    "Microsegmentation จำกัด lateral movement และ implicit deny คือท่าปกติ",
+    "Secure-by-design: ความปลอดภัยเป็น requirement ตั้งแต่วันแรก ด้วย threat modeling และค่าเริ่มต้นที่ปลอดภัย",
+    "Shared responsibility: provider ดูแลแพลตฟอร์ม ลูกค้าเก็บเรื่องข้อมูล identity และสิทธิ์เข้าถึง"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "บริษัทหนึ่งอนุญาตให้อุปกรณ์ใดก็ตามบนเครือข่ายสำนักงานเข้าถึงเซิร์ฟเวอร์ภายในได้ทุกเครื่องหลังล็อกอิน VPN ครั้งเดียว การเปลี่ยนแปลงสถาปัตยกรรมใดสะท้อน zero trust มากที่สุด",
+      "choices": {
+        "A": "เพิ่ม firewall ขอบเขตตัวที่สอง",
+        "B": "บังคับ password ที่ยาวขึ้นที่ VPN",
+        "C": "ย้ายเซิร์ฟเวอร์ทั้งหมดไป subnet ที่แข็งแรงกว่าเดิมหนึ่งเดียว",
+        "D": "ประเมิน identity และสุขภาพอุปกรณ์ทุก request พร้อมการเข้าถึงแบบ microsegment"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "zero trust ตรวจสอบทุก request อย่างชัดเจนและจำกัดการเข้าถึงด้วย least privilege กับ segmentation ส่วนการแข็งแรงขึ้นของขอบเขตหรือ password ยังคงสมมติฐานเดิมว่าข้างในปลอดภัย"
+    }
+  ]
+}

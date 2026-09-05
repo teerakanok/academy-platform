@@ -1,0 +1,136 @@
+{
+  "nodeId": "security-controls-types",
+  "locale": "th",
+  "title": "Security Controls: ประเภทและหมวดหมู่",
+  "objective": "เมื่อจบบทเรียนนี้ ผู้เรียนจำแนก control ตามหน้าที่ (preventive, detective, corrective และเพื่อนๆ) และตามหมวด (administrative, technical, physical) ได้ และอธิบาย compensating control ได้",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "มอง control ได้สองมุมอย่างเป็นอิสระ"
+    },
+    {
+      "kind": "paragraph",
+      "text": "control ทุกตัวอธิบายได้ด้วยสิ่งที่มันทำ (หน้าที่) และสิ่งที่มันทำมาจาก (หมวดหมู่) ข้อสอบยก scenario มาให้แล้วถามอย่างใดอย่างหนึ่ง จึงต้องแยกสองตารางนี้ไว้ในใจให้ชัด Firewall เป็น technical และ preventive ยามรักษาการณ์เป็น physical และ preventive การตรวจ review audit log เป็น administrative (หรือ technical ถ้าอัตโนมัติ) และ detective"
+    },
+    {
+      "kind": "heading",
+      "text": "ตามหน้าที่: control ทำงานเมื่อไหร่"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "หน้าที่",
+        "ทำงานเมื่อไหร่",
+        "ตัวอย่าง"
+      ],
+      "rows": [
+        [
+          "Preventive",
+          "กันเหตุไม่ให้เกิด",
+          "กฎ firewall, MFA, ล็อกประตู, input validation"
+        ],
+        [
+          "Detective",
+          "เผยเหตุระหว่างหรือหลังเกิด",
+          "การแจ้งเตือน IDS, การ review log, การนำฟิล์ม CCTV มาดู"
+        ],
+        [
+          "Corrective",
+          "แก้ผลกระทบหลังเหตุ",
+          "กู้คืนจาก backup, patch จุดที่ถูกโจมตี, เปลี่ยนเส้นทาง traffic"
+        ],
+        [
+          "Deterrent",
+          "ทำให้ไม่กล้าลอง",
+          "ป้ายเตือน, กล้องที่เห็นชัด, ข้อความต้อนรับตอน login"
+        ],
+        [
+          "Recovery",
+          "คืนความสามารถหลังถูกโจมตี",
+          "restore จาก backup, failover site, สร้างระบบใหม่"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "วิธีจับคู่ให้จำง่าย: preventive ตอบโทนการโจมตีก่อนถึงตัว, detective บอกว่าเกิดขึ้นแล้ว, ส่วน corrective กับ recovery คือเก็บบ้านให้กลับมาเหมือนเดิม การใช้งานจริงมักผสมกัน: MFA ป้องกัน, log ตรวจจับ, backup กู้คืน"
+    },
+    {
+      "kind": "heading",
+      "text": "ตามหมวดหมู่: control สร้างจากอะไร"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Administrative (management) control: policy, standard, procedure, การอบรม, การตรวจประวัติ, separation of duties คุมพฤติกรรมมนุษย์",
+        "Technical (logical) control: firewall, การเข้ารหัส, MFA, access control list, antivirus และ EDR บังคับใช้โดยระบบ",
+        "Physical control: ล็อก, บัตร, ยาม, รั้ว, CCTV, mantrap, ระบบดับไฟ ปกป้องสถานที่และอุปกรณ์"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "control หนึ่งตัวสวมหมวกได้สองใบในประโยคเดียว CCTV เป็น physical control ที่ทำหน้าที่ detective (บันทึกภาพ) และ deterrent (เห็นชัดจนไม่กล้า) การอบรมเป็น administrative และ preventive เมื่อข้อสอบถามการจับคู่เฉพาะ ให้อ่านให้ชัดว่าคำถามชี้แกนไหน: หน้าที่หรือหมวดหมู่"
+    },
+    {
+      "kind": "heading",
+      "text": "Compensating control"
+    },
+    {
+      "kind": "paragraph",
+      "text": "บางครั้ง control หลักที่อยากได้ทำไม่ได้ ระบบเก่าใส่ MFA ไม่ได้ จึงวางไว้หลัง jump server ที่มี MFA และจำกัดเครือข่ายที่เข้าถึง jump server นั้น ตัว jump server คือ compensating control: มาตรการทางเลือกที่ให้ระดับลดความเสี่ยงใกล้เคียงกันเมื่อ control หลักใช้ไม่ได้ ให้คาดหวังอย่างน้อยหนึ่ง scenario ที่คำตอบคือ compensating control ในรูปของเส้นทางเลือกสู่การป้องกันระดับเดียวกัน"
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "บนข้อสอบ",
+      "text": "บ่วงคลาสสิก: เรียก backup ว่า preventive ซึ่งผิด backup ไม่ได้หยุดการโจมตี มันเป็น corrective หรือ recovery อีกบ่วง: กล้องกันไว้ก่อนแบบหนึ่ง แต่ถ้าไม่มีคนเฝ้าจอ มันไม่ได้กันเหตุ มัน detect และ deterrent"
+    },
+    {
+      "kind": "try",
+      "title": "จำแนก control หกตัว",
+      "steps": [
+        "จำแนกแต่ละตัวตามหน้าที่และหมวดหมู่: (1) ประชุม review สิทธิ์เดือนละครั้ง; (2) full-disk encryption; (3)ประตูหมุนกับเครื่องอ่านบัตร; (4) honeypot ที่แจ้งเตือน SOC; (5) restore database จาก backup คืนก่อน; (6) ป้ายแจ้งว่าการใช้งานถูกบันทึกไว้",
+        "เขียนหน้าที่ก่อน แล้วตามด้วยหมวดหมู่",
+        "ระบุว่าคู่ไหนเข้ากันเป็น defense-in-depth ชั้นเดียวกันได้"
+      ],
+      "expected": "1: detective, administrative 2: preventive, technical 3: preventive, physical 4: detective, technical 5: corrective/recovery, technical 6: deterrent, administrative หรือ physical คู่ที่เข้ากัน: 2 กับ 5 (ป้องกันแล้วกู้คืน), 3 กับ 4 (ด่านกายภาพบวกการตรวจจับ)"
+    }
+  ],
+  "cheatsheet": [
+    "แกนหน้าที่: preventive (กัน), detective (เผย), corrective (แก้), deterrent (ขู่), recovery (กู้)",
+    "แกนหมวดหมู่: administrative (policy และคน), technical (ระบบ), physical (สถานที่)",
+    "Backup เป็น corrective/recovery ไม่ใช่ preventive เด็ดขาด",
+    "Compensating control = มาตรการทางเลือกเมื่อ control หลักทำไม่ได้",
+    "control หนึ่งตัวจัดได้ทั้งสองแกนพร้อมกัน ให้อ่านให้ชัดว่าข้อสอบถามแกนไหน"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "หลังเกิดเหตุ ransomware องค์กรกู้เซิร์ฟเวอร์คืนจาก offline backup นี่คือ control ประเภทใด?",
+      "choices": {
+        "A": "Preventive",
+        "B": "Detective",
+        "C": "Corrective",
+        "D": "Deterrent"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "การ restore จาก backup เป็นการซ่อมแซมความเสียหายหลังเหตุการณ์ จึงเป็น corrective (ทิศทาง recovery) มันไม่ได้หยุดหรือเผยการโจมตีระหว่างเกิดเหตุเลย"
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Application เก่าใส่ MFA ไม่ได้ ทีมจึงวางมันหลัง gateway เฉพาะที่บังคับ MFA และกรอง source address ตัว gateway นี้คืออะไร?",
+      "choices": {
+        "A": "Physical control",
+        "B": "Deterrent control",
+        "C": "Detective control",
+        "D": "Compensating control"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "control หลัก (MFA บนตัว application) ทำไม่ได้ จึงใช้มาตรการทางเลือกที่ให้การป้องกันใกล้เคียงกัน นั่นคือนิยามของ compensating control ซึ่งที่นี่ implement ด้วยวิธีทาง technical"
+    }
+  ]
+}

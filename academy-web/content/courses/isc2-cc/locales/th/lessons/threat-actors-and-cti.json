@@ -1,0 +1,146 @@
+{
+  "nodeId": "threat-actors-and-cti",
+  "locale": "th",
+  "title": "Threat Actor, แรงจูงใจ และ Cyber Threat Intelligence",
+  "objective": "เมื่อจบบทเรียนนี้ ผู้เรียนจำแนก threat actor ตามแรงจูงใจได้อธิบายว่า cyber threat intelligence เพิ่มอะไร และอธิบาย MITRE ATT&CK กับ Cyber Kill Chain ในระดับแนวคิดได้",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "ใครโจมตี และเพื่ออะไร"
+    },
+    {
+      "kind": "paragraph",
+      "text": "การระบุแหล่งเริ่มจากแรงจูงใจ เพราะแรงจูงใจทำนายพฤติกรรม ข้อสอบคาดหวังให้ผู้เรียนจับคู่กลุ่ม actor กับเป้าหมายและสไตล์ของมัน"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "กลุ่ม actor",
+        "แรงจูงใจ",
+        "พฤติกรรมที่พบ"
+      ],
+      "rows": [
+        [
+          "nation-state / APT",
+          "จารกรรมข้อมูล ทำลาย ได้เปรียบเชิงกลยุทธ์",
+          "อดทน ทรัพยากรดี จับเป้าเฉพาะ; อยู่ในระบบนาน"
+        ],
+        [
+          "cybercriminal",
+          "เงิน",
+          "ransomware โกงการจ่ายเงิน ขโมยข้อมูลไปขาย"
+        ],
+        [
+          "hacktivist",
+          "อุดมการณ์ ประท้วง",
+          "เปลี่ยนหน้าเว็บ ทำลายเพื่อเสียงสะท้อน"
+        ],
+        [
+          "insider",
+          "ความแค้น กำไร หรือความประมาท",
+          "ใช้สิทธิ์ที่มีอยู่แล้ว; แยกจากงานปกติยาก"
+        ],
+        [
+          "script kiddie / มือสมัครเล่น",
+          "ความอยากรู้ อยากมีชื่อ",
+          "ใช้ tool และ exploit ที่มีขาย/เผยแพร่แล้ว; จังหวะเหลือๆ"
+        ],
+        [
+          "คู่แข่ง",
+          "ได้เปรียบทางเศรษฐกิจ",
+          "จารกรรมข้อมูลและแผนของคู่แข่ง"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "insider ต้องบันทึกไว้พิเศษ: พวกเขามีสิทธิ์ถูกต้องอยู่แล้ว control ที่หยุดคนนอก (firewall, MFA) แทบไม่ถ่วงเวลาพวกเขาเลย คำตอบของ scenario insider เอนไปทาง least privilege separation of duties การ log และการเฝ้าพฤติกรรม ไม่ใช่อุปกรณ์ขอบเขต"
+    },
+    {
+      "kind": "heading",
+      "text": "Cyber threat intelligence"
+    },
+    {
+      "kind": "paragraph",
+      "text": "cyber threat intelligence (CTI) คือข้อมูลเรื่องคู่ต่อสู้ที่ถูกเก็บ ประมวล และวิเคราะห์แล้ว กลายเป็นสิ่งที่ใช้ปฏิบัติได้: ใครอาจมาเล่นงานเรา ด้วยวิธีใด เพื่อจัดลำดับการป้องกันและการตรวจจับ ศัพท์สองชิ้นที่ข้อสอบเช็ค: IOC (indicator of compromise) คือ artifact จับต้องได้ของการโจมตี เช่น domain ชั่วร้าย IP หรือ file hash; TTP (tactics, techniques, and procedures) บรรยายวิธีปฏิบัติของคู่ต่อสู้ IOC เก่าเร็วเพราะผู้โจมตีหมุนเวียนโครงสร้างพื้นฐาน; TTP อยู่ทนเพราะการฝึกวิธีใหม่แพง การลงทุนตรวจจับระดับ TTP จึงเป็นการป้องกันที่ลึกกว่าและอยู่นานกว่า"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "strategic intel: แนวโน้มและภูมิทัศน์ สำหรับผู้บริหาร",
+        "operational intel: campaign และกิจกรรมคู่ต่อสู้ สำหรับผู้จัดการ security",
+        "tactical/technical intel: IOC และคำแนะนำตรวจจับ สำหรับ analyst และเครื่องมือ"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Cyber Kill Chain"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Cyber Kill Chain บรรยายการบุกรุกเป็นเฟสต่อเนื่อง: reconnaissance, weaponization, delivery, exploitation, installation, command and control (C2) และ actions on objectives หัวใจสำหรับฝ่ายป้องกัน: ตัดห่วงโซ่ที่เฟสใดก็ได้ การโจมตีล้มเหลว และยิ่งตัดเร็วยิ่งถูก การกรองอีเมลที่ตัด delivery ชนะ incident response ที่สกัด actions on objectives"
+    },
+    {
+      "kind": "heading",
+      "text": "MITRE ATT&CK"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MITRE ATT&CK คือคลังความรู้สาธารณะของพฤติกรรมคู่ต่อสู้ จัดด้วย tactics (เหตุผล: initial access, persistence, exfiltration และอื่นๆ) และ techniques (วิธี: phishing, valid accounts และอีกหลายร้อย) สร้างจากการสังเกตโลกจริง ต่างจาก kill chain แบบเส้นตรง ATT&CK ยอมรับว่าผู้โจมตีวนและข้ามเฟส ฝ่ายป้องกันใช้มันทำแผนที่ความครอบคลุม: technique ใดเราตรวจจับ ตอบสนอง หรือป้องกันได้ และ technique ใดเป็นจุดบอด สำหรับคอร์สนี้ ให้รู้ชื่อ ความสัมพันธ์ tactic กับ technique และการใช้ทำแผนที่ความครอบคลุม"
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "บนข้อสอบ",
+      "text": "จับคู่ actor กับแรงจูงใจ: เงิน (criminal), อุดมการณ์ (hacktivist), จารกรรมข่าวกรอง (nation-state), ความแค้นหรือประมาท (insider) IOC กับ TTP: artifact กับพฤติกรรม; TTP อยู่นานกว่า kill chain = เรียงลำดับ ตัดห่วงใดก็ได้; ATT&CK = เมทริกซ์พฤติกรรมสำหรับทำแผนที่ความครอบคลุม"
+    },
+    {
+      "kind": "try",
+      "title": "อ่านการบุกรุกจำลอง",
+      "steps": [
+        "รายงานการบุกรุกหนึ่งเล่าว่า: ผู้โจมตีส่งอีเมลเฉพาะเป้าพร้อมไฟล์แนบร้าย (delivery) macro รัน (exploitation) สร้าง scheduled task ถาวร (installation) traffic ไหลไป domain ใหม่ทุกคืน (C2) แล้วคัดลอกไฟล์ออก (actions)",
+        "ติดป้ายเฟส kill chain ให้แต่ละเหตุการณ์",
+        "แต่ละเฟส ตั้งชื่อ control หนึ่งตัวที่จะตัดห่วงโซ่ตรงนั้นได้",
+        "จำแนก actor ที่น่าจะเป็นถ้าเป้าหมายคือขโมยเอกสารเจรจาตลอดหลายเดือน"
+      ],
+      "expected": "ป้าย: delivery, exploitation, installation, C2, actions on objectives control: กรองอีเมล; sandbox ไฟล์แนบหรือปิด macro; allow-list และ EDR จับ scheduled task; กรอง DNS/egress และวิเคราะห์ traffic; DLP และ segmentation actor: แรงจูงใจจารกรรมชี้ไปสไตล์ nation-state หรือ APT ซึ่งอดทนและจับเป้า"
+    }
+  ],
+  "cheatsheet": [
+    "กลุ่ม actor ตามแรงจูงใจ: nation-state (จารกรรมข่าวกรอง), criminal (เงิน), hacktivist (อุดมการณ์), insider (แค้น/ประมาท), script kiddie (อยากรู้)",
+    "insider ถือสิทธิ์ถูกต้องอยู่แล้ว: ตอบด้วย least privilege, SoD, log, เฝ้าพฤติกรรม",
+    "CTI = ข้อมูลคู่ต่อสู้ที่วิเคราะห์แล้วใช้ปฏิบัติได้; มีชั้น strategic, operational, tactical",
+    "IOC = artifact (domain, IP, hash) อายุสั้น; TTP = พฤติกรรม อายุยาว; ลงทุนตรวจจับระดับ TTP คุ้มกว่า",
+    "kill chain: เจ็ดเฟสเรียงลำดับ ตัดห่วงไหนก็ได้ยิ่งเร็วยิ่งดี; MITRE ATT&CK: tactics (ทำไม) x techniques (อย่างไร) สำหรับทำแผนที่ความครอบคลุม"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "เว็บไซต์หนึ่งถูกเปลี่ยนหน้าไปแสดงสโลแกนทางการเมือง โดยไม่มีการขโมยข้อมูลหรือเงิน กลุ่ม actor ที่น่าจะเป็นที่สุดคือ?",
+      "choices": {
+        "A": "hacktivist ที่ต้องการเสียงสะท้อนเพื่ออุดมการณ์",
+        "B": "หน่วยจารกรรมข่าวกรอง nation-state",
+        "C": "insider ที่โกงการจ่ายเงิน",
+        "D": "คู่แข่งที่ขโมยความลับทางการค้า"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "การเปลี่ยนหน้าเว็บพร้อมข้อความโดยไม่ขโมยอะไรตรงกับผู้กระทำเพื่ออุดมการณ์และการเผยแพร่ ฝั่งจารกรรมและโกงหลีกเลี่ยงความสนใจ เป้าหมายคือข้อมูลกับเงิน"
+    },
+    {
+      "id": "cp-2",
+      "prompt": "ทำไมทีม security จึงชอบ detection ที่สร้างบน TTP มากกว่าที่สร้างบน IOC ล้วนๆ?",
+      "choices": {
+        "A": "IOC เก็บยากเกินไป",
+        "B": "IOC ทำอัตโนมัติไม่ได้",
+        "C": "TTP มีประโยชน์เฉพาะผู้บริหาร",
+        "D": "ผู้โจมตีเปลี่ยน IP และ domain ได้ถูก แต่การเปลี่ยนวิธีปฏิบัติแพง detection แบบ TTP จึงอยู่นานกว่า"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "ผู้โจมตีจด domain ใหม่ได้ในไม่กี่นาที แต่การเขียนวิธีทำงานใหม่ต้องใช้ความพยายามจริง detection ตามพฤติกรรมจึงเสื่อมช้ากว่า detection ตาม artifact"
+    }
+  ]
+}

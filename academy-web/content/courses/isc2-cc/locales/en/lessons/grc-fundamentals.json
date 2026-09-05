@@ -1,0 +1,178 @@
+{
+  "nodeId": "grc-fundamentals",
+  "locale": "en",
+  "title": "GRC Fundamentals: Policies, Standards, Frameworks",
+  "objective": "By the end of this lesson you can explain governance, risk, and compliance as one system, order the document hierarchy, name common policy types, and recognize the major frameworks.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "GRC: three questions, one system"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Governance asks who decides and who is accountable. Risk asks what could go wrong and what we do about it. Compliance asks whether we follow the rules that apply to us: laws, regulations, contracts, and our own policies. The three interlock: governance sets direction, risk management allocates effort, compliance verifies and evidences. The 2026 CC outline gives this cluster its own domain, so expect direct questions here."
+    },
+    {
+      "kind": "heading",
+      "text": "The document hierarchy"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Document",
+        "Answers",
+        "Example",
+        "Change frequency"
+      ],
+      "rows": [
+        [
+          "Policy",
+          "What and why (management intent)",
+          "All employees must protect confidential information",
+          "Rarely"
+        ],
+        [
+          "Standard",
+          "What specifically (measurable requirement)",
+          "Passwords must be at least 12 characters",
+          "Occasionally"
+        ],
+        [
+          "Procedure",
+          "How, step by step",
+          "How to reset a user password in the identity system",
+          "When the process changes"
+        ],
+        [
+          "Guideline",
+          "Recommended, optional practice",
+          "Tips for working securely from home",
+          "As needed"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The exam tests this ordering and the mandatory/optional split. Policies and standards are mandatory; guidelines are advice. A procedure is the step-by-step layer that turns a standard into repeatable action. If a question describes a document that is recommended but not enforced, it is a guideline."
+    },
+    {
+      "kind": "heading",
+      "text": "Common policy types"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Information security policy: the master document stating commitment, scope, and roles.",
+        "Acceptable use policy (AUP): what users may and may not do with organizational systems.",
+        "Access control policy: how access is granted, reviewed, and revoked.",
+        "Data classification and handling policy: how data is labeled and protected by sensitivity.",
+        "Incident response policy: who is activated and who decides when an incident occurs.",
+        "Password and authentication policy: requirements for credentials and MFA.",
+        "Remote work and BYOD policy: rules for working and devices outside the office.",
+        "Third-party and vendor policy: security requirements for suppliers."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Frameworks you should recognize"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Frameworks are organized catalogs of outcomes or controls that let an organization measure and communicate its program. You do not need deep detail at CC level; you need to recognize names and purposes."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Framework",
+        "Purpose"
+      ],
+      "rows": [
+        [
+          "ISO/IEC 27001",
+          "International standard for an information security management system (ISMS); certifiable"
+        ],
+        [
+          "NIST Cybersecurity Framework (CSF) 2.0",
+          "Six functions: Govern, Identify, Protect, Detect, Respond, Recover; widely used for program structure"
+        ],
+        [
+          "SOC 2",
+          "Audit report on trust service criteria for service organizations"
+        ],
+        [
+          "PCI DSS",
+          "Mandatory standard for organizations handling payment card data"
+        ],
+        [
+          "GDPR / PDPA",
+          "Privacy laws (EU / Thailand) governing personal data"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "NIST CSF 2.0 added the Govern function, which is exactly the domain you are studying: context, risk strategy, roles, policy, oversight, and supply-chain governance. Remember the six functions in order: Govern, Identify, Protect, Detect, Respond, Recover."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Match the document to the sentence: intent (policy), measurable requirement (standard), steps (procedure), advice (guideline). For frameworks, match name to purpose; you will not be asked for clause numbers at this level."
+    },
+    {
+      "kind": "try",
+      "title": "Sort the documents",
+      "steps": [
+        "Assign each sentence to policy, standard, procedure, or guideline: (1) 'Remote workers should prefer a company VPN when on hotel Wi-Fi'; (2) 'MFA is required for all remote access'; (3) 'The organization is committed to protecting client data'; (4) 'To onboard a contractor: submit request, obtain approval, create account, schedule review.'",
+        "Mark which two are mandatory.",
+        "Say who typically approves each level."
+      ],
+      "expected": "1: guideline (recommended). 2: standard (measurable requirement). 3: policy (management intent). 4: procedure (steps). Mandatory: 2 and 3, with policy approved by senior management."
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Build a Simple Risk Register",
+      "description": "Create a risk register in a spreadsheet, score risks with likelihood x impact, assign owners and treatments, and track residual risk. Full guide: labs/build-a-simple-risk-register.en.md.",
+      "estimatedMinutes": 25,
+      "status": "ready",
+      "scale": "full"
+    }
+  ],
+  "cheatsheet": [
+    "GRC: governance = who decides; risk = what could go wrong; compliance = do we follow the rules.",
+    "Document hierarchy: policy (what and why) > standard (specific requirement) > procedure (steps); guideline = optional advice.",
+    "Know the policy families: security, acceptable use, access control, data classification, incident response, password, remote/BYOD, third-party.",
+    "Frameworks: ISO 27001 (ISMS), NIST CSF 2.0 (Govern, Identify, Protect, Detect, Respond, Recover), SOC 2, PCI DSS, GDPR/PDPA.",
+    "Policies and standards are mandatory; guidelines are not."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "'Employees must use the approved ticketing system to request software installation. The request is reviewed, approved, and then installed by IT within one business day.' This sentence is best classified as a:",
+      "choices": {
+        "A": "Policy",
+        "B": "Standard",
+        "C": "Guideline",
+        "D": "Procedure"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "It describes a sequence of steps carried out by specific roles, which is a procedure. A policy would state intent, a standard would give a measurable requirement, and a guideline would merely recommend."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Which NIST CSF 2.0 function was added to cover exactly this domain: context, risk strategy, roles, policy, and oversight?",
+      "choices": {
+        "A": "Identify",
+        "B": "Govern",
+        "C": "Protect",
+        "D": "Recover"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "CSF 2.0 introduced Govern (GV) as the overarching function covering organizational context, risk management strategy, roles, policy, and oversight, including supply-chain governance."
+    }
+  ]
+}

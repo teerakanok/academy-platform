@@ -1,0 +1,252 @@
+{
+  "nodeId": "architecture-practice",
+  "locale": "th",
+  "title": "Practice: สถาปัตยกรรมความมั่นคงปลอดภัย",
+  "objective": "เมื่อจบบทเรียนนี้ ผู้เรียนจะตั้งค่า static address ให้เครื่อง management ตามที่การแยก segment ของมันต้องพึ่งพา วินิจฉัย mask ผิดกับ gateway เก่าจากอาการเพียงอย่างเดียว และตอบข้อสอบสถานการณ์เรื่อง segmentation และ shared responsibility ได้",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "ทำไมต้องลงมือตอนนี้"
+    },
+    {
+      "kind": "paragraph",
+      "text": "สถาปัตยกรรมคือจุดที่การอ่านเงียบ ๆ ล้มเหลว ผู้เรียนท่องได้ว่า management network มีไว้ทำอะไร และ subnet mask ทำงานอย่างไร แต่อาจนิ่งไปต่อหน้าหน้าจอ settings ที่มี admin หน้าบึ้งรออยู่ เครื่องข้างล่างมาจากอาคารเดียวกันที่ถูกแบ่งเป็น segment และพังคนละแบบ: jump server ที่หลุดจาก address ตามเอกสารของ management network, kiosk ที่ mask ของมันเองหักล้าง router ของมันเอง และอีกหนึ่งอาการที่ด่านท้ายบทจะไม่บอกชื่อ"
+    },
+    {
+      "kind": "heading",
+      "text": "Simulation 1: jump server ฝั่ง management"
+    },
+    {
+      "kind": "paragraph",
+      "text": "การแยก management plane จะทำงานก็ต่อเมื่อ address ที่สัญญาไว้รักษาสัญญาของมัน มีเพียง admin subnet เท่านั้นที่ถูก route มาถึง management network และเครื่องมือ admin ทุกตัวกับกฎ firewall ทุกข้อคาดหวัง jump host ไว้ที่ address เดียวตามเอกสาร เช้านี้เครื่องตื่นมาพร้อม lease จากเครือข่ายอื่น address ที่ทุกอย่างพึ่งพาจึงไม่ตอบใครเลย"
+    },
+    {
+      "kind": "simulation",
+      "challenge": {
+        "id": "jump-server-static",
+        "title": "jump server ฝั่ง management",
+        "brief": "management network 10.20.30.0/24 เป็น segment ของตัวเอง: มีเพียง admin subnet ที่ถูก route มาถึง และ jump host ที่เครื่อง admin ทุกเครื่องคาดหวัง นั่งอยู่ที่ address ตามเอกสารคือ 10.20.30.9 ในเครือข่ายนี้ router ที่ 10.20.30.1 เป็น gateway และรับหน้าที่แปลงชื่อเป็น address ด้วย เครื่องนี้ตอนนี้ถือ lease จากเครือข่ายอื่น address ตามเอกสารจึงไม่ถึงใคร และ segment ที่ถูกแยกไว้ก็สูญเสียประตูหน้าเพียงบานเดียวของมัน คืน jump host ให้ management network",
+        "surface": "network-interface",
+        "initial": {
+          "addressMode": "dhcp",
+          "ipv4": "172.16.5.77",
+          "subnet": "255.255.0.0",
+          "gateway": "172.16.5.1",
+          "dns1": "172.16.5.1",
+          "applied": true
+        },
+        "requiredFields": {
+          "dhcp": [],
+          "static": [
+            "ipv4",
+            "subnet",
+            "gateway",
+            "dns1"
+          ]
+        },
+        "requirements": [
+          {
+            "id": "mode",
+            "label": "address ของเครื่อง management ต้องมีเจ้าของกำหนดเอง: เซิร์ฟเวอร์ lease นอก segment ต้องขยับเครื่องนี้ไม่ได้อีก",
+            "field": "addressMode",
+            "operator": "equals",
+            "value": "static"
+          },
+          {
+            "id": "ip",
+            "label": "เครื่องต้องตอบที่ address ตามเอกสารที่เครื่องมือ admin และกฎ firewall พึ่งพา",
+            "field": "ipv4",
+            "operator": "equals",
+            "value": "10.20.30.9"
+          },
+          {
+            "id": "mask",
+            "label": "interface ต้องอยู่บน management network 10.20.30.0/24 ที่ถูกแยกไว้",
+            "field": "subnet",
+            "operator": "equals",
+            "value": "255.255.255.0"
+          },
+          {
+            "id": "gateway",
+            "label": "traffic ที่ออกจาก management network ที่ถูกแยกต้องใช้ router ของมันเอง",
+            "field": "gateway",
+            "operator": "equals",
+            "value": "10.20.30.1"
+          },
+          {
+            "id": "dns",
+            "label": "การแปลงชื่อต้องผ่าน resolver ของ management network เอง",
+            "field": "dns1",
+            "operator": "equals",
+            "value": "10.20.30.1"
+          },
+          {
+            "id": "applied",
+            "label": "การตั้งค่าได้รับการยืนยันด้วยปุ่ม OK แล้ว",
+            "field": "applied",
+            "operator": "isTrue"
+          }
+        ],
+        "hints": [
+          "เครือข่าย /24 ใช้ mask 255.255.255.0: สามชุดแรกคือชื่อเครือข่าย ชุดสุดท้ายคือชื่อเครื่อง",
+          "โจทย์บอกว่า router ที่ address แรกที่ใช้ได้ทำสองหน้าที่: ส่งต่อ traffic และแปลงชื่อให้ segment นี้",
+          "ทุกค่าบนหน้าจอบรรยายเครือข่ายที่ออก lease ให้ — เครือข่ายที่เครื่องที่ถูกแยกไว้นี้ต้องไม่พึ่งพา"
+        ],
+        "debrief": "jump server ถูกออกแบบให้น่าเบื่อโดยเจตนา: มันอยู่บน segment ของตัวเองเพื่อให้เรื่องวุ่นวายที่ไหนก็ได้ในอาคารเข้าถึงมันไม่ได้ และมีเพียง admin subnet ที่ถูก route มาถึง การแยกแบบนี้ยืนอยู่บนสัญญาหนึ่งข้อ — address 10.20.30.9 ถูกเขียนไว้ในกฎ firewall, ระบบ monitoring และ runbook ทุกเล่ม address จึงต้องตั้งด้วยมือและปกป้องไม่ให้เปลี่ยน DHCP reservation ก็ปักมันได้ แต่เครื่องบน segment ที่แยกไว้จะกลายเป็นต้องพึ่ง lease server ที่อยู่นอก segment ซึ่งเป็นเหตุผลที่เครื่อง management plane มักเป็น static เต็มตัว นี่คือถ้อยคำข้อสอบในย่อส่วน: โครงสร้างพื้นฐานที่คนอื่นพึ่งพา ได้ static address ที่บันทึกไว้เป็นลายลักษณ์"
+      }
+    },
+    {
+      "kind": "heading",
+      "text": "Simulation 2: kiosk ที่ mask ผิด"
+    },
+    {
+      "kind": "paragraph",
+      "text": "kiosk ในล็อบบี้บนเครือข่ายบริการอาคารเปิด file share ภายในได้เมื่อพนักงานพิมพ์หมายเลขของเซิร์ฟเวอร์ และไม่มีอย่างอื่นทำงานเลย: เว็บไม่โหลด เมลไม่มา ไม่มีอะไรตอบนอกเหนือจากเครื่องท้องถิ่น address, gateway และ resolver ของมันถูกต้องหมดสำหรับ segment นี้ — แล้วยังเหลืออะไรให้ผิดได้"
+    },
+    {
+      "kind": "simulation",
+      "challenge": {
+        "id": "kiosk-wrong-mask",
+        "title": "kiosk ที่ mask ผิด",
+        "brief": "kiosk ในล็อบบี้บนเครือข่ายบริการอาคาร 10.20.40.0/24 ไปถึง file server ที่ 10.20.40.90 ได้เมื่อเรียกด้วยหมายเลข แต่อย่างอื่นล้มหมด: ไม่มีเว็บ ไม่มีเมล ไม่มีอะไรเลยพ้นเครื่องท้องถิ่น address 10.20.40.75 ของ kiosk ถูกต้อง router ที่ 10.20.40.1 เป็น gateway และ resolver ของ segment นี้ และหน้าจอบอกว่าตั้งค่าแล้ว หาอาการที่ file share รอดแต่อินเทอร์เน็ตรอดไม่ได้ แล้วซ่อมมัน",
+        "surface": "network-interface",
+        "initial": {
+          "addressMode": "static",
+          "ipv4": "10.20.40.75",
+          "subnet": "255.255.255.192",
+          "gateway": "10.20.40.1",
+          "dns1": "10.20.40.1",
+          "applied": true
+        },
+        "requiredFields": {
+          "dhcp": [],
+          "static": [
+            "ipv4",
+            "subnet",
+            "gateway",
+            "dns1"
+          ]
+        },
+        "requirements": [
+          {
+            "id": "mask",
+            "label": "kiosk ต้องมองทั้ง segment 10.20.40.0/24 — รวม router — เป็นเครือข่ายเดียวที่มันสังกัด",
+            "field": "subnet",
+            "operator": "equals",
+            "value": "255.255.255.0"
+          },
+          {
+            "id": "applied",
+            "label": "mask ที่แก้แล้วได้รับการยืนยันด้วยปุ่ม OK",
+            "field": "applied",
+            "operator": "isTrue"
+          }
+        ],
+        "hints": [
+          "file server ตอบเมื่อเรียกด้วยหมายเลข สาย, address และ resolver จึงทำงานครบ ให้ถามว่าอะไรทำให้ kiosk มองบาง address เป็นเพื่อนบ้านแต่บาง address เป็นคนแปลกหน้า",
+          "mask เป็นผู้ลากเส้นนั้น คำนวณว่า mask บนหน้าจอนับช่วง address ใดเป็นท้องถิ่น และ router ที่ 10.20.40.1 อยู่ในช่วงนั้นหรือไม่",
+          "mask 255.255.255.192 หั่นเครือข่ายเป็นก้อนละ 64 address เครื่อง .75 เชื่อว่าก้อนของมันคือ .64 ถึง .127 — และ .1 อยู่นอกโลกใบนั้น"
+        ],
+        "debrief": "ตัวการคือ mask ด้วย 255.255.255.192 เครื่อง kiosk เชื่อว่าเครือข่ายของมันคือก้อน 64 address จาก .64 ถึง .127: file server ที่ .90 นับเป็นเพื่อนบ้านแล้วตอบโดยตรง ขณะที่ router ที่ 10.20.40.1 อยู่นอกก้อนบน 'อีกเครือข่ายหนึ่ง' การส่งมอบ traffic ออกนอก segment จึงไม่เกิดขึ้นเลย การซ่อมมีเพียงช่องเดียว: 255.255.255.0 ทำให้ทั้ง /24 เป็นย่านเดียวกันที่มี router อยู่ข้างใน จำรูปอาการนี้ไว้ — บางส่วนของ segment ตอบ ทุกอย่างพ้นจากนั้นตาย และตัว address ของ gateway ถูกต้อง — แค่นี้ก็เรียกชื่อ 'mask ผิด' ได้ก่อนแตะหน้าจอ"
+      }
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "ข้อสอบนำไปใช้",
+      "text": "ข้อสถานการณ์เรื่อง segmentation ซ่อนอาการผิดพลาดสามแบบไว้ข้างใน เครื่องที่คนอื่นต้องหาเจอที่ address ตามเอกสารคือ static ถ้า traffic ท้องถิ่นรอดแต่ทุกอย่างนอก segment ตาย ให้มองที่เส้นทางไป gateway: mask แคบเกินไปเมื่อ mask ตัด router ออกจากเครือข่ายของเครื่อง หรือ address เก่าหมดอายุเมื่อช่วง address ถูกจัดใหม่ และถ้าเรียกด้วยหมายเลขได้แต่ด้วยชื่อไม่ได้ นั่นคือเรื่องของ resolver"
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: TLS Walkthrough",
+      "description": "กดไล่แปดเฟรมของ TLS handshake ตั้งแต่ ClientHello จนถึง traffic ที่เข้ารหัส แล้วตอบว่าสัญลักษณ์กุญแจที่ปิดแล้วพิสูจน์อะไร แบบฉบับเต็ม: labs/tls-walkthrough.lab.th.md",
+      "estimatedMinutes": 10,
+      "status": "coming-soon",
+      "scale": "inline"
+    }
+  ],
+  "cheatsheet": [
+    "เครื่อง management plane นั่งบน segment ของตัวเอง เข้าถึงได้จาก admin subnet ที่ static address ตามเอกสารซึ่งกฎ firewall และ runbook พึ่งพา",
+    "mask เป็นผู้ตัดสินว่าใครนับเป็นเพื่อนบ้าน: mask แคบเกินไปทำให้ router หลุดออกนอกนิยามเครือข่ายของเครื่องเอง",
+    "ลายเซ็นของ mask ผิด: หนึ่งก้อนของ segment ตอบ ทุกอย่างพ้นจากนั้นตาย และ address ของ gateway ถูกต้อง",
+    "ลายเซ็นของ gateway เก่า: traffic ใน segment ใช้ได้ นอก segment ตาย ทางแก้คือ address ปัจจุบันของ router",
+    "เครือข่าย /24 ใช้ mask 255.255.255.0 และ router ที่ address แรกที่ใช้ได้มักรับหน้าที่แปลงชื่อด้วย"
+  ],
+  "checkpoint": [
+    {
+      "kind": "simulation",
+      "id": "cp-sensor-gateway",
+      "challenge": {
+        "id": "sensor-stale-gateway",
+        "title": "sensor ที่ถูกทิ้งไว้",
+        "brief": "sensor ในคลังสินค้าบนเครือข่ายบริการอาคาร 10.20.40.0/24 คุยกับ collector ท้องถิ่นที่ 10.20.40.200 ได้ทั้งกะ และไม่มีอะไรนอก segment ตอบมันเลยตั้งแต่ช่วง address ถูกจัดใหม่: ไม่มี dashboard ไม่มี update ไม่มีอะไรเลย address 10.20.40.88 ของ sensor, mask และ resolver ถูกต้อง ตั้งค่าแล้ว และบนเครือข่ายนี้ router คือ 10.20.40.1 เหลือเพียงหนึ่งช่องที่ยังแบกค่าจากช่วงเก่า พา sensor กลับมาบนแผนที่",
+        "surface": "network-interface",
+        "initial": {
+          "addressMode": "static",
+          "ipv4": "10.20.40.88",
+          "subnet": "255.255.255.0",
+          "gateway": "10.20.40.254",
+          "dns1": "10.20.40.1",
+          "applied": true
+        },
+        "requiredFields": {
+          "dhcp": [],
+          "static": [
+            "ipv4",
+            "subnet",
+            "gateway",
+            "dns1"
+          ]
+        },
+        "requirements": [
+          {
+            "id": "gateway",
+            "label": "traffic ที่ออกจาก segment ต้องส่งมอบให้ router ตัวจริงของเครือข่ายนี้",
+            "field": "gateway",
+            "operator": "equals",
+            "value": "10.20.40.1"
+          },
+          {
+            "id": "applied",
+            "label": "gateway ที่ซ่อมแล้วได้รับการยืนยันด้วยปุ่ม OK",
+            "field": "applied",
+            "operator": "isTrue"
+          }
+        ],
+        "hints": [
+          "collector ตอบ ดังนั้น address, mask และการแปลงชื่อทำงานครบ ให้ถามว่า traffic ต้องการอุปกรณ์ใดในวินาทีที่มันออกจาก segment",
+          "โจทย์เอ่ยชื่อ router ของเครือข่ายนี้ และช่องบนหน้าจอถือ address อื่น — address ของเครือข่ายที่ไม่มีอยู่แล้ว"
+        ],
+        "debrief": "sensor ถูกทิ้งไว้ด้วยค่าเก่า: gateway ยังชี้ที่ 10.20.40.254 จากก่อนการจัดช่วง address ใหม่ ทั้งที่ router ของ segment นี้ตอบที่ 10.20.40.1 traffic ท้องถิ่นไม่เคยรู้ตัวเพราะเพื่อนบ้านใน segment คุยกันตรง ๆ ส่วน traffic ที่จะไปเครือข่ายอื่นต้องส่งมอบให้ gateway และ gateway ผิดทำให้การส่งมอบหายไปในความมืด อาการเป็นผู้วินิจฉัยให้แล้ว: ท้องถิ่นดี ไกลบ้านตาย resolver ดี — ช่องเดียวที่ยังถือค่าเก่าคือ gateway นี่คืออาการ routing ผิดพลาด อยู่ห่างจากอาการ resolver ผิดพลาดเพียงบ้านเดียว ที่ซึ่งเรียกด้วยหมายเลขได้แต่ด้วยชื่อไม่ได้"
+      }
+    },
+    {
+      "id": "cp-2",
+      "prompt": "guest Wi-Fi ของร้านกาแฟต้องไม่สามารถไปถึงเครือข่ายเครื่องชำระเงิน แม้เครื่อง guest จะติดมัลแวร์ ตัวเลือกสถาปัตยกรรมใดส่งมอบเรื่องนี้",
+      "choices": {
+        "A": "Load balancing traffic ของฝั่ง guest",
+        "B": "Segmentation ด้วยกฎ firewall ระหว่างสองเครือข่าย",
+        "C": "DNS filtering บน resolver ของ guest",
+        "D": "VPN concentrator สำหรับอุปกรณ์ guest"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "segmentation ผ่าน VLAN และกฎ firewall จำกัดความเสียหายโดยทำให้เครือข่ายชำระเงินเข้าถึงไม่ได้จากฝั่ง guest DNS filtering หยุด domain อันตราย load balancer กระจาย traffic และ VPN ขยายการเข้าถึงส่วนตัว ทั้งหมดไม่ได้บล็อกการเข้าถึงข้ามเครือข่าย"
+    },
+    {
+      "id": "cp-3",
+      "prompt": "ทีมหนึ่งรัน virtual machine บนผู้ให้บริการ IaaS สาธารณะ ภายใต้ shared responsibility model การแพตช์ operating system ของแต่ละ virtual machine เป็นหน้าที่ใคร",
+      "choices": {
+        "A": "ลูกค้า เพราะ guest system คือ workload ของลูกค้า",
+        "B": "ผู้ให้บริการ เพราะเครื่องรันอยู่บนฮาร์ดแวร์ของเขา",
+        "C": "ผู้ตรวจสอบของผู้ให้บริการ ในฐานะส่วนหนึ่งของการรับรอง",
+        "D": "ไม่มีใคร เพราะข้อตกลงบริการครอบคลุมไว้แล้ว"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "ภายใต้ IaaS ผู้ให้บริการดูแลความปลอดภัยชั้นกายภาพและ hypervisor ทุกอย่างข้างใน virtual machine เริ่มต้นที่ guest operating system เป็นของลูกค้า การสับสนสองฝั่งของเส้นนี้คือบ่วงคำถาม cloud สุดคลาสสิก"
+    }
+  ]
+}

@@ -1,0 +1,137 @@
+{
+  "nodeId": "redundancy-and-continuity",
+  "locale": "en",
+  "title": "Redundancy, Business Continuity, and Disaster Recovery",
+  "objective": "By the end of this lesson you can separate BCP from DRP, explain BIA, RTO, and RPO with a timeline, choose backup and redundancy options, and treat model drift as a continuity risk.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Continuity keeps the business alive; recovery rebuilds IT"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A business continuity plan (BCP) keeps critical business functions operating through a disruption: people, processes, alternate workplaces, communications. A disaster recovery plan (DRP) is the IT-focused subset that restores systems, data, and connectivity. The exam relationship to remember: DRP is part of BCP, and incident response (Domain 5) handles security events that may escalate into invoking continuity plans."
+    },
+    {
+      "kind": "heading",
+      "text": "BIA: the analysis that sets your targets"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The business impact analysis (BIA) identifies critical processes, their dependencies, and the cost of downtime, then produces recovery targets per process. It answers: what must come back first, how much downtime is tolerable, and how much data loss is tolerable. Every downstream design decision (backup frequency, alternate site choice) traces back to BIA numbers."
+    },
+    {
+      "kind": "heading",
+      "text": "RTO and RPO on one timeline"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Term",
+        "Question it answers",
+        "Example"
+      ],
+      "rows": [
+        [
+          "RTO (Recovery Time Objective)",
+          "How quickly must the system be restored?",
+          "Ordering system back online within 4 hours"
+        ],
+        [
+          "RPO (Recovery Point Objective)",
+          "How much data loss is tolerable, measured in time?",
+          "No more than 1 hour of transactions lost"
+        ],
+        [
+          "MTD (Maximum Tolerable Downtime)",
+          "Absolute downtime limit before unacceptable harm",
+          "Business survives at most 8 hours offline"
+        ],
+        [
+          "Backup frequency",
+          "How do we meet the RPO?",
+          "Hourly backups for a 1-hour RPO"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "RPO looks backward (it sizes backup frequency: an RPO of 1 hour demands backups at least hourly) and RTO looks forward (it sizes recovery capability: staff, runbooks, alternate systems). The classic exam trap swaps them; anchor with the mnemonic RPO = lost data, RTO = lost time."
+    },
+    {
+      "kind": "heading",
+      "text": "Backups and redundancy"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Backups: full, incremental (changes since last full or incremental), and differential (changes since last full); follow a tested rotation, and keep at least one copy offline or immutable so ransomware cannot encrypt it.",
+        "Redundancy: RAID for disks, dual power supplies, clustered servers, multiple network paths, load balancing across sites; RAID protects availability, not a substitute for backup.",
+        "Recovery site options: hot site (ready in minutes to hours, most expensive), warm site (partially equipped, hours to days), cold site (space and power only, days to weeks), cloud recovery (elastic, increasingly common).",
+        "Testing: a backup is proven only by restoration drills; plans are proven by exercises (tabletop, walkthrough, full-scale)."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Model drift as a continuity risk"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The 2026 outline adds model drift to continuity thinking. Model drift means an AI model's performance degrades over time because the world it was trained on changes: customer behavior shifts, fraud patterns evolve, data distributions move. When a drifted model silently makes worse decisions at the heart of a business process (fraud scoring, demand forecasting, support triage), the process is effectively degraded even though every server is up. That makes drift a continuity risk to be monitored, with thresholds and retraining triggers, exactly like a KRI in the previous lesson."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "RPO sizes backup frequency; RTO sizes recovery speed; MTD bounds total downtime. DRP is the IT subset of BCP. Backups are only proven by restore tests. For AI scenarios, degraded model performance is treated as a continuity risk."
+    },
+    {
+      "kind": "try",
+      "title": "Set the numbers",
+      "steps": [
+        "An online store tolerates at most 2 hours of checkout downtime and at most 15 minutes of lost orders. Recent changes: backups run nightly.",
+        "State the RTO and RPO implied by the business statement.",
+        "Say what must change in the backup schedule.",
+        "Choose hot, warm, or cold site and justify it."
+      ],
+      "expected": "RTO = 2 hours; RPO = 15 minutes. Nightly backups cannot meet a 15-minute RPO, so move to continuous or near-continuous replication (for example every 10-15 minutes). A hot site or cloud failover is required, because 2 hours rules out warm and cold recovery."
+    }
+  ],
+  "cheatsheet": [
+    "BCP keeps the business running; DRP (its IT subset) restores systems; BIA produces the recovery targets.",
+    "RPO = tolerable data loss, sized backward into backup frequency; RTO = tolerable downtime, sized into recovery capability; MTD = absolute limit.",
+    "Keep one backup copy offline or immutable against ransomware; test restores, not just backups.",
+    "Sites: hot = fast and expensive; warm = middle; cold = cheap and slow; cloud recovery = elastic alternative.",
+    "Model drift = silent degradation of AI-driven processes; monitor it like a KRI with retraining triggers."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A payroll system can tolerate losing no more than 4 hours of data entry. Backups currently run once per day. Which statement is correct?",
+      "choices": {
+        "A": "The RTO is 4 hours; no change is needed",
+        "B": "The RPO is 4 hours; backup frequency must increase to at least every 4 hours",
+        "C": "The MTD is 4 hours; a hot site is mandatory",
+        "D": "The RPO is 24 hours; daily backups exceed the requirement"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Tolerable data loss is the RPO, and 4 hours of tolerable loss demands backups at least every 4 hours. Daily backups leave a 24-hour window, far beyond tolerance. Downtime tolerance (RTO) is a separate number not stated here."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A fraud-detection model's accuracy has been quietly declining for months as attacker techniques change, degrading a critical business process. In the 2026 outline vocabulary, this is best treated as:",
+      "choices": {
+        "A": "A confidentiality incident",
+        "B": "A physical security failure",
+        "C": "Model drift, a continuity risk to monitor with thresholds and retraining",
+        "D": "A network segmentation error"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Silent degradation of an AI-driven process from a changing environment is model drift. The outline treats it as a continuity risk: measure performance, set thresholds, and trigger retraining before decisions degrade the business."
+    }
+  ]
+}

@@ -1,0 +1,195 @@
+{
+  "nodeId": "resiliency-architecture",
+  "locale": "th",
+  "title": "สถาปัตยกรรมเพื่อความทนทาน (Resiliency)",
+  "objective": "เมื่อจบบทเรียนนี้ ผู้เรียนจะเลือกแพตเทิร์น high availability เปรียบเทียบระดับ RAID ออกแบบแผน backup และจับคู่ recovery site กับต้นทุนและความเร็วได้",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "คำศัพท์ของ availability"
+    },
+    {
+      "kind": "paragraph",
+      "text": "high availability (HA) ตัดจุดล้มเหลวจุดเดียว (single point of failure) ออกด้วยความซ้ำซ้อน: เซิร์ฟเวอร์แบบ cluster, ไฟฟ้าสองเส้น, เส้นทางเครือข่ายคู่ fault tolerance ไปไกลกว่านั้น คือระบบยังทำงานต่อผ่านความเสียหายขององค์ประกอบโดยบริการไม่สะดุด graceful degradation หมายถึงระบบสละฟีเจอร์รองเพื่อรักษาบริการหลักให้มีชีวิต"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Redundancy: สำรองชิ้นส่วนสำคัญซ้ำ แบบ active หรือ standby",
+        "Clustering: หลาย node ทำงานเป็นบริการเดียว failover ย้ายงานไปเครื่องที่รอด",
+        "NIC teaming: การ์ดเครือข่ายหลายใบรวมเป็นลิงก์เดียว",
+        "UPS และเครื่องปั่นไฟ: ข้ามไฟดับช่วงสั้นและยาว",
+        "Load balancing: กระจายงานและตรวจสุขภาพ ดึงเครื่องป่วยออกจากวง"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "RAID ในตารางเดียว"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "ระดับ",
+        "รูปแบบ",
+        "รอดจาก",
+        "ข้อแลกเปลี่ยน"
+      ],
+      "rows": [
+        [
+          "RAID 0",
+          "Striping",
+          "ดิสก์ตาย: ไม่รอด",
+          "เร็ว ไม่มีสำรองเลย"
+        ],
+        [
+          "RAID 1",
+          "Mirroring",
+          "ดิสก์ตายหนึ่งลูก",
+          "เสียความจุไปครึ่งหนึ่ง"
+        ],
+        [
+          "RAID 5",
+          "Striping บวก parity",
+          "ดิสก์ตายหนึ่งลูก",
+          "ต้องมีอย่างน้อยสามลูก"
+        ],
+        [
+          "RAID 6",
+          "Striping บวก parity สองชุด",
+          "ดิสก์ตายสองลูก",
+          "ต้องมีอย่างน้อยสี่ลูก เขียนช้ากว่า"
+        ],
+        [
+          "RAID 10",
+          "Mirror แล้ว stripe",
+          "ตายได้ลูกละคู่ mirror",
+          "เร็วและแพง"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "RAID คือ availability และ RAID ไม่ใช่ backup ของใครเลย",
+      "text": "RAID ทำให้ระบบเดินต่อเมื่อดิสก์เสีย แต่ช่วยอะไรไม่ได้เลยกับการลบไฟล์ ransomware หรือไฟไหม้ เพราะ array คัดลอกทุกการเปลี่ยนแปลงอย่างซื่อสัตย์ เรื่องเหล่านั้นต้องตอบด้วย backup"
+    },
+    {
+      "kind": "heading",
+      "text": "Backup"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "ชนิด",
+        "สิ่งที่คัดลอก",
+        "ความเร็ว restore",
+        "พื้นที่ที่ใช้"
+      ],
+      "rows": [
+        [
+          "Full",
+          "ทั้งหมด",
+          "เร็วสุด ใช้ชุดเดียว",
+          "มากสุด"
+        ],
+        [
+          "Incremental",
+          "สิ่งที่เปลี่ยนตั้งแต่ backup ครั้งล่าสุดทุกชนิด",
+          "ต้องใช้ full บวก incremental ทุกตัว",
+          "น้อยสุด"
+        ],
+        [
+          "Differential",
+          "สิ่งที่เปลี่ยนตั้งแต่ full ครั้งล่าสุด",
+          "ต้องใช้ full บวก differential ตัวเดียว",
+          "โตขึ้นเรื่อย ๆ ตลอดสัปดาห์"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "กฎ 3-2-1 คือแบบ backup ปกติของข้อสอบ: สำเนาสามชุด บนสื่อสองชนิด และหนึ่งชุดอยู่นอกสถานที่หรือ offline snapshot เก็บสถานะ ณ จังหวะหนึ่งไว้ rollback อย่างรวดเร็ว และสำเนาแบบ immutable หรือ air-gapped ทนทานต่อ ransomware ที่ล่า backup ที่เอื้อมถึง"
+    },
+    {
+      "kind": "heading",
+      "text": "Recovery site"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "ไซต์",
+        "สถานะพร้อม",
+        "ความเร็ว",
+        "ต้นทุน"
+      ],
+      "rows": [
+        [
+          "Hot",
+          "รันอยู่ sync แล้ว พร้อมทันที",
+          "นาที",
+          "สูงสุด"
+        ],
+        [
+          "Warm",
+          "มีอุปกรณ์ครบ ต้องอัปข้อมูลและเปิดใช้",
+          "ชั่วโมง",
+          "กลาง"
+        ],
+        [
+          "Cold",
+          "มีเพียงพื้นที่และไฟ",
+          "หลายวัน",
+          "ต่ำสุด"
+        ]
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "ออกแบบความทนทานให้หนึ่งบริการ",
+      "steps": [
+        "บริการ: wiki ภายในใช้ช่วงเวลาทำการ ยอมรับ downtime ได้สี่ชั่วโมง",
+        "เลือกชนิด recovery site พร้อมเหตุผล",
+        "เลือกแผน backup (ชนิดไหนบวกกฎ 3-2-1) และบอกลำดับ restore หลังเกิดเหตุ ransomware",
+        "เลือกมาตรการ HA หนึ่งอย่างภายในไซต์หลัก"
+      ],
+      "expected": "warm site เหมาะกับหน้าต่างสี่ชั่วโมง แผน backup: full รายสัปดาห์บวก incremental รายวัน หนึ่งชุดอยู่นอกสถานที่หรือ immutable แล้ว restore จาก full ล่าสุดตามด้วย incremental จนถึงจุดสะอาดล่าสุด มาตรการ HA: virtual machine แบบ cluster หรืออย่างน้อย standby node ที่ใช้ storage ร่วมกัน"
+    }
+  ],
+  "cheatsheet": [
+    "HA ตัด single point of failure fault tolerance รอดจากความเสียหายโดยบริการไม่หยุด graceful degradation รักษาบริการหลัก",
+    "RAID 0 ไม่มีสำรอง, RAID 1 mirror, RAID 5 parity หนึ่งลูก, RAID 6 สองลูก, RAID 10 mirror ที่ stripe กัน RAID คือ availability ไม่ใช่ backup",
+    "full คัดลอกทั้งหมด incremental คัดลอกตั้งแต่รอบล่าสุด differential ตั้งแต่ full ล่าสุด",
+    "3-2-1: สามชุด สื่อสองชนิด หนึ่งชุดนอกสถานที่ immutability หรือ air gap ปกป้อง backup จาก ransomware",
+    "ไซต์: hot = พร้อมทันที warm = มีอุปกรณ์ cold = โครงเปล่า ต้นทุนลดตามความเร็ว"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "หลังเหตุการณ์ crypto-virus ที่เก็บ backup ต่อกับเครือข่ายก็ถูกเข้ารหัสไปพร้อม production การเปลี่ยนแบบใดแก้ปัญหานี้ได้ดีที่สุด",
+      "choices": {
+        "A": "เปลี่ยนจาก RAID 5 เป็น RAID 10",
+        "B": "เปลี่ยนจาก incremental เป็น differential",
+        "C": "เก็บ backup หนึ่งชุดแบบ offline หรือ immutable",
+        "D": "เพิ่มการ์ดเครือข่ายที่สองให้เครื่อง backup"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "ransomware เข้ารหัสทุกสำเนาที่เอื้อมถึงได้ ทางแก้คือชุด offline หรือ immutable การแก้ RAID และการ์ดเครือข่ายเป็นเรื่อง hardware ล้มเหลว ส่วน incremental กับ differential ไม่เปลี่ยนความเอื้อมถึง"
+    },
+    {
+      "id": "cp-2",
+      "prompt": "สมมติว่า backup ทุกวันนับตั้งแต่ full วันอาทิตย์ แผนใด restore ด้วยชิ้นส่วนน้อยที่สุดหลังข้อมงหายทั้งหมดวันศุกร์",
+      "choices": {
+        "A": "Full บวก incremental สี่ตัว",
+        "B": "Differential ห้าตัวเท่านั้น",
+        "C": "Incremental ห้าตัวเท่านั้น",
+        "D": "Full บวก differential หนึ่งตัว"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "differential สะสมทุกการเปลี่ยนแปลงตั้งแต่ full การ restore วันศุกร์จึงใช้เพียง full บวก differential ของศุกร์ ส่วน incremental ต้องเรียงครบทุกวัน"
+    }
+  ]
+}

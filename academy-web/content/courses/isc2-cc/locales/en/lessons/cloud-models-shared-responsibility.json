@@ -1,0 +1,162 @@
+{
+  "nodeId": "cloud-models-shared-responsibility",
+  "locale": "en",
+  "title": "Cloud Models and Shared Responsibility",
+  "objective": "By the end of this lesson you can compare IaaS, PaaS, and SaaS, list deployment models, apply the shared responsibility model, and explain the shared security model for cloud-hosted AI.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Service models: how much you manage"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Model",
+        "Provider manages",
+        "You manage",
+        "Think"
+      ],
+      "rows": [
+        [
+          "IaaS (Infrastructure)",
+          "Data center, network, virtualization",
+          "OS, patching, middleware, apps, data, access",
+          "Raw machines: most control, most responsibility"
+        ],
+        [
+          "PaaS (Platform)",
+          "Everything through the runtime platform",
+          "Your code, configuration, data, access",
+          "Deploy apps without touching servers"
+        ],
+        [
+          "SaaS (Software)",
+          "The entire application",
+          "Data, user accounts, configuration, access policy",
+          "Configuration and access are your whole job"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The rule the exam tests: as you move from IaaS toward SaaS, the provider takes more layers, but three things are always yours: your data, your users and their access rights, and your configuration choices. A misconfigured public storage bucket is a customer-side failure regardless of model."
+    },
+    {
+      "kind": "heading",
+      "text": "Deployment models"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Public cloud: shared provider infrastructure, multi-tenant; elastic and pay-as-you-go.",
+        "Private cloud: dedicated to one organization, on-premises or hosted; control for regulated or sensitive workloads.",
+        "Hybrid: both, connected; sensitive workloads stay private while bursts scale to public.",
+        "Community: shared among organizations with common requirements, such as government bodies."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Shared responsibility"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The shorthand to memorize: security OF the cloud is the provider's (facilities, hardware, hypervisor); security IN the cloud is the customer's (data, identities, configuration, and what your software does with access). The boundary line moves with the service model: in IaaS you patch the OS you run; in SaaS the provider patches, and your exposure concentrates in access and configuration."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Layer",
+        "IaaS",
+        "PaaS",
+        "SaaS"
+      ],
+      "rows": [
+        [
+          "Physical and hypervisor",
+          "Provider",
+          "Provider",
+          "Provider"
+        ],
+        [
+          "Operating system",
+          "Customer",
+          "Provider",
+          "Provider"
+        ],
+        [
+          "Application code",
+          "Customer",
+          "Customer",
+          "Provider"
+        ],
+        [
+          "Data, identities, configuration",
+          "Customer",
+          "Customer",
+          "Customer"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Shared security model for cloud-hosted AI"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The 2026 outline extends shared responsibility to cloud AI services. The provider secures the platform running the models, but the customer keeps the duties that travel with data and access: protecting training data and prompts fed into the service, managing who and what (including AI bots) can call it, configuring the service safely, and checking that using it does not violate privacy obligations. Sensitive data sent to a public AI service follows the same rule as any other cloud data placement: your data, your responsibility to classify and control before it leaves."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "On the exam",
+      "text": "Watch for the blame-shift trap: 'the provider was hacked, so the exposed bucket is their fault.' If the bucket policy was public, that is customer-side configuration. Data, identities, and configuration are always customer territory, in every model."
+    },
+    {
+      "kind": "try",
+      "title": "Draw the line",
+      "steps": [
+        "For each, say provider or customer: (1) patching the database engine in a managed PaaS database; (2) deciding which employees can access a SaaS HR tool; (3) patching the OS on a rented virtual machine; (4) classifying data before uploading it to a cloud AI service.",
+        "Name the model where the customer holds the most layers.",
+        "State the three always-customer items."
+      ],
+      "expected": "1: provider. 2: customer. 3: customer (IaaS). 4: customer. Most customer layers: IaaS. Always yours: data, identities and access, configuration."
+    }
+  ],
+  "cheatsheet": [
+    "IaaS = you manage OS up; PaaS = provider to runtime, you manage code and config; SaaS = provider runs the app, you manage data, accounts, configuration.",
+    "Deployment: public (multi-tenant elastic), private (dedicated), hybrid (both), community (shared sector).",
+    "Security OF the cloud = provider; security IN the cloud = customer.",
+    "Always the customer's: data, identities and access rights, configuration choices.",
+    "Cloud-hosted AI: provider secures the platform; customer protects data and prompts, governs access (including AI bots), and configures safely."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A company's public cloud storage bucket exposing customer records is traced to a bucket policy set to 'public read' by an administrator. Under shared responsibility, this is:",
+      "choices": {
+        "A": "The provider's failure, since it occurred on their infrastructure",
+        "B": "No one's responsibility in the cloud",
+        "C": "A SaaS-only responsibility",
+        "D": "The customer's failure, in the configuration layer they always own"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Configuration is a customer duty in every service model. The provider secures the underlying service; the customer's policy choice made the data public."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A team pipes customer chats into a cloud-hosted AI service for summarization. Which duty stays with the customer?",
+      "choices": {
+        "A": "Physically securing the provider's data center",
+        "B": "Classifying and protecting the data sent to the service and governing who and what can call it",
+        "C": "Patching the hypervisor under the AI service",
+        "D": "Managing power redundancy at the provider site"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "In the shared security model for cloud AI, data protection, access governance (human and non-human callers), and safe configuration remain customer duties; facilities, hardware, and hypervisor are the provider's side."
+    }
+  ]
+}

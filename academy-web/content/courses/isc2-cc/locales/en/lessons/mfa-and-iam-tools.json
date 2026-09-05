@@ -1,0 +1,146 @@
+{
+  "nodeId": "mfa-and-iam-tools",
+  "locale": "en",
+  "title": "MFA Methods, IAM Tools, and Behavioral Authentication",
+  "objective": "By the end of this lesson you can rank MFA methods by strength, recognize MFA fatigue attacks, describe what IAM tools manage, and explain behavioral authentication and impossible-travel detection.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Not all second factors are equal"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MFA methods differ in how easily attackers bypass them. Ranking them is a reliable exam skill, because scenarios describe a method and ask what went wrong or what to upgrade."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Method",
+        "Factor",
+        "Strength",
+        "Known bypass"
+      ],
+      "rows": [
+        [
+          "Hardware security key (FIDO2) or passkey",
+          "Have (with built-in proof)",
+          "Strongest; phishing-resistant",
+          "Physical theft, rare in practice"
+        ],
+        [
+          "Authenticator app code (TOTP)",
+          "Have",
+          "Strong",
+          "Real-time phishing that relays the code"
+        ],
+        [
+          "Push notification approve/deny",
+          "Have",
+          "Moderate",
+          "MFA fatigue: flood pushes until the user approves"
+        ],
+        [
+          "SMS one-time code",
+          "Have",
+          "Weakest common option",
+          "SIM swapping redirects the codes"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "MFA fatigue (push bombing) works by volume: the attacker, holding a valid password, sends approval requests until the victim taps approve to stop the noise. The mitigations the exam expects: number-matching (approve only after typing the number shown on screen), rate limiting, and phishing-resistant methods such as hardware keys or passkeys, which cannot be fatigue-approved because they cryptographically bind to the real site."
+    },
+    {
+      "kind": "heading",
+      "text": "What IAM tools do"
+    },
+    {
+      "kind": "paragraph",
+      "text": "An identity and access management (IAM) system is the machinery for the lifecycle and models you just learned: a directory of identities and groups, authentication services (including SSO and MFA), authorization policy, provisioning and deprovisioning workflows (often driven from HR systems), and audit logs of who got what. In the cloud, IAM also governs non-human identities: service roles, API keys, and AI workload identities with temporary credentials."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Directory: who exists, groups, attributes; the source of identity truth.",
+        "Authentication: password policies, MFA enforcement, session controls.",
+        "Authorization: roles, policies, and attribute rules evaluated per request.",
+        "Lifecycle automation: joiner-mover-leaver wiring, access reviews, deprovisioning.",
+        "Logging: every grant, denial, and elevation recorded for audit and detection."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Behavioral authentication and impossible travel"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The 2026 outline adds behavioral authentication: systems score each login or request against the user's established patterns, devices, and locations, and step up verification when behavior is unusual. Two named capabilities to know: impossible-travel detection flags a login from a location the user physically could not have reached since their last sign-in (Bangkok at 09:00, Lisbon at 09:20), and adaptive or risk-based authentication responds by demanding a stronger factor, blocking, or triggering review."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Treat these as detective, risk-scored controls layered over standard MFA: they do not replace factors, they decide when to demand more of them. Expect questions that pair a suspicious-pattern scenario with the correct response, which is step-up authentication, not silent acceptance."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Rank passkeys and hardware keys above app codes above push above SMS. A flood-of-approvals scenario is MFA fatigue, answered by number-matching or phishing-resistant factors. A two-continents-in-an-hour scenario is impossible travel, answered by step-up authentication."
+    },
+    {
+      "kind": "try",
+      "title": "Upgrade path drill",
+      "steps": [
+        "A company uses SMS codes and an executive complains about prompt spam at 2 a.m. Name the attack and the two fastest improvements.",
+        "Rank these for a new rollout: SMS, authenticator app, passkey, push with number-matching.",
+        "Write the risk-based rule you would add for logins from new countries."
+      ],
+      "expected": "Attack: MFA fatigue/push bombing is not the SMS case here; prompt spam implies push is in use somewhere, but with SMS the parallel risk is SIM swap; improvements: move to authenticator app or passkey and enable number-matching where push remains. Ranking: passkey, push with number-matching, authenticator app, SMS. Rule: new-country logins require step-up (stronger factor) or temporary block pending review."
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Password Strength and MFA",
+      "description": "Audit your own passwords with a password manager, enable MFA on a real account you own, and identify which factors the setup uses. Full guide: labs/password-strength-and-mfa.en.md.",
+      "estimatedMinutes": 25,
+      "status": "ready",
+      "scale": "full"
+    }
+  ],
+  "cheatsheet": [
+    "MFA strength order: hardware key/passkey > authenticator app (TOTP) > push approve/deny > SMS code.",
+    "MFA fatigue = flooding approval prompts; fix with number-matching or phishing-resistant factors.",
+    "SMS codes fall to SIM swapping; prefer app or passkey where offered.",
+    "IAM tools manage directory, authentication (SSO, MFA), authorization policy, lifecycle automation, and audit logs, including non-human identities.",
+    "Impossible-travel detection and adaptive authentication add risk-based step-up on unusual behavior."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A user with a correct password on file receives 40 approval prompts overnight and eventually taps Approve. Which attack and which best fix?",
+      "choices": {
+        "A": "Credential stuffing; longer passwords",
+        "B": "MFA fatigue (push bombing); number-matching or phishing-resistant keys",
+        "C": "SIM swapping; changing phone numbers",
+        "D": "Salting; hashing upgrades"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Flooding push prompts until a tired user approves is MFA fatigue. Number-matching defeats casual approval, and hardware keys or passkeys cannot be approved on a phishing or replay path at all."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A login appears from a country the user signed in from a different continent 30 minutes earlier. The identity system's best response is:",
+      "choices": {
+        "A": "Allow it, because the password was correct",
+        "B": "Ignore it as a false positive by default",
+        "C": "Delete the user's account immediately",
+        "D": "Flag impossible travel and require step-up authentication or review"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Two distant locations within an impossible travel window is a classic behavioral signal. Risk-based (adaptive) authentication responds with a stronger factor demand or review, not blind acceptance or account deletion."
+    }
+  ]
+}

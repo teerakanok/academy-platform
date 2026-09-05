@@ -1,0 +1,110 @@
+{
+  "nodeId": "hardening-and-configuration",
+  "locale": "th",
+  "title": "การ Hardening และตั้งค่าความปลอดภัย",
+  "objective": "เมื่อจบบทเรียนนี้ ผู้เรียนจะสร้าง baseline ที่ harden แล้ว อธิบาย secure boot และการปกป้อง integrity ของดิสก์ และลด attack surface ของ endpoint ด้วย configuration รวมถึงปิดสิ่งที่ไม่มีใครใช้",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Baseline และ golden image"
+    },
+    {
+      "kind": "paragraph",
+      "text": "baseline คือมาตรฐาน configuration ที่บันทึกและทดสอบแล้ว: service ปิด port ปิด logging เปิด นโยบาย password ตั้งไว้ เครื่องทุกเครื่องถูกเทียบกับ baseline และความเบี่ยงเบนจะถูกดึงกลับ golden image อบ baseline ลงใน template ของเครื่องเลย ทุกเครื่องใหม่จึงเริ่มชีวิตแบบ hardened เหมือนกัน และทำซ้ำได้"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Endpoint hardening: ติด agent ของ EDR เปิด host firewall ถอนสิทธิ์ local admin และเปิด full-disk encryption",
+        "ปิด service, port และ protocol ที่ไม่ใช้: ทุกสิ่งที่เปิดไว้คือประตู ให้ปิดสิ่งที่ไม่มีใครใช้",
+        "Patch management: สแกน จัดลำดับ ทดสอบ ส่งออกไป ตรวจยืนยัน ส่วนระบบที่หมดอายุสนับสนุนให้แยกออกแทน",
+        "Group policy และ MDM: บังคับใช้ baseline จากศูนย์กลางแทนการตั้งมือเครื่องต่อเครื่อง"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "ความถูกต้องของการบูตและดิสก์"
+    },
+    {
+      "kind": "paragraph",
+      "text": "secure boot ให้ firmware ตรวจลายเซ็นของตัวโหลดระบบปฏิบัติการก่อนรัน ซึ่งตัดช่องทาง bootkit ชิป TPM เก็บ key และค่าวัดของห่วงโซ่การบูต ความลับจึงถูก seal ไว้เว้นแต่เครื่องจะบูตเข้าสู่สถานะที่รู้จักว่าดี ดิสก์แบบ self-encrypting และ full-disk encryption ปกป้องข้อมูลที่พักอยู่ measured boot และ remote attestation ให้เซิร์ฟเวอร์พิสูจน์สถานะการบูตของตัวเองต่ออีกเครื่องได้"
+    },
+    {
+      "kind": "heading",
+      "text": "ลด surface บน endpoint"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "ด้าน",
+        "การ harden"
+      ],
+      "rows": [
+        [
+          "Service",
+          "ปิดหรือถอนสิ่งที่ไม่ใช้"
+        ],
+        [
+          "Port และ protocol",
+          "ปิดสิ่งที่ไร้หน้าที่ เลิกใช้ Telnet, FTP, SMBv1"
+        ],
+        [
+          "แอปพลิเคชัน",
+          "Application allowlisting ถอนซอฟต์แวร์ที่ไม่ใช้"
+        ],
+        [
+          "Removable media",
+          "จำกัดหรือบล็อก USB storage ด้วยนโยบาย"
+        ],
+        [
+          "บัญชี",
+          "ลบหรือเปลี่ยนชื่อบัญชี default ไม่มี local admin ถาวร"
+        ],
+        [
+          "Logging",
+          "เปิด logging ก่อนเกิดเหตุ พร้อม sync เวลา"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "บนข้อสอบ",
+      "text": "คำถาม hardening ให้รางวัลกับการเปลี่ยนแปลงที่เล็กที่สุดที่เพียงพอ: สถานการณ์เล่าระบบที่เปิด service เกินจำเป็น คำตอบคือปิด service ที่ไม่ใช้ ไม่ใช่ซื้อผลิตภัณฑ์เพิ่ม ระบบหมดอายุสนับสนุนได้รับการแยกออกหรือเปลี่ยนใหม่ เพราะแพตช์จะไม่มาถึงแล้ว"
+    },
+    {
+      "kind": "try",
+      "title": "เขียน baseline ห้าบรรทัด",
+      "steps": [
+        "เลือกระบบที่ผู้เรียนรู้จัก: แล็ปท็อป เซิร์ฟเวอร์ หรือ router",
+        "เขียนรายการ baseline ห้าข้อในรูปข้อความที่ตรวจได้ เช่น เปิด SSH ปิด Telnet",
+        "ทำเครื่องหมายแต่ละข้อว่าบังคับใช้ด้วย group policy, MDM หรือตรวจด้วยมือ",
+        "เก็บไว้ บทเรียน asset management จะเติม classification และการทำลายข้อมูลเข้ามาในรายการนี้"
+      ],
+      "expected": "ได้ห้าข้อความที่คนอื่นเปิดเครื่องดูแล้วตอบได้ว่าจริงหรือเท็จ พร้อมระบุกลไกบังคับใช้ของแต่ละข้อ"
+    }
+  ],
+  "cheatsheet": [
+    "baseline = มาตรฐาน configuration ที่บันทึกและตรวจได้ golden image = baseline ที่อบลงใน template",
+    "ปิด service, port และ protocol ที่ไม่ใช้ ทุกฟีเจอร์ที่เปิดคือ surface ที่แตะได้",
+    "secure boot ตรวจตัวโหลดระบบ TPM seal key กับสถานะบูตที่รู้จักว่าดี attestation พิสูจน์จากระยะไกล",
+    "full-disk หรือดิสก์ self-encrypting ปกป้องข้อมูลที่พัก นโยบาย removable media ปกป้องข้อมูลที่เดินทาง",
+    "ระบบที่หมดอายุสนับสนุน: แยกออกหรือปลดระวัง เพราะแพตช์จะไม่มาอีก"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "file server หนึ่งยังเปิด Telnet, FTP และ SMBv1 ควบคู่ service ปัจจุบัน ชัยชนะด้าน hardening ที่เร็วที่สุดคือ",
+      "choices": {
+        "A": "ติด antivirus engine ตัวที่สอง",
+        "B": "ย้ายเซิร์ฟเวอร์ไปไว้หลัง firewall เพิ่มอีกสองชั้น",
+        "C": "ปิด protocol และ service เก่าที่ไม่มีใครใช้",
+        "D": "เพิ่มความยาวขั้นต่ำของ password"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "การปิดสิ่งที่ไม่มีใครใช้ตัดการเปิดเผยทิ้งทั้งหมด ส่วนผลิตภัณฑ์เพิ่มและ password ที่ยาวขึ้นเป็นการป้องกันประตูที่ปิดได้อยู่แล้ว"
+    }
+  ]
+}

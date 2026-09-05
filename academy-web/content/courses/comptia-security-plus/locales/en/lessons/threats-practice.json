@@ -1,0 +1,156 @@
+{
+  "nodeId": "threats-practice",
+  "locale": "en",
+  "title": "Practice: Threats, Vulnerabilities, and Mitigations",
+  "objective": "By the end of this lesson you can name an attack from its symptoms alone, map attacker behaviors onto MITRE ATT&CK tactics, and reach for the mitigation the scenario is pointing at.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Why hands-on now"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Attack questions rarely name the attack. They hand you six facts that smell wrong and wait. The skill being tested is diagnosis: symptom to name, name to mitigation. Both drills below strip away the paragraphs and leave only what a log or a report would show, which is exactly the shape of the exam scenario."
+    },
+    {
+      "kind": "heading",
+      "text": "Drill 1: name the attack from six symptoms"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "#",
+        "What the telemetry shows"
+      ],
+      "rows": [
+        [
+          "1",
+          "Three hundred failed logons in one night, spread across forty different usernames from a single address; three accounts then succeed at 02:40"
+        ],
+        [
+          "2",
+          "The finance clerk approves a wire transfer, the request is captured, and the same request is re-sent by someone else at 03:00 and succeeds again"
+        ],
+        [
+          "3",
+          "Staff report SMS messages about a missed parcel with a tracking link; the link opens a copy of the bank's login page"
+        ],
+        [
+          "4",
+          "A laptop starts long, random-looking DNS queries to one domain every five minutes; nobody on that laptop notices anything"
+        ],
+        [
+          "5",
+          "Web server logs show the string ' OR 1=1 -- arriving in the username field of the login form"
+        ],
+        [
+          "6",
+          "An invoice arrives from the real supplier's mailbox, but the bank details on it changed last week; the reply-to is a look-alike domain"
+        ]
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Diagnose, then act",
+      "steps": [
+        "Name each attack in the table using the vocabulary of the exam: password spraying, replay, smishing, command and control, SQL injection, business email compromise, and near-neighbors you considered and rejected.",
+        "For each row, write the one mitigation you would state first, and one neighbor attack it would not stop.",
+        "Mark the two rows you would escalate to incident response tonight, and say why those two outrank the rest."
+      ],
+      "expected": "1) Password spraying that succeeded three times; first answer is MFA and lockout with timeouts. 2) A replay of a valid request; first answer is TLS plus one-time tokens or nonces. 3) Smishing on a credential-harvest page; first answer is reporting channel plus blocks on the domain, plus awareness training. 4) Command and control beaconing over DNS; first answer is DNS sinkhole and egress filtering. 5) SQL injection; first answer is parameterized queries and input validation, with a WAF as the quick win. 6) Business email compromise; first answer is out-of-band verification of payment changes. Rows 1 and 4 escalate tonight: both mean an actor is already inside operating at scale, while 3 and 6 are attempts at people and can be blocked at the gateway first."
+    },
+    {
+      "kind": "paragraph",
+      "text": "The rejected neighbors are where points hide. Spraying differs from stuffing because the password is guessed across accounts rather than leaked pairs replayed into logins. Replay differs from on-path because the attacker already holds the captured request and no longer needs to sit between the parties. Saying the wrong near-neighbor in your head during practice costs nothing; on the exam it costs the question."
+    },
+    {
+      "kind": "heading",
+      "text": "Drill 2: map behaviors to ATT&CK tactics"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "A phishing email with a macro-laden attachment reaches four HR staff.",
+        "Two days later, a scheduled task appears on the file server.",
+        "A tool attempts to dump the memory of the local security authority process.",
+        "The account used on the web server now logs into the database host.",
+        "A compressed archive of designs is uploaded to a file-sharing site."
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Tactic, not technique",
+      "steps": [
+        "Label each behavior with its MITRE ATT&CK tactic: initial access, persistence, credential access, lateral movement, exfiltration.",
+        "For one behavior, also name the technique category in plain words, so the tactic-technique split is visible.",
+        "Name the defense that covers the first behavior and one that covers the last."
+      ],
+      "expected": "Phishing email is initial access. The scheduled task is persistence. The memory dump attempt is credential access. The web-server account on the database host is lateral movement. The upload is exfiltration. The scheduled task's technique category is scheduled task or job. First behavior: email filtering with attachment sandboxing. Last behavior: egress rules and DLP watching large uploads."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Read for the aim",
+      "text": "Tactic names the attacker's goal, technique names the method. When a mapping question stalls, ask what the attacker was trying to get or keep at that moment: getting in is initial access, staying in is persistence, harvesting secrets is credential access, moving inward is lateral movement, leaving with the goods is exfiltration."
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Threats Classify",
+      "description": "Drag twelve incident summaries into social-engineering, malware, network-attack, and insider bins, including two that skilled defenders argue about. Full design: labs/threats-classify.lab.en.md.",
+      "estimatedMinutes": 10,
+      "status": "coming-soon",
+      "scale": "inline"
+    }
+  ],
+  "cheatsheet": [
+    "Spraying guesses a few passwords across many accounts; stuffing replays leaked password pairs; both are answered with MFA and lockout.",
+    "Replay sends a captured valid request again; on-path sits between the parties; TLS plus one-time tokens answer both.",
+    "Random periodic DNS to one domain is command-and-control beaconing; answer with sinkholes and egress filtering.",
+    "Injection strings in input fields point at parameterized queries and a WAF.",
+    "ATT&CK tactic names the goal: initial access, persistence, credential access, lateral movement, exfiltration."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "At 03:00, a funds-transfer web request captured two hours earlier is re-sent byte for byte and the bank honors it again. The clerk's session was valid and no attacker is between the bank and the client. What is this?",
+      "choices": {
+        "A": "An on-path attack relaying the session",
+        "B": "A cross-site request forgery using the clerk's browser",
+        "C": "A replay of a captured valid request",
+        "D": "A credential-stuffing login using the clerk's password"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The captured request is sent again as-is, with no one positioned between the parties, which defines replay. On-path requires relaying live traffic, CSRF needs the clerk's browser to fire the request, and stuffing is a login attack."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "During a review, an analyst finds a scheduled task created on a server two days after a phishing email was opened. In MITRE ATT&CK terms, which tactic does the scheduled task belong to?",
+      "choices": {
+        "A": "Persistence",
+        "B": "Initial access",
+        "C": "Exfiltration",
+        "D": "Reconnaissance"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "A scheduled task keeps the attacker's foothold across reboots, which serves the persistence tactic. Initial access was the phishing email two days earlier, and exfiltration has not begun in this scenario."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Log review shows hundreds of nightly failed logons spread across dozens of usernames from one address, and three accounts that eventually succeed. Which mitigation most directly blunts this campaign?",
+      "choices": {
+        "A": "MFA on every account plus lockout with timeouts",
+        "B": "Renaming the administrator account",
+        "C": "Requiring longer passwords",
+        "D": "Blocking all foreign IP addresses at the firewall"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Spraying wins when a right password alone is enough. MFA makes the password insufficient and lockout with timeouts slows the attempt rate. Longer passwords barely raise the cost of a one-guess-per-account spray, and address blocking fails against botnets."
+    }
+  ]
+}

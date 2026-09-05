@@ -1,0 +1,113 @@
+{
+  "nodeId": "program-mgmt-practice",
+  "locale": "en",
+  "title": "Practice: Security Program Management",
+  "objective": "By the end of this lesson you can score scenarios on a risk matrix and rank them, and pick audit, assessment, scan, penetration test, or tabletop from a one-line request without second-guessing.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Why hands-on now"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Program management questions are score-and-choose questions, and both halves are drills, not readings. The matrix only becomes quick when you have multiplied your way through scenarios yourself, and the audit-versus-scan-versus-test vocabulary only snaps into place when you match it against requests the way a manager would phrase them."
+    },
+    {
+      "kind": "heading",
+      "text": "Drill 1: score six risks"
+    },
+    {
+      "kind": "try",
+      "title": "Multiply, rank, treat",
+      "steps": [
+        "Score each scenario likelihood times impact on the 1-to-5 scale, then rank all six: 1) an unpatchable legacy payroll system with a public exploit, where a compromise halts the monthly pay run; 2) defacement of a marketing microsite holding no personal data; 3) an insider with broad folder rights could copy the client list; 4) a supplier contract now carries a liability clause covering processor failures; 5) ransomware on file servers, with offline backups tested every quarter; 6) a single-region outage of a wiki used by one dev team.",
+        "Name the treatment already in place or the one you would choose, for each.",
+        "Pick the risks you would record as accepted, and say who signs."
+      ],
+      "expected": "1) 4x5=20, mitigate with segmentation and monitoring, the clear first priority. 2) 4x1=4, accept or mitigate cheaply. 3) 2x4=8, mitigate with least-privilege rights reviews. 4) 3x4=12 with the financial impact transferred by the clause; residual operational impact stays home. 5) 3x2=6, already mitigated by tested backups; the residual is the recovery window. 6) 2x1=2, accept and record. Acceptance belongs to a manager who signs the register entry, and the two acceptance candidates here are 2 and 6."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Watch what happened in scenario 4: the transfer moved the money, and only the money. The supplier still fails on your watch, your team still spends the weekend, so the residual risk stays on your register with your name on the owner line. That split, financial impact versus the incident itself, is the single most tested idea in this module."
+    },
+    {
+      "kind": "heading",
+      "text": "Drill 2: audit, scan, or assessment?"
+    },
+    {
+      "kind": "try",
+      "title": "Match the request to the activity",
+      "steps": [
+        "Match each request to one activity: audit, gap assessment, vulnerability scan, penetration test, tabletop exercise.",
+        "Requests: A) the card scheme wants proof we meet the standard, signed by an external party; B) find every missing patch across four hundred hosts before Friday; C) show whether the flaw the scanner reported in the new portal is real; D) tell us where we stand six months before the auditors arrive; E) the response team should rehearse the ransomware plan in conversation, no systems touched.",
+        "For request C, name the two documents that must exist before anyone starts."
+      ],
+      "expected": "A) audit, external and against the standard. B) vulnerability scan, broad and tool-driven. C) penetration test, which demonstrates exploitability; before it starts there must be written authorization and rules of engagement naming scope, timing, and allowed techniques. D) gap assessment, an internal planning view. E) tabletop exercise, a facilitated conversation that exposes plan gaps."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Cheapest correct answer",
+      "text": "When two activities would both work, the exam wants the cheapest correct one: a scan beats a test for coverage of known flaws, a test beats a scan when the question says prove it, an audit beats an assessment when an outside party must rely on the result. And no attacker-side activity starts without signed authorization."
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Risk Matrix Workshop",
+      "description": "Score six given scenarios on a 5x5 matrix, pick a treatment for each, and state the residual risk. Full guide: labs/risk-matrix-workshop.en.md.",
+      "estimatedMinutes": 30,
+      "status": "ready",
+      "scale": "full"
+    }
+  ],
+  "cheatsheet": [
+    "Score is likelihood times impact on the 1-to-5 scale; treat from the highest score down.",
+    "Transfer moves the financial impact only; the incident, the downtime, and the residual risk stay home.",
+    "Acceptance is deliberate, recorded, and signed by the risk owner, usually a manager.",
+    "Audit proves compliance to outsiders; assessment guides your own next move; scan finds candidates; test proves them; tabletop rehearses people.",
+    "Every scan and test runs on written authorization plus rules of engagement."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Three risks sit on the register: a payroll system compromise scored 20, a client-list exposure scored 8, and a dev wiki outage scored 2. Budget covers one treatment this quarter. Which risk gets it?",
+      "choices": {
+        "A": "The payroll system, because treatment follows the highest score",
+        "B": "The client-list exposure, because data loss is worse than downtime",
+        "C": "The wiki, because it is the cheapest to fix",
+        "D": "Split the budget evenly across all three"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Matrix-driven programs treat the highest score first, and 20 towers over 8 and 2 here. Argument-by-feeling reorderings, cheapest-first fixes, and even splits all discard the scoring discipline the register exists to enforce."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "An external firm examines controls against the card payment standard and produces findings that partner banks rely on. What is this activity?",
+      "choices": {
+        "A": "A penetration test",
+        "B": "An audit",
+        "C": "A gap assessment",
+        "D": "A vulnerability scan"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "An external party, checking against a defined standard, producing findings third parties rely on: that is an audit. An assessment guides the organization itself, a scan lists candidate flaws, and a test simulates attacks."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Management wants every unpatched system across four hundred hosts found by Friday, as cheaply as possible. What should they run?",
+      "choices": {
+        "A": "A vulnerability scan",
+        "B": "A full penetration test",
+        "C": "A tabletop exercise",
+        "D": "An external audit"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Broad coverage, many hosts, tool-driven and cheap: the vulnerability scan. A penetration test is deep and narrow and proves single flaws, a tabletop rehearses people, and an audit checks compliance with a standard."
+    }
+  ]
+}

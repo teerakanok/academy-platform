@@ -1,0 +1,185 @@
+{
+  "nodeId": "enterprise-security-forms",
+  "locale": "en",
+  "title": "Enterprise Security Forms",
+  "objective": "By the end of this lesson you can match security appliances and connectivity forms to their jobs, and replace insecure protocols with their secure counterparts.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Appliances and where they sit"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Device",
+        "Sits",
+        "Core job"
+      ],
+      "rows": [
+        [
+          "Firewall",
+          "Network edge and between segments",
+          "Allows or blocks traffic by rule"
+        ],
+        [
+          "IPS (inline)",
+          "In the traffic path",
+          "Blocks detected attacks actively"
+        ],
+        [
+          "IDS (out of path)",
+          "Mirror or tap copy",
+          "Detects and alerts only"
+        ],
+        [
+          "Proxy",
+          "Between users and the web",
+          "Filters and caches web traffic"
+        ],
+        [
+          "WAF",
+          "In front of web apps",
+          "Shields apps from injection and XSS"
+        ],
+        [
+          "Load balancer",
+          "In front of server farms",
+          "Spreads traffic, health-checks members"
+        ],
+        [
+          "SIEM collector",
+          "Central",
+          "Aggregates and correlates logs"
+        ],
+        [
+          "Email security gateway",
+          "In front of mail flow",
+          "Filters spam, malware, phishing"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The firewall row of that table carries a habit the exam keeps retesting: rules are read top-down, the first matching rule wins, and whatever no rule claims falls through to an implicit deny at the bottom. That fall-through is why the safe posture is default deny — permit exactly what the policy names, then let the implicit deny take everything else. It is also why specific rules sit above general ones: when an admin-subnet exception and an everyone-else deny cover the same destination and port, the broader row on top quietly swallows the exception beneath it. Rule order is part of the configuration, not formatting, and the Firewall Rules PBQ lab below grades that order directly."
+    },
+    {
+      "kind": "paragraph",
+      "text": "IDS versus IPS is a favorite exam pair: the IDS sees a copy and alerts; the IPS sits inline and can block, at the price of becoming a possible bottleneck or point of failure. A false positive matters more on an IPS, because traffic stops."
+    },
+    {
+      "kind": "heading",
+      "text": "Connectivity and traffic steering"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "VPN: an encrypted tunnel. Site-to-site joins offices; remote access joins a user; TLS VPNs serve applications through a browser, IPsec tunnels join networks.",
+        "SDN (software-defined networking): a controller programs switches and routers centrally, enabling fast microsegmentation.",
+        "DNS filtering: resolves known-bad domains into nothing, cheap protection at the resolver.",
+        "NAC (network access control): checks device health before granting network access.",
+        "Sensors: taps, mirror ports, and honeypots that feed detection tools."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Secure protocol swaps"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Retire",
+        "Because",
+        "Use instead"
+      ],
+      "rows": [
+        [
+          "Telnet",
+          "Credentials cross the wire in clear text",
+          "SSH"
+        ],
+        [
+          "FTP",
+          "Clear-text transfer",
+          "SFTP or FTPS"
+        ],
+        [
+          "HTTP",
+          "Readable and editable in transit",
+          "HTTPS"
+        ],
+        [
+          "SNMPv1/v2",
+          "Weak community strings in clear text",
+          "SNMPv3"
+        ],
+        [
+          "LDAP",
+          "Clear-text directory queries",
+          "LDAPS"
+        ],
+        [
+          "SMBv1 / old protocols",
+          "Legacy, publicly exploited",
+          "Current SMB with signing"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Protocol questions are usually matching: the scenario names the old protocol and the answer names the secure replacement with the same job. SSH replaces Telnet, SFTP replaces FTP, SNMPv3 replaces v1 and v2, LDAPS replaces LDAP."
+    },
+    {
+      "kind": "try",
+      "title": "Protocol audit of a small office",
+      "steps": [
+        "Inventory from a scenario: a router managed over Telnet, a website on HTTP only, an FTP drop box for partners, and SNMPv2 for monitoring.",
+        "Write the replacement for each.",
+        "For each replacement, note what the new protocol adds (encryption, authentication, integrity).",
+        "Order the four changes by risk reduced."
+      ],
+      "expected": "SSH for the router, HTTPS for the site, SFTP or FTPS for the drop box, SNMPv3 for monitoring. Each adds encrypted, authenticated channels. Router Telnet usually goes first because it exposes admin credentials."
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: TLS vs Plain Protocols",
+      "description": "Capture your own HTTP and HTTPS traffic in Wireshark and compare what each exposes, then connect SSH and Telnet conceptually to what you saw. Full guide: labs/tls-vs-plain-protocols.en.md.",
+      "estimatedMinutes": 30,
+      "status": "ready",
+      "scale": "full"
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Firewall Rules PBQ",
+      "description": "Repair the actions, ports, and order of a college edge firewall's rule table until the flow-test panel reads the way the policy demands. Full design: labs/firewall-rules-pbq.lab.en.md.",
+      "estimatedMinutes": 12,
+      "status": "coming-soon",
+      "scale": "full"
+    }
+  ],
+  "cheatsheet": [
+    "Firewall rules read top-down: the first matching rule wins, so specific rules sit above general ones and the implicit deny catches the rest — default deny is the posture.",
+    "IDS watches a copy and alerts; IPS sits inline and blocks, so its false positives stop traffic.",
+    "Proxy filters web traffic; WAF shields web apps; DNS filtering kills bad domains at resolution.",
+    "VPN forms: site-to-site joins networks, remote access joins a user; TLS serves apps, IPsec joins networks.",
+    "SDN centralizes control of switches and routers, making segmentation fast.",
+    "Swaps: Telnet to SSH, FTP to SFTP or FTPS, HTTP to HTTPS, SNMPv1/v2 to v3, LDAP to LDAPS."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A team wants attack traffic between segments stopped automatically, and accepts that the device sits in the traffic path. Which device fits?",
+      "choices": {
+        "A": "IDS on a mirror port",
+        "B": "DNS filter",
+        "C": "IPS inline between segments",
+        "D": "Load balancer"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Inline placement plus active blocking defines an IPS. The IDS alerts from a copied stream but cannot stop traffic, and DNS filters and load balancers do different jobs."
+    }
+  ]
+}

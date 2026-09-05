@@ -1,0 +1,168 @@
+{
+  "nodeId": "network-fundamentals-threats",
+  "locale": "en",
+  "title": "Network Fundamentals and Threats",
+  "objective": "By the end of this lesson you can explain IP addresses, ports, and common protocols, contrast plaintext with encrypted traffic, and recognize spoofing, on-path, and DoS/DDoS attacks.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Addresses, ports, and protocols"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Every device on a network has an IP address; IPv4 looks like 192.168.1.10 and IPv6 like 2001:db8::1. Services listen on numbered ports: web traffic uses 80 (HTTP) and 443 (HTTPS), secure shell uses 22 (SSH), email transfer uses 25 (SMTP), and domain lookup uses 53 (DNS). A conversation is described by the tuple of source address and port plus destination address and port, carried by TCP (connection-oriented, verified) or UDP (connectionless, fast). You do not need the full OSI model at CC depth, but knowing which protocols speak in plaintext is exam-critical."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Protocol",
+        "Port",
+        "Plaintext?",
+        "Secure alternative"
+      ],
+      "rows": [
+        [
+          "HTTP",
+          "80",
+          "Yes",
+          "HTTPS (443) over TLS"
+        ],
+        [
+          "FTP / TFTP",
+          "20-21 / 69",
+          "Yes",
+          "SFTP or FTPS"
+        ],
+        [
+          "Telnet",
+          "23",
+          "Yes",
+          "SSH (22)"
+        ],
+        [
+          "SMTP",
+          "25",
+          "Often",
+          "SMTP over TLS"
+        ],
+        [
+          "DNS",
+          "53",
+          "Usually",
+          "DNS over HTTPS/TLS"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The security story in one sentence: anyone who can watch the path can read plaintext protocols in full, while TLS-protected traffic reveals only metadata such as sizes and destination. That contrast is what the module lab shows by capturing your own traffic."
+    },
+    {
+      "kind": "heading",
+      "text": "Attack patterns to recognize"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Attack",
+        "What happens",
+        "First defense"
+      ],
+      "rows": [
+        [
+          "Spoofing",
+          "Faking an identity: forged sender, cloned site, forged source address",
+          "Authentication, filters, TLS with certificate checks"
+        ],
+        [
+          "On-path (man-in-the-middle)",
+          "Attacker sits between you and a service, reading or altering traffic",
+          "HTTPS everywhere; avoid unknown networks for sensitive use"
+        ],
+        [
+          "Replay",
+          "A captured valid request is sent again later",
+          "Tokens and timestamps (nonces)"
+        ],
+        [
+          "DoS / DDoS",
+          "Flooding a service or network until it cannot serve",
+          "Rate limiting, traffic filtering, absorption services, redundancy"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "DoS is availability attack number one: one source or a botnet of many (distributed) exhausts bandwidth, connections, or application capacity. Defenses combine filtering upstream, rate limiting, and redundant, scalable infrastructure. Note the asymmetry the exam likes: attack cost scales down with botnets, defense scales up with architecture."
+    },
+    {
+      "kind": "heading",
+      "text": "Why plaintext still matters in 2026"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Legacy services, printers, and misconfigured apps still speak plaintext, and attackers who gain a listening position (rogue access point, on-path position) harvest credentials directly. The exam pairs this with segmentation from a later lesson: plaintext protocols belong on isolated networks at minimum, and replaced with TLS-based equivalents wherever possible."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Port numbers 80/443/22/25/53 appear constantly; so does the plaintext-versus-TLS distinction. For attack scenarios, name the pattern from its mechanism: faked identity (spoofing), interception (on-path), resend (replay), flood (DoS/DDoS)."
+    },
+    {
+      "kind": "try",
+      "title": "Read a connection",
+      "steps": [
+        "Open a terminal and run a connection listing: 'netstat -an' on Windows, or 'ss -tuan' or 'netstat -an' on macOS/Linux.",
+        "Find one connection to port 443 and one to port 80 or 53; note the states.",
+        "For each, say whether an eavesdropper on the path could read its content, and which protocol carries it."
+      ],
+      "expected": "Port 443 connections carry HTTPS inside TLS: content unreadable, destination visible. Port 80 HTTP would be fully readable; DNS on 53 is usually plaintext queries, which is why DNS-over-HTTPS exists."
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Inspect HTTP vs HTTPS",
+      "description": "Capture your own traffic with Wireshark and compare plaintext HTTP requests with TLS-protected HTTPS sessions. Full guide: labs/inspect-http-vs-https.en.md.",
+      "estimatedMinutes": 30,
+      "status": "ready",
+      "scale": "full"
+    }
+  ],
+  "cheatsheet": [
+    "Ports to memorize: HTTP 80, HTTPS 443, SSH 22, SMTP 25, DNS 53, FTP 20-21.",
+    "Plaintext protocols (HTTP, Telnet, FTP, plain DNS) are readable by anyone on the path; TLS protects content.",
+    "Spoofing fakes identity; on-path intercepts; replay resends; DoS/DDoS floods availability.",
+    "DDoS defense = filtering, rate limiting, absorption, redundancy; never a single magic box.",
+    "TCP is connection-verified, UDP is connectionless; both ride on IP addressing."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A cafe user logs into a website whose address bar shows http:// and the login form submits. What is the direct risk?",
+      "choices": {
+        "A": "The site will be rate limited",
+        "B": "Credentials travel in plaintext and are readable by anyone monitoring the path",
+        "C": "The browser will refuse to send the form",
+        "D": "DNS poisoning of the cafe router"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "HTTP is unencrypted, so the username and password cross the network in the clear, visible to an on-path observer such as a rogue access point operator. The browser sends it anyway; DNS poisoning is a different attack."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "An online store is unreachable worldwide; traffic analysis shows millions of requests from distributed sources. Which attack and which CIA element?",
+      "choices": {
+        "A": "DDoS; availability",
+        "B": "Replay; integrity",
+        "C": "Spoofing; confidentiality",
+        "D": "On-path; non-repudiation"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Distributed flooding that makes the service unreachable is a DDoS attack, and its target is availability. No data is read, altered, or disputed in this scenario."
+    }
+  ]
+}

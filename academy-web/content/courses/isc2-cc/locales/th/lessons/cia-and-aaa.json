@@ -1,0 +1,154 @@
+{
+  "nodeId": "cia-and-aaa",
+  "locale": "th",
+  "title": "เป้าหมายของ Security: CIA, Non-Repudiation และ AAA",
+  "objective": "เมื่อจบบทเรียนนี้ ผู้เรียนจำแนก scenario ด้าน security ให้เข้ากับ CIA triad ได้ อธิบาย non-repudiation ได้ และอธิบายว่า authentication, authorization และ accounting ทำงานร่วมกันอย่างไร",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "สามคำถามที่นิยามความปลอดภัย"
+    },
+    {
+      "kind": "paragraph",
+      "text": "คำถาม security แทบทุกข้อย่อกลับมาเป็นสามคำถามง่ายๆ ได้ คือ ข้อมูลนี้มีเฉพาะคนที่ควรเห็นเท่านั้นหรือไม่ ข้อมูลยังถูกต้องไม่ถูกแก้ไขหรือไม่ และเราใช้ระบบได้ตอนที่ต้องการหรือไม่ นี่คือ Confidentiality, Integrity และ Availability หรือ CIA triad เวลาข้อสอบเล่าเหตุการณ์ให้ฟัง ก้าวแรกของผู้เรียนคือบอกให้ได้ว่าเสาไหนของ triad ถูกทำร้าย"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "คุณสมบัติ",
+        "คำถามที่ตอบ",
+        "การละเมิดที่พบบ่อย",
+        "control ที่ใช้ป้องกัน"
+      ],
+      "rows": [
+        [
+          "Confidentiality",
+          "ใครเห็นข้อมูลได้บ้าง?",
+          "ฐานข้อมูลลูกค้ารั่วไปบน forum แฮกเกอร์",
+          "การเข้ารหัส, access control, การจัดระดับชั้นข้อมูล"
+        ],
+        [
+          "Integrity",
+          "ข้อมูลยังถูกต้องและไม่ถูกแก้ไขหรือไม่?",
+          "ยอดเงินในบัญชีถูกเปลี่ยนโดยไม่ได้รับอนุญาต",
+          "hashing, digital signature, input validation"
+        ],
+        [
+          "Availability",
+          "ต้องการใช้แล้วใช้ได้หรือไม่?",
+          "ระบบเวชระเบียนโรงพยาบาลล่มช่วงโดน ransomware",
+          "redundancy, backup, patching, การป้องกัน DDoS"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "เหตุการณ์เดียวทำร้ายได้มากกว่าหนึ่งเสา Ransomware อ่านไฟล์ของเรา (confidentiality) เข้ารหัสไฟล์จนใช้ไม่ได้และเชื่อถือไม่ได้ (integrity และ availability) และอาจขู่จะเปิดเผยข้อมูล นี่คือเหตุผลที่ ransomware ถูกจัดเป็นภัยระดับสูงสุด เพราะกระทบทั้ง triad พร้อมกัน"
+    },
+    {
+      "kind": "paragraph",
+      "text": "องค์กรต่างประเภทให้น้ำหนักเสาไม่เท่ากัน ธนาคารทนยอดเงินผิดไม่ได้จึงให้ integrity มาก่อน โรงพยาบาลต้องเปิดเวชระเบียนได้ทันฉุกเฉินจึงให้ availability มาก่อน หน่วยงานข่าวกรองยก confidentiality ขึ้นแรกสุด บนข้อสอบ ให้อ่านบริบทธุรกิจใน scenario ก่อนเลือกว่าคุณสมบัติใดสำคัญที่สุด"
+    },
+    {
+      "kind": "heading",
+      "text": "Non-repudiation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Non-repudiation หมายถึง บุคคลปฏิเสธอย่างน่าเชื่อว่าตนไม่ได้ทำการกระทำนั้นไม่ได้ ถ้าผู้เรียนเซ็นชื่อดิจิทัลลงในเอกสาร ลายเซ็นผูกตัวผู้เรียนกับเอกสารโดยที่ภายหลังปฏิเสธไม่ได้ Digital signature ให้ non-repudiation เพราะมีเพียง private key ของผู้เรียนเท่านั้นที่สร้างมันได้ ส่วน password ธรรมดาให้ non-repudiation ไม่ได้ เพราะคนอื่นอาจรู้หรือขโมย password ไปได้"
+    },
+    {
+      "kind": "heading",
+      "text": "AAA: คำถามที่ระบบถามทุกครั้งที่ login"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Authentication: พิสูจน์ว่าคุณคือใคร โดยใช้สิ่งที่คุณรู้ (password), สิ่งที่คุณมี (โทรศัพท์หรือ security key) หรือสิ่งที่คุณเป็น (ลายนิ้วมือ)",
+        "Authorization: ตัดสินว่า identity นั้นได้รับอนุญาตให้ทำอะไร เช่น ใช้บัตรเข้าอาคารได้ แต่เข้าห้อง server ไม่ได้",
+        "Accounting: บันทึกว่า identity นั้นทำอะไร ผ่าน log ของการ login, การแก้ไข และการกระทำ เพื่อตรวจสอบย้อนหลังได้"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "บ่วงบาศข้อสอบคลาสสิกคือสลับ authentication กับ authorization วิธีจำง่ายๆ: authentication ตอบว่าคุณเป็นใคร ส่วน authorization ตอบว่าคุณทำอะไรได้ และ accounting ตอบว่าคุณทำอะไรไป ซึ่งเป็นรากฐานของ non-repudiation ในทางปฏิบัติ"
+    },
+    {
+      "kind": "heading",
+      "text": "Defense in depth"
+    },
+    {
+      "kind": "paragraph",
+      "text": "ไม่มี control ใดสมบูรณ์แบบ องค์กรที่มีวุฒิภาวะจึงซ้อน control เป็นชั้นๆ: firewall ที่เครือข่าย, segmentation ภายใน, endpoint protection และ patching, การตรวจสอบที่ application, การเข้ารหัสข้อมูลแกนหลัง บวกคนที่ได้รับการอบรมและล็อกทางกายภาพ ผู้โจมตีต้องเอาชนะทุกชั้นจึงสำเร็จ และแต่ละชั้นเก็บสิ่งที่ชั้นก่อนหน้าพลาด"
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "บนข้อสอบ",
+      "text": "เมื่อ scenario ถามว่า CIA เสาไหนถูกทำร้าย ให้บอกอันตรายด้วยภาษาตัวเองก่อน: ข้อมูลถูกคนผิดเห็น (C), ข้อมูลถูกแก้หรือเสียหาย (I), ระบบใช้ไม่ได้ (A) ถ้าตัวเลือกสองข้อดูใกล้เคียง เลือกข้อที่ตรงกับอันตรายหลักของเรื่อง"
+    },
+    {
+      "kind": "try",
+      "title": "จำแนกอันตราย",
+      "steps": [
+        "อ่านสามสถานการณ์สั้นๆ: (1) นักศึกษาลืมออกจากระบบเครื่องในห้อง lab คนถัดไปเห็น transcript; (2) ผู้ไม่หวังดีเปลี่ยนเกรด F เป็น A; (3) ระบบลงทะเบียนวิชาล่มตลอดสัปดาห์ add/drop",
+        "ระบุ CIA เสาไหนถูกทำร้ายในแต่ละข้อ",
+        "ตั้งชื่อ control ที่จะป้องกันแต่ละข้อ"
+      ],
+      "expected": "1: confidentiality (คนไม่ควรเห็นได้ดู; ล็อกจอหรือ auto-logout) 2: integrity (แก้ไขโดยไม่ได้รับอนุญาต; input validation และ access control) 3: availability (ระบบใช้ไม่ได้ตอนต้องการ; redundancy หรือการวางแผนกำลังรองรับ)"
+    },
+    {
+      "kind": "lab",
+      "title": "แล็บ: Hash a File",
+      "description": "ตรวจ integrity ของไฟล์ด้วย SHA-256 บนเครื่องของผู้เรียนเอง แล้วเปลี่ยนไปเพียง 1 byte และดู hash เปลี่ยนไปทั้งหมด คู่มือฉบับเต็ม: labs/hash-a-file.th.md",
+      "estimatedMinutes": 20,
+      "status": "ready",
+      "scale": "full"
+    },
+    {
+      "kind": "lab",
+      "title": "แล็บ: Integrity Terminal (interactive, เร็วๆ นี้)",
+      "description": "ตรวจ hash ของไฟล์ใน terminal จำลอง ดูไบต์เดียวเปลี่ยน แล้วตรวจซ้ำและเทียบคำตัดสินทั้งสองรอบ ดีไซน์ฉบับเต็ม: labs/integrity-terminal.lab.th.md",
+      "estimatedMinutes": 15,
+      "status": "coming-soon",
+      "scale": "full"
+    }
+  ],
+  "cheatsheet": [
+    "CIA triad: Confidentiality = มีเฉพาะคนที่ควรเห็น; Integrity = ถูกต้องไม่ถูกแก้; Availability = ต้องการใช้แล้วใช้ได้",
+    "Ransomware ทำร้ายทั้ง triad: อ่าน, เข้ารหัส และล็อก",
+    "Non-repudiation มาจาก digital signature ไม่ใช่ password ที่ใช้ร่วมกัน",
+    "AAA: authentication = คุณเป็นใคร; authorization = คุณทำอะไรได้; accounting = คุณทำอะไรไป",
+    "Defense in depth = ซ้อน control หลายชั้นเพื่อให้ความล้มเหลวจุดเดียวไม่ถึงตาย"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "ระบบเวชระเบียนของโรงพยาบาลถูก ransomware เข้ารหัสจนแพทย์เปิดประวัติคนไข้ฉุกเฉินไม่ได้ องค์ประกอบใดของ CIA ถูกทำร้ายมากที่สุด?",
+      "choices": {
+        "A": "Confidentiality",
+        "B": "Availability",
+        "C": "Integrity",
+        "D": "Non-repudiation"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "อันตรายหลักของเรื่องคือระบบใช้ไม่ได้ตอนต้องการ ซึ่งคือ availability การโจมตีอาจกระทบคุณสมบัติอื่นด้วย แต่ผลกระทบต่อความปลอดภัยคนไข้ที่เล่าถึงคือการสูญเสีย availability"
+    },
+    {
+      "id": "cp-2",
+      "prompt": "พนักงานใช้บัตรเข้าอาคารสำนักงานได้ แต่บัตรแผ่นเดียวกันเปิดประตูห้อง server ไม่ได้ ข้อใดอธิบายคู่แนวคิด AAA ที่เกิดขึ้นได้ถูกต้อง?",
+      "choices": {
+        "A": "Accounting สำเร็จ, authentication ปฏิเสธ",
+        "B": "Authorization สำเร็จ, accounting ปฏิเสธ",
+        "C": "Authentication สำเร็จ, authorization ปฏิเสธ",
+        "D": "Authentication ล้มเหลว, authorization อนุญาต"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "บัตรพิสูจน์ตัวตนที่อาคาร (authentication) และคำตอบของคำขอเข้าห้อง server เป็นลบ (authorization) ส่วน accounting คือการบันทึกเหตุการณ์ ซึ่งไม่ใช่สิ่งที่ประตูสองบานนี้สื่อถึง"
+    }
+  ]
+}

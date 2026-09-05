@@ -1,0 +1,131 @@
+{
+  "nodeId": "network-security-devices",
+  "locale": "en",
+  "title": "Network Security Devices: Firewalls, IDS/IPS, Proxies, VPNs",
+  "objective": "By the end of this lesson you can explain what firewalls, IDS, IPS, proxies, and VPNs each do, where they sit, and how AI-powered detection changes the picture.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "The firewall: allow and deny by rule"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A firewall filters traffic crossing a network boundary according to rules built from addresses, ports, and protocols. Packet-filtering firewalls inspect each packet in isolation and are fast but blind to context. Stateful firewalls track connections, so return traffic belonging to an established session is allowed and stray packets are dropped. Next-generation firewalls (NGFW) add application awareness and deep inspection, identifying the actual application behind the traffic, not just the port."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Two rule-craft ideas matter for scenarios: default deny (anything not explicitly allowed is dropped) is the safe posture, and rule order matters because the first matching rule wins. A web application firewall (WAF) is the specialized cousin that protects HTTP applications from attacks such as injection and cross-site scripting."
+    },
+    {
+      "kind": "heading",
+      "text": "IDS versus IPS: alert or block"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "IDS (Intrusion Detection)",
+        "IPS (Intrusion Prevention)"
+      ],
+      "rows": [
+        [
+          "Action",
+          "Detects and alerts only",
+          "Detects and blocks inline"
+        ],
+        [
+          "Placement",
+          "Out of band, watching a copy of traffic",
+          "In line, on the traffic path"
+        ],
+        [
+          "Risk of false positive",
+          "Wasted analyst time",
+          "Can block legitimate traffic"
+        ],
+        [
+          "Detection methods",
+          "Signatures (known patterns) and anomaly (deviations from normal)",
+          "Same methods, with enforcement"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The exam distinction is one line: IDS watches and tells, IPS stands in the path and stops. Signature detection catches known attacks precisely but misses new ones; anomaly detection catches deviations from learned normal but generates more false positives until tuned."
+    },
+    {
+      "kind": "try",
+      "title": "Pick the device",
+      "steps": [
+        "Situation 1: traffic crosses a checkpoint where anything not explicitly allowed is dropped. Firewall, IDS, or honeypot?",
+        "Situation 2: a sensor watches a mirrored copy of traffic and raises alerts on attack patterns but cannot stop them. Firewall, IDS, or honeypot?",
+        "Situation 3: a deliberately exposed decoy system attracts attackers so defenders can study how they work. Firewall, IDS, or honeypot?"
+      ],
+      "expected": "1: firewall — rule enforcement at the crossing point, default deny. 2: IDS — out of band, detects and alerts, cannot block. 3: honeypot — a decoy built to be attacked and studied."
+    },
+    {
+      "kind": "heading",
+      "text": "Proxies and VPNs"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A proxy acts as an intermediary for requests, commonly for web traffic: clients send requests to the proxy, which fetches on their behalf, enabling filtering, caching, and logging. A VPN creates an encrypted tunnel across an untrusted network, so remote users reach internal resources as if on a private link, and site-to-site VPNs connect offices. Both are common scenario props; remember proxies mediate and inspect, VPNs encrypt and extend the network."
+    },
+    {
+      "kind": "heading",
+      "text": "AI-powered firewalls and IDS"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The 2026 outline adds AI-powered firewalls and IDS/IPS to this domain. The idea: instead of matching only static signatures, the engine learns what normal traffic looks like for your environment and flags or blocks anomalies, including novel attack patterns that carry no known signature. The trade-offs are the same as any learning system: better detection of the unknown, but a need for tuning, monitoring, and validation so the model's decisions stay accurate, exactly the model-drift concern from Domain 2."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "IDS alerts out of band; IPS blocks inline. Default deny plus explicit allows is the expected rule posture. Proxies mediate and inspect; VPNs encrypt in tunnels. For AI questions, pair improved unknown-threat detection with the need to monitor model quality."
+    },
+    {
+      "kind": "paragraph",
+      "text": "A deployment rule of thumb worth remembering: detection-first (IDS) where false positives are costly to business flow, prevention (IPS) where the attack surface and confidence justify inline enforcement."
+    }
+  ],
+  "cheatsheet": [
+    "Firewall evolution: packet filter (no context) > stateful (tracks connections) > NGFW (application-aware inspection).",
+    "Default deny with explicit allows; first matching rule wins.",
+    "IDS = out-of-band, alerts; IPS = inline, blocks; signatures catch known, anomalies catch novel.",
+    "WAF protects web applications specifically; proxies mediate and inspect requests; VPNs encrypt tunnels.",
+    "AI-powered detection learns normal traffic and flags anomalies; monitor for drift and false positives."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A sensor receives a copy of traffic via a switch mirror port and raises alerts but cannot block. What is it?",
+      "choices": {
+        "A": "An IPS, because it inspects traffic",
+        "B": "An IDS, deployed out of band",
+        "C": "A firewall in default-deny mode",
+        "D": "A VPN concentrator"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Watching a mirrored copy and alerting without the ability to block is the defining behavior of an intrusion detection system, deployed out of band. Inline blocking would make it an IPS."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "An AI-powered IPS suddenly begins blocking legitimate traffic after a new application rollout changed normal patterns. Which concept explains the failures?",
+      "choices": {
+        "A": "TLS was disabled on the IPS",
+        "B": "Signature database corruption",
+        "C": "The firewall rules were alphabetized",
+        "D": "The model's learned normal is stale, producing false positives (a drift problem)"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Anomaly-based, learned-normal detection misfires when the environment shifts and the baseline no longer matches reality, which is a drift and tuning problem, not a signature or rule-ordering issue."
+    }
+  ]
+}

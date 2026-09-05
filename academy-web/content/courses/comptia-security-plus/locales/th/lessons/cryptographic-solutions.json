@@ -1,0 +1,166 @@
+{
+  "nodeId": "cryptographic-solutions",
+  "locale": "th",
+  "title": "การใช้งาน Cryptography",
+  "objective": "เมื่อจบบทเรียนนี้ ผู้เรียนจะเลือกระหว่าง symmetric และ asymmetric encryption ได้ อธิบาย hashing และ digital signature ได้ และจับคู่เครื่องมือ cryptography แต่ละตัวกับ confidentiality, integrity หรือ non-repudiation ได้",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "encryption สองตระกูล"
+    },
+    {
+      "kind": "paragraph",
+      "text": "symmetric encryption ใช้ shared key เดียวกันทั้งล็อกและปลดล็อก ข้อดีคือเร็ว จึงเป็นม้างานหลักสำหรับข้อมูลจำนวนมาก เช่น การเข้ารหัส disk และไฟล์ จุดอ่อนคือ key distribution: ทั้งสองฝ่ายต้องมี secret key เดียวกัน และการส่ง key ให้กันอย่างปลอดภัยก็เป็นปัญหาใหม่ของตัวเอง"
+    },
+    {
+      "kind": "paragraph",
+      "text": "asymmetric encryption ใช้ key pair: public key ที่ใครก็เอาไปล็อกข้อมูลได้ และ private key ที่เจ้าของเท่านั้นใช้ปลดล็อก ข้อเสียคือช้ากว่า symmetric ระบบจริงจึงใช้แบบผสม: asymmetric ใช้แลก session key สั้น ๆ แล้วให้ symmetric เข้ารหัส traffic ต่อ TLS ทำงานแบบนี้"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "คุณสมบัติ",
+        "Symmetric",
+        "Asymmetric"
+      ],
+      "rows": [
+        [
+          "Key",
+          "shared secret key หนึ่งดอก",
+          "public key บวก private key"
+        ],
+        [
+          "ความเร็ว",
+          "เร็ว เหมาะกับข้อมูลจำนวนมาก",
+          "ช้ากว่า เหมาะกับ key exchange และ signature"
+        ],
+        [
+          "ปัญหาหลัก",
+          "การส่ง key ให้กันอย่างปลอดภัย",
+          "การพิสูจน์ว่าใครเป็นเจ้าของ public key"
+        ],
+        [
+          "ชื่อที่พบบ่อย",
+          "AES, ChaCha20",
+          "RSA, elliptic curve (ECC)"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "hashing: integrity ที่ไม่ต้องมี key"
+    },
+    {
+      "kind": "paragraph",
+      "text": "hash function เปลี่ยน input ใด ๆ ให้เป็น digest ที่มีความยาวคงที่ แก้ input เพียงหนึ่ง byte  digest ก็เปลี่ยนไปทั้งหมด hashing เป็นแบบทางเดียว นำ digest กลับไปสร้าง input เดิมไม่ได้ คุณสมบัตินี้ทำให้ hash เหมาะกับการตรวจ integrity และการเก็บ password ด้วย hash function ที่ช้าและมีการ salt"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "MD5 ให้ digest ยาว 128 บิต และถือว่าแตกแล้วในเชิงความมั่นคงปลอดภัย",
+        "ตระกูล SHA-2 (SHA-256, SHA-512) เป็นทางเลือกมาตรฐานที่ใช้กันทั่วไป",
+        "salting เติมข้อมูลสุ่มก่อน hash เพื่อให้ password เหมือนกันให้ผล hash ต่างกัน",
+        "digital signature ทำโดย hash ข้อความ แล้วเข้ารหัส digest ด้วย private key ของผู้ส่ง ได้ทั้ง integrity และ non-repudiation"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "PKI ในห้าประโยค"
+    },
+    {
+      "kind": "paragraph",
+      "text": "certificate authority (CA) เซ็น certificate ที่ผูก public key เข้ากับ identity ระบบปฏิบัติการและ browser ของผู้เรียนมารายชื่อ root CA ที่เชื่อถือมาให้แล้ว เมื่อเว็บไซต์แสดง certificate อุปกรณ์จะตรวจ chain ขึ้นไปจนถึง root ที่เชื่อถือ วันที่ยังใช้ได้ และสถานะ revocation ถ้าผ่านทั้งหมด อุปกรณ์จึงเชื่อ public key นั้น ทุกอย่างตั้งแต่ HTTPS ไปจนถึง code signing ยืนอยู่บน chain of trust นี้"
+    },
+    {
+      "kind": "heading",
+      "text": "แนวคิดการโจมตีระดับข้อสอบ"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "การโจมตี",
+        "แนวคิดแบบภาษาบ้าน"
+      ],
+      "rows": [
+        [
+          "Collision",
+          "input ต่างกันสองอันให้ digest เดียวกัน MD5 เป็นตัวอย่างคลาสสิก"
+        ],
+        [
+          "Birthday attack",
+          "การหา collision ใด ๆ ก็ได้ ง่ายกว่าการเดาล่วงหน้ามาก"
+        ],
+        [
+          "Downgrade",
+          "หลอกทั้งสองฝ่ายให้ใช้เวอร์ชัน protocol เก่าที่อ่อนแอกว่า"
+        ],
+        [
+          "Replay",
+          "ดักจับข้อมูลที่ถูกต้อง เช่น login token แล้วส่งซ้ำภายหลัง"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "บนข้อสอบ",
+      "text": "จับคู่เป้าหมายกับเครื่องมือ: confidentiality ต้องใช้ encryption, integrity ต้องใช้ hashing, non-repudiation ต้องใช้ digital signature กับ private key เมื่อใดก็ตามที่ข้อสอบพูดถึง repudiation คำตอบมักเกี่ยวกับ private key ของผู้ส่งเกือบทั้งหมด"
+    },
+    {
+      "kind": "lab",
+      "title": "แลป: Hash and Verify",
+      "description": "hash ไฟล์ด้วย SHA-256 แก้ไขหนึ่ง byte แล้ว hash ใหม่ แล้วดู digest เปลี่ยนทั้งหมด เทียบความยาว digest ของ MD5 กับ SHA-256 แบบเคียงกัน คู่มือฉบับเต็ม: labs/hash-and-verify.th.md",
+      "estimatedMinutes": 20,
+      "status": "ready",
+      "scale": "full"
+    },
+    {
+      "kind": "try",
+      "title": "ฝึกจับคู่เป้าหมายกับเครื่องมือ",
+      "steps": [
+        "เขียนเป้าหมายสี่ข้อนี้ลงกระดาษ: confidentiality, integrity, non-repudiation, key exchange",
+        "สำหรับแต่ละเป้าหมาย เขียนชื่อเครื่องมือ cryptography ที่ทำหน้าที่นั้น",
+        "แล้วสลับทิศ: สำหรับแต่ละเครื่องมือ (symmetric encryption, hash, digital signature, asymmetric key pair) เขียนเป้าหมายที่มันรับผิดชอบ",
+        "ทำซ้ำจนจับคู่ได้ทันทีโดยไม่ต้องคิด เพราะข้อสอบจะทดสอบ mapping นี้ทั้งสองทิศทาง"
+      ],
+      "expected": "confidentiality ใช้ symmetric encryption กับข้อมูล, integrity ใช้ hash, non-repudiation ใช้ digital signature, key exchange ใช้ asymmetric pair สังเกตด้วยว่า signature ให้ integrity ด้วย เพราะครอบคลุม digest ของข้อความ"
+    }
+  ],
+  "cheatsheet": [
+    "symmetric = shared key ดอกเดียว เร็ว เหมาะกับข้อมูลจำนวนมาก asymmetric = public บวก private key ช้ากว่า เหมาะกับ key exchange และ signature",
+    "hash = digest ทางเดียวสำหรับ integrity เก็บ password ต้อง salt ก่อน hash, MD5 แตกแล้ว SHA-256 เป็นทางเลือกปกติ",
+    "digital signature = hash ที่เข้ารหัสด้วย private key ของผู้ส่ง = integrity บวก non-repudiation",
+    "PKI: CA เซ็น certificate ผูก identity กับ public key อุปกรณ์ตรวจ chain of trust",
+    "การโจมตีเชิงแนวคิด: collision, birthday, downgrade, replay"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "ผู้จัดการต้องพิสูจน์ว่าไฟล์สัญญามาจากผู้อำนวยการคนใดคนหนึ่งจริง และไม่ถูกแก้ไข คู่คำตอบใดให้ทั้ง non-repudiation และ integrity",
+      "choices": {
+        "A": "symmetric encryption ด้วย AES",
+        "B": "hash ไฟล์ด้วย SHA-256",
+        "C": "เข้ารหัสไฟล์ด้วย public key ของผู้จัดการ",
+        "D": "digital signature ด้วย private key ของผู้อำนวยการ"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "digital signature ให้ integrity ผ่าน hash และให้ non-repudiation ผ่าน private key การ hash อย่างเดียวได้ integrity แต่ไม่พิสูจน์ต้นทาง ส่วนการเข้ารหัสซ่อนเนื้อหาแต่ไม่พิสูจน์ว่าใครส่ง"
+    },
+    {
+      "id": "cp-2",
+      "prompt": "คุณสมบัติใดของ hash ที่ทำให้ใช้ตรวจไฟล์ที่ดาวน์โหลดได้",
+      "choices": {
+        "A": "digest ย้อนกลับไปสร้างไฟล์เดิมได้",
+        "B": "digest ยาวขึ้นตามขนาดไฟล์",
+        "C": "ไฟล์เปลี่ยนแม้เพียงเล็กน้อย digest ก็เปลี่ยนทั้งหมด",
+        "D": "ไฟล์เดิมให้ digest ต่างกันทุกครั้งที่รัน"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "hash เป็น deterministic และต้าน collision ในทางปฏิบัติ: input เดิมให้ digest เดิมเสมอ และการแก้เล็กน้อยทำให้ digest เปลี่ยนทั้งหมด ถ้าย้อนกลับได้ก็ใช้ทำอะไรในจุดนี้ไม่ได้"
+    }
+  ]
+}

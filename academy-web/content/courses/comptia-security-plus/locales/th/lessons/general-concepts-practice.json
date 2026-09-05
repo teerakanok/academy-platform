@@ -1,0 +1,115 @@
+{
+  "nodeId": "general-concepts-practice",
+  "locale": "th",
+  "title": "Practice: แนวคิดความมั่นคงปลอดภัยทั่วไป",
+  "objective": "เมื่อจบบทเรียนนี้ ผู้เรียนจะจัด control ที่ได้รับมาให้ตกใน preventive, detective, corrective หรือ deterrent ได้ทันทีภายใต้แรงกดดันแบบข้อสอบ และเลือกเครื่องมือ cryptographic ที่ถูกต้องให้สถานการณ์ได้ตั้งแต่อ่านจบรอบแรก",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "ทำไมต้องลงมือตอนนี้"
+    },
+    {
+      "kind": "paragraph",
+      "text": "ผู้เรียนอ่านเรื่อง control function กับตระกูล crypto มาแล้ว และรายการเหล่านั้นน่าจะดูเรียบร้อยดี แต่ข้อสอบไม่ยื่นรายการสวย ๆ ให้ ข้อสอบยื่นประโยคเกี่ยวกับกล้อง ป้ายแจ้งเตือน หรือการ restore backup มาหนึ่งประโยค แล้วการจัดประเภทต้องเกิดขึ้นในลมหายใจเดียว การคัดแยก control ด้วยปากกาของตัวเอง และการจับคู่สถานการณ์ crypto แบบสลับลำดับ คือสิ่งที่ทำให้ mapping เหล่านี้เปลี่ยนจากรู้จักเป็นรีเฟล็กซ์"
+    },
+    {
+      "kind": "heading",
+      "text": "แบบฝึก 1: จัดแปด control"
+    },
+    {
+      "kind": "try",
+      "title": "จัดประเภทบนกระดาษ ในสองนาที",
+      "steps": [
+        "คัดลอกแปด control นี้ลงกระดาษ: 1) rule ของ firewall ที่บล็อก Telnet จากอินเทอร์เน็ต 2) กล้อง CCTV ใน data center 3) การ restore backup คืนของเมื่อคืนหลังโดน ransomware 4) ป้าย logon แจ้งว่ากิจกรรมทั้งหมดถูกบันทึก 5) รปภ. ที่โต๊ะต้อนรับ 6) IPS ที่ทิ้ง traffic อันตรายกลางสาย 7) การ wipe แล้ว build เครื่อง laptop ที่ติดมัลแวร์ใหม่ 8) การเปิดดู alert ของ SIEM ทุกวันจันทร์หา logon ผิดปกติ",
+        "วาดสี่คอลัมน์: preventive, detective, corrective, deterrent วาง control แต่ละตัวลงคอลัมน์เดียว พร้อมเหตุผลสามคำข้าง ๆ",
+        "ติดดาวสองตำแหน่งที่ผู้เรียนคิดว่าอ้างเถียงได้ แล้วเขียนคำอ้างของอีกคอลัมน์",
+        "ตั้งเวลาแล้วทำซ้ำจากศูนย์พรุ่งนี้ รอบสองควรใช้เวลาครึ่งเดียว"
+      ],
+      "expected": "firewall rule และ IPS เป็น preventive (หยุดเหตุการณ์) CCTV และการรีวิว SIEM เป็น detective (เผยสิ่งที่เกิดขึ้นหรือกำลังเกิด) การ restore backup และการ rebuild laptop เป็น corrective (คืนสถานะที่ปกติ) ป้าย logon เป็น deterrent (ทำให้ไม่กล้า) ส่วน รปภ. คือข้อโต้แย้งคลาสสิก: เป็น deterrent ถ้าสายตาและการมีอยู่ทำให้เกรงกลัว เป็น preventive ถ้าหน้าที่คือขวางกั้นการเข้าถึงทางกายภาพ คำตอบข้อสอบยึดกับถ้อยคำเรื่องการทำให้ไม่กล้า IPS ก็เถียงได้เพราะมัน detect แล้ว correct ในจังหวะเดียว แต่ผลลัพธ์ที่ส่งมอบคือการป้องกัน"
+    },
+    {
+      "kind": "paragraph",
+      "text": "สังเกตสิ่งที่ตำแหน่งที่ติดดาวสอน: function ตั้งชื่อผลลัพธ์ ไม่ใช่อุปกรณ์ กล้องเป็น detective ตั้งแต่บันทึกและยังเป็น detective อยู่ระหว่าง review หลังเหตุการณ์ อุปกรณ์เดียวกันถ้ามีลำโพงประกาศเสียงดังก็กลายเป็น deterrent เมื่อคำตอบสองทางดูถูกทั้งคู่ ให้ถามว่าสถานการณ์บอกว่า control นี้บรรลุอะไร แล้วจับคำกริยานั้นไปเทียบกับ function"
+    },
+    {
+      "kind": "heading",
+      "text": "แบบฝึก 2: จับคู่ห้าสถานการณ์ crypto"
+    },
+    {
+      "kind": "try",
+      "title": "เลือกเครื่องมือ บอกคุณสมบัติ",
+      "steps": [
+        "สำหรับแต่ละสถานการณ์ เลือกหนึ่งเครื่องมือ: symmetric encryption, asymmetric encryption, hash, digital signature",
+        "1) เข้ารหัส disk image ขนาด 2 TB กลางคืนโดยความเร็วสำคัญ 2) ส่ง session key ขนาด 256-bit ให้คู่ค้าโดยมีแต่คู่ค้าอ่านได้ 3) เผย digest ข้างลิงก์ดาวน์โหลดให้ผู้ซื้อตรวจไฟล์ 4) ผู้อำนวยการอนุมัติใบสั่งซื้อเพื่อให้ vendor พิสูจน์ได้ว่าใครเซ็น 5) เก็บ password ให้ผู้ใช้สองคนที่ตั้ง password เดียวกันมีค่าที่เก็บต่างกัน",
+        "สำหรับแต่ละทางเลือก บอกคุณสมบัติที่ได้: confidentiality, integrity หรือ non-repudiation",
+        "แล้วสลับทิศทาง: สำหรับแต่ละเครื่องมือ เขียนสถานการณ์บรรทัดเดียวที่ข้อสอบจะใช้ชี้มาที่มัน"
+      ],
+      "expected": "1) Symmetric เพื่อความเร็วกับข้อมูลมหาศาล: confidentiality 2) Asymmetric โดย public key ล็อกการแลกเปลี่ยน key: confidentiality ของ session key 3) Hash: integrity 4) Digital signature: integrity บวก non-repudiation เพราะ private key เป็นของผู้อำนวยการ 5) Salted hash: ตรวจยืนยันได้โดยไม่ต้องเก็บ password จริง คิวที่ข้อสอบใช้ซ้ำ: ความเร็วและข้อมูลจำนวนมากชี้ที่ symmetric การกระจาย key ชี้ที่ asymmetric การตรวจแก้ไขชี้ที่ hash การพิสูจน์ผู้ส่งชี้ที่ signature"
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "mapping สองวินาที",
+      "text": "confidentiality ต้องการ encryption, integrity ต้องการ hash, non-repudiation ต้องการ digital signature ด้วย private key ของผู้ส่ง เมื่อสถานการณ์พูดถึง repudiation หรือการพิสูจน์ที่มา ให้สแกนหาคำว่า private key ในตัวเลือกก่อนอ่านจบทั้งหมด"
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Control Types Classify",
+      "description": "ลาก control สิบตัวลงถัง preventive, detective, corrective และ deterrent แล้วโต้แย้งสองตำแหน่งที่อ้างได้ใน debrief แบบฉบับเต็ม: labs/control-types-classify.lab.th.md",
+      "estimatedMinutes": 10,
+      "status": "coming-soon",
+      "scale": "inline"
+    }
+  ],
+  "cheatsheet": [
+    "control function ตั้งชื่อผลลัพธ์: preventive หยุด, detective เผย, corrective คืนสถานะ, deterrent ทำให้ไม่กล้า",
+    "ตำแหน่งที่เถียงได้ตัดสินด้วยคำกริยาของสถานการณ์ ไม่ใช่ตัวอุปกรณ์: คนเฝ้าที่ขวางคือ preventive การมีอยู่ที่ทำให้เกรงกลัวคือ deterrent",
+    "ความเร็วและข้อมูลจำนวนมากชี้ที่ symmetric encryption การกระจาย key ชี้ที่ asymmetric",
+    "การตรวจแก้ไขชี้ที่ hashing การพิสูจน์ผู้ส่งชี้ที่ digital signature และ private key",
+    "การเก็บ password คือ slow salted hash เพื่อให้ password เหมือนกันไม่มีวันหน้าตาเหมือนกัน"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "หลังคลังสินค้าถูกก่อกวน ทีมสืบสวนเปิดฟุตเทจกล้องประตูย้อนหลังเพื่อประกอบภาพว่าของอะไรหายเมื่อไร กล้องทำหน้าที่ control function ใด",
+      "choices": {
+        "A": "Preventive เพราะกล้องอยู่ที่ทางเข้า",
+        "B": "Deterrent เพราะผู้บุกรุกกลัวการถูกบันทึก",
+        "C": "Corrective เพราะเกิดขึ้นหลังเหตุการณ์",
+        "D": "Detective เพราะฟุตเทจเผยสิ่งที่เกิดขึ้น"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "สถานการณ์บอกว่าฟุตเทจถูกใช้เรียนรู้ว่าเกิดอะไรขึ้น ซึ่งคือหน้าที่ detective คำตอบ deterrent ต้องมีถ้อยคำเรื่องทำให้ไม่กล้าลอง และเวลาที่เกิดขึ้นเพียงลำพังไม่ทำให้ control ใดเป็น corrective เลย"
+    },
+    {
+      "id": "cp-2",
+      "prompt": "บริษัทติดป้าย logon ระบุว่ากิจกรรมทั้งหมดถูกเฝ้าดูและการใช้ผิดวัตถุประสงค์จะถูกดำเนินคดี ป้ายนี้ทำหน้าที่ control function ใด",
+      "choices": {
+        "A": "Preventive",
+        "B": "Deterrent",
+        "C": "Corrective",
+        "D": "Detective"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "ป้ายไม่เปลี่ยนอะไรทางเทคนิคเลย มันลดแรงจูงใจทำผิดโดยประกาศผลที่ตามมา ซึ่งคือหน้าที่ deterrent มันไม่ได้เฝ้าดูอะไรและไม่ได้คืนสถานะอะไร"
+    },
+    {
+      "id": "cp-3",
+      "prompt": "vendor ซอฟต์แวร์ต้องการให้ลูกค้ายืนยันว่าไฟล์ patch ไม่ถูกแก้หลังปล่อยตัว และมาจากตัว vendor เอง กลไกเดียวใดส่งมอบทั้งสองอย่าง",
+      "choices": {
+        "A": "digital signature ที่สร้างด้วย private key ของ vendor",
+        "B": "เผย digest SHA-256 ของ patch",
+        "C": "เข้ารหัส patch ด้วย AES แบบ symmetric",
+        "D": "เข้ารหัส patch ด้วย public key ของลูกค้าแต่ละราย"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "signature ครอบ digest ไว้ ของแก้หนึ่งจุดก็พังทันที และมีเพียง private key ของ vendor ที่สร้างมันได้ จึงได้ integrity บวกการพิสูจน์ที่มา digest เปล่า ๆ ให้ integrity แต่ไม่พิสูจน์ว่าใครเผยแพร่ ส่วน encryption ซ่อนเนื้อหาเท่านั้น"
+    }
+  ]
+}

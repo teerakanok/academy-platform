@@ -1,0 +1,131 @@
+{
+  "nodeId": "risk-management",
+  "locale": "en",
+  "title": "Risk Management",
+  "objective": "By the end of this lesson you can score a risk on a likelihood and impact matrix, choose a treatment for it, explain residual risk, and keep a risk register that a manager can actually read.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Risk in one sentence"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A risk is what happens when a threat meets a vulnerability on something the organization values. Rain is a threat, a flat roof is a vulnerability, and the server room under that roof is the asset. Risk management is the discipline of writing that sentence down, scoring it, deciding what to do about it, and recording the decision."
+    },
+    {
+      "kind": "heading",
+      "text": "Score before you decide"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Score",
+        "Likelihood",
+        "Impact"
+      ],
+      "rows": [
+        [
+          "1",
+          "Rare",
+          "Negligible"
+        ],
+        [
+          "2",
+          "Unlikely",
+          "Minor"
+        ],
+        [
+          "3",
+          "Possible",
+          "Moderate"
+        ],
+        [
+          "4",
+          "Likely",
+          "Major"
+        ],
+        [
+          "5",
+          "Almost certain",
+          "Severe"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Multiply the two numbers for a 1 to 25 risk score. Many programs call 1 to 5 low, 6 to 12 medium, and 15 to 25 high. The exact bands vary by organization, but the exam expects you to read a matrix, compare scores, and rank what to treat first."
+    },
+    {
+      "kind": "heading",
+      "text": "Four treatments"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Mitigate: add controls to lower likelihood or impact, such as patching or MFA.",
+        "Transfer: move the financial impact to another party, most commonly cyber-insurance or a contract clause.",
+        "Accept: document the risk and have an owner sign off, usually because treatment costs more than the loss.",
+        "Avoid: stop the risky activity entirely, such as cancelling an unacceptably risky project."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Whatever you choose, some risk remains. That remainder is residual risk, and accepting it is a management decision, not a technical one. Control risk is a cousin worth knowing: the possibility that the control itself fails or does not work as intended."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "On the exam",
+      "text": "Insurance transfers the financial impact, not the incident itself. If a question implies that buying cyber-insurance removed the risk, that answer is wrong: reputational damage and downtime stay with you, so residual risk remains. Also remember that acceptance is deliberate and recorded, never the same as ignoring a risk."
+    },
+    {
+      "kind": "heading",
+      "text": "The risk register"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A register lists each risk with its asset, threat, vulnerability, score, owner, chosen treatment, and status. The owner is the person accountable for the decision, which is usually a manager rather than the engineer who fixes it. On the exam, read for the risk owner and the treatment language: sign-off means accept, control means mitigate, policy or contract means transfer, and cancellation means avoid."
+    },
+    {
+      "kind": "lab",
+      "title": "Risk Matrix Workshop",
+      "description": "Score six given scenarios on a 5x5 matrix, pick a treatment for each, and state the residual risk. Full guide: labs/risk-matrix-workshop.en.md.",
+      "estimatedMinutes": 30,
+      "status": "ready",
+      "scale": "full"
+    },
+    {
+      "kind": "try",
+      "title": "Treat three risks",
+      "steps": [
+        "A legacy payroll system cannot be patched (score 15). A supplier contract now includes a security liability clause (score 8). A marketing microsite with no personal data has a defacement risk (score 4).",
+        "For each, name the treatment already chosen or the one you would choose.",
+        "For the payroll system, state what the residual risk is if it is moved to an isolated segment with extra logging."
+      ],
+      "expected": "Payroll on an isolated segment is mitigation and the remaining exposure is the residual risk, which someone must accept and sign. The liability clause transfers financial impact. The microsite is a candidate for acceptance because the impact is minor and treatment would cost more."
+    }
+  ],
+  "cheatsheet": [
+    "Risk score = likelihood (1-5) x impact (1-5); rank treatments from the highest score down.",
+    "Treatments: mitigate with controls, transfer the financial impact, accept and record with sign-off, avoid by stopping the activity.",
+    "Residual risk always remains after treatment; accepting it is a management decision.",
+    "Cyber-insurance transfers money, not the incident: reputation and downtime stay home.",
+    "A risk register records asset, threat, vulnerability, score, owner, treatment, and status."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A retailer buys cyber-insurance to cover a warehouse control system it cannot upgrade. Six months later a compromise of that system still forces a week of closed stores. What does this outcome demonstrate?",
+      "choices": {
+        "A": "The risk was avoided",
+        "B": "The register should have recorded the risk as mitigated",
+        "C": "The insurance eliminated the control risk",
+        "D": "The transfer moved only the financial impact, and residual risk remained"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Insurance transfers financial impact only. The incident itself, plus downtime and reputational harm, remained with the retailer, which is exactly what residual risk means."
+    }
+  ]
+}

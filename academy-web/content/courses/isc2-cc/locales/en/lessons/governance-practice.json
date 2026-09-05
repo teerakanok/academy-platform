@@ -1,0 +1,188 @@
+{
+  "nodeId": "governance-practice",
+  "locale": "en",
+  "title": "Practice: Risk Registers and KRIs",
+  "objective": "By the end of this lesson you can score and rank a four-row risk register, choose a treatment per risk, and read a KRI dashboard to find the metric that needs management action.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Governance exam questions rarely ask what a risk is; they hand you a half-filled register or a dashboard and ask what to do next. Scoring likelihood times impact, ranking, and choosing the treatment is spreadsheet muscle, and reading a KRI against its threshold is an eyes-on skill. Both compress well into two short drills."
+    },
+    {
+      "kind": "heading",
+      "text": "Drill 1: score and treat the register"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Here is a real-shaped register with four rows. Score each risk as likelihood times impact on the 1-to-5 scale, rank them, then pick one treatment for each: mitigate, transfer, accept, or avoid."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "ID",
+        "Risk",
+        "Likelihood (1-5)",
+        "Impact (1-5)",
+        "Treatment today"
+      ],
+      "rows": [
+        [
+          "R1",
+          "Phishing steals staff credentials",
+          "4",
+          "4",
+          "Yearly awareness email"
+        ],
+        [
+          "R2",
+          "Single-region cloud outage takes the shop offline",
+          "2",
+          "5",
+          "None"
+        ],
+        [
+          "R3",
+          "Minor office laptop theft",
+          "3",
+          "1",
+          "None"
+        ],
+        [
+          "R4",
+          "Unpatched legacy app CVE is exploited",
+          "5",
+          "3",
+          "Partial WAF rule"
+        ]
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Score the register",
+      "steps": [
+        "Compute the score for R1 to R4 and write the ranking from highest to lowest.",
+        "For each risk, choose the treatment and justify it in one sentence: what the score says, and what the cost of fixing says.",
+        "Mark which risks keep residual risk even after your chosen treatment, and say where that leftover risk must be recorded."
+      ],
+      "expected": "Scores: R1 = 16, R4 = 15, R2 = 10, R3 = 3. Ranking: R1, R4, R2, R3. R1 mitigate: enable MFA with number-matching and quarterly phishing simulations; residual risk stays because people still click. R4 mitigate or accept with a deadline: patch or isolate the app; the partial WAF rule alone leaves residual risk that belongs in the register. R2 mitigate or transfer: second region plus a tested failover, or insurance for the revenue loss; impact 5 justifies spend despite likelihood 2. R3 accept: score 3 with cheap tolerance; full-disk encryption is still worth it as a cheap reducing move. All treated risks keep residual risk recorded in the register with an owner and a review date."
+    },
+    {
+      "kind": "heading",
+      "text": "Drill 2: read the KRI dashboard"
+    },
+    {
+      "kind": "paragraph",
+      "text": "KRIs only mean something against their threshold and their trend. The dashboard below has one metric that needs action now, and the skill is spotting which one and saying what management hears."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "KRI",
+        "Threshold",
+        "Current",
+        "Trend"
+      ],
+      "rows": [
+        [
+          "Phishing simulation click rate",
+          "At or below 5%",
+          "11%",
+          "Rising for 3 months"
+        ],
+        [
+          "Critical systems past patch SLA",
+          "0",
+          "2",
+          "Flat"
+        ],
+        [
+          "MFA coverage on admin accounts",
+          "100%",
+          "100%",
+          "Flat"
+        ],
+        [
+          "Weekly backup jobs failing",
+          "At or below 2%",
+          "6%",
+          "Rising for 2 months"
+        ]
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Which KRI is screaming",
+      "steps": [
+        "Mark every KRI that breaches its threshold, then name the single one you escalate first and say why in one sentence.",
+        "Draft the two sentences you report to management for that KRI: what it measures, and what you recommend with an owner and a date.",
+        "Say what you do with the two KRIs that are healthy, if anything."
+      ],
+      "expected": "Breaching: click rate (11% vs 5%, rising) and backup failures (6% vs 2%, rising). Escalate the click rate first: it is the leading sign of the R1-style credential theft, the top register risk, and three months of rise says systemic rather than fluke. Report: 'Staff click simulated phishing at 11% against our 5% limit, rising three months running; we will run targeted retraining for the top-clicking team and enforce MFA number-matching by end of quarter, owner: awareness lead.' Backup failures are the close second and pair with the continuity story. Healthy KRIs: keep reporting them monthly at a glance; a flat healthy KRI is evidence the control works, and a later jump becomes visible against that baseline."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Score before you choose: the highest likelihood-times-impact risk is treated first when the question asks priorities. Treatment keywords: mitigate reduces it, transfer hands the loss to another party, avoid stops the activity, accept documents it. KRI questions turn on threshold plus trend: a breach that is rising beats a breach that is flat."
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Classify the Risk Treatments",
+      "description": "Drag nine risk scenarios into accept, transfer, avoid, and mitigate bins; two of them are genuinely debatable and the debrief explains why. Full design: labs/risk-treatment-classify.lab.en.md.",
+      "estimatedMinutes": 15,
+      "status": "coming-soon",
+      "scale": "inline"
+    }
+  ],
+  "cheatsheet": [
+    "Register score = likelihood x impact on the stated scale; rank before you choose treatments.",
+    "Treatments: mitigate reduces it, transfer hands the loss to another party, avoid stops the activity, accept documents and monitors it.",
+    "Every treated risk keeps residual risk in the register, with an owner and a review date.",
+    "A KRI needs threshold plus trend: a breach that is rising beats a breach that is flat.",
+    "Report to management with: what the KRI measures, the recommendation, the owner, and the date."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A register shows risk A scored 20 and risk B scored 6. Budget covers treating only one this quarter. Which action best fits governance practice?",
+      "choices": {
+        "A": "Treat risk B first because it is cheaper",
+        "B": "Delete both from the register until next year",
+        "C": "Treat neither and buy insurance for both",
+        "D": "Treat risk A first because it carries the highest score and exposure"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Ranking exists to sequence spending: the highest-scored risk is treated first, then the register is reviewed for the next one. Insurance for both is a treatment decision to evaluate per risk, and risks are never deleted, only accepted with documentation."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A KRI dashboard shows phishing click rate 12% against a 5% threshold, rising for three months, while every other KRI is inside its threshold. What does sound reporting to management look like?",
+      "choices": {
+        "A": "Report only the healthy KRIs to show the program works",
+        "B": "Report the breach, the trend, and a recommendation with an owner and a date",
+        "C": "Raise the threshold to 15% so the KRI turns green",
+        "D": "Wait another month to confirm the trend before mentioning it"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Management reporting carries the threshold breach, the trend, and a costed recommendation with ownership. Moving the threshold hides the signal, and waiting a month on a three-month rise wastes the warning the KRI exists to give."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A company located on a flood plain buys insurance covering data center flood damage. Which risk treatment is this?",
+      "choices": {
+        "A": "Transfer",
+        "B": "Mitigate",
+        "C": "Avoid",
+        "D": "Accept"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Insurance hands the financial loss to another party while the risk itself stays: that is transfer. Avoid would move the data center off the flood plain, and mitigate would reduce the damage, for example with barriers."
+    }
+  ]
+}

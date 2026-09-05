@@ -1,0 +1,166 @@
+{
+  "nodeId": "iam-practice",
+  "locale": "en",
+  "title": "Practice: Least Privilege and the Identity Lifecycle",
+  "objective": "By the end of this lesson you can review an entitlement table and trim it with least privilege, separation of duties, and need to know, and you can order a leaver deprovisioning checklist.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "IAM exam scenarios are almost never about definitions; they hand you a permissions list and ask what is wrong with it. The skill is reading a table of who-holds-what and spotting the permission that exceeds the job, then ordering the cleanup when someone leaves. Two drills build exactly that."
+    },
+    {
+      "kind": "heading",
+      "text": "Drill 1: the entitlement review"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Here is the access review export for one small company. For each row decide keep or trim. If you trim, name the exact permission to remove and the principle it violates: least privilege, need to know, or separation of duties."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Employee",
+        "Role",
+        "Permissions granted"
+      ],
+      "rows": [
+        [
+          "Tania",
+          "Help desk analyst",
+          "Reset user passwords; view all user profiles; delete user accounts"
+        ],
+        [
+          "Mark",
+          "Application developer",
+          "Deploy to staging; deploy to production; edit IAM role policies"
+        ],
+        [
+          "Ana",
+          "Accounts payable clerk",
+          "Create invoices; approve invoices she created; export the vendor master list"
+        ],
+        [
+          "Pete",
+          "Intern",
+          "View internal wiki; edit internal wiki; export the staff directory"
+        ],
+        [
+          "Lek",
+          "Line manager",
+          "Record team leave; view salaries of all staff; edit the org structure"
+        ],
+        [
+          "Nu",
+          "External auditor",
+          "Read configuration settings; read audit logs; change firewall rules"
+        ]
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Trim the entitlements",
+      "steps": [
+        "For each of the six rows, write keep or trim, the permission to remove, and the principle it violates.",
+        "Mark the row where the problem is separation of duties rather than too much access, and say the two-person fix.",
+        "Say which existing IAM feature would have prevented three of these rows from drifting: role-based assignments, quarterly access reviews, or self-service groups."
+      ],
+      "expected": "Tania: trim delete user accounts — least privilege; help desk resets, account deletion belongs to identity admins. Mark: trim edit IAM role policies — least privilege plus separation of duties; a developer who can change policies can grant themselves anything, so production deploys go through a pipeline and policy edits go to a separate admin. Ana: trim approve invoices she created — separation of duties; creation and approval must sit with different people. Pete: trim export the staff directory — need to know; an intern reads and edits wiki pages, staff contact data serves no intern task. Lek: trim view salaries of all staff — need to know; leave recording for his team needs his team's data, not company-wide payroll. Nu: trim change firewall rules — least privilege and auditor independence; auditors read, never reconfigure what they audit. Feature: role-based assignment with quarterly access reviews; drift accumulates when permissions attach to persons instead of roles and reviews never trim them."
+    },
+    {
+      "kind": "heading",
+      "text": "Drill 2: order the leaver checklist"
+    },
+    {
+      "kind": "paragraph",
+      "text": "An employee's last working day ends at 17:00. The steps below arrive shuffled, the way real tickets do. Write them in the order you would execute them."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "A — Transfer mailbox and files to the departing employee's manager.",
+        "B — Confirm the last working day with HR.",
+        "C — Disable the accounts in the directory.",
+        "D — Revoke MFA devices, active sessions, and API tokens.",
+        "E — Collect the badge and revoke physical access.",
+        "F — Open a ticket with the access team.",
+        "G — Verify in the next access review that nothing remains active.",
+        "H — Archive per retention policy, then delete."
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Order the leaver checklist",
+      "steps": [
+        "Write your order for A to H as a single sequence, noting any steps you would run in parallel at 17:00 sharp.",
+        "Say why the sequence disables accounts before deleting them, and what is lost if you delete first.",
+        "Add the one check that catches service accounts and scheduled scripts the departed employee owned."
+      ],
+      "expected": "Order: B, F, then at 17:00 run C, D, and E together (disable directory accounts, revoke MFA, sessions, tokens, and physical access), then A (mailbox and file transfer for the manager), then H (archive and delete after retention rules allow), and G closes the loop at the next review. Disable before delete: deletion destroys the audit trail linking past actions to the identity and breaks mailbox retention, while disabling stops access instantly and keeps records intact. The extra check: query for service accounts, API keys, and scheduled tasks owned by the departed user and reassign or revoke them; they keep running with a dead owner's rights if nobody looks."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Spot the permission that exceeds the job: creator-approver pairs fail separation of duties, broad reads of sensitive data fail need to know, and anything letting a role grant itself rights fails least privilege. Leaver questions want disable-first, preserve the trail, revoke sessions and tokens, and clean owned service accounts."
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Password Strength and MFA",
+      "description": "Audit your own passwords in a password manager, enable MFA on a real account you own, and identify the factors in use. Full guide: labs/password-strength-and-mfa.en.md.",
+      "estimatedMinutes": 25,
+      "status": "ready",
+      "scale": "full"
+    }
+  ],
+  "cheatsheet": [
+    "Entitlement review: for every row ask whether the job function needs each permission; excess fails least privilege.",
+    "Creator-approver in one person fails separation of duties; company-wide reads of sensitive data fail need to know.",
+    "A role that can edit its own permissions can grant itself anything; keep policy edits with a separate admin.",
+    "Leaver order: confirm with HR, ticket, then at exit time disable accounts, revoke MFA, sessions, tokens, and physical access together.",
+    "Disable before delete to keep the audit trail; reassign or revoke service accounts and scheduled tasks the leaver owned."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A developer can edit the IAM role policies that govern his own deployments. Which principle does this primarily violate, and what is the standard fix?",
+      "choices": {
+        "A": "Accounting; log the developer's edits",
+        "B": "Need to know; hide the policy names from the developer",
+        "C": "Separation of duties; move policy edits to a separate administrator or approval flow",
+        "D": "Defense in depth; add a firewall rule"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Whoever writes the rules that govern their own access can grant themselves anything, which breaks separation of duties; the fix moves policy authorship to a different party or an approval flow. Logging would record the abuse, and hiding names or adding a firewall rule changes nothing about the self-grant power."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "An accounts payable clerk can both create invoices and approve the invoices she created. Which control principle is broken?",
+      "choices": {
+        "A": "Least privilege",
+        "B": "Single sign-on",
+        "C": "Need to know",
+        "D": "Separation of duties"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Creation and approval of the same transaction must sit with different people; combining them in one person removes the check that separation of duties exists to provide."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "An employee leaves today at 17:00. Which action does the access team take first at that moment?",
+      "choices": {
+        "A": "Disable the account and revoke active sessions, MFA devices, and tokens",
+        "B": "Delete the account to free the license",
+        "C": "Transfer all files to a colleague for review",
+        "D": "Wait for the next quarterly access review"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Disabling stops access immediately while preserving the audit trail and mailbox for retention; deletion frees a license but destroys records that accounting and investigations may need. Transfer and review follow after access is cut."
+    }
+  ]
+}

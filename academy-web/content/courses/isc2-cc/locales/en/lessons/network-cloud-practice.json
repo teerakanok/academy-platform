@@ -1,0 +1,250 @@
+{
+  "nodeId": "network-cloud-practice",
+  "locale": "en",
+  "title": "Practice: Configure the Network Interface",
+  "objective": "By the end of this lesson you can choose static or DHCP addressing per workload, configure a full IPv4 interface by hand, and diagnose a resolver fault from symptoms.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Reading the difference between static and DHCP is not the same as typing it. In this lesson you configure two interfaces yourself, and the graded checkpoint hands you a third that is broken in a way you must diagnose from symptoms before you touch a field. Every value you need is in the brief; the work is deciding which knob serves which outcome."
+    },
+    {
+      "kind": "heading",
+      "text": "The trade: findable versus movable"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Static addressing serves things that must be findable: a web server clients reach at a published address, a printer, a camera, a firewall's management port. The address, mask, default gateway, and resolver are written down, survive every reboot, and never depend on a lease. DHCP serves things that must be movable: laptops, phones, and appliances you drop onto networks you do not control, where the local DHCP server supplies the address, mask, gateway, and resolver for you. The exam keeps asking this as a workload-matching question, and the checkpoint grades it as configuration."
+    },
+    {
+      "kind": "paragraph",
+      "text": "When a host misbehaves, split the failure before you edit anything: can it reach another machine by address? Can it resolve a name to an address? Can it get past its own segment? Each question points at one field, and fixing the wrong one wastes an outage window."
+    },
+    {
+      "kind": "simulation",
+      "challenge": {
+        "id": "dmz-web-server",
+        "title": "The DMZ web server",
+        "brief": "You administer the public web server in the DMZ. External clients are told to reach it at its published address 192.168.20.15 on the 192.168.20.0/24 segment. The segment router at 192.168.20.1 forwards traffic to other networks and also serves DNS for this segment. This morning someone left the interface on DHCP; the lease has already changed once and the site dropped off the client allow-list. Configure the interface so the service stays reachable and stays that way.",
+        "surface": "network-interface",
+        "initial": {
+          "addressMode": "dhcp",
+          "ipv4": "192.168.20.87",
+          "subnet": "255.255.255.0",
+          "gateway": "192.168.20.1",
+          "dns1": "192.168.20.1",
+          "applied": true
+        },
+        "requiredFields": {
+          "dhcp": [],
+          "static": [
+            "ipv4",
+            "subnet",
+            "gateway",
+            "dns1"
+          ]
+        },
+        "requirements": [
+          {
+            "id": "req-mode",
+            "label": "The published address must still be there after every reboot — no lease may change it",
+            "field": "addressMode",
+            "operator": "equals",
+            "value": "static"
+          },
+          {
+            "id": "req-ipv4",
+            "label": "The server must answer on the exact address the clients were told to use",
+            "field": "ipv4",
+            "operator": "equals",
+            "value": "192.168.20.15"
+          },
+          {
+            "id": "req-subnet",
+            "label": "The server must reach every other host on 192.168.20.0/24 directly, without the router",
+            "field": "subnet",
+            "operator": "equals",
+            "value": "255.255.255.0"
+          },
+          {
+            "id": "req-gateway",
+            "label": "Traffic headed beyond this segment must be handed to the segment router named in the brief",
+            "field": "gateway",
+            "operator": "equals",
+            "value": "192.168.20.1"
+          },
+          {
+            "id": "req-dns",
+            "label": "Name lookups must go to the resolver the brief names for this segment",
+            "field": "dns1",
+            "operator": "equals",
+            "value": "192.168.20.1"
+          },
+          {
+            "id": "req-applied",
+            "label": "The new settings must be applied, not left typed on screen",
+            "field": "applied",
+            "operator": "isTrue"
+          }
+        ],
+        "hints": [
+          "The /24 at the end of 192.168.20.0/24 is the mask written in shorthand: 24 network bits. Written as four octets it is the mask most office networks use.",
+          "The router and the resolver are the same host here, and the brief names it: it holds the first usable address on the segment.",
+          "Nothing counts until it is applied — the requirements read the live interface, so use the apply control before checking them."
+        ],
+        "debrief": "Static was the right call because the service is findable: clients hold a published address, so the server may not depend on a lease. Note what you did not change: the mask and the router were already right for the segment, and only the mode and the fixed address made the reachability story whole."
+      }
+    },
+    {
+      "kind": "simulation",
+      "challenge": {
+        "id": "roaming-sensor",
+        "title": "The sensor that must report home",
+        "brief": "Your company ships a monitoring appliance to a partner site. The partner's team plugs it into their own network, reserves nothing for you, and every site this appliance visits runs different addressing. The appliance still carries the static values someone typed at the previous site, so it sits on the new segment unable to talk to anything. Make it work wherever it is plugged in.",
+        "surface": "network-interface",
+        "initial": {
+          "addressMode": "static",
+          "ipv4": "10.44.9.23",
+          "subnet": "255.255.255.0",
+          "gateway": "10.44.9.1",
+          "dns1": "10.44.9.1",
+          "applied": true
+        },
+        "requiredFields": {
+          "dhcp": [],
+          "static": [
+            "ipv4",
+            "subnet",
+            "gateway",
+            "dns1"
+          ]
+        },
+        "requirements": [
+          {
+            "id": "req-mode",
+            "label": "The appliance must get its address, mask, gateway, and resolver from whatever network it is plugged into — no manual reconfiguration per site",
+            "field": "addressMode",
+            "operator": "equals",
+            "value": "dhcp"
+          },
+          {
+            "id": "req-applied",
+            "label": "The change must be applied, not left typed on screen",
+            "field": "applied",
+            "operator": "isTrue"
+          }
+        ],
+        "hints": [
+          "You do not control this network, so you cannot know its mask, router, or resolver. Ask what supplies all four automatically the moment a host joins.",
+          "The static values from the previous site are the whole problem: a fixed address from one network cannot even converse on another."
+        ],
+        "debrief": "DHCP was the right call because the device is movable: the local server hands the appliance everything it needs on every network that hosts it. The trade in one line: static makes a host findable, DHCP makes it movable. Design rule: servers and infrastructure you publish get static; guests and traveling appliances get DHCP."
+      }
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Match the workload to the mode: published servers, printers, cameras, and management ports want static; laptops and visiting appliances want DHCP. Read /24 as 255.255.255.0 and know the router for the segment hands traffic onward and often answers DNS too. Symptom questions: address reachable but names failing points at the resolver, not the cable."
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Inspect HTTP vs HTTPS",
+      "description": "Capture your own traffic in Wireshark and compare plaintext HTTP with TLS-protected HTTPS. Full guide: labs/inspect-http-vs-https.en.md.",
+      "estimatedMinutes": 30,
+      "status": "ready",
+      "scale": "full"
+    }
+  ],
+  "cheatsheet": [
+    "Static serves what must be findable: published servers, printers, cameras, management ports; the config survives reboots.",
+    "DHCP serves what must be movable: laptops, phones, appliances on networks you do not control; the local server supplies address, mask, gateway, and resolver.",
+    "A /24 mask written out is 255.255.255.0; hosts in the same /24 reach each other without the router.",
+    "The default gateway forwards traffic beyond the segment and often serves DNS for it as well.",
+    "Split a fault before editing: reachability by address, then name resolution, then the path out — each points at one field."
+  ],
+  "checkpoint": [
+    {
+      "kind": "simulation",
+      "id": "cp-1",
+      "challenge": {
+        "id": "fw-management-nic",
+        "title": "The misconfigured firewall's management interface",
+        "brief": "From the firewall's management interface, nothing answers by name — yet pinging the address 8.8.8.8 succeeds. The interface currently takes its settings from the network's lease. Site standards for this segment: 192.168.30.0/24, router 192.168.30.1, which also serves DNS; the firewall's management address 192.168.30.44 and its mask are correct and must stay as they are. Diagnose from the symptoms, then fix the interface so name lookups work again and keep working.",
+        "surface": "network-interface",
+        "initial": {
+          "addressMode": "dhcp",
+          "ipv4": "192.168.30.44",
+          "subnet": "255.255.255.0",
+          "gateway": "192.168.30.1",
+          "dns1": "",
+          "applied": true
+        },
+        "requiredFields": {
+          "dhcp": [],
+          "static": [
+            "ipv4",
+            "subnet",
+            "gateway",
+            "dns1"
+          ]
+        },
+        "requirements": [
+          {
+            "id": "req-dns",
+            "label": "Systems must answer by name again — lookups must go to the site resolver in the standards",
+            "field": "dns1",
+            "operator": "equals",
+            "value": "192.168.30.1"
+          },
+          {
+            "id": "req-mode",
+            "label": "The resolver setting must stick — it can no longer arrive and disappear with the lease",
+            "field": "addressMode",
+            "operator": "equals",
+            "value": "static"
+          },
+          {
+            "id": "req-applied",
+            "label": "The fix must be applied, not left typed on screen",
+            "field": "applied",
+            "operator": "isTrue"
+          }
+        ],
+        "hints": [
+          "Split the symptoms: reaching a far-off address by number proves the address, mask, and router all work. So which step is left when names fail?",
+          "The interface shows what the lease provided. Compare the field that answers name lookups with what the site standards document says it should be."
+        ],
+        "debrief": "Reachability by address with failure by name is the classic resolver fault: the path works, the translation does not. The lease handed the interface an empty resolver, so the durable fix pins the resolver in static configuration while the address itself was already correct. Diagnose first, then make the smallest change that fixes it and apply it."
+      }
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Which device should receive a static address as a matter of design?",
+      "choices": {
+        "A": "A sales laptop that travels between offices and hotels",
+        "B": "A DMZ web server that clients reach at a published address",
+        "C": "A visitor's phone on the guest wireless",
+        "D": "A contractor's tablet joining a different site each week"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The web server must be findable at a stable, published address that survives reboots, so static fits by design. Traveling laptops, guest phones, and roaming tablets get their settings from DHCP wherever they land."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A host's subnet mask is written as /24 in the network plan. Which mask does the host need?",
+      "choices": {
+        "A": "255.255.255.0",
+        "B": "255.255.0.0",
+        "C": "255.0.0.0",
+        "D": "255.255.255.255"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The /24 notation counts 24 network bits, which written as four octets is 255.255.255.0. Hosts inside the same /24 reach each other directly; anything beyond goes to the default gateway."
+    }
+  ]
+}

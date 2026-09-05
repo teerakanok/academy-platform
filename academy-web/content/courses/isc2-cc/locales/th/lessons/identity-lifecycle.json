@@ -1,0 +1,129 @@
+{
+  "nodeId": "identity-lifecycle",
+  "locale": "th",
+  "title": "วงจรชีวิต Identity: Provisioning ถึง Deprovisioning",
+  "objective": "เมื่อจบบทเรียนนี้ ผู้เรียนพา identity ผ่าน provisioning, ทบทวน และ deprovisioning ได้อธิบาย joiner-mover-leaver ได้ และบริหาร AI bot กับ service account ในวงจรเดียวกันได้",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "identity เกิด เปลี่ยน และต้องตาย"
+    },
+    {
+      "kind": "paragraph",
+      "text": "หลักสูตร 2026 เพิ่ม identity lifecycle เป็นเนื้อหา D3 อย่างชัดเจน แนวคิดคือ: ความเสี่ยงด้านการเข้าถึงถูกสร้างและทำลายที่เหตุการณ์ในวงจร พนักงานใหม่ได้บัญชี (provisioning) คนที่เปลี่ยนตำแหน่งได้สิทธิ์ใหม่และต้องเสียสิทธิ์เก่า (mover) และบัญชีของคนที่จากไปต้องถูกปิดและลบ (deprovisioning) joiner-mover-leaver (JML) คือศัพท์ย่อที่ข้อสอบใช้"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "ขั้น",
+        "เกิดอะไร",
+        "ความล้มเหลวคลาสสิก"
+      ],
+      "rows": [
+        [
+          "Provisioning (joiner)",
+          "สร้างบัญชี ให้สิทธิ์เริ่มต้นตามบทบาท บันทึกการอนุมัติของหัวหน้า",
+          "สิทธิ์วันแรกที่เยอะเกินแล้วไม่เคยถูกตัด"
+        ],
+        [
+          "Modification (mover)",
+          "ปรับสิทธิ์ให้ตรงบทบาทใหม่ เพิกถอนสิทธิ์เก่า",
+          "การสะสมสิทธิ์: สิทธิ์เก่ารอดทุกครั้งที่ย้าย"
+        ],
+        [
+          "Review",
+          "ทบทวนเป็นรอบ: เจ้าของยืนยันว่าบัญชีแต่ละบัญชียังต้องใช้สิทธิ์ที่มี",
+          "การกดอนุมัติรัวๆ โดยไม่ตรวจจริง"
+        ],
+        [
+          "Deprovisioning (leaver)",
+          "ปิดบัญชี เพิกถอน credential และ token คืนอุปกรณ์ ลบออกจากกลุ่ม",
+          "บัญชีกำพร้าที่ยังใช้ได้หลังเจ้าของจากไปแล้ว"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "บัญชีกำพร้าคือ scenario โปรดของข้อสอบ: สัญญาณชัดที่สุดว่า deprovisioning ล้มเหลว control ที่คู่คือ offboarding checklist ที่เป็นเอกสารและผูกกับเหตุการณ์ HR บวกการทบทวนเป็นรอบที่ออกล่าบัญชีที่เจ้าของจากไปแล้ว"
+    },
+    {
+      "kind": "heading",
+      "text": "Least privilege พาดผ่านทั้งวงจร"
+    },
+    {
+      "kind": "paragraph",
+      "text": "provisioning ควรให้เท่าที่บทบาทต้องใช้ mover ควรลบสิ่งที่บทบาทเก่ามี และการ review ควรตัดสิ่งที่สะสมไว้ access review (recertification) คือตาข่ายนิรภัย: เป็นรอบๆ เจ้าของระบบอนุมัติซ้ำหรือเพิกถอนทุกสิทธิ์ที่ระบบตนเคยให้ review ยังจับ privilege creep คือการต่อสิทธิ์แบบเนิ่นๆ ตอนคนเปลี่ยนโปรเจกต์"
+    },
+    {
+      "kind": "heading",
+      "text": "AI bot และ service account ก็คือ identity"
+    },
+    {
+      "kind": "paragraph",
+      "text": "identity ไม่ได้มีแต่คน service account รัน backup และ integration; AI agent และ bot วันนี้เรียก API อ่านเอกสาร และลงมือกับ ticket ด้วย หลักสูตร 2026 ใส่ AI bot และ service account เข้า lifecycle อย่างชัดเจน และหลักการคือกฎเดียวสำหรับทุก identity: identity ที่ไม่ใช่มนุษย์ทุกตัวต้องมี owner จุดประสงค์ วันทบทวน และทริกเกอร์ deprovisioning"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Owner: ทีมมนุษย์ที่ระบุชื่อได้และรับผิดชอบบัญชี; บัญชีไม่ใช่มนุษย์ที่กำพร้าคือชนิดที่เสี่ยงที่สุด",
+        "จุดประสงค์และขอบเขต: credential จำกัดเฉพาะระบบและการกระทำที่กำหนด (least privilege) ไม่ใช่ shared admin secret",
+        "Review: ทำ inventory และ recertify service account กับ AI bot เหมือนบัญชีผู้ใช้ ท้าทายตัวที่ไม่มีใครใช้",
+        "Deprovisioning: เมื่อโปรเจกต์หรือ integration จบ เพิกถอน credential และ API key และลบสิทธิ์",
+        "สุขอนามัย credential: หมุนเวียน key และเลือก short-lived token แทน secret ถาวรเมื่อแพลตฟอร์มรองรับ"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "บนข้อสอบ",
+      "text": "scenario ที่บอกว่าใครบางคนย้ายแผนกแต่ยังถือสิทธิ์ฝ่ายการเงินเดิม: ความล้มเหลวอยู่ชั้น mover และคำตอบคือลบสิทธิ์เก่าบวกการ review เป็นรอบ scenario ที่บัญชี script ยังรันหลังโปรเจกต์ปิดไปนาน: ความล้มเหลวคือ deprovisioning ของ identity ที่ไม่ใช่มนุษย์"
+    },
+    {
+      "kind": "try",
+      "title": "พา identity หนึ่งเดินผ่าน JML",
+      "steps": [
+        "ตามรอยพนักงานสมมติ Alex: เข้าทีม support (สิทธิ์อ่าน ticket) ย้ายไป engineering (สิทธิ์เข้า repository) แล้วลาออกจากบริษัท",
+        "แต่ละขั้น ระบุสิ่งที่ต้องให้ ทบทวน และเพิกถอน",
+        "เพิ่ม service account ที่ Alex สร้างไว้สำหรับ integration ทดสอบ และบอกว่าต้องทำอะไรเมื่อ Alex ลาออก"
+      ],
+      "expected": "Joiner: สิทธิ์อ่าน ticket อนุมัติโดยหัวหน้า บันทึกไว้ Mover: ได้สิทธิ์ repository; เพิกถอนสิทธิ์ ticket (จุดพลาดที่พบบ่อย) Leaver: ปิดบัญชี SSO เพิกถอน session และ token คืนอุปกรณ์ service account ทดสอบต้องถูกทำ inventory โอน owner ใหม่หรือเพิกถอน ห้ามปล่อยให้ไร้เจ้าของ"
+    }
+  ],
+  "cheatsheet": [
+    "วงจร: provisioning (joiner), modification และ review (mover), deprovisioning (leaver)",
+    "ความล้มเหลวที่ถูกวัดบ่อยสุด: การสะสมสิทธิ์ที่ mover, บัญชีกำพร้าที่ leaver",
+    "access review เป็นรอบ (recertification) คือตาข่ายนิรภัยต่อ privilege creep",
+    "AI bot และ service account ใช้กฎเดียวกัน: owner จุดประสงค์ least privilege วันทบทวน ทริกเกอร์ deprovisioning",
+    "หมุนเวียน credential ของ non-human; เลือก short-lived token แทน secret ถาวร"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "นักวิเคราะห์ย้ายจากฝ่ายการเงินไปการตลาด หลายเดือนต่อมา audit พบว่าเขายังอนุมัติการจ่ายเงินได้ ขั้นใดของวงจรล้มเหลว?",
+      "choices": {
+        "A": "ขั้น mover: สิทธิ์เก่าไม่ถูกเพิกถอนตอนเปลี่ยนบทบาท",
+        "B": "Provisioning",
+        "C": "Deprovisioning เพราะบัญชีถูกปิด",
+        "D": "ไม่มีความล้มเหลว เพราะสิทธิ์ติดตัวไปได้"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "การย้ายบทบาทต้องลบสิทธิ์ของบทบาทเดิม การไม่ลบทำให้เกิดสิทธิ์สะสม ซึ่ง access review เป็นรอบควรจับได้เป็นเกราะชั้นที่สอง"
+    },
+    {
+      "id": "cp-2",
+      "prompt": "ตามวงจร identity AI bot หรือ service account ทุกตัวควรมีคุณสมบัติชุดใด?",
+      "choices": {
+        "A": "credential ถาวรที่ทีมใช้ร่วมกันเพื่อความสะดวก",
+        "B": "Owner ที่ระบุชื่อได้ จุดประสงค์ที่ชัดเจน ขอบเขต least-privilege ตาราง review และทริกเกอร์ deprovisioning",
+        "C": "สิทธิ์ domain administrator เพื่อไม่ให้ถูกขัดจังหวะ",
+        "D": "ไม่ต้อง review เพราะบัญชีที่ไม่ใช่มนุษย์ถูกโจมตีไม่ได้"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "identity ที่ไม่ใช่มนุษย์ใช้วินัยวงจรเดียวกับคน: มีเจ้าของ มีจุดประสงค์ น้อยที่สุด ถูกทบทวน และถูกเพิกถอนเมื่อหมดอายุสิ้น ส่วน shared credential ถาวรที่มีสิทธิ์สูงเป็นสิ่งตรงข้ามทุกข้อ"
+    }
+  ]
+}

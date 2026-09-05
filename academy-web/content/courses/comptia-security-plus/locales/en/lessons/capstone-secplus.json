@@ -1,0 +1,152 @@
+{
+  "nodeId": "capstone-secplus",
+  "locale": "en",
+  "title": "Course Review and Exam-Day Strategy",
+  "objective": "By the end of this lesson you can recall the five domains as one story, plan your exam pacing, and apply a repeatable technique for BEST and FIRST questions.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "The whole course in one story"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Security+ reads as a single sentence. Domain 1 defines what good looks like: goals, controls, and change discipline. Domain 2 introduces the adversary: actors, attacks, malware, and the frameworks that describe them. Domain 3 designs the defense: architecture models, cloud, resiliency, and the enterprise shapes security takes. Domain 4 runs the defense day to day: identity, hardening, certificates, monitoring, and incident response. Domain 5 pays for it and proves it: governance, risk, audits, and people. When a practice question confuses you, ask which part of the sentence it lives in."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Domain",
+        "Weight",
+        "One-line recall"
+      ],
+      "rows": [
+        [
+          "1.0 General Security Concepts",
+          "12%",
+          "CIA, control types and functions, change process, crypto basics"
+        ],
+        [
+          "2.0 Threats, Vulnerabilities, and Mitigations",
+          "22%",
+          "Actors, attacks, malware, vulnerability cycles, MITRE ATT&CK and kill chain"
+        ],
+        [
+          "3.0 Security Architecture",
+          "18%",
+          "Defense in depth, zero trust, cloud models, resiliency, secure designs"
+        ],
+        [
+          "4.0 Security Operations",
+          "28%",
+          "Identity, hardening, assets, certificates, monitoring, forensics and IR"
+        ],
+        [
+          "5.0 Security Program Management and Oversight",
+          "20%",
+          "Governance, risk treatment, audits, awareness"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "The numbers to memorize",
+      "text": "Maximum 90 questions in 90 minutes, passing 750 on a scale of 100 to 900, with a mix of multiple-choice and performance-based questions. The largest domain is Security Operations at 28 percent, so operations practice pays double."
+    },
+    {
+      "kind": "heading",
+      "text": "Pacing: a minute a question, banked"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Ninety questions in ninety minutes is one minute per question plus whatever you bank on easy ones. Work in one pass and answer everything you can quickly; flag anything that stalls you and keep moving. Performance-based questions at the start can eat ten minutes before you notice, so open each with a light first pass: read it, do the parts that are obvious, flag, and return later with the time you saved on multiple choice."
+    },
+    {
+      "kind": "heading",
+      "text": "BEST and FIRST technique"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When a question asks for the BEST answer, several options are usually technically true; the best one is the one that is true, practical, and addresses the root of the scenario. Parameterized queries beat a filtering appliance for injection because they remove the flaw rather than catch some of it. When a question asks what to do FIRST, look for the step that makes every later step smarter: identify and analyze before you contain, contain before you eradicate. The first step is usually assessment, not action."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Read the last line of the question first so you know what is being asked before the story pulls you in.",
+        "Eliminate answers that are true but do not answer the actual question asked.",
+        "Prefer answers that fix causes over answers that hide symptoms.",
+        "For scenario items, match each requirement in the stem to one element of the answer; the best answer matches all of them.",
+        "Change an answer only when you can name the reason you were wrong the first time."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Your final week"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Re-run the practice exam and review every missed item by finding the exact lesson that teaches it, not just the correct letter. Redo the three fastest labs: hash a file, read a phishing header, triage a log. Sleep before the exam; a rested pattern-matcher beats a tired memorizer at one minute per question."
+    },
+    {
+      "kind": "try",
+      "title": "Rehearse the clock",
+      "steps": [
+        "Take the practice exam in this course with a hard 54-minute timer for the 35 questions, which is faster than the real pace, so the real clock feels generous.",
+        "Mark every question you flagged and note how many you changed on review.",
+        "For each miss, write the domain number and lesson title that teaches it."
+      ],
+      "expected": "You finish inside the timer with a few minutes to spare, most review changes fix errors rather than introduce them, and every miss maps to a lesson you can revise in the final week."
+    }
+  ],
+  "cheatsheet": [
+    "Exam math: up to 90 questions, 90 minutes, pass at 750 of 900; Domain 4 is the heaviest at 28 percent.",
+    "Pacing: one minute per question, flag and keep moving, return to flagged items and performance questions with banked time.",
+    "BEST means true, practical, and root-cause. FIRST usually means identify or assess before you act.",
+    "Review misses by lesson, not by letter, and rehearse the clock with a slightly tighter timer.",
+    "Domains as a story: define good, know the enemy, design the defense, run the defense, prove and fund it."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Question 4 is a performance-based item asking you to configure firewall rules, and after four minutes you are only half done. What is the best next action?",
+      "choices": {
+        "A": "Stay until it is perfect, because early questions count more",
+        "B": "Skip all remaining performance questions automatically",
+        "C": "Do the obvious parts, flag it, and continue with the rest of the exam",
+        "D": "Guess randomly and leave the exam early to rest"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "All questions are worth pursuing, but none is worth ten early minutes. Do what is quick, flag, and return with banked time. Early questions do not count more, and skipping or guessing wholesale throws away score you can collect calmly."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "An analyst sees unexpected outbound traffic from a server. Four options are presented. Which phrasing signals a FIRST question you should answer with an assessment step?",
+      "choices": {
+        "A": "Which control would BEST reduce this traffic over time",
+        "B": "Which policy should prohibit this traffic",
+        "C": "Which logging source would have caught this earlier",
+        "D": "What should the analyst do FIRST with this observation"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "FIRST asks for the opening move. Identify and analyze the traffic before containing or redesigning controls, because the later steps depend on what the analysis finds."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A question asks for the BEST mitigation for SQL injection and offers: a web application firewall, parameterized queries, weekly vulnerability scans, and staff training. Which answer wins, and why?",
+      "choices": {
+        "A": "The firewall, because it blocks attacks at the network edge",
+        "B": "Scans, because they find the flaw before attackers do",
+        "C": "Parameterized queries, because they remove the root cause",
+        "D": "Training, because developers write the queries"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "BEST rewards the root-cause fix that is also standard practice. A firewall may catch some payloads, scans only report, and training helps future code but fixes nothing today."
+    }
+  ]
+}

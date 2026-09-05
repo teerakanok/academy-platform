@@ -1,0 +1,171 @@
+{
+  "nodeId": "monitoring-and-siem",
+  "locale": "en",
+  "title": "Monitoring, Logging, and SIEM",
+  "objective": "By the end of this lesson you can explain what a SIEM does, name key log sources and their fields, describe alert fatigue, and say how AI in the SOC reduces it.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Logs are the raw material"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Every system can tell a story: who logged in, what changed, what was allowed or denied. That story lives in logs, and security monitoring is the discipline of collecting and reading them. The exam expects you to know which sources matter and what to look for in each."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Log source",
+        "What it records",
+        "Fields analysts check"
+      ],
+      "rows": [
+        [
+          "Operating systems",
+          "Logins, privilege use, process starts",
+          "Account, timestamp, success or failure, source address"
+        ],
+        [
+          "Firewalls and proxies",
+          "Allowed and denied connections, web requests",
+          "Source and destination, port, action, bytes"
+        ],
+        [
+          "Identity systems",
+          "Authentications, MFA prompts, group changes",
+          "User, result, location, device"
+        ],
+        [
+          "Email gateways",
+          "Message delivery, filtering verdicts",
+          "Sender, recipient, subject, attachments, verdict"
+        ],
+        [
+          "Cloud platforms",
+          "API and console actions",
+          "Identity, action, resource, source IP, result"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "What a SIEM adds"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A SIEM (Security Information and Event Management) centralizes logs from many sources, normalizes them into a common shape, correlates events across systems, raises alerts when patterns match rules, and provides dashboards and retention. Its superpower is correlation: one failed login is noise; five failures followed by a success from the same source, then access to a sensitive share, is a story no single log can tell."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Collection: gather logs centrally before an intruder can erase local copies.",
+        "Normalization: translate different formats into common fields.",
+        "Correlation: join events across sources into detection rules.",
+        "Alerting: notify humans when a rule fires.",
+        "Retention: keep history long enough for investigation and compliance."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Here is the kind of read a monitoring shift hands you: three hours of overnight authentication numbers from one domain controller."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Hour",
+        "Failed logins",
+        "Successful logins"
+      ],
+      "rows": [
+        [
+          "02:00",
+          "9",
+          "31"
+        ],
+        [
+          "03:00",
+          "712",
+          "4"
+        ],
+        [
+          "04:00",
+          "12",
+          "35"
+        ]
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Read the spike",
+      "steps": [
+        "Read the table: failed versus successful logins, per hour, overnight.",
+        "Mark the hour that looks wrong.",
+        "Write the one question you would ask first, before touching anything."
+      ],
+      "expected": "03:00 is the outlier: 712 failures against a single-digit norm, with four successes landing inside the same hour. First question: which accounts did those failures target, and did any run of failures end in a success — the many-failures-then-success shape no single log line can show, which is exactly what correlation is for."
+    },
+    {
+      "kind": "heading",
+      "text": "Alert fatigue"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Alert fatigue is what happens when analysts receive more alerts than they can honestly review: they start skimming, then missing, then ignoring. Poorly tuned rules, duplicated alerts for one incident, and false positives all feed it, and its consequence is real attacks slipping past exhausted people. The classic remedies: tune rules to cut false positives, group related alerts into incidents, prioritize by severity and asset value, and close the loop by feeding investigative outcomes back into rule quality."
+    },
+    {
+      "kind": "heading",
+      "text": "SIEM AI and the SOC"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The 2026 outline names SIEM AI reducing alert fatigue as a D5 topic. Machine analysis helps by clustering duplicate alerts into one incident, scoring which alerts deserve attention first, suppressing known-benign patterns, and surfacing anomalies that no static rule anticipated. The human stays in the loop: the system ranks and groups, analysts decide and investigate. And per Domain 2's drift lesson, AI-assisted detection itself needs monitoring so its quality does not silently degrade."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "SIEM questions test correlation across sources, centralized collection before tampering, and retention for investigation. Alert-fatigue questions pair the problem with tuning, deduplication, and prioritization, now including AI-assisted triage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "One architectural note worth remembering: log collection is only as trustworthy as its transport and storage; sending logs off-host in near real time is what makes them survive an attacker with admin rights on the source machine."
+    }
+  ],
+  "cheatsheet": [
+    "Key log sources: OS auth and process logs, firewall and proxy, identity, email gateway, cloud audit logs.",
+    "SIEM = collect, normalize, correlate, alert, retain; correlation across sources is its core value.",
+    "Ship logs off-host promptly so intruders cannot erase their tracks locally.",
+    "Alert fatigue = too many low-quality alerts; fix by tuning rules, deduplicating, prioritizing, closing feedback loops.",
+    "SIEM AI clusters, scores, suppresses, and finds anomalies to reduce fatigue; analysts keep the decisions."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Analysts receive hundreds of identical alerts daily from one noisy rule and have begun ignoring that alert class entirely. What is this called, and what is the standard fix?",
+      "choices": {
+        "A": "Log injection; replace the SIEM",
+        "B": "Privilege creep; review all accounts",
+        "C": "Scope creep; shrink the log retention",
+        "D": "Alert fatigue; tune the rule, deduplicate, and prioritize by severity"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Overwhelming, low-quality alerting produces alert fatigue, and the fix is rule tuning, grouping duplicates, and severity-based prioritization, so real signals regain attention."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "The strongest reason to forward logs to a central collector in near real time is:",
+      "choices": {
+        "A": "It makes applications run faster",
+        "B": "It removes the need for firewalls",
+        "C": "Evidence survives even if the attacker gains admin access on the source machine",
+        "D": "It encrypts all applications automatically"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "A common attacker action is clearing local logs. Central, near-real-time forwarding preserves the evidence trail independently of the compromised host."
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "nodeId": "certificates-and-pki-ops",
+  "locale": "th",
+  "title": "การบริหาร Certificate และ PKI",
+  "objective": "เมื่อจบบทเรียนนี้ ผู้เรียนจะขับเคลื่อนวงจรชีวิต certificate ตรวจ revocation ด้วย CRL และ OCSP ได้ และวินิจฉัยข้อผิดพลาด certificate ที่ help desk เจอจริงได้",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "วงจรชีวิตของ certificate"
+    },
+    {
+      "kind": "paragraph",
+      "text": "certificate เกิดจาก certificate signing request (CSR): ผู้ขอเก็บ private key ไว้ ส่วน CA เซ็น public key พร้อม identity ให้กลายเป็น certificate ชีวิตของ certificate เดินว่า: ยื่นขอ ตรวจ identity ออกให้ deploy เฝ้าวันหมดอายุ ต่ออายุ และสุดท้ายถูก revoke หรือหมดอายุ เครื่องมืออัตโนมัติต่ออายุก่อนหมดเวลา เพราะ certificate หมดอายุบน load balancer คือ outage ที่ตัวเองสร้างให้ตัวเอง"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Root CA: ที่ยึดความเชื่อถือที่ออฟไลน์และอารักขาแน่นหนาที่สุด",
+        "Intermediate CA: ออก certificate แทน root เพื่อให้ root ออฟไลน์อยู่ได้",
+        "Chain of trust: อุปกรณ์ตรวจ leaf ขึ้นผ่าน intermediate ไปจนถึง root ที่เชื่อถือ",
+        "Wildcard certificate: ใบเดียวครอบคลุม subdomain หนึ่งชั้น (*.example.com)",
+        "SAN (subject alternative name): ระบุหลายชื่อ host ใน certificate เดียว",
+        "Self-signed: ใช้ได้ในแล็บ แต่เป็นสัญญาณเตือนบน browser ใน production",
+        "Key escrow: สำเนา key ที่เก็บอย่างปลอดภัยไว้กู้คืนเมื่อผู้ถือลาออก"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Revocation: CRL และ OCSP"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "วิธี",
+        "ทำงานอย่างไร",
+        "ข้อแลกเปลี่ยน"
+      ],
+      "rows": [
+        [
+          "CRL (certificate revocation list)",
+          "ดาวน์โหลดรายการ certificate ที่ถูก revoke ทั้งชุด",
+          "ครบถ้วนแต่หนักและเก่าเร็ว"
+        ],
+        [
+          "OCSP",
+          "ถาม CA ถึง certificate ใบเดียว",
+          "คำตอบสดต่อการตรวจหนึ่งครั้ง แต่เพิ่ม round trip"
+        ],
+        [
+          "OCSP stapling",
+          "เซิร์ฟเวอร์นำเสนอคำตอบ OCSP ที่สดและเซ็นแล้ว",
+          "เร็วกว่าและเป็นส่วนตัวกว่า OCSP ฝั่ง client"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "ทำไม certificate จึงถูก revoke"
+    },
+    {
+      "kind": "paragraph",
+      "text": "การ revoke มีไว้สำหรับการถูกบุกรุกและการใช้ผิด: private key รั่ว certificate ถูกออกให้ผิดพลาด หรือไซต์เปลี่ยนเจ้าของ การหมดอายุเป็นปัญหาของวันที่ ส่วนการ revoke เป็นปัญหาของความเชื่อถือ CA อาจ revoke เมื่อผู้ขอละเมิดข้อกำหนดด้วย"
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "บนข้อสอบ",
+      "text": "ทักษะที่ถูกวัดคือการจับคู่ข้อผิดพลาดกับสาเหตุ: certificate expired หมายถึงเรื่องวันที่ untrusted root หมายถึง chain ขาดหรือเป็น self-signed hostname mismatch หมายถึงชื่อ URL ไม่ได้อยู่ใน certificate และ certificate revoked หมายถึงให้ไปเช็คสถานะ OCSP หรือ CRL ให้จับข้อความ error เข้ากับสาเหตุ"
+    },
+    {
+      "kind": "try",
+      "title": "วินิจฉัยคำเตือน browser สามแบบ",
+      "steps": [
+        "คำเตือน: (1) NETERR cert not trusted บนแอปภายในที่ใช้ certificate แบบ self-signed (2) hostname mismatch เมื่อเข้า subdomain www ของไซต์ที่ certificate ระบุเฉพาะโดเมนหลัก (3) certificate revoked บนพอร์ทัลคู่ค้า",
+        "บอกสาเหตุของแต่ละข้อ",
+        "บอกทางแก้ที่รักษาความปลอดภัยไว้ได้ ทีละกรณี",
+        "ตัดสินว่ากรณีใดเป็นการแก้วงจรชีวิต กรณีใดเป็นการแก้ความเชื่อถือ"
+      ],
+      "expected": "ข้อ 1: chain แบบ self-signed แก้ด้วยการออก certificate จาก CA ภายในที่อุปกรณ์เชื่อถือ ข้อ 2: ใช้ SAN หรือ wildcard ครอบชื่อ www ออกใบใหม่รวมทุกชื่อ ข้อ 3: ถูก revoke คู่ค้าต้องเปลี่ยน certificate ใหม่ และ browser ที่บล็อกถูกต้องแล้ว ข้อ 3 เป็นปัญหาความเชื่อถือ ข้อ 1 กับ 2 เป็นปัญหาการออกใบและ configuration"
+    }
+  ],
+  "cheatsheet": [
+    "วงจรชีวิต: CSR, ตรวจ identity, ออกใบ, deploy, เฝ้าวันหมดอายุ, ต่ออายุ, revoke หรือหมดอายุ และทำ renewal อัตโนมัติ",
+    "Chain of trust: leaf, intermediate, root โดย root ออฟไลน์เสมอ",
+    "CRL = ดาวน์โหลดรายการเต็ม OCSP = ตรวจรายใบ stapling = เซิร์ฟเวอร์นำเสนอคำตอบสดที่เซ็นแล้ว",
+    "เหตุผล revoke: key รั่ว ออกใบผิดพลาด ใช้ผิดวัตถุประสงค์ การหมดอายุคือเรื่องวันที่ การ revoke คือเรื่องความเชื่อถือ",
+    "Wildcard ครอบ subdomain หนึ่งชั้น SAN ระบุหลายชื่อ production เลี่ยง self-signed"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "browser ปฏิเสธไซต์ที่ private key ถูกเผยแพร่ใน repository สาธารณะ ผู้ถือ key มีคู่ key ใหม่แล้ว ต้องทำอะไรก่อนความเชื่อถือจะกลับมา",
+      "choices": {
+        "A": "รอ certificate เก่าหมดอายุเองตามธรรมชาติ",
+        "B": "ขอให้ผู้ใช้กดข้ามคำเตือนไปก่อน",
+        "C": "รีสตาร์ตเว็บเซิร์ฟเวอร์ด้วย certificate เดิม",
+        "D": "Revoke certificate เก่าและออกใบใหม่ให้คู่ key ใหม่"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "private key ที่รั่วทำให้ความเชื่อถือของ certificate สูญไป CA ต้อง revoke แล้วออก certificate ใหม่ผูกกับ key ใหม่ การรอหมดอายุช้าเกินไป และการใช้ใบเดิมหรือเมินคำเตือนทิ้งการบุกรุกไว้"
+    }
+  ]
+}

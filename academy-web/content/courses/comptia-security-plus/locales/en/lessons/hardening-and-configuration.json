@@ -1,0 +1,110 @@
+{
+  "nodeId": "hardening-and-configuration",
+  "locale": "en",
+  "title": "Hardening and Configuration",
+  "objective": "By the end of this lesson you can build a hardened baseline, explain secure boot and disk integrity, and shrink an endpoint's attack surface with configuration, including disabling what nobody uses.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Baselines and golden images"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A baseline is a documented, tested configuration standard: services off, ports closed, logging on, password policy set. Machines are compared against the baseline, and drift is corrected. A golden image bakes the baseline into the machine template itself, so every new system starts hardened, identical, and reproducible."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Endpoint hardening: EDR agents, host firewall on, local admin rights removed, full-disk encryption enabled.",
+        "Disabling unused services, ports, and protocols: everything switched on is a door; switch off what no one uses.",
+        "Patch management: scan, prioritize, test, deploy, verify; unsupported systems get isolated instead.",
+        "Group policy and MDM: enforce the baseline centrally rather than by hand."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Boot and disk integrity"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Secure boot lets firmware verify the operating system loader's signature before running it, blocking bootkits. A TPM chip stores keys and measurements of the boot chain, so secrets stay sealed unless the machine boots into a known-good state. Self-encrypting drives and full-disk encryption protect data at rest; measured boot and remote attestation let a server prove its boot state to another machine."
+    },
+    {
+      "kind": "heading",
+      "text": "Reducing surface on the endpoint"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Area",
+        "Hardening action"
+      ],
+      "rows": [
+        [
+          "Services",
+          "Disable or uninstall unused ones"
+        ],
+        [
+          "Ports and protocols",
+          "Close what serves no purpose; retire Telnet, FTP, SMBv1"
+        ],
+        [
+          "Applications",
+          "Application allowlisting; remove unused software"
+        ],
+        [
+          "Removable media",
+          "Restrict or block USB storage by policy"
+        ],
+        [
+          "Accounts",
+          "Remove or rename default accounts; no permanent local admin"
+        ],
+        [
+          "Logging",
+          "Turn on logging before an incident, with time sync"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Hardening questions reward the smallest sufficient change: the scenario names a system with unnecessary services running, and the answer disables the unused service, rather than adding another product. End-of-life systems get isolation or replacement, because no patch will come."
+    },
+    {
+      "kind": "try",
+      "title": "Write a five-line baseline",
+      "steps": [
+        "Choose a system you know: a laptop, a server, or a router.",
+        "Write five baseline items as checkable statements, for example 'SSH service enabled, Telnet disabled'.",
+        "Mark each item as enforced by group policy, MDM, or manual check.",
+        "Keep it; the asset-management lesson will add classification and disposal to this list."
+      ],
+      "expected": "Five statements a second person could verify true or false by looking at the machine, each with an enforcement mechanism named."
+    }
+  ],
+  "cheatsheet": [
+    "Baseline = documented, testable configuration standard; golden image = baseline baked into the deployment template.",
+    "Turn off unused services, ports, and protocols; every enabled feature is reachable surface.",
+    "Secure boot verifies the loader; TPM seals keys to a known-good boot state; attestation proves it remotely.",
+    "Full-disk or self-encrypting drives protect data at rest; removal policy protects data in motion.",
+    "Unsupported systems: isolate or retire, because patches will never arrive."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A file server still offers Telnet, FTP, and SMBv1 alongside its current services. The quickest hardening win is to:",
+      "choices": {
+        "A": "Install a second antivirus engine",
+        "B": "Move the server behind two more firewalls",
+        "C": "Disable the unused legacy protocols and services",
+        "D": "Increase the password length policy"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Switching off what nobody uses removes the exposure outright. Extra products and longer passwords defend doors that could instead be closed."
+    }
+  ]
+}

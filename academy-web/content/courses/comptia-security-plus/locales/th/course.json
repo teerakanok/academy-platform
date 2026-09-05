@@ -1,0 +1,51 @@
+{
+  "locale": "th",
+  "title": "CompTIA Security+ (SY0-701)",
+  "subtitle": "คอร์สเตรียมสอบใบรับรองด้านความปลอดภัยใบแรก ออกแบบตามวิธีที่ข้อสอบถามจริง",
+  "audience": "สำหรับผู้เรียนที่มีพื้นฐาน IT หรือ networking มาบ้างและตั้งเป้าสอบใบรับรองด้านความปลอดภัยใบแรก ทุกบทมีทั้งภาษาอังกฤษและภาษาไทยในโครงสร้างเดียวกัน ทุกโดเมนของข้อสอบทั้งห้าปิดท้ายด้วยบทฝึกปฏิบัติ และ capstone ซ้อมกลยุทธ์วันสอบ แล็บทั้งหมดเป็นเชิงป้องกันและรันบนเครื่องของคุณเองหรือ sandbox ฟรี ไม่มีการทดสอบกับระบบของบุคคลที่สาม",
+  "outcomes": [
+    "อธิบายแนวคิดความปลอดภัยพื้นฐานที่ข้อสอบต่อยอด: controls, CIA triad, zero trust, cryptography และ change management (Domain 1, 12%)",
+    "จำแนก threat actor ประเภทการโจมตี และช่องโหว่ แล้วเลือกวิธีลดความเสี่ยงแบบที่ข้อสอบคาดหวัง (Domain 2, 22%)",
+    "เปรียบเทียบสถาปัตยกรรมความปลอดภัย ทั้ง cloud, on-premises, network และการปกป้องข้อมูล แล้วเลือกแบบที่ทนทานกว่า (Domain 3, 18%)",
+    "ปฏิบัติงาน security operations: hardening, identity และ access, monitoring, incident response และการวิเคราะห์ log (Domain 4, 28%)",
+    "นำแนวคิด governance, risk, compliance และ audit ไปใช้กับโปรแกรมความปลอดภัยขององค์กร (Domain 5, 20%)",
+    "ทำข้อสอบจำลอง 35 ข้อ และเข้าสอบ SY0-701 พร้อมแผนเวลาและกลยุทธ์สำหรับข้อแบบ performance-based"
+  ],
+  "skillLabels": {
+    "general-concepts": "แนวคิดความปลอดภัยทั่วไป",
+    "threats-vulns": "ภัยคุกคาม ช่องโหว่ และการลดความเสี่ยง",
+    "architecture": "สถาปัตยกรรมความปลอดภัย",
+    "operations": "ปฏิบัติการด้านความปลอดภัย",
+    "program-mgmt": "การบริหารและกำกับดูแลโปรแกรม"
+  },
+  "nodeTitles": {
+    "security-goals-and-controls": "เป้าหมายความมั่นคงปลอดภัยและการควบคุม",
+    "change-management-process": "กระบวนการ Change Management",
+    "cryptographic-solutions": "การใช้งาน Cryptography",
+    "general-concepts-practice": "Practice: แนวคิดความมั่นคงปลอดภัยทั่วไป",
+    "threat-actors-and-vectors": "ผู้คุกคามและช่องทางโจมตี",
+    "common-attacks": "การโจมตีที่พบบ่อย",
+    "malware-types": "ประเภทของ Malware",
+    "vulnerability-management": "การบริหารจัดการช่องโหว่",
+    "mitigation-matrix-and-attack-frameworks": "เมทริกซ์ป้องกันภัยและ Attack Frameworks",
+    "threats-practice": "Practice: ภัยคุกคาม ช่องโหว่ และการป้องกัน",
+    "architecture-models": "แบบจำลองสถาปัตยกรรมความมั่นคงปลอดภัย",
+    "cloud-and-edge-security": "ความมั่นคงปลอดภัยบน Cloud และ Edge",
+    "resiliency-architecture": "สถาปัตยกรรมเพื่อความทนทาน (Resiliency)",
+    "enterprise-security-forms": "รูปแบบการรักษาความปลอดภัยในองค์กร",
+    "architecture-practice": "Practice: สถาปัตยกรรมความมั่นคงปลอดภัย",
+    "identity-and-privilege-ops": "การบริหาร Identity และ Privilege",
+    "hardening-and-configuration": "การ Hardening และตั้งค่าความปลอดภัย",
+    "asset-and-change-management": "การบริหาร Asset และการเปลี่ยนแปลง",
+    "certificates-and-pki-ops": "การบริหาร Certificate และ PKI",
+    "monitoring-and-logging": "การเฝ้าระวังและการเก็บ Log",
+    "forensics-and-incident-response": "Forensics และ Incident Response",
+    "operations-practice": "Practice: การดำเนินงานความมั่นคงปลอดภัย",
+    "governance-and-compliance": "Governance และ Compliance",
+    "risk-management": "การบริหารความเสี่ยง",
+    "audits-and-assessments": "Audit และการประเมิน",
+    "security-awareness-program": "โปรแกรมสร้างความตระหนักรู้ด้านความปลอดภัย",
+    "program-mgmt-practice": "Practice: การบริหารโปรแกรมความมั่นคงปลอดภัย",
+    "capstone-secplus": "ทบทวนทั้งคอร์สและกลยุทธ์วันสอบ"
+  }
+}

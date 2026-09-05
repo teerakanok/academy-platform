@@ -1,0 +1,195 @@
+{
+  "nodeId": "resiliency-architecture",
+  "locale": "en",
+  "title": "Resiliency Architecture",
+  "objective": "By the end of this lesson you can choose high-availability patterns, compare RAID levels, design a backup scheme, and match recovery sites to cost and speed.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Availability vocabulary"
+    },
+    {
+      "kind": "paragraph",
+      "text": "High availability (HA) removes single points of failure through redundancy: clustered servers, multiple power feeds, paired network paths. Fault tolerance goes further, letting a system keep working through a component failure with service intact. Graceful degradation means a system sheds features but keeps core service alive."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Redundancy: duplicates of a critical part, active or standby.",
+        "Clustering: several nodes acting as one service; failover moves work to a survivor.",
+        "NIC teaming: multiple network cards as one logical link.",
+        "UPS and generators: bridge short and long power loss.",
+        "Load balancing: spreads work and health-checks members out of rotation."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "RAID in one table"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Level",
+        "Layout",
+        "Survives",
+        "Trade-off"
+      ],
+      "rows": [
+        [
+          "RAID 0",
+          "Striping",
+          "Drive loss: no",
+          "Fast, zero redundancy"
+        ],
+        [
+          "RAID 1",
+          "Mirroring",
+          "One drive loss",
+          "Costs double capacity"
+        ],
+        [
+          "RAID 5",
+          "Striping plus parity",
+          "One drive loss",
+          "Minimum three drives"
+        ],
+        [
+          "RAID 6",
+          "Striping plus double parity",
+          "Two drive losses",
+          "Minimum four drives, slower writes"
+        ],
+        [
+          "RAID 10",
+          "Mirror then stripe",
+          "One per mirror pair",
+          "Fast and costly"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "RAID is availability, and RAID is a backup for no one",
+      "text": "RAID keeps a system running through disk failure. It does nothing against deletion, ransomware, or fire, because the array faithfully copies every change. Backups answer those."
+    },
+    {
+      "kind": "heading",
+      "text": "Backups"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Type",
+        "Copies",
+        "Restore speed",
+        "Storage use"
+      ],
+      "rows": [
+        [
+          "Full",
+          "Everything",
+          "Fastest, single set",
+          "Largest"
+        ],
+        [
+          "Incremental",
+          "Changes since the last backup of any type",
+          "Needs full plus every incremental",
+          "Smallest"
+        ],
+        [
+          "Differential",
+          "Changes since the last full",
+          "Needs full plus one differential",
+          "Grows through the week"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The 3-2-1 rule is the exam's default backup design: three copies of the data, on two different media, with one copy off-site or offline. Snapshots capture a point-in-time state for quick rollback, and immutable or air-gapped copies resist ransomware that hunts reachable backups."
+    },
+    {
+      "kind": "heading",
+      "text": "Recovery sites"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Site",
+        "Ready state",
+        "Speed",
+        "Cost"
+      ],
+      "rows": [
+        [
+          "Hot",
+          "Running, synced, ready now",
+          "Minutes",
+          "Highest"
+        ],
+        [
+          "Warm",
+          "Equipped, needs data and activation",
+          "Hours",
+          "Middle"
+        ],
+        [
+          "Cold",
+          "Space and power only",
+          "Days",
+          "Lowest"
+        ]
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Design resiliency for one service",
+      "steps": [
+        "Service: an internal wiki used during business hours; tolerated downtime is four hours.",
+        "Pick a site type and justify it.",
+        "Pick a backup scheme (types plus the 3-2-1 rule) and name the restore order after a ransomware event.",
+        "Pick one HA measure inside the primary site."
+      ],
+      "expected": "Warm site fits a four-hour window. Scheme: weekly full plus daily incremental, one copy off-site or immutable; restore the last full, then incrementals to the latest clean point. HA measure: clustered virtual machines or at least a standby node with shared storage."
+    }
+  ],
+  "cheatsheet": [
+    "HA removes single points of failure; fault tolerance survives failure without service loss; graceful degradation keeps core service.",
+    "RAID 0 none, RAID 1 mirror, RAID 5 one parity drive, RAID 6 two, RAID 10 mirrors striped. RAID is availability, never a backup.",
+    "Full copies all; incremental copies since the last backup; differential copies since the last full.",
+    "3-2-1: three copies, two media, one off-site; immutability or air gaps defend backups from ransomware.",
+    "Sites: hot = ready now, warm = equipped, cold = shell; cost falls as speed falls."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "After a crypto-virus event, the backup repository attached to the network was encrypted along with production. Which design change best addresses this?",
+      "choices": {
+        "A": "Move from RAID 5 to RAID 10",
+        "B": "Switch incrementals to differentials",
+        "C": "Keep one backup copy offline or immutable",
+        "D": "Add a second network card to the backup server"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Ransomware encrypts every reachable copy, so an offline or immutable copy is the fix. RAID and NIC changes address hardware failure, and the full-versus-incremental choice does not change reachability."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Which backup scheme restores with the fewest pieces after a complete loss on Friday, assuming daily backups since Sunday's full?",
+      "choices": {
+        "A": "Full plus four incrementals",
+        "B": "Five differentials only",
+        "C": "Five incrementals only",
+        "D": "Full plus one differential"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "A differential accumulates all changes since the full, so Friday's restore needs the full plus Friday's differential alone. Incrementals need every day in sequence."
+    }
+  ]
+}

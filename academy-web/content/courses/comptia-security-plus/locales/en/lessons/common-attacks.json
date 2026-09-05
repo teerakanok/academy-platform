@@ -1,0 +1,152 @@
+{
+  "nodeId": "common-attacks",
+  "locale": "en",
+  "title": "Common Attacks",
+  "objective": "By the end of this lesson you can recognize the major attack types from a short scenario, explain the logic behind each, and name the first mitigation that comes to mind.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Social engineering first"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Most breaches begin with a person, then a computer. Social engineering works because it exploits helpfulness, urgency, authority, and fear. Phishing is the email form; spear phishing targets a named person; whaling targets executives; smishing uses SMS; vishing uses voice calls. The defense trio is training, reporting, and technical filtering."
+    },
+    {
+      "kind": "heading",
+      "text": "Password and credential attacks"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Brute force: trying every combination; defeated by long passwords and lockouts.",
+        "Dictionary attack: trying likely words and known leaked passwords.",
+        "Password spraying: one common password against many accounts, staying under lockout thresholds.",
+        "Credential stuffing: replaying username and password pairs leaked from other sites.",
+        "Keylogging: recording keystrokes with malware."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Notice the logic, because the exam tests the logic. Spraying avoids lockouts by spreading attempts. Stuffing works because people reuse passwords. Every credential attack is answered by unique passwords, MFA, or both."
+    },
+    {
+      "kind": "heading",
+      "text": "Web and session attacks"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Attack",
+        "What happens",
+        "First defense"
+      ],
+      "rows": [
+        [
+          "SQL injection",
+          "Attacker input is run as part of a database query",
+          "Parameterized queries and input validation"
+        ],
+        [
+          "Cross-site scripting (XSS)",
+          "Attacker script runs in the victim's browser on a trusted site",
+          "Output encoding and input sanitization"
+        ],
+        [
+          "Cross-site request forgery (CSRF)",
+          "A logged-in browser is tricked into sending an unwanted action",
+          "Anti-CSRF tokens"
+        ],
+        [
+          "On-path attack",
+          "Attacker sits between victim and server, reading or altering traffic",
+          "TLS everywhere"
+        ],
+        [
+          "Replay attack",
+          "A captured valid request is sent again",
+          "Tokens and timestamps, nonces"
+        ],
+        [
+          "Privilege escalation",
+          "A user gains rights above their level, vertically or horizontally",
+          "Least privilege and patching"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Two memory hooks: injection attacks the server through input the site failed to check; XSS attacks the visitor through content the site failed to encode. CSRF needs no script at all: it borrows your active session."
+    },
+    {
+      "kind": "heading",
+      "text": "Spoofing and hijacking"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Spoofing means faking an identity: a forged sender address, a cloned website, a forged MAC or IP. Domain spoofing and typosquatting (registering look-alike domains) support phishing. On-path attacks (formerly man-in-the-middle) combine interception with possible alteration, and are answered by encrypted, authenticated channels such as TLS."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Recognition beats memorization. Read the scenario, name the attack in your own words, then match it to the answer list. When two answers both look plausible, prefer the one that matches the mechanism in the story, such as 'browser ran a script from a comment field' pointing to XSS over CSRF."
+    },
+    {
+      "kind": "try",
+      "title": "Attack recognition drill",
+      "steps": [
+        "Cover the attack names and read these clues: (1) a checkout page URL is one letter off the real store; (2) thousands of accounts show logins after one company's breach; (3) a forum comment made browsers alert users; (4) a session token in a URL was reused an hour later.",
+        "Name each attack.",
+        "Give one defense per attack.",
+        "Where two defenses overlap, name the shared control."
+      ],
+      "expected": "1: typosquatting or domain spoofing; user training and DNS filtering. 2: credential stuffing; unique passwords and MFA. 3: XSS; output encoding. 4: replay; short-lived tokens. Shared control: MFA helps both 2 and 4."
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Phishing Header Forensics",
+      "description": "Read sanitized sample email headers, check SPF, DKIM, and DMARC results, and spot a reply-to mismatch. Full guide: labs/phishing-header-forensics.en.md.",
+      "estimatedMinutes": 25,
+      "status": "ready",
+      "scale": "full"
+    }
+  ],
+  "cheatsheet": [
+    "Social engineering family: phishing, spear phishing, whaling, smishing, vishing; answer with training, reporting, filtering.",
+    "Credential logic: spraying spreads attempts across accounts; stuffing reuses leaked pairs; answer with unique passwords and MFA.",
+    "Injection hits the server via unchecked input; XSS hits the visitor via unencoded content; CSRF borrows the active session.",
+    "Replay sends a captured request again; on-path sits between the parties; both are answered by TLS plus tokens.",
+    "Spoofing fakes identity: sender, domain, IP, MAC, or a look-alike site."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "After a breach at another site, hundreds of your users' accounts show successful logins overnight. Users reused the same password there. Which attack is this?",
+      "choices": {
+        "A": "Password spraying",
+        "B": "On-path attack",
+        "C": "Brute force",
+        "D": "Credential stuffing"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Replaying leaked username-password pairs is credential stuffing. Spraying tries a few common passwords across many accounts without a leak, and brute force hammers one account."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A bank customer clicks a link in an email and lands on a site that looks exactly like the bank, at a domain spelled with one swapped letter. Which two attacks are in play?",
+      "choices": {
+        "A": "Typosquatting and phishing",
+        "B": "XSS and CSRF",
+        "C": "Replay and spoofing of MAC address",
+        "D": "SQL injection and escalation"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The look-alike domain is typosquatting, delivered through a phishing email. No site script or session is involved, so the web attacks do not fit."
+    }
+  ]
+}

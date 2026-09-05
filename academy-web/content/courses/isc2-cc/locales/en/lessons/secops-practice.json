@@ -1,0 +1,157 @@
+{
+  "nodeId": "secops-practice",
+  "locale": "en",
+  "title": "Practice: Triage and Data Handling",
+  "objective": "By the end of this lesson you can mark true-positive candidates in an event table, assign severity and escalation, and choose handling for data items by sensitivity.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Operations questions give you a queue, not a lecture: five lines, one of which is a real breach, and a clock. The two drills here train the eyes-on part — marking the rows that matter — and the judgment half that decides how each class of data moves and rests. Both are exam skills you can only get by doing rows."
+    },
+    {
+      "kind": "heading",
+      "text": "Drill 1: triage the event table"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Below is one hour of a night queue. For each row: validate, scope in one phrase, assign severity, and mark the next action. Then name the row that needs hierarchical escalation, meaning authority, not more skill."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Time",
+        "Event",
+        "Context"
+      ],
+      "rows": [
+        [
+          "01:12",
+          "IDS: known malware signature on host TEST-VM-07",
+          "Inside the approved vulnerability-scan window; source is the scan engine"
+        ],
+        [
+          "01:40",
+          "Auth: 220 failed logins then a success on FIN-SRV-02, then a new admin account 'svc_helper' appears",
+          "Finance server; no change ticket matches the account"
+        ],
+        [
+          "02:05",
+          "Identity: impossible-travel login blocked",
+          "User seen in Bangkok at 09:00; attempt from overseas 20 minutes later; blocked by policy"
+        ],
+        [
+          "02:30",
+          "User report: phishing email in an inbox, unread",
+          "One recipient so far; sender domain is a lookalike of the mail provider"
+        ],
+        [
+          "02:47",
+          "Ops: nightly backup job failed once, retry succeeded",
+          "Logs show a storage timeout; the second attempt wrote the full set"
+        ]
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Mark the true-positive candidates",
+      "steps": [
+        "For each of the five rows, write real, suspicious, benign, or operational, plus the severity band you would assign.",
+        "For every real or suspicious row, give the next action and the scope question you would ask first.",
+        "Name the row that needs hierarchical escalation and say which decision belongs to management rather than analysts."
+      ],
+      "expected": "01:12 benign — approved scan matches the signature; close as documented, tune the rule to expect the scan engine; severity low. 01:40 real — high to critical: credentials worked and a new admin exists on a finance server; contain the account, scope what it touched; this row needs hierarchical escalation because finance data exposure can trigger regulatory notification decisions owned by management. 02:05 suspicious — medium: the block worked, verify with the user and check whether any other factor was satisfied; next action contact the user. 02:30 potential — medium-low: hunt other recipients, block the sender domain, ask the user not to interact; severity rises with recipient count. 02:47 operational — low: retry succeeded, but two failures in a trend threaten the recovery story, so watch it and report it with continuity metrics."
+    },
+    {
+      "kind": "heading",
+      "text": "Drill 2: decide the handling"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Four data items are moving through your area. For each: give the sensitivity label, and the handling for storage and for transit — no control, TLS in transit, encryption at rest, or both plus restricted key handling."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "D1 — The marketing PDF destined for the public website.",
+        "D2 — An export of customer names and email addresses for a vendor campaign.",
+        "D3 — The key that decrypts the customer database.",
+        "D4 — Internal source code of the payment service."
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Choose the handling",
+      "steps": [
+        "For D1 to D4, write the sensitivity label and the handling for storage and transit.",
+        "Say which item carries the worst blast radius if it leaks, and which control does the most work in your answer.",
+        "Add the one extra rule for D3 that makes key handling different from data handling."
+      ],
+      "expected": "D1 public — no control beyond integrity of the upload; publish as intended. D2 confidential personal data — TLS in transit and encryption at rest, plus the smallest extract that serves the campaign; the vendor contract covers processing. D3 restricted — the key is the crown: encrypt at rest in a vault or HSM, restricted access with dual control, rotation on schedule, and never in the same store as the data it protects. D4 internal or confidential — TLS in transit, encryption at rest, repository access by role. Worst blast radius: D3, because possessing it converts encrypted customer data into readable customer data everywhere at once. The extra rule: keys get rotation and dual control — losing one must not be forever, and one person alone must never hold the power."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Triage asks validate before escalate; severity weighs impact, urgency, and asset value. Anything that can require regulator notification, spending, or public statements goes up the hierarchy, not just to specialists. Data handling scales with sensitivity: public needs integrity, personal data needs TLS plus encryption at rest, and keys need vault-level care with rotation and dual control."
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Walk the Phishing Triage",
+      "description": "Step frame by frame from 'email arrives' to 'reported to security', with one decision the frames grade you on. Full design: labs/phishing-triage-walkthrough.lab.en.md.",
+      "estimatedMinutes": 12,
+      "status": "coming-soon",
+      "scale": "inline"
+    }
+  ],
+  "cheatsheet": [
+    "Triage each row: validate, scope, severity, then escalate or close with a written reason.",
+    "Benign rows still get closed with a documented reason that feeds detection tuning.",
+    "Failed logins that turn successful plus a new admin account on a finance server is a high-to-critical real incident.",
+    "Hierarchical escalation carries the decisions management owns: regulator notification, spending, public statements.",
+    "Handling scales with sensitivity: public needs integrity, personal data needs TLS plus encryption at rest, and keys live in a vault with rotation and dual control."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A SIEM alert fires during the approved vulnerability-scan window, and the source address matches the scan engine. What is the correct triage outcome?",
+      "choices": {
+        "A": "Escalate to the CISO before touching anything",
+        "B": "Close as a documented false positive and tune the rule to expect scheduled scans",
+        "C": "Ignore the alert and move on without a record",
+        "D": "Reimage the scan engine immediately"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Validation against context shows an approved activity: close with a written reason and tune the rule so scheduled scans stop generating noise. Silent ignoring is the habit triage exists to prevent, and reimage or escalation is disproportionate for a validated scan."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A vendor campaign needs customer names and email addresses exported from the CRM. Which handling fits?",
+      "choices": {
+        "A": "Plain CSV over email; the vendor is trusted",
+        "B": "Encrypt at rest only; transit is the vendor's problem",
+        "C": "TLS in transit, encryption at rest, and the smallest extract that serves the campaign",
+        "D": "Send the full customer table to be safe"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Personal data gets protection in both states — TLS while it moves and encryption where it rests — and minimization limits what any single leak exposes. Trust in the vendor sets contract terms; it never removes the controls."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "During an incident, analysts confirm that customer personal data may have been copied, which could trigger a regulatory notification duty. Who must be brought in beyond the technical specialists?",
+      "choices": {
+        "A": "Only the network team, to block the attacker",
+        "B": "Nobody until systems are fully restored",
+        "C": "The marketing team, to prepare a statement",
+        "D": "Management via hierarchical escalation, because notification and legal decisions belong to them"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Decisions with legal exposure, regulator notification, spending, or public statements sit with management authority, so hierarchical escalation runs beside the technical response. Waiting for full restoration can blow a legal notification deadline."
+    }
+  ]
+}

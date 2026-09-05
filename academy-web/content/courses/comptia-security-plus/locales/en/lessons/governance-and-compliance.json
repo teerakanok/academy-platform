@@ -1,0 +1,124 @@
+{
+  "nodeId": "governance-and-compliance",
+  "locale": "en",
+  "title": "Governance and Compliance",
+  "objective": "By the end of this lesson you can order the documents in a security policy hierarchy, explain what governance, risk, and compliance each mean, and match common frameworks and regulations to the organizations they apply to.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Why paperwork is a security control"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Technology fails quietly when nobody agreed on the rules. Governance is how an organization decides who is accountable, risk management is how it decides what could go wrong, and compliance is how it checks that it follows both its own rules and outside laws. Together these are called GRC, and Domain 5 of the exam tests whether you can tell them apart."
+    },
+    {
+      "kind": "heading",
+      "text": "The policy hierarchy"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Document",
+        "Answers",
+        "Example",
+        "Mandatory?"
+      ],
+      "rows": [
+        [
+          "Policy",
+          "What and why",
+          "All staff must protect confidential data",
+          "Yes"
+        ],
+        [
+          "Standard",
+          "What specifically, measurably",
+          "Passwords must be at least 12 characters",
+          "Yes"
+        ],
+        [
+          "Procedure",
+          "How, step by step",
+          "How to reset a password in the directory",
+          "Yes"
+        ],
+        [
+          "Guideline",
+          "What is recommended",
+          "Tips for working securely from a cafe",
+          "No"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Policies change rarely because they state management intent. Procedures change whenever the process changes. An exam question that names a step-by-step instruction is describing a procedure, and a question that names a measurable requirement is describing a standard."
+    },
+    {
+      "kind": "heading",
+      "text": "Frameworks you must recognize"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "NIST Cybersecurity Framework (CSF): voluntary, risk-based, free to use. Its six functions are Govern, Identify, Protect, Detect, Respond, and Recover.",
+        "ISO 27001: an auditable standard for an information security management system (ISMS). Organizations can be certified against it.",
+        "PCI DSS: required for organizations that store, process, or transmit payment card data.",
+        "GDPR: European Union privacy law covering personal data of EU residents, including breach notification duties.",
+        "SOC 2: an audit report format for service organizations covering trust criteria such as security and availability."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Match the framework to the driver, not to the technology. Payment cards point to PCI DSS. EU personal data points to GDPR. A certifiable management system points to ISO 27001. A free, voluntary improvement skeleton points to NIST CSF. If you see a question about which law forces a 72-hour style breach notification for personal data, think privacy law such as GDPR."
+    },
+    {
+      "kind": "paragraph",
+      "text": "For learners in Thailand, the Personal Data Protection Act (PDPA) plays the role GDPR plays in Europe: it defines personal data, requires a lawful basis such as consent, gives data subjects rights like access and erasure, and can require breach notification. The exam itself tests GDPR by name, but the concepts transfer directly."
+    },
+    {
+      "kind": "heading",
+      "text": "Data classification feeds governance"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Classification labels such as public, internal, confidential, and restricted decide how data is stored, shared, and destroyed. A governance program without classification cannot tell staff which spreadsheet is safe to email, so classification is usually one of the first policies a young security program writes."
+    },
+    {
+      "kind": "try",
+      "title": "Sort five documents",
+      "steps": [
+        "Write these five on paper: a twelve-character password rule, an acceptable use policy, the steps to escrow a laptop before travel, recommended VPN habits for hotels, and a data classification table.",
+        "Label each one policy, standard, procedure, or guideline.",
+        "For the classification table, add the handling rule you would expect at each level, such as who may read confidential data."
+      ],
+      "expected": "Password rule is a standard, acceptable use is a policy, laptop escrow steps are a procedure, hotel VPN tips are a guideline, and the classification table is usually part of a policy or standard with handling procedures attached."
+    }
+  ],
+  "cheatsheet": [
+    "Policy hierarchy: policy (what and why) > standard (measurable requirement) > procedure (step by step) > guideline (recommended, not mandatory).",
+    "GRC: governance decides accountability, risk decides what could go wrong, compliance checks the rules are followed.",
+    "NIST CSF six functions: Govern, Identify, Protect, Detect, Respond, Recover.",
+    "PCI DSS for card data, GDPR for EU personal data, ISO 27001 for a certifiable ISMS, SOC 2 for service organization audit reports.",
+    "Classification levels such as public, internal, confidential, restricted drive handling rules."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A document in the staff wiki titled Escrow steps for laptops before international travel lists numbered actions with owners and screenshots. In the policy hierarchy, what is this document?",
+      "choices": {
+        "A": "Policy",
+        "B": "Standard",
+        "C": "Guideline",
+        "D": "Procedure"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Numbered how-to steps for one task define a procedure. A policy would state intent, a standard would state a measurable requirement, and a guideline would merely recommend."
+    }
+  ]
+}

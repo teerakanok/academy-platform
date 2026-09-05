@@ -1,0 +1,136 @@
+{
+  "nodeId": "security-controls-types",
+  "locale": "en",
+  "title": "Security Controls: Types and Categories",
+  "objective": "By the end of this lesson you can classify a control by function (preventive, detective, corrective, and friends) and by category (administrative, technical, physical), and explain compensating controls.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Two independent ways to slice a control"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Every control can be described by what it does (its function) and by what it is made of (its category). The exam gives you a scenario and asks for one or the other, so keep the two grids separate in your mind. A firewall is technical and preventive. A security guard is physical and preventive. An audit log review is administrative (or technical, if automated) and detective."
+    },
+    {
+      "kind": "heading",
+      "text": "By function: when the control acts"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Function",
+        "When it acts",
+        "Examples"
+      ],
+      "rows": [
+        [
+          "Preventive",
+          "Stops the event from happening",
+          "Firewall rule, MFA, door lock, input validation"
+        ],
+        [
+          "Detective",
+          "Reveals the event, during or after",
+          "IDS alert, audit log review, CCTV footage review"
+        ],
+        [
+          "Corrective",
+          "Fixes impact after the event",
+          "Restore from backup, patch the exploited flaw, reroute traffic"
+        ],
+        [
+          "Deterrent",
+          "Discourages the attempt",
+          "Warning signs, visible cameras, login banners"
+        ],
+        [
+          "Recovery",
+          "Restores capabilities after compromise",
+          "Backup restore, failover site, system rebuild"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "A helpful pairing: preventive controls answer the attack before it lands, detective controls tell you it happened, and corrective and recovery controls put things back. Many real deployments combine them: MFA prevents, logs detect, backups recover."
+    },
+    {
+      "kind": "heading",
+      "text": "By category: what the control is made of"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Administrative (management) controls: policies, standards, procedures, training, background checks, separation of duties. They direct human behavior.",
+        "Technical (logical) controls: firewalls, encryption, MFA, access control lists, antivirus and EDR. They are enforced by systems.",
+        "Physical controls: locks, badges, guards, fences, CCTV, mantraps, fire suppression. They protect facilities and hardware."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "One control can wear two hats in one sentence. CCTV is a physical control that functions as detective (recording) and deterrent (visible). Training is administrative and preventive. When the exam asks for a specific pairing, read which axis the question names: function or category."
+    },
+    {
+      "kind": "heading",
+      "text": "Compensating controls"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Sometimes the primary control you want is impossible. The legacy system cannot support MFA, so you place it behind a jump server with MFA and restrict network access to it. That jump server is a compensating control: an alternative measure that achieves a comparable risk reduction when the primary control cannot be applied. Expect at least one scenario where the correct answer is the compensating control, phrased as an alternative path to the same protection."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "On the exam",
+      "text": "Classic trap: calling a backup a preventive control. Backups do not stop an attack; they are corrective or recovery controls. Another trap: cameras deter, but unless someone watches the feed they do not prevent; they detect and deter."
+    },
+    {
+      "kind": "try",
+      "title": "Classify six controls",
+      "steps": [
+        "Classify each by function AND category: (1) monthly access review meeting; (2) full-disk encryption; (3) turnstile with badge reader; (4) honeypot alerting the SOC; (5) restoring a database from last night's backup; (6) posted sign warning that access is logged.",
+        "Write function first, then category.",
+        "Mark which ones pair naturally in one defense-in-depth stack."
+      ],
+      "expected": "1: detective, administrative. 2: preventive, technical. 3: preventive, physical. 4: detective, technical. 5: corrective/recovery, technical. 6: deterrent, administrative or physical. Pairs: 2 with 5 (prevent then recover), 3 with 4 (physical gate plus detection)."
+    }
+  ],
+  "cheatsheet": [
+    "Function axis: preventive (stop it), detective (reveal it), corrective (fix it), deterrent (discourage it), recovery (restore it).",
+    "Category axis: administrative (policy and people), technical (systems), physical (facilities).",
+    "Backups are corrective/recovery, never preventive.",
+    "Compensating control = alternative measure when the primary control is not feasible.",
+    "One control can be classified on both axes at once; read which axis the question asks for."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "After a ransomware incident, an organization restores servers from offline backups. Which type of control is this?",
+      "choices": {
+        "A": "Preventive",
+        "B": "Detective",
+        "C": "Corrective",
+        "D": "Deterrent"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Restoring from backup repairs the damage after the event, which is a corrective (recovery-oriented) control. It did nothing to stop or reveal the attack while it was happening."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A legacy application cannot support MFA, so the team places it behind a dedicated gateway that requires MFA and restricts source addresses. The gateway is best described as a:",
+      "choices": {
+        "A": "Physical control",
+        "B": "Deterrent control",
+        "C": "Detective control",
+        "D": "Compensating control"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The primary control (MFA on the application) is infeasible, so an alternative measure achieves a comparable protection. That is the definition of a compensating control, implemented here with technical means."
+    }
+  ]
+}

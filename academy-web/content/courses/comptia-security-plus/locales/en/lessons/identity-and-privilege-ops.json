@@ -1,0 +1,135 @@
+{
+  "nodeId": "identity-and-privilege-ops",
+  "locale": "en",
+  "title": "Identity and Privilege Ops",
+  "objective": "By the end of this lesson you can manage account lifecycles, apply MFA and credential policies correctly, and run privilege management with least privilege as the default.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Account types and their risks"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "User accounts: one per human; shared accounts destroy individual attribution.",
+        "Privileged accounts: admin and root; the crown jewels of identity security.",
+        "Service accounts: used by software; often forgotten, rarely rotated, and sometimes over-privileged.",
+        "Guest and temporary accounts: convenience that becomes a backdoor when it outlives its purpose."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The lifecycle matters as much as the type: provision with approval, review access on a schedule, and deprovision the day access ends. Former employees with live accounts are a classic exam scenario, answered by timely deprovisioning and periodic access reviews."
+    },
+    {
+      "kind": "heading",
+      "text": "Authentication factors and MFA"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Factor",
+        "Meaning",
+        "Examples"
+      ],
+      "rows": [
+        [
+          "Knowledge",
+          "Something you know",
+          "Password, PIN"
+        ],
+        [
+          "Possession",
+          "Something you have",
+          "Phone app code, security key"
+        ],
+        [
+          "Inherence",
+          "Something you are",
+          "Fingerprint, face"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "MFA combines two or more different factor types. Two passwords are one factor. Push-fatigue attacks spam approval prompts until a user taps yes, which is why number-matching and hardware keys are stronger answers. SSO logs in once across services; federation lets a trusted partner's identity vouch for you (SAML, OAuth concepts at this level)."
+    },
+    {
+      "kind": "heading",
+      "text": "Credential policies"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Length beats complexity for resistance, but exams expect both: minimum length, complexity classes, rotation with age limits, history to prevent reuse, lockout thresholds with cautious timeouts, and passwordless or MFA-backed flows where possible. Write the policy for people, then enforce it with technical controls."
+    },
+    {
+      "kind": "heading",
+      "text": "Privilege management"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Least privilege: each identity holds the minimum rights for its task, and privilege expires when the task does.",
+        "Separation of duties: split critical processes across people, so one person cannot both create and approve a payment.",
+        "Job rotation: moving staff through roles surfaces hidden abuse and spreads knowledge.",
+        "Just-in-time (JIT) elevation: admin rights granted for a window, then removed.",
+        "PAM (privileged access management): vaults admin credentials, brokers sessions, records what privileged users do.",
+        "Access reviews and account recertification: periodic checks that rights still match roles."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Watch for the shared-admin-password scenario: the fix is individual privileged accounts with PAM brokering, so every action maps to one person. Watch also for the developer-with-permanent-admin scenario: the fix is just-in-time elevation."
+    },
+    {
+      "kind": "try",
+      "title": "Fix one identity mess",
+      "steps": [
+        "Scenario: a small firm runs a shared 'admin' login for all IT staff, a service account with domain admin rights for a legacy app, and an intern account that still works eight months after the internship.",
+        "Write one fix per finding.",
+        "Order the fixes by risk.",
+        "Note which fix needs a technical control rather than a policy."
+      ],
+      "expected": "Individual admin accounts with PAM; the service account gets least-privilege rights and a rotated credential; the intern account is deprovisioned at once. The intern account is both the fastest fix and the loudest signal that deprovisioning is broken. PAM is the technical control; the others are process plus tooling."
+    }
+  ],
+  "cheatsheet": [
+    "Account types: user, privileged, service, guest; each with its own failure mode.",
+    "Lifecycle: provision with approval, review periodically, deprovision on day one after departure.",
+    "MFA = two different factor types (know, have, are). Push fatigue favors number-matching and hardware keys.",
+    "Credential policy: length plus complexity, age and history, lockout with timeouts.",
+    "Privilege: least privilege, separation of duties, job rotation, just-in-time elevation, PAM vaulting and session recording."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "An application uses one domain-admin service account so it 'always has enough rights'. Which change best follows least privilege?",
+      "choices": {
+        "A": "Rotate the password quarterly",
+        "B": "Give the account only the rights the application needs",
+        "C": "Share the password among the app team",
+        "D": "Rename the account to something obscure"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Least privilege trims rights to what the task needs. Rotation and renaming leave excess power in place, and sharing widens exposure."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A user approves an MFA push they never requested, at 2 a.m., to stop the buzzing phone. Which attack and which hardening pair up?",
+      "choices": {
+        "A": "Push fatigue and number matching",
+        "B": "Phishing and longer passwords",
+        "C": "Credential stuffing and lockout",
+        "D": "On-path attack and TLS"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Prompt bombing until a tired user approves is push fatigue; number matching or hardware keys removes the tap-yes reflex."
+    }
+  ]
+}

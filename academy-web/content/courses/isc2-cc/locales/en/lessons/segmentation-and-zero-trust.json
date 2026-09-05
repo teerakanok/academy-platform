@@ -1,0 +1,122 @@
+{
+  "nodeId": "segmentation-and-zero-trust",
+  "locale": "en",
+  "title": "Segmentation, Zero Trust, and Isolating AI Environments",
+  "objective": "By the end of this lesson you can explain VLANs, segmentation, and the DMZ, state zero trust principles, and describe why AI development environments get isolated.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Segmentation: small rooms, not one hall"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A flat network lets any compromised device reach every other device. Segmentation divides the network into zones separated by enforcement points, so a breach in one zone does not immediately become a breach of everything. VLANs (virtual LANs) create logical segments on shared switches: user PCs, servers, printers, and guest Wi-Fi can live in separate VLANs that talk only through a firewall or router policy. The exam presents segmentation as the control that limits lateral movement, the attacker technique of hopping from machine to machine after a first foothold."
+    },
+    {
+      "kind": "heading",
+      "text": "The DMZ"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A DMZ (demilitarized zone) is the classic segmentation pattern for public services: internet-facing servers such as web and mail front ends sit in a middle zone between the internet and the internal network. Outside users reach the DMZ services; the DMZ reaches only the specific internal systems it must, never the whole interior. If a DMZ server is compromised, the blast radius is that zone, not the crown jewels."
+    },
+    {
+      "kind": "heading",
+      "text": "Zero trust"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Traditional security trusted the inside: once past the perimeter, traffic flowed largely unchecked. Zero trust removes that assumption with three principles the exam expects you to recite: never trust, always verify (every request is authenticated and authorized, regardless of network location); least privilege access (grant the minimum needed, just-in-time); and assume breach (design and monitor as if an attacker is already inside, containing blast radius with segmentation and encryption)."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Old perimeter model",
+        "Zero trust model"
+      ],
+      "rows": [
+        [
+          "Inside the network is trusted",
+          "No implicit trust from location"
+        ],
+        [
+          "One strong gate at the edge",
+          "Verification at every resource access"
+        ],
+        [
+          "Broad access once connected (classic VPN)",
+          "Per-application, least-privilege grants"
+        ],
+        [
+          "Flat interior after login",
+          "Micro-segmentation contains movement"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Micro-segmentation is zero trust's network expression: policies wrap individual workloads or applications, not network zones, so even a compromised server can talk only to its defined partners. Remote access shifts from network-level VPNs toward per-application access with identity and device checks, which ties this lesson back to the IAM domain."
+    },
+    {
+      "kind": "heading",
+      "text": "Isolating AI development environments"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The 2026 outline names isolation of AI development environments as a D4 topic. AI development is risky in specific ways: models and datasets are large and valuable, teams pull many external libraries and pre-trained weights (supply-chain exposure), experiments run with broad permissions, and research data may be sensitive. The prescribed pattern is segmentation applied to the AI stack: keep training environments, datasets, and AI tooling in their own network zone with controlled egress, separate credentials and service accounts (Domain 3 lifecycle rules), and monitored access to production data."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Segmentation answers lateral-movement scenarios; DMZ answers public-service exposure; zero trust answers inside-the-network trust questions with 'verify every request, least privilege, assume breach'. AI environments get the same treatment: own zone, own identities, controlled egress."
+    },
+    {
+      "kind": "try",
+      "title": "Design three zones",
+      "steps": [
+        "Sketch zones for a small company that runs: a public website, an internal file server, staff laptops, guest Wi-Fi, and a new AI pilot project with sensitive training data.",
+        "For each zone, state which other zones it may reach.",
+        "Mark where an attacker who compromises the web server can go, and where the AI training data is out of reach."
+      ],
+      "expected": "Zones: DMZ (website), internal server zone (file server), staff VLAN, guest VLAN (internet only), isolated AI zone (controlled egress, dedicated credentials). Web compromise reaches only the DMZ and its defined backend path; guest users cannot see internal anything; AI data is unreachable except through the AI zone's controlled, monitored access."
+    }
+  ],
+  "cheatsheet": [
+    "Segmentation limits lateral movement; VLANs are the standard building block.",
+    "DMZ = middle zone for public services; compromise there must not reach the interior.",
+    "Zero trust: never trust always verify, least privilege just-in-time, assume breach.",
+    "Micro-segmentation wraps policies around workloads, not network zones; per-app access replaces broad network VPN access.",
+    "AI development environments: isolate in their own zone with controlled egress and dedicated identities."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "After an attacker phishes one laptop, they attempt to scan the entire corporate network. Which control, missing here, would have contained this?",
+      "choices": {
+        "A": "More frequent antivirus signature updates",
+        "B": "Stronger password complexity rules",
+        "C": "Network segmentation limiting what the compromised host can reach",
+        "D": "A longer backup retention period"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Uncontained scanning after a single foothold is the signature of a flat network. Segmentation (VLANs, zone firewalls, micro-segmentation) is the control that blocks or blunts lateral movement."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Which statement set matches zero trust principles?",
+      "choices": {
+        "A": "Trust internal traffic; verify external traffic once at the perimeter",
+        "B": "Grant broad VPN access after one strong login",
+        "C": "Verify every request regardless of location, grant least privilege just-in-time, and assume breach",
+        "D": "Segment the perimeter and leave the interior flat"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Zero trust removes location-based trust: every access is verified, privileged narrowly, and monitored under an assume-breach mindset. Perimeter trust, broad VPN grants, and flat interiors are all perimeter-model answers."
+    }
+  ]
+}

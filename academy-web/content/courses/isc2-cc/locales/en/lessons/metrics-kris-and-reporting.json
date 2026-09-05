@@ -1,0 +1,138 @@
+{
+  "nodeId": "metrics-kris-and-reporting",
+  "locale": "en",
+  "title": "Metrics, KRIs, and Reporting",
+  "objective": "By the end of this lesson you can distinguish metrics from KRIs, read trend direction, name AI-specific KRIs, and shape a report for executives.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Metrics measure activity; KRIs warn about risk"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A metric is any measured value: number of patches applied, MFA coverage, training completion. A key risk indicator (KRI) is a metric chosen because it moves ahead of, or with, a risk the organization cares about. Rising phishing click rates, growing numbers of unremediated critical vulnerabilities, and falling patch compliance are KRIs: when they move in the wrong direction, loss events become more likely."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Example indicator",
+        "Metric or KRI?",
+        "Why"
+      ],
+      "rows": [
+        [
+          "MFA enabled on 96% of accounts",
+          "Metric (and a KRI when tracked against a threshold)",
+          "Directly reflects control coverage for account-takeover risk"
+        ],
+        [
+          "Phishing simulation click rate rising for 3 campaigns",
+          "KRI",
+          "Leading signal that account compromise likelihood is rising"
+        ],
+        [
+          "Critical vulnerabilities open longer than 30 days doubling",
+          "KRI",
+          "Exposure window for exploitation is widening"
+        ],
+        [
+          "Number of awareness emails sent",
+          "Metric only",
+          "Activity count; says nothing about risk change"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Direction and thresholds are what make indicators useful. A KRI is defined with a green-amber-red threshold and an owner who reacts when the line crosses into amber. An indicator without a threshold is just a number on a chart."
+    },
+    {
+      "kind": "heading",
+      "text": "AI-specific KRIs"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The 2026 outline adds AI-specific key risk indicators because AI use is now a governance concern. Think of them as KRIs for a new class of exposure."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Sensitive data found in prompts to public AI services (leakage exposure).",
+        "Number of AI tools or models in use without security review (shadow AI).",
+        "Model performance or drift alerts unresolved beyond threshold (decision quality risk).",
+        "AI-related incidents or near misses reported per quarter.",
+        "Share of AI systems with logged, traceable actions and defined owners."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Reporting to management"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Executives need decisions and comparisons, not tool output. A good security report leads with risk posture and trend, states what changed since last period, flags items needing a decision, and translates technical counts into business exposure. The audience-shaping rule: for executives, lead with risk and decisions; for practitioners, include the technical detail in an appendix."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Lead with: overall posture, movement of key KRIs, incidents and their business impact.",
+        "Then: compliance status, budget-relevant findings, decisions requested with options.",
+        "Appendix: detailed metrics, tool outputs, technical evidence.",
+        "Cadence: brief and frequent beats long and rare; align reporting to governance meetings."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Two patterns repeat. First, pick the KRI over the raw activity count: risk-linked and thresholded beats volume-of-work. Second, pick the report that matches its audience: risk language and decisions for the board, technical depth for the SOC."
+    },
+    {
+      "kind": "try",
+      "title": "Build a KRI line",
+      "steps": [
+        "Pick one risk your organization (or a fictional shop) cares about, such as account compromise.",
+        "Choose one metric that moves with that risk and define an amber and red threshold for it.",
+        "Write the one-sentence escalation: who is told and what they decide when red is hit."
+      ],
+      "expected": "Example: risk = account compromise. KRI = percentage of privileged accounts without MFA. Amber above 5%, red above 10%. On red, the CISO pauses new access grants until coverage is restored."
+    }
+  ],
+  "cheatsheet": [
+    "Metric = measurement; KRI = metric tied to a risk, with thresholds and an owner.",
+    "Good KRIs: phishing click rate trend, unremediated critical vulnerabilities, MFA coverage gap, patch compliance slide.",
+    "AI-specific KRIs: sensitive data in public AI prompts, unreviewed AI tools (shadow AI), unresolved model drift, AI incidents, traceability coverage.",
+    "Executive reports lead with risk posture, trends, and decisions requested; technical detail goes to appendices.",
+    "An indicator without a threshold and owner is decoration."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Which of these is the strongest KRI for ransomware exposure?",
+      "choices": {
+        "A": "Count of critical vulnerabilities older than 30 days, trending upward",
+        "B": "Number of security awareness emails sent this quarter",
+        "C": "Number of firewall rules in place",
+        "D": "Total pages of the security policy set"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Aging critical vulnerabilities widen the exploitation window for ransomware entry, and the upward trend signals rising risk: that is a KRI. Email counts, rule counts, and page counts are activity or inventory, not risk-linked indicators."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "You must brief the board on security. Your opening slide should present:",
+      "choices": {
+        "A": "Raw SIEM alert counts by product",
+        "B": "The full list of firewall rule changes",
+        "C": "Risk posture, KRI trends, and decisions requested",
+        "D": "Endpoint agent version numbers"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Boards govern risk, so the report leads with posture, trend, and decisions needed. Operational detail supports the story in appendices, not the opening."
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "nodeId": "architecture-models",
+  "locale": "en",
+  "title": "Architecture Models",
+  "objective": "By the end of this lesson you can explain defense in depth, zero trust, secure-by-design, and shared responsibility, and pick the model a scenario is describing.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Defense in depth: layered security"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Defense in depth stacks multiple controls so a failure of one layer leaves others standing: perimeter firewall, segment gateways, host firewall, application checks, encryption, and backups. The exam phrase to expect: no single control is trusted to catch everything."
+    },
+    {
+      "kind": "heading",
+      "text": "Zero trust"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Zero trust removes the idea of a trusted internal network. Every request is authenticated, authorized, and encrypted, regardless of origin. Three core principles: verify explicitly (strong identity, device health), use least-privilege access (just enough, just in time), and assume breach (segment, encrypt, monitor inside)."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Microsegmentation: cutting the inside network into small zones, so one compromised host reaches little.",
+        "Implicit deny: access is refused unless a rule grants it.",
+        "Continuous verification: sessions re-checked, with device posture in the decision.",
+        "Identity becomes the new perimeter: who and what asks matters more than where they sit."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Secure-by-design and shared responsibility"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Secure-by-design builds security into requirements from day one: threat modeling, least privilege defaults, fail-safe defaults, and keeping security simple enough to verify. It contrasts with bolting controls on after delivery. Shared responsibility draws the line between what a provider secures and what the customer secures; in the cloud the customer always keeps responsibility for data classification, identity, and access choices."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Model",
+        "One-line idea",
+        "Exam trigger phrase"
+      ],
+      "rows": [
+        [
+          "Defense in depth",
+          "Many layers, none trusted alone",
+          "'Multiple overlapping controls'"
+        ],
+        [
+          "Zero trust",
+          "Verify every request, assume breach",
+          "'Never trust, always verify'"
+        ],
+        [
+          "Least privilege",
+          "Minimum rights needed, briefly",
+          "'Only the access the task requires'"
+        ],
+        [
+          "Segmentation",
+          "Zones with gates between",
+          "'Limit lateral movement'"
+        ],
+        [
+          "Secure-by-design",
+          "Security in requirements, end to end",
+          "'From the start of the project'"
+        ],
+        [
+          "Shared responsibility",
+          "Provider and customer each own parts",
+          "'Who patches what in the cloud'"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Zero-trust scenarios mention device health checks, per-request authorization, or microsegmentation. Segmentation questions focus on limiting blast radius. When a question says a design assumed the internal network was safe, the fix is zero trust thinking."
+    },
+    {
+      "kind": "try",
+      "title": "Redesign an office network on paper",
+      "steps": [
+        "Start with a flat network: one subnet holding HR laptops, a file server, and a printer, all able to reach each other.",
+        "Draw segmentation that separates those three groups with a gateway.",
+        "Add zero-trust rules: which request checks now happen at the gateway?",
+        "Add one more layer of defense in depth that has nothing to do with the network."
+      ],
+      "expected": "Three zones with a gateway allowing only needed flows; gateway checks identity, device health, and authorization per request; an extra layer could be disk encryption on the file server or an offline backup, independent of the network."
+    }
+  ],
+  "cheatsheet": [
+    "Defense in depth: stack layers so one failure is survivable.",
+    "Zero trust: verify explicitly, least privilege, assume breach; identity replaces network location.",
+    "Microsegmentation limits lateral movement; implicit deny is the default posture.",
+    "Secure-by-design: security is a requirement from day one, with threat modeling and safe defaults.",
+    "Shared responsibility: the provider secures the platform; the customer keeps data, identity, and access decisions."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A company allows any device on the office network to reach any internal server after one login at the VPN. Which architecture change best reflects zero trust?",
+      "choices": {
+        "A": "Add a second perimeter firewall",
+        "B": "Require longer passwords at the VPN",
+        "C": "Move all servers to one stronger subnet",
+        "D": "Evaluate identity and device health for every request, with microsegmented access"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Zero trust verifies each request explicitly and limits reach through least privilege and segmentation. Stronger perimeters or passwords keep the old trusted-inside assumption."
+    }
+  ]
+}

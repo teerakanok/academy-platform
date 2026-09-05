@@ -1,0 +1,129 @@
+{
+  "nodeId": "governance-and-ethics-basics",
+  "locale": "en",
+  "title": "Governance Basics, Due Care and Due Diligence, and ISC2 Ethics",
+  "objective": "By the end of this lesson you can distinguish due care from due diligence, state the four ISC2 Code of Ethics canons in order, and separate security from privacy.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Governance in one sentence"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Governance is the system by which an organization directs and controls security: who is accountable, what rules exist, how performance is checked. Boards and executives set direction and own accountability; security professionals implement and advise. On the exam, governance questions reward the answer that assigns decisions to management and implementation to practitioners."
+    },
+    {
+      "kind": "heading",
+      "text": "Due care vs due diligence"
+    },
+    {
+      "kind": "paragraph",
+      "text": "These two phrases differ by one idea. Due care is doing what a reasonable, prudent organization would do: installing firewalls, writing policies, training staff, making backups. It is action and ongoing practice. Due diligence is the investigation and verification that your care is adequate and working: assessing risks before adopting a service, auditing controls, reviewing vendors, verifying compliance. Care is practicing; diligence is checking."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Concept",
+        "In plain words",
+        "Example"
+      ],
+      "rows": [
+        [
+          "Due care",
+          "Act prudently, ongoing",
+          "Enable MFA, patch systems, keep backups, train employees"
+        ],
+        [
+          "Due diligence",
+          "Investigate and verify",
+          "Audit vendor security before signing, verify controls after deployment, review logs for compliance"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Courts and regulators care about both. An organization that acted with reasonable care and can prove its diligence checks has a defensible posture; one that skipped either is negligent. Exam scenarios with a company that bought tools but never verified they worked are testing due diligence."
+    },
+    {
+      "kind": "heading",
+      "text": "The four ISC2 Code of Ethics canons"
+    },
+    {
+      "kind": "paragraph",
+      "text": "All ISC2 certificants commit to this code, and the exam can ask about it. The canons are ordered by priority: when two canons conflict, the earlier one wins. A useful memory hook: society, profession's honor, principals, the profession itself."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "1. Protect society, the common good, necessary public trust and confidence, and the infrastructure.",
+        "2. Act honorably, honestly, justly, responsibly, and legally.",
+        "3. Provide diligent and competent service to principals.",
+        "4. Advance and protect the profession."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The ordering matters. If your employer asks you to conceal a breach that endangers the public, canon 1 outranks canon 3: the public comes before the client. Scenario questions about conflicts of interest test exactly this order."
+    },
+    {
+      "kind": "heading",
+      "text": "Security vs privacy"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Security is protecting assets from unauthorized access and harm. Privacy is the right of individuals to control how their personal data is collected, used, and shared. They overlap but are not the same: a company can have strong security and still violate privacy by using collected data in ways people did not expect, and privacy obligations (retention limits, consent) exist even when no attack is in sight. Data protection laws such as GDPR in Europe and PDPA in Thailand make privacy a compliance requirement, not a courtesy."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Ethics answers follow canon order: public first, then honest conduct, then diligent service to your principals, then advancing the profession. When a question offers loyalty to the employer versus the public good, the public wins by canon priority."
+    },
+    {
+      "kind": "try",
+      "title": "Canon ordering drill",
+      "steps": [
+        "Cover the canon list above. For each scenario, name the canon that governs and what it requires: (1) your manager asks you to stay silent about a vulnerability that threatens customer data; (2) you are offered a project you lack the skills to deliver; (3) a colleague asks you to share exam dump material.",
+        "Say which canon wins when two apply.",
+        "Recheck your answers against the ordered list."
+      ],
+      "expected": "1: canon 1 (protect society) overrides duty to the employer; escalate responsibly. 2: canon 3 (diligent and competent service) requires declining or upskilling with disclosure. 3: canon 4 (advance and protect the profession), and canon 2 (act honorably) both reject exam fraud."
+    }
+  ],
+  "cheatsheet": [
+    "Due care = prudent ongoing action (do the right things); due diligence = verify and investigate (prove they work).",
+    "ISC2 ethics canons in priority order: society and public trust, honorable and legal conduct, diligent competent service to principals, advance the profession.",
+    "Canon order decides conflicts: the public outranks the employer.",
+    "Security protects assets; privacy is the individual's control over personal data; both can bind you by law."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A company deploys antivirus on all laptops but never checks whether signatures are updating. Deploying the antivirus is due care; what is missing?",
+      "choices": {
+        "A": "Due diligence",
+        "B": "Due process",
+        "C": "Compensating control",
+        "D": "Risk avoidance"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Verification that a control actually works is due diligence. Acting (deploying) was care; checking is diligence."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Which ISC2 ethics canon has the highest priority when two canons conflict?",
+      "choices": {
+        "A": "Advance and protect the profession",
+        "B": "Protect society, the common good, and public trust",
+        "C": "Provide diligent and competent service to principals",
+        "D": "Act honorably, honestly, justly, responsibly, and legally"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The canons are applied in order, and protection of society and the public trust is canon one. It outranks service to principals (canon 3) and the profession (canon 4)."
+    }
+  ]
+}

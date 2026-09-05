@@ -1,0 +1,129 @@
+{
+  "nodeId": "teams-and-security-testing",
+  "locale": "th",
+  "title": "Red, Blue, Purple Team และการทดสอบความปลอดภัย",
+  "objective": "เมื่อจบบทเรียนนี้ ผู้เรียนอธิบาย red, blue และ purple teaming ได้ ตั้งชื่อประเภท application security testing ได้ เดินพื้นฐาน threat modeling ได้ และอธิบายแนวคิด physical penetration testing ได้",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "สามสีของทีม"
+    },
+    {
+      "kind": "paragraph",
+      "text": "การทดสอบความปลอดภัยจัดระเบียบด้วยบทบาทที่ยืมจากการซ้อมทหาร red team โจมตี (โดยได้รับอนุญาต) เพื่อหาจุดอ่อนก่อนคู่ต่อสู้ตัวจริง blue team ป้องกันและตรวจจับ ดูแล monitoring การตอบสนอง และการเสริมความแข็งแรง purple team ไม่ใช่หน่วยที่สาม แต่เป็นวิธีทำงาน: red กับ blue อยู่ในวงจรเดียวกัน ผลการโจมตีไหลเข้าการสร้าง detection ทันที และการป้องกันถูกทดสอบซ้ำเพื่อยืนยันว่าแก้จริง ประเด็นวัฒนธรรมที่ข้อสอบชอบ: เป้าหมายคือทำให้ระบบดีขึ้น และผลลัพธ์ต้องไปถึงฝั่ง blue"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "ทีม",
+        "ภารกิจ",
+        "ผลลัพธ์"
+      ],
+      "rows": [
+        [
+          "red",
+          "เลียนแบบผู้โจมตีภายใต้ขอบเขตและ rules of engagement ที่ตกลง",
+          "findings, เส้นทางโจมตี, หลักฐาน"
+        ],
+        [
+          "blue",
+          "ตรวจจับ ตอบสนอง เสริมความแข็งแรง",
+          "detections, การรับมือ incident, การลดความเสี่ยง"
+        ],
+        [
+          "purple (การปฏิบัติร่วม)",
+          "ปิดวงจร: ทุก finding ของ red กลายเป็น detection ของ blue แล้วทดสอบซ้ำ",
+          "ความครอบคลุมที่ดีขึ้น การแก้ที่ยืนยันแล้ว"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Application security testing"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "static analysis (SAST): ตรวจ source code โดยไม่รัน; จับ injection และแพทเทิร์นไม่ปลอดภัยตั้งแต่ต้นของการพัฒนา",
+        "dynamic analysis (DAST): สอย application ที่รันอยู่จากภายนอกเหมือนผู้โจมตี; ไม่ต้องมี source",
+        "interactive analysis (IAST) และ software composition analysis (SCA): มองเห็นตอนรัน และทำ inventory ไลบรารีบุคคลที่สามพร้อมช่องโหว่ที่รู้จัก",
+        "penetration testing: การจำลองโจมตีโดยมนุษย์ที่ได้รับอนุญาต ภายในขอบเขตที่กำหนด; จบด้วยรายงานและคำแนะนำแก้ไข",
+        "bug bounty: ให้รางวัลนักวิจัยภายนอกที่รายงานอย่างมีความรับผิดชอบ ขยายความครอบคลุมเกินทีมภายใน"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "ความต่างแบบคำเดียวที่ข้อสอบอยากได้: static ดูโค้ดที่หยุดนิ่ง dynamic ดูแอปที่รันอยู่ และ penetration test คือการโจมตีที่ได้รับอนุญาตพร้อมรายงานท้ายงาน การอนุญาตและขอบเขตคือสิ่งที่แยกทั้งหมดนี้ออกจากอาชญากรรม"
+    },
+    {
+      "kind": "heading",
+      "text": "Threat modeling สี่คำถาม"
+    },
+    {
+      "kind": "paragraph",
+      "text": "threat modeling ถามตั้งแต่ตอนออกแบบ: เรากำลังสร้างอะไร? อะไรอาจพลาด? เราจะทำอย่างไร? เราทำได้ดีแค่ไหน? ระดับ CC ให้จำการฝึก brainstorm ภัยคุกคามบนแผนภาพ (การไหลของข้อมูล เส้นแบ่งความไว้วางใจ) แล้วจับคู่ภัยแต่ตัวกับการลดความเสี่ยง framework อย่าง STRIDE (spoofing, tampering, repudiation, information disclosure, denial of service, elevation of privilege) ให้โครงให้การ brainstorm: แต่ละตัวอักษรคือหมวดของสิ่งที่อาจพลาด"
+    },
+    {
+      "kind": "heading",
+      "text": "แนวคิด physical penetration testing"
+    },
+    {
+      "kind": "paragraph",
+      "text": "physical pen testing ใช้ตรรกะการทดสอบที่ได้รับอนุญาตเดียวกันกับอาคาร: นักทดสอบตามพนักงานเข้าประตู staff ได้หรือไม่ (tailgating) เล่าเรื่องหลอก reception ได้หรือไม่ (pretexting) เสียบอุปกรณ์เข้าพอร์ตเครือข่ายที่เปิดอยู่ได้หรือไม่ หรือเดินเข้าห้อง server ที่ไม่ได้ล็อกได้หรือไม่ ผลลัพธ์นำไปสู่การแก้: วินัยบัตรและ mantrap ต้าน tailgating ขั้นตอนผู้มาเยือนต้าน pretexting port security และตู้ล็อกต้านอุปกรณ์แฝง บวกกล้องและระบบเตือนภัย ข้อสอบคาดหวังแนวคิด (การจำลองโจมตีกายภาพที่ได้รับความยินยอมและมีกติกา) และชื่อคลาสสิก: tailgating กับ pretexting"
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "บนข้อสอบ",
+      "text": "purple = วงจร feedback ไม่ใช่ทีมที่สาม SAST = โค้ดนิ่ง; DAST = แอปที่รัน threat modeling ทำตอนออกแบบ; STRIDE คือรายการหมวดภัย ส่วน physical pen test ตัวคลาสสิกคือ tailgating กับ pretexting เฉลยด้วยวินัยบัตร mantrap และขั้นตอนผู้มาเยือน"
+    },
+    {
+      "kind": "try",
+      "title": "purple-team หนึ่ง finding",
+      "steps": [
+        "รายงาน red-team ระบุ: 'เรา phish นักพัฒนาหนึ่งคน แล้ว credential ของเขาใช้กับบริการ code-signing ภายในได้'",
+        "เขียน detection ที่ blue team ควรมี (log อะไร แพทเทิร์นอะไร)",
+        "เขียน control ที่จะป้องกัน",
+        "อธิบายว่าการทำ purple-team จะยืนยันสองอย่างนี้อย่างไร"
+      ],
+      "expected": "detection: เตือนเมื่อมีการพิสูจน์ตัวตนกับบริการ signing จากอุปกรณ์หรือสถานที่ที่ไม่รู้จัก และเมื่อมีการ sign นอกหน้าต่าง change การป้องกัน: MFA ต้าน phishing บนบริการ signing และสิทธิ์แบบน้อยที่สุด การยืนยัน: red รันเส้นทางโจมตีเดิมในการซ้อมรอบถัดไป detection ต้องยิงและการ login ต้องล้ม"
+    }
+  ],
+  "cheatsheet": [
+    "red โจมตี (โดยได้รับอนุญาต), blue ป้องกัน, purple ปิดวงจรจาก finding สู่ detection ที่ยืนยันแล้ว",
+    "SAST อ่านโค้ดนิ่ง; DAST สอยแอปที่รัน; pen test = โจมตีที่ได้รับอนุญาตในขอบเขตพร้อมรายงาน; bug bounty = การเปิดเผยอย่างรับผิดชอบจากภายนอก",
+    "สี่คำถาม threat modeling: สร้างอะไร อะไรพลาดได้ ทำอะไร ทำได้ดีไหม; STRIDE ลิสต์หมวดภัย",
+    "physical pen testing: tailgating กับ pretexting คือเทคนิคคลาสสิก; วินัยบัตร mantrap ขั้นตอนผู้มาเยือน port security คือทางแก้",
+    "การทดสอบทุกชนิดต้องมีการอนุญาต ขอบเขต และ rules of engagement"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "ใน purple teaming จะเกิดอะไรขึ้นกับ finding ของ red team แต่ละรายการ?",
+      "choices": {
+        "A": "ถูกเก็บไว้ทำรายงานประจำปี",
+        "B": "ถูกแปลงเป็น detection หรือ control ของ blue team แล้วทดสอบซ้ำว่าได้ผลจริง",
+        "C": "ถูกเก็บเป็นความลับจากฝั่งป้องกันเพื่อคงความสมจริง",
+        "D": "ถูกทิ้งเมื่อการซ้อมจบ"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "purple teaming มีอยู่เพื่อปิดวงจร: ทุก finding ของการโจมตีไหลเข้า detection engineering หรือ control เชิงป้องกัน และเส้นทางเดิมถูกทดสอบซ้ำว่าการปรับปรุงได้ผล finding ที่ตายในรายงานคือความล้มเหลวที่ purple มากัน"
+    },
+    {
+      "id": "cp-2",
+      "prompt": "นักทดสอบคนหนึ่งตามพนักงานเข้าประตูรักษาความปลอดภัยโดยไม่ได้ badge เทคนิค physical pen test นี้เรียกว่าอะไร?",
+      "choices": {
+        "A": "Tailgating (piggybacking)",
+        "B": "Pretexting",
+        "C": "Spear phishing",
+        "D": "Elevation of privilege"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "การลอดตามหลังผู้มีสิทธิ์เข้าประตูรักษาความปลอดภัยคือ tailgating ส่วน pretexting คือการแต่งเรื่องเพื่อให้คนให้ความร่วมมือ กรณีประตูอาศัยการปรากฏตัว ไม่ใช่บทสนทนา"
+    }
+  ]
+}

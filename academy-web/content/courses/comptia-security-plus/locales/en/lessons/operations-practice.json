@@ -1,0 +1,164 @@
+{
+  "nodeId": "operations-practice",
+  "locale": "en",
+  "title": "Practice: Security Operations",
+  "objective": "By the end of this lesson you can triage real-shaped log lines in minutes, make chain-of-custody calls without hesitating, and recite the order of volatility as a reflex rather than a list.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Why hands-on now"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Operations is the domain of fast, defensible calls: this line matters, that one is noise, touch the machine last. Reading about triage builds opinions; running triage builds speed. The three drills below are deliberately short, because the exam gives you roughly a minute per question and the day job gives you less."
+    },
+    {
+      "kind": "heading",
+      "text": "Drill 1: triage six log lines"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "#",
+        "The line as it appears"
+      ],
+      "rows": [
+        [
+          "1",
+          "Event 4720 - user account created: svc_backup2, by HELPDESK\\m.navarro, 02:14"
+        ],
+        [
+          "2",
+          "Event 4625 - logon failure, account: administrator, 41 attempts in 3 minutes, source 10.20.30.99"
+        ],
+        [
+          "3",
+          "Event 4624 - logon success, account: j.wong, logon type 2 at console, 08:01"
+        ],
+        [
+          "4",
+          "auth.log: sudo: j.wong : command not allowed ; USER=root ; COMMAND=/bin/cat /etc/shadow"
+        ],
+        [
+          "5",
+          "Event 4634 - logoff, account: j.wong, 08:43"
+        ],
+        [
+          "6",
+          "Event 4624 - logon success, account: svc_backup2, logon type 3, source 203.0.113.66, 02:16"
+        ]
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Mark, justify, act",
+      "steps": [
+        "Mark each line suspicious or expected, and write the event-ID fact that justifies the call.",
+        "Lines 1 and 6 happened two minutes apart. Write one sentence describing what the pair shows.",
+        "Write your first action and the incident-response phase it belongs to.",
+        "Name the condition that makes every timestamp in this table trustworthy."
+      ],
+      "expected": "Lines 1, 2, 4, and 6 are suspicious: an account created at 02:14 (4720), a brute-force run against administrator (4625), an attempt to read the password file with sudo, and the brand-new account logging in from an external address (4624 type 3). Lines 3 and 5 are a normal start of day at the console. Together, 1 and 6 show an account being created and used remotely two minutes later, which reads as an attacker with privileged access. First action: disable svc_backup2 and isolate the host (containment). Timestamps line up across sources only when NTP keeps clocks synchronized."
+    },
+    {
+      "kind": "paragraph",
+      "text": "The pairing is the lesson. Single lines get opinions; pairs get evidence. A 4624 is a success story until you notice it belongs to an account that did not exist two minutes earlier, arriving from an address your network does not own. Note that 203.0.113.x is a documentation-only range used in training material precisely because it can never belong to a real host."
+    },
+    {
+      "kind": "heading",
+      "text": "Drill 2: chain-of-custody decisions"
+    },
+    {
+      "kind": "try",
+      "title": "Four calls, made once",
+      "steps": [
+        "A technician offers to reimage the compromised laptop right away so the user can work again. Decide, and say what happens first.",
+        "A manager asks to carry the original disk to the lawyer's office. Decide, and offer the defensible alternative.",
+        "You must move a disk from the server room to the lab. List what accompanies it.",
+        "An external auditor asks for the original log files. Decide what they receive instead."
+      ],
+      "expected": "1) Decline: isolate the machine, capture RAM and volatile data, image the disk, hash the image, and only then rebuild. 2) Decline: originals stay in evidence storage under seal; the lawyer receives a verified copy with its hash and the custody record. 3) A sealed bag, a hash recorded at acquisition, a signed custody form naming who moved it, when, and where. 4) Verified copies with hashes, never the originals, with the custody log documenting every hand-off."
+    },
+    {
+      "kind": "heading",
+      "text": "Drill 3: order of volatility self-quiz"
+    },
+    {
+      "kind": "try",
+      "title": "Say it before you need it",
+      "steps": [
+        "Order these five from most to least volatile: archival backup media, CPU registers and cache, disk, RAM with live processes, remote logs.",
+        "Name the single action that destroys the top two and keeps the bottom three.",
+        "You may capture only one thing from a live server. Choose, and defend the choice in one sentence."
+      ],
+      "expected": "CPU registers and cache, then RAM, then disk, then remote logs, then archival media. Powering off destroys registers and RAM while disk, remote logs, and archives survive. The one capture is RAM: it holds processes, keys, and connections that exist nowhere else, and it vanishes the moment power does."
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Event Log Terminal",
+      "description": "Search a Windows-style log export for failed logons and a new account, count them, and write a three-line triage note in a simulated terminal. Full design: labs/eventlog-terminal.lab.en.md.",
+      "estimatedMinutes": 15,
+      "status": "coming-soon",
+      "scale": "inline"
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Log Correlation PBQ",
+      "description": "Sort twelve lines from auth, proxy, and EDR logs into one incident or noise, and defend the four lines that look guilty but sit outside the story. Full design: labs/log-correlation-pbq.lab.en.md.",
+      "estimatedMinutes": 12,
+      "status": "coming-soon",
+      "scale": "full"
+    }
+  ],
+  "cheatsheet": [
+    "Event IDs that pay rent: 4624 success, 4625 failure, 4720 account created, 4740 locked out.",
+    "A new account (4720) followed by a remote logon (4624 type 3) minutes later is an intrusion pattern, not a coincidence.",
+    "Order of volatility: registers and cache, RAM, disk, remote logs, archival media; shutdown destroys the top two.",
+    "Chain of custody: originals stay sealed in storage, everyone else works from hashed copies, every move is signed.",
+    "Cross-source timelines hold only when NTP keeps clocks in sync."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "At 02:14 an account svc_backup2 is created, and at 02:16 that account logs on successfully from an external address. What does the pair of events most strongly indicate?",
+      "choices": {
+        "A": "A scheduled backup job running early",
+        "B": "A failed password spray that never succeeded",
+        "C": "Someone with privileged access created a way in and used it",
+        "D": "Clock drift between two log sources"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Creation of a service-looking account at night, followed within minutes by a remote logon from outside, is the classic pattern of an attacker with admin access building persistence. A backup job does not log on from an external address, a spray that failed would show 4625 events, and drift would show as inconsistent times, not as account creation."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "An intern powers off a compromised server before imaging, following the clean-reboot habit. Which evidence is now gone?",
+      "choices": {
+        "A": "The disk contents",
+        "B": "RAM contents: running processes, keys, and connections",
+        "C": "The archived backups",
+        "D": "The firewall logs"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Powering off destroys the most volatile layer entirely: processes, memory-resident keys, and live connections. Disk, archives, and remote logs all survive a shutdown, which is exactly why they sit lower in the order of volatility."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Which collection order follows the order of volatility?",
+      "choices": {
+        "A": "RAM, then disk, then archived logs",
+        "B": "Disk image, then RAM, then archived logs",
+        "C": "Archived logs, then disk, then RAM",
+        "D": "Disk, archived logs, then RAM"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Volatility runs from RAM and registers, through disk, down to logs and archives. Collect the most vanishing evidence first, or lose it to time, shutdown, or an over-helpful cleanup."
+    }
+  ]
+}

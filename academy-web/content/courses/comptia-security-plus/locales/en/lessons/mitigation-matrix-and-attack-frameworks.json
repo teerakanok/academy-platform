@@ -1,0 +1,144 @@
+{
+  "nodeId": "mitigation-matrix-and-attack-frameworks",
+  "locale": "en",
+  "title": "Mitigation Matrix and Attack Frameworks",
+  "objective": "By the end of this lesson you can place an attack on the Cyber Kill Chain and MITRE ATT&CK, and use frameworks plus threat intelligence to choose mitigations.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Why frameworks exist"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Frameworks give defenders a shared map of how attacks unfold, so teams can compare notes, plan defenses, and describe incidents in standard language. The exam expects you to know what each framework is for, and to map a scenario step onto it."
+    },
+    {
+      "kind": "heading",
+      "text": "The Cyber Kill Chain"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Stage",
+        "Attacker activity",
+        "Defense that bites here"
+      ],
+      "rows": [
+        [
+          "1. Reconnaissance",
+          "Harvesting emails, scanning",
+          "Limit public info, IDS on scans"
+        ],
+        [
+          "2. Weaponization",
+          "Building the deliverable",
+          "Threat intel on tooling"
+        ],
+        [
+          "3. Delivery",
+          "Sending the lure",
+          "Email filtering, USB policy"
+        ],
+        [
+          "4. Exploitation",
+          "The payload runs",
+          "Patching, hardening, EDR"
+        ],
+        [
+          "5. Installation",
+          "Backdoor or persistence",
+          "EDR, application allowlisting"
+        ],
+        [
+          "6. Command and control",
+          "Beaconing home",
+          "Egress filtering, DNS sinkhole"
+        ],
+        [
+          "7. Actions on objective",
+          "Steal, encrypt, disrupt",
+          "DLP, segmentation, backups"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The insight behind the model: breaking any single stage breaks the chain. The earlier you break it, the cheaper the defense. That claim is a favorite exam framing."
+    },
+    {
+      "kind": "heading",
+      "text": "MITRE ATT&CK"
+    },
+    {
+      "kind": "paragraph",
+      "text": "ATT&CK is a public knowledge base of adversary tactics and techniques observed in the real world. Tactics are the attacker's goals (such as initial access, persistence, exfiltration). Techniques are the specific ways to reach each goal. Teams use ATT&CK to map coverage, find gaps, and hunt for behaviors matching known techniques."
+    },
+    {
+      "kind": "heading",
+      "text": "Other names worth knowing"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Diamond model: every incident analyzed across adversary, capability, infrastructure, and victim.",
+        "Threat intelligence feeds: current indicators such as malicious domains and file hashes.",
+        "STIX: a standard format for describing threat intelligence; TAXII transports it.",
+        "Intelligence fusion: merging internal logs with external feeds into one operating picture."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Kill-chain questions give a numbered stage and ask for the stage name or the best-stage defense. ATT&CK questions ask you to separate tactic (the goal) from technique (the method). Read for the actor's aim before answering."
+    },
+    {
+      "kind": "try",
+      "title": "Map one incident",
+      "steps": [
+        "Incident narrative: an attacker scraped staff emails from the website, sent tailored resumes with a macro document, established a scheduled task, and later moved stolen files to a cloud storage site.",
+        "Label each sentence with a kill-chain stage.",
+        "Then label the final two sentences with an ATT&CK tactic.",
+        "Name the single control that would have broken the chain earliest."
+      ],
+      "expected": "Scraping = reconnaissance; resume email = delivery; macro = exploitation; scheduled task = installation (persistence in ATT&CK terms); upload = actions on objective / exfiltration. Earliest breaker: blocking or sandboxing macro documents (delivery stage)."
+    }
+  ],
+  "cheatsheet": [
+    "Kill Chain stages: reconnaissance, weaponization, delivery, exploitation, installation, command and control, actions on objective.",
+    "Break any one stage and the chain fails; earlier is cheaper.",
+    "ATT&CK: tactics = goals, techniques = methods; used for coverage mapping and threat hunting.",
+    "Diamond model: adversary, capability, infrastructure, victim.",
+    "STIX describes threat intel; TAXII moves it; intelligence fusion merges sources."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Malware on a laptop begins sending periodic DNS queries to a known-malicious domain. Which kill-chain stage does this represent?",
+      "choices": {
+        "A": "Delivery",
+        "B": "Command and control",
+        "C": "Installation",
+        "D": "Reconnaissance"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Beaconing to an external controller is the command-and-control stage. DNS sinkholes and egress filtering are the matching defenses."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "In MITRE ATT&CK terms, 'persistence' and 'exfiltration' are examples of what?",
+      "choices": {
+        "A": "Techniques",
+        "B": "Mitigations",
+        "C": "Procedures",
+        "D": "Tactics"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Tactics are the attacker's goals; techniques are the concrete methods used to achieve them. Persistence and exfiltration name goals, so they are tactics."
+    }
+  ]
+}

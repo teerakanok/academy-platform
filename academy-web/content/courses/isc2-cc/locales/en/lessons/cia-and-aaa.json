@@ -1,0 +1,154 @@
+{
+  "nodeId": "cia-and-aaa",
+  "locale": "en",
+  "title": "Security Goals: CIA, Non-Repudiation, and AAA",
+  "objective": "By the end of this lesson you can classify any security scenario against the CIA triad, explain non-repudiation, and describe how authentication, authorization, and accounting work together.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Three questions that define security"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Almost every security question reduces to three simple questions. Can only the right people read this data? Is the data still accurate and unaltered? Can we use the system when we need it? These are Confidentiality, Integrity, and Availability, the CIA triad. When an exam scenario describes an incident, your first move is to name which leg of the triad was harmed."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Property",
+        "Question it answers",
+        "Typical violation",
+        "Typical controls"
+      ],
+      "rows": [
+        [
+          "Confidentiality",
+          "Who can see the data?",
+          "Customer database leaked to a hacker forum",
+          "Encryption, access control, data classification"
+        ],
+        [
+          "Integrity",
+          "Is the data accurate and unaltered?",
+          "Bank balance changed without authorization",
+          "Hashing, digital signatures, input validation"
+        ],
+        [
+          "Availability",
+          "Can we use it when needed?",
+          "Hospital records system offline during a ransomware attack",
+          "Redundancy, backups, patching, DDoS protection"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "One event can break more than one leg. Ransomware reads your files (confidentiality), encrypts them so they cannot be trusted or used (integrity and availability), and may threaten publication. That is why ransomware is treated as a top-tier threat: it hits the whole triad at once."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Different organizations weight the legs differently. A bank cannot tolerate altered balances, so integrity leads. A hospital needs records reachable in an emergency, so availability leads. An intelligence agency ranks confidentiality first. On the exam, read the scenario for the business context before choosing which property matters most."
+    },
+    {
+      "kind": "heading",
+      "text": "Non-repudiation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Non-repudiation means a person cannot credibly deny having performed an action. If you digitally sign a document, the signature ties you to it in a way you cannot later disown. Digital signatures provide non-repudiation because only your private key could have created them. Simple passwords do not, because someone else may know or steal the password."
+    },
+    {
+      "kind": "heading",
+      "text": "AAA: what systems ask every time you log in"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Authentication: prove who you are, using something you know (password), something you have (phone or security key), or something you are (fingerprint).",
+        "Authorization: decide what that identity is allowed to do. You may enter the building with a badge but still be barred from the server room.",
+        "Accounting: record what the identity did, through logs of logins, changes, and actions, so activity can be reviewed later."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The classic exam trap swaps authentication and authorization. A quick test: authentication answers who are you; authorization answers what may you do. Accounting then answers what did you do, and it is also what makes non-repudiation possible for accountable actions."
+    },
+    {
+      "kind": "heading",
+      "text": "Defense in depth"
+    },
+    {
+      "kind": "paragraph",
+      "text": "No single control is perfect, so mature security layers controls: network firewalls, then internal segmentation, then endpoint protection and patching, then application checks, then encryption of the data itself, plus trained people and physical locks. An attacker must defeat every layer to succeed, and each layer catches what the previous one missed."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "When a scenario asks which CIA leg was harmed, name the harm in plain words first: data seen by the wrong people (C), data altered or corrupted (I), system unusable (A). When two answers look plausible, pick the one that matches the primary harm in the story."
+    },
+    {
+      "kind": "try",
+      "title": "Classify the harm",
+      "steps": [
+        "Read these three mini-scenarios: (1) a student leaves a lab computer logged in and a stranger views the transcript; (2) an attacker changes a grade from F to A; (3) the course registration system crashes during the add/drop week.",
+        "For each, name the CIA leg that was harmed.",
+        "For each, name one control that would have prevented it."
+      ],
+      "expected": "1: confidentiality (unauthorized viewing; lock screen or auto-logout). 2: integrity (unauthorized alteration; input validation and access controls). 3: availability (system unusable when needed; redundancy or capacity planning)."
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Hash a File",
+      "description": "Verify file integrity with SHA-256 on your own machine, then change one byte and watch the hash change completely. Full guide: labs/hash-a-file.en.md.",
+      "estimatedMinutes": 20,
+      "status": "ready",
+      "scale": "full"
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Integrity Terminal (interactive, coming soon)",
+      "description": "Verify a file hash in a simulated terminal, watch one byte flip, then re-verify and compare the two verdicts. Full design: labs/integrity-terminal.lab.en.md.",
+      "estimatedMinutes": 15,
+      "status": "coming-soon",
+      "scale": "full"
+    }
+  ],
+  "cheatsheet": [
+    "CIA triad: Confidentiality = only the right people see it; Integrity = it is accurate and unaltered; Availability = usable when needed.",
+    "Ransomware harms the whole triad: it reads, encrypts, and locks.",
+    "Non-repudiation comes from digital signatures, not from shared passwords.",
+    "AAA: authentication = who are you; authorization = what may you do; accounting = what did you do.",
+    "Defense in depth = layered controls so one failure is not fatal."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A hospital's electronic health record system is encrypted by ransomware and doctors cannot open patient records during emergencies. Which CIA element is harmed MOST?",
+      "choices": {
+        "A": "Confidentiality",
+        "B": "Availability",
+        "C": "Integrity",
+        "D": "Non-repudiation"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The story's primary harm is that the system cannot be used when needed, which is availability. The attack may also touch other properties, but the patient-safety impact described is loss of availability."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "An employee uses a badge to enter the office building, but the badge does not open the server room door. Which pair of AAA concepts does this describe?",
+      "choices": {
+        "A": "Accounting succeeded, authentication denied",
+        "B": "Authorization succeeded, accounting denied",
+        "C": "Authentication succeeded, authorization denied",
+        "D": "Authentication failed, authorization granted"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The badge proved identity at the building (authentication), and the access decision for the server room was negative (authorization). Accounting would involve logging the events, which is not what the doors illustrate."
+    }
+  ]
+}

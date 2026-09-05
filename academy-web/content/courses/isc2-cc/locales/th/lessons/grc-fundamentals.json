@@ -1,0 +1,178 @@
+{
+  "nodeId": "grc-fundamentals",
+  "locale": "th",
+  "title": "พื้นฐาน GRC: Policy, Standard และ Framework",
+  "objective": "เมื่อจบบทเรียนนี้ ผู้เรียนอธิบาย governance, risk และ compliance ให้เป็นระบบเดียวได้ เรียงลำดับชั้นเอกสารได้ ตั้งชื่อ policy ที่พบบ่อยได้ และจำ framework หลักๆ ได้",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "GRC: สามคำถาม หนึ่งระบบ"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Governance ถามว่าใครตัดสินใจและใครรับผิดชอบ Risk ถามว่าอะไรอาจพลาดและเราจะทำอย่างไร Compliance ถามว่าเราทำตามกฎที่บังคับเราหรือไม่: กฎหมาย ระเบียบ สัญญา และ policy ของเราเอง ทั้งสามส่วนเกี่ยวรั้งกัน: governance วางทิศทาง risk management จัดสรรความพยายาม และ compliance ตรวจสอบกับเก็บหลักฐาน หลักสูตร CC 2026 ยกกลุ่มนี้ขึ้นเป็น domain แยก จึงต้องคาดว่าจะถามตรงๆ"
+    },
+    {
+      "kind": "heading",
+      "text": "ลำดับชั้นเอกสาร"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "เอกสาร",
+        "ตอบอะไร",
+        "ตัวอย่าง",
+        "ความถี่การแก้ไข"
+      ],
+      "rows": [
+        [
+          "Policy",
+          "อะไรและทำไม (เจตนาของผู้บริหาร)",
+          "พนักงานทุกคนต้องปกป้องข้อมูลลับ",
+          "นานๆ ครั้ง"
+        ],
+        [
+          "Standard",
+          "อะไรโดยเฉพาะ (ข้อกำหนดที่วัดได้)",
+          "Password ต้องยาวอย่างน้อย 12 ตัวอักษร",
+          "เป็นครั้งคราว"
+        ],
+        [
+          "Procedure",
+          "ทำอย่างไรทีละขั้น",
+          "วิธี reset password ผู้ใช้ในระบบ identity",
+          "เมื่อกระบวนการเปลี่ยน"
+        ],
+        [
+          "Guideline",
+          "แนวปฏิบัติที่แนะนำ ไม่บังคับ",
+          "เคล็ดลับทำงานปลอดภัยจากที่บ้าน",
+          "ตามความจำเป็น"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "ข้อสอบวัดลำดับนี้และเส้นแบ่งบังคับ/ไม่บังคับ Policy กับ standard บังคับ ส่วน guideline เป็นคำแนะนำ Procedure คือชั้นทีละขั้นที่แปลง standard ให้เป็นการปฏิบัติที่ทำซ้ำได้ ถ้าคำถามบรรยายเอกสารที่แนะนำแต่ไม่บังคับ นั่นคือ guideline"
+    },
+    {
+      "kind": "heading",
+      "text": "policy ที่พบบ่อย"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Information security policy: เอกสารแม่บท ระบุความมุ่งมั่น ขอบเขต และบทบาท",
+        "Acceptable use policy (AUP): ผู้ใช้ทำอะไรกับระบบองค์กรได้และไม่ได้",
+        "Access control policy: สิทธิ์ถูกให้ ทบทวน และเพิกถอนอย่างไร",
+        "Data classification and handling policy: ติดป้ายและปกป้องข้อมูลตามระดับความอ่อนไหว",
+        "Incident response policy: ใครถูกเรียกตัวและใครตัดสินใจเมื่อเกิด incident",
+        "Password and authentication policy: ข้อกำหนดเรื่อง credential และ MFA",
+        "Remote work และ BYOD policy: กติกาการทำงานและอุปกรณ์นอกสำนักงาน",
+        "Third-party และ vendor policy: ข้อกำหนด security ต่อผู้ขายและผู้รับจ้าง"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "framework ที่ควรรู้จัก"
+    },
+    {
+      "kind": "paragraph",
+      "text": "framework คือแค็ตตาล็อกผลลัพธ์หรือ control ที่จัดระเบียบมา ให้องค์กรวัดและสื่อสารโปรแกรมของตัวเองได้ ระดับ CC ไม่ต้องลงลึก แต่ต้องจำชื่อกับจุดประสงค์ให้ได้"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "framework",
+        "จุดประสงค์"
+      ],
+      "rows": [
+        [
+          "ISO/IEC 27001",
+          "มาตรฐานสากลของระบบบริหารความปลอดภัยสารสนเทศ (ISMS); ขอรับการรับรองได้"
+        ],
+        [
+          "NIST Cybersecurity Framework (CSF) 2.0",
+          "หกฟังก์ชัน: Govern, Identify, Protect, Detect, Respond, Recover; ใช้โครงสร้างโปรแกรมอย่างแพร่หลาย"
+        ],
+        [
+          "SOC 2",
+          "รายงานผลตรวจตาม trust service criteria สำหรับองค์กรให้บริการ"
+        ],
+        [
+          "PCI DSS",
+          "มาตรฐานบังคับสำหรับผู้ดูแลข้อมูลบัตรชำระเงิน"
+        ],
+        [
+          "GDPR / PDPA",
+          "กฎหมายคุ้มครองข้อมูลส่วนบุคคล (สหภาพยุโรป / ไทย)"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "NIST CSF 2.0 เพิ่มฟังก์ชัน Govern ซึ่งตรงกับ domain ที่ผู้เรียนกำลังเรียนอยู่: บริบท กลยุทธ์ความเสี่ยง บทบาท policy การกำกับดูแล และ governance ห่วงโซ่อุปทาน จำหกฟังก์ชันตามลำดับ: Govern, Identify, Protect, Detect, Respond, Recover"
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "บนข้อสอบ",
+      "text": "จับคู่เอกสารกับประโยค: เจตนา (policy), ข้อกำหนดที่วัดได้ (standard), ขั้นตอน (procedure), คำแนะนำ (guideline) ส่วน framework ให้จับคู่ชื่อกับจุดประสงค์ ระดับนี้จะไม่ถามเลขข้อกำหนดย่อย"
+    },
+    {
+      "kind": "try",
+      "title": "เรียงเอกสาร",
+      "steps": [
+        "จัดประโยคแต่ละข้อเป็น policy, standard, procedure หรือ guideline: (1) 'พนักงานที่ทำงานทางไกลควรใช้ VPN ของบริษัทเมื่อต่อ Wi-Fi โรงแรม'; (2) 'การเข้าถึงระบบจากระยะไกลต้องใช้ MFA'; (3) 'องค์กรมุ่งมั่นปกป้องข้อมูลลูกค้า'; (4) 'การเปิดบัญชี contractor: ส่งคำขอ ขออนุมัติ สร้างบัญชี นัดวันทบทวน'",
+        "ขีดเส้นใต้สองข้อที่เป็นข้อบังคับ",
+        "บอกว่าใครอนุมัติแต่ละระดับโดยทั่วไป"
+      ],
+      "expected": "1: guideline (แนะนำ) 2: standard (ข้อกำหนดที่วัดได้) 3: policy (เจตนาผู้บริหาร) 4: procedure (ขั้นตอน) ข้อบังคับ: 2 และ 3 โดย policy ได้รับอนุมัติจากผู้บริหารระดับสูง"
+    },
+    {
+      "kind": "lab",
+      "title": "แล็บ: Build a Simple Risk Register",
+      "description": "สร้าง risk register ด้วย spreadsheet ให้คะแนนความเสี่ยงด้วย likelihood x impact มอบ owner และ treatment และติดตาม residual risk คู่มือฉบับเต็ม: labs/build-a-simple-risk-register.th.md",
+      "estimatedMinutes": 25,
+      "status": "ready",
+      "scale": "full"
+    }
+  ],
+  "cheatsheet": [
+    "GRC: governance = ใครตัดสินใจ; risk = อะไรอาจพลาด; compliance = เราทำตามกฎหรือไม่",
+    "ลำดับชั้นเอกสาร: policy (อะไร/ทำไม) > standard (ข้อกำหนดเฉพาะ) > procedure (ขั้นตอน); guideline = คำแนะนำที่ไม่บังคับ",
+    "รู้จักตระกูล policy: security, acceptable use, access control, data classification, incident response, password, remote/BYOD, third-party",
+    "framework: ISO 27001 (ISMS), NIST CSF 2.0 (Govern, Identify, Protect, Detect, Respond, Recover), SOC 2, PCI DSS, GDPR/PDPA",
+    "policy กับ standard บังคับ; guideline ไม่บังคับ"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "'พนักงานต้องใช้ระบบ ticket ที่องค์กรอนุมัติเพื่อขอติดตั้งซอฟต์แวร์ คำขอจะถูกทบทวน อนุมัติ และติดตั้งโดย IT ภายในหนึ่งวันทำการ' ประโยคนี้จัดเป็นอะไร?",
+      "choices": {
+        "A": "Policy",
+        "B": "Standard",
+        "C": "Guideline",
+        "D": "Procedure"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "ประโยคบรรยายลำดับขั้นตอนที่บทบาทเฉพาะทำ ซึ่งคือ procedure policy จะบอกเจตนา standard จะให้ข้อกำหนดที่วัดได้ และ guideline เป็นเพียงคำแนะนำ"
+    },
+    {
+      "id": "cp-2",
+      "prompt": "ฟังก์ชันใดของ NIST CSF 2.0 ถูกเพิ่มเข้ามาเพื่อครอบคลุม domain นี้พอดี คือ บริบท กลยุทธ์ความเสี่ยง บทบาท policy และการกำกับดูแล?",
+      "choices": {
+        "A": "Identify",
+        "B": "Govern",
+        "C": "Protect",
+        "D": "Recover"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "CSF 2.0 เพิ่มฟังก์ชัน Govern (GV) เป็นฟังก์ชันครอบทั้งโปรแกรม ครอบคลุมบริบทองค์กร กลยุทธ์บริหารความเสี่ยง บทบาท policy และการกำกับดูแล รวมถึง governance ห่วงโซ่อุปทาน"
+    }
+  ]
+}

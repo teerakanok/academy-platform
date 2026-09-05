@@ -1,0 +1,129 @@
+{
+  "nodeId": "identity-lifecycle",
+  "locale": "en",
+  "title": "The Identity Lifecycle: Provisioning to Deprovisioning",
+  "objective": "By the end of this lesson you can walk an identity through provisioning, review, and deprovisioning, explain joiner-mover-leaver, and manage AI bots and service accounts inside the same lifecycle.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "An identity is born, changes, and must die"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The 2026 outline adds the identity lifecycle as explicit D3 content. The idea: access risk is created and destroyed at lifecycle events. A new hire gets accounts (provisioning), a person changing roles gains new access and must lose old access (moving), and a leaver's accounts must be disabled and removed (deprovisioning). Joiner-mover-leaver (JML) is the shorthand the exam uses."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Stage",
+        "What happens",
+        "Classic failure"
+      ],
+      "rows": [
+        [
+          "Provisioning (joiner)",
+          "Accounts created, initial access granted per role, manager approval recorded",
+          "Over-provisioned day-one access that is never trimmed"
+        ],
+        [
+          "Modification (mover)",
+          "Access changed to match the new role; old access revoked",
+          "Access accumulation: old permissions survive every transfer"
+        ],
+        [
+          "Review",
+          "Periodic recertification: owners confirm each account still needs its access",
+          "Rubber-stamp approvals with no real check"
+        ],
+        [
+          "Deprovisioning (leaver)",
+          "Accounts disabled, credentials and tokens revoked, assets returned, access removed from groups",
+          "Orphaned accounts that keep working after departure"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Orphaned accounts are a favorite exam scenario: the clearest sign that deprovisioning failed. The matching control is a documented offboarding checklist wired to HR events, plus periodic reviews that hunt for accounts whose owner has left."
+    },
+    {
+      "kind": "heading",
+      "text": "Least privilege across the lifecycle"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Provisioning should grant the minimum the role requires, moving should remove what the old role had, and reviews should trim whatever accumulated. Access reviews (recertification) are the safety net: at a set cadence, each system owner re-approves or revokes every access their system granted. Reviews also catch privilege creep, the slow stacking of rights as people change projects."
+    },
+    {
+      "kind": "heading",
+      "text": "AI bots and service accounts are identities too"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Not every identity has a person behind it. Service accounts run backups and integrations; AI agents and bots now make API calls, read documents, and even act on tickets. The 2026 outline puts AI bots and service accounts into the lifecycle explicitly, and the principle is one rule for all identities: every non-human identity needs an owner, a purpose, a review date, and a deprovisioning trigger."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Owner: a named human team accountable for the account; orphaned non-human accounts are the highest-risk kind.",
+        "Purpose and scope: credentials limited to specific systems and actions (least privilege), not shared admin secrets.",
+        "Review: inventory and recertify service accounts and AI bots like user accounts; challenge dormant ones.",
+        "Deprovisioning: when the project or integration ends, revoke credentials and API keys, and remove access.",
+        "Credential hygiene: rotate keys and prefer short-lived tokens over permanent secrets where the platform allows."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "On the exam",
+      "text": "Scenario tells you someone changed departments and still has old finance access: the failure is at the mover stage, and the answer is removing stale access plus periodic reviews. Scenario shows a script account active long after its project closed: the failure is deprovisioning of a non-human identity."
+    },
+    {
+      "kind": "try",
+      "title": "Run one identity through JML",
+      "steps": [
+        "Trace a fictional employee, Alex: joins support (read access to tickets), moves to engineering (code repository access), then leaves the company.",
+        "At each stage, list what must be granted, reviewed, and revoked.",
+        "Add a service account Alex created for a test integration, and say what happens to it when Alex leaves."
+      ],
+      "expected": "Joiner: ticket-read rights, approved by manager, recorded. Mover: repository access granted; ticket access revoked (the usual miss). Leaver: SSO account disabled, sessions and tokens revoked, assets returned. The test-integration service account must be inventoried, its owner reassigned or the account revoked; it should never survive unowned."
+    }
+  ],
+  "cheatsheet": [
+    "Lifecycle: provisioning (joiner), modification and review (mover), deprovisioning (leaver).",
+    "Most-examined failures: access accumulation at mover, orphaned accounts at leaver.",
+    "Periodic access reviews (recertification) are the safety net against privilege creep.",
+    "AI bots and service accounts follow the same rule: owner, purpose, least privilege, review date, deprovisioning trigger.",
+    "Rotate non-human credentials; prefer short-lived tokens over permanent secrets."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "An analyst transfers from finance to marketing. Months later an audit finds the analyst can still approve payments. Which lifecycle stage failed?",
+      "choices": {
+        "A": "The mover stage: old access was not revoked during the role change",
+        "B": "Provisioning",
+        "C": "Deprovisioning, because the account was disabled",
+        "D": "No failure; access follows the person"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Moving roles must remove the previous role's access. Failing to do so creates accumulated privilege, which the periodic access review should have caught as a backstop."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Which set of properties should every AI bot or service account have, per the identity lifecycle?",
+      "choices": {
+        "A": "Permanent credentials shared across the team for convenience",
+        "B": "A named owner, a defined purpose, least-privilege scope, a review schedule, and a deprovisioning trigger",
+        "C": "Domain administrator rights to avoid interruptions",
+        "D": "No review, because non-human accounts cannot be compromised"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Non-human identities follow the same lifecycle discipline as people: owned, purposeful, minimal, reviewed, and revoked at end of life. Shared permanent admin credentials are the opposite of each property."
+    }
+  ]
+}

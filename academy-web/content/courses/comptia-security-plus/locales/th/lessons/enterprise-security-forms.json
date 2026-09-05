@@ -1,0 +1,185 @@
+{
+  "nodeId": "enterprise-security-forms",
+  "locale": "th",
+  "title": "รูปแบบการรักษาความปลอดภัยในองค์กร",
+  "objective": "เมื่อจบบทเรียนนี้ ผู้เรียนจะจับคู่เครื่องมือและรูปแบบการเชื่อมต่อด้านความปลอดภัยเข้ากับหน้าที่ของมันได้ และเปลี่ยน protocol ที่ไม่ปลอดภัยเป็นคู่ที่ปลอดภัยได้",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "เครื่องมือและตำแหน่งที่มันนั่ง"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "อุปกรณ์",
+        "ตำแหน่ง",
+        "หน้าที่หลัก"
+      ],
+      "rows": [
+        [
+          "Firewall",
+          "ขอบเครือข่ายและระหว่าง segment",
+          "อนุญาตหรือบล็อก traffic ตามกฎ"
+        ],
+        [
+          "IPS (inline)",
+          "อยู่บนเส้นทาง traffic",
+          "บล็อกการโจมตีที่ตรวจพบทันที"
+        ],
+        [
+          "IDS (นอกเส้นทาง)",
+          "รับสำเนาจาก mirror หรือ tap",
+          "ตรวจจับและแจ้งเตือนเท่านั้น"
+        ],
+        [
+          "Proxy",
+          "คั่นระหว่างผู้ใช้กับเว็บ",
+          "กรองและแคช traffic เว็บ"
+        ],
+        [
+          "WAF",
+          "ด้านหน้า web app",
+          "ป้องกันแอปจาก injection และ XSS"
+        ],
+        [
+          "Load balancer",
+          "ด้านหน้ากลุ่มเซิร์ฟเวอร์",
+          "กระจาย traffic ตรวจสุขภาพสมาชิก"
+        ],
+        [
+          "ตัวรวบรวมของ SIEM",
+          "ศูนย์กลาง",
+          "รวมและ correlate log"
+        ],
+        [
+          "Email security gateway",
+          "ด้านหน้ากระแสอีเมล",
+          "กรองสแปม มัลแวร์ phishing"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "แถว firewall ของตารางนั้นพาความเคยชินมาด้วย ที่ข้อสอบถามซ้ำไม่เลิก: กฎอ่านจากบนลงล่าง กฎแรกที่ match ชนะ และสิ่งที่ไม่มีกฎใดรับ จะตกไปจบที่ implicit deny ท้ายตาราง การตกผ่านนี้เองที่ทำให้ท่าปลอดภัยคือ default deny — อนุญาตเฉพาะสิ่งที่นโยบายเอ่ยชื่อ แล้วให้ implicit deny รับที่เหลือทั้งหมด และเป็นเหตุผลเดียวกันที่กฎเฉพาะต้องนั่งเหนือกฎกว้าง: เมื่อข้อยกเว้นของ admin-subnet กับ deny ของคนอื่นทั้งหมดคลุม destination และ port เดียวกัน แถวที่กว้างกว่าที่อยู่ด้านบนจะกลืนข้อยกเว้นข้างล่างทิ้งแบบเงียบ ๆ ลำดับกฎคือส่วนหนึ่งของ configuration ไม่ใช่การจัดหน้า และแลป Firewall Rules PBQ ข้างล่างตัดสินลำดับนั้นตรง ๆ"
+    },
+    {
+      "kind": "paragraph",
+      "text": "IDS กับ IPS เป็นคู่โปรดของข้อสอบ: IDS เห็นเพียงสำเนาแล้วแจ้งเตือน IPS นั่ง inline และบล็อกได้ แลกกับการเสี่ยงกลายเป็นคอขวดหรือจุดล้มเหลว false positive จึงหนักกว่าบน IPS เพราะ traffic หยุดจริง"
+    },
+    {
+      "kind": "heading",
+      "text": "การเชื่อมต่อและการพาเส้นทาง traffic"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "VPN: tunnel เข้ารหัส site-to-site เชื่อมสำนักงาน remote access เชื่อมผู้ใช้คนเดียว TLS VPN เสิร์ฟแอปผ่าน browser ส่วน IPsec เชื่อมเครือข่าย",
+        "SDN (software-defined networking): controller ตั้งค่า switch และ router แบบรวมศูนย์ ทำให้ microsegmentation รวดเร็ว",
+        "DNS filtering: ทำให้โดเมนอันตราย resolve ไม่ได้เลย เป็นการป้องกันราคาถูกที่ชั้น resolver",
+        "NAC (network access control): ตรวจสุขภาพอุปกรณ์ก่อนอนุญาตให้เข้าเครือข่าย",
+        "Sensor: tap, mirror port และ honeypot ที่ป้อนข้อมูลให้เครื่องมือตรวจจับ"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "คู่เปลี่ยน protocol ที่ปลอดภัย"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "เลิกใช้",
+        "เพราะ",
+        "ใช้แทน"
+      ],
+      "rows": [
+        [
+          "Telnet",
+          "credential วิ่งผ่านสายแบบอ่านออก",
+          "SSH"
+        ],
+        [
+          "FTP",
+          "ส่งไฟล์แบบ clear text",
+          "SFTP หรือ FTPS"
+        ],
+        [
+          "HTTP",
+          "อ่านและแก้ได้ระหว่างทาง",
+          "HTTPS"
+        ],
+        [
+          "SNMPv1/v2",
+          "community string อ่อนแอแบบ clear text",
+          "SNMPv3"
+        ],
+        [
+          "LDAP",
+          "ค้นหา directory แบบ clear text",
+          "LDAPS"
+        ],
+        [
+          "SMBv1 / protocol เก่า",
+          "โบราณ มี exploit สาธารณะ",
+          "SMB เวอร์ชันปัจจุบันที่มี signing"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "บนข้อสอบ",
+      "text": "คำถามเรื่อง protocol มักเป็นการจับคู่: สถานการณ์เรียกชื่อ protocol เก่า แล้วคำตอบคือตัวแทนที่ปลอดภัยกว่าที่ทำงานเดียวกัน SSH แทน Telnet, SFTP แทน FTP, SNMPv3 แทน v1 กับ v2 และ LDAPS แทน LDAP"
+    },
+    {
+      "kind": "try",
+      "title": "ตรวจ protocol ของสำนักงานเล็ก",
+      "steps": [
+        "จากสถานการณ์: router ที่ดูแลผ่าน Telnet เว็บไซต์ที่มี HTTP เท่านั้น กล่อง FTP รับไฟล์จากคู่ค้า และ SNMPv2 สำหรับ monitoring",
+        "เขียนตัวแทนของแต่ละอย่าง",
+        "สำหรับแต่ละตัวแทน จดว่า protocol ใหม่เพิ่มอะไร (encryption, authentication, integrity)",
+        "เรียงสี่การเปลี่ยนแปลงตามความเสี่ยงที่ลดได้"
+      ],
+      "expected": "SSH สำหรับ router, HTTPS สำหรับเว็บ, SFTP หรือ FTPS สำหรับกล่องไฟล์ และ SNMPv3 สำหรับ monitoring ทุกคู่เพิ่มช่องทางที่เข้ารหัสและยืนยันตัวตน Telnet ของ router มักต้องเปลี่ยนก่อนเพราะเปิดโปง credential ของผู้ดูแล"
+    },
+    {
+      "kind": "lab",
+      "title": "แลป: TLS vs Plain Protocols",
+      "description": "จับ traffic ของตัวเองทั้ง HTTP และ HTTPS ใน Wireshark แล้วเทียบว่าแต่ละแบบเปิดเผยอะไร จากนั้นเชื่อมโยง SSH กับ Telnet เข้ากับสิ่งที่เห็น คู่มือฉบับเต็ม: labs/tls-vs-plain-protocols.th.md",
+      "estimatedMinutes": 30,
+      "status": "ready",
+      "scale": "full"
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Firewall Rules PBQ",
+      "description": "ซ่อม action, พอร์ต และลำดับของตารางกฎ edge firewall ของวิทยาลัย จนแผงทดสอบ flow อ่านออกตามที่นโยบายสั่ง แบบฉบับเต็ม: labs/firewall-rules-pbq.lab.th.md",
+      "estimatedMinutes": 12,
+      "status": "coming-soon",
+      "scale": "full"
+    }
+  ],
+  "cheatsheet": [
+    "กฎ firewall อ่านจากบนลงล่าง: กฎแรกที่ match ชนะ กฎเฉพาะจึงนั่งเหนือกฎกว้าง และ implicit deny รับที่เหลือ — default deny คือท่าตั้งต้น",
+    "IDS ดูสำเนาแล้วแจ้งเตือน IPS นั่ง inline และบล็อก false positive ของ IPS จึงหยุด traffic จริง",
+    "Proxy กรอง traffic เว็บ WAF ป้องกัน web app DNS filtering ตัดโดเมนอันตรายที่ชั้น resolve",
+    "รูปแบบ VPN: site-to-site เชื่อมเครือข่าย remote access เชื่อมผู้ใช้ TLS เสิร์ฟแอป IPsec เชื่อมเครือข่าย",
+    "SDN รวมการควบคุม switch และ router เป็นศูนย์กลาง ทำ segmentation ได้เร็ว",
+    "คู่เปลี่ยน: Telnet เป็น SSH, FTP เป็น SFTP หรือ FTPS, HTTP เป็น HTTPS, SNMPv1/v2 เป็น v3, LDAP เป็น LDAPS"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "ทีมหนึ่งต้องการให้ traffic โจมตีระหว่าง segment ถูกหยุดอัตโนมัติ และยอมรับว่าอุปกรณ์ต้องนั่งอยู่บนเส้นทาง traffic อุปกรณ์ใดเข้าเรื่อง",
+      "choices": {
+        "A": "IDS บน mirror port",
+        "B": "DNS filter",
+        "C": "IPS แบบ inline ระหว่าง segment",
+        "D": "Load balancer"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "การนั่ง inline บวกการบล็อกเชิงรุกคือนิยามของ IPS ส่วน IDS แจ้งเตือนจากสำเนาแต่หยุด traffic ไม่ได้ และ DNS filter กับ load balancer มีหน้าที่ต่างออกไป"
+    }
+  ]
+}

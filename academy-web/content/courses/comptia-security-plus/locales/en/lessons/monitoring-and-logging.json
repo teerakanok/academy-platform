@@ -1,0 +1,127 @@
+{
+  "nodeId": "monitoring-and-logging",
+  "locale": "en",
+  "title": "Monitoring and Logging",
+  "objective": "By the end of this lesson you can explain what a SIEM and SOAR do, choose the right log sources for a question, and set retention and monitoring policies that hold up in an investigation.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "SIEM: collect, correlate, alert"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A SIEM (security information and event management) pulls logs from everywhere into one place, normalizes them, and correlates events across sources: one login from a strange country matters little, one login from a strange country followed by a privilege change matters a lot. Dashboards and reports turn the pile into an operating picture."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SOAR (security orchestration, automation, and response) adds playbooks: when a defined trigger fires, the system enriches alerts, opens tickets, isolates hosts, or asks a human to approve the next step. The pair to remember for the exam: SIEM sees and correlates, SOAR acts on what was seen."
+    },
+    {
+      "kind": "heading",
+      "text": "Log sources worth naming"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Source",
+        "Answers the question"
+      ],
+      "rows": [
+        [
+          "Firewall and proxy",
+          "What went where, what was blocked"
+        ],
+        [
+          "Authentication and directory",
+          "Who logged in, from where, with what result"
+        ],
+        [
+          "Endpoint and EDR",
+          "What ran on the machine"
+        ],
+        [
+          "DNS",
+          "Which names were resolved by whom"
+        ],
+        [
+          "Application and database",
+          "What the app itself recorded"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Make logs usable"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Time synchronization with NTP: timestamps that disagree make correlation impossible.",
+        "Retention policy: how long each log class is kept, balancing cost, law, and investigation needs.",
+        "Log integrity and access control: attackers edit logs; protect them.",
+        "Monitoring coverage: define what 'normal' looks like, so alerts fire on deviation.",
+        "Simple Network Management Protocol (SNMP) and netflow: traffic and device health telemetry."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Searching is the first hands-on skill logs demand: one export can hold thousands of lines, and the ones that matter are the ones matching a pattern — an event ID, an account, a timestamp. grep and its Windows twin findstr print only the lines of a text file that match, which is how every log investigation starts, from this module's practice drills to a real SOC shift. You will type both in the labs ahead."
+    },
+    {
+      "kind": "code",
+      "caption": "Two ways to say: show me only the failed logons",
+      "lines": [
+        "grep 4625 security.log        (Linux and macOS)",
+        "findstr 4625 security.log      (Windows)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Email, web, and data controls"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Security gateways for email inspect attachments and links before users see them. DLP (data loss prevention) watches data in three places, at the endpoint, on the network, and in cloud services, and blocks or warns when sensitive patterns move against policy. Web filters and DNS filtering cut the destinations of attacks before a click matters."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Two favorite framings: 'logs existed but nothing combined them' points to a SIEM; 'the team saw the alert but the manual steps were too slow' points to SOAR automation. Retention questions hinge on legal needs versus storage cost, with the longest hold for logs under legal investigation."
+    },
+    {
+      "kind": "try",
+      "title": "Investigate one account",
+      "steps": [
+        "Question: did user 'pat' have their account compromised on Monday?",
+        "List the four log sources you would pull first, and what each would show.",
+        "Write the two-source correlation that would most strongly confirm or clear the suspicion.",
+        "Name the control that would have stopped the attack if it were real."
+      ],
+      "expected": "Sources: authentication logs (login times, IPs, failures), directory logs (password or MFA changes), email gateway (new inbox rules), endpoint or EDR (new agents). Strongest correlation: successful foreign-IP login followed within minutes by a new inbox rule or MFA change. Stopping control: MFA, ideally with number matching."
+    }
+  ],
+  "cheatsheet": [
+    "SIEM aggregates, normalizes, and correlates; SOAR automates response playbooks.",
+    "Key sources: firewall and proxy, authentication, endpoint/EDR, DNS, application and database logs.",
+    "NTP time sync makes correlation possible; protect log integrity; set retention by law, cost, and need.",
+    "DLP watches endpoint, network, and cloud for sensitive data leaving policy.",
+    "Email gateways, web filters, and DNS filtering act before the user click completes."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Analysts each watch a different console, and an attack that touched the firewall, email, and domain controller went unnoticed because nobody saw the combined picture. Which tool directly addresses this?",
+      "choices": {
+        "A": "A second firewall in parallel",
+        "B": "A SIEM that aggregates and correlates the sources",
+        "C": "A password vault",
+        "D": "A load balancer"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Correlating events across sources into one timeline is the SIEM's defining job. SOAR could come next for automated response, but the described gap is visibility."
+    }
+  ]
+}

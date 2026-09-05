@@ -1,0 +1,105 @@
+{
+  "nodeId": "certificates-and-pki-ops",
+  "locale": "en",
+  "title": "Certificates and PKI Ops",
+  "objective": "By the end of this lesson you can run the certificate lifecycle, check revocation with CRL and OCSP, and diagnose the certificate errors a help desk actually sees.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "The certificate lifecycle"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A certificate is born from a certificate signing request (CSR): the applicant keeps the private key, the CA signs the public key plus identity into a certificate. The life of a certificate runs: request, validate identity, issue, deploy, monitor expiry, renew, and eventually revoke or expire. Automation tools renew certificates before expiry, because an expired certificate on a load balancer is a self-inflicted outage."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Root CA: the offline, ultra-protected trust anchor.",
+        "Intermediate CA: issues on the root's behalf, so the root stays offline.",
+        "Chain of trust: device verifies leaf up through intermediate to a trusted root.",
+        "Wildcard certificate: one certificate covers one level of subdomains (*.example.com).",
+        "SAN (subject alternative name): lists multiple hostnames in one certificate.",
+        "Self-signed: fine for labs, a warning sign in production browsers.",
+        "Key escrow: a protected copy of keys for recovery when holders leave."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Revocation: CRL and OCSP"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Method",
+        "How it works",
+        "Trade-off"
+      ],
+      "rows": [
+        [
+          "CRL (certificate revocation list)",
+          "Download the full list of revoked certificates",
+          "Complete but heavy and soon out of date"
+        ],
+        [
+          "OCSP",
+          "Ask the CA about one certificate",
+          "Fresh answer per check, adds a round trip"
+        ],
+        [
+          "OCSP stapling",
+          "Server presents a fresh, signed OCSP answer",
+          "Faster and more private than client-side OCSP"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Why certificates get revoked"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Revocation is for compromise and misuse: the private key leaked, the certificate was mis-issued, or the site changed ownership. Expiry is a date problem; revocation is a trust problem. A CA may also revoke a certificate when the subscriber violates its terms."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Error-to-cause mapping is the tested skill: 'certificate expired' means date, 'untrusted root' means a missing or self-signed chain, 'hostname mismatch' means the URL name is absent from the certificate, and 'certificate revoked' means check OCSP or CRL status. Match the error text to the cause."
+    },
+    {
+      "kind": "try",
+      "title": "Diagnose three browser warnings",
+      "steps": [
+        "Warnings: (1) NETERR cert not trusted on an internal app with a self-signed certificate; (2) hostname mismatch when visiting www subdomain of a site whose certificate lists only the apex domain; (3) certificate revoked on a partner portal.",
+        "Name the cause of each.",
+        "Name the fix that keeps security intact, per case.",
+        "Decide which case is a life-cycle fix versus a trust fix."
+      ],
+      "expected": "1: self-signed chain; fix by issuing from an internal CA the devices trust. 2: SAN or wildcard covering the www name; reissue including all names. 3: revocation; the partner must replace the certificate, and your browser is right to block. Case 3 is a trust problem; cases 1 and 2 are issuance and configuration problems."
+    }
+  ],
+  "cheatsheet": [
+    "Lifecycle: CSR, identity validation, issue, deploy, monitor expiry, renew, revoke or expire; automate renewal.",
+    "Chain of trust: leaf, intermediate, root; the root stays offline.",
+    "CRL = full list download; OCSP = per-certificate check; stapling = server supplies a signed fresh answer.",
+    "Revocation reasons: key compromise, mis-issuance, misuse. Expiry is a date problem, revocation a trust problem.",
+    "Wildcard covers one level of subdomains; SAN lists multiple names; production avoids self-signed."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Browsers reject a site whose private key was published in a public code repository. The key holder has a new key pair. What must happen before trust returns?",
+      "choices": {
+        "A": "Wait for the old certificate to expire naturally",
+        "B": "Ask users to click through the warning",
+        "C": "Restart the web server with the same certificate",
+        "D": "Revoke the old certificate and issue a new one for the new key"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "A leaked private key voids the certificate's trust, so the CA revokes it and a fresh certificate binds the new key. Expiry is too slow, and reusing the certificate or ignoring warnings leaves the compromise active."
+    }
+  ]
+}

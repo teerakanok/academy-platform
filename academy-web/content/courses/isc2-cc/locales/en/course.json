@@ -1,0 +1,53 @@
+{
+  "locale": "en",
+  "title": "ISC2 Certified in Cybersecurity (CC)",
+  "subtitle": "An entry-level security certification, taught from zero — no work experience assumed",
+  "audience": "For self-paced learners preparing for the ISC2 CC exam on the 2026-09 outline, with no prior security job required. Five modules follow the five exam domains, each with a guided lab and a closing practice lesson, and every lesson exists in English and Thai with identical checkpoint answers. Labs are defensive only and run on your own computer, a free sandbox or a simulated surface.",
+  "outcomes": [
+    "Apply the security principles the exam tests: CIA, authentication and authorisation, risk, controls, ethics and governance basics (Domain 1, 24%)",
+    "Explain business continuity, disaster recovery and incident response concepts and how they fit together (Domain 2, 17.3%)",
+    "Describe access control concepts — physical and logical — and the identity lifecycle (Domain 3, 20%)",
+    "Recognise network and cloud security fundamentals: threats, infrastructure, secure design and cloud service models (Domain 4, 21.3%)",
+    "Carry out security operations: data security, hardening, best practices and awareness (Domain 5, 17.3%)",
+    "Review the whole outline in the capstone and plan your exam day"
+  ],
+  "skillLabels": {
+    "security-principles": "Security principles",
+    "governance": "Governance, BC/DR and incident response",
+    "iam": "Access control and identity",
+    "network-cloud": "Network and cloud security",
+    "sec-ops": "Security operations"
+  },
+  "nodeTitles": {
+    "cia-and-aaa": "Security Goals: CIA, Non-Repudiation, and AAA",
+    "risk-lifecycle": "The Risk Lifecycle",
+    "security-controls-types": "Security Controls: Types and Categories",
+    "governance-and-ethics-basics": "Governance Basics, Due Care and Due Diligence, and ISC2 Ethics",
+    "ai-data-integrity-risks": "AI Data Integrity Risks",
+    "principles-practice": "Practice: CIA, AAA, and Control Types",
+    "grc-fundamentals": "GRC Fundamentals: Policies, Standards, Frameworks",
+    "security-awareness-and-culture": "Security Awareness and Culture",
+    "metrics-kris-and-reporting": "Metrics, KRIs, and Reporting",
+    "redundancy-and-continuity": "Redundancy, Business Continuity, and Disaster Recovery",
+    "governance-practice": "Practice: Risk Registers and KRIs",
+    "aaa-in-depth": "AAA in Depth: Factors, Sessions, SSO, and Federation",
+    "identity-lifecycle": "The Identity Lifecycle: Provisioning to Deprovisioning",
+    "access-control-models": "Access Control Models and Principles",
+    "mfa-and-iam-tools": "MFA Methods, IAM Tools, and Behavioral Authentication",
+    "iam-practice": "Practice: Least Privilege and the Identity Lifecycle",
+    "network-fundamentals-threats": "Network Fundamentals and Threats",
+    "network-security-devices": "Network Security Devices: Firewalls, IDS/IPS, Proxies, VPNs",
+    "segmentation-and-zero-trust": "Segmentation, Zero Trust, and Isolating AI Environments",
+    "cloud-models-shared-responsibility": "Cloud Models and Shared Responsibility",
+    "wireless-iot-ics": "Wireless, IoT, and ICS Security",
+    "network-cloud-practice": "Practice: Configure the Network Interface",
+    "monitoring-and-siem": "Monitoring, Logging, and SIEM",
+    "event-triage": "Event Triage: From Alert to Decision",
+    "threat-actors-and-cti": "Threat Actors, Motivations, and Cyber Threat Intelligence",
+    "incident-response-cycle": "The Incident Response Cycle, Planning, and Exercises",
+    "teams-and-security-testing": "Red, Blue, Purple Teams and Security Testing",
+    "data-protection-ops": "Data Protection in Operations",
+    "secops-practice": "Practice: Triage and Data Handling",
+    "capstone-cc": "Capstone: Course Review and Exam-Day Strategy"
+  }
+}

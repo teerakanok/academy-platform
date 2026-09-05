@@ -1,0 +1,115 @@
+{
+  "nodeId": "general-concepts-practice",
+  "locale": "en",
+  "title": "Practice: General Security Concepts",
+  "objective": "By the end of this lesson you can sort any named control into preventive, detective, corrective, or deterrent under exam pressure, and pick the right cryptographic tool for a scenario on the first read.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Why hands-on now"
+    },
+    {
+      "kind": "paragraph",
+      "text": "You have read the control functions and the crypto families, and the lists probably felt tidy. The exam will not hand you tidy lists. It hands you a sentence about a camera, a banner, or a backup restore, and the classification has to arrive in one breath. Sorting controls with your own pen, and matching crypto scenarios out of order, is what moves these mappings from recognized to reflex."
+    },
+    {
+      "kind": "heading",
+      "text": "Drill 1: sort eight controls"
+    },
+    {
+      "kind": "try",
+      "title": "Classify on paper, in two minutes",
+      "steps": [
+        "Copy these eight controls onto paper: 1) a firewall rule that blocks Telnet from the internet, 2) CCTV cameras in the data center, 3) restoring last night's backup after a ransomware attack, 4) a logon banner stating that all activity is recorded, 5) a security guard at the reception desk, 6) an IPS that drops malicious traffic mid-stream, 7) wiping and rebuilding an infected laptop, 8) reviewing SIEM alerts every Monday for odd logons.",
+        "Draw four columns: preventive, detective, corrective, deterrent. Place each control in one column and write a three-word reason beside it.",
+        "Star the two placements you would argue about, then write the argument for the other column.",
+        "Set a timer and repeat from scratch tomorrow; the second run should take half the time."
+      ],
+      "expected": "Firewall rule and IPS are preventive (they stop the event). CCTV and SIEM review are detective (they reveal what happened or is happening). Backup restore and laptop rebuild are corrective (they restore a healthy state). The logon banner is deterrent (it discourages). The guard is the classic argument: deterrent if the sign and presence discourage, preventive if the guard physically blocks entry; exam answers key on discouragement wording. The IPS is also arguable, because it detects and then corrects in one motion, but the outcome it delivers is prevention."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Notice what the starred items teach: the function names the outcome, not the hardware. A camera is detective while it records and stays detective even during the incident review. The same device with a loud announcer becomes deterrent. When two answers both look right, ask what the scenario says the control accomplishes, and match that verb to the function."
+    },
+    {
+      "kind": "heading",
+      "text": "Drill 2: match five crypto scenarios"
+    },
+    {
+      "kind": "try",
+      "title": "Pick the tool, name the property",
+      "steps": [
+        "For each scenario, choose one tool: symmetric encryption, asymmetric encryption, hash, digital signature.",
+        "1) Encrypt a 2 TB disk image overnight where speed matters. 2) Send a 256-bit session key to a partner so only the partner can read it. 3) Publish a digest next to the download link so buyers can check the file. 4) A director approves a purchase order so the vendor can prove who signed it. 5) Store passwords so two users with the same password have different stored values.",
+        "For each choice, say which property it delivers: confidentiality, integrity, or non-repudiation.",
+        "Then swap direction: for each tool, write the one-line scenario the exam would use to point at it."
+      ],
+      "expected": "1) Symmetric, for bulk speed: confidentiality. 2) Asymmetric, public key locks the key exchange: confidentiality of the session key. 3) Hash: integrity. 4) Digital signature: integrity plus non-repudiation, because the private key belongs to the director. 5) Salted hash: verification without storing the password itself. Scenario cues the exam reuses: speed and bulk point at symmetric; key distribution points at asymmetric; tamper-check points at hash; prove-the-sender points at signatures."
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "The two-second mapping",
+      "text": "Confidentiality asks for encryption, integrity asks for a hash, non-repudiation asks for a digital signature with the sender's private key. When a scenario mentions repudiation or proof of origin, scan the answers for the private key before reading them fully."
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Control Types Classify",
+      "description": "Drag ten controls into preventive, detective, corrective, and deterrent bins and defend the two debatable placements in the debrief. Full design: labs/control-types-classify.lab.en.md.",
+      "estimatedMinutes": 10,
+      "status": "coming-soon",
+      "scale": "inline"
+    }
+  ],
+  "cheatsheet": [
+    "Control functions name the outcome: preventive stops, detective reveals, corrective restores, deterrent discourages.",
+    "Arguable placements are settled by the scenario verb, not the device: a guard who blocks is preventive, a presence that discourages is deterrent.",
+    "Speed and bulk point at symmetric encryption; key distribution points at asymmetric.",
+    "Tamper-checking points at hashing; proving the sender points at digital signatures and the private key.",
+    "Password storage is a slow, salted hash, so identical passwords never look identical."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "After a warehouse break-in, investigators replay door camera footage to reconstruct what was taken and when. Which control function did the cameras perform?",
+      "choices": {
+        "A": "Preventive, because the cameras sit at the entrance",
+        "B": "Deterrent, because intruders fear recordings",
+        "C": "Corrective, because it happens after the incident",
+        "D": "Detective, because the footage reveals what happened"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The scenario describes the footage being used to learn what happened, which is the detective function. A deterrent answer would need wording about discouraging attempts, and timing alone never makes a control corrective."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A company adds a logon banner stating that all activity is monitored and misuse is prosecuted. Which control function does the banner perform?",
+      "choices": {
+        "A": "Preventive",
+        "B": "Deterrent",
+        "C": "Corrective",
+        "D": "Detective"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A banner changes nothing technically; it discourages misuse by declaring consequences, which is the deterrent function. It monitors nothing and restores nothing."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A software vendor wants customers to confirm that a patch file is unchanged since release and came from the vendor itself. Which single mechanism delivers both?",
+      "choices": {
+        "A": "A digital signature created with the vendor's private key",
+        "B": "Publishing the SHA-256 digest of the patch",
+        "C": "Symmetric encryption of the patch with AES",
+        "D": "Encrypting the patch with each customer's public key"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "A signature covers the digest, so any change breaks it, and only the vendor's private key could produce it, which gives integrity plus proof of origin. A bare digest gives integrity with no proof of who published it, and encryption only hides content."
+    }
+  ]
+}

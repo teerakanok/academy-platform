@@ -1,0 +1,145 @@
+{
+  "nodeId": "security-goals-and-controls",
+  "locale": "th",
+  "title": "เป้าหมายความมั่นคงปลอดภัยและการควบคุม",
+  "objective": "เมื่อจบบทเรียนนี้ ผู้เรียนจะระบุเป้าหมายความมั่นคงปลอดภัยที่อยู่เบื้องหลังทุก control จัดกลุ่ม control ตามประเภทและหน้าที่ และเลือก control ที่เหมาะกับความเสี่ยงที่กำหนดให้ได้",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "ความมั่นคงปลอดภัยพยายามทำอะไร"
+    },
+    {
+      "kind": "paragraph",
+      "text": "control ทุกตัวที่ผู้เรียนจะเรียนในคอร์สนี้ถูกสร้างขึ้นเพื่อปกป้องคุณสมบัติสามอย่างที่เรียกว่า CIA triad ได้แก่ confidentiality (ความลับ), integrity (ความถูกต้องครบถ้วน) และ availability (ความพร้อมใช้งาน) เมื่อข้อสอบอธิบายสถานการณ์ใดมา ให้ถามตัวเองว่าคุณสมบัติใดของสามตัวนี้กำลังถูกคุกคาม คำถามเดียวนี้มักทำให้เห็นคำตอบทันที"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "คุณสมบัติ",
+        "ความหมายแบบเข้าใจง่าย",
+        "ตัวอย่างในชีวิตประจำวัน"
+      ],
+      "rows": [
+        [
+          "Confidentiality",
+          "มีเพียงคนที่ได้รับอนุมัติเท่านั้นที่อ่านข้อมูลได้",
+          "สลิปเงินเดือนที่ซองปิดผนึก"
+        ],
+        [
+          "Integrity",
+          "ข้อมูลยังคงถูกต้องและไม่ถูกแก้ไข",
+          "ซีลกันการเปิดฝายา"
+        ],
+        [
+          "Availability",
+          "ระบบพร้อมใช้งานเมื่อต้องการ",
+          "ไฟสำรองของโรงพยาบาล"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "อีกสองเป้าหมายเสริมที่ออกสอบบ่อยคือ non-repudiation (การปฏิเสธไม่ได้) หมายถึงผู้ส่งไม่สามารถปฏิเสธภายหลังว่าตนไม่ได้ส่งข้อความนั้น ซึ่งพิสูจน์ด้วย digital signature และ authenticity (ความถูกต้องแท้) หมายถึงการยืนยันได้ว่ากำลังคุยกับใครหรืออะไร เช่น การใช้ certificate"
+    },
+    {
+      "kind": "heading",
+      "text": "ประเภทของ control: ดูจากตัว control อยู่ตรงไหน"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Managerial control: กฎและแผน เช่น policy, risk assessment และ change management",
+        "Operational control: วิธีที่คนดูแลระบบ เช่น การอบรม awareness, การลาดตระเวนของรปภ. และ incident response",
+        "Technical control: สิ่งที่ระบบบังคับใช้เอง เช่น firewall, encryption และการยืนยันตัวตนแบบ MFA",
+        "Physical control: สิ่งที่จับต้องได้ เช่น กุญแจ รั้ว กล้องวงจรปิด และ mantrap"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "หน้าที่ของ control: ดูจาก control ทำอะไร"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "หน้าที่",
+        "ทำงานเมื่อไหร่",
+        "ตัวอย่าง"
+      ],
+      "rows": [
+        [
+          "Preventive",
+          "ก่อนเหตุการณ์เกิด",
+          "กุญแจประตู"
+        ],
+        [
+          "Detective",
+          "ระหว่างหรือหลังเหตุการณ์",
+          "log จากเซ็นเซอร์จับการเคลื่อนไหว"
+        ],
+        [
+          "Corrective",
+          "หลังเหตุการณ์ เพื่อกู้คืน",
+          "การ restore จาก backup"
+        ],
+        [
+          "Deterrent",
+          "ทำให้ไม่กล้าลอง",
+          "ป้ายเตือน"
+        ],
+        [
+          "Compensating",
+          "ทางเลือกเมื่อ control หลักใช้ไม่ได้",
+          "การเฝ้าระวังเพิ่มสำหรับระบบเก่า"
+        ],
+        [
+          "Directive",
+          "กำหนดพฤติกรรมด้วยกฎ",
+          "acceptable use policy"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "บนข้อสอบ",
+      "text": "มักเจอข้อสอบที่ยก control หนึ่งตัวมาให้ แล้วถามถึงประเภท หน้าที่ หรือทั้งสองอย่าง กฎของ firewall คือ technical และ preventive ส่วนการอัดภาพจากกล้องคือ physical (หรือ technical) และ detective ให้อ่านสถานการณ์หาเงื่อนไขว่า control ทำงานช่วงเวลาใด"
+    },
+    {
+      "kind": "try",
+      "title": "จัดกลุ่ม control ห้าตัว",
+      "steps": [
+        "ให้เอาห้ารายการนี้มาพิจารณา: การลาดตระเวนของรปภ., กฎ firewall, การอบรม phishing ของพนักงาน, การ restore จาก backup และ password policy ฉบับเขียน",
+        "สำหรับแต่ละรายการ เขียนประเภท: managerial, operational, technical หรือ physical",
+        "แล้วเขียนหน้าที่หลัก: preventive, detective, corrective, deterrent หรือ directive",
+        "มีหนึ่งรายการที่เข้ากลุ่มประเภทได้สองกลุ่มอย่างสมเหตุสมผล ให้จดไว้และอธิบายเหตุผล เพราะข้อสอบให้คะแนนกับคำตอบที่ตรงที่สุด"
+      ],
+      "expected": "การลาดตระเวนคือ physical และ detective หรือ deterrent กฎ firewall คือ technical และ preventive การอบรมคือ operational และ preventive การ restore คือ technical หรือ operational และ corrective ส่วน policy คือ managerial และ directive"
+    },
+    {
+      "kind": "paragraph",
+      "text": "control ยังมีรูปแบบความล้มเหลวที่ควรรู้จัก false positive คือการแจ้งเตือนทั้งที่ไม่มีภัยจริง false negative คือการที่ภัยจริงผ่านไปโดยไม่มีการแจ้งเตือน ถ้าข้อสอบถามว่าทำไม detective control จึงพลาดเหตุการณ์ ให้มองหา false negative"
+    }
+  ],
+  "cheatsheet": [
+    "CIA triad: confidentiality, integrity, availability บวกเป้าหมายเสริมคือ non-repudiation และ authenticity",
+    "ประเภทของ control: managerial (กฎ), operational (คนและกระบวนการ), technical (ระบบบังคับใช้), physical (จับต้องได้)",
+    "หน้าที่ของ control: preventive สกัด, detective เปิดเผย, corrective กู้คืน, deterrent ทำให้ไม่กล้า, compensating ทดแทน, directive สั่งการ",
+    "False positive: แตกตื่นโดยไม่มีภัย false negative: มีภัยแต่ไม่มีสัญญาณเตือน"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "องค์กรหนึ่งแพตช์เครื่อง legacy ไม่ได้ จึงย้ายเครื่องไปอยู่ network segment ที่แยกไว้พร้อมเปิด log เพิ่มเติม การเปิด log เพิ่มเติมนั้นเป็น control แบบใด",
+      "choices": {
+        "A": "Technical และ detective",
+        "B": "Compensating และ preventive",
+        "C": "Physical และ deterrent",
+        "D": "Managerial และ corrective"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "การเปิด log เป็นสิ่งที่ระบบบังคับใช้ (technical) และเปิดเผยกิจกรรมที่เกิดขึ้น (detective) ส่วนการแยก segment เป็นส่วน compensating แต่คำถามถามถึงการ log โดยตรง"
+    }
+  ]
+}

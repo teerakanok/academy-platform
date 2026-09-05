@@ -1,0 +1,51 @@
+{
+  "locale": "en",
+  "title": "CompTIA Security+ (SY0-701)",
+  "subtitle": "Exam-prep for your first security certification, built around how the exam actually asks",
+  "audience": "For learners with basic IT or networking exposure who are aiming for their first security certification. Every lesson exists in English and Thai under the same structure, each of the five exam domains ends with a hands-on practice lesson, and the capstone rehearses exam-day strategy. All labs are defensive and run on your own computer or a free sandbox; nothing targets third-party systems.",
+  "outcomes": [
+    "Explain the general security concepts the exam builds on: controls, the CIA triad, zero trust, cryptography and change management (Domain 1, 12%)",
+    "Recognise threat actors, attack types and vulnerabilities, and choose the mitigation the exam expects (Domain 2, 22%)",
+    "Compare security architectures — cloud, on-premises, network and data protection designs — and pick the resilient option (Domain 3, 18%)",
+    "Carry out security operations: hardening, identity and access, monitoring, incident response and log analysis (Domain 4, 28%)",
+    "Apply governance, risk, compliance and audit concepts to a security program (Domain 5, 20%)",
+    "Sit a 35-question practice exam and walk into SY0-701 with a time plan and a strategy for the performance-based questions"
+  ],
+  "skillLabels": {
+    "general-concepts": "General security concepts",
+    "threats-vulns": "Threats, vulnerabilities and mitigations",
+    "architecture": "Security architecture",
+    "operations": "Security operations",
+    "program-mgmt": "Program management and oversight"
+  },
+  "nodeTitles": {
+    "security-goals-and-controls": "Security Goals and Controls",
+    "change-management-process": "Change Management Process",
+    "cryptographic-solutions": "Cryptographic Solutions",
+    "general-concepts-practice": "Practice: General Security Concepts",
+    "threat-actors-and-vectors": "Threat Actors and Vectors",
+    "common-attacks": "Common Attacks",
+    "malware-types": "Malware Types",
+    "vulnerability-management": "Vulnerability Management",
+    "mitigation-matrix-and-attack-frameworks": "Mitigation Matrix and Attack Frameworks",
+    "threats-practice": "Practice: Threats, Vulnerabilities, and Mitigations",
+    "architecture-models": "Architecture Models",
+    "cloud-and-edge-security": "Cloud and Edge Security",
+    "resiliency-architecture": "Resiliency Architecture",
+    "enterprise-security-forms": "Enterprise Security Forms",
+    "architecture-practice": "Practice: Security Architecture",
+    "identity-and-privilege-ops": "Identity and Privilege Ops",
+    "hardening-and-configuration": "Hardening and Configuration",
+    "asset-and-change-management": "Asset and Change Management",
+    "certificates-and-pki-ops": "Certificates and PKI Ops",
+    "monitoring-and-logging": "Monitoring and Logging",
+    "forensics-and-incident-response": "Forensics and Incident Response",
+    "operations-practice": "Practice: Security Operations",
+    "governance-and-compliance": "Governance and Compliance",
+    "risk-management": "Risk Management",
+    "audits-and-assessments": "Audits and Assessments",
+    "security-awareness-program": "Security Awareness Program",
+    "program-mgmt-practice": "Practice: Security Program Management",
+    "capstone-secplus": "Course Review and Exam-Day Strategy"
+  }
+}

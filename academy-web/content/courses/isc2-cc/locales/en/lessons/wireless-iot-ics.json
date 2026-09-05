@@ -1,0 +1,131 @@
+{
+  "nodeId": "wireless-iot-ics",
+  "locale": "en",
+  "title": "Wireless, IoT, and ICS Security",
+  "objective": "By the end of this lesson you can order wireless security protocols WEP to WPA3, spot an evil twin, and describe the security concerns of IoT and industrial control systems.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Wireless security generations"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Protocol",
+        "Status",
+        "Notes"
+      ],
+      "rows": [
+        [
+          "WEP",
+          "Broken; never use",
+          "Crackable in minutes; legacy only"
+        ],
+        [
+          "WPA (TKIP)",
+          "Deprecated",
+          "Interim fix over WEP; replace"
+        ],
+        [
+          "WPA2 (AES-CCMP)",
+          "Acceptable baseline",
+          "Personal (shared passphrase) and Enterprise (per-user 802.1X/RADIUS) modes"
+        ],
+        [
+          "WPA3",
+          "Current best",
+          "Stronger handshake (SAE) that resists offline passphrase guessing; prefer wherever available"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Two exam anchors: WEP is the always-wrong answer, and WPA3 is the always-preferred one. Between them, WPA2-Personal protects small networks with one shared passphrase, while WPA2/WPA3-Enterprise gives each user an individual credential through a RADIUS server, which is what organizations should use for staff wireless."
+    },
+    {
+      "kind": "heading",
+      "text": "Evil twin and public Wi-Fi"
+    },
+    {
+      "kind": "paragraph",
+      "text": "An evil twin is a rogue access point broadcasting a legitimate-looking network name (SSID), often with a captive portal that harvests credentials. Victims connect to the attacker's network instead of the real one. The tells and defenses: verify network names with staff rather than guessing, treat captive portals that ask for corporate credentials as red flags, and use VPN or cellular data for sensitive work on the road. This pairs with the earlier on-path lesson: the rogue AP creates the on-path position."
+    },
+    {
+      "kind": "heading",
+      "text": "Bluetooth, briefly"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Bluetooth and BLE (Bluetooth Low Energy) connect peripherals and beacons with short range but real risk: discoverable devices, pairing abuse, and firmware weaknesses. Basic hygiene: turn off discovery and pairing when unused, decline unexpected pairing prompts, and unpair devices before disposal. Range is short, but crowded spaces defeat distance assumptions."
+    },
+    {
+      "kind": "heading",
+      "text": "IoT: cheap, everywhere, rarely patched"
+    },
+    {
+      "kind": "paragraph",
+      "text": "IoT devices (cameras, sensors, smart speakers, printers) share a troublesome profile: default credentials, infrequent firmware updates, limited logging, and always-on network connectivity. The exam answer for IoT is hygiene plus isolation: change defaults, update firmware, and place IoT on its own network segment (linking back to segmentation) so a compromised camera cannot reach the file server. Botnets recruit exactly these devices, turning IoT risk into everyone's DDoS problem."
+    },
+    {
+      "kind": "heading",
+      "text": "ICS: when downtime is measured in safety"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Industrial control systems (ICS), including SCADA and PLCs, run physical processes: power, water, manufacturing lines. Their priority ordering often inverts the office norm: availability and safety first, because a stopped process can damage equipment or endanger people. Security guidance therefore emphasizes: segment OT networks from IT and internet, allow-list communications strictly, inventory what is connected, and plan for resilience rather than fast change, since many ICS components run for decades with validated configurations."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "WEP is always wrong; WPA3 is always preferred; Enterprise mode means per-user credentials via RADIUS. IoT scenarios answer with change-defaults plus segmentation. ICS scenarios answer with availability/safety first and OT-IT segmentation."
+    },
+    {
+      "kind": "try",
+      "title": "Harden a small office",
+      "steps": [
+        "A small office has: staff Wi-Fi, guest Wi-Fi, eight IP cameras, a smart TV in the lobby, and one workshop controlled by a PLC. Assign each to a network zone and name its wireless setting.",
+        "List the three IoT hygiene actions you would take this week.",
+        "Say which zone gets the strictest egress rules and why."
+      ],
+      "expected": "Zones: staff Wi-Fi (WPA2/3-Enterprise if possible), guest Wi-Fi (isolated, internet only), IoT segment for cameras and TV (defaults changed, firmware updated), OT segment for the PLC (strict allow-list, no internet). IoT hygiene: change default credentials, update firmware, isolate on the IoT VLAN. Strictest egress: the OT segment, because availability and safety govern there."
+    }
+  ],
+  "cheatsheet": [
+    "Wireless order: WEP (broken, never) < WPA (deprecated) < WPA2 (baseline) < WPA3 (preferred, SAE handshake).",
+    "Enterprise modes use per-user credentials via RADIUS/802.1X; Personal modes share one passphrase.",
+    "Evil twin = rogue AP with a trusted-looking name; verify SSIDs, distrust credential-hungry captive portals, prefer VPN/cellular for sensitive use.",
+    "Bluetooth: disable discovery and pairing when unused; decline unexpected pairing requests.",
+    "IoT: change defaults, update firmware, segment; ICS/OT: availability and safety first, segment from IT, allow-list communications."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Visitors' laptops connect to 'Airport_Free_WiFi' and get a portal asking for their email password to 'verify identity'. What is the most likely explanation?",
+      "choices": {
+        "A": "An evil twin rogue access point harvesting credentials",
+        "B": "Standard WPA3-Enterprise onboarding",
+        "C": "A VPN tunnel requirement",
+        "D": "A firmware update for the router"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "A look-alike SSID with a captive portal that collects real account credentials is the evil twin pattern. Legitimate networks never need your email password to provide Wi-Fi."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A factory's temperature-control PLC must not lose connectivity, and a wrong command could damage equipment. Which design fits best?",
+      "choices": {
+        "A": "Place it on the office Wi-Fi for convenience with WPA2-Personal",
+        "B": "Expose its web interface to the internet for remote vendor support",
+        "C": "Place it in a segmented OT zone with strict communication allow-listing and no internet exposure",
+        "D": "Put it in the same VLAN as staff laptops for easier monitoring"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "ICS availability and safety lead: segment OT from IT, allow-list the specific communications it needs, and keep it off the internet. Convenience mixing with office networks is how industrial incidents begin."
+    }
+  ]
+}

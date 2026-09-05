@@ -1,0 +1,124 @@
+{
+  "nodeId": "access-control-models",
+  "locale": "en",
+  "title": "Access Control Models and Principles",
+  "objective": "By the end of this lesson you can apply least privilege, need to know, and separation of duties, and match scenarios to DAC, MAC, RBAC, and ABAC.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Three principles that answer most access questions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Least privilege: give each identity only the access required for its current role, for as long as needed. Need to know: restrict access to information required for the task, even for people cleared to a level. Separation of duties (SoD): split critical actions across people so no single individual can both commit and conceal fraud, for example one person requests a payment, another approves it. Exam scenarios about fraud almost always resolve to SoD."
+    },
+    {
+      "kind": "heading",
+      "text": "The four models"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Model",
+        "Who decides access",
+        "Strength",
+        "Weakness"
+      ],
+      "rows": [
+        [
+          "DAC (Discretionary)",
+          "The data owner; owners can pass rights on",
+          "Flexible, simple to start",
+          "Rights spread unpredictably; weakest central assurance"
+        ],
+        [
+          "MAC (Mandatory)",
+          "A central authority via labels and rules; users cannot change them",
+          "Strongest enforcement; suits classified environments",
+          "Rigid, expensive to administer"
+        ],
+        [
+          "RBAC (Role-Based)",
+          "Access attaches to roles; users inherit via assignment",
+          "Scales well; matches how organizations think",
+          "Role explosion if roles are not governed"
+        ],
+        [
+          "ABAC (Attribute-Based)",
+          "Rules evaluate attributes of user, resource, and context",
+          "Fine-grained, context-aware (time, location, device)",
+          "Most complex to design and debug"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Recognition hooks: a user sharing their file with a colleague is DAC. Labels such as secret or top-secret on documents, with clearance matching, is MAC. Job titles such as teller, manager, or auditor mapping to permission bundles is RBAC. Access granted only during business hours, only from country X, only to documents tagged finance is ABAC."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RBAC and ABAC often work together: roles give the coarse grant, attributes refine it per request. Zero trust environments (Domain 4) lean on attribute- and context-aware decisions, which is one reason ABAC awareness matters for the new outline."
+    },
+    {
+      "kind": "heading",
+      "text": "Privileged access and job rotation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Administrator and root accounts carry outsized risk, so they get extra treatment: separate admin identities rather than everyday accounts with admin rights, MFA on all privileged logins, vaulted and rotated credentials, and just-enough, just-in-time elevation. Job rotation moves people through roles so no one becomes a single point of failure or an undetectable fraud risk; mandatory vacation serves the same detection purpose in finance contexts."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Classify by who decides: owner decides (DAC), central labels decide (MAC), role membership decides (RBAC), attributes and context decide (ABAC). Fraud scenarios point to separation of duties; over-permission stories point to least privilege."
+    },
+    {
+      "kind": "try",
+      "title": "Model matching",
+      "steps": [
+        "Match each scenario to a model: (1) a project manager shares a folder with a contractor; (2) a defense document marked SECRET is accessible only to cleared staff; (3) every nurse in a hospital ward inherits the medication-view role; (4) a customer record is readable only by support agents located in the same region, during their shift.",
+        "Then name the principle violated when a single clerk both creates and approves vendor payments.",
+        "Say which two models you would combine for a large, dynamic workforce."
+      ],
+      "expected": "1: DAC. 2: MAC. 3: RBAC. 4: ABAC. The clerk case violates separation of duties. Combine RBAC (coarse grants) with ABAC (context refinement)."
+    }
+  ],
+  "cheatsheet": [
+    "Principles: least privilege, need to know, separation of duties (fraud answers point to SoD).",
+    "DAC = owner decides; MAC = central labels decide; RBAC = role decides; ABAC = attributes and context decide.",
+    "RBAC scales; ABAC adds context (time, place, device); they combine in practice.",
+    "Privileged access: separate admin identities, MFA, vaulting, just-in-time elevation, job rotation.",
+    "MAC is the strictest model; DAC is the most flexible and least centrally assured."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Access to the payroll system is granted only to users in the HR role, from managed devices, between 8:00 and 18:00 local time. Which models are combined?",
+      "choices": {
+        "A": "DAC and MAC",
+        "B": "MAC and DAC",
+        "C": "RBAC and ABAC",
+        "D": "DAC only"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Membership in the HR role carries the base grant (RBAC), refined by device and time attributes at request time (ABAC). No owner-passed permissions (DAC) or classification labels (MAC) appear."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "One employee can create new vendors and also approve payments to them. Which principle is violated?",
+      "choices": {
+        "A": "Separation of duties",
+        "B": "Least privilege",
+        "C": "Need to know",
+        "D": "Defense in depth"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "A single person able to both create a payee and approve its payment can commit and conceal fraud. Splitting those steps across people is separation of duties."
+    }
+  ]
+}

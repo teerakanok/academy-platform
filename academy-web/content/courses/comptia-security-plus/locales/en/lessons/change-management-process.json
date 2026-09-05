@@ -1,0 +1,132 @@
+{
+  "nodeId": "change-management-process",
+  "locale": "en",
+  "title": "Change Management Process",
+  "objective": "By the end of this lesson you can walk a change through the standard change-management steps and explain why skipping them creates security incidents.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Why change management is a security control"
+    },
+    {
+      "kind": "paragraph",
+      "text": "An unplanned change is one of the most common causes of outages and breaches. Change management is the process that makes every change visible, reviewed, testable, and reversible. On the exam it is classified as a managerial and preventive control."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Picture a firewall rule added at midnight to fix one problem. Weeks later that rule still routes guest traffic into the payroll segment. A documented change process would have forced a review date and a rollback plan. That is the whole point: the process catches what tired people miss."
+    },
+    {
+      "kind": "heading",
+      "text": "The steps, in order"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Step",
+        "What happens",
+        "Key output"
+      ],
+      "rows": [
+        [
+          "1. Request",
+          "Anyone submits the change with reason and scope",
+          "Change request form"
+        ],
+        [
+          "2. Review",
+          "Impact, risk, and security are assessed",
+          "Impact analysis"
+        ],
+        [
+          "3. Approve",
+          "A change advisory board (CAB) or approver decides",
+          "Approval or rejection"
+        ],
+        [
+          "4. Test",
+          "The change runs in a sandbox or staging area first",
+          "Test results"
+        ],
+        [
+          "5. Schedule",
+          "A maintenance window is agreed and stakeholders told",
+          "Window and notice"
+        ],
+        [
+          "6. Implement",
+          "The change is applied in production",
+          "Applied change"
+        ],
+        [
+          "7. Validate",
+          "Monitoring confirms the intended outcome",
+          "Validation evidence"
+        ],
+        [
+          "8. Document and back out",
+          "Records updated; rollback plan ready if validation fails",
+          "Completed record"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Approval before testing",
+      "text": "The exam likes to ask what step was skipped when a change caused an outage. Look for the story where a change went straight from request to production. The missing steps are testing, approval, or both."
+    },
+    {
+      "kind": "heading",
+      "text": "Terms that signal change questions"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Change advisory board (CAB): the group that reviews and approves changes.",
+        "Impact analysis: the study of what else the change touches.",
+        "Sandbox: an isolated environment that mimics production for safe testing.",
+        "Rollback plan (backout plan): the steps to undo the change.",
+        "Maintenance window: the agreed time slot when changes may be applied.",
+        "Scope creep: widening the change beyond what was approved."
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Draft a mini change request",
+      "steps": [
+        "Pick a small change you know: for example, opening port 443 to a new web server.",
+        "Write three fields: purpose, systems touched, and rollback steps.",
+        "Add one risk you would flag during review, such as whether the server is patched.",
+        "Keep the draft. Later lessons on asset management and hardening will reuse it."
+      ],
+      "expected": "A one-paragraph change request with purpose, scope, risk, and rollback. If your rollback step reads 'undo the change', rewrite it as concrete commands or console actions."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Version control and revision dates belong to the same family. Configurations, firewall rulesets, and infrastructure code all benefit from a history showing who changed what, when, and why."
+    }
+  ],
+  "cheatsheet": [
+    "Change flow: request, review, approve, test, schedule, implement, validate, document and back out.",
+    "CAB approves; the sandbox tests; the rollback plan rescues.",
+    "Change management is a managerial, preventive control.",
+    "Exam tell: an outage right after an undocumented change points to a skipped review or test step."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A technician applies a router config change directly in production during business hours. Traffic drops for an hour. Which two steps were most clearly skipped?",
+      "choices": {
+        "A": "Request and documentation",
+        "B": "Testing and scheduling in an approved window",
+        "C": "Validation and archival",
+        "D": "Rollback and version control"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Going straight to production during business hours skips sandbox testing and the agreed maintenance window. Documentation matters too, but the immediate cause is the missing test and schedule steps."
+    }
+  ]
+}

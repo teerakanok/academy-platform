@@ -1,0 +1,156 @@
+{
+  "nodeId": "threats-practice",
+  "locale": "th",
+  "title": "Practice: ภัยคุกคาม ช่องโหว่ และการป้องกัน",
+  "objective": "เมื่อจบบทเรียนนี้ ผู้เรียนจะบอกชื่อการโจมตีได้จากอาการเพียงอย่างเดียว จับคู่พฤติกรรมผู้โจมตีกับ tactic ของ MITRE ATT&CK ได้ และหยิบ mitigation ที่สถานการณ์กำลังชี้ได้ทันที",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "ทำไมต้องลงมือตอนนี้"
+    },
+    {
+      "kind": "paragraph",
+      "text": "ข้อสอบเรื่องการโจมตีแทบไม่เอ่ยชื่อการโจมตีเลย มันยื่นข้อเท็จจริงหกข้อที่กลิ่นไม่ถูกต้องมาให้ แล้วรอ ทักษะที่ถูกวัดคือการวินิจฉัย: จากอาการไปสู่ชื่อ จากชื่อไปสู่ mitigation แบบฝึกสองชุดข้างล่างตัดย่อหน้ายาว ๆ ทิ้ง เหลือเฉพาะสิ่งที่ log หรือรายงานจะแสดงให้เห็น ซึ่งคือรูปร่างเดียวกับสถานการณ์ในข้อสอบ"
+    },
+    {
+      "kind": "heading",
+      "text": "แบบฝึก 1: บอกชื่อการโจมตีจากหกอาการ"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "#",
+        "สิ่งที่ telemetry แสดง"
+      ],
+      "rows": [
+        [
+          "1",
+          "logon ล้มเหลวสามร้อยครั้งในคืนเดียว กระจายบนสี่สิบ username ต่างกันจาก address เดียว แล้วมีสามบัญชีสำเร็จเมื่อ 02:40"
+        ],
+        [
+          "2",
+          "พนักงานการเงินอนุมัติโอนเงินหนึ่งรายการ คำขอถูกจับไป แล้วคำขอเดิมถูกส่งซ้ำโดยคนอื่นเมื่อ 03:00 และสำเร็จอีกครั้ง"
+        ],
+        [
+          "3",
+          "พนักงานรายงาน SMS เรื่องพัสดุที่ไม่ได้รับพร้อมลิงก์ติดตาม ลิงก์เปิดหน้า login ที่ลอกหน้าตาธนาคาร"
+        ],
+        [
+          "4",
+          "laptop หนึ่งเครื่องเริ่มส่ง DNS query ยาว ๆ ดูสุ่ม ๆ ไปที่ domain เดียวทุกห้านาที เจ้าตัวไม่รู้สึกอะไรเลย"
+        ],
+        [
+          "5",
+          "log ของเว็บเซิร์ฟเวอร์พบ string ' OR 1=1 -- ส่งเข้ามาในช่อง username ของฟอร์ม login"
+        ],
+        [
+          "6",
+          "ใบแจ้งหนี้มาจาก mailbox จริงของ supplier แต่เลขบัญชีธนาคารเปลี่ยนไปเมื่อสัปดาห์ก่อน และ reply-to เป็น domain หน้าตาคล้าย"
+        ]
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "วินิจฉัย แล้วลงมือ",
+      "steps": [
+        "บอกชื่อการโจมตีแต่ละแถวในตารางด้วยคำศัพท์ของข้อสอบ: password spraying, replay, smishing, command and control, SQL injection, business email compromise พร้อมชื่อเพื่อนบ้านที่เกือบเลือกแล้วตัดทิ้ง",
+        "สำหรับแต่ละแถว เขียน mitigation ข้อแรกที่ผู้เรียนจะตอบ และการโจมตีเพื่อนบ้านหนึ่งตัวที่ mitigation นั้นหยุดไม่ได้",
+        "ทำเครื่องหมายสองแถวที่จะ escalate ให้ incident response คืนนี้ พร้อมเหตุผลว่าทำไมสองแถวนี้เหนือกว่าแถวอื่น"
+      ],
+      "expected": "1) password spraying ที่สำเร็จสามบัญชี คำตอบแรกคือ MFA และ lockout แบบมี timeout 2) replay ของ request ที่ถูกต้อง คำตอบแรกคือ TLS บวก one-time token หรือ nonce 3) smishing เข้าหน้าเก็บ credential คำตอบแรกคือช่องทางรายงานและบล็อก domain พร้อม awareness training 4) command and control beaconing ผ่าน DNS คำตอบแรกคือ DNS sinkhole และ egress filtering 5) SQL injection คำตอบแรกคือ parameterized query กับ input validation โดย WAF เป็นชัยชนะเร็ว 6) business email compromise คำตอบแรกคือการยืนยันเปลี่ยนแปลงการเงินผ่านช่องทางอื่น แถว 1 และ 4 escalate คืนนี้: ทั้งคู่แปลว่าคนร้ายอยู่ในระบบแล้วและทำงานเป็นระบบ ส่วน 3 กับ 6 เป็นความพยายามใส่คน ซึ่งบล็อกที่ gateway ได้ก่อน"
+    },
+    {
+      "kind": "paragraph",
+      "text": "เพื่อนบ้านที่ถูกตัดทิ้งคือที่ที่คะแนนซ่อนอยู่ spraying ต่างจาก stuffing ตรงที่เดา password กระจายหลายบัญชี ไม่ใช่เอาคู่ password ที่รั่วไปลองเข้า login replay ต่างจาก on-path ตรงที่ผู้โจมตีถือ request ที่จับไว้แล้ว ไม่ต้องนั่งคั่นกลางทั้งสองฝ่ายอีกต่อไป เรียกชื่อเพื่อนบ้านผิดในหัวตอนฝึกไม่เสียอะไร แต่บนข้อสอบเสียทั้งข้อ"
+    },
+    {
+      "kind": "heading",
+      "text": "แบบฝึก 2: จับคู่พฤติกรรมกับ tactic ของ ATT&CK"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "อีเมลฟิชชิงพร้อมไฟล์แนบ macro ถึงพนักงาน HR สี่คน",
+        "สองวันถัดมา scheduled task โผล่บน file server",
+        "เครื่องมือหนึ่งพยายาม dump หน่วยความจำของกระบวนการ security authority ในเครื่อง",
+        "บัญชีที่ใช้บนเว็บเซิร์ฟเวอร์เริ่มเข้าสู่ database host ได้",
+        "ไฟล์บีบอัดแบบแปลนถูกอัปโหลดขึ้นเว็บแชร์ไฟล์"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "tactic ไม่ใช่ technique",
+      "steps": [
+        "ติดป้ายพฤติกรรมแต่ละข้อด้วย tactic ของ MITRE ATT&CK: initial access, persistence, credential access, lateral movement, exfiltration",
+        "เลือกหนึ่งพฤติกรรม บอกหมวด technique ด้วยภาษาธรรมดา เพื่อให้เห็นความต่างของ tactic-technique ชัด ๆ",
+        "บอกการป้องกันหนึ่งอย่างที่ครอบพฤติกรรมแรก และหนึ่งอย่างที่ครอบพฤติกรรมสุดท้าย"
+      ],
+      "expected": "อีเมลฟิชชิงคือ initial access, scheduled task คือ persistence, การ dump หน่วยความจำคือ credential access, บัญชีเว็บเซิร์ฟเวอร์บน database host คือ lateral movement, การอัปโหลดคือ exfiltration หมวด technique ของ scheduled task คืองานตั้งเวลา พฤติกรรมแรก: กรองอีเมลพร้อม sandbox ไฟล์แนบ พฤติกรรมสุดท้าย: กฎ egress และ DLP จับการอัปโหลดขนาดใหญ่"
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "อ่านหาเป้าหมาย",
+      "text": "tactic ตั้งชื่อเป้าหมายของผู้โจมตี technique ตั้งชื่อวิธี เมื่อข้อจับคู่ติดขัด ให้ถามว่าตอนนั้นผู้โจมตีกำลังจะได้อะไรหรือรักษาอะไร: เข้ามาคือ initial access อยู่ต่อคือ persistence เก็บความลับคือ credential access ขยับเข้าในคือ lateral movement แล้วเดินออกพร้อมของคือ exfiltration"
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Threats Classify",
+      "description": "ลากสรุปเหตุการณ์สิบสองรายการลงถัง social-engineering, malware, network-attack และ insider รวมสองรายการที่นักป้องกันชำนาญยังโต้เถียงกัน แบบฉบับเต็ม: labs/threats-classify.lab.th.md",
+      "estimatedMinutes": 10,
+      "status": "coming-soon",
+      "scale": "inline"
+    }
+  ],
+  "cheatsheet": [
+    "spraying เดา password ไม่กี่ตัวกระจายหลายบัญชี stuffing เอาคู่ password ที่รั่วมาลองใหม่ ทั้งคู่ตอบด้วย MFA และ lockout",
+    "replay ส่ง request ที่จับไว้ซ้ำ on-path นั่งคั่นกลางสองฝ่าย TLS บวก one-time token ตอบทั้งคู่",
+    "DNS สุ่ม ๆ ไป domain เดียวเป็นจังหวะ ๆ คือ beaconing ของ command and control ตอบด้วย sinkhole และ egress filtering",
+    "string injection ในช่องกรอกชี้ที่ parameterized query และ WAF",
+    "tactic ของ ATT&CK ตั้งชื่อเป้าหมาย: initial access, persistence, credential access, lateral movement, exfiltration"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "เมื่อ 03:00 คำขอโอนเงินบนเว็บที่ถูกจับไว้สองชั่วโมงก่อนถูกส่งซ้ำทุก byte และธนาคารให้เงินอีกครั้ง session ของพนักงานยังถูกต้อง และไม่มีใครคั่นกลางธนาคารกับผู้ใช้ นี่คืออะไร",
+      "choices": {
+        "A": "การโจมตี on-path ที่ relay session",
+        "B": "cross-site request forgery ที่ใช้เบราว์เซอร์ของพนักงาน",
+        "C": "replay ของ request ที่ถูกต้องซึ่งจับไว้ได้",
+        "D": "credential stuffing เข้าด้วย password ของพนักงาน"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "คำขอที่จับไว้ถูกส่งใหม่เฉย ๆ โดยไม่มีใครวางตัวคั่นกลางทั้งสองฝ่าย ซึ่งคือนิยามของ replay on-path ต้อง relay traffic สด CSRF ต้องให้เบราว์เซอร์ของพนักงานเป็นผู้ยิง request และ stuffing คือการโจมตีหน้า login"
+    },
+    {
+      "id": "cp-2",
+      "prompt": "ระหว่างตรวจสอบ นักวิเคราะห์พบ scheduled task ถูกสร้างบนเซิร์ฟเวอร์สองวันหลังอีเมลฟิชชิงถูกเปิด ในคำศัพท์ MITRE ATT&CK scheduled task นี้จัด tactic ใด",
+      "choices": {
+        "A": "Persistence",
+        "B": "Initial access",
+        "C": "Exfiltration",
+        "D": "Reconnaissance"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "scheduled task รักษางานที่ผู้โจมตียืนไว้ให้อยู่รอดข้ามการรีบูต จึงรับใช้ tactic ที่ชื่อ persistence ส่วน initial access คืออีเมลฟิชชิงสองวันก่อนหน้า และ exfiltration ยังไม่เริ่มในสถานการณ์นี้"
+    },
+    {
+      "id": "cp-3",
+      "prompt": "การตรวจ log พบ logon ล้มเหลวหลายร้อยครั้งทุกคืนกระจายบนหลายสิบ username จาก address เดียว และมีสามบัญชีที่สำเร็จในที่สุด mitigation ใดตอบแคมเปญนี้ตรงที่สุด",
+      "choices": {
+        "A": "MFA ทุกบัญชีพร้อม lockout แบบมี timeout",
+        "B": "เปลี่ยนชื่อบัญชี administrator",
+        "C": "บังคับใช้ password ที่ยาวขึ้น",
+        "D": "บล็อก IP ต่างประเทศทั้งหมดที่ firewall"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "spraying ชนะเมื่อ password ถูกอย่างเดียวพอ MFA ทำให้ password เพียงลำพังไม่พอ และ lockout แบบมี timeout ถ่วงอัตราการลอง password ที่ยาวขึ้นแทบไม่เพิ่มต้นทุนของการเดาหนึ่งครั้งต่อบัญชี และการบล็อกตาม address ไร้ผลต่อ botnet"
+    }
+  ]
+}

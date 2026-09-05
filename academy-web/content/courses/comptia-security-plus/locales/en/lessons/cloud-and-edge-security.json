@@ -1,0 +1,109 @@
+{
+  "nodeId": "cloud-and-edge-security",
+  "locale": "en",
+  "title": "Cloud and Edge Security",
+  "objective": "By the end of this lesson you can split responsibility across IaaS, PaaS, and SaaS, explain isolation for virtualization and containers, and name the security controls that fit cloud and edge workloads.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Service models and the responsibility line"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Model",
+        "You manage",
+        "Provider manages"
+      ],
+      "rows": [
+        [
+          "On-premises",
+          "Everything: stack, hardware, facility",
+          "Nothing"
+        ],
+        [
+          "IaaS",
+          "OS, apps, data, configuration",
+          "Hardware, virtualization layer, facility"
+        ],
+        [
+          "PaaS",
+          "Apps and data",
+          "OS, runtime, hardware"
+        ],
+        [
+          "SaaS",
+          "Data and user access",
+          "The application itself"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The pattern: the higher the service model, the more the provider owns, and the customer always keeps data, identity, and access configuration. Misconfiguration, such as a storage bucket left world-readable, remains the customer's risk in every model."
+    },
+    {
+      "kind": "heading",
+      "text": "Cloud control vocabulary"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "CSPM (cloud security posture management): continuously checks cloud settings against best practice and flags drift.",
+        "CASB: sits between users and cloud services to enforce policy.",
+        "Virtualization: hypervisors run many virtual machines, isolated from each other.",
+        "Container isolation: containers share the host kernel, so they are lighter but weaker-isolated than virtual machines.",
+        "Infrastructure as code: templates define the environment; templates can be scanned before deployment.",
+        "Transit and rest encryption: both belong in any cloud design."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Edge and special environments"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Edge computing places processing near the data source: store sensors, factory controllers, smart cameras. These devices are physically exposed, rarely patched on a schedule, and often unable to run agent software, so the design answers are network isolation, allowlisting, and encrypted tunnels home. Industrial control (ICS and SCADA) systems and embedded devices follow the same rules: availability first, isolation always."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Cloud shared-responsibility trap",
+      "text": "When an exam scenario describes a breached cloud storage bucket or an unmanaged IAM key, the fix belongs to the customer side: configuration, identity, keys, and logging. Provider-side answers are the wrong half of the model."
+    },
+    {
+      "kind": "try",
+      "title": "Place the responsibility",
+      "steps": [
+        "Three findings: (1) an unpatched database engine on an IaaS virtual machine; (2) company data exposed in a SaaS app shared to 'anyone with the link'; (3) a host-level hypervisor flaw.",
+        "For each, decide: customer or provider responsibility?",
+        "Name the control that prevents it.",
+        "State which service model shifts finding 1 to the provider."
+      ],
+      "expected": "1: customer (OS and app patching on IaaS); moving to PaaS shifts engine patching to the provider. 2: customer (data-sharing configuration). 3: provider (virtualization layer)."
+    }
+  ],
+  "cheatsheet": [
+    "IaaS: you patch the OS and apps. PaaS: you build on a managed runtime. SaaS: you configure data and access.",
+    "Customer keeps, in every model: data, identity, access configuration, and cloud settings.",
+    "CSPM watches cloud posture and drift; CASB enforces policy between users and cloud services.",
+    "Virtual machines isolate strongly via the hypervisor; containers share the kernel, so isolation is lighter.",
+    "Edge and ICS/SCADA: physically exposed, hard to patch; answer with isolation, allowlisting, encrypted tunnels."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A company runs its own application on virtual machines in a public cloud. Who is responsible for patching the guest operating system?",
+      "choices": {
+        "A": "The cloud provider, because the hardware is theirs",
+        "B": "The customer, because this is IaaS",
+        "C": "The ISP, because traffic crosses its network",
+        "D": "No one; guest OS patching is automatic in the cloud"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Virtual machines you configure are IaaS: the provider secures hardware and the virtualization layer, while the customer patches guest operating systems and applications."
+    }
+  ]
+}

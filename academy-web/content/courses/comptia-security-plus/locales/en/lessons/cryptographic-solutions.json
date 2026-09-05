@@ -1,0 +1,166 @@
+{
+  "nodeId": "cryptographic-solutions",
+  "locale": "en",
+  "title": "Cryptographic Solutions",
+  "objective": "By the end of this lesson you can choose between symmetric and asymmetric encryption, explain hashing and digital signatures, and match each cryptographic tool to confidentiality, integrity, or non-repudiation.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Two families of encryption"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Symmetric encryption uses one shared key for both locking and unlocking. It is fast, which makes it the workhorse for bulk data such as disk and file encryption. Its weakness is key distribution: both sides need the same secret key, and delivering it safely is a problem of its own."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Asymmetric encryption uses a key pair: a public key that anyone may use to lock data, and a private key that only the owner uses to unlock it. It is slower than symmetric, so real systems hybrid the two: asymmetric exchanges a short session key, then symmetric encrypts the traffic. TLS works this way."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Property",
+        "Symmetric",
+        "Asymmetric"
+      ],
+      "rows": [
+        [
+          "Keys",
+          "One shared secret key",
+          "Public key plus private key"
+        ],
+        [
+          "Speed",
+          "Fast, good for bulk data",
+          "Slower, good for key exchange and signatures"
+        ],
+        [
+          "Main problem",
+          "Sharing the key safely",
+          "Proving who owns the public key"
+        ],
+        [
+          "Common names",
+          "AES, ChaCha20",
+          "RSA, elliptic curve (ECC)"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Hashing: integrity without a key"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A hash function turns any input into a fixed-length digest. Change one byte of input and the digest changes completely. Hashing is one-way: you cannot rebuild the input from the digest. That makes hashes ideal for integrity checks and password storage with slow, salted hash functions."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "MD5 produces a 128-bit digest and is considered broken for security purposes.",
+        "SHA-2 family (SHA-256, SHA-512) is the current common choice.",
+        "Salting adds random data before hashing so identical passwords hash differently.",
+        "A digital signature hashes the message, then encrypts the digest with the sender's private key, giving integrity plus non-repudiation."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "PKI in five sentences"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A certificate authority (CA) signs a certificate that binds a public key to an identity. Your operating system and browser ship with a list of trusted root CAs. When a website presents its certificate, your device checks the chain up to a trusted root, the validity dates, and the revocation status. If the check passes, your device trusts that public key. Everything from HTTPS to code signing rests on this chain of trust."
+    },
+    {
+      "kind": "heading",
+      "text": "Attack concepts at exam level"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Attack",
+        "Plain-language idea"
+      ],
+      "rows": [
+        [
+          "Collision",
+          "Two different inputs produce the same digest; MD5 is the classic example"
+        ],
+        [
+          "Birthday attack",
+          "Finding any collision becomes far easier than predicting which one"
+        ],
+        [
+          "Downgrade",
+          "Tricking two sides into using a weaker old protocol version"
+        ],
+        [
+          "Replay",
+          "Capturing valid data, such as a login token, and sending it again later"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Match the goal to the tool: confidentiality needs encryption, integrity needs hashing, non-repudiation needs a digital signature with a private key. When a question mentions repudiation, the answer almost always involves the private key of the sender."
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Hash and Verify",
+      "description": "Hash a file with SHA-256, flip a single byte, re-hash, and watch the digest change entirely. Compare MD5 and SHA-256 digest lengths side by side. Full guide: labs/hash-and-verify.en.md.",
+      "estimatedMinutes": 20,
+      "status": "ready",
+      "scale": "full"
+    },
+    {
+      "kind": "try",
+      "title": "Goal-to-tool drill",
+      "steps": [
+        "Write down these four goals: confidentiality, integrity, non-repudiation, key exchange.",
+        "For each, name the cryptographic tool that delivers it.",
+        "Then swap: for each tool (symmetric encryption, hash, digital signature, asymmetric key pair), name the goal it serves.",
+        "Repeat until the mapping is instant, because exam questions test the mapping in both directions."
+      ],
+      "expected": "Confidentiality: symmetric encryption of the data. Integrity: hash. Non-repudiation: digital signature. Key exchange: asymmetric pair. Note that a signature also gives integrity, since the digest is covered."
+    }
+  ],
+  "cheatsheet": [
+    "Symmetric = one shared key, fast, bulk data. Asymmetric = public plus private key, slow, key exchange and signatures.",
+    "Hash = one-way digest for integrity. Salt before hashing passwords. MD5 is broken; SHA-256 is the normal choice.",
+    "Digital signature = hash encrypted with the sender's private key = integrity plus non-repudiation.",
+    "PKI: CA signs certificate binding identity to public key; devices verify the chain of trust.",
+    "Concept attacks: collision, birthday, downgrade, replay."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A manager must prove a contract file came from a specific director and was unaltered. Which combination delivers both non-repudiation and integrity?",
+      "choices": {
+        "A": "Symmetric encryption with AES",
+        "B": "Hashing the file with SHA-256",
+        "C": "Encrypting the file with the manager's public key",
+        "D": "Digital signature using the director's private key"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "A digital signature covers integrity through the hash and non-repudiation through the private key. Hashing alone gives integrity with no proof of origin, and encryption hides content without proving origin."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Which property makes hashing useful for verifying a downloaded file?",
+      "choices": {
+        "A": "The digest can be reversed to rebuild the file",
+        "B": "The digest grows with the size of the file",
+        "C": "Any change to the file changes the digest completely",
+        "D": "The same file produces different digests each run"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Hashing is deterministic and collision-resistant in practice: same input gives the same digest, and a small edit gives a completely different digest. Reversibility would defeat the purpose."
+    }
+  ]
+}

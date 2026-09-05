@@ -1,0 +1,152 @@
+{
+  "nodeId": "capstone-cc",
+  "locale": "en",
+  "title": "Capstone: Course Review and Exam-Day Strategy",
+  "objective": "By the end of this capstone you can connect all five domains into one mental model, explain how CAT shapes your exam day, and walk in with a concrete answering strategy.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "One story across five domains"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The domains are not separate subjects; they are one workflow. Security principles (D1) define what protecting means: CIA, AAA, risk, ethics, and the integrity of the data that AI systems learn from. Governance (D2) decides who is accountable and turns risk into policy, awareness, metrics, and continuity plans. IAM (D3) gives every human and machine an identity with a lifecycle and the minimum access it needs. Networking and cloud (D4) place the workloads and divide responsibility, defending with segmentation, zero trust, and the shared responsibility model. Security operations (D5) watch it all, triage what happens, respond, and protect data through its lifecycle. When a scenario feels confusing, locate it in this workflow and the domain vocabulary follows."
+    },
+    {
+      "kind": "heading",
+      "text": "How CAT changes your exam day"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The CC exam is delivered by computerized adaptive testing (CAT) at Pearson VUE: 2 hours, 100 to 125 items, multiple choice plus advanced item types, passing scaled score 700 of 1000, available in English, Chinese, Japanese, German, and Spanish. Adaptive means the difficulty of your next item depends on how you are doing: answer well and items may get harder; struggle and they may get easier. You cannot know your running score, so do not try to read it from item difficulty."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "You may receive anywhere from 100 to 125 items; a shorter exam is not automatically a fail signal, and a longer one is not a pass signal.",
+        "Budget about one minute per item: with 100-125 items in 120 minutes, pace to finish with time to review flagged items.",
+        "Treat every item as mattering: with adaptivity, careless misses early shape what follows.",
+        "Flag and move on when stuck; return with fresh eyes rather than burning three minutes in place.",
+        "Advanced item types (such as matching or ordering) may lock once answered; be deliberate before confirming."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Reading questions like the exam wants"
+    },
+    {
+      "kind": "paragraph",
+      "text": "CC questions reward principle-first reading. Underline what is actually asked (BEST, FIRST, MOST). Name the domain and concept in your own words before looking at options. Prefer answers that match recognized principles: least privilege, separation of duties, validate before escalate, contain before eradicate, verify every request. Eliminate absolutes and vendor names you did not study; choose the principle over the product. When two answers remain, ask which one the scenario's main harm points to, and choose it."
+    },
+    {
+      "kind": "heading",
+      "text": "The week before"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Re-run the five labs: hash-a-file, build-a-simple-risk-register, password-strength-and-mfa, inspect-http-vs-https, phishing-triage-drill. Muscle memory outlasts memorized text.",
+        "Review each lesson cheatsheet; rewrite from memory the items you miss.",
+        "Take the 30-question practice exam under time pressure: 40 minutes, no notes.",
+        "Confirm logistics: Pearson VUE booking, identification requirements, arrival time, and the exam delivery language you selected.",
+        "Sleep. CAT rewards a rested brain more than one more hour of cramming."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "You are ready when",
+      "text": "You can recite the five domains with weights, explain every term on the cheatsheets to a colleague, walk a phishing email through triage and IR phases, and explain to a friend why their favorite chatbot might be a data leakage risk. That is the whole exam, seen from five angles."
+    },
+    {
+      "kind": "heading",
+      "text": "Five-minute final map"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Domain",
+        "Weight",
+        "One-line anchor"
+      ],
+      "rows": [
+        [
+          "D1 Security Principles",
+          "24%",
+          "CIA, AAA, risk math, ethics canons, AI data integrity"
+        ],
+        [
+          "D2 Security Governance",
+          "17.3%",
+          "Policies, awareness, KRIs, continuity (RTO/RPO, drift)"
+        ],
+        [
+          "D3 IAM Concepts",
+          "20%",
+          "Factors, lifecycle (bots too), models, MFA and behavioral auth"
+        ],
+        [
+          "D4 Networking and Cloud",
+          "21.3%",
+          "Ports and plaintext, firewalls/IDS, zero trust, shared responsibility, wireless/IoT/ICS"
+        ],
+        [
+          "D5 Security Operations and IR",
+          "17.3%",
+          "SIEM and triage, actors and CTI, IR cycle, teams and testing, data protection"
+        ]
+      ]
+    }
+  ],
+  "cheatsheet": [
+    "The five domains are one workflow: define, govern, identify, place and defend, operate and respond.",
+    "CAT: 2 hours, 100-125 items, 700/1000 to pass; difficulty adapts, so never read your score from item hardness.",
+    "Pace one minute per item; flag and return; treat every item as consequential.",
+    "Answer by principle: least privilege, validate before escalate, contain before eradicate, verify every request.",
+    "Before exam day: rerun the labs, rewrite the cheatsheets from memory, do the timed practice exam, verify logistics, sleep."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Halfway through your CAT exam, the items begin feeling noticeably easier. What should you conclude?",
+      "choices": {
+        "A": "You are failing; request a break to recover",
+        "B": "Nothing reliable: perceived difficulty is a poor score signal in adaptive testing, so keep steady pacing and focus",
+        "C": "You are passing with high margin; rush the rest",
+        "D": "The exam is broken; flag it to the proctor"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Item difficulty adapts to your estimated ability, but perception of difficulty is unreliable and tells you neither pass nor fail. The correct behavior is unchanged: steady pace, careful reading, flag and return."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A scenario describes a departed contractor whose service account still runs weekly exports of HR data. Which pairing of domain and answer is correct?",
+      "choices": {
+        "A": "D3: identity lifecycle failure; deprovision the account and review non-human access ownership",
+        "B": "D1: compute the ALE of the export",
+        "C": "D4: segment the HR database",
+        "D": "D5: run a tabletop exercise"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "A non-human identity outliving its owner is a lifecycle (D3) failure: revoke it and fix the governance of service accounts. Other domains offer supporting controls, but the named failure is deprovisioning."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "During an incident, a confirmed compromised server must be handled. Which order matches the IR phases?",
+      "choices": {
+        "A": "Detect and analyze, contain, eradicate, recover, then lessons learned",
+        "B": "Eradicate, contain, detect, recover",
+        "C": "Recover, contain, detect, escalate",
+        "D": "Lessons learned, contain, detect"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The cycle runs detection and analysis, containment, eradication, recovery, and post-incident lessons learned. Stopping the spread precedes removing the cause; learning closes the loop."
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "nodeId": "asset-and-change-management",
+  "locale": "en",
+  "title": "Asset and Change Management",
+  "objective": "By the end of this lesson you can keep a working asset inventory, classify data correctly, and dispose of media so nothing recoverable leaves the building.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "You cannot secure what you cannot name"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Asset management starts with an inventory: every device, its owner, its location, its classification, and its lifecycle state. Discovery scans and agent reports keep the list honest, because unmanaged shadow assets are where breaches live. On the exam, the first step after 'we found an unknown server' is inventory and ownership, then hardening."
+    },
+    {
+      "kind": "heading",
+      "text": "Classification drives handling"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Level",
+        "Typical content",
+        "Handling flavor"
+      ],
+      "rows": [
+        [
+          "Public",
+          "Published brochures",
+          "Free to share"
+        ],
+        [
+          "Internal",
+          "Staff handbooks, diagrams",
+          "Staff only"
+        ],
+        [
+          "Confidential",
+          "Customer records, contracts",
+          "Need to know, encrypted"
+        ],
+        [
+          "Restricted / Highly sensitive",
+          "Payment data, health data, keys",
+          "Strictest controls, full audit trail"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Classification labels decide encryption, sharing, retention, and disposal rules. Labeling can be physical tags, metadata stamps, or DLP rules that read sensitivity and act on it. Data lifecycle thinking covers creation through disposal, with retention schedules that delete what the business no longer needs."
+    },
+    {
+      "kind": "heading",
+      "text": "Disposal and sanitization"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Method",
+        "What it does",
+        "Right for"
+      ],
+      "rows": [
+        [
+          "Wipe (overwrite)",
+          "Overwrites storage with patterns",
+          "Drives staying in service or resale"
+        ],
+        [
+          "Degauss",
+          "Magnetic pulse destroys data",
+          "Magnetic media leaving the org"
+        ],
+        [
+          "Shred / destroy",
+          "Physical destruction",
+          "Failed drives, restricted data"
+        ],
+        [
+          "Certificate of destruction",
+          "Documents the chain",
+          "Audit and compliance evidence"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Delete is a label, a removal of the pointer: the bits remain. Sanitization is the real erasure. For restricted data on failed drives, physical destruction with a certificate is the expected answer. SSDs complicate wiping, which pushes restricted data toward destroy-and-certify."
+    },
+    {
+      "kind": "heading",
+      "text": "Change meets asset"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Asset management joins the change process you learned in Module 1: an inventory entry changes state through a documented change, and end-of-life assets exit the inventory through documented disposal. The paper trail ties the technical life of a machine to the records that auditors read."
+    },
+    {
+      "kind": "try",
+      "title": "Dispose of three assets",
+      "steps": [
+        "Three outgoing assets: a laptop from HR holding confidential files, a failed drive from a payments server, and a stack of DVDs with old marketing clips.",
+        "Pick a disposal method for each.",
+        "Name the evidence you would keep.",
+        "Identify which asset must never simply be deleted-and-donated."
+      ],
+      "expected": "Laptop: wipe, verify, then donate with a record. Failed payments drive: shred or destroy with a certificate of destruction. DVDs: destroy or degauss-free shredding; marketing content is low sensitivity but destruction is cheap. The payments drive must never leave intact."
+    }
+  ],
+  "cheatsheet": [
+    "Inventory first: owner, location, classification, lifecycle state; discovery keeps it honest.",
+    "Classification ladder: public, internal, confidential, restricted; the label sets encryption, sharing, retention, disposal.",
+    "Delete removes a pointer; sanitization removes the data: wipe to overwrite, degauss for magnetic media, shred for destruction.",
+    "Restricted data on failed drives: destroy with a certificate of destruction.",
+    "Asset changes and disposals flow through documented change records."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A hard drive from a restricted-data server fails and cannot be wiped. What is the correct disposal?",
+      "choices": {
+        "A": "Format it and return it to the vendor",
+        "B": "Store it in a desk drawer indefinitely",
+        "C": "Donate it after deleting the files",
+        "D": "Physically destroy it and keep a certificate of destruction"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "When wiping is impossible, restricted data calls for physical destruction with documented evidence. Formatting and deleting leave recoverable data."
+    }
+  ]
+}

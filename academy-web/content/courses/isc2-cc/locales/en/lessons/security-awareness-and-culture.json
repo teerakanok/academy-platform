@@ -1,0 +1,124 @@
+{
+  "nodeId": "security-awareness-and-culture",
+  "locale": "en",
+  "title": "Security Awareness and Culture",
+  "objective": "By the end of this lesson you can describe what a security awareness program includes, why it is role-based and continuous, and how AI-driven social engineering changes the training message.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "People are a control, not just a risk"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Technical controls fail quietly when people are tricked. A well-built awareness program turns the workforce into a detection layer: employees who recognize a suspicious message and report it are operating as human sensors, early in the attack chain, before malware ever runs. Governance domain questions often pair awareness training with reduced phishing success, and the pairing is correct."
+    },
+    {
+      "kind": "heading",
+      "text": "What a program includes"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Baseline training for everyone: phishing recognition, password and MFA habits, data handling, clean desk, reporting channels.",
+        "Role-based additions: developers learn secure coding; finance learns payment fraud and business email compromise; administrators learn privileged account handling.",
+        "Executives and high-value targets: focused training on whaling, deepfakes, and approval discipline for money movement.",
+        "Continuous reinforcement: short monthly or quarterly touchpoints instead of one annual slide deck.",
+        "Phishing simulations with immediate, blame-free coaching for those who click, and trend tracking over time.",
+        "Measurement: report rates, click rates, and time-to-report, improving across campaigns."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Simulations deserve an ethics note that the exam respects: the goal is teaching, not shaming. Publicly punishing clickers teaches people to hide real mistakes, which destroys the reporting culture you are building."
+    },
+    {
+      "kind": "heading",
+      "text": "Culture makes controls stick"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Culture is what people do when nobody is watching. A no-blame reporting environment, leaders who follow the same rules (executives using MFA too), and visible fast responses to reports all reinforce that security is part of the job. The exam prefers answers about making reporting easy and blame-free over answers about punishment."
+    },
+    {
+      "kind": "heading",
+      "text": "Try the instinct before the next section"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "From HR: 'Your benefits confirmation is ready — open the portal whenever it suits you this month.' (hr-benefits@ourcompany.example)",
+        "From Facilities: 'The 4th-floor printer will be offline Saturday 09:00–12:00 for maintenance.' (facilities@ourcompany.example)",
+        "From IT: 'Unverified mailboxes are deleted within 2 hours — reply with your password now to keep yours.' (it-verify@ourcompany-support.example)"
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Spot the phish-shaped promise",
+      "steps": [
+        "Read the three one-line internal emails in the list above.",
+        "Mark the one that leans on urgency plus an unusual request.",
+        "Say what that email is really asking for, and where it should go instead of a reply."
+      ],
+      "expected": "The third email is the lure: a 2-hour deadline (urgency) wrapped around a request no real IT team makes — collecting your password by email reply. It belongs in the reporting channel, not your outbox. The first two ask for nothing sensitive and carry no clock."
+    },
+    {
+      "kind": "heading",
+      "text": "AI-driven social engineering"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The 2026 outline adds AI-driven social engineering to this domain, and the core change is simple: the old advice to spot phishing by its bad grammar is dead. AI now writes flawless, personalized messages in any language, clones voices from short samples for convincing vishing calls, and can produce deepfake video presence in meetings. Quantity and quality both scale."
+    },
+    {
+      "kind": "paragraph",
+      "text": "The defensive shift: train people to rely on verifiable facts rather than surface polish. Check the sender's actual address and domain, hover links before clicking, treat urgency as a red flag, and verify payment or credential requests through a second, known channel. For voice and video, agree on callback verification procedures for sensitive requests. Grammar quality is no longer a signal; the verification habit is."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Awareness questions reward: continuous and role-based programs, phishing simulations with coaching (not punishment), easy blame-free reporting, and verification through a second channel for AI-polished lures. Annual-only training is the classic wrong answer."
+    },
+    {
+      "kind": "paragraph",
+      "text": "A useful mental model for AI-era lures: the attack is no longer a message that looks suspicious; it is a message that looks perfect. The defense is a process that does not depend on how the message looks."
+    }
+  ],
+  "cheatsheet": [
+    "Awareness is a control: trained, reporting employees detect attacks early in the chain.",
+    "Program design: everyone gets a baseline; technical, finance, executive, and privileged roles get targeted additions.",
+    "Simulations teach, never shame; measure click rate, report rate, and time-to-report over time.",
+    "AI-driven social engineering: flawless grammar, cloned voices, deepfakes; verification via a second channel beats surface polish.",
+    "Culture: no-blame reporting, leaders model behavior, fast visible response to reports."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A finance employee receives a video call that looks and sounds exactly like the CFO requesting an urgent wire transfer. What is the strongest procedural control?",
+      "choices": {
+        "A": "Verify the request through a pre-agreed second channel before moving money",
+        "B": "Check the message for grammar and spelling errors",
+        "C": "Reply to the caller asking for confirmation",
+        "D": "Approve it, since deepfakes are rare"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "AI-generated voice and video can defeat eyeball and ear checks, so the reliable control is out-of-band verification through a channel agreed in advance. Replying to the caller verifies nothing, and grammar checks are obsolete against AI-written lures."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Which awareness program design best reduces phishing risk over time?",
+      "choices": {
+        "A": "A mandatory annual 2-hour e-learning module",
+        "B": "Blocking all external email for non-technical staff",
+        "C": "Publicly naming employees who click simulated phishing links",
+        "D": "Continuous role-based training with simulations and blame-free just-in-time coaching"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Effective programs are continuous, tailored to role, and use simulations as teaching moments. Annual-only training decays quickly, public blame suppresses reporting, and blocking email is not an awareness control."
+    }
+  ]
+}

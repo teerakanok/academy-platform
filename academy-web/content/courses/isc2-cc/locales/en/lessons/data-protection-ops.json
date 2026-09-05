@@ -1,0 +1,136 @@
+{
+  "nodeId": "data-protection-ops",
+  "locale": "en",
+  "title": "Data Protection in Operations",
+  "objective": "By the end of this lesson you can describe data states and protections, explain masking and sanitization, say what quantum-resistant cryptography is for, and manage data leakage from public AI services.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Data has three states"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Data at rest (stored on disk, in databases, in backups) is protected by encryption and access control. Data in transit (crossing networks) is protected by TLS and VPNs. Data in use (being processed in memory or displayed) is protected by access controls, minimization, and, increasingly, privacy-enhancing techniques. Every data-protection question starts by naming the state."
+    },
+    {
+      "kind": "heading",
+      "text": "Masking and tokenization"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Data masking hides real values while keeping data usable: a test database shows 'XXXX-1234' or a different, fake card number instead of real ones. Variants include redaction (removal), hashing for comparison (a one-way fingerprint), and tokenization (replacing a value with a meaningless token while the real one is stored in a locked vault). The exam scenario is predictable: production-like data in test environments must be masked or synthesized, never copied raw."
+    },
+    {
+      "kind": "heading",
+      "text": "Sanitization: making data truly gone"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Method",
+        "What it does",
+        "Confidence"
+      ],
+      "rows": [
+        [
+          "Delete / format",
+          "Removes references; data often recoverable",
+          "Low"
+        ],
+        [
+          "Overwrite",
+          "Writes patterns over old data",
+          "Medium-high on working media"
+        ],
+        [
+          "Crypto-erase",
+          "Destroys the encryption key; data becomes unreadable",
+          "High and fast for encrypted media"
+        ],
+        [
+          "Degauss",
+          "Magnetic destruction for magnetic media",
+          "High for disks and tapes"
+        ],
+        [
+          "Physical destruction",
+          "Shredding, crushing, incineration",
+          "Highest; for media leaving control"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The governing idea: deletion is not sanitization. Media leaving your control (sales, donations, disposal, returns for repair) must be sanitized to a standard matching the sensitivity of what it held, with a record kept of how and when."
+    },
+    {
+      "kind": "heading",
+      "text": "Quantum-resistant cryptography"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The 2026 outline adds quantum-resistant cryptography to D5. The concern: a sufficiently capable quantum computer would break the public-key cryptography widely used today for key exchange and signatures, while symmetric encryption needs only larger keys to stay safe. Quantum-resistant (post-quantum) algorithms are new public-key designs built to resist quantum attacks, and standards bodies have begun publishing them. At CC level, the takeaway is governance: inventory where cryptography protects long-lived secrets, and plan migration to quantum-resistant algorithms over time, because data encrypted today could be stored and decrypted later (harvest now, decrypt later)."
+    },
+    {
+      "kind": "heading",
+      "text": "Data leakage from public AI services"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The last new D5 topic is data leakage from public AI services. When staff paste customer data, source code, contracts, or strategy into public chatbots, that data leaves organizational control: it may be stored by the provider, reviewed by humans, used to improve services, or exposed through retention and breach risk. The controls are classic data governance applied to a new channel: classify data first (what may never leave), provide approved AI tools for legitimate work, write an AI acceptable-use policy, train staff, and monitor for violations. This links back to the AI KRIs from Domain 2: sensitive data in public AI prompts is exactly the indicator to watch."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Name the data state before choosing a protection. Masking/tokenization for usable-but-safe data; sanitization (overwrite, crypto-erase, destroy) for disposal; deletion alone is never the answer. Quantum-resistant = migrating public-key crypto against future quantum attack. Public AI services are a leakage channel answered by classification, approved tools, policy, and monitoring."
+    },
+    {
+      "kind": "try",
+      "title": "Protect one dataset four ways",
+      "steps": [
+        "Take a fictional customer database going into: (a) a test environment, (b) an analytics report, (c) disk disposal, (d) a public AI chatbot for support summarization.",
+        "Choose the protection for each case.",
+        "Mark which case is a policy problem more than a technical one."
+      ],
+      "expected": "a: masking or synthetic data. b: aggregation and masking of identifiers. c: crypto-erase plus physical destruction for high sensitivity, with a record. d: disallow for classified data; use an approved, enterprise AI service under contract, which makes it policy and procurement, not just tools."
+    }
+  ],
+  "cheatsheet": [
+    "States: at rest (encryption, access), in transit (TLS, VPN), in use (access, minimization).",
+    "Masking/tokenization keep data usable without exposing real values; test environments never get raw production data.",
+    "Sanitization ladder: delete (weak) < overwrite < crypto-erase < degauss < physical destruction; keep records.",
+    "Quantum-resistant cryptography: future-proof public-key crypto; inventory long-lived secrets and plan migration (harvest now, decrypt later).",
+    "Public AI leakage: classify data, provide approved tools, write AI acceptable-use policy, train, monitor prompts (an AI KRI)."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A team copies production customer data into a test environment for realistic testing. The compliant alternative is:",
+      "choices": {
+        "A": "Use the data but restrict test access to senior staff",
+        "B": "Encrypt the test database with the same key as production",
+        "C": "Use masked or synthetic data that preserves format without real values",
+        "D": "Delete the data immediately after each test run"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Masking or synthetic data gives realism without exposing real customer records in a lower-assurance environment. Access limits and after-the-fact deletion do not undo the exposure."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "An employee pastes a draft contract into a free public AI chatbot to summarize it. Which control set best addresses this?",
+      "choices": {
+        "A": "Faster VPN gateways",
+        "B": "Quantum-resistant key migration",
+        "C": "Banning all email attachments",
+        "D": "Data classification with an AI acceptable-use policy, approved AI tools, training, and monitoring"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Leakage via public AI is a data-governance problem: define what may never leave, give staff a compliant alternative, train them, and watch for violations. Network and crypto controls elsewhere do not stop an authorized user pasting text."
+    }
+  ]
+}

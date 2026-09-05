@@ -1,0 +1,144 @@
+{
+  "nodeId": "mitigation-matrix-and-attack-frameworks",
+  "locale": "th",
+  "title": "เมทริกซ์ป้องกันภัยและ Attack Frameworks",
+  "objective": "เมื่อจบบทเรียนนี้ ผู้เรียนจะวางการโจมตีหนึ่งเหตุการณ์ลงบน Cyber Kill Chain และ MITRE ATT&CK ได้ และใช้ framework ร่วมกับ threat intelligence เพื่อเลือก mitigation ได้",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "ทำไมต้องมี framework"
+    },
+    {
+      "kind": "paragraph",
+      "text": "framework ให้แผนที่ร่วมกันของการโจมตีแก่ฝั่งป้องกัน ทีมจึงเทียบบันทึก วางแผนการป้องกัน และบรรยาย incident ด้วยภาษามาตรฐานเดียวกันได้ ข้อสอบต้องการให้ผู้เรียนรู้ว่า framework แต่ละตัวมีไว้ทำอะไร และวางขั้นตอนของสถานการณ์ลงบนมันได้"
+    },
+    {
+      "kind": "heading",
+      "text": "Cyber Kill Chain"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "ขั้น",
+        "กิจกรรมของผู้โจมตี",
+        "การป้องกันที่สั่งคมที่ขั้นนี้"
+      ],
+      "rows": [
+        [
+          "1. Reconnaissance",
+          "เก็บอีเมล สแกนหาข้อมูล",
+          "จำกัดข้อมูลสาธารณะ, IDS จับการสแกน"
+        ],
+        [
+          "2. Weaponization",
+          "สร้างอาวุธ",
+          "Threat intel เรื่องเครื่องมือ"
+        ],
+        [
+          "3. Delivery",
+          "ส่งเหยื่อล่อ",
+          "กรองอีเมล, นโยบาย USB"
+        ],
+        [
+          "4. Exploitation",
+          "payload ทำงาน",
+          "แพตช์, hardening, EDR"
+        ],
+        [
+          "5. Installation",
+          "ติดตั้ง backdoor หรือ persistence",
+          "EDR, application allowlisting"
+        ],
+        [
+          "6. Command and control",
+          "ส่งสัญญาณกลับบ้าน",
+          "Egress filtering, DNS sinkhole"
+        ],
+        [
+          "7. Actions on objective",
+          "ขโมย เข้ารหัส ทำลาย",
+          "DLP, segmentation, backup"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "หัวใจของโมเดลนี้คือ: ตัดขั้นใดขั้นหนึ่งขาด ลูกโซ่ก็ขาดทั้งเส้น และยิ่งตัดเร็วยิ่งประหยัด แนวคิดนี้เป็นแรงบันดาลใจยอดนิยมของข้อสอบ"
+    },
+    {
+      "kind": "heading",
+      "text": "MITRE ATT&CK"
+    },
+    {
+      "kind": "paragraph",
+      "text": "ATT&CK คือคลังความรู้สาธารณะของ tactics และ techniques ที่ปรประยักษ์ใช้จริงในโลก tactics คือเป้าหมายของผู้โจมตี (เช่น initial access, persistence, exfiltration) technique คือวิธีเฉพาะที่ใช้ไปถึงเป้าหมายแต่ละข้อ ทีมใช้ ATT&CK ทำแผนที่ความครอบคลุม หาช่องว่าง และล่าพฤติกรรมที่ตรงกับ technique ที่รู้จัก"
+    },
+    {
+      "kind": "heading",
+      "text": "ชื่ออื่นที่ควรรู้จัก"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Diamond model: วิเคราะห์ทุก incident ผ่านสี่มุม adversary, capability, infrastructure และ victim",
+        "Threat intelligence feed: ตัวชี้วัดล่าสุด เช่น โดเมนอันตรายและ hash ของไฟล์",
+        "STIX: รูปแบบมาตรฐานสำหรับบรรยาย threat intelligence ส่วน TAXII ใช้ขนส่ง",
+        "Intelligence fusion: รวม log ภายในกับ feed ภายนอกให้เป็นภาพปฏิบัติการเดียว"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "บนข้อสอบ",
+      "text": "โจทย์ kill chain จะให้ขั้นตอนเป็นเลขแล้วถามชื่อขั้นหรือการป้องกันที่ดีที่สุดของขั้นนั้น โจทย์ ATT&CK จะให้แยก tactic (เป้าหมาย) ออกจาก technique (วิธีทำ) ให้อ่านหาเจตนาของคนร้ายก่อนตอบเสมอ"
+    },
+    {
+      "kind": "try",
+      "title": "วาง incident หนึ่งเหตุการณ์ลงแผนที่",
+      "steps": [
+        "เรื่องราว: ผู้โจมตีดึงอีเมลพนักงานจากเว็บไซต์ ส่งเรซูเม่ที่ปรับแต่งพร้อมไฟล์ macro สร้าง scheduled task เก็บไว้ และภายหลังย้ายไฟล์ที่ขโมยมาขึ้นเว็บจัดเก็บข้อมูลบนคลาวด์",
+        "ติดป้ายประโยคแต่ละประโยคด้วยขั้นของ kill chain",
+        "แล้วติดป้ายสองประโยคสุดท้ายด้วย tactic ของ ATT&CK",
+        "บอก control เดียวที่จะตัดลูกโซ่ได้เร็วที่สุด"
+      ],
+      "expected": "การดึงอีเมล = reconnaissance; อีเมลเรซูเม่ = delivery; macro = exploitation; scheduled task = installation (ตาม ATT&CK คือ persistence); การอัปโหลด = actions on objective / exfiltration ตัวตัดลูกโซ่ที่เร็วที่สุด: การบล็อกหรือ sandbox เอกสาร macro (ช่วง delivery)"
+    }
+  ],
+  "cheatsheet": [
+    "ขั้นของ Kill Chain: reconnaissance, weaponization, delivery, exploitation, installation, command and control, actions on objective",
+    "ตัดขั้นใดขั้นหนึ่งขาด ลูกโซ่ก็ล้มเหลว ยิ่งเร็วยิ่งถูก",
+    "ATT&CK: tactics = เป้าหมาย, techniques = วิธีทำ ใช้ทำแผนที่ความครอบคลุมและ threat hunting",
+    "Diamond model: adversary, capability, infrastructure, victim",
+    "STIX บรรยาย threat intel, TAXII ขนส่ง, intelligence fusion รวมแหล่งข้อมูล"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "มัลแวร์บนแล็ปท็อปเริ่มส่ง DNS query เป็นระยะไปยังโดเมนอันตรายที่รู้จักกันดี นี่คือขั้นใดของ kill chain",
+      "choices": {
+        "A": "Delivery",
+        "B": "Command and control",
+        "C": "Installation",
+        "D": "Reconnaissance"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "การ beacon หาตัวควบคุมภายนอกคือขั้น command and control การป้องกันที่เข้าคู่คือ DNS sinkhole และ egress filtering"
+    },
+    {
+      "id": "cp-2",
+      "prompt": "ตาม MITRE ATT&CK, persistence และ exfiltration เป็นตัวอย่างของอะไร",
+      "choices": {
+        "A": "Techniques",
+        "B": "Mitigations",
+        "C": "Procedures",
+        "D": "Tactics"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "tactics คือเป้าหมายของผู้โจมตี ส่วน techniques คือวิธีลงมือที่จับต้องได้ persistence และ exfiltration ระบุเป้าหมาย จึงเป็น tactics"
+    }
+  ]
+}

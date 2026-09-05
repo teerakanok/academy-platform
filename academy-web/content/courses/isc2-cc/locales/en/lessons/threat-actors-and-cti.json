@@ -1,0 +1,146 @@
+{
+  "nodeId": "threat-actors-and-cti",
+  "locale": "en",
+  "title": "Threat Actors, Motivations, and Cyber Threat Intelligence",
+  "objective": "By the end of this lesson you can classify threat actors by motivation, explain what cyber threat intelligence adds, and describe MITRE ATT&CK and the Cyber Kill Chain at concept level.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Who attacks, and why"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Attribution starts with motivation, because motivation predicts behavior. The exam expects you to match an actor class to its typical goal and style."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Actor class",
+        "Motivation",
+        "Typical behavior"
+      ],
+      "rows": [
+        [
+          "Nation-state / APT",
+          "Espionage, sabotage, strategic advantage",
+          "Patient, well-resourced, targeted; long dwell times"
+        ],
+        [
+          "Cybercriminal",
+          "Money",
+          "Ransomware, payment fraud, data theft for sale"
+        ],
+        [
+          "Hacktivist",
+          "Ideology, protest",
+          "Defacement, publicity-driven disruption"
+        ],
+        [
+          "Insider",
+          "Grievance, profit, or negligence",
+          "Uses legitimate access; hard to distinguish from normal work"
+        ],
+        [
+          "Script kiddie / hobbyist",
+          "Curiosity, status",
+          "Reuses published tools and exploits; opportunistic"
+        ],
+        [
+          "Competitor",
+          "Economic advantage",
+          "Espionage against rivals' data and plans"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Insiders deserve special note: they already hold authorized access, so controls that stop outsiders (firewalls, MFA) barely slow them. Answers to insider scenarios lean on least privilege, separation of duties, logging, and behavior monitoring, not perimeter gear."
+    },
+    {
+      "kind": "heading",
+      "text": "Cyber threat intelligence"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Cyber threat intelligence (CTI) is collected, processed, and analyzed information about adversaries, turned into something actionable: who might target us, with what methods, so defenses and detections can be prioritized. Two vocabulary pieces the exam checks: an IOC (indicator of compromise) is a concrete artifact of an attack, such as a malicious domain, IP, or file hash; a TTP (tactics, techniques, and procedures) describes how an adversary operates. IOCs age fast because attackers rotate infrastructure; TTPs persist because retraining tradecraft is expensive. Prioritizing TTP-based detection is the deeper, longer-lived defense."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Strategic intel: trends and landscape, for executives.",
+        "Operational intel: campaigns and adversary activity, for security managers.",
+        "Tactical/technical intel: IOCs and detection guidance, for analysts and tools."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The Cyber Kill Chain"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The Cyber Kill Chain describes an intrusion as sequential phases: reconnaissance, weaponization, delivery, exploitation, installation, command and control (C2), and actions on objectives. Its core insight for defenders: break the chain at any phase and the attack fails, and the earlier you break it, the cheaper the defense. Email filtering breaking delivery beats incident response interrupting actions on objectives."
+    },
+    {
+      "kind": "heading",
+      "text": "MITRE ATT&CK"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MITRE ATT&CK is a public knowledge base of adversary behavior organized by tactics (the why: initial access, persistence, exfiltration, and more) and techniques (the how: phishing, valid accounts, and hundreds more), built from real observations. Unlike the linear kill chain, ATT&CK expects attackers to loop and skip, and defenders use it to map coverage: which techniques can we detect, respond to, or prevent, and which leave blind spots. For this course, know the name, the tactic-versus-technique relationship, and its use for detection and coverage gaps."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Match actor to motive: money (criminal), ideology (hacktivist), espionage (nation-state), grievance or negligence (insider). IOC versus TTP: artifact versus behavior; TTPs last longer. Kill chain = sequential, break any link; ATT&CK = behavior matrix for coverage mapping."
+    },
+    {
+      "kind": "try",
+      "title": "Read a mini intrusion",
+      "steps": [
+        "An intrusion report says: attacker sent a tailored email with a malicious attachment (delivery), the macro ran (exploitation), a persistent scheduled task was created (installation), traffic flowed to a new domain nightly (C2), then files were copied out (actions).",
+        "Label each event with its kill chain phase.",
+        "For each phase, name one control that could have broken the chain there.",
+        "Classify the likely actor if the goal was stealing negotiation documents over months."
+      ],
+      "expected": "Labels: delivery, exploitation, installation, C2, actions on objectives. Controls: email filtering; attachment sandboxing or disabling macros; allow-listing and EDR detection of scheduled tasks; DNS/egress filtering and traffic analysis; DLP and segmentation. Actor: espionage motive points to a nation-state or APT style, patient and targeted."
+    }
+  ],
+  "cheatsheet": [
+    "Actor classes by motive: nation-state (espionage), criminal (money), hacktivist (ideology), insider (grievance/negligence), script kiddie (curiosity).",
+    "Insiders hold legitimate access: answer with least privilege, SoD, logging, behavior monitoring.",
+    "CTI = analyzed, actionable adversary information; strategic, operational, tactical tiers.",
+    "IOC = artifact (domain, IP, hash), short-lived; TTP = behavior, long-lived; TTP-based detection is the stronger investment.",
+    "Kill Chain: seven sequential phases, break any link early; MITRE ATT&CK: tactics (why) x techniques (how) for coverage mapping."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A website is defaced with political slogans and no data or money is taken. The most likely actor class is:",
+      "choices": {
+        "A": "Hacktivist seeking publicity for a cause",
+        "B": "Nation-state espionage unit",
+        "C": "Insider committing payment fraud",
+        "D": "Competitor stealing trade secrets"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Defacement plus messaging with no theft matches ideological, publicity-driven actors. Espionage and fraud actors avoid attention; their goals are data and money."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Why do security teams prefer detections built on TTPs over detections built purely on IOCs?",
+      "choices": {
+        "A": "IOCs are too difficult to collect",
+        "B": "IOCs cannot be automated",
+        "C": "TTPs are only useful to executives",
+        "D": "Attackers can cheaply rotate IPs and domains, but changing tradecraft is expensive, so TTP detections survive longer"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "An attacker can register a new domain in minutes, but rewriting how they operate costs real effort. Behavior-based detections therefore decay slower than artifact-based ones."
+    }
+  ]
+}

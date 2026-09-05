@@ -1,0 +1,128 @@
+{
+  "nodeId": "threat-actors-and-vectors",
+  "locale": "en",
+  "title": "Threat Actors and Vectors",
+  "objective": "By the end of this lesson you can rank threat actors by capability and intent, name what motivates each, and map the attack vectors they prefer.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Who attacks, and why"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Security answers change depending on the opponent. A bored teenager with downloaded tools requires one defense; a funded state team that writes its own exploits requires another. The exam will describe an actor and ask you to infer intent, funding, or sophistication. Start with motivation."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Actor",
+        "Typical motivation",
+        "Capability"
+      ],
+      "rows": [
+        [
+          "Script kiddie",
+          "Thrill, bragging rights",
+          "Low; uses ready-made tools"
+        ],
+        [
+          "Insider (malicious)",
+          "Revenge, profit, ego",
+          "Varies; has internal knowledge"
+        ],
+        [
+          "Insider (accidental)",
+          "None; human error",
+          "Any employee"
+        ],
+        [
+          "Hacktivist",
+          "Ideology, protest",
+          "Medium; publicity-seeking"
+        ],
+        [
+          "Competitor",
+          "Economic gain",
+          "Medium; espionage focus"
+        ],
+        [
+          "Organized crime",
+          "Money",
+          "High; ransomware, fraud"
+        ],
+        [
+          "Nation-state / APT",
+          "Espionage, disruption, war",
+          "Highest; patient, funded, persistent"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "An advanced persistent threat (APT) is the label for a well-resourced actor, usually state-linked, that gains access and stays quietly inside for a long time. The keywords that signal an APT on the exam are patience, long dwell time, and targeted espionage rather than quick profit."
+    },
+    {
+      "kind": "heading",
+      "text": "Vectors: the doors attackers use"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Email: phishing remains the top opening move.",
+        "SMS and messaging: smishing and malicious links on phones.",
+        "Removable media: infected USB drives, sometimes dropped on purpose.",
+        "Web: compromised sites, malicious downloads, typosquatted domains.",
+        "Supply chain: attacking a trusted vendor or software update to reach the real target.",
+        "Unsupported systems: unpatched, end-of-life software with public exploits.",
+        "Insider access: legitimate credentials used for illegitimate aims."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Scenario keywords map to actors: quick defacement points to a script kiddie or hacktivist; a ransom note with a professional payment portal points to organized crime; months of quiet data theft points to an APT. Match the behavior, then the label."
+    },
+    {
+      "kind": "heading",
+      "text": "Threat data and attribution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Threat intelligence feeds, threat actors' known patterns, and intelligence fusion (combining several sources into one picture) all help defenders predict likely attackers. You will meet these again in the attack-frameworks lesson; here the takeaway is that knowing the actor tells you which vectors to watch first."
+    },
+    {
+      "kind": "try",
+      "title": "Actor profiling drill",
+      "steps": [
+        "Read these three mini scenarios: (1) a payroll clerk exports data two weeks before resigning; (2) a hospital's files are locked with a ransom demand; (3) a defense contractor finds an eleven-month-old stealthy backdoor.",
+        "Label each actor type.",
+        "Name the vector each one used.",
+        "For each, name one control that would have stopped it earliest."
+      ],
+      "expected": "1: malicious insider via legitimate access; least privilege and access reviews. 2: organized crime via phishing; MFA and backups. 3: APT via supply chain or unpatched system; patching and network segmentation."
+    }
+  ],
+  "cheatsheet": [
+    "Capability ladder: script kiddie < hacktivist < organized crime < nation-state/APT.",
+    "Motivations: money (crime), ideology (hacktivist), revenge (insider), espionage and disruption (APT).",
+    "Top vectors: email phishing, messaging, removable media, web, supply chain, unsupported systems, insider access.",
+    "APT tell: patient, long dwell time, targeted; label appears when profit is absent."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "An energy utility discovers malware that hid quietly for months while slowly mapping its control network. No ransom was demanded. Which actor fits best?",
+      "choices": {
+        "A": "Script kiddie",
+        "B": "Hacktivist",
+        "C": "Nation-state / APT",
+        "D": "Accidental insider"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Long dwell time, stealthy reconnaissance, critical-infrastructure targeting, and no profit motive all point to an APT. Quick disruption or publicity would fit other actors."
+    }
+  ]
+}

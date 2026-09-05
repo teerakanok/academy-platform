@@ -1,0 +1,126 @@
+{
+  "nodeId": "aaa-in-depth",
+  "locale": "th",
+  "title": "AAA เชิงลึก: Factor, Session, SSO และ Federation",
+  "objective": "เมื่อจบบทเรียนนี้ ผู้เรียนไล่รายการ authentication factor ได้ แยก identification, authentication, authorization และ accounting ให้ออก และอธิบาย SSO กับ federation ในระดับแนวคิดได้",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Identification มาก่อนเป็นอันดับแรก"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Domain 1 แนะนำ AAA เป็นสามคำถาม Domain 3 ลงลึกกว่าและเพิ่มขั้นที่ศูนย์: identification คือการอ้าง identity เช่น พิมพ์ username หรือระบุอีเมล ยังไม่มีอะไรถูกพิสูจน์ Authentication คือการพิสูจน์คำอ้างนั้น Authorization คือการตัดสินว่า identity ที่พิสูจน์แล้วได้ทำอะไร Accounting คือบันทึกว่ามันทำอะไร สี่คำ สี่คำตอบข้อสอบที่ต่างกัน"
+    },
+    {
+      "kind": "heading",
+      "text": "สามตระกูล factor"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "ตระกูล factor",
+        "ความหมาย",
+        "ตัวอย่าง",
+        "โหมดล้มเหลว"
+      ],
+      "rows": [
+        [
+          "Something you know",
+          "ความรู้ที่ควรมีเฉพาะตัวเจ้าของ",
+          "Password, PIN, คำถามลับ",
+          "ถูกเดา, ถูก phish, ใช้ซ้ำข้ามเว็บ"
+        ],
+        [
+          "Something you have",
+          "สิ่งที่ถือครองจริงหรือเสมือน",
+          "โทรศัพท์ที่มี authenticator app, hardware security key, smart card",
+          "ถูกขโมย, SIM swap ในกรณีรหัส SMS"
+        ],
+        [
+          "Something you are",
+          "ลักษณะทางกายภาพหรือพฤติกรรมที่เป็นแกนของตัวตน",
+          "ลายนิ้วมือ, ใบหน้า, ม่านตา, แพทเทิร์นการพิมพ์",
+          "ถูกปลอม, การปรับค่า false accept หรือ reject"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "multi-factor authentication (MFA) ผสม factor จากตระกูลต่างกัน password บวก PIN ยังเป็น factor เดียว: สองสิ่งที่รู้ password บวกรหัสจาก authenticator app คือ MFA จริง: หนึ่งสิ่งที่รู้บวกหนึ่งสิ่งที่มี นี่คือความแตกต่าง IAM ที่ถูกวัดบ่อยที่สุด และโผล่ในชุดคำถามแทบทุกชุด"
+    },
+    {
+      "kind": "heading",
+      "text": "อัตราความผิดพลาดของ biometrics"
+    },
+    {
+      "kind": "paragraph",
+      "text": "ระบบไบโอเมตริกปรับสมดุลระหว่างความผิดพลาดสองแบบ false acceptance ปล่อยคนผิดเข้ามา false rejection กั้นคนถูกต้องไว้ข้างนอก กระทบ availability และผลักให้ผู้ใช้หาทางอ้อม control การลดข้างหนึ่งจะเพิ่มอีกข้าง เกณฑ์จึงเป็นการตัดสินใจทางธุรกิจ โดยทั่วไปเอนไปทางลด false acceptance สำหรับประตูความปลอดภัยสูง"
+    },
+    {
+      "kind": "heading",
+      "text": "SSO และ federation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "single sign-on (SSO) ให้การพิสูจน์ตัวครั้งเดียวเปิดประตูหลาย application: login ที่ identity provider ครั้งเดียวแล้วเข้าถึงเมล แชท และเครื่องมือภายในได้โดยไม่ต้องกรอก credential ซ้ำ ประโยชน์คือ password น้อยลงและ offboarding เร็วขึ้น (ปิดบัญชีเดียว ปิดทุกอย่าง) ความเสี่ยงกระจุกตัวก็มีจริง: บัญชี SSO กลายเป็นกุญแจแม่ จึงต้องใส่ MFA ที่แน่นหนาที่สุดเท่าที่มี"
+    },
+    {
+      "kind": "paragraph",
+      "text": "federation ขยาย SSO ข้ามองค์กร: identity ของบริษัทผู้เรียนใช้ลงชื่อเข้าบริการ SaaS ภายนอกได้ เพราะบริการนั้นไว้วางใจ identity provider ของผู้เรียน ผ่านมาตรฐานอย่าง SAML หรือ OIDC ในระดับแนวคิด ข้อสอบคาดหวังความคิดเรื่องความไว้วางใจ ไม่ใช่กลไกโปรโตคอล: องค์กรหนึ่งค้ำประกัน อีกองค์กรเชื่อ"
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "บนข้อสอบ",
+      "text": "สังเกตคำถามตระกูล factor: password สองตัวไม่ใช่ MFA เด็ดขาด สังเกตคำถามลำดับ: identification (อ้าง) มาก่อน authentication (พิสูจน์) มาก่อน authorization (อนุญาต) ส่วน SSO ให้แลกกันระหว่างความสะดวกและการควบคุมรวมศูนย์ กับ credential แม่มูลค่าสูงที่ต้องปกป้อง"
+    },
+    {
+      "kind": "try",
+      "title": "ตรวจ factor",
+      "steps": [
+        "จำแนกคู่ต่อไปนี้ว่าเป็น MFA จริงหรือ factor เดียว: (1) password บวก one-time code จาก hardware token; (2) PIN บวกสแกนลายนิ้วมือปลดล็อกโทรศัพท์; (3) password บวกคำตอบคำถามลับ; (4) smart card บวก PIN ของการ์ด",
+        "สำหรับกรณี factor เดียว บอกว่าตระกูลที่สองแบบใดจะแก้ได้",
+        "บอกว่าแต่ละคู่กันอะไรได้"
+      ],
+      "expected": "1: MFA จริง (รู้ + มี) 2: MFA จริง (รู้ + เป็น) 3: factor เดียว (รู้ + รู้); เพิ่ม authenticator app (มี) แก้ได้ 4: MFA จริง (มี + รู้) สิ่งที่ MFA ช่วยชะลอคือการโจมตีเฉพาะ password อย่าง stuffing และ phishing"
+    }
+  ],
+  "cheatsheet": [
+    "ลำดับ: identification = การอ้าง, authentication = การพิสูจน์, authorization = การอนุญาต, accounting = การบันทึก",
+    "ตระกูล factor: know (password), have (token หรือ key), are (biometric)",
+    "MFA จริงผสมตระกูล; password สองตัวหรือ password บวก PIN ยังเป็น factor เดียว",
+    "biometrics แลก false acceptance (คนผิดผ่าน) กับ false rejection (คนถูกถูกกั้น); เกณฑ์เป็นการตัดสินใจธุรกิจ",
+    "SSO = login ครั้งเดียวหลายแอป กุญแจแม่ที่ต้องปกป้อง; federation = SSO ข้ามองค์กรผ่าน identity provider ที่ไว้วางใจ"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "เว็บไซต์หนึ่งขอ password แล้วขอชื่อสาวของแม่ต่อ ในเทอมของ AAA สิ่งนี้คืออะไร?",
+      "choices": {
+        "A": "MFA ที่ใช้ knowledge กับ ownership",
+        "B": "federated identity",
+        "C": "behavioral authentication",
+        "D": "สอง instance ของ factor เดียวกัน จึงไม่ใช่ MFA จริง"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "ทั้ง password และคำตอบคำถามลับเป็นสิ่งที่ผู้ใช้รู้ จึงเป็น factor knowledge อย่างเดียว MFA จริงต้องใช้ factor จากตระกูลต่างกัน เช่น ความรู้บวกการครอบครอง"
+    },
+    {
+      "id": "cp-2",
+      "prompt": "เมื่อมี SSO การปิดบัญชีเดียวใน identity provider ตัดการเข้าถึงของพนักงานที่ลาออกจากทุก application ที่เชื่อมต่อ นี่แสดง SSO ในด้านใดเป็นหลัก?",
+      "choices": {
+        "A": "จุดอ่อน เพราะบัญชีถูกทำซ้ำ",
+        "B": "ความไม่เข้ากันกับ federation",
+        "C": "ประโยชน์เชิงปฏิบัติ: จุดเดียวของการเปิดและปิดสิทธิ์",
+        "D": "การพึ่งพา factor ไบโอเมตริก"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "การรวมศูนย์ authentication ทำให้ onboarding และโดยเฉพาะ offboarding เป็นการกระทำเดียว ด้านกลับคือ credential แม่มูลค่าสูง ซึ่งเป็นเหตุผลว่าทำไมบัญชี SSO ต้องมี MFA ที่แน่นสุด"
+    }
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "nodeId": "incident-response-cycle",
+  "locale": "en",
+  "title": "The Incident Response Cycle, Planning, and Exercises",
+  "objective": "By the end of this lesson you can walk through the IR phases, explain what IR planning must contain, describe exercise types from tabletop to full-scale, and apply the idea of testing AI-integrated defenses.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "The cycle in five phases"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Incident response is a cycle, not a one-way pipeline. The widely taught phases (consistent with NIST guidance) run: preparation; detection and analysis; containment, eradication, and recovery; and post-incident activity, with communication running throughout. Expanded for memory:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Preparation: plans, playbooks, tools, contacts, training, and logging in place before anything happens. Most of your IR capability is bought here.",
+        "Detection and analysis: alerts and reports are triaged (previous lesson) and the incident is confirmed and scoped.",
+        "Containment: stop the spread, short-term (isolate hosts, block domains, disable accounts) and long-term (apply fixes so it cannot repeat immediately).",
+        "Eradication: remove the adversary's foothold, malware, accounts, and persistence mechanisms.",
+        "Recovery: restore from clean backups, verify integrity, monitor closely as systems return to service.",
+        "Post-incident (lessons learned): blameless review within days, while memory is fresh; update playbooks, detections, and controls."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Exam sequencing traps: containment precedes eradication (stop the bleeding, then remove the cause), and lessons learned is a phase, not an afterthought. Evidence handling matters throughout: preserve logs and images before cleanup destroys them."
+    },
+    {
+      "kind": "heading",
+      "text": "What IR planning contains"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Roles and contact chains: who leads, who decides, who speaks publicly, reachable at 3 a.m.",
+        "Severity definitions and escalation criteria, agreed before the crisis.",
+        "Playbooks for expected incident types (phishing, ransomware, data exposure) with concrete first steps.",
+        "Communication plans: internal, legal, regulators, customers, and out-of-band channels if primary systems are down.",
+        "Legal and evidence guidelines: what to preserve, chain of custody basics, when to call counsel."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Exercises: from tabletop to full-scale"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Exercise type",
+        "What it is",
+        "Cost"
+      ],
+      "rows": [
+        [
+          "Tabletop (TTX)",
+          "Discussion-based: the team talks through a scenario and injects, following the plan; finds gaps cheaply",
+          "Low"
+        ],
+        [
+          "Walkthrough / drill",
+          "Practice one procedure, such as restoring one backup or calling the notification chain",
+          "Low-medium"
+        ],
+        [
+          "Functional",
+          "Teams respond in a simulated environment",
+          "Medium-high"
+        ],
+        [
+          "Full-scale",
+          "Realistic, all-functions simulation",
+          "High"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Start tabletop, graduate upward: a tabletop that reveals nobody knows the contact chain has paid for itself many times over. Every exercise ends with an after-action review and tracked improvements, or it was theater."
+    },
+    {
+      "kind": "heading",
+      "text": "Testing AI-integrated defenses"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The 2026 outline adds testing of AI-integrated defenses to D5. The principle: if an AI system participates in your defenses (SIEM AI ranking alerts, AI-powered IPS blocking, AI phishing filters), it is part of the attack surface and part of the exercise plan. Test that AI-assisted detections actually fire on realistic samples, that blocking actions do not take down legitimate business flows, that analysts know how to challenge a wrong AI verdict, and that the response plan covers the AI vendor or service failing. Fold AI components into tabletop scenarios explicitly, so teams rehearse the human-plus-machine decisions they will actually face."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Order: prepare, detect, contain, eradicate, recover, lessons learned. Isolate before eradicating; preserve evidence before cleanup. Tabletop = cheap discussion-based gap finder. AI-assisted defenses get exercised like any other control."
+    },
+    {
+      "kind": "try",
+      "title": "Phase a ransomware story",
+      "steps": [
+        "Phase each event: (1) EDR flags encryption behavior on a file server; (2) the server is network-isolated; (3) backups are verified clean and tested; (4) systems are rebuilt and restored; (5) a review updates the playbook and email gateway rules.",
+        "Name the phase where most damage is limited or lost.",
+        "Add one tabletop inject involving the AI-assisted email filter that missed the delivery."
+      ],
+      "expected": "1: detection and analysis. 2: containment. 3-4: eradication and recovery. 5: post-incident lessons learned. Damage is decided at containment speed. Inject example: 'the phishing email passed the AI filter with high confidence; adjust and retest the filter, and update the playbook's report path.'"
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Order the IR Phases (interactive, coming soon)",
+      "description": "Drag six shuffled incident response phases back into the order a real incident runs through, from preparation to lessons learned. Full design: labs/ir-sequence-order.lab.en.md.",
+      "estimatedMinutes": 10,
+      "status": "coming-soon",
+      "scale": "inline"
+    }
+  ],
+  "cheatsheet": [
+    "IR phases: preparation, detection and analysis, containment, eradication, recovery, lessons learned; communication throughout.",
+    "Contain before you eradicate; preserve evidence before cleanup.",
+    "IR plan = roles and contacts, severity and escalation, playbooks, communications, legal/evidence guidance.",
+    "Exercises: tabletop (talk-through, cheap) > drill > functional > full-scale; always close with tracked improvements.",
+    "AI-integrated defenses are exercised too: verify detections fire, blocking is safe, analysts can challenge AI verdicts."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Malware is confirmed on one workstation. Which action belongs to the containment phase?",
+      "choices": {
+        "A": "Rewriting the awareness training material",
+        "B": "Holding the lessons-learned meeting",
+        "C": "Network-isolating the machine and disabling the affected credentials",
+        "D": "Publishing the annual security report"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Containment stops the spread right now: isolate hosts, block indicators, disable compromised accounts. Training updates belong to preparation or post-incident follow-up."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "An organization wants to test its incident response plan for the first time with minimal cost and disruption. The best starting choice is:",
+      "choices": {
+        "A": "A tabletop exercise discussing a scenario against the plan",
+        "B": "A full-scale live simulation in production",
+        "C": "Waiting for a real incident",
+        "D": "Outsourcing the entire IR function"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "A tabletop is discussion-based, cheap, non-disruptive, and reliably exposes gaps in roles, contacts, and procedures. Full-scale comes later; real incidents are not a test plan."
+    }
+  ]
+}

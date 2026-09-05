@@ -1,0 +1,109 @@
+{
+  "nodeId": "cloud-and-edge-security",
+  "locale": "th",
+  "title": "ความมั่นคงปลอดภัยบน Cloud และ Edge",
+  "objective": "เมื่อจบบทเรียนนี้ ผู้เรียนจะแบ่งความรับผิดชอบของ IaaS, PaaS และ SaaS ได้ อธิบายการ isolate ของ virtualization และ container ได้ และเรียกชื่อ control ที่เหมาะกับงานบนคลาวด์และ edge",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Service model กับเส้นแบ่งความรับผิดชอบ"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "โมเดล",
+        "ผู้ใช้ดูแล",
+        "Provider ดูแล"
+      ],
+      "rows": [
+        [
+          "On-premises",
+          "ทุกอย่าง: ทั้ง stack, hardware, อาคาร",
+          "ไม่มี"
+        ],
+        [
+          "IaaS",
+          "OS, แอป, ข้อมูล, configuration",
+          "Hardware, ชั้น virtualization, อาคาร"
+        ],
+        [
+          "PaaS",
+          "แอปและข้อมูล",
+          "OS, runtime, hardware"
+        ],
+        [
+          "SaaS",
+          "ข้อมูลและสิทธิ์ผู้ใช้",
+          "ตัวแอปพลิเคชันเอง"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "แพตเทิร์นคือ: service model ยิ่งสูง provider ยิ่งถือครองมาก แต่ลูกค้ายังเก็บเรื่องข้อมูล identity และการตั้งค่าสิทธิ์ไว้เสมอ การตั้งค่าผิดพลาด เช่น storage bucket ที่เปิดให้ทั้งโลกอ่านได้ ยังเป็นความเสี่ยงของลูกค้าในทุกโมเดล"
+    },
+    {
+      "kind": "heading",
+      "text": "คำศัพท์ของ control บนคลาวด์"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "CSPM (cloud security posture management): ตรวจการตั้งค่าคลาวด์เทียบแนวปฏิบัติที่ดีต่อเนื่อง และแจ้งเตือนเมื่อคลาดเคลื่อน",
+        "CASB: นั่งคั่นระหว่างผู้ใช้กับบริการคลาวด์เพื่อบังคับใช้ policy",
+        "Virtualization: hypervisor รัน virtual machine หลายตัวที่แยกกันอย่างอิสระ",
+        "Container isolation: container ใช้ kernel ของ host ร่วมกัน จึงเบากว่าแต่ isolate ได้หนาแน่นน้อยกว่า virtual machine",
+        "Infrastructure as code: template นิยามสภาพแวดล้อม และสแกน template ก่อน deploy ได้",
+        "การเข้ารหัสระหว่างส่งและพัก: ต้องมีทั้งคู่ในการออกแบบคลาวด์ทุกแบบ"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Edge และสภาพแวดล้อมพิเศษ"
+    },
+    {
+      "kind": "paragraph",
+      "text": "edge computing วางการประมวลผลไว้ใกล้แหล่งข้อมูล: เซ็นเซอร์ในร้านค้า ตัวควบคุมในโรงงาน กล้องอัจฉริยะ อุปกรณ์เหล่านี้ถูกเปิดฟิสิกัล แทบไม่ได้แพตช์ตามตาราง และมักติดซอฟต์แวร์ agent ไม่ได้ คำตอบเชิงออกแบบจึงเป็นการแยกเครือข่าย allowlisting และ tunnel เข้ารหัสกลับบ้าน ระบบควบคุมอุตสาหกรรม (ICS และ SCADA) กับ embedded device ทำตามกฎเดียวกัน: availability มาก่อน แยกเขตเสมอ"
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "กับดัก shared responsibility บนคลาวด์",
+      "text": "เมื่อข้อสอบอธิบาย storage bucket ที่รั่วหรือ IAM key ไร้เจ้าของ ทางแก้ต้องอยู่ฝั่งลูกค้า: configuration, identity, key และ logging คำตอบฝั่ง provider คือครึ่งผิดของโมเดล"
+    },
+    {
+      "kind": "try",
+      "title": "วางเส้นความรับผิดชอบ",
+      "steps": [
+        "สามข้อพบ: (1) database engine ไม่ได้แพตช์บน virtual machine ของ IaaS (2) ข้อมูลบริษัทในแอป SaaS ถูกแชร์เป็น ใครมีลิงก์ก็เปิดได้ (3) ช่องโหว่ที่ hypervisor ระดับ host",
+        "ตัดสินแต่ละข้อว่า: ความรับผิดชอบของลูกค้าหรือ provider",
+        "บอก control ที่ป้องกันได้",
+        "ระบุว่า service model ใดย้ายข้อ 1 ไปเป็นหน้าที่ของ provider"
+      ],
+      "expected": "ข้อ 1: ลูกค้า (การแพตช์ OS และแอปบน IaaS) การย้ายไป PaaS จึงโอนการแพตช์ engine ให้ provider ข้อ 2: ลูกค้า (การตั้งค่าการแชร์ข้อมูล) ข้อ 3: provider (ชั้น virtualization)"
+    }
+  ],
+  "cheatsheet": [
+    "IaaS: ผู้ใช้แพตช์ OS และแอปเอง PaaS: สร้างงานบน runtime ที่ provider ดูแล SaaS: ผู้ใช้ตั้งค่าข้อมูลและสิทธิ์",
+    "ลูกค้าเก็บไว้เสมอทุกโมเดล: ข้อมูล identity การตั้งค่าสิทธิ์ และการตั้งค่าคลาวด์",
+    "CSPM เฝ้า posture และความคลาดเคลื่อนของคลาวด์ CASB บังคับ policy ระหว่างผู้ใช้กับบริการคลาวด์",
+    "Virtual machine isolate หนาแน่นด้วย hypervisor container ใช้ kernel ร่วมกัน การ isolate จึงเบากว่า",
+    "Edge และ ICS/SCADA: ถูกเปิดฟิสิกัล แพตช์ยาก ตอบด้วยการแยกเขต allowlisting และ tunnel เข้ารหัส"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "บริษัทหนึ่งรันแอปพลิเคชันของตัวเองบน virtual machine ใน public cloud ใครรับผิดชอบแพตช์ระบบปฏิบัติการ guest",
+      "choices": {
+        "A": "ผู้ให้บริการคลาวด์ เพราะ hardware เป็นของเขา",
+        "B": "ลูกค้า เพราะนี่คือ IaaS",
+        "C": "ISP เพราะ traffic วิ่งผ่านเครือข่ายเขา",
+        "D": "ไม่มีใคร การแพตช์ guest OS บนคลาวด์เป็นอัตโนมัติ"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "virtual machine ที่ผู้ใช้ configure เองคือ IaaS: provider ดูแล hardware และชั้น virtualization ส่วนลูกค้าแพตช์ guest OS และแอปพลิเคชันเอง"
+    }
+  ]
+}

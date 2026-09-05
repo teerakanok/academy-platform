@@ -1,0 +1,126 @@
+{
+  "nodeId": "aaa-in-depth",
+  "locale": "en",
+  "title": "AAA in Depth: Factors, Sessions, SSO, and Federation",
+  "objective": "By the end of this lesson you can list the authentication factors, keep identification, authentication, authorization, and accounting distinct, and explain SSO and federation at concept level.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Identification comes first"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Domain 1 introduced AAA as three questions. Domain 3 goes deeper and adds a step zero: identification, the claim of an identity, such as typing a username or presenting an email address. Nothing is proven yet. Authentication is the proof of that claim. Authorization is the decision about what the proven identity may do. Accounting is the record of what it did. Four words, four separate exam answers."
+    },
+    {
+      "kind": "heading",
+      "text": "The three factor families"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Factor family",
+        "Meaning",
+        "Examples",
+        "Failure mode"
+      ],
+      "rows": [
+        [
+          "Something you know",
+          "Knowledge only the subject should have",
+          "Password, PIN, security question",
+          "Guessing, phishing, reuse across sites"
+        ],
+        [
+          "Something you have",
+          "A physical or virtual possession",
+          "Phone with authenticator app, hardware security key, smart card",
+          "Theft, SIM swap for SMS codes"
+        ],
+        [
+          "Something you are",
+          "An inherent physical or behavioral trait",
+          "Fingerprint, face, iris, typing pattern",
+          "Spoofing, false accept or reject tuning"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Multi-factor authentication (MFA) combines factors from different families. A password plus a PIN is still one factor: two things you know. A password plus a code from an authenticator app is true MFA: one thing you know plus one thing you have. This is the single most-tested IAM distinction, and it appears in almost every question set."
+    },
+    {
+      "kind": "heading",
+      "text": "Error rates for biometrics"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Biometric systems tune between two errors. A false acceptance (type I in some texts, type II in others; learn the names, not the numbers) lets the wrong person in. A false rejection keeps out the legitimate person, hurting availability and pushing users to bypass the control. Lowering one raises the other, so the threshold is a business decision, usually biased toward fewer false acceptances for high-security doors."
+    },
+    {
+      "kind": "heading",
+      "text": "SSO and federation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Single sign-on (SSO) lets one authentication grant access to many applications: you log in once to your identity provider and reach mail, chat, and internal tools without re-entering credentials. Benefits are fewer passwords and faster offboarding (disable one account, everything closes). The risk concentration is real: the SSO account becomes the master key, so it must carry the strongest MFA available."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Federation extends SSO across organizations: your company identity lets you sign in to an external SaaS service, because the service trusts your identity provider, via standards such as SAML or OIDC at concept level. The exam expects the trust idea, not protocol mechanics: one organization vouches, the other relies."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Spot the factor-family question: two passwords is never MFA. Spot the sequence question: identification (claim) precedes authentication (proof) precedes authorization (permission). For SSO, the expected trade-off is convenience and centralized control versus a high-value master credential."
+    },
+    {
+      "kind": "try",
+      "title": "Factor audit",
+      "steps": [
+        "Classify each pair as true MFA or single-factor: (1) password plus one-time code from a hardware token; (2) PIN plus fingerprint unlock on a phone; (3) password plus the answer to a secret question; (4) smart card plus its PIN.",
+        "For each single-factor case, say which second family would fix it.",
+        "Name what each pairing protects against."
+      ],
+      "expected": "1: true MFA (know + have). 2: true MFA (know + are). 3: single factor (know + know); adding an authenticator app (have) fixes it. 4: true MFA (have + know). Password-only attacks like stuffing and phishing are what MFA blunts."
+    }
+  ],
+  "cheatsheet": [
+    "Sequence: identification = claim, authentication = proof, authorization = permission, accounting = record.",
+    "Factor families: know (password), have (token or key), are (biometric).",
+    "True MFA mixes families; two passwords or password-plus-PIN stays single-factor.",
+    "Biometrics trade false acceptance (wrong person passes) against false rejection (right person blocked); threshold choice is a business decision.",
+    "SSO = one login, many apps, one master key to protect; federation = SSO across organizations via trusted identity providers."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A site asks for a password and then the user's mother's maiden name. In AAA terms, this is:",
+      "choices": {
+        "A": "Multi-factor authentication using knowledge and ownership",
+        "B": "Federated identity",
+        "C": "Behavioral authentication",
+        "D": "Two instances of the same factor, so not true MFA"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Both the password and the security answer are things the user knows, so this is knowledge-factor-only. True MFA requires factors from different families, such as knowledge plus possession."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "With SSO deployed, disabling one account in the identity provider cuts off a departing employee from all connected applications. This illustrates SSO's main:",
+      "choices": {
+        "A": "Weakness, because accounts are duplicated",
+        "B": "Incompatibility with federation",
+        "C": "Operational benefit: one point of enablement and disablement",
+        "D": "Reliance on biometric factors"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Centralizing authentication makes onboarding and especially offboarding a single action. The flip side, a high-value master credential, is why the SSO account needs the strongest MFA."
+    }
+  ]
+}

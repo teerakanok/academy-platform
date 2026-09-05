@@ -1,0 +1,141 @@
+{
+  "nodeId": "forensics-and-incident-response",
+  "locale": "en",
+  "title": "Forensics and Incident Response",
+  "objective": "By the end of this lesson you can run the incident-response phases in order, preserve evidence by order of volatility and chain of custody, and choose containment, eradication, and recovery actions that fit the scenario.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "The IR phases"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Phase",
+        "What happens"
+      ],
+      "rows": [
+        [
+          "Preparation",
+          "Playbooks, tools, contacts, training, before anything happens"
+        ],
+        [
+          "Detection and analysis",
+          "An alert becomes a confirmed incident; scope and severity are set"
+        ],
+        [
+          "Containment",
+          "Stop the spread: isolate hosts, block addresses, disable accounts"
+        ],
+        [
+          "Eradication",
+          "Remove the cause: malware, accounts, backdoors, the exploited flaw"
+        ],
+        [
+          "Recovery",
+          "Restore from clean sources, validate, return to service"
+        ],
+        [
+          "Lessons learned",
+          "Post-incident review; fix the gaps the incident exposed"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Containment has a short-term and a long-term face: isolate the machine now, then decide whether to keep it isolated, rebuild it, or watch it as part of deeper investigation. Eradication without fixing the entry point guarantees a return visit, which is why the exploited vulnerability belongs in the eradication list."
+    },
+    {
+      "kind": "heading",
+      "text": "Order of volatility"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Evidence disappears fastest where it is most fleeting. Collect from most to least volatile: CPU registers and cache, then RAM including running processes and network connections, then temporary files, then disk, then logs and archived data. RAM is the classic exam answer: pull it first, because shutting down destroys it."
+    },
+    {
+      "kind": "heading",
+      "text": "Evidence handling"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Chain of custody: a record of who held the evidence, when, and what was done to it; unbroken, or the evidence loses standing.",
+        "Legal hold: preserve everything related to the case once litigation or investigation is expected.",
+        "Hash evidence at acquisition: prove the copy matches the original.",
+        "Work on copies, with write blockers for original media.",
+        "Documentation timestamps in a defensible timeline."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "First responder rule",
+      "text": "The most common exam mistake is a helpful technician reimaging the machine before evidence is captured. Isolate, preserve, capture volatile data, then clean. Rebuilding first destroys the answers."
+    },
+    {
+      "kind": "try",
+      "title": "Triage one alert",
+      "steps": [
+        "Scenario: EDR flags a workstation beaconing to an unknown host at night; the user reports nothing.",
+        "Write your first three actions in order, naming the IR phase for each.",
+        "List what you would capture before any cleanup, in volatility order.",
+        "Write the one question the lessons-learned meeting must answer."
+      ],
+      "expected": "Contain: isolate the host from the network (containment). Detect and analyze: pull EDR telemetry and authentication logs to set scope (detection and analysis). Preserve: RAM and connection data first, then disk and logs. Lessons learned must answer how the initial access happened and which control would have caught it sooner."
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Windows Event Log Triage",
+      "description": "Find failed logons (event 4625) and new account creation (event 4720) in your own Windows VM, or failed SSH logons in Linux auth.log, then write a three-line triage note. Full guide: labs/windows-event-log-triage.en.md.",
+      "estimatedMinutes": 30,
+      "status": "ready",
+      "scale": "full"
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Volatility Order",
+      "description": "Drag the five evidence classes into the order a first responder collects them, most fleeting first, and defend why RAM comes before disk. Full design: labs/volatility-order.lab.en.md.",
+      "estimatedMinutes": 10,
+      "status": "coming-soon",
+      "scale": "inline"
+    }
+  ],
+  "cheatsheet": [
+    "IR phases: preparation, detection and analysis, containment, eradication, recovery, lessons learned.",
+    "Order of volatility: registers and cache, RAM, temp files, disk, logs and archives. Capture RAM before shutdown.",
+    "Chain of custody: unbroken record of handling; hash at acquisition; work on copies with write blockers.",
+    "Contain first, eradicate the cause (including the exploited flaw), then restore from clean sources.",
+    "Never reimage before volatile evidence is captured."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "An analyst arrives at a compromised, still-running laptop. Which evidence should be captured first?",
+      "choices": {
+        "A": "The contents of RAM, including running processes and connections",
+        "B": "A full disk image",
+        "C": "Last year's archived backups",
+        "D": "The firewall rule list"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "RAM vanishes at shutdown, so it sits highest in the order of volatility for a live machine. Disk, archives, and rule lists all survive longer."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "After an incident, the team removes the malware but leaves the unpatched web flaw it used. Which phase was left incomplete?",
+      "choices": {
+        "A": "Recovery",
+        "B": "Lessons learned",
+        "C": "Eradication",
+        "D": "Preparation"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Eradication removes the cause, including the exploited vulnerability, so the same door closes. Recovery restores service; it cannot substitute for closing the entry point."
+    }
+  ]
+}

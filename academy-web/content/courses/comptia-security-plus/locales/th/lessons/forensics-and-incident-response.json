@@ -1,0 +1,141 @@
+{
+  "nodeId": "forensics-and-incident-response",
+  "locale": "th",
+  "title": "Forensics และ Incident Response",
+  "objective": "เมื่อจบบทเรียนนี้ ผู้เรียนจะดำเนินการตามเฟส incident response อย่างเป็นลำดับ คงรักษาหลักฐานตาม order of volatility และ chain of custody และเลือกการ contain กำจัด และกู้คืนที่เหมาะกับสถานการณ์",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "เฟสของ IR"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "เฟส",
+        "เกิดอะไรขึ้น"
+      ],
+      "rows": [
+        [
+          "Preparation",
+          "Playbook เครื่องมือ ผู้ติดต่อ การฝึกซ้อม ก่อนที่อะไรจะเกิด"
+        ],
+        [
+          "Detection and analysis",
+          "alert กลายเป็น incident ที่ยืนยันแล้ว กำหนดขอบเขตและความรุนแรง"
+        ],
+        [
+          "Containment",
+          "หยุดการแพร่: isolate เครื่อง บล็อก address ปิดบัญชี"
+        ],
+        [
+          "Eradication",
+          "กำจัดต้นเหตุ: มัลแวร์ บัญชี ประตูหลัง ช่องโหว่ที่ถูกใช้"
+        ],
+        [
+          "Recovery",
+          "กู้คืนจากแหล่งที่สะอาด ตรวจยืนยัน กลับสู่บริการ"
+        ],
+        [
+          "Lessons learned",
+          "ทบทวนหลังเหตุการณ์ ปิดช่องว่างที่ incident เปิดเผย"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "containment มีสองหน้า ระยะสั้นและระยะยาว: isolate เครื่องเดี๋ยวนี้ก่อน แล้วค่อยตัดสินว่าจะคงการแยกไว้ สร้างเครื่องใหม่ หรือเฝ้ามันต่อเป็นส่วนหนึ่งของการสืบสวนลึก การกำจัดโดยไม่ปิดจุดเข้าเป็นการเชื้อเชิญให้กลับมาเยือนอีก ช่องโหว่ที่ถูกใช้จึงต้องอยู่ในบัญชีรายการของ eradication"
+    },
+    {
+      "kind": "heading",
+      "text": "Order of volatility"
+    },
+    {
+      "kind": "paragraph",
+      "text": "หลักฐานหายเร็วที่สุดในที่ที่มันเลือนลอยที่สุด เก็บจากเลือนลอยมาไปหาคงที่: register และ cache ของ CPU แล้วไป RAM รวม process ที่กำลังรันและการเชื่อมต่อเครือข่าย แล้วไฟล์ชั่วคราว แล้วดิสก์ แล้ว log และข้อมูล archive RAM คือคำตอบคลาสสิกของข้อสอบ: ดึงมันก่อน เพราะการปิดเครื่องทำลายมันทันที"
+    },
+    {
+      "kind": "heading",
+      "text": "การจัดการหลักฐาน"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Chain of custody: บันทึกว่าใครถือหลักฐาน เมื่อไหร่ ทำอะไรกับมัน ต้องไม่ขาดสาย ไม่อย่างนั้นหลักฐานเสียสถานะ",
+        "Legal hold: คงรักษาทุกสิ่งที่เกี่ยวข้องกับคดีทันทีที่คาดว่าจะมีการฟ้องร้องหรือสืบสวน",
+        "Hash หลักฐาน ณ จุดเก็บ: พิสูจน์ว่าสำเนาตรงกับต้นฉบับ",
+        "ทำงานกับสำเนา โดยใช้ write blocker กับสื่อต้นฉบับ",
+        "บันทึก timestamp ใน timeline ที่ตั้งรับการโต้แย้งได้"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "กฎของ first responder",
+      "text": "ความผิดพลาดที่พบที่สุดบนข้อสอบคือช่างใจดี reimaging เครื่องก่อนที่หลักฐานถูกเก็บ ให้ isolate คงรักษา เก็บข้อมูลเลือนลอย แล้วค่อยทำความสะอาด การสร้างเครื่องใหม่ก่อนคือทำลายคำตอบทิ้ง"
+    },
+    {
+      "kind": "try",
+      "title": "Triage หนึ่ง alert",
+      "steps": [
+        "สถานการณ์: EDR ตรวจพบเวิร์กสเตชัน beacon ไปหา host ไม่รู้จักตอนกลางคืน ผู้ใช้ไม่รายงานอะไรเลย",
+        "เขียนสามการกระทำแรกตามลำดับ พร้อมระบุเฟส IR ของแต่ละอย่าง",
+        "ระบุสิ่งที่จะเก็บก่อนการทำความสะอาดใด ๆ ตามลำดับ volatility",
+        "เขียนหนึ่งคำถามที่การประชุม lessons learned ต้องตอบให้ได้"
+      ],
+      "expected": "Contain: isolate เครื่องออกจากเครือข่าย (containment) ตรวจและวิเคราะห์: ดึง telemetry ของ EDR และ log authentication เพื่อกำหนดขอบเขต (detection and analysis) คงรักษา: RAM และข้อมูล connection ก่อน แล้วจึงดิสก์และ log lessons learned ต้องตอบว่า initial access เกิดได้อย่างไร และ control ใดจะจับได้เร็วกว่านี้"
+    },
+    {
+      "kind": "lab",
+      "title": "แลป: Windows Event Log Triage",
+      "description": "หา logon ล้มเหลว (event 4625) และการสร้างบัญชีใหม่ (event 4720) ใน Windows VM ของตัวเอง หรือ SSH ล้มเหลวใน auth.log ของ Linux แล้วเขียนบันทึก triage สามบรรทัด คู่มือฉบับเต็ม: labs/windows-event-log-triage.th.md",
+      "estimatedMinutes": 30,
+      "status": "ready",
+      "scale": "full"
+    },
+    {
+      "kind": "lab",
+      "title": "แลป: Volatility Order",
+      "description": "ลากกลุ่มหลักฐานห้ากลุ่มเข้าลำดับที่ first responder ต้องเก็บ โดยเริ่มจากกลุ่มที่หายเร็วที่สุด และให้เหตุผลว่าทำไม RAM มาก่อนดิสก์ แบบฉบับเต็ม: labs/volatility-order.lab.th.md",
+      "estimatedMinutes": 10,
+      "status": "coming-soon",
+      "scale": "inline"
+    }
+  ],
+  "cheatsheet": [
+    "เฟส IR: preparation, detection and analysis, containment, eradication, recovery, lessons learned",
+    "Order of volatility: register กับ cache, RAM, ไฟล์ชั่วคราว, ดิสก์, log กับ archive เก็บ RAM ก่อนปิดเครื่อง",
+    "Chain of custody: บันทึกการครอบครองไม่ขาดสาย hash ตอนเก็บ ทำงานกับสำเนาผ่าน write blocker",
+    "Contain ก่อน กำจัดต้นเหตุ (รวมช่องโหว่ที่ถูกใช้) แล้วกู้คืนจากแหล่งสะอาด",
+    "อย่า reimage ก่อนเก็บหลักฐานเลือนลอยเด็ดขาด"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "นักวิเคราะห์ไปถึงแล็ปท็อปที่ถูกบุกรุกและยังเปิดอยู่ ควรเก็บหลักฐานอะไรก่อนเป็นอันดับแรก",
+      "choices": {
+        "A": "เนื้อหาใน RAM รวม process ที่รันอยู่และการเชื่อมต่อ",
+        "B": "อิมเมจดิสก์เต็มลูก",
+        "C": "backup เก่าปีก่อนที่เก็บ archive ไว้",
+        "D": "รายการกฎ firewall"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "RAM สลายทันทีที่ปิดเครื่อง จึงอยู่สูงสุดใน order of volatility ของเครื่องที่ยังมีชีวิต ส่วนดิสก์ archive และรายการกฎอยู่ได้นานกว่า"
+    },
+    {
+      "id": "cp-2",
+      "prompt": "หลังหนึ่ง incident ทีมลบมัลแวร์แล้วแต่ปล่อยช่องโหว่เว็บที่ไม่ได้แพตช์ซึ่งมัลแวร์ใช้เข้ามาไว้เหมือนเดิม เฟสใดยังไม่เสร็จ",
+      "choices": {
+        "A": "Recovery",
+        "B": "Lessons learned",
+        "C": "Eradication",
+        "D": "Preparation"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "eradication กำจัดต้นเหตุ รวมถึงช่องโหว่ที่ถูกใช้ เพื่อปิดประตูเดิมสนิท recovery คืนบริการ แต่ทดแทนการปิดจุดเข้าไม่ได้"
+    }
+  ]
+}

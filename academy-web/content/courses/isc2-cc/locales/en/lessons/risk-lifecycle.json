@@ -1,0 +1,153 @@
+{
+  "nodeId": "risk-lifecycle",
+  "locale": "en",
+  "title": "The Risk Lifecycle",
+  "objective": "By the end of this lesson you can define asset, threat, vulnerability, exploit, and risk, choose among the four risk treatments, and compute SLE, ARO, and ALE.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Five words that must never blur together"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Risk vocabulary is exam gold, because every scenario names these things. An asset is anything of value you protect: data, a system, a reputation. A threat is something that could harm the asset: an attacker, malware, a flood, an careless employee. A vulnerability is a weakness the threat can use: an unpatched service, a weak password, a missing lock. An exploit is the specific technique that turns the weakness into harm. Risk is the meeting of all of it: the likelihood that a threat exploits a vulnerability, times the impact on the asset."
+    },
+    {
+      "kind": "code",
+      "caption": "The conceptual formula",
+      "lines": [
+        "Risk = Likelihood x Impact",
+        "Total risk = Threat x Vulnerability x Asset value"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Notice what is not in that list: a vulnerability with no reachable threat is a latent weakness, and a threat with no vulnerability to use cannot touch you. Risk appears when the two connect on something you value. The exam loves questions built exactly on this distinction."
+    },
+    {
+      "kind": "heading",
+      "text": "Risk never drops to zero"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Inherent risk is the risk before controls. Residual risk is what remains after controls. There is always residual risk, because every control costs money or convenience and cannot cover everything. Residual risk above the organization's tolerance must be formally accepted by management, which is a decision, never an accident or an omission."
+    },
+    {
+      "kind": "heading",
+      "text": "Four ways to treat risk"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Treatment",
+        "What you do",
+        "Example"
+      ],
+      "rows": [
+        [
+          "Mitigate",
+          "Apply controls to lower likelihood or impact",
+          "Patch systems, enable MFA, train staff"
+        ],
+        [
+          "Transfer",
+          "Shift the financial impact to another party",
+          "Buy cyber insurance, outsource to a provider"
+        ],
+        [
+          "Accept",
+          "Document and formally tolerate the risk",
+          "Keep a low-value legacy system running with sign-off"
+        ],
+        [
+          "Avoid",
+          "Stop the activity that creates the risk",
+          "Do not launch the risky feature; decommission the service"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Two traps repeat on exams. First, transfer does not eliminate risk: an insurer may pay costs, but reputational damage stays with you. Second, acceptance must be documented and signed off by the risk owner; silently ignoring a risk is not acceptance."
+    },
+    {
+      "kind": "heading",
+      "text": "Quantitative risk: SLE, ARO, ALE"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Qualitative assessment uses judgment scales such as low, medium, and high, and works when you lack hard data. Quantitative assessment converts risk to money so controls can be compared with losses. Three numbers drive it: asset value (AV), exposure factor (EF, the fraction of the asset lost in one incident), and annual rate of occurrence (ARO, how often the incident is expected per year)."
+    },
+    {
+      "kind": "code",
+      "caption": "Formulas and a worked example",
+      "lines": [
+        "SLE = AV x EF            (loss per single incident)",
+        "ALE = SLE x ARO          (expected loss per year)",
+        "",
+        "Example: server worth 100,000; fire damages 40% of its value",
+        "SLE = 100,000 x 0.40 = 40,000",
+        "Fire expected once every 4 years, so ARO = 0.25",
+        "ALE = 40,000 x 0.25 = 10,000 per year"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "A control is justified in money terms when the reduction in ALE exceeds the control's annual cost. If a 3,000-per-year control lowers the ALE from 10,000 to 2,000, the net benefit is 5,000 per year, so the control pays for itself. Watch the ARO reading: 0.5 means once every two years, not fifty times a year."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "SLE is per incident; ALE is per year. If a question mixes them up in the answer choices, that pair is usually the discriminator. Also memorize that residual risk is accepted by management, not eliminated by controls."
+    },
+    {
+      "kind": "try",
+      "title": "Compute an ALE",
+      "steps": [
+        "A warehouse inventory system is worth 200,000. Ransomware is expected to render 25% of its value unusable per incident, and incidents are expected twice per decade.",
+        "Compute the SLE.",
+        "Compute the ARO.",
+        "Compute the ALE."
+      ],
+      "expected": "SLE = 200,000 x 0.25 = 50,000. ARO = 2 / 10 = 0.2. ALE = 50,000 x 0.2 = 10,000 per year."
+    }
+  ],
+  "cheatsheet": [
+    "Asset = what you protect; threat = what could harm it; vulnerability = the weakness; exploit = the technique; risk = likelihood x impact.",
+    "Inherent risk = before controls; residual risk = after controls; residual risk is never zero and is accepted by management.",
+    "Treatments: mitigate (controls), transfer (insurance), accept (documented sign-off), avoid (stop the activity).",
+    "SLE = AV x EF; ALE = SLE x ARO; a control is justified when ALE reduction exceeds control cost.",
+    "ARO 0.5 = once every two years."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "An unpatched server (weakness) sits in a network that no attacker can reach (no threat present). What does the server represent right now?",
+      "choices": {
+        "A": "A realized risk",
+        "B": "A transferred risk",
+        "C": "An accepted residual risk",
+        "D": "A vulnerability without a matching threat scenario"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Risk requires a threat to meet a vulnerability on a valued asset. With no reachable threat, you have a vulnerability, not a live risk, though patching is still wise because reachability can change."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Asset value 500,000; exposure factor 20%; expected once every 10 years. What is the ALE?",
+      "choices": {
+        "A": "10,000",
+        "B": "50,000",
+        "C": "100,000",
+        "D": "5,000"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "SLE = 500,000 x 0.20 = 100,000. ARO = 0.1. ALE = 100,000 x 0.1 = 10,000 per year. Choice A stops at the SLE and forgets the annualization."
+    }
+  ]
+}

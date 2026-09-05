@@ -1,0 +1,129 @@
+{
+  "nodeId": "teams-and-security-testing",
+  "locale": "en",
+  "title": "Red, Blue, Purple Teams and Security Testing",
+  "objective": "By the end of this lesson you can explain red, blue, and purple teaming, name application security testing types, walk through threat modeling basics, and describe physical penetration testing concepts.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Three team colors"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Security testing is organized around roles borrowed from military exercises. The red team attacks (with authorization) to find weaknesses before real adversaries do. The blue team defends and detects, running monitoring, response, and hardening. The purple team is not a third squad but a way of working: red and blue in the same loop, where attack results flow immediately into detection engineering, and defenses are re-tested to confirm the fix. The exam's cultural point: the goal is improving the system, and findings must reach the blue side."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Team",
+        "Mission",
+        "Output"
+      ],
+      "rows": [
+        [
+          "Red",
+          "Emulate attackers within agreed scope and rules of engagement",
+          "Findings, attack paths, evidence"
+        ],
+        [
+          "Blue",
+          "Detect, respond, harden",
+          "Detections, incident handling, mitigations"
+        ],
+        [
+          "Purple (joint practice)",
+          "Close the loop: every red finding becomes a blue detection, then is retested",
+          "Improved coverage, verified fixes"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Application security testing"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Static analysis (SAST): examines source code without running it; catches injection and insecure patterns early in development.",
+        "Dynamic analysis (DAST): probes the running application from outside like an attacker would; no source needed.",
+        "Interactive analysis (IAST) and software composition analysis (SCA): runtime insight and inventory of third-party libraries with known vulnerabilities.",
+        "Penetration testing: authorized, human-driven attack simulation against defined scope; ends with a report and remediation advice.",
+        "Bug bounty: reward external researchers for responsibly reported findings, extending coverage beyond internal teams."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The one-word distinctions the exam wants: static looks at code at rest, dynamic looks at the running app, and a penetration test is authorized attacking with a report at the end. Authorization and scope are what separate all of these from crime."
+    },
+    {
+      "kind": "heading",
+      "text": "Threat modeling in four questions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Threat modeling asks, early in design: what are we building? What can go wrong? What will we do about it? Did we do a good job? At CC level, the practice to remember is brainstorming threats against a diagram (data flows, trust boundaries), then matching each threat to a mitigation. Frameworks such as STRIDE (spoofing, tampering, repudiation, information disclosure, denial of service, elevation of privilege) give the brainstorm structure: each letter is a category of what can go wrong."
+    },
+    {
+      "kind": "heading",
+      "text": "Physical penetration testing concepts"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Physical pen testing applies the same authorized-testing logic to buildings: can a tester tailgate through a staff entrance behind a badge holder, talk their way past a receptionist (pretexting), connect a device to an exposed network port, or enter an unattended unlocked server room? Findings drive fixes: badge discipline and mantraps against tailgating, visitor procedures against pretexting, port security and locking cabinets against rogue devices, plus camera and alarm coverage. The exam expects the concept (authorized physical attack simulation, with consent and rules) and the classic attack names: tailgating and pretexting."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Purple = feedback loop, not a third team. SAST = code at rest; DAST = running app. Threat modeling happens at design time; STRIDE is the category list. Physical pen test staples: tailgating and pretexting, answered with badge controls, mantraps, and visitor procedures."
+    },
+    {
+      "kind": "try",
+      "title": "Purple-team one finding",
+      "steps": [
+        "A red-team report says: 'we phished a developer and their credentials worked on the internal code-signing service.'",
+        "Write the blue-team detection that should exist (what log, what pattern).",
+        "Write the control that would prevent it.",
+        "Describe how purple-team practice would verify both."
+      ],
+      "expected": "Detection: alert on authentication to the signing service from unrecognized devices or locations, and on signing operations outside change windows. Prevention: phishing-resistant MFA on the signing service and least-privilege access. Verification: red re-runs the same attack path in the next exercise; the detection must fire and the login must fail."
+    }
+  ],
+  "cheatsheet": [
+    "Red attacks (authorized), blue defends, purple closes the loop from finding to verified detection.",
+    "SAST reads code at rest; DAST probes the running app; pen test = scoped authorized attack with a report; bug bounty = external responsible disclosure.",
+    "Threat modeling four questions: what are we building, what can go wrong, what do we do, did we do well; STRIDE lists threat categories.",
+    "Physical pen testing: tailgating and pretexting are the classic techniques; badge discipline, mantraps, visitor procedures, port security are the fixes.",
+    "Every test needs authorization, scope, and rules of engagement."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "In purple teaming, what happens to each red-team finding?",
+      "choices": {
+        "A": "It is filed for the annual report",
+        "B": "It is turned into a blue-team detection or control, then retested to verify it works",
+        "C": "It is kept secret from defenders to preserve realism",
+        "D": "It is discarded after the exercise ends"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Purple teaming exists to close the loop: every attack finding feeds detection engineering or a preventive control, and the same path is retested to confirm the improvement. Findings that die in a report are the failure mode purple practice prevents."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A tester follows an employee through a controlled door without badging in. This physical pen test technique is called:",
+      "choices": {
+        "A": "Tailgating (piggybacking)",
+        "B": "Pretexting",
+        "C": "Spear phishing",
+        "D": "Elevation of privilege"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Slipping through a secure door behind an authorized person is tailgating. Pretexting is inventing a story to gain cooperation; the door scenario relies on presence, not conversation."
+    }
+  ]
+}

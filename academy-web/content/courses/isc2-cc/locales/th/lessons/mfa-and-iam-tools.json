@@ -1,0 +1,146 @@
+{
+  "nodeId": "mfa-and-iam-tools",
+  "locale": "th",
+  "title": "วิธี MFA, เครื่องมือ IAM และ Behavioral Authentication",
+  "objective": "เมื่อจบบทเรียนนี้ ผู้เรียนเรียงลำดับความแน่นหนาของวิธี MFA ได้ จำโจมตี MFA fatigue ได้ บอกสิ่งที่เครื่องมือ IAM บริหารได้ และอธิบาย behavioral authentication กับการตรวจจับ impossible travel ได้",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "factor ที่สองไม่ได้แน่นหนาเท่ากันทุกแบบ"
+    },
+    {
+      "kind": "paragraph",
+      "text": "วิธี MFA ต่างกันที่ความยากง่ายที่ผู้โจมตีจะข้ามได้ การเรียงลำดับคือทักษะข้อสอบที่เชื่อถือได้ เพราะ scenario จะบรรยายวิธีหนึ่งแล้วถามว่าอะไรพลาดหรือควรอัปเกรดเป็นอะไร"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "วิธี",
+        "factor",
+        "ความแน่นหนา",
+        "วิธีถูกข้ามที่รู้จัก"
+      ],
+      "rows": [
+        [
+          "hardware security key (FIDO2) หรือ passkey",
+          "have (พร้อมการพิสูจน์ในตัว)",
+          "แน่นสุด; ต้าน phishing",
+          "ถูกขโมยกายภาพ พบน้อยในทางปฏิบัติ"
+        ],
+        [
+          "รหัสจาก authenticator app (TOTP)",
+          "have",
+          "แน่น",
+          "phishing แบบเรียลไทม์ที่ส่งต่อรหัส"
+        ],
+        [
+          "push notification กดยืนยัน",
+          "have",
+          "ปานกลาง",
+          "MFA fatigue: ถล่ม push จนเจ้าของกดยืนยันเพื่อให้เงียบ"
+        ],
+        [
+          "รหัส SMS ครั้งเดียว",
+          "have",
+          "อ่อนที่สุดในบรรดาที่ใช้กัน",
+          "SIM swap เบี่ยงเบนรหัสไปเบอร์ผู้โจมตี"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "MFA fatigue (push bombing) ทำงานด้วยปริมาณ: ผู้โจมตีมี password ถูกต้องแล้ว จึงส่งคำขอยืนยันรัวๆ จนเหยื่อเหนื่อยและกดยืนยันเพื่อให้เลิกรบกวน ทางแก้ที่ข้อสอบอยากได้: number-matching (ต้องพิมพ์เลขที่ขึ้นบนจอจึงยืนยันได้), จำกัดอัตรา และวิธีต้าน phishing อย่าง hardware key หรือ passkey ซึ่งถูก fatigue ไม่ได้เพราะผูกกับเว็บจริงด้วยการเข้ารหัส"
+    },
+    {
+      "kind": "heading",
+      "text": "เครื่องมือ IAM ทำอะไร"
+    },
+    {
+      "kind": "paragraph",
+      "text": "ระบบ identity and access management (IAM) คือเครื่องจักรของวงจรและโมเดลที่ผู้เรียนเพิ่งเรียน: ไดเรกทอรีของ identity และกลุ่ม บริการ authentication (รวม SSO และ MFA) นโยบาย authorization ขั้นตอน provisioning และ deprovisioning (มักขับเคลื่อนจากระบบ HR) และ audit log ว่าใครได้อะไร ใน cloud IAM ยังคุม identity ที่ไม่ใช่มนุษย์: service role, API key และ AI workload identity ที่ใช้ credential ชั่วคราว"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "ไดเรกทอรี: ใครมีอยู่ กลุ่มใด attribute ใด; แหล่งความจริงของ identity",
+        "authentication: นโยบาย password, การบังคับ MFA, การควบคุม session",
+        "authorization: role, policy และกฎ attribute ที่ประเมินต่อคำขอ",
+        "อัตโนมัติวงจร: การต่อสาย joiner-mover-leaver, access review, deprovisioning",
+        "การ log: ทุกการให้ ปฏิเสธ และยกระดับสิทธิ์ ถูกบันทึกเพื่อ audit และตรวจจับ"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Behavioral authentication และ impossible travel"
+    },
+    {
+      "kind": "paragraph",
+      "text": "หลักสูตร 2026 เพิ่ม behavioral authentication: ระบบให้คะแนนการ login หรือคำขอแต่ละครั้งเทียบกับแพทเทิร์น อุปกรณ์ และสถานที่ที่ผู้ใช้คนนั้นเคยทำ แล้วขอการยืนยันเพิ่มเมื่อพฤติกรรมผิดปกติ ความสามารถสองอย่างที่ต้องรู้ชื่อ: การตรวจจับ impossible travel ธง login จากสถานที่ที่ผู้ใช้เดินทางไปถึงไม่ได้ทางกายภาพตั้งแต่ครั้งก่อน (กรุงเทพ 09:00 ลิสบอน 09:20) และ adaptive หรือ risk-based authentication ที่ตอบสนองด้วยการเรียก factor ที่แข็งขึ้น บล็อก หรือส่งตรวจสอบ"
+    },
+    {
+      "kind": "paragraph",
+      "text": "ให้มองสองอย่างนี้เป็น control แบบ detective ที่ให้คะแนนความเสี่ยงซ้อนบน MFA มาตรฐาน: มันไม่ได้แทน factor แต่ตัดสินว่าเมื่อไหร่ต้องขอ factor มากกว่าปกติ ให้คาดคำถามที่จับคู่ scenario แบบแปลกปลอมกับการตอบสนองที่ถูกต้อง ซึ่งคือ step-up authentication ไม่ใช่การยอมรับเงียบๆ"
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "บนข้อสอบ",
+      "text": "เรียง passkey กับ hardware key สูงกว่ารหัสแอป สูงกว่า push สูงกว่า SMS scenario ถล่มปุ่มยืนยันคือ MFA fatigue เฉลยด้วย number-matching หรือ factor ต้าน phishing scenario สองทวีปในหนึ่งชั่วโมงคือ impossible travel เฉลยด้วย step-up authentication"
+    },
+    {
+      "kind": "try",
+      "title": "ซ้อมเส้นทางอัปเกรด",
+      "steps": [
+        "บริษัทหนึ่งใช้รหัส SMS และผู้บริหารบ่นเรื่องการแจ้งเตือนถล่มตอนตีสอง ตั้งชื่อการโจมตีและสองการปรับปรุงที่เร็วที่สุด",
+        "เรียงความแน่นหนาสำหรับ rollout ใหม่: SMS, authenticator app, passkey, push พร้อม number-matching",
+        "เขียนกฎ risk-based ที่จะเพิ่มสำหรับการ login จากประเทศใหม่"
+      ],
+      "expected": "การโจมตี: กรณี SMS แรงขนานคือ SIM swap ส่วนการแจ้งเตือนถล่มสื่อถึง push ที่ใช้อยู่แห่งหนึ่ง ซึ่งคือ MFA fatigue การปรับปรุง: ย้ายไป authenticator app หรือ passkey และเปิด number-matching ที่ยังใช้ push ลำดับ: passkey, push พร้อม number-matching, authenticator app, SMS กฎ: login จากประเทศใหม่ต้อง step-up (factor ที่แข็งขึ้น) หรือบล็อกชั่วคราวรอตรวจสอบ"
+    },
+    {
+      "kind": "lab",
+      "title": "แล็บ: Password Strength and MFA",
+      "description": "ตรวจ password ของตัวเองด้วย password manager เปิด MFA กับบัญชีจริงที่ผู้เรียนเป็นเจ้าของ และระบุ factor ที่ตั้งค่าใช้อยู่ คู่มือฉบับเต็ม: labs/password-strength-and-mfa.th.md",
+      "estimatedMinutes": 25,
+      "status": "ready",
+      "scale": "full"
+    }
+  ],
+  "cheatsheet": [
+    "ลำดับความแน่นของ MFA: hardware key/passkey > authenticator app (TOTP) > push ยืนยัน > รหัส SMS",
+    "MFA fatigue = ถล่มปุ่มยืนยัน; แก้ด้วย number-matching หรือ factor ต้าน phishing",
+    "รหัส SMS แพ้ SIM swapping; เลือกแอปหรือ passkey เมื่อมีให้เลือก",
+    "เครื่องมือ IAM บริหารไดเรกทอรี, authentication (SSO, MFA), นโยบาย authorization, อัตโนมัติวงจร และ audit log รวม identity ที่ไม่ใช่มนุษย์",
+    "การตรวจจับ impossible travel และ adaptive authentication เพิ่ม step-up ตามความเสี่ยงเมื่อพฤติกรรมผิดปกติ"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "ผู้ใช้ที่ password ถูกต้องได้รับแจ้งเตือนยืนยัน 40 ครั้งช่วงดึก และในที่สุดกดยืนยันไปหนึ่งครั้ง นี่คือการโจมตีใดและแก้อย่างไรดีที่สุด?",
+      "choices": {
+        "A": "Credential stuffing; ต้องใช้ password ที่ยาวขึ้น",
+        "B": "MFA fatigue (push bombing); number-matching หรือ key ต้าน phishing",
+        "C": "SIM swapping; เปลี่ยนเบอร์โทรศัพท์",
+        "D": "Salting; อัปเกรดการ hash"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "การถล่ม push จนผู้ใช้เหนื่อยแล้วกดยืนยันคือ MFA fatigue number-matching ตัดการกดยืนยันแบบเฉยๆ และ hardware key หรือ passkey ใช้บนเส้นทาง phishing หรือ replay ไม่ได้เลย"
+    },
+    {
+      "id": "cp-2",
+      "prompt": "ปรากฏการ login จากประเทศหนึ่ง โดย 30 นาทีก่อนหน้าผู้ใช้เพิ่ง login จากอีกทวีปหนึ่ง การตอบสนองที่ดีที่สุดของระบบ identity คืออะไร?",
+      "choices": {
+        "A": "อนุญาต เพราะ password ถูกต้อง",
+        "B": "มองว่าเป็น false positive โดยปริยาย",
+        "C": "ลบบัญชีผู้ใช้ทันที",
+        "D": "ธง impossible travel และเรียก step-up authentication หรือส่งตรวจสอบ"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "สองสถานที่ห่างกันเกินกว่าจะเดินทางได้ในกรอบเวลานั้นคือสัญญาณพฤติกรรมคลาสสิก risk-based (adaptive) authentication ตอบด้วยการเรียก factor ที่แข็งขึ้นหรือส่งตรวจสอบ ไม่ใช่ยอมแบบตาบอดหรือลบบัญชี"
+    }
+  ]
+}

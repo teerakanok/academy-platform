@@ -1,0 +1,152 @@
+{
+  "nodeId": "common-attacks",
+  "locale": "th",
+  "title": "การโจมตีที่พบบ่อย",
+  "objective": "เมื่อจบบทเรียนนี้ ผู้เรียนจะจำแนกการโจมตีหลัก ๆ ได้จากสถานการณ์สั้น ๆ อธิบายกลไกเบื้องหลังแต่ละแบบ และบอก mitigation แรกที่นึกถึงได้ทันที",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "เริ่มที่ social engineering"
+    },
+    {
+      "kind": "paragraph",
+      "text": "การบุกส่วนใหญ่เริ่มจากคนก่อนเครื่อง social engineering ได้ผลเพราะใช้ประโยชน์จากความเต็มใจช่วยเหลือ ความเร่งด่วน อำนาจสั่งการ และความกลัว phishing คือรูปแบบผ่านอีเมล spear phishing เจาะจงเป้าหมายรายบุคคล whaling เจาะผู้บริหาร smishing ใช้ SMS ส่วน vishing ใช้สายเสียง สามทางป้องกันคือ การอบรม การรายงาน และการกรองทางเทคนิค"
+    },
+    {
+      "kind": "heading",
+      "text": "การโจมตี password และ credential"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Brute force: ลองทุกชุดตัวอักษร เอาชนะด้วย password ที่ยาวและการล็อกบัญชี",
+        "Dictionary attack: ลองคำที่น่าจะใช้และ password ที่เคยรั่วไหล",
+        "Password spraying: ใช้ password ยอดนิยมหนึ่งตัวยิงหลายบัญชี เพื่อไม่ให้โดนล็อก",
+        "Credential stuffing: หยิบคู่ username-password ที่รั่วจากเว็บอื่นมาลองใหม่",
+        "Keylogging: บันทึกการกดแป้นพิมพ์ด้วยมัลแวร์"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "ให้สังเกตกลไก เพราะข้อสอบนั้นทดสอบกลไก spraying เลี่ยงการถูกล็อกด้วยการกระจายความพยายาม stuffing ได้ผลเพราะคนใช้ password ซ้ำกันทุกเว็บ การโจมตี credential ทุกรูปแบบตอบด้วย password ไม่ซ้ำกัน ใช้ MFA หรือทั้งสองอย่าง"
+    },
+    {
+      "kind": "heading",
+      "text": "การโจมตีเว็บและ session"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "การโจมตี",
+        "เกิดอะไรขึ้น",
+        "การป้องกันแรก"
+      ],
+      "rows": [
+        [
+          "SQL injection",
+          "ข้อมูลที่ผู้โจมตีกรอกถูกประมวลผลเป็นส่วนหนึ่งของคำสั่งฐานข้อมูล",
+          "Parameterized queries และ input validation"
+        ],
+        [
+          "Cross-site scripting (XSS)",
+          "script ของผู้โจมตีรันใน browser ของเหยื่อบนเว็บที่เชื่อถือได้",
+          "Output encoding และการทำความสะอาด input"
+        ],
+        [
+          "Cross-site request forgery (CSRF)",
+          "browser ที่ยังล็อกอินอยู่ถูกหลอกให้ส่ง action ที่ไม่ได้ตั้งใจ",
+          "Anti-CSRF token"
+        ],
+        [
+          "On-path attack",
+          "ผู้โจมตีนั่งคั่นระหว่างเหยื่อกับเซิร์ฟเวอร์ อ่านหรือแก้ traffic ได้",
+          "TLS ทุกที่"
+        ],
+        [
+          "Replay attack",
+          "request ที่ถูกต้องที่ถูกดักไว้ถูกส่งซ้ำอีกครั้ง",
+          "Token และ timestamp, nonce"
+        ],
+        [
+          "Privilege escalation",
+          "ผู้ใช้ได้สิทธิ์เกินระดับตัวเอง ทั้งแนวตั้งและแนวนอน",
+          "Least privilege และการแพตช์"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "ท่องจำสองประโยค: injection โจมตีเซิร์ฟเวอร์ผ่าน input ที่เว็บไม่ตรวจ ส่วน XSS โจมตีผู้เยี่ยมชมผ่านเนื้อหาที่เว็บไม่ encode CSRF ไม่ต้องมี script เลย มันยืม session ที่เปิดอยู่ของเหยื่อไปใช้"
+    },
+    {
+      "kind": "heading",
+      "text": "Spoofing และ hijacking"
+    },
+    {
+      "kind": "paragraph",
+      "text": "spoofing หมายถึงการปลอมตัวตน: ที่อยู่ผู้ส่งปลอม เว็บไซต์ clone หรือ MAC/IP ปลอม domain spoofing และ typosquatting (จดโดเมนหน้าตาคล้าย) เป็นกำลังหนุนของ phishing on-path attack (เดิมเรียก man-in-the-middle) รวมการดักฟังกับการแก้ไขข้อมูล และตอบด้วยช่องทางที่เข้ารหัสและยืนยันตัวตนได้ เช่น TLS"
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "บนข้อสอบ",
+      "text": "การจำแนกสำคัญกว่าการท่องจำ อ่านสถานการณ์ ตั้งชื่อการโจมตีด้วยคำของตัวเอง แล้วค่อยจับคู่กับตัวเลือก เมื่อสองคำตอบดูเป็นไปได้ทั้งคู่ ให้เลือนอันที่ตรงกับกลไกในเรื่อง เช่น browser รัน script จากช่อง comment ชี้ไปที่ XSS ไม่ใช่ CSRF"
+    },
+    {
+      "kind": "try",
+      "title": "ฝึกจำแนกการโจมตี",
+      "steps": [
+        "กลบคำว่าชื่อการโจมตีเอาไว้ แล้วอ่านคำใบ้เหล่านี้: (1) URL หน้าชำระเงินต่างจากร้านจริงหนึ่งตัวอักษร (2) หลังบริษัทหนึ่งโดนรั่ว บัญชีของผู้ใช้นับพันมีการล็อกอินสำเร็จพร้อมกัน (3) comment ในฟอรัมทำให้ browser เด้ง alert ที่ผู้ใช้เห็น (4) session token ใน URL ถูกนำไปใช้ใหม่หนึ่งชั่วโมงถัดมา",
+        "ตั้งชื่อการโจมตีแต่ละข้อ",
+        "ให้การป้องกันหนึ่งข้อต่อการโจมตีหนึ่งแบบ",
+        "ถ้าการป้องกันสองข้อซ้อนทับกัน ให้บอก control ที่ใช้ร่วมกัน"
+      ],
+      "expected": "ข้อ 1: typosquatting หรือ domain spoofing ป้องกันด้วยการอบรมผู้ใช้และ DNS filtering ข้อ 2: credential stuffing ป้องกันด้วย password ไม่ซ้ำและ MFA ข้อ 3: XSS ป้องกันด้วย output encoding ข้อ 4: replay ป้องกันด้วย token อายุสั้น control ร่วม: MFA ช่วยได้ทั้งข้อ 2 และ 4"
+    },
+    {
+      "kind": "lab",
+      "title": "แลป: Phishing Header Forensics",
+      "description": "อ่าน email header ตัวอย่างที่ตัดข้อมูลออกแล้ว ตรวจผล SPF, DKIM และ DMARC และจับความผิดปกติของ reply-to คู่มือฉบับเต็ม: labs/phishing-header-forensics.th.md",
+      "estimatedMinutes": 25,
+      "status": "ready",
+      "scale": "full"
+    }
+  ],
+  "cheatsheet": [
+    "ตระกูล social engineering: phishing, spear phishing, whaling, smishing, vishing ตอบด้วยการอบรม การรายงาน และการกรอง",
+    "กลไก credential: spraying กระจายความพยายามข้ามบัญชี stuffing ใช้คู่ที่รั่วซ้ำ ตอบด้วย password ไม่ซ้ำและ MFA",
+    "Injection ตีเซิร์ฟเวอร์ผ่าน input ที่ไม่ตรวจ XSS ตีผู้เยี่ยมชมผ่านเนื้อหาที่ไม่ encode CSRF ยืม session ที่เปิดอยู่",
+    "Replay ส่ง request ที่ดักได้ซ้ำ on-path นั่งคั่นกลาง ทั้งคู่ตอบด้วย TLS บวก token",
+    "Spoofing ปลอมตัวตน: ผู้ส่ง โดเมน IP MAC หรือเว็บหน้าตาคล้าย"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "หลังเว็บไซต์อื่นโดนรั่ว บัญชีผู้ใช้ขององค์กรนับร้อยมีการล็อกอินสำเร็จในช่วงกลางคืน เพราะผู้ใช้ใช้ password เดียวกันทั้งสองที่ นี่คือการโจมตีแบบใด",
+      "choices": {
+        "A": "Password spraying",
+        "B": "On-path attack",
+        "C": "Brute force",
+        "D": "Credential stuffing"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "การหยิบคู่ username-password ที่รั่วไหลมาลองใหม่คือ credential stuffing ส่วน spraying ลอง password ยอดนิยมไม่กี่ตัวกับหลายบัญชีโดยไม่ต้องมีข้อมูลรั่ว และ brute force ทุบบัญชีเดียวตลอดเวลา"
+    },
+    {
+      "id": "cp-2",
+      "prompt": "ลูกค้าธนาคารคลิกลิงก์ในอีเมลแล้วไปถึงเว็บที่หน้าตาเหมือนธนาคารทุกอย่าง แต่ชื่อโดเมนสะกดสลับหนึ่งตัวอักษร มีการโจมตีสองแบบใดทำงานอยู่",
+      "choices": {
+        "A": "Typosquatting และ phishing",
+        "B": "XSS และ CSRF",
+        "C": "Replay และการ spoof MAC address",
+        "D": "SQL injection และ privilege escalation"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "โดเมนหน้าตาคล้ายคือ typosquatting ที่ส่งมาทางอีเมล phishing ไม่มี script บนเว็บหรือ session ใดเกี่ยวข้อง การโจมตีฝั่งเว็บจึงไม่เข้าเรื่อง"
+    }
+  ]
+}

@@ -1,0 +1,252 @@
+{
+  "nodeId": "architecture-practice",
+  "locale": "en",
+  "title": "Practice: Security Architecture",
+  "objective": "By the end of this lesson you can give a management host the static address its isolation depends on, diagnose a wrong mask and a stale gateway from symptoms alone, and defend segmentation and shared-responsibility choices in scenario questions.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Why hands-on now"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Architecture is where reading quietly fails. You can recite what a management network is for and what a subnet mask does, and still freeze in front of a settings screen with a grumpy admin waiting. The machines below come from one building split into segments, and each fails differently: a jump server that drifted off its documented management address, a kiosk whose mask quietly disowns its own router, and a third fault at the checkpoint that the brief will refuse to name."
+    },
+    {
+      "kind": "heading",
+      "text": "Simulation 1: the management jump server"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Management-plane isolation only works if the promised address keeps its promise. Only the admin subnet is routed to the management network, and every admin tool and firewall rule on it expects the jump host at one documented address. This morning the host came up with a lease from a different network, so the address everything relies on answers to nobody."
+    },
+    {
+      "kind": "simulation",
+      "challenge": {
+        "id": "jump-server-static",
+        "title": "The management jump server",
+        "brief": "The management network 10.20.30.0/24 is its own segment: only the admin subnet is routed to it, and the jump host every admin workstation expects sits at the documented address 10.20.30.9. On that network the router at 10.20.30.1 is the gateway and also resolves names. The machine currently holds a lease from a different network, so the documented address reaches nobody and the isolated segment has lost its one front door. Give the management network its jump host back.",
+        "surface": "network-interface",
+        "initial": {
+          "addressMode": "dhcp",
+          "ipv4": "172.16.5.77",
+          "subnet": "255.255.0.0",
+          "gateway": "172.16.5.1",
+          "dns1": "172.16.5.1",
+          "applied": true
+        },
+        "requiredFields": {
+          "dhcp": [],
+          "static": [
+            "ipv4",
+            "subnet",
+            "gateway",
+            "dns1"
+          ]
+        },
+        "requirements": [
+          {
+            "id": "mode",
+            "label": "A management address is set by its owner: a lease server outside the segment must never be able to move this host again",
+            "field": "addressMode",
+            "operator": "equals",
+            "value": "static"
+          },
+          {
+            "id": "ip",
+            "label": "The host must answer at the documented address the admin tools and firewall rules rely on",
+            "field": "ipv4",
+            "operator": "equals",
+            "value": "10.20.30.9"
+          },
+          {
+            "id": "mask",
+            "label": "The interface must sit on the isolated 10.20.30.0/24 management network",
+            "field": "subnet",
+            "operator": "equals",
+            "value": "255.255.255.0"
+          },
+          {
+            "id": "gateway",
+            "label": "Traffic leaving the isolated management network must use its own router",
+            "field": "gateway",
+            "operator": "equals",
+            "value": "10.20.30.1"
+          },
+          {
+            "id": "dns",
+            "label": "Names must resolve through the management network's own resolver",
+            "field": "dns1",
+            "operator": "equals",
+            "value": "10.20.30.1"
+          },
+          {
+            "id": "applied",
+            "label": "The configuration has been confirmed with OK",
+            "field": "applied",
+            "operator": "isTrue"
+          }
+        ],
+        "hints": [
+          "A /24 network uses the mask 255.255.255.0: the first three numbers name the network, the last one names the machine.",
+          "The brief says the router at the first usable address both forwards traffic and resolves names for this segment.",
+          "Every value on screen describes the network that issued the lease — a network this isolated host must not depend on."
+        ],
+        "debrief": "A jump server is deliberately boring: it lives on its own segment so trouble anywhere else in the building cannot reach it, and only the admin subnet is routed there. That isolation is built on a promise — the address 10.20.30.9 is written into firewall rules, monitoring, and every runbook, so the address must be set by hand and defended against change. A DHCP reservation could pin it too, but then a host on the isolated segment depends on a lease server outside it, which is why management-plane machines are usually fully static. That is the exam phrasing in miniature: infrastructure that others depend on gets a documented static address."
+      }
+    },
+    {
+      "kind": "heading",
+      "text": "Simulation 2: the mis-masked kiosk"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The lobby kiosk on the building-services network opens the local file share when staff type the server's number, and nothing else works: no site loads, no mail arrives, nothing beyond the local machines answers. Its address, gateway, and resolver are all correct for the segment — so what is left to be wrong?"
+    },
+    {
+      "kind": "simulation",
+      "challenge": {
+        "id": "kiosk-wrong-mask",
+        "title": "The mis-masked kiosk",
+        "brief": "The lobby kiosk on the building-services network 10.20.40.0/24 reaches the file server at 10.20.40.90 when addressed by number, and everything else fails: no website, no mail, nothing past the local machines. The kiosk's address 10.20.40.75 is correct, the router at 10.20.40.1 is this segment's gateway and resolver, and the screen says the settings are applied. Find the fault the file share survives and the internet does not, and repair it.",
+        "surface": "network-interface",
+        "initial": {
+          "addressMode": "static",
+          "ipv4": "10.20.40.75",
+          "subnet": "255.255.255.192",
+          "gateway": "10.20.40.1",
+          "dns1": "10.20.40.1",
+          "applied": true
+        },
+        "requiredFields": {
+          "dhcp": [],
+          "static": [
+            "ipv4",
+            "subnet",
+            "gateway",
+            "dns1"
+          ]
+        },
+        "requirements": [
+          {
+            "id": "mask",
+            "label": "The kiosk must treat the whole 10.20.40.0/24 segment — router included — as one network it belongs to",
+            "field": "subnet",
+            "operator": "equals",
+            "value": "255.255.255.0"
+          },
+          {
+            "id": "applied",
+            "label": "The corrected mask has been confirmed with OK",
+            "field": "applied",
+            "operator": "isTrue"
+          }
+        ],
+        "hints": [
+          "The file server answers by number, so the cable, the address, and the resolver all do their jobs. Ask what makes the kiosk treat some addresses as neighbors and others as strangers.",
+          "The mask draws that line. Work out which address range the mask on screen treats as local, and whether the router at 10.20.40.1 lands inside it.",
+          "A mask of 255.255.255.192 carves a network into blocks of 64 addresses. The kiosk at .75 believes its block is .64 through .127 — and .1 lives outside that world."
+        ],
+        "debrief": "The mask was the fault. With 255.255.255.192 the kiosk believed its network was the 64-address block .64 to .127: the file server at .90 counted as a neighbor and answered directly, while the router at 10.20.40.1 sat outside the block on 'some other network', so the hand-off that carries traffic off the segment never happened. The repair was one field: 255.255.255.0 makes the whole /24 one neighborhood with the router inside it. Remember the shape of the symptoms — a slice of the segment answers, everything past it is dead, the gateway address itself is correct — and you can name a wrong mask before touching a screen."
+      }
+    },
+    {
+      "kind": "callout",
+      "tone": "tip",
+      "title": "Carry this to the exam",
+      "text": "Segmentation scenarios hide three addressing faults. A host others must find at a documented address is static. Local traffic surviving while everything off-segment dies points at the gateway path: a too-narrow mask when the mask disowns the router, a stale address when the range was rebuilt. Traffic that flows by number and fails by name is the resolver."
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: TLS Walkthrough",
+      "description": "Step through eight frames of a TLS handshake, from ClientHello to encrypted traffic, and answer what the closed padlock proves. Full design: labs/tls-walkthrough.lab.en.md.",
+      "estimatedMinutes": 10,
+      "status": "coming-soon",
+      "scale": "inline"
+    }
+  ],
+  "cheatsheet": [
+    "Management-plane hosts sit on their own segment, reachable from the admin subnet, at static documented addresses the firewall rules and runbooks rely on.",
+    "The mask decides who counts as a neighbor: a too-narrow mask can leave the router outside the host's own idea of its network.",
+    "Wrong-mask signature: one block of the segment answers, everything past it dies, and the gateway address itself is correct.",
+    "Stale-gateway signature: local segment traffic works, off-segment traffic dies, and the fix is the router's current address.",
+    "A /24 network has mask 255.255.255.0, and the router at the first usable address often resolves names too."
+  ],
+  "checkpoint": [
+    {
+      "kind": "simulation",
+      "id": "cp-sensor-gateway",
+      "challenge": {
+        "id": "sensor-stale-gateway",
+        "title": "The stranded sensor",
+        "brief": "The warehouse sensor on the building-services network 10.20.40.0/24 chats with its local collector at 10.20.40.200 all shift, and nothing outside the segment has answered since the address range was rebuilt: no dashboard, no updates, nothing. The sensor's address 10.20.40.88, its mask, and its resolver are correct, the settings are applied, and on this network the router is 10.20.40.1. One field still carries a value from the old range. Put the sensor back on the map.",
+        "surface": "network-interface",
+        "initial": {
+          "addressMode": "static",
+          "ipv4": "10.20.40.88",
+          "subnet": "255.255.255.0",
+          "gateway": "10.20.40.254",
+          "dns1": "10.20.40.1",
+          "applied": true
+        },
+        "requiredFields": {
+          "dhcp": [],
+          "static": [
+            "ipv4",
+            "subnet",
+            "gateway",
+            "dns1"
+          ]
+        },
+        "requirements": [
+          {
+            "id": "gateway",
+            "label": "Traffic leaving the segment must be handed to this network's real router",
+            "field": "gateway",
+            "operator": "equals",
+            "value": "10.20.40.1"
+          },
+          {
+            "id": "applied",
+            "label": "The repaired gateway has been confirmed with OK",
+            "field": "applied",
+            "operator": "isTrue"
+          }
+        ],
+        "hints": [
+          "The collector answers, so the address, the mask, and name lookup all work. Ask which device traffic needs at the moment it leaves the segment.",
+          "The brief names this network's router, and the field on screen holds a different address — one that belonged to a network that no longer exists."
+        ],
+        "debrief": "The sensor was stranded by a stale value: the gateway still pointed at 10.20.40.254 from before the range rebuild, while this segment's router answers at 10.20.40.1. Local traffic never noticed, because neighbors inside the segment talk to each other directly; traffic bound for another network is handed to the gateway, and a wrong gateway sends the hand-off into the dark. The symptoms did the diagnosis for you: local fine, remote dead, resolver fine — the one field still holding an old value was the gateway. This is a routing fault, one neighbor over from the resolver fault, where numbers work and names fail."
+      }
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A cafe's guest Wi-Fi must never reach the payment terminal network, even if a guest machine is infected. Which architecture choice delivers this?",
+      "choices": {
+        "A": "Load balancing the guest traffic",
+        "B": "Segmentation with firewall rules between the networks",
+        "C": "DNS filtering on the guest resolver",
+        "D": "A VPN concentrator for guest devices"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Segmentation, through VLANs and firewall rules, contains the blast radius by making the payment network unreachable from the guest side. DNS filtering stops bad domains, load balancers spread traffic, and VPNs extend private access, so none of them blocks network-to-network reachability."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A team runs virtual machines on a public IaaS provider. Under the shared responsibility model, whose job is patching each virtual machine's guest operating system?",
+      "choices": {
+        "A": "The customer, because the guest system is the customer's workload",
+        "B": "The provider, because the machines run on its hardware",
+        "C": "The provider's auditor, as part of the certification",
+        "D": "Nobody, because the service agreement already covers it"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Under IaaS the provider secures the physical layer and hypervisor; everything inside the virtual machine, starting with the guest operating system, belongs to the customer. Confusing the two sides of that line is the classic cloud question trap."
+    }
+  ]
+}

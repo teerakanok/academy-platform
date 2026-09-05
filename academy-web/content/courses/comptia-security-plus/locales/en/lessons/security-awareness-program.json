@@ -1,0 +1,109 @@
+{
+  "nodeId": "security-awareness-program",
+  "locale": "en",
+  "title": "Security Awareness Program",
+  "objective": "By the end of this lesson you can design a awareness program that changes behavior, run phishing simulations that teach instead of punish, and grow a reporting culture you can measure.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Why people are an interface, not a weakness"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Attackers reach people through email, phone calls, text messages, and chat apps because people are reachable. A security awareness program treats staff as a sensor network: thousands of employees who can spot and report an attack in seconds, if they know what to look for and who to tell. The exam words this as recognition-based training: teach people to recognize what an attack looks like rather than memorize rules."
+    },
+    {
+      "kind": "heading",
+      "text": "What a program contains"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Role-appropriate training: everyone gets phishing and data handling basics; developers get secure coding; administrators get privileged access practices.",
+        "Regular cadence: short monthly or quarterly reinforcement instead of one annual slide deck that everyone forgets.",
+        "Current threat topics: business email compromise, invoice fraud, fake delivery or bank messages, and manipulated voice or video.",
+        "Simple reporting channel: one button or one address to report suspicious mail, answered quickly every time."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Phishing simulations send safe fake emails and measure behavior. Good programs start easy, increase difficulty slowly, and pair every click with just-in-time training: a short lesson shown at the teachable moment, not a punishment. Publicly shaming clickers destroys the reporting culture the program exists to build."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Watch for answers that punish users: they are almost always wrong. The best answer usually pairs simulation with immediate training and rewards reporting. When a question describes an employee who clicked and then reported the mail, treat the report as success, because reporting is the behavior you want to grow."
+    },
+    {
+      "kind": "heading",
+      "text": "Measure behavior, not attendance"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Metric",
+        "Good direction"
+      ],
+      "rows": [
+        [
+          "Phishing click rate",
+          "Falls over time"
+        ],
+        [
+          "Phishing report rate",
+          "Rises over time"
+        ],
+        [
+          "Credential submission rate",
+          "Falls fast"
+        ],
+        [
+          "Training completion",
+          "High and on time"
+        ],
+        [
+          "Repeat clickers",
+          "Shrinking group"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The report rate matters most in the long run. A workforce that reports suspicious mail quickly turns every future campaign into an early-warning system, which is why a rising report rate is celebrated even more than a falling click rate."
+    },
+    {
+      "kind": "try",
+      "title": "Design one campaign month",
+      "steps": [
+        "Pick one audience, for example head office staff, and one theme, for example fake bank alerts.",
+        "Write one learning objective, the simulation difficulty, and the just-in-time training a clicker will see.",
+        "Choose two metrics from the table above and state the direction you want each to move."
+      ],
+      "expected": "A workable month looks like: objective is that staff pause at unexpected urgency and check the sender; difficulty starts easy; clickers get a two-minute coaching page; click rate should fall and report rate should rise compared with last quarter."
+    }
+  ],
+  "cheatsheet": [
+    "Awareness training is recognition-based: teach staff to recognize attacks, then make reporting effortless.",
+    "Phishing simulations: start easy, escalate slowly, and pair every click with just-in-time training, never punishment.",
+    "A click followed by a report is a success story, not a failure.",
+    "Track click rate falling and report rate rising; report rate is the healthiest long-term signal.",
+    "Tailor content to roles and to current local scams, and keep sessions short and frequent."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "In a quarterly phishing simulation, an accountant clicks the link, realizes the mistake, and reports the email within two minutes. What is the best reading of this result?",
+      "choices": {
+        "A": "The program failed because she clicked",
+        "B": "The click proves training must be mandatory weekly",
+        "C": "The click is a miss, but the fast report shows the program is working",
+        "D": "She should be named in the monthly report so others learn"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The goal is a workforce that recognizes and reports. One click with a two-minute report is a self-correcting event and shows the reporting culture is functioning. Punishment or public naming suppresses future reports."
+    }
+  ]
+}

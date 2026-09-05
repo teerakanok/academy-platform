@@ -1,0 +1,145 @@
+{
+  "nodeId": "security-goals-and-controls",
+  "locale": "en",
+  "title": "Security Goals and Controls",
+  "objective": "By the end of this lesson you can name the security goals behind every control, sort controls by type and function, and pick the right control for a given risk.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "What security is trying to achieve"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Every control you will study in this course exists to protect one of three properties, remembered as the CIA triad: confidentiality, integrity, and availability. When an exam question describes a situation, ask which of the three is under threat. That question alone often reveals the answer."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Property",
+        "Plain meaning",
+        "Everyday example"
+      ],
+      "rows": [
+        [
+          "Confidentiality",
+          "Only approved people can read the data",
+          "A pay slip sealed in an envelope"
+        ],
+        [
+          "Integrity",
+          "The data stays correct and unaltered",
+          "A tamper-evident seal on medicine"
+        ],
+        [
+          "Availability",
+          "The system is ready when needed",
+          "A hospital power backup"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Two supporting goals appear throughout the exam. Non-repudiation means the sender cannot later deny having sent a message, usually proven with a digital signature. Authenticity means you can confirm who or what you are talking to, for example with a certificate."
+    },
+    {
+      "kind": "heading",
+      "text": "Control types: where the control lives"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Managerial controls: rules and plans, such as policies, risk assessments, and change management.",
+        "Operational controls: how people run the system, such as awareness training, guard patrols, and incident response.",
+        "Technical controls: something the system enforces, such as firewalls, encryption, and MFA prompts.",
+        "Physical controls: something you can touch, such as locks, fences, cameras, and mantraps."
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Control functions: what the control does"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Function",
+        "Acts when",
+        "Example"
+      ],
+      "rows": [
+        [
+          "Preventive",
+          "Before the event",
+          "Door lock"
+        ],
+        [
+          "Detective",
+          "During or after the event",
+          "Motion sensor log"
+        ],
+        [
+          "Corrective",
+          "After the event, to restore",
+          "Backup restore"
+        ],
+        [
+          "Deterrent",
+          "Discourages the attempt",
+          "Warning sign"
+        ],
+        [
+          "Compensating",
+          "Alternative when the main control is impossible",
+          "Extra monitoring for a legacy system"
+        ],
+        [
+          "Directive",
+          "Directs behavior by rule",
+          "Acceptable use policy"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Expect a scenario naming one control, then a question about its type, its function, or both. A firewall rule is technical and preventive. A camera recording is physical (or technical) and detective. Read the scenario for the clue about when the control acts."
+    },
+    {
+      "kind": "try",
+      "title": "Sort five controls",
+      "steps": [
+        "Take these five items: security guard patrol, firewall rule, staff phishing training, backup restore, and a written password policy.",
+        "For each one, write its type: managerial, operational, technical, or physical.",
+        "Then write its main function: preventive, detective, corrective, deterrent, or directive.",
+        "One item can reasonably fit two types. Note which one and why, because the exam rewards picking the best-fit answer."
+      ],
+      "expected": "Guard patrol is physical and detective or deterrent. Firewall rule is technical and preventive. Training is operational and preventive. Backup restore is technical or operational and corrective. The policy is managerial and directive."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Controls also fail in ways worth naming. A false positive flags normal activity as a threat. A false negative misses a real threat. When the exam asks why a detective control caused an incident review to be missed, look for the false negative."
+    }
+  ],
+  "cheatsheet": [
+    "CIA triad: confidentiality, integrity, availability. Add non-repudiation and authenticity as supporting goals.",
+    "Control types: managerial (rules), operational (people and process), technical (system-enforced), physical (touchable).",
+    "Control functions: preventive stops, detective reveals, corrective restores, deterrent discourages, compensating substitutes, directive instructs.",
+    "False positive: alarm without a threat. False negative: threat without an alarm."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A company cannot patch a legacy machine, so it places the machine on an isolated network segment with extra logging. What kind of control is the extra logging?",
+      "choices": {
+        "A": "Technical and detective",
+        "B": "Compensating and preventive",
+        "C": "Physical and deterrent",
+        "D": "Managerial and corrective"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The logging itself is enforced by the system (technical) and reveals activity that happened (detective). The isolation segment is the compensating part; the logging answers the question asked."
+    }
+  ]
+}

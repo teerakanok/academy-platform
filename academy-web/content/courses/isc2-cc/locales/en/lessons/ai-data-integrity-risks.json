@@ -1,0 +1,113 @@
+{
+  "nodeId": "ai-data-integrity-risks",
+  "locale": "en",
+  "title": "AI Data Integrity Risks",
+  "objective": "By the end of this lesson you can explain model poisoning, describe the privacy risks of AI training data, and say what traceability of AI actions means and why it matters.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Why AI changes the integrity conversation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Traditional software behaves according to its code. A machine-learning model behaves according to its training data, and that creates a new integrity surface: if you corrupt the data, you corrupt the decisions. The 2026 CC outline adds foundational AI security ideas to every domain, and in Domain 1 the focus is data integrity and trustworthiness of AI systems."
+    },
+    {
+      "kind": "heading",
+      "text": "Model poisoning"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Model poisoning (data poisoning) means an attacker injects manipulated data into the training process so the model learns the wrong lessons. One form degrades accuracy across the board, making the model unreliable, which is an attack on availability of trustworthy decisions. Another form installs a backdoor: the model behaves normally on ordinary inputs but misbehaves whenever a secret trigger appears, such as a specific mark or phrase."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Poisoned email filter: trained on attacker-influenced data so specific spam sails through.",
+        "Backdoored image classifier: clean images labeled correctly, but any image with the trigger mark is labeled benign.",
+        "Label flipping: training examples are relabeled (malware marked as benign) so the model internalizes the wrong mapping."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Defenses mirror classic integrity thinking: control who contributes training data, validate and curate datasets, monitor model quality over time, and retrain from trusted sources when quality drifts. The vocabulary the exam wants is poisoning, backdoor trigger, and training data integrity."
+    },
+    {
+      "kind": "heading",
+      "text": "AI training-data privacy"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Models can memorize parts of their training data. When that data contains personal information, two risks appear. First, disclosure: a model may reproduce sensitive training content in its outputs, leaking it to anyone who asks cleverly. Second, inference: attackers may probe a model to determine whether a particular person's record was part of the training set, which itself can be a privacy violation, for example revealing that someone was a patient in a specific program."
+    },
+    {
+      "kind": "paragraph",
+      "text": "The governance answer: treat training data as sensitive data. Minimize what goes in, anonymize or strip identifiers where possible, restrict access to datasets, and test models before deployment to confirm they do not regurgitate personal or confidential content. If the data would be too sensitive to store in a database exposed to user queries, it is too sensitive to train a user-facing model without safeguards."
+    },
+    {
+      "kind": "heading",
+      "text": "Traceability of AI actions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When an AI system takes or recommends an action, such as flagging an email, drafting a reply, or blocking a login, the organization must be able to reconstruct what happened: which model version ran, what inputs it saw, what it output, and who acted on it. That is traceability of AI actions, and it is the AI-era version of the accounting leg of AAA combined with logging discipline."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Traceability depends on logging model versions, prompts or inputs, outputs, and the human decisions that follow, plus keeping those logs tamper-evident. Without it, neither incident response nor legal defense is possible: you cannot investigate what an AI-assisted process did, and you cannot prove what it did not do."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "For AI scenarios, first name which classic property is at stake: poisoned training data is an integrity attack; memorized personal data is a confidentiality and privacy problem; missing logs for AI actions is an accountability and traceability failure. The 2026 outline expects exactly this mapping."
+    },
+    {
+      "kind": "try",
+      "title": "Map AI risks to classic properties",
+      "steps": [
+        "Classify each: (1) an attacker submits subtly mislabeled samples to a public feedback pipeline and the model's accuracy drops; (2) a support chatbot repeats back a customer's personal details that came from its training corpus; (3) a security tool blocks a legitimate login but nobody can determine why because model inputs were not logged.",
+        "Name the classic security property harmed in each.",
+        "Name one control per scenario."
+      ],
+      "expected": "1: integrity of training data (validate contributions, monitor quality). 2: confidentiality and privacy (minimize personal data in training, test for regurgitation). 3: accountability and traceability (log model version, inputs, and outputs)."
+    }
+  ],
+  "cheatsheet": [
+    "Model poisoning = corrupting training data to corrupt decisions; backdoor variants misfire only on a hidden trigger.",
+    "Models can memorize: personal data in training can leak in outputs (disclosure) or be inferred from behavior (membership inference).",
+    "Treat training data as sensitive data: minimize, anonymize, restrict, and test before deployment.",
+    "Traceability of AI actions = logs of model versions, inputs, outputs, and follow-on human decisions, kept tamper-evident.",
+    "Map AI risks to classic properties: poisoning = integrity; memorized data = confidentiality and privacy; missing logs = accountability."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "A spam filter starts misclassifying selected attacker emails as legitimate after the vendor accepted public feedback submissions. What is the best description of this scenario?",
+      "choices": {
+        "A": "A denial-of-service attack on the filter",
+        "B": "A privacy disclosure of training data",
+        "C": "Model poisoning through the training-data pipeline",
+        "D": "An authentication failure"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Attacker-influenced data entered training and bent the model's behavior: that is model poisoning, an integrity attack on the learning pipeline. Nothing was disclosed and the service stayed up."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "After an AI-assisted approval process makes a wrong decision, investigators cannot determine which model version produced the recommendation. Which foundational requirement was missed?",
+      "choices": {
+        "A": "Traceability of AI actions through logging",
+        "B": "Encryption of data in transit",
+        "C": "Network segmentation",
+        "D": "Quantum-resistant cryptography"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Reconstructing what an AI system did requires logs of model versions, inputs, and outputs. Without them there is no traceability, and neither investigation nor defense is possible."
+    }
+  ]
+}

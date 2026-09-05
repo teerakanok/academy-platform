@@ -1,0 +1,119 @@
+{
+  "nodeId": "audits-and-assessments",
+  "locale": "en",
+  "title": "Audits and Assessments",
+  "objective": "By the end of this lesson you can tell an audit from an assessment, contrast a vulnerability scan with a penetration test, and recognize the exercises and agreements that test readiness.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Audit or assessment?"
+    },
+    {
+      "kind": "paragraph",
+      "text": "An audit checks compliance against a defined standard and produces findings an outside party can rely on. An assessment evaluates a situation to help the organization decide what to do, with more freedom of method. Audits are often external and mandatory, such as a PCI DSS audit or an ISO 27001 certification visit; assessments are often internal planning tools, such as a gap assessment before the real audit arrives."
+    },
+    {
+      "kind": "heading",
+      "text": "Scan versus penetration test"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Aspect",
+        "Vulnerability scan",
+        "Penetration test"
+      ],
+      "rows": [
+        [
+          "What it does",
+          "Compares systems to a list of known flaws",
+          "A human tries to exploit weaknesses like an attacker"
+        ],
+        [
+          "Coverage",
+          "Broad, many hosts",
+          "Deep, scoped targets"
+        ],
+        [
+          "Verifies findings?",
+          "No, results can include false positives",
+          "Yes, exploitation proves the finding"
+        ],
+        [
+          "Typical trigger",
+          "Continuous or scheduled",
+          "Annual, or after major change"
+        ],
+        [
+          "Cost and skill",
+          "Lower, tool-driven",
+          "Higher, expert-driven"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Both are attacker-side views of your estate, and both need written authorization before they start. Rules of engagement define what the testers may touch, when, and from where. On the exam, unauthorized testing is never the right answer, even when the technique itself is sound."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "If a question asks for the cheapest way to find unpatched systems across a whole network, choose a vulnerability scan. If it asks for proof that a flaw is actually exploitable, or for a human adversary simulation, choose a penetration test. Remember that scans report possible problems, while a pen test demonstrates real ones."
+    },
+    {
+      "kind": "heading",
+      "text": "Exercises that test people"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A tabletop exercise walks a response team through a scenario in conversation: the facilitator introduces events, and participants talk through what they would do, revealing gaps in the plan before reality does. A simulation or drill goes further and rehearses technical actions. Mature programs run tabletops for ransomware and data breach scenarios at least annually."
+    },
+    {
+      "kind": "heading",
+      "text": "Agreements you will see"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Memorandum of understanding (MOU): a broad, usually non-binding statement of intent between two parties.",
+        "Service-level agreement (SLA): measurable service commitments, such as response times, with consequences when missed.",
+        "Business partner agreement (BPA): obligations between cooperating businesses.",
+        "Non-disclosure agreement (NDA): protects shared confidential information.",
+        "Interconnection security agreement (ISA): security requirements for a direct connection between two organizations' systems."
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Pick the right test",
+      "steps": [
+        "Match each request to the cheapest correct activity: prove the payment portal can be breached before launch; find every missing patch before the quarterly audit; rehearse the incident response plan with the management team.",
+        "For the portal, list two lines you would expect in the rules of engagement before any testing starts."
+      ],
+      "expected": "Portal: penetration test with signed authorization and rules of engagement covering scope, timing, and allowed techniques. Patches: vulnerability scan. Rehearsal: tabletop exercise, followed by a lessons-learned review."
+    }
+  ],
+  "cheatsheet": [
+    "Audit checks compliance against a standard; assessment evaluates a situation to guide decisions.",
+    "Vulnerability scan: broad, cheap, can report false positives. Penetration test: deep, expensive, proves exploitability.",
+    "All attacker-side testing needs written authorization and rules of engagement.",
+    "Tabletop exercise: talk through a scenario to find plan gaps; drills rehearse technical actions.",
+    "Agreements: MOU intent, SLA measurable service, BPA partner obligations, NDA confidentiality, ISA interconnection security."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Management wants proof that a reported flaw in the customer portal is actually exploitable, not just flagged by a scanner. What should they commission?",
+      "choices": {
+        "A": "A full-network vulnerability scan",
+        "B": "An authorized penetration test of the portal",
+        "C": "An internal policy audit",
+        "D": "A tabletop exercise"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Only a penetration test demonstrates exploitability. A scan flags candidates and can be wrong, an audit checks compliance, and a tabletop rehearses people, not systems."
+    }
+  ]
+}

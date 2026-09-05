@@ -1,0 +1,53 @@
+{
+  "locale": "th",
+  "title": "ISC2 Certified in Cybersecurity (CC)",
+  "subtitle": "ใบรับรองด้านความปลอดภัยระดับเริ่มต้น สอนตั้งแต่ศูนย์ ไม่ต้องมีประสบการณ์ทำงาน",
+  "audience": "สำหรับผู้เรียนแบบ self-paced ที่เตรียมสอบ ISC2 CC ตามหลักสูตร 2026-09 โดยไม่ต้องเคยทำงานด้านความปลอดภัยมาก่อน ห้าโมดูลเรียงตามห้าโดเมนของข้อสอบ แต่ละโมดูลมีแล็บแบบมีผู้นำทางและบทฝึกปิดท้าย ทุกบทมีทั้งภาษาอังกฤษและภาษาไทยพร้อมเฉลย checkpoint ที่ตรงกัน แล็บเป็นเชิงป้องกันเท่านั้นและรันบนเครื่องของคุณเอง sandbox ฟรี หรือ surface จำลอง",
+  "outcomes": [
+    "นำหลักการความปลอดภัยที่ข้อสอบวัดไปใช้: CIA, authentication และ authorisation, ความเสี่ยง, controls, จริยธรรม และพื้นฐาน governance (Domain 1, 24%)",
+    "อธิบายแนวคิด business continuity, disaster recovery และ incident response และความสัมพันธ์ระหว่างกัน (Domain 2, 17.3%)",
+    "อธิบายแนวคิด access control ทั้งทางกายภาพและทางตรรกะ และวงจรชีวิตของ identity (Domain 3, 20%)",
+    "จำแนกพื้นฐานความปลอดภัยของ network และ cloud: ภัยคุกคาม โครงสร้างพื้นฐาน การออกแบบที่ปลอดภัย และ service model ของ cloud (Domain 4, 21.3%)",
+    "ปฏิบัติงาน security operations: ความปลอดภัยของข้อมูล hardening แนวปฏิบัติที่ดี และการสร้างความตระหนัก (Domain 5, 17.3%)",
+    "ทบทวนทั้งหลักสูตรใน capstone และวางแผนวันสอบ"
+  ],
+  "skillLabels": {
+    "security-principles": "หลักการความปลอดภัย",
+    "governance": "Governance, BC/DR และ incident response",
+    "iam": "Access control และ identity",
+    "network-cloud": "ความปลอดภัยของ network และ cloud",
+    "sec-ops": "ปฏิบัติการด้านความปลอดภัย"
+  },
+  "nodeTitles": {
+    "cia-and-aaa": "เป้าหมายของ Security: CIA, Non-Repudiation และ AAA",
+    "risk-lifecycle": "วงจรชีวิตของความเสี่ยง",
+    "security-controls-types": "Security Controls: ประเภทและหมวดหมู่",
+    "governance-and-ethics-basics": "พื้นฐาน Governance, Due Care/Due Diligence และจริยธรรม ISC2",
+    "ai-data-integrity-risks": "ความเสี่ยง Integrity ของข้อมูล AI",
+    "principles-practice": "ฝึก: CIA, AAA และประเภทของ Control",
+    "grc-fundamentals": "พื้นฐาน GRC: Policy, Standard และ Framework",
+    "security-awareness-and-culture": "Security Awareness และวัฒนธรรมองค์กร",
+    "metrics-kris-and-reporting": "Metrics, KRI และการรายงาน",
+    "redundancy-and-continuity": "Redundancy, Business Continuity และ Disaster Recovery",
+    "governance-practice": "ฝึก: Risk Register และ KRI",
+    "aaa-in-depth": "AAA เชิงลึก: Factor, Session, SSO และ Federation",
+    "identity-lifecycle": "วงจรชีวิต Identity: Provisioning ถึง Deprovisioning",
+    "access-control-models": "โมเดลและหลักการ Access Control",
+    "mfa-and-iam-tools": "วิธี MFA, เครื่องมือ IAM และ Behavioral Authentication",
+    "iam-practice": "ฝึก: Least Privilege และวงจรชีวิต Identity",
+    "network-fundamentals-threats": "พื้นฐานเครือข่ายและภัยคุกคาม",
+    "network-security-devices": "อุปกรณ์รักษาความปลอดภัยเครือข่าย: Firewall, IDS/IPS, Proxy, VPN",
+    "segmentation-and-zero-trust": "Segmentation, Zero Trust และการแยกสภาพแวดล้อม AI",
+    "cloud-models-shared-responsibility": "โมเดล Cloud และความรับผิดชอบร่วม",
+    "wireless-iot-ics": "Wireless, IoT และ ICS Security",
+    "network-cloud-practice": "ฝึก: ตั้งค่า Network Interface",
+    "monitoring-and-siem": "Monitoring, Logging และ SIEM",
+    "event-triage": "Event Triage: จาก Alert สู่การตัดสินใจ",
+    "threat-actors-and-cti": "Threat Actor, แรงจูงใจ และ Cyber Threat Intelligence",
+    "incident-response-cycle": "วงจร Incident Response, การวางแผน และการซ้อม",
+    "teams-and-security-testing": "Red, Blue, Purple Team และการทดสอบความปลอดภัย",
+    "data-protection-ops": "การปกป้องข้อมูลใน Security Operations",
+    "secops-practice": "ฝึก: Triage และการจัดการข้อมูล",
+    "capstone-cc": "Capstone: ทบทวนทั้งคอร์สและกลยุทธ์วันสอบ"
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "nodeId": "principles-practice",
+  "locale": "en",
+  "title": "Practice: CIA, AAA, and Control Types",
+  "objective": "By the end of this lesson you can label the CIA pillar harmed in one-line scenarios, match controls to preventive, detective, and corrective types, and decide when a system must fail secure.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "You have now read five lessons of definitions, and the exam will hand you none of them as definitions: it hands you one-line stories and expects a label in under a minute. That is a sorting skill, and sorting skills come from reps, not from rereading. This lesson is three short paper drills: label the harm, match the control, spot the fail-secure gap."
+    },
+    {
+      "kind": "heading",
+      "text": "How to run the drills"
+    },
+    {
+      "kind": "paragraph",
+      "text": "For each drill, say your answer out loud before reading the expected result. A wrong answer you hear yourself make is the one you will fix; a wrong answer you only read about fades by tomorrow. Keep every justification to one short sentence: name the harm, the control type, or the failure mode in plain words."
+    },
+    {
+      "kind": "heading",
+      "text": "Drill 1: label the harmed pillar"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Read each one-line scenario and name the CIA pillar that takes the primary hit: confidentiality, integrity, or availability."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "S1 — A customer email list is posted to a public forum after a server break-in.",
+        "S2 — An attacker quietly changes an order quantity from 1 to 100 before checkout.",
+        "S3 — A DNS flood makes the online shop unreachable during a flash sale.",
+        "S4 — An auditor finds last month's access logs were rewritten to hide a rogue login.",
+        "S5 — A stolen, unencrypted laptop exposes employee medical files.",
+        "S6 — A failed firmware update bricks the payment terminals for a full day.",
+        "S7 — An on-path attacker swaps the bank account number inside an emailed invoice.",
+        "S8 — A crypto-mining infection slows the design workstations to a crawl."
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Sort the harm",
+      "steps": [
+        "Label each of S1 to S8 with one CIA pillar: the primary harm, in your own words, in one short sentence.",
+        "Mark any scenario where you can argue a second pillar is also harmed, and name it.",
+        "For S4 only, decide which single control family would have caught the rewrite: hashing and integrity monitoring, or access control on the logs."
+      ],
+      "expected": "S1 confidentiality; S2 integrity; S3 availability; S4 integrity (records altered); S5 confidentiality; S6 availability; S7 integrity; S8 availability. Second-pillar arguments: S1 can include availability if the forum posting forces a takedown; S4 can include confidentiality if the rewrite exposed entries; S8 can include integrity if mined data was altered. S4: hashing and integrity monitoring catches rewrites that access control alone may miss, especially by insiders who already have access."
+    },
+    {
+      "kind": "heading",
+      "text": "Drill 2: match the control to its type"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Each control below does one job first. Label it preventive, detective, or corrective, then add its category: administrative, technical, or physical."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "C1 — Firewall rules blocking inbound SMB from the internet.",
+        "C2 — CCTV cameras at the data center entrance.",
+        "C3 — SHA-256 verification of a vendor-supplied file before install.",
+        "C4 — Quarterly security awareness training for all staff.",
+        "C5 — Restoring encrypted servers from offline backups after ransomware.",
+        "C6 — IDS alerting on a known exploit signature.",
+        "C7 — Account lockout after ten failed password attempts.",
+        "C8 — A lessons-learned meeting that rewrites the password policy after an incident."
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Match control to type",
+      "steps": [
+        "For C1 to C8, write the type: preventive, detective, or corrective.",
+        "Add the category for each: administrative, technical, or physical.",
+        "Pick the one control that would still matter if every preventive control failed, and say why."
+      ],
+      "expected": "C1 preventive technical; C2 detective physical; C3 detective technical; C4 preventive administrative; C5 corrective technical; C6 detective technical; C7 preventive technical; C8 corrective administrative. The one that still matters: C5 — backups and restore are the last line that brings the business back after prevention and detection both fail. C7 earns debate: it prevents continued guessing but the alert on it feeds detection; grade the primary job first."
+    },
+    {
+      "kind": "heading",
+      "text": "Drill 3: spot the fail-secure gap"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When a control loses power or connectivity, it must choose: fail open (keep allowing) or fail secure (keep blocking). Life safety usually wins the argument for doors; security usually wins it for traffic and money."
+    },
+    {
+      "kind": "list",
+      "items": [
+        "F1 — A hospital ward's electronic door locks lose power; staff and patients must still get through.",
+        "F2 — An e-commerce payment-authorization service times out mid-checkout; the site can either let the order through or refuse it.",
+        "F3 — A firewall's rule engine crashes; the vendor supports either pass-all or block-all while it restarts.",
+        "F4 — A data center's biometric door loses its link to the directory; a leftover script unlocks all doors so staff can keep working."
+      ]
+    },
+    {
+      "kind": "try",
+      "title": "Spot the fail-secure gap",
+      "steps": [
+        "For F1 to F4, write fail open or fail secure, plus the value that decides it: life safety, revenue, or security.",
+        "Name which of the four is a dangerous misconfiguration rather than a defensible choice, and say what should replace it.",
+        "Write the one-line rule you would put in policy for door controllers versus network firewalls."
+      ],
+      "expected": "F1 fail open — life safety beats security on doors; pairs with manned override. F2 fail secure — refuse the order; fraud checks lost means the risk falls on the business, so retry with a clear message. F3 fail secure — block-all; a firewall that passes all while broken is a hole, not a control. F4 the dangerous one: unlocking all doors on a directory outage trades a hard problem for an open building; the fix is fail secure with a guarded physical key override. Policy line: doors fail open only where life safety requires it and never silently; traffic controls fail secure by default."
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "On the exam",
+      "text": "Read the harm in plain words before touching the answers: seen by the wrong people is C, altered is I, unusable is A. For control questions, name the control's first job: stop it, see it, or fix it. For crash behavior, life safety argues fail open; almost everything else argues fail secure."
+    },
+    {
+      "kind": "lab",
+      "title": "Lab: Classify the Controls",
+      "description": "Drag ten real controls into preventive, detective, and corrective bins against a graded checklist. Full design: labs/controls-classify.lab.en.md.",
+      "estimatedMinutes": 15,
+      "status": "coming-soon",
+      "scale": "inline"
+    }
+  ],
+  "cheatsheet": [
+    "Label the harm in plain words: seen by the wrong people = confidentiality, altered = integrity, unusable = availability.",
+    "One event can hit two pillars; the exam wants the primary harm in the story.",
+    "Control types by first job: preventive stops it, detective sees it, corrective fixes it; categories are administrative, technical, physical.",
+    "Fail-secure default: block traffic and refuse transactions when a control breaks; fail open only for life safety, with a manned override.",
+    "Backups and restore are the last line that still matters when prevention and detection both fail."
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "After a break-in, an attacker publishes a stolen database of employee medical records on a public website. Which CIA element is harmed MOST?",
+      "choices": {
+        "A": "Integrity",
+        "B": "Confidentiality",
+        "C": "Availability",
+        "D": "Non-repudiation"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The primary harm is exposure: people who should never see the records can now read them. That is confidentiality. The story says nothing about the records being altered or the system going down."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "Which of the following is a detective control?",
+      "choices": {
+        "A": "A firewall rule that blocks inbound SMB",
+        "B": "Requiring dual approval for wire transfers",
+        "C": "Restoring a server from backup after ransomware",
+        "D": "Reviewing SIEM logs for anomalous logins"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Log review finds activity that already happened; it sees rather than stops. The firewall rule stops (preventive), the restore fixes (corrective), and dual approval prevents (preventive)."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "A firewall's rule engine crashes, and by design all traffic is blocked until the engine restarts. Which behavior does this illustrate?",
+      "choices": {
+        "A": "Fail open",
+        "B": "Redundancy",
+        "C": "Fail secure",
+        "D": "Graceful degradation"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "When the control breaks, it keeps blocking: that is fail-secure, the safe default for traffic controls. Fail open would pass all traffic through a broken firewall, which turns an outage into an open door."
+    }
+  ]
+}
