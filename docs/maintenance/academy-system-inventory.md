@@ -1,16 +1,16 @@
 # Academy System Inventory
 
-Status date: `2026-09-03`
+Status date: `2026-09-05`; production release evidence: `../../reports/releases/2026-09-05-production-session-host-gate.md`
 
 ## Current production snapshot
 
 | Surface | Current state | Evidence / notes |
 | --- | --- | --- |
 | Canonical domain | `https://academy.cyberskills.co.th` | behind Cloudflare Access; unauthenticated requests return Access gate `302` |
-| Raw worker endpoint | `https://cyberskills-academy.songpon-te.workers.dev` | reachable; current read-only probe returned `200` |
-| Active deployment | `20f58559-daa8-4b77-81f7-7885686c1a14` | read-only deployment inventory; created `2026-09-02T02:30:39.823497Z` |
-| Active version | `bd4aea53-9137-4d49-a5f4-3a74be959736` | `100%` traffic; version `28`; tag `release-646206ed7cdd`; CPU limit `500 ms` |
-| Residue check | `PASS` | 10 versions inventoried; 9 non-serving versions retained because rollback ownership is not yet unambiguous |
+| Raw worker endpoint | `https://cyberskills-academy.songpon-te.workers.dev` | host-gated: `/`, `/courses`, `/api/leads` return empty no-store `404` |
+| Active deployment | version `6c2e3881-4836-4bee-8bd1-b6e5368b6def` at 100% | `wrangler versions deploy` exit 0, followed by GET smoke 2026-09-05 |
+| Active version | `6c2e3881-4836-4bee-8bd1-b6e5368b6def` | source `c5a169b9`, version 42, tag `release-c5a169b9e567`; predecessor `d4717406` retained for rollback |
+| Residue check | historical PASS; current cleanup not run | all prior versions retained; no release artifact or rollback target deleted |
 | Shared Identity runtime | `60920c9cc08bae2befc22f5c8ddbce5f678fefe9` | Account Center/control API immutable release active; exact GoTrue `v2.186.0`, OTP ambiguity recovery, code-only templates, server-enforced CAPTCHA, and Google Workspace relay |
 | Academy client-assertion diagnostic | source `eb99d9d58f2fe59a0998f2d5dc07842aca0b839d`; not deployed | independently reviewed candidate-only diagnostic; the only attempted run stopped before upload because the Access operator session was unavailable |
 

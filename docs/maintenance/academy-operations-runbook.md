@@ -21,7 +21,7 @@ Use these read-only checks after deploy, rollback, or incident recovery:
 | Check | Expected result |
 | --- | --- |
 | canonical `https://academy.cyberskills.co.th` | `302` to Cloudflare Access while still gated |
-| raw Worker route | empty `404` with `cache-control: no-store` after the host-gate release; the current pre-gate version still returns `200` |
+| raw Worker route | empty `404` with `cache-control: no-store` after the host-gate release; historical pre-gate versions return `200`; the 2026-09-05 release returns `404` |
 | deployment inventory | expected deployment ID and version ID present |
 | residue check | `PASS` |
 | Academy data API health | dedicated container healthy and route reachable |
