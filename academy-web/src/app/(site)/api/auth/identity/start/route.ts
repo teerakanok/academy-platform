@@ -61,7 +61,15 @@ export async function POST(request: Request) {
       if (!browserFlow) return new NextResponse(null, { status: 404 })
       const result = await browserFlow.start(request)
       if (result.kind === 'error') {
-        return NextResponse.json({ ok: false, error: result.error }, { status: result.status })
+        const response = NextResponse.json(
+          { ok: false, error: result.error },
+          { status: result.status },
+        )
+        if (result.status === 429) {
+          response.headers.set('retry-after', '1')
+          response.headers.set('cache-control', 'no-store')
+        }
+        return response
       }
       const response = NextResponse.redirect(new URL(result.location, request.url), result.status)
       for (const cookie of result.cookies) response.headers.append('set-cookie', cookie)

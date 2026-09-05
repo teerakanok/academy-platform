@@ -41,6 +41,7 @@ const ACTIVATION_KEYS = ['revision', 'status'] as const
 const OPAQUE_SESSION_ID = /^[A-Za-z0-9_-]{43}$/
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const CAPACITY_FAILURE = 'เริ่มเข้าสู่ระบบไม่ได้ในขณะนี้'
 
 export type IdentityPostgresTransactionRpcClient = {
   rpc(
@@ -59,9 +60,20 @@ export class IdentityPostgresTransactionStoreFailure extends Error {
   }
 }
 
+export class IdentityTransactionCapacityError extends Error {
+  constructor() {
+    super(CAPACITY_FAILURE)
+    Object.defineProperty(this, 'name', {
+      value: 'IdentityTransactionCapacityError',
+      configurable: true,
+    })
+  }
+}
+
 type CreateResult =
   | { status: 'created'; expiresAt: number }
   | { status: 'duplicate' }
+  | { status: 'capacity_exhausted' }
 
 type ConsumeResult =
   | { status: 'consumed'; transaction: PendingIdentityTransaction }
@@ -140,6 +152,9 @@ export class AcademyPostgresIdentityTransactionStore implements IdentityTransact
     if (!result) throw new IdentityPostgresTransactionStoreFailure()
     if (result.status === 'duplicate') {
       throw new IdentityTransactionStoreError('identity transaction store มี state ที่ยังใช้งานอยู่ซ้ำกัน')
+    }
+    if (result.status === 'capacity_exhausted') {
+      throw new IdentityTransactionCapacityError()
     }
     return snapshotPendingIdentityTransaction({
       ...input,
@@ -384,6 +399,12 @@ function parseCreateResult(value: unknown): CreateResult | null {
   if (!response) return null
   if (hasExactKeys(response, STATUS_RESPONSE_KEYS) && response.status === 'duplicate') {
     return { status: 'duplicate' }
+  }
+  if (
+    hasExactKeys(response, STATUS_RESPONSE_KEYS)
+    && response.status === 'capacity_exhausted'
+  ) {
+    return { status: 'capacity_exhausted' }
   }
   if (!hasExactKeys(response, CREATE_RESPONSE_KEYS) || response.status !== 'created') return null
   const expiresAt = parseCanonicalInstant(response.expiresAt)

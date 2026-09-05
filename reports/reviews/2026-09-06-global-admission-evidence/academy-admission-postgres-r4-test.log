@@ -1,0 +1,48 @@
+
+ RUN  v3.2.7 /private/tmp/academy-security-glm-cde63a58/academy-web
+
+ ❯ |integration| tests/integration/identity-postgres-transaction-store.test.ts (18 tests | 1 failed) 3387ms
+   ✓ identity authorization PostgreSQL transaction boundary > survives an adapter restart while persisting only the browser-binding digest 37ms
+   ✓ identity authorization PostgreSQL transaction boundary > preserves a live transaction after a wrong browser binding and consumes it once with the right binding 41ms
+   ✓ identity authorization PostgreSQL transaction boundary > allows at most one successful concurrent consume across independent adapters 30ms
+   ✓ identity authorization PostgreSQL transaction boundary > leases one callback across concurrent runtimes, records a fixed failure stage, and retries safely 98ms
+   ✓ identity authorization PostgreSQL transaction boundary > does not let an expired stale claim release or finalize a newer owner claim 73ms
+   ✓ identity authorization PostgreSQL transaction boundary > makes the verified-result checkpoint idempotent but rejects changed identity data 74ms
+   ✓ identity authorization PostgreSQL transaction boundary > blocks a rolled-back legacy runtime from consuming any callback already claimed by the new runtime 59ms
+   ✓ identity authorization PostgreSQL transaction boundary > bounds released callback retries and deletes exhausted state 84ms
+   ✓ identity authorization PostgreSQL transaction boundary > deletes an expired transaction before issuing a completion claim 42ms
+   ✓ identity authorization PostgreSQL transaction boundary > expires a completed receipt and never reopens its provider result 82ms
+   ✓ identity authorization PostgreSQL transaction boundary > rechecks database time after a row-lock wait before consuming  1144ms
+   ✓ identity authorization PostgreSQL transaction boundary > rejects concurrent duplicate creation and retains one canonical row 34ms
+   ✓ identity authorization PostgreSQL transaction boundary > starts a full TTL after a successful uniqueness wait  1244ms
+   ✓ identity authorization PostgreSQL transaction boundary > enforces one database-wide outstanding cap across concurrent independent runtimes 48ms
+   × identity authorization PostgreSQL transaction boundary > reclaims capacity after bounded failed exchanges and expired abandoned authorizations 139ms
+     → promise rejected "IdentityTransactionCapacityError: เริ่มเข…" instead of resolving
+   ✓ identity authorization PostgreSQL transaction boundary > deletes an expired transaction durably before returning the expiry classification 35ms
+   ✓ identity authorization PostgreSQL transaction boundary > bounds abandoned-row cleanup on every successful authorization start 36ms
+   ✓ identity authorization PostgreSQL transaction boundary > keeps the table private while exposing only the six callback RPCs to academy_runtime 46ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 17 passed (18)
+   Start at  02:46:40
+   Duration  3.86s (transform 96ms, setup 18ms, collect 98ms, tests 3.39s, environment 0ms, prepare 129ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |integration| tests/integration/identity-postgres-transaction-store.test.ts > identity authorization PostgreSQL transaction boundary > reclaims capacity after bounded failed exchanges and expired abandoned authorizations
+AssertionError: promise rejected "IdentityTransactionCapacityError: เริ่มเข…" instead of resolving
+ ❯ tests/integration/identity-postgres-transaction-store.test.ts:747:31
+    745|     }
+    746|     await expect(new AcademyPostgresIdentityTransactionStore(pgRpcClie…
+    747|       .create(fixture().input)).resolves.toMatchObject({ returnPath: '…
+       |                               ^
+    748|   })
+    749| 
+
+Caused by: IdentityTransactionCapacityError: เริ่มเข้าสู่ระบบไม่ได้ในขณะนี้
+ ❯ AcademyPostgresIdentityTransactionStore.create src/lib/identity/postgres-transaction-store.ts:157:13
+ ❯ tests/integration/identity-postgres-transaction-store.test.ts:746:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

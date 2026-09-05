@@ -29,6 +29,10 @@ const RESULT_KEY_SET_DOCUMENT = JSON.stringify({
 
 let transaction: Record<string, unknown> | undefined
 let rpcCalls: string[] = []
+let createResult: { status: 'created'; expiresAt: string } | { status: 'capacity_exhausted' } = {
+  status: 'created',
+  expiresAt: '2030-01-02T03:04:05.000Z',
+}
 const RATE_LIMIT_SECRET = 'identity-route-test-secret-32-bytes'
 
 beforeEach(async () => {
@@ -52,6 +56,7 @@ beforeEach(async () => {
   vi.stubEnv('IDENTITY_RESULT_KEY_SET_DOCUMENT', RESULT_KEY_SET_DOCUMENT)
   transaction = undefined
   rpcCalls = []
+  createResult = { status: 'created', expiresAt: '2030-01-02T03:04:05.000Z' }
   database.academyDb.mockReturnValue({
     rpc: vi.fn(async (name: string, parameters: Record<string, string>) => {
       rpcCalls.push(name)
@@ -72,7 +77,7 @@ beforeEach(async () => {
           returnPath: parameters.p_return_path,
           expiresAt: '2030-01-02T03:04:05.000Z',
         }
-        return { data: { status: 'created', expiresAt: '2030-01-02T03:04:05.000Z' }, error: null }
+        return { data: createResult, error: null }
       }
       if (name === 'claim_identity_authorization_transaction') {
         return {
@@ -193,5 +198,30 @@ describe('production Identity routes use the real registry composition', () => {
       'Path=/auth/callback', 'HttpOnly', 'Secure', 'SameSite=Lax', 'Max-Age=300',
     ])
     expect(database.academyDb).toHaveBeenCalledTimes(1)
+  })
+
+  it('returns an opaque production capacity refusal through the actual sign-in seam', async () => {
+    vi.stubEnv('NODE_ENV', 'production')
+    createResult = { status: 'capacity_exhausted' }
+
+    const response = await startRoute(await marked(new Request(
+      'https://academy.cyberskills.co.th/api/auth/identity/start',
+      {
+        method: 'POST',
+        headers: {
+          origin: 'https://academy.cyberskills.co.th',
+          host: 'academy.cyberskills.co.th',
+          'content-type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({ next: '/dashboard' }),
+      },
+    )))
+
+    expect(response.status).toBe(429)
+    expect(response.headers.get('retry-after')).toBe('1')
+    await expect(response.text()).resolves.toBe(
+      '{"ok":false,"error":"เริ่มเข้าสู่ระบบไม่ได้ในขณะนี้"}',
+    )
+    expect(rpcCalls).toEqual(['create_identity_authorization_transaction'])
   })
 })

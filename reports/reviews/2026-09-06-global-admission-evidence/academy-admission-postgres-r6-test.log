@@ -1,0 +1,12 @@
+
+ RUN  v3.2.7 /private/tmp/academy-security-glm-cde63a58/academy-web
+
+ ✓ |integration| tests/integration/identity-postgres-transaction-store.test.ts (18 tests) 3488ms
+   ✓ identity authorization PostgreSQL transaction boundary > rechecks database time after a row-lock wait before consuming  1145ms
+   ✓ identity authorization PostgreSQL transaction boundary > starts a full TTL after a successful uniqueness wait  1256ms
+
+ Test Files  1 passed (1)
+      Tests  18 passed (18)
+   Start at  02:50:43
+   Duration  3.88s (transform 74ms, setup 12ms, collect 81ms, tests 3.49s, environment 0ms, prepare 66ms)
+

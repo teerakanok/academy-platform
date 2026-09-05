@@ -8,6 +8,7 @@ import {
   isRetryableAcademyIdentityRuntimeCompletionFailure,
 } from './runtime-completion'
 import { academySessionCookie } from './session-store'
+import { IdentityTransactionCapacityError } from './postgres-transaction-store'
 import {
   beginIdentityAuthorization,
   parseIdentityCallback,
@@ -46,7 +47,7 @@ export type AcademyIdentityRuntimeBrowserFlowResult =
     }
   | {
       kind: 'error'
-      status: 400 | 403 | 413 | 415 | 503
+      status: 400 | 403 | 413 | 415 | 429 | 503
       error: string
       cookies: readonly string[]
     }
@@ -118,7 +119,10 @@ export function createAcademyIdentityRuntimeBrowserFlow(
         return redirectResult(authorization.authorizeUrl, [
           browserBindingCookie(started.state, started.browserBinding),
         ])
-      } catch {
+      } catch (error) {
+        if (error instanceof IdentityTransactionCapacityError) {
+          return errorResult(429, START_FAILURE)
+        }
         return errorResult(503, START_FAILURE)
       }
     }
@@ -133,7 +137,10 @@ export function createAcademyIdentityRuntimeBrowserFlow(
           const form = await readIdentityStartForm(request)
           if (!form.ok) return errorResult(form.status, form.error)
           return await authorize(form.next)
-        } catch {
+        } catch (error) {
+          if (error instanceof IdentityTransactionCapacityError) {
+            return errorResult(429, START_FAILURE)
+          }
           return errorResult(503, START_FAILURE)
         }
       },
@@ -277,7 +284,7 @@ function redirectResult(
 }
 
 function errorResult(
-  status: 400 | 403 | 413 | 415 | 503,
+  status: 400 | 403 | 413 | 415 | 429 | 503,
   error: string,
   cookies: readonly string[] = [],
 ): AcademyIdentityRuntimeBrowserFlowResult {

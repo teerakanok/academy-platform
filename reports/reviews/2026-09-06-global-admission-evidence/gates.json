@@ -1,0 +1,130 @@
+{
+  "utc": "2026-09-05T19:51:58.930324+00:00",
+  "gates": [
+    {
+      "name": "unit",
+      "argv": [
+        "rtk",
+        "proxy",
+        "npx",
+        "vitest",
+        "run",
+        "--project",
+        "unit"
+      ],
+      "cwd": "/private/tmp/academy-security-glm-cde63a58/academy-web",
+      "exit": 0,
+      "log": "academy-global-final-unit.log",
+      "sha256": "7a00462dfdce4876ede1ad81245071f606756f0edef0ed77a7e39fd12c532c88",
+      "utc": "2026-09-05T19:49:40.785994+00:00"
+    },
+    {
+      "name": "lint",
+      "argv": [
+        "rtk",
+        "proxy",
+        "npm",
+        "run",
+        "lint"
+      ],
+      "cwd": "/private/tmp/academy-security-glm-cde63a58/academy-web",
+      "exit": 1,
+      "log": "academy-global-final-lint.log",
+      "sha256": "72ea21b2181f07926f0d4ebfcd23b294b5667835ffa5c69471a8fde664507abb",
+      "utc": "2026-09-05T19:49:48.380429+00:00"
+    },
+    {
+      "name": "tsc-app",
+      "argv": [
+        "rtk",
+        "proxy",
+        "npx",
+        "tsc",
+        "--noEmit"
+      ],
+      "cwd": "/private/tmp/academy-security-glm-cde63a58/academy-web",
+      "exit": 0,
+      "log": "academy-global-final-tsc-app.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "utc": "2026-09-05T19:49:51.912437+00:00"
+    },
+    {
+      "name": "tsc-worker",
+      "argv": [
+        "rtk",
+        "proxy",
+        "npx",
+        "tsc",
+        "-p",
+        "tsconfig.worker.json"
+      ],
+      "cwd": "/private/tmp/academy-security-glm-cde63a58/academy-web",
+      "exit": 0,
+      "log": "academy-global-final-tsc-worker.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "utc": "2026-09-05T19:50:00.190588+00:00"
+    },
+    {
+      "name": "tsc-retention",
+      "argv": [
+        "rtk",
+        "proxy",
+        "npx",
+        "tsc",
+        "-p",
+        "ops/academy-retention-worker/tsconfig.json"
+      ],
+      "cwd": "/private/tmp/academy-security-glm-cde63a58/academy-web",
+      "exit": 0,
+      "log": "academy-global-final-tsc-retention.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "utc": "2026-09-05T19:50:00.869032+00:00"
+    },
+    {
+      "name": "build-cf",
+      "argv": [
+        "rtk",
+        "proxy",
+        "npm",
+        "run",
+        "build:cf"
+      ],
+      "cwd": "/private/tmp/academy-security-glm-cde63a58/academy-web",
+      "exit": 0,
+      "log": "academy-global-final-build-cf.log",
+      "sha256": "b961b9cad5f4974544872a31bd3c2c03ab3896a897fd24ab731bb615b033b76e",
+      "utc": "2026-09-05T19:50:46.338552+00:00"
+    }
+  ],
+  "postgres_evidence": [
+    {
+      "file": "academy-admission-cap-baseline-red.log",
+      "sha256": "15d1009e6b8c4722ab596e96d4c682c9a483d4f5891cd053d203c523e97b32b8"
+    },
+    {
+      "file": "academy-admission-postgres-r3-test.log",
+      "sha256": "839655958e54324e81d3306e26fc288357ab4c3936c0876e26bcbd4a7dd8579e"
+    },
+    {
+      "file": "academy-admission-postgres-r4-test.log",
+      "sha256": "6069e9b454a8565636b1240470bc8f687774dcbe277b65c07d59bcd85789d4e6"
+    },
+    {
+      "file": "academy-admission-postgres-r6-test.log",
+      "sha256": "fa7d49297014293e59524d05fd3a5cb701e0e81170f31286449d16a0a61e0079"
+    },
+    {
+      "file": "academy-admission-postgres-r6.json",
+      "sha256": "087caa918c6a91d9ea89f38c4a43780c331e97f986dd5b886b06aefb4f356944"
+    },
+    {
+      "file": "academy-admission-postgres-r6.mjs",
+      "sha256": "1d959643fb16b3b8b57784488e3dd348effecd1e47e772199b28fa1c071f0d65"
+    },
+    {
+      "file": "academy-admission-cap-baseline.mjs",
+      "sha256": "0f04b0cd55b9f721b7954f0015cd0d6dbd73080c48b528580d09beb329fdacbb"
+    }
+  ],
+  "production_applied": false
+}
