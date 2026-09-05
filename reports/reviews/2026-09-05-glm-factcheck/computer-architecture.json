@@ -1,0 +1,79 @@
+{
+  "course": "computer-architecture",
+  "reviewer": "glm-5.3 (max effort) via glm-worker review mode",
+  "reviewed_on": "2026-09-05",
+  "status": "complete",
+  "summary": "Completed a read-only fact-check of all 48 files under the Computer Architecture course tree: root metadata, build script, EN/TH course metadata, 22 English lessons, and 22 Thai lessons. Audited all 88 checkpoints; EN/TH checkpoint IDs and correct-answer arrays match. Found one wrong/ambiguous answer key, several overgeneralized architecture and OS claims, standards-date issues, portability gaps, and limited Thai drift. No files were changed.",
+  "findings": [
+    {
+      "severity": "critical",
+      "message": "throughput-vs-latency.json cp-2, \"What will adding more worker threads achieve?\", marks C (\"Little — each request still takes as long\") but B is at least equally correct and is the better general answer. Adding workers can reduce observed response latency when requests are queued by serving more requests concurrently; it has little effect only when queueing is absent or cores are already saturated. Reword the scenario to exclude queueing or key B.",
+      "path": "academy-web/content/courses/computer-architecture/locales/en/lessons/throughput-vs-latency.json"
+    },
+    {
+      "severity": "high",
+      "message": "The cheatsheet states, \"Reduced architectures offer four modes: register, immediate, base plus offset, PC-relative,\" but the lesson itself says aarch64 is RISC and has scaled-index and pre-index modes. The nearby claim \"Architectures with complex instruction sets have all of those, and more\" is also not true for every CISC ISA. Scope this to base RISC-V and avoid universal claims about all reduced or complex architectures.",
+      "path": "academy-web/content/courses/computer-architecture/locales/en/lessons/addressing-modes.json"
+    },
+    {
+      "severity": "high",
+      "message": "\"A leaf function calls nothing, so nothing will overwrite its return address, so there is nothing to save — and therefore no frame\" is an invalid universal claim. A leaf can require a frame for spilled values, address-taken locals, variable-length arrays, outgoing stack arguments, or ABI-required stack alignment. Say that the particular trivial leaf needs no frame.",
+      "path": "academy-web/content/courses/computer-architecture/locales/en/lessons/calling-convention.json"
+    },
+    {
+      "severity": "medium",
+      "message": "\"Branches and jumps encode an offset from the current instruction rather than an absolute address\" is too broad. RISC-V conditional branches and JAL are PC-relative, but JALR targets a register plus immediate and is used for indirect branches, returns, and many far calls. Restrict the statement to branch/JAL encoding and note that full position independence can still involve GOT/PLT or other relocations.",
+      "path": "academy-web/content/courses/computer-architecture/locales/en/lessons/addressing-modes.json"
+    },
+    {
+      "severity": "medium",
+      "message": "The table row \"DDR4 | 2014\" is false if \"Introduced\" means standards introduction: JEDEC published JESD79-4 in September 2012. 2014 better describes broader commercial availability. Either date the standard publication correctly or label the column as widespread availability.",
+      "path": "academy-web/content/courses/computer-architecture/locales/en/lessons/ddr-generations.json"
+    },
+    {
+      "severity": "medium",
+      "message": "hit-miss-and-write-policy.json cp-1 keys B, \"Write-allocate fetches each block before writing into it, while writing a complete line lets the hardware skip that fetch,\" as though universal. Full-line behavior is implementation-dependent: conventional write-allocate caches may still fill, while store buffers, write-validate/no-fetch-allocate, non-temporal stores, or write combining can avoid or hide the fill. State the assumed cache policy and present the measured result as implementation-specific.",
+      "path": "academy-web/content/courses/computer-architecture/locales/en/lessons/hit-miss-and-write-policy.json"
+    },
+    {
+      "severity": "medium",
+      "message": "bandwidth-numa-hbm.json cp-3 keys \"Placed every physical page on the initialising thread's node,\" but Linux/NUMA placement is policy- and configuration-dependent. First-touch placement is common under the default local allocation policy, but memory bindings, transparent huge pages, migration, auto-NUMA balancing, and allocation flags can change the outcome. Replace \"every\" with the behavior under a stated default first-touch policy.",
+      "path": "academy-web/content/courses/computer-architecture/locales/en/lessons/bandwidth-numa-hbm.json"
+    },
+    {
+      "severity": "medium",
+      "message": "The lab step \"Take any four-byte word from a real binary and decode it with your program\" followed by \"Compare your answer with objdump on the same address\" is not runnable as written for most learners: no RISC-V binary is supplied, a host binary will not decode as RISC-V, and the default host objdump may lack RISC-V support. Provide a known word/binary and the exact cross-platform objdump invocation or prerequisite toolchain installation.",
+      "path": "academy-web/content/courses/computer-architecture/locales/en/lessons/instruction-formats.json"
+    },
+    {
+      "severity": "medium",
+      "message": "Thai equivalence drift: the Thai paragraph omits the English sentence \"and a pre-index mode that updates the base register.\" Consequently, Thai learners lose the explicit aarch64 exception that qualifies the lesson's RISC-V-only addressing-mode discussion. Add the missing pre-index example to the corresponding Thai paragraph.",
+      "path": "academy-web/content/courses/computer-architecture/locales/th/lessons/addressing-modes.json"
+    },
+    {
+      "severity": "low",
+      "message": "The DDR5 text says \"to 8800 in the current standard\" and identifies JESD79-5C from April 2024. JEDEC's later catalog lists JESD79-5D in November 2025, so the word \"current\" is stale as of 2026. Keep the dated JESD79-5C example but avoid claiming it is the current revision.",
+      "path": "academy-web/content/courses/computer-architecture/locales/en/lessons/ddr-generations.json"
+    },
+    {
+      "severity": "low",
+      "message": "\"A backtrace is a walk over saved return addresses; overflow attacks target the same field\" overgeneralizes debugger behavior. Frame-pointer backtraces are only one mechanism; when frame pointers are omitted, debuggers commonly use DWARF CFI/e unwinder metadata or platform unwind records. Clarify the frame-chain case and mention unwind metadata.",
+      "path": "academy-web/content/courses/computer-architecture/locales/en/lessons/calling-convention.json"
+    },
+    {
+      "severity": "low",
+      "message": "The step \"If your machine has multiple sockets or NUMA nodes, check with: numactl --hardware\" is not portable as written. numactl is a separate Linux package and absent on macOS and many minimal Linux/WSL setups. Provide no-tool Linux alternatives such as lscpu plus /sys NUMA topology, and state the required package when recommending numactl.",
+      "path": "academy-web/content/courses/computer-architecture/locales/en/lessons/bandwidth-numa-hbm.json"
+    },
+    {
+      "severity": "low",
+      "message": "Thai calling-convention cp-1 explanation is malformed: \"และไม่สร้างเลยให้ตัวที่ไม่มี frame มีอยู่เพราะการเรียก\" does not parse coherently and obscures the intended relation between calls and frames. Rewrite it to state that the compiler emits a full frame for a function containing a call and no frame for the call-free example.",
+      "path": "academy-web/content/courses/computer-architecture/locales/th/lessons/calling-convention.json"
+    },
+    {
+      "severity": "info",
+      "message": "The caption \"Measured on an Apple M4\" and the associated custom performance numbers are UNVERIFIED from the repository alone; analogous benchmark claims occur in other lessons. Verification requires the benchmark source, compiler/version and flags, OS/version, core/power configuration, repetition methodology, variance, and machine-reported cache/memory topology. The course appropriately tells learners to reproduce measurements on their own hardware.",
+      "path": "academy-web/content/courses/computer-architecture/locales/en/lessons/cache-friendly-code.json"
+    }
+  ]
+}

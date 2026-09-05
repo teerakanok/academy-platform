@@ -1,0 +1,89 @@
+{
+  "course": "assembly",
+  "reviewer": "glm-5.3 (max effort) via glm-worker review mode",
+  "reviewed_on": "2026-09-05",
+  "status": "complete",
+  "summary": "Reviewed all 14 Assembly nodes in both locales for factual accuracy, checkpoint keys, EN/TH equivalence, and lab runnability. All 56 checkpoint IDs and marked answers are structurally identical across EN/TH; no direct key contradiction or missing checkpoint was found. Materially false or compiler-dependent claims are listed below, and most are mirrored in Thai. Local validation confirmed all course JSON parses, the 14-node prerequisite graph is consistent, and spot-checked Apple clang output matches several supplied x86-64 sequences when x86-64 is forced. On this Apple Silicon host, the documented default cc command instead emits AArch64 and warns that -masm=intel is unused. Coverage: read academy-web/content/courses/assembly/course.json, build-course.mjs, locales/en/course.json, locales/th/course.json, all 14 files under locales/en/lessons/, and all 14 corresponding files under locales/th/lessons/. No files inside the requested assembly course tree were left unread. Governance files outside the course tree were read for repository context only. No external source was fetched; vendor ABI/manual and pinned-toolchain verification remains UNVERIFIED here.",
+  "findings": [
+    {
+      "severity": "critical",
+      "message": "Exact quote: \"you have found the class of bug where a negative length passes a 'less than the buffer size' test by being read as an enormous positive number.\" This is false for an unsigned less-than test: a negative value reinterpreted as a huge unsigned value fails `length < buffer_size`. The usual bug is that a signed comparison admits the negative value, after which unsigned use treats it as huge, or that the wrong comparison direction permits access. The Thai text repeats the same error. Correction: describe the signed comparison and subsequent unsigned use separately; use a concrete two-condition sequence to show exactly which test fails.",
+      "path": "academy-web/content/courses/assembly/locales/en/lessons/arithmetic-and-flags.json"
+    },
+    {
+      "severity": "high",
+      "message": "Exact quote: \"cc -O2 -S -masm=intel -o - prog.c\" does not produce the promised x86-64 output on Apple Silicon. Verified locally: default `cc` emits AArch64 and warns that `-masm=intel` is unused, despite exit success. The audience says macOS without requiring x86-64 hardware. Correction: first verify `uname -m`/`cc -v`, then require Linux/WSL x86-64, an x86-64 container, or macOS `-arch x86_64`/Rosetta, and state expected compiler and version. The Thai lesson needs the same gate.",
+      "path": "academy-web/content/courses/assembly/locales/en/lessons/why-read-assembly.json"
+    },
+    {
+      "severity": "high",
+      "message": "Exact quote: \"Floating-point arguments 1 to 8\" followed by \"xmm0 through xmm7\" states the System V rule too broadly. `float` and `double` use SSE registers, but System V `long double` is not an SSE argument: on Linux/BSD it is classified X87/X87UP, passed in memory, and returned via the x87 stack; platform `long double` representation also differs. Correction: label the row \"float/double SSE arguments\" and separately document `long double` and vector classifications. The Thai \"อาร์กิวเมนต์ทศนิยม\" repeats the overstatement.",
+      "path": "academy-web/content/courses/assembly/locales/en/lessons/abi-and-calling-convention.json"
+    },
+    {
+      "severity": "high",
+      "message": "Exact table entry: \"return f(x)\" / \"Yes, always\" is false as a language or ABI guarantee. Tail-call elimination depends on compiler, optimization flags, prototypes/return types, calling conventions, stack cleanup, variadic rules, interposition rules, and safety constraints. The nearby claim \"At -O2 there is NO call instruction\" is a particular compiler result, not universal. Correction: change to \"can often become an indirect `jmp` when the ABI permits it\" and pin the observed toolchain or present both optimized and unoptimized outputs.",
+      "path": "academy-web/content/courses/assembly/locales/en/lessons/recursion-in-assembly.json"
+    },
+    {
+      "severity": "high",
+      "message": "Exact quote: \"sigaltstack(&ss, NULL);\" appears after file-scope declarations without being placed inside a function; `sigaltstack` and `sigaction` calls cannot appear at file scope in C, so the block is not runnable if copied as shown. Correction: put registration in `main` before recursion, wrap with a function that has a prototype, check both return values, and show `_exit` only inside the signal handler. The Thai code block repeats the layout problem.",
+      "path": "academy-web/content/courses/assembly/locales/en/lessons/recursion-in-assembly.json"
+    },
+    {
+      "severity": "medium",
+      "message": "Exact quote: \"which is why the compiler adds it only when a local array exists.\" Stack-protector behavior is configuration- and toolchain-dependent: `-fstack-protector` is not universal by default, `-fstack-protector-strong` covers more address-taken aggregates, and `-fstack-protector-all` covers functions without arrays. Correction: state the exact default/flag, compare `-fstack-protector-strong` with `-fno-stack-protector`, and avoid the universal \"only when\" rule.",
+      "path": "academy-web/content/courses/assembly/locales/en/lessons/stack-frames.json"
+    },
+    {
+      "severity": "medium",
+      "message": "Checkpoint `cp-1` marks C: \"Look for a jump whose target address is lower than the jump's own address\" in response to \"How do you find every loop in a disassembly?\", and the explanation says it works \"regardless of ... optimisation level.\" That rule misses a loop whose back edge is an indirect/computed jump without a statically known lower target, and it is not a complete method for arbitrary binaries. Correction: qualify the question to ordinary compiler-generated loops with direct back edges, or teach CFG recovery plus indirect-edge resolution; no offered option is universally correct.",
+      "path": "academy-web/content/courses/assembly/locales/en/lessons/loops-in-assembly.json"
+    },
+    {
+      "severity": "medium",
+      "message": "Exact quote: \"The SAME loop compiled at -O2 instead of -O1\" and the lab expect a vector loop and scalar tail. Auto-vectorization at `-O2` is compiler/version/target dependent: older GCC did not enable it at `-O2`, and cost models can choose scalar code even when enabled. Correction: pin a tested compiler, show exact version/options, or use `-O3`/explicit vectorization settings and instruct learners to compare either valid result.",
+      "path": "academy-web/content/courses/assembly/locales/en/lessons/loops-in-assembly.json"
+    },
+    {
+      "severity": "medium",
+      "message": "Exact quote: \"A compiled binary contains no types.\" That is false for binaries retaining DWARF, PDB-type data, RTTI/reflection metadata, or explicit layout metadata. The intended claim is that machine instructions and address arithmetic do not require source-level types. Correction: say \"stripped machine code/debug information\" or \"this exercise assumes no type metadata.\"",
+      "path": "academy-web/content/courses/assembly/locales/en/lessons/arrays-in-assembly.json"
+    },
+    {
+      "severity": "medium",
+      "message": "Exact lab quote: \"Reorder the fields to remove padding and recompile; watch the scale change\" plus expected \"a stride that shrinks when you reorder the fields.\" Reordering removes padding only for some layouts. For the lesson's `struct Big { long a; int b; char c; }` under the x86-64 C ABI, all field orders still require 16 bytes due to alignment of `long`/the aggregate. Correction: provide a specific layout where reordering reduces stride, such as one chosen to demonstrate removed padding, and tell learners that alignment can make size unchanged.",
+      "path": "academy-web/content/courses/assembly/locales/en/lessons/arrays-in-assembly.json"
+    },
+    {
+      "severity": "medium",
+      "message": "Checkpoint `arithmetic-and-flags cp-4` marks \"The value was signed\" solely because of `sar`. The instruction proves an arithmetic right shift and is strong evidence the value is treated as signed, but range/semantic context can permit SAR on an unsigned source value, so it does not prove the original C type. Correction: reword the answer to \"the operation treats the value as signed\" or make the prompt explicitly ask about operation semantics rather than recovered source type.",
+      "path": "academy-web/content/courses/assembly/locales/en/lessons/arithmetic-and-flags.json"
+    },
+    {
+      "severity": "medium",
+      "message": "Exact quote: \"Raise the stack limit with ulimit -s and confirm the depth scales as predicted.\" This is not always runnable: soft limits cannot exceed hard limits, policy can deny the change, shell/macOS limits differ, and thread stacks do not follow the main-thread `ulimit` value. Correction: first show `ulimit -Hs`, use a subshell for a permitted temporary change, provide a failure path, and state that the calculation applies to the measured main-thread stack.",
+      "path": "academy-web/content/courses/assembly/locales/en/lessons/recursion-in-assembly.json"
+    },
+    {
+      "severity": "low",
+      "message": "Exact quote: \"The binary is the only account of what a program does that is guaranteed to be accurate, because it is the thing that runs.\" Static file bytes alone are not always the executing account: relocations, dynamic loaders/JIT, self-modifying code, and runtime patching can change behavior. Correction: say the loaded, patched process plus its executable mappings are authoritative, and distinguish static disassembly from runtime evidence.",
+      "path": "academy-web/content/courses/assembly/locales/en/lessons/reading-real-disassembly.json"
+    },
+    {
+      "severity": "low",
+      "message": "Exact quote: \"RISC-V would have used exactly 4 bytes for every one of them.\" That is true for uncompressed base RISC-V instructions, but the common C extension permits 2-byte compressed instructions. Correction: say \"uncompressed RISC-V base instructions\" or show an RV64 target without compressed extensions.",
+      "path": "academy-web/content/courses/assembly/locales/en/lessons/objdump-and-gdb.json"
+    },
+    {
+      "severity": "low",
+      "message": "Exact quote: \"There is no call stack in the hardware.\" As a baseline-frame statement it is useful, but x86 processors with CET and enabled shadow stacks do maintain hardware return-state tracking in addition to the ordinary writable stack. Correction: say the ABI does not require a conventional frame chain, while noting optional hardware shadow-stack support.",
+      "path": "academy-web/content/courses/assembly/locales/en/lessons/call-and-ret.json"
+    },
+    {
+      "severity": "low",
+      "message": "Thai quality issue, exact quote: \"กิ่งที่คุณกำลังโทษอาจไม่มีอยู่\" and the course repeatedly translates control-flow \"branch\" as \"กิ่ง\". This literal tree-limb wording is unnatural for machine-code branches and can read as broken Thai. Correction: retain \"branch\" or use a clearer phrase such as \"คำสั่งกระโดดแบบมีเงื่อนไข\" consistently.",
+      "path": "academy-web/content/courses/assembly/locales/th/lessons/why-read-assembly.json"
+    }
+  ]
+}

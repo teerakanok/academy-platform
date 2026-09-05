@@ -1,0 +1,84 @@
+{
+  "course": "computer-networking",
+  "reviewer": "glm-5.3 (max effort) via glm-worker review mode",
+  "reviewed_on": "2026-09-05",
+  "status": "complete",
+  "summary": "Completed a read-only audit of all 51 Computer Networking course JSON files, including every English lesson and checkpoint, structural Thai/English comparison, semantic Thai sampling, command portability, and focused standards/man-page checks. Found three critical factual/key issues, several high-impact protocol and lab errors, one Thai drift, and no changed files.",
+  "findings": [
+    {
+      "severity": "critical",
+      "message": "Exact quote: \"addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);\". This is wrong: INADDR_LOOPBACK is already represented in network byte order (locally read system header defines 0x7f000001), while htonl produces 0x0100007f, or 1.0.0.127. The complete server therefore does not bind to loopback as claimed. Use INADDR_LOOPBACK directly; the same erroneous pattern is repeated in client-and-server.json.",
+      "path": "academy-web/content/courses/computer-networking/locales/en/lessons/socket-api.json"
+    },
+    {
+      "severity": "critical",
+      "message": "Checkpoint cp-1 explanation says: \"The IP address is the final destination and never changes.\" This is stated as universal and directly contradicts the later NAT lesson. NAPT rewrites the source/destination IP address and port; special middleboxes can also rewrite addresses. Correction: outside NAT the destination IP remains constant, and the destination MAC changes at every hop.",
+      "path": "academy-web/content/courses/computer-networking/locales/en/lessons/arp-and-icmp.json"
+    },
+    {
+      "severity": "critical",
+      "message": "how-machines-talk cp-4 marks B as the explanation that is \"NOT plausible\", but a route becoming shorter between two requests is possible: routing changes, failover, and CDNs can change the path quickly. TLS resumption, DNS caching, and connection reuse are also all plausible, so the question has no unambiguous correct choice. Reword to ask for the common explanation or provide only one plausible option.",
+      "path": "academy-web/content/courses/computer-networking/locales/en/lessons/how-machines-talk.json"
+    },
+    {
+      "severity": "high",
+      "message": "The course promises \"a working Unix-like shell\", but required labs use Linux-only iproute2 commands, procfs, and epoll, including \"ip route\", \"ss -tunap\", \"/proc/<pid>/status\", and \"epoll_wait\". On this macOS host, ip, ss, and an epoll executable are absent. Require Linux/WSL explicitly, or provide portable alternatives such as ifconfig/netstat, sysctl/ps, and kqueue on macOS.",
+      "path": "academy-web/content/courses/computer-networking/locales/en/course.json"
+    },
+    {
+      "severity": "high",
+      "message": "The exercise says: \"Run it again immediately and compare the two connect times\" and expects caching, connection reuse, and TLS resumption. Separate curl process invocations do not reuse the TCP connection and normally do not share a TLS session cache. Only OS DNS caching may persist. Correct the exercise to use one curl process with multiple transfers, a browser session, or a program that retains a TLS session. UNVERIFIED locally across processes because network execution was unavailable; verify by timing separate curl invocations with -w and -v.",
+      "path": "academy-web/content/courses/computer-networking/locales/en/lessons/how-machines-talk.json"
+    },
+    {
+      "severity": "high",
+      "message": "Checkpoint cp-1 and the cheat sheet say 5 bytes over TCP/IPv4/Ethernet put \"About 59\" bytes on the wire, while the same lesson states real Ethernet pads the frame to 64 bytes including the FCS. 59 is only the Ethernet+IP+TCP header/payload accounting without FCS/padding; the actual minimum Ethernet frame is 64 bytes. Separate those two measurements or offer 64 as the actual on-wire answer.",
+      "path": "academy-web/content/courses/computer-networking/locales/en/lessons/layers-and-encapsulation.json"
+    },
+    {
+      "severity": "high",
+      "message": "Exact claim: \"Change a field's type | No | The bytes are interpreted differently\". Protobuf field changes are not universally incompatible: many changes are wire-compatible when the wire type is unchanged, including signed varint families and string/bytes under the documented compatibility rules. Type changes that change the wire type can be incompatible. Correct the table to distinguish compatible type conversions from incompatible wire-type changes.",
+      "path": "academy-web/content/courses/computer-networking/locales/en/lessons/grpc-and-protobuf.json"
+    },
+    {
+      "severity": "high",
+      "message": "Exact claim: \"a 4xx will fail again identically\". This is false as a universal rule: 401 can succeed after authentication, 403 after authorization changes, 409 after the conflict is resolved, and 429 commonly becomes valid after the Retry-After interval. Correction: most 4xx responses should not be blindly retried unchanged, but retry policy must consider the specific status, method, and headers.",
+      "path": "academy-web/content/courses/computer-networking/locales/en/lessons/http-basics.json"
+    },
+    {
+      "severity": "high",
+      "message": "Exact claim: \"Every one of those works by making the connection outbound from the perspective of the NAT.\" Port forwarding is listed immediately above and is an inbound mapping; it does not work by making an outbound connection. The statement is valid for hole punching, relays, and reverse tunnels, not port forwarding.",
+      "path": "academy-web/content/courses/computer-networking/locales/en/lessons/nat.json"
+    },
+    {
+      "severity": "high",
+      "message": "NAT cp-4 says only: \"Check for an address inside 100.64.0.0/10.\" A client's LAN address is often still 192.168.x.x or 10.x.x.x behind its own router, while the public-echo service shows the final public address, not the carrier's 100.64 intermediate. To detect CGNAT, inspect the router WAN/upstream interface and compare it with the public address seen externally; the current check can produce a false negative.",
+      "path": "academy-web/content/courses/computer-networking/locales/en/lessons/nat.json"
+    },
+    {
+      "severity": "high",
+      "message": "tcp-handshake cp-2 says a refusal \"proves the packet reached the machine\". An immediate refusal only proves that some network element sent an answer: a firewall, load balancer, or middlebox can generate RST before the destination host receives anything. Correction: refusal proves a reachable responder rejected the connection, not necessarily that the destination host or service was reached.",
+      "path": "academy-web/content/courses/computer-networking/locales/en/lessons/tcp-handshake.json"
+    },
+    {
+      "severity": "high",
+      "message": "Thai-only cheat-sheet entry: \"วัดจริง: ping -s 1472 ผ่าน ส่วน -s 1473 สูญหาย 100%\". This adds a claim absent from the English cheat sheet and contradicts the lesson's statement that a 1473-byte ping without the don't-fragment flag can succeed through fragmentation. Include the DF condition or remove this extra Thai entry; all other Thai files had matching block/checkpoint structure and checkpoint answers.",
+      "path": "academy-web/content/courses/computer-networking/locales/th/lessons/layers-and-encapsulation.json"
+    },
+    {
+      "severity": "medium",
+      "message": "The gRPC lab says: \"Capture the traffic with tcpdump and compare its readability\" without establishing plaintext h2c or TLS key capture. A normal TLS-protected gRPC session is deliberately unreadable without a key log or plaintext test endpoint, so the step cannot produce the requested comparison on many default setups. Specify a local h2c server or TLSKEYLOGFILE-based capture setup.",
+      "path": "academy-web/content/courses/computer-networking/locales/en/lessons/grpc-and-protobuf.json"
+    },
+    {
+      "severity": "medium",
+      "message": "Exact claim: \"read and write now return -1 with EAGAIN after 5 seconds\". SO_RCVTIMEO/SO_SNDTIMEO result reporting is implementation-dependent; Linux commonly uses EAGAIN, while portable POSIX code must be prepared for EAGAIN/EWOULDBLOCK and documented platform behavior. State this as Linux behavior or test both error values.",
+      "path": "academy-web/content/courses/computer-networking/locales/en/lessons/error-handling.json"
+    },
+    {
+      "severity": "info",
+      "message": "Coverage: read computer-networking/course.json, locales/en/course.json, locales/th/course.json, and all 24 English plus all 24 Thai lesson JSON files (51 JSON files total), with structural comparison of node IDs, block sequences, checkpoint IDs/choices/answers, and sampled Thai semantic review. build-course.mjs was not read because it is generator tooling rather than learner-facing course content.",
+      "path": "academy-web/content/courses/computer-networking"
+    }
+  ]
+}

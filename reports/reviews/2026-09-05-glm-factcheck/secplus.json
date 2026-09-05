@@ -1,0 +1,94 @@
+{
+  "course": "secplus",
+  "reviewer": "glm-5.3 (max effort) via glm-worker review mode",
+  "reviewed_on": "2026-09-05",
+  "status": "needs_review",
+  "summary": "Needs review before publication as final exam-prep material: all reviewed answer keys and vendor exam facts check out, but two lesson-body factual overstatements and several version, scope, availability, and Thai-language precision issues should be corrected first. No critical wrong-answer-key or false exam-fact finding was identified.",
+  "findings": [
+    {
+      "severity": "high",
+      "message": "“A digital signature hashes the message, then encrypts the digest with the sender's private key, giving integrity plus non-repudiation.” This is textbook RSA-signing shorthand, not a universal definition: ECDSA, EdDSA, and other schemes use a private-key signing operation rather than encryption. Correction: sign the message hash with the algorithm’s private-key signing operation and verify it with the corresponding public key.",
+      "path": "academy-web/content/courses/comptia-security-plus/locales/en/lessons/cryptographic-solutions.json"
+    },
+    {
+      "severity": "high",
+      "message": "“GDPR: European Union privacy law covering personal data of EU residents, including breach notification duties.” This incorrectly narrows GDPR scope: Article 3 concerns processing in the Union and personal data of data subjects who are in the Union, regardless of residence; EU establishment can also bring otherwise global processing into scope. Correction: “personal data of data subjects in the EU/EEA,” with the applicable territorial-scope conditions.",
+      "path": "academy-web/content/courses/comptia-security-plus/locales/en/lessons/governance-and-compliance.json"
+    },
+    {
+      "severity": "medium",
+      "message": "“NIST Cybersecurity Framework (CSF): voluntary, risk-based, free to use. Its six functions are Govern, Identify, Protect, Detect, Respond, and Recover.” The list is correct for CSF 2.0, but the lesson omits the version even though SY0-701 predates CSF 2.0 and CSF 1.1 has five functions. Correction: explicitly teach “NIST CSF 2.0” and note that Govern was added in 2.0.",
+      "path": "academy-web/content/courses/comptia-security-plus/locales/en/lessons/governance-and-compliance.json"
+    },
+    {
+      "severity": "medium",
+      "message": "“Every credential attack is answered by unique passwords, MFA, or both.” Keylogging is listed immediately above as a credential attack but is not reliably prevented by password uniqueness, and some keyloggers can capture OTPs or MFA prompts. Correction: scope the claim to guessing, stuffing, and spraying, or add endpoint anti-malware, hardened input paths, and phishing-resistant MFA as keylogger controls.",
+      "path": "academy-web/content/courses/comptia-security-plus/locales/en/lessons/common-attacks.json"
+    },
+    {
+      "severity": "medium",
+      "message": "“rules are read top-down, the first matching rule wins, and whatever no rule claims falls through to an implicit deny at the bottom.” Rule evaluation and unmatched-action behavior are firewall-vendor and configuration dependent; some policies default to permit unless an explicit final deny exists. Correction: teach first-match ordering as common behavior, then recommend an explicit final deny/default-deny rule rather than presenting implicit deny as universal.",
+      "path": "academy-web/content/courses/comptia-security-plus/locales/en/lessons/enterprise-security-forms.json"
+    },
+    {
+      "severity": "medium",
+      "message": "“TLS VPNs serve applications through a browser, IPsec tunnels join networks.” This overgeneralizes implementation capabilities: TLS/SSL VPN products can provide network or client access, while IPsec supports both site-to-site and remote-access modes. Correction: say TLS VPNs “commonly” expose portal/client-based access and classify by implementation and access mode rather than protocol alone.",
+      "path": "academy-web/content/courses/comptia-security-plus/locales/en/lessons/enterprise-security-forms.json"
+    },
+    {
+      "severity": "medium",
+      "message": "UNVERIFIED prevalence claim: “Email: phishing remains the top opening move.” No dated breach dataset or threat-intelligence source is cited, and leading initial-access vectors vary by population and year. Correction: hedge the claim or cite a dated, reputable breach report; verification requires a current dataset with comparable initial-access categories.",
+      "path": "academy-web/content/courses/comptia-security-plus/locales/en/lessons/threat-actors-and-vectors.json"
+    },
+    {
+      "severity": "medium",
+      "message": "UNVERIFIED prevalence claim: “Most breaches begin with a person, then a computer.” This is broader than the common “human element involved” statistic and is not sourced. Correction: hedge it or cite a dated report whose definition supports “begin with”; verification requires a breach dataset that identifies initial access rather than merely human involvement.",
+      "path": "academy-web/content/courses/comptia-security-plus/locales/en/lessons/common-attacks.json"
+    },
+    {
+      "severity": "medium",
+      "message": "“All labs are defensive and run on your own computer or a free sandbox; nothing targets third-party systems.” This conflicts with the scoped lesson data: seven lab blocks are marked “coming-soon.” The Thai manifest makes the same claim. Correction: qualify the statement as applying only to ready labs, or finish and release the remaining labs before publishing the blanket availability promise.",
+      "path": "academy-web/content/courses/comptia-security-plus/locales/en/course.json"
+    },
+    {
+      "severity": "medium",
+      "message": "UNVERIFIED course-capability claim: “Take the practice exam in this course with a hard 54-minute timer for the 35 questions…” The scoped tree contains 45 prompted checkpoint questions plus one simulation, but no explicit 35-question assessment node or exam definition. A platform-generated assessment outside this content tree could satisfy the claim. Correction/verification: expose or document the generated 35-item assessment and its 54-minute timer; otherwise change the instruction to match the actual scoped assessment.",
+      "path": "academy-web/content/courses/comptia-security-plus/locales/en/lessons/capstone-secplus.json"
+    },
+    {
+      "severity": "low",
+      "message": "“Note that 203.0.113.x is a documentation-only range used in training material precisely because it can never belong to a real host.” The range is reserved for documentation and is not globally routable, but it can be configured on private or laboratory hosts. Correction: “cannot be used as a globally routable public Internet host address.”",
+      "path": "academy-web/content/courses/comptia-security-plus/locales/en/lessons/operations-practice.json"
+    },
+    {
+      "severity": "low",
+      "message": "Thai unnaturalness: “shared secret key หนึ่งดอก” uses an unnatural classifier for a cryptographic key. Correction: “shared secret key หนึ่งค่า” or “shared secret key รายการเดียว,” while retaining the English technical term as industry practice.",
+      "path": "academy-web/content/courses/comptia-security-plus/locales/th/lessons/cryptographic-solutions.json"
+    },
+    {
+      "severity": "low",
+      "message": "Thai unnaturalness: “tunnel เข้ารหัสกลับบ้าน” is colloquial and can obscure the intended destination. Correction: “encrypted tunnel กลับยังระบบ/ศูนย์ควบคุมขององค์กร,” keeping “encrypted tunnel” in English where appropriate.",
+      "path": "academy-web/content/courses/comptia-security-plus/locales/th/lessons/cloud-and-edge-security.json"
+    },
+    {
+      "severity": "low",
+      "message": "Thai technical-translation defect: “สื่อ backup จดหมายเหตุ” renders “archival backup media” as historical-record media and is unnatural in a forensics context. Correction: “สื่อสำรองข้อมูลที่จัดเก็บถาวร (archival media),” with the English term retained for clarity.",
+      "path": "academy-web/content/courses/comptia-security-plus/locales/th/lessons/operations-practice.json"
+    },
+    {
+      "severity": "low",
+      "message": "Thai unnaturalness: “โปรแกรมความปลอดภัยวัยเยาว์” literally describes a juvenile program rather than a newly established or immature security program. Correction: “โปรแกรมความปลอดภัยที่เพิ่งเริ่มต้น” or “โปรแกรมที่ยังไม่เต็มรูปแบบ.”",
+      "path": "academy-web/content/courses/comptia-security-plus/locales/th/lessons/governance-and-compliance.json"
+    },
+    {
+      "severity": "info",
+      "message": "All 45 prompted checkpoint questions and simulation checkpoint “cp-sensor-gateway” were reviewed. No definitively wrong answer key, ambiguous key, or explanation contradiction was found. EN/TH checkpoint IDs, choice keys, and correct arrays match. The stated SY0-701 facts—maximum 90 questions, 90 minutes, 750 passing score on 100–900, domain weights 12/22/18/28/20 percent, and exact domain names—match the vendor-published exam materials.",
+      "path": "academy-web/content/courses/comptia-security-plus/locales/en/lessons/capstone-secplus.json"
+    },
+    {
+      "severity": "info",
+      "message": "Coverage complete: read course.json, locales/en/course.json, locales/th/course.json, and both locales/en/lessons/ and locales/th/lessons/ for architecture-models, architecture-practice, asset-and-change-management, audits-and-assessments, capstone-secplus, certificates-and-pki-ops, change-management-process, cloud-and-edge-security, common-attacks, cryptographic-solutions, enterprise-security-forms, forensics-and-incident-response, general-concepts-practice, governance-and-compliance, hardening-and-configuration, identity-and-privilege-ops, malware-types, mitigation-matrix-and-attack-frameworks, monitoring-and-logging, operations-practice, program-mgmt-practice, resiliency-architecture, risk-management, security-awareness-program, security-goals-and-controls, threat-actors-and-vectors, threats-practice, and vulnerability-management. No required lesson file was omitted; EN/TH nodeId sets and block structures match.",
+      "path": "academy-web/content/courses/comptia-security-plus"
+    }
+  ]
+}

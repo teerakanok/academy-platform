@@ -1,0 +1,94 @@
+{
+  "course": "c-low-level",
+  "reviewer": "glm-5.3 (max effort) via glm-worker review mode",
+  "reviewed_on": "2026-09-05",
+  "status": "complete",
+  "summary": "Reviewed all 51 files in the requested course tree: course manifests plus 24 lessons in English and Thai. All 96 checkpoint keys match structurally and semantically between locales; no missing blocks, changed answers, broken Thai, or translation drift was found. JSON parsing passed for 51/51 files. No definitively wrong answer key was found, but one checkpoint is ambiguously worded and several universal claims about sanitizers, compiler output, platform layouts, and undefined behavior need qualification.",
+  "findings": [
+    {
+      "severity": "critical",
+      "message": "Quote: \"Any sanitizer report exits non-zero, so the check fails and the pull request cannot be merged.\" UBSan reports are often recoverable by default and can return exit status 0. Correction: use `-fno-sanitize-recover=all` or `UBSAN_OPTIONS=halt_on_error=1:abort_on_error=1` when the CI job must fail on UBSan diagnostics; ASan failures do terminate by default.",
+      "path": "academy-web/content/courses/c-low-level/locales/en/lessons/finding-memory-bugs.json"
+    },
+    {
+      "severity": "critical",
+      "message": "Checkpoint `finding-memory-bugs` coverage table quote: \"Out-of-bounds on heap, stack and globals; use-after-free; use-after-return; double free; leaks.\" Plain `-fsanitize=address` does not guarantee use-after-return detection—it commonly requires compiler/runtime mode options—and leak detection is platform-dependent, as the course itself later notes for Apple clang. Correction: state the required use-after-return flags and qualify leak support by platform/toolchain.",
+      "path": "academy-web/content/courses/c-low-level/locales/en/lessons/finding-memory-bugs.json"
+    },
+    {
+      "severity": "high",
+      "message": "Checkpoint `compilation-pipeline` cp-4 asks, \"Why compile with -O0 while learning?\" but marked answer B is \"The debugger no longer matches your source.\" That states an effect of optimization, not a reason for `-O0`; Thai has the same polarity problem. Correction: “With `-O0`, the debugger more closely matches your source; optimization may reorder or remove code.”",
+      "path": "academy-web/content/courses/c-low-level/locales/en/lessons/compilation-pipeline.json"
+    },
+    {
+      "severity": "high",
+      "message": "Quote: \"nm math_utils.o / 0000000000000000 T add\". On macOS Mach-O object files, symbols are normally reported as `_add` and `_main`, so the displayed output is not what a real macOS toolchain produces. Correction: label the output as Linux ELF output and show `_add`/`_main` for macOS.",
+      "path": "academy-web/content/courses/c-low-level/locales/en/lessons/object-files-and-symbols.json"
+    },
+    {
+      "severity": "high",
+      "message": "Quote: \"The sanitizer names the last one precisely: stack-use-after-return.\" The preceding lab only says to compile with `-fsanitize=address`; without explicitly enabling stack-use-after-return instrumentation/runtime behavior, detection is not guaranteed. Correction: provide the exact compiler/runtime options or describe the result as conditional.",
+      "path": "academy-web/content/courses/c-low-level/locales/en/lessons/functions-and-scope.json"
+    },
+    {
+      "severity": "high",
+      "message": "Quote: \"Write the is_admin example above and confirm the flag changes without being assigned.\" Compiler layout, padding, optimization, and intervening execution can prevent that observable result; under AddressSanitizer the invalid write is reported before the lesson's intended corruption outcome. Correction: instruct learners to observe an out-of-bounds report, not guaranteed mutation of a neighboring variable.",
+      "path": "academy-web/content/courses/c-low-level/locales/en/lessons/memory-bug-patterns.json"
+    },
+    {
+      "severity": "high",
+      "message": "Quote: \"Signed overflow behaving differently at two optimisation levels and being named by the sanitizer\". Undefined behavior permits different output but does not guarantee it; GCC/Clang often print the same wrapped-looking value at both `-O0` and `-O2` for this simple program. Correction: make differing output a possible observation and require only UBSan reporting as the deterministic result.",
+      "path": "academy-web/content/courses/c-low-level/locales/en/lessons/integer-representation.json"
+    },
+    {
+      "severity": "medium",
+      "message": "Quote: \"int b; /* 4 bytes — must start on a 4-byte boundary */\" and \"sizeof == 12\" are ABI-specific, not C guarantees; `int` size and alignment vary, and x86-64 permits unaligned integer access. Correction: present 12 bytes as a common x86-64 ABI example and derive actual offsets with `offsetof`.",
+      "path": "academy-web/content/courses/c-low-level/locales/en/lessons/structs.json"
+    },
+    {
+      "severity": "medium",
+      "message": "Quote: \"Two's complement: how negative numbers are stored\" is stated without a C standard version. Before C23, signed integer representations other than two's complement were permitted; C23 requires two's complement. Correction: state the C-version assumption or teach signed interpretation separately from the universal unsigned bit pattern.",
+      "path": "academy-web/content/courses/c-low-level/locales/en/lessons/integer-representation.json"
+    },
+    {
+      "severity": "medium",
+      "message": "Quote: \"reading *pi reads 4 bytes\", \"reading *pd reads 8 bytes\", and \"All three hold an address of the same size.\" `sizeof(int)`, `sizeof(double)`, data-pointer representation, and pointer-size uniformity are not universal C guarantees. Correction: qualify these as common platform examples and use `sizeof *p`/`_Alignof` for the actual target.",
+      "path": "academy-web/content/courses/c-low-level/locales/en/lessons/pointers.json"
+    },
+    {
+      "severity": "medium",
+      "message": "Quote: \"char *literal = \\\"hello\\\"; /* points into read-only memory */\". C makes modification undefined, but does not require literals to reside in physically read-only storage. Correction: say “attempting to modify a string literal is undefined behavior; on many systems it is read-only or crashes.”",
+      "path": "academy-web/content/courses/c-low-level/locales/en/lessons/arrays-and-strings.json"
+    },
+    {
+      "severity": "medium",
+      "message": "Quote: \"Write a recursive function with no base case and run it: observe the crash.\" A trivial empty recursion can be optimized away or transformed, and a huge unused local can be eliminated. Correction: compile with `-O0`, make the recursion observable, or state that a crash is possible rather than guaranteed.",
+      "path": "academy-web/content/courses/c-low-level/locales/en/lessons/stack-vs-heap.json"
+    },
+    {
+      "severity": "medium",
+      "message": "Quote: \"Print the address of a function with printf(\\\"%p\\\", (void *)add)\". ISO C does not guarantee conversion between function pointers and `void *`; POSIX platforms commonly support it, but `%p` still formally requires an object-pointer argument. Correction: use a platform-specific mechanism or explicitly label the cast as a supported POSIX/common-Unix extension, not portable C.",
+      "path": "academy-web/content/courses/c-low-level/locales/en/lessons/function-pointers.json"
+    },
+    {
+      "severity": "medium",
+      "message": "Quote: \"0.30000000000000004441 — the actual stored value\". Twenty fractional decimal digits are a rounded decimal rendering, not the exact rational value of the binary64 number. Correction: call it a high-precision rounded value, or use `%a`/a sufficiently long exact decimal conversion for the actual represented value.",
+      "path": "academy-web/content/courses/c-low-level/locales/en/lessons/floating-point.json"
+    },
+    {
+      "severity": "medium",
+      "message": "Quote: \"gdb ./prog\". The course audience includes macOS, where GDB is normally unavailable and LLDB is standard; `nm -C` also has different behavior on BSD/macOS `nm` than GNU `nm`. Correction: give macOS alternatives (`lldb`, platform-specific `nm` usage) beside the Linux commands.",
+      "path": "academy-web/content/courses/c-low-level/locales/en/lessons/reading-real-c.json"
+    },
+    {
+      "severity": "low",
+      "message": "Checkpoint `structs` cp-4 marked answer: \"The size of its largest member, and it does not track which member was last written.\" A union is at least large enough for its largest member and may require additional tail padding for alignment. Correction: “large enough for the largest member, including any required alignment padding; it does not track the active member.”",
+      "path": "academy-web/content/courses/c-low-level/locales/en/lessons/structs.json"
+    },
+    {
+      "severity": "info",
+      "message": "UNVERIFIED empirical claim: \"Memory-safety defects … have accounted for a large share of serious vulnerabilities in widely used software for decades.\" This is plausible and widely reported, but the lesson supplies no cited dataset or date range. Correction: cite a named, dated vulnerability-study dataset or rephrase as qualitative experience rather than a measurable statistic.",
+      "path": "academy-web/content/courses/c-low-level/locales/en/lessons/why-c.json"
+    }
+  ]
+}

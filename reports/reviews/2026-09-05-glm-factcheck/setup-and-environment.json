@@ -1,0 +1,73 @@
+{
+  "course": "setup-and-environment",
+  "reviewer": "glm-5.3 (max effort) via glm-worker review mode",
+  "reviewed_on": "2026-09-05",
+  "status": "complete",
+  "summary": "Completed the read-only fact-check of all five Setting Up nodes. All 20 checkpoint IDs (five lessons × cp-1..cp-4) and their marked choices, distractors, and explanations were checked; no key is intrinsically wrong, although one PATH checkpoint is configuration-dependent. EN and TH files have matching node structure, paragraphs, checkpoint IDs, and answer keys; no missing paragraph or material translation drift was found. Files read: course.json, build-course.mjs, locales/en/course.json, all five locales/en/lessons/*.json, locales/th/course.json, and all five locales/th/lessons/*.json. No course file was omitted.",
+  "findings": [
+    {
+      "severity": "high",
+      "message": "The quoted lab/output, “cat /etc/shadow — Permission denied,” is not valid on supported macOS: macOS has no /etc/shadow and normally returns “No such file or directory.” The same erroneous expectation and exercise occur in both terminal lessons and in Thai. Correction: use a Linux/macOS branch, e.g. /etc/shadow on Linux and /etc/master.passwd on macOS, or another locally created root-owned mode-600 file.",
+      "path": "academy-web/content/courses/setup-and-environment/locales/en/lessons/first-terminal-session.json"
+    },
+    {
+      "severity": "high",
+      "message": "The step “delete the local directory with rm -rf ~/coursework/first-repo, then git clone it back” can fail because the shell may still be inside the directory it just deleted, so a relative clone cannot reliably create its target. Correction: run “cd ~/coursework && rm -rf first-repo”, then clone from ~/coursework.",
+      "path": "academy-web/content/courses/setup-and-environment/locales/en/lessons/github-account-and-first-push.json"
+    },
+    {
+      "severity": "high",
+      "message": "The sentence “with 2FA on, your account password no longer works over HTTPS, so the token or SSH key routes above are what you will actually use” falsely ties Git password rejection to 2FA. GitHub removed account-password authentication for Git HTTPS operations generally; token, OAuth/credential-manager, or SSH routes are required independently of 2FA status. Correction: remove the 2FA-causation wording and state that account passwords are not accepted for Git HTTPS.",
+      "path": "academy-web/content/courses/setup-and-environment/locales/en/lessons/github-account-and-first-push.json"
+    },
+    {
+      "severity": "high",
+      "message": "The sentence “AddressSanitizer reports leaks on Linux and silently does not on macOS” states a version- and architecture-dependent behavior as universal. LeakSanitizer/AddressSanitizer behavior varies by target, toolchain, and options; macOS configurations can support or enable leak reporting. Correction: specify the tested compiler/OS/architecture and options rather than claiming all macOS builds are silent.",
+      "path": "academy-web/content/courses/setup-and-environment/locales/en/lessons/when-something-does-not-work.json"
+    },
+    {
+      "severity": "medium",
+      "message": "The statement “Darwin is the name of the macOS kernel” is wrong: Darwin is Apple's Unix-like operating-system foundation; the macOS kernel component is XNU. “uname -s” printing Darwin is correct, but the explanation should distinguish the kernel name from the OS/system name.",
+      "path": "academy-web/content/courses/setup-and-environment/locales/en/lessons/choose-your-environment.json"
+    },
+    {
+      "severity": "medium",
+      "message": "Checkpoint when-something-does-not-work cp-3, “The current directory is deliberately not on PATH,” is configuration-dependent rather than universally true: PATH can contain “.” or an empty component that searches it. Most recommended/default configurations omit it, which is why ./name is normally required. Correction: say “is not on PATH in this course’s expected/default shell configuration,” or have learners inspect PATH before asking for the universal reason.",
+      "path": "academy-web/content/courses/setup-and-environment/locales/en/lessons/when-something-does-not-work.json"
+    },
+    {
+      "severity": "medium",
+      "message": "The claim “To make it permanent, put the same line in ~/.bashrc or ~/.zshrc” is not portable across supported systems. Bash login shells, notably common on macOS, may read ~/.bash_profile instead of ~/.bashrc; distributions and user configuration vary. Correction: give shell-specific startup-file guidance, including .bash_profile or instruct users to source .bashrc from it.",
+      "path": "academy-web/content/courses/setup-and-environment/locales/en/lessons/when-something-does-not-work.json"
+    },
+    {
+      "severity": "medium",
+      "message": "The instruction “install Docker Desktop (macOS, Windows) or docker.io (Linux), then:” does not work as written on all supported Linux distributions: docker.io is the Debian/Ubuntu package name, not the Fedora/RHEL route. Correction: provide distro-specific install packages, such as Debian/Ubuntu docker.io and Fedora/RHEL’s supported Docker installation route or explicitly recommend Podman with aliasing where appropriate.",
+      "path": "academy-web/content/courses/setup-and-environment/locales/en/lessons/choose-your-environment.json"
+    },
+    {
+      "severity": "medium",
+      "message": "The statement “so nothing you do here can touch your real machine” overstates Docker isolation. A disposable container deletes its writable layer on exit, but it still has network access and can affect host-mounted resources, system resources, or escape through a kernel/container-runtime flaw. Correction: say filesystem changes inside the unmounted throwaway container are discarded; do not present --rm as a security boundary.",
+      "path": "academy-web/content/courses/setup-and-environment/locales/en/lessons/choose-your-environment.json"
+    },
+    {
+      "severity": "medium",
+      "message": "The displayed output “gti: command not found” is not what ordinary bash or zsh prints. Local bash prints “bash: gti: command not found”; zsh prints “zsh:1: command not found: gti.” Correction: show shell-specific example output or describe it generically without claiming an exact transcript.",
+      "path": "academy-web/content/courses/setup-and-environment/locales/en/lessons/first-terminal-session.json"
+    },
+    {
+      "severity": "low",
+      "message": "The sentence “sudo runs one command as the administrator account, called root, and asks for your password first” is not always true: credentials may be cached, or sudoers may use NOPASSWD or another authentication policy. Correction: say sudo typically prompts, subject to local sudo policy/caching.",
+      "path": "academy-web/content/courses/setup-and-environment/locales/en/lessons/install-the-toolchain.json"
+    },
+    {
+      "severity": "low",
+      "message": "The statement “needs Windows 10 version 2004+ or Windows 11” lists an OS-version prerequisite but omits enabled hardware virtualization/support, so wsl --install can still fail on an otherwise qualifying machine. Correction: state that virtualization support and the Virtual Machine Platform/WSL components must be available/enabled.",
+      "path": "academy-web/content/courses/setup-and-environment/locales/en/lessons/choose-your-environment.json"
+    },
+    {
+      "severity": "info",
+      "message": "EN/TH equivalence check found matching block structure and paragraph coverage; all checkpoint IDs and correct letter sets match in both locales. Technical terms such as PATH, shell, kernel, repository, commit, and tool names are retained consistently, and the Thai text preserves the checked answer meanings. Comment-line wrapping differs but does not omit lesson content."
+    }
+  ]
+}

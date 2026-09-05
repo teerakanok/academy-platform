@@ -1,0 +1,89 @@
+{
+  "course": "git-essentials",
+  "reviewer": "glm-5.3 (max effort) via glm-worker review mode",
+  "reviewed_on": "2026-09-05",
+  "status": "complete",
+  "summary": "Audited all 43 Git Essentials files: root metadata, both localized course files, all 20 English lessons, all 20 Thai lessons, and all 80 checkpoints. EN/TH structure, commands, checkpoint IDs, and marked answers match; no Thai drift or broken Thai found. Findings primarily concern universal claims that conflict with shallow/partial clones or modern/platform-specific behavior.",
+  "findings": [
+    {
+      "severity": "critical",
+      "message": "cp-2 — \"Every copy of the project contains the full history\" is false as stated because the course later teaches shallow clones. A normal full clone contains reachable history; shallow and partial clones can omit commits or objects. Reword to a full clone and make that one choice explicitly about a full clone.",
+      "path": "academy-web/content/courses/git-essentials/locales/en/lessons/why-version-control.json"
+    },
+    {
+      "severity": "high",
+      "message": "\"git pull                       # fetch, then merge (default)\" is not runnable as written for divergent branches on current Git when pull.rebase/pull.ff is unset: Git can abort and require an explicit reconciliation strategy. Teach `git pull --no-rebase`, `git pull --rebase`, or explicit configuration. The same simplification appears in the merging lesson.",
+      "path": "academy-web/content/courses/git-essentials/locales/en/lessons/push-pull-fetch.json"
+    },
+    {
+      "severity": "high",
+      "message": "cp-4 — \"It refuses to delete a branch holding commits that are not merged anywhere\" is inaccurate. `git branch -d` checks whether the branch is merged into its configured upstream, or into HEAD when no upstream exists; it does not scan every ref. Correct the choice/explanation to say merged into its upstream or current HEAD.",
+      "path": "academy-web/content/courses/git-essentials/locales/en/lessons/branching.json"
+    },
+    {
+      "severity": "high",
+      "message": "cp-4 — \"Once it is a commit it is recoverable through the reflog no matter what happens next\" contradicts the lesson's own expiry/GC warning and overstates recovery. Reflogs can be disabled or expire, and unreachable commits can be garbage-collected. Say recent commits are usually recoverable through the reflog before expiry/GC.",
+      "path": "academy-web/content/courses/git-essentials/locales/en/lessons/reflog-rescue.json"
+    },
+    {
+      "severity": "high",
+      "message": "cp-1 explanation — \"It only updates when you fetch or pull\" is incomplete and contradicted by the lab where `origin/main` appears after `git push -u origin main`. Successful pushes can also update the associated remote-tracking ref. Say fetch/pull always updates it and push may update its upstream tracking ref.",
+      "path": "academy-web/content/courses/git-essentials/locales/en/lessons/remotes-and-clone.json"
+    },
+    {
+      "severity": "medium",
+      "message": "\"Major hosts stopped accepting account passwords for Git operations years ago\" is a host-dependent claim stated generally, and cp-3 therefore lacks enough context to make a token universally correct. Rephrase to “many major hosts, including GitHub, require a token; check your host's current authentication documentation.”",
+      "path": "academy-web/content/courses/git-essentials/locales/en/lessons/remotes-and-clone.json"
+    },
+    {
+      "severity": "medium",
+      "message": "Try step — \"Move it into the repository: mkdir -p .githooks && cp .git/hooks/pre-commit .githooks/ && git config core.hooksPath .githooks\" does not commit the hooks, so colleagues cannot obtain them and the expected result is false as written. Add `git add .githooks && git commit`.",
+      "path": "academy-web/content/courses/git-essentials/locales/en/lessons/git-hooks.json"
+    },
+    {
+      "severity": "medium",
+      "message": "The pre-commit loop `for f in $(git diff --cached --name-only --diff-filter=A); do` breaks paths containing spaces and checks the working-tree file rather than the staged blob. Use NUL-delimited staged paths, or size the staged object with `git cat-file -s`/an established hook framework.",
+      "path": "academy-web/content/courses/git-essentials/locales/en/lessons/git-hooks.json"
+    },
+    {
+      "severity": "medium",
+      "message": "\"A 50-line change gets read line by line. A 2,000-line change gets skimmed and approved\" and “Size is the strongest predictor of review quality” are presented as universal empirical facts but are UNVERIFIED. Present them as heuristics or cite a reproducible study with its population and effect size.",
+      "path": "academy-web/content/courses/git-essentials/locales/en/lessons/pull-request-flow.json"
+    },
+    {
+      "severity": "medium",
+      "message": "\"The individual commits still exist in the pull request record if anyone needs them\" is platform- and retention-dependent, not a Git guarantee. Say many platforms retain them in the PR view, while availability after branch deletion or retention changes depends on the host.",
+      "path": "academy-web/content/courses/git-essentials/locales/en/lessons/pull-request-flow.json"
+    },
+    {
+      "severity": "medium",
+      "message": "\"The clean machine has exactly what the repository contains and nothing else\" is false for hosted runners, which include a runner image and preinstalled tools; `actions/setup-node` also supplies the requested toolchain. Correct it to say CI uses a defined fresh environment, which must itself be pinned in the workflow/container when reproducibility matters.",
+      "path": "academy-web/content/courses/git-essentials/locales/en/lessons/github-actions-ci.json"
+    },
+    {
+      "severity": "medium",
+      "message": "\"automated scanners find it within minutes\" is an unqualified time-to-discovery statistic and is UNVERIFIED. Public exposure should still be treated as immediate and the credential rotated, but the discovery-time claim needs platform telemetry or research evidence.",
+      "path": "academy-web/content/courses/git-essentials/locales/en/lessons/gitignore.json"
+    },
+    {
+      "severity": "low",
+      "message": "\"git push --force        # this deletes their commits from the server\" overstates object deletion. Force moves the branch so the commits become unreachable from it; the host may retain recoverable objects temporarily. The operational warning remains valid, but say it removes them from the shared branch rather than immediately erasing objects.",
+      "path": "academy-web/content/courses/git-essentials/locales/en/lessons/push-pull-fetch.json"
+    },
+    {
+      "severity": "low",
+      "message": "\"A branch moves. A tag does not.\" describes convention, not Git capability: tags can be moved or replaced with `-f`. The later “Never move or reuse a published tag” guidance is the technically accurate formulation.",
+      "path": "academy-web/content/courses/git-essentials/locales/en/lessons/tags-and-releases.json"
+    },
+    {
+      "severity": "low",
+      "message": "\"git log -p app.py                 # every change ever made to one file\" is too broad: without `--all` or another revision range, it shows only commits reachable from the current checkout/HEAD. Add `--all` if “every” is intended.",
+      "path": "academy-web/content/courses/git-essentials/locales/en/lessons/status-diff-log.json"
+    },
+    {
+      "severity": "low",
+      "message": "Try title — \"Make a repository with three commits\" conflicts with its steps and expected result, which create two commits. Rename it to two commits or add a third explicit commit step.",
+      "path": "academy-web/content/courses/git-essentials/locales/en/lessons/init-and-commit.json"
+    }
+  ]
+}

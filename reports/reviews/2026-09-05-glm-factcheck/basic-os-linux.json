@@ -1,0 +1,84 @@
+{
+  "course": "basic-os-linux",
+  "reviewer": "glm-5.3 (max effort) via glm-worker review mode",
+  "reviewed_on": "2026-09-05",
+  "status": "complete",
+  "summary": "Reviewed all 39 files under academy-web/content/courses/basic-os-linux/: 1 course manifest, 2 locale manifests, and 36 EN/TH lesson files. Audited 66 checkpoints plus 3 video-cue questions. EN/TH files have matching block structure and checkpoint answers; no answer drift, missing block, or broken Thai was identified. Found one incorrect checkpoint key, several overbroad security/system claims, and runnability gaps on supported WSL/minimal Ubuntu environments.",
+  "findings": [
+    {
+      "severity": "critical",
+      "message": "permissions.json cp-5: choice C \"Deleting is controlled by the directory's write bit\" and explanation \"Write permission there is enough\" are incomplete to the point of being wrong on Linux. Unlink/rename normally requires write and execute/search permission on the parent directory; write alone is insufficient when execute is absent. Replace the key wording with \"write plus execute on the directory\".",
+      "path": "academy-web/content/courses/basic-os-linux/locales/en/lessons/permissions.json"
+    },
+    {
+      "severity": "high",
+      "message": "ssh-and-remote.json cp-2: the marked answer includes \"there is nothing for an automated attack to guess\", but configuring key authentication does not by itself stop password guessing when PasswordAuthentication remains enabled. Correct the explanation: keys avoid transmitting a reusable secret, but password authentication must also be disabled to stop password attacks.",
+      "path": "academy-web/content/courses/basic-os-linux/locales/en/lessons/ssh-and-remote.json"
+    },
+    {
+      "severity": "high",
+      "message": "users-and-root.json: \"root is UID 0, and UID 0 is not checked\" states an outdated universal rule. Traditional DAC checks broadly bypass UID 0, but modern Linux can constrain root through capabilities, LSMs such as SELinux/AppArmor, namespaces, mount properties, and seccomp. Say \"normal Unix permission checks\" and note kernel/configuration-dependent limits.",
+      "path": "academy-web/content/courses/basic-os-linux/locales/en/lessons/users-and-root.json"
+    },
+    {
+      "severity": "high",
+      "message": "processes-and-packages.json: \"Most successful intrusions use a vulnerability that had a patch available\" and cp-3's \"Most intrusions use known vulnerabilities\" are UNVERIFIED quantitative claims. Representative multi-year incident data broken down by initial access and patch status would be required. Remove \"most\" or qualify and cite a specific dataset; credential abuse, phishing, exposed services, and other paths may dominate.",
+      "path": "academy-web/content/courses/basic-os-linux/locales/en/lessons/processes-and-packages.json"
+    },
+    {
+      "severity": "high",
+      "message": "linux-and-distros.json: \"Because Linux runs most servers, most server-side attacks are Linux attacks.\" is an UNVERIFIED inferred statistic. Server-market share does not establish the operating-system distribution of successful attacks. Verification would require attack/incident data classified by server OS and cause. Replace with a defensible statement that Linux is widely used on servers and therefore a common target.",
+      "path": "academy-web/content/courses/basic-os-linux/locales/en/lessons/linux-and-distros.json"
+    },
+    {
+      "severity": "high",
+      "message": "ssh-and-remote.json: \"something is sitting between you and it, decrypting everything you type\" misstates SSH host-key behavior. A changed host key indicates the presented identity differs from the recorded one; SSH blocks the connection, and such an intermediary does not decrypt an existing prior session. Host-key rotation, reassignment, rebuilds, and infrastructure changes are also possible causes. Instruct out-of-band verification before changing known_hosts.",
+      "path": "academy-web/content/courses/basic-os-linux/locales/en/lessons/ssh-and-remote.json"
+    },
+    {
+      "severity": "high",
+      "message": "scheduling-with-cron.json lab step \"crontab -e and add: */2 * * * * /bin/date >> /tmp/cron-test.log 2>&1\" is not guaranteed to run on WSL as the course supports. Many WSL installations do not enable systemd or start the cron daemon by default. Add a prerequisite such as installing cron, checking pgrep cron, enabling systemd or starting the service, or instruct learners to use a VM with cron running.",
+      "path": "academy-web/content/courses/basic-os-linux/locales/en/lessons/scheduling-with-cron.json"
+    },
+    {
+      "severity": "high",
+      "message": "pipes-and-logs.json lab steps \"sudo grep -c 'sudo' /var/log/auth.log\" and \"sudo grep 'sudo' /var/log/auth.log | tail -5\" fail on minimal Ubuntu/WSL systems where rsyslog is not installed and auth.log is absent. Add existence checks and a journalctl-based fallback, or provide fixture logs explicitly.",
+      "path": "academy-web/content/courses/basic-os-linux/locales/en/lessons/pipes-and-logs.json"
+    },
+    {
+      "severity": "medium",
+      "message": "text-and-regex.json lab command \"grep -c '' /var/log/syslog\" assumes /var/log/syslog exists, which is not true on minimal Ubuntu/WSL installs without rsyslog. Add a prerequisite or generated fixture and show how to discover the available journal/log source.",
+      "path": "academy-web/content/courses/basic-os-linux/locales/en/lessons/text-and-regex.json"
+    },
+    {
+      "severity": "medium",
+      "message": "os-what-it-does.json: \"The kernel is the part that enforces\" and \"It is the only code that talks to the hardware directly\" are useful teaching simplifications but not universal; user-space drivers and device-mapped access exist under constraints such as UIO/VFIO and IOMMU. State that ordinary user programs normally request service through the kernel rather than claiming no other code can touch hardware.",
+      "path": "academy-web/content/courses/basic-os-linux/locales/en/lessons/os-what-it-does.json"
+    },
+    {
+      "severity": "medium",
+      "message": "signals-and-jobs.json lab step \"Run: sleep 600 & then: ps aux | grep sleep\" is not a runnable command as written. Split it into two commands, or provide a working one-liner. Also avoid teaching \"HUP ... Reload your configuration\" as universal: reload behavior is application-specific.",
+      "path": "academy-web/content/courses/basic-os-linux/locales/en/lessons/signals-and-jobs.json"
+    },
+    {
+      "severity": "medium",
+      "message": "scheduling-with-cron.json: \"systemd timers ... catching up on a run that was missed while the machine was off\" requires Persistent=true (and an appropriate trigger/clock basis); it is not inherent to every timer. State the dependency on timer configuration.",
+      "path": "academy-web/content/courses/basic-os-linux/locales/en/lessons/scheduling-with-cron.json"
+    },
+    {
+      "severity": "medium",
+      "message": "linux-and-distros.json list item \"It costs nothing per machine\" is false for commercial distributions such as RHEL and SUSE when support subscriptions are required. Say many distributions can be used without per-machine licence fees, while supported enterprise distributions may have subscription costs.",
+      "path": "academy-web/content/courses/basic-os-linux/locales/en/lessons/linux-and-distros.json"
+    },
+    {
+      "severity": "low",
+      "message": "first-shell-script.json: \"the current directory is deliberately not searched for commands\" is presented as universal, but PATH is configurable and some users intentionally include '.'. Teach the normal safe default instead: current directories are normally omitted, and adding '.' is widely discouraged.",
+      "path": "academy-web/content/courses/basic-os-linux/locales/en/lessons/first-shell-script.json"
+    },
+    {
+      "severity": "low",
+      "message": "scheduling-with-cron.json diagram says \"day of week (0-6, Sunday is 0)\". Standard cron also accepts 7 as Sunday and supports names such as SUN. Use 0-7 with both 0 and 7 meaning Sunday, or explicitly say the lesson uses 0.",
+      "path": "academy-web/content/courses/basic-os-linux/locales/en/lessons/scheduling-with-cron.json"
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "course": "isc2cc",
+  "reviewer": "glm-5.3 (max effort) via glm-worker review mode",
+  "reviewed_on": "2026-09-05",
+  "status": "needs_review",
+  "summary": "Reviewed the course manifest, both locale manifests, all 30 English lessons, and all 30 Thai lessons, including every checkpoint and simulation requirement. English and Thai nodeIds, block order, checkpoint IDs, choices, correct-answer arrays, and simulation requirements match structurally. The course is not publishable as exam preparation until the false Domain 2 metadata and the high-severity factual, practice-answer, and network-lab defects are corrected. The remaining medium and Thai-quality issues should also be fixed before release. Guided-lab runtime is UNVERIFIED because the referenced lab guides and runtime are outside the requested review path and are not present beneath the course directory.",
+  "findings": [
+    {
+      "severity": "critical",
+      "message": "Outcome quote \"Explain business continuity, disaster recovery and incident response concepts and how they fit together (Domain 2, 17.3%)\" contradicts ISC2's effective 2026-09-01 outline: Domain 2 is Security Governance at 17.3%. BC/DR remains under redundancy concepts, while incident response is a major component of Domain 5. Also replace the stale skill label \"Governance, BC/DR and incident response\" with a Security Governance label while retaining continuity coverage inside the module."
+    },
+    {
+      "severity": "critical",
+      "message": "Thai outcome quote \"อธิบายแนวคิด business continuity, disaster recovery และ incident response และความสัมพันธ์ระหว่างกัน (Domain 2, 17.3%)\" repeats the false English exam fact. Domain 2 must be translated as Security Governance; BC/DR belongs under redundancy concepts and incident response belongs to Domain 5. The Thai skill label \"Governance, BC/DR และ incident response\" needs the same correction."
+    },
+    {
+      "severity": "high",
+      "message": "Checkpoint cp-2 correctly marks A, but the explanation quote \"Choice A stops at the SLE and forgets the annualization.\" contradicts the key: A is the correct ALE of 10,000, while C is the 100,000 SLE. Change the explanation to identify choice C as the SLE-only distractor."
+    },
+    {
+      "severity": "high",
+      "message": "Checkpoint cp-2 correctly marks A, but the Thai explanation quote \"ตัวเลือก A หยุดอยู่ที่ SLE แล้วลืมแปลงเป็นรายปี\" contradicts the marked answer. Choice A is the correct ALE; choice C is the SLE. Correct the Thai explanation to reference choice C."
+    },
+    {
+      "severity": "high",
+      "message": "Drill item quote \"C3 — SHA-256 verification of a vendor-supplied file before install.\" is paired with expected answer quote \"C3 detective technical\". Under the lesson's own rule that preventive controls act before an attack lands, pre-install verification used as an installation gate is primarily preventive technical, not detective technical. If the intent is detection, the drill must state that the result is only reported after installation."
+    },
+    {
+      "severity": "high",
+      "message": "Thai drill item quote \"C3 — การตรวจ SHA-256 ไฟล์จากผู้ขายก่อนติดตั้ง\" repeats the incorrect expected classification \"C3 detective technical\". Verification before installation should be classified as preventive technical unless the exercise explicitly describes post-install detection only."
+    },
+    {
+      "severity": "high",
+      "message": "Quote \"Ransomware reads your files (confidentiality), encrypts them so they cannot be trusted or used (integrity and availability), and may threaten publication. That is why ransomware is treated as a top-tier threat: it hits the whole triad at once.\" states variant-dependent behavior as universal. Not all ransomware reads or exfiltrates files, and locker ransomware can primarily harm availability. Say \"some data-stealing ransomware\" and avoid the unqualified whole-triad claim."
+    },
+    {
+      "severity": "high",
+      "message": "Thai quote \"Ransomware อ่านไฟล์ของเรา (confidentiality) เข้ารหัสไฟล์จนใช้ไม่ได้และเชื่อถือไม่ได้ (integrity และ availability) และอาจขู่จะเปิดเผยข้อมูล ... เพราะกระทบทั้ง triad พร้อมกัน\" overgeneralizes ransomware behavior in the same way as English. Restrict the confidentiality/exfiltration claim to data-stealing ransomware and note that locker ransomware may primarily reduce availability."
+    },
+    {
+      "severity": "high",
+      "message": "Simulation brief quote \"External clients are told to reach it at its published address 192.168.20.15 on the 192.168.20.0/24 segment.\" cannot describe an internet-facing public DMZ web server because 192.168.0.0/16 is private and not globally routable. Use documentation-approved public example addressing for the public scenario, or relabel the exercise as an internal DMZ-facing service and remove \"external clients\" and \"public\"."
+    },
+    {
+      "severity": "high",
+      "message": "Thai simulation brief quote \"ผู้เรียนดูแลเว็บเซิร์ฟเวอร์สาธารณะใน DMZ client ภายนอกถูกบอกให้เรียกถึงที่อยู่ที่ประกาศไว้ 192.168.20.15\" repeats the impossible public-server/private-address scenario. Replace the address with a valid public example or relabel the exercise as internal and remove the public/external-client framing."
+    },
+    {
+      "severity": "medium",
+      "message": "Outcome quote \"Carry out security operations: data security, hardening, best practices and awareness (Domain 5, 17.3%)\" materially understates the delivered and official Domain 5 scope. The outcome should also name incident response, event triage, threat actors and cyber threat intelligence, and security readiness testing. The Thai outcome repeats the omission."
+    },
+    {
+      "severity": "medium",
+      "message": "The lesson gives conflicting MFA rankings: quote \"Rank passkeys and hardware keys above app codes above push above SMS.\" but the drill expected answer ranks \"passkey, push with number-matching, authenticator app, SMS.\" Number-matching push versus authenticator-app TOTP is implementation- and threat-dependent, not a fixed universal order. The SMS-plus-prompt-spam scenario is also incoherent as written. Present factor strengths by threat, especially phishing resistance, and state explicitly whether push is also deployed."
+    },
+    {
+      "severity": "medium",
+      "message": "Checkpoint cp-2 stem quote \"With SSO deployed, disabling one account in the identity provider cuts off a departing employee from all connected applications.\" states an implementation-dependent result as guaranteed. Existing sessions, refresh tokens, API tokens, service accounts, app-local accounts, and exceptions can survive IdP disablement. The marked answer C is directionally best, but revise the stem to say centralized offboarding can reduce or terminate access when applications honor it and describe token/session revocation."
+    },
+    {
+      "severity": "medium",
+      "message": "Checkpoint cp-2 correct option quote \"Evidence survives even if the attacker gains admin access on the source machine.\" overstates centralized logging. Near-real-time forwarding makes already-shipped evidence more likely to survive local log clearing; it does not guarantee survival against transport failure, credential misuse, collector compromise, or tampering. The lesson's later qualification about trustworthy channels and storage should be carried into the option and explanation."
+    },
+    {
+      "severity": "medium",
+      "message": "Checkpoint cp-2 choice quote \"Tailgating (piggybacking)\" treats the terms as exact synonyms even though many security sources distinguish tailgating as unauthorized entry without consent from piggybacking as knowingly assisted entry. The scenario remains defensibly tailgating, but remove the parenthetical or qualify the distinction so the key is unambiguous."
+    },
+    {
+      "severity": "medium",
+      "message": "Thai sentence quote \"โมเดลสามารถจำเนื้อหาบางส่วนของข้อมูลฝึกได้ ... โมเดลอาจข้อมอกเนื้อหาอ่อนไหว ... ผู้โจมตีอายถามโป้งโมเดล\" contains broken Thai (\"อาจข้อมอก\" and \"ถามโป้งโมเดล\") that blocks comprehension. Use natural forms such as \"นำเนื้อหาอ่อนไหว...ออกมา\" and \"สอบถาม/ตรวจสอบโมเดลอย่างเจาะจง\" while retaining disclosure and inference as English technical terms where useful."
+    },
+    {
+      "severity": "medium",
+      "message": "Thai debrief quote \"เส้นทางทำงาน การแปลภาษาไม่ทำงาน\" mistranslates DNS/name resolution as language translation. Correct it to \"การแปลงชื่อเป็นที่อยู่ (name resolution) ไม่ทำงาน\" or \"การทำงานของ resolver ไม่ทำงาน\"."
+    },
+    {
+      "severity": "medium",
+      "message": "Thai sentence quote \"containment มาก่อน eradication (ห้ามเลือดก่อน แล้วค่อยเอาสาเหตุออก)\" is unnatural and obscures the incident-response concept. Use \"หยุดการลุกลาม/หยุดความเสียหายก่อน แล้วจึงกำจัดสาเหตุ\" while retaining containment and eradication as industry terms."
+    },
+    {
+      "severity": "low",
+      "message": "Expected answer quote \"ต้องปฏิเสธหรือแจ้งข้อจำกัดและเพิ่มทักษษ\" contains the Thai typo \"ทักษษ\". Correct it to \"ทักษะ\"."
+    },
+    {
+      "severity": "low",
+      "message": "Cheatsheet quote \"นั่นมักเป็นตัวคัันใหญ่ของข้อ\" contains the typo \"ตัวคััน\". Use \"ตัวคัด\" or clearer wording such as \"จุดที่มักทำให้เลือกผิด\"."
+    },
+    {
+      "severity": "low",
+      "message": "Expected answer quote \"พันคำขอที่ทีม IT จริงไม่มีวันขอ\" is unnatural Thai. Use \"คำขอที่ฟังไม่ขึ้น/ไม่น่าเชื่อและทีม IT จริงไม่มีวันขอ\"."
+    },
+    {
+      "severity": "low",
+      "message": "Sentence quote \"ใช้ VPN หรือข้อมูลมือถือสำหรับงานอ่อนไหวบนท้องถนน\" says \"sensitive data\" rather than the intended mobile network. Correct it to \"ใช้ VPN หรือเครือข่ายมือถือ (mobile data) สำหรับงานอ่อนไหว\"."
+    },
+    {
+      "severity": "info",
+      "message": "Coverage: read academy-web/content/courses/isc2-cc/course.json, locales/en/course.json, locales/th/course.json, and every lesson in locales/en/lessons/ and locales/th/lessons/: aaa-in-depth, access-control-models, ai-data-integrity-risks, capstone-cc, cia-and-aaa, cloud-models-shared-responsibility, data-protection-ops, event-triage, governance-and-ethics-basics, governance-practice, grc-fundamentals, iam-practice, identity-lifecycle, incident-response-cycle, metrics-kris-and-reporting, mfa-and-iam-tools, monitoring-and-siem, network-cloud-practice, network-fundamentals-threats, network-security-devices, principles-practice, redundancy-and-continuity, risk-lifecycle, secops-practice, security-awareness-and-culture, security-controls-types, segmentation-and-zero-trust, teams-and-security-testing, threat-actors-and-cti, and wireless-iot-ics. No in-scope file was omitted."
+    },
+    {
+      "severity": "info",
+      "message": "Guided-lab runnability is UNVERIFIED: lesson JSON references lab guides and simulated surfaces whose files/runtime are outside the requested course directory and are not present beneath it in this clone. Verify by executing every learner-facing lab on a clean computer and validating every simulation requirement in the deployed renderer before release. The public/private-address contradiction inside the in-scope simulation brief is separately reported above."
+    },
+    {
+      "severity": "info",
+      "message": "No invented CVE identifier or unsupported named-statistics claim was found. The capstone exam mechanics match ISC2's published CC information: CAT, 2 hours, 100–125 items, passing score 700/1000, Pearson VUE, and English, Chinese, Japanese, German, and Spanish. The 2026 domain names and weights are based on ISC2's 2026-08-06 update announcing the effective 2026-09-01 outline."
+    }
+  ]
+}

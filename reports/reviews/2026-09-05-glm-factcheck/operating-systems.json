@@ -1,0 +1,74 @@
+{
+  "course": "operating-systems",
+  "reviewer": "glm-5.3 (max effort) via glm-worker review mode",
+  "reviewed_on": "2026-09-05",
+  "status": "complete",
+  "summary": "Reviewed all 48 files in the requested course tree, including all 22 bilingual lessons and 88 checkpoints. EN/TH structure and checkpoint answers match throughout, apart from one cosmetic missing blank code line in the Thai race lesson. No files changed. One-machine performance claims were not independently reproduced and remain UNVERIFIED without raw run artifacts.",
+  "findings": [
+    {
+      "severity": "critical",
+      "message": "cp-1 marks \"Their code runs inside the privileged program\" as correct, but system() launches a separate /bin/sh child; the lesson itself says modern shells drop setuid privilege. The Thai checkpoint mirrors this wording. Correct it to say the attacker controls a command executed by the vulnerable setuid program, while the injected command itself normally runs as uid 1000 and does not inherently gain root execution.",
+      "path": "academy-web/content/courses/operating-systems/locales/en/lessons/setuid-and-its-risks.json"
+    },
+    {
+      "severity": "critical",
+      "message": "cp-1 asks \"How much memory is copied at the moment of the fork?\" but marks \"None — copy-on-write defers it\" while its explanation says \"Only the page tables are copied.\" Page tables and process metadata are memory. The Thai key mirrors the contradiction. Correct the question to ask about user-data pages, or add an answer stating that user pages are not copied but page tables/metadata are.",
+      "path": "academy-web/content/courses/operating-systems/locales/en/lessons/cow-and-mmap.json"
+    },
+    {
+      "severity": "high",
+      "message": "The course says \"This course assumes a working Unix-like shell and, from the C course onwards, a C compiler and make\", but numerous required steps use Linux-only or optional tools such as strace, /proc, taskset, dmesg, lscpu, and gdb. On macOS, /proc is absent and the checked environment lacks strace/taskset/getfacl/setfacl. State a Linux/WSL prerequisite and provide installation/fallback instructions for each tool.",
+      "path": "academy-web/content/courses/operating-systems/locales/en/course.json"
+    },
+    {
+      "severity": "high",
+      "message": "The step \"docker run --rm -it debian:12-slim bash\" cannot support the following gcc, getcap, setfacl, and getfacl exercises because those packages are not preinstalled in debian:12-slim. Correct the lab to install at least build-essential, acl, and libcap2-bin, and state the Docker privilege/image-download prerequisites.",
+      "path": "academy-web/content/courses/operating-systems/locales/en/lessons/setuid-and-its-risks.json"
+    },
+    {
+      "severity": "high",
+      "message": "The claim \"Kernel mode: all memory, all devices — a bug here can take the machine down\" overstates the privilege model. Ring 0 does not inherently bypass paging or protections such as SMAP/SMEP; kernel code accesses memory permitted by its mappings and can deliberately establish/manage mappings. Correct it to distinguish hardware privilege from the paging and direct-map policy that still constrain ordinary accesses.",
+      "path": "academy-web/content/courses/operating-systems/locales/en/lessons/kernel-vs-user-mode.json"
+    },
+    {
+      "severity": "high",
+      "message": "cp-4 marks \"Because a capability cannot be recalled\" as universally correct. Mediated capability systems can revoke grants, Linux file capabilities can be removed, and revocable capabilities exist through indirection; only unmediated bearer-style tokens are impractical to recall. Scope the claim to unmediated capabilities or reword the key.",
+      "path": "academy-web/content/courses/operating-systems/locales/en/lessons/acl-vs-capability.json"
+    },
+    {
+      "severity": "medium",
+      "message": "The lab expects \"A clean 512-to-1 difference in fault count between huge and normal pages, on identical work.\" That result is conditional on transparent hugepage policy being madvise/compatible, a successful aligned 2 MiB allocation, architecture support, and kernel behavior; fragmentation or THP=never can prevent it. Add the conditions and teach learners to inspect AnonHugePages/smaps rather than expect an unconditional ratio.",
+      "path": "academy-web/content/courses/operating-systems/locales/en/lessons/page-tables-and-tlb.json"
+    },
+    {
+      "severity": "medium",
+      "message": "The instruction \"Run it twice more and compare the addresses — they should differ every time\" treats ASLR as unconditional. ASLR can be disabled system-wide, executables can be non-PIE, and runtimes can reproduce layouts. Correct it to say addresses normally vary when ASLR and PIE are enabled, with a check for that configuration.",
+      "path": "academy-web/content/courses/operating-systems/locales/en/lessons/address-space.json"
+    },
+    {
+      "severity": "medium",
+      "message": "\"Calls like clock_gettime() run that code in user mode, reading a shared time page, and return without ever crossing\" is too universal. Availability depends on the vDSO, clock type, libc/kernel, and execution environment; unsupported combinations fall back to a syscall. Say common clocks normally use the vDSO and verify with strace or /proc/self/maps.",
+      "path": "academy-web/content/courses/operating-systems/locales/en/lessons/syscall-mechanism.json"
+    },
+    {
+      "severity": "medium",
+      "message": "The mmap lesson says \"msync forces them\" and then tells learners to \"msync\" without flags. On Linux, msync requires MS_ASYNC or MS_SYNC; only MS_SYNC requests synchronous writeback. Specify msync(address, length, MS_SYNC) for the behavior the lab is claiming.",
+      "path": "academy-web/content/courses/operating-systems/locales/en/lessons/cow-and-mmap.json"
+    },
+    {
+      "severity": "low",
+      "message": "The race lab states \"Now build with -O2 and run five times: the total is exactly right every time.\" Loop collapsing is compiler-, target-, and source-dependent, and even a collapsed shared increment is not formally immune to lost updates. Present the exact result as an observed example and ask learners to inspect assembly rather than promise it.",
+      "path": "academy-web/content/courses/operating-systems/locales/en/lessons/race-conditions.json"
+    },
+    {
+      "severity": "low",
+      "message": "The explanation \"SIGSEGV is delivered to the process\" is imprecise. A synchronous fault originates on the faulting thread; its default disposition terminates the whole process. Correct the wording while preserving the intended consequence that one thread’s fatal SIGSEGV normally ends all threads.",
+      "path": "academy-web/content/courses/operating-systems/locales/en/lessons/thread-vs-process.json"
+    },
+    {
+      "severity": "low",
+      "message": "The cheatsheet says \"pid 1 reaps its adopted children automatically, so orphans do not linger.\" That assumes a correctly implemented init. A custom container PID 1 can fail to reap adopted children. Say a well-formed init reaps them and that custom PID 1 implementations must wait().",
+      "path": "academy-web/content/courses/operating-systems/locales/en/lessons/zombie-and-orphan.json"
+    }
+  ]
+}
