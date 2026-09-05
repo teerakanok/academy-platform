@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { routeAuthClient } from '@/lib/auth/route-client'
+import { currentUser } from '@/lib/auth/session'
 import { legacyDirectOtpFixtureAllowedForRequest } from '@/lib/auth/legacy-direct-otp'
 import { identityControlLocalFixtureAllowedForRequest } from '@/lib/identity/local-fixture'
 import { readLocalAcademySession } from '@/lib/identity/local-runtime'
@@ -19,7 +20,10 @@ export async function GET(request: Request) {
       : NextResponse.json({ signedIn: false })
   }
   if (!legacyDirectOtpFixtureAllowedForRequest(request)) {
-    return NextResponse.json({ signedIn: false })
+    const user = await currentUser()
+    return user
+      ? NextResponse.json({ signedIn: true, email: user.email })
+      : NextResponse.json({ signedIn: false })
   }
   try {
     const supabase = await routeAuthClient(request)

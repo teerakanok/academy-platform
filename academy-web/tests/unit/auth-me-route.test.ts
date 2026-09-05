@@ -1,8 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { routeAuthClient } = vi.hoisted(() => ({ routeAuthClient: vi.fn() }))
+const { currentUser, routeAuthClient } = vi.hoisted(() => ({
+  currentUser: vi.fn(),
+  routeAuthClient: vi.fn(),
+}))
 
 vi.mock('@/lib/auth/route-client', () => ({ routeAuthClient }))
+vi.mock('@/lib/auth/session', () => ({ currentUser }))
 
 import { GET } from '@/app/(site)/api/auth/me/route'
 
@@ -16,7 +20,20 @@ describe('GET /api/auth/me', () => {
 
   afterEach(() => vi.unstubAllEnvs())
 
-  it('does not inspect a shared GoTrue session on a non-loopback Academy request', async () => {
+  it('validates the opaque production session with currentUser on a non-loopback request', async () => {
+    currentUser.mockResolvedValue({ account: {}, email: 'learner@example.com' })
+
+    const response = await GET(new Request('https://academy.cyberskills.co.th/api/auth/me'))
+
+    expect(routeAuthClient).not.toHaveBeenCalled()
+    expect(currentUser).toHaveBeenCalledTimes(1)
+    expect(response.status).toBe(200)
+    await expect(response.json()).resolves.toEqual({ signedIn: true, email: 'learner@example.com' })
+  })
+
+  it('reports signed out when currentUser rejects an absent durable session', async () => {
+    currentUser.mockResolvedValue(null)
+
     const response = await GET(new Request('https://academy.cyberskills.co.th/api/auth/me'))
 
     expect(routeAuthClient).not.toHaveBeenCalled()

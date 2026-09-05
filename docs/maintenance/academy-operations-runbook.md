@@ -21,7 +21,7 @@ Use these read-only checks after deploy, rollback, or incident recovery:
 | Check | Expected result |
 | --- | --- |
 | canonical `https://academy.cyberskills.co.th` | `302` to Cloudflare Access while still gated |
-| raw Worker route | `200` from current active version |
+| raw Worker route | empty `404` with `cache-control: no-store` after the host-gate release; the current pre-gate version still returns `200` |
 | deployment inventory | expected deployment ID and version ID present |
 | residue check | `PASS` |
 | Academy data API health | dedicated container healthy and route reachable |
@@ -48,7 +48,9 @@ Use these read-only checks after deploy, rollback, or incident recovery:
   - target rollback version ID
   - residue inventory / non-serving version inventory
 - After rollback:
-  - verify canonical `302`, raw `200`, expected target version active, residue `PASS`
+  - verify canonical `302`, the raw-route response documented for that exact target
+    (`404` for a host-gated version; `200` only for a historical pre-gate target),
+    expected target version active, and residue `PASS`
 
 ### 3.2 Academy data API rollback
 

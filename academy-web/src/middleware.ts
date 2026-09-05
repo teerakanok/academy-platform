@@ -102,6 +102,25 @@ export async function middleware(request: NextRequest) {
     return response
   }
 
+  if (process.env.NODE_ENV === 'production') {
+    const hasOpaqueSession = hasSyntacticallyValidLocalAcademySession(
+      request.headers.get('cookie'),
+    )
+    const { pathname, search } = request.nextUrl
+    if (!hasOpaqueSession && !isPublic(pathname)) {
+      if (pathname.startsWith('/api/')) {
+        return NextResponse.json({ ok: false, error: 'ต้องเข้าสู่ระบบก่อน' }, { status: 401 })
+      }
+      const signIn = new URL('/sign-in', request.url)
+      signIn.searchParams.set('next', pathname + search)
+      return NextResponse.redirect(signIn)
+    }
+    // The edge cannot read the durable Identity Control store. A valid cookie is
+    // only a prefilter here; Node routes and server components must validate it
+    // with currentUser() before trusting the principal.
+    return response
+  }
+
   const allowLegacyFixture = legacyDirectOtpFixtureAllowedForRequest(request)
   const url = allowLegacyFixture ? process.env.NEXT_PUBLIC_SUPABASE_URL : undefined
   const anonKey = allowLegacyFixture ? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY : undefined
