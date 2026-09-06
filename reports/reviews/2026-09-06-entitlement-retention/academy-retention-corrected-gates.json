@@ -1,0 +1,31 @@
+[
+  {
+    "name": "unit",
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--project",
+      "unit"
+    ],
+    "exit": 0
+  },
+  {
+    "name": "lint",
+    "command": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "exit": 1
+  },
+  {
+    "name": "build-cf",
+    "command": [
+      "npm",
+      "run",
+      "build:cf"
+    ],
+    "exit": 0
+  }
+]

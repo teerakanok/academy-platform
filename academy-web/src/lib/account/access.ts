@@ -61,35 +61,3 @@ export async function hasCourseEntitlement(userId: string, courseSlug: string): 
   if (error) throw new Error(`ตรวจสิทธิ์เข้าคอร์สไม่สำเร็จ: ${error.message}`)
   return data === true
 }
-
-export async function grantCourseEntitlement(
-  userId: string,
-  courseSlug: string,
-  source: EntitlementSource,
-  expiresAt?: Date,
-): Promise<void> {
-  const db = academyDb()
-  const { error } = await db.from('course_entitlement').upsert(
-    {
-      user_id: userId,
-      course_slug: courseSlug,
-      source,
-      granted_at: new Date().toISOString(),
-      expires_at: expiresAt?.toISOString() ?? null,
-      revoked_at: null,
-    },
-    { onConflict: 'user_id,course_slug' },
-  )
-  if (error) throw new Error(`ให้สิทธิ์เข้าคอร์สไม่สำเร็จ: ${error.message}`)
-}
-
-export async function revokeCourseEntitlement(userId: string, courseSlug: string): Promise<void> {
-  const db = academyDb()
-  // ทำเครื่องหมายว่าเพิกถอน ไม่ลบแถว — ต้องตอบได้ว่าเคยมีสิทธิ์ช่วงไหนบ้าง
-  const { error } = await db
-    .from('course_entitlement')
-    .update({ revoked_at: new Date().toISOString() })
-    .eq('user_id', userId)
-    .eq('course_slug', courseSlug)
-  if (error) throw new Error(`เพิกถอนสิทธิ์ไม่สำเร็จ: ${error.message}`)
-}

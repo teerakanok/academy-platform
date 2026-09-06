@@ -17,6 +17,7 @@ backup verification, restore rehearsal, rollback, or secret-handling change.
    - [`../../academy-web/docs/private-media-delivery.md`](../../academy-web/docs/private-media-delivery.md)
    - [`../../academy-web/docs/academy-retention-scheduler.md`](../../academy-web/docs/academy-retention-scheduler.md)
    - [`../../academy-web/docs/staff-authorization.md`](../../academy-web/docs/staff-authorization.md)
+   - [`../../academy-web/docs/course-entitlement-operator.md`](../../academy-web/docs/course-entitlement-operator.md)
    - [`../../academy-web/docs/privacy/request-runbook.md`](../../academy-web/docs/privacy/request-runbook.md)
 
 ## Scope
@@ -32,3 +33,9 @@ This folder does not replace director-level shared infra records. For Pool A,
 shared Supabase, `ssh-db`, shared Cloudflare, or ecosystem identity ownership,
 read the director repo records first, then return here for Academy-specific
 constraints.
+
+For retention migration incidents, preserve evidence and any authenticated
+sessions for explicit operator review first. A migration rollback must not be
+used as an automatic destructive response; revoke the affected runtime or
+operator credential separately, document the session handling decision, and run
+only the approved bounded retention path when deletion is finally authorized.

@@ -7,10 +7,8 @@ import type { AuthorizationRequest } from '@/lib/identity/adapter'
 import { findOrCreateUser } from '@/lib/account/users'
 import {
   getActivation,
-  grantCourseEntitlement,
   hasCourseEntitlement,
   isServiceUsable,
-  revokeCourseEntitlement,
   syncActivation,
 } from '@/lib/account/access'
 import { getCourseAccess } from '@/lib/account/course-access'
@@ -61,6 +59,25 @@ function request(): AuthorizationRequest {
     codeChallengeMethod: 'S256',
     serviceId: 'academy',
   }
+}
+
+async function seedEntitlement(
+  userId: string,
+  source: 'free' | 'purchase' | 'invitation' | 'grant',
+  expiresAt: Date | null = null,
+  revoked = false,
+) {
+  await withDb(async (db) => {
+    await db.query(
+      `insert into academy.course_entitlement(user_id, course_slug, source, expires_at, revoked_at)
+       values ($1, 'basic-os-linux', $2, $3, $4)
+       on conflict (user_id, course_slug) do update set
+         source = excluded.source,
+         expires_at = excluded.expires_at,
+         revoked_at = excluded.revoked_at`,
+      [userId, source, expiresAt, revoked ? new Date() : null],
+    )
+  })
 }
 
 function verifierFor(req: AuthorizationRequest, verifier: string) {
@@ -140,10 +157,10 @@ describe('ชั้นสถานะต้องแยกจากกันจ�
 
   it('สิทธิ์ที่ถูกเพิกถอนแล้วใช้ไม่ได้ แต่ยังตอบได้ว่าเคยมี', async () => {
     const user = await findOrCreateUser({ issuer: ISS, subject: 'sub-ent', email: 'ent@example.com' })
-    await grantCourseEntitlement(user.id, 'basic-os-linux', 'purchase')
+    await seedEntitlement(user.id, 'purchase')
     expect(await hasCourseEntitlement(user.id, 'basic-os-linux')).toBe(true)
 
-    await revokeCourseEntitlement(user.id, 'basic-os-linux')
+    await seedEntitlement(user.id, 'purchase', null, true)
     expect(await hasCourseEntitlement(user.id, 'basic-os-linux')).toBe(false)
 
     const rows = await withDb((db) =>
@@ -155,13 +172,13 @@ describe('ชั้นสถานะต้องแยกจากกันจ�
 
   it('สิทธิ์ที่หมดอายุแล้วใช้ไม่ได้', async () => {
     const user = await findOrCreateUser({ issuer: ISS, subject: 'sub-exp', email: 'exp@example.com' })
-    await grantCourseEntitlement(user.id, 'basic-os-linux', 'invitation', new Date(Date.now() - 1000))
+    await seedEntitlement(user.id, 'invitation', new Date(Date.now() - 1000))
     expect(await hasCourseEntitlement(user.id, 'basic-os-linux')).toBe(false)
   })
 
   it('สถานะ suspended ใช้บริการไม่ได้ แม้จะเคยมีสิทธิ์คอร์สอยู่', async () => {
     const user = await findOrCreateUser({ issuer: ISS, subject: 'sub-susp', email: 'susp@example.com' })
-    await grantCourseEntitlement(user.id, 'basic-os-linux', 'free')
+    await seedEntitlement(user.id, 'free')
     await syncActivation(user.id, {
       issuer: ISS,
       subject: 'sub-susp',
@@ -191,7 +208,7 @@ describe('ชั้นสถานะต้องแยกจากกันจ�
       nonce: 'n',
       activation: { status: 'active', revision: 1 },
     })
-    await grantCourseEntitlement(user.id, 'basic-os-linux', 'free')
+    await seedEntitlement(user.id, 'free')
 
     expect(await getCourseAccess(user.id, 'basic-os-linux')).toEqual({ allowed: true })
   })

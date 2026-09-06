@@ -253,7 +253,7 @@ Frozen tree: `/private/tmp/secrev-academy` (HEAD `02c712e`, read-only). Inputs: 
   access.ts:65 export async function grantCourseEntitlement(...)   // grep: ไม่มี route/page เรียก
   ```
 - **Remediation:** revoke insert/update บน `course_entitlement` และ `service_activation` จาก `academy_runtime` จนกว่าจะมี purchase path (ให้ผ่าน RPC แคบ ๆ ที่ audit); พิจารณาแยก credential/role ที่สองสำหรับ identity RPC (transaction/session/profile) ออกจาก learner-data role; ลบหรือย้าย `grantCourseEntitlement` ไป operator script ที่ต้องใช้ `academy_staff_admin`.
-- **Sources:** Fable (#3/#33) · **Status:** OPEN
+- **Sources:** Fable (#3/#33) · **Status:** LOCAL VERIFIED — PENDING PRODUCTION (direct authorization-table writes removed; callback `create_identity_session` and monotonic lifecycle activation RPC intentionally preserved)
 
 ### SEC-ACADEMY-017 · learning mutation ที่ authenticated (`/api/progress`, `/api/progress/reset`, `/api/practice/simulation`) ไม่มี per-account quota
 - **Severity:** LOW (ปรับลงจาก GLM MEDIUM: ต้องเป็นผู้เรียนที่มี entitlement; body bounded; ownership-scoped) · **Verdict:** CONFIRMED
@@ -311,7 +311,7 @@ Frozen tree: `/private/tmp/secrev-academy` (HEAD `02c712e`, read-only). Inputs: 
   0018:237      grant execute on function academy.has_staff_role(uuid, text) to service_role;
   ```
 - **Remediation:** revoke grant ของ `service_role` (Academy ย้ายไป `academy_runtime` แล้วใน 0019); ให้ `academy_staff_admin` แก่ login role เฉพาะสำหรับ `manage-staff-role.mjs` แทน `postgres`.
-- **Sources:** Fable (#42) · **Status:** OPEN
+- **Sources:** Fable (#42) · **Status:** LOCAL VERIFIED — PENDING PRODUCTION
 
 ### SEC-ACADEMY-021 · diagnostic Worker รับ `cf-access-jwt-assertion` ด้วย regex เท่านั้น (ไม่ verify ลายเซ็น); nonce เป็น gate เข้ารหัสเดียว (candidate ยังไม่ deploy)
 - **Severity:** INFO · **Verdict:** CONFIRMED
@@ -409,7 +409,7 @@ Frozen tree: `/private/tmp/secrev-academy` (HEAD `02c712e`, read-only). Inputs: 
 | ID | Area | Item | Status | Checked on | Remaining |
 | --- | --- | --- | --- | --- | --- |
 | DIM-01 | Authentication & session | อ่าน `middleware.ts`, `session.ts`, `session-store.ts`, `postgres-session-store.ts`, `runtime-browser-flow.ts`, `runtime-completion.ts`, `transaction.ts` (parseIdentityCallback/completeSignedIdentityCallback), routes start/callback/sign-out/me, migrations 0024/0025/0027/0028: PKCE+state+binding digest, opaque 32-byte session, TTL 24 h, cookie flags, revoke-by-id | CHECKED | 2026-09-05 | SEC-ACADEMY-001/002/003/004/005/009/011 |
-| DIM-02 | Authorization, IDOR & tenancy | ทุก route/page ใต้ `src/app` ถูก grep: protected APIs/lesson/course/access-required เรียก `currentUser()` และ internal player เรียก staff guard; dashboard ตรวจ `currentUser()` ฝั่ง server ก่อน render; `course-access.ts` 4 ชั้น; 0019 grants + `privileged/academy-data-api-roles.sql`; 0018 staff grants | CHECKED | 2026-09-05 | SEC-ACADEMY-016/020; `/player/*` staff guard อ่านผ่าน grep เท่านั้น |
+| DIM-02 | Authorization, IDOR & tenancy | ทุก route/page ใต้ `src/app` ถูก grep: protected APIs/lesson/course/access-required เรียก `currentUser()` และ internal player เรียก staff guard; dashboard ตรวจ `currentUser()` ฝั่ง server ก่อน render; `course-access.ts` 4 ชั้น; 0019 grants + `privileged/academy-data-api-roles.sql`; 0018 staff grants; 0030 separates runtime reads/RPCs from authorization writes and dedicated operator logins | CHECKED | 2026-09-06 | SEC-ACADEMY-016/020 pending independent review + production; `/player/*` staff guard อ่านผ่าน grep เท่านั้น |
 | DIM-03 | Injection & unsafe I/O | zod schema ของ content blocks + sinks `LessonBody`/`ImageBlock`, `resolve.ts`, path-traversal guard ใน course-media (`resolve`+`startsWith`), operator scripts p1-p7/poola producer, diagnostic Worker; ไม่พบ raw SQL ใน runtime (ทุก write ผ่าน supabase-js/RPC) | CHECKED | 2026-09-05 | SEC-ACADEMY-012/019/021 |
 | DIM-04 | Input validation & API abuse | `edge-rate-limit-policy.ts`, `rate-limit.ts`, DO limiter, `mutation-security.ts`, `bounded-body.ts` ใช้ใน leads/otp/verify/progress/practice; `formData()` ใน start; trailing-slash routing ตรวจกับ `@opennextjs/aws` matcher + Next 15.5.22 `next-server.js:336` | CHECKED | 2026-09-05 | SEC-ACADEMY-001/005/007/008/017 |
 | DIM-05 | Secrets, config & info leakage | `wrangler.jsonc` (vars/observability), `next.config.ts` headers/CSP, `safe-log` usage ใน error paths, runbook log rule; ไม่มี tracked env file; ไม่มี secret value ถูกอ่านหรือพิมพ์ | CHECKED | 2026-09-05 | SEC-ACADEMY-026 (UNCERTAIN) |
@@ -433,11 +433,11 @@ Frozen tree: `/private/tmp/secrev-academy` (HEAD `02c712e`, read-only). Inputs: 
 | SEC-ACADEMY-013 | Security headers (CSP) | nonce + `'strict-dynamic'`, hash theme script, test assert no `'unsafe-inline'` ใน script-src | OPEN | 2026-09-05 | ทั้งหมด |
 | SEC-ACADEMY-014 | Static asset hardening | `public/_headers`; build gate ห้าม mp4/vtt/pdf/zip ใน `.open-next/assets`; headers บน worker-generated responses | OPEN | 2026-09-05 | ทั้งหมด |
 | SEC-ACADEMY-015 | Consent integrity | double opt-in; withdrawn = no-op จนกว่ายืนยัน; Turnstile | OPEN | 2026-09-05 | ทั้งหมด (email sending ยังปิด) |
-| SEC-ACADEMY-016 | Least privilege (DB role) | revoke insert/update `course_entitlement`/`service_activation` จาก `academy_runtime`; แยก identity credential; ย้าย grant helper ไป staff script | OPEN | 2026-09-05 | ทั้งหมด |
+| SEC-ACADEMY-016 | Least privilege (DB role) | migration 0030 revokes direct `course_entitlement`/`service_activation` writes, removes dead runtime helpers, and preserves callback/session + lifecycle activation RPCs | LOCAL VERIFIED — PENDING PRODUCTION | 2026-09-06 | PostgreSQL role/race/retention fixtures and independent review passed; production transactional dry-run/apply + privilege verification remain |
 | SEC-ACADEMY-017 | Authenticated quota | per-account/per-course quota ใน DO policy สำหรับ progress/reset/practice | OPEN | 2026-09-05 | ทั้งหมด |
 | SEC-ACADEMY-018 | Test gate hygiene | `test:boundary` ที่ fail เมื่อ env ขาด; ผูกกับ release evidence; รายงาน skip count | OPEN | 2026-09-05 | ทั้งหมด |
 | SEC-ACADEMY-019 | Operator script SQL | psql variables/parameterised client; remote-side UUID re-check; injection unit test | OPEN | 2026-09-05 | ทั้งหมด |
-| SEC-ACADEMY-020 | DB privileges (shared role) | revoke `service_role` grants ใน 0018; dedicated login role ถือ `academy_staff_admin` | OPEN | 2026-09-05 | ทั้งหมด |
+| SEC-ACADEMY-020 | DB privileges (shared role) | migration 0030 revokes Academy staff/control and authorization-table/RPC grants from shared `service_role`, plus `postgres` staff membership; dedicated direct logins are required by both operator scripts | LOCAL VERIFIED — PENDING PRODUCTION | 2026-09-06 | PostgreSQL role/race/retention fixtures and independent review passed; production transactional dry-run/apply + privilege verification remain |
 | SEC-ACADEMY-021 | Diagnostic Worker | verify Access JWT ด้วย JWKS หรือถอด pseudo-check | OPEN | 2026-09-05 | ทั้งหมด (candidate ไม่ deploy) |
 | SEC-ACADEMY-022 | Evidence integrity | SHA-256 fingerprint สำหรับ `challengeVersion` | OPEN | 2026-09-05 | ทั้งหมด |
 | SEC-ACADEMY-023 | PDPA process | reviewed export + deletion procedure (revoke sessions ก่อน); เติม sessions ใน runbook map | OPEN | 2026-09-05 | ทั้งหมด |

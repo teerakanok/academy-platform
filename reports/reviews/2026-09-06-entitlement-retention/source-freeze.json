@@ -1,0 +1,241 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "b11e95b17e997967b01267f92d0c1f059e69922fd1cd780508abdaff6af5863f",
+      "bytes": 12709
+    },
+    {
+      "path": "academy-web/docs/academy-retention-scheduler.md",
+      "sha256": "20eeeeeffb326dfaab12a209a9ef657c91c016da3434c293273919ad807eac54",
+      "bytes": 11345
+    },
+    {
+      "path": "academy-web/docs/course-entitlement-operator.md",
+      "sha256": "271e821f9cda39d4ccd9f165127b1390432f8424c86b64946449fd97e45b2d6a",
+      "bytes": 5874
+    },
+    {
+      "path": "academy-web/docs/privacy/data-processing-register.md",
+      "sha256": "779987eff1ecaf5856374903056b440e1e17e21e0bc2289b0688334be5c626b5",
+      "bytes": 4693
+    },
+    {
+      "path": "academy-web/docs/privacy/request-runbook.md",
+      "sha256": "e4ae6fa794fec136298676d1e06b7c2bc5e8c46400cd082174d2a2b62c6b63dc",
+      "bytes": 3768
+    },
+    {
+      "path": "academy-web/ops/academy-retention-worker/retention.ts",
+      "sha256": "21c11740b86a1fde80608e972963f74e38348e4f00b56c20535bb9a86c89b8b9",
+      "bytes": 6830
+    },
+    {
+      "path": "academy-web/package.json",
+      "sha256": "24ea203576ad591c0d2db3b983f702dbef5759c37a7551e34f6442908b7ef5b2",
+      "bytes": 2585
+    },
+    {
+      "path": "academy-web/supabase/migrations/0001_academy_schema.sql",
+      "sha256": "4c66672568407e4aa2df7df7d37c8ed4dc3c6c5a8581239eff7a88cb1b5b7438",
+      "bytes": 3698
+    },
+    {
+      "path": "academy-web/supabase/migrations/0002_accounts_and_progress.sql",
+      "sha256": "fd03392b101e5fbc515d74798cfbb0a42a3bbd92afb26b62644c44556ed3b053",
+      "bytes": 6307
+    },
+    {
+      "path": "academy-web/supabase/migrations/0003_record_node_progress.sql",
+      "sha256": "036337330b7f364669046640baafd75b22a105f78c1ac73b6059fdaa1bf5c3e1",
+      "bytes": 3964
+    },
+    {
+      "path": "academy-web/supabase/migrations/0004_activation_and_entitlement.sql",
+      "sha256": "209b856ff1041c436db751082807110670cd28f1abecff385ed76b312153bd7a",
+      "bytes": 5076
+    },
+    {
+      "path": "academy-web/supabase/migrations/0005_attempt.sql",
+      "sha256": "c663ec2b5663f6f2d34760b20c3bed3276656159cebdf7c01af29714d88176b5",
+      "bytes": 10502
+    },
+    {
+      "path": "academy-web/supabase/migrations/0006_simulation_evidence.sql",
+      "sha256": "4fabc18161e6d60552bc6e26450f14a526be1a674630cb6b7564e57570b6fe4b",
+      "bytes": 4110
+    },
+    {
+      "path": "academy-web/supabase/migrations/0007_evidence_never_regresses.sql",
+      "sha256": "96c33a178ee2f3e3aa88f884fafecd105ed3ac9b3056f1c81ca2060c54962dfc",
+      "bytes": 5552
+    },
+    {
+      "path": "academy-web/supabase/migrations/0008_passing_attempt.sql",
+      "sha256": "b320481ee91f32f2d3da4747c49d5c8b5326846707c80ab89d0edfdcfe73ad18",
+      "bytes": 7134
+    },
+    {
+      "path": "academy-web/supabase/migrations/0009_attempt_finalize.sql",
+      "sha256": "ea0526ab65c84f9b0daf8f7a481f1789614d10cc5f3a7683e13a2269c3f4ab88",
+      "bytes": 9232
+    },
+    {
+      "path": "academy-web/supabase/migrations/0010_reuse_active_attempt.sql",
+      "sha256": "28f5136cf075cf575343932337e4748e9138c44dcd73e2915db046702dd302d2",
+      "bytes": 6584
+    },
+    {
+      "path": "academy-web/supabase/migrations/0011_attempt_retention.sql",
+      "sha256": "6415fe9bdb4821d8b8427b3e5716201e2a6d393c01ac96b35c67f475cf5f70cf",
+      "bytes": 4797
+    },
+    {
+      "path": "academy-web/supabase/migrations/0012_attempt_integrity_fixes.sql",
+      "sha256": "f19975f5181e4346f154e4bd0d8edeff46fbf8517bab6237f9e7ad983f907b02",
+      "bytes": 11399
+    },
+    {
+      "path": "academy-web/supabase/migrations/0013_integrity_batch.sql",
+      "sha256": "3af60f3cb06baf484b2eb01ac10e6be3c8389ae3f69801d99f55251cdf8dab63",
+      "bytes": 16826
+    },
+    {
+      "path": "academy-web/supabase/migrations/0014_simulation_readiness.sql",
+      "sha256": "053f557c82d9e165606424d9db8791aa684c29063b6aa891dee592b2e333e024",
+      "bytes": 1510
+    },
+    {
+      "path": "academy-web/supabase/migrations/0015_idempotent_progress_reset.sql",
+      "sha256": "890b6d46e96e6df5ad155a2e36a77f4172b90964c42e33cd4bc162f21c81abec",
+      "bytes": 4530
+    },
+    {
+      "path": "academy-web/supabase/migrations/0016_consent_events_v2.sql",
+      "sha256": "f3436264abdcf5868d8b3e397cc937c95cb8cf5635b987f583f4e5395b7205cd",
+      "bytes": 2842
+    },
+    {
+      "path": "academy-web/supabase/migrations/0017_privacy_retention_and_appeals.sql",
+      "sha256": "845539c985955714951b3d8053e93f64deeb686a076a5ac43b0483fb46fd7533",
+      "bytes": 18502
+    },
+    {
+      "path": "academy-web/supabase/migrations/0018_staff_authorization.sql",
+      "sha256": "d5cf794ff6a3c796fb7577e4bac92d987a2722ff64b8899721e92712b40f0aa7",
+      "bytes": 9455
+    },
+    {
+      "path": "academy-web/supabase/migrations/0019_dedicated_runtime_api.sql",
+      "sha256": "725edc351e8b62c2a3d5df56c9e014cf7b4ea86c7eadcc59302a5876ec76afac",
+      "bytes": 4132
+    },
+    {
+      "path": "academy-web/supabase/migrations/0020_dedicated_retention_api.sql",
+      "sha256": "8ed7065bf25906746fb31b52ab022f5c3c4f03151d31b8d8787f6981dcf96256",
+      "bytes": 5207
+    },
+    {
+      "path": "academy-web/supabase/migrations/0021_unlink_email_derived_lead_ownership.sql",
+      "sha256": "add7fb419f608925afe2e87c78d6d6297153a12a4f34be793921abdbeced4805",
+      "bytes": 574
+    },
+    {
+      "path": "academy-web/supabase/migrations/0022_identity_lifecycle_projection.sql",
+      "sha256": "df3e746d5c3863a626c93993730ffec0c805a9d4b63f32883745592037edd8e0",
+      "bytes": 19625
+    },
+    {
+      "path": "academy-web/supabase/migrations/0023_identity_lifecycle_pull_lease.sql",
+      "sha256": "eff6bf92af29569cfac15201184a17f5cc201d8092a783866a0d973c3087f5c1",
+      "bytes": 9094
+    },
+    {
+      "path": "academy-web/supabase/migrations/0024_identity_profile_activation.sql",
+      "sha256": "f0322b64ab270dec8d73e663f0cc2017c0c91df0a558488bb70aa32232fa7cab",
+      "bytes": 2372
+    },
+    {
+      "path": "academy-web/supabase/migrations/0025_identity_authorization_transaction.sql",
+      "sha256": "14934b499d3cb1a27751c8e3552577b0aa5c55bd8c649e5f67187cea1155e94d",
+      "bytes": 9959
+    },
+    {
+      "path": "academy-web/supabase/migrations/0026_identity_lifecycle_principal_contract.sql",
+      "sha256": "5739f1257fa5a18419b8296236dc17f04d21e11ee491da1e85cca90d2f4beaf4",
+      "bytes": 2445
+    },
+    {
+      "path": "academy-web/supabase/migrations/0027_identity_session_store.sql",
+      "sha256": "48d916aa5ae8cac47c800d116ae1c9780580940788f4804c2208fc9f52583fe0",
+      "bytes": 7801
+    },
+    {
+      "path": "academy-web/supabase/migrations/0028_identity_authorization_completion_lease.sql",
+      "sha256": "2831c9a452cc48d778ccf7904ad1197a88658edbb59addaa0d446b28d8831f5a",
+      "bytes": 21916
+    },
+    {
+      "path": "academy-web/supabase/migrations/0029_identity_authorization_admission_cap.sql",
+      "sha256": "6f3a1d1cc1c2b12887f234330d77f5116803fe736103e06b68475b5eed5a833d",
+      "bytes": 5950
+    },
+    {
+      "path": "academy-web/supabase/migrations/0030_least_privilege_course_entitlement.sql",
+      "sha256": "ac2e93342c2bc2ab54a356b5ffddbac9a26c554e746c7ec299dff2959362fb70",
+      "bytes": 13638
+    },
+    {
+      "path": "academy-web/supabase/migrations/0031_course_entitlement_audit_retention.sql",
+      "sha256": "09616defcdd979290c081c38bf3139b23cbff3eaaf54483b5c8c9430c14dcda4",
+      "bytes": 4842
+    },
+    {
+      "path": "academy-web/supabase/privileged/academy-retention-api-function-owners.sql",
+      "sha256": "c4fb395896fb3b712ae5aa86f809722f3b584bb479222619e5235da5e936b254",
+      "bytes": 1260
+    },
+    {
+      "path": "academy-web/supabase/privileged/academy-retention-api-roles.sql",
+      "sha256": "1daed4ba85f6bf701c8a01dad033296e7d8d3df668db2885e360d85358e40cfc",
+      "bytes": 3364
+    },
+    {
+      "path": "academy-web/supabase/rollbacks/0031_course_entitlement_audit_retention.rollback.sql",
+      "sha256": "8fd5531fa59392178cdb67ec554a1ddac7ea9926baf7ea8b181b624e20bb2cc9",
+      "bytes": 687
+    },
+    {
+      "path": "academy-web/tests/integration/academy-retention-api.test.ts",
+      "sha256": "cbf29cca87db7b9189fabe1c79548901afeb12365011ef1adf987352756d2b3a",
+      "bytes": 4598
+    },
+    {
+      "path": "academy-web/tests/integration/academy-retention-db.test.ts",
+      "sha256": "7308082112063683b8a5c7dcdde1cd6b287097484945dc240ecfbc605b1f6271",
+      "bytes": 2672
+    },
+    {
+      "path": "academy-web/tests/integration/course-entitlement-hardening.test.ts",
+      "sha256": "fa69d634eb41401187d7403af080f1cfd856320c712dbfa67df479f75aaf0836",
+      "bytes": 16052
+    },
+    {
+      "path": "academy-web/tests/unit/course-entitlement-audit-retention.test.ts",
+      "sha256": "945a9517c0385e2523b0bb70113ab7c162ab8460a6647ea11c99c9841e6ad813",
+      "bytes": 1473
+    },
+    {
+      "path": "academy-web/tests/unit/retention-scheduler.test.ts",
+      "sha256": "18b669a017549673f2405e993f5f9f159abbe019e55f598f1f686947335e925f",
+      "bytes": 7851
+    },
+    {
+      "path": "docs/maintenance/README.md",
+      "sha256": "b46c2ae184cc1ba51b3762c409df9f4e6ce40f6074b9a1844f958806468e5b9d",
+      "bytes": 2179
+    }
+  ]
+}

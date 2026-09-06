@@ -2,7 +2,7 @@
 
 > Open work only. Move closed items to `completed_log.md` with evidence.
 > Read `../AGENTS.md` first. Provider-neutral — no provider/model names in this plan.
-> **Last updated:** 2026-09-03
+> **Last updated:** 2026-09-06
 
 **Current production checkpoint (2026-09-04 06:3x +07):** Academy Worker
 `cyberskills-academy` serves version `d4717406-58be-43b4-87bb-bc1be260ecdd`
@@ -44,6 +44,19 @@ code), confirm dashboard/catalog, then grant `setup-and-environment`
 entitlement to that account through the audited path, check lesson, progress
 after reload, `412x915`, and sign-out. Historical readiness statements below
 remain dated evidence and do not override this checkpoint.
+
+**Least-privilege manual entitlement checkpoint (2026-09-06):** source now
+separates runtime authorization-table writes from the dedicated data API, removes
+shared `service_role` Academy authorization/staff access, and adds migration `0030` plus a
+direct `academy_entitlement_operator` workflow. Grant/revoke operations resolve
+canonical issuer + UUID subjects (email is only an optional confirmation hint),
+require an active owner actor, accept one bounded course scope/source/reference,
+are idempotent, and write append-only audit. Migration review has a mandatory
+transactional `ROLLBACK` rehearsal before `COMMIT`; rollback preserves audit
+evidence. Callback session RPC, monotonic service activation RPC, and accepted
+migration `0029` admission-cap semantics remain unchanged. No payment provider,
+production database apply, deploy, or credential value is included. Independent
+review and the real PostgreSQL fixture remain required before closure.
 
 **Sole kill-switch operator evidence submitted for Identity review (2026-08-24):**
 Academy now has a source-bound public sole-operator designation for Songpon Teerakanok,

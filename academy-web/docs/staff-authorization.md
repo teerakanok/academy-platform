@@ -20,8 +20,8 @@ grant another.
 - `academy.staff_role_assignment` is the current-state source of truth.
 - `academy.staff_role_audit` records every effective grant and revocation.
 - Browser database roles cannot read either table or execute staff functions.
-- The shared runtime `service_role` can check roles but cannot change them.
-- Only the non-login `academy_staff_admin` control-plane role can execute role changes.
+- The shared Pool A `service_role` cannot read Academy staff data or execute staff functions.
+- Only the dedicated `academy_staff_admin` database login can execute role changes.
 - Server code checks `academy.has_staff_role` on every protected request.
 - `INTERNAL_SURFACES=on` only enables the route family; `/player` still requires
   `content-ops` or `owner` and is forced dynamic so authorization is never prerendered.
@@ -34,9 +34,9 @@ grant another.
 
 ## Bootstrap and changes
 
-There is no staff UI in v1. The migration grants the Supabase `postgres` migration
-operator permission to assume the non-login `academy_staff_admin` role. That operator
-uses `scripts/manage-staff-role.mjs`. The script is dry-run by
+There is no staff UI in v1. A host-side operator provisions a password only for the
+dedicated `academy_staff_admin` login and connects directly as that role for
+`scripts/manage-staff-role.mjs`; the script rejects every other database user. The script is dry-run by
 default and requires `--apply` to change state. Its `DATABASE_URL` must be supplied by the
 approved control-plane environment, never by the shared application runtime.
 
@@ -54,3 +54,6 @@ then revoke the old owner. The database prevents revoking the final owner.
 
 The function prevents a non-owner change, self-revocation of owner, and revocation of
 the final owner. Production bootstrap remains part of the Pool A migration/release gate.
+Course entitlement is deliberately not part of this role. It uses the separate
+`academy_entitlement_operator` login and `owner` actor authorization described in
+`course-entitlement-operator.md`.

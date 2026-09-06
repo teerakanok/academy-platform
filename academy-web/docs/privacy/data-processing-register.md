@@ -17,6 +17,7 @@ certificates, analytics, new processors, or a new data destination.
 | Appeal case reference and status | Resolve a result appeal and hold relevant evidence; legitimate interests and legal claims | Until resolution; related attempt then resumes normal retention | `attempt_appeal`; purge hold in both attempt and account functions |
 | Privacy-rights request evidence | Prove request receipt and disposition without storing the narrative in Academy; legal obligation and legitimate interests | 3 years after completion or denial; open cases are held | `privacy_request`; `purge_expired_privacy_requests(3)` |
 | Staff-role assignment and authorization audit | Enforce and prove access changes; security and legitimate interests | Assignment and related history are held while that role is active; after revocation, assignment and audit history are deleted after 3 years | `purge_expired_staff_authorization_history(3)` |
+| Manual course entitlement decision audit | Prove authorized manual access changes without an email identity authority | Canonical UUID attribution survives account deletion; history is held during active entitlement and for 3 years after revocation or expiry | `run_retention_course_entitlement_history()` |
 
 ## Processing boundaries
 
@@ -42,3 +43,5 @@ purge functions before it is mentioned in the privacy notice.
 Permanent purchase rights are not part of the current release. Before commerce is
 enabled, a purchase ledger and entitlement-restore contract must be defined so account
 retention cannot erase a paid right.
+
+Entitlement audit follows the existing authorization-history hold: retain evidence while a matching entitlement is active and for three years after it ends through revocation or expiry; old event rows become eligible only when that hold no longer applies. Account deletion preserves UUID audit attribution.

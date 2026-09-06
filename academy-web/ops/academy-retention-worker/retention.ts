@@ -27,6 +27,7 @@ export const RETENTION_JOBS: readonly PurgeJob[] = [
   { name: 'accounts', rpc: 'run_retention_inactive_users' },
   { name: 'privacy-requests', rpc: 'run_retention_privacy_requests' },
   { name: 'staff-authorization', rpc: 'run_retention_staff_authorization_history' },
+  { name: 'course-entitlement-history', rpc: 'run_retention_course_entitlement_history' },
 ]
 
 type Fetcher = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>

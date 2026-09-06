@@ -1,0 +1,33 @@
+
+ RUN  v3.2.7 /private/tmp/academy-staff-entitlement-cde63a58/academy-web
+
+ ❯ |integration| tests/integration/course-entitlement-hardening.test.ts (3 tests | 1 failed) 145ms
+   ✓ audited course entitlement operator > grants and revokes idempotently with owner authorization and audit 52ms
+   × audited course entitlement operator > rejects an entitlement change after a concurrent owner revocation commits 49ms
+     → expected undefined to be an instance of Error
+   ✓ audited course entitlement operator > keeps direct mutation and privileged RPCs unavailable to runtime and service roles 7ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  09:31:10
+   Duration  455ms (transform 37ms, setup 14ms, collect 34ms, tests 145ms, environment 0ms, prepare 87ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |integration| tests/integration/course-entitlement-hardening.test.ts > audited course entitlement operator > rejects an entitlement change after a concurrent owner revocation commits
+AssertionError: expected undefined to be an instance of Error
+ ❯ tests/integration/course-entitlement-hardening.test.ts:148:33
+    146|           await db.query('commit')
+    147|           const outcome = await pending
+    148|           expect(outcome.error).toBeInstanceOf(Error)
+       |                                 ^
+    149|           expect(String(outcome.error)).toMatch(/owner staff role requ…
+    150|           const result = await db.query('select count(*)::int as count…
+ ❯ withDb tests/integration/course-entitlement-hardening.test.ts:14:12
+ ❯ tests/integration/course-entitlement-hardening.test.ts:127:7
+ ❯ withDb tests/integration/course-entitlement-hardening.test.ts:14:12
+ ❯ tests/integration/course-entitlement-hardening.test.ts:124:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

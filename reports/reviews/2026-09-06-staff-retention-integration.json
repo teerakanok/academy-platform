@@ -1,0 +1,78 @@
+{
+  "status": "LOCAL_VERIFIED_NOT_DEPLOYED",
+  "base_main": "a5e2ee852029e8f14f170b1fb7cf0b2312675250",
+  "incoming_head": "09bff467427ba5912d65099e3dfe28aa73a607a8",
+  "gates": [
+    {
+      "name": "unit",
+      "command": [
+        "npx",
+        "--no-install",
+        "vitest",
+        "run",
+        "--project",
+        "unit"
+      ],
+      "exit": 0,
+      "log_path": "/private/tmp/cyberskills-prod-cde63a58/academy-staff-combined-unit.log",
+      "sha256": "184309cf3f3d4ccc01c13c4ae4aaa5199929844c91e4db5e881400a0243e298d"
+    },
+    {
+      "name": "lint",
+      "command": [
+        "npm",
+        "run",
+        "lint"
+      ],
+      "exit": 1,
+      "log_path": "/private/tmp/cyberskills-prod-cde63a58/academy-staff-combined-lint.log",
+      "sha256": "2406b7f27e2ceffc276219e79f677f5021a455c01449c8d57b9012858f1edb93"
+    },
+    {
+      "name": "build-cf",
+      "command": [
+        "npm",
+        "run",
+        "build:cf"
+      ],
+      "exit": 0,
+      "log_path": "/private/tmp/cyberskills-prod-cde63a58/academy-staff-combined-build-cf.log",
+      "sha256": "b8ff8a5e1a4a5e78778e1092f51a82e432a6a2c4b9bb0c0a19dbacad66b8e0b3"
+    }
+  ],
+  "unit_passed": 2387,
+  "lint_baseline_errors": 3,
+  "lint_warnings": 16,
+  "source_and_evidence_matches_reviewed_incoming": true,
+  "overlap": {
+    "base": "efd457b6b6137d632b486cb719c9a4f1baf82f23",
+    "incoming_commits": [
+      "f50fec0f7e46345783da3b04470fdf3f9edbb71c",
+      "09bff467427ba5912d65099e3dfe28aa73a607a8"
+    ],
+    "target_commits": [
+      "5e587b6c9f7efcc4a77fe658f5a1059c88529c01",
+      "920f257133cf18cb1ab077a17e6906a891192c8e",
+      "de1fd32796e66f3e57c9af3ea8df958ea5386325",
+      "99b0bfd9730355c043e911f46456827e0d669fcc",
+      "6a0fc4fbd6d5f2bed5dc5df9b623f0e29af46734",
+      "a5e2ee852029e8f14f170b1fb7cf0b2312675250"
+    ],
+    "per_commit_overlap": [
+      {
+        "incoming": "f50fec0f7e46345783da3b04470fdf3f9edbb71c",
+        "existing": "6a0fc4fbd6d5f2bed5dc5df9b623f0e29af46734",
+        "paths": [
+          "reports/security/2026-09-05-security-review-checklist.md"
+        ]
+      }
+    ]
+  },
+  "review": "reports/reviews/2026-09-06-entitlement-retention/independent-review.json",
+  "remaining": [
+    "production transaction ROLLBACK before COMMIT",
+    "production host gate and deploy",
+    "authenticated learner/staff playtest"
+  ],
+  "raw_log_whitespace": "Preserved exact test output; git diff check excludes raw .log evidence only."
+}
