@@ -496,7 +496,9 @@ async function main() {
     const tests = spawnSync(
       process.execPath,
       ['./node_modules/vitest/vitest.mjs', 'run', '--project', 'integration',
-        'tests/integration/identity-lifecycle-page-store.test.ts'],
+        '--fileParallelism=false',
+        'tests/integration/identity-lifecycle-page-store.test.ts',
+        'tests/integration/identity-lifecycle-enforcement.test.ts'],
       {
         cwd: process.cwd(),
         stdio: 'inherit',

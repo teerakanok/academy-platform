@@ -14,14 +14,14 @@ describe('approved Identity Control consumer policy mirror', () => {
       status: 'approved-policy-release-blocked',
       identityControlSource: {
         repository: 'products/cyberskills/identity-control',
-        sourceRevision: 'f0e1cc5dd89271ca2a1a78fd4b3c7b825bf61c1e',
+        sourceRevision: 'ab958eeb7f8c9aabec5a0e0f371e27266fae88a4',
         contractDigests: {
           'config/consumer-registry-v1.approved.json': '572d230a9f84c219e5b82eeb84dd1350bd8a319e180f2208f45db3abc03d1875',
           'docs/integration/consumer-registry-v1.md': 'd880b0e2a8000f6898b76b91ee47ab18b886ac8e2f413f214448a8a2bed575a4',
-          'docs/integration/consumer-conformance-kit.md': 'df1ef8c8b385be09cfcf0481f6e0643db4517eb3a72fb406e8612e388beadb97',
+          'docs/integration/consumer-conformance-kit.md': '203b1e43e8ea9e3b651029f9fb78d8f911b7f7c17942a11c9a1d1931268ed7d6',
           'docs/integration/lifecycle-pull-consumer-contract.md': 'ba7ca71fd5ab845821f6dc9cfc09bc612bef1ed12914331e4ad4e65a0ce6f17c',
-          'packages/contracts/src/index.ts': 'e3f22d7bb02f255c01d3552022b874202df849cf31410ebff98fac7460f5799f',
-          'packages/testing/src/index.ts': 'd12f81616596dc37a9f62ae16e37873c08efabc222427f4b82ced187c0b6a51d',
+          'packages/contracts/src/index.ts': 'b7cd6e7b79f0a5002c523d34dd81fd029ee1997cf9ab08b456bf7d9bfc72573c',
+          'packages/testing/src/index.ts': '300982ed33a1a1ab277c436086d50dacd7aa96bb6dd53f1d86cf775ce9e91344',
         },
       },
       accountCenter: {

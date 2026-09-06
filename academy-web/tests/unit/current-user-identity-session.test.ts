@@ -51,13 +51,29 @@ describe('Academy current user opaque Identity session', () => {
   it.each([
     ['suspended', { ...claims, activation: { status: 'suspended' as const, revision: 4 } }],
     ['deactivated', { ...claims, activation: { status: 'deactivated' as const, revision: 5 } }],
-  ])('keeps %s identity authenticated so authorization can return the honest inactive state', async (_label, value) => {
-    const resolveAccount = vi.fn().mockResolvedValue(account)
+  ])('fails closed when the durable principal is %s', async (_label, value) => {
+    const resolveAccount = vi.fn().mockResolvedValue(null)
     await expect(resolveIdentitySessionUser({
       sessionId,
       sessionStore: { get: vi.fn().mockResolvedValue(value) },
       resolveAccount,
-    })).resolves.toEqual({ account, email: claims.verifiedEmail })
+    })).resolves.toBeNull()
+    expect(resolveAccount).toHaveBeenCalledWith({
+      issuer: value.issuer,
+      subject: value.subject,
+      email: value.verifiedEmail,
+    })
+  })
+
+  it('uses the durable account email so an old session cannot revert a newer verified email', async () => {
+    const renamedAccount = { ...account, email: 'renamed@example.com' }
+    const resolveAccount = vi.fn().mockResolvedValue(renamedAccount)
+
+    await expect(resolveIdentitySessionUser({
+      sessionId,
+      sessionStore: { get: vi.fn().mockResolvedValue(claims) },
+      resolveAccount,
+    })).resolves.toEqual({ account: renamedAccount, email: renamedAccount.email })
   })
 
   it('fails closed when the durable session store or account mapping fails', async () => {

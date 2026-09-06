@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies, headers } from 'next/headers'
-import { findOrCreateUser, type AcademyUser } from '@/lib/account/users'
+import { findActiveUser, type AcademyUser } from '@/lib/account/users'
 import { createAcademyIdentityProductionSessionStore } from '@/lib/identity/production-runtime'
 import type { IdentityDurableSessionPort } from '@/lib/identity/postgres-session-store'
 import { parseAcademySessionCookie } from '@/lib/identity/session-store'
@@ -52,12 +52,12 @@ export interface SessionUser {
   email: string
 }
 
-type IdentityAccountResolver = typeof findOrCreateUser
+type IdentityAccountResolver = typeof findActiveUser
 
 export async function resolveIdentitySessionUser({
   sessionId,
   sessionStore,
-  resolveAccount = findOrCreateUser,
+  resolveAccount = findActiveUser,
 }: {
   sessionId: string
   sessionStore: Pick<IdentityDurableSessionPort, 'get'>
@@ -71,7 +71,8 @@ export async function resolveIdentitySessionUser({
       subject: claims.subject,
       email: claims.verifiedEmail,
     })
-    return { account, email: claims.verifiedEmail }
+    if (!account) return null
+    return { account, email: account.email }
   } catch {
     return null
   }
@@ -107,12 +108,13 @@ export async function currentUser(): Promise<SessionUser | null> {
   if (!email) return null
   if (!user.email_confirmed_at && !user.confirmed_at) return null
 
-  const account = await findOrCreateUser({
+  const account = await findActiveUser({
     issuer: process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'unknown-issuer',
     subject: user.id,
     email,
   })
-  return { account, email }
+  if (!account) return null
+  return { account, email: account.email }
 }
 
 export async function signOut(): Promise<void> {

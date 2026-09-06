@@ -72,15 +72,14 @@ describe('security boundary wiring', () => {
     expect(worker).toContain("rpc: 'run_retention_staff_authorization_history'")
   })
 
-  it('retention capability แยกจาก Academy web Worker และ shared service role', () => {
+  it('retention deletion capability แยกจาก Academy web Worker และ shared service role', () => {
     const appWorker = source('worker.ts')
     const retentionWorker = source('ops/academy-retention-worker/retention.ts')
-    const appConfig = source('wrangler.jsonc')
     const retentionConfig = source('ops/academy-retention-worker/wrangler.jsonc')
 
     expect(appWorker).not.toContain('SUPABASE_SERVICE_ROLE_KEY')
-    expect(appWorker).not.toContain('scheduled(')
-    expect(appConfig).not.toContain('"triggers"')
+    expect(appWorker).not.toContain('ACADEMY_RETENTION_API_JWT_SECRET')
+    expect(appWorker).not.toContain('runRetention')
     expect(retentionWorker).toContain('ACADEMY_RETENTION_API_JWT_SECRET')
     expect(retentionWorker).not.toContain('SUPABASE_SERVICE_ROLE_KEY')
     expect(retentionConfig).toContain('"triggers": { "crons": ["0 3 * * *"] }')

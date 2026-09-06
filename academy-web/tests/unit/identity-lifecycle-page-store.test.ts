@@ -335,6 +335,18 @@ describe('Academy Identity lifecycle page-store boundary', () => {
     expect(rpc.mock.calls[0]![1].p_projections).not.toBe(commit.projections)
   })
 
+  it('reconciles only the source-approved config revision through the dedicated RPC', async () => {
+    const rpc = vi.fn(async () => ({ data: true, error: null }))
+    const store = new AcademyIdentityLifecyclePageStore({ rpc })
+
+    await expect(store.reconcileApprovedConfigurationRevision(2)).resolves.toBe(true)
+    expect(rpc).toHaveBeenCalledWith('approve_identity_lifecycle_config_revision', {
+      p_approved_revision: 2,
+    })
+    await expect(store.reconcileApprovedConfigurationRevision(0)).rejects
+      .toThrow('Identity lifecycle approved config revision is invalid')
+  })
+
   it('claims, renews, releases, and commits only through exact lease RPC payloads', async () => {
     const claimToken = '00000000-0000-4000-8000-000000000001'
     let inputPropertyReads = 0

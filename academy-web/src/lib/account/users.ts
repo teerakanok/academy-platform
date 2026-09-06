@@ -1,4 +1,8 @@
 import { academyDb } from '@/lib/db/server'
+import {
+  isCanonicalIdentityLifecyclePrincipalIssuer,
+  isWellFormedIdentityLifecycleSubject,
+} from '@/lib/identity/lifecycle-principal'
 
 // ชั้นบัญชีของ Academy — ตัวตนจริงอยู่ที่ canonical issuer ของ Identity Control
 // ตารางนี้เก็บแค่ส่วนที่ Academy ต้องใช้ และผูกกับ issuer ด้วย (issuer, subject)
@@ -105,6 +109,30 @@ export async function findOrCreateUser(claims: IdentityClaims): Promise<AcademyU
   }
 
   return toUser(created.data)
+}
+
+/**
+ * Request-path principal resolution is read-only. Exchange completion is the
+ * only production provisioning path; an old session can never recreate or
+ * mutate a profile after lifecycle erasure or a verified-email change.
+ */
+export async function findActiveUser(claims: IdentityClaims): Promise<AcademyUser | null> {
+  if (!isCanonicalIdentityLifecyclePrincipalIssuer(claims.issuer)
+    || !isWellFormedIdentityLifecycleSubject(claims.subject)) return null
+
+  const existing = await academyDb()
+    .from('users')
+    .select('*, service_activation(status)')
+    .eq('issuer', claims.issuer)
+    .eq('subject', claims.subject)
+    .maybeSingle()
+  if (existing.error || !existing.data) return null
+
+  const activation = existing.data.service_activation
+  if (!Array.isArray(activation) || activation.length !== 1 || activation[0]?.status !== 'active') {
+    return null
+  }
+  return toUser(existing.data)
 }
 
 /** ชื่อบนใบรับรอง — แก้ได้จนกว่าจะออกใบ */

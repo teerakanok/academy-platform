@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { createProductionSessionStore, findOrCreateUser, headers } = vi.hoisted(() => ({
+const { createProductionSessionStore, findActiveUser, headers } = vi.hoisted(() => ({
   createProductionSessionStore: vi.fn(),
-  findOrCreateUser: vi.fn(),
+  findActiveUser: vi.fn(),
   headers: vi.fn(),
 }))
 
@@ -10,7 +10,7 @@ vi.mock('next/headers', () => ({
   cookies: vi.fn(),
   headers,
 }))
-vi.mock('@/lib/account/users', () => ({ findOrCreateUser }))
+vi.mock('@/lib/account/users', () => ({ findActiveUser }))
 vi.mock('@/lib/identity/production-runtime', () => ({
   createAcademyIdentityProductionSessionStore: createProductionSessionStore,
 }))
@@ -47,7 +47,7 @@ describe('production currentUser opaque-cookie authorization', () => {
     await expect(currentUser()).resolves.toBeNull()
 
     expect(createProductionSessionStore).toHaveBeenCalledTimes(1)
-    expect(findOrCreateUser).not.toHaveBeenCalled()
+    expect(findActiveUser).not.toHaveBeenCalled()
   })
 
   it('rejects a syntactically valid session after durable revocation', async () => {
@@ -72,6 +72,6 @@ describe('production currentUser opaque-cookie authorization', () => {
       'revoke_identity_session',
       'read_identity_session',
     ])
-    expect(findOrCreateUser).not.toHaveBeenCalled()
+    expect(findActiveUser).not.toHaveBeenCalled()
   })
 })

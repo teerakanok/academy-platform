@@ -1,4 +1,7 @@
 import { createHash, webcrypto } from 'node:crypto'
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   createIdentityClientAssertionJtiSource,
@@ -24,6 +27,8 @@ const JTIS = [
   '018f0c65-4e3f-4ce4-8e64-4efcdd7b5b91',
   '34a49b39-2030-44bb-8bd5-fbd40928cc0a',
 ] as const
+const SIBLING_IDENTITY_CONTROL = join(__dirname, '../../../../identity-control')
+const CANONICAL_IDENTITY_CONTROL = '/private/tmp/identity-security-correction-cde63a58'
 
 afterEach(() => {
   vi.unstubAllGlobals()
@@ -182,8 +187,17 @@ async function loadIdentityControlContracts(): Promise<{
   Authenticator: IdentityControlAuthenticatorConstructor
   ClientControlRegistry: IdentityControlRegistryConstructor
 }> {
-  const authenticatorPath = '../../../../identity-control/packages/core/src/client-assertion'
-  const controlPath = '../../../../identity-control/packages/core/src/client-control'
+  const sourceRoot = existsSync(SIBLING_IDENTITY_CONTROL)
+    ? SIBLING_IDENTITY_CONTROL
+    : CANONICAL_IDENTITY_CONTROL
+  const authenticatorPath = pathToFileURL(join(
+    sourceRoot,
+    'packages/core/src/client-assertion',
+  )).href
+  const controlPath = pathToFileURL(join(
+    sourceRoot,
+    'packages/core/src/client-control',
+  )).href
   const [authenticator, control]: unknown[] = await Promise.all([
     import(authenticatorPath), import(controlPath),
   ])

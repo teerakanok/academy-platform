@@ -3,6 +3,7 @@ import { servePrivateMedia, type MediaWorkerEnv } from './src/lib/media/worker-d
 import { EdgeRateLimiter } from './worker/edge-rate-limiter-do'
 import { isServedHost, unservedHostResponse, type HostPolicyEnv } from './src/lib/edge-host-policy'
 import { enforceEdgeRateLimit } from './src/lib/edge-rate-limit-enforcement'
+import { runAcademyIdentityLifecyclePull } from './src/lib/identity/lifecycle-production-runtime'
 
 export { EdgeRateLimiter }
 
@@ -14,6 +15,19 @@ export * from './.open-next/worker.js'
 interface AcademyWorkerEnv extends MediaWorkerEnv, HostPolicyEnv {
   EDGE_RATE_LIMITER?: DurableObjectNamespace<EdgeRateLimiter>
   RATE_LIMIT_KEY_SECRET?: string
+  IDENTITY_LIFECYCLE_ENABLED?: string
+  IDENTITY_LIFECYCLE_PUBLISHER_ENDPOINT?: string
+  IDENTITY_LIFECYCLE_CLIENT_ASSERTION_AUDIENCE?: string
+  IDENTITY_LIFECYCLE_EVENT_AUDIENCE?: string
+  IDENTITY_LIFECYCLE_CLIENT_ASSERTION_KEY_ID?: string
+  IDENTITY_LIFECYCLE_CLIENT_ASSERTION_PRIVATE_JWK?: string
+  IDENTITY_LIFECYCLE_VERIFICATION_KEY_SET_DOCUMENT?: string
+  IDENTITY_LIFECYCLE_REQUEST_LIMIT?: string
+  IDENTITY_LIFECYCLE_LEASE_DURATION_MS?: string
+  IDENTITY_LIFECYCLE_TIMEOUT_MS?: string
+  IDENTITY_LIFECYCLE_WORKER_ID?: string
+  ACADEMY_DATA_API_URL?: string
+  ACADEMY_DATA_API_JWT_SECRET?: string
 }
 
 /** Thai JSON bodies render as mojibake when a browser navigates to them without a declared charset. */
@@ -35,5 +49,8 @@ export default {
 
     const media = await servePrivateMedia(protectedRequest, env)
     return withJsonCharset(media ?? await openNextHandler.fetch(protectedRequest, env, ctx))
+  },
+  async scheduled(_controller, env) {
+    await runAcademyIdentityLifecyclePull(env as unknown as Record<string, string | undefined>)
   },
 } satisfies ExportedHandler<AcademyWorkerEnv>

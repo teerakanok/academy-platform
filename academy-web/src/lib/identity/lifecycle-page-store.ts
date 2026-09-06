@@ -109,6 +109,19 @@ implements IdentityLifecycleLeasedPageStore {
     return snapshot
   }
 
+  async reconcileApprovedConfigurationRevision(approvedRevision: unknown): Promise<boolean> {
+    assertPositiveSafeInteger(approvedRevision, 'approved config revision')
+    const { data, error } = await this.client.rpc(
+      'approve_identity_lifecycle_config_revision',
+      { p_approved_revision: approvedRevision },
+    )
+    if (error) throw new Error('Identity lifecycle config revision reconciliation failed')
+    if (typeof data !== 'boolean') {
+      throw new Error('Identity lifecycle config revision reconciliation response is invalid')
+    }
+    return data
+  }
+
   async claimPullLease(
     inputValue: IdentityLifecyclePullLeaseClaimInput,
   ): Promise<IdentityLifecyclePullLease | null> {
