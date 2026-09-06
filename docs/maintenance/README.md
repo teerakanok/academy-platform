@@ -17,6 +17,7 @@ backup verification, restore rehearsal, rollback, or secret-handling change.
    - [`../../academy-web/docs/private-media-delivery.md`](../../academy-web/docs/private-media-delivery.md)
    - [`../../academy-web/docs/academy-retention-scheduler.md`](../../academy-web/docs/academy-retention-scheduler.md)
    - [`../../academy-web/docs/staff-authorization.md`](../../academy-web/docs/staff-authorization.md)
+   - [`../../academy-web/docs/course-entitlement-operator.md`](../../academy-web/docs/course-entitlement-operator.md)
    - [`../../academy-web/docs/privacy/request-runbook.md`](../../academy-web/docs/privacy/request-runbook.md)
 
 ## Scope

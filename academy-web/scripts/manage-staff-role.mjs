@@ -26,11 +26,11 @@ function parseArgs(argv) {
 
 async function accountId(client, issuer, subject, label) {
   const result = await client.query(
-    `select id from academy.users where issuer = $1 and subject = $2`,
+    `select academy.resolve_staff_account($1, $2)::text as account_id`,
     [issuer, subject],
   )
-  if (result.rowCount !== 1) throw new Error(`${label} identity did not resolve to exactly one Academy account`)
-  return result.rows[0].id
+  if (result.rowCount !== 1) throw new Error(`${label} identity did not resolve to one Academy account`)
+  return result.rows[0].account_id
 }
 
 const { values, action, apply } = parseArgs(process.argv.slice(2))
@@ -40,20 +40,23 @@ if (!databaseUrl) throw new Error('DATABASE_URL is required and must not be prin
 const client = new pg.Client({ connectionString: databaseUrl })
 await client.connect()
 try {
+  const identity = await client.query(`select current_user as user_name`)
+  if (identity.rows[0].user_name !== 'academy_staff_admin') {
+    throw new Error('DATABASE_URL must connect directly as academy_staff_admin')
+  }
   const actorId = await accountId(client, values.get('actor-issuer'), values.get('actor-subject'), 'actor')
   const targetId = await accountId(client, values.get('target-issuer'), values.get('target-subject'), 'target')
   const before = await client.query(
-    `select revoked_at is null as active from academy.staff_role_assignment where account_id = $1 and role = $2`,
-    [targetId, values.get('role')],
+    `select academy.inspect_staff_role($1, $2, $3) as state`,
+    [actorId, targetId, values.get('role')],
   )
 
   if (!apply) {
-    console.log(`dry_run=true action=${action} role=${values.get('role')} currently_active=${before.rows[0]?.active === true}`)
+    console.log(`dry_run=true action=${action} role=${values.get('role')} actor_authorized=${before.rows[0].state.actorAuthorized} currently_active=${before.rows[0].state.active}`)
     process.exit(0)
   }
 
   await client.query('begin')
-  await client.query('set local role academy_staff_admin')
   const changed = await client.query(
     `select academy.set_staff_role($1, $2, $3, $4, $5) as changed`,
     [actorId, targetId, values.get('role'), action === 'enable', values.get('reference').trim()],
@@ -61,21 +64,15 @@ try {
   await client.query('commit')
 
   const verified = await client.query(
-    `select revoked_at is null as active from academy.staff_role_assignment where account_id = $1 and role = $2`,
-    [targetId, values.get('role')],
+    `select academy.inspect_staff_role($1, $2, $3) as state`,
+    [actorId, targetId, values.get('role')],
   )
   const expectedActive = action === 'enable'
-  if (verified.rows[0]?.active !== expectedActive) throw new Error('post-change assignment verification failed')
+  if (verified.rows[0].state.active !== expectedActive) throw new Error('post-change assignment verification failed')
   if (changed.rows[0].changed) {
-    const audit = await client.query(
-      `select exists (
-         select 1 from academy.staff_role_audit
-          where account_id = $1 and role = $2 and actor_account_id = $3
-            and action = $4 and authorization_reference = $5
-       ) as recorded`,
-      [targetId, values.get('role'), actorId, action === 'enable' ? 'granted' : 'revoked', values.get('reference').trim()],
-    )
-    if (!audit.rows[0].recorded) throw new Error('post-change audit verification failed')
+    if (verified.rows[0].state.lastAuditReference !== values.get('reference').trim()) {
+      throw new Error('post-change audit verification failed')
+    }
   }
   console.log(`applied=true changed=${changed.rows[0].changed} role=${values.get('role')} active=${expectedActive}`)
 } catch (error) {

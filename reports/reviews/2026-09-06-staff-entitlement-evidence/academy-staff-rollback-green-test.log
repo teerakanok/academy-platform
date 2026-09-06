@@ -1,0 +1,10 @@
+
+ RUN  v3.2.7 /private/tmp/academy-staff-entitlement-cde63a58/academy-web
+
+ ✓ |integration| tests/integration/course-entitlement-hardening.test.ts (6 tests) 171ms
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  09:36:46
+   Duration  487ms (transform 37ms, setup 14ms, collect 28ms, tests 171ms, environment 0ms, prepare 77ms)
+

@@ -1,0 +1,44 @@
+
+ RUN  v3.2.7 /private/tmp/academy-staff-entitlement-cde63a58/academy-web
+
+ ❯ |integration| tests/integration/course-entitlement-hardening.test.ts (6 tests | 1 failed) 171ms
+   ✓ audited course entitlement operator > grants and revokes idempotently with owner authorization and audit 41ms
+   ✓ audited course entitlement operator > rejects an entitlement change after a concurrent owner revocation commits 49ms
+   ✓ audited course entitlement operator > refuses a colliding operator role before adopting or changing it 12ms
+   ✓ audited course entitlement operator > refuses unexpected existing staff administrator authority 12ms
+   × audited course entitlement operator > clears any subsequently provisioned staff credential on rollback 20ms
+     → expected { login: false, cleared: false } to deeply equal { login: false, cleared: true }
+   ✓ audited course entitlement operator > keeps direct mutation and privileged RPCs unavailable to runtime and service roles 8ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 passed (6)
+   Start at  09:35:46
+   Duration  548ms (transform 31ms, setup 12ms, collect 28ms, tests 171ms, environment 0ms, prepare 61ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |integration| tests/integration/course-entitlement-hardening.test.ts > audited course entitlement operator > clears any subsequently provisioned staff credential on rollback
+AssertionError: expected { login: false, cleared: false } to deeply equal { login: false, cleared: true }
+
+- Expected
++ Received
+
+  {
+-   "cleared": true,
++   "cleared": false,
+    "login": false,
+  }
+
+ ❯ tests/integration/course-entitlement-hardening.test.ts:200:31
+    198|         const state = await db.query(`select rolcanlogin as login, rol…
+    199|           from pg_authid where rolname = 'academy_staff_admin'`)
+    200|         expect(state.rows[0]).toEqual({ login: false, cleared: true })
+       |                               ^
+    201|       } finally {
+    202|         await db.query('rollback')
+ ❯ withDb tests/integration/course-entitlement-hardening.test.ts:15:12
+ ❯ tests/integration/course-entitlement-hardening.test.ts:192:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

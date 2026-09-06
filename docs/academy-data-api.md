@@ -28,8 +28,9 @@ Academy table has default-deny RLS. Its scope is still constrained:
 - the dedicated API exposes only `academy`, so the Worker has no SQL transport
   to other Pool A schemas;
 - grants exclude retention purges, privacy requests, attempt appeals, staff
-  mutation/audit, and marketing exports; entitlement grant/revocation remains
-  a trusted Academy server operation and has no browser route;
+  mutation/audit, marketing exports, and entitlement grant/revocation;
+- entitlement changes are reachable only through the dedicated
+  `academy_entitlement_operator` database role and its owner-authorized RPC;
 - the API authenticator can set role only to `academy_runtime` or the empty
   anonymous role.
 
