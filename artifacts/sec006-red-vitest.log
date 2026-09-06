@@ -1,0 +1,27 @@
+
+ RUN  v3.2.7 /private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-cDNljN/checkout/academy-web
+
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| tests/unit/assessment-attempt-integrity.test.ts [ tests/unit/assessment-attempt-integrity.test.ts ]
+Error: Cannot find module '@/lib/observability/assessment-integrity' imported from '/private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-cDNljN/checkout/academy-web/tests/unit/assessment-attempt-integrity.test.ts'.
+
+- If you rely on tsconfig.json's "paths" to resolve modules, please install "vite-tsconfig-paths" plugin to handle module resolution.
+- Make sure you don't have relative aliases in your Vitest config. Use absolute paths instead. Read more: https://vitest.dev/guide/common-errors
+ ❯ tests/unit/assessment-attempt-integrity.test.ts:8:1
+      6|   minimumAssessmentDwellSeconds,
+      7| } from '@/lib/course/assessment-policy'
+      8| import { recordAssessmentIntegrityEvent } from '@/lib/observability/as…
+       | ^
+      9| 
+     10| describe('assessment integrity admission policy', () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  20:09:31
+   Duration  242ms (transform 43ms, setup 0ms, collect 0ms, tests 0ms, environment 0ms, prepare 42ms)
+

@@ -23,6 +23,25 @@ export function isTestOutAvailable(_node: CourseRoadmapNode): boolean {
   return false
 }
 
+/**
+ * Current Crucible capstone banks contain three to five questions, so this serves
+ * every authored item without inventing content. The fixed ceiling ensures future
+ * expanded banks are sampled instead of exposed as a full-bank oracle.
+ */
+export function assessmentServeCount(bankSize: number): number {
+  return Math.max(1, Math.min(bankSize, 5))
+}
+
+/** Fifteen seconds per task, with an accessibility-aware thirty-second floor. */
+export function minimumAssessmentDwellSeconds(taskCount: number): number {
+  return Math.max(30, taskCount * 15)
+}
+
+export function assessmentIntegrityEnforced(): boolean {
+  return process.env.NODE_ENV === 'production'
+    || process.env.ACADEMY_ASSESSMENT_INTEGRITY_LOCAL_FIXTURE !== '1'
+}
+
 /** ข้อความบอกผู้เรียนตรงๆ ว่าทำไมยังข้ามด้วยการพิสูจน์ไม่ได้ */
 export const TEST_OUT_UNAVAILABLE_REASON =
   'บทนี้ยังไม่เปิดให้พิสูจน์เพื่อข้าม — กำลังเตรียมคลังข้อสำหรับการวัดผลอยู่'

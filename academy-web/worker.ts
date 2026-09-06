@@ -1,4 +1,5 @@
 import openNextHandler from './.open-next/worker.js'
+import { withEdgeSecurityHeaders } from './src/lib/edge-security-headers'
 import { servePrivateMedia, type MediaWorkerEnv } from './src/lib/media/worker-delivery'
 import { EdgeRateLimiter } from './worker/edge-rate-limiter-do'
 import { isServedHost, unservedHostResponse, type HostPolicyEnv } from './src/lib/edge-host-policy'
@@ -48,7 +49,8 @@ export default {
     if (protectedRequest instanceof Response) return protectedRequest
 
     const media = await servePrivateMedia(protectedRequest, env)
-    return withJsonCharset(media ?? await openNextHandler.fetch(protectedRequest, env, ctx))
+    if (media) return withEdgeSecurityHeaders(withJsonCharset(media))
+    return withJsonCharset(await openNextHandler.fetch(protectedRequest, env, ctx))
   },
   async scheduled(_controller, env) {
     await runAcademyIdentityLifecyclePull(env as unknown as Record<string, string | undefined>)

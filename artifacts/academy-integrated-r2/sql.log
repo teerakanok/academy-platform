@@ -1,0 +1,12 @@
+
+ RUN  v3.2.7 /private/tmp/academy-release-integration-r2-cde63a58/academy-web
+
+(node:30202) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ |integration| tests/integration/assessment-attempt-integrity.test.ts (2 tests) 78ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  22:45:55
+   Duration  305ms (transform 29ms, setup 12ms, collect 26ms, tests 78ms, environment 0ms, prepare 45ms)
+

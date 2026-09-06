@@ -1,0 +1,384 @@
+-- 0033_assessment_attempt_integrity.sql
+-- Durable, application-owned admission and submission guards for assessed attempts.
+-- The input and output contracts of issue_attempt/consume_attempt remain unchanged.
+
+create or replace function academy.attempt_integrity_enforced(p_params jsonb)
+returns boolean
+language sql
+immutable
+set search_path = academy, pg_temp
+as $$
+  select coalesce(p_params -> 'assessment' ->> 'assessed', 'true') <> 'false'
+     and coalesce(p_params -> 'assessment' ->> 'integrityEnforced', 'true') <> 'false'
+$$;
+
+comment on function academy.attempt_integrity_enforced is
+  'Assessed snapshot policy; the production route never emits an explicit disable';
+
+create or replace function academy.assessment_attempt_retry(
+  p_user_id uuid,
+  p_course_slug text,
+  p_node_id text,
+  p_max_per_window int default 3,
+  p_window_minutes int default 30
+)
+returns table (reason text, retry_at timestamptz)
+language sql
+stable
+security invoker
+set search_path = academy, pg_temp
+as $$
+  with recent as (
+    select min(created_at) as oldest_in_window, count(*) as attempt_count
+      from academy.attempt
+     where user_id = p_user_id
+       and course_slug = p_course_slug
+       and node_id = p_node_id
+       and created_at > now() - make_interval(mins => p_window_minutes)
+  ), daily as (
+    select count(*) as attempt_count
+      from academy.attempt
+     where user_id = p_user_id
+       and course_slug = p_course_slug
+       and node_id = p_node_id
+       and academy.attempt_integrity_enforced(params)
+       and created_at >= (date_trunc('day', now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC')
+  ), ranked as (
+    select result_recorded_at,
+           (outcome ->> 'passed')::boolean as passed,
+           row_number() over (order by result_recorded_at desc, attempt_id desc) as position
+      from academy.attempt
+     where user_id = p_user_id
+       and course_slug = p_course_slug
+       and node_id = p_node_id
+       and academy.attempt_integrity_enforced(params)
+       and outcome is not null
+     order by result_recorded_at desc, attempt_id desc
+     limit 2
+  ), latest as (
+    select * from ranked where position = 1
+  ), prior as (
+    select * from ranked where position = 2
+  ), backoff as (
+    select case
+      when latest.passed = false and prior.passed = false
+        then latest.result_recorded_at + interval '15 minutes'
+      when latest.passed = false and prior.position is null
+        then latest.result_recorded_at + interval '5 minutes'
+      else null::timestamptz
+    end as retry_at
+      from latest left join prior on true
+  ), candidates(reason, retry_at) as (
+    select 'rate-window'::text, oldest_in_window + make_interval(mins => p_window_minutes)
+      from recent where oldest_in_window is not null
+        and attempt_count >= least(p_max_per_window, 3)
+    union all
+    select 'daily-cap'::text, (date_trunc('day', now() AT TIME ZONE 'UTC') + interval '1 day') AT TIME ZONE 'UTC'
+    from daily where attempt_count >= 10
+    union all
+    select 'repeat-failure'::text, retry_at
+      from backoff where retry_at is not null
+  )
+  select candidates.reason, candidates.retry_at
+    from candidates
+   where candidates.retry_at > now()
+   order by candidates.retry_at desc, candidates.reason
+   limit 1
+$$;
+
+comment on function academy.assessment_attempt_retry is
+  'Read-only learner retry hint mirroring the authoritative issue_attempt guards';
+
+create or replace function academy.assessment_submission_retry(
+  p_attempt_id uuid,
+  p_user_id uuid,
+  p_course_slug text,
+  p_node_id text,
+  p_challenge_id text
+)
+returns timestamptz
+language sql
+stable
+security invoker
+set search_path = academy, pg_temp
+as $$
+  select a.created_at + make_interval(secs => greatest(
+    30,
+    15 * (
+      coalesce(jsonb_array_length(a.params -> 'questionIds'), jsonb_array_length(a.params -> 'questions'), 0)
+      + coalesce(jsonb_array_length(a.params -> 'simulations'), 0)
+    )
+  ))
+    from academy.attempt a
+   where a.attempt_id = p_attempt_id
+     and a.user_id = p_user_id
+     and a.course_slug = p_course_slug
+     and a.node_id = p_node_id
+     and a.challenge_id = p_challenge_id
+     and a.consumed_at is null
+     and a.expires_at > now()
+     and academy.attempt_integrity_enforced(a.params)
+$$;
+
+comment on function academy.assessment_submission_retry is
+  'Read-only retry hint mirroring the authoritative consume_attempt dwell guard';
+
+create or replace function academy.issue_attempt(
+  p_user_id uuid,
+  p_course_slug text,
+  p_node_id text,
+  p_challenge_id text,
+  p_params jsonb,
+  p_challenge_version text,
+  p_ttl_minutes int default 60,
+  p_max_per_window int default 3,
+  p_window_minutes int default 30
+)
+returns table (attempt_id uuid, expires_at timestamptz, params jsonb)
+language plpgsql
+security invoker
+set search_path = academy, pg_temp
+as $$
+declare
+  v_active_id uuid;
+  v_active_expires timestamptz;
+  v_active_params jsonb;
+  v_epoch bigint;
+  v_assessed boolean := academy.attempt_integrity_enforced(p_params);
+  v_window_max integer := case
+    when academy.attempt_integrity_enforced(p_params) then least(p_max_per_window, 3) else p_max_per_window
+  end;
+  v_oldest_in_window timestamptz;
+  v_daily_count integer;
+  v_backoff_retry_at timestamptz;
+begin
+  perform pg_advisory_xact_lock(
+    hashtextextended(p_user_id::text || '|' || p_course_slug || '|' || p_node_id, 0)
+  );
+
+  insert into academy.course_progress_epoch (user_id, course_slug, epoch)
+  values (p_user_id, p_course_slug, 0)
+  on conflict (user_id, course_slug) do nothing;
+
+  select e.epoch into strict v_epoch
+    from academy.course_progress_epoch e
+   where e.user_id = p_user_id and e.course_slug = p_course_slug
+   for share;
+
+  select a.attempt_id, a.expires_at, a.params
+    into v_active_id, v_active_expires, v_active_params
+    from academy.attempt a
+   where a.user_id = p_user_id
+     and a.course_slug = p_course_slug
+     and a.node_id = p_node_id
+     and a.challenge_id = p_challenge_id
+     and a.progress_epoch = v_epoch
+     and a.consumed_at is null
+     and a.expires_at > now()
+   order by a.created_at desc, a.attempt_id desc
+   limit 1;
+
+  if v_active_id is not null then
+    attempt_id := v_active_id;
+    expires_at := v_active_expires;
+    params := v_active_params;
+    return next;
+    return;
+  end if;
+
+  select min(created_at) into v_oldest_in_window
+    from academy.attempt a
+   where a.user_id = p_user_id
+     and a.course_slug = p_course_slug
+     and a.node_id = p_node_id
+     and a.created_at > now() - make_interval(mins => p_window_minutes);
+
+  select count(*) into v_daily_count
+    from academy.attempt a
+   where a.user_id = p_user_id
+     and a.course_slug = p_course_slug
+     and a.node_id = p_node_id
+     and academy.attempt_integrity_enforced(a.params)
+     and a.created_at >= (date_trunc('day', now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC');
+
+  if v_assessed then
+    with ranked as (
+      select a.attempt_id, a.result_recorded_at, (a.outcome ->> 'passed')::boolean as passed
+        from academy.attempt a
+       where a.user_id = p_user_id
+         and a.course_slug = p_course_slug
+         and a.node_id = p_node_id
+         and academy.attempt_integrity_enforced(a.params)
+         and a.outcome is not null
+       order by a.result_recorded_at desc, a.attempt_id desc
+       limit 2
+    ), latest as (
+      select * from ranked r order by r.result_recorded_at desc, r.attempt_id desc limit 1
+    ), prior as (
+      select * from ranked r order by r.result_recorded_at desc, r.attempt_id desc offset 1 limit 1
+    )
+    select case
+      when latest.passed = false and prior.passed = false
+        then latest.result_recorded_at + interval '15 minutes'
+      when latest.passed = false and prior.result_recorded_at is null
+        then latest.result_recorded_at + interval '5 minutes'
+      else null
+    end
+      into v_backoff_retry_at
+      from latest left join prior on true;
+  end if;
+
+  if v_oldest_in_window is not null
+     and (
+       select count(*)
+         from academy.attempt a
+        where a.user_id = p_user_id
+          and a.course_slug = p_course_slug
+          and a.node_id = p_node_id
+          and a.created_at > now() - make_interval(mins => p_window_minutes)
+     ) >= v_window_max
+  then
+    return;
+  end if;
+
+  if v_assessed and v_backoff_retry_at is not null and v_backoff_retry_at > now() then
+    return;
+  end if;
+  if v_assessed and v_daily_count >= 10 then
+    return;
+  end if;
+
+  return query
+  insert into academy.attempt
+    (user_id, course_slug, node_id, challenge_id, params, challenge_version, expires_at, progress_epoch)
+  values
+    (p_user_id, p_course_slug, p_node_id, p_challenge_id, p_params, p_challenge_version,
+     now() + make_interval(mins => p_ttl_minutes), v_epoch)
+  returning academy.attempt.attempt_id, academy.attempt.expires_at, academy.attempt.params;
+end;
+$$;
+
+create or replace function academy.consume_attempt(
+  p_attempt_id uuid,
+  p_user_id uuid,
+  p_course_slug text,
+  p_node_id text,
+  p_challenge_id text
+)
+returns table (params jsonb, challenge_version text, outcome jsonb, claim_token uuid, claim_state text)
+language plpgsql
+security invoker
+set search_path = academy, pg_temp
+as $$
+begin
+  return query
+  update academy.attempt a
+     set consumed_at = now(),
+         claim_token = gen_random_uuid()
+   where a.attempt_id = p_attempt_id
+     and a.user_id = p_user_id
+     and a.course_slug = p_course_slug
+     and a.node_id = p_node_id
+     and a.challenge_id = p_challenge_id
+     and a.progress_epoch = coalesce((
+       select e.epoch
+         from academy.course_progress_epoch e
+        where e.user_id = p_user_id and e.course_slug = p_course_slug
+     ), 0)
+     and (
+       a.consumed_at is null
+       or (a.outcome is null and a.consumed_at < now() - interval '30 seconds')
+     )
+     and a.expires_at > now()
+     and (
+       not academy.attempt_integrity_enforced(a.params)
+       or now() >= a.created_at + make_interval(secs => greatest(
+         30,
+         15 * (
+           coalesce(jsonb_array_length(a.params -> 'questionIds'), jsonb_array_length(a.params -> 'questions'), 0)
+           + coalesce(jsonb_array_length(a.params -> 'simulations'), 0)
+         )
+       ))
+     )
+  returning a.params, a.challenge_version, a.outcome, a.claim_token, 'claimed'::text;
+
+  if found then
+    return;
+  end if;
+
+  return query
+  select a.params,
+         a.challenge_version,
+         a.outcome,
+         null::uuid,
+         'dwell-time'::text
+    from academy.attempt a
+   where a.attempt_id = p_attempt_id
+     and a.user_id = p_user_id
+     and a.course_slug = p_course_slug
+     and a.node_id = p_node_id
+     and a.challenge_id = p_challenge_id
+     and a.progress_epoch = coalesce((
+       select e.epoch
+         from academy.course_progress_epoch e
+        where e.user_id = p_user_id and e.course_slug = p_course_slug
+     ), 0)
+     and a.consumed_at is null
+     and a.expires_at > now()
+     and academy.attempt_integrity_enforced(a.params)
+     and now() < a.created_at + make_interval(secs => greatest(
+       30,
+       15 * (
+         coalesce(jsonb_array_length(a.params -> 'questionIds'), jsonb_array_length(a.params -> 'questions'), 0)
+         + coalesce(jsonb_array_length(a.params -> 'simulations'), 0)
+       )
+     ));
+
+  return query
+  select a.params,
+         a.challenge_version,
+         a.outcome,
+         null::uuid,
+         case when a.outcome is not null then 'completed' else 'in-progress' end
+    from academy.attempt a
+   where a.attempt_id = p_attempt_id
+     and a.user_id = p_user_id
+     and a.course_slug = p_course_slug
+     and a.node_id = p_node_id
+     and a.challenge_id = p_challenge_id
+     and a.progress_epoch = coalesce((
+       select e.epoch
+         from academy.course_progress_epoch e
+        where e.user_id = p_user_id and e.course_slug = p_course_slug
+     ), 0)
+     and (
+       a.outcome is not null
+       or (
+         a.outcome is null
+         and a.consumed_at is not null
+         and a.consumed_at >= now() - interval '30 seconds'
+         and a.expires_at > now()
+       )
+     );
+end;
+$$;
+
+grant execute on function academy.attempt_integrity_enforced(jsonb) to service_role, academy_runtime;
+grant execute on function academy.assessment_attempt_retry(uuid, text, text, int, int)
+  to service_role, academy_runtime;
+grant execute on function academy.assessment_submission_retry(uuid, uuid, text, text, text)
+  to service_role, academy_runtime;
+grant execute on function academy.consume_attempt(uuid, uuid, text, text, text) to service_role;
+grant execute on function academy.issue_attempt(uuid, text, text, text, jsonb, text, int, int, int) to service_role;
+grant execute on function academy.consume_attempt(uuid, uuid, text, text, text) to academy_runtime;
+grant execute on function academy.issue_attempt(uuid, text, text, text, jsonb, text, int, int, int) to academy_runtime;
+
+revoke all on function academy.attempt_integrity_enforced(jsonb) from public, anon, authenticated;
+revoke all on function academy.assessment_attempt_retry(uuid, text, text, int, int)
+  from public, anon, authenticated;
+revoke all on function academy.assessment_submission_retry(uuid, uuid, text, text, text)
+  from public, anon, authenticated;
+revoke all on function academy.consume_attempt(uuid, uuid, text, text, text)
+  from public, anon, authenticated;
+revoke all on function academy.issue_attempt(uuid, text, text, text, jsonb, text, int, int, int)
+  from public, anon, authenticated;

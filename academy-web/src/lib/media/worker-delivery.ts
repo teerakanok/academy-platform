@@ -1,5 +1,6 @@
 import { verifyMediaGrantSignature } from './grant'
 import { mediaDeliveryCookie } from './cookie'
+import { withEdgeSecurityHeaders } from '../edge-security-headers'
 import { privateMediaById, privateMediaByLegacyPath } from './registry'
 
 interface MediaObject {
@@ -27,11 +28,13 @@ interface MediaRequest {
 
 export async function servePrivateMedia(request: MediaRequest, env: MediaWorkerEnv): Promise<Response | null> {
   const url = new URL(request.url)
-  if (privateMediaByLegacyPath(url.pathname)) return new Response(null, { status: 404 })
+  if (privateMediaByLegacyPath(url.pathname)) return withEdgeSecurityHeaders(new Response(null, { status: 404 }))
   if (!url.pathname.startsWith('/course-media/')) return null
-  if (request.method !== 'GET' && request.method !== 'HEAD') return new Response(null, { status: 405 })
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
+    return withEdgeSecurityHeaders(new Response(null, { status: 405 }))
+  }
   if (!env.MEDIA_SIGNING_SECRET || !env.COURSE_MEDIA) {
-    return new Response('Private media is not configured', { status: 503 })
+    return withEdgeSecurityHeaders(new Response('Private media is not configured', { status: 503 }))
   }
 
   const assetId = url.pathname.slice('/course-media/'.length)
@@ -56,12 +59,12 @@ export async function servePrivateMedia(request: MediaRequest, env: MediaWorkerE
       (start !== null && end !== null && start > end) ||
       (start === null && end === 0)
     ) {
-      return new Response(null, { status: 416 })
+      return withEdgeSecurityHeaders(new Response(null, { status: 416 }))
     }
   }
 
   const object = await env.COURSE_MEDIA.get(asset.key, { range: request.headers })
-  if (!object) return new Response(null, { status: 404 })
+  if (!object) return withEdgeSecurityHeaders(new Response(null, { status: 404 }))
 
   const headers = new Headers({
     'accept-ranges': 'bytes',
@@ -74,21 +77,24 @@ export async function servePrivateMedia(request: MediaRequest, env: MediaWorkerE
   headers.set('cache-control', 'private, no-store')
   if (object.httpEtag) headers.set('etag', object.httpEtag)
   if (requestedRange && (!object.range || object.size === undefined)) {
-    return new Response(null, { status: 416 })
+    return withEdgeSecurityHeaders(new Response(null, { status: 416 }))
   }
   if (requestedRange && object.range && object.size !== undefined) {
     const offset = object.range.offset ?? (object.range.suffix ? Math.max(0, object.size - object.range.suffix) : 0)
     const length = object.range.length ?? (object.range.suffix ? Math.min(object.range.suffix, object.size) : object.size - offset)
     const end = offset + length - 1
     if (!Number.isSafeInteger(offset) || !Number.isSafeInteger(length) || offset < 0 || length < 1 || end >= object.size) {
-      return new Response(null, { status: 416, headers: { 'content-range': `bytes */${object.size}` } })
+      return withEdgeSecurityHeaders(new Response(null, {
+        status: 416,
+        headers: { 'content-range': `bytes */${object.size}` },
+      }))
     }
     headers.set('content-range', `bytes ${offset}-${end}/${object.size}`)
     headers.set('content-length', String(length))
   }
 
-  return new Response(request.method === 'HEAD' ? null : object.body, {
+  return withEdgeSecurityHeaders(new Response(request.method === 'HEAD' ? null : object.body, {
     status: requestedRange && object.range ? 206 : 200,
     headers,
-  })
+  }))
 }

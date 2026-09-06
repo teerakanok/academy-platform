@@ -4,8 +4,13 @@ import { currentUser } from '@/lib/auth/session'
 import { getCourseStructure } from '@/lib/content/course-source'
 import { CHECKPOINT_CHALLENGE_ID, buildAttemptParams, cryptoPick } from '@/lib/course/attempt'
 import { getLessonAnswerKey, mcqItems, simulationItems } from '@/lib/content/answer-key'
-import { isAssessedNode, requiresAttempt } from '@/lib/course/assessment-policy'
-import { issueAttempt, nextAttemptAt } from '@/lib/course/attempt-db'
+import {
+  assessmentIntegrityEnforced,
+  assessmentServeCount,
+  isAssessedNode,
+  requiresAttempt,
+} from '@/lib/course/assessment-policy'
+import { assessmentAttemptRetry, issueAttempt } from '@/lib/course/attempt-db'
 import { toPublicSimulation } from '@/lib/content/public-lesson'
 import { resolveChallenge, rollVariables } from '@/lib/simulation/variables'
 import type { SimulationChallenge } from '@/lib/simulation/types'
@@ -13,6 +18,7 @@ import { readBoundedJson } from '@/lib/http/bounded-body'
 import { validateMutationRequest } from '@/lib/http/mutation-security'
 import { authorizeCourseResource, deniedAccessStatus } from '@/lib/account/course-access'
 import { safeErrorMessage } from '@/lib/safe-log'
+import { recordAssessmentIntegrityEvent } from '@/lib/observability/assessment-integrity'
 
 export const runtime = 'nodejs'
 
@@ -91,9 +97,10 @@ export async function POST(request: Request) {
   }
 
   try {
-    // วันนี้เสิร์ฟเท่าขนาดคลัง (คลังมีเท่าที่ใช้พอดี) — เมื่อคลังโต ≥3 เท่า (W-content)
-    // จำนวนเสิร์ฟจะมาจากนิยาม challenge ไม่ใช่ขนาดคลัง
-    const params = buildAttemptParams(bank, bank.length, isAssessedNode(node))
+    // คลังปัจจุบันมี 3–5 ข้อ จึงเสิร์ฟได้ครบ · เมื่อ Crucible ขยายคลัง
+    // การสุ่ม 5 ข้อต่อ attempt จะกันพื้นผิวกลายเป็น full-bank oracle
+    const params = buildAttemptParams(bank, assessmentServeCount(bank.length), isAssessedNode(node))
+    if (!assessmentIntegrityEnforced()) params.assessment.integrityEnforced = false
 
     // สุ่มค่าตัวแปรของโจทย์จำลองต่อ attempt แล้ว **เก็บโจทย์ทั้งชิ้นหลังแทนค่า**
     // ลง params · ทั้งโจทย์ที่ผู้เรียนอ่านและกติกาที่ใช้ตรวจมาจากวัตถุชิ้นเดียวกันนี้
@@ -122,12 +129,15 @@ export async function POST(request: Request) {
       //
       // บอกเวลาที่ขอได้อีกครั้งไปด้วย: "รอสักครู่" ทำให้ผู้เรียนต้องเดาเอง ซึ่งจบลงที่
       // การกดซ้ำไปเรื่อยๆ · ตัวเลขนี้ไม่ใช่ oracle เพราะไม่แปรตามคำตอบ แปรตามเวลา
-      const readyAt = await nextAttemptAt(ctx)
+      const denial = await assessmentAttemptRetry(ctx)
+      if (denial) recordAssessmentIntegrityEvent(denial.reason, denial.retryAt)
       return NextResponse.json(
         {
           ok: false,
           error: 'ใช้สิทธิ์ครบแล้ว รอสักครู่แล้วลองใหม่',
-          retryAfterSeconds: readyAt ? Math.max(0, Math.ceil((readyAt.getTime() - Date.now()) / 1000)) : undefined,
+          retryAfterSeconds: denial
+            ? Math.max(0, Math.ceil((denial.retryAt.getTime() - Date.now()) / 1000))
+            : undefined,
         },
         { status: 429 },
       )

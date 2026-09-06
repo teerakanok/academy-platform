@@ -1,0 +1,34 @@
+
+ RUN  v3.2.7 /private/tmp/academy-assessment-correction-cde63a58/academy-web
+
+ ❯ |integration| tests/integration/assessment-attempt-integrity.test.ts (2 tests | 1 failed) 69ms
+   × assessment attempt integrity migration > orders cooldown by completion time and enforces dwell with first and repeat failures 43ms
+     → expected 'rate-window' to be 'repeat-failure' // Object.is equality
+   ✓ assessment attempt integrity migration > serializes concurrent admission and applies the rolling and UTC daily ceilings 25ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  21:33:10
+   Duration  294ms (transform 30ms, setup 11ms, collect 31ms, tests 69ms, environment 0ms, prepare 51ms)
+
+(node:82543) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |integration| tests/integration/assessment-attempt-integrity.test.ts > assessment attempt integrity migration > orders cooldown by completion time and enforces dwell with first and repeat failures
+AssertionError: expected 'rate-window' to be 'repeat-failure' // Object.is equality
+
+Expected: "repeat-failure"
+Received: "rate-window"
+
+ ❯ tests/integration/assessment-attempt-integrity.test.ts:113:36
+    111|       expect(await issue(db, userId, 'completion-order')).toBeUndefine…
+    112|       const firstFailure = await retryReason(db, userId, 'completion-o…
+    113|       expect(firstFailure?.reason).toBe('repeat-failure')
+       |                                    ^
+    114|       expect(new Date(firstFailure!.retry_at).getTime()).toBeGreaterTh…
+    115| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

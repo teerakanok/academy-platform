@@ -1,4 +1,6 @@
 // Host policy for the Academy Worker — ทางเข้าของหน้าร้านมีทางเดียวคือโดเมน canonical
+import { withEdgeSecurityHeaders } from './edge-security-headers'
+
 //
 // เหตุผล: Worker ทุกตัวได้ route ดิบ `<name>.<account>.workers.dev` ฟรี และ route นั้น
 // ไม่ผ่าน Cloudflare Access ที่คุมโดเมน canonical อยู่ (พบใน security review 2026-09-05:
@@ -43,5 +45,8 @@ export function isServedHost(request: Request, env: HostPolicyEnv): boolean {
 /** The response for a host we do not serve: a plain 404 with no body that names the
  *  canonical host — a scanner learns nothing, and nothing is cached. */
 export function unservedHostResponse(): Response {
-  return new Response(null, { status: 404, headers: { 'cache-control': 'no-store' } })
+  return withEdgeSecurityHeaders(new Response(null, {
+    status: 404,
+    headers: { 'cache-control': 'no-store' },
+  }))
 }

@@ -11,7 +11,11 @@
   // Lifecycle remains disabled until Identity Control publishes the exact private
   // endpoint/audience/key set and the founder releases the runtime values.
   "triggers": { "crons": ["*/5 * * * *"] },
-  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+    "run_worker_first": ["/media/*"]
+  },
   "durable_objects": {
     "bindings": [{ "name": "EDGE_RATE_LIMITER", "class_name": "EdgeRateLimiter" }]
   },

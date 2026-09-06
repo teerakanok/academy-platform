@@ -1,0 +1,111 @@
+nice: setpriority: Operation not permitted
+
+┌─────────────────────────────┐
+│ OpenNext — Cloudflare build │
+└─────────────────────────────┘
+
+App directory: /private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-HEzwZk/checkout/academy-web
+Next.js version : 15.5.22
+@opennextjs/cloudflare version: 1.20.2
+@opennextjs/aws version: 4.1.0
+WARN workerd compatibility_date: 2025-03-25, consider updating your wrangler config to a more recent date to benefit from the latest features and fixes.
+
+┌─────────────────────────────────┐
+│ OpenNext — Building Next.js app │
+└─────────────────────────────────┘
+
+
+> academy-web@0.1.0 prebuild
+> node scripts/generate-content-registry.mjs
+
+เขียน src/lib/content/registry.generated.ts — 11 คอร์ส, 450 ไฟล์เนื้อหา, 3 เวอร์ชัน consent
+
+> academy-web@0.1.0 build
+> next build
+
+   ▲ Next.js 15.5.22
+
+   Creating an optimized production build ...
+getaddrinfo ENOTFOUND fonts.googleapis.com
+
+Retrying 1/3...
+getaddrinfo ENOTFOUND fonts.googleapis.com
+
+Retrying 1/3...
+getaddrinfo ENOTFOUND fonts.googleapis.com
+
+Retrying 1/3...
+getaddrinfo ENOTFOUND fonts.googleapis.com
+
+Retrying 2/3...
+getaddrinfo ENOTFOUND fonts.googleapis.com
+
+Retrying 2/3...
+getaddrinfo ENOTFOUND fonts.googleapis.com
+
+Retrying 2/3...
+getaddrinfo ENOTFOUND fonts.googleapis.com
+
+Retrying 3/3...
+getaddrinfo ENOTFOUND fonts.googleapis.com
+
+Retrying 3/3...
+getaddrinfo ENOTFOUND fonts.googleapis.com
+
+Retrying 3/3...
+[Error: getaddrinfo ENOTFOUND fonts.googleapis.com] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'fonts.googleapis.com'
+}
+[Error: getaddrinfo ENOTFOUND fonts.googleapis.com] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'fonts.googleapis.com'
+}
+[Error: getaddrinfo ENOTFOUND fonts.googleapis.com] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'fonts.googleapis.com'
+}
+Failed to compile.
+
+src/components/AppShell.tsx
+`next/font` error:
+Failed to fetch `Fraunces` from Google Fonts.
+
+src/components/AppShell.tsx
+`next/font` error:
+Failed to fetch `Inter` from Google Fonts.
+
+src/components/AppShell.tsx
+`next/font` error:
+Failed to fetch `JetBrains Mono` from Google Fonts.
+
+
+> Build failed because of webpack errors
+node:internal/errors:998
+  const err = new Error(message);
+              ^
+
+Error: Command failed: npm run build
+    at genericNodeError (node:internal/errors:998:15)
+    at wrappedFn (node:internal/errors:543:14)
+    at checkExecSyncError (node:child_process:925:11)
+    at Object.execSync (node:child_process:997:15)
+    at buildNextjsApp (file:///private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-HEzwZk/checkout/academy-web/node_modules/@opennextjs/aws/dist/build/buildNextApp.js:15:8)
+    at build (file:///private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-HEzwZk/checkout/academy-web/node_modules/@opennextjs/cloudflare/dist/cli/build/build.js:63:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async buildCommand (file:///private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-HEzwZk/checkout/academy-web/node_modules/@opennextjs/cloudflare/dist/cli/commands/build.js:40:5) {
+  status: 1,
+  signal: null,
+  output: [ null, null, null ],
+  pid: 80805,
+  stdout: null,
+  stderr: null
+}
+
+Node.js v25.5.0

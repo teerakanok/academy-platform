@@ -1,0 +1,228 @@
+diff --git a/academy-web/package.json b/academy-web/package.json
+index ab83f82..67e79d0 100644
+--- a/academy-web/package.json
++++ b/academy-web/package.json
+@@ -24,7 +24,8 @@
+     "verify:cf-public-share-images": "node scripts/verify-cf-public-share-images.mjs",
+     "verify:cf-public-course-pages": "node scripts/verify-cf-public-course-pages.mjs",
+     "verify:workerd": "node scripts/workerd-signer-check.mjs",
+-    "build:cf": "npm run verify:workerd && NEXT_PUBLIC_SUPABASE_URL= NEXT_PUBLIC_SUPABASE_ANON_KEY= opennextjs-cloudflare build",
++    "asset-guard": "node scripts/check-open-next-assets.mjs",
++    "build:cf": "npm run verify:workerd && NEXT_PUBLIC_SUPABASE_URL= NEXT_PUBLIC_SUPABASE_ANON_KEY= opennextjs-cloudflare build && npm run asset-guard",
+     "deploy:cf": "npm run build:cf && wrangler deploy --autoconfig=false --keep-vars",
+     "test:workerd-signer": "node scripts/workerd-signer-check.mjs"
+   },
+diff --git a/academy-web/src/lib/content/course-loader.ts b/academy-web/src/lib/content/course-loader.ts
+index d94993a..df9d8a0 100644
+--- a/academy-web/src/lib/content/course-loader.ts
++++ b/academy-web/src/lib/content/course-loader.ts
+@@ -1,6 +1,7 @@
+ import { z } from 'zod'
+ import { ContentValidationError } from './loader'
+ import type { CourseCopy, CourseStructure, LessonContent } from './course-types'
++import { isSafeContentUrl, isSafeExternalContentUrl } from './content-url-policy'
+ import { placeholdersIn } from '@/lib/simulation/variables'
+ import { SIMULATION_SURFACE_INPUT_FIELDS } from '@/lib/simulation/types'
+ 
+@@ -316,7 +317,7 @@ const blockSchema = z.discriminatedUnion('kind', [
+   }),
+   z.object({
+     kind: z.literal('image'),
+-    src: z.string().min(1),
++    src: z.string().min(1).refine(isSafeContentUrl),
+     // alt บังคับ ไม่ใช่ทางเลือก — ภาพที่อธิบายตัวเองไม่ได้คือเนื้อหาที่หายไป
+     // สำหรับคนที่ใช้ screen reader
+     alt: z.string().min(1),
+@@ -326,7 +327,7 @@ const blockSchema = z.discriminatedUnion('kind', [
+     kind: z.literal('attachment'),
+     title: z.string().min(1),
+     description: z.string().optional(),
+-    href: z.string().min(1),
++    href: z.string().min(1).refine(isSafeContentUrl),
+     fileType: z.enum(['pdf', 'zip', 'other']),
+     sizeLabel: z.string().optional(),
+   }),
+@@ -334,7 +335,7 @@ const blockSchema = z.discriminatedUnion('kind', [
+     kind: z.literal('externalLink'),
+     title: z.string().min(1),
+     description: z.string().optional(),
+-    href: z.string().url(),
++    href: z.string().url().refine(isSafeExternalContentUrl),
+     // ต้องบอกว่าเป็นของใคร ไม่งั้นผู้เรียนไม่รู้ว่ากำลังจะออกไปไหน
+     sourceLabel: z.string().min(1),
+   }),
+diff --git a/academy-web/src/lib/edge-host-policy.ts b/academy-web/src/lib/edge-host-policy.ts
+index 9ffe81c..5cd4c9a 100644
+--- a/academy-web/src/lib/edge-host-policy.ts
++++ b/academy-web/src/lib/edge-host-policy.ts
+@@ -1,4 +1,6 @@
+ // Host policy for the Academy Worker — ทางเข้าของหน้าร้านมีทางเดียวคือโดเมน canonical
++import { withEdgeSecurityHeaders } from './edge-security-headers'
++
+ //
+ // เหตุผล: Worker ทุกตัวได้ route ดิบ `<name>.<account>.workers.dev` ฟรี และ route นั้น
+ // ไม่ผ่าน Cloudflare Access ที่คุมโดเมน canonical อยู่ (พบใน security review 2026-09-05:
+@@ -43,5 +45,8 @@ export function isServedHost(request: Request, env: HostPolicyEnv): boolean {
+ /** The response for a host we do not serve: a plain 404 with no body that names the
+  *  canonical host — a scanner learns nothing, and nothing is cached. */
+ export function unservedHostResponse(): Response {
+-  return new Response(null, { status: 404, headers: { 'cache-control': 'no-store' } })
++  return withEdgeSecurityHeaders(new Response(null, {
++    status: 404,
++    headers: { 'cache-control': 'no-store' },
++  }))
+ }
+diff --git a/academy-web/src/lib/edge-rate-limit-enforcement.ts b/academy-web/src/lib/edge-rate-limit-enforcement.ts
+index a741892..4e7d79f 100644
+--- a/academy-web/src/lib/edge-rate-limit-enforcement.ts
++++ b/academy-web/src/lib/edge-rate-limit-enforcement.ts
+@@ -7,6 +7,7 @@ import {
+   withEdgeRateLimitMarker,
+   type EdgeRateLimitRule,
+ } from './edge-rate-limit-policy'
++import { withEdgeSecurityHeaders } from './edge-security-headers'
+ import { readBoundedJson } from './http/bounded-body'
+ 
+ interface EdgeRateLimitDecision {
+@@ -90,24 +91,27 @@ export async function enforceEdgeRateLimit(
+ }
+ 
+ function unavailableResponse(): Response {
+-  return new Response('ระบบยังไม่พร้อมใช้งานชั่วคราว', {
++  return withEdgeSecurityHeaders(new Response('ระบบยังไม่พร้อมใช้งานชั่วคราว', {
+     status: 503,
+     headers: { 'cache-control': 'no-store' },
+-  })
++  }))
+ }
+ 
+ function limitedResponse(retryAfterSeconds: number): Response {
+-  return new Response('ส่งคำขอถี่เกินไป โปรดลองใหม่ในอีกสักครู่', {
++  return withEdgeSecurityHeaders(new Response('ส่งคำขอถี่เกินไป โปรดลองใหม่ในอีกสักครู่', {
+     status: 429,
+     headers: {
+       'cache-control': 'no-store',
+       'retry-after': String(retryAfterSeconds),
+     },
+-  })
++  }))
+ }
+ 
+ function invalidRouteResponse(): Response {
+-  return new Response(null, { status: 404, headers: { 'cache-control': 'no-store' } })
++  return withEdgeSecurityHeaders(new Response(null, {
++    status: 404,
++    headers: { 'cache-control': 'no-store' },
++  }))
+ }
+ 
+ async function inspectTarget(request: Request, rule: EdgeRateLimitRule): Promise<string | null> {
+diff --git a/academy-web/src/lib/media/worker-delivery.ts b/academy-web/src/lib/media/worker-delivery.ts
+index 31d46ad..d832c2d 100644
+--- a/academy-web/src/lib/media/worker-delivery.ts
++++ b/academy-web/src/lib/media/worker-delivery.ts
+@@ -1,5 +1,6 @@
+ import { verifyMediaGrantSignature } from './grant'
+ import { mediaDeliveryCookie } from './cookie'
++import { withEdgeSecurityHeaders } from '../edge-security-headers'
+ import { privateMediaById, privateMediaByLegacyPath } from './registry'
+ 
+ interface MediaObject {
+@@ -27,11 +28,13 @@ interface MediaRequest {
+ 
+ export async function servePrivateMedia(request: MediaRequest, env: MediaWorkerEnv): Promise<Response | null> {
+   const url = new URL(request.url)
+-  if (privateMediaByLegacyPath(url.pathname)) return new Response(null, { status: 404 })
++  if (privateMediaByLegacyPath(url.pathname)) return withEdgeSecurityHeaders(new Response(null, { status: 404 }))
+   if (!url.pathname.startsWith('/course-media/')) return null
+-  if (request.method !== 'GET' && request.method !== 'HEAD') return new Response(null, { status: 405 })
++  if (request.method !== 'GET' && request.method !== 'HEAD') {
++    return withEdgeSecurityHeaders(new Response(null, { status: 405 }))
++  }
+   if (!env.MEDIA_SIGNING_SECRET || !env.COURSE_MEDIA) {
+-    return new Response('Private media is not configured', { status: 503 })
++    return withEdgeSecurityHeaders(new Response('Private media is not configured', { status: 503 }))
+   }
+ 
+   const assetId = url.pathname.slice('/course-media/'.length)
+@@ -56,12 +59,12 @@ export async function servePrivateMedia(request: MediaRequest, env: MediaWorkerE
+       (start !== null && end !== null && start > end) ||
+       (start === null && end === 0)
+     ) {
+-      return new Response(null, { status: 416 })
++      return withEdgeSecurityHeaders(new Response(null, { status: 416 }))
+     }
+   }
+ 
+   const object = await env.COURSE_MEDIA.get(asset.key, { range: request.headers })
+-  if (!object) return new Response(null, { status: 404 })
++  if (!object) return withEdgeSecurityHeaders(new Response(null, { status: 404 }))
+ 
+   const headers = new Headers({
+     'accept-ranges': 'bytes',
+@@ -74,21 +77,24 @@ export async function servePrivateMedia(request: MediaRequest, env: MediaWorkerE
+   headers.set('cache-control', 'private, no-store')
+   if (object.httpEtag) headers.set('etag', object.httpEtag)
+   if (requestedRange && (!object.range || object.size === undefined)) {
+-    return new Response(null, { status: 416 })
++    return withEdgeSecurityHeaders(new Response(null, { status: 416 }))
+   }
+   if (requestedRange && object.range && object.size !== undefined) {
+     const offset = object.range.offset ?? (object.range.suffix ? Math.max(0, object.size - object.range.suffix) : 0)
+     const length = object.range.length ?? (object.range.suffix ? Math.min(object.range.suffix, object.size) : object.size - offset)
+     const end = offset + length - 1
+     if (!Number.isSafeInteger(offset) || !Number.isSafeInteger(length) || offset < 0 || length < 1 || end >= object.size) {
+-      return new Response(null, { status: 416, headers: { 'content-range': `bytes */${object.size}` } })
++      return withEdgeSecurityHeaders(new Response(null, {
++        status: 416,
++        headers: { 'content-range': `bytes */${object.size}` },
++      }))
+     }
+     headers.set('content-range', `bytes ${offset}-${end}/${object.size}`)
+     headers.set('content-length', String(length))
+   }
+ 
+-  return new Response(request.method === 'HEAD' ? null : object.body, {
++  return withEdgeSecurityHeaders(new Response(request.method === 'HEAD' ? null : object.body, {
+     status: requestedRange && object.range ? 206 : 200,
+     headers,
+-  })
++  }))
+ }
+diff --git a/academy-web/worker.ts b/academy-web/worker.ts
+index a6247dd..a2f5182 100644
+--- a/academy-web/worker.ts
++++ b/academy-web/worker.ts
+@@ -1,4 +1,5 @@
+ import openNextHandler from './.open-next/worker.js'
++import { withEdgeSecurityHeaders } from './src/lib/edge-security-headers'
+ import { servePrivateMedia, type MediaWorkerEnv } from './src/lib/media/worker-delivery'
+ import { EdgeRateLimiter } from './worker/edge-rate-limiter-do'
+ import { isServedHost, unservedHostResponse, type HostPolicyEnv } from './src/lib/edge-host-policy'
+@@ -48,7 +49,8 @@ export default {
+     if (protectedRequest instanceof Response) return protectedRequest
+ 
+     const media = await servePrivateMedia(protectedRequest, env)
+-    return withJsonCharset(media ?? await openNextHandler.fetch(protectedRequest, env, ctx))
++    if (media) return withEdgeSecurityHeaders(withJsonCharset(media))
++    return withJsonCharset(await openNextHandler.fetch(protectedRequest, env, ctx))
+   },
+   async scheduled(_controller, env) {
+     await runAcademyIdentityLifecyclePull(env as unknown as Record<string, string | undefined>)
+diff --git a/academy-web/wrangler.jsonc b/academy-web/wrangler.jsonc
+index c711234..74a7e1c 100644
+--- a/academy-web/wrangler.jsonc
++++ b/academy-web/wrangler.jsonc
+@@ -11,7 +11,11 @@
+   // Lifecycle remains disabled until Identity Control publishes the exact private
+   // endpoint/audience/key set and the founder releases the runtime values.
+   "triggers": { "crons": ["*/5 * * * *"] },
+-  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
++  "assets": {
++    "directory": ".open-next/assets",
++    "binding": "ASSETS",
++    "run_worker_first": ["/media/*"]
++  },
+   "durable_objects": {
+     "bindings": [{ "name": "EDGE_RATE_LIMITER", "class_name": "EdgeRateLimiter" }]
+   },

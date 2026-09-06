@@ -1,0 +1,14 @@
+
+ RUN  v3.2.7 /private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-r4gJaN/checkout/academy-web
+
+ ✓ |unit| tests/unit/attempt-client.test.ts (67 tests) 26ms
+ ✓ |unit| tests/unit/attempt.test.ts (25 tests) 7ms
+ ✓ |unit| tests/unit/attempt-grading.test.ts (6 tests) 2ms
+ ✓ |unit| tests/unit/assessment-attempt-integrity.test.ts (6 tests) 4ms
+
+ Test Files  4 passed (4)
+      Tests  104 passed (104)
+   Start at  21:05:45
+   Duration  860ms (transform 100ms, setup 0ms, collect 185ms, tests 40ms, environment 0ms, prepare 161ms)
+
+EXIT=0

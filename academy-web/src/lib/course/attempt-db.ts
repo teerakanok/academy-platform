@@ -11,6 +11,8 @@ import type { NodeEvent } from './progress-db'
 export const ATTEMPT_TTL_MINUTES = 60
 export const ATTEMPT_MAX_PER_WINDOW = 3
 export const ATTEMPT_WINDOW_MINUTES = 30
+const ATTEMPT_MAX_PRODUCTION_PER_WINDOW = 3
+const ATTEMPT_MAX_TEST_PER_WINDOW = 100
 
 /**
  * โควตาที่ใช้จริง — ปรับได้ด้วย env `ATTEMPT_MAX_PER_WINDOW` (ไม่ตั้ง = 3)
@@ -18,13 +20,17 @@ export const ATTEMPT_WINDOW_MINUTES = 30
  * มีไว้ให้ชุดเทส e2e เดินเส้นทางผู้เรียนซ้ำๆ ได้โดยไม่ต้องไปแตะสมุดนับโควตา —
  * ทางที่ **ห้าม** ทำคือให้ผู้ใช้ล้างแถวเองผ่าน endpoint (เคยทำแล้ว RIL จับว่าลบ
  * โควตาทิ้งทั้งหมด) · ค่านี้เป็น config ฝั่งเซิร์ฟเวอร์ ผู้ใช้เอื้อมไม่ถึง
- * และ production ไม่ต้องตั้ง
+ * และ production ไม่ต้องตั้ง · production ถูก clamp ที่ 3 และ local/e2e ถูก clamp ที่ 100
  */
 export function attemptQuota(): number {
   const raw = process.env.ATTEMPT_MAX_PER_WINDOW?.trim()
   if (!raw) return ATTEMPT_MAX_PER_WINDOW
   const value = Number.parseInt(raw, 10)
-  return Number.isInteger(value) && value > 0 ? value : ATTEMPT_MAX_PER_WINDOW
+  if (!Number.isInteger(value) || value <= 0) return ATTEMPT_MAX_PER_WINDOW
+  const ceiling = process.env.NODE_ENV === 'production'
+    ? ATTEMPT_MAX_PRODUCTION_PER_WINDOW
+    : ATTEMPT_MAX_TEST_PER_WINDOW
+  return Math.min(value, ceiling)
 }
 
 export interface IssuedAttempt {
@@ -53,6 +59,12 @@ export interface ConsumedAttempt {
   /** token ของ claim ปัจจุบัน; null มีได้เฉพาะ retry ที่ outcome จบแล้ว */
   claimToken: string | null
   claimState: 'claimed' | 'completed' | 'in-progress'
+  rejection: { reason: 'dwell-time'; retryAt: Date } | null
+}
+
+export interface DeniedAttempt {
+  reason: 'rate-window' | 'daily-cap' | 'repeat-failure'
+  retryAt: Date
 }
 
 export interface AttemptContext {
@@ -109,6 +121,21 @@ export async function issueAttempt(
   return { attemptId: row.attempt_id, expiresAt: row.expires_at, params: normalizeAttemptParams(row.params) }
 }
 
+/** Read-only retry hint; denial itself is always enforced by issue_attempt SQL. */
+export async function assessmentAttemptRetry(ctx: AttemptContext): Promise<DeniedAttempt | null> {
+  const db = academyDb()
+  const { data, error } = await db.rpc('assessment_attempt_retry', {
+    p_user_id: ctx.userId,
+    p_course_slug: ctx.courseSlug,
+    p_node_id: ctx.nodeId,
+    p_max_per_window: attemptQuota(),
+    p_window_minutes: ATTEMPT_WINDOW_MINUTES,
+  })
+  if (error) throw new Error(`อ่านเวลาออก attempt ใหม่ไม่สำเร็จ: ${error.message}`)
+  const row = (data as { reason: DeniedAttempt['reason']; retry_at: string }[] | null)?.[0]
+  return row ? { reason: row.reason, retryAt: new Date(row.retry_at) } : null
+}
+
 /**
  * ใช้ attempt หนึ่งครั้ง — คืน null เมื่อถูกปฏิเสธ (ไม่ใช่ของผู้ใช้นี้ / คนละบท /
  * ใช้ไปแล้ว / หมดอายุ) โดยตั้งใจไม่แยกเหตุผล: รายละเอียดคือ oracle ให้คนเดา attempt_id
@@ -129,16 +156,35 @@ export async function consumeAttempt(ctx: AttemptContext, attemptId: string): Pr
         challenge_version: string
         outcome: { passed: boolean } | null
         claim_token: string | null
-        claim_state: 'claimed' | 'completed' | 'in-progress'
+        claim_state: 'claimed' | 'completed' | 'in-progress' | 'dwell-time'
       }[]
     | null)?.[0]
   if (!row) return null
+  if (row.claim_state === 'dwell-time') {
+    const { data: retry, error: retryError } = await db.rpc('assessment_submission_retry', {
+      p_attempt_id: attemptId,
+      p_user_id: ctx.userId,
+      p_course_slug: ctx.courseSlug,
+      p_node_id: ctx.nodeId,
+      p_challenge_id: ctx.challengeId,
+    })
+    if (retryError) throw new Error(`อ่านเวลาส่ง attempt ไม่สำเร็จ: ${retryError.message}`)
+    return {
+      params: normalizeAttemptParams(row.params),
+      challengeVersion: row.challenge_version,
+      outcome: row.outcome ?? null,
+      claimToken: null,
+      claimState: 'claimed',
+      rejection: { reason: 'dwell-time', retryAt: new Date(retry as string) },
+    }
+  }
   return {
     params: normalizeAttemptParams(row.params),
     challengeVersion: row.challenge_version,
     outcome: row.outcome ?? null,
     claimToken: row.claim_token ?? null,
     claimState: row.claim_state,
+    rejection: null,
   }
 }
 

@@ -1,0 +1,57 @@
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: 'academy-web@0.1.0',
+npm warn EBADENGINE   required: { node: '24.x' },
+npm warn EBADENGINE   current: { node: 'v25.5.0', npm: '11.12.0' }
+npm warn EBADENGINE }
+npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+npm warn deprecated glob@9.3.5: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+
+added 715 packages in 12s
+
+209 packages are looking for funding
+  run `npm fund` for details
+
+ RUN  v3.2.7 /private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-r4gJaN/checkout/academy-web
+
+ ✓ |unit| tests/unit/attempt-client.test.ts (67 tests) 27ms
+ ✓ |unit| tests/unit/progress-client.test.ts (26 tests) 19ms
+ ✓ |unit| tests/unit/attempt.test.ts (25 tests) 7ms
+ ✓ |unit| tests/unit/progress.test.ts (17 tests) 5ms
+stderr | tests/unit/progress-dashboard-route.test.ts > GET /api/progress dashboard catalog > fails closed when course entitlement storage is unavailable
+[api/progress] อ่านไม่สำเร็จ: access store unavailable
+
+ ✓ |unit| tests/unit/progress-dashboard-route.test.ts (4 tests) 11ms
+ ✓ |unit| tests/unit/attempt-grading.test.ts (6 tests) 2ms
+ ✓ |unit| tests/unit/public-progress.test.ts (6 tests) 3ms
+ ✓ |unit| tests/unit/assessment-attempt-integrity.test.ts (6 tests) 5ms
+ ✓ |unit| tests/unit/progress-db-allowlist.test.ts (2 tests) 3ms
+ ✓ |unit| tests/unit/course-progress.test.ts (2 tests) 2ms
+
+ Test Files  10 passed (10)
+      Tests  161 passed (161)
+   Start at  21:10:07
+   Duration  2.10s (transform 221ms, setup 0ms, collect 440ms, tests 84ms, environment 1ms, prepare 387ms)
+
+
+ RUN  v3.2.7 /private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-r4gJaN/checkout/academy-web
+
+ ❯ |integration| tests/integration/assessment-attempt-integrity.test.ts (2 tests | 2 failed) 6ms
+   × assessment attempt integrity migration > orders cooldown by completion time and enforces dwell with first and repeat failures 4ms
+     → connect EPERM /private/tmp/postgres-fixture-cde63a58/socket/.s.PGSQL.65433
+   × assessment attempt integrity migration > serializes concurrent admission and applies the rolling and UTC daily ceilings 1ms
+     → connect EPERM /private/tmp/postgres-fixture-cde63a58/socket/.s.PGSQL.65433
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |integration| tests/integration/assessment-attempt-integrity.test.ts > assessment attempt integrity migration > orders cooldown by completion time and enforces dwell with first and repeat failures
+ FAIL  |integration| tests/integration/assessment-attempt-integrity.test.ts > assessment attempt integrity migration > serializes concurrent admission and applies the rolling and UTC daily ceilings
+Error: connect EPERM /private/tmp/postgres-fixture-cde63a58/socket/.s.PGSQL.65433
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  21:10:10
+   Duration  222ms (transform 30ms, setup 12ms, collect 31ms, tests 6ms, environment 0ms, prepare 43ms)
+
+EXIT=1

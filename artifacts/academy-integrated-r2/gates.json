@@ -1,0 +1,90 @@
+[
+  {
+    "step": "unit",
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--project",
+      "unit",
+      "--maxWorkers",
+      "1"
+    ],
+    "exit": 0,
+    "log": "artifacts/academy-integrated-r2/unit.log",
+    "sha256": "e88448ad1fb7b513169f5025d41c2f50a0a74a0db6ed790f2e670ac345e0c971"
+  },
+  {
+    "step": "sql",
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--project",
+      "integration",
+      "assessment-attempt-integrity",
+      "--maxWorkers",
+      "1"
+    ],
+    "exit": 0,
+    "log": "artifacts/academy-integrated-r2/sql.log",
+    "sha256": "4841955f084105413428d0d2aaf1c9b8bd0ea7fff075830bb02850681bb9e7e0"
+  },
+  {
+    "step": "lint",
+    "command": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "exit": 1,
+    "log": "artifacts/academy-integrated-r2/lint.log",
+    "sha256": "9b53a75d71f8affc257f91c908826b62e55722877980597b66358791711efbc2"
+  },
+  {
+    "step": "web-ts",
+    "command": [
+      "npx",
+      "tsc",
+      "--noEmit"
+    ],
+    "exit": 0,
+    "log": "artifacts/academy-integrated-r2/web-ts.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "step": "worker-ts",
+    "command": [
+      "npx",
+      "tsc",
+      "-p",
+      "tsconfig.worker.json"
+    ],
+    "exit": 0,
+    "log": "artifacts/academy-integrated-r2/worker-ts.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "step": "build-cf",
+    "command": [
+      "npm",
+      "run",
+      "build:cf"
+    ],
+    "exit": 0,
+    "log": "artifacts/academy-integrated-r2/build-cf.log",
+    "sha256": "b3801db4732f87e0ba18b7702686e7e694b8d66efb40c4a7ac5520d7794aaffe"
+  },
+  {
+    "step": "retention-ts",
+    "command": [
+      "./node_modules/.bin/tsc",
+      "-p",
+      "ops/academy-retention-worker/tsconfig.json"
+    ],
+    "cwd": "/private/tmp/academy-release-integration-r2-cde63a58/academy-web",
+    "exit": 0,
+    "log": "artifacts/academy-integrated-r2/retention-ts.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

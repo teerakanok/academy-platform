@@ -24,7 +24,8 @@
     "verify:cf-public-share-images": "node scripts/verify-cf-public-share-images.mjs",
     "verify:cf-public-course-pages": "node scripts/verify-cf-public-course-pages.mjs",
     "verify:workerd": "node scripts/workerd-signer-check.mjs",
-    "build:cf": "npm run verify:workerd && NEXT_PUBLIC_SUPABASE_URL= NEXT_PUBLIC_SUPABASE_ANON_KEY= opennextjs-cloudflare build",
+    "asset-guard": "node scripts/check-open-next-assets.mjs",
+    "build:cf": "npm run verify:workerd && NEXT_PUBLIC_SUPABASE_URL= NEXT_PUBLIC_SUPABASE_ANON_KEY= opennextjs-cloudflare build && npm run asset-guard",
     "deploy:cf": "npm run build:cf && wrangler deploy --autoconfig=false --keep-vars",
     "test:workerd-signer": "node scripts/workerd-signer-check.mjs"
   },
