@@ -101,7 +101,7 @@ export class AcademyPostgresIdentitySessionStore implements IdentityDurableSessi
     for (let attempt = 0; attempt < maximumAttempts; attempt += 1) {
       const sessionId = stableIdValue ?? randomBytes(32).toString('base64url')
       const sessionIdDigest = digestAcademySessionId(sessionId)
-      const data = await this.callRpc('create_identity_session', {
+      const data = await this.callRpc('create_identity_session_digest', {
         p_session_id: sessionIdDigest,
         p_issuer: input.issuer,
         p_subject_key: encodeSubjectKey(input.subject),
@@ -140,7 +140,7 @@ export class AcademyPostgresIdentitySessionStore implements IdentityDurableSessi
   async revoke(id: string): Promise<void> {
     if (!SESSION_ID.test(id)) return
     const data = await this.callRpc(
-      'revoke_identity_session',
+      'revoke_identity_session_digest',
       { p_session_id: digestAcademySessionId(id) },
     )
     const result = snapshotExactDataRecord(data, STATUS_KEYS)
@@ -167,7 +167,7 @@ export class AcademyPostgresIdentitySessionStore implements IdentityDurableSessi
     rawSessionId: string,
   ): Promise<IdentitySessionReceipt | null> {
     const data = await this.callRpc(
-      'read_identity_session',
+      'read_identity_session_digest',
       { p_session_id: sessionIdDigest },
     )
     const status = snapshotExactDataRecord(data, STATUS_KEYS)

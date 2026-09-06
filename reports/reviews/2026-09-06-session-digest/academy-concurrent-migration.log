@@ -1,0 +1,1 @@
+{"wait":{"wait_event_type":"Lock","wait_event":"transactionid"},"second":{"accepted":false,"code":"23505","message":"duplicate key value violates unique constraint \"pg_proc_proname_args_nsp_index\""},"markerCount":1,"exactlyOnce":true,"doubleHash":false}

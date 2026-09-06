@@ -206,7 +206,7 @@ export class AcademyPostgresIdentityTransactionStore implements IdentityTransact
     const sessionId = deriveStableAcademySessionId(stateValue, browserBindingValue)
     const sessionIdDigest = digestAcademySessionId(sessionId)
     const claimDigest = digestClaimToken(claimToken)
-    const { data } = await this.callRpc('claim_identity_authorization_transaction', {
+    const { data } = await this.callRpc('claim_identity_authorization_transaction_digest', {
       p_state: stateValue,
       p_browser_binding_digest: browserBindingDigest,
       p_claim_digest: claimDigest,
@@ -308,7 +308,7 @@ export class AcademyPostgresIdentityTransactionStore implements IdentityTransact
       || receipt.returnPath !== claim.transaction.returnPath) {
       throw new IdentityPostgresTransactionStoreFailure()
     }
-    const { data } = await this.callRpc('finalize_identity_authorization_transaction', {
+    const { data } = await this.callRpc('finalize_identity_authorization_transaction_digest', {
       p_state: claim.transaction.state,
       p_claim_digest: digestClaimToken(claim.claimToken),
       p_account_id: receipt.accountId,

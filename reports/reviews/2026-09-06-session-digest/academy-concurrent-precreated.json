@@ -1,0 +1,9 @@
+{
+  "command": [
+    "node",
+    "/private/tmp/product-transition-pg-cde63a58/academy-concurrent-migration.mjs",
+    "--precreated"
+  ],
+  "exit": 0,
+  "sha256": "f6c09620c610703afb2f8fd7b1e35b58b41502c59a7e02f2d4c7b4789529ee5e"
+}

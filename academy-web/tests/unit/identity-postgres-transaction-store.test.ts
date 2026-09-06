@@ -2,6 +2,7 @@ import { createHash, randomBytes } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it, vi } from 'vitest'
+import './identity-session-digest-migration.test'
 import {
   AcademyPostgresIdentityTransactionStore,
   IdentityPostgresTransactionStoreFailure,
@@ -192,7 +193,7 @@ describe('AcademyPostgresIdentityTransactionStore', () => {
     expect(first.sessionId).toBe(raw)
     expect(first.exchangeResult).toBeNull()
     expect(first.transaction).toMatchObject({ state: input.state })
-    expect(rpc.mock.calls[0]?.[0]).toBe('claim_identity_authorization_transaction')
+    expect(rpc.mock.calls[0]?.[0]).toBe('claim_identity_authorization_transaction_digest')
     expect(rpc.mock.calls[0]?.[1]).toMatchObject({
       p_state: input.state,
       p_browser_binding_digest: input.browserBindingDigest,
@@ -230,7 +231,7 @@ describe('AcademyPostgresIdentityTransactionStore', () => {
       sessionId: raw,
       returnPath: input.returnPath,
     })
-    expect(rpc.mock.calls[4]?.[0]).toBe('finalize_identity_authorization_transaction')
+    expect(rpc.mock.calls[4]?.[0]).toBe('finalize_identity_authorization_transaction_digest')
     expect(rpc.mock.calls[4]?.[1]).toMatchObject({
       p_state: input.state,
       p_claim_digest: rpc.mock.calls[3]?.[1].p_claim_digest,
@@ -539,7 +540,7 @@ describe('AcademyPostgresIdentityTransactionStore', () => {
     expect(migration).not.toMatch(/grant (?:select|insert|update|delete)[\s\S]*identity_authorization_transaction/i)
   })
 
-  it('prepares a non-destructive digest transition with blocked security downgrade', () => {
+  it('prepares an atomically guarded digest transition with blocked security downgrade', () => {
     const migration = readFileSync(
       join(process.cwd(), 'supabase/migrations/0034_identity_session_id_digest.sql'),
       'utf8',
@@ -549,12 +550,18 @@ describe('AcademyPostgresIdentityTransactionStore', () => {
       'utf8',
     )
 
+    expect(migration).toMatch(/create table if not exists academy\.identity_session_id_digest_transition/i)
+    expect(migration).toMatch(/migration_name = '0034_identity_session_id_digest'/i)
+    expect(migration).toMatch(/raise exception 'identity session digest transition was already applied'/i)
+    expect(migration).toMatch(/lock table academy\.identity_session,[\s\S]*in access exclusive mode/i)
     expect(migration).toMatch(/academy\.identity_session_id_digest\(/)
-    expect(migration).toMatch(/update academy\.identity_session/i)
-    expect(migration).toMatch(/update academy\.identity_authorization_transaction/i)
-    expect(migration).toMatch(/when completed_at is null then null/i)
-    expect(migration).not.toMatch(/delete from academy\.identity_session/i)
-    expect(migration).not.toMatch(/delete from academy\.identity_authorization_transaction/i)
+    expect(migration).toMatch(/update academy\.identity_session\s+set id = academy\.identity_session_id_digest\(id\)/i)
+    expect(migration).toMatch(/set claim_digest = null,[\s\S]*session_id = null[\s\S]*completed_at = null[\s\S]*attempt_count = 0/i)
+    expect(migration).toMatch(/create or replace function academy\.(?:create|read|revoke)_identity_session_digest/i)
+    expect(migration).toMatch(/create or replace function academy\.claim_identity_authorization_transaction_digest/i)
+    expect(migration).toMatch(/create or replace function academy\.finalize_identity_authorization_transaction_digest/i)
+    expect(migration).toMatch(/legacy raw authorization completion is disabled/i)
+    expect(migration).not.toMatch(/identity_session_id_digest\(session_id\)/i)
     expect(rollback).toMatch(/rollback is blocked/i)
     expect(rollback).toMatch(/restore[\s\S]*pre-migration/i)
   })

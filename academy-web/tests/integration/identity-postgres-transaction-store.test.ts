@@ -160,9 +160,9 @@ function pgRpcClient() {
               [parameters.p_state, parameters.p_browser_binding_digest],
             )
           }
-          if (functionName === 'claim_identity_authorization_transaction') {
+          if (functionName === 'claim_identity_authorization_transaction_digest') {
             return client.query(
-              'select academy.claim_identity_authorization_transaction($1, $2, $3, $4, $5) as result',
+              'select academy.claim_identity_authorization_transaction_digest($1, $2, $3, $4, $5) as result',
               [
                 parameters.p_state,
                 parameters.p_browser_binding_digest,
@@ -192,9 +192,9 @@ function pgRpcClient() {
               [parameters.p_state, parameters.p_claim_digest, parameters.p_failure_stage],
             )
           }
-          if (functionName === 'finalize_identity_authorization_transaction') {
+          if (functionName === 'finalize_identity_authorization_transaction_digest') {
             return client.query(
-              'select academy.finalize_identity_authorization_transaction($1, $2, $3, $4, $5) as result',
+              'select academy.finalize_identity_authorization_transaction_digest($1, $2, $3, $4, $5) as result',
               [parameters.p_state, parameters.p_claim_digest, parameters.p_account_id,
                 parameters.p_session_id, parameters.p_subject_key],
             )
@@ -243,9 +243,9 @@ function pgRuntimeRpcClient() {
                 `select academy.consume_identity_authorization_transaction($1, $2) as result`,
                 [parameters.p_state, parameters.p_browser_binding_digest],
               )
-            } else if (functionName === 'claim_identity_authorization_transaction') {
+            } else if (functionName === 'claim_identity_authorization_transaction_digest') {
               response = await client.query(
-                'select academy.claim_identity_authorization_transaction($1, $2, $3, $4, $5) as result',
+                'select academy.claim_identity_authorization_transaction_digest($1, $2, $3, $4, $5) as result',
                 [
                   parameters.p_state,
                   parameters.p_browser_binding_digest,
@@ -272,9 +272,9 @@ function pgRuntimeRpcClient() {
                 'select academy.release_identity_authorization_transaction_claim($1, $2, $3) as result',
                 [parameters.p_state, parameters.p_claim_digest, parameters.p_failure_stage],
               )
-            } else if (functionName === 'finalize_identity_authorization_transaction') {
+            } else if (functionName === 'finalize_identity_authorization_transaction_digest') {
               response = await client.query(
-                'select academy.finalize_identity_authorization_transaction($1, $2, $3, $4, $5) as result',
+                'select academy.finalize_identity_authorization_transaction_digest($1, $2, $3, $4, $5) as result',
                 [parameters.p_state, parameters.p_claim_digest, parameters.p_account_id,
                   parameters.p_session_id, parameters.p_subject_key],
               )

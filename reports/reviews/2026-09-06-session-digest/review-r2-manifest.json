@@ -1,0 +1,251 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "b11e95b17e997967b01267f92d0c1f059e69922fd1cd780508abdaff6af5863f",
+      "bytes": 12709
+    },
+    {
+      "path": "academy-web/docs/identity-session-id-digest.md",
+      "sha256": "931f2c1ab4c453047e13c00887502e2ddbe6756ddc06d5f9fdd7b860146a5f01",
+      "bytes": 2524
+    },
+    {
+      "path": "academy-web/src/lib/identity/postgres-session-store.ts",
+      "sha256": "82c69d29f6abbda851a4f14d1eb6157c13d259b9cd0ba27cab8fe137e17ee823",
+      "bytes": 12674
+    },
+    {
+      "path": "academy-web/src/lib/identity/postgres-transaction-store.ts",
+      "sha256": "da4a34766a0cc19d9b80779e3883ec90b5a985a19524bd3d456a61e615757eaf",
+      "bytes": 24376
+    },
+    {
+      "path": "academy-web/src/lib/identity/session-identifier.ts",
+      "sha256": "7d1361e23bf95836fde94deb8b319fd1cd568786aba44bf74dedf6ad254d6781",
+      "bytes": 757
+    },
+    {
+      "path": "academy-web/supabase/migrations/0032_identity_lifecycle_runtime_enforcement.sql",
+      "sha256": "cff66ec8146fbfce4e8d8c406c1e87d3ba88eb9c9fec6f1723b9363b6347c289",
+      "bytes": 20239
+    },
+    {
+      "path": "academy-web/supabase/migrations/0034_identity_session_id_digest.sql",
+      "sha256": "6355c54a468884008373876565443a6a5456e4005c2026377f46a8a449be66f0",
+      "bytes": 18752
+    },
+    {
+      "path": "academy-web/supabase/rollbacks/0034_identity_session_id_digest.rollback.sql",
+      "sha256": "95f3c5b4028858b5a66ef1c31b7d778fcba371c985b98455b1a29bc381c85ed9",
+      "bytes": 469
+    },
+    {
+      "path": "academy-web/tests/integration/identity-lifecycle-enforcement.test.ts",
+      "sha256": "1641c04bd4d934e8d0b13bb35195502413979f6bca2371675be8caf5d188b19f",
+      "bytes": 18051
+    },
+    {
+      "path": "academy-web/tests/integration/identity-postgres-transaction-store.test.ts",
+      "sha256": "a8704d58804d0e39aba4a4a8e503a668558f354923eededc1c5688267174dc99",
+      "bytes": 38751
+    },
+    {
+      "path": "academy-web/tests/unit/current-user-identity-session.test.ts",
+      "sha256": "9510da4e7a43e62697fc499ef8bb26e7af9ca8e972429d5130db13b411a7dfe4",
+      "bytes": 3631
+    },
+    {
+      "path": "academy-web/tests/unit/current-user-production-cookie.test.ts",
+      "sha256": "5376e71f857823f8a80d7e4f0063d3c2a14b950aa054aae9de8f3e9d21ddbb68",
+      "bytes": 2494
+    },
+    {
+      "path": "academy-web/tests/unit/identity-postgres-session-store.test.ts",
+      "sha256": "f654cd6b55ea2e896ac055f6193c2986d7ac5c6c24dfe68400231230df4caa18",
+      "bytes": 19719
+    },
+    {
+      "path": "academy-web/tests/unit/identity-postgres-transaction-store.test.ts",
+      "sha256": "84d86ae26a63c0d650e0e83dbcbe612125345fcb169b5f5ea7f4c0abfd9104e4",
+      "bytes": 26803
+    },
+    {
+      "path": "academy-web/tests/unit/identity-production-runtime-routes.test.ts",
+      "sha256": "01ff73dd2fc7665486950aee03961279b3de36a715505072d8c97c63fabad911",
+      "bytes": 9306
+    },
+    {
+      "path": "academy-web/tests/unit/identity-runtime-completion.test.ts",
+      "sha256": "ea530cb2fc473703c57b882e64d423cc5f79748dc9d92e4990d327a2ad625b6c",
+      "bytes": 23094
+    },
+    {
+      "path": "academy-web/tests/unit/identity-session-digest-migration.test.ts",
+      "sha256": "37b034c7ca85362c2cc15c881bbc8d5b134c4cab9dd07eb352b2419f219e3c2b",
+      "bytes": 6256
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/CHECKPOINT.md",
+      "sha256": "4f3ad3858a7dc7a556a24db654e92bf8891c3766a81e3a6a22402959743b2fee",
+      "bytes": 925
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-concurrent-migration.json",
+      "sha256": "44cf6431c296cba984eed9606ef75ad1c6f1d7efb68492fbefd2c0ff33a01af3",
+      "bytes": 210
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-concurrent-migration.log",
+      "sha256": "9188d2343a08559c0f08997c2597cda18b407892f9aaff50a453560ea23a5ab8",
+      "bytes": 256
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-concurrent-migration.mjs",
+      "sha256": "4714679e2be94f6f7c958c22b0ef6cd788185853a968fea003d64eafdd5eff7e",
+      "bytes": 3434
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-concurrent-precreated.json",
+      "sha256": "23cd6937f1c6a57ee7d06b9a50eb25289932a648189c2228d650b570610166dd",
+      "bytes": 230
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-concurrent-precreated.log",
+      "sha256": "f6c09620c610703afb2f8fd7b1e35b58b41502c59a7e02f2d4c7b4789529ee5e",
+      "bytes": 201
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-digest-lock-gates-0.log",
+      "sha256": "d36dcba62c0a7df964a632f39c803cfbd2d0fe016886fddc02cb99c3b280aaaa",
+      "bytes": 19161
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-digest-lock-gates-4.log",
+      "sha256": "5abf4a02ec93e1031b6b6967de181579aebc829f0b7719799d5ce03ab692b0ed",
+      "bytes": 3231
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-digest-lock-gates-5.log",
+      "sha256": "b8f122b1a03b6fea21c7e47cfbd9f0c310327a13ed31c0e8668479bae5ec0018",
+      "bytes": 7945
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-digest-lock-gates.json",
+      "sha256": "f8aa531d2dca524d9ca3fcd188544fb8e685be943b642a32ae67cfd99a9029a8",
+      "bytes": 1689
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-digest-lock-transition-pg.json",
+      "sha256": "13ad0454896c47db30aacabcebfe3adb89526cd34a44e81380a18a2d5ce64a6d",
+      "bytes": 261
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-digest-lock-transition-pg.log",
+      "sha256": "2ba6a602e5f97f7abca99e05e2352d2277169f2f0a2691c972f270cc4b4ffe5d",
+      "bytes": 332
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-digest-reapply-red.json",
+      "sha256": "74469f5c0d9273a80fec019863f76f93cff5953cc078e25a4949e04a8c184db8",
+      "bytes": 397
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-digest-reapply-red.log",
+      "sha256": "8adef7308d17454d81a779b4e2b50dc9c5854a6d7a616b2538c0b030bdf0326f",
+      "bytes": 192
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-lock-fix-apply.json",
+      "sha256": "010cab35efc8d62c205ecbb8214908ed845e5b5f3cb5663a87b914097b04517e",
+      "bytes": 317
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-lock-order-green.json",
+      "sha256": "974e0aa713dc1c19f76e1b4924d6b84192f8adbcee8701eef93e330b35780dee",
+      "bytes": 95
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-lock-order-green.log",
+      "sha256": "1efd97d2bb235663c668559f61acf55b132cbe2ed4adf605d61b3b48263de477",
+      "bytes": 92
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-lock-order-red.json",
+      "sha256": "fc731851a0ad5c1d9e3c73687f6c218b72a15bec9f64d0a76657c89a8eb82ed8",
+      "bytes": 95
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-lock-order-red.log",
+      "sha256": "8d2747236d9ba1488e3f17989f6e6e55abfd7c10b9ceff62855240cc0e505bb9",
+      "bytes": 580
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-lock-order.mjs",
+      "sha256": "3fba247b0c49748455ac5e26c1534d5ebd890ff8da0df966f8eb30e168a1b487",
+      "bytes": 2872
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-session-digest-parent-red.json",
+      "sha256": "850acdb82d6f6641f558a4974afd0ec318cc8c93acdbcfe1e6610a39da050786",
+      "bytes": 750
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-session-digest-parent-red.log",
+      "sha256": "f8f5a7a127e19d40304c4f1758ffc47696c377336da6e327119b1feb569deb1b",
+      "bytes": 22112
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-session-digest-r2-gate-0.log",
+      "sha256": "5225f44486ce726e63d86d9051bd4caa61a6c497b65a0cd24251f5f8d33eebe3",
+      "bytes": 18880
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-session-digest-r2-gate-1.log",
+      "sha256": "2943dedd06e464fac06a9e51512655e5cfe0d2900e53bfa327ceabdd993328d9",
+      "bytes": 693
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-session-digest-r2-gates.json",
+      "sha256": "7fcdccf4f218cd4d7fc4dc91245a8019cdaf5e2474f960a2fdb50817361e177a",
+      "bytes": 689
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-session-digest-r3-extra.json",
+      "sha256": "7db152627b985da1da12e5e51180f9de7aae495112050a8f70065f2c9455c820",
+      "bytes": 882
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-session-digest-r3-gate-0.log",
+      "sha256": "2a9a64b3b0e903126d2e73a269309047122a51f2f9ea71d7aa83c8a6b0b4a6ed",
+      "bytes": 338
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-session-digest-r3-gate-1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-session-digest-r3-gate-2.log",
+      "sha256": "5abf4a02ec93e1031b6b6967de181579aebc829f0b7719799d5ce03ab692b0ed",
+      "bytes": 3231
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/academy-session-digest-r3-gates.json",
+      "sha256": "25c074338547526f70f028212f7ef6c3f787bc6c8791fa68fde2434ae4c84931",
+      "bytes": 1077
+    },
+    {
+      "path": "reports/reviews/2026-09-06-session-digest/independent-review-r1.json",
+      "sha256": "0221f861a8f6609ebab8dc1617c76766bd5d30fb4284533563b8ce2f54b02e2b",
+      "bytes": 2561
+    },
+    {
+      "path": "reports/security/2026-09-05-security-review-checklist.md",
+      "sha256": "4c8e7818533ed90ac505811cd66788723835624cfc25f71c67a12d806c9c860d",
+      "bytes": 94135
+    }
+  ]
+}

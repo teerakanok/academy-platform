@@ -79,7 +79,7 @@ beforeEach(async () => {
         }
         return { data: createResult, error: null }
       }
-      if (name === 'claim_identity_authorization_transaction') {
+      if (name === 'claim_identity_authorization_transaction_digest') {
         return {
           data: {
             status: 'claimed',
@@ -142,7 +142,7 @@ describe('production Identity routes use the real registry composition', () => {
     expect(callback.headers.getSetCookie()).toEqual([])
     expect(rpcCalls).toEqual([
       'create_identity_authorization_transaction',
-      'claim_identity_authorization_transaction',
+      'claim_identity_authorization_transaction_digest',
       'release_identity_authorization_transaction_claim',
     ])
     expect(database.academyDb).toHaveBeenCalledTimes(2)

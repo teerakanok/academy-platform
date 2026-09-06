@@ -1,0 +1,66 @@
+[
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--project",
+      "unit"
+    ],
+    "exit": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-digest-lock-gates-0.log",
+    "sha256": "d36dcba62c0a7df964a632f39c803cfbd2d0fe016886fddc02cb99c3b280aaaa"
+  },
+  {
+    "command": [
+      "npx",
+      "tsc",
+      "--noEmit"
+    ],
+    "exit": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-digest-lock-gates-1.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "npx",
+      "tsc",
+      "-p",
+      "tsconfig.worker.json"
+    ],
+    "exit": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-digest-lock-gates-2.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "npx",
+      "tsc",
+      "-p",
+      "ops/academy-retention-worker/tsconfig.json"
+    ],
+    "exit": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-digest-lock-gates-3.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "exit": 1,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-digest-lock-gates-4.log",
+    "sha256": "5abf4a02ec93e1031b6b6967de181579aebc829f0b7719799d5ce03ab692b0ed"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "build:cf"
+    ],
+    "exit": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-digest-lock-gates-5.log",
+    "sha256": "b8f122b1a03b6fea21c7e47cfbd9f0c310327a13ed31c0e8668479bae5ec0018"
+  }
+]

@@ -1,0 +1,20 @@
+{"advisoryWaitObserved":true,"revoked":null,"errorCode":"55P03","sessionResult":{"created":true}}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+undefined !== 1
+
+    at file:///private/tmp/product-transition-pg-cde63a58/academy-lock-order.mjs:36:37
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: undefined,
+  expected: 1,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v25.5.0

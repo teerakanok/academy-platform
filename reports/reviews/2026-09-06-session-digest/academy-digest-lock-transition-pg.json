@@ -1,0 +1,13 @@
+{
+  "command": [
+    "npx",
+    "vitest",
+    "run",
+    "--project",
+    "unit",
+    "tests/unit/identity-session-digest-migration.test.ts",
+    "--maxWorkers=1"
+  ],
+  "exit": 0,
+  "sha256": "2ba6a602e5f97f7abca99e05e2352d2277169f2f0a2691c972f270cc4b4ffe5d"
+}

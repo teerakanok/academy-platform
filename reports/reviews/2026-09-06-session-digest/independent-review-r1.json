@@ -1,0 +1,27 @@
+{
+  "work_order_metadata": {
+    "schema": "model-team.ril.v1",
+    "work_kind": "bounded_code",
+    "role": "implementation_reviewer",
+    "source_sha256": "bc5aa15abad2db80368da05d04ace4f13185da5a438752889c22f195e38d9f2f"
+  },
+  "verdict": "FAIL",
+  "summary": "Digest storage and retries are materially sound: adapters hash raw bearers and claim tokens before RPCs, deterministic retries restore raw IDs only in memory, old-cookie compatibility wrappers hash before storage, legacy callback RPCs fail closed, and 0032 lifecycle locking and least privilege are preserved. Supplied evidence also shows two-client 55P03 RED/GREEN, real-PG transition passes, unit 2437 pass/2 skip, all TypeScript projects pass, baseline lint 3 errors/16 warnings, and a successful Cloudflare build. However, migration single-use enforcement has a lock-order race: the marker is checked only before the exclusive table lock, so concurrent invocations can both pass the check and the second can double-hash sessions and transaction receipts. Production migration, activation, and a concrete owner-verified callback-drain procedure also remain open deployment gates rather than source defects.",
+  "findings": [
+    {
+      "severity": "medium",
+      "message": "Recheck the transition marker after acquiring the exclusive identity-table lock, or serialize marker acquisition first. The current pre-lock check at lines 30-45 permits a second concurrent invocation to proceed after the first commits its marker at lines 538-539, double-hashing durable identifiers despite sequential reapplication being rejected.",
+      "path": "academy-web/supabase/migrations/0034_identity_session_id_digest.sql"
+    },
+    {
+      "severity": "low",
+      "message": "Concretize the production cutover runbook with owner evidence that the legacy callback route is disabled, active 30-second leases have drained, migration 0034 is applied once under serialization, and the new Worker is deployed before activation. The current documentation describes the correct ordering and margin but does not define executable verification and abort gates.",
+      "path": "academy-web/docs/identity-session-id-digest.md"
+    },
+    {
+      "severity": "low",
+      "message": "Production migration and authorization activation remain unperformed; the checkpoint and supplied gates do not establish production database state or authenticated live callback/session behavior. This is an open release gate, not a source bug.",
+      "path": "reports/reviews/2026-09-06-session-digest/CHECKPOINT.md"
+    }
+  ]
+}

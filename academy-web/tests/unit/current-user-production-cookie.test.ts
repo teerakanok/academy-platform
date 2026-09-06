@@ -53,7 +53,7 @@ describe('production currentUser opaque-cookie authorization', () => {
   it('rejects a syntactically valid session after durable revocation', async () => {
     let active = true
     const rpc = vi.fn().mockImplementation((functionName: string) => {
-      if (functionName === 'revoke_identity_session') {
+      if (functionName === 'revoke_identity_session_digest') {
         active = false
         return Promise.resolve({ data: { status: 'revoked' }, error: null })
       }
@@ -69,8 +69,8 @@ describe('production currentUser opaque-cookie authorization', () => {
     await expect(currentUser()).resolves.toBeNull()
 
     expect(rpc.mock.calls.map(([name]) => name)).toEqual([
-      'revoke_identity_session',
-      'read_identity_session',
+      'revoke_identity_session_digest',
+      'read_identity_session_digest',
     ])
     expect(findActiveUser).not.toHaveBeenCalled()
   })

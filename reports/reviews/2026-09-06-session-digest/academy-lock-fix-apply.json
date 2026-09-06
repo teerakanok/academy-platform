@@ -1,0 +1,15 @@
+{
+  "sql_sha256": "c812115b6a74add4cf8ecdd8b4f0bbb8519f4b53bed0b20525e5999c7b928040",
+  "steps": [
+    {
+      "mode": "ROLLBACK",
+      "exit": 0,
+      "output": "BEGIN\nCREATE FUNCTION\nROLLBACK\n"
+    },
+    {
+      "mode": "COMMIT",
+      "exit": 0,
+      "output": "BEGIN\nCREATE FUNCTION\nCOMMIT\n"
+    }
+  ]
+}

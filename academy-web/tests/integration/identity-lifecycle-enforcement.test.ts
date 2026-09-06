@@ -393,7 +393,7 @@ describe('Academy Identity lifecycle runtime enforcement', () => {
     await admin.query(`update academy.identity_session
       set created_at = clock_timestamp() - interval '2 days',
           expires_at = clock_timestamp() - interval '1 day'
-      where id = $1`, ['J'.repeat(43)])
+      where id = academy.identity_session_id_digest($1)`, ['J'.repeat(43)])
 
     const lifecycle = new Client({ connectionString: databaseUrl })
     const callback = new Client({ connectionString: databaseUrl })

@@ -1,0 +1,10 @@
+
+ RUN  v3.2.7 /private/tmp/academy-session-digest-cde63a58/academy-web
+
+ ✓ |unit| tests/unit/identity-session-digest-migration.test.ts (2 tests) 41ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  02:49:01
+   Duration  392ms (transform 41ms, setup 0ms, collect 46ms, tests 41ms, environment 0ms, prepare 79ms)
+

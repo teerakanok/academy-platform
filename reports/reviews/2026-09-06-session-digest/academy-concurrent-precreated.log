@@ -1,0 +1,1 @@
+{"wait":{"wait_event_type":"Lock","wait_event":"transactionid"},"second":{"accepted":false,"code":"XX000","message":"tuple concurrently updated"},"markerCount":1,"exactlyOnce":true,"doubleHash":false}
