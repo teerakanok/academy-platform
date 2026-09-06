@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "commit": "ebe129f3273824736a3a83608d5e155ce2fbc14d",
+  "file_sha256": "d803bc886c6b52329b8da3cc8444182c96338806d44cb61bddb5ede8e7801701",
+  "reviewer": "root independent from GLM author",
+  "evidence": "academy-guide-r2-parent-gates.json",
+  "baseline_red": "academy-guide-parent-red.json",
+  "retained_correction_red": "academy-guide-preservation-red.json",
+  "review": "Exactcurrentreceipt IDs and all links verified; routine unit/lint/background instructions retained; flag enabled with explicit noncredential true; 0034 consumed and old90 rollback barred; no learnerjourney claim; keytableblank."
+}

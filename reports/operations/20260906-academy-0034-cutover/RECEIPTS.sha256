@@ -18,3 +18,7 @@ bd5ef265cc652d4e32f08c616e45b1ad52ddc0ce920d5b88d76573b97138058c  /private/tmp/a
 15f217698ba27fa55405d98ab914d715e0b4a219f26e5678ac4309722fdd3074  /private/tmp/academy-session-digest-cde63a58/reports/operations/20260906-academy-0034-cutover/receipts/academy-robots-canonical-authenticated.json
 054a81c79d00c9de931d02960424879d764b70b01204b6e16abbf04765a8e0bc  /private/tmp/academy-session-digest-cde63a58/reports/operations/20260906-academy-0034-cutover/concrete-cutover-r2-review.md
 041b4019ae77d11db14c6377c74ccf21a8c3700e32f586935ac089e4bcfd8650  /private/tmp/academy-session-digest-cde63a58/reports/operations/20260906-academy-0034-cutover/receipts/academy-cutover-resume-runtime-parity.json
+c975714e2360b3fedd1268ad2834f14f40676af595db960d6cd7e1ec7c15e20c  receipts/academy-guide-parent-red.json
+eff47dcb3711da7e724476fddbad45b2e955e699aa7faf860a9eb333b3ad4a44  receipts/academy-guide-preservation-red.json
+fda24e55a09dfc613bffcb41ceaaf6ad2c39426f6d486fa890368507c7a3e5fd  receipts/academy-guide-r2-parent-gates.json
+5cac8373e8c7cab95f477501420ce69867f980c9598f31194ea6cd5406b44cdd  receipts/academy-maintenance-guide-acceptance.json

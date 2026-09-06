@@ -1,0 +1,11 @@
+{
+  "command": [
+    "rtk",
+    "proxy",
+    "python3",
+    "-c",
+    "from pathlib import Path; s=Path('docs/maintenance/maintain-and-deploy.md').read_text(); assert 'npx vitest run --project unit' in s and 'npm run lint' in s, 'required app gates were removed'; assert 'background' in s.lower(), 'monitoring instruction removed'; assert 'true' in s, 'runtime resume must explicitly enable boolean'; print('GUIDE_RETAINED_MAINTENANCE_GATES=PASS')"
+  ],
+  "exit": 1,
+  "output": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    from pathlib import Path; s=Path('docs/maintenance/maintain-and-deploy.md').read_text(); assert 'npx vitest run --project unit' in s and 'npm run lint' in s, 'required app gates were removed'; assert 'background' in s.lower(), 'monitoring instruction removed'; assert 'true' in s, 'runtime resume must explicitly enable boolean'; print('GUIDE_RETAINED_MAINTENANCE_GATES=PASS')\n                                                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: required app gates were removed\n"
+}

@@ -69,3 +69,9 @@ source-verified hashes. `concrete-cutover-r2-review.md`
 (`054a81c79d00c9de931d02960424879d764b70b01204b6e16abbf04765a8e0bc`)
 is the actual independent R2 PASS. The copied operator scripts and reviews are
 retained for continuation only; they grant no new live authority.
+
+The [maintenance and deployment guide](../../../docs/maintenance/maintain-and-deploy.md)
+now reflects this cutover and its recovery boundary. Its exact current-receipt/link
+checks and independent parent review passed after the retained draft's missing
+routine application gates were restored. The key inventory intentionally remains
+blank for the final owner discussion. Guide verification receipts are included.

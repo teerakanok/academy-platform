@@ -1,0 +1,38 @@
+[
+  {
+    "id": "guide-evidence",
+    "command": [
+      "rtk",
+      "proxy",
+      "python3",
+      "-c",
+      "exec(\"from pathlib import Path\\nimport json,re\\np=Path('docs/maintenance/maintain-and-deploy.md');s=p.read_text();op=Path('reports/operations/20260906-academy-0034-cutover');v=json.loads((op/'receipts/academy-cutover-resumed-forward-verified.json').read_text())['verified_deployment']['versions'][0]['version_id'];assert v in s;assert '0034' in s and '10220' in s\\nlinks=re.findall(r'\\\\[[^\\\\]]*\\\\]\\\\(([^)]+)\\\\)',s);assert len(links)>5,'link parser returned too few links'\\nfor h in links:\\n if '://' not in h and not h.startswith('#'):assert (p.parent/h.split('#')[0]).exists(),h\\nassert '| | | | |' in s;print('GUIDE_CURRENT_RECEIPTS_LINKS_AND_EMPTY_KEYS=PASS')\\n\")"
+    ],
+    "exit": 0,
+    "output": "GUIDE_CURRENT_RECEIPTS_LINKS_AND_EMPTY_KEYS=PASS\n"
+  },
+  {
+    "id": "scope",
+    "command": [
+      "rtk",
+      "proxy",
+      "python3",
+      "-c",
+      "import subprocess; a=subprocess.check_output(['git','diff','--name-only'],text=True).splitlines(); b=subprocess.check_output(['git','ls-files','--others','--exclude-standard'],text=True).splitlines(); assert all(x.startswith('docs/maintenance/') for x in a+b); subprocess.run(['git','diff','--check'],check=True); print('GUIDE_SCOPE=PASS')"
+    ],
+    "exit": 0,
+    "output": "GUIDE_SCOPE=PASS\n"
+  },
+  {
+    "id": "preserved-maintenance",
+    "command": [
+      "rtk",
+      "proxy",
+      "python3",
+      "-c",
+      "from pathlib import Path; s=Path('docs/maintenance/maintain-and-deploy.md').read_text(); assert 'npx vitest run --project unit' in s and 'npm run lint' in s, 'required app gates were removed'; assert 'background' in s.lower(), 'monitoring instruction removed'; assert 'true' in s, 'runtime resume must explicitly enable boolean'; print('GUIDE_RETAINED_MAINTENANCE_GATES=PASS')"
+    ],
+    "exit": 0,
+    "output": "GUIDE_RETAINED_MAINTENANCE_GATES=PASS\n"
+  }
+]
