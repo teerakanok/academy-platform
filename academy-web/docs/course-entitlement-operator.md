@@ -37,11 +37,17 @@ issues `ROLLBACK`. After independent review, and only after a Pool A backup and
 production change record exist, replace `--dry-run` with `--apply`; that path
 issues `COMMIT` only after the same checks pass.
 
-The reversible SQL is
-`supabase/rollbacks/0030_least_privilege_course_entitlement.rollback.sql`. It
-restores the pre-migration grants and removes the dedicated role/functions, but
-intentionally retains `academy.course_entitlement_audit` as evidence. Do not run
-that rollback merely to erase an audit record.
+The reversible SQL for `0030` is
+`supabase/rollbacks/0030_least_privilege_course_entitlement.rollback.sql`. When
+`0031` is installed, first apply
+`supabase/rollbacks/0031_course_entitlement_audit_retention.rollback.sql`. These
+rollbacks remove dedicated privilege and retention surfaces but intentionally
+retain `academy.course_entitlement_audit` as evidence. A migration rollback is
+never an automatic destructive response for existing authenticated sessions;
+handle those sessions through the documented operator incident process. Do not
+run a rollback merely to erase an audit record. Scheduled retention is the only
+audit deletion path and uses the existing three-year authorization-history
+retention bound with a 500-row batch.
 
 ## Dedicated role provisioning
 
@@ -93,10 +99,14 @@ same grant is a no-op. Change `--grant` to `--revoke` for revocation; repeated
 revocation is a no-op. Add `--apply` only after the dry run and reference are
 approved.
 
-Every effective grant/revoke writes one append-only audit row containing the
-target, course scope, action, source, expiry, owner actor, and reference. The
-operator has no direct audit-table access. Independent auditors should query the
-RLS-protected table through the approved Pool A owner/audit process; do not
-expose it to `service_role`.
+Every effective grant/revoke writes one append-only audit row containing only
+canonical target and actor UUIDs, course scope, action, source, expiry, and
+reference. Account purge may remove identities while retaining those UUIDs;
+scheduled retention holds active entitlement evidence and expires it only after
+the existing three-year authorization-history bound following revocation or expiry. The operator has no direct audit-table
+access. Independent auditors should query the RLS-protected table through the
+approved Pool A owner/audit process; do not expose it to `service_role`.
 
 Migration 0030 refuses an existing `academy_entitlement_operator` name and unexpected staff-admin role state before enabling login. Investigate collisions explicitly; do not drop or reset an existing role to force migration. The staff role must match its prior non-login boundary and have no existing password. Owner revocation and entitlement changes share an authorization lock. Rollback disables staff login and clears any password provisioned after migration.
+
+Entitlement audit follows the existing authorization-history hold: retain evidence while a matching entitlement is active and for three years after it ends through revocation or expiry; old event rows become eligible only when that hold no longer applies. Account deletion preserves UUID audit attribution.

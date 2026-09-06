@@ -57,7 +57,7 @@ describe.skipIf(!hasDedicatedApi)('dedicated Academy retention PostgREST contrac
     expect(await response.json()).toBe(testDatabaseId)
   })
 
-  it('allows exactly the five bounded retention RPC capabilities', async () => {
+  it('allows exactly the six bounded retention RPC capabilities', async () => {
     const retention = `Bearer ${tokenFor('academy_retention')}`
     const jobs = [
       'run_retention_attempts',
@@ -65,6 +65,7 @@ describe.skipIf(!hasDedicatedApi)('dedicated Academy retention PostgREST contrac
       'run_retention_inactive_users',
       'run_retention_privacy_requests',
       'run_retention_staff_authorization_history',
+      'run_retention_course_entitlement_history',
     ] as const
 
     const responses = await Promise.all(jobs.map((rpc) => request(`/rpc/${rpc}`, retention)))

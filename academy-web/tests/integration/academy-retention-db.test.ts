@@ -8,6 +8,7 @@ const wrappers = [
   'run_retention_inactive_users',
   'run_retention_privacy_requests',
   'run_retention_staff_authorization_history',
+  'run_retention_course_entitlement_history',
 ]
 
 const policies = [
@@ -16,6 +17,7 @@ const policies = [
   'purge_inactive_users',
   'purge_expired_privacy_requests',
   'purge_expired_staff_authorization_history',
+  'purge_expired_course_entitlement_history',
 ]
 
 describe('Academy retention database capability', () => {
@@ -47,7 +49,7 @@ describe('Academy retention database capability', () => {
         [[...wrappers, ...policies]],
       )
 
-      expect(result.rows).toHaveLength(10)
+      expect(result.rows).toHaveLength(12)
       for (const row of result.rows.filter((row) => wrappers.includes(row.name))) {
         expect(row.owner).toBe('academy_retention_definer')
         expect(row.security_definer).toBe(true)

@@ -15,7 +15,7 @@ aud=academy-retention-api
 ```
 
 The retention API exposes schema `academy` only. The API capability cannot read
-tables directly or choose a retention period. It can call exactly five
+tables directly or choose a retention period. It can call exactly six
 no-argument wrappers, each of which fixes the approved policy:
 
 | Wrapper | Fixed policy |
@@ -25,17 +25,18 @@ no-argument wrappers, each of which fixes the approved policy:
 | `run_retention_inactive_users` | inactive accounts: 2 years; batch 500 |
 | `run_retention_privacy_requests` | privacy requests: 3 years; batch 500 |
 | `run_retention_staff_authorization_history` | staff authorization history: 3 years; batch 500 |
+| `run_retention_course_entitlement_history` | manual course entitlement audit: 3 years; batch 500 |
 
 The underlying purge functions remain responsible for unresolved appeals, case
 holds, evidence bounds, and idempotent deletion.
 
-Those five underlying policy functions are `SECURITY INVOKER` with
+Those six underlying policy functions are `SECURITY INVOKER` with
 `search_path=pg_catalog`. They therefore run as the restricted wrapper owner,
 not as the historical migration operator that originally created them.
 
 `academy_retention_definer` is a NOLOGIN, non-superuser `BYPASSRLS` role. It
 has no API authenticator membership and has explicit grants only on the tables
-and five pre-existing purge functions necessary for those wrappers. This keeps
+and six pre-existing purge functions necessary for those wrappers. This keeps
 Academy tables on their existing default-deny RLS model without adding allow
 policies to user data.
 
@@ -62,10 +63,10 @@ is also entered as a secret for `cyberskills-academy-retention`.
    `supabase/privileged/academy-retention-api-roles.sql`. It creates the
    authenticator, the execute-only capability, and the independent definer
    owner with a fail-closed membership check.
-3. Apply migration `0020_dedicated_retention_api.sql` to Pool A `postgres`.
+3. Apply pending migrations through `0031_course_entitlement_audit_retention.sql` to Pool A `postgres` (including `0020_dedicated_retention_api.sql` on a fresh installation). Do not reapply migrations already recorded in the ledger.
    Immediately afterwards, as database superuser, apply
    `supabase/privileged/academy-retention-api-function-owners.sql`. This step
-   is required: it changes the five `SECURITY DEFINER` wrappers to the
+   is required: it changes the six `SECURITY DEFINER` wrappers to the
    non-login `academy_retention_definer` owner and grants only wrapper execute
    to `academy_retention`.
 4. Create the host-only env file above, then validate and start the dedicated
@@ -104,7 +105,7 @@ is also entered as a secret for `cyberskills-academy-retention`.
 7. Do not insert production fixtures. Cloudflare has no production "run now"
    control for cron triggers. Verify the next daily event through Workers Logs
    and the Worker Trigger Events view; Trigger Events can take up to 30 minutes
-   to appear. Expected first-run outcome is five `retention.purge_complete`
+   to appear. Expected first-run outcome is six `retention.purge_complete`
    records with non-negative integer `deleted` and `rounds` fields, normally
    all zero for an unchanged dataset. Confirm that direct table access and the
    original parameterized purge RPCs still return access denied.
@@ -190,7 +191,7 @@ curl --fail --silent --show-error \
   'http://127.0.0.1:8787/cdn-cgi/handler/scheduled?format=json'
 ```
 
-Expected: the structured result succeeds and the terminal has five
+Expected: the structured result succeeds and the terminal has six
 `retention.purge_complete` logs with non-negative integer counts. Remove
 `.dev.vars` and stop the local test containers after the rehearsal. When running
 the real API contract suite, set the same identifier as
@@ -227,4 +228,4 @@ draining.
    authenticator membership edges, remove the retention Worker secrets, and
    stop the retention API containers. Preserve the Academy web Worker and its
    data API. Reissue both retention credentials together, restore the role
-   scripts, then re-run the direct-table-denial and five-wrapper smoke checks.
+   scripts, then re-run the direct-table-denial and six-wrapper smoke checks.

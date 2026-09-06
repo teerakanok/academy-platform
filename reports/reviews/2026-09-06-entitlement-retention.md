@@ -1,0 +1,7 @@
+# Entitlement audit retention — local candidate
+
+Migration0030 audit foreign keys could block actor erasure and cascade target history. Migration0031 removes both user references, retains the audit, and adds a sixth least-privilege scheduled purge. Evidence remains while matching authority is active or ended less than3years ago; events must themselves be older than3years. Rollback removes scheduling/permissions while preserving evidence.
+
+Observed RED: baseline actor deletion raised23503; old-event purge removed evidence for active/recently ended entitlement. Owned PostgreSQL ROLLBACK rehearsal preceded COMMIT in the disposable fixture. Corrected PostgreSQL11tests passed, including revoke and expiry holds. Unit `npx vitest run --project unit`:2155passed; `npm run build:cf`:exit0. `npm run lint`:exit1 solely the accepted3no-require-imports baseline in academy-bound-worker-executor.cjs,16warnings. Separate app,Worker,andretentionTypeScriptchecks each exit0. Independent frozen47file review PASS/no findings; parent reverified every source hash. Raw final logs/manifests are in the sibling evidence directory. RED evidence remains /private/tmp/cyberskills-prod-cde63a58/academy-retention-baseline-red* and academy-retention-hold-red*.
+
+No production migration/deploy and no live PostgREST HTTP proof. Apply pending migrations through0031 before privileged function-owner assignment; complete production dry-run/host gates and reviewed rollout before closure. This is candidate code evidence, not production readiness.

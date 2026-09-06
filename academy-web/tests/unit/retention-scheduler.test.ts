@@ -15,6 +15,10 @@ const env = {
   ACADEMY_RETENTION_API_JWT_SECRET: secret,
 }
 const attempts: PurgeJob = { name: 'attempts', rpc: 'run_retention_attempts' }
+const entitlementHistory: PurgeJob = {
+  name: 'course-entitlement-history',
+  rpc: 'run_retention_course_entitlement_history',
+}
 
 function json(value: unknown, status = 200): Response {
   return new Response(JSON.stringify(value), { status, headers: { 'content-type': 'application/json' } })
@@ -53,6 +57,13 @@ describe('Academy retention scheduler', () => {
     expect(url.pathname).toBe('/rpc/run_retention_attempts')
     expect(init.body).toBe('{}')
     expect(init.headers).toMatchObject({ 'content-type': 'application/json' })
+  })
+
+  it('configures entitlement-history retention through its fixed no-argument wrapper', async () => {
+    const fetcher = vi.fn().mockResolvedValueOnce(json(1)).mockResolvedValueOnce(json(0))
+    await expect(runPurgeJob(env, entitlementHistory, { fetcher })).resolves.toEqual({ rounds: 2, deleted: 1 })
+    const [url] = fetcher.mock.calls[0] as [URL, RequestInit]
+    expect(url.pathname).toBe('/rpc/run_retention_course_entitlement_history')
   })
 
   it('fails on a timeout or non-integer API result', async () => {

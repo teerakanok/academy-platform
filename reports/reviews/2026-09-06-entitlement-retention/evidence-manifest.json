@@ -1,0 +1,42 @@
+[
+  {
+    "path": "academy-retention-corrected-build-cf.log",
+    "sha256": "252c23eaf1390b4ad50721b0cd960b601773b9bc0ae3d90b9009319674a42f1d",
+    "bytes": 7531
+  },
+  {
+    "path": "academy-retention-corrected-gates.json",
+    "sha256": "e0ed4643b0935bbb580b871939600ccd5485b899ca6a2122f2c4046bbae6f183",
+    "bytes": 364
+  },
+  {
+    "path": "academy-retention-corrected-lint.log",
+    "sha256": "98052e492a52d71abec802190e4f200c9e0aa7d2a63154ba2c0fe1504ca8be7a",
+    "bytes": 3267
+  },
+  {
+    "path": "academy-retention-corrected-unit.log",
+    "sha256": "a791ea6553bf0f0345046042dfc767fbbaaaad7c65d0ed6e808161774f55d157",
+    "bytes": 18094
+  },
+  {
+    "path": "academy-retention-hold-green-test.log",
+    "sha256": "2bb76c4ebc69fb051bc70d1e0cb19c16f3a6b5b3f5535c8a590a6d0fd48757fe",
+    "bytes": 431
+  },
+  {
+    "path": "academy-retention-types.json",
+    "sha256": "0ccda80aa5990252e5a18734859ee02c65e3511f3969f60b449d037b9694eddc",
+    "bytes": 426
+  },
+  {
+    "path": "independent-review.json",
+    "sha256": "40aaf1c29285475c53b6c1cdf1eb835aa3a57ca6261448112ad8d2cd618b1d2b",
+    "bytes": 747
+  },
+  {
+    "path": "source-freeze.json",
+    "sha256": "511366bc90fb0e684c55d1b244bcd29f4018d20ad8b263056c6b27cf81499c09",
+    "bytes": 9279
+  }
+]

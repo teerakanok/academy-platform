@@ -158,6 +158,96 @@ describe('audited course entitlement operator', () => {
     })
   })
 
+  it('keeps entitlement evidence when account purge deletes actor and target', async () => {
+    const owner = await createUser(randomUUID())
+    const learner = await createUser(randomUUID())
+    await withDb(async (db) => {
+      await db.query(`insert into academy.staff_role_assignment(account_id, role, granted_by)
+        values ($1, 'owner', $1)`, [owner])
+      await asOperator(
+        db,
+        `select academy.set_course_entitlement($1, $2, 'setup-and-environment', true, 'grant', null, 'TEST-PURGE-ACTOR-TARGET')`,
+        [owner, learner],
+      )
+      await db.query(
+        `update academy.users set last_seen_at = now() - interval '3 years' where id = any($1::uuid[])`,
+        [[owner, learner]],
+      )
+      await db.query(`update academy.staff_role_assignment set revoked_at = now(), revoked_by = $1 where account_id = $1 and role = 'owner'`, [owner])
+      expect((await db.query(`select academy.purge_inactive_users(2, 500) as deleted`)).rows[0].deleted).toBe(2)
+      const audit = await db.query(
+        `select account_id, actor_account_id, action from academy.course_entitlement_audit
+          where authorization_reference = 'TEST-PURGE-ACTOR-TARGET'`,
+      )
+      expect(audit.rows).toEqual([{ account_id: learner, actor_account_id: owner, action: 'granted' }])
+      await db.query(`delete from academy.course_entitlement_audit where authorization_reference = 'TEST-PURGE-ACTOR-TARGET'`)
+    })
+  })
+
+  it.each(['revoked_at', 'expires_at'])('holds entitlement evidence until the retention boundary after %s', async (endingColumn) => {
+    const owner = await createUser(randomUUID())
+    const learner = await createUser(randomUUID())
+    await withDb(async (db) => {
+      await db.query(`insert into academy.staff_role_assignment(account_id, role, granted_by)
+        values ($1, 'owner', $1)`, [owner])
+      await asOperator(
+        db,
+        `select academy.set_course_entitlement($1, $2, 'setup-and-environment', true, 'grant', null, 'TEST-EXPIRE-ENTITLEMENT')`,
+        [owner, learner],
+      )
+      const auditId = (await db.query(
+        `select event_id from academy.course_entitlement_audit where authorization_reference = 'TEST-EXPIRE-ENTITLEMENT'`,
+      )).rows[0].event_id
+
+      await db.query(
+        `update academy.course_entitlement_audit set occurred_at = now() - interval '3 years 1 day' where event_id = $1`,
+        [auditId],
+      )
+      await db.query('begin')
+      try {
+        await db.query('set local role academy_entitlement_operator')
+        await expect(db.query(`select academy.purge_expired_course_entitlement_history(3, 500)`))
+          .rejects.toThrow(/permission denied/)
+      } finally {
+        await db.query('rollback')
+      }
+      expect((await db.query(`select count(*)::int as count from academy.course_entitlement_audit where event_id = $1`, [auditId])).rows[0].count).toBe(1)
+
+      const purge = async () => {
+        await db.query('begin')
+        try {
+          await db.query('set local role academy_retention')
+          const result = await db.query(`select academy.run_retention_course_entitlement_history() as deleted`)
+          await db.query('commit')
+          return result.rows[0].deleted
+        } catch (error) { await db.query('rollback'); throw error }
+      }
+      // Match existing staff authorization history: active and recently ended authority is held.
+      expect(await purge()).toBe(0)
+      await db.query(`update academy.course_entitlement set ${endingColumn} = now() where user_id = $1`, [learner])
+      expect(await purge()).toBe(0)
+      await db.query(`update academy.course_entitlement set ${endingColumn} = now() - interval '3 years 1 day' where user_id = $1`, [learner])
+      expect(await purge()).toBe(1)
+      expect((await db.query(`select count(*)::int as count from academy.course_entitlement_audit where event_id = $1`, [auditId])).rows[0].count).toBe(0)
+    })
+  })
+
+  it('rejects an expired grant timestamp without writing entitlement or audit evidence', async () => {
+    const owner = await createUser(randomUUID())
+    const learner = await createUser(randomUUID())
+    await withDb(async (db) => {
+      await db.query(`insert into academy.staff_role_assignment(account_id, role, granted_by)
+        values ($1, 'owner', $1)`, [owner])
+      await expect(asOperator(
+        db,
+        `select academy.set_course_entitlement($1, $2, 'setup-and-environment', true, 'grant', now() - interval '1 second', 'TEST-EXPIRED-GRANT-DENY')`,
+        [owner, learner],
+      )).rejects.toThrow(/invalid course entitlement input/)
+      expect((await db.query(`select count(*)::int as count from academy.course_entitlement where user_id = $1`, [learner])).rows[0].count).toBe(0)
+      expect((await db.query(`select count(*)::int as count from academy.course_entitlement_audit where account_id = $1`, [learner])).rows[0].count).toBe(0)
+    })
+  })
+
   it('refuses a colliding operator role before adopting or changing it', async () => {
     const migration = readFileSync(new URL('../../supabase/migrations/0030_least_privilege_course_entitlement.sql', import.meta.url), 'utf8')
     const roleSetup = migration.split('-- Migration 0018')[0]
