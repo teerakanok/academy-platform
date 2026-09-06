@@ -1,0 +1,205 @@
+{
+  "command": [
+    "./node_modules/.bin/wrangler",
+    "deployments",
+    "list",
+    "--name",
+    "cyberskills-academy",
+    "--json"
+  ],
+  "exit": 0,
+  "source": "0e4417ec4e2909f05ab4eb9f3269bcb1c58c184b",
+  "checked": "2026-09-06T20:45:00.780828+00:00",
+  "deployments": [
+    {
+      "id": "ab165606-5980-41bf-a3dc-7ac855f8a58a",
+      "source": "wrangler",
+      "strategy": "percentage",
+      "author_email": "songpon.te@gmail.com",
+      "annotations": {
+        "workers/message": "split;candidate=bf36900f;s=ca2effc",
+        "workers/triggered_by": "deployment"
+      },
+      "versions": [
+        {
+          "version_id": "313465d5-0e37-48e8-8ba4-b6c61cf3d9d0",
+          "percentage": 100
+        },
+        {
+          "version_id": "bf36900f-cbba-4864-9cfd-2ef6b7cbde87",
+          "percentage": 0
+        }
+      ],
+      "created_on": "2026-09-03T18:08:36.562025Z"
+    },
+    {
+      "id": "9674e8f6-43d2-44b2-8bf9-b905b320f1cf",
+      "source": "wrangler",
+      "strategy": "percentage",
+      "author_email": "songpon.te@gmail.com",
+      "annotations": {
+        "workers/message": "activate;s=ca2effc;prev=313465d5",
+        "workers/triggered_by": "deployment"
+      },
+      "versions": [
+        {
+          "version_id": "bf36900f-cbba-4864-9cfd-2ef6b7cbde87",
+          "percentage": 100
+        }
+      ],
+      "created_on": "2026-09-03T18:09:25.056341Z"
+    },
+    {
+      "id": "d761b5d4-c1c9-44b3-9fe6-c3ae0f24485f",
+      "source": "wrangler",
+      "strategy": "percentage",
+      "author_email": "songpon.te@gmail.com",
+      "annotations": {
+        "workers/message": "split;candidate=1c8cc388;s=157736d",
+        "workers/triggered_by": "deployment"
+      },
+      "versions": [
+        {
+          "version_id": "bf36900f-cbba-4864-9cfd-2ef6b7cbde87",
+          "percentage": 100
+        },
+        {
+          "version_id": "1c8cc388-3a9f-4e14-bfe6-39d5a9e651fd",
+          "percentage": 0
+        }
+      ],
+      "created_on": "2026-09-03T18:13:16.578787Z"
+    },
+    {
+      "id": "766ba4a1-aa9a-498d-8122-694f59e14f42",
+      "source": "wrangler",
+      "strategy": "percentage",
+      "author_email": "songpon.te@gmail.com",
+      "annotations": {
+        "workers/message": "activate;s=157736d;prev=bf36900f",
+        "workers/triggered_by": "deployment"
+      },
+      "versions": [
+        {
+          "version_id": "1c8cc388-3a9f-4e14-bfe6-39d5a9e651fd",
+          "percentage": 100
+        }
+      ],
+      "created_on": "2026-09-03T18:14:00.663947Z"
+    },
+    {
+      "id": "434f33c4-9ab3-429d-a83a-75a5f33963cd",
+      "source": "wrangler",
+      "strategy": "percentage",
+      "author_email": "songpon.te@gmail.com",
+      "annotations": {
+        "workers/message": "split;candidate=d4717406;s=594dede",
+        "workers/triggered_by": "deployment"
+      },
+      "versions": [
+        {
+          "version_id": "1c8cc388-3a9f-4e14-bfe6-39d5a9e651fd",
+          "percentage": 100
+        },
+        {
+          "version_id": "d4717406-58be-43b4-87bb-bc1be260ecdd",
+          "percentage": 0
+        }
+      ],
+      "created_on": "2026-09-03T23:29:22.267216Z"
+    },
+    {
+      "id": "fb156af2-d153-43b5-844c-22d3acd0138d",
+      "source": "wrangler",
+      "strategy": "percentage",
+      "author_email": "songpon.te@gmail.com",
+      "annotations": {
+        "workers/message": "activate;s=594dede;prev=1c8cc388",
+        "workers/triggered_by": "deployment"
+      },
+      "versions": [
+        {
+          "version_id": "d4717406-58be-43b4-87bb-bc1be260ecdd",
+          "percentage": 100
+        }
+      ],
+      "created_on": "2026-09-03T23:29:56.295418Z"
+    },
+    {
+      "id": "fa4baea1-dc73-4ba4-b61c-84dbb0d0cbb9",
+      "source": "wrangler",
+      "strategy": "percentage",
+      "author_email": "songpon.te@gmail.com",
+      "annotations": {
+        "workers/message": "split;candidate=6c2e3881;s=c5a169b9;pre-activation-smoke",
+        "workers/triggered_by": "deployment"
+      },
+      "versions": [
+        {
+          "version_id": "d4717406-58be-43b4-87bb-bc1be260ecdd",
+          "percentage": 100
+        },
+        {
+          "version_id": "6c2e3881-4836-4bee-8bd1-b6e5368b6def",
+          "percentage": 0
+        }
+      ],
+      "created_on": "2026-09-05T12:47:31.689775Z"
+    },
+    {
+      "id": "3e0bfee2-7a06-4c1a-a2ce-c74af339c5b1",
+      "source": "wrangler",
+      "strategy": "percentage",
+      "author_email": "songpon.te@gmail.com",
+      "annotations": {
+        "workers/message": "activate;s=c5a169b9;prev=d4717406;host-gate-smoke-pass",
+        "workers/triggered_by": "deployment"
+      },
+      "versions": [
+        {
+          "version_id": "6c2e3881-4836-4bee-8bd1-b6e5368b6def",
+          "percentage": 100
+        }
+      ],
+      "created_on": "2026-09-05T12:49:29.432424Z"
+    },
+    {
+      "id": "29f70c6b-ce0f-4ad6-b1e9-4266176e04ff",
+      "source": "wrangler",
+      "strategy": "percentage",
+      "author_email": "songpon.te@gmail.com",
+      "annotations": {
+        "workers/message": "candidate-smoke;s=bc1c738e7cab4f74f1db5a74efa8216996a02f94",
+        "workers/triggered_by": "deployment"
+      },
+      "versions": [
+        {
+          "version_id": "6c2e3881-4836-4bee-8bd1-b6e5368b6def",
+          "percentage": 100
+        },
+        {
+          "version_id": "90c390b5-ed8e-48e3-8ab5-3a3b8bb30cd8",
+          "percentage": 0
+        }
+      ],
+      "created_on": "2026-09-06T18:07:48.887515Z"
+    },
+    {
+      "id": "1043558a-7697-4f70-a318-256f4a3d0af0",
+      "source": "wrangler",
+      "strategy": "percentage",
+      "author_email": "songpon.te@gmail.com",
+      "annotations": {
+        "workers/message": "activate;s=bc1c738e7cab4f74f1db5a74efa8216996a02f94;prev=6c2e3881-4836-4bee-8bd1-b6e5368b6def",
+        "workers/triggered_by": "deployment"
+      },
+      "versions": [
+        {
+          "version_id": "90c390b5-ed8e-48e3-8ab5-3a3b8bb30cd8",
+          "percentage": 100
+        }
+      ],
+      "created_on": "2026-09-06T18:12:45.664802Z"
+    }
+  ]
+}

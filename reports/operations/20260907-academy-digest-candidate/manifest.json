@@ -1,0 +1,26 @@
+[
+  {
+    "path": "academy-pre-digest-deployments.json",
+    "sha256": "9331808ab8215a421eb81594aa731cad50d2bcb9241ca40aff5ae32550cfae12"
+  },
+  {
+    "path": "academy-digest-upload-process.json",
+    "sha256": "b0b9cd04b2ec82cab3371ab9cf63abfe6775dd14cf9cbfd76a00dd74867ce975"
+  },
+  {
+    "path": "academy-digest-upload.json",
+    "sha256": "f3bc7712bb42646e06768b5ba8b5f130ff2862b6a2d18738c75b1414cf4a3953"
+  },
+  {
+    "path": "academy-digest-split-process.json",
+    "sha256": "d30d38b2e8b5f0d284b07564d4407a6a400e652485e603b5a84539d53cf063a4"
+  },
+  {
+    "path": "academy-digest-split.json",
+    "sha256": "b280668c80c6ca9f1b9651c0614691852db8df7eaac6d7d97ccb880a5078b7a5"
+  },
+  {
+    "path": "academy-digest-candidate-smoke.json",
+    "sha256": "3994ffc2f70618d94ea16a6ad745218ac72b6e7f8b712a59690c3961bf3f6fce"
+  }
+]

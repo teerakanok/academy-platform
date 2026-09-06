@@ -1,0 +1,1 @@
+{"pid": 87294, "command": ["./node_modules/.bin/wrangler", "versions", "upload", "--name", "cyberskills-academy", "--keep-vars", "--tag", "release-0e4417ec4e29", "--message", "s=0e4417ec4e2909f05ab4eb9f3269bcb1c58c184b;reviewed-session-digest;candidate-only"], "started": "2026-09-06T20:45:36.130594+00:00"}
