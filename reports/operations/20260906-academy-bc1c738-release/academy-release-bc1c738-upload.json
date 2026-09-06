@@ -1,0 +1,30 @@
+{
+  "command": [
+    "./node_modules/.bin/wrangler",
+    "versions",
+    "upload",
+    "--name",
+    "cyberskills-academy",
+    "--keep-vars",
+    "--tag",
+    "release-bc1c738e7cab",
+    "--message",
+    "s=bc1c738e7cab4f74f1db5a74efa8216996a02f94;reviewed-final-worker-startup"
+  ],
+  "source": "bc1c738e7cab4f74f1db5a74efa8216996a02f94",
+  "exit": 0,
+  "version_ids": [
+    "90c390b5-ed8e-48e3-8ab5-3a3b8bb30cd8"
+  ],
+  "output": [
+    "Total Upload: 14393.00 KiB / gzip: 3290.93 KiB",
+    "Worker Startup Time: 27 ms",
+    "Uploaded cyberskills-academy (9.84 sec)"
+  ],
+  "errors": {
+    "serverOnly": false,
+    "startup10021": false,
+    "authentication": false
+  },
+  "outputSha256": "f07ac229ba6257d21f19bd4c74e71983692d910292977f01602ccd9a4818c320"
+}

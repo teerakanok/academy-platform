@@ -1,0 +1,87 @@
+{
+  "command": [
+    "wrangler",
+    "versions",
+    "view",
+    "90c390b5-ed8e-48e3-8ab5-3a3b8bb30cd8",
+    "--name",
+    "cyberskills-academy",
+    "--json"
+  ],
+  "exit": 0,
+  "id": "90c390b5-ed8e-48e3-8ab5-3a3b8bb30cd8",
+  "number": 43,
+  "created_on": "2026-09-06T18:03:46.848603Z",
+  "tag": "release-bc1c738e7cab",
+  "message": "s=bc1c738e7cab4f74f1db5a74efa8216996a02f94;reviewed-final-worker-startup",
+  "bindings": [
+    {
+      "name": "ACADEMY_DATA_API_JWT_SECRET",
+      "type": "secret_text"
+    },
+    {
+      "name": "ACADEMY_DATA_API_URL",
+      "type": "secret_text"
+    },
+    {
+      "name": "ACADEMY_IDENTITY_DIAGNOSTIC_NONCE",
+      "type": "secret_text"
+    },
+    {
+      "name": "ASSETS",
+      "type": "assets"
+    },
+    {
+      "name": "COURSE_MEDIA",
+      "type": "r2_bucket"
+    },
+    {
+      "name": "EDGE_RATE_LIMITER",
+      "type": "durable_object_namespace"
+    },
+    {
+      "name": "IDENTITY_ADAPTER",
+      "type": "secret_text"
+    },
+    {
+      "name": "IDENTITY_CLIENT_ASSERTION_KEY_ID",
+      "type": "secret_text"
+    },
+    {
+      "name": "IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK",
+      "type": "secret_text"
+    },
+    {
+      "name": "IDENTITY_CODE_EXCHANGE_TIMEOUT_MS",
+      "type": "secret_text"
+    },
+    {
+      "name": "IDENTITY_RELEASE_APPROVAL",
+      "type": "secret_text"
+    },
+    {
+      "name": "IDENTITY_RESULT_KEY_SET_DOCUMENT",
+      "type": "secret_text"
+    },
+    {
+      "name": "IDENTITY_RUNTIME_ENABLED",
+      "type": "secret_text"
+    },
+    {
+      "name": "IDENTITY_RUNTIME_WIRED",
+      "type": "secret_text"
+    },
+    {
+      "name": "MEDIA_SIGNING_SECRET",
+      "type": "secret_text"
+    },
+    {
+      "name": "NEXT_PUBLIC_SEARCH_INDEXING",
+      "type": "plain_text"
+    },
+    {
+      "name": "RATE_LIMIT_KEY_SECRET",
+      "type": "secret_text"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "command": [
+    "wrangler",
+    "versions",
+    "deploy",
+    "6c2e3881-4836-4bee-8bd1-b6e5368b6def@100",
+    "90c390b5-ed8e-48e3-8ab5-3a3b8bb30cd8@0",
+    "--name",
+    "cyberskills-academy",
+    "--message",
+    "candidate-smoke;s=bc1c738e7cab4f74f1db5a74efa8216996a02f94",
+    "--yes"
+  ],
+  "exit": 0,
+  "expectedDeployment": "3e0bfee2-7a06-4c1a-a2ce-c74af339c5b1",
+  "old": "6c2e3881-4836-4bee-8bd1-b6e5368b6def",
+  "candidate": "90c390b5-ed8e-48e3-8ab5-3a3b8bb30cd8",
+  "outputSha256": "22120f0af690b6b0107316c10808465897a5cf10bb27b07c407298385822eb99",
+  "output": [
+    "╰  SUCCESS  Deployed cyberskills-academy version 6c2e3881-4836-4bee-8bd1-b6e5368b6def at 100% and version 90c390b5-ed8e-48e3-8ab5-3a3b8bb30cd8 at 0% (1.61 sec)"
+  ]
+}

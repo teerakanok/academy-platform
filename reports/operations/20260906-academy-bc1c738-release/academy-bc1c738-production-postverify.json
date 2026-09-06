@@ -1,0 +1,95 @@
+{
+  "command": "wrangler deployments list --name cyberskills-academy --json; GET canonical/raw paths without cookies or override",
+  "source": "bc1c738e7cab4f74f1db5a74efa8216996a02f94",
+  "candidate": "90c390b5-ed8e-48e3-8ab5-3a3b8bb30cd8",
+  "deployment": {
+    "id": "1043558a-7697-4f70-a318-256f4a3d0af0",
+    "created_on": "2026-09-06T18:12:45.664802Z",
+    "versions": [
+      {
+        "version_id": "90c390b5-ed8e-48e3-8ab5-3a3b8bb30cd8",
+        "percentage": 100
+      }
+    ]
+  },
+  "results": [
+    {
+      "host": "cyberskills-academy.songpon-te.workers.dev",
+      "path": "/",
+      "status": 404,
+      "bytes": 0,
+      "cacheControl": "no-store",
+      "contentType": null,
+      "location": null,
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "pass": true
+    },
+    {
+      "host": "cyberskills-academy.songpon-te.workers.dev",
+      "path": "/courses",
+      "status": 404,
+      "bytes": 0,
+      "cacheControl": "no-store",
+      "contentType": null,
+      "location": null,
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "pass": true
+    },
+    {
+      "host": "cyberskills-academy.songpon-te.workers.dev",
+      "path": "/api/leads",
+      "status": 404,
+      "bytes": 0,
+      "cacheControl": "no-store",
+      "contentType": null,
+      "location": null,
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "pass": true
+    },
+    {
+      "host": "academy.cyberskills.co.th",
+      "path": "/",
+      "status": 302,
+      "bytes": 143,
+      "cacheControl": "private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "contentType": "text/html; charset=UTF-8",
+      "location": {
+        "origin": "https://dry-grass-c390.cloudflareaccess.com",
+        "pathname": "/cdn-cgi/access/login/academy.cyberskills.co.th"
+      },
+      "bodySha256": "12755429beb15d5eb57eafa45b8dba326343dd099bf0552038694c3856e8860e",
+      "pass": true
+    },
+    {
+      "host": "academy.cyberskills.co.th",
+      "path": "/sign-in",
+      "status": 302,
+      "bytes": 143,
+      "cacheControl": "private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "contentType": "text/html; charset=UTF-8",
+      "location": {
+        "origin": "https://dry-grass-c390.cloudflareaccess.com",
+        "pathname": "/cdn-cgi/access/login/academy.cyberskills.co.th"
+      },
+      "bodySha256": "12755429beb15d5eb57eafa45b8dba326343dd099bf0552038694c3856e8860e",
+      "pass": true
+    },
+    {
+      "host": "academy.cyberskills.co.th",
+      "path": "/robots.txt",
+      "status": 200,
+      "bytes": 1836,
+      "cacheControl": "private, max-age=0, no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "contentType": "text/plain; charset=utf-8",
+      "location": {
+        "origin": "https://dry-grass-c390.cloudflareaccess.com",
+        "pathname": "/cdn-cgi/access/login/academy.cyberskills.co.th"
+      },
+      "bodySha256": "842b34303164ead41bccb7c05d1707422e98d108753b397b6dcc19683eb02101",
+      "pass": true
+    }
+  ],
+  "pass": true,
+  "scope": "production allocation, raw host denial, canonical Access and unchanged edge robots; no authenticated journey claim",
+  "checkedAt": "2026-09-06T18:13:48.576Z"
+}

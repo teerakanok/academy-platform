@@ -1,7 +1,7 @@
 # Academy — maintain and deploy
 
-Procedure verified on 2026-09-05. The [release checkpoint](../../reports/releases/2026-09-05-production-session-host-gate.md)
-records the exact serving source/version and outstanding authenticated journey.
+Procedure reverified on 2026-09-06. The [current release receipt](../../reports/operations/20260906-academy-bc1c738-release/README.md)
+records serving source bc1c738, version43 at100%, host/Access proof and the outstanding authenticated journey.
 The [operations runbook](academy-operations-runbook.md) covers component recovery;
 its older incident narratives are historical, not a claim about this release.
 

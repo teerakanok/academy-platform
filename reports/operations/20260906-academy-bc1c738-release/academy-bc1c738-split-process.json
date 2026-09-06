@@ -1,0 +1,17 @@
+{
+  "pid": 79772,
+  "command": [
+    "wrangler",
+    "versions",
+    "deploy",
+    "6c2e3881-4836-4bee-8bd1-b6e5368b6def@100",
+    "90c390b5-ed8e-48e3-8ab5-3a3b8bb30cd8@0",
+    "--name",
+    "cyberskills-academy",
+    "--message",
+    "candidate-smoke;s=bc1c738e7cab4f74f1db5a74efa8216996a02f94",
+    "--yes"
+  ],
+  "started": "2026-09-06T18:07:46.690Z",
+  "expectedDeployment": "3e0bfee2-7a06-4c1a-a2ce-c74af339c5b1"
+}

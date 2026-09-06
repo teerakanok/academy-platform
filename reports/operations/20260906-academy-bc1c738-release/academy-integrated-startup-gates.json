@@ -1,0 +1,37 @@
+[
+  {
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "npm",
+      "ci",
+      "--ignore-scripts",
+      "--no-audit"
+    ],
+    "source": "bc1c738e7cab4f74f1db5a74efa8216996a02f94",
+    "tree": "0c65acf83ca5fd168cbb1c493ef0fed23ff7c110",
+    "reviewedTree": "0c65acf83ca5fd168cbb1c493ef0fed23ff7c110",
+    "exit": 0,
+    "signal": null,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-integrated-startup-gate-0.log",
+    "sha256": "e2c849122acb7c90c9201a2a1136440253d1f7c8ca1a6811a1ffc90b1cd36471"
+  },
+  {
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "npm",
+      "run",
+      "build:cf"
+    ],
+    "source": "bc1c738e7cab4f74f1db5a74efa8216996a02f94",
+    "tree": "0c65acf83ca5fd168cbb1c493ef0fed23ff7c110",
+    "reviewedTree": "0c65acf83ca5fd168cbb1c493ef0fed23ff7c110",
+    "exit": 0,
+    "signal": null,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-integrated-startup-gate-1.log",
+    "sha256": "b426f0e083373b08f8e708a0480c90e3aedf6f257f290577b729d3f35c9bb680"
+  }
+]

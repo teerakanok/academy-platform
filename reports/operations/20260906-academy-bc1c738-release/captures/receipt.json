@@ -1,0 +1,38 @@
+{
+  "observedAt": "2026-09-06T18:14:09.863Z",
+  "mode": "isolated-public-no-auth-no-mutations",
+  "results": [
+    {
+      "product": "academy",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "httpStatus": 200,
+      "finalOrigin": "https://dry-grass-c390.cloudflareaccess.com",
+      "finalPath": "/cdn-cgi/access/login/academy.cyberskills.co.th",
+      "screenshot": "academy-desktop.png",
+      "sha256": "ab1f3f4ea6cfe2892ed2c86ae7d05bcd1a7408d221b17a1eddb972688ea39c28",
+      "layout": {
+        "width": 1440,
+        "scrollWidth": 1440
+      }
+    },
+    {
+      "product": "academy",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "httpStatus": 200,
+      "finalOrigin": "https://dry-grass-c390.cloudflareaccess.com",
+      "finalPath": "/cdn-cgi/access/login/academy.cyberskills.co.th",
+      "screenshot": "academy-mobile.png",
+      "sha256": "95b7ae3c382582fb4761f0067226aaa4f68f15fd33117ad73864769c9bd02ee6",
+      "layout": {
+        "width": 390,
+        "scrollWidth": 390
+      }
+    }
+  ]
+}

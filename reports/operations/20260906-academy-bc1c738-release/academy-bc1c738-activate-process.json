@@ -1,0 +1,17 @@
+{
+  "pid": 80923,
+  "command": [
+    "wrangler",
+    "versions",
+    "deploy",
+    "90c390b5-ed8e-48e3-8ab5-3a3b8bb30cd8@100",
+    "--name",
+    "cyberskills-academy",
+    "--message",
+    "activate;s=bc1c738e7cab4f74f1db5a74efa8216996a02f94;prev=6c2e3881-4836-4bee-8bd1-b6e5368b6def",
+    "--yes"
+  ],
+  "source": "bc1c738e7cab4f74f1db5a74efa8216996a02f94",
+  "expectedDeployment": "29f70c6b-ce0f-4ad6-b1e9-4266176e04ff",
+  "started": "2026-09-06T18:12:43.742Z"
+}
