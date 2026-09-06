@@ -1,0 +1,46 @@
+{
+  "maintenance_equals_resumed": true,
+  "runtime": {
+    "migration_tag": "v1-edge-rate-limiter",
+    "assets": {
+      "html_handling": "auto-trailing-slash",
+      "not_found_handling": "none",
+      "headers": {
+        "version": 2,
+        "rules": {
+          "/*": {
+            "set": {
+              "content-security-policy": "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob:; connect-src 'self'; worker-src 'self' blob:; frame-src 'none'; manifest-src 'self'",
+              "permissions-policy": "camera=(), geolocation=(), microphone=(), payment=(), usb=()",
+              "referrer-policy": "strict-origin-when-cross-origin",
+              "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+              "x-content-type-options": "nosniff",
+              "x-dns-prefetch-control": "off",
+              "x-frame-options": "DENY"
+            },
+            "unset": []
+          }
+        }
+      },
+      "raw_headers": "/*\n  Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob:; connect-src 'self'; worker-src 'self' blob:; frame-src 'none'; manifest-src 'self'\n  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload\n  X-Content-Type-Options: nosniff\n  X-Frame-Options: DENY\n  Referrer-Policy: strict-origin-when-cross-origin\n  Permissions-Policy: camera=(), geolocation=(), microphone=(), payment=(), usb=()\n  X-DNS-Prefetch-Control: off\n",
+      "static_routing": {
+        "user_worker": [
+          "/media/*"
+        ]
+      },
+      "serve_directly": true,
+      "raw_run_worker_first": [
+        "/media/*"
+      ]
+    },
+    "compatibility_date": "2025-03-25",
+    "compatibility_flags": [
+      "nodejs_compat",
+      "global_fetch_strictly_public"
+    ],
+    "usage_model": "standard",
+    "limits": {
+      "cpu_ms": 500
+    }
+  }
+}

@@ -39,6 +39,9 @@ No force or API override was used. With `f126…` confirmed as latest, the
 documented `versions secret put` path created `1af77…` with the runtime flag
 enabled. Its script matched the reviewed candidate and its 17 binding names and
 types matched; the receipt records the flag change without exposing a value.
+The closed runtime parity receipt confirms the maintenance and resumed versions
+share the same runtime payload, including the explicit `html_handling` and
+`not_found_handling` defaults that explain the prior resource-object difference.
 
 ## HTTP evidence and boundaries
 
@@ -62,5 +65,7 @@ was submitted. This is a safe continuation receipt, not a completed sign-in;
 later transaction counts must not be compared to the earlier postverify count.
 
 See `receipts/` for immutable copied JSON and `RECEIPTS.sha256` for their
-source-verified hashes. The copied operator scripts and independent R2 review
-are retained for continuation only; they grant no new live authority.
+source-verified hashes. `concrete-cutover-r2-review.md`
+(`054a81c79d00c9de931d02960424879d764b70b01204b6e16abbf04765a8e0bc`)
+is the actual independent R2 PASS. The copied operator scripts and reviews are
+retained for continuation only; they grant no new live authority.
