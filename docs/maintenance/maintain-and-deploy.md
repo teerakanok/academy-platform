@@ -1,103 +1,179 @@
-# Academy — maintain and deploy
+# Maintain and deploy Academy
 
-Procedure reverified on 2026-09-06. The [current release receipt](../../reports/operations/20260906-academy-bc1c738-release/README.md)
-records serving source bc1c738, version43 at100%, host/Access proof and the outstanding authenticated journey.
-The [operations runbook](academy-operations-runbook.md) covers component recovery;
-its older incident narratives are historical, not a claim about this release.
+Procedure reverified against the completed 2026-09-06 session-ID digest cutover.
+The [current handoff pointer](../../reports/handoffs/current.json) targets the
+[handoff record](../../reports/handoffs/20260906T225026Z-academy-session-digest-cutover.md),
+which links the [0034 cutover record](../../reports/operations/20260906-academy-0034-cutover/README.md).
+The cutover record's immutable receipts and
+[independent R2 PASS](../../reports/operations/20260906-academy-0034-cutover/concrete-cutover-r2-review.md)
+are the production source of truth.
 
-## Routine maintenance
+## Current verified boundary
 
-Keep three surfaces distinct: canonical host behind Access, the Worker application, and
-its Academy-only PostgREST/data roles on shared Pool A. Do not infer application auth from
-an Access redirect, or weaken Access to debug a callback. Inspect version/source and scoped
-GET outputs before changing anything. Raw workers.dev404 is the expected host gate; raw200
-is a regression of that gate, not a healthy alternative URL.
+- Deployment `a0a9961e-da7f-48f8-b835-3024704dfbbf` serves version
+  `1af77a26-bba2-4300-9a71-0bc0262ca06d` at 100%, sourced from
+  `0e4417ec4e2909f05ab4eb9f3269bcb1c58c184b`. See the
+  [verified forward receipt](../../reports/operations/20260906-academy-0034-cutover/receipts/academy-cutover-resumed-forward-verified.json).
+- Migration `0034_identity_session_id_digest.sql` is committed. Its digest RPCs
+  and grants are live. Do not reapply migrations `0029`–`0033` or `0034`.
+- The legacy raw session create/read/revoke wrappers remain compatible, but old
+  claim/finalize paths are disabled. Only a reviewed digest-compatible
+  application rollback may be considered.
+- Never deploy the old `90c390b5…` raw-session application after `COMMIT`, or
+  after a COMMIT with unknown transport outcome. Do not restore the retained
+  backup as routine compensation; Academy-scoped restore is separately
+  authorized recovery work.
 
-After every release check canonical root/sign-in and robots, plus raw /, /courses and
-/api/leads. Raw responses must be404, empty and no-store; canonical remains Access302
-until the owner explicitly opens public admission. A real owner-entered session must reach
-/dashboard; also test entitlement denial/allowance, saved progress and sign-out. Never print
-OTP, cookies, callback query or provider payload in evidence.
+Do not conflate a routine application deploy with a migration cutover. Routine
+deploys preserve database compatibility. A migration cutover requires an exact
+reviewed packet, a fresh protected backup, an in-window `ROLLBACK` rehearsal,
+recorded abort/forward commands, drain evidence, and explicit COMMIT gates. The
+consumed 0034 packet is evidence, not a replayable procedure.
 
-## Prepare the exact candidate
+## Authority and evidence
 
-1. Start through lifecycle/router; read AGENTS and handoff, use one owned worktree/writer.
-2. Author content only in Crucible. Import its immutable source mechanically and regenerate
-   the content registry; retain existing publication/entitlement policy unless specifically changed.
-3. Fixes require failing-first evidence. Run from academy-web:
-   `npx vitest run --project unit`, `npm run lint`, and `npm run build:cf`.
-   The accepted baseline is exactly3no-require-imports errors in academy-bound-worker-executor.cjs;
-   new lint errors are not covered by that baseline. Record warning counts and skipped tests.
-4. Run relevant content/roadmap/registry and checkpoint-answer-bias gates for content imports.
-5. Independent reviewer inspects the actual auth/payment/security/production-data diff and
-   evidence; bind approval to file hashes. Commit/push the reviewed source and record its SHA.
-6. Observe current serving version, rollback version and binding names only. A version's
-   credentials must remain inherited in place; do not export/copy them to the operator checkout.
+- Production, database, deploy, and credential authority comes from the separate
+  authorization record, never from this guide or a receipt copy.
+- Read [shared infrastructure rules](./README.md) and the
+  [component runbook](./academy-operations-runbook.md) before maintenance.
+- Record sanitized commands, exit codes, immutable IDs, hashes, safe booleans and
+  counters. Do not print ordinary vars, backups, SQL payloads, cookies, tokens or
+  unfiltered Wrangler metadata; inherited credentials must remain in place.
+- The documented lint baseline is exactly three `no-require-imports` errors in
+  `academy-bound-worker-executor.cjs`. Do not run expensive application gates for
+  documentation-only changes; use the documentation evidence gate.
 
-## Deploy — actual split/override procedure
+## Prepare the application candidate
 
-The Worker exports a Durable Object; a preview URL is unavailable for this configuration.
-Use the proven upload→100/0split→version-header smoke→100%activation path from the handoff.
-Run from academy-web with the installed repository Wrangler. Replace placeholders with the
-observed immutable identifiers; examples below are templates, not commands to paste unchanged.
+1. Start through the lifecycle/router, read the current handoff and authorization
+   boundary, and use one owned worktree/writer.
+2. Author content only in Crucible. Import immutable content mechanically,
+   regenerate the registry, and run the required content/roadmap/registry and
+   checkpoint-answer gates before any course import.
+3. Start with failing-first evidence for application fixes. Run from
+   `academy-web`: `npx vitest run --project unit` and `npm run lint`. The lint
+   result must retain the exact three-error baseline above.
+4. Obtain independent review of the actual auth/security/data/production
+   changes before the application commit. Bind that review to file hashes.
+5. Run the monitored build/deploy in the background and record start/end, exit
+   status, source SHA, warning count, skipped tests and immutable version IDs.
+
+## Routine application deploy
+
+Run from `academy-web` with the repository Wrangler. Replace only the marked
+placeholders with observed immutable identifiers and the reviewed source SHA.
+The Worker exports a Durable Object, so use upload, a 100/0 deployment split,
+version-header smoke checks, then activation.
 
 ```sh
 rtk proxy npm run build:cf
 rtk proxy node node_modules/wrangler/bin/wrangler.js versions upload --name cyberskills-academy --keep-vars --tag release-<sha12> --message 's=<full-source-sha>;release-purpose'
-rtk proxy node node_modules/wrangler/bin/wrangler.js versions deploy <previous-version>@100 <candidate-version>@0 --name cyberskills-academy --message 'candidate-smoke' --yes
+rtk proxy node node_modules/wrangler/bin/wrangler.js versions deploy <previous-version>@100 <candidate-version>@0 --name cyberskills-academy --message 'candidate-smoke;s=<full-source-sha>' --yes
 ```
 
-Persist sanitized CLI exit/version/source receipts. Do not print unfiltered version metadata:
-ordinary vars may contain confidential runtime information. Project only the required version
-IDs, percentages, timestamps, names/types, booleans and hashes. Long build/deploy runs belong
-in background with monitored logs, never a fire-and-forget claim.
-
-For candidate GETs set this header exactly (substitute the candidate UUID):
+For a candidate GET, set this exact header with the candidate UUID:
 
 ```text
 Cloudflare-Workers-Version-Overrides: cyberskills-academy="<candidate-version>"
 ```
 
-The candidate must be in the current deployment for the override to select it;0% is sufficient.
-Verify raw host denial, canonical Access behavior and static content before traffic activation.
-If candidate smoke fails, restore the observed previous version to100% and classify the failure.
-Do not resend an OTP automatically or treat an Access302 as a passed application-session check.
-
-After acceptable candidate smoke:
+Verify raw-host denial, canonical Access behavior, static assets and expected
+application behavior before activation. Do not treat a status code or Access
+redirect as a learner-session proof, and do not resend an OTP automatically.
+After the smoke passes:
 
 ```sh
 rtk proxy node node_modules/wrangler/bin/wrangler.js versions deploy <candidate-version>@100 --name cyberskills-academy --message 'activate;s=<sha>;prev=<previous-version>' --yes
 ```
 
-Repeat GETs without the override/cookies, verify exact active version/100%, then complete the
-real browser journey. If an owner-present journey is pending, do not deploy unrelated content
-and move its target. Retain predecessor and inactive candidate versions; no cleanup is implied.
+Recheck without the override, verify the exact version is at 100%, and retain the
+predecessor and inactive candidate. For a compatible app rollback, deploy only
+the observed verified predecessor at 100% and verify its expected behavior first.
+Never blindly roll back across the 0034 schema boundary.
 
-## Rollback and data changes
+## Digest-cutover recovery boundary
 
-Use the same versions-deploy command with the observed verified predecessor at100%; verify
-its exact expected host behavior first. A historical pre-host-gate version restores raw200,
-so it is not an acceptable long-term rollback target for a public launch. Recheck the route,
-Access behavior and authenticated journey after any rollback.
-For DB changes first read shared-infra access/state and inspect the Academy-only catalog and
-backup point. Execute surgical SQL with ROLLBACK, inspect expected row counts and constraints,
-then repeat with COMMIT only after the dry-run passes. Preserve dedicated roles/RLS and avoid
-service_role shortcuts. Shared-host/restore changes need their own exact plan and independent
-review; an app deployment does not authorize an unrelated infrastructure rewrite.
+The cutover maintenance deployment `8d62fbf9-c51f-4bbd-bfb5-401f83b97a5b` served
+disabled-runtime maintenance version
+`f126b6ac-7e3e-4f47-9990-1716b4c106ba` at 100% and reviewed digest candidate
+`bd109c61-ddda-46c3-8d27-6cedc3365394` at 0%. The operator recorded both forward
+and abort commands before maintenance. Drain checks reached zero active claims
+and zero held identity-table locks; a fresh schema-plus-data backup and an exact
+in-window ROLLBACK passed before COMMIT. Commit changed the Academy schema hash
+from `003eb7…` to `711417a0…`; see the
+[backup receipt](../../reports/operations/20260906-academy-0034-cutover/receipts/academy-0034-fresh-backup.json),
+[rollback receipt](../../reports/operations/20260906-academy-0034-cutover/receipts/academy-0034-maintenance-rollback.json)
+and [COMMIT receipt](../../reports/operations/20260906-academy-0034-cutover/receipts/academy-0034-production-commit.json).
 
-## Payment, entitlements and media
+Before COMMIT, or after a proven ROLLBACK, the separately authorized abort path
+could restore the old application and schema state. After COMMIT or uncertain
+COMMIT, query the marker/schema/state first and retain the maintenance runtime;
+do not auto-retry COMMIT and do not return to old `90c390b5…`. The exact packet
+is consumed and non-idempotent.
 
-Payment provider is still undecided; do not create paid provider accounts or publish a payment
-flow by assumption. Manual entitlement is a separate capability from catalogue visibility.
-An imported course must not accidentally grant access or expose protected lessons/media.
-Private media remains behind the existing authorized grant/binding path. Never repair delivery
-by making the bucket public. See the component runbook for backup/restore gaps and proof requirements.
+With the runtime flag disabled, direct deployment of older `bd109…` failed
+Cloudflare `10220` because `IDENTITY_RUNTIME_ENABLED` differed. Do not use
+`--use-version`, force, or an API override. The verified recovery inspected the
+latest uploaded version, confirmed the reviewed source/runtime and all 17 binding
+names/types, then patched only the inherited boolean flag with the documented
+standard-stdin path; no credential value or file was copied.
+In this template context, the literal `true` is the reviewed noncredential
+feature flag—not a secret and not inherited from the caller's environment.
+
+```sh
+printf '%s\n' true | rtk proxy node node_modules/wrangler/bin/wrangler.js versions secret put IDENTITY_RUNTIME_ENABLED --name cyberskills-academy --message 's=<full-source-sha>;resume-reviewed-digest-runtime'
+```
+
+This creates a new version from the latest version; it does not patch an
+arbitrary historical version. Inspect the new version before deployment: script
+must match the reviewed candidate, assets/runtime payload must match, and there
+must be exactly the reviewed 17 bindings. Then activate it at 100%:
+
+```sh
+rtk proxy node node_modules/wrangler/bin/wrangler.js versions deploy <flag-patched-version>@100 --name cyberskills-academy --message 'Resume reviewed digest runtime after verified 0034 COMMIT' --yes
+```
+
+The actual resumed parity check is retained in the
+[runtime resume receipt](../../reports/operations/20260906-academy-0034-cutover/receipts/academy-cutover-runtime-resume-version.json)
+and [parity receipt](../../reports/operations/20260906-academy-0034-cutover/receipts/academy-cutover-resume-runtime-parity.json).
+
+## Post-deployment evidence
+
+Count proof only when status, content type/body behavior and host gate all agree.
+Canonical `/` and `/sign-in` must return 200; the raw `workers.dev` root must
+return 404. A plain canonical `/robots.txt` GET can return an Access-login body
+despite HTTP 200; that is not product proof. Use authenticated Access curl with
+an absolute request target:
+
+```sh
+rtk proxy cloudflared access curl https://academy.cyberskills.co.th/ --request-target /robots.txt -sS -i --max-time 20
+```
+
+The verified result was `text/plain` 200 with robots directives and no
+Access-login body; see the
+[corrected robots receipt](../../reports/operations/20260906-academy-0034-cutover/receipts/academy-robots-canonical-authenticated.json)
+and [postverify receipt](../../reports/operations/20260906-academy-0034-cutover/receipts/academy-cutover-production-postverify.json).
+The browser Continue action reached Account Center email/Turnstile, but no email,
+challenge/OTP, fresh learner callback, active-cookie persistence, entitlement,
+progress, or sign-out journey was performed by this cutover.
+
+## Payment, entitlements and content
+
+The payment provider remains undecided; do not create accounts or publish a
+payment flow by assumption. Manual entitlement remains a separately auditable
+capability and does not by itself imply payment acceptance.
+
+Crucible remains the content source of truth. Preserve portable structured
+content and run the required content/roadmap/registry and checkpoint-answer gates
+before any course import. Imported catalogue visibility must not grant access or
+expose protected lessons/media; never repair delivery by making a bucket public.
 
 ## Key inventory — final owner sitting pending
 
-Do not populate this table from credential values or request Bitwarden. Existing historical
-registry entries are not a verified current custody/rotation inventory. Fill names, locations
-and rotation decisions only with the owner at the final sitting; never secret values.
+Do not populate this table from credential values or request Bitwarden. Existing
+historical registry entries are not a verified current custody/rotation
+inventory. Fill names, locations and rotation decisions only with the owner at
+the final sitting; never secret values.
 
 | Key name | Stored where | Rotate when | Owner |
 |---|---|---|---|
@@ -105,6 +181,8 @@ and rotation decisions only with the owner at the final sitting; never secret va
 
 ## Current acceptance limits
 
-The session/host-gate source is deployed, but actual owner sign-in and entitlement/progress/
-sign-out remain pending. Other open security items are tracked in the dated security checklist.
-Neither a build nor raw404 proves that real learners can complete the entire course.
+The digest-compatible application and migration are deployed and the verified
+postchecks passed, but real owner sign-in, fresh learner callback, entitlement,
+progress persistence and sign-out remain pending. Do not infer them from HTTP
+status, a build, raw 404, or the committed migration. Track other open security
+work in the dated security checklist.
