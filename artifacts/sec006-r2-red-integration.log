@@ -1,0 +1,23 @@
+
+ RUN  v3.2.7 /private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-r4gJaN/checkout/academy-web
+
+ ❯ |integration| tests/integration/assessment-attempt-integrity.test.ts (2 tests | 2 failed) 7ms
+   × assessment attempt integrity migration > orders cooldown by completion time and enforces dwell with first and repeat failures 5ms
+     → connect EPERM /private/tmp/postgres-fixture-cde63a58/socket/.s.PGSQL.65433
+   × assessment attempt integrity migration > serializes concurrent admission and applies the rolling and UTC daily ceilings 1ms
+     → connect EPERM /private/tmp/postgres-fixture-cde63a58/socket/.s.PGSQL.65433
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |integration| tests/integration/assessment-attempt-integrity.test.ts > assessment attempt integrity migration > orders cooldown by completion time and enforces dwell with first and repeat failures
+ FAIL  |integration| tests/integration/assessment-attempt-integrity.test.ts > assessment attempt integrity migration > serializes concurrent admission and applies the rolling and UTC daily ceilings
+Error: connect EPERM /private/tmp/postgres-fixture-cde63a58/socket/.s.PGSQL.65433
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  21:05:00
+   Duration  229ms (transform 31ms, setup 13ms, collect 38ms, tests 7ms, environment 0ms, prepare 47ms)
+
+EXIT=1

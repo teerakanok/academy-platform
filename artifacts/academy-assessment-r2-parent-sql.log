@@ -1,0 +1,45 @@
+
+ RUN  v3.2.7 /private/tmp/academy-assessment-correction-cde63a58/academy-web
+
+ ❯ |integration| tests/integration/assessment-attempt-integrity.test.ts (2 tests | 2 failed) 61ms
+   × assessment attempt integrity migration > orders cooldown by completion time and enforces dwell with first and repeat failures 48ms
+     → column candidates.reason does not exist
+   × assessment attempt integrity migration > serializes concurrent admission and applies the rolling and UTC daily ceilings 12ms
+     → column candidates.reason does not exist
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  21:32:05
+   Duration  487ms (transform 60ms, setup 28ms, collect 71ms, tests 61ms, environment 0ms, prepare 101ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |integration| tests/integration/assessment-attempt-integrity.test.ts > assessment attempt integrity migration > orders cooldown by completion time and enforces dwell with first and repeat failures
+error: column candidates.reason does not exist
+ ❯ node_modules/pg/lib/client.js:652:17
+ ❯ prepareMigration tests/integration/assessment-attempt-integrity.test.ts:82:3
+     80| async function prepareMigration(db: Client) {
+     81|   await db.query('begin')
+     82|   await db.query(
+       |   ^
+     83|     readFileSync(
+     84|       new URL('../../supabase/migrations/0033_assessment_attempt_integ…
+ ❯ tests/integration/assessment-attempt-integrity.test.ts:95:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |integration| tests/integration/assessment-attempt-integrity.test.ts > assessment attempt integrity migration > serializes concurrent admission and applies the rolling and UTC daily ceilings
+error: column candidates.reason does not exist
+ ❯ node_modules/pg/lib/client.js:652:17
+ ❯ prepareMigration tests/integration/assessment-attempt-integrity.test.ts:82:3
+     80| async function prepareMigration(db: Client) {
+     81|   await db.query('begin')
+     82|   await db.query(
+       |   ^
+     83|     readFileSync(
+     84|       new URL('../../supabase/migrations/0033_assessment_attempt_integ…
+ ❯ tests/integration/assessment-attempt-integrity.test.ts:163:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

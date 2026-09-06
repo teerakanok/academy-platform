@@ -4,6 +4,7 @@ import { currentUser } from '@/lib/auth/session'
 import { identityControlLocalFixtureAllowedForRequest } from '@/lib/identity/local-fixture'
 import { readLocalAcademySession } from '@/lib/identity/local-runtime'
 import { safeErrorMessage } from '@/lib/safe-log'
+import { recordAssessmentIntegrityEvent } from '@/lib/observability/assessment-integrity'
 import { getAllCourses, getCourseStructure } from '@/lib/content/course-source'
 import { toLearnerDashboardCourse } from '@/lib/content/public-course'
 import { getLessonAnswerKey, mcqItems, sameAnswerSet, simulationItems } from '@/lib/content/answer-key'
@@ -295,6 +296,21 @@ export async function POST(request: Request) {
         return NextResponse.json(
           { ok: false, error: 'ความพยายามนี้ใช้ไม่ได้แล้ว', code: 'attempt-invalid' },
           { status: 409 },
+        )
+      }
+      if (consumed.rejection) {
+        recordAssessmentIntegrityEvent(consumed.rejection.reason, consumed.rejection.retryAt)
+        return NextResponse.json(
+          {
+            ok: false,
+            error: 'ใช้เวลาอ่านและตอบโจทย์ให้ครบก่อนส่งคำตอบ',
+            code: 'attempt-dwell-time',
+            retryAfterSeconds: Math.max(
+              0,
+              Math.ceil((consumed.rejection.retryAt.getTime() - Date.now()) / 1000),
+            ),
+          },
+          { status: 425 },
         )
       }
       if (consumed.claimState === 'in-progress') {

@@ -40,7 +40,7 @@ export interface AttemptParams {
    */
   answerKeys: Record<string, string[]>
   /** เกณฑ์ผ่าน/การปกปิดผล ณ ตอนออกใบ ป้องกัน deploy เปลี่ยนชนิด node กลางงาน */
-  assessment: { assessed: boolean }
+  assessment: { assessed: boolean; integrityEnforced?: boolean }
   /** คำอธิบาย ณ ตอนออก attempt — review หลังผ่านต้องไม่เปลี่ยนตาม deploy รุ่นใหม่ */
   explanations?: Record<string, string>
   /**
@@ -67,7 +67,12 @@ export function normalizeAttemptParams(params: AttemptParams): AttemptParams {
   const assessment = rawAssessment
     && typeof rawAssessment === 'object'
     && typeof (rawAssessment as { assessed?: unknown }).assessed === 'boolean'
-    ? { assessed: (rawAssessment as { assessed: boolean }).assessed }
+    ? {
+        assessed: (rawAssessment as { assessed: boolean }).assessed,
+        integrityEnforced: (rawAssessment as { integrityEnforced?: boolean }).integrityEnforced === false
+          ? false
+          : undefined,
+      }
     // ก่อน field นี้มีเฉพาะ assessed checkpoint ที่ออก attempt ใน production content
     : { assessed: true }
   return {

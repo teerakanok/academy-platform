@@ -1,0 +1,282 @@
+diff --git a/academy-web/playwright.config.ts b/academy-web/playwright.config.ts
+index 43269c2..e93de08 100644
+--- a/academy-web/playwright.config.ts
++++ b/academy-web/playwright.config.ts
+@@ -60,6 +60,8 @@ export default defineConfig({
+       // RIL จับว่าลบ speed bump ทิ้งทั้งหมด) · พฤติกรรมของโควตาเองถูกทดสอบใน
+       // tests/integration/attempt-db.test.ts ซึ่งกำหนดค่าเองอย่างชัดเจน
+       ATTEMPT_MAX_PER_WINDOW: process.env.ATTEMPT_MAX_PER_WINDOW ?? '500',
++      ACADEMY_ASSESSMENT_INTEGRITY_LOCAL_FIXTURE:
++        process.env.ACADEMY_ASSESSMENT_INTEGRITY_LOCAL_FIXTURE ?? '1',
+       // Direct GoTrue OTP remains only to provision local learner fixtures. It
+       // is rejected for non-loopback requests and cannot be a production path.
+       ACADEMY_LEGACY_DIRECT_OTP_LOCAL_FIXTURE: '1',
+diff --git a/academy-web/src/app/(site)/api/attempts/route.ts b/academy-web/src/app/(site)/api/attempts/route.ts
+index d84d5fe..a616fb1 100644
+--- a/academy-web/src/app/(site)/api/attempts/route.ts
++++ b/academy-web/src/app/(site)/api/attempts/route.ts
+@@ -4,8 +4,13 @@ import { currentUser } from '@/lib/auth/session'
+ import { getCourseStructure } from '@/lib/content/course-source'
+ import { CHECKPOINT_CHALLENGE_ID, buildAttemptParams, cryptoPick } from '@/lib/course/attempt'
+ import { getLessonAnswerKey, mcqItems, simulationItems } from '@/lib/content/answer-key'
+-import { isAssessedNode, requiresAttempt } from '@/lib/course/assessment-policy'
+-import { issueAttempt, nextAttemptAt } from '@/lib/course/attempt-db'
++import {
++  assessmentIntegrityEnforced,
++  assessmentServeCount,
++  isAssessedNode,
++  requiresAttempt,
++} from '@/lib/course/assessment-policy'
++import { assessmentAttemptRetry, issueAttempt } from '@/lib/course/attempt-db'
+ import { toPublicSimulation } from '@/lib/content/public-lesson'
+ import { resolveChallenge, rollVariables } from '@/lib/simulation/variables'
+ import type { SimulationChallenge } from '@/lib/simulation/types'
+@@ -13,6 +18,7 @@ import { readBoundedJson } from '@/lib/http/bounded-body'
+ import { validateMutationRequest } from '@/lib/http/mutation-security'
+ import { authorizeCourseResource, deniedAccessStatus } from '@/lib/account/course-access'
+ import { safeErrorMessage } from '@/lib/safe-log'
++import { recordAssessmentIntegrityEvent } from '@/lib/observability/assessment-integrity'
+ 
+ export const runtime = 'nodejs'
+ 
+@@ -91,9 +97,10 @@ export async function POST(request: Request) {
+   }
+ 
+   try {
+-    // วันนี้เสิร์ฟเท่าขนาดคลัง (คลังมีเท่าที่ใช้พอดี) — เมื่อคลังโต ≥3 เท่า (W-content)
+-    // จำนวนเสิร์ฟจะมาจากนิยาม challenge ไม่ใช่ขนาดคลัง
+-    const params = buildAttemptParams(bank, bank.length, isAssessedNode(node))
++    // คลังปัจจุบันมี 3–5 ข้อ จึงเสิร์ฟได้ครบ · เมื่อ Crucible ขยายคลัง
++    // การสุ่ม 5 ข้อต่อ attempt จะกันพื้นผิวกลายเป็น full-bank oracle
++    const params = buildAttemptParams(bank, assessmentServeCount(bank.length), isAssessedNode(node))
++    if (!assessmentIntegrityEnforced()) params.assessment.integrityEnforced = false
+ 
+     // สุ่มค่าตัวแปรของโจทย์จำลองต่อ attempt แล้ว **เก็บโจทย์ทั้งชิ้นหลังแทนค่า**
+     // ลง params · ทั้งโจทย์ที่ผู้เรียนอ่านและกติกาที่ใช้ตรวจมาจากวัตถุชิ้นเดียวกันนี้
+@@ -122,12 +129,15 @@ export async function POST(request: Request) {
+       //
+       // บอกเวลาที่ขอได้อีกครั้งไปด้วย: "รอสักครู่" ทำให้ผู้เรียนต้องเดาเอง ซึ่งจบลงที่
+       // การกดซ้ำไปเรื่อยๆ · ตัวเลขนี้ไม่ใช่ oracle เพราะไม่แปรตามคำตอบ แปรตามเวลา
+-      const readyAt = await nextAttemptAt(ctx)
++      const denial = await assessmentAttemptRetry(ctx)
++      if (denial) recordAssessmentIntegrityEvent(denial.reason, denial.retryAt)
+       return NextResponse.json(
+         {
+           ok: false,
+           error: 'ใช้สิทธิ์ครบแล้ว รอสักครู่แล้วลองใหม่',
+-          retryAfterSeconds: readyAt ? Math.max(0, Math.ceil((readyAt.getTime() - Date.now()) / 1000)) : undefined,
++          retryAfterSeconds: denial
++            ? Math.max(0, Math.ceil((denial.retryAt.getTime() - Date.now()) / 1000))
++            : undefined,
+         },
+         { status: 429 },
+       )
+diff --git a/academy-web/src/app/(site)/api/progress/route.ts b/academy-web/src/app/(site)/api/progress/route.ts
+index 0b905d6..f13382d 100644
+--- a/academy-web/src/app/(site)/api/progress/route.ts
++++ b/academy-web/src/app/(site)/api/progress/route.ts
+@@ -4,6 +4,7 @@ import { currentUser } from '@/lib/auth/session'
+ import { identityControlLocalFixtureAllowedForRequest } from '@/lib/identity/local-fixture'
+ import { readLocalAcademySession } from '@/lib/identity/local-runtime'
+ import { safeErrorMessage } from '@/lib/safe-log'
++import { recordAssessmentIntegrityEvent } from '@/lib/observability/assessment-integrity'
+ import { getAllCourses, getCourseStructure } from '@/lib/content/course-source'
+ import { toLearnerDashboardCourse } from '@/lib/content/public-course'
+ import { getLessonAnswerKey, mcqItems, sameAnswerSet, simulationItems } from '@/lib/content/answer-key'
+@@ -297,6 +298,21 @@ export async function POST(request: Request) {
+           { status: 409 },
+         )
+       }
++      if (consumed.rejection) {
++        recordAssessmentIntegrityEvent(consumed.rejection.reason, consumed.rejection.retryAt)
++        return NextResponse.json(
++          {
++            ok: false,
++            error: 'ใช้เวลาอ่านและตอบโจทย์ให้ครบก่อนส่งคำตอบ',
++            code: 'attempt-dwell-time',
++            retryAfterSeconds: Math.max(
++              0,
++              Math.ceil((consumed.rejection.retryAt.getTime() - Date.now()) / 1000),
++            ),
++          },
++          { status: 425 },
++        )
++      }
+       if (consumed.claimState === 'in-progress') {
+         return NextResponse.json(
+           { ok: false, error: 'กำลังตรวจสอบผลจากคำขออีกครั้ง', code: 'claim-replaced' },
+diff --git a/academy-web/src/lib/course/assessment-policy.ts b/academy-web/src/lib/course/assessment-policy.ts
+index 5bd7d86..eece532 100644
+--- a/academy-web/src/lib/course/assessment-policy.ts
++++ b/academy-web/src/lib/course/assessment-policy.ts
+@@ -23,6 +23,25 @@ export function isTestOutAvailable(_node: CourseRoadmapNode): boolean {
+   return false
+ }
+ 
++/**
++ * Current Crucible capstone banks contain three to five questions, so this serves
++ * every authored item without inventing content. The fixed ceiling ensures future
++ * expanded banks are sampled instead of exposed as a full-bank oracle.
++ */
++export function assessmentServeCount(bankSize: number): number {
++  return Math.max(1, Math.min(bankSize, 5))
++}
++
++/** Fifteen seconds per task, with an accessibility-aware thirty-second floor. */
++export function minimumAssessmentDwellSeconds(taskCount: number): number {
++  return Math.max(30, taskCount * 15)
++}
++
++export function assessmentIntegrityEnforced(): boolean {
++  return process.env.NODE_ENV === 'production'
++    || process.env.ACADEMY_ASSESSMENT_INTEGRITY_LOCAL_FIXTURE !== '1'
++}
++
+ /** ข้อความบอกผู้เรียนตรงๆ ว่าทำไมยังข้ามด้วยการพิสูจน์ไม่ได้ */
+ export const TEST_OUT_UNAVAILABLE_REASON =
+   'บทนี้ยังไม่เปิดให้พิสูจน์เพื่อข้าม — กำลังเตรียมคลังข้อสำหรับการวัดผลอยู่'
+diff --git a/academy-web/src/lib/course/attempt-db.ts b/academy-web/src/lib/course/attempt-db.ts
+index 28e7b51..0647939 100644
+--- a/academy-web/src/lib/course/attempt-db.ts
++++ b/academy-web/src/lib/course/attempt-db.ts
+@@ -11,6 +11,8 @@ import type { NodeEvent } from './progress-db'
+ export const ATTEMPT_TTL_MINUTES = 60
+ export const ATTEMPT_MAX_PER_WINDOW = 3
+ export const ATTEMPT_WINDOW_MINUTES = 30
++const ATTEMPT_MAX_PRODUCTION_PER_WINDOW = 3
++const ATTEMPT_MAX_TEST_PER_WINDOW = 100
+ 
+ /**
+  * โควตาที่ใช้จริง — ปรับได้ด้วย env `ATTEMPT_MAX_PER_WINDOW` (ไม่ตั้ง = 3)
+@@ -18,13 +20,17 @@ export const ATTEMPT_WINDOW_MINUTES = 30
+  * มีไว้ให้ชุดเทส e2e เดินเส้นทางผู้เรียนซ้ำๆ ได้โดยไม่ต้องไปแตะสมุดนับโควตา —
+  * ทางที่ **ห้าม** ทำคือให้ผู้ใช้ล้างแถวเองผ่าน endpoint (เคยทำแล้ว RIL จับว่าลบ
+  * โควตาทิ้งทั้งหมด) · ค่านี้เป็น config ฝั่งเซิร์ฟเวอร์ ผู้ใช้เอื้อมไม่ถึง
+- * และ production ไม่ต้องตั้ง
++ * และ production ไม่ต้องตั้ง · production ถูก clamp ที่ 3 และ local/e2e ถูก clamp ที่ 100
+  */
+ export function attemptQuota(): number {
+   const raw = process.env.ATTEMPT_MAX_PER_WINDOW?.trim()
+   if (!raw) return ATTEMPT_MAX_PER_WINDOW
+   const value = Number.parseInt(raw, 10)
+-  return Number.isInteger(value) && value > 0 ? value : ATTEMPT_MAX_PER_WINDOW
++  if (!Number.isInteger(value) || value <= 0) return ATTEMPT_MAX_PER_WINDOW
++  const ceiling = process.env.NODE_ENV === 'production'
++    ? ATTEMPT_MAX_PRODUCTION_PER_WINDOW
++    : ATTEMPT_MAX_TEST_PER_WINDOW
++  return Math.min(value, ceiling)
+ }
+ 
+ export interface IssuedAttempt {
+@@ -53,6 +59,12 @@ export interface ConsumedAttempt {
+   /** token ของ claim ปัจจุบัน; null มีได้เฉพาะ retry ที่ outcome จบแล้ว */
+   claimToken: string | null
+   claimState: 'claimed' | 'completed' | 'in-progress'
++  rejection: { reason: 'dwell-time'; retryAt: Date } | null
++}
++
++export interface DeniedAttempt {
++  reason: 'rate-window' | 'daily-cap' | 'repeat-failure'
++  retryAt: Date
+ }
+ 
+ export interface AttemptContext {
+@@ -109,6 +121,21 @@ export async function issueAttempt(
+   return { attemptId: row.attempt_id, expiresAt: row.expires_at, params: normalizeAttemptParams(row.params) }
+ }
+ 
++/** Read-only retry hint; denial itself is always enforced by issue_attempt SQL. */
++export async function assessmentAttemptRetry(ctx: AttemptContext): Promise<DeniedAttempt | null> {
++  const db = academyDb()
++  const { data, error } = await db.rpc('assessment_attempt_retry', {
++    p_user_id: ctx.userId,
++    p_course_slug: ctx.courseSlug,
++    p_node_id: ctx.nodeId,
++    p_max_per_window: attemptQuota(),
++    p_window_minutes: ATTEMPT_WINDOW_MINUTES,
++  })
++  if (error) throw new Error(`อ่านเวลาออก attempt ใหม่ไม่สำเร็จ: ${error.message}`)
++  const row = (data as { reason: DeniedAttempt['reason']; retry_at: string }[] | null)?.[0]
++  return row ? { reason: row.reason, retryAt: new Date(row.retry_at) } : null
++}
++
+ /**
+  * ใช้ attempt หนึ่งครั้ง — คืน null เมื่อถูกปฏิเสธ (ไม่ใช่ของผู้ใช้นี้ / คนละบท /
+  * ใช้ไปแล้ว / หมดอายุ) โดยตั้งใจไม่แยกเหตุผล: รายละเอียดคือ oracle ให้คนเดา attempt_id
+@@ -129,16 +156,35 @@ export async function consumeAttempt(ctx: AttemptContext, attemptId: string): Pr
+         challenge_version: string
+         outcome: { passed: boolean } | null
+         claim_token: string | null
+-        claim_state: 'claimed' | 'completed' | 'in-progress'
++        claim_state: 'claimed' | 'completed' | 'in-progress' | 'dwell-time'
+       }[]
+     | null)?.[0]
+   if (!row) return null
++  if (row.claim_state === 'dwell-time') {
++    const { data: retry, error: retryError } = await db.rpc('assessment_submission_retry', {
++      p_attempt_id: attemptId,
++      p_user_id: ctx.userId,
++      p_course_slug: ctx.courseSlug,
++      p_node_id: ctx.nodeId,
++      p_challenge_id: ctx.challengeId,
++    })
++    if (retryError) throw new Error(`อ่านเวลาส่ง attempt ไม่สำเร็จ: ${retryError.message}`)
++    return {
++      params: normalizeAttemptParams(row.params),
++      challengeVersion: row.challenge_version,
++      outcome: row.outcome ?? null,
++      claimToken: null,
++      claimState: 'claimed',
++      rejection: { reason: 'dwell-time', retryAt: new Date(retry as string) },
++    }
++  }
+   return {
+     params: normalizeAttemptParams(row.params),
+     challengeVersion: row.challenge_version,
+     outcome: row.outcome ?? null,
+     claimToken: row.claim_token ?? null,
+     claimState: row.claim_state,
++    rejection: null,
+   }
+ }
+ 
+diff --git a/academy-web/src/lib/course/attempt.ts b/academy-web/src/lib/course/attempt.ts
+index b5b991a..ddd2888 100644
+--- a/academy-web/src/lib/course/attempt.ts
++++ b/academy-web/src/lib/course/attempt.ts
+@@ -40,7 +40,7 @@ export interface AttemptParams {
+    */
+   answerKeys: Record<string, string[]>
+   /** เกณฑ์ผ่าน/การปกปิดผล ณ ตอนออกใบ ป้องกัน deploy เปลี่ยนชนิด node กลางงาน */
+-  assessment: { assessed: boolean }
++  assessment: { assessed: boolean; integrityEnforced?: boolean }
+   /** คำอธิบาย ณ ตอนออก attempt — review หลังผ่านต้องไม่เปลี่ยนตาม deploy รุ่นใหม่ */
+   explanations?: Record<string, string>
+   /**
+@@ -67,7 +67,12 @@ export function normalizeAttemptParams(params: AttemptParams): AttemptParams {
+   const assessment = rawAssessment
+     && typeof rawAssessment === 'object'
+     && typeof (rawAssessment as { assessed?: unknown }).assessed === 'boolean'
+-    ? { assessed: (rawAssessment as { assessed: boolean }).assessed }
++    ? {
++        assessed: (rawAssessment as { assessed: boolean }).assessed,
++        integrityEnforced: (rawAssessment as { integrityEnforced?: boolean }).integrityEnforced === false
++          ? false
++          : undefined,
++      }
+     // ก่อน field นี้มีเฉพาะ assessed checkpoint ที่ออก attempt ใน production content
+     : { assessed: true }
+   return {
+diff --git a/academy-web/tests/unit/attempt.test.ts b/academy-web/tests/unit/attempt.test.ts
+index 267a7d8..ab282a6 100644
+--- a/academy-web/tests/unit/attempt.test.ts
++++ b/academy-web/tests/unit/attempt.test.ts
+@@ -196,7 +196,7 @@ describe('attemptQuota', () => {
+     [undefined, 3],
+     ['', 3],
+     ['  ', 3],
+-    ['500', 500],
++    ['500', 100],
+     ['1', 1],
+     ['0', 3],
+     ['-5', 3],

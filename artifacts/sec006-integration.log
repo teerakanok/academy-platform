@@ -1,0 +1,28 @@
+
+ RUN  v3.2.7 /private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-cDNljN/checkout/academy-web
+
+ ❯ |integration| tests/integration/assessment-attempt-integrity.test.ts (1 test | 1 failed) 5ms
+   × assessment attempt integrity migration > enforces dwell, repeat-failure backoff, and the UTC daily ceiling in one rolled-back fixture 4ms
+     → TEST_DATABASE_URL ยังไม่ถูกตั้งค่า — รัน npx supabase start แล้วคัดค่าลง .env.local ตาม .env.example
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |integration| tests/integration/assessment-attempt-integrity.test.ts > assessment attempt integrity migration > enforces dwell, repeat-failure backoff, and the UTC daily ceiling in one rolled-back fixture
+Error: TEST_DATABASE_URL ยังไม่ถูกตั้งค่า — รัน npx supabase start แล้วคัดค่าลง .env.local ตาม .env.example
+ ❯ requiredEnv tests/integration/setup.ts:14:11
+     12|   const value = process.env[name]
+     13|   if (!value) {
+     14|     throw new Error(
+       |           ^
+     15|       `${name} ยังไม่ถูกตั้งค่า — รัน npx supabase start แล้วคัดค่าลง …
+     16|     )
+ ❯ tests/integration/assessment-attempt-integrity.test.ts:46:47
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  20:13:08
+   Duration  213ms (transform 27ms, setup 12ms, collect 29ms, tests 5ms, environment 0ms, prepare 42ms)
+

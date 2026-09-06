@@ -1,0 +1,27 @@
+{
+  "work_order_metadata": {
+    "schema": "model-team.ril.v1",
+    "work_kind": "bounded_code",
+    "role": "implementation_reviewer",
+    "source_sha256": "4ed8c3a0066db55f197ccc3663da5212f3c9d18406ea380258f53ec45e2ed499"
+  },
+  "verdict": "PASS",
+  "summary": "Current SQL and app contract are aligned: admission, cooldown, dwell, UTC daily cap, caller grants, snapshot grading, claim fencing, and deterministic completion ordering are sound. PostgreSQL16 fixture and supplied app/type evidence support PASS; lint matches baseline. Two low follow-ups and separate content/deployment gates remain.",
+  "findings": [
+    {
+      "severity": "low",
+      "message": "The concurrent admission test uses one pg Client, so Promise.all is serialized by that client queue and does not prove independent concurrent transactions. Add real independent PostgreSQL clients and transactions for the changed admission lock boundary.",
+      "path": "academy-web/tests/integration/assessment-attempt-integrity.test.ts"
+    },
+    {
+      "severity": "low",
+      "message": "If another claim reclaims the attempt between consume_attempt and assessment_submission_retry, the retry RPC can return no row and attempt-db currently converts null to an Invalid Date. Handle the missing hint explicitly.",
+      "path": "academy-web/src/lib/course/attempt-db.ts"
+    },
+    {
+      "severity": "info",
+      "message": "At least 15 Crucible capstone MCQs per certificate-bearing bank, approved production migration, deployment, and production smoke remain separate incomplete gates outside this contract PASS.",
+      "path": "reports/security/2026-09-06-sec006-r2-evidence.md"
+    }
+  ]
+}
