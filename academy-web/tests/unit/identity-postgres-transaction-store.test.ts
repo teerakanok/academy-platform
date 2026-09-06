@@ -41,6 +41,16 @@ function fixture(): { browserBinding: string; input: PendingIdentityTransactionI
   }
 }
 
+function rawSessionId(input: PendingIdentityTransactionInput, browserBinding: string): string {
+  return createHash('sha256')
+    .update(`academy-session-id\0${input.state}\0${browserBinding}`)
+    .digest('base64url')
+}
+
+function storedSessionId(rawSessionIdValue: string): string {
+  return createHash('sha256').update(rawSessionIdValue).digest('base64url')
+}
+
 function rpcClient(result: { data: unknown; error: unknown }) {
   return { rpc: vi.fn().mockResolvedValue(result) }
 }
@@ -68,10 +78,14 @@ function exchangeResult(input: PendingIdentityTransactionInput) {
   }
 }
 
-function claimed(input: PendingIdentityTransactionInput, result: unknown = null) {
+function claimed(
+  input: PendingIdentityTransactionInput,
+  result: unknown = null,
+  sessionId: string = SESSION_ID,
+) {
   return {
     status: 'claimed',
-    sessionId: SESSION_ID,
+    sessionId,
     exchangeResult: result,
     transaction: consumed(input).transaction,
   }
@@ -158,11 +172,16 @@ describe('AcademyPostgresIdentityTransactionStore', () => {
   it('claims without consuming, then releases or finalizes only the exact local claim', async () => {
     const { browserBinding, input } = fixture()
     const exchanged = exchangeResult(input)
+    const raw = rawSessionId(input, browserBinding)
+    const digest = storedSessionId(raw)
     const rpc = vi.fn()
-      .mockResolvedValueOnce({ data: claimed(input), error: null })
+      .mockResolvedValueOnce({ data: claimed(input, null, digest), error: null })
       .mockResolvedValueOnce({ data: { status: 'checkpointed' }, error: null })
       .mockResolvedValueOnce({ data: { status: 'released' }, error: null })
-      .mockResolvedValueOnce({ data: claimed(input, exchanged), error: null })
+      .mockImplementationOnce((_name: string, parameters: Record<string, unknown>) => Promise.resolve({
+        data: claimed(input, exchanged, parameters.p_session_id as string),
+        error: null,
+      }))
       .mockResolvedValueOnce({ data: { status: 'completed' }, error: null })
     const store = new AcademyPostgresIdentityTransactionStore({ rpc })
 
@@ -170,7 +189,7 @@ describe('AcademyPostgresIdentityTransactionStore', () => {
     expect(first.status).toBe('claimed')
     if (first.status !== 'claimed') throw new Error('expected active claim')
     expect(first.claimToken).toMatch(/^[A-Za-z0-9_-]{43}$/)
-    expect(first.sessionId).toBe(SESSION_ID)
+    expect(first.sessionId).toBe(raw)
     expect(first.exchangeResult).toBeNull()
     expect(first.transaction).toMatchObject({ state: input.state })
     expect(rpc.mock.calls[0]?.[0]).toBe('claim_identity_authorization_transaction')
@@ -178,7 +197,7 @@ describe('AcademyPostgresIdentityTransactionStore', () => {
       p_state: input.state,
       p_browser_binding_digest: input.browserBindingDigest,
       p_claim_digest: expect.stringMatching(/^[A-Za-z0-9_-]{43}$/),
-      p_session_id: expect.stringMatching(/^[A-Za-z0-9_-]{43}$/),
+      p_session_id: digest,
       p_lease_seconds: 30,
     })
 
@@ -208,7 +227,7 @@ describe('AcademyPostgresIdentityTransactionStore', () => {
     expect(second.exchangeResult).toEqual(exchanged)
     await store.finalize(second, {
       accountId: ACCOUNT_ID,
-      sessionId: SESSION_ID,
+      sessionId: raw,
       returnPath: input.returnPath,
     })
     expect(rpc.mock.calls[4]?.[0]).toBe('finalize_identity_authorization_transaction')
@@ -216,31 +235,83 @@ describe('AcademyPostgresIdentityTransactionStore', () => {
       p_state: input.state,
       p_claim_digest: rpc.mock.calls[3]?.[1].p_claim_digest,
       p_account_id: ACCOUNT_ID,
-      p_session_id: SESSION_ID,
+      p_session_id: digest,
       p_subject_key: expect.stringMatching(/^[a-f0-9]+$/),
     })
   })
 
+  it('persists only deterministic session digests and recovers the same raw receipt', async () => {
+    const { browserBinding, input } = fixture()
+    const exchanged = exchangeResult(input)
+    const raw = rawSessionId(input, browserBinding)
+    const digest = storedSessionId(raw)
+    const rpc = vi.fn()
+      .mockImplementationOnce((_name: string, parameters: Record<string, unknown>) => Promise.resolve({
+        data: claimed(input, null, parameters.p_session_id as string),
+        error: null,
+      }))
+      .mockImplementationOnce((_name: string, parameters: Record<string, unknown>) => Promise.resolve({
+        data: claimed(input, exchanged, parameters.p_session_id as string),
+        error: null,
+      }))
+      .mockResolvedValueOnce({ data: { status: 'completed' }, error: null })
+      .mockResolvedValueOnce({
+        data: {
+          status: 'completed',
+          receipt: { accountId: ACCOUNT_ID, sessionId: digest, returnPath: input.returnPath },
+        },
+        error: null,
+      })
+    const store = new AcademyPostgresIdentityTransactionStore({ rpc })
+
+    const first = await store.claim(input.state, browserBinding)
+    const second = await store.claim(input.state, browserBinding)
+    expect(first).toMatchObject({ sessionId: raw })
+    expect(second).toMatchObject({ sessionId: raw })
+    if (second.status != "claimed") throw new Error("Expected a claimed transaction")
+    await store.finalize(second, {
+      accountId: ACCOUNT_ID,
+      sessionId: raw,
+      returnPath: input.returnPath,
+    })
+    const completed = await store.claim(input.state, browserBinding)
+    expect(completed).toEqual({
+      status: 'completed',
+      receipt: { accountId: ACCOUNT_ID, sessionId: raw, returnPath: input.returnPath },
+    })
+    expect(rpc.mock.calls
+      .every(([, parameters]) => parameters.p_session_id !== raw)).toBe(true)
+    expect(JSON.stringify(rpc.mock.calls)).not.toContain(raw)
+    expect(rpc.mock.calls[0]?.[1].p_session_id).toBe(digest)
+    expect(rpc.mock.calls[2]?.[1].p_session_id).toBe(digest)
+  })
+
   it('returns an exact completed receipt without exposing a new claim token', async () => {
     const { browserBinding, input } = fixture()
+    const raw = rawSessionId(input, browserBinding)
     const store = new AcademyPostgresIdentityTransactionStore(rpcClient({
       data: {
         status: 'completed',
-        receipt: { accountId: ACCOUNT_ID, sessionId: SESSION_ID, returnPath: '/dashboard' },
+        receipt: {
+          accountId: ACCOUNT_ID,
+          sessionId: storedSessionId(raw),
+          returnPath: '/dashboard',
+        },
       },
       error: null,
     }))
 
     await expect(store.claim(input.state, browserBinding)).resolves.toEqual({
       status: 'completed',
-      receipt: { accountId: ACCOUNT_ID, sessionId: SESSION_ID, returnPath: '/dashboard' },
+      receipt: { accountId: ACCOUNT_ID, sessionId: raw, returnPath: '/dashboard' },
     })
   })
 
   it('retries only the idempotent verified-result checkpoint after response loss', async () => {
     const { browserBinding, input } = fixture()
+    const digest = storedSessionId(rawSessionId(input, browserBinding))
     const rpc = vi.fn()
-      .mockResolvedValueOnce({ data: claimed(input), error: null })
+      .mockResolvedValueOnce({ data: claimed(input, null, digest), error: null })
       .mockRejectedValueOnce(new Error('response lost'))
       .mockResolvedValueOnce({ data: { status: 'checkpointed' }, error: null })
     const store = new AcademyPostgresIdentityTransactionStore({ rpc })
@@ -466,6 +537,26 @@ describe('AcademyPostgresIdentityTransactionStore', () => {
     expect(migration).toMatch(/status', 'completed'[\s\S]*sessionId/i)
     expect(migration).toMatch(/attempt_count <> 0[\s\S]*status', 'unknown'[\s\S]*delete from academy\.identity_authorization_transaction/i)
     expect(migration).not.toMatch(/grant (?:select|insert|update|delete)[\s\S]*identity_authorization_transaction/i)
+  })
+
+  it('prepares a non-destructive digest transition with blocked security downgrade', () => {
+    const migration = readFileSync(
+      join(process.cwd(), 'supabase/migrations/0034_identity_session_id_digest.sql'),
+      'utf8',
+    )
+    const rollback = readFileSync(
+      join(process.cwd(), 'supabase/rollbacks/0034_identity_session_id_digest.rollback.sql'),
+      'utf8',
+    )
+
+    expect(migration).toMatch(/academy\.identity_session_id_digest\(/)
+    expect(migration).toMatch(/update academy\.identity_session/i)
+    expect(migration).toMatch(/update academy\.identity_authorization_transaction/i)
+    expect(migration).toMatch(/when completed_at is null then null/i)
+    expect(migration).not.toMatch(/delete from academy\.identity_session/i)
+    expect(migration).not.toMatch(/delete from academy\.identity_authorization_transaction/i)
+    expect(rollback).toMatch(/rollback is blocked/i)
+    expect(rollback).toMatch(/restore[\s\S]*pre-migration/i)
   })
 
   it('requires an atomically shared database outstanding-authorization cap', () => {

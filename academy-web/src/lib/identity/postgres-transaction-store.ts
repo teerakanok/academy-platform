@@ -2,6 +2,10 @@ import { createHash, randomBytes } from 'node:crypto'
 import type { ExchangeResult } from './adapter'
 import { isWellFormedIdentityLifecycleSubject } from './lifecycle-principal'
 import {
+  deriveStableAcademySessionId,
+  digestAcademySessionId,
+} from './session-identifier'
+import {
   digestIdentityBrowserBinding,
   IDENTITY_COMPLETION_FAILURE_STAGES,
   IdentityTransactionError,
@@ -199,16 +203,17 @@ export class AcademyPostgresIdentityTransactionStore implements IdentityTransact
       throw new IdentityTransactionError('callback ไม่ได้มาจาก browser ที่เริ่มเข้าสู่ระบบ', 'browser_mismatch')
     }
     const claimToken = randomBytes(32).toString('base64url')
-    const sessionId = randomBytes(32).toString('base64url')
+    const sessionId = deriveStableAcademySessionId(stateValue, browserBindingValue)
+    const sessionIdDigest = digestAcademySessionId(sessionId)
     const claimDigest = digestClaimToken(claimToken)
     const { data } = await this.callRpc('claim_identity_authorization_transaction', {
       p_state: stateValue,
       p_browser_binding_digest: browserBindingDigest,
       p_claim_digest: claimDigest,
-      p_session_id: sessionId,
+      p_session_id: sessionIdDigest,
       p_lease_seconds: CLAIM_LEASE_SECONDS,
     })
-    const result = parseClaimResult(data)
+    const result = parseClaimResult(data, sessionIdDigest)
     if (!result) throw new IdentityPostgresTransactionStoreFailure()
     if (result.status === 'unknown') {
       throw new IdentityTransactionError('ไม่พบ state หรือ state ถูกใช้ไปแล้ว', 'unknown_state')
@@ -226,12 +231,15 @@ export class AcademyPostgresIdentityTransactionStore implements IdentityTransact
       throw new IdentityTransactionError('callback ใช้จำนวนครั้งครบแล้ว', 'claim_exhausted')
     }
     if (result.status === 'completed') {
-      return Object.freeze({ status: 'completed', receipt: result.receipt })
+      return Object.freeze({
+        status: 'completed',
+        receipt: { ...result.receipt, sessionId },
+      })
     }
     return Object.freeze({
       status: 'claimed',
       claimToken,
-      sessionId: result.sessionId,
+      sessionId,
       transaction: snapshotPendingIdentityTransaction(result.transaction),
       exchangeResult: result.exchangeResult,
     })
@@ -304,7 +312,7 @@ export class AcademyPostgresIdentityTransactionStore implements IdentityTransact
       p_state: claim.transaction.state,
       p_claim_digest: digestClaimToken(claim.claimToken),
       p_account_id: receipt.accountId,
-      p_session_id: receipt.sessionId,
+      p_session_id: digestAcademySessionId(receipt.sessionId),
       p_subject_key: encodeSubjectKey(claim.exchangeResult.subject),
     })
     const result = snapshotBoundedDataRecord(data, STATUS_RESPONSE_KEYS.length)
@@ -427,7 +435,7 @@ function parseConsumeResult(value: unknown): ConsumeResult | null {
   return transaction ? { status: 'consumed', transaction } : null
 }
 
-function parseClaimResult(value: unknown): ClaimResult | null {
+function parseClaimResult(value: unknown, sessionIdDigest: string): ClaimResult | null {
   const response = snapshotBoundedDataRecord(value, ACTIVE_CLAIM_RESPONSE_KEYS.length)
   if (!response) return null
   if (
@@ -442,12 +450,14 @@ function parseClaimResult(value: unknown): ClaimResult | null {
   }
   if (hasExactKeys(response, COMPLETED_RESPONSE_KEYS) && response.status === 'completed') {
     const receipt = snapshotCompletionReceipt(response.receipt)
+    if (receipt && receipt.sessionId !== sessionIdDigest) return null
     return receipt ? { status: 'completed', receipt } : null
   }
   if (!hasExactKeys(response, ACTIVE_CLAIM_RESPONSE_KEYS)
-    || response.status !== 'claimed'
-    || typeof response.sessionId !== 'string'
-    || !OPAQUE_SESSION_ID.test(response.sessionId)) return null
+      || response.status !== 'claimed'
+      || typeof response.sessionId !== 'string'
+      || !OPAQUE_SESSION_ID.test(response.sessionId)
+      || response.sessionId !== sessionIdDigest) return null
   const transaction = snapshotRemoteTransaction(response.transaction)
   if (!transaction) return null
   const exchangeResult = response.exchangeResult === null

@@ -1,0 +1,26 @@
+{
+  "command": [
+    "nice",
+    "-n",
+    "10",
+    "npx",
+    "vitest",
+    "run",
+    "--project",
+    "unit",
+    "tests/unit/identity-postgres-session-store.test.ts",
+    "tests/unit/identity-postgres-transaction-store.test.ts",
+    "tests/unit/identity-runtime-completion.test.ts",
+    "tests/unit/current-user-identity-session.test.ts"
+  ],
+  "base": "53ef705",
+  "replayedPaths": [
+    "academy-web/src/lib/identity/postgres-session-store.ts",
+    "academy-web/src/lib/identity/postgres-transaction-store.ts"
+  ],
+  "exit": 1,
+  "signal": null,
+  "restored": true,
+  "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-session-digest-parent-red.log",
+  "sha256": "f8f5a7a127e19d40304c4f1758ffc47696c377336da6e327119b1feb569deb1b"
+}

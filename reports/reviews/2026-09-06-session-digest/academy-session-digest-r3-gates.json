@@ -1,0 +1,47 @@
+[
+  {
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "npx",
+      "vitest",
+      "run",
+      "--project",
+      "unit",
+      "tests/unit/identity-postgres-transaction-store.test.ts"
+    ],
+    "exit": 0,
+    "signal": null,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-session-digest-r3-gate-0.log",
+    "sha256": "2a9a64b3b0e903126d2e73a269309047122a51f2f9ea71d7aa83c8a6b0b4a6ed"
+  },
+  {
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "npx",
+      "tsc",
+      "--noEmit"
+    ],
+    "exit": 0,
+    "signal": null,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-session-digest-r3-gate-1.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "npm",
+      "run",
+      "lint"
+    ],
+    "exit": 1,
+    "signal": null,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-session-digest-r3-gate-2.log",
+    "sha256": "5abf4a02ec93e1031b6b6967de181579aebc829f0b7719799d5ce03ab692b0ed"
+  }
+]

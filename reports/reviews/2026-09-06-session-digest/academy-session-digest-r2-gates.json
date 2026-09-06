@@ -1,0 +1,32 @@
+[
+  {
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "npx",
+      "vitest",
+      "run",
+      "--project",
+      "unit"
+    ],
+    "exit": 0,
+    "signal": null,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-session-digest-r2-gate-0.log",
+    "sha256": "5225f44486ce726e63d86d9051bd4caa61a6c497b65a0cd24251f5f8d33eebe3"
+  },
+  {
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "npx",
+      "tsc",
+      "--noEmit"
+    ],
+    "exit": 2,
+    "signal": null,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-session-digest-r2-gate-1.log",
+    "sha256": "2943dedd06e464fac06a9e51512655e5cfe0d2900e53bfa327ceabdd993328d9"
+  }
+]

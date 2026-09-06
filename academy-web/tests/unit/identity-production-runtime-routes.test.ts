@@ -83,7 +83,7 @@ beforeEach(async () => {
         return {
           data: {
             status: 'claimed',
-            sessionId: 's'.repeat(43),
+            sessionId: parameters.p_session_id,
             exchangeResult: null,
             transaction,
           },

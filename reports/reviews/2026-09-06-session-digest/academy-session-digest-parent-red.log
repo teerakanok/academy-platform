@@ -1,0 +1,332 @@
+
+ RUN  v3.2.7 /private/tmp/academy-session-digest-cde63a58/academy-web
+
+ ❯ |unit| tests/unit/identity-postgres-session-store.test.ts (29 tests | 5 failed) 29ms
+   × AcademyPostgresIdentitySessionStore > creates an opaque high-entropy session with exact runtime-completion claims 13ms
+     → expected "spy" to be called with arguments: [ 'create_identity_session', …(1) ]
+
+Received: 
+
+  1st spy call:
+
+  [
+    "create_identity_session",
+-   ObjectContaining {
++   {
+      "p_activation_revision": 7,
+      "p_activation_status": "active",
+      "p_issuer": "https://accounts.example.test/auth/v1",
+-     "p_session_id": "I5PXGo8ptmPsOMPAYN9CKsUb6n1_7XMk3aXHfCqGOfA",
++     "p_session_id": "eLTIGb8ofm6ZkYPgQDzMRw2Wvw7YMTlOVzhu9zrqG50",
+      "p_subject_key": "00610063006100640065006d0079002d006c006500610072006e00650072002d0031",
+      "p_ttl_seconds": 86400,
+      "p_verified_email": "learner@example.test",
+    },
+  ]
+
+
+Number of calls: 1
+
+   ✓ AcademyPostgresIdentitySessionStore > rejects a database principal or activation mismatch 2ms
+   × AcademyPostgresIdentitySessionStore > persists only a session digest while the raw bearer authenticates and revokes 1ms
+     → expected [ Array(1) ] to deeply equal [ Array(1) ]
+   ✓ AcademyPostgresIdentitySessionStore > enforces lifecycle principal parity before raw RPC: uppercase issuer 1ms
+   ✓ AcademyPostgresIdentitySessionStore > enforces lifecycle principal parity before raw RPC: non-contract issuer 0ms
+   ✓ AcademyPostgresIdentitySessionStore > enforces lifecycle principal parity before raw RPC: overbound UTF-16 subject 0ms
+   ✓ AcademyPostgresIdentitySessionStore > enforces lifecycle principal parity before raw RPC: unpaired high surrogate 0ms
+   ✓ AcademyPostgresIdentitySessionStore > enforces lifecycle principal parity before raw RPC: unpaired low surrogate 0ms
+   ✓ AcademyPostgresIdentitySessionStore > enforces lifecycle principal parity before raw RPC: NUL subject 0ms
+   ✓ AcademyPostgresIdentitySessionStore > accepts exact lifecycle issuer vector https://accounts.example.test/ 1ms
+   ✓ AcademyPostgresIdentitySessionStore > accepts exact lifecycle issuer vector https://accounts.example.test/auth/v1 0ms
+   ✓ AcademyPostgresIdentitySessionStore > accepts exact lifecycle issuer vector https://accounts.example.test/auth/v1/ 0ms
+   ✓ AcademyPostgresIdentitySessionStore > accepts exact lifecycle issuer vector https://supabase.cyberskills.co.th/auth/v1 0ms
+   ✓ AcademyPostgresIdentitySessionStore > round-trips valid lifecycle UTF-16 subject boundary 1ms
+   ✓ AcademyPostgresIdentitySessionStore > round-trips valid lifecycle UTF-16 subject boundary 1ms
+   ✓ AcademyPostgresIdentitySessionStore > round-trips valid lifecycle UTF-16 subject boundary 0ms
+   ✓ AcademyPostgresIdentitySessionStore > round-trips activation revision 2147483647 without integer narrowing 0ms
+   ✓ AcademyPostgresIdentitySessionStore > round-trips activation revision 2147483648 without integer narrowing 0ms
+   ✓ AcademyPostgresIdentitySessionStore > round-trips activation revision 9007199254740991 without integer narrowing 0ms
+   ✓ AcademyPostgresIdentitySessionStore > rejects a revision above MAX_SAFE before RPC 0ms
+   × AcademyPostgresIdentitySessionStore > reads exact claims and treats unknown or expired sessions as absent 1ms
+     → promise rejected "IdentityPostgresSessionStoreFailure: Iden…" instead of resolving
+   ✓ AcademyPostgresIdentitySessionStore > revokes idempotently and invalid opaque IDs never reach the database 0ms
+   × AcademyPostgresIdentitySessionStore > retries one generated-ID collision with a distinct ID then stops bounded 1ms
+     → expected 'XadG-aBcXuIuJ_Wvy-XuSa7kZH2xAzI5TijrL…' not to be 'XadG-aBcXuIuJ_Wvy-XuSa7kZH2xAzI5TijrL…' // Object.is equality
+   × AcademyPostgresIdentitySessionStore > reuses only an exact stable session after a committed-create response is lost 0ms
+     → promise rejected "IdentityPostgresSessionStoreFailure: Iden…" instead of resolving
+   ✓ AcademyPostgresIdentitySessionStore > rejects surplus input and response before authority can widen 1ms
+   ✓ AcademyPostgresIdentitySessionStore > captures the RPC method once with its receiver and contains hostile proxies 0ms
+   ✓ AcademyPostgresIdentitySessionStore > collapses DB throw, rejection, error, malformed time, and surplus into one fixed error 1ms
+   ✓ AcademyPostgresIdentitySessionStore > keeps storage behind three exact runtime RPCs with no direct/service-role table access 1ms
+   ✓ supabase-js response envelope > accepts the real PostgrestResponse shape (data, error, count, status, statusText) 0ms
+ ❯ |unit| tests/unit/identity-postgres-transaction-store.test.ts (26 tests | 3 failed) 31ms
+   ✓ AcademyPostgresIdentityTransactionStore > creates one exact durable transaction through the database-clock RPC 5ms
+   ✓ AcademyPostgresIdentityTransactionStore > maps database capacity exhaustion to an opaque retryable admission refusal 1ms
+   ✓ AcademyPostgresIdentityTransactionStore > hashes the raw browser binding locally and returns a fresh consumed projection 1ms
+   × AcademyPostgresIdentityTransactionStore > claims without consuming, then releases or finalizes only the exact local claim 7ms
+     → expected '55riZJ1XMughfg6bvut-hudz84NYaoYAebMcW…' to be 'SaMDs-ztarhrkrnWKG5aAJ5GHAxuh1vA_WsFx…' // Object.is equality
+   × AcademyPostgresIdentityTransactionStore > persists only deterministic session digests and recovers the same raw receipt 4ms
+     → expected { status: 'claimed', …(4) } to match object { Object (sessionId) }
+(11 matching properties omitted from actual)
+   × AcademyPostgresIdentityTransactionStore > returns an exact completed receipt without exposing a new claim token 1ms
+     → expected { status: 'completed', …(1) } to deeply equal { status: 'completed', …(1) }
+   ✓ AcademyPostgresIdentityTransactionStore > retries only the idempotent verified-result checkpoint after response loss 1ms
+   ✓ AcademyPostgresIdentityTransactionStore > maps claim status unknown to fixed reason unknown_state 0ms
+   ✓ AcademyPostgresIdentityTransactionStore > maps claim status expired to fixed reason expired_state 0ms
+   ✓ AcademyPostgresIdentityTransactionStore > maps claim status browser_mismatch to fixed reason browser_mismatch 0ms
+   ✓ AcademyPostgresIdentityTransactionStore > maps claim status in_progress to fixed reason claim_in_progress 0ms
+   ✓ AcademyPostgresIdentityTransactionStore > maps claim status exhausted to fixed reason claim_exhausted 0ms
+   ✓ AcademyPostgresIdentityTransactionStore > rejects malformed claim settlement and fixed-stage drift before mutation 1ms
+   ✓ AcademyPostgresIdentityTransactionStore > maps unknown without leaking database detail 0ms
+   ✓ AcademyPostgresIdentityTransactionStore > maps expired without leaking database detail 0ms
+   ✓ AcademyPostgresIdentityTransactionStore > maps browser_mismatch without leaking database detail 0ms
+   ✓ AcademyPostgresIdentityTransactionStore > rejects duplicate live state with the existing fixed store classification 0ms
+   ✓ AcademyPostgresIdentityTransactionStore > rejects inexact input and invalid browser binding before RPC access 0ms
+   ✓ AcademyPostgresIdentityTransactionStore > captures the RPC method once with its receiver and snapshots each response descriptor once 0ms
+   ✓ AcademyPostgresIdentityTransactionStore > reads RPC envelope and result descriptors once without ordinary property access 0ms
+   ✓ AcademyPostgresIdentityTransactionStore > collapses RPC throw, rejection, error, and malformed responses to one fixed failure 3ms
+   ✓ AcademyPostgresIdentityTransactionStore > rejects invalid construction and TTL without reading a second capability 0ms
+   ✓ AcademyPostgresIdentityTransactionStore > keeps durable table mutation behind two exact runtime-only RPCs 1ms
+   ✓ AcademyPostgresIdentityTransactionStore > keeps completion retry state behind bounded runtime-only state-machine RPCs 1ms
+   ✓ AcademyPostgresIdentityTransactionStore > prepares a non-destructive digest transition with blocked security downgrade 0ms
+   ✓ AcademyPostgresIdentityTransactionStore > requires an atomically shared database outstanding-authorization cap 0ms
+ ✓ |unit| tests/unit/current-user-identity-session.test.ts (7 tests) 6ms
+ ✓ |unit| tests/unit/identity-runtime-completion.test.ts (25 tests) 40ms
+
+ Test Files  2 failed | 2 passed (4)
+      Tests  8 failed | 79 passed (87)
+   Start at  01:50:22
+   Duration  707ms (transform 411ms, setup 0ms, collect 893ms, tests 106ms, environment 1ms, prepare 294ms)
+
+stderr | tests/unit/identity-runtime-completion.test.ts > Academy Identity runtime completion seam > does not activate a profile or create a session when exchange fails
+[identity-callback] completion_failed stage=code_exchange released=true
+
+stderr | tests/unit/identity-runtime-completion.test.ts > Academy Identity runtime completion seam > records the fixed client binding pre-exchange stage without consuming state
+[identity-callback] completion_failed stage=client_binding released=true
+
+stderr | tests/unit/identity-runtime-completion.test.ts > Academy Identity runtime completion seam > records the fixed client assertion pre-exchange stage without consuming state
+[identity-callback] completion_failed stage=client_assertion released=true
+
+stderr | tests/unit/identity-runtime-completion.test.ts > Academy Identity runtime completion seam > does not activate a profile or create a session when signed-result verification fails
+[identity-callback] completion_failed stage=result_verification released=true
+
+stderr | tests/unit/identity-runtime-completion.test.ts > Academy Identity runtime completion seam > retries local activation without exchanging the one-time provider code twice
+[identity-callback] completion_failed stage=profile_activation released=true
+
+stderr | tests/unit/identity-runtime-completion.test.ts > Academy Identity runtime completion seam > rejects a checkpointed result with mismatched issuer before local activation
+[identity-callback] completion_failed stage=client_binding released=true
+
+stderr | tests/unit/identity-runtime-completion.test.ts > Academy Identity runtime completion seam > rejects a checkpointed result with mismatched audience before local activation
+[identity-callback] completion_failed stage=client_binding released=true
+
+stderr | tests/unit/identity-runtime-completion.test.ts > Academy Identity runtime completion seam > rejects a checkpointed result with mismatched service before local activation
+[identity-callback] completion_failed stage=client_binding released=true
+
+stderr | tests/unit/identity-runtime-completion.test.ts > Academy Identity runtime completion seam > rejects a checkpointed result with mismatched nonce before local activation
+[identity-callback] completion_failed stage=client_binding released=true
+
+stderr | tests/unit/identity-runtime-completion.test.ts > Academy Identity runtime completion seam > recovers a lost checkpoint response from the durable verified result
+[identity-callback] completion_failed stage=result_checkpoint released=true
+
+stderr | tests/unit/identity-runtime-completion.test.ts > Academy Identity runtime completion seam > rejects an activation commit with mismatched issuer before session creation
+[identity-callback] completion_failed stage=profile_activation released=true
+
+stderr | tests/unit/identity-runtime-completion.test.ts > Academy Identity runtime completion seam > rejects an activation commit with mismatched subject before session creation
+[identity-callback] completion_failed stage=profile_activation released=true
+
+stderr | tests/unit/identity-runtime-completion.test.ts > Academy Identity runtime completion seam > rejects an activation commit with mismatched verified email before session creation
+[identity-callback] completion_failed stage=profile_activation released=true
+
+stderr | tests/unit/identity-runtime-completion.test.ts > Academy Identity runtime completion seam > rejects an activation commit with mismatched activation status before session creation
+[identity-callback] completion_failed stage=profile_activation released=true
+
+stderr | tests/unit/identity-runtime-completion.test.ts > Academy Identity runtime completion seam > rejects an activation commit with mismatched activation revision before session creation
+[identity-callback] completion_failed stage=profile_activation released=true
+
+stderr | tests/unit/identity-runtime-completion.test.ts > Academy Identity runtime completion seam > rejects a session receipt with mismatched claims
+[identity-callback] completion_failed stage=session_creation released=true
+
+stderr | tests/unit/identity-runtime-completion.test.ts > Academy Identity runtime completion seam > rejects a session receipt with malformed claims
+[identity-callback] completion_failed stage=session_creation released=true
+
+stderr | tests/unit/identity-runtime-completion.test.ts > Academy Identity runtime completion seam > retains the same authorization when session creation fails and finalizes exactly once after retry
+[identity-callback] completion_failed stage=session_creation released=true
+
+stderr | tests/unit/identity-runtime-completion.test.ts > Academy Identity runtime completion seam > issues one stable raw session receipt across resumed and completed retries
+[identity-callback] completion_failed stage=transaction_finalize released=true
+
+stderr | tests/unit/identity-runtime-completion.test.ts > Academy Identity runtime completion seam > records transaction_finalize and retains state when finalization fails after session activation
+[identity-callback] completion_failed stage=transaction_finalize released=true
+
+stderr | tests/unit/identity-runtime-completion.test.ts > Academy Identity runtime completion seam > reuses the stable session after a committed create response is lost
+[identity-callback] completion_failed stage=session_creation released=true
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| tests/unit/identity-postgres-session-store.test.ts > AcademyPostgresIdentitySessionStore > creates an opaque high-entropy session with exact runtime-completion claims
+AssertionError: expected "spy" to be called with arguments: [ 'create_identity_session', …(1) ]
+
+Received: 
+
+  1st spy call:
+
+  [
+    "create_identity_session",
+-   ObjectContaining {
++   {
+      "p_activation_revision": 7,
+      "p_activation_status": "active",
+      "p_issuer": "https://accounts.example.test/auth/v1",
+-     "p_session_id": "I5PXGo8ptmPsOMPAYN9CKsUb6n1_7XMk3aXHfCqGOfA",
++     "p_session_id": "eLTIGb8ofm6ZkYPgQDzMRw2Wvw7YMTlOVzhu9zrqG50",
+      "p_subject_key": "00610063006100640065006d0079002d006c006500610072006e00650072002d0031",
+      "p_ttl_seconds": 86400,
+      "p_verified_email": "learner@example.test",
+    },
+  ]
+
+
+Number of calls: 1
+
+ ❯ tests/unit/identity-postgres-session-store.test.ts:106:20
+    104|       'issuer', 'subject', 'verifiedEmail', 'activation', 'createdAt',…
+    105|     ])
+    106|     expect(db.rpc).toHaveBeenCalledWith('create_identity_session', exp…
+       |                    ^
+    107|       p_session_id: storedSessionId(created.id),
+    108|       p_issuer: claims.issuer,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  |unit| tests/unit/identity-postgres-session-store.test.ts > AcademyPostgresIdentitySessionStore > persists only a session digest while the raw bearer authenticates and revokes
+AssertionError: expected [ Array(1) ] to deeply equal [ Array(1) ]
+
+- Expected
++ Received
+
+  [
+-   "1E_ZwbwYWv2ao9ZBAiKM5vIzqYscpzdyxH4S6MvJmtg",
++   "t42M8cPEsVVlSOIOrPVI3EaNiJBw0s-edOkqLmIc8Yw",
+  ]
+
+ ❯ tests/unit/identity-postgres-session-store.test.ts:153:32
+    151|     const digest = storedSessionId(created.id)
+    152| 
+    153|     expect([...stored.keys()]).toEqual([digest])
+       |                                ^
+    154|     expect(created.id).not.toBe(digest)
+    155|     await expect(store.get(created.id)).resolves.toMatchObject({ subje…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  |unit| tests/unit/identity-postgres-session-store.test.ts > AcademyPostgresIdentitySessionStore > reads exact claims and treats unknown or expired sessions as absent
+AssertionError: promise rejected "IdentityPostgresSessionStoreFailure: Iden…" instead of resolving
+ ❯ tests/unit/identity-postgres-session-store.test.ts:245:43
+    243|     ])
+    244|     const store = new AcademyPostgresIdentitySessionStore(db)
+    245|     await expect(store.get('A'.repeat(43))).resolves.toEqual({
+       |                                           ^
+    246|       ...claims, createdAt: Date.parse(CREATED_AT), expiresAt: Date.pa…
+    247|     })
+
+Caused by: IdentityPostgresSessionStoreFailure: Identity durable session operation failed
+ ❯ AcademyPostgresIdentitySessionStore.readReceipt src/lib/identity/postgres-session-store.ts:165:46
+ ❯ AcademyPostgresIdentitySessionStore.get src/lib/identity/postgres-session-store.ts:133:13
+ ❯ tests/unit/identity-postgres-session-store.test.ts:245:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  |unit| tests/unit/identity-postgres-session-store.test.ts > AcademyPostgresIdentitySessionStore > retries one generated-ID collision with a distinct ID then stops bounded
+AssertionError: expected 'XadG-aBcXuIuJ_Wvy-XuSa7kZH2xAzI5TijrL…' not to be 'XadG-aBcXuIuJ_Wvy-XuSa7kZH2xAzI5TijrL…' // Object.is equality
+ ❯ tests/unit/identity-postgres-session-store.test.ts:284:28
+    282|     expect(ids).toHaveLength(2)
+    283|     expect(ids[0]).not.toBe(ids[1])
+    284|     expect(created.id).not.toBe(ids[1])
+       |                            ^
+    285| 
+    286|     const duplicates = client([
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  |unit| tests/unit/identity-postgres-session-store.test.ts > AcademyPostgresIdentitySessionStore > reuses only an exact stable session after a committed-create response is lost
+AssertionError: promise rejected "IdentityPostgresSessionStoreFailure: Iden…" instead of resolving
+ ❯ tests/unit/identity-postgres-session-store.test.ts:300:89
+    298|       { data: { status: 'active', session: session(storedSessionId(sta…
+    299|     ])
+    300|     await expect(new AcademyPostgresIdentitySessionStore(exact).create…
+       |                                                                                         ^
+    301|       .resolves.toMatchObject({ id: stableId, claims })
+    302|     expect(exact.rpc).toHaveBeenNthCalledWith(1, 'create_identity_sess…
+
+Caused by: IdentityPostgresSessionStoreFailure: Identity durable session operation failed
+ ❯ AcademyPostgresIdentitySessionStore.readReceipt src/lib/identity/postgres-session-store.ts:165:46
+ ❯ AcademyPostgresIdentitySessionStore.create src/lib/identity/postgres-session-store.ts:114:26
+ ❯ tests/unit/identity-postgres-session-store.test.ts:300:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+ FAIL  |unit| tests/unit/identity-postgres-transaction-store.test.ts > AcademyPostgresIdentityTransactionStore > claims without consuming, then releases or finalizes only the exact local claim
+AssertionError: expected '55riZJ1XMughfg6bvut-hudz84NYaoYAebMcW…' to be 'SaMDs-ztarhrkrnWKG5aAJ5GHAxuh1vA_WsFx…' // Object.is equality
+
+Expected: "SaMDs-ztarhrkrnWKG5aAJ5GHAxuh1vA_WsFx-WYGtY"
+Received: "55riZJ1XMughfg6bvut-hudz84NYaoYAebMcWOInJN4"
+
+ ❯ tests/unit/identity-postgres-transaction-store.test.ts:192:29
+    190|     if (first.status !== 'claimed') throw new Error('expected active c…
+    191|     expect(first.claimToken).toMatch(/^[A-Za-z0-9_-]{43}$/)
+    192|     expect(first.sessionId).toBe(raw)
+       |                             ^
+    193|     expect(first.exchangeResult).toBeNull()
+    194|     expect(first.transaction).toMatchObject({ state: input.state })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯
+
+ FAIL  |unit| tests/unit/identity-postgres-transaction-store.test.ts > AcademyPostgresIdentityTransactionStore > persists only deterministic session digests and recovers the same raw receipt
+AssertionError: expected { status: 'claimed', …(4) } to match object { Object (sessionId) }
+(11 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "sessionId": "fyTKUhfvX4ASNY0NzWsoG3RtrISoRNDAmn98yP78Fro",
++   "sessionId": "3dbw-RQ0V1echAxfkj32-CQPrZa1YeUeSCXuNbgV4zo",
+  }
+
+ ❯ tests/unit/identity-postgres-transaction-store.test.ts:269:19
+    267|     const first = await store.claim(input.state, browserBinding)
+    268|     const second = await store.claim(input.state, browserBinding)
+    269|     expect(first).toMatchObject({ sessionId: raw })
+       |                   ^
+    270|     expect(second).toMatchObject({ sessionId: raw })
+    271|     await store.finalize(second, {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯
+
+ FAIL  |unit| tests/unit/identity-postgres-transaction-store.test.ts > AcademyPostgresIdentityTransactionStore > returns an exact completed receipt without exposing a new claim token
+AssertionError: expected { status: 'completed', …(1) } to deeply equal { status: 'completed', …(1) }
+
+- Expected
++ Received
+
+  {
+    "receipt": {
+      "accountId": "123e4567-e89b-42d3-a456-426614174000",
+      "returnPath": "/dashboard",
+-     "sessionId": "X-FDEEewJeJ5r6OxjrEhKv7bYrEiBL7dHLkG7MXBkXw",
++     "sessionId": "FeodZeKmJjISFCMaBiHRJV0lto_N4BAbsHozDuZLd5s",
+    },
+    "status": "completed",
+  }
+
+ ❯ tests/unit/identity-postgres-transaction-store.test.ts:303:5
+    301|     }))
+    302| 
+    303|     await expect(store.claim(input.state, browserBinding)).resolves.to…
+       |     ^
+    304|       status: 'completed',
+    305|       receipt: { accountId: ACCOUNT_ID, sessionId: raw, returnPath: '/…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯
+

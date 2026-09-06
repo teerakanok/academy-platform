@@ -1,0 +1,10 @@
+
+ RUN  v3.2.7 /private/tmp/academy-session-digest-cde63a58/academy-web
+
+ ✓ |unit| tests/unit/identity-postgres-transaction-store.test.ts (26 tests) 21ms
+
+ Test Files  1 passed (1)
+      Tests  26 passed (26)
+   Start at  01:59:57
+   Duration  459ms (transform 82ms, setup 0ms, collect 91ms, tests 21ms, environment 0ms, prepare 106ms)
+

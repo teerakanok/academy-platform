@@ -1,0 +1,22 @@
+{
+  "command": [
+    "psql",
+    "-X",
+    "-A",
+    "-t",
+    "-v",
+    "ON_ERROR_STOP=1",
+    "-h",
+    "/private/tmp/postgres-fixture-cde63a58/socket",
+    "-p",
+    "65433",
+    "-U",
+    "fixture_owner",
+    "-d",
+    "postgres"
+  ],
+  "exit": 0,
+  "rollback": true,
+  "migration_sha256": "0e7aa5d7c8828d9df30104ff687db5e5b469c7383ffdcb120645c1e9c902fae0",
+  "unexpected_second_apply": true
+}

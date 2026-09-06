@@ -250,6 +250,20 @@ describe('Academy Identity runtime completion seam', () => {
     expect(fixture.exchanges()).toBe(1)
   })
 
+  it('issues one stable raw session receipt across resumed and completed retries', async () => {
+    const fixture = await createFixture({ finalizeFailures: 1 })
+    const input = { callbackUrl: callbackUrl(), browserBinding }
+
+    await expectFixedCompletionFailure(fixture.runtime.complete(input))
+    const recovered = await fixture.runtime.complete(input)
+    const completed = await fixture.runtime.complete(input)
+
+    expect(recovered.sessionId).toBe(completed.sessionId)
+    expect(fixture.stableSessionIds()).toEqual([recovered.sessionId])
+    expect(fixture.sessionCreates()).toBe(1)
+    expect(fixture.exchanges()).toBe(1)
+  })
+
   it('records transaction_finalize and retains state when finalization fails after session activation', async () => {
     const fixture = await createFixture({ finalizeFailures: 1 })
 
@@ -355,6 +369,7 @@ async function createFixture(options: {
   const root = await mkdtemp(join(tmpdir(), 'academy-identity-runtime-completion-'))
   roots.push(root)
   const calls: string[] = []
+  const stableSessionIds: string[] = []
   let sessionCreateCount = 0
   let exchangeCount = 0
   let activationCommitCount = 0
@@ -486,6 +501,7 @@ async function createFixture(options: {
     sessionStore: {
       create(input: IdentitySessionClaims, stableId: string) {
         calls.push('session')
+        stableSessionIds.push(stableId)
         sessionCreateCount += 1
         if (sessionCreateCount <= (options.sessionFailures ?? 0)) {
           throw new Error('session detail must not escape')
@@ -517,6 +533,7 @@ async function createFixture(options: {
     activationCommits: () => activationCommitCount,
     exchanges: () => exchangeCount,
     sessionCreates: () => sessionCreateCount,
+    stableSessionIds: () => [...stableSessionIds],
   }
 }
 

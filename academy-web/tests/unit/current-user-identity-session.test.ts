@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import { resolveIdentitySessionUser } from '@/lib/auth/session'
+import { parseAcademySessionCookie } from '@/lib/identity/session-store'
 
 const sessionId = 'A'.repeat(43)
 const claims = {
@@ -21,6 +22,13 @@ const account = {
 }
 
 describe('Academy current user opaque Identity session', () => {
+  it('parses exactly one well-formed Academy session cookie', () => {
+    expect(parseAcademySessionCookie(`academy_session=${sessionId}`)).toBe(sessionId)
+    expect(parseAcademySessionCookie(
+      `theme=dark; academy_session=${sessionId}; academy_session=${sessionId}`,
+    )).toBeNull()
+  })
+
   it('maps one active verified principal to the Academy account', async () => {
     const get = vi.fn().mockResolvedValue(claims)
     const resolveAccount = vi.fn().mockResolvedValue(account)

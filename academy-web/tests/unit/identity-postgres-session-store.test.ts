@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it, vi } from 'vitest'
@@ -37,6 +38,10 @@ function encodeSubjectKey(subject: string): string {
     key += subject.charCodeAt(index).toString(16).padStart(4, '0')
   }
   return key
+}
+
+function storedSessionId(rawSessionId: string): string {
+  return createHash('sha256').update(rawSessionId).digest('base64url')
 }
 
 function client(results: Array<{ data: unknown; error: unknown }> | { data: unknown; error: unknown }) {
@@ -99,7 +104,7 @@ describe('AcademyPostgresIdentitySessionStore', () => {
       'issuer', 'subject', 'verifiedEmail', 'activation', 'createdAt', 'expiresAt',
     ])
     expect(db.rpc).toHaveBeenCalledWith('create_identity_session', expect.objectContaining({
-      p_session_id: created.id,
+      p_session_id: storedSessionId(created.id),
       p_issuer: claims.issuer,
       p_subject_key: encodeSubjectKey(claims.subject),
       p_verified_email: claims.verifiedEmail,
@@ -115,6 +120,49 @@ describe('AcademyPostgresIdentitySessionStore', () => {
       subjectKey: encodeSubjectKey('different'),
     }))
     await fixedFailure(() => store.create(claims))
+  })
+
+  it('persists only a session digest while the raw bearer authenticates and revokes', async () => {
+    const stored = new Map<string, unknown>()
+    const db = {
+      rpc: vi.fn().mockImplementation((_name: string, parameters: Record<string, unknown>) => {
+        const digest = parameters.p_session_id as string
+        if (_name === 'create_identity_session') {
+          stored.set(digest, session(digest))
+          return Promise.resolve({
+            data: { status: 'created', session: stored.get(digest) },
+            error: null,
+          })
+        }
+        if (_name === 'read_identity_session') {
+          return Promise.resolve({
+            data: stored.has(digest)
+              ? { status: 'active', session: stored.get(digest) }
+              : { status: 'unknown' },
+            error: null,
+          })
+        }
+        stored.delete(digest)
+        return Promise.resolve({ data: { status: 'revoked' }, error: null })
+      }),
+    }
+    const store = new AcademyPostgresIdentitySessionStore(db)
+    const created = await store.create(claims)
+    const digest = storedSessionId(created.id)
+
+    expect([...stored.keys()]).toEqual([digest])
+    expect(created.id).not.toBe(digest)
+    await expect(store.get(created.id)).resolves.toMatchObject({ subject: claims.subject })
+    await expect(store.get(digest)).resolves.toBeNull()
+    await store.revoke(created.id)
+    await expect(store.get(created.id)).resolves.toBeNull()
+    const sentIdentifiers = db.rpc.mock.calls.map(([, parameters]) => parameters.p_session_id)
+    expect(sentIdentifiers).not.toContain(created.id)
+    expect(sentIdentifiers.filter((_, index) => index !== 2)).toEqual(
+      new Array(4).fill(digest),
+    )
+    expect(sentIdentifiers[2]).not.toBe(digest)
+    expect(JSON.stringify(db.rpc.mock.calls)).not.toContain(created.id)
   })
 
   it.each([
@@ -189,7 +237,7 @@ describe('AcademyPostgresIdentitySessionStore', () => {
 
   it('reads exact claims and treats unknown or expired sessions as absent', async () => {
     const db = client([
-      { data: { status: 'active', session: session() }, error: null },
+      { data: { status: 'active', session: session(storedSessionId('A'.repeat(43))) }, error: null },
       { data: { status: 'expired' }, error: null },
       { data: { status: 'unknown' }, error: null },
     ])
@@ -233,7 +281,7 @@ describe('AcademyPostgresIdentitySessionStore', () => {
     const ids = db.rpc.mock.calls.map(([, parameters]) => parameters.p_session_id)
     expect(ids).toHaveLength(2)
     expect(ids[0]).not.toBe(ids[1])
-    expect(created.id).toBe(ids[1])
+    expect(created.id).not.toBe(ids[1])
 
     const duplicates = client([
       { data: { status: 'duplicate' }, error: null },
@@ -247,15 +295,15 @@ describe('AcademyPostgresIdentitySessionStore', () => {
     const stableId = 'I'.repeat(43)
     const exact = client([
       { data: { status: 'duplicate' }, error: null },
-      { data: { status: 'active', session: session(stableId) }, error: null },
+      { data: { status: 'active', session: session(storedSessionId(stableId)) }, error: null },
     ])
     await expect(new AcademyPostgresIdentitySessionStore(exact).create(claims, stableId))
       .resolves.toMatchObject({ id: stableId, claims })
     expect(exact.rpc).toHaveBeenNthCalledWith(1, 'create_identity_session', expect.objectContaining({
-      p_session_id: stableId,
+      p_session_id: storedSessionId(stableId),
     }))
     expect(exact.rpc).toHaveBeenNthCalledWith(2, 'read_identity_session', {
-      p_session_id: stableId,
+      p_session_id: storedSessionId(stableId),
     })
 
     const mismatch = client([
@@ -263,7 +311,10 @@ describe('AcademyPostgresIdentitySessionStore', () => {
       {
         data: {
           status: 'active',
-          session: session(stableId, { subjectKey: encodeSubjectKey('other-principal') }),
+          session: session(
+            storedSessionId(stableId),
+            { subjectKey: encodeSubjectKey('other-principal') },
+          ),
         },
         error: null,
       },
