@@ -1,0 +1,6 @@
+nice: setpriority: Operation not permitted
+
+> academy-web@0.1.0 asset-guard
+> node scripts/check-open-next-assets.mjs
+
+Asset guard could not inspect /private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-HEzwZk/checkout/academy-web/.open-next/assets: ENOENT: no such file or directory, scandir '/private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-HEzwZk/checkout/academy-web/.open-next/assets'

@@ -1,0 +1,31 @@
+nice: setpriority: Operation not permitted
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: 'academy-web@0.1.0',
+npm warn EBADENGINE   required: { node: '24.x' },
+npm warn EBADENGINE   current: { node: 'v25.5.0', npm: '11.12.0' }
+npm warn EBADENGINE }
+npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+npm warn deprecated glob@9.3.5: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+
+added 715 packages in 14s
+
+209 packages are looking for funding
+  run `npm fund` for details
+
+ RUN  v3.2.7 /private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-HEzwZk/checkout/academy-web
+
+ ✓ |unit| tests/unit/course-content.test.ts (14 tests) 47ms
+ ✓ |unit| tests/unit/identity-security-admission.test.ts (9 tests) 112ms
+ ✓ |unit| tests/unit/security-wiring.test.ts (36 tests) 7ms
+ ✓ |unit| tests/unit/security-boundaries.test.ts (13 tests) 12ms
+ ✓ |unit| tests/unit/content-registry.test.ts (5 tests) 268ms
+ ✓ |unit| tests/unit/security-headers.test.ts (3 tests) 4ms
+ ✓ |unit| tests/unit/edge-response-security-headers.test.ts (2 tests) 5ms
+ ✓ |unit| tests/unit/content-url-security.test.ts (2 tests) 6ms
+ ✓ |unit| tests/unit/static-asset-boundary.test.ts (2 tests) 2ms
+
+ Test Files  9 passed (9)
+      Tests  86 passed (86)
+   Start at  21:32:19
+   Duration  3.64s (transform 629ms, setup 0ms, collect 1.76s, tests 462ms, environment 1ms, prepare 344ms)
+

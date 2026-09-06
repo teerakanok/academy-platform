@@ -7,6 +7,7 @@ import {
   withEdgeRateLimitMarker,
   type EdgeRateLimitRule,
 } from './edge-rate-limit-policy'
+import { withEdgeSecurityHeaders } from './edge-security-headers'
 import { readBoundedJson } from './http/bounded-body'
 
 interface EdgeRateLimitDecision {
@@ -90,24 +91,27 @@ export async function enforceEdgeRateLimit(
 }
 
 function unavailableResponse(): Response {
-  return new Response('ระบบยังไม่พร้อมใช้งานชั่วคราว', {
+  return withEdgeSecurityHeaders(new Response('ระบบยังไม่พร้อมใช้งานชั่วคราว', {
     status: 503,
     headers: { 'cache-control': 'no-store' },
-  })
+  }))
 }
 
 function limitedResponse(retryAfterSeconds: number): Response {
-  return new Response('ส่งคำขอถี่เกินไป โปรดลองใหม่ในอีกสักครู่', {
+  return withEdgeSecurityHeaders(new Response('ส่งคำขอถี่เกินไป โปรดลองใหม่ในอีกสักครู่', {
     status: 429,
     headers: {
       'cache-control': 'no-store',
       'retry-after': String(retryAfterSeconds),
     },
-  })
+  }))
 }
 
 function invalidRouteResponse(): Response {
-  return new Response(null, { status: 404, headers: { 'cache-control': 'no-store' } })
+  return withEdgeSecurityHeaders(new Response(null, {
+    status: 404,
+    headers: { 'cache-control': 'no-store' },
+  }))
 }
 
 async function inspectTarget(request: Request, rule: EdgeRateLimitRule): Promise<string | null> {

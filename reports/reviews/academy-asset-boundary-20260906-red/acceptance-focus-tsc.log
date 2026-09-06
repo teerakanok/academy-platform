@@ -1,0 +1,161 @@
+nice: setpriority: Operation not permitted
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: 'academy-web@0.1.0',
+npm warn EBADENGINE   required: { node: '24.x' },
+npm warn EBADENGINE   current: { node: 'v25.5.0', npm: '11.12.0' }
+npm warn EBADENGINE }
+npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+npm warn deprecated glob@9.3.5: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+
+added 715 packages in 13s
+
+209 packages are looking for funding
+  run `npm fund` for details
+
+ RUN  v3.2.7 /private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-HEzwZk/checkout/academy-web
+
+ ✓ |unit| tests/unit/course-content.test.ts (14 tests) 46ms
+ ✓ |unit| tests/unit/identity-security-admission.test.ts (9 tests) 107ms
+ ✓ |unit| tests/unit/security-wiring.test.ts (36 tests) 11ms
+ ✓ |unit| tests/unit/security-boundaries.test.ts (13 tests) 13ms
+ ✓ |unit| tests/unit/content-registry.test.ts (5 tests) 261ms
+ ✓ |unit| tests/unit/security-headers.test.ts (3 tests) 4ms
+ ❯ |unit| tests/unit/edge-response-security-headers.test.ts (2 tests | 2 failed) 13ms
+   × Worker-generated response security headers > applies the existing Next.js baseline to host refusals 9ms
+     → expected { 'cache-control': 'no-store', …(7) } to match object { …(7) }
+(8 matching properties omitted from actual)
+   × Worker-generated response security headers > applies the baseline to protected-media refusal and error responses 3ms
+     → expected { …(7) } to match object { …(7) }
+(7 matching properties omitted from actual)
+ ❯ |unit| tests/unit/content-url-security.test.ts (2 tests | 2 failed) 9ms
+   × Academy content URL boundary > rejects executable and protocol-relative content URLs 5ms
+     → [
+  {
+    "code": "custom",
+    "path": [
+      "src"
+    ],
+    "message": "Invalid input"
+  }
+]
+   × Academy content URL boundary > preserves supported same-origin and HTTPS content URLs 3ms
+     → expected undefined to be true // Object.is equality
+ ✓ |unit| tests/unit/static-asset-boundary.test.ts (2 tests) 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| tests/unit/content-url-security.test.ts > Academy content URL boundary > rejects executable and protocol-relative content URLs
+ZodError: [
+  {
+    "code": "custom",
+    "path": [
+      "src"
+    ],
+    "message": "Invalid input"
+  }
+]
+ ❯ loadCourseCopySchemaForTest src/lib/content/course-loader.ts:282:22
+    280| /** ทางเข้าให้ test ตรวจ schema ของบล็อกเดี่ยวได้ โดยไม่ต้องประกอบทั้ง…
+    281| export function loadCourseCopySchemaForTest(block: unknown) {
+    282|   return blockSchema.parse(block)
+       |                      ^
+    283| }
+    284| 
+ ❯ tests/unit/content-url-security.test.ts:14:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  |unit| tests/unit/content-url-security.test.ts > Academy content URL boundary > preserves supported same-origin and HTTPS content URLs
+AssertionError: expected undefined to be true // Object.is equality
+
+- Expected: 
+true
+
++ Received: 
+undefined
+
+ ❯ tests/unit/content-url-security.test.ts:39:27
+     37|     })
+     38| 
+     39|     expect(image.success).toBe(true)
+       |                           ^
+     40|     expect(attachment.success).toBe(true)
+     41|     expect(externalLink.success).toBe(true)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  |unit| tests/unit/edge-response-security-headers.test.ts > Worker-generated response security headers > applies the existing Next.js baseline to host refusals
+AssertionError: expected { 'cache-control': 'no-store', …(7) } to match object { …(7) }
+(8 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "Content-Security-Policy": "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob:; connect-src 'self'; worker-src 'self' blob:; frame-src 'none'; manifest-src 'self'",
+-   "Permissions-Policy": "camera=(), geolocation=(), microphone=(), payment=(), usb=()",
+-   "Referrer-Policy": "strict-origin-when-cross-origin",
+-   "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+-   "X-Content-Type-Options": "nosniff",
+-   "X-DNS-Prefetch-Control": "off",
+-   "X-Frame-Options": "DENY",
++   "cache-control": "no-store",
++   "content-security-policy": "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob:; connect-src 'self'; worker-src 'self' blob:; frame-src 'none'; manifest-src 'self'",
++   "permissions-policy": "camera=(), geolocation=(), microphone=(), payment=(), usb=()",
++   "referrer-policy": "strict-origin-when-cross-origin",
++   "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
++   "x-content-type-options": "nosniff",
++   "x-dns-prefetch-control": "off",
++   "x-frame-options": "DENY",
+  }
+
+ ❯ tests/unit/edge-response-security-headers.test.ts:34:50
+     32|     const response = unservedHostResponse()
+     33| 
+     34|     expect(Object.fromEntries(response.headers)).toMatchObject(EXPECTE…
+       |                                                  ^
+     35|     expect(response.headers.get('cache-control')).toBe('no-store')
+     36|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  |unit| tests/unit/edge-response-security-headers.test.ts > Worker-generated response security headers > applies the baseline to protected-media refusal and error responses
+AssertionError: expected { …(7) } to match object { …(7) }
+(7 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "Content-Security-Policy": "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob:; connect-src 'self'; worker-src 'self' blob:; frame-src 'none'; manifest-src 'self'",
+-   "Permissions-Policy": "camera=(), geolocation=(), microphone=(), payment=(), usb=()",
+-   "Referrer-Policy": "strict-origin-when-cross-origin",
+-   "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+-   "X-Content-Type-Options": "nosniff",
+-   "X-DNS-Prefetch-Control": "off",
+-   "X-Frame-Options": "DENY",
++   "content-security-policy": "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob:; connect-src 'self'; worker-src 'self' blob:; frame-src 'none'; manifest-src 'self'",
++   "permissions-policy": "camera=(), geolocation=(), microphone=(), payment=(), usb=()",
++   "referrer-policy": "strict-origin-when-cross-origin",
++   "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
++   "x-content-type-options": "nosniff",
++   "x-dns-prefetch-control": "off",
++   "x-frame-options": "DENY",
+  }
+
+ ❯ tests/unit/edge-response-security-headers.test.ts:49:68
+     47|     expect(unconfigured?.status).toBe(503)
+     48|     for (const response of [legacy, unconfigured]) {
+     49|       expect(response ? Object.fromEntries(response.headers) : {}).toM…
+       |                                                                    ^
+     50|     }
+     51|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  2 failed | 7 passed (9)
+      Tests  4 failed | 82 passed (86)
+   Start at  21:26:27
+   Duration  3.59s (transform 687ms, setup 0ms, collect 1.76s, tests 464ms, environment 1ms, prepare 331ms)
+

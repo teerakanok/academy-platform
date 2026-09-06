@@ -1,0 +1,42 @@
+
+ RUN  v3.2.7 /private/tmp/academy-content-security-cde63a58/academy-web
+
+ ❯ |unit| tests/unit/static-asset-boundary.test.ts (5 tests | 3 failed) 172ms
+   ✓ deployed static-asset boundary > applies the Next.js security-header baseline to static assets 1ms
+   ✓ deployed static-asset boundary > runs the protected-media path through the Worker and wires the final-asset gate 0ms
+   × final asset filesystem guard > refuses a safe-named file symlink instead of hiding protected media 61ms
+     → expected +0 to be 1 // Object.is equality
+   × final asset filesystem guard > refuses a safe-named directory symlink instead of hiding protected media 54ms
+     → expected +0 to be 1 // Object.is equality
+   × final asset filesystem guard > refuses a safe-named cycle symlink instead of hiding protected media 55ms
+     → expected +0 to be 1 // Object.is equality
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 2 passed (5)
+   Start at  22:35:13
+   Duration  390ms (transform 23ms, setup 0ms, collect 20ms, tests 172ms, environment 0ms, prepare 53ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| tests/unit/static-asset-boundary.test.ts > final asset filesystem guard > refuses a safe-named file symlink instead of hiding protected media
+ FAIL  |unit| tests/unit/static-asset-boundary.test.ts > final asset filesystem guard > refuses a safe-named directory symlink instead of hiding protected media
+ FAIL  |unit| tests/unit/static-asset-boundary.test.ts > final asset filesystem guard > refuses a safe-named cycle symlink instead of hiding protected media
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/unit/static-asset-boundary.test.ts:49:29
+     47|       symlinkSync(target, path.join(assets, 'innocent-name'))
+     48|       const result = spawnSync(process.execPath, [path.resolve('script…
+     49|       expect(result.status).toBe(1)
+       |                             ^
+     50|       expect(result.stderr).toMatch(/symlink/i)
+     51|     } finally {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+

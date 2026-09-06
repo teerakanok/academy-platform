@@ -1,0 +1,7 @@
+nice: setpriority: Operation not permitted
+
+> academy-web@0.1.0 asset-guard
+> node scripts/check-open-next-assets.mjs
+
+Protected media payloads found in .open-next/assets:
+- .open-next/assets/protected.mp4

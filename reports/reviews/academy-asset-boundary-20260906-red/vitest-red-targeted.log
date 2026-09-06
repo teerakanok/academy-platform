@@ -1,0 +1,189 @@
+nice: setpriority: Operation not permitted
+
+ RUN  v3.2.7 /private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-HEzwZk/checkout/academy-web
+
+ ✓ |unit| tests/unit/content-registry.test.ts (5 tests) 171ms
+ ✓ |unit| tests/unit/identity-security-admission.test.ts (9 tests) 115ms
+ ✓ |unit| tests/unit/course-content.test.ts (14 tests) 47ms
+ ✓ |unit| tests/unit/security-boundaries.test.ts (13 tests) 12ms
+ ✓ |unit| tests/unit/security-wiring.test.ts (36 tests) 7ms
+ ✓ |unit| tests/unit/security-headers.test.ts (3 tests) 4ms
+ ❯ |unit| tests/unit/edge-response-security-headers.test.ts (2 tests | 2 failed) 12ms
+   × Worker-generated response security headers > applies the existing Next.js baseline to host refusals 9ms
+     → expected { 'cache-control': 'no-store' } to match object { …(7) }
+(1 matching property omitted from actual)
+   × Worker-generated response security headers > applies the baseline to protected-media refusal and error responses 2ms
+     → expected undefined to be 404 // Object.is equality
+ ❯ |unit| tests/unit/content-url-security.test.ts (2 tests | 2 failed) 7ms
+   × Academy content URL boundary > rejects executable and protocol-relative content URLs 6ms
+     → javascript:alert(1): expected undefined to be false // Object.is equality
+   × Academy content URL boundary > preserves supported same-origin and HTTPS content URLs 1ms
+     → expected undefined to be true // Object.is equality
+ ❯ |unit| tests/unit/static-asset-boundary.test.ts (2 tests | 2 failed) 11ms
+   × deployed static-asset boundary > applies the Next.js security-header baseline to static assets 5ms
+     → ENOENT: no such file or directory, open 'public/_headers'
+   × deployed static-asset boundary > runs the protected-media path through the Worker and wires the final-asset gate 6ms
+     → expected '{\n  "$schema": "node_modules/wrangle…' to contain '"run_worker_first": ["/media/*"]'
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| tests/unit/content-url-security.test.ts > Academy content URL boundary > rejects executable and protocol-relative content URLs
+AssertionError: javascript:alert(1): expected undefined to be false // Object.is equality
+
+- Expected: 
+false
+
++ Received: 
+undefined
+
+ ❯ tests/unit/content-url-security.test.ts:18:35
+     16|       const externalLink = loadCourseCopySchemaForTest({ kind: 'extern…
+     17| 
+     18|       expect(image.success, href).toBe(false)
+       |                                   ^
+     19|       expect(attachment.success, href).toBe(false)
+     20|       expect(externalLink.success, href).toBe(false)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  |unit| tests/unit/content-url-security.test.ts > Academy content URL boundary > preserves supported same-origin and HTTPS content URLs
+AssertionError: expected undefined to be true // Object.is equality
+
+- Expected: 
+true
+
++ Received: 
+undefined
+
+ ❯ tests/unit/content-url-security.test.ts:39:27
+     37|     })
+     38| 
+     39|     expect(image.success).toBe(true)
+       |                           ^
+     40|     expect(attachment.success).toBe(true)
+     41|     expect(externalLink.success).toBe(true)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  |unit| tests/unit/edge-response-security-headers.test.ts > Worker-generated response security headers > applies the existing Next.js baseline to host refusals
+AssertionError: expected { 'cache-control': 'no-store' } to match object { …(7) }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "Content-Security-Policy": "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob:; connect-src 'self'; worker-src 'self' blob:; frame-src 'none'; manifest-src 'self'",
+-   "Permissions-Policy": "camera=(), geolocation=(), microphone=(), payment=(), usb=()",
+-   "Referrer-Policy": "strict-origin-when-cross-origin",
+-   "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+-   "X-Content-Type-Options": "nosniff",
+-   "X-DNS-Prefetch-Control": "off",
+-   "X-Frame-Options": "DENY",
++   "cache-control": "no-store",
+  }
+
+ ❯ tests/unit/edge-response-security-headers.test.ts:34:50
+     32|     const response = unservedHostResponse()
+     33| 
+     34|     expect(Object.fromEntries(response.headers)).toMatchObject(EXPECTE…
+       |                                                  ^
+     35|     expect(response.headers.get('cache-control')).toBe('no-store')
+     36|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  |unit| tests/unit/edge-response-security-headers.test.ts > Worker-generated response security headers > applies the baseline to protected-media refusal and error responses
+AssertionError: expected undefined to be 404 // Object.is equality
+
+- Expected: 
+404
+
++ Received: 
+undefined
+
+ ❯ tests/unit/edge-response-security-headers.test.ts:46:28
+     44|     ])
+     45| 
+     46|     expect(legacy?.status).toBe(404)
+       |                            ^
+     47|     expect(unconfigured?.status).toBe(503)
+     48|     for (const response of [legacy, unconfigured]) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  |unit| tests/unit/static-asset-boundary.test.ts > deployed static-asset boundary > applies the Next.js security-header baseline to static assets
+Error: ENOENT: no such file or directory, open 'public/_headers'
+ ❯ tests/unit/static-asset-boundary.test.ts:6:21
+      4| describe('deployed static-asset boundary', () => {
+      5|   it('applies the Next.js security-header baseline to static assets', …
+      6|     const headers = readFileSync('public/_headers', 'utf8')
+       |                     ^
+      7| 
+      8|     for (const value of [
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  |unit| tests/unit/static-asset-boundary.test.ts > deployed static-asset boundary > runs the protected-media path through the Worker and wires the final-asset gate
+AssertionError: expected '{\n  "$schema": "node_modules/wrangle…' to contain '"run_worker_first": ["/media/*"]'
+
+- Expected
++ Received
+
+- "run_worker_first": ["/media/*"]
++ {
++   "$schema": "node_modules/wrangler/config-schema.json",
++   // entry ของหน้าร้าน Academy; retention scheduler มี Worker/credential แยกต่างหาก
++   "main": "worker.ts",
++   "name": "cyberskills-academy",
++   "minify": true,
++   "compatibility_date": "2025-03-25",
++   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
++   // ครอบ observed 480 ms outlier แต่ยังต่ำกว่า Paid default 30 s ถึง 60 เท่า
++   "limits": { "cpu_ms": 500 },
++   // Lifecycle remains disabled until Identity Control publishes the exact private
++   // endpoint/audience/key set and the founder releases the runtime values.
++   "triggers": { "crons": ["*/5 * * * *"] },
++   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
++   "durable_objects": {
++     "bindings": [{ "name": "EDGE_RATE_LIMITER", "class_name": "EdgeRateLimiter" }]
++   },
++   "migrations": [{ "tag": "v1-edge-rate-limiter", "new_sqlite_classes": ["EdgeRateLimiter"] }],
++   // Private lesson media only. Never place MP4/VTT/PDF files under ASSETS.
++   "r2_buckets": [
++     { "binding": "COURSE_MEDIA", "bucket_name": "cyberskills-academy-media" }
++   ],
++   "observability": {
++     "enabled": true,
++     "logs": {
++       "enabled": true,
++       "head_sampling_rate": 0.1,
++       "invocation_logs": true
++     },
++     "traces": { "enabled": false }
++   },
++   "vars": {
++     // preview: ยังไม่เปิดให้ค้นเจอ และยังไม่เปิดระบบบัญชี
++     // (ไม่มี NEXT_PUBLIC_SUPABASE_* = หน้า sign-in จะบอกตรงๆ ว่ายังไม่เปิด
++     //  แทนที่จะโชว์ฟอร์มที่กดแล้ว error)
++     "NEXT_PUBLIC_SEARCH_INDEXING": "off"
++   }
++ }
++
+
+ ❯ tests/unit/static-asset-boundary.test.ts:28:22
+     26|     }
+     27| 
+     28|     expect(wrangler).toContain('"run_worker_first": ["/media/*"]')
+       |                      ^
+     29|     expect(packageJson.scripts['build:cf']).toContain('asset-guard')
+     30|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  3 failed | 6 passed (9)
+      Tests  6 failed | 80 passed (86)
+   Start at  21:20:37
+   Duration  3.61s (transform 626ms, setup 0ms, collect 1.78s, tests 386ms, environment 1ms, prepare 356ms)
+

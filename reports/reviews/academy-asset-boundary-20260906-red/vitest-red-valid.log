@@ -1,0 +1,16 @@
+nice: setpriority: Operation not permitted
+
+ RUN  v3.2.7 /private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-HEzwZk/checkout/academy-web
+
+ ✓ |unit| tests/unit/content-registry.test.ts (5 tests) 165ms
+ ✓ |unit| tests/unit/identity-security-admission.test.ts (9 tests) 121ms
+ ✓ |unit| tests/unit/course-content.test.ts (14 tests) 43ms
+ ✓ |unit| tests/unit/security-boundaries.test.ts (13 tests) 11ms
+ ✓ |unit| tests/unit/security-wiring.test.ts (36 tests) 7ms
+ ✓ |unit| tests/unit/security-headers.test.ts (3 tests) 4ms
+
+ Test Files  6 passed (6)
+      Tests  80 passed (80)
+   Start at  21:19:09
+   Duration  4.15s (transform 591ms, setup 0ms, collect 1.65s, tests 352ms, environment 1ms, prepare 226ms)
+

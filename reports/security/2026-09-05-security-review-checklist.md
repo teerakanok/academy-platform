@@ -432,9 +432,9 @@ Frozen tree: `/private/tmp/secrev-academy` (HEAD `02c712e`, read-only). Inputs: 
 | SEC-ACADEMY-009 | Credential storage | digest session id ก่อนทุก RPC; migrate โดย expire แถวเดิม | OPEN | 2026-09-05 | ทั้งหมด |
 | SEC-ACADEMY-010 | Bearer binding | ผูก grant กับ session/account; Worker เทียบกับ `academy_session`; log account id | OPEN | 2026-09-05 | ทั้งหมด |
 | SEC-ACADEMY-011 | Cookie scope | `__Host-`/`__Secure-` prefix สำหรับ session และ binding cookie; อัปเดต parser/fixture | OPEN | 2026-09-05 | ทั้งหมด |
-| SEC-ACADEMY-012 | Content XSS | scheme allowlist `.refine()` บน image.src/attachment.href/externalLink.href; content-gate test | OPEN | 2026-09-05 | ทั้งหมด |
+| SEC-ACADEMY-012 | Content XSS | scheme allowlist `.refine()` บน image.src/attachment.href/externalLink.href; content-gate test | LOCAL ACCEPTED — PROD OPEN | 2026-09-06 | unit2420, build:cf+actual final assets pass; independent PASS; deployment pending |
 | SEC-ACADEMY-013 | Security headers (CSP) | nonce + `'strict-dynamic'`, hash theme script, test assert no `'unsafe-inline'` ใน script-src | OPEN | 2026-09-05 | ทั้งหมด |
-| SEC-ACADEMY-014 | Static asset hardening | `public/_headers`; build gate ห้าม mp4/vtt/pdf/zip ใน `.open-next/assets`; headers บน worker-generated responses | OPEN | 2026-09-05 | ทั้งหมด |
+| SEC-ACADEMY-014 | Static asset hardening | `public/_headers`; build gate ห้าม mp4/vtt/pdf/zip ใน `.open-next/assets`; headers บน worker-generated responses | LOCAL ACCEPTED — PROD OPEN | 2026-09-06 | unit2420, build:cf+actual final assets pass; independent PASS; deployment pending |
 | SEC-ACADEMY-015 | Consent integrity | double opt-in; withdrawn = no-op จนกว่ายืนยัน; Turnstile | OPEN | 2026-09-05 | ทั้งหมด (email sending ยังปิด) |
 | SEC-ACADEMY-016 | Least privilege (DB role) | migration 0030 revokes direct `course_entitlement`/`service_activation` writes, removes dead runtime helpers, and preserves callback/session + lifecycle activation RPCs | LOCAL VERIFIED — PENDING PRODUCTION | 2026-09-06 | PostgreSQL role/race/retention fixtures and independent review passed; production transactional dry-run/apply + privilege verification remain |
 | SEC-ACADEMY-017 | Authenticated quota | per-account/per-course quota ใน DO policy สำหรับ progress/reset/practice | OPEN | 2026-09-05 | ทั้งหมด |

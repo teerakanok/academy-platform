@@ -1,0 +1,5 @@
+
+> academy-web@0.1.0 asset-guard
+> node scripts/check-open-next-assets.mjs
+
+Asset guard passed: no mp4/vtt/pdf/zip payloads in .open-next/assets

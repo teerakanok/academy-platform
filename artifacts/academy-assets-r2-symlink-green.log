@@ -1,0 +1,10 @@
+
+ RUN  v3.2.7 /private/tmp/academy-content-security-cde63a58/academy-web
+
+ ✓ |unit| tests/unit/static-asset-boundary.test.ts (5 tests) 164ms
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  22:35:45
+   Duration  366ms (transform 21ms, setup 0ms, collect 20ms, tests 164ms, environment 0ms, prepare 43ms)
+

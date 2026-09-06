@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { ContentValidationError } from './loader'
 import type { CourseCopy, CourseStructure, LessonContent } from './course-types'
+import { isSafeContentUrl, isSafeExternalContentUrl } from './content-url-policy'
 import { placeholdersIn } from '@/lib/simulation/variables'
 import { SIMULATION_SURFACE_INPUT_FIELDS } from '@/lib/simulation/types'
 
@@ -316,7 +317,7 @@ const blockSchema = z.discriminatedUnion('kind', [
   }),
   z.object({
     kind: z.literal('image'),
-    src: z.string().min(1),
+    src: z.string().min(1).refine(isSafeContentUrl),
     // alt บังคับ ไม่ใช่ทางเลือก — ภาพที่อธิบายตัวเองไม่ได้คือเนื้อหาที่หายไป
     // สำหรับคนที่ใช้ screen reader
     alt: z.string().min(1),
@@ -326,7 +327,7 @@ const blockSchema = z.discriminatedUnion('kind', [
     kind: z.literal('attachment'),
     title: z.string().min(1),
     description: z.string().optional(),
-    href: z.string().min(1),
+    href: z.string().min(1).refine(isSafeContentUrl),
     fileType: z.enum(['pdf', 'zip', 'other']),
     sizeLabel: z.string().optional(),
   }),
@@ -334,7 +335,7 @@ const blockSchema = z.discriminatedUnion('kind', [
     kind: z.literal('externalLink'),
     title: z.string().min(1),
     description: z.string().optional(),
-    href: z.string().url(),
+    href: z.string().url().refine(isSafeExternalContentUrl),
     // ต้องบอกว่าเป็นของใคร ไม่งั้นผู้เรียนไม่รู้ว่ากำลังจะออกไปไหน
     sourceLabel: z.string().min(1),
   }),
