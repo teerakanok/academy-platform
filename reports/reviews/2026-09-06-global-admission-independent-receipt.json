@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "ok": true,
+  "run_id": "run-7b349ed5711cbceebf9d109acf8e6773",
+  "mode": "review",
+  "contract": "ril",
+  "result_contract": "implementation-ril",
+  "provider": "zai",
+  "worker": "glm",
+  "model": "glm-5.3-flash",
+  "reasoning_effort": "max",
+  "provider_call_evidence": {
+    "model": {
+      "value": "glm-5.3-flash",
+      "provenance": "adapter_bound_requested"
+    },
+    "effort": {
+      "value": "max",
+      "provenance": "adapter_bound_requested"
+    },
+    "usage": {
+      "tokens_used": null,
+      "source": "not_reported"
+    },
+    "status": {
+      "path": "/private/tmp/cyberskills-prod-cde63a58/records/academy-global-review-efd457b/results/run-7b349ed5711cbceebf9d109acf8e6773/status-evidence.json",
+      "sha256": "823d4f005c7266203f0fd688dbab526085e72e125e3cf077b200d0fb5909778b"
+    }
+  },
+  "attempts": 1,
+  "work_order_sha256": "e79d68c4546a2fa5194a74e50a951c9c613eded0bfb86f1f4eb1981bc87c5110",
+  "work_order_metadata": {
+    "schema": "model-team.ril.v1",
+    "work_kind": "bounded_code",
+    "role": "implementation_reviewer",
+    "source_sha256": "29316cc66693b6bfb21bcb39feece0e06b9b9bf9a7f9fade714601f85091e556"
+  },
+  "attachments": [],
+  "execution_policy": {
+    "name": "repo-autonomy-v1",
+    "write_boundary": "read_only_frozen_source",
+    "search_root": null,
+    "verified_command_count": 0,
+    "acceptance_evidence": null
+  },
+  "repository_boundary": {
+    "kind": "benign"
+  },
+  "status_path": "/private/tmp/cyberskills-prod-cde63a58/records/academy-global-review-efd457b/results/locks/7ca23fbec37b5819423742b892dcc0a08c2ffab6c4639d7c82adbb98cf322ba7.status.json",
+  "review_required": false,
+  "provider_result_valid": true,
+  "provider_result_error": null,
+  "provider_result_normalization": null,
+  "result_sha256": "b8de36b6ed446ecfb4a24f68ae423482ca21c6df2fcef7e27f80925b0eef0851",
+  "result_path": "/private/tmp/cyberskills-prod-cde63a58/records/academy-global-review-efd457b/results/run-7b349ed5711cbceebf9d109acf8e6773/result.json",
+  "patch_path": null,
+  "receipt_path": "/private/tmp/cyberskills-prod-cde63a58/records/academy-global-review-efd457b/results/run-7b349ed5711cbceebf9d109acf8e6773/receipt.json",
+  "provider_changed_files": null,
+  "provider_changed_files_match": null,
+  "actual_changed_files": null,
+  "diff": null,
+  "created_at": "2026-09-05T20:04:41.340Z"
+}

@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   AcademyPostgresIdentityTransactionStore,
   IdentityPostgresTransactionStoreFailure,
+  IdentityTransactionCapacityError,
 } from '@/lib/identity/postgres-transaction-store'
 import {
   IdentityTransactionError,
@@ -123,6 +124,16 @@ describe('AcademyPostgresIdentityTransactionStore', () => {
     })
     expect(result).not.toBe(input)
     expect(result.client).not.toBe(input.client)
+  })
+
+  it('maps database capacity exhaustion to an opaque retryable admission refusal', async () => {
+    const { input } = fixture()
+    const store = new AcademyPostgresIdentityTransactionStore(rpcClient({
+      data: { status: 'capacity_exhausted' },
+      error: null,
+    }))
+
+    await expect(store.create(input)).rejects.toBeInstanceOf(IdentityTransactionCapacityError)
   })
 
   it('hashes the raw browser binding locally and returns a fresh consumed projection', async () => {
@@ -455,5 +466,19 @@ describe('AcademyPostgresIdentityTransactionStore', () => {
     expect(migration).toMatch(/status', 'completed'[\s\S]*sessionId/i)
     expect(migration).toMatch(/attempt_count <> 0[\s\S]*status', 'unknown'[\s\S]*delete from academy\.identity_authorization_transaction/i)
     expect(migration).not.toMatch(/grant (?:select|insert|update|delete)[\s\S]*identity_authorization_transaction/i)
+  })
+
+  it('requires an atomically shared database outstanding-authorization cap', () => {
+    const migration = readFileSync(
+      join(process.cwd(), 'supabase/migrations/0029_identity_authorization_admission_cap.sql'),
+      'utf8',
+    )
+
+    expect(migration).toMatch(/identity_authorization_admission_capacity/i)
+    expect(migration).toMatch(/pg_advisory_xact_lock/i)
+    expect(migration).toMatch(/capacity_exhausted/i)
+    expect(migration).toMatch(/expires_at > v_now/i)
+    expect(migration).toMatch(/revoke all on table academy\.identity_authorization_admission_capacity/i)
+    expect(migration).not.toMatch(/grant (?:select|insert|update|delete)[\s\S]*identity_authorization_admission_capacity/i)
   })
 })

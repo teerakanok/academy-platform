@@ -25,6 +25,23 @@ describe('edge rate-limit policy', () => {
     expect(edgeRateLimitRule(new Request('https://academy.cyberskills.co.th/api/progress', { method: 'POST' }))).toBeNull()
   })
 
+  it('protects each Identity entry method and path without path variants', () => {
+    const origin = 'https://academy.cyberskills.co.th'
+    expect(edgeRateLimitRule(new Request(`${origin}/api/auth/identity/start`))).toMatchObject({
+      operation: 'identity-start-get',
+    })
+    expect(edgeRateLimitRule(new Request(`${origin}/api/auth/identity/start`, { method: 'POST' }))).toMatchObject({
+      operation: 'identity-start-post',
+    })
+    expect(edgeRateLimitRule(new Request(`${origin}/auth/callback`))).toMatchObject({
+      operation: 'identity-callback-get',
+    })
+    expect(edgeRateLimitRule(new Request(`${origin}/api/auth/identity/start`, { method: 'PUT' }))).toBeNull()
+    expect(edgeRateLimitRule(new Request(`${origin}/api/auth/identity/start/`))).toBeNull()
+    expect(edgeRateLimitRule(new Request(`${origin}/auth/callback/`))).toBeNull()
+    expect(edgeRateLimitRule(new Request(`${origin}/auth%2Fcallback`))).toBeNull()
+  })
+
   it('uses only Cloudflare-provided client IP at the edge', () => {
     expect(edgeClientAddress(new Request('https://academy.cyberskills.co.th', {
       headers: { 'cf-connecting-ip': '203.0.113.7', 'x-forwarded-for': '198.51.100.9' },

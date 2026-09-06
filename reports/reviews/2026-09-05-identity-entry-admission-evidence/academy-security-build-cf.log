@@ -1,0 +1,146 @@
+
+> academy-web@0.1.0 build:cf
+> npm run verify:workerd && NEXT_PUBLIC_SUPABASE_URL= NEXT_PUBLIC_SUPABASE_ANON_KEY= opennextjs-cloudflare build
+
+
+> academy-web@0.1.0 verify:workerd
+> node scripts/workerd-signer-check.mjs
+
+compatibility ตรงกับแอป: 2025-03-25 ["global_fetch_strictly_public","nodejs_compat"]
+(node:76889) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+PASS  runtime-is-workerd: Cloudflare-Workers
+PASS  cryptokey-introspection-shape: prototype type getter: absent; structuredClone: throws DataCloneError
+PASS  signs-and-verifies: 64-byte signature verifies against the public key
+PASS  signer-imports-non-extractable-sign-only: signer imported jwk/ECDSA P-256/extractable=false/["sign"], and workerd refuses to export such a key
+PASS  rejects-a-cryptokey: refused with the one fixed failure
+PASS  rejects-a-parsed-object: refused with the one fixed failure
+PASS  rejects-a-surplus-member: refused with the one fixed failure
+PASS  rejects-non-json: refused with the one fixed failure
+PASS  code-exchange-fetch-init-accepted-by-workerd: workerd accepted the production code exchange RequestInit
+PASS  result-verification-accepts-identity-shape-on-workerd: importer + verifier accepted a 60 s ES256 result of the Identity shape on workerd
+PASS  private-media-delivery-on-workerd-r2: R2 get with Headers range, 200 full body, 206 bytes 100-199/1000, tampered grant refused
+
+workerd: 11 checks ผ่านทั้งหมด
+
+┌─────────────────────────────┐
+│ OpenNext — Cloudflare build │
+└─────────────────────────────┘
+
+App directory: /private/tmp/academy-security-glm-cde63a58/academy-web
+Next.js version : 15.5.22
+@opennextjs/cloudflare version: 1.20.2
+@opennextjs/aws version: 4.1.0
+WARN workerd compatibility_date: 2025-03-25, consider updating your wrangler config to a more recent date to benefit from the latest features and fixes.
+
+┌─────────────────────────────────┐
+│ OpenNext — Building Next.js app │
+└─────────────────────────────────┘
+
+
+> academy-web@0.1.0 prebuild
+> node scripts/generate-content-registry.mjs
+
+เขียน src/lib/content/registry.generated.ts — 9 คอร์ส, 328 ไฟล์เนื้อหา, 3 เวอร์ชัน consent
+
+> academy-web@0.1.0 build
+> next build
+
+   ▲ Next.js 15.5.22
+
+   Creating an optimized production build ...
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (106kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (258kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+ ✓ Compiled successfully in 7.9s
+   Linting and checking validity of types ...
+
+./src/lib/content/registry.generated.ts
+4:1  Warning: Unused eslint-disable directive (no problems were reported).
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+   Collecting page data ...
+   Generating static pages (0/65) ...
+   Generating static pages (16/65) 
+   Generating static pages (32/65) 
+   Generating static pages (48/65) 
+ ✓ Generating static pages (65/65)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                       Size  First Load JS
+┌ ○ /                                          4.71 kB         111 kB
+├ ○ /_not-found                                  998 B         104 kB
+├ ƒ /access-required                           3.54 kB         109 kB
+├ ƒ /api/attempts                                186 B         103 kB
+├ ƒ /api/auth/identity/start                     186 B         103 kB
+├ ƒ /api/auth/me                                 186 B         103 kB
+├ ƒ /api/auth/otp                                186 B         103 kB
+├ ƒ /api/auth/sign-out                           186 B         103 kB
+├ ƒ /api/auth/verify                             186 B         103 kB
+├ ƒ /api/courses/[slug]/skill-map                186 B         103 kB
+├ ƒ /api/explanations                            186 B         103 kB
+├ ƒ /api/leads                                   186 B         103 kB
+├ ƒ /api/leads/unsubscribe                       186 B         103 kB
+├ ƒ /api/practice/simulation                     186 B         103 kB
+├ ƒ /api/progress                                186 B         103 kB
+├ ƒ /api/progress/reset                          186 B         103 kB
+├ ƒ /auth/callback                               186 B         103 kB
+├ ƒ /course-media/[assetId]                      186 B         103 kB
+├ ○ /courses                                   5.65 kB         114 kB
+├ ƒ /courses/[slug]                              186 B         103 kB
+├ ● /courses/[slug]/[locale]                   6.15 kB         118 kB
+├   ├ /courses/assembly/en
+├   ├ /courses/assembly/th
+├   ├ /courses/basic-os-linux/en
+├   └ [+13 more paths]
+├ ƒ /courses/[slug]/learn                      17.3 kB         126 kB
+├ ƒ /courses/[slug]/lessons/[nodeId]           23.9 kB         133 kB
+├ ● /courses/[slug]/opengraph-image              186 B         103 kB
+├   ├ /courses/assembly/opengraph-image
+├   ├ /courses/basic-os-linux/opengraph-image
+├   ├ /courses/c-low-level/opengraph-image
+├   └ [+5 more paths]
+├ ● /courses/[slug]/share/[locale]               186 B         103 kB
+├   ├ /courses/assembly/share/en
+├   ├ /courses/assembly/share/th
+├   ├ /courses/basic-os-linux/share/en
+├   └ [+13 more paths]
+├ ƒ /dashboard                                 7.87 kB         119 kB
+├ ƒ /player                                    2.33 kB         108 kB
+├ ƒ /player/exam/[id]                          4.99 kB         114 kB
+├ ƒ /player/module/[slug]                      1.93 kB         111 kB
+├ ○ /privacy                                   8.48 kB         114 kB
+├ ○ /robots.txt                                  186 B         103 kB
+├ ƒ /sign-in                                   1.52 kB         116 kB
+├ ○ /sitemap.xml                                 186 B         103 kB
+└ ƒ /unsubscribe                               7.37 kB         113 kB
++ First Load JS shared by all                   103 kB
+  ├ chunks/1255-31f47ebe9b12c7e5.js            46.3 kB
+  ├ chunks/4bd1b696-f785427dddbba9fb.js        54.2 kB
+  └ other shared chunks (total)                   2 kB
+
+
+ƒ Middleware                                   65.2 kB
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+
+
+┌──────────────────────────────┐
+│ OpenNext — Generating bundle │
+└──────────────────────────────┘
+
+(node:77536) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Bundling middleware function...
+Bundling static assets...
+Bundling cache assets...
+Building server function: default...
+Applying code patches: 2.886s
+# copyPackageTemplateFiles
+[35m⚙️ Bundling the OpenNext server...
+[0m
+[35mWorker saved in `.open-next/worker.js` 🚀
+[0m
+OpenNext build complete.

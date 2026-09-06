@@ -8,11 +8,16 @@ Academy protects these public mutations before OpenNext runs:
 | `POST /api/leads/unsubscribe` | 10 requests / 60 seconds / actor |
 | `POST /api/auth/otp` | 10 requests / 60 seconds / actor |
 | `POST /api/auth/verify` | 10 requests / 60 seconds / actor |
+| `GET /api/auth/identity/start` | 10 requests / 60 seconds / actor |
+| `POST /api/auth/identity/start` | 10 requests / 60 seconds / actor |
+| `GET /auth/callback` | 10 requests / 60 seconds / actor |
 
 The outer Worker uses `cf-connecting-ip`, never client-supplied `X-Forwarded-For`.
 It derives an HMAC-based Durable Object name from the actor and route. The object
 stores only a fixed-window count and expiry, then clears its storage by alarm.
 It does not persist an IP address, email address, token, or request body.
+Identity routes verify the resulting signed marker inside OpenNext before any
+authorization transaction or code exchange; missing or forged markers fail closed.
 
 This is intentionally a Durable Object per opaque actor-route pair, not a single
 global limiter. The counter remains consistent across Academy Worker instances

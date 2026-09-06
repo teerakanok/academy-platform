@@ -1,0 +1,54 @@
+{
+  "container": "academy-identity-lifecycle-75224-07fd8d21",
+  "owner": "07fd8d21-ec0d-41e7-802d-2ab729d34da0",
+  "production": false,
+  "migrations": [
+    "0001_academy_schema.sql",
+    "0002_accounts_and_progress.sql",
+    "0003_record_node_progress.sql",
+    "0004_activation_and_entitlement.sql",
+    "0005_attempt.sql",
+    "0006_simulation_evidence.sql",
+    "0007_evidence_never_regresses.sql",
+    "0008_passing_attempt.sql",
+    "0009_attempt_finalize.sql",
+    "0010_reuse_active_attempt.sql",
+    "0011_attempt_retention.sql",
+    "0012_attempt_integrity_fixes.sql",
+    "0013_integrity_batch.sql",
+    "0014_simulation_readiness.sql",
+    "0015_idempotent_progress_reset.sql",
+    "0016_consent_events_v2.sql",
+    "0017_privacy_retention_and_appeals.sql",
+    "0018_staff_authorization.sql",
+    "0019_dedicated_runtime_api.sql",
+    "0020_dedicated_retention_api.sql",
+    "0021_unlink_email_derived_lead_ownership.sql",
+    "0022_identity_lifecycle_projection.sql",
+    "0023_identity_lifecycle_pull_lease.sql",
+    "0024_identity_profile_activation.sql",
+    "0025_identity_authorization_transaction.sql",
+    "0026_identity_lifecycle_principal_contract.sql",
+    "0027_identity_session_store.sql",
+    "0028_identity_authorization_completion_lease.sql"
+  ],
+  "checks": [
+    {
+      "label": "bootstrap-rollback",
+      "exit": 0
+    },
+    {
+      "label": "bootstrap-commit",
+      "exit": 0
+    }
+  ],
+  "image": {
+    "imageId": "sha256:aadf2c0696f5ef357aa7a68da995137f0cf17bad0bf6e1f17de06ae5c769b302",
+    "repoDigest": "postgres@sha256:aadf2c0696f5ef357aa7a68da995137f0cf17bad0bf6e1f17de06ae5c769b302",
+    "architecture": "arm64"
+  },
+  "baseline_red_exit": 1,
+  "test_exit": 0,
+  "test_error": null,
+  "cleanup_verified": true
+}

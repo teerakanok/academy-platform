@@ -1,0 +1,60 @@
+{
+  "verdict": "PASS",
+  "checkpoint": "independent code review; local release candidate only",
+  "reviewer": "director, independent of GLM and Sol authors",
+  "scope_sha256": "2346a352a77833e68a3ca75316936648192adf4b3d4a62ad27324f0475466df7",
+  "files": [
+    {
+      "path": "academy-web/src/app/(site)/api/auth/me/route.ts",
+      "sha256": "d66da13dc7c24ed13633d8facdde4366c849c9e8c9364342f9badc6b2b97503b"
+    },
+    {
+      "path": "academy-web/src/app/(site)/dashboard/page.tsx",
+      "sha256": "f62de03b0fc93c24efb7d10419978a970557fc1d3c3e589727734d100172f037"
+    },
+    {
+      "path": "academy-web/src/middleware.ts",
+      "sha256": "61f6c7f42c8650252344a6c3fd42c6ce46c17b0339c286f92ac27ccccea143f0"
+    },
+    {
+      "path": "academy-web/tests/unit/auth-me-route.test.ts",
+      "sha256": "45be418d2f59f932923074784902a65c2fb80f90715a1e7bad2bed4175c620aa"
+    },
+    {
+      "path": "academy-web/tests/unit/current-user-production-cookie.test.ts",
+      "sha256": "c5cae18b0ca54a743f272291a6f8f20ebf6233131f98957542c855cac86abdf8"
+    },
+    {
+      "path": "academy-web/tests/unit/dashboard-page.test.ts",
+      "sha256": "1f212e4c8ada431ebf4ba6be208657f222a473a56b26c9292efdaea9ffddd295"
+    },
+    {
+      "path": "academy-web/tests/unit/middleware-production-session.test.ts",
+      "sha256": "b83ea8ea7c6a4061c07bb30df8cf3c1d94958776c2acf06790a36dcce250a497"
+    },
+    {
+      "path": "docs/maintenance/academy-operations-runbook.md",
+      "sha256": "060a5f1fc8af5494290cfa3a78078c80adb271657e5c2d7dd08a40eb2057afc9"
+    },
+    {
+      "path": "reports/security/2026-09-05-security-review-checklist.md",
+      "sha256": "b8d9c43aea3f651f2d2be88a4dbd1380ad98701ed023bd3b8e4ea001246de76e"
+    }
+  ],
+  "evidence": {
+    "red": "academy-red.log (3 failed/2 passed) and RTK tee1788611182 (dashboard2 failed)",
+    "unit": "academy-final-unit.log exit0 2135/2135",
+    "lint": "academy-final-lint.log exit1 baseline3 no-require-imports in unchanged executor;16 warnings",
+    "build": "academy-final-build.log exit0 OpenNext complete"
+  },
+  "findings": [],
+  "nonblocking_notes": [
+    "Dashboard redirect unit mock asserts call only; real Next redirect throws and source invokes immediately on null user.",
+    "Session revocation test proves adapter handling of RPC status; it does not prove live lifecycle propagation. SEC003 remains open."
+  ],
+  "release_limits": [
+    "No production login or deployed candidate proof yet.",
+    "Preserve current version d4717406-58be-43b4-87bb-bc1be260ecdd for rollback.",
+    "Existing remote ACADEMY_SERVED_HOSTS override absent, read-only metadata check confirmed."
+  ]
+}

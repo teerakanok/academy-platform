@@ -4,7 +4,10 @@ import { join } from 'node:path'
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
 import { Client } from 'pg'
 import { requiredEnv } from './setup'
-import { AcademyPostgresIdentityTransactionStore } from '@/lib/identity/postgres-transaction-store'
+import {
+  AcademyPostgresIdentityTransactionStore,
+  IdentityTransactionCapacityError,
+} from '@/lib/identity/postgres-transaction-store'
 import type {
   ActiveIdentityCompletionClaim,
   IdentityCompletionClaim,
@@ -15,6 +18,10 @@ const migrationPath = join(process.cwd(), 'supabase/migrations/0025_identity_aut
 const completionLeaseMigrationPath = join(
   process.cwd(),
   'supabase/migrations/0028_identity_authorization_completion_lease.sql',
+)
+const admissionCapMigrationPath = join(
+  process.cwd(),
+  'supabase/migrations/0029_identity_authorization_admission_cap.sql',
 )
 const runtimeTestRole = `academy_identity_transaction_test_${randomBytes(6).toString('hex')}`
 const abandonedStatePrefix = `academy_test_${randomBytes(8).toString('hex')}_`
@@ -34,6 +41,13 @@ async function withDb<T>(run: (client: Client) => Promise<T>): Promise<T> {
   } finally {
     await client.end()
   }
+}
+
+async function setAdmissionCapacity(limit: number): Promise<void> {
+  await withDb((client) => client.query(
+    'update academy.identity_authorization_admission_capacity set outstanding_limit = $1',
+    [limit],
+  ))
 }
 
 function fixture(): { browserBinding: string; input: PendingIdentityTransactionInput } {
@@ -295,13 +309,14 @@ async function cleanup(): Promise<void> {
       'delete from academy.identity_authorization_transaction where state like $1',
       [`${abandonedStatePrefix}%`],
     )
-    for (const completion of testCompletions.values()) {
+  for (const completion of testCompletions.values()) {
       await client.query('delete from academy.identity_session where id = $1', [completion.sessionId])
       await client.query(
         'delete from academy.users where id = $1 and issuer = $2 and subject = $3',
         [completion.accountId, completion.issuer, completion.subject],
       )
     }
+    await client.query('update academy.identity_authorization_admission_capacity set outstanding_limit = 1000')
   })
   testStates.clear()
   testCompletions.clear()
@@ -311,6 +326,7 @@ beforeAll(async () => {
   await withDb(async (client) => {
     await client.query(await readFile(migrationPath, 'utf8'))
     await client.query(await readFile(completionLeaseMigrationPath, 'utf8'))
+    await client.query(await readFile(admissionCapMigrationPath, 'utf8'))
     await client.query(`create role ${runtimeTestRole} inherit nologin`)
     await client.query(`grant academy_runtime to ${runtimeTestRole}`)
     await client.query(`grant ${runtimeTestRole} to current_user`)
@@ -667,6 +683,73 @@ describe('identity authorization PostgreSQL transaction boundary', () => {
     expect(created.expiresAt - now.getTime()).toBeGreaterThanOrEqual(1_800)
   })
 
+  it('enforces one database-wide outstanding cap across concurrent independent runtimes', async () => {
+    await setAdmissionCapacity(4)
+    const fixtures = Array.from({ length: 12 }, () => fixture())
+
+    const attempts = await Promise.allSettled(fixtures.map(({ input }) => (
+      new AcademyPostgresIdentityTransactionStore(pgRpcClient()).create(input)
+    )))
+
+    expect(attempts.filter((attempt) => attempt.status === 'fulfilled')).toHaveLength(4)
+    expect(attempts.filter((attempt) => attempt.status === 'rejected'
+      && attempt.reason instanceof IdentityTransactionCapacityError)).toHaveLength(8)
+    const count = await withDb((client) => client.query(
+      `select count(*)::int as count
+         from academy.identity_authorization_transaction
+        where state = any($1::text[]) and expires_at > clock_timestamp()`,
+      [fixtures.map(({ input }) => input.state)],
+    ))
+    expect(count.rows[0].count).toBe(4)
+  })
+
+  it('reclaims capacity after bounded failed exchanges and expired abandoned authorizations', async () => {
+    await setAdmissionCapacity(4)
+    const prefix = `${abandonedStatePrefix}expired_`
+    await withDb((client) => client.query(`
+      insert into academy.identity_authorization_transaction (
+        state, code_verifier, nonce, browser_binding_digest,
+        client_id, redirect_uri, service_id, audience, expected_issuer,
+        client_assertion_audience, return_path, expires_at, created_at
+      )
+      select
+        $1 || lpad(value::text, 6, '0'),
+        repeat('V', 43), repeat('N', 32), repeat('D', 43),
+        'academy-web-local', 'http://localhost:3000/auth/callback', 'academy',
+        'academy-api-local', 'https://identity.local.invalid/auth/v1',
+        'https://accounts.local.invalid/v1/code/exchange', '/dashboard',
+        clock_timestamp() - interval '1 second',
+        clock_timestamp() - interval '2 seconds'
+      from generate_series(1, 4) as value
+      on conflict (state) do nothing
+    `, [prefix]))
+
+    await expect(new AcademyPostgresIdentityTransactionStore(pgRpcClient())
+      .create(fixture().input)).resolves.toMatchObject({ returnPath: '/dashboard' })
+    const expired = await withDb((client) => client.query(
+      'select count(*)::int as count from academy.identity_authorization_transaction where state like $1',
+      [`${prefix}%`],
+    ))
+    expect(expired.rows[0].count).toBe(0)
+
+    // The successful post-expiry admission above already occupies one slot.
+    for (let index = 0; index < 2; index += 1) {
+      await new AcademyPostgresIdentityTransactionStore(pgRpcClient()).create(fixture().input)
+    }
+    const { browserBinding, input } = fixture()
+    const store = new AcademyPostgresIdentityTransactionStore(pgRpcClient())
+    await store.create(input)
+    await expect(store.create(fixture().input)).rejects.toBeInstanceOf(IdentityTransactionCapacityError)
+    for (const stage of ['client_assertion', 'code_exchange', 'result_verification'] as const) {
+      await store.release(requireActive(await store.claim(input.state, browserBinding)), stage)
+    }
+    // Existing callback policy classifies and removes exhaustion on the next claim.
+    await expect(store.claim(input.state, browserBinding))
+      .rejects.toMatchObject({ reason: 'claim_exhausted' })
+    await expect(new AcademyPostgresIdentityTransactionStore(pgRpcClient())
+      .create(fixture().input)).resolves.toMatchObject({ returnPath: '/dashboard' })
+  })
+
   it('deletes an expired transaction durably before returning the expiry classification', async () => {
     const { browserBinding, input } = fixture()
     const store = new AcademyPostgresIdentityTransactionStore(pgRpcClient())
@@ -730,6 +813,8 @@ describe('identity authorization PostgreSQL transaction boundary', () => {
       select
         has_table_privilege('academy_runtime',
           'academy.identity_authorization_transaction', 'select,insert,update,delete') as runtime_table,
+        has_table_privilege('academy_runtime',
+          'academy.identity_authorization_admission_capacity', 'select,insert,update,delete') as runtime_capacity_table,
         has_table_privilege('anon',
           'academy.identity_authorization_transaction', 'select,insert,update,delete') as anon_table,
         has_table_privilege('authenticated',
@@ -773,6 +858,7 @@ describe('identity authorization PostgreSQL transaction boundary', () => {
 
     expect(privileges.rows[0]).toEqual({
       runtime_table: false,
+      runtime_capacity_table: false,
       anon_table: false,
       authenticated_table: false,
       service_table: false,

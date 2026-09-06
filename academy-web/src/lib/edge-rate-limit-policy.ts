@@ -1,7 +1,14 @@
 export const EDGE_RATE_LIMIT_MARKER_HEADER = 'x-cyberskills-edge-rate-limit'
 export const EDGE_RATE_LIMIT_MARKER_VERSION = 'v2'
 
-export type EdgeRateLimitOperation = 'leads' | 'unsubscribe' | 'otp' | 'verify'
+export type EdgeRateLimitOperation =
+  | 'leads'
+  | 'unsubscribe'
+  | 'otp'
+  | 'verify'
+  | 'identity-start-get'
+  | 'identity-start-post'
+  | 'identity-callback-get'
 
 export interface EdgeRateLimitRule {
   operation: EdgeRateLimitOperation
@@ -14,16 +21,35 @@ const LIMIT = 10
 const MARKER_MAX_AGE_MS = 120_000
 const MARKER_FUTURE_SKEW_MS = 30_000
 
-const rules: Record<string, EdgeRateLimitRule> = {
-  '/api/leads': { operation: 'leads', limit: LIMIT, windowMs: WINDOW_MS },
-  '/api/leads/unsubscribe': { operation: 'unsubscribe', limit: LIMIT, windowMs: WINDOW_MS },
-  '/api/auth/otp': { operation: 'otp', limit: LIMIT, windowMs: WINDOW_MS },
-  '/api/auth/verify': { operation: 'verify', limit: LIMIT, windowMs: WINDOW_MS },
-}
+const rules = new Map([
+  ['POST:/api/leads', { operation: 'leads' as const, limit: LIMIT, windowMs: WINDOW_MS }],
+  ['POST:/api/leads/unsubscribe', {
+    operation: 'unsubscribe' as const,
+    limit: LIMIT,
+    windowMs: WINDOW_MS,
+  }],
+  ['POST:/api/auth/otp', { operation: 'otp' as const, limit: LIMIT, windowMs: WINDOW_MS }],
+  ['POST:/api/auth/verify', { operation: 'verify' as const, limit: LIMIT, windowMs: WINDOW_MS }],
+  ['GET:/api/auth/identity/start', {
+    operation: 'identity-start-get' as const,
+    limit: LIMIT,
+    windowMs: WINDOW_MS,
+  }],
+  ['POST:/api/auth/identity/start', {
+    operation: 'identity-start-post' as const,
+    limit: LIMIT,
+    windowMs: WINDOW_MS,
+  }],
+  ['GET:/auth/callback', {
+    operation: 'identity-callback-get' as const,
+    limit: LIMIT,
+    windowMs: WINDOW_MS,
+  }],
+])
 
 export function edgeRateLimitRule(request: Request): EdgeRateLimitRule | null {
-  if (request.method !== 'POST') return null
-  return rules[new URL(request.url).pathname] ?? null
+  const { pathname } = new URL(request.url)
+  return rules.get(`${request.method}:${pathname}`) ?? null
 }
 
 // At the outer Worker, only this header is set by Cloudflare. Do not treat XFF

@@ -1,0 +1,32 @@
+{
+  "work_order_metadata": {
+    "schema": "model-team.ril.v1",
+    "work_kind": "bounded_code",
+    "role": "implementation_reviewer",
+    "source_sha256": "29316cc66693b6bfb21bcb39feece0e06b9b9bf9a7f9fade714601f85091e556"
+  },
+  "verdict": "PASS",
+  "summary": "SEC001 aggregate admission is code-fixed and justified: PostgreSQL advisory serialization enforces the operator-only cap, real 12-client tests prove 4 admitted and 8 opaque-capacity refusals, and 18/18 PostgreSQL tests plus retained 2146 unit, TypeScript, and build gates pass; lint retains the documented baseline. Duplicate, claim, checkpoint, finalize, retry, expiry, lock-wait, bounded cleanup, and grant behavior are sound. Production migration and authenticated production journey remain pending.",
+  "findings": [
+    {
+      "severity": "low",
+      "message": "Treat delayed capacity release as accepted availability policy: exhausted or completed rows remain counted until a later claim classifies exhaustion or transaction TTL, up to 600 seconds, rather than refunding capacity immediately.",
+      "path": "academy-web/supabase/migrations/0029_identity_authorization_admission_cap.sql"
+    },
+    {
+      "severity": "low",
+      "message": "Expired rows are bounded during subsequent valid starts but can physically persist until then; if deterministic deletion is required, add a separately approved retention sweep for this table.",
+      "path": "academy-web/supabase/migrations/0029_identity_authorization_admission_cap.sql"
+    },
+    {
+      "severity": "low",
+      "message": "Schema rollback remains manual: restore the 0025 create function before dropping the 0029 capacity table and coordinate runtime rollback to avoid a mixed schema/code state.",
+      "path": "academy-web/supabase/migrations/0029_identity_authorization_admission_cap.sql"
+    },
+    {
+      "severity": "low",
+      "message": "Evidence proves a disposable PostgreSQL fixture only. Keep production migration, guarded admission, and authenticated production journey explicitly pending.",
+      "path": "reports/reviews/2026-09-06-global-admission-evidence/gates.json"
+    }
+  ]
+}

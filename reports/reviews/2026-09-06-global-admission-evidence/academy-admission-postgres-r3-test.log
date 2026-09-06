@@ -1,0 +1,77 @@
+
+ RUN  v3.2.7 /private/tmp/academy-security-glm-cde63a58/academy-web
+
+ ❯ |integration| tests/integration/identity-postgres-transaction-store.test.ts (18 tests | 2 failed) 3378ms
+   ✓ identity authorization PostgreSQL transaction boundary > survives an adapter restart while persisting only the browser-binding digest 44ms
+   ✓ identity authorization PostgreSQL transaction boundary > preserves a live transaction after a wrong browser binding and consumes it once with the right binding 46ms
+   ✓ identity authorization PostgreSQL transaction boundary > allows at most one successful concurrent consume across independent adapters 30ms
+   ✓ identity authorization PostgreSQL transaction boundary > leases one callback across concurrent runtimes, records a fixed failure stage, and retries safely 106ms
+   ✓ identity authorization PostgreSQL transaction boundary > does not let an expired stale claim release or finalize a newer owner claim 81ms
+   ✓ identity authorization PostgreSQL transaction boundary > makes the verified-result checkpoint idempotent but rejects changed identity data 79ms
+   ✓ identity authorization PostgreSQL transaction boundary > blocks a rolled-back legacy runtime from consuming any callback already claimed by the new runtime 65ms
+   ✓ identity authorization PostgreSQL transaction boundary > bounds released callback retries and deletes exhausted state 96ms
+   ✓ identity authorization PostgreSQL transaction boundary > deletes an expired transaction before issuing a completion claim 40ms
+   ✓ identity authorization PostgreSQL transaction boundary > expires a completed receipt and never reopens its provider result 87ms
+   ✓ identity authorization PostgreSQL transaction boundary > rechecks database time after a row-lock wait before consuming  1133ms
+   ✓ identity authorization PostgreSQL transaction boundary > rejects concurrent duplicate creation and retains one canonical row 28ms
+   × identity authorization PostgreSQL transaction boundary > starts a full TTL after a successful uniqueness wait 1238ms
+     → identity transaction store มี state ที่ยังใช้งานอยู่ซ้ำกัน
+   ✓ identity authorization PostgreSQL transaction boundary > enforces one database-wide outstanding cap across concurrent independent runtimes 63ms
+   × identity authorization PostgreSQL transaction boundary > reclaims capacity after bounded failed exchanges and expired abandoned authorizations 78ms
+     → เริ่มเข้าสู่ระบบไม่ได้ในขณะนี้
+   ✓ identity authorization PostgreSQL transaction boundary > deletes an expired transaction durably before returning the expiry classification 33ms
+   ✓ identity authorization PostgreSQL transaction boundary > bounds abandoned-row cleanup on every successful authorization start 40ms
+   ✓ identity authorization PostgreSQL transaction boundary > keeps the table private while exposing only the six callback RPCs to academy_runtime 47ms
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 16 passed (18)
+     Errors  1 error
+   Start at  02:45:18
+   Duration  3.78s (transform 85ms, setup 14ms, collect 100ms, tests 3.38s, environment 0ms, prepare 84ms)
+
+(node:60153) PromiseRejectionHandledWarning: Promise rejection was handled asynchronously (rejection id: 1)
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |integration| tests/integration/identity-postgres-transaction-store.test.ts > identity authorization PostgreSQL transaction boundary > starts a full TTL after a successful uniqueness wait
+IdentityTransactionStoreError: identity transaction store มี state ที่ยังใช้งานอยู่ซ้ำกัน
+ ❯ AcademyPostgresIdentityTransactionStore.create src/lib/identity/postgres-transaction-store.ts:154:13
+    152|     if (!result) throw new IdentityPostgresTransactionStoreFailure()
+    153|     if (result.status === 'duplicate') {
+    154|       throw new IdentityTransactionStoreError('identity transaction st…
+       |             ^
+    155|     }
+    156|     if (result.status === 'capacity_exhausted') {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |integration| tests/integration/identity-postgres-transaction-store.test.ts > identity authorization PostgreSQL transaction boundary > reclaims capacity after bounded failed exchanges and expired abandoned authorizations
+IdentityTransactionCapacityError: เริ่มเข้าสู่ระบบไม่ได้ในขณะนี้
+ ❯ AcademyPostgresIdentityTransactionStore.create src/lib/identity/postgres-transaction-store.ts:157:13
+    155|     }
+    156|     if (result.status === 'capacity_exhausted') {
+    157|       throw new IdentityTransactionCapacityError()
+       |             ^
+    158|     }
+    159|     return snapshotPendingIdentityTransaction({
+ ❯ tests/integration/identity-postgres-transaction-store.test.ts:740:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+IdentityTransactionStoreError: identity transaction store มี state ที่ยังใช้งานอยู่ซ้ำกัน
+ ❯ AcademyPostgresIdentityTransactionStore.create src/lib/identity/postgres-transaction-store.ts:154:13
+ ❯ processTicksAndRejections node:internal/process/task_queues:104:5
+
+This error originated in "tests/integration/identity-postgres-transaction-store.test.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "starts a full TTL after a successful uniqueness wait". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+

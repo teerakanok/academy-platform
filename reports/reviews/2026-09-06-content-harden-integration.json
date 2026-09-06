@@ -1,0 +1,73 @@
+{
+  "parents": {
+    "content": "99b0bfd",
+    "harden": "6a0fc4f"
+  },
+  "per_commit_overlap": [],
+  "parent_file_bytes_verified": {
+    "content": 221,
+    "harden": 63
+  },
+  "gates": [
+    {
+      "name": "install",
+      "command": [
+        "npm",
+        "ci",
+        "--ignore-scripts",
+        "--no-audit"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "unit",
+      "command": [
+        "npx",
+        "vitest",
+        "run",
+        "--project",
+        "unit"
+      ],
+      "exit": 0
+    },
+    {
+      "name": "lint",
+      "command": [
+        "npm",
+        "run",
+        "lint"
+      ],
+      "exit": 1
+    },
+    {
+      "name": "build-cf",
+      "command": [
+        "npm",
+        "run",
+        "build:cf"
+      ],
+      "exit": 0
+    }
+  ],
+  "lint_baseline": "3 existing no-require-imports errors;16warnings",
+  "unit": "2378/2378",
+  "production": false,
+  "logs": [
+    {
+      "path": "/private/tmp/cyberskills-prod-cde63a58/academy-integration-install.log",
+      "sha256": "2d20773b93ca8888aea7880390ede177bc99c0aa12767f22ae74d23b067d3fab"
+    },
+    {
+      "path": "/private/tmp/cyberskills-prod-cde63a58/academy-integration-unit.log",
+      "sha256": "3582ec388848e482c4517135d63ae8de6f1e9d77fbc45281250f29381dce495a"
+    },
+    {
+      "path": "/private/tmp/cyberskills-prod-cde63a58/academy-integration-lint.log",
+      "sha256": "2406b7f27e2ceffc276219e79f677f5021a455c01449c8d57b9012858f1edb93"
+    },
+    {
+      "path": "/private/tmp/cyberskills-prod-cde63a58/academy-integration-build-cf.log",
+      "sha256": "36e5d8123a71b4c8611c3426cfb4ea4fa6e51ae5775157db63af921521247ae5"
+    }
+  ]
+}
