@@ -1,0 +1,42 @@
+
+> academy-web@0.1.0 verify:workerd
+> node scripts/workerd-signer-check.mjs
+
+compatibility ตรงกับแอป: 2025-03-25 ["global_fetch_strictly_public","nodejs_compat"]
+(node:76851) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+wrangler dev ไม่ได้รายงานว่า bind 127.0.0.1:61987 สำเร็จภายใน 120s
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mFailed to write to log file Error: EPERM: operation not permitted, open '/Users/teerakanok/Library/Preferences/.wrangler/logs/wrangler-2026-09-06_10-10-38_598.log'[0m
+
+      at async open (node:internal/fs/promises:636:25)
+      at async writeFile (node:internal/fs/promises:1239:14)
+      at async /private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-GMXWwQ/checkout/academy-web/node_modules/wrangler/wrangler-dist/cli.js:60963:7
+      at async Mutex.runWith (/private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-GMXWwQ/checkout/academy-web/node_modules/miniflare/dist/src/index.js:82825:48)
+      at async appendToDebugLogFile (/private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-GMXWwQ/checkout/academy-web/node_modules/wrangler/wrangler-dist/cli.js:60960:3) {
+    errno: -1,
+    code: 'EPERM',
+    syscall: 'open',
+    path: '/Users/teerakanok/Library/Preferences/.wrangler/logs/wrangler-2026-09-06_10-10-38_598.log'
+  }
+
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mWould have written: [0m
+
+  --- 2026-09-06T10:10:38.819Z debug
+  🪵  Writing logs to "/Users/teerakanok/Library/Preferences/.wrangler/logs/wrangler-2026-09-06_10-10-38_598.log"
+  ---
+  
+
+
+Error: listen EPERM: operation not permitted 127.0.0.1
+    at Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    at listenInCluster (node:net:1997:12)
+    at node:net:2206:7
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  code: 'EPERM',
+  errno: -1,
+  syscall: 'listen',
+  address: '127.0.0.1'
+}
+🪵  Logs were written to "/Users/teerakanok/Library/Preferences/.wrangler/logs/wrangler-2026-09-06_10-10-38_598.log"
+

@@ -10,6 +10,7 @@
   },
   "include": [
     "worker.ts",
+    "tests/workerd/signer-worker.ts",
     "worker/identity-client-assertion-secret-diagnostic.ts",
     "types/open-next-worker.d.ts"
   ],

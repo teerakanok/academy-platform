@@ -71,7 +71,9 @@ if (process.env.ACADEMY_SKIP_WORKERD_CHECK === '1') {
 
 const REQUIRED_CHECKS = [
   'code-exchange-fetch-init-accepted-by-workerd',
+  'edge-rate-limit-enforces-and-signs',
   'cryptokey-introspection-shape',
+  'edge-rate-limiter-durable-counters',
   'private-media-delivery-on-workerd-r2',
   'rejects-a-cryptokey',
   'rejects-a-parsed-object',

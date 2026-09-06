@@ -2,26 +2,43 @@
 
 Academy protects these public mutations before OpenNext runs:
 
-| Route | Limit |
-|---|---:|
-| `POST /api/leads` | 10 requests / 60 seconds / actor |
-| `POST /api/leads/unsubscribe` | 10 requests / 60 seconds / actor |
-| `POST /api/auth/otp` | 10 requests / 60 seconds / actor |
-| `POST /api/auth/verify` | 10 requests / 60 seconds / actor |
-| `GET /api/auth/identity/start` | 10 requests / 60 seconds / actor |
-| `POST /api/auth/identity/start` | 10 requests / 60 seconds / actor |
-| `GET /auth/callback` | 10 requests / 60 seconds / actor |
+| Route | Actor | Target | Route ceiling |
+|---|---:|---:|---:|
+| `POST /api/leads` | 10 / 60 seconds | email: 5 / 60 seconds | 300 / 60 seconds |
+| `POST /api/leads/unsubscribe` | 10 / 60 seconds | token: 10 / 60 seconds | 300 / 60 seconds |
+| `POST /api/auth/otp` | 10 / 60 seconds | email: 5 / 60 seconds | 300 / 60 seconds |
+| `POST /api/auth/verify` | 10 / 60 seconds | email: 10 / 60 seconds | 600 / 60 seconds |
+| `GET /api/auth/identity/start` | 10 / 60 seconds | — | 600 / 60 seconds |
+| `POST /api/auth/identity/start` | 10 / 60 seconds | — | 600 / 60 seconds |
+| `GET /auth/callback` | 10 / 60 seconds | — | 600 / 60 seconds |
 
 The outer Worker uses `cf-connecting-ip`, never client-supplied `X-Forwarded-For`.
-It derives an HMAC-based Durable Object name from the actor and route. The object
-stores only a fixed-window count and expiry, then clears its storage by alarm.
-It does not persist an IP address, email address, token, or request body.
+IPv6 actors aggregate to their /64; IPv4 addresses remain /128; malformed
+addresses fail closed. For routes with an actual recipient or unsubscribe
+target, the Worker reads that field from a request clone through a bounded
+16,384-byte reader, then derives an HMAC-based Durable Object name. Identity
+navigation does not invent an email target. Each actor, target, and route
+ceiling uses its own opaque object; no object name contains the IP, email, or
+token. Objects store only a fixed-window count and expiry, then clear storage
+by alarm.
+
+The Worker canonicalizes one trailing slash before its exact method:path lookup
+and preserves query strings. A visible encoded path gets one strict decode at
+the admission boundary: malformed input, encoded slashes/backslashes/control
+bytes, dot segments, double encoding, or a decoded method:path that matches a
+protected rule returns `404`. Harmless percent-encoded public paths—such as
+localized course names and spaced asset filenames—remain public without losing
+their original encoded form. URL parsers can normalize invalid raw input before
+a Worker observes it; `//`, `\`, NUL, and explicit dot segments are therefore
+also rejected rather than treated as proof about the original bytes.
+
 Identity routes verify the resulting signed marker inside OpenNext before any
 authorization transaction or code exchange; missing or forged markers fail closed.
+Explicit loopback fixtures may bypass only after their separate flag plus host
+fixture gate passes; production never has that bypass.
 
-This is intentionally a Durable Object per opaque actor-route pair, not a single
-global limiter. The counter remains consistent across Academy Worker instances
-without turning all traffic into one coordination bottleneck.
+This remains Durable Object coordination per opaque scope-route pair, not an
+in-memory fallback. Counters remain consistent across Academy Worker instances.
 
 ## Release Order
 

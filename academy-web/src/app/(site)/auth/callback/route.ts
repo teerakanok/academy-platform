@@ -27,7 +27,8 @@ export const runtime = 'nodejs'
 // สำหรับ durable store/session ของ Academy.
 
 export async function GET(request: Request) {
-  if (!await hasEdgeRateLimitMarker(request, { secret: process.env.RATE_LIMIT_KEY_SECRET })) {
+  if (!identityControlLocalFixtureAllowedForRequest(request)
+    && !await hasEdgeRateLimitMarker(request, { secret: process.env.RATE_LIMIT_KEY_SECRET })) {
     return new NextResponse(null, { status: 503, headers: { 'cache-control': 'no-store' } })
   }
   const url = new URL(request.url)

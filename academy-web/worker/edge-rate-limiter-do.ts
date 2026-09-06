@@ -13,8 +13,8 @@ export interface EdgeRateLimitDecision {
 
 const COUNTER_KEY = 'counter'
 
-// One object represents one opaque (actor, route) pair. It stores no IP or
-// request payload, only the current fixed-window counter and expiry.
+// One object represents one opaque (scope, route) pair. It stores no IP,
+// target value, or request payload, only the fixed-window counter and expiry.
 export class EdgeRateLimiter extends DurableObject {
   async check(rule: EdgeRateLimitRule, now: number = Date.now()): Promise<EdgeRateLimitDecision> {
     const previous = await this.ctx.storage.get<CounterState>(COUNTER_KEY)

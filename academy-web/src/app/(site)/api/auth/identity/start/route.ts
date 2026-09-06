@@ -17,10 +17,11 @@ export const runtime = 'nodejs'
 const NO_STORE_HEADERS = { 'cache-control': 'no-store' }
 
 export async function GET(request: Request) {
-  if (!await hasEdgeRateLimitMarker(request, { secret: process.env.RATE_LIMIT_KEY_SECRET })) {
+  const localFixture = identityControlLocalFixtureAllowedForRequest(request)
+  if (!localFixture && !await hasEdgeRateLimitMarker(request, { secret: process.env.RATE_LIMIT_KEY_SECRET })) {
     return new NextResponse(null, { status: 503, headers: NO_STORE_HEADERS })
   }
-  if (identityControlLocalFixtureAllowedForRequest(request)) {
+  if (localFixture) {
     return new NextResponse(null, { status: 405, headers: NO_STORE_HEADERS })
   }
   try {
@@ -52,7 +53,8 @@ function signInNoticeRedirect(request: Request, notice: 'identity-start-failed' 
 }
 
 export async function POST(request: Request) {
-  if (!await hasEdgeRateLimitMarker(request, { secret: process.env.RATE_LIMIT_KEY_SECRET })) {
+  if (!identityControlLocalFixtureAllowedForRequest(request)
+    && !await hasEdgeRateLimitMarker(request, { secret: process.env.RATE_LIMIT_KEY_SECRET })) {
     return new NextResponse(null, { status: 503, headers: NO_STORE_HEADERS })
   }
   if (!identityControlLocalFixtureAllowedForRequest(request)) {

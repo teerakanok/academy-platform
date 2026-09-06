@@ -17,6 +17,11 @@ import { importIdentityResultKeySet } from '../../src/lib/identity/result-key-se
 import { issueMediaGrant } from '../../src/lib/media/grant'
 import { MEDIA_DELIVERY_COOKIE } from '../../src/lib/media/cookie'
 import { servePrivateMedia } from '../../src/lib/media/worker-delivery'
+import { enforceEdgeRateLimit } from '../../src/lib/edge-rate-limit-enforcement'
+import { hasEdgeRateLimitMarker } from '../../src/lib/edge-rate-limit-policy'
+import { EdgeRateLimiter } from '../../worker/edge-rate-limiter-do'
+
+export { EdgeRateLimiter }
 
 type Check = { name: string, passed: boolean, detail: string }
 
@@ -32,7 +37,11 @@ const KEY_ID = 'academy-lifecycle-2026-08'
 
 const handler = {
   // nonce มาทาง binding ไม่ใช่ทาง URL คำขอจากภายนอกจึงไม่มีอะไรให้ลอก
-  async fetch(_request: Request, env: { SIGNER_CHECK_NONCE?: string; COURSE_MEDIA?: HarnessBucket }): Promise<Response> {
+  async fetch(_request: Request, env: {
+    SIGNER_CHECK_NONCE?: string
+    COURSE_MEDIA?: HarnessBucket
+    EDGE_RATE_LIMITER?: DurableObjectNamespace<EdgeRateLimiter>
+  }): Promise<Response> {
     const nonce = env?.SIGNER_CHECK_NONCE ?? ''
     const checks: Check[] = []
     const record = async (name: string, run: () => Promise<string>): Promise<void> => {
@@ -63,6 +72,56 @@ const handler = {
       const agent = navigator.userAgent
       if (!agent.includes('Cloudflare-Workers')) throw new Error(`not workerd: ${agent}`)
       return agent
+    })
+
+    await record('edge-rate-limiter-durable-counters', async () => {
+      const namespace = env?.EDGE_RATE_LIMITER
+      if (!namespace) throw new Error('missing EDGE_RATE_LIMITER binding')
+      const limiter = namespace.getByName('workerd-admission-actor-check')
+      const targetLimiter = namespace.getByName('workerd-admission-target-check')
+      const rule = { operation: 'leads' as const, limit: 1, windowMs: 60_000 }
+      const first = await limiter.check(rule)
+      const second = await limiter.check(rule)
+      const target = await targetLimiter.check(rule)
+      if (!first.allowed || second.allowed || !target.allowed) {
+        throw new Error(`actor=${first.allowed}/${second.allowed} target=${target.allowed}`)
+      }
+      return 'real workerd DO kept actor and target counters independent'
+    })
+
+    await record('edge-rate-limit-enforces-and-signs', async () => {
+      const namespace = env?.EDGE_RATE_LIMITER
+      if (!namespace) throw new Error('missing EDGE_RATE_LIMITER binding')
+      const secretBytes = crypto.getRandomValues(new Uint8Array(32))
+      const secret = Array.from(secretBytes, (byte) => byte.toString(16).padStart(2, '0')).join('')
+      const environment = { EDGE_RATE_LIMITER: namespace, RATE_LIMIT_KEY_SECRET: secret }
+      const origin = 'https://academy.cyberskills.co.th'
+
+      const publicRequest = new Request(`${origin}/courses/%E0%B9%84%E0%B8%97%E0%B8%A2`)
+      const publicDecision = await enforceEdgeRateLimit(publicRequest, environment)
+      if (publicDecision instanceof Response || !(publicDecision instanceof Request)) {
+        throw new Error(`valid encoded public path returned ${publicDecision instanceof Response ? publicDecision.status : 'non-request'}`)
+      }
+      if (await hasEdgeRateLimitMarker(publicDecision, { secret })) throw new Error('public path was marked')
+
+      const ambiguous = await enforceEdgeRateLimit(new Request(`${origin}/auth%2Fcallback`), environment)
+      if (!(ambiguous instanceof Response) || ambiguous.status !== 404) throw new Error('protected disguise was not rejected')
+
+      let admitted = 0
+      for (let attempt = 0; attempt < 11; attempt += 1) {
+        const decision = await enforceEdgeRateLimit(new Request(`${origin}/api/auth/identity/start`, {
+          method: 'POST',
+          headers: { 'cf-connecting-ip': '198.51.100.10' },
+        }), environment)
+        if (decision instanceof Response) {
+          if (attempt !== 10 || decision.status !== 429) throw new Error(`unexpected response at ${attempt}`)
+          break
+        }
+        if (!(await hasEdgeRateLimitMarker(decision, { secret }))) throw new Error(`marker invalid at ${attempt}`)
+        admitted += 1
+      }
+      if (admitted !== 10) throw new Error(`admitted ${admitted}/10 before 429`)
+      return 'real DO admitted 10, returned 429, rejected ambiguity, and signed valid markers'
     })
 
     // หลักฐานตรงๆ ว่าทำไม contract เดิมใช้ไม่ได้ที่นี่ — บันทึกเป็นข้อมูล

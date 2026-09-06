@@ -1,0 +1,55 @@
+
+ RUN  v3.2.7 /private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-GMXWwQ/checkout/academy-web
+
+ ✓ |unit| tests/unit/identity-security-admission.test.ts > Identity unauthenticated admission > does not use the in-memory limiter as a production marker fallback 5ms
+ ✓ |unit| tests/unit/identity-security-admission.test.ts > Identity unauthenticated admission > rejects missing or forged edge markers before start or callback work 4ms
+ ✓ |unit| tests/unit/identity-security-admission.test.ts > Identity unauthenticated admission > rejects missing callback markers before any exchange work 0ms
+ ✓ |unit| tests/unit/identity-security-admission.test.ts > Identity unauthenticated admission > bounds the POST form before a transaction is created 6ms
+ ✓ |unit| tests/unit/identity-security-admission.test.ts > Identity unauthenticated admission > returns 429 before OpenNext when an actor exhausts its method-aware budget 8ms
+ ✓ |unit| tests/unit/identity-security-admission.test.ts > Identity unauthenticated admission > aggregates IPv6 actors and durable route targets across source addresses 8ms
+ ✓ |unit| tests/unit/identity-security-admission.test.ts > Identity unauthenticated admission > keeps a bounded global route ceiling above legitimate shared bursts 78ms
+ ✓ |unit| tests/unit/identity-security-admission.test.ts > Identity unauthenticated admission > fails closed when a later durable budget scope is unavailable 1ms
+ ✓ |unit| tests/unit/identity-security-admission.test.ts > Identity unauthenticated admission > rejects protected route variants and preserves a bounded request stream 1ms
+ ✓ |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > protects POST /api/leads as leads 2ms
+ ✓ |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > protects POST /api/leads/unsubscribe as unsubscribe 0ms
+ ✓ |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > protects POST /api/auth/otp as otp 0ms
+ ✓ |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > protects POST /api/auth/verify as verify 0ms
+ ✓ |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > does not limit GET or an unlisted API mutation at the edge 0ms
+ × |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > preserves valid encoded public paths while rejecting protected-route disguises 6ms
+   → expected { kind: 'invalid' } to deeply equal { kind: 'public' }
+ ✓ |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > protects each Identity entry method and canonical path without ambiguous variants 1ms
+ ✓ |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > uses only Cloudflare-provided client IP at the edge 1ms
+ ✓ |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > derives a stable opaque object name without embedding the client address 3ms
+ ✓ |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > aggregates IPv6 actors by /64 without exposing the address 1ms
+ ✓ |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > derives keyed target names from actual recipients only 2ms
+ ✓ |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > accepts only a fresh signed marker bound to the outer Worker request 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > preserves valid encoded public paths while rejecting protected-route disguises
+AssertionError: expected { kind: 'invalid' } to deeply equal { kind: 'public' }
+
+- Expected
++ Received
+
+  {
+-   "kind": "public",
++   "kind": "invalid",
+  }
+
+ ❯ tests/unit/edge-rate-limit-policy.test.ts:33:8
+     31|     const origin = 'https://academy.cyberskills.co.th'
+     32|     expect(edgeRateLimitAdmission(new Request(`${origin}/courses/%E0%B…
+     33|       .toEqual({ kind: 'public' })
+       |        ^
+     34|     expect(edgeRateLimitAdmission(new Request(`${origin}/assets/course…
+     35|       .toEqual({ kind: 'public' })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 20 passed (21)
+   Start at  17:06:43
+   Duration  1.58s (transform 563ms, setup 0ms, collect 1.11s, tests 130ms, environment 0ms, prepare 82ms)
+

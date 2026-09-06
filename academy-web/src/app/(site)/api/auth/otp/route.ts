@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server'
 import { routeAuthClient } from '@/lib/auth/route-client'
-import { allowRequest } from '@/lib/rate-limit'
-import { clientKey } from '@/lib/request-ip'
 import { hasEdgeRateLimitMarker } from '@/lib/edge-rate-limit-policy'
 import { readBoundedJson } from '@/lib/http/bounded-body'
 import { validateMutationRequest } from '@/lib/http/mutation-security'
@@ -23,6 +21,12 @@ export async function POST(request: Request) {
       { status: 503 },
     )
   }
+
+  if (!legacyDirectOtpFixtureAllowedForRequest(request)
+    && !await hasEdgeRateLimitMarker(request, { secret: process.env.RATE_LIMIT_KEY_SECRET })) {
+    return NextResponse.json({ ok: false, error: 'ระบบยังไม่พร้อมใช้งานชั่วคราว' }, { status: 503 })
+  }
+
   if (!acceptsAuthTransport(request)) {
     return NextResponse.json({ ok: false, error: 'ต้องเชื่อมต่อผ่าน HTTPS' }, { status: 400 })
   }
@@ -30,12 +34,6 @@ export async function POST(request: Request) {
   if (!mutation.ok) {
     return NextResponse.json({ ok: false, error: mutation.error }, { status: mutation.status })
   }
-
-  if (!await hasEdgeRateLimitMarker(request, { secret: process.env.RATE_LIMIT_KEY_SECRET })
-    && !allowRequest(`otp:${clientKey(request)}`)) {
-    return NextResponse.json({ ok: false, error: 'ขอรหัสถี่เกินไป ลองใหม่ในอีกสักครู่' }, { status: 429 })
-  }
-
   const parsed = await readBoundedJson(request, MAX_BODY_BYTES)
   if (!parsed.ok && parsed.reason === 'too-large') {
     return NextResponse.json({ ok: false, error: 'คำขอใหญ่เกินไป' }, { status: 413 })

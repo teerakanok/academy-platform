@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { academyDb } from '@/lib/db/server'
 import { CURRENT_CONSENT_VERSION } from '@/lib/consent'
-import { allowRequest } from '@/lib/rate-limit'
 import { hasEdgeRateLimitMarker } from '@/lib/edge-rate-limit-policy'
-import { clientKey } from '@/lib/request-ip'
 import { readBoundedJson } from '@/lib/http/bounded-body'
 import { validateMutationRequest } from '@/lib/http/mutation-security'
 import { safeErrorMessage } from '@/lib/safe-log'
@@ -25,19 +23,17 @@ const leadSchema = z.object({
 })
 
 export async function POST(request: NextRequest) {
+  if (!await hasEdgeRateLimitMarker(request, { secret: process.env.RATE_LIMIT_KEY_SECRET })) {
+    return NextResponse.json(
+      { ok: false, error: 'ระบบยังไม่พร้อมใช้งานชั่วคราว' },
+      { status: 503 },
+    )
+  }
+
   const mutation = validateMutationRequest(request, { requireJson: true })
   if (!mutation.ok) {
     return NextResponse.json({ ok: false, error: mutation.error }, { status: mutation.status })
   }
-
-  if (!await hasEdgeRateLimitMarker(request, { secret: process.env.RATE_LIMIT_KEY_SECRET })
-    && !allowRequest(`leads:${clientKey(request)}`)) {
-    return NextResponse.json(
-      { ok: false, error: 'ส่งคำขอถี่เกินไป โปรดลองใหม่ในอีกสักครู่' },
-      { status: 429 },
-    )
-  }
-
   const body = await readBoundedJson(request, MAX_BODY_BYTES)
   if (!body.ok && body.reason === 'too-large') {
     return NextResponse.json({ ok: false, error: 'ขนาดคำขอเกินกำหนด' }, { status: 413 })

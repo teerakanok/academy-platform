@@ -1,0 +1,62 @@
+[
+  {
+    "stage": "install",
+    "argv": [
+      "npm",
+      "ci",
+      "--ignore-scripts",
+      "--no-audit"
+    ],
+    "exit": 0
+  },
+  {
+    "stage": "unit",
+    "argv": [
+      "npx",
+      "vitest",
+      "run",
+      "--project",
+      "unit",
+      "--maxWorkers",
+      "1"
+    ],
+    "exit": 0
+  },
+  {
+    "stage": "lint",
+    "argv": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "exit": 1
+  },
+  {
+    "stage": "types",
+    "argv": [
+      "npx",
+      "tsc",
+      "--noEmit"
+    ],
+    "exit": 0
+  },
+  {
+    "stage": "worker-types",
+    "argv": [
+      "npx",
+      "tsc",
+      "-p",
+      "tsconfig.worker.json"
+    ],
+    "exit": 0
+  },
+  {
+    "stage": "build",
+    "argv": [
+      "npm",
+      "run",
+      "build:cf"
+    ],
+    "exit": 0
+  }
+]

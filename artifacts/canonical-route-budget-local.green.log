@@ -1,0 +1,30 @@
+
+ RUN  v3.2.7 /private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-GMXWwQ/checkout/academy-web
+
+ ✓ |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > protects POST /api/leads as leads 2ms
+ ✓ |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > protects POST /api/leads/unsubscribe as unsubscribe 0ms
+ ✓ |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > protects POST /api/auth/otp as otp 0ms
+ ✓ |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > protects POST /api/auth/verify as verify 0ms
+ ✓ |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > does not limit GET or an unlisted API mutation at the edge 0ms
+ ✓ |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > preserves valid encoded public paths while rejecting protected-route disguises 1ms
+ ✓ |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > protects each Identity entry method and canonical path without ambiguous variants 1ms
+ ✓ |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > uses only Cloudflare-provided client IP at the edge 1ms
+ ✓ |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > derives a stable opaque object name without embedding the client address 3ms
+ ✓ |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > aggregates IPv6 actors by /64 without exposing the address 1ms
+ ✓ |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > derives keyed target names from actual recipients only 2ms
+ ✓ |unit| tests/unit/edge-rate-limit-policy.test.ts > edge rate-limit policy > accepts only a fresh signed marker bound to the outer Worker request 1ms
+ ✓ |unit| tests/unit/identity-security-admission.test.ts > Identity unauthenticated admission > does not use the in-memory limiter as a production marker fallback 5ms
+ ✓ |unit| tests/unit/identity-security-admission.test.ts > Identity unauthenticated admission > rejects missing or forged edge markers before start or callback work 4ms
+ ✓ |unit| tests/unit/identity-security-admission.test.ts > Identity unauthenticated admission > rejects missing callback markers before any exchange work 0ms
+ ✓ |unit| tests/unit/identity-security-admission.test.ts > Identity unauthenticated admission > bounds the POST form before a transaction is created 7ms
+ ✓ |unit| tests/unit/identity-security-admission.test.ts > Identity unauthenticated admission > returns 429 before OpenNext when an actor exhausts its method-aware budget 7ms
+ ✓ |unit| tests/unit/identity-security-admission.test.ts > Identity unauthenticated admission > aggregates IPv6 actors and durable route targets across source addresses 8ms
+ ✓ |unit| tests/unit/identity-security-admission.test.ts > Identity unauthenticated admission > keeps a bounded global route ceiling above legitimate shared bursts 79ms
+ ✓ |unit| tests/unit/identity-security-admission.test.ts > Identity unauthenticated admission > fails closed when a later durable budget scope is unavailable 1ms
+ ✓ |unit| tests/unit/identity-security-admission.test.ts > Identity unauthenticated admission > rejects protected route variants and preserves a bounded request stream 2ms
+
+ Test Files  2 passed (2)
+      Tests  21 passed (21)
+   Start at  17:08:39
+   Duration  1.55s (transform 552ms, setup 0ms, collect 1.09s, tests 126ms, environment 0ms, prepare 82ms)
+
