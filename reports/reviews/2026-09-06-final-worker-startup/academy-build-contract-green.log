@@ -1,0 +1,11 @@
+
+ RUN  v3.2.7 /private/tmp/academy-worker-startup-cde63a58/academy-web
+
+ ✓ |unit| tests/unit/static-asset-boundary.test.ts (7 tests) 789ms
+   ✓ deployed static-asset boundary > executes the existing workerd gate before compilation and the final bundle gate afterwards  633ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  00:13:23
+   Duration  977ms (transform 23ms, setup 0ms, collect 20ms, tests 789ms, environment 0ms, prepare 41ms)
+

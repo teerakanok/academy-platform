@@ -1,0 +1,1201 @@
+diff --git a/academy-web/next.config.ts b/academy-web/next.config.ts
+index bbd43c3..761b1e4 100644
+--- a/academy-web/next.config.ts
++++ b/academy-web/next.config.ts
+@@ -44,6 +44,12 @@ const nextConfig: NextConfig = {
+   // Security baseline: ไม่มี external resource ใน CSP scope ของ app นี้ —
+   // fonts ผ่าน next/font (self-hosted ตอน build), ไม่มี third-party script
+   poweredByHeader: false,
++  webpack(config, { dev }) {
++    if (!dev && process.env.ACADEMY_BUILD_DISABLE_WEBPACK_CACHE === '1') {
++      config.cache = false
++    }
++    return config
++  },
+   async headers() {
+     return [
+       {
+diff --git a/academy-web/package.json b/academy-web/package.json
+index 67e79d0..ebcb230 100644
+--- a/academy-web/package.json
++++ b/academy-web/package.json
+@@ -25,7 +25,7 @@
+     "verify:cf-public-course-pages": "node scripts/verify-cf-public-course-pages.mjs",
+     "verify:workerd": "node scripts/workerd-signer-check.mjs",
+     "asset-guard": "node scripts/check-open-next-assets.mjs",
+-    "build:cf": "npm run verify:workerd && NEXT_PUBLIC_SUPABASE_URL= NEXT_PUBLIC_SUPABASE_ANON_KEY= opennextjs-cloudflare build && npm run asset-guard",
++    "build:cf": "bash scripts/build-cloudflare.sh",
+     "deploy:cf": "npm run build:cf && wrangler deploy --autoconfig=false --keep-vars",
+     "test:workerd-signer": "node scripts/workerd-signer-check.mjs"
+   },
+diff --git a/academy-web/src/lib/db/server.ts b/academy-web/src/lib/db/server.ts
+index 354dfef..ca91982 100644
+--- a/academy-web/src/lib/db/server.ts
++++ b/academy-web/src/lib/db/server.ts
+@@ -1,83 +1,3 @@
+-/// <reference types="node" />
++import 'server-only'
+ 
+-import { createClient } from '@supabase/supabase-js'
+-import { issueAcademyRuntimeToken } from './runtime-token'
+-
+-export type AcademyDbConfig = {
+-  url: string
+-  signingSecret: string
+-  fetch?: typeof globalThis.fetch
+-  now?: () => Date
+-}
+-
+-function validateAcademyDataApiUrl(value: string): string {
+-  let url: URL
+-  try {
+-    url = new URL(value)
+-  } catch {
+-    throw new Error('ACADEMY_DATA_API_URL ต้องเป็น dedicated API URL ที่ถูกต้อง')
+-  }
+-
+-  const isSecureOrigin = url.protocol === 'https:'
+-  const isLocalLoopback = url.protocol === 'http:' && url.hostname === '127.0.0.1'
+-  if (!isSecureOrigin && !isLocalLoopback) {
+-    throw new Error('ACADEMY_DATA_API_URL ต้องเป็น HTTPS หรือ HTTP loopback 127.0.0.1')
+-  }
+-  if (url.username || url.password || url.pathname !== '/' || url.search || url.hash) {
+-    throw new Error('ACADEMY_DATA_API_URL ต้องเป็น origin ตรงของ dedicated API เท่านั้น')
+-  }
+-  return url.origin
+-}
+-
+-/**
+- * Boolean form of the same origin rule `createAcademyDb` enforces — lets test
+- * harnesses pin their raw fetch targets to exactly the origins the production
+- * client would accept (HTTPS or HTTP loopback 127.0.0.1, bare origin).
+- */
+-export function isSafeAcademyDataApiUrl(value: string): boolean {
+-  try {
+-    validateAcademyDataApiUrl(value)
+-    return true
+-  } catch {
+-    return false
+-  }
+-}
+-
+-export function academyDataApiFetch(baseFetch: typeof globalThis.fetch): typeof globalThis.fetch {
+-  return (input, init) => {
+-    const inputUrl = input instanceof Request ? input.url : input.toString()
+-    const url = new URL(inputUrl)
+-    // supabase-js always constructs a Supabase-style /rest/v1 URL. The dedicated
+-    // PostgREST service owns the origin directly, so strip only that fixed prefix.
+-    if (url.pathname === '/rest/v1' || url.pathname.startsWith('/rest/v1/')) {
+-      url.pathname = url.pathname.slice('/rest/v1'.length) || '/'
+-    }
+-    if (input instanceof Request) {
+-      return baseFetch(new Request(url.toString(), input), init)
+-    }
+-    return baseFetch(url.toString(), init)
+-  }
+-}
+-
+-/**
+- * Server-only Academy data client. The URL must point at the dedicated
+- * Academy PostgREST instance; the shared Pool A endpoint is intentionally
+- * incompatible with this credential.
+- */
+-export function createAcademyDb({ url, signingSecret, fetch, now = () => new Date() }: AcademyDbConfig) {
+-  return createClient(validateAcademyDataApiUrl(url), 'academy-runtime', {
+-    auth: { persistSession: false, autoRefreshToken: false },
+-    db: { schema: 'academy' },
+-    accessToken: () => issueAcademyRuntimeToken(signingSecret, now()),
+-    global: { fetch: academyDataApiFetch(fetch ?? globalThis.fetch) },
+-  })
+-}
+-
+-export function academyDb() {
+-  const url = process.env.ACADEMY_DATA_API_URL
+-  const signingSecret = process.env.ACADEMY_DATA_API_JWT_SECRET
+-  if (!url || !signingSecret) {
+-    throw new Error('ACADEMY_DATA_API_URL / ACADEMY_DATA_API_JWT_SECRET ยังไม่ถูกตั้งค่า (ดู .env.example)')
+-  }
+-  return createAcademyDb({ url, signingSecret })
+-}
++export * from './academy-db-core'
+diff --git a/academy-web/src/lib/identity/lifecycle-production-runtime.ts b/academy-web/src/lib/identity/lifecycle-production-runtime.ts
+index f740c93..7d52058 100644
+--- a/academy-web/src/lib/identity/lifecycle-production-runtime.ts
++++ b/academy-web/src/lib/identity/lifecycle-production-runtime.ts
+@@ -1,352 +1,3 @@
+ import 'server-only'
+ 
+-import { academyDb } from '@/lib/db/server'
+-import { parseStrictJsonText, readStrictJsonResponse } from '@/lib/http/strict-json-response'
+-import { createIdentityClientAssertionJtiSource } from './client-assertion-jti-source'
+-import { createIdentityClientAssertionProvider } from './client-assertion-provider'
+-import { APPROVED_ACADEMY_CONSUMER_REGISTRY_V1 } from './consumer-policy'
+-import {
+-  createIdentityClientAssertionWebCryptoSigner,
+-} from './client-assertion-webcrypto-signer'
+-import { AcademyIdentityLifecyclePageStore } from './lifecycle-page-store'
+-import { createIdentityLifecyclePullResponseTransport } from './lifecycle-pull-response-transport'
+-import {
+-  runIdentityLifecyclePullCycle,
+-  type IdentityLifecyclePullCycleResult,
+-} from './lifecycle-pull-cycle'
+-import { createIdentityLifecyclePullTransport } from './lifecycle-pull-transport'
+-import {
+-  IDENTITY_LIFECYCLE_PULL_LEASE_MAX_DURATION_MS,
+-  IDENTITY_LIFECYCLE_PULL_LEASE_MIN_DURATION_MS,
+-} from './lifecycle-pull-lease'
+-
+-const PRINCIPAL_ISSUER = 'https://supabase.cyberskills.co.th/auth/v1'
+-const CONSUMER_ID = 'academy-web'
+-const KEY_ID = /^[A-Za-z0-9][A-Za-z0-9_-]{0,47}$/
+-const WORKER_ID = /^[A-Za-z0-9][A-Za-z0-9._:/-]{0,159}$/
+-const COORDINATE = /^[A-Za-z0-9_-]{43}$/
+-const FINGERPRINT = /^[a-f0-9]{64}$/
+-const MAX_KEY_SET_CHARACTERS = 64 * 1024
+-const MAX_JWK_CHARACTERS = 4_096
+-
+-export type AcademyIdentityLifecycleProductionConfig = Readonly<{
+-  approvedConfigRevision: number
+-  endpoint: string
+-  clientAssertionAudience: string
+-  envelopePolicy: {
+-    expectedIssuer: string
+-    expectedAudience: string
+-    clockSkewSeconds: number
+-    maximumLifetimeSeconds: number
+-    key: {
+-      keyId: string
+-      algorithm: 'ES256'
+-      publicJwk: JsonWebKey
+-    }
+-  }
+-  clientAssertionKeyId: string
+-  clientAssertionPrivateJwk: string
+-  requestedLimit: number
+-  leaseDurationMs: number
+-  workerId: string
+-  timeoutMs: number
+-}>
+-
+-type RuntimeDependencies = {
+-  academyDb: () => IdentityLifecycleRpcClient
+-  fetch: typeof globalThis.fetch
+-  createSigner: typeof createIdentityClientAssertionWebCryptoSigner
+-  now: () => Date
+-}
+-
+-type IdentityLifecycleRpcClient = {
+-  rpc(
+-    functionName: string,
+-    parameters: Record<string, unknown>,
+-  ): PromiseLike<{ data: unknown, error: unknown }>
+-}
+-
+-export type AcademyIdentityLifecycleProductionRuntimeOptions = {
+-  environment?: Record<string, string | undefined>
+-  dependencies?: Partial<RuntimeDependencies>
+-}
+-
+-export function projectAcademyIdentityLifecycleProductionConfig(
+-  environmentValue: Record<string, string | undefined>,
+-): AcademyIdentityLifecycleProductionConfig | null {
+-  try {
+-    const enabled = environmentValue.IDENTITY_LIFECYCLE_ENABLED
+-    const endpoint = environmentValue.IDENTITY_LIFECYCLE_PUBLISHER_ENDPOINT
+-    const clientAssertionAudience = environmentValue.IDENTITY_LIFECYCLE_CLIENT_ASSERTION_AUDIENCE
+-    const eventAudience = environmentValue.IDENTITY_LIFECYCLE_EVENT_AUDIENCE
+-    const clientAssertionKeyId = environmentValue.IDENTITY_LIFECYCLE_CLIENT_ASSERTION_KEY_ID
+-    const privateJwk = environmentValue.IDENTITY_LIFECYCLE_CLIENT_ASSERTION_PRIVATE_JWK
+-    const keySetDocument = environmentValue.IDENTITY_LIFECYCLE_VERIFICATION_KEY_SET_DOCUMENT
+-    const workerId = environmentValue.IDENTITY_LIFECYCLE_WORKER_ID
+-    if (typeof clientAssertionKeyId !== 'string' || typeof workerId !== 'string') return null
+-    if (enabled !== 'true'
+-      || !isExactHttpsUrl(endpoint)
+-      || !isExactHttpsUrl(clientAssertionAudience)
+-      || !isExactHttpsUrl(eventAudience)
+-      || !KEY_ID.test(clientAssertionKeyId ?? '')
+-      || !WORKER_ID.test(workerId ?? '')
+-      || !isCanonicalPrivateJwk(privateJwk)) return null
+-
+-    const requestedLimit = parseBoundedInteger(
+-      environmentValue.IDENTITY_LIFECYCLE_REQUEST_LIMIT ?? '50',
+-      1,
+-      100,
+-    )
+-    const leaseDurationMs = parseBoundedInteger(
+-      environmentValue.IDENTITY_LIFECYCLE_LEASE_DURATION_MS ?? '30000',
+-      IDENTITY_LIFECYCLE_PULL_LEASE_MIN_DURATION_MS,
+-      IDENTITY_LIFECYCLE_PULL_LEASE_MAX_DURATION_MS,
+-    )
+-    const timeoutMs = parseBoundedInteger(
+-      environmentValue.IDENTITY_LIFECYCLE_TIMEOUT_MS ?? '1000',
+-      100,
+-      5_000,
+-    )
+-    const key = parseActiveLifecycleKey(keySetDocument)
+-    if (!requestedLimit || !leaseDurationMs || !timeoutMs || !key) return null
+-
+-    return Object.freeze({
+-      approvedConfigRevision: APPROVED_ACADEMY_CONSUMER_REGISTRY_V1.client.configRevision,
+-      endpoint,
+-      clientAssertionAudience,
+-      envelopePolicy: Object.freeze({
+-        expectedIssuer: PRINCIPAL_ISSUER,
+-        expectedAudience: eventAudience,
+-        clockSkewSeconds: 30,
+-        maximumLifetimeSeconds: 120,
+-        key,
+-      }),
+-      clientAssertionKeyId,
+-      clientAssertionPrivateJwk: privateJwk,
+-      requestedLimit,
+-      leaseDurationMs,
+-      workerId,
+-      timeoutMs,
+-    })
+-  } catch {
+-    return null
+-  }
+-}
+-
+-export async function createAcademyIdentityLifecyclePullCycleRuntime(
+-  options: AcademyIdentityLifecycleProductionRuntimeOptions = {},
+-): Promise<(() => Promise<IdentityLifecyclePullCycleResult>) | null> {
+-  const environment = options.environment ?? process.env
+-  if (environment.IDENTITY_LIFECYCLE_ENABLED !== 'true') return null
+-  const config = projectAcademyIdentityLifecycleProductionConfig(environment)
+-  if (!config) {
+-    throw new Error('Identity lifecycle production configuration is incomplete')
+-  }
+-  try {
+-    const dependencies = resolveDependencies(options.dependencies)
+-    if (!dependencies) throw new Error('invalid runtime dependencies')
+-
+-    const signer = await dependencies.createSigner({
+-      clientId: CONSUMER_ID,
+-      purpose: 'lifecycle_pull',
+-      keyId: config.clientAssertionKeyId,
+-      privateJwk: config.clientAssertionPrivateJwk,
+-    })
+-    const responseTransport = createIdentityLifecyclePullResponseTransport({
+-      endpoint: config.endpoint,
+-      timeoutMs: config.timeoutMs,
+-      fetchPort: { fetch: dependencies.fetch },
+-    })
+-    const transport = createIdentityLifecyclePullTransport({
+-      consumerId: CONSUMER_ID,
+-      clientAssertionAudience: config.clientAssertionAudience,
+-      requestedLimit: config.requestedLimit,
+-      clientAssertionProvider: createIdentityClientAssertionProvider({
+-        clientId: CONSUMER_ID,
+-        purpose: 'lifecycle_pull',
+-        audience: config.clientAssertionAudience,
+-        keyId: config.clientAssertionKeyId,
+-        lifetimeSeconds: 120,
+-        clock: { now: dependencies.now },
+-        jtiSource: createIdentityClientAssertionJtiSource(),
+-        signer,
+-      }),
+-      responseTransport,
+-      responseReader: {
+-        read(response: Response) {
+-          return readStrictJsonResponse(response, {
+-            maxBytes: 512 * 1024,
+-            maxDepth: 8,
+-            timeoutMs: config.timeoutMs,
+-          })
+-        },
+-      },
+-      envelopePolicy: config.envelopePolicy,
+-    })
+-    const store = new AcademyIdentityLifecyclePageStore(dependencies.academyDb())
+-    return async () => {
+-      await store.reconcileApprovedConfigurationRevision(config.approvedConfigRevision)
+-      return runIdentityLifecyclePullCycle({
+-        store,
+-        transport,
+-        clock: { now: dependencies.now },
+-        approvedConfigRevision: config.approvedConfigRevision,
+-        workerId: config.workerId,
+-        leaseDurationMs: config.leaseDurationMs,
+-      })
+-    }
+-  } catch {
+-    throw new Error('Identity lifecycle runtime initialization failed')
+-  }
+-}
+-
+-export async function runAcademyIdentityLifecyclePull(
+-  environment: Record<string, string | undefined>,
+-): Promise<IdentityLifecyclePullCycleResult | { outcome: 'disabled' }> {
+-  const pull = await createAcademyIdentityLifecyclePullCycleRuntime({ environment })
+-  if (!pull) return { outcome: 'disabled' }
+-  return pull()
+-}
+-
+-function resolveDependencies(
+-  overrides: Partial<RuntimeDependencies> | undefined,
+-): RuntimeDependencies | null {
+-  const dependencies: RuntimeDependencies = {
+-    academyDb: overrides?.academyDb ?? academyDb,
+-    fetch: overrides?.fetch ?? globalThis.fetch,
+-    createSigner: overrides?.createSigner ?? createIdentityClientAssertionWebCryptoSigner,
+-    now: overrides?.now ?? (() => new Date()),
+-  }
+-  return typeof dependencies.academyDb === 'function'
+-    && typeof dependencies.fetch === 'function'
+-    && typeof dependencies.createSigner === 'function'
+-    && typeof dependencies.now === 'function'
+-    ? dependencies
+-    : null
+-}
+-
+-function parseActiveLifecycleKey(
+-  documentValue: string | undefined,
+-): AcademyIdentityLifecycleProductionConfig['envelopePolicy']['key'] | null {
+-  const parsed = parseStrictJsonText(documentValue ?? '', MAX_KEY_SET_CHARACTERS, 8)
+-  if (!parsed.ok) return null
+-  const document = exactRecord(parsed.value, [
+-    'issuer', 'keys', 'retiredKeyFingerprints', 'retiredKeyIds', 'revision',
+-  ])
+-  if (!document
+-    || document.issuer !== PRINCIPAL_ISSUER
+-    || !Number.isSafeInteger(document.revision as unknown)
+-    || (document.revision as unknown as number) < 1
+-    || !Array.isArray(document.keys)
+-    || document.keys.length < 1
+-    || document.keys.length > 3
+-    || !isSortedUniqueStringList(document.retiredKeyFingerprints, FINGERPRINT, 64)) return null
+-  const retiredKeyIds = document.retiredKeyIds
+-  if (!isSortedUniqueStringList(retiredKeyIds, KEY_ID, 64)) return null
+-
+-  const active = document.keys.filter((entry) => exactRecord(entry, [
+-    'algorithm', 'keyId', 'publicJwk', 'state',
+-  ]))
+-  const activeKeys = active.filter((entry) => {
+-    const record = entry as Record<string, unknown>
+-    return record.algorithm === 'ES256' && record.state === 'active'
+-  })
+-  if (active.length !== document.keys.length || activeKeys.length !== 1) return null
+-  const entry = activeKeys[0] as Record<string, unknown>
+-  if (typeof entry.keyId !== 'string'
+-    || !KEY_ID.test(entry.keyId)
+-    || ((entry.state === 'retired') !== retiredKeyIds.includes(entry.keyId))) return null
+-  const jwk = exactRecord(entry.publicJwk, ['crv', 'kty', 'x', 'y'])
+-  if (!jwk
+-    || jwk.kty !== 'EC'
+-    || jwk.crv !== 'P-256'
+-    || typeof jwk.x !== 'string'
+-    || !COORDINATE.test(jwk.x)
+-    || typeof jwk.y !== 'string'
+-    || !COORDINATE.test(jwk.y)) return null
+-  return {
+-    keyId: entry.keyId as string,
+-    algorithm: 'ES256',
+-    publicJwk: {
+-      kty: 'EC',
+-      crv: 'P-256',
+-      x: jwk.x,
+-      y: jwk.y,
+-    },
+-  }
+-}
+-
+-function isCanonicalPrivateJwk(value: string | undefined): value is string {
+-  if (!value || value.length > MAX_JWK_CHARACTERS) return false
+-  const parsed = parseStrictJsonText(value, MAX_JWK_CHARACTERS, 3)
+-  if (!parsed.ok) return false
+-  const jwk = exactRecord(parsed.value, ['crv', 'd', 'kty', 'x', 'y'])
+-  return !!jwk
+-    && jwk.kty === 'EC'
+-    && jwk.crv === 'P-256'
+-    && typeof jwk.x === 'string'
+-    && COORDINATE.test(jwk.x)
+-    && typeof jwk.y === 'string'
+-    && COORDINATE.test(jwk.y)
+-    && typeof jwk.d === 'string'
+-    && COORDINATE.test(jwk.d)
+-}
+-
+-function parseBoundedInteger(
+-  value: string | undefined,
+-  minimum: number,
+-  maximum: number,
+-): number | null {
+-  if (!value || !/^(?:0|[1-9][0-9]{0,8})$/.test(value)) return null
+-  const parsed = Number(value)
+-  return Number.isSafeInteger(parsed) && parsed >= minimum && parsed <= maximum ? parsed : null
+-}
+-
+-function exactRecord(
+-  value: unknown,
+-  keys: readonly string[],
+-): Record<string, unknown> | null {
+-  if (!value
+-    || typeof value !== 'object'
+-    || Array.isArray(value)
+-    || Object.getPrototypeOf(value) !== Object.prototype) return null
+-  const actual = Reflect.ownKeys(value)
+-  if (actual.length !== keys.length
+-    || actual.some((key) => typeof key !== 'string' || !keys.includes(key))) return null
+-  const record = Object.create(null) as Record<string, unknown>
+-  for (const key of keys) {
+-    const descriptor = Object.getOwnPropertyDescriptor(value, key)
+-    if (!descriptor || !descriptor.enumerable || !('value' in descriptor)) return null
+-    record[key] = descriptor.value
+-  }
+-  return record
+-}
+-
+-function isSortedUniqueStringList(
+-  value: unknown,
+-  pattern: RegExp,
+-  maximum: number,
+-): value is string[] {
+-  return Array.isArray(value)
+-    && value.length <= maximum
+-    && value.every((entry, index) => (
+-      typeof entry === 'string'
+-      && pattern.test(entry)
+-      && (index === 0 || value[index - 1] < entry)
+-    ))
+-}
+-
+-function isExactHttpsUrl(value: string | undefined): value is string {
+-  if (!value) return false
+-  try {
+-    const url = new URL(value)
+-    return url.protocol === 'https:'
+-      && url.username === ''
+-      && url.password === ''
+-      && url.search === ''
+-      && url.hash === ''
+-      && url.toString() === value
+-  } catch {
+-    return false
+-  }
+-}
++export * from '../../../worker/identity-lifecycle-runtime'
+diff --git a/academy-web/tests/unit/identity-key-distribution-not-wired.test.ts b/academy-web/tests/unit/identity-key-distribution-not-wired.test.ts
+index 396fc8b..1eebd27 100644
+--- a/academy-web/tests/unit/identity-key-distribution-not-wired.test.ts
++++ b/academy-web/tests/unit/identity-key-distribution-not-wired.test.ts
+@@ -337,6 +337,11 @@ describe('การกระจาย verification key ของ Identity ยั
+     IDENTITY_LIB,
+     'lifecycle-production-runtime.ts',
+   ))
++  const workerLifecycleCompositionPath = canonical(join(
++    ROOT,
++    'worker',
++    'identity-lifecycle-runtime.ts',
++  ))
+   const custodyDiagnosticPath = canonical(join(
+     ROOT,
+     'worker',
+@@ -349,6 +354,7 @@ describe('การกระจาย verification key ของ Identity ยั
+     localRuntimePath,
+     productionCompositionPath,
+     lifecycleProductionCompositionPath,
++    workerLifecycleCompositionPath,
+     custodyDiagnosticPath,
+   ]))
+   const { files: productionCompositionReachable } = reachableFrom([productionCompositionPath])
+diff --git a/academy-web/tests/unit/static-asset-boundary.test.ts b/academy-web/tests/unit/static-asset-boundary.test.ts
+index a511d4f..74188c2 100644
+--- a/academy-web/tests/unit/static-asset-boundary.test.ts
++++ b/academy-web/tests/unit/static-asset-boundary.test.ts
+@@ -24,12 +24,54 @@ describe('deployed static-asset boundary', () => {
+ 
+   it('runs the protected-media path through the Worker and wires the final-asset gate', () => {
+     const wrangler = readFileSync('wrangler.jsonc', 'utf8')
+-    const packageJson = JSON.parse(readFileSync('package.json', 'utf8')) as {
+-      scripts: Record<string, string>
+-    }
++    const buildScript = readFileSync('scripts/build-cloudflare.sh', 'utf8')
+ 
+     expect(wrangler).toContain('"run_worker_first": ["/media/*"]')
+-    expect(packageJson.scripts['build:cf']).toContain('asset-guard')
++    expect(buildScript).toContain('asset-guard')
++  })
++
++  it('refuses font mocks before any production build command runs', () => {
++    const root = mkdtempSync(path.join(tmpdir(), 'academy-build-contract-'))
++    try {
++      const marker = path.join(root, 'called')
++      for (const command of ['node', 'npm', 'npx']) {
++        writeFileSync(path.join(root, command), '#!/bin/sh\nprintf called >> "$BUILD_CONTRACT_MARKER"\n', { mode: 0o700 })
++      }
++      const result = spawnSync('/bin/bash', [path.resolve('scripts/build-cloudflare.sh')], {
++        cwd: root,
++        env: { NODE_ENV: 'production', PATH: `${root}:/usr/bin:/bin`, NEXT_FONT_GOOGLE_MOCKED_RESPONSES: 'synthetic-fixture', BUILD_CONTRACT_MARKER: marker },
++        encoding: 'utf8',
++      })
++      expect(result.status).toBe(1)
++      expect(result.stderr).toContain('Production build refuses mocked font responses')
++      expect(() => readFileSync(marker)).toThrow()
++    } finally {
++      rmSync(root, { recursive: true, force: true })
++    }
++  })
++
++  it('executes the existing workerd gate before compilation and the final bundle gate afterwards', () => {
++    const root = mkdtempSync(path.join(tmpdir(), 'academy-build-contract-'))
++    try {
++      const marker = path.join(root, 'called')
++      for (const command of ['node', 'npm', 'npx']) {
++        writeFileSync(path.join(root, command), `#!/bin/sh\nprintf '%s\\n' "${command} $*" >> "$BUILD_CONTRACT_MARKER"\n`, { mode: 0o700 })
++      }
++      const result = spawnSync('/bin/bash', [path.resolve('scripts/build-cloudflare.sh')], {
++        cwd: root,
++        env: { NODE_ENV: 'production', PATH: `${root}:/usr/bin:/bin`, BUILD_CONTRACT_MARKER: marker },
++        encoding: 'utf8',
++      })
++      expect(result.status).toBe(0)
++      expect(readFileSync(marker, 'utf8').trim().split('\n')).toEqual([
++        'npm run verify:workerd',
++        'npx opennextjs-cloudflare build',
++        'npm run asset-guard',
++        'node scripts/check-final-worker-startup.mjs',
++      ])
++    } finally {
++      rmSync(root, { recursive: true, force: true })
++    }
+   })
+ })
+ 
+diff --git a/academy-web/worker.ts b/academy-web/worker.ts
+index a2f5182..edeb119 100644
+--- a/academy-web/worker.ts
++++ b/academy-web/worker.ts
+@@ -4,7 +4,7 @@ import { servePrivateMedia, type MediaWorkerEnv } from './src/lib/media/worker-d
+ import { EdgeRateLimiter } from './worker/edge-rate-limiter-do'
+ import { isServedHost, unservedHostResponse, type HostPolicyEnv } from './src/lib/edge-host-policy'
+ import { enforceEdgeRateLimit } from './src/lib/edge-rate-limit-enforcement'
+-import { runAcademyIdentityLifecyclePull } from './src/lib/identity/lifecycle-production-runtime'
++import { runAcademyIdentityLifecyclePull } from './worker/identity-lifecycle-runtime'
+ 
+ export { EdgeRateLimiter }
+ 
+diff --git a/academy-web/scripts/build-cloudflare.sh b/academy-web/scripts/build-cloudflare.sh
+new file mode 100644
+index 0000000..b792fad
+--- /dev/null
++++ b/academy-web/scripts/build-cloudflare.sh
+@@ -0,0 +1,16 @@
++#!/usr/bin/env bash
++set -euo pipefail
++
++export NEXT_PUBLIC_SUPABASE_URL=
++export NEXT_PUBLIC_SUPABASE_ANON_KEY=
++export ACADEMY_BUILD_DISABLE_WEBPACK_CACHE=1
++
++if [[ -n "${NEXT_FONT_GOOGLE_MOCKED_RESPONSES:-}" ]]; then
++  echo 'Production build refuses mocked font responses' >&2
++  exit 1
++fi
++
++npm run verify:workerd
++npx opennextjs-cloudflare build
++npm run asset-guard
++node scripts/check-final-worker-startup.mjs
+diff --git a/academy-web/scripts/check-final-worker-startup.mjs b/academy-web/scripts/check-final-worker-startup.mjs
+new file mode 100644
+index 0000000..9fa1f26
+--- /dev/null
++++ b/academy-web/scripts/check-final-worker-startup.mjs
+@@ -0,0 +1,129 @@
++#!/usr/bin/env node
++
++import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
++import { spawnSync } from 'node:child_process'
++import path from 'node:path'
++import process from 'node:process'
++import { fileURLToPath } from 'node:url'
++
++const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
++const artifactPath = path.join(root, '.open-next/worker.js')
++const entryPath = path.join(root, 'worker.ts')
++
++if (!existsSync(entryPath) || !existsSync(artifactPath)) {
++  console.error('FAIL final OpenNext artifact is missing; run the OpenNext build first')
++  process.exit(1)
++}
++
++const bundleDirectory = path.join(root, '.next/final-worker-bundle')
++const bundlePath = path.join(bundleDirectory, 'worker.js')
++rmSync(bundleDirectory, { force: true, recursive: true })
++mkdirSync(bundleDirectory, { recursive: true })
++
++const bundling = spawnSync(process.execPath, [
++  'node_modules/wrangler/bin/wrangler.js',
++  'deploy', '--dry-run', `--outdir=${bundleDirectory}`,
++  '--autoconfig=false', '--keep-vars',
++], {
++  cwd: root,
++  encoding: 'utf8',
++  env: { ...process.env, CI: 'true', WRANGLER_SEND_METRICS: 'false' },
++})
++
++if (bundling.status !== 0) {
++  console.error('FAIL final production Worker bundling failed')
++  if (bundling.stdout) console.error(bundling.stdout)
++  if (bundling.stderr) console.error(bundling.stderr)
++  process.exit(1)
++}
++
++const bundle = await readFileSync(bundlePath, 'utf8')
++if (bundle.includes('server-only')) {
++  console.error('FAIL final Worker startup imported the React server-only boundary')
++  process.exit(1)
++}
++
++const relativeBundle = './bundle.js'
++const wasmModules = [...bundle.matchAll(/from\s*"(\.\/[^"]+\.wasm)"/g)]
++  .map((match) => match[1])
++  .filter((name, index, names) => names.indexOf(name) === index)
++const dataModules = [...bundle.matchAll(/(?:from\s*|import\s*\()\s*"(\.\/[^"]+\.bin)"/g)]
++  .map((match) => match[1])
++  .filter((name, index, names) => names.indexOf(name) === index)
++const moduleEntries = [
++  { name: './bundle.js', type: 'esModule' },
++  ...wasmModules.map((name) => ({ name, type: 'wasm' })),
++  ...dataModules.map((name) => ({ name, type: 'data' })),
++]
++
++const moduleDefinition = (entry) => {
++  const sourceName = entry.name === './bundle.js' ? 'worker.js' : path.basename(entry.name)
++  return `(name="${entry.name}", ${entry.type}=embed "final-worker-bundle/${sourceName}")`
++}
++
++const testModule = `
++import worker from '${relativeBundle}'
++export default {
++  async test() {
++    if (typeof worker.fetch !== 'function') throw new Error('Worker fetch handler is missing')
++    if (typeof worker.scheduled !== 'function') throw new Error('Worker scheduled lifecycle handler is missing')
++
++    const outbound = await fetch('https://outbound-gate.invalid/')
++    if (outbound.status !== 503 || outbound.headers.get('x-outbound-request-blocked') !== 'true') {
++      throw new Error('outbound service was not intercepted')
++    }
++
++    const response = await worker.fetch(
++      new Request('https://raw-host.example/'),
++      { IDENTITY_LIFECYCLE_ENABLED: 'false' },
++      { waitUntil() {}, passThroughOnException() {} },
++    )
++    if (response.status !== 404 || response.headers.get('cache-control') !== 'no-store') {
++      throw new Error('raw-host gate returned ' + response.status)
++    }
++  },
++}
++`
++const testModulePath = path.join(root, '.next/final-worker-startup-test.js')
++const configPath = path.join(root, '.next/final-worker-startup.capnp')
++writeFileSync(testModulePath, testModule)
++writeFileSync(configPath, `using Config = import "/workerd/workerd.capnp".Config;
++const config :Config = (
++  services = [
++    (
++      name = "blocked-outbound",
++      worker = (
++        modules = [(name="blocked.js", esModule="export default { async fetch() { return new Response(null, { status: 503, headers: { 'x-outbound-request-blocked': 'true' } }) } }")],
++        compatibilityDate = "2025-03-25",
++      ),
++    ),
++    (
++      name = "academy-final-worker",
++      worker = (
++        modules = [(name="gate.js", esModule=embed "final-worker-startup-test.js"), ${moduleEntries.map(moduleDefinition).join(', ')}],
++        compatibilityDate = "2025-03-25",
++        compatibilityFlags = ["nodejs_compat", "global_fetch_strictly_public"],
++        globalOutbound = "blocked-outbound",
++      ),
++    ),
++  ],
++);
++`)
++
++const runtime = spawnSync(process.execPath, [
++  'node_modules/workerd/bin/workerd',
++  'test',
++  '-Inode_modules',
++  '--no-verbose',
++  configPath,
++  'academy-final-worker',
++], { cwd: root, encoding: 'utf8' })
++
++if (runtime.stdout) console.log(runtime.stdout.trim())
++if (runtime.status !== 0) {
++  console.error('FAIL final Worker did not initialize on real workerd')
++  if (runtime.stderr) console.error(runtime.stderr)
++  process.exit(1)
++}
++
++console.log(`PASS final OpenNext Worker initialized on real workerd; raw-host gate HTTP 404; outbound requests blocked; bundle ${(bundle.length / 1024).toFixed(1)} KiB`)
+diff --git a/academy-web/src/lib/db/academy-db-core.ts b/academy-web/src/lib/db/academy-db-core.ts
+new file mode 100644
+index 0000000..3ae3a5e
+--- /dev/null
++++ b/academy-web/src/lib/db/academy-db-core.ts
+@@ -0,0 +1,104 @@
++/// <reference types="node" />
++
++import { createClient } from '@supabase/supabase-js'
++
++const runtimeTokenEncoder = new TextEncoder()
++
++async function issueWorkerRuntimeToken(secret: string, now: Date): Promise<string> {
++  const secretBytes = runtimeTokenEncoder.encode(secret)
++  if (secretBytes.byteLength < 32) {
++    throw new Error('ACADEMY_DATA_API_JWT_SECRET ต้องมีอย่างน้อย 32 bytes')
++  }
++
++  const issuedAt = Math.floor(now.getTime() / 1000)
++  const encode = (value: object) => runtimeTokenEncoder.encode(JSON.stringify(value))
++  const base64Url = (bytes: Uint8Array) => {
++    let binary = ''
++    for (const byte of bytes) binary += String.fromCharCode(byte)
++    return btoa(binary).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/u, '')
++  }
++  const header = base64Url(encode({ alg: 'HS256', typ: 'JWT' }))
++  const payload = base64Url(encode({
++    aud: 'academy-data-api',
++    exp: issuedAt + 60,
++    iat: issuedAt,
++    role: 'academy_runtime',
++  }))
++  const signed = `${header}.${payload}`
++  const key = await crypto.subtle.importKey(
++    'raw',
++    secretBytes,
++    { name: 'HMAC', hash: 'SHA-256' },
++    false,
++    ['sign'],
++  )
++  const signature = await crypto.subtle.sign('HMAC', key, runtimeTokenEncoder.encode(signed))
++  return `${signed}.${base64Url(new Uint8Array(signature))}`
++}
++
++export type AcademyDbConfig = {
++  url: string
++  signingSecret: string
++  fetch?: typeof globalThis.fetch
++  now?: () => Date
++}
++
++function validateAcademyDataApiUrl(value: string): string {
++  let url: URL
++  try {
++    url = new URL(value)
++  } catch {
++    throw new Error('ACADEMY_DATA_API_URL ต้องเป็น dedicated API URL ที่ถูกต้อง')
++  }
++
++  const isSecureOrigin = url.protocol === 'https:'
++  const isLocalLoopback = url.protocol === 'http:' && url.hostname === '127.0.0.1'
++  if (!isSecureOrigin && !isLocalLoopback) {
++    throw new Error('ACADEMY_DATA_API_URL ต้องเป็น HTTPS หรือ HTTP loopback 127.0.0.1')
++  }
++  if (url.username || url.password || url.pathname !== '/' || url.search || url.hash) {
++    throw new Error('ACADEMY_DATA_API_URL ต้องเป็น origin ของ dedicated API เท่านั้น')
++  }
++  return url.origin
++}
++
++export function isSafeAcademyDataApiUrl(value: string): boolean {
++  try {
++    validateAcademyDataApiUrl(value)
++    return true
++  } catch {
++    return false
++  }
++}
++
++export function academyDataApiFetch(baseFetch: typeof globalThis.fetch): typeof globalThis.fetch {
++  return (input, init) => {
++    const inputUrl = input instanceof Request ? input.url : input.toString()
++    const url = new URL(inputUrl)
++    if (url.pathname === '/rest/v1' || url.pathname.startsWith('/rest/v1/')) {
++      url.pathname = url.pathname.slice('/rest/v1'.length) || '/'
++    }
++    if (input instanceof Request) {
++      return baseFetch(new Request(url.toString(), input), init)
++    }
++    return baseFetch(url.toString(), init)
++  }
++}
++
++export function createAcademyDb({ url, signingSecret, fetch, now = () => new Date() }: AcademyDbConfig) {
++  return createClient(validateAcademyDataApiUrl(url), 'academy-runtime', {
++    auth: { persistSession: false, autoRefreshToken: false },
++    db: { schema: 'academy' },
++    accessToken: () => issueWorkerRuntimeToken(signingSecret, now()),
++    global: { fetch: academyDataApiFetch(fetch ?? globalThis.fetch) },
++  })
++}
++
++export function academyDb() {
++  const url = process.env.ACADEMY_DATA_API_URL
++  const signingSecret = process.env.ACADEMY_DATA_API_JWT_SECRET
++  if (!url || !signingSecret) {
++    throw new Error('ACADEMY_DATA_API_URL / ACADEMY_DATA_API_JWT_SECRET ยังไม่ถูกตั้งค่า (ดู .env.example)')
++  }
++  return createAcademyDb({ url, signingSecret })
++}
+diff --git a/academy-web/worker/identity-lifecycle-runtime.ts b/academy-web/worker/identity-lifecycle-runtime.ts
+new file mode 100644
+index 0000000..028c801
+--- /dev/null
++++ b/academy-web/worker/identity-lifecycle-runtime.ts
+@@ -0,0 +1,350 @@
++import { academyDb } from '../src/lib/db/academy-db-core'
++import { parseStrictJsonText, readStrictJsonResponse } from '../src/lib/http/strict-json-response'
++import { createIdentityClientAssertionJtiSource } from '../src/lib/identity/client-assertion-jti-source'
++import { createIdentityClientAssertionProvider } from '../src/lib/identity/client-assertion-provider'
++import { APPROVED_ACADEMY_CONSUMER_REGISTRY_V1 } from '../src/lib/identity/consumer-policy'
++import {
++  createIdentityClientAssertionWebCryptoSigner,
++} from '../src/lib/identity/client-assertion-webcrypto-signer'
++import { AcademyIdentityLifecyclePageStore } from '../src/lib/identity/lifecycle-page-store'
++import { createIdentityLifecyclePullResponseTransport } from '../src/lib/identity/lifecycle-pull-response-transport'
++import {
++  runIdentityLifecyclePullCycle,
++  type IdentityLifecyclePullCycleResult,
++} from '../src/lib/identity/lifecycle-pull-cycle'
++import { createIdentityLifecyclePullTransport } from '../src/lib/identity/lifecycle-pull-transport'
++import {
++  IDENTITY_LIFECYCLE_PULL_LEASE_MAX_DURATION_MS,
++  IDENTITY_LIFECYCLE_PULL_LEASE_MIN_DURATION_MS,
++} from '../src/lib/identity/lifecycle-pull-lease'
++
++const PRINCIPAL_ISSUER = 'https://supabase.cyberskills.co.th/auth/v1'
++const CONSUMER_ID = 'academy-web'
++const KEY_ID = /^[A-Za-z0-9][A-Za-z0-9_-]{0,47}$/
++const WORKER_ID = /^[A-Za-z0-9][A-Za-z0-9._:/-]{0,159}$/
++const COORDINATE = /^[A-Za-z0-9_-]{43}$/
++const FINGERPRINT = /^[a-f0-9]{64}$/
++const MAX_KEY_SET_CHARACTERS = 64 * 1024
++const MAX_JWK_CHARACTERS = 4_096
++
++export type AcademyIdentityLifecycleProductionConfig = Readonly<{
++  approvedConfigRevision: number
++  endpoint: string
++  clientAssertionAudience: string
++  envelopePolicy: {
++    expectedIssuer: string
++    expectedAudience: string
++    clockSkewSeconds: number
++    maximumLifetimeSeconds: number
++    key: {
++      keyId: string
++      algorithm: 'ES256'
++      publicJwk: JsonWebKey
++    }
++  }
++  clientAssertionKeyId: string
++  clientAssertionPrivateJwk: string
++  requestedLimit: number
++  leaseDurationMs: number
++  workerId: string
++  timeoutMs: number
++}>
++
++type RuntimeDependencies = {
++  academyDb: () => IdentityLifecycleRpcClient
++  fetch: typeof globalThis.fetch
++  createSigner: typeof createIdentityClientAssertionWebCryptoSigner
++  now: () => Date
++}
++
++type IdentityLifecycleRpcClient = {
++  rpc(
++    functionName: string,
++    parameters: Record<string, unknown>,
++  ): PromiseLike<{ data: unknown, error: unknown }>
++}
++
++export type AcademyIdentityLifecycleProductionRuntimeOptions = {
++  environment?: Record<string, string | undefined>
++  dependencies?: Partial<RuntimeDependencies>
++}
++
++export function projectAcademyIdentityLifecycleProductionConfig(
++  environmentValue: Record<string, string | undefined>,
++): AcademyIdentityLifecycleProductionConfig | null {
++  try {
++    const enabled = environmentValue.IDENTITY_LIFECYCLE_ENABLED
++    const endpoint = environmentValue.IDENTITY_LIFECYCLE_PUBLISHER_ENDPOINT
++    const clientAssertionAudience = environmentValue.IDENTITY_LIFECYCLE_CLIENT_ASSERTION_AUDIENCE
++    const eventAudience = environmentValue.IDENTITY_LIFECYCLE_EVENT_AUDIENCE
++    const clientAssertionKeyId = environmentValue.IDENTITY_LIFECYCLE_CLIENT_ASSERTION_KEY_ID
++    const privateJwk = environmentValue.IDENTITY_LIFECYCLE_CLIENT_ASSERTION_PRIVATE_JWK
++    const keySetDocument = environmentValue.IDENTITY_LIFECYCLE_VERIFICATION_KEY_SET_DOCUMENT
++    const workerId = environmentValue.IDENTITY_LIFECYCLE_WORKER_ID
++    if (typeof clientAssertionKeyId !== 'string' || typeof workerId !== 'string') return null
++    if (enabled !== 'true'
++      || !isExactHttpsUrl(endpoint)
++      || !isExactHttpsUrl(clientAssertionAudience)
++      || !isExactHttpsUrl(eventAudience)
++      || !KEY_ID.test(clientAssertionKeyId ?? '')
++      || !WORKER_ID.test(workerId ?? '')
++      || !isCanonicalPrivateJwk(privateJwk)) return null
++
++    const requestedLimit = parseBoundedInteger(
++      environmentValue.IDENTITY_LIFECYCLE_REQUEST_LIMIT ?? '50',
++      1,
++      100,
++    )
++    const leaseDurationMs = parseBoundedInteger(
++      environmentValue.IDENTITY_LIFECYCLE_LEASE_DURATION_MS ?? '30000',
++      IDENTITY_LIFECYCLE_PULL_LEASE_MIN_DURATION_MS,
++      IDENTITY_LIFECYCLE_PULL_LEASE_MAX_DURATION_MS,
++    )
++    const timeoutMs = parseBoundedInteger(
++      environmentValue.IDENTITY_LIFECYCLE_TIMEOUT_MS ?? '1000',
++      100,
++      5_000,
++    )
++    const key = parseActiveLifecycleKey(keySetDocument)
++    if (!requestedLimit || !leaseDurationMs || !timeoutMs || !key) return null
++
++    return Object.freeze({
++      approvedConfigRevision: APPROVED_ACADEMY_CONSUMER_REGISTRY_V1.client.configRevision,
++      endpoint,
++      clientAssertionAudience,
++      envelopePolicy: Object.freeze({
++        expectedIssuer: PRINCIPAL_ISSUER,
++        expectedAudience: eventAudience,
++        clockSkewSeconds: 30,
++        maximumLifetimeSeconds: 120,
++        key,
++      }),
++      clientAssertionKeyId,
++      clientAssertionPrivateJwk: privateJwk,
++      requestedLimit,
++      leaseDurationMs,
++      workerId,
++      timeoutMs,
++    })
++  } catch {
++    return null
++  }
++}
++
++export async function createAcademyIdentityLifecyclePullCycleRuntime(
++  options: AcademyIdentityLifecycleProductionRuntimeOptions = {},
++): Promise<(() => Promise<IdentityLifecyclePullCycleResult>) | null> {
++  const environment = options.environment ?? process.env
++  if (environment.IDENTITY_LIFECYCLE_ENABLED !== 'true') return null
++  const config = projectAcademyIdentityLifecycleProductionConfig(environment)
++  if (!config) {
++    throw new Error('Identity lifecycle production configuration is incomplete')
++  }
++  try {
++    const dependencies = resolveDependencies(options.dependencies)
++    if (!dependencies) throw new Error('invalid runtime dependencies')
++
++    const signer = await dependencies.createSigner({
++      clientId: CONSUMER_ID,
++      purpose: 'lifecycle_pull',
++      keyId: config.clientAssertionKeyId,
++      privateJwk: config.clientAssertionPrivateJwk,
++    })
++    const responseTransport = createIdentityLifecyclePullResponseTransport({
++      endpoint: config.endpoint,
++      timeoutMs: config.timeoutMs,
++      fetchPort: { fetch: dependencies.fetch },
++    })
++    const transport = createIdentityLifecyclePullTransport({
++      consumerId: CONSUMER_ID,
++      clientAssertionAudience: config.clientAssertionAudience,
++      requestedLimit: config.requestedLimit,
++      clientAssertionProvider: createIdentityClientAssertionProvider({
++        clientId: CONSUMER_ID,
++        purpose: 'lifecycle_pull',
++        audience: config.clientAssertionAudience,
++        keyId: config.clientAssertionKeyId,
++        lifetimeSeconds: 120,
++        clock: { now: dependencies.now },
++        jtiSource: createIdentityClientAssertionJtiSource(),
++        signer,
++      }),
++      responseTransport,
++      responseReader: {
++        read(response: Response) {
++          return readStrictJsonResponse(response, {
++            maxBytes: 512 * 1024,
++            maxDepth: 8,
++            timeoutMs: config.timeoutMs,
++          })
++        },
++      },
++      envelopePolicy: config.envelopePolicy,
++    })
++    const store = new AcademyIdentityLifecyclePageStore(dependencies.academyDb())
++    return async () => {
++      await store.reconcileApprovedConfigurationRevision(config.approvedConfigRevision)
++      return runIdentityLifecyclePullCycle({
++        store,
++        transport,
++        clock: { now: dependencies.now },
++        approvedConfigRevision: config.approvedConfigRevision,
++        workerId: config.workerId,
++        leaseDurationMs: config.leaseDurationMs,
++      })
++    }
++  } catch {
++    throw new Error('Identity lifecycle runtime initialization failed')
++  }
++}
++
++export async function runAcademyIdentityLifecyclePull(
++  environment: Record<string, string | undefined>,
++): Promise<IdentityLifecyclePullCycleResult | { outcome: 'disabled' }> {
++  const pull = await createAcademyIdentityLifecyclePullCycleRuntime({ environment })
++  if (!pull) return { outcome: 'disabled' }
++  return pull()
++}
++
++function resolveDependencies(
++  overrides: Partial<RuntimeDependencies> | undefined,
++): RuntimeDependencies | null {
++  const dependencies: RuntimeDependencies = {
++    academyDb: overrides?.academyDb ?? academyDb,
++    fetch: overrides?.fetch ?? globalThis.fetch,
++    createSigner: overrides?.createSigner ?? createIdentityClientAssertionWebCryptoSigner,
++    now: overrides?.now ?? (() => new Date()),
++  }
++  return typeof dependencies.academyDb === 'function'
++    && typeof dependencies.fetch === 'function'
++    && typeof dependencies.createSigner === 'function'
++    && typeof dependencies.now === 'function'
++    ? dependencies
++    : null
++}
++
++function parseActiveLifecycleKey(
++  documentValue: string | undefined,
++): AcademyIdentityLifecycleProductionConfig['envelopePolicy']['key'] | null {
++  const parsed = parseStrictJsonText(documentValue ?? '', MAX_KEY_SET_CHARACTERS, 8)
++  if (!parsed.ok) return null
++  const document = exactRecord(parsed.value, [
++    'issuer', 'keys', 'retiredKeyFingerprints', 'retiredKeyIds', 'revision',
++  ])
++  if (!document
++    || document.issuer !== PRINCIPAL_ISSUER
++    || !Number.isSafeInteger(document.revision as unknown)
++    || (document.revision as unknown as number) < 1
++    || !Array.isArray(document.keys)
++    || document.keys.length < 1
++    || document.keys.length > 3
++    || !isSortedUniqueStringList(document.retiredKeyFingerprints, FINGERPRINT, 64)) return null
++  const retiredKeyIds = document.retiredKeyIds
++  if (!isSortedUniqueStringList(retiredKeyIds, KEY_ID, 64)) return null
++
++  const active = document.keys.filter((entry) => exactRecord(entry, [
++    'algorithm', 'keyId', 'publicJwk', 'state',
++  ]))
++  const activeKeys = active.filter((entry) => {
++    const record = entry as Record<string, unknown>
++    return record.algorithm === 'ES256' && record.state === 'active'
++  })
++  if (active.length !== document.keys.length || activeKeys.length !== 1) return null
++  const entry = activeKeys[0] as Record<string, unknown>
++  if (typeof entry.keyId !== 'string'
++    || !KEY_ID.test(entry.keyId)
++    || ((entry.state === 'retired') !== retiredKeyIds.includes(entry.keyId))) return null
++  const jwk = exactRecord(entry.publicJwk, ['crv', 'kty', 'x', 'y'])
++  if (!jwk
++    || jwk.kty !== 'EC'
++    || jwk.crv !== 'P-256'
++    || typeof jwk.x !== 'string'
++    || !COORDINATE.test(jwk.x)
++    || typeof jwk.y !== 'string'
++    || !COORDINATE.test(jwk.y)) return null
++  return {
++    keyId: entry.keyId as string,
++    algorithm: 'ES256',
++    publicJwk: {
++      kty: 'EC',
++      crv: 'P-256',
++      x: jwk.x,
++      y: jwk.y,
++    },
++  }
++}
++
++function isCanonicalPrivateJwk(value: string | undefined): value is string {
++  if (!value || value.length > MAX_JWK_CHARACTERS) return false
++  const parsed = parseStrictJsonText(value, MAX_JWK_CHARACTERS, 3)
++  if (!parsed.ok) return false
++  const jwk = exactRecord(parsed.value, ['crv', 'd', 'kty', 'x', 'y'])
++  return !!jwk
++    && jwk.kty === 'EC'
++    && jwk.crv === 'P-256'
++    && typeof jwk.x === 'string'
++    && COORDINATE.test(jwk.x)
++    && typeof jwk.y === 'string'
++    && COORDINATE.test(jwk.y)
++    && typeof jwk.d === 'string'
++    && COORDINATE.test(jwk.d)
++}
++
++function parseBoundedInteger(
++  value: string | undefined,
++  minimum: number,
++  maximum: number,
++): number | null {
++  if (!value || !/^(?:0|[1-9][0-9]{0,8})$/.test(value)) return null
++  const parsed = Number(value)
++  return Number.isSafeInteger(parsed) && parsed >= minimum && parsed <= maximum ? parsed : null
++}
++
++function exactRecord(
++  value: unknown,
++  keys: readonly string[],
++): Record<string, unknown> | null {
++  if (!value
++    || typeof value !== 'object'
++    || Array.isArray(value)
++    || Object.getPrototypeOf(value) !== Object.prototype) return null
++  const actual = Reflect.ownKeys(value)
++  if (actual.length !== keys.length
++    || actual.some((key) => typeof key !== 'string' || !keys.includes(key))) return null
++  const record = Object.create(null) as Record<string, unknown>
++  for (const key of keys) {
++    const descriptor = Object.getOwnPropertyDescriptor(value, key)
++    if (!descriptor || !descriptor.enumerable || !('value' in descriptor)) return null
++    record[key] = descriptor.value
++  }
++  return record
++}
++
++function isSortedUniqueStringList(
++  value: unknown,
++  pattern: RegExp,
++  maximum: number,
++): value is string[] {
++  return Array.isArray(value)
++    && value.length <= maximum
++    && value.every((entry, index) => (
++      typeof entry === 'string'
++      && pattern.test(entry)
++      && (index === 0 || value[index - 1] < entry)
++    ))
++}
++
++function isExactHttpsUrl(value: string | undefined): value is string {
++  if (!value) return false
++  try {
++    const url = new URL(value)
++    return url.protocol === 'https:'
++      && url.username === ''
++      && url.password === ''
++      && url.search === ''
++      && url.hash === ''
++      && url.toString() === value
++  } catch {
++    return false
++  }
++}

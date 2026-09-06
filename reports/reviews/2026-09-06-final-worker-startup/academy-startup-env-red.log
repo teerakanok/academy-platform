@@ -1,0 +1,60 @@
+
+ RUN  v3.2.7 /private/tmp/academy-worker-startup-cde63a58/academy-web
+
+ ❯ |unit| tests/unit/identity-lifecycle-production-runtime.test.ts (11 tests | 2 failed) 19ms
+   × Academy Identity lifecycle production pull runtime > uses supplied Worker database bindings without process.env population 6ms
+     → Identity lifecycle runtime initialization failed
+   × Academy Identity lifecycle production pull runtime > does not fall back to ambient database credentials when supplied bindings are absent 7ms
+     → promise resolved "[AsyncFunction]" instead of rejecting
+   ✓ Academy Identity lifecycle production pull runtime > fails closed until every exact producer-approved runtime value is present 0ms
+   ✓ Academy Identity lifecycle production pull runtime > pins the canonical producer issuer and rejects a mismatched verification set 0ms
+   ✓ Academy Identity lifecycle production pull runtime > composes the durable store, leased cycle, purpose-bound assertion, and strict transport 1ms
+   ✓ Academy Identity lifecycle production pull runtime > reconciles the source-pinned approved config revision before claiming a pull lease 1ms
+   ✓ Academy Identity lifecycle production pull runtime > makes an explicit enabled-but-incomplete production schedule fail loudly and closed 1ms
+   ✓ Academy Identity lifecycle production pull runtime > keeps an absent rollout flag disabled without constructing dependencies 0ms
+   ✓ Academy Identity lifecycle production pull runtime > surfaces sanitized enabled-runtime initialization failures 1ms
+   ✓ Academy Identity lifecycle production pull runtime > keeps lifecycle authorization enforcement fail-closed during rollback 0ms
+   ✓ Academy Identity lifecycle production pull runtime > wires the production Worker schedule without retaining the deletion capability in the app Worker 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| tests/unit/identity-lifecycle-production-runtime.test.ts > Academy Identity lifecycle production pull runtime > uses supplied Worker database bindings without process.env population
+Error: Identity lifecycle runtime initialization failed
+ ❯ createAcademyIdentityLifecyclePullCycleRuntime worker/identity-lifecycle-runtime.ts:197:11
+    195|     }
+    196|   } catch {
+    197|     throw new Error('Identity lifecycle runtime initialization failed')
+       |           ^
+    198|   }
+    199| }
+ ❯ tests/unit/identity-lifecycle-production-runtime.test.ts:78:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |unit| tests/unit/identity-lifecycle-production-runtime.test.ts > Academy Identity lifecycle production pull runtime > does not fall back to ambient database credentials when supplied bindings are absent
+AssertionError: promise resolved "[AsyncFunction]" instead of rejecting
+
+- Expected: 
+Error {
+  "message": "rejected promise",
+}
+
++ Received: 
+[Function anonymous]
+
+ ❯ tests/unit/identity-lifecycle-production-runtime.test.ts:98:9
+     96|         environment: environment(),
+     97|         dependencies: { createSigner: deps.createSigner, fetch: deps.f…
+     98|       })).rejects.toThrow('Identity lifecycle runtime initialization f…
+       |         ^
+     99|       expect(deps.fetch).not.toHaveBeenCalled()
+    100|     } finally { vi.unstubAllEnvs() }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 9 passed (11)
+   Start at  00:45:53
+   Duration  505ms (transform 110ms, setup 0ms, collect 168ms, tests 19ms, environment 0ms, prepare 52ms)
+

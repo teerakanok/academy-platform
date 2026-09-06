@@ -1,0 +1,74 @@
+[
+  {
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "npx",
+      "vitest",
+      "run",
+      "--project",
+      "unit",
+      "tests/unit/static-asset-boundary.test.ts",
+      "--maxWorkers",
+      "1"
+    ],
+    "exit": 0,
+    "sha256": "082af37f8922358f620fefbd19d8d0051cd2aa4707765e203ce53094ba8c0996",
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-startup-parent-r2-gate-0.log"
+  },
+  {
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "npx",
+      "tsc",
+      "--noEmit"
+    ],
+    "exit": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-startup-parent-r2-gate-1.log"
+  },
+  {
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "npx",
+      "tsc",
+      "-p",
+      "tsconfig.worker.json"
+    ],
+    "exit": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-startup-parent-r2-gate-2.log"
+  },
+  {
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "npx",
+      "tsc",
+      "-p",
+      "ops/academy-retention-worker/tsconfig.json"
+    ],
+    "exit": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-startup-parent-r2-gate-3.log"
+  },
+  {
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "npm",
+      "run",
+      "lint"
+    ],
+    "exit": 1,
+    "sha256": "548a80468af78eb86b71de8d789d4e4528c01438cf57ed396084e3206859c9e0",
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-startup-parent-r2-gate-4.log"
+  }
+]

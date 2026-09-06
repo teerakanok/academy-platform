@@ -337,6 +337,11 @@ describe('การกระจาย verification key ของ Identity ยั
     IDENTITY_LIB,
     'lifecycle-production-runtime.ts',
   ))
+  const workerLifecycleCompositionPath = canonical(join(
+    ROOT,
+    'worker',
+    'identity-lifecycle-runtime.ts',
+  ))
   const custodyDiagnosticPath = canonical(join(
     ROOT,
     'worker',
@@ -349,6 +354,7 @@ describe('การกระจาย verification key ของ Identity ยั
     localRuntimePath,
     productionCompositionPath,
     lifecycleProductionCompositionPath,
+    workerLifecycleCompositionPath,
     custodyDiagnosticPath,
   ]))
   const { files: productionCompositionReachable } = reachableFrom([productionCompositionPath])

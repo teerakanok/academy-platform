@@ -1,0 +1,64 @@
+
+ RUN  v3.2.7 /private/tmp/academy-worker-startup-cde63a58/academy-web
+
+ ❯ |unit| tests/unit/static-asset-boundary.test.ts (7 tests | 2 failed) 2498ms
+   ✓ deployed static-asset boundary > applies the Next.js security-header baseline to static assets 1ms
+   ✓ deployed static-asset boundary > runs the protected-media path through the Worker and wires the final-asset gate 0ms
+   × deployed static-asset boundary > refuses font mocks before any production build command runs 910ms
+     → expected +0 to be 1 // Object.is equality
+   × deployed static-asset boundary > executes the existing workerd gate before compilation and the final bundle gate afterwards 1410ms
+     → expected [ …(3) ] to deeply equal [ 'npm run verify:workerd', …(3) ]
+   ✓ final asset filesystem guard > refuses a safe-named file symlink instead of hiding protected media 59ms
+   ✓ final asset filesystem guard > refuses a safe-named directory symlink instead of hiding protected media 60ms
+   ✓ final asset filesystem guard > refuses a safe-named cycle symlink instead of hiding protected media 56ms
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 5 passed (7)
+   Start at  00:12:24
+   Duration  2.70s (transform 23ms, setup 0ms, collect 21ms, tests 2.50s, environment 0ms, prepare 43ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| tests/unit/static-asset-boundary.test.ts > deployed static-asset boundary > refuses font mocks before any production build command runs
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/unit/static-asset-boundary.test.ts:45:29
+     43|         encoding: 'utf8',
+     44|       })
+     45|       expect(result.status).toBe(1)
+       |                             ^
+     46|       expect(result.stderr).toContain('Production build refuses mocked…
+     47|       expect(() => readFileSync(marker)).toThrow()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |unit| tests/unit/static-asset-boundary.test.ts > deployed static-asset boundary > executes the existing workerd gate before compilation and the final bundle gate afterwards
+AssertionError: expected [ …(3) ] to deeply equal [ 'npm run verify:workerd', …(3) ]
+
+- Expected
++ Received
+
+  [
+-   "npm run verify:workerd",
+    "npx opennextjs-cloudflare build",
+    "npm run asset-guard",
+    "node scripts/check-final-worker-startup.mjs",
+  ]
+
+ ❯ tests/unit/static-asset-boundary.test.ts:66:63
+     64|       })
+     65|       expect(result.status).toBe(0)
+     66|       expect(readFileSync(marker, 'utf8').trim().split('\n')).toEqual([
+       |                                                               ^
+     67|         'npm run verify:workerd',
+     68|         'npx opennextjs-cloudflare build',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

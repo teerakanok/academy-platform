@@ -4,7 +4,7 @@ import { servePrivateMedia, type MediaWorkerEnv } from './src/lib/media/worker-d
 import { EdgeRateLimiter } from './worker/edge-rate-limiter-do'
 import { isServedHost, unservedHostResponse, type HostPolicyEnv } from './src/lib/edge-host-policy'
 import { enforceEdgeRateLimit } from './src/lib/edge-rate-limit-enforcement'
-import { runAcademyIdentityLifecyclePull } from './src/lib/identity/lifecycle-production-runtime'
+import { runAcademyIdentityLifecyclePull } from './worker/identity-lifecycle-runtime'
 
 export { EdgeRateLimiter }
 
