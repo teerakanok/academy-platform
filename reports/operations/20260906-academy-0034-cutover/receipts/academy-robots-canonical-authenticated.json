@@ -1,0 +1,23 @@
+{
+  "command": [
+    "rtk",
+    "proxy",
+    "cloudflared",
+    "access",
+    "curl",
+    "https://academy.cyberskills.co.th/",
+    "--request-target",
+    "/robots.txt",
+    "-sS",
+    "-i",
+    "--max-time",
+    "20"
+  ],
+  "exit": 0,
+  "status": "HTTP/2 200 ",
+  "content_type": "content-type: text/plain; charset=utf-8",
+  "body_bytes": 1863,
+  "body_sha256": "36d72bef5c475dbc85e08ebb40df2cc60a2175a0f5f760ae61705b292fb51260",
+  "robots_directives": true,
+  "access_login_body": false
+}

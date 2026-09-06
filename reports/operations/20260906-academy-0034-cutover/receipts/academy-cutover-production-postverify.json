@@ -1,0 +1,140 @@
+{
+  "http": [
+    {
+      "path": "/",
+      "command": [
+        "rtk",
+        "proxy",
+        "cloudflared",
+        "access",
+        "curl",
+        "https://academy.cyberskills.co.th/",
+        "-sS",
+        "-i",
+        "--max-time",
+        "25"
+      ],
+      "exit": 0,
+      "status": "HTTP/2 200 ",
+      "body_bytes": 182094,
+      "body_sha256": "5d77e47a9d4d5bfd622bd76df0a3b90f82f1f3562c194fafa272f0c86c8d50ce",
+      "course_previews": true,
+      "location_path": "",
+      "notice": [],
+      "set_cookie_count": 0
+    },
+    {
+      "path": "/sign-in",
+      "command": [
+        "rtk",
+        "proxy",
+        "cloudflared",
+        "access",
+        "curl",
+        "https://academy.cyberskills.co.th/sign-in",
+        "-sS",
+        "-i",
+        "--max-time",
+        "25"
+      ],
+      "exit": 0,
+      "status": "HTTP/2 200 ",
+      "body_bytes": 16743,
+      "body_sha256": "0e77f35e7bf84f623850db3f76765af52f9c86b13441418377a32834bc186e6f",
+      "course_previews": false,
+      "location_path": "",
+      "notice": [],
+      "set_cookie_count": 0
+    },
+    {
+      "path": "/robots.txt",
+      "command": [
+        "rtk",
+        "proxy",
+        "curl",
+        "https://academy.cyberskills.co.th/robots.txt",
+        "-sS",
+        "-i",
+        "--max-time",
+        "25"
+      ],
+      "exit": 0,
+      "status": "HTTP/2 200 ",
+      "body_bytes": 1836,
+      "body_sha256": "842b34303164ead41bccb7c05d1707422e98d108753b397b6dcc19683eb02101",
+      "course_previews": false,
+      "location_path": "/cdn-cgi/access/login/academy.cyberskills.co.th",
+      "notice": [],
+      "set_cookie_count": 1
+    },
+    {
+      "path": "worker-host",
+      "command": [
+        "rtk",
+        "proxy",
+        "curl",
+        "https://cyberskills-academy.songpon-te.workers.dev/",
+        "-sS",
+        "-i",
+        "--max-time",
+        "25"
+      ],
+      "exit": 0,
+      "status": "HTTP/2 404 ",
+      "body_bytes": 0,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "course_previews": false,
+      "location_path": "",
+      "notice": [],
+      "set_cookie_count": 0
+    },
+    {
+      "path": "/auth/callback?code=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&state=BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+      "command": [
+        "rtk",
+        "proxy",
+        "cloudflared",
+        "access",
+        "curl",
+        "https://academy.cyberskills.co.th/auth/callback?code=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&state=BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+        "-sS",
+        "-i",
+        "--max-time",
+        "25"
+      ],
+      "exit": 0,
+      "status": "HTTP/2 303 ",
+      "body_bytes": 0,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "course_previews": false,
+      "location_path": "/sign-in",
+      "notice": [
+        "identity-unavailable"
+      ],
+      "set_cookie_count": 1
+    }
+  ],
+  "db_command": [
+    "rtk",
+    "proxy",
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=10",
+    "root@ssh-db.cyberskills.co.th",
+    "docker exec -i supabase-db psql -X -U postgres -d postgres -v ON_ERROR_STOP=1 -v VERBOSITY=sqlstate -At"
+  ],
+  "sql": "BEGIN READ ONLY;\nSELECT json_build_object('marker_count',(SELECT count(*) FROM academy.identity_session_id_digest_transition WHERE migration_name='0034_identity_session_id_digest'),'session_count',(SELECT count(*) FROM academy.identity_session),'invalid_digest_count',(SELECT count(*) FROM academy.identity_session WHERE id !~ '^[A-Za-z0-9_-]{43}$'),'transaction_count',(SELECT count(*) FROM academy.identity_authorization_transaction),'active_claims',(SELECT count(*) FROM academy.identity_authorization_transaction WHERE claim_expires_at>clock_timestamp()),'legacy_links',(SELECT count(*) FROM academy.identity_authorization_transaction WHERE session_id IS NOT NULL OR completed_at IS NOT NULL OR claim_digest IS NOT NULL),'digest_rpc_count',(SELECT count(*) FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='academy' AND p.proname IN ('create_identity_session_digest','read_identity_session_digest','revoke_identity_session_digest','claim_identity_authorization_transaction_digest','finalize_identity_authorization_transaction_digest')),'runtime_digest_grants',(SELECT bool_and(has_function_privilege('academy_runtime',p.oid,'EXECUTE')) FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='academy' AND p.proname IN ('create_identity_session_digest','read_identity_session_digest','revoke_identity_session_digest','claim_identity_authorization_transaction_digest','finalize_identity_authorization_transaction_digest')));\nROLLBACK;\n",
+  "db": {
+    "marker_count": 1,
+    "session_count": 1,
+    "invalid_digest_count": 0,
+    "transaction_count": 2,
+    "active_claims": 0,
+    "legacy_links": 0,
+    "digest_rpc_count": 5,
+    "runtime_digest_grants": true
+  },
+  "pass": true
+}

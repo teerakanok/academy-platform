@@ -1,0 +1,16 @@
+{
+  "observed_browser": "Safari",
+  "window_id": 37481,
+  "origin": "https://accounts.cyberskills.co.th",
+  "path": "/sign-in",
+  "query_keys": [
+    "client_id",
+    "code_challenge",
+    "code_challenge_method",
+    "nonce",
+    "redirect_uri",
+    "service_id",
+    "state"
+  ],
+  "email_submit_performed": false
+}

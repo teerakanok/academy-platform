@@ -1,0 +1,9 @@
+{
+  "old_candidate": "bd109c61-ddda-46c3-8d27-6cedc3365394",
+  "new_candidate": "1af77a26-bba2-4300-9a71-0bc0262ca06d",
+  "script_equal": true,
+  "binding_names_types_equal": true,
+  "binding_count": 17,
+  "other_resources_equal": false,
+  "script_sha256": "a3ed345c1e2b9c8ae507f124912ea67ff088d4b681a28c632b8b7478ccafa9a4"
+}

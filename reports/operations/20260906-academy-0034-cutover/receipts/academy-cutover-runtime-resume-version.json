@@ -1,0 +1,22 @@
+{
+  "command": [
+    "rtk",
+    "proxy",
+    "./node_modules/.bin/wrangler",
+    "versions",
+    "secret",
+    "put",
+    "IDENTITY_RUNTIME_ENABLED",
+    "--name",
+    "cyberskills-academy",
+    "--message",
+    "s=0e4417ec4e2909f05ab4eb9f3269bcb1c58c184b;resume-reviewed-digest-runtime"
+  ],
+  "source_latest_version": "f126b6ac-7e3e-4f47-9990-1716b4c106ba",
+  "exit": 0,
+  "new_version_ids": [
+    "1af77a26-bba2-4300-9a71-0bc0262ca06d"
+  ],
+  "output_sha256": "dc658e7631b5c5e5528d3ede89504ea5e4c477ed76b78d0477327422b73df01a",
+  "runtime_flag_enabled": true
+}

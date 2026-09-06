@@ -1,0 +1,19 @@
+{
+  "command": [
+    "rtk",
+    "proxy",
+    "./node_modules/.bin/wrangler",
+    "versions",
+    "deploy",
+    "1af77a26-bba2-4300-9a71-0bc0262ca06d@100",
+    "--name",
+    "cyberskills-academy",
+    "--message",
+    "Resume reviewed digest runtime after verified 0034 COMMIT",
+    "--yes"
+  ],
+  "exit": 0,
+  "finished_at": 1788735028.015709,
+  "output_sha256": "50258f1e40d965d7f9e20302208cf8542d7587c0a0ad72d6214815a25aca7797",
+  "prior_deployment": "8d62fbf9-c51f-4bbd-bfb5-401f83b97a5b"
+}

@@ -1,0 +1,70 @@
+{
+  "checks": [
+    {
+      "command": [
+        "rtk",
+        "proxy",
+        "cloudflared",
+        "access",
+        "curl",
+        "https://academy.cyberskills.co.th/api/auth/identity/start?next=%2Fdashboard",
+        "-sS",
+        "-i",
+        "--max-time",
+        "20",
+        "-H",
+        "Cookie: academy_session=CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC"
+      ],
+      "exit": 0,
+      "status": "HTTP/2 303 ",
+      "location_path": "/sign-in",
+      "notice": [
+        "identity-unavailable"
+      ],
+      "set_cookie_count": 0,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "rtk",
+        "proxy",
+        "cloudflared",
+        "access",
+        "curl",
+        "https://academy.cyberskills.co.th/auth/callback?code=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&state=BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+        "-sS",
+        "-i",
+        "--max-time",
+        "20",
+        "-H",
+        "Cookie: academy_session=CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC"
+      ],
+      "exit": 0,
+      "status": "HTTP/2 303 ",
+      "location_path": "/sign-in",
+      "notice": [
+        "identity-unavailable"
+      ],
+      "set_cookie_count": 0,
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "drain_command": [
+    "rtk",
+    "proxy",
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=10",
+    "root@ssh-db.cyberskills.co.th",
+    "docker exec -i supabase-db psql -X -U postgres -d postgres -v ON_ERROR_STOP=1 -v VERBOSITY=sqlstate -At"
+  ],
+  "sql": "BEGIN READ ONLY;\nSELECT json_build_object('active_claims',(SELECT count(*) FROM academy.identity_authorization_transaction WHERE claim_expires_at>clock_timestamp()),'held_identity_locks',(SELECT count(*) FROM pg_locks WHERE relation IN ('academy.identity_session'::regclass,'academy.identity_authorization_transaction'::regclass) AND pid<>pg_backend_pid() AND granted));\nROLLBACK;\n",
+  "drain": {
+    "active_claims": 0,
+    "held_identity_locks": 0
+  },
+  "elapsed_seconds": 37.18456196784973,
+  "pass": true
+}

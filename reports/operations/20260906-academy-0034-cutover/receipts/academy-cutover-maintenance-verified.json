@@ -1,0 +1,39 @@
+{
+  "command": [
+    "rtk",
+    "proxy",
+    "./node_modules/.bin/wrangler",
+    "versions",
+    "deploy",
+    "f126b6ac-7e3e-4f47-9990-1716b4c106ba@100",
+    "bd109c61-ddda-46c3-8d27-6cedc3365394@0",
+    "--name",
+    "cyberskills-academy",
+    "--message",
+    "Authorized Academy session digest maintenance window",
+    "--yes"
+  ],
+  "started_at": 1788734736.9320362,
+  "finished_at": 1788734742.432538,
+  "exit": 0,
+  "output_sha256": "cbe71c6897d0ef931fd5f601e3376c36d1ee574a3c907d68f2d0bf031d496da0",
+  "stderr_present": false,
+  "verified_deployment": {
+    "command": [
+      "rtk",
+      "proxy",
+      "./node_modules/.bin/wrangler",
+      "deployments",
+      "list",
+      "--name",
+      "cyberskills-academy",
+      "--json"
+    ],
+    "id": "8d62fbf9-c51f-4bbd-bfb5-401f83b97a5b",
+    "created_on": "2026-09-06T22:45:39.348557Z",
+    "versions": {
+      "f126b6ac-7e3e-4f47-9990-1716b4c106ba": 100,
+      "bd109c61-ddda-46c3-8d27-6cedc3365394": 0
+    }
+  }
+}

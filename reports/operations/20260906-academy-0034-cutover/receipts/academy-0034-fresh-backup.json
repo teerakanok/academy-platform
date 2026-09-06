@@ -1,0 +1,21 @@
+{
+  "transport_exit": 0,
+  "host_script_sha256": "ce7245a3fd5ce7668f5a88f67a63da9c23e9dad29983161d7550d1e954b73b9c",
+  "stderr_present": false,
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "receipt": {
+    "cutover_id": "f1da7e80-2f70-414d-b563-e83d8fb20221",
+    "pre_backup_schema_sha256": "003eb7eeccd4c5167152ddbb52857b362c1c6f2d6b90f7d2249fb86300dce036",
+    "backup_started_at": 1788734787.0468876,
+    "maintenance_started_at": 1788734742.432538,
+    "operation": "Academy Pool A postgres schema-only boundary full schema+data backup",
+    "path": "/root/academy-db-backups/20260906T224627Z-digest-0034-cde63a58/academy.dump",
+    "sha256": "38d1f122a74b31a986aeeb36498b8f261c2290f92069bbab7297cdfaacbbd8af",
+    "bytes": 259138,
+    "mode": "0600",
+    "archiveListEntries": 336,
+    "archiveListExit": 0,
+    "restoreExecuted": false,
+    "productionSchemaMutation": false
+  }
+}
