@@ -1,0 +1,5 @@
+{
+  "command": "psql Pool A postgres: cache reload notification ROLLBACK then COMMIT; independent READ ONLY production postconditions",
+  "exit": 0,
+  "output": "BEGIN\nNOTIFY\nROLLBACK\nBEGIN\nNOTIFY\nCOMMIT\nBEGIN\nDO\nacademy_0029_0033_postconditions_pass\nowner|academy_retention_definer\noperator_password_unset|t\nCOMMIT\n"
+}

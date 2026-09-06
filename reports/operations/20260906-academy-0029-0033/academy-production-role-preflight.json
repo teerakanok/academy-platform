@@ -1,0 +1,5 @@
+{
+  "sql": "BEGIN READ ONLY;\nSELECT current_user,session_user,current_setting('server_version');\nSELECT rolname,rolsuper,rolcreaterole,rolcanlogin FROM pg_roles WHERE rolname IN ('postgres','supabase_admin','academy_retention_definer');\nSELECT pg_has_role('postgres','academy_retention_definer','MEMBER'),has_schema_privilege('academy_retention_definer','academy','CREATE');\nSELECT proname,pg_get_userbyid(proowner) FROM pg_proc WHERE pronamespace='academy'::regnamespace AND proname LIKE 'run_retention_%' ORDER BY proname;\nCOMMIT;",
+  "exit": 0,
+  "output": "BEGIN\npostgres|postgres|15.8\nsupabase_admin|t|t|t\npostgres|f|t|t\nacademy_retention_definer|f|f|f\nf|f\nrun_retention_attempts|academy_retention_definer\nrun_retention_inactive_users|academy_retention_definer\nrun_retention_leads|academy_retention_definer\nrun_retention_privacy_requests|academy_retention_definer\nrun_retention_staff_authorization_history|academy_retention_definer\nCOMMIT\n"
+}

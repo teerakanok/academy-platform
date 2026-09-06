@@ -1,0 +1,14 @@
+{
+  "exit": 0,
+  "receipt": {
+    "operation": "Academy Pool A postgres schema-only boundary full schema+data backup",
+    "path": "/root/academy-db-backups/20260906T1610Z-release-4b89baf-cde63a58/academy.dump",
+    "sha256": "e1b47e9dab9a532bafa5fe842237f9216ff2905cfcdf168e974c9e3e9a114183",
+    "bytes": 206687,
+    "mode": "0600",
+    "archiveListEntries": 273,
+    "archiveListExit": 0,
+    "restoreExecuted": false,
+    "productionSchemaMutation": false
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "command": [
+    "./node_modules/.bin/wrangler",
+    "versions",
+    "upload",
+    "--name",
+    "cyberskills-academy",
+    "--keep-vars",
+    "--tag",
+    "release-4b89baf079a4",
+    "--message",
+    "s=4b89baf079a4618393febc6f3479393efac6ee80;reviewed-assessment-content-hardening"
+  ],
+  "source": "4b89baf079a4618393febc6f3479393efac6ee80",
+  "exit": 1,
+  "version_ids": [],
+  "output": [
+    "Uploaded 7 of 20 assets",
+    "Uploaded 13 of 20 assets",
+    "Uploaded 20 of 20 assets",
+    "\u2728 Success! Uploaded 20 files (59 already uploaded) (1.30 sec)",
+    "Total Upload: 14393.41 KiB / gzip: 3294.82 KiB"
+  ],
+  "known_errors": []
+}

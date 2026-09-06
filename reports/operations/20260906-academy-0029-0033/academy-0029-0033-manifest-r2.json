@@ -1,0 +1,35 @@
+{
+  "release": "4b89baf",
+  "target": {
+    "pool": "A",
+    "database": "postgres",
+    "schema": "academy"
+  },
+  "files": [
+    {
+      "path": "academy-web/supabase/migrations/0029_identity_authorization_admission_cap.sql",
+      "sha256": "6f3a1d1cc1c2b12887f234330d77f5116803fe736103e06b68475b5eed5a833d"
+    },
+    {
+      "path": "academy-web/supabase/migrations/0030_least_privilege_course_entitlement.sql",
+      "sha256": "ac2e93342c2bc2ab54a356b5ffddbac9a26c554e746c7ec299dff2959362fb70"
+    },
+    {
+      "path": "academy-web/supabase/migrations/0031_course_entitlement_audit_retention.sql",
+      "sha256": "09616defcdd979290c081c38bf3139b23cbff3eaaf54483b5c8c9430c14dcda4"
+    },
+    {
+      "path": "academy-web/supabase/migrations/0032_identity_lifecycle_runtime_enforcement.sql",
+      "sha256": "cff66ec8146fbfce4e8d8c406c1e87d3ba88eb9c9fec6f1723b9363b6347c289"
+    },
+    {
+      "path": "academy-web/supabase/migrations/0033_assessment_attempt_integrity.sql",
+      "sha256": "8bbfe5a1f052eb286ff23c9886fca6c96487e35a9772daa0be7df1b98687a1ef"
+    }
+  ],
+  "body_sha256": "3221991d805026fba0dd9ebb28ce1b8c5da335600f60783b9bd67bd9ba9686c8",
+  "privileged_statements_source": "academy-web/supabase/privileged/academy-retention-api-function-owners.sql",
+  "sequence": "same BEGIN+body, first ROLLBACK, verify baseline unchanged, then separate decision to COMMIT",
+  "operator": "supabase_admin connection, SET LOCAL ROLE postgres for original migration ownership; RESET ROLE for exact two privileged retention statements; SET LOCAL ROLE postgres for checks",
+  "reason": "Verified production postgres is NOSUPERUSER, no membership of retention definer and target lacks schema CREATE; supabase_admin is real superuser."
+}

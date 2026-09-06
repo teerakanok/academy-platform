@@ -1,0 +1,99 @@
+{
+  "exit": 0,
+  "resource_keys": [
+    "script",
+    "script_runtime",
+    "bindings"
+  ],
+  "binding_names_types": [
+    {
+      "name": "ACADEMY_DATA_API_JWT_SECRET",
+      "type": "secret_text",
+      "class_name": null
+    },
+    {
+      "name": "ACADEMY_DATA_API_URL",
+      "type": "secret_text",
+      "class_name": null
+    },
+    {
+      "name": "ACADEMY_IDENTITY_DIAGNOSTIC_NONCE",
+      "type": "secret_text",
+      "class_name": null
+    },
+    {
+      "name": "ASSETS",
+      "type": "assets",
+      "class_name": null
+    },
+    {
+      "name": "COURSE_MEDIA",
+      "type": "r2_bucket",
+      "class_name": null
+    },
+    {
+      "name": "EDGE_RATE_LIMITER",
+      "type": "durable_object_namespace",
+      "class_name": "EdgeRateLimiter"
+    },
+    {
+      "name": "IDENTITY_ADAPTER",
+      "type": "secret_text",
+      "class_name": null
+    },
+    {
+      "name": "IDENTITY_CLIENT_ASSERTION_KEY_ID",
+      "type": "secret_text",
+      "class_name": null
+    },
+    {
+      "name": "IDENTITY_CLIENT_ASSERTION_PRIVATE_JWK",
+      "type": "secret_text",
+      "class_name": null
+    },
+    {
+      "name": "IDENTITY_CODE_EXCHANGE_TIMEOUT_MS",
+      "type": "secret_text",
+      "class_name": null
+    },
+    {
+      "name": "IDENTITY_RELEASE_APPROVAL",
+      "type": "secret_text",
+      "class_name": null
+    },
+    {
+      "name": "IDENTITY_RESULT_KEY_SET_DOCUMENT",
+      "type": "secret_text",
+      "class_name": null
+    },
+    {
+      "name": "IDENTITY_RUNTIME_ENABLED",
+      "type": "secret_text",
+      "class_name": null
+    },
+    {
+      "name": "IDENTITY_RUNTIME_WIRED",
+      "type": "secret_text",
+      "class_name": null
+    },
+    {
+      "name": "MEDIA_SIGNING_SECRET",
+      "type": "secret_text",
+      "class_name": null
+    },
+    {
+      "name": "NEXT_PUBLIC_SEARCH_INDEXING",
+      "type": "plain_text",
+      "class_name": null
+    },
+    {
+      "name": "RATE_LIMIT_KEY_SECRET",
+      "type": "secret_text",
+      "class_name": null
+    }
+  ],
+  "source_hashes": [
+    "c5a169b9e567507b1788b6052bfad1e56c325f8e"
+  ],
+  "tag": "release-c5a169b9e567"
+}
