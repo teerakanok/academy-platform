@@ -1,0 +1,15 @@
+{
+  "command": [
+    "nice",
+    "-n",
+    "10",
+    "npm",
+    "run",
+    "build:cf"
+  ],
+  "cwd": "/private/tmp/academy-worker-startup-cde63a58/academy-web",
+  "exit": 0,
+  "sha256": "ced17d65184fdeba9a81839075b686f80193ed168c38dd0471894f52255c6050",
+  "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-startup-parent-build.log",
+  "finished": "2026-09-06T17:16:47.463290+00:00"
+}

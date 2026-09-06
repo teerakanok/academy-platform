@@ -1,0 +1,90 @@
+[
+  {
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "npx",
+      "vitest",
+      "run",
+      "--project",
+      "unit"
+    ],
+    "exit": 0,
+    "signal": null,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-startup-env-gate-0.log",
+    "sha256": "5663df581eeeb5ef0d3a570502b32ab6b010b96ba2432a35d0d2672fefd82c8b"
+  },
+  {
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "npx",
+      "tsc",
+      "--noEmit"
+    ],
+    "exit": 0,
+    "signal": null,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-startup-env-gate-1.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "npx",
+      "tsc",
+      "-p",
+      "tsconfig.worker.json"
+    ],
+    "exit": 0,
+    "signal": null,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-startup-env-gate-2.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "npx",
+      "tsc",
+      "-p",
+      "ops/academy-retention-worker/tsconfig.json"
+    ],
+    "exit": 0,
+    "signal": null,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-startup-env-gate-3.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "npm",
+      "run",
+      "build:cf"
+    ],
+    "exit": 0,
+    "signal": null,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-startup-env-gate-4.log",
+    "sha256": "183892b9ba6ff09c290a18a0fd5b17bd8023ac4717e188b238fca0acd4971fb3"
+  },
+  {
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "npm",
+      "run",
+      "lint"
+    ],
+    "exit": 1,
+    "signal": null,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-startup-env-gate-5.log",
+    "sha256": "548a80468af78eb86b71de8d789d4e4528c01438cf57ed396084e3206859c9e0"
+  }
+]

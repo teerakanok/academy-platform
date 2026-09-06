@@ -44,6 +44,12 @@ const nextConfig: NextConfig = {
   // Security baseline: ไม่มี external resource ใน CSP scope ของ app นี้ —
   // fonts ผ่าน next/font (self-hosted ตอน build), ไม่มี third-party script
   poweredByHeader: false,
+  webpack(config, { dev }) {
+    if (!dev && process.env.ACADEMY_BUILD_DISABLE_WEBPACK_CACHE === '1') {
+      config.cache = false
+    }
+    return config
+  },
   async headers() {
     return [
       {

@@ -1,0 +1,28 @@
+service academy-red-worker: Uncaught Error: This module cannot be imported from a Client Component module. It should only be used from a Server Component.
+  at ./academy-server-only.js:1:7
+node:child_process:964
+    throw err;
+    ^
+
+Error: Command failed: /private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-b81Nrz/checkout/academy-web/node_modules/@cloudflare/workerd-darwin-arm64/bin/workerd test -Inode_modules --no-verbose .next/academy-red.capnp academy-red-worker
+    at genericNodeError (node:internal/errors:998:15)
+    at wrappedFn (node:internal/errors:543:14)
+    at checkExecSyncError (node:child_process:925:11)
+    at Object.execFileSync (node:child_process:961:15)
+    at Object.<anonymous> (/private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-b81Nrz/checkout/academy-web/node_modules/workerd/bin/workerd:139:26)
+    at Module._compile (node:internal/modules/cjs/loader:1803:14)
+    at Object..js (node:internal/modules/cjs/loader:1934:10)
+    at Module.load (node:internal/modules/cjs/loader:1524:32)
+    at Module._load (node:internal/modules/cjs/loader:1326:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14) {
+  status: 1,
+  signal: null,
+  output: [ null, null, null ],
+  pid: 21496,
+  stdout: null,
+  stderr: null
+}
+
+Node.js v25.5.0
+
+RED_EXIT=1

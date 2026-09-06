@@ -1,0 +1,221 @@
+{
+  "schema": "checkpoint-freeze-manifest.v1",
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "b11e95b17e997967b01267f92d0c1f059e69922fd1cd780508abdaff6af5863f",
+      "bytes": 12709
+    },
+    {
+      "path": "academy-web/artifacts/final-lint.log",
+      "sha256": "1a933f2a059bc938136b8cc3dce1fb37d40e7205a427deadaed46ffc59b8bf4a",
+      "bytes": 3668
+    },
+    {
+      "path": "academy-web/artifacts/final-unit.log",
+      "sha256": "281193d53ea443b9c45c17e06dd8df37d5b348b4c472fecdd3e9072def8699b8",
+      "bytes": 17813
+    },
+    {
+      "path": "academy-web/artifacts/final-worker-green-build.log",
+      "sha256": "51ae54c19edec332153a548fc6b5d90427db50f4dedfedebb17800d9f22b7b60",
+      "bytes": 22811
+    },
+    {
+      "path": "academy-web/artifacts/final-worker-green-startup.log",
+      "sha256": "30cdad8a233a7544368ed3373e86f893d3fa7dfabe55c815d6c37d0879875def",
+      "bytes": 126
+    },
+    {
+      "path": "academy-web/artifacts/final-worker-red.log",
+      "sha256": "47218ee519196463728b2f6594b6fd31d53b16becc2773884bf18ae69dbdcca5",
+      "bytes": 1336
+    },
+    {
+      "path": "academy-web/next.config.ts",
+      "sha256": "6dc9f43231ef0834209738fa6c3547aa81153e11da8b5e2329f317b59ae3ed5d",
+      "bytes": 2496
+    },
+    {
+      "path": "academy-web/package.json",
+      "sha256": "d58aec07f617677f32305b1b2f443ac7fe108de35cb14fa4b1cbcc1a33e2a6df",
+      "bytes": 2569
+    },
+    {
+      "path": "academy-web/scripts/build-cloudflare.sh",
+      "sha256": "e46b28e2f90adbc93c21dd8568d40324d714c9cb276bf4204be0758b9072d61f",
+      "bytes": 407
+    },
+    {
+      "path": "academy-web/scripts/check-final-worker-startup.mjs",
+      "sha256": "a9162428c55de29a2665624a5fab9562224cdccd76ed5b4c598cc1dd6b241dc7",
+      "bytes": 4882
+    },
+    {
+      "path": "academy-web/src/lib/db/academy-db-core.ts",
+      "sha256": "b6b8b861a1c0890de3e24a57d5e5b7cd5bd733b63d17267dba060728aaee5b8a",
+      "bytes": 3800
+    },
+    {
+      "path": "academy-web/src/lib/db/server.ts",
+      "sha256": "7ad63024dde540716b3698ed06d97e4057dbd8f358d342060f739589e977c33e",
+      "bytes": 56
+    },
+    {
+      "path": "academy-web/src/lib/identity/lifecycle-production-runtime.ts",
+      "sha256": "aeb5270c0902cc05e297df53f614e35c2745f2bc07cd285ffbe99d0a3fa0337e",
+      "bytes": 81
+    },
+    {
+      "path": "academy-web/tests/unit/identity-key-distribution-not-wired.test.ts",
+      "sha256": "8ddf378c5233a351e078fa083aff8bf245d87e38a4e17572048096cd14e6700a",
+      "bytes": 23605
+    },
+    {
+      "path": "academy-web/tests/unit/identity-lifecycle-production-runtime.test.ts",
+      "sha256": "6567ce0ca571916b048bb4b30ccbb905e0e947893c1d776771b4e9dfc4a51672",
+      "bytes": 9753
+    },
+    {
+      "path": "academy-web/tests/unit/static-asset-boundary.test.ts",
+      "sha256": "1800e802887da550f2d7567d586cb4f1a15f3139f6f44d2d6c5c30f86ac4f873",
+      "bytes": 4305
+    },
+    {
+      "path": "academy-web/tsconfig.worker.json",
+      "sha256": "ce5f8258c55558238b42590bd0386dc26555ac6ac07404497fbbaf6a7a8e16a6",
+      "bytes": 731
+    },
+    {
+      "path": "academy-web/worker.ts",
+      "sha256": "341bdb48dc04de204aac9cf2ea096a57d18b58cf7acafe45ed51001c4c4fbf1b",
+      "bytes": 3055
+    },
+    {
+      "path": "academy-web/worker/identity-lifecycle-runtime.ts",
+      "sha256": "b917cc2011a129b2b74dbfd944cd31aee5bd59d16fa5d6c44965764679d0a613",
+      "bytes": 12883
+    },
+    {
+      "path": "academy-web/wrangler.jsonc",
+      "sha256": "ad04ed380635023a7abd516c36794cbb4a0eee7c209e64a584cc8333d1253996",
+      "bytes": 1861
+    },
+    {
+      "path": "reports/reviews/2026-09-06-final-worker-startup/academy-build-contract-green.log",
+      "sha256": "82b282055c960fb033e7580dc316d7c2ba97fa8446817dbea4ed231e39dd2bd7",
+      "bytes": 460
+    },
+    {
+      "path": "reports/reviews/2026-09-06-final-worker-startup/academy-build-contract-red.log",
+      "sha256": "1145f4f0a5e9068e0089f5f8f9c7316f80e34c2a14e2ee0cb96ca36fc39821bb",
+      "bytes": 2903
+    },
+    {
+      "path": "reports/reviews/2026-09-06-final-worker-startup/academy-startup-env-gate-0.log",
+      "sha256": "5663df581eeeb5ef0d3a570502b32ab6b010b96ba2432a35d0d2672fefd82c8b",
+      "bytes": 18499
+    },
+    {
+      "path": "reports/reviews/2026-09-06-final-worker-startup/academy-startup-env-gate-1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/reviews/2026-09-06-final-worker-startup/academy-startup-env-gate-2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/reviews/2026-09-06-final-worker-startup/academy-startup-env-gate-3.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/reviews/2026-09-06-final-worker-startup/academy-startup-env-gate-4.log",
+      "sha256": "183892b9ba6ff09c290a18a0fd5b17bd8023ac4717e188b238fca0acd4971fb3",
+      "bytes": 7945
+    },
+    {
+      "path": "reports/reviews/2026-09-06-final-worker-startup/academy-startup-env-gate-5.log",
+      "sha256": "548a80468af78eb86b71de8d789d4e4528c01438cf57ed396084e3206859c9e0",
+      "bytes": 3231
+    },
+    {
+      "path": "reports/reviews/2026-09-06-final-worker-startup/academy-startup-env-gates.json",
+      "sha256": "8fe28117f335bb271b2624534b627b7d9621d108dc85104d6e5eea729b34c4d0",
+      "bytes": 2031
+    },
+    {
+      "path": "reports/reviews/2026-09-06-final-worker-startup/academy-startup-env-red.log",
+      "sha256": "cd1bf9292889b0ad7b757b3bbd71b5776c89863159bf02d37950ac60a0005b0c",
+      "bytes": 3627
+    },
+    {
+      "path": "reports/reviews/2026-09-06-final-worker-startup/academy-startup-parent-build.json",
+      "sha256": "cec23e72fde758ccf4ee3ab6dbb159f9df1bb28d94e13379225b1218208d0839",
+      "bytes": 395
+    },
+    {
+      "path": "reports/reviews/2026-09-06-final-worker-startup/academy-startup-parent-build.log",
+      "sha256": "ced17d65184fdeba9a81839075b686f80193ed168c38dd0471894f52255c6050",
+      "bytes": 7945
+    },
+    {
+      "path": "reports/reviews/2026-09-06-final-worker-startup/academy-startup-parent-gate-0.log",
+      "sha256": "e17edea05a2b64cac7355481db4fa9fedd38e2ca2f9d965e3e62bcaa492c52bf",
+      "bytes": 17920
+    },
+    {
+      "path": "reports/reviews/2026-09-06-final-worker-startup/academy-startup-parent-gates.json",
+      "sha256": "93b6d982b59191554178ec96c691c2ca189b75ece9f77407b2b2ef5882092165",
+      "bytes": 676
+    },
+    {
+      "path": "reports/reviews/2026-09-06-final-worker-startup/academy-startup-parent-r2-gate-0.log",
+      "sha256": "082af37f8922358f620fefbd19d8d0051cd2aa4707765e203ce53094ba8c0996",
+      "bytes": 461
+    },
+    {
+      "path": "reports/reviews/2026-09-06-final-worker-startup/academy-startup-parent-r2-gate-1.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/reviews/2026-09-06-final-worker-startup/academy-startup-parent-r2-gate-2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/reviews/2026-09-06-final-worker-startup/academy-startup-parent-r2-gate-3.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "reports/reviews/2026-09-06-final-worker-startup/academy-startup-parent-r2-gate-4.log",
+      "sha256": "548a80468af78eb86b71de8d789d4e4528c01438cf57ed396084e3206859c9e0",
+      "bytes": 3231
+    },
+    {
+      "path": "reports/reviews/2026-09-06-final-worker-startup/academy-startup-parent-r2-gates.json",
+      "sha256": "f76ac2d31af304b29adc546112aee4df12ba3073b7710c95ae4440b0597d8a76",
+      "bytes": 1722
+    },
+    {
+      "path": "reports/reviews/2026-09-06-final-worker-startup/independent-review-r1.json",
+      "sha256": "4126d50f134eabe22777301ad8e59ef78395081e92f1ba0b1a0232ccfabea429",
+      "bytes": 1058
+    },
+    {
+      "path": "reports/reviews/2026-09-06-final-worker-startup/review-disposition-r2.md",
+      "sha256": "5ba339d18dac3131a183b49ba33b5b4a6af45d337a389ea4e0c82d4cb2777322",
+      "bytes": 605
+    },
+    {
+      "path": "reports/reviews/2026-09-06-final-worker-startup/source.patch",
+      "sha256": "6dacdb9d85f807577288920d60f2bc06a5915158cc19c54925ebb97b8e326b14",
+      "bytes": 46378
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "work_order_metadata": {
+    "schema": "model-team.ril.v1",
+    "work_kind": "bounded_code",
+    "role": "implementation_reviewer",
+    "source_sha256": "16710c5b599926c5ccebe498c36f747dea97dd9cfc7d354002fc4abd4532ca54"
+  },
+  "verdict": "FAIL",
+  "summary": "Build, startup, unit, and approved-lint contracts are preserved, but scheduled lifecycle database credentials are read from process.env instead of the Worker env supplied by the scheduled handler.",
+  "findings": [
+    {
+      "severity": "high",
+      "message": "runAcademyIdentityLifecyclePull receives Worker env, but resolveDependencies defaults to academyDb(), which reads process.env.ACADEMY_DATA_API_URL and ACADEMY_DATA_API_JWT_SECRET. The declared compatibility configuration does not guarantee process.env population, so an enabled scheduled pull can fail to obtain its database binding. Pass the supplied environment into createAcademyDb or explicitly adopt a supported process-env population contract.",
+      "path": "academy-web/worker/identity-lifecycle-runtime.ts"
+    }
+  ]
+}

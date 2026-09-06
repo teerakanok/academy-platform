@@ -25,7 +25,7 @@
     "verify:cf-public-course-pages": "node scripts/verify-cf-public-course-pages.mjs",
     "verify:workerd": "node scripts/workerd-signer-check.mjs",
     "asset-guard": "node scripts/check-open-next-assets.mjs",
-    "build:cf": "npm run verify:workerd && NEXT_PUBLIC_SUPABASE_URL= NEXT_PUBLIC_SUPABASE_ANON_KEY= opennextjs-cloudflare build && npm run asset-guard",
+    "build:cf": "bash scripts/build-cloudflare.sh",
     "deploy:cf": "npm run build:cf && wrangler deploy --autoconfig=false --keep-vars",
     "test:workerd-signer": "node scripts/workerd-signer-check.mjs"
   },

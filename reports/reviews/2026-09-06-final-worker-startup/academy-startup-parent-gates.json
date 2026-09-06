@@ -1,0 +1,32 @@
+[
+  {
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "npx",
+      "vitest",
+      "run",
+      "--project",
+      "unit",
+      "--maxWorkers",
+      "1"
+    ],
+    "exit": 0,
+    "sha256": "e17edea05a2b64cac7355481db4fa9fedd38e2ca2f9d965e3e62bcaa492c52bf",
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-startup-parent-gate-0.log"
+  },
+  {
+    "command": [
+      "nice",
+      "-n",
+      "10",
+      "npx",
+      "tsc",
+      "--noEmit"
+    ],
+    "exit": 2,
+    "sha256": "4a369c947b119db0beb573ea9b0bd76a563365929a3e4875ae09a8bba657df8d",
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-startup-parent-gate-1.log"
+  }
+]

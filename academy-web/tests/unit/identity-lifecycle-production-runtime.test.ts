@@ -70,6 +70,36 @@ function dependencies() {
 }
 
 describe('Academy Identity lifecycle production pull runtime', () => {
+  it('uses supplied Worker database bindings without process.env population', async () => {
+    vi.stubEnv('ACADEMY_DATA_API_URL', undefined)
+    vi.stubEnv('ACADEMY_DATA_API_JWT_SECRET', undefined)
+    try {
+      const deps = dependencies()
+      const runtime = await createAcademyIdentityLifecyclePullCycleRuntime({
+        environment: environment({
+          ACADEMY_DATA_API_URL: 'https://academy-data.example.test',
+          ACADEMY_DATA_API_JWT_SECRET: 'test-only-signing-secret-with-at-least-32-bytes',
+        }),
+        dependencies: { createSigner: deps.createSigner, fetch: deps.fetch, now: deps.now },
+      })
+      expect(runtime).toBeTypeOf('function')
+      expect(deps.fetch).not.toHaveBeenCalled()
+    } finally { vi.unstubAllEnvs() }
+  })
+
+  it('does not fall back to ambient database credentials when supplied bindings are absent', async () => {
+    vi.stubEnv('ACADEMY_DATA_API_URL', 'https://ambient.example.test')
+    vi.stubEnv('ACADEMY_DATA_API_JWT_SECRET', 'test-only-ambient-secret-with-at-least-32-bytes')
+    try {
+      const deps = dependencies()
+      await expect(createAcademyIdentityLifecyclePullCycleRuntime({
+        environment: environment(),
+        dependencies: { createSigner: deps.createSigner, fetch: deps.fetch, now: deps.now },
+      })).rejects.toThrow('Identity lifecycle runtime initialization failed')
+      expect(deps.fetch).not.toHaveBeenCalled()
+    } finally { vi.unstubAllEnvs() }
+  })
+
   it('fails closed until every exact producer-approved runtime value is present', () => {
     for (const key of [
       'IDENTITY_LIFECYCLE_ENABLED',

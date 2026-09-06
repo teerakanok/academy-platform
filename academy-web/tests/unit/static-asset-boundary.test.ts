@@ -24,12 +24,54 @@ describe('deployed static-asset boundary', () => {
 
   it('runs the protected-media path through the Worker and wires the final-asset gate', () => {
     const wrangler = readFileSync('wrangler.jsonc', 'utf8')
-    const packageJson = JSON.parse(readFileSync('package.json', 'utf8')) as {
-      scripts: Record<string, string>
-    }
+    const buildScript = readFileSync('scripts/build-cloudflare.sh', 'utf8')
 
     expect(wrangler).toContain('"run_worker_first": ["/media/*"]')
-    expect(packageJson.scripts['build:cf']).toContain('asset-guard')
+    expect(buildScript).toContain('asset-guard')
+  })
+
+  it('refuses font mocks before any production build command runs', () => {
+    const root = mkdtempSync(path.join(tmpdir(), 'academy-build-contract-'))
+    try {
+      const marker = path.join(root, 'called')
+      for (const command of ['node', 'npm', 'npx']) {
+        writeFileSync(path.join(root, command), '#!/bin/sh\nprintf called >> "$BUILD_CONTRACT_MARKER"\n', { mode: 0o700 })
+      }
+      const result = spawnSync('/bin/bash', [path.resolve('scripts/build-cloudflare.sh')], {
+        cwd: root,
+        env: { NODE_ENV: 'production', PATH: `${root}:/usr/bin:/bin`, NEXT_FONT_GOOGLE_MOCKED_RESPONSES: 'synthetic-fixture', BUILD_CONTRACT_MARKER: marker },
+        encoding: 'utf8',
+      })
+      expect(result.status).toBe(1)
+      expect(result.stderr).toContain('Production build refuses mocked font responses')
+      expect(() => readFileSync(marker)).toThrow()
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
+  })
+
+  it('executes the existing workerd gate before compilation and the final bundle gate afterwards', () => {
+    const root = mkdtempSync(path.join(tmpdir(), 'academy-build-contract-'))
+    try {
+      const marker = path.join(root, 'called')
+      for (const command of ['node', 'npm', 'npx']) {
+        writeFileSync(path.join(root, command), `#!/bin/sh\nprintf '%s\\n' "${command} $*" >> "$BUILD_CONTRACT_MARKER"\n`, { mode: 0o700 })
+      }
+      const result = spawnSync('/bin/bash', [path.resolve('scripts/build-cloudflare.sh')], {
+        cwd: root,
+        env: { NODE_ENV: 'production', PATH: `${root}:/usr/bin:/bin`, BUILD_CONTRACT_MARKER: marker },
+        encoding: 'utf8',
+      })
+      expect(result.status).toBe(0)
+      expect(readFileSync(marker, 'utf8').trim().split('\n')).toEqual([
+        'npm run verify:workerd',
+        'npx opennextjs-cloudflare build',
+        'npm run asset-guard',
+        'node scripts/check-final-worker-startup.mjs',
+      ])
+    } finally {
+      rmSync(root, { recursive: true, force: true })
+    }
   })
 })
 
