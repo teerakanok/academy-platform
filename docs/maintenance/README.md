@@ -2,6 +2,9 @@
 
 Maintenance entry point for CyberSkills Academy.
 
+For source preparation, version upload, smoke and activation, use
+[`academy-production-release.md`](./academy-production-release.md).
+
 Read this folder before any Academy production operation, incident response,
 backup verification, restore rehearsal, rollback, or secret-handling change.
 
