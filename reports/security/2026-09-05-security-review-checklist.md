@@ -77,19 +77,20 @@ Frozen tree: `/private/tmp/secrev-academy` (HEAD `02c712e`, read-only). Inputs: 
 - **Sources:** Fable (#14/#21) · **Status:** LOCAL VERIFIED — INDEPENDENT REVIEW PASS; PRODUCTION PENDING. Owned PostgreSQL covers erasure, stale-email refusal, callback/session deletion races, and fail-closed rollback.
 
 ### SEC-ACADEMY-005 · `POST /api/auth/identity/start` อ่าน body ทั้งก้อนด้วย `request.formData()` โดยไม่มีเพดาน (ไม่ต้อง auth)
-- **Severity:** MEDIUM · **Verdict:** CONFIRMED (code path ตรวจแล้ว; ผล memory/CPU exhaustion อนุมานจาก platform limit ไม่ได้ reproduce)
-- **File:line:** `academy-web/src/lib/identity/runtime-browser-flow.ts:129-135` · `academy-web/src/app/(site)/api/auth/identity/start/route.ts:77` · เทียบ `academy-web/src/lib/http/bounded-body.ts:17-29` · `academy-web/wrangler.jsonc:10`
-- **Attack path:** client ส่ง `POST /api/auth/identity/start` พร้อม `Origin: https://<host>` และ body multipart/urlencoded หลายสิบ MB (Cloudflare รับได้ถึง 100 MB ต่อ request บน plan ทั่วไป) หรือ multipart หลายแสน part เล็ก ๆ; `validateMutationRequest` ผ่านทันที (Origin = Host) แล้ว `await request.formData()` buffer ทั้งหมดก่อนเช็คว่ามี key เดียว. ทุก JSON route ในระบบใช้ `readBoundedJson` แต่ route นี้ (และ fixture branch บรรทัด 77) ไม่ได้ใช้.
+- **Severity:** MEDIUM · **Verdict:** CONFIRMED — LOCALLY REMEDIATED (ผล memory/CPU exhaustion เดิมอนุมานจาก platform limit; ไม่ได้ reproduce บน production)
+- **File:line:** `academy-web/src/lib/identity/start-form.ts:3-24` · `academy-web/src/lib/http/bounded-body.ts:17-66` · `academy-web/src/lib/identity/runtime-browser-flow.ts:131-139` · `academy-web/src/app/(site)/api/auth/identity/start/route.ts:87-100` · `academy-web/tests/unit/identity-security-admission.test.ts:106-148`
+- **Attack path (ก่อนแก้):** client ส่ง `POST /api/auth/identity/start` พร้อม `Origin: https://<host>` และ body multipart/urlencoded ขนาดใหญ่; `validateMutationRequest` ผ่านแล้ว `request.formData()` buffer ทั้งหมดก่อนเช็ค field ทั้งใน production flow และ local-fixture route.
 - **Impact:** ต่อ request: ชน isolate memory (128 MB) หรือ `cpu_ms: 500` → error/evict isolate ซ้ำ ๆ → sign-in entry degrade สำหรับทุกคน. `bounded-body.ts` เองอธิบาย hazard นี้ไว้ในหัวไฟล์.
 - **Evidence:**
   ```
-  runtime-browser-flow.ts:129-133  const mutation = validateMutationRequest(request); if (!mutation.ok) ...; const form = await request.formData()
-  start/route.ts:77                const form = await request.formData()   // local-fixture branch
-  bounded-body.ts:1-6              "อ่าน request body แบบมีเพดาน — หยุดอ่านทันทีที่เกิน" (ใช้ใน leads/progress/practice/otp/verify แต่ไม่ใช่ที่นี่)
-  wrangler.jsonc:10                "limits": { "cpu_ms": 500 }
+  start-form.ts:3-24             2048-byte limit; exact urlencoded media type; readBoundedBody ก่อน URLSearchParams
+  bounded-body.ts:25-66          cancel เมื่อ Content-Length/stream เกิน; หยุดอ่านทันที; ปล่อย reader lock
+  runtime-browser-flow.ts:137    production flow เรียก readIdentityStartForm ก่อน authorize/transaction
+  start/route.ts:93              local-fixture flow ใช้ helper เดียวกันก่อน beginIdentityAuthorization
+  identity-security-admission.test.ts:106-148  multipart=415, oversized=413, transaction RPC list ว่าง
   ```
-- **Remediation:** ก่อน `formData()` ปฏิเสธถ้า `content-type` ไม่ใช่ `application/x-www-form-urlencoded` หรือ `content-length` หาย/เกิน ~2 KB; ดีกว่านั้นคือ `readBoundedBody(request, 2048)` แล้ว parse ด้วย `URLSearchParams` (ปฏิเสธ multipart ทั้งหมด); ทำเหมือนกันที่ route.ts:77; unit test ว่า body 1 MB ได้ 413 โดยไม่ถูกอ่านจนจบ.
-- **Sources:** Fable (#17) · **Status:** CODE CHANGED — LOCAL GATES BLOCKED (independent review + deployment pending; npm tarball fetch ENOTFOUND)
+- **Remediation:** ใช้ shared stream-bounded helper แล้วทั้งสอง call site และผ่าน local independent review. LOW gap ที่เหลือคือเพิ่ม regression ซึ่งส่ง streamed oversized body ผ่าน production route seam จริงและยืนยัน 413 พร้อม transaction RPC list ว่าง; fixture oversized ปัจจุบัน exercise local-fixture branch. Production smoke/deploy ยังไม่พิสูจน์.
+- **Sources:** Fable (#17) + admission review `run-0a8a2cc5afc7b344280fab9de2141489` · **Status:** LOCAL VERIFIED — INDEPENDENT REVIEW PASS; PRODUCTION PENDING
 
 ### SEC-ACADEMY-006 · capstone (certificate-bearing) brute-force ได้: answer space 256–1024 state, โจทย์ชุดเดิมทุก attempt, oracle ตอบแค่ pass/fail, quota 3/30 นาที; override `ATTEMPT_MAX_PER_WINDOW` ไม่มี production guard
 - **Severity:** MEDIUM · **Verdict:** CONFIRMED
@@ -422,7 +423,7 @@ Frozen tree: `/private/tmp/secrev-academy` (HEAD `02c712e`, read-only). Inputs: 
 | SEC-ACADEMY-002 | Auth gate wiring | production branch ใน middleware (syntactic prefilter, 401 JSON สำหรับ `/api/*`), `/api/auth/me` และ dashboard ผ่าน `currentUser()`, adversarial unit ครอบ forged/expired/revoked durable session | DEPLOYED; real-session pending | 2026-09-05 | production smoke ด้วย cookie จริงและ owner-present journey — ยังไม่ปิด production |
 | SEC-ACADEMY-003 | Session revocation / lifecycle | Production scheduled pull composition + migration0032 fenced effects, indexed principal revoke, source-approved config reconciliation, and strict fail-closed config | LOCAL VERIFIED — INDEPENDENT PASS; PRODUCTION PENDING | 2026-09-06 | Unit2403/2403; typechecks3/3; owned PostgreSQL38/38 including callback/config/lock-order races; exact endpoint/audience/key provisioning and exact durable issuer pinning remain pending |
 | SEC-ACADEMY-004 | Data protection (erasure) | Find-only active resolver, durable email display, callback/lifecycle/session principal lock, deleted projection erasure guard, detached audit retention | LOCAL VERIFIED — INDEPENDENT PASS; PRODUCTION PENDING | 2026-09-06 | Unit2403/2403; typechecks3/3; owned PostgreSQL38/38; production apply/deploy pending |
-| SEC-ACADEMY-005 | Unbounded input | bounded form read (≤2 KB, urlencoded เท่านั้น) ใน `runtime-browser-flow.ts:132` และ `start/route.ts:77`; unit test 413 | CODE FIXED — PENDING INDEPENDENT REVIEW | 2026-09-06 | independent review and production only; exact unit gate blocked pre-test by pinned `npm ci` network `ENOTFOUND` |
+| SEC-ACADEMY-005 | Unbounded input | Shared streamed form read (≤2048 bytes, urlencoded เท่านั้น) ก่อน transaction ทั้ง production และ local-fixture flow | LOCAL VERIFIED — INDEPENDENT REVIEW PASS; PRODUCTION PENDING | 2026-09-06 | Full unit2403/2403 includes bounded-body9/9 and admission4/4; LOW production-route streamed-oversize regression gap; production smoke/deploy pending |
 | SEC-ACADEMY-006 | Assessment integrity | bank ≥3× + sample/shuffle; backoff + daily cap ใน `issue_attempt`; alert; clamp `ATTEMPT_MAX_PER_WINDOW` ใน production; dwell time | OPEN | 2026-09-05 | ทั้งหมด |
 | SEC-ACADEMY-007 | Rate-limit path normalisation | normalise pathname ก่อน lookup; ปฏิเสธ variant ด้วย 404; production fail-closed แทน in-memory fallback; tests สำหรับ `/…/` และ encoded | OPEN | 2026-09-05 | ทั้งหมด (latent) |
 | SEC-ACADEMY-008 | Rate-limit key granularity | IPv6 /64 aggregation; per-target key (email hash); global per-route ceiling | OPEN | 2026-09-05 | ทั้งหมด |
