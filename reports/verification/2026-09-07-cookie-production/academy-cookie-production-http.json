@@ -1,0 +1,160 @@
+{
+  "checked_at": "2026-09-07T17:34:14.232Z",
+  "mode": "production",
+  "version_override": false,
+  "candidate_version": "8e4d5c04-6b6f-459b-99e3-5b2352d0f133",
+  "checks": [
+    {
+      "path": "/",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/sign-in",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/robots.txt",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/assembly/en",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/assembly/th",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/basic-os-linux/en",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/basic-os-linux/th",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/c-low-level/en",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/c-low-level/th",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/computer-architecture/en",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/computer-architecture/th",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/computer-networking/en",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/computer-networking/th",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/git-essentials/en",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/git-essentials/th",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/operating-systems/en",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/operating-systems/th",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/setup-and-environment/en",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/setup-and-environment/th",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/operating-systems/learn",
+      "status": 307,
+      "expected": 307,
+      "pass": true
+    },
+    {
+      "path": "/courses/computer-networking/learn",
+      "status": 307,
+      "expected": 307,
+      "pass": true
+    },
+    {
+      "path": "/courses/setup-and-environment/learn",
+      "status": 307,
+      "expected": 307,
+      "pass": true
+    },
+    {
+      "path": "/courses/c-low-level/learn",
+      "status": 307,
+      "expected": 307,
+      "pass": true
+    },
+    {
+      "path": "/courses/comptia-security-plus/en",
+      "status": 404,
+      "expected": 404,
+      "pass": true
+    },
+    {
+      "surface": "raw-host",
+      "status": 404,
+      "expected": 404,
+      "pass": true
+    }
+  ],
+  "browser_verified": false,
+  "pass": true
+}

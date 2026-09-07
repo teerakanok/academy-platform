@@ -12,11 +12,13 @@ are the database-cutover source of truth. Current application evidence is in the
 
 ## Current verified boundary
 
-- Deployment `6d90afd6-6d05-498d-8a90-88872bcb8c92` serves version
-  `f67cb693-8faf-416d-a598-eaf77b9f637d` at100%, source
-  `624e5e39c79ca1d316e84f57b8586d0efb9d4f7b`, verified2026-09-07T15:59:54Z.
-  See the [current deployment receipt](../../reports/verification/2026-09-07-final-capstone-production/deployment.json).
-  Predecessor `772b75a6-e06b-404b-a268-5dbb4ec24e86` is retained.
+- Deployment `b2238de8-ad52-4a0e-83b8-80e6141da016` serves version
+  `8e4d5c04-6b6f-459b-99e3-5b2352d0f133` at100%, source
+  `948385076f7e022d112e4c309958cefebf95dd28`, verified2026-09-07T17:34:17.898Z.
+  See the [current deployment receipt](../../reports/verification/2026-09-07-cookie-production/academy-cookie-production-allocation.json).
+  Predecessor `f67cb693-8faf-416d-a598-eaf77b9f637d` is retained.
+  Host-cookie cutover requires fresh sign-in for legacy sessions/in-flight callbacks;
+  rollback also requires fresh sign-in. See the [cookie release proof](../../reports/verification/2026-09-07-cookie-production/README.md).
 - Accepted/imported/deployed capstone banks:23/23. Production HTTP25/25 and real
   Chrome EN/TH desktop/mobile captures passed. This does not close authenticated
   learner submission, entitlement, payment or complete playtest acceptance.

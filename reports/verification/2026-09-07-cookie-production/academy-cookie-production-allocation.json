@@ -1,0 +1,22 @@
+{
+  "command": [
+    "node",
+    "node_modules/wrangler/bin/wrangler.js",
+    "deployments",
+    "list",
+    "--name",
+    "cyberskills-academy",
+    "--json"
+  ],
+  "deployment": {
+    "id": "b2238de8-ad52-4a0e-83b8-80e6141da016",
+    "created_on": "2026-09-07T17:33:45.659149Z",
+    "versions": [
+      {
+        "id": "8e4d5c04-6b6f-459b-99e3-5b2352d0f133",
+        "percentage": 100
+      }
+    ]
+  },
+  "checked_at": "2026-09-07T17:34:17.898Z"
+}

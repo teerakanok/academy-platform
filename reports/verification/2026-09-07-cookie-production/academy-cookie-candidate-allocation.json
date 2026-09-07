@@ -1,0 +1,20 @@
+{
+  "command": [
+    "node",
+    "node_modules/wrangler/bin/wrangler.js",
+    "versions",
+    "deploy",
+    "f67cb693-8faf-416d-a598-eaf77b9f637d@100",
+    "8e4d5c04-6b6f-459b-99e3-5b2352d0f133@0",
+    "--name",
+    "cyberskills-academy",
+    "--message",
+    "candidate-smoke;s=948385076f7e022d112e4c309958cefebf95dd28",
+    "--yes"
+  ],
+  "exit_code": 0,
+  "previous": "f67cb693-8faf-416d-a598-eaf77b9f637d",
+  "candidate": "8e4d5c04-6b6f-459b-99e3-5b2352d0f133",
+  "output_sha256": "bc04ee50c7afd691fa0a4afa44ec85a93bae47b89ae9e778ca9131ae9dbe584e",
+  "checked_at": "2026-09-07T17:29:22.069Z"
+}

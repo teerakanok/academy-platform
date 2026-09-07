@@ -1,0 +1,58 @@
+[
+  {
+    "file": "academy-cookie-version-upload.json",
+    "sha256": "c61a88f7dec3ad4dc3a67cde3912610fa9ebb7fe8729952f30afc4285bfc299d"
+  },
+  {
+    "file": "academy-cookie-before-allocation.json",
+    "sha256": "3a529eb1bd80daa682e5097d887c426d40d12c9ed9e60d55d84c5e864d066ab7"
+  },
+  {
+    "file": "academy-cookie-candidate-allocation.json",
+    "sha256": "29694282c437f5c6745322b49fed4f54a1261a5a4b95a99d5cc977b76c2306b0"
+  },
+  {
+    "file": "academy-cookie-candidate-http.json",
+    "sha256": "44014c247ce25f0cb4b5a97c0f58ab34349d975b74a10cccb5c1912016ef3240"
+  },
+  {
+    "file": "academy-cookie-browser-candidate.json",
+    "sha256": "657a0bf932924a4a8b3040041c9da4e53871ac5df654a1200292611a47ec6954"
+  },
+  {
+    "file": "academy-cookie-activation.json",
+    "sha256": "ee27a2fc85294f3f29a632e65aaa413e7bd582ceca14003cea46caca5b0d14af"
+  },
+  {
+    "file": "academy-cookie-production-http.json",
+    "sha256": "167515d32a5938d9042bc2b2244f04d94436a19bc56e456598555149ff71fa58"
+  },
+  {
+    "file": "academy-cookie-browser-production.json",
+    "sha256": "7ad1af64df3c7fab2d95d5c109e7aa018a86db3824b3935775169cf748a40d47"
+  },
+  {
+    "file": "academy-cookie-production-allocation.json",
+    "sha256": "78a484f71a1bacf348a919fbf6282e8bbe2688e9cae578ebeb81504886fac376"
+  },
+  {
+    "file": "academy-cookie-integrated-source-parity.json",
+    "sha256": "2a2b5003f1db1ef28bf9e19f520fe528ad244495f84036b45a4f0aaeb538b7ad"
+  },
+  {
+    "file": "academy-cookie-http-probe.mjs",
+    "sha256": "5bda0edfc6c2c873d704394e5f9a5fe1eb5c3f5d27bac72fb96e6c3c23d23f2b"
+  },
+  {
+    "file": "academy-cookie-browser-probe.mjs",
+    "sha256": "81d4cf3deb4ccc3100b54827b85ac2de3c58f2d7469a9f3ae468aef63c8611bf"
+  },
+  {
+    "file": "academy-cookie-production-sign-in-en-desktop.png",
+    "sha256": "f9dd8f7097aed4c50d763a4b347a7e1353ec5706baec8c802916980deb055869"
+  },
+  {
+    "file": "academy-cookie-production-sign-in-en-mobile.png",
+    "sha256": "f2dad7af5b5ed6b717f14a7c07c915fe34f45eb53db8bd2fa32c0c48411d21f9"
+  }
+]

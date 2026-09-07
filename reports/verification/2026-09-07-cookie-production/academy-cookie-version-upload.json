@@ -1,0 +1,20 @@
+{
+  "command": [
+    "node",
+    "node_modules/wrangler/bin/wrangler.js",
+    "versions",
+    "upload",
+    "--name",
+    "cyberskills-academy",
+    "--keep-vars",
+    "--tag",
+    "release-948385076f7e",
+    "--message",
+    "s=948385076f7e022d112e4c309958cefebf95dd28;host-cookie-isolation"
+  ],
+  "source": "948385076f7e022d112e4c309958cefebf95dd28",
+  "exit_code": 0,
+  "version": "8e4d5c04-6b6f-459b-99e3-5b2352d0f133",
+  "output_sha256": "7b8d13bcbde470f654365f5c5603377dae10c07cf7c71c371c98b4cb00fd8a4e",
+  "checked_at": "2026-09-07T17:28:53.064556+00:00"
+}
