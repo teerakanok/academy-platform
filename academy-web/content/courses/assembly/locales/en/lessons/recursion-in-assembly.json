@@ -372,6 +372,160 @@
         "A"
       ],
       "explanation": "Tail-call elimination stops, and the per-call frame growth that had been optimised away returns. Taking a local's address or adding work after the recursive call both remove the tail position. This is the first thing to check when a recursive program behaves differently between optimisation levels."
+    },
+    {
+      "id": "cp-5",
+      "prompt": "On x86-64, what must a near call preserve so that the callee can return to the instruction after the call?",
+      "choices": {
+        "A": "The caller's complete register file",
+        "B": "The callee's local variables",
+        "C": "The return address on the stack",
+        "D": "A copy of the function's source code"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "A call records the address of the next instruction on the stack. ret uses that saved address to resume the caller. Recursive calls work because each invocation gets a distinct return address and its own frame."
+    },
+    {
+      "id": "cp-6",
+      "prompt": "After fact(n - 1) returns, the example executes mov rcx, rax and then mov rax, [rbp - 24]. Which values are ready for imul rax, rcx?",
+      "choices": {
+        "A": "rax holds fact(n - 1); rcx holds n",
+        "B": "rax holds n; rcx holds fact(n - 1)",
+        "C": "rax and rcx both hold n",
+        "D": "rax and rcx both hold the return address"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The call returns fact(n - 1) in rax, so the first mov preserves that result in rcx. Reloading [rbp - 24] then restores the outer n into rax. imul combines exactly those two values to produce n × fact(n - 1)."
+    },
+    {
+      "id": "cp-7",
+      "prompt": "At the base case of fact(4), which statement best describes the three earlier invocations?",
+      "choices": {
+        "A": "They share one frame and one return address",
+        "B": "They have been moved to heap objects",
+        "C": "They no longer exist because the base case ran",
+        "D": "Each has its own frame and pending return address"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Each call creates its own activation record and leaves a return address for its callee to use. When the base case returns, those calls resume one by one and use their separately saved n values."
+    },
+    {
+      "id": "cp-8",
+      "prompt": "In an ordinary function epilogue, what is ret responsible for?",
+      "choices": {
+        "A": "Allocating the next stack frame",
+        "B": "Restoring every caller-saved register",
+        "C": "Transferring control to the saved return address",
+        "D": "Comparing the recursive argument with the base case"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The frame cleanup happens before ret in the example. ret then obtains the saved return address from the stack and transfers control back to the caller, which is the reverse of the call edge."
+    },
+    {
+      "id": "cp-9",
+      "prompt": "A measured recursive frame grows from 32 bytes to 96 bytes after adding locals. With the same stack limit, what happens to the predicted maximum depth?",
+      "choices": {
+        "A": "It triples",
+        "B": "It falls to roughly one third",
+        "C": "It stays unchanged",
+        "D": "It falls by exactly 64 calls"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Depth is approximately stack limit divided by frame size. Tripling the measured frame size therefore cuts the predicted depth to one third. Measure again: pre-existing frames and compiler changes can make the observed value differ slightly."
+    },
+    {
+      "id": "cp-10",
+      "prompt": "Which source shape leaves a recursive call in tail position?",
+      "choices": {
+        "A": "return n * fact(n - 1);",
+        "B": "long result = fact(n - 1); return result * n;",
+        "C": "printf(\"%ld\\n\", fact(n - 1)); return n;",
+        "D": "return fact(n - 1);"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Only the last form has nothing left to do after the recursive call returns. That makes a tail-call transformation possible when the compiler and ABI conditions permit it; the other forms still need the returned value or perform later work."
+    },
+    {
+      "id": "cp-11",
+      "prompt": "A function is tail-recursive in source, but its -O2 disassembly still contains call to itself. What can you conclude from the binary?",
+      "choices": {
+        "A": "The source is not recursive",
+        "B": "The call must overflow the stack immediately",
+        "C": "This build did not eliminate that recursive call",
+        "D": "The call was converted into a heap allocation"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "A self-call in the emitted code is direct evidence that this build retained recursion at that site. It does not identify one universal reason: compiler options, surrounding work, ABI constraints, and the exact program can all affect the transformation."
+    },
+    {
+      "id": "cp-12",
+      "prompt": "Why does a stack-overflow handler need an alternate signal stack?",
+      "choices": {
+        "A": "It makes recursive calls use the heap",
+        "B": "The normal stack may have no usable space left",
+        "C": "It changes the program's stack limit",
+        "D": "It preserves caller-saved registers automatically"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A SIGSEGV caused by exhausting the stack arrives when the normal stack is unreliable for handler work. sigaltstack provides separate storage, and SA_ONSTACK tells the signal mechanism to run the handler there."
+    },
+    {
+      "id": "cp-13",
+      "prompt": "Inside the stack-overflow signal handler, which output approach is appropriate?",
+      "choices": {
+        "A": "Call printf with a formatted depth",
+        "B": "Build a std::string and write it later",
+        "C": "Use snprintf, then call malloc",
+        "D": "Use write with hand-formatted digits"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The lesson's handler uses write and converts digits itself because stdio formatting functions are not async-signal-safe. Keeping the handler to operations that are safe in that context prevents a diagnostic path from failing in a new way."
+    },
+    {
+      "id": "cp-14",
+      "prompt": "Which sigaction flag asks the kernel to run a signal handler on the stack registered by sigaltstack?",
+      "choices": {
+        "A": "SA_RESTART",
+        "B": "SA_SIGINFO",
+        "C": "SA_ONSTACK",
+        "D": "SA_NODEFER"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "sigaltstack only registers alternate storage. SA_ONSTACK is the handler flag that selects it when the signal is delivered, which is why both pieces appear in the stack-exhaustion example."
+    },
+    {
+      "id": "cp-15",
+      "prompt": "The stack-exhaustion experiment reports that sigaction(SIGSEGV, &sa, NULL) returned -1 before recursion begins. What should the program do?",
+      "choices": {
+        "A": "Continue and assume the handler will still run",
+        "B": "Report setup failure and exit before the experiment",
+        "C": "Retry only after the stack has overflowed",
+        "D": "Replace SIGSEGV with a normal return value"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The alternate stack and handler registration are prerequisites for the experiment's controlled failure path. If sigaction fails, continuing would not establish that stack exhaustion is handled safely; the correct result is a visible setup error and an early exit."
     }
   ]
 }

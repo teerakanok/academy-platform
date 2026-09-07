@@ -317,6 +317,160 @@
         "D"
       ],
       "explanation": "An instruction you cannot explain means the function does something you have not accounted for. In the worked example the unconditional jmp into the middle of the loop is explained by loop rotation. An unexplained instruction is the signal that the reading is incomplete."
+    },
+    {
+      "id": "cp-5",
+      "prompt": "Under the System V AMD64 integer calling convention, what role does edx have on entry to this three-parameter function?",
+      "choices": {
+        "A": "It holds the return address",
+        "B": "It holds the third integer argument",
+        "C": "It is always the loop counter",
+        "D": "It holds the stack frame size"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The integer argument registers begin rdi, rsi, rdx. In this function rdi is the array address, rsi is the count, and edx is the value compared with each element's id field."
+    },
+    {
+      "id": "cp-6",
+      "prompt": "The function begins with mov eax, -1 before it tests the count. What is the most supported reconstruction of that value?",
+      "choices": {
+        "A": "It is the first element's id",
+        "B": "It is a stack-frame marker",
+        "C": "It is the default return value for no match",
+        "D": "It is the byte offset of the flags field"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "eax is the integer return register. The early non-positive-count path goes directly to ret without changing eax, while a successful match replaces it with ecx. That supports -1 as the no-match result."
+    },
+    {
+      "id": "cp-7",
+      "prompt": "What property does test byte ptr [rdi], 8 check after an element's id matches?",
+      "choices": {
+        "A": "Whether the whole byte equals 8",
+        "B": "Whether bit 3 of that byte is set",
+        "C": "Whether the byte is a signed negative value",
+        "D": "Whether the next element exists"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "test performs a bitwise AND for flags and does not store a result. Mask 8 is binary 00001000, so the following je skips this element when bit 3 is clear."
+    },
+    {
+      "id": "cp-8",
+      "prompt": "After cmp dword ptr [rdi - 4], edx, what does jne .L5 mean for an element whose id differs from the requested value?",
+      "choices": {
+        "A": "Skip its flag test and advance to the next element",
+        "B": "Return the current index immediately",
+        "C": "Treat the count as negative",
+        "D": "Reload the function's first argument"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "jne takes the mismatch path to .L5. That path increments the index, advances the pointer by one stride, checks the bound, and then tries the next element; the flag test is only relevant after an id match."
+    },
+    {
+      "id": "cp-9",
+      "prompt": "Why is rcx the best reconstruction for the loop index rather than for the return value?",
+      "choices": {
+        "A": "rcx is callee-saved",
+        "B": "rcx always contains a pointer under System V",
+        "C": "It starts at zero, increments once per stride, and is copied to eax on success",
+        "D": "It is the third argument register"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "xor ecx, ecx initializes the counter, inc rcx advances it, and cmp rsi, rcx bounds it. On success mov eax, ecx copies that index into the ABI return register."
+    },
+    {
+      "id": "cp-10",
+      "prompt": "What behavior follows from test rsi, rsi followed by jle .L7 before the prologue?",
+      "choices": {
+        "A": "A zero count makes the loop run once",
+        "B": "A non-positive count returns the default value without entering the loop",
+        "C": "The function converts rsi to an unsigned count",
+        "D": "The function allocates a larger stack frame"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The jump goes to the ret path before push rbp and before the loop setup. Since eax was already set to -1, zero and negative counts return that default without dereferencing rdi."
+    },
+    {
+      "id": "cp-11",
+      "prompt": "The pointer advances by 16 bytes after each unsuccessful element. What does that establish most directly?",
+      "choices": {
+        "A": "The array elements occupy 16 bytes each",
+        "B": "The function returns a 16-byte value",
+        "C": "There are exactly 16 elements",
+        "D": "The flags field is 16 bits wide"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "A repeated pointer stride is the spacing between successive elements in the traversal. It establishes the element size for this access pattern; it does not reveal the array length or the return type."
+    },
+    {
+      "id": "cp-12",
+      "prompt": "A dword load from one field proves which limited fact about that field?",
+      "choices": {
+        "A": "It is definitely a signed int in the source",
+        "B": "It is definitely an enum in the source",
+        "C": "This instruction accesses four bytes at that offset",
+        "D": "It is the first field declared in every compatible struct"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The size annotation gives the width used by this instruction. It does not recover the source-language type or all declarations that could share the layout; those are intent-level facts the disassembly alone does not provide."
+    },
+    {
+      "id": "cp-13",
+      "prompt": "Why does the positive-count path execute push rbp only after the early jle guard?",
+      "choices": {
+        "A": "push rbp performs the signed comparison",
+        "B": "The immediate-return path needs no frame setup",
+        "C": "The ABI forbids frames for positive counts",
+        "D": "The push changes rsi into the loop bound"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The zero-or-negative path does no loop work and reaches ret directly, so it has no need to establish and later dismantle the frame. The placement is evidence for a fast early return, not a separate calling convention."
+    },
+    {
+      "id": "cp-14",
+      "prompt": "If two elements both match the id and have bit 3 set, which index does this function return?",
+      "choices": {
+        "A": "The first matching index",
+        "B": "The last matching index",
+        "C": "The number of matching elements",
+        "D": "-1, because duplicates are errors"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "After the first successful flag test, mov eax, ecx is followed by the shared epilogue and ret. There is no jump back to .L5 on that path, so later elements are never examined."
+    },
+    {
+      "id": "cp-15",
+      "prompt": "Which source-level fact remains unjustified even after this function's behavior and layout are reconstructed?",
+      "choices": {
+        "A": "The loop examines elements in increasing address order",
+        "B": "The function returns -1 on a non-positive count",
+        "C": "The original programmer's chosen function and field names",
+        "D": "The function checks an id before testing one flag bit"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The instructions establish behavior, accesses, and control flow, but names are source-level intent. Labels can be stripped or renamed, and several source programs can compile to the same behavior, so a reconstruction should name this limit explicitly."
     }
   ]
 }
