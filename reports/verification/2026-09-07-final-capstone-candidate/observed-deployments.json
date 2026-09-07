@@ -1,0 +1,139 @@
+{
+  "command": [
+    "node",
+    "node_modules/wrangler/bin/wrangler.js",
+    "deployments",
+    "list",
+    "--name",
+    "cyberskills-academy",
+    "--json"
+  ],
+  "exit_code": 0,
+  "checked_at": "2026-09-07T15:55:10.310948+00:00",
+  "deployments": [
+    {
+      "id": "ece847b8-6092-493d-bf81-41ae10dd51ae",
+      "created_on": "2026-09-07T06:06:51.752325Z",
+      "versions": [
+        {
+          "version_id": "1af77a26-bba2-4300-9a71-0bc0262ca06d",
+          "percentage": 100
+        },
+        {
+          "version_id": "56c2e7bd-26be-4d68-bda1-70df901e6187",
+          "percentage": 0
+        }
+      ]
+    },
+    {
+      "id": "c1f0f8ae-fa8b-43d4-bf76-f18b5e336f5c",
+      "created_on": "2026-09-07T06:09:20.702487Z",
+      "versions": [
+        {
+          "version_id": "56c2e7bd-26be-4d68-bda1-70df901e6187",
+          "percentage": 100
+        }
+      ]
+    },
+    {
+      "id": "2bbac255-1441-43f7-8982-dac359cd4992",
+      "created_on": "2026-09-07T08:03:40.788865Z",
+      "versions": [
+        {
+          "version_id": "56c2e7bd-26be-4d68-bda1-70df901e6187",
+          "percentage": 100
+        },
+        {
+          "version_id": "6beb8fed-236e-47ea-bd4a-8af9834c61ef",
+          "percentage": 0
+        }
+      ]
+    },
+    {
+      "id": "7e63726c-7d19-4194-a198-3919c6b699ec",
+      "created_on": "2026-09-07T08:47:59.929546Z",
+      "versions": [
+        {
+          "version_id": "56c2e7bd-26be-4d68-bda1-70df901e6187",
+          "percentage": 100
+        },
+        {
+          "version_id": "0eed364a-1714-4e03-bf62-0af2230cfb55",
+          "percentage": 0
+        }
+      ]
+    },
+    {
+      "id": "733e4fa3-52c4-4717-b3da-aed3aafe5023",
+      "created_on": "2026-09-07T08:49:36.634858Z",
+      "versions": [
+        {
+          "version_id": "0eed364a-1714-4e03-bf62-0af2230cfb55",
+          "percentage": 100
+        }
+      ]
+    },
+    {
+      "id": "98a128c0-63f8-4df8-9a2f-84b70cc53185",
+      "created_on": "2026-09-07T09:05:45.1985Z",
+      "versions": [
+        {
+          "version_id": "0eed364a-1714-4e03-bf62-0af2230cfb55",
+          "percentage": 100
+        },
+        {
+          "version_id": "33a85d92-6a72-42f5-8a74-7a5a3a5c633b",
+          "percentage": 0
+        }
+      ]
+    },
+    {
+      "id": "937de442-b8ce-4a06-8328-ee75817cf045",
+      "created_on": "2026-09-07T09:08:01.887852Z",
+      "versions": [
+        {
+          "version_id": "33a85d92-6a72-42f5-8a74-7a5a3a5c633b",
+          "percentage": 100
+        }
+      ]
+    },
+    {
+      "id": "1104d2cf-d0be-4d4b-afc4-afb92eb2eba2",
+      "created_on": "2026-09-07T13:57:26.065026Z",
+      "versions": [
+        {
+          "version_id": "33a85d92-6a72-42f5-8a74-7a5a3a5c633b",
+          "percentage": 100
+        },
+        {
+          "version_id": "772b75a6-e06b-404b-a268-5dbb4ec24e86",
+          "percentage": 0
+        }
+      ]
+    },
+    {
+      "id": "2771c927-fa16-42fc-9730-d5fe3321d5e1",
+      "created_on": "2026-09-07T13:59:43.748931Z",
+      "versions": [
+        {
+          "version_id": "772b75a6-e06b-404b-a268-5dbb4ec24e86",
+          "percentage": 100
+        }
+      ]
+    },
+    {
+      "id": "73481d5e-f816-4671-82de-8496f4b66e85",
+      "created_on": "2026-09-07T15:39:48.460369Z",
+      "versions": [
+        {
+          "version_id": "772b75a6-e06b-404b-a268-5dbb4ec24e86",
+          "percentage": 100
+        },
+        {
+          "version_id": "f67cb693-8faf-416d-a598-eaf77b9f637d",
+          "percentage": 0
+        }
+      ]
+    }
+  ]
+}

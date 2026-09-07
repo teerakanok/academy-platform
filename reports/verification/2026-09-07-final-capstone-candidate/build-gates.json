@@ -1,0 +1,44 @@
+[
+  {
+    "name": "ts-app",
+    "command": [
+      "npx",
+      "tsc",
+      "--noEmit"
+    ],
+    "exit_code": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-final-capstone-release-ts-app.log"
+  },
+  {
+    "name": "ts-worker",
+    "command": [
+      "npx",
+      "tsc",
+      "-p",
+      "tsconfig.worker.json"
+    ],
+    "exit_code": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-final-capstone-release-ts-worker.log"
+  },
+  {
+    "name": "ts-retention",
+    "command": [
+      "npx",
+      "tsc",
+      "-p",
+      "ops/academy-retention-worker/tsconfig.json"
+    ],
+    "exit_code": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-final-capstone-release-ts-retention.log"
+  },
+  {
+    "name": "build",
+    "command": [
+      "npm",
+      "run",
+      "build:cf"
+    ],
+    "exit_code": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-final-capstone-release-build.log"
+  }
+]
