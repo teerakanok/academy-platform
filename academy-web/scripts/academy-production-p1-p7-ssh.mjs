@@ -17,7 +17,7 @@ const EXPECTED = Object.freeze({
   manifest: "443b9f7c80f7e89e649922807692b9657c93737bc17b809bd46d2631a6eb1571",
   authority: "b0a1897048e9881a0789204619de9c770bc5258904ba597ab7afc026998cb01e",
   hostHelper:
-    "221f2831c71f108128b23992358aa61fde9daca213cbd0c5a1c157180e55544f",
+    "ead268f57955758091c8d436bc92dc8862667a3cd9f2d487512e0ab36b639891",
 });
 const OP = /^\/root\/identity-synthetic-operations\/academy-p5-[a-f0-9]{18}$/;
 const UUID =
@@ -254,9 +254,14 @@ export async function secureTransferOtp(staged, options = {}) {
 async function db(invokeHost, mode, operationPath) {
   if (!OP.test(operationPath)) fail();
   const value = JSON.parse(await invokeHost([mode, operationPath]));
-  if (value.status !== (mode === "enroll" ? "ENROLLED" : "ABSENT")) fail();
+  const operationId = operationPath.split("/").at(-1);
+  const emailSha256 = createHash("sha256").update(`${operationId}@synthetic.cyberskills.co.th`).digest("hex");
+  if (value.schema !== "academy-synthetic-fixture-db/v1" ||
+      value.operationId !== operationId || value.emailSha256 !== emailSha256 ||
+      value.status !== (mode === "enroll" ? "ENROLLED" : "ABSENT")) fail();
   return {
     ...value,
+    status: mode === "enroll" ? "PASS" : "ABSENT",
     receiptSha256: createHash("sha256")
       .update(`${JSON.stringify(value)}\n`)
       .digest("hex"),

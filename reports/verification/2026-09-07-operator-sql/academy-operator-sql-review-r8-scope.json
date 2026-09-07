@@ -1,0 +1,21 @@
+{
+  "root": "/private/tmp/academy-operator-sql-cde63a58",
+  "base": "ef82a5dbd2436b958c722d78069f807d04507e3f",
+  "files": {
+    "academy-web/scripts/academy-macos-root-preflight-worker.sh": "b28a2f1ba2ab558970f20b4de0b335d475436b78dc365d712fe346ea029ee2b9",
+    "academy-web/scripts/academy-poola-production-producer.mjs": "ec83328278d6e775df8c6cda5ef08726ce745e105b7bc2280b6f745e31280282",
+    "academy-web/scripts/academy-poola-production-producer.test.mjs": "52a6e1b8e1b11d74fab84e2d093690357e706f0526dbf1a9551cdd7a804b0478",
+    "academy-web/scripts/academy-production-activation-cli.test.mjs": "2b5018fc67a91ae222b2d1a912c51e75b48dbf5bd71e3b5f38fae9bc9c66517f",
+    "academy-web/scripts/academy-production-operation.mjs": "98508a146bf8800c9555044e500e659a276c8bd075d90fc23c72f9b105f92050",
+    "academy-web/scripts/academy-production-operation.test.mjs": "30942c7e6c2cccc2007b6a42a978972ec1ef630ad9d2c116a5c1fcdb9ce31dcb",
+    "academy-web/scripts/academy-production-p1-p7-host.mjs": "ead268f57955758091c8d436bc92dc8862667a3cd9f2d487512e0ab36b639891",
+    "academy-web/scripts/academy-production-p1-p7-host.test.mjs": "5b767bffb44f7e960d52e1fa82d85f3427b3bc6fb737ad6cebeb89d0f66b959a",
+    "academy-web/scripts/academy-production-p1-p7-runner.mjs": "9abbe09719aacc910809bdc0acd009db6862c621218103b5383ca72599200264",
+    "academy-web/scripts/academy-production-p1-p7-runner.test.mjs": "377e4e13e56415abf06816af5d895115db34383f0ff0f7d992359978121f051e",
+    "academy-web/scripts/academy-production-p1-p7-ssh.mjs": "932acb74b9ceab03adaadc1a2f691e931516a78e20b5ac1c60818a7ae48fef03",
+    "academy-web/scripts/academy-production-p1-p7-ssh.test.mjs": "46f52e4abb8b917b5f8055a7232fd8fba13068f9a669e1e4583a7a08dbd3f09a",
+    "academy-web/scripts/identity-production-activation-controller.mjs": "613c5f05f9030e78e3efd668a596aad1f90748d0d45b8142806b168a4db7c3fd",
+    "academy-web/scripts/identity-production-activation-controller.test.mjs": "33474909113e846bfb0dee173f754e17cf008448ba0f00d25b83c27ce72a2798",
+    "reports/security/2026-09-05-security-review-checklist.md": "d47a6dc5a2800302c96153145df7714e29d7ff500c50a454f09f9cd72c4374b7"
+  }
+}

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { createHash, randomUUID } from "node:crypto";
 import {
   chmod,
@@ -260,7 +260,7 @@ case "$*" in
   *" dropdb "*) [ "\${FAKE_DROP_FAIL:-0}" = 1 ] && exit 9 || exit 0 ;;
   *" createdb "*) exit 0 ;;
   *" -d academy_restore_"*) printf '8|0|0|0|0|0|0\\n' ;;
-  *" from pg_database "*) printf '0\\n' ;;
+  *" -v scratch="*) cat >/dev/null; printf '0\\n' ;;
   *) exit 7 ;;
 esac
 `,
@@ -312,4 +312,129 @@ esac
   const failure = await execute(true);
   assert.notEqual(failure.status, 0);
   assert.equal(failure.stdout, "");
+});
+
+test("remote independently rejects malformed authority before side effects", async (t) => {
+  const f = await fixture(t),
+    bin = join(f.root, "bin"),
+    workspace = join(f.root, "remote"),
+    dockerCalls = join(f.root, "docker.log");
+  await mkdir(bin);
+  const docker = join(bin, "docker");
+  await writeFile(
+    docker,
+    `#!/bin/sh\nprintf '%s\\n' "$*" >> "\${FAKE_DOCKER_LOG}"\nexit 42\n`,
+  );
+  await chmod(docker, 0o755);
+  const execute = (authorityId, operation = "backup") =>
+    new Promise((resolve) => {
+      const child = spawn("/bin/sh", ["-c", remoteCommandForTest(workspace)], {
+        env: {
+          PATH: `${bin}:/usr/bin:/bin`,
+          FAKE_DOCKER_LOG: dockerCalls,
+        },
+        stdio: ["pipe", "pipe", "pipe"],
+      });
+      let stdout = "",
+        stderr = "";
+      child.stdout.on("data", (chunk) => (stdout += chunk));
+      child.stderr.on("data", (chunk) => (stderr += chunk));
+      child.on("close", (status) => resolve({ status, stdout, stderr }));
+      child.stdin.end(
+        JSON.stringify({
+          operation,
+          authorityId,
+          releaseRevision: R,
+          identityReadinessSha256: D,
+          identityRestoreReceiptSha256: D,
+          capturedAt: "2026-08-30T00:00:00.000Z",
+        }),
+      );
+    });
+  const authority = "x'; select 1; --";
+  const result = await execute(authority);
+  assert.notEqual(result.status, 0);
+  assert.equal(result.stdout, "");
+  assert.match(result.stderr, /authority/);
+  await assert.rejects(stat(join(workspace, authority)));
+  await assert.rejects(stat(workspace));
+  await assert.rejects(readFile(dockerCalls));
+  const traversal = await execute("../../quote'; touch escaped;--");
+  assert.notEqual(traversal.status, 0);
+  assert.equal(traversal.stdout, "");
+  assert.match(traversal.stderr, /authority/);
+  await assert.rejects(stat(join(f.root, "quote'; touch escaped;--")));
+  await assert.rejects(readFile(dockerCalls));
+});
+
+test("remote scratch existence probe binds its derived database name", async (t) => {
+  const source = await readFile(
+    new URL("./academy-poola-production-producer.mjs", import.meta.url),
+    "utf8",
+  );
+  assert.match(
+    source,
+    /scratch='academy_restore_'\+aid\.replace\('-','_'\)/,
+  );
+  assert.match(source, /'-v','scratch='\+scratch/);
+  assert.match(source, /datname=:'scratch'/);
+  assert.doesNotMatch(source, /datname='"?\s*\+\s*scratch/);
+});
+
+test("remote program sends derived scratch through a psql variable", async (t) => {
+  const f = await fixture(t),
+    bin = join(f.root, "bin"),
+    workspace = join(f.root, "remote"),
+    dockerCalls = join(f.root, "docker.log");
+  await mkdir(bin);
+  const docker = join(bin, "docker");
+  await writeFile(docker, `#!/bin/sh\nprintf '%s\\n' "$*" >> "\${FAKE_DOCKER_LOG}"\nexit 42\n`);
+  await chmod(docker, 0o755);
+  const status = await new Promise((resolve) => {
+    const child = spawn("/bin/sh", ["-c", remoteCommandForTest(workspace)], {
+      env: { PATH: `${bin}:/usr/bin:/bin`, FAKE_DOCKER_LOG: dockerCalls },
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+    child.on("close", resolve);
+    child.stdin.end(
+      JSON.stringify({
+        operation: "backup",
+        authorityId: f.authority,
+        releaseRevision: R,
+        identityReadinessSha256: D,
+        identityRestoreReceiptSha256: D,
+        capturedAt: "2026-09-07T00:00:00.000Z",
+      }),
+    );
+  });
+  assert.notEqual(status, 0);
+  const calls = await readFile(dockerCalls, "utf8");
+  const scratch = `academy_restore_${f.authority.replaceAll("-", "_")}`;
+  assert.match(calls, new RegExp(`-v scratch=${scratch}(?:\\s|$)`));
+  assert.match(calls, /exec -i supabase-db psql/);
+  await assert.rejects(
+    readFile(join(workspace, scratch, "academy.dump"), "utf8"),
+  );
+});
+
+
+test("remote cleanup probe executes its exact psql invocation on PostgreSQL", async (t) => {
+  const psql = process.env.ACADEMY_SEC019_PSQL;
+  const databaseUrl = process.env.ACADEMY_SEC019_DATABASE_URL;
+  if (!psql || !databaseUrl) return t.skip("local PostgreSQL fixture unavailable");
+  assert.equal(new URL(databaseUrl).pathname, "/academy_sec019_disposable");
+  const source = await readFile(new URL("./academy-poola-production-producer.mjs", import.meta.url), "utf8");
+  const expression = source.split("\n").find((line) => line.trimStart().startsWith("absent=run(")).trim().slice("absent=".length);
+  const probe = spawnSync("python3", ["-c", `import json,sys,subprocess
+p=json.load(sys.stdin)
+scratch=p['scratch']
+def run(a,data=None):
+ start=a.index('psql')+1
+ flags=a[start:]
+ # Replace only the production connection; preserve the actual SQL transport.
+ flags=flags[4:]
+ return subprocess.run([p['psql'],'-d',p['databaseUrl']]+flags,input=data,text=True,capture_output=True,check=True).stdout
+assert eval(p['expression']) == p['expected']
+`], { input: JSON.stringify({ psql, databaseUrl, expression, scratch: "academy_sec019_disposable", expected: false }), encoding: "utf8", timeout: 30000 });
+  assert.equal(probe.status, 0, probe.stderr);
 });

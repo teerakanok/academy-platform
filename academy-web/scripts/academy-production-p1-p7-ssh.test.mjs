@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { EventEmitter } from "node:events";
 import {
   mkdtemp,
@@ -36,7 +36,7 @@ test("SSH adapter invokes only fixed reviewed wrapper and bounded host programs"
         schema: "academy-synthetic-fixture-db/v1",
         operationId: operationPath.split("/").at(-1),
         status: mode === "enroll" ? "ENROLLED" : "ABSENT",
-        emailSha256: D,
+        emailSha256: createHash("sha256").update(`${operationPath.split("/").at(-1)}@synthetic.cyberskills.co.th`).digest("hex"),
       });
     }
     if (args.includes("issue"))
@@ -77,7 +77,7 @@ test("SSH adapter invokes only fixed reviewed wrapper and bounded host programs"
     await remote.consumeOtp({ operationPath, outputPath: issued.outputPath }),
     "123456",
   );
-  assert.equal((await remote.enroll({ operationPath })).status, "ENROLLED");
+  assert.equal((await remote.enroll({ operationPath })).status, "PASS");
   assert.equal((await remote.cleanup({ operationPath })).status, "ABSENT");
   assert.ok(calls.every((args) => args[0].startsWith("/opt/")));
   assert.ok(calls.every((args) => !args.includes("-e")));

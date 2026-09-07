@@ -191,7 +191,9 @@ function runSsh(payload, deadline) {
   });
 }
 const REMOTE = String.raw`import sys,json,subprocess,hashlib,os,stat,datetime,re
-p=json.load(sys.stdin); op=p['operation']; aid=p['authorityId']; base='/root/academy-db-backups/'+aid; os.makedirs(base,mode=0o700,exist_ok=True); st=os.stat(base,follow_symlinks=False)
+p=json.load(sys.stdin); op=p['operation']; aid=p['authorityId']
+if not re.fullmatch(r'[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}',aid): raise RuntimeError('authority')
+base='/root/academy-db-backups/'+aid; os.makedirs(base,mode=0o700,exist_ok=True); st=os.stat(base,follow_symlinks=False)
 if st.st_uid!=0 or (st.st_mode & 0o777)!=0o700: raise RuntimeError('workspace')
 def run(a,data=None): return subprocess.run(a,input=data,text=not isinstance(data,(bytes,bytearray)),capture_output=True,check=True).stdout
 def canonical_schema(raw):
@@ -240,7 +242,7 @@ if op=='backup':
   b=open(final,'rb').read();schema_hash=hashlib.sha256(source_schema.encode()).hexdigest();result={'status':'MATCH','artifactSha256':hashlib.sha256(b).hexdigest(),'bytes':len(b),'objectCount':int(proof[0]),'sourceSchemaSha256':schema_hash,'restoredSchemaSha256':hashlib.sha256(restored_schema.encode()).hexdigest()}
  finally:
   dropped=subprocess.run(['docker','exec','supabase-db','dropdb','-U','postgres','--if-exists',scratch],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL).returncode==0;os.path.exists(tmp) and os.unlink(tmp)
-  absent=run(['docker','exec','supabase-db','psql','-U','postgres','-d','postgres','-AtX','-c',"select count(*) from pg_database where datname='"+scratch+"'"]).strip()=='0'
+  absent=run(['docker','exec','-i','supabase-db','psql','-U','postgres','-d','postgres','-AtqX','-v','ON_ERROR_STOP=1','-v','scratch='+scratch],"select count(*) from pg_database where datname=:'scratch';\n").strip()=='0'
   if not dropped or not absent: raise RuntimeError('cleanup')
  print(json.dumps({**result,'cleanupVerified':True}))
 else:

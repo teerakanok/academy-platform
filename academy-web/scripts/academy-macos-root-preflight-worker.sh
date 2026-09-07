@@ -111,7 +111,7 @@ publication="$("$stage/source/node" -e 'const fs=require("fs"),v=JSON.parse(fs.r
 db_root=/opt/academy/production-db
 state_root=/private/var/root/academy-production-state
 phase=STAGE_DATABASE
-[[ "$(/usr/bin/shasum -a 256 /opt/academy/production-operations/academy-poola-production-producer.mjs | /usr/bin/awk '{print $1}')" == 4a1db4922fdb39b5b8841adb186b39e463a9e53448abb8d19bb4ea21198afc15 ]]
+[[ "$(/usr/bin/shasum -a 256 /opt/academy/production-operations/academy-poola-production-producer.mjs | /usr/bin/awk '{print $1}')" == ec83328278d6e775df8c6cda5ef08726ce745e105b7bc2280b6f745e31280282 ]]
 ensure_root_directory() {
   local path=$1
   if [[ -e "$path" ]]; then

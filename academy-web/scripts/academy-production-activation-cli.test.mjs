@@ -1,3 +1,4 @@
+import { IDENTITY_SYNTHETIC_AUTHORITY } from "./academy-production-p1-p7-runner.mjs";
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import { chmod, mkdtemp, readFile, realpath, rm, writeFile } from 'node:fs/promises'
@@ -103,7 +104,7 @@ test('CLI restart publishes a retained terminal journal before provider discover
       : call.operation === 'applyMigrations' ? {status:'PASS',operation:'academy-migrations-0021-0027',ordered:['0021','0022','0023','0024','0025','0026','0027'],receiptSha256:D}
       : call.operation === 'uploadCandidate' ? {status:'PASS',workerName:'cyberskills-academy',versionId:ids.candidate,sourceRevision:revision,trafficPercentage:0,configuredNamesSha256:configSha256,receiptSha256:D}
       : call.operation === 'activateTraffic' ? {status:'PASS',previousDeploymentId:ids.currentDeployment,previousVersionId:ids.currentVersion,deploymentId:ids.active,activeVersionId:ids.candidate,trafficPercentage:100,semantics:optimisticSemantics,receiptSha256:D}
-      : call.operation === 'smokeP1P7' ? {status:'PASS',deploymentId:ids.active,versionId:ids.candidate,configuredNamesSha256:configSha256,checks:['P1','P2','P3','P4','P5','P6','P7'],receiptSha256:D}
+      : call.operation === 'smokeP1P7' ? {status:'PASS',deploymentId:ids.active,versionId:ids.candidate,configuredNamesSha256:configSha256,operationId:'academy-p5-abcdef0123456789ab',checks:['P1','P2','P3','P4','P5','P6','P7'],cleanup:{status:'ABSENT',identityReceiptSha256:D,academyReceiptSha256:D},runnerReceiptSha256:D,identitySyntheticAuthority:IDENTITY_SYNTHETIC_AUTHORITY,receiptSha256:D}
       : {status:'PASS',deploymentId:ids.active,versionId:ids.candidate,versionCount:2,nonServingVersionCount:1,inventorySha256:D,receiptSha256:D}
     return { status: 0, stdout: JSON.stringify(output) }
   }

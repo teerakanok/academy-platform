@@ -91,6 +91,7 @@ const common = [
     const out = await executeAcademyProductionOperation(args, {
       runHook: async () => ({
         status: "PASS",
+        operationId: "academy-p5-abcdef0123456789ab",
         deploymentId: I,
         versionId: I,
         configuredNamesSha256: D,
@@ -109,6 +110,7 @@ const common = [
       }),
     });
     assert.equal(out.status, "PASS");
+    assert.equal(out.operationId, "academy-p5-abcdef0123456789ab");
     const drifted = [...args];
     drifted[drifted.length - 1] = "c".repeat(64);
     await assert.rejects(

@@ -1,0 +1,38 @@
+✖ bound fixture SQL proves enrollment and cleanup behavior on PostgreSQL (3441.776209ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3778.614708
+
+✖ failing tests:
+
+test at academy-web/scripts/academy-production-p1-p7-host.test.mjs:149:1
+✖ bound fixture SQL proves enrollment and cleanup behavior on PostgreSQL (3441.776209ms)
+  AssertionError [ERR_ASSERTION]: ERROR:  column f.id does not exist
+  LINE 2:     where u.id=f.id and u.subject=f.subject and u.email=f.em...
+                         ^
+  HINT:  Perhaps you meant to reference the column "u.id".
+  QUERY:  delete from academy.users u using academy_synthetic_fixture f
+      where u.id=f.id and u.subject=f.subject and u.email=f.email
+  CONTEXT:  PL/pgSQL function inline_code_block line 11 at SQL statement
+  
+  
+  3 !== 0
+  
+      at run (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/academy-production-p1-p7-host.test.mjs:179:12)
+      at TestContext.<anonymous> (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/academy-production-p1-p7-host.test.mjs:203:16)
+      at Test.runInAsyncScope (node:async_hooks:212:14)
+      at Test.run (node:internal/test_runner/test:1109:25)
+      at Test.start (node:internal/test_runner/test:1006:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:358:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 3,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { IDENTITY_SYNTHETIC_AUTHORITY } from "./academy-production-p1-p7-runner.mjs"
 
 import { createHash } from 'node:crypto'
 import { constants } from 'node:fs'
@@ -248,10 +249,14 @@ export async function runAcademyProductionActivation({ plan: input, ports: input
     await advance('traffic-activation', 'confirmed', { activeDeploymentId })
     base.steps.push({ name: 'traffic-activation', status: 'PASS', receiptSha256: activation.receiptSha256 })
     const smoke = expect(await ports.smokeP1P7({ deploymentId: activeDeploymentId, versionId: candidate.versionId, configuredNamesSha256: CONFIG_SHA256 }),
-      ['status','deploymentId','versionId','configuredNamesSha256','checks','receiptSha256'], value => value.status === 'PASS'
+      ['status','deploymentId','versionId','configuredNamesSha256','operationId','checks','cleanup','runnerReceiptSha256','identitySyntheticAuthority','receiptSha256'], value => value.status === 'PASS'
         && value.deploymentId === activeDeploymentId && value.versionId === candidate.versionId
-        && value.configuredNamesSha256 === CONFIG_SHA256 && JSON.stringify(value.checks) === JSON.stringify(CHECKS))
-    base.steps.push({ name: 'authenticated-p1-p7', status: 'PASS', receiptSha256: smoke.receiptSha256 })
+        && value.configuredNamesSha256 === CONFIG_SHA256 && JSON.stringify(value.checks) === JSON.stringify(CHECKS)
+        && /^academy-p5-[a-f0-9]{18}$/.test(value.operationId ?? '')
+        && value.cleanup?.status === 'ABSENT' && SHA256.test(value.cleanup.identityReceiptSha256)
+        && SHA256.test(value.cleanup.academyReceiptSha256) && SHA256.test(value.runnerReceiptSha256)
+        && JSON.stringify(value.identitySyntheticAuthority) === JSON.stringify(IDENTITY_SYNTHETIC_AUTHORITY))
+    base.steps.push({ name: 'authenticated-p1-p7', status: 'PASS', receiptSha256: smoke.receiptSha256, evidence: { operationId: smoke.operationId, runnerReceiptSha256: smoke.runnerReceiptSha256 } })
     const residue = expect(await ports.checkResidue({ expectedDeploymentId: activeDeploymentId, expectedVersionId: candidate.versionId }),
       ['status','deploymentId','versionId','versionCount','nonServingVersionCount','inventorySha256','receiptSha256'], value => value.status === 'PASS'
         && value.deploymentId === activeDeploymentId && value.versionId === candidate.versionId

@@ -1,0 +1,43 @@
+✔ requires the exact P1-P7 sequence and terminal absence proof (3.189167ms)
+✔ every post-prepare failure still performs cleanup and emits no PASS (1.833584ms)
+✔ headed production contract waits for real Turnstile without reading or logging its token (3.263959ms)
+✖ production pins match the exact reviewed operator source (1.27725ms)
+✖ real SSH enrollment adapter completes P6 and binds final receipt to operation (0.8045ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 3
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 88.767833
+
+✖ failing tests:
+
+test at scripts/academy-production-p1-p7-runner.test.mjs:118:1
+✖ production pins match the exact reviewed operator source (1.27725ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '221f2831c71f108128b23992358aa61fde9daca213cbd0c5a1c157180e55544f'
+  - 'ead268f57955758091c8d436bc92dc8862667a3cd9f2d487512e0ab36b639891'
+  
+      at TestContext.<anonymous> (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/academy-production-p1-p7-runner.test.mjs:120:9)
+      at async Test.run (node:internal/test_runner/test:1116:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:786:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '221f2831c71f108128b23992358aa61fde9daca213cbd0c5a1c157180e55544f',
+    expected: 'ead268f57955758091c8d436bc92dc8862667a3cd9f2d487512e0ab36b639891',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at scripts/academy-production-p1-p7-runner.test.mjs:125:1
+✖ real SSH enrollment adapter completes P6 and binds final receipt to operation (0.8045ms)
+  Error: ACADEMY_P1_P7_REJECTED
+      at fail (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/academy-production-p1-p7-runner.mjs:46:9)
+      at runAcademyP1P7 (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/academy-production-p1-p7-runner.mjs:106:7)
+      at async TestContext.<anonymous> (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/academy-production-p1-p7-runner.test.mjs:131:15)
+      at async Test.run (node:internal/test_runner/test:1116:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:786:7)
