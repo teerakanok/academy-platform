@@ -1,0 +1,20 @@
+{
+  "command": [
+    "node",
+    "node_modules/wrangler/bin/wrangler.js",
+    "versions",
+    "deploy",
+    "f67cb693-8faf-416d-a598-eaf77b9f637d@100",
+    "--name",
+    "cyberskills-academy",
+    "--yes",
+    "--message",
+    "activate-624e5e39c79c-final-capstones"
+  ],
+  "exit_code": 0,
+  "source": "624e5e39c79ca1d316e84f57b8586d0efb9d4f7b",
+  "version": "f67cb693-8faf-416d-a598-eaf77b9f637d",
+  "rollback_version": "772b75a6-e06b-404b-a268-5dbb4ec24e86",
+  "output_sha256": "ad88b00b3dea06c09a17da767943a552b950e21aaa94d294b623dea1f05b3bf1",
+  "checked_at": "2026-09-07T15:59:06.645596+00:00"
+}

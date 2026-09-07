@@ -1,0 +1,82 @@
+[
+  {
+    "production": "academy-final-production-c-low-level-en-desktop.png",
+    "sha256": "a83d5dfee758f2f88542f4f4d1130d521302f7dddb07458f1f9b1ede047d64cd",
+    "identical_to_inspected_candidate": true
+  },
+  {
+    "production": "academy-final-production-c-low-level-en-mobile.png",
+    "sha256": "2b7e98a7af6b7cea422411bede06f5a9e5be21291c49d8d9c30cf1546158ddb2",
+    "identical_to_inspected_candidate": true
+  },
+  {
+    "production": "academy-final-production-c-low-level-th-desktop.png",
+    "sha256": "9b6c8e42726d9db57588f31a9a0eb94acfd353981eb277df724eb4962b47bfce",
+    "identical_to_inspected_candidate": true
+  },
+  {
+    "production": "academy-final-production-c-low-level-th-mobile.png",
+    "sha256": "ede1e9d7296a8f3bc6b324f6622814f67f0996595e9d8d6b8dbe77fdcea9edc0",
+    "identical_to_inspected_candidate": true
+  },
+  {
+    "production": "academy-final-production-computer-networking-en-desktop.png",
+    "sha256": "050a612f70ea8a5cec90475fb7ee7d4d2f996e7af7d5eeae1fc2618b69ad7308",
+    "identical_to_inspected_candidate": true
+  },
+  {
+    "production": "academy-final-production-computer-networking-en-mobile.png",
+    "sha256": "5850cfa7394dd05d011ee8be4c75be662248faa71c344cf66eb9d673f6725697",
+    "identical_to_inspected_candidate": true
+  },
+  {
+    "production": "academy-final-production-computer-networking-th-desktop.png",
+    "sha256": "8e115227768875c7e47544e0f22a2225dff1ec9f93af8f681e42c4781a59a39c",
+    "identical_to_inspected_candidate": true
+  },
+  {
+    "production": "academy-final-production-computer-networking-th-mobile.png",
+    "sha256": "0c4495138979d9254533708af783f80694d699c71cb1fbf3ff641da10659609d",
+    "identical_to_inspected_candidate": true
+  },
+  {
+    "production": "academy-final-production-operating-systems-en-desktop.png",
+    "sha256": "0115cc245fea4490314e91c4f2cb1a062098b7baf6eb866605f47d9db065cc68",
+    "identical_to_inspected_candidate": true
+  },
+  {
+    "production": "academy-final-production-operating-systems-en-mobile.png",
+    "sha256": "47dd5e0126124ced7a9b27f449eeffde8b92ac4d65d9520db941a522f29a21c9",
+    "identical_to_inspected_candidate": true
+  },
+  {
+    "production": "academy-final-production-operating-systems-th-desktop.png",
+    "sha256": "285777151a6f3cbb0174434a345705c8e009b8e3a5c5824eb752d282d0298445",
+    "identical_to_inspected_candidate": false
+  },
+  {
+    "production": "academy-final-production-operating-systems-th-mobile.png",
+    "sha256": "834482d32d883433c61e0d42af5505ffb75df33448df8ab3836de6f5808f291e",
+    "identical_to_inspected_candidate": true
+  },
+  {
+    "production": "academy-final-production-setup-and-environment-en-desktop.png",
+    "sha256": "ebbac23301e3b6e87b502e7bf970de59274361df141e260d774670b3c007c498",
+    "identical_to_inspected_candidate": true
+  },
+  {
+    "production": "academy-final-production-setup-and-environment-en-mobile.png",
+    "sha256": "30ac40647197bb399bde59dfd423fd681463360cf4efb3ac382491b6005ae0f6",
+    "identical_to_inspected_candidate": true
+  },
+  {
+    "production": "academy-final-production-setup-and-environment-th-desktop.png",
+    "sha256": "a88024a55be53c5c43408803cbaa10aa8cb29a6490f558bdfef3cb8c09b61ee6",
+    "identical_to_inspected_candidate": false
+  },
+  {
+    "production": "academy-final-production-setup-and-environment-th-mobile.png",
+    "sha256": "a64fa9a73b62e20598da81f3176a2e9311e13923010e9989816d90283de48d88",
+    "identical_to_inspected_candidate": true
+  }
+]

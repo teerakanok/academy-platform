@@ -22,3 +22,6 @@ Accepted/imported capstone count is23/23; live remains8/23 until activation and 
 Import and unit/lint proof: `../2026-09-07-final-capstone-import/`.
 Three TypeScript gates and build:cf passed before upload; ignored build artifacts were not rebuilt here.
 The source SHA remains624e5e39 even when this evidence-only commit changes branch HEAD.
+
+Superseded release state: candidate later passed real Chrome inspection and was activated.
+See `../2026-09-07-final-capstone-production/` for deployment and post-release proof.

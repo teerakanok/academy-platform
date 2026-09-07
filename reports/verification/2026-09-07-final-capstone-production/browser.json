@@ -1,0 +1,343 @@
+{
+  "checked_at": "2026-09-07T15:59:28.021Z",
+  "version_override": false,
+  "checks": [
+    {
+      "path": "/",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/sign-in",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/robots.txt",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/assembly/en",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/assembly/th",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/basic-os-linux/en",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/basic-os-linux/th",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/c-low-level/en",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/c-low-level/th",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/computer-architecture/en",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/computer-architecture/th",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/computer-networking/en",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/computer-networking/th",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/git-essentials/en",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/git-essentials/th",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/operating-systems/en",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/operating-systems/th",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/setup-and-environment/en",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/setup-and-environment/th",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/git-essentials/learn",
+      "status": 307,
+      "pass": true
+    },
+    {
+      "path": "/courses/comptia-security-plus/en",
+      "status": 404,
+      "pass": true
+    },
+    {
+      "surface": "raw-host",
+      "status": 404,
+      "pass": true
+    }
+  ],
+  "captures": [
+    {
+      "course": "operating-systems",
+      "locale": "en",
+      "name": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "url": "https://academy.cyberskills.co.th/courses/operating-systems/en",
+      "h1": "Operating Systems",
+      "status": 200,
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "course": "operating-systems",
+      "locale": "en",
+      "name": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "url": "https://academy.cyberskills.co.th/courses/operating-systems/en",
+      "h1": "Operating Systems",
+      "status": 200,
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "course": "operating-systems",
+      "locale": "th",
+      "name": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "url": "https://academy.cyberskills.co.th/courses/operating-systems/th",
+      "h1": "ระบบปฏิบัติการ",
+      "status": 200,
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "course": "operating-systems",
+      "locale": "th",
+      "name": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "url": "https://academy.cyberskills.co.th/courses/operating-systems/th",
+      "h1": "ระบบปฏิบัติการ",
+      "status": 200,
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "course": "computer-networking",
+      "locale": "en",
+      "name": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "url": "https://academy.cyberskills.co.th/courses/computer-networking/en",
+      "h1": "Computer Networking",
+      "status": 200,
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "course": "computer-networking",
+      "locale": "en",
+      "name": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "url": "https://academy.cyberskills.co.th/courses/computer-networking/en",
+      "h1": "Computer Networking",
+      "status": 200,
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "course": "computer-networking",
+      "locale": "th",
+      "name": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "url": "https://academy.cyberskills.co.th/courses/computer-networking/th",
+      "h1": "เครือข่ายคอมพิวเตอร์",
+      "status": 200,
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "course": "computer-networking",
+      "locale": "th",
+      "name": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "url": "https://academy.cyberskills.co.th/courses/computer-networking/th",
+      "h1": "เครือข่ายคอมพิวเตอร์",
+      "status": 200,
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "course": "setup-and-environment",
+      "locale": "en",
+      "name": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "url": "https://academy.cyberskills.co.th/courses/setup-and-environment/en",
+      "h1": "Setting Up",
+      "status": 200,
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "course": "setup-and-environment",
+      "locale": "en",
+      "name": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "url": "https://academy.cyberskills.co.th/courses/setup-and-environment/en",
+      "h1": "Setting Up",
+      "status": 200,
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "course": "setup-and-environment",
+      "locale": "th",
+      "name": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "url": "https://academy.cyberskills.co.th/courses/setup-and-environment/th",
+      "h1": "ตั้งต้นให้พร้อม",
+      "status": 200,
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "course": "setup-and-environment",
+      "locale": "th",
+      "name": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "url": "https://academy.cyberskills.co.th/courses/setup-and-environment/th",
+      "h1": "ตั้งต้นให้พร้อม",
+      "status": 200,
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "course": "c-low-level",
+      "locale": "en",
+      "name": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "url": "https://academy.cyberskills.co.th/courses/c-low-level/en",
+      "h1": "C & Low-level Programming",
+      "status": 200,
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "course": "c-low-level",
+      "locale": "en",
+      "name": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "url": "https://academy.cyberskills.co.th/courses/c-low-level/en",
+      "h1": "C & Low-level Programming",
+      "status": 200,
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "course": "c-low-level",
+      "locale": "th",
+      "name": "desktop",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "url": "https://academy.cyberskills.co.th/courses/c-low-level/th",
+      "h1": "C และการเขียนโปรแกรมระดับล่าง",
+      "status": 200,
+      "overflow": false,
+      "pass": true
+    },
+    {
+      "course": "c-low-level",
+      "locale": "th",
+      "name": "mobile",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "url": "https://academy.cyberskills.co.th/courses/c-low-level/th",
+      "h1": "C และการเขียนโปรแกรมระดับล่าง",
+      "status": 200,
+      "overflow": false,
+      "pass": true
+    }
+  ],
+  "pass": true
+}
