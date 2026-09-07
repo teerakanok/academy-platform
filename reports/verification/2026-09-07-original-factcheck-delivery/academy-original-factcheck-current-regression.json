@@ -1,0 +1,11 @@
+{
+  "observed_at": "2026-09-07T17:07:30.033542+00:00",
+  "command": [
+    "node",
+    "--test",
+    "courses/academy/tests/factcheck-critical-high-regression.test.mjs"
+  ],
+  "cwd": "/private/tmp/crucible-capstone-banks-sparse-cde63a58",
+  "exit_code": 0,
+  "log": "academy-original-factcheck-current-regression.log"
+}

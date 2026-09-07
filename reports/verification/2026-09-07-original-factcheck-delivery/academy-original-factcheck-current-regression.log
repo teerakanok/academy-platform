@@ -1,0 +1,18 @@
+✔ assembly critical/high corrections remain present in both locales (7.199834ms)
+✔ assembly alternate-stack example compiles and runs in bounded and isolated exhaustion modes (1715.230666ms)
+✔ setup and environment high corrections remain present in both locales (2.821416ms)
+✔ operating systems critical/high corrections remain present in both locales (4.589792ms)
+✔ Git essentials critical/high corrections remain present in both locales (3.320292ms)
+✔ computer networking critical/high corrections remain present in both locales (7.378667ms)
+✔ INADDR_LOOPBACK is converted from host to network byte order in executable C (557.832708ms)
+✔ computer architecture critical/high corrections remain present in both locales (5.279292ms)
+✔ C low-level critical/high corrections remain present in both locales (6.6825ms)
+✔ basic OS/Linux critical/high corrections remain present in both locales (5.646292ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2386.581875
