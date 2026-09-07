@@ -61,3 +61,7 @@ This release guide intentionally leaves the table blank until the final owner di
 ## Verified public-course release — 2026-09-07 08:50 UTC
 
 Current app source `5572e8318b67ebf7858c4c1fccf1831ae01d335f`, Worker `0eed364a-1714-4e03-bf62-0af2230cfb55` at100%, deployment `733e4fa3-52c4-4717-b3da-aed3aafe5023`. The existing versions-upload/0%-candidate/override-smoke/100%-activation flow was used. All16 public localized course pages return200 after activation without a version override; authenticated lessons still redirect to sign-in and raw host404. Root viewed realChrome1440x900/390x844. Proof: `reports/verification/2026-09-07-public-course-cache-production/`. Build must run the cache sync before upload; uploading assets without generated prerender cache caused the prior course404. Predecessor `56c2e7bd-26be-4d68-bda1-70df901e6187` remains the rollback version. Authenticated learner/entitlement/operator acceptance remains open.
+
+## Verified Linux content release — 2026-09-07 09:08 UTC
+
+Supersedes the serving version in the preceding release record. Source `9ad69fd8de46bb4f0d2be900372d4eec4f19e8b9`, Worker `33a85d92-6a72-42f5-8a74-7a5a3a5c633b` at 100%, deployment `937de442-b8ce-4a06-8328-ee75817cf045`. Rollback predecessor `0eed364a-1714-4e03-bf62-0af2230cfb55`. Post-activation public route and real browser proof: `reports/verification/2026-09-07-linux-capstone-production/`. Authenticated learner and operator acceptance remain open.

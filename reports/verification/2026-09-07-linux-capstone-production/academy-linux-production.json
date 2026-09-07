@@ -1,0 +1,130 @@
+{
+  "checked_at": "2026-09-07T09:08:55.507Z",
+  "version_override": false,
+  "checks": [
+    {
+      "path": "/",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/sign-in",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/robots.txt",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/assembly/en",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/assembly/th",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/basic-os-linux/en",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/basic-os-linux/th",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/c-low-level/en",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/c-low-level/th",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/computer-architecture/en",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/computer-architecture/th",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/computer-networking/en",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/computer-networking/th",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/git-essentials/en",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/git-essentials/th",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/operating-systems/en",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/operating-systems/th",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/setup-and-environment/en",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/setup-and-environment/th",
+      "status": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/basic-os-linux/learn",
+      "status": 307,
+      "pass": true
+    },
+    {
+      "path": "/courses/comptia-security-plus/en",
+      "status": 404,
+      "pass": true
+    },
+    {
+      "surface": "raw-host",
+      "status": 404,
+      "pass": true
+    }
+  ],
+  "captures": [
+    {
+      "name": "desktop",
+      "status": 200,
+      "h1": "พื้นฐานระบบปฏิบัติการและ Linux",
+      "pass": true
+    },
+    {
+      "name": "mobile",
+      "status": 200,
+      "h1": "พื้นฐานระบบปฏิบัติการและ Linux",
+      "pass": true
+    }
+  ]
+}

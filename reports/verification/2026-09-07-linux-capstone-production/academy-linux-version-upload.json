@@ -1,0 +1,22 @@
+{
+  "source": "9ad69fd8de46bb4f0d2be900372d4eec4f19e8b9",
+  "command": [
+    "node",
+    "node_modules/wrangler/bin/wrangler.js",
+    "versions",
+    "upload",
+    "--name",
+    "cyberskills-academy",
+    "--keep-vars",
+    "--tag",
+    "release-9ad69fd8de46",
+    "--message",
+    "s=9ad69fd8de46bb4f0d2be900372d4eec4f19e8b9;linux-capstone-content"
+  ],
+  "exit": 0,
+  "version_ids": [
+    "33a85d92-6a72-42f5-8a74-7a5a3a5c633b"
+  ],
+  "output_sha256": "a9f60277555bf2d307889ae4e9586f58d893059ffe9c644b483e6d0dcea14083",
+  "error_codes": []
+}
