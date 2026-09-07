@@ -190,6 +190,160 @@
         "C"
       ],
       "explanation": "Both the kernel version and its enabled speculative-execution mitigations change the cost of the crossing itself. Mitigations for speculative-execution vulnerabilities added real work to every boundary crossing. This is a good example of a security decision with a directly measurable performance price — and of why you measure on the machine you actually deploy to."
+    },
+    {
+      "id": "cp-5",
+      "prompt": "What can a successful write return?",
+      "choices": {
+        "A": "Always the buffer capacity",
+        "B": "Fewer bytes than requested",
+        "C": "Only a file descriptor",
+        "D": "A count of future writes"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A successful write can be short, so code must continue with the remaining bytes."
+    },
+    {
+      "id": "cp-6",
+      "prompt": "What does a system call return value of -1 usually require?",
+      "choices": {
+        "A": "Treat it as zero bytes",
+        "B": "Reuse it as an address",
+        "C": "Assume the kernel retried it",
+        "D": "Check errno and handle the error"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "For interfaces such as read and write, -1 signals failure and errno identifies the reason."
+    },
+    {
+      "id": "cp-7",
+      "prompt": "For read, what does EINTR mean when no bytes were returned?",
+      "choices": {
+        "A": "A signal interrupted the call before data was read",
+        "B": "The file reached end of file",
+        "C": "The buffer is full",
+        "D": "The descriptor became writable"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "A read can be interrupted before transferring data; retry policy depends on the program context."
+    },
+    {
+      "id": "cp-8",
+      "prompt": "Why advance the buffer pointer after a short write?",
+      "choices": {
+        "A": "To change the file type",
+        "B": "To clear errno",
+        "C": "To avoid writing the bytes already written again",
+        "D": "To make the call blocking"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The return count identifies the completed prefix; the next call starts after that prefix."
+    },
+    {
+      "id": "cp-9",
+      "prompt": "What does strace primarily show for a process?",
+      "choices": {
+        "A": "Kernel source code",
+        "B": "CPU cache contents",
+        "C": "System calls, signals, and their results",
+        "D": "Compiler optimizations"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "strace observes the user/kernel interface, including calls, return values, and signals."
+    },
+    {
+      "id": "cp-10",
+      "prompt": "Why does a system call validate user pointers and sizes?",
+      "choices": {
+        "A": "User mode has no memory",
+        "B": "User memory arguments cannot be trusted by the kernel",
+        "C": "Every pointer is already safe",
+        "D": "Validation makes files faster"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The kernel must reject invalid user addresses and sizes before using them for an operation."
+    },
+    {
+      "id": "cp-11",
+      "prompt": "What is a file descriptor in a Unix-like process?",
+      "choices": {
+        "A": "A pathname stored in memory",
+        "B": "A physical disk sector",
+        "C": "A process identifier",
+        "D": "An integer handle used for an open file or stream"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "A descriptor is a process-visible handle; the kernel associates it with an open resource."
+    },
+    {
+      "id": "cp-12",
+      "prompt": "Why check a call result before using it as a byte count?",
+      "choices": {
+        "A": "A negative error value is not a valid byte count",
+        "B": "It changes the call ABI",
+        "C": "It opens the file twice",
+        "D": "It removes a context switch"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Casting an error to an unsigned size can turn failure into a dangerously large count."
+    },
+    {
+      "id": "cp-13",
+      "prompt": "What is the sound way to judge syscall overhead?",
+      "choices": {
+        "A": "Use one published number",
+        "B": "Measure the target workload on the target system",
+        "C": "Count source lines",
+        "D": "Assume clock speed decides it"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Costs depend on workload, kernel, hardware, and configuration, so measurement must match deployment."
+    },
+    {
+      "id": "cp-14",
+      "prompt": "Why should code avoid hard-coding a syscall number?",
+      "choices": {
+        "A": "Numbers are encrypted",
+        "B": "The linker chooses random numbers",
+        "C": "The number is tied to an architecture and ABI",
+        "D": "All calls use number zero"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "System-call numbering is an ABI detail and can differ across architectures and environments."
+    },
+    {
+      "id": "cp-15",
+      "prompt": "What relationship can a C library function have to system calls?",
+      "choices": {
+        "A": "It is always a system call",
+        "B": "It cannot enter the kernel",
+        "C": "It always creates a process",
+        "D": "It may make zero, one, or several system calls"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "A library interface is not automatically a one-to-one system call; its implementation can vary."
     }
   ]
 }

@@ -190,6 +190,160 @@
         "C"
       ],
       "explanation": "ทั้งเวอร์ชันของ kernel และมาตรการป้องกันช่องโหว่ speculative execution ที่เปิดอยู่ เปลี่ยนราคาของการข้ามเส้นเอง มาตรการเหล่านี้เพิ่มงานจริงให้ทุกการข้ามเส้น นี่เป็นตัวอย่างที่ดีของการตัดสินใจด้านความปลอดภัยที่มีราคาด้านประสิทธิภาพซึ่งวัดได้โดยตรง และเป็นเหตุผลที่ต้องวัดบนเครื่องที่คุณจะ deploy จริง"
+    },
+    {
+      "id": "cp-5",
+      "prompt": "write ที่สำเร็จอาจคืนอะไร",
+      "choices": {
+        "A": "ความจุ buffer เสมอ",
+        "B": "ไบต์น้อยกว่าที่ร้องขอ",
+        "C": "เฉพาะ file descriptor",
+        "D": "จำนวน write ในอนาคต"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "write ที่สำเร็จอาจสั้น จึงต้องทำต่อกับไบต์ที่เหลือ"
+    },
+    {
+      "id": "cp-6",
+      "prompt": "ค่าคืน -1 จาก system call มักต้องทำอะไร",
+      "choices": {
+        "A": "ถือว่าเป็นศูนย์ไบต์",
+        "B": "ใช้เป็น address",
+        "C": "สมมติว่า kernel ลองใหม่แล้ว",
+        "D": "ตรวจ errno และจัดการ error"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "สำหรับ interface เช่น read และ write ค่า -1 บอกความล้มเหลว และ errno บอกสาเหตุ"
+    },
+    {
+      "id": "cp-7",
+      "prompt": "สำหรับ read ค่า EINTR เมื่อยังไม่มีไบต์คืนมาหมายถึงอะไร",
+      "choices": {
+        "A": "signal ขัดจังหวะ call ก่อนอ่านข้อมูล",
+        "B": "ไฟล์ถึง end of file",
+        "C": "buffer เต็ม",
+        "D": "descriptor เขียนได้แล้ว"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "read อาจถูกขัดจังหวะก่อนส่งข้อมูล การจะลองใหม่ขึ้นกับบริบทโปรแกรม"
+    },
+    {
+      "id": "cp-8",
+      "prompt": "ทำไมต้องเลื่อน pointer ของ buffer หลัง short write",
+      "choices": {
+        "A": "เพื่อเปลี่ยนชนิดไฟล์",
+        "B": "เพื่อล้าง errno",
+        "C": "เพื่อไม่เขียนไบต์ที่เขียนแล้วซ้ำ",
+        "D": "เพื่อทำให้ call block"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "จำนวนที่คืนมาระบุส่วนต้นที่เสร็จแล้ว call ถัดไปจึงเริ่มหลังส่วนนั้น"
+    },
+    {
+      "id": "cp-9",
+      "prompt": "strace แสดงอะไรเป็นหลักสำหรับ process",
+      "choices": {
+        "A": "source code ของ kernel",
+        "B": "เนื้อหา CPU cache",
+        "C": "system call, signal และผลลัพธ์",
+        "D": "compiler optimization"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "strace สังเกต interface ระหว่าง user/kernel รวม call ค่าคืน และ signal"
+    },
+    {
+      "id": "cp-10",
+      "prompt": "ทำไม system call ต้อง validate pointer และขนาดจาก user",
+      "choices": {
+        "A": "user mode ไม่มี memory",
+        "B": "kernel เชื่อ argument memory จาก user ไม่ได้",
+        "C": "pointer ทุกตัวปลอดภัยอยู่แล้ว",
+        "D": "validation ทำให้ไฟล์เร็วขึ้น"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "kernel ต้องปฏิเสธ address และขนาดจาก user ที่ไม่ถูกต้องก่อนใช้ทำงาน"
+    },
+    {
+      "id": "cp-11",
+      "prompt": "file descriptor ใน process แบบ Unix-like คืออะไร",
+      "choices": {
+        "A": "pathname ที่เก็บใน memory",
+        "B": "sector จริงบน disk",
+        "C": "process identifier",
+        "D": "handle จำนวนเต็มที่ใช้แทนไฟล์หรือ stream ที่เปิดอยู่"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "descriptor คือ handle ที่ process เห็น และ kernel ผูกมันกับ resource ที่เปิดอยู่"
+    },
+    {
+      "id": "cp-12",
+      "prompt": "ทำไมต้องตรวจผลของ call ก่อนใช้เป็นจำนวนไบต์",
+      "choices": {
+        "A": "ค่า error ติดลบไม่ใช่จำนวนไบต์ที่ใช้ได้",
+        "B": "มันเปลี่ยน ABI ของ call",
+        "C": "มันเปิดไฟล์สองครั้ง",
+        "D": "มันตัด context switch"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "การแปลง error เป็นขนาด unsigned อาจเปลี่ยนความล้มเหลวเป็นจำนวนที่ใหญ่อันตราย"
+    },
+    {
+      "id": "cp-13",
+      "prompt": "วิธีที่ถูกต้องในการตัดสิน overhead ของ syscall คืออะไร",
+      "choices": {
+        "A": "ใช้ตัวเลขเผยแพร่ตัวเดียว",
+        "B": "วัด workload เป้าหมายบนระบบเป้าหมาย",
+        "C": "นับบรรทัด source",
+        "D": "สมมติว่า clock speed ตัดสิน"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "ต้นทุนขึ้นกับ workload, kernel, hardware และการตั้งค่า จึงต้องวัดให้ตรงกับที่ deploy"
+    },
+    {
+      "id": "cp-14",
+      "prompt": "ทำไมโค้ดไม่ควร hard-code หมายเลข syscall",
+      "choices": {
+        "A": "หมายเลขถูกเข้ารหัส",
+        "B": "linker สุ่มหมายเลข",
+        "C": "หมายเลขผูกกับ architecture และ ABI",
+        "D": "ทุก call ใช้หมายเลขศูนย์"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "หมายเลข system call เป็นรายละเอียด ABI และต่างกันได้ตาม architecture และ environment"
+    },
+    {
+      "id": "cp-15",
+      "prompt": "function ของ C library อาจสัมพันธ์กับ system call อย่างไร",
+      "choices": {
+        "A": "มันเป็น system call เสมอ",
+        "B": "มันเข้า kernel ไม่ได้",
+        "C": "มันสร้าง process เสมอ",
+        "D": "มันอาจเรียก system call ศูนย์ หนึ่ง หรือหลายครั้ง"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "interface ของ library ไม่ได้เท่ากับ system call หนึ่งต่อหนึ่ง และ implementation เปลี่ยนได้"
     }
   ]
 }

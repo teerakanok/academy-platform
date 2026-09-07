@@ -211,6 +211,160 @@
         "A"
       ],
       "explanation": "And if the lesson genuinely never mentions the difference, that is a defect in the lesson worth reporting. This track states its platform wherever it matters. Silence about a difference you can reproduce is a gap in the material, not necessarily a mistake by you."
+    },
+    {
+      "id": "cp-5",
+      "prompt": "What does command -v help diagnose?",
+      "choices": {
+        "A": "Whether a package manager installed the command",
+        "B": "The current working directory",
+        "C": "Which command path the shell resolves",
+        "D": "The arguments the program will receive"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "It reveals the command the shell would use, including aliases or functions in many shells."
+    },
+    {
+      "id": "cp-6",
+      "prompt": "Why use ./tool for a file in the current directory?",
+      "choices": {
+        "A": "It explicitly names that local path",
+        "B": "It ensures the tool has execute permission",
+        "C": "It adds the directory to PATH",
+        "D": "It runs the tool with administrator privileges"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The prefix avoids relying on PATH search and selects the file here."
+    },
+    {
+      "id": "cp-7",
+      "prompt": "What should you inspect after Permission denied on a script?",
+      "choices": {
+        "A": "Whether the script prints standard output",
+        "B": "Whether the command has network access",
+        "C": "Whether its argument names are valid",
+        "D": "Execute permission and the filesystem mount options"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The x bit and mounts such as noexec can both affect executing a file."
+    },
+    {
+      "id": "cp-8",
+      "prompt": "What does echo $PATH show?",
+      "choices": {
+        "A": "The previous command exit code",
+        "B": "Directories searched for unqualified command names",
+        "C": "Files in the current directory",
+        "D": "Commands that are currently running"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The shell searches these directories in order when a command has no slash."
+    },
+    {
+      "id": "cp-9",
+      "prompt": "Why record the exact error message?",
+      "choices": {
+        "A": "It distinguishes different failure conditions",
+        "B": "It guarantees diagnosis without reproducing the problem",
+        "C": "It replaces recording the environment and version",
+        "D": "It proves the failure originated in the shell"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Exact text, command, and exit status make a problem reproducible and searchable."
+    },
+    {
+      "id": "cp-10",
+      "prompt": "What does uname -s help identify?",
+      "choices": {
+        "A": "The owner of the current directory",
+        "B": "The number of CPU cores",
+        "C": "The operating-system family in use",
+        "D": "Whether a service listens on a port"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Platform differences can explain command flags, paths, and package behavior."
+    },
+    {
+      "id": "cp-11",
+      "prompt": "What is a useful first check for a missing executable?",
+      "choices": {
+        "A": "Whether the current user is root",
+        "B": "Whether a source file has execute permission",
+        "C": "Whether DNS resolves a project host",
+        "D": "Whether its install directory is on PATH"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "An installed program is not found by name when its directory is absent from PATH."
+    },
+    {
+      "id": "cp-12",
+      "prompt": "What information does a command exit status provide?",
+      "choices": {
+        "A": "The text printed by the previous command",
+        "B": "It reports success or failure to scripts and callers",
+        "C": "Whether the shell will find a command",
+        "D": "How much memory the command used"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Output can look plausible even when a command failed; status is a separate signal."
+    },
+    {
+      "id": "cp-13",
+      "prompt": "What should a minimal bug report include?",
+      "choices": {
+        "A": "Steps, environment, expected result, and actual result",
+        "B": "Only the program version",
+        "C": "The preferred solution",
+        "D": "A screenshot without the exact error"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "A small reproducible report lets another person test the same condition."
+    },
+    {
+      "id": "cp-14",
+      "prompt": "Why avoid adding current directory to PATH globally?",
+      "choices": {
+        "A": "The system finds commands more quickly",
+        "B": "Only root can run local files",
+        "C": "It prevents duplicate files",
+        "D": "An unexpected local file could be selected as a command"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Explicit ./ names the intended file without changing global command resolution."
+    },
+    {
+      "id": "cp-15",
+      "prompt": "What should you change first when debugging?",
+      "choices": {
+        "A": "Every configuration file at the same time",
+        "B": "Permissions first regardless of the symptom",
+        "C": "One small variable while keeping observations",
+        "D": "Network hardware before observing the error"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Changing many things at once hides which change affected the result."
     }
   ]
 }

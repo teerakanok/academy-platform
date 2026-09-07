@@ -1,0 +1,851 @@
+{
+  "source_revision": "a160ff52bd07b132a3ae30578a7273f7f9b746f7",
+  "packages": [
+    "courses/academy/operating-systems",
+    "courses/academy/computer-networking",
+    "courses/academy/setup-and-environment",
+    "courses/academy/c-low-level"
+  ],
+  "json_files": 162,
+  "changed_files": [
+    "academy-web/content/courses/operating-systems/locales/en/lessons/cow-and-mmap.json",
+    "academy-web/content/courses/operating-systems/locales/en/lessons/producer-consumer.json",
+    "academy-web/content/courses/operating-systems/locales/en/lessons/setuid-and-its-risks.json",
+    "academy-web/content/courses/operating-systems/locales/en/lessons/syscall-lifecycle.json",
+    "academy-web/content/courses/operating-systems/locales/th/lessons/cow-and-mmap.json",
+    "academy-web/content/courses/operating-systems/locales/th/lessons/producer-consumer.json",
+    "academy-web/content/courses/operating-systems/locales/th/lessons/setuid-and-its-risks.json",
+    "academy-web/content/courses/operating-systems/locales/th/lessons/syscall-lifecycle.json",
+    "academy-web/content/courses/computer-networking/locales/en/lessons/arp-and-icmp.json",
+    "academy-web/content/courses/computer-networking/locales/en/lessons/client-and-server.json",
+    "academy-web/content/courses/computer-networking/locales/en/lessons/event-driven-and-c10k.json",
+    "academy-web/content/courses/computer-networking/locales/th/lessons/arp-and-icmp.json",
+    "academy-web/content/courses/computer-networking/locales/th/lessons/client-and-server.json",
+    "academy-web/content/courses/computer-networking/locales/th/lessons/event-driven-and-c10k.json",
+    "academy-web/content/courses/setup-and-environment/locales/en/lessons/when-something-does-not-work.json",
+    "academy-web/content/courses/setup-and-environment/locales/th/lessons/when-something-does-not-work.json",
+    "academy-web/content/courses/c-low-level/locales/en/lessons/arrays-and-strings.json",
+    "academy-web/content/courses/c-low-level/locales/en/lessons/defensive-c.json",
+    "academy-web/content/courses/c-low-level/locales/en/lessons/malloc-and-free.json",
+    "academy-web/content/courses/c-low-level/locales/en/lessons/reading-real-c.json",
+    "academy-web/content/courses/c-low-level/locales/th/lessons/arrays-and-strings.json",
+    "academy-web/content/courses/c-low-level/locales/th/lessons/defensive-c.json",
+    "academy-web/content/courses/c-low-level/locales/th/lessons/malloc-and-free.json",
+    "academy-web/content/courses/c-low-level/locales/th/lessons/reading-real-c.json"
+  ],
+  "byte_exact": true,
+  "original_four_and_noncheckpoint_preserved": true,
+  "visibility": "existing syllabus-preview unchanged",
+  "files": [
+    {
+      "source": "courses/academy/operating-systems/course.json",
+      "target": "academy-web/content/courses/operating-systems/course.json",
+      "sha256": "35ffbf117e3d8145a3b27e2dafcc4d6054f99d29c25ed10a9f3eb7def6e20e88"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/en/course.json",
+      "target": "academy-web/content/courses/operating-systems/locales/en/course.json",
+      "sha256": "e557f606a051f144d086e63410947ccaa2d688ad151a05267538402c3b2d5f3b"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/en/lessons/acl-vs-capability.json",
+      "target": "academy-web/content/courses/operating-systems/locales/en/lessons/acl-vs-capability.json",
+      "sha256": "78db002df27d6003afee75914c488f7ff20b228faa91243488f5705b887276fc"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/en/lessons/address-space.json",
+      "target": "academy-web/content/courses/operating-systems/locales/en/lessons/address-space.json",
+      "sha256": "acb971922e709afdb59062a7fa2a35e940b986b77b3f043d5a0baef081209ad1"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/en/lessons/async-signal-safety.json",
+      "target": "academy-web/content/courses/operating-systems/locales/en/lessons/async-signal-safety.json",
+      "sha256": "d74e3672690b8c59f406cb2daf2e081e0e249cecb1f769aba4176a1bf2502834"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/en/lessons/cow-and-mmap.json",
+      "target": "academy-web/content/courses/operating-systems/locales/en/lessons/cow-and-mmap.json",
+      "sha256": "dfab31f1b77ea33162029ffd2499a5bbf7441755c30e385bbbc5455402ddc3d3"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/en/lessons/cpu-scheduling.json",
+      "target": "academy-web/content/courses/operating-systems/locales/en/lessons/cpu-scheduling.json",
+      "sha256": "60143768ee6fe6e2ab0a8dc6994f79520145df3e54c9b73e30c9fc6b5d2f80ab"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/en/lessons/deadlock.json",
+      "target": "academy-web/content/courses/operating-systems/locales/en/lessons/deadlock.json",
+      "sha256": "56cafff0455d5771095ccc7260e832e882205a077b9f490e132d8a1a3308eaae"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/en/lessons/demand-paging.json",
+      "target": "academy-web/content/courses/operating-systems/locales/en/lessons/demand-paging.json",
+      "sha256": "3beca52b96800a843fb56843d807de01ba93e14962231aa05ea697c72939819a"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/en/lessons/fork-exec-wait.json",
+      "target": "academy-web/content/courses/operating-systems/locales/en/lessons/fork-exec-wait.json",
+      "sha256": "1cbef42a5bb3328d27c5a40ee950dd8a7fd8802e9ba7939222cbf7aab734d8b1"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/en/lessons/kernel-vs-user-mode.json",
+      "target": "academy-web/content/courses/operating-systems/locales/en/lessons/kernel-vs-user-mode.json",
+      "sha256": "c18abd259bfbc7f52b0de008ef6d6a6b840299462868381931bfe2af5b3b6ca3"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/en/lessons/mutex.json",
+      "target": "academy-web/content/courses/operating-systems/locales/en/lessons/mutex.json",
+      "sha256": "92217f81e251550bac158aeeac796e9726f0a9d29c73adaaf4b732dce8ef9ffe"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/en/lessons/page-tables-and-tlb.json",
+      "target": "academy-web/content/courses/operating-systems/locales/en/lessons/page-tables-and-tlb.json",
+      "sha256": "1f26dbeca3972f8dfd59eddbb05f24c94abb50486a5483ca019e9aaf6e941089"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/en/lessons/privilege-rings.json",
+      "target": "academy-web/content/courses/operating-systems/locales/en/lessons/privilege-rings.json",
+      "sha256": "c0d75f1bf2b0e1a04a17250bd65defa1ed3e68f04fe2ac8f117452823c9e95cd"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/en/lessons/producer-consumer.json",
+      "target": "academy-web/content/courses/operating-systems/locales/en/lessons/producer-consumer.json",
+      "sha256": "7d03a70a7ba3119c14ded37393751b23855b3e19fc235e03c39c0e3f4f871a2e"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/en/lessons/pthreads.json",
+      "target": "academy-web/content/courses/operating-systems/locales/en/lessons/pthreads.json",
+      "sha256": "2a5fc43e81dc60252027e3b05c05c642c26ecc4f10a4f417eeb9d8e6039fc64a"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/en/lessons/race-conditions.json",
+      "target": "academy-web/content/courses/operating-systems/locales/en/lessons/race-conditions.json",
+      "sha256": "55c0a7a4d1cc0df9af3b824e01810012bf83d6a0082b30d6208d51f3f7cd4ef0"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/en/lessons/semaphore-and-condvar.json",
+      "target": "academy-web/content/courses/operating-systems/locales/en/lessons/semaphore-and-condvar.json",
+      "sha256": "a64974b72a1ab6ab1e24a27d1c52628997707d492d0024415e95decfcf539036"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/en/lessons/setuid-and-its-risks.json",
+      "target": "academy-web/content/courses/operating-systems/locales/en/lessons/setuid-and-its-risks.json",
+      "sha256": "39ab3d011f8db493b9d5f85d8d708cfdde3fca629da4d474ba807fcd5349d958"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/en/lessons/signals.json",
+      "target": "academy-web/content/courses/operating-systems/locales/en/lessons/signals.json",
+      "sha256": "92b3aab7bc41e6e0faacd5c570902301f0996ac1dd1e2e1bd9d61c8d108ac126"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/en/lessons/syscall-lifecycle.json",
+      "target": "academy-web/content/courses/operating-systems/locales/en/lessons/syscall-lifecycle.json",
+      "sha256": "68eeecbc2af793e594eec7bfd135c08e038821eeecece4a3600773856e387694"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/en/lessons/syscall-mechanism.json",
+      "target": "academy-web/content/courses/operating-systems/locales/en/lessons/syscall-mechanism.json",
+      "sha256": "a9baaffd7cc7590e07194ec8ecfbe3c1f011ef41b34c5c82aa814ddd52704e3b"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/en/lessons/thread-vs-process.json",
+      "target": "academy-web/content/courses/operating-systems/locales/en/lessons/thread-vs-process.json",
+      "sha256": "3751abf3d7c508adf3a54eb5b40dd6a75c25bf4102eff4e6d071a99ddd22bb1a"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/en/lessons/zombie-and-orphan.json",
+      "target": "academy-web/content/courses/operating-systems/locales/en/lessons/zombie-and-orphan.json",
+      "sha256": "4c3d1217c507a5a2f1883211795c590249a2f4d8f1a9bc1a5df04ed1c5ac7713"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/th/course.json",
+      "target": "academy-web/content/courses/operating-systems/locales/th/course.json",
+      "sha256": "70b10d9f1e853081ae33506a94ab7c8587cd7e2a158b27eef46777fc9ddc0024"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/th/lessons/acl-vs-capability.json",
+      "target": "academy-web/content/courses/operating-systems/locales/th/lessons/acl-vs-capability.json",
+      "sha256": "95e78f71a0d4bb9b80adeb29ae01aa23b96d887b1929cb65647e655005b0593b"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/th/lessons/address-space.json",
+      "target": "academy-web/content/courses/operating-systems/locales/th/lessons/address-space.json",
+      "sha256": "d1585aa5248d1383ec3edabdb65e2ab58ea8875ca6637bb9e53c542cc404faa9"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/th/lessons/async-signal-safety.json",
+      "target": "academy-web/content/courses/operating-systems/locales/th/lessons/async-signal-safety.json",
+      "sha256": "b8b28efd8707ced1f52a6f2570c448304676c08f11bf49978d5aedc8660a7a6d"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/th/lessons/cow-and-mmap.json",
+      "target": "academy-web/content/courses/operating-systems/locales/th/lessons/cow-and-mmap.json",
+      "sha256": "4aefe140c24d3c2cf4ce2af4fab6c268feff1f290acb10402d988964310e2d56"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/th/lessons/cpu-scheduling.json",
+      "target": "academy-web/content/courses/operating-systems/locales/th/lessons/cpu-scheduling.json",
+      "sha256": "162d6907b38471521b885c3b23d6f8fe6e9d9b7bc8afcce80f26691bb3077ae4"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/th/lessons/deadlock.json",
+      "target": "academy-web/content/courses/operating-systems/locales/th/lessons/deadlock.json",
+      "sha256": "9842ce4ac3d2f2c1663ef87a35ab9a37127234aecb3137a56d66601a48497dc9"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/th/lessons/demand-paging.json",
+      "target": "academy-web/content/courses/operating-systems/locales/th/lessons/demand-paging.json",
+      "sha256": "eda067038777c577076371f52a17935c0e56bc55cea55e8bd5db4bb128fe45ce"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/th/lessons/fork-exec-wait.json",
+      "target": "academy-web/content/courses/operating-systems/locales/th/lessons/fork-exec-wait.json",
+      "sha256": "a476c87e5d52ed34215a96fff91b00b890f73a1e96c2c8ef1373b1c1038c52ef"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/th/lessons/kernel-vs-user-mode.json",
+      "target": "academy-web/content/courses/operating-systems/locales/th/lessons/kernel-vs-user-mode.json",
+      "sha256": "c8cfa22a7a2aa984c408325e617f762d2f425821db4b65fa4ba77d2d7057530c"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/th/lessons/mutex.json",
+      "target": "academy-web/content/courses/operating-systems/locales/th/lessons/mutex.json",
+      "sha256": "97aeb0ab24a0b2a539c394975657ef109419d21bbc88e5e53ba119b7e330f3eb"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/th/lessons/page-tables-and-tlb.json",
+      "target": "academy-web/content/courses/operating-systems/locales/th/lessons/page-tables-and-tlb.json",
+      "sha256": "46975469a69df9b6c4ebf4670b2598aae145357da7592ac51d8f15bc9bd49789"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/th/lessons/privilege-rings.json",
+      "target": "academy-web/content/courses/operating-systems/locales/th/lessons/privilege-rings.json",
+      "sha256": "1663df063077cf4b0fe3d78311ea91a1c526e0e08f3e2d4a304ab9bc7faf7aea"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/th/lessons/producer-consumer.json",
+      "target": "academy-web/content/courses/operating-systems/locales/th/lessons/producer-consumer.json",
+      "sha256": "a3419f6c307fac6e033808b198ef5e6cb35bc4d4da9d8cb8dfd3c5fe988eb75a"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/th/lessons/pthreads.json",
+      "target": "academy-web/content/courses/operating-systems/locales/th/lessons/pthreads.json",
+      "sha256": "d45b9b90022b6a078c35b912155bc81ea86e5ffddd56813aeea8369069e584be"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/th/lessons/race-conditions.json",
+      "target": "academy-web/content/courses/operating-systems/locales/th/lessons/race-conditions.json",
+      "sha256": "cf9d0a36a3433e07cc2ba5a770593700fd71053d0033eaff38922c80c7b0bca1"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/th/lessons/semaphore-and-condvar.json",
+      "target": "academy-web/content/courses/operating-systems/locales/th/lessons/semaphore-and-condvar.json",
+      "sha256": "a601dbdb594fc7dceea51c37affd020d3664a9cc6ba43312f4fea9a2af8a3f17"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/th/lessons/setuid-and-its-risks.json",
+      "target": "academy-web/content/courses/operating-systems/locales/th/lessons/setuid-and-its-risks.json",
+      "sha256": "ed693a3799676aa0838e596bf217c14704edb68e3b35731e4f8613cf174c94e7"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/th/lessons/signals.json",
+      "target": "academy-web/content/courses/operating-systems/locales/th/lessons/signals.json",
+      "sha256": "55643788f286f1505a0018b8fc60916fcddb9ac1f787ea36e917e572d2d6a056"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/th/lessons/syscall-lifecycle.json",
+      "target": "academy-web/content/courses/operating-systems/locales/th/lessons/syscall-lifecycle.json",
+      "sha256": "3f3b0e0b3b86e71aac79ad746dc4d376923b461b2e9176eb4b68e8f949cc1d37"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/th/lessons/syscall-mechanism.json",
+      "target": "academy-web/content/courses/operating-systems/locales/th/lessons/syscall-mechanism.json",
+      "sha256": "62699d342b4b8c86ad067755f907fd909969fba4f1b9b332d64ba2165c3cb2fc"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/th/lessons/thread-vs-process.json",
+      "target": "academy-web/content/courses/operating-systems/locales/th/lessons/thread-vs-process.json",
+      "sha256": "0bd4d7f0b240d7dcfdced2999b23496cac8153160b7c1f6829c1e8154dd467df"
+    },
+    {
+      "source": "courses/academy/operating-systems/locales/th/lessons/zombie-and-orphan.json",
+      "target": "academy-web/content/courses/operating-systems/locales/th/lessons/zombie-and-orphan.json",
+      "sha256": "a3d6cbf9c45119db40d5314bb65effac23d595e55c4078403c10a89e1d3933a8"
+    },
+    {
+      "source": "courses/academy/computer-networking/course.json",
+      "target": "academy-web/content/courses/computer-networking/course.json",
+      "sha256": "ab50d675d0a670b15ec40b1cf0dd709c7af14afb8202b79084031ec9d3896010"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/course.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/course.json",
+      "sha256": "e3a1a63116e1dc5f65d9adc7f73c3d62d806f749f55efa32423da80b040ad43a"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/arp-and-icmp.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/arp-and-icmp.json",
+      "sha256": "a01bd38dedb956ee95acae32211da55a281c070eba61c7a15226d980ce7bdd8c"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/bgp-overview.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/bgp-overview.json",
+      "sha256": "1b029856f097942252c13218370db17f04b891c01b5ea9041c3f543826e31f35"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/blocking-vs-nonblocking.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/blocking-vs-nonblocking.json",
+      "sha256": "731eb9e0345a4b7aafef213f43e21d762fca84a641b21aad40a3be6d6578dad9"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/client-and-server.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/client-and-server.json",
+      "sha256": "458e098a2b4444b449de3ee4c47e69651201069817fef9d99c3e79d85799e476"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/dns-and-resolution.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/dns-and-resolution.json",
+      "sha256": "72b7d6e8591817b86d73ed74c30d6ee655bd19e4fdc4268f59b032074b37fc64"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/error-handling.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/error-handling.json",
+      "sha256": "0775edb53493b124134f140ff8569fe8f2246406144c88fe4ba4643b2ac91fb9"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/event-driven-and-c10k.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/event-driven-and-c10k.json",
+      "sha256": "6103ad7c5e3a188a8deb7b7b208a425c310d4421ab1afd296b629171a969f903"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/file-descriptors.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/file-descriptors.json",
+      "sha256": "66c35d1fc4a42d0296d4ce0b737f58cfaddbc82a09470feeb5db9c5c327a38de"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/grpc-and-protobuf.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/grpc-and-protobuf.json",
+      "sha256": "27d8d4ded444b68a2b2fedde79d205c22dc8c4899fa8ef99d6a395b2d76405b1"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/how-machines-talk.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/how-machines-talk.json",
+      "sha256": "d130d76d006210de0228cdeb586099073242b7ca8d4b38c8984147c1d189b8dd"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/http-basics.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/http-basics.json",
+      "sha256": "126869a0f03810ba749e91a61e1e002946c1163c02b1934edda7ca1e89b36d9f"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/ip-addressing.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/ip-addressing.json",
+      "sha256": "df5c0ccf249db5f9458fb65fea32c3a6c49dc7dd10ad1bbece7e15356c1b6c57"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/ipv6.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/ipv6.json",
+      "sha256": "75a30c2a197d1ad9b5c0f09f9b75f5d7216a9e3a49057b8216ac5d675b4020d7"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/layers-and-encapsulation.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/layers-and-encapsulation.json",
+      "sha256": "831acf41f59e5d2576e122c4889b2a07ace1065459db0b3b5f072295b15866f6"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/nat.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/nat.json",
+      "sha256": "2b57079026f1e21730b28b6d51ac596b720b997be46f46cb74740351967af8fd"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/routing-basics.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/routing-basics.json",
+      "sha256": "ec7f4ef0a150f3bc242b660120fb6cc67027c2021e37a0dc9c4498acfcd9d2ff"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/rpc-concepts.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/rpc-concepts.json",
+      "sha256": "c2aadaf493d755a73ea497890db3a6adfb5fa94ef1d40e2b6fc1edff2372affc"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/select-poll-epoll.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/select-poll-epoll.json",
+      "sha256": "6bb88b73089341b91a7cfcbac820e27bf7120f646e95fd46834b7c21bc728881"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/socket-api.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/socket-api.json",
+      "sha256": "11a5df866843d2e9a4d664b6e609a75af1e7a45ee921715920d6ce3499f70629"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/subnetting.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/subnetting.json",
+      "sha256": "59a4930ad9403562bd4304cb6162f5602df07a347de9b6ff6674691c5d307271"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/tcp-handshake.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/tcp-handshake.json",
+      "sha256": "862999a84de8f9a5b334ac9e04afd9f22d44682c1d7bdc0270947ae48de2a1f5"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/thread-per-connection.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/thread-per-connection.json",
+      "sha256": "b83533b5fa67901db4b64b25646cabed2abc2529d8b7c3840c37e2c47d3eeb9d"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/thread-pool.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/thread-pool.json",
+      "sha256": "bbda2bfcbfdca80f2ca8017d907c7e3de9e7493964ba6227d1d88a6c7bca87cd"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/en/lessons/vpn-concepts.json",
+      "target": "academy-web/content/courses/computer-networking/locales/en/lessons/vpn-concepts.json",
+      "sha256": "94d7a8c7723d45d0bee89ce3cc7dea58bfacb4d8e7f891609ff3d637af00532a"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/course.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/course.json",
+      "sha256": "e143357b9a1d0de757b96540eb599c29bb30c661accaf0b8472a886902a83579"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/arp-and-icmp.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/arp-and-icmp.json",
+      "sha256": "8b8d97212a587aa3bd8949e76abfa61e9fe3626a296eed27bb8b94535f1108f2"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/bgp-overview.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/bgp-overview.json",
+      "sha256": "427f6d3c6d96a8a2d7e3880d94ea16c5873697e5710beeafaf2efdff3db0d595"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/blocking-vs-nonblocking.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/blocking-vs-nonblocking.json",
+      "sha256": "eaf72e5c5346b26ec70665298172c0624186ba8245a91ed3babf470b8832a7ca"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/client-and-server.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/client-and-server.json",
+      "sha256": "d1221a7b52bc032f698f46ccd20e7cbf1ee576fcede3728b81a33af015ac4250"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/dns-and-resolution.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/dns-and-resolution.json",
+      "sha256": "01f80096f608f5358cc673c2449b77937116d019d7910bdf21bdb8492c25fecc"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/error-handling.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/error-handling.json",
+      "sha256": "fb49813514cbd4ef484e4e5225a7d7b79024430c23468d245f9210d78fcb4631"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/event-driven-and-c10k.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/event-driven-and-c10k.json",
+      "sha256": "310d6d5c3606abe2e932dfddd605d2bdd62a9bb8fd5a53b7f960ebe2b0ed2bd4"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/file-descriptors.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/file-descriptors.json",
+      "sha256": "657f68f47ab4a27d7f69380edb361418409dbe4d5e4234adc10c9328252623f6"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/grpc-and-protobuf.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/grpc-and-protobuf.json",
+      "sha256": "2308ab8db26bda5f9dded061cd9aa59ff304a7f492322cbf694891b844946259"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/how-machines-talk.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/how-machines-talk.json",
+      "sha256": "076752577d5f78e12d1a86795f9c4d8f8eba7ba00f0febb54424c625359ef9c1"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/http-basics.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/http-basics.json",
+      "sha256": "2e5013eddcc9bb038ec5fcecaa43acbbaa4a0fc03e032c1158d798140df82103"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/ip-addressing.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/ip-addressing.json",
+      "sha256": "f1017819a9dfa9655c889b862933da8cbe14b48add16f259e81c772ed1cf0cf1"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/ipv6.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/ipv6.json",
+      "sha256": "0499540ba203c0fe6eae475abf5de555d3f3845b0a22b3ea1aeb9c7595b2fd2d"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/layers-and-encapsulation.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/layers-and-encapsulation.json",
+      "sha256": "ade7249f198c35e3bfbe2836460135bcb4408ed8b8eef9720dda4f02a1a872ba"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/nat.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/nat.json",
+      "sha256": "649963d2906497e5e0769dc948f7a87f34ea373d305008702e84bd9b264e67bb"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/routing-basics.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/routing-basics.json",
+      "sha256": "bf3d45c37dcac4e9b6875b3a1fdc480ded5f5090a193f7d1e4cde0e50f1772b3"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/rpc-concepts.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/rpc-concepts.json",
+      "sha256": "665b32fc0591167edd2e810c566b20ca71da6b6854375c1fbd75e429fdda43e9"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/select-poll-epoll.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/select-poll-epoll.json",
+      "sha256": "17f96b41f30beecaf1c92e35de54773eaec25e2676cac1447b882cec340f28c8"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/socket-api.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/socket-api.json",
+      "sha256": "f6d81861f093bd808dc06da1c604a0530620b78f58ace5c295642b8dd16c194a"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/subnetting.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/subnetting.json",
+      "sha256": "a31eaa21fe2c34ce094fe3021e156351c31ee3f6e04bf937958c0443f8502262"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/tcp-handshake.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/tcp-handshake.json",
+      "sha256": "e10baf1850388a75c13ca77ab9b8a02bc342eecc8cbdb8e3c8b02a327c7f146a"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/thread-per-connection.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/thread-per-connection.json",
+      "sha256": "8c83a712fd29d48a4854997bd0f7ced91b08daeee32739fcce55a08ccaa19e50"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/thread-pool.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/thread-pool.json",
+      "sha256": "ec8626836ab8cde6e1bf4a3a02aa30d0b9dac32a66998e43e217cfadcafd75d2"
+    },
+    {
+      "source": "courses/academy/computer-networking/locales/th/lessons/vpn-concepts.json",
+      "target": "academy-web/content/courses/computer-networking/locales/th/lessons/vpn-concepts.json",
+      "sha256": "42e3cd6293bc4b578b2d8eb11f328725dba71219066642d5fa5d9234ea924dbe"
+    },
+    {
+      "source": "courses/academy/setup-and-environment/course.json",
+      "target": "academy-web/content/courses/setup-and-environment/course.json",
+      "sha256": "0b91a2b48fa7a3020b5debcb1447b8210cff74459a0a2ce209f86a07dd71ac5e"
+    },
+    {
+      "source": "courses/academy/setup-and-environment/locales/en/course.json",
+      "target": "academy-web/content/courses/setup-and-environment/locales/en/course.json",
+      "sha256": "067083f3ca2744662c3fccb4f3022a29842747c01e08457680e74b0c4b453c40"
+    },
+    {
+      "source": "courses/academy/setup-and-environment/locales/en/lessons/choose-your-environment.json",
+      "target": "academy-web/content/courses/setup-and-environment/locales/en/lessons/choose-your-environment.json",
+      "sha256": "9ae88f0048056b33e01b1b4868fc70f9c9a099675f481de967f242582b4a2232"
+    },
+    {
+      "source": "courses/academy/setup-and-environment/locales/en/lessons/first-terminal-session.json",
+      "target": "academy-web/content/courses/setup-and-environment/locales/en/lessons/first-terminal-session.json",
+      "sha256": "69793227518ab6793838a345ce5f966960a414537740da656ab2c3d012f55c66"
+    },
+    {
+      "source": "courses/academy/setup-and-environment/locales/en/lessons/github-account-and-first-push.json",
+      "target": "academy-web/content/courses/setup-and-environment/locales/en/lessons/github-account-and-first-push.json",
+      "sha256": "41531b4a3025858b5aefef48642c06546ca73caa894258a72b5bd3bdb28d3af4"
+    },
+    {
+      "source": "courses/academy/setup-and-environment/locales/en/lessons/install-the-toolchain.json",
+      "target": "academy-web/content/courses/setup-and-environment/locales/en/lessons/install-the-toolchain.json",
+      "sha256": "19b55bfdb3cb815058efb41ffa5f59eccd3717aab494200658e5b86e79a5d857"
+    },
+    {
+      "source": "courses/academy/setup-and-environment/locales/en/lessons/when-something-does-not-work.json",
+      "target": "academy-web/content/courses/setup-and-environment/locales/en/lessons/when-something-does-not-work.json",
+      "sha256": "c6a1ce40982bb9d0b7788aaaaaeacb3f2db6bcae324f21a514d6c6a1829303e1"
+    },
+    {
+      "source": "courses/academy/setup-and-environment/locales/th/course.json",
+      "target": "academy-web/content/courses/setup-and-environment/locales/th/course.json",
+      "sha256": "fde4de6b738bf8c593e12c2dd8a37de14fd792a32b650a2a32b8442f67912da5"
+    },
+    {
+      "source": "courses/academy/setup-and-environment/locales/th/lessons/choose-your-environment.json",
+      "target": "academy-web/content/courses/setup-and-environment/locales/th/lessons/choose-your-environment.json",
+      "sha256": "b3f51ac0ad35fab0fe548d77c2c029068c6d4b031360ddb891ceed7d072fbeec"
+    },
+    {
+      "source": "courses/academy/setup-and-environment/locales/th/lessons/first-terminal-session.json",
+      "target": "academy-web/content/courses/setup-and-environment/locales/th/lessons/first-terminal-session.json",
+      "sha256": "9b8190af889a7686dd9a9e9247eb5748adb3da4e4959954754b80f110049c6f7"
+    },
+    {
+      "source": "courses/academy/setup-and-environment/locales/th/lessons/github-account-and-first-push.json",
+      "target": "academy-web/content/courses/setup-and-environment/locales/th/lessons/github-account-and-first-push.json",
+      "sha256": "3581d19c269d2ded04950052507ae15e72a0d0ed98ab0c64e11621f8595d6228"
+    },
+    {
+      "source": "courses/academy/setup-and-environment/locales/th/lessons/install-the-toolchain.json",
+      "target": "academy-web/content/courses/setup-and-environment/locales/th/lessons/install-the-toolchain.json",
+      "sha256": "4997cc11a4eb319f36795bc2351a6188a599b0a9bbef6ee3dee58dc41e835af9"
+    },
+    {
+      "source": "courses/academy/setup-and-environment/locales/th/lessons/when-something-does-not-work.json",
+      "target": "academy-web/content/courses/setup-and-environment/locales/th/lessons/when-something-does-not-work.json",
+      "sha256": "5506dd0ad975c509482dc1dea69cad62a50dd81760c9bc4af4eb7beacc7fa245"
+    },
+    {
+      "source": "courses/academy/c-low-level/course.json",
+      "target": "academy-web/content/courses/c-low-level/course.json",
+      "sha256": "d25ebfec42f6d6425af3e99005ee368c5166737ae6a1b1a8080e165de4d0aa62"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/course.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/course.json",
+      "sha256": "1ab1f2341d43c26e0cc7b35369bc0d7b2c6df8bc19258e8adbb9da975f27f2d1"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/arrays-and-strings.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/arrays-and-strings.json",
+      "sha256": "dc4e5e64bd8fa051b84a5b09aa68d7524d39440ad7481375fab9ac42d8335c09"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/bitwise-ops.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/bitwise-ops.json",
+      "sha256": "08cf7270c949db881e73e7e9755b542494a06a41d8ca6cb4450e4acc91c375aa"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/compilation-pipeline.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/compilation-pipeline.json",
+      "sha256": "a59db3f8e82f27206afe22b78089fe29f40fb743084b2cd61f8382146d83cabc"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/control-flow.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/control-flow.json",
+      "sha256": "fd831e2ce5cc4ec49330143fe8707bb14735c1c2aea326f5bc5e63a919f27143"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/defensive-c.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/defensive-c.json",
+      "sha256": "d3dc8f2fdf3034a95d2684dbf384f06e9f86fa0af184455a018ea8f6e45df9bb"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/endianness-and-layout.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/endianness-and-layout.json",
+      "sha256": "05258607a9a7fbeda43e27487130eda69d0bd59dfba4158e90b04ce21768fe62"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/finding-memory-bugs.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/finding-memory-bugs.json",
+      "sha256": "020eec123820464a6c64e93da64f2970bda1a7d67edf985bc47a62c1c233b6e1"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/first-c-program.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/first-c-program.json",
+      "sha256": "dafa932355fdd20e609a6bd6197a75e0b55ce0956efa739eee1473e3aa580b5f"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/floating-point.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/floating-point.json",
+      "sha256": "73e4932946e22e895842745eb56dade72381bbdb74a1333e8534b480c8ec9db2"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/function-pointers.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/function-pointers.json",
+      "sha256": "07335d17802747ab03a24c03a8e04949db7d2e5fc7b1974c86f739c24817c44b"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/functions-and-scope.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/functions-and-scope.json",
+      "sha256": "26fe0f825f16a652a911c05d7612f26f400150b351737d587a700b284049e0dc"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/integer-representation.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/integer-representation.json",
+      "sha256": "a7205839be9fa3622b10f3452f945d734acdab83ce3ac79a68e040e6263bc83e"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/libraries-and-builds.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/libraries-and-builds.json",
+      "sha256": "d28a5b2cbc97f39dcf329fe38f91ed5607e2373a12c9e36dc8bbc9a22ef94396"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/malloc-and-free.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/malloc-and-free.json",
+      "sha256": "cc108afce31f1e69e4e2795c6a6ad16eeae4904259f768eafd9030291ba5299a"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/memory-bug-patterns.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/memory-bug-patterns.json",
+      "sha256": "b1bc54c11863b1430bb38ee8375819d638175f1d6602d6bd4a5840339d40c7fa"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/object-files-and-symbols.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/object-files-and-symbols.json",
+      "sha256": "24cb1d6a0c4bf7a27b83e975eb2bf8c1ca325670d07fd07412259f6762456d9b"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/pointer-arithmetic.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/pointer-arithmetic.json",
+      "sha256": "a40f6044462ce7e66d853ce3c7ad5dc6727f3a3d9f54f4c12c69f9f52c8373b7"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/pointers.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/pointers.json",
+      "sha256": "e7e974577207b534225531f27bb5ad2df94dffa487f9be2ac5446e26c2284bfc"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/reading-real-c.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/reading-real-c.json",
+      "sha256": "121dc3481e61cf57c7d5d576b9e9463d93fa7501cea3137e0a8b8e800257467d"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/stack-vs-heap.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/stack-vs-heap.json",
+      "sha256": "a0c2df06455d61ef26911cbc4083bc6a2fb99df6fb4a7a40484df4526281e80d"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/structs.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/structs.json",
+      "sha256": "a6ee113d2f4a8b05a24b3c6d6d65d65d767bf6602267ba52d6c6b2fd29871726"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/types-and-operators.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/types-and-operators.json",
+      "sha256": "0f367465e0cb4bf1af00bae882484b89ca3355a264b55a29d912faaebc93f2da"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/undefined-behavior.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/undefined-behavior.json",
+      "sha256": "2cbd1ce4b5f4add4812b7b7d247ec5738f0e6347c524b3da65b86d235cf69206"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/why-c.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/why-c.json",
+      "sha256": "3a08c9f5a8c9c03493f74dc9a29be4b99ef87a9be29c17470b1450b3cdb5b183"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/course.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/course.json",
+      "sha256": "51c877f2562164b41888f4414dd8b70b44d84a9671c64419a0a81bdc0ea01474"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/arrays-and-strings.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/arrays-and-strings.json",
+      "sha256": "9fbebf427c825c0e176109b86050c436e54ce1cf3fa22ac76bf018c96b93481a"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/bitwise-ops.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/bitwise-ops.json",
+      "sha256": "7247fa64b981db1845d9c3ebc1984ade8e33a530477bdd438ee02e299820be86"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/compilation-pipeline.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/compilation-pipeline.json",
+      "sha256": "f06627fd242d19f4c174ad9713514f547bfdfe3985a6e659b720b9b8a793b52d"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/control-flow.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/control-flow.json",
+      "sha256": "ca3130b48151df6fef588d3da6e84da400193697ca7044ffbda5b0750e66452b"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/defensive-c.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/defensive-c.json",
+      "sha256": "abb6b5cc5de480e98494ac770d2632b88c6a297a6c1275ca49bba54e89f9c270"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/endianness-and-layout.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/endianness-and-layout.json",
+      "sha256": "58ffb256c8991c995b1d5ee856f42bda924379d50c776c1dc6b99343c2d04ed8"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/finding-memory-bugs.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/finding-memory-bugs.json",
+      "sha256": "c39eb0f883b1aa1d597fe74b21b17b35aa408d6a8bb8a46e31d40f6725d22a4f"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/first-c-program.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/first-c-program.json",
+      "sha256": "689bb2fc9354d9218b18d7577298b03c1de4f7efe03426206abb3914067a6b0d"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/floating-point.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/floating-point.json",
+      "sha256": "5c56be6d53357d92cf6398d6a88b2d21cd63b446b8af625590d7b19c98316fe6"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/function-pointers.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/function-pointers.json",
+      "sha256": "89089e53f3b22fae1e6ec579be694d6e895b9f22a58d8d8c5eeb534aa082f642"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/functions-and-scope.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/functions-and-scope.json",
+      "sha256": "1544d999f36b350bac58178ddafa49ec1df4a2cb0a146889314a08d43b4197dd"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/integer-representation.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/integer-representation.json",
+      "sha256": "72f75f99626ffc5ff5c8d32f00fe846d0b1261b2bdef216ba40569ff9cb50e65"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/libraries-and-builds.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/libraries-and-builds.json",
+      "sha256": "f1856026634b1019256e4ab8eae639c832cd56c22e2c81a237bf5061a4c82ee5"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/malloc-and-free.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/malloc-and-free.json",
+      "sha256": "2a88fcf55c9c60620461671d4238642667fc8dca7efdaff7a2ae32a38fe947ae"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/memory-bug-patterns.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/memory-bug-patterns.json",
+      "sha256": "5a69784e5d9870eb9c2721b4188f36e8a00741675a7448982b766851b4a601fd"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/object-files-and-symbols.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/object-files-and-symbols.json",
+      "sha256": "6a8b7fdc2f92ee1e5940cfa5dac6a5a2ee623edb913c14dfc375eefc4e997502"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/pointer-arithmetic.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/pointer-arithmetic.json",
+      "sha256": "ab2785d6137e692a7a315f5c72a0f105777920d6401dc4d4e26f2b2cf19d839f"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/pointers.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/pointers.json",
+      "sha256": "7bfcb424abc0506c5c5498bee3c13e0ae7ddf09e6cad31da223ae96654ae6e65"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/reading-real-c.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/reading-real-c.json",
+      "sha256": "e2dbb80876a456f28dd84532f0ea71e96049954b722ab8e6a4197b3be0a8de4e"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/stack-vs-heap.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/stack-vs-heap.json",
+      "sha256": "fa2009025f56881c88890f13ca87248af73048e21cd5d83d8596e024a22036d2"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/structs.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/structs.json",
+      "sha256": "70861496ccb6991af24e728fda94ecf88c92c0e07a511a9ceb1ead7455d49db1"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/types-and-operators.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/types-and-operators.json",
+      "sha256": "2d0f917417fc4014346a221293ab6cec920d217e8046e6f71c8d498931db410a"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/undefined-behavior.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/undefined-behavior.json",
+      "sha256": "714058a38f2ae97d002089798ffd3b01270020084f85f70f6c3fa175c8db8762"
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/why-c.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/why-c.json",
+      "sha256": "e6d77aec375e61989374987702025a0a944f15cc9848625da255365e8373a234"
+    }
+  ]
+}

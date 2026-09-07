@@ -239,6 +239,160 @@
         "A"
       ],
       "explanation": "Each router that discards one reports Time Exceeded, revealing its address. The path is mapped by deliberately sending packets that cannot arrive. A router configured not to send those replies appears as a star while still forwarding traffic normally. Concretely, it sends hop limits of 1, then 2, then 3, and so on."
+    },
+    {
+      "id": "cp-5",
+      "prompt": "What does ARP resolve on an IPv4 LAN?",
+      "choices": {
+        "A": "A hostname to an IPv4 address",
+        "B": "An IP address to a link-layer address",
+        "C": "An IPv4 address to a TCP port",
+        "D": "A remote router address to a route"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "ARP discovers the next-hop link-layer address on the local network."
+    },
+    {
+      "id": "cp-6",
+      "prompt": "Which local address target does a host normally ARP for when the destination is off-link?",
+      "choices": {
+        "A": "The destination host's MAC address across the Internet",
+        "B": "The DNS server's address",
+        "C": "The source host's own address",
+        "D": "It ARPs for its configured next-hop gateway"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The Ethernet frame goes to the local gateway, while the IP destination remains remote."
+    },
+    {
+      "id": "cp-7",
+      "prompt": "What does an ICMP Echo Reply confirm?",
+      "choices": {
+        "A": "A responding IP stack received the Echo Request",
+        "B": "A TCP handshake completed",
+        "C": "The target application accepted a connection",
+        "D": "Every router on the path is reachable"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "It shows a reply arrived, but it does not prove an application service is healthy."
+    },
+    {
+      "id": "cp-8",
+      "prompt": "What can ICMP Time Exceeded reveal?",
+      "choices": {
+        "A": "A DNS name resolved successfully",
+        "B": "A TCP connection was reset",
+        "C": "A packet hop limit expired at a router",
+        "D": "A packet reached its final application"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Traceroute uses controlled hop-limit expiry to learn responding path hops."
+    },
+    {
+      "id": "cp-9",
+      "prompt": "Why should a firewall allow useful ICMP errors?",
+      "choices": {
+        "A": "They replace transport-layer acknowledgements",
+        "B": "They can report delivery problems such as MTU limits",
+        "C": "They make ARP requests routable",
+        "D": "They guarantee every ping receives a reply"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Blocking all ICMP can hide conditions that endpoints need to adapt their traffic."
+    },
+    {
+      "id": "cp-10",
+      "prompt": "What identifies the next hop in an Ethernet frame?",
+      "choices": {
+        "A": "The original sender's IP address",
+        "B": "The final IP destination on every hop",
+        "C": "The TCP destination port",
+        "D": "The destination link-layer address"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "A routed packet is re-encapsulated at each link, so link addresses change hop by hop."
+    },
+    {
+      "id": "cp-11",
+      "prompt": "What does an ARP cache entry represent?",
+      "choices": {
+        "A": "A learned local IP-to-link-address mapping",
+        "B": "A permanent route to a remote network",
+        "C": "The DNS record for a host name",
+        "D": "A list of all hosts on the Internet"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The cache avoids asking again until the mapping expires or is replaced."
+    },
+    {
+      "id": "cp-12",
+      "prompt": "Why can ping fail while a web service still works?",
+      "choices": {
+        "A": "The web server must be off the local network",
+        "B": "TCP requires ARP to be disabled",
+        "C": "ICMP may be filtered while TCP is allowed",
+        "D": "Ping always tests the web server process"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Different protocols can have different firewall policy, so one probe is not a full diagnosis."
+    },
+    {
+      "id": "cp-13",
+      "prompt": "What does a gratuitous ARP commonly announce?",
+      "choices": {
+        "A": "A router forwards an ARP request to another LAN",
+        "B": "A host claims or refreshes its own IPv4 mapping",
+        "C": "A host asks a DNS server for its IP address",
+        "D": "A switch assigns a new MAC address"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Hosts can update nearby caches when an address or link address changes."
+    },
+    {
+      "id": "cp-14",
+      "prompt": "Why is ARP limited to a local broadcast domain?",
+      "choices": {
+        "A": "Routers do not forward its local broadcast requests",
+        "B": "ARP packets use no broadcast addressing",
+        "C": "IP routing tables contain MAC addresses",
+        "D": "A host can ARP only its own address"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "ARP is a link-local protocol; routers separate those broadcast domains."
+    },
+    {
+      "id": "cp-15",
+      "prompt": "What should you inspect first for a missing local ARP resolution?",
+      "choices": {
+        "A": "The remote web service TCP port",
+        "B": "The DNS records for the remote name",
+        "C": "The contents of the application payload",
+        "D": "The interface, subnet, and next-hop configuration"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "ARP depends on correct local link and routing assumptions before it can find a neighbor."
     }
   ]
 }

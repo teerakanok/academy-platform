@@ -239,10 +239,10 @@
       "id": "cp-5",
       "prompt": "ทำไม function ที่รับ array ต้องรับ length ด้วย",
       "choices": {
-        "A": "The compiler handles it automatically",
-        "B": "It only changes performance",
+        "A": "pointer บันทึกจำนวนสมาชิกที่มันอ้างถึง",
+        "B": "compiler กู้ length จากสมาชิกตัวแรก",
         "C": "parameter เป็น pointer และไม่มีความยาวของ array",
-        "D": "It is unrelated to the program data"
+        "D": "length ของ array หาได้ด้วย sizeof ใน callee เสมอ"
       },
       "correct": [
         "C"
@@ -254,9 +254,9 @@
       "prompt": "strlen นับอะไร",
       "choices": {
         "A": "จำนวนไบต์ก่อน terminating NUL byte",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "B": "ตัวอักษรรวม terminating NUL byte",
+        "C": "Unicode character หลัง decode",
+        "D": "จำนวน byte ที่จองให้ pointer เป้าหมาย"
       },
       "correct": [
         "A"
@@ -267,9 +267,9 @@
       "id": "cp-7",
       "prompt": "sizeof นับอะไรใน char s[] = \"hi\"",
       "choices": {
-        "A": "It is unrelated to the program data",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
+        "A": "เฉพาะตัวอักษรที่เห็น จึงเป็น 2",
+        "B": "bytes ใน pointer parameter ไม่ว่าประกาศอย่างไร",
+        "C": "storage ของ string literal รวม implementation padding",
         "D": "terminating zero byte ด้วย"
       },
       "correct": [
@@ -281,10 +281,10 @@
       "id": "cp-8",
       "prompt": "ทำไม string literal จึงไม่ใช่ buffer ที่เขียนได้",
       "choices": {
-        "A": "It only changes performance",
+        "A": "มันอยู่บน stack และ resize ได้",
         "B": "การแก้ไขมี undefined behavior",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "C": "compiler สร้างสำเนาที่เขียนได้ทุกครั้งที่เรียก",
+        "D": "เปลี่ยนได้เฉพาะ field ความยาว"
       },
       "correct": [
         "B"
@@ -295,10 +295,10 @@
       "id": "cp-9",
       "prompt": "fgets ควรได้รับอะไรสำหรับ character array",
       "choices": {
-        "A": "It only changes performance",
+        "A": "จำนวน character ที่อ่านไปแล้ว",
         "B": "ความจุของ array",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "C": "address ของ newline ตัวถัดไป",
+        "D": "ความยาวของ source string"
       },
       "correct": [
         "B"
@@ -309,9 +309,9 @@
       "id": "cp-10",
       "prompt": "ทำไมใช้ snprintf กับข้อความที่ format",
       "choices": {
-        "A": "It is unrelated to the program data",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
+        "A": "มันจอง destination เสมอ",
+        "B": "มันตรวจ format ตั้งแต่ compile time",
+        "C": "มันเขียน character ที่ format ครบทุกตัวแม้พื้นที่ไม่พอ",
         "D": "มันรับความจุของปลายทาง"
       },
       "correct": [
@@ -324,9 +324,9 @@
       "prompt": "strcpy ไม่ปลอดภัยเพราะอะไร",
       "choices": {
         "A": "มันไม่มี argument บอกความจุปลายทาง",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "B": "มันหยุดหลัง whitespace ตัวแรก",
+        "C": "มันตรวจความจุปลายทางก่อน copy",
+        "D": "มันรับได้เฉพาะ character array"
       },
       "correct": [
         "A"
@@ -337,10 +337,10 @@
       "id": "cp-12",
       "prompt": "strncpy อาจไม่สร้าง C string เมื่อใด",
       "choices": {
-        "A": "The compiler handles it automatically",
-        "B": "It only changes performance",
+        "A": "ทุกครั้งที่ destination ใหญ่กว่า count",
+        "B": "เมื่อ destination ถูก zero-fill ไว้ก่อน",
         "C": "เมื่อความยาว source ถึง count",
-        "D": "It is unrelated to the program data"
+        "D": "เฉพาะเมื่อ source มี newline"
       },
       "correct": [
         "C"
@@ -351,9 +351,9 @@
       "id": "cp-13",
       "prompt": "array สองมิติธรรมดาใน C ถูกเก็บอย่างไร",
       "choices": {
-        "A": "It is unrelated to the program data",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
+        "A": "แต่ละ row เป็น pointer ที่จองแยกกัน",
+        "B": "แบบ column-major ที่ column อยู่ติดกัน",
+        "C": "เก็บเฉพาะ cell ที่ไม่เป็นศูนย์แบบ sparse",
         "D": "เป็น block เดียวแบบ row-major"
       },
       "correct": [
@@ -365,10 +365,10 @@
       "id": "cp-14",
       "prompt": "index ที่ถูกต้องของ array ยาว n ต้องเป็นอย่างไร",
       "choices": {
-        "A": "The compiler handles it automatically",
-        "B": "It only changes performance",
+        "A": "เท่ากับ n ได้เป็นสมาชิกสุดท้าย",
+        "B": "แค่ไม่ติดลบก็พอ",
         "C": "น้อยกว่า n และไม่ติดลบ",
-        "D": "It is unrelated to the program data"
+        "D": "ต้องเป็นบวกและเป็นผลคูณของ n"
       },
       "correct": [
         "C"
@@ -379,10 +379,10 @@
       "id": "cp-15",
       "prompt": "pointer ที่ใช้เป็น text ควรมีอะไรคู่กัน",
       "choices": {
-        "A": "It only changes performance",
+        "A": "เฉพาะ character encoding",
         "B": "กติกาความจุและ termination ที่ชัดเจน",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "C": "ชื่อ source file",
+        "D": "pointer เป็น const หรือไม่"
       },
       "correct": [
         "B"

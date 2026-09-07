@@ -265,10 +265,10 @@
       "id": "cp-5",
       "prompt": "ทำไมต้องตรวจ malloc ว่าเป็น NULL",
       "choices": {
-        "A": "It only changes performance",
+        "A": "malloc กำหนดทุก byte เป็นศูนย์",
         "B": "การจอง memory อาจล้มเหลว",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "C": "NULL หมายถึงจอง memory ว่างสำเร็จ",
+        "D": "memory ที่คืนมาต้อง free ก่อนใช้"
       },
       "correct": [
         "B"
@@ -279,9 +279,9 @@
       "id": "cp-6",
       "prompt": "ทำไมเขียน sizeof *p ใน malloc",
       "choices": {
-        "A": "It is unrelated to the program data",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
+        "A": "มันรับประกันว่า malloc ไม่ล้มเหลว",
+        "B": "มันคำนวณจำนวน element ให้อัตโนมัติ",
+        "C": "มันทำให้ memory เป็นศูนย์",
         "D": "มันตาม type ของ pointer อัตโนมัติ"
       },
       "correct": [
@@ -294,9 +294,9 @@
       "prompt": "calloc เพิ่มอะไรนอกจากจอง memory",
       "choices": {
         "A": "มัน zero storage และตรวจ count-size overflow",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "B": "มันคืน memory ที่ free ไม่ได้",
+        "C": "มันเก็บ allocation เดิมไว้เมื่อล้มเหลว",
+        "D": "มันจองตาม CPU cache ปัจจุบัน"
       },
       "correct": [
         "A"
@@ -307,10 +307,10 @@
       "id": "cp-8",
       "prompt": "ทำไมต้องรับผล realloc(p, new_size) ลง temporary เมื่อ new_size ไม่เป็นศูนย์",
       "choices": {
-        "A": "The compiler handles it automatically",
-        "B": "It only changes performance",
+        "A": "สำเร็จแล้วต้องใช้ address เดิมเสมอ",
+        "B": "realloc free ของเดิมก่อนตรวจขนาด",
         "C": "เมื่อล้มเหลว allocation เดิมยัง valid",
-        "D": "It is unrelated to the program data"
+        "D": "reallocation ที่ขนาดไม่เป็นศูนย์ทำได้แค่ย่อ block"
       },
       "correct": [
         "C"
@@ -321,10 +321,10 @@
       "id": "cp-9",
       "prompt": "realloc ทำอะไรกับ interior pointers ได้",
       "choices": {
-        "A": "The compiler handles it automatically",
-        "B": "It only changes performance",
+        "A": "ทำให้ยังใช้ได้เพราะ block โตขึ้น",
+        "B": "แปลงเป็น offset ให้อัตโนมัติ",
         "C": "ทำให้ใช้ไม่ได้เมื่อย้าย block",
-        "D": "It is unrelated to the program data"
+        "D": "ทำให้ชี้ไป byte แรกของ block ใหม่"
       },
       "correct": [
         "C"
@@ -336,9 +336,9 @@
       "prompt": "memory leak คืออะไร",
       "choices": {
         "A": "storage ที่จองแล้วเข้าถึงเพื่อ free ไม่ได้",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "B": "stack memory ที่ free ตอน function return",
+        "C": "allocation ที่ allocator cache เก็บไว้โดยตั้งใจ",
+        "D": "memory ที่ calloc จองเท่านั้น"
       },
       "correct": [
         "A"
@@ -349,9 +349,9 @@
       "id": "cp-11",
       "prompt": "use-after-free คืออะไร",
       "choices": {
-        "A": "It is unrelated to the program data",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
+        "A": "การ free NULL pointer",
+        "B": "การอ่าน stack local ที่ยังไม่ initialize",
+        "C": "การขอ allocation ขนาดศูนย์",
         "D": "เข้าถึง storage หลัง lifetime สิ้นสุด"
       },
       "correct": [
@@ -363,10 +363,10 @@
       "id": "cp-12",
       "prompt": "double free คืออะไร",
       "choices": {
-        "A": "It only changes performance",
+        "A": "การ free allocation ทุกตัวตอน process จบ",
         "B": "release allocation เดียวมากกว่าหนึ่งครั้ง",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "C": "การใช้ realloc เปลี่ยนขนาด",
+        "D": "การกำหนด NULL หลัง free"
       },
       "correct": [
         "B"
@@ -378,9 +378,9 @@
       "prompt": "pointer ใดส่งให้ free ได้อย่างปลอดภัย",
       "choices": {
         "A": "NULL",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "B": "pointer variable ที่ยังไม่ initialize",
+        "C": "pointer กลาง allocation",
+        "D": "address ของ local array"
       },
       "correct": [
         "A"
@@ -391,10 +391,10 @@
       "id": "cp-14",
       "prompt": "กติกา ownership ใดทำให้ cleanup ง่าย",
       "choices": {
-        "A": "The compiler handles it automatically",
-        "B": "It only changes performance",
+        "A": "ทุก function free pointer ทุกตัวที่รับมา",
+        "B": "caller และ callee ต่าง free ทุก allocation",
         "C": "หนึ่ง owner รับผิดชอบแต่ละ allocation",
-        "D": "It is unrelated to the program data"
+        "D": "allocator เป็น owner ของทุก block หลัง return"
       },
       "correct": [
         "C"
@@ -405,9 +405,9 @@
       "id": "cp-15",
       "prompt": "ทำไมใช้ address sanitizer หรือ Valgrind",
       "choices": {
-        "A": "It is unrelated to the program data",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
+        "A": "มันกัน malloc คืน NULL",
+        "B": "มันซ่อม invalid access ทุกแบบอัตโนมัติ",
+        "C": "มันแทน test ของ error path ได้",
         "D": "มันตรวจ memory-lifetime fault ทั่วไปได้"
       },
       "correct": [

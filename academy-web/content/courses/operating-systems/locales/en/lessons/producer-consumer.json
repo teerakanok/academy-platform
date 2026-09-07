@@ -205,6 +205,160 @@
         "C"
       ],
       "explanation": "Work is silently lost. Close means 'no more will arrive'. Saying that while more are still arriving makes it untrue, and consumers act on it."
+    },
+    {
+      "id": "cp-5",
+      "prompt": "Why put pthread_cond_wait in a while loop?",
+      "choices": {
+        "A": "It makes scheduling FIFO",
+        "B": "It removes the mutex",
+        "C": "It prevents thread creation",
+        "D": "The predicate may be false again when the thread wakes"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "A wakeup is not permission to proceed; the thread rechecks shared state while holding the mutex."
+    },
+    {
+      "id": "cp-6",
+      "prompt": "What should one queue mutex protect?",
+      "choices": {
+        "A": "The count, indexes, and closed state as one invariant",
+        "B": "Only the condition variable",
+        "C": "Only producer IDs",
+        "D": "Only the array capacity"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The state that decides whether a thread may push, pop, or exit must change together under the mutex."
+    },
+    {
+      "id": "cp-7",
+      "prompt": "What event should wake a consumer waiting for work?",
+      "choices": {
+        "A": "A consumer removes an item",
+        "B": "The queue capacity changes",
+        "C": "A producer makes the queue nonempty",
+        "D": "A thread reads its ID"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "After adding an item under the mutex, the producer signals that the not-empty predicate can hold."
+    },
+    {
+      "id": "cp-8",
+      "prompt": "What must happen before signaling a condition variable?",
+      "choices": {
+        "A": "Destroy the mutex",
+        "B": "Update the shared predicate while holding its mutex",
+        "C": "Join every thread",
+        "D": "Flush the queue"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "State and notification must be coordinated through the mutex so a waiter cannot miss the meaningful change."
+    },
+    {
+      "id": "cp-9",
+      "prompt": "What should a producer do when a bounded queue is full?",
+      "choices": {
+        "A": "Wait until the not-full predicate becomes true",
+        "B": "Overwrite the oldest item",
+        "C": "Close the queue",
+        "D": "Unlock permanently"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "A bounded queue cannot accept another item until a consumer creates space."
+    },
+    {
+      "id": "cp-10",
+      "prompt": "What should follow a consumer removing an item?",
+      "choices": {
+        "A": "Broadcast process exit",
+        "B": "Reset the indexes",
+        "C": "Duplicate the item",
+        "D": "Notify a producer that space may be available"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Removing an item can make the not-full predicate true for a waiting producer."
+    },
+    {
+      "id": "cp-11",
+      "prompt": "When may a consumer exit after queue close?",
+      "choices": {
+        "A": "As soon as close is called",
+        "B": "When the queue is closed and empty",
+        "C": "After one item",
+        "D": "Before checking the queue"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Close says no more items will arrive; emptiness says all already accepted work was consumed."
+    },
+    {
+      "id": "cp-12",
+      "prompt": "What should a push operation do after the queue is closed?",
+      "choices": {
+        "A": "Store it without locking",
+        "B": "Wake only consumers",
+        "C": "Reject the new item according to the queue contract",
+        "D": "Change the capacity"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "A close operation promises no further arrivals, so a later push must not silently violate that promise."
+    },
+    {
+      "id": "cp-13",
+      "prompt": "How does using the same mutex prevent a lost wakeup?",
+      "choices": {
+        "A": "It makes all wakes broadcasts",
+        "B": "It fixes CPU speed",
+        "C": "It removes predicates",
+        "D": "It coordinates testing the predicate with starting the wait"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The waiter checks state and waits atomically with respect to the signaler changing that state."
+    },
+    {
+      "id": "cp-14",
+      "prompt": "What does a condition variable hold for the queue?",
+      "choices": {
+        "A": "The next item",
+        "B": "No queue items; it only coordinates waiting",
+        "C": "A second mutex",
+        "D": "The thread stack"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The queue data lives in its protected state; a condition variable lets threads wait for a predicate."
+    },
+    {
+      "id": "cp-15",
+      "prompt": "When is it safe to destroy a queue mutex and condition variables?",
+      "choices": {
+        "A": "After all threads using the queue have stopped",
+        "B": "After the first wakeup",
+        "C": "Whenever the queue is full",
+        "D": "Before joining threads"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "No thread may still wait on or access synchronization objects when they are destroyed."
     }
   ]
 }

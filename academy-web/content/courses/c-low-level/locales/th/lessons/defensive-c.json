@@ -270,9 +270,9 @@
       "id": "cp-5",
       "prompt": "ควรปฏิเสธ length ติดลบที่ไม่น่าเชื่อถือเมื่อใด",
       "choices": {
-        "A": "It is unrelated to the program data",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
+        "A": "หลังมันกลายเป็น allocation size",
+        "B": "หลังบวกเข้ากับ pointer เท่านั้น",
+        "C": "หลัง cast เป็น unsigned โดยตรง",
         "D": "ก่อนแปลงเป็น size_t"
       },
       "correct": [
@@ -284,10 +284,10 @@
       "id": "cp-6",
       "prompt": "ทำไม initialize pointer เป็น NULL",
       "choices": {
-        "A": "The compiler handles it automatically",
-        "B": "It only changes performance",
+        "A": "มันจอง storage ทันที",
+        "B": "มันรับประกันว่า dereference สำเร็จ",
         "C": "มันให้ค่า empty ที่กำหนดไว้แก่ failure path",
-        "D": "It is unrelated to the program data"
+        "D": "มันตั้ง pointer ไป byte แรกของ stack"
       },
       "correct": [
         "C"
@@ -298,10 +298,10 @@
       "id": "cp-7",
       "prompt": "buffer API ควรรับอะไรพร้อม pointer",
       "choices": {
-        "A": "It only changes performance",
+        "A": "index ล่าสุดที่เขียน",
         "B": "ความจุของมัน",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "C": "text encoding ที่คาดไว้",
+        "D": "file descriptor ของ caller"
       },
       "correct": [
         "B"
@@ -313,9 +313,9 @@
       "prompt": "ทำไมหลีกเลี่ยง size literal ที่ซ้ำกัน",
       "choices": {
         "A": "buffer ที่เปลี่ยนอาจไม่ตรง literal เก่า",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "B": "literal ทำให้ compiler resize buffer ได้",
+        "C": "ค่าที่ซ้ำกัน update พร้อมกันเสมอ",
+        "D": "literal เดียวทำให้ไม่ต้อง runtime check"
       },
       "correct": [
         "A"
@@ -326,10 +326,10 @@
       "id": "cp-9",
       "prompt": "strtol ให้อะไรเหนือ atoi",
       "choices": {
-        "A": "It only changes performance",
+        "A": "มันคืนศูนย์เสมอเมื่อ text ผิด",
         "B": "มันรายงาน conversion error ผ่าน end pointer และ range check",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "C": "มันจอง number ที่ parse ได้",
+        "D": "มันรับได้เฉพาะเลขฐานสิบ"
       },
       "correct": [
         "B"
@@ -340,9 +340,9 @@
       "id": "cp-10",
       "prompt": "guard clause มีไว้ทำอะไร",
       "choices": {
-        "A": "It is unrelated to the program data",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
+        "A": "ทำเงื่อนไขซ้ำในทุก branch",
+        "B": "เลื่อน validation ทั้งหมดไปตอน return",
+        "C": "เปลี่ยน failure เป็น success แบบเงียบ",
         "D": "ปฏิเสธ precondition ที่ไม่ถูกตั้งแต่ต้น"
       },
       "correct": [
@@ -354,10 +354,10 @@
       "id": "cp-11",
       "prompt": "ทำไมต้องระบุ ownership ของ pointer ที่คืน",
       "choices": {
-        "A": "The compiler handles it automatically",
-        "B": "It only changes performance",
+        "A": "มันเลือก memory address",
+        "B": "มันทำเครื่องหมาย pointer เป็น const",
         "C": "มันบอกว่าใครต้อง free",
-        "D": "It is unrelated to the program data"
+        "D": "มันให้ allocator free ให้อัตโนมัติ"
       },
       "correct": [
         "C"
@@ -369,9 +369,9 @@
       "prompt": "const ช่วยป้องกันอะไร",
       "choices": {
         "A": "การเขียนผ่าน interface ที่สัญญาว่าอ่านอย่างเดียว",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "B": "caller ทุกคนได้สำเนาที่แก้ไม่ได้",
+        "C": "memory ยัง valid หลัง free",
+        "D": "มันป้องกัน integer overflow"
       },
       "correct": [
         "A"
@@ -382,10 +382,10 @@
       "id": "cp-13",
       "prompt": "อะไรปลอดภัยกว่า runtime check เมื่อทำได้",
       "choices": {
-        "A": "The compiler handles it automatically",
-        "B": "It only changes performance",
+        "A": "เพิ่ม runtime assertion ให้มากขึ้น",
+        "B": "ทดสอบ input ทุกตัวสองครั้ง",
         "C": "ทำให้ invalid state เป็นไปไม่ได้ตั้งแต่ compile time",
-        "D": "It is unrelated to the program data"
+        "D": "log request ที่ผิดให้เร็วขึ้น"
       },
       "correct": [
         "C"
@@ -396,10 +396,10 @@
       "id": "cp-14",
       "prompt": "error path ต้องทำอะไรหลังจอง resource บางส่วน",
       "choices": {
-        "A": "It only changes performance",
+        "A": "เก็บ resource ไว้ retry ภายหลัง",
         "B": "release ทุก resource ที่ตนเป็น owner",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "C": "release เฉพาะ allocation สุดท้าย",
+        "D": "return โดยไม่เปลี่ยน resource"
       },
       "correct": [
         "B"
@@ -410,9 +410,9 @@
       "id": "cp-15",
       "prompt": "review ควร trace อะไรของ size ทุกตัว",
       "choices": {
-        "A": "It is unrelated to the program data",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
+        "A": "compiler ใด optimize มัน",
+        "B": "loop รันกี่ครั้ง",
+        "C": "developer คนใดเพิ่มมัน",
         "D": "มันมาจากที่ใดและถูก validate ที่ใด"
       },
       "correct": [

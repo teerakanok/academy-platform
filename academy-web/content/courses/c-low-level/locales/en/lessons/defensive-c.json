@@ -270,9 +270,9 @@
       "id": "cp-5",
       "prompt": "When should a negative untrusted length be rejected?",
       "choices": {
-        "A": "It is unrelated to the program data",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
+        "A": "After it becomes an allocation size",
+        "B": "Only after adding it to a pointer",
+        "C": "After casting it to unsigned explicitly",
         "D": "Before converting it to size_t"
       },
       "correct": [
@@ -284,10 +284,10 @@
       "id": "cp-6",
       "prompt": "Why initialize a pointer to NULL?",
       "choices": {
-        "A": "The compiler handles it automatically",
-        "B": "It only changes performance",
+        "A": "It allocates storage immediately",
+        "B": "It guarantees dereference succeeds",
         "C": "It gives failure paths a defined empty value",
-        "D": "It is unrelated to the program data"
+        "D": "It sets the pointer to the first byte of the stack"
       },
       "correct": [
         "C"
@@ -298,10 +298,10 @@
       "id": "cp-7",
       "prompt": "What should a buffer API accept with the pointer?",
       "choices": {
-        "A": "It only changes performance",
+        "A": "The index last written",
         "B": "Its capacity",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "C": "The expected text encoding",
+        "D": "The caller's file descriptor"
       },
       "correct": [
         "B"
@@ -313,9 +313,9 @@
       "prompt": "Why avoid duplicated size literals?",
       "choices": {
         "A": "A changed buffer can drift from its old literal",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "B": "Literals let the compiler resize a buffer",
+        "C": "Duplicated values always update together",
+        "D": "One literal makes a run-time check unnecessary"
       },
       "correct": [
         "A"
@@ -326,10 +326,10 @@
       "id": "cp-9",
       "prompt": "What does strtol offer over atoi?",
       "choices": {
-        "A": "It only changes performance",
+        "A": "It always returns zero for invalid text",
         "B": "It reports conversion errors through end pointers and range checks",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "C": "It allocates the parsed number",
+        "D": "It accepts only decimal digits"
       },
       "correct": [
         "B"
@@ -340,9 +340,9 @@
       "id": "cp-10",
       "prompt": "What is the purpose of a guard clause?",
       "choices": {
-        "A": "It is unrelated to the program data",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
+        "A": "Repeat each condition in every branch",
+        "B": "Defer all validation until return",
+        "C": "Convert failure into silent success",
         "D": "Reject invalid preconditions early"
       },
       "correct": [
@@ -354,10 +354,10 @@
       "id": "cp-11",
       "prompt": "Why state ownership for a returned pointer?",
       "choices": {
-        "A": "The compiler handles it automatically",
-        "B": "It only changes performance",
+        "A": "It selects the memory address",
+        "B": "It marks the pointer as const",
         "C": "It tells the caller who must free it",
-        "D": "It is unrelated to the program data"
+        "D": "It lets the allocator free it automatically"
       },
       "correct": [
         "C"
@@ -369,9 +369,9 @@
       "prompt": "What does const help prevent?",
       "choices": {
         "A": "Writes through an interface that promises read-only data",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "B": "All callers receive immutable copies",
+        "C": "Memory stays valid after free",
+        "D": "Integer overflow is prevented"
       },
       "correct": [
         "A"
@@ -382,10 +382,10 @@
       "id": "cp-13",
       "prompt": "What is safer than a runtime check when possible?",
       "choices": {
-        "A": "The compiler handles it automatically",
-        "B": "It only changes performance",
+        "A": "Adding more runtime assertions",
+        "B": "Testing every input twice",
         "C": "Making the invalid state impossible at compile time",
-        "D": "It is unrelated to the program data"
+        "D": "Logging invalid requests earlier"
       },
       "correct": [
         "C"
@@ -396,10 +396,10 @@
       "id": "cp-14",
       "prompt": "What must an error path do after partial allocation?",
       "choices": {
-        "A": "It only changes performance",
+        "A": "Keep resources for a later retry",
         "B": "Release every resource it owns",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "C": "Release only the last allocation",
+        "D": "Return without changing resources"
       },
       "correct": [
         "B"
@@ -410,9 +410,9 @@
       "id": "cp-15",
       "prompt": "What should a review trace for each size?",
       "choices": {
-        "A": "It is unrelated to the program data",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
+        "A": "Which compiler optimized it",
+        "B": "How many times a loop runs",
+        "C": "Which developer added it",
         "D": "Where it came from and where it was validated"
       },
       "correct": [

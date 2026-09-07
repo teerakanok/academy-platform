@@ -212,6 +212,160 @@
         "C"
       ],
       "explanation": "There is no return value to check on a memory access, so the failure arrives as a signal. This is the main reason to be careful mapping files that others can modify."
+    },
+    {
+      "id": "cp-5",
+      "prompt": "After a successful fork, how do parent and child writes to private memory relate on Linux?",
+      "choices": {
+        "A": "A write to private memory in one process does not change the other process",
+        "B": "They share every writable byte",
+        "C": "The child cannot write memory",
+        "D": "The parent is paused forever"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "For private memory, including MAP_PRIVATE mappings, parent and child have separate address spaces and later writes do not alter the other process memory."
+    },
+    {
+      "id": "cp-6",
+      "prompt": "What typically triggers a copy-on-write page copy?",
+      "choices": {
+        "A": "Reading the page",
+        "B": "Listing file descriptors",
+        "C": "A process writes to a shared inherited page",
+        "D": "Creating a mutex"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Copy-on-write delays a private page copy until a write needs one process to diverge."
+    },
+    {
+      "id": "cp-7",
+      "prompt": "What does fork return in the newly created child?",
+      "choices": {
+        "A": "The parent PID",
+        "B": "A file descriptor",
+        "C": "The page size",
+        "D": "Zero"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "fork returns zero in the child and the child PID in the parent, allowing the paths to differ."
+    },
+    {
+      "id": "cp-8",
+      "prompt": "What does MAP_SHARED allow between mappings of the same file region?",
+      "choices": {
+        "A": "Each process gets an unrelated file",
+        "B": "Changes can be visible to other processes mapping that region",
+        "C": "Writes are always private",
+        "D": "The file becomes immutable"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "MAP_SHARED is for shared mappings; visibility and synchronization still matter to cooperating processes."
+    },
+    {
+      "id": "cp-9",
+      "prompt": "What happens to the file after a MAP_PRIVATE mapping is modified?",
+      "choices": {
+        "A": "The file is truncated",
+        "B": "All mappers exit",
+        "C": "The descriptor is closed",
+        "D": "The mapping change does not write through to the file"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "MAP_PRIVATE gives the process a private modification; it is not a file-update mechanism."
+    },
+    {
+      "id": "cp-10",
+      "prompt": "What value reports mmap failure on Linux?",
+      "choices": {
+        "A": "Zero",
+        "B": "MAP_FAILED",
+        "C": "The file size",
+        "D": "The last file descriptor"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "mmap returns MAP_FAILED, not NULL, on failure, so code must test the documented sentinel."
+    },
+    {
+      "id": "cp-11",
+      "prompt": "What does mmap do to the file descriptor current offset?",
+      "choices": {
+        "A": "It leaves the current offset unchanged",
+        "B": "It seeks to file end",
+        "C": "It resets to zero",
+        "D": "It advances by mapping length"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Mapping uses the supplied mapping offset; it does not behave like a read that advances the descriptor offset."
+    },
+    {
+      "id": "cp-12",
+      "prompt": "On Linux, what must an mmap file offset satisfy?",
+      "choices": {
+        "A": "It must be one byte",
+        "B": "It must equal file size",
+        "C": "It must be a multiple of the page size",
+        "D": "It must be a power of two bytes"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Linux requires the mmap offset to be a multiple of the page size."
+    },
+    {
+      "id": "cp-13",
+      "prompt": "What can msync request for a modified shared mapping?",
+      "choices": {
+        "A": "A new process ID",
+        "B": "Synchronization of changes with the backing file",
+        "C": "Copy-on-write for every page",
+        "D": "A different address space"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "msync requests synchronization for a shared mapping; applications still check its return value."
+    },
+    {
+      "id": "cp-14",
+      "prompt": "Why can copy-on-write make fork fast for a large process?",
+      "choices": {
+        "A": "It defers copying user pages until a write needs it",
+        "B": "It removes page tables",
+        "C": "It makes RAM infinite",
+        "D": "It disables writes"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Deferring copies avoids immediately copying every user page when the child may soon exec or exit."
+    },
+    {
+      "id": "cp-15",
+      "prompt": "After a successful mmap, may code close the file descriptor?",
+      "choices": {
+        "A": "No, it always unmaps",
+        "B": "Only after msync fails",
+        "C": "Only in the child",
+        "D": "Yes; the mapping remains valid independently of that descriptor"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The mapping is established by mmap; closing the descriptor does not by itself unmap the region."
     }
   ]
 }

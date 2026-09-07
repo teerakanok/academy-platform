@@ -287,6 +287,160 @@
         "A"
       ],
       "explanation": "Binary content needs escaping; a length does not. With a length, the receiver knows exactly how many bytes to read and their content is irrelevant. With a delimiter, any occurrence inside the payload must be escaped, and forgetting to is a classic parsing bug."
+    },
+    {
+      "id": "cp-5",
+      "prompt": "What does TCP preserve for an application?",
+      "choices": {
+        "A": "Each send call becomes one matching recv call",
+        "B": "The ends of packets and message types",
+        "C": "Only complete application records",
+        "D": "An ordered byte stream without built-in message ends"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "A receiver must frame its own messages because read calls do not preserve protocol message ends."
+    },
+    {
+      "id": "cp-6",
+      "prompt": "What must a length-prefixed receiver do before allocation?",
+      "choices": {
+        "A": "Validate the announced length against a limit",
+        "B": "Allocate whatever size the peer requests",
+        "C": "Treat the first received bytes as a complete body",
+        "D": "Use the local CPU word size as the protocol limit"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Network length fields are untrusted input and must be bounded before allocating."
+    },
+    {
+      "id": "cp-7",
+      "prompt": "What does accept return on success?",
+      "choices": {
+        "A": "The same listening descriptor with client data ready",
+        "B": "The received-byte count from the peer",
+        "C": "A new connected socket descriptor",
+        "D": "The peer's port number as a descriptor"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The listening socket remains available while each accepted connection gets its own descriptor."
+    },
+    {
+      "id": "cp-8",
+      "prompt": "Why loop around send or write on a socket?",
+      "choices": {
+        "A": "TCP guarantees each call writes the full buffer",
+        "B": "A successful call can send only part of the buffer",
+        "C": "The loop turns separate sends into messages",
+        "D": "It makes read return a whole request"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The return count tells how much was sent; remaining bytes still need handling."
+    },
+    {
+      "id": "cp-9",
+      "prompt": "What does recv returning zero mean after a positive-length request on a TCP socket?",
+      "choices": {
+        "A": "The peer performed an orderly shutdown",
+        "B": "No data has arrived yet, so retry immediately",
+        "C": "The buffer was filled exactly",
+        "D": "The peer's address can no longer be queried"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "After a positive-length request, zero signals end of the peer byte stream, not another payload byte."
+    },
+    {
+      "id": "cp-10",
+      "prompt": "Why set a maximum message size?",
+      "choices": {
+        "A": "To make every send atomic",
+        "B": "To prevent TCP retransmission",
+        "C": "To choose the kernel receive buffer",
+        "D": "To bound memory and work from untrusted peers"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "A protocol limit keeps one client from demanding an unbounded allocation."
+    },
+    {
+      "id": "cp-11",
+      "prompt": "What does CLOSE_WAIT indicate locally?",
+      "choices": {
+        "A": "The local application closed before the peer",
+        "B": "The peer closed and the local process has not closed",
+        "C": "The TCP handshake is awaiting accept",
+        "D": "A lost packet must be retransmitted"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The application normally needs to close its descriptor after finishing its response."
+    },
+    {
+      "id": "cp-12",
+      "prompt": "Why encode multi-byte protocol integers explicitly?",
+      "choices": {
+        "A": "TCP chooses the byte order for integers",
+        "B": "One CPU architecture makes values portable",
+        "C": "Peers may use different native byte orders",
+        "D": "The first recv converts all data automatically"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Network byte order provides a shared representation across hosts."
+    },
+    {
+      "id": "cp-13",
+      "prompt": "On Linux, what does listen backlog limit?",
+      "choices": {
+        "A": "The queue of fully established connections waiting for accept",
+        "B": "The queue of half-open SYN requests",
+        "C": "Bytes queued for one accepted socket",
+        "D": "The number of descriptors a process may open"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "On Linux, backlog limits fully established sockets waiting for accept; a full queue can delay or refuse new attempts."
+    },
+    {
+      "id": "cp-14",
+      "prompt": "Why close every accepted socket?",
+      "choices": {
+        "A": "To flush unread data onto the network",
+        "B": "To make the listening socket accept faster",
+        "C": "To convert the connection into UDP",
+        "D": "To release its descriptor and connection resources"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Leaving descriptors open eventually reaches process limits and stops new work."
+    },
+    {
+      "id": "cp-15",
+      "prompt": "What should a protocol parser retain across partial reads?",
+      "choices": {
+        "A": "Only the most recent recv buffer",
+        "B": "Its framing state and bytes received so far",
+        "C": "The peer's Ethernet MAC address",
+        "D": "One operating-system thread for every message"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "TCP delivery can split fields and bodies, so parsing continues across calls."
     }
   ]
 }

@@ -239,6 +239,160 @@
         "A"
       ],
       "explanation": "เส้นทางถูกทำแผนที่ด้วยการจงใจส่ง packet ที่ไปไม่ถึง เราเตอร์ที่ถูกตั้งไม่ให้ส่งคำตอบเหล่านั้นจะปรากฏเป็นดาว ขณะที่ยังส่งต่อทราฟฟิกตามปกติ เราเตอร์ทุกตัวที่ทิ้ง packet จะรายงาน Time Exceeded ซึ่งเปิดเผยที่อยู่ของมัน"
+    },
+    {
+      "id": "cp-5",
+      "prompt": "ARP resolve อะไรบน IPv4 LAN",
+      "choices": {
+        "A": "ชื่อโฮสต์เป็น IPv4 address",
+        "B": "IP address เป็น link-layer address",
+        "C": "IPv4 address เป็น TCP port",
+        "D": "router ระยะไกลเป็นเส้นทาง"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "ARP ค้นหา link-layer address ของ next hop บนเครือข่ายท้องถิ่น"
+    },
+    {
+      "id": "cp-6",
+      "prompt": "เมื่อปลายทางอยู่นอก link host ปกติ ARP หา address เป้าหมายในท้องถิ่นใด",
+      "choices": {
+        "A": "MAC address ของ host ปลายทางข้าม Internet",
+        "B": "address ของ DNS server",
+        "C": "address ของ host ต้นทางเอง",
+        "D": "มัน ARP หา next-hop gateway ที่ตั้งไว้"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Ethernet frame ไป gateway ท้องถิ่น ส่วน IP destination ยังเป็นปลายทางไกล"
+    },
+    {
+      "id": "cp-7",
+      "prompt": "ICMP Echo Reply ยืนยันอะไร",
+      "choices": {
+        "A": "IP stack ที่ตอบรับ Echo Request",
+        "B": "TCP handshake เสร็จสมบูรณ์",
+        "C": "application ปลายทางรับ connection",
+        "D": "router ทุกตัวบนเส้นทางเข้าถึงได้"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "มันแสดงว่า reply กลับมา แต่ไม่พิสูจน์ว่า application service ปกติ"
+    },
+    {
+      "id": "cp-8",
+      "prompt": "ICMP Time Exceeded เปิดเผยอะไรได้",
+      "choices": {
+        "A": "DNS name resolve สำเร็จ",
+        "B": "TCP connection ถูก reset",
+        "C": "hop limit ของ packet หมดที่ router",
+        "D": "packet ถูกส่งถึง application ปลายทาง"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "traceroute ใช้ hop limit ที่หมดอย่างควบคุมเพื่อเรียนรู้ hop บน path"
+    },
+    {
+      "id": "cp-9",
+      "prompt": "ทำไม firewall ควรอนุญาต ICMP error ที่มีประโยชน์",
+      "choices": {
+        "A": "มันแทน transport-layer acknowledgements",
+        "B": "มันรายงานปัญหาการส่ง เช่น ข้อจำกัด MTU ได้",
+        "C": "มันทำให้ ARP request route ได้",
+        "D": "มันรับประกันว่าทุก ping ได้ reply"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "การ block ICMP ทั้งหมดอาจซ่อนเงื่อนไขที่ endpoint ต้องใช้ปรับ traffic"
+    },
+    {
+      "id": "cp-10",
+      "prompt": "อะไรระบุ next hop ใน Ethernet frame",
+      "choices": {
+        "A": "IP address ของผู้ส่งเดิม",
+        "B": "IP destination สุดท้ายในทุก hop",
+        "C": "TCP destination port",
+        "D": "destination link-layer address"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "packet ที่ route ถูกห่อใหม่ทุก link จึงเปลี่ยน link address ทุก hop"
+    },
+    {
+      "id": "cp-11",
+      "prompt": "ARP cache entry แทนอะไร",
+      "choices": {
+        "A": "mapping IP-to-link-address ในท้องถิ่นที่เรียนรู้",
+        "B": "route ถาวรไปยัง remote network",
+        "C": "DNS record ของชื่อ host",
+        "D": "รายชื่อ host ทั้งหมดใน Internet"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "cache ช่วยไม่ต้องถามซ้ำจน mapping หมดอายุหรือถูกแทน"
+    },
+    {
+      "id": "cp-12",
+      "prompt": "ทำไม ping ล้มเหลวแต่ web service ยังทำงานได้",
+      "choices": {
+        "A": "web server ต้องอยู่นอก local network",
+        "B": "TCP ต้องปิด ARP",
+        "C": "ICMP อาจถูก filter ขณะที่ TCP อนุญาต",
+        "D": "ping ตรวจ process ของ web server เสมอ"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "protocol ต่างกันอาจมี firewall policy ต่างกัน probe เดียวจึงไม่ใช่การวินิจฉัยครบ"
+    },
+    {
+      "id": "cp-13",
+      "prompt": "gratuitous ARP มักประกาศอะไร",
+      "choices": {
+        "A": "router forward ARP request ไป LAN อื่น",
+        "B": "host ยืนยันหรือ refresh mapping IPv4 ของตน",
+        "C": "host ถาม DNS server หา IP address",
+        "D": "switch กำหนด MAC address ใหม่"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "host อัปเดต cache ใกล้เคียงได้เมื่อ address หรือ link address เปลี่ยน"
+    },
+    {
+      "id": "cp-14",
+      "prompt": "ทำไม ARP จำกัดใน local broadcast domain",
+      "choices": {
+        "A": "router ไม่ forward broadcast request ท้องถิ่น",
+        "B": "ARP packet ไม่ใช้ broadcast address",
+        "C": "ตาราง IP routing เก็บ MAC address",
+        "D": "host ARP ได้เฉพาะ address ตน"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "ARP เป็น protocol ระดับ link-local และ router แยก broadcast domain"
+    },
+    {
+      "id": "cp-15",
+      "prompt": "ควรตรวจอะไรแรกเมื่อ ARP ในท้องถิ่นหาย",
+      "choices": {
+        "A": "TCP port ของ web service ระยะไกล",
+        "B": "DNS record ของชื่อระยะไกล",
+        "C": "เนื้อหา application payload",
+        "D": "interface, subnet และ next-hop configuration"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "ARP ต้องอาศัยสมมติฐาน link และ routing ท้องถิ่นที่ถูกต้องก่อนหา neighbor"
     }
   ]
 }

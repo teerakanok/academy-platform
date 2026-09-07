@@ -252,6 +252,160 @@
         "D"
       ],
       "explanation": "It combines all three designs from this module: loops stay responsive because they never block, and blocking work happens in the pool where blocking is allowed. Concretely: one loop per core for the connections, plus a thread pool for anything that would block."
+    },
+    {
+      "id": "cp-5",
+      "prompt": "What does readiness notification mean?",
+      "choices": {
+        "A": "The requested operation already completed",
+        "B": "An operation may make progress without blocking",
+        "C": "All readable data forms one message",
+        "D": "The peer sent an application-level reply"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Readiness is not a complete message; code still handles partial reads and writes."
+    },
+    {
+      "id": "cp-6",
+      "prompt": "Where should an event loop keep partial request state?",
+      "choices": {
+        "A": "A global buffer shared by all sockets",
+        "B": "The TCP packet header",
+        "C": "The client's DNS cache",
+        "D": "In a per-connection state object"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The loop returns to other work, so each connection must retain its own progress."
+    },
+    {
+      "id": "cp-7",
+      "prompt": "What event matters after a partial nonblocking write?",
+      "choices": {
+        "A": "Writability so remaining output can be sent",
+        "B": "Another read event while output is pending",
+        "C": "A new TCP handshake",
+        "D": "The kernel combines remaining output automatically"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "A connection needs queued output until the socket accepts more bytes."
+    },
+    {
+      "id": "cp-8",
+      "prompt": "Why avoid blocking work in the event loop?",
+      "choices": {
+        "A": "Each connection needs its own event loop",
+        "B": "A blocking call makes TCP unordered",
+        "C": "It delays every other connection handled by that loop",
+        "D": "Only the slow client is delayed"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "One blocked loop cannot promptly service its other ready connections."
+    },
+    {
+      "id": "cp-9",
+      "prompt": "What is the usual response to EAGAIN on nonblocking read?",
+      "choices": {
+        "A": "Close the connection as a protocol error",
+        "B": "Retry in a tight loop until data arrives",
+        "C": "Switch the socket back to blocking mode",
+        "D": "Wait for another readiness notification"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "EAGAIN says the operation would block now; it is not an end-of-stream result."
+    },
+    {
+      "id": "cp-10",
+      "prompt": "Why track output offsets per connection?",
+      "choices": {
+        "A": "To count the current connections",
+        "B": "To resume exactly after bytes already written",
+        "C": "To arrange bytes by TCP packet",
+        "D": "To store the global server log"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The offset prevents duplicating or dropping bytes across partial writes."
+    },
+    {
+      "id": "cp-11",
+      "prompt": "What should a loop do when a connection closes?",
+      "choices": {
+        "A": "Retain its state for a later event",
+        "B": "Move it to a global queue",
+        "C": "Remove its state and release its resources",
+        "D": "Keep its descriptor open for diagnostics"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Keeping dead connection state leaks memory and descriptors over time."
+    },
+    {
+      "id": "cp-12",
+      "prompt": "Why can an event loop scale connection count?",
+      "choices": {
+        "A": "It avoids a dedicated blocked thread per idle connection",
+        "B": "It shares one operating-system thread across CPUs",
+        "C": "It makes each TCP transfer faster",
+        "D": "It removes the need for resource limits"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Many idle connections can wait in the kernel while few loop threads manage readiness."
+    },
+    {
+      "id": "cp-13",
+      "prompt": "What does edge-triggered readiness require?",
+      "choices": {
+        "A": "Wait for a second event after one read",
+        "B": "Read exactly one buffer size",
+        "C": "Drain available work until the operation would block",
+        "D": "Switch the socket to blocking mode"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "With edge triggering, code must consume available data so it does not wait for a missed edge."
+    },
+    {
+      "id": "cp-14",
+      "prompt": "Where should CPU-heavy work go in an event-driven service?",
+      "choices": {
+        "A": "The main I/O-loop callback",
+        "B": "A worker pool or other bounded executor",
+        "C": "One new unbounded thread for every request",
+        "D": "Synchronous work inside the readiness dispatch"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Moving expensive work off the loop keeps I/O responsiveness predictable."
+    },
+    {
+      "id": "cp-15",
+      "prompt": "What must tests simulate for event-driven output?",
+      "choices": {
+        "A": "Only full-buffer writes",
+        "B": "Events where every client is fast",
+        "C": "Disconnects before output is sent",
+        "D": "Slow receivers and partial writes"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Fast loopback clients can hide the queued-output state that slow clients require."
     }
   ]
 }

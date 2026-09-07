@@ -212,6 +212,160 @@
         "C"
       ],
       "explanation": "การเข้าถึงหน่วยความจำไม่มีค่าคืนให้ตรวจ ความล้มเหลวจึงมาถึงในรูป signal นี่คือเหตุผลหลักที่ต้องระวังการ map ไฟล์ที่คนอื่นแก้ได้"
+    },
+    {
+      "id": "cp-5",
+      "prompt": "หลัง fork สำเร็จ การเขียน private memory ของ parent และ child เกี่ยวกันอย่างไรบน Linux",
+      "choices": {
+        "A": "การเขียน private memory ใน process หนึ่งไม่เปลี่ยนอีก process",
+        "B": "ทั้งคู่ใช้ทุกไบต์ที่เขียนได้ร่วมกัน",
+        "C": "child เขียน memory ไม่ได้",
+        "D": "parent ถูกพักตลอดไป"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "สำหรับ private memory รวม MAP_PRIVATE mapping นั้น parent และ child มี address space แยกกัน การเขียนภายหลังไม่แก้ memory ของอีกฝ่าย"
+    },
+    {
+      "id": "cp-6",
+      "prompt": "อะไรเป็นตัวกระตุ้นการคัดลอกหน้าแบบ copy-on-write โดยทั่วไป",
+      "choices": {
+        "A": "การอ่านหน้า",
+        "B": "การแสดง file descriptor",
+        "C": "process เขียนลงหน้าที่รับสืบทอดร่วมกัน",
+        "D": "การสร้าง mutex"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "copy-on-write เลื่อนสำเนาส่วนตัวจนการเขียนต้องให้ process หนึ่งต่างออกไป"
+    },
+    {
+      "id": "cp-7",
+      "prompt": "fork คืนอะไรใน child ที่เพิ่งสร้าง",
+      "choices": {
+        "A": "PID ของ parent",
+        "B": "file descriptor",
+        "C": "ขนาดหน้า",
+        "D": "ศูนย์"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "fork คืนศูนย์ใน child และคืน PID ของ child ใน parent จึงแยก path ได้"
+    },
+    {
+      "id": "cp-8",
+      "prompt": "MAP_SHARED อนุญาตอะไรระหว่าง mapping ของ file region เดียวกัน",
+      "choices": {
+        "A": "แต่ละ process ได้ไฟล์ที่ไม่เกี่ยวกัน",
+        "B": "การเปลี่ยนแปลงอาจเห็นได้แก่ process อื่นที่ map region นั้น",
+        "C": "write เป็นส่วนตัวเสมอ",
+        "D": "ไฟล์เปลี่ยนไม่ได้"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "MAP_SHARED ใช้สำหรับ shared mapping โดย process ที่ทำงานร่วมกันยังต้องคำนึงถึง visibility และ synchronization"
+    },
+    {
+      "id": "cp-9",
+      "prompt": "เกิดอะไรกับไฟล์หลังแก้ MAP_PRIVATE mapping",
+      "choices": {
+        "A": "ไฟล์ถูกตัดสั้น",
+        "B": "mapper ทุกตัวออก",
+        "C": "descriptor ถูกปิด",
+        "D": "การเปลี่ยน mapping ไม่เขียนทะลุถึงไฟล์"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "MAP_PRIVATE ให้การแก้ส่วนตัวแก่ process และไม่ใช่กลไกอัปเดตไฟล์"
+    },
+    {
+      "id": "cp-10",
+      "prompt": "ค่าใดรายงาน mmap ล้มเหลวบน Linux",
+      "choices": {
+        "A": "ศูนย์",
+        "B": "MAP_FAILED",
+        "C": "ขนาดไฟล์",
+        "D": "file descriptor ล่าสุด"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "mmap คืน MAP_FAILED ไม่ใช่ NULL เมื่อล้มเหลว จึงต้องตรวจ sentinel ตามเอกสาร"
+    },
+    {
+      "id": "cp-11",
+      "prompt": "mmap ทำอะไรกับ current offset ของ file descriptor",
+      "choices": {
+        "A": "มันปล่อย current offset ไว้เหมือนเดิม",
+        "B": "มัน seek ไปท้ายไฟล์",
+        "C": "มัน reset เป็นศูนย์",
+        "D": "มันเลื่อนตามความยาว mapping"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "mapping ใช้ offset ที่ส่งให้ และไม่ทำงานเหมือน read ที่เลื่อน descriptor offset"
+    },
+    {
+      "id": "cp-12",
+      "prompt": "บน Linux offset ของไฟล์ใน mmap ต้องเป็นอย่างไร",
+      "choices": {
+        "A": "ต้องเป็นหนึ่งไบต์",
+        "B": "ต้องเท่าขนาดไฟล์",
+        "C": "ต้องเป็นจำนวนเท่าของขนาดหน้า",
+        "D": "ต้องเป็นกำลังสองของไบต์"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Linux กำหนดให้ offset ของ mmap เป็นจำนวนเท่าของขนาดหน้า"
+    },
+    {
+      "id": "cp-13",
+      "prompt": "msync ขออะไรได้สำหรับ shared mapping ที่แก้แล้ว",
+      "choices": {
+        "A": "process ID ใหม่",
+        "B": "การ sync การเปลี่ยนกับ backing file",
+        "C": "copy-on-write ทุกหน้า",
+        "D": "address space ใหม่"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "msync ขอการ sync สำหรับ shared mapping และ application ยังต้องตรวจค่าคืน"
+    },
+    {
+      "id": "cp-14",
+      "prompt": "ทำไม copy-on-write ทำให้ fork ของ process ใหญ่เร็วได้",
+      "choices": {
+        "A": "มันเลื่อนการคัดลอก user page จนการเขียนต้องใช้",
+        "B": "มันตัด page table",
+        "C": "มันทำให้ RAM ไม่จำกัด",
+        "D": "มันปิดการเขียน"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "การเลื่อนสำเนาหลีกเลี่ยงการคัดลอก user page ทุกหน้าทันทีเมื่อ child อาจ exec หรือออกเร็ว"
+    },
+    {
+      "id": "cp-15",
+      "prompt": "หลัง mmap สำเร็จ โค้ดปิด file descriptor ได้ไหม",
+      "choices": {
+        "A": "ไม่ได้ มัน unmap เสมอ",
+        "B": "เฉพาะเมื่อ msync ล้มเหลว",
+        "C": "เฉพาะใน child",
+        "D": "ได้ mapping ยัง valid แยกจาก descriptor นั้น"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "mapping ถูกสร้างโดย mmap การปิด descriptor ไม่ได้ unmap region เอง"
     }
   ]
 }

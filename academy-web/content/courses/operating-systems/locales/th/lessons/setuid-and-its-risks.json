@@ -232,6 +232,160 @@
         "B"
       ],
       "explanation": "file capability ให้ได้แค่ความสามารถเดียวนั้น และไม่ให้อะไรเกินนั้น นั่นคือส่วนต่างที่วัดได้จากบทที่แล้ว: ชุด capability 2000 แทนที่จะเป็น a80425fb ความสามารถเท่าเดิม แต่อำนาจที่จะเสียไปเหลือเศษเสี้ยว"
+    },
+    {
+      "id": "cp-5",
+      "prompt": "ID ใดสำคัญเมื่อโปรแกรม setuid ทำ operation",
+      "choices": {
+        "A": "เฉพาะชื่อโปรแกรม",
+        "B": "เฉพาะ PID ของ parent",
+        "C": "effective ID ที่ใช้ทำ operation",
+        "D": "เฉพาะเจ้าของ terminal"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "kernel ตรวจสิทธิ์ของ operation ด้วย effective credential โดยทั่วไป ต่างจาก access ที่ตรวจ real ID"
+    },
+    {
+      "id": "cp-6",
+      "prompt": "ทำไมต้องทิ้ง effective privilege ก่อนจัดการงานที่ไม่น่าเชื่อถือ",
+      "choices": {
+        "A": "มัน validate input ทุกตัว",
+        "B": "บั๊กจะมีอำนาจให้ใช้ผิดน้อยลง",
+        "C": "มันเปลี่ยน real UID",
+        "D": "มันทำให้ PATH น่าเชื่อถือ"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "least privilege จำกัดสิ่งที่ความผิดพลาดขณะจัดการ input จะทำได้หากถูกโจมตี"
+    },
+    {
+      "id": "cp-7",
+      "prompt": "โปรแกรมสิทธิ์สูงควรเลือก executable ภายนอกอย่างไร",
+      "choices": {
+        "A": "ใช้ path ที่เชื่อถือได้ตายตัวและ argument ที่ควบคุม",
+        "B": "ใช้ PATH entry แรก",
+        "C": "ให้ shell ค้นหา",
+        "D": "เชื่อ current directory"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "โปรแกรมสิทธิ์สูงห้ามให้ PATH ที่ผู้โจมตีควบคุมเลือก executable ที่จะรัน"
+    },
+    {
+      "id": "cp-8",
+      "prompt": "ทำไม system() จึงเป็นตัวเลือกที่ไม่ดีในโค้ดสิทธิ์สูง",
+      "choices": {
+        "A": "มันเริ่ม process ไม่ได้",
+        "B": "มันลบ effective ID",
+        "C": "มันคืนศูนย์เสมอ",
+        "D": "มันเรียก shell ที่ parse command string"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "การ parse ของ shell เพิ่มกฎ expansion และ quoting ที่ทำให้จัดการข้อมูลไม่น่าเชื่อถืออย่างปลอดภัยยากขึ้น"
+    },
+    {
+      "id": "cp-9",
+      "prompt": "O_NOFOLLOW ขออะไรสำหรับ pathname component สุดท้ายบน Linux",
+      "choices": {
+        "A": "เปิดทุก link สองครั้ง",
+        "B": "ไม่ตาม symbolic link ตรงนั้น",
+        "C": "สร้าง root shell",
+        "D": "เพิกเฉยสิทธิ์ไฟล์"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "O_NOFOLLOW ปฏิเสธ symbolic link สุดท้ายได้ แม้การจัดการ pathname อย่างปลอดภัยอาจต้องมี control อื่น"
+    },
+    {
+      "id": "cp-10",
+      "prompt": "ทำไม mkstemp มีประโยชน์สำหรับ temporary file สิทธิ์สูง",
+      "choices": {
+        "A": "มันทำให้ไฟล์เขียนได้ทั่วโลก",
+        "B": "มันปิด cleanup",
+        "C": "มันสร้างไฟล์ไม่ซ้ำและคืน descriptor ที่เปิดแล้ว",
+        "D": "มันตาม symlink ทุกตัว"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "การสร้างและเปิด temporary file ที่เลือกพร้อมกันหลีกเลี่ยงช่องว่างจากการตรวจชื่อแยก"
+    },
+    {
+      "id": "cp-11",
+      "prompt": "file capability ให้สิ่งใดแก่ executable ได้บน Linux",
+      "choices": {
+        "A": "kernel ใหม่",
+        "B": "PATH ที่เชื่อถือได้",
+        "C": "input ที่เปลี่ยนไม่ได้",
+        "D": "capability ที่ระบุแทนอำนาจ root ทั้งหมด"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "capability ลดอำนาจได้ด้วยการให้สิทธิ์เฉพาะ แทนชุด root ทั้งหมด"
+    },
+    {
+      "id": "cp-12",
+      "prompt": "ทำไมต้องปิด file descriptor ที่ไม่ต้องใช้ก่อน exec ในโค้ดสิทธิ์สูง",
+      "choices": {
+        "A": "โปรแกรมใหม่อาจรับสิทธิ์เข้าถึงที่ใช้ได้ไป",
+        "B": "มันเปลี่ยนเจ้าของไฟล์",
+        "C": "มันทำให้ exec synchronous",
+        "D": "มันล้าง signal ทั้งหมด"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "descriptor ที่สืบทอดอาจข้าม pathname check เพราะมันอ้าง resource ที่เปิดอยู่แล้ว"
+    },
+    {
+      "id": "cp-13",
+      "prompt": "โปรแกรมสิทธิ์สูงควรทำอะไรกับ filename ที่ user ควบคุม",
+      "choices": {
+        "A": "สมมติว่า access() lock มัน",
+        "B": "เก็บใน PATH",
+        "C": "validate และหลีกเลี่ยง race แบบ check-then-use ของชื่อ",
+        "D": "รันมันเป็น command"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "ชื่ออาจเปลี่ยนระหว่าง operation แยกกัน จึงต้องจับ validation คู่กับการออกแบบ file operation ที่ปลอดภัย"
+    },
+    {
+      "id": "cp-14",
+      "prompt": "ทำไมโค้ดสิทธิ์สูงต้องตรวจค่าคืนที่เกี่ยวกับความปลอดภัยทุกค่า",
+      "choices": {
+        "A": "check หรือการเปลี่ยนสิทธิ์ที่ล้มเหลวห้ามถูกถือว่าสำเร็จ",
+        "B": "มันทำให้ logging เป็น optional",
+        "C": "มันบังคับ root access",
+        "D": "มันตัด race condition"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "การทำต่อหลัง security operation ล้มเหลวอาจทำให้โค้ดรันด้วยอำนาจหรือสมมติฐานผิด"
+    },
+    {
+      "id": "cp-15",
+      "prompt": "filesystem mount แบบ nosuid ทำอะไรได้บน Linux",
+      "choices": {
+        "A": "เข้ารหัส executable ทุกไฟล์",
+        "B": "ป้องกันไม่ให้ผลของ setuid และ file capability มีผล",
+        "C": "ทำให้ทุกไฟล์ root เป็นเจ้าของ",
+        "D": "ให้ผู้ใช้ทุกคนเปลี่ยน ID ได้"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Linux อาจเพิกเฉยการยกสิทธิ์จาก setuid bit และ file capability บน nosuid mount"
     }
   ]
 }

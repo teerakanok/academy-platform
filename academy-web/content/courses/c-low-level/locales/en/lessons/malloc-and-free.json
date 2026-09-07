@@ -265,10 +265,10 @@
       "id": "cp-5",
       "prompt": "Why check malloc for NULL?",
       "choices": {
-        "A": "It only changes performance",
+        "A": "malloc initializes all bytes to zero",
         "B": "Allocation can fail",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "C": "NULL means an empty allocation succeeded",
+        "D": "Returned memory must be freed before use"
       },
       "correct": [
         "B"
@@ -279,9 +279,9 @@
       "id": "cp-6",
       "prompt": "Why write sizeof *p in malloc?",
       "choices": {
-        "A": "It is unrelated to the program data",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
+        "A": "It guarantees malloc never fails",
+        "B": "It calculates the number of elements automatically",
+        "C": "It causes the memory to be zeroed",
         "D": "It follows the pointer type automatically"
       },
       "correct": [
@@ -294,9 +294,9 @@
       "prompt": "What does calloc add beyond allocation?",
       "choices": {
         "A": "It zeroes storage and checks count-size overflow",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "B": "It returns memory that free cannot release",
+        "C": "It preserves an old allocation on failure",
+        "D": "It allocates according to the current CPU cache"
       },
       "correct": [
         "A"
@@ -307,10 +307,10 @@
       "id": "cp-8",
       "prompt": "Why assign realloc(p, new_size) to a temporary when new_size is nonzero?",
       "choices": {
-        "A": "The compiler handles it automatically",
-        "B": "It only changes performance",
+        "A": "Success always keeps the same address",
+        "B": "realloc frees the original before checking size",
         "C": "Failure leaves the original allocation valid",
-        "D": "It is unrelated to the program data"
+        "D": "A nonzero reallocation can only shrink a block"
       },
       "correct": [
         "C"
@@ -321,10 +321,10 @@
       "id": "cp-9",
       "prompt": "What can realloc do to interior pointers?",
       "choices": {
-        "A": "The compiler handles it automatically",
-        "B": "It only changes performance",
+        "A": "Keep them valid because the block grows",
+        "B": "Convert them to offsets automatically",
         "C": "Invalidate them by moving the block",
-        "D": "It is unrelated to the program data"
+        "D": "Make them point to the new first byte"
       },
       "correct": [
         "C"
@@ -336,9 +336,9 @@
       "prompt": "What is a memory leak?",
       "choices": {
         "A": "Allocated storage that is no longer reachable for free",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "B": "Stack memory freed at function return",
+        "C": "An allocation intentionally held by an allocator cache",
+        "D": "Memory allocated with calloc only"
       },
       "correct": [
         "A"
@@ -349,9 +349,9 @@
       "id": "cp-11",
       "prompt": "What is use-after-free?",
       "choices": {
-        "A": "It is unrelated to the program data",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
+        "A": "Freeing a NULL pointer",
+        "B": "Reading an uninitialized stack local",
+        "C": "Requesting an allocation of size zero",
         "D": "Accessing storage after its lifetime ended"
       },
       "correct": [
@@ -363,10 +363,10 @@
       "id": "cp-12",
       "prompt": "What is double free?",
       "choices": {
-        "A": "It only changes performance",
+        "A": "Freeing all allocations at process exit",
         "B": "Releasing one allocation more than once",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "C": "Using realloc to change size",
+        "D": "Assigning NULL after free"
       },
       "correct": [
         "B"
@@ -378,9 +378,9 @@
       "prompt": "Which pointer may be passed safely to free?",
       "choices": {
         "A": "NULL",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "B": "An uninitialized pointer variable",
+        "C": "A pointer to the middle of an allocation",
+        "D": "The address of a local array"
       },
       "correct": [
         "A"
@@ -391,10 +391,10 @@
       "id": "cp-14",
       "prompt": "What ownership rule simplifies cleanup?",
       "choices": {
-        "A": "The compiler handles it automatically",
-        "B": "It only changes performance",
+        "A": "Every function frees every pointer it receives",
+        "B": "Caller and callee both free each allocation",
         "C": "One owner is responsible for each allocation",
-        "D": "It is unrelated to the program data"
+        "D": "The allocator owns all blocks after return"
       },
       "correct": [
         "C"
@@ -405,9 +405,9 @@
       "id": "cp-15",
       "prompt": "Why use an address sanitizer or Valgrind?",
       "choices": {
-        "A": "It is unrelated to the program data",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
+        "A": "They prevent malloc from returning NULL",
+        "B": "They automatically repair every invalid access",
+        "C": "They replace tests of error paths",
         "D": "They can detect common memory-lifetime faults"
       },
       "correct": [

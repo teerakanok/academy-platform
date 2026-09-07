@@ -1,0 +1,33 @@
+[
+  {
+    "name": "generator",
+    "command": [
+      "node",
+      "scripts/generate-content-registry.mjs"
+    ],
+    "exit_code": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-final-capstone-import-generator.log"
+  },
+  {
+    "name": "unit",
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--project",
+      "unit"
+    ],
+    "exit_code": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-final-capstone-import-unit.log"
+  },
+  {
+    "name": "lint",
+    "command": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "exit_code": 1,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-final-capstone-import-lint.log"
+  }
+]

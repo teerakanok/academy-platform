@@ -239,10 +239,10 @@
       "id": "cp-5",
       "prompt": "Why must a function receive an array length?",
       "choices": {
-        "A": "The compiler handles it automatically",
-        "B": "It only changes performance",
+        "A": "A pointer records the number of elements it references",
+        "B": "The compiler recovers the length from the first element",
         "C": "The parameter is a pointer and carries no array length",
-        "D": "It is unrelated to the program data"
+        "D": "Array length is always available through sizeof in the callee"
       },
       "correct": [
         "C"
@@ -254,9 +254,9 @@
       "prompt": "What does strlen count?",
       "choices": {
         "A": "Bytes before the terminating NUL byte",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "B": "Characters including the terminating NUL byte",
+        "C": "Unicode characters after decoding",
+        "D": "Allocated bytes in the pointer target"
       },
       "correct": [
         "A"
@@ -267,9 +267,9 @@
       "id": "cp-7",
       "prompt": "What does sizeof include for char s[] = \"hi\"?",
       "choices": {
-        "A": "It is unrelated to the program data",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
+        "A": "Only the visible characters, so 2",
+        "B": "Bytes in a pointer parameter regardless of its declaration",
+        "C": "String-literal storage including implementation padding",
         "D": "The terminating zero byte"
       },
       "correct": [
@@ -281,10 +281,10 @@
       "id": "cp-8",
       "prompt": "Why is a string literal not a writable buffer?",
       "choices": {
-        "A": "It only changes performance",
+        "A": "It is placed on the stack and can be resized",
         "B": "Modifying it has undefined behavior",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "C": "The compiler creates a writable copy for each call",
+        "D": "Only its length field can change"
       },
       "correct": [
         "B"
@@ -295,10 +295,10 @@
       "id": "cp-9",
       "prompt": "What should fgets receive for a character array?",
       "choices": {
-        "A": "It only changes performance",
+        "A": "The number of characters already read",
         "B": "The array capacity",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "C": "The address of the next newline",
+        "D": "The source string's length"
       },
       "correct": [
         "B"
@@ -309,9 +309,9 @@
       "id": "cp-10",
       "prompt": "Why use snprintf for formatted text?",
       "choices": {
-        "A": "It is unrelated to the program data",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
+        "A": "It always allocates the destination",
+        "B": "It treats the format as compile-time checked",
+        "C": "It writes every formatted character regardless of space",
         "D": "It is given the destination capacity"
       },
       "correct": [
@@ -324,9 +324,9 @@
       "prompt": "What is unsafe about strcpy?",
       "choices": {
         "A": "It has no destination capacity argument",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "B": "It stops after the first whitespace",
+        "C": "It checks destination capacity before copying",
+        "D": "It accepts only character arrays"
       },
       "correct": [
         "A"
@@ -337,10 +337,10 @@
       "id": "cp-12",
       "prompt": "When can strncpy leave no C string?",
       "choices": {
-        "A": "The compiler handles it automatically",
-        "B": "It only changes performance",
+        "A": "Whenever the destination is larger than the count",
+        "B": "When the destination was zero-filled first",
         "C": "When the source length reaches the count",
-        "D": "It is unrelated to the program data"
+        "D": "Only when the source contains a newline"
       },
       "correct": [
         "C"
@@ -351,9 +351,9 @@
       "id": "cp-13",
       "prompt": "How are ordinary C two-dimensional arrays stored?",
       "choices": {
-        "A": "It is unrelated to the program data",
-        "B": "It only changes performance",
-        "C": "The compiler handles it automatically",
+        "A": "Each row as a separately allocated pointer",
+        "B": "Column-major with columns adjacent",
+        "C": "Only nonzero cells in sparse storage",
         "D": "As one contiguous row-major block"
       },
       "correct": [
@@ -365,10 +365,10 @@
       "id": "cp-14",
       "prompt": "What must an index satisfy for an array of length n?",
       "choices": {
-        "A": "The compiler handles it automatically",
-        "B": "It only changes performance",
+        "A": "It may equal n as the final element",
+        "B": "It need only be nonnegative",
         "C": "It must be less than n and nonnegative",
-        "D": "It is unrelated to the program data"
+        "D": "It must be positive and a multiple of n"
       },
       "correct": [
         "C"
@@ -379,10 +379,10 @@
       "id": "cp-15",
       "prompt": "What should accompany a pointer used as text?",
       "choices": {
-        "A": "It only changes performance",
+        "A": "Only the character encoding",
         "B": "A clear capacity and termination rule",
-        "C": "The compiler handles it automatically",
-        "D": "It is unrelated to the program data"
+        "C": "The source file name",
+        "D": "Whether the pointer is const"
       },
       "correct": [
         "B"

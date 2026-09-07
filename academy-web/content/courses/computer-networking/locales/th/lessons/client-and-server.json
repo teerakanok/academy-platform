@@ -286,6 +286,160 @@
         "A"
       ],
       "explanation": "เมื่อมีความยาว ผู้รับรู้แน่ชัดว่าต้องอ่านกี่ไบต์ และเนื้อหาของมันไม่เกี่ยวเลย ส่วนเมื่อใช้ตัวคั่น การปรากฏของมันในเนื้อหาต้องถูกหลบ และการลืมทำคือบั๊กการแยกวิเคราะห์คลาสสิก เนื้อหาไบนารีจึงต้องมีการหลบอักขระ ส่วนความยาวไม่ต้อง"
+    },
+    {
+      "id": "cp-5",
+      "prompt": "TCP รักษาอะไรให้ application",
+      "choices": {
+        "A": "แต่ละ send จะเป็น recv หนึ่งครั้งเสมอ",
+        "B": "ขอบเขต packet และชนิด message",
+        "C": "เฉพาะ application record ที่สมบูรณ์",
+        "D": "byte stream ที่เรียงลำดับ ไม่ใช่ขอบเขต message"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "receiver ต้องกำหนด frame message เอง เพราะขอบเขต read ไม่ใช่ message protocol"
+    },
+    {
+      "id": "cp-6",
+      "prompt": "receiver แบบ length-prefixed ต้องทำอะไรก่อน allocation",
+      "choices": {
+        "A": "validate length ที่ประกาศเทียบกับ limit",
+        "B": "allocate ตามขนาดที่ peer ขอทุกค่า",
+        "C": "ถือว่า bytes ชุดแรกคือ body ครบ",
+        "D": "ใช้ขนาด word ของ CPU เป็น protocol limit"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "length field จากเครือข่ายเป็น input ไม่น่าเชื่อถือและต้องจำกัดก่อน allocation"
+    },
+    {
+      "id": "cp-7",
+      "prompt": "accept คืนอะไรเมื่อสำเร็จ",
+      "choices": {
+        "A": "listening descriptor เดิมที่มี client data พร้อม",
+        "B": "จำนวน received bytes จาก peer",
+        "C": "socket descriptor ใหม่ที่เชื่อมต่อแล้ว",
+        "D": "port ของ peer ในฐานะ descriptor"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "listening socket ยังใช้ได้ ขณะที่ connection ที่รับแต่ละตัวได้ descriptor ของตน"
+    },
+    {
+      "id": "cp-8",
+      "prompt": "ทำไมต้อง loop รอบ send หรือ write บน socket",
+      "choices": {
+        "A": "TCP รับประกันว่า call หนึ่งส่ง buffer ครบ",
+        "B": "call ที่สำเร็จอาจส่งได้เพียงบางส่วนของ buffer",
+        "C": "loop เปลี่ยน send แยกให้เป็น message",
+        "D": "มันทำให้ read ได้ request ครบ"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "จำนวนที่คืนมาบอกว่าส่งแล้วเท่าไร และไบต์ที่เหลือต้องจัดการต่อ"
+    },
+    {
+      "id": "cp-9",
+      "prompt": "recv คืนศูนย์หมายถึงอะไรหลัง request ความยาวบวกบน TCP socket",
+      "choices": {
+        "A": "peer ปิดการเชื่อมต่อแบบ orderly",
+        "B": "ยังไม่มี data จึง retry ทันที",
+        "C": "buffer ถูกเติมพอดี",
+        "D": "ถาม address ของ peer ไม่ได้อีก"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "หลัง request ความยาวบวก ศูนย์บอกจุดจบของ byte stream จาก peer ไม่ใช่ payload อีกไบต์."
+    },
+    {
+      "id": "cp-10",
+      "prompt": "ทำไมต้องตั้ง maximum message size",
+      "choices": {
+        "A": "ทำให้ทุก send เป็น atomic",
+        "B": "ป้องกัน TCP retransmission",
+        "C": "เลือก kernel receive buffer",
+        "D": "เพื่อจำกัด memory และงานจาก peer ที่ไม่น่าเชื่อถือ"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "limit ของ protocol กัน client เดียวเรียก allocation ที่ไม่จำกัด"
+    },
+    {
+      "id": "cp-11",
+      "prompt": "CLOSE_WAIT บอกอะไรในฝั่ง local",
+      "choices": {
+        "A": "local application ปิดก่อน peer",
+        "B": "peer ปิดแล้วแต่ process local ยังไม่ปิด",
+        "C": "TCP handshake รอ accept",
+        "D": "packet หายจึงต้อง retransmit"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "application โดยทั่วไปต้องปิด descriptor หลังตอบเสร็จ"
+    },
+    {
+      "id": "cp-12",
+      "prompt": "ทำไมต้อง encode จำนวนหลายไบต์ของ protocol อย่างชัดเจน",
+      "choices": {
+        "A": "TCP ตัดสิน byte order ของจำนวนเต็ม",
+        "B": "CPU architecture เดียวกันทำให้ค่า portable",
+        "C": "peer อาจใช้ native byte order ต่างกัน",
+        "D": "recv ครั้งแรกแปลง data ทั้งหมดให้อัตโนมัติ"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "network byte order ให้ representation ร่วมกันข้าม host"
+    },
+    {
+      "id": "cp-13",
+      "prompt": "บน Linux listen backlog จำกัดอะไร",
+      "choices": {
+        "A": "คิวของ connection ที่ตั้งเสร็จแล้วและรอ accept",
+        "B": "คิวของ SYN request ที่ยัง half-open",
+        "C": "bytes ที่คิวของ accepted socket เดียว",
+        "D": "จำนวน descriptor ที่ process เปิดได้"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "บน Linux backlog จำกัด socket ที่ตั้ง connection เสร็จแล้วและรอ accept คิวเต็มอาจหน่วงหรือปฏิเสธ attempt ใหม่"
+    },
+    {
+      "id": "cp-14",
+      "prompt": "ทำไมต้องปิด accepted socket ทุกตัว",
+      "choices": {
+        "A": "flush unread data ออก network",
+        "B": "ทำให้ listening socket accept เร็ว",
+        "C": "เปลี่ยน connection เป็น UDP",
+        "D": "เพื่อคืน descriptor และ resource ของ connection"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "ปล่อย descriptor เปิดไว้จะถึง limit ของ process และหยุดงานใหม่"
+    },
+    {
+      "id": "cp-15",
+      "prompt": "parser ของ protocol ควรเก็บอะไรข้าม partial read",
+      "choices": {
+        "A": "เฉพาะ recv buffer ล่าสุด",
+        "B": "framing state และไบต์ที่รับแล้ว",
+        "C": "Ethernet MAC address ของ peer",
+        "D": "OS thread หนึ่งตัวต่อ message"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "TCP อาจแบ่ง field และ body จึงต้อง parse ต่อข้าม call"
     }
   ]
 }

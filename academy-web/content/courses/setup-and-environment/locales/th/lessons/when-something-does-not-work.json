@@ -208,6 +208,160 @@
         "A"
       ],
       "explanation": "และถ้าบทเรียนไม่เคยพูดถึงความต่างนั้นจริง ๆ นั่นคือข้อบกพร่องของบทเรียนที่ควรแจ้ง สายวิชานี้ระบุแพลตฟอร์มไว้ทุกที่ที่มันสำคัญ ความเงียบเรื่องความต่างที่คุณทำซ้ำได้คือช่องว่างของเนื้อหา ไม่จำเป็นต้องเป็นความผิดของคุณ"
+    },
+    {
+      "id": "cp-5",
+      "prompt": "command -v ช่วยวินิจฉัยอะไร",
+      "choices": {
+        "A": "package manager ติดตั้ง command นี้หรือไม่",
+        "B": "current working directory",
+        "C": "shell resolve command path ใด",
+        "D": "arguments ที่ program จะได้รับ"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "มันเผย command ที่ shell จะใช้ รวม alias หรือ function ในหลาย shell"
+    },
+    {
+      "id": "cp-6",
+      "prompt": "ทำไมใช้ ./tool สำหรับไฟล์ใน current directory",
+      "choices": {
+        "A": "มันระบุ local path นั้นอย่างชัดเจน",
+        "B": "มันทำให้ tool มี execute permission",
+        "C": "มันเพิ่ม directory ลง PATH",
+        "D": "มันรัน tool ด้วยสิทธิ์ administrator"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "prefix เลี่ยงการพึ่ง PATH search และเลือกไฟล์ตรงนี้"
+    },
+    {
+      "id": "cp-7",
+      "prompt": "ควรตรวจอะไรหลัง Permission denied บน script",
+      "choices": {
+        "A": "script พิมพ์ standard output หรือไม่",
+        "B": "command ใช้ network ได้หรือไม่",
+        "C": "ชื่อ argument ถูกต้องหรือไม่",
+        "D": "execute permission และ mount option ของ filesystem"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "x bit และ mount เช่น noexec ต่างกระทบการ execute ไฟล์ได้"
+    },
+    {
+      "id": "cp-8",
+      "prompt": "echo $PATH แสดงอะไร",
+      "choices": {
+        "A": "exit code ของ command ก่อนหน้า",
+        "B": "directory ที่ค้นหาชื่อ command ที่ไม่ระบุ path",
+        "C": "files ใน current directory",
+        "D": "commands ที่กำลังทำงาน"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "shell ค้นหา directory เหล่านี้ตามลำดับเมื่อ command ไม่มี slash"
+    },
+    {
+      "id": "cp-9",
+      "prompt": "ทำไมต้องบันทึก error message ให้ตรง",
+      "choices": {
+        "A": "มันแยก failure condition ที่ต่างกัน",
+        "B": "มันรับประกันว่าวินิจฉัยได้โดยไม่ต้อง reproduce ปัญหา",
+        "C": "มันใช้แทนการบันทึก environment และ version ได้",
+        "D": "มันพิสูจน์ว่า failure มาจาก shell เสมอ"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "ข้อความ command และ exit status ที่ตรงทำให้ปัญหา reproduce และค้นหาได้"
+    },
+    {
+      "id": "cp-10",
+      "prompt": "uname -s ช่วยระบุอะไร",
+      "choices": {
+        "A": "owner ของ current directory",
+        "B": "จำนวน CPU cores",
+        "C": "ตระกูล operating system ที่ใช้อยู่",
+        "D": "service ฟังอยู่บน port หรือไม่"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "ความต่าง platform อธิบาย flag path และพฤติกรรม package ได้"
+    },
+    {
+      "id": "cp-11",
+      "prompt": "การตรวจแรกที่มีประโยชน์สำหรับ executable ที่หายคืออะไร",
+      "choices": {
+        "A": "current user เป็น root หรือไม่",
+        "B": "source file มี execute permission หรือไม่",
+        "C": "DNS resolve project host ได้หรือไม่",
+        "D": "directory ที่ติดตั้งอยู่บน PATH หรือไม่"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "program ที่ติดตั้งแล้วจะไม่ถูกพบด้วยชื่อเมื่อ directory ไม่อยู่ใน PATH"
+    },
+    {
+      "id": "cp-12",
+      "prompt": "exit status ของ command บอกข้อมูลอะไร",
+      "choices": {
+        "A": "ข้อความที่ command ก่อนหน้าพิมพ์",
+        "B": "มันรายงานความสำเร็จหรือล้มเหลวแก่ script และ caller",
+        "C": "shell จะหา command เจอหรือไม่",
+        "D": "command ใช้ memory เท่าใด"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "output อาจดูน่าเชื่อแม้ command ล้มเหลว status เป็น signal แยก"
+    },
+    {
+      "id": "cp-13",
+      "prompt": "bug report ขั้นต่ำควรมีอะไร",
+      "choices": {
+        "A": "ขั้นตอน environment ผลที่คาด และผลที่เกิด",
+        "B": "เฉพาะ version ของ program",
+        "C": "วิธีแก้ที่อยากได้",
+        "D": "screenshot ที่ไม่มี error ตรงตัว"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "รายงานที่ reproduce ได้เล็ก ๆ ให้คนอื่นทดสอบเงื่อนไขเดียวกันได้"
+    },
+    {
+      "id": "cp-14",
+      "prompt": "ทำไมหลีกเลี่ยงการเพิ่ม current directory ใน PATH แบบ global",
+      "choices": {
+        "A": "system หา command ได้เร็วขึ้น",
+        "B": "เฉพาะ root รัน local file ได้",
+        "C": "มันป้องกัน files ซ้ำ",
+        "D": "ไฟล์ local ที่ไม่คาดอาจถูกเลือกเป็น command"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "การใช้ ./ ระบุไฟล์ที่ตั้งใจโดยไม่เปลี่ยน command resolution ทั้งระบบ"
+    },
+    {
+      "id": "cp-15",
+      "prompt": "ควรเปลี่ยนอะไรแรกเมื่อ debug",
+      "choices": {
+        "A": "configuration file ทุกไฟล์พร้อมกัน",
+        "B": "permission ก่อนเสมอไม่ว่า symptom ใด",
+        "C": "ตัวแปรเล็กหนึ่งตัวพร้อมเก็บ observation",
+        "D": "network hardware ก่อนสังเกต error"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "เปลี่ยนหลายอย่างพร้อมกันซ่อนว่าการเปลี่ยนใดส่งผล"
     }
   ]
 }

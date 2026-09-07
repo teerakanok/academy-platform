@@ -232,6 +232,160 @@
         "B"
       ],
       "explanation": "A file capability can grant exactly that one ability, and nothing else. That is the measured difference from the previous lesson: capability set 2000 instead of a80425fb. Same functionality, a fraction of the authority to lose."
+    },
+    {
+      "id": "cp-5",
+      "prompt": "Which IDs matter when a setuid program performs an operation?",
+      "choices": {
+        "A": "Only the program name",
+        "B": "Only the parent PID",
+        "C": "The effective IDs used for the operation",
+        "D": "Only the terminal owner"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Kernel permission checks for an operation normally use effective credentials, unlike access checking real IDs."
+    },
+    {
+      "id": "cp-6",
+      "prompt": "Why drop effective privilege before handling untrusted work?",
+      "choices": {
+        "A": "It validates every input",
+        "B": "A bug then has less authority to misuse",
+        "C": "It changes real UID",
+        "D": "It makes PATH trusted"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Least privilege limits what an input-handling mistake can do if it is exploited."
+    },
+    {
+      "id": "cp-7",
+      "prompt": "How should a privileged program choose an external executable?",
+      "choices": {
+        "A": "Use a fixed trusted path and controlled arguments",
+        "B": "Use the first PATH entry",
+        "C": "Ask the shell to search",
+        "D": "Trust the current directory"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "A privileged program must not let an attacker-controlled PATH select the executable it runs."
+    },
+    {
+      "id": "cp-8",
+      "prompt": "Why is system() a poor choice in privileged code?",
+      "choices": {
+        "A": "It cannot start processes",
+        "B": "It removes effective IDs",
+        "C": "It always returns zero",
+        "D": "It invokes a shell that parses a command string"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Shell parsing adds expansion and quoting rules that make untrusted data harder to handle safely."
+    },
+    {
+      "id": "cp-9",
+      "prompt": "What does O_NOFOLLOW request for the final pathname component on Linux?",
+      "choices": {
+        "A": "Open every link twice",
+        "B": "Do not follow a symbolic link there",
+        "C": "Create a root shell",
+        "D": "Ignore file permissions"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "O_NOFOLLOW can reject a final symbolic link, though secure pathname handling may need further controls."
+    },
+    {
+      "id": "cp-10",
+      "prompt": "Why is mkstemp useful for a privileged temporary file?",
+      "choices": {
+        "A": "It makes files world-writable",
+        "B": "It disables cleanup",
+        "C": "It creates a unique file and returns an open descriptor",
+        "D": "It follows any symlink"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Creating and opening the selected temporary file together avoids a separate name-check window."
+    },
+    {
+      "id": "cp-11",
+      "prompt": "What can a file capability grant to an executable on Linux?",
+      "choices": {
+        "A": "A new kernel",
+        "B": "A trusted PATH",
+        "C": "An immutable input",
+        "D": "A named capability instead of full root authority"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Capabilities can reduce authority by granting a specific privilege rather than the entire root set."
+    },
+    {
+      "id": "cp-12",
+      "prompt": "Why close unneeded file descriptors before exec in privileged code?",
+      "choices": {
+        "A": "The new program could otherwise inherit useful access",
+        "B": "It changes the file owner",
+        "C": "It makes exec synchronous",
+        "D": "It clears all signals"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "An inherited descriptor can bypass pathname checks because it already refers to an open resource."
+    },
+    {
+      "id": "cp-13",
+      "prompt": "What should a privileged program do with user-controlled filenames?",
+      "choices": {
+        "A": "Assume access() locks it",
+        "B": "Store it in PATH",
+        "C": "Validate them and avoid check-then-use name races",
+        "D": "Run it as a command"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "A name can change between separate operations, so validation must be paired with safe file-operation design."
+    },
+    {
+      "id": "cp-14",
+      "prompt": "Why must privileged code check every security-relevant return value?",
+      "choices": {
+        "A": "A failed check or privilege change must not be treated as success",
+        "B": "It makes logging optional",
+        "C": "It forces root access",
+        "D": "It removes race conditions"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Continuing after a failed security operation can leave code running with the wrong authority or assumption."
+    },
+    {
+      "id": "cp-15",
+      "prompt": "What can a nosuid filesystem mount do on Linux?",
+      "choices": {
+        "A": "Encrypt every executable",
+        "B": "Prevent setuid and file capability effects from taking effect",
+        "C": "Make all files root-owned",
+        "D": "Allow any user to change IDs"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Linux can ignore privilege elevation from setuid bits and file capabilities on a nosuid mount."
     }
   ]
 }

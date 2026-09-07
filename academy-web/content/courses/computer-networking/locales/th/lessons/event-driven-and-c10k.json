@@ -252,6 +252,160 @@
         "D"
       ],
       "explanation": "มันผสมการออกแบบทั้งสามแบบจากโมดูลนี้: ลูปยังตอบสนองได้เพราะไม่เคยบล็อก และงานที่บล็อกก็เกิดขึ้นใน pool ซึ่งเป็นที่ที่การบล็อกได้รับอนุญาต"
+    },
+    {
+      "id": "cp-5",
+      "prompt": "readiness notification หมายถึงอะไร",
+      "choices": {
+        "A": "operation ที่ขอเสร็จแล้ว",
+        "B": "operation อาจทำต่อได้โดยไม่ block",
+        "C": "data ที่อ่านได้ทั้งหมดเป็น message เดียว",
+        "D": "peer ส่ง application-level reply แล้ว"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "readiness ไม่ใช่ message ที่ครบ โค้ดยังต้องจัดการ partial read/write"
+    },
+    {
+      "id": "cp-6",
+      "prompt": "event loop ควรเก็บ state ของ request ที่ไม่ครบที่ไหน",
+      "choices": {
+        "A": "buffer กลางที่ socket ทุกตัวใช้ร่วม",
+        "B": "TCP packet header",
+        "C": "DNS cache ของ client",
+        "D": "ใน state object ต่อ connection"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "loop กลับไปทำงานอื่น จึงต้องให้แต่ละ connection เก็บความคืบหน้าของตน"
+    },
+    {
+      "id": "cp-7",
+      "prompt": "event ใดสำคัญหลัง nonblocking write ได้บางส่วน",
+      "choices": {
+        "A": "writability เพื่อส่ง output ที่เหลือ",
+        "B": "read event อีกรอบแม้ output ค้าง",
+        "C": "TCP handshake ใหม่",
+        "D": "kernel รวม output ที่เหลือให้อัตโนมัติ"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "connection ต้องเก็บ output ไว้จน socket รับไบต์เพิ่มได้"
+    },
+    {
+      "id": "cp-8",
+      "prompt": "ทำไมหลีกเลี่ยงงาน block ใน event loop",
+      "choices": {
+        "A": "แต่ละ connection ต้องมี event loop หนึ่งตัว",
+        "B": "blocking call ทำให้ TCP ไม่เรียงลำดับ",
+        "C": "มันหน่วง connection อื่นทุกตัวที่ loop นั้นดูแล",
+        "D": "มีผลช้าเฉพาะ client ที่ช้า"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "loop ที่ block ตัวเดียวไม่อาจให้บริการ connection พร้อมอื่นได้ทัน"
+    },
+    {
+      "id": "cp-9",
+      "prompt": "ปกติควรตอบ EAGAIN จาก nonblocking read อย่างไร",
+      "choices": {
+        "A": "ปิด connection ทันทีว่า protocol error",
+        "B": "retry วนแน่นจน data มา",
+        "C": "เปลี่ยน socket กลับเป็น blocking",
+        "D": "รอ readiness notification ครั้งต่อไป"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "EAGAIN บอกว่า operation จะ block ตอนนี้ ไม่ใช่ end-of-stream"
+    },
+    {
+      "id": "cp-10",
+      "prompt": "ทำไมต้อง track output offset ต่อ connection",
+      "choices": {
+        "A": "นับจำนวน connection ปัจจุบัน",
+        "B": "เพื่อกลับไปต่อหลังไบต์ที่เขียนแล้วพอดี",
+        "C": "เรียง bytes ตาม TCP packet",
+        "D": "เก็บ server log กลาง"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "offset ป้องกันการส่งซ้ำหรือทิ้งไบต์ข้าม partial write"
+    },
+    {
+      "id": "cp-11",
+      "prompt": "loop ควรทำอะไรเมื่อ connection ปิด",
+      "choices": {
+        "A": "เก็บ state ไว้รอ event ถัดไป",
+        "B": "ย้ายมันไป global queue",
+        "C": "เอา state ออกและคืน resource",
+        "D": "เปิด descriptor ไว้เพื่อ diagnostics"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "เก็บ state ของ connection ตายทำให้ memory และ descriptor รั่วตามเวลา"
+    },
+    {
+      "id": "cp-12",
+      "prompt": "ทำไม event loop scale จำนวน connection ได้",
+      "choices": {
+        "A": "มันเลี่ยง thread ที่ block เฉพาะต่อ connection ว่าง",
+        "B": "แชร์ OS thread ข้าม CPU",
+        "C": "ทำให้ TCP transfer ของแต่ละ client เร็ว",
+        "D": "ไม่ต้องตั้ง resource limits"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "connection ว่างจำนวนมากรอใน kernel ได้ขณะ loop thread ไม่กี่ตัวจัดการ readiness"
+    },
+    {
+      "id": "cp-13",
+      "prompt": "edge-triggered readiness ต้องการอะไร",
+      "choices": {
+        "A": "รอ event รอบสองหลัง read ครั้งเดียว",
+        "B": "read แค่ขนาด buffer",
+        "C": "ระบายงานที่มีจน operation จะ block",
+        "D": "เปลี่ยน socket เป็น blocking"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "เมื่อ edge-triggered โค้ดต้องใช้ข้อมูลที่มีเพื่อไม่รอ edge ที่พลาด"
+    },
+    {
+      "id": "cp-14",
+      "prompt": "งานใช้ CPU หนักควรไปที่ใดใน service แบบ event-driven",
+      "choices": {
+        "A": "callback ของ I/O loop หลัก",
+        "B": "worker pool หรือ executor ที่จำกัด",
+        "C": "thread ใหม่ที่ไม่จำกัดหนึ่งตัวต่อ request",
+        "D": "งาน synchronous ภายใน readiness dispatch"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "ย้ายงานหนักออกจาก loop ช่วยให้ I/O ตอบสนองคาดเดาได้"
+    },
+    {
+      "id": "cp-15",
+      "prompt": "test ต้องจำลองอะไรสำหรับ output event-driven",
+      "choices": {
+        "A": "เฉพาะการเขียนเต็ม buffer",
+        "B": "event ที่ client ทุกตัวเร็ว",
+        "C": "การตัดการเชื่อมต่อก่อนส่ง output",
+        "D": "receiver ช้าและ partial write"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "client loopback ที่เร็วอาจซ่อน queued-output state ที่ client ช้าต้องใช้"
     }
   ]
 }

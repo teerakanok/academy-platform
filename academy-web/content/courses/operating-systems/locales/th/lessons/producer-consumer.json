@@ -205,6 +205,160 @@
         "C"
       ],
       "explanation": "การปิดแปลว่า \"จะไม่มีอะไรเข้ามาอีก\" การพูดแบบนั้นขณะที่ยังมีของเข้ามาอยู่ทำให้มันไม่จริง และ consumer ก็ทำตามนั้น"
+    },
+    {
+      "id": "cp-5",
+      "prompt": "ทำไมต้องใส่ pthread_cond_wait ใน while loop",
+      "choices": {
+        "A": "มันทำให้ scheduling เป็น FIFO",
+        "B": "มันตัด mutex",
+        "C": "มันป้องกันการสร้าง thread",
+        "D": "predicate อาจเป็นเท็จอีกครั้งเมื่อตื่น"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "การตื่นไม่ใช่อนุญาตให้ทำต่อ thread ต้องตรวจ shared state อีกครั้งขณะถือ mutex"
+    },
+    {
+      "id": "cp-6",
+      "prompt": "queue mutex หนึ่งตัวควรปกป้องอะไร",
+      "choices": {
+        "A": "count, index และสถานะ closed เป็น invariant เดียว",
+        "B": "เฉพาะ condition variable",
+        "C": "เฉพาะ ID ของ producer",
+        "D": "เฉพาะความจุ array"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "state ที่ตัดสินว่า thread push pop หรือออกได้ ต้องเปลี่ยนร่วมกันใต้ mutex"
+    },
+    {
+      "id": "cp-7",
+      "prompt": "เหตุการณ์ใดควรปลุก consumer ที่รองาน",
+      "choices": {
+        "A": "consumer เอา item ออก",
+        "B": "ความจุคิวเปลี่ยน",
+        "C": "producer ทำให้คิวไม่ว่าง",
+        "D": "thread อ่าน ID ของตน"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "หลังเพิ่ม item ใต้ mutex producer ส่งสัญญาณว่า predicate not-empty อาจเป็นจริง"
+    },
+    {
+      "id": "cp-8",
+      "prompt": "อะไรต้องเกิดก่อนส่งสัญญาณ condition variable",
+      "choices": {
+        "A": "ทำลาย mutex",
+        "B": "อัปเดต shared predicate ขณะถือ mutex",
+        "C": "join ทุก thread",
+        "D": "ล้างคิว"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "state และการแจ้งต้องประสานผ่าน mutex เพื่อไม่ให้ waiter พลาดการเปลี่ยนที่สำคัญ"
+    },
+    {
+      "id": "cp-9",
+      "prompt": "producer ควรทำอะไรเมื่อ bounded queue เต็ม",
+      "choices": {
+        "A": "รอจน predicate not-full เป็นจริง",
+        "B": "เขียนทับ item เก่าสุด",
+        "C": "ปิดคิว",
+        "D": "ปลด lock ถาวร"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "bounded queue รับ item เพิ่มไม่ได้จน consumer สร้างพื้นที่"
+    },
+    {
+      "id": "cp-10",
+      "prompt": "อะไรควรตามหลัง consumer เอา item ออก",
+      "choices": {
+        "A": "broadcast การออก process",
+        "B": "reset index",
+        "C": "ทำสำเนา item",
+        "D": "แจ้ง producer ว่าพื้นที่อาจว่าง"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "การเอา item ออกอาจทำให้ predicate not-full เป็นจริงสำหรับ producer ที่รอ"
+    },
+    {
+      "id": "cp-11",
+      "prompt": "consumer ออกได้เมื่อใดหลังคิวปิด",
+      "choices": {
+        "A": "ทันทีที่เรียก close",
+        "B": "เมื่อคิวปิดและว่าง",
+        "C": "หลัง item เดียว",
+        "D": "ก่อนตรวจคิว"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "close บอกว่าจะไม่มี item ใหม่ และความว่างบอกว่างานที่รับแล้วถูกใช้หมด"
+    },
+    {
+      "id": "cp-12",
+      "prompt": "การ push ควรทำอะไรหลังคิวปิด",
+      "choices": {
+        "A": "เก็บโดยไม่ lock",
+        "B": "ปลุกเฉพาะ consumer",
+        "C": "ปฏิเสธ item ใหม่ตาม contract ของคิว",
+        "D": "เปลี่ยนความจุ"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "close สัญญาว่าจะไม่มี item ใหม่ ดังนั้น push ทีหลังต้องไม่ละเมิดสัญญาเงียบ ๆ"
+    },
+    {
+      "id": "cp-13",
+      "prompt": "การใช้ mutex เดียวกันป้องกัน lost wakeup อย่างไร",
+      "choices": {
+        "A": "มันทำให้ทุก wake เป็น broadcast",
+        "B": "มันแก้ความเร็ว CPU",
+        "C": "มันตัด predicate",
+        "D": "มันประสานการตรวจ predicate กับการเริ่มรอ"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "waiter ตรวจ state และเริ่มรออย่างแบ่งแยกไม่ได้เมื่อเทียบกับ signaler ที่เปลี่ยน state"
+    },
+    {
+      "id": "cp-14",
+      "prompt": "condition variable เก็บอะไรให้คิว",
+      "choices": {
+        "A": "item ถัดไป",
+        "B": "ไม่มี item ของคิว มันเพียงประสานการรอ",
+        "C": "mutex ตัวที่สอง",
+        "D": "stack ของ thread"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "ข้อมูลคิวอยู่ใน state ที่ป้องกัน ส่วน condition variable ให้ thread รอ predicate"
+    },
+    {
+      "id": "cp-15",
+      "prompt": "เมื่อใดจึงปลอดภัยที่จะทำลาย queue mutex และ condition variable",
+      "choices": {
+        "A": "หลังทุก thread ที่ใช้คิวหยุดแล้ว",
+        "B": "หลัง wakeup ครั้งแรก",
+        "C": "เมื่อคิวเต็ม",
+        "D": "ก่อน join thread"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "ห้ามมี thread ใดยังรอหรือเข้าถึง synchronization object ตอนถูกทำลาย"
     }
   ]
 }
