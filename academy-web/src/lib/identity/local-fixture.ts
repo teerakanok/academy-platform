@@ -1,4 +1,8 @@
-const SESSION_ID = /^[A-Za-z0-9_-]{32,160}$/
+import {
+  HOST_ACADEMY_SESSION_COOKIE,
+  LEGACY_ACADEMY_SESSION_COOKIE,
+  parseSessionCookieForNames,
+} from '../auth/session-cookie'
 
 export interface IdentityControlLocalFixtureEnvironment {
   NODE_ENV?: string
@@ -54,15 +58,10 @@ export function identityControlLocalFixtureAllowedForHost(
 }
 
 export function hasSyntacticallyValidLocalAcademySession(cookieHeader: string | null): boolean {
-  if (!cookieHeader) return false
-  let count = 0
-  let valid = false
-  for (const part of cookieHeader.split(';')) {
-    const pair = part.trim()
-    const separator = pair.indexOf('=')
-    if ((separator === -1 ? pair : pair.slice(0, separator)).trim() !== 'academy_session') continue
-    count += 1
-    valid = separator !== -1 && SESSION_ID.test(pair.slice(separator + 1).trim())
-  }
-  return count === 1 && valid
+  return parseSessionCookieForNames(
+    cookieHeader,
+    process.env.NODE_ENV === 'production'
+      ? [HOST_ACADEMY_SESSION_COOKIE]
+      : [HOST_ACADEMY_SESSION_COOKIE, LEGACY_ACADEMY_SESSION_COOKIE],
+  ) !== null
 }

@@ -20,6 +20,11 @@ binding when that cookie is valid and bound to the requested asset. Missing, tam
 ownership-mismatched, and expired cookies return to the authorization route without
 reading R2. Responses support byte ranges and use private/no-store caching.
 
+Production session binding reads only the browser-enforced
+`__Host-academy_session` cookie. An HTTP-only local fixture may explicitly read
+the historical unprefixed name so browser-enforced `__Host-` cookies do not have
+to bypass their Secure requirement.
+
 The cookie is a bearer credential and can remain usable for at most five minutes after
 access is revoked. It never appears in a URL, browser history, or edge request URL
 logs. A new authorization redirect checks access immediately; this five-minute bounded

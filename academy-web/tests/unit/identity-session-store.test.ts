@@ -76,13 +76,13 @@ describe('local durable identity session store', () => {
     const sessionId = 'session_token_123456789012345678901234'
 
     expect(academySessionCookie(sessionId, { secure: true, maxAge: 900 })).toBe(
-      `academy_session=${sessionId}; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=900`,
+      `__Host-academy_session=${sessionId}; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=900`,
     )
     expect(academySessionCookie(sessionId, { secure: false })).toBe(
       `academy_session=${sessionId}; Path=/; HttpOnly; SameSite=Lax`,
     )
     expect(expireAcademySessionCookie({ secure: true })).toBe(
-      'academy_session=; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=0',
+      '__Host-academy_session=; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=0',
     )
     expect(expireAcademySessionCookie({ secure: false })).toBe(
       'academy_session=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0',

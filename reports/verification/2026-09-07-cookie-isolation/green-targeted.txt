@@ -1,0 +1,10 @@
+
+ RUN  v3.2.7 /private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-CXdbRb/checkout/academy-web
+
+ ✓ |unit| tests/unit/host-session-cookie-isolation.test.ts (3 tests) 7ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  23:59:38
+   Duration  393ms (transform 62ms, setup 0ms, collect 108ms, tests 7ms, environment 0ms, prepare 58ms)
+

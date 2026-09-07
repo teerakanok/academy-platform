@@ -110,8 +110,7 @@ const config :Config = (
 );
 `)
 
-const runtime = spawnSync(process.execPath, [
-  'node_modules/workerd/bin/workerd',
+const runtime = spawnSync(path.join(root, 'node_modules/.bin/workerd'), [
   'test',
   '-Inode_modules',
   '--no-verbose',

@@ -1,0 +1,24 @@
+[
+  {
+    "gate": "final-lint",
+    "command": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "exit_code": 1,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-cookie-root-final-lint.log",
+    "finished_at": "2026-09-07T17:21:19.714124+00:00"
+  },
+  {
+    "gate": "final-build-cf",
+    "command": [
+      "npm",
+      "run",
+      "build:cf"
+    ],
+    "exit_code": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-cookie-root-final-build-cf.log",
+    "finished_at": "2026-09-07T17:22:03.867867+00:00"
+  }
+]

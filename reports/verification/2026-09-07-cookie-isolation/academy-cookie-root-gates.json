@@ -1,0 +1,78 @@
+[
+  {
+    "gate": "unit",
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--project",
+      "unit"
+    ],
+    "cwd": "/private/tmp/academy-cookie-isolation-cde63a58/academy-web",
+    "exit_code": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-cookie-root-unit.log",
+    "finished_at": "2026-09-07T17:16:20.363222+00:00"
+  },
+  {
+    "gate": "lint",
+    "command": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "cwd": "/private/tmp/academy-cookie-isolation-cde63a58/academy-web",
+    "exit_code": 1,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-cookie-root-lint.log",
+    "finished_at": "2026-09-07T17:16:27.824900+00:00"
+  },
+  {
+    "gate": "types-app",
+    "command": [
+      "npx",
+      "tsc",
+      "--noEmit"
+    ],
+    "cwd": "/private/tmp/academy-cookie-isolation-cde63a58/academy-web",
+    "exit_code": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-cookie-root-types-app.log",
+    "finished_at": "2026-09-07T17:16:34.754734+00:00"
+  },
+  {
+    "gate": "types-worker",
+    "command": [
+      "npx",
+      "tsc",
+      "-p",
+      "tsconfig.worker.json"
+    ],
+    "cwd": "/private/tmp/academy-cookie-isolation-cde63a58/academy-web",
+    "exit_code": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-cookie-root-types-worker.log",
+    "finished_at": "2026-09-07T17:16:36.048042+00:00"
+  },
+  {
+    "gate": "types-retention",
+    "command": [
+      "npx",
+      "tsc",
+      "-p",
+      "ops/academy-retention-worker/tsconfig.json"
+    ],
+    "cwd": "/private/tmp/academy-cookie-isolation-cde63a58/academy-web",
+    "exit_code": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-cookie-root-types-retention.log",
+    "finished_at": "2026-09-07T17:16:36.765780+00:00"
+  },
+  {
+    "gate": "build-cf",
+    "command": [
+      "npm",
+      "run",
+      "build:cf"
+    ],
+    "cwd": "/private/tmp/academy-cookie-isolation-cde63a58/academy-web",
+    "exit_code": 1,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-cookie-root-build-cf.log",
+    "finished_at": "2026-09-07T17:16:40.663272+00:00"
+  }
+]

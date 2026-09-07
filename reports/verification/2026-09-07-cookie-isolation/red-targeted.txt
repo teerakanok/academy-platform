@@ -1,0 +1,76 @@
+
+ RUN  v3.2.7 /private/var/folders/pg/r1yx9jq103v4vk0hj199ypf40000gn/T/glm-worker-worktree-CXdbRb/checkout/academy-web
+
+ ❯ |unit| tests/unit/host-session-cookie-isolation.test.ts (3 tests | 3 failed) 14ms
+   × production browser session cookie isolation > issues and expires browser-enforced host-only session cookies 5ms
+     → expected 'academy_session=AAAAAAAAAAAAAAAAAAAAA…' to be '__Host-academy_session=AAAAAAAAAAAAAA…' // Object.is equality
+   × production browser session cookie isolation > rejects legacy bearer authority and malformed or duplicate names 1ms
+     → expected 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA…' to be null
+   × production browser session cookie isolation > uses the same accepted session in middleware and rejects an injected legacy cookie 7ms
+     → expected Response { status: 307, statusText: '', headers: Headers { Location: 'https://academy.cyberskills.co.th/sign-in?next=%2Fdashboard' }, body: null, bodyUsed: false, ok: false, redirected: false, type: 'default', url: '' } to match object { status: 200 }
+(3 matching properties omitted from actual)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| tests/unit/host-session-cookie-isolation.test.ts > production browser session cookie isolation > issues and expires browser-enforced host-only session cookies
+AssertionError: expected 'academy_session=AAAAAAAAAAAAAAAAAAAAA…' to be '__Host-academy_session=AAAAAAAAAAAAAA…' // Object.is equality
+
+Expected: "__Host-academy_session=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=900"
+Received: "academy_session=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=900"
+
+ ❯ tests/unit/host-session-cookie-isolation.test.ts:21:20
+     19|   it('issues and expires browser-enforced host-only session cookies', …
+     20|     const issued = academySessionCookie(sessionId, { maxAge: 900 })
+     21|     expect(issued).toBe([
+       |                    ^
+     22|       `__Host-academy_session=${sessionId}`,
+     23|       'Path=/',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  |unit| tests/unit/host-session-cookie-isolation.test.ts > production browser session cookie isolation > rejects legacy bearer authority and malformed or duplicate names
+AssertionError: expected 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA…' to be null
+
+- Expected: 
+null
+
++ Received: 
+"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+
+ ❯ tests/unit/host-session-cookie-isolation.test.ts:35:71
+     33| 
+     34|   it('rejects legacy bearer authority and malformed or duplicate names…
+     35|     expect(parseAcademySessionCookie(`academy_session=${sessionId}`)).…
+       |                                                                       ^
+     36|     expect(parseAcademySessionCookie(`__Host-academy_session=${session…
+     37|     expect(parseAcademySessionCookie(`__Host-academy_session=${session…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  |unit| tests/unit/host-session-cookie-isolation.test.ts > production browser session cookie isolation > uses the same accepted session in middleware and rejects an injected legacy cookie
+AssertionError: expected Response { status: 307, statusText: '', headers: Headers { Location: 'https://academy.cyberskills.co.th/sign-in?next=%2Fdashboard' }, body: null, bodyUsed: false, ok: false, redirected: false, type: 'default', url: '' } to match object { status: 200 }
+(3 matching properties omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "status": 200,
++ NextResponse {
++   Symbol(internal response): {
++     "cookies": bound ResponseCookies {
++       "_headers": Headers {},
++       "_parsed": Map {},
++     },
++     "url": undefined,
++   },
+  }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed (3)
+   Start at  23:57:13
+   Duration  387ms (transform 57ms, setup 0ms, collect 106ms, tests 14ms, environment 0ms, prepare 48ms)
+

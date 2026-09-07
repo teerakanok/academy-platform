@@ -1,0 +1,10 @@
+
+ RUN  v3.2.7 /private/tmp/academy-cookie-isolation-cde63a58/academy-web
+
+ ✓ |unit| tests/unit/host-session-cookie-isolation.test.ts (3 tests) 7ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  00:15:36
+   Duration  385ms (transform 57ms, setup 0ms, collect 103ms, tests 7ms, environment 0ms, prepare 48ms)
+

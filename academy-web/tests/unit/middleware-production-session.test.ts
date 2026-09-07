@@ -14,7 +14,7 @@ describe('production middleware opaque-session prefilter', () => {
 
   it('continues a protected request carrying a syntactically valid Academy session cookie', async () => {
     const request = new NextRequest('https://academy.cyberskills.co.th/dashboard', {
-      headers: { cookie: `academy_session=${'A'.repeat(43)}` },
+      headers: { cookie: `__Host-academy_session=${'A'.repeat(43)}` },
     })
 
     const response = await middleware(request)

@@ -37,7 +37,7 @@ function bucket(body = 'PDF', range?: { offset?: number; length?: number; suffix
 
 function cookie(grant: string, sessionId: string | null = SESSION_ID) {
   const mediaCookie = `${MEDIA_DELIVERY_COOKIE}=${grant}`
-  return sessionId === null ? mediaCookie : `${mediaCookie}; academy_session=${sessionId}`
+  return sessionId === null ? mediaCookie : `${mediaCookie}; __Host-academy_session=${sessionId}`
 }
 
 async function legacyUnboundGrant() {
@@ -100,7 +100,7 @@ describe('private media Worker delivery', () => {
     for (const candidate of [`${valid}x`, mismatched, 'not-a-token', null]) {
       const response = await servePrivateMedia(new Request('https://academy.test/course-media/formats-handout', {
         headers: candidate === null
-          ? { cookie: 'academy_session=short' }
+          ? { cookie: '__Host-academy_session=short' }
           : { cookie: cookie(candidate) },
       }), {
         MEDIA_SIGNING_SECRET: SECRET,
@@ -121,9 +121,9 @@ describe('private media Worker delivery', () => {
       cookie(grant, wrongSession),
       cookie(grant, ''),
       cookie(grant, 'short'),
-      `${cookie(grant)}; academy_session=${wrongSession}`,
-      `${cookie(grant)}; academy_session`,
-      `${MEDIA_DELIVERY_COOKIE}=${grant}; academy_session=${SESSION_ID}; academy_session=${wrongSession}`,
+      `${cookie(grant)}; __Host-academy_session=${wrongSession}`,
+      `${cookie(grant)}; __Host-academy_session`,
+      `${MEDIA_DELIVERY_COOKIE}=${grant}; __Host-academy_session=${SESSION_ID}; __Host-academy_session=${wrongSession}`,
     ]
 
     for (const header of candidates) {
@@ -132,6 +132,16 @@ describe('private media Worker delivery', () => {
       }), { MEDIA_SIGNING_SECRET: SECRET, COURSE_MEDIA: media })
       expect(response).toBeNull()
     }
+    expect(media.get).not.toHaveBeenCalled()
+  })
+
+  it('rejects a legacy unprefixed Academy session without reading R2', async () => {
+    const media = bucket()
+    const response = await servePrivateMedia(new Request('https://academy.test/course-media/formats-handout', {
+      headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${await token()}; academy_session=${SESSION_ID}` },
+    }), { MEDIA_SIGNING_SECRET: SECRET, COURSE_MEDIA: media })
+
+    expect(response).toBeNull()
     expect(media.get).not.toHaveBeenCalled()
   })
 

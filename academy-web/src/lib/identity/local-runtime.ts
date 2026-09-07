@@ -30,6 +30,7 @@ import {
   type LocalIdentityAuthorizationRegistration,
 } from './transaction'
 import { canonicalLocalIdentityOrigin, identityControlLocalFixtureAllowedForRequest } from './local-fixture'
+import { LEGACY_IDENTITY_BINDING_COOKIE_PREFIX } from '../auth/session-cookie'
 
 const LOCAL_CLIENT_ASSERTION = [
   'eyJhbGciOiJFUzI1NiIsImtpZCI6ImxvY2FsIn0',
@@ -119,12 +120,12 @@ export function localIdentityBrowserBindingCookie(state: string, binding: string
   if (!isCanonicalIdentityTransactionState(state) || !BROWSER_BINDING.test(binding)) {
     throw new IdentityLocalRuntimeError()
   }
-  return `${browserBindingCookieName(state)}=${binding}; Path=/auth/callback; HttpOnly; SameSite=Lax; Max-Age=300`
+  return `${browserBindingCookieName(state)}=${binding}; Path=/; HttpOnly; SameSite=Lax; Max-Age=300`
 }
 
 export function expireLocalIdentityBrowserBindingCookie(state: string): string {
   if (!isCanonicalIdentityTransactionState(state)) throw new IdentityLocalRuntimeError()
-  return `${browserBindingCookieName(state)}=; Path=/auth/callback; HttpOnly; SameSite=Lax; Max-Age=0`
+  return `${browserBindingCookieName(state)}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`
 }
 
 export function readLocalIdentityBrowserBinding(cookieHeader: string | null, state: string): string | null {
@@ -172,7 +173,7 @@ export function revokeLocalAcademySession(request: Request): string {
 }
 
 function browserBindingCookieName(state: string): string {
-  return `academy_identity_binding_${state.slice(0, 32)}`
+  return `${LEGACY_IDENTITY_BINDING_COOKIE_PREFIX}${state.slice(0, 32)}`
 }
 
 function requireLocalOrigin(value: string | undefined): string {
