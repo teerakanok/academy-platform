@@ -1,0 +1,23 @@
+{
+  "exit": 0,
+  "command": [
+    "node",
+    "node_modules/wrangler/bin/wrangler.js",
+    "versions",
+    "upload",
+    "--name",
+    "cyberskills-academy",
+    "--keep-vars",
+    "--tag",
+    "release-5bd58861b96a",
+    "--message",
+    "s=5bd58861b96a9547f2bcd89ecb73108338d5312c;assembly-capstone-content"
+  ],
+  "source": "5bd58861b96a9547f2bcd89ecb73108338d5312c",
+  "version_ids": [
+    "6beb8fed-236e-47ea-bd4a-8af9834c61ef"
+  ],
+  "error_codes": [],
+  "output_sha256": "55fa783c0976fddcef8c86329af2dc9f16e7798513c842963720bb274fade9c2",
+  "retry_basis": "versions list latest47 remains56c2e7bd, no5bd5886 candidate; first API GET service returned10013"
+}

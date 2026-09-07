@@ -1,0 +1,39 @@
+{
+  "checked_at": "2026-09-07T08:04:34.992Z",
+  "version": "6beb8fed-236e-47ea-bd4a-8af9834c61ef",
+  "results": [
+    {
+      "path": "/",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "access_login_body": false,
+      "body_bytes": 182094
+    },
+    {
+      "path": "/sign-in",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "access_login_body": false,
+      "body_bytes": 16743
+    },
+    {
+      "path": "/courses/assembly",
+      "status": 308,
+      "content_type": "text/html; charset=utf-8",
+      "access_login_body": false,
+      "body_bytes": 9906
+    },
+    {
+      "path": "/robots.txt",
+      "status": 200,
+      "content_type": "text/plain; charset=utf-8",
+      "access_login_body": false,
+      "body_bytes": 1863
+    },
+    {
+      "surface": "raw-host",
+      "status": 404
+    }
+  ],
+  "pass": false
+}
