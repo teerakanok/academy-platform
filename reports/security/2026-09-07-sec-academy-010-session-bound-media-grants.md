@@ -54,3 +54,7 @@ No migration was added or replayed. DB0034 remains unchanged. No protected `.env
 ## Root acceptance update — 2026-09-07
 
 Root reproduced the baseline delivery vulnerability (HTTP 200 without session; test exit 1), restored exact candidate bytes, and obtained 16/16 delivery plus 60/60 focused and full unit PASS. All three type gates and `npm run build:cf` passed, including real workerd and final bundle startup. Independent security source review PASS. The earlier sandbox failures remain historical evidence; production remains pending. See [root raw evidence](../verification/2026-09-07-media-session-binding-root/README.md).
+
+## Production update — 2026-09-07T06:10Z
+
+Source90866d8 is serving on Worker56c2e7bd at100%, verified by actual deployments list and canonical/raw-host GETs plus a root-viewed real Chrome sign-in capture. See [production evidence](../verification/2026-09-07-media-session-binding-production/README.md). Authenticated media acceptance and immediate-revocation/logging residuals remain open.

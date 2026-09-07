@@ -1,0 +1,39 @@
+{
+  "checked_at": "2026-09-07T06:07:54.105Z",
+  "version": "56c2e7bd-26be-4d68-bda1-70df901e6187",
+  "pass": true,
+  "results": [
+    {
+      "path": "/",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "access_login_body": false,
+      "body_bytes": 181228
+    },
+    {
+      "path": "/sign-in",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "access_login_body": false,
+      "body_bytes": 16635
+    },
+    {
+      "path": "/robots.txt",
+      "status": 200,
+      "content_type": "text/plain; charset=utf-8",
+      "access_login_body": false,
+      "robots_directive": true,
+      "body_bytes": 1863
+    },
+    {
+      "path": "/_next/static/css/6cc752cf5939ea68.css",
+      "status": 200,
+      "content_type": "text/css",
+      "body_bytes": 50474
+    },
+    {
+      "surface": "raw-host",
+      "status": 404
+    }
+  ]
+}

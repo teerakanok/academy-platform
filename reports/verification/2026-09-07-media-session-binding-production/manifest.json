@@ -1,0 +1,26 @@
+[
+  {
+    "path": "academy-media-version-upload.json",
+    "sha256": "4d01977d0e44b7a817eb2b3b069d9ddadf0af74a04814935aebd151fed55efe0"
+  },
+  {
+    "path": "academy-media-candidate-zero-percent.json",
+    "sha256": "8cbe90830db5ff7e99262a468ad30b7173147e5f0718c3e5d17c0f31e97fe3cb"
+  },
+  {
+    "path": "academy-media-candidate-smoke.json",
+    "sha256": "726399e1d7a31f23b6ed9e9bc5d2e90545f934e964a0671f20e4114d8040b4cd"
+  },
+  {
+    "path": "academy-media-production-activation.json",
+    "sha256": "2ee46c6eafb434cbd21221754b3312d7afb86e83339a683cf14903dd6e19fc84"
+  },
+  {
+    "path": "academy-media-production-proof.json",
+    "sha256": "4fbe8555365d9d334f90e6efa762942793e72be09dc08b50743eda091c02dbf2"
+  },
+  {
+    "path": "academy-media-production-sign-in.png",
+    "sha256": "f031d9635080dabdf173c2590dba7e389abdd448e03576ce2660ea6ff46a644a"
+  }
+]

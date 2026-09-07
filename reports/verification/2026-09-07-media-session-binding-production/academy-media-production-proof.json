@@ -1,0 +1,46 @@
+{
+  "checked_at": "2026-09-07T06:10:26.763Z",
+  "pass": true,
+  "results": [
+    {
+      "path": "/",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "access_login_body": false
+    },
+    {
+      "path": "/sign-in",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "access_login_body": false
+    },
+    {
+      "path": "/robots.txt",
+      "status": 200,
+      "content_type": "text/plain; charset=utf-8",
+      "access_login_body": false,
+      "robots_directive": true
+    },
+    {
+      "surface": "raw-host",
+      "status": 404
+    }
+  ],
+  "browser": {
+    "status": 200,
+    "origin": "https://academy.cyberskills.co.th",
+    "path": "/sign-in",
+    "title": "Sign in · CYBERSKILLS Academy",
+    "screenshot": "/private/tmp/cyberskills-prod-cde63a58/records/academy-media-production-sign-in.png"
+  },
+  "deployment": {
+    "id": "c1f0f8ae-fa8b-43d4-bf76-f18b5e336f5c",
+    "created_on": "2026-09-07T06:09:20.702487Z",
+    "versions": [
+      {
+        "version_id": "56c2e7bd-26be-4d68-bda1-70df901e6187",
+        "percentage": 100
+      }
+    ]
+  }
+}

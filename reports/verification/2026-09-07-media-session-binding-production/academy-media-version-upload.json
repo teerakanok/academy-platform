@@ -1,0 +1,21 @@
+{
+  "exit": 0,
+  "command": [
+    "node",
+    "node_modules/wrangler/bin/wrangler.js",
+    "versions",
+    "upload",
+    "--name",
+    "cyberskills-academy",
+    "--keep-vars",
+    "--tag",
+    "release-90866d8990ac",
+    "--message",
+    "s=90866d8990ac8707206db7938b0c53e5df44b2a4;session-bound-media-grants"
+  ],
+  "source": "90866d8990ac8707206db7938b0c53e5df44b2a4",
+  "version_ids": [
+    "56c2e7bd-26be-4d68-bda1-70df901e6187"
+  ],
+  "log_sha256": "746fa2d512d9c8cb096a4a2d93e38be972ec00cbce4ece1f087559aa50173cd3"
+}
