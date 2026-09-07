@@ -1,0 +1,6 @@
+workerd/server/server.c++:6943: debug: [ TEST ] academy-final-worker
+{"path":"/courses/assembly/en","status":200,"bytes":40476,"h1":"Assembly: Reading Machine Code"}
+{"path":"/courses/assembly/th","status":200,"bytes":39801,"h1":"ภาษาแอสเซมบลี: อ่านภาษาเครื่อง"}
+{"path":"/courses/setup-and-environment/en","status":200,"bytes":31121,"h1":"Setting Up"}
+{"path":"/courses/setup-and-environment/th","status":200,"bytes":30837,"h1":"ตั้งต้นให้พร้อม"}
+workerd/server/server.c++:6957: debug: [ PASS ] academy-final-worker (268.739ms)

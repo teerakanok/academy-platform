@@ -1,0 +1,6 @@
+{
+  "academy-web/package.json": "f407065ac92e29ec8730734892246951040493d393615c9a285879efe7b44885",
+  "academy-web/scripts/build-cloudflare.sh": "bcfa6f93bdb3f9802e9074bd21bc83fa6a3ff6752077204b4cac7d9a149ad6c9",
+  "academy-web/scripts/sync-open-next-cache.mjs": "2c3d53c9ce700d9b1cb608871bea2eb835058db70a6a4e3adfc56ed05443be8b",
+  "academy-web/tests/unit/static-asset-boundary.test.ts": "2b1d46e350b1ecad6d4e0fb472f21bf655eff4b1732db509f791cfd1f2be819e"
+}

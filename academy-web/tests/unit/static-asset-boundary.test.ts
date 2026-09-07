@@ -66,6 +66,7 @@ describe('deployed static-asset boundary', () => {
       expect(readFileSync(marker, 'utf8').trim().split('\n')).toEqual([
         'npm run verify:workerd',
         'npx opennextjs-cloudflare build',
+        'npm run cache:sync',
         'npm run asset-guard',
         'node scripts/check-final-worker-startup.mjs',
       ])

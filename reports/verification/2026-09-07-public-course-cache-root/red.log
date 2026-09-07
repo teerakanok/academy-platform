@@ -1,0 +1,29 @@
+workerd/server/server.c++:6943: debug: [ TEST ] academy-final-worker
+StaticAssetsIncrementalCache: Failed to set to read-only cache key=/_not-found type=cache
+{"path":"/courses/assembly/en","status":404,"bytes":5385,"h1":"404"}
+workerd/server/server.c++:6957: debug: [ FAIL ] academy-final-worker (292.259ms)
+Tests failed!
+node:child_process:964
+    throw err;
+    ^
+
+Error: Command failed: /private/tmp/academy-course-route-cde63a58/academy-web/node_modules/@cloudflare/workerd-darwin-arm64/bin/workerd test -Inode_modules --no-verbose .next/course-route-root.capnp academy-final-worker
+    at genericNodeError (node:internal/errors:998:15)
+    at wrappedFn (node:internal/errors:543:14)
+    at checkExecSyncError (node:child_process:925:11)
+    at Object.execFileSync (node:child_process:961:15)
+    at Object.<anonymous> (/private/tmp/academy-course-route-cde63a58/academy-web/node_modules/workerd/bin/workerd:139:26)
+    at Module._compile (node:internal/modules/cjs/loader:1803:14)
+    at Object..js (node:internal/modules/cjs/loader:1934:10)
+    at Module.load (node:internal/modules/cjs/loader:1524:32)
+    at Module._load (node:internal/modules/cjs/loader:1326:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14) {
+  status: 1,
+  signal: null,
+  output: [ null, null, null ],
+  pid: 20861,
+  stdout: null,
+  stderr: null
+}
+
+Node.js v25.5.0
