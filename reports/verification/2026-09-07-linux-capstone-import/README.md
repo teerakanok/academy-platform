@@ -1,0 +1,5 @@
+# Linux capstone source import — 2026-09-07
+
+Mechanical copy from Crucible e2d92bac9665db37619ecbf838282aaed53bafa1 courses/academy/basic-os-linux. All39packageJSON matchsource bytes; exactly6localizedlessonfiles changed. Eachofthreecapstonebanks now15MCQs EN/TH; originalquestions/noncheckpointfields preserved byCruciblerootRED/GREEN/fullcontent/plain/readerproof. No otherpackageorvisibilitychange; syllabus-preview remains.
+
+node scripts/generate-content-registry.mjs exit0 (11courses,450contentfiles,3consentversions;registryunchanged). npx --no-install vitest run --project unit exit0. npm run lint exit1 solely3acceptedbaselineerrors/16warnings. npm run build:cf exit0 with83syncedcacheassets,assetguard0,realworkerdstartup/rawhost404. Rawlogsretained. Local source import verified; no newproduction version yet, no authenticatedlearner proof. Currentliveapp remains5572e8318b67ebf7858c4c1fccf1831ae01d335f/version0eed364a. Beforepublicationuseexistingcandidate0/override/realbrowser/100/postproofflow. CrucibleINDEX continuation update required whenimportcommitknown.

@@ -1,0 +1,202 @@
+{
+  "source_commit": "e2d92bac9665db37619ecbf838282aaed53bafa1",
+  "source_package": "courses/academy/basic-os-linux",
+  "files": [
+    {
+      "path": "course.json",
+      "changed": false,
+      "sha256": "c6da25037360513a7e001ee64e5a6f930a9328a03af6f5ad86f383a7124a6a87"
+    },
+    {
+      "path": "locales/en/course.json",
+      "changed": false,
+      "sha256": "93edd4bb6ee939293c8eac7a2690576458847af6516f9a22ecdb532057fa4092"
+    },
+    {
+      "path": "locales/th/course.json",
+      "changed": false,
+      "sha256": "d60d713d1e900c33f254a068f0592cc4710f969648410b5cad2b6efbe367c1ce"
+    },
+    {
+      "path": "locales/th/lessons/filesystem-tree.json",
+      "changed": false,
+      "sha256": "8e5de654fd48e391572b695415a3129e681ae2508016eb03237334dc869330fd"
+    },
+    {
+      "path": "locales/th/lessons/permissions.json",
+      "changed": true,
+      "sha256": "7103dd2a4fdfb92a95422b8b461bb6b455f315382b4e643669ffed009e12f4b2"
+    },
+    {
+      "path": "locales/th/lessons/get-a-linux.json",
+      "changed": false,
+      "sha256": "ba79dae594883d5e1927c85a048f9eb551bd7088df82d295f069436ecbb74d18"
+    },
+    {
+      "path": "locales/th/lessons/text-and-regex.json",
+      "changed": false,
+      "sha256": "f050b99a0fab447876f8ee6c67c9d7a248a5c9a9e0ae626795caba292eb8e460"
+    },
+    {
+      "path": "locales/th/lessons/linux-and-distros.json",
+      "changed": false,
+      "sha256": "40d505182629418de98d482764a1096be3729dcc112344988a2de6964d416555"
+    },
+    {
+      "path": "locales/th/lessons/users-and-root.json",
+      "changed": false,
+      "sha256": "6c6c776493293b8693679d98b9c3e0c04b8a791d72121fbb04ecb4ea44ffb4e1"
+    },
+    {
+      "path": "locales/th/lessons/scheduling-with-cron.json",
+      "changed": false,
+      "sha256": "1e35d6077929b23358b1b7a912cc0a52039f5ede4b3f52347941d43f837a0201"
+    },
+    {
+      "path": "locales/th/lessons/pipes-and-logs.json",
+      "changed": true,
+      "sha256": "cbbc683104a29604fc4b568ae47a36d3f48c1c00c2037c39cc94243bbc062fbf"
+    },
+    {
+      "path": "locales/th/lessons/files-and-safety.json",
+      "changed": false,
+      "sha256": "6d5613674a5d3036612d20224449196588cdaa509c17c8d29608fbc499d03d2e"
+    },
+    {
+      "path": "locales/th/lessons/script-logic.json",
+      "changed": false,
+      "sha256": "9437703155b55230a67d5fea116561a1b01756711b838ed8e5eb03502d8e5413"
+    },
+    {
+      "path": "locales/th/lessons/first-shell-script.json",
+      "changed": false,
+      "sha256": "2296e9eea4f1bbce9891a1e418b53911fa829683111c379fc4e67f47d1005a45"
+    },
+    {
+      "path": "locales/th/lessons/sed-and-awk.json",
+      "changed": false,
+      "sha256": "27686141fc11c4e12e1f8e66cc4de4e87e683b7be9bd73daf540bacb90854b49"
+    },
+    {
+      "path": "locales/th/lessons/ssh-and-remote.json",
+      "changed": true,
+      "sha256": "4d4e89772bc40d90f8096b509aa8fbde7580bc7dcabadaf69ff89f0945a5f222"
+    },
+    {
+      "path": "locales/th/lessons/os-what-it-does.json",
+      "changed": false,
+      "sha256": "cea3b6811d9784d67ff3d6242833fb5930c9e4c9f00a73fcfb23a43d6d64bea5"
+    },
+    {
+      "path": "locales/th/lessons/navigate-and-look.json",
+      "changed": false,
+      "sha256": "bc4926ddab6958871db3c50c45307186d3d86278246f9c0f2aa63fea8bb8a133"
+    },
+    {
+      "path": "locales/th/lessons/signals-and-jobs.json",
+      "changed": false,
+      "sha256": "081c6ff4df5ead0955a395c3df446044d599a49f85339126fe4c786106add219"
+    },
+    {
+      "path": "locales/th/lessons/processes-and-packages.json",
+      "changed": false,
+      "sha256": "ee75624ad59bf1094bb0c8d5baa6fc0d8fe1a6d3c0c58149126ae4d5a791f13c"
+    },
+    {
+      "path": "locales/th/lessons/script-safety.json",
+      "changed": false,
+      "sha256": "15684bcfdda74a3801d1cc7a6b70ab0127a6da1dcee7a4ecf4a9ee904e64e137"
+    },
+    {
+      "path": "locales/en/lessons/filesystem-tree.json",
+      "changed": false,
+      "sha256": "ea5cf493b267315c0edd15d865ead5f30ae9296fc245172266f61e65cd58e7cd"
+    },
+    {
+      "path": "locales/en/lessons/permissions.json",
+      "changed": true,
+      "sha256": "bccb80a4d68e006f912ab0787c31d7dbebfe1509984c263344684089bc543929"
+    },
+    {
+      "path": "locales/en/lessons/get-a-linux.json",
+      "changed": false,
+      "sha256": "d08a05f069b20fa89a167e28d436afeed6ffd67eb82c9685358b67ab85e52c7e"
+    },
+    {
+      "path": "locales/en/lessons/text-and-regex.json",
+      "changed": false,
+      "sha256": "f0cb9c8c9eea7d4f8bcb4aff903bdf63001dc92874863de521df656ae0a8efbb"
+    },
+    {
+      "path": "locales/en/lessons/linux-and-distros.json",
+      "changed": false,
+      "sha256": "962b54183743ee012d8adfe883ca0ef94d3e99c85405b4099bbd1487b4298447"
+    },
+    {
+      "path": "locales/en/lessons/users-and-root.json",
+      "changed": false,
+      "sha256": "55803aafbdb57f107d0fb70cdd2e3e7a153a2c0c56be0f7efcfeff2564a0184d"
+    },
+    {
+      "path": "locales/en/lessons/scheduling-with-cron.json",
+      "changed": false,
+      "sha256": "d56c9e138f131435df773c1e11a971808d439aa7085f42826167f93e3594ca2d"
+    },
+    {
+      "path": "locales/en/lessons/pipes-and-logs.json",
+      "changed": true,
+      "sha256": "883dc173d4a3cb68ab725b5ff1750a231ebf10b7e72c03c102b2ee5a4e07d331"
+    },
+    {
+      "path": "locales/en/lessons/files-and-safety.json",
+      "changed": false,
+      "sha256": "ca4ec45db4689c07882203636a62af3487223ee8eb9d4ca19d62192a3eecb0f4"
+    },
+    {
+      "path": "locales/en/lessons/script-logic.json",
+      "changed": false,
+      "sha256": "ff9a3f4158d363b2a0f58f33d26f4025d7327fad892c30fb202e9144b7d0d6c7"
+    },
+    {
+      "path": "locales/en/lessons/first-shell-script.json",
+      "changed": false,
+      "sha256": "88060b3bb45ad774508d7fc8aab9de9b518ec961014794e51c9294d66f7ac8c1"
+    },
+    {
+      "path": "locales/en/lessons/sed-and-awk.json",
+      "changed": false,
+      "sha256": "66dedb93e6182a4e14e55b1b00504399685bf33c49058b88e69517d301e2dc36"
+    },
+    {
+      "path": "locales/en/lessons/ssh-and-remote.json",
+      "changed": true,
+      "sha256": "e603e056a913ac60bb9539980bb61e636b9bad1adb100e3d3d377919569bc34a"
+    },
+    {
+      "path": "locales/en/lessons/os-what-it-does.json",
+      "changed": false,
+      "sha256": "545251b130ef5a0d518a9041389ca642c6dc665b8a238c5f29f77034705ab331"
+    },
+    {
+      "path": "locales/en/lessons/navigate-and-look.json",
+      "changed": false,
+      "sha256": "bf1bf7930383f5d98c4e5754455c8dc281b80a94785f86a1b3bd8e73ce8a4cde"
+    },
+    {
+      "path": "locales/en/lessons/signals-and-jobs.json",
+      "changed": false,
+      "sha256": "9eec52ea477f9df4ed68da59adf6d59bf65fd1dd7742cf1581878eb521f7e711"
+    },
+    {
+      "path": "locales/en/lessons/processes-and-packages.json",
+      "changed": false,
+      "sha256": "e9ed1aad3fa780e77207d46526694db7dd9b6c6a74c0a9d3ad38349617e68966"
+    },
+    {
+      "path": "locales/en/lessons/script-safety.json",
+      "changed": false,
+      "sha256": "fd9b357e488c2a0225f053fd6d71122c8e816d7df8c2b85d77f67bfcd7834a99"
+    }
+  ],
+  "visibility": "unchanged syllabus-preview"
+}
