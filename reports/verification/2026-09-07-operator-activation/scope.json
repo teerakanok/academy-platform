@@ -1,0 +1,8 @@
+{
+  "sourceRevision": "1e2b0ff7cb09a0d5205aa61ab22060fea6fed037",
+  "paths": [
+    "academy-web/scripts/academy-production-operation-install-command.mjs",
+    "academy-web/scripts/academy-production-operation-install-command.test.mjs"
+  ],
+  "liveOperations": false
+}

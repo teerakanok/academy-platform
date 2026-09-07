@@ -1,0 +1,24 @@
+[
+  {
+    "name": "unit",
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--project",
+      "unit"
+    ],
+    "exit_code": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-operator-activation-root-unit.log"
+  },
+  {
+    "name": "lint",
+    "command": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "exit_code": 1,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-operator-activation-root-lint.log"
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "command": [
+    "node",
+    "--test",
+    "scripts/academy-production-operation-install-command.test.mjs",
+    "scripts/academy-production-operation.test.mjs",
+    "scripts/academy-production-operation-install.test.mjs"
+  ],
+  "exit_code": 0,
+  "source_sha256": {
+    "scripts/academy-production-operation-install-command.mjs": "29486821142d4430da8d0c33b5d6c161c2551eac55411cba4abaa0995ae2ede4",
+    "scripts/academy-production-operation-install-command.test.mjs": "1012a6a931a80f0e145ca8ee61b64d74f8ad8510726a594c725370a9801e635d"
+  },
+  "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-operator-activation-root-focused.log",
+  "scope_note": "Only two existing test files executed (2/2): install-command.test.mjs and operation.test.mjs. The third argv path operation-install.test.mjs does not exist; Node ignored it. Existing operation.test.mjs owns installer coverage; no third-test claim."
+}
