@@ -243,6 +243,160 @@
         "B"
       ],
       "explanation": "buffer การจอง ลูป การแกะข้อมูล การแปลงจำนวนเต็ม — ทุกกลุ่มข้อบกพร่องในคอร์สนี้คือรูปแบบหนึ่งของคำถามนั้นที่ไม่ได้ถูกตอบ"
+    },
+    {
+      "id": "cp-5",
+      "prompt": "สิ่งแรกที่ควรทำกับโปรเจกต์ C ที่ไม่คุ้นคืออะไร",
+      "choices": {
+        "A": "The compiler handles it automatically",
+        "B": "It only changes performance",
+        "C": "build มัน",
+        "D": "It is unrelated to the program data"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "โปรเจกต์ที่ build ได้จึงรัน แก้ และสำรวจ dependency จริงได้."
+    },
+    {
+      "id": "cp-6",
+      "prompt": "ทำไมเริ่มจาก header",
+      "choices": {
+        "A": "It only changes performance",
+        "B": "มันบรรยาย intended interface",
+        "C": "The compiler handles it automatically",
+        "D": "It is unrelated to the program data"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "มันให้แผนที่ module ก่อนรายละเอียด implementation."
+    },
+    {
+      "id": "cp-7",
+      "prompt": "ทำไมตาม execution path หนึ่งเส้นจนจบ",
+      "choices": {
+        "A": "มันเชื่อม input, check และ output",
+        "B": "It only changes performance",
+        "C": "The compiler handles it automatically",
+        "D": "It is unrelated to the program data"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "การอ่านเรียงชื่อไฟล์ซ่อนการเดินของข้อมูล."
+    },
+    {
+      "id": "cp-8",
+      "prompt": "grep หา memcpy ให้อะไร",
+      "choices": {
+        "A": "It is unrelated to the program data",
+        "B": "It only changes performance",
+        "C": "The compiler handles it automatically",
+        "D": "จุดที่ต้องถาม provenance ของ length"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "call ไม่ได้เป็น defect อัตโนมัติ ต้องตรวจ size ของมัน."
+    },
+    {
+      "id": "cp-9",
+      "prompt": "nm ช่วยเผยอะไร",
+      "choices": {
+        "A": "symbol ที่ binary นิยามหรือต้องการ",
+        "B": "It only changes performance",
+        "C": "The compiler handles it automatically",
+        "D": "It is unrelated to the program data"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "มันช่วยเชื่อมความคาดหวังของ source กับ binary linkage."
+    },
+    {
+      "id": "cp-10",
+      "prompt": "backtrace ของ debugger แสดงอะไร",
+      "choices": {
+        "A": "The compiler handles it automatically",
+        "B": "It only changes performance",
+        "C": "call chain ที่กำลังทำงาน",
+        "D": "It is unrelated to the program data"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "มันให้บริบทของจุดทำงานปัจจุบันและ caller."
+    },
+    {
+      "id": "cp-11",
+      "prompt": "ทำไมดู git log หรือ blame",
+      "choices": {
+        "A": "It is unrelated to the program data",
+        "B": "It only changes performance",
+        "C": "The compiler handles it automatically",
+        "D": "มันอธิบายได้ว่าทำไมมีโค้ดแปลก"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "history อาจบอกเหตุผล compatibility หรือ bug fix ก่อนแก้โค้ด."
+    },
+    {
+      "id": "cp-12",
+      "prompt": "ควรถามอะไรตามทุก buffer operation",
+      "choices": {
+        "A": "It only changes performance",
+        "B": "size หรือ index มาจากไหนและใครตรวจ",
+        "C": "The compiler handles it automatically",
+        "D": "It is unrelated to the program data"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "คำถามนี้ตาม untrusted value ก่อนคุม memory access."
+    },
+    {
+      "id": "cp-13",
+      "prompt": "grep hit ของ malloc ที่ไม่ตรวจคืออะไร",
+      "choices": {
+        "A": "The compiler handles it automatically",
+        "B": "It only changes performance",
+        "C": "คำถาม review เรื่อง failure handling",
+        "D": "It is unrelated to the program data"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "hit ชี้ให้ตรวจว่า NULL และ cleanup ถูกจัดการหรือไม่."
+    },
+    {
+      "id": "cp-14",
+      "prompt": "ทำไม system หรือ exec จึงเป็น target ของ review",
+      "choices": {
+        "A": "argument ของมันเข้าไปยัง process อื่นได้",
+        "B": "It only changes performance",
+        "C": "The compiler handles it automatically",
+        "D": "It is unrelated to the program data"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "ต้องตรวจ input และ quoting ก่อนเรียกโปรแกรมอื่น."
+    },
+    {
+      "id": "cp-15",
+      "prompt": "โปรเจกต์ฝึกต่อที่มีประโยชน์คืออะไร",
+      "choices": {
+        "A": "It is unrelated to the program data",
+        "B": "It only changes performance",
+        "C": "The compiler handles it automatically",
+        "D": "โปรแกรมจริงขนาดเล็กที่มี file format"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "มันฝึก parsing, size, ownership, error และ debugging ร่วมกัน."
     }
   ]
 }

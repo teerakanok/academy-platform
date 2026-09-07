@@ -316,6 +316,160 @@
         "A"
       ],
       "explanation": "A well-predicted branch already costs almost nothing, so removing it gains nothing while adding the other side's work. And a side with an effect cannot be executed unconditionally at all."
+    },
+    {
+      "id": "cp-5",
+      "prompt": "What does a mispredicted branch make the processor do in this lesson?",
+      "choices": {
+        "A": "Keep executing the fetched path",
+        "B": "Discard work fetched after the branch and restart at the correct address",
+        "C": "Re-run the whole program",
+        "D": "Change the source code"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "When the branch resolves wrong, instructions fetched from the guessed path cannot retire. Fetch resumes from the correct target."
+    },
+    {
+      "id": "cp-6",
+      "prompt": "Why does a two-bit saturating predictor avoid one common one-bit loop mistake?",
+      "choices": {
+        "A": "It stores all program inputs",
+        "B": "It knows every loop bound",
+        "C": "It removes the branch instruction",
+        "D": "One unusual outcome does not immediately reverse its prediction"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "A loop exit is often one not-taken outcome after many taken outcomes. Two bits require another miss before changing direction."
+    },
+    {
+      "id": "cp-7",
+      "prompt": "Why did sorting data speed the threshold loop at -O0 in the lesson?",
+      "choices": {
+        "A": "It made branch outcomes occur in long predictable runs",
+        "B": "It changed the final sum",
+        "C": "It reduced the number of additions",
+        "D": "It guaranteed a cache hit"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The elements and arithmetic are unchanged. Sorted values make the comparison false for a run and then true for a run, which history learns."
+    },
+    {
+      "id": "cp-8",
+      "prompt": "What must you inspect before claiming a benchmark measures branch prediction at a chosen optimisation level?",
+      "choices": {
+        "A": "The source file name",
+        "B": "The disk free space",
+        "C": "The generated assembly",
+        "D": "The compiler logo"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The lesson’s -O2 build removed the conditional branch. Assembly inspection establishes whether a branch remains to predict."
+    },
+    {
+      "id": "cp-9",
+      "prompt": "At -O2, what transformation explained equal sorted and unsorted timings in the example?",
+      "choices": {
+        "A": "The array was sorted automatically",
+        "B": "The processor stopped speculating",
+        "C": "The comparison became a mask and the add ran unconditionally",
+        "D": "The loop ran only once"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The optimiser produced branchless work: failing elements contribute zero through a mask, so branch direction no longer affects timing."
+    },
+    {
+      "id": "cp-10",
+      "prompt": "When is branchless code often a poor trade in this lesson?",
+      "choices": {
+        "A": "When one path is costly or has side effects",
+        "B": "When the condition is unpredictable and both sides are cheap",
+        "C": "When a comparison produces a mask",
+        "D": "When the array is sorted"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Branchless code may evaluate both sides. That is wasteful for expensive work and incorrect when a skipped path must not cause effects."
+    },
+    {
+      "id": "cp-11",
+      "prompt": "Why should two benchmark cases be interleaved and repeated?",
+      "choices": {
+        "A": "To force a different instruction set",
+        "B": "To remove the need for a timer",
+        "C": "To make each run use more memory",
+        "D": "To reduce ordering effects and distinguish stable results from noise"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Running one case first can warm hardware or trigger setup effects. Alternating cases and repeating helps expose that bias."
+    },
+    {
+      "id": "cp-12",
+      "prompt": "Which branch is least helped by longer local history?",
+      "choices": {
+        "A": "A loop branch with many similar iterations",
+        "B": "A branch driven by genuinely unpredictable data",
+        "C": "A branch that is always taken",
+        "D": "A branch that repeats a short learnable pattern"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "History predicts patterns only when prior outcomes relate to the next one. Random-looking input gives no stable pattern to learn."
+    },
+    {
+      "id": "cp-13",
+      "prompt": "Why must fetch choose a next address before a branch resolves?",
+      "choices": {
+        "A": "The fetch stage needs instructions to keep the pipeline supplied",
+        "B": "A resolved branch cannot change control flow",
+        "C": "A compiler cannot emit branch targets",
+        "D": "The cache stores only one address"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Waiting for each branch would leave later stages without instructions and lose the overlap the pipeline was built to provide."
+    },
+    {
+      "id": "cp-14",
+      "prompt": "What does a correct prediction avoid?",
+      "choices": {
+        "A": "All arithmetic in the branch condition",
+        "B": "The need to fetch instructions",
+        "C": "Discarding instructions from a wrong path",
+        "D": "The need for a comparison"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "A correct guess lets fetched instructions continue normally. The penalty arises when the wrong-path fetch must be thrown away."
+    },
+    {
+      "id": "cp-15",
+      "prompt": "What conclusion is justified if an optimisation removes a conditional branch?",
+      "choices": {
+        "A": "Every program should be rewritten branchlessly",
+        "B": "The original predictor became more accurate",
+        "C": "The data became sorted",
+        "D": "That benchmark no longer isolates branch-misprediction cost"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "After removing the conditional branch, no direction remains to predict. That build measures a different cost."
     }
   ]
 }

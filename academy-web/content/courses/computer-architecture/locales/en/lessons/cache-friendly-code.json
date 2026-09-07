@@ -275,6 +275,160 @@
         "C"
       ],
       "explanation": "And the ranking follows from the hardware, so it must be re-checked on the target machine. 58x, 5.9x and 1.3x give the ranking. A machine with less bandwidth would raise the importance of volume, which is why the numbers must be reproduced where the code will run."
+    },
+    {
+      "id": "cp-5",
+      "prompt": "Why does row-order traversal usually use a fetched cache block more fully for the shown row-major matrix?",
+      "choices": {
+        "A": "It disables the cache",
+        "B": "It changes integer arithmetic",
+        "C": "It allocates fewer rows",
+        "D": "It visits adjacent elements stored together"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "In the shown layout, neighbouring columns of one row are adjacent in memory. Sequential traversal can consume several useful elements from a fetched block."
+    },
+    {
+      "id": "cp-6",
+      "prompt": "What does tiling change in the slow column-style traversal?",
+      "choices": {
+        "A": "The matrix values",
+        "B": "The loop’s result type",
+        "C": "The order so a small region is reused before moving on",
+        "D": "The cache line size"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Tiling groups work on a small submatrix. It improves reuse before the traversal jumps to distant memory again, without changing the mathematical result."
+    },
+    {
+      "id": "cp-7",
+      "prompt": "Why should the best tile size be measured on the target machine?",
+      "choices": {
+        "A": "Every compiler chooses 16 by rule",
+        "B": "Cache capacity and surrounding workload affect reuse",
+        "C": "The matrix must always be 64 MB",
+        "D": "Tiling removes all cache misses"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The lesson’s 16x16 peak is a measurement on one machine. Cache hierarchy, data size, and other activity can shift the useful size."
+    },
+    {
+      "id": "cp-8",
+      "prompt": "What is the useful warning from an array-of-structures versus separate-arrays result that improves only modestly?",
+      "choices": {
+        "A": "Reduced traffic does not guarantee a large speedup for a sequential stream on that hardware",
+        "B": "Data layout never matters",
+        "C": "The cache is disabled",
+        "D": "The code is incorrect"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The measured stream had enough prefetching and bandwidth that moving extra bytes was relatively cheap. Measure the actual bottleneck before claiming a large gain."
+    },
+    {
+      "id": "cp-9",
+      "prompt": "Which change preserves the computation but can turn a poor matrix access pattern into a more local one?",
+      "choices": {
+        "A": "Use a larger integer type",
+        "B": "Tile the loop over bounded row and column ranges",
+        "C": "Remove the inner loop",
+        "D": "Store the answer in a global variable"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A tiled loop still visits the required elements but groups nearby accesses so data can be reused while it remains resident."
+    },
+    {
+      "id": "cp-10",
+      "prompt": "What does a peak followed by worse timings for larger tiles suggest?",
+      "choices": {
+        "A": "The CPU stopped executing instructions",
+        "B": "The program changed its answer",
+        "C": "The compiler deleted the loop",
+        "D": "The working set stopped fitting as well in a useful cache level"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "As a tile grows, data needed for reuse can displace itself or compete for cache space. The peak is evidence to investigate, not a universal cache-size proof."
+    },
+    {
+      "id": "cp-11",
+      "prompt": "Why is a performance number without the tested machine incomplete?",
+      "choices": {
+        "A": "It hides which programming language was used",
+        "B": "It cannot be written in a report",
+        "C": "Hardware and system conditions can change the bottleneck",
+        "D": "All machines have identical caches"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The lesson’s ranking follows its measured hardware. Different cache, bandwidth, data size, and load can change both the size and cause of an effect."
+    },
+    {
+      "id": "cp-12",
+      "prompt": "For a loop that uses only x from each large particle, what layout may reduce unused data brought in?",
+      "choices": {
+        "A": "A field array containing x values",
+        "B": "A larger particle structure",
+        "C": "A random pointer chain",
+        "D": "A branch for every particle"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Separating frequently used fields can avoid fetching unrelated fields. The payoff still depends on access order and available bandwidth."
+    },
+    {
+      "id": "cp-13",
+      "prompt": "What should you do when a layout change gives no measurable improvement?",
+      "choices": {
+        "A": "Claim a tenfold gain from reduced bytes",
+        "B": "Assume the timer is wrong",
+        "C": "Keep the result and investigate the actual bottleneck",
+        "D": "Delete the benchmark"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "A null result is evidence about this workload and machine. It may show streaming already hides the traffic cost or that another limit dominates."
+    },
+    {
+      "id": "cp-14",
+      "prompt": "Which property makes hardware prefetching more likely to help?",
+      "choices": {
+        "A": "Each address is data-dependent and random",
+        "B": "Addresses follow a regular forward pattern",
+        "C": "The loop changes source code",
+        "D": "The result is stored on disk"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Regular sequential accesses give hardware a usable next-address pattern. Pointer chasing and irregular jumps give much less warning."
+    },
+    {
+      "id": "cp-15",
+      "prompt": "What comparison makes a cache-layout benchmark fair?",
+      "choices": {
+        "A": "Compare two versions with different answers",
+        "B": "Use a different compiler for each version",
+        "C": "Run only the faster version",
+        "D": "Keep the data, useful work, and correctness check equivalent"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "A fair test changes the layout or traversal deliberately while preserving the computation. Otherwise a timing difference may come from doing different work."
     }
   ]
 }

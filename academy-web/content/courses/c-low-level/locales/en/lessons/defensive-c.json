@@ -265,6 +265,160 @@
         "B"
       ],
       "explanation": "They turn a possible runtime defect into a compile error — or remove the possibility entirely. A check that cannot be skipped. A runtime check has to be written, kept, and executed. A compile-time impossibility needs none of those things."
+    },
+    {
+      "id": "cp-5",
+      "prompt": "When should a negative untrusted length be rejected?",
+      "choices": {
+        "A": "It is unrelated to the program data",
+        "B": "It only changes performance",
+        "C": "The compiler handles it automatically",
+        "D": "Before converting it to size_t"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Conversion turns a negative value into a large unsigned value."
+    },
+    {
+      "id": "cp-6",
+      "prompt": "Why initialize a pointer to NULL?",
+      "choices": {
+        "A": "The compiler handles it automatically",
+        "B": "It only changes performance",
+        "C": "It gives failure paths a defined empty value",
+        "D": "It is unrelated to the program data"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Cleanup can test or free it safely instead of using an indeterminate pointer."
+    },
+    {
+      "id": "cp-7",
+      "prompt": "What should a buffer API accept with the pointer?",
+      "choices": {
+        "A": "It only changes performance",
+        "B": "Its capacity",
+        "C": "The compiler handles it automatically",
+        "D": "It is unrelated to the program data"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The function needs a bound before it can write safely."
+    },
+    {
+      "id": "cp-8",
+      "prompt": "Why avoid duplicated size literals?",
+      "choices": {
+        "A": "A changed buffer can drift from its old literal",
+        "B": "It only changes performance",
+        "C": "The compiler handles it automatically",
+        "D": "It is unrelated to the program data"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Deriving size at the declaration site prevents stale constants."
+    },
+    {
+      "id": "cp-9",
+      "prompt": "What does strtol offer over atoi?",
+      "choices": {
+        "A": "It only changes performance",
+        "B": "It reports conversion errors through end pointers and range checks",
+        "C": "The compiler handles it automatically",
+        "D": "It is unrelated to the program data"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Callers can validate malformed input instead of receiving an ambiguous value."
+    },
+    {
+      "id": "cp-10",
+      "prompt": "What is the purpose of a guard clause?",
+      "choices": {
+        "A": "It is unrelated to the program data",
+        "B": "It only changes performance",
+        "C": "The compiler handles it automatically",
+        "D": "Reject invalid preconditions early"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The successful path stays flat and easier to review."
+    },
+    {
+      "id": "cp-11",
+      "prompt": "Why state ownership for a returned pointer?",
+      "choices": {
+        "A": "The compiler handles it automatically",
+        "B": "It only changes performance",
+        "C": "It tells the caller who must free it",
+        "D": "It is unrelated to the program data"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Without ownership, leaks and double frees become likely."
+    },
+    {
+      "id": "cp-12",
+      "prompt": "What does const help prevent?",
+      "choices": {
+        "A": "Writes through an interface that promises read-only data",
+        "B": "It only changes performance",
+        "C": "The compiler handles it automatically",
+        "D": "It is unrelated to the program data"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The compiler can reject code that violates that interface."
+    },
+    {
+      "id": "cp-13",
+      "prompt": "What is safer than a runtime check when possible?",
+      "choices": {
+        "A": "The compiler handles it automatically",
+        "B": "It only changes performance",
+        "C": "Making the invalid state impossible at compile time",
+        "D": "It is unrelated to the program data"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Types, enums, and static constraints remove a path instead of detecting it late."
+    },
+    {
+      "id": "cp-14",
+      "prompt": "What must an error path do after partial allocation?",
+      "choices": {
+        "A": "It only changes performance",
+        "B": "Release every resource it owns",
+        "C": "The compiler handles it automatically",
+        "D": "It is unrelated to the program data"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Error handling must follow the same ownership rule as success cleanup."
+    },
+    {
+      "id": "cp-15",
+      "prompt": "What should a review trace for each size?",
+      "choices": {
+        "A": "It is unrelated to the program data",
+        "B": "It only changes performance",
+        "C": "The compiler handles it automatically",
+        "D": "Where it came from and where it was validated"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Following size provenance exposes unchecked data before it reaches memory operations."
     }
   ]
 }

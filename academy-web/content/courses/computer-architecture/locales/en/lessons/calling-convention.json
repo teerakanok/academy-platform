@@ -231,6 +231,160 @@
         "A"
       ],
       "explanation": "It is the same structure a buffer overflow corrupts when it reaches the saved return address — which is why the protections around that field exist."
+    },
+    {
+      "id": "cp-5",
+      "prompt": "In the shown AArch64 caller, which register already holds the first integer argument?",
+      "choices": {
+        "A": "w2",
+        "B": "w1",
+        "C": "w0",
+        "D": "x30"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The caller receives x in w0. It computes the second and third arguments into w1 and w2 before bl helper."
+    },
+    {
+      "id": "cp-6",
+      "prompt": "Which instruction in the example transfers control to helper and records where to return?",
+      "choices": {
+        "A": "bl _helper",
+        "B": "ret",
+        "C": "ldp x29, x30, [sp], #16",
+        "D": "mov x29, sp"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "bl branches to the callee and writes the return address to the link register. Saving that value to the stack is separate work."
+    },
+    {
+      "id": "cp-7",
+      "prompt": "After helper returns, where does the shown caller find its integer result?",
+      "choices": {
+        "A": "w1",
+        "B": "x30",
+        "C": "w2",
+        "D": "w0"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The example shifts w0 immediately after bl helper. Under this lesson’s AArch64 example, w0 carries the returned integer value."
+    },
+    {
+      "id": "cp-8",
+      "prompt": "Why does caller save x30 before it calls helper?",
+      "choices": {
+        "A": "It needs an extra argument register",
+        "B": "A nested call would replace caller’s return address",
+        "C": "ret cannot read x30",
+        "D": "The stack requires every function to save x30"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "bl helper writes a new return address to x30. caller must preserve its own return address before that overwrite if it will later return."
+    },
+    {
+      "id": "cp-9",
+      "prompt": "What does stp x29, x30, [sp, #-16]! do in the shown prologue?",
+      "choices": {
+        "A": "Restores two registers and raises sp",
+        "B": "Saves the frame pointer and return address while allocating 16 bytes",
+        "C": "Compares x29 with x30",
+        "D": "Passes two stack arguments"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The paired store writes x29 and x30 at the decremented stack pointer. The ! updates sp as part of that instruction."
+    },
+    {
+      "id": "cp-10",
+      "prompt": "Which statement about callee-saved registers is correct?",
+      "choices": {
+        "A": "They hold return addresses only",
+        "B": "The caller may always discard its value after a call",
+        "C": "They are only used by leaf functions",
+        "D": "A callee that uses one must restore its incoming value before returning"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Callee-saved means the called function preserves the value visible to its caller when it chooses to use that register."
+    },
+    {
+      "id": "cp-11",
+      "prompt": "Which fact can make a compiler create a frame even for a function that does not call another function?",
+      "choices": {
+        "A": "Its local state needs stack storage, such as an addressable or spilled value",
+        "B": "It has two integer arguments",
+        "C": "It returns an integer",
+        "D": "It uses an add instruction"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The two-instruction leaf is one observed example, not a universal promise. Locals, spills, alignment, or tool settings can still require stack space."
+    },
+    {
+      "id": "cp-12",
+      "prompt": "What does ldp x29, x30, [sp], #16 accomplish before ret?",
+      "choices": {
+        "A": "Calls the previous function",
+        "B": "Loads two outgoing arguments",
+        "C": "Restores saved state and releases this 16-byte frame",
+        "D": "Predicts the next branch"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The paired load restores x29 and x30 from the current stack frame, then post-indexing raises sp by 16 bytes."
+    },
+    {
+      "id": "cp-13",
+      "prompt": "Why is a calling convention needed when both caller and callee are compiled separately?",
+      "choices": {
+        "A": "It makes all functions use the same instruction count",
+        "B": "It chooses a cache replacement policy",
+        "C": "It prevents every stack overflow",
+        "D": "It lets code agree on argument, result, and preservation locations"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Separate pieces of machine code need a shared contract for where values go and which registers survive a call."
+    },
+    {
+      "id": "cp-14",
+      "prompt": "A debugger follows saved return addresses to show a backtrace. Which field is it using in the shown non-leaf frame?",
+      "choices": {
+        "A": "The branch predictor history",
+        "B": "The current w0 result",
+        "C": "The saved x30 value",
+        "D": "The instruction cache tag"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The return address saved from x30 links this frame to the instruction that resumes in its caller, allowing stack walking."
+    },
+    {
+      "id": "cp-15",
+      "prompt": "Why can inlining remove call-frame work in an appropriate build?",
+      "choices": {
+        "A": "It changes all locals into globals",
+        "B": "The call site disappears, so no nested call needs its return address preserved",
+        "C": "It makes x30 callee-saved",
+        "D": "It turns every function into a system call"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "When the compiler replaces a call with the callee body, there may be no call instruction and no nested return address to save at that call site."
     }
   ]
 }

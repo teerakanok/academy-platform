@@ -1,0 +1,597 @@
+{
+  "source_revision": "a83e71c55696e89e41ef3c39040f35cb176223f3",
+  "courses": [
+    "courses/academy/computer-architecture",
+    "courses/academy/c-low-level"
+  ],
+  "files": [
+    {
+      "source": "courses/academy/computer-architecture/course.json",
+      "target": "academy-web/content/courses/computer-architecture/course.json",
+      "sha256": "d0b80158232b58cbff1dce0c653e060d30ad7a842ab705fc445328af726464cd",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/en/course.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/en/course.json",
+      "sha256": "72db55bd56189f9d89e4547900339279038db25f5bb70efde2400b418ec4cd2b",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/en/lessons/addressing-modes.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/en/lessons/addressing-modes.json",
+      "sha256": "74bced46969909554f2227b3a8f8fded7b023ef91f1b309448cd37b3db9d5c6f",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/en/lessons/bandwidth-numa-hbm.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/en/lessons/bandwidth-numa-hbm.json",
+      "sha256": "9b94da7f1df2719da6afcf1e7961a856e8c266a99300648bf0140210a6608970",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/en/lessons/cache-friendly-code.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/en/lessons/cache-friendly-code.json",
+      "sha256": "b6000801d5ab5347e28f8e2adc109a234f776fd29f6ce4996961ced6664b2702",
+      "changed": true
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/en/lessons/cache-mapping.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/en/lessons/cache-mapping.json",
+      "sha256": "be0cd9b455ab38e0f5f978f36e10ca27960c04334c7f705e6589efd7e4645d81",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/en/lessons/calling-convention.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/en/lessons/calling-convention.json",
+      "sha256": "0c62adb1b15d55f93a8c827f6f5100309981bf755ff48a4e471ef5704f678647",
+      "changed": true
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/en/lessons/control-hazards-and-prediction.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/en/lessons/control-hazards-and-prediction.json",
+      "sha256": "ba7aa5fe4142e00543531583be0cb409cb5bb2b001f6ac6515408436f6bce976",
+      "changed": true
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/en/lessons/control-signals.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/en/lessons/control-signals.json",
+      "sha256": "af77b07019c5813671b4490620ea113644af3f1f5b24d3e0928babc16190adf2",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/en/lessons/data-hazards-and-forwarding.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/en/lessons/data-hazards-and-forwarding.json",
+      "sha256": "7fc62ceab805cf261738b4183ab32d3e43ad6bd3a73692696a52326e7ee67920",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/en/lessons/ddr-generations.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/en/lessons/ddr-generations.json",
+      "sha256": "d614dac9dd5c32b2e896a6bcf37ee547ed59d5ac322148720524beeb0494f996",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/en/lessons/dram-cells-and-timing.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/en/lessons/dram-cells-and-timing.json",
+      "sha256": "0288617baecda824738f4834545a5dc6196bd74c61f6961fdacfabc755a06261",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/en/lessons/hit-miss-and-write-policy.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/en/lessons/hit-miss-and-write-policy.json",
+      "sha256": "f830af46d482bedcf7f23e00ec85307915c496ef09f65dd4bc659d61fc69eefc",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/en/lessons/instruction-encoding.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/en/lessons/instruction-encoding.json",
+      "sha256": "79b2b4b8614ac7684188a531ecdee8948923d5a37eacdfb85ad76fd2694e4f2f",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/en/lessons/instruction-formats.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/en/lessons/instruction-formats.json",
+      "sha256": "a2191fe4810b28702868d5adfa8656f1dbd8955328f3965411ce0878d896f221",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/en/lessons/load-store-architecture.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/en/lessons/load-store-architecture.json",
+      "sha256": "1df266a1bc8af9f3a756f1694f10c3ab4d86e79a88552e4f6125f47c04c8b217",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/en/lessons/load-use-stall.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/en/lessons/load-use-stall.json",
+      "sha256": "62e3730b20c268280546f6b3e3ee5b940aa0af35508bc354bce9d2e7ee4ecf86",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/en/lessons/locality.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/en/lessons/locality.json",
+      "sha256": "6b4cfe75046ab8c7459ca5cfdf87cc5e8bcc1158bdb84359f98ef9481f98fbae",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/en/lessons/multi-cycle-and-cpi.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/en/lessons/multi-cycle-and-cpi.json",
+      "sha256": "e1d26099107d8686b30f7c5e9ff622d519eb5988760020b0be1b23ccb47e5929",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/en/lessons/pipeline-stages.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/en/lessons/pipeline-stages.json",
+      "sha256": "4d72d43e26d8998c51595619b233a864cf2e345e9d034edee044901be585ef56",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/en/lessons/risc-vs-cisc.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/en/lessons/risc-vs-cisc.json",
+      "sha256": "dcf74d9ff165f8d444d0831ef1e57a61a1cff16f538a60e89b8dd41935e2ec47",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/en/lessons/single-cycle-datapath.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/en/lessons/single-cycle-datapath.json",
+      "sha256": "0d16f596fada7f14f0b6cbef9bb2520d28fe655f79c5dda65a2a1a5c5263b788",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/en/lessons/throughput-vs-latency.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/en/lessons/throughput-vs-latency.json",
+      "sha256": "49308de862312101b21b5f271e927ce555213c7e8811955f902fc17c48d4f263",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/en/lessons/what-is-an-isa.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/en/lessons/what-is-an-isa.json",
+      "sha256": "8d2a261030b916f9b07829ad7e4514e0a865e5e118231bd27355c5da0ee07fc0",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/th/course.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/th/course.json",
+      "sha256": "11fc4488725be894a8109f84fd5cf7e5abc9002553ec66ab3c0bab38f8b9ee30",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/th/lessons/addressing-modes.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/th/lessons/addressing-modes.json",
+      "sha256": "0108d86d19bf2d07a28ecdb7ba01a44e7a94fb13659203e991c1351994784ceb",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/th/lessons/bandwidth-numa-hbm.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/th/lessons/bandwidth-numa-hbm.json",
+      "sha256": "02207fa3c9f820e9e4eda2960f7cf8304d90eb71286f8daac8b85cb6615a61aa",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/th/lessons/cache-friendly-code.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/th/lessons/cache-friendly-code.json",
+      "sha256": "aa59985e004b7a4b893adbc5b365c39be5af87afcd3fe678f9db49a751489b12",
+      "changed": true
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/th/lessons/cache-mapping.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/th/lessons/cache-mapping.json",
+      "sha256": "f812810e514402f7fc370fe4e14ccb6143d248f89bf051b529bf2b9873ae6dd6",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/th/lessons/calling-convention.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/th/lessons/calling-convention.json",
+      "sha256": "d2dcb2e03cc30603bb37a9ac85615095fde79ffaf4c5d28b945112fe27e52f6f",
+      "changed": true
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/th/lessons/control-hazards-and-prediction.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/th/lessons/control-hazards-and-prediction.json",
+      "sha256": "7d5814aedfc0da7c69aa99adf31d61ca5c078721f1b51e91646ade4cd109e876",
+      "changed": true
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/th/lessons/control-signals.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/th/lessons/control-signals.json",
+      "sha256": "d699996aa7332683a9d19893656c94fefc32bb7fbd61bcb18abb623623a4d8db",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/th/lessons/data-hazards-and-forwarding.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/th/lessons/data-hazards-and-forwarding.json",
+      "sha256": "8d741e8b6b7e41f81f0ca0b9458d437c4d8404bd5b34183824c25b662d0ef0d8",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/th/lessons/ddr-generations.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/th/lessons/ddr-generations.json",
+      "sha256": "b8c6d1e363cd6be4e0268068315419dc536855d19725c217e0bda50013eccf9e",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/th/lessons/dram-cells-and-timing.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/th/lessons/dram-cells-and-timing.json",
+      "sha256": "696f839eb41886e7f18a1b31ddb4dfa3057a777b71c18197316470084af8d6d7",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/th/lessons/hit-miss-and-write-policy.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/th/lessons/hit-miss-and-write-policy.json",
+      "sha256": "d6327954d71549c26cd8c2bdd6b94d42b902935e4d4e8425d4e0a083e5f14c1d",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/th/lessons/instruction-encoding.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/th/lessons/instruction-encoding.json",
+      "sha256": "797bf0192b36b25340ea95f82b7c564610c805540fe81cdfeacb00eddc004dda",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/th/lessons/instruction-formats.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/th/lessons/instruction-formats.json",
+      "sha256": "dadd9547a29435286ff9a4b5dcced73035a3f2d13a7616e68c7be73f5cf40a76",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/th/lessons/load-store-architecture.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/th/lessons/load-store-architecture.json",
+      "sha256": "42a595fdf0b0fbc2968eaa2e0756e3b1fe75b00652c8725c6abf24e9200f6da0",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/th/lessons/load-use-stall.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/th/lessons/load-use-stall.json",
+      "sha256": "643bea31d8879ff4bf500cdbe15dfb031de58a27243caa796995833a0c7157c0",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/th/lessons/locality.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/th/lessons/locality.json",
+      "sha256": "fa0bdffc357e868869b67c3c0389f7fc66070a3abca116d0b84c68239b1002b4",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/th/lessons/multi-cycle-and-cpi.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/th/lessons/multi-cycle-and-cpi.json",
+      "sha256": "9eec34b1b419c0acd8d2133d761b040c424ce733bffb4906e0ff89006e57b213",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/th/lessons/pipeline-stages.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/th/lessons/pipeline-stages.json",
+      "sha256": "66ccb9dff3682aad30cfd146bc7dd62f36a1ff6a68a572c6d3c7ee32f3a3642e",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/th/lessons/risc-vs-cisc.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/th/lessons/risc-vs-cisc.json",
+      "sha256": "0186a47dec550d841b89e52b020616538d76ae1bffbfcd45d3720d32705c4e76",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/th/lessons/single-cycle-datapath.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/th/lessons/single-cycle-datapath.json",
+      "sha256": "9abc8227a1445ef2fc9233260fe970feaba9b6f0d4e360dacc8c38dac3285076",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/th/lessons/throughput-vs-latency.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/th/lessons/throughput-vs-latency.json",
+      "sha256": "e474c8d945e137fa91b864d6b9c98c6d002091c7bcfd4f15620625cc6ddfc01b",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/computer-architecture/locales/th/lessons/what-is-an-isa.json",
+      "target": "academy-web/content/courses/computer-architecture/locales/th/lessons/what-is-an-isa.json",
+      "sha256": "d2bf35a65213c339c71d700f7fc22c9942314ccad0e22bfefd789976d60177a4",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/course.json",
+      "target": "academy-web/content/courses/c-low-level/course.json",
+      "sha256": "d25ebfec42f6d6425af3e99005ee368c5166737ae6a1b1a8080e165de4d0aa62",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/course.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/course.json",
+      "sha256": "1ab1f2341d43c26e0cc7b35369bc0d7b2c6df8bc19258e8adbb9da975f27f2d1",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/arrays-and-strings.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/arrays-and-strings.json",
+      "sha256": "d2b897c6655b13a1efbb9d924abe81d41d917c3ae1bb71680c2321c9e3261a2a",
+      "changed": true
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/bitwise-ops.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/bitwise-ops.json",
+      "sha256": "08cf7270c949db881e73e7e9755b542494a06a41d8ca6cb4450e4acc91c375aa",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/compilation-pipeline.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/compilation-pipeline.json",
+      "sha256": "a59db3f8e82f27206afe22b78089fe29f40fb743084b2cd61f8382146d83cabc",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/control-flow.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/control-flow.json",
+      "sha256": "fd831e2ce5cc4ec49330143fe8707bb14735c1c2aea326f5bc5e63a919f27143",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/defensive-c.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/defensive-c.json",
+      "sha256": "b93eebe2d30b0732424cdef1715ca3b3df3f7216b160b2131b35235b741a6f62",
+      "changed": true
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/endianness-and-layout.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/endianness-and-layout.json",
+      "sha256": "05258607a9a7fbeda43e27487130eda69d0bd59dfba4158e90b04ce21768fe62",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/finding-memory-bugs.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/finding-memory-bugs.json",
+      "sha256": "020eec123820464a6c64e93da64f2970bda1a7d67edf985bc47a62c1c233b6e1",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/first-c-program.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/first-c-program.json",
+      "sha256": "dafa932355fdd20e609a6bd6197a75e0b55ce0956efa739eee1473e3aa580b5f",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/floating-point.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/floating-point.json",
+      "sha256": "73e4932946e22e895842745eb56dade72381bbdb74a1333e8534b480c8ec9db2",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/function-pointers.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/function-pointers.json",
+      "sha256": "07335d17802747ab03a24c03a8e04949db7d2e5fc7b1974c86f739c24817c44b",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/functions-and-scope.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/functions-and-scope.json",
+      "sha256": "26fe0f825f16a652a911c05d7612f26f400150b351737d587a700b284049e0dc",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/integer-representation.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/integer-representation.json",
+      "sha256": "a7205839be9fa3622b10f3452f945d734acdab83ce3ac79a68e040e6263bc83e",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/libraries-and-builds.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/libraries-and-builds.json",
+      "sha256": "d28a5b2cbc97f39dcf329fe38f91ed5607e2373a12c9e36dc8bbc9a22ef94396",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/malloc-and-free.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/malloc-and-free.json",
+      "sha256": "982f6bc88eafa713a14c64f9722a4b9bc5851f95920d01cce3eb9d0b73de89b8",
+      "changed": true
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/memory-bug-patterns.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/memory-bug-patterns.json",
+      "sha256": "b1bc54c11863b1430bb38ee8375819d638175f1d6602d6bd4a5840339d40c7fa",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/object-files-and-symbols.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/object-files-and-symbols.json",
+      "sha256": "24cb1d6a0c4bf7a27b83e975eb2bf8c1ca325670d07fd07412259f6762456d9b",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/pointer-arithmetic.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/pointer-arithmetic.json",
+      "sha256": "a40f6044462ce7e66d853ce3c7ad5dc6727f3a3d9f54f4c12c69f9f52c8373b7",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/pointers.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/pointers.json",
+      "sha256": "e7e974577207b534225531f27bb5ad2df94dffa487f9be2ac5446e26c2284bfc",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/reading-real-c.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/reading-real-c.json",
+      "sha256": "6ef6311411563daae667033a13e9bcc0a2dff14665dd92df7841622cac8a55a5",
+      "changed": true
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/stack-vs-heap.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/stack-vs-heap.json",
+      "sha256": "a0c2df06455d61ef26911cbc4083bc6a2fb99df6fb4a7a40484df4526281e80d",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/structs.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/structs.json",
+      "sha256": "a6ee113d2f4a8b05a24b3c6d6d65d65d767bf6602267ba52d6c6b2fd29871726",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/types-and-operators.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/types-and-operators.json",
+      "sha256": "0f367465e0cb4bf1af00bae882484b89ca3355a264b55a29d912faaebc93f2da",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/undefined-behavior.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/undefined-behavior.json",
+      "sha256": "2cbd1ce4b5f4add4812b7b7d247ec5738f0e6347c524b3da65b86d235cf69206",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/en/lessons/why-c.json",
+      "target": "academy-web/content/courses/c-low-level/locales/en/lessons/why-c.json",
+      "sha256": "3a08c9f5a8c9c03493f74dc9a29be4b99ef87a9be29c17470b1450b3cdb5b183",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/course.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/course.json",
+      "sha256": "51c877f2562164b41888f4414dd8b70b44d84a9671c64419a0a81bdc0ea01474",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/arrays-and-strings.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/arrays-and-strings.json",
+      "sha256": "5b2e80d02130dabba756929109a78f2a3c6be1ac2c091893d9927ac3bfb2b63f",
+      "changed": true
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/bitwise-ops.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/bitwise-ops.json",
+      "sha256": "7247fa64b981db1845d9c3ebc1984ade8e33a530477bdd438ee02e299820be86",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/compilation-pipeline.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/compilation-pipeline.json",
+      "sha256": "f06627fd242d19f4c174ad9713514f547bfdfe3985a6e659b720b9b8a793b52d",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/control-flow.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/control-flow.json",
+      "sha256": "ca3130b48151df6fef588d3da6e84da400193697ca7044ffbda5b0750e66452b",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/defensive-c.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/defensive-c.json",
+      "sha256": "6b97055a2d51c391a3e4d4d21454bbbff674cf908995b9881f5aaa817b838402",
+      "changed": true
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/endianness-and-layout.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/endianness-and-layout.json",
+      "sha256": "58ffb256c8991c995b1d5ee856f42bda924379d50c776c1dc6b99343c2d04ed8",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/finding-memory-bugs.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/finding-memory-bugs.json",
+      "sha256": "c39eb0f883b1aa1d597fe74b21b17b35aa408d6a8bb8a46e31d40f6725d22a4f",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/first-c-program.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/first-c-program.json",
+      "sha256": "689bb2fc9354d9218b18d7577298b03c1de4f7efe03426206abb3914067a6b0d",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/floating-point.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/floating-point.json",
+      "sha256": "5c56be6d53357d92cf6398d6a88b2d21cd63b446b8af625590d7b19c98316fe6",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/function-pointers.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/function-pointers.json",
+      "sha256": "89089e53f3b22fae1e6ec579be694d6e895b9f22a58d8d8c5eeb534aa082f642",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/functions-and-scope.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/functions-and-scope.json",
+      "sha256": "1544d999f36b350bac58178ddafa49ec1df4a2cb0a146889314a08d43b4197dd",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/integer-representation.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/integer-representation.json",
+      "sha256": "72f75f99626ffc5ff5c8d32f00fe846d0b1261b2bdef216ba40569ff9cb50e65",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/libraries-and-builds.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/libraries-and-builds.json",
+      "sha256": "f1856026634b1019256e4ab8eae639c832cd56c22e2c81a237bf5061a4c82ee5",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/malloc-and-free.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/malloc-and-free.json",
+      "sha256": "e55ca5e949e9bb2bf7fc49d5e1c1dba66733b182b4dbf2f126175bcf47638bf6",
+      "changed": true
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/memory-bug-patterns.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/memory-bug-patterns.json",
+      "sha256": "5a69784e5d9870eb9c2721b4188f36e8a00741675a7448982b766851b4a601fd",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/object-files-and-symbols.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/object-files-and-symbols.json",
+      "sha256": "6a8b7fdc2f92ee1e5940cfa5dac6a5a2ee623edb913c14dfc375eefc4e997502",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/pointer-arithmetic.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/pointer-arithmetic.json",
+      "sha256": "ab2785d6137e692a7a315f5c72a0f105777920d6401dc4d4e26f2b2cf19d839f",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/pointers.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/pointers.json",
+      "sha256": "7bfcb424abc0506c5c5498bee3c13e0ae7ddf09e6cad31da223ae96654ae6e65",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/reading-real-c.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/reading-real-c.json",
+      "sha256": "ab759dface105f654be7b2992ae9c8bf475f82fc842ab3040559f72e08296cec",
+      "changed": true
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/stack-vs-heap.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/stack-vs-heap.json",
+      "sha256": "fa2009025f56881c88890f13ca87248af73048e21cd5d83d8596e024a22036d2",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/structs.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/structs.json",
+      "sha256": "70861496ccb6991af24e728fda94ecf88c92c0e07a511a9ceb1ead7455d49db1",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/types-and-operators.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/types-and-operators.json",
+      "sha256": "2d0f917417fc4014346a221293ab6cec920d217e8046e6f71c8d498931db410a",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/undefined-behavior.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/undefined-behavior.json",
+      "sha256": "714058a38f2ae97d002089798ffd3b01270020084f85f70f6c3fa175c8db8762",
+      "changed": false
+    },
+    {
+      "source": "courses/academy/c-low-level/locales/th/lessons/why-c.json",
+      "target": "academy-web/content/courses/c-low-level/locales/th/lessons/why-c.json",
+      "sha256": "e6d77aec375e61989374987702025a0a944f15cc9848625da255365e8373a234",
+      "changed": false
+    }
+  ]
+}
