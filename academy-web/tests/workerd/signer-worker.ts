@@ -365,7 +365,7 @@ const handler = {
         }
         const deniedWrongSession = await servePrivateMedia(
           new Request('https://academy.cyberskills.co.th/course-media/os-video-en', {
-            headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}; academy_session=${'X'.repeat(43)}` },
+            headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}; __Host-academy_session=${'X'.repeat(43)}` },
           }),
           mediaEnv,
         )
@@ -374,7 +374,7 @@ const handler = {
         }
         const full = await servePrivateMedia(
           new Request('https://academy.cyberskills.co.th/course-media/os-video-en', {
-            headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}; academy_session=${sessionId}` },
+            headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}; __Host-academy_session=${sessionId}` },
           }),
           mediaEnv,
         )
@@ -383,7 +383,7 @@ const handler = {
         if (fullBytes.byteLength !== 1_000 || fullBytes[999] !== 999 % 251) throw new Error('full body mismatch')
         const ranged = await servePrivateMedia(
           new Request('https://academy.cyberskills.co.th/course-media/os-video-en', {
-            headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}; academy_session=${sessionId}`, range: 'bytes=100-199' },
+            headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}; __Host-academy_session=${sessionId}`, range: 'bytes=100-199' },
           }),
           mediaEnv,
         )
@@ -396,14 +396,14 @@ const handler = {
         const head = await servePrivateMedia(
           new Request('https://academy.cyberskills.co.th/course-media/os-video-en', {
             method: 'HEAD',
-            headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}; academy_session=${sessionId}` },
+            headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}; __Host-academy_session=${sessionId}` },
           }),
           mediaEnv,
         )
         if (head?.status !== 200) throw new Error(`HEAD status ${head?.status}`)
         const denied = await servePrivateMedia(
           new Request('https://academy.cyberskills.co.th/course-media/os-video-en', {
-            headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}x; academy_session=${sessionId}` },
+            headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}x; __Host-academy_session=${sessionId}` },
           }),
           mediaEnv,
         )

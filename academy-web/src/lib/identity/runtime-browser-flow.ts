@@ -1,4 +1,8 @@
 import { safeNextPath } from '@/lib/auth/route-client'
+import {
+  HOST_IDENTITY_BINDING_COOKIE_PREFIX,
+  LEGACY_IDENTITY_BINDING_COOKIE_PREFIX,
+} from '@/lib/auth/session-cookie'
 import { validateMutationRequest } from '@/lib/http/mutation-security'
 import { readIdentityStartForm } from './start-form'
 
@@ -7,7 +11,7 @@ import {
   createAcademyIdentityRuntimeCompletion,
   isRetryableAcademyIdentityRuntimeCompletionFailure,
 } from './runtime-completion'
-import { academySessionCookie } from './session-store'
+import { academySessionCookie, expireLegacyAcademySessionCookie } from './session-store'
 import { IdentityTransactionCapacityError } from './postgres-transaction-store'
 import {
   beginIdentityAuthorization,
@@ -179,6 +183,7 @@ export function createAcademyIdentityRuntimeBrowserFlow(
 
       async complete(request: Request): Promise<AcademyIdentityRuntimeBrowserFlowResult> {
         let state: string | null = null
+        let secure = false
         try {
           if (!(request instanceof Request)) return errorResult(400, CALLBACK_FAILURE)
           const urlValue = request.url
@@ -187,20 +192,29 @@ export function createAcademyIdentityRuntimeBrowserFlow(
           const callbackUrl = new URL(urlValue)
           const callback = parseIdentityCallback(callbackUrl)
           state = callback.state
-          const binding = readBrowserBindingCookie(cookieHeader, state)
+          secure = callbackUrl.protocol === 'https:'
+            || headers.get('x-forwarded-proto')?.split(',')[0]?.trim().toLowerCase() === 'https'
+            || (
+              process.env.NODE_ENV === 'production'
+              && !['localhost', '127.0.0.1', '::1'].includes(callbackUrl.hostname)
+            )
+          const binding = readBrowserBindingCookie(cookieHeader, state, secure)
           if (!binding) throw new Error(CALLBACK_FAILURE)
 
           const completed = await completion.complete({ callbackUrl, browserBinding: binding })
           return redirectResult(completed.returnPath, [
-            academySessionCookie(completed.sessionId),
-            expireBrowserBindingCookie(state),
+            academySessionCookie(completed.sessionId, { secure }),
+            expireBrowserBindingCookie(state, secure),
+            ...(secure ? [expireLegacyAcademySessionCookie()] : []),
           ])
         } catch (error) {
           const preserveBinding = isRetryableAcademyIdentityRuntimeCompletionFailure(error)
           return errorResult(
             state === null ? 400 : 503,
             CALLBACK_FAILURE,
-            state === null || preserveBinding ? [] : [expireBrowserBindingCookie(state)],
+            state === null || preserveBinding
+              ? []
+              : [expireBrowserBindingCookie(state, secure)],
           )
         }
       },
@@ -214,31 +228,17 @@ function browserBindingCookie(state: string, binding: string): string {
   if (!OPAQUE_STATE.test(state) || !BROWSER_BINDING.test(binding)) {
     throw new Error(START_FAILURE)
   }
-  return [
-    `${browserBindingCookieName(state)}=${binding}`,
-    'Path=/auth/callback',
-    'HttpOnly',
-    'Secure',
-    'SameSite=Lax',
-    'Max-Age=300',
-  ].join('; ')
+  return bindingCookieString(browserBindingCookieName(state, true), binding, '300')
 }
 
-function expireBrowserBindingCookie(state: string): string {
+function expireBrowserBindingCookie(state: string, secure: boolean): string {
   if (!OPAQUE_STATE.test(state)) throw new Error(CALLBACK_FAILURE)
-  return [
-    `${browserBindingCookieName(state)}=`,
-    'Path=/auth/callback',
-    'HttpOnly',
-    'Secure',
-    'SameSite=Lax',
-    'Max-Age=0',
-  ].join('; ')
+  return bindingCookieString(browserBindingCookieName(state, secure), '', '0')
 }
 
-function readBrowserBindingCookie(cookieHeader: string | null, state: string): string | null {
+function readBrowserBindingCookie(cookieHeader: string | null, state: string, secure: boolean): string | null {
   if (!cookieHeader || !OPAQUE_STATE.test(state)) return null
-  const expectedName = browserBindingCookieName(state)
+  const expectedName = browserBindingCookieName(state, secure)
   let count = 0
   let binding: string | null = null
   for (const rawPair of cookieHeader.split(';')) {
@@ -253,8 +253,19 @@ function readBrowserBindingCookie(cookieHeader: string | null, state: string): s
   return count === 1 ? binding : null
 }
 
-function browserBindingCookieName(state: string): string {
-  return `academy_identity_binding_${state.slice(0, 32)}`
+function browserBindingCookieName(state: string, secure: boolean): string {
+  return `${secure ? HOST_IDENTITY_BINDING_COOKIE_PREFIX : LEGACY_IDENTITY_BINDING_COOKIE_PREFIX}${state.slice(0, 32)}`
+}
+
+function bindingCookieString(name: string, value: string, maxAge: string): string {
+  return [
+    `${name}=${value}`,
+    'Path=/',
+    'HttpOnly',
+    'Secure',
+    'SameSite=Lax',
+    `Max-Age=${maxAge}`,
+  ].join('; ')
 }
 
 function isCanonicalAuthorizationUrl(value: unknown): value is string {

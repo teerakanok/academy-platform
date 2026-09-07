@@ -1,0 +1,75 @@
+
+> academy-web@0.1.0 prebuild
+> node scripts/generate-content-registry.mjs
+
+เขียน src/lib/content/registry.generated.ts — 11 คอร์ส, 450 ไฟล์เนื้อหา, 3 เวอร์ชัน consent
+
+> academy-web@0.1.0 build
+> next build
+
+   ▲ Next.js 15.5.22
+
+   Creating an optimized production build ...
+getaddrinfo ENOTFOUND fonts.googleapis.com
+
+Retrying 1/3...
+getaddrinfo ENOTFOUND fonts.googleapis.com
+
+Retrying 1/3...
+getaddrinfo ENOTFOUND fonts.googleapis.com
+
+Retrying 1/3...
+getaddrinfo ENOTFOUND fonts.googleapis.com
+
+Retrying 2/3...
+getaddrinfo ENOTFOUND fonts.googleapis.com
+
+Retrying 2/3...
+getaddrinfo ENOTFOUND fonts.googleapis.com
+
+Retrying 2/3...
+getaddrinfo ENOTFOUND fonts.googleapis.com
+
+Retrying 3/3...
+getaddrinfo ENOTFOUND fonts.googleapis.com
+
+Retrying 3/3...
+getaddrinfo ENOTFOUND fonts.googleapis.com
+
+Retrying 3/3...
+[Error: getaddrinfo ENOTFOUND fonts.googleapis.com] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'fonts.googleapis.com'
+}
+[Error: getaddrinfo ENOTFOUND fonts.googleapis.com] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'fonts.googleapis.com'
+}
+[Error: getaddrinfo ENOTFOUND fonts.googleapis.com] {
+  errno: -3008,
+  code: 'ENOTFOUND',
+  syscall: 'getaddrinfo',
+  hostname: 'fonts.googleapis.com'
+}
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (106kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (258kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+Failed to compile.
+
+src/components/AppShell.tsx
+`next/font` error:
+Failed to fetch `Fraunces` from Google Fonts.
+
+src/components/AppShell.tsx
+`next/font` error:
+Failed to fetch `Inter` from Google Fonts.
+
+src/components/AppShell.tsx
+`next/font` error:
+Failed to fetch `JetBrains Mono` from Google Fonts.
+
+
+> Build failed because of webpack errors

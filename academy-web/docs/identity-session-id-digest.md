@@ -1,7 +1,8 @@
 # Academy durable session identifier digest
 
-The browser cookie remains the only holder of the 256-bit opaque
-`academy_session` bearer. The current adapters call the explicit
+The host-only `__Host-academy_session` cookie remains the only production holder
+of the 256-bit opaque bearer. HTTP local fixtures explicitly retain the
+historical unprefixed name. The current adapters call the explicit
 `*_digest` PostgreSQL RPCs and never send the raw bearer. Durable session rows
 and completed transaction receipts therefore contain only its SHA-256
 base64url digest.
@@ -36,8 +37,10 @@ a check-violation error. Reapplying in a parent `ROLLBACK` rehearsal therefore
 proves that PostgreSQL rejects the second execution without double hashing.
 
 Roll back the application first if needed: the legacy session wrappers preserve
-old cookies, while only in-flight/lost-response authorization callbacks require
-a retry after rolling forward. Database rollback remains intentionally blocked;
+old durable sessions, while only in-flight/lost-response authorization callbacks
+require a retry after rolling forward. A rollback across the `__Host-` cookie
+cutover additionally makes new-prefix browser cookies unreadable and requires
+affected learners to sign in again. Database rollback remains intentionally blocked;
 restoring replayable identifiers would undo the security correction. Full data
 recovery requires the independently verified pre-migration snapshot and an
 explicit live-session decision, never a broad automatic restore or logout.

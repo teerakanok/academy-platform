@@ -1,0 +1,42 @@
+[
+  {
+    "file": "academy-cookie-root-causal.json",
+    "sha256": "f6eadf93cebd56da02d13ae89b280e67626c5cc0320b5c7cd7ad23d5453302c7"
+  },
+  {
+    "file": "academy-cookie-root-causal-red.log",
+    "sha256": "ad9acd6be092ec82de8802f888c6c4afea1d4186c78217c50bcdb836b7d736a2"
+  },
+  {
+    "file": "academy-cookie-root-focused-green.log",
+    "sha256": "a033effaddcf3063065e2fabf11ee3eef3f2ba73c209145a63537643ab98944c"
+  },
+  {
+    "file": "academy-cookie-root-gates.json",
+    "sha256": "b1af1a2f63372749774e7e286886352c25f8d4e0295b0adb9c81c09809f94198"
+  },
+  {
+    "file": "academy-cookie-root-unit.log",
+    "sha256": "bc9e6e1441a664184a38aee35601c0da17cff3b8605a6d97329a11ddd69907c9"
+  },
+  {
+    "file": "academy-cookie-root-final-gates.json",
+    "sha256": "b41251e9a252c581acd65a97fa6c24ac70584c33c664801f784c86d2d8583e3a"
+  },
+  {
+    "file": "academy-cookie-root-final-lint.log",
+    "sha256": "e935b37e032caaa144b003938b1da291a4b81908c43705265453b92f5b40d18d"
+  },
+  {
+    "file": "academy-cookie-root-final-build-cf.log",
+    "sha256": "f7c011b502434e2eea7c33f793e1362a74e6459a5d5c9cfe8e128951681e4bda"
+  },
+  {
+    "file": "academy-cookie-root-build-cf-r2.log",
+    "sha256": "4fa1f81fbdae49c3fb54c76a653569b423cfc8956ec312f7ef864af3437f9e89"
+  },
+  {
+    "file": "academy-cookie-final-startup-green.log",
+    "sha256": "a705931d8107b73bf97b7a8a2c3d17da8d012e2b1cf20d209cdcaeb51574af31"
+  }
+]

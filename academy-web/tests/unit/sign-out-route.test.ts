@@ -82,6 +82,7 @@ describe('POST /api/auth/sign-out', () => {
   })
 
   it('revokes the production opaque session and expires only the current-device cookie', async () => {
+    vi.stubEnv('NODE_ENV', 'production')
     vi.stubEnv('ACADEMY_LEGACY_DIRECT_OTP_LOCAL_FIXTURE', '')
     const revoke = vi.fn().mockResolvedValue(undefined)
     productionSessionStore.mockReturnValue({ revoke })
@@ -90,7 +91,7 @@ describe('POST /api/auth/sign-out', () => {
     const response = await POST(new Request('https://academy.cyberskills.co.th/api/auth/sign-out', {
       method: 'POST',
       headers: {
-        cookie: `academy_session=${sessionId}`,
+        cookie: `__Host-academy_session=${sessionId}`,
         host: 'academy.cyberskills.co.th',
         origin: 'https://academy.cyberskills.co.th',
         'sec-fetch-site': 'same-origin',
@@ -105,7 +106,9 @@ describe('POST /api/auth/sign-out', () => {
       revocation: 'confirmed',
     })
     expect(projectSignOutResponse(payload)).toEqual({ revocation: 'confirmed' })
-    expect(response.headers.get('set-cookie')).toContain('academy_session=;')
-    expect(response.headers.get('set-cookie')).toContain('Max-Age=0')
+    expect(response.headers.getSetCookie()).toEqual([
+      '__Host-academy_session=; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=0',
+      'academy_session=; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=0',
+    ])
   })
 })

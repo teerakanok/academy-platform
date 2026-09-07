@@ -15,7 +15,7 @@ async function authorizeDelivery(request: NextRequest, assetId: string) {
   const asset = privateMediaById(assetId)
   if (!secret || !asset) return new NextResponse(null, { status: 404 })
 
-  const sessionId = parseAcademySessionCookie(request.headers)
+  const sessionId = parseAcademySessionCookie(request.headers, { allowLegacy: allowsLocalHttpSession(request) })
   if (!sessionId) return new NextResponse(null, { status: 401 })
 
   const user = await currentUser()
@@ -56,7 +56,7 @@ async function deliver(request: NextRequest, assetId: string, head: boolean) {
 
   const asset = privateMediaById(assetId)
   const token = mediaDeliveryCookie(request.headers)
-  const sessionId = parseAcademySessionCookie(request.headers)
+  const sessionId = parseAcademySessionCookie(request.headers, { allowLegacy: allowsLocalHttpSession(request) })
   const grant = token ? await verifyMediaGrantSignature(token, secret) : null
   const grantValid = !!asset && !!grant && !!sessionId &&
     grant.assetId === asset.id &&
@@ -120,4 +120,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
 export async function HEAD(request: NextRequest, { params }: { params: Promise<{ assetId: string }> }) {
   return deliver(request, (await params).assetId, true)
+}
+
+function allowsLocalHttpSession(request: NextRequest): boolean {
+  return process.env.NODE_ENV !== 'production' && !isSecureRequest(request)
 }

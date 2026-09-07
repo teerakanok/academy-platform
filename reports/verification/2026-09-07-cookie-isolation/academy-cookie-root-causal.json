@@ -1,0 +1,18 @@
+{
+  "checked_at": "2026-09-07T17:15:37.000295+00:00",
+  "command": [
+    "npx",
+    "vitest",
+    "run",
+    "--project",
+    "unit",
+    "tests/unit/host-session-cookie-isolation.test.ts"
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "red_exit": 1,
+  "green_exit": 0,
+  "restored_sha256": "ab530de7700aae77ff1f395cf739d17107e6f897933c8f1bac3e87f695ce7840",
+  "restored_exact": true
+}

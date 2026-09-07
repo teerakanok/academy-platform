@@ -174,6 +174,9 @@ describe('Academy Identity runtime browser flow', () => {
 
     const completed = await fixture.flow.complete(callbackRequest(started, started.binding))
     expect(completed).toMatchObject({ kind: 'redirect', location: '/dashboard' })
+    if (completed.kind !== 'redirect') throw new Error('expected redirect')
+    expect(completed.cookies[0]).toBe(`__Host-academy_session=${SESSION_ID}; Path=/; HttpOnly; SameSite=Lax; Secure`)
+    expect(completed.cookies[1]).toMatch(/^__Host-academy_identity_binding_[^=]+=; Path=\/; HttpOnly; Secure; SameSite=Lax; Max-Age=0$/)
     expect(fixture.calls).toEqual([
       'create', 'authorize', 'claim', 'claim', 'assertion', 'exchange', 'verify',
       'checkpoint', 'activation', 'session', 'finalize',

@@ -31,7 +31,7 @@ describe('production currentUser opaque-cookie authorization', () => {
     vi.clearAllMocks()
     vi.stubEnv('NODE_ENV', 'production')
     headers.mockResolvedValue(new Headers({
-      cookie: `academy_session=${sessionId}`,
+      cookie: `__Host-academy_session=${sessionId}`,
     }))
   })
 

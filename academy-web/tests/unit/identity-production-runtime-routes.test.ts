@@ -195,7 +195,7 @@ describe('production Identity routes use the real registry composition', () => {
     const cookie = navigation.headers.getSetCookie()
     expect(cookie).toHaveLength(1)
     expect(cookie[0]!.split('; ').slice(1)).toEqual([
-      'Path=/auth/callback', 'HttpOnly', 'Secure', 'SameSite=Lax', 'Max-Age=300',
+      'Path=/', 'HttpOnly', 'Secure', 'SameSite=Lax', 'Max-Age=300',
     ])
     expect(database.academyDb).toHaveBeenCalledTimes(1)
   })

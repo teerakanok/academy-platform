@@ -187,7 +187,28 @@ Frozen tree: `/private/tmp/secrev-academy` (HEAD `02c712e`, read-only). Inputs: 
   runtime-browser-flow.ts:216-221  `${browserBindingCookieName(state)}=${binding}`, 'Path=/auth/callback', 'HttpOnly', 'Secure', 'SameSite=Lax', 'Max-Age=300'
   ```
 - **Remediation:** เปลี่ยนชื่อเป็น `__Host-academy_session` (Secure, ไม่มี Domain, Path=/) และ `__Secure-academy_identity_binding_<state>` (คง Path=/auth/callback) หรือ `__Host-` ทั้งคู่; อัปเดต parser/fixture (secure:false path) ให้ตรง; คง exact-one parser.
-- **Sources:** Fable (#11) · **Status:** OPEN
+- **Local correction (2026-09-08):** production now issues and accepts
+  `__Host-academy_session` (Secure, no Domain, Path=/) and state-specific
+  `__Host-academy_identity_binding_<state-prefix>` cookies (Secure, no Domain,
+  Path=/). The exact-one parser accepts only that session name in production and
+  rejects malformed, duplicate, and legacy unprefixed bearer authority. Middleware,
+  durable session lookup, callback completion, sign-out, media authorization, and
+  Worker media delivery use the same host-only accepted session; explicit
+  `http://localhost` fixtures retain an unprefixed transport without reopening
+  production. Successful completion/sign-out expires a host-only legacy cookie;
+  it cannot overwrite a sibling-injected `Domain=` cookie, but that cookie remains
+  harmless because production ignores the old name. Existing production cookies
+  require one new sign-in; rollback across the cutover makes new-prefix cookies
+  unreadable and also requires sign-in. RED focused 3/3 failed on unprefixed
+  issuance/acceptance; GREEN targeted 34/34, full unit 2,445 passed/2 skipped,
+  app+worker+retention TypeScript 3/3 exit 0, lint reached only the three known
+  `academy-bound-worker-executor.cjs` require errors. See
+  [cookie isolation evidence](../verification/2026-09-07-cookie-isolation/cookie-isolation.md).
+- **Sources:** Fable (#11) · **Status:** LOCAL VERIFIED — PENDING PRODUCTION
+- **Checked (2026-09-08):** local verified; production sign-in/callback/sign-out
+  and authenticated media acceptance pending. `build:cf`/workerd was blocked by
+  sandbox EPERM on `listen 127.0.0.1`; `next build` was blocked by restricted DNS
+  to Google Fonts.
 
 ### SEC-ACADEMY-012 · URL field ใน lesson content รับทุก scheme (`javascript:`/`data:`/`vbscript:`) และไปถึง `<a href>`/`<img src>`; CSP มี `'unsafe-inline'`
 - **Severity:** LOW (ต้องมี write access ใน content pipeline/repo) · **Verdict:** CONFIRMED
@@ -437,7 +458,7 @@ Frozen tree: `/private/tmp/secrev-academy` (HEAD `02c712e`, read-only). Inputs: 
 | SEC-ACADEMY-008 | Rate-limit key granularity | durable IPv6 /64 actor aggregation; bounded HMAC target budgets; global per-route ceilings; malformed IP/target fail-safe handling | DEPLOYED — AUTHENTICATED/BEHAVIOR PROOF OPEN | 2026-09-06 | Focused RED then GREEN 21/21 covers same/other /64, target reuse, ceilings, partial failure, stream preservation; parent actual workerd enforcement/marker13checks and build:cf exit0; independent review PASS; production proof pending ; Worker bc1c738 version43 now active100%, host/Access GET and Chrome captures passed; reports/operations/20260906-academy-bc1c738-release (not authenticated application proof) |
 | SEC-ACADEMY-009 | Credential storage | digest session id ก่อนทุก RPC; migration0034 hash แถวเดิมใน place และจัดการ in-flight ด้วย retry | CLOSED — production digest storage verified | 2026-09-07 | Exact0034 ROLLBACK then COMMIT0; before/after digest aggregates and row preservation verified; read-only marker1, invalid digest0, five RPCs/runtime grants true; app0e4417ec on Worker1af77a26 at100%; independent source/migration/operator reviews retained in reports/operations/20260906-academy-0034-cutover. Full learner/active-cookie journey remains separately open. |
 | SEC-ACADEMY-010 | Bearer binding | ผูก grant กับ session digest; Worker เทียบ exact one `academy_session` ก่อน R2 | DEPLOYED — PENDING AUTHENTICATED MEDIA ACCEPTANCE | 2026-09-07 | authenticated media acceptance, immediate revocation lag, delivery-log accountability |
-| SEC-ACADEMY-011 | Cookie scope | `__Host-`/`__Secure-` prefix สำหรับ session และ binding cookie; อัปเดต parser/fixture | OPEN | 2026-09-05 | ทั้งหมด |
+| SEC-ACADEMY-011 | Cookie scope | `__Host-` prefix สำหรับ session/binding, production legacy rejection, exact-one parser; HTTP fixture เท่านั้น | LOCAL VERIFIED — PENDING PRODUCTION | 2026-09-08 | RED 3/3; focused 34/34; unit2445/2skip; tsc3/3; lint baseline3; production journey/media, workerd/build, independent review pending; reports/verification/2026-09-07-cookie-isolation |
 | SEC-ACADEMY-012 | Content XSS | scheme allowlist `.refine()` บน image.src/attachment.href/externalLink.href; content-gate test | DEPLOYED — AUTHENTICATED/BEHAVIOR PROOF OPEN | 2026-09-06 | unit2420, build:cf+actual final assets pass; independent PASS; production behavior proof pending ; Worker bc1c738 version43 now active100%, host/Access GET and Chrome captures passed; reports/operations/20260906-academy-bc1c738-release (not authenticated application proof) |
 | SEC-ACADEMY-013 | Security headers (CSP) | nonce + `'strict-dynamic'`, hash theme script, test assert no `'unsafe-inline'` ใน script-src | OPEN | 2026-09-05 | ทั้งหมด |
 | SEC-ACADEMY-014 | Static asset hardening | `public/_headers`; build gate ห้าม mp4/vtt/pdf/zip ใน `.open-next/assets`; headers บน worker-generated responses | DEPLOYED — AUTHENTICATED/BEHAVIOR PROOF OPEN | 2026-09-06 | unit2420, build:cf+actual final assets pass; independent PASS; production behavior proof pending ; Worker bc1c738 version43 now active100%, host/Access GET and Chrome captures passed; reports/operations/20260906-academy-bc1c738-release (not authenticated application proof) |

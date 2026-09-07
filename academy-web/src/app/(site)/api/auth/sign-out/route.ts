@@ -4,8 +4,11 @@ import { validateMutationRequest } from '@/lib/http/mutation-security'
 import { legacyDirectOtpFixtureAllowedForRequest } from '@/lib/auth/legacy-direct-otp'
 import { identityControlLocalFixtureAllowedForRequest } from '@/lib/identity/local-fixture'
 import { revokeLocalAcademySession } from '@/lib/identity/local-runtime'
-import { expireAcademySessionCookie } from '@/lib/identity/session-store'
-import { parseAcademySessionCookie } from '@/lib/identity/session-store'
+import {
+  expireAcademySessionCookie,
+  expireLegacyAcademySessionCookie,
+  parseAcademySessionCookie,
+} from '@/lib/identity/session-store'
 import { createAcademyIdentityProductionSessionStore } from '@/lib/identity/production-runtime'
 import { safeErrorMessage } from '@/lib/safe-log'
 
@@ -43,6 +46,7 @@ export async function POST(request: Request) {
     }
     const response = NextResponse.json({ ok: true, scope: 'local', revocation })
     response.headers.append('set-cookie', expireAcademySessionCookie())
+    response.headers.append('set-cookie', expireLegacyAcademySessionCookie())
     return response
   }
   const mutation = validateMutationRequest(request)
