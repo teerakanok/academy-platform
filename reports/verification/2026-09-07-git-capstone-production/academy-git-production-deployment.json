@@ -1,0 +1,24 @@
+{
+  "id": "2771c927-fa16-42fc-9730-d5fe3321d5e1",
+  "versions": [
+    {
+      "version_id": "772b75a6-e06b-404b-a268-5dbb4ec24e86",
+      "percentage": 100
+    }
+  ],
+  "created_on": "2026-09-07T13:59:43.748931Z",
+  "annotations": {
+    "workers/message": "release;s=af3f5ded63fc491b09b55980bfb5f3cf3fb943ab;git-capstone-content",
+    "workers/triggered_by": "deployment"
+  },
+  "command": [
+    "node",
+    "node_modules/wrangler/bin/wrangler.js",
+    "deployments",
+    "list",
+    "--name",
+    "cyberskills-academy",
+    "--json"
+  ],
+  "exit": 0
+}

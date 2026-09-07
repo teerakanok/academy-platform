@@ -1,0 +1,16 @@
+{
+  "command": [
+    "node",
+    "node_modules/wrangler/bin/wrangler.js",
+    "versions",
+    "deploy",
+    "772b75a6-e06b-404b-a268-5dbb4ec24e86@100%",
+    "--name",
+    "cyberskills-academy",
+    "--yes",
+    "--message",
+    "release;s=af3f5ded63fc491b09b55980bfb5f3cf3fb943ab;git-capstone-content"
+  ],
+  "exit": 0,
+  "output_sha256": "5dd0373d6d57c714aef85ea495e708354bc760bf498d6393aecc5eb5e52b6c40"
+}

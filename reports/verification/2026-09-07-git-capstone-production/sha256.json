@@ -1,0 +1,11 @@
+{
+  "academy-git-version-upload.json": "e3a7373d21d01085500d4df309ed37746a08d17d0e316668c825a333c497d7aa",
+  "academy-git-candidate-allocation.json": "bd99e6e7d36132020586dfe6cbe5a91492c190fc7c27f102a5343b47c1e3272c",
+  "academy-git-candidate.json": "602bf48fbdf14b28f71b3408c9660726a15eb7e323432c3ffcbffc23400a07e3",
+  "academy-git-production-activation.json": "df21ac36a798c3cd710f0516f06d1dfdf7dfef50a549632459bd2518895cac80",
+  "academy-git-production.json": "8ecc025135ce79ee77fe1ef0e91cfdd2d0524d78754ea6f50294893731115c73",
+  "academy-git-production-deployment.json": "24d46459b656b6ab5913f555965f7a9acb0a86e75f3627e53ce078de01d233f1",
+  "academy-git-production-desktop.png": "31708f936156b51d4d1c0ff4addd2fdc9daa17ef2990ea8ecc9572ddcc9205b9",
+  "academy-git-production-mobile.png": "b6ee594a23fbf032eca974d1acb11c0ae9f7163567199aae5a77815ab1b63cd4",
+  "academy-git-live-probe.mjs": "a61b178e4c0573297ff131ed81bdab52cd6d6db1f16c7395a555ebd4d4af2264"
+}

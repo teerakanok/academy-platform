@@ -65,3 +65,7 @@ Current app source `5572e8318b67ebf7858c4c1fccf1831ae01d335f`, Worker `0eed364a-
 ## Verified Linux content release — 2026-09-07 09:08 UTC
 
 Supersedes the serving version in the preceding release record. Source `9ad69fd8de46bb4f0d2be900372d4eec4f19e8b9`, Worker `33a85d92-6a72-42f5-8a74-7a5a3a5c633b` at 100%, deployment `937de442-b8ce-4a06-8328-ee75817cf045`. Rollback predecessor `0eed364a-1714-4e03-bf62-0af2230cfb55`. Post-activation public route and real browser proof: `reports/verification/2026-09-07-linux-capstone-production/`. Authenticated learner and operator acceptance remain open.
+
+## Verified Git content release — 2026-09-07 14:00 UTC
+
+Supersedes the serving Linux version above. Source `af3f5ded63fc491b09b55980bfb5f3cf3fb943ab`, Worker `772b75a6-e06b-404b-a268-5dbb4ec24e86` at100%, deployment `2771c927-fa16-42fc-9730-d5fe3321d5e1`; rollback predecessor `33a85d92-6a72-42f5-8a74-7a5a3a5c633b`. Post-activation evidence and real browser captures: `reports/verification/2026-09-07-git-capstone-production/`. Authenticated learner/operator gates remain open.
