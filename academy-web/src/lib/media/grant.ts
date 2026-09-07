@@ -5,6 +5,7 @@ export interface MediaGrant {
   courseSlug: string
   nodeId: string
   expiresAt: number
+  sessionIdDigest: string
 }
 
 function encodeBase64Url(bytes: Uint8Array): string {
@@ -44,7 +45,24 @@ function validGrant(value: unknown): value is MediaGrant {
     /^[a-z0-9][a-z0-9-]{0,100}$/.test(grant.nodeId) &&
     typeof grant.expiresAt === 'number' &&
     Number.isSafeInteger(grant.expiresAt)
+    && typeof grant.sessionIdDigest === 'string'
+    && /^[A-Za-z0-9_-]{43}$/.test(grant.sessionIdDigest)
   )
+}
+
+export async function createMediaSessionDigest(sessionId: string): Promise<string> {
+  if (!/^[A-Za-z0-9_-]{32,160}$/.test(sessionId)) throw new Error('invalid Academy session')
+  const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', encoder.encode(sessionId)))
+  return encodeBase64Url(digest)
+}
+
+export function mediaSessionDigestMatches(grantDigest: string, sessionIdDigest: string): boolean {
+  if (grantDigest.length !== sessionIdDigest.length) return false
+  let mismatch = 0
+  for (let index = 0; index < grantDigest.length; index += 1) {
+    mismatch |= grantDigest.charCodeAt(index) ^ sessionIdDigest.charCodeAt(index)
+  }
+  return mismatch === 0
 }
 
 export async function issueMediaGrant(grant: MediaGrant, secret: string): Promise<string> {

@@ -14,7 +14,7 @@ import {
 import { CODE_EXCHANGE_FETCH_INIT } from '../../src/lib/identity/code-exchange-response-transport'
 import { createIdentityCodeExchangeResultVerifierPort } from '../../src/lib/identity/code-exchange-result-verifier-port'
 import { importIdentityResultKeySet } from '../../src/lib/identity/result-key-set-importer'
-import { issueMediaGrant } from '../../src/lib/media/grant'
+import { createMediaSessionDigest, issueMediaGrant } from '../../src/lib/media/grant'
 import { MEDIA_DELIVERY_COOKIE } from '../../src/lib/media/cookie'
 import { servePrivateMedia } from '../../src/lib/media/worker-delivery'
 import { enforceEdgeRateLimit } from '../../src/lib/edge-rate-limit-enforcement'
@@ -335,16 +335,46 @@ const handler = {
       await bucket.put(key, bytes, { httpMetadata: { contentType: 'video/mp4' } })
       try {
         const secret = 'workerd-check-media-secret-0123456789abcdef0123456789abcdef'
+        const sessionId = 'S'.repeat(43)
+        const sessionIdDigest = await createMediaSessionDigest(sessionId)
         const token = await issueMediaGrant({
           assetId: 'os-video-en',
           courseSlug: 'basic-os-linux',
           nodeId: 'os-what-it-does',
           expiresAt: Math.floor(Date.now() / 1_000) + 60,
+          sessionIdDigest,
         }, secret)
-        const mediaEnv = { MEDIA_SIGNING_SECRET: secret, COURSE_MEDIA: bucket }
-        const full = await servePrivateMedia(
+        let bucketCalls = 0
+        const mediaEnv = {
+          MEDIA_SIGNING_SECRET: secret,
+          COURSE_MEDIA: {
+            get: async (...arguments_: Parameters<NonNullable<HarnessBucket>['get']>) => {
+              bucketCalls += 1
+              return bucket.get(...arguments_)
+            },
+          },
+        }
+        const deniedWithoutSession = await servePrivateMedia(
           new Request('https://academy.cyberskills.co.th/course-media/os-video-en', {
             headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}` },
+          }),
+          mediaEnv,
+        )
+        if (deniedWithoutSession !== null || bucketCalls !== 0) {
+          throw new Error('grant alone was not refused before R2')
+        }
+        const deniedWrongSession = await servePrivateMedia(
+          new Request('https://academy.cyberskills.co.th/course-media/os-video-en', {
+            headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}; academy_session=${'X'.repeat(43)}` },
+          }),
+          mediaEnv,
+        )
+        if (deniedWrongSession !== null || bucketCalls !== 0) {
+          throw new Error('wrong session was not refused before R2')
+        }
+        const full = await servePrivateMedia(
+          new Request('https://academy.cyberskills.co.th/course-media/os-video-en', {
+            headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}; academy_session=${sessionId}` },
           }),
           mediaEnv,
         )
@@ -353,7 +383,7 @@ const handler = {
         if (fullBytes.byteLength !== 1_000 || fullBytes[999] !== 999 % 251) throw new Error('full body mismatch')
         const ranged = await servePrivateMedia(
           new Request('https://academy.cyberskills.co.th/course-media/os-video-en', {
-            headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}`, range: 'bytes=100-199' },
+            headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}; academy_session=${sessionId}`, range: 'bytes=100-199' },
           }),
           mediaEnv,
         )
@@ -363,14 +393,22 @@ const handler = {
         if (contentRange !== 'bytes 100-199/1000' || rangedBytes.byteLength !== 100 || rangedBytes[0] !== 100) {
           throw new Error(`range mismatch: ${contentRange} ${rangedBytes.byteLength}`)
         }
+        const head = await servePrivateMedia(
+          new Request('https://academy.cyberskills.co.th/course-media/os-video-en', {
+            method: 'HEAD',
+            headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}; academy_session=${sessionId}` },
+          }),
+          mediaEnv,
+        )
+        if (head?.status !== 200) throw new Error(`HEAD status ${head?.status}`)
         const denied = await servePrivateMedia(
           new Request('https://academy.cyberskills.co.th/course-media/os-video-en', {
-            headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}x` },
+            headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${token}x; academy_session=${sessionId}` },
           }),
           mediaEnv,
         )
         if (denied !== null) throw new Error('tampered grant was not refused')
-        return 'R2 get with Headers range, 200 full body, 206 bytes 100-199/1000, tampered grant refused'
+        return 'R2 get with Headers range, session-bound 200/206/HEAD, grant-alone and wrong-session refused before R2'
       } finally {
         await bucket.delete(key)
       }

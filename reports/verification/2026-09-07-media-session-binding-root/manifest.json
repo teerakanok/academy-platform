@@ -1,0 +1,78 @@
+{
+  "base": "a8effcae74ee6de3ef7697cfbdefde33556cbd44",
+  "evidence": [
+    {
+      "path": "academy-media-root-baseline-delivery-red.log",
+      "sha256": "56ee8704ea7218f694ee1fb080ce7410ec2e087cc5b68fb60a7c3036dca10d8e"
+    },
+    {
+      "path": "academy-media-root-baseline-delivery-red.json",
+      "sha256": "bd9ee88b7d7a6e46a7022168c2d123349131b4c7f2eeee1154346c4698f61c61"
+    },
+    {
+      "path": "academy-media-root-restored-green.log",
+      "sha256": "2878be0349b9c831001f7e82686f56eb9cba7fe47f9071b2781fa332cf98ecdb"
+    },
+    {
+      "path": "academy-media-root-candidate-focused.log",
+      "sha256": "1783d90db1036cc188f2c3493b22e4e2339503adf921bf74e4568e4ca6c57113"
+    },
+    {
+      "path": "academy-media-root-unit.log",
+      "sha256": "c20c704041d24aa541b7cdb081c908a18a723c56afa16d44d7575fb8137c3451"
+    },
+    {
+      "path": "academy-media-root-lint.log",
+      "sha256": "104e822440d6a569f7500a9df6d802406adc497550213d296a61442edff803bb"
+    },
+    {
+      "path": "academy-media-root-gates.json",
+      "sha256": "f2861a54b4e3021101cbca1df00d69aff49d5b70011d0177cea9aa38e157ff10"
+    },
+    {
+      "path": "academy-media-root-build-cf.log",
+      "sha256": "b919120457de130d9c764684711aeb1fd1a02f4d173cc0559aa9f0406e057e7c"
+    },
+    {
+      "path": "academy-media-root-build-cf.log.json",
+      "sha256": "740248385542e0478d5130b439fe196276beab24e7c12232434d212dc1f4c17e"
+    }
+  ],
+  "reviewed_source": [
+    {
+      "path": "academy-web/src/app/(site)/course-media/[assetId]/route.ts",
+      "sha256": "14003380cd9b0b85f51ec1e85e99d9ca3a640578bfa1de22dd472bb19a855271"
+    },
+    {
+      "path": "academy-web/src/lib/media/cookie.ts",
+      "sha256": "f2d81bd4cb313c5f7cd6b0ea0c88a414824e7df6523a1c5f4739484b303623a8"
+    },
+    {
+      "path": "academy-web/src/lib/media/grant.ts",
+      "sha256": "ffc30da00d663a2498c5bac0c90585e211877ff534f3e109bed54879a4d0c3f0"
+    },
+    {
+      "path": "academy-web/src/lib/media/worker-delivery.ts",
+      "sha256": "72b4be8189b886ef255ce988413cfc5af86fca011ac1189df3d1652e69135980"
+    },
+    {
+      "path": "academy-web/tests/unit/media-delivery.test.ts",
+      "sha256": "c5f1dbe3e6374611049f4c1a1cb11e1bc2fb3b0cda27de7707d4bea628f9dfd3"
+    },
+    {
+      "path": "academy-web/tests/unit/media-grant.test.ts",
+      "sha256": "e1ac61a2201d74f5709761acea2b664b9e801d84dcc6c5645594f1bde0e49446"
+    },
+    {
+      "path": "academy-web/tests/unit/media-route.test.ts",
+      "sha256": "9811ee3a52be665abe5ffc3eef5f3ec1b6d210f934e664b8bfd27f7933f7edf1"
+    },
+    {
+      "path": "academy-web/tests/workerd/signer-worker.ts",
+      "sha256": "7b55424e604b8a26e262a77aaf186cec369394894c22a94bbd22a1519a9d2433"
+    }
+  ],
+  "reviewer": "crux_integrated_release_review",
+  "review_status": "PASS",
+  "production": "PENDING"
+}

@@ -1,0 +1,10 @@
+{
+  "exit": 0,
+  "command": [
+    "npm",
+    "run",
+    "build:cf"
+  ],
+  "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-media-root-build-cf.log",
+  "sha256": "b919120457de130d9c764684711aeb1fd1a02f4d173cc0559aa9f0406e057e7c"
+}

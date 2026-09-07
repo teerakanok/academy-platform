@@ -1,18 +1,22 @@
 import { describe, expect, it, vi } from 'vitest'
-import { issueMediaGrant } from '@/lib/media/grant'
+import { createMediaSessionDigest, issueMediaGrant } from '@/lib/media/grant'
 import { MEDIA_DELIVERY_COOKIE } from '@/lib/media/cookie'
 import { PRIVATE_MEDIA_ASSETS } from '@/lib/media/registry'
 import { servePrivateMedia } from '@/lib/media/worker-delivery'
 
 const SECRET = 'test-only-media-signing-secret-32-bytes-minimum'
+const SESSION_ID = 'A'.repeat(43)
 
-async function token(overrides: Partial<{ key: string; courseSlug: string; nodeId: string; expiresAt: number }> = {}) {
+async function token(
+  overrides: Partial<{ key: string; courseSlug: string; nodeId: string; expiresAt: number; sessionIdDigest: string }> = {},
+) {
   return issueMediaGrant(
     {
       assetId: 'formats-handout',
       courseSlug: 'content-formats-demo',
       nodeId: 'formats-references',
       expiresAt: Math.floor(Date.now() / 1000) + 300,
+      sessionIdDigest: await createMediaSessionDigest(SESSION_ID),
       ...overrides,
     },
     SECRET,
@@ -29,6 +33,25 @@ function bucket(body = 'PDF', range?: { offset?: number; length?: number; suffix
       writeHttpMetadata() {},
     })),
   }
+}
+
+function cookie(grant: string, sessionId: string | null = SESSION_ID) {
+  const mediaCookie = `${MEDIA_DELIVERY_COOKIE}=${grant}`
+  return sessionId === null ? mediaCookie : `${mediaCookie}; academy_session=${sessionId}`
+}
+
+async function legacyUnboundGrant() {
+  const payload = btoa(JSON.stringify({
+    assetId: 'formats-handout',
+    courseSlug: 'content-formats-demo',
+    nodeId: 'formats-references',
+    expiresAt: Math.floor(Date.now() / 1000) + 300,
+  })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(SECRET), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
+  const signature = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(payload))
+  const encodedSignature = btoa(String.fromCharCode(...new Uint8Array(signature)))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
+  return `${payload}.${encodedSignature}`
 }
 
 describe('private media Worker delivery', () => {
@@ -56,7 +79,7 @@ describe('private media Worker delivery', () => {
     const media = bucket('PDF', { offset: 0, length: 3 }, 3)
     const response = await servePrivateMedia(
       new Request('https://academy.test/course-media/formats-handout', {
-        headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${await token()}` },
+        headers: { cookie: cookie(await token()) },
       }),
       { MEDIA_SIGNING_SECRET: SECRET, COURSE_MEDIA: media },
     )
@@ -76,7 +99,9 @@ describe('private media Worker delivery', () => {
     const mismatched = await token({ nodeId: 'wrong-node' })
     for (const candidate of [`${valid}x`, mismatched, 'not-a-token', null]) {
       const response = await servePrivateMedia(new Request('https://academy.test/course-media/formats-handout', {
-        headers: candidate ? { cookie: `${MEDIA_DELIVERY_COOKIE}=${candidate}` } : undefined,
+        headers: candidate === null
+          ? { cookie: 'academy_session=short' }
+          : { cookie: cookie(candidate) },
       }), {
         MEDIA_SIGNING_SECRET: SECRET,
         COURSE_MEDIA: media,
@@ -86,11 +111,35 @@ describe('private media Worker delivery', () => {
     expect(media.get).not.toHaveBeenCalled()
   })
 
+  it('never reads R2 for a grant without the exact single issuing session', async () => {
+    const media = bucket()
+    const grant = await token()
+    const wrongSession = 'B'.repeat(43)
+    const candidates = [
+      await legacyUnboundGrant(),
+      cookie(grant, null),
+      cookie(grant, wrongSession),
+      cookie(grant, ''),
+      cookie(grant, 'short'),
+      `${cookie(grant)}; academy_session=${wrongSession}`,
+      `${cookie(grant)}; academy_session`,
+      `${MEDIA_DELIVERY_COOKIE}=${grant}; academy_session=${SESSION_ID}; academy_session=${wrongSession}`,
+    ]
+
+    for (const header of candidates) {
+      const response = await servePrivateMedia(new Request('https://academy.test/course-media/formats-handout', {
+        headers: { cookie: header },
+      }), { MEDIA_SIGNING_SECRET: SECRET, COURSE_MEDIA: media })
+      expect(response).toBeNull()
+    }
+    expect(media.get).not.toHaveBeenCalled()
+  })
+
   it('forwards an expired delivery cookie through authenticated renewal without reading R2', async () => {
     const media = bucket()
     const expired = await token({ expiresAt: 1 })
     const response = await servePrivateMedia(new Request('https://academy.test/course-media/formats-handout', {
-      headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${expired}` },
+      headers: { cookie: cookie(expired) },
     }), {
       MEDIA_SIGNING_SECRET: SECRET,
       COURSE_MEDIA: media,
@@ -111,7 +160,7 @@ describe('private media Worker delivery', () => {
   ])('normalizes $label R2 range responses', async ({ header, range, expected }) => {
     const response = await servePrivateMedia(
       new Request('https://academy.test/course-media/formats-handout', {
-        headers: { range: header, cookie: `${MEDIA_DELIVERY_COOKIE}=${await token()}` },
+        headers: { range: header, cookie: cookie(await token()) },
       }),
       { MEDIA_SIGNING_SECRET: SECRET, COURSE_MEDIA: bucket('part', range, 10) },
     )
@@ -123,7 +172,7 @@ describe('private media Worker delivery', () => {
     const media = bucket('PDF')
     const grant = await token()
     const head = await servePrivateMedia(new Request('https://academy.test/course-media/formats-handout', {
-      method: 'HEAD', headers: { cookie: `${MEDIA_DELIVERY_COOKIE}=${grant}` },
+      method: 'HEAD', headers: { cookie: cookie(grant) },
     }), {
       MEDIA_SIGNING_SECRET: SECRET,
       COURSE_MEDIA: media,
@@ -134,7 +183,7 @@ describe('private media Worker delivery', () => {
     for (const range of ['bytes=5-2', 'bytes=0-1,4-5', 'bytes=-0', 'items=0-2']) {
       const response = await servePrivateMedia(
         new Request('https://academy.test/course-media/formats-handout', {
-          headers: { range, cookie: `${MEDIA_DELIVERY_COOKIE}=${grant}` },
+          headers: { range, cookie: cookie(grant) },
         }),
         { MEDIA_SIGNING_SECRET: SECRET, COURSE_MEDIA: media },
       )
@@ -145,7 +194,7 @@ describe('private media Worker delivery', () => {
   it('does not emit a malformed 206 when R2 omits range metadata', async () => {
     const response = await servePrivateMedia(
       new Request('https://academy.test/course-media/formats-handout', {
-        headers: { range: 'bytes=0-1', cookie: `${MEDIA_DELIVERY_COOKIE}=${await token()}` },
+        headers: { range: 'bytes=0-1', cookie: cookie(await token()) },
       }),
       { MEDIA_SIGNING_SECRET: SECRET, COURSE_MEDIA: bucket('PDF') },
     )

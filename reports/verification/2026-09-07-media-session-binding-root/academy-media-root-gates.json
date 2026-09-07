@@ -1,0 +1,65 @@
+[
+  {
+    "gate": "unit",
+    "command": [
+      "npx",
+      "--no-install",
+      "vitest",
+      "run",
+      "--project",
+      "unit"
+    ],
+    "exit": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-media-root-unit.log",
+    "sha256": "c20c704041d24aa541b7cdb081c908a18a723c56afa16d44d7575fb8137c3451"
+  },
+  {
+    "gate": "lint",
+    "command": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "exit": 1,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-media-root-lint.log",
+    "sha256": "104e822440d6a569f7500a9df6d802406adc497550213d296a61442edff803bb"
+  },
+  {
+    "gate": "types",
+    "command": [
+      "npx",
+      "--no-install",
+      "tsc",
+      "--noEmit"
+    ],
+    "exit": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-media-root-types.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "gate": "worker-types",
+    "command": [
+      "npx",
+      "--no-install",
+      "tsc",
+      "-p",
+      "tsconfig.worker.json"
+    ],
+    "exit": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-media-root-worker-types.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "gate": "retention-types",
+    "command": [
+      "npx",
+      "--no-install",
+      "tsc",
+      "-p",
+      "ops/academy-retention-worker/tsconfig.json"
+    ],
+    "exit": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-media-root-retention-types.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

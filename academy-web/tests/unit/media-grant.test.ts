@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { issueMediaGrant, verifyMediaGrant, type MediaGrant } from '@/lib/media/grant'
+import { createMediaSessionDigest, issueMediaGrant, verifyMediaGrant, type MediaGrant } from '@/lib/media/grant'
 
 const SECRET = 'test-only-media-signing-secret-32-bytes-minimum'
 const grant: MediaGrant = {
@@ -7,6 +7,7 @@ const grant: MediaGrant = {
   courseSlug: 'basic-os-linux',
   nodeId: 'os-what-it-does',
   expiresAt: 2_000,
+  sessionIdDigest: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
 }
 
 describe('private media grant', () => {
@@ -27,5 +28,15 @@ describe('private media grant', () => {
   it('refuses weak secrets and unsafe object keys', async () => {
     await expect(issueMediaGrant(grant, 'short')).rejects.toThrow(/32 bytes/)
     await expect(issueMediaGrant({ ...grant, assetId: '../secret.env' }, SECRET)).rejects.toThrow(/invalid media grant/)
+  })
+
+  it('does not place a raw session identifier in the signed payload', async () => {
+    const sessionId = 'raw-session-value-that-must-never-be-signed'
+    const sessionIdDigest = await createMediaSessionDigest(sessionId)
+    const token = await issueMediaGrant({ ...grant, sessionIdDigest }, SECRET)
+
+    expect(token.split('.')[0]).not.toContain(sessionId)
+    await expect(verifyMediaGrant(token, SECRET, 1_999)).resolves.toEqual({ ...grant, sessionIdDigest })
+    await expect(createMediaSessionDigest(`${sessionId}x`)).resolves.not.toBe(sessionIdDigest)
   })
 })

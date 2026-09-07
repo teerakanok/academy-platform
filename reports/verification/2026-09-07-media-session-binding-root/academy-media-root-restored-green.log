@@ -1,0 +1,10 @@
+
+ RUN  v3.2.7 /private/tmp/academy-media-session-binding-cde63a58/academy-web
+
+ ✓ |unit| tests/unit/media-delivery.test.ts (16 tests) 20ms
+
+ Test Files  1 passed (1)
+      Tests  16 passed (16)
+   Start at  13:01:26
+   Duration  434ms (transform 56ms, setup 0ms, collect 61ms, tests 20ms, environment 0ms, prepare 75ms)
+

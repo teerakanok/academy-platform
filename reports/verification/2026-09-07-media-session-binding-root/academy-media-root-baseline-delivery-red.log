@@ -1,0 +1,49 @@
+
+ RUN  v3.2.7 /private/tmp/academy-media-session-binding-cde63a58/academy-web
+
+ ❯ |unit| tests/unit/media-delivery.test.ts (16 tests | 1 failed) 22ms
+   ✓ private media Worker delivery > ignores unrelated paths so OpenNext remains the handler 2ms
+   ✓ private media Worker delivery > blocks the registered legacy path /media/lesson-demo.mp4 before OpenNext 2ms
+   ✓ private media Worker delivery > blocks the registered legacy path /media/lesson-demo-th.mp4 before OpenNext 0ms
+   ✓ private media Worker delivery > blocks the registered legacy path /media/captions/os-what-it-does.en.vtt before OpenNext 0ms
+   ✓ private media Worker delivery > blocks the registered legacy path /media/captions/os-what-it-does.th.vtt before OpenNext 0ms
+   ✓ private media Worker delivery > blocks the registered legacy path /media/sample-handout.pdf before OpenNext 0ms
+   ✓ private media Worker delivery > serves a registered object only with a valid bound grant 5ms
+   ✓ private media Worker delivery > forwards missing, tampered, and ownership-mismatched grants to the authorization route before R2 1ms
+   × private media Worker delivery > never reads R2 for a grant without the exact single issuing session 5ms
+     → expected Response { status: 200, statusText: '', headers: Headers { 'accept-ranges': 'bytes', 'cache-control': 'private, no-store', 'content-type': 'application/pdf', 'X-Content-Type-Options': 'nosniff', etag: '"etag"', 'Content-Security-Policy': "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob:; connect-src 'self'; worker-src 'self' blob:; frame-src 'none'; manifest-src 'self'", 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Frame-Options': 'DENY', 'Referrer-Policy': 'strict-origin-when-cross-origin', 'Permissions-Policy': 'camera=(), geolocation=(), microphone=(), payment=(), usb=()', 'X-DNS-Prefetch-Control': 'off' }, body: ReadableStream { locked: false, state: 'readable', supportsBYOB: true }, bodyUsed: false, ok: true, redirected: false, type: 'default', url: '' } to be null
+   ✓ private media Worker delivery > forwards an expired delivery cookie through authenticated renewal without reading R2 1ms
+   ✓ private media Worker delivery > fails closed when the private binding or signing secret is absent 0ms
+   ✓ private media Worker delivery > normalizes 'closed' R2 range responses 1ms
+   ✓ private media Worker delivery > normalizes 'open' R2 range responses 1ms
+   ✓ private media Worker delivery > normalizes 'suffix' R2 range responses 1ms
+   ✓ private media Worker delivery > supports HEAD and rejects malformed, multiple, and impossible ranges before R2 1ms
+   ✓ private media Worker delivery > does not emit a malformed 206 when R2 omits range metadata 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| tests/unit/media-delivery.test.ts > private media Worker delivery > never reads R2 for a grant without the exact single issuing session
+AssertionError: expected Response { status: 200, statusText: '', headers: Headers { 'accept-ranges': 'bytes', 'cache-control': 'private, no-store', 'content-type': 'application/pdf', 'X-Content-Type-Options': 'nosniff', etag: '"etag"', 'Content-Security-Policy': "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob:; connect-src 'self'; worker-src 'self' blob:; frame-src 'none'; manifest-src 'self'", 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Frame-Options': 'DENY', 'Referrer-Policy': 'strict-origin-when-cross-origin', 'Permissions-Policy': 'camera=(), geolocation=(), microphone=(), payment=(), usb=()', 'X-DNS-Prefetch-Control': 'off' }, body: ReadableStream { locked: false, state: 'readable', supportsBYOB: true }, bodyUsed: false, ok: true, redirected: false, type: 'default', url: '' } to be null
+
+- Expected: 
+null
+
++ Received: 
+Response {}
+
+ ❯ tests/unit/media-delivery.test.ts:133:24
+    131|         headers: { cookie: header },
+    132|       }), { MEDIA_SIGNING_SECRET: SECRET, COURSE_MEDIA: media })
+    133|       expect(response).toBeNull()
+       |                        ^
+    134|     }
+    135|     expect(media.get).not.toHaveBeenCalled()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 15 passed (16)
+   Start at  13:00:35
+   Duration  476ms (transform 49ms, setup 0ms, collect 50ms, tests 22ms, environment 0ms, prepare 102ms)
+

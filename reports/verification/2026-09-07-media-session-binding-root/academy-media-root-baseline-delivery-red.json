@@ -1,0 +1,14 @@
+{
+  "red_exit": 1,
+  "command": [
+    "vitest",
+    "run",
+    "--project",
+    "unit",
+    "tests/unit/media-delivery.test.ts"
+  ],
+  "baseline_delivery_sha256": "7b687ae76546c573e4789e54f3428cc1fa38457248f3631a02ef573a0629f496",
+  "restored_candidate_sha256": "72b4be8189b886ef255ce988413cfc5af86fca011ac1189df3d1652e69135980",
+  "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-media-root-baseline-delivery-red.log",
+  "log_sha256": "56ee8704ea7218f694ee1fb080ce7410ec2e087cc5b68fb60a7c3036dca10d8e"
+}

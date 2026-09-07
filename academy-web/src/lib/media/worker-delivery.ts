@@ -1,5 +1,5 @@
-import { verifyMediaGrantSignature } from './grant'
-import { mediaDeliveryCookie } from './cookie'
+import { createMediaSessionDigest, mediaSessionDigestMatches, verifyMediaGrantSignature } from './grant'
+import { mediaDeliveryCookie, parseAcademySessionCookie } from './cookie'
 import { withEdgeSecurityHeaders } from '../edge-security-headers'
 import { privateMediaById, privateMediaByLegacyPath } from './registry'
 
@@ -42,8 +42,11 @@ export async function servePrivateMedia(request: MediaRequest, env: MediaWorkerE
   if (!asset) return null
   const token = mediaDeliveryCookie(request.headers)
   if (!token) return null
+  const sessionId = parseAcademySessionCookie(request.headers)
+  if (!sessionId) return null
   const grant = await verifyMediaGrantSignature(token, env.MEDIA_SIGNING_SECRET)
   if (!grant || grant.assetId !== asset.id || asset.courseSlug !== grant.courseSlug || asset.nodeId !== grant.nodeId) return null
+  if (!mediaSessionDigestMatches(grant.sessionIdDigest, await createMediaSessionDigest(sessionId))) return null
   if (grant.expiresAt <= Math.floor(Date.now() / 1000)) return null
 
   const requestedRange = request.headers.get('range')

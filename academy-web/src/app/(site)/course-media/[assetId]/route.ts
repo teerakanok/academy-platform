@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { readFile } from 'node:fs/promises'
 import { resolve, sep } from 'node:path'
-import { issueMediaGrant, verifyMediaGrantSignature } from '@/lib/media/grant'
+import { createMediaSessionDigest, issueMediaGrant, mediaSessionDigestMatches, verifyMediaGrantSignature } from '@/lib/media/grant'
 import { privateMediaById } from '@/lib/media/registry'
-import { DELIVERY_GRANT_TTL_SECONDS, MEDIA_DELIVERY_COOKIE, mediaDeliveryCookie, mediaDeliveryPath } from '@/lib/media/cookie'
+import { DELIVERY_GRANT_TTL_SECONDS, MEDIA_DELIVERY_COOKIE, mediaDeliveryCookie, mediaDeliveryPath, parseAcademySessionCookie } from '@/lib/media/cookie'
 import { currentUser } from '@/lib/auth/session'
 import { authorizeCourseResource } from '@/lib/account/course-access'
 import { isSecureRequest } from '@/lib/auth/cookie-policy'
@@ -15,14 +15,18 @@ async function authorizeDelivery(request: NextRequest, assetId: string) {
   const asset = privateMediaById(assetId)
   if (!secret || !asset) return new NextResponse(null, { status: 404 })
 
+  const sessionId = parseAcademySessionCookie(request.headers)
+  if (!sessionId) return new NextResponse(null, { status: 401 })
+
   const user = await currentUser()
   if (!user) return new NextResponse(null, { status: 401 })
   const access = await authorizeCourseResource(user.account.id, asset.courseSlug, asset.nodeId)
   if (!access.allowed) return new NextResponse(null, { status: access.reason === 'unavailable' ? 503 : 403 })
 
   const now = Math.floor(Date.now() / 1000)
+  const sessionIdDigest = await createMediaSessionDigest(sessionId)
   const token = await issueMediaGrant(
-    { assetId: asset.id, courseSlug: asset.courseSlug, nodeId: asset.nodeId, expiresAt: now + DELIVERY_GRANT_TTL_SECONDS },
+    { assetId: asset.id, courseSlug: asset.courseSlug, nodeId: asset.nodeId, expiresAt: now + DELIVERY_GRANT_TTL_SECONDS, sessionIdDigest },
     secret,
   )
   const response = new NextResponse(null, {
@@ -52,8 +56,15 @@ async function deliver(request: NextRequest, assetId: string, head: boolean) {
 
   const asset = privateMediaById(assetId)
   const token = mediaDeliveryCookie(request.headers)
+  const sessionId = parseAcademySessionCookie(request.headers)
   const grant = token ? await verifyMediaGrantSignature(token, secret) : null
-  if (!asset || !grant || grant.expiresAt <= Math.floor(Date.now() / 1000) || grant.assetId !== asset.id || asset.courseSlug !== grant.courseSlug || asset.nodeId !== grant.nodeId) {
+  const grantValid = !!asset && !!grant && !!sessionId &&
+    grant.assetId === asset.id &&
+    asset.courseSlug === grant.courseSlug &&
+    asset.nodeId === grant.nodeId &&
+    grant.expiresAt > Math.floor(Date.now() / 1000) &&
+    mediaSessionDigestMatches(grant.sessionIdDigest, await createMediaSessionDigest(sessionId))
+  if (!grantValid) {
     return authorizeDelivery(request, assetId)
   }
 
