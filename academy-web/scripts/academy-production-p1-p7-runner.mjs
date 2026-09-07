@@ -34,7 +34,7 @@ export const IDENTITY_SYNTHETIC_AUTHORITY = Object.freeze({
   wrapperAuthoritySha256:
     "b0a1897048e9881a0789204619de9c770bc5258904ba597ab7afc026998cb01e",
   hostHelperSha256:
-    "ead268f57955758091c8d436bc92dc8862667a3cd9f2d487512e0ab36b639891",
+    "6930f7dcd9cf261b6fb8fed5e945f2f2523873359256ae51ca06ebf0825c4dc3",
 });
 
 const CHECKS = Object.freeze(["P1", "P2", "P3", "P4", "P5", "P6", "P7"]);

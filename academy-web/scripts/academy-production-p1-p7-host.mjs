@@ -111,10 +111,9 @@ export function databaseForTest(
     !OPERATION_ID.test(operationId)
   )
     fail();
-  const sql =
+  const scopedSql =
     mode === "enroll"
-      ? `begin;
-create temp table academy_synthetic_fixture on commit drop as
+      ? `create temp table academy_synthetic_fixture on commit drop as
   select :'academy_subject'::text as subject, :'academy_email'::text as email;
 do $$ declare target uuid; begin
   lock table academy.users in share row exclusive mode;
@@ -130,10 +129,8 @@ select count(*) from academy.course_entitlement e
   join academy.users u on u.id=e.user_id
   join academy_synthetic_fixture f on u.subject=f.subject and u.email=f.email
   where e.course_slug='setup-and-environment' and e.source='grant'
-    and e.revoked_at is null;
-commit;`
-      : `begin;
-create temp table academy_synthetic_fixture on commit drop as
+    and e.revoked_at is null;`
+      : `create temp table academy_synthetic_fixture on commit drop as
   select :'academy_subject'::text as subject, :'academy_email'::text as email;
 do $$ declare target uuid; matched bigint; begin
   lock table academy.users in share row exclusive mode;
@@ -149,11 +146,8 @@ do $$ declare target uuid; matched bigint; begin
     where u.id=target and u.subject=f.subject and u.email=f.email;
 end $$;
 select count(*) from academy.users u
-  join academy_synthetic_fixture f on u.subject=f.subject and u.email=f.email;
-commit;`;
-  const result = spawnDatabase(
-    "/usr/bin/docker",
-    [
+  join academy_synthetic_fixture f on u.subject=f.subject and u.email=f.email;`;
+  const argv = [
       "exec",
       "-i",
       "supabase-db",
@@ -171,10 +165,33 @@ commit;`;
       "-AtX",
       "-q",
     ],
-    { input: sql, encoding: "utf8", maxBuffer: 65_536, timeout: 30_000 },
-  );
+    transaction = (terminal) => `begin;
+set local lock_timeout = '2s';
+set local statement_timeout = '8s';
+${scopedSql}
+${terminal};`,
+    invoke = (terminal) =>
+      spawnDatabase("/usr/bin/docker", argv, {
+        input: transaction(terminal),
+        encoding: "utf8",
+        maxBuffer: 65_536,
+        timeout: 12_000,
+      });
   const expected = mode === "enroll" ? "1" : "0";
-  if (result.status !== 0 || result.stdout.trim() !== expected) fail();
+  const rehearsal = invoke("rollback");
+  if (
+    rehearsal?.status !== 0 ||
+    typeof rehearsal.stdout !== "string" ||
+    rehearsal.stdout.trim() !== expected
+  )
+    fail();
+  const committed = invoke("commit");
+  if (
+    committed?.status !== 0 ||
+    typeof committed.stdout !== "string" ||
+    committed.stdout.trim() !== expected
+  )
+    fail();
   return {
     schema: "academy-synthetic-fixture-db/v1",
     operationId,

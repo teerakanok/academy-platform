@@ -1,0 +1,18 @@
+[
+  {
+    "path": "academy-web/scripts/academy-production-p1-p7-host.mjs",
+    "sha256": "6930f7dcd9cf261b6fb8fed5e945f2f2523873359256ae51ca06ebf0825c4dc3"
+  },
+  {
+    "path": "academy-web/scripts/academy-production-p1-p7-host.test.mjs",
+    "sha256": "555c388204f5dfff1b66eecc780ab3d84d397c4d09e3029db4ca99b5fcf2e309"
+  },
+  {
+    "path": "academy-web/scripts/academy-production-p1-p7-runner.mjs",
+    "sha256": "4c4f8f1026d7466005ea3ded6b138755200fff4d6810554f63fcc8f04828af28"
+  },
+  {
+    "path": "academy-web/scripts/academy-production-p1-p7-ssh.mjs",
+    "sha256": "b42cc1c506c3fd7a2527f5ecce40cc33db7d28d64bd71b8a6a95e0b0b5356c45"
+  }
+]

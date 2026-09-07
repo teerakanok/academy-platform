@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
@@ -24,7 +24,7 @@ test("host helper uses stable no-follow reads and argv/stdin database execution"
   assert.match(source, /O_NOFOLLOW/);
   assert.match(source, /before\.dev !== after\.dev/);
   assert.match(source, /"\/usr\/bin\/docker"/);
-  assert.match(source, /input: sql/);
+  assert.match(source, /input: transaction\(terminal\)/);
   assert.doesNotMatch(source, /execSync|shell\s*:/);
   assert.doesNotMatch(source, /console\./);
 });
@@ -55,8 +55,8 @@ test("database values bind as text-compatible psql variables outside the do bloc
     emailSha256:
       "683c83a07e5822e2e24ad814680cc454e97951f066cd717afd9e925d231a73a2",
   });
-  assert.equal(calls.length, 1);
-  const { argv, options } = calls[0];
+  assert.equal(calls.length, 2);
+  const [{ argv, options }, committed] = calls;
   const variableValues = [];
   for (let index = 0; index < argv.length; index += 1) {
     if (argv[index] === "-v") variableValues.push(argv[index + 1]);
@@ -73,6 +73,17 @@ test("database values bind as text-compatible psql variables outside the do bloc
   assert.doesNotMatch(sql, /drop fixture/);
   assert.doesNotMatch(sql, /quote';/);
   assert.ok(argv.includes("-q"));
+  assert.match(sql, /set local lock_timeout = '2s';/);
+  assert.match(sql, /set local statement_timeout = '8s';/);
+  assert.match(sql, /rollback;$/);
+  assert.match(committed.options.input, /commit;$/);
+  assert.equal(
+    sql.replace(/rollback;$/, ""),
+    committed.options.input.replace(/commit;$/, ""),
+  );
+  assert.deepEqual(committed.argv, argv);
+  assert.equal(options.timeout, 12_000);
+  assert.equal(committed.options.timeout, 12_000);
   assert.match(
     await readFile(
       new URL("./academy-production-p1-p7-host.mjs", import.meta.url),
@@ -80,6 +91,26 @@ test("database values bind as text-compatible psql variables outside the do bloc
     ),
     /databaseForTest\(mode, subject, email, spawnSync, operationId\)/,
   );
+});
+
+test("failed database rehearsal rejects before any commit invocation", () => {
+  const calls = [];
+  assert.throws(
+    () =>
+      databaseForTest(
+        "enroll",
+        "11111111-2222-5333-8444-555555555555",
+        "safe@example.test",
+        (file, argv, options) => {
+          calls.push({ file, argv, options });
+          return { status: 0, stdout: "0\n" };
+        },
+      ),
+    /REJECTED/,
+  );
+  assert.equal(calls.length, 1);
+  assert.match(calls[0].options.input, /rollback;$/);
+  assert.doesNotMatch(calls[0].options.input, /commit;/);
 });
 
 test("cleanup rejects duplicate fixture users before its final commit", () => {
@@ -146,7 +177,7 @@ test("database result must be the exact expected row count", () => {
   );
 });
 
-test("bound fixture SQL proves enrollment and cleanup behavior on PostgreSQL", (t) => {
+test("bound fixture SQL proves enrollment, rollback, cleanup, and lock deadline on PostgreSQL", async (t) => {
   const psql = process.env.ACADEMY_SEC019_PSQL;
   const databaseUrl = process.env.ACADEMY_SEC019_DATABASE_URL;
   if (!psql || !databaseUrl)
@@ -155,20 +186,24 @@ test("bound fixture SQL proves enrollment and cleanup behavior on PostgreSQL", (
   const disposable = new URL(databaseUrl);
   if (disposable.pathname !== "/academy_sec019_disposable") assert.fail("fixture must target academy_sec019_disposable");
   const capture = (mode) => {
-    let sql = "";
+    const transactions = [];
     const variables = [];
     databaseForTest(
       mode,
       "11111111-2222-5333-8444-555555555555",
       "quote'; drop fixture;--@synthetic.example",
       (file, argv, options) => {
-        sql = options.input;
+        transactions.push(options.input);
         for (let index = 0; index < argv.length; index += 1)
           if (argv[index] === "-v") variables.push(argv[index + 1]);
         return { status: 0, stdout: mode === "enroll" ? "1\n" : "0\n" };
       },
     );
-    return { sql, variables };
+    return {
+      rehearsal: transactions[0],
+      commit: transactions[1],
+      variables: variables.slice(0, variables.length / 2),
+    };
   };
   const run = (sql, variables = []) => {
     const result = spawnSync(
@@ -188,7 +223,7 @@ create table academy.course_entitlement(user_id uuid not null references academy
   t.after(() => run("drop schema academy cascade;"));
   assert.notEqual(
     spawnSync(psql, ["-d", databaseUrl, ...enroll.variables.flatMap((value) => ["-v", value]), "-v", "ON_ERROR_STOP=1", "-AtX", "-q"], {
-      input: enroll.sql,
+      input: enroll.commit,
       encoding: "utf8",
       timeout: 30000,
       maxBuffer: 65536,
@@ -197,16 +232,20 @@ create table academy.course_entitlement(user_id uuid not null references academy
   );
   assert.equal(run("select count(*) from academy.users;"), "0\n");
   run(`insert into academy.users(issuer,subject,email) values ('https://issuer.test','11111111-2222-5333-8444-555555555555','other@example.test'),('https://issuer-other.test','11111111-2222-5333-8444-555555555555','quote''; drop fixture;--@synthetic.example');`);
-  assert.equal(run(enroll.sql, enroll.variables), "1\n");
-  assert.equal(run(enroll.sql, enroll.variables), "1\n");
+  assert.equal(run(enroll.rehearsal, enroll.variables), "1\n");
+  assert.equal(run(`select count(*) from academy.course_entitlement where course_slug='setup-and-environment';`), "0\n");
+  assert.equal(run(enroll.commit, enroll.variables), "1\n");
+  assert.equal(run(enroll.commit, enroll.variables), "1\n");
   assert.equal(run(`select count(*) from academy.course_entitlement where course_slug='setup-and-environment';`), "1\n");
-  assert.equal(run(cleanup.sql, cleanup.variables), "0\n");
-  assert.equal(run(cleanup.sql, cleanup.variables), "0\n");
+  assert.equal(run(cleanup.rehearsal, cleanup.variables), "0\n");
+  assert.equal(run("select count(*) from academy.users where email=$$quote'; drop fixture;--@synthetic.example$$;"), "1\n");
+  assert.equal(run(cleanup.commit, cleanup.variables), "0\n");
+  assert.equal(run(cleanup.commit, cleanup.variables), "0\n");
   assert.equal(run("select count(*) from academy.users where email='other@example.test';"), "1\n");
   run(`insert into academy.users(issuer,subject,email) values ('https://issuer-duplicate.test','11111111-2222-5333-8444-555555555555','quote''; drop fixture;--@synthetic.example'),('https://issuer-duplicate-other.test','11111111-2222-5333-8444-555555555555','quote''; drop fixture;--@synthetic.example');`);
-  for (const { sql, variables } of [enroll, cleanup]) {
+  for (const { commit, variables } of [enroll, cleanup]) {
     const result = spawnSync(psql, ["-d", databaseUrl, ...variables.flatMap((value) => ["-v", value]), "-v", "ON_ERROR_STOP=1", "-AtX", "-q"], {
-      input: sql,
+      input: commit,
       encoding: "utf8",
       timeout: 30000,
       maxBuffer: 65536,
@@ -214,4 +253,58 @@ create table academy.course_entitlement(user_id uuid not null references academy
     assert.notEqual(result.status, 0);
   }
   assert.equal(run("select count(*) from academy.users;"), "3\n");
+
+  run("delete from academy.users where email <> 'other@example.test';");
+  const holder = spawn(psql, ["-d", databaseUrl, "-AtX", "-q"], {
+    stdio: ["pipe", "pipe", "pipe"],
+  });
+  const closed = new Promise((resolve) => holder.once("close", resolve));
+  t.after(async () => {
+    if (holder.exitCode === null) holder.kill("SIGTERM");
+    await closed;
+  });
+  const locked = new Promise((resolve, reject) => {
+    let stdout = "";
+    const timer = setTimeout(() => reject(new Error("lock holder timeout")), 5_000);
+    holder.once("error", reject);
+    holder.stdout.on("data", (chunk) => {
+      stdout += chunk;
+      if (stdout.includes("LOCKED")) {
+        clearTimeout(timer);
+        resolve();
+      }
+    });
+  });
+  holder.stdin.end(
+    "begin; lock table academy.users in access exclusive mode; select 'LOCKED'; select pg_sleep(4); rollback;\n",
+  );
+  await locked;
+  const startedAt = Date.now();
+  const timedOut = spawnSync(
+    psql,
+    [
+      "-d",
+      databaseUrl,
+      ...enroll.variables.flatMap((value) => ["-v", value]),
+      "-v",
+      "ON_ERROR_STOP=1",
+      "-AtX",
+      "-q",
+    ],
+    {
+      input: enroll.rehearsal,
+      encoding: "utf8",
+      timeout: 12_000,
+      maxBuffer: 65_536,
+    },
+  );
+  assert.notEqual(timedOut.status, 0);
+  assert.match(timedOut.stderr, /lock timeout/);
+  assert.ok(Date.now() - startedAt < 5_000);
+  holder.kill("SIGTERM");
+  await closed;
+  assert.equal(
+    run("select count(*) from academy.course_entitlement;"),
+    "0\n",
+  );
 });

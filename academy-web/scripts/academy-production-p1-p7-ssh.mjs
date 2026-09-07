@@ -17,7 +17,7 @@ const EXPECTED = Object.freeze({
   manifest: "443b9f7c80f7e89e649922807692b9657c93737bc17b809bd46d2631a6eb1571",
   authority: "b0a1897048e9881a0789204619de9c770bc5258904ba597ab7afc026998cb01e",
   hostHelper:
-    "ead268f57955758091c8d436bc92dc8862667a3cd9f2d487512e0ab36b639891",
+    "6930f7dcd9cf261b6fb8fed5e945f2f2523873359256ae51ca06ebf0825c4dc3",
 });
 const OP = /^\/root\/identity-synthetic-operations\/academy-p5-[a-f0-9]{18}$/;
 const UUID =

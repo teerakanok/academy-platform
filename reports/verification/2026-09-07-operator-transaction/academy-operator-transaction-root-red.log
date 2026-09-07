@@ -1,0 +1,374 @@
+✔ host helper rejects foreign paths before protected reads or database calls (0.97075ms)
+✖ host helper uses stable no-follow reads and argv/stdin database execution (4.382958ms)
+✖ database values bind as text-compatible psql variables outside the do block (1.876958ms)
+✖ failed database rehearsal rejects before any commit invocation (0.38125ms)
+✔ cleanup rejects duplicate fixture users before its final commit (0.164916ms)
+✔ protected fixture boundary rejects malformed identity before database (0.240958ms)
+✔ database result must be the exact expected row count (0.178375ms)
+﹣ bound fixture SQL proves enrollment, rollback, cleanup, and lock deadline on PostgreSQL (0.22975ms) # real PostgreSQL fixture unavailable: set ACADEMY_SEC019_PSQL and ACADEMY_SEC019_DATABASE_URL
+ℹ tests 8
+ℹ suites 0
+ℹ pass 4
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 85.388208
+
+✖ failing tests:
+
+test at scripts/academy-production-p1-p7-host.test.mjs:19:1
+✖ host helper uses stable no-follow reads and argv/stdin database execution (4.382958ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /input: transaction\(terminal\)/. Input:
+  
+  '#!/usr/bin/env node\n' +
+    'import { spawnSync } from "node:child_process";\n' +
+    'import { createHash } from "node:crypto";\n' +
+    'import {\n' +
+    '  closeSync,\n' +
+    '  constants,\n' +
+    '  fstatSync,\n' +
+    '  lstatSync,\n' +
+    '  openSync,\n' +
+    '  readFileSync,\n' +
+    '  realpathSync,\n' +
+    '  unlinkSync,\n' +
+    '  writeFileSync,\n' +
+    '} from "node:fs";\n' +
+    'import { dirname } from "node:path";\n' +
+    '\n' +
+    'const OP = /^\\/root\\/identity-synthetic-operations\\/academy-p5-[a-f0-9]{18}$/;\n' +
+    'const SUBJECT_UUID =\n' +
+    '  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;\n' +
+    'const OPERATION_ID = /^academy-p5-[a-f0-9]{18}$/;\n' +
+    'const fail = () => {\n' +
+    '  throw new Error("ACADEMY_P1_P7_HOST_REJECTED");\n' +
+    '};\n' +
+    '\n' +
+    'function ancestry(path) {\n' +
+    '  let p = path;\n' +
+    '  while (true) {\n' +
+    '    const s = lstatSync(p);\n' +
+    '    if (\n' +
+    '      !s.isDirectory() ||\n' +
+    '      s.isSymbolicLink() ||\n' +
+    '      s.uid !== 0 ||\n' +
+    '      s.mode & 0o022 ||\n' +
+    '      realpathSync(p) !== p\n' +
+    '    )\n' +
+    '      fail();\n' +
+    '    if (p === "/") return;\n' +
+    '    p = dirname(p);\n' +
+    '  }\n' +
+    '}\n' +
+    'function readStable(path, maximum, mode = 0o600) {\n' +
+    '  ancestry(dirname(path));\n' +
+    '  const fd = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW);\n' +
+    '  try {\n' +
+    '    const before = fstatSync(fd, { bigint: true });\n' +
+    '    if (\n' +
+    '      !before.isFile() ||\n' +
+    '      before.uid !== 0n ||\n' +
+    '      (before.mode & 0o777n) !== BigInt(mode) ||\n' +
+    '      before.nlink !== 1n ||\n' +
+    '      before.size < 2n ||\n' +
+    '      before.size > BigInt(maximum)\n' +
+    '    )\n' +
+    '      fail();\n' +
+    '    const bytes = readFileSync(fd);\n' +
+    '    const after = fstatSync(fd, { bigint: true }),\n' +
+    '      pathState = lstatSync(path, { bigint: true });\n' +
+    '    if (\n' +
+    '      before.dev !== after.dev ||\n' +
+    '      before.ino !== after.ino ||\n' +
+    '      before.size !== after.size ||\n' +
+    '      before.mtimeNs !== after.mtimeNs ||\n' +
+    '      before.ctimeNs !== after.ctimeNs ||\n' +
+    '      after.dev !== pathState.dev ||\n' +
+    '      after.ino !== pathState.ino ||\n' +
+    '      after.size !== pathState.size\n' +
+    '    )\n' +
+    '      fail();\n' +
+    '    return bytes;\n' +
+    '  } finally {\n' +
+    '    closeSync(fd);\n' +
+    '  }\n' +
+    '}\n' +
+    '\n' +
+    'function fixture(operationPath, readOperation = readStable) {\n' +
+    '  if (!OP.test(operationPath)) fail();\n' +
+    '  const operationId = operationPath.split("/").at(-1),\n' +
+    '    value = JSON.parse(\n' +
+    '      readOperation(`${operationPath}/prepare-input.json`, 16_384),\n' +
+    '    ),\n' +
+    '    cleanup = JSON.parse(readOperation(`${operationPath}/cleanup.json`, 16_384));\n' +
+    '  if (\n' +
+    '    value.operationId !== operationId ||\n' +
+    '    value.email !== `${operationId}@synthetic.cyberskills.co.th` ||\n' +
+    '    cleanup.schema !== "identity-synthetic-sign-in-cleanup/v2" ||\n' +
+    '    cleanup.operationId !== operationId ||\n' +
+    '    cleanup.state !== "owned" ||\n' +
+    '    !SUBJECT_UUID.test(cleanup.userId ?? "") ||\n' +
+    '    cleanup.emailSha256 !==\n' +
+    '      createHash("sha256").update(value.email).digest("hex")\n' +
+    '  )\n' +
+    '    fail();\n' +
+    '  return { operationId, email: value.email, subject: cleanup.userId };\n' +
+    '}\n' +
+    '\n' +
+    'export function fixtureForTest(operationPath, readOperation) {\n' +
+    '  return fixture(operationPath, readOperation);\n' +
+    '}\n' +
+    '\n' +
+    'export function databaseForTest(\n' +
+    '  mode,\n' +
+    '  subject,\n' +
+    '  email,\n' +
+    '  spawnDatabase = spawnSync,\n' +
+    '  operationId = "academy-p5-000000000000000000",\n' +
+    ') {\n' +
+    '  if (\n' +
+    '    !["enroll", "cleanup"].includes(mode) ||\n' +
+    '    !SUBJECT_UUID.test(subject) ||\n' +
+    '    typeof email !== "string" ||\n' +
+    '    !OPERATION_ID.test(operationId)\n' +
+    '  )\n' +
+    '    fail();\n' +
+    '  const sql =\n' +
+    '    mode === "enroll"\n' +
+    '      ? `begin;\n' +
+    'create temp table academy_synthetic_fixture on commit drop as\n' +
+    "  select :'academy_subject'::text as subject, :'academy_email'::text as email;\n" +
+    'do $$ declare target uuid; begin\n' +
+    '  lock table academy.users in share row exclusive mode;\n' +
+    '  select u.id into strict target\n' +
+    '    from academy.users u join academy_synthetic_fixture f\n' +
+    '      on u.subject=f.subject and u.email=f.email;\n' +
+    '  insert into academy.course_entitlement(user_id,course_slug,source)\n' +
+    "    values(target,'setup-and-environment','grant')\n" +
+    '    on conflict(user_id,course_slug) do update\n' +
+    "      set source='grant',revoked_at=null,expires_at=null;\n" +
+    'end $$;\n' +
+    'select count(*) from academy.course_entitlement e\n' +
+    '  join academy.users u on u.id=e.user_id\n' +
+    '  join academy_synthetic_fixture f on u.subject=f.subject and u.email=f.email\n' +
+    "  where e.course_slug='setup-and-environment' and e.source='grant'\n" +
+    '    and e.revoked_at is null;\n' +
+    'commit;`\n' +
+    '      : `begin;\n' +
+    'create temp table academy_synthetic_fixture on commit drop as\n' +
+    "  select :'academy_subject'::text as subject, :'academy_email'::text as email;\n" +
+    'do $$ declare target uuid; matched bigint; begin\n' +
+    '  lock table academy.users in share row exclusive mode;\n' +
+    '  select count(*) into strict matched\n' +
+    '    from academy.users u join academy_synthetic_fixture f\n' +
+    '      on u.subject=f.subject and u.email=f.email;\n' +
+    '  if matched = 0 then return; end if;\n' +
+    "  if matched <> 1 then raise exception 'ACADEMY_FIXTURE_USER_NOT_UNIQUE'; end if;\n" +
+    '  select u.id into strict target\n' +
+    '    from academy.users u join academy_synthetic_fixture f\n' +
+    '      on u.subject=f.subject and u.email=f.email;\n' +
+    '  delete from academy.users u using academy_synthetic_fixture f\n' +
+    '    where u.id=target and u.subject=f.subject and u.email=f.email;\n' +
+    'end $$;\n' +
+    'select count(*) from academy.users u\n' +
+    '  join academy_synthetic_fixture f on u.subject=f.subject and u.email=f.email;\n' +
+    'commit;`;\n' +
+    '  const result = spawnDatabase(\n' +
+    '    "/usr/bin/docker",\n' +
+    '    [\n' +
+    '      "exec",\n' +
+    '      "-i",\n' +
+    '      "supabase-db",\n' +
+    '      "psql",\n' +
+    '      "-U",\n' +
+    '      "postgres",\n' +
+    '      "-d",\n' +
+    '      "postgres",\n' +
+    '      "-v",\n' +
+    '      `academy_subject=${subject}`,\n' +
+    '      "-v",\n' +
+    '      `academy_email=${email}`,\n' +
+    '      "-v",\n' +
+    '      "ON_ERROR_STOP=1",\n' +
+    '      "-AtX",\n' +
+    '      "-q",\n' +
+    '    ],\n' +
+    '    { input: sql, encoding: "utf8", maxBuffer: 65_536, timeout: 30_000 },\n' +
+    '  );\n' +
+    '  const expected = mode === "enroll" ? "1" : "0";\n' +
+    '  if (result.status !== 0 || result.stdout.trim() !== expected) fail();\n' +
+    '  return {\n' +
+    '    schema: "academy-synthetic-fixture-db/v1",\n' +
+    '    operationId,\n' +
+    '    status: mode === "enroll" ? "ENROLLED" : "ABSENT",\n' +
+    '    emailSha256: createHash("sha256").update(email).digest("hex"),\n' +
+    '};\n' +
+    '}\n' +
+    '\n' +
+    'function database(mode, operationPath) {\n' +
+    '  const { email, operationId, subject } = fixture(operationPath);\n' +
+    '  return databaseForTest(mode, subject, email, spawnSync, operationId);\n' +
+    '}\n' +
+    '\n' +
+    'export function main(args) {\n' +
+    '  const [mode, operationPath, outputPath] = args;\n' +
+    '  if (mode === "verify-authority" && args.length === 1) {\n' +
+    '    const files = [\n' +
+    '      ["/opt/node-v24.18.0/bin/node", 100_000_000, 0o755],\n' +
+    '      [\n' +
+    '        "/opt/identity-control/operators/prepare/87be595ca1f8db8a/prepare-synthetic-sign-in-fixture.mjs",\n' +
+    '        100_000,\n' +
+    '        0o500,\n' +
+    '      ],\n' +
+    '      [\n' +
+    '        "/opt/identity-control/operators/prepare/87be595ca1f8db8a/manifest.json",\n' +
+    '        100_000,\n' +
+    '        0o400,\n' +
+    '      ],\n' +
+    '      [\n' +
+    '        "/root/identity-reservation-wrapper-authority-b1b346f.json",\n' +
+    '        100_000,\n' +
+    '        0o600,\n' +
+    '      ],\n' +
+    '      [process.argv[1], 100_000, 0o755],\n' +
+    '    ];\n' +
+    '    process.stdout.write(\n' +
+    '      `${JSON.stringify(\n' +
+    '        files.map(([p, n, m]) =>\n' +
+    '          createHash("sha256")\n' +
+    '            .update(readStable(p, n, m))\n' +
+    '            .digest("hex"),\n' +
+    '        ),\n' +
+    '      )}\\n`,\n' +
+    '    );\n' +
+    '    return;\n' +
+    '  }\n' +
+    '  if (!OP.test(operationPath)) fail();\n' +
+    '  if (mode === "stage-otp") {\n' +
+    '    if (outputPath !== `${operationPath}/issue-output.json`) fail();\n' +
+    '    const value = JSON.parse(readStable(outputPath, 16_384));\n' +
+    '    if (!/^\\d{6}$/.test(value.code ?? "")) fail();\n' +
+    '    const handoff = `${operationPath}/academy-otp-handoff`;\n' +
+    '    const bytes = Buffer.from(`${value.code}\\n`);\n' +
+    '    try {\n' +
+    '      const fd = openSync(\n' +
+    '        handoff,\n' +
+    '        constants.O_WRONLY |\n' +
+    '          constants.O_CREAT |\n' +
+    '          constants.O_EXCL |\n' +
+    '          constants.O_NOFOLLOW,\n' +
+    '        0o600,\n' +
+    '      );\n' +
+    '      try {\n' +
+    '        writeFileSync(fd, bytes);\n' +
+    '      } finally {\n' +
+    '        closeSync(fd);\n' +
+    '      }\n' +
+    '    } catch (error) {\n' +
+    '      if (error?.code !== "EEXIST" || !readStable(handoff, 32).equals(bytes))\n' +
+    '        fail();\n' +
+    '    }\n' +
+    '    process.stdout.write(\n' +
+    '      `${JSON.stringify({ status: "STAGED", handoffPath: handoff })}\\n`,\n' +
+    '    );\n' +
+    '    return;\n' +
+    '  }\n' +
+    '  if (mode === "clear-otp") {\n' +
+    '    if (outputPath !== `${operationPath}/academy-otp-handoff`) fail();\n' +
+    '    try {\n' +
+    '      readStable(outputPath, 32);\n' +
+    '    } catch (error) {\n' +
+    '      if (error?.code === "ENOENT") {\n' +
+    '        process.stdout.write(`${JSON.stringify({ status: "ABSENT" })}\\n`);\n' +
+    '        return;\n' +
+    '      }\n' +
+    '      throw error;\n' +
+    '    }\n' +
+    '    unlinkSync(outputPath);\n' +
+    '    process.stdout.write(`${JSON.stringify({ status: "ABSENT" })}\\n`);\n' +
+    '    return;\n' +
+    '  }\n' +
+    '  if (outputPath !== undefined || !["enroll", "cleanup"].includes(mode)) fail();\n' +
+    '  process.stdout.write(`${JSON.stringify(database(mode, operationPath))}\\n`);\n' +
+    '}\n' +
+    '\n' +
+    'if (import.meta.url === `file://${process.argv[1]}`) {\n' +
+    '  try {\n' +
+    '    main(process.argv.slice(2));\n' +
+    '  } catch {\n' +
+    '    process.stderr.write("ACADEMY_P1_P7_HOST_REJECTED\\n");\n' +
+    '    process.exitCode = 1;\n' +
+    '  }\n' +
+    '}\n'
+  
+      at TestContext.<anonymous> (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/academy-production-p1-p7-host.test.mjs:27:10)
+      at async Test.run (node:internal/test_runner/test:1116:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:786:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '#!/usr/bin/env node\nimport { spawnSync } from "node:child_process";\nimport { createHash } from "node:crypto";\nimport {\n  closeSync,\n  constants,\n  fstatSync,\n  lstatSync,\n  openSync,\n  readFileSync,\n  realpathSync,\n  unlinkSync,\n  writeFileSync,\n} from "node:fs";\nimport { dirname } from "node:path";\n\nconst OP = /^\\/root\\/identity-synthetic-operations\\/academy-p5-[a-f0-9]{18}$/;\nconst SUBJECT_UUID =\n  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;\nconst OPERATION_ID = /^academy-p5-[a-f0-9]{18}$/;\nconst fail = () => {\n  throw new Error("ACADEMY_P1_P7_HOST_REJECTED");\n};\n\nfunction ancestry(path) {\n  let p = path;\n  while (true) {\n    const s = lstatSync(p);\n    if (\n      !s.isDirectory() ||\n      s.isSymbolicLink() ||\n      s.uid !== 0 ||\n      s.mode & 0o022 ||\n      realpathSync(p) !== p\n    )\n      fail();\n    if (p === "/") return;\n    p = dirname(p);\n  }\n}\nfunction readStable(path, maximum, mode = 0o600) {\n  ancestry(dirname(path));\n  const fd = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW);\n  try {\n    const before = fstatSync(fd, { bigint: true });\n    if (\n      !before.isFile() ||\n      before.uid !== 0n ||\n      (before.mode & 0o777n) !== BigInt(mode) ||\n      before.nlink !== 1n ||\n      before.size < 2n ||\n      before.size > BigInt(maximum)\n    )\n      fail();\n    const bytes = readFileSync(fd);\n    const after = fstatSync(fd, { bigint: true }),\n      pathState = lstatSync(path, { bigint: true });\n    if (\n      before.dev !== after.dev ||\n      before.ino !== after.ino ||\n      before.size !== after.size ||\n      before.mtimeNs !== after.mtimeNs ||\n      before.ctimeNs !== after.ctimeNs ||\n      after.dev !== pathState.dev ||\n      after.ino !== pathState.ino ||\n      after.size !== pathState.size\n    )\n      fail();\n    return bytes;\n  } finally {\n    closeSync(fd);\n  }\n}\n\nfunction fixture(operationPath, readOperation = readStable) {\n  if (!OP.test(operationPath)) fail();\n  const operationId = operationPath.split("/").at(-1),\n    value = JSON.parse(\n      readOperation(`${operationPath}/prepare-input.json`, 16_384),\n    ),\n    cleanup = JSON.parse(readOperation(`${operationPath}/cleanup.json`, 16_384));\n  if (\n    value.operationId !== operationId ||\n    value.email !== `${operationId}@synthetic.cyberskills.co.th` ||\n    cleanup.schema !== "identity-synthetic-sign-in-cleanup/v2" ||\n    cleanup.operationId !== operationId ||\n    cleanup.state !== "owned" ||\n    !SUBJECT_UUID.test(cleanup.userId ?? "") ||\n    cleanup.emailSha256 !==\n      createHash("sha256").update(value.email).digest("hex")\n  )\n    fail();\n  return { operationId, email: value.email, subject: cleanup.userId };\n}\n\nexport function fixtureForTest(operationPath, readOperation) {\n  return fixture(operationPath, readOperation);\n}\n\nexport function databaseForTest(\n  mode,\n  subject,\n  email,\n  spawnDatabase = spawnSync,\n  operationId = "academy-p5-000000000000000000",\n) {\n  if (\n    !["enroll", "cleanup"].includes(mode) ||\n    !SUBJECT_UUID.test(subject) ||\n    typeof email !== "string" ||\n    !OPERATION_ID.test(operationId)\n  )\n    fail();\n  const sql =\n    mode === "enroll"\n      ? `begin;\ncreate temp table academy_synthetic_fixture on commit drop as\n  select :\'academy_subject\'::text as subject, :\'academy_email\'::text as email;\ndo $$ declare target uuid; begin\n  lock table academy.users in share row exclusive mode;\n  select u.id into strict target\n    from academy.users u join academy_synthetic_fixture f\n      on u.subject=f.subject and u.email=f.email;\n  insert into academy.course_entitlement(user_id,course_slug,source)\n    values(target,\'setup-and-environment\',\'grant\')\n    on conflict(user_id,course_slug) do update\n      set source=\'grant\',revoked_at=null,expires_at=null;\nend $$;\nselect count(*) from academy.course_entitlement e\n  join academy.users u on u.id=e.user_id\n  join academy_synthetic_fixture f on u.subject=f.subject and u.email=f.email\n  where e.course_slug=\'setup-and-environment\' and e.source=\'grant\'\n    and e.revoked_at is null;\ncommit;`\n      : `begin;\ncreate temp table academy_synthetic_fixture on commit drop as\n  select :\'academy_subject\'::text as subject, :\'academy_email\'::text as email;\ndo $$ declare target uuid; matched bigint; begin\n  lock table academy.users in share row exclusive mode;\n  select count(*) into strict matched\n    from academy.users u join academy_synthetic_fixture f\n      on u.subject=f.subject and u.email=f.email;\n  if matched = 0 then return; end if;\n  if matched <> 1 then raise exception \'ACADEMY_FIXTURE_USER_NOT_UNIQUE\'; end if;\n  select u.id into strict target\n    from academy.users u join academy_synthetic_fixture f\n      on u.subject=f.subject and u.email=f.email;\n  delete from academy.users u using academy_synthetic_fixture f\n    where u.id=target and u.subject=f.subject and u.email=f.email;\nend $$;\nselect count(*) from academy.users u\n  join academy_synthetic_fixture f on u.subject=f.subject and u.email=f.email;\ncommit;`;\n  const result = spawnDatabase(\n    "/usr/bin/docker",\n    [\n      "exec",\n      "-i",\n      "supabase-db",\n      "psql",\n      "-U",\n      "postgres",\n      "-d",\n      "postgres",\n      "-v",\n      `academy_subject=${subject}`,\n      "-v",\n      `academy_email=${email}`,\n      "-v",\n      "ON_ERROR_STOP=1",\n      "-AtX",\n      "-q",\n    ],\n    { input: sql, encoding: "utf8", maxBuffer: 65_536, timeout: 30_000 },\n  );\n  const expected = mode === "enroll" ? "1" : "0";\n  if (result.status !== 0 || result.stdout.trim() !== expected) fail();\n  return {\n    schema: "academy-synthetic-fixture-db/v1",\n    operationId,\n    status: mode === "enroll" ? "ENROLLED" : "ABSENT",\n    emailSha256: createHash("sha256").update(email).digest("hex"),\n};\n}\n\nfunction database(mode, operationPath) {\n  const { email, operationId, subject } = fixture(operationPath);\n  return databaseForTest(mode, subject, email, spawnSync, operationId);\n}\n\nexport function main(args) {\n  const [mode, operationPath, outputPath] = args;\n  if (mode === "verify-authority" && args.length === 1) {\n    const files = [\n      ["/opt/node-v24.18.0/bin/node", 100_000_000, 0o755],\n      [\n        "/opt/identity-control/operators/prepare/87be595ca1f8db8a/prepare-synthetic-sign-in-fixture.mjs",\n        100_000,\n        0o500,\n      ],\n      [\n        "/opt/identity-control/operators/prepare/87be595ca1f8db8a/manifest.json",\n        100_000,\n        0o400,\n      ],\n      [\n        "/root/identity-reservation-wrapper-authority-b1b346f.json",\n        100_000,\n        0o600,\n      ],\n      [process.argv[1], 100_000, 0o755],\n    ];\n    process.stdout.write(\n      `${JSON.stringify(\n        files.map(([p, n, m]) =>\n          createHash("sha256")\n            .update(readStable(p, n, m))\n            .digest("hex"),\n        ),\n      )}\\n`,\n    );\n    return;\n  }\n  if (!OP.test(operationPath)) fail();\n  if (mode === "stage-otp") {\n    if (outputPath !== `${operationPath}/issue-output.json`) fail();\n    const value = JSON.parse(readStable(outputPath, 16_384));\n    if (!/^\\d{6}$/.test(value.code ?? "")) fail();\n    const handoff = `${operationPath}/academy-otp-handoff`;\n    const bytes = Buffer.from(`${value.code}\\n`);\n    try {\n      const fd = openSync(\n        handoff,\n        constants.O_WRONLY |\n          constants.O_CREAT |\n          constants.O_EXCL |\n          constants.O_NOFOLLOW,\n        0o600,\n      );\n      try {\n        writeFileSync(fd, bytes);\n      } finally {\n        closeSync(fd);\n      }\n    } catch (error) {\n      if (error?.code !== "EEXIST" || !readStable(handoff, 32).equals(bytes))\n        fail();\n    }\n    process.stdout.write(\n      `${JSON.stringify({ status: "STAGED", handoffPath: handoff })}\\n`,\n    );\n    return;\n  }\n  if (mode === "clear-otp") {\n    if (outputPath !== `${operationPath}/academy-otp-handoff`) fail();\n    try {\n      readStable(outputPath, 32);\n    } catch (error) {\n      if (error?.code === "ENOENT") {\n        process.stdout.write(`${JSON.stringify({ status: "ABSENT" })}\\n`);\n        return;\n      }\n      throw error;\n    }\n    unlinkSync(outputPath);\n    process.stdout.write(`${JSON.stringify({ status: "ABSENT" })}\\n`);\n    return;\n  }\n  if (outputPath !== undefined || !["enroll", "cleanup"].includes(mode)) fail();\n  process.stdout.write(`${JSON.stringify(database(mode, operationPath))}\\n`);\n}\n\nif (import.meta.url === `file://${process.argv[1]}`) {\n  try {\n    main(process.argv.slice(2));\n  } catch {\n    process.stderr.write("ACADEMY_P1_P7_HOST_REJECTED\\n");\n    process.exitCode = 1;\n  }\n}\n',
+    expected: /input: transaction\(terminal\)/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at scripts/academy-production-p1-p7-host.test.mjs:32:1
+✖ database values bind as text-compatible psql variables outside the do block (1.876958ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  1 !== 2
+  
+      at TestContext.<anonymous> (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/academy-production-p1-p7-host.test.mjs:58:10)
+      at Test.runInAsyncScope (node:async_hooks:212:14)
+      at Test.run (node:internal/test_runner/test:1109:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:786:18)
+      at Test.postRun (node:internal/test_runner/test:1238:19)
+      at Test.run (node:internal/test_runner/test:1166:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:786:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at scripts/academy-production-p1-p7-host.test.mjs:96:1
+✖ failed database rehearsal rejects before any commit invocation (0.38125ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /rollback;$/. Input:
+  
+  'begin;\n' +
+    'create temp table academy_synthetic_fixture on commit drop as\n' +
+    "  select :'academy_subject'::text as subject, :'academy_email'::text as email;\n" +
+    'do $$ declare target uuid; begin\n' +
+    '  lock table academy.users in share row exclusive mode;\n' +
+    '  select u.id into strict target\n' +
+    '    from academy.users u join academy_synthetic_fixture f\n' +
+    '      on u.subject=f.subject and u.email=f.email;\n' +
+    '  insert into academy.course_entitlement(user_id,course_slug,source)\n' +
+    "    values(target,'setup-and-environment','grant')\n" +
+    '    on conflict(user_id,course_slug) do update\n' +
+    "      set source='grant',revoked_at=null,expires_at=null;\n" +
+    'end $$;\n' +
+    'select count(*) from academy.course_entitlement e\n' +
+    '  join academy.users u on u.id=e.user_id\n' +
+    '  join academy_synthetic_fixture f on u.subject=f.subject and u.email=f.email\n' +
+    "  where e.course_slug='setup-and-environment' and e.source='grant'\n" +
+    '    and e.revoked_at is null;\n' +
+    'commit;'
+  
+      at TestContext.<anonymous> (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/academy-production-p1-p7-host.test.mjs:112:10)
+      at Test.runInAsyncScope (node:async_hooks:212:14)
+      at Test.run (node:internal/test_runner/test:1109:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:786:18)
+      at Test.postRun (node:internal/test_runner/test:1238:19)
+      at Test.run (node:internal/test_runner/test:1166:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:786:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: "begin;\ncreate temp table academy_synthetic_fixture on commit drop as\n  select :'academy_subject'::text as subject, :'academy_email'::text as email;\ndo $$ declare target uuid; begin\n  lock table academy.users in share row exclusive mode;\n  select u.id into strict target\n    from academy.users u join academy_synthetic_fixture f\n      on u.subject=f.subject and u.email=f.email;\n  insert into academy.course_entitlement(user_id,course_slug,source)\n    values(target,'setup-and-environment','grant')\n    on conflict(user_id,course_slug) do update\n      set source='grant',revoked_at=null,expires_at=null;\nend $$;\nselect count(*) from academy.course_entitlement e\n  join academy.users u on u.id=e.user_id\n  join academy_synthetic_fixture f on u.subject=f.subject and u.email=f.email\n  where e.course_slug='setup-and-environment' and e.source='grant'\n    and e.revoked_at is null;\ncommit;",
+    expected: /rollback;$/,
+    operator: 'match',
+    diff: 'simple'
+  }
