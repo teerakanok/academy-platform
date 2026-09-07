@@ -1,0 +1,10 @@
+[
+  {
+    "path": "academy-web/scripts/academy-production-operation-install.mjs",
+    "sha256": "c31236b192ad19dfbc2c6a07036876aebdc27cf0d2feb3a8ca595ca424b731a6"
+  },
+  {
+    "path": "academy-web/scripts/academy-production-operation.test.mjs",
+    "sha256": "e0962d873d793f12c8f763ce10836d0cd06ad707f047b3f162a0b68f3669aab2"
+  }
+]
