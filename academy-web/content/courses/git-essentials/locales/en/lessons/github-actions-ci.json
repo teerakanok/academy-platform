@@ -225,6 +225,160 @@
         "C"
       ],
       "explanation": "The workflow file itself is committed and readable. The workflow is part of the repository. Anything sensitive placed there is committed, permanent in the history, and readable by everyone with access."
+    },
+    {
+      "id": "cp-5",
+      "prompt": "Where is a GitHub Actions workflow normally stored?",
+      "choices": {
+        "A": "A developer home directory",
+        "B": ".git/objects",
+        "C": "README only",
+        "D": ".github/workflows"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Workflow files live in the repository so CI behavior is reviewed with the code."
+    },
+    {
+      "id": "cp-6",
+      "prompt": "What should CI start from to avoid local-machine assumptions?",
+      "choices": {
+        "A": "A cached home directory",
+        "B": "An untracked file",
+        "C": "A fresh checkout",
+        "D": "A developer shell"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "A clean checkout exposes dependencies that were never recorded in the repository."
+    },
+    {
+      "id": "cp-7",
+      "prompt": "Why pin or declare dependencies in CI?",
+      "choices": {
+        "A": "To hide failures",
+        "B": "To make the environment reproducible",
+        "C": "To avoid tests",
+        "D": "To store secrets"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Declared dependencies let another runner construct the same build environment."
+    },
+    {
+      "id": "cp-8",
+      "prompt": "What should a failed required CI check do?",
+      "choices": {
+        "A": "Block merging until addressed",
+        "B": "Delete the branch",
+        "C": "Pass after a delay",
+        "D": "Create a release"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "A required check is a gate only when it affects the merge decision."
+    },
+    {
+      "id": "cp-9",
+      "prompt": "Why run CI on a pull request?",
+      "choices": {
+        "A": "To change credentials",
+        "B": "To test the proposed integrated change",
+        "C": "To skip review",
+        "D": "To edit secrets"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The pull request is the candidate change that must work before it reaches shared code."
+    },
+    {
+      "id": "cp-10",
+      "prompt": "What should a workflow secret reference contain?",
+      "choices": {
+        "A": "The secret value in YAML",
+        "B": "A committed .env file",
+        "C": "A command-line password",
+        "D": "A platform secret reference"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The platform secret store keeps sensitive values out of repository history."
+    },
+    {
+      "id": "cp-11",
+      "prompt": "A local test passes but CI fails. What should you compare first?",
+      "choices": {
+        "A": "Logos",
+        "B": "Commit timestamps",
+        "C": "The clean CI environment and local assumptions",
+        "D": "Branch colors"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Missing declared files, dependencies, or configuration are common differences."
+    },
+    {
+      "id": "cp-12",
+      "prompt": "Why require checks on an up-to-date branch?",
+      "choices": {
+        "A": "To test what will actually merge",
+        "B": "To remove tests",
+        "C": "To avoid review",
+        "D": "To speed cloning"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "A passing result on an old base does not prove the combined result will pass."
+    },
+    {
+      "id": "cp-13",
+      "prompt": "What is CI feedback for a failing test?",
+      "choices": {
+        "A": "A secret value",
+        "B": "A reason to ignore the test",
+        "C": "Evidence to investigate and fix",
+        "D": "A replacement for review"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "CI identifies a reproducible failure; the team still diagnoses the cause."
+    },
+    {
+      "id": "cp-14",
+      "prompt": "Why keep workflow changes in version control?",
+      "choices": {
+        "A": "They are invisible to runners",
+        "B": "They can be reviewed and changed with code",
+        "C": "They cannot fail",
+        "D": "They replace documentation"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Workflow definitions are part of the engineering system and deserve normal review."
+    },
+    {
+      "id": "cp-15",
+      "prompt": "What is the purpose of a test job in CI?",
+      "choices": {
+        "A": "To send marketing email",
+        "B": "To create credentials",
+        "C": "To bypass branch rules",
+        "D": "To run defined checks in a repeatable environment"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "A job turns repository commands into repeatable evidence for a proposed change."
     }
   ]
 }

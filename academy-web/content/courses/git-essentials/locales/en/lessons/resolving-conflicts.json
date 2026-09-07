@@ -208,6 +208,160 @@
         "B"
       ],
       "explanation": "Conflicts scale with divergence. A branch that stays close to the shared branch has little to conflict with; one that runs for a month accumulates the collision in advance. Up to date means merging the shared branch into yours regularly."
+    },
+    {
+      "id": "cp-5",
+      "prompt": "Which command shows files still unmerged?",
+      "choices": {
+        "A": "git stash",
+        "B": "git tag",
+        "C": "git status",
+        "D": "git clone"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "git status names unmerged paths and tells you the next resolution steps."
+    },
+    {
+      "id": "cp-6",
+      "prompt": "After editing conflict markers away, what records the resolution?",
+      "choices": {
+        "A": "git add <file>",
+        "B": "git fetch",
+        "C": "git log",
+        "D": "git remote"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Staging the edited file tells Git that its conflict is resolved."
+    },
+    {
+      "id": "cp-7",
+      "prompt": "What must not remain in a resolved source file?",
+      "choices": {
+        "A": "A commit message",
+        "B": "A branch name",
+        "C": "A newline",
+        "D": "<<<<<<<, =======, or >>>>>>> markers"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Conflict markers are temporary text inserted by Git and would break or corrupt the final source."
+    },
+    {
+      "id": "cp-8",
+      "prompt": "Why read both sides before choosing a resolution?",
+      "choices": {
+        "A": "Git requires it",
+        "B": "Each side may express intent worth preserving",
+        "C": "It makes merging faster",
+        "D": "The older side always wins"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A conflict is evidence of overlapping edits, not evidence that one author is wrong."
+    },
+    {
+      "id": "cp-9",
+      "prompt": "What does git diff show during a conflict?",
+      "choices": {
+        "A": "Only remote commits",
+        "B": "The worktree changes you still need to inspect",
+        "C": "Only tags",
+        "D": "A finished merge"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Inspecting the changed file and its surrounding context is how you validate the chosen resolution."
+    },
+    {
+      "id": "cp-10",
+      "prompt": "When is git merge --abort appropriate?",
+      "choices": {
+        "A": "After pushing",
+        "B": "To accept every incoming line",
+        "C": "To delete a remote branch",
+        "D": "When you need to return to the pre-merge state"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Abort is safer than guessing when the necessary product context is unavailable."
+    },
+    {
+      "id": "cp-11",
+      "prompt": "A conflict is resolved and staged. What should happen before committing?",
+      "choices": {
+        "A": "Run the relevant checks",
+        "B": "Force push",
+        "C": "Delete the branch",
+        "D": "Remove Git history"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "A syntactically clean merge can still combine behavior incorrectly; tests check the resulting program."
+    },
+    {
+      "id": "cp-12",
+      "prompt": "Why do frequent integrations reduce conflict risk?",
+      "choices": {
+        "A": "They prevent edits",
+        "B": "They remove branches",
+        "C": "They limit how far histories diverge",
+        "D": "They make Git choose automatically"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Short-lived divergence creates fewer overlapping changes to reconcile."
+    },
+    {
+      "id": "cp-13",
+      "prompt": "What does a conflict marker separate?",
+      "choices": {
+        "A": "A secret and value",
+        "B": "Two repositories",
+        "C": "A tag and branch",
+        "D": "Competing versions of the same region"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The marker block exposes the local and incoming versions so a human can construct the intended result."
+    },
+    {
+      "id": "cp-14",
+      "prompt": "Why is blindly choosing ours risky?",
+      "choices": {
+        "A": "It changes file mode",
+        "B": "It deletes the remote",
+        "C": "It can silently discard incoming intent",
+        "D": "It creates a tag"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "A strategy choice is not a substitute for understanding what the other edit accomplished."
+    },
+    {
+      "id": "cp-15",
+      "prompt": "What is the desired outcome of a conflict resolution?",
+      "choices": {
+        "A": "The shortest file",
+        "B": "A tested result preserving compatible intent",
+        "C": "The newest timestamp",
+        "D": "No commit"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Resolve the behavior, then verify it, rather than treating marker removal as the goal."
     }
   ]
 }

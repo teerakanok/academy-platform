@@ -209,6 +209,160 @@
         "A"
       ],
       "explanation": "If one does not, bisect stops there and blames a commit that was merely broken, not the one that introduced the bug. This is the practical payoff of the discipline: a history where each commit works is a history you can search automatically."
+    },
+    {
+      "id": "cp-5",
+      "prompt": "What should one atomic commit represent?",
+      "choices": {
+        "A": "One file",
+        "B": "One coherent change",
+        "C": "One workday",
+        "D": "One branch"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The unit is a reviewable and reversible change, which may span several files."
+    },
+    {
+      "id": "cp-6",
+      "prompt": "Before committing, which command reviews staged content?",
+      "choices": {
+        "A": "git clean",
+        "B": "git bisect",
+        "C": "git clone",
+        "D": "git diff --staged"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Review the exact snapshot that the commit will contain, not only unstaged work."
+    },
+    {
+      "id": "cp-7",
+      "prompt": "Why avoid mixing formatting with behavior changes?",
+      "choices": {
+        "A": "It hides the behavior change in noise",
+        "B": "Formatting cannot be reverted",
+        "C": "Git rejects it",
+        "D": "It changes branch names"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Reviewers need to see logic clearly; mechanical churn makes important lines easy to miss."
+    },
+    {
+      "id": "cp-8",
+      "prompt": "What property makes a commit useful to bisect?",
+      "choices": {
+        "A": "It has a long message",
+        "B": "It touches one file",
+        "C": "It builds and runs on its own",
+        "D": "It is merged"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Bisect needs each tested point to be a meaningful working state."
+    },
+    {
+      "id": "cp-9",
+      "prompt": "If a change has two independent purposes, what is usually best?",
+      "choices": {
+        "A": "Force push twice",
+        "B": "Hide one purpose",
+        "C": "Split it into coherent commits",
+        "D": "Amend main"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Separate commits make review, reversal, and bug investigation more precise."
+    },
+    {
+      "id": "cp-10",
+      "prompt": "What does git revert create?",
+      "choices": {
+        "A": "A new commit undoing an earlier commit",
+        "B": "An erased history",
+        "C": "A new remote",
+        "D": "A merge conflict always"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Revert preserves shared history while applying the inverse change as a new record."
+    },
+    {
+      "id": "cp-11",
+      "prompt": "Why write a specific commit message?",
+      "choices": {
+        "A": "To satisfy Git",
+        "B": "To reduce file size",
+        "C": "To encrypt code",
+        "D": "To explain the change when reading history"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "History is a maintenance tool; a clear message makes later investigation faster."
+    },
+    {
+      "id": "cp-12",
+      "prompt": "Which commit grouping is poor?",
+      "choices": {
+        "A": "A feature and its tests",
+        "B": "Several unrelated fixes bundled together",
+        "C": "A rename alone",
+        "D": "A bug fix and its test"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Unrelated work makes a commit hard to review, revert, and bisect."
+    },
+    {
+      "id": "cp-13",
+      "prompt": "What should you do when a staged diff includes an accidental file?",
+      "choices": {
+        "A": "Unstage it and review again",
+        "B": "Commit it anyway",
+        "C": "Delete all history",
+        "D": "Push immediately"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The staging area is where you curate the exact coherent commit."
+    },
+    {
+      "id": "cp-14",
+      "prompt": "Why do tests belong with a behavior change?",
+      "choices": {
+        "A": "They create tags",
+        "B": "They rename files",
+        "C": "They document and verify the new behavior",
+        "D": "They avoid commits"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Keeping the proof with the behavior makes the commit independently checkable."
+    },
+    {
+      "id": "cp-15",
+      "prompt": "What should a reviewer be able to answer from one commit?",
+      "choices": {
+        "A": "Who owns every file",
+        "B": "Which IDE was used",
+        "C": "What will happen next year",
+        "D": "What changed and why"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "A focused diff and message let a reviewer assess one decision at a time."
     }
   ]
 }
