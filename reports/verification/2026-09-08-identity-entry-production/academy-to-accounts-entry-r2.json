@@ -1,0 +1,29 @@
+{
+  "at": "2026-09-07T18:55:01.575Z",
+  "navigation": [
+    {
+      "host": "academy.cyberskills.co.th",
+      "path": "/sign-in",
+      "status": 200
+    },
+    {
+      "host": "academy.cyberskills.co.th",
+      "path": "/api/auth/identity/start",
+      "status": 303
+    },
+    {
+      "host": "accounts.cyberskills.co.th",
+      "path": "/sign-in",
+      "status": 200
+    }
+  ],
+  "final_host": "accounts.cyberskills.co.th",
+  "final_path": "/sign-in",
+  "email_inputs": 1,
+  "buttons": [
+    "TH",
+    "EN",
+    "Email me a sign-in code"
+  ],
+  "signin_unavailable": false
+}
