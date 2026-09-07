@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import nextConfig from '../../next.config'
+import { ACADEMY_EDGE_SECURITY_HEADERS } from '../../src/lib/edge-security-headers'
 
 const EXPECTED_CSP = [
   ['default-src', ["'self'"]],
@@ -7,7 +8,7 @@ const EXPECTED_CSP = [
   ['form-action', ["'self'"]],
   ['frame-ancestors', ["'none'"]],
   ['object-src', ["'none'"]],
-  ['script-src', ["'self'", "'unsafe-inline'"]],
+  ['script-src', ["'self'"]],
   ['style-src', ["'self'", "'unsafe-inline'"]],
   ['img-src', ["'self'", 'data:', 'blob:']],
   ['font-src', ["'self'", 'data:']],
@@ -43,7 +44,8 @@ describe('production HTTP security headers', () => {
 
   it('enforces the exact approved CSP directives', async () => {
     const headers = await globalHeaders()
-    const policy = headers.get('Content-Security-Policy')
+    expect(headers.has('Content-Security-Policy')).toBe(false)
+    const policy = ACADEMY_EDGE_SECURITY_HEADERS['Content-Security-Policy']
 
     expect(policy).toBeDefined()
     const directives = policy!.split('; ').map((directive) => {
@@ -73,5 +75,22 @@ describe('production HTTP security headers', () => {
       expect(key).not.toMatch(/[\r\n]/u)
       expect(value).not.toMatch(/[\r\n]/u)
     }
+  })
+})
+
+describe('development HTTP CSP', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+    vi.resetModules()
+  })
+
+  it('permits framework development evaluation only in development', async () => {
+    vi.stubEnv('NODE_ENV', 'development')
+    const { default: developmentConfig } = await import('../../next.config')
+    const rules = await developmentConfig.headers!()
+    const fullPolicy = rules[0].headers.find(({ key }) => key === 'Content-Security-Policy')!.value
+    const scriptPolicy = fullPolicy.split('; ').find((directive) => directive.startsWith('script-src'))!
+
+    expect(scriptPolicy).toBe("script-src 'self' 'unsafe-eval'")
   })
 })

@@ -1,44 +1,5 @@
 import type { NextConfig } from 'next'
-
-function localAccountCenterFormActionOrigin(): string | null {
-  if (
-    process.env.NODE_ENV === 'production'
-    || process.env.ACADEMY_IDENTITY_CONTROL_LOCAL_FIXTURE !== '1'
-  ) return null
-
-  const value = process.env.ACADEMY_IDENTITY_CONTROL_LOCAL_ACCOUNT_CENTER_ORIGIN
-  if (!value) return null
-  try {
-    const url = new URL(value)
-    return url.protocol === 'http:'
-      && (url.hostname === 'localhost' || url.hostname === '127.0.0.1')
-      && url.origin === value
-      ? value
-      : null
-  } catch {
-    return null
-  }
-}
-
-const localAccountCenterOrigin = localAccountCenterFormActionOrigin()
-
-const contentSecurityPolicy = [
-  "default-src 'self'",
-  "base-uri 'self'",
-  `form-action 'self'${localAccountCenterOrigin ? ` ${localAccountCenterOrigin}` : ''}`,
-  "frame-ancestors 'none'",
-  "object-src 'none'",
-  // next dev (react-refresh/eval sourcemap) ต้องการ unsafe-eval; production ไม่เติมเด็ดขาด
-  `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === 'development' ? " 'unsafe-eval'" : ''}`,
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob:",
-  "font-src 'self' data:",
-  "media-src 'self' blob:",
-  "connect-src 'self'",
-  "worker-src 'self' blob:",
-  "frame-src 'none'",
-  "manifest-src 'self'",
-].join('; ')
+import { academyContentSecurityPolicy } from './src/lib/content-security-policy'
 
 const nextConfig: NextConfig = {
   // Security baseline: ไม่มี external resource ใน CSP scope ของ app นี้ —
@@ -55,7 +16,13 @@ const nextConfig: NextConfig = {
       {
         source: '/:path*',
         headers: [
-          { key: 'Content-Security-Policy', value: contentSecurityPolicy },
+          // Rendered production CSP belongs to middleware. OpenNext combines
+          // configured headers with middleware headers; a second static policy
+          // would block legitimate nonce-bearing hydration scripts.
+          ...(process.env.NODE_ENV === 'development' ? [{
+            key: 'Content-Security-Policy',
+            value: academyContentSecurityPolicy(["'self'", "'unsafe-eval'"]),
+          }] : []),
           { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'X-Frame-Options', value: 'DENY' },

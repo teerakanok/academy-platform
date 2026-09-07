@@ -1,0 +1,21 @@
+{
+  "name": "academy-csp-local-cde63a58",
+  "main": "/private/tmp/academy-csp-cde63a58/academy-web/.next/final-worker-bundle/worker.js",
+  "compatibility_date": "2025-03-25",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public"
+  ],
+  "assets": {
+    "directory": "/private/tmp/academy-csp-cde63a58/academy-web/.open-next/assets",
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/media/*"
+    ]
+  },
+  "vars": {
+    "NEXT_PUBLIC_SEARCH_INDEXING": "off",
+    "IDENTITY_LIFECYCLE_ENABLED": "false"
+  },
+  "no_bundle": true
+}

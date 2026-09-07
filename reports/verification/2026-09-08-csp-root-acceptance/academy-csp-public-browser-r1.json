@@ -1,0 +1,16 @@
+{
+  "command": [
+    "rtk",
+    "proxy",
+    "npx",
+    "playwright",
+    "test",
+    "--config=playwright.public.config.ts",
+    "--project=public-chromium",
+    "--grep",
+    "choosing Thai from the root|signed-out visitors inspect|catalog controls filter"
+  ],
+  "exit": 0,
+  "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-csp-public-browser-r1.log",
+  "sha256": "e58107581007c3f9d45471438b92722dfaff07bab9f939da894f4afc0b828ac4"
+}

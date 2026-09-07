@@ -50,7 +50,9 @@ export default {
 
     const media = await servePrivateMedia(protectedRequest, env)
     if (media) return withEdgeSecurityHeaders(withJsonCharset(media))
-    return withJsonCharset(await openNextHandler.fetch(protectedRequest, env, ctx))
+    return withJsonCharset(
+      withEdgeSecurityHeaders(await openNextHandler.fetch(protectedRequest, env, ctx)),
+    )
   },
   async scheduled(_controller, env) {
     await runAcademyIdentityLifecyclePull(env as unknown as Record<string, string | undefined>)

@@ -1,0 +1,51 @@
+{
+  "checked_at": "2026-09-07T21:55:34.911Z",
+  "scope": "local production Worker via workerd; no production journey claim",
+  "checks": [
+    {
+      "check": "fresh-response-nonce-0",
+      "status": 200,
+      "scriptCount": 22,
+      "allScriptNoncesMatch": true,
+      "cacheControl": "private, no-store",
+      "pass": true
+    },
+    {
+      "check": "fresh-response-nonce-1",
+      "status": 200,
+      "scriptCount": 22,
+      "allScriptNoncesMatch": true,
+      "cacheControl": "private, no-store",
+      "pass": true
+    }
+  ],
+  "captures": [],
+  "browserHeaders": {
+    "status": 200,
+    "csp": "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'nonce-qYg6W+j4z6PDjdNEz2siPof2GHOT0vy/fWz22GgNsp0=' 'strict-dynamic'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob:; connect-src 'self'; worker-src 'self' blob:; frame-src 'none'; manifest-src 'self', default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob:; connect-src 'self'; worker-src 'self' blob:; frame-src 'none'; manifest-src 'self'",
+    "cache": "private, no-store"
+  },
+  "diagnostic": {
+    "url": "http://127.0.0.1:61003/courses/basic-os-linux/en",
+    "title": "",
+    "body": "",
+    "pageErrors": [
+      "Connection closed.",
+      "Connection closed."
+    ],
+    "consoleErrors": [
+      "Executing inline script violates the following Content Security Policy directive 'script-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-rVz7IFmeVTCYEQX9nPYqvatm5HZxH13eWMD47E0+c9o='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked.",
+      "Executing inline script violates the following Content Security Policy directive 'script-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-7mu4H06fwDCjmnxxr/xNHyuQC6pLTHr4M2E4jXw5WZs='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked.",
+      "Executing inline script violates the following Content Security Policy directive 'script-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-kyaKBybsHvqmdq5RcfhCZ+crfD0hW2GQeUy0Bp1fWNg='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked.",
+      "Executing inline script violates the following Content Security Policy directive 'script-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-jxpmuzEyvVmGf1uu3rLnVb++ac4Q0kh49VFIlwUf6Q0='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked.",
+      "Executing inline script violates the following Content Security Policy directive 'script-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-OBTN3RiyCV4Bq7dFqZ5a2pAXjnCcCYeTJMO2I/LYKeo='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked.",
+      "Executing inline script violates the following Content Security Policy directive 'script-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-o0eyJ3nPDTs9r/8xMXisVKRGPe3qW+g0NPIGy9+d6z4='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked.",
+      "Executing inline script violates the following Content Security Policy directive 'script-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-RWBG1d/hKdX7rn+Ow6ggA8MIYY+GqFd2fyctdw24VMw='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked.",
+      "Executing inline script violates the following Content Security Policy directive 'script-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-0k0MdtN4GSBnh8dph8krEQfZbQIn3Qv/Vkk9hDROL4k='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked.",
+      "Executing inline script violates the following Content Security Policy directive 'script-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-vFm5efYfQt/rKbx2NLZVtV69v/ehXqtT/pyXtjuxyY4='), or a nonce ('nonce-...') is required to enable inline execution. The action has been blocked."
+    ]
+  },
+  "failure": "locator.waitFor: Timeout 10000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('public-course-syllabus') to be visible\u001b[22m\n",
+  "serverLogTail": "Attaching additional modules:\n[wrangler:info] ✨ Parsed 1 valid header rule.\n[wrangler:info] Ready on http://127.0.0.1:61003\n[wrangler:info] GET /courses/basic-os-linux/en 200 OK (550ms)\n[wrangler:info] GET /courses/basic-os-linux/en 200 OK (14ms)\n[wrangler:info] GET /courses/basic-os-linux/en 200 OK (17ms)\n[wrangler:info] GET /_next/static/media/558ca1a6aa3cb55e-s.p.woff2 200 OK (8ms)\n[wrangler:info] GET /_next/static/css/6cc752cf5939ea68.css 200 OK (15ms)\n[wrangler:info] GET /brand/logo-academy.svg 200 OK (14ms)\n[wrangler:info] GET /_next/static/chunks/webpack-05770cbd3b870bcf.js 200 OK (14ms)\n[wrangler:info] GET /_next/static/media/c6c91ee583345af4-s.p.woff2 200 OK (15ms)\n[wrangler:info] GET /_next/static/media/e4af272ccee01ff0-s.p.woff2 200 OK (16ms)\n[wrangler:info] GET /_next/static/chunks/4bd1b696-f785427dddbba9fb.js 200 OK (17ms)\n[wrangler:info] GET /_next/static/chunks/1356-8ac2296275443024.js 200 OK (11ms)\n[wrangler:info] GET /_next/static/chunks/6302-db94130098d580c8.js 200 OK (12ms)\n[wrangler:info] GET /_next/static/chunks/1255-602cbdb158395325.js 200 OK (15ms)\n[wrangler:info] GET /_next/static/chunks/main-app-a09de21e0266c50f.js 200 OK (14ms)\n[wrangler:info] GET /_next/static/chunks/2619-3c9e02e22d10480a.js 200 OK (13ms)\n[wrangler:info] GET /_next/static/chunks/7683-20a59019fe65188b.js 200 OK (15ms)\n[wrangler:info] GET /_next/static/chunks/app/(localized)/courses/%5Bslug%5D/%5Blocale%5D/layout-5fd89e090882689e.js 200 OK (6ms)\n[wrangler:info] GET /_next/static/chunks/4252-7c7c086194d93be4.js 200 OK (7ms)\n[wrangler:info] GET /_next/static/chunks/app/(localized)/courses/%5Bslug%5D/%5Blocale%5D/page-a5fee43223ac92d0.js 200 OK (8ms)\n",
+  "pass": false
+}

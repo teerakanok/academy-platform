@@ -1,0 +1,40 @@
+[
+  {
+    "command": [
+      "rtk",
+      "proxy",
+      "npm",
+      "ci",
+      "--ignore-scripts"
+    ],
+    "exit": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-csp-root-gates-r1-0.log",
+    "sha256": "676c89235ebf0665197eae42d909d0f2eb92b3c92a870baff446efacce584f54"
+  },
+  {
+    "command": [
+      "rtk",
+      "proxy",
+      "npx",
+      "vitest",
+      "run",
+      "--project",
+      "unit"
+    ],
+    "exit": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-csp-root-gates-r1-1.log",
+    "sha256": "c074f70b55aea2b1642d74acc2afeb92adaff6397d7103768cbb4597a4756ca3"
+  },
+  {
+    "command": [
+      "rtk",
+      "proxy",
+      "npm",
+      "run",
+      "lint"
+    ],
+    "exit": 1,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-csp-root-gates-r1-2.log",
+    "sha256": "510aefd3d40c22d452bca45920e6245b9720752bc7e9213b56a55b2efe8be6c7"
+  }
+]

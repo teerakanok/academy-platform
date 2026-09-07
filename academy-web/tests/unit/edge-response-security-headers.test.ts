@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { unservedHostResponse } from '@/lib/edge-host-policy'
+import { withEdgeSecurityHeaders } from '@/lib/edge-security-headers'
 import { servePrivateMedia } from '@/lib/media/worker-delivery'
 
 const EXPECTED_HEADERS = {
@@ -9,7 +10,7 @@ const EXPECTED_HEADERS = {
     "form-action 'self'",
     "frame-ancestors 'none'",
     "object-src 'none'",
-    "script-src 'self' 'unsafe-inline'",
+    "script-src 'self'",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob:",
     "font-src 'self' data:",
@@ -53,5 +54,26 @@ describe('Worker-generated response security headers', () => {
         expect(response!.headers.get(key)).toBe(value)
       }
     }
+  })
+})
+
+describe('Worker CSP fallback', () => {
+  it('preserves a strict nonce-bearing page policy and makes nonce HTML uncacheable', () => {
+    const nonce = 'A'.repeat(32)
+    const pagePolicy = [
+      "default-src 'self'",
+      "script-src 'self' 'nonce-<nonce>' 'strict-dynamic'",
+      "style-src 'self' 'unsafe-inline'",
+    ].join('; ').replace('<nonce>', nonce)
+    const response = withEdgeSecurityHeaders(new Response('<html></html>', {
+      headers: {
+        'content-type': 'text/html; charset=utf-8',
+        'content-security-policy': pagePolicy,
+        'cache-control': 'public, max-age=60',
+      },
+    }))
+
+    expect(response.headers.get('content-security-policy')).toBe(pagePolicy)
+    expect(response.headers.get('cache-control')).toBe('private, no-store')
   })
 })

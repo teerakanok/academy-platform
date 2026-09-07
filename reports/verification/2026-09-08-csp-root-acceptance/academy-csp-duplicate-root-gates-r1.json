@@ -1,0 +1,49 @@
+[
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--project",
+      "unit",
+      "tests/unit/security-headers.test.ts",
+      "tests/unit/edge-response-security-headers.test.ts",
+      "tests/unit/middleware-production-session.test.ts"
+    ],
+    "exit": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-csp-duplicate-root-gates-r1-0.log",
+    "sha256": "2a9d7b65f5af05ea55ecf32234b3d24b5a76c4de8ae60efa973d807671ab77e6"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--project",
+      "unit"
+    ],
+    "exit": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-csp-duplicate-root-gates-r1-1.log",
+    "sha256": "13e625d8dacde9ecb14cc0750c2153f815ff4d32ac362d409deed06f23a73878"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "build:cf"
+    ],
+    "exit": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-csp-duplicate-root-gates-r1-2.log",
+    "sha256": "a97c52c014c5b0c36620f9736b31868e652aa720e9297f7ba4896c3c5248902b"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "exit": 1,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-csp-duplicate-root-gates-r1-3.log",
+    "sha256": "510aefd3d40c22d452bca45920e6245b9720752bc7e9213b56a55b2efe8be6c7"
+  }
+]

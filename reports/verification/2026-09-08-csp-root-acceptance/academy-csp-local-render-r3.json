@@ -1,0 +1,81 @@
+{
+  "checked_at": "2026-09-07T21:49:26.322Z",
+  "scope": "local production Next build; no production journey claim",
+  "checks": [
+    {
+      "check": "fresh-response-nonce-0",
+      "status": 200,
+      "scriptCount": 25,
+      "allScriptNoncesMatch": true,
+      "cacheControl": "private, no-cache, no-store, max-age=0, must-revalidate",
+      "pass": true
+    },
+    {
+      "check": "fresh-response-nonce-1",
+      "status": 200,
+      "scriptCount": 25,
+      "allScriptNoncesMatch": true,
+      "cacheControl": "private, no-cache, no-store, max-age=0, must-revalidate",
+      "pass": true
+    }
+  ],
+  "captures": [
+    {
+      "name": "desktop",
+      "theme": "light",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "url": "http://127.0.0.1:61003/courses/basic-os-linux/th",
+      "capture": "/private/tmp/cyberskills-prod-cde63a58/records/academy-csp-local-desktop-light-r3.png",
+      "injectionBlocked": true,
+      "actualTheme": "light",
+      "pageErrors": [],
+      "pass": true
+    },
+    {
+      "name": "desktop",
+      "theme": "dark",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "url": "http://127.0.0.1:61003/courses/basic-os-linux/th",
+      "capture": "/private/tmp/cyberskills-prod-cde63a58/records/academy-csp-local-desktop-dark-r3.png",
+      "injectionBlocked": true,
+      "actualTheme": "dark",
+      "pageErrors": [],
+      "pass": true
+    },
+    {
+      "name": "mobile",
+      "theme": "light",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "url": "http://127.0.0.1:61003/courses/basic-os-linux/th",
+      "capture": "/private/tmp/cyberskills-prod-cde63a58/records/academy-csp-local-mobile-light-r3.png",
+      "injectionBlocked": true,
+      "actualTheme": "light",
+      "pageErrors": [],
+      "pass": true
+    },
+    {
+      "name": "mobile",
+      "theme": "dark",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "url": "http://127.0.0.1:61003/courses/basic-os-linux/th",
+      "capture": "/private/tmp/cyberskills-prod-cde63a58/records/academy-csp-local-mobile-dark-r3.png",
+      "injectionBlocked": true,
+      "actualTheme": "dark",
+      "pageErrors": [],
+      "pass": true
+    }
+  ],
+  "pass": true
+}

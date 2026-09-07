@@ -1,0 +1,112 @@
+
+ RUN  v3.2.7 /private/tmp/academy-csp-cde63a58/academy-web
+
+ ❯ |unit| tests/unit/edge-response-security-headers.test.ts (3 tests | 3 failed) 14ms
+   × Worker-generated response security headers > applies the existing Next.js baseline to host refusals 7ms
+     → expected 'default-src \'self\'; base-uri \'self…' to be 'default-src \'self\'; base-uri \'self…' // Object.is equality
+   × Worker-generated response security headers > applies the baseline to protected-media refusal and error responses 3ms
+     → expected 'default-src \'self\'; base-uri \'self…' to be 'default-src \'self\'; base-uri \'self…' // Object.is equality
+   × Worker CSP fallback > preserves a strict nonce-bearing page policy and makes nonce HTML uncacheable 4ms
+     → expected 'default-src \'self\'; base-uri \'self…' to be 'default-src \'self\'; script-src \'se…' // Object.is equality
+ ❯ |unit| tests/unit/middleware-production-session.test.ts (5 tests | 2 failed) 14ms
+   ✓ production middleware opaque-session prefilter > continues a protected request carrying a syntactically valid Academy session cookie 4ms
+   ✓ production middleware opaque-session prefilter > still redirects a protected production page without a session cookie 1ms
+   ✓ production middleware opaque-session prefilter > still denies a protected production API without a session cookie 2ms
+   × production middleware opaque-session prefilter > rejects caller CSP controls and mints unique nonce policies 5ms
+     → expected '' to match /^script-src …/=]{44}' 'strict-dynamic'$
+   × production middleware opaque-session prefilter > preserves production sign-in redirects while applying the strict edge fallback 1ms
+     → expected '' to be 'script-src \'self\'' // Object.is equality
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| tests/unit/edge-response-security-headers.test.ts > Worker-generated response security headers > applies the existing Next.js baseline to host refusals
+AssertionError: expected 'default-src \'self\'; base-uri \'self…' to be 'default-src \'self\'; base-uri \'self…' // Object.is equality
+
+Expected: "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob:; connect-src 'self'; worker-src 'self' blob:; frame-src 'none'; manifest-src 'self'"
+Received: "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob:; connect-src 'self'; worker-src 'self' blob:; frame-src 'none'; manifest-src 'self'"
+
+ ❯ tests/unit/edge-response-security-headers.test.ts:36:41
+     34| 
+     35|     for (const [key, value] of Object.entries(EXPECTED_HEADERS)) {
+     36|       expect(response.headers.get(key)).toBe(value)
+       |                                         ^
+     37|     }
+     38|     expect(response.headers.get('cache-control')).toBe('no-store')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  |unit| tests/unit/edge-response-security-headers.test.ts > Worker-generated response security headers > applies the baseline to protected-media refusal and error responses
+AssertionError: expected 'default-src \'self\'; base-uri \'self…' to be 'default-src \'self\'; base-uri \'self…' // Object.is equality
+
+Expected: "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob:; connect-src 'self'; worker-src 'self' blob:; frame-src 'none'; manifest-src 'self'"
+Received: "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob:; connect-src 'self'; worker-src 'self' blob:; frame-src 'none'; manifest-src 'self'"
+
+ ❯ tests/unit/edge-response-security-headers.test.ts:54:44
+     52|       expect(response).toBeDefined()
+     53|       for (const [key, value] of Object.entries(EXPECTED_HEADERS)) {
+     54|         expect(response!.headers.get(key)).toBe(value)
+       |                                            ^
+     55|       }
+     56|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  |unit| tests/unit/edge-response-security-headers.test.ts > Worker CSP fallback > preserves a strict nonce-bearing page policy and makes nonce HTML uncacheable
+AssertionError: expected 'default-src \'self\'; base-uri \'self…' to be 'default-src \'self\'; script-src \'se…' // Object.is equality
+
+Expected: "default-src 'self'; script-src 'self' 'nonce-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' 'strict-dynamic'; style-src 'self' 'unsafe-inline'"
+Received: "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob:; connect-src 'self'; worker-src 'self' blob:; frame-src 'none'; manifest-src 'self'"
+
+ ❯ tests/unit/edge-response-security-headers.test.ts:76:61
+     74|     }))
+     75| 
+     76|     expect(response.headers.get('content-security-policy')).toBe(pageP…
+       |                                                             ^
+     77|     expect(response.headers.get('cache-control')).toBe('private, no-st…
+     78|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  |unit| tests/unit/middleware-production-session.test.ts > production middleware opaque-session prefilter > rejects caller CSP controls and mints unique nonce policies
+AssertionError: expected '' to match /^script-src …/=]{44}' 'strict-dynamic'$
+
+- Expected: 
+/^script-src 'self' 'nonce-[A-Za-z0-9+/=]{44}' 'strict-dynamic'$/
+
++ Received: 
+""
+
+ ❯ tests/unit/middleware-production-session.test.ts:61:26
+     59|     const scriptPolicy = policy.split('; ').find((directive) => direct…
+     60| 
+     61|     expect(scriptPolicy).toMatch(/^script-src 'self' 'nonce-[A-Za-z0-9…
+       |                          ^
+     62|     expect(scriptPolicy).not.toContain('unsafe-inline')
+     63|     expect(scriptPolicy).not.toContain('unsafe-eval')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  |unit| tests/unit/middleware-production-session.test.ts > production middleware opaque-session prefilter > preserves production sign-in redirects while applying the strict edge fallback
+AssertionError: expected '' to be 'script-src \'self\'' // Object.is equality
+
+- Expected
++ Received
+
+- script-src 'self'
+
+ ❯ tests/unit/middleware-production-session.test.ts:77:26
+     75|     expect(response.status).toBe(307)
+     76|     expect(new URL(response.headers.get('location') ?? '').pathname).t…
+     77|     expect(scriptPolicy).toBe("script-src 'self'")
+       |                          ^
+     78|   })
+     79| })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  5 failed | 3 passed (8)
+   Start at  04:51:53
+   Duration  505ms (transform 108ms, setup 0ms, collect 197ms, tests 28ms, environment 0ms, prepare 130ms)
+

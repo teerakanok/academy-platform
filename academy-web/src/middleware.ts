@@ -7,6 +7,8 @@ import {
   hasSyntacticallyValidLocalAcademySession,
   identityControlLocalFixtureAllowedForRequest,
 } from '@/lib/identity/local-fixture'
+import { withEdgeSecurityHeaders } from '@/lib/edge-security-headers'
+import { academyContentSecurityPolicy } from '@/lib/content-security-policy'
 
 // ประตูเดียวของทั้งเว็บ — ตัดสินว่าเส้นทางไหนเปิด เส้นทางไหนต้องมีบัญชี
 //
@@ -59,13 +61,40 @@ function isPublic(pathname: string): boolean {
   return false
 }
 
+function requestNonce(): string {
+  const bytes = new Uint8Array(32)
+  crypto.getRandomValues(bytes)
+  return btoa(String.fromCharCode(...bytes))
+}
+
+function continueWithContentSecurityPolicy(request: NextRequest): NextResponse {
+  const nonce = requestNonce()
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.delete('x-nonce')
+  requestHeaders.delete('content-security-policy')
+  requestHeaders.delete('content-security-policy-report-only')
+  requestHeaders.set('x-nonce', nonce)
+  requestHeaders.set(
+    'Content-Security-Policy',
+    `script-src ${["'self'", `'nonce-${nonce}'`, "'strict-dynamic'"].join(' ')}`,
+  )
+
+  const response = NextResponse.next({ request: { headers: requestHeaders } })
+  response.headers.set('Content-Security-Policy', academyContentSecurityPolicy([
+    "'self'",
+    `'nonce-${nonce}'`,
+    "'strict-dynamic'",
+  ]))
+  return response
+}
+
 export async function middleware(request: NextRequest) {
   // พื้นผิวภายในถูกปิดก่อนทุกอย่าง — ก่อนแม้แต่จะดูว่าใครล็อกอินอยู่
   //
   // ต้องอยู่ก่อนชั้น auth เพราะปัญหาที่แก้คือ "ผู้เรียนที่ล็อกอินแล้วก็เข้าไม่ได้"
   // ไม่ใช่แค่ผู้ไม่ล็อกอิน · ตอบ 404 ไม่ใช่ 403 เพื่อไม่ประกาศว่ามีอะไรอยู่ตรงนี้
   if (isInternalSurface(request.nextUrl.pathname) && !internalSurfacesEnabled()) {
-    return new NextResponse(null, { status: 404 })
+    return withEdgeSecurityHeaders(new NextResponse(null, { status: 404 }))
   }
 
   // locale ของ overview สาธารณะเป็น enum ที่แคบ. รูปสาม segment อื่นต้องตายที่
@@ -77,12 +106,12 @@ export async function middleware(request: NextRequest) {
     !COURSE_OG_IMAGE.test(requestPath) &&
     !COURSE_LEARNER_OVERVIEW.test(requestPath)
   ) {
-    return new NextResponse(null, { status: 404 })
+    return withEdgeSecurityHeaders(new NextResponse(null, { status: 404 }))
   }
 
   // ต่ออายุ session ทุก request — ถ้าไม่ทำ cookie จะหมดอายุกลางคันแล้วผู้เรียน
   // ถูกเด้งออกระหว่างทำ quiz ซึ่งเสียงานที่ยังไม่ได้บันทึก
-  let response = NextResponse.next({ request })
+  let response = continueWithContentSecurityPolicy(request)
 
   const allowIdentityFixture = identityControlLocalFixtureAllowedForRequest(request)
   if (allowIdentityFixture) {
@@ -90,11 +119,13 @@ export async function middleware(request: NextRequest) {
     const hasLocalSession = hasSyntacticallyValidLocalAcademySession(request.headers.get('cookie'))
     if (!hasLocalSession && !isPublic(pathname)) {
       if (pathname.startsWith('/api/')) {
-        return NextResponse.json({ ok: false, error: 'ต้องเข้าสู่ระบบก่อน' }, { status: 401 })
+        return withEdgeSecurityHeaders(
+          NextResponse.json({ ok: false, error: 'ต้องเข้าสู่ระบบก่อน' }, { status: 401 }),
+        )
       }
       const signIn = new URL('/sign-in', request.url)
       signIn.searchParams.set('next', pathname + search)
-      return NextResponse.redirect(signIn)
+      return withEdgeSecurityHeaders(NextResponse.redirect(signIn))
     }
     // A syntactically valid cookie is only a coarse middleware prefilter. The
     // Node routes own durable session validation, so sign-in must stay reachable
@@ -109,11 +140,13 @@ export async function middleware(request: NextRequest) {
     const { pathname, search } = request.nextUrl
     if (!hasOpaqueSession && !isPublic(pathname)) {
       if (pathname.startsWith('/api/')) {
-        return NextResponse.json({ ok: false, error: 'ต้องเข้าสู่ระบบก่อน' }, { status: 401 })
+        return withEdgeSecurityHeaders(
+          NextResponse.json({ ok: false, error: 'ต้องเข้าสู่ระบบก่อน' }, { status: 401 }),
+        )
       }
       const signIn = new URL('/sign-in', request.url)
       signIn.searchParams.set('next', pathname + search)
-      return NextResponse.redirect(signIn)
+      return withEdgeSecurityHeaders(NextResponse.redirect(signIn))
     }
     // The edge cannot read the durable Identity Control store. A valid cookie is
     // only a prefilter here; Node routes and server components must validate it
@@ -128,7 +161,7 @@ export async function middleware(request: NextRequest) {
     // ตั้ง env ไม่ครบ = ตัดสินสิทธิ์ไม่ได้ → ปิดไว้ก่อน ไม่ใช่ปล่อยผ่าน
     return isPublic(request.nextUrl.pathname)
       ? response
-      : NextResponse.redirect(new URL('/sign-in', request.url))
+      : withEdgeSecurityHeaders(NextResponse.redirect(new URL('/sign-in', request.url)))
   }
 
   const supabase = createServerClient(url, anonKey, {
@@ -156,7 +189,9 @@ export async function middleware(request: NextRequest) {
     // HTML ของหน้า sign-in กลับมา แล้ว JSON.parse พังด้วย error ที่อ่านไม่รู้เรื่อง
     // แทนที่จะบอกตรงๆ ว่า "ยังไม่ได้เข้าสู่ระบบ"
     if (pathname.startsWith('/api/')) {
-      return NextResponse.json({ ok: false, error: 'ต้องเข้าสู่ระบบก่อน' }, { status: 401 })
+      return withEdgeSecurityHeaders(
+        NextResponse.json({ ok: false, error: 'ต้องเข้าสู่ระบบก่อน' }, { status: 401 }),
+      )
     }
     const signIn = new URL('/sign-in', request.url)
     // จำที่ที่เขากำลังจะไป — ล็อกอินเสร็จต้องกลับมาที่เดิม ไม่ใช่โยนไปหน้าแรก
@@ -166,7 +201,7 @@ export async function middleware(request: NextRequest) {
 
   // ล็อกอินแล้วยังเปิดหน้าเข้าสู่ระบบ = เดินวนเปล่าๆ พาไปที่เรียนเลย
   if (user && (pathname === '/sign-in' || pathname === '/sign-in/sent')) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    return withEdgeSecurityHeaders(NextResponse.redirect(new URL('/dashboard', request.url)))
   }
 
   return response

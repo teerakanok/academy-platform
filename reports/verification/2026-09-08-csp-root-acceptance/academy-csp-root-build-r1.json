@@ -1,0 +1,44 @@
+[
+  {
+    "command": [
+      "npx",
+      "tsc",
+      "--noEmit"
+    ],
+    "exit": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-csp-root-build-r1-0.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "npx",
+      "tsc",
+      "-p",
+      "tsconfig.worker.json"
+    ],
+    "exit": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-csp-root-build-r1-1.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "npx",
+      "tsc",
+      "-p",
+      "ops/academy-retention-worker/tsconfig.json"
+    ],
+    "exit": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-csp-root-build-r1-2.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "build:cf"
+    ],
+    "exit": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-csp-root-build-r1-3.log",
+    "sha256": "45b243361ec18b2d4387547a86c06843f09f61d35467d2b3511e917b76e74501"
+  }
+]

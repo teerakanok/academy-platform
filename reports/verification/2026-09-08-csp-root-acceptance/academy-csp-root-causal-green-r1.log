@@ -1,0 +1,11 @@
+
+ RUN  v3.2.7 /private/tmp/academy-csp-cde63a58/academy-web
+
+ ✓ |unit| tests/unit/edge-response-security-headers.test.ts (3 tests) 5ms
+ ✓ |unit| tests/unit/middleware-production-session.test.ts (5 tests) 11ms
+
+ Test Files  2 passed (2)
+      Tests  8 passed (8)
+   Start at  04:51:54
+   Duration  398ms (transform 86ms, setup 0ms, collect 159ms, tests 16ms, environment 0ms, prepare 108ms)
+

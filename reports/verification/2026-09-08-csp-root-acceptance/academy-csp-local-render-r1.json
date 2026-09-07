@@ -1,0 +1,39 @@
+{
+  "checked_at": "2026-09-07T21:48:00.434Z",
+  "scope": "local production Next build; no production journey claim",
+  "checks": [
+    {
+      "check": "fresh-response-nonce-0",
+      "status": 200,
+      "scriptCount": 25,
+      "allScriptNoncesMatch": true,
+      "cacheControl": "private, no-cache, no-store, max-age=0, must-revalidate",
+      "pass": true
+    },
+    {
+      "check": "fresh-response-nonce-1",
+      "status": 200,
+      "scriptCount": 25,
+      "allScriptNoncesMatch": true,
+      "cacheControl": "private, no-cache, no-store, max-age=0, must-revalidate",
+      "pass": true
+    }
+  ],
+  "captures": [
+    {
+      "name": "desktop",
+      "theme": "light",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "url": "http://127.0.0.1:61003/courses/basic-os-linux/th",
+      "capture": "/private/tmp/cyberskills-prod-cde63a58/records/academy-csp-local-desktop-light-r1.png",
+      "injectionBlocked": false,
+      "pageErrors": [],
+      "pass": false
+    }
+  ],
+  "failure": "BROWSER_ACCEPTANCE_FAILED",
+  "pass": false
+}

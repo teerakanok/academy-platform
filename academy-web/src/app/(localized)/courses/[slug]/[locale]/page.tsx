@@ -2,12 +2,13 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { CourseExperience } from '@/components/course/CourseExperience'
 import { getPublicCourse, listPublicCourseSlugs } from '@/lib/content/course-source'
+import { headers } from 'next/headers'
 import { toPublicCourse } from '@/lib/content/public-course'
 import { publicCourseShareImagePath } from '@/lib/course-share-image'
 import { isUiLocale } from '@/lib/i18n/ui'
 import { absoluteUrl, publicPage } from '@/lib/seo'
 
-export const dynamic = 'force-static'
+export const dynamic = 'force-dynamic'
 export const dynamicParams = false
 
 export function generateStaticParams() {
@@ -57,6 +58,7 @@ export default async function LocalizedCoursePage({
   params: Promise<{ slug: string; locale: string }>
 }) {
   const { slug, locale } = await params
+  const nonce = (await headers()).get('x-nonce') ?? undefined
   const course = publicCourseForPath(slug, locale)
   if (!course) notFound()
 
@@ -80,6 +82,7 @@ export default async function LocalizedCoursePage({
   return (
     <div className="mx-auto max-w-5xl px-6 py-12">
       <script
+        nonce={nonce}
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />

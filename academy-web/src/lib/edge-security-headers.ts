@@ -5,7 +5,7 @@ export const ACADEMY_EDGE_SECURITY_HEADERS = {
     "form-action 'self'",
     "frame-ancestors 'none'",
     "object-src 'none'",
-    "script-src 'self' 'unsafe-inline'",
+    "script-src 'self'",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob:",
     "font-src 'self' data:",
@@ -25,7 +25,25 @@ export const ACADEMY_EDGE_SECURITY_HEADERS = {
 
 export function withEdgeSecurityHeaders(response: Response): Response {
   const headers = new Headers(response.headers)
-  for (const [key, value] of Object.entries(ACADEMY_EDGE_SECURITY_HEADERS)) headers.set(key, value)
+  const pagePolicy = headers.get('Content-Security-Policy')
+  const pageScriptPolicy = pagePolicy
+    ?.split(';')
+    .find((directive) => directive.trim().startsWith('script-src'))
+    ?.trim()
+  const preservesNoncePolicy = Boolean(
+    pageScriptPolicy
+    && pageScriptPolicy.includes("'nonce-")
+    && pageScriptPolicy.includes("'strict-dynamic'")
+    && !pageScriptPolicy.includes("'unsafe-inline'")
+    && !pageScriptPolicy.includes("'unsafe-eval'"),
+  )
+
+  for (const [key, value] of Object.entries(ACADEMY_EDGE_SECURITY_HEADERS)) {
+    if (key !== 'Content-Security-Policy' || !preservesNoncePolicy) headers.set(key, value)
+  }
+  if (preservesNoncePolicy && headers.get('content-type')?.includes('text/html')) {
+    headers.set('Cache-Control', 'private, no-store')
+  }
 
   return new Response(response.body, {
     status: response.status,

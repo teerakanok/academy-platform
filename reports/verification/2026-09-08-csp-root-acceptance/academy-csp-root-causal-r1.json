@@ -1,0 +1,39 @@
+{
+  "manifest_matches": 14,
+  "results": [
+    {
+      "phase": "predecessor RED",
+      "command": [
+        "rtk",
+        "proxy",
+        "npx",
+        "vitest",
+        "run",
+        "--project",
+        "unit",
+        "tests/unit/middleware-production-session.test.ts",
+        "tests/unit/edge-response-security-headers.test.ts"
+      ],
+      "exit": 1,
+      "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-csp-root-causal-red-r1.log",
+      "sha256": "81e3ef3f7c6733087c41168b3146300c12e1f14511a795cd9dc9f5cdc6103409"
+    },
+    {
+      "phase": "exact restored GREEN",
+      "command": [
+        "rtk",
+        "proxy",
+        "npx",
+        "vitest",
+        "run",
+        "--project",
+        "unit",
+        "tests/unit/middleware-production-session.test.ts",
+        "tests/unit/edge-response-security-headers.test.ts"
+      ],
+      "exit": 0,
+      "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-csp-root-causal-green-r1.log",
+      "sha256": "2bdc309e8dc5f5cee71c68f7e319718a62398eca8affe4b89107fbe9c807dfbd"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "repo": "/private/tmp/academy-csp-cde63a58",
+  "retained_patch_sha256": "812bcd76f3fcfacd3ba7fa3842f25019ba8f1a76b2caf7c5e1c3df03ee080b55",
+  "files": [
+    {
+      "path": "academy-web/next.config.ts",
+      "sha256": "be4bd853921a9c83be1e6f6a1a998c5de12bda3c10795fa4bba98e3ee57f3aad"
+    },
+    {
+      "path": "academy-web/public/_headers",
+      "sha256": "4fe19340fd3c777aee49ceb3e85b8eaaa4aa4d9814164d041774c0009ca84251"
+    },
+    {
+      "path": "academy-web/src/app/(localized)/courses/[slug]/[locale]/page.tsx",
+      "sha256": "007bdb0f91e3b1785cc02e17505f97c403689ca196cba49847ce6b44555c3849"
+    },
+    {
+      "path": "academy-web/src/components/AppShell.tsx",
+      "sha256": "95ab010f438ab47f06980303b1d1e315ca68a41f1f1c89b47e0ec3b4ceb2b47a"
+    },
+    {
+      "path": "academy-web/src/components/ThemeBootstrapScript.tsx",
+      "sha256": "f5d90fd57773bce75f0f32e929cc4a26d786940e543a7b9f7ba094461fe053d7"
+    },
+    {
+      "path": "academy-web/src/lib/content-security-policy.ts",
+      "sha256": "6459345daa0e7820cd80d0ab1d609732f5e3b6a1bc4881e0804965e9d3557868"
+    },
+    {
+      "path": "academy-web/src/lib/edge-security-headers.ts",
+      "sha256": "9621169db436430b97b0341db4f02350962f08d1a61906fabf35c313fddd773a"
+    },
+    {
+      "path": "academy-web/src/middleware.ts",
+      "sha256": "8f8829d68c5bec2e23a9a82bd55d94aabcf5ca36d30f8f8a561dbaf4a9e37d62"
+    },
+    {
+      "path": "academy-web/tests/unit/edge-response-security-headers.test.ts",
+      "sha256": "69b4f9faed8f4f7f08b661478c1bc9a1f7d2a7bb0649b85b9eb0ed5e0ccd6bd4"
+    },
+    {
+      "path": "academy-web/tests/unit/middleware-production-session.test.ts",
+      "sha256": "4c1f8513d051fcc7bb0d62a1b6449e46ddded970b040a6338f53e5e4aea5f437"
+    },
+    {
+      "path": "academy-web/tests/unit/security-headers.test.ts",
+      "sha256": "e67c616477299001ee4ad58049eec80f6bc9b79c1469f80476640d0b43c0b8ea"
+    },
+    {
+      "path": "academy-web/tests/unit/theme-bootstrap.test.ts",
+      "sha256": "84a4e21ac976d85d49f7bc870733dc9ad1e7f3422176502ecd6ec03971bb3181"
+    },
+    {
+      "path": "academy-web/worker.ts",
+      "sha256": "532d35b41efd04fc442ad7c31ac2336570a5cfd6462ea59ee55769a3a1c9ca66"
+    },
+    {
+      "path": "reports/verification/2026-09-08-csp-source/report.md",
+      "sha256": "012a96d662934002a0ac2b4a68afea9ca7fe0652c2096e95365e321eafdd541b"
+    }
+  ],
+  "supersedes": "academy-csp-review-scope-r1.json",
+  "correction": "Remove production Next configured CSP; middleware owns HTML policy; development configuration and Worker/static fallbacks unchanged."
+}
