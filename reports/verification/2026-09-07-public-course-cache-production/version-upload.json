@@ -1,0 +1,22 @@
+{
+  "source": "5572e8318b67ebf7858c4c1fccf1831ae01d335f",
+  "command": [
+    "node",
+    "node_modules/wrangler/bin/wrangler.js",
+    "versions",
+    "upload",
+    "--name",
+    "cyberskills-academy",
+    "--keep-vars",
+    "--tag",
+    "release-5572e8318b67",
+    "--message",
+    "s=5572e8318b67ebf7858c4c1fccf1831ae01d335f;public-course-cache"
+  ],
+  "exit": 0,
+  "version_ids": [
+    "0eed364a-1714-4e03-bf62-0af2230cfb55"
+  ],
+  "output_sha256": "495862635c482a5ea0571dccf78c679b0136681de11aaeac94e3f93b7c368a36",
+  "error_codes": []
+}

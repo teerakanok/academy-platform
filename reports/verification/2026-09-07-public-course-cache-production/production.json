@@ -1,0 +1,165 @@
+{
+  "checked_at": "2026-09-07T08:50:30.517Z",
+  "version_override": false,
+  "checks": [
+    {
+      "path": "/",
+      "status": 200,
+      "expected": 200,
+      "h1": "Stop relearning what you already know.",
+      "pass": true
+    },
+    {
+      "path": "/sign-in",
+      "status": 200,
+      "expected": 200,
+      "h1": "One CYBERSKILLS account",
+      "pass": true
+    },
+    {
+      "path": "/robots.txt",
+      "status": 200,
+      "expected": 200,
+      "pass": true
+    },
+    {
+      "path": "/courses/assembly/en",
+      "status": 200,
+      "expected": 200,
+      "h1": "Assembly: Reading Machine Code",
+      "pass": true
+    },
+    {
+      "path": "/courses/assembly/th",
+      "status": 200,
+      "expected": 200,
+      "h1": "ภาษาแอสเซมบลี: อ่านภาษาเครื่อง",
+      "pass": true
+    },
+    {
+      "path": "/courses/basic-os-linux/en",
+      "status": 200,
+      "expected": 200,
+      "h1": "Basic OS &amp; Linux",
+      "pass": true
+    },
+    {
+      "path": "/courses/basic-os-linux/th",
+      "status": 200,
+      "expected": 200,
+      "h1": "พื้นฐานระบบปฏิบัติการและ Linux",
+      "pass": true
+    },
+    {
+      "path": "/courses/c-low-level/en",
+      "status": 200,
+      "expected": 200,
+      "h1": "C &amp; Low-level Programming",
+      "pass": true
+    },
+    {
+      "path": "/courses/c-low-level/th",
+      "status": 200,
+      "expected": 200,
+      "h1": "C และการเขียนโปรแกรมระดับล่าง",
+      "pass": true
+    },
+    {
+      "path": "/courses/computer-architecture/en",
+      "status": 200,
+      "expected": 200,
+      "h1": "Computer Architecture",
+      "pass": true
+    },
+    {
+      "path": "/courses/computer-architecture/th",
+      "status": 200,
+      "expected": 200,
+      "h1": "สถาปัตยกรรมคอมพิวเตอร์",
+      "pass": true
+    },
+    {
+      "path": "/courses/computer-networking/en",
+      "status": 200,
+      "expected": 200,
+      "h1": "Computer Networking",
+      "pass": true
+    },
+    {
+      "path": "/courses/computer-networking/th",
+      "status": 200,
+      "expected": 200,
+      "h1": "เครือข่ายคอมพิวเตอร์",
+      "pass": true
+    },
+    {
+      "path": "/courses/git-essentials/en",
+      "status": 200,
+      "expected": 200,
+      "h1": "Git Essentials",
+      "pass": true
+    },
+    {
+      "path": "/courses/git-essentials/th",
+      "status": 200,
+      "expected": 200,
+      "h1": "Git ฉบับใช้งานจริง",
+      "pass": true
+    },
+    {
+      "path": "/courses/operating-systems/en",
+      "status": 200,
+      "expected": 200,
+      "h1": "Operating Systems",
+      "pass": true
+    },
+    {
+      "path": "/courses/operating-systems/th",
+      "status": 200,
+      "expected": 200,
+      "h1": "ระบบปฏิบัติการ",
+      "pass": true
+    },
+    {
+      "path": "/courses/setup-and-environment/en",
+      "status": 200,
+      "expected": 200,
+      "h1": "Setting Up",
+      "pass": true
+    },
+    {
+      "path": "/courses/setup-and-environment/th",
+      "status": 200,
+      "expected": 200,
+      "h1": "ตั้งต้นให้พร้อม",
+      "pass": true
+    },
+    {
+      "path": "/courses/assembly/learn",
+      "status": 307,
+      "expected": 307,
+      "pass": true
+    },
+    {
+      "path": "/courses/comptia-security-plus/en",
+      "status": 404,
+      "expected": 404,
+      "h1": "404",
+      "pass": true
+    }
+  ],
+  "captures": [
+    {
+      "name": "desktop",
+      "status": 200,
+      "h1": "Assembly: Reading Machine Code",
+      "pass": true
+    },
+    {
+      "name": "mobile",
+      "status": 200,
+      "h1": "Assembly: Reading Machine Code",
+      "pass": true
+    }
+  ]
+}
