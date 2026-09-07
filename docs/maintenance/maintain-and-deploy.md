@@ -1,19 +1,25 @@
 # Maintain and deploy Academy
 
-Procedure reverified against the completed 2026-09-06 session-ID digest cutover.
+Procedure combines the completed 2026-09-06 session-ID digest cutover with the
+verified 2026-09-07 final-capstone application release.
 The [current handoff pointer](../../reports/handoffs/current.json) targets the
 [handoff record](../../reports/handoffs/20260906T225026Z-academy-session-digest-cutover.md),
 which links the [0034 cutover record](../../reports/operations/20260906-academy-0034-cutover/README.md).
 The cutover record's immutable receipts and
 [independent R2 PASS](../../reports/operations/20260906-academy-0034-cutover/concrete-cutover-r2-review.md)
-are the production source of truth.
+are the database-cutover source of truth. Current application evidence is in the
+[final-capstone production proof](../../reports/verification/2026-09-07-final-capstone-production/README.md).
 
 ## Current verified boundary
 
-- Deployment `a0a9961e-da7f-48f8-b835-3024704dfbbf` serves version
-  `1af77a26-bba2-4300-9a71-0bc0262ca06d` at 100%, sourced from
-  `0e4417ec4e2909f05ab4eb9f3269bcb1c58c184b`. See the
-  [verified forward receipt](../../reports/operations/20260906-academy-0034-cutover/receipts/academy-cutover-resumed-forward-verified.json).
+- Deployment `6d90afd6-6d05-498d-8a90-88872bcb8c92` serves version
+  `f67cb693-8faf-416d-a598-eaf77b9f637d` at100%, source
+  `624e5e39c79ca1d316e84f57b8586d0efb9d4f7b`, verified2026-09-07T15:59:54Z.
+  See the [current deployment receipt](../../reports/verification/2026-09-07-final-capstone-production/deployment.json).
+  Predecessor `772b75a6-e06b-404b-a268-5dbb4ec24e86` is retained.
+- Accepted/imported/deployed capstone banks:23/23. Production HTTP25/25 and real
+  Chrome EN/TH desktop/mobile captures passed. This does not close authenticated
+  learner submission, entitlement, payment or complete playtest acceptance.
 - Migration `0034_identity_session_id_digest.sql` is committed. Its digest RPCs
   and grants are live. Do not reapply migrations `0029`–`0033` or `0034`.
 - The legacy raw session create/read/revoke wrappers remain compatible, but old
