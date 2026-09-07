@@ -228,6 +228,7 @@ export async function executeAcademyProductionOperation(
       JSON.stringify(value?.checks) !==
         JSON.stringify(["P1", "P2", "P3", "P4", "P5", "P6", "P7"]) ||
       value.status !== "PASS" ||
+      !/^academy-p5-[a-f0-9]{18}$/.test(value.operationId ?? "") ||
       value.deploymentId !== v["--deployment"] ||
       value.versionId !== v["--version"] ||
       value.configuredNamesSha256 !== v["--config"] ||
@@ -248,6 +249,7 @@ export async function executeAcademyProductionOperation(
       deploymentId: value.deploymentId,
       versionId: value.versionId,
       configuredNamesSha256: value.configuredNamesSha256,
+      operationId: value.operationId,
       checks: value.checks,
       cleanup: value.cleanup,
       runnerReceiptSha256: value.receiptSha256,

@@ -1,0 +1,51 @@
+✔ publishes canonical protected backup receipt only after isolated restore MATCH (12.517416ms)
+✔ publishes v2 exact-byte transaction receipt bound to backup and ordered hashes (11.872833ms)
+✔ remote failure and migration digest drift publish no receipt (1.650167ms)
+✔ remote boundary retains cleanup and one atomic migration transaction (0.714459ms)
+✔ invalid backup receipt and noncanonical expiry cause zero remote calls (1.459042ms)
+✔ decoded remote program proves restore and suppresses MATCH when cleanup fails (4295.745334ms)
+✔ remote independently rejects malformed authority before side effects (329.053625ms)
+✔ remote scratch existence probe binds its derived database name (0.576667ms)
+✔ remote program sends derived scratch through a psql variable (829.795541ms)
+✔ host helper rejects foreign paths before protected reads or database calls (0.960333ms)
+✔ host helper uses stable no-follow reads and argv/stdin database execution (3.7785ms)
+✔ database values bind as text-compatible psql variables outside the do block (1.755708ms)
+✔ cleanup rejects duplicate fixture users before its final commit (0.271458ms)
+✔ protected fixture boundary rejects malformed identity before database (0.277042ms)
+✔ database result must be the exact expected row count (0.200375ms)
+✖ bound fixture SQL proves enrollment and cleanup behavior on PostgreSQL (541.317458ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 15
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5705.688959
+
+✖ failing tests:
+
+test at academy-web/scripts/academy-production-p1-p7-host.test.mjs:149:1
+✖ bound fixture SQL proves enrollment and cleanup behavior on PostgreSQL (541.317458ms)
+  AssertionError [ERR_ASSERTION]: ERROR:  syntax error at or near ":"
+  LINE 2: ...11-2222-5333-8444-555555555555'::text as subject, :'academy_...
+                                                               ^
+  
+  
+  3 !== 0
+  
+      at run (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/academy-production-p1-p7-host.test.mjs:179:12)
+      at TestContext.<anonymous> (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/academy-production-p1-p7-host.test.mjs:200:16)
+      at Test.runInAsyncScope (node:async_hooks:212:14)
+      at Test.run (node:internal/test_runner/test:1109:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:786:18)
+      at Test.postRun (node:internal/test_runner/test:1238:19)
+      at Test.run (node:internal/test_runner/test:1166:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:786:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 3,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

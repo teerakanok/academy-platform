@@ -1,0 +1,19 @@
+✔ scripts/academy-production-operation-install-command.test.mjs (345.210291ms)
+academy production operation wrappers and install manifest verified
+✔ scripts/academy-production-operation.test.mjs (4290.44325ms)
+✔ requires the exact P1-P7 sequence and terminal absence proof (1.993ms)
+✔ every post-prepare failure still performs cleanup and emits no PASS (1.395042ms)
+✔ headed production contract waits for real Turnstile without reading or logging its token (2.928917ms)
+✔ production pins match the exact reviewed operator source (1.364958ms)
+✔ real SSH enrollment adapter completes P6 and binds final receipt to operation (0.662709ms)
+✔ SSH adapter invokes only fixed reviewed wrapper and bounded host programs (1.931125ms)
+✔ SSH adapter rejects foreign operation paths before calls (0.251125ms)
+✔ secure OTP transfer uses real O_EXCL path and rejects ancestor, oversize, and timeout (41.003542ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4299.381375

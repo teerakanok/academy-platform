@@ -1,0 +1,37 @@
+{
+  "merged_tree": "ff7fcfb2e6b3c78a4c1519f1f6c43c139cab7b61",
+  "application_parity": [
+    {
+      "path": "academy-web/src",
+      "before": "c49c56358ef401b50332b73cbc0b371ce539beb1",
+      "after": "c49c56358ef401b50332b73cbc0b371ce539beb1",
+      "equal": true
+    },
+    {
+      "path": "academy-web/public",
+      "before": "c3bf1336f29ffe948b111232f8042a8a74caedea",
+      "after": "c3bf1336f29ffe948b111232f8042a8a74caedea",
+      "equal": true
+    },
+    {
+      "path": "academy-web/package.json",
+      "before": "b38908a19b644374b2d6472a96ba36cbc467a62d",
+      "after": "b38908a19b644374b2d6472a96ba36cbc467a62d",
+      "equal": true
+    },
+    {
+      "path": "academy-web/package-lock.json",
+      "before": "f54df0511ebfc41b5b4b9304266dc45d8ac03259",
+      "after": "f54df0511ebfc41b5b4b9304266dc45d8ac03259",
+      "equal": true
+    },
+    {
+      "path": "academy-web/worker.ts",
+      "before": "edeb1191224312baadeb9718d5472b18392bbd0c",
+      "after": "edeb1191224312baadeb9718d5472b18392bbd0c",
+      "equal": true
+    }
+  ],
+  "operator_files_exact_9be6807": 17,
+  "conflicts": ""
+}

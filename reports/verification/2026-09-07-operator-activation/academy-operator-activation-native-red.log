@@ -1,0 +1,26 @@
+file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/academy-production-operation-install-command.mjs:40
+  throw new Error("ACADEMY_OPERATION_INSTALL_COMMAND_REJECTED");
+        ^
+
+Error: ACADEMY_OPERATION_INSTALL_COMMAND_REJECTED
+    at fail (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/academy-production-operation-install-command.mjs:40:9)
+    at candidateManifest (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/academy-production-operation-install-command.mjs:132:7)
+    at async inspectAcademyProductionOperationInstall (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/academy-production-operation-install-command.mjs:178:21)
+    at async file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/academy-production-operation-install-command.test.mjs:95:22
+
+Node.js v25.5.0
+✖ scripts/academy-production-operation-install-command.test.mjs (68.810667ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 74.677292
+
+✖ failing tests:
+
+test at scripts/academy-production-operation-install-command.test.mjs:1:1
+✖ scripts/academy-production-operation-install-command.test.mjs (68.810667ms)
+  'test failed'

@@ -1,0 +1,41 @@
+✖ remote cleanup probe executes its exact psql invocation on PostgreSQL (143.354875ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 217.427917
+
+✖ failing tests:
+
+test at scripts/academy-poola-production-producer.test.mjs:421:1
+✖ remote cleanup probe executes its exact psql invocation on PostgreSQL (143.354875ms)
+  AssertionError [ERR_ASSERTION]: Traceback (most recent call last):
+    File "<string>", line 10, in <module>
+      assert eval(p['expression']) == p['expected']
+             ~~~~^^^^^^^^^^^^^^^^^
+    File "<string>", line 1, in <module>
+      import json,sys,subprocess
+    File "<string>", line 9, in run
+      return subprocess.run([p['psql'],'-d',p['databaseUrl']]+flags,input=data,text=True,capture_output=True,check=True).stdout
+             ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 578, in run
+      raise CalledProcessError(retcode, process.args,
+                               output=stdout, stderr=stderr)
+  subprocess.CalledProcessError: Command '['/private/tmp/postgres-fixture-cde63a58/install/bin/psql', '-d', 'postgresql://fixture_owner@localhost/academy_sec019_disposable?host=/private/tmp/postgres-fixture-cde63a58/socket&port=65433', '-AtqX', '-v', 'scratch=academy_sec019_disposable', '-c', "select count(*) from pg_database where datname=:'scratch'"]' returned non-zero exit status 1.
+  
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/academy-poola-production-producer.test.mjs:439:10)
+      at async Test.run (node:internal/test_runner/test:1116:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

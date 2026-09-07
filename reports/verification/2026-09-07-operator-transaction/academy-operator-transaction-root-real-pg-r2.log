@@ -1,0 +1,16 @@
+✔ host helper rejects foreign paths before protected reads or database calls (1.006542ms)
+✔ host helper uses stable no-follow reads and argv/stdin database execution (3.72125ms)
+✔ database values bind as text-compatible psql variables outside the do block (1.815667ms)
+✔ failed database rehearsal rejects before any commit invocation (0.248667ms)
+✔ cleanup rejects duplicate fixture users before its final commit (0.178333ms)
+✔ protected fixture boundary rejects malformed identity before database (0.277417ms)
+✔ database result must be the exact expected row count (0.179916ms)
+✔ bound fixture SQL proves enrollment, rollback, cleanup, and lock deadline on PostgreSQL (4192.752708ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4279.077958

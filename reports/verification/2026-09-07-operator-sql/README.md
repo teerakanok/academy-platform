@@ -1,0 +1,9 @@
+# Operator SQL hardening and receipt integration
+
+Prepared from Academy ef82a5dbd2436b958c722d78069f807d04507e3f. Host fixture values use psql variables outside DO blocks, text-compatible subjects, exact-one target selection and quiet exact-count output. Cleanup retains unrelated users and rejects duplicate matching identities. Remote backup producer validates authority UUID before filesystem/process effects and sends its catalog probe through stdin/docker -i (psql -c does not expand variables).
+
+Runner/preflight/SSH digest pins bind the corrected producer and host. SSH validates schema, exact operation ID and synthetic-email digest before mapping enrollment to PASS. Runner, operation wrapper and final activation evidence preserve operation ID; controller validates the complete wrapper receipt. This code does not authorize replaying historical controller migrations.
+
+Root RED evidence proves PostgreSQL type/SQL identifier/psql -c failures and pin/adapter/canonical-schema mismatches. Final ordered standalone gate across eight affected test files:54/54pass including actual local PostgreSQL16, zero skips. Full product unit2441pass/2skips. Lint exit1 has only3 accepted baseline errors in academy-bound-worker-executor.cjs,17warnings. Final diffcheck0. Independent reviewer inspected exact r8 source scope, required two integration corrections and returned PASS after root executable evidence.
+
+No production operator installation, migration, synthetic sign-in or deployment performed. SEC019 remains production-proof-open. SHARE ROW EXCLUSIVE bounds duplicate selection against concurrent writes but no DB lock_timeout is configured; outer subprocess timeout does not establish remote transaction cancellation. Exact installation packet/canary and timeout mitigation remain before production operation.

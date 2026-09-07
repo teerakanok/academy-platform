@@ -1,0 +1,37 @@
+[
+  {
+    "command": [
+      "node",
+      "--test",
+      "scripts/academy-production-operation-install-command.test.mjs",
+      "scripts/academy-production-operation.test.mjs",
+      "scripts/academy-production-p1-p7-runner.test.mjs",
+      "scripts/academy-production-p1-p7-ssh.test.mjs"
+    ],
+    "exit_code": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-operator-integration-gate-r1-0.log",
+    "finished_at": "2026-09-07T19:49:20.796843+00:00"
+  },
+  {
+    "command": [
+      "npx",
+      "vitest",
+      "run",
+      "--project",
+      "unit"
+    ],
+    "exit_code": 0,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-operator-integration-gate-r1-1.log",
+    "finished_at": "2026-09-07T19:49:34.604038+00:00"
+  },
+  {
+    "command": [
+      "npm",
+      "run",
+      "lint"
+    ],
+    "exit_code": 1,
+    "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-operator-integration-gate-r1-2.log",
+    "finished_at": "2026-09-07T19:49:41.213960+00:00"
+  }
+]

@@ -1,0 +1,506 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
+  [
+    {
+      dev: 16777234,
+      entries: {
+-       'academy-poola-production-producer.mjs': {
+-         bytes: 17775,
+-         dev: 16777234,
+-         gid: 0,
+-         ino: 262682039,
+-         mode: 493,
+-         sha256: 'ec83328278d6e775df8c6cda5ef08726ce745e105b7bc2280b6f745e31280282',
+-         type: 'file',
+-         uid: 501
+-       },
+-       'academy-production-cloudflare-helper.mjs': {
+-         bytes: 26757,
+-         dev: 16777234,
+-         gid: 0,
+-         ino: 262682040,
+-         mode: 420,
+-         sha256: 'db5656d66f1cd01aa313625d97774023ccb8bde299785279c2f9bc687f24dd2b',
+-         type: 'file',
+-         uid: 501
+-       },
+-       'academy-production-database-adapter.mjs': {
+-         bytes: 10247,
+-         dev: 16777234,
+-         gid: 0,
+-         ino: 262682042,
+-         mode: 420,
+-         sha256: 'da0496c20d7b2b19ae27b4cf75acd06c5d4ebfcb8a37599cea99b5b48889ff59',
+-         type: 'file',
+-         uid: 501
+-       },
+-       'academy-production-operation-install.mjs': {
+-         bytes: 21162,
+-         dev: 16777234,
+-         gid: 0,
+-         ino: 262682038,
+-         mode: 493,
+-         sha256: 'd3677e2dc5d2585b099630025d34f12c7fa2f21d82a50e64d122bdc296a30d4f',
+-         type: 'file',
+-         uid: 501
+-       },
+-       'academy-production-operation.mjs': {
+-         bytes: 7543,
+-         dev: 16777234,
+-         gid: 0,
+-         ino: 262682034,
+-         mode: 493,
+-         sha256: '98508a146bf8800c9555044e500e659a276c8bd075d90fc23c72f9b105f92050',
+-         type: 'file',
+-         uid: 501
+-       },
+-       'academy-production-p1-p7-host.mjs': {
+-         bytes: 8508,
+-         dev: 16777234,
+-         gid: 0,
+-         ino: 262682037,
+-         mode: 493,
+-         sha256: 'ead268f57955758091c8d436bc92dc8862667a3cd9f2d487512e0ab36b639891',
+-         type: 'file',
+-         uid: 501
+-       },
+-       'academy-production-p1-p7-runner.mjs': {
+-         bytes: 16460,
+-         dev: 16777234,
+-         gid: 0,
+-         ino: 262682035,
+-         mode: 493,
+-         sha256: '9abbe09719aacc910809bdc0acd009db6862c621218103b5383ca72599200264',
+-         type: 'file',
+-         uid: 501
+-       },
+-       'academy-production-p1-p7-ssh.mjs': {
+-         bytes: 8670,
+-         dev: 16777234,
+-         gid: 0,
+-         ino: 262682036,
+-         mode: 420,
+-         sha256: '932acb74b9ceab03adaadc1a2f691e931516a78e20b5ac1c60818a7ae48fef03',
+-         type: 'file',
+-         uid: 501
+-       },
+-       'current-deployment.mjs': {
+-         bytes: 7911,
+-         dev: 16777234,
+-         gid: 0,
+-         ino: 262682043,
+-         mode: 420,
+-         sha256: '362dc1a8957f95b158ad3954c71f856f79882a880f7659f9e55c63888e80d98a',
+-         type: 'file',
+-         uid: 501
+-       },
+-       'identity-production-activation-preflight.mjs': {
+-         bytes: 11338,
+-         dev: 16777234,
+-         gid: 0,
+-         ino: 262682041,
+-         mode: 420,
+-         sha256: 'e30ddf6a98614e642a698be8f0239a2431622f0d115a3bd70ad11b08c443feb6',
+-         type: 'file',
+-         uid: 501
+-       },
+        'p1-p7-config.json': {
+          bytes: 24,
+          dev: 16777234,
+          gid: 0,
+          ino: 262682032,
+
+    at file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/academy-production-operation.test.mjs:584:14 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [
+    {
+      type: 'directory',
+      dev: 16777234,
+      ino: 262682022,
+      mode: 448,
+      uid: 501,
+      gid: 0,
+      entries: {
+        'p1-p7-config.json': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682032,
+          mode: 384,
+          uid: 501,
+          gid: 0,
+          bytes: 24,
+          sha256: 'ab35ff8592f8fcc93c7cc4db6df21ca9fe406155b4c8fee534a4f0d699e54924'
+        }
+      }
+    },
+    {
+      type: 'directory',
+      dev: 16777234,
+      ino: 262682045,
+      mode: 448,
+      uid: 501,
+      gid: 0,
+      entries: {
+        'academy-poola-production-producer.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682028,
+          mode: 493,
+          uid: 501,
+          gid: 0,
+          bytes: 17775,
+          sha256: 'ec83328278d6e775df8c6cda5ef08726ce745e105b7bc2280b6f745e31280282'
+        },
+        'academy-production-cloudflare-helper.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682029,
+          mode: 420,
+          uid: 501,
+          gid: 0,
+          bytes: 26757,
+          sha256: 'db5656d66f1cd01aa313625d97774023ccb8bde299785279c2f9bc687f24dd2b'
+        },
+        'academy-production-database-adapter.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682030,
+          mode: 420,
+          uid: 501,
+          gid: 0,
+          bytes: 10247,
+          sha256: 'da0496c20d7b2b19ae27b4cf75acd06c5d4ebfcb8a37599cea99b5b48889ff59'
+        },
+        'academy-production-operation-install.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682027,
+          mode: 493,
+          uid: 501,
+          gid: 0,
+          bytes: 21162,
+          sha256: 'd3677e2dc5d2585b099630025d34f12c7fa2f21d82a50e64d122bdc296a30d4f'
+        },
+        'academy-production-operation.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682023,
+          mode: 493,
+          uid: 501,
+          gid: 0,
+          bytes: 7550,
+          sha256: 'e20603f8801e1236eb4afacb726ff8fe637ad341585eb7ba4e296d254397909e'
+        },
+        'academy-production-p1-p7-host.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682026,
+          mode: 493,
+          uid: 501,
+          gid: 0,
+          bytes: 8508,
+          sha256: 'ead268f57955758091c8d436bc92dc8862667a3cd9f2d487512e0ab36b639891'
+        },
+        'academy-production-p1-p7-runner.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682024,
+          mode: 493,
+          uid: 501,
+          gid: 0,
+          bytes: 16460,
+          sha256: '9abbe09719aacc910809bdc0acd009db6862c621218103b5383ca72599200264'
+        },
+        'academy-production-p1-p7-ssh.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682025,
+          mode: 420,
+          uid: 501,
+          gid: 0,
+          bytes: 8670,
+          sha256: '932acb74b9ceab03adaadc1a2f691e931516a78e20b5ac1c60818a7ae48fef03'
+        },
+        'current-deployment.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682031,
+          mode: 420,
+          uid: 501,
+          gid: 0,
+          bytes: 7911,
+          sha256: '362dc1a8957f95b158ad3954c71f856f79882a880f7659f9e55c63888e80d98a'
+        }
+      }
+    },
+    { type: 'absent' },
+    {
+      type: 'file',
+      dev: 16777234,
+      ino: 262682047,
+      mode: 384,
+      uid: 501,
+      gid: 0,
+      bytes: 659,
+      sha256: 'e9ee7863516cb86813f7a63feee63859bf77ecb61b417678154b36df15dde51c'
+    }
+  ],
+  expected: [
+    {
+      type: 'directory',
+      dev: 16777234,
+      ino: 262682022,
+      mode: 448,
+      uid: 501,
+      gid: 0,
+      entries: {
+        'academy-poola-production-producer.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682039,
+          mode: 493,
+          uid: 501,
+          gid: 0,
+          bytes: 17775,
+          sha256: 'ec83328278d6e775df8c6cda5ef08726ce745e105b7bc2280b6f745e31280282'
+        },
+        'academy-production-cloudflare-helper.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682040,
+          mode: 420,
+          uid: 501,
+          gid: 0,
+          bytes: 26757,
+          sha256: 'db5656d66f1cd01aa313625d97774023ccb8bde299785279c2f9bc687f24dd2b'
+        },
+        'academy-production-database-adapter.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682042,
+          mode: 420,
+          uid: 501,
+          gid: 0,
+          bytes: 10247,
+          sha256: 'da0496c20d7b2b19ae27b4cf75acd06c5d4ebfcb8a37599cea99b5b48889ff59'
+        },
+        'academy-production-operation-install.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682038,
+          mode: 493,
+          uid: 501,
+          gid: 0,
+          bytes: 21162,
+          sha256: 'd3677e2dc5d2585b099630025d34f12c7fa2f21d82a50e64d122bdc296a30d4f'
+        },
+        'academy-production-operation.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682034,
+          mode: 493,
+          uid: 501,
+          gid: 0,
+          bytes: 7543,
+          sha256: '98508a146bf8800c9555044e500e659a276c8bd075d90fc23c72f9b105f92050'
+        },
+        'academy-production-p1-p7-host.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682037,
+          mode: 493,
+          uid: 501,
+          gid: 0,
+          bytes: 8508,
+          sha256: 'ead268f57955758091c8d436bc92dc8862667a3cd9f2d487512e0ab36b639891'
+        },
+        'academy-production-p1-p7-runner.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682035,
+          mode: 493,
+          uid: 501,
+          gid: 0,
+          bytes: 16460,
+          sha256: '9abbe09719aacc910809bdc0acd009db6862c621218103b5383ca72599200264'
+        },
+        'academy-production-p1-p7-ssh.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682036,
+          mode: 420,
+          uid: 501,
+          gid: 0,
+          bytes: 8670,
+          sha256: '932acb74b9ceab03adaadc1a2f691e931516a78e20b5ac1c60818a7ae48fef03'
+        },
+        'current-deployment.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682043,
+          mode: 420,
+          uid: 501,
+          gid: 0,
+          bytes: 7911,
+          sha256: '362dc1a8957f95b158ad3954c71f856f79882a880f7659f9e55c63888e80d98a'
+        },
+        'identity-production-activation-preflight.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682041,
+          mode: 420,
+          uid: 501,
+          gid: 0,
+          bytes: 11338,
+          sha256: 'e30ddf6a98614e642a698be8f0239a2431622f0d115a3bd70ad11b08c443feb6'
+        },
+        'p1-p7-config.json': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682032,
+          mode: 384,
+          uid: 501,
+          gid: 0,
+          bytes: 24,
+          sha256: 'ab35ff8592f8fcc93c7cc4db6df21ca9fe406155b4c8fee534a4f0d699e54924'
+        }
+      }
+    },
+    {
+      type: 'directory',
+      dev: 16777234,
+      ino: 262682045,
+      mode: 448,
+      uid: 501,
+      gid: 0,
+      entries: {
+        'academy-poola-production-producer.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682028,
+          mode: 493,
+          uid: 501,
+          gid: 0,
+          bytes: 17775,
+          sha256: 'ec83328278d6e775df8c6cda5ef08726ce745e105b7bc2280b6f745e31280282'
+        },
+        'academy-production-cloudflare-helper.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682029,
+          mode: 420,
+          uid: 501,
+          gid: 0,
+          bytes: 26757,
+          sha256: 'db5656d66f1cd01aa313625d97774023ccb8bde299785279c2f9bc687f24dd2b'
+        },
+        'academy-production-database-adapter.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682030,
+          mode: 420,
+          uid: 501,
+          gid: 0,
+          bytes: 10247,
+          sha256: 'da0496c20d7b2b19ae27b4cf75acd06c5d4ebfcb8a37599cea99b5b48889ff59'
+        },
+        'academy-production-operation-install.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682027,
+          mode: 493,
+          uid: 501,
+          gid: 0,
+          bytes: 21162,
+          sha256: 'd3677e2dc5d2585b099630025d34f12c7fa2f21d82a50e64d122bdc296a30d4f'
+        },
+        'academy-production-operation.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682023,
+          mode: 493,
+          uid: 501,
+          gid: 0,
+          bytes: 7550,
+          sha256: 'e20603f8801e1236eb4afacb726ff8fe637ad341585eb7ba4e296d254397909e'
+        },
+        'academy-production-p1-p7-host.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682026,
+          mode: 493,
+          uid: 501,
+          gid: 0,
+          bytes: 8508,
+          sha256: 'ead268f57955758091c8d436bc92dc8862667a3cd9f2d487512e0ab36b639891'
+        },
+        'academy-production-p1-p7-runner.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682024,
+          mode: 493,
+          uid: 501,
+          gid: 0,
+          bytes: 16460,
+          sha256: '9abbe09719aacc910809bdc0acd009db6862c621218103b5383ca72599200264'
+        },
+        'academy-production-p1-p7-ssh.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682025,
+          mode: 420,
+          uid: 501,
+          gid: 0,
+          bytes: 8670,
+          sha256: '932acb74b9ceab03adaadc1a2f691e931516a78e20b5ac1c60818a7ae48fef03'
+        },
+        'current-deployment.mjs': {
+          type: 'file',
+          dev: 16777234,
+          ino: 262682031,
+          mode: 420,
+          uid: 501,
+          gid: 0,
+          bytes: 7911,
+          sha256: '362dc1a8957f95b158ad3954c71f856f79882a880f7659f9e55c63888e80d98a'
+        }
+      }
+    },
+    { type: 'absent' },
+    {
+      type: 'file',
+      dev: 16777234,
+      ino: 262682047,
+      mode: 384,
+      uid: 501,
+      gid: 0,
+      bytes: 659,
+      sha256: 'e9ee7863516cb86813f7a63feee63859bf77ecb61b417678154b36df15dde51c'
+    }
+  ],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v25.5.0
+✖ scripts/academy-production-operation.test.mjs (4058.505459ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4064.115
+
+✖ failing tests:
+
+test at scripts/academy-production-operation.test.mjs:1:1
+✖ scripts/academy-production-operation.test.mjs (4058.505459ms)
+  'test failed'

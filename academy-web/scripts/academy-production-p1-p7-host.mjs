@@ -15,6 +15,9 @@ import {
 import { dirname } from "node:path";
 
 const OP = /^\/root\/identity-synthetic-operations\/academy-p5-[a-f0-9]{18}$/;
+const SUBJECT_UUID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const OPERATION_ID = /^academy-p5-[a-f0-9]{18}$/;
 const fail = () => {
   throw new Error("ACADEMY_P1_P7_HOST_REJECTED");
 };
@@ -69,22 +72,20 @@ function readStable(path, maximum, mode = 0o600) {
   }
 }
 
-function fixture(operationPath) {
+function fixture(operationPath, readOperation = readStable) {
   if (!OP.test(operationPath)) fail();
   const operationId = operationPath.split("/").at(-1),
     value = JSON.parse(
-      readStable(`${operationPath}/prepare-input.json`, 16_384),
+      readOperation(`${operationPath}/prepare-input.json`, 16_384),
     ),
-    cleanup = JSON.parse(readStable(`${operationPath}/cleanup.json`, 16_384));
+    cleanup = JSON.parse(readOperation(`${operationPath}/cleanup.json`, 16_384));
   if (
     value.operationId !== operationId ||
     value.email !== `${operationId}@synthetic.cyberskills.co.th` ||
     cleanup.schema !== "identity-synthetic-sign-in-cleanup/v2" ||
     cleanup.operationId !== operationId ||
     cleanup.state !== "owned" ||
-    !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-      cleanup.userId ?? "",
-    ) ||
+    !SUBJECT_UUID.test(cleanup.userId ?? "") ||
     cleanup.emailSha256 !==
       createHash("sha256").update(value.email).digest("hex")
   )
@@ -92,15 +93,61 @@ function fixture(operationPath) {
   return { operationId, email: value.email, subject: cleanup.userId };
 }
 
-function database(mode, operationPath) {
-  const { operationId, email, subject } = fixture(operationPath);
-  const sql =
+export function fixtureForTest(operationPath, readOperation) {
+  return fixture(operationPath, readOperation);
+}
+
+export function databaseForTest(
+  mode,
+  subject,
+  email,
+  spawnDatabase = spawnSync,
+  operationId = "academy-p5-000000000000000000",
+) {
+  if (
+    !["enroll", "cleanup"].includes(mode) ||
+    !SUBJECT_UUID.test(subject) ||
+    typeof email !== "string" ||
+    !OPERATION_ID.test(operationId)
+  )
+    fail();
+  const scopedSql =
     mode === "enroll"
-      ? `begin; do $$ declare u uuid; begin select id into strict u from academy.users where subject='${subject}' and email='${email}'; insert into academy.course_entitlement(user_id,course_slug,source) values(u,'setup-and-environment','grant') on conflict(user_id,course_slug) do update set source='grant',revoked_at=null,expires_at=null; end $$; commit; select count(*) from academy.course_entitlement e join academy.users u on u.id=e.user_id where u.subject='${subject}' and u.email='${email}' and e.course_slug='setup-and-environment' and e.source='grant' and e.revoked_at is null;`
-      : `begin; delete from academy.users where subject='${subject}' and email='${email}'; commit; select count(*) from academy.users where subject='${subject}' and email='${email}';`;
-  const result = spawnSync(
-    "/usr/bin/docker",
-    [
+      ? `create temp table academy_synthetic_fixture on commit drop as
+  select :'academy_subject'::text as subject, :'academy_email'::text as email;
+do $$ declare target uuid; begin
+  lock table academy.users in share row exclusive mode;
+  select u.id into strict target
+    from academy.users u join academy_synthetic_fixture f
+      on u.subject=f.subject and u.email=f.email;
+  insert into academy.course_entitlement(user_id,course_slug,source)
+    values(target,'setup-and-environment','grant')
+    on conflict(user_id,course_slug) do update
+      set source='grant',revoked_at=null,expires_at=null;
+end $$;
+select count(*) from academy.course_entitlement e
+  join academy.users u on u.id=e.user_id
+  join academy_synthetic_fixture f on u.subject=f.subject and u.email=f.email
+  where e.course_slug='setup-and-environment' and e.source='grant'
+    and e.revoked_at is null;`
+      : `create temp table academy_synthetic_fixture on commit drop as
+  select :'academy_subject'::text as subject, :'academy_email'::text as email;
+do $$ declare target uuid; matched bigint; begin
+  lock table academy.users in share row exclusive mode;
+  select count(*) into strict matched
+    from academy.users u join academy_synthetic_fixture f
+      on u.subject=f.subject and u.email=f.email;
+  if matched = 0 then return; end if;
+  if matched <> 1 then raise exception 'ACADEMY_FIXTURE_USER_NOT_UNIQUE'; end if;
+  select u.id into strict target
+    from academy.users u join academy_synthetic_fixture f
+      on u.subject=f.subject and u.email=f.email;
+  delete from academy.users u using academy_synthetic_fixture f
+    where u.id=target and u.subject=f.subject and u.email=f.email;
+end $$;
+select count(*) from academy.users u
+  join academy_synthetic_fixture f on u.subject=f.subject and u.email=f.email;`;
+  const argv = [
       "exec",
       "-i",
       "supabase-db",
@@ -110,19 +157,52 @@ function database(mode, operationPath) {
       "-d",
       "postgres",
       "-v",
+      `academy_subject=${subject}`,
+      "-v",
+      `academy_email=${email}`,
+      "-v",
       "ON_ERROR_STOP=1",
       "-AtX",
+      "-q",
     ],
-    { input: sql, encoding: "utf8", maxBuffer: 65_536, timeout: 30_000 },
-  );
+    transaction = (terminal) => `begin;
+set local lock_timeout = '2s';
+set local statement_timeout = '8s';
+${scopedSql}
+${terminal};`,
+    invoke = (terminal) =>
+      spawnDatabase("/usr/bin/docker", argv, {
+        input: transaction(terminal),
+        encoding: "utf8",
+        maxBuffer: 65_536,
+        timeout: 12_000,
+      });
   const expected = mode === "enroll" ? "1" : "0";
-  if (result.status !== 0 || result.stdout.trim() !== expected) fail();
+  const rehearsal = invoke("rollback");
+  if (
+    rehearsal?.status !== 0 ||
+    typeof rehearsal.stdout !== "string" ||
+    rehearsal.stdout.trim() !== expected
+  )
+    fail();
+  const committed = invoke("commit");
+  if (
+    committed?.status !== 0 ||
+    typeof committed.stdout !== "string" ||
+    committed.stdout.trim() !== expected
+  )
+    fail();
   return {
     schema: "academy-synthetic-fixture-db/v1",
     operationId,
     status: mode === "enroll" ? "ENROLLED" : "ABSENT",
     emailSha256: createHash("sha256").update(email).digest("hex"),
-  };
+};
+}
+
+function database(mode, operationPath) {
+  const { email, operationId, subject } = fixture(operationPath);
+  return databaseForTest(mode, subject, email, spawnSync, operationId);
 }
 
 export function main(args) {

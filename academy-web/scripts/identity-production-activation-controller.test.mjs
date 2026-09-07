@@ -1,3 +1,4 @@
+import { IDENTITY_SYNTHETIC_AUTHORITY } from "./academy-production-p1-p7-runner.mjs";
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import { mkdtemp, readFile, realpath, rm, writeFile } from 'node:fs/promises'
@@ -27,7 +28,7 @@ async function fixture(t) {
     applyMigrations:async input=>{calls.push(['migrate',input]);return{status:'PASS',operation:'academy-migrations-0021-0027',ordered:input.ordered,receiptSha256:D}},
     uploadCandidate:async input=>{calls.push(['upload',input]);return{status:'PASS',workerName:'cyberskills-academy',versionId:ids.candidate,sourceRevision:plan.academy.sourceRevision,trafficPercentage:0,configuredNamesSha256:configSha256,receiptSha256:D}},
     activateTraffic:async input=>{calls.push(['activate',input]);return{status:'PASS',previousDeploymentId:ids.deploymentId,previousVersionId:ids.current,deploymentId:ids.activeDeployment,activeVersionId:ids.candidate,trafficPercentage:100,semantics:S,receiptSha256:D}},
-    smokeP1P7:async input=>{calls.push(['smoke',input]);return{status:'PASS',deploymentId:ids.activeDeployment,versionId:ids.candidate,configuredNamesSha256:configSha256,checks:['P1','P2','P3','P4','P5','P6','P7'],receiptSha256:D}},
+    smokeP1P7:async input=>{calls.push(['smoke',input]);return{status:'PASS',deploymentId:ids.activeDeployment,versionId:ids.candidate,configuredNamesSha256:configSha256,operationId:'academy-p5-abcdef0123456789ab',checks:['P1','P2','P3','P4','P5','P6','P7'],cleanup:{status:'ABSENT',identityReceiptSha256:D,academyReceiptSha256:D},runnerReceiptSha256:D,identitySyntheticAuthority:IDENTITY_SYNTHETIC_AUTHORITY,receiptSha256:D}},
     rollbackTraffic:async input=>{calls.push(['rollback',input]);return{status:'ROLLED_BACK',observedActiveDeploymentId:ids.activeDeployment,observedActiveVersionId:ids.candidate,deploymentId:ids.rollbackDeployment,restoredVersionId:ids.current,semantics:S,receiptSha256:D}},
     checkResidue:async input=>{calls.push(['residue',input]);return{status:'PASS',deploymentId:input.expectedDeploymentId,versionId:input.expectedVersionId,versionCount:2,nonServingVersionCount:1,inventorySha256:D,receiptSha256:D}},
   }

@@ -1,0 +1,397 @@
+{
+  "base": "ef82a5dbd2436b958c722d78069f807d04507e3f",
+  "current": "51d0c14",
+  "operator": "9be6807",
+  "current_commits": [
+    {
+      "commit": "5bd58861b96a9547f2bcd89ecb73108338d5312c",
+      "paths": [
+        "academy-web/content/courses/assembly/locales/en/lessons/reading-real-disassembly.json",
+        "academy-web/content/courses/assembly/locales/en/lessons/recursion-in-assembly.json",
+        "academy-web/content/courses/assembly/locales/th/lessons/reading-real-disassembly.json",
+        "academy-web/content/courses/assembly/locales/th/lessons/recursion-in-assembly.json",
+        "reports/verification/2026-09-07-assembly-capstone-import/README.md",
+        "reports/verification/2026-09-07-assembly-capstone-import/academy-assembly-import-lint.log",
+        "reports/verification/2026-09-07-assembly-capstone-import/academy-assembly-import-unit.log"
+      ]
+    },
+    {
+      "commit": "5572e8318b67ebf7858c4c1fccf1831ae01d335f",
+      "paths": [
+        "academy-web/package.json",
+        "academy-web/scripts/build-cloudflare.sh",
+        "academy-web/scripts/sync-open-next-cache.mjs",
+        "academy-web/tests/unit/static-asset-boundary.test.ts",
+        "reports/verification/2026-09-07-public-course-cache-root/README.md",
+        "reports/verification/2026-09-07-public-course-cache-root/all-pages.log",
+        "reports/verification/2026-09-07-public-course-cache-root/build.log",
+        "reports/verification/2026-09-07-public-course-cache-root/course-route-root-test.js",
+        "reports/verification/2026-09-07-public-course-cache-root/course-route-root.capnp",
+        "reports/verification/2026-09-07-public-course-cache-root/green.log",
+        "reports/verification/2026-09-07-public-course-cache-root/red.log",
+        "reports/verification/2026-09-07-public-course-cache-root/scope.json",
+        "reports/verification/2026-09-07-public-course-cache-root/unit.log"
+      ]
+    },
+    {
+      "commit": "01e3ca71b6420b7ca5ec66216eeb9ab27797b139",
+      "paths": [
+        "docs/maintenance/academy-production-release.md",
+        "reports/verification/2026-09-07-public-course-cache-production/README.md",
+        "reports/verification/2026-09-07-public-course-cache-production/candidate-browser.json",
+        "reports/verification/2026-09-07-public-course-cache-production/candidate-smoke.json",
+        "reports/verification/2026-09-07-public-course-cache-production/deployment.json",
+        "reports/verification/2026-09-07-public-course-cache-production/production-desktop.png",
+        "reports/verification/2026-09-07-public-course-cache-production/production-mobile.png",
+        "reports/verification/2026-09-07-public-course-cache-production/production.json",
+        "reports/verification/2026-09-07-public-course-cache-production/version-upload.json"
+      ]
+    },
+    {
+      "commit": "9ad69fd8de46bb4f0d2be900372d4eec4f19e8b9",
+      "paths": [
+        "academy-web/content/courses/basic-os-linux/locales/en/lessons/permissions.json",
+        "academy-web/content/courses/basic-os-linux/locales/en/lessons/pipes-and-logs.json",
+        "academy-web/content/courses/basic-os-linux/locales/en/lessons/ssh-and-remote.json",
+        "academy-web/content/courses/basic-os-linux/locales/th/lessons/permissions.json",
+        "academy-web/content/courses/basic-os-linux/locales/th/lessons/pipes-and-logs.json",
+        "academy-web/content/courses/basic-os-linux/locales/th/lessons/ssh-and-remote.json",
+        "reports/verification/2026-09-07-linux-capstone-import/README.md",
+        "reports/verification/2026-09-07-linux-capstone-import/build.log",
+        "reports/verification/2026-09-07-linux-capstone-import/lint.log",
+        "reports/verification/2026-09-07-linux-capstone-import/source.json",
+        "reports/verification/2026-09-07-linux-capstone-import/unit.log"
+      ]
+    },
+    {
+      "commit": "43913549bd86450815bbe171568564362f6713aa",
+      "paths": [
+        "docs/maintenance/academy-production-release.md",
+        "reports/verification/2026-09-07-linux-capstone-import/README.md",
+        "reports/verification/2026-09-07-linux-capstone-production/README.md",
+        "reports/verification/2026-09-07-linux-capstone-production/academy-linux-candidate.json",
+        "reports/verification/2026-09-07-linux-capstone-production/academy-linux-production-deployment.json",
+        "reports/verification/2026-09-07-linux-capstone-production/academy-linux-production-desktop.png",
+        "reports/verification/2026-09-07-linux-capstone-production/academy-linux-production-mobile.png",
+        "reports/verification/2026-09-07-linux-capstone-production/academy-linux-production.json",
+        "reports/verification/2026-09-07-linux-capstone-production/academy-linux-version-upload.json",
+        "reports/verification/2026-09-07-linux-capstone-production/sha256.json"
+      ]
+    },
+    {
+      "commit": "af3f5ded63fc491b09b55980bfb5f3cf3fb943ab",
+      "paths": [
+        "academy-web/content/courses/git-essentials/locales/en/lessons/atomic-commits.json",
+        "academy-web/content/courses/git-essentials/locales/en/lessons/github-actions-ci.json",
+        "academy-web/content/courses/git-essentials/locales/en/lessons/resolving-conflicts.json",
+        "academy-web/content/courses/git-essentials/locales/th/lessons/atomic-commits.json",
+        "academy-web/content/courses/git-essentials/locales/th/lessons/github-actions-ci.json",
+        "academy-web/content/courses/git-essentials/locales/th/lessons/resolving-conflicts.json",
+        "reports/verification/2026-09-07-git-capstone-import/README.md",
+        "reports/verification/2026-09-07-git-capstone-import/academy-git-import-build.log",
+        "reports/verification/2026-09-07-git-capstone-import/academy-git-import-lint.log",
+        "reports/verification/2026-09-07-git-capstone-import/academy-git-import-source.json",
+        "reports/verification/2026-09-07-git-capstone-import/academy-git-import-unit.log"
+      ]
+    },
+    {
+      "commit": "cf7fb0ae12a9a567fe58f0b9c3eaabec61356e62",
+      "paths": [
+        "docs/maintenance/academy-production-release.md",
+        "reports/verification/2026-09-07-git-capstone-production/README.md",
+        "reports/verification/2026-09-07-git-capstone-production/academy-git-candidate-allocation.json",
+        "reports/verification/2026-09-07-git-capstone-production/academy-git-candidate.json",
+        "reports/verification/2026-09-07-git-capstone-production/academy-git-live-probe.mjs",
+        "reports/verification/2026-09-07-git-capstone-production/academy-git-production-activation.json",
+        "reports/verification/2026-09-07-git-capstone-production/academy-git-production-deployment.json",
+        "reports/verification/2026-09-07-git-capstone-production/academy-git-production-desktop.png",
+        "reports/verification/2026-09-07-git-capstone-production/academy-git-production-mobile.png",
+        "reports/verification/2026-09-07-git-capstone-production/academy-git-production.json",
+        "reports/verification/2026-09-07-git-capstone-production/academy-git-version-upload.json",
+        "reports/verification/2026-09-07-git-capstone-production/sha256.json"
+      ]
+    },
+    {
+      "commit": "8b4ba7c0d771bc96c8e9f04ce782e09c6f93b17a",
+      "paths": [
+        "academy-web/content/courses/c-low-level/locales/en/lessons/arrays-and-strings.json",
+        "academy-web/content/courses/c-low-level/locales/en/lessons/defensive-c.json",
+        "academy-web/content/courses/c-low-level/locales/en/lessons/malloc-and-free.json",
+        "academy-web/content/courses/c-low-level/locales/en/lessons/reading-real-c.json",
+        "academy-web/content/courses/c-low-level/locales/th/lessons/arrays-and-strings.json",
+        "academy-web/content/courses/c-low-level/locales/th/lessons/defensive-c.json",
+        "academy-web/content/courses/c-low-level/locales/th/lessons/malloc-and-free.json",
+        "academy-web/content/courses/c-low-level/locales/th/lessons/reading-real-c.json",
+        "academy-web/content/courses/computer-architecture/locales/en/lessons/cache-friendly-code.json",
+        "academy-web/content/courses/computer-architecture/locales/en/lessons/calling-convention.json",
+        "academy-web/content/courses/computer-architecture/locales/en/lessons/control-hazards-and-prediction.json",
+        "academy-web/content/courses/computer-architecture/locales/th/lessons/cache-friendly-code.json",
+        "academy-web/content/courses/computer-architecture/locales/th/lessons/calling-convention.json",
+        "academy-web/content/courses/computer-architecture/locales/th/lessons/control-hazards-and-prediction.json",
+        "reports/verification/2026-09-07-architecture-c-capstone-import/README.md",
+        "reports/verification/2026-09-07-architecture-c-capstone-import/academy-architecture-c-import-gates.json",
+        "reports/verification/2026-09-07-architecture-c-capstone-import/academy-architecture-c-import-lint.log",
+        "reports/verification/2026-09-07-architecture-c-capstone-import/academy-architecture-c-import-source.json",
+        "reports/verification/2026-09-07-architecture-c-capstone-import/academy-architecture-c-import-unit.log"
+      ]
+    },
+    {
+      "commit": "624e5e39c79ca1d316e84f57b8586d0efb9d4f7b",
+      "paths": [
+        "academy-web/content/courses/c-low-level/locales/en/lessons/arrays-and-strings.json",
+        "academy-web/content/courses/c-low-level/locales/en/lessons/defensive-c.json",
+        "academy-web/content/courses/c-low-level/locales/en/lessons/malloc-and-free.json",
+        "academy-web/content/courses/c-low-level/locales/en/lessons/reading-real-c.json",
+        "academy-web/content/courses/c-low-level/locales/th/lessons/arrays-and-strings.json",
+        "academy-web/content/courses/c-low-level/locales/th/lessons/defensive-c.json",
+        "academy-web/content/courses/c-low-level/locales/th/lessons/malloc-and-free.json",
+        "academy-web/content/courses/c-low-level/locales/th/lessons/reading-real-c.json",
+        "academy-web/content/courses/computer-networking/locales/en/lessons/arp-and-icmp.json",
+        "academy-web/content/courses/computer-networking/locales/en/lessons/client-and-server.json",
+        "academy-web/content/courses/computer-networking/locales/en/lessons/event-driven-and-c10k.json",
+        "academy-web/content/courses/computer-networking/locales/th/lessons/arp-and-icmp.json",
+        "academy-web/content/courses/computer-networking/locales/th/lessons/client-and-server.json",
+        "academy-web/content/courses/computer-networking/locales/th/lessons/event-driven-and-c10k.json",
+        "academy-web/content/courses/operating-systems/locales/en/lessons/cow-and-mmap.json",
+        "academy-web/content/courses/operating-systems/locales/en/lessons/producer-consumer.json",
+        "academy-web/content/courses/operating-systems/locales/en/lessons/setuid-and-its-risks.json",
+        "academy-web/content/courses/operating-systems/locales/en/lessons/syscall-lifecycle.json",
+        "academy-web/content/courses/operating-systems/locales/th/lessons/cow-and-mmap.json",
+        "academy-web/content/courses/operating-systems/locales/th/lessons/producer-consumer.json",
+        "academy-web/content/courses/operating-systems/locales/th/lessons/setuid-and-its-risks.json",
+        "academy-web/content/courses/operating-systems/locales/th/lessons/syscall-lifecycle.json",
+        "academy-web/content/courses/setup-and-environment/locales/en/lessons/when-something-does-not-work.json",
+        "academy-web/content/courses/setup-and-environment/locales/th/lessons/when-something-does-not-work.json",
+        "reports/verification/2026-09-07-final-capstone-import/README.md",
+        "reports/verification/2026-09-07-final-capstone-import/gates.json",
+        "reports/verification/2026-09-07-final-capstone-import/generator.log",
+        "reports/verification/2026-09-07-final-capstone-import/lint.log",
+        "reports/verification/2026-09-07-final-capstone-import/source.json",
+        "reports/verification/2026-09-07-final-capstone-import/unit.log"
+      ]
+    },
+    {
+      "commit": "ec94399786aba6a4214dcb01a5ef6e8aece2f268",
+      "paths": [
+        "reports/verification/2026-09-07-final-capstone-candidate/README.md",
+        "reports/verification/2026-09-07-final-capstone-candidate/build-gates.json",
+        "reports/verification/2026-09-07-final-capstone-candidate/candidate-allocation.json",
+        "reports/verification/2026-09-07-final-capstone-candidate/candidate-http.json",
+        "reports/verification/2026-09-07-final-capstone-candidate/observed-deployments.json",
+        "reports/verification/2026-09-07-final-capstone-candidate/version-upload.json"
+      ]
+    },
+    {
+      "commit": "c136b37b437a06e8cfb46ab506a2575527899dee",
+      "paths": [
+        "reports/verification/2026-09-07-final-capstone-candidate/README.md",
+        "reports/verification/2026-09-07-final-capstone-production/README.md",
+        "reports/verification/2026-09-07-final-capstone-production/academy-final-production-c-low-level-en-desktop.png",
+        "reports/verification/2026-09-07-final-capstone-production/academy-final-production-c-low-level-en-mobile.png",
+        "reports/verification/2026-09-07-final-capstone-production/academy-final-production-c-low-level-th-desktop.png",
+        "reports/verification/2026-09-07-final-capstone-production/academy-final-production-c-low-level-th-mobile.png",
+        "reports/verification/2026-09-07-final-capstone-production/academy-final-production-computer-networking-en-desktop.png",
+        "reports/verification/2026-09-07-final-capstone-production/academy-final-production-computer-networking-en-mobile.png",
+        "reports/verification/2026-09-07-final-capstone-production/academy-final-production-computer-networking-th-desktop.png",
+        "reports/verification/2026-09-07-final-capstone-production/academy-final-production-computer-networking-th-mobile.png",
+        "reports/verification/2026-09-07-final-capstone-production/academy-final-production-operating-systems-en-desktop.png",
+        "reports/verification/2026-09-07-final-capstone-production/academy-final-production-operating-systems-en-mobile.png",
+        "reports/verification/2026-09-07-final-capstone-production/academy-final-production-operating-systems-th-desktop.png",
+        "reports/verification/2026-09-07-final-capstone-production/academy-final-production-operating-systems-th-mobile.png",
+        "reports/verification/2026-09-07-final-capstone-production/academy-final-production-setup-and-environment-en-desktop.png",
+        "reports/verification/2026-09-07-final-capstone-production/academy-final-production-setup-and-environment-en-mobile.png",
+        "reports/verification/2026-09-07-final-capstone-production/academy-final-production-setup-and-environment-th-desktop.png",
+        "reports/verification/2026-09-07-final-capstone-production/academy-final-production-setup-and-environment-th-mobile.png",
+        "reports/verification/2026-09-07-final-capstone-production/activation.json",
+        "reports/verification/2026-09-07-final-capstone-production/browser-probe.mjs",
+        "reports/verification/2026-09-07-final-capstone-production/browser.json",
+        "reports/verification/2026-09-07-final-capstone-production/candidate-browser.json",
+        "reports/verification/2026-09-07-final-capstone-production/deployment.json",
+        "reports/verification/2026-09-07-final-capstone-production/http-probe.mjs",
+        "reports/verification/2026-09-07-final-capstone-production/http.json",
+        "reports/verification/2026-09-07-final-capstone-production/image-comparison.json"
+      ]
+    },
+    {
+      "commit": "4a4eb7aa4bbe016940b54ca2818bb0efda0369f3",
+      "paths": [
+        "docs/maintenance/maintain-and-deploy.md"
+      ]
+    },
+    {
+      "commit": "316f0c5ad33cfd82c46ff86610acb856848506b4",
+      "paths": [
+        "reports/verification/2026-09-07-original-factcheck-delivery/README.md",
+        "reports/verification/2026-09-07-original-factcheck-delivery/academy-original-factcheck-current-regression.json",
+        "reports/verification/2026-09-07-original-factcheck-delivery/academy-original-factcheck-current-regression.log",
+        "reports/verification/2026-09-07-original-factcheck-delivery/academy-original-factcheck-reconcile.json",
+        "reports/verification/2026-09-07-original-factcheck-delivery/academy-original-factcheck-reconcile.py"
+      ]
+    },
+    {
+      "commit": "8499b7b16fa522da170972a7c28b47cc51b312a2",
+      "paths": [
+        "academy-web/docs/identity-session-id-digest.md",
+        "academy-web/docs/private-media-delivery.md",
+        "academy-web/scripts/check-final-worker-startup.mjs",
+        "academy-web/src/app/(site)/api/auth/sign-out/route.ts",
+        "academy-web/src/app/(site)/course-media/[assetId]/route.ts",
+        "academy-web/src/lib/auth/session-cookie.ts",
+        "academy-web/src/lib/identity/local-fixture.ts",
+        "academy-web/src/lib/identity/local-runtime.ts",
+        "academy-web/src/lib/identity/runtime-browser-flow.ts",
+        "academy-web/src/lib/identity/session-store.ts",
+        "academy-web/src/lib/media/cookie.ts",
+        "academy-web/tests/unit/current-user-production-cookie.test.ts",
+        "academy-web/tests/unit/host-session-cookie-isolation.test.ts",
+        "academy-web/tests/unit/identity-production-runtime-routes.test.ts",
+        "academy-web/tests/unit/identity-runtime-browser-flow.test.ts",
+        "academy-web/tests/unit/identity-session-store.test.ts",
+        "academy-web/tests/unit/media-delivery.test.ts",
+        "academy-web/tests/unit/middleware-production-session.test.ts",
+        "academy-web/tests/unit/sign-out-route.test.ts",
+        "academy-web/tests/workerd/signer-worker.ts",
+        "reports/security/2026-09-05-security-review-checklist.md",
+        "reports/verification/2026-09-07-cookie-isolation/academy-cookie-final-startup-green.log",
+        "reports/verification/2026-09-07-cookie-isolation/academy-cookie-root-build-cf-r2.log",
+        "reports/verification/2026-09-07-cookie-isolation/academy-cookie-root-causal-red.log",
+        "reports/verification/2026-09-07-cookie-isolation/academy-cookie-root-causal.json",
+        "reports/verification/2026-09-07-cookie-isolation/academy-cookie-root-final-build-cf.log",
+        "reports/verification/2026-09-07-cookie-isolation/academy-cookie-root-final-gates.json",
+        "reports/verification/2026-09-07-cookie-isolation/academy-cookie-root-final-lint.log",
+        "reports/verification/2026-09-07-cookie-isolation/academy-cookie-root-focused-green.log",
+        "reports/verification/2026-09-07-cookie-isolation/academy-cookie-root-gates.json",
+        "reports/verification/2026-09-07-cookie-isolation/academy-cookie-root-unit.log",
+        "reports/verification/2026-09-07-cookie-isolation/build-cf.txt",
+        "reports/verification/2026-09-07-cookie-isolation/build-next.txt",
+        "reports/verification/2026-09-07-cookie-isolation/cookie-isolation.md",
+        "reports/verification/2026-09-07-cookie-isolation/green-targeted.txt",
+        "reports/verification/2026-09-07-cookie-isolation/lint-typescript.txt",
+        "reports/verification/2026-09-07-cookie-isolation/red-targeted.txt",
+        "reports/verification/2026-09-07-cookie-isolation/root-acceptance.md",
+        "reports/verification/2026-09-07-cookie-isolation/root-evidence-manifest.json",
+        "reports/verification/2026-09-07-cookie-isolation/typescript.txt",
+        "reports/verification/2026-09-07-cookie-isolation/unit-full-final.txt"
+      ]
+    },
+    {
+      "commit": "66fbd09f045ce3f06eed154a9ba3112c0ac71d1e",
+      "paths": [
+        "docs/maintenance/maintain-and-deploy.md",
+        "reports/security/2026-09-05-security-review-checklist.md",
+        "reports/verification/2026-09-07-cookie-production/README.md",
+        "reports/verification/2026-09-07-cookie-production/academy-cookie-activation.json",
+        "reports/verification/2026-09-07-cookie-production/academy-cookie-before-allocation.json",
+        "reports/verification/2026-09-07-cookie-production/academy-cookie-browser-candidate.json",
+        "reports/verification/2026-09-07-cookie-production/academy-cookie-browser-probe.mjs",
+        "reports/verification/2026-09-07-cookie-production/academy-cookie-browser-production.json",
+        "reports/verification/2026-09-07-cookie-production/academy-cookie-candidate-allocation.json",
+        "reports/verification/2026-09-07-cookie-production/academy-cookie-candidate-http.json",
+        "reports/verification/2026-09-07-cookie-production/academy-cookie-http-probe.mjs",
+        "reports/verification/2026-09-07-cookie-production/academy-cookie-integrated-source-parity.json",
+        "reports/verification/2026-09-07-cookie-production/academy-cookie-production-allocation.json",
+        "reports/verification/2026-09-07-cookie-production/academy-cookie-production-http.json",
+        "reports/verification/2026-09-07-cookie-production/academy-cookie-production-sign-in-en-desktop.png",
+        "reports/verification/2026-09-07-cookie-production/academy-cookie-production-sign-in-en-mobile.png",
+        "reports/verification/2026-09-07-cookie-production/academy-cookie-version-upload.json",
+        "reports/verification/2026-09-07-cookie-production/manifest.json"
+      ]
+    },
+    {
+      "commit": "51d0c14f2db4d068d2f3c6b8896959cd02e256cb",
+      "paths": [
+        "reports/verification/2026-09-08-identity-entry-production/README.md",
+        "reports/verification/2026-09-08-identity-entry-production/academy-login-entry-r1.json",
+        "reports/verification/2026-09-08-identity-entry-production/academy-login-entry-r1.png",
+        "reports/verification/2026-09-08-identity-entry-production/academy-to-accounts-entry-r2.json",
+        "reports/verification/2026-09-08-identity-entry-production/academy-to-accounts-entry-r2.png",
+        "reports/verification/2026-09-08-identity-entry-production/manifest.json"
+      ]
+    }
+  ],
+  "operator_commits": [
+    {
+      "commit": "e5f2ce3ce2780418598da074683eb8fb3afc1d7b",
+      "paths": [
+        "academy-web/scripts/academy-macos-root-preflight-worker.sh",
+        "academy-web/scripts/academy-poola-production-producer.mjs",
+        "academy-web/scripts/academy-poola-production-producer.test.mjs",
+        "academy-web/scripts/academy-production-activation-cli.test.mjs",
+        "academy-web/scripts/academy-production-operation.mjs",
+        "academy-web/scripts/academy-production-operation.test.mjs",
+        "academy-web/scripts/academy-production-p1-p7-host.mjs",
+        "academy-web/scripts/academy-production-p1-p7-host.test.mjs",
+        "academy-web/scripts/academy-production-p1-p7-runner.mjs",
+        "academy-web/scripts/academy-production-p1-p7-runner.test.mjs",
+        "academy-web/scripts/academy-production-p1-p7-ssh.mjs",
+        "academy-web/scripts/academy-production-p1-p7-ssh.test.mjs",
+        "academy-web/scripts/identity-production-activation-controller.mjs",
+        "academy-web/scripts/identity-production-activation-controller.test.mjs",
+        "reports/security/2026-09-05-security-review-checklist.md",
+        "reports/verification/2026-09-07-operator-sql/README.md",
+        "reports/verification/2026-09-07-operator-sql/academy-operator-canonical-receipt-root-red.log",
+        "reports/verification/2026-09-07-operator-sql/academy-operator-sql-cleanup-root-red.log",
+        "reports/verification/2026-09-07-operator-sql/academy-operator-sql-integration-root-red.log",
+        "reports/verification/2026-09-07-operator-sql/academy-operator-sql-r2-root-real-pg-red-r2.log",
+        "reports/verification/2026-09-07-operator-sql/academy-operator-sql-remote-psql-root-red.log",
+        "reports/verification/2026-09-07-operator-sql/academy-operator-sql-review-r8-scope.json",
+        "reports/verification/2026-09-07-operator-sql/academy-operator-sql-root-final.log",
+        "reports/verification/2026-09-07-operator-sql/academy-operator-sql-root-lint-r8.log",
+        "reports/verification/2026-09-07-operator-sql/academy-operator-sql-root-unit-r8.log",
+        "reports/verification/2026-09-07-operator-sql/academy-operator-sql-ssh-pin-root-red.log"
+      ]
+    },
+    {
+      "commit": "1c4d886684123e1b26d5ea1f4062809c2e5ecdaa",
+      "paths": [
+        "academy-web/scripts/academy-production-operation-install.mjs",
+        "academy-web/scripts/academy-production-operation.test.mjs",
+        "reports/verification/2026-09-07-operator-installer/README.md",
+        "reports/verification/2026-09-07-operator-installer/academy-installer-corrupt-backup-root-green.log",
+        "reports/verification/2026-09-07-operator-installer/academy-installer-corrupt-backup-root-red.log",
+        "reports/verification/2026-09-07-operator-installer/academy-installer-native-root-focused.log",
+        "reports/verification/2026-09-07-operator-installer/academy-installer-native-root-gates.json",
+        "reports/verification/2026-09-07-operator-installer/academy-installer-native-root-lint.log",
+        "reports/verification/2026-09-07-operator-installer/academy-installer-native-root-unit.log",
+        "reports/verification/2026-09-07-operator-installer/scope.json"
+      ]
+    },
+    {
+      "commit": "1e2b0ff7cb09a0d5205aa61ab22060fea6fed037",
+      "paths": [
+        "academy-web/scripts/academy-production-p1-p7-host.mjs",
+        "academy-web/scripts/academy-production-p1-p7-host.test.mjs",
+        "academy-web/scripts/academy-production-p1-p7-runner.mjs",
+        "academy-web/scripts/academy-production-p1-p7-ssh.mjs",
+        "reports/verification/2026-09-07-operator-transaction/README.md",
+        "reports/verification/2026-09-07-operator-transaction/academy-operator-transaction-root-gates-r2.json",
+        "reports/verification/2026-09-07-operator-transaction/academy-operator-transaction-root-lint-r2.log",
+        "reports/verification/2026-09-07-operator-transaction/academy-operator-transaction-root-real-pg-r2.log",
+        "reports/verification/2026-09-07-operator-transaction/academy-operator-transaction-root-red.log",
+        "reports/verification/2026-09-07-operator-transaction/academy-operator-transaction-root-related-r2.log",
+        "reports/verification/2026-09-07-operator-transaction/academy-operator-transaction-root-unit-r2.log",
+        "reports/verification/2026-09-07-operator-transaction/scope.json"
+      ]
+    },
+    {
+      "commit": "9be6807a1f5282e3f01a69ed5ffef29d6a55aa62",
+      "paths": [
+        "academy-web/scripts/academy-production-operation-install-command.mjs",
+        "academy-web/scripts/academy-production-operation-install-command.test.mjs",
+        "reports/verification/2026-09-07-operator-activation/README.md",
+        "reports/verification/2026-09-07-operator-activation/academy-operator-activation-native-green.log",
+        "reports/verification/2026-09-07-operator-activation/academy-operator-activation-native-lint.log",
+        "reports/verification/2026-09-07-operator-activation/academy-operator-activation-native-red.log",
+        "reports/verification/2026-09-07-operator-activation/academy-operator-activation-root-focused.json",
+        "reports/verification/2026-09-07-operator-activation/academy-operator-activation-root-focused.log",
+        "reports/verification/2026-09-07-operator-activation/academy-operator-activation-root-gates.json",
+        "reports/verification/2026-09-07-operator-activation/academy-operator-activation-root-lint.log",
+        "reports/verification/2026-09-07-operator-activation/academy-operator-activation-root-unit.log",
+        "reports/verification/2026-09-07-operator-activation/scope.json"
+      ]
+    }
+  ],
+  "overlap": [
+    "reports/security/2026-09-05-security-review-checklist.md"
+  ]
+}

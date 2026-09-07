@@ -1,0 +1,195 @@
+✔ runner uses a least-privilege environment and returns bounded JSON (701.000958ms)
+✔ runner kills and reaps output overflow, hang, and signal exits (4163.392458ms)
+✖ CLI restart publishes a retained terminal journal before provider discovery and leaves no journal (133.800292ms)
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
++ actual - expected
+
++ undefined
+- 'academy-p5-abcdef0123456789ab'
+
+    at file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/academy-production-operation.test.mjs:113:12
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: undefined,
+  expected: 'academy-p5-abcdef0123456789ab',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v25.5.0
+✖ scripts/academy-production-operation.test.mjs (956.552084ms)
+✔ default dry-run validates fresh authority and performs no mutation (24.247167ms)
+✔ authority revision and actual readiness digest fail before recovery or discovery (38.027541ms)
+✔ controller ignores a self-consistent caller authority and re-verifies pinned provenance (12.568666ms)
+✖ explicit release executes exact ordered activation and binds candidate identity (115.719833ms)
+✔ malformed backup receipt after an attempted mutation is recovery-required (44.818875ms)
+✔ failure after confirmed backup is recovery-required and secret-free (62.063708ms)
+✔ post-activation smoke failure rolls back with CAS binding and checks residue (113.104042ms)
+✔ rollback residue failure is uncertain and does not accept rollback receipt (114.004375ms)
+✔ rollback CAS mismatch is terminal uncertainty (113.4845ms)
+✔ unbound activation failure never attempts an unsafe rollback (104.155125ms)
+✔ smoke receipt mismatch triggers bounded rollback (113.651542ms)
+✔ durable journal records every mutating failure and its terminal receipt (280.607333ms)
+✔ failure receipt is durably bound to the terminal failed journal (117.707ms)
+✖ startup reconciles a retained journal before starting new mutation (153.496ms)
+✖ restart publishes terminal activation receipt before discovery and removes journal (120.10475ms)
+✖ terminal journal is bound to the canonical digest of every validated plan field (104.949917ms)
+✔ receipt publication is idempotent-exact, no-clobber, and mode 0600 (41.206709ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 15
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5073.914417
+
+✖ failing tests:
+
+test at scripts/academy-production-activation-cli.test.mjs:71:1
+✖ CLI restart publishes a retained terminal journal before provider discovery and leaves no journal (133.800292ms)
+  Error: Academy production activation controller failed
+      at runAcademyProductionActivation (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/identity-production-activation-controller.mjs:312:11)
+      at async TestContext.<anonymous> (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/academy-production-activation-cli.test.mjs:112:3)
+      at async Test.run (node:internal/test_runner/test:1116:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:786:7) {
+    receipt: {
+      schema: 'academy-production-activation-controller-receipt/v1',
+      mode: 'release',
+      commandIntent: 'release_requested',
+      identityReadinessSha256: 'e8675cbfac79810e995bc372ee17bd9445b4596e3b99b124be773bf486fb65c3',
+      sourceRevision: 'fa7bca732aefa58ab7fc2c784676a113b873466b',
+      planSha256: 'f12b16db0ecf3f157be53664c8d6932fb305eb2998fda27ccbe8b1b38c82ac81',
+      currentServing: { deploymentId: '11111111-1111-4111-8111-111111111111', versionId: '22222222-2222-4222-8222-222222222222' },
+      steps: [
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object]
+      ],
+      status: 'FAILED_ROLLBACK_UNCERTAIN_RECOVERY_REQUIRED',
+      productionMutation: true,
+      mutationLedger: { backupRestore: 'confirmed', migrations: 'confirmed', candidateUpload: 'confirmed', trafficActivation: 'rollback_uncertain' }
+    }
+  }
+
+test at scripts/academy-production-operation.test.mjs:1:1
+✖ scripts/academy-production-operation.test.mjs (956.552084ms)
+  'test failed'
+
+test at scripts/identity-production-activation-controller.test.mjs:41:1
+✖ explicit release executes exact ordered activation and binds candidate identity (115.719833ms)
+  Error: Academy production activation controller failed
+      at runAcademyProductionActivation (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/identity-production-activation-controller.mjs:312:11)
+      at async TestContext.<anonymous> (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/identity-production-activation-controller.test.mjs:41:137)
+      at async Test.run (node:internal/test_runner/test:1116:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:786:7) {
+    receipt: {
+      schema: 'academy-production-activation-controller-receipt/v1',
+      mode: 'release',
+      commandIntent: 'release_requested',
+      identityReadinessSha256: 'e8675cbfac79810e995bc372ee17bd9445b4596e3b99b124be773bf486fb65c3',
+      sourceRevision: 'fa7bca732aefa58ab7fc2c784676a113b873466b',
+      planSha256: '1f755806cbaa9ed012983b41b526d57937cd12ed7dadb8e61aefd7a73733c2c2',
+      currentServing: { deploymentId: '11111111-1111-4111-8111-111111111111', versionId: '22222222-2222-4222-8222-222222222222' },
+      steps: [
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object],
+        [Object]
+      ],
+      status: 'FAILED_TRAFFIC_ROLLED_BACK_RECOVERY_REQUIRED',
+      productionMutation: true,
+      mutationLedger: { backupRestore: 'confirmed', migrations: 'confirmed', candidateUpload: 'confirmed', trafficActivation: 'rolled_back' }
+    }
+  }
+
+test at scripts/identity-production-activation-controller.test.mjs:60:1
+✖ startup reconciles a retained journal before starting new mutation (153.496ms)
+  Error: Academy production activation controller failed
+      at runAcademyProductionActivation (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/identity-production-activation-controller.mjs:312:11)
+      at async TestContext.<anonymous> (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/identity-production-activation-controller.test.mjs:60:367)
+      at async Test.run (node:internal/test_runner/test:1116:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:786:7) {
+    receipt: {
+      schema: 'academy-production-activation-controller-receipt/v1',
+      mode: 'release',
+      commandIntent: 'release_requested',
+      identityReadinessSha256: 'e8675cbfac79810e995bc372ee17bd9445b4596e3b99b124be773bf486fb65c3',
+      sourceRevision: 'fa7bca732aefa58ab7fc2c784676a113b873466b',
+      planSha256: 'c7a4450ca20b5963792f237c23c0019fed29a9f42ae3055636fa7a60e047ff28',
+      currentServing: { deploymentId: '11111111-1111-4111-8111-111111111111', versionId: '22222222-2222-4222-8222-222222222222' },
+      steps: [
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object]
+      ],
+      status: 'FAILED_TRAFFIC_ROLLED_BACK_RECOVERY_REQUIRED',
+      productionMutation: true,
+      mutationLedger: { backupRestore: 'confirmed', migrations: 'confirmed', candidateUpload: 'confirmed', trafficActivation: 'rolled_back' }
+    }
+  }
+
+test at scripts/identity-production-activation-controller.test.mjs:61:1
+✖ restart publishes terminal activation receipt before discovery and removes journal (120.10475ms)
+  Error: Academy production activation controller failed
+      at runAcademyProductionActivation (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/identity-production-activation-controller.mjs:312:11)
+      at async TestContext.<anonymous> (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/identity-production-activation-controller.test.mjs:61:140)
+      at async Test.run (node:internal/test_runner/test:1116:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:786:7) {
+    receipt: {
+      schema: 'academy-production-activation-controller-receipt/v1',
+      mode: 'release',
+      commandIntent: 'release_requested',
+      identityReadinessSha256: 'e8675cbfac79810e995bc372ee17bd9445b4596e3b99b124be773bf486fb65c3',
+      sourceRevision: 'fa7bca732aefa58ab7fc2c784676a113b873466b',
+      planSha256: '07640879025e93dacbe52adff30f4584f88e5cb50813f59065289e2c6edf894c',
+      currentServing: { deploymentId: '11111111-1111-4111-8111-111111111111', versionId: '22222222-2222-4222-8222-222222222222' },
+      steps: [
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object],
+        [Object]
+      ],
+      status: 'FAILED_TRAFFIC_ROLLED_BACK_RECOVERY_REQUIRED',
+      productionMutation: true,
+      mutationLedger: { backupRestore: 'confirmed', migrations: 'confirmed', candidateUpload: 'confirmed', trafficActivation: 'rolled_back' }
+    }
+  }
+
+test at scripts/identity-production-activation-controller.test.mjs:62:1
+✖ terminal journal is bound to the canonical digest of every validated plan field (104.949917ms)
+  Error: Academy production activation controller failed
+      at runAcademyProductionActivation (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/identity-production-activation-controller.mjs:312:11)
+      at async TestContext.<anonymous> (file:///private/tmp/academy-operator-sql-cde63a58/academy-web/scripts/identity-production-activation-controller.test.mjs:62:137)
+      at async Test.run (node:internal/test_runner/test:1116:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:786:7) {
+    receipt: {
+      schema: 'academy-production-activation-controller-receipt/v1',
+      mode: 'release',
+      commandIntent: 'release_requested',
+      identityReadinessSha256: 'e8675cbfac79810e995bc372ee17bd9445b4596e3b99b124be773bf486fb65c3',
+      sourceRevision: 'fa7bca732aefa58ab7fc2c784676a113b873466b',
+      planSha256: '68bb0121d9623c13325b7e9c8637f5ebb0de99cc41e2f106b5a928eb0f51cf0f',
+      currentServing: { deploymentId: '11111111-1111-4111-8111-111111111111', versionId: '22222222-2222-4222-8222-222222222222' },
+      steps: [
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object],
+        [Object]
+      ],
+      status: 'FAILED_TRAFFIC_ROLLED_BACK_RECOVERY_REQUIRED',
+      productionMutation: true,
+      mutationLedger: { backupRestore: 'confirmed', migrations: 'confirmed', candidateUpload: 'confirmed', trafficActivation: 'rolled_back' }
+    }
+  }

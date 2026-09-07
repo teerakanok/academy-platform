@@ -34,7 +34,7 @@ export const IDENTITY_SYNTHETIC_AUTHORITY = Object.freeze({
   wrapperAuthoritySha256:
     "b0a1897048e9881a0789204619de9c770bc5258904ba597ab7afc026998cb01e",
   hostHelperSha256:
-    "221f2831c71f108128b23992358aa61fde9daca213cbd0c5a1c157180e55544f",
+    "6930f7dcd9cf261b6fb8fed5e945f2f2523873359256ae51ca06ebf0825c4dc3",
 });
 
 const CHECKS = Object.freeze(["P1", "P2", "P3", "P4", "P5", "P6", "P7"]);
@@ -139,6 +139,7 @@ export async function runAcademyP1P7({ binding, ports }) {
   const body = {
     status: "PASS",
     authorityId: binding.authorityId,
+    operationId: binding.operationId,
     releaseRevision: binding.releaseRevision,
     identityReadinessSha256: binding.identityReadinessSha256,
     validUntil: binding.validUntil,
