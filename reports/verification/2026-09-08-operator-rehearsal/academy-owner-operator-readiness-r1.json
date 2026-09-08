@@ -1,0 +1,16 @@
+{
+  "at": "2026-09-08T05:03:07.069989+00:00",
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "root@ssh-db.cyberskills.co.th",
+    "docker exec -i supabase-db psql -X -qAt -v ON_ERROR_STOP=1 -U supabase_admin -d postgres"
+  ],
+  "sql": "BEGIN READ ONLY; SET LOCAL statement_timeout='5s';\nSELECT jsonb_build_object('operatorRoles',(SELECT jsonb_agg(jsonb_build_object('name',rolname,'canLogin',rolcanlogin,'superuser',rolsuper,'bypassRls',rolbypassrls,'passwordConfigured',rolpassword IS NOT NULL)) FROM pg_authid WHERE rolname IN ('academy_staff_admin','academy_entitlement_operator')),'activeOwners',(SELECT count(*) FROM academy.staff_role_assignment WHERE role='owner' AND revoked_at IS NULL),'founderHintCandidates',(SELECT count(*) FROM academy.users WHERE email='songpon@cyberskills.co.th'),'academyAccounts',(SELECT count(*) FROM academy.users));\nROLLBACK;\n",
+  "exitCode": 0,
+  "stdout": "{\"activeOwners\": 0, \"operatorRoles\": [{\"name\": \"academy_entitlement_operator\", \"canLogin\": true, \"bypassRls\": false, \"superuser\": false, \"passwordConfigured\": false}, {\"name\": \"academy_staff_admin\", \"canLogin\": true, \"bypassRls\": false, \"superuser\": false, \"passwordConfigured\": false}], \"academyAccounts\": 2, \"founderHintCandidates\": 1}\n",
+  "stderrBytes": 0
+}

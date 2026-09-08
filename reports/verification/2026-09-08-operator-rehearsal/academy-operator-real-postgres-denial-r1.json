@@ -1,0 +1,83 @@
+{
+  "at": "2026-09-08T05:31:27.078673+00:00",
+  "scope": "own local fixture",
+  "results": [
+    {
+      "case": "unauthorized actor academy_staff_admin",
+      "command": [
+        "node",
+        "scripts/manage-staff-role.mjs",
+        "--enable",
+        "--role",
+        "content-ops",
+        "--target-subject",
+        "95000000-0000-4000-8000-000000000001",
+        "--actor-issuer",
+        "https://operator-fixture.invalid/",
+        "--actor-subject",
+        "95000000-0000-4000-8000-000000000002",
+        "--target-issuer",
+        "https://operator-fixture.invalid/",
+        "--reference",
+        "ws-cde63a58-rehearsal-local-test",
+        "--rehearse"
+      ],
+      "exitCode": 1,
+      "sqlState42501": true,
+      "stdout": "",
+      "before": {
+        "staff": "e445ee4fdb2b2f99d325e44f1a23b424",
+        "staffAudit": "b60841f47f6db898ec353635f62da3f1",
+        "entitlement": "bff587efba4fe4482e41534c24a57d65",
+        "entitlementAudit": "ad9dd4ee33fb679e27b0f99756c54f11"
+      },
+      "after": {
+        "staff": "e445ee4fdb2b2f99d325e44f1a23b424",
+        "staffAudit": "b60841f47f6db898ec353635f62da3f1",
+        "entitlement": "bff587efba4fe4482e41534c24a57d65",
+        "entitlementAudit": "ad9dd4ee33fb679e27b0f99756c54f11"
+      },
+      "rowsUnchanged": true
+    },
+    {
+      "case": "unauthorized actor academy_entitlement_operator",
+      "command": [
+        "node",
+        "scripts/manage-course-entitlement.mjs",
+        "--grant",
+        "--course",
+        "setup-and-environment",
+        "--source",
+        "grant",
+        "--target-subject",
+        "95000000-0000-4000-8000-000000000002",
+        "--actor-issuer",
+        "https://operator-fixture.invalid/",
+        "--actor-subject",
+        "95000000-0000-4000-8000-000000000002",
+        "--target-issuer",
+        "https://operator-fixture.invalid/",
+        "--reference",
+        "ws-cde63a58-rehearsal-local-test",
+        "--rehearse"
+      ],
+      "exitCode": 1,
+      "sqlState42501": true,
+      "stdout": "",
+      "before": {
+        "staff": "e445ee4fdb2b2f99d325e44f1a23b424",
+        "staffAudit": "b60841f47f6db898ec353635f62da3f1",
+        "entitlement": "bff587efba4fe4482e41534c24a57d65",
+        "entitlementAudit": "ad9dd4ee33fb679e27b0f99756c54f11"
+      },
+      "after": {
+        "staff": "e445ee4fdb2b2f99d325e44f1a23b424",
+        "staffAudit": "b60841f47f6db898ec353635f62da3f1",
+        "entitlement": "bff587efba4fe4482e41534c24a57d65",
+        "entitlementAudit": "ad9dd4ee33fb679e27b0f99756c54f11"
+      },
+      "rowsUnchanged": true
+    }
+  ],
+  "pass": true
+}

@@ -1,0 +1,13 @@
+{
+  "at": "2026-09-08T05:30:38.362811+00:00",
+  "command": [
+    "npm",
+    "run",
+    "lint"
+  ],
+  "cwd": "/private/tmp/academy-operator-rehearsal-cde63a58/academy-web",
+  "exitCode": 1,
+  "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-operator-root-lint-r1.log",
+  "logSha256": "75de1688170e27d5487ec76287cff0a155588a30aecebd8550fb2dcef4ae2814",
+  "tail": "\n  5:10  warning  'dirname' is defined but never used  @typescript-eslint/no-unused-vars\n\n/private/tmp/academy-operator-rehearsal-cde63a58/academy-web/scripts/academy-release-fs-fake.mjs\n  7:7  warning  'IFREG' is assigned a value but never used  @typescript-eslint/no-unused-vars\n  8:7  warning  'IFDIR' is assigned a value but never used  @typescript-eslint/no-unused-vars\n  9:7  warning  'IFLNK' is assigned a value but never used  @typescript-eslint/no-unused-vars\n\n/private/tmp/academy-operator-rehearsal-cde63a58/academy-web/scripts/academy-release-real-fs.test.mjs\n  11:10  warning  'dirname' is defined but never used  @typescript-eslint/no-unused-vars\n\n/private/tmp/academy-operator-rehearsal-cde63a58/academy-web/scripts/calc.mjs\n  17:10  warning  'readFileSync' is defined but never used  @typescript-eslint/no-unused-vars\n\n/private/tmp/academy-operator-rehearsal-cde63a58/academy-web/scripts/dump-biased-mcqs.mjs\n  4:37  warning  'existsSync' is defined but never used  @typescript-eslint/no-unused-vars\n\n/private/tmp/academy-operator-rehearsal-cde63a58/academy-web/src/lib/content/registry.generated.ts\n  4:1  warning  Unused eslint-disable directive (no problems were reported)\n\n/private/tmp/academy-operator-rehearsal-cde63a58/academy-web/tests/factcheck/arithmetic-consistency.mjs\n  21:7  warning  'NUM' is assigned a value but never used  @typescript-eslint/no-unused-vars\n\n\u2716 20 problems (3 errors, 17 warnings)\n  0 errors and 1 warning potentially fixable with the `--fix` option.\n\n"
+}

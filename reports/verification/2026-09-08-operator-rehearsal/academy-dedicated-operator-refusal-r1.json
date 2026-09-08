@@ -1,0 +1,16 @@
+{
+  "at": "2026-09-08T05:12:47.389049+00:00",
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "root@ssh-db.cyberskills.co.th",
+    "python3 -"
+  ],
+  "remoteScript": "import subprocess,json\nr=[]\nfor role in ['academy_staff_admin','academy_entitlement_operator']:\n p=subprocess.run(['docker','exec','-i','supabase-db','psql','-X','-w','-qAt','-h','/var/run/postgresql','-U',role,'-d','postgres','-c','SELECT current_user'],capture_output=True,text=True)\n e=p.stderr.lower();r.append({'role':role,'exitCode':p.returncode,'peerRejected':'peer authentication failed' in e,'identRejected':'ident authentication failed' in e,'noHbaEntry':'no pg_hba.conf entry' in e,'connectionRefused':'connection refused' in e,'missingSocket':'could not connect' in e or 'no such file' in e,'passwordRejected':'password authentication failed' in e,'databaseDenied':'permission denied for database' in e,'noPassword':'no password supplied' in e})\nprint(json.dumps(r))\n",
+  "exitCode": 0,
+  "stdout": "[{\"role\": \"academy_staff_admin\", \"exitCode\": 2, \"peerRejected\": true, \"identRejected\": false, \"noHbaEntry\": false, \"connectionRefused\": false, \"missingSocket\": false, \"passwordRejected\": false, \"databaseDenied\": false, \"noPassword\": false}, {\"role\": \"academy_entitlement_operator\", \"exitCode\": 2, \"peerRejected\": true, \"identRejected\": false, \"noHbaEntry\": false, \"connectionRefused\": false, \"missingSocket\": false, \"passwordRejected\": false, \"databaseDenied\": false, \"noPassword\": false}]\n",
+  "stderrBytes": 0
+}

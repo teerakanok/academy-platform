@@ -1,0 +1,257 @@
+{
+  "at": "2026-09-08T05:30:25.840250+00:00",
+  "scope": "own local disposable DB only; sequences may advance under rollback; row state/audit digests compared",
+  "snapshotCommand": [
+    "/private/tmp/postgres-fixture-cde63a58/install/bin/psql",
+    "-X",
+    "-qAt",
+    "-v",
+    "ON_ERROR_STOP=1",
+    "-h",
+    "/private/tmp/postgres-fixture-cde63a58/socket",
+    "-p",
+    "65433",
+    "-U",
+    "fixture_owner",
+    "-d",
+    "academy_activation_50505a66b8f0"
+  ],
+  "snapshotSql": "BEGIN READ ONLY; SELECT jsonb_build_object('staff',(SELECT md5(coalesce(jsonb_agg(to_jsonb(t) ORDER BY account_id,role)::text,'[]')) FROM academy.staff_role_assignment t),'staffAudit',(SELECT md5(coalesce(jsonb_agg(to_jsonb(t) ORDER BY event_id)::text,'[]')) FROM academy.staff_role_audit t),'entitlement',(SELECT md5(coalesce(jsonb_agg(to_jsonb(t) ORDER BY user_id,course_slug)::text,'[]')) FROM academy.course_entitlement t),'entitlementAudit',(SELECT md5(coalesce(jsonb_agg(to_jsonb(t) ORDER BY event_id)::text,'[]')) FROM academy.course_entitlement_audit t)); ROLLBACK;",
+  "results": [
+    {
+      "case": "first-owner rehearsal",
+      "command": [
+        "node",
+        "scripts/manage-staff-role.mjs",
+        "--enable",
+        "--role",
+        "owner",
+        "--target-subject",
+        "95000000-0000-4000-8000-000000000001",
+        "--actor-issuer",
+        "https://operator-fixture.invalid/",
+        "--actor-subject",
+        "95000000-0000-4000-8000-000000000001",
+        "--target-issuer",
+        "https://operator-fixture.invalid/",
+        "--reference",
+        "ws-cde63a58-rehearsal-local-test",
+        "--rehearse"
+      ],
+      "role": "academy_staff_admin",
+      "exitCode": 0,
+      "stdout": "rehearsed=true changed=true role=owner active=true\n",
+      "stderr": "",
+      "before": {
+        "staff": "d751713988987e9331980363e24189ce",
+        "staffAudit": "d751713988987e9331980363e24189ce",
+        "entitlement": "d751713988987e9331980363e24189ce",
+        "entitlementAudit": "d751713988987e9331980363e24189ce"
+      },
+      "after": {
+        "staff": "d751713988987e9331980363e24189ce",
+        "staffAudit": "d751713988987e9331980363e24189ce",
+        "entitlement": "d751713988987e9331980363e24189ce",
+        "entitlementAudit": "d751713988987e9331980363e24189ce"
+      },
+      "rowsRestored": true
+    },
+    {
+      "case": "first-owner apply after rehearsal",
+      "command": [
+        "node",
+        "scripts/manage-staff-role.mjs",
+        "--enable",
+        "--role",
+        "owner",
+        "--target-subject",
+        "95000000-0000-4000-8000-000000000001",
+        "--actor-issuer",
+        "https://operator-fixture.invalid/",
+        "--actor-subject",
+        "95000000-0000-4000-8000-000000000001",
+        "--target-issuer",
+        "https://operator-fixture.invalid/",
+        "--reference",
+        "ws-cde63a58-rehearsal-local-test",
+        "--apply"
+      ],
+      "role": "academy_staff_admin",
+      "exitCode": 0,
+      "stdout": "applied=true changed=true role=owner active=true\n",
+      "stderr": "",
+      "before": {
+        "staff": "d751713988987e9331980363e24189ce",
+        "staffAudit": "d751713988987e9331980363e24189ce",
+        "entitlement": "d751713988987e9331980363e24189ce",
+        "entitlementAudit": "d751713988987e9331980363e24189ce"
+      },
+      "after": {
+        "staff": "e445ee4fdb2b2f99d325e44f1a23b424",
+        "staffAudit": "b60841f47f6db898ec353635f62da3f1",
+        "entitlement": "d751713988987e9331980363e24189ce",
+        "entitlementAudit": "d751713988987e9331980363e24189ce"
+      },
+      "rowsRestored": false
+    },
+    {
+      "case": "existing-owner no-op rehearsal",
+      "command": [
+        "node",
+        "scripts/manage-staff-role.mjs",
+        "--enable",
+        "--role",
+        "owner",
+        "--target-subject",
+        "95000000-0000-4000-8000-000000000001",
+        "--actor-issuer",
+        "https://operator-fixture.invalid/",
+        "--actor-subject",
+        "95000000-0000-4000-8000-000000000001",
+        "--target-issuer",
+        "https://operator-fixture.invalid/",
+        "--reference",
+        "ws-cde63a58-rehearsal-local-test",
+        "--rehearse"
+      ],
+      "role": "academy_staff_admin",
+      "exitCode": 0,
+      "stdout": "rehearsed=true changed=false role=owner active=true\n",
+      "stderr": "",
+      "before": {
+        "staff": "e445ee4fdb2b2f99d325e44f1a23b424",
+        "staffAudit": "b60841f47f6db898ec353635f62da3f1",
+        "entitlement": "d751713988987e9331980363e24189ce",
+        "entitlementAudit": "d751713988987e9331980363e24189ce"
+      },
+      "after": {
+        "staff": "e445ee4fdb2b2f99d325e44f1a23b424",
+        "staffAudit": "b60841f47f6db898ec353635f62da3f1",
+        "entitlement": "d751713988987e9331980363e24189ce",
+        "entitlementAudit": "d751713988987e9331980363e24189ce"
+      },
+      "rowsRestored": true
+    },
+    {
+      "case": "course entitlement rehearsal",
+      "command": [
+        "node",
+        "scripts/manage-course-entitlement.mjs",
+        "--grant",
+        "--course",
+        "setup-and-environment",
+        "--source",
+        "grant",
+        "--target-subject",
+        "95000000-0000-4000-8000-000000000002",
+        "--actor-issuer",
+        "https://operator-fixture.invalid/",
+        "--actor-subject",
+        "95000000-0000-4000-8000-000000000001",
+        "--target-issuer",
+        "https://operator-fixture.invalid/",
+        "--reference",
+        "ws-cde63a58-rehearsal-local-test",
+        "--rehearse"
+      ],
+      "role": "academy_entitlement_operator",
+      "exitCode": 0,
+      "stdout": "rehearsed=true changed=true action=grant course=setup-and-environment\n",
+      "stderr": "",
+      "before": {
+        "staff": "e445ee4fdb2b2f99d325e44f1a23b424",
+        "staffAudit": "b60841f47f6db898ec353635f62da3f1",
+        "entitlement": "d751713988987e9331980363e24189ce",
+        "entitlementAudit": "d751713988987e9331980363e24189ce"
+      },
+      "after": {
+        "staff": "e445ee4fdb2b2f99d325e44f1a23b424",
+        "staffAudit": "b60841f47f6db898ec353635f62da3f1",
+        "entitlement": "d751713988987e9331980363e24189ce",
+        "entitlementAudit": "d751713988987e9331980363e24189ce"
+      },
+      "rowsRestored": true
+    },
+    {
+      "case": "course entitlement apply after rehearsal",
+      "command": [
+        "node",
+        "scripts/manage-course-entitlement.mjs",
+        "--grant",
+        "--course",
+        "setup-and-environment",
+        "--source",
+        "grant",
+        "--target-subject",
+        "95000000-0000-4000-8000-000000000002",
+        "--actor-issuer",
+        "https://operator-fixture.invalid/",
+        "--actor-subject",
+        "95000000-0000-4000-8000-000000000001",
+        "--target-issuer",
+        "https://operator-fixture.invalid/",
+        "--reference",
+        "ws-cde63a58-rehearsal-local-test",
+        "--apply"
+      ],
+      "role": "academy_entitlement_operator",
+      "exitCode": 0,
+      "stdout": "applied=true changed=true action=grant course=setup-and-environment\n",
+      "stderr": "",
+      "before": {
+        "staff": "e445ee4fdb2b2f99d325e44f1a23b424",
+        "staffAudit": "b60841f47f6db898ec353635f62da3f1",
+        "entitlement": "d751713988987e9331980363e24189ce",
+        "entitlementAudit": "d751713988987e9331980363e24189ce"
+      },
+      "after": {
+        "staff": "e445ee4fdb2b2f99d325e44f1a23b424",
+        "staffAudit": "b60841f47f6db898ec353635f62da3f1",
+        "entitlement": "bff587efba4fe4482e41534c24a57d65",
+        "entitlementAudit": "ad9dd4ee33fb679e27b0f99756c54f11"
+      },
+      "rowsRestored": false
+    },
+    {
+      "case": "existing entitlement no-op rehearsal",
+      "command": [
+        "node",
+        "scripts/manage-course-entitlement.mjs",
+        "--grant",
+        "--course",
+        "setup-and-environment",
+        "--source",
+        "grant",
+        "--target-subject",
+        "95000000-0000-4000-8000-000000000002",
+        "--actor-issuer",
+        "https://operator-fixture.invalid/",
+        "--actor-subject",
+        "95000000-0000-4000-8000-000000000001",
+        "--target-issuer",
+        "https://operator-fixture.invalid/",
+        "--reference",
+        "ws-cde63a58-rehearsal-local-test",
+        "--rehearse"
+      ],
+      "role": "academy_entitlement_operator",
+      "exitCode": 0,
+      "stdout": "rehearsed=true changed=false action=grant course=setup-and-environment\n",
+      "stderr": "",
+      "before": {
+        "staff": "e445ee4fdb2b2f99d325e44f1a23b424",
+        "staffAudit": "b60841f47f6db898ec353635f62da3f1",
+        "entitlement": "bff587efba4fe4482e41534c24a57d65",
+        "entitlementAudit": "ad9dd4ee33fb679e27b0f99756c54f11"
+      },
+      "after": {
+        "staff": "e445ee4fdb2b2f99d325e44f1a23b424",
+        "staffAudit": "b60841f47f6db898ec353635f62da3f1",
+        "entitlement": "bff587efba4fe4482e41534c24a57d65",
+        "entitlementAudit": "ad9dd4ee33fb679e27b0f99756c54f11"
+      },
+      "rowsRestored": true
+    }
+  ],
+  "pass": true
+}

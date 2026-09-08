@@ -1,0 +1,15 @@
+{
+  "at": "2026-09-08T05:30:28.018330+00:00",
+  "command": [
+    "npx",
+    "vitest",
+    "run",
+    "--project",
+    "unit"
+  ],
+  "cwd": "/private/tmp/academy-operator-rehearsal-cde63a58/academy-web",
+  "exitCode": 0,
+  "log": "/private/tmp/cyberskills-prod-cde63a58/records/academy-operator-root-unit-r1.log",
+  "logSha256": "5745f91fd21c4fca7f8fbe31a2afaff7f53e18050527c8ba0403b031a049f389",
+  "tail": "ctivation released=true\n\nstderr | tests/unit/identity-runtime-browser-flow.test.ts > Academy Identity runtime browser flow > retains the browser-bound callback after session failure and finalizes it after one retry\n[identity-callback] completion_failed stage=session_creation released=true\n\nstderr | tests/unit/identity-production-runtime-routes.test.ts > production Identity routes use the real registry composition > starts through the registry and routes a callback into the same server-only composition\n[identity-code-exchange] response status=503 no_store=true elapsed_ms=33\n\nstderr | tests/unit/identity-production-runtime-routes.test.ts > production Identity routes use the real registry composition > starts through the registry and routes a callback into the same server-only composition\n[identity-callback] completion_failed stage=code_exchange released=true\n\nstderr | tests/unit/progress-dashboard-route.test.ts > GET /api/progress dashboard catalog > fails closed when course entitlement storage is unavailable\n[api/progress] \u0e2d\u0e48\u0e32\u0e19\u0e44\u0e21\u0e48\u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08: access store unavailable\n\nstderr | tests/unit/sign-out-route.test.ts > POST /api/auth/sign-out > provider revoke \u0e25\u0e49\u0e21\u0e40\u0e2b\u0e25\u0e27\u0e01\u0e47\u0e25\u0e49\u0e32\u0e07 cookie \u0e02\u0e2d\u0e07 browser \u0e41\u0e25\u0e30\u0e04\u0e37\u0e19 contract local-only\n[auth/sign-out] revoke local refresh token \u0e44\u0e21\u0e48\u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08: provider unavailable\n\n(node:30886) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n"
+}
