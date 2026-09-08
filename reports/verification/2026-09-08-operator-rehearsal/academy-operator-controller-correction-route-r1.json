@@ -1,0 +1,56 @@
+{
+  "command": [
+    "node",
+    "/Users/teerakanok/Dev/cyberskills-director-governance/scripts/model-team-route.mjs",
+    "auto-route",
+    "--workflow",
+    "codex",
+    "--small-change",
+    "--context-coupled",
+    "--rationale",
+    "Two concrete CLI composition defects in retained worker patch observed by controller during real isolated PostgreSQL acceptance; bounded correction avoids another full dispatch while independent approval remains required.",
+    "--task",
+    "Correct two local rehearsal composition errors and causal regressions: staff audit query has three placeholders but two parameters, and first owner bootstrap legitimately changes actorAuthorized false to true. Preserve existing authorization checks and inspect the accepted patch context."
+  ],
+  "route": {
+    "status": "OK",
+    "task_class": "controller_judgment",
+    "work_kind": "bounded_code",
+    "reasoning_effort": "low",
+    "reason": "Two concrete CLI composition defects in retained worker patch observed by controller during real isolated PostgreSQL acceptance; bounded correction avoids another full dispatch while independent approval remains required.",
+    "workflow": "codex",
+    "selected_automatically": true,
+    "role": "controller",
+    "worker": null,
+    "model": "gpt-6-astra",
+    "launcher": null,
+    "launcher_arguments": null,
+    "execution_mode": "controller_inline",
+    "escalation": null,
+    "fork_turns": "none",
+    "direct_execution_reason": "Two concrete CLI composition defects in retained worker patch observed by controller during real isolated PostgreSQL acceptance; bounded correction avoids another full dispatch while independent approval remains required.",
+    "effort_instruction": "requested effort for this task; preserve the active session setting when the harness cannot change it",
+    "unavailable_pools": [],
+    "subscription_budget": {
+      "status": "unknown",
+      "controller_pool": "codex",
+      "worker_pool": null,
+      "selected_pool": "codex",
+      "capacity_status": "unknown",
+      "scheduling": "capability_default"
+    },
+    "route_decision": {
+      "basis": "capability_default",
+      "selection_origin": "automatic",
+      "rationale": "Two concrete CLI composition defects in retained worker patch observed by controller during real isolated PostgreSQL acceptance; bounded correction avoids another full dispatch while independent approval remains required.",
+      "decision_inputs": {
+        "task_signals": [
+          "small_change",
+          "context_coupled"
+        ],
+        "clean_baseline": false,
+        "rationale": "Two concrete CLI composition defects in retained worker patch observed by controller during real isolated PostgreSQL acceptance; bounded correction avoids another full dispatch while independent approval remains required."
+      }
+    }
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "at": "2026-09-08T05:24:05.170606+00:00",
+  "scope": "own disposable local clone only",
+  "migration": "/private/tmp/academy-operator-rehearsal-cde63a58/academy-web/supabase/migrations/0036_admin_rehearsal_audit_projection.sql",
+  "sha256": "93ae2bb111bb94730907d788e7f89654b60c33be29d9aa8fb50da2fd50a0195a",
+  "results": [
+    {
+      "command": [
+        "/private/tmp/postgres-fixture-cde63a58/install/bin/psql",
+        "-X",
+        "-qAt",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-h",
+        "/private/tmp/postgres-fixture-cde63a58/socket",
+        "-p",
+        "65433",
+        "-U",
+        "fixture_owner",
+        "-d",
+        "academy_activation_50505a66b8f0"
+      ],
+      "outcome": "ROLLBACK",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/private/tmp/postgres-fixture-cde63a58/install/bin/psql",
+        "-X",
+        "-qAt",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-h",
+        "/private/tmp/postgres-fixture-cde63a58/socket",
+        "-p",
+        "65433",
+        "-U",
+        "fixture_owner",
+        "-d",
+        "academy_activation_50505a66b8f0"
+      ],
+      "outcome": "COMMIT",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

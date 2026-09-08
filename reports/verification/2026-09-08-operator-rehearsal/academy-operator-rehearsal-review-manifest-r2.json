@@ -1,0 +1,44 @@
+{
+  "source": "/private/tmp/academy-operator-rehearsal-cde63a58",
+  "base": "e092c5ca2e44570600d51d2ce38df940dabca53d",
+  "workerPatch": "676edb94c3a3720724772269136baf44a583824511b2a65f027be93f77a65f7a",
+  "controllerCorrectionRoute": "academy-operator-controller-correction-route-r1.json",
+  "files": [
+    {
+      "path": "academy-web/docs/course-entitlement-operator.md",
+      "sha256": "fcf5325ddc3d40d9446cbc07bb5f2a1dd737d76a3c545d222a435d75aa5bcb07"
+    },
+    {
+      "path": "academy-web/docs/staff-authorization.md",
+      "sha256": "c21395976223c2cf77349d3ba02338cf1c224e6e8ca94bd91527d9b24930ba1a"
+    },
+    {
+      "path": "academy-web/scripts/admin-rehearsal.mjs",
+      "sha256": "1e493340ce4e6cc326a898783c562965c6e69fdf3f6d4870757bf89af792c38e"
+    },
+    {
+      "path": "academy-web/scripts/manage-course-entitlement.mjs",
+      "sha256": "df490a0b349a56e82695d66a2cfb1938bb1e03fccbb295f1d6eed863e6456fc7"
+    },
+    {
+      "path": "academy-web/scripts/manage-staff-role.mjs",
+      "sha256": "c62983e239793f64616b2d152e5a00240953e13cf3a19d9877bbfd125adf5286"
+    },
+    {
+      "path": "academy-web/supabase/migrations/0036_admin_rehearsal_audit_projection.sql",
+      "sha256": "93ae2bb111bb94730907d788e7f89654b60c33be29d9aa8fb50da2fd50a0195a"
+    },
+    {
+      "path": "academy-web/supabase/rollbacks/0036_admin_rehearsal_audit_projection.rollback.sql",
+      "sha256": "b6cd84d7c11978f0ea160afa87aeb89c1ceb411c2b71e12fb7fee9dd727aab02"
+    },
+    {
+      "path": "academy-web/tests/unit/admin-rehearsal-audit-seam.test.ts",
+      "sha256": "c549541a3155db2820c1d6bcf5062b8c1fbfaa9409a96c64d76364a2a029ec91"
+    },
+    {
+      "path": "academy-web/tests/unit/admin-rehearsal-scripts.test.ts",
+      "sha256": "acb01e80da15d659f027082a3494572c75babb8eeada2d8a5d25ebdd45c5a1e9"
+    }
+  ]
+}

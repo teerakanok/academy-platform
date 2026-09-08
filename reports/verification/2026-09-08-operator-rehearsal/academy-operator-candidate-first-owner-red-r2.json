@@ -1,0 +1,25 @@
+{
+  "at": "2026-09-08T05:27:49.078796+00:00",
+  "command": [
+    "node",
+    "scripts/manage-staff-role.mjs",
+    "--enable",
+    "--role",
+    "owner",
+    "--actor-issuer",
+    "https://operator-fixture.invalid/",
+    "--actor-subject",
+    "95000000-0000-4000-8000-000000000001",
+    "--target-issuer",
+    "https://operator-fixture.invalid/",
+    "--target-subject",
+    "95000000-0000-4000-8000-000000000001",
+    "--reference",
+    "ws-cde63a58-rehearsal-local-test",
+    "--rehearse"
+  ],
+  "exitCode": 1,
+  "stdout": "",
+  "stderr": "file:///private/tmp/academy-operator-rehearsal-cde63a58/academy-web/scripts/admin-rehearsal.mjs:30\n      throw new Error('in-transaction authorization verification failed')\n            ^\n\nError: in-transaction authorization verification failed\n    at rehearseMutation (file:///private/tmp/academy-operator-rehearsal-cde63a58/academy-web/scripts/admin-rehearsal.mjs:30:13)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async main (file:///private/tmp/academy-operator-rehearsal-cde63a58/academy-web/scripts/manage-staff-role.mjs:92:7)\n    at async file:///private/tmp/academy-operator-rehearsal-cde63a58/academy-web/scripts/manage-staff-role.mjs:131:3\n\nNode.js v25.5.0\n",
+  "stage": "after staff bind fix, before first-owner authorization correction"
+}

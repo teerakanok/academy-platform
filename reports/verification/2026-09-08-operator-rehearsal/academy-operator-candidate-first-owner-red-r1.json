@@ -1,0 +1,28 @@
+{
+  "at": "2026-09-08T05:25:45.623990+00:00",
+  "command": [
+    "node",
+    "scripts/manage-staff-role.mjs",
+    "--enable",
+    "--role",
+    "owner",
+    "--actor-issuer",
+    "https://operator-fixture.invalid/",
+    "--actor-subject",
+    "95000000-0000-4000-8000-000000000001",
+    "--target-issuer",
+    "https://operator-fixture.invalid/",
+    "--target-subject",
+    "95000000-0000-4000-8000-000000000001",
+    "--reference",
+    "ws-cde63a58-rehearsal-local-test",
+    "--rehearse"
+  ],
+  "environmentKeys": [
+    "DATABASE_URL (own local fixture)"
+  ],
+  "exitCode": 1,
+  "stdout": "",
+  "stderr": "/private/tmp/academy-operator-rehearsal-cde63a58/academy-web/node_modules/pg/lib/client.js:652\n          Error.captureStackTrace(err)\n                ^\n\nerror: bind message supplies 2 parameters, but prepared statement \"\" requires 3\n    at /private/tmp/academy-operator-rehearsal-cde63a58/academy-web/node_modules/pg/lib/client.js:652:17\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async latestAudit (file:///private/tmp/academy-operator-rehearsal-cde63a58/academy-web/scripts/manage-staff-role.mjs:48:18)\n    at async rehearseMutation (file:///private/tmp/academy-operator-rehearsal-cde63a58/academy-web/scripts/admin-rehearsal.mjs:22:23)\n    at async main (file:///private/tmp/academy-operator-rehearsal-cde63a58/academy-web/scripts/manage-staff-role.mjs:92:7)\n    at async file:///private/tmp/academy-operator-rehearsal-cde63a58/academy-web/scripts/manage-staff-role.mjs:131:3 {\n  length: 137,\n  severity: 'ERROR',\n  code: '08P01',\n  detail: undefined,\n  hint: undefined,\n  position: undefined,\n  internalPosition: undefined,\n  internalQuery: undefined,\n  where: undefined,\n  schema: undefined,\n  table: undefined,\n  column: undefined,\n  dataType: undefined,\n  constraint: undefined,\n  file: 'postgres.c',\n  line: '1736',\n  routine: 'exec_bind_message'\n}\n\nNode.js v25.5.0\n",
+  "expected": "first owner rehearsal succeeds with unchanged durable rows"
+}

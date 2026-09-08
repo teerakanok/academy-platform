@@ -1,0 +1,66 @@
+{
+  "at": "2026-09-08T05:20:53.070667+00:00",
+  "baselineSource": "fe4220a1850d277d542cd5e30f38360776df4b15 (unchanged operator scripts at proof478acbb)",
+  "expected": "--rehearse must execute mutation and report rollback restoration; inspect-only is insufficient",
+  "harnessExitCode": 1,
+  "results": [
+    {
+      "command": [
+        "node",
+        "scripts/manage-staff-role.mjs",
+        "--enable",
+        "--role",
+        "owner",
+        "--actor-issuer",
+        "https://operator-fixture.invalid/",
+        "--actor-subject",
+        "95000000-0000-4000-8000-000000000001",
+        "--target-issuer",
+        "https://operator-fixture.invalid/",
+        "--target-subject",
+        "95000000-0000-4000-8000-000000000001",
+        "--reference",
+        "ws-cde63a58-rehearsal-local-test",
+        "--rehearse"
+      ],
+      "cwd": "/private/tmp/academy-csp-cde63a58/academy-web",
+      "environmentKeys": [
+        "DATABASE_URL (owned local fixture only)"
+      ],
+      "scriptExitCode": 0,
+      "stdout": "dry_run=true action=enable role=owner actor_authorized=false currently_active=null\n",
+      "stderr": "",
+      "expectedRehearsalObserved": false
+    },
+    {
+      "command": [
+        "node",
+        "scripts/manage-course-entitlement.mjs",
+        "--grant",
+        "--course",
+        "setup-and-environment",
+        "--source",
+        "grant",
+        "--actor-issuer",
+        "https://operator-fixture.invalid/",
+        "--actor-subject",
+        "95000000-0000-4000-8000-000000000001",
+        "--target-issuer",
+        "https://operator-fixture.invalid/",
+        "--target-subject",
+        "95000000-0000-4000-8000-000000000002",
+        "--reference",
+        "ws-cde63a58-rehearsal-local-test",
+        "--rehearse"
+      ],
+      "cwd": "/private/tmp/academy-csp-cde63a58/academy-web",
+      "environmentKeys": [
+        "DATABASE_URL (owned local fixture only)"
+      ],
+      "scriptExitCode": 0,
+      "stdout": "dry_run=true action=grant actor_authorized=false active=false course=setup-and-environment target_account=95000000-0000-4000-8000-000000000012\n",
+      "stderr": "",
+      "expectedRehearsalObserved": false
+    }
+  ]
+}

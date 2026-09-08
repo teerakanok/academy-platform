@@ -1,0 +1,62 @@
+[
+  {
+    "file": "academy-operator-root-causal-red-r1.json",
+    "sha256": "1e769e6340238ffa7d2cb0e7d351395c6bf0a9d724aca51edcd6f834b57a7922"
+  },
+  {
+    "file": "academy-operator-candidate-first-owner-red-r1.json",
+    "sha256": "48c3953d01e0ca180fc0a96563d8c5384daab6ba8495099b501fb84ad81bd338"
+  },
+  {
+    "file": "academy-operator-candidate-first-owner-red-r2.json",
+    "sha256": "9159ac11445c351665ee020072ad66208f017e5aee364f06e3c9efe9662a16db"
+  },
+  {
+    "file": "academy-operator-controller-correction-route-r1.json",
+    "sha256": "dbe8bb9360df580e0167fad878603d8d559b2ac20a25319b9f1efad8cf86688a"
+  },
+  {
+    "file": "academy-operator-controller-unit-red-r1.json",
+    "sha256": "3ed4f8d243fb8249040a8ac96c87dac375b322a8e78e7fe3b9818125d1e25943"
+  },
+  {
+    "file": "academy-operator-controller-unit-green-r1.json",
+    "sha256": "752bc4ec8748300a308c4f45ad913ec46ba21dbc9e7b681d8d932463725563c5"
+  },
+  {
+    "file": "academy-operator-rehearsal-review-manifest-r2.json",
+    "sha256": "65310f0ec760614401840d83a5aadcd0aa22867f33069b15c9796c267a28c029"
+  },
+  {
+    "file": "academy-operator-real-postgres-acceptance-r1.json",
+    "sha256": "5a04d62dfe6b610378a455b209d03a26e1006416850f190006e40cccb0ba44e9"
+  },
+  {
+    "file": "academy-operator-real-postgres-denial-r1.json",
+    "sha256": "fef4fe57c16a4a17814edce0ee85137f63e9a29a74f4cd1700425d9afc3da435"
+  },
+  {
+    "file": "academy-operator-root-unit-r1.json",
+    "sha256": "2c94e897ac7ece479c21e1ceabddecf1f667df4951376a2896294944780387a2"
+  },
+  {
+    "file": "academy-operator-root-lint-r1.json",
+    "sha256": "4a0cf7aaf74f4056916978cedd71b113f6cfb7376f20e3063cad5396bf08dc53"
+  },
+  {
+    "file": "academy-operator-audit-seam-local-r1.json",
+    "sha256": "fc70399f4672e779fb316306abf810cbd6f8402197d1abdad1291f5c67358997"
+  },
+  {
+    "file": "academy-operator-rehearsal-independent-review-r1.md",
+    "sha256": "095276624596a0061a81d4463e2f8ebbb1b33605a61ee1efde768b623b33497c"
+  },
+  {
+    "file": "academy-owner-operator-readiness-r1.json",
+    "sha256": "6852e4f2ef25917a7da092d3d493f5164a1f125352d9da8ba15deadaafdfc523"
+  },
+  {
+    "file": "academy-dedicated-operator-refusal-r1.json",
+    "sha256": "6f0a9f058aaa19f96f4fd931d0b8ffa32e96cdab1e8919125aec0d85f653e743"
+  }
+]

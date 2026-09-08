@@ -1,0 +1,15 @@
+{
+  "at": "2026-09-08T05:28:56.494555+00:00",
+  "command": [
+    "npx",
+    "vitest",
+    "run",
+    "--project",
+    "unit",
+    "tests/unit/admin-rehearsal-scripts.test.ts"
+  ],
+  "cwd": "/private/tmp/academy-operator-rehearsal-cde63a58/academy-web",
+  "exitCode": 0,
+  "logSha256": "af6567e1d4449bf9b907e4fe813209fe3a24ecc2472d4f8d347e12218948381c",
+  "output": "\n RUN  v3.2.7 /private/tmp/academy-operator-rehearsal-cde63a58/academy-web\n\n \u2713 |unit| tests/unit/admin-rehearsal-scripts.test.ts (6 tests) 7ms\n\n Test Files  1 passed (1)\n      Tests  6 passed (6)\n   Start at  12:28:55\n   Duration  618ms (transform 46ms, setup 0ms, collect 59ms, tests 7ms, environment 0ms, prepare 69ms)\n\n"
+}
