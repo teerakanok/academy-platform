@@ -254,6 +254,136 @@ describe('Academy Identity lifecycle runtime enforcement', () => {
     expect(profile.rows[0].email).toBe('new@example.com')
   })
 
+  it('lets the effective runtime activate profiles while denying direct authorization writes', async () => {
+    const runtime = new Client({ connectionString: databaseUrl })
+    await runtime.connect()
+    try {
+      await commitUnderLease(null, 'runtime-effective', [
+        readyProjection('runtime-effective-subject', 'active', 1),
+        readyProjection('runtime-canonical-subject', 'active', 1),
+      ])
+      await runtime.query('set role academy_runtime')
+
+      await expect(runtime.query(`
+        select academy.commit_identity_profile_activation(
+          $1, $2, $3, 'active', 1
+        ) as account_id
+      `, [ISSUER, 'runtime-unobserved-subject', 'runtime-unobserved@example.com']))
+        .rejects.toThrow(/canonical Identity principal is not active/)
+      await runtime.query('rollback')
+
+      const activated = await runtime.query(`
+        select academy.commit_identity_profile_activation(
+          $1, $2, $3, 'active', 1
+        ) as account_id
+      `, [ISSUER, 'runtime-effective-subject', 'runtime-effective@example.com'])
+      const accountId = activated.rows[0].account_id as string
+
+      await expect(runtime.query(`
+        select academy.commit_identity_profile_activation(
+          $1, $2, $3, 'suspended', 1
+        ) as account_id
+      `, [ISSUER, 'runtime-effective-subject', 'runtime-effective@example.com']))
+        .rejects.toThrow(/activation revision conflict/)
+      await runtime.query('rollback')
+
+      const promoted = await runtime.query(`
+        select academy.commit_identity_profile_activation(
+          $1, $2, $3, 'suspended', 2
+        ) as account_id
+      `, [ISSUER, 'runtime-effective-subject', 'runtime-effective@example.com'])
+      expect(promoted.rows[0].account_id).toBe(accountId)
+      expect(await activation(accountId)).toEqual({ status: 'suspended', revision: 2 })
+
+      const canonical = await runtime.query(`
+        select academy.commit_identity_profile_activation(
+          $1, $2, $3, 'active', 1
+        ) as account_id
+      `, [ISSUER, 'runtime-canonical-subject', 'runtime-effective@example.com'])
+      expect(canonical.rows[0].account_id).not.toBe(accountId)
+      const mapped = await admin.query(`
+        select subject, email from academy.users
+        where issuer = $1 and subject = any($2)
+        order by subject
+      `, [ISSUER, ['runtime-canonical-subject', 'runtime-effective-subject']])
+      expect(mapped.rows).toEqual([
+        { subject: 'runtime-canonical-subject', email: 'runtime-effective@example.com' },
+        { subject: 'runtime-effective-subject', email: 'runtime-effective@example.com' },
+      ])
+
+      await expect(runtime.query(`
+        insert into academy.service_activation (user_id, status, revision)
+        values ($1, 'suspended', 2)
+      `, [accountId])).rejects.toThrow(/permission denied for table service_activation/i)
+      await runtime.query('rollback')
+
+      const boundary = await runtime.query(`
+        select
+          has_table_privilege(current_user, 'academy.service_activation', 'insert') as activation_insert,
+          has_table_privilege(current_user, 'academy.service_activation', 'update') as activation_update,
+          has_table_privilege(current_user, 'academy.course_entitlement', 'insert') as entitlement_insert,
+          has_table_privilege(current_user, 'academy.course_entitlement', 'update') as entitlement_update,
+          has_function_privilege(current_user, 'academy.sync_service_activation(uuid,text,integer)', 'execute') as sync_execute
+      `)
+      expect(boundary.rows[0]).toEqual({
+        activation_insert: false,
+        activation_update: false,
+        entitlement_insert: false,
+        entitlement_update: false,
+        sync_execute: true,
+      })
+
+      const definition = await admin.query(`
+        select
+          owner.rolname as owner,
+          function_definition.prosecdef as security_definer,
+          array_to_string(function_definition.proconfig, ',') as configuration
+        from pg_proc function_definition
+        join pg_roles owner on owner.oid = function_definition.proowner
+        where function_definition.oid =
+          'academy.sync_service_activation(uuid,text,integer)'::regprocedure
+      `)
+      expect(definition.rows[0]).toEqual({
+        owner: 'academy_activation_writer',
+        security_definer: true,
+        configuration: 'search_path=pg_catalog, academy',
+      })
+
+      const writerBoundary = await admin.query(`
+        select
+          has_table_privilege('academy_activation_writer', 'academy.service_activation', 'select') as activation_select,
+          has_table_privilege('academy_activation_writer', 'academy.service_activation', 'insert') as activation_insert,
+          has_table_privilege('academy_activation_writer', 'academy.service_activation', 'update') as activation_update,
+          has_table_privilege('academy_activation_writer', 'academy.service_activation', 'delete') as activation_delete,
+          has_table_privilege('academy_activation_writer', 'academy.course_entitlement', 'insert') as entitlement_insert,
+          has_table_privilege('academy_activation_writer', 'academy.staff_role_assignment', 'insert') as staff_insert
+      `)
+      expect(writerBoundary.rows[0]).toEqual({
+        activation_select: true,
+        activation_insert: true,
+        activation_update: true,
+        activation_delete: false,
+        entitlement_insert: false,
+        staff_insert: false,
+      })
+
+      const sharedRoles = await admin.query(`
+        select
+          has_function_privilege('service_role', 'academy.sync_service_activation(uuid,text,integer)', 'execute') as service_execute,
+          has_function_privilege('academy_entitlement_operator', 'academy.sync_service_activation(uuid,text,integer)', 'execute') as operator_execute,
+          has_function_privilege('academy_staff_admin', 'academy.sync_service_activation(uuid,text,integer)', 'execute') as staff_execute
+      `)
+      expect(sharedRoles.rows[0]).toEqual({
+        service_execute: false,
+        operator_execute: false,
+        staff_execute: false,
+      })
+    } finally {
+      await runtime.query('reset role').catch(() => undefined)
+      await runtime.end()
+    }
+  })
+
   it('pauses active grants on an unapproved config revision while applying revocations', async () => {
     const pausedId = await activate('config-active-subject', 'active@example.com')
     const revokedId = await activate('config-disabled-subject', 'disabled@example.com')
