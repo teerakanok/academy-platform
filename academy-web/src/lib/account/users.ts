@@ -128,8 +128,13 @@ export async function findActiveUser(claims: IdentityClaims): Promise<AcademyUse
     .maybeSingle()
   if (existing.error || !existing.data) return null
 
-  const activation = existing.data.service_activation
-  if (!Array.isArray(activation) || activation.length !== 1 || activation[0]?.status !== 'active') {
+  const activation: unknown = existing.data.service_activation
+  const activationRecord = Array.isArray(activation)
+    ? (activation.length === 1 ? activation[0] : null)
+    : activation
+  if (!activationRecord
+    || typeof activationRecord !== 'object'
+    || (activationRecord as { status?: unknown }).status !== 'active') {
     return null
   }
   return toUser(existing.data)
