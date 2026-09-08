@@ -1,0 +1,20 @@
+{
+  "at": "2026-09-08T04:42:01.190420+00:00",
+  "command": [
+    "node",
+    "node_modules/wrangler/bin/wrangler.js",
+    "versions",
+    "deploy",
+    "8318899f-74ef-4223-8603-5f6508a5d2d4@100",
+    "3830694b-bca9-4035-8bd0-e853ee6dd1fa@0",
+    "--name",
+    "cyberskills-academy",
+    "--message",
+    "candidate-smoke;s=fe4220a1850d277d542cd5e30f38360776df4b15",
+    "--yes"
+  ],
+  "beforeDeployment": "39ca67fd-02b7-4b46-b6bf-9faba4acf2d5",
+  "exitCode": 0,
+  "outputSha256": "ea60a72ed729826003b64e0e40cd2f5d1c003c94d6c09fbe7f1eec566ab295ce",
+  "output": "\n \u26c5\ufe0f wrangler 4.120.0 (update available 4.129.1)\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\u256d Deploy Worker Versions by splitting traffic between multiple versions\n\u2502\n\u251c Fetching latest deployment\n\u2502\n\u251c Your current deployment has 1 version(s):\n\u2502\n\u2502 (100%) 8318899f-74ef-4223-8603-5f6508a5d2d4\n\u2502       Created:  2026-09-07T22:03:22.24823Z\n\u2502           Tag:  release-4116b0ebc4e2\n\u2502       Message:  s=4116b0ebc4e2eab1195b0e3cc644cb73c0795b9b;nonce-csp-single-policy\n\u2502\n\u251c Fetching versions\n\u2502\n\u251c Which version(s) do you want to deploy?\n\u251c 2 Worker Version(s) selected\n\u2502\n\u251c     Worker Version 1:  8318899f-74ef-4223-8603-5f6508a5d2d4\n\u2502              Created:  2026-09-07T22:03:22.24823Z\n\u2502                  Tag:  release-4116b0ebc4e2\n\u2502              Message:  s=4116b0ebc4e2eab1195b0e3cc644cb73c0795b9b;nonce-csp-single-policy\n\u2502\n\u251c     Worker Version 2:  3830694b-bca9-4035-8bd0-e853ee6dd1fa\n\u2502              Created:  2026-09-08T04:40:45.366109Z\n\u2502                  Tag:  release-fe4220a1850d\n\u2502              Message:  s=fe4220a1850d277d542cd5e30f38360776df4b15;active-user-response-shape\n\u2502\n\u251c\u200aWhat percentage of traffic should Worker Version 1 receive?\n\u251c\u200a100% of traffic\n\u251c\n\u251c\u200aWhat percentage of traffic should Worker Version 2 receive?\n\u251c\u200a0% of traffic\n\u251c\n\u251c Add a deployment message\n\u2502 Deployment message candidate-smoke;s=fe4220a1850d277d542cd5e30f38360776df4b15\n\u2502\n\u251c Deploying 2 version(s)\n\u2502\n\u251c Syncing non-versioned settings\n\u2502\n\u2502 Synced non-versioned settings:\n\u2502                      logpush:  false\n\u2502                observability:  enabled:             true\n\u2502                                head_sampling_rate:  1\n\u2502               tail_consumers:  <skipped>\n\u2502     streaming_tail_consumers:  <skipped>\n\u2502\n\u2570\u200a SUCCESS \u200aDeployed cyberskills-academy version 8318899f-74ef-4223-8603-5f6508a5d2d4 at 100% and version 3830694b-bca9-4035-8bd0-e853ee6dd1fa at 0% (4.63 sec)\n"
+}

@@ -1,0 +1,12 @@
+{
+  "at": "2026-09-08T04:36:55.834670+00:00",
+  "command": [
+    "npx",
+    "tsc",
+    "-p",
+    "tsconfig.worker.json"
+  ],
+  "exitCode": 0,
+  "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "tail": ""
+}

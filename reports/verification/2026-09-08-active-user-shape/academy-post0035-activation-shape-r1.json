@@ -1,0 +1,16 @@
+{
+  "at": "2026-09-08T04:25:47.687129+00:00",
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "root@ssh-db.cyberskills.co.th",
+    "python3 -"
+  ],
+  "remoteScript": "import subprocess,json,time,base64,hmac,hashlib,urllib.request\ntry:\n data=json.loads(subprocess.run(['docker','inspect','academy-data-api'],capture_output=True,check=True).stdout)\n env=dict(x.split('=',1) for x in data[0]['Config']['Env'] if '=' in x)\n secret=env['PGRST_JWT_SECRET'];now=int(time.time());b64=lambda x:base64.urlsafe_b64encode(x).decode().rstrip('=')\n signed=b64(json.dumps({'alg':'HS256','typ':'JWT'}).encode())+'.'+b64(json.dumps({'aud':'academy-data-api','role':'academy_runtime','iat':now,'exp':now+30}).encode())\n token=signed+'.'+b64(hmac.new(secret.encode(),signed.encode(),hashlib.sha256).digest())\n req=urllib.request.Request('http://127.0.0.1:50600/users?select=service_activation(status)&limit=1',headers={'Authorization':'Bearer '+token,'Accept-Profile':'academy'})\n with urllib.request.urlopen(req,timeout=10) as response:\n  rows=json.load(response);a=rows[0].get('service_activation') if rows else None\n  print(json.dumps({'httpStatus':response.status,'rows':len(rows),'activationShape':'array' if isinstance(a,list) else 'object' if isinstance(a,dict) else 'null','activationStatus':a.get('status') if isinstance(a,dict) else None,'secretsPrinted':False,'queryProjection':'service_activation(status) only; one row; no identifiers/email'}))\nexcept Exception:\n print(json.dumps({'probe':'FAILED','detailSuppressed':True}));raise SystemExit(1)\n",
+  "exitCode": 0,
+  "stdout": "{\"httpStatus\": 200, \"rows\": 1, \"activationShape\": \"object\", \"activationStatus\": \"active\", \"secretsPrinted\": false, \"queryProjection\": \"service_activation(status) only; one row; no identifiers/email\"}\n",
+  "stderrBytes": 0
+}

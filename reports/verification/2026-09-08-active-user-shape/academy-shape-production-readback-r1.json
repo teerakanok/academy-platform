@@ -1,0 +1,24 @@
+{
+  "at": "2026-09-08T04:52:15.374126+00:00",
+  "command": [
+    "node",
+    "node_modules/wrangler/bin/wrangler.js",
+    "deployments",
+    "list",
+    "--name",
+    "cyberskills-academy",
+    "--json"
+  ],
+  "exitCode": 0,
+  "deployment": {
+    "id": "3ecc5f51-2c30-4ce1-86c9-cdd2fb076b1a",
+    "created_on": "2026-09-08T04:51:42.589531Z",
+    "versions": [
+      {
+        "version_id": "3830694b-bca9-4035-8bd0-e853ee6dd1fa",
+        "percentage": 100
+      }
+    ]
+  },
+  "pass": true
+}

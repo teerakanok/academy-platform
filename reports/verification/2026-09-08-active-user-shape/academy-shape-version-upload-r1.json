@@ -1,0 +1,21 @@
+{
+  "at": "2026-09-08T04:40:49.372588+00:00",
+  "command": [
+    "node",
+    "node_modules/wrangler/bin/wrangler.js",
+    "versions",
+    "upload",
+    "--name",
+    "cyberskills-academy",
+    "--keep-vars",
+    "--tag",
+    "release-fe4220a1850d",
+    "--message",
+    "s=fe4220a1850d277d542cd5e30f38360776df4b15;active-user-response-shape"
+  ],
+  "source": "fe4220a1850d277d542cd5e30f38360776df4b15",
+  "exitCode": 0,
+  "version": "3830694b-bca9-4035-8bd0-e853ee6dd1fa",
+  "outputSha256": "142bdb05d13294f1482861443536636f42f94b533205ced0eefcddfb9ed69e67",
+  "safeTail": "\n \u26c5\ufe0f wrangler 4.120.0 (update available 4.129.1)\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\ud83c\udf00 Building list of assets...\n\u2728 Read 228 files from the assets directory /private/tmp/academy-csp-cde63a58/academy-web/.open-next/assets\n\ud83c\udf00 Starting asset upload...\n\ud83c\udf00 Found 3 new or modified static assets to upload. Proceeding with upload...\n+ /BUILD_ID\n+ /cdn-cgi/_next_cache/OAMybS7qYjZ3sFI_y76Pu/500.cache\n+ /cdn-cgi/_next_cache/OAMybS7qYjZ3sFI_y76Pu/_not-found.cache\nUploaded 1 of 3 assets\nUploaded 2 of 3 assets\nUploaded 3 of 3 assets\n\u2728 Success! Uploaded 3 files (140 already uploaded) (2.20 sec)\n\nTotal Upload: 14686.23 KiB / gzip: 3353.63 KiB\nWorker Startup Time: 33 ms\nYour Worker has access to the following bindings:\nBinding                                                          Resource                  \nenv.EDGE_RATE_LIMITER [value omitted]\nenv.COURSE_MEDIA [value omitted]\nenv.ASSETS                                                       Assets                    \nenv.NEXT_PUBLIC_SEARCH_INDEXING [value omitted]\n\nUploaded cyberskills-academy (18.25 sec)\nWorker Version ID: 3830694b-bca9-4035-8bd0-e853ee6dd1fa\n\nTo deploy this version to production traffic use the command wrangler versions deploy\n\nChanges to non-versioned settings (config properties 'logpush' or 'tail_consumers') take effect after your next deployment using the command wrangler versions deploy\n\nChanges to triggers (routes, custom domains, cron schedules, etc) must be applied with the command wrangler triggers deploy\n\n"
+}
