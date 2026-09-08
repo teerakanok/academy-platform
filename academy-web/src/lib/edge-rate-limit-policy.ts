@@ -8,6 +8,9 @@ export type EdgeRateLimitOperation =
   | 'unsubscribe'
   | 'otp'
   | 'verify'
+  | 'learner-progress'
+  | 'learner-reset'
+  | 'learner-simulation'
   | 'identity-start-get'
   | 'identity-start-post'
   | 'identity-callback-get'
@@ -257,6 +260,35 @@ export async function edgeRateLimitTargetObjectName({
     encoder.encode(`academy-target:${operation}:${normalizedTarget}`),
   )
   return `v1:target:${operation}:${base64Url(signature)}`
+}
+
+export async function edgeRateLimitAuthenticatedObjectName({
+  operation,
+  scope,
+  identity,
+  secret,
+}: {
+  operation: EdgeRateLimitOperation
+  scope: 'account' | 'account-course'
+  identity: string
+  secret: string
+}): Promise<string | null> {
+  const normalizedIdentity = identity.trim()
+  if (!normalizedIdentity || normalizedIdentity.length > 320) return null
+  const encoder = new TextEncoder()
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  )
+  const signature = await crypto.subtle.sign(
+    'HMAC',
+    key,
+    encoder.encode(`academy-authenticated:${operation}:${scope}:${normalizedIdentity}`),
+  )
+  return `v1:authenticated:${operation}:${scope}:${base64Url(signature)}`
 }
 
 export async function edgeRateLimitGlobalObjectName({

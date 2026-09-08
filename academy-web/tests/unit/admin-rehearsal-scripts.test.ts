@@ -35,7 +35,7 @@ function entitlementArguments(overrides: string[] = []) {
 
 type Query = { sql: string; values?: unknown[] }
 
-function fakeClient(handlers: Array<(query: Query) => unknown>) {
+function fakeClient(handlers: Array<(query: Query) => Record<string, unknown>[]>) {
   const calls: Query[] = []
   const connections = { connect: 0, end: 0 }
   let handlerIndex = 0

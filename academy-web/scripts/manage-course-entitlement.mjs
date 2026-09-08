@@ -108,6 +108,14 @@ async function main() {
   await runMain({ argv: process.argv.slice(2), environment: process.env })
 }
 
+/**
+ * Dependencies expose only the database operations used by this command.
+ * @param {{ argv?: string[], environment?: { DATABASE_URL?: string },
+ *   createClient?: (connectionString: string) => {
+ *     connect: () => Promise<void>, end: () => Promise<void>,
+ *     query: (sql: string, values?: unknown[]) => Promise<{ rows: Record<string, unknown>[], rowCount: number | null }>
+ *   }, output?: (line: string) => void }} [dependencies]
+ */
 export async function runMain({
   argv = process.argv.slice(2),
   environment = process.env,

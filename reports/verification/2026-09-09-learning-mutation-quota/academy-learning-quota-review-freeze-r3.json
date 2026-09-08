@@ -1,0 +1,59 @@
+{
+  "repo": "/private/tmp/academy-learning-quota-cde63a58",
+  "base": "31c44d07b25a8100548c16eb7314b3b881d809b2",
+  "files": [
+    {
+      "path": "academy-web/docs/edge-rate-limit.md",
+      "sha256": "0b83cff5d877c7abc2a3127d7f6be5d1adc039ea6551b2ce9ed5125e13695411"
+    },
+    {
+      "path": "academy-web/scripts/workerd-signer-check.mjs",
+      "sha256": "5f93f25beee9ac174158b4a7667ebae6c204231ccd5d70340c55d2dda993716b"
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/practice/simulation/route.ts",
+      "sha256": "104f24c8d435a1c004b2b08d8a03efc7e1c3588a3fa12883a03b9f2c05cc75ea"
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/progress/reset/route.ts",
+      "sha256": "f96dd01625d8d3f649d3e78c46bc411a8bb153e8ad3b3d56037318201077dd6c"
+    },
+    {
+      "path": "academy-web/src/app/(site)/api/progress/route.ts",
+      "sha256": "d5381aeddff3b6ffcc2c04f644ebbe97a4fafca629d3b343a73950bbefcbd226"
+    },
+    {
+      "path": "academy-web/src/lib/edge-rate-limit-policy.ts",
+      "sha256": "7cc0b16f1fc966e8079da0d6fcfad10eebf34c2b3044282ef87a2af0260d23c5"
+    },
+    {
+      "path": "academy-web/src/lib/authenticated-mutation-quota.ts",
+      "sha256": "62bfa533d54eb4b667dd56b53269cecc549d858d7aeb664a5942dc8112fdcbe6"
+    },
+    {
+      "path": "academy-web/tests/unit/authenticated-mutation-quota-route.test.ts",
+      "sha256": "cb45ac483d8f7913d71d20682a7c21aa7abadbc50d090b8949a59ef5f349fd6b"
+    },
+    {
+      "path": "academy-web/tests/workerd/authenticated-mutation-quota-worker.ts",
+      "sha256": "3fa79879158f7987d58560a6c8bb38d7bc55e9ba8cb85ecfe4635aef4d4c8992"
+    },
+    {
+      "path": "academy-web/tests/workerd/signer-worker.ts",
+      "sha256": "db4daacb37bab7fc483081237f763ff8c7d3efd3516231adcec794909567be03"
+    },
+    {
+      "path": "academy-web/tsconfig.json",
+      "sha256": "b5088041ca988c42f78ec329b5daa19eb104a7470bbd41429e6896ad0a44b7ae"
+    },
+    {
+      "path": "academy-web/tsconfig.worker.json",
+      "sha256": "ed012ba569172b6d29e858436aa7b50f3b7386fcf90ac7e28c586569934ec5be"
+    },
+    {
+      "path": "reports/security/2026-09-05-security-review-checklist.md",
+      "sha256": "053691e84bac0c1564d6ad7e8d02bc783d9a1c1b18bc3eea02f573f88a96e9e6"
+    }
+  ],
+  "seed_patch_sha256": "bc97c50b5a91d7f6d83fa37d7a1c7e239a9342775dd4bb7e8e4e1e6575aeab7b"
+}

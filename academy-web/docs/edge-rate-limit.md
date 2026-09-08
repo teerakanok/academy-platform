@@ -13,6 +13,11 @@ Academy protects these public mutations before OpenNext runs:
 | `GET /auth/callback` | 10 / 60 seconds | — | 600 / 60 seconds |
 
 The outer Worker uses `cf-connecting-ip`, never client-supplied `X-Forwarded-For`.
+After OpenNext authenticates a learner, the progress, reset, and simulation/grading
+routes apply a second quota layer through `getCloudflareContext().env` and the same
+`EDGE_RATE_LIMITER` Durable Object binding. The account key comes only from the
+authenticated `currentUser()` account ID; the course key comes from a validated course
+slug. Client headers and body fields cannot select the account.
 IPv6 actors aggregate to their /64; IPv4 addresses remain /128; malformed
 addresses fail closed. For routes with an actual recipient or unsubscribe
 target, the Worker reads that field from a request clone through a bounded
@@ -36,6 +41,15 @@ Identity routes verify the resulting signed marker inside OpenNext before any
 authorization transaction or code exchange; missing or forged markers fail closed.
 Explicit loopback fixtures may bypass only after their separate flag plus host
 fixture gate passes; production never has that bypass.
+
+Authenticated learner quotas use separate opaque account and account-course object
+names. Progress allows 120 requests/account/minute and 60/account-course/minute;
+Practice grading allows 60/account/minute and 30/account-course/minute, half the
+progress budgets while admitting a 30-request learner burst. Destructive
+reset is tighter at 6/account/hour and 3/account-course/hour. These ceilings cover
+ordinary UI bursts while bounding authenticated authorization, database, and grading
+work. A missing binding or secret, malformed authenticated identity, or Durable Object
+failure returns 503 before entitlement checks or the protected mutation.
 
 This remains Durable Object coordination per opaque scope-route pair, not an
 in-memory fallback. Counters remain consistent across Academy Worker instances.

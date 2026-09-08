@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { currentUser } from '@/lib/auth/session'
+import { checkAuthenticatedMutationQuota } from '@/lib/authenticated-mutation-quota'
 import { getCourseStructure } from '@/lib/content/course-source'
 import { getLessonAnswerKey } from '@/lib/content/answer-key'
 import { readBoundedJson } from '@/lib/http/bounded-body'
@@ -44,6 +45,16 @@ const schema = z.object({
 /** ขนาด body สูงสุดที่ยอมอ่าน (byte จริง) — กันการยัด JSON ก้อนใหญ่ให้ parser ทำงานฟรี */
 const MAX_BODY_BYTES = 8 * 1024
 
+function quotaResponse(quota: Awaited<ReturnType<typeof checkAuthenticatedMutationQuota>>) {
+  if (quota.allowed) throw new Error('allowed quota cannot become a response')
+  const headers: Record<string, string> = { 'cache-control': 'no-store' }
+  if (quota.status === 429) headers['retry-after'] = String(quota.retryAfterSeconds)
+  return NextResponse.json(
+    { ok: false, error: quota.status === 429 ? 'ส่งคำขอถี่เกินไป โปรดลองอีกครั้งตามเวลาที่แจ้ง' : 'ระบบยังไม่พร้อมใช้งานชั่วคราว' },
+    { status: quota.status, headers },
+  )
+}
+
 export async function POST(request: Request) {
   const mutation = validateMutationRequest(request, { requireJson: true })
   if (!mutation.ok) {
@@ -73,6 +84,13 @@ export async function POST(request: Request) {
   if (!structure || !node) {
     return NextResponse.json({ ok: false, error: 'ไม่พบบทเรียนนี้' }, { status: 404 })
   }
+
+  const quota = await checkAuthenticatedMutationQuota({
+    operation: 'learner-simulation',
+    accountId: user.account.id,
+    courseSlug: input.slug,
+  })
+  if (!quota.allowed) return quotaResponse(quota)
 
   const access = await authorizeCourseResource(user.account.id, input.slug, input.nodeId)
   if (!access.allowed) {

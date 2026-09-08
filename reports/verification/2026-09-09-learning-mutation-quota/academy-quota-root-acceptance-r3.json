@@ -1,0 +1,31 @@
+{
+  "build_command": "npm run build:cf",
+  "cwd": "/private/tmp/academy-learning-quota-cde63a58/academy-web",
+  "node": "24.18.0",
+  "tool_session": 6494,
+  "exit": 0,
+  "observed": [
+    "workerd14/14",
+    "Next65/65pages",
+    "OpenNext build complete",
+    "cache64",
+    "assetguardPASS",
+    "finalWorker realworkerd rawhost404 outboundblocked"
+  ],
+  "raw_log_retained": false,
+  "unit": {
+    "log": "academy-quota-correction-unit-r3.log",
+    "exit": 0,
+    "passed": 2474,
+    "skipped": 2,
+    "sha256": "39a367569b19e0f2e9ce446a04ae719eb9d3ab1111809eba51a560cf17f2aa13"
+  },
+  "lint": {
+    "log": "academy-quota-correction-lint-r3.log",
+    "exit": 1,
+    "baseline_errors": 3,
+    "warnings": 17,
+    "sha256": "7fbda2d64a84dd3a3fe4a7294b1d5b27aed7892b773e5183f60e0e7a2c106b3d"
+  },
+  "production_deployed": false
+}

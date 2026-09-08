@@ -70,6 +70,7 @@ if (process.env.ACADEMY_SKIP_WORKERD_CHECK === '1') {
 }
 
 const REQUIRED_CHECKS = [
+  'authenticated-mutation-quota-durable-binding',
   'code-exchange-fetch-init-accepted-by-workerd',
   'edge-rate-limit-enforces-and-signs',
   'cryptokey-introspection-shape',

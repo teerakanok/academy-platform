@@ -19,6 +19,7 @@ import { MEDIA_DELIVERY_COOKIE } from '../../src/lib/media/cookie'
 import { servePrivateMedia } from '../../src/lib/media/worker-delivery'
 import { enforceEdgeRateLimit } from '../../src/lib/edge-rate-limit-enforcement'
 import { hasEdgeRateLimitMarker } from '../../src/lib/edge-rate-limit-policy'
+import { checkAuthenticatedMutationQuota } from '../../src/lib/authenticated-mutation-quota'
 import { EdgeRateLimiter } from '../../worker/edge-rate-limiter-do'
 
 export { EdgeRateLimiter }
@@ -41,6 +42,7 @@ const handler = {
     SIGNER_CHECK_NONCE?: string
     COURSE_MEDIA?: HarnessBucket
     EDGE_RATE_LIMITER?: DurableObjectNamespace<EdgeRateLimiter>
+    RATE_LIMIT_KEY_SECRET?: string
   }): Promise<Response> {
     const nonce = env?.SIGNER_CHECK_NONCE ?? ''
     const checks: Check[] = []
@@ -77,8 +79,10 @@ const handler = {
     await record('edge-rate-limiter-durable-counters', async () => {
       const namespace = env?.EDGE_RATE_LIMITER
       if (!namespace) throw new Error('missing EDGE_RATE_LIMITER binding')
-      const limiter = namespace.getByName('workerd-admission-actor-check')
-      const targetLimiter = namespace.getByName('workerd-admission-target-check')
+      // Each harness request owns fresh counters; wrangler can persist DO state across runs.
+      const probeId = crypto.randomUUID()
+      const limiter = namespace.getByName(`workerd-admission-actor-check:${probeId}`)
+      const targetLimiter = namespace.getByName(`workerd-admission-target-check:${probeId}`)
       const rule = { operation: 'leads' as const, limit: 1, windowMs: 60_000 }
       const first = await limiter.check(rule)
       const second = await limiter.check(rule)
@@ -87,6 +91,53 @@ const handler = {
         throw new Error(`actor=${first.allowed}/${second.allowed} target=${target.allowed}`)
       }
       return 'real workerd DO kept actor and target counters independent'
+    })
+
+    await record('authenticated-mutation-quota-durable-binding', async () => {
+      const namespace = env?.EDGE_RATE_LIMITER
+      if (!namespace) throw new Error('missing EDGE_RATE_LIMITER binding')
+      const secretBytes = crypto.getRandomValues(new Uint8Array(32))
+      const secret = Array.from(secretBytes, (byte) => byte.toString(16).padStart(2, '0')).join('')
+      const contextSymbol = Symbol.for('__cloudflare-context__')
+      const globalScope = globalThis as Record<symbol, unknown>
+      const previousContext = globalScope[contextSymbol]
+      globalScope[contextSymbol] = {
+        ctx: {},
+        cf: undefined,
+        env: { EDGE_RATE_LIMITER: namespace, RATE_LIMIT_KEY_SECRET: secret },
+      }
+
+      try {
+        const options = {
+          operation: 'learner-progress' as const,
+          accountId: '01234567-89ab-cdef-89ab-0123456789ab',
+          courseSlug: 'workerd-binding-course',
+        }
+        for (let attempt = 0; attempt < 61; attempt += 1) {
+          const decision = await checkAuthenticatedMutationQuota(options)
+          if (attempt < 60 && !decision.allowed) throw new Error(`premature denial at ${attempt}`)
+          if (attempt === 60) {
+            if (decision.allowed || decision.status !== 429) {
+              throw new Error(`course decision was allowed=${decision.allowed}`)
+            }
+          }
+        }
+        const isolatedAccount = await checkAuthenticatedMutationQuota({
+          ...options,
+          accountId: '01234567-89ab-cdef-89ab-0123456789ac',
+        })
+        if (!isolatedAccount.allowed) throw new Error('account isolation failed')
+        const missingBinding = await checkAuthenticatedMutationQuota({
+          ...options,
+          environment: {},
+        })
+        if (missingBinding.allowed || missingBinding.status !== 503) {
+          throw new Error('missing binding did not fail closed')
+        }
+      } finally {
+        globalScope[contextSymbol] = previousContext
+      }
+      return 'OpenNext context resolved the real DO binding and enforced isolated fail-close quotas'
     })
 
     await record('edge-rate-limit-enforces-and-signs', async () => {

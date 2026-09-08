@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { currentUser } from '@/lib/auth/session'
+import { checkAuthenticatedMutationQuota } from '@/lib/authenticated-mutation-quota'
 import { validateMutationRequest } from '@/lib/http/mutation-security'
 import { deniedAccessStatus, getCourseAccess } from '@/lib/account/course-access'
 import { getCourseStructure } from '@/lib/content/course-source'
@@ -7,6 +8,16 @@ import { loadProgress, loadResetReceipt, resetProgress } from '@/lib/course/prog
 import { safeErrorMessage } from '@/lib/safe-log'
 
 export const runtime = 'nodejs'
+
+function quotaResponse(quota: Awaited<ReturnType<typeof checkAuthenticatedMutationQuota>>) {
+  if (quota.allowed) throw new Error('allowed quota cannot become a response')
+  const headers: Record<string, string> = { 'cache-control': 'no-store' }
+  if (quota.status === 429) headers['retry-after'] = String(quota.retryAfterSeconds)
+  return NextResponse.json(
+    { ok: false, error: quota.status === 429 ? 'ส่งคำขอถี่เกินไป โปรดลองอีกครั้งตามเวลาที่แจ้ง' : 'ระบบยังไม่พร้อมใช้งานชั่วคราว' },
+    { status: quota.status, headers },
+  )
+}
 
 function requestContext(request: Request) {
   const params = new URL(request.url).searchParams
@@ -78,6 +89,13 @@ export async function POST(request: Request) {
   if (!getCourseStructure(slug)) {
     return NextResponse.json({ ok: false, error: 'ไม่พบคอร์สนี้' }, { status: 404 })
   }
+
+  const quota = await checkAuthenticatedMutationQuota({
+    operation: 'learner-reset',
+    accountId: user.account.id,
+    courseSlug: slug,
+  })
+  if (!quota.allowed) return quotaResponse(quota)
 
   const access = await getCourseAccess(user.account.id, slug)
   if (!access.allowed) {
