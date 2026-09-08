@@ -18,3 +18,5 @@ GLM5.3-flash/max work order wo-e00e2245-6882-40a6-8779-09d6a0ed5cfe completed in
 Probe attempts r2/r3 failed before HTTP because of an incorrect working directory. Access token readiness was separately confirmed; r4 used academy-web and passed. Those failures are apparatus errors, not product or credential failures. This repeats an earlier known cwd issue: future reuse must retain the executable's recorded cwd, and credential requests require an actual credential-readiness failure.
 
 Each copied artifact is bound in manifest.json. Temporary full test logs remain in the session records with hashes in the receipts; ordinary artifacts contain no secret values.
+
+At04:57:26UTC, normal Safari GET /api/auth/me returned parsed JSON signedIn=true; only booleans were retained. The browser was returned to Dashboard. Independent bounded SEC-ACADEMY-002 review PASS closes the original auth-gate criterion; checklist Status/Checked on updated2026-09-08. Other journey criteria remain separate.

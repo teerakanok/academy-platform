@@ -82,5 +82,13 @@
   {
     "file": "academy-shape-production-sign-in-en-mobile.png",
     "sha256": "8c52e16adfb82f374c35820431c17537bdedbccb8021a0bfa578193e7c3b62bb"
+  },
+  {
+    "file": "academy-owner-me-production-r1.json",
+    "sha256": "499f516b8d8b4fdb066e6992ad99165e628c7b3725c31346cb0dfd70e2e45bce"
+  },
+  {
+    "file": "academy-sec002-closure-independent-review-r1.md",
+    "sha256": "e24f367090a9c43c73ce40ab1ca3bfa4dd88973e700d36c8cd1ba4c6a41353ae"
   }
 ]
