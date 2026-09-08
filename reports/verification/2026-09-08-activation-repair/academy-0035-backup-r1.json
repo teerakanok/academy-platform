@@ -1,0 +1,16 @@
+{
+  "at": "2026-09-08T04:12:57.772340+00:00",
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "root@ssh-db.cyberskills.co.th",
+    "python3 -"
+  ],
+  "remoteScript": "import pathlib,subprocess,os,hashlib,json\np=pathlib.Path('/root/academy-db-backups/20260908T0413Z-activation-0035-cde63a58');p.mkdir(mode=0o700)\na=p/'academy.dump'\nwith a.open('xb') as f:\n os.chmod(a,0o600)\n result=subprocess.run(['docker','exec','supabase-db','pg_dump','-U','postgres','-d','postgres','-Fc','--schema=academy'],stdout=f,stderr=subprocess.PIPE)\nif result.returncode: raise SystemExit('BACKUP_FAILED_RETAIN_DIRECTORY')\nwith a.open('rb') as f:\n verified=subprocess.run(['docker','exec','-i','supabase-db','pg_restore','--list'],stdin=f,capture_output=True)\nif verified.returncode:raise SystemExit('ARCHIVE_LIST_FAILED_RETAIN_BACKUP')\nx={'backup':str(a),'bytes':a.stat().st_size,'mode':oct(a.stat().st_mode&0o777),'sha256':hashlib.sha256(a.read_bytes()).hexdigest(),'archiveListExit':verified.returncode,'archiveListLines':len(verified.stdout.splitlines()),'dumpExit':result.returncode}\n(p/'receipt.json').write_text(json.dumps(x,indent=2));os.chmod(p/'receipt.json',0o600);print(json.dumps(x))\n",
+  "exitCode": 0,
+  "stdout": "{\"backup\": \"/root/academy-db-backups/20260908T0413Z-activation-0035-cde63a58/academy.dump\", \"bytes\": 271412, \"mode\": \"0o600\", \"sha256\": \"cb7d3cb2f8f59ba908a25ff4d16f97f64014ccc917586f9435bc42307ee3a10f\", \"archiveListExit\": 0, \"archiveListLines\": 372, \"dumpExit\": 0}\n",
+  "stderrBytes": 0
+}

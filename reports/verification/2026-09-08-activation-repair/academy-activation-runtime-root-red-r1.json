@@ -1,0 +1,25 @@
+{
+  "observedAt": "2026-09-08T03:57:08.900920+00:00",
+  "command": [
+    "/private/tmp/postgres-fixture-cde63a58/install/bin/psql",
+    "-X",
+    "-h",
+    "/private/tmp/postgres-fixture-cde63a58/socket",
+    "-p",
+    "65433",
+    "-U",
+    "fixture_owner",
+    "-d",
+    "academy_activation_50505a66b8f0",
+    "-v",
+    "ON_ERROR_STOP=1",
+    "-v",
+    "VERBOSITY=verbose"
+  ],
+  "sql": "BEGIN;\nSET LOCAL statement_timeout='5s';\nSET LOCAL ROLE academy_runtime;\nSELECT academy.commit_identity_profile_activation('https://supabase.cyberskills.co.th/auth/v1','f9a0b7a5-8ea4-4489-8b65-bb019f2a794c','activation-fixture@example.invalid','active',1) IS NOT NULL AS runtime_activation_succeeds;\nROLLBACK;\n",
+  "exitCode": 3,
+  "output": "BEGIN\nSET\nSET\n",
+  "error": "ERROR:  42501: permission denied for table service_activation\nCONTEXT:  SQL statement \"insert into academy.service_activation (user_id, status, revision, synced_at)\n  values (p_user_id, p_status, p_revision, now())\n  on conflict (user_id) do nothing\"\nPL/pgSQL function sync_service_activation(uuid,text,integer) line 9 at SQL statement\nSQL statement \"SELECT academy.sync_service_activation(v_account_id, p_status, p_revision)\"\nPL/pgSQL function commit_identity_profile_activation(text,text,text,text,integer) line 56 at PERFORM\nLOCATION:  aclcheck_error, aclchk.c:2814\n",
+  "productionTouched": false,
+  "rollback": "psql disconnect aborts failed transaction; no commit path"
+}

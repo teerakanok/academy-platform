@@ -1,0 +1,16 @@
+{
+  "at": "2026-09-08T04:19:42.530343+00:00",
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "root@ssh-db.cyberskills.co.th",
+    "docker exec -i supabase-db psql -X -v ON_ERROR_STOP=1 -U supabase_admin -d postgres"
+  ],
+  "sql": "BEGIN READ ONLY; SELECT current_database(),current_user,rolsuper FROM pg_roles WHERE rolname=current_user; ROLLBACK;",
+  "exitCode": 0,
+  "stdout": "BEGIN\n current_database |  current_user  | rolsuper \n------------------+----------------+----------\n postgres         | supabase_admin | t\n(1 row)\n\nROLLBACK\n",
+  "stderrBytes": 0
+}

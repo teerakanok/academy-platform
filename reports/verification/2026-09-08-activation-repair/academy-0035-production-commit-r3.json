@@ -1,0 +1,21 @@
+{
+  "at": "2026-09-08T04:21:54.952563+00:00",
+  "sourceCommit": "22887df",
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "root@ssh-db.cyberskills.co.th",
+    "docker exec -i supabase-db psql -X -v ON_ERROR_STOP=1 -v VERBOSITY=sqlstate -U supabase_admin -d postgres"
+  ],
+  "packet": "academy-0035-commit-r3.sql",
+  "packetSha256": "86e8da83f540857f3e5f407326edf5bb002f34cd9ef4081475ee40fbb1cc0d5e",
+  "exitCode": 0,
+  "stdout": "BEGIN\nSET\nSET\n pg_advisory_xact_lock \n-----------------------\n \n(1 row)\n\nDO\nDO\nALTER ROLE\nGRANT\nGRANT\nCREATE POLICY\nALTER FUNCTION\nALTER FUNCTION\nREVOKE\nGRANT\nDO\nCOMMIT\n        ?column?        \n------------------------\n ACADEMY_0035_COMMITTED\n(1 row)\n\n",
+  "stderr": "",
+  "pass": true
+}

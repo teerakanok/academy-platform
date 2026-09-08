@@ -1,0 +1,20 @@
+{
+  "at": "2026-09-08T04:18:11.957857+00:00",
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "root@ssh-db.cyberskills.co.th",
+    "docker exec -i supabase-db psql -X -v ON_ERROR_STOP=1 -v VERBOSITY=sqlstate -U postgres -d postgres"
+  ],
+  "packet": "academy-0035-rehearse-r3.sql",
+  "packetSha256": "f9bd98eff488f0306277d5671f1879919ec1fa0b15eeb502ef79cc454d83c74d",
+  "exitCode": 3,
+  "stdout": "BEGIN\nSET\nSET\n pg_advisory_xact_lock \n-----------------------\n \n(1 row)\n\n",
+  "stderr": "ERROR:  P0001\n",
+  "pass": false
+}

@@ -1,0 +1,16 @@
+{
+  "at": "2026-09-08T04:07:46.079646+00:00",
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "root@ssh-db.cyberskills.co.th",
+    "docker exec -i supabase-db psql -X -v ON_ERROR_STOP=1 -U postgres -d postgres"
+  ],
+  "sql": "BEGIN READ ONLY; SET LOCAL statement_timeout='5s';\nSELECT current_database(), current_user;\nSELECT owner.rolname AS owner,p.prosecdef,p.proconfig,p.proacl::text,md5(p.prosrc) AS body_md5 FROM pg_proc p JOIN pg_roles owner ON owner.oid=p.proowner WHERE p.oid='academy.sync_service_activation(uuid,text,integer)'::regprocedure;\nSELECT count(*) AS writer_role_collision FROM pg_roles WHERE rolname='academy_activation_writer';\nSELECT count(*) AS policy_collision FROM pg_policy WHERE polrelid='academy.service_activation'::regclass AND polname='academy_service_activation_sync_writer';\nSELECT relrowsecurity,relforcerowsecurity FROM pg_class WHERE oid='academy.service_activation'::regclass;\nROLLBACK;\n",
+  "exitCode": 0,
+  "stdout": "BEGIN\nSET\n current_database | current_user \n------------------+--------------\n postgres         | postgres\n(1 row)\n\n  owner   | prosecdef | proconfig |                      proacl                      |             body_md5             \n----------+-----------+-----------+--------------------------------------------------+----------------------------------\n postgres | f         |           | {postgres=X/postgres,academy_runtime=X/postgres} | cf1feed0de1a4fd0f9480ae07cebc4b9\n(1 row)\n\n writer_role_collision \n-----------------------\n                     0\n(1 row)\n\n policy_collision \n------------------\n                0\n(1 row)\n\n relrowsecurity | relforcerowsecurity \n----------------+---------------------\n t              | f\n(1 row)\n\nROLLBACK\n",
+  "stderrBytes": 0
+}

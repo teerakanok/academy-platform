@@ -1,0 +1,16 @@
+{
+  "at": "2026-09-08T04:23:00.290134+00:00",
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "root@ssh-db.cyberskills.co.th",
+    "docker exec -i supabase-db psql -X -v ON_ERROR_STOP=1 -v VERBOSITY=sqlstate -U supabase_admin -d postgres"
+  ],
+  "sql": "BEGIN READ ONLY; SET LOCAL statement_timeout='5s';\nDO $verify$ BEGIN\nIF NOT EXISTS (SELECT FROM pg_proc WHERE oid='academy.sync_service_activation(uuid,text,integer)'::regprocedure AND proowner='academy_activation_writer'::regrole AND prosecdef AND proconfig=ARRAY['search_path=pg_catalog, academy'] AND md5(prosrc)='cf1feed0de1a4fd0f9480ae07cebc4b9') THEN RAISE EXCEPTION 'function postcondition'; END IF;\nIF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='academy_activation_writer' AND NOT rolcanlogin AND NOT rolinherit AND NOT rolsuper AND NOT rolcreatedb AND NOT rolcreaterole AND NOT rolreplication AND NOT rolbypassrls) THEN RAISE EXCEPTION 'role postcondition'; END IF;\nIF EXISTS (SELECT FROM pg_auth_members WHERE roleid='academy_activation_writer'::regrole OR member='academy_activation_writer'::regrole) THEN RAISE EXCEPTION 'role membership'; END IF;\nIF NOT has_function_privilege('academy_runtime','academy.sync_service_activation(uuid,text,integer)','execute') OR has_function_privilege('service_role','academy.sync_service_activation(uuid,text,integer)','execute') THEN RAISE EXCEPTION 'RPC execute boundary'; END IF;\nIF has_table_privilege('academy_runtime','academy.service_activation','INSERT') OR has_table_privilege('academy_runtime','academy.service_activation','UPDATE') OR has_table_privilege('academy_runtime','academy.course_entitlement','INSERT') OR has_table_privilege('academy_runtime','academy.staff_role_assignment','INSERT') THEN RAISE EXCEPTION 'runtime direct privilege'; END IF;\nIF NOT has_table_privilege('academy_activation_writer','academy.service_activation','SELECT') OR NOT has_table_privilege('academy_activation_writer','academy.service_activation','INSERT') OR NOT has_table_privilege('academy_activation_writer','academy.service_activation','UPDATE') OR has_table_privilege('academy_activation_writer','academy.service_activation','DELETE') OR has_table_privilege('academy_activation_writer','academy.course_entitlement','INSERT') OR has_table_privilege('academy_activation_writer','academy.staff_role_assignment','INSERT') THEN RAISE EXCEPTION 'writer privilege'; END IF;\nIF NOT EXISTS (SELECT FROM pg_policy WHERE polrelid='academy.service_activation'::regclass AND polname='academy_service_activation_sync_writer' AND polroles=ARRAY['academy_activation_writer'::regrole::oid] AND polcmd='*' AND polpermissive AND pg_get_expr(polqual,polrelid)='true' AND pg_get_expr(polwithcheck,polrelid)='true') THEN RAISE EXCEPTION 'writer policy'; END IF;\nIF NOT EXISTS (SELECT FROM pg_class WHERE oid='academy.service_activation'::regclass AND relrowsecurity AND NOT relforcerowsecurity) THEN RAISE EXCEPTION 'activation RLS state drift'; END IF;\nEND $verify$;\nSELECT 'ACADEMY_0035_POSTVERIFY_PASS';\nROLLBACK;\n",
+  "exitCode": 0,
+  "stdout": "BEGIN\nSET\nDO\n           ?column?           \n------------------------------\n ACADEMY_0035_POSTVERIFY_PASS\n(1 row)\n\nROLLBACK\n",
+  "stderr": ""
+}

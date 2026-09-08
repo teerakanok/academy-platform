@@ -1,0 +1,15 @@
+{
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "root@ssh-db.cyberskills.co.th",
+    "docker exec -i supabase-db psql -X -v ON_ERROR_STOP=1 -U postgres -d postgres"
+  ],
+  "sql": "BEGIN READ ONLY; SELECT rolname,rolsuper,rolcreaterole,rolcanlogin FROM pg_roles WHERE rolname IN ('postgres','supabase_admin'); ROLLBACK;",
+  "exitCode": 0,
+  "stdout": "BEGIN\n    rolname     | rolsuper | rolcreaterole | rolcanlogin \n----------------+----------+---------------+-------------\n supabase_admin | t        | t             | t\n postgres       | f        | t             | t\n(2 rows)\n\nROLLBACK\n",
+  "stderrBytes": 0
+}

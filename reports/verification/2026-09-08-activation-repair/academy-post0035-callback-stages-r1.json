@@ -1,0 +1,16 @@
+{
+  "at": "2026-09-08T04:23:47.916025+00:00",
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "root@ssh-db.cyberskills.co.th",
+    "docker exec -i supabase-db psql -X -v ON_ERROR_STOP=1 -U postgres -d postgres"
+  ],
+  "sql": "BEGIN READ ONLY;\nSET LOCAL statement_timeout='5s';\nSELECT current_database() = 'postgres' AS expected_database;\nSELECT coalesce(last_failure_stage,'none') AS failure_stage, count(*) AS transactions,\n count(*) FILTER (WHERE completed_at IS NOT NULL) AS completed,\n count(*) FILTER (WHERE result_issuer IS NOT NULL) AS result_checkpointed,\n max(attempt_count) AS max_attempts\n FROM academy.identity_authorization_transaction\n WHERE created_at >= '2026-09-08 04:21:00+00'::timestamptz\n   AND created_at < '2026-09-08 04:24:00+00'::timestamptz\n GROUP BY last_failure_stage ORDER BY last_failure_stage NULLS FIRST;\nROLLBACK;\n",
+  "exitCode": 0,
+  "stdout": "BEGIN\nSET\n expected_database \n-------------------\n t\n(1 row)\n\n failure_stage | transactions | completed | result_checkpointed | max_attempts \n---------------+--------------+-----------+---------------------+--------------\n none          |            1 |         1 |                   1 |            1\n(1 row)\n\nROLLBACK\n",
+  "stderrBytes": 0
+}

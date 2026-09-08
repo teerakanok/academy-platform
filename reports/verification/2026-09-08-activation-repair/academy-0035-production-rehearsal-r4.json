@@ -1,0 +1,20 @@
+{
+  "at": "2026-09-08T04:21:28.114478+00:00",
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "root@ssh-db.cyberskills.co.th",
+    "docker exec -i supabase-db psql -X -v ON_ERROR_STOP=1 -v VERBOSITY=sqlstate -U supabase_admin -d postgres"
+  ],
+  "packet": "academy-0035-rehearse-r3.sql",
+  "packetSha256": "f9bd98eff488f0306277d5671f1879919ec1fa0b15eeb502ef79cc454d83c74d",
+  "exitCode": 0,
+  "stdout": "BEGIN\nSET\nSET\n pg_advisory_xact_lock \n-----------------------\n \n(1 row)\n\nDO\nDO\nALTER ROLE\nGRANT\nGRANT\nCREATE POLICY\nALTER FUNCTION\nALTER FUNCTION\nREVOKE\nGRANT\nDO\nROLLBACK\nBEGIN\nDO\n          ?column?           \n-----------------------------\n ACADEMY_0035_REHEARSAL_PASS\n(1 row)\n\nROLLBACK\n",
+  "stderr": "",
+  "pass": true
+}
