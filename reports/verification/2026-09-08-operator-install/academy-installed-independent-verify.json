@@ -1,0 +1,9 @@
+{
+  "schema": "academy-installed-independent-verification/v1",
+  "exit": 0,
+  "status": "PASS",
+  "managedFiles": 10,
+  "manifestSha256": "e09698c6f75e18b90307439cdfe0270994f57160d59e0850af36c588eeb68b90",
+  "configMetadataUnchanged": true,
+  "sourceRecordSha256": "e36766fa9efdb32cd0bc7b1578df241c6edae4468238415ebba414c7ceefb098"
+}

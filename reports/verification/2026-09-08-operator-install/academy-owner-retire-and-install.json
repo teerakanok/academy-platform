@@ -1,0 +1,26 @@
+{
+  "schema": "academy-operator-retire-and-install-sanitized/v1",
+  "preflight": {
+    "exit": 0,
+    "originalInspectionMatches": true
+  },
+  "retirement": {
+    "exit": 0,
+    "status": "RETAINED",
+    "inspectionSha256": "b233e3ba14a4e2c2244509f9dff7ad89500159b5bc8d89e09d0e31ef1979ce5f",
+    "journalSha256": "2da1749fd25ba47ea8590e8285f13d25c9ca1ad1e877e261eb02195c2ba3628f",
+    "journalManifestSha256": "26fd66af6c55b804f10f7c60de8f9c321550a1015ea4da7c575e99e134d66054",
+    "retainedPath": "/opt/academy/production-operations.install-journal.json.retained-2da1749fd25ba47ea8590e8285f13d25c9ca1ad1e877e261eb02195c2ba3628f.json"
+  },
+  "installation": {
+    "exit": 0,
+    "status": "INSTALLED_AND_VERIFIED",
+    "sourceRevision": "1e2b0ff7cb09a0d5205aa61ab22060fea6fed037",
+    "inspectionSha256": "7ac0e138fddc56527033ad0f2b6d38fe7323f9252a7cd42e5441b8edc5bf882b",
+    "predecessorManifestSha256": "51094ae62224024bba25b50fe0f6d696c447fdefc0890da0f919aad9beed1af3",
+    "candidateManifestSha256": "e09698c6f75e18b90307439cdfe0270994f57160d59e0850af36c588eeb68b90",
+    "installStatus": "PASS",
+    "verifyStatus": "PASS"
+  },
+  "sourceRecordSha256": "6d8a4a953e41963603fd6e81caa3b93425230135b334acdb9e7a540e53a77a85"
+}
