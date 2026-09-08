@@ -1,0 +1,21 @@
+{
+  "at": "2026-09-08T05:53:45.317768+00:00",
+  "sourceCommit": "584f3b6",
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "root@ssh-db.cyberskills.co.th",
+    "docker exec -i supabase-db psql -X -v ON_ERROR_STOP=1 -v VERBOSITY=sqlstate -U supabase_admin -d postgres"
+  ],
+  "packet": "academy-0036-rollback-r1.sql",
+  "sha256": "8d44be899ef3476a3e2510d46ecfae22c130967cb994f7c1a01fa1bf62dfff9f",
+  "exitCode": 0,
+  "stdout": "BEGIN\nSET\nSET\n pg_advisory_xact_lock \n-----------------------\n \n(1 row)\n\nDO\nSET\nCREATE FUNCTION\nCREATE FUNCTION\nREVOKE\nREVOKE\nGRANT\nGRANT\nDO\nRESET\nROLLBACK\n       ?column?        \n-----------------------\n ACADEMY_0036_ROLLBACK\n(1 row)\n\n",
+  "stderr": "",
+  "pass": true
+}

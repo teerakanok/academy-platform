@@ -1,0 +1,25 @@
+{
+  "at": "2026-09-08T05:49:05.458900+00:00",
+  "scope": "owned local clone only; whole sequence ROLLBACK restores existing two functions",
+  "command": [
+    "/private/tmp/postgres-fixture-cde63a58/install/bin/psql",
+    "-X",
+    "-qAt",
+    "-v",
+    "ON_ERROR_STOP=1",
+    "-h",
+    "/private/tmp/postgres-fixture-cde63a58/socket",
+    "-p",
+    "65433",
+    "-U",
+    "fixture_owner",
+    "-d",
+    "academy_activation_50505a66b8f0"
+  ],
+  "packet": "/private/tmp/cyberskills-prod-cde63a58/records/academy-0036-forward-inverse-local-r1.sql",
+  "sha256": "1f158f3aeda70fdabb8254e28ca908d795405ad366545e485a0661d3a0f176f3",
+  "substitutions": "explicit local database and fixture owner; production body, ACL shape and guard logic unchanged",
+  "exitCode": 0,
+  "stdout": "\n\n2\n",
+  "stderr": ""
+}

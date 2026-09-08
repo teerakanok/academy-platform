@@ -1,0 +1,54 @@
+[
+  {
+    "file": "academy-0036-packet-manifest-r1.json",
+    "sha256": "c8ac78a22331b10730628210b36cc869a0ae8bd429c70845f21b625c8442e2dd"
+  },
+  {
+    "file": "academy-0036-operational-independent-review-r1.md",
+    "sha256": "4dff3a49ec0fc216de897af49f55fce8bf554b267a818e441b6ee95cc53986ca"
+  },
+  {
+    "file": "academy-0036-preflight-readonly-r1.json",
+    "sha256": "c97cbbbd661c0ec5df749297a169623a6d156a740b70d415b1ca229eb8cf0d59"
+  },
+  {
+    "file": "academy-0036-forward-inverse-local-r1.json",
+    "sha256": "9c922e1de1c209850a38d6e4b3574122b40afa212abfd0dd71e0c41b40a7f84a"
+  },
+  {
+    "file": "academy-0036-forward-inverse-local-r1.sql",
+    "sha256": "1f158f3aeda70fdabb8254e28ca908d795405ad366545e485a0661d3a0f176f3"
+  },
+  {
+    "file": "academy-0036-production-rehearsal-r1.json",
+    "sha256": "07b0ae778cc7fec4790c863e3607691add872b5733a7590c6868bf185d839825"
+  },
+  {
+    "file": "academy-0036-production-commit-r1.json",
+    "sha256": "e2dfa8b1d5f6ae743ff878954caf497f1842cc20fd33a5b11e361ea3e43f39cb"
+  },
+  {
+    "file": "academy-0036-production-postverify-r1.json",
+    "sha256": "65c852f1384f97fb34980bfe5eacf1f03a69edcfe3c2c3996a0751b363d93c3b"
+  },
+  {
+    "file": "academy-0036-commit-r1.sql",
+    "sha256": "5bce0fef3fdd0fbc058d0ac0c549cc94ec060c30b2fc6b383e083238265512c0"
+  },
+  {
+    "file": "academy-0036-rollback-r1.sql",
+    "sha256": "8d44be899ef3476a3e2510d46ecfae22c130967cb994f7c1a01fa1bf62dfff9f"
+  },
+  {
+    "file": "academy-0036-inverse-commit-r1.sql",
+    "sha256": "dac7d9934fbec72ff0c86edc8c1e8860d430bfb3fa95ea249b69124a66eb673d"
+  },
+  {
+    "file": "academy-0036-inverse-rehearsal-r1.sql",
+    "sha256": "298feb8a7fae85632d39c13eb3af385db90e2d1722d353d5236b89ae0db551f7"
+  },
+  {
+    "file": "academy-0036-postcondition-r1.sql",
+    "sha256": "e7a698985a8c791e465e97aef44184d4eefc67a30e30a9ad567ead03bfb53415"
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "at": "2026-09-08T05:46:46.360365+00:00",
+  "command": [
+    "ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "root@ssh-db.cyberskills.co.th",
+    "docker exec -i supabase-db psql -X -qAt -v ON_ERROR_STOP=1 -v VERBOSITY=sqlstate -U supabase_admin -d postgres"
+  ],
+  "sql": "BEGIN READ ONLY; SET LOCAL statement_timeout='5s'; SELECT jsonb_build_object('database',current_database(),'operator',current_user,'newFunctions', (SELECT count(*) FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='academy' AND p.proname IN ('inspect_staff_role_audit','inspect_course_entitlement_audit')),'auditTables',(SELECT jsonb_agg(jsonb_build_object('name',c.relname,'owner',r.rolname,'rls',c.relrowsecurity,'forceRls',c.relforcerowsecurity)) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace JOIN pg_roles r ON r.oid=c.relowner WHERE n.nspname='academy' AND c.relname IN ('staff_role_audit','course_entitlement_audit')),'existingInspectors',(SELECT jsonb_agg(jsonb_build_object('name',p.proname,'owner',r.rolname,'securityDefiner',p.prosecdef)) FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace JOIN pg_roles r ON r.oid=p.proowner WHERE n.nspname='academy' AND p.proname IN ('inspect_staff_role_assignment','inspect_course_entitlement'))); ROLLBACK;",
+  "exitCode": 0,
+  "stdout": "{\"database\": \"postgres\", \"operator\": \"supabase_admin\", \"auditTables\": [{\"rls\": true, \"name\": \"staff_role_audit\", \"owner\": \"postgres\", \"forceRls\": false}, {\"rls\": true, \"name\": \"course_entitlement_audit\", \"owner\": \"postgres\", \"forceRls\": false}], \"newFunctions\": 0, \"existingInspectors\": [{\"name\": \"inspect_course_entitlement\", \"owner\": \"postgres\", \"securityDefiner\": true}]}\n",
+  "stderr": ""
+}

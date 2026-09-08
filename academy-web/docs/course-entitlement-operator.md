@@ -9,11 +9,12 @@ progress functions, Identity callback/session RPCs, and the monotonic service
 activation RPC.
 
 The entitlement database role is `academy_entitlement_operator`. It is a direct
-PostgreSQL login with only three executable functions:
+PostgreSQL login with these bounded executable functions:
 
 - `academy.resolve_entitlement_account`
 - `academy.inspect_course_entitlement`
 - `academy.set_course_entitlement`
+- `academy.inspect_course_entitlement_audit` (migration `0036`, latest audit for rehearsal verification)
 
 It has no table privilege and cannot call staff-role mutation. The application
 runtime, shared `service_role`, browser roles, and `academy_staff_admin` cannot

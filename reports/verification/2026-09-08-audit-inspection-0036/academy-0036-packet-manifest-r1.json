@@ -1,0 +1,15 @@
+{
+  "source_commit": "584f3b6",
+  "source_sha256": "93ae2bb111bb94730907d788e7f89654b60c33be29d9aa8fb50da2fd50a0195a",
+  "files": {
+    "academy-0036-inverse-commit-r1.sql": "dac7d9934fbec72ff0c86edc8c1e8860d430bfb3fa95ea249b69124a66eb673d",
+    "academy-0036-commit-r1.sql": "5bce0fef3fdd0fbc058d0ac0c549cc94ec060c30b2fc6b383e083238265512c0",
+    "academy-0036-rollback-r1.sql": "8d44be899ef3476a3e2510d46ecfae22c130967cb994f7c1a01fa1bf62dfff9f",
+    "academy-0036-inverse-rehearsal-r1.sql": "298feb8a7fae85632d39c13eb3af385db90e2d1722d353d5236b89ae0db551f7",
+    "academy-0036-postcondition-r1.sql": "e7a698985a8c791e465e97aef44184d4eefc67a30e30a9ad567ead03bfb53415"
+  },
+  "body_md5": {
+    "inspect_staff_role_audit": "678670779a4257c0268ab48ddbab169e",
+    "inspect_course_entitlement_audit": "72e8b23c4d6353638958617804eb7ec4"
+  }
+}
