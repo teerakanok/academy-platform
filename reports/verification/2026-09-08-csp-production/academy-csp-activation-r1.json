@@ -1,0 +1,20 @@
+{
+  "at": "2026-09-08T03:07:24.165634+00:00",
+  "command": [
+    "node",
+    "node_modules/wrangler/bin/wrangler.js",
+    "versions",
+    "deploy",
+    "8318899f-74ef-4223-8603-5f6508a5d2d4@100",
+    "--name",
+    "cyberskills-academy",
+    "--message",
+    "activate;s=4116b0ebc4e2eab1195b0e3cc644cb73c0795b9b;prev=8e4d5c04-6b6f-459b-99e3-5b2352d0f133",
+    "--yes"
+  ],
+  "exit": 0,
+  "versionMentioned": true,
+  "deployedMarker": true,
+  "stdoutBytes": 1892,
+  "stderrBytes": 0
+}

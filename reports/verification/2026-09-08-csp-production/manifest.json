@@ -1,0 +1,38 @@
+[
+  {
+    "path": "academy-csp-browser-candidate-r2.json",
+    "sha256": "6cef74386948f71290d35b63c3afb2325fec7facc89f9922e1fc0af9948f26cd"
+  },
+  {
+    "path": "academy-csp-preactivation-root-r1.json",
+    "sha256": "d4eded83df4d12f20e98c366e70abbb8cb9d73949d101b97a30328513a328527"
+  },
+  {
+    "path": "academy-csp-activation-r1.json",
+    "sha256": "c9190c0f1e7aff33c545ccb288f872cf713619e7ddf9eddc3f0217ad876cce5d"
+  },
+  {
+    "path": "academy-csp-production-allocation-r1.json",
+    "sha256": "67d77bb81181bd4274c971be2655b4c014205fa95c3a51ec00bbd93311e889b5"
+  },
+  {
+    "path": "academy-csp-browser-production-r2.json",
+    "sha256": "9ad38fde6c416360f235643f7fdfd890a5934c34585b93223080d84f78dbbf51"
+  },
+  {
+    "path": "academy-csp-candidate-sign-in-en-desktop.png",
+    "sha256": "a5ecf724a2a0d4755727241d402d2ab6de9132de3535d1956f315892f26d2bc9"
+  },
+  {
+    "path": "academy-csp-candidate-sign-in-en-mobile.png",
+    "sha256": "f2dad7af5b5ed6b717f14a7c07c915fe34f45eb53db8bd2fa32c0c48411d21f9"
+  },
+  {
+    "path": "academy-csp-production-sign-in-en-desktop.png",
+    "sha256": "f9dd8f7097aed4c50d763a4b347a7e1353ec5706baec8c802916980deb055869"
+  },
+  {
+    "path": "academy-csp-production-sign-in-en-mobile.png",
+    "sha256": "f2dad7af5b5ed6b717f14a7c07c915fe34f45eb53db8bd2fa32c0c48411d21f9"
+  }
+]
