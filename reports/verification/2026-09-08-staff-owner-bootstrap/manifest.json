@@ -1,0 +1,103 @@
+{
+  "scope": "Exact allowlisted nonsecret receipt promotion; hashes bind actual copied bytes",
+  "at": "2026-09-08T13:38:12.454945+00:00",
+  "files": [
+    {
+      "file": "academy-staff-root-dry-run-r1.json",
+      "sha256": "6c72fb0c0c2051672a0fc5e01a1ad2ccccac5b5540892507ea5cece332e51cdd",
+      "bytes": 467,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-staff-root-dry-run-r1.json",
+      "reason": "allowlisted nonsecret staff operation/evidence receipt"
+    },
+    {
+      "file": "academy-staff-controller-diagnosis-r2.md",
+      "sha256": "ffc42ae3c4bba11e424886137ed64c625c3bf98e031b0ec9f4eab705a1ad871d",
+      "bytes": 3561,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-staff-controller-diagnosis-r2.md",
+      "reason": "allowlisted nonsecret staff operation/evidence receipt"
+    },
+    {
+      "file": "academy-staff-controller-local-compatibility-r2.json",
+      "sha256": "d2f737bd37a8aa4e21b4e0262c158e15118915a3128fe32bb5b9d1079954cbcf",
+      "bytes": 3676,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-staff-controller-local-compatibility-r2.json",
+      "reason": "allowlisted nonsecret staff operation/evidence receipt"
+    },
+    {
+      "file": "academy-staff-controller-independent-review-r2.md",
+      "sha256": "a2b26937146a064b97d28a3e559b4a4a06d5a5f80c91a38e85558166b243130e",
+      "bytes": 1426,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-staff-controller-independent-review-r2.md",
+      "reason": "allowlisted nonsecret staff operation/evidence receipt"
+    },
+    {
+      "file": "academy-staff-root-dry-run-r2.json",
+      "sha256": "2e0b202b529b0d2ddab9294bf07ab009ae4c1421d921419e9f18def87556c55c",
+      "bytes": 615,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-staff-root-dry-run-r2.json",
+      "reason": "allowlisted nonsecret staff operation/evidence receipt"
+    },
+    {
+      "file": "academy-staff-root-rehearse-r2.json",
+      "sha256": "88a1999727bf88ba1d9873e0fe46fe60f937d6213fb536bc0d2f30aed33da42c",
+      "bytes": 585,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-staff-root-rehearse-r2.json",
+      "reason": "allowlisted nonsecret staff operation/evidence receipt"
+    },
+    {
+      "file": "academy-staff-postrehearsal-readonly-r2.json",
+      "sha256": "acc6fd85d7dd54bd6013832acbaa95b4a03e4b3b38e2d9f561f0b413923411e1",
+      "bytes": 858,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-staff-postrehearsal-readonly-r2.json",
+      "reason": "allowlisted nonsecret staff operation/evidence receipt"
+    },
+    {
+      "file": "academy-staff-root-apply-r2.json",
+      "sha256": "ff558f1d09b9a65ed1481f2d962f631b6d464a7ad900b95aadc32fc9763174df",
+      "bytes": 577,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-staff-root-apply-r2.json",
+      "reason": "allowlisted nonsecret staff operation/evidence receipt"
+    },
+    {
+      "file": "academy-staff-postapply-founder-r2.json",
+      "sha256": "3f55bd6d7ee96f0b83cd9c959301ea1d4098cd72281199dc25e78a5396fb2348",
+      "bytes": 827,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-staff-postapply-founder-r2.json",
+      "reason": "allowlisted nonsecret staff operation/evidence receipt"
+    },
+    {
+      "file": "academy-staff-independent-postverify-r1.json",
+      "sha256": "ca1b143cf4789dd5666b98a750c8d09dafda355f3cb9f7109fad829ffc1783c1",
+      "bytes": 1257,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-staff-independent-postverify-r1.json",
+      "reason": "allowlisted nonsecret staff operation/evidence receipt"
+    },
+    {
+      "file": "academy-staff-forward-close-r1.json",
+      "sha256": "f1c5d851ef801c621e016eecde82129ce594fe2078fabf98bcbe5720aa4a82e3",
+      "bytes": 208,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-staff-forward-close-r1.json",
+      "reason": "allowlisted nonsecret staff operation/evidence receipt"
+    },
+    {
+      "file": "academy-staff-root-forward-r1.json",
+      "sha256": "b3898e620ae7baa132ff1080fb4d2bf17d65b3909612dd73c1b0938963172592",
+      "bytes": 505,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-staff-root-forward-r1.json",
+      "reason": "allowlisted nonsecret staff operation/evidence receipt"
+    },
+    {
+      "file": "founder-binding-readonly.json",
+      "sha256": "c434255ae99a958ab011ddcc043d7821bb8efc5de2c62bbdad87b7a7d4eb7dc9",
+      "bytes": 576,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-credential-activation-r1/founder-binding-readonly.json",
+      "reason": "allowlisted nonsecret staff operation/evidence receipt"
+    }
+  ],
+  "credentialValuesIncluded": false,
+  "canonicalPrivateValuesIncluded": false,
+  "controllersIncluded": false,
+  "originalsRetained": true,
+  "commitOwner": "root",
+  "productSourceChanges": false
+}

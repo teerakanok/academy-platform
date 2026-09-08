@@ -1,0 +1,13 @@
+{
+  "at": "2026-09-08T13:29:04.210389+00:00",
+  "command": [
+    "/Users/teerakanok/.nvm/versions/node/v25.5.0/bin/node",
+    "/private/tmp/cyberskills-prod-cde63a58/records/academy-staff-root-controller-r2.mjs",
+    "dry-run",
+    "54881"
+  ],
+  "controllerSha256": "20353a26463d4056559e9ef30090e750ddda8a9097ae86ce006ffcb6cdf51cb3",
+  "exit": 0,
+  "output": "{\"status\":\"PASS\",\"mode\":\"dry-run\",\"directRole\":\"academy_staff_admin\",\"negativeRejected\":true,\"targetMatched\":true,\"output\":[\"dry_run=true action=enable role=owner actor_authorized=false currently_active=null\"]}",
+  "stderrBytes": 0
+}

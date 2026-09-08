@@ -1,0 +1,26 @@
+{
+  "at": "2026-09-08T13:12:53.757991+00:00",
+  "pid": 45002,
+  "port": 54881,
+  "command": [
+    "ssh",
+    "-N",
+    "-T",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "ExitOnForwardFailure=yes",
+    "-o",
+    "ConnectTimeout=15",
+    "-o",
+    "ServerAliveInterval=15",
+    "-o",
+    "ServerAliveCountMax=2",
+    "-L",
+    "127.0.0.1:54881:172.18.0.8:5432",
+    "root@ssh-db.cyberskills.co.th"
+  ],
+  "target": "supabase-db/supabase_default/172.18.0.8:5432"
+}

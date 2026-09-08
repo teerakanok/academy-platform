@@ -1,0 +1,29 @@
+{
+  "at": "2026-09-08T12:55:51.388477+00:00",
+  "scope": "fresh post-r3 configured/boundary/application counts and owned-prefix residue metadata only",
+  "sshExitCode": 0,
+  "sshStderrBytes": 0,
+  "sourceSha256": "0f7827782bd3fdc6164bc7b47e82ad4bcdf31f30e9ce2598571c090d46d6b962",
+  "result": {
+    "configuredBoundaryPassed": true,
+    "containerPgpassResidueCount": 0,
+    "counts": {
+      "passwordsConfigured": 2,
+      "passwordsNull": 0,
+      "roles": 2
+    },
+    "mutation": false,
+    "ownedHostDirectoryAbsent": true,
+    "passwordValuesRead": false,
+    "preservedState": {
+      "catalogDigest": "dc92df49c697d46eca22bf6938b1b2aa",
+      "entitlementAudits": 0,
+      "entitlements": 0,
+      "roleBoundaryDigest": "cf7a028832d6d421859150fd614bdbf8",
+      "staffAssignments": 0,
+      "staffAudits": 0
+    },
+    "status": "PASS"
+  },
+  "matchesPostApplyPreservedState": true
+}

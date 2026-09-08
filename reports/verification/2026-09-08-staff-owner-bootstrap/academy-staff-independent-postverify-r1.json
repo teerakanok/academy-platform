@@ -1,0 +1,37 @@
+{
+  "at": "2026-09-08T13:34:32.807601+00:00",
+  "command": [
+    "python3",
+    "-I",
+    "-B",
+    "/private/tmp/cyberskills-prod-cde63a58/records/academy-staff-independent-postverify-r1.py"
+  ],
+  "sourceSha256": "102fe68c58147736f8df733297a154f1f5b6ba5abe6a5c547dee4a273c670fa1",
+  "exit": 0,
+  "result": {
+    "at": "2026-09-08T13:34:29.911286+00:00",
+    "bindingFile": "/private/tmp/cyberskills-prod-cde63a58/records/crux-owner-canonical-binding-private-r2.json",
+    "canonicalBindingSha256": "3044f697361fade2d2f77271b73321d1b90fd0972e42c0850df39c047be116dc",
+    "credentialValuesRead": false,
+    "exitCode": 0,
+    "identityValuesSuppressed": true,
+    "mutation": false,
+    "result": {
+      "activeOwners": 1,
+      "adminTargetMatched": true,
+      "canonicalAcademyAccounts": 1,
+      "canonicalFounderOwners": 1,
+      "canonicalSelfGrantedOwnerAssignments": 1,
+      "entitlementAudits": 0,
+      "entitlements": 0,
+      "intendedCanonicalGrantAudits": 1,
+      "staffAssignments": 1,
+      "staffAudits": 1
+    },
+    "scope": "Pool A Academy independent canonical owner/audit/reference and unchanged entitlements after reviewed apply",
+    "status": "PASS",
+    "stderrBytes": 0
+  },
+  "stderrBytes": 0,
+  "rawErrorsSuppressed": true
+}

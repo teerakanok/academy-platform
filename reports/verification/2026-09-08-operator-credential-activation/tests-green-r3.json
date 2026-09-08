@@ -1,0 +1,16 @@
+{
+  "at": "2026-09-08T12:49:53.915135+00:00",
+  "command": [
+    "python3",
+    "-I",
+    "-B",
+    "/private/tmp/cyberskills-prod-cde63a58/records/academy-credential-verification-r3/test_packet.py"
+  ],
+  "exitCode": 0,
+  "passed": 28,
+  "tests": 28,
+  "remoteSourceSha256": "2829187bfac38deecf6fc3005efd66864419b4e8e0b8be865d1582d42dcc6a30",
+  "logSha256": "aadc246b80d435a343cafa45a223fe6753a1422e3793dc5d716398b1f84e8199",
+  "liveCalls": 0,
+  "ownerCredentialReads": 0
+}

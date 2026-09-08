@@ -1,0 +1,32 @@
+{
+  "startedAt": "2026-09-08T12:30:58.789281+00:00",
+  "finishedAt": "2026-09-08T12:31:01.934408+00:00",
+  "command": [
+    "python3",
+    "-I",
+    "-B",
+    "/private/tmp/cyberskills-prod-cde63a58/records/academy-credential-activation-r1/controller.py",
+    "rehearse",
+    "--reviewed-manifest-sha256",
+    "518932579a869d2c3a34f011a7b310d2ea099bf602a5ba5a7c02876b92b0d60c"
+  ],
+  "controllerExitCode": 1,
+  "controllerStderrBytes": 0,
+  "result": {
+    "code": "ROLE_INSPECTION_REFUSED",
+    "database": "postgres",
+    "host": "ssh-db.cyberskills.co.th",
+    "manifestSha256": "518932579a869d2c3a34f011a7b310d2ea099bf602a5ba5a7c02876b92b0d60c",
+    "noAutomaticRecovery": true,
+    "ownedHostCopiesRemoved": true,
+    "ownerOriginalsRetained": true,
+    "packet": "academy-credential-activation-r1",
+    "roles": [
+      "academy_staff_admin",
+      "academy_entitlement_operator"
+    ],
+    "sshExitCode": 1,
+    "status": "REFUSED"
+  },
+  "scope": "Live password transaction REHEARSE only; no COMMIT or grant authorized"
+}

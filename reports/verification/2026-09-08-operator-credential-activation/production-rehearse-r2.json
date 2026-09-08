@@ -1,0 +1,38 @@
+{
+  "startedAt": "2026-09-08T12:38:57.535037+00:00",
+  "finishedAt": "2026-09-08T12:39:01.007245+00:00",
+  "command": [
+    "python3",
+    "-I",
+    "-B",
+    "/private/tmp/cyberskills-prod-cde63a58/records/academy-credential-activation-r2/controller.py",
+    "rehearse",
+    "--reviewed-manifest-sha256",
+    "29db658311e260c040f4f1b8c93ba0a883236c6123f43a8c86e266a3a76a5edb"
+  ],
+  "controllerExitCode": 0,
+  "controllerStderrBytes": 0,
+  "result": {
+    "configured": 0,
+    "database": "postgres",
+    "events": [
+      "fresh_null_and_boundary_verified",
+      "two_passwords_set_then_rollback",
+      "fresh_null_and_preserved_state_verified"
+    ],
+    "host": "ssh-db.cyberskills.co.th",
+    "manifestSha256": "29db658311e260c040f4f1b8c93ba0a883236c6123f43a8c86e266a3a76a5edb",
+    "mode": "rehearse",
+    "ownedHostCopiesRemoved": true,
+    "ownerOriginalsRetained": true,
+    "packet": "academy-credential-activation-r1",
+    "roles": [
+      "academy_staff_admin",
+      "academy_entitlement_operator"
+    ],
+    "rollbackRestored": true,
+    "sshExitCode": 0,
+    "status": "PASS"
+  },
+  "scope": "r2 live REHEARSE only; no COMMIT or grant"
+}

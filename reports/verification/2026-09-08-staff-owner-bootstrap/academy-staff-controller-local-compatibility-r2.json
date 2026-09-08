@@ -1,0 +1,117 @@
+{
+  "at": "2026-09-08T13:27:22.328637+00:00",
+  "status": "PASS",
+  "scope": "local syntax/inspect/pre-input refusal; accepted CLI with nonsecret fake client; SELECT-only existing local PostgreSQL",
+  "productionInvoked": false,
+  "credentialReads": false,
+  "r1Unchanged": true,
+  "controllerSha256": "20353a26463d4056559e9ef30090e750ddda8a9097ae86ce006ffcb6cdf51cb3",
+  "checks": [
+    {
+      "command": [
+        "/Users/teerakanok/.nvm/versions/node/v25.5.0/bin/node",
+        "--check",
+        "/private/tmp/cyberskills-prod-cde63a58/records/academy-staff-root-controller-r2.mjs"
+      ],
+      "exit": 0,
+      "output": null,
+      "stderrBytes": 0
+    },
+    {
+      "command": [
+        "/Users/teerakanok/.nvm/versions/node/v25.5.0/bin/node",
+        "/private/tmp/cyberskills-prod-cde63a58/records/academy-staff-root-controller-r2.mjs",
+        "inspect"
+      ],
+      "exit": 0,
+      "output": {
+        "status": "INSPECT_PASS",
+        "secretValuesRead": false,
+        "mutation": false
+      },
+      "stderrBytes": 0
+    },
+    {
+      "command": [
+        "/Users/teerakanok/.nvm/versions/node/v25.5.0/bin/node",
+        "/private/tmp/cyberskills-prod-cde63a58/records/academy-staff-root-controller-r2.mjs",
+        "invalid-mode"
+      ],
+      "exit": 1,
+      "output": {
+        "status": "UNCONFIRMED",
+        "stage": "MODE",
+        "code": "MODE_REQUIRED",
+        "databaseCode": null,
+        "automaticRetry": false,
+        "rawErrorsSuppressed": true
+      },
+      "stderrBytes": 0
+    },
+    {
+      "command": [
+        "/Users/teerakanok/.nvm/versions/node/v25.5.0/bin/node",
+        "/private/tmp/cyberskills-prod-cde63a58/records/academy-staff-root-controller-r2.mjs",
+        "dry-run"
+      ],
+      "exit": 1,
+      "output": {
+        "status": "UNCONFIRMED",
+        "stage": "PORT",
+        "code": "PORT_REQUIRED",
+        "databaseCode": null,
+        "automaticRetry": false,
+        "rawErrorsSuppressed": true
+      },
+      "stderrBytes": 0
+    },
+    {
+      "command": [
+        "/Users/teerakanok/.nvm/versions/node/v25.5.0/bin/node",
+        "/private/tmp/cyberskills-prod-cde63a58/records/academy-staff-invocation-compatibility-local-r1.mjs"
+      ],
+      "exit": 0,
+      "output": {
+        "status": "PASS",
+        "existingCliInvokedWithFixture": true,
+        "r1NullProjectionAccepted": false,
+        "r2NullProjectionAccepted": true,
+        "unknownProjectionRejected": true,
+        "appendedOutputRejected": true,
+        "readOnlyFixtureQueries": 4,
+        "networkCalls": 0,
+        "credentialReads": 0
+      },
+      "stderrBytes": 0
+    },
+    {
+      "command": [
+        "/private/tmp/postgres-fixture-cde63a58/install/bin/psql",
+        "-X",
+        "-w",
+        "-qAt",
+        "-v",
+        "ON_ERROR_STOP=1",
+        "-h",
+        "/private/tmp/postgres-fixture-cde63a58/socket",
+        "-p",
+        "65433",
+        "-U",
+        "fixture_owner",
+        "-d",
+        "academy_activation_50505a66b8f0",
+        "-c",
+        "select json_build_object('castText', inet '172.18.0.8'::text, 'hostText', host(inet '172.18.0.8'), 'r1HostMatch', inet '172.18.0.8'::text = '172.18.0.8', 'r2HostMatch', host(inet '172.18.0.8') = '172.18.0.8', 'existingInspectorNoAssignmentActive', academy.inspect_staff_role('00000000-0000-4000-8000-000000000001'::uuid, '00000000-0000-4000-8000-000000000001'::uuid, 'owner')->'active');"
+      ],
+      "exit": 0,
+      "output": {
+        "castText": "172.18.0.8/32",
+        "hostText": "172.18.0.8",
+        "r1HostMatch": false,
+        "r2HostMatch": true,
+        "existingInspectorNoAssignmentActive": null
+      },
+      "stderrBytes": 0
+    }
+  ]
+}

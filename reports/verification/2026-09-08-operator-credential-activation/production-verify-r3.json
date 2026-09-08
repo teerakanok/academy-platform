@@ -1,0 +1,34 @@
+{
+  "startedAt": "2026-09-08T12:54:07.236262+00:00",
+  "finishedAt": "2026-09-08T12:54:11.508042+00:00",
+  "command": [
+    "python3",
+    "-I",
+    "-B",
+    "/private/tmp/cyberskills-prod-cde63a58/records/academy-credential-verification-r3/controller.py",
+    "verify",
+    "--reviewed-manifest-sha256",
+    "759a2a54c98c6ee0b5203ce937ead91e655eafacd1fdaaf164b5dc951a4e6980"
+  ],
+  "controllerExitCode": 0,
+  "controllerStderrBytes": 0,
+  "result": {
+    "configured": 2,
+    "database": "postgres",
+    "directLogins": 2,
+    "host": "ssh-db.cyberskills.co.th",
+    "manifestSha256": "759a2a54c98c6ee0b5203ce937ead91e655eafacd1fdaaf164b5dc951a4e6980",
+    "mode": "verify",
+    "mutation": false,
+    "ownedHostCopiesRemoved": true,
+    "ownerOriginalsRetained": true,
+    "packet": "academy-credential-activation-r1",
+    "roles": [
+      "academy_staff_admin",
+      "academy_entitlement_operator"
+    ],
+    "sshExitCode": 0,
+    "status": "PASS"
+  },
+  "scope": "r3 VERIFY ONLY; actual empty-password negative and supplied-password positive direct logins"
+}

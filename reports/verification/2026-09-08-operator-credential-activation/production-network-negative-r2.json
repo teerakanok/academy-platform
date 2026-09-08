@@ -1,0 +1,32 @@
+{
+  "at": "2026-09-08T12:45:24.274402+00:00",
+  "scope": "negative-only password-free probe through observed existing supabase-db DNS route",
+  "sshExitCode": 0,
+  "sshStderrBytes": 0,
+  "sourceSha256": "ccfd45258fd68a14883d0d6e17ede9b0e63c009edd6bea453df10c85bffddcac",
+  "result": {
+    "checks": [
+      {
+        "exitCode": 2,
+        "host": "supabase-db",
+        "noPasswordSuppliedRejected": true,
+        "passwordSupplied": false,
+        "role": "academy_staff_admin",
+        "stderrBytes": 117,
+        "unexpectedDirectSuccess": false
+      },
+      {
+        "exitCode": 2,
+        "host": "supabase-db",
+        "noPasswordSuppliedRejected": true,
+        "passwordSupplied": false,
+        "role": "academy_entitlement_operator",
+        "stderrBytes": 117,
+        "unexpectedDirectSuccess": false
+      }
+    ],
+    "mutation": false,
+    "ownerPasswordReads": 0,
+    "positiveLoginsAttempted": 0
+  }
+}

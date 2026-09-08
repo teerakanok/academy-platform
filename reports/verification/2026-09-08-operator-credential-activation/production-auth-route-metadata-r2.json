@@ -1,0 +1,143 @@
+{
+  "at": "2026-09-08T12:44:31.667939+00:00",
+  "scope": "read-only matching HBA method fields (no options) and exact supabase-db network/DNS metadata",
+  "sshExitCode": 0,
+  "sshStderrBytes": 0,
+  "sourceSha256": "785e65d70729cd050563071eb45ec462bcb8aabd5efd97a8d22a2e3cbc59f9e0",
+  "result": {
+    "containerDns": {
+      "entries": [
+        "172.18.0.8      supabase-db"
+      ],
+      "exitCode": 0,
+      "stderrBytes": 0
+    },
+    "credentialValuesRead": false,
+    "hbaOptionsRead": false,
+    "matchingHbaRules": [
+      {
+        "address": null,
+        "database": [
+          "all"
+        ],
+        "line": 83,
+        "method": "peer",
+        "netmask": null,
+        "parseErrorPresent": false,
+        "type": "local",
+        "users": [
+          "all"
+        ]
+      },
+      {
+        "address": "127.0.0.1",
+        "database": [
+          "all"
+        ],
+        "line": 84,
+        "method": "trust",
+        "netmask": "255.255.255.255",
+        "parseErrorPresent": false,
+        "type": "host",
+        "users": [
+          "all"
+        ]
+      },
+      {
+        "address": "::1",
+        "database": [
+          "all"
+        ],
+        "line": 85,
+        "method": "trust",
+        "netmask": "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+        "parseErrorPresent": false,
+        "type": "host",
+        "users": [
+          "all"
+        ]
+      },
+      {
+        "address": "10.0.0.0",
+        "database": [
+          "all"
+        ],
+        "line": 88,
+        "method": "scram-sha-256",
+        "netmask": "255.0.0.0",
+        "parseErrorPresent": false,
+        "type": "host",
+        "users": [
+          "all"
+        ]
+      },
+      {
+        "address": "172.16.0.0",
+        "database": [
+          "all"
+        ],
+        "line": 89,
+        "method": "scram-sha-256",
+        "netmask": "255.240.0.0",
+        "parseErrorPresent": false,
+        "type": "host",
+        "users": [
+          "all"
+        ]
+      },
+      {
+        "address": "192.168.0.0",
+        "database": [
+          "all"
+        ],
+        "line": 90,
+        "method": "scram-sha-256",
+        "netmask": "255.255.0.0",
+        "parseErrorPresent": false,
+        "type": "host",
+        "users": [
+          "all"
+        ]
+      },
+      {
+        "address": "0.0.0.0",
+        "database": [
+          "all"
+        ],
+        "line": 91,
+        "method": "scram-sha-256",
+        "netmask": "0.0.0.0",
+        "parseErrorPresent": false,
+        "type": "host",
+        "users": [
+          "all"
+        ]
+      },
+      {
+        "address": "::",
+        "database": [
+          "all"
+        ],
+        "line": 94,
+        "method": "scram-sha-256",
+        "netmask": "::",
+        "parseErrorPresent": false,
+        "type": "host",
+        "users": [
+          "all"
+        ]
+      }
+    ],
+    "mutation": false,
+    "networks": [
+      {
+        "aliases": [
+          "supabase-db",
+          "db"
+        ],
+        "ipAddress": "172.18.0.8",
+        "name": "supabase_default"
+      }
+    ]
+  }
+}

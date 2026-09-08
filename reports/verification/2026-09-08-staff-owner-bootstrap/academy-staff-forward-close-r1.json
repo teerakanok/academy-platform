@@ -1,0 +1,10 @@
+{
+  "at": "2026-09-08T13:35:36.060023+00:00",
+  "pid": 45002,
+  "exactArgvMatched": true,
+  "signal": "SIGTERM",
+  "verification": "PASS",
+  "pidAbsent": true,
+  "localPortClosed": true,
+  "wrapperExit": 0
+}

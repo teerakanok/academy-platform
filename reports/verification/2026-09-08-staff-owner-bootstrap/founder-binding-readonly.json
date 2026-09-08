@@ -1,0 +1,17 @@
+{
+  "at": "2026-09-08T12:21:34.709337+00:00",
+  "bindingFile": "/private/tmp/cyberskills-prod-cde63a58/records/crux-owner-canonical-binding-private-r2.json",
+  "canonicalBindingSha256": "3044f697361fade2d2f77271b73321d1b90fd0972e42c0850df39c047be116dc",
+  "credentialValuesRead": false,
+  "exitCode": 0,
+  "identityValuesSuppressed": true,
+  "mutation": false,
+  "result": {
+    "activeOwners": 0,
+    "canonicalAcademyAccounts": 1,
+    "canonicalFounderOwners": 0
+  },
+  "scope": "Pool A Academy canonical issuer+subject count only",
+  "status": "PASS",
+  "stderrBytes": 0
+}

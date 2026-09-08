@@ -1,0 +1,96 @@
+{
+  "scope": "Exact allowlisted nonsecret receipt promotion; hashes bind actual copied bytes",
+  "at": "2026-09-08T13:38:12.454378+00:00",
+  "files": [
+    {
+      "file": "production-rehearse-r1.json",
+      "sha256": "290befc76aa33ee6c2b534c81e0326c091948d4f746dff0e81b6bb462e78b339",
+      "bytes": 1030,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-credential-activation-r1/production-rehearse-r1.json",
+      "reason": "r1 admin-context refusal"
+    },
+    {
+      "file": "production-readonly-diagnosis-r1.json",
+      "sha256": "c1351bfec8fceffe2e056937566495f86423f83010405503c931b86727b135aa",
+      "bytes": 2013,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-credential-activation-r1/production-readonly-diagnosis-r1.json",
+      "reason": "existing injected admin transport comparison and NULL boundary"
+    },
+    {
+      "file": "production-rehearse-r2.json",
+      "sha256": "c16722cdbc372969b316fc6ab030bdd929380c9b7b29620977a29c973b1a8a0b",
+      "bytes": 1155,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-credential-activation-r2/production-rehearse-r2.json",
+      "reason": "actual two-role ROLLBACK rehearsal"
+    },
+    {
+      "file": "production-null-readback-r2.json",
+      "sha256": "78cc12fd9a78cef9cea8b26371385721d40dbcb1b5c14fb6b40eee738ca8d4c9",
+      "bytes": 785,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-credential-activation-r2/production-null-readback-r2.json",
+      "reason": "fresh NULL2 and unchanged boundary"
+    },
+    {
+      "file": "production-apply-r2.json",
+      "sha256": "0fae8d80d09ae89f4b9f8e2b312f58dff3358f8a851611c745aad95514b2a7d5",
+      "bytes": 1044,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-credential-activation-r2/production-apply-r2.json",
+      "reason": "actual commit with enforcement refusal; partial outcome retained"
+    },
+    {
+      "file": "production-postapply-readonly-r2.json",
+      "sha256": "f1ab54a19cb5442512681167dc17930f7cd6c70beef37553a53d3d81653178aa",
+      "bytes": 1370,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-credential-activation-r2/production-postapply-readonly-r2.json",
+      "reason": "configured2 and unchanged state; loopback trust false positive"
+    },
+    {
+      "file": "production-auth-route-metadata-r2.json",
+      "sha256": "fcdbab55135dee7b77383e0e96934cd3ffc8b90f2ed53dbf04f65a6a4e0d3045",
+      "bytes": 3042,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-credential-activation-r2/production-auth-route-metadata-r2.json",
+      "reason": "selected nonsecret HBA methods/network/DNS; options not read"
+    },
+    {
+      "file": "production-network-negative-r2.json",
+      "sha256": "203c74c619e47d01102e0c68a676063b49fdcccb2260ee95be219a7fe796b09e",
+      "bytes": 923,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-credential-activation-r2/production-network-negative-r2.json",
+      "reason": "real absent-password rejection through existing container DNS"
+    },
+    {
+      "file": "production-verify-r3.json",
+      "sha256": "0a86535d7a9f919f1f48cce1422a8332518daf6237e083f975e316106ff617ab",
+      "bytes": 1065,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-credential-verification-r3/production-verify-r3.json",
+      "reason": "actual negative+positive direct-login acceptance"
+    },
+    {
+      "file": "production-postverify-readonly-r3.json",
+      "sha256": "040772d7640ada1cc10ce573433e6e3f3c24874060cb5c44ab1c5e5889a49f48",
+      "bytes": 893,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-credential-verification-r3/production-postverify-readonly-r3.json",
+      "reason": "fresh state and zero owned residue"
+    },
+    {
+      "file": "root-verify-review-r3.json",
+      "sha256": "cec49867beb5621f77623378e6bc92c32b591aa1a9cbe4d597aacbcac658f16f",
+      "bytes": 715,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-credential-verification-r3/root-verify-review-r3.json",
+      "reason": "independent exact-source/mode acceptance"
+    },
+    {
+      "file": "tests-green-r3.json",
+      "sha256": "af754f0fec1e6eabc95e831b52b6bd7e89da4c073c17530f63f3295db9bb5a60",
+      "bytes": 475,
+      "sourceReceipt": "/private/tmp/cyberskills-prod-cde63a58/records/academy-credential-verification-r3/tests-green.json",
+      "reason": "28/28 focused packet tests tied to source"
+    }
+  ],
+  "credentialValuesIncluded": false,
+  "canonicalPrivateValuesIncluded": false,
+  "controllersIncluded": false,
+  "originalsRetained": true,
+  "commitOwner": "root",
+  "productSourceChanges": false
+}

@@ -1,0 +1,48 @@
+{
+  "at": "2026-09-08T12:42:55.657837+00:00",
+  "scope": "post-APPLY configured/boundary readback and no-password-only transport diagnosis",
+  "sshExitCode": 0,
+  "sshStderrBytes": 0,
+  "sourceSha256": "573fbca6fbb703fce90045db84c414f07d4c2fed960c9e5eacadb3ac35403b23",
+  "result": {
+    "configuredBoundaryPassed": true,
+    "counts": {
+      "passwordsConfigured": 2,
+      "passwordsNull": 0,
+      "roles": 2
+    },
+    "mutation": false,
+    "negativeControls": [
+      {
+        "directRoleMarkerReturned": true,
+        "errorClasses": [],
+        "exitCode": 0,
+        "passwordSupplied": false,
+        "role": "academy_staff_admin",
+        "stderrBytes": 0,
+        "stdoutBytes": 15
+      },
+      {
+        "directRoleMarkerReturned": true,
+        "errorClasses": [],
+        "exitCode": 0,
+        "passwordSupplied": false,
+        "role": "academy_entitlement_operator",
+        "stderrBytes": 0,
+        "stdoutBytes": 15
+      }
+    ],
+    "ownedHostDirectoryAbsent": true,
+    "passwordValuesRead": false,
+    "preservedState": {
+      "catalogDigest": "dc92df49c697d46eca22bf6938b1b2aa",
+      "entitlementAudits": 0,
+      "entitlements": 0,
+      "roleBoundaryDigest": "cf7a028832d6d421859150fd614bdbf8",
+      "staffAssignments": 0,
+      "staffAudits": 0
+    },
+    "status": "READBACK_COMPLETED"
+  },
+  "matchesPreApplyPreservedState": true
+}

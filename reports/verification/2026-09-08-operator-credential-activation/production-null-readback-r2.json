@@ -1,0 +1,27 @@
+{
+  "at": "2026-09-08T12:39:42.344334+00:00",
+  "scope": "r2 post-rehearsal fresh read-only NULL/boundary readback",
+  "sshExitCode": 0,
+  "sshStderrBytes": 0,
+  "sourceSha256": "532c5c372f414238238b3197a111cf9bd6a293963f84e8fa1a2273c277870bfe",
+  "result": {
+    "counts": {
+      "passwordsConfigured": 0,
+      "passwordsNull": 2,
+      "roles": 2
+    },
+    "freshFrozenBoundaryPassed": true,
+    "mutation": false,
+    "ownedHostDirectoryAbsent": true,
+    "preservedState": {
+      "catalogDigest": "dc92df49c697d46eca22bf6938b1b2aa",
+      "entitlementAudits": 0,
+      "entitlements": 0,
+      "roleBoundaryDigest": "cf7a028832d6d421859150fd614bdbf8",
+      "staffAssignments": 0,
+      "staffAudits": 0
+    },
+    "status": "PASS"
+  },
+  "matchesPreRehearsalReadback": true
+}

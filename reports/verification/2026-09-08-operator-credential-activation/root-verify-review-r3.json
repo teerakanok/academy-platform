@@ -1,0 +1,23 @@
+{
+  "recordedAt": "2026-09-08T12:54:07.235774+00:00",
+  "reviewer": "root independent reviewer",
+  "reviewSource": "current parent VERIFY ONLY direction",
+  "sessionId": "ws-cde63a58-f932-47e3-bd65-df549781e118",
+  "reviewDisposition": "PASS",
+  "reviewedManifestSha256": "759a2a54c98c6ee0b5203ce937ead91e655eafacd1fdaaf164b5dc951a4e6980",
+  "diff": "psql and pgpass host only to observed supabase-db SCRAM route; no guards changed",
+  "rootTests": {
+    "passed": 28,
+    "total": 28,
+    "exitCode": 0
+  },
+  "reviewedPriorState": "passwords configured2; preserved boundary/state",
+  "approvedMode": "verify",
+  "forbiddenInThisStep": [
+    "apply",
+    "rehearse",
+    "reset",
+    "HBA edit",
+    "grant"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "at": "2026-09-08T13:19:48.923004+00:00",
+  "command": [
+    "/Users/teerakanok/.nvm/versions/node/v25.5.0/bin/node",
+    "/private/tmp/cyberskills-prod-cde63a58/records/academy-staff-root-controller-r1.mjs",
+    "dry-run",
+    "54881"
+  ],
+  "controllerSha256": "75bc2042857a31ee52b5c16bc94143744912eed9f1ce36df2ac33090d9ef8120",
+  "exit": 1,
+  "output": "{\"status\":\"UNCONFIRMED\",\"automaticRetry\":false,\"rawErrorsSuppressed\":true}",
+  "stderrBytes": 0
+}

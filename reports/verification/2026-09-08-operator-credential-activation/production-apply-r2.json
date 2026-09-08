@@ -1,0 +1,32 @@
+{
+  "startedAt": "2026-09-08T12:41:03.834704+00:00",
+  "finishedAt": "2026-09-08T12:41:07.590295+00:00",
+  "command": [
+    "python3",
+    "-I",
+    "-B",
+    "/private/tmp/cyberskills-prod-cde63a58/records/academy-credential-activation-r2/controller.py",
+    "apply",
+    "--reviewed-manifest-sha256",
+    "29db658311e260c040f4f1b8c93ba0a883236c6123f43a8c86e266a3a76a5edb"
+  ],
+  "controllerExitCode": 1,
+  "controllerStderrBytes": 0,
+  "result": {
+    "code": "PASSWORD_AUTH_REQUIRED_NOT_PROVEN",
+    "database": "postgres",
+    "host": "ssh-db.cyberskills.co.th",
+    "manifestSha256": "29db658311e260c040f4f1b8c93ba0a883236c6123f43a8c86e266a3a76a5edb",
+    "noAutomaticRecovery": true,
+    "ownedHostCopiesRemoved": true,
+    "ownerOriginalsRetained": true,
+    "packet": "academy-credential-activation-r1",
+    "roles": [
+      "academy_staff_admin",
+      "academy_entitlement_operator"
+    ],
+    "sshExitCode": 1,
+    "status": "REFUSED"
+  },
+  "scope": "Reviewed r2 password APPLY for exactly two dedicated Academy roles; no grants"
+}

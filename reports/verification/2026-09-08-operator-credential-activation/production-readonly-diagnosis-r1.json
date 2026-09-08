@@ -1,0 +1,72 @@
+{
+  "at": "2026-09-08T12:33:10.628990+00:00",
+  "scope": "fresh read-only NULL/role boundary plus exact transport comparison; no mutation",
+  "sshExitCode": 0,
+  "sshStderrBytes": 0,
+  "sourceSha256": "2cc417ed1efd82e71196cc3a31dcda0e8cd5b9dcae59ce1de5569daa776dc16a",
+  "result": {
+    "existingAdmin": {
+      "errorClasses": [],
+      "exitCode": 0,
+      "result": {
+        "expectedCurrentRole": true,
+        "expectedDatabase": true,
+        "expectedSessionRole": true,
+        "roles": [
+          {
+            "bypassRls": false,
+            "canLogin": true,
+            "createDb": false,
+            "createRole": false,
+            "inherit": false,
+            "memberOf": 0,
+            "members": 0,
+            "name": "academy_entitlement_operator",
+            "ownedObjects": 0,
+            "passwordConfigured": false,
+            "replication": false,
+            "settingsCount": 0,
+            "superuser": false
+          },
+          {
+            "bypassRls": false,
+            "canLogin": true,
+            "createDb": false,
+            "createRole": false,
+            "inherit": false,
+            "memberOf": 0,
+            "members": 0,
+            "name": "academy_staff_admin",
+            "ownedObjects": 0,
+            "passwordConfigured": false,
+            "replication": false,
+            "settingsCount": 0,
+            "superuser": false
+          }
+        ]
+      },
+      "stderrBytes": 0
+    },
+    "existingAdminFrozenBoundary": {
+      "errorClasses": [],
+      "exitCode": 0,
+      "result": {
+        "catalogDigest": "dc92df49c697d46eca22bf6938b1b2aa",
+        "entitlementAudits": 0,
+        "entitlements": 0,
+        "roleBoundaryDigest": "cf7a028832d6d421859150fd614bdbf8",
+        "staffAssignments": 0,
+        "staffAudits": 0
+      },
+      "stderrBytes": 0
+    },
+    "ownedHostDirectoryAbsent": true,
+    "scrubbedAdmin": {
+      "errorClasses": [
+        "no password supplied"
+      ],
+      "exitCode": 2,
+      "stderrBytes": 118
+    }
+  }
+}
