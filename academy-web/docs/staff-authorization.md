@@ -37,7 +37,10 @@ grant another.
 There is no staff UI in v1. A host-side operator provisions a password only for the
 dedicated `academy_staff_admin` login and connects directly as that role for
 `scripts/manage-staff-role.mjs`; the script rejects every other database user. The script is dry-run by
-default and requires `--apply` to change state. Its `DATABASE_URL` must be supplied by the
+default and requires `--apply` to change state. Add `--rehearse` instead of `--apply` to execute the
+same audited RPC in a transaction, verify the resulting role and latest audit, roll back, and verify
+that the original role and audit are restored. `--rehearse` cannot be combined with `--apply`. Its
+`DATABASE_URL` must be supplied by the
 approved control-plane environment, never by the shared application runtime.
 
 1. The founder signs in once so an `academy.users` account exists.

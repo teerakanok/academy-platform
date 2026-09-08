@@ -1,16 +1,19 @@
 #!/usr/bin/env node
 import pg from 'pg'
+import { assertExclusiveModes, rehearseMutation } from './admin-rehearsal.mjs'
 
 const ROLES = new Set(['owner', 'learner-support', 'privacy-officer', 'content-ops'])
 
-function parseArgs(argv) {
+export function parseStaffArgs(argv) {
   const values = new Map()
   let action = null
   let apply = false
+  let rehearse = false
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i]
     if (arg === '--enable' || arg === '--disable') action = arg.slice(2)
     else if (arg === '--apply') apply = true
+    else if (arg === '--rehearse') rehearse = true
     else if (arg.startsWith('--')) values.set(arg.slice(2), argv[++i])
     else throw new Error(`unexpected argument: ${arg}`)
   }
@@ -21,7 +24,7 @@ function parseArgs(argv) {
   if (values.get('reference').trim().length < 8 || values.get('reference').trim().length > 120) {
     throw new Error('--reference must be 8-120 characters')
   }
-  return { values, action, apply }
+  return { values, action, apply, rehearse, mode: assertExclusiveModes({ apply, rehearse }) }
 }
 
 async function accountId(client, issuer, subject, label) {
@@ -33,51 +36,98 @@ async function accountId(client, issuer, subject, label) {
   return result.rows[0].account_id
 }
 
-const { values, action, apply } = parseArgs(process.argv.slice(2))
-const databaseUrl = process.env.DATABASE_URL
-if (!databaseUrl) throw new Error('DATABASE_URL is required and must not be printed')
-
-const client = new pg.Client({ connectionString: databaseUrl })
-await client.connect()
-try {
-  const identity = await client.query(`select current_user as user_name`)
-  if (identity.rows[0].user_name !== 'academy_staff_admin') {
-    throw new Error('DATABASE_URL must connect directly as academy_staff_admin')
-  }
-  const actorId = await accountId(client, values.get('actor-issuer'), values.get('actor-subject'), 'actor')
-  const targetId = await accountId(client, values.get('target-issuer'), values.get('target-subject'), 'target')
-  const before = await client.query(
+export async function inspectState(client, actorId, targetId, role) {
+  const result = await client.query(
     `select academy.inspect_staff_role($1, $2, $3) as state`,
-    [actorId, targetId, values.get('role')],
+    [actorId, targetId, role],
   )
+  return result.rows[0].state
+}
 
-  if (!apply) {
-    console.log(`dry_run=true action=${action} role=${values.get('role')} actor_authorized=${before.rows[0].state.actorAuthorized} currently_active=${before.rows[0].state.active}`)
-    process.exit(0)
-  }
-
-  await client.query('begin')
-  const changed = await client.query(
-    `select academy.set_staff_role($1, $2, $3, $4, $5) as changed`,
-    [actorId, targetId, values.get('role'), action === 'enable', values.get('reference').trim()],
+export async function latestAudit(client, actorId, targetId, role) {
+  const result = await client.query(
+    `select academy.inspect_staff_role_audit($1, $2, $3) as audit`,
+    [actorId, targetId, role],
   )
-  await client.query('commit')
+  return result.rows[0].audit
+}
 
-  const verified = await client.query(
-    `select academy.inspect_staff_role($1, $2, $3) as state`,
-    [actorId, targetId, values.get('role')],
-  )
-  const expectedActive = action === 'enable'
-  if (verified.rows[0].state.active !== expectedActive) throw new Error('post-change assignment verification failed')
-  if (changed.rows[0].changed) {
-    if (verified.rows[0].state.lastAuditReference !== values.get('reference').trim()) {
-      throw new Error('post-change audit verification failed')
+export async function main({
+  argv = process.argv.slice(2),
+  environment = process.env,
+  createClient = (connectionString) => new pg.Client({ connectionString }),
+  output = console.log,
+} = {}) {
+  const options = parseStaffArgs(argv)
+  const databaseUrl = environment.DATABASE_URL
+  if (!databaseUrl) throw new Error('DATABASE_URL is required and must not be printed')
+
+  const client = createClient(databaseUrl)
+  await client.connect()
+  try {
+    const identity = await client.query(`select current_user as user_name`)
+    if (identity.rows[0].user_name !== 'academy_staff_admin') {
+      throw new Error('DATABASE_URL must connect directly as academy_staff_admin')
     }
+    const actorId = await accountId(client, options.values.get('actor-issuer'), options.values.get('actor-subject'), 'actor')
+    const targetId = await accountId(client, options.values.get('target-issuer'), options.values.get('target-subject'), 'target')
+    const role = options.values.get('role')
+    const reference = options.values.get('reference').trim()
+
+    if (options.mode === 'inspect') {
+      const before = await inspectState(client, actorId, targetId, role)
+      output(`dry_run=true action=${options.action} role=${role} actor_authorized=${before.actorAuthorized} currently_active=${before.active}`)
+      return
+    }
+
+    const stateQuery = () => inspectState(client, actorId, targetId, role)
+    const auditQuery = () => latestAudit(client, actorId, targetId, role)
+    const mutate = () => client.query(
+      `select academy.set_staff_role($1, $2, $3, $4, $5) as changed`,
+      [actorId, targetId, role, options.action === 'enable', reference],
+    ).then((result) => result.rows[0].changed)
+    const expectedActive = options.action === 'enable'
+
+    if (options.mode === 'rehearse') {
+      await rehearseMutation({
+        client,
+        inspectState: stateQuery,
+        inspectAudit: auditQuery,
+        mutate,
+        expectedActive,
+        expectedActorAuthorized: role === 'owner' && actorId === targetId && expectedActive ? true : undefined,
+        verifyIntendedAudit: (audit) => {
+          if (audit === null
+            || audit.action !== (expectedActive ? 'granted' : 'revoked')
+            || audit.authorizationReference !== reference) {
+            throw new Error('in-transaction audit verification failed')
+          }
+        },
+        output: ({ changed }) => output(`rehearsed=true changed=${changed} role=${role} active=${expectedActive}`),
+      })
+      return
+    }
+
+    await client.query('begin')
+    const changed = await mutate()
+    await client.query('commit')
+
+    const verified = await stateQuery()
+    if (verified.active !== expectedActive) throw new Error('post-change assignment verification failed')
+    if (changed) {
+      if (verified.lastAuditReference !== reference) {
+        throw new Error('post-change audit verification failed')
+      }
+    }
+    output(`applied=true changed=${changed} role=${role} active=${expectedActive}`)
+  } catch (error) {
+    await client.query('rollback').catch(() => undefined)
+    throw error
+  } finally {
+    await client.end()
   }
-  console.log(`applied=true changed=${changed.rows[0].changed} role=${values.get('role')} active=${expectedActive}`)
-} catch (error) {
-  await client.query('rollback').catch(() => undefined)
-  throw error
-} finally {
-  await client.end()
+}
+
+if (process.argv[1] && process.argv[1].endsWith('manage-staff-role.mjs')) {
+  await main()
 }
