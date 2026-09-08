@@ -1,24 +1,35 @@
 # Maintain and deploy Academy
 
-Procedure combines the completed 2026-09-06 session-ID digest cutover with the
-verified 2026-09-07 final-capstone application release.
-The [current handoff pointer](../../reports/handoffs/current.json) targets the
-[handoff record](../../reports/handoffs/20260906T225026Z-academy-session-digest-cutover.md),
-which links the [0034 cutover record](../../reports/operations/20260906-academy-0034-cutover/README.md).
-The cutover record's immutable receipts and
-[independent R2 PASS](../../reports/operations/20260906-academy-0034-cutover/concrete-cutover-r2-review.md)
-are the database-cutover source of truth. Current application evidence is in the
-[final-capstone production proof](../../reports/verification/2026-09-07-final-capstone-production/README.md).
+Current application source `fe4220a1850d277d542cd5e30f38360776df4b15` fixes the
+reported Account Center return/sign-in loop. See the
+[actual owner login proof](../../reports/verification/2026-09-08-active-user-shape/README.md),
+[0035 activation repair](../../reports/verification/2026-09-08-activation-repair/README.md),
+and [0036 audit inspection activation](../../reports/verification/2026-09-08-audit-inspection-0036/README.md).
+The [current handoff pointer](../../reports/handoffs/current.json) remains the
+prior session-close pointer until lifecycle finish; these dated verified records
+supersede its historical release IDs. The
+[0034 cutover record](../../reports/operations/20260906-academy-0034-cutover/README.md)
+remains authoritative for its consumed migration and recovery boundary.
 
 ## Current verified boundary
 
-- Deployment `b2238de8-ad52-4a0e-83b8-80e6141da016` serves version
-  `8e4d5c04-6b6f-459b-99e3-5b2352d0f133` at100%, source
-  `948385076f7e022d112e4c309958cefebf95dd28`, verified2026-09-07T17:34:17.898Z.
-  See the [current deployment receipt](../../reports/verification/2026-09-07-cookie-production/academy-cookie-production-allocation.json).
-  Predecessor `f67cb693-8faf-416d-a598-eaf77b9f637d` is retained.
-  Host-cookie cutover requires fresh sign-in for legacy sessions/in-flight callbacks;
-  rollback also requires fresh sign-in. See the [cookie release proof](../../reports/verification/2026-09-07-cookie-production/README.md).
+- Deployment `3ecc5f51-2c30-4ce1-86c9-cdd2fb076b1a` serves Worker version
+  `3830694b-bca9-4035-8bd0-e853ee6dd1fa` at100%, sourcefe4220a,
+  activated2026-09-08T04:51UTC. Root observed owner Safari Dashboard and
+  signed-in API after activation. Safari Dashboard remained authenticated after
+  the Identity release at07:12:54UTC. Original sign-in-loop SEC002 is closed.
+  This does not establish entitlement or persistent learner progress.
+- SQL0035 repaired bounded runtime activation/session authorization; SQL0036
+  added two dedicated-operator latest-audit read functions. Both had production
+  ROLLBACK rehearsal before COMMIT and separate readback; do not replay either.
+  Neither receipt grants founder staff role or course entitlement by itself.
+- Staff/entitlement CLIs now support inspect, exact mutation ROLLBACK rehearsal,
+  and apply. Dedicated roles `academy_staff_admin` and
+  `academy_entitlement_operator` need owner-supplied new DB passwords through0600
+  files. These are not Mac/Google/Cloudflare or learner login passwords.
+  Do not bypass direct-role login with an admin connection plus SET ROLE.
+  Bind the canonical account issuer/subject from authoritative Identity evidence,
+  never email equality, then use the scoped staff/entitlement operator runbooks.
 - Accepted/imported/deployed capstone banks:23/23. Production HTTP25/25 and real
   Chrome EN/TH desktop/mobile captures passed. This does not close authenticated
   learner submission, entitlement, payment or complete playtest acceptance.
@@ -189,8 +200,9 @@ the final sitting; never secret values.
 
 ## Current acceptance limits
 
-The digest-compatible application and migration are deployed and the verified
-postchecks passed, but real owner sign-in, fresh learner callback, entitlement,
-progress persistence and sign-out remain pending. Do not infer them from HTTP
-status, a build, raw 404, or the committed migration. Track other open security
-work in the dated security checklist.
+The current application and migrations0034–0036 have verified deployment receipts.
+Real owner sign-in and authenticated Dashboard are accepted, including the
+post-Identity-release observation linked above. Fresh learner callback, staff/
+entitlement, progress persistence and full sign-out remain pending. Do not infer
+these remaining journeys from HTTP status, a build or committed migration. Track
+other open security work in the dated security checklist.
