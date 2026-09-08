@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import pg from 'pg'
+import { assertExclusiveModes, rehearseMutation } from './admin-rehearsal.mjs'
 
 const CANONICAL_SUBJECT = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
 const COURSE_SLUG = /^[a-z0-9][a-z0-9-]{0,119}$/
@@ -10,10 +11,12 @@ function parseArgs(argv) {
   const values = new Map()
   let action = null
   let apply = false
+  let rehearse = false
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index]
     if (argument === '--grant' || argument === '--revoke') action = argument.slice(2)
     else if (argument === '--apply') apply = true
+    else if (argument === '--rehearse') rehearse = true
     else if (argument.startsWith('--')) values.set(argument.slice(2), argv[++index])
     else throw new Error(`unexpected argument: ${argument}`)
   }
@@ -50,7 +53,15 @@ function parseArgs(argv) {
     }
     expiresAt = parsed.toISOString()
   }
-  return { values, action, apply, reference, expiresAt }
+  return {
+    values,
+    action,
+    apply,
+    rehearse,
+    mode: assertExclusiveModes({ apply, rehearse }),
+    reference,
+    expiresAt,
+  }
 }
 
 function validateIssuer(value, key) {
@@ -77,11 +88,36 @@ async function accountId(client, issuer, subject, emailHint, label) {
 
 export const internals = { parseArgs, validateIssuer }
 
+async function inspectState(client, actorId, targetId, course) {
+  const result = await client.query(
+    `select academy.inspect_course_entitlement($1, $2, $3) as state`,
+    [actorId, targetId, course],
+  )
+  return result.rows[0].state
+}
+
+async function latestAudit(client, actorId, targetId, course) {
+  const result = await client.query(
+    `select academy.inspect_course_entitlement_audit($1, $2, $3) as audit`,
+    [actorId, targetId, course],
+  )
+  return result.rows[0].audit
+}
+
 async function main() {
-  const options = parseArgs(process.argv.slice(2))
-  const databaseUrl = process.env.DATABASE_URL
+  await runMain({ argv: process.argv.slice(2), environment: process.env })
+}
+
+export async function runMain({
+  argv = process.argv.slice(2),
+  environment = process.env,
+  createClient = (connectionString) => new pg.Client({ connectionString }),
+  output = console.log,
+} = {}) {
+  const options = parseArgs(argv)
+  const databaseUrl = environment.DATABASE_URL
   if (!databaseUrl) throw new Error('DATABASE_URL is required and must not be printed')
-  const client = new pg.Client({ connectionString: databaseUrl })
+  const client = createClient(databaseUrl)
   await client.connect()
   try {
     const identity = await client.query(`select current_user as user_name`)
@@ -102,32 +138,57 @@ async function main() {
       options.values.get('target-email-hint'),
       'target',
     )
-    const inspection = await client.query(
-      `select academy.inspect_course_entitlement($1, $2, $3) as state`,
-      [actorId, targetId, options.values.get('course')],
-    )
-    if (!options.apply) {
-      console.log(
-        `dry_run=true action=${options.action} actor_authorized=${inspection.rows[0].state.actorAuthorized} active=${inspection.rows[0].state.active} course=${options.values.get('course')} target_account=${targetId}`,
+    const course = options.values.get('course')
+    if (options.mode === 'inspect') {
+      const inspection = await inspectState(client, actorId, targetId, course)
+      output(
+        `dry_run=true action=${options.action} actor_authorized=${inspection.actorAuthorized} active=${inspection.active} course=${course} target_account=${targetId}`,
       )
       return
     }
-    await client.query('begin')
-    const changed = await client.query(
+
+    const stateQuery = () => inspectState(client, actorId, targetId, course)
+    const auditQuery = () => latestAudit(client, actorId, targetId, course)
+    const mutate = () => client.query(
       `select academy.set_course_entitlement($1, $2, $3, $4, $5, $6, $7) as changed`,
       [
         actorId,
         targetId,
-        options.values.get('course'),
+        course,
         options.action === 'grant',
         options.values.get('source'),
         options.expiresAt,
         options.reference,
       ],
-    )
+    ).then((result) => result.rows[0].changed)
+    const expectedActive = options.action === 'grant'
+
+    if (options.mode === 'rehearse') {
+      await rehearseMutation({
+        client,
+        inspectState: stateQuery,
+        inspectAudit: auditQuery,
+        mutate,
+        expectedActive,
+        verifyIntendedAudit: (audit) => {
+          if (audit === null
+            || audit.action !== (expectedActive ? 'granted' : 'revoked')
+            || audit.authorizationReference !== options.reference) {
+            throw new Error('in-transaction audit verification failed')
+          }
+        },
+        output: ({ changed }) => output(
+          `rehearsed=true changed=${changed} action=${options.action} course=${course}`,
+        ),
+      })
+      return
+    }
+
+    await client.query('begin')
+    const changed = await mutate()
     await client.query('commit')
-    console.log(
-      `applied=true changed=${changed.rows[0].changed} action=${options.action} course=${options.values.get('course')}`,
+    output(
+      `applied=true changed=${changed} action=${options.action} course=${course}`,
     )
   } catch (error) {
     await client.query('rollback').catch(() => undefined)

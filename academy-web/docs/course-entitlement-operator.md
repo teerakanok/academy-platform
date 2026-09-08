@@ -97,7 +97,9 @@ DATABASE_URL='<approved entitlement-operator URI, never printed>' \
 For a dated cohort grant, add `--expires-at '<future-RFC3339>'`. Re-running the
 same grant is a no-op. Change `--grant` to `--revoke` for revocation; repeated
 revocation is a no-op. Add `--apply` only after the dry run and reference are
-approved.
+approved. Add `--rehearse` instead of `--apply` to execute the same audited RPC in a
+transaction, verify the resulting entitlement and latest audit, roll back, and verify that the
+original entitlement and audit are restored. `--rehearse` cannot be combined with `--apply`.
 
 Every effective grant/revoke writes one append-only audit row containing only
 canonical target and actor UUIDs, course scope, action, source, expiry, and
