@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import {
@@ -18,6 +19,7 @@ import {
   CANDIDATE,
   executeReviewedAcademyProductionOperationInstall,
   inspectAcademyProductionOperationInstall,
+  SOURCE_REVISION,
 } from "./academy-production-operation-install-command.mjs";
 import { CURRENT_ENTRY_NAMES } from "./academy-production-operation-install.mjs";
 import { renderOperationManifest } from "./render-academy-production-operation-manifest.mjs";
@@ -288,7 +290,33 @@ try {
     expectedUid,
     expectedGid,
   });
-  assert.equal(inspection.sourceRevision, "1e2b0ff7cb09a0d5205aa61ab22060fea6fed037");
+  // Assert the inspection SURFACES the module's own pin, rather than duplicating
+  // the literal here — a copy has to be edited on every re-pin and so gets edited
+  // blindly. What is worth pinning is that the value is a real commit in this
+  // repository: a pin that names no commit describes no bytes.
+  assert.equal(inspection.sourceRevision, SOURCE_REVISION);
+  assert.match(SOURCE_REVISION, /^[a-f0-9]{40}$/);
+  {
+    // Decide availability from whether we are in a work tree, NOT from whether
+    // cat-file succeeded: a pin naming no object makes cat-file exit non-zero,
+    // which is precisely the failure this assertion exists to catch. Keying the
+    // skip on cat-file's status would swallow it.
+    const inWorkTree = spawnSync("git", ["rev-parse", "--is-inside-work-tree"], {
+      cwd: SCRIPTS_DIR,
+      encoding: "utf8",
+    });
+    if (inWorkTree.status === 0 && inWorkTree.stdout.trim() === "true") {
+      const probe = spawnSync("git", ["cat-file", "-t", SOURCE_REVISION], {
+        cwd: SCRIPTS_DIR,
+        encoding: "utf8",
+      });
+      assert.equal(
+        probe.status === 0 ? probe.stdout.trim() : "<no such object>",
+        "commit",
+        `SOURCE_REVISION ${SOURCE_REVISION} does not name a commit in this repository`,
+      );
+    }
+  }
   assert.equal(inspection.managed.length, 9);
   assert.equal(inspection.newManagedCollisions.length, 0);
   assert.ok(

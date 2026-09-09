@@ -17,7 +17,7 @@ import { renderOperationManifest } from "./render-academy-production-operation-m
 
 const INSTALL_ROOT = "/opt/academy/production-operations";
 // Re-pinned at commit time to the revision the CANDIDATE bytes below came from.
-const SOURCE_REVISION = "1e2b0ff7cb09a0d5205aa61ab22060fea6fed037";
+export const SOURCE_REVISION = "61a5afdae516a671046751a251e211f9d8da6bfa";
 const SHA = /^[a-f0-9]{64}$/;
 const CONFIG = "p1-p7-config.json";
 export const CANDIDATE = Object.freeze([
