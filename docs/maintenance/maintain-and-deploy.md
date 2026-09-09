@@ -97,8 +97,19 @@ Cloudflare-Workers-Version-Overrides: cyberskills-academy="<candidate-version>"
 ```
 
 Verify raw-host denial, canonical Access behavior, static assets and expected
-application behavior before activation. Do not treat a status code or Access
-redirect as a learner-session proof, and do not resend an OTP automatically.
+application behavior before activation. The override header requests the
+candidate but can fall back to the deployment allocation, so it does not by
+itself prove which version served the request. Before activation, correlate at
+least one sanitized override request with candidate-specific Worker
+observability or an intentionally issued non-secret candidate version marker.
+A matching status, Access redirect, or response body is not candidate
+attribution. If correlation is unavailable, record the smoke as unattributed
+and do not treat it as candidate acceptance. Under current authority, the exact
+reviewed activation path may establish the serving version with a provider
+allocation receipt, version-bound postchecks, and the retained rollback version;
+do not upload another version solely to add a marker. Do not treat a status code
+or Access redirect as a learner-session proof, and do not resend an OTP
+automatically.
 After the smoke passes:
 
 ```sh
