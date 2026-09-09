@@ -1,1 +1,5 @@
-{"schema": "session-handoff-pointer/v1", "path": "20260906T225026Z-academy-session-digest-cutover.md", "sha256": "fdaad945370fd6f57bcf1bc3bc014a1fb1a2334f10b3ab14c43a07251252d4e7"}
+{
+  "schema": "session-handoff-pointer/v1",
+  "path": "20260909T110000000Z-full-program-continuation.md",
+  "sha256": "9c40b0a360ce4c4af4bdbb054b4260051b74329c67ebd003e1b90dd899e665df"
+}
