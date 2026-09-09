@@ -11,7 +11,7 @@
   "repo": {
     "remote": "github.com/teerakanok/academy-platform",
     "branch": "handoff/claude-20260909-academy",
-    "base_head": "b16eccd3333cca45fcb92ca08aea4a8e0bcc3263"
+    "base_head": "1f623b13e275306df7fe1fa17345b387838951fe"
   },
   "delivery": "local",
   "worktree": {
@@ -122,7 +122,7 @@ Complete the full academy delivery, verification, integration and operational ac
 ## Repository State
 - ready
 - handoff/claude-20260909-academy
-- b16eccd3333cca45fcb92ca08aea4a8e0bcc3263
+- 1f623b13e275306df7fe1fa17345b387838951fe
 - local
 
 ## Completed This Session
