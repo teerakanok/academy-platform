@@ -14,6 +14,8 @@ const FILES = [
   "identity-production-activation-preflight.mjs",
   "academy-production-database-adapter.mjs",
   "current-deployment.mjs",
+  "academy-release-manifest.mjs",
+  "academy-release-pointer.mjs",
 ];
 export async function renderOperationManifest({
   root = new URL(".", import.meta.url),

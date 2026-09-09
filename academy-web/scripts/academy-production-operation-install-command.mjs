@@ -16,26 +16,40 @@ import {
 import { renderOperationManifest } from "./render-academy-production-operation-manifest.mjs";
 
 const INSTALL_ROOT = "/opt/academy/production-operations";
+// Re-pinned at commit time to the revision the CANDIDATE bytes below came from.
 const SOURCE_REVISION = "1e2b0ff7cb09a0d5205aa61ab22060fea6fed037";
 const SHA = /^[a-f0-9]{64}$/;
 const CONFIG = "p1-p7-config.json";
-const CANDIDATE = Object.freeze([
+export const CANDIDATE = Object.freeze([
   ["academy-production-operation.mjs", 7543, "98508a146bf8800c9555044e500e659a276c8bd075d90fc23c72f9b105f92050", "0755"],
   ["academy-production-p1-p7-runner.mjs", 16460, "4c4f8f1026d7466005ea3ded6b138755200fff4d6810554f63fcc8f04828af28", "0755"],
   ["academy-production-p1-p7-ssh.mjs", 8670, "b42cc1c506c3fd7a2527f5ecce40cc33db7d28d64bd71b8a6a95e0b0b5356c45", "0644"],
   ["academy-production-p1-p7-host.mjs", 8980, "6930f7dcd9cf261b6fb8fed5e945f2f2523873359256ae51ca06ebf0825c4dc3", "0755"],
-  ["academy-production-operation-install.mjs", 22214, "c31236b192ad19dfbc2c6a07036876aebdc27cf0d2feb3a8ca595ca424b731a6", "0755"],
+  ["academy-production-operation-install.mjs", 23488, "9f299c5c25a056902426f72c98f3bf3a4d5651b544159f56668234b8ecbe2290", "0755"],
   ["academy-poola-production-producer.mjs", 17775, "ec83328278d6e775df8c6cda5ef08726ce745e105b7bc2280b6f745e31280282", "0755"],
   ["academy-production-cloudflare-helper.mjs", 26757, "db5656d66f1cd01aa313625d97774023ccb8bde299785279c2f9bc687f24dd2b", "0644"],
   ["identity-production-activation-preflight.mjs", 11338, "e30ddf6a98614e642a698be8f0239a2431622f0d115a3bd70ad11b08c443feb6", "0644"],
   ["academy-production-database-adapter.mjs", 10247, "da0496c20d7b2b19ae27b4cf75acd06c5d4ebfcb8a37599cea99b5b48889ff59", "0644"],
   ["current-deployment.mjs", 7911, "362dc1a8957f95b158ad3954c71f856f79882a880f7659f9e55c63888e80d98a", "0644"],
+  ["academy-release-manifest.mjs", 11272, "e63128223ff20ef86f6ca1108845848523e7b25f46293cfab39ea66e25d37413", "0644"],
+  ["academy-release-pointer.mjs", 8458, "7cac358f35e6446e314e5cc9f884c9770b3395dcf9394221d6f61c569385fcee", "0644"],
 ]);
-const LEGACY_NAMES = Object.freeze(
-  CANDIDATE.filter(
-    ([name]) => name !== "identity-production-activation-preflight.mjs",
-  ).map(([name]) => name),
-);
+// The managed files the predecessor install is expected to already hold. Written
+// out literally and never derived from CANDIDATE: growing CANDIDATE must not
+// silently redefine which installed files count as predecessors, which files are
+// foreign-retained, or which are new-managed collisions. Advance this list only
+// together with an executed install transition.
+const LEGACY_NAMES = Object.freeze([
+  "academy-production-operation.mjs",
+  "academy-production-p1-p7-runner.mjs",
+  "academy-production-p1-p7-ssh.mjs",
+  "academy-production-p1-p7-host.mjs",
+  "academy-production-operation-install.mjs",
+  "academy-poola-production-producer.mjs",
+  "academy-production-cloudflare-helper.mjs",
+  "academy-production-database-adapter.mjs",
+  "current-deployment.mjs",
+]);
 const fail = () => {
   throw new Error("ACADEMY_OPERATION_INSTALL_COMMAND_REJECTED");
 };

@@ -17,7 +17,7 @@ import {
 import { dirname, join, resolve } from "node:path";
 
 const SHA = /^[a-f0-9]{64}$/;
-const CURRENT_ENTRY_NAMES = Object.freeze([
+export const CURRENT_ENTRY_NAMES = Object.freeze([
   "academy-production-operation.mjs",
   "academy-production-p1-p7-runner.mjs",
   "academy-production-p1-p7-ssh.mjs",
@@ -28,14 +28,44 @@ const CURRENT_ENTRY_NAMES = Object.freeze([
   "identity-production-activation-preflight.mjs",
   "academy-production-database-adapter.mjs",
   "current-deployment.mjs",
+  "academy-release-manifest.mjs",
+  "academy-release-pointer.mjs",
 ]);
-const LEGACY_ENTRY_NAMES = Object.freeze(
-  CURRENT_ENTRY_NAMES.filter(
-    (name) => name !== "identity-production-activation-preflight.mjs",
-  ),
+// Accepted historical install sets are written out literally and never derived
+// from CURRENT_ENTRY_NAMES: deriving them made growing the current set silently
+// redefine which already-installed manifests remain valid.
+const LEGACY_ENTRY_NAME_SETS = Object.freeze([
+  Object.freeze([
+    "academy-production-operation.mjs",
+    "academy-production-p1-p7-runner.mjs",
+    "academy-production-p1-p7-ssh.mjs",
+    "academy-production-p1-p7-host.mjs",
+    "academy-production-operation-install.mjs",
+    "academy-poola-production-producer.mjs",
+    "academy-production-cloudflare-helper.mjs",
+    "identity-production-activation-preflight.mjs",
+    "academy-production-database-adapter.mjs",
+    "current-deployment.mjs",
+  ]),
+  Object.freeze([
+    "academy-production-operation.mjs",
+    "academy-production-p1-p7-runner.mjs",
+    "academy-production-p1-p7-ssh.mjs",
+    "academy-production-p1-p7-host.mjs",
+    "academy-production-operation-install.mjs",
+    "academy-poola-production-producer.mjs",
+    "academy-production-cloudflare-helper.mjs",
+    "academy-production-database-adapter.mjs",
+    "current-deployment.mjs",
+  ]),
+]);
+const LEGACY_ENTRY_NAMES_BY_LENGTH = new Map(
+  LEGACY_ENTRY_NAME_SETS.map((names) => [names.length, names]),
 );
 const ENTRY_MODES = new Map(
-  CURRENT_ENTRY_NAMES.map((name) => [
+  [
+    ...new Set([...CURRENT_ENTRY_NAMES, ...LEGACY_ENTRY_NAME_SETS.flat()]),
+  ].map((name) => [
     name,
     [
       "academy-production-operation.mjs",
@@ -156,10 +186,10 @@ function validateManifestAt(
   { allowLegacy = true } = {},
 ) {
   const expectedNames =
-    manifest?.entries?.length === 10
+    manifest?.entries?.length === CURRENT_ENTRY_NAMES.length
       ? CURRENT_ENTRY_NAMES
-      : allowLegacy && manifest?.entries?.length === 9
-        ? LEGACY_ENTRY_NAMES
+      : allowLegacy
+        ? (LEGACY_ENTRY_NAMES_BY_LENGTH.get(manifest?.entries?.length) ?? null)
         : null;
   if (
     manifest?.schema !== "academy-production-operation-install-manifest/v1" ||

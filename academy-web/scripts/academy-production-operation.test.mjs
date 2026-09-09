@@ -189,7 +189,7 @@ const common = [
 }
 {
   const manifest = await renderOperationManifest({});
-  assert.equal(manifest.entries.length, 10);
+  assert.equal(manifest.entries.length, 12);
   assert.ok(manifest.entries.some((entry) => entry.name === "identity-production-activation-preflight.mjs"));
   assert.ok(
     manifest.entries.every(
@@ -349,10 +349,24 @@ const common = [
     await mkdtemp(join(process.cwd(), "academy-operation-legacy.")),
   );
   const fixtureIdentity = await stat(fixtureRoot);
+  // The previously accepted nine-name install set, written out literally: a
+  // fixture derived from the current set stops describing a real predecessor the
+  // moment the current set grows.
+  const LEGACY_NINE_ENTRY_NAMES = new Set([
+    "academy-production-operation.mjs",
+    "academy-production-p1-p7-runner.mjs",
+    "academy-production-p1-p7-ssh.mjs",
+    "academy-production-p1-p7-host.mjs",
+    "academy-production-operation-install.mjs",
+    "academy-poola-production-producer.mjs",
+    "academy-production-cloudflare-helper.mjs",
+    "academy-production-database-adapter.mjs",
+    "current-deployment.mjs",
+  ]);
   const legacyBase = {
     ...rendered,
-    entries: rendered.entries.filter(
-      (entry) => entry.name !== "identity-production-activation-preflight.mjs",
+    entries: rendered.entries.filter((entry) =>
+      LEGACY_NINE_ENTRY_NAMES.has(entry.name),
     ),
   };
   const sourceRoot = join(fixtureRoot, "owned-sources");
