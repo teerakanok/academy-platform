@@ -114,10 +114,19 @@ export interface DashboardCourse {
   nodeTitles: LearnerDashboardCourse['nodeTitles']
 }
 
+export interface DashboardCertificate {
+  certificateNumber: string
+  courseSlug: string
+  courseVersion: string
+  issuedAt: string
+}
+
 type DashboardResponse = {
   courses: DashboardCourse[]
   accessibleCourseSlugs: string[]
   records: Record<string, CourseProgressRecord>
+
+  certificates: DashboardCertificate[]
 }
 
 function record(value: unknown): Record<string, unknown> | null {
@@ -226,10 +235,11 @@ export function parseDashboardResponse(body: unknown): DashboardResponse | null 
   const response = record(body)
   if (
     !response
-    || !hasExactKeys(response, ['ok', 'accessibleCourseSlugs', 'records', 'courses'])
+    || !hasExactKeys(response, ['ok', 'accessibleCourseSlugs', 'records', 'courses', 'certificates'])
     || response.ok !== true
     || !Array.isArray(response.courses)
     || !Array.isArray(response.accessibleCourseSlugs)
+    || !Array.isArray(response.certificates)
   ) return null
   if (!response.accessibleCourseSlugs.every((slug) => typeof slug === 'string')) return null
   const records = record(response.records)
@@ -253,9 +263,28 @@ export function parseDashboardResponse(body: unknown): DashboardResponse | null 
     projectedRecords.push([slug, projected])
   }
 
+  const certificates: DashboardCertificate[] = []
+  for (const entry of response.certificates) {
+    const cert = record(entry)
+    if (!cert
+      || !hasExactKeys(cert, ['certificateNumber', 'courseSlug', 'courseVersion', 'issuedAt'])
+      || typeof cert.certificateNumber !== 'string'
+      || typeof cert.courseSlug !== 'string'
+      || !allowed.has(cert.courseSlug)
+      || typeof cert.courseVersion !== 'string'
+      || typeof cert.issuedAt !== 'string') return null
+    certificates.push({
+      certificateNumber: cert.certificateNumber,
+      courseSlug: cert.courseSlug,
+      courseVersion: cert.courseVersion,
+      issuedAt: cert.issuedAt,
+    })
+  }
+
   return {
     courses: courses as DashboardCourse[],
     accessibleCourseSlugs: [...response.accessibleCourseSlugs],
+    certificates,
     records: Object.fromEntries(projectedRecords),
   }
 }
@@ -286,6 +315,7 @@ export function CourseDashboard({
   const [progress, setProgress] = useState<Record<string, CourseProgressRecord>>({})
   const [accessState, setAccessState] = useState<'loading' | 'ready' | 'signed-out' | 'denied' | 'unavailable'>('loading')
   const [accessibleSlugs, setAccessibleSlugs] = useState<string[]>([])
+  const [certificates, setCertificates] = useState<DashboardCertificate[]>([])
   const [reload, setReload] = useState(0)
 
   useEffect(() => {
@@ -309,6 +339,7 @@ export function CourseDashboard({
           setCourses([])
           setProgress({})
           setAccessibleSlugs([])
+          setCertificates([])
           setAccessState(result.state)
           return
         }
@@ -321,6 +352,7 @@ export function CourseDashboard({
         setCourses(authorizedCourses)
         setProgress(next)
         setAccessibleSlugs([...allowed])
+        setCertificates(result.body.certificates)
         setAccessState('ready')
       })
       .catch(() => {
@@ -328,6 +360,7 @@ export function CourseDashboard({
         setCourses([])
         setProgress({})
         setAccessibleSlugs([])
+        setCertificates([])
         setAccessState('unavailable')
       })
     return () => {
@@ -532,6 +565,36 @@ export function CourseDashboard({
         <p className="mt-4 max-w-xl text-sm leading-relaxed text-cs-body">
           Shows lesson coverage across your enrolled courses, not proficiency.
         </p>
+        {certificates.length > 0 && (
+          <section className="mt-8" data-testid="dashboard-achievements">
+            <h3 className="font-display text-lg font-semibold text-cs-text">Achievements</h3>
+            <ul className="mt-3 space-y-2">
+              {certificates.map((certificate) => (
+                <li
+                  key={certificate.certificateNumber}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-control border border-cs-border bg-cs-surface px-4 py-3"
+                  data-testid="dashboard-achievement"
+                >
+                  <div>
+                    <p className="text-sm font-semibold text-cs-text">
+                      Certificate of Course Completion
+                    </p>
+                    <p className="font-mono text-xs text-cs-muted">
+                      {certificate.courseSlug} · v{certificate.courseVersion} · {certificate.issuedAt.slice(0, 10)} · {certificate.certificateNumber.slice(0, 12)}…
+                    </p>
+                  </div>
+                  <a
+                    href={`/api/courses/${certificate.courseSlug}/certificate/pdf`}
+                    className="rounded-control border border-cs-border px-3 py-1.5 text-sm font-semibold text-cs-accent transition-colors hover:border-cs-accent"
+                    download
+                  >
+                    Download PDF
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </section>}
 
       {accessState === 'ready' && showInternalSurfaces && (

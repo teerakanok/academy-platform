@@ -39,6 +39,7 @@ import {
   remapAnswersToReal,
 } from '@/lib/course/attempt'
 import { simulationsToGrade } from '@/lib/course/attempt-grading'
+import { academyDb } from '@/lib/db/server'
 import {
   loadAllProgress,
   loadProgress,
@@ -580,11 +581,27 @@ export async function GET(request: Request) {
     const records = accessibleCourseSlugs.length > 0
       ? await loadAllProgress(user.account.id, accessibleCourseSlugs)
       : {}
+    const db = academyDb()
+    const { data: certificateRows, error: certificateError } = await db
+      .from('course_certificates')
+      .select('certificate_number, course_slug, course_version, issued_at, revoked_at')
+      .eq('user_id', user.account.id)
+      .order('issued_at', { ascending: false })
+    if (certificateError) throw new Error(`อ่านใบรับรองไม่สำเร็จ: ${certificateError.message}`)
+    const certificates = (certificateRows ?? [])
+      .filter((row) => accessibleCourseSlugs.includes(row.course_slug as string) && row.revoked_at == null)
+      .map((row) => ({
+        certificateNumber: row.certificate_number as string,
+        courseSlug: row.course_slug as string,
+        courseVersion: row.course_version as string,
+        issuedAt: new Date(row.issued_at as string).toISOString(),
+      }))
     return learnerProgressResponse({
       ok: true,
       accessibleCourseSlugs,
       // DTO ถูกสร้างหลัง entitlement gate เท่านั้น; dashboard ไม่รับ registry ทั้งก้อนผ่าน Flight.
       courses: accessibleCourses.map(toLearnerDashboardCourse),
+      certificates,
       records: Object.fromEntries(
         accessibleCourses
           .filter((course) => records[course.structure.slug])

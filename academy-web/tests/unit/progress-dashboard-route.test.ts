@@ -33,6 +33,14 @@ vi.mock('@/lib/simulation/types', () => ({ gradeSimulation: vi.fn(), gradingFing
 vi.mock('@/lib/course/attempt-db', () => ({ commitAttemptResult: vi.fn(), consumeAttempt: vi.fn(), finalizeAttempt: vi.fn(), inspectAttempt: vi.fn() }))
 vi.mock('@/lib/course/attempt', () => ({ attemptExplanations: vi.fn(), CHECKPOINT_CHALLENGE_ID: 'challenge', remapAnswersToReal: vi.fn() }))
 vi.mock('@/lib/course/attempt-grading', () => ({ simulationsToGrade: vi.fn() }))
+vi.mock('@/lib/db/server', () => ({
+  academyDb: vi.fn(() => ({
+    from: vi.fn(() => ({
+      select: () => ({ eq: vi.fn(() => ({ order: vi.fn(() => ({ data: [], error: null })) })) }),
+    })),
+  })),
+}))
+
 vi.mock('@/lib/course/progress-db', () => ({
   loadAllProgress,
   loadProgress: vi.fn(),

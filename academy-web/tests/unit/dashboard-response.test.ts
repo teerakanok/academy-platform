@@ -10,6 +10,7 @@ import { emptyProgress } from '@/lib/course/progress'
 const response = {
   ok: true,
   accessibleCourseSlugs: ['course-1'],
+  certificates: [],
   records: {},
   courses: [{
     structure: {

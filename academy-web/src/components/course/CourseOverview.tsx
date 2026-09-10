@@ -30,6 +30,28 @@ export function CourseOverview({
   translatedNodeIds: string[]
   learnerRoute?: boolean
 }) {
+  const [certificate, setCertificate] = useState<{ certificateNumber: string } | null>(null)
+  const [certificateBusy, setCertificateBusy] = useState(false)
+  const [certificateError, setCertificateError] = useState(false)
+  const claimCertificate = async () => {
+    setCertificateBusy(true)
+    setCertificateError(false)
+    try {
+      const response = await fetch(`/api/courses/${structure.slug}/certificate`, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({}),
+      })
+      const value = (await response.json()) as { ok: boolean; issued?: { certificateNumber: string } | null }
+      if (!response.ok || !value.ok || !value.issued) throw new Error('issue failed')
+      setCertificate({ certificateNumber: value.issued.certificateNumber })
+    } catch {
+      setCertificateError(true)
+    } finally {
+      setCertificateBusy(false)
+    }
+  }
   const text = learnerCourseUi(locale)
   const ui = UI[locale]
   const [record, setRecord] = useState<CourseProgressRecord | null>(null)
@@ -335,6 +357,40 @@ export function CourseOverview({
             <p className="mt-2 max-w-2xl text-xs text-cs-muted" data-testid="certificate-availability-note">
               {text.certificatePreview(recordSummary.recordComplete)}
             </p>
+            {recordSummary.recordComplete && !accessIssue && (
+              <div className="mt-4 flex flex-wrap items-center gap-3" data-testid="certificate-claim">
+                {certificate ? (
+                  <>
+                    <span className="font-mono text-xs text-cs-muted" data-testid="certificate-issued-number">
+                      {text.certificateIssued(certificate.certificateNumber)}
+                    </span>
+                    <a
+                      href={`/api/courses/${structure.slug}/certificate/pdf`}
+                      data-testid="certificate-download"
+                      className="rounded-control border border-cs-border bg-cs-surface px-4 py-2 text-sm font-semibold text-cs-accent transition-colors hover:border-cs-accent"
+                      download
+                    >
+                      {text.certificateDownload}
+                    </a>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={claimCertificate}
+                    disabled={certificateBusy}
+                    data-testid="certificate-issue"
+                    className="rounded-control bg-cs-accent-fill px-4 py-2 text-sm font-semibold text-cs-on-accent transition-colors hover:opacity-90 disabled:opacity-60"
+                  >
+                    {certificateBusy ? text.certificateBusy : text.certificateIssue}
+                  </button>
+                )}
+                {certificateError && (
+                  <span className="text-sm text-cs-body" data-testid="certificate-issue-error" role="alert">
+                    {text.certificateIssueFailed}
+                  </span>
+                )}
+              </div>
+            )}
             <p className="mt-2 max-w-2xl text-xs text-cs-muted" data-testid="certificate-progress-note">
               {text.lessonsFinished(recordSummary.lessonsFinished, recordSummary.total)}
             </p>

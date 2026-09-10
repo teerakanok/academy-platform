@@ -23,6 +23,11 @@ export type LearnerCourseUi = {
   recordBody: (complete: boolean) => string
   noAssessment: string
   certificatePreview: (complete: boolean) => string
+  certificateIssue: string
+  certificateIssued: (number: string) => string
+  certificateDownload: string
+  certificateIssueFailed: string
+  certificateBusy: string
   lessonsFinished: (finished: number, total: number) => string
   skippedBlockers: (count: number) => string
   openBlocker: string
@@ -91,6 +96,11 @@ const en: LearnerCourseUi = {
   certificatePreview: (complete) => complete
     ? 'A shareable Certificate of Course Completion with public verification is planned for a later release. It will recognize assessed completion of this course; it is separate from a professional certification.'
     : 'A shareable Certificate of Course Completion with public verification is planned for a later release. Finish every lesson and pass every required assessed checkpoint to complete its course record.',
+  certificateIssue: 'Get my certificate',
+  certificateIssued: (number) => `Certificate issued · ${number}`,
+  certificateDownload: 'Download certificate (PDF)',
+  certificateIssueFailed: 'Could not issue the certificate. Please try again.',
+  certificateBusy: 'Working…',
   lessonsFinished: (finished, total) => `Lessons finished: ${finished} / ${total}`,
   skippedBlockers: (count) => `${count === 1 ? 'One lesson you skipped is' : `${count} lessons you skipped are`} still open. ${count === 1 ? 'Its checkpoint is' : 'Their checkpoints are'} quick if you already know the material.`,
   openBlocker: 'Open: ',
@@ -167,6 +177,11 @@ const th: LearnerCourseUi = {
   certificatePreview: (complete) => complete
     ? 'ใบรับรองการจบคอร์สที่แชร์และตรวจสอบสาธารณะได้มีแผนเปิดในรุ่นถัดไป ใบนี้รับรองการจบคอร์สตามด่านประเมิน ไม่ใช่ใบรับรองวิชาชีพ'
     : 'ใบรับรองการจบคอร์สที่แชร์และตรวจสอบสาธารณะได้มีแผนเปิดในรุ่นถัดไป เรียนให้ครบและผ่านด่านประเมินทุกด่านเพื่อให้ประวัติคอร์สสมบูรณ์',
+  certificateIssue: 'รับใบรับรอง',
+  certificateIssued: (number) => `ออกใบรับรองแล้ว · ${number}`,
+  certificateDownload: 'ดาวน์โหลดใบรับรอง (PDF)',
+  certificateIssueFailed: 'ออกใบรับรองไม่สำเร็จ โปรดลองอีกครั้ง',
+  certificateBusy: 'กำลังดำเนินการ…',
   lessonsFinished: (finished, total) => `เรียนจบแล้ว: ${finished} / ${total} บท`,
   skippedBlockers: (count) => `${count === 1 ? 'บทที่ข้ามไว้ 1 บท' : `บทที่ข้ามไว้ ${count} บท`} ยังกลับมาเรียนได้ ด่านของบทเหล่านี้ใช้เวลาไม่นานหากคุณรู้เนื้อหาอยู่แล้ว`,
   openBlocker: 'เปิด: ',
