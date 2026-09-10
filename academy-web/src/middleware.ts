@@ -58,6 +58,10 @@ function isPublic(pathname: string): boolean {
   // Brand assets are public. Lesson MP4/VTT/PDF use path-scoped delivery cookies
   // and must never be added to this allowlist or public ASSETS.
   if (pathname.startsWith('/brand/')) return true
+  // Certificate verification is a public capability per the approved certificate
+  // claim — anyone holding a certificate number can verify its status. The
+  // endpoint returns status only, never learner identity or evidence.
+  if (pathname === '/api/certificate/verify') return true
   return false
 }
 
