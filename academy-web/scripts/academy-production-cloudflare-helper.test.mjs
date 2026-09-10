@@ -379,8 +379,16 @@ test('activation tolerates a co-allocated zero-traffic candidate in the latest d
 test('activation rejects partial traffic splits in the latest deployment', async () => {
   const split = [{ id: deployment, created_on:'2026-08-29T10:00:00Z',
     versions:[{version_id:version,percentage:60},{version_id:candidate,percentage:40}] }]
-  const run = async args => (!args || args[1] === 'list') ? JSON.stringify(split) : ''
+  // The post-state must be one the mutation would accept (distinct deployment
+  // id, candidate at 100), so the ONLY thing this test pins is rejection at
+  // the pre-state — a loosened filter that fires `versions deploy` on a split
+  // allocation fails both assertions below instead of hiding behind the
+  // postcondition.
+  const nextProvider = [{ id: activated, created_on:'2026-08-29T10:02:00Z', versions:[{version_id:candidate,percentage:100}] }]
+  let listings = 0; const calls = []
+  const run = async args => { calls.push(args); if (!args || args[1] === 'list') return JSON.stringify(listings++ === 0 ? split : nextProvider); return '' }
   await assert.rejects(executeAcademyCloudflareHelper([...common,'--operation','activate','--expected-deployment',deployment,'--expected-version',version,'--candidate',candidate,'--traffic','100'], { ...options, run }))
+  assert.equal(calls.some(call => call?.[0] === 'versions' && call[1] === 'deploy'), false)
 })
 
 test('rollback verifies exact serving target after optimistic transition', async () => {
