@@ -1,0 +1,364 @@
+{
+  "nodeId": "producer-consumer",
+  "locale": "en",
+  "title": "Build a producer-consumer queue that does not corrupt",
+  "objective": "By the end of this lesson you have written a bounded queue that several producers and consumers use concurrently, shuts down without losing items or hanging, and passes thread sanitizer.",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "This is the structure underneath thread pools, job runners, logging pipelines, and every server that separates accepting work from doing it. It uses everything in this module at once: a mutex for the data, condition variables for the waiting, and a shutdown protocol that is where almost every homemade version goes wrong."
+    },
+    {
+      "kind": "heading",
+      "text": "What the queue must guarantee"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Every item produced is consumed exactly once — none lost, none duplicated",
+        "A producer facing a full queue waits instead of overwriting: that is back-pressure, and it is the point of a bounded queue",
+        "A consumer facing an empty queue sleeps instead of spinning",
+        "When production ends, every consumer exits — after draining what is left, not before",
+        "No thread is left asleep at shutdown"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "The implementation"
+    },
+    {
+      "kind": "code",
+      "caption": "A bounded queue, complete",
+      "lines": [
+        "#define CAP 8",
+        "",
+        "typedef struct {",
+        "    int buf[CAP];",
+        "    int head, tail, count;",
+        "    int closed;",
+        "    pthread_mutex_t m;",
+        "    pthread_cond_t not_full, not_empty;   /* two conditions, one mutex */",
+        "} queue_t;",
+        "",
+        "void q_put(queue_t *q, int v) {",
+        "    pthread_mutex_lock(&q->m);",
+        "    while (q->count == CAP)",
+        "        pthread_cond_wait(&q->not_full, &q->m);    /* back-pressure lives here */",
+        "    q->buf[q->tail] = v;",
+        "    q->tail = (q->tail + 1) % CAP;",
+        "    q->count++;",
+        "    pthread_cond_signal(&q->not_empty);",
+        "    pthread_mutex_unlock(&q->m);",
+        "}",
+        "",
+        "/* returns 1 with an item, or 0 when the queue is closed AND drained */",
+        "int q_get(queue_t *q, int *out) {",
+        "    pthread_mutex_lock(&q->m);",
+        "    while (q->count == 0 && !q->closed)",
+        "        pthread_cond_wait(&q->not_empty, &q->m);",
+        "    if (q->count == 0 && q->closed) {              /* the only clean exit */",
+        "        pthread_mutex_unlock(&q->m);",
+        "        return 0;",
+        "    }",
+        "    *out = q->buf[q->head];",
+        "    q->head = (q->head + 1) % CAP;",
+        "    q->count--;",
+        "    pthread_cond_signal(&q->not_full);",
+        "    pthread_mutex_unlock(&q->m);",
+        "    return 1;",
+        "}",
+        "",
+        "void q_close(queue_t *q) {",
+        "    pthread_mutex_lock(&q->m);",
+        "    q->closed = 1;",
+        "    pthread_cond_broadcast(&q->not_empty);   /* broadcast, not signal — see below */",
+        "    pthread_mutex_unlock(&q->m);",
+        "}"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "info",
+      "title": "Two conditions, one mutex — and why",
+      "text": "Producers and consumers wait for opposite things, so they need separate condition variables: waking a producer because the queue became non-empty would be pointless. But both wait on the SAME mutex, because both are protecting the same data. One mutex per shared structure, as many condition variables as there are distinct things to wait for."
+    },
+    {
+      "kind": "heading",
+      "text": "Shutdown: the part that is usually wrong"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A consumer's wait condition is (count > 0 || closed). Without the second half, closing the queue leaves every consumer asleep with nothing to wake them, and the program hangs at exit — the failure the previous lesson warned about. And the wake-up must be a broadcast: signal wakes one consumer, that one exits, and the rest sleep forever."
+    },
+    {
+      "kind": "paragraph",
+      "text": "The order also matters. Join the producers first, then close, then join the consumers. Closing while producers are still running would tell consumers to stop before the work is finished."
+    },
+    {
+      "kind": "code",
+      "caption": "Main, in the only order that works",
+      "lines": [
+        "q_init(&q);",
+        "",
+        "for (int i = 0; i < CONSUMERS; i++) pthread_create(&c[i], NULL, consumer, NULL);",
+        "for (int i = 0; i < PRODUCERS; i++) pthread_create(&p[i], NULL, producer, NULL);",
+        "",
+        "for (int i = 0; i < PRODUCERS; i++) pthread_join(p[i], NULL);   /* 1. producers finish */",
+        "q_close(&q);                                                    /* 2. announce the end */",
+        "for (int i = 0; i < CONSUMERS; i++) pthread_join(c[i], NULL);   /* 3. consumers drain and exit */"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "How to know it is right"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Do not judge it by whether it appears to work. Count. Three producers pushing 50,000 items each must produce exactly 150,000 consumed items, and the queue must end empty. Verified: five consecutive runs of this implementation reported 150,000 produced, 150,000 consumed, and count 0 — and thread sanitizer reported nothing."
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Counting the results needs its own lock",
+      "text": "Each consumer counts locally and adds its total to the shared figure once, under a separate mutex, at the end. Incrementing a shared total on every item would be the race from earlier in this module — and it would also make the statistics the bottleneck of the whole program."
+    },
+    {
+      "kind": "try",
+      "title": "Build it, then break it four ways",
+      "steps": [
+        "Implement the queue above with 3 producers x 50,000 items and 4 consumers",
+        "Verify: total consumed == 150,000 and the queue ends empty, over five runs",
+        "Build with -fsanitize=thread and confirm it is silent",
+        "BREAK 1: change the consumer's while to if — run and watch it take from an empty queue",
+        "BREAK 2: change q_close's broadcast to signal — run and watch it hang with consumers asleep",
+        "BREAK 3: call q_close before joining the producers — watch items get lost",
+        "BREAK 4: change the wait condition from while (q->count == 0 && !q->closed) to while (q->count == 0) — watch it hang at exit",
+        "For each break, use Ctrl-\\ to force a core dump, or attach with gdb -p <pid> and run thread apply all bt to see exactly where each thread is stuck"
+      ],
+      "expected": "One correct implementation and four distinct failures, each with its own signature: corrupted counts, a hang with all consumers in pthread_cond_wait, lost items, and a hang at exit. Being able to look at a stuck program's backtrace and say which of these it is — that is the deliverable of this whole module."
+    }
+  ],
+  "cheatsheet": [
+    "One mutex per shared structure; one condition variable per distinct thing waited for",
+    "Producer waits while full; consumer waits while empty — always in a while loop",
+    "Bounded queue + waiting producer = back-pressure",
+    "Consumer wait condition must be (count > 0 || closed), or shutdown hangs",
+    "Close with broadcast, never signal — every consumer must be woken",
+    "Order: join producers, then close, then join consumers",
+    "Consumers must drain the queue after close, not exit immediately",
+    "Count per thread and merge once; a shared per-item counter is both a race and a bottleneck",
+    "Verify by counting across several runs, and run it under thread sanitizer"
+  ],
+  "checkpoint": [
+    {
+      "id": "cp-1",
+      "prompt": "Why must q_close use broadcast rather than signal?",
+      "choices": {
+        "A": "Every waiting consumer must learn the queue is closed",
+        "B": "signal only works with a single mutex",
+        "C": "broadcast is faster",
+        "D": "broadcast flushes the queue"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Signal wakes one and the rest sleep forever. Closing is a state change that concerns all waiters, not a single item that one waiter can take."
+    },
+    {
+      "id": "cp-2",
+      "prompt": "A consumer waits while (count == 0) and the queue is closed with items still in it. What goes wrong?",
+      "choices": {
+        "A": "Nothing",
+        "B": "The items are lost",
+        "C": "The mutex leaks",
+        "D": "The consumer never learns about the close and sleeps forever"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The program hangs at exit. The wait condition must include the shutdown state: while (count == 0 && !closed). Otherwise there is no event that can end the wait."
+    },
+    {
+      "id": "cp-3",
+      "prompt": "Why does the queue have two condition variables rather than one?",
+      "choices": {
+        "A": "To avoid spurious wakeups",
+        "B": "To allow more waiters",
+        "C": "Producers and consumers wait for opposite conditions",
+        "D": "Because two mutexes are used"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "One variable would wake threads that still cannot proceed. Same mutex, because it is the same data. Separate condition variables, because 'not full' and 'not empty' are different events."
+    },
+    {
+      "id": "cp-4",
+      "prompt": "You close the queue before joining the producers. What is the effect?",
+      "choices": {
+        "A": "The producers crash",
+        "B": "Nothing, if the queue is empty",
+        "C": "Consumers may exit while producers are still adding items",
+        "D": "The queue rejects further items automatically"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Work is silently lost. Close means 'no more will arrive'. Saying that while more are still arriving makes it untrue, and consumers act on it."
+    },
+    {
+      "id": "cp-5",
+      "prompt": "Why put pthread_cond_wait in a while loop?",
+      "choices": {
+        "A": "It makes scheduling FIFO",
+        "B": "It removes the mutex",
+        "C": "It prevents thread creation",
+        "D": "The predicate may be false again when the thread wakes"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "A wakeup is not permission to proceed; the thread rechecks shared state while holding the mutex."
+    },
+    {
+      "id": "cp-6",
+      "prompt": "What should one queue mutex protect?",
+      "choices": {
+        "A": "The count, indexes, and closed state as one invariant",
+        "B": "Only the condition variable",
+        "C": "Only producer IDs",
+        "D": "Only the array capacity"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The state that decides whether a thread may push, pop, or exit must change together under the mutex."
+    },
+    {
+      "id": "cp-7",
+      "prompt": "What event should wake a consumer waiting for work?",
+      "choices": {
+        "A": "A consumer removes an item",
+        "B": "The queue capacity changes",
+        "C": "A producer makes the queue nonempty",
+        "D": "A thread reads its ID"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "After adding an item under the mutex, the producer signals that the not-empty predicate can hold."
+    },
+    {
+      "id": "cp-8",
+      "prompt": "What must happen before signaling a condition variable?",
+      "choices": {
+        "A": "Destroy the mutex",
+        "B": "Update the shared predicate while holding its mutex",
+        "C": "Join every thread",
+        "D": "Flush the queue"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "State and notification must be coordinated through the mutex so a waiter cannot miss the meaningful change."
+    },
+    {
+      "id": "cp-9",
+      "prompt": "What should a producer do when a bounded queue is full?",
+      "choices": {
+        "A": "Wait until the not-full predicate becomes true",
+        "B": "Overwrite the oldest item",
+        "C": "Close the queue",
+        "D": "Unlock permanently"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "A bounded queue cannot accept another item until a consumer creates space."
+    },
+    {
+      "id": "cp-10",
+      "prompt": "What should follow a consumer removing an item?",
+      "choices": {
+        "A": "Broadcast process exit",
+        "B": "Reset the indexes",
+        "C": "Duplicate the item",
+        "D": "Notify a producer that space may be available"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Removing an item can make the not-full predicate true for a waiting producer."
+    },
+    {
+      "id": "cp-11",
+      "prompt": "When may a consumer exit after queue close?",
+      "choices": {
+        "A": "As soon as close is called",
+        "B": "When the queue is closed and empty",
+        "C": "After one item",
+        "D": "Before checking the queue"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Close says no more items will arrive; emptiness says all already accepted work was consumed."
+    },
+    {
+      "id": "cp-12",
+      "prompt": "What should a push operation do after the queue is closed?",
+      "choices": {
+        "A": "Store it without locking",
+        "B": "Wake only consumers",
+        "C": "Reject the new item according to the queue contract",
+        "D": "Change the capacity"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "A close operation promises no further arrivals, so a later push must not silently violate that promise."
+    },
+    {
+      "id": "cp-13",
+      "prompt": "How does using the same mutex prevent a lost wakeup?",
+      "choices": {
+        "A": "It makes all wakes broadcasts",
+        "B": "It fixes CPU speed",
+        "C": "It removes predicates",
+        "D": "It coordinates testing the predicate with starting the wait"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The waiter checks state and waits atomically with respect to the signaler changing that state."
+    },
+    {
+      "id": "cp-14",
+      "prompt": "What does a condition variable hold for the queue?",
+      "choices": {
+        "A": "The next item",
+        "B": "No queue items; it only coordinates waiting",
+        "C": "A second mutex",
+        "D": "The thread stack"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The queue data lives in its protected state; a condition variable lets threads wait for a predicate."
+    },
+    {
+      "id": "cp-15",
+      "prompt": "When is it safe to destroy a queue mutex and condition variables?",
+      "choices": {
+        "A": "After all threads using the queue have stopped",
+        "B": "After the first wakeup",
+        "C": "Whenever the queue is full",
+        "D": "Before joining threads"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "No thread may still wait on or access synchronization objects when they are destroyed."
+    }
+  ]
+}

@@ -1,0 +1,301 @@
+{
+  "id": "iccs227-operating-systems",
+  "slug": "iccs227-operating-systems",
+  "version": "1.0.0",
+  "publicAvailability": "syllabus-preview",
+  "defaultLocale": "en",
+  "availableLocales": [
+    "en",
+    "th"
+  ],
+  "level": "intermediate",
+  "estimatedMinutes": 401,
+  "coverMotif": "layers",
+  "skills": [
+    {
+      "id": "kernel-interface",
+      "maxScore": 100
+    },
+    {
+      "id": "processes",
+      "maxScore": 100
+    },
+    {
+      "id": "concurrency",
+      "maxScore": 100
+    },
+    {
+      "id": "synchronisation",
+      "maxScore": 100
+    },
+    {
+      "id": "virtual-memory",
+      "maxScore": 100
+    },
+    {
+      "id": "os-security",
+      "maxScore": 100
+    }
+  ],
+  "globalSkillWeights": {
+    "foundations": 0.8,
+    "security-ops": 0.2
+  },
+  "nodes": [
+    {
+      "id": "kernel-vs-user-mode",
+      "kind": "lesson",
+      "prerequisites": [],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "kernel-interface": 3,
+        "os-security": 2
+      }
+    },
+    {
+      "id": "syscall-mechanism",
+      "kind": "lesson",
+      "prerequisites": [
+        "kernel-vs-user-mode"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "kernel-interface": 4
+      }
+    },
+    {
+      "id": "syscall-lifecycle",
+      "kind": "capstone",
+      "prerequisites": [
+        "syscall-mechanism"
+      ],
+      "estimatedMinutes": 20,
+      "skillWeights": {
+        "kernel-interface": 4,
+        "processes": 2
+      }
+    },
+    {
+      "id": "fork-exec-wait",
+      "kind": "lesson",
+      "prerequisites": [
+        "syscall-lifecycle"
+      ],
+      "estimatedMinutes": 20,
+      "skillWeights": {
+        "processes": 4,
+        "kernel-interface": 2
+      }
+    },
+    {
+      "id": "zombie-and-orphan",
+      "kind": "lesson",
+      "prerequisites": [
+        "fork-exec-wait",
+        "signals"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "processes": 4
+      }
+    },
+    {
+      "id": "signals",
+      "kind": "lesson",
+      "prerequisites": [
+        "fork-exec-wait"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "processes": 3,
+        "kernel-interface": 2
+      }
+    },
+    {
+      "id": "async-signal-safety",
+      "kind": "lesson",
+      "prerequisites": [
+        "signals"
+      ],
+      "estimatedMinutes": 17,
+      "skillWeights": {
+        "processes": 3,
+        "os-security": 2
+      }
+    },
+    {
+      "id": "thread-vs-process",
+      "kind": "lesson",
+      "prerequisites": [
+        "fork-exec-wait"
+      ],
+      "estimatedMinutes": 16,
+      "skillWeights": {
+        "concurrency": 4,
+        "processes": 2
+      }
+    },
+    {
+      "id": "pthreads",
+      "kind": "lesson",
+      "prerequisites": [
+        "thread-vs-process"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "concurrency": 4
+      }
+    },
+    {
+      "id": "race-conditions",
+      "kind": "lesson",
+      "prerequisites": [
+        "pthreads"
+      ],
+      "estimatedMinutes": 19,
+      "skillWeights": {
+        "concurrency": 4,
+        "synchronisation": 3
+      }
+    },
+    {
+      "id": "mutex",
+      "kind": "lesson",
+      "prerequisites": [
+        "race-conditions"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "synchronisation": 4,
+        "concurrency": 2
+      }
+    },
+    {
+      "id": "semaphore-and-condvar",
+      "kind": "lesson",
+      "prerequisites": [
+        "mutex"
+      ],
+      "estimatedMinutes": 19,
+      "skillWeights": {
+        "synchronisation": 4
+      }
+    },
+    {
+      "id": "producer-consumer",
+      "kind": "capstone",
+      "prerequisites": [
+        "semaphore-and-condvar"
+      ],
+      "estimatedMinutes": 22,
+      "skillWeights": {
+        "synchronisation": 4,
+        "concurrency": 4
+      }
+    },
+    {
+      "id": "deadlock",
+      "kind": "lesson",
+      "prerequisites": [
+        "mutex",
+        "semaphore-and-condvar"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "synchronisation": 4,
+        "concurrency": 2
+      }
+    },
+    {
+      "id": "cpu-scheduling",
+      "kind": "lesson",
+      "prerequisites": [
+        "thread-vs-process"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "processes": 3,
+        "concurrency": 2
+      }
+    },
+    {
+      "id": "address-space",
+      "kind": "lesson",
+      "prerequisites": [
+        "fork-exec-wait"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "virtual-memory": 4
+      }
+    },
+    {
+      "id": "page-tables-and-tlb",
+      "kind": "lesson",
+      "prerequisites": [
+        "address-space"
+      ],
+      "estimatedMinutes": 19,
+      "skillWeights": {
+        "virtual-memory": 4
+      }
+    },
+    {
+      "id": "demand-paging",
+      "kind": "lesson",
+      "prerequisites": [
+        "page-tables-and-tlb"
+      ],
+      "estimatedMinutes": 18,
+      "skillWeights": {
+        "virtual-memory": 4
+      }
+    },
+    {
+      "id": "cow-and-mmap",
+      "kind": "capstone",
+      "prerequisites": [
+        "demand-paging"
+      ],
+      "estimatedMinutes": 21,
+      "skillWeights": {
+        "virtual-memory": 4,
+        "processes": 3
+      }
+    },
+    {
+      "id": "privilege-rings",
+      "kind": "lesson",
+      "prerequisites": [
+        "kernel-vs-user-mode"
+      ],
+      "estimatedMinutes": 15,
+      "skillWeights": {
+        "os-security": 4
+      }
+    },
+    {
+      "id": "acl-vs-capability",
+      "kind": "lesson",
+      "prerequisites": [
+        "privilege-rings"
+      ],
+      "estimatedMinutes": 17,
+      "skillWeights": {
+        "os-security": 4
+      }
+    },
+    {
+      "id": "setuid-and-its-risks",
+      "kind": "capstone",
+      "prerequisites": [
+        "acl-vs-capability"
+      ],
+      "estimatedMinutes": 20,
+      "skillWeights": {
+        "os-security": 4,
+        "processes": 2
+      }
+    }
+  ]
+}
