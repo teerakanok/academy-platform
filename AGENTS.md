@@ -14,10 +14,12 @@ For every Academy session:
 
 1. Read director context: `../../../AGENTS.md`.
 2. Read this file.
-3. Read `plans/active_plan.md` and `plans/completed_log.md`.
+3. Read `plans/active_plan.md` for the current open slice. Read `plans/completed_log.md` only when tracing a prior decision, evidence, or residual risk.
 4. Read local `principles/` and `skills/` only when the task matches a project-specific addition.
 5. For operations, incident response, backup, restore, rollback, or secret inventory work, read `docs/maintenance/README.md`.
 6. For cross-product work, read `../../../ecosystem/ECOSYSTEM.md`.
+
+In long status and active-plan files, read current work and task-relevant sections. Before editing, scan headings and open, deferred, or blocked items for applicable constraints; follow any linked risk gates. Read completed history when tracing decisions, evidence, or residual risk.
 
 For a live learner canary, production UX/UI walkthrough, or post-release learner
 acceptance check, load `skills/academy-production-playtest/SKILL.md`. Its authority,
@@ -178,7 +180,7 @@ When delegating work on this product, describe roles by **neutral capability tie
 | `coding` | code-heavy implementation |
 | `longrun` | long autonomous build/agent tasks |
 
-(Tier → concrete model mapping lives in the orchestration layer / `config/model-tiers.yaml`, not here.)
+(Tier → concrete model mapping is owned by the installed governance root’s `skills/model-team-routing/SKILL.md`, reached through the `work-session` envelope, not this repo.)
 
 ---
 
