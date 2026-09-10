@@ -1,11 +1,13 @@
-import { getPublicCourse, listPublicCourseSlugs } from '@/lib/content/course-source'
+import { getPublicCourse } from '@/lib/content/course-source'
 import { publicPage } from '@/lib/seo'
 import { toPublicCourseCatalogItem } from '@/lib/content/public-course'
 import type { Locale } from '@/lib/content/course-types'
 import { PublicCourseCatalog } from '@/components/course/PublicCourseCatalog'
+import { getVisiblePublicCourses } from '@/lib/course/visibility'
 
 // หน้าร้านสาธารณะ — แยกจาก /dashboard ("My learning") โดยตั้งใจ. ข้อมูลที่ข้าม
 // ไป client ถูกตัดเป็น catalog DTO ใน toPublicCourseCatalogItem เสมอ.
+// Visibility และ title/subtitle ผ่าน runtime course_settings ของเจ้าของคอร์ส.
 
 export const metadata = publicPage({
   path: '/courses',
@@ -13,12 +15,14 @@ export const metadata = publicPage({
   description: 'See each course route before learning access opens: the lessons, prerequisite order, and required checkpoints.',
 })
 
-export default function CoursesPage() {
-  const courses = listPublicCourseSlugs().flatMap((slug) => {
-    const course = getPublicCourse(slug)
-    if (!course) return []
+export const dynamic = 'force-dynamic'
+
+export default async function CoursesPage() {
+  const visibleCourses = await getVisiblePublicCourses()
+  const courses = visibleCourses.flatMap((course) => {
+    const slug = course.structure.slug
     const copies = Object.fromEntries(
-      course.structure.availableLocales.flatMap((locale) => {
+      course.structure.availableLocales.flatMap((locale: Locale) => {
         const localized = getPublicCourse(slug, locale)
         return localized ? [[locale, { title: localized.copy.title, subtitle: localized.copy.subtitle }]] : []
       }),

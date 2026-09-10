@@ -330,176 +330,129 @@ import c323 from '../../../content/courses/git-essentials/locales/th/lessons/wor
 import c324 from '../../../content/courses/git-essentials/locales/th/lessons/worktree.json'
 import c325 from '../../../content/courses/git-essentials/locales/th/course.json'
 import c326 from '../../../content/courses/git-essentials/course.json'
-import c327 from '../../../content/courses/iccs227-operating-systems/locales/en/lessons/acl-vs-capability.json'
-import c328 from '../../../content/courses/iccs227-operating-systems/locales/en/lessons/address-space.json'
-import c329 from '../../../content/courses/iccs227-operating-systems/locales/en/lessons/async-signal-safety.json'
-import c330 from '../../../content/courses/iccs227-operating-systems/locales/en/lessons/cow-and-mmap.json'
-import c331 from '../../../content/courses/iccs227-operating-systems/locales/en/lessons/cpu-scheduling.json'
-import c332 from '../../../content/courses/iccs227-operating-systems/locales/en/lessons/deadlock.json'
-import c333 from '../../../content/courses/iccs227-operating-systems/locales/en/lessons/demand-paging.json'
-import c334 from '../../../content/courses/iccs227-operating-systems/locales/en/lessons/fork-exec-wait.json'
-import c335 from '../../../content/courses/iccs227-operating-systems/locales/en/lessons/kernel-vs-user-mode.json'
-import c336 from '../../../content/courses/iccs227-operating-systems/locales/en/lessons/mutex.json'
-import c337 from '../../../content/courses/iccs227-operating-systems/locales/en/lessons/page-tables-and-tlb.json'
-import c338 from '../../../content/courses/iccs227-operating-systems/locales/en/lessons/privilege-rings.json'
-import c339 from '../../../content/courses/iccs227-operating-systems/locales/en/lessons/producer-consumer.json'
-import c340 from '../../../content/courses/iccs227-operating-systems/locales/en/lessons/pthreads.json'
-import c341 from '../../../content/courses/iccs227-operating-systems/locales/en/lessons/race-conditions.json'
-import c342 from '../../../content/courses/iccs227-operating-systems/locales/en/lessons/semaphore-and-condvar.json'
-import c343 from '../../../content/courses/iccs227-operating-systems/locales/en/lessons/setuid-and-its-risks.json'
-import c344 from '../../../content/courses/iccs227-operating-systems/locales/en/lessons/signals.json'
-import c345 from '../../../content/courses/iccs227-operating-systems/locales/en/lessons/syscall-lifecycle.json'
-import c346 from '../../../content/courses/iccs227-operating-systems/locales/en/lessons/syscall-mechanism.json'
-import c347 from '../../../content/courses/iccs227-operating-systems/locales/en/lessons/thread-vs-process.json'
-import c348 from '../../../content/courses/iccs227-operating-systems/locales/en/lessons/zombie-and-orphan.json'
-import c349 from '../../../content/courses/iccs227-operating-systems/locales/en/course.json'
-import c350 from '../../../content/courses/iccs227-operating-systems/locales/th/lessons/acl-vs-capability.json'
-import c351 from '../../../content/courses/iccs227-operating-systems/locales/th/lessons/address-space.json'
-import c352 from '../../../content/courses/iccs227-operating-systems/locales/th/lessons/async-signal-safety.json'
-import c353 from '../../../content/courses/iccs227-operating-systems/locales/th/lessons/cow-and-mmap.json'
-import c354 from '../../../content/courses/iccs227-operating-systems/locales/th/lessons/cpu-scheduling.json'
-import c355 from '../../../content/courses/iccs227-operating-systems/locales/th/lessons/deadlock.json'
-import c356 from '../../../content/courses/iccs227-operating-systems/locales/th/lessons/demand-paging.json'
-import c357 from '../../../content/courses/iccs227-operating-systems/locales/th/lessons/fork-exec-wait.json'
-import c358 from '../../../content/courses/iccs227-operating-systems/locales/th/lessons/kernel-vs-user-mode.json'
-import c359 from '../../../content/courses/iccs227-operating-systems/locales/th/lessons/mutex.json'
-import c360 from '../../../content/courses/iccs227-operating-systems/locales/th/lessons/page-tables-and-tlb.json'
-import c361 from '../../../content/courses/iccs227-operating-systems/locales/th/lessons/privilege-rings.json'
-import c362 from '../../../content/courses/iccs227-operating-systems/locales/th/lessons/producer-consumer.json'
-import c363 from '../../../content/courses/iccs227-operating-systems/locales/th/lessons/pthreads.json'
-import c364 from '../../../content/courses/iccs227-operating-systems/locales/th/lessons/race-conditions.json'
-import c365 from '../../../content/courses/iccs227-operating-systems/locales/th/lessons/semaphore-and-condvar.json'
-import c366 from '../../../content/courses/iccs227-operating-systems/locales/th/lessons/setuid-and-its-risks.json'
-import c367 from '../../../content/courses/iccs227-operating-systems/locales/th/lessons/signals.json'
-import c368 from '../../../content/courses/iccs227-operating-systems/locales/th/lessons/syscall-lifecycle.json'
-import c369 from '../../../content/courses/iccs227-operating-systems/locales/th/lessons/syscall-mechanism.json'
-import c370 from '../../../content/courses/iccs227-operating-systems/locales/th/lessons/thread-vs-process.json'
-import c371 from '../../../content/courses/iccs227-operating-systems/locales/th/lessons/zombie-and-orphan.json'
-import c372 from '../../../content/courses/iccs227-operating-systems/locales/th/course.json'
-import c373 from '../../../content/courses/iccs227-operating-systems/course.json'
-import c374 from '../../../content/courses/isc2-cc/locales/en/lessons/aaa-in-depth.json'
-import c375 from '../../../content/courses/isc2-cc/locales/en/lessons/access-control-models.json'
-import c376 from '../../../content/courses/isc2-cc/locales/en/lessons/ai-data-integrity-risks.json'
-import c377 from '../../../content/courses/isc2-cc/locales/en/lessons/capstone-cc.json'
-import c378 from '../../../content/courses/isc2-cc/locales/en/lessons/cia-and-aaa.json'
-import c379 from '../../../content/courses/isc2-cc/locales/en/lessons/cloud-models-shared-responsibility.json'
-import c380 from '../../../content/courses/isc2-cc/locales/en/lessons/data-protection-ops.json'
-import c381 from '../../../content/courses/isc2-cc/locales/en/lessons/event-triage.json'
-import c382 from '../../../content/courses/isc2-cc/locales/en/lessons/governance-and-ethics-basics.json'
-import c383 from '../../../content/courses/isc2-cc/locales/en/lessons/governance-practice.json'
-import c384 from '../../../content/courses/isc2-cc/locales/en/lessons/grc-fundamentals.json'
-import c385 from '../../../content/courses/isc2-cc/locales/en/lessons/iam-practice.json'
-import c386 from '../../../content/courses/isc2-cc/locales/en/lessons/identity-lifecycle.json'
-import c387 from '../../../content/courses/isc2-cc/locales/en/lessons/incident-response-cycle.json'
-import c388 from '../../../content/courses/isc2-cc/locales/en/lessons/metrics-kris-and-reporting.json'
-import c389 from '../../../content/courses/isc2-cc/locales/en/lessons/mfa-and-iam-tools.json'
-import c390 from '../../../content/courses/isc2-cc/locales/en/lessons/monitoring-and-siem.json'
-import c391 from '../../../content/courses/isc2-cc/locales/en/lessons/network-cloud-practice.json'
-import c392 from '../../../content/courses/isc2-cc/locales/en/lessons/network-fundamentals-threats.json'
-import c393 from '../../../content/courses/isc2-cc/locales/en/lessons/network-security-devices.json'
-import c394 from '../../../content/courses/isc2-cc/locales/en/lessons/principles-practice.json'
-import c395 from '../../../content/courses/isc2-cc/locales/en/lessons/redundancy-and-continuity.json'
-import c396 from '../../../content/courses/isc2-cc/locales/en/lessons/risk-lifecycle.json'
-import c397 from '../../../content/courses/isc2-cc/locales/en/lessons/secops-practice.json'
-import c398 from '../../../content/courses/isc2-cc/locales/en/lessons/security-awareness-and-culture.json'
-import c399 from '../../../content/courses/isc2-cc/locales/en/lessons/security-controls-types.json'
-import c400 from '../../../content/courses/isc2-cc/locales/en/lessons/segmentation-and-zero-trust.json'
-import c401 from '../../../content/courses/isc2-cc/locales/en/lessons/teams-and-security-testing.json'
-import c402 from '../../../content/courses/isc2-cc/locales/en/lessons/threat-actors-and-cti.json'
-import c403 from '../../../content/courses/isc2-cc/locales/en/lessons/wireless-iot-ics.json'
-import c404 from '../../../content/courses/isc2-cc/locales/en/course.json'
-import c405 from '../../../content/courses/isc2-cc/locales/th/lessons/aaa-in-depth.json'
-import c406 from '../../../content/courses/isc2-cc/locales/th/lessons/access-control-models.json'
-import c407 from '../../../content/courses/isc2-cc/locales/th/lessons/ai-data-integrity-risks.json'
-import c408 from '../../../content/courses/isc2-cc/locales/th/lessons/capstone-cc.json'
-import c409 from '../../../content/courses/isc2-cc/locales/th/lessons/cia-and-aaa.json'
-import c410 from '../../../content/courses/isc2-cc/locales/th/lessons/cloud-models-shared-responsibility.json'
-import c411 from '../../../content/courses/isc2-cc/locales/th/lessons/data-protection-ops.json'
-import c412 from '../../../content/courses/isc2-cc/locales/th/lessons/event-triage.json'
-import c413 from '../../../content/courses/isc2-cc/locales/th/lessons/governance-and-ethics-basics.json'
-import c414 from '../../../content/courses/isc2-cc/locales/th/lessons/governance-practice.json'
-import c415 from '../../../content/courses/isc2-cc/locales/th/lessons/grc-fundamentals.json'
-import c416 from '../../../content/courses/isc2-cc/locales/th/lessons/iam-practice.json'
-import c417 from '../../../content/courses/isc2-cc/locales/th/lessons/identity-lifecycle.json'
-import c418 from '../../../content/courses/isc2-cc/locales/th/lessons/incident-response-cycle.json'
-import c419 from '../../../content/courses/isc2-cc/locales/th/lessons/metrics-kris-and-reporting.json'
-import c420 from '../../../content/courses/isc2-cc/locales/th/lessons/mfa-and-iam-tools.json'
-import c421 from '../../../content/courses/isc2-cc/locales/th/lessons/monitoring-and-siem.json'
-import c422 from '../../../content/courses/isc2-cc/locales/th/lessons/network-cloud-practice.json'
-import c423 from '../../../content/courses/isc2-cc/locales/th/lessons/network-fundamentals-threats.json'
-import c424 from '../../../content/courses/isc2-cc/locales/th/lessons/network-security-devices.json'
-import c425 from '../../../content/courses/isc2-cc/locales/th/lessons/principles-practice.json'
-import c426 from '../../../content/courses/isc2-cc/locales/th/lessons/redundancy-and-continuity.json'
-import c427 from '../../../content/courses/isc2-cc/locales/th/lessons/risk-lifecycle.json'
-import c428 from '../../../content/courses/isc2-cc/locales/th/lessons/secops-practice.json'
-import c429 from '../../../content/courses/isc2-cc/locales/th/lessons/security-awareness-and-culture.json'
-import c430 from '../../../content/courses/isc2-cc/locales/th/lessons/security-controls-types.json'
-import c431 from '../../../content/courses/isc2-cc/locales/th/lessons/segmentation-and-zero-trust.json'
-import c432 from '../../../content/courses/isc2-cc/locales/th/lessons/teams-and-security-testing.json'
-import c433 from '../../../content/courses/isc2-cc/locales/th/lessons/threat-actors-and-cti.json'
-import c434 from '../../../content/courses/isc2-cc/locales/th/lessons/wireless-iot-ics.json'
-import c435 from '../../../content/courses/isc2-cc/locales/th/course.json'
-import c436 from '../../../content/courses/isc2-cc/course.json'
-import c437 from '../../../content/courses/operating-systems/locales/en/lessons/acl-vs-capability.json'
-import c438 from '../../../content/courses/operating-systems/locales/en/lessons/address-space.json'
-import c439 from '../../../content/courses/operating-systems/locales/en/lessons/async-signal-safety.json'
-import c440 from '../../../content/courses/operating-systems/locales/en/lessons/cow-and-mmap.json'
-import c441 from '../../../content/courses/operating-systems/locales/en/lessons/cpu-scheduling.json'
-import c442 from '../../../content/courses/operating-systems/locales/en/lessons/deadlock.json'
-import c443 from '../../../content/courses/operating-systems/locales/en/lessons/demand-paging.json'
-import c444 from '../../../content/courses/operating-systems/locales/en/lessons/fork-exec-wait.json'
-import c445 from '../../../content/courses/operating-systems/locales/en/lessons/kernel-vs-user-mode.json'
-import c446 from '../../../content/courses/operating-systems/locales/en/lessons/mutex.json'
-import c447 from '../../../content/courses/operating-systems/locales/en/lessons/page-tables-and-tlb.json'
-import c448 from '../../../content/courses/operating-systems/locales/en/lessons/privilege-rings.json'
-import c449 from '../../../content/courses/operating-systems/locales/en/lessons/producer-consumer.json'
-import c450 from '../../../content/courses/operating-systems/locales/en/lessons/pthreads.json'
-import c451 from '../../../content/courses/operating-systems/locales/en/lessons/race-conditions.json'
-import c452 from '../../../content/courses/operating-systems/locales/en/lessons/semaphore-and-condvar.json'
-import c453 from '../../../content/courses/operating-systems/locales/en/lessons/setuid-and-its-risks.json'
-import c454 from '../../../content/courses/operating-systems/locales/en/lessons/signals.json'
-import c455 from '../../../content/courses/operating-systems/locales/en/lessons/syscall-lifecycle.json'
-import c456 from '../../../content/courses/operating-systems/locales/en/lessons/syscall-mechanism.json'
-import c457 from '../../../content/courses/operating-systems/locales/en/lessons/thread-vs-process.json'
-import c458 from '../../../content/courses/operating-systems/locales/en/lessons/zombie-and-orphan.json'
-import c459 from '../../../content/courses/operating-systems/locales/en/course.json'
-import c460 from '../../../content/courses/operating-systems/locales/th/lessons/acl-vs-capability.json'
-import c461 from '../../../content/courses/operating-systems/locales/th/lessons/address-space.json'
-import c462 from '../../../content/courses/operating-systems/locales/th/lessons/async-signal-safety.json'
-import c463 from '../../../content/courses/operating-systems/locales/th/lessons/cow-and-mmap.json'
-import c464 from '../../../content/courses/operating-systems/locales/th/lessons/cpu-scheduling.json'
-import c465 from '../../../content/courses/operating-systems/locales/th/lessons/deadlock.json'
-import c466 from '../../../content/courses/operating-systems/locales/th/lessons/demand-paging.json'
-import c467 from '../../../content/courses/operating-systems/locales/th/lessons/fork-exec-wait.json'
-import c468 from '../../../content/courses/operating-systems/locales/th/lessons/kernel-vs-user-mode.json'
-import c469 from '../../../content/courses/operating-systems/locales/th/lessons/mutex.json'
-import c470 from '../../../content/courses/operating-systems/locales/th/lessons/page-tables-and-tlb.json'
-import c471 from '../../../content/courses/operating-systems/locales/th/lessons/privilege-rings.json'
-import c472 from '../../../content/courses/operating-systems/locales/th/lessons/producer-consumer.json'
-import c473 from '../../../content/courses/operating-systems/locales/th/lessons/pthreads.json'
-import c474 from '../../../content/courses/operating-systems/locales/th/lessons/race-conditions.json'
-import c475 from '../../../content/courses/operating-systems/locales/th/lessons/semaphore-and-condvar.json'
-import c476 from '../../../content/courses/operating-systems/locales/th/lessons/setuid-and-its-risks.json'
-import c477 from '../../../content/courses/operating-systems/locales/th/lessons/signals.json'
-import c478 from '../../../content/courses/operating-systems/locales/th/lessons/syscall-lifecycle.json'
-import c479 from '../../../content/courses/operating-systems/locales/th/lessons/syscall-mechanism.json'
-import c480 from '../../../content/courses/operating-systems/locales/th/lessons/thread-vs-process.json'
-import c481 from '../../../content/courses/operating-systems/locales/th/lessons/zombie-and-orphan.json'
-import c482 from '../../../content/courses/operating-systems/locales/th/course.json'
-import c483 from '../../../content/courses/operating-systems/course.json'
-import c484 from '../../../content/courses/setup-and-environment/locales/en/lessons/choose-your-environment.json'
-import c485 from '../../../content/courses/setup-and-environment/locales/en/lessons/first-terminal-session.json'
-import c486 from '../../../content/courses/setup-and-environment/locales/en/lessons/github-account-and-first-push.json'
-import c487 from '../../../content/courses/setup-and-environment/locales/en/lessons/install-the-toolchain.json'
-import c488 from '../../../content/courses/setup-and-environment/locales/en/lessons/when-something-does-not-work.json'
-import c489 from '../../../content/courses/setup-and-environment/locales/en/course.json'
-import c490 from '../../../content/courses/setup-and-environment/locales/th/lessons/choose-your-environment.json'
-import c491 from '../../../content/courses/setup-and-environment/locales/th/lessons/first-terminal-session.json'
-import c492 from '../../../content/courses/setup-and-environment/locales/th/lessons/github-account-and-first-push.json'
-import c493 from '../../../content/courses/setup-and-environment/locales/th/lessons/install-the-toolchain.json'
-import c494 from '../../../content/courses/setup-and-environment/locales/th/lessons/when-something-does-not-work.json'
-import c495 from '../../../content/courses/setup-and-environment/locales/th/course.json'
-import c496 from '../../../content/courses/setup-and-environment/course.json'
+import c327 from '../../../content/courses/isc2-cc/locales/en/lessons/aaa-in-depth.json'
+import c328 from '../../../content/courses/isc2-cc/locales/en/lessons/access-control-models.json'
+import c329 from '../../../content/courses/isc2-cc/locales/en/lessons/ai-data-integrity-risks.json'
+import c330 from '../../../content/courses/isc2-cc/locales/en/lessons/capstone-cc.json'
+import c331 from '../../../content/courses/isc2-cc/locales/en/lessons/cia-and-aaa.json'
+import c332 from '../../../content/courses/isc2-cc/locales/en/lessons/cloud-models-shared-responsibility.json'
+import c333 from '../../../content/courses/isc2-cc/locales/en/lessons/data-protection-ops.json'
+import c334 from '../../../content/courses/isc2-cc/locales/en/lessons/event-triage.json'
+import c335 from '../../../content/courses/isc2-cc/locales/en/lessons/governance-and-ethics-basics.json'
+import c336 from '../../../content/courses/isc2-cc/locales/en/lessons/governance-practice.json'
+import c337 from '../../../content/courses/isc2-cc/locales/en/lessons/grc-fundamentals.json'
+import c338 from '../../../content/courses/isc2-cc/locales/en/lessons/iam-practice.json'
+import c339 from '../../../content/courses/isc2-cc/locales/en/lessons/identity-lifecycle.json'
+import c340 from '../../../content/courses/isc2-cc/locales/en/lessons/incident-response-cycle.json'
+import c341 from '../../../content/courses/isc2-cc/locales/en/lessons/metrics-kris-and-reporting.json'
+import c342 from '../../../content/courses/isc2-cc/locales/en/lessons/mfa-and-iam-tools.json'
+import c343 from '../../../content/courses/isc2-cc/locales/en/lessons/monitoring-and-siem.json'
+import c344 from '../../../content/courses/isc2-cc/locales/en/lessons/network-cloud-practice.json'
+import c345 from '../../../content/courses/isc2-cc/locales/en/lessons/network-fundamentals-threats.json'
+import c346 from '../../../content/courses/isc2-cc/locales/en/lessons/network-security-devices.json'
+import c347 from '../../../content/courses/isc2-cc/locales/en/lessons/principles-practice.json'
+import c348 from '../../../content/courses/isc2-cc/locales/en/lessons/redundancy-and-continuity.json'
+import c349 from '../../../content/courses/isc2-cc/locales/en/lessons/risk-lifecycle.json'
+import c350 from '../../../content/courses/isc2-cc/locales/en/lessons/secops-practice.json'
+import c351 from '../../../content/courses/isc2-cc/locales/en/lessons/security-awareness-and-culture.json'
+import c352 from '../../../content/courses/isc2-cc/locales/en/lessons/security-controls-types.json'
+import c353 from '../../../content/courses/isc2-cc/locales/en/lessons/segmentation-and-zero-trust.json'
+import c354 from '../../../content/courses/isc2-cc/locales/en/lessons/teams-and-security-testing.json'
+import c355 from '../../../content/courses/isc2-cc/locales/en/lessons/threat-actors-and-cti.json'
+import c356 from '../../../content/courses/isc2-cc/locales/en/lessons/wireless-iot-ics.json'
+import c357 from '../../../content/courses/isc2-cc/locales/en/course.json'
+import c358 from '../../../content/courses/isc2-cc/locales/th/lessons/aaa-in-depth.json'
+import c359 from '../../../content/courses/isc2-cc/locales/th/lessons/access-control-models.json'
+import c360 from '../../../content/courses/isc2-cc/locales/th/lessons/ai-data-integrity-risks.json'
+import c361 from '../../../content/courses/isc2-cc/locales/th/lessons/capstone-cc.json'
+import c362 from '../../../content/courses/isc2-cc/locales/th/lessons/cia-and-aaa.json'
+import c363 from '../../../content/courses/isc2-cc/locales/th/lessons/cloud-models-shared-responsibility.json'
+import c364 from '../../../content/courses/isc2-cc/locales/th/lessons/data-protection-ops.json'
+import c365 from '../../../content/courses/isc2-cc/locales/th/lessons/event-triage.json'
+import c366 from '../../../content/courses/isc2-cc/locales/th/lessons/governance-and-ethics-basics.json'
+import c367 from '../../../content/courses/isc2-cc/locales/th/lessons/governance-practice.json'
+import c368 from '../../../content/courses/isc2-cc/locales/th/lessons/grc-fundamentals.json'
+import c369 from '../../../content/courses/isc2-cc/locales/th/lessons/iam-practice.json'
+import c370 from '../../../content/courses/isc2-cc/locales/th/lessons/identity-lifecycle.json'
+import c371 from '../../../content/courses/isc2-cc/locales/th/lessons/incident-response-cycle.json'
+import c372 from '../../../content/courses/isc2-cc/locales/th/lessons/metrics-kris-and-reporting.json'
+import c373 from '../../../content/courses/isc2-cc/locales/th/lessons/mfa-and-iam-tools.json'
+import c374 from '../../../content/courses/isc2-cc/locales/th/lessons/monitoring-and-siem.json'
+import c375 from '../../../content/courses/isc2-cc/locales/th/lessons/network-cloud-practice.json'
+import c376 from '../../../content/courses/isc2-cc/locales/th/lessons/network-fundamentals-threats.json'
+import c377 from '../../../content/courses/isc2-cc/locales/th/lessons/network-security-devices.json'
+import c378 from '../../../content/courses/isc2-cc/locales/th/lessons/principles-practice.json'
+import c379 from '../../../content/courses/isc2-cc/locales/th/lessons/redundancy-and-continuity.json'
+import c380 from '../../../content/courses/isc2-cc/locales/th/lessons/risk-lifecycle.json'
+import c381 from '../../../content/courses/isc2-cc/locales/th/lessons/secops-practice.json'
+import c382 from '../../../content/courses/isc2-cc/locales/th/lessons/security-awareness-and-culture.json'
+import c383 from '../../../content/courses/isc2-cc/locales/th/lessons/security-controls-types.json'
+import c384 from '../../../content/courses/isc2-cc/locales/th/lessons/segmentation-and-zero-trust.json'
+import c385 from '../../../content/courses/isc2-cc/locales/th/lessons/teams-and-security-testing.json'
+import c386 from '../../../content/courses/isc2-cc/locales/th/lessons/threat-actors-and-cti.json'
+import c387 from '../../../content/courses/isc2-cc/locales/th/lessons/wireless-iot-ics.json'
+import c388 from '../../../content/courses/isc2-cc/locales/th/course.json'
+import c389 from '../../../content/courses/isc2-cc/course.json'
+import c390 from '../../../content/courses/operating-systems/locales/en/lessons/acl-vs-capability.json'
+import c391 from '../../../content/courses/operating-systems/locales/en/lessons/address-space.json'
+import c392 from '../../../content/courses/operating-systems/locales/en/lessons/async-signal-safety.json'
+import c393 from '../../../content/courses/operating-systems/locales/en/lessons/cow-and-mmap.json'
+import c394 from '../../../content/courses/operating-systems/locales/en/lessons/cpu-scheduling.json'
+import c395 from '../../../content/courses/operating-systems/locales/en/lessons/deadlock.json'
+import c396 from '../../../content/courses/operating-systems/locales/en/lessons/demand-paging.json'
+import c397 from '../../../content/courses/operating-systems/locales/en/lessons/fork-exec-wait.json'
+import c398 from '../../../content/courses/operating-systems/locales/en/lessons/kernel-vs-user-mode.json'
+import c399 from '../../../content/courses/operating-systems/locales/en/lessons/mutex.json'
+import c400 from '../../../content/courses/operating-systems/locales/en/lessons/page-tables-and-tlb.json'
+import c401 from '../../../content/courses/operating-systems/locales/en/lessons/privilege-rings.json'
+import c402 from '../../../content/courses/operating-systems/locales/en/lessons/producer-consumer.json'
+import c403 from '../../../content/courses/operating-systems/locales/en/lessons/pthreads.json'
+import c404 from '../../../content/courses/operating-systems/locales/en/lessons/race-conditions.json'
+import c405 from '../../../content/courses/operating-systems/locales/en/lessons/semaphore-and-condvar.json'
+import c406 from '../../../content/courses/operating-systems/locales/en/lessons/setuid-and-its-risks.json'
+import c407 from '../../../content/courses/operating-systems/locales/en/lessons/signals.json'
+import c408 from '../../../content/courses/operating-systems/locales/en/lessons/syscall-lifecycle.json'
+import c409 from '../../../content/courses/operating-systems/locales/en/lessons/syscall-mechanism.json'
+import c410 from '../../../content/courses/operating-systems/locales/en/lessons/thread-vs-process.json'
+import c411 from '../../../content/courses/operating-systems/locales/en/lessons/zombie-and-orphan.json'
+import c412 from '../../../content/courses/operating-systems/locales/en/course.json'
+import c413 from '../../../content/courses/operating-systems/locales/th/lessons/acl-vs-capability.json'
+import c414 from '../../../content/courses/operating-systems/locales/th/lessons/address-space.json'
+import c415 from '../../../content/courses/operating-systems/locales/th/lessons/async-signal-safety.json'
+import c416 from '../../../content/courses/operating-systems/locales/th/lessons/cow-and-mmap.json'
+import c417 from '../../../content/courses/operating-systems/locales/th/lessons/cpu-scheduling.json'
+import c418 from '../../../content/courses/operating-systems/locales/th/lessons/deadlock.json'
+import c419 from '../../../content/courses/operating-systems/locales/th/lessons/demand-paging.json'
+import c420 from '../../../content/courses/operating-systems/locales/th/lessons/fork-exec-wait.json'
+import c421 from '../../../content/courses/operating-systems/locales/th/lessons/kernel-vs-user-mode.json'
+import c422 from '../../../content/courses/operating-systems/locales/th/lessons/mutex.json'
+import c423 from '../../../content/courses/operating-systems/locales/th/lessons/page-tables-and-tlb.json'
+import c424 from '../../../content/courses/operating-systems/locales/th/lessons/privilege-rings.json'
+import c425 from '../../../content/courses/operating-systems/locales/th/lessons/producer-consumer.json'
+import c426 from '../../../content/courses/operating-systems/locales/th/lessons/pthreads.json'
+import c427 from '../../../content/courses/operating-systems/locales/th/lessons/race-conditions.json'
+import c428 from '../../../content/courses/operating-systems/locales/th/lessons/semaphore-and-condvar.json'
+import c429 from '../../../content/courses/operating-systems/locales/th/lessons/setuid-and-its-risks.json'
+import c430 from '../../../content/courses/operating-systems/locales/th/lessons/signals.json'
+import c431 from '../../../content/courses/operating-systems/locales/th/lessons/syscall-lifecycle.json'
+import c432 from '../../../content/courses/operating-systems/locales/th/lessons/syscall-mechanism.json'
+import c433 from '../../../content/courses/operating-systems/locales/th/lessons/thread-vs-process.json'
+import c434 from '../../../content/courses/operating-systems/locales/th/lessons/zombie-and-orphan.json'
+import c435 from '../../../content/courses/operating-systems/locales/th/course.json'
+import c436 from '../../../content/courses/operating-systems/course.json'
+import c437 from '../../../content/courses/setup-and-environment/locales/en/lessons/choose-your-environment.json'
+import c438 from '../../../content/courses/setup-and-environment/locales/en/lessons/first-terminal-session.json'
+import c439 from '../../../content/courses/setup-and-environment/locales/en/lessons/github-account-and-first-push.json'
+import c440 from '../../../content/courses/setup-and-environment/locales/en/lessons/install-the-toolchain.json'
+import c441 from '../../../content/courses/setup-and-environment/locales/en/lessons/when-something-does-not-work.json'
+import c442 from '../../../content/courses/setup-and-environment/locales/en/course.json'
+import c443 from '../../../content/courses/setup-and-environment/locales/th/lessons/choose-your-environment.json'
+import c444 from '../../../content/courses/setup-and-environment/locales/th/lessons/first-terminal-session.json'
+import c445 from '../../../content/courses/setup-and-environment/locales/th/lessons/github-account-and-first-push.json'
+import c446 from '../../../content/courses/setup-and-environment/locales/th/lessons/install-the-toolchain.json'
+import c447 from '../../../content/courses/setup-and-environment/locales/th/lessons/when-something-does-not-work.json'
+import c448 from '../../../content/courses/setup-and-environment/locales/th/course.json'
+import c449 from '../../../content/courses/setup-and-environment/course.json'
 
 /** โครง + ข้อความของทุกคอร์ส ผูกเข้ามาตอน build ไม่ใช่ตอน request */
 export const COURSE_REGISTRY: Record<
@@ -879,198 +832,145 @@ export const COURSE_REGISTRY: Record<
       "worktree": c324,
     },
   },
-  "iccs227-operating-systems": {
-    __structure: c373,
-    "en": {
-      __copy: c349,
-      "acl-vs-capability": c327,
-      "address-space": c328,
-      "async-signal-safety": c329,
-      "cow-and-mmap": c330,
-      "cpu-scheduling": c331,
-      "deadlock": c332,
-      "demand-paging": c333,
-      "fork-exec-wait": c334,
-      "kernel-vs-user-mode": c335,
-      "mutex": c336,
-      "page-tables-and-tlb": c337,
-      "privilege-rings": c338,
-      "producer-consumer": c339,
-      "pthreads": c340,
-      "race-conditions": c341,
-      "semaphore-and-condvar": c342,
-      "setuid-and-its-risks": c343,
-      "signals": c344,
-      "syscall-lifecycle": c345,
-      "syscall-mechanism": c346,
-      "thread-vs-process": c347,
-      "zombie-and-orphan": c348,
-    },
-    "th": {
-      __copy: c372,
-      "acl-vs-capability": c350,
-      "address-space": c351,
-      "async-signal-safety": c352,
-      "cow-and-mmap": c353,
-      "cpu-scheduling": c354,
-      "deadlock": c355,
-      "demand-paging": c356,
-      "fork-exec-wait": c357,
-      "kernel-vs-user-mode": c358,
-      "mutex": c359,
-      "page-tables-and-tlb": c360,
-      "privilege-rings": c361,
-      "producer-consumer": c362,
-      "pthreads": c363,
-      "race-conditions": c364,
-      "semaphore-and-condvar": c365,
-      "setuid-and-its-risks": c366,
-      "signals": c367,
-      "syscall-lifecycle": c368,
-      "syscall-mechanism": c369,
-      "thread-vs-process": c370,
-      "zombie-and-orphan": c371,
-    },
-  },
   "isc2-cc": {
-    __structure: c436,
+    __structure: c389,
     "en": {
-      __copy: c404,
-      "aaa-in-depth": c374,
-      "access-control-models": c375,
-      "ai-data-integrity-risks": c376,
-      "capstone-cc": c377,
-      "cia-and-aaa": c378,
-      "cloud-models-shared-responsibility": c379,
-      "data-protection-ops": c380,
-      "event-triage": c381,
-      "governance-and-ethics-basics": c382,
-      "governance-practice": c383,
-      "grc-fundamentals": c384,
-      "iam-practice": c385,
-      "identity-lifecycle": c386,
-      "incident-response-cycle": c387,
-      "metrics-kris-and-reporting": c388,
-      "mfa-and-iam-tools": c389,
-      "monitoring-and-siem": c390,
-      "network-cloud-practice": c391,
-      "network-fundamentals-threats": c392,
-      "network-security-devices": c393,
-      "principles-practice": c394,
-      "redundancy-and-continuity": c395,
-      "risk-lifecycle": c396,
-      "secops-practice": c397,
-      "security-awareness-and-culture": c398,
-      "security-controls-types": c399,
-      "segmentation-and-zero-trust": c400,
-      "teams-and-security-testing": c401,
-      "threat-actors-and-cti": c402,
-      "wireless-iot-ics": c403,
+      __copy: c357,
+      "aaa-in-depth": c327,
+      "access-control-models": c328,
+      "ai-data-integrity-risks": c329,
+      "capstone-cc": c330,
+      "cia-and-aaa": c331,
+      "cloud-models-shared-responsibility": c332,
+      "data-protection-ops": c333,
+      "event-triage": c334,
+      "governance-and-ethics-basics": c335,
+      "governance-practice": c336,
+      "grc-fundamentals": c337,
+      "iam-practice": c338,
+      "identity-lifecycle": c339,
+      "incident-response-cycle": c340,
+      "metrics-kris-and-reporting": c341,
+      "mfa-and-iam-tools": c342,
+      "monitoring-and-siem": c343,
+      "network-cloud-practice": c344,
+      "network-fundamentals-threats": c345,
+      "network-security-devices": c346,
+      "principles-practice": c347,
+      "redundancy-and-continuity": c348,
+      "risk-lifecycle": c349,
+      "secops-practice": c350,
+      "security-awareness-and-culture": c351,
+      "security-controls-types": c352,
+      "segmentation-and-zero-trust": c353,
+      "teams-and-security-testing": c354,
+      "threat-actors-and-cti": c355,
+      "wireless-iot-ics": c356,
     },
     "th": {
-      __copy: c435,
-      "aaa-in-depth": c405,
-      "access-control-models": c406,
-      "ai-data-integrity-risks": c407,
-      "capstone-cc": c408,
-      "cia-and-aaa": c409,
-      "cloud-models-shared-responsibility": c410,
-      "data-protection-ops": c411,
-      "event-triage": c412,
-      "governance-and-ethics-basics": c413,
-      "governance-practice": c414,
-      "grc-fundamentals": c415,
-      "iam-practice": c416,
-      "identity-lifecycle": c417,
-      "incident-response-cycle": c418,
-      "metrics-kris-and-reporting": c419,
-      "mfa-and-iam-tools": c420,
-      "monitoring-and-siem": c421,
-      "network-cloud-practice": c422,
-      "network-fundamentals-threats": c423,
-      "network-security-devices": c424,
-      "principles-practice": c425,
-      "redundancy-and-continuity": c426,
-      "risk-lifecycle": c427,
-      "secops-practice": c428,
-      "security-awareness-and-culture": c429,
-      "security-controls-types": c430,
-      "segmentation-and-zero-trust": c431,
-      "teams-and-security-testing": c432,
-      "threat-actors-and-cti": c433,
-      "wireless-iot-ics": c434,
+      __copy: c388,
+      "aaa-in-depth": c358,
+      "access-control-models": c359,
+      "ai-data-integrity-risks": c360,
+      "capstone-cc": c361,
+      "cia-and-aaa": c362,
+      "cloud-models-shared-responsibility": c363,
+      "data-protection-ops": c364,
+      "event-triage": c365,
+      "governance-and-ethics-basics": c366,
+      "governance-practice": c367,
+      "grc-fundamentals": c368,
+      "iam-practice": c369,
+      "identity-lifecycle": c370,
+      "incident-response-cycle": c371,
+      "metrics-kris-and-reporting": c372,
+      "mfa-and-iam-tools": c373,
+      "monitoring-and-siem": c374,
+      "network-cloud-practice": c375,
+      "network-fundamentals-threats": c376,
+      "network-security-devices": c377,
+      "principles-practice": c378,
+      "redundancy-and-continuity": c379,
+      "risk-lifecycle": c380,
+      "secops-practice": c381,
+      "security-awareness-and-culture": c382,
+      "security-controls-types": c383,
+      "segmentation-and-zero-trust": c384,
+      "teams-and-security-testing": c385,
+      "threat-actors-and-cti": c386,
+      "wireless-iot-ics": c387,
     },
   },
   "operating-systems": {
-    __structure: c483,
+    __structure: c436,
     "en": {
-      __copy: c459,
-      "acl-vs-capability": c437,
-      "address-space": c438,
-      "async-signal-safety": c439,
-      "cow-and-mmap": c440,
-      "cpu-scheduling": c441,
-      "deadlock": c442,
-      "demand-paging": c443,
-      "fork-exec-wait": c444,
-      "kernel-vs-user-mode": c445,
-      "mutex": c446,
-      "page-tables-and-tlb": c447,
-      "privilege-rings": c448,
-      "producer-consumer": c449,
-      "pthreads": c450,
-      "race-conditions": c451,
-      "semaphore-and-condvar": c452,
-      "setuid-and-its-risks": c453,
-      "signals": c454,
-      "syscall-lifecycle": c455,
-      "syscall-mechanism": c456,
-      "thread-vs-process": c457,
-      "zombie-and-orphan": c458,
+      __copy: c412,
+      "acl-vs-capability": c390,
+      "address-space": c391,
+      "async-signal-safety": c392,
+      "cow-and-mmap": c393,
+      "cpu-scheduling": c394,
+      "deadlock": c395,
+      "demand-paging": c396,
+      "fork-exec-wait": c397,
+      "kernel-vs-user-mode": c398,
+      "mutex": c399,
+      "page-tables-and-tlb": c400,
+      "privilege-rings": c401,
+      "producer-consumer": c402,
+      "pthreads": c403,
+      "race-conditions": c404,
+      "semaphore-and-condvar": c405,
+      "setuid-and-its-risks": c406,
+      "signals": c407,
+      "syscall-lifecycle": c408,
+      "syscall-mechanism": c409,
+      "thread-vs-process": c410,
+      "zombie-and-orphan": c411,
     },
     "th": {
-      __copy: c482,
-      "acl-vs-capability": c460,
-      "address-space": c461,
-      "async-signal-safety": c462,
-      "cow-and-mmap": c463,
-      "cpu-scheduling": c464,
-      "deadlock": c465,
-      "demand-paging": c466,
-      "fork-exec-wait": c467,
-      "kernel-vs-user-mode": c468,
-      "mutex": c469,
-      "page-tables-and-tlb": c470,
-      "privilege-rings": c471,
-      "producer-consumer": c472,
-      "pthreads": c473,
-      "race-conditions": c474,
-      "semaphore-and-condvar": c475,
-      "setuid-and-its-risks": c476,
-      "signals": c477,
-      "syscall-lifecycle": c478,
-      "syscall-mechanism": c479,
-      "thread-vs-process": c480,
-      "zombie-and-orphan": c481,
+      __copy: c435,
+      "acl-vs-capability": c413,
+      "address-space": c414,
+      "async-signal-safety": c415,
+      "cow-and-mmap": c416,
+      "cpu-scheduling": c417,
+      "deadlock": c418,
+      "demand-paging": c419,
+      "fork-exec-wait": c420,
+      "kernel-vs-user-mode": c421,
+      "mutex": c422,
+      "page-tables-and-tlb": c423,
+      "privilege-rings": c424,
+      "producer-consumer": c425,
+      "pthreads": c426,
+      "race-conditions": c427,
+      "semaphore-and-condvar": c428,
+      "setuid-and-its-risks": c429,
+      "signals": c430,
+      "syscall-lifecycle": c431,
+      "syscall-mechanism": c432,
+      "thread-vs-process": c433,
+      "zombie-and-orphan": c434,
     },
   },
   "setup-and-environment": {
-    __structure: c496,
+    __structure: c449,
     "en": {
-      __copy: c489,
-      "choose-your-environment": c484,
-      "first-terminal-session": c485,
-      "github-account-and-first-push": c486,
-      "install-the-toolchain": c487,
-      "when-something-does-not-work": c488,
+      __copy: c442,
+      "choose-your-environment": c437,
+      "first-terminal-session": c438,
+      "github-account-and-first-push": c439,
+      "install-the-toolchain": c440,
+      "when-something-does-not-work": c441,
     },
     "th": {
-      __copy: c495,
-      "choose-your-environment": c490,
-      "first-terminal-session": c491,
-      "github-account-and-first-push": c492,
-      "install-the-toolchain": c493,
-      "when-something-does-not-work": c494,
+      __copy: c448,
+      "choose-your-environment": c443,
+      "first-terminal-session": c444,
+      "github-account-and-first-push": c445,
+      "install-the-toolchain": c446,
+      "when-something-does-not-work": c447,
     },
   },
 } as never
