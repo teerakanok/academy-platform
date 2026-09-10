@@ -90,7 +90,7 @@ export function SignInForm({ next }: { next: string }) {
             type="submit"
             disabled={busy}
             data-testid="sign-in-submit"
-            className="w-full rounded-control bg-cs-accent-fill px-6 py-3 text-sm font-semibold text-cs-on-accent transition-transform duration-200 hover:-translate-y-0.5 disabled:opacity-60 disabled:hover:translate-y-0"
+            className="w-full rounded-control bg-cs-accent-fill px-6 py-4 text-base font-semibold text-cs-on-accent shadow-lift transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-60 disabled:hover:translate-y-0"
           >
             {busy ? 'Sending…' : 'Send me a code'}
           </button>
@@ -122,7 +122,7 @@ export function SignInForm({ next }: { next: string }) {
             type="submit"
             disabled={busy || code.length !== 6}
             data-testid="sign-in-verify"
-            className="w-full rounded-control bg-cs-accent-fill px-6 py-3 text-sm font-semibold text-cs-on-accent transition-transform duration-200 hover:-translate-y-0.5 disabled:opacity-60 disabled:hover:translate-y-0"
+            className="w-full rounded-control bg-cs-accent-fill px-6 py-4 text-base font-semibold text-cs-on-accent shadow-lift transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-60 disabled:hover:translate-y-0"
           >
             {busy ? 'Checking…' : 'Continue'}
           </button>

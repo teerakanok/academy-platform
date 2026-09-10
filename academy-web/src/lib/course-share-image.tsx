@@ -6,7 +6,7 @@ import type { Locale, PublicCourse } from '@/lib/content/course-types'
 
 export const COURSE_SHARE_IMAGE_SIZE = { width: 1200, height: 630 }
 
-const FILL = '#38BDF8'
+const FILL = '#00A280'
 const INK = '#06121C'
 const BG = '#0B1620'
 
@@ -51,7 +51,7 @@ export async function renderPublicCourseShareImage(course: PublicCourse): Promis
           background: BG,
           padding: 72,
           fontFamily: 'Noto Sans Thai',
-          backgroundImage: `radial-gradient(1000px 460px at 30% -10%, rgba(56,189,248,0.28), rgba(56,189,248,0) 70%)`,
+          backgroundImage: `radial-gradient(1000px 460px at 30% -10%, rgba(0,162,128,0.28), rgba(0,162,128,0) 70%)`,
         }}
       >
         <div

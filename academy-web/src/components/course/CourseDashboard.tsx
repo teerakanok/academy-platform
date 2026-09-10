@@ -24,9 +24,10 @@ import { globalSkillData } from '@/lib/course/skills'
 import { CourseCover } from './CourseCover'
 import { RadarChart } from './RadarChart'
 
-// ความคืบหน้าเป็น "จุดต่อบทเรียน" ไม่ใช่แถบ — แถบที่ 0% คือเส้นจางที่มองไม่เห็น
-// และไม่บอกอะไรเลย ส่วนจุดบอกได้ทันทีว่าคอร์สยาวแค่ไหนและเดินไปถึงไหน
-// คอร์สที่ยาวมากกลับไปใช้แถบ เพราะจุด 50 จุดอ่านไม่ออก
+// ความคืบหน้าเป็น "จุดต่อบทเรียน" บวก "แถบเล็กใต้จุด" — จุดบอกได้ทันทีว่าคอร์สยาว
+// แค่ไหนและเดินไปถึงไหน (แถบอย่างเดียวที่ 0% คือเส้นจางที่มองไม่เห็นและไม่บอกอะไรเลย)
+// ส่วนแถบเพิ่มรูปทรงให้เห็น "ไปได้ไกลแล้ว" ในชำเสี้ยวโดยไม่ต้องนับจุด (audit 2026-09-11)
+// คอร์สที่ยาวมากใช้แถบอย่างเดียว เพราะจุด 50 จุดอ่านไม่ออก
 const MAX_DOTS = 12
 const MAX_DASHBOARD_RESPONSE_BYTES = 256 * 1024
 
@@ -61,32 +62,41 @@ function LessonProgress({
       </div>
 
       {useDots ? (
-        <ul
-          className="flex flex-wrap gap-1 sm:gap-1.5"
-          role="progressbar"
-          aria-valuenow={finishedPercent}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label={`${label} progress`}
-        >
-          {structure.nodes.map((node) => {
-            const status = nodeStatus(node, state)
-            const isFinished = status === 'completed' || status === 'tested-out'
-            const isSkipped = status === 'skipped'
-            return (
-              <li
-                key={node.id}
-                className={`h-2.5 w-2.5 rounded-full transition-colors ${
-                  isFinished
-                    ? 'bg-cs-accent-fill'
-                    : isSkipped
-                      ? 'border border-dashed border-cs-border-2 bg-transparent'
-                      : 'bg-cs-border-2/70'
-                }`}
-              />
-            )
-          })}
-        </ul>
+        <>
+          <ul
+            className="flex flex-wrap gap-1 sm:gap-1.5"
+            role="progressbar"
+            aria-valuenow={finishedPercent}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`${label} progress`}
+          >
+            {structure.nodes.map((node) => {
+              const status = nodeStatus(node, state)
+              const isFinished = status === 'completed' || status === 'tested-out'
+              const isSkipped = status === 'skipped'
+              return (
+                <li
+                  key={node.id}
+                  className={`h-2.5 w-2.5 rounded-full transition-colors ${
+                    isFinished
+                      ? 'bg-cs-accent-fill'
+                      : isSkipped
+                        ? 'border border-dashed border-cs-border-2 bg-transparent'
+                        : 'bg-cs-border-2/70'
+                  }`}
+                />
+              )
+            })}
+          </ul>
+          {/* แถบเสริมใต้จุด — ตกแต่งให้เห็นภาพรวมเร็วขึ้น ค่าจริงอยู่ที่ ul ด้านบนแล้ว */}
+          <div className="mt-2 h-1 overflow-hidden rounded-full bg-cs-surface-sunken" aria-hidden="true">
+            <div
+              className="h-full rounded-full bg-cs-accent-fill transition-[width] duration-500"
+              style={{ width: `${finishedPercent}%` }}
+            />
+          </div>
+        </>
       ) : (
         <div
           className="h-1.5 overflow-hidden rounded-full bg-cs-surface-sunken"
@@ -459,6 +469,19 @@ export function CourseDashboard({
         </section>
       )}
 
+      {/* ยังไม่มีคอร์สที่เริ่มแล้ว — หน้านี้ต้องทักทาย ไม่ใช่ว่างเปล่า (audit 2026-09-11) */}
+      {accessState === 'ready' && !resume && accessibleCourses.length > 0 && (
+        <section className="card-feature hero-wash p-6 sm:p-8" data-testid="start-today-card">
+          <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-cs-accent">Welcome</p>
+          <h2 className="mt-2 font-display text-2xl font-semibold leading-snug text-cs-text">
+            Every expert started with lesson one
+          </h2>
+          <p className="mt-2 max-w-xl text-sm leading-relaxed text-cs-body">
+            Pick any course below — your progress saves to your CYBERSKILLS account from the very first step.
+          </p>
+        </section>
+      )}
+
       {accessState === 'ready' && resume && resumeNode && (
         <section
           className="card-feature hero-wash relative overflow-hidden p-6 sm:p-8"
@@ -541,11 +564,18 @@ export function CourseDashboard({
           })}
         </ul>
         {accessibleCourses.length === 0 && (
-          <div>
-            <p className="text-sm text-cs-body" data-testid="dashboard-no-courses">
+          <div className="card-feature p-6 sm:p-8">
+            <h3 className="font-display text-xl font-semibold text-cs-text">Nothing here yet — and that is okay</h3>
+            <p className="mt-2 max-w-xl text-sm leading-relaxed text-cs-body" data-testid="dashboard-no-courses">
               No courses are included in your current enrollment.
             </p>
-            <Link href="/courses" className="mt-4 inline-block text-sm font-medium text-cs-accent underline underline-offset-4">
+            <p className="mt-1 max-w-xl text-sm leading-relaxed text-cs-body">
+              You can still look through every course route and see what is ahead.
+            </p>
+            <Link
+              href="/courses"
+              className="mt-4 inline-block rounded-control bg-cs-accent-fill px-5 py-2.5 text-sm font-semibold text-cs-on-accent"
+            >
               Browse available courses
             </Link>
           </div>

@@ -173,14 +173,25 @@ export function PublicCourseCatalog({ courses }: PublicCourseCatalogProps) {
               <Link
                 href={`/courses/${course.structure.slug}/${detailLocale}`}
                 data-testid={`catalogue-card-${course.structure.slug}`}
-                className="card-feature card-interactive block h-full overflow-hidden"
+                className="card-feature card-interactive group block h-full overflow-hidden"
               >
-                <CourseCover structure={course.structure} />
+                {/* ปกขยายเบาๆ ตอนชี้การ์ด — ภาษาเดียวกับการ์ดใน dashboard */}
+                <CourseCover
+                  structure={course.structure}
+                  className="transition-transform duration-300 group-hover:scale-[1.03]"
+                />
                 <div className="p-6">
-                  <p className="font-mono text-[11px] uppercase tracking-wide text-cs-muted">
-                    {t.courses.level[course.structure.level]} · {t.courses.lessons(lessonCount)} · {t.courses.checkpoints(checkpointCount)}
-                  </p>
-                  <h2 className="mt-2 font-display text-xl font-semibold text-cs-text">{copy.title}</h2>
+                  {/* ระดับคอร์สเป็นป้ายเต็มสีเพื่อให้แยกจากข้อความรอบข้างได้ทันที (audit 2026-09-11) */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-cs-accent-fill px-2.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-cs-on-accent">
+                      {t.courses.level[course.structure.level]}
+                    </span>
+                    <span className="font-mono text-[11px] text-cs-muted">
+                      {t.courses.lessons(lessonCount)} · {t.courses.checkpoints(checkpointCount)} ·{' '}
+                      {t.courses.duration(course.structure.estimatedMinutes)}
+                    </span>
+                  </div>
+                  <h2 className="mt-3 font-display text-xl font-semibold text-cs-text">{copy.title}</h2>
                   <p className="mt-2 text-sm leading-relaxed text-cs-body">{copy.subtitle}</p>
                 </div>
               </Link>

@@ -40,6 +40,7 @@ export interface UiStrings {
     openToAll: string
     lessons: (n: number) => string
     checkpoints: (n: number) => string
+    duration: (minutes: number) => string
     level: Record<'beginner' | 'intermediate' | 'advanced', string>
     searchLabel: string
     searchPlaceholder: string
@@ -95,6 +96,7 @@ const en: UiStrings = {
     openToAll: 'Previews are open to everyone. Learning access will open with a CYBERSKILLS account.',
     lessons: (n) => `${n} lessons`,
     checkpoints: (n) => `${n} required checkpoint${n === 1 ? '' : 's'}`,
+    duration: (minutes) => (minutes >= 60 ? `about ${Math.round(minutes / 60)} h` : `${minutes} min`),
     level: { beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced' },
     searchLabel: 'Search courses',
     searchPlaceholder: 'Search by title or short description',
@@ -156,6 +158,7 @@ const th: UiStrings = {
     openToAll: 'ทุกคนดูตัวอย่างคอร์สได้ ส่วนการเข้าเรียนจะเปิดพร้อมบัญชี CYBERSKILLS',
     lessons: (n) => `${n} บท`,
     checkpoints: (n) => `${n} ด่านบังคับ`,
+    duration: (minutes) => (minutes >= 60 ? `ประมาณ ${Math.round(minutes / 60)} ชม.` : `${minutes} นาที`),
     level: { beginner: 'เริ่มต้น', intermediate: 'ระดับกลาง', advanced: 'ขั้นสูง' },
     searchLabel: 'ค้นหาคอร์ส',
     searchPlaceholder: 'ค้นหาด้วยชื่อหรือคำอธิบายสั้น',

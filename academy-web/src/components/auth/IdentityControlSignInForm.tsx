@@ -20,7 +20,7 @@ export function IdentityControlSignInForm({
           <button
             type="submit"
             data-testid="identity-control-continue"
-            className="w-full rounded-control bg-cs-accent-fill px-6 py-3 text-sm font-semibold text-cs-on-accent transition-transform duration-200 hover:-translate-y-0.5"
+            className="w-full rounded-control bg-cs-accent-fill px-6 py-4 text-base font-semibold text-cs-on-accent shadow-lift transition-all duration-200 hover:-translate-y-0.5"
           >
             Continue to CYBERSKILLS Account
           </button>
@@ -29,7 +29,7 @@ export function IdentityControlSignInForm({
         <a
           href={startUrl}
           data-testid="identity-control-continue"
-          className="mt-6 block w-full rounded-control bg-cs-accent-fill px-6 py-3 text-center text-sm font-semibold text-cs-on-accent transition-transform duration-200 hover:-translate-y-0.5"
+          className="mt-6 block w-full rounded-control bg-cs-accent-fill px-6 py-4 text-center text-base font-semibold text-cs-on-accent shadow-lift transition-all duration-200 hover:-translate-y-0.5"
         >
           Continue to CYBERSKILLS Account
         </a>

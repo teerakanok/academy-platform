@@ -12,46 +12,47 @@
  *
  * ทำไมค่าถึงต่างจากเว็บหลัก: เว็บหลักคือบริษัท security (เข้ม/คม/terminal)
  * ส่วน Academy คือห้องเรียน — งานของมันคือลดกำแพงความกลัว ไม่ใช่สร้างความน่าเกรงขาม
- *   · พื้นหลังขาวอมฟ้าอ่อน เข้าชุดกับสีประจำตัวของ Academy
+ *   · พื้นหลังขาวอมเขียวอ่อน เข้าชุดกับสีประจำตัวของ Academy
  *   · light เป็นค่าตั้งต้น, dark สลับได้
  *
- * สีประจำ Academy คือ #38BDF8 — เป็นค่าที่มีอยู่แล้วใน productBrand ของเว็บหลัก
- * (cyberskills-web/src/lib/content-v2.js) และในโลโก้ logo-academy.svg ไม่ใช่สีที่
- * คิดขึ้นใหม่ ใช้โมเดลเดียวกับเว็บหลัก: สีสดสำหรับพื้น (ตัวอักษรเป็น ink เข้ม)
- * และเฉดเข้มกว่าสำหรับตัวอักษร/เส้น เพื่อให้ผ่าน WCAG
+ * สีประจำ Academy คือเขียวของแบรนด์ CYBERSKILLS: #00A280 (เข้ม) กับ #00CFA3
+ * (สว่าง) — ตาม audit 2026-09-11 ที่ให้รวมสีประจำกับ Identity และ Crux เพื่อให้
+ * สามผลิตภัณฑ์อ่านเป็น "บ้านเดียวกัน" โมเดลยังเดิม: สีสดสำหรับพื้น (ตัวอักษรเป็น
+ * ink เข้ม) และเฉดเข้มกว่า (#00795E) สำหรับตัวอักษร/เส้น เพื่อให้ผ่าน WCAG
  *
  * ทำไมไม่มี "สีที่สอง": สถานะ Done กับ Proven คือผลลัพธ์เดียวกัน (ปลอดภัยแล้ว)
  * ที่มาคนละทาง จึงควรเป็นสีเดียวกันคนละน้ำหนัก — และการทดสอบยืนยันว่าไม่มีสีไหน
- * แยกจากฟ้าได้จริงในสายตา deuteran (ม่วง/ชมพูตก ΔE 0.3–5.2, เขียวอมฟ้าตกเกณฑ์
+ * แยกจากสีประจำได้จริงในสายตา deuteran (ม่วง/ชมพูตก ΔE 0.3–5.2, เขียวอมฟ้าตกเกณฑ์
  * ตาปกติ) ตัวแยกจริงคือรูปทรง + ไอคอน + ป้ายข้อความ ซึ่งมีครบอยู่แล้ว
  */
 
 :root {
   /* ---- LIGHT = ค่าตั้งต้นของ Academy ---- */
-  --cs-bg: 243 247 250; /* #F3F7FA ขาวอมฟ้า เข้าชุดกับสีประจำ Academy */
+  --cs-bg: 243 250 247; /* #F3FAF7 ขาวอมเขียว เข้าชุดกับสีประจำแบรนด์ */
   --cs-surface: 255 255 255;
-  --cs-surface-2: 235 241 246;
-  --cs-border: 212 222 232;
-  --cs-border-2: 176 192 208;
+  --cs-surface-2: 235 244 241;
+  --cs-border: 212 226 223;
+  --cs-border-2: 176 200 195;
   --cs-text: 14 28 40; /* น้ำเงินเกือบดำ นุ่มกว่าดำสนิท */
   --cs-primary: 14 28 40;
   --cs-body: 42 60 76;
   --cs-muted: 88 106 124;
   --cs-faint: 104 120 136;
 
-  /* #0A6C9E = textLight ของ Academy ตาม productBrand — ใช้กับตัวอักษร ขอบ และ
-     เส้น/จุดในกราฟ (white 5.75 · surface-2 5.07 · bg 5.34 ผ่าน AA ทุกพื้น) */
-  --cs-accent: 10 108 158;
-  /* #38BDF8 = สีสดประจำ Academy — ใช้เป็นพื้นเท่านั้น คู่กับ ink เข้ม (8.82) */
-  --cs-accent-fill: 56 189 248;
+  /* #00795E = เขียวเข้มของแบรนด์ — ใช้กับตัวอักษร ขอบ และเส้น/จุดในกราฟ
+     (white 5.39 · surface-2 4.73 · bg 5.00 ผ่าน AA ทุกพื้น)
+     ส่วน #00A280 สดเกินกว่าจะเป็นตัวอักษรขนาดเล็ก (white 3.24) จึงสงวนไว้เป็นพื้น */
+  --cs-accent: 0 121 94;
+  /* #00A280 = สีประจำแบรนด์ CYBERSKILLS — ใช้เป็นพื้นเท่านั้น คู่กับ ink เข้ม (5.83) */
+  --cs-accent-fill: 0 162 128;
   --cs-on-accent: 6 18 28;
-  --cs-accent-dim: rgba(56, 189, 248, 0.12);
-  --cs-accent-border: rgba(10, 108, 158, 0.28);
+  --cs-accent-dim: rgba(0, 162, 128, 0.12);
+  --cs-accent-border: rgba(0, 121, 94, 0.3);
 
   /* น้ำหนักที่สองของสีเดียวกัน ใช้กับสถานะ "พิสูจน์แล้ว" และของที่ต้องลงมือ */
-  --cs-accent-2: 10 108 158;
-  --cs-accent-2-dim: rgba(10, 108, 158, 0.08);
-  --cs-accent-2-border: rgba(10, 108, 158, 0.4);
+  --cs-accent-2: 0 121 94;
+  --cs-accent-2-dim: rgba(0, 121, 94, 0.08);
+  --cs-accent-2-border: rgba(0, 121, 94, 0.4);
 
   /* #A6480A — สีเตือน ต้องผ่าน AA บน surface-2 เช่นกัน (5.21) */
   --cs-amber: 166 72 10;
@@ -61,7 +62,7 @@
   /* ระดับพื้นผิว: เดิมมีแค่ surface กับ surface-2 ทำให้ทุกกล่องน้ำหนักเท่ากันหมด
      raised = ของที่ต้องเด่นกว่าเพื่อน · sunken = ร่องที่ของอื่นวางอยู่ข้างบน */
   --cs-surface-raised: 255 255 255;
-  --cs-surface-sunken: 228 236 243;
+  --cs-surface-sunken: 228 238 234;
 
   --cs-shadow-card: 0 1px 3px rgba(12, 32, 48, 0.06), 0 8px 24px -12px rgba(12, 32, 48, 0.12);
   --cs-shadow-lift: 0 2px 6px rgba(12, 32, 48, 0.08), 0 16px 36px -16px rgba(12, 32, 48, 0.18);
@@ -69,46 +70,46 @@
   --cs-shadow-feature: 0 4px 12px rgba(12, 32, 48, 0.1), 0 28px 56px -24px rgba(12, 32, 48, 0.26);
 
   /* พื้นหลังของหน้าปกคอร์ส — ตัวที่ทำให้สีประจำตัวได้โผล่จริงบนหน้า */
-  --cs-cover-wash: linear-gradient(135deg, rgba(56, 189, 248, 0.24) 0%, rgba(56, 189, 248, 0.08) 48%, rgba(10, 108, 158, 0.14) 100%);
-  --cs-hero-wash: radial-gradient(1100px 400px at 50% 42%, rgba(56, 189, 248, 0.13) 0%, rgba(56, 189, 248, 0.04) 46%, rgba(56, 189, 248, 0) 70%);
+  --cs-cover-wash: linear-gradient(135deg, rgba(0, 162, 128, 0.24) 0%, rgba(0, 162, 128, 0.08) 48%, rgba(0, 121, 94, 0.14) 100%);
+  --cs-hero-wash: radial-gradient(1100px 400px at 50% 42%, rgba(0, 162, 128, 0.13) 0%, rgba(0, 162, 128, 0.04) 46%, rgba(0, 162, 128, 0) 70%);
 }
 
 :root[data-theme='dark'] {
-  --cs-bg: 9 16 22;
-  --cs-surface: 16 26 35;
-  --cs-surface-2: 25 38 50;
-  --cs-border: 35 52 67;
-  --cs-border-2: 54 78 98;
+  --cs-bg: 9 18 15;
+  --cs-surface: 16 30 26;
+  --cs-surface-2: 25 44 39;
+  --cs-border: 35 57 51;
+  --cs-border-2: 54 82 74;
   --cs-text: 235 243 250;
   --cs-primary: 235 243 250;
   --cs-body: 199 213 226;
   --cs-muted: 140 158 176;
   --cs-faint: 121 139 157;
 
-  /* dark: ฟ้าสดอ่านเป็นตัวอักษรได้สบาย (bg 8.85 · surface-2 7.06) */
-  --cs-accent: 56 189 248;
-  --cs-accent-fill: 56 189 248;
+  /* dark: เขียวสว่างอ่านเป็นตัวอักษรได้สบาย (bg 9.5 · surface-2 7.3) */
+  --cs-accent: 0 207 163;
+  --cs-accent-fill: 0 162 128;
   --cs-on-accent: 6 18 28;
-  --cs-accent-dim: rgba(56, 189, 248, 0.16);
-  --cs-accent-border: rgba(56, 189, 248, 0.34);
+  --cs-accent-dim: rgba(0, 207, 163, 0.16);
+  --cs-accent-border: rgba(0, 207, 163, 0.34);
 
-  --cs-accent-2: 125 211 252; /* #7DD3FC = hover ของ Academy */
-  --cs-accent-2-dim: rgba(125, 211, 252, 0.12);
-  --cs-accent-2-border: rgba(125, 211, 252, 0.42);
+  --cs-accent-2: 0 207 163; /* #00CFA3 = เฉดสว่างของแบรนด์ ใช้เป็น hover */
+  --cs-accent-2-dim: rgba(0, 207, 163, 0.12);
+  --cs-accent-2-border: rgba(0, 207, 163, 0.42);
 
   --cs-amber: 245 165 74;
   --cs-amber-dim: rgba(245, 165, 74, 0.14);
   --cs-amber-border: rgba(245, 165, 74, 0.32);
 
-  --cs-surface-raised: 21 34 45;
-  --cs-surface-sunken: 12 21 29;
+  --cs-surface-raised: 21 37 32;
+  --cs-surface-sunken: 12 24 20;
 
   --cs-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
   --cs-shadow-lift: 0 2px 6px rgba(0, 0, 0, 0.45), 0 16px 36px -16px rgba(0, 0, 0, 0.7);
   --cs-shadow-feature: 0 4px 14px rgba(0, 0, 0, 0.5), 0 28px 60px -24px rgba(0, 0, 0, 0.8);
 
-  --cs-cover-wash: linear-gradient(135deg, rgba(56, 189, 248, 0.2) 0%, rgba(56, 189, 248, 0.06) 46%, rgba(125, 211, 252, 0.08) 100%);
-  --cs-hero-wash: radial-gradient(1100px 400px at 50% 42%, rgba(56, 189, 248, 0.085) 0%, rgba(56, 189, 248, 0.028) 46%, rgba(56, 189, 248, 0) 70%);
+  --cs-cover-wash: linear-gradient(135deg, rgba(0, 162, 128, 0.2) 0%, rgba(0, 162, 128, 0.06) 46%, rgba(0, 207, 163, 0.08) 100%);
+  --cs-hero-wash: radial-gradient(1100px 400px at 50% 42%, rgba(0, 162, 128, 0.085) 0%, rgba(0, 162, 128, 0.028) 46%, rgba(0, 162, 128, 0) 70%);
 }
 
 html {
@@ -124,7 +125,59 @@ body {
   color: rgb(var(--cs-text));
 }
 
-/* การ์ดสีขาวบนพื้นขาวอมฟ้าต้องมีเงาบางๆ ถึงจะลอยขึ้นมา */
+/* ---- การเคลื่อนไหวระดับโลก (audit 2026-09-11) ----
+   เบา สั้น และถูกปิดทั้งหมดโดย prefers-reduced-motion ด้านล่าง
+   utility เฉพาะที่ (transition-colors ฯลฯ) มี specificity สูงกว่าจึงยังชนะได้ */
+
+a,
+button,
+[role='button'] {
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    transform 100ms ease;
+}
+
+/* ลิฟต์จิ๋วตอนชี้ กดแล้วยุบกลับ — ลิงก์ข้อความที่เป็น inline box ไม่ได้รับ
+   transform จึงไม่กระตุกข้อความในย่อหน้า */
+a:hover,
+button:hover {
+  transform: translateY(-1px);
+}
+
+a:active,
+button:active {
+  transform: translateY(0);
+}
+
+/* hover ของปุ่ม/ลิงก์พื้นสีแบรนด์ — ขยับไปหาเฉดสว่าง #00CFA3 เสมอทั้งสองธีม
+   (ink เข้มบน #00CFA3 ได้ 9.4 ผ่าน AA สบาย) แตะเฉพาะ a/button เพื่อไม่ไปกวน
+   ป้าย จุด แถบ ที่ใช้พื้นเดียวกันแต่ไม่ใช่ปุ่ม */
+a.bg-cs-accent-fill:hover,
+button.bg-cs-accent-fill:hover {
+  background-color: #00cfa3;
+}
+
+/* หน้าจางเข้ามาเบาๆ ครั้งเดียวตอนโหลด — main ของ SiteChrome ค้างอยู่ข้าม
+   client-side navigation จึงไม่กะพริบซ้ำตอนเปลี่ยนหน้า */
+main {
+  animation: fadeIn 200ms ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* การ์ดสีขาวบนพื้นขาวอมเขียวต้องมีเงาบางๆ ถึงจะลอยขึ้นมา */
 .card {
   @apply rounded-2xl border border-cs-border bg-cs-surface;
   box-shadow: var(--cs-shadow-card);

@@ -52,16 +52,20 @@ export default async function SignInPage({
         <Image
           src="/brand/logo-academy.svg"
           alt=""
-          width={44}
-          height={44}
+          width={56}
+          height={56}
           priority
           className="mx-auto"
         />
-        <h1 className="mt-4 font-display text-3xl font-semibold leading-tight tracking-tight text-cs-text">
+        <h1 className="mt-5 font-display text-4xl font-semibold leading-tight tracking-tight text-cs-text">
           One CYBERSKILLS account
         </h1>
         <p className="mx-auto mt-3 max-w-md text-cs-body">
           Your CYBERSKILLS account keeps your Academy learning record with you across devices.
+        </p>
+        {/* ประโยชน์แบบย่อ — บอกคุณค่าของบัญชีเดียวก่อนถึงปุ่ม (audit 2026-09-11) */}
+        <p className="mt-4 text-sm font-semibold text-cs-accent">
+          One account for all CYBERSKILLS courses
         </p>
       </div>
 

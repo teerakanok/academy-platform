@@ -41,8 +41,9 @@ describe('Identity Control sign-in form boundary', () => {
   })
 
   it('preserves the shared CTA styling and accessible text', () => {
-    expect(renderedLocalForm).toContain('class="w-full rounded-control bg-cs-accent-fill px-6 py-3 text-sm font-semibold text-cs-on-accent')
-    expect(renderedForm).toContain('class="mt-6 block w-full rounded-control bg-cs-accent-fill px-6 py-3 text-center text-sm font-semibold text-cs-on-accent')
+    // audit 2026-09-11: CTA ตัวใหญ่ขึ้น (py-4 · text-base · shadow-lift) ให้อ่านออกทันทีว่าเป็นปุ่มหลักของหน้า
+    expect(renderedLocalForm).toContain('class="w-full rounded-control bg-cs-accent-fill px-6 py-4 text-base font-semibold text-cs-on-accent shadow-lift')
+    expect(renderedForm).toContain('class="mt-6 block w-full rounded-control bg-cs-accent-fill px-6 py-4 text-center text-base font-semibold text-cs-on-accent shadow-lift')
     expect(renderedForm).toContain('Continue to CYBERSKILLS Account')
   })
 
