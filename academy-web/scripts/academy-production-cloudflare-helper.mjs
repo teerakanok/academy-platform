@@ -118,8 +118,12 @@ function groupAlive(pid) {
 function currentFrom(source) {
   if (typeof source !== 'string' || Buffer.byteLength(source) > 1024 * 1024) fail()
   const current = parseCurrentDeploymentJson(source)
-  if (current.versions.length !== 1 || current.versions[0].percentage !== 100) fail()
-  return { deploymentId: current.id, versionId: current.versions[0].id }
+  // `versions upload` co-allocates the uploaded candidate into the latest
+  // deployment at 0%, so zero-traffic entries must not disqualify the
+  // serving determination; any partial split still fails closed.
+  const serving = current.versions.filter(entry => entry.percentage !== 0)
+  if (serving.length !== 1 || serving[0].percentage !== 100) fail()
+  return { deploymentId: current.id, versionId: serving[0].id }
 }
 
 function duplicateSafe(source) {

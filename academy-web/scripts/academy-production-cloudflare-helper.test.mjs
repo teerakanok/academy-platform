@@ -365,6 +365,24 @@ test('activation and rollback use optimistic exact pre/post conditions and discl
   assert.ok(calls.some(call => call?.[0] === 'versions' && call[1] === 'deploy' && call[2] === `${candidate}@100`))
 })
 
+test('activation tolerates a co-allocated zero-traffic candidate in the latest deployment', async () => {
+  const coAllocated = [{ id: deployment, created_on:'2026-08-29T10:00:00Z',
+    versions:[{version_id:version,percentage:100},{version_id:candidate,percentage:0}] }]
+  const activatedProvider = [{ id: activated, created_on:'2026-08-29T10:02:00Z', versions:[{version_id:candidate,percentage:100}] }]
+  let listings = 0
+  const run = async args => (!args || args[1] === 'list') ? JSON.stringify(listings++ === 0 ? coAllocated : activatedProvider) : ''
+  const value = await executeAcademyCloudflareHelper([...common,'--operation','activate','--expected-deployment',deployment,'--expected-version',version,'--candidate',candidate,'--traffic','100'], { ...options, run })
+  assert.equal(value.activeVersionId, candidate)
+  assert.equal(value.previousVersionId, version)
+})
+
+test('activation rejects partial traffic splits in the latest deployment', async () => {
+  const split = [{ id: deployment, created_on:'2026-08-29T10:00:00Z',
+    versions:[{version_id:version,percentage:60},{version_id:candidate,percentage:40}] }]
+  const run = async args => (!args || args[1] === 'list') ? JSON.stringify(split) : ''
+  await assert.rejects(executeAcademyCloudflareHelper([...common,'--operation','activate','--expected-deployment',deployment,'--expected-version',version,'--candidate',candidate,'--traffic','100'], { ...options, run }))
+})
+
 test('rollback verifies exact serving target after optimistic transition', async () => {
   const rollbackDeployment = '55555555-5555-4555-8555-555555555555'
   const activeProvider = [{ id:activated, created_on:'2026-08-29T10:02:00Z', versions:[{version_id:candidate,percentage:100}] }]
