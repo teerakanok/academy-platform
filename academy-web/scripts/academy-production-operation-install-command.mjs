@@ -17,7 +17,7 @@ import { renderOperationManifest } from "./render-academy-production-operation-m
 
 const INSTALL_ROOT = "/opt/academy/production-operations";
 // Re-pinned at commit time to the revision the CANDIDATE bytes below came from.
-export const SOURCE_REVISION = "61a5afdae516a671046751a251e211f9d8da6bfa";
+export const SOURCE_REVISION = "66e4c0b8f3f36bb3084ddd10904cc76ee3f8f9e3";
 const SHA = /^[a-f0-9]{64}$/;
 const CONFIG = "p1-p7-config.json";
 export const CANDIDATE = Object.freeze([
@@ -27,7 +27,7 @@ export const CANDIDATE = Object.freeze([
   ["academy-production-p1-p7-host.mjs", 8980, "6930f7dcd9cf261b6fb8fed5e945f2f2523873359256ae51ca06ebf0825c4dc3", "0755"],
   ["academy-production-operation-install.mjs", 23488, "9f299c5c25a056902426f72c98f3bf3a4d5651b544159f56668234b8ecbe2290", "0755"],
   ["academy-poola-production-producer.mjs", 17775, "ec83328278d6e775df8c6cda5ef08726ce745e105b7bc2280b6f745e31280282", "0755"],
-  ["academy-production-cloudflare-helper.mjs", 26757, "db5656d66f1cd01aa313625d97774023ccb8bde299785279c2f9bc687f24dd2b", "0644"],
+  ["academy-production-cloudflare-helper.mjs", 27017, "68f5e5249170a3d86172484385a34cf86e5e168455d58b96b2d8464c167e09e4", "0644"],
   ["identity-production-activation-preflight.mjs", 11338, "e30ddf6a98614e642a698be8f0239a2431622f0d115a3bd70ad11b08c443feb6", "0644"],
   ["academy-production-database-adapter.mjs", 10247, "da0496c20d7b2b19ae27b4cf75acd06c5d4ebfcb8a37599cea99b5b48889ff59", "0644"],
   ["current-deployment.mjs", 7911, "362dc1a8957f95b158ad3954c71f856f79882a880f7659f9e55c63888e80d98a", "0644"],
@@ -47,8 +47,11 @@ const LEGACY_NAMES = Object.freeze([
   "academy-production-operation-install.mjs",
   "academy-poola-production-producer.mjs",
   "academy-production-cloudflare-helper.mjs",
+  "identity-production-activation-preflight.mjs",
   "academy-production-database-adapter.mjs",
   "current-deployment.mjs",
+  "academy-release-manifest.mjs",
+  "academy-release-pointer.mjs",
 ]);
 const fail = () => {
   throw new Error("ACADEMY_OPERATION_INSTALL_COMMAND_REJECTED");

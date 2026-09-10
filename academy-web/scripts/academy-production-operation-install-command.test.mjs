@@ -235,7 +235,8 @@ async function snapshot(root) {
 // The managed files the predecessor install actually holds, written out
 // literally. Deriving this fixture from the current rendered set (previously
 // "everything except IDENTITY") made it stop describing a real predecessor the
-// moment the installed set grew.
+// moment the installed set grew. Advanced to the full managed set after the
+// executed 2026-09-10 twelve-file install transition.
 const PREDECESSOR_NAMES = new Set([
   "academy-production-operation.mjs",
   "academy-production-p1-p7-runner.mjs",
@@ -244,11 +245,14 @@ const PREDECESSOR_NAMES = new Set([
   "academy-production-operation-install.mjs",
   "academy-poola-production-producer.mjs",
   "academy-production-cloudflare-helper.mjs",
+  "identity-production-activation-preflight.mjs",
   "academy-production-database-adapter.mjs",
   "current-deployment.mjs",
+  "academy-release-manifest.mjs",
+  "academy-release-pointer.mjs",
 ]);
 
-async function legacyFixture(base, { collision = false } = {}) {
+async function legacyFixture(base) {
   const installRoot = join(base, "operations");
   await mkdir(installRoot, { recursive: true, mode: 0o700 });
   const manifest = await renderOperationManifest({});
@@ -266,12 +270,6 @@ async function legacyFixture(base, { collision = false } = {}) {
     mode: 0o600,
   });
   await chmod(join(installRoot, "foreign-retained.txt"), 0o600);
-  if (collision) {
-    await writeFile(join(installRoot, IDENTITY), "foreign collision\n", {
-      mode: 0o600,
-    });
-    await chmod(join(installRoot, IDENTITY), 0o600);
-  }
   return installRoot;
 }
 
@@ -317,7 +315,7 @@ try {
       );
     }
   }
-  assert.equal(inspection.managed.length, 9);
+  assert.equal(inspection.managed.length, 12);
   assert.equal(inspection.newManagedCollisions.length, 0);
   assert.ok(
     inspection.managed.every(
@@ -388,7 +386,9 @@ try {
     /REJECTED/,
   );
   assert.deepEqual(await snapshot(predecessorRoot), predecessorDrift);
-  await assert.rejects(lstat(join(predecessorRoot, IDENTITY)), /ENOENT/);
+  // IDENTITY is a managed predecessor file since the twelve-file transition:
+  // a rejected execute must leave it in place rather than absent.
+  assert.equal((await readFile(join(predecessorRoot, IDENTITY))).length, 11338);
 
   const configRoot = await legacyFixture(join(root, "config-drift"));
   const configInspection = await inspectAcademyProductionOperationInstall({
@@ -409,29 +409,33 @@ try {
     /REJECTED/,
   );
   assert.deepEqual(await snapshot(configRoot), configDrift);
-  await assert.rejects(lstat(join(configRoot, IDENTITY)), /ENOENT/);
+  assert.equal((await readFile(join(configRoot, IDENTITY))).length, 11338);
 
-  const collisionRoot = await legacyFixture(join(root, "collision"), {
-    collision: true,
+  // A drifted managed file (previously the foreign "new-managed collision"
+  // case before every candidate name became managed) is repaired in place by
+  // a reviewed reinstall; it no longer blocks the transition.
+  const repairRoot = await legacyFixture(join(root, "managed-drift-repair"));
+  // Mode must stay 0644: stableManagedFile rejects a managed file whose mode
+  // no longer matches the candidate contract before any repair can run.
+  await writeFile(join(repairRoot, IDENTITY), "drifted managed bytes\n", {
+    mode: 0o644,
   });
-  const collisionInspection = await inspectAcademyProductionOperationInstall({
-    installRoot: collisionRoot,
+  await chmod(join(repairRoot, IDENTITY), 0o644);
+  const repairInspection = await inspectAcademyProductionOperationInstall({
+    installRoot: repairRoot,
     expectedUid,
     expectedGid,
   });
-  assert.deepEqual(collisionInspection.newManagedCollisions, [IDENTITY]);
-  const before = await snapshot(collisionRoot);
-  await assert.rejects(
-    executeReviewedAcademyProductionOperationInstall({
-      inspection: collisionInspection,
-      inspectionSha256: digest(collisionInspection),
-      installRoot: collisionRoot,
-      expectedUid,
-      expectedGid,
-    }),
-    /REJECTED/,
-  );
-  assert.deepEqual(await snapshot(collisionRoot), before);
+  assert.deepEqual(repairInspection.newManagedCollisions, []);
+  const repairReceipt = await executeReviewedAcademyProductionOperationInstall({
+    inspection: repairInspection,
+    inspectionSha256: digest(repairInspection),
+    installRoot: repairRoot,
+    expectedUid,
+    expectedGid,
+  });
+  assert.equal(repairReceipt.status, "INSTALLED_AND_VERIFIED");
+  assert.equal((await readFile(join(repairRoot, IDENTITY))).length, 11338);
 } finally {
   await rm(root, { recursive: true, force: true });
 }
