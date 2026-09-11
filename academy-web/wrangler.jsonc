@@ -37,6 +37,6 @@
     // preview: ยังไม่เปิดให้ค้นเจอ และยังไม่เปิดระบบบัญชี
     // (ไม่มี NEXT_PUBLIC_SUPABASE_* = หน้า sign-in จะบอกตรงๆ ว่ายังไม่เปิด
     //  แทนที่จะโชว์ฟอร์มที่กดแล้ว error)
-    "NEXT_PUBLIC_SEARCH_INDEXING": "off"
+    "NEXT_PUBLIC_SEARCH_INDEXING": "on"
   }
 }
