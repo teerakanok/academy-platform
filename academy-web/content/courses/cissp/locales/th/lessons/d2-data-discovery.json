@@ -1,0 +1,105 @@
+{
+  "nodeId": "d2-data-discovery",
+  "locale": "th",
+  "title": "Data Discovery",
+  "objective": "Study-guide review — CISSP — Domain 2: Asset Security: Data Discovery.",
+  "blocks": [
+    {
+      "kind": "list",
+      "items": [
+        "Data discovery — the process of identifying and locating data across the organization before it can be classified and protected",
+        "Organizations cannot protect data they do not know exists — discovery is the essential first step",
+        "Discovery methods: automated scanning tools, data loss prevention (DLP) in discovery mode, network traffic analysis, interviews with data owners",
+        "Identifies: where sensitive data resides, who has access, how it flows through systems, whether it complies with policies",
+        "Discovery feeds directly into data classification — you must find the data before you can label and protect it"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Data discovery addresses a fundamental challenge: organizations often have sensitive data scattered across file shares, cloud storage, databases, email archives, and employee devices without a clear inventory. Discovery must occur before classification can be effective. Key discovery activities:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Structured data discovery — scanning databases and data warehouses for sensitive fields (SSN, credit card numbers, PHI)",
+        "Unstructured data discovery — scanning file shares, email, collaboration tools for sensitive content",
+        "Cloud data discovery — identifying data stored in SaaS applications, cloud storage (S3, Azure Blob)",
+        "Shadow IT discovery — finding data in unauthorized applications and services"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: \"Value to assets can be represented through confidentiality (sensitivity), integrity (accuracy and meaningfulness), and availability (criticality). It stands to reason, then, that we need to classify assets based on those three characteristics.\" But first, you must discover what assets exist. ⚠️ Exam Trap: Data discovery comes BEFORE classification in the data governance lifecycle. You cannot classify what you haven't found. The exam may present scenarios where an organization has data governance failures — often the root cause is inadequate discovery."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Data discovery: the process of identifying and locating data across the organization before it can be classified and protected",
+    "Structured data discovery: scanning databases and data warehouses for sensitive fields (SSN, credit card numbers, PHI)",
+    "Unstructured data discovery: scanning file shares, email, collaboration tools for sensitive content",
+    "Cloud data discovery: identifying data stored in SaaS applications, cloud storage (S3, Azure Blob)",
+    "Shadow IT discovery: finding data in unauthorized applications and services"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Data discovery\" is described as:",
+      "choices": {
+        "A": "the process of identifying and locating data across the organization before it can be classified and protected",
+        "B": "scanning file shares, email, collaboration tools for sensitive content",
+        "C": "identifying data stored in SaaS applications, cloud storage (S3, Azure Blob)",
+        "D": "scanning databases and data warehouses for sensitive fields (SSN, credit card numbers, PHI)"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Data discovery — the process of identifying and locating data across the organization before it can be classified and protected"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Structured data discovery\" is described as:",
+      "choices": {
+        "A": "identifying data stored in SaaS applications, cloud storage (S3, Azure Blob)",
+        "B": "the process of identifying and locating data across the organization before it can be classified and protected",
+        "C": "scanning file shares, email, collaboration tools for sensitive content",
+        "D": "scanning databases and data warehouses for sensitive fields (SSN, credit card numbers, PHI)"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Structured data discovery — scanning databases and data warehouses for sensitive fields (SSN, credit card numbers, PHI)"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Unstructured data discovery\" is described as:",
+      "choices": {
+        "A": "scanning file shares, email, collaboration tools for sensitive content",
+        "B": "identifying data stored in SaaS applications, cloud storage (S3, Azure Blob)",
+        "C": "finding data in unauthorized applications and services",
+        "D": "scanning databases and data warehouses for sensitive fields (SSN, credit card numbers, PHI)"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Unstructured data discovery — scanning file shares, email, collaboration tools for sensitive content"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Cloud data discovery\" is described as:",
+      "choices": {
+        "A": "identifying data stored in SaaS applications, cloud storage (S3, Azure Blob)",
+        "B": "finding data in unauthorized applications and services",
+        "C": "scanning databases and data warehouses for sensitive fields (SSN, credit card numbers, PHI)",
+        "D": "scanning file shares, email, collaboration tools for sensitive content"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Cloud data discovery — identifying data stored in SaaS applications, cloud storage (S3, Azure Blob)"
+    }
+  ]
+}

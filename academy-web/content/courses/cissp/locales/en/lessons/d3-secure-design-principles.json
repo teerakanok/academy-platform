@@ -1,0 +1,317 @@
+{
+  "nodeId": "d3-secure-design-principles",
+  "locale": "en",
+  "title": "Secure Design Principles",
+  "objective": "Study-guide review — CISSP — Domain 3: Security Architecture and Engineering: Secure Design Principles.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Defense in Depth"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Apply multiple layers of security controls (layered defense)",
+        "No single control should be the sole protection for any asset",
+        "Layers should include administrative, technical, and physical controls",
+        "Also called layered security or onion defense",
+        "If one layer fails, others continue to provide protection"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Defense in depth ensures that an attacker must bypass multiple security controls to reach an asset. Example layers for a data center:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Perimeter — Fences, gates, guards",
+        "Building — Locks, badge readers, CCTV",
+        "Server room — Biometric access, mantrap",
+        "Network — Firewalls, IDS/IPS, segmentation",
+        "Host — OS hardening, antimalware, patching",
+        "Application — Input validation, authentication",
+        "Data — Encryption, access controls, DLP"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: \"Defense in depth\" is listed as an example of secure design principles alongside threat modeling, least privilege, and secure defaults. ⚠️ Exam Trap: Defense in depth is not just about having multiple firewalls (that's defense in breadth). True defense in depth uses DIFFERENT types of controls at DIFFERENT layers."
+    },
+    {
+      "kind": "heading",
+      "text": "Zero Trust Architecture"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Never trust, always verify — replaces \"trust but verify\"",
+        "Assume the network is always hostile, even internal",
+        "Verify every access request regardless of source location",
+        "Micro-segmentation limits lateral movement",
+        "Implemented through Zero Trust Network Access (ZTNA)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP, the seven tenets of Zero Trust:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Know your architecture (users, devices, and services)",
+        "Know your user, service, and device identities",
+        "Know the health of your users, devices, and services",
+        "Use policies to authorize requests",
+        "Authenticate everywhere",
+        "Focus your monitoring on devices and services",
+        "Don't trust any network"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Stewart: \"Due to the rapid growth and changes in the modern threatscape, the trust but verify model of security is no longer sufficient. Most security experts now recommend designing organizational security around the zero-trust model.\" Zero trust is particularly relevant in modern environments with:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Remote workers accessing resources from anywhere",
+        "Cloud services spanning multiple providers",
+        "BYOD (Bring Your Own Device) policies",
+        "IoT devices with limited security capabilities"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Least Privilege and Need to Know"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Users receive minimum access required for their job function",
+        "Need to know adds context — access based on legitimate business requirement",
+        "Applies to users, processes, and systems",
+        "Reduces attack surface and limits damage from compromise",
+        "Must be reviewed regularly to prevent privilege creep"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Least privilege and need to know work together:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Least privilege defines the minimum LEVEL of access",
+        "Need to know defines WHETHER access is needed at all"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Example: A system administrator may have the technical privilege to access all databases (least privilege for their role), but they should only access databases relevant to their current work assignment (need to know). Privilege creep occurs when users accumulate access rights over time as they change roles or take on new responsibilities without having old access revoked."
+    },
+    {
+      "kind": "heading",
+      "text": "Secure Defaults and Fail-Secure"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Systems should default to the most secure configuration",
+        "Fail-secure (fail-closed) — System denies access on failure (e.g., locked door on power loss)",
+        "Fail-open — System allows access on failure (used for life safety, e.g., fire exit)",
+        "Default-deny is preferred over default-allow",
+        "All unnecessary features/ports/services should be disabled by default"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Stewart: Secure design includes \"managing secure defaults, designing a system to fail securely.\" Fail-secure vs. Fail-open:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Scenario",
+        "Preferred Mode",
+        "Reason"
+      ],
+      "rows": [
+        [
+          "Door to data center",
+          "Fail-secure (locked)",
+          "Protect assets"
+        ],
+        [
+          "Fire exit door",
+          "Fail-open (unlocked)",
+          "Life safety"
+        ],
+        [
+          "Firewall",
+          "Fail-secure (deny)",
+          "Block unauthorized access"
+        ],
+        [
+          "Emergency lighting",
+          "Fail-open (on)",
+          "Life safety"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Life safety ALWAYS takes priority over security. If a fire occurs, doors must fail-open even if that means security is temporarily compromised."
+    },
+    {
+      "kind": "heading",
+      "text": "Separation of Duties and Mechanisms"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Separation of mechanisms — Security mechanisms should be independent",
+        "Compromise of one mechanism should not compromise others",
+        "Critical processes require multiple approvals (two-person control)",
+        "System administration and security audit should be separate roles",
+        "Supports defense in depth by ensuring independent control layers"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Keep It Simple"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Also called Economy of Mechanism",
+        "Simpler systems have fewer vulnerabilities",
+        "Complex systems are harder to secure, test, and audit",
+        "Minimize the attack surface by reducing unnecessary features",
+        "Prefer proven, simple solutions over complex ones"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: In the context of designing and building a secure system, simplicity results in:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Smaller attack surface",
+        "Fewer errors and vulnerabilities",
+        "Less complex testing"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The \"KISS\" principle (Keep It Simple, Stupid) applies directly to security architecture. Every additional feature, service, or interface is a potential attack vector."
+    },
+    {
+      "kind": "heading",
+      "text": "Privacy by Design"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Integrate privacy protections into system design from the beginning",
+        "Not an afterthought — build privacy into the architecture",
+        "Seven foundational principles (developed by Ann Cavoukian)",
+        "Required by GDPR Article 25 (Data Protection by Design)",
+        "Includes data minimization, purpose limitation, and transparency"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Perimeter: Fences, gates, guards",
+    "Building: Locks, badge readers, CCTV",
+    "Server room: Biometric access, mantrap",
+    "Network: Firewalls, IDS/IPS, segmentation",
+    "Host: OS hardening, antimalware, patching",
+    "Application: Input validation, authentication",
+    "Data: Encryption, access controls, DLP",
+    "Never trust, always verify: replaces \"trust but verify\""
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 3: Security Architecture and Engineering, \"Perimeter\" is described as:",
+      "choices": {
+        "A": "Fail-secure (deny)",
+        "B": "Fences, gates, guards",
+        "C": "Fail-open (unlocked)",
+        "D": "Fail-secure (locked)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Perimeter — Fences, gates, guards"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 3: Security Architecture and Engineering, \"Building\" is described as:",
+      "choices": {
+        "A": "Fences, gates, guards",
+        "B": "replaces \"trust but verify\"",
+        "C": "Biometric access, mantrap",
+        "D": "Locks, badge readers, CCTV"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Building — Locks, badge readers, CCTV"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 3: Security Architecture and Engineering, \"Server room\" is described as:",
+      "choices": {
+        "A": "Locks, badge readers, CCTV",
+        "B": "replaces \"trust but verify\"",
+        "C": "Fences, gates, guards",
+        "D": "Biometric access, mantrap"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Server room — Biometric access, mantrap"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 3: Security Architecture and Engineering, \"Network\" is described as:",
+      "choices": {
+        "A": "OS hardening, antimalware, patching",
+        "B": "Firewalls, IDS/IPS, segmentation",
+        "C": "Encryption, access controls, DLP",
+        "D": "Input validation, authentication"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Network — Firewalls, IDS/IPS, segmentation"
+    }
+  ]
+}

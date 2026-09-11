@@ -1,0 +1,421 @@
+{
+  "nodeId": "d1-security-governance-principles",
+  "locale": "th",
+  "title": "Security Governance Principles",
+  "objective": "Study-guide review — CISSP — Domain 1: Security and Risk Management: Security Governance Principles.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Alignment with Business Strategy"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Security governance must be aligned with corporate governance",
+        "Governance = directing the organization to achieve its goals and objectives",
+        "CEO is ultimately accountable for organizational governance",
+        "Security function should be viewed as an organizational enabler",
+        "CISO/CSO reports organizational security posture to executive leadership"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: \"Governance means to govern properly to allow the organization to achieve its goals and objectives focused on increasing the value of the organization for the stakeholders.\" Security governance involves:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Aligning the organization's security function to business strategy, goals, mission, and objectives",
+        "Defining organizational roles and responsibilities for security",
+        "Managing security policies, standards, baselines, guidelines, and procedures",
+        "Monitoring compliance with security policies"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "One way an organization can establish sound governance aligned with security is through the establishment of an Organizational Governance Committee, charged with promoting the top-down governance structure critical to achieving organizational goals. From Destination CISSP: \"If the CEO regularly communicates the need for robust security that is aligned with the strategy, goals, mission, and objectives of the organization, the security function will be viewed as a great asset and an organizational enabler.\" ⚠️ Exam Trap: Security governance is a MANAGEMENT function, not a technical one. The CISSP exam expects you to think about governance from a business perspective."
+    },
+    {
+      "kind": "heading",
+      "text": "Organizational Roles and Responsibilities"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "CEO — Ultimately accountable for organizational governance and security",
+        "CISO/CSO — Responsible for security program implementation",
+        "Board of Directors — Oversight and fiduciary responsibility",
+        "Data Owner — Accountable for classification and protection of data",
+        "Data Custodian — Day-to-day data management and protection"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Role",
+        "Responsibility"
+      ],
+      "rows": [
+        [
+          "CEO",
+          "Ultimate accountability for organizational governance; sets tone from top"
+        ],
+        [
+          "Board of Directors",
+          "Oversight of governance; fiduciary responsibility"
+        ],
+        [
+          "CISO/CSO",
+          "Security program design, implementation, management"
+        ],
+        [
+          "Data Owner",
+          "Classification decisions; defines access requirements; usually senior management"
+        ],
+        [
+          "Data Custodian",
+          "Day-to-day data handling; backups, restoration; implements controls per Owner's direction"
+        ],
+        [
+          "Data Steward",
+          "Business responsibility for data quality, metadata, governance, compliance"
+        ],
+        [
+          "Data Processor",
+          "Processes data on behalf of the Data Controller (GDPR term)"
+        ],
+        [
+          "Data Controller",
+          "Determines purposes and means of processing personal data (GDPR term)"
+        ],
+        [
+          "Data Subject",
+          "Individual to whom personal data pertains"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: \"Owners are ultimately accountable for an asset and protecting its value. Owners should understand the importance of following governance mandates and the need to classify each asset they're accountable for.\" ⚠️ Exam Trap: Data Owners are management/executives who make classification decisions. Data Custodians are IT staff who implement the technical controls. Don't confuse these roles."
+    },
+    {
+      "kind": "heading",
+      "text": "Security Policy Hierarchy"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Policies — High-level management directives; compulsory; define \"what\"",
+        "Standards — Compulsory requirements for uniform use of technology",
+        "Baselines — Minimum security configuration levels",
+        "Guidelines — Recommended actions; not compulsory (advisory)",
+        "Procedures — Step-by-step instructions; define \"how\""
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Document",
+        "Mandatory?",
+        "Defines",
+        "Example"
+      ],
+      "rows": [
+        [
+          "Policy",
+          "Yes",
+          "What must be done",
+          "\"All data must be classified\""
+        ],
+        [
+          "Standard",
+          "Yes",
+          "What to use",
+          "\"AES-256 for encryption\""
+        ],
+        [
+          "Baseline",
+          "Yes",
+          "Minimum level",
+          "\"CIS Benchmark for Windows\""
+        ],
+        [
+          "Guideline",
+          "No (advisory)",
+          "Suggestions",
+          "\"Consider using password manager\""
+        ],
+        [
+          "Procedure",
+          "Yes",
+          "How to do it",
+          "\"Step 1: Open console, Step 2: ...\""
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: \"Once policies are set, the remaining security documentation can be crafted under the guidance of those policies. Standards define compulsory requirements for the homogenous use of hardware, software, technology, and security controls.\" From Stewart: \"All too often, policies, standards, baselines, guidelines, and procedures are developed only as an afterthought or in response to a security incident.\" From Shon Harris: \"Guidelines outline methodologies, include suggested actions, and are not compulsory.\" Guidelines deal with gray areas where specific standards don't apply. Mnemonic: Policies → Standards → Baselines → Guidelines → Procedures (from most strategic to most operational: \"People Should Be Good Practitioners\") ⚠️ Exam Trap: Guidelines are the ONLY non-mandatory document in the hierarchy. Everything else (policies, standards, baselines, procedures) is compulsory."
+    },
+    {
+      "kind": "heading",
+      "text": "Data Roles Taxonomy"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Data Owner/Controller — Accountable for protection; defines classification and access",
+        "Data Custodian — Implements technical controls; day-to-day management",
+        "Data Steward — Business responsibility for data quality and governance",
+        "Data Processor — Processes data on behalf of the controller (GDPR)",
+        "Data Subject — Individual whose personal data is being processed"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: Data Owners are typically senior management who:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Define classification levels for their data",
+        "Approve access requests",
+        "Define retention and destruction requirements",
+        "Are ultimately accountable for data protection"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Official CBK (Table 2-3): Different types of owners exist with different responsibilities related to data protection, including defining security requirements, deciding access rights, and assisting in risk assessment. Data Custodians are typically IT staff who:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Implement and maintain security controls",
+        "Perform regular backups",
+        "Manage data storage",
+        "Ensure data integrity through technical means"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: The Owner makes the DECISIONS. The Custodian IMPLEMENTS the decisions. If a question asks \"who decides classification?\" — it's the Owner. If it asks \"who performs backups?\" — it's the Custodian."
+    },
+    {
+      "kind": "heading",
+      "text": "Security Control Categories and Types"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Three Categories:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Administrative (Managerial) — Policies, procedures, training",
+        "Technical (Logical) — Hardware/software controls (firewalls, encryption)",
+        "Physical — Locks, fences, guards, environmental controls"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Seven Types (Functional):"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Preventive — Stop incidents before they occur",
+        "Detective — Identify incidents during or after occurrence",
+        "Corrective — Fix problems after detection",
+        "Deterrent — Discourage violations",
+        "Compensating — Alternative when primary control isn't feasible",
+        "Directive — Specify required actions (policies, signs)",
+        "Recovery — Restore systems to normal operation"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Controls are classified by category (administrative/technical/physical) AND by type (what they do functionally). Any control can be mapped to both dimensions:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Control Example",
+        "Category",
+        "Type"
+      ],
+      "rows": [
+        [
+          "Security policy",
+          "Administrative",
+          "Directive"
+        ],
+        [
+          "Firewall",
+          "Technical",
+          "Preventive"
+        ],
+        [
+          "CCTV camera",
+          "Physical",
+          "Detective"
+        ],
+        [
+          "Security awareness training",
+          "Administrative",
+          "Preventive"
+        ],
+        [
+          "IDS",
+          "Technical",
+          "Detective"
+        ],
+        [
+          "Guard dog",
+          "Physical",
+          "Deterrent"
+        ],
+        [
+          "Backup system",
+          "Technical",
+          "Recovery"
+        ],
+        [
+          "Fire extinguisher",
+          "Physical",
+          "Corrective"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Chapple: \"A compensation control provides an alternative when it isn't possible to implement the preferred control.\" Example: If you can't implement biometric access, you might use smart card + PIN as a compensating control. From Stewart: \"Directive access controls include security policy requirements or criteria, posted notifications, escape route exit signs, monitoring, supervision, and procedures.\" ⚠️ Exam Trap: Don't confuse categories with types. A firewall is a TECHNICAL control (category) that performs a PREVENTIVE function (type). The exam often asks you to classify controls by both dimensions."
+    },
+    {
+      "kind": "heading",
+      "text": "Due Care and Due Diligence"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Due Care — Doing what a reasonable person would do (acting responsibly)",
+        "Due Diligence — Research and assessment before making decisions",
+        "Both are legal standards that protect against negligence claims",
+        "Due Care = \"doing the right thing\"; Due Diligence = \"knowing the right thing\"",
+        "Failure to exercise due care/diligence may result in legal liability"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: \"Prudence implies a proactive and diligent approach to decision-making. In a legal context, acting prudently may serve to protect an individual or organization from liability.\" Due Care is the action — implementing appropriate security controls, following policies, responding to incidents. It means taking reasonable steps to protect assets. Due Diligence is the investigation — researching threats, understanding risks, evaluating controls before implementing them. It means understanding your environment. Example:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Due Diligence = Researching patch management best practices",
+        "Due Care = Actually applying patches in a timely manner"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Remember: Due Diligence = \"homework\" (research/planning). Due Care = \"action\" (implementation/maintenance). Both are required to avoid negligence."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "CEO: Ultimately accountable for organizational governance and security",
+    "CISO/CSO: Responsible for security program implementation",
+    "Board of Directors: Oversight and fiduciary responsibility",
+    "Data Owner: Accountable for classification and protection of data",
+    "Data Custodian: Day-to-day data management and protection",
+    "CEO: Ultimate accountability for organizational governance; sets tone from top",
+    "Board of Directors: Oversight of governance; fiduciary responsibility",
+    "CISO/CSO: Security program design, implementation, management"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"CEO\" is described as:",
+      "choices": {
+        "A": "Determines purposes and means of processing personal data (GDPR term)",
+        "B": "Accountable for protection; defines classification and access",
+        "C": "Doing what a reasonable person would do (acting responsibly)",
+        "D": "Ultimately accountable for organizational governance and security"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: CEO — Ultimately accountable for organizational governance and security"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"CISO/CSO\" is described as:",
+      "choices": {
+        "A": "Responsible for security program implementation",
+        "B": "Recommended actions; not compulsory (advisory)",
+        "C": "Research and assessment before making decisions",
+        "D": "Alternative when primary control isn't feasible"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: CISO/CSO — Responsible for security program implementation"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Board of Directors\" is described as:",
+      "choices": {
+        "A": "Oversight and fiduciary responsibility",
+        "B": "Day-to-day data management and protection",
+        "C": "Step-by-step instructions; define \"how\"",
+        "D": "Minimum security configuration levels"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Board of Directors — Oversight and fiduciary responsibility"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Data Owner\" is described as:",
+      "choices": {
+        "A": "Compulsory requirements for uniform use of technology",
+        "B": "Accountable for classification and protection of data",
+        "C": "Implements technical controls; day-to-day management",
+        "D": "Security program design, implementation, management"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Data Owner — Accountable for classification and protection of data"
+    }
+  ]
+}

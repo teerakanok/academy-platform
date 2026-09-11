@@ -1,0 +1,477 @@
+{
+  "nodeId": "d3-cryptography-fundamentals",
+  "locale": "th",
+  "title": "Cryptography Fundamentals",
+  "objective": "Study-guide review — CISSP — Domain 3: Security Architecture and Engineering: Cryptography Fundamentals.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Symmetric Encryption"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Uses one shared key for both encryption and decryption",
+        "Fast and efficient for bulk data encryption",
+        "Key distribution is the biggest challenge",
+        "Number of keys needed = n(n-1)/2 where n = number of users",
+        "Provides confidentiality but NOT authentication or non-repudiation"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Major Symmetric Algorithms:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Algorithm",
+        "Key Size",
+        "Block Size",
+        "Status"
+      ],
+      "rows": [
+        [
+          "DES",
+          "56 bits",
+          "64 bits",
+          "Deprecated (insecure)"
+        ],
+        [
+          "3DES",
+          "112/168 bits",
+          "64 bits",
+          "Deprecated (slow)"
+        ],
+        [
+          "AES",
+          "128/192/256 bits",
+          "128 bits",
+          "Current standard"
+        ],
+        [
+          "Blowfish",
+          "32-448 bits",
+          "64 bits",
+          "Legacy"
+        ],
+        [
+          "RC4",
+          "40-2048 bits",
+          "Stream",
+          "Deprecated (insecure)"
+        ],
+        [
+          "RC5/RC6",
+          "Variable",
+          "Variable",
+          "Academic"
+        ],
+        [
+          "IDEA",
+          "128 bits",
+          "64 bits",
+          "Legacy"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Shon Harris: \"Symmetric key algorithms can provide confidentiality, but not authentication or nonrepudiation.\" From Chapple: \"Symmetric key cryptography has several weaknesses: Key distribution is a major problem. Parties must have a secure method of exchanging the secret key before establishing communications.\" Block vs. Stream Ciphers:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Block cipher — Encrypts fixed-size blocks of data (AES, DES)",
+        "Stream cipher — Encrypts data bit by bit or byte by byte (RC4)"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Confusion and Diffusion: From Chapple: \"Cryptographic algorithms rely on two basic operations: confusion (making the relationship between key and ciphertext complex) and diffusion (spreading plaintext influence across the ciphertext).\" ⚠️ Exam Trap: AES is the current standard. Know that AES uses 128-bit blocks (not 64-bit like DES). AES key sizes are 128, 192, or 256 bits."
+    },
+    {
+      "kind": "heading",
+      "text": "Asymmetric Encryption"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Uses key pair — public key (shared) and private key (secret)",
+        "Slower than symmetric but solves key distribution problem",
+        "Provides confidentiality, authentication, and non-repudiation",
+        "Number of keys needed = 2n where n = number of users",
+        "Foundation for digital signatures and PKI"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Major Asymmetric Algorithms:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Algorithm",
+        "Based On",
+        "Use Case"
+      ],
+      "rows": [
+        [
+          "RSA",
+          "Integer factorization",
+          "Encryption, signatures (most common)"
+        ],
+        [
+          "Diffie-Hellman",
+          "Discrete logarithm",
+          "Key exchange only"
+        ],
+        [
+          "ECC",
+          "Elliptic curves",
+          "Mobile, IoT (smaller keys, same security)"
+        ],
+        [
+          "DSA",
+          "Discrete logarithm",
+          "Digital signatures only"
+        ],
+        [
+          "ElGamal",
+          "Discrete logarithm",
+          "Encryption, signatures"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Chapple: \"RSA is the most commonly used asymmetric algorithm, and its strength has had to continue to increase to mitigate advancements in processing technology.\" Comparison:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Feature",
+        "Symmetric",
+        "Asymmetric"
+      ],
+      "rows": [
+        [
+          "Speed",
+          "Fast",
+          "Slow"
+        ],
+        [
+          "Key distribution",
+          "Difficult",
+          "Easy (public key is shared)"
+        ],
+        [
+          "Keys for n users",
+          "n(n-1)/2",
+          "2n"
+        ],
+        [
+          "Provides",
+          "Confidentiality",
+          "Confidentiality + Authentication + Non-repudiation"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Hybrid cryptosystems combine both: asymmetric encryption exchanges a symmetric session key, which is then used for bulk data encryption. This is how TLS/HTTPS works."
+    },
+    {
+      "kind": "heading",
+      "text": "Hashing Algorithms"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Produces fixed-length output (digest/hash) from any input",
+        "One-way function — cannot reverse the hash to get the original data",
+        "Used for integrity verification, password storage, digital signatures",
+        "Must be collision-resistant (hard to find two inputs with same hash)",
+        "Hashing does NOT provide confidentiality (no key involved)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Algorithm",
+        "Output",
+        "Status"
+      ],
+      "rows": [
+        [
+          "MD5",
+          "128 bits",
+          "Broken (collisions found)"
+        ],
+        [
+          "SHA-1",
+          "160 bits",
+          "Deprecated (collisions found)"
+        ],
+        [
+          "SHA-2 (SHA-256, SHA-512)",
+          "256/512 bits",
+          "Current standard"
+        ],
+        [
+          "SHA-3",
+          "Variable",
+          "Government standard"
+        ],
+        [
+          "HMAC",
+          "Variable",
+          "Hash + key for authentication"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Chapple: \"The Secure Hash Algorithm SHA-3 is the government standard. They must allow input of any length, provide fixed-length output, make it relatively easy to compute the hash function for any input, provide one-way functionality, and be collision-resistant.\" HMAC (Hash-based Message Authentication Code): Combines a hash with a secret key to provide both integrity AND authentication. HMAC-SHA256 is commonly used. ⚠️ Exam Trap: Hashing provides INTEGRITY, not confidentiality. If a hash value changes, the data has been modified. But hashing alone doesn't tell you WHO modified it (HMAC adds that)."
+    },
+    {
+      "kind": "heading",
+      "text": "Digital Signatures"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Created by encrypting hash with sender's private key",
+        "Provides integrity, authentication, and non-repudiation",
+        "Verified using sender's public key",
+        "Does NOT provide confidentiality (the message itself is not encrypted)",
+        "Combined with encryption for full CIA protection"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Digital Signature Process:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Sender creates hash of the message",
+        "Sender encrypts hash with their private key → digital signature",
+        "Sender sends message + signature",
+        "Recipient decrypts signature with sender's public key → reveals hash",
+        "Recipient hashes the received message independently",
+        "If hashes match → integrity confirmed, authentication confirmed"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "What digital signatures provide:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Integrity — Hash verifies data hasn't been modified",
+        "Authentication — Only the private key holder could create the signature",
+        "Non-repudiation — Sender cannot deny sending (their private key was used)"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Digital signatures are created with the PRIVATE key and verified with the PUBLIC key. This is the opposite of encryption (encrypt with public, decrypt with private)."
+    },
+    {
+      "kind": "heading",
+      "text": "Public Key Infrastructure"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "PKI — Framework for managing digital certificates and public keys",
+        "Certificate Authority (CA) — Issues and manages certificates",
+        "Registration Authority (RA) — Verifies identity before CA issues certificate",
+        "Certificate Revocation List (CRL) — List of revoked certificates",
+        "OCSP — Online Certificate Status Protocol (real-time revocation checking)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP (Figure 3-60): PKI components include CA, RA, digital certificates, CRL, and key management systems. X.509 Certificate Contents:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Version, Serial number",
+        "Signature algorithm",
+        "Issuer (CA)",
+        "Validity period (not before, not after)",
+        "Subject (certificate holder)",
+        "Public key",
+        "Extensions",
+        "Digital signature of the CA"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Certificate Pinning: From Chapple: \"If a malicious actor is sitting between the web server and the user, the malicious actor might send a spoofed certificate. Certificate pinning offers a means by which this possibility can be avoided.\" ⚠️ Exam Trap: A certificate does NOT contain the private key. It contains the public key and is signed by the CA's private key."
+    },
+    {
+      "kind": "heading",
+      "text": "Cryptographic Attacks"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Brute Force — Try every possible key (countered by longer keys)",
+        "Birthday Attack — Exploits hash collisions (probability math)",
+        "Man-in-the-Middle — Intercept and alter communications",
+        "Known Plaintext — Attacker has both plaintext and ciphertext",
+        "Chosen Plaintext/Ciphertext — Attacker can choose inputs for analysis"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Attack",
+        "Description",
+        "Defense"
+      ],
+      "rows": [
+        [
+          "Brute Force",
+          "Try all possible keys",
+          "Longer key sizes"
+        ],
+        [
+          "Birthday",
+          "Find hash collisions",
+          "Longer hash output"
+        ],
+        [
+          "Meet-in-the-Middle",
+          "Attack double encryption from both ends",
+          "Triple encryption (3DES)"
+        ],
+        [
+          "MITM",
+          "Intercept communication",
+          "Certificate pinning, mutual auth"
+        ],
+        [
+          "Known Plaintext",
+          "Has some plaintext/ciphertext pairs",
+          "Strong algorithms"
+        ],
+        [
+          "Side Channel",
+          "Analyze timing, power, EM emissions",
+          "Constant-time implementations"
+        ],
+        [
+          "Rubber Hose",
+          "Physical coercion to reveal keys",
+          "Key escrow, plausible deniability"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Chapple: \"Birthday attacks exploit the mathematics behind the birthday problem (probability of two people sharing a birthday in a group).\" From Shon Harris: \"Social engineering techniques can also be used in cryptanalysis.\" ⚠️ Exam Trap: The birthday attack works against HASHING, not encryption. It exploits the probability of finding collisions. A hash function with n-bit output can be birthday-attacked with approximately 2^(n/2) attempts."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "AES: 128/192/256 bits",
+    "Block cipher: Encrypts fixed-size blocks of data (AES, DES)",
+    "Stream cipher: Encrypts data bit by bit or byte by byte (RC4)",
+    "RSA: Integer factorization",
+    "Diffie-Hellman: Discrete logarithm",
+    "ECC: Elliptic curves",
+    "DSA: Discrete logarithm",
+    "ElGamal: Discrete logarithm"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 3: Security Architecture and Engineering, \"AES\" is described as:",
+      "choices": {
+        "A": "Discrete logarithm",
+        "B": "Confidentiality",
+        "C": "Elliptic curves",
+        "D": "128/192/256 bits"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: AES: 128/192/256 bits"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 3: Security Architecture and Engineering, \"Block cipher\" is described as:",
+      "choices": {
+        "A": "Exploits hash collisions (probability math)",
+        "B": "Encrypts fixed-size blocks of data (AES, DES)",
+        "C": "Verifies identity before CA issues certificate",
+        "D": "Encrypts data bit by bit or byte by byte (RC4)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Block cipher — Encrypts fixed-size blocks of data (AES, DES)"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 3: Security Architecture and Engineering, \"Stream cipher\" is described as:",
+      "choices": {
+        "A": "Verifies identity before CA issues certificate",
+        "B": "Encrypts fixed-size blocks of data (AES, DES)",
+        "C": "cannot reverse the hash to get the original data",
+        "D": "Encrypts data bit by bit or byte by byte (RC4)"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Stream cipher — Encrypts data bit by bit or byte by byte (RC4)"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 3: Security Architecture and Engineering, \"RSA\" is described as:",
+      "choices": {
+        "A": "Integer factorization",
+        "B": "Intercept communication",
+        "C": "Find hash collisions",
+        "D": "Try all possible keys"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: RSA: Integer factorization"
+    }
+  ]
+}

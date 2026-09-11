@@ -1,0 +1,354 @@
+{
+  "nodeId": "d1-business-continuity-planning-bcp",
+  "locale": "en",
+  "title": "Business Continuity Planning (BCP)",
+  "objective": "Study-guide review — CISSP — Domain 1: Security and Risk Management: Business Continuity Planning (BCP).",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Business Impact Analysis (BIA)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "BIA identifies critical business functions and the impact of disruption",
+        "Determines maximum tolerable downtime for each function",
+        "Identifies dependencies between business functions",
+        "Prioritizes recovery efforts based on criticality",
+        "Must have senior management support and sponsorship"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The BIA is the first step in BCP. It identifies and prioritizes critical business functions and determines the impact of disruption to each. BIA output includes:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "List of critical business functions ranked by priority",
+        "Maximum tolerable downtime for each function",
+        "Resource requirements for recovery",
+        "Dependencies between functions",
+        "Financial and operational impact estimates"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: \"If your team is not truly representative of the organization, you may miss critical priorities. Be sure to gather input from all parts of the organization.\" From Shon Harris: \"The BCP coordinator would need to implement specific requirements to ensure that the defined objectives within the scope can be accomplished.\""
+    },
+    {
+      "kind": "heading",
+      "text": "RPO, RTO, WRT, and MTD"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "RPO (Recovery Point Objective) — Maximum acceptable data loss measured in time",
+        "RTO (Recovery Time Objective) — Maximum time to restore service after disruption",
+        "WRT (Work Recovery Time) — Time to verify system integrity after restoration",
+        "MTD (Maximum Tolerable Downtime) — Total time a process can be disrupted",
+        "MTD = RTO + WRT"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Metric",
+        "Definition",
+        "Example"
+      ],
+      "rows": [
+        [
+          "RPO",
+          "Maximum data loss tolerance",
+          "RPO = 4 hours → backups every 4 hours"
+        ],
+        [
+          "RTO",
+          "Time to get system running",
+          "RTO = 2 hours → must be up within 2 hours"
+        ],
+        [
+          "WRT",
+          "Time to verify restored system",
+          "WRT = 1 hour → testing and validation"
+        ],
+        [
+          "MTD",
+          "Total acceptable downtime",
+          "MTD = RTO + WRT = 3 hours"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Key Relationships:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "RPO determines backup frequency (shorter RPO = more frequent backups)",
+        "RTO determines recovery site type (shorter RTO = hotter site)",
+        "MTD is the business-driven constraint that determines RTO and WRT",
+        "RTO + WRT must not exceed MTD"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: MTD = RTO + WRT. If the MTD is 4 hours and RTO is 2 hours, the WRT is 2 hours. The exam tests this arithmetic. ⚠️ Exam Trap: RPO is about DATA LOSS, not downtime. RTO is about SERVICE RESTORATION. They are independent metrics."
+    },
+    {
+      "kind": "heading",
+      "text": "BCP Process and Lifecycle"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Project Scope and Planning — Define scope, get management support",
+        "Business Impact Analysis (BIA) — Identify critical functions and impacts",
+        "Continuity Planning — Develop strategies and procedures",
+        "Approval and Implementation — Get management sign-off, implement plan",
+        "Testing and Exercises — Validate the plan works",
+        "Maintenance — Keep the plan updated"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Senior Management Support is CRITICAL: From Chapple: \"When working on a business continuity plan, the BCP team's executive acknowledged the importance of his support and agreed to participate. He sent an email to all employees introducing the effort and stating that it had his full backing.\" The BCP must be a living document — updated whenever the organization changes:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "New systems or applications",
+        "Personnel changes",
+        "Business process changes",
+        "After every test/exercise",
+        "After any actual disaster"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Senior management support is the MOST CRITICAL success factor for BCP. Without it, the plan will fail."
+    },
+    {
+      "kind": "heading",
+      "text": "Recovery Site Types"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Site Type",
+        "Cost",
+        "Activation Time",
+        "Equipment",
+        "Data"
+      ],
+      "rows": [
+        [
+          "Hot Site",
+          "Highest",
+          "Minutes to hours",
+          "Full",
+          "Near real-time"
+        ],
+        [
+          "Warm Site",
+          "Moderate",
+          "Hours to days (~12+ hrs)",
+          "Partial",
+          "Recent backups"
+        ],
+        [
+          "Cold Site",
+          "Lowest",
+          "Weeks",
+          "None (shell)",
+          "None"
+        ],
+        [
+          "Mobile Site",
+          "Varies",
+          "Hours to days",
+          "Self-contained",
+          "Varies"
+        ],
+        [
+          "Cloud Site",
+          "Varies",
+          "Minutes",
+          "Virtual",
+          "Varies"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: \"A cold site is basically just a shell of a building that needs to be populated with equipment, data, and people. It usually takes weeks to bring a cold site online. The biggest advantage of a cold site is cost — it's cheap.\" \"A warm site is better than a cold site, because in addition to the shell of a building, basic equipment is available and perhaps partially configured.\" From Chapple: \"Activation of a warm site typically takes at least 12 hours from the time a disaster is declared. This does not mean that any site that can be activated in less than 12 hours qualifies as a hot site, however; switchover times for most hot sites are often measured in seconds or minutes.\" Reciprocal Agreements: From Chapple: Organizations may enter agreements to share their facilities. However, these are unreliable because:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Both organizations may be affected by the same disaster",
+        "Sharing resources may compromise security",
+        "Capacity may be insufficient for both organizations"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: \"Another method of reducing the expense of a hot site is to use the hot site as a development or testing environment during normal operations.\" ⚠️ Exam Trap: Hot site = fastest activation, highest cost. Cold site = slowest activation, lowest cost. Warm site = middle ground. The exam loves trade-off questions about cost vs. recovery time."
+    },
+    {
+      "kind": "heading",
+      "text": "BCP Testing and Maintenance"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Checklist Test — Review the plan on paper (least disruptive)",
+        "Structured Walk-through (Tabletop) — Team discusses scenarios around a table",
+        "Simulation Test — Practice specific scenarios without affecting operations",
+        "Parallel Test — Activate alternate site while primary remains operational",
+        "Full Interruption Test — Shut down primary, operate from alternate (most disruptive)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Test Type",
+        "Disruption",
+        "Realism",
+        "Cost"
+      ],
+      "rows": [
+        [
+          "Checklist",
+          "None",
+          "Low",
+          "Minimal"
+        ],
+        [
+          "Walk-through",
+          "None",
+          "Low-Medium",
+          "Low"
+        ],
+        [
+          "Simulation",
+          "Minimal",
+          "Medium",
+          "Moderate"
+        ],
+        [
+          "Parallel",
+          "Minimal",
+          "High",
+          "High"
+        ],
+        [
+          "Full Interruption",
+          "Full",
+          "Highest",
+          "Highest"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Tests should progress from least to most disruptive. Never start with a full interruption test. ⚠️ Exam Trap: A parallel test runs the alternate site alongside the primary — both are operational simultaneously. A full interruption test actually shuts down the primary. The exam distinguishes between these."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "RPO (Recovery Point Objective): Maximum acceptable data loss measured in time",
+    "RTO (Recovery Time Objective): Maximum time to restore service after disruption",
+    "WRT (Work Recovery Time): Time to verify system integrity after restoration",
+    "MTD (Maximum Tolerable Downtime): Total time a process can be disrupted",
+    "RPO: Maximum data loss tolerance",
+    "RTO: Time to get system running",
+    "WRT: Time to verify restored system",
+    "MTD: Total acceptable downtime"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"RPO (Recovery Point Objective)\" is described as:",
+      "choices": {
+        "A": "Review the plan on paper (least disruptive)",
+        "B": "Maximum acceptable data loss measured in time",
+        "C": "Maximum time to restore service after disruption",
+        "D": "Time to verify system integrity after restoration"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: RPO (Recovery Point Objective) — Maximum acceptable data loss measured in time"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"RTO (Recovery Time Objective)\" is described as:",
+      "choices": {
+        "A": "Maximum time to restore service after disruption",
+        "B": "Review the plan on paper (least disruptive)",
+        "C": "Maximum acceptable data loss measured in time",
+        "D": "Time to verify system integrity after restoration"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: RTO (Recovery Time Objective) — Maximum time to restore service after disruption"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"WRT (Work Recovery Time)\" is described as:",
+      "choices": {
+        "A": "Time to verify system integrity after restoration",
+        "B": "Review the plan on paper (least disruptive)",
+        "C": "Maximum acceptable data loss measured in time",
+        "D": "Maximum time to restore service after disruption"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: WRT (Work Recovery Time) — Time to verify system integrity after restoration"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"MTD (Maximum Tolerable Downtime)\" is described as:",
+      "choices": {
+        "A": "Get management sign-off, implement plan",
+        "B": "Total time a process can be disrupted",
+        "C": "Identify critical functions and impacts",
+        "D": "Define scope, get management support"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: MTD (Maximum Tolerable Downtime) — Total time a process can be disrupted"
+    }
+  ]
+}

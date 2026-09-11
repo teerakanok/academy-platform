@@ -1,0 +1,141 @@
+{
+  "nodeId": "d5-the-iaaa-model-foundation-of-iam",
+  "locale": "en",
+  "title": "The IAAA Model — Foundation of IAM",
+  "objective": "Study-guide review — CISSP — Domain 5: Identity and Access Management (IAM): The IAAA Model — Foundation of IAM.",
+  "blocks": [
+    {
+      "kind": "list",
+      "items": [
+        "Identification — User claims an identity (username, email, account number)",
+        "Authentication — System verifies the claimed identity (password, biometric, token)",
+        "Authorization — System grants appropriate access based on verified identity",
+        "Accountability — System tracks and logs all user actions for audit"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The IAAA model is the conceptual foundation for ALL identity and access management:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Step",
+        "Question Answered",
+        "Example"
+      ],
+      "rows": [
+        [
+          "Identification",
+          "\"Who are you?\"",
+          "Entering a username"
+        ],
+        [
+          "Authentication",
+          "\"Prove it.\"",
+          "Entering a password, scanning a fingerprint"
+        ],
+        [
+          "Authorization",
+          "\"What can you do?\"",
+          "ACL grants read access to a file"
+        ],
+        [
+          "Accountability",
+          "\"What did you do?\"",
+          "Audit log records file access"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Key Relationships:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Identification without authentication is meaningless (anyone can claim to be admin)",
+        "Authentication without authorization is useless (verified identity but no access decisions)",
+        "Authorization without accountability is dangerous (access granted but no record of actions)",
+        "All four must work together for a complete IAM system"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: The exam tests IAAA as a sequence. Identification ALWAYS comes first (claim identity), followed by authentication (verify claim), then authorization (grant access), then accountability (log actions). Know the order."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Identification: User claims an identity (username, email, account number)",
+    "Authentication: System verifies the claimed identity (password, biometric, token)",
+    "Authorization: System grants appropriate access based on verified identity",
+    "Accountability: System tracks and logs all user actions for audit",
+    "Authorization: \"What can you do?\"",
+    "Accountability: \"What did you do?\""
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"Identification\" is described as:",
+      "choices": {
+        "A": "System tracks and logs all user actions for audit",
+        "B": "System verifies the claimed identity (password, biometric, token)",
+        "C": "User claims an identity (username, email, account number)",
+        "D": "System grants appropriate access based on verified identity"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Identification — User claims an identity (username, email, account number)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"Authentication\" is described as:",
+      "choices": {
+        "A": "System verifies the claimed identity (password, biometric, token)",
+        "B": "System tracks and logs all user actions for audit",
+        "C": "User claims an identity (username, email, account number)",
+        "D": "System grants appropriate access based on verified identity"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Authentication — System verifies the claimed identity (password, biometric, token)"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"Authorization\" is described as:",
+      "choices": {
+        "A": "System tracks and logs all user actions for audit",
+        "B": "System verifies the claimed identity (password, biometric, token)",
+        "C": "System grants appropriate access based on verified identity",
+        "D": "User claims an identity (username, email, account number)"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Authorization — System grants appropriate access based on verified identity"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"Accountability\" is described as:",
+      "choices": {
+        "A": "System tracks and logs all user actions for audit",
+        "B": "User claims an identity (username, email, account number)",
+        "C": "System grants appropriate access based on verified identity",
+        "D": "System verifies the claimed identity (password, biometric, token)"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Accountability — System tracks and logs all user actions for audit"
+    }
+  ]
+}

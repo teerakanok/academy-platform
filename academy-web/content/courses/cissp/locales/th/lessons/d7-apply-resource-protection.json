@@ -1,0 +1,164 @@
+{
+  "nodeId": "d7-apply-resource-protection",
+  "locale": "th",
+  "title": "Apply Resource Protection",
+  "objective": "Study-guide review — CISSP — Domain 7: Security Operations: Apply Resource Protection.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Media Management"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Media lifecycle: creation → use → storage → transportation → disposal",
+        "Marking/labeling — media must be labeled with its classification level",
+        "Handling — follow classification-specific handling procedures (e.g., top secret media requires different handling than public media)",
+        "Storage — store in access-controlled areas appropriate to classification; portable media (USB, tapes) in locked safes or vaults",
+        "Transportation — use tamper-evident packaging; maintain chain of custody during transport",
+        "Sanitization — clearing, purging, or destruction (covered in Domain 2)",
+        "Downgrading — reducing the classification level of media; some organizations prohibit downgrading entirely (e.g., top secret media is destroyed, never downgraded)",
+        "Backup tapes should be protected as confidential information at minimum"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Media management extends to all forms of data storage: hard drives, USB drives, optical media, backup tapes, and even paper documents. Each type requires appropriate handling throughout its lifecycle. Tape media is highly susceptible to loss due to corruption, physical damage, and theft. Basic physical security practices should be followed: storing tapes in locked safes or vaults, or within a secure room with additional physical security controls. When media is being decommissioned, the sanitization method must match the classification level. For government environments, the US government doesn't consider any purging method acceptable to purge top secret data — media labeled top secret will always remain top secret until it is physically destroyed. NIST SP 800-88 Sanitization Methods by Media Type:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Method",
+        "HDD (Magnetic)",
+        "SSD (Flash)",
+        "Tape (Magnetic)",
+        "Optical"
+      ],
+      "rows": [
+        [
+          "Clear (overwrite)",
+          "✅ Effective",
+          "✅ Limited (wear leveling may leave remnants)",
+          "✅ Effective",
+          "❌ Not applicable"
+        ],
+        [
+          "Purge (degaussing)",
+          "✅ Effective",
+          "❌ NOT effective — SSDs have no magnetic media",
+          "✅ Effective",
+          "❌ Not applicable"
+        ],
+        [
+          "Purge (crypto-erase)",
+          "N/A",
+          "✅ Recommended for SEDs",
+          "N/A",
+          "N/A"
+        ],
+        [
+          "Destroy (physical)",
+          "✅ Most assured",
+          "✅ Most assured",
+          "✅ Most assured",
+          "✅ Most assured"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Degaussing does NOT work on SSDs — SSDs use flash memory, not magnetic platters. For SSDs: use crypto-erase (if self-encrypting drive) or physical destruction. See Domain 2 for detailed sanitization coverage."
+    },
+    {
+      "kind": "heading",
+      "text": "Hardware and Software Asset Management"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Asset inventory — maintain a comprehensive inventory of all hardware and software assets",
+        "Track: owner, location, classification, configuration, purchase date, license information, warranty status",
+        "Tangible assets — hardware (servers, laptops, network devices); tracked via serial numbers, barcodes, RFID tags",
+        "Intangible assets — software licenses, intellectual property, data",
+        "Review intangible assets at least annually",
+        "Asset management tools can automate discovery and tracking",
+        "End-of-life (EOL) and end-of-support (EOS) — track vendor support timelines; unsupported systems are security risks"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Marking/labeling: media must be labeled with its classification level",
+    "Handling: follow classification-specific handling procedures (e.g., top secret media requires different handling than public media)",
+    "Storage: store in access-controlled areas appropriate to classification; portable media (USB, tapes) in locked safes or vaults",
+    "Transportation: use tamper-evident packaging; maintain chain of custody during transport",
+    "Sanitization: clearing, purging, or destruction (covered in Domain 2)",
+    "Asset inventory: maintain a comprehensive inventory of all hardware and software assets",
+    "Tangible assets: hardware (servers, laptops, network devices); tracked via serial numbers, barcodes, RFID tags",
+    "Intangible assets: software licenses, intellectual property, data"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Marking/labeling\" is described as:",
+      "choices": {
+        "A": "clearing, purging, or destruction (covered in Domain 2)",
+        "B": "media must be labeled with its classification level",
+        "C": "software licenses, intellectual property, data",
+        "D": "maintain a comprehensive inventory of all hardware and software assets"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Marking/labeling — media must be labeled with its classification level"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Handling\" is described as:",
+      "choices": {
+        "A": "hardware (servers, laptops, network devices); tracked via serial numbers, barcodes, RFID tags",
+        "B": "reducing the classification level of media; some organizations prohibit downgrading entirely (e.g., top secret media is destroyed, never downgraded)",
+        "C": "follow classification-specific handling procedures (e.g., top secret media requires different handling than public media)",
+        "D": "store in access-controlled areas appropriate to classification; portable media (USB, tapes) in locked safes or vaults"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Handling — follow classification-specific handling procedures (e.g., top secret media requires different handling than public media)"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Storage\" is described as:",
+      "choices": {
+        "A": "follow classification-specific handling procedures (e.g., top secret media requires different handling than public media)",
+        "B": "hardware (servers, laptops, network devices); tracked via serial numbers, barcodes, RFID tags",
+        "C": "reducing the classification level of media; some organizations prohibit downgrading entirely (e.g., top secret media is destroyed, never downgraded)",
+        "D": "store in access-controlled areas appropriate to classification; portable media (USB, tapes) in locked safes or vaults"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Storage — store in access-controlled areas appropriate to classification; portable media (USB, tapes) in locked safes or vaults"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Transportation\" is described as:",
+      "choices": {
+        "A": "use tamper-evident packaging; maintain chain of custody during transport",
+        "B": "maintain a comprehensive inventory of all hardware and software assets",
+        "C": "track vendor support timelines; unsupported systems are security risks",
+        "D": "clearing, purging, or destruction (covered in Domain 2)"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Transportation — use tamper-evident packaging; maintain chain of custody during transport"
+    }
+  ]
+}

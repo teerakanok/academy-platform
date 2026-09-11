@@ -1,0 +1,190 @@
+{
+  "nodeId": "d6-assessment-and-testing-strategies",
+  "locale": "en",
+  "title": "Assessment and Testing Strategies",
+  "objective": "Study-guide review — CISSP — Domain 6: Security Assessment and Testing: Assessment and Testing Strategies.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Security Assessment Overview"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Security assessments evaluate the effectiveness of security controls",
+        "Assessments should be regular, planned, and documented",
+        "Include technical and non-technical evaluation methods",
+        "Results drive risk-based decisions about security improvements",
+        "Must cover people, processes, and technology"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From the Official CBK: Security assessment and testing involves \"identifying organizational goals, critical systems, and the controls in place to mitigate risks to those goals or systems. As always, balancing the cost of measuring with the benefits is critical.\" Types of security assessments:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Vulnerability assessments — Identify weaknesses",
+        "Penetration tests — Exploit weaknesses to prove impact",
+        "Security audits — Verify compliance with policies and standards",
+        "Risk assessments — Evaluate likelihood and impact of threats",
+        "Configuration reviews — Verify systems meet baseline standards"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Internal vs External Assessments"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Internal assessments — Conducted by the organization's own security team",
+        "External assessments — Conducted by independent third parties",
+        "External assessments provide objectivity and credibility",
+        "Internal assessments offer deeper organizational knowledge",
+        "Many compliance frameworks require external assessments"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Aspect",
+        "Internal",
+        "External"
+      ],
+      "rows": [
+        [
+          "Objectivity",
+          "Lower (potential bias)",
+          "Higher (independent)"
+        ],
+        [
+          "Organizational knowledge",
+          "Deep",
+          "Limited"
+        ],
+        [
+          "Cost",
+          "Lower (existing staff)",
+          "Higher (contracted)"
+        ],
+        [
+          "Compliance value",
+          "Limited",
+          "Often required"
+        ],
+        [
+          "Frequency",
+          "More frequent",
+          "Less frequent (annual/biannual)"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Regulatory compliance often requires EXTERNAL (independent) assessments. Internal assessments are valuable but may not satisfy compliance requirements because they lack independence."
+    },
+    {
+      "kind": "heading",
+      "text": "Third-Party Audits"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Independent evaluation of an organization's controls",
+        "SOC reports — Most common third-party audit framework",
+        "Results shared with customers, regulators, and stakeholders",
+        "Provides assurance without requiring individual customer audits",
+        "Based on AICPA standards (SSAE 18 in the U.S.)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: Third-party assessments allow \"the organization to conduct an external assessment instead of multiple third-party assessments and then sharing the resulting report with customers and potential customers.\" \"Outside of the United States, similar engagements are conducted under the International Standard on Assurance Engagements (ISAE) 3402.\""
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Vulnerability assessments: Identify weaknesses",
+    "Penetration tests: Exploit weaknesses to prove impact",
+    "Security audits: Verify compliance with policies and standards",
+    "Risk assessments: Evaluate likelihood and impact of threats",
+    "Configuration reviews: Verify systems meet baseline standards",
+    "Internal assessments: Conducted by the organization's own security team",
+    "External assessments: Conducted by independent third parties",
+    "Objectivity: Lower (potential bias)"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"Vulnerability assessments\" is described as:",
+      "choices": {
+        "A": "Exploit weaknesses to prove impact",
+        "B": "Identify weaknesses",
+        "C": "Lower (existing staff)",
+        "D": "Lower (potential bias)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Vulnerability assessments — Identify weaknesses"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"Penetration tests\" is described as:",
+      "choices": {
+        "A": "Verify systems meet baseline standards",
+        "B": "Conducted by independent third parties",
+        "C": "Most common third-party audit framework",
+        "D": "Exploit weaknesses to prove impact"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Penetration tests — Exploit weaknesses to prove impact"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"Security audits\" is described as:",
+      "choices": {
+        "A": "Verify compliance with policies and standards",
+        "B": "Evaluate likelihood and impact of threats",
+        "C": "Conducted by the organization's own security team",
+        "D": "Most common third-party audit framework"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Security audits — Verify compliance with policies and standards"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"Risk assessments\" is described as:",
+      "choices": {
+        "A": "Conducted by independent third parties",
+        "B": "Verify systems meet baseline standards",
+        "C": "Most common third-party audit framework",
+        "D": "Evaluate likelihood and impact of threats"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Risk assessments — Evaluate likelihood and impact of threats"
+    }
+  ]
+}

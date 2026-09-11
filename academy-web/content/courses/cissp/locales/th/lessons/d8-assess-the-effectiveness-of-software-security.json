@@ -1,0 +1,238 @@
+{
+  "nodeId": "d8-assess-the-effectiveness-of-software-security",
+  "locale": "th",
+  "title": "Assess the Effectiveness of Software Security",
+  "objective": "Study-guide review — CISSP — Domain 8: Software Development Security: Assess the Effectiveness of Software Security.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Security Testing Methods"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Method",
+        "When",
+        "What It Tests",
+        "Key Benefit"
+      ],
+      "rows": [
+        [
+          "Unit testing",
+          "During development",
+          "Individual functions/methods",
+          "Catches bugs early"
+        ],
+        [
+          "Integration testing",
+          "After unit testing",
+          "Interactions between components",
+          "Catches interface issues"
+        ],
+        [
+          "System testing",
+          "After integration",
+          "Complete system functionality",
+          "End-to-end verification"
+        ],
+        [
+          "Acceptance testing",
+          "Before deployment",
+          "Business requirements",
+          "User validation"
+        ],
+        [
+          "Regression testing",
+          "After changes",
+          "Previously working functionality",
+          "Prevents breaking existing features"
+        ],
+        [
+          "Security testing",
+          "Throughout SDLC",
+          "Security controls and vulnerabilities",
+          "Identifies security weaknesses"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "SAST, DAST, IAST, and RASP"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Tool Type",
+        "Full Name",
+        "How It Works",
+        "When Used"
+      ],
+      "rows": [
+        [
+          "SAST",
+          "Static Application Security Testing",
+          "Analyzes source code without executing it; white-box approach",
+          "During development/build"
+        ],
+        [
+          "DAST",
+          "Dynamic Application Security Testing",
+          "Tests running application from the outside; black-box approach",
+          "Against deployed/staging application"
+        ],
+        [
+          "IAST",
+          "Interactive Application Security Testing",
+          "Combines SAST and DAST; instruments the application to monitor from inside during testing",
+          "During QA/testing"
+        ],
+        [
+          "RASP",
+          "Runtime Application Self-Protection",
+          "Embedded within the application; monitors and protects in real-time during production",
+          "In production"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Each testing approach has strengths and limitations: SAST — Analyzes source code or bytecode to find vulnerabilities without executing the program. Advantages: can find issues early, covers all code paths. Limitations: high false positive rate, language-dependent, cannot find runtime issues. DAST — Tests the running application by sending requests and analyzing responses. Advantages: finds runtime vulnerabilities, language-independent, tests the application as an attacker would. Limitations: limited code coverage, cannot identify the specific vulnerable code, slower. IAST — Combines elements of both SAST and DAST by instrumenting the application. As the CBK notes, \"like code analysis like SAST, it is also language-dependent, meaning some languages may not be supported and the dynamic elements of IAST may cause performance issues if run in a production environment.\" RASP — \"As the name implies, RASP is designed to run inside an application in real time, providing continuous security monitoring and protection.\" It can detect and block attacks as they occur, providing a last line of defense. ⚠️ Exam Trap: SAST = white box (analyzes source code, no execution needed). DAST = black box (tests running application, no source code needed). Know when to use each: SAST during development, DAST against deployed applications, RASP in production."
+    },
+    {
+      "kind": "heading",
+      "text": "Fuzzing"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Fuzz testing (fuzzing) — sending random, unexpected, or malformed input to an application to find crashes, exceptions, or security vulnerabilities",
+        "Two main approaches:",
+        "Mutation (dumb) fuzzing — takes valid input and randomly modifies it (bit flipping, inserting random data)",
+        "Generational (intelligent/smart) fuzzing — develops data models and creates new fuzzed input based on understanding of the data types used by the program",
+        "Effective at finding: buffer overflows, format string vulnerabilities, injection flaws, denial of service conditions",
+        "Automated and can run continuously; produces large volumes of test cases",
+        "Limited by code coverage — may not reach all code paths"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Fuzzing is a powerful technique for finding security vulnerabilities that traditional testing methods might miss. Mutation fuzzing is simpler to set up — it takes known good inputs and randomly modifies them. Generational fuzzing is more sophisticated — it understands the input format and generates test cases that are more likely to trigger edge cases. Key exam points:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Mutation fuzzing = takes existing valid data and randomly modifies it",
+        "Generational fuzzing = creates new data based on understanding of the expected input format",
+        "Generational fuzzing is more effective but requires more setup (understanding the input specification)",
+        "Both approaches are useful for finding vulnerabilities in parsers, protocol handlers, and file format processors"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Code Review and Inspection"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Peer review — developers review each other's code for security issues, logic errors, and coding standard compliance",
+        "Formal inspection (Fagan inspection) — structured, multi-step code review process: planning, overview, preparation, inspection, rework, follow-up",
+        "Pair programming — two developers work together at one workstation; continuous real-time review",
+        "Automated code review — tools that scan code for known patterns of vulnerabilities (part of SAST)",
+        "Code review is one of the most effective methods for finding vulnerabilities early",
+        "Focus areas: input validation, authentication/authorization logic, error handling, cryptographic implementation, data handling"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Software Composition Analysis (SCA)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Identifies open-source and third-party components in the codebase",
+        "Checks known vulnerability databases (NVD, CVE) for vulnerabilities in those components",
+        "Verifies license compliance for open-source components",
+        "Critical for supply chain security — knowing what components are in your software",
+        "Software Bill of Materials (SBOM) — comprehensive inventory of all software components; increasingly required by regulation",
+        "Tools: Snyk, Black Duck, OWASP Dependency-Check, npm audit, pip-audit"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Unit testing: During development",
+    "Integration testing: After unit testing",
+    "System testing: After integration",
+    "Acceptance testing: Before deployment",
+    "Security testing: Throughout SDLC",
+    "SAST: Static Application Security Testing",
+    "DAST: Dynamic Application Security Testing",
+    "IAST: Interactive Application Security Testing"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Unit testing\" is described as:",
+      "choices": {
+        "A": "After unit testing",
+        "B": "During development",
+        "C": "After integration",
+        "D": "Before deployment"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Unit testing: During development"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Integration testing\" is described as:",
+      "choices": {
+        "A": "After unit testing",
+        "B": "During development",
+        "C": "After integration",
+        "D": "Before deployment"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Integration testing: After unit testing"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"System testing\" is described as:",
+      "choices": {
+        "A": "After unit testing",
+        "B": "After integration",
+        "C": "During development",
+        "D": "Before deployment"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: System testing: After integration"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Acceptance testing\" is described as:",
+      "choices": {
+        "A": "After integration",
+        "B": "Before deployment",
+        "C": "During development",
+        "D": "After unit testing"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Acceptance testing: Before deployment"
+    }
+  ]
+}

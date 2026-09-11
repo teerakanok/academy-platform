@@ -1,0 +1,224 @@
+{
+  "nodeId": "d6-log-review-as-a-security-assessment-technique",
+  "locale": "th",
+  "title": "Log Review as a Security Assessment Technique",
+  "objective": "Study-guide review — CISSP — Domain 6: Security Assessment and Testing: Log Review as a Security Assessment Technique.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Ongoing Assessment Through Log Analysis"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Log review is a critical ongoing security assessment technique",
+        "Goes beyond SIEM alerting — involves manual and systematic review of log data",
+        "Provides evidence of control effectiveness, policy violations, and security incidents",
+        "Required by many compliance frameworks as part of continuous assessment",
+        "Part of the broader continuous monitoring program"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Log review as an assessment technique involves:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Access logs — Who accessed what, when, and from where. Look for anomalies: unusual hours, unusual locations, excessive access",
+        "Authentication logs — Failed login attempts, account lockouts, privilege escalation events",
+        "System logs — Configuration changes, service starts/stops, patch installations",
+        "Application logs — Error messages, transaction records, data access patterns",
+        "Network logs — Firewall denies, IDS alerts, traffic anomalies"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "Why Log Review Matters as Assessment:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Logs are evidence that controls are working (or not working)",
+        "Regular log review detects issues that automated tools may miss",
+        "Provides a baseline of normal activity for anomaly detection",
+        "Supports compliance — auditors will ask \"who reviews your logs and how often?\""
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: SIEM systems \"require a properly trained team that understands how to read and interpret what they're seeing as well as what escalation procedures to follow when a legitimate alert is raised.\" Assessment Integration:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Log Type",
+        "What to Look For",
+        "Assessment Value"
+      ],
+      "rows": [
+        [
+          "Access logs",
+          "Unauthorized access attempts",
+          "Validates access controls"
+        ],
+        [
+          "Change logs",
+          "Unauthorized changes",
+          "Validates change management"
+        ],
+        [
+          "Error logs",
+          "Repeated failures",
+          "Identifies system weaknesses"
+        ],
+        [
+          "Audit logs",
+          "Policy violations",
+          "Validates policy enforcement"
+        ],
+        [
+          "Security logs",
+          "Intrusion indicators",
+          "Validates detection capabilities"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Log review is NOT just a reactive activity (looking at logs after an incident). It is a PROACTIVE security assessment technique — regular log review can identify security issues BEFORE they become incidents. The exam may test log review as part of \"ongoing security assessment activities.\""
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Access logs: Who accessed what, when, and from where. Look for anomalies: unusual hours, unusual locations, excessive access",
+    "Authentication logs: Failed login attempts, account lockouts, privilege escalation events",
+    "System logs: Configuration changes, service starts/stops, patch installations",
+    "Application logs: Error messages, transaction records, data access patterns",
+    "Network logs: Firewall denies, IDS alerts, traffic anomalies",
+    "Access logs: Unauthorized access attempts",
+    "Change logs: Unauthorized changes",
+    "Error logs: Repeated failures"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "What is the PRIMARY difference between vulnerability scanning and penetration testing?",
+      "choices": {
+        "A": "Vulnerability scanning is automated; penetration testing is manual",
+        "B": "Vulnerability scanning identifies weaknesses; penetration testing exploits them",
+        "C": "Vulnerability scanning is internal; penetration testing is external",
+        "D": "Vulnerability scanning is cheaper; penetration testing is more expensive"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The fundamental difference is that vulnerability scanning IDENTIFIES weaknesses, while penetration testing goes further to EXPLOIT those weaknesses and demonstrate the actual impact. While scanning may be mostly automated and pen testing includes manual techniques, the key distinction is identification vs. exploitation. Tests: Vulnerability assessment vs penetration testing"
+    },
+    {
+      "id": "q2",
+      "prompt": "An organization wants to share its security audit results with customers but not reveal detailed findings. Which report type should they provide?",
+      "choices": {
+        "A": "SOC 1 Type II",
+        "B": "SOC 2 Type I",
+        "C": "SOC 2 Type II",
+        "D": "SOC 3"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "SOC 3 is the public-facing report that provides a summary of the organization's security controls without detailed findings. SOC 1 and SOC 2 reports contain detailed information and are typically shared only under NDA. SOC 3 is specifically designed for broad distribution to customers and the public. Tests: SOC report types, report audience"
+    },
+    {
+      "id": "q3",
+      "prompt": "Which audit report type evaluates whether controls are operating EFFECTIVELY over a period of time (typically 6-12 months)?",
+      "choices": {
+        "A": "SOC 1 Type I",
+        "B": "SOC 2 Type I",
+        "C": "SOC 2 Type II",
+        "D": "SOC 3"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "SOC 2 Type II evaluates the operating effectiveness of security controls over a period of time (typically 6-12 months). Type I only evaluates the design adequacy of controls at a point in time. Type II provides stronger assurance because it demonstrates controls actually work over an extended period. Tests: SOC 2 Type I vs Type II"
+    },
+    {
+      "id": "q4",
+      "prompt": "A penetration tester is given full access to source code, network diagrams, and system credentials before testing. What type of test is this?",
+      "choices": {
+        "A": "Black box",
+        "B": "White box",
+        "C": "Gray box",
+        "D": "Blue box"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "White box (full knowledge) testing provides the tester with complete information about the target, including source code, architecture, and credentials. This allows the most thorough testing but is least realistic from an external attacker's perspective. Tests: Penetration testing types"
+    },
+    {
+      "id": "q5",
+      "prompt": "Which security metric type provides early warning of INCREASING risk?",
+      "choices": {
+        "A": "KPI (Key Performance Indicator)",
+        "B": "KRI (Key Risk Indicator)",
+        "C": "SLA (Service Level Agreement)",
+        "D": "ROI (Return on Investment)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "KRIs (Key Risk Indicators) are leading indicators that provide early warning of increasing risk before incidents occur. KPIs measure past performance. SLAs define service expectations. ROI measures return on investment. Tests: Security metrics, KPI vs KRI"
+    },
+    {
+      "id": "q6",
+      "prompt": "An auditor is reviewing access control configurations. The organization's IT team selects which 50 accounts to include in the audit sample. What is the problem with this approach?",
+      "choices": {
+        "A": "The sample size is too small",
+        "B": "The sample must be selected randomly by the auditor",
+        "C": "Only privileged accounts should be audited",
+        "D": "Account audits don't require sampling"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The auditor must control the sampling process. If the IT team (auditee) selects the sample, they could cherry-pick favorable examples, making the results unreliable. Sampling must be random and controlled by the auditor to be valid. Tests: Audit sampling, auditor independence"
+    },
+    {
+      "id": "q7",
+      "prompt": "Which software testing technique sends random and malformed input to applications to discover crashes and vulnerabilities?",
+      "choices": {
+        "A": "Regression testing",
+        "B": "Unit testing",
+        "C": "Fuzz testing",
+        "D": "Integration testing"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Fuzz testing (fuzzing) sends random, malformed, or unexpected input to discover crashes, memory leaks, and unhandled exceptions. It is highly effective at finding zero-day vulnerabilities, particularly buffer overflows and format string bugs. Tests: Fuzz testing, software testing methods"
+    },
+    {
+      "id": "q8",
+      "prompt": "Which testing method analyzes source code WITHOUT executing the application?",
+      "choices": {
+        "A": "DAST (Dynamic Application Security Testing)",
+        "B": "SAST (Static Application Security Testing)",
+        "C": "Fuzz testing",
+        "D": "Penetration testing"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "SAST analyzes source code, bytecode, or binary code without executing the application. It identifies vulnerabilities in code patterns during development (shift-left security). DAST, fuzz testing, and penetration testing all require a running application. Tests: SAST vs DAST, static analysis"
+    }
+  ]
+}

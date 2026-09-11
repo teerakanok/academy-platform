@@ -1,0 +1,389 @@
+{
+  "nodeId": "d1-legal-regulatory-and-compliance",
+  "locale": "en",
+  "title": "Legal, Regulatory, and Compliance",
+  "objective": "Study-guide review — CISSP — Domain 1: Security and Risk Management: Legal, Regulatory, and Compliance.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Legal Frameworks and Computer Crime Laws"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Computer Fraud and Abuse Act (CFAA) — Primary U.S. federal computer crime law",
+        "FISMA — Requires security for U.S. federal government systems",
+        "Computer Security Act of 1987 — Established NIST security role for federal systems",
+        "EU GDPR — Comprehensive data protection for EU residents",
+        "Criminal vs. Civil vs. Administrative law — Different burdens of proof"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Computer Fraud and Abuse Act (CFAA) — 18 U.S.C. § 1030: From Chapple: Section 1030(a)(2) describes the misdemeanor act of intentionally accessing a computer without or in excess of authorization and obtaining information from a protected computer. Key amendments to the CFAA:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Extended coverage from \"federal interest\" computers to any computer used in interstate commerce",
+        "Added prohibition against creating any type of malicious code",
+        "Allowed for imprisonment regardless of whether damage was intended"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "FISMA (Federal Information Security Modernization Act): Extends the Computer Security Act of 1987. Requires all U.S. federal government agencies to implement information security programs. Legal Systems:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Type",
+        "Standard of Proof",
+        "Example"
+      ],
+      "rows": [
+        [
+          "Criminal",
+          "Beyond a reasonable doubt",
+          "Hacking prosecution"
+        ],
+        [
+          "Civil",
+          "Preponderance of evidence",
+          "Breach of contract"
+        ],
+        [
+          "Administrative",
+          "Varies by agency",
+          "Regulatory enforcement"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Intellectual Property"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Copyright — Protects original creative works (automatic upon creation)",
+        "Trademark — Protects brand identity (logos, names, slogans)",
+        "Patent — Protects inventions and processes (20-year term)",
+        "Trade Secret — Protects proprietary business information (no registration required)",
+        "Licensing — Defines terms of use for software and content"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "IP Type",
+        "Protection Period",
+        "Registration Required?",
+        "What it Protects"
+      ],
+      "rows": [
+        [
+          "Copyright",
+          "Life of author + 70 years",
+          "No (automatic)",
+          "Creative works, software code"
+        ],
+        [
+          "Trademark",
+          "As long as used",
+          "Recommended (not required)",
+          "Brand identity"
+        ],
+        [
+          "Patent",
+          "20 years from filing",
+          "Yes",
+          "Inventions, processes"
+        ],
+        [
+          "Trade Secret",
+          "As long as kept secret",
+          "No",
+          "Business information, formulas"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Copyright is AUTOMATIC upon creation — you don't need to register it (though registration strengthens legal claims). Patents MUST be registered and provide the strongest protection but expire after 20 years. Trade secrets have no expiration but lose protection if disclosed. The Coca-Cola formula is a classic trade secret example — it could have been patented but would have expired decades ago."
+    },
+    {
+      "kind": "heading",
+      "text": "Privacy Laws and Regulations"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "GDPR — EU data protection; requires consent; right to be forgotten",
+        "HIPAA — U.S. healthcare data protection (PHI)",
+        "GLBA — U.S. financial data protection",
+        "PCI DSS — Payment card industry security standard",
+        "COPPA — U.S. children's online privacy protection"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "GDPR Key Principles:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Lawfulness, fairness, transparency",
+        "Purpose limitation",
+        "Data minimization",
+        "Accuracy",
+        "Storage limitation",
+        "Integrity and confidentiality",
+        "Accountability"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "HIPAA applies to healthcare providers, health insurers, health information clearinghouses, and business associates that handle Protected Health Information (PHI). From Chapple: \"HIPAA defines PHI much more broadly than most expect. Employers that provide health insurance may handle PHI, so HIPAA applies.\" PCI DSS is mandatory for any entity that processes payment card transactions. From Destination CISSP: \"Failure to comply with PCI DSS can lead to fines, loss of card processing privileges, and reputational damage.\" California SB 1386 implemented the first statewide data breach notification requirement. All but three U.S. states eventually followed with similar laws. Quick-Reference: Key Legal Acts and Regulations"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Act/Regulation",
+        "Scope",
+        "Key Requirements",
+        "Applies To"
+      ],
+      "rows": [
+        [
+          "SOX (Sarbanes-Oxley)",
+          "U.S. financial reporting",
+          "Internal controls, CEO/CFO certification, audit trails, whistleblower protection",
+          "Publicly traded companies"
+        ],
+        [
+          "HIPAA",
+          "U.S. healthcare",
+          "PHI protection, breach notification (60 days), Business Associate Agreements",
+          "Healthcare providers, insurers, clearinghouses, business associates"
+        ],
+        [
+          "GLBA (Gramm-Leach-Bliley)",
+          "U.S. financial",
+          "Financial Privacy Rule, Safeguards Rule, Pretexting Protection",
+          "Financial institutions"
+        ],
+        [
+          "COPPA",
+          "U.S. children's privacy",
+          "Parental consent required before collecting data from children under 13",
+          "Websites/apps targeting children"
+        ],
+        [
+          "PCI DSS",
+          "Payment cards (global)",
+          "12 requirements: firewalls, encryption, access control, testing, policy",
+          "Any entity processing card transactions"
+        ],
+        [
+          "GDPR",
+          "EU data protection (global reach)",
+          "Consent, right to erasure, 72-hour breach notification, DPO, data minimization",
+          "Any organization processing EU residents' data"
+        ],
+        [
+          "FISMA",
+          "U.S. federal IT",
+          "Risk-based security programs for federal systems, annual reviews",
+          "Federal agencies and contractors"
+        ],
+        [
+          "FERPA",
+          "U.S. education",
+          "Protect student educational records; parental consent for disclosure",
+          "Educational institutions receiving federal funds"
+        ],
+        [
+          "ECPA",
+          "U.S. electronic comms",
+          "Restricts wiretapping and electronic eavesdropping",
+          "Government and private entities"
+        ],
+        [
+          "CFAA (Computer Fraud and Abuse Act)",
+          "U.S. computer crime",
+          "Criminalizes unauthorized access to computer systems",
+          "Anyone accessing protected computers"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Import/Export Controls and Trans-Border Data Flow"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "EAR (Export Administration Regulations) — Controls dual-use technology exports",
+        "ITAR (International Traffic in Arms Regulations) — Controls defense-related exports",
+        "Wassenaar Arrangement — Multilateral export control agreement",
+        "Encryption technology is subject to export restrictions",
+        "Trans-border data flow must comply with both source and destination country laws"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Export controls affect information security because strong encryption technology is classified as a controlled item. Organizations that develop or distribute encryption products must comply with export regulations. The Wassenaar Arrangement is a voluntary export control regime among 42 countries that controls the export of conventional arms and dual-use goods and technologies, including certain cybersecurity tools. ⚠️ Exam Trap: Remember that encryption exports are regulated. A U.S. company cannot freely export strong encryption to all countries without proper licensing."
+    },
+    {
+      "kind": "heading",
+      "text": "Compliance Frameworks"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "COBIT — IT governance framework (ISACA); maps business goals to IT goals",
+        "ITIL — IT service management best practices",
+        "ISO 27001 — Information Security Management System (ISMS) standard; certifiable",
+        "NIST CSF — Cybersecurity Framework (Identify, Protect, Detect, Respond, Recover)",
+        "FedRAMP — Federal Risk and Authorization Management Program for cloud services"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Framework",
+        "Issuing Body",
+        "Focus",
+        "Certifiable?"
+      ],
+      "rows": [
+        [
+          "COBIT",
+          "ISACA",
+          "IT Governance",
+          "No (assessment)"
+        ],
+        [
+          "ITIL",
+          "Axelos",
+          "IT Service Management",
+          "Individual cert"
+        ],
+        [
+          "ISO 27001",
+          "ISO/IEC",
+          "ISMS",
+          "Yes (organizational)"
+        ],
+        [
+          "NIST CSF",
+          "NIST",
+          "Cybersecurity Risk",
+          "No (voluntary)"
+        ],
+        [
+          "FedRAMP",
+          "U.S. Government",
+          "Cloud Security",
+          "Authorization"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "NIST CSF Five Functions: Identify → Protect → Detect → Respond → Recover From Destination CISSP: \"FedRAMP has three impact levels (low, moderate, and high) to account for different levels of sensitivity and classification of federal data.\" ISO 27001 is the only framework in this list that provides organizational certification. Companies can be \"ISO 27001 certified,\" meaning an external auditor has verified their ISMS. ⚠️ Exam Trap: NIST CSF is voluntary and risk-based. ISO 27001 is certifiable. COBIT focuses on governance (linking IT to business). Don't confuse their scopes."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Computer Fraud and Abuse Act (CFAA): Primary U.S. federal computer crime law",
+    "FISMA: Requires security for U.S. federal government systems",
+    "Computer Security Act of 1987: Established NIST security role for federal systems",
+    "EU GDPR: Comprehensive data protection for EU residents",
+    "Criminal vs. Civil vs. Administrative law: Different burdens of proof",
+    "Criminal: Beyond a reasonable doubt",
+    "Civil: Preponderance of evidence",
+    "Administrative: Varies by agency"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Computer Fraud and Abuse Act (CFAA)\" is described as:",
+      "choices": {
+        "A": "U.S. children's online privacy protection",
+        "B": "U.S. healthcare data protection (PHI)",
+        "C": "Payment card industry security standard",
+        "D": "Primary U.S. federal computer crime law"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Computer Fraud and Abuse Act (CFAA) — Primary U.S. federal computer crime law"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"FISMA\" is described as:",
+      "choices": {
+        "A": "Protects inventions and processes (20-year term)",
+        "B": "Protects original creative works (automatic upon creation)",
+        "C": "Established NIST security role for federal systems",
+        "D": "Requires security for U.S. federal government systems"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: FISMA — Requires security for U.S. federal government systems"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Computer Security Act of 1987\" is described as:",
+      "choices": {
+        "A": "Protects brand identity (logos, names, slogans)",
+        "B": "Requires security for U.S. federal government systems",
+        "C": "Protects inventions and processes (20-year term)",
+        "D": "Established NIST security role for federal systems"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Computer Security Act of 1987 — Established NIST security role for federal systems"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"EU GDPR\" is described as:",
+      "choices": {
+        "A": "Protects inventions and processes (20-year term)",
+        "B": "Defines terms of use for software and content",
+        "C": "Comprehensive data protection for EU residents",
+        "D": "Protects brand identity (logos, names, slogans)"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: EU GDPR — Comprehensive data protection for EU residents"
+    }
+  ]
+}

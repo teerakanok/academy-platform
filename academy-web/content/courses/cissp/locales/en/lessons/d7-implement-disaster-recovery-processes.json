@@ -1,0 +1,251 @@
+{
+  "nodeId": "d7-implement-disaster-recovery-processes",
+  "locale": "en",
+  "title": "Implement Disaster Recovery Processes",
+  "objective": "Study-guide review — CISSP — Domain 7: Security Operations: Implement Disaster Recovery Processes.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Disaster Recovery Planning"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "DRP — plan for recovering IT systems and operations after a disaster",
+        "BCP focuses on keeping the business running during a disaster; DRP focuses on restoring IT after a disaster",
+        "DRP is a subset of the broader BCP program",
+        "Key components: recovery procedures, roles and responsibilities, communication plans, testing schedules",
+        "Disaster assessment — initial evaluation to determine the extent of damage and required recovery actions",
+        "May require transferring operations to an alternative facility"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "RPO, RTO, WRT, and MTD"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Metric",
+        "Full Name",
+        "Definition",
+        "Focus"
+      ],
+      "rows": [
+        [
+          "RPO",
+          "Recovery Point Objective",
+          "Maximum acceptable data loss measured in time",
+          "How much data can you afford to lose?"
+        ],
+        [
+          "RTO",
+          "Recovery Time Objective",
+          "Maximum time to restore system functionality",
+          "How quickly must you recover?"
+        ],
+        [
+          "WRT",
+          "Work Recovery Time",
+          "Time to verify system integrity, test, and make ready for production",
+          "Time between system restoration and full operation"
+        ],
+        [
+          "MTD/MAD",
+          "Maximum Tolerable Downtime / Maximum Allowable Downtime",
+          "Maximum total time a process can be disrupted before unacceptable impact",
+          "Total downtime tolerance"
+        ]
+      ]
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Relationship: RTO + WRT ≤ MTD",
+        "RPO drives backup frequency — if RPO = 4 hours, backups must occur at least every 4 hours",
+        "RTO drives recovery site selection — lower RTO requires more ready sites (hot > warm > cold)",
+        "MTBF (Mean Time Between Failures) — average time a system operates before failure; higher = more reliable",
+        "MTTR (Mean Time to Repair) — average time to repair a failed system; lower = faster recovery"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Understanding the relationships between these metrics is essential:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "MTD/MAD is the overarching constraint — the absolute maximum time a business process can be down before causing unacceptable damage. This is determined by the Business Impact Analysis (BIA).",
+        "RTO is the target for restoring system functionality — must be less than MTD.",
+        "WRT is the time needed after system restoration to verify integrity, test functionality, and return to full production. RTO + WRT must not exceed MTD.",
+        "RPO is independent of the downtime metrics — it measures acceptable data loss. An RPO of zero means no data loss is acceptable (requiring synchronous replication)."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "How to reduce the cost of BCP and DRP plans: \"The more quickly a given process needs to be recovered, the more expensive it is going to be\" (Destination CISSP). Organizations must balance recovery objectives against budget:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "RPO near zero → expensive real-time replication",
+        "RTO near zero → expensive hot/mirrored sites",
+        "Longer RPO/RTO → cheaper backup/recovery options"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: RTO + WRT ≤ MTD. If the question asks about the MAXIMUM time a business function can be down, the answer is MTD, not RTO. RTO is when the system is restored; WRT is the additional time to verify and test. Together they must not exceed MTD."
+    },
+    {
+      "kind": "heading",
+      "text": "DR Testing Types"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Test Type",
+        "Description",
+        "Risk to Production",
+        "Confidence Level"
+      ],
+      "rows": [
+        [
+          "Checklist/desk check",
+          "Review plan on paper; individuals verify their responsibilities",
+          "None",
+          "Lowest"
+        ],
+        [
+          "Walkthrough/tabletop",
+          "Team walks through the plan together in a meeting; discuss each step",
+          "None",
+          "Low"
+        ],
+        [
+          "Simulation",
+          "Simulate a disaster scenario; team practices response procedures (no actual systems affected)",
+          "None",
+          "Medium"
+        ],
+        [
+          "Parallel test",
+          "Activate recovery systems alongside production; production continues normally",
+          "Low",
+          "High"
+        ],
+        [
+          "Full interruption",
+          "Shut down production and activate recovery systems; most realistic but highest risk",
+          "Highest",
+          "Highest"
+        ]
+      ]
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Start with less disruptive tests and progress to more realistic ones as confidence grows",
+        "DRP tests should be conducted at least annually and after significant changes to the environment",
+        "Document test results and update the plan based on lessons learned"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DR testing is essential because an untested plan is unreliable. Organizations should begin with lower-risk tests (checklist, walkthrough) and progress to more realistic tests (parallel, full interruption) as the plan matures and confidence grows. The full interruption test is the most realistic and provides the highest confidence that the plan will work in an actual disaster. However, it also carries the highest risk because production operations are actually shut down. A full interruption test failure could result in an actual unplanned outage. The parallel test is often the best compromise — it activates recovery systems and processes real data alongside production, providing high confidence without risking production operations. ⚠️ Exam Trap: Full interruption test = most realistic but highest risk. Parallel test = activates DR systems while production continues. The exam often asks which test type provides the most confidence with acceptable risk — parallel test is usually the answer in business-focused scenarios."
+    },
+    {
+      "kind": "heading",
+      "text": "Business Continuity Operations"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "A disaster has different aspects: natural disasters (earthquake, flood, hurricane), man-made disasters (fire, explosion, cyberattack), and utility failures (power, water, communications)",
+        "Emergency response — immediate actions to protect life safety and minimize damage",
+        "Crisis communications — pre-established communication plans for notifying employees, customers, partners, and media",
+        "Succession planning — identifying who takes over critical roles if key personnel are unavailable",
+        "Duress codes — covert signals to indicate that an employee is acting under coercion; should be changed regularly and include training for particularly vulnerable employees (senior executives, employees in high-risk areas)"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "DRP: plan for recovering IT systems and operations after a disaster",
+    "Disaster assessment: initial evaluation to determine the extent of damage and required recovery actions",
+    "RPO: Recovery Point Objective",
+    "RTO: Recovery Time Objective",
+    "WRT: Work Recovery Time",
+    "MTD/MAD: Maximum Tolerable Downtime / Maximum Allowable Downtime",
+    "RPO drives backup frequency: if RPO = 4 hours, backups must occur at least every 4 hours",
+    "RTO drives recovery site selection: lower RTO requires more ready sites (hot > warm > cold)"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"DRP\" is described as:",
+      "choices": {
+        "A": "plan for recovering IT systems and operations after a disaster",
+        "B": "if RPO = 4 hours, backups must occur at least every 4 hours",
+        "C": "immediate actions to protect life safety and minimize damage",
+        "D": "Review plan on paper; individuals verify their responsibilities"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: DRP — plan for recovering IT systems and operations after a disaster"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Disaster assessment\" is described as:",
+      "choices": {
+        "A": "identifying who takes over critical roles if key personnel are unavailable",
+        "B": "Activate recovery systems alongside production; production continues normally",
+        "C": "initial evaluation to determine the extent of damage and required recovery actions",
+        "D": "Shut down production and activate recovery systems; most realistic but highest risk"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Disaster assessment — initial evaluation to determine the extent of damage and required recovery actions"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"RPO\" is described as:",
+      "choices": {
+        "A": "Recovery Time Objective",
+        "B": "Recovery Point Objective",
+        "C": "Work Recovery Time",
+        "D": "Maximum Tolerable Downtime / Maximum Allowable Downtime"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: RPO: Recovery Point Objective"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"RTO\" is described as:",
+      "choices": {
+        "A": "Recovery Time Objective",
+        "B": "Recovery Point Objective",
+        "C": "Work Recovery Time",
+        "D": "Maximum Tolerable Downtime / Maximum Allowable Downtime"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: RTO: Recovery Time Objective"
+    }
+  ]
+}

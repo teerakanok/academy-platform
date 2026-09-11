@@ -1,0 +1,213 @@
+{
+  "nodeId": "d2-data-destruction-and-sanitization",
+  "locale": "th",
+  "title": "Data Destruction and Sanitization",
+  "objective": "Study-guide review — CISSP — Domain 2: Asset Security: Data Destruction and Sanitization.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Sanitization Methods"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Clearing — Overwriting data with zeros/patterns; protects against casual recovery",
+        "Purging — More intensive removal; protects against lab-based attacks (degaussing, crypto-erase)",
+        "Destruction — Physical destruction of media (shredding, incineration, disintegration)",
+        "Method selection depends on data classification and media type",
+        "NIST SP 800-88 provides guidelines for media sanitization"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Method",
+        "Level",
+        "Technique",
+        "Protection Against"
+      ],
+      "rows": [
+        [
+          "Clearing",
+          "Basic",
+          "Overwriting (1+ passes)",
+          "Casual recovery (software tools)"
+        ],
+        [
+          "Purging",
+          "Moderate",
+          "Degaussing, crypto-erase, secure erase",
+          "Lab-based recovery"
+        ],
+        [
+          "Destruction",
+          "Highest",
+          "Shredding, incineration, melting, disintegration",
+          "All recovery attempts"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Chapple: \"Erasing a file doesn't delete it. Clearing media overwrites it with zeros or patterns. Purging uses more intensive methods. Destruction physically destroys the media.\" Degaussing: Uses a powerful magnetic field to erase magnetic media (hard drives, tapes). NOT effective on solid-state drives (SSDs) or optical media because they don't use magnetic storage. ⚠️ Exam Trap: Degaussing does NOT work on SSDs! SSDs require different sanitization methods (crypto-erase, physical destruction, or manufacturer secure erase commands). The exam tests this distinction."
+    },
+    {
+      "kind": "heading",
+      "text": "Data Remanence"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Data remanence — Residual data remaining after deletion or sanitization attempts",
+        "Simple deletion only removes the file pointer, not the actual data",
+        "Formatting may not completely remove all data",
+        "Overwriting multiple times reduces but may not eliminate remanence",
+        "Physical destruction is the only guaranteed method to eliminate all remanence"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Data remanence is the biggest concern when decommissioning or repurposing storage media. Even after deletion, data may remain:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "File deletion — Only removes directory entry; data blocks remain intact",
+        "Quick format — Rebuilds file system structure; data blocks remain",
+        "Full format — May overwrite data blocks once; may not eliminate all remanence",
+        "Single overwrite — Generally sufficient for most purposes (NIST SP 800-88 guidance)",
+        "Multiple overwrites — Provides additional assurance but diminishing returns"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "For highly classified data, physical destruction is the only acceptable method."
+    },
+    {
+      "kind": "heading",
+      "text": "Cryptographic Erasure"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Encrypts data first, then destroys the encryption key",
+        "Data becomes unrecoverable without the key",
+        "Effective for cloud environments where physical destruction isn't possible",
+        "Faster than traditional overwriting methods",
+        "Requires strong encryption to be effective"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Cryptographic erasure (crypto-erase) is increasingly important in cloud environments where you don't have physical access to storage media. The process:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Encrypt all data with a strong key (e.g., AES-256)",
+        "When data must be destroyed, securely destroy the encryption key",
+        "Without the key, the encrypted data is computationally infeasible to recover"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "This approach is approved by NIST SP 800-88 as a valid purging method. It is particularly useful for:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Cloud storage services",
+        "Solid-state drives (SSDs) where degaussing doesn't work",
+        "Self-encrypting drives (SEDs) with hardware encryption"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Crypto-erase only works if the original encryption was strong. Weak encryption = weak erasure. Also, if key copies exist anywhere (backup, escrow), the data is not truly destroyed."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Clearing: Overwriting data with zeros/patterns; protects against casual recovery",
+    "Purging: More intensive removal; protects against lab-based attacks (degaussing, crypto-erase)",
+    "Destruction: Physical destruction of media (shredding, incineration, disintegration)",
+    "Data remanence: Residual data remaining after deletion or sanitization attempts",
+    "File deletion: Only removes directory entry; data blocks remain intact",
+    "Quick format: Rebuilds file system structure; data blocks remain",
+    "Full format: May overwrite data blocks once; may not eliminate all remanence",
+    "Single overwrite: Generally sufficient for most purposes (NIST SP 800-88 guidance)"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Clearing\" is described as:",
+      "choices": {
+        "A": "Overwriting data with zeros/patterns; protects against casual recovery",
+        "B": "Residual data remaining after deletion or sanitization attempts",
+        "C": "Generally sufficient for most purposes (NIST SP 800-88 guidance)",
+        "D": "Physical destruction of media (shredding, incineration, disintegration)"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Clearing — Overwriting data with zeros/patterns; protects against casual recovery"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Purging\" is described as:",
+      "choices": {
+        "A": "Generally sufficient for most purposes (NIST SP 800-88 guidance)",
+        "B": "Overwriting data with zeros/patterns; protects against casual recovery",
+        "C": "Physical destruction of media (shredding, incineration, disintegration)",
+        "D": "More intensive removal; protects against lab-based attacks (degaussing, crypto-erase)"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Purging — More intensive removal; protects against lab-based attacks (degaussing, crypto-erase)"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Destruction\" is described as:",
+      "choices": {
+        "A": "Residual data remaining after deletion or sanitization attempts",
+        "B": "Generally sufficient for most purposes (NIST SP 800-88 guidance)",
+        "C": "Overwriting data with zeros/patterns; protects against casual recovery",
+        "D": "Physical destruction of media (shredding, incineration, disintegration)"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Destruction — Physical destruction of media (shredding, incineration, disintegration)"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Data remanence\" is described as:",
+      "choices": {
+        "A": "May overwrite data blocks once; may not eliminate all remanence",
+        "B": "Generally sufficient for most purposes (NIST SP 800-88 guidance)",
+        "C": "Residual data remaining after deletion or sanitization attempts",
+        "D": "Overwriting data with zeros/patterns; protects against casual recovery"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Data remanence — Residual data remaining after deletion or sanitization attempts"
+    }
+  ]
+}

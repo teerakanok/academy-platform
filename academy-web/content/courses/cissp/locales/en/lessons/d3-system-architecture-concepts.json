@@ -1,0 +1,260 @@
+{
+  "nodeId": "d3-system-architecture-concepts",
+  "locale": "en",
+  "title": "System Architecture Concepts",
+  "objective": "Study-guide review — CISSP — Domain 3: Security Architecture and Engineering: System Architecture Concepts.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Processor States and Rings"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Ring 0 (Kernel mode) — Most privileged; OS kernel",
+        "Ring 1 — Operating system services",
+        "Ring 2 — Drivers and protocols",
+        "Ring 3 (User mode) — Least privileged; applications",
+        "Supervisor state — CPU in Ring 0; full hardware access"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The protection ring model enforces privilege separation:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "User applications (Ring 3) cannot directly access hardware",
+        "System calls mediate access from user mode to kernel mode",
+        "Hardware enforces the boundaries between rings",
+        "Malware in Ring 3 is contained by ring boundaries (in theory)"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Most modern operating systems only use Ring 0 (kernel) and Ring 3 (user). Rings 1 and 2 are typically unused. Hypervisors sometimes operate at Ring -1 (below the kernel)."
+    },
+    {
+      "kind": "heading",
+      "text": "Memory Protection"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Process isolation — Each process has its own memory space",
+        "Hardware segmentation — CPU enforces memory boundaries",
+        "Virtual memory — Abstracts physical memory; provides isolation",
+        "ASLR (Address Space Layout Randomization) — Randomizes memory addresses",
+        "DEP (Data Execution Prevention) — Prevents code execution in data segments"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Memory protection prevents:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "One process from accessing another process's memory",
+        "Buffer overflow attacks (with DEP, ASLR, stack canaries)",
+        "Unauthorized access to kernel memory from user space"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Stewart: \"Controlling who may access data stored in memory while a computer is in use is primarily the responsibility of the operating system.\""
+    },
+    {
+      "kind": "heading",
+      "text": "Virtualization Security"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Hypervisor — Software that creates and manages virtual machines",
+        "Type 1 (Bare-metal) — Runs directly on hardware (VMware ESXi, Hyper-V)",
+        "Type 2 (Hosted) — Runs on top of an OS (VirtualBox, VMware Workstation)",
+        "VM Escape — Attacker breaks out of VM to access hypervisor or other VMs",
+        "VM Sprawl — Uncontrolled proliferation of VMs creating management challenges"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From the Official CBK: \"There is always the possibility that unpatched defects in the hardware or hypervisor might be known to a threat actor who is then able to compromise the protections that are supposed to prevent unrelated clients...\" Key virtualization security concerns:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "VM Escape — Most critical threat; allows access to hypervisor",
+        "Inter-VM attacks — VMs on same host attacking each other",
+        "Side-channel attacks — Extracting data from shared CPU/cache (Spectre, Meltdown)",
+        "Snapshot security — VM snapshots may contain sensitive data in memory",
+        "Resource contention — One VM consuming resources affects others (DoS)"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Type 1 hypervisors are MORE secure than Type 2 because they don't depend on an underlying OS (smaller attack surface)."
+    },
+    {
+      "kind": "heading",
+      "text": "Cloud Computing Security"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "IaaS — Customer controls OS and applications; provider controls infrastructure",
+        "PaaS — Customer controls applications; provider controls OS and below",
+        "SaaS — Provider controls everything; customer only uses the application",
+        "Shared Responsibility Model — Security responsibility divided between provider and customer",
+        "More abstraction = less customer control, more provider responsibility"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Model",
+        "Customer Responsible For",
+        "Provider Responsible For"
+      ],
+      "rows": [
+        [
+          "IaaS",
+          "OS, apps, data, middleware",
+          "Hardware, network, storage, hypervisor"
+        ],
+        [
+          "PaaS",
+          "Apps, data",
+          "OS, middleware, runtime, hardware"
+        ],
+        [
+          "SaaS",
+          "Data, user access",
+          "Everything else"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Deployment Models:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Public Cloud — Shared infrastructure, multi-tenant",
+        "Private Cloud — Dedicated infrastructure, single tenant",
+        "Hybrid Cloud — Mix of public and private",
+        "Community Cloud — Shared among organizations with common interests"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Stewart: \"Cloud computing is a concept where processing and storage are performed elsewhere over a network connection rather than locally.\" ⚠️ Exam Trap: In ALL cloud models, the CUSTOMER is always responsible for their DATA. You can outsource operations but never accountability."
+    },
+    {
+      "kind": "heading",
+      "text": "Trusted Platform Module"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "TPM — Hardware chip that stores cryptographic keys securely",
+        "Provides hardware-based root of trust",
+        "Supports measured boot — validates boot integrity",
+        "Used for BitLocker, full-disk encryption key storage",
+        "Resistant to software attacks because keys never leave the chip"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Ring 0 (Kernel mode): Most privileged; OS kernel",
+    "Ring 1: Operating system services",
+    "Ring 2: Drivers and protocols",
+    "Ring 3 (User mode): Least privileged; applications",
+    "Supervisor state: CPU in Ring 0; full hardware access",
+    "Process isolation: Each process has its own memory space",
+    "Hardware segmentation: CPU enforces memory boundaries",
+    "Virtual memory: Abstracts physical memory; provides isolation"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 3: Security Architecture and Engineering, \"Ring 0 (Kernel mode)\" is described as:",
+      "choices": {
+        "A": "OS, apps, data, middleware",
+        "B": "Operating system services",
+        "C": "Randomizes memory addresses",
+        "D": "Most privileged; OS kernel"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Ring 0 (Kernel mode) — Most privileged; OS kernel"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 3: Security Architecture and Engineering, \"Ring 1\" is described as:",
+      "choices": {
+        "A": "Mix of public and private",
+        "B": "Most privileged; OS kernel",
+        "C": "Operating system services",
+        "D": "OS, apps, data, middleware"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Ring 1 — Operating system services"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 3: Security Architecture and Engineering, \"Ring 2\" is described as:",
+      "choices": {
+        "A": "Drivers and protocols",
+        "B": "Operating system services",
+        "C": "Data, user access",
+        "D": "Mix of public and private"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Ring 2 — Drivers and protocols"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 3: Security Architecture and Engineering, \"Ring 3 (User mode)\" is described as:",
+      "choices": {
+        "A": "CPU enforces memory boundaries",
+        "B": "Randomizes memory addresses",
+        "C": "Least privileged; applications",
+        "D": "Most privileged; OS kernel"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Ring 3 (User mode) — Least privileged; applications"
+    }
+  ]
+}

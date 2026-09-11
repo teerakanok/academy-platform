@@ -1,0 +1,229 @@
+{
+  "nodeId": "d3-security-evaluation-models",
+  "locale": "th",
+  "title": "Security Evaluation Models",
+  "objective": "Study-guide review — CISSP — Domain 3: Security Architecture and Engineering: Security Evaluation Models.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "TCSEC (Orange Book)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Trusted Computer System Evaluation Criteria (U.S. DoD, 1985)",
+        "Evaluates confidentiality only (no integrity or availability)",
+        "Levels: D (minimal) → C1, C2 (discretionary) → B1, B2, B3 (mandatory) → A1 (verified)",
+        "Part of the Rainbow Series of security publications",
+        "Replaced by Common Criteria but still historically important for CISSP"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Level",
+        "Name",
+        "Key Feature"
+      ],
+      "rows": [
+        [
+          "D",
+          "Minimal Protection",
+          "No security; failed evaluation"
+        ],
+        [
+          "C1",
+          "Discretionary Security",
+          "Basic DAC; user-level access control"
+        ],
+        [
+          "C2",
+          "Controlled Access",
+          "Object reuse protection; auditing (e.g., Windows NT)"
+        ],
+        [
+          "B1",
+          "Labeled Security",
+          "Mandatory access controls (MAC); security labels"
+        ],
+        [
+          "B2",
+          "Structured Protection",
+          "Formal security model; trusted path"
+        ],
+        [
+          "B3",
+          "Security Domains",
+          "Reference monitor concept; strict isolation"
+        ],
+        [
+          "A1",
+          "Verified Design",
+          "Formal verification and proofs"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: TCSEC evaluates CONFIDENTIALITY only. ITSEC (European) was the first to add integrity and availability evaluation."
+    },
+    {
+      "kind": "heading",
+      "text": "ITSEC"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Information Technology Security Evaluation Criteria (European, 1991)",
+        "Evaluates confidentiality, integrity, AND availability",
+        "Separates functionality from assurance",
+        "Uses E0-E6 assurance levels",
+        "Precursor to Common Criteria"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Common Criteria"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "ISO/IEC 15408 — International standard for IT security evaluation",
+        "Protection Profile (PP) — Describes security requirements for a category of products",
+        "Security Target (ST) — Vendor's claim of what their product does",
+        "Evaluation Assurance Level (EAL) — EAL1 (lowest) to EAL7 (highest)",
+        "Mutual recognition across 31+ countries (CCRA)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "EAL",
+        "Name",
+        "Description"
+      ],
+      "rows": [
+        [
+          "EAL1",
+          "Functionally Tested",
+          "Basic testing"
+        ],
+        [
+          "EAL2",
+          "Structurally Tested",
+          "Design reviewed"
+        ],
+        [
+          "EAL3",
+          "Methodically Tested",
+          "Thorough testing"
+        ],
+        [
+          "EAL4",
+          "Methodically Designed, Tested, Reviewed",
+          "Most common commercial level"
+        ],
+        [
+          "EAL5",
+          "Semi-Formally Designed and Tested",
+          "High assurance"
+        ],
+        [
+          "EAL6",
+          "Semi-Formally Verified Design and Tested",
+          "Very high assurance"
+        ],
+        [
+          "EAL7",
+          "Formally Verified Design and Tested",
+          "Highest assurance"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: EAL4 is the highest level that is typically commercially achievable. EAL5-EAL7 require formal methods and are rarely achieved by commercial products."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Minimal Protection: No security; failed evaluation",
+    "C1: Discretionary Security",
+    "C2: Controlled Access",
+    "B1: Labeled Security",
+    "B2: Structured Protection",
+    "B3: Security Domains",
+    "A1: Verified Design",
+    "ISO/IEC 15408: International standard for IT security evaluation"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 3: Security Architecture and Engineering, \"Minimal Protection\" is described as:",
+      "choices": {
+        "A": "Formally Verified Design and Tested",
+        "B": "Semi-Formally Designed and Tested",
+        "C": "EAL1 (lowest) to EAL7 (highest)",
+        "D": "No security; failed evaluation"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Minimal Protection: No security; failed evaluation"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 3: Security Architecture and Engineering, \"C1\" is described as:",
+      "choices": {
+        "A": "Structurally Tested",
+        "B": "Discretionary Security",
+        "C": "Functionally Tested",
+        "D": "Structured Protection"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: C1: Discretionary Security"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 3: Security Architecture and Engineering, \"C2\" is described as:",
+      "choices": {
+        "A": "Controlled Access",
+        "B": "Verified Design",
+        "C": "Security Domains",
+        "D": "Labeled Security"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: C2: Controlled Access"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 3: Security Architecture and Engineering, \"B1\" is described as:",
+      "choices": {
+        "A": "Labeled Security",
+        "B": "Verified Design",
+        "C": "Controlled Access",
+        "D": "Security Domains"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: B1: Labeled Security"
+    }
+  ]
+}

@@ -1,0 +1,366 @@
+{
+  "nodeId": "d7-manage-physical-security",
+  "locale": "en",
+  "title": "Manage Physical Security",
+  "objective": "Study-guide review — CISSP — Domain 7: Security Operations: Manage Physical Security.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Perimeter Security Controls"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Fencing — deters casual intruders; height matters: 3-4 ft (deters casual trespass), 6-7 ft (difficult to climb), 8 ft+ with barbed wire (deters determined intruders)",
+        "Lighting — deters intruders and aids CCTV surveillance; critical areas should have 2-foot candle illumination minimum",
+        "CCTV/surveillance — recording and real-time monitoring; should cover all entry points and critical areas",
+        "Guards — human security personnel; can make judgment calls that automated systems cannot",
+        "Bollards — physical barriers that prevent vehicle-borne attacks",
+        "Mantrap/vestibule — small room with two doors; only one can be open at a time, preventing tailgating/piggybacking",
+        "Turnstiles — control individual entry; count entries and exits"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Internal Security Controls"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Motion detectors — detect movement within protected areas",
+        "Security badges/smart cards — control access to specific areas; log entry/exit",
+        "Biometric access — high-security areas may require fingerprint, iris, or facial recognition",
+        "Escort requirements — visitors must be escorted by authorized personnel in sensitive areas",
+        "Locks — mechanical (key), cipher (combination), electronic (smart card), biometric",
+        "Safes and vaults — for storing high-value items, media, and backup tapes"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Environmental Controls"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Temperature — data centers should maintain 64-75°F (18-24°C); equipment failures increase with temperature",
+        "Humidity — too low = static electricity (can damage equipment); too high = condensation and corrosion",
+        "Recommended humidity: 40-60% relative humidity",
+        "Contamination — clean air; contaminants should be filtered out",
+        "Positive pressurization — maintains higher air pressure inside secure areas; prevents contaminants from entering",
+        "Water detection — sensors under raised floors and near water sources to detect leaks early",
+        "Server rooms should be located away from water, gas, and sewage lines"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Static electricity damage thresholds (voltage levels at which damage occurs):"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Voltage",
+        "Effect"
+      ],
+      "rows": [
+        [
+          "40V",
+          "Damage to sensitive circuits and electronic components"
+        ],
+        [
+          "1,000V",
+          "Scrambling of monitor displays"
+        ],
+        [
+          "1,500V",
+          "Destruction of data stored on hard drives"
+        ],
+        [
+          "2,000V",
+          "Abrupt system shutdown"
+        ],
+        [
+          "4,000V",
+          "Printer jam or component damage"
+        ],
+        [
+          "17,000V",
+          "Permanent circuit damage"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Water issues such as leakage and flooding pose a significant risk. Server rooms should use raised floors (to keep equipment above minor flooding), moisture sensors, and water-resistant cable management. Additionally, the server room should be located away from water, gas, and sewage lines — these pose too large a risk of leakage or flooding."
+    },
+    {
+      "kind": "heading",
+      "text": "Fire Prevention, Detection, and Suppression"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Fire triangle: fuel + oxygen + heat — remove any one to extinguish the fire"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Fire detection types:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Smoke detectors — photoelectric (detect visible particles) or ionization (detect invisible combustion particles)",
+        "Heat detectors — fixed temperature or rate-of-rise",
+        "Flame detectors — detect infrared or ultraviolet radiation from flames"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Fire suppression classes:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Class",
+        "Fire Type",
+        "Suppression Agent"
+      ],
+      "rows": [
+        [
+          "A",
+          "Common combustibles (wood, paper)",
+          "Water, soda acid"
+        ],
+        [
+          "B",
+          "Liquid (oil, gas, petroleum)",
+          "CO2, soda acid, FM-200, Halon"
+        ],
+        [
+          "C",
+          "Electrical",
+          "CO2, FM-200, Halon (non-conductive)"
+        ],
+        [
+          "D",
+          "Metal (magnesium, sodium)",
+          "Dry powder"
+        ],
+        [
+          "K",
+          "Kitchen (cooking oil, grease)",
+          "Wet chemical"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Clean agents (gas-based suppression for data centers):"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Halon — effective but depletes ozone layer; banned by Montreal Protocol (1987); existing systems may remain but cannot be recharged",
+        "FM-200 (HFC-227ea) — halon replacement; safe for occupied areas; does not deplete ozone",
+        "Inergen/Argonite — inert gas mixture that reduces oxygen to 12-15% (below combustion threshold but still breathable)",
+        "CO2 — removes oxygen; dangerous to humans — not for use in occupied areas",
+        "Most fires in a data center are caused by overloaded electrical distribution outlets",
+        "Use plenum-rated cabling in air-handling spaces — produces less toxic smoke when burning"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Fire suppression in data centers requires special consideration because traditional water-based systems can cause more damage to equipment than the fire itself. Clean agents like FM-200 and Inergen are designed to suppress fire without damaging electronic equipment. Gas discharge systems usually remove oxygen from the air, making them potentially hazardous to personnel. Halon is particularly effective (it interrupts the chemical reaction of combustion) but was banned under the Montreal Protocol because it depletes the ozone layer. Companies that have existing halon extinguishers are legally allowed to keep them but cannot recharge them with new halon. Fire detection systems should be linked to notification mechanisms and building management systems. When suppression is triggered, linked systems should automatically contact the local fire response team. All plenum areas should have fire detectors, and only plenum-rated cabling should be used in these areas. Emergency-response training should include CPR, emergency shutdown procedures, and a pre-established rendezvous location or safety verification mechanism. ⚠️ Exam Trap: Water (Class A) is NEVER used on electrical fires (Class C). CO2 is effective but dangerous to humans. FM-200 is the most common data center suppression agent — safe for people and electronics. Halon works but is banned from new production."
+    },
+    {
+      "kind": "heading",
+      "text": "Power and HVAC"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "UPS (Uninterruptible Power Supply) — provides short-term power during outages until generators start",
+        "Generator — provides long-term backup power; diesel generators are most common",
+        "Dual power feeds — connections from two different power substations for redundancy",
+        "Power line conditioners — protect against power quality issues:"
+      ]
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Issue",
+        "Description"
+      ],
+      "rows": [
+        [
+          "Blackout",
+          "Complete power loss"
+        ],
+        [
+          "Brownout",
+          "Prolonged low voltage"
+        ],
+        [
+          "Sag/dip",
+          "Momentary low voltage"
+        ],
+        [
+          "Surge",
+          "Prolonged high voltage"
+        ],
+        [
+          "Spike",
+          "Momentary high voltage"
+        ],
+        [
+          "Noise",
+          "Electromagnetic interference (EMI) on power line"
+        ],
+        [
+          "Inrush",
+          "Initial surge of power when device is turned on"
+        ]
+      ]
+    },
+    {
+      "kind": "list",
+      "items": [
+        "HVAC — Heating, Ventilation, and Air Conditioning",
+        "Must be sized appropriately for the heat load of the equipment",
+        "Hot aisle/cold aisle configuration — cold air enters from one side, hot exhaust exits the other",
+        "Proper grounding protects against electrical damage and ESD (Electrostatic Discharge)"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Lighting: deters intruders and aids CCTV surveillance; critical areas should have 2-foot candle illumination minimum",
+    "CCTV/surveillance: recording and real-time monitoring; should cover all entry points and critical areas",
+    "Guards: human security personnel; can make judgment calls that automated systems cannot",
+    "Bollards: physical barriers that prevent vehicle-borne attacks",
+    "Mantrap/vestibule: small room with two doors; only one can be open at a time, preventing tailgating/piggybacking",
+    "Turnstiles: control individual entry; count entries and exits",
+    "Motion detectors: detect movement within protected areas",
+    "Security badges/smart cards: control access to specific areas; log entry/exit"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "An organization discovers that an employee has been embezzling funds using fraudulent transactions. What type of investigation is most appropriate?",
+      "choices": {
+        "A": "Criminal investigation",
+        "B": "Administrative investigation",
+        "C": "Regulatory investigation",
+        "D": "Civil investigation"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Embezzlement is a criminal offense. While the organization may also conduct an internal (administrative) investigation, the criminal nature of the act requires law enforcement involvement and criminal investigation procedures with the highest standard of proof — beyond a reasonable doubt."
+    },
+    {
+      "id": "q2",
+      "prompt": "During a forensic investigation, what should an analyst do FIRST when connecting a suspect's hard drive to a forensic workstation?",
+      "choices": {
+        "A": "Create a forensic image of the drive",
+        "B": "Run an antivirus scan on the drive",
+        "C": "Calculate a cryptographic hash of the drive",
+        "D": "Search the drive for evidence"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The analyst should FIRST calculate a cryptographic hash of the original drive contents. This establishes the baseline integrity. Then a forensic image (bit-for-bit copy) is created, and its hash is compared to the original to verify the image is identical. Analysis is performed on the copy, never the original."
+    },
+    {
+      "id": "q3",
+      "prompt": "Which type of IDS can detect previously unknown attacks?",
+      "choices": {
+        "A": "Signature-based IDS",
+        "B": "Anomaly-based IDS",
+        "C": "Rule-based IDS",
+        "D": "Host-based IDS"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "An anomaly-based (behavior-based) IDS establishes a baseline of normal activity and alerts on deviations. Because it looks for abnormal behavior rather than known attack signatures, it can detect new and unknown attacks. Signature-based IDS can only detect attacks whose signatures are in its database."
+    },
+    {
+      "id": "q4",
+      "prompt": "What is the PRIMARY purpose of maintaining chain of custody for digital evidence?",
+      "choices": {
+        "A": "To track the cost of the investigation",
+        "B": "To ensure evidence integrity for court admissibility",
+        "C": "To assign blame to the responsible party",
+        "D": "To comply with organizational policy"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The primary purpose of chain of custody is to control evidence to maintain its integrity so it can be presented in court. A broken chain of custody can render evidence inadmissible because its integrity cannot be guaranteed."
+    },
+    {
+      "id": "q5",
+      "prompt": "An organization performs daily incremental backups (Mon-Sat) and weekly full backups (Sunday). If a failure occurs on Thursday, which backups are needed for restoration?",
+      "choices": {
+        "A": "Only Thursday's incremental backup",
+        "B": "Sunday's full backup and Thursday's incremental backup",
+        "C": "Sunday's full backup and Monday through Thursday incremental backups",
+        "D": "Sunday's full backup and Wednesday's differential backup"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Incremental backups only contain data changed since the LAST backup of any type. To restore, you need the last full backup (Sunday) PLUS all subsequent incremental backups in order (Monday, Tuesday, Wednesday, Thursday). Each incremental only has one day's changes."
+    },
+    {
+      "id": "q6",
+      "prompt": "Which recovery site type provides the fastest recovery time?",
+      "choices": {
+        "A": "Hot site",
+        "B": "Cold site",
+        "C": "Warm site",
+        "D": "Redundant/mirrored site"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "A redundant/mirrored site runs simultaneously with the production site and provides failover in minutes. A hot site provides recovery in hours. A warm site takes days, and a cold site takes weeks. The mirrored site is also the most expensive option."
+    },
+    {
+      "id": "q7",
+      "prompt": "Which RAID level provides NO fault tolerance?",
+      "choices": {
+        "A": "RAID 1",
+        "B": "RAID 5",
+        "C": "RAID 0",
+        "D": "RAID 6"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "RAID 0 is striping only — it distributes data across multiple disks for performance but provides no redundancy. If any single disk fails, ALL data is lost. RAID 1 (mirroring), RAID 5 (striping with parity), and RAID 6 (double parity) all provide fault tolerance."
+    },
+    {
+      "id": "q8",
+      "prompt": "What is the relationship between RTO, WRT, and MTD?",
+      "choices": {
+        "A": "RTO = MTD - WRT",
+        "B": "RTO × WRT = MTD",
+        "C": "RTO + WRT ≤ MTD",
+        "D": "RTO = WRT + MTD"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "RTO (time to restore system) + WRT (time to verify and make production-ready) must be less than or equal to MTD (maximum tolerable downtime). If the total exceeds MTD, the business suffers unacceptable impact."
+    }
+  ]
+}

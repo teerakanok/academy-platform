@@ -1,0 +1,247 @@
+{
+  "nodeId": "d5-access-control-attacks",
+  "locale": "th",
+  "title": "Access Control Attacks",
+  "objective": "Study-guide review — CISSP — Domain 5: Identity and Access Management (IAM): Access Control Attacks.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Password Attacks"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Brute force — Try all possible combinations (time vs. key length)",
+        "Dictionary — Try common words and passwords",
+        "Rainbow table — Precomputed hash-to-password lookup (defeated by salting)",
+        "Credential stuffing — Use stolen credentials from one breach on other sites",
+        "Password spraying — Try common passwords across many accounts"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Attack",
+        "Method",
+        "Defense"
+      ],
+      "rows": [
+        [
+          "Brute force",
+          "Try all combinations",
+          "Long passwords, lockout policy"
+        ],
+        [
+          "Dictionary",
+          "Common words",
+          "Complex passwords, no dictionary words"
+        ],
+        [
+          "Rainbow table",
+          "Hash lookup",
+          "Salted hashes"
+        ],
+        [
+          "Credential stuffing",
+          "Reuse leaked credentials",
+          "Unique passwords, MFA"
+        ],
+        [
+          "Password spraying",
+          "Common passwords vs many accounts",
+          "Account lockout, monitoring"
+        ],
+        [
+          "Phishing",
+          "Trick user into revealing password",
+          "Security awareness, MFA"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Salting defeats rainbow tables. Each password gets a unique random salt before hashing, making precomputed tables useless. Modern systems should use bcrypt/scrypt/Argon2 (not plain MD5/SHA)."
+    },
+    {
+      "kind": "heading",
+      "text": "Session Attacks"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Session hijacking — Steal active session token",
+        "Session fixation — Set known session ID before authentication",
+        "Cookie theft — Steal session cookies via XSS or network sniffing",
+        "Replay attack — Reuse captured authentication tokens",
+        "Prevention: HTTPS, secure cookies, session timeouts, re-auth for sensitive actions"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Privilege Escalation"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Vertical — Gaining HIGHER privileges (user → admin)",
+        "Horizontal — Accessing ANOTHER user's resources at same level",
+        "Exploits software vulnerabilities, misconfigurations, or social engineering",
+        "Prevention: patching, least privilege, code review, monitoring",
+        "Rootkits often used to maintain elevated access"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Social Engineering"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Phishing — Fraudulent emails to steal credentials or install malware",
+        "Spear phishing — Targeted phishing against specific individuals",
+        "Whaling — Phishing targeting senior executives",
+        "Pretexting — Creating false scenario to obtain information",
+        "Tailgating/Piggybacking — Following authorized person through secured entrance"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Social engineering exploits the HUMAN element, bypassing technical controls entirely. It is often the most effective attack vector because it targets psychology rather than technology. Defense: Security awareness training, phishing simulations, verification procedures, physical access controls. ⚠️ Exam Trap: Social engineering is considered the MOST effective attack technique because it targets the weakest link — humans. Technical controls are meaningless if an employee willingly gives away credentials."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Brute force: Try all possible combinations (time vs. key length)",
+    "Dictionary: Try common words and passwords",
+    "Rainbow table: Precomputed hash-to-password lookup (defeated by salting)",
+    "Credential stuffing: Use stolen credentials from one breach on other sites",
+    "Password spraying: Try common passwords across many accounts",
+    "Brute force: Try all combinations",
+    "Credential stuffing: Reuse leaked credentials",
+    "Password spraying: Common passwords vs many accounts"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "Which access control model allows the data owner to determine who has access to their data?",
+      "choices": {
+        "A": "Mandatory Access Control (MAC)",
+        "B": "Discretionary Access Control (DAC)",
+        "C": "Role-Based Access Control (RBAC)",
+        "D": "Rule-Based Access Control"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "DAC allows the data owner to make access decisions at their discretion. In DAC, the owner of an object can grant or deny access to others. MAC is system-enforced (no owner discretion). RBAC is based on job roles. Rule-based uses predefined rules. Tests: DAC, access control models"
+    },
+    {
+      "id": "q2",
+      "prompt": "In Kerberos authentication, what does the TGT (Ticket Granting Ticket) prove?",
+      "choices": {
+        "A": "The user has access to a specific service",
+        "B": "The user has been authenticated by the KDC",
+        "C": "The user's password is correct",
+        "D": "The user has administrative privileges"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The TGT proves that the user has been authenticated by the Key Distribution Center (KDC). The user presents the TGT to the Ticket Granting Server to request service-specific tickets. The TGT itself does not grant access to any specific service. Tests: Kerberos, TGT purpose"
+    },
+    {
+      "id": "q3",
+      "prompt": "A biometric system has a FAR of 1% and FRR of 5%. What does the FAR represent?",
+      "choices": {
+        "A": "1% of authorized users are rejected",
+        "B": "1% of unauthorized users are accepted",
+        "C": "1% of all users experience errors",
+        "D": "1% of authentication attempts fail"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "False Accept Rate (FAR/Type II error) represents the percentage of unauthorized users who are incorrectly accepted. A 1% FAR means 1 in 100 unauthorized attempts succeeds. This is the more dangerous error type because it allows intruders in. Tests: Biometric error rates, FAR"
+    },
+    {
+      "id": "q4",
+      "prompt": "An employee uses a password and a fingerprint scan to log into a system. What type of authentication is this?",
+      "choices": {
+        "A": "Single-factor authentication",
+        "B": "Two-factor authentication",
+        "C": "Three-factor authentication",
+        "D": "Mutual authentication"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "This is two-factor authentication combining something you know (password — Type 1) and something you are (fingerprint — Type 3). Two different factor categories are used, satisfying the MFA requirement. Tests: Multi-factor authentication, factor types"
+    },
+    {
+      "id": "q5",
+      "prompt": "Which SSO protocol is XML-based and primarily used for web-based single sign-on in enterprise environments?",
+      "choices": {
+        "A": "OAuth 2.0",
+        "B": "SAML",
+        "C": "Kerberos",
+        "D": "RADIUS"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "SAML (Security Assertion Markup Language) is XML-based and designed for web-based SSO. OAuth 2.0 is for authorization (not authentication). Kerberos is ticket-based (not XML). RADIUS is an authentication protocol for network access (not SSO for web apps). Tests: SAML, SSO protocols"
+    },
+    {
+      "id": "q6",
+      "prompt": "What is the PRIMARY risk of single sign-on (SSO)?",
+      "choices": {
+        "A": "Increased complexity for users",
+        "B": "Higher administrative overhead",
+        "C": "Single point of compromise — if the SSO credential is stolen, all connected systems are accessible",
+        "D": "Incompatibility with cloud applications"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "SSO's primary risk is that one compromised credential grants access to ALL connected systems. This single point of compromise makes strong SSO authentication (MFA) critical. Despite this risk, SSO generally improves security by reducing password fatigue and the number of credentials users must manage. Tests: SSO risks, single point of failure"
+    },
+    {
+      "id": "q7",
+      "prompt": "An organization discovers that an employee who transferred departments six months ago still has access to their previous department's files. What security issue does this represent?",
+      "choices": {
+        "A": "Unauthorized access",
+        "B": "Privilege creep",
+        "C": "Separation of duties violation",
+        "D": "Need-to-know violation"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Privilege creep occurs when users accumulate access rights over time, typically during role changes, without having previous access revoked. The employee no longer needs the old department's access, but it was never removed. Regular access reviews would catch this. Tests: Privilege creep, access review"
+    },
+    {
+      "id": "q8",
+      "prompt": "Which access control model uses attributes such as user role, time of day, location, and resource sensitivity to make access decisions?",
+      "choices": {
+        "A": "DAC",
+        "B": "MAC",
+        "C": "RBAC",
+        "D": "ABAC"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "ABAC (Attribute-Based Access Control) evaluates multiple attributes to make access decisions, including subject attributes (role, clearance), object attributes (sensitivity, type), environment attributes (time, location), and action attributes (read, write). This provides the most granular and context-aware access control. Tests: ABAC, attribute-based decisions"
+    }
+  ]
+}

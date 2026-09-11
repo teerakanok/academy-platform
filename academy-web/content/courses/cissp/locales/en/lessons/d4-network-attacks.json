@@ -1,0 +1,219 @@
+{
+  "nodeId": "d4-network-attacks",
+  "locale": "en",
+  "title": "Network Attacks",
+  "objective": "Study-guide review — CISSP — Domain 4: Communication and Network Security: Network Attacks.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Denial of Service"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "DoS — Single source overwhelms target resources",
+        "DDoS — Multiple sources (botnet) coordinated attack",
+        "SYN Flood — Exploits TCP handshake; fills connection table",
+        "Smurf Attack — ICMP broadcast amplification",
+        "Amplification Attack — Uses DNS/NTP to multiply attack traffic"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SYN Flood Defense:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "SYN cookies",
+        "Increase connection queue size",
+        "Reduce SYN-RECEIVED timer",
+        "IPS/firewall rate limiting"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Smurf Attack: Attacker sends ICMP echo request to broadcast address with spoofed source (victim's IP). All hosts respond to the victim, overwhelming it. DDoS Mitigation:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Content delivery networks (CDN)",
+        "DDoS mitigation services (Cloudflare, AWS Shield)",
+        "Rate limiting and traffic shaping",
+        "Black hole routing (last resort)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Man-in-the-Middle"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Attacker intercepts and potentially modifies communication between two parties",
+        "Both parties believe they're communicating directly",
+        "Enabled by ARP spoofing, DNS spoofing, or rogue proxy",
+        "Prevented by encryption, certificate pinning, mutual authentication",
+        "HTTPS/TLS with proper certificate validation is the primary defense"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "ARP Spoofing and DNS Poisoning"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "ARP Spoofing — False ARP replies associate attacker's MAC with victim's IP",
+        "DNS Poisoning — Corrupt DNS cache to redirect traffic to malicious site",
+        "DNS Spoofing — Forge DNS responses before legitimate response arrives",
+        "ARP defense: Dynamic ARP Inspection (DAI), static ARP entries",
+        "DNS defense: DNSSEC, encrypted DNS (DoH, DoT)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Session Hijacking"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Attacker takes over an active authenticated session",
+        "Cookie theft — Stealing session cookies (XSS attack vector)",
+        "TCP sequence prediction — Guessing TCP sequence numbers",
+        "Session fixation — Setting a known session ID before authentication",
+        "Prevention: secure cookies, session timeouts, TLS, re-authentication for sensitive actions"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "DoS: Single source overwhelms target resources",
+    "DDoS: Multiple sources (botnet) coordinated attack",
+    "SYN Flood: Exploits TCP handshake; fills connection table",
+    "Smurf Attack: ICMP broadcast amplification",
+    "Amplification Attack: Uses DNS/NTP to multiply attack traffic",
+    "ARP Spoofing: False ARP replies associate attacker's MAC with victim's IP",
+    "DNS Poisoning: Corrupt DNS cache to redirect traffic to malicious site",
+    "DNS Spoofing: Forge DNS responses before legitimate response arrives"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "At which OSI layer do routers primarily operate?",
+      "choices": {
+        "A": "Layer 1 — Physical",
+        "B": "Layer 2 — Data Link",
+        "C": "Layer 3 — Network",
+        "D": "Layer 4 — Transport"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Routers operate at Layer 3 (Network) and make forwarding decisions based on IP addresses. Switches operate at Layer 2 (Data Link) using MAC addresses. Hubs operate at Layer 1 (Physical). Tests: OSI model, network devices"
+    },
+    {
+      "id": "q2",
+      "prompt": "Which IPsec protocol provides encryption, integrity, AND authentication?",
+      "choices": {
+        "A": "AH (Authentication Header)",
+        "B": "ESP (Encapsulating Security Payload)",
+        "C": "IKE (Internet Key Exchange)",
+        "D": "ISAKMP"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "ESP provides all three: encryption (confidentiality), integrity, and authentication. AH provides only integrity and authentication — no encryption. IKE and ISAKMP are used for key negotiation, not direct data protection. Tests: IPsec protocols, AH vs ESP"
+    },
+    {
+      "id": "q3",
+      "prompt": "An organization wants to allow external web traffic to reach their web server without exposing the internal network. Which network architecture should they implement?",
+      "choices": {
+        "A": "NAT",
+        "B": "VLAN",
+        "C": "DMZ",
+        "D": "VPN"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "A DMZ (Demilitarized Zone) places public-facing servers between two firewalls, allowing external access to the web server while protecting the internal network. NAT provides address translation but not isolation. VLANs are logical segments but don't provide the dual-firewall protection. VPNs are for encrypted remote access, not public web hosting. Tests: DMZ architecture, network segmentation"
+    },
+    {
+      "id": "q4",
+      "prompt": "Which wireless security protocol uses AES-CCMP and is the MINIMUM acceptable standard for current deployments?",
+      "choices": {
+        "A": "WEP",
+        "B": "WPA with TKIP",
+        "C": "WPA2",
+        "D": "Open authentication"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "WPA2 uses AES-CCMP encryption and is the current minimum acceptable standard. WEP is completely broken. WPA with TKIP is deprecated. WPA3 is the newest and strongest but WPA2 remains the minimum baseline. Tests: Wireless security protocols"
+    },
+    {
+      "id": "q5",
+      "prompt": "During a DDoS attack, an organization's web server is overwhelmed with SYN requests that never complete the TCP handshake. What type of attack is this?",
+      "choices": {
+        "A": "Smurf attack",
+        "B": "SYN flood",
+        "C": "Ping of death",
+        "D": "Teardrop attack"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A SYN flood attack sends numerous SYN packets without completing the three-way handshake (never sending the final ACK). This fills the server's connection table with half-open connections, preventing legitimate connections. Tests: DoS attacks, TCP handshake exploitation"
+    },
+    {
+      "id": "q6",
+      "prompt": "Which of the following BEST prevents ARP spoofing attacks?",
+      "choices": {
+        "A": "DNSSEC",
+        "B": "Dynamic ARP Inspection (DAI)",
+        "C": "WPA2 encryption",
+        "D": "Network Address Translation (NAT)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Dynamic ARP Inspection (DAI) validates ARP packets against a trusted DHCP snooping binding table. It drops ARP packets with invalid IP-to-MAC bindings, preventing ARP spoofing attacks. DNSSEC protects DNS (not ARP). WPA2 protects wireless (not ARP). NAT translates addresses (not ARP protection). Tests: ARP spoofing defense, Layer 2 security"
+    },
+    {
+      "id": "q7",
+      "prompt": "What is the PRIMARY security concern with split tunneling in a VPN?",
+      "choices": {
+        "A": "Slower performance",
+        "B": "Inability to access corporate resources",
+        "C": "Traffic not destined for the corporate network bypasses security controls",
+        "D": "Increased bandwidth costs"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Split tunneling routes only corporate traffic through the VPN while personal traffic goes directly to the Internet. This means the user's non-corporate traffic bypasses all corporate security controls (firewall, IDS, content filtering), potentially exposing the device to attacks that could compromise the corporate network when corporate-bound traffic is sent through the tunnel. Tests: VPN configuration, split tunneling risks"
+    },
+    {
+      "id": "q8",
+      "prompt": "A network architect needs to separate departments on the same physical switch. Which technology creates separate broadcast domains on a single switch?",
+      "choices": {
+        "A": "NAC",
+        "B": "VLAN",
+        "C": "VPN",
+        "D": "DMZ"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "VLANs (Virtual LANs) create separate broadcast domains on a single switch, logically isolating traffic between departments without requiring separate physical switches. NAC controls device access. VPNs encrypt traffic. DMZs are for public-facing services. Tests: VLANs, network segmentation"
+    }
+  ]
+}

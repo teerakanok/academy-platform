@@ -1,0 +1,234 @@
+{
+  "nodeId": "d6-penetration-testing",
+  "locale": "en",
+  "title": "Penetration Testing",
+  "objective": "Study-guide review — CISSP — Domain 6: Security Assessment and Testing: Penetration Testing.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Penetration Testing Methodologies"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "OWASP Testing Guide — Web application security testing",
+        "NIST SP 800-115 — Technical Guide to Information Security Testing",
+        "PTES — Penetration Testing Execution Standard",
+        "OSSTMM — Open Source Security Testing Methodology Manual",
+        "Methodology ensures consistent, repeatable, and thorough testing"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Testing Types"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Black Box (Zero Knowledge) — Tester has NO prior knowledge of the target",
+        "White Box (Full Knowledge) — Tester has COMPLETE knowledge (source code, architecture)",
+        "Gray Box (Partial Knowledge) — Tester has SOME knowledge (user credentials, network maps)",
+        "Black box simulates external attacker; white box simulates insider threat",
+        "White box is most thorough; black box is most realistic"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Type",
+        "Knowledge",
+        "Simulates",
+        "Thoroughness",
+        "Realism"
+      ],
+      "rows": [
+        [
+          "Black Box",
+          "None",
+          "External attacker",
+          "Lower",
+          "Highest"
+        ],
+        [
+          "White Box",
+          "Full",
+          "Insider/developer",
+          "Highest",
+          "Lower"
+        ],
+        [
+          "Gray Box",
+          "Partial",
+          "Privileged user",
+          "Medium",
+          "Medium"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: White box testing finds MORE vulnerabilities because testers can analyze source code and architecture. Black box testing is more REALISTIC but may miss deeply embedded flaws."
+    },
+    {
+      "kind": "heading",
+      "text": "Rules of Engagement"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Written agreement defining scope, boundaries, and expectations",
+        "Specifies what systems can be tested and what techniques are allowed",
+        "Defines time windows for testing (avoid business-critical hours)",
+        "Includes emergency contacts and escalation procedures",
+        "Legal authorization must be obtained before any testing begins"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Rules of engagement typically include:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Scope — Which systems, networks, applications are in scope",
+        "Excluded systems — Systems that must NOT be tested",
+        "Allowed techniques — Social engineering, physical, network, application",
+        "DoS testing — Usually prohibited or heavily restricted",
+        "Data handling — How sensitive data found during testing is handled",
+        "Communication — How findings are reported (especially critical ones)",
+        "Timeline — Start date, end date, testing windows",
+        "Legal protections — Indemnification and liability"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Penetration testing without proper written authorization is a CRIME (unauthorized access). Always get signed rules of engagement before testing."
+    },
+    {
+      "kind": "heading",
+      "text": "Penetration Testing Phases"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Planning/Scoping — Define scope, objectives, rules of engagement",
+        "Reconnaissance — Gather information about the target (passive and active)",
+        "Scanning/Enumeration — Identify live systems, open ports, services",
+        "Exploitation — Attempt to exploit discovered vulnerabilities",
+        "Post-Exploitation — Determine what access was gained, pivot to other systems",
+        "Reporting — Document findings, evidence, and recommendations"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Reconnaissance Types:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Passive — No direct interaction with target (OSINT, DNS lookups, social media)",
+        "Active — Direct interaction with target (port scanning, service enumeration)"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Reporting should include:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Executive summary (for management)",
+        "Technical findings with evidence",
+        "Risk ratings for each finding",
+        "Remediation recommendations",
+        "Retesting plan"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "OWASP Testing Guide: Web application security testing",
+    "NIST SP 800-115: Technical Guide to Information Security Testing",
+    "PTES: Penetration Testing Execution Standard",
+    "OSSTMM: Open Source Security Testing Methodology Manual",
+    "Black Box (Zero Knowledge): Tester has NO prior knowledge of the target",
+    "White Box (Full Knowledge): Tester has COMPLETE knowledge (source code, architecture)",
+    "Gray Box (Partial Knowledge): Tester has SOME knowledge (user credentials, network maps)",
+    "Scope: Which systems, networks, applications are in scope"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"OWASP Testing Guide\" is described as:",
+      "choices": {
+        "A": "Web application security testing",
+        "B": "Start date, end date, testing windows",
+        "C": "Indemnification and liability",
+        "D": "Systems that must NOT be tested"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: OWASP Testing Guide — Web application security testing"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"NIST SP 800-115\" is described as:",
+      "choices": {
+        "A": "Open Source Security Testing Methodology Manual",
+        "B": "Document findings, evidence, and recommendations",
+        "C": "Technical Guide to Information Security Testing",
+        "D": "Define scope, objectives, rules of engagement"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: NIST SP 800-115 — Technical Guide to Information Security Testing"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"PTES\" is described as:",
+      "choices": {
+        "A": "Tester has NO prior knowledge of the target",
+        "B": "Penetration Testing Execution Standard",
+        "C": "Usually prohibited or heavily restricted",
+        "D": "Start date, end date, testing windows"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: PTES — Penetration Testing Execution Standard"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"OSSTMM\" is described as:",
+      "choices": {
+        "A": "Technical Guide to Information Security Testing",
+        "B": "Open Source Security Testing Methodology Manual",
+        "C": "Document findings, evidence, and recommendations",
+        "D": "Define scope, objectives, rules of engagement"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: OSSTMM — Open Source Security Testing Methodology Manual"
+    }
+  ]
+}

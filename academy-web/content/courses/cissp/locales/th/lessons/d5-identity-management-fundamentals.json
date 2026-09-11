@@ -1,0 +1,175 @@
+{
+  "nodeId": "d5-identity-management-fundamentals",
+  "locale": "th",
+  "title": "Identity Management Fundamentals",
+  "objective": "Study-guide review — CISSP — Domain 5: Identity and Access Management (IAM): Identity Management Fundamentals.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Identity Lifecycle"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Provisioning — Creating accounts and granting initial access",
+        "Management — Maintaining and updating access throughout employment",
+        "Review — Periodic access review and recertification",
+        "Deprovisioning — Disabling/deleting accounts when no longer needed",
+        "Identity lifecycle must be documented and auditable"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The identity lifecycle encompasses the entire span from account creation to deletion:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Enrollment/Registration — User identity verified, account created",
+        "Provisioning — Access rights assigned based on role",
+        "Active Use — User accesses resources; activity logged",
+        "Maintenance — Role changes, access updates, password resets",
+        "Review — Periodic recertification of access rights",
+        "Deprovisioning — Account disabled/deleted upon departure or role change"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Chapple: \"Organizations use provisioning and onboarding processes when hiring employees and deprovisioning and offboarding processes when employees leave.\" ⚠️ Exam Trap: Deprovisioning is just as important as provisioning. Orphaned accounts (active accounts for departed employees) are a major security risk."
+    },
+    {
+      "kind": "heading",
+      "text": "Provisioning and Deprovisioning"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Provisioning should follow the principle of least privilege",
+        "Access based on role, department, and job function",
+        "Automated provisioning reduces errors and ensures consistency",
+        "Deprovisioning must be immediate for involuntary termination",
+        "Account disabling (not deleting) preserves audit trail"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Provisioning best practices:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Use role templates to assign standard access for each position",
+        "Require manager approval before granting access",
+        "Document all access grants with justification",
+        "Implement automated workflows for common provisioning tasks"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Deprovisioning checklist:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Disable all accounts immediately upon termination",
+        "Revoke remote access (VPN, email, cloud)",
+        "Collect physical access badges and keys",
+        "Transfer ownership of shared resources",
+        "Archive or reassign email and files",
+        "Document deprovisioning completion"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Identity as a Service"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "IDaaS — Cloud-based identity management",
+        "Provides SSO, MFA, directory services as a service",
+        "Reduces on-premises identity infrastructure",
+        "Examples: Okta, Azure AD, AWS IAM",
+        "Must evaluate vendor security and data sovereignty"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Provisioning: Creating accounts and granting initial access",
+    "Management: Maintaining and updating access throughout employment",
+    "Review: Periodic access review and recertification",
+    "Deprovisioning: Disabling/deleting accounts when no longer needed",
+    "Enrollment/Registration: User identity verified, account created",
+    "Provisioning: Access rights assigned based on role",
+    "Active Use: User accesses resources; activity logged",
+    "Maintenance: Role changes, access updates, password resets"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"Provisioning\" is described as:",
+      "choices": {
+        "A": "Disabling/deleting accounts when no longer needed",
+        "B": "Creating accounts and granting initial access",
+        "C": "Periodic access review and recertification",
+        "D": "Role changes, access updates, password resets"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Provisioning — Creating accounts and granting initial access"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"Management\" is described as:",
+      "choices": {
+        "A": "Creating accounts and granting initial access",
+        "B": "Disabling/deleting accounts when no longer needed",
+        "C": "Account disabled/deleted upon departure or role change",
+        "D": "Maintaining and updating access throughout employment"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Management — Maintaining and updating access throughout employment"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"Review\" is described as:",
+      "choices": {
+        "A": "Periodic recertification of access rights",
+        "B": "User accesses resources; activity logged",
+        "C": "Periodic access review and recertification",
+        "D": "Creating accounts and granting initial access"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Review — Periodic access review and recertification"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"Deprovisioning\" is described as:",
+      "choices": {
+        "A": "Disabling/deleting accounts when no longer needed",
+        "B": "Role changes, access updates, password resets",
+        "C": "Maintaining and updating access throughout employment",
+        "D": "Creating accounts and granting initial access"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Deprovisioning — Disabling/deleting accounts when no longer needed"
+    }
+  ]
+}

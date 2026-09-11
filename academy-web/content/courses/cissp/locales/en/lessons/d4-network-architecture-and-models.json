@@ -1,0 +1,215 @@
+{
+  "nodeId": "d4-network-architecture-and-models",
+  "locale": "en",
+  "title": "Network Architecture and Models",
+  "objective": "Study-guide review — CISSP — Domain 4: Communication and Network Security: Network Architecture and Models.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "OSI Reference Model"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Layer",
+        "Name",
+        "Function",
+        "Protocols/Devices",
+        "PDU"
+      ],
+      "rows": [
+        [
+          "7",
+          "Application",
+          "User interface, network services",
+          "HTTP, FTP, SMTP, DNS",
+          "Data"
+        ],
+        [
+          "6",
+          "Presentation",
+          "Data formatting, encryption, compression",
+          "SSL/TLS, JPEG, ASCII",
+          "Data"
+        ],
+        [
+          "5",
+          "Session",
+          "Session management, dialog control",
+          "NetBIOS, RPC, SQL",
+          "Data"
+        ],
+        [
+          "4",
+          "Transport",
+          "End-to-end delivery, flow control",
+          "TCP, UDP",
+          "Segment"
+        ],
+        [
+          "3",
+          "Network",
+          "Routing, logical addressing",
+          "IP, ICMP, IPsec",
+          "Packet"
+        ],
+        [
+          "2",
+          "Data Link",
+          "MAC addressing, framing, error detection",
+          "Ethernet, Wi-Fi, ARP, switches",
+          "Frame"
+        ],
+        [
+          "1",
+          "Physical",
+          "Bits on the wire, signaling",
+          "Cables, hubs, repeaters",
+          "Bits"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Stewart: \"The layers are ordered specifically to indicate how information flows through the various levels of communication. Each layer communicates directly with the layer above it as well as the layer below it.\" From the Official CBK: \"The presentation layer ensures that formats are converted and presented to the application layer as needed.\" Mnemonic (bottom-up): \"Please Do Not Throw Sausage Pizza Away\" (Physical, Data Link, Network, Transport, Session, Presentation, Application) ⚠️ Exam Trap: Know which layer each protocol and device operates at:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Switches operate at Layer 2 (Data Link) — some at Layer 3",
+        "Routers operate at Layer 3 (Network)",
+        "Firewalls can operate at Layers 3-7 depending on type",
+        "Encryption happens at Layers 2 (WPA), 3 (IPsec), 4 (TLS), 6 (SSL historical)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "TCP/IP Model"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "TCP/IP Layer",
+        "OSI Equivalent",
+        "Protocols"
+      ],
+      "rows": [
+        [
+          "Application",
+          "Layers 5-7",
+          "HTTP, FTP, DNS, SMTP"
+        ],
+        [
+          "Transport",
+          "Layer 4",
+          "TCP, UDP"
+        ],
+        [
+          "Internet",
+          "Layer 3",
+          "IP, ICMP, ARP"
+        ],
+        [
+          "Link (Network Access)",
+          "Layers 1-2",
+          "Ethernet, Wi-Fi"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Stewart: \"The OSI Network layer is called the internet layer in TCP/IP and then the bottom two layers of the OSI model are handled by TCP/IP's link layer.\" The TCP/IP model is the practical model used in real networks, while OSI is the theoretical reference model. The CISSP exam tests both."
+    },
+    {
+      "kind": "heading",
+      "text": "Encapsulation and De-encapsulation"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Encapsulation — Adding headers/trailers as data moves DOWN the layers",
+        "De-encapsulation — Removing headers/trailers as data moves UP the layers",
+        "Each layer adds its own header with control information",
+        "Data at each layer has a specific name (PDU — Protocol Data Unit)",
+        "Application → Segments → Packets → Frames → Bits"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Application: User interface, network services",
+    "Presentation: Data formatting, encryption, compression",
+    "Session: Session management, dialog control",
+    "Transport: End-to-end delivery, flow control",
+    "Network: Routing, logical addressing",
+    "Data Link: MAC addressing, framing, error detection",
+    "Physical: Bits on the wire, signaling",
+    "Encapsulation: Adding headers/trailers as data moves DOWN the layers"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"Application\" is described as:",
+      "choices": {
+        "A": "End-to-end delivery, flow control",
+        "B": "Session management, dialog control",
+        "C": "Routing, logical addressing",
+        "D": "User interface, network services"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Application: User interface, network services"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"Presentation\" is described as:",
+      "choices": {
+        "A": "MAC addressing, framing, error detection",
+        "B": "Session management, dialog control",
+        "C": "Data formatting, encryption, compression",
+        "D": "End-to-end delivery, flow control"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Presentation: Data formatting, encryption, compression"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"Session\" is described as:",
+      "choices": {
+        "A": "Data formatting, encryption, compression",
+        "B": "Session management, dialog control",
+        "C": "User interface, network services",
+        "D": "End-to-end delivery, flow control"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Session: Session management, dialog control"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"Transport\" is described as:",
+      "choices": {
+        "A": "User interface, network services",
+        "B": "Session management, dialog control",
+        "C": "Routing, logical addressing",
+        "D": "End-to-end delivery, flow control"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Transport: End-to-end delivery, flow control"
+    }
+  ]
+}

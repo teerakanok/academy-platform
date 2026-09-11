@@ -1,0 +1,157 @@
+{
+  "nodeId": "d2-asset-handling-requirements",
+  "locale": "th",
+  "title": "Asset Handling Requirements",
+  "objective": "Study-guide review — CISSP — Domain 2: Asset Security: Asset Handling Requirements.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Media Handling and Marking"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Media must be marked/labeled with its classification level",
+        "Handling procedures must match the classification of data on the media",
+        "Physical media requires secure storage appropriate to classification",
+        "Transporting classified media requires encryption or secure courier",
+        "Downgrading media classification requires sanitization first"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Media handling encompasses the entire lifecycle:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Storage — Locked cabinets, safes, or controlled access rooms based on classification",
+        "Transport — Encryption for digital media; secure courier for physical",
+        "Disposal — Appropriate sanitization method based on classification",
+        "Reuse — Must be properly sanitized before reuse, especially at lower classification levels"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Media containing classified data cannot simply be reformatted and reused for unclassified purposes. Proper sanitization (clearing, purging, or destruction) is required first."
+    },
+    {
+      "kind": "heading",
+      "text": "Data Storage and Archiving"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Archives must maintain classification protections throughout retention period",
+        "Storage media should be tested periodically for reliability",
+        "Environmental controls (temperature, humidity) affect media longevity",
+        "Archive accessibility must be ensured for the entire retention period",
+        "Consider technology obsolescence when choosing archive media"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From the Official CBK: Data archiving requirements include:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Media type selection",
+        "Security requirements maintenance",
+        "Availability requirements throughout retention"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Key considerations for long-term archiving:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Media degradation — Magnetic media degrades over time; optical media can last longer",
+        "Format obsolescence — Can you still read this format in 20 years?",
+        "Hardware availability — Will compatible drives/readers exist?",
+        "Encryption key management — Archived encrypted data is useless without keys"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Storage: Locked cabinets, safes, or controlled access rooms based on classification",
+    "Transport: Encryption for digital media; secure courier for physical",
+    "Disposal: Appropriate sanitization method based on classification",
+    "Reuse: Must be properly sanitized before reuse, especially at lower classification levels",
+    "Media degradation: Magnetic media degrades over time; optical media can last longer",
+    "Format obsolescence: Can you still read this format in 20 years?",
+    "Hardware availability: Will compatible drives/readers exist?",
+    "Encryption key management: Archived encrypted data is useless without keys"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Storage\" is described as:",
+      "choices": {
+        "A": "Must be properly sanitized before reuse, especially at lower classification levels",
+        "B": "Magnetic media degrades over time; optical media can last longer",
+        "C": "Locked cabinets, safes, or controlled access rooms based on classification",
+        "D": "Encryption for digital media; secure courier for physical"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Storage — Locked cabinets, safes, or controlled access rooms based on classification"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Transport\" is described as:",
+      "choices": {
+        "A": "Archived encrypted data is useless without keys",
+        "B": "Encryption for digital media; secure courier for physical",
+        "C": "Magnetic media degrades over time; optical media can last longer",
+        "D": "Appropriate sanitization method based on classification"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Transport — Encryption for digital media; secure courier for physical"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Disposal\" is described as:",
+      "choices": {
+        "A": "Encryption for digital media; secure courier for physical",
+        "B": "Archived encrypted data is useless without keys",
+        "C": "Appropriate sanitization method based on classification",
+        "D": "Magnetic media degrades over time; optical media can last longer"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Disposal — Appropriate sanitization method based on classification"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Reuse\" is described as:",
+      "choices": {
+        "A": "Encryption for digital media; secure courier for physical",
+        "B": "Magnetic media degrades over time; optical media can last longer",
+        "C": "Must be properly sanitized before reuse, especially at lower classification levels",
+        "D": "Locked cabinets, safes, or controlled access rooms based on classification"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Reuse — Must be properly sanitized before reuse, especially at lower classification levels"
+    }
+  ]
+}

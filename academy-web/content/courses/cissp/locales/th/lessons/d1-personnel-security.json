@@ -1,0 +1,199 @@
+{
+  "nodeId": "d1-personnel-security",
+  "locale": "th",
+  "title": "Personnel Security",
+  "objective": "Study-guide review — CISSP — Domain 1: Security and Risk Management: Personnel Security.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Hiring Practices and Background Checks"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Background checks should match the security level of the position",
+        "Include: work history, education verification, references, criminal records",
+        "Risk designation determines the depth of screening required",
+        "Candidate screening is part of the administrative controls for personnel security",
+        "NDA (Non-Disclosure Agreement) should be signed before access is granted"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From the Official CBK: \"The thoroughness of your candidate screening process should match the security of the position that you're filling. As a CISSP, risk designation (or the equivalent) determines the thoroughness of candidate screening.\" Security clearance validation is essential for positions with access to classified information. Background checks should cover:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Employment history verification",
+        "Education verification",
+        "Reference checks",
+        "Criminal background checks",
+        "Credit checks (for financial positions)",
+        "Drug testing (where legally permitted)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Employment Agreements and Policies"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "NDA (Non-Disclosure Agreement) — Protects confidential information",
+        "AUP (Acceptable Use Policy) — Defines acceptable use of organizational resources",
+        "Non-compete agreement — Restricts work for competitors after leaving",
+        "Employment agreements should be signed before granting access",
+        "Policies must be reviewed and acknowledged by all employees"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Stewart: \"An acceptable use policy is a commonly produced document that exists as part of the overall security documentation infrastructure. The acceptable use policy is specifically designed to assign security roles within the organization as well as ensure the responsible use of equipment and information.\" NDAs protect the organization's confidential and proprietary information. They should be signed during onboarding and may extend beyond employment."
+    },
+    {
+      "kind": "heading",
+      "text": "Separation of Duties and Least Privilege"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Separation of Duties (SoD) — No single person controls all phases of a critical process",
+        "Least Privilege — Users get only the minimum access required for their job",
+        "Need to Know — Access based on legitimate business requirement",
+        "SoD prevents fraud, error, and abuse of privilege",
+        "Two-Person Control (Two-Man Rule) — Critical actions require two people"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Stewart: \"When duties are properly segregated, no single employee will have the ability to commit fraud or make a mistake and have it go undetected.\" From Destination CISSP: \"Two-person control ensures that no single person has sufficient privileges to compromise the security of the environment.\" This combines segregation of duties and two-person control into a single solution — the information or privilege required to perform an operation is divided among two or more users. From Chapple: \"Separation of duties is a core requirement of the least privilege policy, but it also combines the principle of least privilege.\" ⚠️ Exam Trap: Separation of duties PREVENTS fraud. Job rotation DETECTS fraud. Don't confuse their purposes."
+    },
+    {
+      "kind": "heading",
+      "text": "Job Rotation and Mandatory Vacations"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Job Rotation — Periodically moving employees between roles",
+        "Primary purpose: detect fraud and minimize risk of collusion",
+        "Mandatory Vacations — Force employees to take time off (typically 1-2 weeks)",
+        "Allows others to cover duties and potentially uncover irregularities",
+        "Cross-training benefit: builds organizational resilience"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Stewart: \"The longer a person works in a specific position, the more likely they are to be assigned additional work tasks and thus expand their privileges and access. As a person becomes increasingly familiar with their work tasks, they may abuse their access or privileges.\" From Chapple: \"One of the primary reasons to enforce job rotation is to uncover or minimize the risk of fraud, collusion, or an abuse of position by those with low or high-risk privileges.\" Mandatory vacations serve a similar purpose — when an employee is forced to take time off, someone else must cover their duties, which may expose fraudulent activities that were being concealed."
+    },
+    {
+      "kind": "heading",
+      "text": "Termination Procedures"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Exit interview should be conducted",
+        "All access immediately revoked upon termination",
+        "Company property must be returned (badges, keys, laptops)",
+        "Escort terminated employee from the building",
+        "Involuntary termination requires extra precautions (immediate access removal)",
+        "Remind departing employee of NDA obligations"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Termination procedures are critical to preventing insider threats. For involuntary termination (firing), access should be disabled simultaneously with or before the notification. The employee should be escorted out immediately. For voluntary termination (resignation), the transition period should be managed carefully. Access should be progressively reduced and fully revoked on the last day. ⚠️ Exam Trap: The exam emphasizes that access revocation should happen IMMEDIATELY upon termination, especially for involuntary termination. Don't leave active accounts for former employees."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "NDA (Non-Disclosure Agreement): Protects confidential information",
+    "AUP (Acceptable Use Policy): Defines acceptable use of organizational resources",
+    "Non-compete agreement: Restricts work for competitors after leaving",
+    "Separation of Duties (SoD): No single person controls all phases of a critical process",
+    "Least Privilege: Users get only the minimum access required for their job",
+    "Need to Know: Access based on legitimate business requirement",
+    "Two-Person Control (Two-Man Rule): Critical actions require two people",
+    "Job Rotation: Periodically moving employees between roles"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"NDA (Non-Disclosure Agreement)\" is described as:",
+      "choices": {
+        "A": "Critical actions require two people",
+        "B": "Protects confidential information",
+        "C": "Periodically moving employees between roles",
+        "D": "Restricts work for competitors after leaving"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: NDA (Non-Disclosure Agreement) — Protects confidential information"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"AUP (Acceptable Use Policy)\" is described as:",
+      "choices": {
+        "A": "Access based on legitimate business requirement",
+        "B": "Force employees to take time off (typically 1-2 weeks)",
+        "C": "Restricts work for competitors after leaving",
+        "D": "Defines acceptable use of organizational resources"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: AUP (Acceptable Use Policy) — Defines acceptable use of organizational resources"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Non-compete agreement\" is described as:",
+      "choices": {
+        "A": "Defines acceptable use of organizational resources",
+        "B": "Restricts work for competitors after leaving",
+        "C": "Access based on legitimate business requirement",
+        "D": "Periodically moving employees between roles"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Non-compete agreement — Restricts work for competitors after leaving"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Separation of Duties (SoD)\" is described as:",
+      "choices": {
+        "A": "No single person controls all phases of a critical process",
+        "B": "Defines acceptable use of organizational resources",
+        "C": "Force employees to take time off (typically 1-2 weeks)",
+        "D": "Users get only the minimum access required for their job"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Separation of Duties (SoD) — No single person controls all phases of a critical process"
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "nodeId": "d7-due-care-due-diligence-and-the-prudent-man-rule",
+  "locale": "th",
+  "title": "Due Care, Due Diligence, and the Prudent Man Rule",
+  "objective": "Study-guide review — CISSP — Domain 7: Security Operations: Due Care, Due Diligence, and the Prudent Man Rule.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Operational Due Care"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Due Care — taking reasonable steps to protect assets; \"doing the right thing\" (actions)",
+        "Due Diligence — researching and understanding risks before making decisions; \"doing homework\" (investigation)",
+        "Prudent Man Rule — a senior executive must take personal responsibility for ensuring due care; originated from the U.S. Federal Sentencing Guidelines (1991)",
+        "Gross Negligence — failure to exercise even basic care; e.g., failing to apply critical security patches for months",
+        "A company that fails to implement reasonable security (e.g., no SSL for financial transactions) is not practicing due care"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Shon Harris: \"Many times due diligence (data gathering) has to be performed so that proper due care (prudent actions) can take place.\" If a company does not implement SSL for account transactions, it is not practicing due care. The U.S. Federal Sentencing Guidelines of 1991 formalized the Prudent Man Rule, requiring senior executives to take personal responsibility for ensuring due care in protecting organizational assets. This directly applies to security operations: a manager who knows about a critical vulnerability but fails to patch it could be found grossly negligent. Operational Due Care Examples:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Patching systems within a reasonable timeframe → due care",
+        "Failing to patch a known critical vulnerability for 6+ months → gross negligence",
+        "Conducting a risk assessment before selecting a cloud provider → due diligence",
+        "Implementing security controls based on risk assessment findings → due care"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Manager Mindset: On the CISSP exam, the \"correct\" answer often involves the manager ensuring due diligence is performed (understanding risks) and due care is exercised (taking action). Failing to do either can result in legal liability. ⚠️ Exam Trap: Due diligence = research/investigation. Due care = action/implementation. The Prudent Man Rule holds executives personally responsible. Gross negligence is the failure to exercise basic care — it can result in both civil and criminal penalties."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Due Care: taking reasonable steps to protect assets; \"doing the right thing\" (actions)",
+    "Due Diligence: researching and understanding risks before making decisions; \"doing homework\" (investigation)",
+    "Prudent Man Rule: a senior executive must take personal responsibility for ensuring due care; originated from the U.S. Federal Sentencing Guidelines (1991)",
+    "Gross Negligence: failure to exercise even basic care; e.g., failing to apply critical security patches for months"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Due Care\" is described as:",
+      "choices": {
+        "A": "researching and understanding risks before making decisions; \"doing homework\" (investigation)",
+        "B": "failure to exercise even basic care; e.g., failing to apply critical security patches for months",
+        "C": "a senior executive must take personal responsibility for ensuring due care; originated from the U.S. Federal Sentencing Guidelines (1991)",
+        "D": "taking reasonable steps to protect assets; \"doing the right thing\" (actions)"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Due Care — taking reasonable steps to protect assets; \"doing the right thing\" (actions)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Due Diligence\" is described as:",
+      "choices": {
+        "A": "failure to exercise even basic care; e.g., failing to apply critical security patches for months",
+        "B": "researching and understanding risks before making decisions; \"doing homework\" (investigation)",
+        "C": "taking reasonable steps to protect assets; \"doing the right thing\" (actions)",
+        "D": "a senior executive must take personal responsibility for ensuring due care; originated from the U.S. Federal Sentencing Guidelines (1991)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Due Diligence — researching and understanding risks before making decisions; \"doing homework\" (investigation)"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Prudent Man Rule\" is described as:",
+      "choices": {
+        "A": "failure to exercise even basic care; e.g., failing to apply critical security patches for months",
+        "B": "a senior executive must take personal responsibility for ensuring due care; originated from the U.S. Federal Sentencing Guidelines (1991)",
+        "C": "researching and understanding risks before making decisions; \"doing homework\" (investigation)",
+        "D": "taking reasonable steps to protect assets; \"doing the right thing\" (actions)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Prudent Man Rule — a senior executive must take personal responsibility for ensuring due care; originated from the U.S. Federal Sentencing Guidelines (1991)"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Gross Negligence\" is described as:",
+      "choices": {
+        "A": "failure to exercise even basic care; e.g., failing to apply critical security patches for months",
+        "B": "researching and understanding risks before making decisions; \"doing homework\" (investigation)",
+        "C": "taking reasonable steps to protect assets; \"doing the right thing\" (actions)",
+        "D": "a senior executive must take personal responsibility for ensuring due care; originated from the U.S. Federal Sentencing Guidelines (1991)"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Gross Negligence — failure to exercise even basic care; e.g., failing to apply critical security patches for months"
+    }
+  ]
+}

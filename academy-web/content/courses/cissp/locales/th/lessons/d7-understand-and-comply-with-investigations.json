@@ -1,0 +1,230 @@
+{
+  "nodeId": "d7-understand-and-comply-with-investigations",
+  "locale": "th",
+  "title": "Understand and Comply with Investigations",
+  "objective": "Study-guide review — CISSP — Domain 7: Security Operations: Understand and Comply with Investigations.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Investigation Types"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Administrative — internal investigation for policy violations; uses preponderance of evidence standard (>50% likelihood)",
+        "Criminal — law enforcement involvement; requires proof beyond a reasonable doubt (highest burden of proof)",
+        "Civil — disputes between parties; uses preponderance of evidence standard",
+        "Regulatory — government agency investigation for compliance violations (e.g., HIPAA, PCI DSS, GDPR)",
+        "Industry standards — investigations into violation of industry standards (e.g., PCI DSS); not legal proceedings but can result in fines or loss of certification"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The type of investigation determines the legal standard of proof required. Criminal investigations require proof \"beyond a reasonable doubt\" — the highest standard. Civil and administrative investigations use the lower \"preponderance of evidence\" standard (more likely than not). Regulatory investigations may use either standard depending on the jurisdiction and regulation. Organizations should have clear policies defining when an internal investigation should be escalated to law enforcement. Key factors include: severity of the incident, legal reporting requirements (e.g., breach notification laws), and whether criminal activity is suspected. Early engagement of legal counsel is critical to preserve attorney-client privilege and ensure proper evidence handling. ⚠️ Exam Trap: Don't confuse the burden of proof standards. Criminal = beyond a reasonable doubt. Civil/Administrative = preponderance of evidence. The exam often tests which standard applies in a given scenario."
+    },
+    {
+      "kind": "heading",
+      "text": "Evidence Collection and Handling"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Evidence must be relevant (related to the case), sufficient (enough to support findings), and reliable (trustworthy and verifiable)",
+        "Order of volatility — collect most volatile evidence first: CPU registers/cache → RAM → swap/temp files → hard drives → logs → physical configuration → archive media",
+        "Live evidence — stored in RAM, cache, CPU; lost if power is disrupted — must be captured first",
+        "Forensic image — bitwise copy (bit-for-bit) of the original media; analysis is performed on the copy, never the original",
+        "Calculate cryptographic hash (MD5 or SHA) of the original before and after imaging to prove integrity",
+        "Actions taken during evidence collection must not change the original evidence",
+        "Locard's Exchange Principle — every contact leaves a trace; investigators must minimize contamination"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The order of volatility is critical for proper evidence collection. The most volatile data (CPU registers, cache, running processes, network connections) will be lost first when a system is powered down. NIST SP 800-86 and RFC 3227 provide guidance on the order of volatility. When performing live forensics, investigators must use trusted tools (typically from a write-protected USB or CD) to extract live evidence and minimize contamination. Running programs on the target system can alter evidence. As noted in the CISSP references: \"Do not run any programs on the system(s) that are potential evidence\" and \"Act ethically and in good faith while conducting a forensics investigation.\" For disk imaging, tools like EnCase, FTK Imager, and dd are commonly used. The forensic image must be verified by comparing hash values before and after the imaging process. If the hashes match, the image is an exact copy. Two different hash algorithms should be used (e.g., both MD5 and SHA-256) for additional assurance. ⚠️ Exam Trap: Always collect the MOST volatile evidence first (CPU/RAM), not the hard drive. The exam will present scenarios asking what to collect first — always choose the most volatile source."
+    },
+    {
+      "kind": "heading",
+      "text": "Chain of Custody"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Documents the chronological handling of evidence from collection to presentation in court",
+        "Must record: who collected it, when it was collected, where it was stored, who had access, and any transfers between parties",
+        "Evidence must be labeled with comprehensive identification — date, time, collector, case number, description",
+        "Evidence containers should be tamper-evident — any attempt to open results in obvious signs of tampering",
+        "A broken chain of custody can render evidence inadmissible in court",
+        "Every person who handles the evidence must be documented, from the first responder to the courtroom"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The chain of custody is the most critical aspect of evidence management for legal proceedings. As stated in the CISSP CBK: \"The location of the evidence must be fully documented from the moment it was collected to the moment it appears in court to ensure that it is indeed the same item. This requires thorough labeling of evidence and comprehensive logs noting who had access.\" Physical evidence should be stored in tamper-evident bags or containers. Each transfer of evidence must be logged with signatures from both the transferring and receiving parties. Digital evidence requires additional safeguards such as hash verification at each transfer point. Best practices for maintaining chain of custody:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Record and document everything, including dates, times, and locations of all actions taken",
+        "Note the condition of any evidence collected and relevant personnel involved",
+        "Always make copies of digital evidence and perform analysis on the copies",
+        "Store original evidence in a secure, access-controlled location",
+        "Maintain a detailed log of every person who accesses the evidence"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: The primary focus of chain of custody is control of evidence to maintain integrity for court presentation. A gap in the chain of custody = potentially inadmissible evidence."
+    },
+    {
+      "kind": "heading",
+      "text": "Reporting and Documentation"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "All investigation activities must be thoroughly documented in real time",
+        "Documentation should be suitable for multiple stakeholders: prosecution/defense, judge/jury, regulators, investors, insurers",
+        "Reports must include: timeline of events, evidence collected, methods used, findings, and conclusions",
+        "Legal hold (litigation hold) — preservation of all potentially relevant records when litigation is reasonably anticipated",
+        "Breach notification requirements vary by jurisdiction — know the reporting timelines (e.g., GDPR 72 hours)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Documentation is a continuous process throughout any investigation. As the CBK states, evidence and information gathered during incident response can be used as evidence in legal proceedings, so the IR team's activities should follow strict standards to ensure any information gathered can be used later. In most privacy legislation, there is a requirement to report breaches to affected individuals and/or regulatory authorities within specified timeframes. Organizations must understand what type of data they handle, what regulations apply, and get proper legal guidance on reporting requirements. GDPR requires notification to the supervisory authority within 72 hours of becoming aware of a breach, while various US state laws have different requirements."
+    },
+    {
+      "kind": "heading",
+      "text": "Digital Forensics Tools, Tactics, and Procedures"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Forensic workstations — dedicated systems with forensic software suites (EnCase, FTK, Autopsy)",
+        "Write blockers — hardware or software devices that prevent any writes to the evidence media during examination",
+        "Forensic imaging — bit-for-bit copy; tools include EnCase, FTK Imager, dd (Linux)",
+        "Network forensics — capture and analysis of network traffic; tools include Wireshark, tcpdump, NetFlow",
+        "Memory forensics — analysis of RAM dumps; tools include Volatility Framework",
+        "Mobile device forensics — specialized tools for extracting data from smartphones and tablets",
+        "Cloud forensics — unique challenges: data spread across jurisdictions, shared infrastructure, limited physical access; refer to NIST IR 8006"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Digital forensics follows a structured methodology: identification → preservation → collection → examination → analysis → presentation → decision. Each phase has specific requirements and best practices. Cloud forensics presents unique challenges that traditional forensics doesn't face. NIST IR 8006 specifically addresses these challenges, with a focus on identifying common challenges and offering solutions to adapt existing DFIR tools, techniques, and practices to the cloud. Key challenges include: data may be stored across multiple jurisdictions, shared infrastructure means evidence may be commingled with other tenants' data, and SLAs may limit the organization's ability to perform forensic analysis. After connecting a device to a forensic workstation, the analyst should immediately calculate a cryptographic hash of the device contents and then use forensic tools to create a forensic image — a bitwise copy of the data stored on the device. The analyst should then compare the hash of the image to the hash of the original to verify integrity."
+    },
+    {
+      "kind": "heading",
+      "text": "Artifacts"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Data artifacts — files, documents, databases, log entries, email messages",
+        "Computer artifacts — system files, registry entries, temporary files, deleted files (recoverable from unallocated space), swap/page files",
+        "Network artifacts — packet captures, flow data, DNS logs, firewall logs, proxy logs",
+        "Mobile device artifacts — call logs, SMS/MMS, GPS data, app data, photos with metadata (EXIF)",
+        "Forensic artifacts should be documented and their relevance to the investigation explained for all stakeholders"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Artifacts are the pieces of evidence discovered during forensic examination. They can be found in many locations within a system. Log files are created as part of normal system operations and can provide evidence useful to an investigator. Deleted files may still be recoverable from unallocated disk space until they are overwritten. Browser history, temporary internet files, and cached data can reveal user activities. System registry (on Windows) contains configuration data that can show installed software, USB device history, and user activity. The most relevant evidence should be documented for the sake of use by all relevant stakeholders, including: prosecution/defense, judge/jury, regulators, investors, and insurers."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Administrative: internal investigation for policy violations; uses preponderance of evidence standard (>50% likelihood)",
+    "Criminal: law enforcement involvement; requires proof beyond a reasonable doubt (highest burden of proof)",
+    "Civil: disputes between parties; uses preponderance of evidence standard",
+    "Regulatory: government agency investigation for compliance violations (e.g., HIPAA, PCI DSS, GDPR)",
+    "Industry standards: investigations into violation of industry standards (e.g., PCI DSS); not legal proceedings but can result in fines or loss of certification",
+    "Live evidence: stored in RAM, cache, CPU; lost if power is disrupted — must be captured first",
+    "Forensic image: bitwise copy (bit-for-bit) of the original media; analysis is performed on the copy, never the original",
+    "Locard's Exchange Principle: every contact leaves a trace; investigators must minimize contamination"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Administrative\" is described as:",
+      "choices": {
+        "A": "internal investigation for policy violations; uses preponderance of evidence standard (>50% likelihood)",
+        "B": "bitwise copy (bit-for-bit) of the original media; analysis is performed on the copy, never the original",
+        "C": "law enforcement involvement; requires proof beyond a reasonable doubt (highest burden of proof)",
+        "D": "hardware or software devices that prevent any writes to the evidence media during examination"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Administrative — internal investigation for policy violations; uses preponderance of evidence standard (>50% likelihood)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Criminal\" is described as:",
+      "choices": {
+        "A": "hardware or software devices that prevent any writes to the evidence media during examination",
+        "B": "internal investigation for policy violations; uses preponderance of evidence standard (>50% likelihood)",
+        "C": "law enforcement involvement; requires proof beyond a reasonable doubt (highest burden of proof)",
+        "D": "bitwise copy (bit-for-bit) of the original media; analysis is performed on the copy, never the original"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Criminal — law enforcement involvement; requires proof beyond a reasonable doubt (highest burden of proof)"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Civil\" is described as:",
+      "choices": {
+        "A": "call logs, SMS/MMS, GPS data, app data, photos with metadata (EXIF)",
+        "B": "disputes between parties; uses preponderance of evidence standard",
+        "C": "packet captures, flow data, DNS logs, firewall logs, proxy logs",
+        "D": "specialized tools for extracting data from smartphones and tablets"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Civil — disputes between parties; uses preponderance of evidence standard"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Regulatory\" is described as:",
+      "choices": {
+        "A": "capture and analysis of network traffic; tools include Wireshark, tcpdump, NetFlow",
+        "B": "government agency investigation for compliance violations (e.g., HIPAA, PCI DSS, GDPR)",
+        "C": "hardware or software devices that prevent any writes to the evidence media during examination",
+        "D": "stored in RAM, cache, CPU; lost if power is disrupted — must be captured first"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Regulatory — government agency investigation for compliance violations (e.g., HIPAA, PCI DSS, GDPR)"
+    }
+  ]
+}

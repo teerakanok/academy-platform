@@ -1,0 +1,823 @@
+{
+  "id": "cissp",
+  "slug": "cissp",
+  "version": "0.1.0",
+  "publicAvailability": "internal",
+  "defaultLocale": "en",
+  "availableLocales": [
+    "en",
+    "th"
+  ],
+  "level": "advanced",
+  "estimatedMinutes": 507,
+  "coverMotif": "shield",
+  "skills": [
+    {
+      "id": "d1",
+      "maxScore": 100
+    },
+    {
+      "id": "d2",
+      "maxScore": 100
+    },
+    {
+      "id": "d3",
+      "maxScore": 100
+    },
+    {
+      "id": "d4",
+      "maxScore": 100
+    },
+    {
+      "id": "d5",
+      "maxScore": 100
+    },
+    {
+      "id": "d6",
+      "maxScore": 100
+    },
+    {
+      "id": "d7",
+      "maxScore": 100
+    },
+    {
+      "id": "d8",
+      "maxScore": 100
+    }
+  ],
+  "globalSkillWeights": {
+    "foundations": 0.3,
+    "governance-risk": 0.4,
+    "security-ops": 0.3
+  },
+  "nodes": [
+    {
+      "id": "d1-professional-ethics",
+      "kind": "lesson",
+      "prerequisites": [],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d1": 4
+      }
+    },
+    {
+      "id": "d1-security-concepts",
+      "kind": "lesson",
+      "prerequisites": [
+        "d1-professional-ethics"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "d1": 4
+      }
+    },
+    {
+      "id": "d1-security-governance-principles",
+      "kind": "lesson",
+      "prerequisites": [
+        "d1-security-concepts"
+      ],
+      "estimatedMinutes": 10,
+      "skillWeights": {
+        "d1": 4
+      }
+    },
+    {
+      "id": "d1-legal-regulatory-and-compliance",
+      "kind": "lesson",
+      "prerequisites": [
+        "d1-security-governance-principles"
+      ],
+      "estimatedMinutes": 9,
+      "skillWeights": {
+        "d1": 4
+      }
+    },
+    {
+      "id": "d1-personnel-security",
+      "kind": "lesson",
+      "prerequisites": [
+        "d1-legal-regulatory-and-compliance"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d1": 4
+      }
+    },
+    {
+      "id": "d1-security-awareness-education-and-training",
+      "kind": "lesson",
+      "prerequisites": [
+        "d1-personnel-security"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d1": 4
+      }
+    },
+    {
+      "id": "d1-risk-management",
+      "kind": "lesson",
+      "prerequisites": [
+        "d1-security-awareness-education-and-training"
+      ],
+      "estimatedMinutes": 14,
+      "skillWeights": {
+        "d1": 4
+      }
+    },
+    {
+      "id": "d1-business-continuity-planning-bcp",
+      "kind": "lesson",
+      "prerequisites": [
+        "d1-risk-management"
+      ],
+      "estimatedMinutes": 8,
+      "skillWeights": {
+        "d1": 4
+      }
+    },
+    {
+      "id": "d1-supply-chain-risk-management-scrm",
+      "kind": "lesson",
+      "prerequisites": [
+        "d1-business-continuity-planning-bcp"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d1": 4
+      }
+    },
+    {
+      "id": "d1-investigation-types-and-evidence-handling",
+      "kind": "capstone",
+      "prerequisites": [
+        "d1-supply-chain-risk-management-scrm"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "d1": 4
+      }
+    },
+    {
+      "id": "d2-data-discovery",
+      "kind": "lesson",
+      "prerequisites": [
+        "d1-investigation-types-and-evidence-handling"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d2": 4
+      }
+    },
+    {
+      "id": "d2-information-and-asset-classification",
+      "kind": "lesson",
+      "prerequisites": [
+        "d2-data-discovery"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d2": 4
+      }
+    },
+    {
+      "id": "d2-data-roles-and-responsibilities",
+      "kind": "lesson",
+      "prerequisites": [
+        "d2-information-and-asset-classification"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d2": 4
+      }
+    },
+    {
+      "id": "d2-data-lifecycle-management",
+      "kind": "lesson",
+      "prerequisites": [
+        "d2-data-roles-and-responsibilities"
+      ],
+      "estimatedMinutes": 8,
+      "skillWeights": {
+        "d2": 4
+      }
+    },
+    {
+      "id": "d2-asset-handling-requirements",
+      "kind": "lesson",
+      "prerequisites": [
+        "d2-data-lifecycle-management"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d2": 4
+      }
+    },
+    {
+      "id": "d2-data-security-controls",
+      "kind": "lesson",
+      "prerequisites": [
+        "d2-asset-handling-requirements"
+      ],
+      "estimatedMinutes": 8,
+      "skillWeights": {
+        "d2": 4
+      }
+    },
+    {
+      "id": "d2-data-destruction-and-sanitization",
+      "kind": "lesson",
+      "prerequisites": [
+        "d2-data-security-controls"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d2": 4
+      }
+    },
+    {
+      "id": "d2-privacy-protection",
+      "kind": "capstone",
+      "prerequisites": [
+        "d2-data-destruction-and-sanitization"
+      ],
+      "estimatedMinutes": 9,
+      "skillWeights": {
+        "d2": 4
+      }
+    },
+    {
+      "id": "d3-secure-design-principles",
+      "kind": "lesson",
+      "prerequisites": [
+        "d2-privacy-protection"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "d3": 4
+      }
+    },
+    {
+      "id": "d3-security-models",
+      "kind": "lesson",
+      "prerequisites": [
+        "d3-secure-design-principles"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "d3": 4
+      }
+    },
+    {
+      "id": "d3-security-evaluation-models",
+      "kind": "lesson",
+      "prerequisites": [
+        "d3-security-models"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d3": 4
+      }
+    },
+    {
+      "id": "d3-system-architecture-concepts",
+      "kind": "lesson",
+      "prerequisites": [
+        "d3-security-evaluation-models"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d3": 4
+      }
+    },
+    {
+      "id": "d3-cryptography-fundamentals",
+      "kind": "lesson",
+      "prerequisites": [
+        "d3-system-architecture-concepts"
+      ],
+      "estimatedMinutes": 9,
+      "skillWeights": {
+        "d3": 4
+      }
+    },
+    {
+      "id": "d3-physical-security",
+      "kind": "capstone",
+      "prerequisites": [
+        "d3-cryptography-fundamentals"
+      ],
+      "estimatedMinutes": 10,
+      "skillWeights": {
+        "d3": 4
+      }
+    },
+    {
+      "id": "d4-network-architecture-and-models",
+      "kind": "lesson",
+      "prerequisites": [
+        "d3-physical-security"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d4": 4
+      }
+    },
+    {
+      "id": "d4-network-components-and-devices",
+      "kind": "lesson",
+      "prerequisites": [
+        "d4-network-architecture-and-models"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d4": 4
+      }
+    },
+    {
+      "id": "d4-network-protocols-and-services",
+      "kind": "lesson",
+      "prerequisites": [
+        "d4-network-components-and-devices"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d4": 4
+      }
+    },
+    {
+      "id": "d4-secure-network-design",
+      "kind": "lesson",
+      "prerequisites": [
+        "d4-network-protocols-and-services"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d4": 4
+      }
+    },
+    {
+      "id": "d4-secure-communication-channels",
+      "kind": "lesson",
+      "prerequisites": [
+        "d4-secure-network-design"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d4": 4
+      }
+    },
+    {
+      "id": "d4-wireless-network-security",
+      "kind": "lesson",
+      "prerequisites": [
+        "d4-secure-communication-channels"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d4": 4
+      }
+    },
+    {
+      "id": "d4-network-attacks",
+      "kind": "capstone",
+      "prerequisites": [
+        "d4-wireless-network-security"
+      ],
+      "estimatedMinutes": 8,
+      "skillWeights": {
+        "d4": 4
+      }
+    },
+    {
+      "id": "d5-the-iaaa-model-foundation-of-iam",
+      "kind": "lesson",
+      "prerequisites": [
+        "d4-network-attacks"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d5": 4
+      }
+    },
+    {
+      "id": "d5-identity-management-fundamentals",
+      "kind": "lesson",
+      "prerequisites": [
+        "d5-the-iaaa-model-foundation-of-iam"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d5": 4
+      }
+    },
+    {
+      "id": "d5-authentication-methods",
+      "kind": "lesson",
+      "prerequisites": [
+        "d5-identity-management-fundamentals"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "d5": 4
+      }
+    },
+    {
+      "id": "d5-single-sign-on-and-federation",
+      "kind": "lesson",
+      "prerequisites": [
+        "d5-authentication-methods"
+      ],
+      "estimatedMinutes": 8,
+      "skillWeights": {
+        "d5": 4
+      }
+    },
+    {
+      "id": "d5-access-control-models",
+      "kind": "lesson",
+      "prerequisites": [
+        "d5-single-sign-on-and-federation"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d5": 4
+      }
+    },
+    {
+      "id": "d5-access-control-administration",
+      "kind": "lesson",
+      "prerequisites": [
+        "d5-access-control-models"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d5": 4
+      }
+    },
+    {
+      "id": "d5-access-control-attacks",
+      "kind": "capstone",
+      "prerequisites": [
+        "d5-access-control-administration"
+      ],
+      "estimatedMinutes": 8,
+      "skillWeights": {
+        "d5": 4
+      }
+    },
+    {
+      "id": "d6-assessment-and-testing-strategies",
+      "kind": "lesson",
+      "prerequisites": [
+        "d5-access-control-attacks"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d6": 4
+      }
+    },
+    {
+      "id": "d6-vulnerability-assessment",
+      "kind": "lesson",
+      "prerequisites": [
+        "d6-assessment-and-testing-strategies"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d6": 4
+      }
+    },
+    {
+      "id": "d6-penetration-testing",
+      "kind": "lesson",
+      "prerequisites": [
+        "d6-vulnerability-assessment"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d6": 4
+      }
+    },
+    {
+      "id": "d6-security-audits",
+      "kind": "lesson",
+      "prerequisites": [
+        "d6-penetration-testing"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "d6": 4
+      }
+    },
+    {
+      "id": "d6-log-management-and-monitoring",
+      "kind": "lesson",
+      "prerequisites": [
+        "d6-security-audits"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d6": 4
+      }
+    },
+    {
+      "id": "d6-security-metrics-and-reporting",
+      "kind": "lesson",
+      "prerequisites": [
+        "d6-log-management-and-monitoring"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d6": 4
+      }
+    },
+    {
+      "id": "d6-software-testing",
+      "kind": "lesson",
+      "prerequisites": [
+        "d6-security-metrics-and-reporting"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d6": 4
+      }
+    },
+    {
+      "id": "d6-bc-dr-testing-hierarchy",
+      "kind": "lesson",
+      "prerequisites": [
+        "d6-software-testing"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d6": 4
+      }
+    },
+    {
+      "id": "d6-vulnerability-assessment-vs-penetration-testing-manager",
+      "kind": "lesson",
+      "prerequisites": [
+        "d6-bc-dr-testing-hierarchy"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d6": 4
+      }
+    },
+    {
+      "id": "d6-log-review-as-a-security-assessment-technique",
+      "kind": "capstone",
+      "prerequisites": [
+        "d6-vulnerability-assessment-vs-penetration-testing-manager"
+      ],
+      "estimatedMinutes": 8,
+      "skillWeights": {
+        "d6": 4
+      }
+    },
+    {
+      "id": "d7-understand-and-comply-with-investigations",
+      "kind": "lesson",
+      "prerequisites": [
+        "d6-log-review-as-a-security-assessment-technique"
+      ],
+      "estimatedMinutes": 13,
+      "skillWeights": {
+        "d7": 4
+      }
+    },
+    {
+      "id": "d7-conduct-logging-and-monitoring-activities",
+      "kind": "lesson",
+      "prerequisites": [
+        "d7-understand-and-comply-with-investigations"
+      ],
+      "estimatedMinutes": 11,
+      "skillWeights": {
+        "d7": 4
+      }
+    },
+    {
+      "id": "d7-perform-configuration-management",
+      "kind": "lesson",
+      "prerequisites": [
+        "d7-conduct-logging-and-monitoring-activities"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d7": 4
+      }
+    },
+    {
+      "id": "d7-apply-foundational-security-operations-concepts",
+      "kind": "lesson",
+      "prerequisites": [
+        "d7-perform-configuration-management"
+      ],
+      "estimatedMinutes": 8,
+      "skillWeights": {
+        "d7": 4
+      }
+    },
+    {
+      "id": "d7-due-care-due-diligence-and-the-prudent-man-rule",
+      "kind": "lesson",
+      "prerequisites": [
+        "d7-apply-foundational-security-operations-concepts"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d7": 4
+      }
+    },
+    {
+      "id": "d7-apply-resource-protection",
+      "kind": "lesson",
+      "prerequisites": [
+        "d7-due-care-due-diligence-and-the-prudent-man-rule"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d7": 4
+      }
+    },
+    {
+      "id": "d7-conduct-incident-management",
+      "kind": "lesson",
+      "prerequisites": [
+        "d7-apply-resource-protection"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d7": 4
+      }
+    },
+    {
+      "id": "d7-operate-and-maintain-detective-and-preventive-measures",
+      "kind": "lesson",
+      "prerequisites": [
+        "d7-conduct-incident-management"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "d7": 4
+      }
+    },
+    {
+      "id": "d7-implement-and-support-patch-and-vulnerability-managemen",
+      "kind": "lesson",
+      "prerequisites": [
+        "d7-operate-and-maintain-detective-and-preventive-measures"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d7": 4
+      }
+    },
+    {
+      "id": "d7-understand-and-participate-in-change-management-process",
+      "kind": "lesson",
+      "prerequisites": [
+        "d7-implement-and-support-patch-and-vulnerability-managemen"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d7": 4
+      }
+    },
+    {
+      "id": "d7-implement-recovery-strategies",
+      "kind": "lesson",
+      "prerequisites": [
+        "d7-understand-and-participate-in-change-management-process"
+      ],
+      "estimatedMinutes": 12,
+      "skillWeights": {
+        "d7": 4
+      }
+    },
+    {
+      "id": "d7-implement-disaster-recovery-processes",
+      "kind": "lesson",
+      "prerequisites": [
+        "d7-implement-recovery-strategies"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "d7": 4
+      }
+    },
+    {
+      "id": "d7-manage-physical-security",
+      "kind": "capstone",
+      "prerequisites": [
+        "d7-implement-disaster-recovery-processes"
+      ],
+      "estimatedMinutes": 13,
+      "skillWeights": {
+        "d7": 4
+      }
+    },
+    {
+      "id": "d8-understand-and-integrate-security-in-the-sdlc",
+      "kind": "lesson",
+      "prerequisites": [
+        "d7-manage-physical-security"
+      ],
+      "estimatedMinutes": 11,
+      "skillWeights": {
+        "d8": 4
+      }
+    },
+    {
+      "id": "d8-identify-and-apply-security-controls-in-software-develo",
+      "kind": "lesson",
+      "prerequisites": [
+        "d8-understand-and-integrate-security-in-the-sdlc"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d8": 4
+      }
+    },
+    {
+      "id": "d8-assess-the-effectiveness-of-software-security",
+      "kind": "lesson",
+      "prerequisites": [
+        "d8-identify-and-apply-security-controls-in-software-develo"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d8": 4
+      }
+    },
+    {
+      "id": "d8-assess-security-impact-of-acquired-software",
+      "kind": "lesson",
+      "prerequisites": [
+        "d8-assess-the-effectiveness-of-software-security"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d8": 4
+      }
+    },
+    {
+      "id": "d8-define-and-apply-secure-coding-guidelines-and-standards",
+      "kind": "lesson",
+      "prerequisites": [
+        "d8-assess-security-impact-of-acquired-software"
+      ],
+      "estimatedMinutes": 8,
+      "skillWeights": {
+        "d8": 4
+      }
+    },
+    {
+      "id": "d8-software-vulnerabilities-and-attacks",
+      "kind": "lesson",
+      "prerequisites": [
+        "d8-define-and-apply-secure-coding-guidelines-and-standards"
+      ],
+      "estimatedMinutes": 10,
+      "skillWeights": {
+        "d8": 4
+      }
+    },
+    {
+      "id": "d8-malicious-code-and-malware",
+      "kind": "lesson",
+      "prerequisites": [
+        "d8-software-vulnerabilities-and-attacks"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "d8": 4
+      }
+    },
+    {
+      "id": "d8-database-security",
+      "kind": "lesson",
+      "prerequisites": [
+        "d8-malicious-code-and-malware"
+      ],
+      "estimatedMinutes": 6,
+      "skillWeights": {
+        "d8": 4
+      }
+    },
+    {
+      "id": "d8-ai-and-machine-learning-security",
+      "kind": "capstone",
+      "prerequisites": [
+        "d8-database-security"
+      ],
+      "estimatedMinutes": 7,
+      "skillWeights": {
+        "d8": 4
+      }
+    }
+  ]
+}

@@ -1,0 +1,436 @@
+{
+  "nodeId": "d7-implement-recovery-strategies",
+  "locale": "th",
+  "title": "Implement Recovery Strategies",
+  "objective": "Study-guide review — CISSP — Domain 7: Security Operations: Implement Recovery Strategies.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Backup Strategies"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Type",
+        "What It Backs Up",
+        "Speed",
+        "Restore Time",
+        "Archive Bit"
+      ],
+      "rows": [
+        [
+          "Full",
+          "All selected data",
+          "Slowest",
+          "Fastest (single restore)",
+          "Clears all"
+        ],
+        [
+          "Incremental",
+          "Only data changed since last backup of any type",
+          "Fastest",
+          "Slowest (full + all incrementals)",
+          "Clears changed"
+        ],
+        [
+          "Differential",
+          "All data changed since last full backup",
+          "Medium",
+          "Medium (full + last differential)",
+          "Does NOT clear"
+        ]
+      ]
+    },
+    {
+      "kind": "list",
+      "items": [
+        "3-2-1 Rule: maintain 3 copies of data, on 2 different media types, with 1 copy offsite",
+        "Store offsite backups far enough from the primary site to avoid the same regional disaster",
+        "Test backup restores regularly — a backup that cannot be restored is worthless",
+        "Backup tape protection — tapes should be encrypted and stored in physically secure locations",
+        "Use CRC (Cyclic Redundancy Check) to validate backup integrity"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Understanding the differences between backup types is critical for the exam. The key differentiator is the archive bit behavior:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Full backup: Backs up everything and clears the archive bit on all files. This is the baseline.",
+        "Incremental backup: Backs up only files with the archive bit set (changed since last backup of any type) and clears the archive bit. Fastest backup, but restoration requires the last full backup plus ALL incremental backups in order.",
+        "Differential backup: Backs up all files changed since the last full backup (archive bit set) but does NOT clear the archive bit. Faster restore than incremental (only need last full + last differential), but each differential grows in size."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Common rotation schemes:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Grandfather-Father-Son (GFS): daily (son), weekly (father), monthly (grandfather) — provides multiple recovery points",
+        "Tower of Hanoi: more complex rotation that provides more recovery points with fewer tapes"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The decision of how far offsite to store backups is important. If stored too close to the primary site (e.g., in a building next door), a regional disaster could destroy both. Best practice is to store offsite backups in a geographically separate location. ⚠️ Exam Trap: Incremental = changed since LAST BACKUP (any type), clears archive bit. Differential = changed since LAST FULL backup, does NOT clear archive bit. The restore tradeoff: incremental is faster to backup but slower to restore; differential is slower to backup but faster to restore."
+    },
+    {
+      "kind": "heading",
+      "text": "Recovery Site Types"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Site Type",
+        "Infrastructure",
+        "Data",
+        "Recovery Time",
+        "Cost"
+      ],
+      "rows": [
+        [
+          "Cold site",
+          "Empty facility with power, HVAC, connectivity",
+          "No equipment or data",
+          "Weeks",
+          "$ (lowest)"
+        ],
+        [
+          "Warm site",
+          "Facility with some equipment pre-installed",
+          "Data may be partially current",
+          "Days",
+          "$$"
+        ],
+        [
+          "Hot site",
+          "Fully equipped mirror of production",
+          "Near-real-time data replication",
+          "Hours",
+          "$$$"
+        ],
+        [
+          "Mobile site",
+          "Portable facility (trailer/container)",
+          "Equipment brought on-site",
+          "Variable",
+          "$$$"
+        ],
+        [
+          "Redundant/mirrored site",
+          "Exact duplicate running simultaneously",
+          "Real-time data sync",
+          "Minutes",
+          "$$$$ (highest)"
+        ]
+      ]
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Cloud-based recovery — using cloud infrastructure for disaster recovery; offers flexibility and scalability",
+        "Reciprocal agreement — two organizations agree to provide DR hosting for each other; low cost but limited assurance",
+        "Hot site cost is usually as much as the cost of the primary site",
+        "Site selection depends on RPO/RTO requirements balanced against budget"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Recovery site selection is driven by the organization's recovery objectives (RPO and RTO) and budget constraints. As noted in Destination CISSP, a hot site provides near-immediate recovery but \"this benefit comes at very high cost, and it is usually as much as the cost of the primary site.\" Key considerations for each site type:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Cold site: Cheapest but slowest recovery (weeks). Suitable for non-critical systems with high MTD. Requires shipping and installing equipment, restoring data from backups.",
+        "Warm site: Balance of cost and recovery time. Some equipment is pre-installed, and data may be partially replicated. Requires final configuration and data restoration.",
+        "Hot site: Near-immediate recovery with fully replicated data. Suitable for critical systems with very low RTO/RPO. Most expensive, as it essentially doubles infrastructure costs.",
+        "Redundant/mirrored site: Active-active configuration where both sites handle production traffic. Provides the fastest failover (minutes) but at the highest cost."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Reciprocal agreements between organizations are the cheapest option but have significant limitations: the hosting organization may not have sufficient capacity, technology differences can complicate recovery, and there's no guarantee the hosting site will be available when needed. Recovery Site Decision Matrix (MTD/Budget-Driven):"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "MTD Tolerance",
+        "Budget Level",
+        "Recommended Site",
+        "Rationale"
+      ],
+      "rows": [
+        [
+          "Minutes",
+          "High ($$$$$)",
+          "Redundant/mirrored",
+          "Real-time sync, instant failover"
+        ],
+        [
+          "Hours",
+          "High ($$$$)",
+          "Hot site",
+          "Fully equipped, near-real-time data"
+        ],
+        [
+          "12-24 hours",
+          "Medium ($$$)",
+          "Warm site",
+          "Some equipment, partial data"
+        ],
+        [
+          "Days-Weeks",
+          "Low ($$)",
+          "Cold site",
+          "Shell facility, lowest cost"
+        ],
+        [
+          "Variable",
+          "Low ($)",
+          "Reciprocal agreement",
+          "Mutual agreement, limited assurance"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Decision logic: Start with MTD from the BIA → determine RTO → match to site type that meets RTO within budget. \"The more quickly a given process needs to be recovered, the more expensive it is going to be\" (Destination CISSP). ⚠️ Exam Trap: The exam expects you to match recovery objectives to site types. If MTD = 4 hours, a cold site (weeks) is NOT acceptable. Think like a manager: balance recovery needs against cost, and justify the decision with BIA data."
+    },
+    {
+      "kind": "heading",
+      "text": "System Resilience and Fault Tolerance"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Fault tolerance — the ability of a system to continue operating when a component fails",
+        "High availability (HA) — designing systems to maximize uptime through redundancy and automatic failover",
+        "Spare types:"
+      ]
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Type",
+        "Description",
+        "Recovery"
+      ],
+      "rows": [
+        [
+          "Cold spare",
+          "Spare component in storage; must be installed and configured",
+          "Hours/days"
+        ],
+        [
+          "Warm spare",
+          "Pre-configured and ready; needs minimal setup",
+          "Minutes/hours"
+        ],
+        [
+          "Hot spare",
+          "Running and ready to take over immediately",
+          "Seconds/minutes"
+        ]
+      ]
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Clustering — multiple servers working together; if one fails, others take over the workload",
+        "Load balancing — distributing traffic across multiple servers for performance and redundancy",
+        "Redundant power — UPS (Uninterruptible Power Supply), generators, dual power feeds",
+        "Uptime Institute Tier levels (I through IV) define data center availability guarantees"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Fault-tolerant systems use redundancy to eliminate single points of failure. The Uptime Institute defines four tiers of data center availability:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Tier I: Basic — single path for power and cooling, no redundancy (~99.671% uptime)",
+        "Tier II: Redundant Components — adds redundant components to Tier I (~99.741%)",
+        "Tier III: Concurrently Maintainable — multiple paths, can maintain without downtime (~99.982%)",
+        "Tier IV: Fault Tolerant — full redundancy, survives any single fault (~99.995%)"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "\"Hot spares are expensive, as are the systems within which they're used, but they also provide significant benefits to an organization\" (Destination CISSP). The choice between cold, warm, and hot spares depends on the criticality of the system and acceptable recovery time. Your ability to tolerate faults is related to your RPO. If hours or days of data can be lost without serious consequence, your fault tolerance requirements are lower. If no data loss is acceptable, you need real-time replication and hot spares."
+    },
+    {
+      "kind": "heading",
+      "text": "RAID"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "RAID (Redundant Array of Independent Disks) — combines multiple physical disks for performance and/or redundancy"
+      ]
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "RAID Level",
+        "Description",
+        "Min Disks",
+        "Fault Tolerance",
+        "Performance"
+      ],
+      "rows": [
+        [
+          "RAID 0",
+          "Striping (no redundancy)",
+          "2",
+          "None — if one disk fails, all data lost",
+          "Best read/write"
+        ],
+        [
+          "RAID 1",
+          "Mirroring",
+          "2",
+          "1 disk can fail",
+          "Good read, same write"
+        ],
+        [
+          "RAID 5",
+          "Striping with distributed parity",
+          "3",
+          "1 disk can fail",
+          "Good read, slower write"
+        ],
+        [
+          "RAID 6",
+          "Striping with double parity",
+          "4",
+          "2 disks can fail",
+          "Good read, slowest write"
+        ],
+        [
+          "RAID 10 (1+0)",
+          "Mirrored stripes (combines RAID 1 + RAID 0)",
+          "4",
+          "1 disk per mirror set",
+          "Best overall"
+        ]
+      ]
+    },
+    {
+      "kind": "list",
+      "items": [
+        "RAID is not a backup — it provides availability, not disaster recovery",
+        "RAID protects against disk failure only, not data corruption, deletion, or ransomware"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "RAID provides disk-level redundancy to prevent a single disk failure from causing data loss or downtime. However, it is critical to understand that RAID is NOT a replacement for backups. Key exam points:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "RAID 0: Performance only — striping across disks. If ANY disk fails, ALL data is lost. Never use for important data without other protections.",
+        "RAID 1: Simple mirroring — data is written identically to two disks. If one fails, the other has a complete copy. Uses 50% of total disk capacity for redundancy.",
+        "RAID 5: Distributes parity information across all disks. Can survive one disk failure — the parity data is used to reconstruct the lost data. Requires minimum 3 disks, usable capacity = (N-1) disks.",
+        "RAID 6: Double parity — can survive TWO simultaneous disk failures. Minimum 4 disks, usable capacity = (N-2) disks. More write overhead than RAID 5.",
+        "RAID 10: Combines mirroring and striping — first mirrors the data (RAID 1), then stripes across the mirror sets (RAID 0). Provides both performance and redundancy."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: RAID 0 provides NO fault tolerance — it is striping only. RAID 5 can survive ONE disk failure. RAID 6 can survive TWO disk failures. RAID is for availability, NOT backup."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Full: All selected data",
+    "Incremental: Only data changed since last backup of any type",
+    "Differential: All data changed since last full backup",
+    "Backup tape protection: tapes should be encrypted and stored in physically secure locations",
+    "Cold site: Empty facility with power, HVAC, connectivity",
+    "Warm site: Facility with some equipment pre-installed",
+    "Hot site: Fully equipped mirror of production",
+    "Mobile site: Portable facility (trailer/container)"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Full\" is described as:",
+      "choices": {
+        "A": "Striping (no redundancy)",
+        "B": "All selected data",
+        "C": "Striping with double parity",
+        "D": "Striping with distributed parity"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Full: All selected data"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Incremental\" is described as:",
+      "choices": {
+        "A": "Mirrored stripes (combines RAID 1 + RAID 0)",
+        "B": "Only data changed since last backup of any type",
+        "C": "Pre-configured and ready; needs minimal setup",
+        "D": "Empty facility with power, HVAC, connectivity"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Incremental: Only data changed since last backup of any type"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Differential\" is described as:",
+      "choices": {
+        "A": "Exact duplicate running simultaneously",
+        "B": "Portable facility (trailer/container)",
+        "C": "Facility with some equipment pre-installed",
+        "D": "All data changed since last full backup"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Differential: All data changed since last full backup"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Backup tape protection\" is described as:",
+      "choices": {
+        "A": "the ability of a system to continue operating when a component fails",
+        "B": "tapes should be encrypted and stored in physically secure locations",
+        "C": "UPS (Uninterruptible Power Supply), generators, dual power feeds",
+        "D": "Spare component in storage; must be installed and configured"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Backup tape protection — tapes should be encrypted and stored in physically secure locations"
+    }
+  ]
+}

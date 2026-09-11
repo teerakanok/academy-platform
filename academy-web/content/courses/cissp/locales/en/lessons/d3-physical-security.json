@@ -1,0 +1,331 @@
+{
+  "nodeId": "d3-physical-security",
+  "locale": "en",
+  "title": "Physical Security",
+  "objective": "Study-guide review — CISSP — Domain 3: Security Architecture and Engineering: Physical Security.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Site and Facility Design"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Crime Prevention Through Environmental Design (CPTED) — Design spaces to deter crime",
+        "Natural surveillance — Clear sight lines, lighting",
+        "Natural access control — Landscaping, pathways direct traffic flow",
+        "Territorial reinforcement — Fences, signs show ownership",
+        "Facility should have controlled access points minimized to necessary entrances"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Environmental Controls"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Temperature — Data centers typically 64-75°F (18-24°C)",
+        "Humidity — 40-60% relative humidity ideal",
+        "Too low humidity → static electricity damage",
+        "Too high humidity → condensation and corrosion",
+        "Positive pressurization — Clean air pushed in; contaminants kept out"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From the Official CBK: Environmental requirements include clean air with contaminants filtered out and positive pressurization to prevent contaminated air from entering. Electromagnetic Interference (EMI): From Shon Harris: Effects of magnetic fields on electronics:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Field Strength (gauss)",
+        "Effect"
+      ],
+      "rows": [
+        [
+          "10",
+          "Possible damage to sensitive circuits"
+        ],
+        [
+          "1,000",
+          "Scrambling of monitor displays"
+        ],
+        [
+          "1,500",
+          "Destruction of data on hard drives"
+        ],
+        [
+          "2,000",
+          "Abrupt system shutdown"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "TEMPEST — U.S. government program to prevent electromagnetic emanation-based eavesdropping. From Destination CISSP: \"Different layers of physical security exist that prevent someone from getting near a device, eliminating the ability to pick up the emanations.\""
+    },
+    {
+      "kind": "heading",
+      "text": "Fire Detection and Suppression"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Detection Types:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Smoke detectors — Ionization (fast-burning fires) or photoelectric (smoldering fires)",
+        "Heat detectors — Fixed temperature or rate-of-rise",
+        "Flame detectors — Detect infrared energy from flames"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Suppression Types:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Water — Wet pipe, dry pipe, deluge, pre-action",
+        "Gas-based — FM-200, Inergen, Novec 1230 (safe for equipment and people)",
+        "Halon — Effective but ozone-depleting (banned for new installations)",
+        "CO2 — Effective but dangerous to people (oxygen displacement)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Water System",
+        "Description",
+        "Best For"
+      ],
+      "rows": [
+        [
+          "Wet pipe",
+          "Always has water in pipes",
+          "Offices (fastest response)"
+        ],
+        [
+          "Dry pipe",
+          "Water held back by valve; released on activation",
+          "Cold environments"
+        ],
+        [
+          "Pre-action",
+          "Two triggers needed (alarm + heat)",
+          "Data centers (prevents accidental discharge)"
+        ],
+        [
+          "Deluge",
+          "Large volume release",
+          "High-hazard areas"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Shon Harris: \"By law, companies that have halon extinguishers may continue to use them but cannot install new ones.\" Halon replacements include FM-200 and Inergen. From the Official CBK: \"The original clean agents included carbon dioxide (CO2), but CO2 depletes oxygen and can be lethal.\" ⚠️ Exam Trap: For data centers, pre-action systems are preferred because they require two triggers before releasing water, preventing accidental discharge. Gas-based systems (FM-200, Inergen) are even better because they don't damage electronics. ⚠️ Exam Trap: CO2 systems can KILL people. They should never be used in occupied spaces without proper warning and evacuation systems. Life safety always comes first."
+    },
+    {
+      "kind": "heading",
+      "text": "Power Supply Protection"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "UPS (Uninterruptible Power Supply) — Battery backup for short-term outages",
+        "Generator — Long-term backup power (fuel-driven)",
+        "Surge protector — Protects against voltage spikes",
+        "Power conditioner/Line conditioner — Smooths power fluctuations",
+        "Dual power feeds — Redundant power from different substations"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Power Issues:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Issue",
+        "Description",
+        "Protection"
+      ],
+      "rows": [
+        [
+          "Blackout",
+          "Complete power loss",
+          "UPS + Generator"
+        ],
+        [
+          "Brownout",
+          "Sustained low voltage",
+          "Power conditioner"
+        ],
+        [
+          "Surge/Spike",
+          "Short high voltage",
+          "Surge protector"
+        ],
+        [
+          "Sag/Dip",
+          "Short low voltage",
+          "UPS"
+        ],
+        [
+          "Noise",
+          "Interference on power line",
+          "Line conditioner"
+        ],
+        [
+          "Transient",
+          "Short disturbance",
+          "Surge protector"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "UPS provides immediate battery power during outages, bridging the gap until generators start (typically 10-30 seconds startup time)."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Crime Prevention Through Environmental Design (CPTED): Design spaces to deter crime",
+    "Natural surveillance: Clear sight lines, lighting",
+    "Natural access control: Landscaping, pathways direct traffic flow",
+    "Territorial reinforcement: Fences, signs show ownership",
+    "Temperature: Data centers typically 64-75°F (18-24°C)",
+    "Humidity: 40-60% relative humidity ideal",
+    "Positive pressurization: Clean air pushed in; contaminants kept out",
+    "10: Possible damage to sensitive circuits"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "Which security model prevents a subject with a Secret clearance from reading Top Secret data?",
+      "choices": {
+        "A": "Biba Model",
+        "B": "Clark-Wilson Model",
+        "C": "Bell-LaPadula Model",
+        "D": "Brewer-Nash Model"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The Bell-LaPadula Model's Simple Security Property (\"No Read Up\") prevents a subject from reading data classified above their clearance level. A subject with Secret clearance cannot read Top Secret data. Bell-LaPadula focuses on confidentiality protection. Tests: Bell-LaPadula Model, Simple Security Property"
+    },
+    {
+      "id": "q2",
+      "prompt": "An organization wants to ensure that database transactions maintain integrity by forcing all modifications to go through authorized programs. Which security model BEST supports this requirement?",
+      "choices": {
+        "A": "Bell-LaPadula",
+        "B": "Biba",
+        "C": "Clark-Wilson",
+        "D": "Graham-Denning"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Clark-Wilson enforces integrity through well-formed transactions. Users access Constrained Data Items (CDIs) only through Transformation Procedures (TPs) — authorized programs. This is exactly the commercial integrity model where users interact with data only through approved applications. Tests: Clark-Wilson Model, integrity through well-formed transactions"
+    },
+    {
+      "id": "q3",
+      "prompt": "What is the PRIMARY difference between a Type 1 and Type 2 hypervisor?",
+      "choices": {
+        "A": "Type 1 supports more virtual machines",
+        "B": "Type 1 runs directly on hardware; Type 2 runs on top of an OS",
+        "C": "Type 2 is more secure because the OS adds protection",
+        "D": "Type 1 is for desktop use; Type 2 is for servers"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "A Type 1 (bare-metal) hypervisor runs directly on the hardware without a host OS, making it more efficient and more secure (smaller attack surface). A Type 2 (hosted) hypervisor runs on top of a host OS, making it easier to install but less secure and less efficient. Type 1 is used for servers; Type 2 for desktops. Tests: Virtualization, hypervisor types"
+    },
+    {
+      "id": "q4",
+      "prompt": "Which cryptographic attack exploits the mathematical birthday paradox to find collisions?",
+      "choices": {
+        "A": "Brute force attack",
+        "B": "Known plaintext attack",
+        "C": "Birthday attack",
+        "D": "Meet-in-the-middle attack"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The birthday attack exploits hash collisions using the birthday paradox — the probability that two inputs produce the same hash output. With a hash of n bits, approximately 2^(n/2) attempts are needed. This is why hash functions need longer outputs (SHA-256 instead of MD5's 128 bits). Tests: Cryptographic attacks, birthday attack"
+    },
+    {
+      "id": "q5",
+      "prompt": "A company deploys AES-256 encryption for data at rest and TLS 1.3 for data in transit. The CTO asks about protecting data in use. Which technology addresses this?",
+      "choices": {
+        "A": "Full-disk encryption",
+        "B": "VPN tunneling",
+        "C": "Secure enclaves (Intel SGX)",
+        "D": "Digital signatures"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Secure enclaves like Intel SGX protect data while it's being actively processed in memory. Full-disk encryption protects data at rest. VPN and TLS protect data in transit. Digital signatures provide integrity, not data protection. Data in use is the hardest state to protect because data must typically be decrypted for processing. Tests: Data states, data in use protection"
+    },
+    {
+      "id": "q6",
+      "prompt": "Which fire suppression system is MOST appropriate for a data center with staff working inside?",
+      "choices": {
+        "A": "CO2 system",
+        "B": "Wet pipe sprinkler",
+        "C": "FM-200 (clean agent) system",
+        "D": "Deluge system"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "FM-200 (HFC-227ea) is a clean agent that suppresses fire without leaving residue and is safe for occupied spaces (unlike CO2 which depletes oxygen and can be lethal). Wet pipe sprinklers damage equipment. Deluge systems release massive amounts of water. CO2 systems are dangerous to people. Tests: Fire suppression, data center safety"
+    },
+    {
+      "id": "q7",
+      "prompt": "In a symmetric encryption environment with 100 users, how many unique keys are needed for all users to communicate securely with each other?",
+      "choices": {
+        "A": "100",
+        "B": "200",
+        "C": "4,950",
+        "D": "10,000"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Formula: n(n-1)/2 = 100(99)/2 = 4,950 keys. Each pair of users needs a unique shared key. This exponential growth is why symmetric encryption has a key distribution problem, which asymmetric encryption solves (only 2n = 200 keys needed). Tests: Symmetric key management, key calculation formula"
+    },
+    {
+      "id": "q8",
+      "prompt": "Which of the Bell-LaPadula properties prevents a Top Secret user from writing data to a Secret-level file?",
+      "choices": {
+        "A": "Simple Security Property",
+        "B": "Star (*) Property",
+        "C": "Strong Star Property",
+        "D": "Discretionary Security Property"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The Star () Property (\"No Write Down\") prevents a subject from writing data to a lower classification level. A Top Secret user writing to a Secret file would potentially leak Top Secret information down to the Secret level, violating confidentiality. Tests: Bell-LaPadula, Star Property*"
+    }
+  ]
+}

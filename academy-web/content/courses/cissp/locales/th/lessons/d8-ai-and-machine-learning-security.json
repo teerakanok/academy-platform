@@ -1,0 +1,167 @@
+{
+  "nodeId": "d8-ai-and-machine-learning-security",
+  "locale": "th",
+  "title": "AI and Machine Learning Security",
+  "objective": "Study-guide review — CISSP — Domain 8: Software Development Security: AI and Machine Learning Security.",
+  "blocks": [
+    {
+      "kind": "list",
+      "items": [
+        "Machine Learning (ML) — systems that learn from data to improve without being explicitly programmed",
+        "Artificial Intelligence (AI) — broader concept; systems that can make predictions and derive meaningful insights from data",
+        "Expert systems — AI systems that encode human expertise in specific domains using if-then rules; indicate which outcomes are good or bad without the user having to input complex conditions",
+        "Neural networks — systems modeled after biological neural networks; excel at pattern recognition"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Security concerns with AI/ML:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Adversarial attacks — carefully crafted inputs designed to trick ML models into making incorrect predictions",
+        "Data poisoning — manipulating training data to cause the model to learn incorrect patterns",
+        "Model theft/extraction — reverse-engineering or stealing ML models through API queries",
+        "Bias and fairness — models may inherit and amplify biases present in training data",
+        "Privacy — training data may contain sensitive information that could be extracted from the model"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "AI/ML for security:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "ML and AI-based tools can empower systems to use data to learn and improve without being explicitly programmed, make predictions, and derive actionable insights",
+        "Applications: malware detection, anomaly detection, user behavior analytics, threat intelligence"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Machine Learning (ML): systems that learn from data to improve without being explicitly programmed",
+    "Artificial Intelligence (AI): broader concept; systems that can make predictions and derive meaningful insights from data",
+    "Neural networks: systems modeled after biological neural networks; excel at pattern recognition",
+    "Adversarial attacks: carefully crafted inputs designed to trick ML models into making incorrect predictions",
+    "Data poisoning: manipulating training data to cause the model to learn incorrect patterns",
+    "Model theft/extraction: reverse-engineering or stealing ML models through API queries",
+    "Bias and fairness: models may inherit and amplify biases present in training data",
+    "Privacy: training data may contain sensitive information that could be extracted from the model"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "During which SDLC phase should security requirements FIRST be defined?",
+      "choices": {
+        "A": "Design",
+        "B": "Development",
+        "C": "Requirements gathering",
+        "D": "Testing"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Security requirements should be defined during the requirements gathering phase — the same phase where functional requirements are defined. Security should be integrated from the very beginning of the SDLC, not added later during design or testing."
+    },
+    {
+      "id": "q2",
+      "prompt": "What is the PRIMARY defense against SQL injection attacks?",
+      "choices": {
+        "A": "Input validation using denylisting",
+        "B": "Web Application Firewall (WAF)",
+        "C": "Parameterized queries (prepared statements)",
+        "D": "Output encoding"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Parameterized queries (prepared statements) are the primary defense against SQL injection because they completely separate code from data. The database engine treats the parameter as a data value, not executable SQL, regardless of the input. WAFs and input validation are additional layers but not the primary defense."
+    },
+    {
+      "id": "q3",
+      "prompt": "Which type of malware self-replicates across networks WITHOUT requiring user interaction?",
+      "choices": {
+        "A": "Virus",
+        "B": "Trojan",
+        "C": "Worm",
+        "D": "Logic bomb"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "A worm is a standalone malware that self-replicates across networks without requiring user interaction. A virus needs a host program and user action (like opening a file). A Trojan relies on deception but doesn't self-replicate. A logic bomb lies dormant until triggered by a condition."
+    },
+    {
+      "id": "q4",
+      "prompt": "What is the key difference between SAST and DAST?",
+      "choices": {
+        "A": "SAST tests the running application; DAST analyzes source code",
+        "B": "SAST analyzes source code without execution; DAST tests the running application",
+        "C": "SAST is performed by developers; DAST is performed by security teams",
+        "D": "SAST finds more vulnerabilities than DAST"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "SAST (Static Application Security Testing) analyzes source code or bytecode without executing the program — a white-box approach. DAST (Dynamic Application Security Testing) tests the running application from the outside — a black-box approach. They complement each other; SAST is used during development, DAST against deployed applications."
+    },
+    {
+      "id": "q5",
+      "prompt": "An attacker tricks a victim's browser into making requests to a web application where the victim is already authenticated. What type of attack is this?",
+      "choices": {
+        "A": "Cross-Site Scripting (XSS)",
+        "B": "Cross-Site Request Forgery (CSRF)",
+        "C": "Session hijacking",
+        "D": "SQL injection"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Cross-Site Request Forgery (CSRF) exploits the browser's automatic inclusion of cookies/credentials with requests. The attacker tricks the victim's browser into making unintended requests to a site where the victim is authenticated, such as transferring funds. Defenses include CSRF tokens and the SameSite cookie attribute."
+    },
+    {
+      "id": "q6",
+      "prompt": "Which CMMI level represents an organization with standardized, documented processes across the entire organization?",
+      "choices": {
+        "A": "Level 2 — Managed",
+        "B": "Level 3 — Defined",
+        "C": "Level 4 — Quantitatively Managed",
+        "D": "Level 5 — Optimizing"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "CMMI Level 3 (Defined) means processes are standardized and documented across the organization. Level 2 (Managed) has processes at the project level. Level 4 (Quantitatively Managed) adds statistical measurement. Level 5 (Optimizing) focuses on continuous improvement."
+    },
+    {
+      "id": "q7",
+      "prompt": "A database contains salary information. A user can see 9 out of 10 salaries in a department and the department total. They can calculate the unknown salary. What type of attack is this?",
+      "choices": {
+        "A": "Aggregation",
+        "B": "Inference",
+        "C": "SQL injection",
+        "D": "Polyinstantiation"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "This is an inference attack — the user deduces (infers) sensitive information (the 10th salary) from available non-sensitive data (9 salaries and the total) using logic. Aggregation involves combining many non-sensitive pieces into sensitive information. Polyinstantiation is a defense, not an attack."
+    },
+    {
+      "id": "q8",
+      "prompt": "Which software testing technique sends random or malformed data as input to find crashes or vulnerabilities?",
+      "choices": {
+        "A": "Regression testing",
+        "B": "Fuzzing",
+        "C": "Static analysis",
+        "D": "Unit testing"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Fuzzing (fuzz testing) sends random, unexpected, or malformed input to an application to find crashes, exceptions, or security vulnerabilities. Mutation fuzzing randomly modifies valid input, while generational fuzzing creates new data based on understanding the expected input format."
+    }
+  ]
+}

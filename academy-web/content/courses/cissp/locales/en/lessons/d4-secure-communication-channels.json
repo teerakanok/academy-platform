@@ -1,0 +1,234 @@
+{
+  "nodeId": "d4-secure-communication-channels",
+  "locale": "en",
+  "title": "Secure Communication Channels",
+  "objective": "Study-guide review — CISSP — Domain 4: Communication and Network Security: Secure Communication Channels.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "VPN Technologies"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Creates encrypted tunnel over untrusted network (Internet)",
+        "Site-to-site — Connects two networks (offices)",
+        "Remote access — Connects individual user to network",
+        "Full tunnel — All traffic goes through VPN",
+        "Split tunnel — Only corporate traffic goes through VPN (risk: unprotected personal traffic)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "IPsec"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Network layer (Layer 3) security protocol suite",
+        "AH (Authentication Header) — Integrity and authentication only (no encryption)",
+        "ESP (Encapsulating Security Payload) — Encryption + integrity + authentication",
+        "Transport mode — Encrypts payload only; original IP header visible",
+        "Tunnel mode — Encrypts entire original packet; new IP header added"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Component",
+        "Provides",
+        "Encrypts"
+      ],
+      "rows": [
+        [
+          "AH",
+          "Authentication + Integrity",
+          "Nothing (no encryption)"
+        ],
+        [
+          "ESP",
+          "Authentication + Integrity + Encryption",
+          "Payload (transport) or entire packet (tunnel)"
+        ],
+        [
+          "Mode",
+          "Use Case",
+          "What's Encrypted"
+        ],
+        [
+          "Transport",
+          "Host-to-host",
+          "Payload only"
+        ],
+        [
+          "Tunnel",
+          "Site-to-site VPN",
+          "Entire original packet"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Stewart: \"In tunnel mode, IPSec provides encryption protection for both the payload and message header by encapsulating the entire original LAN protocol packet and adding its own temporary IPSec header.\" IKE (Internet Key Exchange) establishes the IPsec security association (SA):"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Phase 1: Establishes secure channel (IKE SA)",
+        "Phase 2: Negotiates IPsec SA for data transfer"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: AH provides integrity but NO encryption. ESP provides both. AH is incompatible with NAT because it protects the IP header (which NAT modifies). ESP in transport mode works with NAT traversal."
+    },
+    {
+      "kind": "heading",
+      "text": "TLS/SSL"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "TLS (Transport Layer Security) — Current standard (TLS 1.3 is latest)",
+        "SSL — Deprecated predecessor (SSL 3.0 was last version)",
+        "Operates at Layer 4-5 (between Transport and Application)",
+        "Provides encryption, integrity, and server authentication",
+        "Uses asymmetric key exchange → symmetric bulk encryption"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "TLS Handshake (simplified):"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Client Hello (supported ciphers, random number)",
+        "Server Hello (chosen cipher, certificate, random number)",
+        "Key exchange (asymmetric encryption)",
+        "Session keys derived (symmetric encryption begins)"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "TLS 1.3 improvements:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Removed weak algorithms (RC4, MD5, SHA-1, DES, 3DES)",
+        "Reduced handshake to 1-RTT (faster)",
+        "Perfect Forward Secrecy (PFS) required",
+        "Removed RSA key exchange (only ephemeral Diffie-Hellman)"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: SSL is DEPRECATED. All versions of SSL (1.0, 2.0, 3.0) have known vulnerabilities. Only TLS 1.2+ should be used. The exam may still use \"SSL/TLS\" but know that SSL alone is insecure."
+    },
+    {
+      "kind": "heading",
+      "text": "Tunneling Protocols"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "L2TP — Layer 2 Tunneling Protocol; no native encryption; usually paired with IPsec",
+        "PPTP — Point-to-Point Tunneling Protocol; insecure, deprecated",
+        "GRE — Generic Routing Encapsulation; Cisco proprietary; no encryption",
+        "SSH — Secure Shell; encrypted tunnel for remote management (port 22)",
+        "WireGuard — Modern VPN protocol; fast, simple, strong encryption"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Chapple: \"L2TP does not offer native encryption, but it supports the use of payload encryption protocols. Although it isn't required, L2TP is most often deployed using IPSec's ESP for payload encryption.\" From Stewart: Tunneling \"prevents the traffic control devices from blocking or dropping the communication because such devices don't examine the tunneled contents.\""
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Site-to-site: Connects two networks (offices)",
+    "Remote access: Connects individual user to network",
+    "Full tunnel: All traffic goes through VPN",
+    "Split tunnel: Only corporate traffic goes through VPN (risk: unprotected personal traffic)",
+    "AH (Authentication Header): Integrity and authentication only (no encryption)",
+    "ESP (Encapsulating Security Payload): Encryption + integrity + authentication",
+    "Transport mode: Encrypts payload only; original IP header visible",
+    "Tunnel mode: Encrypts entire original packet; new IP header added"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"Site-to-site\" is described as:",
+      "choices": {
+        "A": "Authentication + Integrity",
+        "B": "Connects individual user to network",
+        "C": "All traffic goes through VPN",
+        "D": "Connects two networks (offices)"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Site-to-site — Connects two networks (offices)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"Remote access\" is described as:",
+      "choices": {
+        "A": "Connects individual user to network",
+        "B": "Current standard (TLS 1.3 is latest)",
+        "C": "Connects two networks (offices)",
+        "D": "Encryption + integrity + authentication"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Remote access — Connects individual user to network"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"Full tunnel\" is described as:",
+      "choices": {
+        "A": "Connects individual user to network",
+        "B": "Connects two networks (offices)",
+        "C": "All traffic goes through VPN",
+        "D": "Authentication + Integrity"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Full tunnel — All traffic goes through VPN"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"Split tunnel\" is described as:",
+      "choices": {
+        "A": "Secure Shell; encrypted tunnel for remote management (port 22)",
+        "B": "Only corporate traffic goes through VPN (risk: unprotected personal traffic)",
+        "C": "Generic Routing Encapsulation; Cisco proprietary; no encryption",
+        "D": "Layer 2 Tunneling Protocol; no native encryption; usually paired with IPsec"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Split tunnel — Only corporate traffic goes through VPN (risk: unprotected personal traffic)"
+    }
+  ]
+}

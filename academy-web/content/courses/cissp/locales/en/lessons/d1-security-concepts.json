@@ -1,0 +1,305 @@
+{
+  "nodeId": "d1-security-concepts",
+  "locale": "en",
+  "title": "Security Concepts",
+  "objective": "Study-guide review — CISSP — Domain 1: Security and Risk Management: Security Concepts.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "The Role of Security"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Security must support the business in achieving its goals",
+        "Security must increase the organization's value",
+        "Focus on ALL assets, not just information or data",
+        "Security is a support role — an enabler, not a blocker",
+        "Security function aligns with business strategy, goals, mission, and objectives"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The role of security has evolved to become fully integrated with business processes. Security focuses on anything that represents value — assets — and implements controls that increase the value of those assets. From Destination CISSP: The focus of the security function is to:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Allow and enable the organization to achieve its goals and objectives",
+        "Increase the organization's value"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "Through proper security governance, those accountable for increasing organizational value can be supported and enabled to achieve their goals. ⚠️ Exam Trap: The CISSP exam tests the \"think like a manager\" mindset. Security is never about saying \"no\" — it's about enabling the business while managing risk. If a question gives you a choice between blocking an activity and finding a way to enable it securely, choose the enabling option. From Ahmed (How to Think Like a Manager): \"To profit-driven businesses, information security is an afterthought... A manager will try to use the security program itself to not only protect company assets, but also attempt to produce measurable cost-saving results.\""
+    },
+    {
+      "kind": "heading",
+      "text": "The CIA Triad"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Confidentiality: Prevents unauthorized disclosure of information",
+        "Integrity: Ensures accuracy and prevents unauthorized modification",
+        "Availability: Ensures assets are accessible when needed by authorized users",
+        "Foundational model for designing all security programs",
+        "Applied to ALL assets, not just data"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Component",
+        "Definition",
+        "Attack Example",
+        "Control Example"
+      ],
+      "rows": [
+        [
+          "Confidentiality",
+          "Prevents unauthorized disclosure",
+          "Eavesdropping, data breach",
+          "Encryption, access controls"
+        ],
+        [
+          "Integrity",
+          "Prevents unauthorized changes",
+          "Man-in-the-middle, tampering",
+          "Hashing, digital signatures"
+        ],
+        [
+          "Availability",
+          "Ensures timely access",
+          "DDoS, hardware failure",
+          "Redundancy, load balancing"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP (Table 1-2):"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Confidentiality — Protects assets from unauthorized access and disclosure",
+        "Integrity — Protects assets from unauthorized or accidental changes",
+        "Availability — Protects critical assets based on value to ensure organizational assets are available when required by stakeholders"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Shon Harris: Some controls map to multiple CIA components. For example:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Availability controls: Redundant arrays (RAID), clustering, load balancing, backups",
+        "Integrity controls: Hashing, digital signatures, change management",
+        "Confidentiality controls: Encryption, access controls, data classification"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Shon Harris refers to the \"AIC triad\" (Availability, Integrity, Confidentiality) — same concept, different order. The exam uses CIA."
+    },
+    {
+      "kind": "heading",
+      "text": "The DAD Triad"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Disclosure — opposite of Confidentiality",
+        "Alteration — opposite of Integrity",
+        "Destruction/Denial — opposite of Availability",
+        "DAD represents the threats that CIA protects against",
+        "Understanding DAD helps identify which CIA component is at risk"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The DAD triad is the inverse of CIA and represents the primary threats:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "CIA Component",
+        "DAD Threat"
+      ],
+      "rows": [
+        [
+          "Confidentiality",
+          "Disclosure"
+        ],
+        [
+          "Integrity",
+          "Alteration"
+        ],
+        [
+          "Availability",
+          "Destruction/Denial"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "When analyzing a scenario, identify whether the threat involves disclosure (breach of confidentiality), alteration (breach of integrity), or denial/destruction (breach of availability) to determine which CIA component is at risk."
+    },
+    {
+      "kind": "heading",
+      "text": "AAA Services"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Authentication — Proving identity (who are you?)",
+        "Authorization — Granting permissions (what can you do?)",
+        "Accounting — Tracking actions (what did you do?)",
+        "Sometimes expanded to AAAA (adding Auditing)",
+        "Foundation for all access control systems"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Authentication factors (the three factors of authentication):"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Something you know — password, PIN",
+        "Something you have — smartcard, token",
+        "Something you are — biometrics (fingerprint, iris)"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "Multifactor authentication (MFA) requires two or more factors from different categories. Using two passwords is not MFA — both are \"something you know.\" Authorization determines what resources and operations an authenticated subject can access. Authorization is granted based on identity, roles, group memberships, and security policies. Accounting/Auditing creates a record of who did what and when. This is essential for incident investigation, compliance, and non-repudiation. Audit logs must be protected from tampering."
+    },
+    {
+      "kind": "heading",
+      "text": "Non-Repudiation"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Ensures a party cannot deny performing an action",
+        "Achieved through digital signatures and audit trails",
+        "Combines authentication + integrity",
+        "Critical for legal and contractual obligations",
+        "Supports accountability in security programs"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Non-repudiation provides assurance that the sender of information cannot deny having sent it, and the recipient cannot deny having received it. This is achieved primarily through:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Digital signatures — Provide origin authentication and integrity",
+        "Audit trails — Record actions with timestamps and user identification",
+        "Transaction logs — Record transactions in databases and applications"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "Non-repudiation is especially important in e-commerce, legal proceedings, and regulatory compliance. Without non-repudiation, a user could claim they never authorized a transaction."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Confidentiality: Prevents unauthorized disclosure of information",
+    "Integrity: Ensures accuracy and prevents unauthorized modification",
+    "Availability: Ensures assets are accessible when needed by authorized users",
+    "Confidentiality: Prevents unauthorized disclosure",
+    "Integrity: Prevents unauthorized changes",
+    "Availability: Ensures timely access",
+    "Confidentiality: Protects assets from unauthorized access and disclosure",
+    "Integrity: Protects assets from unauthorized or accidental changes"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Confidentiality\" is described as:",
+      "choices": {
+        "A": "Hashing, digital signatures, change management",
+        "B": "Prevents unauthorized disclosure of information",
+        "C": "Encryption, access controls, data classification",
+        "D": "Record transactions in databases and applications"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Confidentiality: Prevents unauthorized disclosure of information"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Integrity\" is described as:",
+      "choices": {
+        "A": "Protects assets from unauthorized access and disclosure",
+        "B": "Ensures accuracy and prevents unauthorized modification",
+        "C": "Protects assets from unauthorized or accidental changes",
+        "D": "Record actions with timestamps and user identification"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Integrity: Ensures accuracy and prevents unauthorized modification"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Availability\" is described as:",
+      "choices": {
+        "A": "Redundant arrays (RAID), clustering, load balancing, backups",
+        "B": "Ensures assets are accessible when needed by authorized users",
+        "C": "Ensures accuracy and prevents unauthorized modification",
+        "D": "Protects assets from unauthorized access and disclosure"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Availability: Ensures assets are accessible when needed by authorized users"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Availability controls\" is described as:",
+      "choices": {
+        "A": "Protects assets from unauthorized access and disclosure",
+        "B": "Ensures accuracy and prevents unauthorized modification",
+        "C": "Ensures assets are accessible when needed by authorized users",
+        "D": "Redundant arrays (RAID), clustering, load balancing, backups"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Availability controls: Redundant arrays (RAID), clustering, load balancing, backups"
+    }
+  ]
+}

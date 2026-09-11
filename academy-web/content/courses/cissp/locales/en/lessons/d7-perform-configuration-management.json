@@ -1,0 +1,135 @@
+{
+  "nodeId": "d7-perform-configuration-management",
+  "locale": "en",
+  "title": "Perform Configuration Management",
+  "objective": "Study-guide review — CISSP — Domain 7: Security Operations: Perform Configuration Management.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Configuration Baselines"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Baseline — a documented, reviewed, and agreed-upon specification used as the basis for future configuration changes",
+        "Security baselines define the minimum security settings required for systems",
+        "Sources for baselines: CIS Benchmarks, DISA STIGs (Security Technical Implementation Guides), NIST guidelines, vendor hardening guides",
+        "STIGs are strict baselines used by the US Department of Defense — may be too restrictive for commercial use but serve as a high-water mark",
+        "Organizations tailor baselines to their specific environment — not every baseline control is appropriate for every system",
+        "Deviation from baseline requires documented approval through the change management process"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Configuration management ensures that systems are deployed and maintained in a known, secure state. A baseline represents the approved configuration for a system — any changes from this baseline must go through the change management process. As the Official CBK notes regarding STIGs: \"these baselines are unlikely to be broadly useful as many common functionalities must be disabled to comply with a STIG. However, organizations may use these as a high-water mark\" for their own baseline development. The key is tailoring — adapting the baseline to the organization's specific needs while maintaining an acceptable level of security. Configuration management databases (CMDBs) track the current configuration of all assets and their relationships. This is essential for change management, incident response (understanding what changed), and disaster recovery (knowing how to rebuild systems)."
+    },
+    {
+      "kind": "heading",
+      "text": "Provisioning and Baselining"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Imaging — deploying systems from a standardized, hardened image ensures consistent baseline configuration",
+        "Images should be updated regularly to include the latest patches and security configurations",
+        "Hardening — removing unnecessary services, protocols, and software; changing default passwords; enabling security features",
+        "Every installed application and operating service must be tracked in the configuration management database",
+        "Components that cannot be disabled must be carefully secured and monitored",
+        "Decommissioning — securely wiping data, revoking access, updating inventory when systems are retired"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Automation and Infrastructure as Code"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Infrastructure as Code (IaC) — managing infrastructure through machine-readable definition files rather than manual configuration",
+        "Immutable infrastructure — systems are never modified after deployment; changes require teardown and rebuild from updated images/templates",
+        "Reduces configuration drift and human error",
+        "Cloud and virtualized environments make this process practical — automated deployment tools handle the rebuild process",
+        "DevSecOps integrates security into the CI/CD pipeline, including automated security scanning of infrastructure definitions"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Immutable infrastructure is an increasingly important concept. As the CBK notes, changes to the infrastructure require a teardown and rebuild process, which is automated and less error-prone and labor-intensive than legacy system-by-system upgrades. Virtualized cloud environments make this process easy, and tools exist specifically for managing immutable infrastructure (e.g., Terraform, Ansible, Puppet, Chef). The benefit of immutable infrastructure is that configuration drift — where systems gradually deviate from their intended configuration — is eliminated. Every deployment starts from a known-good baseline, and any changes require a new deployment rather than in-place modifications."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Baseline: a documented, reviewed, and agreed-upon specification used as the basis for future configuration changes",
+    "Imaging: deploying systems from a standardized, hardened image ensures consistent baseline configuration",
+    "Hardening: removing unnecessary services, protocols, and software; changing default passwords; enabling security features",
+    "Decommissioning: securely wiping data, revoking access, updating inventory when systems are retired",
+    "Infrastructure as Code (IaC): managing infrastructure through machine-readable definition files rather than manual configuration",
+    "Immutable infrastructure: systems are never modified after deployment; changes require teardown and rebuild from updated images/templates"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Baseline\" is described as:",
+      "choices": {
+        "A": "systems are never modified after deployment; changes require teardown and rebuild from updated images/templates",
+        "B": "managing infrastructure through machine-readable definition files rather than manual configuration",
+        "C": "removing unnecessary services, protocols, and software; changing default passwords; enabling security features",
+        "D": "a documented, reviewed, and agreed-upon specification used as the basis for future configuration changes"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Baseline — a documented, reviewed, and agreed-upon specification used as the basis for future configuration changes"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Imaging\" is described as:",
+      "choices": {
+        "A": "managing infrastructure through machine-readable definition files rather than manual configuration",
+        "B": "a documented, reviewed, and agreed-upon specification used as the basis for future configuration changes",
+        "C": "deploying systems from a standardized, hardened image ensures consistent baseline configuration",
+        "D": "securely wiping data, revoking access, updating inventory when systems are retired"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Imaging — deploying systems from a standardized, hardened image ensures consistent baseline configuration"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Hardening\" is described as:",
+      "choices": {
+        "A": "systems are never modified after deployment; changes require teardown and rebuild from updated images/templates",
+        "B": "a documented, reviewed, and agreed-upon specification used as the basis for future configuration changes",
+        "C": "removing unnecessary services, protocols, and software; changing default passwords; enabling security features",
+        "D": "managing infrastructure through machine-readable definition files rather than manual configuration"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Hardening — removing unnecessary services, protocols, and software; changing default passwords; enabling security features"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Decommissioning\" is described as:",
+      "choices": {
+        "A": "deploying systems from a standardized, hardened image ensures consistent baseline configuration",
+        "B": "securely wiping data, revoking access, updating inventory when systems are retired",
+        "C": "managing infrastructure through machine-readable definition files rather than manual configuration",
+        "D": "a documented, reviewed, and agreed-upon specification used as the basis for future configuration changes"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Decommissioning — securely wiping data, revoking access, updating inventory when systems are retired"
+    }
+  ]
+}

@@ -1,0 +1,200 @@
+{
+  "nodeId": "d7-apply-foundational-security-operations-concepts",
+  "locale": "th",
+  "title": "Apply Foundational Security Operations Concepts",
+  "objective": "Study-guide review — CISSP — Domain 7: Security Operations: Apply Foundational Security Operations Concepts.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Need to Know and Least Privilege"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Need to know — access to information is granted only to individuals who require it to perform their specific job function",
+        "Least privilege — users receive the absolute minimum amount of access necessary to perform their assigned job functions",
+        "Need to know focuses on permissions and the ability to access information",
+        "Least privilege focuses on access rights and the level of access granted",
+        "Both principles limit the potential damage from insider threats, compromised accounts, and errors",
+        "Access should be sufficient to perform assigned job functions and not in excess"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "While closely related, need to know and least privilege are distinct concepts. Need to know is about whether an individual requires access to specific information to do their job. Least privilege is about ensuring that when access is granted, it is limited to the minimum necessary. For example, a network administrator may need to know the network architecture details (need to know) but should only have the specific administrative privileges required for their duties (least privilege) — they should not have access to HR databases or financial systems unless their job specifically requires it. The principle of least privilege should be applied to all aspects of access: physical access, logical access, system privileges, database permissions, and network access. Privileged accounts (root, administrator) should be used only when necessary and for the minimum duration required."
+    },
+    {
+      "kind": "heading",
+      "text": "Separation of Duties and Responsibilities"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Separation of duties (SoD) — divides critical tasks among multiple individuals so no single person can complete a critical action alone",
+        "Prevents fraud, errors, and abuse by requiring collusion between multiple parties",
+        "Example: the person who requests a purchase should not be the person who approves it",
+        "Split knowledge — information or access required to complete a task is divided among multiple individuals",
+        "When administration and security responsibilities are divided among several users, no single person has sufficient access to circumvent or disable security mechanisms"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Two-Person Control"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Also called the two-man rule — requires the approval or presence of two individuals for critical actions",
+        "Applied to: nuclear launch codes, safe combinations, key ceremonies, critical system changes",
+        "Ensures accountability and reduces risk of unauthorized actions by a single individual",
+        "Different from separation of duties — two-person control requires both people to act simultaneously, while SoD divides sequential tasks"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Privileged Account Management"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Privileged accounts (root, administrator, service accounts) pose the highest risk — must be tightly controlled",
+        "Implement Privileged Access Management (PAM) solutions to vault, rotate, and audit privileged credentials",
+        "Privileged account usage should be logged and reviewed more frequently than regular accounts",
+        "Security personnel should perform privileged account audits much more frequently than regular user account audits",
+        "Monitor for privilege escalation and privilege creep (accumulation of privileges beyond what is needed)",
+        "Both excessive privileges and privilege creep violate the principle of least privilege; account reviews are effective at discovering these problems"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Privileged accounts typically include: root/administrator accounts, service accounts, application accounts, emergency/break-glass accounts, and accounts with elevated database or system access. These accounts require additional controls:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Use of PAM solutions that check out credentials for a limited time",
+        "Multi-factor authentication for privileged access",
+        "Session recording and keystroke logging for privileged sessions",
+        "Automatic password rotation after each use",
+        "Alert on unusual privileged account activity"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "In the case of a user changing roles, their access should be reviewed at the time of the change. New access for the new role should be granted, and access from the previous role should be revoked. This prevents privilege creep — the gradual accumulation of unnecessary access rights over time. ⚠️ Exam Trap: Think like a manager — regular account reviews and privileged account audits are the primary controls for detecting excessive privileges and privilege creep."
+    },
+    {
+      "kind": "heading",
+      "text": "Job Rotation and Mandatory Vacations"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Job rotation — periodically moving personnel between roles to detect fraud and reduce single points of failure",
+        "Mandatory vacations — requiring employees to take time off so that another person performs their duties, potentially uncovering irregularities",
+        "Both are detective controls — they help discover fraud, errors, or unauthorized activities",
+        "Cross-training benefit: multiple people understand each role, improving continuity"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Service Level Agreements (SLA)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "SLA — agreement between an organization and a vendor stipulating performance expectations and often including penalties for non-compliance",
+        "Should include: uptime guarantees, response times, support hours, escalation procedures, security requirements",
+        "MOU (Memorandum of Understanding) — less formal agreement documenting mutual understanding between parties; typically not legally enforceable",
+        "MOA (Memorandum of Agreement) — similar to MOU but may include more specific terms",
+        "OLA (Operational Level Agreement) — internal agreement between departments supporting the SLA",
+        "Organizations should have clear requirements when working with third parties and ensure the SLA includes these requirements"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Service level agreements are critical for managing third-party risk. As stated in the Study Guide: \"An SLA is an agreement between an organization and an outside entity, such as a vendor. The SLA stipulates performance expectations and often includes penalties if the vendor doesn't meet these expectations.\" SLAs should address security-specific requirements such as: data handling and protection, incident response and notification procedures, audit rights, compliance with relevant regulations, and data return/destruction upon contract termination. Cloud computing has made SLAs particularly important, as organizations must ensure their cloud providers meet their security and availability requirements. An MOU documents the mutual understanding between parties regarding their relationship and expectations. Unlike an SLA, an MOU is typically not legally binding but establishes a framework for cooperation. Organizations sometimes use both an MOU (for the overall relationship) and an SLA (for specific service commitments)."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Need to know: access to information is granted only to individuals who require it to perform their specific job function",
+    "Least privilege: users receive the absolute minimum amount of access necessary to perform their assigned job functions",
+    "Separation of duties (SoD): divides critical tasks among multiple individuals so no single person can complete a critical action alone",
+    "Split knowledge: information or access required to complete a task is divided among multiple individuals",
+    "Job rotation: periodically moving personnel between roles to detect fraud and reduce single points of failure",
+    "Mandatory vacations: requiring employees to take time off so that another person performs their duties, potentially uncovering irregularities",
+    "SLA: agreement between an organization and a vendor stipulating performance expectations and often including penalties for non-compliance",
+    "MOU (Memorandum of Understanding): less formal agreement documenting mutual understanding between parties; typically not legally enforceable"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Need to know\" is described as:",
+      "choices": {
+        "A": "divides critical tasks among multiple individuals so no single person can complete a critical action alone",
+        "B": "less formal agreement documenting mutual understanding between parties; typically not legally enforceable",
+        "C": "users receive the absolute minimum amount of access necessary to perform their assigned job functions",
+        "D": "access to information is granted only to individuals who require it to perform their specific job function"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Need to know — access to information is granted only to individuals who require it to perform their specific job function"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Least privilege\" is described as:",
+      "choices": {
+        "A": "divides critical tasks among multiple individuals so no single person can complete a critical action alone",
+        "B": "users receive the absolute minimum amount of access necessary to perform their assigned job functions",
+        "C": "access to information is granted only to individuals who require it to perform their specific job function",
+        "D": "less formal agreement documenting mutual understanding between parties; typically not legally enforceable"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Least privilege — users receive the absolute minimum amount of access necessary to perform their assigned job functions"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Separation of duties (SoD)\" is described as:",
+      "choices": {
+        "A": "users receive the absolute minimum amount of access necessary to perform their assigned job functions",
+        "B": "less formal agreement documenting mutual understanding between parties; typically not legally enforceable",
+        "C": "divides critical tasks among multiple individuals so no single person can complete a critical action alone",
+        "D": "access to information is granted only to individuals who require it to perform their specific job function"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Separation of duties (SoD) — divides critical tasks among multiple individuals so no single person can complete a critical action alone"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Split knowledge\" is described as:",
+      "choices": {
+        "A": "less formal agreement documenting mutual understanding between parties; typically not legally enforceable",
+        "B": "users receive the absolute minimum amount of access necessary to perform their assigned job functions",
+        "C": "information or access required to complete a task is divided among multiple individuals",
+        "D": "periodically moving personnel between roles to detect fraud and reduce single points of failure"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Split knowledge — information or access required to complete a task is divided among multiple individuals"
+    }
+  ]
+}

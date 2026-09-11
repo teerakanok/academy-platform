@@ -1,0 +1,248 @@
+{
+  "nodeId": "d6-software-testing",
+  "locale": "th",
+  "title": "Software Testing",
+  "objective": "Study-guide review — CISSP — Domain 6: Security Assessment and Testing: Software Testing.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Code Review Methods"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Code review — Human examination of source code for flaws",
+        "Static Application Security Testing (SAST) — Automated source code analysis",
+        "Finds vulnerabilities before deployment (shift-left security)",
+        "Can detect: buffer overflows, SQL injection, XSS, hardcoded credentials",
+        "Peer review and pair programming complement automated tools"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Code review methods range from informal to highly structured:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Method",
+        "Formality",
+        "Process",
+        "Use Case"
+      ],
+      "rows": [
+        [
+          "Fagan Inspection",
+          "Highest",
+          "Rigid formal process with defined entry/exit criteria, roles (moderator, reader, recorder, author), and stages (planning, overview, preparation, inspection, rework, follow-up)",
+          "Safety-critical systems, high-assurance environments"
+        ],
+        [
+          "Formal Review/Walkthrough",
+          "Medium",
+          "Author walks through code with reviewers; less rigid than Fagan",
+          "Standard development environments"
+        ],
+        [
+          "Peer Review",
+          "Low-Medium",
+          "Developers review each other's code informally",
+          "Agile teams, continuous development"
+        ],
+        [
+          "Pair Programming",
+          "Informal",
+          "Two developers work together in real-time; continuous review",
+          "Agile/XP methodology"
+        ],
+        [
+          "Static Analysis (SAST)",
+          "Automated",
+          "Tools scan source code/bytecode for known vulnerability patterns",
+          "CI/CD pipelines, all environments"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From the ISC2 Study Guide: \"Fagan inspections follow a rigid formal process, with defined entry and exit criteria that must be met before transitioning between stages. The Fagan inspection level of formality is normally found only in highly restrictive environments where code flaws may have catastrophic impact.\" From Chapple: \"During a code review, also known as a 'peer review,' developers other than the one who wrote the code review it for defects. Code reviews may result in approval of an application's move into a production environment, or they may send the code back to the original developer with recommendations.\" ⚠️ Exam Trap: Fagan inspection is the MOST FORMAL code review method. It has six specific stages and defined roles. The exam tests whether you know that Fagan inspections are for high-assurance environments where code flaws could have catastrophic consequences. Most organizations use less rigorous peer review. ⚠️ Exam Trap: Static analysis (SAST) analyzes CODE without executing it. It complements but does NOT replace human code review — automated tools can miss business logic flaws that a human reviewer would catch."
+    },
+    {
+      "kind": "heading",
+      "text": "Dynamic Testing"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Dynamic Application Security Testing (DAST) — Tests running applications",
+        "Black-box testing — No source code access; tests from outside",
+        "Finds runtime vulnerabilities that static analysis may miss",
+        "Tests actual behavior under various inputs and conditions",
+        "Interactive Application Security Testing (IAST) — Combines SAST and DAST"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Method",
+        "When",
+        "What It Tests",
+        "Requires Source Code?"
+      ],
+      "rows": [
+        [
+          "SAST",
+          "Development",
+          "Code patterns",
+          "Yes"
+        ],
+        [
+          "DAST",
+          "Runtime",
+          "Application behavior",
+          "No"
+        ],
+        [
+          "IAST",
+          "Runtime",
+          "Both code and behavior",
+          "Partial"
+        ],
+        [
+          "SCA",
+          "Build time",
+          "Third-party dependencies",
+          "Yes (manifests)"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: SAST analyzes CODE (doesn't need a running application). DAST analyzes a RUNNING APPLICATION (doesn't need source code). They complement each other and should be used together."
+    },
+    {
+      "kind": "heading",
+      "text": "Fuzz Testing"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Sends random, malformed, or unexpected input to an application",
+        "Designed to find crashes, memory leaks, and unhandled exceptions",
+        "Generational (intelligent) fuzzing — Creates input based on data model understanding",
+        "Mutation fuzzing — Modifies known-good inputs randomly",
+        "Highly effective at finding zero-day vulnerabilities"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Chapple: \"Generational (intelligent) fuzzing develops data models and creates new fuzzed input based on an understanding of the types of data used by the program.\" Fuzzing is effective because:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Developers often don't test edge cases",
+        "Automated fuzzers can run millions of test cases",
+        "Finds vulnerabilities that manual testing misses",
+        "Particularly good at finding buffer overflows and format string vulnerabilities"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Interface Testing"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "API testing — Verifies APIs handle input correctly and enforce access controls",
+        "UI testing — Validates user interface behavior and security controls",
+        "Physical interface testing — Tests hardware interfaces for vulnerabilities",
+        "Integration testing — Verifies security across component boundaries",
+        "Focus on input validation, authentication, authorization, and error handling"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Code review: Human examination of source code for flaws",
+    "Static Application Security Testing (SAST): Automated source code analysis",
+    "Dynamic Application Security Testing (DAST): Tests running applications",
+    "Black-box testing: No source code access; tests from outside",
+    "Interactive Application Security Testing (IAST): Combines SAST and DAST",
+    "Generational (intelligent) fuzzing: Creates input based on data model understanding",
+    "Mutation fuzzing: Modifies known-good inputs randomly",
+    "API testing: Verifies APIs handle input correctly and enforce access controls"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"Code review\" is described as:",
+      "choices": {
+        "A": "Verifies security across component boundaries",
+        "B": "Tests hardware interfaces for vulnerabilities",
+        "C": "No source code access; tests from outside",
+        "D": "Human examination of source code for flaws"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Code review — Human examination of source code for flaws"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"Static Application Security Testing (SAST)\" is described as:",
+      "choices": {
+        "A": "Combines SAST and DAST",
+        "B": "Modifies known-good inputs randomly",
+        "C": "Automated source code analysis",
+        "D": "Tests running applications"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Static Application Security Testing (SAST) — Automated source code analysis"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"Dynamic Application Security Testing (DAST)\" is described as:",
+      "choices": {
+        "A": "Automated source code analysis",
+        "B": "Tests running applications",
+        "C": "Combines SAST and DAST",
+        "D": "Modifies known-good inputs randomly"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Dynamic Application Security Testing (DAST) — Tests running applications"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"Black-box testing\" is described as:",
+      "choices": {
+        "A": "No source code access; tests from outside",
+        "B": "Human examination of source code for flaws",
+        "C": "Tests hardware interfaces for vulnerabilities",
+        "D": "Verifies security across component boundaries"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Black-box testing — No source code access; tests from outside"
+    }
+  ]
+}

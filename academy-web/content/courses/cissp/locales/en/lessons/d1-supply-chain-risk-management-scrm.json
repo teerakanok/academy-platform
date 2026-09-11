@@ -1,0 +1,168 @@
+{
+  "nodeId": "d1-supply-chain-risk-management-scrm",
+  "locale": "en",
+  "title": "Supply Chain Risk Management (SCRM)",
+  "objective": "Study-guide review — CISSP — Domain 1: Security and Risk Management: Supply Chain Risk Management (SCRM).",
+  "blocks": [
+    {
+      "kind": "list",
+      "items": [
+        "Assess and manage risks from third-party vendors and suppliers",
+        "Evaluate vendor security practices before engagement",
+        "Include security requirements in contracts and SLAs",
+        "Monitor vendor compliance throughout the relationship",
+        "Apply minimum security baselines to all third parties",
+        "NIST SP 800-161 — Supply Chain Risk Management Practices for Federal Information Systems [VERIFY — specific 800-161 content not in RAG]",
+        "Hardware Root of Trust — verify hardware integrity from manufacturing to deployment; prevents supply chain tampering (e.g., implanted backdoors in chips or firmware)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Supply chain risk is increasingly important as organizations depend on third-party services, cloud providers, and global supply chains. Key SCRM activities:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Vendor Assessment — Evaluate security posture before engagement (questionnaires, SOC 2 reports, ISO 27001 certification, penetration test results)",
+        "Contract Requirements — Include security requirements, right-to-audit clauses, breach notification, data handling obligations",
+        "SLA Monitoring — Verify vendor meets security requirements through continuous assessment",
+        "Fourth-Party Risk — Consider the vendors your vendors use (your cloud provider's subcontractors)",
+        "Hardware/Software Integrity — Verify supply chain integrity to prevent tampering"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Third-Party Assessment Methods:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Method",
+        "Description",
+        "Assurance Level"
+      ],
+      "rows": [
+        [
+          "SOC 2 Type II",
+          "Independent audit of controls over time",
+          "High"
+        ],
+        [
+          "ISO 27001 Certification",
+          "ISMS certification by accredited body",
+          "High"
+        ],
+        [
+          "Vendor Questionnaire",
+          "Self-reported security practices",
+          "Low-Medium"
+        ],
+        [
+          "Penetration Test Report",
+          "Third-party security testing results",
+          "Medium-High"
+        ],
+        [
+          "Right-to-Audit Clause",
+          "Contractual right to audit vendor directly",
+          "Highest"
+        ],
+        [
+          "Site Visit",
+          "Physical inspection of vendor facilities",
+          "Medium-High"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Hardware Root of Trust ensures that hardware components have not been tampered with during manufacturing or transit. This includes:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Trusted Platform Module (TPM) — hardware chip that provides cryptographic functions and secure boot verification",
+        "Supply chain validation — verifying the provenance of hardware from manufacturer to deployment",
+        "Firmware integrity checking — ensuring firmware has not been modified with malicious code",
+        "Bill of Materials (BOM) verification — confirming components match specifications"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: \"When working with an external service, be sure to review any SLA (service-level agreements) to ensure that the security requirements for new hardware, software, or services should always meet or exceed the security of your existing infrastructure.\" ⚠️ Exam Trap: SCRM is not just about evaluating vendors at the start — it requires CONTINUOUS monitoring throughout the relationship. The exam expects a manager mindset: establish requirements in contracts, verify through audits, and maintain ongoing oversight. Hardware root of trust prevents supply chain attacks at the physical level."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Vendor Assessment: Evaluate security posture before engagement (questionnaires, SOC 2 reports, ISO 27001 certification, penetration test results)",
+    "Contract Requirements: Include security requirements, right-to-audit clauses, breach notification, data handling obligations",
+    "SLA Monitoring: Verify vendor meets security requirements through continuous assessment",
+    "Fourth-Party Risk: Consider the vendors your vendors use (your cloud provider's subcontractors)",
+    "Hardware/Software Integrity: Verify supply chain integrity to prevent tampering",
+    "SOC 2 Type II: Independent audit of controls over time",
+    "ISO 27001 Certification: ISMS certification by accredited body",
+    "Vendor Questionnaire: Self-reported security practices"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Hardware Root of Trust\" is described as:",
+      "choices": {
+        "A": "hardware chip that provides cryptographic functions and secure boot verification",
+        "B": "Include security requirements, right-to-audit clauses, breach notification, data handling obligations",
+        "C": "Evaluate security posture before engagement (questionnaires, SOC 2 reports, ISO 27001 certification, penetration test results)",
+        "D": "verify hardware integrity from manufacturing to deployment; prevents supply chain tampering (e.g., implanted backdoors in chips or firmware)"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Hardware Root of Trust — verify hardware integrity from manufacturing to deployment; prevents supply chain tampering (e.g., implanted backdoors in chips or firmware)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Vendor Assessment\" is described as:",
+      "choices": {
+        "A": "Evaluate security posture before engagement (questionnaires, SOC 2 reports, ISO 27001 certification, penetration test results)",
+        "B": "hardware chip that provides cryptographic functions and secure boot verification",
+        "C": "Include security requirements, right-to-audit clauses, breach notification, data handling obligations",
+        "D": "verify hardware integrity from manufacturing to deployment; prevents supply chain tampering (e.g., implanted backdoors in chips or firmware)"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Vendor Assessment — Evaluate security posture before engagement (questionnaires, SOC 2 reports, ISO 27001 certification, penetration test results)"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Contract Requirements\" is described as:",
+      "choices": {
+        "A": "Consider the vendors your vendors use (your cloud provider's subcontractors)",
+        "B": "Evaluate security posture before engagement (questionnaires, SOC 2 reports, ISO 27001 certification, penetration test results)",
+        "C": "Include security requirements, right-to-audit clauses, breach notification, data handling obligations",
+        "D": "hardware chip that provides cryptographic functions and secure boot verification"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Contract Requirements — Include security requirements, right-to-audit clauses, breach notification, data handling obligations"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"SLA Monitoring\" is described as:",
+      "choices": {
+        "A": "verifying the provenance of hardware from manufacturer to deployment",
+        "B": "Consider the vendors your vendors use (your cloud provider's subcontractors)",
+        "C": "hardware chip that provides cryptographic functions and secure boot verification",
+        "D": "Verify vendor meets security requirements through continuous assessment"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: SLA Monitoring — Verify vendor meets security requirements through continuous assessment"
+    }
+  ]
+}

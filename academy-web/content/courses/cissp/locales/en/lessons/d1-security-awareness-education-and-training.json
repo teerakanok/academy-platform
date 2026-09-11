@@ -1,0 +1,136 @@
+{
+  "nodeId": "d1-security-awareness-education-and-training",
+  "locale": "en",
+  "title": "Security Awareness, Education, and Training",
+  "objective": "Study-guide review — CISSP — Domain 1: Security and Risk Management: Security Awareness, Education, and Training.",
+  "blocks": [
+    {
+      "kind": "list",
+      "items": [
+        "Awareness — General understanding of security risks (all employees)",
+        "Training — Skills development for specific security tasks (IT/security staff)",
+        "Education — Formal degree/certification programs (career development)",
+        "Programs must be periodic and reviewed for content relevancy",
+        "Social engineering awareness is a critical component"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Level",
+        "Audience",
+        "Goal",
+        "Example"
+      ],
+      "rows": [
+        [
+          "Awareness",
+          "All employees",
+          "Recognize threats",
+          "Annual security briefing"
+        ],
+        [
+          "Training",
+          "IT/security staff",
+          "Build skills",
+          "Incident response training"
+        ],
+        [
+          "Education",
+          "Career-focused",
+          "Deep understanding",
+          "CISSP certification"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From the Official CBK: \"Appropriate levels of awareness, training, and education are required within the organization. Periodic reviews for content relevancy are essential.\" Security awareness programs should cover:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Phishing and social engineering",
+        "Password hygiene",
+        "Physical security (tailgating, clean desk)",
+        "Data handling and classification",
+        "Incident reporting procedures"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Awareness is for EVERYONE. Training is for people with specific security roles. Education is for career development. The exam distinguishes between these three levels."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Awareness: General understanding of security risks (all employees)",
+    "Training: Skills development for specific security tasks (IT/security staff)",
+    "Education: Formal degree/certification programs (career development)",
+    "Training: IT/security staff"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Awareness\" is described as:",
+      "choices": {
+        "A": "Formal degree/certification programs (career development)",
+        "B": "General understanding of security risks (all employees)",
+        "C": "Skills development for specific security tasks (IT/security staff)",
+        "D": "IT/security staff"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Awareness — General understanding of security risks (all employees)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Training\" is described as:",
+      "choices": {
+        "A": "Skills development for specific security tasks (IT/security staff)",
+        "B": "Formal degree/certification programs (career development)",
+        "C": "General understanding of security risks (all employees)",
+        "D": "IT/security staff"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Training — Skills development for specific security tasks (IT/security staff)"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Education\" is described as:",
+      "choices": {
+        "A": "General understanding of security risks (all employees)",
+        "B": "Formal degree/certification programs (career development)",
+        "C": "Skills development for specific security tasks (IT/security staff)",
+        "D": "IT/security staff"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Education — Formal degree/certification programs (career development)"
+    },
+    {
+      "id": "q4",
+      "prompt": "Which term does the study guide for Domain 1: Security and Risk Management define as: \"General understanding of security risks (all employees)\"?",
+      "choices": {
+        "A": "Awareness",
+        "B": "Education",
+        "C": "Training",
+        "D": "Integrity"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Awareness — General understanding of security risks (all employees)"
+    }
+  ]
+}

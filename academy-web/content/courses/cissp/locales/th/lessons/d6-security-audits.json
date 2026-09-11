@@ -1,0 +1,290 @@
+{
+  "nodeId": "d6-security-audits",
+  "locale": "th",
+  "title": "Security Audits",
+  "objective": "Study-guide review — CISSP — Domain 6: Security Assessment and Testing: Security Audits.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Audit Types and Standards"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Internal audit — Conducted by organization's own audit team",
+        "External audit — Conducted by independent third-party auditor",
+        "Compliance audit — Verifies adherence to specific regulations (HIPAA, PCI DSS, SOX)",
+        "Operational audit — Evaluates efficiency and effectiveness of operations",
+        "Financial audit — Examines financial statements and controls"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "SOC Reports"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "SOC 1 — Financial reporting controls (relevant to financial audits)",
+        "SOC 2 — Security, availability, processing integrity, confidentiality, privacy (Trust Services Criteria)",
+        "SOC 3 — Same as SOC 2 but public-facing summary (no detailed findings)",
+        "Type I — Controls at a point in time (design adequacy)",
+        "Type II — Controls over a period of time (operational effectiveness, typically 6-12 months)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SOC Report Matrix — Full Breakdown:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Report",
+        "Focus",
+        "What It Evaluates",
+        "Audience",
+        "Distribution"
+      ],
+      "rows": [
+        [
+          "SOC 1 Type I",
+          "Financial controls",
+          "Control design at a point in time",
+          "Auditors, regulators",
+          "Restricted (NDA)"
+        ],
+        [
+          "SOC 1 Type II",
+          "Financial controls",
+          "Control effectiveness over 6-12 months",
+          "Auditors, regulators",
+          "Restricted (NDA)"
+        ],
+        [
+          "SOC 2 Type I",
+          "Security controls (Trust Services Criteria)",
+          "Control design at a point in time — \"Do appropriate controls exist?\"",
+          "Management, customers (NDA)",
+          "Restricted (NDA)"
+        ],
+        [
+          "SOC 2 Type II",
+          "Security controls (Trust Services Criteria)",
+          "Control effectiveness over 6-12 months — \"Do controls actually WORK over time?\"",
+          "Management, customers (NDA)",
+          "Restricted (NDA)"
+        ],
+        [
+          "SOC 3",
+          "Security controls (summary)",
+          "Same scope as SOC 2 but no detailed findings",
+          "General public",
+          "Public — no NDA needed"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Trust Services Criteria (TSC) — SOC 2 evaluates these 5 categories:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Security (required) — Protection against unauthorized access",
+        "Availability — System is available for operation and use",
+        "Processing Integrity — Processing is complete, accurate, timely",
+        "Confidentiality — Information designated as confidential is protected",
+        "Privacy — Personal information is collected, used, retained, and disposed of properly"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "Type I vs Type II — The Critical Distinction:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Aspect",
+        "Type I",
+        "Type II"
+      ],
+      "rows": [
+        [
+          "Question answered",
+          "\"Are controls properly DESIGNED?\"",
+          "\"Do controls actually WORK?\""
+        ],
+        [
+          "Time scope",
+          "Single point in time (snapshot)",
+          "Period of time (typically 6-12 months)"
+        ],
+        [
+          "Evidence",
+          "Description of controls + design evaluation",
+          "Description + testing results + operational evidence"
+        ],
+        [
+          "Confidence level",
+          "Lower — controls may exist on paper but not in practice",
+          "Higher — proves controls operated effectively over time"
+        ],
+        [
+          "Cost",
+          "Lower (shorter engagement)",
+          "Higher (longer engagement, more testing)"
+        ],
+        [
+          "Use case",
+          "New service provider, initial assessment",
+          "Established provider, ongoing assurance"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: \"Companies have this evaluation done so they can use this as a selling point to attract new customers and provide confidence for their current customers.\" Manager Decision: Which SOC Report to Request?"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Evaluating a cloud provider's financial controls → SOC 1",
+        "Evaluating a SaaS provider's security → SOC 2 Type II (strongest assurance)",
+        "Quick initial assessment of a new vendor → SOC 2 Type I (sufficient for initial evaluation)",
+        "Marketing to general public → SOC 3 (shareable without NDA)",
+        "Due diligence before contract → SOC 2 Type II (proves controls work over time)"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: SOC 2 Type II is the GOLD STANDARD because it evaluates controls over a period (usually 6-12 months), proving they actually work over time. Type I only proves they were DESIGNED properly at a single point. ⚠️ Exam Trap: SOC 2 reports contain sensitive details and are shared under NDA. SOC 3 reports are the public-facing version with no sensitive detail. If the question says \"share with the general public\" → SOC 3. ⚠️ Exam Trap: SOC 1 is about FINANCIAL controls (relevant to financial audits). SOC 2 is about SECURITY controls. Don't confuse them — if the question mentions financial reporting, it's SOC 1. If it mentions security, availability, or privacy, it's SOC 2."
+    },
+    {
+      "kind": "heading",
+      "text": "SSAE 18 and ISAE 3402"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "SSAE 18 — Statement on Standards for Attestation Engagements (U.S. — AICPA)",
+        "ISAE 3402 — International Standard on Assurance Engagements (international)",
+        "Frameworks for service organization audits",
+        "Replace the older SAS 70 standard",
+        "Govern how SOC reports are created and structured"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Audit Sampling"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Statistical sampling — Uses mathematical methods for representative sample",
+        "Non-statistical (judgmental) sampling — Based on auditor's judgment",
+        "Sample must be random and representative of the population",
+        "Results from sample are extrapolated to the entire population",
+        "Larger samples provide greater confidence but cost more"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Chapple: \"Sampling only works if it is random! Don't allow system administrators to generate the sample or select the items to include in the sample.\" If sampling reveals no significant flaws, \"they make the assumption that this is representative of the entire population.\" However, the auditor must document:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "How the sample was selected",
+        "Sample size justification",
+        "Confidence level achieved",
+        "Any anomalies found in the sample"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: The AUDITOR must control the sampling process. If the auditee selects which items are examined, the results are meaningless because they could cherry-pick favorable examples."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Internal audit: Conducted by organization's own audit team",
+    "External audit: Conducted by independent third-party auditor",
+    "Compliance audit: Verifies adherence to specific regulations (HIPAA, PCI DSS, SOX)",
+    "Operational audit: Evaluates efficiency and effectiveness of operations",
+    "Financial audit: Examines financial statements and controls",
+    "SOC 1: Financial reporting controls (relevant to financial audits)",
+    "SOC 2: Security, availability, processing integrity, confidentiality, privacy (Trust Services Criteria)",
+    "SOC 3: Same as SOC 2 but public-facing summary (no detailed findings)"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"Internal audit\" is described as:",
+      "choices": {
+        "A": "System is available for operation and use",
+        "B": "Security controls (Trust Services Criteria)",
+        "C": "Examines financial statements and controls",
+        "D": "Conducted by organization's own audit team"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Internal audit — Conducted by organization's own audit team"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"External audit\" is described as:",
+      "choices": {
+        "A": "Description of controls + design evaluation",
+        "B": "Security controls (Trust Services Criteria)",
+        "C": "Controls at a point in time (design adequacy)",
+        "D": "Conducted by independent third-party auditor"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: External audit — Conducted by independent third-party auditor"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"Compliance audit\" is described as:",
+      "choices": {
+        "A": "Verifies adherence to specific regulations (HIPAA, PCI DSS, SOX)",
+        "B": "Statement on Standards for Attestation Engagements (U.S. — AICPA)",
+        "C": "International Standard on Assurance Engagements (international)",
+        "D": "Same as SOC 2 but public-facing summary (no detailed findings)"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Compliance audit — Verifies adherence to specific regulations (HIPAA, PCI DSS, SOX)"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"Operational audit\" is described as:",
+      "choices": {
+        "A": "Lower — controls may exist on paper but not in practice",
+        "B": "Uses mathematical methods for representative sample",
+        "C": "Evaluates efficiency and effectiveness of operations",
+        "D": "Information designated as confidential is protected"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Operational audit — Evaluates efficiency and effectiveness of operations"
+    }
+  ]
+}

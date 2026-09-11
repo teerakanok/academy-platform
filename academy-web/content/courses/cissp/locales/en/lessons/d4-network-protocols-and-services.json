@@ -1,0 +1,254 @@
+{
+  "nodeId": "d4-network-protocols-and-services",
+  "locale": "en",
+  "title": "Network Protocols and Services",
+  "objective": "Study-guide review — CISSP — Domain 4: Communication and Network Security: Network Protocols and Services.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "TCP, UDP, and IP"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "TCP — Connection-oriented, reliable, three-way handshake (SYN, SYN-ACK, ACK)",
+        "UDP — Connectionless, unreliable, faster (no handshake)",
+        "IP (IPv4) — 32-bit addresses, connectionless, best-effort delivery",
+        "IPv6 — 128-bit addresses, built-in IPsec support, no broadcast",
+        "ICMP — Error messaging and diagnostics (ping, traceroute)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "TCP Three-Way Handshake:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Client → SYN → Server",
+        "Server → SYN-ACK → Client",
+        "Client → ACK → Server"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "Connection established. Key Port Numbers:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Port",
+        "Protocol",
+        "Service"
+      ],
+      "rows": [
+        [
+          "20/21",
+          "TCP",
+          "FTP (data/control)"
+        ],
+        [
+          "22",
+          "TCP",
+          "SSH/SFTP"
+        ],
+        [
+          "23",
+          "TCP",
+          "Telnet (insecure)"
+        ],
+        [
+          "25",
+          "TCP",
+          "SMTP"
+        ],
+        [
+          "53",
+          "TCP/UDP",
+          "DNS"
+        ],
+        [
+          "80",
+          "TCP",
+          "HTTP"
+        ],
+        [
+          "110",
+          "TCP",
+          "POP3"
+        ],
+        [
+          "143",
+          "TCP",
+          "IMAP"
+        ],
+        [
+          "443",
+          "TCP",
+          "HTTPS"
+        ],
+        [
+          "389",
+          "TCP",
+          "LDAP"
+        ],
+        [
+          "636",
+          "TCP",
+          "LDAPS"
+        ],
+        [
+          "3389",
+          "TCP",
+          "RDP"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: TCP provides reliability; UDP provides speed. DNS uses BOTH (UDP for queries, TCP for zone transfers). Know the well-known ports (0-1023)."
+    },
+    {
+      "kind": "heading",
+      "text": "DNS, DHCP, and ARP"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "DNS — Resolves domain names to IP addresses (port 53)",
+        "DHCP — Automatically assigns IP configurations (ports 67/68)",
+        "ARP — Resolves IP addresses to MAC addresses (Layer 2)",
+        "DNSSEC — Adds authentication to DNS responses (prevents spoofing)",
+        "All three are frequent attack targets (DNS poisoning, DHCP starvation, ARP spoofing)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DNS Hierarchy: Root → TLD (.com, .org) → Second-level (example.com) → Subdomain (www.example.com) DNS Record Types:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "A — IPv4 address mapping",
+        "AAAA — IPv6 address mapping",
+        "MX — Mail exchange server",
+        "CNAME — Canonical name (alias)",
+        "PTR — Reverse lookup",
+        "SOA — Start of Authority",
+        "NS — Name server"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "DNSSEC adds digital signatures to DNS records, allowing resolvers to verify the authenticity of DNS responses. This prevents DNS cache poisoning attacks."
+    },
+    {
+      "kind": "heading",
+      "text": "Email Protocols"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "SMTP — Sends email (port 25; port 587 with auth)",
+        "POP3 — Retrieves email, downloads and deletes from server (port 110; 995 SSL)",
+        "IMAP — Retrieves email, keeps on server, supports folders (port 143; 993 SSL)",
+        "S/MIME — Email encryption and digital signatures using PKI",
+        "DKIM, SPF, DMARC — Email authentication and anti-spoofing"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "HTTP/HTTPS and Web Protocols"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "HTTP — Unencrypted web traffic (port 80)",
+        "HTTPS — HTTP over TLS (port 443)",
+        "TLS — Provides encryption, integrity, and authentication for web",
+        "HSTS — Forces browsers to use HTTPS only",
+        "Certificate pinning — Prevents MITM with fraudulent certificates"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "TCP: Connection-oriented, reliable, three-way handshake (SYN, SYN-ACK, ACK)",
+    "UDP: Connectionless, unreliable, faster (no handshake)",
+    "IP (IPv4): 32-bit addresses, connectionless, best-effort delivery",
+    "IPv6: 128-bit addresses, built-in IPsec support, no broadcast",
+    "ICMP: Error messaging and diagnostics (ping, traceroute)",
+    "DNS: Resolves domain names to IP addresses (port 53)",
+    "DHCP: Automatically assigns IP configurations (ports 67/68)",
+    "ARP: Resolves IP addresses to MAC addresses (Layer 2)"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"TCP\" is described as:",
+      "choices": {
+        "A": "Retrieves email, downloads and deletes from server (port 110; 995 SSL)",
+        "B": "Retrieves email, keeps on server, supports folders (port 143; 993 SSL)",
+        "C": "Connection-oriented, reliable, three-way handshake (SYN, SYN-ACK, ACK)",
+        "D": "Provides encryption, integrity, and authentication for web"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: TCP — Connection-oriented, reliable, three-way handshake (SYN, SYN-ACK, ACK)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"UDP\" is described as:",
+      "choices": {
+        "A": "Resolves IP addresses to MAC addresses (Layer 2)",
+        "B": "Error messaging and diagnostics (ping, traceroute)",
+        "C": "Connectionless, unreliable, faster (no handshake)",
+        "D": "Email encryption and digital signatures using PKI"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: UDP — Connectionless, unreliable, faster (no handshake)"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"IP (IPv4)\" is described as:",
+      "choices": {
+        "A": "Adds authentication to DNS responses (prevents spoofing)",
+        "B": "32-bit addresses, connectionless, best-effort delivery",
+        "C": "Automatically assigns IP configurations (ports 67/68)",
+        "D": "128-bit addresses, built-in IPsec support, no broadcast"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: IP (IPv4) — 32-bit addresses, connectionless, best-effort delivery"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"IPv6\" is described as:",
+      "choices": {
+        "A": "32-bit addresses, connectionless, best-effort delivery",
+        "B": "128-bit addresses, built-in IPsec support, no broadcast",
+        "C": "Adds authentication to DNS responses (prevents spoofing)",
+        "D": "Automatically assigns IP configurations (ports 67/68)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: IPv6 — 128-bit addresses, built-in IPsec support, no broadcast"
+    }
+  ]
+}

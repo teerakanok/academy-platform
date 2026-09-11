@@ -1,0 +1,185 @@
+{
+  "nodeId": "d5-access-control-administration",
+  "locale": "en",
+  "title": "Access Control Administration",
+  "objective": "Study-guide review — CISSP — Domain 5: Identity and Access Management (IAM): Access Control Administration.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Account Management"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Service accounts — Used by applications; require strong passwords and monitoring",
+        "Shared accounts — Discouraged; undermine accountability",
+        "Privileged accounts — Administrator/root; require extra protection",
+        "Guest accounts — Limited access; disable when not needed",
+        "All accounts must have an identified owner responsible for access"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Privilege Management"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Enforce least privilege — minimum access for job function",
+        "Watch for privilege creep — accumulation of unnecessary access over time",
+        "Privilege escalation — gaining higher privileges (horizontal or vertical)",
+        "Use role templates for consistent privilege assignment",
+        "Implement just-in-time (JIT) access for temporary elevated privileges"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Chapple: \"Both excessive privileges and privilege creep violate the basic security principle of least privilege, and account reviews are effective at discovering these problems.\" Privilege Creep Prevention:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Regular access reviews/recertification",
+        "Role-based access control",
+        "Automated deprovisioning on role change",
+        "Manager approval for all access changes"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Access Review and Audit"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Periodic reviews — Regular recertification of access rights (quarterly/annually)",
+        "User entitlement audits — Verify users have only needed access",
+        "Privileged account audits — More frequent than regular account reviews",
+        "Access logging — Record all access attempts (successful and failed)",
+        "Segregation of duties — Verify through access review"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Stewart: \"Security personnel would perform user entitlement audits for privileged accounts much more often than user entitlement audits of regular user accounts.\" Access reviews should verify:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Users still need their current access",
+        "No orphaned accounts exist",
+        "Separation of duties is maintained",
+        "Privileged access is justified and monitored",
+        "Service accounts have current owners"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Privileged Access Management"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "PAM — Controls and monitors access for privileged accounts",
+        "Password vaulting — Stores privileged credentials in encrypted vault",
+        "Session recording — Records all privileged sessions for audit",
+        "Just-in-time access — Temporary elevation with automatic revocation",
+        "Privileged Access Workstations (PAW) — Dedicated, hardened systems for admin tasks"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Chapple: Third-party PAM services \"integrate with Microsoft Active Directory. Once configured, users log onto the domain and access resources without logging on again.\" PAM reduces risk by:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Eliminating shared admin passwords",
+        "Providing audit trails for all privileged actions",
+        "Limiting the time window for privileged access",
+        "Detecting anomalous privileged behavior"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Service accounts: Used by applications; require strong passwords and monitoring",
+    "Shared accounts: Discouraged; undermine accountability",
+    "Privileged accounts: Administrator/root; require extra protection",
+    "Guest accounts: Limited access; disable when not needed",
+    "Privilege escalation: gaining higher privileges (horizontal or vertical)",
+    "Periodic reviews: Regular recertification of access rights (quarterly/annually)",
+    "User entitlement audits: Verify users have only needed access",
+    "Privileged account audits: More frequent than regular account reviews"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"Service accounts\" is described as:",
+      "choices": {
+        "A": "Regular recertification of access rights (quarterly/annually)",
+        "B": "Used by applications; require strong passwords and monitoring",
+        "C": "Controls and monitors access for privileged accounts",
+        "D": "gaining higher privileges (horizontal or vertical)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Service accounts — Used by applications; require strong passwords and monitoring"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"Shared accounts\" is described as:",
+      "choices": {
+        "A": "Verify users have only needed access",
+        "B": "Limited access; disable when not needed",
+        "C": "Records all privileged sessions for audit",
+        "D": "Discouraged; undermine accountability"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Shared accounts — Discouraged; undermine accountability"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"Privileged accounts\" is described as:",
+      "choices": {
+        "A": "More frequent than regular account reviews",
+        "B": "Dedicated, hardened systems for admin tasks",
+        "C": "Administrator/root; require extra protection",
+        "D": "Temporary elevation with automatic revocation"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Privileged accounts — Administrator/root; require extra protection"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"Guest accounts\" is described as:",
+      "choices": {
+        "A": "Verify users have only needed access",
+        "B": "Records all privileged sessions for audit",
+        "C": "Limited access; disable when not needed",
+        "D": "Discouraged; undermine accountability"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Guest accounts — Limited access; disable when not needed"
+    }
+  ]
+}

@@ -1,0 +1,243 @@
+{
+  "nodeId": "d4-wireless-network-security",
+  "locale": "th",
+  "title": "Wireless Network Security",
+  "objective": "Study-guide review — CISSP — Domain 4: Communication and Network Security: Wireless Network Security.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Wireless Standards"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Standard",
+        "Frequency",
+        "Max Speed",
+        "Range"
+      ],
+      "rows": [
+        [
+          "802.11a",
+          "5 GHz",
+          "54 Mbps",
+          "Short"
+        ],
+        [
+          "802.11b",
+          "2.4 GHz",
+          "11 Mbps",
+          "Long"
+        ],
+        [
+          "802.11g",
+          "2.4 GHz",
+          "54 Mbps",
+          "Medium"
+        ],
+        [
+          "802.11n",
+          "2.4/5 GHz",
+          "600 Mbps",
+          "Long"
+        ],
+        [
+          "802.11ac",
+          "5 GHz",
+          "~7 Gbps",
+          "Medium"
+        ],
+        [
+          "802.11ax (Wi-Fi 6)",
+          "2.4/5/6 GHz",
+          "~10 Gbps",
+          "Long"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Wireless Security Protocols"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "WEP — Wired Equivalent Privacy; broken, never use (RC4, static keys)",
+        "WPA — Wi-Fi Protected Access; improved but still uses RC4 (TKIP)",
+        "WPA2 — Uses AES-CCMP; current minimum standard",
+        "WPA3 — Uses SAE (Simultaneous Authentication of Equals); strongest",
+        "802.1X/EAP — Enterprise authentication for wireless (RADIUS backend)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Protocol",
+        "Encryption",
+        "Authentication",
+        "Status"
+      ],
+      "rows": [
+        [
+          "WEP",
+          "RC4 (broken)",
+          "Shared key",
+          "Deprecated/Broken"
+        ],
+        [
+          "WPA",
+          "TKIP/RC4",
+          "PSK or Enterprise",
+          "Deprecated"
+        ],
+        [
+          "WPA2",
+          "AES-CCMP",
+          "PSK or Enterprise",
+          "Current standard"
+        ],
+        [
+          "WPA3",
+          "AES-GCMP/SAE",
+          "SAE or Enterprise",
+          "Latest standard"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Shon Harris: \"Wireless encryption at the Data Link Layer\" operates at Layer 2. ⚠️ Exam Trap: WEP is COMPLETELY broken and should never be used. WPA2 with AES is the MINIMUM acceptable standard. WPA3 is preferred for new deployments."
+    },
+    {
+      "kind": "heading",
+      "text": "Wireless Attacks"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Evil Twin — Rogue AP mimicking legitimate network",
+        "Deauthentication — Forcing clients to disconnect (DoS or capture handshake)",
+        "War Driving — Scanning for wireless networks while driving",
+        "WPS Attack — Exploiting Wi-Fi Protected Setup PIN (brute-forceable)",
+        "Bluetooth attacks — Bluejacking, Bluesnarfing, Bluebugging"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Attack",
+        "Target",
+        "Description"
+      ],
+      "rows": [
+        [
+          "Evil Twin",
+          "Users",
+          "Fake AP with same SSID; captures credentials"
+        ],
+        [
+          "Deauth",
+          "Clients",
+          "Sends deauth frames to disconnect users"
+        ],
+        [
+          "KRACK",
+          "WPA2",
+          "Key reinstallation attack on 4-way handshake"
+        ],
+        [
+          "Bluejacking",
+          "Bluetooth",
+          "Sending unsolicited messages"
+        ],
+        [
+          "Bluesnarfing",
+          "Bluetooth",
+          "Stealing data from Bluetooth device"
+        ],
+        [
+          "Bluebugging",
+          "Bluetooth",
+          "Taking control of Bluetooth device"
+        ]
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "WEP: Wired Equivalent Privacy; broken, never use (RC4, static keys)",
+    "WPA: Wi-Fi Protected Access; improved but still uses RC4 (TKIP)",
+    "WPA2: Uses AES-CCMP; current minimum standard",
+    "WPA3: Uses SAE (Simultaneous Authentication of Equals); strongest",
+    "802.1X/EAP: Enterprise authentication for wireless (RADIUS backend)",
+    "Evil Twin: Rogue AP mimicking legitimate network",
+    "Deauthentication: Forcing clients to disconnect (DoS or capture handshake)",
+    "War Driving: Scanning for wireless networks while driving"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"WEP\" is described as:",
+      "choices": {
+        "A": "Wired Equivalent Privacy; broken, never use (RC4, static keys)",
+        "B": "Uses SAE (Simultaneous Authentication of Equals); strongest",
+        "C": "Wi-Fi Protected Access; improved but still uses RC4 (TKIP)",
+        "D": "Forcing clients to disconnect (DoS or capture handshake)"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: WEP — Wired Equivalent Privacy; broken, never use (RC4, static keys)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"WPA\" is described as:",
+      "choices": {
+        "A": "Wi-Fi Protected Access; improved but still uses RC4 (TKIP)",
+        "B": "Enterprise authentication for wireless (RADIUS backend)",
+        "C": "Forcing clients to disconnect (DoS or capture handshake)",
+        "D": "Uses SAE (Simultaneous Authentication of Equals); strongest"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: WPA — Wi-Fi Protected Access; improved but still uses RC4 (TKIP)"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"WPA2\" is described as:",
+      "choices": {
+        "A": "Bluejacking, Bluesnarfing, Bluebugging",
+        "B": "Uses AES-CCMP; current minimum standard",
+        "C": "Rogue AP mimicking legitimate network",
+        "D": "Scanning for wireless networks while driving"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: WPA2 — Uses AES-CCMP; current minimum standard"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"WPA3\" is described as:",
+      "choices": {
+        "A": "Wi-Fi Protected Access; improved but still uses RC4 (TKIP)",
+        "B": "Wired Equivalent Privacy; broken, never use (RC4, static keys)",
+        "C": "Uses SAE (Simultaneous Authentication of Equals); strongest",
+        "D": "Forcing clients to disconnect (DoS or capture handshake)"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: WPA3 — Uses SAE (Simultaneous Authentication of Equals); strongest"
+    }
+  ]
+}

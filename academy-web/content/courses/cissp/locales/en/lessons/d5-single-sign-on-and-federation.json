@@ -1,0 +1,406 @@
+{
+  "nodeId": "d5-single-sign-on-and-federation",
+  "locale": "en",
+  "title": "Single Sign-On and Federation",
+  "objective": "Study-guide review — CISSP — Domain 5: Identity and Access Management (IAM): Single Sign-On and Federation.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Single Sign-On"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "User authenticates once and gains access to multiple systems",
+        "Reduces password fatigue and support calls",
+        "Single point of compromise — if SSO credential is stolen, all access is compromised",
+        "Must be combined with MFA to mitigate single-point risk",
+        "SSO improves both security (fewer passwords to manage) and usability"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Stewart: \"Scripted access or logon scripts establish communication links by providing an automated process to transmit login credentials at the start of a login session. Scripted access can often simulate SSO even though the environment still requires multiple authentications.\" SSO Benefits:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Users manage fewer passwords (better password hygiene)",
+        "Faster access to resources (productivity)",
+        "Centralized authentication management",
+        "Easier to enforce consistent security policies"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "SSO Risks:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Single point of failure/compromise",
+        "If SSO system is down, no access to any connected system",
+        "Requires strong authentication for the SSO credential"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Kerberos"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Ticket-based authentication system (developed at MIT)",
+        "Uses symmetric key cryptography (AES)",
+        "KDC (Key Distribution Center) — Central authentication authority",
+        "TGT (Ticket Granting Ticket) — Proves identity to the ticket-granting server",
+        "Service Ticket — Grants access to a specific service"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Kerberos Authentication Flow:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "User sends credentials to Authentication Server (AS)",
+        "AS responds with a message containing the TGT (encrypted with the KDC's secret key/krbtgt) and a session key (encrypted with the user's key)",
+        "User presents TGT to Ticket Granting Server (TGS) — user cannot read the TGT itself, only forwards it",
+        "TGS issues Service Ticket for the requested service",
+        "User presents Service Ticket to the application server"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "Key Kerberos Concepts:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Realm — The domain/scope of Kerberos authority",
+        "Principal — Any entity with an identity in Kerberos (user or service)",
+        "Session key — Temporary key for communication between principal and service",
+        "Timestamps — Used to prevent replay attacks (requires synchronized clocks)"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Kerberos Vulnerabilities:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "KDC is a single point of failure — if KDC goes down, no authentication",
+        "Clock synchronization required (typically within 5 minutes)",
+        "Pass-the-ticket attacks — stolen tickets can be reused",
+        "Golden ticket — forged TGT using compromised krbtgt account"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Kerberos uses SYMMETRIC encryption and requires SYNCHRONIZED CLOCKS. If clocks are out of sync, authentication fails. Kerberos does NOT use certificates or asymmetric keys."
+    },
+    {
+      "kind": "heading",
+      "text": "SAML"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Security Assertion Markup Language — XML-based SSO for web applications",
+        "Identity Provider (IdP) — Authenticates the user",
+        "Service Provider (SP) — Provides the resource/application",
+        "Uses assertions (authentication, attribute, authorization)",
+        "Common in enterprise SSO for cloud/web applications"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SAML Flow:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "User requests access to SP (e.g., Salesforce)",
+        "SP redirects user to IdP (e.g., Okta)",
+        "User authenticates with IdP",
+        "IdP sends SAML assertion (signed XML) to SP",
+        "SP validates assertion and grants access"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "SAML Assertion Types:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Authentication — User has been authenticated (who they are)",
+        "Attribute — User attributes (role, department, email)",
+        "Authorization — What the user is authorized to do"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: SAML is XML-based and primarily used for WEB-BASED SSO. For mobile/API authentication, OAuth/OIDC is more appropriate."
+    },
+    {
+      "kind": "heading",
+      "text": "OAuth and OpenID Connect"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "OAuth 2.0 — Authorization framework (NOT authentication)",
+        "OpenID Connect (OIDC) — Authentication layer built on top of OAuth 2.0",
+        "Uses access tokens and ID tokens (JWT format)",
+        "Common for third-party app authorization (\"Login with Google\")",
+        "Supports mobile and API use cases better than SAML"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Key Distinction:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "OAuth 2.0 = Authorization (\"What can you access?\") — issues access tokens",
+        "OpenID Connect = Authentication (\"Who are you?\") — adds identity layer with ID tokens"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "OAuth Flow Example (Login with Google):"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "User clicks \"Login with Google\" on App",
+        "App redirects to Google authorization server",
+        "User consents to sharing profile info",
+        "Google issues authorization code",
+        "App exchanges code for access token",
+        "App uses token to access Google APIs on user's behalf"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: OAuth is AUTHORIZATION, not authentication. It delegates access without sharing passwords. OpenID Connect ADDS authentication to OAuth. Know the difference."
+    },
+    {
+      "kind": "heading",
+      "text": "LDAP and Directory Services"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "LDAP (Lightweight Directory Access Protocol) — Protocol for accessing directory services",
+        "Uses hierarchical structure (DC → OU → CN)",
+        "Port 389 (LDAP), Port 636 (LDAPS — encrypted)",
+        "Active Directory — Microsoft's LDAP-based directory service",
+        "Stores user accounts, groups, policies, and computer objects"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Federated Identity Management"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Extends authentication trust across organizational boundaries",
+        "Users authenticate in their home organization and access resources in partner organizations",
+        "Based on trust relationships between identity providers",
+        "Standards: SAML, OAuth, OIDC, WS-Federation",
+        "Reduces need for multiple accounts across organizations"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Chapple: \"Federated identity allows sharing of identity information between organizations.\" Federation Benefits:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Users manage one set of credentials",
+        "Organizations don't need to create/manage accounts for external users",
+        "Standardized protocols ensure interoperability",
+        "Reduces password management overhead"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Federation Risks:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Trust dependency on external IdP",
+        "If partner's IdP is compromised, your resources may be at risk",
+        "Complex trust relationship management"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "RADIUS vs. TACACS+"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "RADIUS — Remote Authentication Dial-In User Service (ports 1812/1813)",
+        "TACACS+ — Terminal Access Controller Access-Control System Plus (port 49)",
+        "Both are AAA protocols (Authentication, Authorization, Accounting)",
+        "RADIUS is industry standard; TACACS+ is Cisco-proprietary",
+        "Critical distinction: encryption scope and protocol type"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Feature",
+        "RADIUS",
+        "TACACS+"
+      ],
+      "rows": [
+        [
+          "Protocol",
+          "UDP (1812/1813)",
+          "TCP (port 49)"
+        ],
+        [
+          "Encryption",
+          "Encrypts password only",
+          "Encrypts entire payload"
+        ],
+        [
+          "AAA",
+          "Combines authentication and authorization",
+          "Separates authentication, authorization, and accounting"
+        ],
+        [
+          "Vendor",
+          "Open standard (RFC 2865)",
+          "Cisco proprietary"
+        ],
+        [
+          "Use Case",
+          "Network access (VPN, Wi-Fi)",
+          "Device administration (router/switch management)"
+        ],
+        [
+          "Multiprotocol",
+          "IP only",
+          "Supports multiple protocols (AppleTalk, IPX, etc.)"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From the ISC2 Study Guide: \"RADIUS uses UDP, and TACACS+ uses TCP. RADIUS encrypts only the password, but TACACS+ encrypts the full payload.\" ⚠️ Exam Trap: RADIUS encrypts ONLY the password in the access-request packet. TACACS+ encrypts the ENTIRE payload. If the question asks about \"more secure\" AAA protocol, TACACS+ is the answer because of full payload encryption. ⚠️ Exam Trap: TACACS+ SEPARATES authentication, authorization, and accounting into distinct processes. RADIUS COMBINES authentication and authorization. This separation in TACACS+ provides more granular control."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "KDC (Key Distribution Center): Central authentication authority",
+    "TGT (Ticket Granting Ticket): Proves identity to the ticket-granting server",
+    "Service Ticket: Grants access to a specific service",
+    "Realm: The domain/scope of Kerberos authority",
+    "Principal: Any entity with an identity in Kerberos (user or service)",
+    "Session key: Temporary key for communication between principal and service",
+    "Timestamps: Used to prevent replay attacks (requires synchronized clocks)",
+    "KDC is a single point of failure: if KDC goes down, no authentication"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"KDC (Key Distribution Center)\" is described as:",
+      "choices": {
+        "A": "Provides the resource/application",
+        "B": "What the user is authorized to do",
+        "C": "XML-based SSO for web applications",
+        "D": "Central authentication authority"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: KDC (Key Distribution Center) — Central authentication authority"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"TGT (Ticket Granting Ticket)\" is described as:",
+      "choices": {
+        "A": "Authorization framework (NOT authentication)",
+        "B": "Proves identity to the ticket-granting server",
+        "C": "Authentication layer built on top of OAuth 2.0",
+        "D": "forged TGT using compromised krbtgt account"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: TGT (Ticket Granting Ticket) — Proves identity to the ticket-granting server"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"Service Ticket\" is described as:",
+      "choices": {
+        "A": "Grants access to a specific service",
+        "B": "Provides the resource/application",
+        "C": "XML-based SSO for web applications",
+        "D": "if KDC goes down, no authentication"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Service Ticket — Grants access to a specific service"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"Realm\" is described as:",
+      "choices": {
+        "A": "if KDC goes down, no authentication",
+        "B": "Grants access to a specific service",
+        "C": "The domain/scope of Kerberos authority",
+        "D": "Microsoft's LDAP-based directory service"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Realm — The domain/scope of Kerberos authority"
+    }
+  ]
+}

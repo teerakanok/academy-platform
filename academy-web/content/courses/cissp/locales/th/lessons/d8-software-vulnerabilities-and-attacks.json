@@ -1,0 +1,253 @@
+{
+  "nodeId": "d8-software-vulnerabilities-and-attacks",
+  "locale": "th",
+  "title": "Software Vulnerabilities and Attacks",
+  "objective": "Study-guide review — CISSP — Domain 8: Software Development Security: Software Vulnerabilities and Attacks.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Buffer Overflow"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Occurs when a program writes data beyond the boundaries of allocated memory (buffer)",
+        "Attacker overwrites adjacent memory, potentially including the instruction pointer (return address)",
+        "Once the instruction pointer is overwritten, whatever code has been placed in the buffer can be executed, all under the security context of the application",
+        "Stack-based buffer overflow — overflows the call stack; most common type",
+        "Heap-based buffer overflow — overflows dynamically allocated memory on the heap",
+        "Defenses: bounds checking, safe string functions, stack canaries, ASLR (Address Space Layout Randomization), DEP/NX (Data Execution Prevention / No-Execute), using memory-safe languages"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Buffer overflows are one of the most dangerous and well-understood software vulnerabilities. The attack works by providing more input than the buffer can hold, causing the excess data to overwrite adjacent memory. If the attacker carefully crafts the overflow data, they can overwrite the return address (instruction pointer) on the stack to point to their malicious code (shellcode). The key principle: the malicious code executes with the same privileges as the vulnerable application. If the application runs as root/administrator, the attacker gains full system control. Modern defenses make exploitation more difficult but do not eliminate the vulnerability:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "ASLR — randomizes memory addresses so attackers cannot predict where their shellcode will be loaded",
+        "DEP/NX — marks memory regions as non-executable, preventing code execution in data areas",
+        "Stack canaries — special values placed between buffers and control data; if overwritten, the application terminates before the malicious code can execute",
+        "Memory-safe languages (Java, Python, Rust) — prevent buffer overflows through bounds checking"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Buffer overflow executes code in the security context of the vulnerable application. This is why running services with least privilege is critical — even if a buffer overflow is exploited, the damage is limited to the application's privileges."
+    },
+    {
+      "kind": "heading",
+      "text": "Injection Attacks"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "SQL Injection — inserting malicious SQL commands into input fields that are used in database queries",
+        "Defense: parameterized queries (prepared statements), stored procedures, input validation",
+        "Command Injection (OS Injection) — inserting operating system commands through application input",
+        "Defense: avoid calling OS commands from application code; if necessary, use strict allowlisting",
+        "LDAP Injection — inserting malicious LDAP statements into queries",
+        "XML Injection / XXE (XML External Entity) — exploiting XML parsers to read files, perform SSRF, or cause DoS",
+        "NoSQL Injection — similar to SQL injection but targeting NoSQL databases"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Injection attacks consistently rank among the most critical web application vulnerabilities. The root cause is always the same: the application fails to properly separate code from data, allowing attacker-supplied data to be interpreted as commands. SQL injection example:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Vulnerable code: SELECT * FROM users WHERE username = '\" + userInput + \"'\"",
+        "Malicious input: ' OR '1'='1",
+        "Resulting query: SELECT * FROM users WHERE username = '' OR '1'='1' — returns all users"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The parameterized query defense works because the database engine treats the parameter as a data value, not part of the SQL command, regardless of what the user provides:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Safe code: SELECT * FROM users WHERE username = ? (with parameter binding)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Cross-Site Scripting (XSS)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Attacker injects malicious scripts (usually JavaScript) into web pages viewed by other users",
+        "Reflected (non-persistent) XSS — malicious script is reflected off a web server (e.g., in error messages, search results); victim must click a crafted link",
+        "Stored (persistent) XSS — malicious script is permanently stored on the server (e.g., in a forum post, comment, database record); affects all users who view the content",
+        "DOM-based XSS — vulnerability exists in client-side JavaScript that manipulates the DOM without proper sanitization",
+        "Consequences: session hijacking, credential theft, defacement, malware distribution, keylogging",
+        "Defenses: output encoding, input validation, Content Security Policy (CSP), HttpOnly cookie flag"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The nonpersistent (reflected) cross-site scripting vulnerability requires the victim to click a specially crafted link containing the malicious script. The script is sent to the server, which \"reflects\" it back in the response. The victim's browser then executes the script in the context of the vulnerable website. Stored XSS is more dangerous because it does not require victim interaction beyond visiting the page — the malicious script is stored on the server and delivered to every user who views the affected page. Frameworks that automatically implement anti-XSS protections (automatic output encoding) significantly reduce XSS risk. Content Security Policy (CSP) headers provide an additional layer of defense by instructing browsers to only execute scripts from approved sources. ⚠️ Exam Trap: Reflected XSS = requires victim to click a link (non-persistent). Stored XSS = stored on the server, affects all viewers (persistent). Stored is more dangerous because it doesn't require user interaction beyond normal browsing."
+    },
+    {
+      "kind": "heading",
+      "text": "Cross-Site Request Forgery (CSRF)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Attacker tricks a victim's browser into making unintended requests to a vulnerable web application where the victim is authenticated",
+        "Exploits the browser's automatic inclusion of cookies/credentials with requests",
+        "Example: victim is logged into their bank; visits a malicious page that contains a hidden form submitting a transfer request to the bank",
+        "Defenses: CSRF tokens (unique, unpredictable tokens per session/request), SameSite cookie attribute, re-authentication for sensitive operations, checking Referer/Origin headers"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Race Conditions and TOCTOU"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Race condition — occurs when the outcome depends on the timing or sequence of events, and multiple processes/threads compete for shared resources",
+        "TOCTOU (Time-of-Check to Time-of-Use) — specific race condition where a resource's state changes between the time it is checked and the time it is used",
+        "Example: checking file permissions (time-of-check), then opening the file (time-of-use) — an attacker may change the file between check and use",
+        "Defenses: atomic operations, proper locking mechanisms, minimizing the window between check and use, avoiding shared state"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "TOCTOU vulnerabilities are particularly insidious because they exploit the inherent gap between verifying a condition and acting on it. In a multithreaded or multi-user environment, another process can modify the resource in that gap. Common TOCTOU scenarios:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "File access: check if user has permission to read file → attacker replaces file with a symbolic link to a sensitive file → application reads the sensitive file",
+        "Authentication: verify user's access level → user's access is revoked → application performs the privileged action with stale authorization"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: TOCTOU is a specific type of race condition. If the exam mentions \"time-of-check to time-of-use\" or describes a scenario where a resource changes between verification and use, the answer is TOCTOU."
+    },
+    {
+      "kind": "heading",
+      "text": "Privilege Escalation"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Vertical escalation — gaining higher privileges than authorized (e.g., regular user → administrator)",
+        "Horizontal escalation — accessing resources of another user at the same privilege level (e.g., accessing another user's account)",
+        "Attack vectors: exploiting vulnerabilities (buffer overflow), misconfigurations, social engineering, credential theft",
+        "Defenses: least privilege, proper access controls, patching, monitoring for anomalous access patterns"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Backdoors and Trapdoors"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Backdoor — undocumented access method intentionally or unintentionally left in software",
+        "Trapdoor — essentially the same as a backdoor; sometimes used to describe a developer's maintenance access point",
+        "May be installed by: malware, attackers who have gained access, or developers during development (should be removed before release)",
+        "Defenses: code review, integrity monitoring, behavior analysis, following secure SDLC practices"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Stack-based buffer overflow: overflows the call stack; most common type",
+    "Heap-based buffer overflow: overflows dynamically allocated memory on the heap",
+    "ASLR: randomizes memory addresses so attackers cannot predict where their shellcode will be loaded",
+    "DEP/NX: marks memory regions as non-executable, preventing code execution in data areas",
+    "Stack canaries: special values placed between buffers and control data; if overwritten, the application terminates before the malicious code can execute",
+    "SQL Injection: inserting malicious SQL commands into input fields that are used in database queries",
+    "LDAP Injection: inserting malicious LDAP statements into queries",
+    "XML Injection / XXE (XML External Entity): exploiting XML parsers to read files, perform SSRF, or cause DoS"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Stack-based buffer overflow\" is described as:",
+      "choices": {
+        "A": "inserting malicious LDAP statements into queries",
+        "B": "overflows dynamically allocated memory on the heap",
+        "C": "similar to SQL injection but targeting NoSQL databases",
+        "D": "overflows the call stack; most common type"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Stack-based buffer overflow — overflows the call stack; most common type"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Heap-based buffer overflow\" is described as:",
+      "choices": {
+        "A": "overflows the call stack; most common type",
+        "B": "similar to SQL injection but targeting NoSQL databases",
+        "C": "overflows dynamically allocated memory on the heap",
+        "D": "inserting malicious LDAP statements into queries"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Heap-based buffer overflow — overflows dynamically allocated memory on the heap"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"ASLR\" is described as:",
+      "choices": {
+        "A": "vulnerability exists in client-side JavaScript that manipulates the DOM without proper sanitization",
+        "B": "randomizes memory addresses so attackers cannot predict where their shellcode will be loaded",
+        "C": "inserting malicious SQL commands into input fields that are used in database queries",
+        "D": "essentially the same as a backdoor; sometimes used to describe a developer's maintenance access point"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: ASLR — randomizes memory addresses so attackers cannot predict where their shellcode will be loaded"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"DEP/NX\" is described as:",
+      "choices": {
+        "A": "gaining higher privileges than authorized (e.g., regular user → administrator)",
+        "B": "marks memory regions as non-executable, preventing code execution in data areas",
+        "C": "undocumented access method intentionally or unintentionally left in software",
+        "D": "inserting malicious SQL commands into input fields that are used in database queries"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: DEP/NX — marks memory regions as non-executable, preventing code execution in data areas"
+    }
+  ]
+}

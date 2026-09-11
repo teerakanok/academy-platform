@@ -1,0 +1,193 @@
+{
+  "nodeId": "d1-investigation-types-and-evidence-handling",
+  "locale": "en",
+  "title": "Investigation Types and Evidence Handling",
+  "objective": "Study-guide review — CISSP — Domain 1: Security and Risk Management: Investigation Types and Evidence Handling.",
+  "blocks": [
+    {
+      "kind": "list",
+      "items": [
+        "Administrative Investigation — Internal policy violations",
+        "Criminal Investigation — Law enforcement, \"beyond a reasonable doubt\"",
+        "Civil Investigation — Lawsuits, \"preponderance of evidence\"",
+        "Regulatory Investigation — Compliance enforcement",
+        "Evidence must maintain chain of custody for admissibility"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Evidence Types:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Real/Physical Evidence — Tangible objects (hard drives, printed documents)",
+        "Documentary Evidence — Written documents, logs, records",
+        "Testimonial Evidence — Witness statements",
+        "Demonstrative Evidence — Models, diagrams, simulations"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Evidence Admissibility Requirements:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Relevant — Related to the case",
+        "Authentic — Proven to be genuine",
+        "Reliable — Collected using sound methods",
+        "Complete — Not modified or partial"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Chain of Custody documents:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Who collected the evidence",
+        "When it was collected",
+        "How it was stored and protected",
+        "Who had access to it",
+        "Any transfers of custody"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Criminal cases require \"beyond a reasonable doubt\" (highest standard). Civil cases require \"preponderance of evidence\" (more likely than not). The exam tests these standards."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Administrative Investigation: Internal policy violations",
+    "Criminal Investigation: Law enforcement, \"beyond a reasonable doubt\"",
+    "Civil Investigation: Lawsuits, \"preponderance of evidence\"",
+    "Regulatory Investigation: Compliance enforcement",
+    "Real/Physical Evidence: Tangible objects (hard drives, printed documents)",
+    "Documentary Evidence: Written documents, logs, records",
+    "Testimonial Evidence: Witness statements",
+    "Demonstrative Evidence: Models, diagrams, simulations"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "A CISSP discovers that their employer is knowingly violating privacy regulations by collecting and selling customer data without consent. What should the CISSP do FIRST?",
+      "choices": {
+        "A": "Immediately contact law enforcement",
+        "B": "Report the violation through the organization's internal channels",
+        "C": "Resign from the position to avoid personal liability",
+        "D": "Contact ISC2's ethics board to report the employer"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The CISSP should first report through internal channels. While Canon 1 (protect society) takes precedence over Canon 3 (service to principals), the responsible first step is internal reporting. If internal channels fail to address the violation, then external reporting (law enforcement, regulators) becomes appropriate. Resignation (C) doesn't address the problem. Contacting ISC2 (D) is about professional ethics violations, not criminal matters. Tests: ISC2 Code of Ethics, Canons priority, manager mindset"
+    },
+    {
+      "id": "q2",
+      "prompt": "An organization's total asset value for a web server is $500,000. A risk assessment determines that a specific threat has an exposure factor of 40% and is expected to occur twice per year. What is the Annualized Loss Expectancy (ALE)?",
+      "choices": {
+        "A": "$200,000",
+        "B": "$400,000",
+        "C": "$100,000",
+        "D": "$500,000"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "SLE = AV × EF = $500,000 × 0.40 = $200,000 ALE = SLE × ARO = $200,000 × 2 = $400,000 Tests: Quantitative risk analysis formulas — SLE = AV × EF, ALE = SLE × ARO"
+    },
+    {
+      "id": "q3",
+      "prompt": "During a business impact analysis, the team identifies that the email system has an MTD of 24 hours and an RTO of 16 hours. What is the maximum Work Recovery Time (WRT)?",
+      "choices": {
+        "A": "40 hours",
+        "B": "24 hours",
+        "C": "16 hours",
+        "D": "8 hours"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "MTD = RTO + WRT. Therefore, WRT = MTD − RTO = 24 − 16 = 8 hours. The WRT represents the time needed to verify the integrity of restored systems after the service is back online. Tests: BIA metrics — MTD, RTO, WRT relationship"
+    },
+    {
+      "id": "q4",
+      "prompt": "A security team discovers that a terminated employee's VPN access is still active two weeks after departure. Which personnel security control MOST directly addresses this failure?",
+      "choices": {
+        "A": "Separation of duties",
+        "B": "Mandatory vacations",
+        "C": "Proper offboarding procedures",
+        "D": "Job rotation"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Proper offboarding/termination procedures ensure that all access is revoked immediately upon termination. This is a failure in the termination process, not a failure of SoD, mandatory vacations, or job rotation. The organization should have a checklist that includes immediate access revocation across all systems. Tests: Personnel security — termination procedures"
+    },
+    {
+      "id": "q5",
+      "prompt": "Which of the following is NOT a valid risk response strategy?",
+      "choices": {
+        "A": "Risk avoidance",
+        "B": "Risk rejection",
+        "C": "Risk mitigation",
+        "D": "Risk transfer"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Risk rejection (ignoring or denying risk exists) is NEVER a valid response strategy. The four valid strategies are: avoidance, mitigation, transfer, and acceptance. Risk deterrence is sometimes considered a fifth strategy. Rejecting risk is essentially negligence. Tests: Risk response strategies"
+    },
+    {
+      "id": "q6",
+      "prompt": "A company is considering implementing a new firewall that costs $50,000 per year. The current ALE for network intrusions is $120,000. After implementing the firewall, the ALE is expected to decrease to $30,000. Should the company implement the firewall?",
+      "choices": {
+        "A": "Yes, because the value of the safeguard is $40,000",
+        "B": "Yes, because network security is always a priority",
+        "C": "No, because the firewall costs more than the residual ALE",
+        "D": "No, because qualitative analysis should be used instead"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "Cost-benefit analysis: (ALE before) − (ALE after) − (Cost of control) = Value $120,000 − $30,000 − $50,000 = $40,000 (positive value) Since the value is positive, the control is cost-effective and should be implemented. A manager would evaluate this based on the financial analysis, not just \"security is always a priority\" (which is not how managers think about risk). Tests: Quantitative risk analysis, cost-benefit analysis, manager mindset"
+    },
+    {
+      "id": "q7",
+      "prompt": "According to the ISC2 Code of Ethics, which Canon has the HIGHEST priority?",
+      "choices": {
+        "A": "Provide diligent and competent service to principals",
+        "B": "Act honorably, honestly, justly, responsibly, and legally",
+        "C": "Advance and protect the profession",
+        "D": "Protect society, the common good, necessary public trust and confidence, and the infrastructure"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "Canon 1 — \"Protect society, the common good, necessary public trust and confidence, and the infrastructure\" — has the highest priority. The Canons are applied in order: 1 > 2 > 3 > 4. If conflicts arise between Canons, the higher-priority Canon takes precedence. Tests: ISC2 Code of Ethics — Canon priority order"
+    },
+    {
+      "id": "q8",
+      "prompt": "Which type of security document is NOT mandatory within an organization?",
+      "choices": {
+        "A": "Policy",
+        "B": "Standard",
+        "C": "Guideline",
+        "D": "Procedure"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Guidelines are advisory and not compulsory. They outline methodologies and include suggested actions. Policies, standards, and procedures are all mandatory documents that employees must follow. Tests: Security policy hierarchy — mandatory vs. advisory"
+    }
+  ]
+}

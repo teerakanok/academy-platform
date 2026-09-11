@@ -1,0 +1,274 @@
+{
+  "nodeId": "d5-authentication-methods",
+  "locale": "en",
+  "title": "Authentication Methods",
+  "objective": "Study-guide review — CISSP — Domain 5: Identity and Access Management (IAM): Authentication Methods.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Authentication Factors"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Type 1 — Something You Know — Password, PIN, security question",
+        "Type 2 — Something You Have — Smart card, token, phone",
+        "Type 3 — Something You Are — Biometrics (fingerprint, iris, face)",
+        "Type 4 — Somewhere You Are — Geolocation, IP address",
+        "Type 5 — Something You Do — Behavioral biometrics (typing pattern, gait)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Chapple: \"The three factors of authentication are something you know (such as a password or PIN), something you have (such as a smartcard or token), and something you are (based on biometrics). Multifactor authentication includes two or more authentication factors, and using it is more secure than using a single factor.\" ⚠️ Exam Trap: The classic three factors are Types 1-3. Types 4 and 5 are supplementary. MFA requires factors from at LEAST two DIFFERENT categories. Two passwords = single factor (both are Type 1)."
+    },
+    {
+      "kind": "heading",
+      "text": "Multi-Factor Authentication"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Combines two or more DIFFERENT authentication factor types",
+        "Much stronger than any single factor alone",
+        "Required by many compliance frameworks (PCI DSS, HIPAA)",
+        "Two-factor (2FA) — minimum acceptable MFA",
+        "All factors should be independent — compromise of one shouldn't reveal another"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Valid MFA combinations:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Password (Type 1) + Hardware token (Type 2) = 2FA",
+        "PIN (Type 1) + Fingerprint (Type 3) = 2FA",
+        "Smart card (Type 2) + PIN (Type 1) = 2FA"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "NOT MFA:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Password + Security question = Single factor (both Type 1)",
+        "Two different PINs = Single factor (both Type 1)"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: SMS-based MFA (receiving codes via text) is weaker than app-based or hardware tokens because SMS can be intercepted (SIM swapping, SS7 attacks). However, SMS MFA is still better than no MFA."
+    },
+    {
+      "kind": "heading",
+      "text": "Password Management"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Complexity — Require uppercase, lowercase, numbers, special characters",
+        "Length — Minimum 8-12 characters (longer is better)",
+        "History — Prevent reuse of recent passwords (typically last 12-24)",
+        "Aging — Force periodic changes (debated; NIST now recommends against forced rotation)",
+        "Account lockout — Lock after failed attempts (typically 3-5)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "NIST SP 800-63B (Updated Password Guidance):"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Favor longer passwords/passphrases over complexity rules",
+        "Don't force periodic password changes (unless breach suspected)",
+        "Screen passwords against known compromised password lists",
+        "Allow paste into password fields (encourages password managers)",
+        "Don't use password hints or knowledge-based questions"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Password Storage:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Never store passwords in plaintext",
+        "Use salted hashes (bcrypt, scrypt, Argon2)",
+        "Salt = random value added before hashing to prevent rainbow table attacks"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: NIST's updated guidance RECOMMENDS AGAINST forced periodic password changes. However, the CISSP exam may still test traditional password policies. Know both perspectives."
+    },
+    {
+      "kind": "heading",
+      "text": "Biometric Authentication"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Physiological — Fingerprint, iris, retina, facial recognition, palm vein",
+        "Behavioral — Voice pattern, typing rhythm, signature dynamics, gait",
+        "Crossover Error Rate (CER/EER) — Where FAR and FRR meet; lower = better accuracy",
+        "False Accept Rate (FAR/Type II) — Unauthorized person accepted (security risk)",
+        "False Reject Rate (FRR/Type I) — Authorized person rejected (usability issue)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Metric",
+        "Description",
+        "Security Impact"
+      ],
+      "rows": [
+        [
+          "FAR (Type II)",
+          "False Accept Rate",
+          "More dangerous — lets intruders in"
+        ],
+        [
+          "FRR (Type I)",
+          "False Reject Rate",
+          "Annoying — locks out legitimate users"
+        ],
+        [
+          "CER/EER",
+          "Crossover Error Rate",
+          "Best accuracy measure — lower = better"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Biometric Ranking by Accuracy: Iris > Retina > Fingerprint > Palm > Voice > Face > Signature From Shon Harris: Biometric factors include \"something you are (based on biometrics).\" Side channel attacks can target biometric systems \"by gathering data pertaining to how a device operates.\" ⚠️ Exam Trap: FAR (Type II error) is MORE DANGEROUS than FRR (Type I error). FAR lets unauthorized users in. FRR merely inconveniences legitimate users. To increase security, lower the FAR (which increases FRR — tradeoff). ⚠️ Exam Trap: Retina scans are the MOST accurate but also the MOST invasive. They can reveal health conditions, raising privacy concerns."
+    },
+    {
+      "kind": "heading",
+      "text": "Token-Based Authentication"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Hardware tokens — Physical devices generating one-time codes (RSA SecurID)",
+        "Software tokens — Apps generating TOTP codes (Google Authenticator)",
+        "Smart cards — Contain embedded certificate/key (CAC, PIV)",
+        "HOTP — HMAC-based One-Time Password (counter-based)",
+        "TOTP — Time-based One-Time Password (time-based; most common)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Shon Harris: Smart cards \"require physical interaction with a reader (contact) or no physical interaction with the reader (contactless architectures). Two contactless architectures are combi (one chip) and hybrid (two chips).\" Smart Card Components:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Embedded microprocessor or memory chip",
+        "Stores X.509 certificates and private keys",
+        "Requires PIN to unlock (two-factor: something you have + something you know)",
+        "Resistant to cloning when using crypto processor"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Type 1 — Something You Know: Password, PIN, security question",
+    "Type 2 — Something You Have: Smart card, token, phone",
+    "Type 3 — Something You Are: Biometrics (fingerprint, iris, face)",
+    "Type 4 — Somewhere You Are: Geolocation, IP address",
+    "Type 5 — Something You Do: Behavioral biometrics (typing pattern, gait)",
+    "Two-factor (2FA): minimum acceptable MFA",
+    "Complexity: Require uppercase, lowercase, numbers, special characters",
+    "Length: Minimum 8-12 characters (longer is better)"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"Type 1 — Something You Know\" is described as:",
+      "choices": {
+        "A": "Password, PIN, security question",
+        "B": "Geolocation, IP address",
+        "C": "Smart card, token, phone",
+        "D": "Biometrics (fingerprint, iris, face)"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Type 1 — Something You Know — Password, PIN, security question"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"Type 2 — Something You Have\" is described as:",
+      "choices": {
+        "A": "Geolocation, IP address",
+        "B": "minimum acceptable MFA",
+        "C": "Crossover Error Rate",
+        "D": "Smart card, token, phone"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Type 2 — Something You Have — Smart card, token, phone"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"Type 3 — Something You Are\" is described as:",
+      "choices": {
+        "A": "Password, PIN, security question",
+        "B": "Minimum 8-12 characters (longer is better)",
+        "C": "Lock after failed attempts (typically 3-5)",
+        "D": "Biometrics (fingerprint, iris, face)"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Type 3 — Something You Are — Biometrics (fingerprint, iris, face)"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"Type 4 — Somewhere You Are\" is described as:",
+      "choices": {
+        "A": "Crossover Error Rate",
+        "B": "minimum acceptable MFA",
+        "C": "Geolocation, IP address",
+        "D": "Smart card, token, phone"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Type 4 — Somewhere You Are — Geolocation, IP address"
+    }
+  ]
+}

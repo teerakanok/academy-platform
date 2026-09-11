@@ -1,0 +1,301 @@
+{
+  "nodeId": "d2-data-security-controls",
+  "locale": "th",
+  "title": "Data Security Controls",
+  "objective": "Study-guide review — CISSP — Domain 2: Asset Security: Data Security Controls.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Scoping and Tailoring"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Scoping — Determining which parts of a standard/framework apply to your organization",
+        "Tailoring — Customizing selected controls to fit specific organizational needs",
+        "Baselines — Minimum security configuration levels for systems",
+        "Organizations may need compensating controls when standard controls aren't feasible",
+        "Control selection must balance security needs with business requirements"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Chapple: \"Some controls aren't appropriate or feasible in a remote office location. In this situation, the organization can select compensating security controls to tailor the baseline to the remote location.\" Scoping narrows the list of controls to those relevant to the organization's environment. Tailoring adjusts those controls to fit specific needs while maintaining adequate security. Example: A NIST 800-53 control requires smart card authentication. If an organization cannot implement smart cards, they might tailor this control by implementing MFA with hardware tokens as a compensating control."
+    },
+    {
+      "kind": "heading",
+      "text": "Data Loss Prevention (DLP)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Network DLP — Scans files before they leave the network (including cloud DLP)",
+        "Endpoint DLP — Prevents users from copying, printing, or transferring sensitive files",
+        "Storage DLP — Scans data at rest for policy violations",
+        "DLP solutions use content inspection and contextual analysis",
+        "DLP relies on data classification to identify sensitive data"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Chapple: \"Network DLP solutions scan files before they leave the network. Endpoint DLP solutions prevent users from copying or printing some files.\" DLP detection methods:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Keyword matching — Searching for specific terms",
+        "Pattern matching — Detecting data patterns (credit card numbers, SSNs)",
+        "Document fingerprinting — Identifying specific documents",
+        "Statistical analysis — Detecting anomalous data movements"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "DLP is most effective when combined with proper data classification. Without classification, DLP cannot reliably identify what data needs protection. ⚠️ Exam Trap: DLP requires data classification to work effectively. If data isn't classified, DLP has no way to know what's sensitive."
+    },
+    {
+      "kind": "heading",
+      "text": "Encryption for Data Protection"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "At Rest — Full-disk encryption (FDE), file-level encryption, database encryption",
+        "In Transit — TLS, IPsec, VPN, S/MIME for email",
+        "In Use — Homomorphic encryption, secure enclaves (emerging technology)",
+        "Encryption does NOT replace access controls — use both",
+        "Key management is critical — lost keys = lost data"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Encryption is one of the most important data security controls across all data states:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Data State",
+        "Encryption Method",
+        "Use Case"
+      ],
+      "rows": [
+        [
+          "At Rest",
+          "AES-256, BitLocker, FileVault",
+          "Disk/file encryption"
+        ],
+        [
+          "In Transit",
+          "TLS 1.3, IPsec, WireGuard",
+          "Network communication"
+        ],
+        [
+          "In Use",
+          "Intel SGX, AMD SEV",
+          "Processing sensitive data"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From the Official CBK: Email content protection example — \"Private: Email and attachments must be encrypted with AES 256.\" Key Management Considerations:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Who creates keys?",
+        "How are keys stored and protected?",
+        "How are keys distributed?",
+        "When are keys rotated?",
+        "How are keys revoked/destroyed?",
+        "What happens if a key is compromised?"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Access Controls for Data"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Access should follow need-to-know and least privilege principles",
+        "Mandatory Access Control (MAC) — System-enforced based on labels/clearances",
+        "Discretionary Access Control (DAC) — Owner decides who can access",
+        "Role-Based Access Control (RBAC) — Access based on job role/function",
+        "Access must be reviewed regularly (access reviews/recertification)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Model",
+        "Who Decides",
+        "Strength",
+        "Use Case"
+      ],
+      "rows": [
+        [
+          "MAC",
+          "System/policy",
+          "Strongest",
+          "Government/military"
+        ],
+        [
+          "DAC",
+          "Data owner",
+          "Flexible",
+          "General business"
+        ],
+        [
+          "RBAC",
+          "Administrator",
+          "Scalable",
+          "Enterprise"
+        ],
+        [
+          "ABAC",
+          "Attributes/rules",
+          "Fine-grained",
+          "Cloud, complex environments"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Shon Harris: \"In MAC, the system compares the subject's security clearance to the object's security label. In DAC, the system compares the subject's identity to the ACL on the resource.\" ⚠️ Exam Trap: MAC is the MOST restrictive model — the system enforces access based on labels, and even the data owner cannot override these restrictions. DAC is the LEAST restrictive — the owner has full control over who accesses their data."
+    },
+    {
+      "kind": "heading",
+      "text": "Digital Rights Management (DRM) and Information Rights Management (IRM)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "DRM — technologies that control how digital content (music, video, software, e-books) is used, copied, and distributed",
+        "IRM — applies DRM concepts to enterprise documents and email (e.g., preventing forwarding, printing, or copying of sensitive documents)",
+        "DRM/IRM enforces persistent protection — controls travel with the data regardless of location",
+        "Common DRM techniques: licensing, encryption, digital watermarking, online authentication, automatic expiration",
+        "DMCA (Digital Millennium Copyright Act) — prohibits circumvention of DRM/copyright protection mechanisms"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: \"The purpose of DRM is to prevent the unauthorized use, modification, and distribution of copyrighted works such as intellectual property.\" DRM techniques include:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Licensing — grants access and defines terms of use; tied to specific devices or accounts",
+        "Encryption — content is encrypted; only authorized users with valid licenses can decrypt",
+        "Digital watermarking — embedded tags that tie content to specific license holders for tracking unauthorized distribution",
+        "Persistent online authentication — requires periodic connection to verify license validity",
+        "Automatic expiration — content access expires after a defined period"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "IRM extends DRM to enterprise environments. Examples:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Microsoft Azure Information Protection / Purview — prevent email forwarding, restrict document printing",
+        "Adobe Document Cloud — persistent PDF access controls",
+        "Enterprise IRM can restrict: copying, printing, screen capture, forwarding, editing"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Chapple: \"Persistent online authentication, automatic expiration, and a continuous audit trail are all methods used with digital rights management (DRM) technologies.\" ⚠️ Exam Trap: DRM protects copyrighted content (music, video, software). IRM protects enterprise data (documents, email). Both provide persistent protection that follows the data. The exam may test the distinction between DRM and IRM, or ask about DMCA provisions that make circumventing DRM illegal."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Scoping: Determining which parts of a standard/framework apply to your organization",
+    "Tailoring: Customizing selected controls to fit specific organizational needs",
+    "Baselines: Minimum security configuration levels for systems",
+    "Network DLP: Scans files before they leave the network (including cloud DLP)",
+    "Endpoint DLP: Prevents users from copying, printing, or transferring sensitive files",
+    "Storage DLP: Scans data at rest for policy violations",
+    "Keyword matching: Searching for specific terms",
+    "Pattern matching: Detecting data patterns (credit card numbers, SSNs)"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Scoping\" is described as:",
+      "choices": {
+        "A": "content is encrypted; only authorized users with valid licenses can decrypt",
+        "B": "Determining which parts of a standard/framework apply to your organization",
+        "C": "grants access and defines terms of use; tied to specific devices or accounts",
+        "D": "Prevents users from copying, printing, or transferring sensitive files"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Scoping — Determining which parts of a standard/framework apply to your organization"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Tailoring\" is described as:",
+      "choices": {
+        "A": "Scans files before they leave the network (including cloud DLP)",
+        "B": "Prevents users from copying, printing, or transferring sensitive files",
+        "C": "Full-disk encryption (FDE), file-level encryption, database encryption",
+        "D": "Customizing selected controls to fit specific organizational needs"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Tailoring — Customizing selected controls to fit specific organizational needs"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Baselines\" is described as:",
+      "choices": {
+        "A": "requires periodic connection to verify license validity",
+        "B": "content access expires after a defined period",
+        "C": "Minimum security configuration levels for systems",
+        "D": "Detecting data patterns (credit card numbers, SSNs)"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Baselines — Minimum security configuration levels for systems"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Network DLP\" is described as:",
+      "choices": {
+        "A": "prohibits circumvention of DRM/copyright protection mechanisms",
+        "B": "Homomorphic encryption, secure enclaves (emerging technology)",
+        "C": "Customizing selected controls to fit specific organizational needs",
+        "D": "Scans files before they leave the network (including cloud DLP)"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Network DLP — Scans files before they leave the network (including cloud DLP)"
+    }
+  ]
+}

@@ -1,0 +1,223 @@
+{
+  "nodeId": "d8-identify-and-apply-security-controls-in-software-develo",
+  "locale": "en",
+  "title": "Identify and Apply Security Controls in Software Development Ecosystems",
+  "objective": "Study-guide review — CISSP — Domain 8: Software Development Security: Identify and Apply Security Controls in Software Development Ecosystems.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Programming Languages and Concepts"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Language types:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Compiled — source code translated to machine code before execution (C, C++, Rust, Go); generally faster execution",
+        "Interpreted — source code executed line-by-line at runtime (Python, Ruby, JavaScript); more portable but slower",
+        "Hybrid — compiled to intermediate bytecode, then interpreted/JIT compiled (Java, C#)"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Object-Oriented Programming (OOP) concepts:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Encapsulation — bundling data and methods together; hiding internal implementation from external access; supports information hiding",
+        "Inheritance — creating new classes from existing ones; promotes code reuse",
+        "Polymorphism — objects of different types can be treated as objects of a common parent type",
+        "Abstraction — exposing only essential features while hiding implementation details"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Security-relevant concepts:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Cohesion — degree to which elements within a module belong together; high cohesion is desirable (each module does one thing well)",
+        "Coupling — degree of interdependency between modules; low coupling is desirable (modules are independent)",
+        "High cohesion + low coupling = more secure, maintainable, and testable code"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Libraries, APIs, and SDKs"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Libraries — reusable collections of pre-written code that provide specific functionality",
+        "APIs (Application Programming Interfaces) — defined interfaces for software components to communicate; must be secured (authentication, authorization, rate limiting, input validation)",
+        "SDKs (Software Development Kits) — collections of software libraries combined with documentation, examples, and other resources designed to help programmers",
+        "Security concerns: supply chain attacks targeting popular libraries; dependency vulnerabilities; API key management",
+        "Organizations should publish SDKs to make libraries more accessible to developers while maintaining security standards"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "API security is increasingly critical as applications become more interconnected. Key API security measures include:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Authentication and authorization (OAuth 2.0, API keys, JWT)",
+        "Input validation on all API endpoints",
+        "Rate limiting and throttling to prevent abuse",
+        "Transport encryption (TLS)",
+        "API versioning to manage changes without breaking security",
+        "Logging and monitoring of API access",
+        "API gateways for centralized security policy enforcement"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Supply chain attacks targeting software libraries have become increasingly common. Developers must verify the integrity of libraries they use, monitor for known vulnerabilities (using tools like npm audit, pip-audit, or Snyk), and keep dependencies updated."
+    },
+    {
+      "kind": "heading",
+      "text": "Source Code Repositories"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Repositories (e.g., Git, SVN) are valuable assets in need of protection",
+        "They are valuable targets because they host sensitive data and can be used to introduce unwanted software or functionality",
+        "Security controls: access control, branch protection, code review requirements, commit signing, secrets scanning",
+        "The repository itself should be treated as a security-critical asset — compromise of the repository can lead to supply chain attacks",
+        "Secrets (API keys, passwords, certificates) must never be committed to source code repositories"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Application Security Frameworks"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Frameworks that automatically implement security controls reduce the burden on individual developers",
+        "Examples: frameworks that automatically implement anti-XSS protections, CSRF tokens, parameterized queries",
+        "Should be incorporated into security and awareness training materials",
+        "Use frameworks with built-in security features rather than implementing security controls from scratch"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Integrated Development Environments (IDE) Security"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "IDEs can include security plugins and extensions that scan code during development",
+        "Static analysis plugins provide real-time feedback on security issues as developers write code",
+        "Linting and formatting tools can enforce secure coding standards automatically",
+        "IDE configurations should be standardized across development teams"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Runtime Environments"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Sandboxing — isolating application execution to limit the impact of vulnerabilities",
+        "Containerization — lightweight isolation using containers (Docker, Kubernetes); each application runs in its own container with defined resources and permissions",
+        "Virtual machines — heavier isolation; complete operating system per VM",
+        "Serverless — cloud provider manages the runtime; reduces infrastructure attack surface but introduces new risks (function injection, insecure configuration)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Continuous Integration and Continuous Delivery (CI/CD)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Automated pipelines that build, test, and deploy software",
+        "Security integration points: pre-commit hooks, build-time scanning, pre-deployment gates, post-deployment monitoring",
+        "Pipeline security — the CI/CD pipeline itself must be secured; compromise of the pipeline = supply chain attack",
+        "Secrets management in pipelines: use vault solutions (HashiCorp Vault, AWS Secrets Manager), never hardcode credentials in pipeline definitions",
+        "Artifact signing — sign build artifacts to verify integrity and provenance"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Compiled: source code translated to machine code before execution (C, C++, Rust, Go); generally faster execution",
+    "Interpreted: source code executed line-by-line at runtime (Python, Ruby, JavaScript); more portable but slower",
+    "Hybrid: compiled to intermediate bytecode, then interpreted/JIT compiled (Java, C#)",
+    "Encapsulation: bundling data and methods together; hiding internal implementation from external access; supports information hiding",
+    "Inheritance: creating new classes from existing ones; promotes code reuse",
+    "Polymorphism: objects of different types can be treated as objects of a common parent type",
+    "Abstraction: exposing only essential features while hiding implementation details",
+    "Cohesion: degree to which elements within a module belong together; high cohesion is desirable (each module does one thing well)"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Compiled\" is described as:",
+      "choices": {
+        "A": "the CI/CD pipeline itself must be secured; compromise of the pipeline = supply chain attack",
+        "B": "source code translated to machine code before execution (C, C++, Rust, Go); generally faster execution",
+        "C": "degree of interdependency between modules; low coupling is desirable (modules are independent)",
+        "D": "source code executed line-by-line at runtime (Python, Ruby, JavaScript); more portable but slower"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Compiled — source code translated to machine code before execution (C, C++, Rust, Go); generally faster execution"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Interpreted\" is described as:",
+      "choices": {
+        "A": "the CI/CD pipeline itself must be secured; compromise of the pipeline = supply chain attack",
+        "B": "source code translated to machine code before execution (C, C++, Rust, Go); generally faster execution",
+        "C": "source code executed line-by-line at runtime (Python, Ruby, JavaScript); more portable but slower",
+        "D": "degree of interdependency between modules; low coupling is desirable (modules are independent)"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Interpreted — source code executed line-by-line at runtime (Python, Ruby, JavaScript); more portable but slower"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Hybrid\" is described as:",
+      "choices": {
+        "A": "objects of different types can be treated as objects of a common parent type",
+        "B": "reusable collections of pre-written code that provide specific functionality",
+        "C": "isolating application execution to limit the impact of vulnerabilities",
+        "D": "compiled to intermediate bytecode, then interpreted/JIT compiled (Java, C#)"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Hybrid — compiled to intermediate bytecode, then interpreted/JIT compiled (Java, C#)"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Encapsulation\" is described as:",
+      "choices": {
+        "A": "degree to which elements within a module belong together; high cohesion is desirable (each module does one thing well)",
+        "B": "bundling data and methods together; hiding internal implementation from external access; supports information hiding",
+        "C": "collections of software libraries combined with documentation, examples, and other resources designed to help programmers",
+        "D": "source code translated to machine code before execution (C, C++, Rust, Go); generally faster execution"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Encapsulation — bundling data and methods together; hiding internal implementation from external access; supports information hiding"
+    }
+  ]
+}

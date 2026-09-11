@@ -1,0 +1,156 @@
+{
+  "nodeId": "d6-bc-dr-testing-hierarchy",
+  "locale": "th",
+  "title": "BC/DR Testing Hierarchy",
+  "objective": "Study-guide review — CISSP — Domain 6: Security Assessment and Testing: BC/DR Testing Hierarchy.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Disaster Recovery Plan Testing Types"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "DR plans must be tested regularly to ensure they work when needed",
+        "Tests range from least disruptive (tabletop) to most disruptive (full-scale)",
+        "A manager must know which test type is appropriate based on maturity and risk tolerance",
+        "More disruptive tests provide higher confidence but carry greater operational risk",
+        "Testing should progress from least to most disruptive as the plan matures"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Test Type",
+        "Description",
+        "Disruption",
+        "Confidence"
+      ],
+      "rows": [
+        [
+          "Checklist Review",
+          "Distribute plan copies for review; individuals verify their roles and responsibilities",
+          "Lowest",
+          "Lowest"
+        ],
+        [
+          "Tabletop Exercise",
+          "Key personnel discuss the plan in a conference room, walking through scenarios verbally. No systems are actually tested",
+          "Low",
+          "Low-Medium"
+        ],
+        [
+          "Walkthrough (Structured Walk-Through)",
+          "Team members walk through the plan step by step, verifying each procedure on paper. More detailed than tabletop but still discussion-based",
+          "Low",
+          "Medium"
+        ],
+        [
+          "Simulation Test",
+          "Team simulates a disaster scenario and practices response procedures. May involve some operational components but does not affect production",
+          "Medium",
+          "Medium-High"
+        ],
+        [
+          "Parallel Test",
+          "DR systems are brought online at the recovery site while primary systems continue to run. Verifies the recovery site can support operations without disrupting production",
+          "Medium-High",
+          "High"
+        ],
+        [
+          "Full-Scale (Full-Interruption/Cutover) Test",
+          "Primary systems are actually shut down and operations transfer to the recovery site. The only test that fully validates the DR plan",
+          "Highest",
+          "Highest"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: \"Parallel Test — DR plan at recovery site/on parallel systems. Full-interruption/Full-scale — Cause an actual disaster and follow DR plan to restore systems and data.\" Key Manager Decision Framework:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "New/untested plan → Start with checklist review or tabletop",
+        "Maturing plan → Progress to walkthrough and simulation",
+        "Validated plan → Parallel test (low risk to production)",
+        "Full confidence needed → Full-scale test (high risk, highest assurance)"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: A parallel test brings the recovery site online BUT production systems continue to run — there is NO actual disruption to operations. A full-scale test actually SHUTS DOWN production — it's the only test that truly validates the plan but carries the most risk. ⚠️ Exam Trap: The exam loves scenario questions: \"The organization has never tested its DR plan. Which test should they start with?\" Answer: Tabletop exercise — least disruptive, allows team to identify gaps before risking operational systems."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Checklist Review: Distribute plan copies for review; individuals verify their roles and responsibilities",
+    "Tabletop Exercise: Key personnel discuss the plan in a conference room, walking through scenarios verbally. No systems are actually tested",
+    "Simulation Test: Team simulates a disaster scenario and practices response procedures. May involve some operational components but does not affect production"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"Checklist Review\" is described as:",
+      "choices": {
+        "A": "Team members walk through the plan step by step, verifying each procedure on paper. More detailed than tabletop but still discussion-based",
+        "B": "Primary systems are actually shut down and operations transfer to the recovery site. The only test that fully validates the DR plan",
+        "C": "Distribute plan copies for review; individuals verify their roles and responsibilities",
+        "D": "Key personnel discuss the plan in a conference room, walking through scenarios verbally. No systems are actually tested"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Checklist Review: Distribute plan copies for review; individuals verify their roles and responsibilities"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"Tabletop Exercise\" is described as:",
+      "choices": {
+        "A": "Team simulates a disaster scenario and practices response procedures. May involve some operational components but does not affect production",
+        "B": "Team members walk through the plan step by step, verifying each procedure on paper. More detailed than tabletop but still discussion-based",
+        "C": "Primary systems are actually shut down and operations transfer to the recovery site. The only test that fully validates the DR plan",
+        "D": "Key personnel discuss the plan in a conference room, walking through scenarios verbally. No systems are actually tested"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Tabletop Exercise: Key personnel discuss the plan in a conference room, walking through scenarios verbally. No systems are actually tested"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"Walkthrough (Structured Walk-Through)\" is described as:",
+      "choices": {
+        "A": "Team simulates a disaster scenario and practices response procedures. May involve some operational components but does not affect production",
+        "B": "Primary systems are actually shut down and operations transfer to the recovery site. The only test that fully validates the DR plan",
+        "C": "Team members walk through the plan step by step, verifying each procedure on paper. More detailed than tabletop but still discussion-based",
+        "D": "Key personnel discuss the plan in a conference room, walking through scenarios verbally. No systems are actually tested"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Walkthrough (Structured Walk-Through): Team members walk through the plan step by step, verifying each procedure on paper. More detailed than tabletop but still discussion-based"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"Simulation Test\" is described as:",
+      "choices": {
+        "A": "Team simulates a disaster scenario and practices response procedures. May involve some operational components but does not affect production",
+        "B": "Team members walk through the plan step by step, verifying each procedure on paper. More detailed than tabletop but still discussion-based",
+        "C": "Primary systems are actually shut down and operations transfer to the recovery site. The only test that fully validates the DR plan",
+        "D": "Key personnel discuss the plan in a conference room, walking through scenarios verbally. No systems are actually tested"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Simulation Test: Team simulates a disaster scenario and practices response procedures. May involve some operational components but does not affect production"
+    }
+  ]
+}

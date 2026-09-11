@@ -1,0 +1,296 @@
+{
+  "nodeId": "d4-network-components-and-devices",
+  "locale": "en",
+  "title": "Network Components and Devices",
+  "objective": "Study-guide review — CISSP — Domain 4: Communication and Network Security: Network Components and Devices.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Switches, Routers, and Gateways"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Hub — Layer 1; broadcasts to all ports (no intelligence, obsolete)",
+        "Switch — Layer 2; forwards based on MAC address; creates collision domains",
+        "Router — Layer 3; forwards based on IP address; creates broadcast domains",
+        "Gateway — Connects different network architectures or protocols",
+        "Layer 3 Switch — Combines switching and routing capabilities"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Device",
+        "Layer",
+        "Addresses",
+        "Segments"
+      ],
+      "rows": [
+        [
+          "Hub",
+          "1",
+          "None",
+          "Single collision domain"
+        ],
+        [
+          "Switch",
+          "2",
+          "MAC",
+          "Separate collision domains per port"
+        ],
+        [
+          "Router",
+          "3",
+          "IP",
+          "Separate broadcast domains"
+        ],
+        [
+          "Gateway",
+          "3-7",
+          "Various",
+          "Protocol translation"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Switches operate at Layer 2 by default (using MAC addresses). Layer 3 switches can also route using IP addresses. Routers create broadcast domain boundaries — broadcast traffic does NOT cross a router."
+    },
+    {
+      "kind": "heading",
+      "text": "Firewalls"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Packet Filtering (Stateless) — Layer 3; examines individual packets; no context",
+        "Stateful Inspection — Layer 3-4; tracks connection state; allows related return traffic",
+        "Application Proxy — Layer 7; deep content inspection; breaks client-server connection",
+        "Next-Generation Firewall (NGFW) — Combines stateful, application awareness, and IPS",
+        "Web Application Firewall (WAF) — Protects web applications from Layer 7 attacks"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Stewart: \"Static packet-filtering firewalls are known as first-generation firewalls; they operate at layer 3 (the Network layer). Application-level gateway firewalls are also called proxy firewalls.\""
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Generation",
+        "Type",
+        "Layer",
+        "Pros",
+        "Cons"
+      ],
+      "rows": [
+        [
+          "1st",
+          "Packet Filter",
+          "3",
+          "Fast, simple",
+          "No context, easily spoofed"
+        ],
+        [
+          "2nd",
+          "Stateful",
+          "3-4",
+          "Tracks connections",
+          "Can't inspect content"
+        ],
+        [
+          "3rd",
+          "Application Proxy",
+          "7",
+          "Deep inspection",
+          "Slow, breaks connections"
+        ],
+        [
+          "NGFW",
+          "Combined",
+          "3-7",
+          "Comprehensive",
+          "Complex, expensive"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Chapple: \"CBAC (Context-Based Access Control) is a feature of firewall software that intelligently filters TCP and UDP packets based on application layer protocol session information.\" ⚠️ Exam Trap: A proxy firewall BREAKS the client-server connection — the client connects to the proxy, and the proxy creates a NEW connection to the server. This provides the deepest inspection but is also the slowest."
+    },
+    {
+      "kind": "heading",
+      "text": "Intrusion Detection and Prevention Systems"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "IDS (Intrusion Detection System) — Monitors and ALERTS; passive",
+        "IPS (Intrusion Prevention System) — Monitors and BLOCKS; active (inline)",
+        "NIDS/NIPS — Network-based; monitors network traffic",
+        "HIDS/HIPS — Host-based; monitors system activity",
+        "Detection methods: Signature-based (known attacks) vs. Anomaly-based (behavioral)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Feature",
+        "IDS",
+        "IPS"
+      ],
+      "rows": [
+        [
+          "Action",
+          "Alert only",
+          "Alert + Block"
+        ],
+        [
+          "Placement",
+          "Passive (out of band)",
+          "Inline (in traffic path)"
+        ],
+        [
+          "Risk",
+          "Misses nothing (no blocking risk)",
+          "False positives may block legitimate traffic"
+        ],
+        [
+          "Latency",
+          "No impact",
+          "May add latency"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Detection Methods:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Signature-based — Matches known attack patterns; fast; cannot detect zero-day attacks",
+        "Anomaly-based — Learns normal behavior; detects novel attacks; higher false positives",
+        "Heuristic — Uses rules and algorithms; balance between signature and anomaly"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: IDS is PASSIVE (detect and alert). IPS is ACTIVE (detect and block). An IPS must be INLINE (in the traffic path) to block traffic."
+    },
+    {
+      "kind": "heading",
+      "text": "Proxy Servers"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Forward Proxy — Represents internal clients to external servers",
+        "Reverse Proxy — Represents external clients to internal servers",
+        "Provides anonymity, caching, content filtering, and logging",
+        "Application-level proxy provides deep packet inspection",
+        "Can enforce security policies on outbound traffic"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Load Balancers"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Distributes traffic across multiple servers for availability",
+        "Round-robin, least connections, IP hash — common algorithms",
+        "Provides high availability and fault tolerance",
+        "Can perform SSL offloading (terminates SSL at the load balancer)",
+        "Improves both performance and resilience"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Hub: Layer 1; broadcasts to all ports (no intelligence, obsolete)",
+    "Switch: Layer 2; forwards based on MAC address; creates collision domains",
+    "Router: Layer 3; forwards based on IP address; creates broadcast domains",
+    "Gateway: Connects different network architectures or protocols",
+    "Layer 3 Switch: Combines switching and routing capabilities",
+    "Packet Filtering (Stateless): Layer 3; examines individual packets; no context",
+    "Stateful Inspection: Layer 3-4; tracks connection state; allows related return traffic",
+    "Application Proxy: Layer 7; deep content inspection; breaks client-server connection"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"Hub\" is described as:",
+      "choices": {
+        "A": "Layer 3; forwards based on IP address; creates broadcast domains",
+        "B": "Layer 1; broadcasts to all ports (no intelligence, obsolete)",
+        "C": "Uses rules and algorithms; balance between signature and anomaly",
+        "D": "Layer 2; forwards based on MAC address; creates collision domains"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Hub — Layer 1; broadcasts to all ports (no intelligence, obsolete)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"Switch\" is described as:",
+      "choices": {
+        "A": "Layer 3; forwards based on IP address; creates broadcast domains",
+        "B": "Layer 7; deep content inspection; breaks client-server connection",
+        "C": "Layer 2; forwards based on MAC address; creates collision domains",
+        "D": "Layer 3-4; tracks connection state; allows related return traffic"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Switch — Layer 2; forwards based on MAC address; creates collision domains"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"Router\" is described as:",
+      "choices": {
+        "A": "Layer 3; forwards based on IP address; creates broadcast domains",
+        "B": "Uses rules and algorithms; balance between signature and anomaly",
+        "C": "Layer 2; forwards based on MAC address; creates collision domains",
+        "D": "Layer 3-4; tracks connection state; allows related return traffic"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Router — Layer 3; forwards based on IP address; creates broadcast domains"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"Gateway\" is described as:",
+      "choices": {
+        "A": "Connects different network architectures or protocols",
+        "B": "Combines stateful, application awareness, and IPS",
+        "C": "Layer 3; examines individual packets; no context",
+        "D": "Represents internal clients to external servers"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Gateway — Connects different network architectures or protocols"
+    }
+  ]
+}

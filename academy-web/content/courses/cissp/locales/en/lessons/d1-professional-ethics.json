@@ -1,0 +1,138 @@
+{
+  "nodeId": "d1-professional-ethics",
+  "locale": "en",
+  "title": "Professional Ethics",
+  "objective": "Study-guide review — CISSP — Domain 1: Security and Risk Management: Professional Ethics.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "ISC2 Code of Ethics"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "CISSP holders must comply with the ISC2 Code of Professional Ethics",
+        "Applies to all ISC2 members globally — no exceptions",
+        "Agreement and strict adherence is a condition of gaining AND maintaining CISSP",
+        "Code consists of a Preamble and four Canons",
+        "Violation can result in certification revocation"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The ISC2 Code of Professional Ethics Preamble states: \"The safety and welfare of society and the common good, duty to our principals, and to each other, requires that we adhere, and be seen to adhere, to the highest ethical standards of behavior. Therefore, strict adherence to this Code is a condition of certification.\" All ISC2 members, including CISSP candidates, must agree to this code before attempting the exam. Ethical violations are taken seriously and can result in revocation of certification through the ISC2 Ethics Board review process. ⚠️ Exam Trap: The exam will likely ask at least one ethics question. Remember that the Canons are applied in order of priority — if a scenario presents a conflict between Canons, the higher-numbered Canon yields to the lower-numbered one (Canon 1 > Canon 2 > Canon 3 > Canon 4)."
+    },
+    {
+      "kind": "heading",
+      "text": "The Four Canons"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Canon 1: Protect society, the common good, necessary public trust and confidence, and the infrastructure",
+        "Canon 2: Act honorably, honestly, justly, responsibly, and legally",
+        "Canon 3: Provide diligent and competent service to principals",
+        "Canon 4: Advance and protect the profession"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Memorize the exact order — the exam tests this directly. Canon 1 is the highest priority. Society and the common good ALWAYS come first. If your employer asks you to do something that harms the public, Canon 1 overrides Canon 3 (service to principals/employers). Canon 2 governs personal conduct. You must act with integrity even when no one is watching. Canon 3 — \"Principals\" refers to employers, clients, or those you serve professionally. You owe them diligent and competent service, but NOT at the expense of society (Canon 1) or honesty (Canon 2). Canon 4 — Contributing to the growth and reputation of the security profession. Mentoring, publishing research, and participating in professional organizations. ⚠️ Exam Trap: A common scenario: Your employer asks you to cover up a data breach. Canon 1 (protect society) and Canon 2 (act honestly/legally) override Canon 3 (serve your employer). The correct answer is to report the breach. Mnemonic: \"Society → Honor → Service → Profession\" (SHSP — \"Ships\") From Shon Harris: \"Before you take this exam, be sure you understand and agree with the codes of ethics. In addition to these codes, all information security professionals should also support their organization's code of ethics.\""
+    },
+    {
+      "kind": "heading",
+      "text": "Organizational Code of Ethics"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Ethics are foundational to a successful security program",
+        "Ethical behavior = do nothing harmful to anyone else",
+        "Ethics vary due to culture, education, beliefs",
+        "Consistent ethics require codification in policies",
+        "Must be driven by management, top-down"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Organizations must establish their own code of ethics in addition to the ISC2 code. The success of any security program requires ethical support from every level of the organization, driven by management and instilled through proper support, direction, and enforcement. From Shon Harris: \"Certain structures can be put into place that provide a breeding ground for unethical behavior.\" Organizations must actively design their policies and incentive structures to promote ethical behavior. The best way to promote consistent ethical behavior is through corporate policies — rules that prescribe, promote, and instill ethical behavior. Policies must be legal, and adherence must start with senior management."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Canon 1: Protect society, the common good, necessary public trust and confidence, and the infrastructure",
+    "Canon 2: Act honorably, honestly, justly, responsibly, and legally",
+    "Canon 3: Provide diligent and competent service to principals",
+    "Canon 4: Advance and protect the profession"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Canon 1\" is described as:",
+      "choices": {
+        "A": "Advance and protect the profession",
+        "B": "Provide diligent and competent service to principals",
+        "C": "Act honorably, honestly, justly, responsibly, and legally",
+        "D": "Protect society, the common good, necessary public trust and confidence, and the infrastructure"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Canon 1: Protect society, the common good, necessary public trust and confidence, and the infrastructure"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Canon 2\" is described as:",
+      "choices": {
+        "A": "Provide diligent and competent service to principals",
+        "B": "Advance and protect the profession",
+        "C": "Act honorably, honestly, justly, responsibly, and legally",
+        "D": "Protect society, the common good, necessary public trust and confidence, and the infrastructure"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Canon 2: Act honorably, honestly, justly, responsibly, and legally"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Canon 3\" is described as:",
+      "choices": {
+        "A": "Protect society, the common good, necessary public trust and confidence, and the infrastructure",
+        "B": "Advance and protect the profession",
+        "C": "Provide diligent and competent service to principals",
+        "D": "Act honorably, honestly, justly, responsibly, and legally"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Canon 3: Provide diligent and competent service to principals"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Canon 4\" is described as:",
+      "choices": {
+        "A": "Advance and protect the profession",
+        "B": "Protect society, the common good, necessary public trust and confidence, and the infrastructure",
+        "C": "Act honorably, honestly, justly, responsibly, and legally",
+        "D": "Provide diligent and competent service to principals"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Canon 4: Advance and protect the profession"
+    }
+  ]
+}

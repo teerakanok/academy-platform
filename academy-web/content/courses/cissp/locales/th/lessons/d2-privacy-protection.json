@@ -1,0 +1,261 @@
+{
+  "nodeId": "d2-privacy-protection",
+  "locale": "th",
+  "title": "Privacy Protection",
+  "objective": "Study-guide review — CISSP — Domain 2: Asset Security: Privacy Protection.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Data Privacy Principles"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Purpose Limitation — Data collected only for specified, legitimate purposes",
+        "Data Minimization — Collect only what is necessary",
+        "Storage Limitation — Keep data only as long as needed",
+        "Accuracy — Data must be accurate and up-to-date",
+        "Accountability — Controller must demonstrate compliance"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "These principles align closely with GDPR's seven principles but are broadly applicable across privacy frameworks:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Lawfulness, fairness, transparency — Processing must have legal basis and be transparent",
+        "Purpose limitation — Data used only for the stated purpose",
+        "Data minimization — Don't collect more than you need",
+        "Accuracy — Keep data correct and current",
+        "Storage limitation — Don't keep data longer than necessary",
+        "Integrity and confidentiality — Protect data appropriately",
+        "Accountability — Demonstrate compliance with all principles"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: \"Data Owners need to have clearly defined accountabilities including defining classification, approving access, and retention and destruction.\""
+    },
+    {
+      "kind": "heading",
+      "text": "De-identification and Anonymization"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "De-identification — Removing identifying information from data sets",
+        "Anonymization — Irreversibly removing all identifying information",
+        "Pseudonymization — Replacing identifiers with pseudonyms (reversible with key)",
+        "Tokenization — Replacing sensitive data with non-sensitive tokens",
+        "Data Masking — Hiding portions of data (e.g., showing only last 4 digits of SSN)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Technique",
+        "Reversible?",
+        "Use Case"
+      ],
+      "rows": [
+        [
+          "Anonymization",
+          "No",
+          "Research, analytics"
+        ],
+        [
+          "Pseudonymization",
+          "Yes (with key)",
+          "GDPR-compliant processing"
+        ],
+        [
+          "Tokenization",
+          "Yes (with vault)",
+          "Payment processing (PCI DSS)"
+        ],
+        [
+          "Data Masking",
+          "Depends",
+          "Display protection, testing"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Anonymization is IRREVERSIBLE — once anonymized, data cannot be linked back to an individual. Pseudonymization IS reversible with the key and is specifically mentioned in GDPR as a security measure (but data is still considered personal data under GDPR)."
+    },
+    {
+      "kind": "heading",
+      "text": "Data Minimization"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Collect only the minimum data necessary for the stated purpose",
+        "Reduces risk and liability in case of a breach",
+        "Required by GDPR and recommended by most privacy frameworks",
+        "Applies to collection, processing, and retention",
+        "Less data collected = smaller attack surface"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Data minimization is both a privacy principle and a security practice:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Collection minimization — Don't ask for information you don't need",
+        "Processing minimization — Don't process data beyond the stated purpose",
+        "Retention minimization — Don't keep data longer than necessary",
+        "Access minimization — Don't give access to more data than needed (least privilege)"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: \"The more damaging a security breach will be if you don't need data, securely destroy it. Retention policies and various data management solutions can help archive, secure, and delete old or unnecessary data.\""
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Purpose Limitation: Data collected only for specified, legitimate purposes",
+    "Data Minimization: Collect only what is necessary",
+    "Storage Limitation: Keep data only as long as needed",
+    "Accuracy: Data must be accurate and up-to-date",
+    "Accountability: Controller must demonstrate compliance",
+    "Lawfulness, fairness, transparency: Processing must have legal basis and be transparent",
+    "Purpose limitation: Data used only for the stated purpose",
+    "Data minimization: Don't collect more than you need"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "An organization is decommissioning old hard drives that contained confidential financial data. The IT team wants to reformat the drives and donate them. What is the BEST recommendation?",
+      "choices": {
+        "A": "Reformatting is sufficient for confidential data",
+        "B": "Perform a single-pass overwrite before donating",
+        "C": "Degauss the drives and then donate them",
+        "D": "Physically destroy the drives to prevent data remanence"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "For confidential data, physical destruction provides the highest assurance against data remanence. Reformatting (A) does not remove data. A single overwrite (B) may leave traces. While degaussing (C) works for magnetic drives, physical destruction is the most reliable method for confidential data that will leave organizational control. When media leaves your possession, destruction is the safest option. Tests: Data destruction, data remanence, classification-appropriate sanitization"
+    },
+    {
+      "id": "q2",
+      "prompt": "Under GDPR, which role determines the purposes and means of processing personal data?",
+      "choices": {
+        "A": "Data Processor",
+        "B": "Data Custodian",
+        "C": "Data Controller",
+        "D": "Data Steward"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The Data Controller determines the purposes and means of processing personal data under GDPR. The Data Processor processes data on behalf of the Controller. The Data Custodian is an organizational role for day-to-day management. The Data Steward handles data quality and governance. Tests: Data roles, GDPR terminology"
+    },
+    {
+      "id": "q3",
+      "prompt": "An organization wants to use production data in a test environment but needs to protect sensitive customer information. Which technique replaces sensitive data with non-sensitive equivalents while maintaining the data format?",
+      "choices": {
+        "A": "Encryption",
+        "B": "Hashing",
+        "C": "Tokenization",
+        "D": "Data masking"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Tokenization replaces sensitive data with non-sensitive tokens that maintain the same format and length. This is ideal for test environments because the data structure remains the same but contains no real sensitive information. Encryption (A) changes the format. Hashing (B) is one-way and changes format. Data masking (D) hides portions but may still contain partial real data. Tests: De-identification techniques, data protection in testing"
+    },
+    {
+      "id": "q4",
+      "prompt": "A company stores customer data across multiple cloud providers. Under data privacy principles, who is PRIMARILY responsible for ensuring the data is properly classified and protected?",
+      "choices": {
+        "A": "The cloud service providers",
+        "B": "The data custodians at each cloud provider",
+        "C": "The Data Owner within the organization",
+        "D": "The organization's IT security team"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The Data Owner is ultimately accountable for classification decisions and ensuring proper protection, regardless of where data is stored. Cloud providers act as Data Processors/Custodians who implement controls, but the accountability remains with the Data Owner. The organization cannot outsource accountability. Tests: Data ownership, cloud responsibility, data roles"
+    },
+    {
+      "id": "q5",
+      "prompt": "Which data sanitization method is MOST appropriate for solid-state drives (SSDs)?",
+      "choices": {
+        "A": "Degaussing",
+        "B": "Single-pass overwriting",
+        "C": "Cryptographic erasure",
+        "D": "Multiple-pass overwriting"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Cryptographic erasure is the most appropriate method for SSDs. Degaussing (A) does not work on SSDs because they don't use magnetic storage. Overwriting (B, D) may not reach all cells due to SSD wear-leveling algorithms that redirect writes. Crypto-erase works by destroying the encryption key, making all data unrecoverable regardless of the storage technology. Tests: Sanitization methods, SSD-specific challenges"
+    },
+    {
+      "id": "q6",
+      "prompt": "During which stage of the data lifecycle is data MOST vulnerable to exposure?",
+      "choices": {
+        "A": "At rest",
+        "B": "In transit",
+        "C": "In use",
+        "D": "In archive"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Data in use (being actively processed) is most vulnerable because it typically must be decrypted and loaded into memory for processing. While data at rest can be encrypted and data in transit can be protected by TLS/VPN, data in use is often in cleartext in memory, making it susceptible to memory scraping attacks, side-channel attacks, and unauthorized access. Tests: Data states, data protection challenges"
+    },
+    {
+      "id": "q7",
+      "prompt": "An organization's data classification policy requires that all media be labeled with its classification level. A USB drive contains files classified at different levels. How should the USB drive be labeled?",
+      "choices": {
+        "A": "With the most common classification level on the drive",
+        "B": "With the lowest classification level on the drive",
+        "C": "With the highest classification level on the drive",
+        "D": "With all classification levels present on the drive"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "Media must be labeled with the HIGHEST classification level of data it contains. This ensures the media receives protection appropriate for its most sensitive content. If a USB drive contains both public and confidential data, the entire drive should be labeled and handled as confidential. Tests: Media handling, asset classification"
+    },
+    {
+      "id": "q8",
+      "prompt": "Which privacy technique is specifically recognized by GDPR as a security measure but does NOT remove the data from GDPR's scope?",
+      "choices": {
+        "A": "Anonymization",
+        "B": "Pseudonymization",
+        "C": "Tokenization",
+        "D": "Data masking"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "Pseudonymization is specifically mentioned in GDPR as a security measure. However, pseudonymized data is still considered personal data under GDPR because it can be re-identified using the pseudonymization key. Only true anonymization removes data from GDPR scope entirely. Tests: GDPR privacy techniques, anonymization vs. pseudonymization"
+    }
+  ]
+}

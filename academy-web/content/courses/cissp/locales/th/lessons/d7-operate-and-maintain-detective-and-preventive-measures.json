@@ -1,0 +1,196 @@
+{
+  "nodeId": "d7-operate-and-maintain-detective-and-preventive-measures",
+  "locale": "th",
+  "title": "Operate and Maintain Detective and Preventive Measures",
+  "objective": "Study-guide review — CISSP — Domain 7: Security Operations: Operate and Maintain Detective and Preventive Measures.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Firewalls"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Packet filtering (Layer 3-4) — examines source/destination IP and port; stateless",
+        "Stateful inspection (Layer 3-4) — tracks connection state; allows return traffic for established connections",
+        "Application-level gateway (proxy firewall, Layer 7) — deep inspection of application protocols; high security but high overhead",
+        "Next-generation firewall (NGFW) — combines traditional firewall with IPS, application awareness, and deep packet inspection",
+        "Web Application Firewall (WAF) — specifically protects web applications against attacks like SQL injection, XSS",
+        "Place firewalls at: network perimeter, between security zones, in front of critical servers"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Firewalls are fundamental to network security operations. It is appropriate to place a network firewall at the border (between the Internet and the internal network), but a web application firewall (WAF) should be placed in front of web servers to protect against application-layer attacks. Key firewall rule best practices:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Rules are processed in order (top-to-bottom); place the most specific rules first",
+        "Implement an implicit deny (deny all) rule at the end of the rule set",
+        "Log denied connections for security monitoring",
+        "Regularly review and audit firewall rules",
+        "Use egress filtering to prevent data exfiltration and block outbound connections to known malicious destinations"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Intrusion Detection and Prevention"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "See IDS/IPS section above for detailed coverage",
+        "Active IDS — identifies and responds to threats (can reconfigure firewalls, terminate sessions)",
+        "Passive IDS — only monitors and alerts; no automated response",
+        "IDS/IPS should be tuned regularly to reduce false positives and false negatives",
+        "Honeypots/honeynets — decoy systems designed to attract attackers; provide intelligence on attack methods"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Enticement vs. Entrapment"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Enticement — making a target attractive to draw attackers (legal); e.g., deploying a honeypot with open ports",
+        "Entrapment — inducing someone to commit a crime they would not have otherwise committed (illegal)",
+        "Key test: Would the person have committed the act without the inducement? If yes → enticement. If no → entrapment.",
+        "Honeypots = enticement (legal), as long as the organization does not actively lure specific individuals"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The legal distinction between enticement and entrapment is a high-yield exam topic. From Shon Harris: a company deploys a honeypot with many open ports and services running and exhibits vulnerabilities that the attacker would want to exploit. The company can log the attacker's actions and later attempt to prosecute. This action is legal unless the company crosses the line into entrapment. Enticement = making something attractive but not forcing or inducing the action. The attacker makes the choice independently. Example: A honeypot sitting on the network with vulnerabilities — the attacker finds and attacks it on their own. Entrapment = tricking, persuading, or coercing someone into committing a crime they would not have otherwise committed. Example: A company employee directly contacting a known hacker and challenging them to break in. The key test: Would the person have committed the act without the inducement? If yes → enticement (legal). If no → entrapment (illegal). ⚠️ Exam Trap: Honeypots are enticement, NOT entrapment — as long as you don't actively lure specific individuals into attacking. Simply deploying a decoy system is legal enticement. The exam tests this distinction."
+    },
+    {
+      "kind": "heading",
+      "text": "Whitelisting and Blacklisting"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Whitelisting (allowlisting) — only explicitly approved applications/traffic are allowed; everything else is denied",
+        "Blacklisting (denylisting) — known bad applications/traffic are blocked; everything else is allowed",
+        "Whitelisting is more secure but harder to manage (requires maintaining an approved list)",
+        "Blacklisting is easier to implement but less secure (new/unknown threats are not blocked)",
+        "Applied to: applications (application control), email (spam filtering), network traffic, URLs"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Sandboxing and Third-Party Security Services"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Sandboxing — running untrusted code or files in an isolated environment to observe behavior before allowing execution in production",
+        "Used for: malware analysis, testing suspicious email attachments, evaluating unknown applications",
+        "Third-party security services — outsourcing security functions to specialized providers (MSSPs)",
+        "Benefits: access to specialized expertise, 24/7 monitoring, cost efficiencies",
+        "Risks: loss of direct control, dependency on third party, potential target for attackers, additional overhead of managing the relationship"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "As the CBK notes regarding third-party security services: the benefits must be balanced against loss of control inherent in using a third party, the potential for the third party to be a target of attack, and the additional overhead of managing the third party. Pooling and sharing resources is a fundamental business concept, and security services are no exception, but due diligence is essential."
+    },
+    {
+      "kind": "heading",
+      "text": "Anti-Malware and Endpoint Protection"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Signature-based — detects known malware based on signatures; requires regular updates",
+        "Heuristic/behavioral — monitors for suspicious behavior patterns; can detect unknown malware",
+        "Endpoint Detection and Response (EDR) — advanced endpoint security that provides continuous monitoring, threat detection, and automated response",
+        "User Entity and Behavior Analytics (UEBA) — establishes behavioral profiles and monitors users for deviations that may indicate malicious activity or compromised accounts",
+        "Deploy anti-malware on all endpoints, servers, and email gateways",
+        "Regular definition updates and full system scans are essential"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Next-generation firewall (NGFW): combines traditional firewall with IPS, application awareness, and deep packet inspection",
+    "Web Application Firewall (WAF): specifically protects web applications against attacks like SQL injection, XSS",
+    "Active IDS: identifies and responds to threats (can reconfigure firewalls, terminate sessions)",
+    "Passive IDS: only monitors and alerts; no automated response",
+    "Honeypots/honeynets: decoy systems designed to attract attackers; provide intelligence on attack methods",
+    "Enticement: making a target attractive to draw attackers (legal); e.g., deploying a honeypot with open ports",
+    "Entrapment: inducing someone to commit a crime they would not have otherwise committed (illegal)",
+    "Sandboxing: running untrusted code or files in an isolated environment to observe behavior before allowing execution in production"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Next-generation firewall (NGFW)\" is described as:",
+      "choices": {
+        "A": "combines traditional firewall with IPS, application awareness, and deep packet inspection",
+        "B": "inducing someone to commit a crime they would not have otherwise committed (illegal)",
+        "C": "decoy systems designed to attract attackers; provide intelligence on attack methods",
+        "D": "identifies and responds to threats (can reconfigure firewalls, terminate sessions)"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Next-generation firewall (NGFW) — combines traditional firewall with IPS, application awareness, and deep packet inspection"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Web Application Firewall (WAF)\" is described as:",
+      "choices": {
+        "A": "identifies and responds to threats (can reconfigure firewalls, terminate sessions)",
+        "B": "specifically protects web applications against attacks like SQL injection, XSS",
+        "C": "decoy systems designed to attract attackers; provide intelligence on attack methods",
+        "D": "inducing someone to commit a crime they would not have otherwise committed (illegal)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Web Application Firewall (WAF) — specifically protects web applications against attacks like SQL injection, XSS"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Active IDS\" is described as:",
+      "choices": {
+        "A": "specifically protects web applications against attacks like SQL injection, XSS",
+        "B": "inducing someone to commit a crime they would not have otherwise committed (illegal)",
+        "C": "identifies and responds to threats (can reconfigure firewalls, terminate sessions)",
+        "D": "decoy systems designed to attract attackers; provide intelligence on attack methods"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Active IDS — identifies and responds to threats (can reconfigure firewalls, terminate sessions)"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Passive IDS\" is described as:",
+      "choices": {
+        "A": "monitors for suspicious behavior patterns; can detect unknown malware",
+        "B": "detects known malware based on signatures; requires regular updates",
+        "C": "outsourcing security functions to specialized providers (MSSPs)",
+        "D": "only monitors and alerts; no automated response"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Passive IDS — only monitors and alerts; no automated response"
+    }
+  ]
+}

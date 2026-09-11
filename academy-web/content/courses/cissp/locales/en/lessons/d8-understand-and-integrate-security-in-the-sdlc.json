@@ -1,0 +1,357 @@
+{
+  "nodeId": "d8-understand-and-integrate-security-in-the-sdlc",
+  "locale": "en",
+  "title": "Understand and Integrate Security in the SDLC",
+  "objective": "Study-guide review — CISSP — Domain 8: Software Development Security: Understand and Integrate Security in the SDLC.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Software Development Lifecycle (SDLC) Phases"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The SDLC defines the structured process for developing software:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Conceptual Definition / Feasibility — determine if the project makes sense; examine requirements and proposed functionality; brainstorming sessions; review obvious restrictions",
+        "Requirements Gathering — define functional and non-functional requirements, including security requirements",
+        "Design — architecture and design decisions; threat modeling; security architecture review",
+        "Development / Coding — write the code following secure coding standards",
+        "Testing / Validation — verify the software meets requirements; includes security testing (SAST, DAST, penetration testing)",
+        "Deployment / Release — move to production; includes final security review, hardening, change management",
+        "Operations and Maintenance — ongoing support, patching, monitoring, incident response",
+        "Disposal / Retirement — secure decommissioning; data sanitization; archival"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Security must be integrated into EVERY phase — not bolted on at the end",
+        "Requirements phase should include security requirements alongside functional requirements",
+        "Security risks should be identified as part of change management, and requirements must be documented and carried through all SDLC phases"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A conceptual definition of the project should be developed during the feasibility phase. The team examines the software's requirements and proposed functionality, brainstorming sessions take place, and obvious restrictions are reviewed. This early phase should include a preliminary security assessment to identify potential security concerns before significant resources are committed. The key principle is \"shift left\" — moving security activities earlier in the SDLC rather than treating security as a final gate. Finding and fixing vulnerabilities during design or development is significantly cheaper than fixing them after deployment. Studies suggest that fixing a bug in production can cost 30-100x more than fixing it during design. Security activities by phase:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Requirements: Security requirements, compliance requirements, data classification",
+        "Design: Threat modeling, security architecture review, design patterns",
+        "Development: Secure coding standards, code review, unit testing",
+        "Testing: SAST, DAST, penetration testing, security regression testing",
+        "Deployment: Security hardening, configuration review, final security assessment",
+        "Operations: Monitoring, patching, incident response, vulnerability management",
+        "Disposal: Data sanitization, certificate revocation, access removal"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Security must be part of EVERY SDLC phase. If the exam asks when security should be considered, the answer is \"from the beginning\" or \"throughout the entire lifecycle\" — never just at the end or during testing only."
+    },
+    {
+      "kind": "heading",
+      "text": "SDLC Models"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Model",
+        "Description",
+        "Characteristics"
+      ],
+      "rows": [
+        [
+          "Waterfall",
+          "Sequential, linear phases; each phase must complete before the next begins",
+          "Simple, rigid; no going back; poor for changing requirements"
+        ],
+        [
+          "V-Model",
+          "Extension of Waterfall; each development phase has a corresponding testing phase",
+          "Testing is planned early; still sequential"
+        ],
+        [
+          "Spiral",
+          "Iterative; repeats phases in spirals with increasing detail; emphasizes risk analysis",
+          "Risk-driven; good for large, complex projects"
+        ],
+        [
+          "Iterative/Incremental",
+          "Software built in increments; each iteration adds functionality",
+          "More flexible than Waterfall; working software early"
+        ],
+        [
+          "Prototyping",
+          "Build quick prototypes to validate requirements before full development",
+          "Reduces misunderstanding of requirements; prototype may be discarded"
+        ],
+        [
+          "RAD (Rapid Application Development)",
+          "Emphasizes rapid prototyping and user feedback over rigid planning",
+          "Fast development; may sacrifice quality"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The Waterfall model is the oldest and most straightforward — it proceeds through phases sequentially: requirements → design → implementation → testing → deployment → maintenance. Its primary weakness is inflexibility — if requirements change after the design phase, it is very difficult and expensive to go back. The Spiral model, introduced by Barry Boehm, addresses Waterfall's limitations by incorporating iterative development with explicit risk analysis. Each \"spiral\" includes: determine objectives, identify risks, develop and test, plan the next iteration. The emphasis on risk analysis makes it particularly suitable for security-critical projects. The key exam distinction is between sequential models (Waterfall, V-Model) and iterative models (Spiral, Agile). Sequential models are predictable but inflexible; iterative models are flexible but require more management discipline."
+    },
+    {
+      "kind": "heading",
+      "text": "Integrating Security into the SDLC"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Threat modeling — identify threats during design phase; use STRIDE, DREAD, PASTA, or attack trees",
+        "Security requirements — define alongside functional requirements; include authentication, authorization, encryption, audit logging",
+        "Secure design principles — defense in depth, least privilege, fail-secure, separation of duties, secure defaults",
+        "Security testing — integrated throughout development, not just at the end",
+        "Security reviews / gates — formal review points where security is evaluated before proceeding to the next phase",
+        "Risks should be identified as part of change management, documented, and carried through all SDLC phases to address these risks appropriately and test the mitigations in place"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Software Development Methodologies"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Agile:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Iterative, incremental approach with short development cycles (sprints, typically 2-4 weeks)",
+        "Scrum — framework within Agile; defines roles (Scrum Master, Product Owner, Development Team), events (Sprint, Daily Standup, Sprint Review, Sprint Retrospective), and artifacts (Product Backlog, Sprint Backlog)",
+        "Kanban — visual workflow management; continuous flow rather than fixed sprints",
+        "Emphasizes collaboration, working software, and responding to change",
+        "Security considerations: security stories/tasks in the backlog, automated security testing in CI/CD"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "SAFe (Scaled Agile Framework):"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Scales Agile practices to large enterprises",
+        "Four levels: Essential SAFe, Large Solution SAFe, Portfolio SAFe, Full SAFe",
+        "Full SAFe includes all elements of the other levels and is designed to support enterprises that build and maintain large, integrated solutions requiring hundreds of practitioners"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Extreme Programming (XP):"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Emphasizes pair programming, test-driven development (TDD), continuous integration",
+        "Security benefits: code review through pairing, comprehensive testing"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "DevOps and DevSecOps"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "DevOps — culture and practices that unite software development (Dev) and IT operations (Ops)",
+        "DevSecOps — integrates security into the DevOps pipeline as a first-class concern",
+        "Continuous Integration (CI) — developers frequently merge code changes; automated builds and tests run on each merge",
+        "Continuous Delivery (CD) — code is always in a deployable state; deployment can happen at any time",
+        "Continuous Deployment — every change that passes automated tests is automatically deployed to production",
+        "Infrastructure as Code (IaC) — infrastructure defined in version-controlled code files; enables automated, repeatable deployments",
+        "Security in DevSecOps: automated SAST/DAST in pipeline, security unit tests, container scanning, dependency checking, secrets management"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DevSecOps shifts security left by embedding it directly into the CI/CD pipeline. Rather than security being a separate gate at the end of development, security testing is automated and runs with every code commit. This includes:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Pre-commit hooks for secrets detection",
+        "SAST scanning on every pull request",
+        "Dependency/SCA scanning for known vulnerabilities in libraries",
+        "Container image scanning before deployment",
+        "DAST scanning against staging environments",
+        "Infrastructure-as-code security scanning (e.g., Terraform security analysis)"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "The goal is to make security feedback as fast as possible — developers should know about security issues within minutes of committing code, not weeks later during a separate security review."
+    },
+    {
+      "kind": "heading",
+      "text": "Maturity Models"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "CMMI (Capability Maturity Model Integration) — framework for improving organizational processes:"
+      ]
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Level",
+        "Name",
+        "Description"
+      ],
+      "rows": [
+        [
+          "1",
+          "Initial",
+          "Processes are unpredictable, reactive, ad hoc"
+        ],
+        [
+          "2",
+          "Managed",
+          "Processes are planned and managed at the project level"
+        ],
+        [
+          "3",
+          "Defined",
+          "Processes are standardized across the organization"
+        ],
+        [
+          "4",
+          "Quantitatively Managed",
+          "Processes are measured and controlled using statistics"
+        ],
+        [
+          "5",
+          "Optimizing",
+          "Focus on continuous process improvement"
+        ]
+      ]
+    },
+    {
+      "kind": "list",
+      "items": [
+        "SAMM (Software Assurance Maturity Model) — OWASP framework specifically for software security maturity",
+        "BSIMM (Building Security In Maturity Model) — descriptive model based on observed software security practices across organizations",
+        "IDEAL Model — Initiating, Diagnosing, Establishing, Acting, Learning — process improvement model"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "CMMI provides a structured framework for evaluating and improving an organization's software development maturity. The five levels represent a progression from chaotic, ad hoc processes (Level 1) to fully optimized processes with continuous improvement (Level 5). Key exam points:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Level 1 (Initial): No formal processes; success depends on individual effort (\"heroic\" developers)",
+        "Level 2 (Managed): Basic project management exists; processes are repeated for similar projects",
+        "Level 3 (Defined): Organization-wide standard processes exist and are documented",
+        "Level 4 (Quantitatively Managed): Metrics are collected and used to manage processes",
+        "Level 5 (Optimizing): Continuous improvement through quantitative feedback"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Know the five CMMI levels and their names. Level 1 is \"Initial\" (not \"None\" or \"Incomplete\"). The levels represent organizational maturity, not individual project quality."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Requirements Gathering: define functional and non-functional requirements, including security requirements",
+    "Design: architecture and design decisions; threat modeling; security architecture review",
+    "Development / Coding: write the code following secure coding standards",
+    "Testing / Validation: verify the software meets requirements; includes security testing (SAST, DAST, penetration testing)",
+    "Deployment / Release: move to production; includes final security review, hardening, change management",
+    "Operations and Maintenance: ongoing support, patching, monitoring, incident response",
+    "Disposal / Retirement: secure decommissioning; data sanitization; archival",
+    "Security must be integrated into EVERY phase: not bolted on at the end"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Conceptual Definition / Feasibility\" is described as:",
+      "choices": {
+        "A": "determine if the project makes sense; examine requirements and proposed functionality; brainstorming sessions; review obvious restrictions",
+        "B": "infrastructure defined in version-controlled code files; enables automated, repeatable deployments",
+        "C": "verify the software meets requirements; includes security testing (SAST, DAST, penetration testing)",
+        "D": "define alongside functional requirements; include authentication, authorization, encryption, audit logging"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Conceptual Definition / Feasibility — determine if the project makes sense; examine requirements and proposed functionality; brainstorming sessions; review obvious restrictions"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Requirements Gathering\" is described as:",
+      "choices": {
+        "A": "define functional and non-functional requirements, including security requirements",
+        "B": "architecture and design decisions; threat modeling; security architecture review",
+        "C": "culture and practices that unite software development (Dev) and IT operations (Ops)",
+        "D": "Initiating, Diagnosing, Establishing, Acting, Learning — process improvement model"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Requirements Gathering — define functional and non-functional requirements, including security requirements"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Design\" is described as:",
+      "choices": {
+        "A": "move to production; includes final security review, hardening, change management",
+        "B": "architecture and design decisions; threat modeling; security architecture review",
+        "C": "Extension of Waterfall; each development phase has a corresponding testing phase",
+        "D": "every change that passes automated tests is automatically deployed to production"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Design — architecture and design decisions; threat modeling; security architecture review"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Development / Coding\" is described as:",
+      "choices": {
+        "A": "write the code following secure coding standards",
+        "B": "framework for improving organizational processes:",
+        "C": "Processes are standardized across the organization",
+        "D": "secure decommissioning; data sanitization; archival"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Development / Coding — write the code following secure coding standards"
+    }
+  ]
+}

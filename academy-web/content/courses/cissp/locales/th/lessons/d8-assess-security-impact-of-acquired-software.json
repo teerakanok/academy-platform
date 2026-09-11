@@ -1,0 +1,117 @@
+{
+  "nodeId": "d8-assess-security-impact-of-acquired-software",
+  "locale": "th",
+  "title": "Assess Security Impact of Acquired Software",
+  "objective": "Study-guide review — CISSP — Domain 8: Software Development Security: Assess Security Impact of Acquired Software.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Commercial Off-The-Shelf (COTS)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Pre-built software purchased from vendors (e.g., Microsoft Office, Oracle Database, SAP)",
+        "Security considerations: vendor patching cadence, known vulnerabilities, default configurations, vendor security track record",
+        "Limited ability to customize security — dependent on vendor's security implementation",
+        "Configuration hardening — disable unnecessary features, change defaults, apply vendor security guidelines",
+        "Verify vendor compliance with relevant security standards and regulations",
+        "Maintain inventory of all COTS software and monitor for security advisories"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Open-Source Software"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Source code is publicly available; can be inspected, modified, and distributed",
+        "Security advantages: community review (\"many eyes\"), transparency, ability to patch independently",
+        "Security risks: may lack dedicated security team, abandoned projects, supply chain attacks (malicious packages)",
+        "Due diligence: evaluate community activity, recent commits, known vulnerabilities, license terms",
+        "Monitor vulnerability databases for all open-source components in use"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Third-Party and Managed Services"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Cloud services, SaaS applications, managed security services",
+        "Security assessment: review vendor security certifications (SOC 2, ISO 27001), SLAs, data handling practices",
+        "Shared responsibility model — understand which security controls are the vendor's responsibility and which are yours",
+        "Right to audit — contracts should include provisions for security audits of the vendor",
+        "Data ownership and portability — ensure data can be extracted and migrated when the relationship ends",
+        "Risk of vendor lock-in, vendor compromise, or service discontinuation"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Configuration hardening: disable unnecessary features, change defaults, apply vendor security guidelines",
+    "Shared responsibility model: understand which security controls are the vendor's responsibility and which are yours",
+    "Right to audit: contracts should include provisions for security audits of the vendor",
+    "Data ownership and portability: ensure data can be extracted and migrated when the relationship ends"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Configuration hardening\" is described as:",
+      "choices": {
+        "A": "understand which security controls are the vendor's responsibility and which are yours",
+        "B": "contracts should include provisions for security audits of the vendor",
+        "C": "ensure data can be extracted and migrated when the relationship ends",
+        "D": "disable unnecessary features, change defaults, apply vendor security guidelines"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Configuration hardening — disable unnecessary features, change defaults, apply vendor security guidelines"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Shared responsibility model\" is described as:",
+      "choices": {
+        "A": "ensure data can be extracted and migrated when the relationship ends",
+        "B": "understand which security controls are the vendor's responsibility and which are yours",
+        "C": "contracts should include provisions for security audits of the vendor",
+        "D": "disable unnecessary features, change defaults, apply vendor security guidelines"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Shared responsibility model — understand which security controls are the vendor's responsibility and which are yours"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Right to audit\" is described as:",
+      "choices": {
+        "A": "ensure data can be extracted and migrated when the relationship ends",
+        "B": "contracts should include provisions for security audits of the vendor",
+        "C": "disable unnecessary features, change defaults, apply vendor security guidelines",
+        "D": "understand which security controls are the vendor's responsibility and which are yours"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Right to audit — contracts should include provisions for security audits of the vendor"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Data ownership and portability\" is described as:",
+      "choices": {
+        "A": "ensure data can be extracted and migrated when the relationship ends",
+        "B": "understand which security controls are the vendor's responsibility and which are yours",
+        "C": "disable unnecessary features, change defaults, apply vendor security guidelines",
+        "D": "contracts should include provisions for security audits of the vendor"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Data ownership and portability — ensure data can be extracted and migrated when the relationship ends"
+    }
+  ]
+}

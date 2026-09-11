@@ -1,0 +1,207 @@
+{
+  "nodeId": "d2-data-roles-and-responsibilities",
+  "locale": "th",
+  "title": "Data Roles and Responsibilities",
+  "objective": "Study-guide review — CISSP — Domain 2: Asset Security: Data Roles and Responsibilities.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Data Owners and Controllers"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Data Owner — Senior management; accountable for data protection and classification",
+        "Data Controller (GDPR) — Determines purposes and means of processing personal data",
+        "Owners define who can access data and under what conditions",
+        "Owners are ultimately accountable for asset protection",
+        "Classification decisions are the Owner's responsibility"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From the Official CBK (Table 2-3):"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Data Owner/Controller — Accountable for protection of data; holds legal rights and defines access requirements; identifies classification; decides who has access with what types of privileges"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: \"Owners are ultimately accountable for an asset and protecting its value. Owners should understand the importance of following governance mandates and the need to classify each asset they're accountable for.\" Data Owners must:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Define classification levels for their data",
+        "Approve access requests",
+        "Define retention and destruction requirements",
+        "Assist in identification and assessment of security controls",
+        "Be involved in risk assessment for their data"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Data Custodians and Processors"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Data Custodian — IT staff; implements and maintains controls per Owner's direction",
+        "Data Processor (GDPR) — Processes data on behalf of the Controller",
+        "Custodians handle day-to-day data management (backups, storage, access control)",
+        "Custodians do NOT make classification decisions",
+        "Processors must follow Controller's instructions for data handling"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Official CBK: The Data Custodian is responsible for:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Implementing security controls specified by the Owner",
+        "Performing regular backups and restoration testing",
+        "Managing data storage infrastructure",
+        "Ensuring data integrity through technical means",
+        "Verifying security requirements and security controls for information systems"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "GDPR-specific: Under GDPR, the Data Processor must:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Process data only as instructed by the Controller",
+        "Implement appropriate technical and organizational measures",
+        "Notify the Controller of any data breach without undue delay",
+        "Delete or return all personal data at end of processing relationship"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Data Stewards and Subjects"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Data Steward — Business responsibility for data quality, metadata, governance, compliance",
+        "Data Subject — Individual to whom personal data pertains",
+        "System Owner — Responsible for the system hosting the data",
+        "Stewards ensure data quality and consistency across the organization",
+        "Subjects have rights under privacy laws (access, correction, deletion)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Official CBK (Table 2-3):"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Data Steward — Business responsibility for data (metadata definition, data quality, governance, compliance)",
+        "Data Subject — Individual to whom personal data pertains"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Under GDPR, Data Subjects have rights including:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Right of access (view their data)",
+        "Right to rectification (correct errors)",
+        "Right to erasure (\"right to be forgotten\")",
+        "Right to data portability",
+        "Right to object to processing",
+        "Right not to be subject to automated decision-making"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Data Owner: Senior management; accountable for data protection and classification",
+    "Data Custodian: IT staff; implements and maintains controls per Owner's direction",
+    "Data Steward: Business responsibility for data quality, metadata, governance, compliance",
+    "Data Subject: Individual to whom personal data pertains",
+    "System Owner: Responsible for the system hosting the data",
+    "Data Steward: Business responsibility for data (metadata definition, data quality, governance, compliance)",
+    "Data Subject: Individual to whom personal data pertains"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Data Owner\" is described as:",
+      "choices": {
+        "A": "Business responsibility for data (metadata definition, data quality, governance, compliance)",
+        "B": "Business responsibility for data quality, metadata, governance, compliance",
+        "C": "IT staff; implements and maintains controls per Owner's direction",
+        "D": "Senior management; accountable for data protection and classification"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Data Owner — Senior management; accountable for data protection and classification"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Data Owner/Controller\" is described as:",
+      "choices": {
+        "A": "Senior management; accountable for data protection and classification",
+        "B": "Accountable for protection of data; holds legal rights and defines access requirements; identifies classification; decides who has access with what types of privileges",
+        "C": "Business responsibility for data quality, metadata, governance, compliance",
+        "D": "Business responsibility for data (metadata definition, data quality, governance, compliance)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Data Owner/Controller — Accountable for protection of data; holds legal rights and defines access requirements; identifies classification; decides who has access with what types of privileges"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Data Custodian\" is described as:",
+      "choices": {
+        "A": "IT staff; implements and maintains controls per Owner's direction",
+        "B": "Senior management; accountable for data protection and classification",
+        "C": "Business responsibility for data quality, metadata, governance, compliance",
+        "D": "Responsible for the system hosting the data"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Data Custodian — IT staff; implements and maintains controls per Owner's direction"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Data Steward\" is described as:",
+      "choices": {
+        "A": "Business responsibility for data (metadata definition, data quality, governance, compliance)",
+        "B": "IT staff; implements and maintains controls per Owner's direction",
+        "C": "Senior management; accountable for data protection and classification",
+        "D": "Business responsibility for data quality, metadata, governance, compliance"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Data Steward — Business responsibility for data quality, metadata, governance, compliance"
+    }
+  ]
+}

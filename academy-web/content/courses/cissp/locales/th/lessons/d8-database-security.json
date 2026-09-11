@@ -1,0 +1,169 @@
+{
+  "nodeId": "d8-database-security",
+  "locale": "th",
+  "title": "Database Security",
+  "objective": "Study-guide review — CISSP — Domain 8: Software Development Security: Database Security.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Database Concepts"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Relational database — data organized in tables (relations) with rows (tuples/records) and columns (attributes/fields)",
+        "Primary key — unique identifier for each row in a table",
+        "Foreign key — field that references the primary key of another table; establishes relationships",
+        "SQL (Structured Query Language) — standard language for querying and manipulating relational databases",
+        "ACID properties of transactions:",
+        "Atomicity — transaction completes entirely or not at all (all-or-nothing)",
+        "Consistency — transaction brings database from one valid state to another",
+        "Isolation — concurrent transactions do not interfere with each other",
+        "Durability — once committed, transaction results survive system failures",
+        "NoSQL databases — non-relational databases (document, key-value, graph, column-family); designed for scalability and flexibility"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Understanding database concepts is important for the CISSP because databases store the organization's most valuable data. Security professionals must understand both how databases work and how they can be attacked. Normalization is the process of organizing data to reduce redundancy and improve integrity. The normal forms (1NF, 2NF, 3NF, BCNF) progressively eliminate different types of data anomalies. While detailed knowledge of normalization levels is not required for the CISSP, understanding the concept of reducing redundancy to improve data integrity is important. Views provide a database security mechanism by controlling which data users can see. A view presents a virtual table that shows only specific columns or rows from the underlying tables. This supports the principle of least privilege — users see only the data they need."
+    },
+    {
+      "kind": "heading",
+      "text": "Database Security Concerns"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "SQL injection — the primary database attack vector; mitigated with parameterized queries",
+        "Excessive privileges — users with more database access than needed",
+        "Privilege abuse — legitimate users misusing their access",
+        "Database activity monitoring (DAM) — monitors and records database activity independent of the database engine",
+        "Encryption — encrypt sensitive data at rest (column-level or full-database encryption) and in transit (TLS)",
+        "Backup security — database backups contain all data and must be protected at the same level as the production database",
+        "Default accounts and configurations — disable default accounts, change default passwords, remove sample databases"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Inference and Aggregation"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Inference — deriving sensitive information from non-sensitive data through logical deduction",
+        "Example: knowing a department has 10 employees and 9 salaries, you can calculate the 10th",
+        "Defense: restrict access to combinations of data that could allow inference; careful query analysis",
+        "Aggregation — combining multiple pieces of non-sensitive data to derive sensitive information",
+        "Example: individually non-sensitive data points about military unit locations, sizes, and equipment combined to reveal classified troop strength",
+        "Defense: classification of aggregated data at a higher level than individual pieces; access controls on aggregate queries",
+        "Both attacks exploit the relationship between data elements rather than direct access to classified data"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Inference and aggregation are particularly challenging security problems because they involve deriving sensitive information from data that is individually non-sensitive. Traditional access controls that protect individual data elements may not prevent these attacks. The key difference:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Inference: Using logic and reasoning to deduce information that is not directly available. The attacker uses known data plus logic to determine unknown data.",
+        "Aggregation: Combining many small pieces of individually non-sensitive data to build a complete picture that is sensitive. The whole is more sensitive than the parts."
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Database security mechanisms to address these include: polyinstantiation, cell-level access controls, query analysis tools that detect potentially dangerous query patterns, and statistical database protections that add noise to query results. ⚠️ Exam Trap: Inference = deduction from existing data. Aggregation = combining non-sensitive pieces to create sensitive data. Both are database security concerns that traditional access controls don't fully address."
+    },
+    {
+      "kind": "heading",
+      "text": "Polyinstantiation"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Polyinstantiation — allowing multiple rows in a database with the same primary key but at different security levels",
+        "Purpose: prevent inference attacks by providing different data to users at different classification levels",
+        "Without polyinstantiation: if a user with Secret clearance queries for a record and gets \"no data found,\" they can infer that the record exists at a higher classification level (Top Secret)",
+        "With polyinstantiation: the user gets a plausible but different (possibly cover) record, preventing inference about the existence of higher-classified data",
+        "Adds complexity and storage overhead but addresses a real security gap"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Relational database: data organized in tables (relations) with rows (tuples/records) and columns (attributes/fields)",
+    "Primary key: unique identifier for each row in a table",
+    "Foreign key: field that references the primary key of another table; establishes relationships",
+    "SQL (Structured Query Language): standard language for querying and manipulating relational databases",
+    "Atomicity: transaction completes entirely or not at all (all-or-nothing)",
+    "Consistency: transaction brings database from one valid state to another",
+    "Isolation: concurrent transactions do not interfere with each other",
+    "Durability: once committed, transaction results survive system failures"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Relational database\" is described as:",
+      "choices": {
+        "A": "allowing multiple rows in a database with the same primary key but at different security levels",
+        "B": "data organized in tables (relations) with rows (tuples/records) and columns (attributes/fields)",
+        "C": "encrypt sensitive data at rest (column-level or full-database encryption) and in transit (TLS)",
+        "D": "database backups contain all data and must be protected at the same level as the production database"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Relational database — data organized in tables (relations) with rows (tuples/records) and columns (attributes/fields)"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Primary key\" is described as:",
+      "choices": {
+        "A": "users with more database access than needed",
+        "B": "unique identifier for each row in a table",
+        "C": "legitimate users misusing their access",
+        "D": "concurrent transactions do not interfere with each other"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Primary key — unique identifier for each row in a table"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Foreign key\" is described as:",
+      "choices": {
+        "A": "deriving sensitive information from non-sensitive data through logical deduction",
+        "B": "combining multiple pieces of non-sensitive data to derive sensitive information",
+        "C": "disable default accounts, change default passwords, remove sample databases",
+        "D": "field that references the primary key of another table; establishes relationships"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Foreign key — field that references the primary key of another table; establishes relationships"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"SQL (Structured Query Language)\" is described as:",
+      "choices": {
+        "A": "transaction completes entirely or not at all (all-or-nothing)",
+        "B": "monitors and records database activity independent of the database engine",
+        "C": "standard language for querying and manipulating relational databases",
+        "D": "the primary database attack vector; mitigated with parameterized queries"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: SQL (Structured Query Language) — standard language for querying and manipulating relational databases"
+    }
+  ]
+}

@@ -1,0 +1,199 @@
+{
+  "nodeId": "d6-security-metrics-and-reporting",
+  "locale": "en",
+  "title": "Security Metrics and Reporting",
+  "objective": "Study-guide review — CISSP — Domain 6: Security Assessment and Testing: Security Metrics and Reporting.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Key Performance Indicators"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "KPIs measure how well security objectives are being achieved",
+        "Quantifiable metrics tied to organizational goals",
+        "Examples: mean time to patch, percentage of systems scanned, training completion rate",
+        "Must be meaningful, measurable, and actionable",
+        "Reported to management regularly"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From the Official CBK: \"KPIs—Key Performance Indicators\" are one of two critical types of security metrics, along with KRIs. Common security KPIs:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Mean time to detect (MTTD) — How quickly threats are detected",
+        "Mean time to respond (MTTR) — How quickly incidents are addressed",
+        "Patch compliance rate — Percentage of systems patched within SLA",
+        "Vulnerability scan coverage — Percentage of assets scanned",
+        "Security awareness training completion — Percentage of employees trained",
+        "False positive rate — Accuracy of detection tools"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From the Official CBK: \"Management review and approval metrics typically focus on products and processes, including the review and approval process itself. Things like 'time to resolve defects,' 'number of defects identified,' 'defect detection effectiveness,' 'average cost per defect.'\""
+    },
+    {
+      "kind": "heading",
+      "text": "Key Risk Indicators"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "KRIs provide early warning of increasing risk",
+        "Leading indicators that predict potential security issues",
+        "Examples: number of unpatched critical systems, failed login attempts, expired certificates",
+        "Trigger proactive risk management actions",
+        "Different from KPIs (KPIs measure performance; KRIs measure risk)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From the Official CBK: \"Two types of metrics are very important: KPIs—Key Performance Indicators and KRIs—Key Risk Indicators.\" KPI vs KRI:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Metric Type",
+        "Measures",
+        "Orientation",
+        "Example"
+      ],
+      "rows": [
+        [
+          "KPI",
+          "Performance",
+          "Backward-looking (how we did)",
+          "Patch compliance: 95%"
+        ],
+        [
+          "KRI",
+          "Risk level",
+          "Forward-looking (what might happen)",
+          "50 unpatched critical systems"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: KPIs are LAGGING indicators (measuring past performance). KRIs are LEADING indicators (predicting future risk). Both are essential but serve different purposes."
+    },
+    {
+      "kind": "heading",
+      "text": "Management Review and Reporting"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Security reports must be tailored to the audience",
+        "Executive reports — High-level risk posture, trends, business impact",
+        "Technical reports — Detailed findings, CVEs, remediation steps",
+        "Compliance reports — Adherence to regulatory requirements",
+        "Reports should include trends (improving or worsening over time)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From the Official CBK: Incident Response Measurement should include:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Involved Parties: CIO, CISO",
+        "Data Source: Incident logs, incident tracking database",
+        "Reporting Format: Line chart that illustrates individual categories"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Metrics should be specific to the audience — \"what do they want to see, what do they need to know.\" ⚠️ Exam Trap: Report to executives in BUSINESS terms (risk, cost, impact), not technical terms (CVE numbers, port numbers). A CISO presenting to the board should say \"we reduced breach risk by 40%\" not \"we patched 500 CVEs.\""
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Mean time to detect (MTTD): How quickly threats are detected",
+    "Mean time to respond (MTTR): How quickly incidents are addressed",
+    "Patch compliance rate: Percentage of systems patched within SLA",
+    "Vulnerability scan coverage: Percentage of assets scanned",
+    "Security awareness training completion: Percentage of employees trained",
+    "False positive rate: Accuracy of detection tools",
+    "Executive reports: High-level risk posture, trends, business impact",
+    "Technical reports: Detailed findings, CVEs, remediation steps"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"Mean time to detect (MTTD)\" is described as:",
+      "choices": {
+        "A": "How quickly threats are detected",
+        "B": "Percentage of assets scanned",
+        "C": "How quickly incidents are addressed",
+        "D": "Percentage of employees trained"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Mean time to detect (MTTD) — How quickly threats are detected"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"Patch compliance rate\" is described as:",
+      "choices": {
+        "A": "Incident logs, incident tracking database",
+        "B": "Detailed findings, CVEs, remediation steps",
+        "C": "Adherence to regulatory requirements",
+        "D": "Percentage of systems patched within SLA"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Patch compliance rate — Percentage of systems patched within SLA"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"Security awareness training completion\" is described as:",
+      "choices": {
+        "A": "How quickly threats are detected",
+        "B": "Percentage of employees trained",
+        "C": "Percentage of assets scanned",
+        "D": "How quickly incidents are addressed"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Security awareness training completion — Percentage of employees trained"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"False positive rate\" is described as:",
+      "choices": {
+        "A": "Accuracy of detection tools",
+        "B": "How quickly threats are detected",
+        "C": "Percentage of employees trained",
+        "D": "Percentage of assets scanned"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: False positive rate — Accuracy of detection tools"
+    }
+  ]
+}

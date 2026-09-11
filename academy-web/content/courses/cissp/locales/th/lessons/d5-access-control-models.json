@@ -1,0 +1,270 @@
+{
+  "nodeId": "d5-access-control-models",
+  "locale": "th",
+  "title": "Access Control Models",
+  "objective": "Study-guide review — CISSP — Domain 5: Identity and Access Management (IAM): Access Control Models.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Discretionary Access Control"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Data owner decides who gets access",
+        "Based on Access Control Lists (ACLs)",
+        "Most flexible but least secure model",
+        "Subject identity determines access (identity-based)",
+        "Used in most commercial operating systems (Windows NTFS, Linux permissions)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Stewart: \"The DAC model allows the owner of data to modify permissions on the data. In the DAC model, objects have owners, and the owners can grant or deny access to objects that they own.\" From Chapple: \"Identity-based access control is a subset of DAC because systems identify users based on their identity and assign resource ownership to identities.\" DAC Weakness: Users can share or delegate access without centralized control. A user who owns a file can grant access to anyone, potentially violating organizational security policies. ⚠️ Exam Trap: DAC is the LEAST restrictive model. The owner has full control. This is the default in most operating systems."
+    },
+    {
+      "kind": "heading",
+      "text": "Mandatory Access Control"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "System enforces access based on security labels and clearances",
+        "Users cannot change access permissions (only administrators)",
+        "Uses classification labels (Top Secret, Secret, Confidential, Unclassified)",
+        "Most restrictive model; used in government/military",
+        "Based on Bell-LaPadula (confidentiality) and Biba (integrity) models"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Shon Harris: \"MAC Operating systems enforce the system's security policy through the use of security labels.\" From Stewart: \"The MAC model uses labels to assign access based on a user's need to know and organization policies.\" From Chapple: \"When documented in a table, the MAC model sometimes resembles a lattice.\" MAC requires:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Every subject has a security clearance",
+        "Every object has a classification label",
+        "System compares clearance to label for every access request",
+        "Administrators (not users) manage labels and clearances"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: MAC is SYSTEM-ENFORCED. Even the data owner cannot override MAC restrictions. DAC is OWNER-CONTROLLED. Know this fundamental distinction."
+    },
+    {
+      "kind": "heading",
+      "text": "Role-Based Access Control"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Access based on job role/function, not individual identity",
+        "Users assigned to roles; roles assigned permissions",
+        "Simplifies administration in large organizations",
+        "Supports separation of duties and least privilege",
+        "Most commonly used model in enterprise environments"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Shon Harris: \"RBAC Access decisions are based on each subject's role and/or functional position.\" From Stewart: When organizations need new capabilities, \"they would define the privileges needed for these new roles and how they plan on assigning the privileges, such as with groups.\" RBAC Components:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Users — Assigned to roles",
+        "Roles — Collections of permissions",
+        "Permissions — Access rights to resources",
+        "Sessions — Active user-role associations"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "RBAC Benefits:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Simplified administration (manage roles, not individual users)",
+        "Easy to enforce least privilege and SoD",
+        "Supports compliance requirements",
+        "Reduces administrative errors"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Attribute-Based Access Control"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Access based on attributes of subject, object, environment, and action",
+        "Most flexible and granular model",
+        "Uses policies that evaluate attributes at access time",
+        "Attributes: user role, department, time of day, location, resource sensitivity",
+        "Ideal for cloud and complex environments"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "ABAC Policy Example: \"Allow access to financial reports IF user.role = 'Finance' AND user.clearance >= document.classification AND time = business_hours AND location = 'corporate_network'\" ABAC vs RBAC:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Feature",
+        "RBAC",
+        "ABAC"
+      ],
+      "rows": [
+        [
+          "Granularity",
+          "Role-level",
+          "Attribute-level"
+        ],
+        [
+          "Flexibility",
+          "Moderate",
+          "Highest"
+        ],
+        [
+          "Complexity",
+          "Lower",
+          "Higher"
+        ],
+        [
+          "Context-aware",
+          "No",
+          "Yes"
+        ],
+        [
+          "Best for",
+          "Standard enterprise",
+          "Complex/cloud environments"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Rule-Based Access Control"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Access decisions based on predefined rules (IF-THEN)",
+        "Rules applied uniformly to all users (not individual-based)",
+        "Firewalls are the classic example (ACL rules)",
+        "Can be combined with other models for layered control",
+        "Rules typically managed by administrators, not users"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Stewart: \"A rule-based access control model uses rules to determine access.\" From the Official CBK: Rule-based access control \"reviews an incoming packet to determine if it comes from an IP address that is allowed, while a file-system reviews the current user against the file's ACL to determine if the requested action is allowed.\" ⚠️ Exam Trap: Rule-based is NOT the same as role-based. Rule-based uses predefined rules (like firewall ACLs). Role-based uses job function/role assignments. The names sound similar but function differently."
+    },
+    {
+      "kind": "heading",
+      "text": "Risk-Based Access Control"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Access decisions factor in real-time risk assessment",
+        "Considers context: location, device, behavior, time",
+        "May require additional authentication for high-risk access",
+        "Supports adaptive authentication (step-up when risk is detected)",
+        "Used by modern zero trust implementations"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Users: Assigned to roles",
+    "Roles: Collections of permissions",
+    "Permissions: Access rights to resources",
+    "Sessions: Active user-role associations",
+    "Best for: Standard enterprise"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"Users\" is described as:",
+      "choices": {
+        "A": "Standard enterprise",
+        "B": "Collections of permissions",
+        "C": "Assigned to roles",
+        "D": "Access rights to resources"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Users — Assigned to roles"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"Roles\" is described as:",
+      "choices": {
+        "A": "Collections of permissions",
+        "B": "Standard enterprise",
+        "C": "Active user-role associations",
+        "D": "Access rights to resources"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Roles — Collections of permissions"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"Permissions\" is described as:",
+      "choices": {
+        "A": "Collections of permissions",
+        "B": "Active user-role associations",
+        "C": "Standard enterprise",
+        "D": "Access rights to resources"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Permissions — Access rights to resources"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 5: Identity and Access Management, \"Sessions\" is described as:",
+      "choices": {
+        "A": "Active user-role associations",
+        "B": "Standard enterprise",
+        "C": "Access rights to resources",
+        "D": "Collections of permissions"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Sessions — Active user-role associations"
+    }
+  ]
+}

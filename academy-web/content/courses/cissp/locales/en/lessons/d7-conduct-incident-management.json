@@ -1,0 +1,206 @@
+{
+  "nodeId": "d7-conduct-incident-management",
+  "locale": "en",
+  "title": "Conduct Incident Management",
+  "objective": "Study-guide review — CISSP — Domain 7: Security Operations: Conduct Incident Management.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Incident Management Steps"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The CISSP Security Operations domain defines incident management steps as:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Detection — identify that an incident has occurred",
+        "Response — initial response to contain and assess the incident",
+        "Mitigation — actions to limit the impact of the incident",
+        "Reporting — notify stakeholders, management, and authorities as required",
+        "Recovery — restore systems to normal operations",
+        "Remediation — address the root cause to prevent recurrence",
+        "Lessons learned — post-incident review to improve processes"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "It's important to stress that incident management does not include just technical response — it encompasses the entire lifecycle from detection through lessons learned. The NIST SP 800-61 framework contains many of the same elements and has the same goal of effectively managing incident response. Each step is critical:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Detection: May come from automated systems (IDS/IPS, SIEM, AV alerts) or human observation (help desk calls, user reports). The ability to quickly and accurately detect incidents reduces their impact.",
+        "Response: The first response is to limit or contain the damage. This may include isolating affected systems, disabling compromised accounts, or blocking malicious IP addresses.",
+        "Mitigation: Goes beyond initial containment to actively reduce the impact. This may be ongoing as incidents are dynamic.",
+        "Reporting: Legal requirements may mandate notification to regulators, law enforcement, and affected individuals. Internal reporting to management is also essential.",
+        "Recovery: Restore systems from backups, rebuild from images, verify clean systems before returning to production.",
+        "Remediation: Address root cause — e.g., patching the vulnerability that was exploited, implementing anti-phishing training if the attack vector was phishing.",
+        "Lessons Learned: Formal post-incident review to identify what worked, what didn't, and what needs improvement."
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Know the CISSP-specific incident management steps in order: Detection → Response → Mitigation → Reporting → Recovery → Remediation → Lessons Learned. The NIST framework uses slightly different terminology but the concepts are the same."
+    },
+    {
+      "kind": "heading",
+      "text": "Detection"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Sources of detection: IDS/IPS alerts, SIEM correlation, antivirus alerts, user reports, audit log review, help desk tickets",
+        "Indicators of Compromise (IoCs) — artifacts that indicate a potential security incident has occurred",
+        "Importance of triage — quickly assess severity and scope to prioritize response efforts",
+        "Automated detection reduces mean time to detect (MTTD)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Response"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "First priority: contain the damage and prevent further spread",
+        "Containment strategies: isolate affected systems/networks, disable compromised accounts, block malicious IPs/domains",
+        "Ensure response actions preserve evidence for potential investigation — maintain chain of custody",
+        "Activate the Incident Response Team (IRT) per the incident response plan",
+        "The IR team must identify both the current and likely future impacts of the incident"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Mitigation"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Actively reduce the scope and impact of the incident beyond initial containment",
+        "May involve: applying emergency patches, updating firewall rules, implementing additional monitoring",
+        "Details of the response effort need to be carefully documented during mitigation",
+        "Use pre-established runbooks, checklists, or reaction guides — people in a crisis situation do not always make the best decisions, so planning ahead is crucial"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Reporting"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Internal reporting — notify management, CISO, legal, HR, and affected business units",
+        "External reporting — may be required to: regulators, law enforcement, affected individuals, breach notification authorities",
+        "Breach notification laws vary by jurisdiction — understand applicable timelines and requirements",
+        "Document all reporting actions: who was notified, when, by whom, what was communicated"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Recovery"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Restore systems to normal operations with verified clean state",
+        "Steps: restore from known-good backups, rebuild from hardened images, apply current patches",
+        "Verify system integrity before returning to production — scan for remaining compromise indicators",
+        "Update security controls based on lessons from the incident",
+        "May involve operations transfer to an alternative facility if the primary site is compromised"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Remediation and Lessons Learned"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Remediation — address the root cause to prevent the same or similar incidents from recurring",
+        "Examples: robust user anti-phishing training, blocking known malicious email senders/domains, implementing email security tools",
+        "Lessons learned — formal post-incident review meeting involving all stakeholders",
+        "Document: what happened, how it was detected, what went well, what needs improvement, action items",
+        "Update incident response plan, playbooks, and training based on findings",
+        "Use results to improve detective and preventive measures"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Detection: identify that an incident has occurred",
+    "Response: initial response to contain and assess the incident",
+    "Mitigation: actions to limit the impact of the incident",
+    "Reporting: notify stakeholders, management, and authorities as required",
+    "Recovery: restore systems to normal operations",
+    "Remediation: address the root cause to prevent recurrence",
+    "Lessons learned: post-incident review to improve processes",
+    "Indicators of Compromise (IoCs): artifacts that indicate a potential security incident has occurred"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Detection\" is described as:",
+      "choices": {
+        "A": "identify that an incident has occurred",
+        "B": "actions to limit the impact of the incident",
+        "C": "post-incident review to improve processes",
+        "D": "restore systems to normal operations"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Detection — identify that an incident has occurred"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Response\" is described as:",
+      "choices": {
+        "A": "initial response to contain and assess the incident",
+        "B": "address the root cause to prevent recurrence",
+        "C": "actions to limit the impact of the incident",
+        "D": "notify stakeholders, management, and authorities as required"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Response — initial response to contain and assess the incident"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Mitigation\" is described as:",
+      "choices": {
+        "A": "address the root cause to prevent recurrence",
+        "B": "post-incident review to improve processes",
+        "C": "identify that an incident has occurred",
+        "D": "actions to limit the impact of the incident"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Mitigation — actions to limit the impact of the incident"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Reporting\" is described as:",
+      "choices": {
+        "A": "artifacts that indicate a potential security incident has occurred",
+        "B": "notify management, CISO, legal, HR, and affected business units",
+        "C": "notify stakeholders, management, and authorities as required",
+        "D": "formal post-incident review meeting involving all stakeholders"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Reporting — notify stakeholders, management, and authorities as required"
+    }
+  ]
+}

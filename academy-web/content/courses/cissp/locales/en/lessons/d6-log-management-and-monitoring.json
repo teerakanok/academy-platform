@@ -1,0 +1,144 @@
+{
+  "nodeId": "d6-log-management-and-monitoring",
+  "locale": "en",
+  "title": "Log Management and Monitoring",
+  "objective": "Study-guide review — CISSP — Domain 6: Security Assessment and Testing: Log Management and Monitoring.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Log Collection and Analysis"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Collect logs from all security-relevant systems (firewalls, IDS, servers, applications)",
+        "Logs must be protected from tampering (write-once storage, digital signatures)",
+        "Centralized log management — Aggregate logs in a single location",
+        "Log retention — Keep logs long enough for compliance and forensics",
+        "Time synchronization (NTP) — Essential for correlating events across systems"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "SIEM Systems"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Security Information and Event Management — Centralizes log analysis",
+        "Real-time correlation of events from multiple sources",
+        "Alerting on suspicious patterns and policy violations",
+        "Compliance reporting — Automated reports for auditors",
+        "Examples: Splunk, IBM QRadar, Microsoft Sentinel, Elastic SIEM"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SIEM capabilities:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Log aggregation — Collect logs from diverse sources",
+        "Normalization — Convert different log formats to common format",
+        "Correlation — Identify relationships between events",
+        "Alerting — Notify on matching rule or anomaly",
+        "Dashboards — Visual representation of security posture",
+        "Forensic analysis — Search and investigate historical events"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: SIEM is for MONITORING and ANALYSIS. It requires proper configuration of rules and baselines to be effective. A SIEM without tuning produces too many false positives and becomes \"shelfware.\""
+    },
+    {
+      "kind": "heading",
+      "text": "Continuous Monitoring"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Ongoing assessment of security controls and risk posture",
+        "Automates detection of configuration drift and new vulnerabilities",
+        "Supports near real-time awareness of security state",
+        "Required by NIST SP 800-137 and FISMA",
+        "Includes: vulnerability scanning, configuration management, log monitoring"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Centralized log management: Aggregate logs in a single location",
+    "Log retention: Keep logs long enough for compliance and forensics",
+    "Time synchronization (NTP): Essential for correlating events across systems",
+    "Security Information and Event Management: Centralizes log analysis",
+    "Compliance reporting: Automated reports for auditors",
+    "Log aggregation: Collect logs from diverse sources",
+    "Normalization: Convert different log formats to common format",
+    "Correlation: Identify relationships between events"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"Centralized log management\" is described as:",
+      "choices": {
+        "A": "Identify relationships between events",
+        "B": "Aggregate logs in a single location",
+        "C": "Collect logs from diverse sources",
+        "D": "Notify on matching rule or anomaly"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Centralized log management — Aggregate logs in a single location"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"Log retention\" is described as:",
+      "choices": {
+        "A": "Visual representation of security posture",
+        "B": "Convert different log formats to common format",
+        "C": "Keep logs long enough for compliance and forensics",
+        "D": "Essential for correlating events across systems"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Log retention — Keep logs long enough for compliance and forensics"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"Time synchronization (NTP)\" is described as:",
+      "choices": {
+        "A": "Essential for correlating events across systems",
+        "B": "Visual representation of security posture",
+        "C": "Keep logs long enough for compliance and forensics",
+        "D": "Convert different log formats to common format"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Time synchronization (NTP) — Essential for correlating events across systems"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 6: Security Assessment and Testing, \"Security Information and Event Management\" is described as:",
+      "choices": {
+        "A": "Notify on matching rule or anomaly",
+        "B": "Centralizes log analysis",
+        "C": "Collect logs from diverse sources",
+        "D": "Automated reports for auditors"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Security Information and Event Management — Centralizes log analysis"
+    }
+  ]
+}

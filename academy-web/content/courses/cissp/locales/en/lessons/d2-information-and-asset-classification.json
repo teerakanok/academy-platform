@@ -1,0 +1,226 @@
+{
+  "nodeId": "d2-information-and-asset-classification",
+  "locale": "en",
+  "title": "Information and Asset Classification",
+  "objective": "Study-guide review — CISSP — Domain 2: Asset Security: Information and Asset Classification.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Data Classification Levels"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Government/Military Classifications (most to least sensitive):"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Top Secret — Unauthorized disclosure could cause exceptionally grave damage to national security",
+        "Secret — Unauthorized disclosure could cause serious damage to national security",
+        "Confidential — Unauthorized disclosure could cause damage to national security",
+        "Unclassified — Not classified; may still be sensitive (e.g., FOUO, SBU)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: Classification of information determines the level of protection required. The classification system is designed to protect national security information based on the damage that unauthorized disclosure could cause. From Stewart: \"Items labeled as confidential, secret, and top secret are collectively known as classified. Often, revealing the actual classification of data to unauthorized individuals is a violation of the classification system.\" From Shon Harris: \"The U.S. president, vice president, and agency heads can classify data in the United States. Additionally, individuals in any of these positions can delegate permission for others to classify data.\" ⚠️ Exam Trap: Classifications apply not just to data but also to hardware and systems that process classified data. A computer processing top secret data is itself classified at the top secret level."
+    },
+    {
+      "kind": "heading",
+      "text": "Commercial Data Classifications"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Common commercial classification levels (most to least sensitive):"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Confidential/Restricted — Highest sensitivity; trade secrets, competitive advantage",
+        "Private — Personal information (PII, employee records)",
+        "Sensitive — Data requiring extra protection beyond normal",
+        "Public — Available to anyone; no special protection needed"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Government",
+        "Commercial Equivalent",
+        "Damage if Disclosed"
+      ],
+      "rows": [
+        [
+          "Top Secret",
+          "Confidential/Restricted",
+          "Catastrophic business damage"
+        ],
+        [
+          "Secret",
+          "Private",
+          "Significant business impact"
+        ],
+        [
+          "Confidential",
+          "Sensitive",
+          "Moderate impact"
+        ],
+        [
+          "Unclassified",
+          "Public",
+          "Minimal or no impact"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Stewart: Organizations aren't required to use specific classification labels. However, it is important that they classify data so that they can properly protect it based on its value. From Shon Harris: Examples of confidential/restricted data include healthcare information, programming code, and information that keeps the company competitive. Public data can be deleted using regular measures when it is time to do so. ⚠️ Exam Trap: The exam may present non-standard classification labels. Focus on the CONCEPT (most sensitive to least sensitive) rather than specific labels."
+    },
+    {
+      "kind": "heading",
+      "text": "Classification Procedures"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Data Owner is responsible for defining classification levels",
+        "Classification must be based on value, sensitivity, and criticality of data",
+        "Classification must be reviewed periodically and adjusted as value changes",
+        "Classification determines handling, storage, and destruction requirements",
+        "Overclassification wastes resources; underclassification creates risk"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: \"The classification of assets must be adjusted over time to ensure the assets are protected based on the value that they represent to the organization. The classification of an asset also drives archiving and retention requirements.\" From Chapple: \"A data classification policy identifies classification labels used within the organization. It also identifies how data owners can determine the proper classification, and how personnel should protect data based on its classification.\" Classification considerations:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Value to the organization",
+        "Sensitivity of the information",
+        "Legal/regulatory requirements",
+        "Age of the information (may decrease in sensitivity over time)",
+        "Cost of protection vs. cost of loss"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Asset Classification and Labeling"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "All assets must be inventoried and assigned an owner",
+        "Assets should be labeled with their classification level",
+        "Labels must be clearly visible and consistent",
+        "Media is labeled with the highest classification level of data it contains",
+        "Both physical and digital assets require classification"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From the Official CBK: Classification policies should:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Define varying forms of asset media (digital, tape, paper, etc.)",
+        "Include all factors that drive value, which determine how assets are protected",
+        "Outline asset liability and consequences of regulatory oversight",
+        "Describe industry standard classification schemes"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: \"Media is typically labeled with the highest classification level of data it contains.\" If a USB drive contains both public and secret data, the entire drive is classified as secret."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Top Secret: Unauthorized disclosure could cause exceptionally grave damage to national security",
+    "Secret: Unauthorized disclosure could cause serious damage to national security",
+    "Confidential: Unauthorized disclosure could cause damage to national security",
+    "Unclassified: Not classified; may still be sensitive (e.g., FOUO, SBU)",
+    "Confidential/Restricted: Highest sensitivity; trade secrets, competitive advantage",
+    "Private: Personal information (PII, employee records)",
+    "Sensitive: Data requiring extra protection beyond normal",
+    "Public: Available to anyone; no special protection needed"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Top Secret\" is described as:",
+      "choices": {
+        "A": "Unauthorized disclosure could cause exceptionally grave damage to national security",
+        "B": "Unauthorized disclosure could cause serious damage to national security",
+        "C": "Unauthorized disclosure could cause damage to national security",
+        "D": "Highest sensitivity; trade secrets, competitive advantage"
+      },
+      "correct": [
+        "A"
+      ],
+      "explanation": "The study guide states: Top Secret — Unauthorized disclosure could cause exceptionally grave damage to national security"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Secret\" is described as:",
+      "choices": {
+        "A": "Highest sensitivity; trade secrets, competitive advantage",
+        "B": "Unauthorized disclosure could cause exceptionally grave damage to national security",
+        "C": "Unauthorized disclosure could cause serious damage to national security",
+        "D": "Unauthorized disclosure could cause damage to national security"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Secret — Unauthorized disclosure could cause serious damage to national security"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Confidential\" is described as:",
+      "choices": {
+        "A": "Unauthorized disclosure could cause serious damage to national security",
+        "B": "Not classified; may still be sensitive (e.g., FOUO, SBU)",
+        "C": "Highest sensitivity; trade secrets, competitive advantage",
+        "D": "Unauthorized disclosure could cause damage to national security"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Confidential — Unauthorized disclosure could cause damage to national security"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Unclassified\" is described as:",
+      "choices": {
+        "A": "Highest sensitivity; trade secrets, competitive advantage",
+        "B": "Not classified; may still be sensitive (e.g., FOUO, SBU)",
+        "C": "Unauthorized disclosure could cause damage to national security",
+        "D": "Available to anyone; no special protection needed"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Unclassified — Not classified; may still be sensitive (e.g., FOUO, SBU)"
+    }
+  ]
+}

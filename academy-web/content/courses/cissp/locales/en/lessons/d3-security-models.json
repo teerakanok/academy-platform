@@ -1,0 +1,328 @@
+{
+  "nodeId": "d3-security-models",
+  "locale": "en",
+  "title": "Security Models",
+  "objective": "Study-guide review — CISSP — Domain 3: Security Architecture and Engineering: Security Models.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "State Machine Model"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Foundation for many formal security models",
+        "System is always in a defined state (set of permissions and access)",
+        "Secure state — all access permissions are controlled and enforced",
+        "State transitions must maintain security invariants",
+        "Bell-LaPadula and Biba are built on the state machine model"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Shon Harris: \"The developer must define a secure state for each state variable. The next step is to define and identify the allowable state transition functions. These functions will describe how the system transitions between states while maintaining security.\" A system is in a secure state when:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "All subjects can only access objects they are authorized to access",
+        "All state transitions maintain the security properties",
+        "No unauthorized information flow can occur"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Bell-LaPadula Model"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Focuses on CONFIDENTIALITY (protects against unauthorized disclosure)",
+        "Simple Security Property (\"No Read Up\") — Subject cannot read above their clearance",
+        "Star (*) Property (\"No Write Down\") — Subject cannot write to a lower classification",
+        "Strong Star Property — Subject can only read/write at their own level",
+        "Does NOT address integrity"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Chapple: \"The Bell-LaPadula properties are in place to protect data confidentiality. A subject cannot read an object that is classified at a higher level than the subject is cleared for.\""
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Property",
+        "Rule",
+        "Purpose"
+      ],
+      "rows": [
+        [
+          "Simple Security",
+          "No Read Up",
+          "Prevents unauthorized reading"
+        ],
+        [
+          "Star (*)",
+          "No Write Down",
+          "Prevents information leakage"
+        ],
+        [
+          "Strong Star",
+          "Read/Write only at own level",
+          "Strictest enforcement"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Shon Harris: \"The Bell-LaPadula model deals only with confidentiality, while the Biba and Clark-Wilson models deal only with integrity.\" Mnemonic: Bell-LaPadula = \"BLP = Be Low for Peace\" (you can't read up, can't write down — keeps secrets UP) ⚠️ Exam Trap: Bell-LaPadula is CONFIDENTIALITY only. It says nothing about integrity. A user can write to a higher level (star property allows write up), which could corrupt data at higher levels. This is why Biba exists."
+    },
+    {
+      "kind": "heading",
+      "text": "Biba Model"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Focuses on INTEGRITY (protects against unauthorized modification)",
+        "Simple Integrity Property (\"No Read Down\") — Subject cannot read from lower integrity",
+        "Star (*) Integrity Property (\"No Write Up\") — Subject cannot write to higher integrity",
+        "Inverse of Bell-LaPadula",
+        "Does NOT address confidentiality"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Property",
+        "Rule",
+        "Purpose"
+      ],
+      "rows": [
+        [
+          "Simple Integrity",
+          "No Read Down",
+          "Prevents corruption by lower-integrity data"
+        ],
+        [
+          "Star (*) Integrity",
+          "No Write Up",
+          "Prevents corruption of higher-integrity data"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Mnemonic: Biba = \"Biba = Basically Integrity\" — No Read Down, No Write Up (protects integrity by keeping lower-quality data from contaminating higher levels) Comparison:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "Bell-LaPadula",
+        "Biba"
+      ],
+      "rows": [
+        [
+          "Protects",
+          "Confidentiality",
+          "Integrity"
+        ],
+        [
+          "No Read",
+          "Up (no read above clearance)",
+          "Down (no read from lower integrity)"
+        ],
+        [
+          "No Write",
+          "Down (no write below clearance)",
+          "Up (no write to higher integrity)"
+        ]
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: Bell-LaPadula and Biba are INVERSES of each other. Bell-LaPadula: No Read Up, No Write Down. Biba: No Read Down, No Write Up. The exam frequently tests this distinction."
+    },
+    {
+      "kind": "heading",
+      "text": "Clark-Wilson Model"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Focuses on INTEGRITY through well-formed transactions",
+        "Uses Constrained Data Items (CDIs) — data protected by the model",
+        "Unconstrained Data Items (UDIs) — data not yet validated",
+        "Transformation Procedures (TPs) — only authorized operations that can modify CDIs",
+        "Integrity Verification Procedures (IVPs) — verify CDI integrity"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Stewart: \"An integrity verification procedure (IVP) is a procedure that scans data items and confirms their integrity. Transformation procedures (TPs) are the only procedures that are allowed to modify a CDI.\" Clark-Wilson is more practical than Biba for commercial environments because:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "It enforces well-formed transactions (like accounting double-entry bookkeeping)",
+        "Users access data only through authorized programs (TPs)",
+        "Separation of duties is built into the model",
+        "It's the closest model to how real commercial systems work"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Key Concept: Users never access CDIs directly — they must go through TPs. This is similar to how database applications work: users interact with the application (TP), not the database directly."
+    },
+    {
+      "kind": "heading",
+      "text": "Brewer-Nash Model"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Also called the Chinese Wall model",
+        "Prevents conflicts of interest by dynamically controlling access",
+        "Once a user accesses data from one competitor, they're blocked from accessing data from rival competitors",
+        "Used in financial, legal, and consulting environments",
+        "Access restrictions are dynamic — they change based on prior access history"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Example: A consulting firm advises both Coca-Cola and Pepsi. Once a consultant accesses Coca-Cola's data, they are automatically prevented from accessing Pepsi's data (and vice versa). This prevents conflict of interest and information leakage between competitors. The model addresses both confidentiality and integrity through conflict-of-interest classes."
+    },
+    {
+      "kind": "heading",
+      "text": "Graham-Denning and Harrison-Ruzzo-Ullman"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Graham-Denning — Defines 8 primitive protection rights for subjects and objects",
+        "Addresses how to create, delete, and transfer access rights securely",
+        "Harrison-Ruzzo-Ullman (HRU) — Extension of Graham-Denning with formal access matrix",
+        "Both address the access control matrix concept",
+        "Focus on the secure management of access rights"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Graham-Denning's 8 basic protection rights:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Create object",
+        "Create subject",
+        "Delete object",
+        "Delete subject",
+        "Read access rights",
+        "Grant access rights",
+        "Delete access rights",
+        "Transfer access rights"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "These models formalize how access control decisions are made and managed, forming the theoretical foundation for modern access control systems."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Secure state: all access permissions are controlled and enforced",
+    "Simple Security Property (\"No Read Up\"): Subject cannot read above their clearance",
+    "Star (*) Property (\"No Write Down\"): Subject cannot write to a lower classification",
+    "Strong Star Property: Subject can only read/write at their own level",
+    "Strong Star: Read/Write only at own level",
+    "Simple Integrity Property (\"No Read Down\"): Subject cannot read from lower integrity",
+    "Star (*) Integrity Property (\"No Write Up\"): Subject cannot write to higher integrity",
+    "Protects: Confidentiality"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 3: Security Architecture and Engineering, \"Secure state\" is described as:",
+      "choices": {
+        "A": "Subject cannot write to a lower classification",
+        "B": "all access permissions are controlled and enforced",
+        "C": "Extension of Graham-Denning with formal access matrix",
+        "D": "only authorized operations that can modify CDIs"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Secure state — all access permissions are controlled and enforced"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 3: Security Architecture and Engineering, \"Simple Security Property (\"No Read Up\")\" is described as:",
+      "choices": {
+        "A": "Subject cannot write to a lower classification",
+        "B": "Subject cannot write to higher integrity",
+        "C": "Subject cannot read from lower integrity",
+        "D": "Subject cannot read above their clearance"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Simple Security Property (\"No Read Up\") — Subject cannot read above their clearance"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 3: Security Architecture and Engineering, \"Star (*) Property (\"No Write Down\")\" is described as:",
+      "choices": {
+        "A": "all access permissions are controlled and enforced",
+        "B": "Subject cannot write to a lower classification",
+        "C": "only authorized operations that can modify CDIs",
+        "D": "Subject can only read/write at their own level"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Star (*) Property (\"No Write Down\") — Subject cannot write to a lower classification"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 3: Security Architecture and Engineering, \"Strong Star Property\" is described as:",
+      "choices": {
+        "A": "Subject cannot write to a lower classification",
+        "B": "Subject can only read/write at their own level",
+        "C": "only authorized operations that can modify CDIs",
+        "D": "all access permissions are controlled and enforced"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Strong Star Property — Subject can only read/write at their own level"
+    }
+  ]
+}

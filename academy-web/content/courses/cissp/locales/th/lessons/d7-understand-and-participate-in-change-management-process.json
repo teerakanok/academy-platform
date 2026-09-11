@@ -1,0 +1,137 @@
+{
+  "nodeId": "d7-understand-and-participate-in-change-management-process",
+  "locale": "th",
+  "title": "Understand and Participate in Change Management Processes",
+  "objective": "Study-guide review — CISSP — Domain 7: Security Operations: Understand and Participate in Change Management Processes.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Change Management Lifecycle"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Request — formal submission of the proposed change with justification",
+        "Review — assess the impact, risk, and resource requirements of the change",
+        "Approve/Reject — change advisory board or authorized individual makes the decision",
+        "Test — validate the change in a non-production environment",
+        "Implement — deploy the approved and tested change during a maintenance window",
+        "Document — record all details of the change: what, when, who, why, outcome",
+        "Post-implementation review — verify the change achieved its objectives without unintended consequences"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Change management processes help prevent outages by ensuring changes are reviewed, approved, and tested before deployment",
+        "Ensures that changes are documented — critical for disaster recovery (e.g., administrators can review logs to see what changed recently)",
+        "Rollback plan — every change should have a documented plan to reverse it if problems occur"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Change management is a foundational operations security process. Without proper change management, unauthorized or poorly tested changes can introduce vulnerabilities, cause outages, or create configuration drift. A change log should track all approved changes. It can be manually created or generated from an internal system as personnel record activity related to a change. Change logs are useful for tracking approved changes and are also helpful as part of a disaster recovery program — administrators can review the change logs to identify recent changes that may have contributed to a failure. Emergency changes (e.g., critical security patches for actively exploited vulnerabilities) may follow an expedited process, but they should still be documented after the fact and reviewed by the CAB in the next regular meeting."
+    },
+    {
+      "kind": "heading",
+      "text": "Change Advisory Board (CAB)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "CAB — committee responsible for reviewing and approving/rejecting proposed changes",
+        "Composition: representatives from IT, security, business units, and management",
+        "Evaluates: technical feasibility, business impact, risk, resource requirements, scheduling",
+        "Emergency CAB (ECAB) — smaller group with authority to approve emergency changes quickly"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Configuration Management Database (CMDB)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Central repository of information about IT assets and their configurations",
+        "Tracks configuration items (CIs) — hardware, software, documentation, and their relationships",
+        "Essential for: change impact analysis, incident investigation, disaster recovery planning",
+        "Every installed application and service must be part of the CMDB so vulnerabilities can be tracked",
+        "Integration with change management — all changes should update the CMDB"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Request: formal submission of the proposed change with justification",
+    "Review: assess the impact, risk, and resource requirements of the change",
+    "Approve/Reject: change advisory board or authorized individual makes the decision",
+    "Test: validate the change in a non-production environment",
+    "Implement: deploy the approved and tested change during a maintenance window",
+    "Document: record all details of the change: what, when, who, why, outcome",
+    "Post-implementation review: verify the change achieved its objectives without unintended consequences",
+    "Rollback plan: every change should have a documented plan to reverse it if problems occur"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Request\" is described as:",
+      "choices": {
+        "A": "record all details of the change: what, when, who, why, outcome",
+        "B": "formal submission of the proposed change with justification",
+        "C": "assess the impact, risk, and resource requirements of the change",
+        "D": "change advisory board or authorized individual makes the decision"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Request — formal submission of the proposed change with justification"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Review\" is described as:",
+      "choices": {
+        "A": "change advisory board or authorized individual makes the decision",
+        "B": "assess the impact, risk, and resource requirements of the change",
+        "C": "deploy the approved and tested change during a maintenance window",
+        "D": "record all details of the change: what, when, who, why, outcome"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Review — assess the impact, risk, and resource requirements of the change"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Approve/Reject\" is described as:",
+      "choices": {
+        "A": "assess the impact, risk, and resource requirements of the change",
+        "B": "smaller group with authority to approve emergency changes quickly",
+        "C": "deploy the approved and tested change during a maintenance window",
+        "D": "change advisory board or authorized individual makes the decision"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Approve/Reject — change advisory board or authorized individual makes the decision"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 7: Security Operations, \"Test\" is described as:",
+      "choices": {
+        "A": "assess the impact, risk, and resource requirements of the change",
+        "B": "record all details of the change: what, when, who, why, outcome",
+        "C": "validate the change in a non-production environment",
+        "D": "formal submission of the proposed change with justification"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Test — validate the change in a non-production environment"
+    }
+  ]
+}

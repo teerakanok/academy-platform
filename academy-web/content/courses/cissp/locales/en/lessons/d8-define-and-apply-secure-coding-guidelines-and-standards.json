@@ -1,0 +1,270 @@
+{
+  "nodeId": "d8-define-and-apply-secure-coding-guidelines-and-standards",
+  "locale": "en",
+  "title": "Define and Apply Secure Coding Guidelines and Standards",
+  "objective": "Study-guide review — CISSP — Domain 8: Software Development Security: Define and Apply Secure Coding Guidelines and Standards.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "OWASP Top 10"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The OWASP Top 10 represents the most critical web application security risks. No standard is a guaranteed match for every organization, so these should be used as starting points from which organizations can develop and implement their own practices (a process known as tailoring)."
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "#",
+        "Risk",
+        "Description"
+      ],
+      "rows": [
+        [
+          "1",
+          "Broken Access Control",
+          "Users act outside their intended permissions"
+        ],
+        [
+          "2",
+          "Cryptographic Failures",
+          "Failures in cryptography leading to data exposure"
+        ],
+        [
+          "3",
+          "Injection",
+          "Untrusted data sent to an interpreter (SQL, OS, LDAP)"
+        ],
+        [
+          "4",
+          "Insecure Design",
+          "Missing or ineffective security controls in design"
+        ],
+        [
+          "5",
+          "Security Misconfiguration",
+          "Default configs, unnecessary features, verbose errors"
+        ],
+        [
+          "6",
+          "Vulnerable and Outdated Components",
+          "Using components with known vulnerabilities"
+        ],
+        [
+          "7",
+          "Identification and Authentication Failures",
+          "Weaknesses in authentication mechanisms"
+        ],
+        [
+          "8",
+          "Software and Data Integrity Failures",
+          "Code/infrastructure without integrity verification"
+        ],
+        [
+          "9",
+          "Security Logging and Monitoring Failures",
+          "Insufficient logging, monitoring, and alerting"
+        ],
+        [
+          "10",
+          "Server-Side Request Forgery (SSRF)",
+          "Application fetches remote resources without validation"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "OWASP has led the effort to design coding guidelines and standards for a variety of languages, software libraries, and application environments like web and mobile. The OWASP Top 10 is the most well-known output, but OWASP also provides:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "OWASP Application Security Verification Standard (ASVS) — detailed security requirements",
+        "OWASP Testing Guide — comprehensive testing methodology",
+        "OWASP Cheat Sheet Series — quick reference guides for specific security topics",
+        "OWASP Mobile Security Project — mobile-specific security guidance"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Frameworks that automatically implement security controls (such as anti-XSS protections or CSRF tokens) should be incorporated into development practices and awareness training. Using frameworks with built-in security features is far more reliable than expecting every developer to implement security correctly from scratch. ⚠️ Exam Trap: Know the OWASP Top 10 categories at a high level. The exam is unlikely to ask about specific rankings but may present scenarios that map to these categories — especially injection, broken access control, and security misconfiguration."
+    },
+    {
+      "kind": "heading",
+      "text": "Secure Coding Practices"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The CMU Software Engineering Institute (SEI) publishes the Top 10 Secure Coding Practices (which actually contains twelve practices):"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Validate input — validate all input from untrusted sources",
+        "Heed compiler warnings — compile code with the highest warning level and address all warnings",
+        "Architect and design for security — create a software architecture and design following security principles",
+        "Keep it simple — reduce attack surface by keeping code simple and minimizing complexity",
+        "Default deny — base access decisions on permission rather than exclusion",
+        "Adhere to the principle of least privilege — every process should operate with the minimum set of privileges",
+        "Sanitize data sent to other systems — sanitize all output sent to other systems (databases, shells, etc.)",
+        "Practice defense in depth — manage risk with multiple defensive strategies",
+        "Use effective quality assurance techniques — thorough testing helps find and eliminate vulnerabilities",
+        "Adopt a secure coding standard — develop and implement a secure coding standard for your language/platform"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "heading",
+      "text": "Input Validation"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "All input from untrusted sources must be validated — type, format, length, range, encoding",
+        "Allowlisting (whitelist) approach — define what IS allowed; reject everything else (preferred over denylisting)",
+        "Denylisting (blacklist) approach — define what IS NOT allowed; allow everything else (weaker, can be bypassed)",
+        "Validate on the server side — client-side validation can be bypassed",
+        "Parameterized queries (prepared statements) — separate code from data to prevent injection attacks",
+        "Canonicalization — convert input to a standard form before validation to prevent encoding-based bypass attacks"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Input validation is the single most important secure coding practice. The majority of software vulnerabilities — including SQL injection, XSS, buffer overflow, and command injection — result from insufficient input validation. The allowlisting approach is strongly preferred over denylisting. With denylisting, you must anticipate every possible malicious input — and attackers are constantly finding new ways to bypass filters. With allowlisting, you define exactly what valid input looks like, and anything that doesn't match is rejected. Parameterized queries are the primary defense against SQL injection. Instead of concatenating user input into SQL strings, parameters are bound separately so the database treats them as data, not executable code. This eliminates the ability for an attacker to inject SQL commands through user input."
+    },
+    {
+      "kind": "heading",
+      "text": "Output Encoding"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Encode output before rendering to prevent injection attacks (especially XSS)",
+        "HTML encoding — convert special characters (<, >, &, \", ') to HTML entities",
+        "URL encoding — encode special characters in URLs using percent-encoding",
+        "JavaScript encoding — escape characters that have special meaning in JavaScript",
+        "Context-specific encoding — use the right encoding for the output context (HTML body, HTML attribute, JavaScript, CSS, URL)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Error Handling and Logging"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Fail securely — when errors occur, the system should default to a secure state (deny access, not grant it)",
+        "Do not expose sensitive information in error messages — stack traces, internal paths, database structures, version numbers",
+        "Log security-relevant events: authentication attempts, access control failures, input validation failures, application errors",
+        "Logs from application-level should be correlated with infrastructure logs for comprehensive monitoring",
+        "Data from multiple sources should be correlated to provide investigators with a holistic view of incidents"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Session Management"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Generate strong, random session identifiers — sufficient entropy to prevent guessing",
+        "Session timeout — terminate sessions after a period of inactivity",
+        "Session invalidation — properly destroy sessions on logout (server-side, not just client-side)",
+        "Protect session tokens: HTTPS only, HttpOnly cookie flag (prevents JavaScript access), Secure cookie flag (only sent over HTTPS), SameSite attribute (prevents CSRF)",
+        "Regenerate session ID after authentication to prevent session fixation attacks",
+        "Do not expose session IDs in URLs"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "CMU SEI Secure Coding Standards"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Language-specific secure coding standards published by Carnegie Mellon's Software Engineering Institute",
+        "Available for C, C++, Java, Perl, and Android",
+        "Provide detailed rules and recommendations organized by category (input validation, declarations, expressions, memory management, etc.)",
+        "Each rule includes: description, noncompliant code example, compliant code example, risk assessment",
+        "Organizations should adopt and tailor these standards to their specific development environment"
+      ]
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Broken Access Control: Users act outside their intended permissions",
+    "Cryptographic Failures: Failures in cryptography leading to data exposure",
+    "Injection: Untrusted data sent to an interpreter (SQL, OS, LDAP)",
+    "Insecure Design: Missing or ineffective security controls in design",
+    "Security Misconfiguration: Default configs, unnecessary features, verbose errors",
+    "Vulnerable and Outdated Components: Using components with known vulnerabilities",
+    "Identification and Authentication Failures: Weaknesses in authentication mechanisms",
+    "Software and Data Integrity Failures: Code/infrastructure without integrity verification"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Broken Access Control\" is described as:",
+      "choices": {
+        "A": "Using components with known vulnerabilities",
+        "B": "Insufficient logging, monitoring, and alerting",
+        "C": "manage risk with multiple defensive strategies",
+        "D": "Users act outside their intended permissions"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Broken Access Control: Users act outside their intended permissions"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Cryptographic Failures\" is described as:",
+      "choices": {
+        "A": "terminate sessions after a period of inactivity",
+        "B": "Code/infrastructure without integrity verification",
+        "C": "Failures in cryptography leading to data exposure",
+        "D": "Missing or ineffective security controls in design"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Cryptographic Failures: Failures in cryptography leading to data exposure"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Injection\" is described as:",
+      "choices": {
+        "A": "Code/infrastructure without integrity verification",
+        "B": "Missing or ineffective security controls in design",
+        "C": "Untrusted data sent to an interpreter (SQL, OS, LDAP)",
+        "D": "Default configs, unnecessary features, verbose errors"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Injection: Untrusted data sent to an interpreter (SQL, OS, LDAP)"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 8: Software Development Security, \"Insecure Design\" is described as:",
+      "choices": {
+        "A": "Code/infrastructure without integrity verification",
+        "B": "Missing or ineffective security controls in design",
+        "C": "Failures in cryptography leading to data exposure",
+        "D": "Untrusted data sent to an interpreter (SQL, OS, LDAP)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Insecure Design: Missing or ineffective security controls in design"
+    }
+  ]
+}

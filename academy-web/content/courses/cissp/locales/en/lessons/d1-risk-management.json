@@ -1,0 +1,495 @@
+{
+  "nodeId": "d1-risk-management",
+  "locale": "en",
+  "title": "Risk Management",
+  "objective": "Study-guide review — CISSP — Domain 1: Security and Risk Management: Risk Management.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Risk Management Concepts"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Risk = Threat × Vulnerability × Impact (probability of loss)",
+        "Threat — Any potential danger to assets",
+        "Vulnerability — Weakness that can be exploited by a threat",
+        "Impact — Harm that results when a threat exploits a vulnerability",
+        "Asset — Anything of value to the organization"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP (Figure 1-5): The relationship between risk components:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Threat — A potential cause of an unwanted incident",
+        "Vulnerability — A weakness in a system that can be exploited",
+        "Risk — The likelihood that a threat will exploit a vulnerability and the resulting impact",
+        "Impact — The damage that occurs when a risk is realized",
+        "Exposure — The extent to which an organization is susceptible to a loss"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Additional terms:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Threat Agent/Source — The entity that exploits the vulnerability",
+        "Threat Vector — The method used to exploit the vulnerability",
+        "Countermeasure/Safeguard — Control implemented to reduce risk"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: \"It is important to consider all possible risks when performing risk evaluation, including accidents, natural disasters, financial threats, civil unrest, pandemics, physical threats, technical exploitations, and social engineering attacks.\""
+    },
+    {
+      "kind": "heading",
+      "text": "Risk Assessment Methodologies"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Quantitative — Uses numerical values and financial calculations (ALE, SLE, ARO)",
+        "Qualitative — Uses subjective ratings (High/Medium/Low) based on judgment",
+        "Hybrid — Combines both approaches (most common in practice)",
+        "Quantitative is more objective but harder to perform",
+        "Qualitative is faster but more subjective"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Method",
+        "Pros",
+        "Cons"
+      ],
+      "rows": [
+        [
+          "Quantitative",
+          "Objective, financial values, supports cost-benefit analysis",
+          "Requires extensive data, time-consuming"
+        ],
+        [
+          "Qualitative",
+          "Faster, easier to perform, requires less data",
+          "Subjective, harder to justify financially"
+        ],
+        [
+          "Hybrid",
+          "Best of both, practical",
+          "Still requires some data"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: \"Risk prioritization (or criticality prioritization) can be as simple as ordering risks from worst to least unfavorable or sorting ALEs from largest to smallest. However, complex and integrated risk analysis methods may integrate qualitative and quantitative elements together.\" The quantitative approach starts with asset valuation and threat identification, which can be performed in any order. This results in asset-threat pairings that need estimations of harm potential/severity and frequency/likelihood."
+    },
+    {
+      "kind": "heading",
+      "text": "Threat Modeling"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Systematic process for identifying and categorizing threats to assets",
+        "STRIDE — Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege",
+        "DREAD — Measures and ranks threat severity",
+        "PASTA — Process for Attack Simulation and Threat Analysis (7 stages)",
+        "Ultimate goal: prioritize potential threats against valuable assets"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: \"Numerous threat modeling methodologies exist, and the primary goal of most is to provide a systematic and deliberate means of identifying and categorizing threats to a given asset.\" STRIDE (developed by Microsoft):"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Letter",
+        "Threat",
+        "CIA Impact"
+      ],
+      "rows": [
+        [
+          "S",
+          "Spoofing",
+          "Authentication"
+        ],
+        [
+          "T",
+          "Tampering",
+          "Integrity"
+        ],
+        [
+          "R",
+          "Repudiation",
+          "Non-repudiation"
+        ],
+        [
+          "I",
+          "Information Disclosure",
+          "Confidentiality"
+        ],
+        [
+          "D",
+          "Denial of Service",
+          "Availability"
+        ],
+        [
+          "E",
+          "Elevation of Privilege",
+          "Authorization"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "DREAD measures threat severity across five dimensions:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Damage potential",
+        "Reproducibility",
+        "Exploitability",
+        "Affected users",
+        "Discoverability"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "PASTA (Process for Attack Simulation and Threat Analysis): From Official CBK: \"PASTA is a risk-centric methodology, developed in 2012, that supports dynamic threat analysis. The PASTA methodology integrates business objectives with technical requirements, making the output more easily understood by upper management.\" PASTA has 7 stages (from Destination CISSP, Table 1-28). From Stewart: \"It's common to pair threats with vulnerabilities to identify threats that can exploit assets and represent significant risks. The ultimate goal of threat modeling is to prioritize the potential threats against an organization's valuable assets.\" ⚠️ Exam Trap: STRIDE identifies threat TYPES. DREAD RANKS threat severity. PASTA integrates BUSINESS objectives with technical analysis. Know the purpose of each."
+    },
+    {
+      "kind": "heading",
+      "text": "Quantitative Risk Analysis Formulas"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "AV (Asset Value) — Dollar value of the asset",
+        "EF (Exposure Factor) — Percentage of asset loss (0-100%)",
+        "SLE = AV × EF — Single Loss Expectancy",
+        "ARO (Annualized Rate of Occurrence) — Expected frequency per year",
+        "ALE = SLE × ARO — Annualized Loss Expectancy"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Step-by-step Quantitative Risk Analysis:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Asset Valuation (AV): Determine the dollar value of each asset",
+        "Exposure Factor (EF): Estimate the percentage of asset loss from a specific threat",
+        "Calculate SLE: SLE = AV × EF",
+        "Estimate ARO: How often the threat is expected to occur per year",
+        "Calculate ALE: ALE = SLE × ARO"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "Example:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Server value (AV) = $200,000",
+        "Exposure Factor for fire (EF) = 45%",
+        "SLE = $200,000 × 0.45 = $90,000",
+        "Fire expected once every 10 years (ARO) = 0.1",
+        "ALE = $90,000 × 0.1 = $9,000/year"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Chapple: \"SLE is an element of quantitative risk analysis that represents the cost associated with a single realized risk against a specific asset. The formula is SLE = asset value (AV) × exposure factor (EF).\" From Stewart: \"The EF represents the percentage of loss that an organization would experience if a specific asset were violated by a realized risk. The EF can also be called the loss potential.\" Cost-Benefit Analysis for Controls:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "ALE (before control) − ALE (after control) − Cost of control = Value of control",
+        "If the value is positive, the control is justified",
+        "If negative, the control costs more than the risk"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: \"It is not a good business practice to implement controls that cost more than the risk they are meant to mitigate.\" ⚠️ Exam Trap: Memorize: SLE = AV × EF, ALE = SLE × ARO. Also know that if EF or ARO is missing from a question, you cannot calculate the full formula. From Ahmed (How to Think Like a Manager): \"When values are missing, the correct choice will be determined by knowing the concepts.\""
+    },
+    {
+      "kind": "heading",
+      "text": "Qualitative Risk Analysis"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Uses subjective ratings: High, Medium, Low (or 1-5 scale)",
+        "Based on expert judgment and group consensus",
+        "Common techniques: Delphi method, brainstorming, interviews, questionnaires",
+        "Results displayed in a risk matrix (likelihood × impact)",
+        "Faster and less expensive than quantitative analysis"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Delphi Method: An anonymous feedback technique where experts independently assess risks, then results are shared and iteratively refined until consensus is reached. Anonymity prevents groupthink and dominant personality bias. Risk Matrix Example:"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "",
+        "Low Impact",
+        "Medium Impact",
+        "High Impact"
+      ],
+      "rows": [
+        [
+          "High Likelihood",
+          "Medium",
+          "High",
+          "Critical"
+        ],
+        [
+          "Medium Likelihood",
+          "Low",
+          "Medium",
+          "High"
+        ],
+        [
+          "Low Likelihood",
+          "Low",
+          "Low",
+          "Medium"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: Qualitative value analysis uses relative measures rather than exact financial values. It is often used as a starting point before deciding whether a full quantitative analysis is needed."
+    },
+    {
+      "kind": "heading",
+      "text": "Risk Response Strategies"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Risk Avoidance — Stop the activity that creates the risk",
+        "Risk Mitigation — Implement controls to reduce likelihood or impact",
+        "Risk Transfer — Shift risk to a third party (insurance, outsourcing)",
+        "Risk Acceptance — Acknowledge and accept the risk (document it!)",
+        "Risk Deterrence — Discourage threat agents from acting",
+        "Risk Rejection — Ignoring risk (NEVER acceptable — not a valid strategy!)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP (Figure 1-8): \"To avoid risk means to choose to stop doing whatever exposes the asset to risk.\" From Shon Harris: A company could \"decide not to allow any IM activity by their users because there is not a strong enough business need for its continued use. Discontinuing this service is an example of risk avoidance.\" Risk Acceptance requires formal documentation: From Stewart: \"In most cases, accepting risk requires a clearly written statement that indicates why a safeguard was not implemented, who is responsible for the decision, and who will be accountable if the risk is realized.\" Risk Transfer (also called Risk Assignment/Transference): From Destination CISSP: \"Purchasing cybersecurity insurance or traditional insurance and outsourcing are common forms of assigning or transferring risk.\" ⚠️ Exam Trap: Risk REJECTION (ignoring/denying risk) is NEVER acceptable. Risk ACCEPTANCE is valid but must be documented and approved by management. Don't confuse the two. ⚠️ Exam Trap: Insurance transfers FINANCIAL risk but not LIABILITY or RESPONSIBILITY. You can transfer the financial impact of a breach but you're still responsible for protecting the data. From Destination CISSP: \"It is not a good business practice to implement controls that cost more than the risk they are meant to mitigate. If the cost of a control is more than the cost of the risk, a good business decision would be to accept the risk.\""
+    },
+    {
+      "kind": "heading",
+      "text": "Risk Appetite, Tolerance, and Capacity"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Risk Appetite — Amount of risk an organization is willing to accept to achieve goals",
+        "Risk Tolerance — Acceptable variation from the risk appetite",
+        "Risk Capacity — Maximum risk an organization can absorb before failure",
+        "Residual Risk — Risk remaining after controls are implemented",
+        "Total Risk = Threats × Vulnerabilities × Asset Value"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Concept",
+        "Definition",
+        "Example"
+      ],
+      "rows": [
+        [
+          "Risk Appetite",
+          "How much risk the organization WANTS to take",
+          "\"We accept moderate risk for innovation\""
+        ],
+        [
+          "Risk Tolerance",
+          "How much deviation from appetite is OK",
+          "±10% from expected loss"
+        ],
+        [
+          "Risk Capacity",
+          "Maximum risk before existential threat",
+          "Total revenue, total assets"
+        ],
+        [
+          "Residual Risk",
+          "Risk after controls applied",
+          "Risk − Control effectiveness"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Key Formula:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Total Risk = Threats × Vulnerabilities × Asset Value",
+        "Residual Risk = Total Risk − Controls (or Total Risk × (1 − Control Effectiveness))"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Management must formally accept residual risk. If residual risk exceeds risk appetite, additional controls must be implemented."
+    },
+    {
+      "kind": "heading",
+      "text": "Risk Frameworks"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "NIST RMF (Risk Management Framework) — 7 steps: Prepare, Categorize, Select, Implement, Assess, Authorize, Monitor",
+        "ISO 31000 — International standard for enterprise risk management",
+        "COSO ERM — Enterprise Risk Management framework (Committee of Sponsoring Organizations)",
+        "OCTAVE — Operationally Critical Threat, Asset, and Vulnerability Evaluation (Carnegie Mellon)",
+        "FAIR — Factor Analysis of Information Risk (quantitative risk model)"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "NIST RMF Steps:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Prepare — Establish context and priorities",
+        "Categorize — Classify information systems by impact level",
+        "Select — Choose appropriate security controls",
+        "Implement — Put controls in place",
+        "Assess — Evaluate control effectiveness",
+        "Authorize — Senior management accepts remaining risk",
+        "Monitor — Continuous monitoring of controls"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "paragraph",
+      "text": "ISO 31000 provides a universal framework for risk management applicable to any type of risk, not just information security. It focuses on integrating risk management into organizational governance and decision-making. ⚠️ Exam Trap: NIST RMF is the U.S. government standard. ISO 31000 is international. FAIR is the only framework that focuses specifically on QUANTITATIVE risk analysis."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Threat: Any potential danger to assets",
+    "Vulnerability: Weakness that can be exploited by a threat",
+    "Impact: Harm that results when a threat exploits a vulnerability",
+    "Asset: Anything of value to the organization",
+    "Threat: A potential cause of an unwanted incident",
+    "Vulnerability: A weakness in a system that can be exploited",
+    "Risk: The likelihood that a threat will exploit a vulnerability and the resulting impact",
+    "Impact: The damage that occurs when a risk is realized"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Threat\" is described as:",
+      "choices": {
+        "A": "Percentage of asset loss (0-100%)",
+        "B": "Any potential danger to assets",
+        "C": "Establish context and priorities",
+        "D": "Evaluate control effectiveness"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Threat — Any potential danger to assets"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Vulnerability\" is described as:",
+      "choices": {
+        "A": "The entity that exploits the vulnerability",
+        "B": "A potential cause of an unwanted incident",
+        "C": "Weakness that can be exploited by a threat",
+        "D": "Acceptable variation from the risk appetite"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Vulnerability — Weakness that can be exploited by a threat"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Impact\" is described as:",
+      "choices": {
+        "A": "Ignoring risk (NEVER acceptable — not a valid strategy!)",
+        "B": "Maximum risk an organization can absorb before failure",
+        "C": "Uses subjective ratings (High/Medium/Low) based on judgment",
+        "D": "Harm that results when a threat exploits a vulnerability"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Impact — Harm that results when a threat exploits a vulnerability"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 1: Security and Risk Management, \"Asset\" is described as:",
+      "choices": {
+        "A": "Discourage threat agents from acting",
+        "B": "Anything of value to the organization",
+        "C": "How much deviation from appetite is OK",
+        "D": "Maximum risk before existential threat"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Asset — Anything of value to the organization"
+    }
+  ]
+}

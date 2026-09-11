@@ -1,0 +1,234 @@
+{
+  "nodeId": "d2-data-lifecycle-management",
+  "locale": "en",
+  "title": "Data Lifecycle Management",
+  "objective": "Study-guide review — CISSP — Domain 2: Asset Security: Data Lifecycle Management.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Data Lifecycle Stages"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Create — Data is generated or collected",
+        "Store — Data is placed in a storage medium",
+        "Use — Data is accessed and used for business purposes",
+        "Share — Data is distributed to authorized parties",
+        "Archive — Data is moved to long-term storage",
+        "Destroy — Data is securely disposed of when no longer needed"
+      ],
+      "ordered": true
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP (Figure 2-3): \"As information moves through each stage of the life cycle, it may increase or decrease in classification or value, and it should be protected at its level.\" Each stage has different security requirements:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Create — Classify at creation; apply initial access controls",
+        "Store — Encrypt at rest; implement access controls and backups",
+        "Use — Protect in memory; control access; audit usage",
+        "Share — Encrypt in transit; verify recipient authorization",
+        "Archive — Maintain protection; ensure recoverability; define retention period",
+        "Destroy — Use appropriate sanitization method based on classification"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From the Official CBK: \"Data archiving requirements include media type, security requirements, and availability requirements.\" ⚠️ Exam Trap: Data must be protected at EVERY stage of the lifecycle. The most commonly overlooked stages are Archive (organizations forget about archived data) and Destroy (organizations fail to properly sanitize media)."
+    },
+    {
+      "kind": "heading",
+      "text": "Data States"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Data at Rest — Stored data (files on disk, database entries)",
+        "Data in Transit — Data moving across networks",
+        "Data in Use — Data being actively processed in memory"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Data State",
+        "Description",
+        "Protection Methods"
+      ],
+      "rows": [
+        [
+          "At Rest",
+          "Stored on disk, database, tape, USB",
+          "Full-disk encryption (FDE), file encryption, access controls, backups"
+        ],
+        [
+          "In Transit",
+          "Moving over network (LAN, WAN, Internet)",
+          "TLS/SSL, VPN, IPsec, email encryption"
+        ],
+        [
+          "In Use",
+          "Active in memory/CPU processing",
+          "Memory protection, process isolation, secure enclaves"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: \"Data at rest refers to data that is stored somewhere. Data at rest can be protected and secured through access control mechanisms, backups (and restores), and encryption.\" From Chapple: \"Data in use (also called data being processed) refers to data in memory or temporary storage buffers while an application is using it. Applications often decrypt encrypted data before placing it in memory. This allows the application to work on it, but it's important to flush these buffers when the data is no longer needed.\" ⚠️ Exam Trap: Data in use is the HARDEST to protect because it must be decrypted for processing. Technologies like Intel SGX (Secure Guard Extensions) and AMD SEV (Secure Encrypted Virtualization) aim to protect data in use."
+    },
+    {
+      "kind": "heading",
+      "text": "Data Retention Policies"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Define how long data must be kept based on legal, regulatory, and business needs",
+        "Retention periods vary by data type and jurisdiction",
+        "Data should be securely destroyed when retention period expires",
+        "Keeping data longer than necessary increases risk and liability",
+        "Retention policies can reduce liabilities in legal proceedings"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Destination CISSP: \"Retention policies can reduce liabilities.\" If an organization has a clear retention policy and properly destroys data according to that policy, it may have a legal defense against demands for data that no longer exists. From the Official CBK: \"Do not keep records longer than is necessary to accomplish the original purpose for which the information was collected.\" Key considerations:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Legal requirements (e.g., financial records: 7 years; medical records: varies by state)",
+        "Regulatory requirements (e.g., SOX, HIPAA, GDPR)",
+        "Business requirements (e.g., customer contracts, project documentation)",
+        "Cost of storage vs. value of retained data"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: The exam tests whether data should be DESTROYED when no longer needed. Keeping unnecessary data increases both storage costs and breach liability."
+    },
+    {
+      "kind": "heading",
+      "text": "Legal Hold (Litigation Hold)"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "A legal hold overrides normal retention and destruction policies when litigation is reasonably anticipated or pending",
+        "Organizations must preserve all potentially relevant data when a legal hold is in effect — even data scheduled for deletion",
+        "Failure to preserve data under legal hold can result in spoliation sanctions (adverse inference, fines, case dismissal)",
+        "Legal hold applies to: email, documents, databases, backup tapes, chat logs, voicemail — any electronically stored information (ESI)",
+        "Legal counsel or compliance officer typically issues the legal hold notice"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Chapple: \"A company cannot legally delete potential evidence after a lawsuit is filed. However, if a retention policy is in place and data is destroyed according to that policy BEFORE litigation is anticipated, the organization has a stronger legal defense.\" Key points:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "A legal hold suspends all data destruction activities for the relevant data",
+        "The hold remains in effect until litigation concludes or counsel lifts it",
+        "Organizations should have a legal hold process documented as part of their data governance program",
+        "Employees must be notified of legal holds and trained on their obligations to preserve data",
+        "Automated retention/deletion systems must have the capability to exempt data under legal hold"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "Scenario (Exam Context): An organization has a policy of deleting emails older than 6 months. A lawsuit is filed. The organization MUST immediately suspend the email deletion policy for all data potentially relevant to the lawsuit. Continuing to delete emails after a lawsuit is filed = spoliation = severe legal penalties. ⚠️ Exam Trap: Legal hold OVERRIDES retention policies. Even if your policy says \"delete after 90 days,\" you CANNOT delete data that is subject to a legal hold. The exam tests whether candidates understand that litigation preservation takes precedence over standard retention schedules."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Create: Data is generated or collected",
+    "Store: Data is placed in a storage medium",
+    "Use: Data is accessed and used for business purposes",
+    "Share: Data is distributed to authorized parties",
+    "Archive: Data is moved to long-term storage",
+    "Destroy: Data is securely disposed of when no longer needed",
+    "Create: Classify at creation; apply initial access controls",
+    "Store: Encrypt at rest; implement access controls and backups"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Create\" is described as:",
+      "choices": {
+        "A": "Data is placed in a storage medium",
+        "B": "Data moving across networks",
+        "C": "Active in memory/CPU processing",
+        "D": "Data is generated or collected"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Create — Data is generated or collected"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Store\" is described as:",
+      "choices": {
+        "A": "Data is moved to long-term storage",
+        "B": "Stored on disk, database, tape, USB",
+        "C": "Active in memory/CPU processing",
+        "D": "Data is placed in a storage medium"
+      },
+      "correct": [
+        "D"
+      ],
+      "explanation": "The study guide states: Store — Data is placed in a storage medium"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Use\" is described as:",
+      "choices": {
+        "A": "Protect in memory; control access; audit usage",
+        "B": "Stored data (files on disk, database entries)",
+        "C": "Data is accessed and used for business purposes",
+        "D": "Data is securely disposed of when no longer needed"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Use — Data is accessed and used for business purposes"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 2: Asset Security, \"Share\" is described as:",
+      "choices": {
+        "A": "Stored data (files on disk, database entries)",
+        "B": "Data is distributed to authorized parties",
+        "C": "Data being actively processed in memory",
+        "D": "Moving over network (LAN, WAN, Internet)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Share — Data is distributed to authorized parties"
+    }
+  ]
+}

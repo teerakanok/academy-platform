@@ -1,0 +1,248 @@
+{
+  "nodeId": "d4-secure-network-design",
+  "locale": "th",
+  "title": "Secure Network Design",
+  "objective": "Study-guide review — CISSP — Domain 4: Communication and Network Security: Secure Network Design.",
+  "blocks": [
+    {
+      "kind": "heading",
+      "text": "Network Segmentation"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Divides network into smaller, isolated segments",
+        "Limits lateral movement after a breach",
+        "Reduces attack surface within each segment",
+        "Implemented through firewalls, VLANs, and subnets",
+        "Supports zero trust architecture through micro-segmentation"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "DMZ Architecture"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Demilitarized Zone — Segment between external and internal networks",
+        "Hosts public-facing services (web servers, email gateways, DNS)",
+        "Protected by two firewalls (external-facing and internal-facing)",
+        "External firewall allows specific traffic to DMZ; internal firewall restricts DMZ-to-LAN",
+        "Compromise of DMZ server does NOT give direct access to internal network"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Dual-Firewall DMZ Architecture: `` Internet → [External Firewall] → DMZ → [Internal Firewall] → LAN `` The external firewall permits specific inbound traffic (HTTP/HTTPS to web server). The internal firewall is more restrictive, allowing only necessary communication from DMZ to internal resources (e.g., database queries on specific ports). ⚠️ Exam Trap: A DMZ with two firewalls from DIFFERENT vendors provides better defense in depth. A vulnerability in one vendor's firewall is unlikely to exist in the other vendor's product."
+    },
+    {
+      "kind": "heading",
+      "text": "VLANs"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Virtual LAN — Logically separates network segments on the same switch",
+        "Creates separate broadcast domains without additional hardware",
+        "Configured on managed switches (Layer 2)",
+        "VLAN hopping — Attack that jumps between VLANs (double tagging, switch spoofing)",
+        "VLANs are NOT a security boundary alone — use with firewalls/ACLs"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "VLAN Security Best Practices:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "Disable unused ports and assign to an unused VLAN",
+        "Change the native VLAN from the default (VLAN 1)",
+        "Use 802.1Q trunking with explicit VLAN tagging",
+        "Enable port security to limit MAC addresses per port",
+        "Don't rely on VLANs as the sole security control"
+      ]
+    },
+    {
+      "kind": "callout",
+      "tone": "warning",
+      "title": "Exam trap",
+      "text": "⚠️ Exam Trap: VLANs provide LOGICAL separation, not PHYSICAL separation. VLAN hopping attacks (double tagging, switch spoofing) can bypass VLAN boundaries. Always pair VLANs with ACLs and firewalls."
+    },
+    {
+      "kind": "heading",
+      "text": "Network Access Control"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "NAC (802.1X) — Controls device access to the network",
+        "Verifies identity, health, and compliance before granting access",
+        "Supplicant (client) → Authenticator (switch/AP) → Authentication Server (RADIUS)",
+        "Non-compliant devices sent to remediation VLAN",
+        "Supports BYOD security and guest network access"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Software-Defined Networking"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "SDN — Separates control plane from data plane",
+        "Control plane — Decision-making (routing logic, managed centrally)",
+        "Data plane — Traffic forwarding (switches, routers)",
+        "Enables programmable, dynamic network management",
+        "Security concern: centralized controller is a single point of failure/attack"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "Converged Protocols"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "FCoE (Fibre Channel over Ethernet) — Carries storage traffic over Ethernet networks",
+        "iSCSI (Internet Small Computer System Interface) — Carries SCSI storage commands over IP networks",
+        "VoIP (Voice over IP) — Carries voice traffic over IP; uses SIP/RTP protocols",
+        "MPLS (Multiprotocol Label Switching) — High-performance traffic routing using labels",
+        "Convergence introduces new attack surfaces — storage, voice, and data on same network"
+      ]
+    },
+    {
+      "kind": "heading",
+      "text": "📚 Extended Notes"
+    },
+    {
+      "kind": "table",
+      "headers": [
+        "Protocol",
+        "Carries",
+        "Over",
+        "Security Concern"
+      ],
+      "rows": [
+        [
+          "FCoE",
+          "Storage (Fibre Channel)",
+          "Ethernet",
+          "Storage traffic exposed to network attacks; no native encryption"
+        ],
+        [
+          "iSCSI",
+          "Storage (SCSI)",
+          "IP/TCP",
+          "Vulnerable to IP-based attacks; must use IPsec or CHAP auth"
+        ],
+        [
+          "VoIP",
+          "Voice",
+          "IP/UDP",
+          "Eavesdropping, caller ID spoofing, toll fraud, DoS"
+        ],
+        [
+          "MPLS",
+          "Any",
+          "Label-switched paths",
+          "Label spoofing, path manipulation"
+        ]
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "VoIP Security:"
+    },
+    {
+      "kind": "list",
+      "items": [
+        "RTP (Real-time Transport Protocol) — carries voice data; no encryption",
+        "SRTP (Secure RTP) — encrypted version; provides confidentiality and authentication",
+        "VoIP requires QoS to ensure voice quality — attackers can degrade QoS to disrupt calls"
+      ]
+    },
+    {
+      "kind": "paragraph",
+      "text": "From Chapple: \"Other concepts that may be considered examples of converged technologies include VPN, SDN, cloud, virtualization, SOA, microservices, and serverless architecture.\" ⚠️ Exam Trap: Converged protocols combine multiple types of traffic (storage, voice, data) onto a single network. This creates risk because a compromise of the shared network can affect ALL services. The exam tests whether you understand the security implications of convergence, particularly with VoIP (eavesdropping via packet capture) and iSCSI (storage traffic vulnerable to IP attacks)."
+    }
+  ],
+  "attribution": "v2 Unified Edition — Synthesized from 7 CISSP reference books Sources: Destination CISSP (Witcher), ISC2 Study Guide (Chapple), James Stewart, Official CBK (Deane), Shon Harris All-in-One, How To Think Like A Manager (Ahmed) Date: 2026-04-10",
+  "cheatsheet": [
+    "Demilitarized Zone: Segment between external and internal networks",
+    "Virtual LAN: Logically separates network segments on the same switch",
+    "VLAN hopping: Attack that jumps between VLANs (double tagging, switch spoofing)",
+    "NAC (802.1X): Controls device access to the network",
+    "SDN: Separates control plane from data plane",
+    "Control plane: Decision-making (routing logic, managed centrally)",
+    "Data plane: Traffic forwarding (switches, routers)",
+    "FCoE (Fibre Channel over Ethernet): Carries storage traffic over Ethernet networks"
+  ],
+  "checkpoint": [
+    {
+      "id": "q1",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"Demilitarized Zone\" is described as:",
+      "choices": {
+        "A": "High-performance traffic routing using labels",
+        "B": "Carries SCSI storage commands over IP networks",
+        "C": "Segment between external and internal networks",
+        "D": "Carries storage traffic over Ethernet networks"
+      },
+      "correct": [
+        "C"
+      ],
+      "explanation": "The study guide states: Demilitarized Zone — Segment between external and internal networks"
+    },
+    {
+      "id": "q2",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"Virtual LAN\" is described as:",
+      "choices": {
+        "A": "Segment between external and internal networks",
+        "B": "Logically separates network segments on the same switch",
+        "C": "Decision-making (routing logic, managed centrally)",
+        "D": "Carries voice traffic over IP; uses SIP/RTP protocols"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: Virtual LAN — Logically separates network segments on the same switch"
+    },
+    {
+      "id": "q3",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"VLAN hopping\" is described as:",
+      "choices": {
+        "A": "Logically separates network segments on the same switch",
+        "B": "Attack that jumps between VLANs (double tagging, switch spoofing)",
+        "C": "Carries voice traffic over IP; uses SIP/RTP protocols",
+        "D": "Decision-making (routing logic, managed centrally)"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: VLAN hopping — Attack that jumps between VLANs (double tagging, switch spoofing)"
+    },
+    {
+      "id": "q4",
+      "prompt": "In the study guide for Domain 4: Communication and Network Security, \"NAC (802.1X)\" is described as:",
+      "choices": {
+        "A": "Traffic forwarding (switches, routers)",
+        "B": "Controls device access to the network",
+        "C": "Separates control plane from data plane",
+        "D": "High-performance traffic routing using labels"
+      },
+      "correct": [
+        "B"
+      ],
+      "explanation": "The study guide states: NAC (802.1X) — Controls device access to the network"
+    }
+  ]
+}
